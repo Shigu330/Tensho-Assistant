@@ -7,7 +7,7 @@
 tags are protected (repository rulesets). `build.yml` also has a job that builds like the Dalamud repository (since 0.512,
 `docs/evidence/0.512-d17-build.md`).
 
-The files in this folder are the drafts of 0.323 and are **no longer kept in step** (checked on 2026-11-09, version 0.971): in `.github/`,
+The files in this folder are the drafts of 0.323 and are **no longer kept in step** (checked on 2026-11-09): in `.github/`,
 Dependabot has raised the action versions, `CodeQL.yml` now builds the plugin with Dalamud's reference assemblies (`build-mode: manual`)
 instead of `build-mode: none`, and its pull request trigger watches `main` only. Read `.github/` for what runs; this folder is history.
 
@@ -51,7 +51,7 @@ normalize).
 `Stable-*` sont protégés (rulesets du dépôt). `build.yml` a aussi un job qui compile comme le dépôt Dalamud (depuis la 0.512,
 `docs/evidence/0.512-d17-build.md`).
 
-Les fichiers de ce dossier sont les brouillons de la 0.323 et **ne sont plus tenus à jour** (vérifié le 2026-11-09, version 0.971) : dans
+Les fichiers de ce dossier sont les brouillons de la 0.323 et **ne sont plus tenus à jour** (vérifié le 2026-11-09) : dans
 `.github/`, Dependabot a monté les versions des actions, `CodeQL.yml` compile maintenant le plugin avec les assemblys de référence de
 Dalamud (`build-mode: manual`) au lieu de `build-mode: none`, et son déclencheur de pull request ne surveille que `main`. Lisez
 `.github/` pour ce qui tourne ; ce dossier est de l'historique.

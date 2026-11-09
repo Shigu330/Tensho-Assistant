@@ -21,7 +21,7 @@ Please do not open a public issue or disclose details about the vulnerability be
 
 ## Scope
 
-What the plugin does that matters for security (checked against the code on 2026-11-09, version 0.971 of the `Devloppement` branch):
+What the plugin does that matters for security (read against the code of the `Devloppement` branch on 2026-11-09; each later change is added here with the version that brings it):
 
 - **Network**: HTTPS requests with a timeout and a size limit (`src/TenshoAssistant/Community/BoundedHttp.cs`, or the client's own
   limit for Universalis) to:
@@ -150,7 +150,7 @@ N'ouvrez pas de ticket public et ne divulguez pas de détails sur la vulnérabil
 
 ## Périmètre
 
-Ce que fait le plugin et qui compte pour la sécurité (relu contre le code le 2026-11-09, version 0.971 de la branche `Devloppement`) :
+Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de la branche `Devloppement` le 2026-11-09 ; chaque changement d'après est ajouté ici avec la version qui l'apporte) :
 
 - **Réseau** : requêtes HTTPS avec un délai et une taille limités (`src/TenshoAssistant/Community/BoundedHttp.cs`, ou la limite propre
   du client pour Universalis) vers :

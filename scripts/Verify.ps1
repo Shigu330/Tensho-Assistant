@@ -63,6 +63,11 @@ if ($Release -and (& git -C $taskRoot tag --list "Stable-$taskVersionNow")) {
 $taskChangelog = Get-Content -LiteralPath (Join-Path $taskRoot 'CHANGELOG.md') -Encoding UTF8
 $taskTopEntry = $taskChangelog | Where-Object { $_ -match '^## (\d+\.\d+\.\d+)\s*$' } | Select-Object -First 1
 if ($taskTopEntry -ne "## $taskVersionNow") { Write-Host "WARNING: the top entry of CHANGELOG.md is '$taskTopEntry', not '## $taskVersionNow' (-Commit will refuse it)." -ForegroundColor Yellow }
+# System plan 4.14: a release publishes documents produced for its own version (tools/docgen.py: index, page table, version marks).
+if ($Release) {
+    & python -I -X utf8 (Join-Path $taskRoot 'tools\docgen.py') check --release
+    if ($LASTEXITCODE -ne 0) { throw 'Documents not produced for this version: python -I -X utf8 tools/docgen.py write, then Verify again.' }
+}
 if ($TestsOnly) {
     Push-Location $taskRoot
     try {

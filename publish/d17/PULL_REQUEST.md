@@ -1,4 +1,4 @@
-<!-- Draft prepared by the AI agent at the author's request (first written 2026-10-31, checked against the code on 2026-11-09, version 0.971).
+<!-- Draft prepared by the AI agent at the author's request (first written 2026-10-31, checked against the code on 2026-11-09).
 No submission to the official repository is planned (DEC-039, 2026-11-05): this draft is kept in case the author changes his mind, and as a
 summary of what the plugin does. The Dalamud AI policy asks that the AI disclosure and the pull request description be written by a human:
 rewrite it in your own words before posting. Do not post it as it is.

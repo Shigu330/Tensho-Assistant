@@ -20,8 +20,11 @@
 
 English is the reference language. Missing keys fall back to English, then to `[Key.Name]`.
 
-Current state (2026-11-09, version 0.971): English and French are complete (French must stay complete); German (`de.json`) and Japanese
-(`ja.json`) translate 35 keys only and have not been reviewed by native speakers. The completion of each language is shown in
+<!-- docgen:languages-en -->
+Current state (counted in the language files, version <!-- docgen:version -->0.1015<!-- /docgen:version -->): English and French are complete (7033 keys; French must stay complete); German (`de.json`) translates 30 keys and Japanese (`ja.json`) translates 30 keys, not reviewed by native speakers.
+<!-- /docgen:languages-en -->
+
+The completion of each language is shown in
 Settings → Debug and in the contributor panel of Diagnostics (developer mode).
 
 Language files are discovered automatically; no enum or C# window changes are needed.
@@ -61,8 +64,11 @@ official game catalog: these files translate the plugin interface, and game data
 
 L'anglais est la langue de référence. Les clés manquantes se replient sur l'anglais, puis sur `[Key.Name]`.
 
-État actuel (2026-11-09, version 0.971) : l'anglais et le français sont complets (le français doit le rester) ; l'allemand (`de.json`)
-et le japonais (`ja.json`) ne traduisent que 35 clés et n'ont pas été relus par des locuteurs natifs. L'avancement de chaque langue est
+<!-- docgen:languages-fr -->
+État actuel (compté dans les fichiers de langue, version <!-- docgen:version -->0.1015<!-- /docgen:version -->) : l'anglais et le français sont complets (7033 clés ; le français doit le rester) ; l'allemand (`de.json`) traduit 30 clés et le japonais (`ja.json`) traduit 30 clés, sans relecture par des locuteurs natifs.
+<!-- /docgen:languages-fr -->
+
+L'avancement de chaque langue est
 affiché dans Paramètres → Debug et dans le panneau contributeur de Diagnostics (mode développeur).
 
 Les fichiers de langue sont trouvés automatiquement ; aucun changement d'énumération ni de fenêtre C# n'est nécessaire.
