@@ -118,6 +118,13 @@ internal sealed partial class MainWindow
                 foreach (var value in new[] { stats?.Strength, stats?.Intelligence, stats?.PhysicalResistance, stats?.MagicalResistance, stats?.Vitality })
                 { ImGui.TableNextColumn(); ImGui.TextUnformatted(value?.ToString() ?? "?"); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.CatchPlace);
+                // X-110 (0.984, user request: where to tame each beast, exact place): places seen in game, the common place menu on them (X-111).
+                if (BeastPlacesOf(beast.Id) is { Count: > 0 } places)
+                {
+                    ImGui.SameLine(); ImGui.TextColored(Accent, localization.Format("BeastUi.PlacesSeen", places.Count));
+                    Tip("BeastUi.PlacesSeenTip");
+                    NpcMenu($"BeastPlaces{beast.Id}", beast.Name, 0, places);
+                }
             }
         }
         finally { ImGui.EndTable(); }
@@ -240,6 +247,36 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled("    " + string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
             ImGui.TextUnformatted("    → " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
         }
+    }
+
+    /// <summary>
+    /// X-110 (0.984): where a beast was seen tamed (BeastTamed with a place: yours or shared), then where the monster it is tamed from was seen
+    /// (MonsterPlace; the monster from those tames, or from the wiki's « tamed from » enemy). Six places at most; worked out again when the base changes.
+    /// </summary>
+    private (int Wiki, object? Seen, int Revision)? beastPlacesFor;
+    private Dictionary<uint, IReadOnlyList<Npcs.NpcLocation>> beastPlaces = [];
+    private IReadOnlyList<Npcs.NpcLocation> BeastPlacesOf(uint beast)
+    {
+        if (DiscoveryStore is not { } store || !DiscoveriesLoaded || maps.State.Catalog is not { } catalog) return [];
+        var key = (BeastWiki?.Revision ?? -1, (object?)Seen(), store.Revision);
+        if (beastPlacesFor != key) { beastPlacesFor = key; beastPlaces = []; }
+        if (beastPlaces.TryGetValue(beast, out var known)) return known;
+        var places = new List<Npcs.NpcLocation>();
+        void Add(Discoveries.DiscoveryFact fact)
+        {
+            if (fact.Map == 0 || places.Count >= 6 || catalog.Find(fact.Map) is not { } map) return;
+            var at = Maps.MapProjection.CoordinateFromWorld(new Vector3(fact.X, 0, fact.Z), map);
+            if (places.Any(place => place.MapId == fact.Map && Vector2.Distance(new Vector2(place.X, place.Y), at) < 1)) return;
+            places.Add(new(fact.Territory, fact.Map, map.Zone, at.X, at.Y, fact.X, 0, fact.Z));
+        }
+        var tames = store.Find(Discoveries.DiscoveryKind.BeastTamed, beast, 8);
+        foreach (var fact in tames) Add(fact);
+        var monsters = new HashSet<uint>(tames.Select(fact => fact.Detail).Where(id => id != 0));
+        if (BeastWiki?.Book is { } book && EnglishMonsterIds is { } english)
+            foreach (var row in book.Rows.Where(row => row.Number == beast)) foreach (var id in english(row.Enemy.Trim())) monsters.Add(id);
+        foreach (var monster in monsters.Take(4)) foreach (var fact in store.Find(Discoveries.DiscoveryKind.MonsterPlace, monster, 3)) Add(fact);
+        if (beastPlaces.Count < 512) beastPlaces[beast] = places;
+        return places;
     }
 
     private void DrawBeastBoards(BeastCatalog catalog)

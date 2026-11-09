@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.984.0
+- Plan global, Verify : Dresseur (X-110, votre demande : où capturer chaque bête, position exacte) : dans la liste des bêtes, la colonne du lieu indique maintenant « (n lieux vus) » quand Tensho connaît des positions : où la bête a été capturée en jeu, puis où son monstre a été vu (le monstre des captures, ou celui que donne le bestiaire du wiki), par vous ou par la communauté. Clic droit : drapeau et éthérite la plus proche pour chaque lieu. Les captures déjà notées sans monstre connu restent valables (le lieu reste facultatif pour elles). Non validé en jeu.
+- Tests : BeastPlaces984Tests. Verify.ps1 (agent) : 1617/1617, 0 avertissement, 0 erreur ; DLL 0.984.0.0. Non validé en jeu.
+### English
+- Beastmaster (X-110, your request: where to tame each beast, exact place): in the beast list, the place column now says « (n places seen) » when Tensho knows positions: where the beast was tamed in game, then where its monster was seen (the monster of those tames, or the one the wiki's bestiary gives), by you or the community. Right click: flag and nearest aetheryte for each place. Tames already noted without a known monster stay valid (the place stays optional for them). Not validated in game.
+
 ## 0.983.0
 - Plan global, Verify : Positions (X-111, votre demande : partout où il y a une position, pouvoir placer le drapeau et l'éthérite la plus proche) : Tensho a déjà un menu commun pour ça depuis la 0.704 (clic droit sur une position : drapeau, éthérite la plus proche avec le coût, carte Tensho, météo), présent à 21 endroits. L'inventaire de toutes les pages qui écrivent des coordonnées n'a trouvé qu'un manque : la page des conditions des rangs S (lieu donné par la communauté et ALÉA vus en jeu), qui l'a maintenant. Un test l'exige désormais pour toute page qui écrit des coordonnées. Non validé en jeu.
 - Tests : Positions983Tests. Verify.ps1 (agent) : 1616/1616, 0 avertissement, 0 erreur ; DLL 0.983.0.0. Non validé en jeu.

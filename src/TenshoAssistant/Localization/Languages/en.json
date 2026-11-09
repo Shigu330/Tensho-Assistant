@@ -193,6 +193,8 @@
     "TeamPanelNote": "Tensho shows this only before entering and in front of the board; it turns off when a fight starts.",
     "BoardPanel": "Team panel beside the board",
     "BoardPanelTip": "Shows the team panel beside the game's board window: before entering, and in the labyrinth only in front of the board, never during a fight (DEC-047).\nDefault: on.",
+    "PlacesSeen": "({0} places seen)",
+    "PlacesSeenTip": "Where this beast was tamed, or its monster seen, in game (yours or shared discoveries; the monster from the wiki's bestiary when known). Right click: flag and nearest aetheryte for each place.",
     "Boards": "Boards",
     "ObtainedUnknown": "Beasts obtained: not read yet. Open the Master's Bestiary once in the game.",
     "ObtainedFailed": "Beasts obtained: read failed (perhaps after a game update).",
