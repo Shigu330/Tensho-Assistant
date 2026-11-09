@@ -106,6 +106,8 @@ orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu
 
 ### Essais en jeu à faire (liste au 2026-11-02, DLL 0.315.0.0)
 
+Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
+
 Non validé en jeu d'après [STATUS](../ai/STATUS.md) : 0.232–0.302, 0.307–0.309, 0.315. Dans cette plage, déjà rapporté OK par
 l'utilisateur le 2026-11-02 (ne pas refaire) : 0.265–0.271, 0.276–0.279, 0.283–0.289, 0.290–0.292 (légèreté seulement), 0.293–0.299 ;
 hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « non essayé », pas « OK ».
@@ -1659,6 +1661,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1008) Aucun essai maintenant. Après la mise à jour de Dalamud : charger le plugin en mode développeur ; l'agent compare l'autotest à celui d'avant.
 
 - [ ] (0.1009) Aucun essai maintenant : le jeu est en maintenance jusqu'au 10 novembre 11 h.
+
+- [ ] (0.1010) Rien à essayer maintenant ; la campagne commence demain par l'étape 0 de docs/project/TESTING-ROUTE.md.
 
 **0.535 : interfaces** — à voir en jouant
 

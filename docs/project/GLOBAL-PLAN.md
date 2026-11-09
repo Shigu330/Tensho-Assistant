@@ -198,7 +198,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P19 | Tests en jeu de la carte encore en attente | S |  |
+| P19 | Tests en jeu de la carte encore en attente | S | 0.1010 : parcours de la campagne, les 782 essais ouverts rangés par activité, étape 0 d'après-patch en tête : [TESTING-ROUTE](TESTING-ROUTE.md) |
 
 P19 s'élargit en campagne guidée de fin : tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md), selon le déroulement ci-dessus.
 
