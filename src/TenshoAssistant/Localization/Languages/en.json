@@ -5559,6 +5559,11 @@
     "FilterTip": "Shows only the entries whose unlocking item has this source, from the same data as the right-click menu. « No known source » does not mean « cannot be obtained »."
   },
   "Wishlist": {
+    "SaleAlert": "Alert when a wish is on sale under my price",
+    "SaleAlertTip": "When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources).\nDefault: off.",
+    "ColumnPrice": "My price",
+    "PriceTip": "Your price in gil for the sale alert; 0 = no alert for this wish.",
+    "OnSale": "Wish on sale: {0} at {1} gil on {2} (your price: {3}).",
     "Title": "Wishlist",
     "Add": "Add to my wishlist",
     "Remove": "Remove from my wishlist",

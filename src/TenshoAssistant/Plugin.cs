@@ -1551,6 +1551,7 @@ public sealed class Plugin : IDalamudPlugin
             ("GameLogRequest",mainWindow.ProcessGameLogRequest),
             ("HuntTrain",mainWindow.ObserveHuntTrain),
             ("Garden",mainWindow.ObserveGarden),
+            ("WishlistSales",mainWindow.WatchWishlistSales),
             ("PlotWatch",mainWindow.WatchPlots),
             ("Fishing",mainWindow.DrawFishingPanel),
         ];

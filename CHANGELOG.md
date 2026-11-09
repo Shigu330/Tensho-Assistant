@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1000.0
+- Plan global, Verify : Souhaits (X-101, votre choix DEC-048) : la liste de souhaits a une colonne « Mon prix » et un réglage « Alerte quand un souhait est en vente sous mon prix », désactivé par défaut. Activé (et Universalis activé), Tensho demande à Universalis, au plus une fois toutes les 30 minutes, les souhaits qui ont un prix (20 par requête) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, avec le monde, une fois à chaque passage sous ce prix. Rien n'est demandé pendant la coupure JcJ ni quand Universalis est coupé. Non validé en jeu.
+- Tests : WishSales1000Tests. Verify.ps1 (agent) : 1637/1637, 0 avertissement, 0 erreur ; DLL 0.1000.0.0. Non validé en jeu.
+### English
+- Wishlist (X-101, your choice DEC-048): the wishlist has a « My price » column and a setting « Alert when a wish is on sale under my price », off by default. When on (and Universalis on), Tensho asks Universalis, at most once every 30 minutes, for the wishes that have a price (20 a request) and writes a chat line when one is listed under your price, with the world, once each time it goes under. Nothing is asked during the PvP cut or with Universalis off. Not validated in game.
+
 ## 0.999.0
 - Plan global, Verify : Paramètres (X-100, votre choix DEC-048) : la page a maintenant les onglets validés : Général (fenêtre, langue, thème, polices, survol des objets), Panneaux à côté du jeu (recherche de mission, personnage, panneaux cachés derrière le jeu, puis les aides de chaque outil), Carte, Suivi et notifications (alarmes, commandes du jeu, barre du serveur : monnaies et gils), Données et sources (rangements, cache, sources communautaires), Avancé, Débogage. En haut, un champ « Chercher un réglage » trouve n'importe quel réglage de la page par son nom et ouvre son onglet. Chaque réglage reste aussi à côté de son outil. Non validé en jeu.
 - Tests : SettingsTabs999Tests. Verify.ps1 (agent) : 1636/1636, 0 avertissement, 0 erreur ; DLL 0.999.0.0. Non validé en jeu.

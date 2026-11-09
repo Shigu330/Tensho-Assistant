@@ -22,7 +22,7 @@ public static class ConfigurationReset
         // 0.347 (g, I-08): the player's item notes and labels.
         "ItemNotes",
         // 0.360 (g, C-09): the player's wishlist.
-        "Wishlist",
+        "Wishlist", "WishlistPrices",
         // 0.368 (g, C-15): the achievements the player tracks.
         "TrackedAchievements",
         // 0.369 (g, X-03): the title chosen for each job.
@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "HoverShowCompare",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "ShowBeastBoardPanel", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
+        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
@@ -618,6 +618,9 @@ public sealed partial class Configuration
     // 0.360 (g, C-09): wishlist item ids, in the order they were added (replaced whole on every change).
     private List<uint>? wishlist;
     public List<uint>? Wishlist { get=>Volatile.Read(ref wishlist); set=>Volatile.Write(ref wishlist,value); }
+    // X-101 (0.1000, DEC-048): the player's price for each wish, and the sale alert (off by default).
+    public Dictionary<uint,long>? WishlistPrices { get; set; }
+    public bool WishlistSaleAlert { get; set; }
     // 0.368 (g, C-15): tracked achievement ids, 100 at most (replaced whole on every change).
     private List<uint>? trackedAchievements;
     public List<uint>? TrackedAchievements { get=>Volatile.Read(ref trackedAchievements); set=>Volatile.Write(ref trackedAchievements,value); }

@@ -5559,6 +5559,11 @@
     "FilterTip": "Ne montre que les entrées dont un objet de déblocage a cette source, d'après les mêmes données que le menu du clic droit. « Aucune source connue » ne veut pas dire « impossible à obtenir »."
   },
   "Wishlist": {
+    "SaleAlert": "Alerte quand un souhait est en vente sous mon prix",
+    "SaleAlertTip": "Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Demande Universalis activé (Paramètres › Données et sources).\nPar défaut : désactivé.",
+    "ColumnPrice": "Mon prix",
+    "PriceTip": "Votre prix en gils pour l'alerte de vente ; 0 = pas d'alerte pour ce souhait.",
+    "OnSale": "Souhait en vente : {0} à {1} gils sur {2} (votre prix : {3}).",
     "Title": "Souhaits",
     "Add": "Ajouter à mes souhaits",
     "Remove": "Retirer de mes souhaits",
