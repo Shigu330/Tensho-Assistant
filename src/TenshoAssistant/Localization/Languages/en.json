@@ -5868,6 +5868,7 @@
   },
   "Garden": {
     "CareSeveral": "Garden: several beds are noted here and the game does not say which one: update it in the Garden page.",
+    "HarvestNoneRipe": "Garden: a harvest seen, but no bed noted here is ripe: nothing removed from the journal.",
     "HarvestedNotice": "Garden: {0} harvested, removed from the journal — {1}.",
     "UprootedNotice": "Garden: {0} removed from the journal — {1}.",
     "PageTitle": "Garden",

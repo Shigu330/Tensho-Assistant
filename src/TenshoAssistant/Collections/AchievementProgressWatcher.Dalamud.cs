@@ -34,7 +34,8 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     {
         this.framework=framework;this.client=client;this.player=player;this.log=log;this.file=file;this.tracked=tracked;this.completed=completed;
         writer=new((error,what)=>log.Warning(error,"{0}",what));
-        try{if(file is not null && File.Exists(file))all=AchievementProgressStore.Read(File.ReadAllText(file)) ?? [];}
+        // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it.
+        try{if(file is not null && File.Exists(file)){if(AchievementProgressStore.Read(File.ReadAllText(file)) is { } read)all=read;else{log.Warning("Saved achievement progress unreadable: kept as is, not written over.");this.file=null;}}}
         catch(Exception error){log.Warning(error,"Saved achievement progress unreadable: kept as is, not written over.");file=null;this.file=null;}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }

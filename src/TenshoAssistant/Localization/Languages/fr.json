@@ -5868,6 +5868,7 @@
   },
   "Garden": {
     "CareSeveral": "Jardin : plusieurs emplacements sont notés ici et le jeu ne dit pas lequel : mettez-le à jour dans la page Jardin.",
+    "HarvestNoneRipe": "Jardin : récolte vue, mais aucun emplacement noté ici n'est mûr : rien n'est retiré du journal.",
     "HarvestedNotice": "Jardin : {0} récolté, retiré du journal — {1}.",
     "UprootedNotice": "Jardin : {0} retiré du journal — {1}.",
     "PageTitle": "Jardinage",

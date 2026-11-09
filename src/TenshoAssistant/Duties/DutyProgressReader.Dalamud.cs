@@ -39,7 +39,8 @@ public sealed unsafe class DutyProgressReader : IDisposable
     {
         this.framework=framework;this.client=client;this.unlocks=unlocks;this.data=data;this.log=log;this.catalog=catalog;this.player=player;this.file=file;
         writer=new((error,what)=>log.Warning(error,"{0}",what));
-        try{if(file is not null && File.Exists(file) && DutyProgress.Read(File.ReadAllText(file)) is { } read){saved=read.All;lastCharacter=read.Last;}}
+        // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it.
+        try{if(file is not null && File.Exists(file)){if(DutyProgress.Read(File.ReadAllText(file)) is { } read){saved=read.All;lastCharacter=read.Last;}else{log.Warning("Saved duty progress unreadable: kept as is, not written over.");this.file=null;}}}
         catch(Exception error){log.Warning(error,"Saved duty progress unreadable: kept as is, not written over.");this.file=null;}
         if(saved.TryGetValue(lastCharacter,out var last))state=new(last.ByInstance,last.ReadAt,true);
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);

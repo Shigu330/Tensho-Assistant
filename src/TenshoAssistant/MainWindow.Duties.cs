@@ -100,10 +100,13 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Format("DutyCounts.Duties",dutyMatches.Length));
         ImGui.SameLine();
-        if (progress is not null) ImGui.TextDisabled(localization.Format("DutyProgress.Count",dutyProgressCount.Completed,dutyProgressCount.Known));
-        // X-106 (0.990): logged out, the last character's saved state, said as such.
-        if (progress is { FromDisk: true }) ImGui.TextDisabled(localization.Format("DutyProgress.Saved",progress.ReadAt.ToLocalTime().ToString("g")));
-        else ImGui.TextDisabled(localization.Get(DutyProgressUnavailable?.Invoke() == true ? "DutyProgress.Unavailable" : "DutyProgress.Unknown"));
+        if (progress is null) ImGui.TextDisabled(localization.Get(DutyProgressUnavailable?.Invoke() == true ? "DutyProgress.Unavailable" : "DutyProgress.Unknown"));
+        else
+        {
+            ImGui.TextDisabled(localization.Format("DutyProgress.Count",dutyProgressCount.Completed,dutyProgressCount.Known));
+            // X-106 (0.990): logged out, the last character's saved state, said as such. 0.997 (review): the « unknown » line no longer pairs with this one.
+            if (progress.FromDisk) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("DutyProgress.Saved",progress.ReadAt.ToLocalTime().ToString("g"))); }
+        }
         if (!ImGui.BeginTable("DutyCatalog",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
         try
         {

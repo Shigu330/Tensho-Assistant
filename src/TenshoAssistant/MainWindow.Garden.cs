@@ -55,8 +55,13 @@ internal sealed partial class MainWindow
     {
         var here=GardenJournal.At(configuration.GardenBeds,zone);
         if(here.Length==0)return;
-        // #36 (0.978): a harvest with several beds here: the only one ripe is that one.
-        if(here.Length>1 && kind==GardenChatKind.Harvested && here.Where(row=>GardenJournal.RipeAt(row)<=DateTimeOffset.UtcNow).ToArray() is { Length:1 } ripe)here=ripe;
+        // #36 (0.978): a harvest is of a ripe bed: the only one ripe here is that one; none ripe (0.997, review): nothing is removed, the player is told.
+        if(kind==GardenChatKind.Harvested)
+        {
+            var ripe=here.Where(row=>GardenJournal.RipeAt(row)<=DateTimeOffset.UtcNow).ToArray();
+            if(ripe.Length==0){ChatNotice?.Invoke(localization.Get("Garden.HarvestNoneRipe"));return;}
+            here=ripe;
+        }
         if(here.Length>1){ChatNotice?.Invoke(localization.Get("Garden.CareSeveral"));return;}
         var bed=here[0];
         if(kind==GardenChatKind.Tended)GardenJournal.Tend(bed,DateTimeOffset.UtcNow);

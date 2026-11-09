@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.997.0
+- Plan global, Verify : Relecture du code de la nuit (0.977 à 0.996, deux relecteurs et une vérification de chaque défaut) : quatre défauts confirmés et corrigés. Dresseur : un plan d'équipe fait avant la lecture de vos bêtes n'est plus réutilisé ensuite. Butin des contenus : la ligne « état inconnu » ne s'affiche plus à côté du compte quand l'état est connu. Succès et contenus : un fichier enregistré illisible est gardé tel quel, jamais réécrit. Jardin : une récolte qui affiche plusieurs lignes de gain ne compte qu'une fois, et seul un emplacement mûr est retiré du journal. Non validé en jeu.
+- Tests : NightReview997Tests. Verify.ps1 (agent) : 1633/1633, 0 avertissement, 0 erreur ; DLL 0.997.0.0. Non validé en jeu.
+### English
+- Review of the night's code (0.977 to 0.996, two reviewers and a check of each defect): four defects confirmed and fixed. Beastmaster: a team plan made before your beasts were read is no longer reused afterwards. Duty loot: the « state unknown » line no longer shows next to the count when the state is known. Achievements and duties: an unreadable saved file is kept as is, never written over. Garden: a harvest printing several gain lines counts once, and only a ripe bed leaves the journal. Not validated in game.
+
 ## 0.996.0
 - Plan global, Verify : Contenus (X-90) : le bestiaire des donjons profonds est la même lecture du wiki, sur chaque groupe d'étages (Donjons profonds › Étages › un groupe) : ses ennemis et les notes du wiki, hors du donjon (Tensho se coupe dedans). Corrections vérifiées sur le wiki : les étages s'appellent sans « The » sur le wiki (Tensho réessaie une fois) ; les sous-sections du butin (une par boss) sont maintenant écartées avec lui. Non validé en jeu.
 - Tests : DutyGuide994Tests. Verify.ps1 (agent) : 1631/1631, 0 avertissement, 0 erreur ; DLL 0.996.0.0. Non validé en jeu.

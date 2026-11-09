@@ -120,7 +120,7 @@ public static class BeastTeams
         return found;
     }
     public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks)
-        => string.Join(",", (held ?? new HashSet<uint>()).Order()) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}"));
+        => (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
     public static SavedPlans? Read(string text)
     {
