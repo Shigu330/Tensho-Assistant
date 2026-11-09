@@ -148,3 +148,25 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | 6 | Poissons de collection « pas pris en compte » (X-97) | Question : où l'avez-vous vu ? Les prises collectionnables sont bien comptées dans les sacs et les découvertes ; proposition : afficher dans l'aide à la pêche la collectionnabilité visée et les assignats d'un poisson collectionnable | — |
 | 7 | Langue des fichiers de l'agent (X-91, 2026-11-09) | CLAUDE.md, docs/ai/RULES.md et le skill de version mis à jour contre le code, mais gardés en français (exception de l'étape 4 : fichiers hors Git, consignes de l'utilisateur en français) | Les traduire en anglais avec les documents vivants, juste avant la 1.0.0 |
 | 8 | Outils de contenus (X-90), docs/project/CONTENT-TOOLS.md | Tableaux stratégiques en notes écrites par vous, masquées en combat, sans dessin sur l'écran du jeu ; bestiaire des donjons profonds hors du donjon, sans conseil ; suivi partagé des NM d'Eurêka laissé aux plugins existants | Conseils de la communauté hors du donjon ; autre format de tableaux |
+| 9 | Alerte « souhait en vente sous un prix » (X-101) : Tensho interrogerait Universalis en arrière-plan, sans clic, pour vos souhaits avec un prix (règle Dalamud : appel réseau automatique, à déclarer) | Réglage coupé par défaut ; au plus une fois toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion à la baisse sous le prix ; Universalis déjà dans la liste des hôtes | Seulement sur un bouton « Vérifier maintenant » (aucun appel automatique) |
+| 10 | Regroupement des outils et des réglages (X-100) | Voir la section « Proposition X-100 » ci-dessous | Garder la disposition actuelle |
+
+## Proposition X-100 : regroupement des outils et des réglages (2026-11-10, à valider)
+
+Constat (0.991) : la navigation a 8 groupes ; « Progression » compte 16 pages et « Monde » 11 ; les réglages sont dans 7 onglets et aussi sur les pages (MapView 92, Paramètres 44, Avancé 24, panneaux des listes 13…, 320 réglages au total, docs/project/SETTINGS.md).
+
+| Groupe proposé | Pages | Changement |
+|---|---|---|
+| Objets | Objets, Rangements, Tri, Marché | Lexique part dans « Références » |
+| Production | Artisanat, Récolte, Pêche en mer, Île sanctuaire, Enchaînement de macros | inchangé (sans les livraisons) |
+| Monde | Carte, Météo, ALÉA, Marchands, Butin des contenus, Butin des monstres, Découvertes | sans les minuteurs |
+| Suivi (nouveau) | Alarmes, Rappels, Jardin, Compagnie libre | les minuteurs et rappels ensemble |
+| Progression | Quêtes, Fêtes, Collections, Mandats, Carnet de chasse, Peuples alliés, Grandes compagnies, Livraisons (spéciales et sur mesure), Équipement, Chocobo | 10 pages au lieu de 16 ; les deux livraisons réunies |
+| Contenus (nouveau, X-90) | Eurêka/Bozja/Croissant, Donjons profonds, Reliques, Carnaval masqué, Dresseur, plus tard tableaux stratégiques | une famille par contenu (X-92) |
+| Gold Saucer | Revue de mode, Triple Triade, Mini Cactpot | inchangé |
+| Références (nouveau) | Lexique, Aide, Crédits | ce qu'on consulte |
+| Préférences | Paramètres, Diagnostics (développeur) | Accueil et Mes outils restent en tête, hors groupe |
+
+Réglages : chaque réglage reste aussi à côté de son outil (comme aujourd'hui), et la page Paramètres les regroupe par les mêmes groupes que la navigation :
+Général (langue, thème, polices, discussion, sons) · Panneaux à côté des fenêtres du jeu (récolte, artisanat, collectionnable, ventes des servants, recherche de mission, revue de mode, Triple Triade, plateau du dresseur…) · Carte · Suivi et notifications (alarmes, rappels, Discord, barre du serveur : monnaies, gils) · Données et sources (sources communautaires, cache, découvertes) · Avancé · Débogage.
+Plus un champ de recherche en haut des Paramètres qui trouve n'importe quel réglage par son nom (les 320) et ouvre son onglet.

@@ -24,16 +24,33 @@ internal static class CompetitiveGate
     /// <summary>X-109 (0.981, DEC-047): a subscription that runs out of a cut, and during one only while the labyrinth's board is open (the team panel).</summary>
     public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
-        void Guarded(IFramework running){if(!cut || labyrinthBoard)handler(running);}
+        void Guarded(IFramework running){if(!cut || labyrinthBoard)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }
     /// <summary>On the framework thread, when the cut starts (true) or ends (false).</summary>
     public static event Action<bool>? Changed;
 
+    /// <summary>
+    /// 0.992 (the log shows « Long CompetitiveGate…Guarded » hitches at each load, 90 to 144 ms, without saying which reader): in developer mode, a
+    /// subscription that takes more than 50 ms is named in the log, once per reader.
+    /// </summary>
+    internal static Action<string,double>? SlowSubscription { get; set; }
+    private static readonly HashSet<string> slowNamed=[];
+    private static void Timed(IFramework.OnUpdateDelegate handler,IFramework running)
+    {
+        if(Developer?.Invoke()!=true){handler(running);return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        handler(running);
+        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        if(spent<=50)return;
+        var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
+        lock(Gate){if(!slowNamed.Add(name))return;}
+        SlowSubscription?.Invoke(name,spent);
+    }
     public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
-        void Guarded(IFramework running){if(!cut)handler(running);}
+        void Guarded(IFramework running){if(!cut)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }

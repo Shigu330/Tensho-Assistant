@@ -115,6 +115,7 @@ public sealed class Plugin : IDalamudPlugin
             var newInstall = saved is null;
             var configuration = saved ?? new Configuration();
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
+            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (named once).",name,spent);
             autoBankCapture = () => configuration.AutoBankCapture;
             fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)

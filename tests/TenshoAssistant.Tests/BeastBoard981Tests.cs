@@ -17,7 +17,7 @@ internal static class BeastBoard981Tests
         {
             var gate=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
             Check(gate.Contains("board=!window.IsNull && window.IsVisible && !condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];"),"board and no combat");
-            Check(gate.Contains("void Guarded(IFramework running){if(!cut || labyrinthBoard)handler(running);}"),"AddBoard");
+            Check(gate.Contains("void Guarded(IFramework running){if(!cut || labyrinthBoard)Timed(handler,running);}"),"AddBoard");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs")).Contains("CompetitiveGate.AddBoard(framework, OnUpdate);"),"reader");
             Check(new TenshoAssistant.Configuration().ShowBeastBoardPanel,"on by default");
         }),

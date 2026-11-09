@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.992.0
+- Plan global, Verify : Diagnostic (0.992) : à chaque chargement, le journal de Dalamud signale des ralentissements de 90 à 144 ms dans un lecteur de Tensho sans dire lequel. En mode développeur, Tensho nomme maintenant tout lecteur qui prend plus de 50 ms dans une image (une fois par lecteur), pour corriger le bon. Aussi notés : la proposition de regroupement des outils et des réglages (X-100) et la question sur l'alerte « souhait en vente » (X-101), à voir ensemble. Non validé en jeu.
+- Tests : SlowReaders992Tests. Verify.ps1 (agent) : 1626/1626, 0 avertissement, 0 erreur ; DLL 0.992.0.0. Non validé en jeu.
+### English
+- Diagnosis (0.992): at each load, the Dalamud log reports 90 to 144 ms hitches in a Tensho reader without saying which. In developer mode, Tensho now names any reader taking over 50 ms in one frame (once per reader), to fix the right one. Also written: the proposal for grouping the tools and settings (X-100) and the question on the « wish on sale » alert (X-101), to go through together. Not validated in game.
+
 ## 0.991.0
 - Plan global, Verify : Objets (X-105, idée retenue à la revue) : les filtres de la recherche d'objets ont maintenant un choix « Job » : seulement les objets que ce job peut utiliser, d'après la catégorie de jobs de l'objet (donnée du jeu). Le catalogue des objets garde cette catégorie ; son cache sur le disque est refait une fois au prochain lancement. Non validé en jeu.
 - Tests : JobFilter991Tests. Verify.ps1 (agent) : 1625/1625, 0 avertissement, 0 erreur ; DLL 0.991.0.0. Non validé en jeu.
