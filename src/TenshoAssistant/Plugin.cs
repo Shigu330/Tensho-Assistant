@@ -741,6 +741,16 @@ public sealed class Plugin : IDalamudPlugin
                 ? expansionQuest.Expansion.Value.Name.ExtractText():null;
             // X-109 (0.980): the beast team plans kept on disk.
             mainWindow.BeastTeamsFile=()=>Path.Combine(pluginInterface.GetPluginConfigDirectory(),"BeastTeams.json");
+            // X-105 (0.991): the jobs, and which ClassJobCategory rows include each (raw column = job + 1, the sheet's own layout).
+            mainWindow.JobList=()=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Where(job=>job.RowId!=0 && !job.Name.IsEmpty)
+                .Select(job=>(job.RowId,job.Name.ExtractText() is { Length:>0 } name ? char.ToUpper(name[0],System.Globalization.CultureInfo.CurrentCulture)+name[1..]:"")).Where(job=>job.Item2.Length>0).ToArray();
+            mainWindow.JobCategoriesOf=job=>
+            {
+                var found=new HashSet<uint>();
+                try{foreach(var row in data.Excel.GetSheet<Lumina.Excel.RawRow>(null,"ClassJobCategory"))if(row.ReadColumn((int)job+1) is bool allowed && allowed)found.Add(row.RowId);}
+                catch(Exception error){log.Warning(error,"Job categories unreadable (perhaps after a game update): the job filter finds nothing.");}
+                return found;
+            };
             mainWindow.GrandCompanyNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GrandCompany>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.EquippedGearUnavailable=()=>gear?.Unavailable==true;
             // 0.333: names of the squadron's mission and training (Reminders).

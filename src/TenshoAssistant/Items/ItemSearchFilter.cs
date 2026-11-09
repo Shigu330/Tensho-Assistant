@@ -6,7 +6,9 @@ namespace TenshoAssistant.Items;
 /// catalogue does not keep ClassJobCategory.
 /// </summary>
 public sealed record ItemSearchFilter(uint Category=0,int MinEquipLevel=0,int MaxEquipLevel=0,uint MinItemLevel=0,uint MaxItemLevel=0,
-    EquipmentSlots Slot=EquipmentSlots.None,bool TradableOnly=false,bool MarketableOnly=false)
+    EquipmentSlots Slot=EquipmentSlots.None,bool TradableOnly=false,bool MarketableOnly=false,
+    // X-105 (0.991, user choice DEC-045, from I-12): a job, and the ClassJobCategory rows that include it (given by the page).
+    uint Job=0,IReadOnlySet<uint>? JobCategories=null)
 {
     public static readonly ItemSearchFilter None=new();
     public bool IsEmpty=>this==None;
@@ -17,5 +19,6 @@ public sealed record ItemSearchFilter(uint Category=0,int MinEquipLevel=0,int Ma
           && (MinItemLevel==0 || item.ItemLevel>=MinItemLevel) && (MaxItemLevel==0 || item.ItemLevel<=MaxItemLevel)
           && (Slot==EquipmentSlots.None || (item.Equipment & Slot)!=0)
           && (!TradableOnly || !item.Traits.HasFlag(ItemTraits.Untradable))
-          && (!MarketableOnly || item.IsMarketable);
+          && (!MarketableOnly || item.IsMarketable)
+          && (Job==0 || JobCategories?.Contains(item.JobCategory)==true);
 }

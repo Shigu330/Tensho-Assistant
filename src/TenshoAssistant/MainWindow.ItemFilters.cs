@@ -10,6 +10,10 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal Func<string,IReadOnlyList<(uint Id,string Name,uint Icon)>>? KeyItemSearch { get; set; }
+    /// <summary>X-105 (0.991): the game's jobs (ClassJob), and the ClassJobCategory rows that include one.</summary>
+    internal Func<IReadOnlyList<(uint Id,string Name)>>? JobList { get; set; }
+    internal Func<uint,IReadOnlySet<uint>>? JobCategoriesOf { get; set; }
+    private IReadOnlyList<(uint Id,string Name)>? jobList;
     private ItemSearchFilter itemSearchFilter=ItemSearchFilter.None;
     private string keyItemQuery="";
     private IReadOnlyList<(uint Id,string Name,uint Icon)> keyItemResults=[];
@@ -58,6 +62,24 @@ internal sealed partial class MainWindow
                 finally{ImGui.EndCombo();}
             }
             Tip("ItemFilters.SlotTip");
+            // X-105 (0.991): the job that can use the item.
+            if(JobList is not null && JobCategoriesOf is not null)
+            {
+                jobList??=JobList();
+                ImGui.SetNextItemWidth(220);
+                var jobName=filter.Job==0 ? localization.Get("ItemFilters.Any"):jobList.FirstOrDefault(job=>job.Id==filter.Job).Name ?? $"#{filter.Job}";
+                if(ImGui.BeginCombo(localization.Get("ItemFilters.Job")+"##FilterJob",jobName))
+                {
+                    try
+                    {
+                        if(ImGui.Selectable(localization.Get("ItemFilters.Any"),filter.Job==0))filter=filter with{Job=0,JobCategories=null};
+                        foreach(var (id,name) in jobList)
+                            if(ImGui.Selectable($"{name}##Job{id}",filter.Job==id))filter=filter with{Job=id,JobCategories=JobCategoriesOf(id)};
+                    }
+                    finally{ImGui.EndCombo();}
+                }
+                Tip("ItemFilters.JobTip");
+            }
             var tradable=filter.TradableOnly;
             if(ImGui.Checkbox(localization.Get("ItemFilters.Tradable")+"##FilterTradable",ref tradable))filter=filter with{TradableOnly=tradable};
             Tip("ItemFilters.TradableTip");

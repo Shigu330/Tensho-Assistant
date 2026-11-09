@@ -5400,6 +5400,8 @@
     "Tip": "Condition pour que la boutique propose cet article (données du jeu). « Fait » vient de votre journal de quêtes ou de vos hauts faits lus par Tensho."
   },
   "ItemFilters": {
+    "Job": "Job",
+    "JobTip": "Seulement les objets que ce job peut utiliser (la catégorie de jobs de l'objet, donnée du jeu).",
     "Title": "Filtres",
     "Category": "Catégorie",
     "CategoryTip": "Ne garde que les objets de cette catégorie (celle de la fenêtre d'objet du jeu).",

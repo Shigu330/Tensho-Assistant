@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.991.0
+- Plan global, Verify : Objets (X-105, idée retenue à la revue) : les filtres de la recherche d'objets ont maintenant un choix « Job » : seulement les objets que ce job peut utiliser, d'après la catégorie de jobs de l'objet (donnée du jeu). Le catalogue des objets garde cette catégorie ; son cache sur le disque est refait une fois au prochain lancement. Non validé en jeu.
+- Tests : JobFilter991Tests. Verify.ps1 (agent) : 1625/1625, 0 avertissement, 0 erreur ; DLL 0.991.0.0. Non validé en jeu.
+### English
+- Items (X-105, idea kept at the review): the item search filters now have a « Job » choice: only the items that job can use, from the item's job category (game data). The item catalogue keeps that category; its disk cache is rebuilt once at the next start. Not validated in game.
+
 ## 0.990.0
 - Plan global, Verify : Contenus (X-106, idée retenue à la revue) : l'état « fait » des contenus (page Butin des contenus) est maintenant gardé sur le disque pour chaque personnage. Déconnecté, la page montre l'état enregistré de votre dernier personnage, avec la date de la lecture. Non validé en jeu.
 - Tests : DutySaved990Tests. Verify.ps1 (agent) : 1624/1624, 0 avertissement, 0 erreur ; DLL 0.990.0.0. Non validé en jeu.

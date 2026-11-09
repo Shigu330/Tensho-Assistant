@@ -5400,6 +5400,8 @@
     "Tip": "Condition for the shop to offer this article (game data). « Done » comes from your quest journal or your achievements read by Tensho."
   },
   "ItemFilters": {
+    "Job": "Job",
+    "JobTip": "Only the items this job can use (the game's job category of the item).",
     "Title": "Filters",
     "Category": "Category",
     "CategoryTip": "Keeps only the items of this category (the one of the game's item window).",
