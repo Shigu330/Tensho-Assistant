@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1005.0
+- Plan global, Verify : Découvertes : le fait faux noté avant la 0.911 est retiré, à votre demande. C'est l'objet clé « Gants abandonnés », gardé sous le numéro 2169 au lieu de 2002169. Règle générale : un fait « objet demandé par une quête » vu pour la dernière fois avant la publication de la 0.911 (8 novembre, 16 h 42) est refusé à la lecture, à l'import et à la fusion des découvertes partagées. La base est réécrite sans lui à l'enregistrement suivant. Le fichier commun est reconstruit avec l'outil de fusion, qui suit la même règle. Non validé en jeu.
+- Tests : QuestAskedFix1005Tests. Verify.ps1 (agent) : 1643/1643, 0 avertissement, 0 erreur ; DLL 0.1005.0.0. Non validé en jeu.
+### English
+- Discoveries: the wrong fact noted before 0.911 is removed, at your request: the key item 2002169 kept as 2169. General rule: a QuestItemAsked fact last seen before 0.911 was published (8 November, 16:42) is refused when read, imported or merged with the shared discoveries; the base is written again without it at the next save. The common file is rebuilt with the merge tool, which follows the same rule. Not validated in game.
+
 ## 0.1004.0
 - Plan global, Verify : Sonde de vérification des découvertes (outil) mise à jour d'après la revérification de votre base (docs/evidence/0.1004-discoveries-check.md) : elle connaît les sortes ajoutées depuis la 0.933, la pêche en mer sur le bateau (poissons des lieux IKDSpot, météo de la mer dont le courant spectral) et la plage de niveaux d'un fait vu plusieurs fois dans son intervalle. Elle ne signale plus ces faux défauts ; aucun défaut actuel des parseurs n'a été trouvé. Rien ne change dans le plugin.
 - Tests : AirshipLoot1003Tests. Verify.ps1 (agent) : 1641/1641, 0 avertissement, 0 erreur ; DLL 0.1004.0.0. Non validé en jeu.

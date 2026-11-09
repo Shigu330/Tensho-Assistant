@@ -6,7 +6,8 @@ using TenshoAssistant.Discoveries;
 internal static class Parsers911Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
-    private static readonly DateTimeOffset At=new(2026,11,8,12,0,0,TimeSpan.Zero);
+    // 0.1005: after 0.911's publication (QuestItemAsks.Fixed), as every QuestItemAsked fact kept.
+    private static readonly DateTimeOffset At=new(2026,11,8,16,0,0,TimeSpan.Zero);
     private static string Source(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
     // The text from a declaration's start to its end mark (both included), or "" when missing.
     private static string Between(string text,string start,string end)

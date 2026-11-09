@@ -426,19 +426,20 @@ public sealed class DiscoveryStore
         && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
         && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1)
         && ValueCounts.Valid(fact.Values) && ValueCounts.Valid(fact.ImportedValues)
-        && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues);
+        && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues)
+        && !(fact.Kind==DiscoveryKind.QuestItemAsked && fact.Last<QuestItemAsks.Fixed);
 
     public void Load(DiscoveryFile file){lock(gate)LoadLocked(file,true);}
     private void LoadLocked(DiscoveryFile file,bool count)
     {
         {
             // 0.855: each fact moved to its 50-yalm cell; those meeting in one are joined, and the base is written again, smaller.
-            var read=0;var shared=SharedHeld();
+            var read=0;var refused=0;var shared=SharedHeld();
             foreach(var original in file.Facts)
             {
                 if(original is null)continue;
                 var fact=Recell(original);
-                if(!Valid(fact))continue;
+                if(!Valid(fact)){refused++;continue;}
                 read++;
                 if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
                 // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
@@ -446,7 +447,8 @@ public sealed class DiscoveryStore
                 else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
                 else LeftOut++;
             }
-            if(count && read>facts.Count || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
+            // 0.1005: a refused fact (one written before a fix) is gone from the file at the next save, not only from memory.
+            if(count && (read>facts.Count || refused>0) || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
             revision++;
         }
     }
@@ -501,6 +503,11 @@ public sealed class DiscoveryStore
 public static class QuestItemAsks
 {
     public const uint HqOffset=1_000_000;
+    /// <summary>
+    /// 0.1005 (docs/evidence/0.1004-discoveries-check.md, the user's choice): 0.911 was published at 2026-11-08 16:42 (UTC+1); a QuestItemAsked fact last seen
+    /// before it may hold a key item without its 2 000 000 (seen: 2002169 kept as 2169) or an HQ item without its offset: refused when read, imported or merged.
+    /// </summary>
+    public static readonly DateTimeOffset Fixed=new(2026,11,8,15,42,29,TimeSpan.Zero);
     public static uint Subject(uint item,bool hq)=>ItemGains.BaseItem(item) is var plain && (plain==0 || plain>=ItemGains.KeyItemStart || !hq) ? plain:plain+HqOffset;
     public static uint Item(uint subject)=>ItemGains.BaseItem(subject);
     public static bool Hq(uint subject)=>subject is >= HqOffset and < ItemGains.KeyItemStart;

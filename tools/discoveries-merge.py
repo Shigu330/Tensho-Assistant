@@ -21,6 +21,7 @@ import base64,collections,gzip,json,math,os,re,subprocess,sys,urllib.request,zip
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
+QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)
 KINDS=set(range(1,38))-{26,27};PLACED={1,2,3,8,10,19,22,23,28,29,30}  # 26, 27: 0.890's and 0.891's wrong spearfishing shadows
 CELL=50;MAX_FACTS=200_000;VERSIONS={1,2};VERSION=2
 FIELDS={"Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"}
@@ -49,6 +50,7 @@ def valid(f):
         if set(f)-FIELDS or f["Kind"] not in KINDS or f["Subject"]<=0:return False
         if f["Kind"] in PLACED and f["Map"]==0:return False
         if f["Kind"]==3 and f["X"]==0 and f["Z"]==0:return False  # 0.911: a FATE at exactly (0, 0) is the game's zero position for about a second
+        if f["Kind"]==25 and when(f["Last"])<QUEST_ASKED_FIXED:return False  # 0.1005: QuestItemAsks.Fixed, a quest item noted before 0.911's fix
         if not all(math.isfinite(f[n]) and abs(f[n])<=10000 for n in ("X","Z")):return False
         if (math.floor(f["X"]/CELL),math.floor(f["Z"]/CELL))!=(f["CellX"],f["CellZ"]):return False
         if not (0<=f["LevelMin"]<=100000 and 0<=f["LevelMax"]<=100000):return False
@@ -90,7 +92,13 @@ def rebuild():
     merged={}
     for name in sorted(os.listdir(PLAYERS)) if os.path.isdir(PLAYERS) else []:
         if not name.endswith(".json"):continue
-        for f in json.load(open(os.path.join(PLAYERS,name),encoding="utf-8"))["Facts"]:
+        path=os.path.join(PLAYERS,name);player=json.load(open(path,encoding="utf-8"))
+        # 0.1005: a player file kept before a new rule follows it too, written again without the facts it now refuses.
+        kept=[f for f in player["Facts"] if valid(dict(f))]
+        if len(kept)<len(player["Facts"]):
+            print(f"{name}: {len(player['Facts'])-len(kept)} facts refused by the current rules")
+            player["Facts"]=kept;json.dump(player,open(path,"w",encoding="utf-8",newline="\n"),ensure_ascii=False,separators=(",",":"))
+        for f in kept:
             known=merged.get(key(f))
             if known is None:merged[key(f)]=dict(f);continue
             known["Imported"]+=1
