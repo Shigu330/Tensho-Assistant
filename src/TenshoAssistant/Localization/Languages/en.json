@@ -3344,6 +3344,7 @@
     "TreasureMapTip": "Your deciphered treasure map: {0}",
     "ShowBookmarks": "Your bookmarks",
     "ShowBookmarksHelp": "Draws your Maps page bookmarks (star); a click places the flag on one.\nDefault: on.",
+    "BeastToTame": "Beast to tame: {0} (place seen in game)",
     "BookmarkClick": "Click: place the flag here.",
     "AddBookmark": "Add to bookmarks",
     "AddBookmarkTip": "Adds this point to your bookmarks with this name (empty: the zone and coordinates).",

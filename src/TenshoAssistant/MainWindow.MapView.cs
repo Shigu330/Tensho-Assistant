@@ -1620,6 +1620,28 @@ internal sealed partial class MainWindow
                     {var coordinate=MapProjection.CoordinateFromPixel(pixel,map);FlagFromMap(map,coordinate.X,coordinate.Y);}
                 }
             }
+            // X-110 (0.985, user request): where to tame the beasts not tamed yet, seen in game (BeastPlacesOf), on this map, with the beast layer
+            // (as Beastmaster, or always when chosen); the beast's icon, a click places the flag.
+            if(settings.ShowBeastMonsters && (settings.BeastMonstersAlways || characterStats.State.JobId==BeastmasterJob)
+               && Beasts?.State is { Catalog:{ } tameCatalog, Obtained:{ } tamedAlready })
+            {
+                var tameSize=Math.Max(6,baseIcon*0.6f);
+                foreach(var wild in tameCatalog.Beasts)
+                {
+                    if(tamedAlready.Contains(wild.Id))continue;
+                    foreach(var place in BeastPlacesOf(wild.Id))
+                    {
+                        if(place.MapId!=map.MapId)continue;
+                        var pixel=MapProjection.PixelFromCoordinate(new Vector2(place.X,place.Y),map);var at=origin+mapPan+pixel*mapZoom;
+                        if(!textures.TryGetFromGameIcon(new GameIconLookup(wild.Icon),out var wildShared) || !wildShared.TryGetWrap(out var wildIcon,out _) || wildIcon is null)continue;
+                        draw.AddImage(wildIcon.Handle,at-new Vector2(tameSize/2),at+new Vector2(tameSize/2),Vector2.Zero,Vector2.One,ImGui.GetColorU32(new Vector4(1,1,1,0.85f)));
+                        if(!hovered || Vector2.Distance(io.MousePos,at)>tameSize/2)continue;
+                        sightseeingTip=null;tooltipPoint=null;
+                        tooltip=localization.Format("MapView.BeastToTame",wild.Name)+"\n"+localization.Get("MapView.BookmarkClick");
+                        if(top is null && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)FlagFromMap(map,place.X,place.Y);
+                    }
+                }
+            }
             if(settings.ShowPlayer && player is { } here)DrawPlayerArrow(draw,origin+mapPan+here*mapZoom,live!.Rotation,settings.ShowViewCone,MapViewSettings.ClampMarker(settings.PlayerIconScale),
                 MapViewSettings.ClampMarker(settings.ViewConeScale),MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity),settings.ViewConeColor);
             // 0.297 (user request): targets outside the view keep their icon on the map's edge, compass style.

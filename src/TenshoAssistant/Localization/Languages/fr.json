@@ -3344,6 +3344,7 @@
     "TreasureMapTip": "Votre carte au trésor déchiffrée : {0}",
     "ShowBookmarks": "Vos favoris",
     "ShowBookmarksHelp": "Dessine vos favoris de la page Cartes (étoile) ; un clic pose le drapeau dessus.\nPar défaut : activé.",
+    "BeastToTame": "Bête à capturer : {0} (lieu vu en jeu)",
     "BookmarkClick": "Clic : poser le drapeau ici.",
     "AddBookmark": "Ajouter aux favoris",
     "AddBookmarkTip": "Ajoute ce point à vos favoris, avec ce nom (vide : la zone et les coordonnées).",

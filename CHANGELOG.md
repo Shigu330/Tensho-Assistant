@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.985.0
+- Plan global, Verify : Dresseur (X-110) : sur la carte Tensho, les bêtes pas encore capturées apparaissent avec leur icône aux lieux vus en jeu (où elles ont été capturées, ou leur monstre vu, par vous ou la communauté), avec la couche des bêtes du dresseur (en dresseur, ou toujours si choisi) ; au survol « Bête à capturer », un clic place le drapeau. Non validé en jeu.
+- Tests : BeastMap985Tests. Verify.ps1 (agent) : 1618/1618, 0 avertissement, 0 erreur ; DLL 0.985.0.0. Non validé en jeu.
+### English
+- Beastmaster (X-110): on the Tensho map, the beasts not tamed yet show with their icon at the places seen in game (where they were tamed, or their monster seen, by you or the community), with the Beastmaster beast layer (as Beastmaster, or always when chosen); « Beast to tame » on hover, a click places the flag. Not validated in game.
+
 ## 0.984.0
 - Plan global, Verify : Dresseur (X-110, votre demande : où capturer chaque bête, position exacte) : dans la liste des bêtes, la colonne du lieu indique maintenant « (n lieux vus) » quand Tensho connaît des positions : où la bête a été capturée en jeu, puis où son monstre a été vu (le monstre des captures, ou celui que donne le bestiaire du wiki), par vous ou par la communauté. Clic droit : drapeau et éthérite la plus proche pour chaque lieu. Les captures déjà notées sans monstre connu restent valables (le lieu reste facultatif pour elles). Non validé en jeu.
 - Tests : BeastPlaces984Tests. Verify.ps1 (agent) : 1617/1617, 0 avertissement, 0 erreur ; DLL 0.984.0.0. Non validé en jeu.
