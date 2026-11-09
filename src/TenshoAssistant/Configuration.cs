@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "HoverShowCompare",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "ShowBeastBoardPanel", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
+        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
@@ -426,6 +426,8 @@ public sealed partial class Configuration
     private Dictionary<uint,int>? currencyThresholds;
     public bool CurrencyAlerts { get=>Volatile.Read(ref currencyAlerts); set=>Volatile.Write(ref currencyAlerts,value); }
     public bool CurrencyServerBar { get=>Volatile.Read(ref currencyServerBar); set=>Volatile.Write(ref currencyServerBar,value); }
+    // X-107 (0.986): the gil of the day in the server info bar (off by default).
+    public bool GilServerBar { get; set; }
     // 0.606: with the alerts, the weekly limit of the limited tomestones reached.
     public bool CurrencyWeeklyCapAlert { get; set; } = true;
     public Dictionary<uint,int>? CurrencyThresholds { get=>Volatile.Read(ref currencyThresholds); set=>Volatile.Write(ref currencyThresholds,value); }

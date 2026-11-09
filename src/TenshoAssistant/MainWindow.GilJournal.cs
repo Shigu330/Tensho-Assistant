@@ -30,6 +30,8 @@ internal sealed partial class MainWindow
     private void DrawGilJournal()
     {
         ImGui.TextWrapped(localization.Get("GilJournal.Help"));
+        // X-107 (0.986): the gil of the day in the server info bar.
+        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
         if(GilJournalState?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("CharacterUi.Offline"));return;}
         if(state.Unavailable)ImGui.TextColored(Accent,localization.Get("GilJournal.Unreadable"));
         string Amount(long? value)=>value is { } known ? known.ToString("N0"):localization.Get("Currencies.Unknown");

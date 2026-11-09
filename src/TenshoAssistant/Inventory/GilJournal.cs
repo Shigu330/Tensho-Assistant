@@ -73,6 +73,13 @@ public static class GilJournal
     }
 
     /// <summary>Gains and spendings per category since a time, for one source.</summary>
+    /// <summary>X-107 (0.986): the character's gil gained and spent since local midnight, transfers with retainers and the company chest left out.</summary>
+    public static (long Gained,long Spent) Today(IEnumerable<GilEntry> entries,DateTimeOffset now)
+    {
+        var since=new DateTimeOffset(now.ToLocalTime().Date,now.ToLocalTime().Offset);
+        var today=entries.Where(entry=>entry.Source==GilSource.Character && entry.At>=since && !IsTransfer(entry.Category)).ToArray();
+        return (today.Where(entry=>entry.Delta>0).Sum(entry=>entry.Delta),today.Where(entry=>entry.Delta<0).Sum(entry=>-entry.Delta));
+    }
     public static IReadOnlyList<(GilCategory Category,long Gained,long Spent)> Totals(IEnumerable<GilEntry> entries,GilSource source,DateTimeOffset since)
         =>entries.Where(entry=>entry.Source==source && entry.At>=since).GroupBy(entry=>entry.Category)
             .Select(group=>(group.Key,group.Where(entry=>entry.Delta>0).Sum(entry=>entry.Delta),group.Where(entry=>entry.Delta<0).Sum(entry=>-entry.Delta)))

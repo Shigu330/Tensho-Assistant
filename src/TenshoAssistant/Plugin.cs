@@ -709,6 +709,8 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
+            Inventory.GilDtrEntry? gilBar=null;
+            registrations.Register(()=>gilBar=new Inventory.GilDtrEntry(dtrBar,framework,()=>configuration.GilServerBar,()=>gilWatcher?.State?.Entries,localization.Get,mainWindow.OpenGilJournal),()=>gilBar?.Dispose());
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
             // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
             Items.ItemNoteShopReminder? shopReminder=null;

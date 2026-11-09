@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.986.0
+- Plan global, Verify : Gils du jour (X-107, idée retenue à la revue) : une entrée « Tensho Assistant (Gil) » peut s'afficher dans la barre d'informations du serveur, avec le net de vos gils depuis minuit ; au survol les gains et les dépenses, un clic ouvre le journal des gils. Les transferts avec vos servants et le coffre de la compagnie ne comptent pas. Réglage dans l'onglet Gils de la page Rangements, désactivé par défaut. Non validé en jeu.
+- Tests : GilBar986Tests. Verify.ps1 (agent) : 1619/1619, 0 avertissement, 0 erreur ; DLL 0.986.0.0. Non validé en jeu.
+### English
+- Gil of the day (X-107, idea kept at the review): a « Tensho Assistant (Gil) » entry can show in the server info bar, with your gil net since midnight; gained and spent on hover, a click opens the gil journal. Transfers with your retainers and the company chest do not count. Setting on the Gil tab of the Storage page, off by default. Not validated in game.
+
 ## 0.985.0
 - Plan global, Verify : Dresseur (X-110) : sur la carte Tensho, les bêtes pas encore capturées apparaissent avec leur icône aux lieux vus en jeu (où elles ont été capturées, ou leur monstre vu, par vous ou la communauté), avec la couche des bêtes du dresseur (en dresseur, ou toujours si choisi) ; au survol « Bête à capturer », un clic place le drapeau. Non validé en jeu.
 - Tests : BeastMap985Tests. Verify.ps1 (agent) : 1618/1618, 0 avertissement, 0 erreur ; DLL 0.985.0.0. Non validé en jeu.

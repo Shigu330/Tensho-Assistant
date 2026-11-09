@@ -42,7 +42,7 @@ internal static class CompetitiveCut610Tests
             var around=Code().Where(file=>!file.EndsWith("CompetitiveGate.Dalamud.cs") && Regex.IsMatch(File.ReadAllText(file),@"\.Update\s*[+-]=")).Select(Path.GetFileName).ToArray();
             Check(around.Length==0,"going around the gate: "+string.Join(", ",around));
             var always=Code().Where(file=>File.ReadAllText(file).Contains("CompetitiveGate.AddAlways(")).Select(file=>Path.GetFileName(file)!).Order().ToArray();
-            Check(always.SequenceEqual(["AlarmDtrEntry.Dalamud.cs","CurrencyDtrEntry.Dalamud.cs","NativeMapReplacer.Dalamud.cs","ReminderDtrEntry.Dalamud.cs"]),"only what must undo something: "+string.Join(", ",always));
+            Check(always.SequenceEqual(["AlarmDtrEntry.Dalamud.cs","CurrencyDtrEntry.Dalamud.cs","GilDtrEntry.Dalamud.cs","NativeMapReplacer.Dalamud.cs","ReminderDtrEntry.Dalamud.cs"]),"only what must undo something: "+string.Join(", ",always));
             foreach(var file in always)Check(File.ReadAllText(Code().First(path=>Path.GetFileName(path)==file)).Contains("CompetitiveGate.Cut)"),$"{file} acts on the cut");
         }),
         ("Competitive (0.615): the chat is not read during a cut either",() =>

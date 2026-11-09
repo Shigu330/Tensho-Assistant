@@ -5354,6 +5354,9 @@
   },
   "GilJournal": {
     "Tab": "Gils",
+    "ServerBar": "Gils du jour dans la barre du serveur",
+    "ServerBarTip": "Montre les gils du jour de votre personnage (net, depuis minuit) dans la barre d'informations du serveur ; son info-bulle donne les gains et les dépenses, un clic ouvre cette page. Les transferts avec vos servants et le coffre de la compagnie ne comptent pas.\nPar défaut : désactivé.",
+    "BarTip": "Gils aujourd'hui (depuis minuit) : +{0} gagnés, -{1} dépensés.\nClic : le journal des gils.",
     "Help": "Chaque variation de vos gils, gardée 90 jours sur ce PC : ceux du personnage, de vos servants (connus une fois la cloche ouverte) et du coffre de compagnie (quand il est ouvert). La catégorie vient de la fenêtre du jeu ouverte au moment du changement (boutique, marché, réparation, téléportation…).",
     "Unreadable": "Le journal enregistré n'a pas pu être lu : il n'est pas réécrit (voir le journal Dalamud).",
     "Balances": "Personnage : {0} · servants : {1} · coffre de compagnie : {2}",

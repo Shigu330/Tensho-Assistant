@@ -5354,6 +5354,9 @@
   },
   "GilJournal": {
     "Tab": "Gil",
+    "ServerBar": "Gil of the day in the server bar",
+    "ServerBarTip": "Shows your character's gil of the day (net, since midnight) in the server info bar; its tooltip gives gained and spent, a click opens this page. Transfers with your retainers and the company chest are left out.\nDefault: off.",
+    "BarTip": "Gil today (since midnight): +{0} gained, -{1} spent.\nClick: the gil journal.",
     "Help": "Every change of your gil, kept 90 days on this PC: the character's, your retainers' (known once the bell is opened) and the company chest's (while it is open). The category comes from the game window open when it changed (shop, market, repair, teleport…).",
     "Unreadable": "The saved journal could not be read: it is not written over (see the Dalamud log).",
     "Balances": "Character: {0} · retainers: {1} · company chest: {2}",
