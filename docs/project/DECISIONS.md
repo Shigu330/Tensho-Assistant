@@ -54,6 +54,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-047 | 2026-11-09 | Aide au choix des 3 bêtes de chaque affrontement du Dédale bestial : l'écran du plateau est dans l'instance (relevé du 2026-11-09 : « Competitive cut on: territory 1339 » à l'entrée, juste après la fenêtre de mission), où DEC-038 coupe tout Tensho. |
 | DEC-048 | 2026-11-10 | Propositions 9 (X-101, alerte « souhait en vente », appel réseau automatique) et 10 (X-100, regroupement des outils et des réglages) de G-PROPOSALS. |
 | DEC-049 | 2026-11-10 | Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches. |
+| DEC-050 | 2026-11-09 | Sujets confiés à l'agent le 2026-11-09 : releases, politique IA de Dalamud, licence EUPL-1.2, icône. Des DEC et des documents publics disaient encore le contraire : commits faits par l'application de bureau (DEC-009, DEC-010), release après une séance de jeu (DEC-033), politique IA suivie (DEC-010, DEC-039), EUPL « à accepter par l'utilisateur » (GAPS), icône « à garder ou remplacer » (PUBLISHING, point 7). |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -144,7 +145,7 @@ Options: Garder ACT en étude facultative ; le retirer du périmètre. Garder le
 Decision: ACT/IINACT et Combat retirés du projet (docs mises à jour, aucun code concerné). Archives checkpoints/*.zip ignorées par git (gardées sur disque) ; logs et notes de vérification restent suivis.
 Reason: Décision de périmètre de l'utilisateur ; l'historique git conserve déjà chaque version du code.
 Consequences: Les zips restent créés à chaque version mais hors dépôt. Les commits sont faits automatiquement par l'application de bureau, pas par l'agent. Les zips déjà présents dans l'historique local ne sont pas réécrits.
-References: .gitignore, docs/ai/PROMPT-MAITRE.md §5, CLAUDE.md
+References: .gitignore, docs/ai/PROMPT-MAITRE.md §5, CLAUDE.md ; modifiée par DEC-050 (commits et releases par l'agent)
 
 DEC-ID: DEC-010
 Timestamp: 2026-10-31 Europe/Brussels
@@ -154,7 +155,7 @@ Options: Garder checkpoints/ suivi ; l'ignorer entièrement. Documents à la rac
 Decision: `checkpoints/` entièrement ignoré par git (local), plus de zip par version ; preuves citées par le code dans `docs/evidence/` ; historique par version dans `CHANGELOG.md` ; documents rangés en `docs/ai/`, `docs/project/`, `docs/goals/` avec la carte `docs/README.md` ; `CONTRIBUTING.md` (règles, licences, publication Dalamud et politique IA). Remplace la conséquence « zips créés à chaque version » de DEC-009.
 Reason: L'historique git conserve le code de chaque version ; une entrée par public (joueur, contributeur, agent) rend la reprise plus sûre.
 Consequences: L'utilisateur fait les commits (GitHub Desktop). Les zips déjà présents dans l'historique git n'en sont retirés que sur demande explicite (réécriture d'historique). Les gros documents de `docs/project/` gardent leur partie historique, marquée comme archive.
-References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, CLAUDE.md
+References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, CLAUDE.md ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent)
 
 DEC-ID: DEC-011
 Timestamp: 2026-10-31 Europe/Brussels
@@ -294,7 +295,7 @@ Options: Numérotation libre ; SemVer classique (majeur, mineur, correctif) ; r�
 Decision: X.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt officiel Dalamud, DEC-023) ; x.Y.0 = versions de l'utilisateur et de l'agent (le troisième nombre revient à 0) ; x.y.Z = versions de la communauté (contributions extérieures, numéro fixé par le mainteneur à la fusion, une PR peut le proposer).
 Reason: Décision de l'utilisateur ; la numérotation actuelle (0.317.0) la suit déjà.
 Consequences: L'agent monte seulement le deuxième nombre ; jamais le premier sans demande ; le troisième est réservé aux contributions. Documenté dans CLAUDE.md (« À chaque version livrée ») et CONTRIBUTING.md (« Versions and releases »).
-References: CLAUDE.md, CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj
+References: CLAUDE.md, CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj ; modifiée par DEC-050 (releases par l'agent, `-Major` réservé à l'utilisateur)
 
 DEC-ID: DEC-025
 Timestamp: 2026-11-02 Europe/Brussels (0.318)
@@ -304,7 +305,7 @@ Options: Pour chaque manque : ajouter, plus tard ou non ; ordre par valeur ou pa
 Decision: 101 manques retenus sur 103 ; plus tard : I-14 (tri de l'arsenal et tri automatique) et X-05 (bulles des PNJ dans le chat). Ordre : domaine par domaine, Inventaire et marché → Collections → Monde → Récolte → Artisanat → Nouveaux domaines ; dans un domaine, valeur haute et petite taille d'abord. Choix précis tranchés maintenant (colonne « Choix » de GAPS.md), notamment : solveur d'artisanat optimal proposé en deux versions au choix par un réglage (C# original dans la DLL, Raphael natif) ; si Macro Chain est actif, Tensho s'appuie sur lui ; Universalis seulement au survol ou à la demande pour les prix et les ventes des servants ; un fichier par personnage, jamais d'Account ID ; alarmes d'échéance créées d'office (alarmes Tensho, jamais /alarm d'office) ; pêche en mer dans la page Récolte, aide complète d'un coup ; rotations de collectionnables propres à Tensho selon les seuils de remise ; événements saisonniers par les données du jeu seulement ; Faux Hollows : données du jeu d'abord, puis licence compatible, sinon relevés ; PaissaDB accepté en surveillance régulière (réglage), lecture seule. Licence EUPL-1.2 : compatible avec la GPL v3 (avis requis).
 Reason: Choix de l'utilisateur, lot par lot dans la conversation (2026-11-02).
 Consequences: Étape g) de la file (docs/project/ROADMAP.md, docs/ai/STATUS.md), après R-12, d), e) et f) ; chaque manque est une version vérifiable à part. Toute fonction qui agit d'office reste désactivable et respecte les règles Dalamud relevées dans GAPS.md (pas de requête serveur sans action du joueur, données lues seulement après ouverture par le joueur). Le solveur Raphael ajoute un fichier natif hors de la DLL : exception voulue par l'utilisateur, en option.
-References: docs/project/GAPS.md, docs/project/ROADMAP.md (étape g), docs/evidence/0.318-plugin-gaps.json, CONTRIBUTING.md (licences)
+References: docs/project/GAPS.md, docs/project/ROADMAP.md (étape g), docs/evidence/0.318-plugin-gaps.json, CONTRIBUTING.md (licences) ; EUPL-1.2 confirmée par DEC-050
 
 DEC-ID: DEC-026
 Timestamp: 2026-11-03 Europe/Brussels (0.447)
@@ -383,7 +384,7 @@ Options: Les conseils de l'agent, ou les changer un par un.
 Decision: Cadre des fenêtres du jeu retiré. Conseils de jeu en JcE seulement : Triple Triade contre un PNJ, jamais en tournoi ni contre un joueur. Reste, conseils de l'agent : release après une session de jeu sur la dernière version ; ventes des servants, Universalis sur clic ; I-15 lors d'une séance en jeu avec l'utilisateur ; N-10 laissé de côté, seulement s'il sert à l'utilisateur.
 Reason: Décision de l'utilisateur.
 Consequences: Les territoires 579, 940 et 941 coupent les conseils (docs/evidence/0.510-triad-competitive.md). Point « Conseil en match » de PUBLISHING traité ; le panneau du Dédale reste à demander à l'équipe avant la 1.0.0.
-References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31
+References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31 ; règle de release modifiée par DEC-050
 
 DEC-ID: DEC-034
 Timestamp: 2026-11-04 Europe/Brussels
@@ -443,7 +444,7 @@ Options: Découper en petits plugins ; se passer de Dalamud ; continuer sur le d
 Decision: Pas de soumission au dépôt officiel. Tensho continue sur le dépôt personnalisé, et le plan continue. Les règles et consignes de Dalamud restent appliquées comme si le plugin était soumis. Remplace la partie soumission de DEC-023 et DEC-037.
 Reason: Décision de l'utilisateur.
 Consequences: La 1.0.0 marque la fin du plan global sur le dépôt personnalisé, sans PR D17 ; c'est toujours l'utilisateur qui la décide. docs/project/PUBLISHING.md reste la liste des règles à tenir, les étapes de soumission ne sont plus à faire. Un petit plugin séparé reste possible un jour, sur sa demande. Découper Tensho en plusieurs plugins : étudié en brouillon le 2026-11-06 et abandonné par l'utilisateur (« on va pas le faire »), branche retirée.
-References: DEC-023, DEC-037, docs/project/PUBLISHING.md
+References: DEC-023, DEC-037, docs/project/PUBLISHING.md ; modifiée par DEC-050 (politique IA plus suivie)
 
 DEC-ID: DEC-040
 Timestamp: 2026-11-07 Europe/Brussels
@@ -544,3 +545,13 @@ Decision: Les trois, chacun avec son réglage (couche de la carte, icône au-des
 Reason: Décision de l'utilisateur.
 Consequences: X-40 codé en 0.1002.
 References: G-PROPOSALS n° 11, X-35, X-40
+
+DEC-ID: DEC-050
+Timestamp: 2026-11-09 Europe/Brussels (0.1020)
+Problem: Sujets confiés à l'agent le 2026-11-09 : releases, politique IA de Dalamud, licence EUPL-1.2, icône. Des DEC et des documents publics disaient encore le contraire : commits faits par l'application de bureau (DEC-009, DEC-010), release après une séance de jeu (DEC-033), politique IA suivie (DEC-010, DEC-039), EUPL « à accepter par l'utilisateur » (GAPS), icône « à garder ou remplacer » (PUBLISHING, point 7).
+Evidence: Demandes de l'utilisateur du 2026-11-09 (plan du système de travail, approuvé) : l'agent gère git entièrement, releases, icône et licences comprises ; politique IA de Dalamud retirée, la déclaration d'IA du manifeste reste (elle dit vrai) ; release quand le plugin a changé, que les contrôles sont verts et que ce qui a changé est validé en jeu, correctif urgent (patch du jeu, confidentialité) sans attendre et marqué « not validated in game » ; la 1.0.0 reste la décision de l'utilisateur. EUPL v1.2 (décision d'exécution (UE) 2017/863 de la Commission, https://eur-lex.europa.eu/eli/dec_impl/2017/863/oj), lue le 2026-11-09 : l'article 5 (« clause de compatibilité ») permet de distribuer une œuvre dérivée qui combine l'œuvre et une œuvre sous licence compatible selon cette licence compatible ; l'annexe liste la GNU GPL v. 2 et v. 3 ; le même article demande de garder intacts les avis de droit d'auteur et de joindre la licence.
+Options: Releases par l'utilisateur seulement ; releases par l'agent dans des garde-fous. Politique IA suivie ou non. EUPL acceptée, refusée ou laissée en attente. Icône gardée ou refaite.
+Decision: 1) Releases par l'agent, seulement par `Verify.ps1 -Release` : plugin changé, contrôles refaits en entier (compilation, tests, langues, paquet), CI du commit poussé verte, fichiers de travail et adresse de webhook absents, `repo.json` relu avant son commit, essais en jeu des versions depuis la dernière release tous validés ; sinon correctif urgent seulement (`-Hotfix "<raison>"`, notes « not validated in game »). main avance en avance rapide seulement ; un retour arrière se fait par revert et une version supérieure, jamais en supprimant un tag. Un nouveau premier numéro (1.0.0 d'abord) demande `-Major`, réservé à l'utilisateur. Mises à jour Dependabot fusionnées par script (auteur Dependabot vérifié, fichiers de `.github/` seulement, CI verte) ; PR humaines : l'utilisateur. 2) Politique IA de Dalamud plus suivie comme règle (aucune soumission, DEC-039) ; la déclaration d'IA du manifeste et du README reste ; les autres règles Dalamud restent appliquées. 3) EUPL-1.2 : DEC-025 confirmée ; du code sous EUPL-1.2 peut entrer dans Tensho sous GPL v3 par la clause de compatibilité, avec ses avis de droit d'auteur gardés et le crédit (README, page Crédits). 4) Icône actuelle (générée par l'agent, déclarée) gardée.
+Reason: Décisions de l'utilisateur (points 1 et 2, et délégation des points 3 et 4) ; texte officiel de l'EUPL lu pour le point 3 ; pour le point 4, rien ne demande de la refaire : elle est déclarée, et la préférence pour une icône faite main venait de la politique IA retirée.
+Consequences: Modifie DEC-009 et DEC-010 (commits et releases faits par l'agent, plus par l'application de bureau ni par l'utilisateur), DEC-024 (releases par l'agent ; le premier numéro reste à l'utilisateur, garde `-Major` ; la 1.0.0 marque la fin du plan global sur le dépôt personnalisé, DEC-039), DEC-033 (« release après une session de jeu » devient le point 1 ci-dessus), DEC-039 et DEC-010 (la politique IA sort des règles suivies). PUBLISHING : points 6 et 7 fermés, point 4 aligné sur DEC-047. GAPS : EUPL-1.2 « compatible avec avis » partout. CONTRIBUTING et README disent qui essaie en jeu et quand une release part.
+References: DEC-009, DEC-010, DEC-024, DEC-025, DEC-033, DEC-039, DEC-047, scripts/Release.ps1, scripts/Verify.ps1, docs/project/PUBLISHING.md, docs/project/GAPS.md, CONTRIBUTING.md, README.md

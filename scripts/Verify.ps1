@@ -7,6 +7,8 @@
     [switch]$DryRun,
     # 0.1017, with -Release: urgent fix (game patch, privacy) released before its in-game tests; the reason heads the release notes.
     [string]$Hotfix,
+    # 0.1020, with -Release: the major number (x of x.y.z) is the maintainer's decision; a release that raises it needs this switch.
+    [switch]$Major,
     # Re-run everything even when this exact source state already passed (see the stamp below).
     [switch]$Force,
     # 0.323: contributors without the game: builds the test project only (pure logic, no Dalamud), runs the tests and the language
@@ -16,6 +18,7 @@
 $ErrorActionPreference = 'Stop'
 if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
+if ($Major -and -not $Release) { throw '-Major goes with -Release only.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot
@@ -30,7 +33,7 @@ if (-not $DotNet) {
         elseif (Test-Path -LiteralPath $taskLegacySdk) { $taskLegacySdk } else { 'dotnet' }
 }
 # Stamp of the last green run (0.219): version + SHA-256 of every git-tracked or new file except *.md, docs/ and repo.json. When nothing
-# changed since that run (e.g. -Commit then -Release) and the DLL is still there, the build/tests/package checks are not run again.
+# changed since that run (e.g. -Commit after a plain run; never -Release since 0.1020) and the DLL is still there, the build/tests/package checks are not run again.
 # 0.323: the Dalamud version (Dalamud.dll in DALAMUD_HOME, else XIVLauncher's dev hooks) and the SDK version are part of the stamp, so
 # an update of either runs every check again.
 function Get-TaskEnvironment {
@@ -89,7 +92,8 @@ if ($TestsOnly) {
 }
 $taskFingerprint = Get-TaskFingerprint
 $taskSkip = $false
-if (-not $Force -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'))) {
+# 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
+if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'))) {
     $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
 }
@@ -153,6 +157,7 @@ if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$D
 if ($Release) {
     $taskReleaseArgs = @{ Mode = 'Release'; DryRun = $DryRun }
     if ($PSBoundParameters.ContainsKey('Hotfix')) { $taskReleaseArgs.Hotfix = $Hotfix }
+    if ($Major) { $taskReleaseArgs.Major = $true }
     & (Join-Path $PSScriptRoot 'Release.ps1') @taskReleaseArgs; if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 exit 0

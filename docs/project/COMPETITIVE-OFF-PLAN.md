@@ -87,7 +87,8 @@ Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflic
 | D4 | Quai de Wolves' Den ? | Coupé |
 | D5 | Triple Triade contre un joueur en zone normale ? | Seule la partie Triple Triade se coupe |
 
-Panneau du Dédale : abandonné. La page du dresseur reste une liste d'informations, hors du Dédale.
+Panneau du Dédale : abandonné ici, puis repris en exception limitée par DEC-047 (X-109) : le panneau d'équipe devant le plateau, entre
+les combats seulement, coupé dès le début de chaque combat. Le reste du dresseur reste une liste d'informations, hors du Dédale.
 
 Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'examen de la soumission peut donc juger autrement.
 

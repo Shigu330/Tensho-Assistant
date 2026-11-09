@@ -7,20 +7,21 @@ which are still applied; the submission steps are no longer to be done.
 
 Rules re-read on 2026-11-04: [submission](https://dalamud.dev/plugin-publishing/submission),
 [approval](https://dalamud.dev/plugin-publishing/approval-process),
-[restrictions](https://dalamud.dev/plugin-publishing/restrictions), [AI policy](https://dalamud.dev/plugin-publishing/ai-policy),
+[restrictions](https://dalamud.dev/plugin-publishing/restrictions), [AI policy](https://dalamud.dev/plugin-publishing/ai-policy) (no longer followed since DEC-050),
 [metadata](https://dalamud.dev/plugin-development/plugin-metadata),
 [technical considerations](https://dalamud.dev/plugin-development/technical-considerations), README of
 [DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17). How they build: [record](../evidence/0.512-d17-build.md).
 List checked against the code at version 0.971 (2026-11-09).
 
-The custom repository: `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, updated by `Verify.ps1 -Release`
-(latest release: `Stable-0.802.0`, 2026-11-07). Version 1.0.0 marks the end of the global plan on this custom repository; the user decides
+The custom repository: `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, updated by `Verify.ps1 -Release`,
+run by the agent (DEC-050); the latest release is on the GitHub releases page. Version 1.0.0 marks the end of the global plan on this custom repository; the user decides
 it (DEC-039).
 
 Answer received on the Dalamud Discord, 2026-11-05 (hOst1k, question asked by the author): no size limit if the plugin follows the rules;
 the bigger it is, the longer the first review; better not to aim too complex from the start, Simple Tweaks and « VanillaTweaks » (probably
 VanillaPlus) having grown over time. Exact role of this person in the team: not checked. At that date: 57,419 lines of C# in the plugin,
-123,519 lines tracked by git. The AI policy remains: an « Auto » submission too big for the author to account for may be closed.
+123,519 lines tracked by git. The AI policy also applied then: an « Auto » submission too big for the author to account for may be closed
+(no longer followed since DEC-050).
 
 Rest of the same exchange, 2026-11-05: after learning of the 57,000 lines written with an agent, goat answers that this amount of code
 cannot be reviewed, new Era adds that many things already exist in other plugins, and MidoriKami asks the approval team (`@dalamud-pac`)
@@ -32,7 +33,7 @@ first commit on 2026-10-31.
 ## Former submission steps (not to do since DEC-039)
 
 Kept because several of them are Dalamud rules the code still follows. Points marked **Dalamud rule** need a summary and the author's
-agreement (instruction of 2026-11-04).
+agreement (instruction of 2026-11-04), except the AI policy, no longer followed (DEC-050).
 
 | # | Point | Who | State |
 |---|---|---|---|
@@ -40,12 +41,12 @@ agreement (instruction of 2026-11-04).
 | 2 | **Dalamud rule**: title by job, the only action towards the game without a click (setting off by default) | author | **decided** (DEC-035): kept as it is |
 | 3 | Game alarms: nothing to change. The `/alarm` commands always start from a player's click: adding an alarm while the setting is on, or « Send »; the automatic alarms of retainers and vessels never create one | — | done |
 | 3 bis | **Dalamud rule**: PvP and competitive content: Tensho stops entirely, with no setting (DEC-038, 0.610) | author | coded, not tried in game |
-| 4 | **Dalamud rule**: Beastmaster. The page is a list of information; the Labyrinth panel is dropped (DEC-038) | author | handled |
+| 4 | **Dalamud rule**: Beastmaster. The page is a list of information. The Labyrinth panel dropped by DEC-038 comes back as a limited exception (DEC-047, X-109): the team panel in front of the Beastmaster Labyrinth board, between fights only, off from the start of each fight | author | decided (DEC-047); to prove in game |
 | 5 | **Dalamud rule**: windows. « If it looks like a window, use the window API. » Everything is converted (0.514, 0.516) except the invisible click zones of the Fashion Report; to check in game (#38) | author | to check in game |
-| 6 | **Dalamud rule**: AI disclosure and pull request text written by the author, who must be able to explain the code. Size on 2026-11-09: 608 C# files, 71,194 lines in the plugin | author | not needed since DEC-039; draft in `publish/d17/PULL_REQUEST.md` |
-| 7 | **Dalamud rule**: AI-generated icon, declared. The policy prefers a hand-made icon | author | open: keep it or replace it |
-| 8 | Screenshots for the installer: `images/image1.png` to `image5.png`, 730×380 at most. Optional, none exist | author (in game) | open |
-| 9 | Move to 1.0.0 (author's decision), Verify, public commit, release `Stable-1.0.0` | agent, on request | at the end |
+| 6 | **Dalamud rule**: AI disclosure and pull request text written by the author, who must be able to explain the code. Size on 2026-11-09: 608 C# files, 71,194 lines in the plugin | author | **closed** (DEC-050): AI policy no longer followed; the AI disclosure stays in the manifest and the README; draft in `publish/d17/PULL_REQUEST.md` |
+| 7 | AI-generated icon, declared. The AI policy preferred a hand-made icon | agent | **closed** (DEC-050): the current icon is kept, still declared |
+| 8 | Screenshots for the installer: `images/image1.png` to `image5.png`, 730×380 at most. Optional, none exist; `Verify.ps1 -Release` lists them in `repo.json` when they exist (0.1020) | agent, in game with the author | open |
+| 9 | Move to 1.0.0 (author's decision; the release needs `-Major`), Verify, public commit, release `Stable-1.0.0` | agent, on request | at the end |
 | 10 | Commit hash and `changelog` in `manifest.toml`, fork of goatcorp/DalamudPluginsD17, branch, copy of `publish/d17/testing/live/TenshoAssistant/`, pull request | author | not to do since DEC-039 |
 
 ## State of the checklist
@@ -96,7 +97,8 @@ more than a week.
 2026-10-31: display name « Tensho Assistant »; AI level « Auto »; icon generated and declared; official repository. 2026-11-02 (DEC-023):
 submission at version 1.0.0; German and Japanese kept in the package, partial, falling back to English. 2026-11-04 (DEC-033): frame of the
 game windows removed (it was planned before D17); game advice in PvE only. 2026-11-05 (DEC-039): no submission, the custom repository
-only, the rules kept. Quest icons 71141 / 71151: the setting says « variant n » as long as no in-game record gives their meaning; nothing
+only, the rules kept. 2026-11-09: the Labyrinth team panel as a limited exception (DEC-047); releases by the agent, AI policy no
+longer followed (AI disclosure kept), EUPL-1.2 confirmed, current icon kept (DEC-050). Quest icons 71141 / 71151: the setting says « variant n » as long as no in-game record gives their meaning; nothing
 blocking.
 
 ---
@@ -108,21 +110,21 @@ Dalamud, qui restent appliquées ; les étapes de soumission ne sont plus à fai
 
 Règles relues le 2026-11-04 : [soumission](https://dalamud.dev/plugin-publishing/submission),
 [approbation](https://dalamud.dev/plugin-publishing/approval-process),
-[restrictions](https://dalamud.dev/plugin-publishing/restrictions), [politique IA](https://dalamud.dev/plugin-publishing/ai-policy),
+[restrictions](https://dalamud.dev/plugin-publishing/restrictions), [politique IA](https://dalamud.dev/plugin-publishing/ai-policy) (plus suivie depuis DEC-050),
 [métadonnées](https://dalamud.dev/plugin-development/plugin-metadata),
 [considérations techniques](https://dalamud.dev/plugin-development/technical-considerations), README de
 [DalamudPluginsD17](https://github.com/goatcorp/DalamudPluginsD17). Compilation chez eux : [relevé](../evidence/0.512-d17-build.md).
 Liste relue contre le code à la version 0.971 (2026-11-09).
 
 Le dépôt personnalisé : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
-`Verify.ps1 -Release` (dernière release : `Stable-0.802.0`, 2026-11-07). La version 1.0.0 marque la fin du plan global sur ce dépôt
+`Verify.ps1 -Release`, lancé par l'agent (DEC-050) ; la dernière release est sur la page des releases GitHub. La version 1.0.0 marque la fin du plan global sur ce dépôt
 personnalisé ; c'est l'utilisateur qui la décide (DEC-039).
 
 Réponse reçue sur le Discord de Dalamud, 2026-11-05 (hOst1k, question posée par l'auteur) : pas de limite de taille si le plugin respecte
 les règles ; plus il est gros, plus le premier examen est long ; mieux vaut ne pas viser trop complexe dès le départ, Simple Tweaks et
 « VanillaTweaks » (sans doute VanillaPlus) ayant grandi avec le temps. Rôle exact de cette personne dans l'équipe : non vérifié. À cette
-date : 57 419 lignes de C# dans le plugin, 123 519 lignes suivies par git. Reste la politique IA : une soumission « Auto » trop grosse
-pour que l'auteur en réponde peut être fermée.
+date : 57 419 lignes de C# dans le plugin, 123 519 lignes suivies par git. La politique IA s'appliquait aussi : une soumission « Auto » trop grosse
+pour que l'auteur en réponde peut être fermée (plus suivie depuis DEC-050).
 
 Suite du même échange, 2026-11-05 : après avoir appris les 57 000 lignes écrites avec un agent, goat répond que cette quantité de code
 n'est pas examinable, new Era ajoute que beaucoup de choses existent déjà dans d'autres plugins, et MidoriKami demande à l'équipe
@@ -134,7 +136,7 @@ ouvertes contre 156 cochées ; premier commit le 2026-10-31.
 ## Anciennes étapes de soumission (plus à faire depuis DEC-039)
 
 Gardées parce que plusieurs sont des règles Dalamud que le code suit toujours. Les points marqués **règle Dalamud** demandent un résumé
-et l'accord de l'auteur (consigne du 2026-11-04).
+et l'accord de l'auteur (consigne du 2026-11-04), sauf la politique IA, plus suivie (DEC-050).
 
 | # | Point | Qui | État |
 |---|---|---|---|
@@ -142,12 +144,12 @@ et l'accord de l'auteur (consigne du 2026-11-04).
 | 2 | **Règle Dalamud** : titre selon le job, seule action vers le jeu sans clic (réglage désactivé par défaut) | auteur | **décidé** (DEC-035) : gardé tel quel |
 | 3 | Alarmes du jeu : rien à changer. Les commandes `/alarm` partent toujours d'un clic du joueur : ajouter une alarme quand le réglage est actif, ou « Envoyer » ; les alarmes automatiques des servants et des vaisseaux n'en créent jamais | — | fait |
 | 3 bis | **Règle Dalamud** : JcJ et contenu compétitif : Tensho se coupe en entier, sans réglage (DEC-038, 0.610) | auteur | codé, pas essayé en jeu |
-| 4 | **Règle Dalamud** : dresseur. La page est une liste d'informations ; le panneau du Dédale est abandonné (DEC-038) | auteur | traité |
+| 4 | **Règle Dalamud** : dresseur. La page est une liste d'informations. Le panneau du Dédale abandonné par DEC-038 revient en exception limitée (DEC-047, X-109) : le panneau d'équipe devant le plateau du Dédale bestial, entre les combats seulement, coupé dès le début de chaque combat | auteur | décidé (DEC-047) ; à prouver en jeu |
 | 5 | **Règle Dalamud** : fenêtres. « Si ça ressemble à une fenêtre, utiliser l'API de fenêtres. » Tout est converti (0.514, 0.516) sauf les zones de clic invisibles de la Revue de mode ; à vérifier en jeu (#38) | auteur | à vérifier en jeu |
-| 6 | **Règle Dalamud** : déclaration d'IA et texte de la PR écrits par l'auteur, qui doit pouvoir expliquer le code. Taille au 2026-11-09 : 608 fichiers C#, 71 194 lignes dans le plugin | auteur | plus nécessaire depuis DEC-039 ; brouillon dans `publish/d17/PULL_REQUEST.md` |
-| 7 | **Règle Dalamud** : icône générée par IA, déclarée. La politique préfère une icône faite main | auteur | ouvert : la garder ou la remplacer |
-| 8 | Captures pour l'installeur : `images/image1.png` à `image5.png`, 730×380 au plus. Facultatif, aucune n'existe | auteur (en jeu) | ouvert |
-| 9 | Passer à 1.0.0 (décision de l'auteur), Verify, commit public, release `Stable-1.0.0` | agent, sur demande | à la fin |
+| 6 | **Règle Dalamud** : déclaration d'IA et texte de la PR écrits par l'auteur, qui doit pouvoir expliquer le code. Taille au 2026-11-09 : 608 fichiers C#, 71 194 lignes dans le plugin | auteur | **fermé** (DEC-050) : politique IA plus suivie ; la déclaration d'IA reste dans le manifeste et le README ; brouillon dans `publish/d17/PULL_REQUEST.md` |
+| 7 | Icône générée par IA, déclarée. La politique IA préférait une icône faite main | agent | **fermé** (DEC-050) : l'icône actuelle est gardée, toujours déclarée |
+| 8 | Captures pour l'installeur : `images/image1.png` à `image5.png`, 730×380 au plus. Facultatif, aucune n'existe ; `Verify.ps1 -Release` les inscrit dans `repo.json` quand elles existent (0.1020) | agent, en jeu avec l'auteur | ouvert |
+| 9 | Passer à 1.0.0 (décision de l'auteur ; la release demande `-Major`), Verify, commit public, release `Stable-1.0.0` | agent, sur demande | à la fin |
 | 10 | Hash du commit et `changelog` dans `manifest.toml`, fork de goatcorp/DalamudPluginsD17, branche, copie de `publish/d17/testing/live/TenshoAssistant/`, PR | auteur | plus à faire depuis DEC-039 |
 
 ## État de la liste de contrôle
@@ -198,5 +200,6 @@ peut dépasser une semaine.
 2026-10-31 : nom affiché « Tensho Assistant » ; niveau d'IA « Auto » ; icône générée et déclarée ; dépôt officiel. 2026-11-02 (DEC-023) :
 soumission à la version 1.0.0 ; allemand et japonais gardés dans le paquet, partiels, repli sur l'anglais. 2026-11-04 (DEC-033) : cadre
 des fenêtres du jeu retiré (il était prévu avant D17) ; conseils de jeu en JcE seulement. 2026-11-05 (DEC-039) : pas de soumission, le
-dépôt personnalisé seulement, les règles gardées. Icônes de quête 71141 / 71151 : le réglage dit « variante n » tant qu'aucun relevé en
+dépôt personnalisé seulement, les règles gardées. 2026-11-09 : panneau d'équipe du Dédale en exception limitée (DEC-047) ; releases
+par l'agent, politique IA plus suivie (déclaration d'IA gardée), EUPL-1.2 confirmée, icône actuelle gardée (DEC-050). Icônes de quête 71141 / 71151 : le réglage dit « variante n » tant qu'aucun relevé en
 jeu n'en donne le sens ; rien de bloquant.

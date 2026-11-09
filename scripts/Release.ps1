@@ -2,7 +2,9 @@
     [Parameter(Mandatory)][ValidateSet('Commit', 'Release')][string]$Mode,
     [switch]$DryRun,
     # 0.1017: urgent fix (game patch, privacy) released before its in-game tests; the reason goes at the top of the release notes.
-    [string]$Hotfix
+    [string]$Hotfix,
+    # 0.1020: the major number (x of x.y.z, 1.0.0 first) is the maintainer's decision: raising it needs this switch.
+    [switch]$Major
 )
 # Git steps after a green Verify.ps1 (called by Verify.ps1 -Commit / -Release; see CONTRIBUTING.md 'Versions et releases').
 #   Commit  : on Devloppement, commits every change as 'x.y.z' with the CHANGELOG entry as body, then pushes Devloppement.
@@ -91,6 +93,49 @@ function Assert-CiGreen([string]$Sha) {
     Write-Output "CI: '$requiredWorkflow' green for $short."
 }
 if ($Hotfix -and $Mode -ne 'Release') { throw '-Hotfix goes with -Release only.' }
+if ($Major -and $Mode -ne 'Release') { throw '-Major goes with -Release only.' }
+# 0.1020: the plugin's screenshots for the Dalamud installer: images/image1.png to image5.png next to the icon, PNG of 730x380
+# at most (docs/project/PUBLISHING.md, point 8), listed in repo.json as ImageUrls. None yet: the entry then has no ImageUrls.
+$imageWidth = 730; $imageHeight = 380
+function Get-PngSize([string]$Path) {
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    $signature = [byte[]](0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+    if ($bytes.Length -lt 24) { return $null }
+    for ($at = 0; $at -lt 8; $at++) { if ($bytes[$at] -ne $signature[$at]) { return $null } }
+    $read = { param($at) ([int]$bytes[$at] -shl 24) -bor ([int]$bytes[$at + 1] -shl 16) -bor ([int]$bytes[$at + 2] -shl 8) -bor [int]$bytes[$at + 3] }
+    return @((& $read 16), (& $read 20))
+}
+function Get-ImageUrls([string]$BaseUrl) {
+    $urls = @()
+    $folder = Join-Path $root 'src\TenshoAssistant\images'
+    foreach ($index in 1..5) {
+        $file = Join-Path $folder "image$index.png"
+        if (-not (Test-Path -LiteralPath $file)) { continue }
+        $size = Get-PngSize $file
+        if (-not $size) { Stop-Release "Stopped: images/image$index.png is not a PNG file." }
+        if ($size[0] -gt $imageWidth -or $size[1] -gt $imageHeight) { Stop-Release "Stopped: images/image$index.png is $($size[0])x$($size[1]); the installer's screenshots are ${imageWidth}x$imageHeight at most." }
+        $urls += "$BaseUrl/image$index.png"
+    }
+    return , $urls
+}
+# 0.1020: repo.json is read back before it is committed: one entry, this version, this release's zip, an icon and screenshots that exist.
+function Assert-RepoJson([string]$Text, [string]$Version, [string]$Download) {
+    try { $parsed = @($Text | ConvertFrom-Json) } catch { Stop-Release "Stopped: repo.json is not valid JSON ($($_.Exception.Message))." }
+    if ($parsed.Count -ne 1) { Stop-Release "Stopped: repo.json holds $($parsed.Count) entries; one is expected." }
+    $item = $parsed[0]
+    $problems = @()
+    if ($item.InternalName -ne 'TenshoAssistant') { $problems += "InternalName '$($item.InternalName)'" }
+    if ("$($item.AssemblyVersion)" -notmatch "^$([regex]::Escape($Version))(\.0)?$") { $problems += "AssemblyVersion '$($item.AssemblyVersion)' is not $Version" }
+    foreach ($key in 'DownloadLinkInstall', 'DownloadLinkUpdate', 'DownloadLinkTesting') { if ($item.$key -ne $Download) { $problems += "$key does not point at $Download" } }
+    foreach ($key in 'Author', 'Name', 'Description', 'Punchline', 'RepoUrl', 'DalamudApiLevel', 'Changelog') { if (-not "$($item.$key)".Trim()) { $problems += "$key is empty" } }
+    $local = Join-Path $root 'src\TenshoAssistant\images'
+    foreach ($url in @($item.IconUrl) + @($item.ImageUrls | Where-Object { $_ })) {
+        if (-not $url) { $problems += 'IconUrl is empty'; continue }
+        if (-not (Test-Path -LiteralPath (Join-Path $local ($url -replace '^.*/', '')))) { $problems += "$url has no file in src/TenshoAssistant/images" }
+    }
+    if ($problems.Count) { Stop-Release "Stopped: repo.json read back: $($problems -join '; ')." }
+    Write-Output "repo.json read back: $($item.AssemblyVersion), icon and $(@($item.ImageUrls | Where-Object { $_ }).Count) screenshot(s)."
+}
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
 function Add-HotfixNote([string]$Notes) {
     if (-not $Hotfix) { return $Notes }
@@ -257,6 +302,9 @@ try {
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
     $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
     if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0]; Write-Output "Release notes cover the versions after $($lastReleased[0])." }
+    # 0.1020: a new major number (1.0.0 first) is released only on the maintainer's word (-Major).
+    $lastMajor = if ($lastReleased.Count -gt 0) { ([version]$lastReleased[0]).Major } else { 0 }
+    if (([version]$version).Major -gt $lastMajor -and -not $Major) { Stop-Release "Stopped: $version raises the major number (last release $($lastReleased[0])); that is the maintainer's decision: -Major." }
     $notes = Add-HotfixNote $notes
     if ($Hotfix) { Write-Output "Urgent fix: $($Hotfix.Trim())" }
     if ($DryRun) { Write-Output "--- release notes ---`n$notes`n---------------------" }
@@ -264,21 +312,26 @@ try {
     $output = 'src\TenshoAssistant\bin\x64\Release'
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $output 'TenshoAssistant.json') | ConvertFrom-Json
     $download = "https://github.com/$repository/releases/download/$tag/latest.zip"
+    $imagesUrl = "https://raw.githubusercontent.com/$repository/$releaseBranch/src/TenshoAssistant/images"
+    $imageUrls = Get-ImageUrls $imagesUrl
     $entry = [ordered]@{
         Author = $manifest.Author; Name = $manifest.Name; InternalName = $manifest.InternalName
         AssemblyVersion = $manifest.AssemblyVersion; TestingAssemblyVersion = $manifest.AssemblyVersion
         Description = $manifest.Description; Punchline = $manifest.Punchline; ApplicableVersion = $manifest.ApplicableVersion
         RepoUrl = $manifest.RepoUrl; Tags = $manifest.Tags; DalamudApiLevel = $manifest.DalamudApiLevel
-        IconUrl = "https://raw.githubusercontent.com/$repository/$releaseBranch/src/TenshoAssistant/images/icon.png"
+        IconUrl = "$imagesUrl/icon.png"
         DownloadLinkInstall = $download; DownloadLinkUpdate = $download; DownloadLinkTesting = $download
         IsHide = $false; IsTestingExclusive = $false; AcceptsFeedback = $manifest.AcceptsFeedback
         LastUpdate = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds(); Changelog = $notes
     }
+    if ($imageUrls.Count) { $entry.ImageUrls = $imageUrls }
     $json = ConvertTo-Json @($entry) -Depth 4
+    Assert-RepoJson $json $version $download
     [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
 
     # Local steps first: repo.json committed on Devloppement and tagged. Nothing is public yet. No branch change (0.1017).
     Step "write repo.json ($version)" { [IO.File]::WriteAllText((Join-Path $root 'repo.json'), $json + "`n", [Text.UTF8Encoding]::new($false)) }
+    if (-not $DryRun) { Assert-RepoJson ([IO.File]::ReadAllText((Join-Path $root 'repo.json'))) $version $download }
     Step "git commit repo.json" { git add repo.json; git commit -m "$version · repo.json" }
     if (-not $DryRun) { Assert-NoAgentFiles 'HEAD' }
     Step "git tag -a $tag" { git tag -a $tag -m "Tensho Assistant $version" }
