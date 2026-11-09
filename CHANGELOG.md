@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.988.0
+- Plan global, Verify : Mandats (X-103, idée retenue à la revue) : dans la file des mandats d'artisanat acceptés, un bouton « Préparer » ajoute à la liste d'artisanat choisie ce que ces mandats demandent et que vous n'avez pas encore (quantités additionnées par objet, ce que vous possédez déduit, objets avec une recette seulement). Sans liste, le bouton est grisé et dit d'en créer une. Non validé en jeu.
+- Tests : LevePrepare988Tests. Verify.ps1 (agent) : 1622/1622, 0 avertissement, 0 erreur ; DLL 0.988.0.0. Non validé en jeu.
+### English
+- Leves (X-103, idea kept at the review): in the accepted crafting leves queue, a « Prepare » button adds to the chosen crafting list what those leves ask and you do not hold yet (quantities added up per item, what you hold taken off, items with a recipe only). Without a list, the button is greyed and says to make one. Not validated in game.
+
 ## 0.987.0
 - Plan global, Verify : Succès (X-102, idée retenue à la revue) : la progression des succès vue par Tensho est maintenant gardée sur le disque, par personnage, et retrouvée au prochain lancement. Quand un succès que vous suivez est vu passer à son maximum, une ligne « Succès suivi terminé : … » s'affiche dans la discussion. Non validé en jeu.
 - Tests : AchievementSaved987Tests. Verify.ps1 (agent) : 1621/1621, 0 avertissement, 0 erreur ; DLL 0.987.0.0. Non validé en jeu.

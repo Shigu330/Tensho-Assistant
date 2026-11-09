@@ -5610,6 +5610,11 @@
     "Accepted": "Accepted",
     "Completed": "Completed",
     "NotCompleted": "Not completed",
+    "Prepare": "Prepare: add what is missing to « {0} »",
+    "PrepareTip": "Adds to the chosen crafting list (Preparation page) what the accepted crafting leves ask and you do not hold yet, items with a recipe only.",
+    "PrepareNoList": "Make a crafting list first (Preparation page).",
+    "Prepared": "{0} items added to « {1} ».",
+    "PrepareNothing": "Nothing missing: you hold what they ask.",
     "CraftQueue": "Accepted crafting leves ({0})",
     "CraftLine": "{0} — {1} ×{2} · held: {3}"
   },

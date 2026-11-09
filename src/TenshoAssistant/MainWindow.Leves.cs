@@ -173,6 +173,32 @@ internal sealed partial class MainWindow
         finally{ImGui.EndTable();}
     }
 
+    // X-103 (0.988, user choice DEC-045, from C-14): « Prepare »: what the accepted crafting leves ask and you do not hold yet, into the chosen
+    // crafting list (only items with a recipe; a quantity unknown counts one, a stock unknown counts none held).
+    private string? levePrepareMessage;
+    private void DrawLevePrepare(IReadOnlyList<ItemLeveUse> crafts)
+    {
+        var store=CraftListStore;
+        var lists=store is { Unavailable:false } ? store.Lists:null;
+        ImGui.BeginDisabled(lists is not { Count:>0 });
+        try
+        {
+            var list=lists is { Count:>0 } ? lists[Math.Clamp(craftListIndex,0,lists.Count-1)]:null;
+            if(ImGui.Button(localization.Format("Leves.Prepare",list?.Name ?? "—")) && list is not null && store is not null)
+            {
+                var wanted=LevePrepare.Missing(crafts.SelectMany(leve=>leve.Requests).Select(request=>(request.ItemId,request.Quantity)),
+                    id=>GetRecipeHoldings(id) is { HasObservation:true } held ? held.Total:0,id=>recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 });
+                var current=list;var added=0;
+                foreach(var (item,quantity) in wanted)if(Craft.CraftLists.Add(current,item,quantity) is { } next){current=next;added++;}
+                levePrepareMessage=added>0 && store.Set(Math.Clamp(craftListIndex,0,lists!.Count-1),current) ? localization.Format("Leves.Prepared",added,list.Name)
+                    :wanted.Count==0 ? localization.Get("Leves.PrepareNothing"):localization.Get("CraftLists.AddFailed");
+            }
+        }
+        finally{ImGui.EndDisabled();}
+        Tip(lists is { Count:>0 } ? "Leves.PrepareTip":"Leves.PrepareNoList");
+        if(levePrepareMessage is { } said){ImGui.SameLine();ImGui.TextDisabled(said);}
+    }
+
     // Accepted crafting leves: the items they ask (CraftLeve, Items/ItemUseCatalog) and the copies the character holds.
     private void DrawAcceptedCraftLeves(LeveProgressState? progress)
     {
@@ -181,6 +207,7 @@ internal sealed partial class MainWindow
         if(crafts.Length==0)return;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Leves.CraftQueue",crafts.Length)+"###LeveCraftQueue",ImGuiTreeNodeFlags.DefaultOpen))return;
         RefreshRecipeHoldingsCache();
+        DrawLevePrepare(crafts);
         var items=itemCatalog.State.Catalog;var size=new Vector2(ImGui.GetTextLineHeight());
         foreach(var leve in crafts)
             foreach(var request in leve.Requests)

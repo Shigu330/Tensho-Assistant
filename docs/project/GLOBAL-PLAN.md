@@ -465,7 +465,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-100 | Revue du 2026-11-09 (DEC-045) : revoir le regroupement et la disposition des outils (pages, onglets, accueil), avec le plan des réglages (G-PROPOSALS n° 3) | Plan proposé à l'utilisateur avant tout changement |
 | X-101 | Idée retenue (DEC-045, de C-09) : alerte quand un objet de la liste de souhaits est en vente sous un prix choisi (Universalis) | À faire |
 | X-102 | Idée retenue (DEC-045, de C-15) : progression des succès suivis gardée sur disque, alerte quand l'un est terminé | 0.987 : progression vue gardée par personnage (AchievementProgress.json, écrite hors du jeu), ligne de discussion quand un succès suivi est vu atteindre son maximum |
-| X-103 | Idée retenue (DEC-045, de C-14) : bouton « Préparer » qui envoie les objets des mandats d'artisanat acceptés à la liste de préparation | À faire |
+| X-103 | Idée retenue (DEC-045, de C-14) : bouton « Préparer » qui envoie les objets des mandats d'artisanat acceptés à la liste de préparation | 0.988 : bouton « Préparer » de la file des mandats d'artisanat acceptés : ce qui manque (demandé moins possédé, recettes seulement) dans la liste d'artisanat choisie |
 | X-104 | Idée retenue (DEC-045, de C-05) : pièces manquantes d'une tenue ajoutées d'un clic à une liste | À faire |
 | X-105 | Idée retenue (DEC-045, de I-12) : filtre par job dans la liste des objets (format du cache des objets à changer) | À faire |
 | X-106 | Idée retenue (DEC-045, de C-01) : état « fait » des contenus gardé par personnage, visible hors connexion | À faire |

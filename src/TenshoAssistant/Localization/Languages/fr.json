@@ -5610,6 +5610,11 @@
     "Accepted": "Accepté",
     "Completed": "Terminé",
     "NotCompleted": "Pas terminé",
+    "Prepare": "Préparer : ajouter ce qui manque à « {0} »",
+    "PrepareTip": "Ajoute à la liste d'artisanat choisie (page Préparation) ce que demandent les mandats d'artisanat acceptés et que vous n'avez pas encore, objets avec une recette seulement.",
+    "PrepareNoList": "Créez d'abord une liste d'artisanat (page Préparation).",
+    "Prepared": "{0} objets ajoutés à « {1} ».",
+    "PrepareNothing": "Rien ne manque : vous avez ce qu'ils demandent.",
     "CraftQueue": "Mandats d'artisanat acceptés ({0})",
     "CraftLine": "{0} — {1} ×{2} · possédés : {3}"
   },
