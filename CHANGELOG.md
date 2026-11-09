@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.995.0
+- Plan global, Verify : Contenus (X-90, DEC-045) : sous les mécaniques du wiki, une partie « Vos notes et schéma d'arène » pour chaque contenu : une note écrite (placements, ordre), et un schéma d'arène ronde ou carrée où vous posez des marques à la souris (repères A à D et 1 à 4, rôles T1, H1, D1… ou un libellé court), nord en haut ; un code « TENSHO-ARENA1 » à copier et coller pour partager. Gardé sur ce PC, masqué pendant un combat, rien n'est posé dans le jeu. Non validé en jeu.
+- Tests : DutyNotes995Tests. Verify.ps1 (agent) : 1631/1631, 0 avertissement, 0 erreur ; DLL 0.995.0.0. Non validé en jeu.
+### English
+- Duties (X-90, DEC-045): under the wiki's mechanics, a « Your notes and arena drawing » part for each duty: a written note (placements, order), and a round or square arena drawing where you place marks with the mouse (waymarks A to D and 1 to 4, roles T1, H1, D1… or a short label), north up; a « TENSHO-ARENA1 » code to copy and paste to share. Kept on this PC, hidden during combat, nothing is placed in the game. Not validated in game.
+
 ## 0.994.0
 - Plan global, Verify : Contenus (X-90, DEC-045) : le détail d'un contenu (page Butin des contenus) a une partie « Mécaniques et stratégie (wiki) » : sur votre clic, Tensho lit la page de ce contenu sur le wiki FFXIV Console Games (licence GFDL, en anglais, crédité), la découpe en sections (objectifs, boss, mécaniques…) et laisse de côté le butin, l'histoire, la galerie et semblables ; gardée sur ce PC, coupée par l'interrupteur Wiki, masquée pendant un combat. Non validé en jeu.
 - Tests : DutyGuide994Tests. Verify.ps1 (agent) : 1629/1629, 0 avertissement, 0 erreur ; DLL 0.994.0.0. Non validé en jeu.

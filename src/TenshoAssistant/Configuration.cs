@@ -12,7 +12,7 @@ public static class ConfigurationReset
         "Version", "Alarms", "ReminderDone", "TreasureMapAt", "MacroChainPlan", "MapBookmarks", "PlaceDirectory", "CraftPresets", "CraftLogTargets", "GcSupplySeen", "GpRegenBase", "CollectableScrutinyGain", "CollectableIntuitionGain", "TripleTriadDeck",
         "TripleTriadDecks", "FollowedQuests", "Observations", "InventorySortProfiles", "InventorySortTemplates", "LanguageCode",
         // 0.315: saved data added since 0.258 (vessels, gear and materia plans).
-        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
+        "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
@@ -446,6 +446,8 @@ public sealed partial class Configuration
     public bool RouteUnlockedOnly { get; set; } = true;
     // 0.310 (R-11): gear plans (job → slot → item) and the planner's filters.
     public Dictionary<uint,Dictionary<TenshoAssistant.Gear.GearSlot,uint>>? GearPlans { get; set; }
+    // X-90 (0.995): the player's notes and arena drawings, by duty (ContentFinderCondition row).
+    public Dictionary<uint,TenshoAssistant.Duties.DutyNote>? DutyNotes { get; set; }
     // X-85 V1 (0.917): ocean fishing departures seen aboard (loop slot, route the game said); they settle the timetable of each port.
     public List<TenshoAssistant.Gathering.OceanSighting>? OceanSightings { get; set; }
     // X-96 (0.959): zones with a story weather where the game confirmed the standard forecast for this player (their story is done).

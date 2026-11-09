@@ -3092,6 +3092,22 @@
     "Quality": "Qualité : {0} / {1}",
     "Durability": "Solidité : {0} / {1}"
   },
+  "DutyNotes": {
+    "Title": "Vos notes et schéma d'arène",
+    "TextTip": "Votre propre note pour ce contenu (placements, ordre…), gardée sur ce PC ; 2000 caractères au plus. Montrée ici seulement, jamais pendant un combat.",
+    "Round": "Arène ronde",
+    "Square": "Arène carrée",
+    "ShapeTip": "La forme du schéma.",
+    "North": "N",
+    "CanvasTip": "Glissez une marque pour la placer ; clic droit pour la retirer. Le nord est en haut. Rien n'est posé dans le jeu.",
+    "LabelTip": "Un libellé court (4 caractères au plus) pour une nouvelle marque, posée au centre.",
+    "Add": "Ajouter",
+    "Copy": "Copier le code",
+    "Paste": "Coller un code",
+    "PasteTip": "Remplace la note et le schéma de ce contenu par un code « TENSHO-ARENA1: » du presse-papiers.",
+    "OtherDuty": "Le code a été fait pour un autre contenu : collé ici quand même.",
+    "NotACode": "Le presse-papiers ne contient pas de code d'arène."
+  },
   "DutyGuide": {
     "Title": "Mécaniques et stratégie (wiki)",
     "InCombat": "Masqué pendant un combat.",

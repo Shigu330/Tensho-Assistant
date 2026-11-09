@@ -3092,6 +3092,22 @@
     "Quality": "Quality: {0} / {1}",
     "Durability": "Durability: {0} / {1}"
   },
+  "DutyNotes": {
+    "Title": "Your notes and arena drawing",
+    "TextTip": "Your own note for this duty (placements, order…), kept on this PC; up to 2000 characters. Shown here only, never during combat.",
+    "Round": "Round arena",
+    "Square": "Square arena",
+    "ShapeTip": "The shape of the drawing.",
+    "North": "N",
+    "CanvasTip": "Drag a mark to place it; right click removes it. North is up. Nothing is placed in the game.",
+    "LabelTip": "A short label (up to 4 characters) for a new mark, added at the centre.",
+    "Add": "Add",
+    "Copy": "Copy the code",
+    "Paste": "Paste a code",
+    "PasteTip": "Replaces this duty's note and drawing with a « TENSHO-ARENA1: » code from the clipboard.",
+    "OtherDuty": "The code was made for another duty: pasted here anyway.",
+    "NotACode": "The clipboard holds no arena code."
+  },
   "DutyGuide": {
     "Title": "Mechanics and strategy (wiki)",
     "InCombat": "Hidden during combat.",
