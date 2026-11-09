@@ -18,7 +18,7 @@
 
 Working documents of [project/](project/), changed with almost every version and written in French for now (their English translation is
 planned just before 1.0.0): [GLOBAL-PLAN](project/GLOBAL-PLAN.md) (global plan and current state), [TESTING](project/TESTING.md)
-(in-game test protocols), [SETTINGS](project/SETTINGS.md) (inventory of the settings: default, where, real effect), [BACKLOG](project/BACKLOG.md), [USER-REQUESTS](project/USER-REQUESTS.md) (user requests),
+(in-game test protocols), [SETTINGS](project/SETTINGS.md) (inventory of the settings: default, where, real effect), [CONTENT-TOOLS](project/CONTENT-TOOLS.md) (content tools study, X-90), [BACKLOG](project/BACKLOG.md), [USER-REQUESTS](project/USER-REQUESTS.md) (user requests),
 [DECISIONS](project/DECISIONS.md), [GAPS](project/GAPS.md) (gaps against other Dalamud plugins and choices made),
 [REFERENCES](project/REFERENCES.md) (verified APIs and sources), [PROPOSALS-TRIAGE](project/PROPOSALS-TRIAGE.md) (sorting of the
 proposals), [MAP-PROPOSALS](project/MAP-PROPOSALS.md) (map), [ITEMS-PROPOSALS](project/ITEMS-PROPOSALS.md) (items, bank, sorting,
@@ -52,7 +52,7 @@ Some documents of `project/` still name old goal sheets (`goals/`) and agent fil
 
 Documents de travail de [project/](project/), changés à presque chaque version et écrits en français pour l'instant (leur traduction
 anglaise est prévue juste avant la 1.0.0) : [GLOBAL-PLAN](project/GLOBAL-PLAN.md) (plan global et état actuel),
-[TESTING](project/TESTING.md) (protocoles d'essai en jeu), [SETTINGS](project/SETTINGS.md) (inventaire des réglages : défaut, où,
+[TESTING](project/TESTING.md) (protocoles d'essai en jeu), [CONTENT-TOOLS](project/CONTENT-TOOLS.md) (étude des outils de contenus, X-90), [SETTINGS](project/SETTINGS.md) (inventaire des réglages : défaut, où,
 effet réel), [BACKLOG](project/BACKLOG.md), [USER-REQUESTS](project/USER-REQUESTS.md)
 (demandes de l'utilisateur), [DECISIONS](project/DECISIONS.md), [GAPS](project/GAPS.md) (manques face aux autres plugins Dalamud et
 choix retenus), [REFERENCES](project/REFERENCES.md) (API et sources vérifiées), [PROPOSALS-TRIAGE](project/PROPOSALS-TRIAGE.md) (tri

@@ -13,8 +13,11 @@ public sealed record FieldEventRow(FieldEventKind Kind,uint Id,uint Instance,str
 
 public static class FieldBoard
 {
-    /// <summary>The four Eureka zones, Bozjan Southern Front, Zadnor. TerritoryType, checked on 2026-11-07.</summary>
-    public static readonly IReadOnlyList<uint> Territories=[732,763,795,827,920,975];
+    /// <summary>
+    /// X-90 / X-92 (0.975): the field operation zones are the TerritoryType rows of these uses: 41 Eureka, 48 Bozja, 61 Occult Crescent
+    /// (docs/evidence/0.975-field-zones.md; the six zones fixed in 0.717 are exactly uses 41 and 48). A new zone of the same family is listed without code.
+    /// </summary>
+    public static readonly IReadOnlyList<uint> FieldZoneUses=[41,48,61];
 
     /// <summary>The rows the layout places, once each, the FATEs first by level. A row with no entry in this layout belongs to another zone.</summary>
     public static IReadOnlyList<FieldEvent> Place(IEnumerable<FieldLayoutEntry> entries,IEnumerable<FieldEventRow> rows)

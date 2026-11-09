@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.975.0
+- Plan global, Verify : Eurêka et Bozja devient aussi la page du Croissant occulte (X-90) : les zones de la page ne sont plus une liste écrite dans le code mais tirées des feuilles du jeu (usage de zone Eurêka, Bozja, Croissant occulte ; relevé : docs/evidence/0.975-field-zones.md). Les deux zones du Croissant occulte y entrent, avec leurs ALÉA et affrontements placés depuis les fichiers du jeu ; une future zone de la même famille y entrera sans code (X-92). Non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.975.0.0. Non validé en jeu.
+### English
+- Eureka and Bozja is now the Occult Crescent page too (X-90): the page's zones are no longer a list written in the code but drawn from the game's sheets (zone use Eureka, Bozja, Occult Crescent; reading: docs/evidence/0.975-field-zones.md). The two Occult Crescent zones come in, with their FATEs and engagements placed from the game's files; a future zone of the same family will come in without code (X-92). Not validated in game.
+
 ## 0.974.0
 - Plan global, Verify : Reliques (X-90, votre document « à faire » : « armures et armes reliques pour chaque version de relique, pas par job ») : la page des reliques a un choix « Vue » : « Par arme ou par job » (comme avant) ou « Par version de relique » : on choisit une étape de la famille et la page liste l'arme de chaque job à cette étape (étapes repérées par leur niveau d'objet), ou pour les armures chaque ensemble avec ses pièces possédées. Non validé en jeu.
 - Tests : RelicStages974Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.974.0.0. Non validé en jeu.

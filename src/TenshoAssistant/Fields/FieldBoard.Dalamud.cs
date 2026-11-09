@@ -36,11 +36,10 @@ internal static class FieldCatalogLoader
         foreach(var row in data.GetExcelSheet<DynamicEvent>())
             if(row.LGBMapRange!=0)rows.Add(new(FieldEventKind.Engagement,row.RowId,row.LGBMapRange,row.Name.ExtractText(),row.Description.ExtractText(),null,row.MaxParticipants));
         var zones=new List<FieldZone>();
-        var territories=data.GetExcelSheet<TerritoryType>();
-        foreach(var id in FieldBoard.Territories)
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
         {
-            if(!territories.TryGetRow(id,out var territory))continue;
-            zones.Add(new(id,territory.Map.RowId,territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "",FieldBoard.Place(Entries(data,log,territory),rows)));
+            if(territory.RowId==0 || !FieldBoard.FieldZoneUses.Contains(territory.TerritoryIntendedUse.RowId))continue;
+            zones.Add(new(territory.RowId,territory.Map.RowId,territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "",FieldBoard.Place(Entries(data,log,territory),rows)));
         }
         var records=data.GetExcelSheet<MYCWarResultNotebook>()
             .Where(row=>row.RowId!=0 && !row.Name.IsEmpty)
