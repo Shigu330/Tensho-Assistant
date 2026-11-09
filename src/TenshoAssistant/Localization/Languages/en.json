@@ -3092,6 +3092,18 @@
     "Quality": "Quality: {0} / {1}",
     "Durability": "Durability: {0} / {1}"
   },
+  "DutyGuide": {
+    "Title": "Mechanics and strategy (wiki)",
+    "InCombat": "Hidden during combat.",
+    "Fetch": "Read on the wiki",
+    "Refresh": "Read again",
+    "FetchTip": "Reads this duty's page on the FFXIV Console Games Wiki (GFDL licence, in English) on your click, kept on this PC. Sections about loot, story and the like are left out. Settings › Advanced › Wiki turns it off.",
+    "Loading": "Reading the wiki…",
+    "Error": "The wiki page could not be read.",
+    "Source": "Wiki: « {0} », read {1} (GFDL, FFXIV Console Games Wiki)",
+    "Open": "Open the page",
+    "Empty": "The page has no mechanics or strategy section."
+  },
   "DutyUi": {
     "SeenChest": "Chest (seen in game)",
     "UnlockedBy": "Unlocked by:",

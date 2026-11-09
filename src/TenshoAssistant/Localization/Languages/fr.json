@@ -3092,6 +3092,18 @@
     "Quality": "Qualité : {0} / {1}",
     "Durability": "Solidité : {0} / {1}"
   },
+  "DutyGuide": {
+    "Title": "Mécaniques et stratégie (wiki)",
+    "InCombat": "Masqué pendant un combat.",
+    "Fetch": "Lire sur le wiki",
+    "Refresh": "Relire",
+    "FetchTip": "Lit la page de ce contenu sur le wiki FFXIV Console Games (licence GFDL, en anglais), sur votre clic, gardée sur ce PC. Les sections butin, histoire et semblables sont laissées de côté. Paramètres › Avancé › Wiki le coupe.",
+    "Loading": "Lecture du wiki…",
+    "Error": "La page du wiki n'a pas pu être lue.",
+    "Source": "Wiki : « {0} », lu le {1} (GFDL, FFXIV Console Games Wiki)",
+    "Open": "Ouvrir la page",
+    "Empty": "La page n'a pas de section de mécaniques ou de stratégie."
+  },
   "DutyUi": {
     "SeenChest": "Coffre (vu en jeu)",
     "UnlockedBy": "Débloqué par :",

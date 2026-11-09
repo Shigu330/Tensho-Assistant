@@ -162,6 +162,12 @@ public sealed class Plugin : IDalamudPlugin
             var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);
+            // X-90 (0.994): duty guides from the wiki, by the duty's English name (ContentFinderCondition, English sheet).
+            var dutyGuides=new Duties.WikiDutyGuides(id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>(Dalamud.Game.ClientLanguage.English).GetRowOrDefault(id)?.Name.ExtractText() is { Length:>0 } english
+                ? char.ToUpperInvariant(english[0])+english[1..]:null,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            registrations.Register(()=>{},dutyGuides.Dispose);
+            mainWindow.DutyGuides=dutyGuides;
+            mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
             // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
             // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English

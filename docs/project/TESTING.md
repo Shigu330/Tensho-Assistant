@@ -1628,6 +1628,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.993) Recharger Tensho en mode développeur : plus de « Slow reader: GilWatcher » ; le journal des gils garde son contenu.
 
+- [ ] (0.994) Butin des contenus › un donjon › « Mécaniques et stratégie (wiki) » › Lire sur le wiki : sections Objectives, boss… ; en combat : « Masqué pendant un combat ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

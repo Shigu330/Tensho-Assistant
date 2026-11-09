@@ -142,6 +142,35 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton($"{quest.Name}##DutyUnlock{duty.DutyId}")){SelectQuest(quest.Id);page=Page.Quests;}
         ImGui.SameLine();ImGui.TextDisabled(QuestProgressLabel(quest));
     }
+    // X-90 (0.994, DEC-045 and DEC-041): the duty's mechanics and strategy from the wiki (GFDL), on a click, out of combat only (hidden in combat).
+    internal WikiDutyGuides? DutyGuides { get; set; }
+    internal Func<bool>? InCombatNow { get; set; }
+    private void DrawDutyGuide(DutyDefinition duty)
+    {
+        if(DutyGuides is not { } guides)return;
+        guides.Select(duty.DutyId);
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("DutyGuide.Title")+"###DutyGuide"))return;
+        if(InCombatNow?.Invoke()==true){EmptyState("DutyGuide.InCombat");return;}
+        var view=guides.State;
+        ImGui.BeginDisabled(view.Loading);
+        try{if(SourceButton(localization.Get(view.Document is null ? "DutyGuide.Fetch":"DutyGuide.Refresh"),configuration.CommunityWiki,true))_=guides.RequestAsync(view.Document is not null);}
+        finally{ImGui.EndDisabled();}
+        Tip("DutyGuide.FetchTip");
+        if(view.Loading)ImGui.TextDisabled(localization.Get("DutyGuide.Loading"));
+        if(view.Error is { } error)DrawDataError(error,"DutyGuide.Error");
+        if(view.Document is not { } document)return;
+        ImGui.TextDisabled(localization.Format("DutyGuide.Source",document.Title,document.FetchedAt.ToLocalTime().ToString("g")));
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("DutyGuide.Open")))Dalamud.Utility.Util.OpenLink(document.Url);
+        if(document.Sections.Count==0){EmptyState("DutyGuide.Empty");return;}
+        foreach(var section in document.Sections)
+        {
+            if(!ImGui.TreeNode(section.Title+$"###DutyGuide{section.Title}"))continue;
+            try{ImGui.TextWrapped(section.Text);}
+            finally{ImGui.TreePop();}
+        }
+    }
+
     private void DrawDutyLootDetails()
     {
         var state = dutyLoot.State;
@@ -152,6 +181,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine(); DrawDutyStatus(DutyProgressSource?.Invoke()?.Of(duty.InstanceId));
         DrawDutyUnlock(duty);
         if(developerMode)ImGui.TextDisabled(localization.Format("DevMode.DutyInstance",duty.DutyId,duty.InstanceId));
+        DrawDutyGuide(duty);
         if (state.Loading)
         { if (ImGui.Button(localization.Get("DutyUi.Cancel"))) dutyLoot.Cancel(); ImGui.SameLine(); ImGui.TextDisabled(localization.Get("DutyUi.Loading")); }
         else

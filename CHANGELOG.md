@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.994.0
+- Plan global, Verify : Contenus (X-90, DEC-045) : le détail d'un contenu (page Butin des contenus) a une partie « Mécaniques et stratégie (wiki) » : sur votre clic, Tensho lit la page de ce contenu sur le wiki FFXIV Console Games (licence GFDL, en anglais, crédité), la découpe en sections (objectifs, boss, mécaniques…) et laisse de côté le butin, l'histoire, la galerie et semblables ; gardée sur ce PC, coupée par l'interrupteur Wiki, masquée pendant un combat. Non validé en jeu.
+- Tests : DutyGuide994Tests. Verify.ps1 (agent) : 1629/1629, 0 avertissement, 0 erreur ; DLL 0.994.0.0. Non validé en jeu.
+### English
+- Duties (X-90, DEC-045): a duty's details (Duty loot page) have a « Mechanics and strategy (wiki) » part: on your click, Tensho reads the duty's page on the FFXIV Console Games Wiki (GFDL licence, in English, credited), cuts it into sections (objectives, bosses, mechanics…) and leaves out loot, story, gallery and the like; kept on this PC, turned off by the Wiki switch, hidden during combat. Not validated in game.
+
 ## 0.993.0
 - Plan global, Verify : Chargement plus fluide (0.993) : le relevé de la 0.992 a nommé les lecteurs lents au chargement. Le journal des gils (128 ms sur une image) est maintenant lu en arrière-plan ; rien n'est noté avant qu'il soit chargé, et une lecture ratée n'est jamais écrasée. Restent nommés : la lecture des quêtes (83 ms) et le catalogue des actions d'artisanat (57 ms), plus la capture de développement (mode développeur seulement). Non validé en jeu.
 - Tests : GilLoad993Tests. Verify.ps1 (agent) : 1627/1627, 0 avertissement, 0 erreur ; DLL 0.993.0.0. Non validé en jeu.
