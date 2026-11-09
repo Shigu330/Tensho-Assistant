@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.996.0
+- Plan global, Verify : Contenus (X-90) : le bestiaire des donjons profonds est la même lecture du wiki, sur chaque groupe d'étages (Donjons profonds › Étages › un groupe) : ses ennemis et les notes du wiki, hors du donjon (Tensho se coupe dedans). Corrections vérifiées sur le wiki : les étages s'appellent sans « The » sur le wiki (Tensho réessaie une fois) ; les sous-sections du butin (une par boss) sont maintenant écartées avec lui. Non validé en jeu.
+- Tests : DutyGuide994Tests. Verify.ps1 (agent) : 1631/1631, 0 avertissement, 0 erreur ; DLL 0.996.0.0. Non validé en jeu.
+### English
+- Duties (X-90): the deep dungeons' bestiary is the same wiki reading, on each set of floors (Deep dungeons › Floors › a set): its enemies and the wiki's notes, out of the dungeon (Tensho stops inside). Fixes checked on the wiki: the floors are named without « The » there (Tensho tries once more); the loot's sub-sections (one per boss) now go with it. Not validated in game.
+
 ## 0.995.0
 - Plan global, Verify : Contenus (X-90, DEC-045) : sous les mécaniques du wiki, une partie « Vos notes et schéma d'arène » pour chaque contenu : une note écrite (placements, ordre), et un schéma d'arène ronde ou carrée où vous posez des marques à la souris (repères A à D et 1 à 4, rôles T1, H1, D1… ou un libellé court), nord en haut ; un code « TENSHO-ARENA1 » à copier et coller pour partager. Gardé sur ce PC, masqué pendant un combat, rien n'est posé dans le jeu. Non validé en jeu.
 - Tests : DutyNotes995Tests. Verify.ps1 (agent) : 1631/1631, 0 avertissement, 0 erreur ; DLL 0.995.0.0. Non validé en jeu.

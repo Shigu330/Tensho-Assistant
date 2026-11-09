@@ -6851,7 +6851,7 @@
     "TabItems": "Objets",
     "TabLoot": "Coffres",
     "NoFloors": "Aucun étage trouvé sous ce nom dans les contenus.",
-    "FloorsHint": "L'état est celui que le jeu donne pour chaque groupe d'étages : votre étage le plus avancé n'est pas lu.",
+    "FloorsHint": "L'état est celui que le jeu donne pour chaque groupe d'étages : votre étage le plus avancé n'est pas lu. Cliquez sur un groupe d'étages : son butin, et ses ennemis avec les notes du wiki (hors du donjon : Tensho se coupe dedans).",
     "ColumnName": "Nom",
     "ColumnLevel": "Niveau",
     "ColumnState": "État",

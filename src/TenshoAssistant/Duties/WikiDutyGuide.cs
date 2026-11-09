@@ -39,10 +39,16 @@ public static class WikiDutyGuideParser
     {
         var headings=Regex.Matches(html,"<h([2-4])\\b[^>]*>(.*?)</h\\1>",RegexOptions.Singleline|RegexOptions.IgnoreCase,TimeSpan.FromSeconds(1));
         var sections=new List<WikiGuideSection>();
+        // 0.996 (checked on the wiki: « Loot » holds one sub-section per boss, named after it): a section left out takes its sub-sections with it.
+        var skippedLevel=int.MaxValue;
         for(var index=0;index<headings.Count && sections.Count<MaximumSections;index++)
         {
+            var level=headings[index].Groups[1].Value[0]-'0';
+            if(level>skippedLevel)continue;
+            skippedLevel=int.MaxValue;
             var title=Text(headings[index].Groups[2].Value).Replace("\n"," ").Trim();
-            if(title.Length==0 || Skipped.Any(word=>title.Contains(word,StringComparison.OrdinalIgnoreCase)))continue;
+            if(title.Length==0)continue;
+            if(Skipped.Any(word=>title.Contains(word,StringComparison.OrdinalIgnoreCase))){skippedLevel=level;continue;}
             var start=headings[index].Index+headings[index].Length;
             var end=index+1<headings.Count ? headings[index+1].Index:html.Length;
             var text=Text(html[start..end]);
@@ -51,6 +57,11 @@ public static class WikiDutyGuideParser
         }
         return sections;
     }
+
+    /// <summary>The wiki answered « no such page ».</summary>
+    public static bool Missing(string json)=>json.Contains("\"missingtitle\"",StringComparison.Ordinal);
+    /// <summary>The title without a leading « The », or null when it has none.</summary>
+    public static string? WithoutArticle(string title)=>title.StartsWith("The ",StringComparison.OrdinalIgnoreCase) && title.Length>4 ? title[4..]:null;
 
     public static WikiDutyGuide Parse(string json,uint dutyId,string expectedTitle,DateTimeOffset fetchedAt)
     {
@@ -116,6 +127,13 @@ public sealed class WikiDutyGuides(Func<uint,string?> englishName,Func<TimeSpan>
             linked.CancelAfter(TimeSpan.FromSeconds(25));
             var uri=new Uri("https://ffxiv.consolegameswiki.com/mediawiki/api.php?action=parse&format=json&redirects=1&prop=text%7Crevid&page="+Uri.EscapeDataString(title.Replace(' ','_')));
             var json=await BoundedHttp.ReadAsync(http,uri,GarlandClient.MaximumBytes,linked.Token).ConfigureAwait(false);
+            // 0.996 (checked on the wiki): the game names the deep dungeons' floors « The Palace of the Dead (Floors 1-10) », the wiki without « The »: one more try.
+            if(WikiDutyGuideParser.Missing(json) && WikiDutyGuideParser.WithoutArticle(title) is { } shorter)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1),linked.Token).ConfigureAwait(false);
+                title=shorter;
+                json=await BoundedHttp.ReadAsync(http,new Uri("https://ffxiv.consolegameswiki.com/mediawiki/api.php?action=parse&format=json&redirects=1&prop=text%7Crevid&page="+Uri.EscapeDataString(title.Replace(' ','_'))),GarlandClient.MaximumBytes,linked.Token).ConfigureAwait(false);
+            }
             var document=WikiDutyGuideParser.Parse(json,dutyId,title,DateTimeOffset.UtcNow);
             lock(gate)
             {

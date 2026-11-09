@@ -6851,7 +6851,7 @@
     "TabItems": "Items",
     "TabLoot": "Coffers",
     "NoFloors": "No floor found under this name in the duties.",
-    "FloorsHint": "The state is the one the game gives for each set of floors: your own furthest floor is not read.",
+    "FloorsHint": "The state is the one the game gives for each set of floors: your own furthest floor is not read. Click a set of floors: its loot, and its enemies with the wiki's notes (out of the dungeon: Tensho stops inside).",
     "ColumnName": "Name",
     "ColumnLevel": "Level",
     "ColumnState": "State",

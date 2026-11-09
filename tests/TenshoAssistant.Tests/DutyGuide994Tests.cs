@@ -14,6 +14,11 @@ internal static class DutyGuide994Tests
             var sections=WikiDutyGuideParser.Sections(html);
             Check(sections.Count==2 && sections[0].Title=="Objectives" && sections[0].Text=="Clear the hall\nDefeat the boss","objectives: "+string.Join("|",sections.Select(row=>row.Title+"="+row.Text)));
             Check(sections[1].Title=="Boss: Adjudicator" && sections[1].Text=="Avoid the red circles.","boss");
+            // 0.996: the sub-sections of a section left out go with it (the wiki's « Loot » has one per boss).
+            var nested=WikiDutyGuideParser.Sections("<h2>Bosses</h2><h3>Chopper</h3><p>Stack.</p><h2>Loot</h2><h3>Chopper</h3><p>Sword</p><h2>Notes</h2><p>Ok</p>");
+            Check(nested.Count==2 && nested[0].Title=="Chopper" && nested[0].Text=="Stack." && nested[1].Title=="Notes","nested skip: "+string.Join("|",nested.Select(row=>row.Title)));
+            Check(WikiDutyGuideParser.WithoutArticle("The Palace of the Dead (Floors 1-10)")=="Palace of the Dead (Floors 1-10)" && WikiDutyGuideParser.WithoutArticle("Sastasha")==null,"article");
+            Check(WikiDutyGuideParser.Missing("{\"error\":{\"code\":\"missingtitle\"}}"),"missing");
         }),
         ("Duty guide 994: shown out of combat only, credited, on a click",() =>
         {

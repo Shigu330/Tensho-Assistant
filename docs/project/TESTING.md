@@ -1632,6 +1632,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.995) Butin des contenus › un raid › « Vos notes et schéma d'arène » : écrire une note, ajouter T1 et A, les glisser, copier le code, coller dans un autre contenu.
 
+- [ ] (0.996) Donjons profonds › Palais des morts › Étages › 1-10 › « Mécaniques et stratégie (wiki) » › Lire : sections Enemies, Floor 10 Boss ; Sastasha : pas de butin des boss.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
