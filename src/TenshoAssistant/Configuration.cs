@@ -186,6 +186,13 @@ public sealed class MapViewSettings
     public bool ShowBeastMonsters { get; set; } = true;
     public bool BeastMonstersAlways { get; set; }
     public bool AboveBeast { get; set; } = true;
+    /// <summary>X-40 (0.1002, DEC-049): the list layer also counts every crafting list, not only the lists shown in a panel.</summary>
+    public bool ListMonstersAllLists { get; set; } = true;
+    /// <summary>X-40 (0.1002): monsters your relic book still asks for (after the Relics page read it), and monsters dropping an item of your wishlist.</summary>
+    public bool ShowRelicMonsters { get; set; } = true;
+    public bool AboveRelic { get; set; } = true;
+    public bool ShowWishMonsters { get; set; } = true;
+    public bool AboveWish { get; set; } = true;
     /// <summary>0.799 (X-38): icons above the heads of nearby monsters that matter, in the game's view; which reasons, their size, how far, and in combat.</summary>
     public bool MonsterIconsAbove { get; set; } = true;
     public bool AboveBlueSpell { get; set; } = true;

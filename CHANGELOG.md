@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1002.0
+- Plan global, Verify : Monstres proches (X-40, votre choix DEC-049 : les trois) : a) la couche « vos listes » compte maintenant les matériaux de toutes vos listes d'artisanat, pas seulement la liste d'un panneau (réglage « Toutes les listes d'artisanat », activé) ; b) nouvelle couche « Monstres de votre livre de relique » : les monstres que votre livre en cours demande encore (Zodiaque), avec combien il en reste, un bouclier au-dessus de leur tête ; connue une fois le livre lu sur la page Reliques, relu chaque minute ; c) nouvelle couche « Monstres qui font tomber un souhait » : un cœur au-dessus des monstres qui font tomber un objet de vos souhaits pas encore obtenu. Réglages dans Paramètres › Carte et le menu des couches. Non validé en jeu.
+- Tests : MonsterUses1002Tests. Verify.ps1 (agent) : 1639/1639, 0 avertissement, 0 erreur ; DLL 0.1002.0.0. Non validé en jeu.
+### English
+- Nearby monsters (X-40, your choice DEC-049: all three): a) the « your lists » layer now counts the materials of every crafting list, not only a panel's list (setting « Every crafting list », on); b) new layer « Monsters of your relic book »: the monsters your book under way still asks for (Zodiac), with how many are left, a shield above their head; known once the book is read on the Relics page, read again every minute; c) new layer « Monsters dropping a wish »: a heart above monsters dropping an item of your wishlist not obtained yet. Settings in Settings › Map and the layers menu. Not validated in game.
+
 ## 0.1001.0
 - Plan global, Verify : Contenus à venir (X-92) : l'inventaire des listes de numéros écrites dans le code n'a trouvé qu'un cas que les feuilles du jeu donnent : les territoires du Dédale bestial (coupure JcJ et classé). Ses plateaux sont maintenant aussi tirés des feuilles : un plateau ajouté par une mise à jour sera coupé (et son panneau d'équipe permis devant le plateau) sans code. La liste écrite reste, dans le doute. Aussi : SECURITY.md déclare la vérification des souhaits. Non validé en jeu.
 - Tests : LabyrinthSheets1001Tests. Verify.ps1 (agent) : 1638/1638, 0 avertissement, 0 erreur ; DLL 0.1001.0.0. Non validé en jeu.

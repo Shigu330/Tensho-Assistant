@@ -484,3 +484,13 @@ Decision: X-101 : réglage coupé par défaut ; activé : au plus une vérificat
 Reason: Décisions de l'utilisateur (choix recommandés).
 Consequences: X-100 et X-101 à coder.
 References: G-PROPOSALS (9, 10, « Proposition X-100 »), DEC-039
+
+DEC-ID: DEC-049
+Timestamp: 2026-11-10 Europe/Brussels
+Problem: Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches.
+Evidence: Réponse de l'utilisateur : « Les trois ».
+Options: a) toutes les listes d'artisanat, b) cibles du livre de relique, c) butin des souhaits ; seulement a) ; rien.
+Decision: Les trois, chacun avec son réglage (couche de la carte, icône au-dessus de la tête), activés par défaut. a) étend la couche « vos listes » (X-35) qui ne comptait que la liste affichée dans un panneau.
+Reason: Décision de l'utilisateur.
+Consequences: X-40 codé en 0.1002.
+References: G-PROPOSALS n° 11, X-35, X-40

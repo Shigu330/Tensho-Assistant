@@ -6,7 +6,7 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection, Beast }
+internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection, Beast, Relic, Wish }
 internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
@@ -23,6 +23,54 @@ internal sealed partial class MainWindow
     private readonly ReferenceMemo<TenshoAssistant.Collections.CollectionState,NearbyMissingCollections> nearbyMissingCollections=new(state=>NearbyMissingCollections.From(state.Entries));
     private readonly ReferenceMemo<TenshoAssistant.Collections.CollectionState,NearbyBlueSpells> nearbyBlueSpells=new(state=>NearbyBlueSpells.From(state.Entries));
     private readonly ReferenceMemo<TenshoAssistant.Beastmaster.BeastCatalog,Dictionary<uint,string>> nearbyBeastNames=new(catalog=>catalog.Beasts.ToDictionary(beast=>beast.Id,beast=>beast.Name));
+    // X-40 (0.1002): every crafting list's materials still missing, every 10 s.
+    private (long At,HashSet<uint> Items) allCraftListNeeds=(-100_000,[]);
+    private HashSet<uint> AllCraftListNeeds()
+    {
+        var now=Environment.TickCount64;
+        if(now-allCraftListNeeds.At<10_000)return allCraftListNeeds.Items;
+        var items=new HashSet<uint>();
+        if(CraftListStore is { Unavailable:false, Lists:{ Count:>0 } lists })
+            foreach(var list in lists)
+                foreach(var (item,amount) in Craft.CraftLists.Ingredients(CraftListPlans(list)))
+                    if(GetRecipeHoldings(item) is not { HasObservation:true } held || held.Total<amount)items.Add(item);
+        allCraftListNeeds=(now,items);
+        return items;
+    }
+    /// <summary>X-40 (0.1002): the wishes not obtained: a collection entry not acquired, or an item held nowhere (unknown counts as not held).</summary>
+    private HashSet<uint> WishesNotObtained()
+    {
+        var items=itemCatalog.State.Catalog;var wanted=new HashSet<uint>();
+        foreach(var id in configuration.Wishlist ?? [])
+        {
+            var definition=items?.Find(id);
+            if(CollectionOf(definition) is { } entry){if(CollectionStateOf(entry)!=TenshoAssistant.Collections.CollectionAcquisition.Acquired)wanted.Add(id);continue;}
+            if(GetRecipeHoldings(id) is not { HasObservation:true, Total:>0 })wanted.Add(id);
+        }
+        return wanted;
+    }
+    /// <summary>
+    /// X-40 (0.1002): the relic book under way and what its monsters still need (by the game's name), from the Relics page's reading; the catalogue is loaded
+    /// and the book read again once a minute while the layer is on. Nothing known yet: empty.
+    /// </summary>
+    private long relicNearbyReadAt=-100_000;
+    private Dictionary<string,int> RelicNeeds()
+    {
+        if(!relicCatalogTried && RelicCatalogLoad is { } load){relicCatalogTried=true;relicCatalogTask=Task.Run(load);}
+        if(relicCatalogTask is { IsCompleted:true } done && relicCatalog is null)relicCatalog=done.IsCompletedSuccessfully ? done.Result:null;
+        ConsumeRelicRead();
+        var now=Environment.TickCount64;
+        if(relicRead is null && ReadRelics is { } read && now-relicNearbyReadAt>60_000){relicNearbyReadAt=now;relicRead=read();}
+        var needs=new Dictionary<string,int>(StringComparer.CurrentCultureIgnoreCase);
+        if(relicProgress is not { Note:not 0 } progress || relicCatalog?.Books.GetValueOrDefault(progress.Note) is not { } book)return needs;
+        for(var index=0;index<book.Monsters.Count;index++)
+        {
+            var target=book.Monsters[index];
+            var left=target.Needed-(index<progress.Monsters.Count ? progress.Monsters[index]:0);
+            if(left>0 && target.Name.Trim().Length>0)needs[target.Name.Trim()]=left;
+        }
+        return needs;
+    }
     private void RefreshNearbyMonsters()
     {
         var now=Environment.TickCount64;
@@ -35,20 +83,29 @@ internal sealed partial class MainWindow
         var notes=new Dictionary<uint,List<MonsterNote>>();
         void Note(uint id,MonsterNoteKind kind,string text){if(!notes.TryGetValue(id,out var list))notes[id]=list=[];list.Add(new(kind,text));}
         // X-35: the drops the tracking lists still need.
-        if((configuration.ListPanelsNearbyMonsters || configuration.MapView.ShowListMonsters) && lumina?.State.Data is { } data)
+        // X-40 (0.1002, DEC-049): the wishes not obtained yet use the same drops.
+        var wantList=configuration.ListPanelsNearbyMonsters || configuration.MapView.ShowListMonsters;
+        var wantWish=configuration.MapView.ShowWishMonsters;
+        if((wantList || wantWish) && lumina?.State.Data is { } data)
         {
             RefreshRecipeHoldingsCache();
             var needed=new HashSet<uint>();
-            foreach(var key in new[]{"CraftList","Workshop","Preparation"})
-                if(ListPanelLinesFor(key) is { } known)
-                    foreach(var (item,amount) in known.Lines)
-                        if(GetRecipeHoldings(item) is not { HasObservation:true } held || held.Total<amount)needed.Add(item);
+            if(wantList)
+            {
+                foreach(var key in new[]{"CraftList","Workshop","Preparation"})
+                    if(ListPanelLinesFor(key) is { } known)
+                        foreach(var (item,amount) in known.Lines)
+                            if(GetRecipeHoldings(item) is not { HasObservation:true } held || held.Total<amount)needed.Add(item);
+                // X-40 (0.1002): every crafting list, not only the one in a panel (worked out again every 10 s).
+                if(configuration.MapView.ListMonstersAllLists)needed.UnionWith(AllCraftListNeeds());
+            }
+            var wishes=wantWish ? WishesNotObtained():[];
             // 0.819 (X-53, user report: a woolly yak, a loaghtan not marked): drops by the monster's row, by its name (other rows of the same name), and by the wiki's
             // pages already on disk for the items the list needs (their English monster names matched to rows); no request is made.
             var names=monsters.GroupBy(monster=>monster.NameId).ToDictionary(group=>group.Key,group=>group.First().Name);
             var wikiDrops=new Dictionary<uint,List<uint>>();
             if(wikiMonsterSources is { } wiki && EnglishMonsterIds is { } englishIds)
-                foreach(var item in needed)
+                foreach(var item in needed.Concat(wishes))
                 {
                     wiki.Warm(item);
                     if(wiki.Cached(item) is not { Monsters:{ Count:>0 } rows })continue;
@@ -63,9 +120,14 @@ internal sealed partial class MainWindow
             var seenDrops=Seen()?.DropsByMonster;
             IReadOnlyList<uint> Drops(uint id)=>(seenDrops?.GetValueOrDefault(id) ?? []).Concat(data.ItemsDroppedBy(id)).Concat(names.TryGetValue(id,out var name) ? data.ItemsDroppedByName(name):[])
                 .Concat(wikiDrops.TryGetValue(id,out var fromWiki) ? fromWiki:[]).Distinct().ToArray();
-            foreach(var id in ids)
-                if(NearbyMonsters.ListDrops(id,Drops,needed) is { Count:>0 } drops)
-                    Note(id,MonsterNoteKind.List,localization.Format("MapView.MonsterDrops",string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
+            if(wantList)
+                foreach(var id in ids)
+                    if(NearbyMonsters.ListDrops(id,Drops,needed) is { Count:>0 } drops)
+                        Note(id,MonsterNoteKind.List,localization.Format("MapView.MonsterDrops",string.Join(", ",drops.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
+            if(wishes.Count>0)
+                foreach(var id in ids)
+                    if(NearbyMonsters.ListDrops(id,Drops,wishes) is { Count:>0 } wished)
+                        Note(id,MonsterNoteKind.Wish,localization.Format("MapView.MonsterWish",string.Join(", ",wished.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
             if(configuration.ListPanelsNearbyMonsters)nearbyDroppedItems=NearbyMonsters.DroppedNearby(monsters.Select(monster=>(monster.NameId,monster.Name)),Drops,needed);
             // 0.818 (X-53, user report: the woolly yak, the loaghtan not marked): what the chain sees, in developer mode, when it changes.
             NearbyMonstersLog($"{monsters.Count} monsters ({string.Join(", ",monsters.Select(monster=>$"{monster.Name} {monster.NameId}").Distinct().Take(8))}); list needs {needed.Count} items; "
@@ -73,6 +135,10 @@ internal sealed partial class MainWindow
                 +$"panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}, above {configuration.MapView.AboveList}");
         }
         else NearbyMonstersLog($"{monsters.Count} monsters; drop data {(lumina?.State.Data is null ? "not loaded":"loaded")}, panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}");
+        // X-40 (0.1002, DEC-049): the monsters the relic book under way still asks for, by name (the book's names are the game's, in its language).
+        if(configuration.MapView.ShowRelicMonsters && RelicNeeds() is { Count:>0 } relicNeeds)
+            foreach(var monster in monsters.GroupBy(monster=>monster.NameId).Select(group=>group.First()))
+                if(relicNeeds.TryGetValue(monster.Name.Trim(),out var left))Note(monster.NameId,MonsterNoteKind.Relic,localization.Format("MapView.MonsterRelic",left));
         // X-36: what the hunting log still asks for, in each log's current rank.
         if(configuration.MapView.ShowHuntLogMonsters && HuntEntries?.Invoke() is { Count:>0 } entries && HuntSlots?.Invoke() is { } slots)
         {

@@ -2,7 +2,7 @@ namespace TenshoAssistant;
 
 /// <summary>
 /// X-100 (0.999, DEC-048): every setting of the Settings page (its label key) and its tab, for the search. Generated from the code by scanning each
-/// tab's methods; a test makes the same scan and fails when this list is out of step.
+/// tab's methods (scripts/agent/settings_index.py); a test makes the same scan and fails when this list is out of step.
 /// </summary>
 public static class SettingsIndex
 {
@@ -56,6 +56,8 @@ public static class SettingsIndex
         ("MapView.AboveFate","Map"),
         ("MapView.AboveHuntLog","Map"),
         ("MapView.AboveList","Map"),
+        ("MapView.AboveRelic","Map"),
+        ("MapView.AboveWish","Map"),
         ("MapView.BeastMonstersAlways","Map"),
         ("MapView.BlueMageMonstersAlways","Map"),
         ("MapView.ChatLinks","Map"),
@@ -78,6 +80,7 @@ public static class SettingsIndex
         ("MapView.HideInDuty","Map"),
         ("MapView.HideTitleBar","Map"),
         ("MapView.HideUndiscovered","Map"),
+        ("MapView.ListMonstersAllLists","Map"),
         ("MapView.Locked","Map"),
         ("MapView.MonsterIconsAbove","Map"),
         ("MapView.MonsterIconsHideInCombat","Map"),
@@ -106,10 +109,12 @@ public static class SettingsIndex
         ("MapView.ShowPlayer","Map"),
         ("MapView.ShowPlayerCoordinates","Map"),
         ("MapView.ShowQuests","Map"),
+        ("MapView.ShowRelicMonsters","Map"),
         ("MapView.ShowSightseeing","Map"),
         ("MapView.ShowTreasure","Map"),
         ("MapView.ShowVendors","Map"),
         ("MapView.ShowViewCone","Map"),
+        ("MapView.ShowWishMonsters","Map"),
         ("MapView.TeleportOnClick","Map"),
         ("MapView.WheelInvert","Map"),
         ("Advanced.HideBarsBehindGame","Panels"),

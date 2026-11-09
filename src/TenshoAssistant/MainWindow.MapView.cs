@@ -179,6 +179,8 @@ internal sealed partial class MainWindow
         MonsterNoteKind.BlueSpell=>settings.ShowBlueMageMonsters,
         MonsterNoteKind.Collection=>settings.ShowCollectionMonsters,
         MonsterNoteKind.Beast=>settings.ShowBeastMonsters,
+        MonsterNoteKind.Relic=>settings.ShowRelicMonsters,
+        MonsterNoteKind.Wish=>settings.ShowWishMonsters,
         _=>true,
     };
     private void MeasureMap(string part,Action draw)
@@ -555,7 +557,7 @@ internal sealed partial class MainWindow
                 settings.ShowParty=settings.ShowBookmarks=settings.ShowHuntMarks=settings.ShowTreasure=settings.ShowFixedIcons=settings.ShowPlaceNames=settings.ShowIconNames=shown;
                 settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=settings.ShowIslandAnimals=shown;
                 // 0.902 (user report: the monster layers were left out of All and None).
-                settings.ShowListMonsters=settings.ShowHuntLogMonsters=settings.ShowFateMonsters=settings.ShowBlueMageMonsters=settings.ShowCollectionMonsters=settings.ShowBeastMonsters=shown;
+                settings.ShowListMonsters=settings.ShowHuntLogMonsters=settings.ShowFateMonsters=settings.ShowBlueMageMonsters=settings.ShowCollectionMonsters=settings.ShowBeastMonsters=settings.ShowRelicMonsters=settings.ShowWishMonsters=shown;
                 changed=true;
             }
             if(ImGui.SmallButton(localization.Get("MapView.LayersAll")))All(true);
@@ -590,6 +592,8 @@ internal sealed partial class MainWindow
             changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value);
             changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value);
             changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value);
+            changed|=SettingBox("MapView.ShowRelicMonsters",settings.ShowRelicMonsters,value=>settings.ShowRelicMonsters=value);
+            changed|=SettingBox("MapView.ShowWishMonsters",settings.ShowWishMonsters,value=>settings.ShowWishMonsters=value);
             changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value);
             // X-76 H3 (0.914): the layers shown stay as ticked when saving fails (the next save writes them). This menu is in the map
             // window, where the main window's footer is not seen, so it keeps its own error line.
@@ -693,6 +697,11 @@ internal sealed partial class MainWindow
                 finally{ImGui.EndDisabled();ImGui.Unindent();}
                 changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
                 changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
+                // X-40 (0.1002): every crafting list, not only the one in a panel; greyed while the list layer is off.
+                ImGui.Indent();
+                ImGui.BeginDisabled(!settings.ShowListMonsters && !configuration.ListPanelsNearbyMonsters);
+                try{changed|=SettingBox("MapView.ListMonstersAllLists",settings.ListMonstersAllLists,value=>settings.ListMonstersAllLists=value,MapDefaults.ListMonstersAllLists);}
+                finally{ImGui.EndDisabled();ImGui.Unindent();}
                 changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
                 changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
                 changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
@@ -709,6 +718,9 @@ internal sealed partial class MainWindow
                 ImGui.BeginDisabled(!settings.ShowBeastMonsters);
                 try{changed|=SettingBox("MapView.BeastMonstersAlways",settings.BeastMonstersAlways,value=>settings.BeastMonstersAlways=value,MapDefaults.BeastMonstersAlways);}
                 finally{ImGui.EndDisabled();ImGui.Unindent();}
+                // X-40 (0.1002, DEC-049): relic book targets and wish drops.
+                changed|=SettingBox("MapView.ShowRelicMonsters",settings.ShowRelicMonsters,value=>settings.ShowRelicMonsters=value,MapDefaults.ShowRelicMonsters);
+                changed|=SettingBox("MapView.ShowWishMonsters",settings.ShowWishMonsters,value=>settings.ShowWishMonsters=value,MapDefaults.ShowWishMonsters);
                 // 0.799 (X-38): icons above the monsters' heads, in the game's view.
                 changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
                 if(settings.MonsterIconsAbove)
@@ -733,6 +745,12 @@ internal sealed partial class MainWindow
                     finally{ImGui.EndDisabled();}
                     ImGui.BeginDisabled(!settings.ShowBeastMonsters);
                     try{changed|=SettingBox("MapView.AboveBeast",settings.AboveBeast,value=>settings.AboveBeast=value,MapDefaults.AboveBeast);}
+                    finally{ImGui.EndDisabled();}
+                    ImGui.BeginDisabled(!settings.ShowRelicMonsters);
+                    try{changed|=SettingBox("MapView.AboveRelic",settings.AboveRelic,value=>settings.AboveRelic=value,MapDefaults.AboveRelic);}
+                    finally{ImGui.EndDisabled();}
+                    ImGui.BeginDisabled(!settings.ShowWishMonsters);
+                    try{changed|=SettingBox("MapView.AboveWish",settings.AboveWish,value=>settings.AboveWish=value,MapDefaults.AboveWish);}
                     finally{ImGui.EndDisabled();}
                     changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
                     var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
@@ -1508,7 +1526,7 @@ internal sealed partial class MainWindow
             MapMark("canvas nearby objects");
             // 0.795 (X-35, user request): nearby monsters that drop an item the tracking lists still need.
             // 0.796 (X-36): one layer for every reason; one icon per monster, the first reason's, and every reason on hover.
-            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
+            if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters || settings.ShowRelicMonsters || settings.ShowWishMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
             {
                 RefreshNearbyMonsters();
                 foreach(var monster in monsters)

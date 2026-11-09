@@ -51,6 +51,8 @@ internal sealed partial class MainWindow
         MonsterNoteKind.Fate=>settings.AboveFate,
         MonsterNoteKind.Collection=>settings.AboveCollection,
         MonsterNoteKind.Beast=>settings.AboveBeast,
+        MonsterNoteKind.Relic=>settings.AboveRelic,
+        MonsterNoteKind.Wish=>settings.AboveWish,
         _=>false,
     };
     internal static (FontAwesomeIcon Symbol,Vector4 Colour) MonsterGlyph(MonsterNoteKind kind)=>kind switch
@@ -60,6 +62,8 @@ internal sealed partial class MainWindow
         MonsterNoteKind.BlueSpell=>(FontAwesomeIcon.HatWizard,new Vector4(0.40f,0.60f,1f,1)),
         MonsterNoteKind.Collection=>(FontAwesomeIcon.Gem,new Vector4(0.95f,0.50f,0.85f,1)),
         MonsterNoteKind.Beast=>(FontAwesomeIcon.Dragon,new Vector4(0.45f,0.85f,0.55f,1)),
+        MonsterNoteKind.Relic=>(FontAwesomeIcon.ShieldAlt,new Vector4(0.95f,0.75f,0.30f,1)),
+        MonsterNoteKind.Wish=>(FontAwesomeIcon.Heart,new Vector4(0.95f,0.40f,0.55f,1)),
         _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
     };
 }

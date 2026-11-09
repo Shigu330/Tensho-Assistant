@@ -18,6 +18,14 @@ internal sealed partial class MainWindow
     private readonly Dictionary<string,int> relicLines=[];
     private string? relicTabFocus;
 
+    /// <summary>X-40 (0.1002): the book's reading, taken by the page or by the nearby monsters, whichever sees it done first.</summary>
+    private void ConsumeRelicRead()
+    {
+        if(relicRead is not { IsCompleted:true } read)return;
+        relicRead=null;
+        relicReadFailed=!read.IsCompletedSuccessfully;
+        relicProgress=read.IsCompletedSuccessfully ? read.Result:null;
+    }
     private void DrawRelicWeapons()
     {
         Heading(localization.Get("Relics.Title"),localization.Get("Relics.Subtitle"));
@@ -32,12 +40,7 @@ internal sealed partial class MainWindow
         if(relicCatalogTask is { } done && relicCatalog is null){relicCatalog=done.IsCompletedSuccessfully ? done.Result:null;}
         if(relicCatalog is not { Lines.Count:>0 } catalog){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Relics.SheetsUnavailable"));return;}
         ImGui.TextWrapped(localization.Get("Relics.Help"));
-        if(relicRead is { IsCompleted:true } read)
-        {
-            relicRead=null;
-            relicReadFailed=!read.IsCompletedSuccessfully;
-            relicProgress=read.IsCompletedSuccessfully ? read.Result:null;
-        }
+        ConsumeRelicRead();
         ImGui.BeginDisabled(ReadRelics is null || relicRead is not null);
         try{if(ImGui.Button(localization.Get("Relics.Read")))relicRead=ReadRelics!();}
         finally{ImGui.EndDisabled();}
