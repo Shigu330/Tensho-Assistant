@@ -8,6 +8,23 @@ namespace TenshoAssistant.FreeCompany;
 /// </summary>
 public static class AirshipLogRoute
 {
+    /// <summary>
+    /// X-73 (0.1003): each stop's finds (in the order of the voyage) given the sector of the route at the same place. Null when the stops with a find
+    /// are not exactly as many as the route's sectors: then nothing is paired (never guessed).
+    /// </summary>
+    public static IReadOnlyList<(uint Item,uint Sector,int Count)>? Pair(IReadOnlyList<(uint Primary,int PrimaryCount,uint Additional,int AdditionalCount)> stops,IReadOnlyList<uint> route)
+    {
+        var found=stops.Where(stop=>stop.Primary!=0 || stop.Additional!=0).ToArray();
+        if(found.Length==0 || found.Length!=route.Count)return null;
+        var loot=new List<(uint,uint,int)>();
+        for(var index=0;index<found.Length;index++)
+        {
+            if(found[index].Primary!=0)loot.Add((found[index].Primary,route[index],found[index].PrimaryCount));
+            if(found[index].Additional!=0)loot.Add((found[index].Additional,route[index],found[index].AdditionalCount));
+        }
+        return loot;
+    }
+
     public static IReadOnlyList<uint> Sectors(IEnumerable<string> lines,IEnumerable<(uint Id,string Name)> sectors)
     {
         var names=sectors.Where(sector=>sector.Name.Length>0).OrderByDescending(sector=>sector.Name.Length).ToArray();

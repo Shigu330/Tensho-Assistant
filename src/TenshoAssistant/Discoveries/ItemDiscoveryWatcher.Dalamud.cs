@@ -272,6 +272,10 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 || FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.OccultCrescent)!=null);
             var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same),
                 field,deepDungeon);
+            // 0.1003 (the check of the user's base: no monster drop noted): developer mode, the inputs of a gain put down to nothing, to find why.
+            if(cause==ItemGains.Cause.None && debug())
+                log.Information("Item gain not attributed: {0}; busy {1}, duty {2}, own target dead {3} ms ago, FATE {4} ended {5} ms ago, spent {6}.",
+                    string.Join(", ",gains.Select(pair=>$"{pair.Key}x{pair.Value}")),busy || !wanted.ItemSources,duty,now-death.At,fateId,now-fateEndedAt,spent?.ToString() ?? "none");
             foreach(var (item,count) in gains)
             {
                 var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;var hq=hqGains.ContainsKey(item);

@@ -64,6 +64,9 @@ public sealed unsafe class VoyageWatcher : IDisposable
     /// </summary>
     /// <summary>Item, sector, quantity, HQ (X-76 P7, 0.934: HouseWorkshopSubmarineGathered.ItemHQPrimary / ItemHQAdditional).</summary>
     public Action<uint,uint,int,bool>? SectorLoot { get; set; }
+    /// <summary>X-73 (0.1003): an airship's find: item, AirshipExplorationPoint row, quantity; once per voyage (AirshipLogRoute.Pair).</summary>
+    public Action<uint,uint,int>? AirshipLoot { get; set; }
+    private readonly OnceSet<(ulong House,int Slot,uint Registered)> airshipsNoted=new(1024);
     /// <summary>X-76 P7 (0.934): one visit per sector of a voyage: sector, second find (DoubleDip), the vessel's surveillance.</summary>
     public Action<uint,bool,int>? SectorVisit { get; set; }
     public Action<uint,uint>? SectorUnlock { get; set; }
@@ -147,17 +150,21 @@ public sealed unsafe class VoyageWatcher : IDisposable
             try
             {
                 var airships=workshop->Airship.Data;
-                var lastRoute=AirshipLastRoute(workshop,houseId);
+                var lastRouteRead=AirshipLastRoute(workshop,houseId);
+                var lastRoute=lastRouteRead?.Names;
+                (int Slot,uint Registered,List<(uint,int,uint,int)> Stops)? single=null;
                 for(var index=0;index<Math.Min(workshop->Airship.AirshipCount,airships.Length);index++)
                 {
                     ref var air=ref airships[index];
                     if(air.RankId==0)continue;
-                    var loot=new List<VoyageLoot>();
+                    var loot=new List<VoyageLoot>();var stops=new List<(uint,int,uint,int)>();
                     foreach(var found in air.GatheredData)
                     {
                         if(found.ItemIdPrimary!=0)loot.Add(new(found.ItemIdPrimary,found.ItemCountPrimary));
                         if(found.ItemIdAdditional!=0)loot.Add(new(found.ItemIdAdditional,found.ItemCountAdditional));
+                        stops.Add((found.ItemIdPrimary,found.ItemCountPrimary,found.ItemIdAdditional,found.ItemCountAdditional));
                     }
+                    single=(index+1,air.RegisterTime,stops);
                     // 0.315: airship stats (single totals: airship ranks add no bonus) and part rows (« AirshipExplorationPart Key »).
                     airRead.Add(new VoyageVessel{HouseId=houseId,Kind=VesselKind.Airship,Slot=index+1,Name=air.NameString,Rank=air.RankId,Exp=air.CurrentExp,NextExp=air.NextLevelExp,
                         RegisteredAt=Time(air.RegisterTime),ReturnAt=Time(air.ReturnTime),Loot=loot,ReadAt=now,
@@ -165,6 +172,10 @@ public sealed unsafe class VoyageWatcher : IDisposable
                         Parts=PartsBySlot(VesselKind.Airship,[air.HullId,air.SternId,air.BowId,air.BridgeId])});
                 }
                 // T26 (0.919): the log does not say which airship it is about: kept only when the company has a single airship.
+                // X-73 (0.1003): the single airship's finds, paired with the route's sectors, once per voyage, for the discoveries base.
+                if(airRead.Count==1 && AirshipLoot is not null && lastRouteRead is { } routeRead && single is { Registered:not 0 } one
+                   && AirshipLogRoute.Pair(one.Stops,routeRead.Ids) is { Count:>0 } paired && airshipsNoted.Add((houseId,one.Slot,one.Registered)))
+                    foreach(var (item,sector,count) in paired)AirshipLoot(item,sector,count);
                 if(airRead.Count==1)
                     airRead[0]=airRead[0] with {LastRoute=lastRoute ?? (configuration.Voyages ?? []).FirstOrDefault(vessel=>vessel.HouseId==houseId && vessel.Kind==VesselKind.Airship && vessel.Slot==airRead[0].Slot)?.LastRoute ?? []};
                 else if(airRead.Count>1 && lastRoute is { Count:>0 } && !airshipLogWarned){airshipLogWarned=true;log.Information("Airship voyage log read, but {0} airships: the route is not attached to one.",airRead.Count);}
@@ -221,7 +232,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
     /// T26 (0.919): the sector names of the voyage log (null when the log is empty: nothing read, the saved route is kept). Sector names from
     /// AirshipExplorationPoint.Name in the client language; read on the framework thread with the rest of the workshop.
     /// </summary>
-    private List<string>? AirshipLastRoute(WorkshopTerritory* workshop,ulong houseId)
+    private (List<string> Names,List<uint> Ids)? AirshipLastRoute(WorkshopTerritory* workshop,ulong houseId)
     {
         var lines=new List<string>();
         for(var index=0;index<workshop->Airship.AirshipLogs.Length;index++)
@@ -235,7 +246,8 @@ public sealed unsafe class VoyageWatcher : IDisposable
         if(lines.Count==0)return null;
         var sectors=data.GetExcelSheet<AirshipExplorationPoint>().Where(row=>!row.Name.IsEmpty).Select(row=>(row.RowId,row.Name.ExtractText())).ToArray();
         var names=sectors.ToDictionary(sector=>sector.RowId,sector=>sector.Item2);
-        return AirshipLogRoute.Sectors(lines,sectors).Select(id=>names[id]).ToList();
+        var ids=AirshipLogRoute.Sectors(lines,sectors).ToList();
+        return (ids.Select(id=>names[id]).ToList(),ids);
     }
 
     // 0.336: sheet rows 0 to 24 are the sectors (row 22 is the old Diadem, carries passengers, not offered); unnamed rows are skipped.

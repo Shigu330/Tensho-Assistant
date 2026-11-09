@@ -20,6 +20,7 @@ internal sealed partial class MainWindow
     internal Func<uint,string>? DutyName { get; set; }
     /// <summary>X-73.8 (0.862): a submersible sector's name.</summary>
     internal Func<uint,string>? SectorName { get; set; }
+    internal Func<uint,string>? AirshipSectorName { get; set; }
     /// <summary>X-73.9 (0.863): a blue magic spell's and a beast's names.</summary>
     internal Func<uint,string>? SpellName { get; set; }
     /// <summary>X-73.18 (0.889): a Quest row's name (QuestNameOf, MainWindow.ShopRequirements.cs), or its number.</summary>
@@ -117,7 +118,7 @@ internal sealed partial class MainWindow
         return lines;
     }
     private static readonly DiscoveryKind[] ItemSourceKinds=[DiscoveryKind.Reduction,DiscoveryKind.Desynthesis,DiscoveryKind.Venture,DiscoveryKind.DutyChest,DiscoveryKind.FateReward,
-        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
+        DiscoveryKind.MonsterDrop,DiscoveryKind.ItemFromItem,DiscoveryKind.FishCatch,DiscoveryKind.FishCondition,DiscoveryKind.FashionEvaluation,DiscoveryKind.VoyageDrop,DiscoveryKind.AirshipDrop,DiscoveryKind.VoyageUnlock,DiscoveryKind.BlueSpellLearned,DiscoveryKind.BeastTamed,DiscoveryKind.FestivalSeen,DiscoveryKind.VistaSeen];
     /// <summary>0.911 (X-76): the other kinds the page's search lists too (never shown as an item's source); with the places, FATEs and item sources, every kind.</summary>
     private static readonly DiscoveryKind[] OtherSeenKinds=[DiscoveryKind.NpcPlace,DiscoveryKind.BlueSpellCaster,DiscoveryKind.FishLure,DiscoveryKind.FishTransition,DiscoveryKind.FishBite,
         DiscoveryKind.QuestItemAsked,DiscoveryKind.SpearShadow,DiscoveryKind.FishBiteBait,DiscoveryKind.IntuitionStart,DiscoveryKind.IntuitionCatch,DiscoveryKind.VoyageVisit,DiscoveryKind.MonsterKill,DiscoveryKind.DutyChestOpened,DiscoveryKind.SpectralBefore,DiscoveryKind.FishPoints];
@@ -291,6 +292,7 @@ internal sealed partial class MainWindow
         DiscoveryKind.NpcPlace=>localization.Format("DiscoveriesUi.NpcPlace",SquadronMemberName?.Invoke(fact.Subject) is { Length:>0 } npcName ? npcName:$"#{fact.Subject}"),
         DiscoveryKind.VistaSeen=>localization.Format("DiscoveriesUi.VistaSeen",fact.Subject,weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.VoyageDrop=>localization.Format("DiscoveriesUi.FromSector",DiscoveryItemName(fact.Subject),DiscoverySectorName(fact.Detail)),
+        DiscoveryKind.AirshipDrop=>localization.Format("DiscoveriesUi.FromAirshipSector",DiscoveryItemName(fact.Subject),AirshipSectorName?.Invoke(fact.Detail) is { Length:>0 } sector ? sector:$"#{fact.Detail}"),
         DiscoveryKind.VoyageUnlock=>localization.Format("DiscoveriesUi.SectorUnlock",DiscoverySectorName(fact.Subject),DiscoverySectorName(fact.Detail)),
         DiscoveryKind.FashionEvaluation=>localization.Format("DiscoveriesUi.FashionJudged",DiscoveryItemName(fact.Subject),fashionHints.State.Catalog?.Hints.FirstOrDefault(hint=>hint.Id==fact.Detail)?.Name ?? $"#{fact.Detail}"),
         DiscoveryKind.FishCondition=>localization.Format("DiscoveriesUi.FishWeather",DiscoveryItemName(fact.Subject),weather.State.Catalog?.Weather(fact.Detail)?.Name ?? $"#{fact.Detail}"),

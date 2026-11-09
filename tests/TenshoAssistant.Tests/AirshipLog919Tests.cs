@@ -24,7 +24,7 @@ internal static class AirshipLog919Tests
             var a=new VoyageVessel{Kind=VesselKind.Airship,LastRoute=["A"]};var b=a with {LastRoute=["B"]};
             Check(!Voyages.SameAs([a],[b]) && Voyages.SameAs([a],[a with {}]),"last route compared");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs"));
-            Check(watcher.Contains("if(airRead.Count==1)") && watcher.Contains("var lastRoute=AirshipLastRoute(workshop,houseId);"),"single airship only");
+            Check(watcher.Contains("if(airRead.Count==1)") && watcher.Contains("var lastRouteRead=AirshipLastRoute(workshop,houseId);"),"single airship only");
         }),
     ];
 }

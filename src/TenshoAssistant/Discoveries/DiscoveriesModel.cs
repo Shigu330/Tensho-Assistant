@@ -62,7 +62,11 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     SpectralBefore=35,
     // X-85 V2 (0.964): FishPoints: Subject = an ocean fish, levels = the points one catch of it brought (the stop's FishData points grew by that much; bonuses
     // of the moment included), territory = the voyage's.
-    FishPoints=36 }
+    FishPoints=36,
+    // X-73 (0.1003, user request « the parsers we lack to complete what we still take from the community »): AirshipDrop: Subject = an item an airship
+    // brought back, Detail = the AirshipExplorationPoint row (sector) it came from, levels = the quantity. The sector comes from the voyage log's route
+    // (T26), paired with the stops in order: noted only with a single airship and as many stops with loot as sectors in the route.
+    AirshipDrop=37 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
