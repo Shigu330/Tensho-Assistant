@@ -5476,6 +5476,7 @@
     "Missing": "missing"
   },
   "DutyProgress": {
+    "Saved": "Saved state of your last character (read {0}).",
     "Filter": "Progress",
     "FilterAll": "All",
     "FilterNotCompleted": "Not completed",

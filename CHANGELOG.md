@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.990.0
+- Plan global, Verify : Contenus (X-106, idée retenue à la revue) : l'état « fait » des contenus (page Butin des contenus) est maintenant gardé sur le disque pour chaque personnage. Déconnecté, la page montre l'état enregistré de votre dernier personnage, avec la date de la lecture. Non validé en jeu.
+- Tests : DutySaved990Tests. Verify.ps1 (agent) : 1624/1624, 0 avertissement, 0 erreur ; DLL 0.990.0.0. Non validé en jeu.
+### English
+- Duties (X-106, idea kept at the review): the duties' « done » state (Duty loot page) is now kept on disk for each character. Logged out, the page shows your last character's saved state, with the date it was read. Not validated in game.
+
 ## 0.989.0
 - Plan global, Verify : Tenues (X-104, idée retenue à la revue) : sous une tenue dépliée (Collections › Tenues), deux boutons : « Pièces manquantes → souhaits » ajoute les pièces que vous n'avez pas à votre liste de souhaits, et « Fabricables → liste » ajoute celles qui ont une recette à la liste d'artisanat choisie. Non validé en jeu.
 - Tests : OutfitLists989Tests. Verify.ps1 (agent) : 1623/1623, 0 avertissement, 0 erreur ; DLL 0.989.0.0. Non validé en jeu.

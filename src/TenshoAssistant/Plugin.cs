@@ -1101,7 +1101,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => dutyLoader = new DutyCatalogLoader(duties, data, framework, log), () => dutyLoader?.Dispose());
             // g, C-01 (0.355): unlocked / completed duties, read on the framework thread while the Duty loot page shows them.
             DutyProgressReader? dutyProgress = null;
-            registrations.Register(() => dutyProgress = new DutyProgressReader(framework, client, unlocks, data, log, () => duties.State.Catalog), () => dutyProgress?.Dispose());
+            registrations.Register(() => dutyProgress = new DutyProgressReader(framework, client, unlocks, data, log, () => duties.State.Catalog, player, Path.Combine(pluginInterface.GetPluginConfigDirectory(), "DutyProgress.json")), () => dutyProgress?.Dispose());
             mainWindow.DutyProgressSource = () => { dutyProgress?.Want(); return dutyProgress?.State; };
             mainWindow.DutyProgressUnavailable = () => dutyProgress?.Unavailable == true;
             CharacterStatsReader? statsReader = null;

@@ -7,7 +7,8 @@ public enum DutyStatus : byte { Locked, Unlocked, Completed }
 public enum DutyProgressFilter { All, NotCompleted, UnlockedNotCompleted, Completed }
 
 /// <summary>Status of each catalog duty by InstanceContent row, copied on the framework thread; a missing entry is unknown, never « locked ».</summary>
-public sealed record DutyProgressState(IReadOnlyDictionary<uint,DutyStatus> ByInstance,DateTimeOffset ReadAt)
+/// <summary>X-106 (0.990): FromDisk = the state saved for the last character, shown while logged out.</summary>
+public sealed record DutyProgressState(IReadOnlyDictionary<uint,DutyStatus> ByInstance,DateTimeOffset ReadAt,bool FromDisk=false)
 {
     public DutyStatus? Of(uint instanceId)=>ByInstance.TryGetValue(instanceId,out var status) ? status:null;
 }
@@ -18,6 +19,16 @@ public sealed record DutyProgressState(IReadOnlyDictionary<uint,DutyStatus> ByIn
 /// </summary>
 public static class DutyProgress
 {
+    /// <summary>X-106 (0.990, user choice DEC-045, from C-01): the states saved per character (content id), with when they were read.</summary>
+    public sealed record Saved(Dictionary<uint,DutyStatus> ByInstance,DateTimeOffset ReadAt);
+    public static string Write(Dictionary<ulong,Saved> all,ulong last)=>System.Text.Json.JsonSerializer.Serialize(new SavedFile(all,last));
+    public static (Dictionary<ulong,Saved> All,ulong Last)? Read(string text)
+    {
+        try{return System.Text.Json.JsonSerializer.Deserialize<SavedFile>(text) is { All:not null } file ? (file.All,file.Last):null;}
+        catch(System.Text.Json.JsonException){return null;}
+    }
+    public sealed record SavedFile(Dictionary<ulong,Saved> All,ulong Last);
+
     public static bool Matches(DutyProgressFilter filter,DutyStatus? status)=>filter switch
     {
         DutyProgressFilter.NotCompleted=>status is not DutyStatus.Completed,

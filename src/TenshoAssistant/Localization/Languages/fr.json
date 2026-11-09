@@ -5476,6 +5476,7 @@
     "Missing": "manquante"
   },
   "DutyProgress": {
+    "Saved": "État enregistré de votre dernier personnage (lu le {0}).",
     "Filter": "Avancement",
     "FilterAll": "Tous",
     "FilterNotCompleted": "Non terminés",

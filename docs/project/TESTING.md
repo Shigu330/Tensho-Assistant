@@ -1620,6 +1620,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.989) Collections › Tenues : déplier une tenue incomplète, « Pièces manquantes → souhaits » : elles sont dans Souhaits ; « Fabricables → … » : dans la liste d'artisanat.
 
+- [ ] (0.990) Ouvrir Butin des contenus (lecture), se déconnecter, rouvrir la page : états affichés et ligne « État enregistré de votre dernier personnage ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
