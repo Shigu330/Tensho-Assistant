@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.989.0
+- Plan global, Verify : Tenues (X-104, idée retenue à la revue) : sous une tenue dépliée (Collections › Tenues), deux boutons : « Pièces manquantes → souhaits » ajoute les pièces que vous n'avez pas à votre liste de souhaits, et « Fabricables → liste » ajoute celles qui ont une recette à la liste d'artisanat choisie. Non validé en jeu.
+- Tests : OutfitLists989Tests. Verify.ps1 (agent) : 1623/1623, 0 avertissement, 0 erreur ; DLL 0.989.0.0. Non validé en jeu.
+### English
+- Outfits (X-104, idea kept at the review): under an open outfit (Collections › Outfits), two buttons: « Missing pieces → wishlist » adds the pieces you do not own to your wishlist, and « Craftable → list » adds those with a recipe to the chosen crafting list. Not validated in game.
+
 ## 0.988.0
 - Plan global, Verify : Mandats (X-103, idée retenue à la revue) : dans la file des mandats d'artisanat acceptés, un bouton « Préparer » ajoute à la liste d'artisanat choisie ce que ces mandats demandent et que vous n'avez pas encore (quantités additionnées par objet, ce que vous possédez déduit, objets avec une recette seulement). Sans liste, le bouton est grisé et dit d'en créer une. Non validé en jeu.
 - Tests : LevePrepare988Tests. Verify.ps1 (agent) : 1622/1622, 0 avertissement, 0 erreur ; DLL 0.988.0.0. Non validé en jeu.

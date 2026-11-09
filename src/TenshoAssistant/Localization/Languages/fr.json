@@ -5567,6 +5567,10 @@
     "StateComplete": "toutes les pièces possédées",
     "StateInDresser": "prête à ranger",
     "StateStored": "rangée",
+    "ToWishlist": "Pièces manquantes ({0}) → souhaits",
+    "ToWishlistTip": "Ajoute les pièces que vous n'avez pas (sacs, rangements enregistrés, coffre à apparence) à votre liste de souhaits (Collections › Souhaits).",
+    "ToCraftList": "Fabricables ({0}) → « {1} »",
+    "ToCraftListTip": "Ajoute les pièces manquantes qui ont une recette à la liste d'artisanat choisie (page Préparation), une de chaque.",
     "InDresser": "dans le coffre",
     "Elsewhere": "possédée, hors du coffre",
     "NotOwned": "manquante"

@@ -5567,6 +5567,10 @@
     "StateComplete": "every piece owned",
     "StateInDresser": "ready to store",
     "StateStored": "stored",
+    "ToWishlist": "Missing pieces ({0}) → wishlist",
+    "ToWishlistTip": "Adds the pieces you do not own (bags, saved storages, dresser) to your wishlist (Collections › Wishlist).",
+    "ToCraftList": "Craftable ({0}) → « {1} »",
+    "ToCraftListTip": "Adds the missing pieces that have a recipe to the chosen crafting list (Preparation page), one of each.",
     "InDresser": "in the dresser",
     "Elsewhere": "owned, outside the dresser",
     "NotOwned": "missing"
