@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1011.0
+- Plan global, Verify : Pêche (C10) : le chrono de l'aide à la pêche, et celui de la pêche en mer, repart tout seul à chaque lancer, au pêcher au vif compris. Avant, il ne partait qu'au début de la pêche et il fallait cliquer sur « Relancer » à chaque lancer. Le signal est l'état « lancer » de la ligne, déjà prouvé en jeu en 0.887 et lu à chaque image ; les leurres ne relancent pas le chrono. Le bouton reste pour une remise à zéro à la main. Plan global : à votre demande, plus rien n'est prévu après la 1.0.0 ; C10, le seul point qui y était, est fait. Non validé en jeu.
+- Tests : FishingCast1011Tests. Verify.ps1 (agent) : 1647/1647, 0 avertissement, 0 erreur ; DLL 0.1011.0.0. Non validé en jeu.
+### English
+- Fishing (C10): the stopwatch of the fishing help, and the ocean fishing one, restarts by itself at each cast, mooch included. Before, it only started when fishing began and had to be restarted by hand at each cast. The signal is the line's casting state, proven in game in 0.887 and read every frame; lures do not restart it. The button stays for a manual reset. Global plan: at your request nothing is planned after 1.0.0 any more; C10, the only point there, is done. Not validated in game.
+
 ## 0.1010.0
 - Plan global, Verify : Préparation de la campagne d'essais en jeu (phase 6) : nouveau document docs/project/TESTING-ROUTE.md. Les 782 essais encore ouverts de TESTING.md sont rangés par activité, pour enchaîner ceux qui se font au même endroit : fenêtres et réglages de Tensho, objets et marché, collections, artisanat, récolte et pêche, carte et monde ouvert, compagnie, mini-jeux, puis rappels et minuteurs, instances, et le JcJ en dernier. Les prérequis sont regroupés (sous-marin, client anglais, salon Discord de test…). Une étape 0 vient en tête : les vérifications d'après le patch 7.58 (autotest comparé, actions qui agissent sur le jeu, relevés en attente). Chaque essai renvoie à sa ligne de TESTING.md, qui reste la liste à cocher. Rien ne change dans le plugin.
 - Tests : GameUpdateInventory1008Tests. Verify.ps1 (agent) : 1645/1645, 0 avertissement, 0 erreur ; DLL 0.1010.0.0. Non validé en jeu.

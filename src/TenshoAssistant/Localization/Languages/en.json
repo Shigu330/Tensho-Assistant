@@ -1411,7 +1411,7 @@
     "SourcesShort": "Sources (i)",
     "Elapsed": "Stopwatch: {0} s",
     "Restart": "Restart",
-    "RestartHelp": "Resets the stopwatch: click it at each cast, as fishing stays active between casts.",
+    "RestartHelp": "The stopwatch restarts by itself at each cast; this button resets it by hand.",
     "BiteLoading": "Bite time: loading (Teamcraft)…",
     "BiteTime": "Bite after {0}–{1} s (usually {2} s)",
     "BiteTimeHelp": "Time between the cast and the bite, from {0} player reports (Teamcraft). Green while the stopwatch is in the range.",
