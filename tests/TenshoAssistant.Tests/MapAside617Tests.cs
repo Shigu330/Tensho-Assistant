@@ -4,6 +4,7 @@ using TenshoAssistant.UI;
 internal static class MapAside617Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
@@ -117,7 +118,7 @@ internal static class MapAside617Tests
         ("Map enlarged: no stepping aside then, the same as before otherwise",() =>
         {
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs")).Replace("\r\n","\n");
-            Check(tracker.Contains("if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;\n        var byWindow=BehindGame(at,size);var byPanel=Panels?.Over(at,size)==true;"),"checked first");
+            Check(HasCode(tracker,"if(UI.MapEnlarged.Is(mapRestore is not null,size.X,size.Y,screen.X,screen.Y))return false;\n        var byWindow=BehindGame(at,size);var byPanel=Panels?.Over(at,size)==true;"),"checked first");
         }),
     ];
 }

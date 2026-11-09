@@ -1,9 +1,12 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): SlowFrame745Tests, SlowReaders992Tests merged into SlowFrameTests; every case is kept.
 using TenshoAssistant.Diagnostics;
+using TenshoAssistant.Craft;
+using TenshoAssistant.Gathering;
 internal static class SlowFrameTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
+    private static string ReadLf(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         // From SlowFrame745Tests: 0.745 (user report: Tensho feels heavy): which part of a slow frame costs.
@@ -48,6 +51,13 @@ internal static class SlowFrameTests
             var gate=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
             Check(gate.Contains("void Guarded(IFramework running){if(!cut)Timed(handler,running);}"),"cut first");
             Check(gate.Contains("if(Developer?.Invoke()!=true){handler(running);return;}") && gate.Contains("if(spent<=50)return;") && gate.Contains("if(!slowNamed.Add(name))return;"),"developer, 50 ms, once");
+        }),
+        ("Diagnostics: the panels beside the game's windows have their draw time, in developer mode",() =>
+        {
+            Check(ReadLf("Plugin.cs").Contains("mainWindow.RecordOverlayDraw(name,") && ReadLf("Plugin.cs").Contains("var started=mainWindow.DeveloperMode ?"),"measured in developer mode only");
+            Check(ReadLf("MainWindow.Diagnostics.cs").Contains("DiagnosticsUi.OverlayTimes") && ReadLf("MainWindow.cs").Contains("overlayDrawMs"),"shown");
+            Check(ReadLf("MainWindow.cs").Contains("if (milliseconds < 0.02) return;"),"in-game report: a closed panel's zeros no longer push its times out");
+            Check(ReadLf("MapViewWindow.cs").Contains("owner.RecordOverlayDraw(\"Map\","),"in-game report: the map has its line");
         }),
     ];
 }

@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Text.Json;
 using TenshoAssistant.Fashion;
 using TenshoAssistant.Items;
+using TenshoAssistant.Alarms;
+using TenshoAssistant.UI;
 
 internal static class FashionTests
 {
@@ -133,6 +135,28 @@ internal static class FashionTests
             Check(service.State.Dataset is null && !service.State.Loading && calls==2,"disposed batch and future requests inert");
             using var borrowed=client.GetAsync("https://example.invalid/ownership-test").GetAwaiter().GetResult();
             Check(calls==3,"borrowed client remains usable");
-        })
+        }),
+        ("Fashion Report weeks start on Tuesday 08:00 UTC and the slots follow the game window",()=>
+        {
+            var start=new DateTimeOffset(2018,1,30,8,0,0,TimeSpan.Zero);
+            Check(TenshoAssistant.Fashion.FashionWeek.Number(start)==0 && TenshoAssistant.Fashion.FashionWeek.Number(start.AddDays(7).AddSeconds(-1))==0,"first week");
+            Check(TenshoAssistant.Fashion.FashionWeek.Number(start.AddDays(7))==1 && TenshoAssistant.Fashion.FashionWeek.ThemeRow(start.AddDays(7))==10,"second week, theme row + 9");
+            var (begin,next)=TenshoAssistant.Fashion.FashionWeek.Bounds(start.AddDays(10));
+            Check(begin==start.AddDays(7) && next==start.AddDays(14),"week bounds");
+            Check(TenshoAssistant.Fashion.FashionWeek.Slots.Length==11 && TenshoAssistant.Fashion.FashionWeek.Slots[0]==TenshoAssistant.Items.EquipmentSlots.MainHand
+                && TenshoAssistant.Fashion.FashionWeek.Slots[10]==TenshoAssistant.Items.EquipmentSlots.Ring,"11 slots, weapon first, rings last");
+        }),
+        ("0.581: the week's outfit keeps one piece per slot, and another week's choice is dropped",() =>
+        {
+            var week=new DateTimeOffset(2026,11,3,8,0,0,TimeSpan.Zero);
+            var outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(null,week,1,10);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week)[1]==10,"chosen");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,1,11);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week)[1]==11 && outfit.Slots.Count==1,"one per slot");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,1,11);
+            Check(outfit.Slots.Count==0,"unticked");
+            outfit=TenshoAssistant.Fashion.FashionOutfit.Toggle(outfit,week,2,12);
+            Check(TenshoAssistant.Fashion.FashionOutfit.Current(outfit,week.AddDays(7)).Count==0,"another week");
+        }),
     ];
 }

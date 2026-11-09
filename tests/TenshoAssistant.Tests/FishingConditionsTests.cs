@@ -2,6 +2,7 @@ using System.Text.Json;
 using TenshoAssistant.Community;
 using TenshoAssistant.Gathering;
 using TenshoAssistant.Monsters;
+using TenshoAssistant.UI;
 
 internal static class FishingConditionsTests
 {
@@ -69,6 +70,14 @@ internal static class FishingConditionsTests
                 Check(value.FishingError is null && value.Monsters.Single().Id==777 && spot.BaitChains![0].Single()==2585,"other source facts survive invalid optional conditions");
                 Check(spot.Conditions is {Error:not null,Weather:null,PreviousWeather:null} && spot.Conditions.Timing.Kind==GatheringScheduleKind.Unknown,"no fallback to unrestricted or available");
             }
+        }),
+        ("0.568: a fish's window and weather now: unknown stays unknown, and a window can cross midnight",() =>
+        {
+            Check(TenshoAssistant.Gathering.FishNow.InWindow(60,120,90)==true && TenshoAssistant.Gathering.FishNow.InWindow(60,120,120)==false,"plain window");
+            Check(TenshoAssistant.Gathering.FishNow.InWindow(1320,60,1400)==true && TenshoAssistant.Gathering.FishNow.InWindow(1320,60,30)==true && TenshoAssistant.Gathering.FishNow.InWindow(1320,60,600)==false,"across midnight");
+            Check(TenshoAssistant.Gathering.FishNow.InWindow(null,120,90) is null,"no window");
+            Check(TenshoAssistant.Gathering.FishNow.WeatherFits([1,2],2)==true && TenshoAssistant.Gathering.FishNow.WeatherFits([1,2],3)==false,"weather");
+            Check(TenshoAssistant.Gathering.FishNow.WeatherFits([1],null) is null && TenshoAssistant.Gathering.FishNow.WeatherFits([],1) is null,"unknown weather or no condition");
         }),
     };
 }

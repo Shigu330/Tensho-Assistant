@@ -1,4 +1,5 @@
 using TenshoAssistant.Craft;
+using TenshoAssistant.Gathering;
 
 // A-05 (0.433): crafting lists of several items, in a file of their own.
 internal static class CraftLists433Tests
@@ -37,6 +38,18 @@ internal static class CraftLists433Tests
                 Check(broken.Unavailable && !broken.Set(0,new("X",[])) && File.ReadAllText(path)=="{ not json","not written over");
             }
             finally{if(Directory.Exists(folder))Directory.Delete(folder,true);}
+        }),
+        ("Crafting list raw needs: a recipe's materials over the whole list, shared materials added, an item without recipe as it is",() =>
+        {
+            RecipeDefinition Recipe(uint recipe,uint result,params (uint Id,int Amount)[] ingredients)=>new(recipe,result,1,"Test",100,ingredients.Select(row=>new RecipeIngredient(row.Id,row.Amount)).ToArray(),0,null);
+            var ingot=Recipe(1,100,(1000,2));var sword=Recipe(2,200,(100,3),(1000,1));var plate=Recipe(3,300,(1000,5));
+            var catalog=RecipeCatalog.Build([ingot,sword,plate],"fixture");
+            var list=new CraftList("L",[new(200,2),new(300,1),new(1000,7),new(2000,4)]);
+            var needs=CraftLists.RawNeeds(list,new Dictionary<uint,RecipeDefinition>{[200]=sword,[300]=plate},catalog);
+            Check(needs[1000]==2*(3*2+1)+5+7,"shared raw material: "+needs[1000]);
+            Check(needs[2000]==4,"an entry without recipe");
+            Check(!needs.ContainsKey(100) && !needs.ContainsKey(200),"nothing crafted is gathered");
+            Check(CraftLists.RawNeeds(new CraftList("E",[]),new Dictionary<uint,RecipeDefinition>(),catalog).Count==0,"empty list");
         }),
     ];
 }

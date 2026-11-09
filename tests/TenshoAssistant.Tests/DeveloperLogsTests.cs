@@ -1,3 +1,4 @@
+using TenshoAssistant.Maps;
 // Test audit of 2026-11-09, batch 2 (0.1021): LinkTest836Tests, MenuLog781Tests, ListPanelLog840Tests, NearbyLog818Tests, MessageCapture809Tests, MapMarkers842Tests, MapMarks791Tests merged into DeveloperLogsTests; every case is kept.
 internal static class DeveloperLogsTests
 {
@@ -56,6 +57,15 @@ internal static class DeveloperLogsTests
             foreach(var mark in new[]{"canvas vendors","canvas icon list","canvas icons drawn","canvas nearby objects","canvas monsters","canvas menus","canvas nearest aetheryte","canvas end"})
                 Check(map.Contains("MapMark(\""+mark+"\");"),"0.805: "+mark);
             Check(map.Contains("MeasureMap(\"map overlay controls\","),"layout split (the canvas: SlowFrameTests)");
+        }),
+        ("Reading capture: developer mode only, stopped by the competitive cut, limited",() =>
+        {
+            var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
+            Check(code.Contains("CompetitiveGate.Add(framework,OnUpdate)") && code.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"the frame goes through the gate");
+            Check(code.Contains("CompetitiveGate.Cut") && code.Contains("ChatMessageUnhandled-=OnMessage"),"the chat too, with its cleanup");
+            Check(code.Contains("if(disposed || !enabled())return;"),"nothing outside developer mode");
+            Check(code.Contains("if(count>=limit)return;"),"a limit on the lines");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("()=>configuration.DeveloperMode,log)"),"wired to the setting");
         }),
     ];
 }

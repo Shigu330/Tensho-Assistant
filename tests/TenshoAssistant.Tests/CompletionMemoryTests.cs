@@ -15,12 +15,5 @@ internal static class CompletionMemoryTests
             Check(CompletionMemory.Merge(Unknown,null,true) == Unknown,"nothing remembered");
             Check(new TenshoAssistant.Caching.CachePreferences().Get(TenshoAssistant.Caching.CacheArea.Completion) == TenshoAssistant.Caching.CacheRetention.SevenDays,"seven days by default");
         }),
-        ("Retainers and saddlebags are saved automatically unless turned off, older configurations included",()=>
-        {
-            Check(new TenshoAssistant.Configuration().AutoBankCapture,"on by default");
-            Check(System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.Configuration>("{\"Version\":1}")!.AutoBankCapture,"older configuration: on");
-            var off=new TenshoAssistant.Configuration{AutoBankCapture=false};
-            Check(!System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.Configuration>(System.Text.Json.JsonSerializer.Serialize(off))!.AutoBankCapture,"choice kept");
-        }),
     ];
 }

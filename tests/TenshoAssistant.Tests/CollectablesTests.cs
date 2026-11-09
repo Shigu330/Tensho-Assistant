@@ -2,7 +2,7 @@ using TenshoAssistant.Craft;
 using TenshoAssistant.Gathering;
 
 // 0.478 (user requests, in-game campaign, lot 6): collectables with a long name, their tab and sort; GP over the nodes of a crafting list; forbidden actions; the panel's layout.
-internal static class Gathering478Tests
+internal static class CollectablesTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
@@ -127,18 +127,6 @@ internal static class Gathering478Tests
             Check(one.Move==CollectableMove.Restore,$"the last attempt: restore first: {one}");
             Check(CollectableAdvisor.Advise(turnBelow,4,ore,new CollectableBonuses(175,88,809,200,100,false,true,300,6,13,100,0.5m)) is {Expected:>0},"a search with the chance ends");
         }),
-        ("Crafting list raw needs: a recipe's materials over the whole list, shared materials added, an item without recipe as it is",() =>
-        {
-            RecipeDefinition Recipe(uint recipe,uint result,params (uint Id,int Amount)[] ingredients)=>new(recipe,result,1,"Test",100,ingredients.Select(row=>new RecipeIngredient(row.Id,row.Amount)).ToArray(),0,null);
-            var ingot=Recipe(1,100,(1000,2));var sword=Recipe(2,200,(100,3),(1000,1));var plate=Recipe(3,300,(1000,5));
-            var catalog=RecipeCatalog.Build([ingot,sword,plate],"fixture");
-            var list=new CraftList("L",[new(200,2),new(300,1),new(1000,7),new(2000,4)]);
-            var needs=CraftLists.RawNeeds(list,new Dictionary<uint,RecipeDefinition>{[200]=sword,[300]=plate},catalog);
-            Check(needs[1000]==2*(3*2+1)+5+7,"shared raw material: "+needs[1000]);
-            Check(needs[2000]==4,"an entry without recipe");
-            Check(!needs.ContainsKey(100) && !needs.ContainsKey(200),"nothing crafted is gathered");
-            Check(CraftLists.RawNeeds(new CraftList("E",[]),new Dictionary<uint,RecipeDefinition>(),catalog).Count==0,"empty list");
-        }),
         ("Collectable with a long name: the game's cut name finds its thresholds, only when it names one item",() =>
         {
             var catalog=new CollectableCatalog([Rule(36291,"Minerai de durium noble collectionnable",80,1000,10),Rule(35636,"Poings en durium noble collectionnables",80,494,10),Rule(9,"Bois collectionnable",50,100,1),Rule(10,"Bois collectionné",50,120,1)]);
@@ -161,19 +149,6 @@ internal static class Gathering478Tests
             var table=Read("MainWindow.CollectableTable.cs");
             Check(table.Contains("ImGuiTableFlags.Sortable") && table.Contains("TableGetSortSpecs"),"table");
             Check(Read("MainWindow.Pages.cs").Contains("new(Page.GatheringCollectables,\"Production\",null,DrawCollectablesPage,") && Read("UI/Navigation/MainWindow.CategoryNavigation.cs").Contains("Page.GatheringCollectables") && !Read("MainWindow.GatheringBrowser.cs").Contains("DrawCollectableTable();"),"its own tab");
-        }),
-        ("GP actions can be forbidden, on both jobs, like macro actions",() =>
-        {
-            var free=Node(1000);
-            Check(free.Best.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Yield),"the yield action is used when free");
-            var key=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.Effect==GpEffect.Yield).Select(GpActionRules.Key));
-            var without=Node(1000,key);
-            Check(without.Best.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield) && without.Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield)),"never planned");
-            var botanist=GpOptimizer.Solve(new(17,90,1000,4,1,100,0,1,MoreActions:true,Forbidden:key),Catalog());
-            Check(botanist.Best.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield),"the botanist's twin too");
-            Check(GpActionRules.Joined(["b","a","a",""])=="a|b" && GpActionRules.Joined(null)=="","joined");
-            Check(GpActionRules.Groups(Catalog()).All(group=>group.Miner is not null && group.Botanist is not null),"each action has its twin");
-            Check(Read("MainWindow.Settings.cs").Contains("DrawGpPlanSettings();") && Read("MainWindow.GatheringGp.cs").Contains("Forbidden:GpForbidden"),"in the settings and the GP page");
         }),
         ("Collectable window values: read from the in-game capture; anything missing or of another type gives no turn",() =>
         {
@@ -358,86 +333,61 @@ internal static class Gathering478Tests
             Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice") && panel.Contains("WrappedTooltip(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
             Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50,"default");
         }),
-        ("GP tick: once GP stops rising, no tick is promised; it comes back with the next rise; what a tick gives is seen",() =>
+        ("Collectables: thresholds by item and by the name shown, tiers, empty rows left out",() =>
         {
-            var at=new DateTimeOffset(2026,11,4,10,0,0,TimeSpan.Zero);
-            var tracker=new RegenTickTracker();
-            Check(tracker.Observe(100,800,at) is {Stalled:false,Progress:null},"first read: waiting, not stopped");
-            var running=tracker.Observe(105,800,at.AddSeconds(3));
-            Check(running is {Stalled:false,Gain:0} && running.SecondsLeft is not null,"a first rise: a tick, its size not told yet");
-            Check(tracker.Observe(107,800,at.AddSeconds(4)) is {Gain:0},"a rise out of time (in-game report: 2 was kept): not a tick's size");
-            Check(tracker.Observe(112,800,at.AddSeconds(7)) is {Gain:5},"a tick after it: 5");
-            Check(tracker.Observe(112,800,at.AddSeconds(10)) is {Stalled:false},"within a tick and a half: still running");
-            var stopped=tracker.Observe(112,800,at.AddSeconds(12));
-            Check(stopped is {Stalled:true,Progress:null,SecondsLeft:null},"in-game report: stopped, at a gathering window");
-            Check(tracker.Observe(112,800,at.AddSeconds(100)) is {Stalled:true},"still said after a long time");
-            Check(tracker.Observe(115,800,at.AddSeconds(101)) is {Stalled:false,Gain:5},"it rises again; a rise after a pause does not change what a tick gives");
-            Check(tracker.Observe(800,800,at.AddSeconds(200)) is {Stalled:false},"full: not stopped");
-            Check(Read("MainWindow.RegenTick.cs").Contains("GpTick.Stalled") && Read("MainWindow.RegenTick.cs").Contains("measuredBase!=configuration.GpRegenBase"),"said, and the last measure kept");
-            Check(!Read("MainWindow.GatheringPanel.cs").Contains("GpRegenBase=") && !Read("MainWindow.CollectablePanel.cs").Contains("GpRegenBase="),"measured in one place only");
-            Check(GpRegen.Traits(16).SequenceEqual([192u,236u,239u]) && GpRegen.Traits(17).SequenceEqual([193u,237u,240u]) && GpRegen.Traits(18).SequenceEqual([194u,238u,241u]) && GpRegen.Traits(8).Count==0,"the traits of the sheet, job by job");
-            Check(GpRegen.Bonus([],16)==0 && GpRegen.Bonus([192],16)==1 && GpRegen.Bonus([192,236],16)==2 && GpRegen.Bonus([192,236,239],16)==3 && GpRegen.Bonus([236],16)==2 && GpRegen.Bonus([193],16)==0,"the highest unlocked gives the total; another job's does not count");
-            Check(GpRegen.Base(8,3)==5 && GpRegen.Rate(0,5,3)==8 && GpRegen.Rate(0,5,1)==6,"measured on one job, known on another");
-            Check(GpRegen.Rate(0,0,3)==0 && GpRegen.Rate(9,5,3)==9,"no measure: unknown, not invented; the setting wins");
+            // Values of docs/evidence/0.409-collectables.md (rows 23.0 and 14.0).
+            var catalog=new CollectableCatalog([
+                new(30970,"Arc long en cèdre collectionnable",50,50,110,150,190,45,49,54,true),
+                new(12713,"Pic-à-glace",50,51,49,81,114,6,7,11,true),
+                new(5108,"Minerai de cuivre jaune",50,50,0,0,0,0,0,0,true),
+            ]);
+            Check(catalog.Count==2,"rows with no threshold left out");
+            Check(catalog.For(5108).Count==0 && catalog.For(30970).Count==1,"by item");
+            Check(catalog.Named("Arc long en  cèdre collectionnable ") is [{ ItemId:30970 }],"by the name shown, icon and spaces removed");
+            Check(catalog.Named("pic-à-glace") is [{ Low:49,Mid:81,High:114 }],"name case ignored");
+            var rule=catalog.For(30970)[0];
+            Check(Collectables.Tier(rule,109)==CollectableTier.Below && Collectables.Tier(rule,110)==CollectableTier.Low
+                && Collectables.Tier(rule,150)==CollectableTier.Mid && Collectables.Tier(rule,999)==CollectableTier.High,"tiers");
         }),
-        ("GP tick: the time until full, from what a tick gives; none while unknown or paused",() =>
+        ("Collectables: numbers read as shown by the game; anything else is unknown",() =>
         {
-            RegenTickState At(uint gp,double? left,bool stalled=false)=>new(gp,800,left is null ? null:0.5,left,stalled,5);
-            Check(RegenTickTracker.ToFull(At(790,2),5)==TimeSpan.FromSeconds(2+3),"two ticks: this one, then 3 s");
-            Check(RegenTickTracker.ToFull(At(793,2),5)==TimeSpan.FromSeconds(2+3),"a part of a tick counts whole");
-            Check(RegenTickTracker.ToFull(At(795,1),5)==TimeSpan.FromSeconds(1),"the next tick fills it");
-            Check(RegenTickTracker.ToFull(At(800,1),5)==TimeSpan.Zero,"full");
-            Check(RegenTickTracker.ToFull(At(700,2),0) is null && RegenTickTracker.ToFull(At(700,null,true),5) is null && RegenTickTracker.ToFull(At(700,null),5) is null,"unknown gain, paused, no tick seen");
-            var bar=Read("MainWindow.RegenTick.cs");
-            Check(bar.Contains("(float)tick.Gp/tick.MaxGp") && bar.Contains("AddRectFilled") && bar.Contains("GpTick.Full"),"the bar shows GP, the highlight the tick");
+            Check(Collectables.Number("600")==600 && Collectables.Number("1,234")==1234 && Collectables.Number("1 234")==1234,"numbers");
+            Check(Collectables.Number(null) is null && Collectables.Number("") is null && Collectables.Number("12a") is null && Collectables.Number("-5") is null,"unknown");
         }),
-        ("Diagnostics: the panels beside the game's windows have their draw time, in developer mode",() =>
+        ("Collectables: the reader stays on the framework thread, reads named fields only, and no action is advised",() =>
         {
-            Check(Read("Plugin.cs").Contains("mainWindow.RecordOverlayDraw(name,") && Read("Plugin.cs").Contains("var started=mainWindow.DeveloperMode ?"),"measured in developer mode only");
-            Check(Read("MainWindow.Diagnostics.cs").Contains("DiagnosticsUi.OverlayTimes") && Read("MainWindow.cs").Contains("overlayDrawMs"),"shown");
-            Check(Read("MainWindow.cs").Contains("if (milliseconds < 0.02) return;"),"in-game report: a closed panel's zeros no longer push its times out");
-            Check(Read("MapViewWindow.cs").Contains("owner.RecordOverlayDraw(\"Map\","),"in-game report: the map has its line");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/CollectableReader.Dalamud.cs"));
+            Check(reader.Contains("framework.IsInFrameworkUpdateThread") && reader.Contains("addon->ItemName") && reader.Contains("addon->IntegrityLeftover")
+                && reader.Contains("MaxValues=64") && reader.Contains("_=Task.Run(Load)"),"reader");
+            Check(!reader.Contains("FireCallback") && !reader.Contains("SetAtkValues"),"nothing sent to the game");
+            var panel=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CollectablePanel.cs"));
+            Check(panel.Contains("CollectablePanel.Unknown") && panel.Contains("developerMode && ImGui.CollapsingHeader"),"current collectability unknown, raw values in developer mode");
         }),
-        ("The help follows what is unlocked: an action the window does not offer or the job has not learned is never advised",() =>
+        ("Collectables table 0.413: every kept rule by level, filtered by item or group words",() =>
         {
-            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
-            string[] Flags(params int[] closed){var raw=Raw(0,177,88,265,132,false);foreach(var index in closed)raw[index]=$"{index}:bool False";return raw;}
-            var full=new CollectableBonuses(175,88,809,200,100,false,true,0,4,13);
-            Check(CollectableTurn.Parse(Flags())! is {ScrutinyOpen:true,FocusOpen:true,BrazenOpen:true},"nothing closed");
-            var noScrutiny=CollectableTurn.Parse(Flags(40))!;
-            Check(noScrutiny.ScrutinyOpen==false && CollectableAdvisor.Advise(noScrutiny,4,ore,full) is {Scrutinies:0} and {Target:CollectableTier.Low},"Scrutiny not offered: not counted, the plan is what is left");
-            Check(CollectableAdvisor.Advise(noScrutiny,4,ore,full)!.Move!=CollectableMove.Scrutiny,"nor advised");
-            var noFocus=CollectableTurn.Parse(Flags(40,43))! with {IntuitionChance=40};
-            Check(CollectableAdvisor.Advise(noFocus,3,ore,full)!.Move!=CollectableMove.Focus,"Collector's Focus below its level: not advised");
-            var noBrazen=CollectableTurn.Parse(Flags(31))!;
-            Check(CollectableAdvisor.Advise(noBrazen,4,ore)!.Move!=CollectableMove.Brazen,"nor a roll the window does not offer");
-            var locked=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.JobId==16 && spec.Effect==GpEffect.Attempt).Select(GpActionRules.Key));
-            Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
-            var list=Read("MainWindow.GatheringPlanSettings.cs");
-            Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
+            var catalog=new CollectableCatalog([
+                new(2,"Noyau de glacier",50,51,141,236,332,13,16,26,true,"Nv 50-60"),
+                new(1,"Madrier de cèdre d'affinage",80,80,360,540,720,5,10,15,false,"Composants d'affinage pour menuisier"),
+                new(3,"Pic-à-glace",50,51,49,81,114,6,7,11,true,"Nv 50-60"),
+                new(4,"Vide",50,50,0,0,0,0,0,0,true,"Nv 50-60"),
+            ]);
+            Check(catalog.All.Select(rule=>rule.ItemId).SequenceEqual(new uint[]{2,3,1}),"by level then name, empty rows left out");
+            Check(Collectables.Filter(catalog.All,"nv 50").Length==2 && Collectables.Filter(catalog.All,"menuisier madrier").Length==1
+                && Collectables.Filter(catalog.All,"  ").Length==3 && Collectables.Filter(catalog.All,"glace 80").Length==0,"filter");
+            var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CollectableTable.cs"));
+            Check(ui.Contains("Tip(\"CollectableTable.SearchTip\")") && ui.Contains("clipper.End();clipper.Destroy();") && ui.Contains("CollectableTable.ItemReward"),"table");
         }),
-        ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
+        ("Held collectables 0.432: tier and scrips by the first scrip rule; items the game does not take for scrips left out",() =>
         {
-            var lists=Read("MainWindow.MapLocalLists.cs");
-            Check(lists.Contains("new[]{\"MapLocal.Favorites\",\"MapLocal.Quests\",") && lists.IndexOf("DrawLocalFavorites(map);",StringComparison.Ordinal)<lists.IndexOf("DrawLocalQuests(map);",StringComparison.Ordinal),"before Quests and FATEs");
-            Check(lists.Contains("MapBookmarks.RemoveAt(items,remove)") && lists.Contains("FlagFromMap(map,point.X,point.Y)") && lists.Contains("OpenMapPointFromPage(target!,point.X,point.Y)"),"removed, flagged here, opened elsewhere");
-        }),
-        ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
-        {
-            var replacer=Read("Maps/NativeMapReplacer.Dalamud.cs");
-            Check(replacer.Contains("var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();") && replacer.Contains("if(visible && !wasVisible && !waiting)") && replacer.Contains("wasVisible=visible && !waiting;"),"the decision waits");
-            Check(replacer.Contains("startingUntil=DateTimeOffset.UtcNow.AddSeconds(15)"),"not for ever: a map that cannot draw (combat, duty) still leaves the game's");
-        }),
-        ("Gathering panel: readable at its width; a collectable says where its GP goes; the regeneration is measured, or said to be unknown",() =>
-        {
-            var panel=Read("MainWindow.GatheringPanel.cs");
-            Check(panel.Contains("\"GatheringPanel.CollectablePlan\"") && panel.Contains("Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}"),"a collectable has no GP plan here, and says why");
-            Check(panel.Contains("ImGui.PushTextWrapPos(0);") && panel.Contains("BeginGroup"),"texts wrap; name and rates on two lines");
-            foreach(var language in new[]{"en","fr"})
-            {
-                var texts=System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json")))!["CollectablePanel"]!;
-                Check(!texts["Unknown"]!.GetValue<string>().Contains("confirm",StringComparison.OrdinalIgnoreCase),"the player is not asked to confirm anything: "+language);
-            }
+            var catalog=new CollectableCatalog([
+                new(30970,"Arc long",50,50,110,150,190,45,49,54,true),
+                new(31101,"Madrier",80,80,360,540,720,5,10,15,false),
+            ]);
+            Check(Collectables.Value(catalog,new(30970,160)) is { Tier:CollectableTier.Mid, Scrips:49 },"mid tier");
+            Check(Collectables.Value(catalog,new(30970,100)) is { Tier:CollectableTier.Below, Scrips:0 },"below");
+            Check(Collectables.Value(catalog,new(30970,190))!.Scrips==54 && Collectables.Value(catalog,new(31101,800)) is null && Collectables.Value(catalog,new(5,1)) is null,"high; item rewards and unknown: none");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/CollectableReader.Dalamud.cs"));
+            Check(reader.Contains("now>Volatile.Read(ref holdingsWanted)") && reader.Contains("item->IsCollectable()") && reader.Contains("container->IsLoaded"),"bags read only while asked");
         }),
     ];
 }

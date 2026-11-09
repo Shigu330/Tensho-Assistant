@@ -1,11 +1,13 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): NearbyMonsters795Tests, MonsterIcons799Tests, MonsterUses1002Tests, HuntNearby796Tests merged into NearbyMonstersTests; every case is kept.
 using TenshoAssistant.Monsters;
 using TenshoAssistant.Hunting;
+using TenshoAssistant.UI;
 internal static class NearbyMonstersTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
     private static HuntSlot Slot(int rank,params byte[] first)=>new(rank,[first,new byte[4],new byte[4],new byte[4],new byte[4],new byte[4],new byte[4],new byte[4],new byte[4],new byte[4]]);
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         // From NearbyMonsters795Tests: 0.795 (X-34, X-35, user request): nearby monsters that drop what the lists still need.
@@ -73,6 +75,11 @@ internal static class NearbyMonstersTests
             Check(Read("Plugin.cs").Contains(".Where(name=>name.Length>0)),pair.target.Value.BNpcName.RowId))"),"name row");
             Check(Read("MainWindow.HuntingLog.cs").Contains("()=>configuration.MapView.ShowHuntLogMonsters"),"page setting");
             Check(Read("MainWindow.NearbyMonsters.cs").Contains("HuntingLog.Missing(entries,slots,HuntGrandCompany?.Invoke())"),"used");
+        }),
+        ("0.551: a monster's map button places the flag at its known position, and says where it comes from",() =>
+        {
+            var monsters=ReadLf("MainWindow.Monsters.cs");
+            Check(monsters.Contains("if (monster.X is { } x && monster.Y is { } y)") && monsters.Contains("FlagFromMap(chosen,x,y);") && monsters.Contains("mapX=20.5f"),"known position, else as before");
         }),
     ];
 }

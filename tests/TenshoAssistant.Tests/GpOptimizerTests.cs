@@ -1,5 +1,6 @@
 using TenshoAssistant.Character;
 using TenshoAssistant.Gathering;
+using TenshoAssistant.Alarms;
 
 internal static class GpOptimizerTests
 {
@@ -118,6 +119,15 @@ internal static class GpOptimizerTests
             stats.Clear(); Check(stats.State.CurrentGp is null && stats.State.MaximumGp is null && stats.State.CharacterId==0,"no foreign resource evidence after clear");
             Reject(()=>stats.Publish(42,"",16,"",100,new Dictionary<string,int>(),500,400));
             Reject(()=>stats.Publish(42,"",16,"",100,new Dictionary<string,int>(),500,null));
-        })
+        }),
+        ("Bountiful II estimate: +3 from 110 % of the base, +2 from 90 %, else +1, unknown without rating or base",()=>
+        {
+            // Base 3420 = ItemLevel.Gathering of a level 90 ore (docs/evidence/0.224-bountiful-base.md): steps at 3078 and 3762.
+            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(3762,3420)==3 && TenshoAssistant.Gathering.BountifulEstimate.Bonus(3761,3420)==2,"+3 step");
+            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(3078,3420)==2 && TenshoAssistant.Gathering.BountifulEstimate.Bonus(3077,3420)==1,"+2 step");
+            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(0,3420) is null && TenshoAssistant.Gathering.BountifulEstimate.Bonus(4000,0) is null,"unknown");
+            Check(TenshoAssistant.Gathering.BountifulEstimate.NextStep(3000,3420)==3078 && TenshoAssistant.Gathering.BountifulEstimate.NextStep(3500,3420)==3762
+                && TenshoAssistant.Gathering.BountifulEstimate.NextStep(4000,3420) is null,"next step");
+        }),
     ];
 }

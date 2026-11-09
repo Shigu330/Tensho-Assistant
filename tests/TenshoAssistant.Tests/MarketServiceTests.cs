@@ -1,9 +1,12 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): Market346Tests, MarketBatch608Tests, MarketPace710Tests merged into MarketServiceTests; every case is kept.
 using TenshoAssistant.Market;
+using TenshoAssistant.UI;
 internal static class MarketServiceTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         // From Market346Tests: 0.346 (g, I-06 and I-07): NPC sale price in the item information; lowest offer minus 1 for the clipboard, own retainers left out.
@@ -93,7 +96,12 @@ internal static class MarketServiceTests
         }),
         ("Market pace: a long list asks nothing more for an item with no price",() =>
         {
-            Check(Read("Market/PreparationPriceSession.cs").Contains("state=new(context,list,copied.Length,0,false,null); }\n                        return;".Replace("\n",Environment.NewLine)) || Read("Market/PreparationPriceSession.cs").Replace("\r\n","\n").Contains("state=new(context,list,copied.Length,0,false,null); }\n                        return;"),"stops after its request");
+            Check(HasCode(Read("Market/PreparationPriceSession.cs"),"state=new(context,list,copied.Length,0,false,null); } return;"),"stops after its request");
+        }),
+        ("0.567: the market page copies the lowest offer minus 1, without your retainers",() =>
+        {
+            var board=ReadLf("MainWindow.MarketBoard.cs");
+            Check(board.Contains("!ownRetainers.Contains(offer.Retainer)") && board.Contains("()=>lowest.Paste.ToString("),"only copied, own retainers left out");
         }),
     ];
 }

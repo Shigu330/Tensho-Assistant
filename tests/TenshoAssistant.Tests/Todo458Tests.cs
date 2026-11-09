@@ -26,14 +26,14 @@ internal static class Todo458Tests
             Check(page.Contains("ImGui.BeginTable(\"Reminders\",7,") && page.Contains("ImGui.Checkbox(\"##Bar\"+key,ref inBar)") && page.Contains("PersonalTasks.Pending(configuration.PersonalTasks,now)"),"boxes and tasks");
             var entry=Read("Alarms/ReminderDtrEntry.Dalamud.cs");
             Check(entry.Contains("SeIconChar.QuestRepeatable,todoLines.Count,") && entry.Contains("configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true"),"count and filter");
-            Check(Read("Configuration.cs").Contains("\"ReminderBarHidden\","),"reset with the settings");
+            Check(TenshoAssistant.ConfigurationReset.Reset.Contains("ReminderBarHidden"),"reset with the settings");
             foreach(var row in ReminderCounts.CheckedRows)Check(page.Contains("Row(\""+row+"\","),"row on the page: "+row);
         }),
         ("Server bar (0.459): a third icon for what is finished, only when there is some, with its own setting",() =>
         {
             var entry=Read("Alarms/ReminderDtrEntry.Dalamud.cs");
             Check(entry.Contains("bar.Get(\"Tensho Assistant (Finished reminders)\")") && entry.Contains("configuration.ReminderFinishedServerBar && finished.Length>0,SeIconChar.BoxedStar,finished.Sum(item=>item.Count),"),"finished icon");
-            Check(new TenshoAssistant.Configuration().ReminderFinishedServerBar && Read("Configuration.cs").Contains("\"ReminderFinishedServerBar\","),"setting");
+            Check(new TenshoAssistant.Configuration().ReminderFinishedServerBar && TenshoAssistant.ConfigurationReset.Reset.Contains("ReminderFinishedServerBar"),"setting");
         }),
         ("Garden (0.459): its own page, out of Reminders; journal and crossbreeds are two sections",() =>
         {

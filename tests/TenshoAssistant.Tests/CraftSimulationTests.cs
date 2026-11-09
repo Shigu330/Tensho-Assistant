@@ -1,4 +1,5 @@
 using TenshoAssistant.Craft;
+using TenshoAssistant.UI;
 
 internal static class CraftSimulationTests
 {
@@ -7,6 +8,7 @@ internal static class CraftSimulationTests
     private static CraftSimulationResult Run(params CraftActionKind[] actions)=>CraftSimulation.Run(Recipe(),Stats,0,actions);
     private static void Check(bool condition,string message) { if(!condition) throw new Exception(message); }
     private static void Throws<T>(Action run) where T:Exception { try {run();} catch(T) {return;} throw new Exception(typeof(T).Name); }
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases => new (string,Action)[]
     {
         ("Craft base gains truncate before action multipliers and level modifier boundary",()=>
@@ -122,6 +124,13 @@ internal static class CraftSimulationTests
             Throws<ArgumentException>(()=>new CraftActionCatalog(rows.Skip(1),"bad"));
             var duplicate=rows.ToArray(); duplicate[0]=duplicate[1]; Throws<ArgumentException>(()=>new CraftActionCatalog(duplicate,"bad"));
             var service=new CraftActionCatalogService(); service.Publish(catalog); service.Fail(new Exception("changed")); Check(service.State.Catalog is null,"no stale metadata after failure");
-        })
+        }),
+        ("0.572: the simulator finds its own recipe and runs once per change",() =>
+        {
+            var view=Read("MainWindow.CraftSimulation.cs");
+            Check(view.Contains("if(key==simulationAutoKey)return false;") && view.Contains("ImGui.Button(localization.Get(\"CraftSequence.Simulate\")) || SimulationAutoDue()"),"once per change");
+            Check(view.Contains("if(simulationRecipeQuery!=simulationRecipeShown)"),"the list is rebuilt only when the text changes");
+            Check(new TenshoAssistant.CraftSearchSettings().AutoSimulate,"on by default");
+        }),
     };
 }

@@ -1,10 +1,12 @@
 using TenshoAssistant.Gear;
+using TenshoAssistant.UI;
 
 // 0.593 (T25): several named plans for a job.
 internal static class GearPlanSets593Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Gear plans: a new plan copies the current one, which is kept aside",() =>
@@ -56,6 +58,26 @@ internal static class GearPlanSets593Tests
             Check(TenshoAssistant.ConfigurationReset.Kept.Contains("GearPlanSets"),"in the player's data reset");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Gear.cs"));
             Check(page.IndexOf("DrawGearPlanPicker(state.JobId);")<page.IndexOf("var plans=configuration.GearPlans??=[];"),"taken before the frame reads the plan");
+        }),
+        ("0.579: all jobs (glamour) is on the gear page itself, the same setting as in its filters",() =>
+        {
+            var gear=Read("MainWindow.Gear.cs");
+            var page=gear[gear.IndexOf("private void DrawGearPlanner()")..gear.IndexOf("DrawGearWear(catalog);")];
+            Check(page.Contains("BoolSetting(\"Gear.AllJobs\""),"on the page");
+            Check(gear.Split("configuration.GearAllJobs=value").Length==3,"one setting, shown twice");
+        }),
+        ("0.580: the gear page plans another job: no worn piece and no read value is lent to it",() =>
+        {
+            var gear=Read("MainWindow.Gear.cs");
+            Check(gear.Contains("Where(piece=>!otherJob && catalog.Find(piece.ItemId) is not null)"),"no worn piece");
+            Check(gear.Contains("Values=new Dictionary<string,int>(),Category=0,Role=0,Modifiers=default"),"no read value");
+            Check(gear.Contains("levels?.TryGetValue(gearJob,out var known)==true"),"a job whose level is known");
+        }),
+        ("0.585: job levels leave out the sheet's empty rows; the gear page's label comes before its list",() =>
+        {
+            Check(Read("Plugin.cs").Contains("Where(row=>row.ExpArrayIndex>=0 && !row.Name.IsEmpty)"),"rows 44 and 45 of ClassJob have no name, and share the first level slot");
+            var gear=Read("MainWindow.Gear.cs");
+            Check(gear.IndexOf("ImGui.TextUnformatted(localization.Get(\"Gear.PlanFor\"))")<gear.IndexOf("ImGui.BeginCombo(\"###GearJob\""),"label first");
         }),
     ];
 }

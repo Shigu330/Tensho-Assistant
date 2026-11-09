@@ -9,6 +9,20 @@ using TenshoAssistant.Monsters;
 internal static class DrawCost956Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    // The braced block that follows head (empty when missing).
+    private static string Block(string text,string head)
+    {
+        var at=text.IndexOf(head,StringComparison.Ordinal);
+        if(at<0)return "";
+        var open=text.IndexOf('{',at);
+        var depth=0;
+        for(var i=open;i>=0 && i<text.Length;i++)
+        {
+            if(text[i]=='{')depth++;
+            else if(text[i]=='}' && --depth==0)return text[open..(i+1)];
+        }
+        return "";
+    }
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
     private static int Count(string text,string part) => text.Split(part).Length-1;
     private static CollectionEntry Entry(CollectionKind kind,uint id,bool unlocked,bool negative=false) => new(kind,id,"Name"+id,0,unlocked,NegativeConfirmed:negative);
@@ -83,7 +97,8 @@ internal static class DrawCost956Tests
             Check(view.Contains("var widthKey=new MapMenuWidthKey(catalog,mapZoneMenu.Builds,localization.Revision,ImGui.GetFontSize());",StringComparison.Ordinal)
                 && view.Contains("var listKey=new MapMenuWidthKey(catalog,mapZoneMenu.Builds,localization.Revision,ImGui.GetFontSize());",StringComparison.Ordinal),"widths per lists, language and font size");
             Check(view.Contains("ImGui.SetNextItemWidth(MenuWidth(mapZoneNamesWidth,true));",StringComparison.Ordinal) && view.Contains("private static float MenuWidth(float text,bool wing)",StringComparison.Ordinal)
-                && Count(view,"MenuTextWidth(")==4,"the names are measured only when the key changes; the padding on every frame");
+                && Count(view,"MenuTextWidth(")-Count(view,"float MenuTextWidth(") is var calls && calls>=1
+                && Count(Block(view,"if(mapMenuWidthKey!=widthKey)"),"MenuTextWidth(")==calls,"the names are measured only when the key changes; the padding on every frame");
         }),
         ("Guide « Windows » step: the marks are worked out when a state they read changes, then drawn from the copy",() =>
         {

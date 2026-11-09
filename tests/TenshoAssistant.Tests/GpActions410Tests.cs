@@ -1,4 +1,5 @@
 using TenshoAssistant.Gathering;
+using TenshoAssistant.Craft;
 
 // R-09 (0.410): Solid Reason / Ageless Words (another attempt; Eureka Moment at 50 % from level 90) and Clear Vision / Flora Mastery
 // (+15 % on one attempt) in the GP optimizer, only when the scenario asks for them (MoreActions).
@@ -37,6 +38,9 @@ internal static class GpActions410Tests
         return best;
     }
 
+    private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
+    private static GpActionCatalog CatalogRaw()=>new(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,$"Action {spec.Id}",0,"Text")),"fixture");
+    private static GpOptimization Node(int budget,string forbidden="",int attempts=4,int success=100)=>GpOptimizer.Solve(new(16,90,budget,attempts,1,success,0,1,MoreActions:true,Forbidden:forbidden),CatalogRaw());
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("GP actions 0.410: Solid Reason and Clear Vision placed as well as an attempt-by-attempt search",() =>
@@ -71,6 +75,19 @@ internal static class GpActions410Tests
             var tool=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.GatheringGp.cs"));
             Check(panel.Contains("MoreActions:true") && panel.Contains("GpUi.Eureka"),"panel");
             Check(tool.Contains("gpMoreActions=true") && tool.Contains("Tip(\"GpUi.MoreActionsTip\")") && tool.Contains("GpUi.Eureka"),"tool");
+        }),
+        ("GP actions can be forbidden, on both jobs, like macro actions",() =>
+        {
+            var free=Node(1000);
+            Check(free.Best.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Yield),"the yield action is used when free");
+            var key=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.Effect==GpEffect.Yield).Select(GpActionRules.Key));
+            var without=Node(1000,key);
+            Check(without.Best.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield) && without.Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield)),"never planned");
+            var botanist=GpOptimizer.Solve(new(17,90,1000,4,1,100,0,1,MoreActions:true,Forbidden:key),CatalogRaw());
+            Check(botanist.Best.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Yield),"the botanist's twin too");
+            Check(GpActionRules.Joined(["b","a","a",""])=="a|b" && GpActionRules.Joined(null)=="","joined");
+            Check(GpActionRules.Groups(CatalogRaw()).All(group=>group.Miner is not null && group.Botanist is not null),"each action has its twin");
+            Check(Read("MainWindow.Settings.cs").Contains("DrawGpPlanSettings();") && Read("MainWindow.GatheringGp.cs").Contains("Forbidden:GpForbidden"),"in the settings and the GP page");
         }),
     ];
 }

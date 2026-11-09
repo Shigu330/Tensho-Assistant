@@ -1,4 +1,5 @@
 using TenshoAssistant.Items;
+using TenshoAssistant.UI;
 
 // 0.349 (g, X-07): wiki and Lodestone pages of an item, opened on the player's click or command only; hosts credited.
 internal static class ExternalLinks349Tests
@@ -6,6 +7,7 @@ internal static class ExternalLinks349Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
 
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("External links: wiki by English name, Lodestone search in the Tensho language, names escaped",() =>
@@ -18,6 +20,12 @@ internal static class ExternalLinks349Tests
             Check(Read("Items/ItemContextMenuBridge.Dalamud.cs").Contains("Links?.Invoke(token.Item.ItemId)",StringComparison.Ordinal),"right-click entries");
             Check(Read("Plugin.cs").Contains("parts[0].ToLowerInvariant() is \"wiki\" or \"lodestone\"",StringComparison.Ordinal),"commands");
             Check(Read("Credits/CreditCatalog.cs").Contains("\"fr.finalfantasyxiv.com\"",StringComparison.Ordinal),"Lodestone hosts credited");
+        }),
+        ("0.555: item commands in French and English, added beside wiki and lodestone",() =>
+        {
+            var links=ReadLf("MainWindow.ExternalLinks.cs");
+            foreach(var word in new[]{"\"objet\" or \"item\"","\"prix\" or \"price\"","\"recolte\" or \"récolte\" or \"gather\"","\"recette\" or \"recipe\""})Check(links.Contains(word),word);
+            Check(ReadLf("Plugin.cs").Contains("MainWindow.CommandRoute(parts[0]) is { } route"),"the command uses them");
         }),
     ];
 }

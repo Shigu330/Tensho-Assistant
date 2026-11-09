@@ -1,9 +1,11 @@
 using TenshoAssistant.MiniGames;
+using TenshoAssistant.UI;
 
 internal static class MiniCactpotObservationTests
 {
     private static readonly int[] Board=[1,0,3,0,5,0,0,0,9];
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
         ("Cactpot observation copies row-major zeros without exposing caller mutation",()=>
@@ -95,6 +97,12 @@ internal static class MiniCactpotObservationTests
         {
             using var session=new MiniCactpotSolveSession();session.StartAsync(new int[9],0,1).GetAwaiter().GetResult();
             Check(session.State.Result is null && session.State.Error is not null && !session.State.Loading,"no revealed digit rejected");
-        })
+        }),
+        ("0.571: the Mini Cactpot page shows the gains the advice uses",() =>
+        {
+            Check(TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(6)==10000 && TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(24)==3600,"ends");
+            Check(TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(5)==0 && TenshoAssistant.MiniGames.MiniCactpotSolver.RewardOf(25)==0,"out of range");
+            Check(Read("MainWindow.MiniCactpot.cs").Contains("DrawMiniCactpotRewards();"),"drawn");
+        }),
     };
 }

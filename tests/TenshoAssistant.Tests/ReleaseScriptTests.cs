@@ -1,9 +1,11 @@
 using System.Text.RegularExpressions;
+using System.Net;
+using TenshoAssistant.Community;
 
 // 0.1017 (release guards, before the patch-day release): the release checks GitHub's CI of the commit first, moves main by
 // fast-forward only without changing branch, never publishes the maintainer's agent files or a webhook address, and an urgent fix
 // says so in its notes.
-internal static class ReleaseGuards1017Tests
+internal static class ReleaseScriptTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n","\n");
@@ -59,6 +61,16 @@ internal static class ReleaseGuards1017Tests
             var verify=Read("scripts/Verify.ps1");
             Check(verify.Contains("[string]$Hotfix",StringComparison.Ordinal) && verify.Contains("$taskReleaseArgs.Hotfix = $Hotfix",StringComparison.Ordinal),"Verify.ps1 passes -Hotfix on");
             Check(verify.Contains("-Hotfix goes with -Release only.",StringComparison.Ordinal),"Verify.ps1 refuses -Hotfix without -Release");
+        }),
+        ("Release: a tag without its GitHub release or without main is resumed; gh probes cannot stop Windows PowerShell 5.1",() =>
+        {
+            var release = File.ReadAllText(Path.GetFullPath("scripts/Release.ps1"));
+            Check(release.Contains("function Test-Native",StringComparison.Ordinal) && !Regex.IsMatch(release,@"&\s*\$gh\s+(release view|auth status)[^\n]*\*>\s*\$null\s*\r?\n\s*if\s*\(\$LASTEXITCODE"),"gh probes go through Test-Native");
+            Check(release.Contains("if ($hasRelease -and $mainHasTag) { Stop-Release",StringComparison.Ordinal),"stops only when both are published");
+            Check(release.Contains("if (-not $hasRelease) { Step \"gh release create",StringComparison.Ordinal),"resume skips an existing GitHub release");
+            Check(release.Contains("'core.quotePath=false'",StringComparison.Ordinal),"new file names listed unquoted");
+            var verify = File.ReadAllText(Path.GetFullPath("scripts/Verify.ps1"));
+            Check(!Regex.IsMatch(verify,@"already released \(tag Stable-[^\n]*\r?\n\s*exit 2"),"Verify.ps1 -Release no longer stops on an existing tag");
         }),
     ];
 }

@@ -3,6 +3,7 @@ using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Character;
 using TenshoAssistant.Craft;
+using TenshoAssistant.UI;
 
 internal static class CraftLogTests
 {
@@ -16,6 +17,7 @@ internal static class CraftLogTests
     private static CharacterStatsState Stats(DateTimeOffset now)=>new(1,"Artisan",8,"Menuisier",100,now,
         new Dictionary<string,int>{{"Craftsmanship",1000},{"Control",1000},{"CraftingPoints",500}});
     private static CraftLogObservation Observation(DateTimeOffset now)=>new(1,123,456,0,new(100,200),new(500,600),now,8,StartingQuality:0,MaximumQuality:1000);
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
         ("Craft log observation rejects invalid geometry and consumes bounded recipe opening once",()=>
@@ -102,6 +104,13 @@ internal static class CraftLogTests
             Check(config.CraftLogHelperEnabled && !config.MarketPricesOnHover,"requested passive helper never enables prices");
             config.CraftLogHelperEnabled=false;var copy=JsonSerializer.Deserialize<Configuration>(JsonSerializer.Serialize(config))!;
             Check(!copy.CraftLogHelperEnabled && copy.Version==1,"disabled helper survives reload without schema migration");
+        }),
+        ("0.552: the crafting log tries sequences saved for other recipes, when the setting asks",() =>
+        {
+            var session=Read("Craft/CraftLogSession.cs");
+            Check(session.Contains("!own && !input.TryAllPresets") && session.Contains("own ? 0:preset.ResultItemId"),"only on the setting, and it says for which recipe");
+            Check(new TenshoAssistant.Configuration().CraftLogTryAllPresets,"on by default");
+            Check(Read("MainWindow.CraftLog.cs").Contains("TryAllPresets:configuration.CraftLogTryAllPresets"),"passed to the session");
         }),
     };
 }

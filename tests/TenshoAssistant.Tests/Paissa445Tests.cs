@@ -26,7 +26,7 @@ internal static class Paissa445Tests
             Check(plots[2] is { District:641, Ward:30, Plot:60, Size:2, Price:40000000 },"large");
             Check(PaissaDb.New(null,plots).Count==0 && PaissaDb.New([plots[0]],plots).Count==2,"new only after a first read");
             var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Plots.cs"));
-            Check(ui.Contains("Math.Clamp(configuration.PlotWatchMinutes,10,240)") && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs")).Replace("\r\n","\n").Contains("public bool PlotWatch { get; set; }\n")
+            Check(ui.Contains("Math.Clamp(configuration.PlotWatchMinutes,10,240)") && !new TenshoAssistant.Configuration().PlotWatch && TenshoAssistant.ConfigurationReset.Reset.Contains("PlotWatch")
                 ,"watch off by default, interval bounded");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Community/PaissaDb.cs")).Contains("$\"https://{PaissaDb.Host}/worlds/{worldId}\""),"only the world id is sent");
         }),

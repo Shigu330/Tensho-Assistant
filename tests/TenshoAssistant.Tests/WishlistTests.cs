@@ -15,7 +15,7 @@ internal static class WishlistTests
             Check(Wishlist.Toggle([3,3,0],0)!.SequenceEqual([3u]),"duplicates and zero dropped");
             var full = Enumerable.Range(1,Wishlist.MaximumItems).Select(id => (uint)id).ToList();
             Check(Wishlist.Toggle(full,9999) is null && Wishlist.Toggle(full,1)!.Count == Wishlist.MaximumItems - 1,"full: refused, removal still works");
-            Check(Read("Configuration.cs").Contains("\"Wishlist\",",StringComparison.Ordinal),"kept on reset");
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("Wishlist"),"kept on reset");
             Check(Read("MainWindow.DutyFinder.cs").Contains("DrawWishlistToggle(item);",StringComparison.Ordinal)
                 && Read("MainWindow.Collections.cs").Contains("if(collectionWishlistTab){DrawWishlist();return;}",StringComparison.Ordinal),"menu entry and Collections tab");
         }),

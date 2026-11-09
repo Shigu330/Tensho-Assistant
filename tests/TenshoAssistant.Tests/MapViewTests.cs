@@ -4,10 +4,15 @@ using TenshoAssistant.Maps;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Numerics;
+using TenshoAssistant.Craft;
+using TenshoAssistant.Gathering;
+using TenshoAssistant.UI;
 internal static class MapViewTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
+    private static string ReadLf(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
+    private static string Read2(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         // From MapGatherers895Tests: 0.895 (X-80): the map's gathering points split by gatherer (miner, botanist, fisher), under the « Gathering points » switch.
@@ -90,6 +95,20 @@ internal static class MapViewTests
             var map=new MapDefinition(11,128,"La Noscea","Limsa Lominsa","Le Tillac",0,200,0,"ui/map/s1t1/00/s1t100_m.tex",-25,13,3);
             var world=new Vector3(31.5f,7,-112.25f);
             Check(MapProjection.CoordinateFromWorld(world,map)==MapProjection.CoordinateFromPixel(MapProjection.PixelFromWorld(world,map),map),"same coordinate");
+        }),
+        ("Tensho map after a reload: the game map left open waits for the Tensho map to be able to draw, for a short time",() =>
+        {
+            var replacer=ReadLf("Maps/NativeMapReplacer.Dalamud.cs");
+            Check(replacer.Contains("var waiting=visible && !wasVisible && now<startingUntil && options.ReplaceGameMap && !bypass && !canShow();") && replacer.Contains("if(visible && !wasVisible && !waiting)") && replacer.Contains("wasVisible=visible && !waiting;"),"the decision waits");
+            Check(replacer.Contains("startingUntil=DateTimeOffset.UtcNow.AddSeconds(15)"),"not for ever: a map that cannot draw (combat, duty) still leaves the game's");
+        }),
+        ("Map: its title bar on a setting, off by default; Balanced greyed is not choosable",() =>
+        {
+            Check(!new TenshoAssistant.MapViewSettings().HideTitleBar,"off by default");
+            Check(Read2("MainWindow.MapView.cs").Contains("(settings.HideTitleBar ? ImGuiWindowFlags.NoTitleBar:0)") && Read2("MainWindow.MapView.cs").Contains("SettingBox(\"MapView.HideTitleBar\""),"setting");
+            var panel=Read2("MainWindow.CollectablePanel.cs");
+            Check(panel.Contains("if(same)ImGui.BeginDisabled();") && panel.Contains("if(same)ImGui.EndDisabled();") && panel.Contains("if(balancedOff && risk==50)risk=CollectableRisk.Safe;"),"disabled, shown as Safe");
+            Check(panel.Contains("ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)"),"its tooltip still says why");
         }),
     ];
 }

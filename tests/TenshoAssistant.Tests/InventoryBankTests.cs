@@ -1,5 +1,7 @@
 using System.Text.Json.Nodes;
 using TenshoAssistant.Inventory;
+using TenshoAssistant.Collections;
+using TenshoAssistant.UI;
 
 internal static class InventoryBankTests
 {
@@ -7,6 +9,7 @@ internal static class InventoryBankTests
     private static readonly InventoryItem Hq = new(new(42), true);
     private static readonly DateTimeOffset Time = new(2026, 10, 27, 15, 0, 0, TimeSpan.FromHours(1));
 
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static (string Name, Action Run)[] Cases =>
     [
         ("Bank scopes contain only explicit storage pages", () =>
@@ -217,6 +220,20 @@ internal static class InventoryBankTests
                 Check(ReferenceEquals(bank.State, disposedState) && bank.State.Entries.Count == 0, "no late save publication");
             }
             finally { bank.Dispose(); store.Release.Set(); }
+        }),
+        ("Retainers and saddlebags are saved automatically unless turned off, older configurations included",()=>
+        {
+            Check(new TenshoAssistant.Configuration().AutoBankCapture,"on by default");
+            Check(System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.Configuration>("{\"Version\":1}")!.AutoBankCapture,"older configuration: on");
+            var off=new TenshoAssistant.Configuration{AutoBankCapture=false};
+            Check(!System.Text.Json.JsonSerializer.Deserialize<TenshoAssistant.Configuration>(System.Text.Json.JsonSerializer.Serialize(off))!.AutoBankCapture,"choice kept");
+        }),
+        ("0.576: one read can be erased, on two clicks, and a retainer gone from the bell is only said",() =>
+        {
+            var bank=Read("MainWindow.Bank.cs");
+            Check(bank.Contains("if(!armed)bankForgetArmed=entry.Key;") && bank.Contains("bank.ForgetAsync(entry.Key)"),"two clicks");
+            Check(bank.Contains("listed.All(known=>known.Id!=entry.Key.StorageId)"),"said when the bell does not list it");
+            Check(Read("Inventory/BankService.cs").Contains("state.Entries.Where(e => e.Key != forgotten)"),"only that read");
         }),
     ];
 

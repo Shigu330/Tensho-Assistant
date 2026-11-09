@@ -2,6 +2,8 @@
 using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Maps;
+using TenshoAssistant.Craft;
+using TenshoAssistant.Gathering;
 internal static class MapBookmarkTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -10,6 +12,7 @@ internal static class MapBookmarkTests
     { try { action(); } catch (T) { return; } throw new Exception($"Expected {typeof(T).Name}"); }
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
     private static MapBookmark Mark(string name,float x,string? note=null,string? group=null)=>new(Guid.NewGuid(),name,10,20,x,12,note,group);
+    private static string ReadLf(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Map bookmarks preserve exact map territory coordinates and identity through configuration", () =>
@@ -109,6 +112,12 @@ internal static class MapBookmarkTests
             Check(view.Contains("GlyphBookmark=0xFFFF0005",StringComparison.Ordinal) && view.Contains("FlagFromMap(map,clicked.X,clicked.Y)",StringComparison.Ordinal)
                 && view.Contains("MapBookmarks.Add(items,MapBookmarks.Create(map,name,",StringComparison.Ordinal),"layer, click and menu");
             Check(new TenshoAssistant.MapViewSettings().ShowBookmarks,"on by default");
+        }),
+        ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
+        {
+            var lists=ReadLf("MainWindow.MapLocalLists.cs");
+            Check(lists.Contains("new[]{\"MapLocal.Favorites\",\"MapLocal.Quests\",") && lists.IndexOf("DrawLocalFavorites(map);",StringComparison.Ordinal)<lists.IndexOf("DrawLocalQuests(map);",StringComparison.Ordinal),"before Quests and FATEs");
+            Check(lists.Contains("MapBookmarks.RemoveAt(items,remove)") && lists.Contains("FlagFromMap(map,point.X,point.Y)") && lists.Contains("OpenMapPointFromPage(target!,point.X,point.Y)"),"removed, flagged here, opened elsewhere");
         }),
     ];
 }

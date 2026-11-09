@@ -14,7 +14,7 @@ internal static class Titles369Tests
             Check(changer.Contains("if(!first && byJob() && jobTitles()?.TryGetValue(job,out var title)==true)",StringComparison.Ordinal),"by job: on a real change only, when on");
             Check(!new TenshoAssistant.Configuration().JobTitlesEnabled,"off by default");
             var configuration = Read("Configuration.cs");
-            Check(configuration.Contains("\"JobTitles\",",StringComparison.Ordinal) && configuration.Contains("\"UndercutClipboard\", \"JobTitlesEnabled\",",StringComparison.Ordinal),
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("JobTitles") && TenshoAssistant.ConfigurationReset.Reset.Contains("JobTitlesEnabled"),
                 "map kept, switch reset");
             Check(Read("Plugin.cs").Contains("()=>titleChanger?.Dispose()",StringComparison.Ordinal),"released");
         }),

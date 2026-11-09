@@ -1,8 +1,10 @@
 using TenshoAssistant.Alarms;
+using TenshoAssistant.UI;
 
 internal static class AlarmScheduleTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Daily ET alarms recur every 70 real minutes at the ET time and ring once per occurrence within their lead",()=>
@@ -54,24 +56,44 @@ internal static class AlarmScheduleTests
             Check(GameAlarmCommand.Build(new TenshoAlarm { Repeat = AlarmRepeat.Once },1,false) is null,"only daily ET alarms");
             Check(GameAlarmCommand.IsAlarmCommand(command!) && !GameAlarmCommand.IsAlarmCommand("/say hi") && !GameAlarmCommand.IsAlarmCommand("/alarm \"a\"\n/say"),"only alarm commands");
         }),
-        ("Fashion Report weeks start on Tuesday 08:00 UTC and the slots follow the game window",()=>
+        ("0.556: an alarm can ring again on time, once, after really ringing ahead",() =>
         {
-            var start=new DateTimeOffset(2018,1,30,8,0,0,TimeSpan.Zero);
-            Check(TenshoAssistant.Fashion.FashionWeek.Number(start)==0 && TenshoAssistant.Fashion.FashionWeek.Number(start.AddDays(7).AddSeconds(-1))==0,"first week");
-            Check(TenshoAssistant.Fashion.FashionWeek.Number(start.AddDays(7))==1 && TenshoAssistant.Fashion.FashionWeek.ThemeRow(start.AddDays(7))==10,"second week, theme row + 9");
-            var (begin,next)=TenshoAssistant.Fashion.FashionWeek.Bounds(start.AddDays(10));
-            Check(begin==start.AddDays(7) && next==start.AddDays(14),"week bounds");
-            Check(TenshoAssistant.Fashion.FashionWeek.Slots.Length==11 && TenshoAssistant.Fashion.FashionWeek.Slots[0]==TenshoAssistant.Items.EquipmentSlots.MainHand
-                && TenshoAssistant.Fashion.FashionWeek.Slots[10]==TenshoAssistant.Items.EquipmentSlots.Ring,"11 slots, weapon first, rings last");
+            var at=new DateTimeOffset(2026,11,5,12,0,0,TimeSpan.Zero);
+            TenshoAssistant.Alarms.TenshoAlarm Alarm()=>new(){Repeat=TenshoAssistant.Alarms.AlarmRepeat.Once,At=at,LeadMinutes=5};
+            var alarm=Alarm();
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at) is null,"it has not rung ahead");
+            alarm.LastRung=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddMinutes(-1)) is null,"not before its time");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddSeconds(5))==at,"at its time");
+            alarm.LastOnTime=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(alarm,at.AddSeconds(6)) is null,"once");
+            var noLead=Alarm();noLead.LeadMinutes=0;noLead.LastRung=at;
+            Check(TenshoAssistant.Alarms.AlarmSchedule.OnTimeDue(noLead,at.AddSeconds(5)) is null,"no lead: the first ring was on time");
+            Check(!new TenshoAssistant.Alarms.AlarmSettings().RingOnTime,"off by default");
         }),
-        ("Bountiful II estimate: +3 from 110 % of the base, +2 from 90 %, else +1, unknown without rating or base",()=>
+        ("0.557: an alarm can be put off and edited; the original stays",() =>
         {
-            // Base 3420 = ItemLevel.Gathering of a level 90 ore (docs/evidence/0.224-bountiful-base.md): steps at 3078 and 3762.
-            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(3762,3420)==3 && TenshoAssistant.Gathering.BountifulEstimate.Bonus(3761,3420)==2,"+3 step");
-            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(3078,3420)==2 && TenshoAssistant.Gathering.BountifulEstimate.Bonus(3077,3420)==1,"+2 step");
-            Check(TenshoAssistant.Gathering.BountifulEstimate.Bonus(0,3420) is null && TenshoAssistant.Gathering.BountifulEstimate.Bonus(4000,0) is null,"unknown");
-            Check(TenshoAssistant.Gathering.BountifulEstimate.NextStep(3000,3420)==3078 && TenshoAssistant.Gathering.BountifulEstimate.NextStep(3500,3420)==3762
-                && TenshoAssistant.Gathering.BountifulEstimate.NextStep(4000,3420) is null,"next step");
+            var now=new DateTimeOffset(2026,11,5,12,0,0,TimeSpan.Zero);
+            var alarm=new TenshoAssistant.Alarms.TenshoAlarm{Label="Mandragora",Group="G",ItemId=4,Repeat=TenshoAssistant.Alarms.AlarmRepeat.EorzeaDaily,EtMinute=60};
+            var later=TenshoAssistant.Alarms.AlarmSchedule.Snooze(alarm,now,5);
+            Check(later.Label=="Mandragora" && later.Group=="G" && later.ItemId==4 && later.Repeat==TenshoAssistant.Alarms.AlarmRepeat.Once && later.At==now.AddMinutes(5) && later.Id!=alarm.Id,"a new one-off alarm");
+            Check(alarm.Repeat==TenshoAssistant.Alarms.AlarmRepeat.EorzeaDaily,"the original stays");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Snooze(alarm,now,0).At==now.AddMinutes(1),"at least a minute");
+            Check(Read("MainWindow.Alarms.cs").Contains("if(alarm.AutoKey.Length==0 && ImGui.SmallButton(localization.Get(\"Alarms.Edit\")"),"an automatic alarm is not edited");
+        }),
+        ("0.577: alarms in real time repeat by day, week or game reset",() =>
+        {
+            var at=new DateTimeOffset(2026,11,5,20,0,0,TimeSpan.Zero);
+            TenshoAssistant.Alarms.TenshoAlarm Alarm(TenshoAssistant.Alarms.AlarmRepeat repeat)=>new(){Repeat=repeat,At=at};
+            var daily=Alarm(TenshoAssistant.Alarms.AlarmRepeat.RealDaily);
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at.AddHours(-1))==at,"before its first time");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at)==at.AddDays(1),"strictly after");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(daily,at.AddDays(3).AddHours(1))==at.AddDays(4),"days later");
+            var weekly=Alarm(TenshoAssistant.Alarms.AlarmRepeat.RealWeekly);
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(weekly,at.AddDays(1))==at.AddDays(7),"a week on");
+            var reset=TenshoAssistant.Alarms.AlarmSchedule.Next(Alarm(TenshoAssistant.Alarms.AlarmRepeat.DailyReset),at);
+            Check(reset==TenshoAssistant.Reminders.ResetSchedule.NextDaily(at,TenshoAssistant.Reminders.ResetSchedule.DailyHour),"the daily reset");
+            Check(TenshoAssistant.Alarms.AlarmSchedule.Next(Alarm(TenshoAssistant.Alarms.AlarmRepeat.WeeklyReset),at)>at,"the weekly reset");
         }),
     ];
 }

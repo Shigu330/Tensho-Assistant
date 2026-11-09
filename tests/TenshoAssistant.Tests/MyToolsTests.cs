@@ -1,5 +1,6 @@
 using System.Text;
 using TenshoAssistant.MyTools;
+using TenshoAssistant.UI;
 
 // TEMPLATES-001 (DEC-029): tools made of data: strict format, sharing, progress, store.
 internal static class MyToolsTests
@@ -27,6 +28,7 @@ internal static class MyToolsTests
         finally{Directory.Delete(root,true);}
     }
 
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("My tools format: the seven blocks read and written back the same",() =>
@@ -192,6 +194,15 @@ internal static class MyToolsTests
             Check(page.Contains("ToolTemplateFormat.Import(myToolsPasted)") && page.Contains("DrawMyToolBlocks(template,null,store)"),"checked and previewed");
             Check(Read("Plugin.cs").Contains("new TenshoAssistant.MyTools.ToolTemplateStore(") && Read("MainWindow.Pages.cs").Contains("new(Page.MyTools,null,PageLabel(\"Navigation.MyTools\"),DrawMyTools,"),"registered");
             Check(!Read("MyTools/ToolTemplateFormat.cs").Contains("Assembly.Load") && !Read("MyTools/ToolTemplateStore.cs").Contains("Assembly.Load"),"no code loaded");
+        }),
+        ("0.541: a tool's item list shows prices: lowest of NQ and HQ, unknown never free, asked only on the button",() =>
+        {
+            Check(TenshoAssistant.MyTools.ToolItemCost.Lowest(100,80)==80 && TenshoAssistant.MyTools.ToolItemCost.Lowest(null,80)==80 && TenshoAssistant.MyTools.ToolItemCost.Lowest(100,null)==100 && TenshoAssistant.MyTools.ToolItemCost.Lowest(null,null) is null,"lowest");
+            var cost=TenshoAssistant.MyTools.ToolItemCost.Missing([(2,10m),(0,null),(3,null),(null,5m)]);
+            Check(cost==(20m,2),"known 2 x 10; nothing missing is free; no price or no stock is unknown");
+            var tools=ReadLf("MainWindow.MyTools.cs");
+            Check(tools.Contains("toolPrices.StartListAsync(market,character,worldId,unpriced.Take(ToolItemCost.MaximumAsked))") && tools.Contains("SourceButton(localization.Format(\"MyToolsUi.AskPrices\""),"on the button, within the session's limit");
+            Check(TenshoAssistant.MyTools.ToolItemCost.MaximumAsked==32,"the session's limit");
         }),
     ];
 }

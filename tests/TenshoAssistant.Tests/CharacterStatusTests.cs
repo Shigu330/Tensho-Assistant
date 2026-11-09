@@ -1,5 +1,6 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): CharacterStatus374Tests, CharacterTimers936Tests merged into CharacterStatusTests; every case is kept.
 using TenshoAssistant.Character;
+using TenshoAssistant.Maps;
 internal static class CharacterStatusTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -64,6 +65,28 @@ internal static class CharacterStatusTests
             Check(CharacterStatuses.DailyWeekly(old,TimersNow.AddHours(-2),TimersNow.AddDays(-2))==(3,6),"since reset");
             Check(CharacterStatuses.DailyWeekly(old,TimersNow.AddMinutes(-10),TimersNow.AddDays(-2))==(null,6),"daily reset passed");
             Check(CharacterStatuses.DailyWeekly(new CharacterStatus{ContentId=1},TimersNow,TimersNow)==(null,null),"never read");
+        }),
+        ("Job progress (T21): one row per experience slot, the job standing for its class, in the game's order",() =>
+        {
+            // ClassJob rows: 1 gladiator and 19 paladin share slot 1; 8 carpenter alone in slot 8.
+            var jobs=TenshoAssistant.Gear.JobProgressList.Jobs(new Dictionary<uint,int>{[1]=1,[19]=1,[8]=8},new Dictionary<uint,int>{[19]=1,[8]=30});
+            Check(string.Join(",",jobs.Select(job=>job.Job))=="19,8","paladin first, then carpenter");
+            Check(new TenshoAssistant.Gear.JobProgressRow(19,0,0,0) is { Unlocked:false },"level 0: not unlocked");
+            Check(Math.Abs(new TenshoAssistant.Gear.JobProgressRow(19,90,50,200).Fraction-0.25f)<0.001f,"share of the level");
+            Check(new TenshoAssistant.Gear.JobProgressRow(19,100,0,0).Fraction==1,"nothing to earn");
+            Check(new TenshoAssistant.Gear.JobProgressRow(19,90,500,200).Fraction==1,"never past the bar");
+        }),
+        ("Company actions (T27): the statuses paired with the timers in order, or no end at all",() =>
+        {
+            var now=new DateTimeOffset(2026,11,6,10,0,0,TimeSpan.Zero);
+            // The reading of 2026-11-06: 19131 and 19135 seconds at the last update, 76 seconds ago.
+            var read=TenshoAssistant.Reminders.CompanyBenefits.Build([364,2932],[19131,19135,0],76,now);
+            Check(read[0].Status==364 && read[0].Ends==now.AddSeconds(19055),"first status, first timer");
+            Check(read[1].Status==2932 && read[1].Ends==now.AddSeconds(19059),"second status, second timer");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364,2932],[0,0,0],0,now).All(benefit=>benefit.Ends is null),"window not opened: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364],[19131,19135,0],0,now).All(benefit=>benefit.Ends is null),"counts differ: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([364],[50],76,now).All(benefit=>benefit.Ends is null),"run out: unknown");
+            Check(TenshoAssistant.Reminders.CompanyBenefits.Build([],[0,0,0],0,now).Count==0,"none active");
         }),
     ];
 }

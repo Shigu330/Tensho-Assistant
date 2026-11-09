@@ -4,6 +4,7 @@ using TenshoAssistant.Gathering;
 internal static class FishingWiringTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private static string Read(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
@@ -62,7 +63,7 @@ internal static class FishingWiringTests
         ("Fishing cast 1011: the line read every frame, kept on change, wired to both stopwatches",() =>
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs"));
-            Check(reader.Contains("if(disposed)return;\n        ReadLine();") || reader.Contains("if(disposed)return;\r\n        ReadLine();"),"every frame, before the half-second throttle");
+            Check(HasCode(reader,"if(disposed)return; ReadLine();"),"every frame, before the half-second throttle");
             Check(reader.Contains("if(state==lineState)return;") && reader.Contains("if(state==1)Volatile.Write(ref castAt"),"CastingOut only, on change");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
             Check(plugin.Contains("mainWindow.FishingCastAt=()=>baitReader?.CastAt;"),"wired");

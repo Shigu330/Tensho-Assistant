@@ -1,4 +1,5 @@
 using TenshoAssistant.Inventory;
+using TenshoAssistant.UI;
 
 internal static class InventoryVisualSortTests
 {
@@ -10,6 +11,7 @@ internal static class InventoryVisualSortTests
     private static readonly (int Bag,InventoryStack Stack)[] Rows=
     [ (0,new(new(new(42),false),8,12,89)), (1,new(new(new(42),true),2,0,3)), (3,new(new(new(43),false),8,34,15)) ];
     private static InventorySortResult Preview(InventorySnapshot snapshot)=>InventorySortPreview.Build(snapshot.Containers.Values,140,InventorySortField.Quantity,true,id=>("Item "+id,1));
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
         ("Visual sort is a full physical-slot bijection preserving separate piles and qualities",()=>
@@ -90,6 +92,11 @@ internal static class InventoryVisualSortTests
             var disposed=new InventoryVisualSortService();disposed.Request(plan,now);disposed.Clear();Check(disposed.Take(7,now) is null,"logout cleared");
             disposed.Request(plan,now);disposed.Dispose();disposed.Dispose();
             Check(!disposed.Request(plan,now) && disposed.Take(7,now) is null && !disposed.State.Pending,"terminal lifecycle");
+        }),
+        ("0.565: the sort preview frames what would move; an unread place says nothing",() =>
+        {
+            var view=Read("MainWindow.SortPreview.cs");
+            Check(view.Contains("shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position") && view.Contains("stack.DisplayIndex>=0 && stack.DisplayIndex!=target"),"count and frame agree");
         }),
     };
 }

@@ -4,9 +4,11 @@ using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Items;
 using TenshoAssistant.Market;
+using TenshoAssistant.UI;
 internal static class ItemHoverTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private static ItemCatalog Catalog()=>ItemCatalog.Build([new(42,"Marketable",true,IsMarketable:true),new(43,"Bound",true),new(44,"NQ only",false,IsMarketable:true)],new("fixture","French","v",1));
     private static HttpResponseMessage Response()=>new(HttpStatusCode.OK){Content=new StringContent("{\"results\":[{\"itemId\":42}]}")};
     private static readonly string Source = Path.GetFullPath("src/TenshoAssistant");
@@ -27,6 +29,7 @@ internal static class ItemHoverTests
           "hq":{},
           "worldUploadTimes":[{"worldId":97,"timestamp":1793612456000}]}]}
         """;
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Common hover resolves NQ HQ collectible and bound items without market assumptions",()=>
@@ -163,7 +166,7 @@ internal static class ItemHoverTests
             var settings = Read("MainWindow.Settings.cs");
             // X-76 H5 (0.915): the shared combo row brings the tooltip and the « ↺ ».
             Check(settings.Contains("ComboSetting(\"Settings.MarketScope\",\"Settings.MarketScopeTip\",()=>MarketScopeShown,",StringComparison.Ordinal),"Settings row with tooltip and ↺");
-            Check(Text("en","MarketScopeTip").EndsWith("\\nDefault: data center.\"",StringComparison.Ordinal) && Text("fr","MarketScopeTip").EndsWith("\\nPar défaut : centre de données.\"",StringComparison.Ordinal),"tips end with the default");
+            Check(Text("en","MarketScopeTip").Split("\\n")[^1].StartsWith("Default: ",StringComparison.Ordinal) && Text("fr","MarketScopeTip").Split("\\n")[^1].StartsWith("Par défaut : ",StringComparison.Ordinal),"tips end with the default");
         }),
         ("Hover hidden in duties: off by default, reset; in a duty nothing is observed, so no panel and no price request",() =>
         {
@@ -228,9 +231,14 @@ internal static class ItemHoverTests
             Check(reader.Contains("held && !refreshHeld",StringComparison.Ordinal) && reader.Contains("configuration.HoverPriceRefresh",StringComparison.Ordinal),"one request per press, setting honoured");
             Check(reader.Contains("slot->ItemId==id",StringComparison.Ordinal) && reader.Contains("DetailKind.InventoryItem",StringComparison.Ordinal),"stack only from the player's own slot holding that item");
             var coordinator=ReadFile("Market/ItemHoverCoordinator.cs").Replace("\r\n","\n");
-            Check(coordinator.Contains("refreshWanted|=refresh;") && coordinator.Contains("if(!refreshWanted && cached is not null && market.IsFresh(cached,now))return null;\n            if(!tracker.TakeRequest(now))return null;"),"0.524: the press waits for the 5 s bound, and only a real request takes it");
+            Check(coordinator.Contains("refreshWanted|=refresh;") && HasCode(coordinator,"if(!refreshWanted && cached is not null && market.IsFresh(cached,now))return null;\n            if(!tracker.TakeRequest(now))return null;"),"0.524: the press waits for the 5 s bound, and only a real request takes it");
             Check(coordinator.Contains("market.CancelBackground();refreshWanted=false;"),"another item forgets the press");
             Check(ReadFile("MainWindow.MarketHover.cs").Contains("prices.FetchedAt.ToLocalTime().ToString(\"G\")"),"the seconds show that it changed");
+        }),
+        ("0.559: a material's tooltip says which storage holds it, from the rows already computed",() =>
+        {
+            Check(ReadLf("MainWindow.CraftPlan.cs").Contains("DrawStorageDetail(material.Holdings);") && ReadLf("MainWindow.CraftChain.cs").Contains("DrawStorageDetail(stored);"),"both tables");
+            Check(ReadLf("MainWindow.CraftPlan.cs").Contains("row.IsCached && row.ObservedAt is { } seen"),"a saved read shows its date");
         }),
     ];
 }

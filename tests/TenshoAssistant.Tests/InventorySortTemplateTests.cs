@@ -1,6 +1,7 @@
 using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Inventory;
+using TenshoAssistant.UI;
 
 internal static class InventorySortTemplateTests
 {
@@ -77,6 +78,14 @@ internal static class InventorySortTemplateTests
             using var service=new InventoryVisualSortService();
             Check(!service.State.Pending && !service.Request(plan,now),"loading a template cannot replace required direct capture receipt");
             Check(loaded.CharacterId==8 && loaded.Kind==BankStorageKind.PremiumSaddlebag && profile.CharacterId==7,"original profile and destination remain independent");
+        }),
+        ("0.566: a sort template goes to text and back, checked, with a new id; bad text is refused",() =>
+        {
+            var template=new TenshoAssistant.Inventory.InventorySortTemplate(Guid.NewGuid(),"Mine",4,35,[new(TenshoAssistant.Inventory.InventorySortField.ItemLevel,true)],[new("Zone",0,5,Query:"Ore")]);
+            var text=TenshoAssistant.Inventory.InventorySortTemplates.Encode(template);
+            var back=TenshoAssistant.Inventory.InventorySortTemplates.Decode(text);
+            Check(back is not null && back.Name=="Mine" && back.Id!=template.Id && back.Zones.Count==1 && back.Zones[0].Query=="Ore" && back.Criteria.Count==1 && back.Criteria[0].Descending,"round trip");
+            foreach(var bad in new[]{null,"","hello","TENSHO-SORT1:???","TENSHO-SORT1:e30="})Check(TenshoAssistant.Inventory.InventorySortTemplates.Decode(bad) is null,"refused: "+bad);
         }),
     };
 }

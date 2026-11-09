@@ -1,5 +1,7 @@
 # TenshoAssistant
 
+> *Traduction française plus bas.*
+
 TenshoAssistant is a Dalamud plugin for Final Fantasy XIV that brings everyday tools together in one window, opened with `/tensho`:
 items and storage, inventory sorting, market prices, crafting, gathering and fishing, a map that replaces the game map, weather, alarms
 and reminders, free company voyages, quests, collections, character stats, a gear planner, Gold Saucer helpers, macro chains,
@@ -434,8 +436,6 @@ This project is an original plugin implementation, but it relies on these ecosys
 
 TenshoAssistant is a multi-tool Dalamud plugin intended to centralize useful gameplay support surfaces into a single interface. The current codebase demonstrates a modular architecture with shared catalogs, domain services, and a rich main window that spans inventory, gathering, crafting, quest support, collections, market information, and more. The project documentation remains the definitive reference for maturity, scope, and current status of each feature area.
 
-Traduction française plus bas.
-
 ---
 
 # TenshoAssistant
@@ -840,6 +840,12 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   Récolte abondante II, affichée comme estimation.
 
 Liens et détails : section anglaise ci-dessus.
+
+## Notes
+
+- Le projet est un plugin utilitaire complet pour FFXIV, pas seulement un suivi d’objets.
+- Inconnu n’est pas zéro : quand une valeur n’est pas connue (rangement pas encore ouvert, aucune donnée de la communauté), le plugin le dit au lieu de deviner.
+- La couverture exacte des modules se vérifie toujours dans la documentation du projet, jamais d’après des références plus anciennes.
 
 ## Résumé
 

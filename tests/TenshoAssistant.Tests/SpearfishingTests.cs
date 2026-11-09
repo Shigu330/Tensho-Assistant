@@ -2,6 +2,7 @@
 using TenshoAssistant.Community;
 using TenshoAssistant.Gathering;
 using TenshoAssistant.Discoveries;
+using TenshoAssistant.Maps;
 internal static class SpearfishingTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -83,6 +84,12 @@ internal static class SpearfishingTests
             Check(three.Count==3 && three.Contains((11u,1,200)) && three.Contains((12u,1,200)),"rest alike");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("if((int)message.LogKind!=67 || message.Sender.TextValue.Trim().Length!=0)return;") && watcher.Contains("()=>chat.ChatMessageUnhandled-=OnSpearChat)"),"chat, owned");
+        }),
+        ("Gathering sources (C29): spearfishing points name their fish, and the cache follows",() =>
+        {
+            var loader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs"));
+            Check(loader.Contains("reference.RowType == typeof(SpearfishingItem)"),"read before the gathering items are filtered");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/GatheringCatalogCache.cs")).Contains("CopyRules=2"),"an old cache without them is rebuilt");
         }),
     ];
 }

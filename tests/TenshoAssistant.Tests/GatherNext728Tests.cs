@@ -1,4 +1,6 @@
 using TenshoAssistant.Gathering;
+using TenshoAssistant.Craft;
+using TenshoAssistant.UI;
 
 // 0.728 (user request): the next action of a node's plan. The plan of the report: 2026-11-07, 823 GP, four attempts.
 internal static class GatherNext728Tests
@@ -10,6 +12,18 @@ internal static class GatherNext728Tests
     private static readonly GpPlan Plan=new(750,24m,[new(Gift1,1),new(Gift2,1),new(Tidings,1),new(Bountiful,4)]);
     private static GpNextStep Next(int gp,int attempts,GpPlan? plan=null)=>GpNextAction.Next(plan ?? Plan,823,gp,4,attempts);
 
+    private static string ReadLf(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
+    private static CollectableRule Rule(uint id,string name,int level,int high,int reward,string group="G")=>new(id,name,level,level+1,high/2,high*3/4,high,1,2,reward,true,group);
+    private static GpOptimization Node(int budget,string forbidden="",int attempts=4,int success=100)=>GpOptimizer.Solve(new(16,90,budget,attempts,1,success,0,1,MoreActions:true,Forbidden:forbidden),Catalog());
+    private static string[] Raw(int current,int scour,int low,int high,int meticulous,bool scrutinyBox,bool intuitionBox=false)
+    {
+        var raw=Enumerable.Range(0,59).Select(index=>$"{index}:uint 0").ToArray();
+        raw[2]="2:uint 36291";raw[13]=$"13:uint {current}";raw[14]="14:uint 1000";
+        raw[26]="26:uint 22182";raw[29]="29:uint 22183";raw[32]="32:uint 22184";raw[35]="35:uint 240";raw[38]="38:uint 22185";
+        raw[48]=$"48:uint {scour}";raw[49]=$"49:uint {low}";raw[50]=$"50:uint {high}";raw[51]=$"51:uint {meticulous}";raw[52]="52:text 8 %";raw[54]=$"54:bool {(scrutinyBox ? "True":"False")}";raw[56]=$"56:bool {(intuitionBox ? "True":"False")}";raw[41]="41:uint 21205";
+        return raw;
+    }
+    private static GpActionCatalog Catalog()=>new(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,$"Action {spec.Id}",0,"Text")),"fixture");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Gather next: the plan of the report, step by step",() =>
@@ -81,6 +95,43 @@ internal static class GatherNext728Tests
             Check(!panel.Contains("located.Wanted=0"),"0.733: nothing clears the request after the panel asked");
             Check(!Read("Gathering/GpNextAction.cs").Contains("Dalamud"),"pure");
             Check(panel.IndexOf("DrawGatheringNext(shown")<panel.IndexOf("if(next is { Kind:not GpNextKind.Done })ImGui.Separator();"),"a line between the next action and the plan");
+        }),
+        ("The help follows what is unlocked: an action the window does not offer or the job has not learned is never advised",() =>
+        {
+            var ore=Rule(36291,"Ore",80,1000,20) with {Low=400,Mid=700,High=1000,RewardLow=3,RewardMid=7,RewardHigh=20};
+            string[] Flags(params int[] closed){var raw=Raw(0,177,88,265,132,false);foreach(var index in closed)raw[index]=$"{index}:bool False";return raw;}
+            var full=new CollectableBonuses(175,88,809,200,100,false,true,0,4,13);
+            Check(CollectableTurn.Parse(Flags())! is {ScrutinyOpen:true,FocusOpen:true,BrazenOpen:true},"nothing closed");
+            var noScrutiny=CollectableTurn.Parse(Flags(40))!;
+            Check(noScrutiny.ScrutinyOpen==false && CollectableAdvisor.Advise(noScrutiny,4,ore,full) is {Scrutinies:0} and {Target:CollectableTier.Low},"Scrutiny not offered: not counted, the plan is what is left");
+            Check(CollectableAdvisor.Advise(noScrutiny,4,ore,full)!.Move!=CollectableMove.Scrutiny,"nor advised");
+            var noFocus=CollectableTurn.Parse(Flags(40,43))! with {IntuitionChance=40};
+            Check(CollectableAdvisor.Advise(noFocus,3,ore,full)!.Move!=CollectableMove.Focus,"Collector's Focus below its level: not advised");
+            var noBrazen=CollectableTurn.Parse(Flags(31))!;
+            Check(CollectableAdvisor.Advise(noBrazen,4,ore)!.Move!=CollectableMove.Brazen,"nor a roll the window does not offer");
+            var locked=GpActionRules.Joined(GpActionCatalog.Specs.Where(spec=>spec.JobId==16 && spec.Effect==GpEffect.Attempt).Select(GpActionRules.Key));
+            Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
+            var list=ReadLf("MainWindow.GatheringPlanSettings.cs");
+            Check(list.Contains("!unlocked(spec.Id)") && ReadLf("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && ReadLf("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && ReadLf("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
+        }),
+        ("Gathering panel: readable at its width; a collectable says where its GP goes; the regeneration is measured, or said to be unknown",() =>
+        {
+            var panel=ReadLf("MainWindow.GatheringPanel.cs");
+            Check(panel.Contains("\"GatheringPanel.CollectablePlan\"") && panel.Contains("Collectables?.Catalog?.For(slot.ItemId) is {Count:>0}"),"a collectable has no GP plan here, and says why");
+            Check(panel.Contains("ImGui.PushTextWrapPos(0);") && panel.Contains("BeginGroup"),"texts wrap; name and rates on two lines");
+            foreach(var language in new[]{"en","fr"})
+            {
+                var texts=System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json")))!["CollectablePanel"]!;
+                Check(!texts["Unknown"]!.GetValue<string>().Contains("confirm",StringComparison.OrdinalIgnoreCase),"the player is not asked to confirm anything: "+language);
+            }
+        }),
+        ("0.560: the gathering help says what the last chain still needs",() =>
+        {
+            TenshoAssistant.Inventory.ItemHoldingsSummary Stock(long total)=>new([],total,0,true,false,false,true);
+            var result=new TenshoAssistant.Craft.CraftChainResult(1,1,[],[new(5,14,TenshoAssistant.Craft.CraftChainReason.RawMaterial)],new Dictionary<uint,TenshoAssistant.Inventory.ItemHoldingsSummary>{[5]=Stock(10)});
+            Check(result.Remaining(5,10)==14 && result.Remaining(5,13)==11,"falls as you gather");
+            Check(result.Remaining(5,99)==0 && result.Remaining(5,3)==14,"bounded");
+            Check(result.Remaining(6,10) is null,"not needed");
         }),
     ];
 }

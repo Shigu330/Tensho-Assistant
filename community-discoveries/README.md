@@ -25,7 +25,7 @@ the sums over the players. Version 1 files (without them) are still read.
 
 ---
 
-## Français
+# Découvertes de la communauté
 
 `discoveries.json` contient les découvertes partagées par les joueurs avec Monde › Découvertes › « Échange avec les autres joueurs (GitHub) » : ce que
 chaque joueur connecté a vu lui-même part dans un gist secret à son nom, avec un ticket « Discoveries: <login> » dans ce dépôt qui y renvoie. Tensho

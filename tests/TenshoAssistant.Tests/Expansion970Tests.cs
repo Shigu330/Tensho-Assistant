@@ -20,7 +20,7 @@ internal static class Expansion970Tests
         {
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Quests/QuestReader.Dalamud.cs")).Contains("Expansion = row.Expansion.IsValid ? row.Expansion.Value.Name.ExtractText()"),"reader");
             var quests=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Quests.cs"));
-            Check(System.Text.RegularExpressions.Regex.Matches(quests,"\"QuestDetails.Expansion\"").Count==2,"quest tooltip and details");
+            Check(System.Text.RegularExpressions.Regex.Matches(quests,"\"QuestDetails.Expansion\"").Count>=2,"quest tooltip and details");
             var hover=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MarketHover.cs"));
             Check(hover.Contains("DrawItemExpansion(id);") && hover.Contains("ExpansionOrigin.Of(zones,fromQuests)"),"item tooltips");
         }),

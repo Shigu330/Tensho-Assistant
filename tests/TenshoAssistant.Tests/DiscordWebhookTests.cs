@@ -7,6 +7,7 @@ using TenshoAssistant.Alarms;
 internal static class DiscordWebhookTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private const string Url = "https://discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstuvwxyz_ABCDEF-123456";
     private const string Token = "abcdefghijklmnopqrstuvwxyz_ABCDEF-123456";
     private static string ChannelUrl(char mark)=>"https://discord.com/api/webhooks/123456789012345678/"+new string(mark,40);
@@ -300,7 +301,7 @@ internal static class DiscordWebhookTests
             Check(plugin.Split("DiscordWebhook.UrlFor(settings,").Length==4,"alarms, currencies, duty ready");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/UI/Components/SettingRow.cs")).Contains("configuration.Discord.CategoryUrls=categoryWebhooks;"),"kept by a reset, as the main address");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discord.cs"));
-            Check(view.Contains("ImGuiInputTextFlags.Password,reset:false);\n                    discordCategoryEdits".Replace("\n",view.Contains("\r\n") ? "\r\n":"\n")),"typed masked");
+            Check(HasCode(view,"ImGuiInputTextFlags.Password,reset:false); discordCategoryEdits"),"typed masked");
             Check(view.Contains("DiscordWebhook.Redact(Read())"),"shown redacted");
             Check(!File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Advanced.cs")).Contains("CategoryUrls"),"not in the diagnostic report");
             Check(TenshoAssistant.Help.ProblemReport.Clean("x "+ChannelUrl('b')+" y")=="x <webhook> y","and a report cleans any address");

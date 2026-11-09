@@ -5,6 +5,7 @@ using TenshoAssistant.Competitive;
 internal static class CompetitiveCut610Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private static string Root=>Path.GetFullPath("src/TenshoAssistant");
     private static string Source(string file)=>File.ReadAllText(Path.Combine(Root,file)).Replace("\r\n","\n");
     private static IEnumerable<string> Code()=>Directory.EnumerateFiles(Root,"*.cs",SearchOption.AllDirectories).Where(file=>!file.Contains("\\obj\\") && !file.Contains("/obj/") && !file.Contains("\\bin\\") && !file.Contains("/bin/"));
@@ -54,9 +55,9 @@ internal static class CompetitiveCut610Tests
         ("Competitive: nothing shown, no command, no menu, no hook work, no way to turn it off",() =>
         {
             var plugin=Source("Plugin.cs");
-            Check(plugin.Contains("private void Draw()\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}"),"no drawing but the labyrinth board's panel (DEC-047)");
+            Check(HasCode(plugin,"private void Draw(){ if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}"),"no drawing but the labyrinth board's panel (DEC-047)");
             Check(plugin.Contains("boardWindow.IsOpen=allowed && !boardPanelBroken && showBoardPanel() && boardReader?.State.Board==true;"),"that panel only while the board is open");
-            Check(plugin.Contains("private void OnCommand(string command, string arguments)\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)"),"commands");
+            Check(HasCode(plugin,"private void OnCommand(string command, string arguments){ if(TenshoAssistant.Competitive.CompetitiveGate.Cut)"),"commands");
             Check(plugin.Contains("private void Open(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;") && plugin.Contains("private void OpenConfig(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"opening");
             Check(plugin.IndexOf("new TenshoAssistant.Competitive.CompetitiveWatcher(")<plugin.IndexOf("mainWindow = new MainWindow("),"decided before anything starts");
             Check(Source("Items/ItemContextMenuBridge.Dalamud.cs").Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"context menu");

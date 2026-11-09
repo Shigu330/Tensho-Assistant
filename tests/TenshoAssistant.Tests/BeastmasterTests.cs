@@ -66,7 +66,11 @@ internal static class BeastmasterTests
         ("Beast places: the column is last, so the sort columns do not move",() =>
         {
             var page=Read("MainWindow.Beastmaster.cs");
-            Check(page.Contains("BeginTable(\"BeastTable\", 9,") && page.Contains("localization.Get(\"BeastUi.CatchPlace\"), ImGuiTableColumnFlags.NoSort"),"column");
+            var table=page[page.IndexOf("BeginTable(\"BeastTable\"",StringComparison.Ordinal)..];
+            table=table[..table.IndexOf("EndTable",StringComparison.Ordinal)];
+            var last=table[table.LastIndexOf("TableSetupColumn(",StringComparison.Ordinal)..];
+            last=last[..last.IndexOf('\n')];
+            Check(last.Contains("localization.Get(\"BeastUi.CatchPlace\")",StringComparison.Ordinal) && last.Contains("NoSort",StringComparison.Ordinal),"the place is the last column, not sortable");
         }),
         // From BeastPlaces984Tests: X-110 (0.984): where to tame a beast: its tames with a place, then its monster's places seen (the wiki's enemy too), with the place menu.
         ("Beast places 984: tames first, then the monster's places, the menu on them, the tame kind still optional on place",() =>

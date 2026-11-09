@@ -1,5 +1,6 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): Resilience452Tests, Resilience453Tests, Resilience454Tests, Resilience507Tests merged into ResilienceTests; every case is kept.
 using TenshoAssistant.Craft;
+using TenshoAssistant.MiniGames;
 internal static class ResilienceTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -191,6 +192,26 @@ internal static class ResilienceTests
         {
             Check(Code("Caching/GameCacheIdentity.Dalamud.cs").Contains("typeof(IDataManager).Assembly.GetName().Version"),"a Dalamud with other sheet definitions does not serve old values");
             Check(Code("MiniGames/TriadObservationReader.Dalamud.cs").Contains("text.ReplaceLineEndings(\" \")"),"a capture is no longer cut at a newline");
+        }),
+        ("Catalog loaders: an empty copy is a failure, a failed gear read says so (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            string Code(string file)=>File.ReadAllText(Path.Combine(root,file));
+            Check(Code("Craft/RecipeCatalogLoader.Dalamud.cs").Contains("if (rows.Count == 0) throw new InvalidDataException"),"recipes");
+            Check(Code("Duties/DutyCatalogLoader.Dalamud.cs").Contains("if (copied.Count == 0) throw new InvalidDataException"),"duties");
+            Check(Code("Npcs/NpcVendorLoader.Dalamud.cs").Contains("if(vendors.Length==0 || rows.Length==0)throw new InvalidDataException"),"vendors");
+            Check(Code("Gear/GearLoader.Dalamud.cs").Contains("catalogFailed=true;") && Code("MainWindow.Gear.cs").Contains("Gear.CatalogFailed") && Code("MainWindow.ChocoboBarding.cs").Contains("GearNotReady"),"gear catalog");
+            Check(Code("Gear/GameGearsetReader.Dalamud.cs").Contains("unavailable=true;") && Code("MainWindow.Gearsets.cs").Contains("source.Unavailable"),"gear sets");
+        }),
+        ("Map and dresser readers: what is not read stays unknown (R-14)",()=>
+        {
+            var root=Path.GetFullPath("src/TenshoAssistant");
+            var map=File.ReadAllText(Path.Combine(root,"Maps/MapLiveReader.Dalamud.cs"));
+            Check(map.Contains("if(player==null)return (null,null);") && map.Contains("adventureRows.Length>bits.Length*8)return (unlocked,null);") && map.Contains("\"Sightseeing rows unavailable.\""),"unknown collected sets");
+            var bank=File.ReadAllText(Path.Combine(root,"Inventory/BankInventoryBridge.Dalamud.cs"));
+            Check(bank.Contains("mirage->IsSetSlotUnlocked(index, column)") && bank.Contains("held.Any(value => value) ? held : null") && bank.Contains("Dresser outfit {0}: slots held {1}."),"outfit pieces by slot, nothing held = as before, logged");
+            var plugin=File.ReadAllText(Path.Combine(root,"Plugin.cs"));
+            Check(plugin.Contains("outfit.Ring.RowId }") && !plugin.Contains("outfit.Ring.RowId }.Where"),"columns kept in order");
         }),
     ];
 }

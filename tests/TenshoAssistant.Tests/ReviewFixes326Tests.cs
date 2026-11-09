@@ -41,16 +41,6 @@ internal static class ReviewFixes326Tests
             var check = wiki.IndexOf("if(Enabled?.Invoke()==false)throw new SourceDisabledException",StringComparison.Ordinal);
             Check(check > 0 && check < wiki.IndexOf("BoundedHttp.ReadAsync",StringComparison.Ordinal),"wiki item: switch checked before the download");
         }),
-        ("Release: a tag without its GitHub release or without main is resumed; gh probes cannot stop Windows PowerShell 5.1",() =>
-        {
-            var release = File.ReadAllText(Path.GetFullPath("scripts/Release.ps1"));
-            Check(release.Contains("function Test-Native",StringComparison.Ordinal) && !Regex.IsMatch(release,@"&\s*\$gh\s+(release view|auth status)[^\n]*\*>\s*\$null\s*\r?\n\s*if\s*\(\$LASTEXITCODE"),"gh probes go through Test-Native");
-            Check(release.Contains("if ($hasRelease -and $mainHasTag) { Stop-Release",StringComparison.Ordinal),"stops only when both are published");
-            Check(release.Contains("if (-not $hasRelease) { Step \"gh release create",StringComparison.Ordinal),"resume skips an existing GitHub release");
-            Check(release.Contains("'core.quotePath=false'",StringComparison.Ordinal),"new file names listed unquoted");
-            var verify = File.ReadAllText(Path.GetFullPath("scripts/Verify.ps1"));
-            Check(!Regex.IsMatch(verify,@"already released \(tag Stable-[^\n]*\r?\n\s*exit 2"),"Verify.ps1 -Release no longer stops on an existing tag");
-        }),
         ("Pages: Duty Finder follows the collections and Garland coming back; « Delete all » is armed per section; texts fixed",() =>
         {
             var finder = Read("MainWindow.DutyFinder.cs");

@@ -4,6 +4,7 @@ using TenshoAssistant.Inventory;
 internal static class CraftChainTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    private static bool HasCode(string text,string code)=>System.Text.RegularExpressions.Regex.Replace(text,@"\s+","").Contains(System.Text.RegularExpressions.Regex.Replace(code,@"\s+",""),StringComparison.Ordinal);
     private static ItemHoldingsSummary Stock(long quantity = 0) => new([], quantity, 0, true, false, false, true);
     private static void Throws<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception($"Expected {typeof(T).Name}"); }
@@ -171,7 +172,7 @@ internal static class CraftChainTests
         ("Chain: the ticks last one calculation; each row has its buttons",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftChain.cs")).Replace("\r\n","\n");
-            Check(view.Contains("craftChainDone.Clear();\n            _ = craftChain.StartAsync("),"a new calculation starts clean");
+            Check(HasCode(view,"craftChainDone.Clear();\n            _ = craftChain.StartAsync("),"a new calculation starts clean");
             Check(view.Contains("OpenCraftLog(step.Recipe)") && view.Contains("OpenCraftSimulation(step.Recipe)"),"Log and Simulate");
             Check(view.Contains("foreach (var step in merged) text.AppendLine("),"the copied text shows the same rows");
         }),

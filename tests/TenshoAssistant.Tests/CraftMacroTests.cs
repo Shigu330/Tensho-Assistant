@@ -1,5 +1,6 @@
 // Test audit of 2026-11-09, batch 2 (0.1021): CraftMacroImport425Tests merged into CraftMacroTests; every case is kept.
 using TenshoAssistant.Craft;
+using TenshoAssistant.UI;
 internal static class CraftMacroTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -12,6 +13,7 @@ internal static class CraftMacroTests
         return CraftSimulation.Run(recipe,new(100,1000,1000,10000),0,sequence);
     }
     private static void Throws<T>(Action run) where T:Exception {try{run();}catch(T){return;}throw new Exception(typeof(T).Name);}
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Craft macro split preserves all actions and fifteen line boundary",()=>
@@ -73,6 +75,15 @@ internal static class CraftMacroTests
             Check(CraftMacroImport.Parse(new string('a',CraftMacroImport.MaxText+1),Find).Actions.Count==0 && CraftMacroImport.Parse(null,Find).Ignored==0,"bounded");
             var many=string.Join('\n',Enumerable.Repeat("/ac Manipulation",150));
             Check(CraftMacroImport.Parse(many,Find).Actions.Count==CraftMacroImport.MaxActions,"at most 100 actions");
+        }),
+        ("0.573: the macro's end line has its sound and can stay on the last page; the panel's cache key follows",() =>
+        {
+            var export=Read("Craft/CraftMacroExport.cs");
+            Check(export.Contains("if(echo && (!echoLastOnly || index==chunks.Length-1))") && export.Contains("echoSound is >=1 and <=16"),"rule");
+            Check(Read("Craft/CraftLogSession.cs").Contains("input.Echo,input.EchoSound,input.EchoLastOnly,"),"in the cache key");
+            var settings=new TenshoAssistant.CraftSearchSettings();
+            Check(settings.BoundedEchoSound==1 && !settings.EchoLastOnly,"as before until set");
+            settings.EchoSound=99;Check(settings.BoundedEchoSound==16,"bounded");
         }),
     ];
 }

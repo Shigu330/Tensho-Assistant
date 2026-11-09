@@ -27,8 +27,7 @@ internal static class Tracker415Tests
             var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.TrackerWindow.cs"));
             Check(ui.Contains("()=>configuration.TrackerWindow,()=>!windowDisposed && !gameGui.GameUiHidden") && ui.Contains("configuration.TrackerWindow=false;")
                 && ui.Contains("trackerRefresh=now.AddSeconds(1)"),"window");
-            var configuration=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs"));
-            Check(configuration.Contains("public bool TrackerWindow { get; set; }") && configuration.Contains("\"TrackerWindow\","),"setting off by default and listed");
+            Check(!new TenshoAssistant.Configuration().TrackerWindow && TenshoAssistant.ConfigurationReset.Reset.Contains("TrackerWindow"),"setting off by default and listed");
         }),
     ];
 }

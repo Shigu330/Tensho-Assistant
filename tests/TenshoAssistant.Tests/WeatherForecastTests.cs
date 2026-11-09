@@ -1,11 +1,13 @@
 using System.Numerics;
 using TenshoAssistant.Gathering;
+using TenshoAssistant.UI;
 
 internal static class WeatherForecastTests
 {
     private static void Check(bool condition,string why){if(!condition)throw new Exception(why);}
     private static void Throws<T>(Action run) where T:Exception{try{run();}catch(T){return;}throw new Exception(typeof(T).Name);}
     private static WeatherCatalog Catalog(params WeatherShare[] shares)=>new([new(1,"Clair",1),new(2,"Pluie",2)],[new(10,1,shares)],"fixture");
+    private static string Read(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
     {
         ("Weather target hand fixtures and independent arbitrary precision oracle",()=>
@@ -50,6 +52,12 @@ internal static class WeatherForecastTests
             Throws<NotSupportedException>(()=>((IList<WeatherPeriod>)forecast).Clear());
             Throws<NotSupportedException>(()=>((IList<WeatherShare>)catalog.Zone(10)!.Shares).Clear());
             var service=new WeatherCatalogService();service.Publish(catalog);service.Fail(new Exception("changed"));Check(service.State.Catalog is null,"no old metadata after fail");
-        })
+        }),
+        ("0.563: the weather table of several zones is computed once per period, and kept by reset all",() =>
+        {
+            var view=Read("MainWindow.Weather.cs");
+            Check(view.Contains("period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count") && view.Contains("WeatherFavoritePeriods=6,WeatherFavoriteZones=12"),"bounded, once per period");
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("WeatherFavorites"),"the player's data");
+        }),
     };
 }

@@ -2,11 +2,13 @@
 using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Items;
+using TenshoAssistant.UI;
 internal static class ItemContextMenuTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static ItemCatalog Catalog()=>ItemCatalog.Build([new(42,"Bound HQ-capable",true),new(43,"NQ only",false)],new("fixture","French","v",1));
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
+    private static string ReadLf(string name)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+name)).Replace("\r\n","\n");
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Inventory menu copies the chosen quality and dispatches each route once without hover state",()=>
@@ -86,6 +88,12 @@ internal static class ItemContextMenuTests
             Check(cell.Contains("var key=ImGui.GetID(baseId);") && cell.Contains("menuSeen[key]=seen+1;"),"by place and item");
             Check(!cell.Contains("menuSerial++"),"no frame-wide serial");
             Check(cell.Contains("ItemLinksMenu(UniqueMenuId($\"ItemCell{item.Id}\"),item);") && cell.Contains("ItemLinksMenu($\"ItemCellName{id}\",item);"),"the icon and the name keep apart ids (0.269)");
+        }),
+        ("0.561: an item's menu copies its name, links it in your own chat and opens its pages",() =>
+        {
+            var menu=ReadLf("MainWindow.DutyFinder.cs");
+            foreach(var entry in new[]{"ItemMenu.CopyName","ItemMenu.LinkChat","ItemMenu.OpenOn","ExternalLinks.Universalis(item.Id)","ExternalLinks.Garland(item.Id)","ExternalLinks.Teamcraft("})Check(menu.Contains(entry),entry);
+            Check(ReadLf("Plugin.cs").Contains("chatGui.Print(new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddItemLink(id,false).BuiltString)"),"printed locally, nothing sent");
         }),
     ];
 }

@@ -1,3 +1,4 @@
+using TenshoAssistant.Maps;
 // Test audit of 2026-11-09, batch 2 (0.1021): GoThere397Tests, GoThereMenu762Tests, HiddenGoThere834Tests merged into GoThereTests; every case is kept.
 internal static class GoThereTests
 {
@@ -35,6 +36,20 @@ internal static class GoThereTests
             var access=new TenshoAssistant.Gathering.GatherPointAccess(null,17,60);
             Check(!access.Blocks(60) && access.Blocks(61),"level");
             Check(new TenshoAssistant.Gathering.GatherPointAccess("Tome",17,90).Blocks(10),"tome");
+        }),
+        ("Teleport list (0.662): the game's function is called only with the player there for a moment",() =>
+        {
+            var at=new DateTimeOffset(2026,11,6,12,0,0,TimeSpan.Zero);
+            var gate=new TenshoAssistant.Maps.TeleportListGate();
+            Check(!gate.Allowed(false,false,at),"no player");
+            Check(!gate.Allowed(true,true,at.AddSeconds(1)),"between zones");
+            Check(!gate.Allowed(true,false,at.AddSeconds(2)),"just back");
+            Check(!gate.Allowed(true,false,at.AddSeconds(4)),"not yet");
+            Check(gate.Allowed(true,false,at.AddSeconds(5)),"settled");
+            Check(!gate.Allowed(false,false,at.AddSeconds(6)) && !gate.Allowed(true,false,at.AddSeconds(7)),"it starts again after a change of zone");
+            var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Replace("\r\n","\n");
+            Check(reader.Contains("if(listAllowed && Interlocked.Exchange(ref costsRequest,0)==1)"),"a request waits, it is not spent");
+            Check(reader.IndexOf("listAllowed=teleportGate.Allowed")<reader.IndexOf("ReadTeleportCosts());"),"checked first");
         }),
     ];
 }
