@@ -39,7 +39,8 @@ internal static class FieldCatalogLoader
         foreach(var territory in data.GetExcelSheet<TerritoryType>())
         {
             if(territory.RowId==0 || !FieldBoard.FieldZoneUses.Contains(territory.TerritoryIntendedUse.RowId))continue;
-            zones.Add(new(territory.RowId,territory.Map.RowId,territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "",FieldBoard.Place(Entries(data,log,territory),rows)));
+            zones.Add(new(territory.RowId,territory.Map.RowId,territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "",FieldBoard.Place(Entries(data,log,territory),rows))
+                {Use=territory.TerritoryIntendedUse.RowId});
         }
         var records=data.GetExcelSheet<MYCWarResultNotebook>()
             .Where(row=>row.RowId!=0 && !row.Name.IsEmpty)

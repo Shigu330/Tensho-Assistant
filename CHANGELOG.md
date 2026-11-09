@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.976.0
+- Plan global, Verify : Correction (X-90) : sur la page Eurêka et Bozja, les ALÉA du Croissant occulte étaient appelés « escarmouches » (le mot de Bozja), parce que le mot dépendait du numéro de zone ; il dépend maintenant de l'usage de zone du jeu : escarmouche à Bozja seulement. Non validé en jeu.
+- Tests : FieldContent717Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.976.0.0. Non validé en jeu.
+### English
+- Fix (X-90): on the Eureka and Bozja page, the Occult Crescent FATEs were called « skirmishes » (Bozja's word), because the word followed the zone number; it now follows the game's zone use: skirmish in Bozja only. Not validated in game.
+
 ## 0.975.0
 - Plan global, Verify : Eurêka et Bozja devient aussi la page du Croissant occulte (X-90) : les zones de la page ne sont plus une liste écrite dans le code mais tirées des feuilles du jeu (usage de zone Eurêka, Bozja, Croissant occulte ; relevé : docs/evidence/0.975-field-zones.md). Les deux zones du Croissant occulte y entrent, avec leurs ALÉA et affrontements placés depuis les fichiers du jeu ; une future zone de la même famille y entrera sans code (X-92). Non validé en jeu.
 - Tests : FieldContent717Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.975.0.0. Non validé en jeu.

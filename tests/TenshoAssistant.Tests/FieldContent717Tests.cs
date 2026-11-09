@@ -43,6 +43,7 @@ internal static class FieldContent717Tests
         ("Eureka and Bozja: the zones of the field uses (0.975: Occult Crescent too), and the search on name or text",() =>
         {
             Check(FieldBoard.FieldZoneUses.SequenceEqual([41u,48u,61u]),"zones");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.FieldContent.cs")).Contains("zone.Use==FieldBoard.BozjaUse ? \"FieldContent.KindSkirmish\""),"skirmishes in Bozja only");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs")).Contains("FieldBoard.FieldZoneUses.Contains(territory.TerritoryIntendedUse.RowId)"),"from the sheet");
             Check(FieldBoard.Matches("",["a"]) && FieldBoard.Matches("BC",["x","abcd"]) && !FieldBoard.Matches("z",["x"]),"search");
         }),
