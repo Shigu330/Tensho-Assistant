@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1004.0
+- Plan global, Verify : Sonde de vérification des découvertes (outil) mise à jour d'après la revérification de votre base (docs/evidence/0.1004-discoveries-check.md) : elle connaît les sortes ajoutées depuis la 0.933, la pêche en mer sur le bateau (poissons des lieux IKDSpot, météo de la mer dont le courant spectral) et la plage de niveaux d'un fait vu plusieurs fois dans son intervalle. Elle ne signale plus ces faux défauts ; aucun défaut actuel des parseurs n'a été trouvé. Rien ne change dans le plugin.
+- Tests : AirshipLoot1003Tests. Verify.ps1 (agent) : 1641/1641, 0 avertissement, 0 erreur ; DLL 0.1004.0.0. Non validé en jeu.
+### English
+- Discoveries check probe (tool) updated after the recheck of your base (docs/evidence/0.1004-discoveries-check.md): it knows the kinds added since 0.933, ocean fishing on the ship (fish of the IKDSpot spots, the sea's weather including the spectral current) and the level range of a fact seen several times within its gap. It no longer reports these false defects; no current parser defect was found. Nothing changes in the plugin.
+
 ## 0.1003.0
 - Plan global, Verify : Parseurs (votre demande : revérifier les parseurs et ce qu'ils ont trouvé, et ceux qui manquent face aux sources communautaires). Votre base : 1773 faits ; la vérification contre les feuilles du jeu ne trouve aucun défaut actuel des parseurs (deux faits abîmés datent d'avant la 0.911, déjà corrigée). Nouveau : le butin des aéronefs est relevé (comme celui des sous-marins), avec le secteur tiré du journal du voyage ; noté seulement avec un seul aéronef et quand les étapes et les secteurs correspondent. En mode développeur, un gain d'objet attribué à rien écrit ses raisons au journal (aucun butin de monstre n'a été noté chez vous : on saura pourquoi au prochain combat). Restent sans parseur : le butin des cartes au trésor (relevé en jeu d'abord), le jardin (X-108) et PaissaDB (règle Dalamud). Non validé en jeu.
 - Tests : AirshipLoot1003Tests. Verify.ps1 (agent) : 1641/1641, 0 avertissement, 0 erreur ; DLL 0.1003.0.0. Non validé en jeu.

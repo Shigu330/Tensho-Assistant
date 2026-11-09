@@ -1648,6 +1648,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1003) Atelier de la compagnie, au retour d'un aéronef : Découvertes, « … ← aéronef, secteur » ; mode développeur, un combat : lignes « Item gain not attributed » si un butin n'est pas noté.
 
+- [ ] (0.1004) Aucun essai en jeu : outil de vérification seulement.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

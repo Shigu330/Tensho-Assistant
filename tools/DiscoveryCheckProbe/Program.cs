@@ -40,6 +40,13 @@ string F(float value)=>value.ToString("0.0",CultureInfo.InvariantCulture);
 // Indexes built once from the sheets.
 var rodFish=fishParameters.Where(row=>row.Item.RowId!=0).Select(row=>row.Item.RowId).ToHashSet();
 var spotsByTerritory=fishingSpots.Where(row=>row.TerritoryType.RowId!=0).GroupBy(row=>row.TerritoryType.RowId).ToDictionary(group=>group.Key,group=>group.ToArray());
+// 0.1004: ocean fishing happens on the ship (IKDRoute.Instance → its territory); its fish are those of the IKDSpot fishing spots, its weather is the sea's
+// (the spectral current included), so the ship's own WeatherRate does not apply.
+var oceanTerritories=new HashSet<uint>();var oceanFish=new HashSet<uint>();
+foreach(var route in game.GetExcelSheet<IKDRoute>()!)if(route.Instance.ValueNullable is { } duty && duty.TerritoryType.RowId!=0)oceanTerritories.Add(duty.TerritoryType.RowId);
+foreach(var ikd in game.GetExcelSheet<IKDSpot>()!)
+    foreach(var spot in new[]{ikd.SpotMain.ValueNullable,ikd.SpotSub.ValueNullable})
+        if(spot is { } fishing)foreach(var item in fishing.Item)if(item.RowId!=0)oceanFish.Add(item.RowId);
 var spearRowsByItem=spearItems.Where(row=>row.Item.RowId!=0).GroupBy(row=>row.Item.RowId).ToDictionary(group=>group.Key,group=>group.Select(row=>row.RowId).ToHashSet());
 var spearPointsByTerritory=new Dictionary<uint,List<(uint Point,uint Base,HashSet<uint> SpearRows)>>();
 foreach(var point in gatheringPoints)
@@ -101,8 +108,10 @@ Dictionary<uint,(float X,float Z)> FateLayout(uint territory)
 
 var kindNames=new Dictionary<int,string>{[1]="MonsterPlace",[2]="HuntMarkPlace",[3]="FateSeen",[4]="Desynthesis",[5]="Venture",[6]="DutyChest",[7]="FateReward",[8]="MonsterDrop",
     [9]="ItemFromItem",[10]="FishCatch",[11]="FishCondition",[12]="FashionEvaluation",[13]="VoyageDrop",[14]="VoyageUnlock",[15]="BlueSpellLearned",[16]="BeastTamed",[17]="FestivalSeen",
-    [18]="VistaSeen",[19]="NpcPlace",[20]="FishLure",[21]="FishTransition",[22]="BlueSpellCaster",[23]="FishBite",[24]="Reduction",[25]="QuestItemAsked",[28]="SpearShadow"};
-var placeKinds=new HashSet<int>{1,2,3,8,10,19,22,23,28};
+    [18]="VistaSeen",[19]="NpcPlace",[20]="FishLure",[21]="FishTransition",[22]="BlueSpellCaster",[23]="FishBite",[24]="Reduction",[25]="QuestItemAsked",[28]="SpearShadow",
+    // 0.1004: the kinds added since 0.933 (DiscoveriesModel.cs), and those that keep a place (DiscoveryStore.HasPlace, tools/discoveries-merge.py PLACED).
+    [29]="FishBiteBait",[30]="IntuitionStart",[31]="IntuitionCatch",[32]="VoyageVisit",[33]="MonsterKill",[34]="DutyChestOpened",[35]="SpectralBefore",[36]="FishPoints",[37]="AirshipDrop"};
+var placeKinds=new HashSet<int>{1,2,3,8,10,19,22,23,28,29,30};
 var report=new SortedDictionary<int,KindReport>();
 KindReport For(int kind)=>report.TryGetValue(kind,out var found) ? found:report[kind]=new KindReport();
 string Describe(Fact fact)
@@ -135,7 +144,8 @@ foreach(var fact in facts)
     if(fact.First<dayZero)Impossible($"First {fact.First:O} before 2013-08-27");
     if(fact.Seen<0 || fact.Imported<0 || fact.Seen+fact.Imported==0)Suspect($"Seen {fact.Seen} Imported {fact.Imported}");
     if(fact.LevelMin>fact.LevelMax)Impossible($"LevelMin {fact.LevelMin} > LevelMax {fact.LevelMax}");
-    if(fact.Seen==1 && fact.Imported==0 && fact.LevelMin!=fact.LevelMax)Impossible($"seen once but LevelMin {fact.LevelMin} != LevelMax {fact.LevelMax}");
+    // 0.1004: a sighting within the kind's gap widens the levels without counting a new one (DiscoveryStore.See): only a fact seen at one moment must have one level.
+    if(fact.Seen==1 && fact.Imported==0 && fact.First==fact.Last && fact.LevelMin!=fact.LevelMax)Impossible($"seen once but LevelMin {fact.LevelMin} != LevelMax {fact.LevelMax}");
     // Place.
     Map? map=null;
     if(placeKinds.Contains(fact.Kind))
@@ -166,6 +176,12 @@ foreach(var fact in facts)
     bool IsRodFish(uint id){if(rodFish.Contains(id))return true;Impossible($"{ItemName(id)} is not the Item of any FishParameter row (rod fishing)");return false;}
     void FishAtTerritory(uint fish,string what)
     {
+        if(oceanTerritories.Contains(fact.Territory))
+        {
+            if(oceanFish.Contains(fish))Note($"{what} {ItemName(fish)}: an ocean fish (IKDSpot), caught on the ship");
+            else Impossible($"{what} {ItemName(fish)}: on the ship but in no IKDSpot fishing spot");
+            return;
+        }
         var spots=spotsByTerritory.GetValueOrDefault(fact.Territory) ?? [];
         var holding=spots.Where(spot=>spot.Item.Any(item=>item.RowId==fish)).ToArray();
         if(holding.Length==0){Impossible($"{what} {ItemName(fish)}: no FishingSpot of territory {TerritoryName(fact.Territory)} lists it ({spots.Length} spots there)");return;}
@@ -181,6 +197,7 @@ foreach(var fact in facts)
     void WeatherPossible(uint weather,string what)
     {
         if(weathers.GetRowOrDefault(weather) is null){Impossible($"{what} {weather} has no Weather row");return;}
+        if(oceanTerritories.Contains(fact.Territory)){Note($"{what} {WeatherName(weather)} at sea (the ship's own WeatherRate does not apply)");return;}
         var possible=PossibleWeathers(fact.Territory);
         if(possible.Count==0)Suspect($"territory {TerritoryName(fact.Territory)} has no WeatherRate to check {what} against");
         else if(!possible.Contains(weather))Impossible($"{what} {WeatherName(weather)} is not in territory {TerritoryName(fact.Territory)}'s WeatherRate ({string.Join(", ",possible.Order().Select(WeatherName))})");
@@ -267,7 +284,7 @@ foreach(var fact in facts)
         case 11:
             if(IsRodFish(fact.Subject))FishAtTerritory(fact.Subject,"fish");
             WeatherPossible(fact.Detail,"weather");MinutesAgree();
-            if(fact.Imported==0)foreach(var (label,at) in new[]{("First",fact.First),("Last",fact.Last)})
+            if(fact.Imported==0 && !oceanTerritories.Contains(fact.Territory))foreach(var (label,at) in new[]{("First",fact.First),("Last",fact.Last)})
             {
                 var (weather,_,why)=Forecast(fact.Territory,at);
                 if(why.Length>0)Suspect($"forecast at {label} not computable: {why}");
@@ -314,7 +331,7 @@ foreach(var fact in facts)
         case 21:
             if(IsRodFish(fact.Subject))FishAtTerritory(fact.Subject,"fish");
             WeatherPossible(fact.Detail,"previous weather");MinutesAgree();
-            if(fact.Imported==0)foreach(var (label,at) in new[]{("First",fact.First),("Last",fact.Last)})
+            if(fact.Imported==0 && !oceanTerritories.Contains(fact.Territory))foreach(var (label,at) in new[]{("First",fact.First),("Last",fact.Last)})
             {
                 var (weather,_,why)=Forecast(fact.Territory,at.AddSeconds(-1400));
                 if(why.Length>0)Suspect($"forecast 1400 s before {label} not computable: {why}");
