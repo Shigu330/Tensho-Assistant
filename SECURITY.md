@@ -24,17 +24,23 @@ Please do not open a public issue or disclose details about the vulnerability be
 What the plugin does that matters for security (read against the code of the `Devloppement` branch on 2026-11-09; each later change is added here with the version that brings it):
 
 - **Network**: HTTPS requests with a timeout and a size limit (`src/TenshoAssistant/Community/BoundedHttp.cs`, or the client's own
-  limit for Universalis) to:
-  - Universalis (`universalis.app`: prices, listings and history, by world and item id); when the wishlist sale alert is on (off by default, 0.1000), one request every 30 minutes at most for up to 20 wishes that have a price;
-  - Garland Tools (`www.garlandtools.org`: item sources, duty and monster loot);
-  - the FFXIV Console Games Wiki (`ffxiv.consolegameswiki.com`: item acquisition, monster drops, sightseeing log, blue magic spells,
-    Beastmaster and island pasture pages);
-  - Teamcraft's public reports (`gubal.ffxivteamcraft.com`: one GraphQL POST query carrying the fishing spot id);
-  - GitHub-hosted data (`raw.githubusercontent.com`, `api.github.com`): LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet
-    (Fashion Report), and this repository (community tool gallery and help videos, on a click, data only, never code);
-  - PaissaDB (`paissadb.zhu.codes`: open housing plots, by world id, on a click or with its optional watch);
-  - the shared discoveries exchange below (GitHub);
-  - the Discord webhook below.
+  limit for Universalis) to the sources below (produced from the code by `tools/docgen.py`: every file that makes a request is in a row, with the setting that turns its source off):
+
+<!-- docgen:network-en -->
+| Source | Hosts | Off with | Code |
+|---|---|---|---|
+| **Universalis**: prices, listings and history, by world and item id; with the wishlist sale alert (off by default), one request every 30 minutes at most for up to 20 wishes that have a price | `universalis.app` | « Universalis (market prices) » | `Market/MarketService.cs`, `Market/MarketBoardService.cs`, `Market/RetainerSales.cs` |
+| **Garland Tools**: item sources, duty and monster loot | `www.garlandtools.org` | « Garland Tools » | `Community/GarlandClient.cs`, `Duties/DutyLootService.cs` |
+| **FFXIV Console Games Wiki**: item acquisition, monster drops, duty guides, sightseeing log, blue magic spells, Beastmaster and island pasture pages | `ffxiv.consolegameswiki.com` | « Wiki (consolegameswiki) » | `Community/WikiItemAcquisition.cs`, `Duties/WikiDutyGuide.cs`, `Maps/WikiVistas.cs`, `Monsters/BeastWikiIndex.cs`, `Monsters/BlueSpellWikiIndex.cs`, `Monsters/WikiMonsterSources.cs`, `Island/IslandAnimals.Dalamud.cs`, `Island/IslandAnimals.cs` |
+| **Teamcraft**: public reports: one GraphQL POST query carrying the fishing spot id | `gubal.ffxivteamcraft.com` | « Teamcraft (bite times) » | `Community/FishBiteTimes.cs` |
+| **LuminaSupplemental**: community data files (CSV) hosted on GitHub | `raw.githubusercontent.com` | « LuminaSupplemental » | `Community/LuminaSupplemental.cs` |
+| **GatherBuddy**: fish data (baits, mooches, windows) hosted on GitHub | `raw.githubusercontent.com`, `api.github.com` | « GatherBuddy (fishing) » | `Community/GatherBuddyFish.cs` |
+| **Fashion Report (FFXIVGachaSpreadsheet)**: the week's Fashion Report data hosted on GitHub | `raw.githubusercontent.com` | « Fashion Report (FFXIVGachaSpreadsheet) » | `Fashion/FashionDataService.cs` |
+| **PaissaDB**: open housing plots, by world id, on a click or with its optional watch | `paissadb.zhu.codes` | « Plots for sale (PaissaDB) » | `Community/PaissaDb.cs` |
+| **This repository**: community tool gallery and help videos, on a click, data only, never code | `raw.githubusercontent.com` | — (on a click) | `MyTools/ToolGallery.cs`, `Help/CommunityHelp.cs` |
+| **Shared discoveries exchange**: the common file of this repository; after « Connect GitHub » only, the player's own sightings to a secret gist and one issue (described below); on « Exchange now » or with « Automatic exchange » | `raw.githubusercontent.com`, `api.github.com`, `github.com`, `gist.github.com` | « Automatic exchange » | `Discoveries/GitHubExchange.cs`, `Discoveries/CommunityDiscoveries.cs` |
+| **Discord webhook**: HTTPS POST of alarms and alerts to the player's own webhook (described below) | `discord.com`, `discordapp.com`, `ptb.discord.com`, `canary.discord.com` | « Post alarms to Discord » | `Alarms/DiscordNotifier.cs`, `Alarms/DiscordWebhook.cs` |
+<!-- /docgen:network-en -->
 
   All are GET requests except Teamcraft's query, the GitHub sign-in and uploads of the exchange, and the Discord webhook. Requests carry
   item, world, spot or page identifiers only; no player data, no telemetry (the exchange and Discord are the player's choice, below).
@@ -153,18 +159,23 @@ N'ouvrez pas de ticket public et ne divulguez pas de détails sur la vulnérabil
 Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de la branche `Devloppement` le 2026-11-09 ; chaque changement d'après est ajouté ici avec la version qui l'apporte) :
 
 - **Réseau** : requêtes HTTPS avec un délai et une taille limités (`src/TenshoAssistant/Community/BoundedHttp.cs`, ou la limite propre
-  du client pour Universalis) vers :
-  - Universalis (`universalis.app` : prix, annonces et historique, par monde et numéro d'objet) ; quand l'alerte de vente des souhaits est activée (désactivée par défaut, 0.1000), une requête toutes les 30 minutes au plus pour 20 souhaits avec un prix au plus ;
-  - Garland Tools (`www.garlandtools.org` : sources d'objets, butin des contenus et des monstres) ;
-  - le FFXIV Console Games Wiki (`ffxiv.consolegameswiki.com` : acquisition des objets, butin des monstres, carnet d'exploration, sorts
-    de mage bleu, pages du dresseur et du pâturage de l'île) ;
-  - les rapports publics de Teamcraft (`gubal.ffxivteamcraft.com` : une requête GraphQL POST portant le numéro du lieu de pêche) ;
-  - des données hébergées sur GitHub (`raw.githubusercontent.com`, `api.github.com`) : LuminaSupplemental, GatherBuddy,
-    FFXIVGachaSpreadsheet (Revue de mode), et ce dépôt (galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données
-    seulement, jamais de code) ;
-  - PaissaDB (`paissadb.zhu.codes` : terrains libres, par numéro de monde, sur un clic ou avec sa surveillance facultative) ;
-  - l'échange des découvertes partagées ci-dessous (GitHub) ;
-  - le webhook Discord ci-dessous.
+  du client pour Universalis) vers les sources ci-dessous (tableau produit depuis le code par `tools/docgen.py` : chaque fichier qui fait une requête y est, avec le réglage qui coupe sa source) :
+
+<!-- docgen:network-fr -->
+| Source | Hôtes | Coupée par | Code |
+|---|---|---|---|
+| **Universalis** : prix, annonces et historique, par monde et numéro d'objet ; avec l'alerte de vente des souhaits (désactivée par défaut), une requête toutes les 30 minutes au plus pour 20 souhaits au plus qui ont un prix | `universalis.app` | « Universalis (prix du marché) » | `Market/MarketService.cs`, `Market/MarketBoardService.cs`, `Market/RetainerSales.cs` |
+| **Garland Tools** : sources d'objets, butin des contenus et des monstres | `www.garlandtools.org` | « Garland Tools » | `Community/GarlandClient.cs`, `Duties/DutyLootService.cs` |
+| **FFXIV Console Games Wiki** : acquisition des objets, butin des monstres, guides des contenus, carnet d'exploration, sorts de mage bleu, pages du dresseur et du pâturage de l'île | `ffxiv.consolegameswiki.com` | « Wiki (consolegameswiki) » | `Community/WikiItemAcquisition.cs`, `Duties/WikiDutyGuide.cs`, `Maps/WikiVistas.cs`, `Monsters/BeastWikiIndex.cs`, `Monsters/BlueSpellWikiIndex.cs`, `Monsters/WikiMonsterSources.cs`, `Island/IslandAnimals.Dalamud.cs`, `Island/IslandAnimals.cs` |
+| **Teamcraft** : rapports publics : une requête GraphQL POST portant le numéro du lieu de pêche | `gubal.ffxivteamcraft.com` | « Teamcraft (temps de touche) » | `Community/FishBiteTimes.cs` |
+| **LuminaSupplemental** : fichiers de données de la communauté (CSV) hébergés sur GitHub | `raw.githubusercontent.com` | « LuminaSupplemental » | `Community/LuminaSupplemental.cs` |
+| **GatherBuddy** : données des poissons (appâts, remises à l'eau, fenêtres) hébergées sur GitHub | `raw.githubusercontent.com`, `api.github.com` | « GatherBuddy (pêche) » | `Community/GatherBuddyFish.cs` |
+| **Fashion Report (FFXIVGachaSpreadsheet)** : les données de la Revue de mode de la semaine, hébergées sur GitHub | `raw.githubusercontent.com` | « Revue de mode (FFXIVGachaSpreadsheet) » | `Fashion/FashionDataService.cs` |
+| **PaissaDB** : terrains libres, par numéro de monde, sur un clic ou avec sa surveillance facultative | `paissadb.zhu.codes` | « Terrains en vente (PaissaDB) » | `Community/PaissaDb.cs` |
+| **This repository** : galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code | `raw.githubusercontent.com` | — (sur un clic) | `MyTools/ToolGallery.cs`, `Help/CommunityHelp.cs` |
+| **Shared discoveries exchange** : le fichier commun de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist secret et un ticket (décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique » | `raw.githubusercontent.com`, `api.github.com`, `github.com`, `gist.github.com` | « Échange automatique » | `Discoveries/GitHubExchange.cs`, `Discoveries/CommunityDiscoveries.cs` |
+| **Discord webhook** : envoi HTTPS POST des alarmes et alertes vers le webhook du joueur (décrit plus bas) | `discord.com`, `discordapp.com`, `ptb.discord.com`, `canary.discord.com` | « Envoyer les alarmes sur Discord » | `Alarms/DiscordNotifier.cs`, `Alarms/DiscordWebhook.cs` |
+<!-- /docgen:network-fr -->
 
   Toutes sont des requêtes GET, sauf celle de Teamcraft, la connexion et les envois de l'échange GitHub, et le webhook Discord. Les
   requêtes ne portent que des numéros d'objet, de monde, de lieu ou de page ; aucune donnée du joueur, aucune télémétrie (l'échange et

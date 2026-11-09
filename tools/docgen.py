@@ -8,6 +8,13 @@ Three generators, each written between its marks and nowhere else:
   versions  the version the documents were produced for (inline marks), from the <Version> of the csproj, and the state of the
             translations in Localization/README.md, counted in the language files; a version number written by hand in a sentence
             such as « checked on …, version 0.971 » is refused
+  settings  docs/project/SETTINGS.md (plan 4.16): every settings control of the code (BoolSetting, IntSetting, SliderSetting,
+            ComboSetting, the map's SettingBox), the Configuration property it writes with its type and default, where it is and its
+            label and tooltip in English and French; then the settings of « restore every setting » that no control writes
+  network   SECURITY.md (English and French): the sources the plugin contacts, from the list NETWORK checked against the code
+            (every file that makes a request is in a row, every host it names is a host of a row) and the setting that turns each off
+  decisions docs/project/DECISIONS.md: the index, one row per DEC with its date and problem
+  evidence  docs/evidence/README.md: one row per evidence file with the tracked files that cite it
 A block is
     <!-- docgen:KEY -->
     ...produced text...
@@ -20,10 +27,12 @@ between two releases they may be older, never newer. A test (PublicDocsTests) an
 Usage (from the repository root):
   python -I -X utf8 tools/docgen.py          print every block
   python -I -X utf8 tools/docgen.py write    write the blocks and the version marks
+  python -I -X utf8 tools/docgen.py write --blocks   write the blocks only, the version marks keep their version (each version)
   python -I -X utf8 tools/docgen.py check    exit 1 if a block is out of date, a version is written by hand, or the marks disagree;
                                              a version mark older than the csproj is reported (exit 0): produce them before a release
   python -I -X utf8 tools/docgen.py check --release   the same, and a version mark older than the csproj is an error too
 """
+import functools
 import json
 import re
 import subprocess
@@ -66,9 +75,10 @@ INDEX = [
     ([("project/", None)], "contributors and agent", "contributeurs et agent",
      "{core}, and the working documents listed below", "{core}, et les documents de travail listés plus bas"),
     ([("evidence/", None)], "contributors and agent", "contributeurs et agent",
-     "probe outputs and log excerpts cited by the code (evidence of the data links), most named `<version>-<subject>`",
+     "probe outputs and log excerpts cited by the code (evidence of the data links), most named `<version>-<subject>`; "
+     "[index](evidence/README.md) of the files that cite each",
      "sorties de sondes et extraits de journaux cités par le code (preuves des liens de données), le plus souvent nommés "
-     "`<version>-<sujet>`"),
+     "`<version>-<sujet>` ; [index](evidence/README.md) des fichiers qui citent chacune"),
     ([("../Localization/README.md", None)], "translators", "traducteurs",
      "adding or completing a language", "ajouter ou compléter une langue"),
     ([("../community-help/README.md", None), ("../community-templates/README.md", None), ("../community-discoveries/README.md", None)],
@@ -102,7 +112,8 @@ PROJECT_WORKING = [
     ("GLOBAL-PLAN", "global plan and current state", "plan global et état actuel"),
     ("TESTING", "in-game test protocols", "protocoles d'essai en jeu"),
     ("TESTING-ROUTE", "the in-game tests not yet ticked, sorted by activity", "les essais en jeu non cochés, rangés par activité"),
-    ("SETTINGS", "inventory of the settings: default, where, real effect", "inventaire des réglages : défaut, où, effet réel"),
+    ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",
+     "inventaire des réglages, produit depuis le code : défaut, où, libellé et info-bulle"),
     ("CONTENT-TOOLS", "content tools study, X-90", "étude des outils de contenus, X-90"),
     ("BACKLOG", None, None),
     ("USER-REQUESTS", "user requests", "demandes de l'utilisateur"),
@@ -300,6 +311,377 @@ def version_problems(release):
     return errors, notes
 
 
+# ------------------------------------------------------------------------------------------------------------------------- settings
+SOURCE = ROOT / "src/TenshoAssistant"
+CONFIGURATION = SOURCE / "Configuration.cs"
+SETTINGS_INDEX = SOURCE / "SettingsIndex.cs"
+CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
+SETTING_BOX = re.compile(r'\bSettingBox\(\s*"([\w.]+)"\s*,\s*([\w.]+)\s*,')
+PROPERTY = re.compile(r"public\s+(?:required\s+)?([\w.<>?,\[\] ]+?)\s+(\w+)\s*\{\s*get\s*(;\s*(?:set|init);\s*\}(?:\s*=\s*([^;\n]+);)?|=>[^{}]*\})")
+# A property with get=>/set=> accessors reads a backing field (« ref field » or « =>field »), whose initializer is the default.
+BACKING = re.compile(r"(?:\bref\s+|=>\s*)([a-z_]\w*)\b")
+CLASS = re.compile(r"^[ \t]*(?:(?:public|internal|private|protected|sealed|static|partial|abstract|readonly)\s+)*(?:class|record|struct)\s+(\w+)",
+                   re.M)
+
+
+def source_files():
+    return sorted(path for path in SOURCE.rglob("*.cs") if "obj" not in path.parts and "bin" not in path.parts)
+
+
+def read_source(path):
+    return path.read_text(encoding="utf-8-sig").replace("\r\n", "\n")
+
+
+def text_of(texts, key):
+    """A text of a language file: a flat key at the root (« Home.… ») or Section.Key."""
+    if key in texts and isinstance(texts[key], str):
+        return texts[key]
+    section, _, rest = key.partition(".")
+    value = texts.get(section, {}).get(rest) if isinstance(texts.get(section), dict) else None
+    return value if isinstance(value, str) else None
+
+
+def call_body(text, start):
+    """The arguments of the call opened just before start (parentheses balanced, strings skipped)."""
+    depth, i, quote = 1, start, None
+    while i < len(text) and depth:
+        ch = text[i]
+        if quote:
+            if ch == "\\":
+                i += 1
+            elif ch == quote:
+                quote = None
+        elif ch in "\"'":
+            quote = ch
+        elif ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        i += 1
+    return text[start:i - 1]
+
+
+# Local names of a part of Configuration in the files that draw its controls: (file, name) → property of Configuration.
+ALIASES = {("MainWindow.MapView.cs", "settings"): "MapView", ("MainWindow.MapView.cs", "contextSettings"): "MapView",
+           ("MainWindow.Settings.cs", "search"): "CraftSearch", ("MainWindow.FashionWeek.cs", "options"): "FashionOptions",
+           ("MainWindow.GearWear.cs", "WearSettings"): "GearWear"}
+
+
+def setting_path(expression, file):
+    """configuration.A.B → A.B; a local name of ALIASES → its property; anything else: None."""
+    expression = expression.strip().lstrip("!").replace("?.", ".")
+    if expression.startswith("configuration."):
+        return expression[len("configuration."):]
+    head, _, rest = expression.partition(".")
+    return f"{ALIASES[(file, head)]}.{rest}" if (file, head) in ALIASES and rest else None
+
+
+@functools.cache
+def controls():
+    """Every settings control of the code: (path or None, label key, tip key or None, file name)."""
+    out = []
+    for path in source_files():
+        text = read_source(path)
+        for found in CONTROL.finditer(text):
+            body = call_body(text, text.index("(", found.start()) + 1)
+            body = re.sub(r"\((configuration\.[\w.]+)\s*\?\?=\s*new\(\)\)", r"\1", body)  # (configuration.X??=new()).Y=value
+            write =re.search(r"\b(\w+)\s*=>\s*\{?\s*([\w.?]+)\s*=\s*\1\b", body)
+            out.append((setting_path(write.group(2), path.name) if write else None, found.group(2), found.group(3), path.name))
+        for found in SETTING_BOX.finditer(text):
+            out.append((setting_path(found.group(2), path.name), found.group(1), found.group(1) + "Help", path.name))
+    return out
+
+
+@functools.cache
+def declarations():
+    """{class name: {property: (type, initializer or None)}} for every class of the plugin."""
+    classes = {}
+    for path in source_files():
+        text = read_source(path)
+        heads = [(found.start(), found.group(1)) for found in CLASS.finditer(text)]
+        for found in PROPERTY.finditer(text):
+            owner = None
+            for at, name in heads:
+                if at < found.start():
+                    owner = name
+            if not owner:
+                continue
+            initial = (found.group(4) or "").strip() or None
+            if found.group(3).startswith("=>"):
+                # « private bool a=true,b; »: the declarator of the field, and its initializer if any.
+                field = BACKING.search(found.group(3))
+                line = field and re.search(rf"^\s*private\s+(?:volatile\s+|static\s+)*[\w.<>?\[\] ]+?\s+([^;]*\b{field.group(1)}\b[^;]*);", text, re.M)
+                declared = line and re.search(rf"\b{field.group(1)}\s*(?:=\s*([^,]+))?(?:,|$)", line.group(1))
+                initial = (declared.group(1) or "").strip() or None if declared else None
+            classes.setdefault(owner, {}).setdefault(found.group(2), (found.group(1).strip(), initial))
+    return classes
+
+
+def resolve(classes, path):
+    """(type, default text) of a path from Configuration, or None when a part is not a property."""
+    owner, found = "Configuration", None
+    for part in path.split("."):
+        found = classes.get(owner, {}).get(part)
+        if not found:
+            return None
+        owner = found[0].rstrip("?").split(".")[-1]
+    kind, initial = found
+    if initial is None:
+        initial = "null" if kind.endswith("?") or kind in ("string",) else "false" if kind == "bool" else \
+            "0" if kind in ("int", "uint", "long", "float", "double", "byte", "ushort") else "(empty)"
+    elif initial in ("new()", "[]") or initial.startswith("new "):
+        initial = "(empty)" if initial in ("[]",) or "List<" in initial or "Dictionary<" in initial or "HashSet<" in initial else "(object)"
+    return kind.split(".")[-1] if "<" not in kind else kind, initial.replace("TenshoAssistant.", "")
+
+
+def reset_names():
+    text = read_source(CONFIGURATION)
+    block = re.search(r"Reset\s*=\s*new HashSet<string>\s*\{(.*?)\};", text, re.S).group(1)
+    return re.findall(r'"(\w+)"', re.sub(r"//[^\n]*", "", block))
+
+
+def settings_tabs():
+    return dict(re.findall(r'\("([\w.]+)","(\w+)"\)', read_source(SETTINGS_INDEX)))
+
+
+def settings_rows():
+    """[(path or label key, kind, default, places, en text, fr text, has path)] sorted by path."""
+    classes, tabs = declarations(), settings_tabs()
+    en, fr = language("en"), language("fr")
+    rows = {}
+    for path, label, tip, file in controls():
+        key = path or f"({label})"
+        tab = tabs.get(label)
+        page = file[len("MainWindow."):-3] if file.startswith("MainWindow.") else file
+        title = text_of(en, f"PageHelp.{page}Title")
+        place = f"Settings › {tab}" if tab else f"page {title.strip()}" if title else f"`{file}`"
+        row = rows.setdefault(key, {"path": path, "places": [], "label": label, "tip": tip, "settings": False})
+        if place not in row["places"]:
+            row["places"].append(place)
+        if tab and not row["settings"]:  # the texts of the Settings page win over a page's own copy
+            row.update(label=label, tip=tip, settings=True)
+    out = []
+    for key in sorted(rows, key=str.lower):
+        row = rows[key]
+        kind, default = (resolve(classes, row["path"]) or ("?", "?")) if row["path"] else ("—", "—")
+
+        def texts(lang):
+            label = text_of(lang, row["label"]) or row["label"]
+            tip = text_of(lang, row["tip"]) if row["tip"] else None
+            return f"**{cell(label)}**" + (f" — {cell(tip)}" if tip else "")
+        out.append((key, kind, default, row["places"], texts(en), texts(fr), bool(row["path"])))
+    return out
+
+
+def settings_block():
+    rows = settings_rows()
+    covered = {row[0].split(".")[0] for row in rows if row[6]}
+    classes = declarations()
+    lines = ["| Réglage | Type | Défaut | Où | Libellé et info-bulle (en) | Libellé et info-bulle (fr) |", "|---|---|---|---|---|---|"]
+    for key, kind, default, places, en, fr, _ in rows:
+        lines.append(f"| `{key}` | {cell(kind)} | {cell(default)} | {cell(' · '.join(places))} | {en} | {fr} |")
+    hidden = [name for name in sorted(reset_names(), key=str.lower) if name not in covered]
+    lines += ["", f"Réglages remis par « Tout remettre par défaut » sans case dans l'interface ({len(hidden)}) : état de l'interface, choix "
+              "écrits par une page ou marques de migration.", "", "| Réglage | Type | Défaut |", "|---|---|---|"]
+    for name in hidden:
+        kind, default = resolve(classes, name) or ("?", "?")
+        lines.append(f"| `{name}` | {cell(kind)} | {cell(default)} |")
+    counted = sum(1 for row in rows if row[6])
+    lines += ["", f"Compté : {len(rows)} cases ({counted} reliées à `Configuration`, {len(rows) - counted} à un autre fichier), "
+              f"{len(hidden)} réglages sans case."]
+    return "\n".join(lines)
+
+
+def settings_problems():
+    problems = []
+    classes = declarations()
+    for key, kind, default, places, en, fr, has_path in settings_rows():
+        if has_path and kind == "?":
+            problems.append(f"settings: {key} is written by a control but is not a property path of Configuration")
+    for name in reset_names():
+        if name not in classes.get("Configuration", {}):
+            problems.append(f"settings: {name} of ConfigurationReset.Reset is not a property of Configuration")
+    return problems
+
+
+# -------------------------------------------------------------------------------------------------------------------------- network
+# One row per source the plugin contacts: (name, hosts, setting that turns it off or None, code files, what en, what fr).
+# The hosts and files are checked against the code: every file that makes a request is in a row (or NETWORK_LEFT_OUT), every host it
+# names is a host of a row (or NOT_CONTACTED), and every host of a row is named by one of its files.
+NETWORK = [
+    ("Universalis", ["universalis.app"], "CommunityUniversalis",
+     ["Market/MarketService.cs", "Market/MarketBoardService.cs", "Market/RetainerSales.cs"],
+     "prices, listings and history, by world and item id; with the wishlist sale alert (off by default), one request every 30 minutes at "
+     "most for up to 20 wishes that have a price",
+     "prix, annonces et historique, par monde et numéro d'objet ; avec l'alerte de vente des souhaits (désactivée par défaut), une requête "
+     "toutes les 30 minutes au plus pour 20 souhaits au plus qui ont un prix"),
+    ("Garland Tools", ["www.garlandtools.org"], "CommunityGarland", ["Community/GarlandClient.cs", "Duties/DutyLootService.cs"],
+     "item sources, duty and monster loot", "sources d'objets, butin des contenus et des monstres"),
+    ("FFXIV Console Games Wiki", ["ffxiv.consolegameswiki.com"], "CommunityWiki",
+     ["Community/WikiItemAcquisition.cs", "Duties/WikiDutyGuide.cs", "Maps/WikiVistas.cs", "Monsters/BeastWikiIndex.cs",
+      "Monsters/BlueSpellWikiIndex.cs", "Monsters/WikiMonsterSources.cs", "Island/IslandAnimals.Dalamud.cs", "Island/IslandAnimals.cs"],
+     "item acquisition, monster drops, duty guides, sightseeing log, blue magic spells, Beastmaster and island pasture pages",
+     "acquisition des objets, butin des monstres, guides des contenus, carnet d'exploration, sorts de mage bleu, pages du dresseur et du "
+     "pâturage de l'île"),
+    ("Teamcraft", ["gubal.ffxivteamcraft.com"], "CommunityTeamcraftBites", ["Community/FishBiteTimes.cs"],
+     "public reports: one GraphQL POST query carrying the fishing spot id",
+     "rapports publics : une requête GraphQL POST portant le numéro du lieu de pêche"),
+    ("LuminaSupplemental", ["raw.githubusercontent.com"], "CommunityLumina", ["Community/LuminaSupplemental.cs"],
+     "community data files (CSV) hosted on GitHub", "fichiers de données de la communauté (CSV) hébergés sur GitHub"),
+    ("GatherBuddy", ["raw.githubusercontent.com", "api.github.com"], "CommunityGatherBuddy", ["Community/GatherBuddyFish.cs"],
+     "fish data (baits, mooches, windows) hosted on GitHub", "données des poissons (appâts, remises à l'eau, fenêtres) hébergées sur GitHub"),
+    ("Fashion Report (FFXIVGachaSpreadsheet)", ["raw.githubusercontent.com"], "CommunityFashion", ["Fashion/FashionDataService.cs"],
+     "the week's Fashion Report data hosted on GitHub", "les données de la Revue de mode de la semaine, hébergées sur GitHub"),
+    ("PaissaDB", ["paissadb.zhu.codes"], "CommunityPaissa", ["Community/PaissaDb.cs"],
+     "open housing plots, by world id, on a click or with its optional watch",
+     "terrains libres, par numéro de monde, sur un clic ou avec sa surveillance facultative"),
+    ("This repository", ["raw.githubusercontent.com"], None, ["MyTools/ToolGallery.cs", "Help/CommunityHelp.cs"],
+     "community tool gallery and help videos, on a click, data only, never code",
+     "galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code"),
+    ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com"], "Discovery.AutoExchange",
+     ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs"],
+     "the common file of this repository; after « Connect GitHub » only, the player's own sightings to a secret gist and one issue "
+     "(described below); on « Exchange now » or with « Automatic exchange »",
+     "le fichier commun de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist secret et un ticket "
+     "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique »"),
+    ("Discord webhook", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled",
+     ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],
+     "HTTPS POST of alarms and alerts to the player's own webhook (described below)",
+     "envoi HTTPS POST des alarmes et alertes vers le webhook du joueur (décrit plus bas)"),
+]
+# Files that hold an HTTP client or a request without contacting a source of their own, with the reason.
+NETWORK_LEFT_OUT = {
+    "Community/BoundedHttp.cs": "the bounded reader every request goes through (timeout, size limit)",
+    "Credits/CreditCatalog.cs": "the credits page: names and links only",
+    "Diagnostics/PageSweepWindow.Dalamud.cs": "the developer page sweep: draws the pages, whose own requests are listed here",
+}
+# Hosts named by request files that are never contacted (links shown or sent as text).
+NOT_CONTACTED = {"creativecommons.org": "the CC0 licence link in the exchange's texts",
+                 "www.youtube.com": "help videos, opened in the player's browser on a click",
+                 "youtube.com": "help videos, opened in the player's browser on a click",
+                 "youtu.be": "help videos, opened in the player's browser on a click"}
+REQUEST = re.compile(r"\bHttpClient\b|\bBoundedHttp\b|\bHttpRequestMessage\b")
+HOST = re.compile(r'https?://([a-z0-9.-]+\.[a-z]{2,})|"([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|app|codes|gg|io|co|be|wiki|tv))"')
+
+
+def network_block(code):
+    en = code == "en"
+    texts = language(code)
+    labels = {path: label for path, label, _, _ in controls() if path}
+    rows = ["| Source | Hosts | Off with | Code |" if en else "| Source | Hôtes | Coupée par | Code |", "|---|---|---|---|"]
+    for name, hosts, setting, files, what_en, what_fr in NETWORK:
+        if setting:
+            label = text_of(texts, labels.get(setting, "")) or setting
+            switch = f"« {cell(label)} »"
+        else:
+            switch = "— (on a click)" if en else "— (sur un clic)"
+        code_cell = ", ".join(f"`{file}`" for file in files)
+        rows.append(f"| **{name}**: {what_en if en else what_fr} | {', '.join(f'`{host}`' for host in hosts)} | {switch} | {code_cell} |"
+                    .replace("**:", "**:" if en else "** :"))
+    return "\n".join(rows)
+
+
+def network_problems():
+    problems, listed, hosts = [], {}, set()
+    for name, row_hosts, setting, files, *_ in NETWORK:
+        hosts.update(row_hosts)
+        named = set()
+        for file in files:
+            path = SOURCE / file
+            if not path.exists():
+                problems.append(f"network: {name}: src/TenshoAssistant/{file} does not exist")
+                continue
+            listed[file] = name
+            named.update(group for found in HOST.finditer(read_source(path)) for group in found.groups() if group)
+        for host in row_hosts:
+            if host not in named:
+                problems.append(f"network: {name}: no file of the row names {host}")
+        if setting and setting not in {path for path, *_ in controls()}:
+            problems.append(f"network: {name}: {setting} is not a setting of a control")
+    for path in source_files():
+        file = path.relative_to(SOURCE).as_posix()
+        text = read_source(path)
+        if not REQUEST.search(text) or file in NETWORK_LEFT_OUT:
+            continue
+        if file not in listed:
+            problems.append(f"network: src/TenshoAssistant/{file} makes requests but is in no row (tools/docgen.py, NETWORK)")
+        for found in HOST.finditer(text):
+            host = found.group(1) or found.group(2)
+            if host not in hosts and host not in NOT_CONTACTED:
+                problems.append(f"network: src/TenshoAssistant/{file} names {host}, in no row (tools/docgen.py, NETWORK or NOT_CONTACTED)")
+    return problems
+
+
+# ------------------------------------------------------------------------------------------------------------------------ decisions
+DECISIONS = ROOT / "docs/project/DECISIONS.md"
+
+
+def decisions():
+    """[(DEC-NNN, date, problem)] in the order of the file."""
+    text = DECISIONS.read_text(encoding="utf-8").replace("\r\n", "\n")
+    out = []
+    for block in re.finditer(r"^DEC-ID: (DEC-\d+)\n(.*?)(?=^DEC-ID: |\Z)", text, re.M | re.S):
+        date = re.search(r"^Timestamp: (\d{4}-\d{2}-\d{2})", block.group(2), re.M)
+        problem = re.search(r"^Problem: (.+)$", block.group(2), re.M)
+        out.append((block.group(1), date.group(1) if date else "?", problem.group(1).strip() if problem else "?"))
+    return out
+
+
+def decisions_block():
+    rows = ["| DEC | Date | Problème |", "|---|---|---|"]
+    rows += [f"| {dec} | {date} | {cell(problem)} |" for dec, date, problem in decisions()]
+    return "\n".join(rows)
+
+
+def decisions_problems():
+    seen, problems = set(), []
+    for dec, date, problem in decisions():
+        if dec in seen:
+            problems.append(f"decisions: {dec} is written twice in docs/project/DECISIONS.md")
+        seen.add(dec)
+        if "?" in (date, problem):
+            problems.append(f"decisions: {dec} has no Timestamp or no Problem line")
+    return problems
+
+
+# ------------------------------------------------------------------------------------------------------------------------- evidence
+EVIDENCE = ROOT / "docs/evidence"
+CODE_ROOTS = ("src/", "tests/", "tools/", "scripts/", ".github/")
+
+
+def evidence_files():
+    return sorted(path.name for path in EVIDENCE.iterdir() if path.is_file() and path.name != "README.md")
+
+
+@functools.cache
+def evidence_citations():
+    """{evidence file: (code files, documents)} from the tracked files that name it (the evidence folder itself left out)."""
+    names = evidence_files()
+    cited = {name: ([], []) for name in names}
+    for path in git_files("*"):
+        if path.startswith("docs/evidence/") or not path.endswith((".cs", ".py", ".ps1", ".md", ".json", ".yml", ".csproj", ".txt")):
+            continue
+        try:
+            text = (ROOT / path).read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for name in names:
+            if name in text:
+                cited[name][0 if path.startswith(CODE_ROOTS) else 1].append(path)
+    return cited
+
+
+def evidence_block():
+    cited = evidence_citations()
+    rows = ["| Evidence · Preuve | Code and tests · Code et tests | Documents |", "|---|---|---|"]
+    for name, (code, docs) in cited.items():
+        rows.append(f"| [{name}]({name}) | {', '.join(f'`{path}`' for path in code) or '—'} | {', '.join(f'`{path}`' for path in docs) or '—'} |")
+    by_code = sum(1 for code, _ in cited.values() if code)
+    nowhere = sum(1 for code, docs in cited.values() if not code and not docs)
+    return ("\n".join(rows) + f"\n\nCounted · compté : {len(cited)} files · fichiers ; {by_code} cited by the code or the tests · citées par le "
+            f"code ou les tests ; {nowhere} cited nowhere · citées nulle part.")
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- write
 BLOCKS = [
     ("docs/README.md", "index-en", lambda: index_block("en")),
@@ -308,7 +690,16 @@ BLOCKS = [
     ("README.md", "pages-fr", lambda: pages_block("fr")),
     ("Localization/README.md", "languages-en", lambda: languages_block("en")),
     ("Localization/README.md", "languages-fr", lambda: languages_block("fr")),
+    ("docs/project/SETTINGS.md", "settings", settings_block),
+    ("SECURITY.md", "network-en", lambda: network_block("en")),
+    ("SECURITY.md", "network-fr", lambda: network_block("fr")),
+    ("docs/project/DECISIONS.md", "decisions", decisions_block),
+    ("docs/evidence/README.md", "evidence", evidence_block),
 ]
+
+
+def problems_of_sources():
+    return index_problems() + settings_problems() + network_problems() + decisions_problems()
 
 
 def produce(text, key, body):
@@ -320,8 +711,8 @@ def produce(text, key, body):
     return text[: i + len(start)] + body + text[j:]
 
 
-def documents():
-    """{file: (text on disk with \\n, text it should have)}."""
+def documents(marks=True):
+    """{file: (text on disk with \\n, text it should have)}; marks=False leaves the version marks as they are."""
     out = {}
     for name in dict.fromkeys([name for name, _, _ in BLOCKS] + list(NO_HAND_VERSION)):
         path = ROOT / name
@@ -332,7 +723,9 @@ def documents():
         for file, key, body in BLOCKS:
             if file == name:
                 new = produce(new, key, body())
-        new = VERSION_MARK.sub(f"<!-- docgen:version -->{csproj_version()}<!-- /docgen:version -->", new)
+        kept = VERSION_MARK.findall(now)
+        version = csproj_version() if marks or not kept else kept[0]  # a block's own mark keeps the file's version too
+        new = VERSION_MARK.sub(f"<!-- docgen:version -->{version}<!-- /docgen:version -->", new)
         out[name] = (now, new)
     return out
 
@@ -342,9 +735,9 @@ def main(argv):
         for file, key, body in BLOCKS:
             print(f"## {file} · {key}\n\n{body()}\n")
         return 0
-    if argv == ["write"]:
+    if argv[:1] == ["write"] and set(argv[1:]) <= {"--blocks"}:
         changed = []
-        for name, (now, new) in documents().items():
+        for name, (now, new) in documents("--blocks" not in argv).items():
             if new != now:
                 path = ROOT / name
                 crlf = b"\r\n" in path.read_bytes()  # keep the line endings of the file
@@ -352,12 +745,13 @@ def main(argv):
                 changed.append(name)
         print(f"docgen: {len(changed)} document(s) written{': ' + ', '.join(changed) if changed else ''} (version {csproj_version()})")
         errors, _ = version_problems(False)
-        for line in index_problems() + errors:
+        problems = problems_of_sources()
+        for line in problems + errors:
             print("docgen:", line)
-        return 1 if index_problems() or errors else 0
+        return 1 if problems or errors else 0
     if argv[:1] == ["check"] and set(argv[1:]) <= {"--release"}:
         release = "--release" in argv
-        problems = index_problems()
+        problems = problems_of_sources()
         for name, (now, new) in documents().items():
             # The version marks are compared apart (they follow the csproj only before a release).
             if VERSION_MARK.sub("", now) != VERSION_MARK.sub("", new) or (release and now != new):

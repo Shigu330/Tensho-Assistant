@@ -1,10 +1,60 @@
 # Décisions durables
 
-Index : 001 toolchain · 002 cycle de vie · 003 inconnu ≠ zéro (inventaire) · 004 lecture des sacs · 005 preuve de complétude ·
-006 interface commune · 007 banque servants / chocobo · 008 vue Objets & rangements · 009 ACT hors périmètre · 010 git et
-documentation · 011 ordre des sources · 012 plan avant D17 · 013 aucun autre plugin requis · 014 ordre des fenêtres (R-05) ·
-015 caches et réseau · 016 une infobulle, un menu · 017 tout dans la DLL · 018 réglages et « Tout remettre par défaut » ·
-019 inconnu ≠ aucun dans l'interface · 020 mirage depuis 7.4 · 021 données communautaires embarquées · 022 estimations signalées.
+Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
+
+<!-- docgen:decisions -->
+| DEC | Date | Problème |
+|---|---|---|
+| DEC-001 | 2026-10-27 | Choisir la toolchain réelle du nouveau plugin. |
+| DEC-002 | 2026-10-27 | Vérifier le lifecycle sans exécuter le jeu. |
+| DEC-003 | 2026-10-27 | Éviter de confondre absence dans un inventaire partiel et quantité zéro. |
+| DEC-004 | 2026-10-27 | Lire les sacs sans surinterpréter la complétude ni conserver la mémoire native. |
+| DEC-005 | 2026-10-27 | Le compteur concorde avec l'inventaire déclaré, mais affiche toujours « total inconnu » dans 0.1.0. |
+| DEC-006 | 2026-10-27 | La fenêtre de diagnostic doit préparer une interface commune aux différents outils, à la demande utilisateur. |
+| DEC-007 | 2026-10-27 | Inclure servants et chocobo dans les recherches quand leurs inventaires sont fermés, avec actualisation volontaire depuis leurs menus. |
+| DEC-008 | 2026-10-27 | L'interface sépare trop les sacs et la banque, et la recherche n'affiche pas les icônes réelles des objets. |
+| DEC-009 | 2026-10-31 | ACT/IINACT et un domaine Combat figuraient comme étude complémentaire ; dépôt git ajouté avec les archives des points de contrôle suivies. |
+| DEC-010 | 2026-10-31 | Les sauvegardes (zips de points de contrôle) et la documentation à plat devenaient lourdes et peu lisibles une fois le dépôt sur GitHub ; il fallait aussi accueillir des contributeurs. |
+| DEC-011 | 2026-10-31 | Ordre et nature des sources affichées pour « Comment l'obtenir » ; place de l'outil ALEA. |
+| DEC-012 | 2026-11-01 | Fixer ce qui reste à faire avant la publication D17 et ce qui ne sera pas fait. |
+| DEC-013 | 2026-11-01 | Compter l'arsenal, le coffre à apparence et l'armoire dans les stocks et le « possédé » de la Revue de mode. |
+| DEC-014 | 2026-11-01 | Les fenêtres de Tensho passent au-dessus des fenêtres du jeu (demande R-05). |
+| DEC-015 | 2026-11-01 | Après un échec réseau, LuminaSupplemental et GatherBuddy relançaient le téléchargement à chaque image ; une copie expirée était perdue hors ligne ; les annonces du marché n'avaient pas de cache disque. |
+| DEC-016 | 2026-11-01 | Infobulles réduites et complètes empilées pour un même objet, menus de clic droit en double ou différents selon l'endroit. |
+| DEC-017 | 2026-11-01 | Le paquet livrait une copie des fichiers de langue à côté de la DLL. |
+| DEC-018 | 2026-11-01 | Des réglages sans aide ni retour au défaut ; « remettre les réglages par défaut » doit viser tous les réglages sans perdre les données de l'utilisateur. |
+| DEC-019 | 2026-11-02 | Plusieurs vues transformaient une donnée non lue en « aucun », « non obtenu » ou 0. |
+| DEC-020 | 2026-11-02 | L'utilisateur demande d'essayer l'équipement des autres jobs : « on peut mirager tout le stuff maintenant (vérifie) ». |
+| DEC-021 | 2026-11-02 | Le butin et les seuils des sous-marins ne sont pas dans les données du jeu (décidés côté serveur). |
+| DEC-022 | 2026-11-01 | Plusieurs calculs reposent sur des règles absentes des données du jeu (communautaires ou propres à Tensho). |
+| DEC-023 | 2026-11-02 | Points « À décider / à revoir » de la feuille de route (0.316), tranchés par l'utilisateur. |
+| DEC-024 | 2026-11-02 | Règle de numérotation des versions du plugin (`<Version>` du csproj, tags `Stable-x.y.z`). |
+| DEC-025 | 2026-11-02 | Quels manques du plan c) ajouter à Tensho, dans quel ordre, et avec quels choix précis. |
+| DEC-026 | 2026-11-03 | Décisions gardées pour la fin (G-PROPOSALS, ROADMAP « Décisions reportées à la fin ») : lesquelles trancher maintenant, et comment. |
+| DEC-027 | 2026-11-03 | Sources de N-06 (escouade) et N-14 (croisements), DEC-026 point 11 ; recherche : docs/evidence/0.448-n06-n14-sources.md. |
+| DEC-028 | 2026-11-03 | A-03 / A-04 : dépendance native Raphael (licence, build hors ligne de Plogon, taille), et solveur des suggestions pendant la synthèse. |
+| DEC-029 | 2026-11-04 | Portée et ordre du chat personnalisable (CHAT-001) et des modèles communautaires (TEMPLATES-001). |
+| DEC-030 | 2026-11-04 | Le chat personnalisable décidé en DEC-029 (points C1 à C12, livré en 0.471, phases 0 et 1). |
+| DEC-031 | 2026-11-04 | Plan de première prise en main, aide, vidéos et tickets (ONBOARD-001) ; dix décisions G1 à G10. GitHub n'était plus tenu à jour depuis 0.454. |
+| DEC-032 | 2026-11-04 | Conseil d'équipe du dresseur face aux règles Dalamud (combat, contenu compétitif) ; le Dédale bestial a des classements (fenêtre XBMRanking). |
+| DEC-033 | 2026-11-04 | Six décisions ouvertes : release, conseil en match de Triple Triade, moment de la requête des ventes de servants, I-15, N-10, cadre des fenêtres du jeu. |
+| DEC-034 | 2026-11-04 | La compilation du dépôt Dalamud utilise le SDK 10.0.101 sous Linux, réseau coupé ; global.json exigeait 10.0.403 (DEC d'origine), Tensho n'aurait pas compilé chez eux, et il n'avait jamais été compilé sous Linux. |
+| DEC-035 | 2026-11-04 | Titre selon le job : sur option désactivée par défaut, le titre change sans clic au changement de job, alors que Dalamud interdit les requêtes automatiques au serveur sans action du joueur. |
+| DEC-036 | 2026-11-04 | Le plan de PR sur la liste de fabrication (0.478, 0.479) ne proposait rien sur un nœud à 5 tentatives avec 809 PR : le premier nœud vu comptait comme normal, et ses PR restaient gardés. |
+| DEC-037 | 2026-11-05 | Revue de toutes les propositions avec l'utilisateur : 100 points gardés pour avant la 1.0.0, 12 rejetés ([GLOBAL-PLAN](GLOBAL-PLAN.md)). |
+| DEC-038 | 2026-11-05 | Tensho tourne partout en JcJ et en contenu classé ; seuls les conseils de Triple Triade y sont coupés (DEC-033). |
+| DEC-039 | 2026-11-05 | Le 2026-11-05, sur le Discord de Dalamud, plusieurs membres de l'équipe jugent Tensho trop gros pour être relu et en grande partie déjà couvert par d'autres plugins. |
+| DEC-040 | 2026-11-07 | Le passage des pages de l'auto-contrôle (0.724, corrigé en 0.726) ouvre chaque page sans clic ; certaines demandent alors une source communautaire activée dans les réglages (44 requêtes au premier passage, 2 au suivant grâce au cache). |
+| DEC-041 | 2026-11-08 | Le document « a faire » demande des outils de contenus (Eurêka, Bozja, donjons profonds, île Lunule, raids fatals) avec des tableaux stratégiques ; DEC-009 a retiré le domaine Combat (seule exception : le dresseur, informations seulement, JcE, DEC-032). |
+| DEC-042 | 2026-11-08 | Le format du fichier des découvertes n'a pas de place pour le HQ, des compteurs par valeur ou des dénominateurs (taux de butin futurs) ; le changer après la 1.0.0 obligerait à migrer les fichiers de tous les joueurs. |
+| DEC-043 | 2026-11-08 | Durées des voyages de sous-marins calculées par une formule communautaire (SubmarineTracker, MIT) ; le jeu a ses propres fonctions de calcul. |
+| DEC-044 | 2026-11-08 | Pêche en mer (X-85) : quel appât déclenche le courant spectral, si les données du jeu ne le disent pas. |
+| DEC-045 | 2026-11-09 | Revue des propositions de G-PROPOSALS « À revoir avec l'utilisateur » (points 1 à 8). |
+| DEC-046 | 2026-11-09 | Maximiseur d'équipe du dresseur (demande du 2026-11-09) alors que DEC-032 excluait une « meilleure équipe » calculée sans nouvelle décision (le Dédale bestial a des classements). |
+| DEC-047 | 2026-11-09 | Aide au choix des 3 bêtes de chaque affrontement du Dédale bestial : l'écran du plateau est dans l'instance (relevé du 2026-11-09 : « Competitive cut on: territory 1339 » à l'entrée, juste après la fenêtre de mission), où DEC-038 coupe tout Tensho. |
+| DEC-048 | 2026-11-10 | Propositions 9 (X-101, alerte « souhait en vente », appel réseau automatique) et 10 (X-100, regroupement des outils et des réglages) de G-PROPOSALS. |
+| DEC-049 | 2026-11-10 | Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches. |
+<!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
 Timestamp: 2026-10-27 Europe/Brussels
