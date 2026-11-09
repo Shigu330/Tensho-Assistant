@@ -13,13 +13,18 @@ public sealed record XbmRow(uint Row, ushort Sub, object?[] Cells)
 }
 public sealed record BeastStats(int Strength, int Intelligence, int PhysicalResistance, int MagicalResistance, int Vitality);
 /// <summary>AutoAttack: the element's name for a physical one; empty for a magical one. Ranks[0] = rank 1.</summary>
-public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "")
+/// <summary>X-109 (0.980): AutoRow = the XBMElement row of the automatic attack (9 slashing, 8 piercing, 7 blunt; 0 magical).</summary>
+public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "", uint AutoRow = 0)
 {
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
 public sealed record BoardAction(string Name, string Shape, string Target);
-public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOnlyList<BoardAction> Actions);
+/// <summary>
+/// X-109 (0.980, docs/evidence/0.980-beast-teams.md): Stars = XBMBattleDetail columns 1 to 5, the stars of the game's board window, in the order
+/// Strength, Intelligence, Physical resistance, Magical resistance, Vitality (the user's capture: Chevalier du plateau 2, 1, 2, 2, 3); WeaknessRow = its XBMElement row.
+/// </summary>
+public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOnlyList<BoardAction> Actions, BeastStats? Stars = null, uint WeaknessRow = 0);
 public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies);
 public sealed record BoardBonus(string Name, string Condition, int Points);
 public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses);
@@ -46,20 +51,22 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         var elements = sheets["XBMElement"].ToDictionary(row => row.Row, row => row.Text(0));
         string Element(uint row) => elements.GetValueOrDefault(row, "");
         // Action.AttackType 1, 2, 3 = slashing, piercing, blunt; their XBMElement rows are 9, 8, 7 (Cu sith: 45187, « piercing » on the game's sheet).
-        string Auto(uint action) => attackType(action) switch { 1 => Element(9), 2 => Element(8), 3 => Element(7), _ => "" };
+        uint AutoRow(uint action) => attackType(action) switch { 1 => 9u, 2 => 8u, 3 => 7u, _ => 0u };
+        string Auto(uint action) => AutoRow(action) is var element and not 0 ? Element(element) : "";
         var grow = sheets["XBMPetParamGrow"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub)
             .Select(row => new BeastStats(row.Int(0), row.Int(1), row.Int(2), row.Int(3), row.Int(4))).ToArray());
         var beasts = sheets["XBMPet"].Where(row => row.Row != 0 && row.UInt(4) != 0).Select(row => new Beast(row.Row, Capitalize(petName(row.UInt(0))), row.UInt(4),
             familyName(row.Int(1)), Auto(row.UInt(5)), row.Text(9), row.Text(10), Array.AsReadOnly(grow.GetValueOrDefault(row.UInt(2)) ?? []),
             // 0.688 (user report): columns 6 and 7, where the beast is caught: docs/evidence/0.688-beast-places.md.
-            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "")).ToArray();
+            catchPlace?.Invoke(row.Int(6), row.UInt(7)) ?? "", AutoRow(row.UInt(5)))).ToArray();
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
         var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), "")));
         var enemies = sheets["XBMBattleDetail"].Where(row => row.UInt(0) != 0).GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub).Select(row =>
             new BoardEnemy(Capitalize(enemyName(row.UInt(0))), row.UInt(10), Element(row.UInt(8)),
-                Array.AsReadOnly(new[] { row.UInt(6), row.UInt(7) }.Where(id => id != 0 && actions.ContainsKey(id)).Select(id => actions[id]).ToArray()))).ToArray());
+                Array.AsReadOnly(new[] { row.UInt(6), row.UInt(7) }.Where(id => id != 0 && actions.ContainsKey(id)).Select(id => actions[id]).ToArray()),
+                new BeastStats(row.Int(1), row.Int(2), row.Int(3), row.Int(4), row.Int(5)), row.UInt(8))).ToArray());
         var battles = sheets["XBMContentBattle"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub).ToArray());
         var bonuses = sheets["XBMScoreBonus"].OrderBy(row => row.Row).ToArray();
         var boards = sheets["XBMContent"].Where(row => row.Row != 0 && row.UInt(0) != 0).Select(row =>

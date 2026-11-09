@@ -5,8 +5,8 @@ using TenshoAssistant.Beastmaster;
 namespace TenshoAssistant;
 
 // Progression › Beastmaster (0.500, user request): the beasts, with their attributes at a chosen rank, and the boards of the Beast Labyrinth with
-// their enemies and bonuses. Reads only. No team advice yet: what makes a beast better against an enemy is not established
-// (docs/evidence/0.500-xbm-columns.md).
+// their enemies and bonuses. Reads only. 0.980 (X-109, DEC-046): a team tab, prepared out of combat, following plain rules said on the page
+// (docs/evidence/0.980-beast-teams.md).
 internal sealed partial class MainWindow
 {
     internal BeastService? Beasts { get; set; }
@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
         [
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
             ("Boards", localization.Get("BeastUi.Boards"), () => DrawBeastBoards(catalog)),
+            ("Team", localization.Get("BeastUi.Team"), () => DrawBeastTeam(state, catalog)),
         ], ref beastTabFocus);
     }
 
@@ -122,9 +123,8 @@ internal sealed partial class MainWindow
         finally { ImGui.EndTable(); }
     }
 
-    private void DrawBeastBoards(BeastCatalog catalog)
+    private Board DrawBeastBoardChoice(BeastCatalog catalog)
     {
-        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
         beastBoard = Math.Clamp(beastBoard, 0, catalog.Boards.Count - 1);
         var board = catalog.Boards[beastBoard];
         ImGui.SetNextItemWidth(320);
@@ -134,6 +134,84 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("BeastUi.BoardTip");
+        return board;
+    }
+
+    // X-109 (0.980, DEC-046): the 10 beasts for a board and the 3 of each fight, prepared out of combat, kept on disk (BeastTeams.json).
+    internal Func<string>? BeastTeamsFile { get; set; }
+    private BeastTeams.SavedPlans? beastPlans;
+    private bool beastPlansLoaded;
+    private Task<BoardPlan>? beastPlanTask;
+    private (uint Board, string Key)? beastPlanFor;
+    internal BoardPlan? BeastPlanFor(Board board, BeastState state)
+    {
+        if (!beastPlansLoaded)
+        {
+            beastPlansLoaded = true;
+            try { if (BeastTeamsFile?.Invoke() is { } file && File.Exists(file)) beastPlans = BeastTeams.Read(File.ReadAllText(file)); }
+            catch (Exception error) { log.Warning(error, "Beast team plans unreadable."); }
+            beastPlans ??= new([], []);
+        }
+        var key = BeastTeams.Key(state.Obtained, BeastRanks);
+        if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
+        {
+            beastPlanTask = null;
+            if (done.IsCompletedSuccessfully)
+            {
+                beastPlans!.Plans[wanted.Board] = done.Result; beastPlans.Keys[wanted.Board] = wanted.Key;
+                try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+                catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+            }
+        }
+        if (beastPlans!.Keys.GetValueOrDefault(board.Id) == key && beastPlans.Plans.TryGetValue(board.Id, out var plan)) return plan;
+        if (beastPlanTask is null && state.Catalog is { } catalog)
+        {
+            var held = state.Obtained; var ranks = BeastRanks;
+            beastPlanFor = (board.Id, key);
+            beastPlanTask = Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, held, ranks));
+        }
+        return beastPlans.Plans.GetValueOrDefault(board.Id);
+    }
+    /// <summary>X-109: each beast's rank when read in the game's team window (later version); null: unknown, the board's limit is assumed.</summary>
+    internal IReadOnlyDictionary<uint, int>? BeastRanks { get; set; }
+
+    private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
+    {
+        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
+        var board = DrawBeastBoardChoice(catalog);
+        ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
+        if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
+        DrawBeastPlan(plan, board, catalog, state.Obtained is null);
+    }
+
+    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown)
+    {
+        Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+        if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
+        if (plan.RanksAssumed) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", board.RankLimit));
+        ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
+        foreach (var pick in plan.Team)
+        {
+            if (Of(pick.Beast) is not { } beast) continue;
+            DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
+            ImGui.TextUnformatted(localization.Format("BeastUi.TeamBeast", beast.Name, pick.Rank, beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical")));
+        }
+        ImGui.Spacing();
+        foreach (var battle in plan.Battles)
+        {
+            if (battle.Battle >= board.Battles.Count) continue;
+            var fight = board.Battles[battle.Battle];
+            ImGui.TextColored(Accent, fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", battle.Battle));
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.TeamHit", battle.WeaknessesHit, battle.Enemies));
+            ImGui.TextDisabled("    " + string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
+            ImGui.TextUnformatted("    → " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+        }
+    }
+
+    private void DrawBeastBoards(BeastCatalog catalog)
+    {
+        if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
+        var board = DrawBeastBoardChoice(catalog);
         ImGui.TextUnformatted(localization.Format("BeastUi.BoardLine", board.Level, board.ItemLevel, board.TeamSize, board.RankLimit));
         ImGui.TextDisabled(localization.Get("BeastUi.WeaknessNote"));
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("BeastUi.Enemies"), ImGuiTreeNodeFlags.DefaultOpen))
@@ -147,6 +225,8 @@ internal sealed partial class MainWindow
                     DrawSmallGameIcon(enemy.Icon); ImGui.SameLine();
                     ImGui.TextUnformatted(enemy.Name);
                     if (enemy.Weakness.Length > 0) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.Weakness", enemy.Weakness)); }
+                    // X-109 (0.980): the game's stars of the enemy (same order as its board window).
+                    if (enemy.Stars is { } stars) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality)); }
                     foreach (var action in enemy.Actions)
                         ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Shape, action.Target }.Where(part => part.Length > 0)));
                 }

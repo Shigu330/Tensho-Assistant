@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.980.0
+- Plan global, Verify : Dresseur (X-109, DEC-046) : nouvel onglet « Équipe » de la page Dresseur. Pour un plateau, Tensho propose les 10 bêtes à emmener et, pour chaque combat, les 3 à appeler parmi elles, préparés hors combat. Le jeu ne donne pas la formule des combats : Tensho suit des règles simples, affichées sur la page (toucher la faiblesse du plus d'ennemis possible, puis l'attaque face à leurs résistances, puis la défense). Les étoiles des ennemis (Force, Intelligence, résistances, Vitalité) sont lues dans les feuilles du jeu et montrées sur l'onglet des plateaux ; elles correspondent à votre capture. Le résultat est gardé sur le disque (BeastTeams.json). Les rangs de vos bêtes ne sont pas encore lus : la limite du plateau est supposée, et c'est dit. Non validé en jeu.
+- Tests : BeastTeams980Tests. Verify.ps1 (agent) : 1611/1611, 0 avertissement, 0 erreur ; DLL 0.980.0.0. Non validé en jeu.
+### English
+- Beastmaster (X-109, DEC-046): new « Team » tab on the Beastmaster page. For a board, Tensho offers the 10 beasts to bring and, for each fight, the 3 to call among them, prepared out of combat. The game gives no formula of the fights: Tensho follows plain rules shown on the page (hit the weakness of as many enemies as possible, then attack against their resistances, then defence). The enemies' stars (Strength, Intelligence, resistances, Vitality) are read from the game's sheets and shown on the boards tab; they match your capture. The result is kept on disk (BeastTeams.json). Your beasts' ranks are not read yet: the board's limit is assumed, and said. Not validated in game.
+
 ## 0.979.0
 - Plan global, Verify : Dédale bestial (X-109, DEC-047), relevé pour l'essai de ce soir : en mode développeur et seulement dans le Dédale, Tensho écrit au journal, à chaque changement, l'état « en combat » du jeu, l'état « en mission » et les noms des fenêtres visibles (lecture seule, deux fois par seconde). Il servira à trouver le moment exact où un combat commence, avant d'activer le panneau d'équipe entre les combats. Tout le reste de Tensho reste coupé dans le Dédale. Décisions DEC-046 et DEC-047 et plan X-108 à X-111 notés. Non validé en jeu.
 - Tests : Labyrinth979Tests. Verify.ps1 (agent) : 1608/1608, 0 avertissement, 0 erreur ; DLL 0.979.0.0. Non validé en jeu.

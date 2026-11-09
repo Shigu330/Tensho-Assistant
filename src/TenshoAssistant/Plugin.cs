@@ -727,6 +727,8 @@ public sealed class Plugin : IDalamudPlugin
                 ? expansionTerritory.ExVersion.Value.Name.ExtractText():null;
             mainWindow.QuestExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id) is { } expansionQuest && expansionQuest.Expansion.IsValid
                 ? expansionQuest.Expansion.Value.Name.ExtractText():null;
+            // X-109 (0.980): the beast team plans kept on disk.
+            mainWindow.BeastTeamsFile=()=>Path.Combine(pluginInterface.GetPluginConfigDirectory(),"BeastTeams.json");
             mainWindow.GrandCompanyNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GrandCompany>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.EquippedGearUnavailable=()=>gear?.Unavailable==true;
             // 0.333: names of the squadron's mission and training (Reminders).
