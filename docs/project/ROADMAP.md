@@ -78,72 +78,31 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 
 ## To decide / to review
 
-Points still open, as noted at 0.512: each waits for an in-game record or is settled in a step of the plan. No value is guessed meanwhile.
-ONBOARD-001 and TEMPLATES-001 are agent goal sheets, outside the repository.
+<!-- gen:decisions:en -->
+Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| Point | Source | Finding | Record or step expected |
+| N° | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
-| Getting started, help, videos, issues | ONBOARD-001 | The 8 slices coded (0.502 to 0.506), DEC-031 | In-game validation; a release for the video list |
-| Community templates | TEMPLATES-001, [DEC-029](DECISIONS.md) | Finished on the code side in 0.476 | In-game validation; gallery visible after a release |
-| « Cost ≤ capacity » rule below rank 50 | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Cost ≤ capacity » | Rule of the community tools. Consistent with 11 published airship builds; not checked in game below rank 50. | In-game record on a vessel below rank 50. |
-| Marker type of leves | CHANGELOG 0.298 | The log shows types 0, 3 (quests), 4 and 6; no record says which one is a leve. | In-game record: leve accepted, map open, developer mode. |
-| Flag icon 60561 | `MainWindow.MapView.cs` (`FlagIcon`); CHANGELOG 0.102 (« assumed »); map audit 0.328 | The flag icon id is not proven in docs/evidence (placing the flag is validated in game). | In-game record: flag placed, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` read on the framework (probe), log in docs/evidence. |
-| Quest icons 71141 / 71151 | [BACKLOG](BACKLOG.md); [0.211-event-icons](../evidence/0.211-event-icons.md) | The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». |
-| Estimated Bountiful bonus (0.224) | [BACKLOG](BACKLOG.md), « Review of open points »; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) | Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. |
-| Materia: piece on several slots | [0.312-materia](../evidence/0.312-materia.md), « Not checked in game » | A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). |
-| Useful missing settings | R-06 step 5; audit of point d) (2026-11-02) | DONE 0.327 (re-read 2026-11-03): number of search results, market scope remembered, Triple Triad helpers, automatic computation of the crafting log, hover hidden during a duty, chat line silenced during a duty, opening page, parts of the hover panel. | In-game tests. |
-
-### Decisions left for the end (agent's provisional choice, to confirm)
-
-Batch of 2026-11-03 ([DEC-026](DECISIONS.md)): « Monsters on hover » removed (0.447); inventory 250 ms: DEC-004 kept, sort editor kept on
-screen (0.447); line endings: nothing to normalize; GitHub: protections, Dependabot and CI build turned on (0.447); memoquartz: 80 %
-confirmed; choices of g) (G-PROPOSALS) confirmed as a block. The other rows remain to confirm during the in-game tests.
-
-| Point | Provisional choice | Where to change it |
-|---|---|---|
-| R-12 Discord: defaults | Sending off; every category ticked; message « ⏰ [label] : dans [minutes] min ([time]) »; name « Tensho »; character name not sent. Since 0.778 (X-23), each new alarm has its Discord box off. | Settings › Alarms › Discord |
-| R-12 Discord: rate | Two seconds at least between two messages, a queue of 20 messages (the oldest dropped past that), three tries at most on « 429 ». | `Alarms/DiscordNotifier.cs` |
-| Fashion Report: source turned off (0.321) | No more download; a recent copy kept on disk stays shown. | `Fashion/FashionDataService.cs` |
-| « Reset everything to default » (0.321) | The folded groups of the navigation are kept (interface state); the map settings, including the icon sizes and priorities per map, are reset. | `Configuration.cs` (ConfigurationReset) |
-| New order of Release.ps1 (0.323) | Checks, tag and GitHub release with the zip, then main (repo.json) last; resumes if the tag exists without a release. | `scripts/Release.ps1` |
-| GitHub Actions and Dependabot (0.323) | **Turned on in 0.447** (DEC-026); job building like Dalamud added in 0.512. | `.github/`, [publish/github](../../publish/github/README.md) |
-| Protections of the GitHub repository (0.323) | **Turned on in 0.447** (DEC-026): force push and deletion forbidden on main and Devloppement, Stable-* tags protected. | GitHub settings |
-| Line endings eol=lf (0.323) | **Nothing to normalize** (DEC-026). | `.gitattributes` |
-| Code of conduct, CODEOWNERS, pre-push hook (0.323) | Not created (code of conduct, CODEOWNERS); hook ready, inactive (`git config core.hooksPath .githooks` to turn it on). | `.githooks/pre-push` |
-| R-13 Credits: partial settings | Settled provisionally in 0.324 (recommended choice applied): the Garland and wiki switches cut their whole source, Universalis has its own switch (on by default) with « price on hover » below it; copies kept stay shown. To confirm or change at the end. | `Configuration.cs`, services of `Plugin.cs` |
-| R-12 Discord: alarms written in the game's list | They ring in the game and are still sent to Discord. | `Alarms/AlarmService.Dalamud.cs` (Ring) |
-| Tooltip test (0.325) | Ratchet (a list of exceptions that only shrinks) and regular expressions, without dependency; no zero tolerance and no Roslyn. | `tests/TenshoAssistant.Tests/TooltipRatchet325Tests.cs`, `tooltip-baseline.txt` |
-| Step g): proposals and provisional choices | Kept along g) in [G-PROPOSALS](G-PROPOSALS.md): provisional choices applied, ideas found while coding, gaps left for an in-game session. | [G-PROPOSALS](G-PROPOSALS.md) |
-| Currency alerts (I-02, 0.344) | Agent's provisional choices: threshold 80 % of the cap for all; without a Grand Company, no seal alert; a currency already above at load is listed without a message; no reminder at login. Crystals, leves and gil not followed. To confirm or change. | `Inventory/Currencies.cs`, `MainWindow.Currencies.cs` |
-| Refresh key of the hovered price (I-01, 0.343) | Agent's provisional choice: Ctrl+Alt during the hover (the F keys and letters are taken by the game), adjustable (can be turned off). | `MainWindow.MarketHover.cs`, `Items/ItemHoverReader.Dalamud.cs` |
-| Map, items, crafting and gathering, other tools: what to add (step e) | Proposals of the audit of 2026-11-02, partly done since; each proposal has its « State » line. | [MAP-PROPOSALS](MAP-PROPOSALS.md), [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md), [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md), [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) |
-| Inventory cleared 250 ms at each change (audit 0.329, defect 7) | Not fixed: the fix contradicts DEC-004 (« atomic invalidation, coalesced collection 250 ms ») and its tests. Recommended: keep DEC-004 and let the sort editor keep the last complete list (never for the preview or the sort). | `MainWindow.SortPreview.cs`; DEC-004 |
-| Frame of the game windows (0.332) | **Removed in 0.510** (DEC-033, user's decision). | — |
-| Squadron in R-11 step 4 (probe 0.332) | A squadron member's gear is only an appearance (glamour, dyes), without stats: nothing to plan. Applied in 0.340 (barding done, squadron not planned); to confirm at the end. | [0.332-squadron-probe](../evidence/0.332-squadron-probe.md) |
-| « Monsters on hover » without effect (noted in 0.327) | **Removed in 0.447** (DEC-026). | — |
-| Immediate deletions (0.325) | Two-click confirmation for « Delete all » of an alarm group only; elsewhere (alarm, deck, storage template, crafting sequence), a tooltip says the deletion is immediate. | `MainWindow.Alarms.cs` |
-
-### Decided on 2026-11-02 ([DEC-023](DECISIONS.md))
-
-| Point | Decision |
-|---|---|
-| Submarine loot threshold table | Keep the SubmarineTracker table; on the 19 sectors where it is below every record, the tier carries the note « not confirmed by the records ». |
-| Value of submarine routes | Add the market price (Universalis) beside the NPC price, and the surveillance / retrieval tiers if the source splits the records by tier. |
-| Airship unlock tree | LuminaSupplemental data (GPL-3.0) embedded in the DLL, with the licence notice in the file. |
-| Airship route planner | Distance and duration only; the loot is shown « unknown », never estimated. |
-| Materia: overmelding rate | Read the success rate from the game data and show it per advanced slot. |
-| Character page removed (0.341, user request) | The Gear page shows the same real values. The panel beside the game's Character window is kept (decided by the user on 2026-11-02). |
-| Other gear (R-11 step 4) | Chocobo barding: DONE 0.340 ([evidence](../evidence/0.340-chocobo-barding.md)). Squadron: appearance only, left out. |
-| Reminders: squadron, Ehcatl Gliders | Probe a readable time in the game's memory (FFXIVClientStructs); otherwise leave it aside. |
-| Seasonal events (R-09) | DONE 0.342: game data only (running events, quests, NPCs and shops of the layers); names from the guide NPC (French) or LuminaSupplemental; no future dates. |
-| Game frames and textures (ULD) | Frame removed in 0.510 (DEC-033). |
-| D17 publication | Replaced by DEC-039 (2026-11-05): no submission, the custom repository only. |
-| German and Japanese translations | Kept in the package (partial, English fallback). |
-| Tone of the French texts | « vous » everywhere (done 0.317, automatic test). |
-| Ocean fishing | Calendar (« Ocean fishing » page) and help during the voyage; game data (IKDRoute, IKDRouteTable, IKDSpot). |
-| Additions to the 17 tools | Taken into plan c): adaptive rotation (A-04), armoury and automatic sort (I-14, later). |
-| EUPL-1.2 licence | Compatible with GPL v3 through its clause (notice required): Tourist, Glamaholic, Quest Map, Better Party Finder (DEC-025). |
-| `FilteredTable` template | Removed from the plan (agent's choice, rule « no premature abstraction »): to create at the first real repeated need. |
+| D-83 | Getting started, help, videos, issues: The 8 slices coded (0.502 to 0.506), DEC-031 | In-game validation; a release for the video list | ONBOARD-001 |
+| D-84 | Community templates: Finished on the code side in 0.476 | In-game validation; gallery visible after a release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
+| D-85 | « Cost ≤ capacity » rule below rank 50: Rule of the community tools. Consistent with 11 published airship builds; not checked in game below rank 50. | In-game record on a vessel below rank 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
+| D-86 | Marker type of leves: The log shows types 0, 3 (quests), 4 and 6; no record says which one is a leve. | In-game record: leve accepted, map open, developer mode. | CHANGELOG 0.298 |
+| D-87 | Flag icon 60561: The flag icon id is not proven in docs/evidence (placing the flag is validated in game). | In-game record: flag placed, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` read on the framework (probe), log in docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
+| D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
+| D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
+| D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-92 | R-12 Discord: defaults | Sending off; every category ticked; message « ⏰ [label] : dans [minutes] min ([time]) »; name « Tensho »; character name not sent. Since 0.778 (X-23), each new alarm has its Discord box off. | Réglages › Alarmes › Discord |
+| D-93 | R-12 Discord: rate | Two seconds at least between two messages, a queue of 20 messages (the oldest dropped past that), three tries at most on « 429 ». | `Alarms/DiscordNotifier.cs` |
+| D-94 | Fashion Report: source turned off (0.321) | No more download; a recent copy kept on disk stays shown. | `Fashion/FashionDataService.cs` |
+| D-95 | « Reset everything to default » (0.321) | The folded groups of the navigation are kept (interface state); the map settings, including the icon sizes and priorities per map, are reset. | `Configuration.cs` (ConfigurationReset) |
+| D-96 | New order of Release.ps1 (0.323) | Checks, tag and GitHub release with the zip, then main (repo.json) last; resumes if the tag exists without a release. | `scripts/Release.ps1` |
+| D-100 | Code of conduct, CODEOWNERS, pre-push hook (0.323) | Not created (code of conduct, CODEOWNERS); hook ready, inactive (`git config core.hooksPath .githooks` to turn it on). | `.githooks/pre-push` |
+| D-101 | R-13 Credits: partial settings | Settled provisionally in 0.324 (recommended choice applied): the Garland and wiki switches cut their whole source, Universalis has its own switch (on by default) with « price on hover » below it; copies kept stay shown. To confirm or change at the end. | `Configuration.cs`, services de `Plugin.cs` |
+| D-102 | R-12 Discord: alarms written in the game's list | They ring in the game and are still sent to Discord. | `Alarms/AlarmService.Dalamud.cs` (Ring) |
+| D-103 | Tooltip test (0.325) | Ratchet (a list of exceptions that only shrinks) and regular expressions, without dependency; no zero tolerance and no Roslyn. | `tests/TenshoAssistant.Tests/TooltipRatchet325Tests.cs`, `tooltip-baseline.txt` |
+| D-110 | Squadron in R-11 step 4 (probe 0.332) | A squadron member's gear is only an appearance (glamour, dyes), without stats: nothing to plan. Applied in 0.340 (barding done, squadron not planned); to confirm at the end. | [0.332-squadron-probe](../evidence/0.332-squadron-probe.md) |
+| D-112 | Immediate deletions (0.325) | Two-click confirmation for « Delete all » of an alarm group only; elsewhere (alarm, deck, storage template, crafting sequence), a tooltip says the deletion is immediate. | `MainWindow.Alarms.cs` |
+<!-- /gen:decisions:en -->
 
 ## In-game tests
 
@@ -237,72 +196,31 @@ donnée prise sur des sites web).
 
 ## À décider / à revoir
 
-Points encore ouverts, notés au 0.512 : chacun attend un relevé en jeu ou se règle dans une étape du plan. Aucune valeur n'est devinée en
-attendant. ONBOARD-001 et TEMPLATES-001 sont des fiches d'objectifs de l'agent, hors du dépôt.
+<!-- gen:decisions:fr -->
+Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| Point | Source | Constat | Relevé ou étape attendus |
+| N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
-| Prise en main, aide, vidéos, tickets | ONBOARD-001 | Les 8 lots codés (0.502 à 0.506), DEC-031 | Validation en jeu ; une release pour la liste de vidéos |
-| Modèles de la communauté | TEMPLATES-001, [DEC-029](DECISIONS.md) | Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release |
-| Règle « coût ≤ capacité » sous le rang 50 | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » | Règle des outils de la communauté. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. |
-| Type de marqueur des mandats | CHANGELOG 0.298 | Le journal montre les types 0, 3 (quêtes), 4 et 6 ; aucun relevé ne dit lequel désigne un mandat. | Relevé en jeu : mandat accepté, carte ouverte, mode développeur. |
-| Icône du drapeau 60561 | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 | L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. |
-| Icônes de quête 71141 / 71151 | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) | Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». |
-| Bonus d'Abondance estimé (0.224) | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) | Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. |
-| Matérias : pièce sur plusieurs emplacements | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » | Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). |
-| Réglages utiles manquants | R-06 étape 5 ; audit du point d) (2026-11-02) | FAIT 0.327 (relu le 2026-11-03) : nombre de résultats de recherche, portée du marché mémorisée, aides Triple Triad, calcul automatique du carnet, survol masqué en mission, silence en mission de la ligne de discussion, page d'ouverture, parties du panneau au survol. | Tests en jeu. |
-
-### Décisions reportées à la fin (choix provisoire de l'agent, à confirmer)
-
-Lot du 2026-11-03 ([DEC-026](DECISIONS.md)) : « Monstres au survol » retiré (0.447) ; inventaire 250 ms : DEC-004 gardée, éditeur du tri
-gardé à l'écran (0.447) ; fins de ligne : rien à normaliser ; GitHub : protections, Dependabot et compilation en CI activés (0.447) ;
-mémoquartz : 80 % confirmé ; choix de g) (G-PROPOSALS) confirmés en bloc. Les autres lignes restent à confirmer pendant les tests en jeu.
-
-| Point | Choix provisoire | Où le changer |
-|---|---|---|
-| R-12 Discord : valeurs par défaut | Envoi désactivé ; toutes les catégories cochées ; message « ⏰ [label] : dans [minutes] min ([time]) » ; nom « Tensho » ; nom du personnage non envoyé. Depuis la 0.778 (X-23), chaque nouvelle alarme a sa case Discord décochée. | Réglages › Alarmes › Discord |
-| R-12 Discord : débit | Deux secondes au moins entre deux messages, file de 20 messages (les plus anciens écartés au-delà), trois essais au plus sur « 429 ». | `Alarms/DiscordNotifier.cs` |
-| Revue de mode : source coupée (0.321) | Plus aucun téléchargement ; une copie récente gardée sur disque reste affichée. | `Fashion/FashionDataService.cs` |
-| « Tout remettre par défaut » (0.321) | Les groupes repliés de la navigation sont gardés (état de l'interface) ; les réglages de la carte, dont les tailles et priorités d'icônes par carte, sont remis à zéro. | `Configuration.cs` (ConfigurationReset) |
-| Nouvel ordre de Release.ps1 (0.323) | Contrôles, tag et release GitHub avec le zip, puis main (repo.json) en dernier ; reprise si le tag existe sans release. | `scripts/Release.ps1` |
-| GitHub Actions et Dependabot (0.323) | **Activés en 0.447** (DEC-026) ; job de compilation à la manière de Dalamud ajouté en 0.512. | `.github/`, [publish/github](../../publish/github/README.md) |
-| Protections du dépôt GitHub (0.323) | **Activées en 0.447** (DEC-026) : push forcé et suppression interdits sur main et Devloppement, tags Stable-* protégés. | réglages GitHub |
-| Fins de ligne eol=lf (0.323) | **Rien à normaliser** (DEC-026). | `.gitattributes` |
-| Code de conduite, CODEOWNERS, hook pre-push (0.323) | Non créés (code de conduite, CODEOWNERS) ; hook prêt, inactif (`git config core.hooksPath .githooks` pour l'activer). | `.githooks/pre-push` |
-| R-13 Crédits : réglages partiels | Résolu à titre provisoire en 0.324 (choix recommandé appliqué) : les interrupteurs Garland et wiki coupent toute leur source, Universalis a son propre interrupteur (activé par défaut) avec « prix au survol » en dessous ; les copies gardées restent affichées. À confirmer ou à changer à la fin. | `Configuration.cs`, services de `Plugin.cs` |
-| R-12 Discord : alarmes écrites dans la liste du jeu | Elles sonnent dans le jeu et partent quand même sur Discord. | `Alarms/AlarmService.Dalamud.cs` (Ring) |
-| Test des infobulles (0.325) | Cliquet (liste d'exceptions qui ne fait que diminuer) et expressions régulières, sans dépendance ; pas de tolérance zéro ni de Roslyn. | `tests/TenshoAssistant.Tests/TooltipRatchet325Tests.cs`, `tooltip-baseline.txt` |
-| Étape g) : propositions et choix provisoires | Tenus au fil de g) dans [G-PROPOSALS](G-PROPOSALS.md) : choix provisoires appliqués, idées repérées en codant, écarts laissés pour une séance en jeu. | [G-PROPOSALS](G-PROPOSALS.md) |
-| Alertes de monnaies (I-02, 0.344) | Choix provisoires de l'agent : seuil de 80 % du plafond pour toutes ; sans Grande Compagnie, pas d'alerte de sceaux ; une monnaie déjà au-dessus au chargement est listée sans message ; pas de rappel à la connexion. Cristaux, mandats et gils non suivis. À confirmer ou changer. | `Inventory/Currencies.cs`, `MainWindow.Currencies.cs` |
-| Touche d'actualisation du prix survolé (I-01, 0.343) | Choix provisoire de l'agent : Ctrl+Alt pendant le survol (les touches F et les lettres sont prises par le jeu), réglable (désactivable). | `MainWindow.MarketHover.cs`, `Items/ItemHoverReader.Dalamud.cs` |
-| Carte, objets, artisanat et récolte, autres outils : quoi ajouter (étape e) | Propositions de l'audit du 2026-11-02, en partie faites depuis ; chaque proposition a sa ligne « État ». | [MAP-PROPOSALS](MAP-PROPOSALS.md), [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md), [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md), [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) |
-| Inventaire vidé 250 ms à chaque changement (audit 0.329, défaut 7) | Non corrigé : la correction contredit DEC-004 (« invalidation atomique, collecte coalescée 250 ms ») et ses tests. Recommandé : garder DEC-004 et faire garder à l'éditeur de tri la dernière liste complète (jamais pour l'aperçu ni le tri). | `MainWindow.SortPreview.cs` ; DEC-004 |
-| Cadre des fenêtres du jeu (0.332) | **Retiré en 0.510** (DEC-033, décision de l'utilisateur). | — |
-| Escouade dans R-11 étape 4 (sonde 0.332) | L'équipement d'un membre d'escouade n'est qu'une apparence (mirage, teintures), sans caractéristiques : rien à planifier. Appliqué en 0.340 (barde faite, escouade non planifiée) ; à confirmer à la fin. | [0.332-squadron-probe](../evidence/0.332-squadron-probe.md) |
-| « Monstres au survol » sans effet (relevé en 0.327) | **Retiré en 0.447** (DEC-026). | — |
-| Suppressions immédiates (0.325) | Confirmation en deux clics pour « Tout supprimer » d'un groupe d'alarmes seulement ; ailleurs (alarme, deck, modèle de rangement, séquence d'artisanat), une infobulle dit que la suppression est immédiate. | `MainWindow.Alarms.cs` |
-
-### Décidé le 2026-11-02 ([DEC-023](DECISIONS.md))
-
-| Point | Décision |
-|---|---|
-| Table des seuils de butin des sous-marins | Garder la table SubmarineTracker ; sur les 19 secteurs où elle est sous toutes les observations, le palier porte la mention « non confirmé par les relevés ». |
-| Valeur des trajets de sous-marin | Ajouter le prix du marché (Universalis) à côté du prix PNJ, et les paliers de surveillance / récupération si la source sépare les relevés par palier. |
-| Arbre de déblocage des dirigeables | Données de LuminaSupplemental (GPL-3.0) embarquées dans la DLL, avec l'avis de licence dans le fichier. |
-| Planificateur de trajets de dirigeable | Distance et durée seulement ; le butin est affiché « inconnu », jamais estimé. |
-| Matérias : taux de surmatérialisation | Lire le taux de réussite dans les données du jeu et l'afficher par emplacement avancé. |
-| Page Personnage retirée (0.341, demande de l'utilisateur) | La page Équipement montre les mêmes valeurs réelles. Le panneau à côté de la fenêtre Personnage du jeu est gardé (décidé par l'utilisateur le 2026-11-02). |
-| Autres équipements (R-11 étape 4) | Barde de chocobo : FAITE 0.340 ([preuve](../evidence/0.340-chocobo-barding.md)). Escouade : apparence seulement, retirée. |
-| Rappels : escouade, Planeurs d'Ehcatl | Sonder une heure lisible dans la mémoire du jeu (FFXIVClientStructs) ; sinon laisser de côté. |
-| Événements saisonniers (R-09) | FAIT 0.342 : données du jeu seulement (événements en cours, quêtes, PNJ et boutiques des calques) ; noms par le PNJ guide (français) ou LuminaSupplemental ; pas de dates à venir. |
-| Cadres et textures du jeu (ULD) | Cadre retiré en 0.510 (DEC-033). |
-| Publication D17 | Remplacée par DEC-039 (2026-11-05) : pas de soumission, le dépôt personnalisé seulement. |
-| Traductions allemande et japonaise | Gardées dans le paquet (partielles, repli anglais). |
-| Ton des textes français | Vouvoiement partout (fait 0.317, test automatique). |
-| Pêche en mer | Calendrier (page « Pêche en mer ») et aide pendant la traversée ; données du jeu (IKDRoute, IKDRouteTable, IKDSpot). |
-| Compléments des 17 outils | Repris dans le plan c) : rotation adaptative (A-04), tri de l'arsenal et automatique (I-14, plus tard). |
-| Licence EUPL-1.2 | Compatible avec la GPL v3 par sa clause (avis requis) : Tourist, Glamaholic, Quest Map, Better Party Finder (DEC-025). |
-| Modèle `FilteredTable` | Retiré du plan (choix de l'agent, règle « pas d'abstraction prématurée ») : à créer au premier besoin réel répété. |
+| D-83 | Prise en main, aide, vidéos, tickets : Les 8 lots codés (0.502 à 0.506), DEC-031 | Validation en jeu ; une release pour la liste de vidéos | ONBOARD-001 |
+| D-84 | Modèles de la communauté : Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
+| D-85 | Règle « coût ≤ capacité » sous le rang 50 : Règle des outils de la communauté. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
+| D-86 | Type de marqueur des mandats : Le journal montre les types 0, 3 (quêtes), 4 et 6 ; aucun relevé ne dit lequel désigne un mandat. | Relevé en jeu : mandat accepté, carte ouverte, mode développeur. | CHANGELOG 0.298 |
+| D-87 | Icône du drapeau 60561 : L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
+| D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
+| D-89 | Bonus d'Abondance estimé (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
+| D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-92 | R-12 Discord : valeurs par défaut | Envoi désactivé ; toutes les catégories cochées ; message « ⏰ [label] : dans [minutes] min ([time]) » ; nom « Tensho » ; nom du personnage non envoyé. Depuis la 0.778 (X-23), chaque nouvelle alarme a sa case Discord décochée. | Réglages › Alarmes › Discord |
+| D-93 | R-12 Discord : débit | Deux secondes au moins entre deux messages, file de 20 messages (les plus anciens écartés au-delà), trois essais au plus sur « 429 ». | `Alarms/DiscordNotifier.cs` |
+| D-94 | Revue de mode : source coupée (0.321) | Plus aucun téléchargement ; une copie récente gardée sur disque reste affichée. | `Fashion/FashionDataService.cs` |
+| D-95 | « Tout remettre par défaut » (0.321) | Les groupes repliés de la navigation sont gardés (état de l'interface) ; les réglages de la carte, dont les tailles et priorités d'icônes par carte, sont remis à zéro. | `Configuration.cs` (ConfigurationReset) |
+| D-96 | Nouvel ordre de Release.ps1 (0.323) | Contrôles, tag et release GitHub avec le zip, puis main (repo.json) en dernier ; reprise si le tag existe sans release. | `scripts/Release.ps1` |
+| D-100 | Code de conduite, CODEOWNERS, hook pre-push (0.323) | Non créés (code de conduite, CODEOWNERS) ; hook prêt, inactif (`git config core.hooksPath .githooks` pour l'activer). | `.githooks/pre-push` |
+| D-101 | R-13 Crédits : réglages partiels | Résolu à titre provisoire en 0.324 (choix recommandé appliqué) : les interrupteurs Garland et wiki coupent toute leur source, Universalis a son propre interrupteur (activé par défaut) avec « prix au survol » en dessous ; les copies gardées restent affichées. À confirmer ou à changer à la fin. | `Configuration.cs`, services de `Plugin.cs` |
+| D-102 | R-12 Discord : alarmes écrites dans la liste du jeu | Elles sonnent dans le jeu et partent quand même sur Discord. | `Alarms/AlarmService.Dalamud.cs` (Ring) |
+| D-103 | Test des infobulles (0.325) | Cliquet (liste d'exceptions qui ne fait que diminuer) et expressions régulières, sans dépendance ; pas de tolérance zéro ni de Roslyn. | `tests/TenshoAssistant.Tests/TooltipRatchet325Tests.cs`, `tooltip-baseline.txt` |
+| D-110 | Escouade dans R-11 étape 4 (sonde 0.332) | L'équipement d'un membre d'escouade n'est qu'une apparence (mirage, teintures), sans caractéristiques : rien à planifier. Appliqué en 0.340 (barde faite, escouade non planifiée) ; à confirmer à la fin. | [0.332-squadron-probe](../evidence/0.332-squadron-probe.md) |
+| D-112 | Suppressions immédiates (0.325) | Confirmation en deux clics pour « Tout supprimer » d'un groupe d'alarmes seulement ; ailleurs (alarme, deck, modèle de rangement, séquence d'artisanat), une infobulle dit que la suppression est immédiate. | `MainWindow.Alarms.cs` |
+<!-- /gen:decisions:fr -->
 
 ## Tests en jeu
 
