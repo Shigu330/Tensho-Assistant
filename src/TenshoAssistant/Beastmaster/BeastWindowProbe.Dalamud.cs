@@ -34,7 +34,7 @@ internal sealed class BeastWindowProbe : IDisposable
         return line.Length <= MaximumText ? line : line[..MaximumText];
     }
 
-    private static unsafe void Texts(AtkUldManager* manager, int depth, List<string> found)
+    internal static unsafe void Texts(AtkUldManager* manager, int depth, List<string> found)
     {
         if (depth > MaximumDepth || !UiNodes.Walkable(manager)) return;
         var count = Math.Min((int)manager->NodeListCount, MaximumNodes);

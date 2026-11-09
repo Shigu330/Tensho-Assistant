@@ -1602,6 +1602,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.980) Dresseur › Équipe › 1er plateau : 10 bêtes listées, puis pour chaque combat les ennemis avec leur faiblesse et 3 bêtes ; onglet Plateaux : étoiles des ennemis (Chevalier du plateau : For 2 · Int 1 · Rés. phys. 2 · Rés. mag. 2 · Vit 3).
 
+- [ ] (0.981) Devant le plateau d'avant l'entrée : panneau Tensho à droite de « Formation de l'équipe », plateau choisi, 10 bêtes avec leur rang lu ; entrer : panneau devant le plateau ; « Commencer le combat » : le panneau disparaît ; journal : « Labyrinth board panel on/off ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

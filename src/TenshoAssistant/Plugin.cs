@@ -36,6 +36,12 @@ public sealed class Plugin : IDalamudPlugin
     private PanelWindow[] panelWindows = [];
     private AttachedPanels? attachedPanels;
     private readonly WindowSystem windows = new("TenshoAssistant");
+    // X-109 (0.981, DEC-047): the Beastmaster board's team panel, the only window drawn during a cut, and only while the labyrinth's board is open.
+    private readonly WindowSystem boardWindows = new("TenshoBeastBoard");
+    private BeastBoardWindow? boardWindow;
+    private Beastmaster.BeastBoardReader? boardReader;
+    private Func<bool> showBoardPanel=()=>false;
+    private bool boardPanelBroken;
     private readonly InventoryService inventoryService = new();
     private readonly InventoryVisualSortService visualSort=new();
     private readonly ItemCatalogService itemCatalog = new();
@@ -470,6 +476,10 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>configuration.CommunityUniversalis},()=>retainerCompare?.Dispose());
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
+            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead),()=>boardReader?.Dispose());
+            registrations.Register(()=>{boardWindow=new BeastBoardWindow(mainWindow){Windows=()=>boardReader?.State ?? default};boardWindows.AddWindow(boardWindow);},()=>{if(boardWindow is not null)boardWindows.RemoveWindow(boardWindow);});
+            showBoardPanel=()=>configuration.ShowBeastBoardPanel;
+            mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
@@ -1464,7 +1474,7 @@ public sealed class Plugin : IDalamudPlugin
     private UI.FontManager? fonts;
     private void Draw()
     {
-        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}
         // 0.745: in developer mode, a slow frame is written to the log with its costliest parts.
         if(!mainWindow.DeveloperMode){DrawFrame();return;}
         var started=System.Diagnostics.Stopwatch.GetTimestamp();var paused=GC.GetTotalPauseDuration();
@@ -1542,6 +1552,15 @@ public sealed class Plugin : IDalamudPlugin
         windows.Draw();
         if(windowsStarted!=0)mainWindow.SlowFrames.Add(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),"all windows",System.Diagnostics.Stopwatch.GetElapsedTime(windowsStarted).TotalMilliseconds);
         attachedPanels?.EndFrame();
+        DrawBeastBoard(true);
+    }
+    /// <summary>X-109 (0.981, DEC-047): the board's team panel when the game's board window is open (in a cut, only while the labyrinth's board is).</summary>
+    private void DrawBeastBoard(bool allowed)
+    {
+        if(boardWindow is null)return;
+        boardWindow.IsOpen=allowed && !boardPanelBroken && showBoardPanel() && boardReader?.State.Board==true;
+        try{boardWindows.Draw();}
+        catch(Exception error){boardWindow.IsOpen=false;boardPanelBroken=true;log.Error(error,"The Beastmaster board panel turned off until the plugin reloads.");}
     }
     private (string Name,Action Draw)[]? overlays;
     private T LoadSheet<T>(string name,Func<T> read,T unavailable)

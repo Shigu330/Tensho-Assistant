@@ -54,7 +54,8 @@ internal static class CompetitiveCut610Tests
         ("Competitive: nothing shown, no command, no menu, no hook work, no way to turn it off",() =>
         {
             var plugin=Source("Plugin.cs");
-            Check(plugin.Contains("private void Draw()\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"no drawing");
+            Check(plugin.Contains("private void Draw()\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}"),"no drawing but the labyrinth board's panel (DEC-047)");
+            Check(plugin.Contains("boardWindow.IsOpen=allowed && !boardPanelBroken && showBoardPanel() && boardReader?.State.Board==true;"),"that panel only while the board is open");
             Check(plugin.Contains("private void OnCommand(string command, string arguments)\n    {\n        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)"),"commands");
             Check(plugin.Contains("private void Open(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;") && plugin.Contains("private void OpenConfig(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"opening");
             Check(plugin.IndexOf("new TenshoAssistant.Competitive.CompetitiveWatcher(")<plugin.IndexOf("mainWindow = new MainWindow("),"decided before anything starts");

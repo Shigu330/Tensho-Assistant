@@ -17,6 +17,17 @@ internal static class CompetitiveGate
     private static readonly Dictionary<IFramework.OnUpdateDelegate,IFramework.OnUpdateDelegate> Wrappers=[];
     private static volatile bool cut;
     public static bool Cut=>cut;
+    // X-109 (0.981, DEC-047): in the Beastmaster labyrinth, the board window is open and the player is not in combat (docs/evidence/0.979-labyrinth-reading.md).
+    private static volatile bool labyrinthBoard;
+    public static bool LabyrinthBoard=>labyrinthBoard;
+    internal static void SetLabyrinthBoard(bool value)=>labyrinthBoard=value;
+    /// <summary>X-109 (0.981, DEC-047): a subscription that runs out of a cut, and during one only while the labyrinth's board is open (the team panel).</summary>
+    public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)
+    {
+        void Guarded(IFramework running){if(!cut || labyrinthBoard)handler(running);}
+        lock(Gate)Wrappers[handler]=Guarded;
+        framework.Update+=Guarded;
+    }
     /// <summary>On the framework thread, when the cut starts (true) or ends (false).</summary>
     public static event Action<bool>? Changed;
 
@@ -87,6 +98,11 @@ internal sealed class CompetitiveWatcher : IDisposable
     private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
     private void Tick(IFramework _)
     {
+        // X-109 (0.981, DEC-047): the board is open (its window visible) and the player not in combat; anything else, or a failed read, is no board.
+        var board=false;
+        if(CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))
+            try{var window=gui.GetAddonByName("XBMStageDetailList");board=!window.IsNull && window.IsVisible && !condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];}catch(Exception){board=false;}
+        if(board!=CompetitiveGate.LabyrinthBoard){CompetitiveGate.SetLabyrinthBoard(board);log.Information("Labyrinth board panel {0}: territory {1}.",board ? "on":"off",client.TerritoryType);}
         if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.Labyrinth.Contains((uint)client.TerritoryType))
             try{ReadLabyrinth();}catch(Exception error){if(labyrinthSeen!="failed"){labyrinthSeen="failed";log.Warning(error,"Labyrinth reading failed.");}}
         var now=Decide();

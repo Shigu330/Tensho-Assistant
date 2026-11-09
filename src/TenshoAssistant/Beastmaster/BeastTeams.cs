@@ -102,7 +102,23 @@ public static class BeastTeams
     }
 
     /// <summary>The plans kept on disk (X-109: « cache disque »), one per board, with what they were computed from.</summary>
-    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys);
+    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys, Dictionary<uint, int>? Ranks = null);
+
+    /// <summary>
+    /// X-109 (0.981): the ranks shown in the game's team window (XBMPetParty: each beast's attributes, then its name, then its rank; docs/evidence/0.980-beast-teams.md).
+    /// A name followed by a number from 1 to the highest rank is that beast's rank; anything else is left out.
+    /// </summary>
+    public static Dictionary<uint, int> ParseRanks(IReadOnlyList<string> texts, IReadOnlyList<Beast> beasts)
+    {
+        var found = new Dictionary<uint, int>();
+        for (var index = 0; index + 1 < texts.Count; index++)
+        {
+            var beast = beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, texts[index], StringComparison.CurrentCultureIgnoreCase));
+            if (beast is null || !int.TryParse(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
+            found[beast.Id] = rank;
+        }
+        return found;
+    }
     public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks)
         => string.Join(",", (held ?? new HashSet<uint>()).Order()) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);

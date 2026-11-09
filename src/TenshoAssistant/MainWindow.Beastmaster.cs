@@ -172,13 +172,47 @@ internal sealed partial class MainWindow
         }
         return beastPlans.Plans.GetValueOrDefault(board.Id);
     }
-    /// <summary>X-109: each beast's rank when read in the game's team window (later version); null: unknown, the board's limit is assumed.</summary>
-    internal IReadOnlyDictionary<uint, int>? BeastRanks { get; set; }
+    /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
+    internal IReadOnlyDictionary<uint, int>? BeastRanks => beastPlans?.Ranks;
+    /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change.</summary>
+    internal void BeastRanksRead(Dictionary<uint, int> ranks)
+    {
+        if (beastPlans is null) return;
+        var known = beastPlans.Ranks ?? [];
+        if (ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)) return;
+        var merged = new Dictionary<uint, int>(known);
+        foreach (var (beast, rank) in ranks) merged[beast] = rank;
+        beastPlans = beastPlans with { Ranks = merged };
+        try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+        catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+    }
+    /// <summary>X-109 (0.981): the board of a labyrinth territory (its ContentFinderCondition); null outside.</summary>
+    internal Func<uint, uint>? BeastBoardOfTerritory { get; set; }
+
+    /// <summary>X-109 (0.981, DEC-047): the panel beside the game's board: in the labyrinth its own board, before entering the board chosen here.</summary>
+    internal void DrawBeastBoardPanel()
+    {
+        var state = Beasts?.State;
+        if (state?.Catalog is not { } catalog || catalog.Boards.Count == 0) { EmptyState("BeastUi.Loading"); return; }
+        Board board;
+        if (TenshoAssistant.Competitive.CompetitiveGate.Cut)
+        {
+            var id = BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0;
+            if (catalog.Boards.FirstOrDefault(row => row.Id == id) is not { } here) { EmptyState("BeastUi.TeamBoardUnknown"); return; }
+            board = here;
+            ImGui.TextColored(Accent, board.Name);
+        }
+        else board = DrawBeastBoardChoice(catalog);
+        if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
+        DrawBeastPlan(plan, board, catalog, state.Obtained is null);
+        ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote"));
+    }
 
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
     {
         if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
         var board = DrawBeastBoardChoice(catalog);
+        BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
         ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null);

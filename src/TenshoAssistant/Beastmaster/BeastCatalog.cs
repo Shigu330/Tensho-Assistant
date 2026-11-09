@@ -27,7 +27,8 @@ public sealed record BoardAction(string Name, string Shape, string Target);
 public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOnlyList<BoardAction> Actions, BeastStats? Stars = null, uint WeaknessRow = 0);
 public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies);
 public sealed record BoardBonus(string Name, string Condition, int Points);
-public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses);
+/// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.</summary>
+public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0);
 public enum BeastSort { Name, Family, Auto, Strength, Intelligence, PhysicalResistance, MagicalResistance, Vitality }
 
 public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Board> Boards)
@@ -76,7 +77,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
             var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []))).ToArray();
             var scored = bonuses.Where(bonus => FirstBonusColumn + (int)bonus.Row < row.Cells.Length).Select(bonus => new BoardBonus(bonus.Text(1), bonus.Text(2), row.Int(FirstBonusColumn + (int)bonus.Row)))
                 .Where(bonus => bonus.Points > 0 && bonus.Name.Length > 0).ToArray();
-            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored));
+            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0));
         }).ToArray();
         return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
     }
