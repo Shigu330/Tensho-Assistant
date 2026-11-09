@@ -151,7 +151,7 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 | 9 | Alerte « souhait en vente sous un prix » (X-101) : Tensho interrogerait Universalis en arrière-plan, sans clic, pour vos souhaits avec un prix (règle Dalamud : appel réseau automatique, à déclarer) | Réglage coupé par défaut ; au plus une fois toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion à la baisse sous le prix ; Universalis déjà dans la liste des hôtes | Seulement sur un bouton « Vérifier maintenant » (aucun appel automatique) |
 | 10 | Regroupement des outils et des réglages (X-100) | Voir la section « Proposition X-100 » ci-dessous | Garder la disposition actuelle |
 
-## Proposition X-100 : regroupement des outils et des réglages (2026-11-10, à valider)
+## Proposition X-100 : regroupement des outils et des réglages (2026-11-10) — **validée (DEC-048)** ; n° 9 : automatique coupé par défaut (DEC-048)
 
 Constat (0.991) : la navigation a 8 groupes ; « Progression » compte 16 pages et « Monde » 11 ; les réglages sont dans 7 onglets et aussi sur les pages (MapView 92, Paramètres 44, Avancé 24, panneaux des listes 13…, 320 réglages au total, docs/project/SETTINGS.md).
 

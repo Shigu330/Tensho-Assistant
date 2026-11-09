@@ -1636,6 +1636,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.997) Butin des contenus connecté : une seule ligne d'état ; jardin : récolter un emplacement mûr à côté d'un autre pas mûr : seul le mûr est retiré.
 
+- [ ] (0.998) Fenêtre Tensho : groupes SUIVI, CONTENUS et RÉFÉRENCES dans la navigation ; chaque page s'ouvre comme avant.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

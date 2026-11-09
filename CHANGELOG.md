@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.998.0
+- Plan global, Verify : Navigation (X-100, votre choix DEC-048) : les pages sont regroupées comme validé : Objets ; Production ; Monde ; Suivi (Alarmes, Rappels, Jardin, Compagnie libre) ; Progression (10 pages, les deux livraisons réunies) ; Contenus (Eurêka/Bozja/Croissant, Donjons profonds, Reliques, Carnaval masqué, Dresseur) ; Gold Saucer ; Références (Lexique, Aide, Crédits) ; Préférences. Aucune page retirée ; Accueil et Mes outils restent en tête. Non validé en jeu.
+- Tests : Navigation998Tests. Verify.ps1 (agent) : 1634/1634, 0 avertissement, 0 erreur ; DLL 0.998.0.0. Non validé en jeu.
+### English
+- Navigation (X-100, your choice DEC-048): the pages are grouped as approved: Items; Production; World; Tracking (Alarms, Reminders, Garden, Free company); Progression (10 pages, both deliveries together); Content (Eureka/Bozja/Occult Crescent, Deep dungeons, Relics, Masked Carnivale, Beastmaster); Gold Saucer; References (Lexicon, Help, Credits); Preferences. No page removed; Home and My tools stay at the top. Not validated in game.
+
 ## 0.997.0
 - Plan global, Verify : Relecture du code de la nuit (0.977 à 0.996, deux relecteurs et une vérification de chaque défaut) : quatre défauts confirmés et corrigés. Dresseur : un plan d'équipe fait avant la lecture de vos bêtes n'est plus réutilisé ensuite. Butin des contenus : la ligne « état inconnu » ne s'affiche plus à côté du compte quand l'état est connu. Succès et contenus : un fichier enregistré illisible est gardé tel quel, jamais réécrit. Jardin : une récolte qui affiche plusieurs lignes de gain ne compte qu'une fois, et seul un emplacement mûr est retiré du journal. Non validé en jeu.
 - Tests : NightReview997Tests. Verify.ps1 (agent) : 1633/1633, 0 avertissement, 0 erreur ; DLL 0.997.0.0. Non validé en jeu.

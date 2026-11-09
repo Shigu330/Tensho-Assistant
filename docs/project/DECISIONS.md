@@ -474,3 +474,13 @@ Decision: Exception limitée à DEC-038 pour le Dédale bestial : dans ses terri
 Reason: Décision de l'utilisateur, règle Dalamud rappelée avant (dépôt personnalisé, DEC-039).
 Consequences: X-109 : le moment du début de combat est à prouver en jeu (relevé de développement autorisé par cette exception) avant d'activer le panneau ; en doute, coupé.
 References: DEC-032, DEC-038, DEC-039, DEC-041, DEC-046
+
+DEC-ID: DEC-048
+Timestamp: 2026-11-10 Europe/Brussels
+Problem: Propositions 9 (X-101, alerte « souhait en vente », appel réseau automatique) et 10 (X-100, regroupement des outils et des réglages) de G-PROPOSALS.
+Evidence: Réponses de l'utilisateur du 2026-11-10 (cases à cocher), après le rappel de la règle Dalamud pour l'appel automatique.
+Options: X-101 automatique coupé par défaut, bouton seulement, rien ; X-100 regroupement proposé ou disposition actuelle ; réglages en onglets + recherche, recherche seule, rien.
+Decision: X-101 : réglage coupé par défaut ; activé : au plus une vérification toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion quand un prix passe sous le sien ; Universalis déjà déclaré. X-100 : navigation en groupes Objets, Production, Monde, Suivi, Progression, Contenus, Gold Saucer, Références, Préférences (Accueil et Mes outils en tête) ; Paramètres en onglets Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé, Débogage, avec une recherche parmi tous les réglages ; chaque réglage reste aussi à côté de son outil.
+Reason: Décisions de l'utilisateur (choix recommandés).
+Consequences: X-100 et X-101 à coder.
+References: G-PROPOSALS (9, 10, « Proposition X-100 »), DEC-039
