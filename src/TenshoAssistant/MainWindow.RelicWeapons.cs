@@ -48,7 +48,99 @@ internal sealed partial class MainWindow
             tabs.Add((key,localization.Get("Relics.Family"+key),catalog.Armours?.GetValueOrDefault(key) is { Count:>0 } sets
                 ? ()=>DetailTabs($"RelicParts{key}",[("Weapons",localization.Get("Relics.PartWeapons"),()=>DrawRelicFamily(key,lines)),("Armour",localization.Get("Relics.PartArmour"),()=>DrawRelicArmour(key,sets))],ref relicPartFocus)
                 :()=>DrawRelicFamily(key,lines)));
+        DrawRelicViewChoice();
         DetailTabs("RelicTabs",tabs,ref relicTabFocus);
+    }
+
+    // X-90 (0.974, user request): the stage view, every job's weapon or armour of one relic version, beside the per-job view.
+    private bool relicByStage;
+    private readonly Dictionary<string,int> relicStageChosen=[];
+    private void DrawRelicViewChoice()
+    {
+        ImGui.SetNextItemWidth(220);
+        if(ImGui.BeginCombo(localization.Get("Relics.View")+"###RelicView",localization.Get(relicByStage ? "Relics.ViewStage":"Relics.ViewJob")))
+        {
+            try
+            {
+                if(ImGui.Selectable(localization.Get("Relics.ViewJob")+"##RelicViewJob",!relicByStage))relicByStage=false;
+                if(ImGui.Selectable(localization.Get("Relics.ViewStage")+"##RelicViewStage",relicByStage))relicByStage=true;
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("Relics.ViewTip");
+    }
+    private int RelicStageCombo(string id,IReadOnlyList<string> labels)
+    {
+        var chosen=Math.Clamp(relicStageChosen.GetValueOrDefault(id),0,labels.Count-1);
+        ImGui.SetNextItemWidth(360);
+        if(ImGui.BeginCombo(localization.Get("Relics.Stage")+$"###RelicStage{id}",labels[chosen]))
+        {
+            try{for(var index=0;index<labels.Count;index++)if(ImGui.Selectable($"{labels[index]}##RelicStage{id}{index}",index==chosen))relicStageChosen[id]=chosen=index;}
+            finally{ImGui.EndCombo();}
+        }
+        Tip("Relics.StageTip");
+        return chosen;
+    }
+    private void DrawRelicStageWeapons(string family,IReadOnlyList<IReadOnlyList<uint>> lines)
+    {
+        if(itemCatalog.State.Catalog is not { } items){EmptyState("Relics.Loading");return;}
+        var stages=RelicBoard.ByLevel(lines,id=>(int)(items.Find(id)?.ItemLevel ?? 0));
+        if(stages.Count==0){EmptyState("Relics.Loading");return;}
+        var chosen=RelicStageCombo("Weapons"+family,stages.Select((stage,index)=>localization.Format("Relics.StageLabel",index+1,stage.Level)).ToArray());
+        long? Held(uint id){var stock=GetRecipeHoldings(id);return stock.HasObservation ? stock.Total:null;}
+        if(!ImGui.BeginTable($"###RelicStageWeapons{family}",2,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnWeapon"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnHeld"));
+            ImGui.TableHeadersRow();
+            var size=new Vector2(ImGui.GetTextLineHeight());
+            foreach(var id in stages[chosen].Items)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();DrawItemIcon(items.Find(id),size);
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(id);
+                ImGui.SameLine();ImGui.TextUnformatted(items.Find(id)?.Name ?? $"#{id}");
+                ImGui.TableNextColumn();
+                if(Held(id) is not { } held)ImGui.TextDisabled("?");
+                else if(held>0)ImGui.TextColored(Success,held.ToString("N0"));
+                else ImGui.TextDisabled("0");
+            }
+        }
+        finally{ImGui.EndTable();}
+    }
+    private void DrawRelicStageArmour(string family,IReadOnlyList<RelicArmourSet> sets)
+    {
+        var items=itemCatalog.State.Catalog;
+        string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
+        // The armour stages keep their place in every set (a stage a set does not have stays empty), so the index is the stage.
+        var indexes=Enumerable.Range(0,sets.Count==0 ? 0:sets.Max(set=>set.Stages.Count)).Where(index=>sets.Any(set=>index<set.Stages.Count && set.Stages[index].Count>0)).ToArray();
+        if(indexes.Length==0){EmptyState("Relics.Loading");return;}
+        var labels=indexes.Select((stage,index)=>localization.Format("Relics.StageArmourLabel",index+1,Name(sets.First(set=>stage<set.Stages.Count && set.Stages[stage].Count>0).Stages[stage][0]))).ToArray();
+        var chosen=indexes[RelicStageCombo("Armour"+family,labels)];
+        long? Held(uint id){var stock=GetRecipeHoldings(id);return stock.HasObservation ? stock.Total:null;}
+        if(!ImGui.BeginTable($"###RelicStageArmour{family}",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Relics.ArmourSet"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnArmour"));
+            ImGui.TableSetupColumn(localization.Get("Relics.ColumnPieces"));
+            ImGui.TableHeadersRow();
+            foreach(var set in sets)
+            {
+                if(chosen>=set.Stages.Count || set.Stages[chosen] is not { Count:>0 } pieces)continue;
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();ImGui.TextUnformatted(set.Name);
+                ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
+                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0") ?? "?"))));
+                ImGui.TableNextColumn();
+                var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
+                if(known==0)ImGui.TextDisabled("?");
+                else if(held==pieces.Count)ImGui.TextColored(Success,$"{held}/{pieces.Count}");
+                else ImGui.TextUnformatted(known<pieces.Count ? $"{held}/{pieces.Count} ?":$"{held}/{pieces.Count}");
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 
     private string? relicPartFocus;
@@ -57,6 +149,7 @@ internal sealed partial class MainWindow
     // W-13 (0.720): the later relics' armour, a line per stage, its pieces in the tooltip. docs/evidence/0.720-relic-armour.md.
     private void DrawRelicArmour(string family,IReadOnlyList<RelicArmourSet> sets)
     {
+        if(relicByStage){DrawRelicStageArmour(family,sets);return;}
         var items=itemCatalog.State.Catalog;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
         var chosen=Math.Clamp(relicArmourSets.GetValueOrDefault(family),0,sets.Count-1);
@@ -95,6 +188,7 @@ internal sealed partial class MainWindow
 
     private void DrawRelicFamily(string family,IReadOnlyList<IReadOnlyList<uint>> lines)
     {
+        if(relicByStage){DrawRelicStageWeapons(family,lines);return;}
         var items=itemCatalog.State.Catalog;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
         var chosen=Math.Clamp(relicLines.GetValueOrDefault(family),0,lines.Count-1);

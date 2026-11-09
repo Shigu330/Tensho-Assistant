@@ -26,6 +26,14 @@ public sealed record RelicProgress(RelicReadStatus Status,uint Note,IReadOnlyLis
 
 public static class RelicBoard
 {
+    /// <summary>
+    /// X-90 (0.974, user request « relic weapons and armour for each relic version, not per job »): every line's items grouped by item level, lowest
+    /// first. Each stage of a relic family has its own item level for every job, so a group is one stage; items of unknown level (0) are left out.
+    /// </summary>
+    public static IReadOnlyList<(int Level,IReadOnlyList<uint> Items)> ByLevel(IReadOnlyList<IReadOnlyList<uint>> lines,Func<uint,int> level)
+        =>lines.SelectMany(line=>line).Where(id=>id!=0).Distinct().Select(id=>(Id:id,Level:level(id))).Where(item=>item.Level>0)
+            .GroupBy(item=>item.Level).OrderBy(group=>group.Key).Select(group=>(group.Key,(IReadOnlyList<uint>)group.Select(item=>item.Id).ToArray())).ToArray();
+
     public static readonly IReadOnlyList<(string Key,IReadOnlyList<RelicStageRule> Stages)> Rules=
     [
         ("Anima",[new(170,"Animated"),new(200,"Awoken"),new(210,null,4),new(230,"Hyperconductive"),new(240,null,4),new(260,"Sharpened"),new(270,null,4),new(275,"Lux")]),

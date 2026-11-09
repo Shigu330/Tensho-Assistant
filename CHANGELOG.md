@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.974.0
+- Plan global, Verify : Reliques (X-90, votre document « à faire » : « armures et armes reliques pour chaque version de relique, pas par job ») : la page des reliques a un choix « Vue » : « Par arme ou par job » (comme avant) ou « Par version de relique » : on choisit une étape de la famille et la page liste l'arme de chaque job à cette étape (étapes repérées par leur niveau d'objet), ou pour les armures chaque ensemble avec ses pièces possédées. Non validé en jeu.
+- Tests : RelicStages974Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.974.0.0. Non validé en jeu.
+### English
+- Relics (X-90, your « to do » document: « relic armour and weapons for each relic version, not per job »): the relic page has a « View » choice: « By weapon or job » (as before) or « By relic version »: you pick a stage of the family and the page lists every job's weapon at that stage (stages found by their item level), or for the armour each set with its pieces held. Not validated in game.
+
 ## 0.973.0
 - Plan global, Verify : Outils de contenus (X-90), première étape : en mode développeur, Tensho écrit au journal l'état d'Eurêka (expérience élémentaire, niveau maximal, répartition de la magia, magicite, éther), de Bozja (expérience, actions oubliées au holster) et du Croissant occulte (savoir et niveau synchronisé, métier de soutien et ses niveaux, argent et or), à chaque changement. C'est votre propre progression, rien du combat (DEC-041). Le relevé est ajouté à la table des rappels ; la page viendra après. Non validé en jeu.
 - Tests : FieldStates973Tests. Verify.ps1 (agent) : 1603/1603, 0 avertissement, 0 erreur ; DLL 0.973.0.0. Non validé en jeu.
