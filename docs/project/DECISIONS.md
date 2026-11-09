@@ -444,3 +444,13 @@ Decision: Les relevés en jeu de l'utilisateur d'abord ; en attendant, une sourc
 Reason: Décision de l'utilisateur.
 Consequences: Un parseur note les courants spectraux observés et l'appât du lancer.
 References: X-85, X-76
+
+DEC-ID: DEC-045
+Timestamp: 2026-11-09 Europe/Brussels
+Problem: Revue des propositions de G-PROPOSALS « À revoir avec l'utilisateur » (points 1 à 8).
+Evidence: Réponses de l'utilisateur du 2026-11-09 (cases à cocher).
+Options: Pour chaque point, la proposition recommandée ou l'autre choix (G-PROPOSALS).
+Decision: 1 coupure JcJ : laissée comme aujourd'hui (travaux lancés non annulés, alerte Discord de mission gardée). 2 position dans les découvertes partagées : exacte partout, après explication (utile aux cartes des autres joueurs ; elle peut dire où vous pêchiez tel jour). 3 réglages : l'agent propose un plan des onglets et sections, rien ne change avant accord. 4 choix provisoires : déjà confirmés par DEC-026 ; revue des alternatives. 5 ventes des servants : comparaison Universalis sur clic. 6 poissons de collection : vus dans l'aide à la pêche ; y ajouter la collectionnabilité visée et les assignats. 7 fichiers de l'agent : en français (au choix de l'agent, réponses en français). 8 outils de contenus : mécaniques et stratégies du wiki (GFDL, sur clic, créditées, interrupteur Wiki), notes écrites et schéma d'arène dans la fenêtre Tensho, hors combat, jamais par-dessus le jeu, aucun marqueur posé dans le jeu ; liens navigateur pour les sites sans licence ; bestiaire des donjons profonds avec les notes du wiki, hors du donjon seulement.
+Reason: Décisions de l'utilisateur.
+Consequences: X-97 (aide à la pêche), X-90 (wiki, notes, schéma, bestiaire), plan des réglages à proposer.
+References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, docs/project/CONTENT-TOOLS.md

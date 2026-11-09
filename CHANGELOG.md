@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.977.0
+- Plan global, Verify : Carte (X-99, votre signalement avec captures) : après un ciblage depuis une autre zone puis une téléportation, les marqueurs des quêtes pas encore acceptées manquaient sur la carte Tensho. Cause (journal) : Tensho les lisait seulement dans la liste de la fenêtre carte du jeu, qui ne contient que la carte affichée en dernier dans cette fenêtre (ici la carte du monde). Ces quêtes sont maintenant lues aussi dans la liste que le jeu garde à jour sans fenêtre ouverte, sans doublon. Revue des propositions notée (DEC-045) et idées retenues ajoutées au plan (X-100 à X-107). Non validé en jeu.
+- Tests : UnacceptedQuests977Tests. Verify.ps1 (agent) : 1606/1606, 0 avertissement, 0 erreur ; DLL 0.977.0.0. Non validé en jeu.
+### English
+- Map (X-99, your report with captures): after targeting from another zone then a teleport, the markers of the quests not accepted yet were missing from the Tensho map. Cause (log): Tensho read them only from the game's map window list, which holds only the map last shown in that window (here the world map). They are now also read from the list the game keeps current without a window, without doubles. Proposal review recorded (DEC-045) and the ideas kept added to the plan (X-100 to X-107). Not validated in game.
+
 ## 0.976.0
 - Plan global, Verify : Correction (X-90) : sur la page Eurêka et Bozja, les ALÉA du Croissant occulte étaient appelés « escarmouches » (le mot de Bozja), parce que le mot dépendait du numéro de zone ; il dépend maintenant de l'usage de zone du jeu : escarmouche à Bozja seulement. Non validé en jeu.
 - Tests : FieldContent717Tests. Verify.ps1 (agent) : 1605/1605, 0 avertissement, 0 erreur ; DLL 0.976.0.0. Non validé en jeu.

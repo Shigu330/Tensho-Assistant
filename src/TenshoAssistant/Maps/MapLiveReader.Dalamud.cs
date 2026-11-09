@@ -443,6 +443,9 @@ internal sealed class MapLiveReader : IDisposable
         if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
         // 0.848 (X-70): the game's quest list, current at each step, replaces the window's markers of the same quests.
         var current=MapQuestEvents.Merge(lastEvents,ReadGameQuests(),marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
+        // X-99 (0.977, user report with captures: after a teleport, the quests not accepted yet were missing from the Tensho map): the map window's
+        // list holds only the map last shown in the game's own window (here the world map, 919), so the game's own list of those quests is added.
+        current=MapGameLeves.Merge(current,ReadGameUnaccepted(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z));
         return WithLeveAreas(MapGameLeves.Merge(current,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
     }
     /// <summary>0.848 (X-70): the markers of the quests the game renders, from its own Map (kept current with or without its map window); bounded.</summary>
@@ -466,6 +469,30 @@ internal sealed class MapLiveReader : IDisposable
                     var text=label.Length>0 ? label:TooltipText(data.TooltipString);
                     result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,text,info->ObjectiveId,3,data.DataId,false));
                 }
+            }
+        }
+        return result;
+    }
+    /// <summary>X-99 (0.977): the markers of the quests not accepted yet, from the game's Map (UnacceptedQuestMarkers, kept with or without its map window); bounded.</summary>
+    private static unsafe IReadOnlyList<MapEventMarker> ReadGameUnaccepted()
+    {
+        var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
+        if(map==null)return [];
+        var count=map->UnacceptedQuestMarkers.LongCount;
+        if(count is <=0 or >1024)return [];
+        var result=new List<MapEventMarker>();var visited=0;
+        foreach(var entry in map->UnacceptedQuestMarkers)
+        {
+            var info=entry;
+            if(++visited>1024 || result.Count>=256)break;
+            if(info.ObjectiveId==0)continue;
+            var points=info.MarkerData.LongCount;
+            if(points is <=0 or >32)continue;
+            var label=TooltipText(&info.Label);
+            foreach(var data in info.MarkerData)
+            {
+                if(data.IconId==0 || data.MapId==0 || !float.IsFinite(data.Position.X) || !float.IsFinite(data.Position.Z) || result.Count>=256)continue;
+                result.Add(new(data.MapId,data.IconId,data.Position,float.IsFinite(data.Radius) ? Math.Max(0,data.Radius):0,label.Length>0 ? label:TooltipText(data.TooltipString),info.ObjectiveId,3,data.DataId,false));
             }
         }
         return result;

@@ -136,6 +136,8 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md) �
 
 ## À revoir avec l'utilisateur (notées le 2026-11-08 au soir, demande « continue en notant les propositions »)
 
+**Revus le 2026-11-09 (DEC-045)** : 1 laissé ; 2 position exacte partout ; 3 plan à proposer ; 4 déjà confirmé (DEC-026), alternatives revues ; 5 sur clic ; 6 aide à la pêche ; 7 français ; 8 wiki + notes + schéma, bestiaire avec notes du wiki.
+
 | # | Sujet | Proposition (recommandée) | Autre choix |
 |---|---|---|---|
 | 1 | Coupure JcJ des travaux déjà lancés (DEC-038, audit 0.949) | Annuler dès le début de la coupure : connexion GitHub en attente, échange de découvertes, lectures Garland et wiki, prix d'une préparation ; couper l'alerte Discord « mission trouvée » en JcJ | Laisser comme aujourd'hui (non retenu le 2026-11-08) |
