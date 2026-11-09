@@ -319,6 +319,7 @@ Rules: [Localization/README.md](Localization/README.md). In short:
 ## Documentation to consult
 
 - [docs/README.md](docs/README.md) — map of all documents
+- [docs/FAQ.md](docs/FAQ.md) — frequent questions (the same as the plugin's Help page); ask a new one in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a)
 - [CONTRIBUTING.md](CONTRIBUTING.md) — build, tests, project rules, Dalamud publishing rules
 - [CHANGELOG.md](CHANGELOG.md) — what changed in each version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) — the plan, what is done and what is validated in game
@@ -709,6 +710,7 @@ Règles : [Localization/README.md](Localization/README.md). En bref :
 ## Documentation utile
 
 - [docs/README.md](docs/README.md) : carte de tous les documents
+- [docs/FAQ.md](docs/FAQ.md) : questions fréquentes (les mêmes que la page Aide du plugin) ; une nouvelle question se pose dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a)
 - [CONTRIBUTING.md](CONTRIBUTING.md) : compiler, tester, règles du projet, publication Dalamud
 - [CHANGELOG.md](CHANGELOG.md) : changements par version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) : le plan, ce qui est fait et validé en jeu

@@ -8,6 +8,7 @@
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | contributors | build, test, conventions, evidence, licences, adding a tool, versions and releases, Dalamud rules |
 | [../SECURITY.md](../SECURITY.md) | everyone | reporting a vulnerability, sensitive surfaces of the plugin (network, local files, actions in the game) |
 | [../CHANGELOG.md](../CHANGELOG.md) | everyone | what changed in each version (French, then `### English`) |
+| [FAQ.md](FAQ.md) | everyone | frequent questions, English then French, written by `tools/faq.py` from the plugin's list (the Help page shows the same); new questions in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a) |
 | [project/](project/) | contributors and agent | [PROJECT](project/PROJECT.md) (scope), [ROADMAP](project/ROADMAP.md) (the 17 reference plugins and the user requests R-01 to R-14), [ARCHITECTURE](project/ARCHITECTURE.md) (code map), [PUBLISHING](project/PUBLISHING.md) (Dalamud rules kept), and the working documents listed below |
 | [evidence/](evidence/) | contributors and agent | probe outputs and log excerpts cited by the code (evidence of the data links), most named `<version>-<subject>`; in English |
 | [../Localization/README.md](../Localization/README.md) | translators | adding or completing a language |
@@ -42,6 +43,7 @@ Some documents of `project/` still name old goal sheets (`goals/`) and agent fil
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | contributeurs | compiler, tester, conventions, preuves, licences, ajouter un outil, versions et releases, règles Dalamud |
 | [../SECURITY.md](../SECURITY.md) | tout le monde | signaler une vulnérabilité, surfaces sensibles du plugin (réseau, fichiers locaux, actions dans le jeu) |
 | [../CHANGELOG.md](../CHANGELOG.md) | tout le monde | ce qui a changé à chaque version (français, puis `### English`) |
+| [FAQ.md](FAQ.md) | tout le monde | questions fréquentes, en anglais puis en français, écrites par `tools/faq.py` depuis la liste du plugin (la page Aide montre les mêmes) ; nouvelles questions dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a) |
 | [project/](project/) | contributeurs et agent | [PROJECT](project/PROJECT.md) (périmètre), [ROADMAP](project/ROADMAP.md) (les 17 plugins de référence et les demandes R-01 à R-14), [ARCHITECTURE](project/ARCHITECTURE.md) (carte du code), [PUBLISHING](project/PUBLISHING.md) (règles Dalamud tenues), et les documents de travail listés plus bas |
 | [evidence/](evidence/) | contributeurs et agent | sorties de sondes et extraits de journaux cités par le code (preuves des liens de données), le plus souvent nommés `<version>-<sujet>` ; en anglais |
 | [../Localization/README.md](../Localization/README.md) | traducteurs | ajouter ou compléter une langue |

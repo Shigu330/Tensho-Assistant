@@ -135,19 +135,38 @@ internal sealed partial class MainWindow
         finally { ImGui.EndPopup(); }
     }
 
+    // System plan 4.19 (F3): the questions are one list (Help/Faq.cs), searched like the pages; docs/FAQ.md is written from it (tools/faq.py).
+    private string? faqKey;
+    private IReadOnlyList<HelpTopic> faqView = [];
+    private void DrawFaq()
+    {
+        var language = localization.CurrentCode + "|" + helpQuery;
+        if (faqKey != language)
+        {
+            faqKey = language;
+            faqView = HelpIndex.Search(Faq.Entries.Select(entry => new HelpTopic(entry.Key, localization.Get($"Help.Question{entry.Key}"), localization.Get($"Help.Answer{entry.Key}"), "", "")), helpQuery);
+        }
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Faq"), ImGuiTreeNodeFlags.DefaultOpen)) return;
+        if (faqView.Count == 0) ImGui.TextDisabled(localization.Get("Help.FaqNoResult"));
+        foreach (var topic in faqView)
+        {
+            if (!ImGui.TreeNode(topic.Title + $"###HelpQuestion{topic.Key}")) continue;
+            try
+            {
+                ImGui.TextWrapped(topic.Purpose);
+                if (Faq.PageOf(topic.Key) is { } name && Enum.TryParse<Page>(name, out var target) && ImGui.SmallButton(localization.Get("Help.OpenPage") + "##OpenFaq" + topic.Key)) page = target;
+            }
+            finally { ImGui.TreePop(); }
+        }
+    }
+
     private void DrawHelpPage()
     {
         Heading(localization.Get("PageHelp.HelpTitle"), localization.Get("PageHelp.HelpPurpose"));
         if (ImGui.SmallButton(localization.Get("Guide.Start"))) StartGuide();
         Tip("Guide.StartTip");
         ImGui.SetNextItemWidth(320); ImGui.InputTextWithHint("##HelpQuery", localization.Get("Help.Search"), ref helpQuery, 64); Tip("Help.SearchTip");
-        if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Faq"), ImGuiTreeNodeFlags.DefaultOpen))
-            foreach (var question in new[] { "EmptyPage", "WhyOpen", "Marks", "Internet", "Saved", "Actions", "Report" })
-            {
-                if (!ImGui.TreeNode(localization.Get($"Help.Question{question}") + $"###HelpQuestion{question}")) continue;
-                try { ImGui.TextWrapped(localization.Get($"Help.Answer{question}")); }
-                finally { ImGui.TreePop(); }
-            }
+        DrawFaq();
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Pages"), ImGuiTreeNodeFlags.DefaultOpen))
         {
             // 0.511: rebuilt when the language changes, or the help stayed in the old one.

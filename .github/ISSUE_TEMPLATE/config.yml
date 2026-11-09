@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Frequent questions (FAQ) / Questions fréquentes
+    url: https://github.com/Shigu330/Tensho-Assistant/blob/main/docs/FAQ.md
+    about: Installation, language, empty pages, what goes on the Internet… Read it first. / Lisez-la d'abord.
+  - name: Ask a question (Q&A) / Poser une question
+    url: https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a
+    about: A question that is not a problem or an idea. / Une question qui n'est ni un problème ni une idée.
   - name: Security vulnerability (private report)
     url: https://github.com/Shigu330/Tensho-Assistant/security/advisories/new
     about: Report security problems privately, never in a public issue.

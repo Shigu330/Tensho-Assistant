@@ -1027,6 +1027,7 @@ tests = tests.Concat(RetainerSalesTests.Cases).ToArray();
 tests = tests.Concat(Resilience507Tests.Cases).ToArray();
 tests = tests.Concat(GuideFlowTests.Cases).ToArray();
 tests = tests.Concat(PageCoverageTests.Cases).ToArray();
+tests = tests.Concat(FaqTests.Cases).ToArray();
 tests = tests.Concat(BeastCatalogTests.Cases).ToArray();
 tests = tests.Concat(DutyLootServiceTests.Cases).ToArray();
 tests = tests.Concat(MonsterLootTests.Cases).ToArray();
