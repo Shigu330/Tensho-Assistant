@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.982.0
+- Plan global, Verify : Pêche (X-97, votre signalement : les poissons de collection ne semblaient pas pris en compte, vu dans l'aide à la pêche) : sous chaque poisson collectionnable, l'aide à la pêche montre maintenant ses trois paliers de collectabilité, et au survol les assignats de chacun et l'échange concerné, tirés des données du jeu (les mêmes règles que le panneau « Collectionnable » de la récolte). Non validé en jeu.
+- Tests : FishCollectable982Tests. Verify.ps1 (agent) : 1614/1614, 0 avertissement, 0 erreur ; DLL 0.982.0.0. Non validé en jeu.
+### English
+- Fishing (X-97, your report: collectable fish did not seem counted, seen in the fishing helper): under each collectable fish, the fishing helper now shows its three collectability tiers, and on hover the scrips of each and the exchange concerned, from the game's data (the same rules as the gathering « Collectable » panel). Not validated in game.
+
 ## 0.981.0
 - Plan global, Verify : Dresseur (X-109, DEC-047) : un panneau Tensho s'affiche à côté de la fenêtre du plateau du jeu, avec les 10 bêtes à emmener et les 3 de chaque combat. Avant d'entrer, on choisit le plateau dans le panneau ; dans le Dédale, c'est celui où vous êtes, et le panneau n'existe que tant que la fenêtre du plateau est ouverte et que vous n'êtes pas en combat. Pendant la coupure du Dédale, c'est la seule chose que Tensho affiche ; il se coupe dès la confirmation de « Commencer le combat ». Le rang de vos bêtes est lu dans la fenêtre « Formation de l'équipe » et gardé sur le disque : il remplace la limite supposée. Réglage « Panneau d'équipe à côté du plateau » (onglet Équipe, activé par défaut). Non validé en jeu.
 - Tests : BeastBoard981Tests. Verify.ps1 (agent) : 1613/1613, 0 avertissement, 0 erreur ; DLL 0.981.0.0. Non validé en jeu.

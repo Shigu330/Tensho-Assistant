@@ -123,6 +123,13 @@ internal sealed partial class MainWindow
                             ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
                             if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
                             DrawFishNow(row.FishId,now.Territory);
+                            // X-97 (0.982, user report: « collectable fish not taken into account », seen in the fishing helper; DEC-045): the collectability of each
+                            // tier and its scrips, from the game's sheets (CollectablesShopRefine, CollectablesShopRewardScrip), the same rules as the gathering panel.
+                            if(Collectables?.Catalog?.For(row.FishId) is { Count:>0 } collectable && collectable.FirstOrDefault(rule=>rule.Scrips) is { } scrip)
+                            {
+                                ImGui.TextColored(Accent,localization.Format("FishingPanel.Collectable",scrip.Low,scrip.Mid,scrip.High));
+                                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FishingPanel.CollectableTip",scrip.Low,scrip.RewardLow,scrip.Mid,scrip.RewardMid,scrip.High,scrip.RewardHigh,scrip.Group));
+                            }
                             ImGui.TableNextColumn();
                             for(var step=0;step<row.Route.Count;step++)
                             {

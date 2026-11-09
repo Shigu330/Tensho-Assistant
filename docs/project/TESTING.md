@@ -1604,6 +1604,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.981) Devant le plateau d'avant l'entrée : panneau Tensho à droite de « Formation de l'équipe », plateau choisi, 10 bêtes avec leur rang lu ; entrer : panneau devant le plateau ; « Commencer le combat » : le panneau disparaît ; journal : « Labyrinth board panel on/off ».
 
+- [ ] (0.982) Aide à la pêche dans un lieu avec un poisson collectionnable : ligne « Collectionnable : … / … / … », survol : assignats de chaque palier.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

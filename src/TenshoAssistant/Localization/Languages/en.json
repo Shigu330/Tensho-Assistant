@@ -1373,6 +1373,8 @@
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },
   "FishingPanel": {
+    "Collectable": "Collectable: {0} / {1} / {2}",
+    "CollectableTip": "Collectability aimed at, and the scrips it brings (game data):\n{0} and up: {1}\n{2} and up: {3}\n{4} and up: {5}\nExchange: {6}",
     "SeenShort": "seen",
     "SeenInGame": "Seen in game (×{0}): {1}",
     "SeenBaits": "bait or mooch {0}",

@@ -1373,6 +1373,8 @@
     "BountifulFloor": "Bonus d'Abondance inconnu (valeur de récolte ou base de l'objet non lue) : le plan compte +1, le minimum de la règle."
   },
   "FishingPanel": {
+    "Collectable": "Collectionnable : {0} / {1} / {2}",
+    "CollectableTip": "Collectabilité visée et assignats qu'elle rapporte (données du jeu) :\n{0} et plus : {1}\n{2} et plus : {3}\n{4} et plus : {5}\nÉchange : {6}",
     "SeenShort": "vu",
     "SeenInGame": "Vu en jeu (×{0}) : {1}",
     "SeenBaits": "appât ou mooch {0}",
