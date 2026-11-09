@@ -1658,6 +1658,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1008) Aucun essai maintenant. Après la mise à jour de Dalamud : charger le plugin en mode développeur ; l'agent compare l'autotest à celui d'avant.
 
+- [ ] (0.1009) Aucun essai maintenant : le jeu est en maintenance jusqu'au 10 novembre 11 h.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
