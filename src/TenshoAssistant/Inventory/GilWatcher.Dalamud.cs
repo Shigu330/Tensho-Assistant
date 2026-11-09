@@ -63,6 +63,15 @@ public sealed unsafe class GilWatcher : IDisposable
             var id=player.IsLoaded ? player.ContentId:0;
             if(id!=character){Save(now);Switch(id,now);}
             if(id==0)return;
+            // 0.993 (« Slow reader: GilWatcher 128 ms » at each load): the journal is read off the frame; nothing is recorded until it is there.
+            if(loading is { } read)
+            {
+                if(!read.IsCompleted)return;
+                loading=null;
+                if(read.IsCompletedSuccessfully)entries=read.Result;
+                else{loadFailed=true;log.Warning(read.Exception?.GetBaseException(),"Gil journal could not be read; it is not written over.");}
+                Volatile.Write(ref state,new GilJournalState(character,entries.ToArray(),null,null,null,loadFailed));
+            }
             // R-14 (0.453): the balance only once the Currency container is loaded (as CurrencyWatcher, 0.344): before it GetGil gives 0, which
             // became a starting point at login, then a « + all the gil » entry. Each function checked: a source lost after an update stays unknown.
             var inventory=(nint)InventoryManager.StaticAddressPointers.pInstance!=0 ? InventoryManager.Instance():null;
@@ -133,13 +142,13 @@ public sealed unsafe class GilWatcher : IDisposable
         return true;
     }
 
+    private Task<List<GilEntry>>? loading;
     private void Switch(ulong id,DateTimeOffset now)
     {
         character=id;gil=null;retainers=null;company=null;dirty=false;loadFailed=false;entries=[];
-        if(id!=0)
-            try{entries=GilJournal.Prune(GilJournal.Read(Path.Combine(folder,FileName(id))),now);}
-            catch(Exception error){loadFailed=true;log.Warning(error,"Gil journal could not be read; it is not written over.");}
-        Volatile.Write(ref state,id==0 ? null:new GilJournalState(id,entries.ToArray(),null,null,null,loadFailed));
+        var path=Path.Combine(folder,FileName(id));
+        loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(GilJournal.Read(path),now));
+        Volatile.Write(ref state,null);
     }
 
     private void Save(DateTimeOffset now)

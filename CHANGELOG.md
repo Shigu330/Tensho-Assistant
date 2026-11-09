@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.993.0
+- Plan global, Verify : Chargement plus fluide (0.993) : le relevé de la 0.992 a nommé les lecteurs lents au chargement. Le journal des gils (128 ms sur une image) est maintenant lu en arrière-plan ; rien n'est noté avant qu'il soit chargé, et une lecture ratée n'est jamais écrasée. Restent nommés : la lecture des quêtes (83 ms) et le catalogue des actions d'artisanat (57 ms), plus la capture de développement (mode développeur seulement). Non validé en jeu.
+- Tests : GilLoad993Tests. Verify.ps1 (agent) : 1627/1627, 0 avertissement, 0 erreur ; DLL 0.993.0.0. Non validé en jeu.
+### English
+- Smoother load (0.993): the 0.992 reading named the slow readers at load. The gil journal (128 ms on one frame) is now read in the background; nothing is recorded before it is loaded, and a failed read is never written over. Still named: the quest reading (83 ms) and the crafting action catalogue (57 ms), plus the developer capture (developer mode only). Not validated in game.
+
 ## 0.992.0
 - Plan global, Verify : Diagnostic (0.992) : à chaque chargement, le journal de Dalamud signale des ralentissements de 90 à 144 ms dans un lecteur de Tensho sans dire lequel. En mode développeur, Tensho nomme maintenant tout lecteur qui prend plus de 50 ms dans une image (une fois par lecteur), pour corriger le bon. Aussi notés : la proposition de regroupement des outils et des réglages (X-100) et la question sur l'alerte « souhait en vente » (X-101), à voir ensemble. Non validé en jeu.
 - Tests : SlowReaders992Tests. Verify.ps1 (agent) : 1626/1626, 0 avertissement, 0 erreur ; DLL 0.992.0.0. Non validé en jeu.

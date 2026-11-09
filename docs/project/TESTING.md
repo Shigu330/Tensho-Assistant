@@ -1626,6 +1626,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.992) Mode développeur, recharger Tensho : dalamud.log, lignes « Slow reader: … ».
 
+- [ ] (0.993) Recharger Tensho en mode développeur : plus de « Slow reader: GilWatcher » ; le journal des gils garde son contenu.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
