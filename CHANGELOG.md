@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1007.0
+- Plan global, Verify : Sous-marins (DEC-043) : premier relevé de la sonde, dans votre jeu, hors de l'atelier de compagnie : les fonctions du jeu donnent 0 pour chaque trajet et chaque exploration (3044 trajets, 142 explorations, trois vitesses). Elles ne servent donc pas hors de l'atelier : la formule reste (docs/evidence/0.1006-submarine-functions.md). La sonde réessaie maintenant à chaque changement de zone jusqu'à lire une valeur ; le relevé à l'atelier est ajouté aux rappels. Plan global : la ligne X-76 (nettoyage) dit enfin « fait ». Non validé en jeu.
+- Tests : SubmarineProbe1006Tests. Verify.ps1 (agent) : 1644/1644, 0 avertissement, 0 erreur ; DLL 0.1007.0.0. Non validé en jeu.
+### English
+- Submarines (DEC-043): first probe reading, in your game, outside the company workshop: the game's functions give 0 for every leg and survey (3044 legs, 142 surveys, three speeds). They are no use outside the workshop: the formula stays (docs/evidence/0.1006-submarine-functions.md). The probe now tries again at each zone change until it reads a value; the workshop reading is added to the reminders. Global plan: the X-76 row (cleanup) finally says done. Not validated in game.
+
 ## 0.1006.0
 - Plan global, Verify : Sous-marins (DEC-043, votre décision « oui si lecture pure ») : avant que les fonctions de calcul du jeu remplacent la formule communautaire des durées de voyage, une sonde prouve ce qu'elles calculent. En mode développeur seulement, une fois par session, connecté : chaque trajet et chaque exploration de chaque carte est comparé à la formule, et le résultat va au journal (« Submarine voyage check »). Rien n'est encore utilisé. Fonctions statiques qui ne font que calculer ; rien n'est envoyé au serveur. Non validé en jeu.
 - Tests : SubmarineProbe1006Tests. Verify.ps1 (agent) : 1644/1644, 0 avertissement, 0 erreur ; DLL 0.1006.0.0. Non validé en jeu.

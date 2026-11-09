@@ -8,7 +8,8 @@ internal static class SubmarineProbe1006Tests
         ("Submarine probe 1006: developer only, once, logged in, functions resolved before any call, wired with a dispose",() =>
         {
             var probe=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/FreeCompany/SubmarineVoyageProbe.Dalamud.cs"));
-            Check(probe.Contains("if(done || !developer() || !client.IsLoggedIn)return;") && probe.Contains("done=true;"),"once, developer, logged in");
+            // 0.1007: once per zone while the functions give only 0, done after the first reading with a value (or a failure).
+            Check(probe.Contains("if(done || !developer() || !client.IsLoggedIn || (uint)client.TerritoryType==triedIn)return;") && probe.Contains("if(anyValue){done=true;"),"once, developer, logged in");
             var check=probe.IndexOf("MemberFunctionPointers.GetSubmarineVoyageTime==0");var call=probe.IndexOf("HousingManager.GetSubmarineSurveyDuration(b");
             Check(check>0 && call>check && probe.Contains("MemberFunctionPointers.GetSubmarineSurveyDuration==0"),"pointers first");
             Check(probe.Contains("CompetitiveGate.Add(framework,OnUpdate)") && probe.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"gate and dispose");

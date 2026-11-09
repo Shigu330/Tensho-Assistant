@@ -11,6 +11,8 @@ namespace TenshoAssistant.FreeCompany;
 /// sent to the server). For each map, every leg (start and sectors) and every survey is compared with VoyagePlanner's formula, with the
 /// game's point taken as the sheet row and as the row minus 1 (FFXIVClientStructs: « each map uses 0 index as their starting point »).
 /// The counts go to the log (« Submarine voyage check »); nothing is used yet. Removed on dispose.
+/// 0.1007 (first reading, docs/evidence/0.1006-submarine-functions.md): outside the company workshop the three functions give 0 for every point and
+/// speed; the probe now tries again after each zone change while it reads nothing but 0, and stops after the first reading with a value.
 /// </summary>
 public sealed unsafe class SubmarineVoyageProbe : IDisposable
 {
@@ -21,6 +23,7 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
     private readonly IPluginLog log;
     private readonly Func<bool> developer;
     private bool done;
+    private uint triedIn=uint.MaxValue;
 
     public SubmarineVoyageProbe(IFramework framework,IClientState client,IDataManager data,IPluginLog log,Func<bool> developer)
     {
@@ -30,11 +33,12 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
 
     private void OnUpdate(IFramework _)
     {
-        if(done || !developer() || !client.IsLoggedIn)return;
-        done=true;
+        if(done || !developer() || !client.IsLoggedIn || (uint)client.TerritoryType==triedIn)return;
+        triedIn=(uint)client.TerritoryType;
         if((nint)HousingManager.MemberFunctionPointers.GetSubmarineVoyageTime==0 || (nint)HousingManager.MemberFunctionPointers.GetSubmarineVoyageDistance==0
             || (nint)HousingManager.MemberFunctionPointers.GetSubmarineSurveyDuration==0)
-        {log.Info("Submarine voyage check: the game's functions are not resolved in this version.");return;}
+        {done=true;log.Info("Submarine voyage check: the game's functions are not resolved in this version.");return;}
+        var anyValue=false;var lines=new List<string>();
         try
         {
             var sectors=data.GetExcelSheet<SubmarineExploration>().Where(row=>row.Map.RowId!=0)
@@ -53,6 +57,7 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
                         {
                             var b=(byte)(to.Id-offset);
                             var survey=HousingManager.GetSubmarineSurveyDuration(b,(short)speed);surveys++;
+                            if(survey!=0)anyValue=true;
                             if(survey==VoyagePlanner.SurveySeconds(to,speed))surveySame++;
                             foreach(var from in points)
                             {
@@ -62,6 +67,7 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
                                 var distance=HousingManager.GetSubmarineVoyageDistance(a,b);
                                 legs++;
                                 var formulaTime=VoyagePlanner.LegSeconds(from,to,speed);var formulaDistance=VoyagePlanner.LegDistance(from,to);
+                                if(time!=0 || distance!=0)anyValue=true;
                                 if(time==formulaTime)timeSame++;
                                 if(distance==formulaDistance)distanceSame++;
                                 if(samples.Count<4 && (time!=formulaTime || distance!=formulaDistance))
@@ -70,11 +76,12 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
                             if(samples.Count<6 && survey!=VoyagePlanner.SurveySeconds(to,speed))samples.Add($"survey {to.Id} game {survey} formula {VoyagePlanner.SurveySeconds(to,speed)}");
                         }
                     }
-                    log.Info("Submarine voyage check (point = row - {0}, speed {1}): {2} legs, time equal {3}, distance equal {4}; {5} surveys, equal {6}; differences: {7}",
-                        offset,speed,legs,timeSame,distanceSame,surveys,surveySame,samples.Count==0 ? "none":string.Join("; ",samples));
+                    lines.Add($"Submarine voyage check (territory {triedIn}, point = row - {offset}, speed {speed}): {legs} legs, time equal {timeSame}, distance equal {distanceSame}; {surveys} surveys, equal {surveySame}; differences: {(samples.Count==0 ? "none":string.Join("; ",samples))}");
                 }
+            if(anyValue){done=true;foreach(var line in lines)log.Info(line);}
+            else log.Debug("Submarine voyage check (territory {0}): the game's functions give 0 here; tried again in the next zone.",triedIn);
         }
-        catch(Exception error){log.Warning(error,"Submarine voyage check failed.");}
+        catch(Exception error){done=true;log.Warning(error,"Submarine voyage check failed.");}
     }
 
     public void Dispose()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
