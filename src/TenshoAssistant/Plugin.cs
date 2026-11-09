@@ -582,6 +582,9 @@ public sealed class Plugin : IDalamudPlugin
             FreeCompany.AirshipVoyageTable? airshipTable=null;
             registrations.Register(()=>airshipTable=new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());
             mainWindow.AirshipTable=()=>airshipTable?.State;
+            // DEC-043 (0.1006): developer-mode probe of the game's submarine functions against the formula, once per session (log only).
+            FreeCompany.SubmarineVoyageProbe? submarineProbe=null;
+            registrations.Register(()=>submarineProbe=new FreeCompany.SubmarineVoyageProbe(framework,client,data,log,()=>configuration.DeveloperMode),()=>submarineProbe?.Dispose());
             mainWindow.RequestAirshipTable=(speed,points)=>airshipTable?.Request(speed,points);
             mainWindow.VoyageReadUnavailable=()=>voyages?.ReadUnavailable==true;
             Gear.GearLoader? gear=null;

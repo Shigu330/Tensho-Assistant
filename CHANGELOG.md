@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1006.0
+- Plan global, Verify : Sous-marins (DEC-043, votre décision « oui si lecture pure ») : avant que les fonctions de calcul du jeu remplacent la formule communautaire des durées de voyage, une sonde prouve ce qu'elles calculent. En mode développeur seulement, une fois par session, connecté : chaque trajet et chaque exploration de chaque carte est comparé à la formule, et le résultat va au journal (« Submarine voyage check »). Rien n'est encore utilisé. Fonctions statiques qui ne font que calculer ; rien n'est envoyé au serveur. Non validé en jeu.
+- Tests : SubmarineProbe1006Tests. Verify.ps1 (agent) : 1644/1644, 0 avertissement, 0 erreur ; DLL 0.1006.0.0. Non validé en jeu.
+### English
+- Submarines (DEC-043, your decision « yes if pure reading »): before the game's own functions replace the community formula for voyage durations, a probe proves what they compute. Developer mode only, once per session, logged in: every leg and survey of every map is compared with the formula and the result goes to the log (« Submarine voyage check »). Nothing is used yet. Static functions that only compute; nothing is sent to the server. Not validated in game.
+
 ## 0.1005.0
 - Plan global, Verify : Découvertes : le fait faux noté avant la 0.911 est retiré, à votre demande. C'est l'objet clé « Gants abandonnés », gardé sous le numéro 2169 au lieu de 2002169. Règle générale : un fait « objet demandé par une quête » vu pour la dernière fois avant la publication de la 0.911 (8 novembre, 16 h 42) est refusé à la lecture, à l'import et à la fusion des découvertes partagées. La base est réécrite sans lui à l'enregistrement suivant. Le fichier commun est reconstruit avec l'outil de fusion, qui suit la même règle. Non validé en jeu.
 - Tests : QuestAskedFix1005Tests. Verify.ps1 (agent) : 1643/1643, 0 avertissement, 0 erreur ; DLL 0.1005.0.0. Non validé en jeu.

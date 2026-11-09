@@ -1652,6 +1652,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1005) Aucun essai demandé : la sonde tools/DiscoveryCheckProbe ne doit plus signaler QuestItemAsked après l'enregistrement suivant de la base (une minute de jeu).
 
+- [ ] (0.1006) Rien à faire : la sonde tourne seule au rechargement (mode développeur) ; l'agent lit le journal.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
