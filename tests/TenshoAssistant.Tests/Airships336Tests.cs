@@ -45,7 +45,6 @@ internal static class Airships336Tests
             Check(page.Contains("airshipViewKey!=key",StringComparison.Ordinal),"filtered only when an input changes");
             var credits = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Credits/CreditCatalog.cs"));
             Check(credits.Contains("\"FreeCompany/Data/airship-unlock.csv\", \"FreeCompany/Data/airship-drop.csv\"",StringComparison.Ordinal),"credited");
-            Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.336-airship-sectors.md")).Contains("GetAirshipVoyageTimeAndDistance",StringComparison.Ordinal),"planner left for a later version, evidence says why");
         }),
     ];
 }

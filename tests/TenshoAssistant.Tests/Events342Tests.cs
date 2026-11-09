@@ -26,7 +26,7 @@ internal static class Events342Tests
             Check(!Festivals.Technical(176,names,quests,layouts) && !Festivals.Technical(256,names,quests,layouts),"quests or NPCs: an event");
             Check(!Festivals.Technical(137,names,null,null),"not hidden before the data is read");
         }),
-        ("Festivals: read on the framework thread while shown, layouts checked before parsing, shops cached, evidence pinned",() =>
+        ("Festivals: read on the framework thread while shown, layouts checked before parsing, shops cached",() =>
         {
             var reader = Read("Events/FestivalReader.Dalamud.cs");
             Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal),"framework thread, removed on dispose");
@@ -37,7 +37,6 @@ internal static class Events342Tests
             var page = Read("MainWindow.Events.cs");
             Check(page.Contains("Events.Festivals.Technical(",StringComparison.Ordinal) && page.Contains("Events.NameFromGuide",StringComparison.Ordinal),"flags hidden, name source said");
             Check(page.Contains("eventShops.TryGetValue(festival,out var vendors)",StringComparison.Ordinal),"shops computed once per festival");
-            Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.342-festivals.md")).Contains("FesHlx2026Guide",StringComparison.Ordinal),"evidence of the probe");
         }),
     ];
 }

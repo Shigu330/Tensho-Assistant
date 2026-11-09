@@ -36,12 +36,12 @@ internal static class Garden448Tests
         ("Garden journal: kept by « reset all », reminders a reset setting, checked every 10 s from the frame, nothing read from the game",() =>
         {
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
-            var configuration=Read("Configuration.cs");
-            Check(configuration.Contains("        \"GardenBeds\",\n    };") && configuration.Contains("\"GardenAlerts\",") && configuration.Contains("public bool GardenAlerts { get; set; } = true;"),"kept list, reset setting");
+            // 0.1019 (test audit #24): the lists themselves, not the text of Configuration.cs.
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("GardenBeds") && TenshoAssistant.ConfigurationReset.Reset.Contains("GardenAlerts") && new TenshoAssistant.Configuration().GardenAlerts,"kept list, reset setting");
             var ui=Read("MainWindow.Garden.cs");
             Check(ui.Contains("if(now-gardenObservedAt<TimeSpan.FromSeconds(10))return;") && ui.Contains("if(!configuration.GardenAlerts ||"),"throttled, setting");
             Check(!ui.Contains("unsafe") && !ui.Contains("FFXIVClientStructs"),"no game reading");
-            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden") && Read("MainWindow.Garden.cs").Contains("DrawGardenJournal();"),"wired");
+            Check(Read("Plugin.cs").Contains("mainWindow.ObserveGarden"),"wired (the page's sections: Todo458Tests)");
         }),
     ];
 }

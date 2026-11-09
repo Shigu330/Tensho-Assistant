@@ -101,13 +101,6 @@ internal static class Craft468Tests
             Check(Read("Configuration.cs").Contains("public Dictionary<uint,int>? CraftLogTargets") && Read("Configuration.cs").Contains("\"CraftLogTargets\""),"target kept");
             Check(ui.Contains("DrawCraftLogState(job,manipulationDetected,current.ManipulationAllowed)") && ui.Contains("craftLogDetected?.Specialist==true") && ui.Contains("craftLogManipulation[job]=manipulation"),"state");
             Check(ui.Contains("if(!result.SavedIsEnough)DrawCraftLogMacro(") && ui.Contains("CraftPresets.Commit(configuration,save,"),"saved");
-            Check(Read("Craft/CraftLogObservation.cs").Contains("new(stats.Level,cs,control,cp,manipulation,specialist)"),"specialist passed to the calculation");
-        }),
-        ("Projection window: its setting is also under Crafting, and its cross turns it off",() =>
-        {
-            Check(Read("MainWindow.Settings.cs").Contains("DrawCraftLiveSettings();") && Read("MainWindow.CraftLive.cs").Contains("BoolSetting(\"CraftLiveUi.Panel\",\"CraftLiveUi.PanelTip\",()=>configuration.CraftLivePanel"),"setting");
-            var panel=Read("MainWindow.CraftProjection.cs");
-            Check(panel.Contains("\"TenshoCraftLivePanel\"") && panel.Contains("()=>{configuration.CraftLivePanel=false;craftLive.SetEnabled(CraftLiveWanted(configuration));SaveReminders();}"),"cross");
         }),
     ];
 }

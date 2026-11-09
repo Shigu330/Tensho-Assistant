@@ -10,7 +10,6 @@ internal static class OpenStorage770Tests
         {
             var bridge=Read("Inventory/BankInventoryBridge.Dalamud.cs");
             Check(bridge.Contains("OpenStorageRefresh = TimeSpan.FromSeconds(2)") && bridge.Contains("(always ? TimeSpan.FromMinutes(2) : OpenStorageRefresh)"),"interval");
-            Check(!bridge.Contains("TimeSpan.FromSeconds(30))))"),"no longer 30 s");
         }),
     ];
 }

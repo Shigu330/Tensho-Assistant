@@ -35,9 +35,7 @@ internal static class PageCoverageTests
         {
             var pages=Pages();
             var tools=Read("src/TenshoAssistant/MainWindow.Tools.cs");
-            var list=Read("src/TenshoAssistant/MainWindow.Pages.cs");
-            var listed=Regex.Matches(list,@"new\(Page\.(\w+),").Select(match=>match.Groups[1].Value).ToArray();
-            foreach(var page in pages)Check(listed.Count(name=>name==page)==1,$"page {page}: once in MainWindow.Pages.cs");
+            // 0.1019 (test audit #60): each page once in MainWindow.Pages.cs is checked by Pages470Tests (same list, set equality with the enum).
             Check(tools.Contains("PlannedTools.Concat(PageTools())") && tools.Contains("if (!opened.Contains(entry.Page) && !DirectoryLeftOut.ContainsKey(entry.Page))")
                 && tools.Contains("foreach (var entry in PageEntries)"),"the directory is completed from the list of pages");
             var opened=Regex.Matches(tools,@"FontAwesomeIcon\.\w+, Page\.(\w+)\),").Select(match=>match.Groups[1].Value).ToHashSet();

@@ -51,8 +51,6 @@ internal static class ProbeSet874Tests
             Check(reader.Contains("board.HistoryReceived+=OnHistory;") && reader.Contains("board.HistoryReceived-=OnHistory;"),"history subscribed and released");
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains("if(!configuration.Discovery.Enabled || !configuration.Discovery.FashionReport || mainWindow.DiscoveryStore is not { } store)return;"),"outfit behind its setting");
-            var duty=Read("MainWindow.DutyFinder.cs");
-            Check(duty.Contains("if(go is null && developerMode && gatheringCatalog.State.Catalog?.ForItem(item.Id) is { Count:>0 } sources && goThereLogged.Add(item.Id))"),"Go there log: developer mode, once per item");
         }),
     ];
 }

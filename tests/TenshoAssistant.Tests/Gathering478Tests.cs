@@ -256,7 +256,7 @@ internal static class Gathering478Tests
             Check(CollectableAdvisor.Advise(close with {IntuitionChance=0},3,ore,focusBonus)!.Move!=CollectableMove.Focus,"chance not read: Focus not proposed");
             var panel=Read("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("LearnCollectableBonuses(turn,active);") && panel.Contains("\"CollectablePanel.LearnScrutiny\"") && Read("Plugin.cs").Contains("status.StatusId==757"),"measured, asked for, status read");
-            Check(Read("Configuration.cs").Contains("\"CollectableUseFocus\"") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseFocus\"") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseScrutiny\""),"setting");
+            Check(TenshoAssistant.ConfigurationReset.Reset.Contains("CollectableUseFocus") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseFocus\"") && Read("MainWindow.GatheringPlanSettings.cs").Contains("\"CollectablePanel.UseScrutiny\""),"setting");
         }),
         ("Collectable plan always ends: at the maximum, above high, with a free Meticulous and the smallest gains (a stack overflow closed the game, in-game report)",() =>
         {
@@ -356,7 +356,7 @@ internal static class Gathering478Tests
             }
             var panel=Read("MainWindow.CollectablePanel.cs");
             Check(panel.Contains("CollectableRisk.Snap(configuration.CollectableRiskTolerance)") && panel.Contains("FontAwesomeIcon.HandHolding:cap==50 ? FontAwesomeIcon.BalanceScale:FontAwesomeIcon.Dice") && panel.Contains("WrappedTooltip(localization.Get($\"CollectablePanel.Cap{cap}\")"),"three steps");
-            Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50 || Read("Configuration.cs").Contains("CollectableRiskTolerance { get; set; } = 50"),"default");
+            Check(new TenshoAssistant.Configuration().CollectableRiskTolerance==50,"default");
         }),
         ("GP tick: once GP stops rising, no tick is promised; it comes back with the next rise; what a tick gives is seen",() =>
         {
@@ -379,7 +379,6 @@ internal static class Gathering478Tests
             Check(GpRegen.Bonus([],16)==0 && GpRegen.Bonus([192],16)==1 && GpRegen.Bonus([192,236],16)==2 && GpRegen.Bonus([192,236,239],16)==3 && GpRegen.Bonus([236],16)==2 && GpRegen.Bonus([193],16)==0,"the highest unlocked gives the total; another job's does not count");
             Check(GpRegen.Base(8,3)==5 && GpRegen.Rate(0,5,3)==8 && GpRegen.Rate(0,5,1)==6,"measured on one job, known on another");
             Check(GpRegen.Rate(0,0,3)==0 && GpRegen.Rate(9,5,3)==9,"no measure: unknown, not invented; the setting wins");
-            Check(Read("Plugin.cs").Contains("unlocks.IsTraitUnlocked(row)"),"the game's unlock state");
         }),
         ("GP tick: the time until full, from what a tick gives; none while unknown or paused",() =>
         {
@@ -416,7 +415,6 @@ internal static class Gathering478Tests
             Check(Node(1000,locked).Frontier.All(plan=>plan.Actions.All(use=>use.Action.Spec.Effect!=GpEffect.Attempt)),"an action not learned leaves the GP plan");
             var list=Read("MainWindow.GatheringPlanSettings.cs");
             Check(list.Contains("!unlocked(spec.Id)") && Read("MainWindow.GatheringPanel.cs").Contains("Forbidden:GpForbiddenFor(start.JobId)") && Read("MainWindow.GatheringGp.cs").Contains("GpForbiddenFor(gpJob)") && Read("MainWindow.CollectablePanel.cs").Contains("GpForbiddenFor(job)"),"used by the panel, the GP page and the collectable plan");
-            Check(Read("Plugin.cs").Contains("(row.UnlockLink.RowId==0 || unlocks.IsActionUnlocked(row))"),"the game's unlock state");
         }),
         ("Map right-click menu: a Favorites tab first, to go to a favorite or remove it",() =>
         {

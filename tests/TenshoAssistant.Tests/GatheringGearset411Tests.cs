@@ -28,8 +28,7 @@ internal static class GatheringGearset411Tests
             Check(gathering.Contains("DrawGatheringGearset(source);"),"on each source");
             // 0.412 (user's choice in GAPS): « Go there » also equips, only with the setting (off by default, in the reset list).
             Check(gathering.Contains("if(configuration.GoThereEquip)EquipGatheringGearset(source);"),"Go there equips with the setting");
-            var configuration=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs"));
-            Check(configuration.Contains("public bool GoThereEquip { get; set; }") && configuration.Contains("\"GoThereEquip\","),"setting off by default and listed");
+            Check(!new TenshoAssistant.Configuration().GoThereEquip && TenshoAssistant.ConfigurationReset.Reset.Contains("GoThereEquip"),"setting off by default and listed");
         }),
     ];
 }

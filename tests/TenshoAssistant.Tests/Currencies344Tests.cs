@@ -83,7 +83,6 @@ internal static class Currencies344Tests
             Check(watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);",StringComparison.Ordinal) && watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);",StringComparison.Ordinal)
                 && watcher.Contains("player.ContentId==0",StringComparison.Ordinal),"framework thread, logged-in character only, removed on dispose");
             Check(Read("MainWindow.Currencies.cs").Contains("new Dictionary<uint,int>(known)",StringComparison.Ordinal),"copy on write");
-            Check(File.ReadAllText(Path.GetFullPath("docs/evidence/0.344-currencies.md")).Contains("GetMaxCompanySeals",StringComparison.Ordinal),"evidence of the probe");
         }),
     ];
 }

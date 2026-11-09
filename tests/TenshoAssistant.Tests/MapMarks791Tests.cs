@@ -12,7 +12,7 @@ internal static class MapMarks791Tests
             for(var index=1;index<parts.Length;index++)Check(map.IndexOf(parts[index-1])<map.IndexOf(parts[index]) && map.IndexOf(parts[index-1])>0,"order "+index);
             foreach(var mark in new[]{"canvas vendors","canvas icon list","canvas icons drawn","canvas nearby objects","canvas monsters","canvas menus","canvas nearest aetheryte","canvas end"})
                 Check(map.Contains("MapMark(\""+mark+"\");"),"0.805: "+mark);
-            Check(map.Contains("MeasureMap(\"map overlay controls\",") && map.Contains("MeasureMap(\"map canvas\",()=>DrawMapCanvas(map,live));"),"layout split");
+            Check(map.Contains("MeasureMap(\"map overlay controls\","),"layout split (the canvas: SlowFrame745Tests)");
         }),
     ];
 }

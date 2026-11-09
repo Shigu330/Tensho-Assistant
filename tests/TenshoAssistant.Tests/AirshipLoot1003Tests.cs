@@ -20,7 +20,13 @@ internal static class AirshipLoot1003Tests
             Check(Enum.IsDefined(TenshoAssistant.Discoveries.DiscoveryKind.AirshipDrop),"kind");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(page.Contains("DiscoveryKind.AirshipDrop=>localization.Format(\"DiscoveriesUi.FromAirshipSector\"") && page.Contains("DiscoveryKind.VoyageDrop,DiscoveryKind.AirshipDrop,"),"label, source");
-            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,38))-{26,27}"),"merge tool");
+            // 0.1019 (test audit #11, #51, #52): the merge tool knows exactly the kinds of the plugin, read from its KINDS line.
+            var kinds=System.Text.RegularExpressions.Regex.Match(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")),@"(?m)^KINDS=set\(range\(1,(\d+)\)\)-\{([\d,]*)\}");
+            Check(kinds.Success,"merge tool: KINDS line");
+            var excluded=kinds.Groups[2].Value.Split(',',StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToHashSet();
+            var tool=Enumerable.Range(1,int.Parse(kinds.Groups[1].Value)-1).Where(kind=>!excluded.Contains(kind)).ToHashSet();
+            var plugin=Enum.GetValues<TenshoAssistant.Discoveries.DiscoveryKind>().Select(kind=>(int)kind).Where(kind=>kind>0).ToHashSet();
+            Check(tool.SetEquals(plugin),"merge tool kinds = DiscoveryKind: only tool "+string.Join(",",tool.Except(plugin))+", only plugin "+string.Join(",",plugin.Except(tool)));
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs")).Contains("Item gain not attributed:"),"diagnosis");
         }),
     ];

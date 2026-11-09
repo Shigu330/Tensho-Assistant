@@ -9,8 +9,13 @@ internal static class WrongJob788Tests
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftLog.cs"));
             Check(view.Contains("ImGui.TextWrapped(localization.Format(\"CraftLogUi.Remembered\",JobName(job),context.Recipe?.CraftType ?? \"\",rememberedAt.ToLocalTime().ToString(\"g\")));"),"named, wrapped");
             Check(view.Contains("ImGui.PushStyleColor(ImGuiCol.Text,UI.FfxivTheme.Warning);") && view.Contains("DrawEquipRecipeJob(worn,\"CraftLogEquipRemembered\")"),"warning, button");
+            // 0.1019 (test audit #50): the message itself carries the three values, not just any line of the file.
             foreach(var lang in new[]{"en","fr"})
-                Check(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{lang}.json")).Contains("{2}"),"three values: "+lang);
+            {
+                using var document=System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{lang}.json")));
+                var text=document.RootElement.GetProperty("CraftLogUi").GetProperty("Remembered").GetString() ?? "";
+                Check(text.Contains("{0}") && text.Contains("{1}") && text.Contains("{2}"),"three values: "+lang);
+            }
         }),
     ];
 }

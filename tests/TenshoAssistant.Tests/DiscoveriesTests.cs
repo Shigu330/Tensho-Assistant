@@ -58,7 +58,14 @@ internal static class DiscoveriesTests
             var page=Read("MainWindow.Discoveries.cs");
             Check(page.Contains("|| !DiscoveriesLoaded)return;") && page.Contains("store.SeeMonster(monster.NameId,monster.BaseId,live.TerritoryId,live.MapId,monster.Position,monster.Level,at)"),"after the read, from the monsters");
             Check(Read("Plugin.cs").Contains("File.Move(saved,saved+\".broken\",true)"),"a broken file is set aside");
-            Check(!Read("Discoveries/DiscoveriesModel.cs").Contains("Player") || Read("Discoveries/DiscoveriesModel.cs").Contains("never a player's name"),"no player field");
+            // 0.1019 (test audit #2): by reflection, no saved field of a fact (nor of any type of the Discoveries namespace) can carry a player.
+            var playerish=new System.Text.RegularExpressions.Regex("Player|Character|ContentId|Account|Retainer|Owner",System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var factFields=typeof(DiscoveryFact).GetProperties().Select(property=>property.Name).ToList();
+            Check(factFields.Count>=15 && factFields.Contains("Subject") && !factFields.Any(name=>playerish.IsMatch(name) || name.Contains("Name",StringComparison.OrdinalIgnoreCase)),"no player field: "+string.Join(",",factFields));
+            var leaks=typeof(DiscoveryFact).Assembly.GetTypes().Where(type=>type.Namespace=="TenshoAssistant.Discoveries")
+                .SelectMany(type=>type.GetProperties().Concat<System.Reflection.MemberInfo>(type.GetFields()).Select(member=>type.Name+"."+member.Name))
+                .Where(name=>playerish.IsMatch(name)).ToList();
+            Check(leaks.Count==0,"no player member in Discoveries: "+string.Join(",",leaks));
         }),
     ];
 }

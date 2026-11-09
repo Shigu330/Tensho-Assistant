@@ -10,6 +10,8 @@ internal static class CraftLiveGroup948Tests
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
             var live=Read("MainWindow.CraftLive.cs");var settings=Read("MainWindow.Settings.cs");
             Check(live.Contains("private void DrawCraftLiveSettings()") && live.Contains("var off=!configuration.CraftLivePanel;") && settings.Contains("DrawCraftLiveSettings();"),"one block");
+            // 0.1019 (test audit #7, from Craft468Tests): the window's own switch is the shared row (its cross: AttachedPanels516Tests).
+            Check(live.Contains("BoolSetting(\"CraftLiveUi.Panel\",\"CraftLiveUi.PanelTip\",()=>configuration.CraftLivePanel"),"window switch");
             Check(System.Text.RegularExpressions.Regex.Matches(live+settings,"BoolSetting\\(\"CraftLiveUi.Suggest\"").Count==1,"drawn once in code");
             Check(Read("MainWindow.CraftProjection.cs").Contains("if(!configuration.CraftLivePanel || !configuration.CraftLiveSuggest"),"no work without the window");
         }),

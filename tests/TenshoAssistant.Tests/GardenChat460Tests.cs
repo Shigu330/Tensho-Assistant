@@ -40,7 +40,7 @@ internal static class GardenChat460Tests
             var watcher=Read("Reminders/GardenChatWatcher.Dalamud.cs");
             Check(watcher.Contains("chat.ChatMessageUnhandled+=OnMessage;") && watcher.Contains("chat.ChatMessageUnhandled-=OnMessage;") && watcher.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);"),"subscribed and released");
             Check(watcher.Contains("agent->SelectedItems") && !watcher.Contains("ConfirmSeedAndSoilSelection"),"read only");
-            Check(new TenshoAssistant.Configuration().GardenDetect && Read("Configuration.cs").Contains("\"GardenDetect\""),"setting");
+            Check(new TenshoAssistant.Configuration().GardenDetect && TenshoAssistant.ConfigurationReset.Reset.Contains("GardenDetect"),"setting");
             foreach(var language in new[]{"en","fr"})
                 Check(Read($"Localization/Languages/{language}.json").Contains(language=="en" ? "from the game's chat lines":"à partir des lignes du chat du jeu"),"explained: "+language);
             Check(Read("MainWindow.Garden.cs").Contains("if(known.Seed is null){ChatNotice?.Invoke(localization.Get(\"Garden.DetectedUnknown\"));return;}"),"an unknown seed is not guessed");

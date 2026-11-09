@@ -45,7 +45,7 @@ internal static class GcSupply469Tests
         {
             var reader=Read("Items/GcSupplyReader.Dalamud.cs");
             Check(reader.Contains("\"ContentsInfoDetail\"") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);") && !reader.Contains("Fire"),"read only, with its cleanup");
-            Check(Read("Plugin.cs").Contains("new Items.GcSupplyReader(") && Read("Configuration.cs").Contains("\"GcSupplySeen\""),"registered, kept");
+            Check(Read("Plugin.cs").Contains("new Items.GcSupplyReader(") && TenshoAssistant.ConfigurationReset.Kept.Contains("GcSupplySeen"),"registered, kept");
             foreach(var file in new[]{"MainWindow.MarketHover.cs","MainWindow.Tools.cs","MainWindow.ItemUses.cs"})Check(Read(file).Contains("GcSupplyLine("),file);
             var panel=Read("MainWindow.CraftLog.cs");
             Check(panel.Contains("ImGui.Checkbox(\"###CraftLogManipulation\"") && panel.Contains("Find(job,CraftActionKind.Manipulation)") && panel.Contains("DrawDetectedConsumables(craftLogDetected)"),"panel");

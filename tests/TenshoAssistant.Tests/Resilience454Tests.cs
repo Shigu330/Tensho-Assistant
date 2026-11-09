@@ -37,10 +37,9 @@ internal static class Resilience454Tests
             var names=Read("Items/GameNames.Lumina.cs");
             Check(names.Contains("catch(Exception error){Warn(error);garland[(type,id)]=null;return null;}") && names.Contains("var monsters=Safe(()=>") && names.Contains("var duties=Safe(()=>"),"names");
         }),
-        ("Functions checked: retainer sorter, map node move, treasure map said once; Triad data plausible; no French in the code",() =>
+        ("Functions checked: retainer sorter (map node move: Map328Tests), treasure map said once; Triad data plausible; no French in the code",() =>
         {
             Check(Read("Inventory/InventoryNativeReader.Dalamud.cs").Contains("(nint)ItemOrderModule.MemberFunctionPointers.GetActiveRetainerSorter != 0") && Read("Inventory/InventoryVisualSortBridge.Dalamud.cs").Contains("(nint)ItemOrderModule.MemberFunctionPointers.GetActiveRetainerSorter!=0"),"sorter");
-            Check(Read("Maps/NativeMapReplacer.Dalamud.cs").Contains("keepGameMap=!options.ReplaceGameMap || bypass || !canShow() || !canMove;"),"map");
             Check(Read("Maps/TreasureMapReader.Dalamud.cs").Contains("The treasure map could not be read: game function not resolved"),"treasure");
             Check(Read("MiniGames/TriadNpcLoader.Dalamud.cs").Contains("if (cardOfItem.Count == 0 || npcOfMatch.Count == 0) throw new InvalidOperationException("),"triad");
             Check(!Read("Gathering/GatheringObservationReader.Dalamud.cs").Contains("GetAsAtkTextNode") && Read("Craft/CraftLiveObservation.cs").Contains("\"Native text too long.\""),"cast, English");

@@ -5,10 +5,9 @@ internal static class HuntAlert446Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Hunt marks: A/S alert off by default, reset, once per mark; the train call is copied with <flag>, never sent",() =>
+        ("Hunt marks: A/S alert off by default, reset, once per mark; the train call is copied with <flag> (also sent on click: Decisions447Tests)",() =>
         {
-            var configuration=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs")).Replace("\r\n","\n");
-            Check(configuration.Contains("public bool HuntMarkAlert { get; set; }\n") && configuration.Contains("\"HuntMarkAlert\","),"setting off by default and in the reset list");
+            Check(!new TenshoAssistant.Configuration().HuntMarkAlert && TenshoAssistant.ConfigurationReset.Reset.Contains("HuntMarkAlert"),"setting off by default and in the reset list");
             var ui=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.HuntTrain.cs"));
             Check(ui.Contains("item.Kind==MapObjectKind.HuntMark && item.Level>=2") && ui.Contains("huntMarksAnnounced.Add("),"A and S only, once per mark");
             Check(ui.Contains("if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound("),"sound follows the alarm options");

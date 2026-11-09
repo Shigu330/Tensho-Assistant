@@ -62,7 +62,7 @@ internal static class GuideFlowTests
         ("Guide and help: what runs in Draw stays light and follows the language",() =>
         {
             var guide=Read("src/TenshoAssistant/MainWindow.Guide.cs");
-            Check(guide.Contains("guideChecklistNext = now + System.Diagnostics.Stopwatch.Frequency * 2;") && guide.Contains("DrawGuideWindows(tasks, false);"),"the Home list reads what is saved, every two seconds");
+            Check(guide.Contains("DrawGuideWindows(tasks, false);"),"the Home list reads what is saved (every two seconds: DrawCost956Tests)");
             var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
             Check(help.Contains("var language = localization.CurrentCode + \"|\" + helpQuery;"),"help rebuilt on a language change");
         }),

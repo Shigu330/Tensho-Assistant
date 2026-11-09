@@ -13,7 +13,7 @@ internal static class HuntMarks441Tests
             Check(reader.Contains("IBattleNpc { CurrentHp:>0 }=>MapObjectKind.HuntMark") && reader.Contains("if(kind is null || !item.IsTargetable)continue;"),"alive, targetable");
             var view=Read("MainWindow.MapView.cs");
             Check(view.Contains("MapObjectKind.HuntMark=>!settings.ShowHuntMarks") && view.Contains("MapView.HuntMarkLabel"),"layer setting and label");
-            Check(Read("Configuration.cs").Contains("public bool ShowHuntMarks { get; set; } = true;"),"on by default");
+            Check(new TenshoAssistant.MapViewSettings().ShowHuntMarks,"on by default");
         }),
     ];
 }

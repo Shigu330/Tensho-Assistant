@@ -66,11 +66,11 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.332-uld-window-frame.md](0.332-uld-window-frame.md) | `tools/README.md` | `CHANGELOG.md` |
 | [0.333-ehcatl-probe.md](0.333-ehcatl-probe.md) | — | `CHANGELOG.md` |
 | [0.335-submarine-tiers.md](0.335-submarine-tiers.md) | `tests/TenshoAssistant.Tests/Routes335Tests.cs` | `CHANGELOG.md` |
-| [0.336-airship-sectors.md](0.336-airship-sectors.md) | `src/TenshoAssistant/FreeCompany/AirshipPlanner.cs`, `src/TenshoAssistant/FreeCompany/AirshipSectors.cs`, `src/TenshoAssistant/FreeCompany/AirshipVoyageTable.Dalamud.cs`, `tests/TenshoAssistant.Tests/Airships336Tests.cs` | `CHANGELOG.md` |
+| [0.336-airship-sectors.md](0.336-airship-sectors.md) | `src/TenshoAssistant/FreeCompany/AirshipPlanner.cs`, `src/TenshoAssistant/FreeCompany/AirshipSectors.cs`, `src/TenshoAssistant/FreeCompany/AirshipVoyageTable.Dalamud.cs` | `CHANGELOG.md` |
 | [0.338-overmeld-rates.md](0.338-overmeld-rates.md) | `src/TenshoAssistant/Gear/GearCatalog.cs`, `tests/TenshoAssistant.Tests/Overmeld338Tests.cs` | `CHANGELOG.md` |
-| [0.340-chocobo-barding.md](0.340-chocobo-barding.md) | `src/TenshoAssistant/Gear/ChocoboBarding.cs`, `tests/TenshoAssistant.Tests/Barding340Tests.cs` | `CHANGELOG.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
-| [0.342-festivals.md](0.342-festivals.md) | `src/TenshoAssistant/Events/Festivals.cs`, `src/TenshoAssistant/MainWindow.Events.cs`, `tests/TenshoAssistant.Tests/Events342Tests.cs` | `CHANGELOG.md` |
-| [0.344-currencies.md](0.344-currencies.md) | `src/TenshoAssistant/Inventory/Currencies.cs`, `tests/TenshoAssistant.Tests/Currencies344Tests.cs` | `CHANGELOG.md` |
+| [0.340-chocobo-barding.md](0.340-chocobo-barding.md) | `src/TenshoAssistant/Gear/ChocoboBarding.cs` | `CHANGELOG.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
+| [0.342-festivals.md](0.342-festivals.md) | `src/TenshoAssistant/Events/Festivals.cs`, `src/TenshoAssistant/MainWindow.Events.cs` | `CHANGELOG.md` |
+| [0.344-currencies.md](0.344-currencies.md) | `src/TenshoAssistant/Inventory/Currencies.cs` | `CHANGELOG.md` |
 | [0.356-roulettes.md](0.356-roulettes.md) | `src/TenshoAssistant/Plugin.cs`, `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/Roulettes356Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
 | [0.357-armoire.md](0.357-armoire.md) | — | `CHANGELOG.md` |
 | [0.363-leves.md](0.363-leves.md) | — | `CHANGELOG.md` |

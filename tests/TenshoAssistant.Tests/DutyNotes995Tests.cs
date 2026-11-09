@@ -4,6 +4,14 @@ using TenshoAssistant.Duties;
 internal static class DutyNotes995Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+    // A method's text, from its declaration to the next member at the same indentation, or "" when missing.
+    internal static string Method(string text,string declaration)
+    {
+        var from=text.IndexOf(declaration,StringComparison.Ordinal);
+        if(from<0)return "";
+        var to=System.Text.RegularExpressions.Regex.Match(text[(from+declaration.Length)..],@"\r?\n    (private|internal|public|protected)\b");
+        return to.Success ? text.Substring(from,declaration.Length+to.Index):text[from..];
+    }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
@@ -19,7 +27,8 @@ internal static class DutyNotes995Tests
         ("Duty notes 995: hidden in combat, kept with the player's data",() =>
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Duties.cs"));
-            Check(page.Contains("private void DrawDutyNotes(DutyDefinition duty)") && page.Contains("if(InCombatNow?.Invoke()==true){EmptyState(\"DutyGuide.InCombat\");return;}"),"combat");
+            // 0.1019 (test audit #1): the guard is looked for inside DrawDutyNotes itself, not anywhere in the page (DrawDutyGuide has the same line).
+            Check(Method(page,"private void DrawDutyNotes(DutyDefinition duty)").Contains("if(InCombatNow?.Invoke()==true){EmptyState(\"DutyGuide.InCombat\");return;}"),"combat");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs")).Contains("\"DutyNotes\""),"kept");
         }),
     ];

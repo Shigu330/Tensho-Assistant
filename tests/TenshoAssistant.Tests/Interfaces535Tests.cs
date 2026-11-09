@@ -156,7 +156,7 @@ internal static class Interfaces535Tests
         {
             var view=Read("MainWindow.Weather.cs");
             Check(view.Contains("period!=weatherFavoritesPeriod || weatherFavoritesGrid.Count!=favorites.Count") && view.Contains("WeatherFavoritePeriods=6,WeatherFavoriteZones=12"),"bounded, once per period");
-            Check(Read("Configuration.cs").Contains("\"WeatherFavorites\","),"the player's data");
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("WeatherFavorites"),"the player's data");
         }),
         ("0.565: the sort preview frames what would move; an unread place says nothing",() =>
         {

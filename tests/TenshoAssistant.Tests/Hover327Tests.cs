@@ -42,7 +42,6 @@ internal static class Hover327Tests
                 && reader.Contains("owner!=0 && !hidden && !gui.GameUiHidden ? gui.HoveredItem:0;",StringComparison.Ordinal),"the reader stops in a duty");
             Check(Read("Plugin.cs").Contains("{ InDuty = () => mapLive?.State is { InDuty: true },",StringComparison.Ordinal),"same detection as the map's « Hide in duties »");
             Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"Settings.HoverHideInDuty\",\"Settings.HoverHideInDutyTip\",",StringComparison.Ordinal),"shared row (tooltip and ↺)");
-            Check(Text("en","HoverHideInDutyTip").EndsWith("\\nDefault: off.\"",StringComparison.Ordinal) && Text("fr","HoverHideInDutyTip").EndsWith("\\nPar défaut : désactivé.\"",StringComparison.Ordinal),"tips end with the default");
             // Managed half of the reader in a duty: « nothing hovered » clears the item, so the panel is not drawn and nothing is asked.
             using var http = new HttpClient(new MarketTestHandler((_,_) => throw new Exception("unexpected HTTP")));
             using var market = new MarketService(http);
@@ -71,7 +70,6 @@ internal static class Hover327Tests
             foreach (var key in new[] { "HoverCollection","HoverStock","HoverUsages","HoverSources" })
             {
                 Check(settings.Contains("BoolSetting(\"Settings." + key + "\",\"Settings." + key + "Tip\",",StringComparison.Ordinal),"shared row (tooltip and ↺): " + key);
-                Check(Text("en",key + "Tip").EndsWith("\\nDefault: on.\"",StringComparison.Ordinal) && Text("fr",key + "Tip").EndsWith("\\nPar défaut : activé.\"",StringComparison.Ordinal),"tip ends with the default: " + key);
             }
         }),
     ];

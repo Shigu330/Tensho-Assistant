@@ -32,7 +32,7 @@ internal static class Island679Tests
             Check(view.Contains("liveEvents.Where(marker=>eventMaps.Contains(marker.MapId))"),"events");
             Check(!view.Contains("liveEvents.Where(marker=>marker.MapId==map.MapId)"),"not one map");
         }),
-        ("Island map: the five kinds are in the map's display menu, once each, and All and None count them",() =>
+        ("Island map: the five kinds are in the map's display menu, once each (All and None: MapLayersAll902Tests)",() =>
         {
             var view=Read("MainWindow.MapView.cs");
             var popup=view.IndexOf("BeginPopup(\"MapViewLayers\")",StringComparison.Ordinal);
@@ -42,7 +42,6 @@ internal static class Island679Tests
                 Check(popup>=0 && box>popup && box<popup+4000,kind+" in the display menu");
                 Check(view.LastIndexOf($"SettingBox(\"MapView.ShowIsland{kind}\"",StringComparison.Ordinal)==box,kind+" once");
             }
-            Check(view.Contains("settings.ShowIslandPlants=settings.ShowIslandWood=settings.ShowIslandRocks=settings.ShowIslandEarth=settings.ShowIslandFishing=settings.ShowIslandAnimals=shown;"),"All and None (0.901: and the animals)");
         }),
         ("Island map: a place of one kind at the same spot is drawn once, and a far one or another kind stays apart",() =>
         {

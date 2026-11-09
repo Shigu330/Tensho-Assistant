@@ -7,12 +7,11 @@ internal static class DropCounts935Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Drop counts 935: a kill per credited death, a chest once per object, merge tool aware",() =>
+        ("Drop counts 935: a kill per credited death, a chest once per object",() =>
         {
             Check((int)DiscoveryKind.MonsterKill==33 && (int)DiscoveryKind.DutyChestOpened==34,"kinds");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("store.SeeSource(DiscoveryKind.MonsterKill,npc.NameId,0,npc.Level,at,territory);") && watcher.Contains("if(chestsSeen.Add(item.ChestObjectId))store.SeeSource(DiscoveryKind.DutyChestOpened,duty,0,1,at,territory);"),"counted");
-            Check(File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py")).Contains("KINDS=set(range(1,"),"merge tool");
         }),
     ];
 }

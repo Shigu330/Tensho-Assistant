@@ -28,8 +28,7 @@ internal static class HomeToday599Tests
         {
             var settings=new TenshoAssistant.Configuration();
             Check(settings.HomeTodayHidden is null && settings.HomeTilesHidden is null,"everything shown");
-            var config=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs"));
-            Check(config.Contains("\"HomeTodayHidden\"") && config.Contains("\"HomeTilesHidden\""),"in the reset list");
+            Check(TenshoAssistant.ConfigurationReset.Reset.Contains("HomeTodayHidden") && TenshoAssistant.ConfigurationReset.Reset.Contains("HomeTilesHidden"),"in the reset list");
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.HomeToday.cs"));
             Check(view.Contains("TimeSpan.FromSeconds(1)") && !view.Contains("GameTimers.Read"),"once a second, from what is already copied");
             var home=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Home.cs"));

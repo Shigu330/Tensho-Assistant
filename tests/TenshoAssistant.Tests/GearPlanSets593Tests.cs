@@ -53,7 +53,7 @@ internal static class GearPlanSets593Tests
             GearPlanSet? set=null;
             for(var index=0;index<GearPlanSets.MaxPlans-1;index++)Check(GearPlanSets.New(ref set,"Main",$"P{index}",[],[]),"under the limit");
             Check(!GearPlanSets.New(ref set,"Main","One too many",[],[]),"at the limit");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Configuration.cs")).Contains("\"GearPlanSets\""),"in the player's data reset");
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("GearPlanSets"),"in the player's data reset");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Gear.cs"));
             Check(page.IndexOf("DrawGearPlanPicker(state.JobId);")<page.IndexOf("var plans=configuration.GearPlans??=[];"),"taken before the frame reads the plan");
         }),

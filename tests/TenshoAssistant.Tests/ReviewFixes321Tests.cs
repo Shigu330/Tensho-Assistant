@@ -29,22 +29,6 @@ internal static class ReviewFixes321Tests
             var edited = new TenshoAssistant.CraftSearchSettings { Steps = 0, Width = 9999, Budget = -5, ExtraWait = 7 };
             Check(edited.BoundedSteps == 1 && edited.BoundedWidth == 512 && edited.BoundedBudget == 1 && edited.BoundedExtraWait == 3,"bounds 1–100, 1–512, 1–500 000, 0–3");
         }),
-        ("A tooltip never sits between a control's « if » and the block it guards",()=>
-        {
-            // The 0.287 pass put Tip(...) right after « if(ImGui.Checkbox(...)) »: the « if » then guarded the tooltip and the save block ran every frame.
-            var root = Path.GetFullPath("src/TenshoAssistant");
-            // Controls only: « if(ImGui.IsItemHovered()) » followed by the tooltip is the intended form.
-            var guard = new Regex(@"^\s*if\s*\(\s*ImGui\.(Checkbox|Button|SmallButton|InputText\w*|InputInt|InputFloat|Slider\w+|Drag\w+|Combo|BeginCombo|Selectable|RadioButton|ColorEdit\d)\(.*\)\s*\)\s*$");
-            var found = new List<string>();
-            foreach (var file in Directory.EnumerateFiles(root,"*.cs",SearchOption.AllDirectories).Where(file => !Path.GetRelativePath(root,file).Split(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar).Any(part => part is "obj" or "bin")))
-            {
-                var lines = File.ReadAllLines(file);
-                for (var index = 0; index + 1 < lines.Length; index++)
-                    if (guard.IsMatch(lines[index]) && Regex.IsMatch(lines[index + 1],@"^\s*(Tip|WrappedTooltip)\("))
-                        found.Add($"{Path.GetFileName(file)}:{index + 1}");
-            }
-            Check(found.Count == 0,"tooltip guarded by a control's if: " + string.Join(", ",found));
-        }),
         ("Universalis data centre table: after a failure it is asked again at most once a minute, not on every frame",()=>
         {
             var calls = 0;

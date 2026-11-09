@@ -36,7 +36,7 @@ internal static class ItemNotes347Tests
             Check(ItemNotes.InBags(live,0,notes).ToSell.Count == 0 && ItemNotes.InBags(null,9,notes).ToSell.Count == 0,"no character or no live inventory: nothing");
             Check(Read("Items/ItemNoteShopReminder.Dalamud.cs").Contains("open && !shopOpen",StringComparison.Ordinal),"once per shop opening");
             Check(!new TenshoAssistant.Configuration().ItemNoteImportantSound && new TenshoAssistant.Configuration().ItemNoteShopReminder,"sound off, reminder on by default");
-            Check(Read("Configuration.cs").Contains("\"ItemNotes\",",StringComparison.Ordinal),"notes are saved data, kept by « restore every setting »");
+            Check(TenshoAssistant.ConfigurationReset.Kept.Contains("ItemNotes"),"notes are saved data, kept by « restore every setting »");
         }),
     ];
 }

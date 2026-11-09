@@ -37,7 +37,7 @@ internal static class GardenCrosses450Tests
             var ui=Read("MainWindow.GardenCrosses.cs");
             Check(ui.Contains("if(!task.IsCompletedSuccessfully)") && !ui.Contains("http") && !ui.Contains("unsafe"),"waits for the task, nothing online, no game memory");
             Check(Read("TenshoAssistant.csproj").Contains("<EmbeddedResource Include=\"Reminders\\Data\\garden-crosses.csv\" />"),"embedded");
-            Check(Read("Credits/CreditCatalog.cs").Contains("new(\"CrossbreedHelper\", CreditKind.Embedded") && Read("MainWindow.Garden.cs").Contains("DrawGardenCrosses();"),"credited, wired");
+            Check(Read("Credits/CreditCatalog.cs").Contains("new(\"CrossbreedHelper\", CreditKind.Embedded"),"credited (wired: Todo458Tests)");
         }),
     ];
 }

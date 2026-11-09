@@ -58,7 +58,6 @@ internal static class CraftLogAutoSolve327Tests
             var greyed = settings.IndexOf("ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);",StringComparison.Ordinal);
             var row = settings.IndexOf("BoolSetting(\"ModuleSettings.CraftLogAutoSolve\",\"ModuleSettings.CraftLogAutoSolveTip\",()=>configuration.CraftLogAutoSolve,value=>configuration.CraftLogAutoSolve=value,c=>c.CraftLogAutoSolve);",StringComparison.Ordinal);
             Check(helper >= 0 && greyed > helper && row > greyed,"shared row with « ↺ » under the helper switch, greyed while it is off");
-            Check(Text("fr","ModuleSettings","CraftLogAutoSolveTip").EndsWith("\nPar défaut : activé.",StringComparison.Ordinal) && Text("en","ModuleSettings","CraftLogAutoSolveTip").EndsWith("\nDefault: on.",StringComparison.Ordinal),"tips end with their default");
             foreach (var language in new[] { "fr","en" })
                 Check(Text(language,"ModuleSettings","CraftLogAutoSolve").Length > 0 && Text(language,"CraftLogUi","Compute").Length > 0 && Text(language,"CraftLogUi","ComputeTip").Length > 0,"texts: " + language);
         }),

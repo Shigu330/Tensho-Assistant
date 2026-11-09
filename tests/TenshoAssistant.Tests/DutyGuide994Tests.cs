@@ -23,7 +23,8 @@ internal static class DutyGuide994Tests
         ("Duty guide 994: shown out of combat only, credited, on a click",() =>
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Duties.cs"));
-            Check(page.Contains("if(InCombatNow?.Invoke()==true){EmptyState(\"DutyGuide.InCombat\");return;}"),"combat");
+            // 0.1019 (test audit #1): the guard is looked for inside DrawDutyGuide itself (DrawDutyNotes has the same line).
+            Check(DutyNotes995Tests.Method(page,"private void DrawDutyGuide(DutyDefinition duty)").Contains("if(InCombatNow?.Invoke()==true){EmptyState(\"DutyGuide.InCombat\");return;}"),"combat");
             Check(TenshoAssistant.Credits.CreditCatalog.All.Any(credit=>credit.Files.Contains("Duties/WikiDutyGuide.cs")),"credited");
         }),
     ];

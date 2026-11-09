@@ -16,12 +16,14 @@ internal static class QuestTarget813Tests
             var stepDone=new[]{((uint)2285,(uint)219,400f,50f)};
             Check(MapQuestTarget.Gone(stepDone,2285,219,at) && MapQuestTarget.Gone([],2285,219,at),"point moved, quest done");
             Check(!MapQuestTarget.Gone([],0,219,at),"no quest found: kept (unknown)");
+            // 0.847 (X-69, user report; was QuestStep847Tests): the target goes when the quest's step is done ("point moved" above), for every journal target (below).
         }),
-        ("Quest target: read from the game's Map, used only for journal targets without a quest, reset with each new target",() =>
+        ("Quest target: read from the game's Map for every journal target, reset with each new target",() =>
         {
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(map.Contains("if(mapGameTarget is { } bare && mapLive?.State?.QuestPoints is { } points)") && map.Replace("\r\n","\n").Contains("mapGameTargetObjective=0;\n                mapGameTarget=focus.UsesRoute(map)") ,"used, reset");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Contains("if(count is <=0 or >32)continue;"),"bounded");
+            // 0.1019 (test audit #55): the bound is looked for inside ReadQuestPoints (the same line exists in another reader of the file).
+            Check(DutyNotes995Tests.Method(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")),"private static unsafe IReadOnlyList<MapQuestPoint>? ReadQuestPoints()").Contains("if(count is <=0 or >32)continue;"),"bounded");
         }),
     ];
 }

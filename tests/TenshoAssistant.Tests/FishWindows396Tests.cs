@@ -38,8 +38,13 @@ internal static class FishWindows396Tests
             var catalog = new WeatherCatalog([new(1,"Clair",1)],[new(10,1,[new(1,100)],true)],"test");
             Check(FishWindows.Next(Fish(null,null,[],[]),catalog,10,DateTimeOffset.UtcNow)!.Count==0,"always");
             Check(FishWindows.Next(Fish(null,null,[1],[]),catalog,10,DateTimeOffset.UtcNow) is null,"individual weather: unknown");
-            var timeOnly = FishWindows.Next(Fish(60,120,[],[]),catalog,10,DateTimeOffset.UtcNow,2)!;
-            Check(timeOnly.Count==2 && Math.Abs((timeOnly[0].EndsAt-timeOnly[0].StartsAt).TotalSeconds-175)<1 || timeOnly[0].StartsAt<DateTimeOffset.UtcNow,"one ET hour = 175 s");
+            // 0.1019 (test audit #13): a fixed time outside the window (10:00 ET), so the count and the length are always checked.
+            var tenEt = DateTimeOffset.FromUnixTimeSeconds(1_700_002_150);
+            Check((int)(tenEt.ToUnixTimeSeconds()*60/175%1440)==600,"fixed time is 10:00 ET");
+            var timeOnly = FishWindows.Next(Fish(60,120,[],[]),catalog,10,tenEt,2)!;
+            Check(timeOnly.Count==2,"two windows: "+timeOnly.Count);
+            Check(timeOnly.All(window=>Math.Abs((window.EndsAt-window.StartsAt).TotalSeconds-175)<1),"one ET hour = 175 s");
+            Check(timeOnly[0].StartsAt>tenEt && Math.Abs((timeOnly[0].StartsAt-tenEt).TotalSeconds-15*175)<1,"next 1:00 ET, 15 ET hours later");
         }),
     ];
 }

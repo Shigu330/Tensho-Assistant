@@ -20,10 +20,8 @@ internal static class Resilience452Tests
             foreach(var sheet in new[]{"ClassJob","ContentRoulette","ContentsNote"})
                 Check(plugin.Contains("LoadSheet(\""+sheet+"\",()=>data.GetExcelSheet<Lumina.Excel.Sheets."+sheet+">()"),"guarded at load: "+sheet);
         }),
-        ("Alarm chat link: one handler per item, kept; a chat failure leaves the sound and Discord",() =>
+        ("Alarm chat line: a chat failure leaves the sound and Discord (the links: AlarmLinks414Tests)",() =>
         {
-            var plugin=Read("Plugin.cs");
-            Check(!plugin.Contains("RegisterAlarmLink"),"0.774: no link handler any more");
             Check(Read("Alarms/AlarmService.Dalamud.cs").Contains("catch (Exception error) { log.Warning(error, \"Alarm chat line could not be written.\"); }"),"chat guarded");
         }),
         ("Hooks (A-14): the game's function always runs, nothing is thrown back, the game's 1-byte bool is kept",() =>

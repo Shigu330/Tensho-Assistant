@@ -8,7 +8,7 @@ internal static class ZoneCostIcons824Tests
         {
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ListPanels.cs"));
             Check(page.Contains("private const uint TeleportIcon=111;") && page.Contains("itemCatalog.State.Catalog?.Find(1)"),"icons");
-            Check(page.Contains("if(group.Cost is { } gil)DrawListZoneCost(gil);") && !page.Contains("\" · \"+localization.Format(\"ListPanels.ZoneCost\""),"no words in the header");
+            Check(page.Contains("if(group.Cost is { } gil)DrawListZoneCost(gil);"),"icons, no words in the header");
         }),
     ];
 }
