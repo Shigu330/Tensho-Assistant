@@ -105,7 +105,7 @@ Utiles sans être prioritaires. « En partie » : une première version existe.
 | P25 | Mini-carte Tensho | Seconde carte à maintenir, le jeu en a une |
 | P26 | Position mise en évidence au survol des listes | Valeur basse |
 | P27 | Couleur réglable par icône | Valeur basse |
-| C10 | Chrono de touche à chaque lancer | Demande une sonde, et les plugins de pêche existants le font déjà |
+| C10 | Chrono de touche à chaque lancer | Demande une sonde, et les plugins de pêche existants le font déjà. 2026-11-09 : plus rien après la 1.0.0 ; la sonde existait (0.887) : fait en 0.1011 |
 | C23 | Action suivante sur les barres de raccourcis | Dessin sur l'interface du jeu à chaque image, sensible aux mises à jour ; C5 donne l'information sans ce risque |
 
 ## Liste complète

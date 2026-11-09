@@ -19,6 +19,13 @@ public sealed unsafe class FishingBaitReader : IDisposable
     private const uint IntuitionStatus=568;
     private double intuitionLeft=-1;
     public double? IntuitionLeft=>Volatile.Read(ref intuitionLeft) is >= 0 and var left ? left:null;
+    /// <summary>
+    /// C10 (0.1011): when the last cast started, for the stopwatch of the fishing help. The line's state (FishingEventHandler, through
+    /// EventFramework.EventHandlerModule) turns to CastingOut (1) at each cast, mooch included; lures do not change it (docs/evidence/0.887-fishing-bite.md).
+    /// Read every frame (one field), only the change is kept; null before the first cast.
+    /// </summary>
+    private long castAt=-1;private int lineState=-1;private bool lineWarned;
+    public DateTimeOffset? CastAt=>Volatile.Read(ref castAt) is >= 0 and var ticks ? new DateTimeOffset(ticks,TimeSpan.Zero):null;
 
     public FishingBaitReader(IFramework framework,IObjectTable objects,IPluginLog log)
     {
@@ -28,8 +35,10 @@ public sealed unsafe class FishingBaitReader : IDisposable
 
     private void OnUpdate(IFramework _)
     {
+        if(disposed)return;
+        ReadLine();
         var now=DateTimeOffset.UtcNow;
-        if(disposed || now<nextRead)return;
+        if(now<nextRead)return;
         nextRead=now.AddMilliseconds(500);
         try
         {
@@ -47,6 +56,23 @@ public sealed unsafe class FishingBaitReader : IDisposable
         {
             Volatile.Write(ref bait,-1);Volatile.Write(ref intuitionLeft,-1d);
             if(!warned){warned=true;log.Warning(error,"The bait in hand could not be read.");}
+        }
+    }
+
+    private void ReadLine()
+    {
+        try
+        {
+            var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
+            var handler=events==null ? null:events->EventHandlerModule.FishingEventHandler;
+            var state=handler==null ? -1:(int)handler->State;
+            if(state==lineState)return;
+            lineState=state;
+            if(state==1)Volatile.Write(ref castAt,DateTimeOffset.UtcNow.UtcTicks);
+        }
+        catch(Exception error)
+        {
+            if(!lineWarned){lineWarned=true;log.Warning(error,"The fishing line could not be read.");}
         }
     }
 

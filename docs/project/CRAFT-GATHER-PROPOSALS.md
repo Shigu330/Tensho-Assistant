@@ -90,6 +90,8 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## C10 — G4 — Chrono de touche relancé tout seul à chaque lancer
 
+- **État (2026-11-09)** : FAIT 0.1011, avant la 1.0.0 (plus rien n'est prévu après). Signal du lancer : état CastingOut de la ligne, prouvé en jeu en 0.887 (docs/evidence/0.887-fishing-bite.md), lu à chaque image dans `Gathering/FishingBaitReader.Dalamud.cs` ; les chronos de l'aide à la pêche et de la pêche en mer repartent de ce moment ; le bouton manuel reste.
+
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
 - **Ce que le joueur obtient** : Le chrono de l'aide à la pêche, comparé aux temps de touche Teamcraft, repart de zéro à chaque lancer, sans clic sur « Relancer ». La plage verte « ça peut mordre » devient juste pour chaque lancer.
 - **Comment, taille, dépendances** : Sonde d'abord : un signal fiable du lancer (drapeaux de condition pendant le lancer et l'attente, ou état du gestionnaire de pêche FFXIVClientStructs), relevé en jeu dans docs/evidence. Ensuite : copie sur le thread du framework, gardée R-14 ; le bouton manuel reste. Taille S après la sonde. Dépendances : G15 (lectures hors Draw). Décision : aucune.

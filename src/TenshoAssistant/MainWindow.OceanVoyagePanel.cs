@@ -163,6 +163,7 @@ internal sealed partial class MainWindow
             var fishingState=fishingNow?.Invoke()?.Fishing==true;
             if(fishingState && !oceanFishingBefore)oceanFishingSince=DateTimeOffset.UtcNow;
             if(!fishingState)oceanFishingSince=null;
+            else oceanFishingSince=FromCast(oceanFishingSince,FishingCastAt?.Invoke());
             oceanFishingBefore=fishingState;
             var elapsed=oceanFishingSince is { } since ? (int)(DateTimeOffset.UtcNow-since).TotalSeconds:(int?)null;
             if(elapsed is { } seconds)

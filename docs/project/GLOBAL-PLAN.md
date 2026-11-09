@@ -12,13 +12,12 @@ Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisa
 | 2 | Petites propositions | 43 | Non |
 | 3 | Propositions moyennes | 19 | Non |
 | 4 | Idées, sonde web et sources sans le jeu | 6 | Non |
-| 5 | Relevés en jeu, puis le code qui en dépend | 27 | Oui, l'un après l'autre |
+| 5 | Relevés en jeu, puis le code qui en dépend | 28 | Oui, l'un après l'autre |
 | 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre |
 | 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide | | Non |
 | Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) | | |
-| Après la 1.0.0 | C10, chrono de touche | 1 | |
 
-Total avant la 1.0.0 : 99 points. Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
+Total avant la 1.0.0 : 100 points. **Rien n'est prévu après la 1.0.0 (demande de l'utilisateur, 2026-11-09)** : C10, seul point qui y était, est passé en phase 5. Le portage à l'API 16 de Dalamud n'est pas un point du plan : il se fait dès que Dalamud la publie, quelle que soit la version de Tensho (docs/evidence/0.1009-dalamud-api16-watch.md). Le bouton pour afficher ou cacher des icônes sur la carte existe déjà (rapport de l'utilisateur) : la demande est retirée.
 
 ## Déroulement en jeu (phases 5 et 6)
 
@@ -148,6 +147,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | ~~C28~~ fait en 0.663 | Durée de l'intuition et compte à rebours | S | Unité à confirmer sur une vraie intuition. |
 | ~~C29~~ fait en 0.649 | R-15, partie anticipée : poissons au harpon dans la page Récolte | S-M |  |
 | C30 | Relevé local de vos prises et temps de touche personnels | M |  |
+| ~~C10~~ fait en 0.1011 | Chrono de touche relancé tout seul à chaque lancer (aide à la pêche et pêche en mer) ; le relevé est celui de la 0.887 (état « lancer » de la ligne) | S | Passé d'« après la 1.0.0 » à la phase 5 (2026-11-09) |
 
 ### Artisanat
 
@@ -198,7 +198,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P19 | Tests en jeu de la carte encore en attente | S |  |
+| P19 | Tests en jeu de la carte encore en attente | S | 0.1010 : parcours de la campagne, les 782 essais ouverts rangés par activité, étape 0 d'après-patch en tête : [TESTING-ROUTE](TESTING-ROUTE.md) |
 
 P19 s'élargit en campagne guidée de fin : tout ce qui a été codé, avec les cases ouvertes de [TESTING](TESTING.md), selon le déroulement ci-dessus.
 

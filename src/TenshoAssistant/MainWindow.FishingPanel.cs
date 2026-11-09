@@ -26,6 +26,9 @@ internal sealed partial class MainWindow
     // 0.398 (g, R-04): the bait in hand, copied on the framework thread (Gathering/FishingBaitReader); null = not a fisher or not read.
     internal Func<uint?>? FishingBait { get; set; }
     internal Func<double?>? FishingIntuitionLeft { get; set; }
+    /// <summary>C10 (0.1011): start of the last cast (FishingBaitReader.CastAt); the stopwatches restart from it, the button stays for a manual restart.</summary>
+    internal Func<DateTimeOffset?>? FishingCastAt { get; set; }
+    private static DateTimeOffset? FromCast(DateTimeOffset? since,DateTimeOffset? cast)=>Gathering.FishingStopwatch.FromCast(since,cast);
     internal void ToggleFishingPanel()=>fishingPanelManual=!fishingPanelManual;
     private Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?>? fishingSpotAt;
     internal void ConfigureFishingHelp(Func<(uint Job,uint Territory,float X,float Z,bool Fishing)?> now,Func<uint,float,float,(uint Id,string Name,float X,float Z,uint[] Fish)?> spotAt)
@@ -78,6 +81,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get(now.Fishing ? "FishingPanel.Fishing":"FishingPanel.NotFishing"));
             if(now.Fishing && !fishingBefore)fishingSince=DateTimeOffset.UtcNow;
             if(!now.Fishing)fishingSince=null;
+            else fishingSince=FromCast(fishingSince,FishingCastAt?.Invoke());
             fishingBefore=now.Fishing;
             var elapsed=fishingSince is { } since ? (int)(DateTimeOffset.UtcNow-since).TotalSeconds:(int?)null;
             if(elapsed is { } seconds)

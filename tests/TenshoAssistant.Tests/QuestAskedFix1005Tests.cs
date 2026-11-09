@@ -21,7 +21,7 @@ internal static class QuestAskedFix1005Tests
         ("Quest asked fix 1005: the merge tool follows the same rule, in rebuild too",() =>
         {
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)") && tool.Contains("if f[\"Kind\"]==25 and when(f[\"Last\"])<QUEST_ASKED_FIXED:return False"),"valid");
+            Check(tool.Contains("QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)") && tool.Contains("if f[\"Kind\"]==25 and when(f[\"Last\"])<(QUEST_ASKED_FIXED_DAY if day(f[\"Last\"])==f[\"Last\"] else QUEST_ASKED_FIXED):return False"),"valid");
             Check(tool.Contains("kept=[f for f in player[\"Facts\"] if valid(dict(f))]"),"rebuild");
         }),
     ];
