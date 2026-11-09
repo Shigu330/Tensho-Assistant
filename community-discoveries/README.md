@@ -5,7 +5,12 @@
 `discoveries.json` holds the discoveries players shared through World › Discoveries › « Exchange with other players (GitHub) »: each connected player's
 own sightings go to a secret gist of theirs, with one « Discoveries: <login> » issue in this repository pointing to it. Tensho downloads this file during
 an exchange (automatic once a day when turned on, or « Exchange now ») and joins it to the base as imported. A discovery holds game rows and places only:
-never a player's name, position or id; what leaves the PC carries the day of each sighting, never its time.
+never a player's name, position or id; what leaves the PC carries the day of each sighting, never its time, and the files of this folder keep the day
+only too (since Tensho 0.1012).
+
+**Licence.** The shared discoveries (`discoveries.json` and `players/`) are published under CC0-1.0 (public domain dedication,
+https://creativecommons.org/publicdomain/zero/1.0/): anyone may reuse them for any purpose without asking. A player agrees to it when connecting
+GitHub in the plugin (the warning says so) and the issue of each player states it.
 
 The maintainer merges the gists with `python tools/discoveries-merge.py sync` (GitHub CLI needed; `--dry-run` reports only): each player's valid facts kept
 in `players/<issue>.json`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then `discoveries.json` rebuilt from the
@@ -26,7 +31,11 @@ the sums over the players. Version 1 files (without them) are still read.
 chaque joueur connecté a vu lui-même part dans un gist secret à son nom, avec un ticket « Discoveries: <login> » dans ce dépôt qui y renvoie. Tensho
 télécharge ce fichier lors d'un échange (automatique une fois par jour quand il est activé, ou « Échanger maintenant ») et le joint à la base comme importé.
 Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom, la position ni l'identifiant d'un joueur ; ce qui quitte le PC porte le jour
-de chaque observation, jamais son heure.
+de chaque observation, jamais son heure, et les fichiers de ce dossier ne gardent eux aussi que le jour (depuis Tensho 0.1012).
+
+**Licence.** Les découvertes partagées (`discoveries.json` et `players/`) sont publiées sous CC0-1.0 (renonciation au droit d'auteur,
+https://creativecommons.org/publicdomain/zero/1.0/deed.fr) : chacun peut les reprendre pour tout usage sans demander. Un joueur l'accepte en connectant
+GitHub dans le plugin (l'avertissement le dit) et le ticket de chaque joueur l'indique.
 
 Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (GitHub CLI nécessaire ; `--dry-run` fait seulement le rapport) : les faits
 valides de chaque joueur gardés dans `players/<ticket>.json`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,

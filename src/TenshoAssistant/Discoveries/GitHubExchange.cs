@@ -171,7 +171,7 @@ public sealed class GitHubExchange : IDisposable
             var opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",new JsonObject
             {
                 ["title"]=$"Discoveries: {Login}",
-                ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\nThe gist is updated at each exchange; this issue stays the same.",
+                ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.",
                 ["labels"]=new JsonArray("discoveries"),
             }).ConfigureAwait(false);
             lock(gate)meta.Issue=opened?["number"]?.GetValue<int>() ?? 0;

@@ -1666,6 +1666,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1011) Pêcheur : lancer, attendre une touche, relancer sans cliquer sur « Relancer » : le chrono repart de 0 à chaque lancer (aussi au vif) ; un leurre ne le relance pas ; le bouton le remet à zéro à la main. Même chose dans le panneau de la pêche en mer.
 
+- [ ] (0.1012) Rien à essayer en jeu : texte de l'avertissement « Connecter GitHub » (Monde › Découvertes) qui mentionne CC0-1.0.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

@@ -627,7 +627,7 @@
     "ExchangeTitle": "Exchange with other players (GitHub)",
     "ExchangeHelp": "Share what you discovered and take what others found. Without connecting, the automatic exchange only takes the common discoveries. A discovery never holds a player's name, position or id.",
     "Connect": "Connect GitHub",
-    "ConnectTip": "Shows a short code to approve on github.com (no password is typed in the game). Tensho asks to create a secret gist and to open an issue in its repository. The authorization stays on this PC, protected by Windows, and can be revoked at any time on github.com › Settings › Applications.",
+    "ConnectTip": "Shows a short code to approve on github.com (no password is typed in the game). Tensho asks to create a secret gist and to open an issue in its repository. The authorization stays on this PC, protected by Windows, and can be revoked at any time on github.com › Settings › Applications. What you send is published in Tensho's repository under CC0-1.0 (public domain): anyone may reuse it.",
     "ConnectCode": "Code to approve: {0}",
     "ConnectCopy": "Copy",
     "ConnectOpen": "Open github.com/login/device",

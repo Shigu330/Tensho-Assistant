@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1012.0
+- Plan global, 4.2 (plan du système) : confidentialité et licence des découvertes partagées. Demande : l'utilisateur (2026-11-09, plan C3 version 4, point 4.2, urgent). Cause : le plugin n'envoie que le jour de chaque observation depuis 0.949, mais `tools/discoveries-merge.py` gardait l'heure d'un gist plus ancien, et `community-discoveries/` publiait 1 453 faits avec leur heure ; la licence CC0-1.0 n'était écrite que dans les Crédits. Correction : l'outil valide la date telle qu'envoyée puis la ramène au jour (un gist avec heures est accepté et ramené, pas refusé), en `sync` comme en `rebuild` ; la règle des objets de quête (genre 25) passe à « Last ≥ 2026-11-09 » pour une date au jour ; `community-discoveries` réécrit (historique git non réécrit) ; CC0-1.0 écrite dans le README du dossier (en, fr), l'avertissement de connexion (en, fr), le ticket de chaque joueur (case cochée) et SECURITY. Aucun code de jeu changé
+- Tests : DiscoveriesPrivacy1012Tests. Verify.ps1 (agent) : 1650/1650, 0 avertissement, 0 erreur ; DLL 0.1012.0.0. Non validé en jeu.
+### English
+- Shared discoveries privacy and licence (urgent). The merge tool kept the time of each sighting from an older gist although the plugin sends the day only since 0.949; it now checks the date as sent and keeps the day, in sync and rebuild, and community-discoveries is rewritten with the day only (git history not rewritten). CC0-1.0 is now stated in the folder's README, the GitHub connection warning (en, fr), each player's issue (ticked box) and SECURITY. No game code changed; not validated in game.
+
 ## 0.1011.0
 - Plan global, Verify : Pêche (C10) : le chrono de l'aide à la pêche, et celui de la pêche en mer, repart tout seul à chaque lancer, au pêcher au vif compris. Avant, il ne partait qu'au début de la pêche et il fallait cliquer sur « Relancer » à chaque lancer. Le signal est l'état « lancer » de la ligne, déjà prouvé en jeu en 0.887 et lu à chaque image ; les leurres ne relancent pas le chrono. Le bouton reste pour une remise à zéro à la main. Plan global : à votre demande, plus rien n'est prévu après la 1.0.0 ; C10, le seul point qui y était, est fait. Non validé en jeu.
 - Tests : FishingCast1011Tests. Verify.ps1 (agent) : 1647/1647, 0 avertissement, 0 erreur ; DLL 0.1011.0.0. Non validé en jeu.
