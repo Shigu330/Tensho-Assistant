@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.978.0
+- Plan global, Verify : Jardin (ticket #36, votre récolte de cette nuit) : la récolte est maintenant reconnue : un gain d'objet pendant que la cible est un emplacement du potager, dans un logement (relevé : docs/evidence/0.978-garden-harvest.md). L'emplacement récolté est retiré du journal avec une ligne « Jardin : … récolté » ; s'il y en a plusieurs à cet endroit, celui arrivé à maturité seul est choisi, sinon rien n'est deviné. Les pots de fleurs ne sont pas encore reconnus (objet non relevé). Non validé en jeu.
+- Tests : GardenHarvest978Tests. Verify.ps1 (agent) : 1607/1607, 0 avertissement, 0 erreur ; DLL 0.978.0.0. Non validé en jeu.
+### English
+- Garden (ticket #36, your harvest tonight): the harvest is now recognised: an item gain while the target is a garden bed, in housing (reading: docs/evidence/0.978-garden-harvest.md). The harvested bed leaves the journal with a « Garden: … harvested » line; with several there, the only ripe one is chosen, otherwise nothing is guessed. Flowerpots are not recognised yet (object not read). Not validated in game.
+
 ## 0.977.0
 - Plan global, Verify : Carte (X-99, votre signalement avec captures) : après un ciblage depuis une autre zone puis une téléportation, les marqueurs des quêtes pas encore acceptées manquaient sur la carte Tensho. Cause (journal) : Tensho les lisait seulement dans la liste de la fenêtre carte du jeu, qui ne contient que la carte affichée en dernier dans cette fenêtre (ici la carte du monde). Ces quêtes sont maintenant lues aussi dans la liste que le jeu garde à jour sans fenêtre ouverte, sans doublon. Revue des propositions notée (DEC-045) et idées retenues ajoutées au plan (X-100 à X-107). Non validé en jeu.
 - Tests : UnacceptedQuests977Tests. Verify.ps1 (agent) : 1606/1606, 0 avertissement, 0 erreur ; DLL 0.977.0.0. Non validé en jeu.

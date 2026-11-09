@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
     /// </summary>
     internal void GardenPlanted(GardenChatEvent found,uint? seedId,string? zone)
     {
-        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){GardenCared(found.Kind,zone);return;}
+        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted or GardenChatKind.Harvested){GardenCared(found.Kind,zone);return;}
         var seeds=GardenSeedCatalog?.Invoke() ?? [];
         var known=seedId is { } id ? seeds.FirstOrDefault(row=>row.Seed.SeedId==id):default;
         if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
@@ -55,9 +55,16 @@ internal sealed partial class MainWindow
     {
         var here=GardenJournal.At(configuration.GardenBeds,zone);
         if(here.Length==0)return;
+        // #36 (0.978): a harvest with several beds here: the only one ripe is that one.
+        if(here.Length>1 && kind==GardenChatKind.Harvested && here.Where(row=>GardenJournal.RipeAt(row)<=DateTimeOffset.UtcNow).ToArray() is { Length:1 } ripe)here=ripe;
         if(here.Length>1){ChatNotice?.Invoke(localization.Get("Garden.CareSeveral"));return;}
         var bed=here[0];
         if(kind==GardenChatKind.Tended)GardenJournal.Tend(bed,DateTimeOffset.UtcNow);
+        else if(kind==GardenChatKind.Harvested)
+        {
+            configuration.GardenBeds=(configuration.GardenBeds ?? []).Where(row=>row.Id!=bed.Id).ToList();
+            ChatNotice?.Invoke(localization.Format("Garden.HarvestedNotice",bed.Seed,bed.Place));
+        }
         else
         {
             configuration.GardenBeds=(configuration.GardenBeds ?? []).Where(row=>row.Id!=bed.Id).ToList();

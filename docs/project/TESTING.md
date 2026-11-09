@@ -1596,6 +1596,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.977) Cibler un lieu d'une autre zone, se téléporter dans la zone, ouvrir la carte Tensho sans ouvrir celle du jeu : les marqueurs rouges des quêtes pas encore acceptées sont là.
 
+- [ ] (0.978) Planter (le journal note l'emplacement), à maturité récolter : ligne « Jardin : … récolté, retiré du journal ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

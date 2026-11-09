@@ -5805,6 +5805,7 @@
   },
   "Garden": {
     "CareSeveral": "Jardin : plusieurs emplacements sont notés ici et le jeu ne dit pas lequel : mettez-le à jour dans la page Jardin.",
+    "HarvestedNotice": "Jardin : {0} récolté, retiré du journal — {1}.",
     "UprootedNotice": "Jardin : {0} retiré du journal — {1}.",
     "PageTitle": "Jardinage",
     "PageDescription": "Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. Les plantations sont notées d'office à partir des lignes du chat du jeu (réglage ci-dessous).",
