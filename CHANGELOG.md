@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.999.0
+- Plan global, Verify : Paramètres (X-100, votre choix DEC-048) : la page a maintenant les onglets validés : Général (fenêtre, langue, thème, polices, survol des objets), Panneaux à côté du jeu (recherche de mission, personnage, panneaux cachés derrière le jeu, puis les aides de chaque outil), Carte, Suivi et notifications (alarmes, commandes du jeu, barre du serveur : monnaies et gils), Données et sources (rangements, cache, sources communautaires), Avancé, Débogage. En haut, un champ « Chercher un réglage » trouve n'importe quel réglage de la page par son nom et ouvre son onglet. Chaque réglage reste aussi à côté de son outil. Non validé en jeu.
+- Tests : SettingsTabs999Tests. Verify.ps1 (agent) : 1636/1636, 0 avertissement, 0 erreur ; DLL 0.999.0.0. Non validé en jeu.
+### English
+- Settings (X-100, your choice DEC-048): the page now has the approved tabs: General (window, language, theme, fonts, item hover), Panels beside the game (duty finder, character, panels hidden behind the game, then each tool's aids), Map, Tracking and notifications (alarms, game commands, server bar: currencies and gil), Data and sources (storage, cache, community sources), Advanced, Debug. At the top, a « Search a setting » field finds any setting of the page by its name and opens its tab. Each setting also stays beside its tool. Not validated in game.
+
 ## 0.998.0
 - Plan global, Verify : Navigation (X-100, votre choix DEC-048) : les pages sont regroupées comme validé : Objets ; Production ; Monde ; Suivi (Alarmes, Rappels, Jardin, Compagnie libre) ; Progression (10 pages, les deux livraisons réunies) ; Contenus (Eurêka/Bozja/Croissant, Donjons profonds, Reliques, Carnaval masqué, Dresseur) ; Gold Saucer ; Références (Lexique, Aide, Crédits) ; Préférences. Aucune page retirée ; Accueil et Mes outils restent en tête. Non validé en jeu.
 - Tests : Navigation998Tests. Verify.ps1 (agent) : 1634/1634, 0 avertissement, 0 erreur ; DLL 0.998.0.0. Non validé en jeu.

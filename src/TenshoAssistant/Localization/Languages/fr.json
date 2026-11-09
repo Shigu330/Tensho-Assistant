@@ -849,6 +849,9 @@
     "ItemSearchLimit": "Nombre d'objets que la recherche liste au plus : page Objets, et choix de l'objet dans Butin des monstres et PNJ vendeurs. Plus haut = liste plus longue à parcourir ; au-delà, précisez la recherche (10 à 100).\nPar défaut : 30."
   },
   "Settings": {
+    "SearchHint": "Chercher un réglage…",
+    "SearchTip": "Trouve n'importe quel réglage de cette page par son nom ; un clic ouvre son onglet.",
+    "SearchNone": "Aucun réglage ne porte ce nom.",
     "HelpBanners": "Aide à la première visite des pages",
     "HoverCompare": "Comparaison avec la pièce portée",
     "HoverCompareTip": "Sous l'infobulle d'une pièce d'équipement : différence de niveau d'objet et de statistiques avec la pièce portée au même emplacement (les deux bagues pour une bague). Valeurs de base, sans matérias.\nPar défaut : activé.",
@@ -2323,9 +2326,11 @@
     "General": "Général",
     "Interface": "Interface",
     "Modules": "Modules",
-    "Data": "Données",
+    "Data": "Données et sources",
     "Debug": "Debug",
-    "Map": "Carte"
+    "Map": "Carte",
+    "Panels": "Panneaux à côté du jeu",
+    "Tracking": "Suivi et notifications"
   },
   "ModuleSettings": {
     "BuffWait": "Attente ajoutée aux buffs",

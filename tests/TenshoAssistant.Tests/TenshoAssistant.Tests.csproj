@@ -107,6 +107,7 @@
     <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressStore.cs" Link="Collections/AchievementProgressStore.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LeveCatalog.cs" Link="Leves/LeveCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LevePrepare.cs" Link="Leves/LevePrepare.cs" />
+    <Compile Include="../../src/TenshoAssistant/SettingsIndex.cs" Link="SettingsIndex.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/HuntingLog.cs" Link="Hunting/HuntingLog.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/SRankConditions.cs" Link="Hunting/SRankConditions.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="Gathering/GatheringCatalog.cs" />

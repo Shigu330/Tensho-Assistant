@@ -849,6 +849,9 @@
     "ItemSearchLimit": "How many items the search lists at most: Items page, and the item picker of Monster loot and NPC vendors. Higher = a longer list to scroll; beyond it, refine your search (10 to 100).\nDefault: 30."
   },
   "Settings": {
+    "SearchHint": "Search a setting…",
+    "SearchTip": "Finds any setting of this page by its name; a click opens its tab.",
+    "SearchNone": "No setting has this name.",
     "HelpBanners": "First-visit help on the pages",
     "HoverCompare": "Comparison with the worn piece",
     "HoverCompareTip": "Under a gear piece's tooltip: item level and stat difference with the piece worn in the same slot (both rings for a ring). Base values, no materia.\nDefault: on.",
@@ -2323,9 +2326,11 @@
     "General": "General",
     "Interface": "Interface",
     "Modules": "Modules",
-    "Data": "Data",
+    "Data": "Data and sources",
     "Debug": "Debug",
-    "Map": "Map"
+    "Map": "Map",
+    "Panels": "Panels beside the game",
+    "Tracking": "Tracking and notifications"
   },
   "ModuleSettings": {
     "BuffWait": "Extra wait for buffs",

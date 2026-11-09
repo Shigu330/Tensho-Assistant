@@ -75,6 +75,18 @@ internal sealed partial class MainWindow
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
 
         ImGui.Separator();
+        ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
+        CopyButton(localization.Get("Advanced.CopyReport"),()=>BugReport());
+        Tip("Advanced.CopyReportTip");
+        ImGui.SameLine();
+        CopyButton(localization.Get("Advanced.CopyRepository"),()=>RepositoryUrl);
+        Tip("Advanced.CopyRepositoryTip");
+    }
+
+    // X-100 (0.999, DEC-048): the community sources, now in « Data and sources ».
+    private void DrawSourceSettings()
+    {
+        ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SourcesTitle"));
         ImGui.TextDisabled(localization.Get("Advanced.SourcesHelp"));
         DrawGameDataOnly();
@@ -108,6 +120,11 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
         BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
 
+    }
+
+    // X-100 (0.999, DEC-048): the game command delay and « remove all alarms », now in « Tracking and notifications ».
+    private void DrawAlarmCommandSettings()
+    {
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));
         configuration.AlarmOptions??=new();
@@ -130,13 +147,6 @@ internal sealed partial class MainWindow
         if(clearAlarmsArmed)clearAlarmsSeenFrame=ImGui.GetFrameCount();
         Tip("Advanced.ClearAlarmsTip");
 
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
-        CopyButton(localization.Get("Advanced.CopyReport"),()=>BugReport());
-        Tip("Advanced.CopyReportTip");
-        ImGui.SameLine();
-        CopyButton(localization.Get("Advanced.CopyRepository"),()=>RepositoryUrl);
-        Tip("Advanced.CopyRepositoryTip");
     }
 
     /// <summary>Text for an issue: version, language, data states and errors, settings that change behaviour; no character data.</summary>

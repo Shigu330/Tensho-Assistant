@@ -14,13 +14,14 @@ internal sealed partial class MainWindow
     private void DrawSettings()
     {
         Heading(localization.Get("Settings.Title"),localization.Get("Settings.Description"));
+        DrawSettingsSearch();
         if(ImGui.BeginTabBar("SettingsSections"))
         {
             try
             {
-                SettingsTab("General",DrawGeneralSettings);
-                SettingsTab("Interface",DrawInterfaceSettings);
-                SettingsTab("Modules",DrawModuleSettings);
+                // X-100 (0.999, DEC-048): General, Panels beside the game, Map, Tracking and notifications, Data and sources, Advanced, Debug.
+                SettingsTab("General",()=>{DrawGeneralSettings();DrawInterfaceSettings();});
+                SettingsTab("Panels",DrawPanelSettings);
                 SettingsTab("Map",()=>
                 {
                     // The per-map icon list needs a map: the one shown in the Tensho map, else the player's map.
@@ -29,6 +30,7 @@ internal sealed partial class MainWindow
                     if(ImGui.Button(localization.Get("MapView.OpenMap")))OpenMapView(0);
                     DrawMapSettingsBody(shown);
                 });
+                SettingsTab("Tracking",DrawTrackingSettings);
                 SettingsTab("Data",DrawDataSettings);
                 SettingsTab("Advanced",DrawAdvancedSettings);
                 if(developerMode)SettingsTab("Debug",DrawDeveloperSettings);
@@ -140,6 +142,43 @@ internal sealed partial class MainWindow
             Enum.GetValues<TenshoAssistant.Market.MarketScope>().Select(scope=>(scope,localization.Get("Settings.MarketScope"+scope))).ToArray(),DefaultConfiguration.MarketBoardScope,200);
         ImGui.Spacing(); ImGui.Separator();
     }
+    // X-100 (0.999, DEC-048): the panels beside the game's windows, then each tool's aids (they were « Modules »).
+    private void DrawPanelSettings()
+    {
+        BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
+        BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
+        BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
+        ImGui.Spacing();ImGui.Separator();
+        DrawModuleSettings();
+    }
+
+    // X-100 (0.999, DEC-048): alarms, their game commands, and the server bar entries (also on their own pages).
+    private void DrawTrackingSettings()
+    {
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
+        DrawAlarmCommandSettings();
+        ImGui.Separator();
+        BoolSetting("Currencies.ServerBar","Currencies.ServerBarTip",()=>configuration.CurrencyServerBar,value=>configuration.CurrencyServerBar=value,c=>c.CurrencyServerBar);
+        BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
+    }
+
+    // X-100 (0.999, DEC-048): a search among every setting of this page (SettingsIndex, kept in step with the code by a test); a click opens its tab.
+    private string settingsQuery="";
+    private void DrawSettingsSearch()
+    {
+        ImGui.SetNextItemWidth(280);
+        ImGui.InputTextWithHint("##SettingsSearch",localization.Get("Settings.SearchHint"),ref settingsQuery,64);
+        Tip("Settings.SearchTip");
+        var query=settingsQuery.Trim();
+        if(query.Length<2)return;
+        var hits=SettingsIndex.Entries.Where(entry=>localization.Get(entry.Key).Contains(query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
+        if(hits.Length==0){ImGui.TextDisabled(localization.Get("Settings.SearchNone"));return;}
+        foreach(var (key,tab) in hits)
+            if(ImGui.Selectable($"{localization.Get(key)}  ·  {localization.Get("SettingsSections."+tab)}##SettingHit{key}")){requestedSettingsTab=tab;settingsQuery="";}
+        ImGui.Separator();
+    }
+
     private void DrawModuleSettings()
     {
         ImGui.TextWrapped(localization.Get("Observation.SavedHelp"));
@@ -226,7 +265,6 @@ internal sealed partial class MainWindow
             if(macroCopySaved is not null && !ImGui.IsAnyItemActive())SaveMacroCopy();
             ImGui.TextDisabled(localization.Get("ModuleSettings.MacroCopyHelp"));
         }
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle"),ImGuiTreeNodeFlags.DefaultOpen))DrawAlarmSettings();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Gathering"),ImGuiTreeNodeFlags.DefaultOpen))
         {
             // 0.330 (audit): the gathering help needs the node observation, both rows go through SaveGatheringChoice. « Observe » shows the
@@ -276,12 +314,9 @@ internal sealed partial class MainWindow
     private void DrawDataSettings()
     {
         // 0.324: shared setting rows (tooltip and « ↺ »).
-        BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
-        BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
-        BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
-        BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         BoolSetting("BankUi.AutoSetting","BankUi.AutoSettingHelp",()=>configuration.AutoBankCapture,value=>configuration.AutoBankCapture=value,c=>c.AutoBankCapture);
         DrawCacheSettings();
+        DrawSourceSettings();
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ModuleSettings.Profiles")))
         {
             ImGui.TextWrapped(localization.Get("ModuleSettings.ProfilesHelp"));
@@ -357,6 +392,6 @@ internal sealed partial class MainWindow
 
     private void DrawToolSettingsLink(string id)
     {
-        if(ImGui.SmallButton(localization.Get("Settings.Title")+"###ToolSettings"+id)){page=Page.Settings;requestedSettingsTab="Modules";IsOpen=true;}
+        if(ImGui.SmallButton(localization.Get("Settings.Title")+"###ToolSettings"+id)){page=Page.Settings;requestedSettingsTab="Panels";IsOpen=true;}
     }
 }
