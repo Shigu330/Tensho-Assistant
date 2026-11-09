@@ -1,3 +1,52 @@
+# Content tools (X-90, X-92) — study of 2026-11-09
+
+> *Traduction française plus bas.*
+
+Request (the "to do" document): look at what the existing plugins do, then build suitable tools for Eureka (elemental level,
+distribution of the magia), Bozja, deep dungeons, the Occult Crescent island (Île de Lunule), strategy boards for the content and the
+fatal raids, and relics by version. Framework: DEC-041 (preparation only, nothing during combat, nothing that reads combat, PvE only,
+switched off in PvP and in ranked content), Dalamud rules kept (DEC-039), X-92 (nothing hard-coded per content when the game provides it, designed per family).
+The plugins quoted were looked at for their functions only (public pages), never their code.
+
+## What Tensho already has
+
+| Family | Already in Tensho | Source |
+|---|---|---|
+| Eureka, Bozja | FATEs of each zone, skirmishes, critical engagements, field records, lost actions (0.717, 0.721) | game sheets |
+| Deep dungeons | the four dungeons, floors, items (apples, stones), loot (0.718); Tensho switches itself off inside them (DEC-038) | game sheets |
+| Relics | all families, weapons and armour, stage reached according to your bags; view by version (0.974) | game sheets |
+| S ranks | spawn conditions, places of the FATEs seen (0.670, 0.971) | community + discoveries |
+| After an update | new entries in the sheets in the log and in the self-check (0.972) | game sheets |
+| Field states | development record for Eureka, Bozja, the Occult Crescent (0.973); no page yet | game (your progress) |
+
+## Existing plugins (public functions)
+
+| Plugin | Does | Note for Tensho |
+|---|---|---|
+| Eureka Helper (snorux) | tracking of the NMs with a shared site, management of the elementals, relic help, alarms | the shared tracking goes through a third-party site: outside Tensho (network, Dalamud rule); relics already covered |
+| NecroLens | in deep dungeons: nearby objects highlighted, floor timers | drawing what is hidden or automating: refused (Dalamud rules, DEC-038) |
+| MonsterDex | bestiary and tips during deep dungeons | combat tips in game: outside DEC-041; a bestiary outside the dungeon would be preparation |
+| Bozja, Occult Crescent | no plugin found; a tracking site for lost actions exists | free ground for Tensho |
+
+## Proposals per family (preparation only)
+
+| # | Tool | Data | Dalamud rule | Recommended default |
+|---|---|---|---|---|
+| 1 | Eureka: "Your progress" page: elemental level and experience, distribution of the magia, magicite, from the record of 0.973 | your state (game) | no (reading your state, outside combat) | to do after the in-game record |
+| 2 | Bozja: lost actions owned and holstered, next to the existing list; field records obtained | your state (game) | no | to do after the record |
+| 3 | Occult Crescent: knowledge, support jobs and their levels, silver and gold; FATEs and engagements of the island from the sheets (like Eureka) | game | no | to do after the record |
+| 4 | Deep dungeons: bestiary by range of floors, outside the dungeon (preparation), from the sheets when they provide it | sheets; otherwise community | to confirm: tip texts | page outside the dungeon only, without tips until accepted |
+| 5 | Strategy boards for the content and fatal raids: notes written by the player (placements, order), one per content, list of contents taken from the sheets (X-92), hidden in combat | your notes | yes: summary and agreement before coding | propose a notes format, with no drawing on the game screen |
+| 6 | Families (X-92): one page template for the contents of a same family (fields, deep dungeons, raids), fed by ContentFinderCondition and ContentType | sheets | no | yes |
+
+## Questions for the user (final batch)
+
+1. Strategy boards (no. 5): simple notes written by you, hidden in combat, with nothing drawn on the game screen? (recommended)
+2. Deep dungeons (no. 4): a bestiary page outside the dungeon, without combat tips? or with the community's tips, outside the dungeon only?
+3. Shared tracking of the Eureka NMs through a third-party site: left to the existing plugins? (recommended: yes, Tensho stays without a third-party site)
+
+---
+
 # Outils de contenus (X-90, X-92) — étude du 2026-11-09
 
 Demande (document « a faire ») : regarder ce que font les plugins existants, puis faire des outils adéquats pour Eurêka (niveau élémentaire,

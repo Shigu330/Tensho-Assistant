@@ -93,7 +93,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.402-notebooks.md](0.402-notebooks.md) | `src/TenshoAssistant/Gathering/NotebookReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.405-game-logs.md](0.405-game-logs.md) | — | `CHANGELOG.md` |
 | [0.406-languages.md](0.406-languages.md) | — | `CHANGELOG.md` |
-| [0.409-collectables.md](0.409-collectables.md) | `src/TenshoAssistant/Gathering/Collectables.cs`, `src/TenshoAssistant/MainWindow.CollectableTable.cs` | `CHANGELOG.md` |
+| [0.409-collectables.md](0.409-collectables.md) | `src/TenshoAssistant/Gathering/Collectables.cs`, `src/TenshoAssistant/MainWindow.CollectableTable.cs`, `tests/TenshoAssistant.Tests/CollectablesTests.cs` | `CHANGELOG.md` |
 | [0.410-gp-actions.md](0.410-gp-actions.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Gathering/GpActions.cs`, `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md` |
 | [0.411-gathering-jobs.md](0.411-gathering-jobs.md) | `src/TenshoAssistant/Gear/Gearsets.cs`, `tests/TenshoAssistant.Tests/GatheringGearset411Tests.cs` | `CHANGELOG.md` |
 | [0.417-spearfishing.md](0.417-spearfishing.md) | `src/TenshoAssistant/Gathering/Spearfishing.cs`, `tests/TenshoAssistant.Tests/SpearfishingTests.cs`, `tools/DiscoveryCheckProbe/Program.cs` | `CHANGELOG.md` |
@@ -112,7 +112,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.459-garden-detection.md](0.459-garden-detection.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `CHANGELOG.md` |
 | [0.463-squadron-probe.log](0.463-squadron-probe.log) | — | `CHANGELOG.md` |
 | [0.478-collectable-truncated-name.md](0.478-collectable-truncated-name.md) | `src/TenshoAssistant/Gathering/Collectables.cs` | `CHANGELOG.md` |
-| [0.479-collectable-window-values.md](0.479-collectable-window-values.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md` |
+| [0.479-collectable-window-values.md](0.479-collectable-window-values.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/CollectablesTests.cs` | `CHANGELOG.md` |
 | [0.488-gp-regen-traits.md](0.488-gp-regen-traits.md) | `src/TenshoAssistant/Gathering/RegenTick.cs` | `CHANGELOG.md` |
 | [0.493-triad-npc-requirements.md](0.493-triad-npc-requirements.md) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
 | [0.494-selfcheck-first-pass.log](0.494-selfcheck-first-pass.log) | — | `CHANGELOG.md` |

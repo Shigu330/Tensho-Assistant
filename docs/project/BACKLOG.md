@@ -1,3 +1,139 @@
+# Targeted backlog
+
+> *Traduction française plus bas.*
+
+## Open — state at 0.315.0 (2026-11-02), corrections of 2026-11-04 (0.512)
+
+The queue has been dealt with since (ROADMAP, CHANGELOG); a line may be done without being marked here. What remains for 1.0.0: [PUBLISHING](PUBLISHING.md).
+
+The points waiting for a decision or an in-game survey are grouped in the [ROADMAP](ROADMAP.md), section "To decide / to
+review"; the in-game tests waiting, in its section "Tests to run in game". The order of work is in
+the maintainer's status file ("Next action").
+
+Map (MAP-001, plan: MAP-016-PLAN (maintainer's notes, not in the repository))
+- Icons of the representatives (e.g. Rowena's representatives): fixed in 0.155 (MAP-017), validated in game 2026-10-31.
+- Exploration markers: **closed** (was "paused" at 0.154); wiki weather cited, displayed and used by the alarms since 0.201.
+- Quest type icon approximate (71141 calculated against 71151 seen in game); `ObjectiveId` correspondence partly unproven.
+  Still open: in-game survey awaited, not blocking for D17 (the setting says "variant n").
+- Marker type of the guildleves (markers at the edge of the map, 0.298): surveyed and dealt with in 0.652 ([evidence](../evidence/0.652-leve-markers.md)).
+- Frames and textures of the game taken from the ULDs (R-06 step 6): frame removed in 0.510 (DEC-033), closed.
+
+Items and collections
+- Sources still unknown for some items (Alsvid, Vegetal Voucher NPC): unknown documented (decision 2026-11-01);
+  other collection types to cover (COLL-001).
+- NPC vendors: coded currencies and InclusionShop already dealt with (line outdated at 0.154); free company shops (FccShop)
+  **done in 0.295**, validated in game. Line closed.
+- Injection of text into the game's native tooltip: **abandoned** (user decision 2026-11-01).
+- Quest currencies without a direct item: unknown documented (QUEST-CURRENCIES-005-STUDY (maintainer's notes, not in the repository)).
+
+Inventory and sort: armoury, glamour dresser and armoire read as storages (0.235–0.240, to validate in game); their sort
+(SORT-ARMOURY-009, HEAVY) and SORT-AUTO-010 (opt-in): after publication. Disk cache of the small catalogues (maps, dungeons,
+uses) not done, small gain.
+
+Gathering: Bountiful bonus **done in 0.224** as an estimate (community rule cited, displayed "estimated", editable), to
+validate in game; the old note "do not invent a formula" remains true: no official formula. Ocean fishing not covered
+(no usable data source).
+
+Free company, Reminders, Gear (R-07, R-08, R-11): remainders and open choices in the ROADMAP ("To decide / to review"):
+table of submarine thresholds, airship unlock tree (LuminaSupplemental, GPL-3.0), airship route
+planner, capacity rule under rank 50, squadron and Planeurs d'Ehcatl, step 4 of R-11. R-09 (events): not started.
+
+Publication (PUBLISH-018, see [PUBLISHING](PUBLISHING.md)): possible D17 submission (user's decision). Code side done
+(0.156–0.157): icon `src/TenshoAssistant/images/icon.png` (AI-generated, declared), `manifest.toml` ready, PR draft with the
+AI declaration. The old mention "`images/icon.png`, `manifest.toml` and the AI declaration are missing" is outdated since 0.157.
+What remains for the author: commit and push, commit hash in `manifest.toml`, PR text and declaration rewritten by him (see
+[CONTRIBUTING](../../CONTRIBUTING.md#publication-dalamud)); German and Japanese translations partial, not reviewed.
+
+The 17 lines of the [ROADMAP](ROADMAP.md) remain PARTIAL.
+
+## Review of the open points (2026-11-01, before D17 publication)
+User decision: publish after resolution; the injection of text into the game's native tooltip is **not** done.
+Follow-up at 0.315 (2026-11-02) added at the end of each decision: only the quest icons point remains open.
+
+| Point | Finding | Decision |
+|---|---|---|
+| Bountiful bonus (Bountiful Yield II / Bountiful Harvest II, actions 272/273) | GatheringOptimizer (MIT) asks for it by hand; frozen_rabbit_tome (no licence, fact surveyed only): +3 if gathering ≥ ⌊base × 1.1⌋, +2 if ≥ ⌊base × 0.9⌋, otherwise +1, base = "Gathering" value of the point's item level (Teamcraft item-level table, from the game's ItemLevel sheet). Community rule, not official. | **Do**: prefill the bonus with this rule (gathering stat read, point's item level by probe), displayed "estimated", editable. → **DONE 0.224** ([evidence](../evidence/0.224-bountiful-base.md)), to validate in game. |
+| Fashion Report: glamour dresser and armoire | Readable in the client (glamour dresser, armoire); gives a more accurate "owned". | **Do** (probe before use). → **DONE 0.235–0.240** (widened to the armoury, read without another plugin, linked to the Bank), to validate in game. |
+| Vendors: free company shops | FccShop sheet not read (InclusionShop and coded currencies already dealt with, backlog line outdated). | **Do** (small). → **DONE 0.295** ([evidence](../evidence/0.295-fcc-shops.md)), validated in game. |
+| Quest icons: name of the variants, 71141 vs 71151 | Meaning of the variants absent from the data; only observation in game gives it. | **Do only with an in-game survey** from the user; otherwise leave "variant n". → **Open**: no survey at 0.315. |
+| Map: journal quest target that stays (request 2026-11-01, R-01) | The "Target shown by the game (journal)" icon could not be removed. | **Do**. → **DONE 0.242–0.243** (removal by right click, then automatic), to validate in game. |
+| Map: "compass arrows" towards a target out of view (request 2026-11-01) | — | **Do**. → **DONE 0.297** as icons at the edge of the map, one setting per type; validated in game. |
+| Fashion Report: score | No per-piece score data in the sources. | **Do not do** (would be invented). |
+| Deleting a game alarm from Tensho | No per-alarm /alarm subcommand (only "clear" = everything); DeleteAlarm(index) unproven. | **Do not do** (risk of erasing the wrong alarm); manual reminder kept. |
+| Remaining unknown sources (Alsvid, Vegetal Voucher NPC) | Absent from the game, from Garland and from LuminaSupplemental. | **Do not do**: unknown documented. |
+| Exploration markers (wiki weather) | Wiki weather already displayed and used by the alarms (0.201). | **Closed** (wiki source cited). |
+| Add-ons of the 17 tools (adaptive rotation, armoury sort, native Triad rules…) | Big undertakings, not necessary to publish. | **After publication**, case by case. → **Taken up** in plan c) ([GAPS](GAPS.md), step g of the [ROADMAP](ROADMAP.md)): adaptive rotation A-04 retained, armoury sort I-14 later; native Triple Triad rules not surveyed by the comparison, remain here. |
+| Injection into the native tooltip | — | **Abandoned** (user decision). |
+
+## Archive
+
+> Historical entries (2026-10-27 → 2026-10-30), from the most recent to the oldest; their "NEXT" and counters are those of their date.
+
+- QUEST-ITEM-PROGRESS-007 CLOSED (2026-10-30): TESTED 477/477 + VALIDATED_IN_GAME reported by the user on DLL 0.76.0.0 (disconnection, sequence 255, "1 variant" included). SORT-RUNTIME-VALIDATION CLOSED (native sort validated in game, user report 2026-10-30). SORT-ZONE-SELECT-011 TESTED in 0.77 (multi-categories, chosen items, "; " terms, click on the preview); in-game validation to do. Next: SORT-ITEM-PROPS-008.
+- CATALOG-CACHE-012: items 0.81 (validated in game), recipes 0.82, gathering/fishing 0.83 (TESTED). Map, Duty, ItemUse not done (small catalogues, small gain).
+- NPC-VENDORS-014 TESTED in 0.88 (NPC vendors tool, map flag, hover). Possible follow-ups: verified table of coded currencies other than tomestones (scrips), InclusionShop, free company shops.
+- HOVER-TOOLTIP-013 TESTED in 0.85 (panel under the native tooltip, cheapest in the data centre, stock/obtaining/uses). Future HEAVY option: injection of text into the native tooltip.
+- SORT-ITEM-PROPS-008 TESTED in 0.84 (levels, rarity, price, ID, unique/untradable/dye/repairable/collectable). SortaKinda follow-ups: SORT-ARMOURY-009 (HEAVY), SORT-AUTO-010 opt-in.
+
+- QUEST-CURRENCIES-005-STUDY closed on documented UNKNOWN: fifteen currencies without a reward Item/GC key, no unique relation found; quantities kept, no company invented. See the QUEST-CURRENCIES-005-STUDY study (maintainer's notes, not in the repository). BASE-AUDIT-003 finished: consistency/delivery 0.69 and improved diagnostics; independent follow-up depending on quota, with no global blocking.
+
+- BASE-AUDIT-002 finished within its checking scope: 17 references present, 17 coverages PARTIAL, 71 local links/61 Markdown resolved, DLL and package 0.59.0.0 matching. See the BASE-AUDIT-002 study (maintainer's notes, not in the repository). Next independent study: GatherBuddy/fishing catalogue, after checking the quota; do not invent the missing baits/prerequisites.
+
+- USE-CONTEXT-004 IMPLEMENTED / TESTED in 0.53: opt-in inventory menu, five shared routes, owner/revision/age guard, no network request by the menu. Native rendering to confirm; discussion links and Default targets outside this slice.
+- SORT-NATIVE-002-STUDY OBSOLETE (2026-10-30): native application delivered in 0.54–0.59. Replaced by the SORT-GAP-008-STUDY study (maintainer's notes, not in the repository): 1) in-game validation of the native sort (never observed), 2) SORT-ITEM-PROPS-008 (LIGHT, static Item properties), 3) SORT-ARMOURY-009, 4) SORT-AUTO-010 opt-in.
+
+State at 0.75.0 (2026-10-29, archive): shared cache and adjustable staleness (CACHE-001 (maintainer's notes, not in the repository)). Prices, quests, collections, community sources, Fashion Report and notebook calculations reuse dated persistent snapshots. Independent durations in Settings: 5 min, 1 h, 24 h or 7 d; forced refresh from the tools. Imports remain manual and flag their staleness; live observations keep a short invalidation. 466/466 tests/package/SHA-256 passing, zero warnings/errors; in-game validation of this cache still to do.
+
+- GATHER-FISH-006 IMPLEMENTED / TESTED in 0.60: native notebook, 2,461 sheets, restrictions and tomes; 389 tests/package and native probes passing. 491 weather codes remain unknown.
+- GATHER-FISH-SOURCES-007 IMPLEMENTED / TESTED in 0.61: baits/chains per place, common cache/transport, 396 tests and real consultation 4869 passing. Native weather code 2 unexplained, Unknown kept.
+- GATHER-FISH-WINDOWS-008 IMPLEMENTED / TESTED in 0.62: conditions per place, ET/UTC time ranges, previous weather distinct; 401 tests and real probes passing. Availability not deduced.
+- GATHER-FISH-WEATHER-009 IMPLEMENTED / TESTED in 0.63: native weather names/icons per territory, ambiguities and incomplete metadata unknown; 405 tests and real probes passing.
+- GATHER-FISH-FORECAST-010 IMPLEMENTED / TESTED in 0.64: ranges of the filled criteria, coverage and ternary logic explicit; 412 tests and real probes/dated fixtures passing. No guaranteed catch.
+- COLL-002 IMPLEMENTED / TESTED in 0.65: native orchestrion, positive confirmations, categories and bidirectional Item/context links, category errors isolated; 416 tests and native probe passing.
+- COLL-003 IMPLEMENTED / TESTED in 0.66: titles/achievements, categories/sheets/rewards, three-state proof of acquisition and coalesced refresh; 421 tests and native probe passing, no runtime claimed.
+- QUEST-REWARDS-003 IMPLEMENTED / TESTED in 0.67: native conditional rewards and Item/stocks link; 426 tests and probe 5,373 quests/9,313 rows passing. Four quantities, fifteen currencies and current-rank association explicitly unknown.
+- QUEST-ITEM-SOURCES-004 IMPLEMENTED / TESTED in 0.68: shared Item → quests index, variants/coverage kept and atomic/cancellable publication; 434 tests, 3,496 Items/8,288 associations verified.
+- NEXT QUEST-CURRENCIES-005-STUDY: fifteen currencies without a direct Item, GC keys and variants on evidence; do not choose company/currency by convention. The older NEXT entries below are historical; GOAL.md determines the current next step.
+
+- SORT-TEMPLATES-007 IMPLEMENTED / TESTED in 0.59: bounded common library, compatible geometry, loading as a draft, copies without observations; 385 tests/package, Newtonsoft three modes and ZIP identical to the canonical outputs.
+- NEXT BASE-AUDIT-002: targeted audit of the scope of the 17 tools, documents/paths and limits. Counter to check before any new big slice; 5% reserve.
+
+- SORT-FILTERS-006 IMPLEMENTED / TESTED in 0.58: equipment, market and HQ potential, explicit unknowns, 379 tests/package, Newtonsoft and native probe passing.
+- NEXT SORT-TEMPLATES-007: rule templates independent of the character, compatible geometry, loading as a draft without native application.
+
+- SORT-PROTECTED-005 IMPLEMENTED / TESTED in 0.57: protected positions and inversion, refusal of absent/ambiguous indices, 374 tests/package and Newtonsoft three modes.
+- NEXT SORT-FILTERS-006: equipment/market from the existing Item metadata; do not turn an absence of metadata into false.
+
+- SORT-RULES-004 IMPLEMENTED / TESTED in 0.56: profiles per scope, four criteria, 32 reserved zones with native category/quality/search, positioned preview and refusal of losses; 369 tests/package and Newtonsoft three modes.
+- NEXT SORT-PROTECTED-005: zones preserved at their current positions and inverted filling, with a guard on the visual indices and no new native engine.
+
+- SORT-SCOPES-003 IMPLEMENTED / TESTED in 0.55: direct reading distinct from the bank, saddlebags/retainer, exact scope and recapture before application. 361 tests/package; runtime not observed.
+- NEXT SORT-RULES-004: cell zones and filters of the native categories, multiple criteria; preview/swap and explicit application shared.
+
+- SORT-NATIVE-002 IMPLEMENTED / TESTED in 0.54: explicit visual application of the four bags, recent snapshot revalidated, full swap. 355 tests/package; native/rendering/persistence not observed.
+- NEXT SORT-SCOPES-003: capture live the opened saddlebags/retainers before proposing the application to the storage; the imported cache alone allows no writing.
+
+UPDATE 2026-10-27 / 0.5.27: the old READY/TODO states of CRAFT-001A below are outdated. Catalogue, notebook and preparation implemented, 63 tests passed and user confirmation received. This old checkpoint is closed; GOAL.md describes the current slice. The unobserved runtime scenarios remain kept in TESTING.md.
+
+- CORE-001 DONE: managed snapshot and InventoryService with owner/containers/NQ-HQ scope, coverage and observations; eight inventory tests pass.
+- INV-001 DONE (implementation/tests): adapter of the four bags integrated, framework reading, invalidation and Partial/Unknown snapshots. No Complete assumed.
+- INV-002 DONE (implementation/tests, 0.1.1): proof of loading/stability and complete reading, display of an exact total of the four bags if complete; new live test required.
+- RUNTIME-001: current user protocol accepted; advanced cases of unloading/error/second character kept in TESTING.md, with no success assumed.
+- ITEM-001 DONE on the code/tests side: shared Item catalogue, generation metadata and search by name/ID linked to the bags diagnostic.
+- ITEM-001-RUNTIME DONE: French catalogue 50,880 items, search/selection and NQ/HQ/total confirmed by capture and user feedback.
+- CRAFT-001A READY: Recipe + RecipeLevelTable + ingredients catalogue; first slice recipe → ingredients, based on the same Item catalogue.
+- UI-003 DONE on the code/tests side: common space with navigation, directory of the 17 tools, settings and diagnostics separated. UI-003-RUNTIME ACTIVE: visual check 0.2.0 before resuming CRAFT-001A.
+- UI-004 DONE on the code/tests side: directory replaced by a grid of native icons; details only in a sheet after a click. The UI-003-RUNTIME test must use the new DLL 0.2.1.
+- BANK-001 DONE on the code/tests side: persistent cache per character/retainer/saddlebag, manual imports attached to menus and dated search results. BANK-001-RUNTIME ACTIVE: check anchoring/import/reimport/persistence in 0.3.0 before resuming the recipes.
+- Bank: retainers' equipment/crystals/market and possible manual deletion of an old survey remain separate extensions, without claiming to be included in the survey of the seven pages.
+- UI-005 DONE on the code/tests side: real icons and unified Character/Chocobo/Retainers grouping. UI-005-RUNTIME ACTIVE: check 0.4.0 visually. The 0.3.0 capture proves a consultable chocobo cache but does not yet validate the retainer imports or their attachment/persistence.
+- CRAFT-001 TODO after ITEM-001: Recipe + RecipeLevelTable + ingredients catalogue; recipe → needs path.
+- Runtime CORE-000 to perform: loading, command, preference, reloading/unloading and logs in an appropriate FFXIV client.
+- The following phases of each plugin remain in ROADMAP.md. The repositories not provided must be identified and their licences checked at the time of their targeted study (NEEDS_STUDY).
+- Combat/ACT/IINACT: removed from the project (user decision 2026-10-31).
+
+---
+
 # Backlog ciblé
 
 ## Ouvert — état au 0.315.0 (2026-11-02), corrections du 2026-11-04 (0.512)

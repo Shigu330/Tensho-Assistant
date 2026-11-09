@@ -1,3 +1,115 @@
+# Plan: Tensho switches itself off in PvP and in ranked content
+
+> *Traduction française plus bas.*
+
+State: **coded in 0.610, compiled and tested, not tried in game.** User's request, 2026-11-05: « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements » ("plan that in PvP the plugin deactivates and reactivates after PvP, no settings, make it compulsory, same for ranked match, triad or beastmaster or anything else that could be detected by SE or create an impact on rankings"). Decision: DEC-038. Data: [docs/evidence/0.600-competitive-inventory.md](../evidence/0.600-competitive-inventory.md).
+
+## What is wanted
+
+- In PvP and in ranked content, Tensho stops by itself. On leaving, it starts again by itself, as it was.
+- No setting, no checkbox, no command to avoid it.
+- Dalamud rule concerned: no advantage in a competitive or PvP environment ([CONTRIBUTING.md](../../CONTRIBUTING.md#publication-dalamud)).
+
+**A limit to state clearly:** "detectable by SE" (« détectable par SE ») cannot be measured. This plan reduces what Tensho does in this content to almost nothing, it cannot promise that nothing is detectable.
+
+## Dalamud clarifications (reread on 2026-11-05)
+
+Sources: [restrictions](https://dalamud.dev/plugin-publishing/restrictions), Dalamud code (`Dalamud/Game/ClientState/ClientState.cs`).
+
+- **PvP:** the page lists everything done in PvP among the outright refusals ("Anything in PvP: Not allowed"). Switching all of Tensho off goes in this direction.
+- **"Competitive":** the rule forbids any advantage in a competitive environment, without giving a list or a definition. The review is subjective. For a doubt, the page asks to contact the team on the Dalamud Discord: that is for the author to do, not the agent.
+- **"Detectable by SE":** this is not a Dalamud criterion. The closest: no exchange with the game's servers that is automatic or outside what the game allows. This rule applies everywhere, not only in PvP: the inventory of step 1 covers it too, including the per-job title setting (DEC-035).
+- **No switch-off offered by Dalamud:** it gives `IsPvP`, `EnterPvP` and `LeavePvP`, nothing that stops a plugin in its place. The guard remains to be written.
+- **`IsPvP` is not enough:** Dalamud deduces it from `TerritoryType.IsPvpZone`. It is therefore false at 579 (Battlehall) and at the Lord of Verminion territories, which are absent from the 24 zones: `ContentFinderCondition.PvP` is also needed. It is true at the Wolves' Den dock (250), the only territory that `IsPvPExcludingDen` removes.
+
+## What already exists
+
+Only the Triple Triad advice is switched off (`TriadMatchAdvisor.Competitive`: 579, 940, 941; DEC-033). Everything else in Tensho runs in PvP today: no code reads `IsPvP`.
+
+## Where Tensho switches off
+
+| Level | Content | How it is known |
+|---|---|---|
+| 1. Game flags | PvP, Triple Triad Battlehall, Lord of Verminion | `IClientState.IsPvP` with `EnterPvP` and `LeavePvP`, `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP`: new PvP maps are covered without an update |
+| 1 bis. During the match | Triple Triad Battlehall (Triple Triad Battlehall, 579): the user tried it, the place has PvE. The public hall has PvE matches: neither the place nor the match is enough. Tensho only switches off inside the arena instance (0.612) | `GameMain.IsInPvPInstance`. Measured in the public hall, PvE duel included: false, while `BoundByDuty` and the content row are true there. **True in an arena match: to confirm in game**, the log writes these values (`Competitive arena check`) |
+| 2. Listed | Triple Triad tournaments (940, 941), Crucible of the Unbroken (1339-1343), Mahjong (831, ranked or not) | No flag: list in the code, with its evidence |
+| 3. To establish | Deep dungeons | Switched off if step 1 establishes that they are ranked (D1). Any other ranked content found there, Ishgard or cosmic exploration included, goes back to the user with its evidence: nothing is switched off without their agreement |
+| 4. Outside a zone | Triple Triad against a player, in a normal zone | The zone is not enough: only the Triple Triad part switches off (D5) |
+
+## What "switched off" means
+
+Tensho stays loaded: that is what lets it start again by itself. A single guard does everything, on the framework thread, and only keeps the reading of the zone.
+
+| Part | In a switched-off zone |
+|---|---|
+| Display | Nothing: window, panels, map, tooltips, context menus, server bar |
+| The game's map | Given back to the game if Tensho replaces it (`NativeMapReplacer`) |
+| Game readings | Stopped, `Framework.Update` subscriptions included |
+| Hooks | Disabled (`CraftRecorder`, `MacroChainBridge`) |
+| Actions on the game | Refused: macros, sort, gear sets, flag, teleport, opening of windows |
+| Network | No new request; requests in progress cancelled |
+| Alarms and Discord | Nothing during the switch-off, no catching up (D2) |
+| `/tensho` commands | One line saying that Tensho is switched off |
+| Data | Nothing is erased; no writing of the settings file |
+
+On leaving: the windows come back as they were, the readings resume, the game's map is replaced again if the setting asks for it.
+
+**In case of doubt, Tensho stays switched off:** unknown zone during a loading, sheet unreadable after a game update. When the plugin loads while already in PvP, it starts switched off.
+
+## Steps
+
+1. **Inventory, without the game.** Look for the other rankings (game windows, ClientStructs, data). List every `Framework.Update` subscription, hook, call that acts on the game and network request of the plugin: 118 registrations in `Plugin.cs`, 93 `.Dalamud.cs` files.
+2. **Decisions** D1 to D5: taken, see below. What remains is what the inventory will find new.
+3. **Guard and detection.** A pure, tested rule, plugged into the game's events. DEC updated.
+4. **Display.** Switch-off at the entry of `Draw`, game map given back, server bar, menus and tooltips.
+5. **Readings, hooks, actions, network.** Each subscription goes through the guard. A test walks through the code and refuses any new subscription that does not go through it, like the one for the tooltips.
+6. **Alarms and Discord**, according to D2, and the chat line of D3.
+7. **Documents.** `PUBLISHING.md`, `CONTRIBUTING.md`, help and getting started; the Triple Triad advice goes through the same rule.
+8. **In-game test**, one point at a time: see below. **To do.**
+
+Size: big undertaking, mostly step 5. Place in the global plan: before phase 5, so that the in-game tests are already done with this switch-off.
+
+## Tests
+
+- Pure rule: each territory of the evidence, an unknown territory, an unknown state.
+- No setting: no property of `Configuration` nor language key allows avoiding it.
+- Code: every subscription, hook and action call goes through the guard.
+
+Tests already done (2026-11-05, user's report and log, 0.611): Wolves' Den dock, territory 250: switched off on entry, chat line, `/tensho` answers with the same line, resumed by itself on leaving. Battlehall hall (0.614, user's report): no switch-off, Triple Triad panel displayed in a duel against an NPC. Still to try: an arena match against a player, a content detected by the ContentFinderCondition flag (Lord of Verminion), one from the list (Mahjong, tournament, Crucible of the Unbroken), a deep dungeon, a Frontline or Crystalline Conflict.
+
+In-game tests: Wolves' Den dock; custom Crystalline Conflict match; Frontline; Triple Triad Battlehall and tournament; Lord of Verminion; Crucible of the Unbroken; Mahjong. For each: enter with the map and panels open, everything must disappear and come back on leaving. Also: reload the plugin in the middle of a match; disconnect in the middle of a match.
+
+## Decisions taken (2026-11-05, checklist)
+
+| No. | Question | User's answer |
+|---|---|---|
+| D1 | Which content switches off all of Tensho, in addition to PvP, the Battlehall and Lord of Verminion? | Triple Triad tournaments and Mahjong (ranked and unranked, same territory). Crucible of the Unbroken. If the inventory establishes that they are ranked: deep dungeons. **Not** ocean fishing (no ranking, according to the user), nor Ishgard and cosmic exploration (the user thinks there is none), nor chocobo races and the rest of the Gold Saucer |
+| D2 | An alarm during a switch-off? | Nothing: no sound, no chat, no Discord, and no catching up on leaving |
+| D3 | Does Tensho warn? | One line in the chat on entry, nothing on leaving |
+| D4 | Wolves' Den dock? | Switched off |
+| D5 | Triple Triad against a player in a normal zone? | Only the Triple Triad part switches off |
+
+Crucible of the Unbroken panel: abandoned here, then taken up again as a limited exception by DEC-047 (X-109): the team panel in front of the board, between
+fights only, switched off from the start of each fight. The rest of the beastmaster remains a list of information, outside the Crucible of the Unbroken.
+
+Question to the Dalamud team on what counts as competitive: not retained for the moment. The rule gives no list: the review of the submission may therefore judge otherwise.
+
+Inventory: the deep dungeons have a ranking (Lodestone), so they switch Tensho off; ocean fishing, Ishgard and cosmic exploration have none according to this page.
+
+## What is coded (0.610)
+
+`Competitive/CompetitiveGate.Dalamud.cs` and `Competitive/CompetitiveZones.cs`. During the switch-off, the framework subscriptions of 77 files go through the guard, and a test refuses any that would bypass it. Since 0.615, the chat readers too: they still read in 0.610 to 0.614, an oversight corrected. Still active, without reading the game in combat: the modified-inventory notice, which only marks a reread for later, and the change of the system theme setting. Display, commands, context menu, server bar: switched off. The game's map: given back. Discord: what was waiting is abandoned. One line in the chat on entry.
+
+Differences from the plan, to know about:
+
+- The hooks stay in place (macro, sequence recording), but let the game's call through without doing anything; they are not removed.
+- A web request that has already left finishes normally; no new one leaves, for lack of display and ticks. It is not cancelled.
+- An inventory sort or a macro write already in progress stops in the middle and resumes on leaving. Not tried.
+- An alarm whose time falls during the match does not ring afterwards: the calculation looks at the next occurrence. An alarm whose advance notice begins during the match and whose time falls after rings on leaving.
+- If the game sheets become unreadable after an update, Tensho stays switched off everywhere as long as one is connected, with a warning in the log only.
+
+---
+
 # Plan : Tensho se coupe en JcJ et en contenu classé
 
 État : **codé en 0.610, compilé et testé, pas essayé en jeu.** Demande de l'utilisateur, 2026-11-05 : « prevoir que en pvp le plugin se deactive et reactive apres pvp pas de reglages fais obligatoirement pareil pour match classer triad ou dresseur ou autre tous ce qui pourrais etre detecter par SE ou cree un impact sur des classements ». Décision : DEC-038. Données : [docs/evidence/0.600-competitive-inventory.md](../evidence/0.600-competitive-inventory.md).

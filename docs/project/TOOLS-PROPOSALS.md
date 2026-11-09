@@ -1,3 +1,253 @@
+# Alarms, free company, quests, gear, mini-games: improvement proposals (audit of 2026-11-02, step e)
+
+> *Traduction française plus bas.*
+
+List drawn up by a read-only multi-agent audit (0.330). **Nothing was implemented** at the time of the audit (re-read on 2026-11-03: the proposals made since then, at step g, carry a « Status » line): you choose what we add
+(rule of 2026-11-02, [ROADMAP](ROADMAP.md) « Decisions postponed to the end »). The defects found by the same audit are fixed in
+0.331 ([CHANGELOG](../../CHANGELOG.md)). Several proposals overlap with gaps already kept for step g)
+([GAPS](GAPS.md), I-*): they say so.
+
+Value and size are the audit's estimates. « Probe »: a read of the game or an in-game reading is needed before coding.
+
+## T0 — Real-time alarms: by hand, every day, every week or at every reset (X-10, anticipated part)
+
+- **Status (re-read on 2026-11-05)**: DONE 0.577.
+- **Status (re-read on 2026-11-03)**: partly 0.386 (X-10: single alarm at a local date); every day, every week or at every reset not done.
+- **Value**: high; main file: `src/TenshoAssistant/Alarms/TenshoAlarm.cs`.
+- **What the player gets**: An alarm set only once comes back by itself: « 30 min before the weekly reset », « every day at 21:00 », « end of the supply missions ». The Reminders bell offers « At each daily reset » instead of a single alarm that disappears after ringing. You can also set by hand an alarm at a local time, or a timer (« in 45 min »).
+- **How, size, dependencies**: Add AlarmRepeat.RealDaily (local time), RealWeekly (day + time) and Reset (ResetSchedule key: daily 15:00 UTC, supply 20:00 UTC, weekly Tuesday 08:00 UTC, leves 00:00/12:00 UTC). AlarmSchedule.Next computes them (pure function, with tests). « By hand » form: ET time, local time or timer. Copy into the game: ET only, as today (with « lt », the meaning of « rp » is not proven: docs/evidence/0.205-alarm-command.md). Size S-M. Dependencies: none; Discord unchanged (Reminders category). Probe: none. Decision: does the Reminders bell create a recurring alarm by default (recommended: yes).
+- **Source**: Alarms/TenshoAlarm.cs:3: AlarmRepeat only knows Once and EorzeaDaily. MainWindow.Reminders.cs:108 and MainWindow.FreeCompany.cs:111 create Once alarms, removed 10 min after their time (AlarmSchedule.RemoveExpired). MainWindow.Alarms.cs:349-362: adding by hand only offers a daily ET time. Reset times: docs/evidence/0.300-calendar-resets.md (Reminders/ResetSchedule.cs). GAPS.md X-10 (« alarms by hand », small, Choice « Add »).
+
+## T1 — Per-character reminders: « done » boxes and treasure map of each character (M-04, anticipated part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.374 (M-04: « done » boxes per character).
+- **Value**: high; main file: `src/TenshoAssistant/Configuration.cs`.
+- **What the player gets**: With several characters, ticking « Fashion Report done » or « treasure map opened » on one no longer ticks the others. Each character keeps its 18 h wait and its boxes until the reset.
+- **How, size, dependencies**: Key by the ContentId of the logged-in character: Dictionary<ulong,…> for ReminderDone and TreasureMapAt. At the first login, the old values go to the logged-in character (tested migration). When logged out, the page says « Unknown character » and nothing can be ticked. Size S. Dependencies: none; prepares M-04 (view of several characters). Probe: none. Decision: none (already taken for M-04).
+- **Source**: Configuration.cs:208-209: ReminderDone and TreasureMapAt exist as a single copy for the whole configuration, with no character identifier. MainWindow.Reminders.cs:51-58 and 94-101 read and write them as they are. docs/evidence/0.300-calendar-resets.md: treasure maps are « specific to the character (18 h after the last map) ». GAPS.md M-04 (Choice: one file per character, like I-03, never an Account ID).
+
+## T2 — Vessel return alarm created automatically at each reading (M-01, voyages part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.371 (M-01).
+- **Value**: high; main file: `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`.
+- **What the player gets**: As soon as you visit the workshop, each submarine and each airship under way has its return alarm, and its Discord message if you set it, without clicking the bell of each line. A restarted voyage replaces the old alarm.
+- **How, size, dependencies**: After Voyages.Merge (VoyageWatcher.Dalamud.cs:122, framework thread), for each vessel under way: a Once alarm with Source=Voyage and a stable key (house + type + slot). It is replaced if the time changes and removed if the vessel is back. Respect AlarmSchedule.Maximum (60) and say so. Setting « Automatic return alarms » (on, tooltip, ↺). Size S. Dependencies: none; the retainers part of M-01 follows « Retainer ventures: one line per retainer ». Probe: none. Decision: already taken (DEC-025).
+- **Source**: MainWindow.FreeCompany.cs:109-112: the alarm only exists on a bell click, line by line. GAPS.md M-01 (small, value high, Choice: « Tensho alarm created automatically at each reading, setting on by default; never a game alarm through /alarm automatically »). Return time read from the game: docs/evidence/0.307-fc-voyages.md (ReturnTime).
+
+## T3 — Quests: Level and Zone columns, sort and level filter
+
+- **Status (re-read on 2026-11-05)**: DONE 0.550.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Quests.cs`.
+- **What the player gets**: The quest list shows the level and the zone of each quest. You sort it by level or by zone and limit it to a range of levels, for example the side quests of your level in a zone.
+- **How, size, dependencies**: Two more columns, with ImGuiTableFlags.Sortable. The sort is redone only when the input changes, like questMatches (nothing heavy in Draw). « Level from … to … » fields with tooltip and ↺, remembered. Size S. Dependencies: none. Probe: none. Decision: none.
+- **Source**: MainWindow.Quests.cs:143-150: table of 3 columns (quest, category, progress), without sort. QuestEntry already carries Level, AdditionalLevel and Zone (Quests/QuestService.cs:20-22), which only the detail sheet shows (MainWindow.Quests.cs:209-214).
+
+## T4 — Monsters: flag on the monster's position, not at the centre of the map
+
+- **Status (re-read on 2026-11-05)**: DONE 0.551.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Monsters.cs`.
+- **What the player gets**: On the sheet of a monster that drops the item, « Open the map » places the flag at the spot given by Garland Tools and opens the Tensho map on it, with the mention « community position ». Today the map opens at the centre.
+- **How, size, dependencies**: If X and Y are known: convert the map coordinates into a world position (Maps/MapProjection) then call ShowOnTenshoMap(map, position). Otherwise, keep the current behaviour. The tooltip says the source is Garland and that the spawn is not proven. Size S. Dependencies: Tensho map. Probe: none. Decision: none.
+- **Source**: MainWindow.Monsters.cs:183: the button sets mapX=mapY=20.5 and opens the Maps page, even when the sheet shows the position (MainWindow.Monsters.cs:150-151; Garland « coords » coordinates read in Monsters/MonsterDocuments.cs:100). ShowOnTenshoMap and FlagAt already exist (MainWindow.MapView.cs:815, MainWindow.MapLocalLists.cs:57).
+
+## T5 — An in-game reading session for these tools, before coding
+
+- **Value**: high; main file: `docs/project/TESTING.md`.
+- **What the player gets**: A single guided session (developer mode) provides all the missing evidence at once. The proposals that depend on it are then coded without back and forth.
+- **How, size, dependencies**: First tools/ApiProbe outside the game (owners, types, units), then a list of in-game readings in TESTING.md; the logs go into docs/evidence/. Size S. Dependencies: none. Decision: timing of the session (recommended: before the treasure map, the roulettes and the completed duties).
+- **Source**: Probes requested by the proposals of this batch (names found on 2026-11-02 in FFXIVClientStructs.dll and Lumina.Excel.dll, owners and types not proven): GetNextMapAllowanceTimestamp (treasure map), IsRouletteComplete (roulettes), IsInstanceContentCompleted (completed duties), ContentFinderCondition.UnlockQuest and Quest.InstanceContentUnlock / ClassJobUnlock (unlocks), ClassJobLevels / ClassJobExperience (job levels), Condition / SpiritbondOrCollectability (condition and spiritbond), HousingWorkshopAirshipGathered (airship route), FreeCompanyActionTimer (company actions), name of the company at the workshop, roulette reset time, Mini Cactpot payout table. Same method as CRAFT-GATHER-PROPOSALS.md C33.
+
+## T6 — Treasure map: next allowance read from the game (M-02, anticipated part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.372 (M-02).
+- **Value**: high; main file: `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`.
+- **What the player gets**: The « Treasure maps » line of the Reminders gives the real time of the next map, like the game's Calendar, without a click on « opened ». The manual button stays as a fallback.
+- **How, size, dependencies**: tools/ApiProbe probe (owner, type, unit), evidence in docs/evidence/. Reading in GameTimers.Read, on the framework thread and guarded R-14: value absent or out of bounds = « unavailable after a game update », with fallback to the button. Size S. Dependencies: « Per-character reminders », reading session. Probe: yes, plus a reading compared with the Calendar. Decision: none.
+- **Source**: MainWindow.Reminders.cs:51-58: the 18 h wait is started by hand (comment: « the game gives no time that Tensho can read »). The game's Calendar does show it (docs/evidence/0.300-calendar-resets.md). The names GetNextMapAllowanceTimestamp and NextMapAllowanceDateTime are present in FFXIVClientStructs.dll (string found on 2026-11-02; owner and signature to confirm). GAPS.md M-02 (« treasure map allowance », Choice « Add »).
+
+## T7 — Daily roulettes done or not, in the Reminders (C-02, anticipated part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.356 (C-02).
+- **Value**: high; main file: `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`.
+- **What the player gets**: The Reminders list your roulettes (expert, levelling, alliance…) with a tick read from the game. You see at a glance which ones remain before the daily reset, with an alarm.
+- **How, size, dependencies**: Probe of the owner and of the expected index, evidence in docs/evidence/. Read once per second with the other counters, guarded R-14; a collapsible line « Roulettes (n left) ». Read in game the reset time (Duty Finder window) before displaying it. Size S. Dependencies: reading session; the role bonus alert stays with C-02 in g). Decision: none (choice made).
+- **Source**: GAPS.md C-02 (small, value high, Choice « Add »; depends on GameTimers and ResetSchedule). The name IsRouletteComplete is present in FFXIVClientStructs.dll (found on 2026-11-02, owner to confirm); it is used nowhere in src/. Roulette names: ContentRoulette sheet (to probe). The roulette reset time is not in docs/evidence/0.300-calendar-resets.md.
+
+## T8 — Completed duties or not, with a « not completed » filter (C-01, anticipated part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.355 (C-01).
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Duties.cs`.
+- **What the player gets**: The duty list marks ✓ those you have already completed and can show only the others. The Duty Finder panel says it too.
+- **How, size, dependencies**: In-game probe on a done duty and a not-done one (evidence in docs/evidence/). Reading on the framework thread when the page opens, then at each zone change; copy into a set of identifiers, guarded R-14 (« unavailable after a game update »). Size S. Dependencies: reading session. Decision: none (choice made).
+- **Source**: GAPS.md C-01 (small, value high, Choice « Add »; probe of the identifier expected by IsInstanceContentCompleted). The name IsInstanceContentCompleted is present in FFXIVClientStructs.dll but is not used in src/. DutyDefinition already keeps InstanceId (Duties/DutyCatalog.cs:5).
+
+## T9 — Gear: upgrades you already own (M-12, anticipated part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.383 (M-12).
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Gear.cs`.
+- **What the player gets**: For the worn job, Tensho flags per slot any piece with a higher item level than the one worn, usable at your level, already in your bags, the armoury chest, a saddlebag or with a retainer. It says where to take it from.
+- **How, size, dependencies**: Computation outside Draw, redone when the worn gear, the stocks or the job change: GearRules.Fits, level ≤ job level, item level > worn piece. « Owned upgrades » list with the storage and a « Try on » button. Size S-M. Dependencies: storages read by the Bank. Probe: none. Decision: count the glamour dresser and the armoire (recommended: no, these pieces cannot be worn directly).
+- **Source**: GAPS.md M-12 (« possible upgrades for all jobs », Choice « Add »). The page already shows possession (DrawOwnedMark, MainWindow.Gear.cs:515) and the pieces to obtain (MainWindow.Gear.cs:535), but not the owned pieces better than those worn. ItemHoldings gives the detail per storage (Inventory/ItemHoldings.cs:4-14).
+
+## T10 — Home: « Today » block and tiles of your choice
+
+- **Status (re-read on 2026-11-05)**: DONE 0.599.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Home.cs`.
+- **What the player gets**: When Tensho opens, you see what matters now: reminders not done before the next reset, vessels back or next return, retainer ventures finished, followed quests, the next three alarms. Each line opens its page. You also choose the tiles of the home page (Reminders, Free company, Gear…).
+- **How, size, dependencies**: Move the reading of GameTimers into a small service on Framework.Update (once per second, guarded R-14, immutable copy), read by the Reminders and the Home. Build the « Today » block once per second (nothing heavy in Draw). List of tiles in the configuration: order and box per tile, with tooltip and ↺. Size M. Dependencies: « Per-character reminders », return alarms, « Retainer ventures ». Probe: none. Decision: lines shown by default (recommended: all, each can be hidden).
+- **Source**: MainWindow.Home.cs:39-56: only the calculations in progress, the next alarm and the errors. MainWindow.Home.cs:70-82: ten fixed tiles, without Reminders, Free company, Gear or Fashion Report. The game counters are only read while the Reminders page is drawn (MainWindow.Reminders.cs:26-36).
+
+## T11 — Quests « available now » and quests of the current zone
+
+- **Status (re-read on 2026-11-05)**: DONE 0.582.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Quests.cs`.
+- **What the player gets**: A filter shows the quests you can take: not done, prerequisites completed, not excluded by another choice (starting city, Grand Company), level reached. A second filter limits to the zone where you are, with the quest giver on the map. The conditions that Tensho cannot read are flagged (« condition not interpreted ») and never count as met.
+- **How, size, dependencies**: Computation on the published list, not in Draw: unconfirmed + CompletionEvidence + absent from questOtherCity. Level compared with that of the required job if « Levels and experience of all jobs » is done, otherwise only displayed. Unknown join or required step: « Verify ». Zone: current territory, already read by the map. Size M. Dependencies: job levels for the level filter; ClassJobCategory column of Quest to probe. Decision: include repeatable quests (recommended: not by default).
+- **Source**: MainWindow.Quests.cs:112-118: only the filters All, In progress, Completed and Unconfirmed. QuestLinks.CompletionEvidence (Quests/QuestService.cs:53-58) already knows whether the prerequisites are done; QuestAlternatives.NotPlayable (0.286) rules out the options not taken; PreviousQuestStep stays raw (QuestService.cs:17). Giver and map: MainWindow.Quests.cs:215-227.
+
+## T12 — Path to a quest: remaining prerequisites, count and next one to do
+
+- **Status (re-read on 2026-11-05)**: DONE 0.583.
+- **Value**: high; main file: `src/TenshoAssistant/Quests/QuestService.cs`.
+- **What the player gets**: On the sheet of a quest (or of a duty, with « Unlocked by »), Tensho lists in order all the quests still to do to reach it, their number, and the first one to take now, with a map button. Useful for a main scenario, a job or a dungeon to unlock.
+- **How, size, dependencies**: Bounded traversal on a cancellable worker: cycle guard, node ceiling, result published and cached per quest and per observation. Join 1 = all branches; join 2 = the branch already done, otherwise the shortest; unknown mode = stop with « condition not interpreted ». Collapsible list in the sheet, a click opens the quest. Size M. Dependencies: none; serves « Unlocked by ». Probe: none. Decision: none.
+- **Source**: Quests/QuestService.cs:32: « No recursive traversal ». The sheet only shows the direct prerequisites (MainWindow.Quests.cs:230-245) and the direct following quests. The modes of PreviousQuestJoin 1 (all) and 2 (at least one) are already interpreted (QuestService.cs:53-58).
+
+## T13 — Duties and quests: « Unlocked by » and « Unlocks »
+
+- **Value**: high; main file: `src/TenshoAssistant/Duties/DutyCatalogLoader.Dalamud.cs`.
+- **What the player gets**: On the Duty loot page and in the Duty Finder panel, each dungeon, trial or raid says which quest unlocks it and whether you have done it, with a link to the quest and its path. The sheet of a quest says what it unlocks (duty, job).
+- **How, size, dependencies**: tools/ApiProbe probe of the columns (type, null values), evidence in docs/evidence/. Add UnlockQuestId to DutyDefinition, copied on the framework like the rest; reverse index quest → duties built with the quest list. « Unlocked by … (done / not done / unknown) » line in MainWindow.Duties.cs and MainWindow.DutyFinder.cs. Size M. Dependencies: « Path to a quest ». Probe: yes. Decision: none.
+- **Source**: Duties/DutyCatalogLoader.Dalamud.cs:47-52 only copies the name, the type, the level and the icon. The columns UnlockQuest (ContentFinderCondition), InstanceContentUnlock and ClassJobUnlock (Quest) have their name in Lumina.Excel.dll (found on 2026-11-02) but are read nowhere in src/. No evidence in docs/evidence.
+
+## T14 — Gear: prepare the plan of a job other than the one worn
+
+- **Status (re-read on 2026-11-05)**: DONE 0.580.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.Gear.cs`.
+- **What the player gets**: A job menu on the Gear page: you prepare or consult the plan of your healer while being a blacksmith. Pieces, materia, pieces to obtain and try-on work; the real attributes are marked « read on the worn job only ».
+- **How, size, dependencies**: Displayed job = chosen job (by default, the worn job); catalogue filtered for that job. If that job is not worn, the attributes column only shows the sum of the pieces and the materia, with no invented real value. Size M. Dependencies: job levels for the level of that job (otherwise a level field). Probe: none. Decision: none.
+- **Source**: MainWindow.Gear.cs:39 and 45: the plan and the materia are taken for state.JobId, the worn job. A code imported for another job is saved but stays invisible as long as that job is not worn (MainWindow.Gear.cs:147, « ImportedOtherJob »).
+
+## T15 — Fashion Report: outfit of the chosen week, tried on in one click, with the place of each piece
+
+- **Status (re-read on 2026-11-05)**: DONE 0.581.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.FashionWeek.cs`.
+- **What the player gets**: You choose one piece per slot among those proposed for the week. « Try on the outfit » puts them all in the fitting room, and a list says where each piece is (bags, armoury chest, glamour dresser, armoire, retainer), which ones are missing and their sources.
+- **How, size, dependencies**: Choice per slot kept until the weekly reset (Tuesday 08:00 UTC, docs/evidence/0.300-calendar-resets.md). « Try on the outfit » button, on click only. Table slot → piece → storage, recomputed when the choice or the stocks change. Size M. Dependencies: none. Probe: none. Decision: none.
+- **Source**: MainWindow.FashionWeek.cs:93 and 129-132: the pieces are sorted « owned first », without choice or grouped try-on. Try-on already exists (Plugin.cs:266, TryOnItem; « Try on the plan » on the Gear page, MainWindow.Gear.cs:97-100). ItemHoldings gives the storage (Inventory/ItemHoldings.cs:4).
+
+## T16 — Retainer ventures: one line per retainer, with alarm
+
+- **Status (re-read on 2026-11-05)**: DONE 0.570.
+- **Status (re-read on 2026-11-03)**: partly 0.371 (automatic alarm at the end of each retainer venture) and 0.374 (view of your characters).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Reminders.cs`.
+- **What the player gets**: The « Retainer ventures » line unfolds: for each retainer, its finished venture or its end time, a bell, and an alarm « when all are finished ».
+- **How, size, dependencies**: Collapsible line (TreeNode) in the same table; Once alarms with Source=Reminder (Discord category « Reminders »); copy of the end times kept per character for the Home. Size S. Dependencies: « Per-character reminders ». The automatic alarms of M-01 for retainers stay in g), or follow the same option as the vessels. Probe: none. Decision: none.
+- **Source**: Reminders/GameTimers.Dalamud.cs:30-40 already reads the name and the end time of each retainer, but MainWindow.Reminders.cs:67-71 only shows two numbers and the next end. This data is only known after the retainer list has been opened (RetainerManager.IsReady).
+
+## T17 — Reminders ticked by themselves when the game says so
+
+- **Status (re-read on 2026-11-05)**: DONE 0.558.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Reminders.cs`.
+- **What the player gets**: When the game indicates 0 custom deliveries or 0 allied society quests left, the « done » box ticks itself until the reset. The manual tick stays for the rest.
+- **How, size, dependencies**: Done = manual tick, or counter read at 0 since the last reset (marked « from the game »); an unknown counter allows no deduction. Setting « Tick from the game » (on, tooltip, ↺). Size S. Dependencies: none. Probe: none. Decision: on by default (recommended: yes).
+- **Source**: MainWindow.Reminders.cs:46 and 49: DeliveriesLeft and AlliedQuestsLeft are read and displayed, but the « done » box (MainWindow.Reminders.cs:94-101) is never ticked from them.
+
+## T18 — Discord: time read in the time zone of each member, and tags [zone], [objet], [et]
+
+- **Status (re-read on 2026-11-05)**: DONE 0.564.
+- **Value**: medium; main file: `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
+- **What the player gets**: In a shared free company channel, each member reads the alarm time in their own time zone (and « in 5 minutes »). Your messages can also give the zone, the item and the Eorzea time.
+- **How, size, dependencies**: New tags [discordtime] (<t:unix:t>), [relative] (<t:unix:R>), [zone], [objet] and [et]. The names are resolved on the framework thread when the alarm rings, then passed to the notifier. [time] does not change. Format tests. Size S. Dependencies: none. Probe: none (Discord syntax). Decision: change the default template (recommended: no, keep the current one).
+- **Source**: Alarms/DiscordWebhook.cs:116: [time] is your local time in HH:mm format. Only tags: [label], [minutes], [time], [character]. TenshoAlarm already keeps TerritoryId, ItemId and EtMinute (Alarms/TenshoAlarm.cs:23-28). USER-REQUESTS.md R-12: « see more if possible or interesting ».
+
+## T19 — Alarms: edit the name and the time, and « Remind me again after 5 min »
+
+- **Status (re-read on 2026-11-05)**: DONE 0.557.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Alarms.cs`.
+- **What the player gets**: You rename an alarm or change its ET time or its date without recreating it. An alarm that has just rung can be postponed by a few minutes, from the Alarms page or the tooltip of the server bar.
+- **How, size, dependencies**: Name and time fields, saved when leaving the field, as for Discord. For an alarm copied into the game, a message says to correct the game's one by hand (Alarms.DeleteInGame). « Snooze » creates a Once alarm with the same name; adjustable duration (5 min, tooltip, ↺). Size S. Dependencies: none. Probe: none. Decision: default snooze duration (recommended: 5 min).
+- **Source**: MainWindow.Alarms.cs:307-331: each alarm only has its box, its reminder and « Delete ». No snooze possible: AlarmService.Ring marks the occurrence as handled (Alarms/AlarmService.Dalamud.cs:158).
+
+## T20 — Alarms: also ring at the exact time
+
+- **Status (re-read on 2026-11-05)**: DONE 0.556.
+- **Value**: medium; main file: `src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs`.
+- **What the player gets**: In addition to the reminder N minutes before, the alarm can ring a second time when the window opens: gathering point, fish, vessel return.
+- **How, size, dependencies**: Per-alarm option, plus a default setting « Ring again at the exact time » (off, tooltip, ↺). A second « on time handled » state avoids ringing twice; Discord only at the first ring (rate limit). Check tests. Size S. Dependencies: none. Probe: none. Decision: also send the second ring on Discord (recommended: no).
+- **Source**: Alarms/AlarmService.Dalamud.cs:147-176 and Alarms/TenshoAlarm.cs:93-101: an occurrence only rings once, at the start of the reminder (LastOccurrence).
+
+## T21 — Character: levels and experience of all jobs
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Character.cs`.
+- **What the player gets** (Character page removed in 0.341: to be placed in the Gear page): The page lists your jobs with their level, an experience bar, and those not yet unlocked. Other tools use it: available quests, plan of another job, crafting simulation.
+- **How, size, dependencies**: Probe (fields, index, value of a non-unlocked job), evidence in docs/evidence/. Copy once per second on the framework thread in CharacterStatsReader, guarded R-14; table per role. Size S. Dependencies: reading session. Decision: none.
+- **Source**: MainWindow.Character.cs:16-40: only the worn job is displayed. ClassJobLevels and ClassJobExperience have their name in FFXIVClientStructs.dll (found on 2026-11-02) but are not used in src/. The job → index mapping is to be proven (probably the ClassJob.ExpArrayIndex column).
+
+## T22 — Gear: condition and spiritbond of worn pieces (M-06, display part)
+
+- **Status (re-read on 2026-11-03)**: DONE 0.376 (M-06).
+- **Value**: medium; main file: `src/TenshoAssistant/Gear/GearLoader.Dalamud.cs`.
+- **What the player gets**: On the Gear page, each worn piece shows its condition (%) and its spiritbond. A piece to repair, or ready for materia extraction, stands out.
+- **How, size, dependencies**: Probe the scales (piece at 100% then worn, spiritbond at 100%), evidence in docs/evidence/. Two more fields in EquippedPiece, copied at the same reading and guarded R-14. Display only: the alert and the bar stay in M-06. Size S. Dependencies: reading session. Decision: none.
+- **Source**: GAPS.md M-06 (Choice: Tensho alert and on-screen bar, adjustable thresholds). Gear/GearLoader.Dalamud.cs:127 already reads the EquippedItems container, but EquippedPiece (Gear/GearCatalog.cs:34) keeps neither the condition nor the spiritbond. The names Condition and SpiritbondOrCollectability are present in FFXIVClientStructs.dll; their scale remains to be proven.
+
+## T23 — Free company: vessels grouped by company, erasable old reading, value of the last loot
+
+- **Status (re-read on 2026-11-05)**: DONE 0.603.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.FreeCompany.cs`.
+- **What the player gets**: With characters in several companies, each workshop has its own frame (company name, reading date). The reading of a company you have left can be erased. Each returned vessel shows the value of its loot at the NPC price.
+- **How, size, dependencies**: Read the company name at the reading (source to probe; failing that, « Workshop n »). One frame (Header) per house; « Erase this read » button with two clicks. Value = Σ quantity × NPC price (the market price will come with f) 2). Size S. Dependencies: none. Probe: company name. Decision: none.
+- **Source**: MainWindow.FreeCompany.cs:39-50: grouping by vessel type only. FreeCompany/VoyageWatcher.Dalamud.cs:122 merges the readings by HouseId, so several workshops get mixed, with the same slot numbers. The NPC prices are already in the voyage catalogue (VoyageWatcher.Dalamud.cs:17-20).
+
+## T24 — Discord: one channel per category (several webhooks)
+
+- **Status (re-read on 2026-11-05)**: DONE 0.598.
+- **Value**: medium; main file: `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
+- **What the player gets**: Vessel returns go to the free company channel, your gathering alarms to your private channel.
+- **How, size, dependencies**: Optional address per category (empty = main address). Each one is masked, checked by IsValidUrl, never written in the logs nor in the Diagnostics report. Queue and rate pause specific to each address; « Send a test » per address. Size M. Dependencies: none. Probe: none. Decision: number of addresses (recommended: one per existing category).
+- **Source**: Alarms/DiscordWebhook.cs:14-30: a single address for all categories. USER-REQUESTS.md R-12 puts « several webhooks » to study.
+
+## T25 — Gear: several named plans per job
+
+- **Status (re-read on 2026-11-05)**: DONE 0.593.
+- **Value**: medium; main file: `src/TenshoAssistant/Configuration.cs`.
+- **What the player gets**: For the same job, you keep « levelling », « crafting » and « best possible », and switch from one to the other; each one is shared by code.
+- **How, size, dependencies**: Named list per job (name, pieces, materia) and choice of the active plan. Migration of the old plan into « Plan 1 », with a test. Duplicate, rename, delete; the tooltip says that deletion is immediate (rule 0.325). Size S-M. Dependencies: none. Probe: none. Decision: maximum number of plans (recommended: 10 per job).
+- **Source**: Configuration.cs:218 and 228: GearPlans and GearMateria only keep one plan per job, and « Clear the plan » erases everything (MainWindow.Gear.cs:107).
+
+## T26 — Airships: route of the last voyage reconstructed
+
+- **Value**: medium; main file: `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`.
+- **What the player gets**: The Route column of the airships shows the destinations instead of « route unknown ».
+- **How, size, dependencies**: Probe HousingWorkshopAirshipGathered for a point field (like Point on the submarine side). If it exists: route = distinct points of the finds, names taken from AirshipExplorationPoint, with the mention « from the loot ». Otherwise, stay « unknown ». Size S after the probe. Dependencies: reading session; useful for the airship planner of f) 3. Decision: none.
+- **Source**: docs/evidence/0.307-fc-voyages.md: « No list of route points for the airships »; MainWindow.FreeCompany.cs:74 displays RouteUnknown. The airship finds are already read (HousingWorkshopAirshipGathered, VoyageWatcher.Dalamud.cs:94-103), but nothing proves that they carry a route point.
+
+## T27 — Active company actions: end time and alarm
+
+- **Value**: medium; main file: `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`.
+- **What the player gets**: The Reminders show the company actions in progress (experience bonus, gathering bonus…) and their end time, with a bell to relaunch one in time.
+- **How, size, dependencies**: Probe the owner and the moment when the game fills the data (perhaps only when the company window is opened). Reminders line guarded R-14, with the date of the reading. Size M. Dependencies: reading session. Decision: keep the proposal if the data only exists when opened (recommended: yes, with the date of the reading).
+- **Source**: Nothing reads them in src/ (search done). The names FreeCompanyActionTimer and CompanyActionTimer are present in FFXIVClientStructs.dll (found on 2026-11-02, owner unknown). Action names: CompanyAction sheet (to probe). Rule of GAPS.md: data that the game only sends when a window is opened is only read after an opening made by the player.
+
+## T28 — Collections: « Recently obtained » and sources menu for emotes
+
+- **Status (re-read on 2026-11-05)**: DONE 0.602.
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.Collections.cs`.
+- **What the player gets**: A « Recently obtained » line lists, with the date, what you have gained since the previous reading (mounts, minions, orchestrion rolls…). Right-clicking an emote opens its sources, as for mounts.
+- **How, size, dependencies**: At each published observation, compare with the already recorded obtained identifiers (per character, 200 entries at most, kept 90 days); list at the top of the page. Add Emote to the sources menu. Size S. Dependencies: « Per-character reminders » (key per character). Probe: none. Decision: retention period (recommended: 90 days).
+- **Source**: MainWindow.Collections.cs:92: totals only, no history. MainWindow.Collections.cs:153-154: CollectionSourcesMenu serves mounts, minions, cards and orchestrion rolls, not emotes, whose tooltip does have the sources (line 149).
+
+## T29 — Mini Cactpot: payout table proven and visible
+
+- **Status (re-read on 2026-11-05)**: DONE 0.571.
+- **Value**: low; main file: `src/TenshoAssistant/MiniGames/MiniCactpotSolver.cs`.
+- **What the player gets**: Under the advice, the payout of each line sum (6 to 24) is displayed, as on the game's ticket: you see what the advised line aims at.
+- **How, size, dependencies**: Look for the table in the game data (probe of the Gold Saucer sheets) or read it on the ticket in game; evidence in docs/evidence/ and a test that compares. Collapsible table under the advice. Size S. Dependencies: reading session. Decision: none.
+- **Source**: MiniGames/MiniCactpotSolver.cs:9: table of 25 payouts written in the code, credited to the game (Credits/CreditCatalog.cs:38-39) but with no evidence in docs/evidence. Rule: no game data without a cited source.
+
+---
+
 # Alarmes, compagnie libre, quêtes, équipement, mini-jeux : propositions d'amélioration (audit du 2026-11-02, étape e)
 
 Liste établie par un audit multi-agents en lecture seule (0.330). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute

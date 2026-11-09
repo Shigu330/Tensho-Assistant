@@ -1,3 +1,200 @@
+# Items, bank, sorting and market: improvement proposals (audit of 2026-11-02, step e)
+
+> *Traduction française plus bas.*
+
+List drawn up by a read-only multi-agent audit (0.328). **Nothing was implemented** at the time of the audit (re-read on 2026-11-03: the proposals made since then, at step g, carry a "State" line): you choose what we add
+(rule of 2026-11-02, [ROADMAP](ROADMAP.md) "Decisions postponed to the end"). The defects found by the same audit are fixed in
+0.329 ([CHANGELOG](../../CHANGELOG.md)). Several proposals overlap gaps already kept for step g)
+([GAPS](GAPS.md), I-*): they say so.
+
+Value and size are the audit's estimates. "Probe": a read of the game or an in-game capture is needed before coding.
+
+## I0 — Count worn pieces in the stocks and in "owned"
+
+- **State (re-read on 2026-11-05)**: DONE 0.549.
+- **Value**: high; main file: `src/TenshoAssistant/Inventory/DalamudInventoryReader.Dalamud.cs`.
+- **What the player gets**: Worn gear counts as owned. The Fashion Report no longer says "not owned" for the piece you are wearing. The hover stock and the item sheet include it, on a "Worn" line. The "owned" filters of the other tools count it too.
+- **How, size, dependencies**: Add GameInventoryType.EquippedItems (1000) to the capture done on the framework thread, with the same IGameInventory reader and the same coverage. Add a "Worn" StorageLabel (PlayerBags category), translated in Inventory/StorageNames.cs. The sort (InventorySortScope, containers 0-3) and the Bank grid (MainWindow.Bank.cs:184-186, containers 0-3) are not touched: a test must verify this, with a survey of all the consumers of inventory.Current (Diagnostics, sort, Bank). Size S. Probe: none for the read; in-game check afterwards (put on then remove a piece). Decision: count worn gear everywhere as owned (recommended: yes, on a separate line to stay visible).
+- **Source**: Inventory/DalamudInventoryReader.Dalamud.cs:11-13 captures only bags 1 to 4 and the crystals. Inventory/ItemHoldings.cs:34-43 counts only containers 0-3 and 2001. MainWindow.FashionWeek.cs:41 (FashionOwned) goes through GetRecipeHoldings, hence without the worn gear. Only the Gear page handles it separately (MainWindow.Gear.cs:512, IsWorn). docs/evidence/0.318-plugin-gaps.json (Allagan Tools): "Worn gear, currencies and crystals of the retainers counted in the stocks" = missing. EquippedItems is already read elsewhere: Gear/GearLoader.Dalamud.cs:127 and Craft/CraftLiveReader.Dalamud.cs:22.
+
+## I1 — Flag and erase the record of a dismissed retainer or of an old storage
+
+- **State (re-read on 2026-11-05)**: DONE 0.576.
+- **Value**: high; main file: `src/TenshoAssistant/Inventory/BankService.cs`.
+- **What the player gets**: A dismissed retainer no longer counts forever in your stocks. The Storage page flags the registered retainers that no longer appear at the summoning bell, and an "Erase this read" button (two clicks) removes them. Your totals become correct again: hover, sheet, the "missing" of crafting, Fashion Report.
+- **How, size, dependencies**: Add InventoryBankService.DeleteAsync(BankKey), in the same bounded queue and with the same atomic write (FileInventoryBankStore). Button in "Imports" (DrawImportManager) with the two-click confirmation of MainWindow.Alarms.cs. An "absent from the summoning bell" mention when KnownRetainers is known and does not contain this retainer; never an automatic erasure. Size S-M. Probe: none. Decision: no new one (part of the I-03 choice, doable before g); to confirm: manual erasure only (recommended).
+- **Source**: BACKLOG.md:124: "possible manual deletion of an old record" remains a separate extension. GAPS.md:114 (I-03), Choice: "Erase this character" button. Inventory/BankService.cs:30 has only ImportAsync, no deletion. Inventory/ItemHoldings.cs:65-76 counts every registered retainer record for the character. MainWindow.Bank.cs:428-441 compares the summoning bell list (BankInventoryBridge.Dalamud.cs:188-197, KnownRetainers) with the records only to find the retainers not imported, never the surplus records.
+
+## I2 — I-01, anticipated part: last sale and refresh key on hover
+
+- **State (re-read on 2026-11-03)**: DONE 0.343 (I-01: last sale, Ctrl+Alt to refresh).
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.MarketHover.cs`.
+- **What the player gets**: Under an item's tooltip, you already see the lowest NQ/HQ price of the world and the cheapest of the data center. To these are added the last sale (price and date) and a key to hold to re-read the price, without opening the Market page. Afterwards, after a probe: region price, sales per day and average price.
+- **How, size, dependencies**: Step 1 (S, no probe): display RecentSale/SaleAt NQ and HQ in DrawHoveredPrices. The key is read on the framework thread (IKeyState, in Items/ItemHoverReader.Dalamud.cs); it requests a forced read, at most every 3 s (cadence of Market/MarketService.cs:138). "Refresh key" setting (none / Alt / Ctrl / Shift) with tooltip and ↺. Step 2 (S): probe of an aggregated response (truncated response in docs/evidence), then read of minListing.region, dailySaleVelocity and averageSalePrice in MarketQuote.Parse (same request; raise the cache version "universalis-aggregated-v2"). The stack price waits for the probe of the hovered quantity (shared with I-06). Decision: the default key (recommended: Alt, like Price Insight, with "none" possible).
+- **Source**: GAPS.md:112 (I-01), Choice: "price on hover only (no preloading), refresh key". Market/MarketQuote.cs:37 already reads recentPurchase.world, displayed only on the Market page (MainWindow.Market.cs:65-66). DrawHoveredPrices (MainWindow.MarketHover.cs:406-429) displays only Minimum. docs/evidence/0.318-plugin-gaps.json (Price Insight): "Last purchase on hover" and "Refresh with Alt" = partial. The fields region, dailySaleVelocity and averageSalePrice cited by GAPS are proven by no capture: docs/evidence/0.270-universalis-listings.md covers only /api/v2/{scope}/{item}.
+
+## I3 — NPC vendor prices in the preparation cost and on the Market page
+
+- **State (re-read on 2026-11-05)**: DONE 0.575.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.PreparationCost.cs`.
+- **What the player gets**: For each ingredient sold for gil by an NPC vendor, the preparation cost shows the NPC price next to the market minimum and can keep the cheaper one. The Summary of the Market page says "Sold by an NPC: X gil" (name and place, link to the vendor). You no longer buy on the market what costs less at a vendor.
+- **How, size, dependencies**: Pure function "NPC price in gil" (cheapest NpcShopKind.Gil offer, quality of the offer NpcShopSale.Hq) passed to PreparationCost.BuildDemands. New column, "NPC" status and a quality choice "cheapest, NPC included". Market page: a line in the Summary with DrawVendorLink. No network request. Size S-M. Probe: none (sheets already read); an in-game check on a known item. Dependency: part of A-06 (Crafting domain), doable before g. Decision: does the NPC enter the "cheapest" total (recommended: yes, on a line marked "NPC").
+- **Source**: GAPS.md:77 (A-06) cites as data the "GilShopItem vendor prices (Npcs/NpcVendorLoader.Dalamud.cs)", Choice "Add". Market/PreparationCost.cs:86-99 reads only the market (a non-tradable item stays NotMarketable). Npcs/NpcVendorCatalog.cs:7-15: NpcShopKind.Gil and costs in item 1 (gil), already loaded. docs/evidence/0.318-plugin-gaps.json (SimpleMarketBoard): "highlight when an NPC sells cheaper" = missing.
+
+## I4 — Batched Universalis prices: one request for a whole list
+
+- **Value**: high; main file: `src/TenshoAssistant/Market/MarketService.cs`.
+- **What the player gets**: "Read prices" of the preparation cost (and of future lists) answers in one request instead of one per ingredient: a few seconds instead of about 100 s for 32 ingredients, without risking the 2-minute stop, with far fewer requests to Universalis. It also makes it possible to price, on click, a storage or a submarine route at the market price.
+- **How, size, dependencies**: Probe first: GET aggregated/{world}/{id1,id2,…} with curl (maximum number of items, field of the failed items), response truncated in docs/evidence. Then RequestBatchAsync(ids) in MarketService: same lock, same 3 s pause, bounded response, memory and disk cache per item. PreparationPriceSession uses it, with the limit raised to the proven value. Size M. Dependencies: none; it then serves I-13, A-06, f) 2, and a possible "storage value at the market price" (Retainer Inventory Price in 0.318-plugin-gaps.json, outside the 103 gaps: to decide). Decision: the new limit (recommended: the one proven by the probe, 100 if confirmed).
+- **Source**: Market/MarketService.cs:138: 3 s between two requests, one at a time. Market/PreparationPriceSession.cs:22: 32 items at most; line 28: stop after 2 minutes. MainWindow.PreparationCost.cs:94 displays the limit notice. MarketQuote.Parse (Market/MarketQuote.cs:21-31) already walks a "results" array by itemId. ROADMAP "Decided on 2026-11-02", f) 2: market price of submarine routes. Cadence of the sources: docs/evidence/0.246-cache-audit.md.
+
+## I5 — Preparation cost at the data center price (option of A-06)
+
+- **State (re-read on 2026-11-05)**: DONE 0.574.
+- **Value**: medium; main file: `src/TenshoAssistant/Market/PreparationCost.cs`.
+- **What the player gets**: The preparation cost is computed at the current world or at the cheapest of the data center, with the world where to buy, for whoever changes world to do their shopping.
+- **How, size, dependencies**: "Scope: world / data center" combo with tooltip, remembered with ↺. Each line states the world (MarketState.NameOf). Text copy completed. No new request. Size S. Probe: none. Dependency: part of A-06, doable before g. Decision: no new one (option already chosen).
+- **Source**: GAPS.md:77 (A-06), Choice: "lowest listing of the world (data center as an option)". Market/MarketQuote.cs:41-44 already reads NqCheapest/HqCheapest (data center minimum and its world) in the same response. Market/PreparationCost.cs:93-96 uses only the world's Nq/Hq.Minimum.
+
+## I6 — I-06, anticipated part: NPC sale price, per unit
+
+- **State (re-read on 2026-11-03)**: DONE 0.346 (I-06, NQ price only).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MarketHover.cs`.
+- **What the player gets**: Under the tooltip and in the header of the item sheet: "NPC sale: X gil each", to choose quickly between the market and the vendor. The total of the stack comes after the probe of the hovered quantity.
+- **How, size, dependencies**: One line in the hover panel: fifth part "NPC price", with its box, its tooltip and its ↺, like the HoverShow*. Same line in the "facts" of the sheet. Value 0: nothing is displayed (the "unsellable" meaning is not proven). HQ: no price until it is captured, with no guessed coefficient. Size S. Probe: quantity of the hovered stack (AgentItemDetail or InventoryItem, shared with I-01) for the total; in-game capture for an HQ price. Decision: no new one.
+- **Source**: GAPS.md:117 (I-06), Choice "Add", depends on the hovered quantity. Items/ItemCatalog.cs:11 (SellPrice) comes from Item.PriceLow (Items/ItemCatalogLoader.Dalamud.cs:138); only the sort uses it (MainWindow.SortRules.cs). The header of the sheet (MainWindow.ItemSheet.cs:50-60) does not display it.
+
+## I7 — I-12, anticipated part: category and slot filters, levels in the results
+
+- **State (re-read on 2026-11-03)**: DONE 0.353 (I-12).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Items.cs`.
+- **What the player gets**: The item search accepts a filter by game category, equipment slot and level; each result shows its category and its levels. Finding "all level 90 rings", or a material among homonyms, becomes direct.
+- **How, size, dependencies**: ItemCatalog.Search(query, limit, filter) with category, slot (EquipmentSlots) and level bounds; empty query allowed when a filter is set. Combos and fields with tooltip, "Clear filters" button. Recomputed only when the query or a filter changes (as today, MainWindow.Items.cs:679-684). Size S. Probe: none. The job filter (ClassJobCategory) and the key items (EventItem) stay in g: columns to add to the catalog. Decision: no new one.
+- **Source**: GAPS.md:123 (I-12), Choice "Add". Items/ItemCatalog.cs:86-105 searches only by name or ID. MainWindow.Items.cs:702-716: a result is only an icon and a name. The data already exist: ItemCatalog.Categories (Items/ItemCatalog.cs:38, 45-47); Equipment, ItemLevel and EquipLevel in ItemDefinition.
+
+## I8 — X-07, anticipated part: open the item on Universalis, Garland Tools, Teamcraft or the wiki
+
+- **State (re-read on 2026-11-05)**: DONE 0.561.
+- **State (re-read on 2026-11-03)**: partly 0.349 (X-07: wiki and Lodestone); Universalis, Garland Tools and Teamcraft not in this menu.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
+- **What the player gets**: Right click on an item, in the Tensho windows and in the "Tensho" menu of the game: "Open on…" opens the item's page in the browser.
+- **How, size, dependencies**: "Open on" submenu: Universalis (/market/{id}), Garland Tools (#item/{id}), Teamcraft (item sheet by ID), consolegameswiki (English title). Lodestone: search by name only, because the game data give no Lodestone identifier. Util.OpenLink on click only. "External links" box with tooltip and ↺. Credits and manifest completed (sites named). Size S. Probe: check each URL form once (docs/evidence). Decision: the list of sites (recommended: the four above) and the /wiki, /lodestone commands (recommended: no, the menu is enough).
+- **Source**: GAPS.md:199 (X-07), Choice "Add". No OpenLink in the code (search of 2026-11-02). Menus concerned: ItemLinksMenu (MainWindow.DutyFinder.cs:145-160) and Items/ItemContextMenuBridge.Dalamud.cs:60-80. The English name, already loaded (Items/ItemCatalog.cs:11, EnglishName), gives the wiki title.
+
+## I9 — Copy the item name and item link in the chat (local)
+
+- **State (re-read on 2026-11-05)**: DONE 0.561, with I8.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.DutyFinder.cs`.
+- **What the player gets**: Right click on an item: "Copy the name", to paste into the game's market search. "Link in my chat": Tensho writes into your own chat alone a clickable link of the item, which you then share yourself if you wish.
+- **How, size, dependencies**: ImGui.SetClipboardText(item.Name). Link: SeStringBuilder.AddItemLink(id, hq) then IChatGui.Print, a local message: nothing is sent to the server. Same entries in the game menu. Size S. Probe: none. Decision: add these entries, not chosen in c) (recommended: "Copy the name" yes, the link as an option).
+- **Source**: ItemLinksMenu (MainWindow.DutyFinder.cs:145-160) has neither copy nor link; no ItemPayload in the code. docs/evidence/0.318-plugin-gaps.json (Item Search): "Link the item in the chat without owning it" = missing. This gap is not part of the 103 of GAPS.
+
+## I10 — Crystals and gil of the retainers in the retainer record
+
+- **State (re-read on 2026-11-03)**: partly: retainers' gil in the gil journal (0.351); retainers' crystals not verified.
+- **Value**: medium; main file: `src/TenshoAssistant/Inventory/BankInventoryBridge.Dalamud.cs`.
+- **What the player gets**: The crystals entrusted to the retainers count in the Crystals tab (one column per retainer), in the "missing" of crafting and on hover. The gil of each retainer is kept, with the date of the record.
+- **How, size, dependencies**: Probe first: are RetainerCrystals (12001) and RetainerGil (12000) loaded when InventoryRetainer is open (IsLoaded, size)? Capture by tools/ApiProbe or the log in developer mode, in docs/evidence. Then a separate container group (new BankStorageKind, or schema 2 of the file) so as to change neither the "exact group" validation (BankEntryValidator) nor the sort scope (10000-10006). Size M. Dependency: none; prepares I-03 and I-04. Decision: advance this part before g (recommended: yes, crystals first).
+- **Source**: Inventory/BankModels.cs:9: a retainer covers only containers 10000-10006. The Crystals tab (MainWindow.Items.cs:54-89) reads only container 2001 of the character. BACKLOG.md:124: "equipment/crystals/market of the retainers" not included. docs/evidence/0.318-plugin-gaps.json: Allagan Tools "crystals of the retainers counted in the stocks" = missing, Crystal Terror = partial. GAPS.md:114-115 (I-03, I-04) rest on data of the same nature.
+
+## I11 — Sortable list view of the Bank
+
+- **State (re-read on 2026-11-05)**: DONE 0.594.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Bank.cs`.
+- **What the player gets**: In addition to the 5 × 7 grids, a "List" view: one item per line, with NQ, HQ, total and the storages where it is, sortable by name, quantity or category. With several retainers, you finally see at a glance where your materials are.
+- **How, size, dependencies**: "Grid / List" toggle, remembered, with tooltip and ↺. ImGui table sortable by header, with clipper, modelled on MainWindow.MarketBoard.cs. Rows recomputed only when the source or a filter changes. Search aligned with the catalog's normalisation. Size S-M. Probe: none. Decision: default view (recommended: the grid, as today).
+- **Source**: MainWindow.Bank.cs:181-203 already computes the rows aggregated by item (bankSourceRows). The display exists only as grids (MainWindow.Bank.cs:303-370). The Bank search (MatchesBankFilters, MainWindow.Bank.cs:388-403) does not strip accents, unlike the item search (Items/ItemCatalog.cs:114-123). docs/evidence/0.318-plugin-gaps.json: Allagan Tools "saved filter lists" and AetherBags = partial.
+
+## I12 — Glamour dresser report: pieces for the armoire and duplicates
+
+- **State (re-read on 2026-11-03)**: DONE 0.357 (C-03, pieces for the armoire) and 0.358 (C-07, identical looks).
+- **Value**: medium; main file: `src/TenshoAssistant/Inventory/BankInventoryBridge.Dalamud.cs`.
+- **What the player gets**: A report, moving nothing, lists the glamour dresser pieces that the armoire can take, and the duplicate pieces between glamour dresser, armoire, bags and armoury chest. You know what to remove to free glamour dresser slots.
+- **How, size, dependencies**: Pure projection on the records (BankEntry GlamourDresser and Armoire, bags, armoury chest): "accepted by the armoire" = item present in cabinetRows; duplicate = same item in two storages. A section of the Storage page, recomputed only when a record changes. Size S-M. Probe: none new; in-game validation of 0.236-0.240 first. Decision: add this report, new (recommended: yes, after this in-game validation).
+- **Source**: BankInventoryBridge.Dalamud.cs:224-255 already copies the content of the glamour dresser and of the armoire; cabinetRows gives the items accepted by the armoire (Cabinet sheet). GAPS.md:121 (I-10) follows the same spirit: "report only, no move". STATUS, "To validate in game": the reading of the glamour dresser and of the armoire (0.234-0.240) is not yet validated in game.
+
+## I13 — I-10, anticipated part: unmerged stacks
+
+- **State (re-read on 2026-11-03)**: DONE 0.348 (I-10).
+- **Value**: medium; main file: `src/TenshoAssistant/Items/ItemCatalogLoader.Dalamud.cs`.
+- **What the player gets**: A report of the items spread over several incomplete stacks in the same storage (bags, saddlebags, retainers), for example: "3 stacks of Iron Ore (12, 40, 99) would fit in 2".
+- **How, size, dependencies**: Add Item.StackSize to the catalog (ItemCatalogLoader.Dalamud.cs:135-142, with the item cache version raised). Pure projection per storage: same item, same quality, NQ and HQ separate. The "armoury chest outside the gear sets" part waits for a probe of RaptureGearsetModule and stays in g. Size S. Probe: none for the stacks. Decision: no new one.
+- **Source**: GAPS.md:121 (I-10), Choice: "report only, no move". ItemDefinition (Items/ItemCatalog.cs:9-13) has no stack size. The stacks per slot are already captured (Inventory/InventorySnapshot.cs, InventoryStack).
+
+## I14 — Undo the last sort
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: medium; main file: `src/TenshoAssistant/Inventory/InventoryVisualSortBridge.Dalamud.cs`.
+- **What the player gets**: After "Apply", an "Undo the last sort" button restores the previous order of the bags or of the open storage, as long as nothing has moved since.
+- **How, size, dependencies**: Keep the previous order (managed copy of the pages and slots) with the verified snapshot. "Undo" builds an inverse plan subject to the same checks (plan.Matches, RequireOpenForSort, SortFunctionIndex). The undo is lost when changing character or storage and at the slightest item move. Size S-M. Probe: none; in-game test. Decision: a single undo level, for the session (recommended).
+- **Source**: InventoryVisualSortBridge.Dalamud.cs:75-84 copies the original native order before any write; lines 99-108: write after all the checks. ROADMAP, SORT-001 (SortaKinda reference). Project rule: a sort applies only on click, verified against what is open.
+
+## I15 — Share a sort template as text (copy / paste)
+
+- **State (re-read on 2026-11-05)**: DONE 0.566.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.SortTemplates.cs`.
+- **What the player gets**: A storage template is copied as text and pasted at another player's or on another PC.
+- **How, size, dependencies**: Export: versioned JSON, compressed in base64, with a prefix like "Tensho-Tri-1:", put in the clipboard. Import: bounded size (for example 64 KiB), strict read then InventorySortTemplates.Validate, new identifier, unique name. The item and category identifiers are those of the game, independent of the language. Tooltips on both buttons. Size S. Probe: none. Decision: the format (recommended: this one).
+- **Source**: Inventory/InventorySortTemplates.cs:3-5: a template contains neither character nor retainer. MainWindow.SortTemplates.cs:13-60: create, update, delete, load; neither export nor import. docs/evidence/0.318-plugin-gaps.json (SortaKinda): "import and export of the rules" = partial.
+
+## I16 — Commands "/tensho objet" and "/tensho prix"
+
+- **State (re-read on 2026-11-05)**: DONE 0.555.
+- **Value**: medium; main file: `src/TenshoAssistant/Plugin.cs`.
+- **What the player gets**: "/tensho objet Iron Ore" opens the item sheet, or the search if there are several results; "/tensho prix …" opens the Market page. Both also work in a game macro.
+- **How, size, dependencies**: Read the arguments (French and English words), search with ItemCatalog.Search, then SelectItem and OpenItemSheet, or OpenRoute(Market). Translate the command help (Plugin.CommandHelp). Size S. Probe: none. Decision: the keywords (recommended: objet/item and prix/price; marchand/vendor as an option).
+- **Source**: Plugin.cs:377-380: only "peche" is recognised. docs/evidence/0.318-plugin-gaps.json (Item Vendor Location): "Search command (/pvendor name)" = missing.
+
+## I17 — I-13, anticipated part: gil value of a currency
+
+- **State (re-read on 2026-11-03)**: DONE 0.354 (I-13).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.ItemUses.cs`.
+- **What the player gets**: In "Uses › Currency" of a currency item (seals, marks, scrip…), a "Read prices" button gives for each article its market value and the gain in gil per unit of currency, from the most profitable to the least profitable.
+- **How, size, dependencies**: Bounded list launched on click: PreparationPriceSession, or better the batched request of the proposal "Batched Universalis prices". Value = world minimum ÷ cost. Non-tradable articles marked "not sellable". The balance and "how many can I buy" wait for I-02; the coded currencies stay "unknown". Size M. Dependency: the Universalis batches (recommended). Decision: no new one.
+- **Source**: GAPS.md:124 (I-13), Choice "Add", depends on the balances (I-02) and on the coded currencies. MainWindow.ItemUses.cs:81-108 lists the articles and their cost, without value. docs/evidence/0.318-plugin-gaps.json: Currency Profit Scanner and Currency Spender.
+
+## I18 — I-07, anticipated part: copy "lowest price − 1" from the Market page
+
+- **State (re-read on 2026-11-05)**: DONE 0.567.
+- **State (re-read on 2026-11-03)**: partly 0.346 (I-07: when the offers are opened in the game); not from the Market page.
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.MarketBoard.cs`.
+- **What the player gets**: On the Listings tab of Tensho, a button copies the lowest price minus 1 (NQ or HQ). Your own retainers are marked, so as not to undercut yourself.
+- **How, size, dependencies**: Button with tooltip, which ignores the listings of your retainers (KnownRetainers) and displays the date of the listing, because Universalis can lag behind the game. The full version (offers of the game read when the list opens, IMarketBoard) stays in g. Size S. Probe: none. Decision: do this version early (recommended: only if you want it before g; otherwise wait for the full I-07, more reliable).
+- **Source**: GAPS.md:118 (I-07), Choice: copy to the clipboard only. MainWindow.MarketBoard.cs:161-216 displays the listings with the retainer's name, without copy. The names of your retainers are known after the summoning bell is opened (BankInventoryBridge.Dalamud.cs:188-197).
+
+## I19 — English item name in the sheet and the tooltip
+
+- **State (re-read on 2026-11-05)**: DONE 0.562.
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.ItemSheet.cs`.
+- **What the player gets**: Optionally, the item's English name is displayed under its name, useful with English guides and wikis.
+- **How, size, dependencies**: "English name" box, off by default, with tooltip and ↺. Displayed only if the client is not in English and if the name differs. Size S. Probe: none. Decision: add it (new).
+- **Source**: Items/ItemCatalog.cs:11: EnglishName is loaded for the wiki. docs/evidence/0.318-plugin-gaps.json (BilingualTooltips): "EnglishName loaded for the wiki, never displayed". This gap is not part of the 103 of GAPS.
+
+## I20 — Sort preview: moved slots flagged
+
+- **State (re-read on 2026-11-05)**: DONE 0.565.
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.SortPreview.cs`.
+- **What the player gets**: The preview frames the slots that change and says how many items move. "Apply" is greyed when the sort would change nothing.
+- **How, size, dependencies**: Compare the origin slot (DisplayIndex) with the target slot in the cached projection. Add a coloured frame and a counter; the computation follows the projection and is not redone at every frame. Size S. Probe: none. Decision: none.
+- **Source**: MainWindow.SortPreview.cs:136-146: only the result is drawn. The plan is already built (InventoryVisualSortPlan.Build) and the projection is cached (MainWindow.SortPreview.cs:73-80).
+
+## I21 — Job and gear set filter in the sort rules
+
+- **State (re-read on 2026-11-05)**: DONE 0.595.
+- **Value**: low; main file: `src/TenshoAssistant/Inventory/InventorySortRules.cs`.
+- **What the player gets**: A sort zone can take only the gear of one job, or the pieces of your gear sets.
+- **How, size, dependencies**: Copy ClassJobCategory (list of jobs) into the catalog, then add a job filter to the zone. For the sets: probe of RaptureGearsetModule first. Size M. Decision: add it, new (recommended: with or after I-14).
+- **Source**: Inventory/InventorySortRules.cs:8-12: InventorySortMetadata has no job. docs/evidence/0.318-plugin-gaps.json (SortaKinda): "Filters by class or job and by gear set" = missing. The catalog does not read ClassJobCategory (Items/ItemCatalogLoader.Dalamud.cs:135-142).
+
+## I22 — Computations done at every frame (postponed to e): preparation cost and market history
+
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.PreparationCost.cs`.
+- **What the player gets**: Nothing visible: the preparation cost and history pages stay light with long lists.
+- **How, size, dependencies**: Measure first in game, with a chain of more than 30 ingredients. If the gain is real: a cache key like ChainCostViewKey (MainWindow.PreparationCost.cs:20, 65-71), and marketSalesKey extended to the filtered sales and to the statistics. Size S. Decision: none.
+- **Source**: CHANGELOG.md:181 (0.325): "Postponed to step e): caching of the plan and of the preparation cost… to measure in game before changing". MainWindow.PreparationCost.cs:40-41: PreparationCost.Build at every frame. MainWindow.MarketBoard.cs:223-230: filter and statistics of the sales at every frame. docs/evidence/0.292-draw-times.md: under 0.5 ms per frame.
+
+---
+
 # Objets, banque, tri et marché : propositions d'amélioration (audit du 2026-11-02, étape e)
 
 Liste établie par un audit multi-agents en lecture seule (0.328). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute

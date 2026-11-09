@@ -1,3 +1,82 @@
+# Proposals and provisional choices of step g) — to review together
+
+> *Traduction française plus bas.*
+
+This document is kept during the development of step g) (the gaps of GAPS.md). It records the ideas spotted while coding and the
+choices made provisionally, to review them together with the user (step h and the decisions at the end). Nothing here is decided yet.
+The provisional choices are also recalled in the [ROADMAP](ROADMAP.md), "Decisions postponed to the end".
+Reread on 2026-11-03 (0.446): an alternative done since then is marked "DONE x.y" in its column; what remains is the choice itself to confirm.
+**DECIDED 2026-11-03 (DEC-026)**: all the provisional choices below are confirmed by the user, except X-13 (sending to the chat on click
+added in 0.447); their alternatives remain ideas. X-04: simple link (0.447). Gaps: A-03 / A-04 studied in session; N-06 and N-14:
+community source to look for, licence first; N-08: journal with typed durations (0.448).
+
+## Decisions
+
+<!-- gen:decisions:g-en -->
+The choices noted in this file are settled: DEC-023, DEC-026, DEC-032, DEC-033, DEC-035, DEC-045, DEC-048 ([DECISIONS](DECISIONS.md)). Original text of the sections: [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md). What remains open is listed in the [ROADMAP](ROADMAP.md), "To decide / to review".
+<!-- /gen:decisions:g-en -->
+
+## Ideas spotted while coding (not done)
+
+| Spotted in | Idea | Why not yet |
+|---|---|---|
+| 0.344 | Alert on the weekly cap of tomestones (in addition to the total cap) | Outside the user's choice for I-02 |
+| 0.345 | "Where is this item?" on all characters (tooltip and item sheet), by extending ItemHoldings | Big change to the stocks; to do after in-game validation of I-03 |
+| 0.345 | Retainers' gil in the characters view | The game only gives it when the bell is opened; to probe |
+| 0.347 | List of all annotated items (Items page) with a filter by label | Small; to do with the other item lists (I-12) |
+| 0.346 | Undercutting: also show the recent average sale price before pasting (safeguard against an offer that is too low) | Needs one more Universalis call |
+| 0.345 | Only rewrite a character's file if its quantities changed | Saves disk writes; today one write every 2 minutes per storage read automatically |
+
+Triage of the proposals of the four audits (2026-11-05): [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
+Review of 2026-11-05 with the user: [global plan](GLOBAL-PLAN.md). I-15, N-13 and X-14 are set aside; N-10 is taken up again.
+
+## Gaps left for a session with the user
+
+| Gap | Reason |
+|---|---|
+| I-05 (retainers' market announcements) | First version DONE 0.508, to try in game; the rest below |
+| A-03, A-04 (Raphael solver and adaptive suggestions) | A-03 DONE 0.465 (DEC-028, as an option). A-04 DONE 0.509, to try in game |
+| N-06 (squadron, composition of missions) | DONE 0.451 (DEC-027): planner from the game sheets and GcArmyManager; percentage "≈" until the in-game probe (TESTING 0.451); affinities not counted ([evidence](../evidence/0.448-n06-n14-sources.md)) |
+| N-07 (island sanctuary, map of resources and materials) | Map done in 0.667 (unit of the positions to compare on the island); materials of the creations and of an agenda done in 0.673, without your stocks ([evidence](../evidence/0.673-island-materials.md)) |
+| N-10 (island workshop, solver) | Big: reading the game's supply and demand and a solver; to do with the user, see below |
+| N-04 (housing lottery) | State of the player's entries: structure of the game not found in FFXIVClientStructs (to probe in game) |
+| N-12 (spawn conditions of the S ranks), N-13 (visible furniture), X-14 (housing tools) | Community rules per mark, reading of the furniture and display fixes: sources and risks to decide together |
+| N-08 (gardening journal) | DONE 0.448 (decided on 2026-11-03, DEC-026): journal with durations typed by the player, Reminders page |
+| N-14 (gardening crossbreeding planner) | DONE 0.450 (DEC-027): MIT pairs from nick75g linked to the items through the English Item sheet, displayed in the game's language ([evidence](../evidence/0.448-n06-n14-sources.md)) |
+| I-15 (search in the game's inventory windows) | Touches the game's interface: to do with the user, see below |
+
+## Gaps left for an in-game session (2026-11-04)
+
+| Point | Why not autonomously | What would be needed |
+|---|---|---|
+| I-15, search in the inventory windows | Goes through native pointers on every frame, 15 unknowns (tab numbers, names of the retainers' grids, order of the slots). Coding blindly may crash the game | First a read-only probe, with the user in front of the windows |
+| N-10, island workshop | Done without the game in 0.671 and 0.672, unknowns listed in `docs/evidence/0.671-island-workshop.md` | Tests and capture in front of the island's agenda; forecast of the week later |
+| I-05, continued | Reading of the game's offers, view of all the retainers | After a try of 0.508 |
+| Beastmaster, continued | Set aside by the user | Probe already in place (0.501) |
+
+## Proposal X-100: regrouping of the tools and settings (2026-11-10) — **validated (DEC-048)**; no. 9: automatic off by default (DEC-048)
+
+Finding (0.991): the navigation has 8 groups; "Progression" has 16 pages and "World" 11; the settings are in 7 tabs and also on the pages (MapView 92, Settings 44, Advanced 24, list panels 13…, 320 settings in all, docs/project/SETTINGS.md).
+
+| Proposed group | Pages | Change |
+|---|---|---|
+| Items | Items, Storage, Sort, Market | Lexicon goes to "References" |
+| Production | Crafting, Gathering, Ocean fishing, Island sanctuary, Macro chain | unchanged (without the deliveries) |
+| World | Map, Weather, FATEs, Vendors, Duty loot, Monster loot, Discoveries | without the timers |
+| Tracking (new) | Alarms, Reminders, Garden, Free company | the timers and reminders together |
+| Progression | Quests, Festivals, Collections, Guildleves, Hunting log, Allied societies, Grand Companies, Deliveries (special and custom), Gear, Chocobo | 10 pages instead of 16; the two deliveries merged |
+| Content (new, X-90) | Eureka/Bozja/Occult Crescent, Deep dungeons, Relics, Masked Carnivale, Beastmaster, later strategy boards | one family per content (X-92) |
+| Gold Saucer | Fashion Report, Triple Triad, Mini Cactpot | unchanged |
+| References (new) | Lexicon, Help, Credits | what one consults |
+| Preferences | Settings, Diagnostics (developer) | Home and My tools stay at the top, outside any group |
+
+Settings: each setting also stays next to its tool (as today), and the Settings page groups them by the same groups as the navigation:
+General (language, theme, fonts, chat, sounds) · Panels beside the game's windows (gathering, crafting, collectable, retainers' sales, mission search, Fashion Report, Triple Triad, beastmaster board…) · Map · Tracking and notifications (alarms, reminders, Discord, server bar: currencies, gil) · Data and sources (community sources, cache, discoveries) · Advanced · Debug.
+Plus a search field at the top of the Settings that finds any setting by its name (all 320) and opens its tab.
+| 11 | Nearby monsters, other uses (X-40); today: your lists, hunting log, FATEs, blue mage, missing collections, beastmaster, guildleve targets | Add (each one a layer of the map, ticked in Settings › Map and on its page): a) the monster drops an ingredient of one of your crafting lists (loot seen in game, then wiki); b) target of a relic book in progress (Zodiac: "defeat N …"); c) the monster drops an item from your wishes | Only a); or nothing |
+
+---
+
 # Propositions et choix provisoires de l'étape g) — à revoir ensemble
 
 Ce document est tenu pendant le développement de l'étape g) (les écarts de GAPS.md). On y note les idées repérées en codant et les

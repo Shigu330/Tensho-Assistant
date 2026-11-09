@@ -1,3 +1,235 @@
+# Tensho map: improvement proposals (audit of 2026-11-02, step e)
+
+> *Traduction française plus bas.*
+
+List drawn up by a read-only multi-agent audit of the map (0.327). **Nothing was implemented** at the time of the audit (re-read on 2026-11-03: the proposals made since then, at step g, carry a "State" line): you choose what we
+add (rule of 2026-11-02: decisions are kept for the end, see [ROADMAP](ROADMAP.md) "Decisions postponed to the end").
+The defects found by the same audit are fixed in 0.328 ([CHANGELOG](../../CHANGELOG.md)); P0 is one of them.
+
+Value and size are the audit's estimates. "Probe": a read of the game or an in-game capture is needed before coding
+(no data is guessed). The sources cited are files of the repository.
+
+## P0 — Show the game map when the Tensho map cannot be displayed
+
+- **State (re-read on 2026-11-03)**: DONE 0.328 (defects of the audit).
+- **Value**: high; main file: `src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs`.
+- **What the player gets**: Today, if you press M while the Tensho map is hidden, no map is displayed. This is the case in combat or in a duty with "Hide in combat" or "Hide in duties" ticked, or when the map catalog is not yet loaded or has failed. With the fallback, the game map stays visible whenever the Tensho map cannot be drawn.
+- **How, size, dependencies**: Pass the replacer a "Tensho map displayable" function (catalog loaded and no hiding in progress) in place of MapViewOpen. If it answers no when AreaMap appears, keep the game map (keepGameMap). If the Tensho map hides while hosting (start of a combat), call Restore(unit). Size S. No probe. In-game test: press M in combat with the option ticked. One decision: if the user prefers "no map in combat", this choice becomes a setting (with tooltip and ↺).
+- **Source**: Found by reading the code, not reproduced in game. Plugin.cs:145: the replacer receives tenshoOpen = MainWindow.MapViewOpen, which says only whether the map is open, not whether it is visible. MainWindow.MapView.cs:76-82 (MapViewVisible) and MapViewWindow.cs:21 (DrawConditions): the window is not drawn if the catalog is absent or if one of the hidings applies. NativeMapReplacer.Dalamud.cs:50-62: the game map is nonetheless placed off screen (hosted). Rule R-14 of the maintainer's rules: fail cleanly.
+
+## P1 — Zoom at opening, adjustable and kept between sessions
+
+- **State (re-read on 2026-11-05)**: DONE 0.542.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The map opens at the zoom chosen by the player: the last zoom used (kept after a game restart), a fixed percentage following the character, or the whole map. The zoom applied when a quest or a link is requested is adjustable too. Today, the map always starts at 50%.
+- **How, size, dependencies**: Add to MapViewSettings: OpenZoomMode (last, fixed, whole map), OpenZoomPercent, FocusZoomPercent (100% by default) and LastZoom. LastZoom is saved when the window closes or after a pause, never at every frame. Each setting has its tooltip and its ↺. List them in the ConfigurationReset lists (a test requires it). Size S. No probe. One decision: the default value. Recommended: "last zoom", with 50% the first time, which changes nothing for the current user.
+- **Source**: Audit note "Map: zoom at launch" (step e). MainWindow.MapView.cs:26: mapZoom=0.5f, a field never saved. Lines 773 and 806: a quest or a link imposes a zoom of at least 100% (Math.Max(mapZoom,1f)), a frozen value. Lines 780 and 816-821: choosing an area in the menus switches to "whole map". Configuration.cs:57-167: MapViewSettings has no zoom field.
+
+## P2 — Label size set apart from the icon size
+
+- **State (re-read on 2026-11-05)**: DONE 0.543.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: Place names and the level labels of gathering points stay readable at all zooms without overlapping. On a very zoomed-out region map, the names shrink or hide under a threshold chosen by the player. The gathering labels and the edge markers follow the chosen size.
+- **How, size, dependencies**: Add a separate "Name zoom follow" (fallback: the current value) and a "minimum zoom to show names", then make the gathering labels follow the same rule (adjustable threshold, or minimum zoom, in place of 0.6). Possibly add a scale for the edge markers. Option: do not draw a name that overlaps another already drawn (rectangle test, list bounded per map). Tooltip and ↺ everywhere. Size S. No probe. One decision: the default values (recommended: today's, nothing changes as long as the player sets nothing).
+- **Source**: Audit note "label zoom". MainWindow.MapView.cs:837-852: names are worth font × 2.4 × zoom^follow × name scale. The "Zoom follow" is shared with the icons (Configuration.cs:113-116, 15% by default), so that at 15% zoom the names keep about 75% of their size and overlap. Lines 930-931: the level label of the gathering points has the fixed size of the font and appears only above a hard-coded zoom threshold (0.6). Line 1459: the edge markers are a fixed 26 px.
+
+## P3 — Nearest aetheryte to the flag or to a point, with its cost
+
+- **State (re-read on 2026-11-05)**: DONE 0.544.
+- **State (re-read on 2026-11-03)**: partly: nearest aetheryte with its cost for the chat links (0.373) and "Go there" of the gathering places (0.397); not yet from the flag or from any point.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: Right click on the map or on the flag: the entry "Teleport to the nearest aetheryte" gives the name and the real cost in gil, then asks for the usual confirmation. No more need to look for the aetheryte next to a placed flag (hunt train, meeting point).
+- **How, size, dependencies**: Computation in texture pixels on the displayed map, among the markers whose AetheryteId≠0. Cost read in TeleportCosts: if it is absent, the line says "cost unknown (not attuned?)", never 0. Entry added to the general menu and to the menu of the flag icon. Limit stated on screen: only the aetherytes of this map, without travel time. The aethernet shards (DataType 4, icon 60430, key meaning unknown in 0.107.0-aetheryte-probe.log) stay excluded as long as they are not probed. Size S. No probe for DataType 3. No new decision: it is a part of M-03, already kept (DEC-025), doable alone from now on.
+- **Source**: GAPS.md:154 (M-03: "nearest aetheryte on click"). docs/evidence/0.318-plugin-gaps.json: Aetheric Flow and MapLinker, "nearest aetheryte", high value. Already present in the code: DataType 3 markers = aetherytes (MapMarkerSource.Dalamud.cs:31, proof docs/evidence/0.107.0-aetheryte-probe.log, RADZ type=3 lines), real cost read in the game (MapLiveReader.Dalamud.cs, ReadTeleportCosts), confirmation window (MainWindow.MapView.cs:1065-1083).
+
+## P4 — Chat map links (M-03): list, flag and nearest aetheryte
+
+- **State (re-read on 2026-11-03)**: DONE 0.373 (M-03).
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The map links seen in the chat (hunt trains, treasure maps, meeting points) are kept in a list of the Tensho map, filterable by channel. A click places the flag and centres the map. A button offers the nearest aetheryte, teleport always on click.
+- **How, size, dependencies**: New reader Maps/ChatMapLinks.Dalamud.cs: subscription to ChatMessage with an owner and a Dispose. It copies the MapLinkPayload (territory, map, X/Y), the channel and the time into a bounded history. Display in the map: right-click tab or panel. It depends on the "nearest aetheryte" proposal. Size M. In-game probe only if coordinates written as text without a link are also read: "X / Y" format depending on the language, risk of false positives. Remaining decision: advance M-03 in e) or leave it in g); size of the history; read or not the free text (recommended: links only).
+- **Source**: GAPS.md:154 (M-03), user's choice DEC-025: "list in Tensho (all channels, filterable), flag and nearest aetheryte on click". Planned at step g) 3 World (ROADMAP.md, step g). docs/evidence/0.318-plugin-gaps.json: MapLinker, ChatCoordinates and Aetheric Flow, high value. API: IChatGui.ChatMessage (present in Dalamud.xml, Hooks/dev).
+
+## P5 — Wheel: zoom from the whole window and not adjustable
+
+- **State (re-read on 2026-11-05)**: DONE 0.545.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The wheel zooms everywhere over the map: on the zoom slider, on the tool column and on the names laid over the map. The wheel step is adjustable and its direction can be inverted.
+- **How, size, dependencies**: Read io.MouseWheel when the map window or one of its children is hovered (IsWindowHovered RootAndChildWindows). Over the column or the slider, zoom around the centre of the canvas. Add MapViewSettings.WheelStep and WheelInvert, with tooltip and ↺. Size S. No probe. One decision: specify what the note was aiming at, since the wheel already works on the canvas (recommended: the three points above).
+- **Source**: Audit note "no wheel step". The canvas already zooms with the wheel around the cursor (MainWindow.MapView.cs:790-796). However, the wheel is ignored as soon as the mouse is over an element laid over the map (line 786: hovered && !mapOverlayHovered), and the vertical slider (line 415, VSliderFloat) does not react to the wheel. The step is fixed (1.15 at line 794; 1.25 for the buttons, lines 409 and 418).
+
+## P6 — Character coordinates always visible, and distances
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: A corner of the map permanently shows the character's X/Y coordinates, and those of the flag if there is one. The tooltips of the cursor, of the icons and of the edge markers give the distance from the character, in a straight line (relief is not counted).
+- **How, size, dependencies**: Add MapProjection.WorldFromPixel, with round-trip tests. Distance on X/Z from live.Position. The displayed unit is that of the game world; its name (yalms) is to be confirmed in game against a known distance, assuming nothing. A "coordinates and distances" setting with tooltip and ↺. Size S. Probe: an in-game check of the unit. No decision, except the display corner (recommended: bottom right, facing the cursor coordinates).
+- **Source**: STATUS.md:129: request of 2026-11-01 for the edge markers, "possible distance", not done. Version 0.297 kept only the name (MainWindow.MapView.cs:1480). Lines 1039-1046: only the cursor coordinates are displayed, and only on hover. MapProjection.cs has no pixel → world conversion.
+
+## P7 — Unattuned aetherytes flagged and cost on hover
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: Hovering an aetheryte immediately gives its teleport cost. An unattuned aetheryte is greyed out and says so, instead of being learned after the click.
+- **How, size, dependencies**: On hover, request RefreshTeleportCosts, which stays queued and is read on the framework thread, at most once every few seconds, then display the cost if it is known. The attuned state is read on the framework, copied per map and protected (R-14); if it is unreadable, no greying (unknown, not "unattuned"). Size S. Probe: IsAetheryteUnlocked compared with the game's Teleport window, to be recorded in docs/evidence. No decision.
+- **Source**: MainWindow.MapView.cs:1206: on hover, only the "click = teleport" hint is displayed; the cost appears only in the confirmation window (lines 1072-1075). MapLiveReader.Dalamud.cs (comment on TeleportCosts): an aetheryte absent from the list is "unattuned or not offered", which stays ambiguous. Name found in the local DLLs, meaning to probe: UIState.IsAetheryteUnlocked(uint) (FFXIVClientStructs.xml, Hooks/dev).
+
+## P8 — Bookmarks drawn on the map, added by right click, with a note (M-08)
+
+- **State (re-read on 2026-11-03)**: DONE 0.378 (M-08).
+- **Value**: medium; main file: `src/TenshoAssistant/Maps/MapBookmarks.cs`.
+- **What the player gets**: The bookmarks are displayed on the Tensho map, with an icon adjustable like the others. A right click "Add to bookmarks" here saves the point, with a note and an optional group. "Copy the coordinates" puts X/Y in the clipboard. The bookmarks can be shared by a text code.
+- **How, size, dependencies**: New drawn layer (glyph key like GlyphVista, with size and priority in the icon table). Note and Group fields added to the record as nullable, so that old configurations load. Menu entry with name input. Share code modelled on TENSHO-GEAR1 (no third-party site). Size S. No probe. Remaining decisions: format of the sharing; global or per-character scope (recommended: global, as today).
+- **Source**: GAPS.md:159 (M-08, choice "Add", DEC-025, step g) 3): "neither drawn on the map, nor note, nor group, nor sharing". MapBookmarks.cs: record without note or group, 200 bookmarks at most. MainWindow.MapView.cs:1099: the right click only sends the coordinates to the Maps page ("Use in the tool").
+
+## P9 — FATEs: experience bonus and colour according to the time left
+
+- **State (re-read on 2026-11-05)**: DONE 0.548.
+- **Value**: medium; main file: `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
+- **What the player gets**: On the map and in the FATE tab of the right click, a FATE with a bonus is marked, and the colour shows the ones about to end.
+- **How, size, dependencies**: Copy HasBonus into MapFateMarker on the framework thread, then display the label and a colour according to SecondsLeft. The thresholds are an interface choice, adjustable with tooltip and ↺. Size S. In-game capture: check that HasBonus matches the game's bonus icon. No decision, except the thresholds (recommended: orange under 5 min).
+- **Source**: docs/evidence/0.318-plugin-gaps.json: Mappy, "List of active FATEs: colour according to expiry, "Exp Bonus!"", status partial. MapLiveReader.Dalamud.cs, ReadFates: the bonus is not copied. MapFateMarker has no bonus field. The Dalamud API exposes IFate.HasBonus (Dalamud.xml, Hooks/dev). MainWindow.MapLocalLists.cs:94-98 (FateLabel).
+
+## P10 — Search on the map (places, aetherytes, NPCs, quests, resources)
+
+- **State (re-read on 2026-11-05)**: DONE 0.597.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: A search field in the map window finds a place name, an aetheryte, a vendor or Triple Triad NPC, a quest giver or a gathering resource, on all maps. A click opens the right map, centres it and places the flag.
+- **How, size, dependencies**: Search index built only once outside Draw (on a worker), from the data already in cache: MapMarker labels of all ranges, local index (quests, gathering), catalog of vendor NPCs, Triple Triad NPCs. Bounded result list, with clipper. Magnifier button in the tool column. Size M. Probe only for the aethernet (meaning of the DataType 4 key). One decision: scope of the types searched (recommended: everything except the aethernet as long as it is not probed).
+- **Source**: docs/evidence/0.318-plugin-gaps.json: Mappy, "Search for maps, aetherytes, points of interest and the aethernet, with centring", status partial. MapCatalog.cs, Search: region, zone, subzone and id only, in the Maps page (MainWindow.Maps.cs:39-41) and not in the map window.
+
+## P11 — Undiscovered parts hidden like on the game map
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: Like the game map, the Tensho map hides or greys the areas and regions that the character has not yet discovered. This avoids revealing places.
+- **How, size, dependencies**: Probe first (tools/ApiProbe, then an in-game capture on a half-discovered zone, to be recorded in docs/evidence). Then: read on the framework, copied per map, and drawing of a veil on the undiscovered subregions, or greying of the menu entries. If the read fails: everything stays visible and the message "discovery state unavailable" is displayed (R-14). Size M. Decision: hide, grey, or leave a setting (recommended: setting, on by default like the game).
+- **Source**: MAP-016-PLAN (maintainer's notes, not in the repository), lines 57, 68 and 69: "undiscovered maps hidden like the game", still among the leftovers. Names found in the local DLLs, meaning to probe: Lumina columns Map.DiscoveryIndex, DiscoveryArrayByte and DiscoveryFlag (Lumina.Excel.dll); FFXIVClientStructs MapDiscoveryManager.IsMapRegionDiscovered(uint, byte) and IsRegionDiscovered (FFXIVClientStructs.xml, Hooks/dev). The game's fog texture or mask are unknown.
+
+## P12 — Names written next to the icons, like the game map
+
+- **State (re-read on 2026-11-05)**: DONE 0.596.
+- **Value**: medium; main file: `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs`.
+- **What the player gets**: The names that the game writes next to some icons (aetherytes, important places) are written on the Tensho map with the same placement, and not only in the tooltip.
+- **How, size, dependencies**: Probe the values of SubtextOrientation, compared with a capture of the game map, and record the result in docs/evidence. Copy the column into MapIconMarker. Write the text on the indicated side, at the size of the names (depends on the proposal on labels). On/off setting with tooltip and ↺. If the column is unreadable, no text. Size M. Decision: enable by default or not (recommended: yes, like the game).
+- **Source**: MapMarkerSource.Dalamud.cs:30-33: only PlaceNameSubtext is copied. MainWindow.MapView.cs:844: only the markers without icon (Icon==0) are written on the map; the name of a marker with an icon serves only as a tooltip (lines 896-904). Name found in Lumina.Excel.dll, meaning to probe: MapMarker.SubtextOrientation.
+
+## P13 — Location of the deciphered treasure map (M-14)
+
+- **State (re-read on 2026-11-03)**: DONE 0.384 (M-14).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The deciphered treasure map that you own is drawn on the Tensho map, with an icon, an edge marker and the flag in one click, without searching on the internet.
+- **How, size, dependencies**: In-game probe first, with a deciphered map in the pocket, then record in docs/evidence. Then: read on the framework, protected (R-14), copy of the position (map, X/Z), new layer with size and priority, and edge marker. Size M. No decision (already kept), except the possible advance from g) to e).
+- **Source**: GAPS.md:165 (M-14, choice "Add", step g) 3), with its note: read by EventItemManager.GetTreasureHuntRank() and GetTreasureSpotSubKey(), to probe. These two names are present in FFXIVClientStructs.dll (Hooks/dev). Lumina data TreasureSpot (Location to Level) and TreasureHuntRank. Reminder already present: Configuration.cs:208 (TreasureMapAt).
+
+## P14 — Measure the map's display time and lighten it
+
+- **State (re-read on 2026-11-05)**: DONE for the measurement, 0.489 ("Map" line of the diagnostics); lightening remains to be decided on measurement (triage of 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The map, the heaviest window of Tensho, stays smooth, and its cost per frame is visible in Diagnostics, like that of the other pages.
+- **How, size, dependencies**: Add a "Map" line to the Diagnostics capture (same ring of 120 frames). Keep the grouping of the vendors by (map, catalog, ShowFixedIcons), like mapGatheringCache, and the markers filtered by reference of live.Events. Size S. In-game capture by the user, before and after, as in 0.292. No decision.
+- **Source**: docs/evidence/0.292-draw-times.md: only the pages of the main window were measured (MainWindow.cs:102, pageDrawMs indexed by Page); the map window never was. Work redone at every frame: MainWindow.MapView.cs:856 (markers filtered with ToArray), 884-895 (VendorCandidates, then MapVendorIcons.Nearest for each vendor, line 1162), plus the LINQ queries on the markers. Rule: "nothing heavy in Draw".
+
+## P15 — State of the game reads displayed on the map (R-14, map part)
+
+- **State (re-read on 2026-11-05)**: DONE 0.569.
+- **Value**: medium; main file: `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
+- **What the player gets**: After an FF14 update, the map states precisely what no longer works ("quest markers unavailable after a game update", "teleport unavailable"), instead of an empty map without explanation. The rest keeps working.
+- **How, size, dependencies**: One status per part (position, flag, markers, FATEs, objects, party, collected, teleport, replacement), published with the state. Each read is isolated in its own try, so that a failure does not cut the others. A discreet line on the map, and the same status in Diagnostics. Linked to the fallback on the game map. Size S to M. No probe. Decision: do the map part now or integrate it into step g2 R-14 (recommended: now, since e) starts with the map).
+- **Source**: the maintainer's rules (R-14). MapLiveReader.Dalamud.cs:104: any error clears the whole state (state=null) and leaves only a message in the log. The arrow, the flag, the markers and the party disappear together, without saying anything on screen. NativeMapReplacer: catch with log only. Native write: ClearFlag (FlagMarkerCount=0).
+
+## P16 — Option: left click on the map to place the flag
+
+- **State (re-read on 2026-11-05)**: DONE 0.546.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: A brief left click on an empty spot of the map places the flag, without going through the right-click menu; a drag still moves the map.
+- **How, size, dependencies**: On release of the left button without dragging (mapDragged false), on an area without icon and on an area map (TerritoryId≠0), call PlaceFlagFromMapView. Setting with tooltip and ↺. Size S. In-game capture on the behaviour of the game map. Decision: enabled or not by default (recommended: disabled, to change nothing).
+- **Source**: MainWindow.MapView.cs:788-789: the left click serves only to drag. The flag is placed by the right-click menu (line 1091) or by the click on an icon. That the game map places the flag with a simple click remains to be confirmed in game, without assuming it.
+
+## P17 — Capture of the marker type of the leves and of their areas
+
+- **Value**: medium; main file: `docs/project/BACKLOG.md`.
+- **What the player gets**: The leves form a proper category in the edge markers and in the area colours, instead of being mixed with the "other events".
+- **How, size, dependencies**: In-game capture: leve accepted, map open, developer mode. The line "Map event marker icon … type …" is already written in the log (MapLiveReader.Dalamud.cs, ReadEvents). Copy this capture into docs/evidence, then make the type a category of the EdgeEvents switch and an area colour. Size S. In-game capture first. No decision.
+- **Source**: BACKLOG.md:14 and ROADMAP.md:82: marker type of the leves unknown. TESTING.md:234: capture requested. MAP-016-PLAN (maintainer's notes, not in the repository), lines 57 and 69: "confirmation of the leve areas". In docs/evidence/0.135.0-marker-evidence.log and 0.136.0-marker-evidence.log, only types 0, 3 and 4 appear, without saying which one designates a leve.
+
+## P18 — Game frames and textures (ULD), starting with the map
+
+- **State (re-read on 2026-11-04)**: abandoned: the game frame of 0.332 is removed in 0.510 (DEC-033, rendering judged bad).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: The map window (tool buttons, frame, menus) takes up the frames and textures of the game interface, in the same DLL and without external resource. The other windows follow afterwards.
+- **How, size, dependencies**: Probe first: .uld paths and part numbers of the buttons and of the frame of the game map (tools/ApiProbe), with a screenshot, recorded in docs/evidence. Then: single loading outside Draw, one part per button, and fallback on the current ImGui drawing if a part is missing (R-14). Size M for the map, L for the whole interface. Decision: scope (map only or everything at once) and degree of imitation (buttons, frame, background).
+- **Source**: BACKLOG.md:15; ROADMAP.md:46 (step e); ROADMAP.md:53 and 119 (DEC-023: before D17); R-06 (maintainer's notes, not in the repository), line 137 (priority to the game's .tex and .uld). No ULD is read today (no occurrence in src/). API present in Dalamud.xml (Hooks/dev): UiBuilder.LoadUld(string) and UldWrapper.LoadTexturePart(string, int).
+
+## P19 — In-game map tests still pending
+
+- **Value**: medium; main file: `docs/project/TESTING.md`.
+- **What the player gets**: Before adding functions to the map, we confirm that the latest changes work. Otherwise, an old defect and a new one risk getting mixed up.
+- **How, size, dependencies**: A short guided check of these five points (about 10 minutes in game), before the first map version of step e) or just after. Size S. In-game capture. Decision: do it now or keep it for h) (recommended: now, since e) precisely modifies the map).
+- **Source**: TESTING.md:146-156: 0.242–0.243 (R-01, journal target), 0.244 (R-03, Triple Triad), 0.245 (R-04, menu specific to each icon), 0.259 and 0.262 (tooltips and ↺), 0.308 (zoom level background). ROADMAP.md:136 and 144. The user's instruction places the tests at the end of the queue (step h).
+
+## P20 — "Layers" button to show or hide everything in one click
+
+- **State (re-read on 2026-11-05)**: DONE 0.547.
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: A button of the tool column opens a small list of layers (quests, FATEs, gathering, vendors, sightseeing, currents, party, bookmarks) that you show or hide in one click, without opening the settings.
+- **How, size, dependencies**: Pop-up window that reuses the existing boxes (SettingBox, same keys, same ↺), and a 9th button in the column computation. Size S. No probe. Decision: list of the layers offered.
+- **Source**: All these layers are boxes of the settings menu, in several sections (MainWindow.MapView.cs:444-561). The tool column has 8 buttons (line 378).
+
+## P21 — Keyboard shortcuts in the map
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/MapViewWindow.cs`.
+- **What the player gets**: When the map has focus: +/- to zoom, arrows to move it, Home for the whole map, a key to follow the character.
+- **How, size, dependencies**: Read ImGui.IsKeyPressed only when the map window has focus and no text field is active, so as not to steal the game's keys. On/off setting with tooltip and ↺. Size S. No probe. Decision: the keys (recommended: disabled by default).
+- **Source**: MapViewWindow.cs:17 (Escape does not close the map). MainWindow.MapView.cs reads no key.
+
+## P22 — Names of the quest icon variants (71141 / 71151)
+
+- **Value**: low; main file: `docs/project/BACKLOG.md`.
+- **What the player gets**: The icon settings display the real meaning of each quest icon variant, instead of "variant n".
+- **How, size, dependencies**: In-game capture: quests of each variant visible on the map, with screenshot and log line, recorded in docs/evidence. Only then, rename the MapView.QuestKind labels. Without a capture, keep "variant n". Size S. In-game capture first. No decision.
+- **Source**: BACKLOG.md:12-13; ROADMAP.md:83; TESTING.md:235; docs/evidence/0.211-event-icons.md. This meaning does not exist in the game data; only an in-game capture gives it. It is the only "before D17" point still open.
+
+## P23 — Nearby friends on the map
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
+- **What the player gets**: The friends present around the character, hence already loaded by the game, are drawn on the Tensho map like the party members.
+- **How, size, dependencies**: In ReadObjects, copy the players with StatusFlags.Friend (name, position), at most N. New layer with size and priority, disabled by default. Free Company members: no reliable source known (the tag does not surely identify the company), so left aside without a probe. Size S. Decision: add this layer or not (privacy).
+- **Source**: docs/evidence/0.318-plugin-gaps.json and GAPS.md:434: Mini-Mappingway (MIT), "friends and Free Company members", status partial: only the party is shown (ReadParty). ReadObjects already walks the object table. Dalamud exposes StatusFlags.Friend (Dalamud.xml). Rule noted in GAPS (MinimapPlugin): show only what the game already displays, without making it a radar.
+
+## P24 — Teleport command by name (/tensho tp)
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/Plugin.cs`.
+- **What the player gets**: Typing "/tensho tp Ul'dah" (or an alias) launches the same teleport request as the click on an aetheryte of the map, with its cost.
+- **How, size, dependencies**: Subcommand that searches the list of aetherytes (Aetheryte sheet, in cache) then opens the confirmation, or teleports directly if the option allows it. It is always an explicit action of the player. Size S. No probe. Decision: name of the command and alias.
+- **Source**: docs/evidence/0.318-plugin-gaps.json and GAPS.md:443: Teleporter, status partial, teleport on click only. MapLiveReader.Teleport and ReadTeleportCosts already exist.
+
+## P25 — Tensho minimap
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: A small compact window that follows the character (aetherytes, party, FATEs, flag), resizable and zoomable, next to the game's minimap or in its place.
+- **How, size, dependencies**: Second WindowSystem window that reuses DrawMapCanvas in compact mode (without menus). Rotation with the camera requires reading the camera orientation (probe). Size L. Decision: do it or not, and rotation or north up.
+- **Source**: GAPS.md:467 and docs/evidence/0.318-plugin-gaps.json: MinimapPlugin, status partial (the Tensho map follows the player but is not a minimap and does not rotate). Compliance rule noted: show only what the game displays.
+
+## P26 — Position highlighted when hovering the right-click lists
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.MapLocalLists.cs`.
+- **What the player gets**: When hovering a line of the right-click tabs (quest, NPC, gathering point), the corresponding place blinks on the map underneath.
+- **How, size, dependencies**: Keep the hovered position of the current frame; the canvas draws a pulsed ring at the next frame. Size S. No probe. No decision.
+- **Source**: MainWindow.MapLocalLists.cs:90-91 and following lines: on hover, only the coordinates are displayed as text (CoordinateText).
+
+## P27 — Colour adjustable per icon
+
+- **State (re-read on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
+- **What the player gets**: Each icon type can receive a tint, in addition to its size and its priority, to spot at a glance what matters.
+- **How, size, dependencies**: IconTints table (global and per map, like the sizes), applied by the colour parameter of AddImage. Colour swatch with tooltip and ↺ on each line. Size S. No probe. Decision: useful or not (low value).
+- **Source**: docs/evidence/0.318-plugin-gaps.json: Mappy, "Per-icon settings: visibility, size, colour", status partial, low value. MainWindow.MapView.cs:646-702: visible, size, priority and menu, without colour.
+
+---
+
 # Carte Tensho : propositions d'amélioration (audit du 2026-11-02, étape e)
 
 Liste établie par un audit multi-agents en lecture seule de la carte (0.327). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on
