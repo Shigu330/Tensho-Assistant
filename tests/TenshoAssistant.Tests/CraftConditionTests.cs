@@ -1,11 +1,11 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): CraftConditions435Tests merged into CraftConditionTests; every case is kept.
 using TenshoAssistant.Craft;
 using TenshoAssistant.Items;
-
 internal static class CraftConditionTests
 {
+    private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static readonly RecipeDefinition Recipe=new(1,2,1,"Menuisier",100,[],0,new(80,10000,10000,100,100,100,100,0,0,0));
     private static readonly CraftStats Stats=new(100,1000,1000,500,true);
-    private static void Check(bool condition,string why){if(!condition)throw new Exception(why);}
     private static CraftActionCatalog Catalog()=>new(CraftActionCatalog.Specs.SelectMany(spec=>Enumerable.Range(8,8)
         .Select(job=>new CraftActionMetadata(spec,(uint)job,spec.CanonicalId,spec.Kind.ToString(),1,"Native"))),"fixture",
         CraftObservedEffects.Specs.Select(spec=>new CraftStatusMetadata(spec.Id,spec.Id.ToString(),1,"Native")));
@@ -17,8 +17,11 @@ internal static class CraftConditionTests
         var date=DateTimeOffset.UtcNow;var recipes=RecipeCatalog.Build([Recipe],"fixture");
         return CraftLiveProjection.Build(new(true,42,CraftLiveStatusKind.Observed,date,new(raw,recipes),null),catalog,date);
     }
-    public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
-    {
+    private static readonly CraftRecipeParameters P=new(80,5000,5000,100,100,100,100,0,0,0,Expert:true);
+    private static CraftSimStep Step(CraftActionKind kind,CraftStepCondition condition,CraftSimState? state=null)
+        =>CraftSimulation.Apply(P,Stats,5,102,135,state ?? new CraftSimState(1,0,0,80,500,0),kind,out var error,condition) ?? throw new Exception(error);
+    public static IEnumerable<(string Name,Action Run)> Cases =>
+    [
         ("Ordinary craft condition factors affect quality only with one final floor",()=>
         {
             var state=new CraftSimState(1,0,0,80,500,2,Innovation:4,GreatStrides:3);
@@ -71,6 +74,24 @@ internal static class CraftConditionTests
                 Check(step.QualityGain==10000 && step.After.InnerQuiet==1,"raw maximum unaffected by condition");
             }
             Check(CraftSimulation.Apply(recipe.Simulation!,Stats,90,102,135,state,CraftActionKind.BasicTouch,out var error,(CraftStepCondition)99) is null && error is not null,"invalid condition rejected");
-        })
-    };
+        }),
+        // From CraftConditions435Tests: A-07 (0.435): expert recipes simulated (normal condition at every step), and the expert conditions' effects in the transition.
+        ("A-07: Pliant halves CP, Sturdy and Robust halve durability (with Waste Not too), Malleable × 1.5 progress",() =>
+        {
+            Check(Step(CraftActionKind.Innovation,CraftStepCondition.Pliant).CpCost==9 && Step(CraftActionKind.Observe,CraftStepCondition.Pliant).CpCost==4,"18 → 9, 7 → 4 (rounded up)");
+            Check(Step(CraftActionKind.BasicSynthesis,CraftStepCondition.Sturdy).After.Durability==75 && Step(CraftActionKind.BasicSynthesis,CraftStepCondition.Robust).After.Durability==75,"10 → 5");
+            Check(Step(CraftActionKind.BasicSynthesis,CraftStepCondition.Sturdy,new CraftSimState(1,0,0,80,500,0,WasteNot:3)).After.Durability==77,"10 → 2.5 → 3");
+            Check(Step(CraftActionKind.Groundwork,CraftStepCondition.Sturdy).After.Durability==70,"20 → 10");
+            Check(Step(CraftActionKind.BasicSynthesis,CraftStepCondition.Malleable).ProgressGain==183 && Step(CraftActionKind.BasicSynthesis,CraftStepCondition.Normal).ProgressGain==122,"122 × 1.5");
+        }),
+        ("A-07: Primed lengthens the buffs set this step; Centered and Good Omen change nothing here; expert recipes simulated",() =>
+        {
+            Check(Step(CraftActionKind.Innovation,CraftStepCondition.Primed).After.Innovation==6 && Step(CraftActionKind.Manipulation,CraftStepCondition.Primed).After.Manipulation==10,"+2");
+            Check(Step(CraftActionKind.BasicTouch,CraftStepCondition.Centered).QualityGain==Step(CraftActionKind.BasicTouch,CraftStepCondition.Normal).QualityGain
+                && Step(CraftActionKind.BasicTouch,CraftStepCondition.GoodOmen).QualityGain==135,"no gain change");
+            var recipe=new RecipeDefinition(1,2,1,"Fixture",5,[],0,P);
+            Check(CraftSimulation.Unsupported(recipe) is null && CraftSimulation.Run(recipe,Stats,0,[CraftActionKind.BasicSynthesis]).Error is null,"expert recipe simulated");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CraftSimulation.cs")).Contains("if(p.Expert)ImGui.TextColored(Accent,localization.Get(\"CraftSimulation.ExpertNormal\"));"),"said on screen");
+        }),
+    ];
 }

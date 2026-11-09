@@ -1,8 +1,8 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): WikiVistas401Tests merged into WikiVistaTests; every case is kept.
 using TenshoAssistant.Maps;
-
 internal static class WikiVistaTests
 {
-    private static void Check(bool value,string message){if(!value)throw new Exception(message);}
+    private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     // Rows of the wiki's raw Sightseeing Log page (read 2026-10-31), A Realm Reborn #1–3 and Heavensward #1.
     private const string Sample="""
 ==Unlock==
@@ -17,8 +17,8 @@ internal static class WikiVistaTests
 === Coerthas Western Highlands ===
 |1 || [[Heavensward Sightseeing Log 1: Falcon's Nest|Falcon's Nest]] || [[Coerthas Western Highlands]] || {{coords|32, 36, 2.4}} || {{action icon|Lookout}} || On top of the tower. (Requires flying.)
 """;
-    public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
-    {
+    public static IEnumerable<(string Name,Action Run)> Cases =>
+    [
         ("Wiki vistas parse weathers, time, emote and comment per expansion section",()=>
         {
             var document=WikiVistaParser.Parse(Sample,DateTimeOffset.UnixEpoch);
@@ -49,5 +49,16 @@ internal static class WikiVistaTests
             try{WikiVistaParser.Parse("==Unlock==\nnothing here",DateTimeOffset.UnixEpoch);}catch(InvalidDataException){failed=true;}
             Check(failed,"rejected");
         }),
-    };
+        // From WikiVistas401Tests: 0.401 (user report): a vista whose wiki coordinates carry a stray dot (« 25.2, 27.2. Z:1.0 », Sightseeing Log, 2026-11-03) is read,
+        // and a coordinate that is not a number skips its row instead of failing the whole page.
+        ("Wiki vistas: stray dot read, odd row skipped, page kept",() =>
+        {
+            var page = "==Heavensward Vistas==\n"
+                + "| 1 || [[A]] || [[Zone]] || {{coords|25.2, 27.2. Z:1.0}} || Scrute || note\n"
+                + "| 2 || [[B]] || [[Zone]] || {{coords|x, y}} || Scrute || note\n"
+                + "| 3 || [[C]] || [[Zone]] || {{coords|10.0, 11.5}} || Scrute || note\n";
+            var document = WikiVistaParser.Parse(page,DateTimeOffset.UtcNow);
+            Check(document.Rows.Count==2 && document.Rows[0].X==25.2f && document.Rows[0].Y==27.2f && document.Rows[1].Number==3,"stray dot read, bad row skipped");
+        }),
+    ];
 }

@@ -1,16 +1,34 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): Hover327Tests, HoverPrices343Tests merged into ItemHoverTests; every case is kept.
 using System.Net;
 using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Items;
 using TenshoAssistant.Market;
-
 internal static class ItemHoverTests
 {
+    private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static ItemCatalog Catalog()=>ItemCatalog.Build([new(42,"Marketable",true,IsMarketable:true),new(43,"Bound",true),new(44,"NQ only",false,IsMarketable:true)],new("fixture","French","v",1));
-    private static void Check(bool value,string message){if(!value)throw new Exception(message);}
     private static HttpResponseMessage Response()=>new(HttpStatusCode.OK){Content=new StringContent("{\"results\":[{\"itemId\":42}]}")};
-    public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
-    {
+    private static readonly string Source = Path.GetFullPath("src/TenshoAssistant");
+    private static string Read(string file) => File.ReadAllText(Path.Combine(Source,file));
+    // A language line, trimmed and without its final comma (escapes kept: a new line reads « \n »).
+    private static string Text(string code,string key) =>
+        File.ReadLines(Path.Combine(Source,"Localization","Languages",code + ".json")).Select(line => line.Trim().TrimEnd(','))
+            .FirstOrDefault(line => line.StartsWith("\"" + key + "\": ",StringComparison.Ordinal)) ?? "";
+    private static string ReadFile(string file) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + file));
+
+    // Shape of a real Universalis aggregated answer (item 5057, world 97, read 2026-11-03), values shortened.
+    private const string Answer = """
+        {"results":[{"itemId":5057,
+          "nq":{"minListing":{"world":{"price":89},"dc":{"price":45,"worldId":83},"region":{"price":40,"worldId":33}},
+                "recentPurchase":{"world":{"price":71,"timestamp":1793612456000}},
+                "averageSalePrice":{"world":{"price":104.09}},
+                "dailySaleVelocity":{"world":{"quantity":93.3}}},
+          "hq":{},
+          "worldUploadTimes":[{"worldId":97,"timestamp":1793612456000}]}]}
+        """;
+    public static IEnumerable<(string Name,Action Run)> Cases =>
+    [
         ("Common hover resolves NQ HQ collectible and bound items without market assumptions",()=>
         {
             var catalog=Catalog();
@@ -128,6 +146,91 @@ internal static class ItemHoverTests
             using var market=new MarketService(http);using var context=new ItemHoverService();
             var coordinator=new ItemHoverCoordinator(context,market);coordinator.Observe(false,true,7,0,43,Catalog(),DateTimeOffset.UtcNow);coordinator.Dispose();
             Check(coordinator.Observe(true,true,7,71,42,Catalog(),DateTimeOffset.UtcNow) is null && context.State.Item is null,"coordinator disposed terminal");
-        })
-    };
+        }),
+        // From Hover327Tests: 0.327 (queue step e, settings that need no decision, audit 2026-11-02): Market page scope saved, item hover panel hidden in duties,
+        // the four parts of that panel. Every default keeps the 0.326 behaviour.
+        ("Market page scope: data centre by default and for older files, saved, reset; the page and Settings share it",() =>
+        {
+            var fresh = new Configuration();
+            Check(fresh.MarketBoardScope == MarketScope.DataCenter && ConfigurationReset.Reset.Contains("MarketBoardScope"),"default data centre, reset with the settings");
+            Check(JsonSerializer.Deserialize<Configuration>("{\"Version\":1}")!.MarketBoardScope == MarketScope.DataCenter,"older file: data centre");
+            fresh.MarketBoardScope = MarketScope.World;
+            Check(JsonSerializer.Deserialize<Configuration>(JsonSerializer.Serialize(fresh))!.MarketBoardScope == MarketScope.World,"choice kept");
+            var page = Read("MainWindow.MarketBoard.cs");
+            Check(!page.Contains("marketScope",StringComparison.Ordinal),"no window-only scope left");
+            Check(page.Contains("Enum.IsDefined(configuration.MarketBoardScope) ? configuration.MarketBoardScope:MarketScope.DataCenter",StringComparison.Ordinal),"unknown saved value: data centre");
+            Check(page.Contains("MarketScopeShown==scope))ChooseMarketScope(scope);",StringComparison.Ordinal),"a click on the page saves it");
+            var settings = Read("MainWindow.Settings.cs");
+            // X-76 H5 (0.915): the shared combo row brings the tooltip and the « ↺ ».
+            Check(settings.Contains("ComboSetting(\"Settings.MarketScope\",\"Settings.MarketScopeTip\",()=>MarketScopeShown,",StringComparison.Ordinal),"Settings row with tooltip and ↺");
+            Check(Text("en","MarketScopeTip").EndsWith("\\nDefault: data center.\"",StringComparison.Ordinal) && Text("fr","MarketScopeTip").EndsWith("\\nPar défaut : centre de données.\"",StringComparison.Ordinal),"tips end with the default");
+        }),
+        ("Hover hidden in duties: off by default, reset; in a duty nothing is observed, so no panel and no price request",() =>
+        {
+            var fresh = new Configuration();
+            Check(!fresh.HoverHideInDuty && ConfigurationReset.Reset.Contains("HoverHideInDuty"),"off by default, reset with the settings");
+            var reader = Read("Items/ItemHoverReader.Dalamud.cs");
+            Check(reader.Contains("var hidden=configuration.HoverHideInDuty && InDuty();",StringComparison.Ordinal)
+                && reader.Contains("owner!=0 && !hidden && !gui.GameUiHidden ? gui.HoveredItem:0;",StringComparison.Ordinal),"the reader stops in a duty");
+            Check(Read("Plugin.cs").Contains("{ InDuty = () => mapLive?.State is { InDuty: true },",StringComparison.Ordinal),"same detection as the map's « Hide in duties »");
+            Check(Read("MainWindow.Settings.cs").Contains("BoolSetting(\"Settings.HoverHideInDuty\",\"Settings.HoverHideInDutyTip\",",StringComparison.Ordinal),"shared row (tooltip and ↺)");
+            // Managed half of the reader in a duty: « nothing hovered » clears the item, so the panel is not drawn and nothing is asked.
+            using var http = new HttpClient(new MarketTestHandler((_,_) => throw new Exception("unexpected HTTP")));
+            using var market = new MarketService(http);
+            using var context = new ItemHoverService(); using var coordinator = new ItemHoverCoordinator(context,market);
+            var catalog = ItemCatalog.Build([new(42,"Marketable",true,IsMarketable:true)],new("fixture","French","v",1));
+            var now = DateTimeOffset.UtcNow;
+            coordinator.Observe(false,true,7,71,42,catalog,now);
+            Check(context.State.Fresh(now),"hovered outside a duty");
+            Check(coordinator.Observe(true,true,7,71,0,catalog,now) is null && context.State.Item is null && !context.State.Fresh(now),"in a duty: no item, no panel, no request");
+        }),
+        ("Hover panel parts: all four on by default and for older files, reset; only the panel under the game's tooltip follows them",() =>
+        {
+            var fresh = new Configuration(); var legacy = JsonSerializer.Deserialize<Configuration>("{\"Version\":1}")!;
+            foreach (var name in new[] { "HoverShowCollection","HoverShowStock","HoverShowUsages","HoverShowSources" })
+            {
+                var property = typeof(Configuration).GetProperty(name)!;
+                Check((bool)property.GetValue(fresh)! && (bool)property.GetValue(legacy)!,"on by default: " + name);
+                Check(ConfigurationReset.Reset.Contains(name),"reset with the settings: " + name);
+            }
+            var hover = Read("MainWindow.MarketHover.cs");
+            Check(hover.Contains("DrawItemInfoBody(item,hovered.ItemId,hoverPanel:true);",StringComparison.Ordinal),"the hover panel follows the parts");
+            Check(hover.Contains("            DrawItemInfoBody(item,id);",StringComparison.Ordinal) && Read("MainWindow.ItemSheet.cs").Contains("try{DrawItemInfoBody(item,id);}",StringComparison.Ordinal),"Tensho's item tooltip and the item sheet keep every part");
+            Check(hover.Contains("if(hoverPanel && !configuration.HoverShowSources)return;",StringComparison.Ordinal),"no « How to get it » (nor its Garland / wiki requests) when hidden");
+            Check(hover.Contains("observed.Stable(now) && HoverInfoShown(item,hovered.ItemId);",StringComparison.Ordinal),"no empty panel when nothing is left to draw");
+            var settings = Read("MainWindow.Settings.cs");
+            foreach (var key in new[] { "HoverCollection","HoverStock","HoverUsages","HoverSources" })
+            {
+                Check(settings.Contains("BoolSetting(\"Settings." + key + "\",\"Settings." + key + "Tip\",",StringComparison.Ordinal),"shared row (tooltip and ↺): " + key);
+            }
+        }),
+        // From HoverPrices343Tests: 0.343 (g, I-01): complete hover price — last sale, average, sales per day, region cheapest, stack value, Ctrl+Alt refresh.
+        ("Hover prices: Universalis velocity, average and region cheapest parsed; missing values stay unknown",() =>
+        {
+            var quote = MarketQuote.Parse(Answer,97,5057,DateTimeOffset.UnixEpoch);
+            Check(quote.Nq.Minimum == 89 && quote.Nq.RecentSale == 71 && quote.Nq.Average == 104.09m && quote.Nq.Velocity == 93.3m,"world values");
+            Check(quote.NqRegion is { Price: 40, WorldId: 33 } && quote.NqCheapest is { Price: 45, WorldId: 83 },"region and data center cheapest");
+            Check(quote.Hq.Average is null && quote.Hq.Velocity is null && quote.HqRegion is null,"HQ absent: unknown, never zero");
+            Check(ReadFile("Market/MarketService.cs").Contains("\"universalis-aggregated-v4\"",StringComparison.Ordinal),"disk copies without the new fields are fetched again");
+        }),
+        ("Hover prices: stack of the hovered slot kept only for that item; refresh asked once per Ctrl+Alt press, by the player",() =>
+        {
+            using var service = new ItemHoverService();
+            var catalog = ItemCatalog.Build([new(5057,"Item",true,IsMarketable: true)],new("test","French","test",1));
+            service.Observe(true,1,5057,catalog,DateTimeOffset.UnixEpoch);
+            service.SetStack(42);
+            Check(service.State.Stack == 42,"stack recorded");
+            service.Observe(true,1,5057,catalog,DateTimeOffset.UnixEpoch.AddSeconds(1));
+            Check(service.State.Stack == 42,"same item: kept");
+            service.SetStack(0);
+            Check(service.State.Stack is null,"zero is no stack");
+            var reader = ReadFile("Items/ItemHoverReader.Dalamud.cs");
+            Check(reader.Contains("held && !refreshHeld",StringComparison.Ordinal) && reader.Contains("configuration.HoverPriceRefresh",StringComparison.Ordinal),"one request per press, setting honoured");
+            Check(reader.Contains("slot->ItemId==id",StringComparison.Ordinal) && reader.Contains("DetailKind.InventoryItem",StringComparison.Ordinal),"stack only from the player's own slot holding that item");
+            var coordinator=ReadFile("Market/ItemHoverCoordinator.cs").Replace("\r\n","\n");
+            Check(coordinator.Contains("refreshWanted|=refresh;") && coordinator.Contains("if(!refreshWanted && cached is not null && market.IsFresh(cached,now))return null;\n            if(!tracker.TakeRequest(now))return null;"),"0.524: the press waits for the 5 s bound, and only a real request takes it");
+            Check(coordinator.Contains("market.CancelBackground();refreshWanted=false;"),"another item forgets the press");
+            Check(ReadFile("MainWindow.MarketHover.cs").Contains("prices.FetchedAt.ToLocalTime().ToString(\"G\")"),"the seconds show that it changed");
+        }),
+    ];
 }

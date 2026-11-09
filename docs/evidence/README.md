@@ -62,7 +62,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.315-vessel-builds.md](0.315-vessel-builds.md) | `src/TenshoAssistant/FreeCompany/VesselBuilds.cs`, `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/Program.cs`, `tests/TenshoAssistant.Tests/Sectors334Tests.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.318-plugin-gaps.json](0.318-plugin-gaps.json) | — | `CHANGELOG.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/DECISIONS.md`, `docs/project/GAPS.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.320-credits.json](0.320-credits.json) | `src/TenshoAssistant/Credits/CreditCatalog.cs` | `CHANGELOG.md` |
-| [0.332-squadron-probe.md](0.332-squadron-probe.md) | `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/Squadron333Tests.cs` | `CHANGELOG.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
+| [0.332-squadron-probe.md](0.332-squadron-probe.md) | `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs` | `CHANGELOG.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.332-uld-window-frame.md](0.332-uld-window-frame.md) | `tools/README.md` | `CHANGELOG.md` |
 | [0.333-ehcatl-probe.md](0.333-ehcatl-probe.md) | — | `CHANGELOG.md` |
 | [0.335-submarine-tiers.md](0.335-submarine-tiers.md) | `tests/TenshoAssistant.Tests/Routes335Tests.cs` | `CHANGELOG.md` |
@@ -74,7 +74,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.356-roulettes.md](0.356-roulettes.md) | `src/TenshoAssistant/Plugin.cs`, `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/Roulettes356Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
 | [0.357-armoire.md](0.357-armoire.md) | — | `CHANGELOG.md` |
 | [0.363-leves.md](0.363-leves.md) | — | `CHANGELOG.md` |
-| [0.364-hunting-log.md](0.364-hunting-log.md) | `src/TenshoAssistant/Hunting/HuntingLog.cs`, `tests/TenshoAssistant.Tests/HuntingLog364Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
+| [0.364-hunting-log.md](0.364-hunting-log.md) | `src/TenshoAssistant/Hunting/HuntingLog.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
 | [0.367-blue-spell-wiki.md](0.367-blue-spell-wiki.md) | — | `CHANGELOG.md` |
 | [0.368-achievement-progress.md](0.368-achievement-progress.md) | — | `CHANGELOG.md` |
 | [0.369-titles.md](0.369-titles.md) | — | `CHANGELOG.md` |
@@ -85,7 +85,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.382-counters.md](0.382-counters.md) | `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md` |
 | [0.383-gearsets.md](0.383-gearsets.md) | — | `CHANGELOG.md` |
 | [0.384-treasure-map.md](0.384-treasure-map.md) | `src/TenshoAssistant/Maps/TreasureMapReader.Dalamud.cs` | `CHANGELOG.md` |
-| [0.387-blue-spell-name.md](0.387-blue-spell-name.md) | `tests/TenshoAssistant.Tests/BlueSpellName387Tests.cs` | `CHANGELOG.md` |
+| [0.387-blue-spell-name.md](0.387-blue-spell-name.md) | — | `CHANGELOG.md` |
 | [0.387-collection-items.md](0.387-collection-items.md) | `src/TenshoAssistant/Collections/ExtraCollectionReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.392-ocean-fishing.md](0.392-ocean-fishing.md) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `CHANGELOG.md` |
 | [0.395-blue-spellbook.md](0.395-blue-spellbook.md) | — | `CHANGELOG.md` |
@@ -96,20 +96,20 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.409-collectables.md](0.409-collectables.md) | `src/TenshoAssistant/Gathering/Collectables.cs`, `src/TenshoAssistant/MainWindow.CollectableTable.cs`, `tests/TenshoAssistant.Tests/Collectables409Tests.cs` | `CHANGELOG.md` |
 | [0.410-gp-actions.md](0.410-gp-actions.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Gathering/GpActions.cs`, `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md` |
 | [0.411-gathering-jobs.md](0.411-gathering-jobs.md) | `src/TenshoAssistant/Gear/Gearsets.cs`, `tests/TenshoAssistant.Tests/GatheringGearset411Tests.cs` | `CHANGELOG.md` |
-| [0.417-spearfishing.md](0.417-spearfishing.md) | `src/TenshoAssistant/Gathering/Spearfishing.cs`, `tests/TenshoAssistant.Tests/Spearfishing417Tests.cs`, `tools/DiscoveryCheckProbe/Program.cs` | `CHANGELOG.md` |
-| [0.418-ocean-voyage.md](0.418-ocean-voyage.md) | `src/TenshoAssistant/Gathering/OceanVoyage.cs`, `tests/TenshoAssistant.Tests/OceanVoyage418Tests.cs` | `CHANGELOG.md` |
+| [0.417-spearfishing.md](0.417-spearfishing.md) | `src/TenshoAssistant/Gathering/Spearfishing.cs`, `tools/DiscoveryCheckProbe/Program.cs` | `CHANGELOG.md` |
+| [0.418-ocean-voyage.md](0.418-ocean-voyage.md) | `src/TenshoAssistant/Gathering/OceanVoyage.cs` | `CHANGELOG.md` |
 | [0.420-craft-food.md](0.420-craft-food.md) | `src/TenshoAssistant/Craft/CraftConsumables.cs`, `tests/TenshoAssistant.Tests/CraftConsumables420Tests.cs` | `CHANGELOG.md` |
 | [0.434-craft-actions.md](0.434-craft-actions.md) | `src/TenshoAssistant/Craft/CraftActionCatalog.cs`, `src/TenshoAssistant/Craft/CraftSimulation.cs`, `tests/TenshoAssistant.Tests/CraftActions434Tests.cs` | `CHANGELOG.md` |
-| [0.440-hunt-bills.md](0.440-hunt-bills.md) | `src/TenshoAssistant/Reminders/HuntBills.cs`, `tests/TenshoAssistant.Tests/HuntBills440Tests.cs` | `CHANGELOG.md` |
+| [0.440-hunt-bills.md](0.440-hunt-bills.md) | `src/TenshoAssistant/Reminders/HuntBills.cs` | `CHANGELOG.md` |
 | [0.441-hunt-marks.md](0.441-hunt-marks.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.443-bingo-tasks.md](0.443-bingo-tasks.md) | — | `CHANGELOG.md` |
 | [0.444-housing.md](0.444-housing.md) | `src/TenshoAssistant/Maps/PlaceDirectory.cs` | `CHANGELOG.md` |
 | [0.448-n06-n14-sources.md](0.448-n06-n14-sources.md) | `src/TenshoAssistant/MainWindow.Squadron.cs`, `src/TenshoAssistant/Reminders/SquadronPlanner.cs`, `tools/garden-data.py` | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/G-PROPOSALS.md` |
 | [0.451-raphael-study.md](0.451-raphael-study.md) | `src/TenshoAssistant/Craft/RaphaelActions.cs`, `src/TenshoAssistant/Craft/RaphaelCraftSolver.Dalamud.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md` |
 | [0.451-xivapi-v2.md](0.451-xivapi-v2.md) | — | `docs/project/PUBLISHING.md` |
-| [0.452-craft-buff-rows.md](0.452-craft-buff-rows.md) | `tests/TenshoAssistant.Tests/Resilience452Tests.cs` | `CHANGELOG.md` |
-| [0.456-garden-grid.md](0.456-garden-grid.md) | `src/TenshoAssistant/Credits/CreditCatalog.cs`, `src/TenshoAssistant/MainWindow.GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenCrosses.cs`, `tests/TenshoAssistant.Tests/GardenPlan456Tests.cs` | `CHANGELOG.md` |
-| [0.459-garden-detection.md](0.459-garden-detection.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenChat460Tests.cs` | `CHANGELOG.md` |
+| [0.452-craft-buff-rows.md](0.452-craft-buff-rows.md) | — | `CHANGELOG.md` |
+| [0.456-garden-grid.md](0.456-garden-grid.md) | `src/TenshoAssistant/Credits/CreditCatalog.cs`, `src/TenshoAssistant/MainWindow.GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenCrosses.cs` | `CHANGELOG.md` |
+| [0.459-garden-detection.md](0.459-garden-detection.md) | `src/TenshoAssistant/Reminders/GardenChat.cs` | `CHANGELOG.md` |
 | [0.463-squadron-probe.log](0.463-squadron-probe.log) | — | `CHANGELOG.md` |
 | [0.478-collectable-truncated-name.md](0.478-collectable-truncated-name.md) | `src/TenshoAssistant/Gathering/Collectables.cs` | `CHANGELOG.md` |
 | [0.479-collectable-window-values.md](0.479-collectable-window-values.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/Gathering478Tests.cs` | `CHANGELOG.md` |
@@ -134,7 +134,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.586-flight-sets.md](0.586-flight-sets.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.596-map-label-orientation.md](0.596-map-label-orientation.md) | `src/TenshoAssistant/Maps/MapLabels.cs`, `tests/TenshoAssistant.Tests/MapLabels596Tests.cs` | `CHANGELOG.md` |
 | [0.600-competitive-inventory.md](0.600-competitive-inventory.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/project/COMPETITIVE-OFF-PLAN.md`, `docs/project/DECISIONS.md` |
-| [0.608-universalis-batch.md](0.608-universalis-batch.md) | `src/TenshoAssistant/Market/MarketService.cs`, `tests/TenshoAssistant.Tests/MarketBatch608Tests.cs` | `CHANGELOG.md` |
+| [0.608-universalis-batch.md](0.608-universalis-batch.md) | `src/TenshoAssistant/Market/MarketService.cs` | `CHANGELOG.md` |
 | [0.628-quest-target-on-world-map.md](0.628-quest-target-on-world-map.md) | `src/TenshoAssistant/Maps/MapCatalog.cs` | — |
 | [0.631-region-zone-images.md](0.631-region-zone-images.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | — |
 | [0.633-quest-route.md](0.633-quest-route.md) | `src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs` | — |
@@ -212,12 +212,12 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.857-community-map.md](0.857-community-map.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Market/SeenPrices.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [0.866-credit-references.md](0.866-credit-references.md) | — | `docs/project/GLOBAL-PLAN.md` |
 | [0.871-regions.md](0.871-regions.md) | `src/TenshoAssistant/Market/MarketBoardService.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.874-probe-coverage.md](0.874-probe-coverage.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/ProbeSet874Tests.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/FishBite887Tests.cs` | `CHANGELOG.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
+| [0.874-probe-coverage.md](0.874-probe-coverage.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
+| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.888-aetherial-reduction.md](0.888-aetherial-reduction.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.889-hand-in.md](0.889-hand-in.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.890-spearfishing.md](0.890-spearfishing.md) | — | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.891-spearfishing-slots.md](0.891-spearfishing-slots.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/Spearfish890Tests.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
+| [0.891-spearfishing-slots.md](0.891-spearfishing-slots.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.894-fishing-spot-area.md](0.894-fishing-spot-area.md) | `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.896-spearfishing-lag.md](0.896-spearfishing-lag.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/Spearfishing.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.899-overmeld-rates.md](0.899-overmeld-rates.md) | — | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
@@ -242,7 +242,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.961-ocean-missions.md](0.961-ocean-missions.md) | `src/TenshoAssistant/Gathering/OceanMissions.cs` | `CHANGELOG.md` |
 | [0.97.0-wolf-npc-probe.log](0.97.0-wolf-npc-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `CHANGELOG.md` |
 | [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `CHANGELOG.md` |
-| [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenHarvest978Tests.cs` | `CHANGELOG.md` |
+| [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs` | `CHANGELOG.md` |
 | [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.980-beast-teams.md](0.980-beast-teams.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `src/TenshoAssistant/MainWindow.Beastmaster.cs` | — |
@@ -257,5 +257,5 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 
-Counted · compté : 249 files · fichiers ; 186 cited by the code or the tests · citées par le code ou les tests ; 7 cited nowhere · citées nulle part.
+Counted · compté : 249 files · fichiers ; 184 cited by the code or the tests · citées par le code ou les tests ; 7 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

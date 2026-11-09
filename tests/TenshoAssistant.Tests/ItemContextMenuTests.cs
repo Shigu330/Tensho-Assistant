@@ -1,13 +1,14 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): ItemMenu737Tests merged into ItemContextMenuTests; every case is kept.
 using System.Text.Json;
 using TenshoAssistant;
 using TenshoAssistant.Items;
-
 internal static class ItemContextMenuTests
 {
+    private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static ItemCatalog Catalog()=>ItemCatalog.Build([new(42,"Bound HQ-capable",true),new(43,"NQ only",false)],new("fixture","French","v",1));
-    private static void Check(bool value,string message){if(!value)throw new Exception(message);}
-    public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
-    {
+    private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
+    public static IEnumerable<(string Name,Action Run)> Cases =>
+    [
         ("Inventory menu copies the chosen quality and dispatches each route once without hover state",()=>
         {
             using var session=new ItemContextMenuSession();var catalog=Catalog();var now=DateTimeOffset.UtcNow;
@@ -78,5 +79,13 @@ internal static class ItemContextMenuTests
             var copy=JsonSerializer.Deserialize<Configuration>(JsonSerializer.Serialize(settings))!;
             Check(copy.ItemContextMenuEnabled && !copy.ItemUsagesOnHover && !copy.MarketPricesOnHover && copy.Version==1,"menu alone roundtrips without activating hover or network");
         }),
-    };
+        // From ItemMenu737Tests: 0.737 (user report): an item's right-click menu closed at once, now and then.
+        ("Item menu: its id counts only the same item at the same place, not every icon of the frame",() =>
+        {
+            var cell=Read("UI/Components/ItemCell.cs");
+            Check(cell.Contains("var key=ImGui.GetID(baseId);") && cell.Contains("menuSeen[key]=seen+1;"),"by place and item");
+            Check(!cell.Contains("menuSerial++"),"no frame-wide serial");
+            Check(cell.Contains("ItemLinksMenu(UniqueMenuId($\"ItemCell{item.Id}\"),item);") && cell.Contains("ItemLinksMenu($\"ItemCellName{id}\",item);"),"the icon and the name keep apart ids (0.269)");
+        }),
+    ];
 }

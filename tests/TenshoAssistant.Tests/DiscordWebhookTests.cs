@@ -1,15 +1,15 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): DiscordOff778Tests, DiscordChannels598Tests merged into DiscordWebhookTests; every case is kept.
+// R-12 (0.319): Discord webhook rules (addresses, message, mentions) and the notifier's retry and queue rules.
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using TenshoAssistant.Alarms;
-
-// R-12 (0.319): Discord webhook rules (addresses, message, mentions) and the notifier's retry and queue rules.
 internal static class DiscordWebhookTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private const string Url = "https://discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstuvwxyz_ABCDEF-123456";
     private const string Token = "abcdefghijklmnopqrstuvwxyz_ABCDEF-123456";
-
+    private static string ChannelUrl(char mark)=>"https://discord.com/api/webhooks/123456789012345678/"+new string(mark,40);
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
         ("Discord webhook addresses: only HTTPS on Discord's own hosts with a webhook path are accepted",()=>
@@ -256,6 +256,54 @@ internal static class DiscordWebhookTests
             using var notifier = new DiscordNotifier(new HttpClient(new MarketTestHandler((_,_) => throw new HttpRequestException("failed " + Url))),(_,_) => Task.CompletedTask);
             notifier.SendAsync(new(Url,"{}")).GetAwaiter().GetResult();
             Check(!notifier.State.ToString().Contains(Token,StringComparison.Ordinal),"state has only a status and a code");
+        }),
+        // From DiscordOff778Tests: 0.778 (X-23, user request): Discord off for a new alarm.
+        ("Discord off by default: a new alarm does not post; a saved one keeps its choice",() =>
+        {
+            Check(!new TenshoAlarm().Discord,"new");
+            var saved=System.Text.Json.JsonSerializer.Deserialize<TenshoAlarm>("{\"Discord\":true}")!;
+            Check(saved.Discord,"saved choice kept");
+        }),
+        // From DiscordChannels598Tests: 0.598 (T24): a Discord channel per category. Addresses here are made up, of the right shape.
+        ("Discord channels: a category's own address, else the main one",() =>
+        {
+            var settings=new DiscordSettings{Enabled=true,WebhookUrl=ChannelUrl('a'),CategoryUrls=new(){[AlarmSource.Voyage]=ChannelUrl('b')}};
+            Check(DiscordWebhook.UrlFor(settings,AlarmSource.Voyage)==ChannelUrl('b'),"its own");
+            Check(DiscordWebhook.UrlFor(settings,AlarmSource.Gathering)==ChannelUrl('a'),"the main one");
+            Check(DiscordWebhook.UrlFor(new DiscordSettings{WebhookUrl=ChannelUrl('a')},AlarmSource.Voyage)==ChannelUrl('a'),"none set");
+        }),
+        ("Discord channels: a bad address never receives anything",() =>
+        {
+            var settings=new DiscordSettings{Enabled=true,WebhookUrl=ChannelUrl('a'),CategoryUrls=new(){[AlarmSource.Voyage]="https://evil.net/api/webhooks/1/2"}};
+            Check(DiscordWebhook.UrlFor(settings,AlarmSource.Voyage)==ChannelUrl('a'),"falls back on the main one");
+            var alone=new DiscordSettings{Enabled=true,CategoryUrls=new(){[AlarmSource.Voyage]="https://evil.net/api/webhooks/1/2"}};
+            Check(!DiscordWebhook.ShouldSend(alone,AlarmSource.Voyage),"no valid address at all: nothing is sent");
+        }),
+        ("Discord channels: a category can send without a main address, the others cannot; switches still count",() =>
+        {
+            var settings=new DiscordSettings{Enabled=true,CategoryUrls=new(){[AlarmSource.Currency]=ChannelUrl('b')}};
+            Check(DiscordWebhook.ShouldSend(settings,AlarmSource.Currency) && !DiscordWebhook.ShouldSend(settings,AlarmSource.DutyPop),"only the one with an address");
+            settings.Currencies=false;
+            Check(!DiscordWebhook.ShouldSend(settings,AlarmSource.Currency),"its category off");
+            settings.Currencies=true;settings.Enabled=false;
+            Check(!DiscordWebhook.ShouldSend(settings,AlarmSource.Currency),"sending off");
+            var fish=new TenshoAlarm{JobId=18,Discord=true};
+            var fishing=new DiscordSettings{Enabled=true,CategoryUrls=new(){[AlarmSource.Fishing]=ChannelUrl('c')}};
+            Check(DiscordWebhook.ShouldSend(fishing,fish),"an alarm, through its category");
+            fish.Discord=false;
+            Check(!DiscordWebhook.ShouldSend(fishing,fish),"its own switch");
+        }),
+        ("Discord channels: every sender uses it, the reset keeps them, no report shows them",() =>
+        {
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            Check(!plugin.Contains("discord.Enqueue(new(settings.WebhookUrl"),"no sender left on the main address alone");
+            Check(plugin.Split("DiscordWebhook.UrlFor(settings,").Length==4,"alarms, currencies, duty ready");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/UI/Components/SettingRow.cs")).Contains("configuration.Discord.CategoryUrls=categoryWebhooks;"),"kept by a reset, as the main address");
+            var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discord.cs"));
+            Check(view.Contains("ImGuiInputTextFlags.Password,reset:false);\n                    discordCategoryEdits".Replace("\n",view.Contains("\r\n") ? "\r\n":"\n")),"typed masked");
+            Check(view.Contains("DiscordWebhook.Redact(Read())"),"shown redacted");
+            Check(!File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Advanced.cs")).Contains("CategoryUrls"),"not in the diagnostic report");
+            Check(TenshoAssistant.Help.ProblemReport.Clean("x "+ChannelUrl('b')+" y")=="x <webhook> y","and a report cleans any address");
         }),
     ];
 }

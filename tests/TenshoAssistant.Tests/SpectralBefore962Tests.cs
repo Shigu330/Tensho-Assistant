@@ -1,6 +1,6 @@
 using TenshoAssistant.Discoveries;
 
-// X-85 V4 (0.962): the catch just before a spectral current is noted (seen with, never « triggers »), shown at the stop (the merge tool: AirshipLoot1003Tests).
+// X-85 V4 (0.962): the catch just before a spectral current is noted (seen with, never « triggers »), shown at the stop (the merge tool: AirshipTests).
 internal static class SpectralBefore962Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }

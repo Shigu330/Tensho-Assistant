@@ -1,7 +1,8 @@
+// Test audit of 2026-11-09, batch 2 (0.1021): CraftMacroImport425Tests merged into CraftMacroTests; every case is kept.
 using TenshoAssistant.Craft;
-
 internal static class CraftMacroTests
 {
+    private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static CraftActionCatalog Catalog(string name="Travail de base")=>new(CraftActionCatalog.Specs.SelectMany(spec=>Enumerable.Range(8,8)
         .Select(job=>new CraftActionMetadata(spec,(uint)job,spec.CanonicalId,name+job,1,"Native"))),"fixture");
     private static CraftSimulationResult Completed(int count)
@@ -10,10 +11,9 @@ internal static class CraftMacroTests
         var sequence=Enumerable.Repeat(CraftActionKind.Observe,count-1).Append(CraftActionKind.BasicSynthesis);
         return CraftSimulation.Run(recipe,new(100,1000,1000,10000),0,sequence);
     }
-    private static void Check(bool condition,string why) {if(!condition)throw new Exception(why);}
     private static void Throws<T>(Action run) where T:Exception {try{run();}catch(T){return;}throw new Exception(typeof(T).Name);}
-    public static IEnumerable<(string Name,Action Run)> Cases=>new (string,Action)[]
-    {
+    public static IEnumerable<(string Name,Action Run)> Cases =>
+    [
         ("Craft macro split preserves all actions and fifteen line boundary",()=>
         {
             foreach(var count in new[]{1,14,15,28,29,100})
@@ -59,6 +59,20 @@ internal static class CraftMacroTests
                 Throws<NotSupportedException>(()=>((IList<CraftMacroPage>)export.Pages).Clear());
             }
             finally {System.Globalization.CultureInfo.CurrentCulture=previous;}
-        })
-    };
+        }),
+        // From CraftMacroImport425Tests: A-08 (0.425): a pasted crafting macro read back into simulator actions.
+        ("Macro import: /ac lines with or without quotes and waits; other commands ignored; unknown names listed",() =>
+        {
+            var names=new Dictionary<string,CraftActionKind>(StringComparer.OrdinalIgnoreCase)
+                {["Mémoire musculaire"]=CraftActionKind.MuscleMemory,["Manipulation"]=CraftActionKind.Manipulation,["Ouvrage de base"]=CraftActionKind.BasicSynthesis};
+            CraftActionKind? Find(string name)=>names.TryGetValue(name,out var kind) ? kind:null;
+            var text="/mlock\n/ac \"Mémoire musculaire\" <wait.3>\r\n/ac Manipulation <wait.2>\n  /action \"ouvrage de base\"\n/ac \"Inconnue\" <wait.3>\n/echo fini <se.1>\n/nextmacro\n";
+            var result=CraftMacroImport.Parse(text,Find);
+            Check(result.Actions.SequenceEqual([CraftActionKind.MuscleMemory,CraftActionKind.Manipulation,CraftActionKind.BasicSynthesis]),"actions in order, case ignored");
+            Check(result.Unknown.SequenceEqual(["Inconnue"]) && result.Ignored==3,"unknown listed, other commands counted");
+            Check(CraftMacroImport.Parse(new string('a',CraftMacroImport.MaxText+1),Find).Actions.Count==0 && CraftMacroImport.Parse(null,Find).Ignored==0,"bounded");
+            var many=string.Join('\n',Enumerable.Repeat("/ac Manipulation",150));
+            Check(CraftMacroImport.Parse(many,Find).Actions.Count==CraftMacroImport.MaxActions,"at most 100 actions");
+        }),
+    ];
 }
