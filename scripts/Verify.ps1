@@ -1,10 +1,12 @@
 ﻿param(
     [string]$DotNet,
-    # After a green run (0.219): -Commit commits and pushes Devloppement; -Release merges Devloppement into main, tags Stable-x.y.z,
-    # creates the GitHub release with latest.zip, then publishes main (which carries repo.json).
+    # After a green run (0.219): -Commit commits and pushes Devloppement; -Release (once that commit's CI is green on GitHub, 0.1017)
+    # tags Stable-x.y.z, creates the GitHub release with latest.zip, then moves main (which carries repo.json) forward to it.
     [switch]$Commit,
     [switch]$Release,
     [switch]$DryRun,
+    # 0.1017, with -Release: urgent fix (game patch, privacy) released before its in-game tests; the reason heads the release notes.
+    [string]$Hotfix,
     # Re-run everything even when this exact source state already passed (see the stamp below).
     [switch]$Force,
     # 0.323: contributors without the game: builds the test project only (pure logic, no Dalamud), runs the tests and the language
@@ -13,6 +15,8 @@
 )
 $ErrorActionPreference = 'Stop'
 if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
+if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
+if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot
 if (-not $DotNet) {
@@ -146,5 +150,9 @@ finally { Pop-Location }
 # Git steps only after everything above passed (scripts/Release.ps1).
 # The git step's exit code is passed on (2 = expected stop such as 'already released'), so commit-release.bat can stop before releasing.
 if ($Commit) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Commit -DryRun:$DryRun; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
-if ($Release) { & (Join-Path $PSScriptRoot 'Release.ps1') -Mode Release -DryRun:$DryRun; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
+if ($Release) {
+    $taskReleaseArgs = @{ Mode = 'Release'; DryRun = $DryRun }
+    if ($PSBoundParameters.ContainsKey('Hotfix')) { $taskReleaseArgs.Hotfix = $Hotfix }
+    & (Join-Path $PSScriptRoot 'Release.ps1') @taskReleaseArgs; if ($LASTEXITCODE) { exit $LASTEXITCODE }
+}
 exit 0

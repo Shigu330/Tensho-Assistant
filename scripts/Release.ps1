@@ -1,14 +1,17 @@
 ﻿param(
     [Parameter(Mandatory)][ValidateSet('Commit', 'Release')][string]$Mode,
-    [switch]$DryRun
+    [switch]$DryRun,
+    # 0.1017: urgent fix (game patch, privacy) released before its in-game tests; the reason goes at the top of the release notes.
+    [string]$Hotfix
 )
 # Git steps after a green Verify.ps1 (called by Verify.ps1 -Commit / -Release; see CONTRIBUTING.md 'Versions et releases').
 #   Commit  : on Devloppement, commits every change as 'x.y.z' with the CHANGELOG entry as body, then pushes Devloppement.
-#   Release : from a clean Devloppement, commits repo.json (Dalamud custom repository), merges into main and tags Stable-x.y.z
-#             (local steps); then pushes the tag, creates the GitHub release with latest.zip (GitHub CLI 'gh'), pushes main
-#             (repo.json) last, and brings Devloppement up to date. A release stopped halfway (tag pushed, GitHub release or main
-#             missing) is resumed by running the same command again: only the missing steps run.
-# -DryRun prints every command without running it.
+#   Release : from a clean, pushed Devloppement whose CI is green, commits repo.json (Dalamud custom repository) and tags it
+#             Stable-x.y.z (local steps); then pushes the tag, creates the GitHub release with latest.zip (GitHub CLI 'gh'), moves
+#             main to the same commit last (fast-forward only: no merge commit, no branch change), and pushes Devloppement.
+#             A release stopped halfway (tag pushed, GitHub release or main missing) is resumed by running the same command again:
+#             only the missing steps run.
+# -DryRun prints every command without running it (the CI check only warns).
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $repository = 'Shigu330/Tensho-Assistant'
@@ -29,7 +32,8 @@ function Test-DocsOnly([string[]]$Paths) { -not ($Paths | Where-Object { $_ -not
 function Test-Native([scriptblock]$Command) {
     $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
     try { & $Command *> $null; return ($LASTEXITCODE -eq 0) }
-    finally { $ErrorActionPreference = $previous }
+    # 0.1017: the probe's own exit code (git grep finding nothing = 1) must not become the script's exit code.
+    finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
 }
 function Invoke-Git([string[]]$Arguments) {
     # Windows PowerShell 5.1 turns any git line on stderr (e.g. 'From https://…' of a fetch) into a terminating error when redirected:
@@ -39,6 +43,60 @@ function Invoke-Git([string[]]$Arguments) {
     finally { $ErrorActionPreference = $previous }
     if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') : $output" }
     return $output
+}
+# 0.1017 guards (stop with exit code 2 before anything is committed or published).
+# The maintainer's working files stay outside git: their list is the .gitignore block written in 0.802 (the lines after its
+# '# 0.802' comment, up to the next blank line). Each one is still ignored, never tracked, staged or in the released tree.
+function Get-WorkingPaths {
+    $ignore = @(Get-Content -LiteralPath (Join-Path $root '.gitignore') -Encoding UTF8)
+    $start = [Array]::FindIndex($ignore, [Predicate[string]] { param($line) $line.StartsWith('# 0.802') })
+    $paths = @()
+    if ($start -ge 0) { for ($i = $start + 1; $i -lt $ignore.Count -and $ignore[$i].Trim(); $i++) { if (-not $ignore[$i].StartsWith('#')) { $paths += $ignore[$i].Trim() } } }
+    if ($paths.Count -lt 5) { Stop-Release "Stopped: the .gitignore block of the maintainer's working files ('# 0.802') is missing or shorter than its five lines." }
+    return $paths
+}
+function Assert-NoAgentFiles([string]$Tree) {
+    $paths = @(Get-WorkingPaths)
+    foreach ($path in $paths) {
+        $probe = if ($path.EndsWith('/')) { "${path}probe" } else { $path }
+        if (-not (Test-Native { git check-ignore -q --no-index $probe })) { Stop-Release "Stopped: '$path' is no longer ignored by .gitignore (the maintainer's working files stay outside git)." }
+    }
+    $specs = @($paths | ForEach-Object { $_.TrimEnd('/') })
+    $found = @(Invoke-Git (@('ls-files', '--') + $specs)) + @(Invoke-Git (@('diff', '--cached', '--name-only', '--') + $specs))
+    if ($Tree) { $found += @(Invoke-Git (@('ls-tree', '-r', '--name-only', $Tree, '--') + $specs)) }
+    $found = @($found | Where-Object { $_ } | Select-Object -Unique)
+    if ($found.Count) { Stop-Release "Stopped: the maintainer's working files are in git: $(($found | Select-Object -First 10) -join ', ')." }
+}
+# No Discord webhook address in a tracked file (same pattern as the agent's publication check).
+function Assert-NoSecret {
+    if (Test-Native { git grep -q -I -E 'discord(app)?\.com/api/webhooks/[0-9]+/' -- . ':!tests' }) { Stop-Release 'Stopped: a Discord webhook address is in a tracked file.' }
+}
+# The CI of the commit being released must be green on GitHub: 'Build and test' succeeded (Windows build, tests, Dalamud-like build),
+# and no other finished workflow failed. A workflow still running elsewhere (CodeQL) does not block.
+$requiredWorkflow = 'Build and test'
+function Assert-CiGreen([string]$Sha) {
+    $short = $Sha.Substring(0, 7)
+    function Fail-Ci([string]$Text) { if ($DryRun) { Write-Host "WARNING (dry run): $Text" -ForegroundColor Yellow } else { Stop-Release $Text } }
+    $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $json = & $gh run list --repo $repository --commit $Sha --json 'workflowName,status,conclusion' 2>$null; $code = $LASTEXITCODE }
+    finally { $ErrorActionPreference = $previous }
+    if ($code -ne 0 -or -not $json) { Fail-Ci "Could not read the CI of $short (gh run list): released only with a green CI."; return }
+    $runs = @(($json -join "`n") | ConvertFrom-Json)
+    $build = @($runs | Where-Object { $_.workflowName -eq $requiredWorkflow })
+    if ($build.Count -eq 0) { Fail-Ci "No '$requiredWorkflow' run for $short on GitHub yet: push it first (Verify.ps1 -Commit), wait for the CI, then -Release again."; return }
+    if ($build[0].status -ne 'completed') { Fail-Ci "CI '$requiredWorkflow' still running for ${short}: wait for it, then -Release again."; return }
+    if ($build[0].conclusion -ne 'success') { Fail-Ci "CI '$requiredWorkflow' ended '$($build[0].conclusion)' for ${short}: fix it before releasing."; return }
+    $failed = @($runs | Where-Object { $_.workflowName -ne $requiredWorkflow -and $_.status -eq 'completed' -and $_.conclusion -notin @('success', 'skipped', 'neutral') })
+    if ($failed.Count) { Fail-Ci "CI of ${short}: $(($failed | ForEach-Object { "$($_.workflowName) $($_.conclusion)" }) -join ', ')."; return }
+    Write-Output "CI: '$requiredWorkflow' green for $short."
+}
+if ($Hotfix -and $Mode -ne 'Release') { throw '-Hotfix goes with -Release only.' }
+if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
+function Add-HotfixNote([string]$Notes) {
+    if (-not $Hotfix) { return $Notes }
+    $reason = $Hotfix.Trim()
+    return "**Urgent fix** ($reason): released without waiting for the in-game tests; not validated in game.`n" +
+        "**Correctif urgent** ($reason) : publié sans attendre les essais en jeu ; non validé en jeu.`n`n$Notes"
 }
 
 Push-Location $root
@@ -91,7 +149,7 @@ try {
     }
 
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
-    if ($branch -ne $developBranch) { throw "Current branch is '$branch': switch to '$developBranch' (git checkout $developBranch) first." }
+    if ($branch -ne $developBranch) { throw "Current branch is '$branch': commits and releases start from '$developBranch' only." }
 
     # Already released: the tag of this version exists here or on GitHub.
     $released = [bool](Invoke-Git @('tag', '--list', $tag)) -or [bool](& git ls-remote --tags origin "refs/tags/$tag")
@@ -122,7 +180,9 @@ try {
             if ($untracked.Count -gt 0) { Write-Output "New files to add ($($untracked.Count)):"; $untracked | ForEach-Object { Write-Output "  + $_" } }
             $blocked = @($untracked | Where-Object { $_ -match '\.(zip|7z|dll|exe|pdb)$' -or ((Test-Path -LiteralPath $_ -PathType Leaf) -and (Get-Item -LiteralPath $_).Length -gt 5MB) })
             if ($blocked.Count -gt 0) { Stop-Release "Not committed: new archive, binary or large file(s): $($blocked -join ', '). Move them out of the repository or add them to .gitignore." }
+            Assert-NoAgentFiles; Assert-NoSecret
             Step "git add -A" { git add -A }
+            if (-not $DryRun) { Assert-NoAgentFiles }
             Step "git commit -F <message '$subject'>" { git commit -F $message }
         }
         else { Write-Output "Nothing to commit on $developBranch." }
@@ -169,12 +229,13 @@ try {
         $commit = (Invoke-Git @('rev-list', '-n', '1', $tag)).Trim()
         $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
         if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0] }
+        $notes = Add-HotfixNote $notes
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
+        Assert-NoAgentFiles $commit
         if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
         if (-not $hasRelease) { Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
-        Step "git push origin ${commit}:$releaseBranch" { git push origin "${commit}:refs/heads/$releaseBranch" }
-        # A run stopped after « checkout main » left main checked out: Devloppement is the branch brought up to date.
-        Step "git checkout $developBranch" { git checkout $developBranch }
+        # Fast-forward only: GitHub refuses a push of main that is not one (no force anywhere).
+        Step "git push origin ${commit}:$releaseBranch (fast-forward)" { git push origin "${commit}:refs/heads/$releaseBranch" }
         Step "git merge --ff-only $tag (on $developBranch)" { git merge --ff-only $commit }
         Step "git push origin $developBranch" { git push origin $developBranch }
         Write-Output ($(if ($DryRun) { "DRY RUN: nothing was published ($tag)." } else { "RELEASE $tag published (resumed): $releaseUrl" }))
@@ -183,11 +244,21 @@ try {
 
     $newCommits = @(Invoke-Git @('log', '--format=%s', "origin/$releaseBranch..HEAD") | Where-Object { $_ })
     if ($newCommits.Count -eq 0) { Stop-Release "Nothing new on $developBranch since the last release (origin/$releaseBranch)." }
+    # 0.1017: what is released is what GitHub has and checked: Devloppement pushed, its CI green, no agent file, no secret.
+    $ahead = [int](Invoke-Git @('rev-list', '--count', "origin/$developBranch..HEAD"))
+    if ($ahead -gt 0) {
+        $text = "$developBranch has $ahead commit(s) not pushed: run '.\scripts\Verify.ps1 -Commit' first, wait for the CI, then -Release."
+        if ($DryRun) { Write-Host "WARNING (dry run): $text" -ForegroundColor Yellow } else { Stop-Release $text }
+    }
+    Assert-NoAgentFiles 'HEAD'; Assert-NoSecret
+    Assert-CiGreen ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
 
     # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
     $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
     if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0]; Write-Output "Release notes cover the versions after $($lastReleased[0])." }
+    $notes = Add-HotfixNote $notes
+    if ($Hotfix) { Write-Output "Urgent fix: $($Hotfix.Trim())" }
     if ($DryRun) { Write-Output "--- release notes ---`n$notes`n---------------------" }
     # repo.json: Dalamud custom repository entry built from the packaged manifest, pointing at this release's zip.
     $output = 'src\TenshoAssistant\bin\x64\Release'
@@ -206,21 +277,19 @@ try {
     $json = ConvertTo-Json @($entry) -Depth 4
     [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
 
-    # Local steps first: repo.json committed on Devloppement, merged into main, tagged. Nothing is public yet.
+    # Local steps first: repo.json committed on Devloppement and tagged. Nothing is public yet. No branch change (0.1017).
     Step "write repo.json ($version)" { [IO.File]::WriteAllText((Join-Path $root 'repo.json'), $json + "`n", [Text.UTF8Encoding]::new($false)) }
     Step "git commit repo.json" { git add repo.json; git commit -m "$version · repo.json" }
-    # The release branch is GitHub's main: the local main is set to origin/main before merging (no local Stable branch needed).
-    Step "git checkout -B $releaseBranch origin/$releaseBranch" { git checkout -B $releaseBranch "origin/$releaseBranch" }
-    Step "git merge --no-ff $developBranch" { git merge --no-ff $developBranch -m "Release $version" }
+    if (-not $DryRun) { Assert-NoAgentFiles 'HEAD' }
     Step "git tag -a $tag" { git tag -a $tag -m "Tensho Assistant $version" }
-    # Public steps: the tag and the GitHub release with the zip, then main (repo.json) last, then Devloppement.
+    # Public steps: the tag and the GitHub release with the zip, then main (repo.json) last, moved to the tagged commit as a
+    # fast-forward (origin/main is an ancestor of Devloppement, checked above; GitHub refuses anything else, no force anywhere),
+    # then Devloppement.
     Step "git push origin $tag" { git push origin $tag }
     Step "gh release create $tag latest.zip" { & $gh release create $tag $zip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
-    Step "git push origin $releaseBranch" { git push origin $releaseBranch }
-    Step "git checkout $developBranch" { git checkout $developBranch }
-    Step "git merge --ff-only $releaseBranch" { git merge --ff-only $releaseBranch }
+    Step "git push origin HEAD:$releaseBranch (fast-forward)" { git push origin "HEAD:refs/heads/$releaseBranch" }
     Step "git push origin $developBranch" { git push origin $developBranch }
-    Write-Output ($(if ($DryRun) { "DRY RUN: nothing was merged, tagged or published ($tag)." } else { "RELEASE $tag published: https://github.com/$repository/releases/tag/$tag" }))
+    Write-Output ($(if ($DryRun) { "DRY RUN: nothing was committed, tagged or published ($tag)." } else { "RELEASE $tag published: https://github.com/$repository/releases/tag/$tag" }))
     Write-Output "Custom repository URL: https://raw.githubusercontent.com/$repository/$releaseBranch/repo.json"
 }
 finally { Pop-Location }
