@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.987.0
+- Plan global, Verify : Succès (X-102, idée retenue à la revue) : la progression des succès vue par Tensho est maintenant gardée sur le disque, par personnage, et retrouvée au prochain lancement. Quand un succès que vous suivez est vu passer à son maximum, une ligne « Succès suivi terminé : … » s'affiche dans la discussion. Non validé en jeu.
+- Tests : AchievementSaved987Tests. Verify.ps1 (agent) : 1621/1621, 0 avertissement, 0 erreur ; DLL 0.987.0.0. Non validé en jeu.
+### English
+- Achievements (X-102, idea kept at the review): the achievement progress Tensho saw is now kept on disk, per character, and found again at the next start. When an achievement you track is seen reaching its maximum, a « Tracked achievement complete: … » line shows in the chat. Not validated in game.
+
 ## 0.986.0
 - Plan global, Verify : Gils du jour (X-107, idée retenue à la revue) : une entrée « Tensho Assistant (Gil) » peut s'afficher dans la barre d'informations du serveur, avec le net de vos gils depuis minuit ; au survol les gains et les dépenses, un clic ouvre le journal des gils. Les transferts avec vos servants et le coffre de la compagnie ne comptent pas. Réglage dans l'onglet Gils de la page Rangements, désactivé par défaut. Non validé en jeu.
 - Tests : GilBar986Tests. Verify.ps1 (agent) : 1619/1619, 0 avertissement, 0 erreur ; DLL 0.986.0.0. Non validé en jeu.

@@ -11,7 +11,7 @@ internal static class AchievementProgress368Tests
             var watcher = Read("Collections/AchievementProgressWatcher.Dalamud.cs");
             Check(watcher.Contains("(nint)Achievement.MemberFunctionPointers.RequestAchievementProgress!=0",StringComparison.Ordinal)
                 && watcher.Contains("TimeSpan.FromSeconds(3)",StringComparison.Ordinal),"request guarded and spaced");
-            Check(watcher.Contains("if(player.ContentId!=character){character=player.ContentId;progress=[];}",StringComparison.Ordinal),"per character");
+            Check(watcher.Contains("if(player.ContentId!=character){character=player.ContentId;progress=all.TryGetValue(character,out var saved) ? new(saved):[];}",StringComparison.Ordinal),"per character (0.987: that character's saved progress)");
             var page = Read("MainWindow.AchievementProgress.cs");
             Check(page.Contains("ImGui.SmallButton(localization.Get(\"AchievementProgress.Ask\")",StringComparison.Ordinal)
                 && Directory.EnumerateFiles(Path.GetFullPath("src/TenshoAssistant"),"*.cs",SearchOption.AllDirectories)

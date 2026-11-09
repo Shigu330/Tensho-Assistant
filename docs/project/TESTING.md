@@ -1614,6 +1614,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.986) Rangements › Gils : cocher « Gils du jour dans la barre du serveur » ; barre du serveur : « +… » ; survol : gains et dépenses.
 
+- [ ] (0.987) Suivre un succès presque fini, demander sa progression, le finir : ligne dans la discussion ; relancer : la progression vue est toujours là.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

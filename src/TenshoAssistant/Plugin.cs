@@ -809,7 +809,8 @@ public sealed class Plugin : IDalamudPlugin
                 ()=>configuration.JobTitlesEnabled,()=>configuration.JobTitles),()=>titleChanger?.Dispose());
             // g, C-15 (0.368): achievement progress, read passively; asked from the server only on the player's click.
             Collections.AchievementProgressWatcher? achievementProgress=null;
-            registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log),
+            registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log,
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"AchievementProgress.json"),id=>configuration.TrackedAchievements?.Contains(id)==true,mainWindow.AchievementCompleted),
                 ()=>achievementProgress?.Dispose());
             // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
             Collections.ExtraCollectionReader? extraCollections=null;

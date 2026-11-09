@@ -3,8 +3,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace TenshoAssistant.Collections;
 
-/// <summary>Progress of one achievement as the game received it: current, maximum, when Tensho saw it.</summary>
-public sealed record AchievementProgress(uint Current,uint Max,DateTimeOffset SeenAt);
 
 /// <summary>
 /// g, C-15 (0.368): achievement progress. The game keeps the progress of the last achievement asked (Achievement.ProgressAchievementId,
@@ -25,9 +23,19 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     private DateTimeOffset nextRead,lastRequest;
     private bool disposed,warned;
 
-    public AchievementProgressWatcher(IFramework framework,IClientState client,IPlayerState player,IPluginLog log)
+    // X-102 (0.987, user choice DEC-045, from C-15): what was seen is kept on disk per character (AchievementProgress.json), and a tracked
+    // achievement seen reaching its maximum is said once (completed).
+    private readonly string? file;
+    private readonly Func<uint,bool>? tracked;
+    private readonly Action<uint>? completed;
+    private readonly BackgroundWriter writer;
+    private Dictionary<ulong,Dictionary<uint,AchievementProgress>> all=[];
+    public AchievementProgressWatcher(IFramework framework,IClientState client,IPlayerState player,IPluginLog log,string? file=null,Func<uint,bool>? tracked=null,Action<uint>? completed=null)
     {
-        this.framework=framework;this.client=client;this.player=player;this.log=log;
+        this.framework=framework;this.client=client;this.player=player;this.log=log;this.file=file;this.tracked=tracked;this.completed=completed;
+        writer=new((error,what)=>log.Warning(error,"{0}",what));
+        try{if(file is not null && File.Exists(file))all=AchievementProgressStore.Read(File.ReadAllText(file)) ?? [];}
+        catch(Exception error){log.Warning(error,"Saved achievement progress unreadable: kept as is, not written over.");file=null;this.file=null;}
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
@@ -61,7 +69,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
             lock(gate)
             {
                 // Another character: what was seen belongs to the previous one.
-                if(player.ContentId!=character){character=player.ContentId;progress=[];}
+                if(player.ContentId!=character){character=player.ContentId;progress=all.TryGetValue(character,out var saved) ? new(saved):[];}
                 request=pendingRequest;pendingRequest=0;
             }
             if(request!=0 && (nint)Achievement.MemberFunctionPointers.RequestAchievementProgress!=0)achievement->RequestAchievementProgress(request);
@@ -72,7 +80,17 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
                 lock(gate)
                 {
                     var current=Math.Min(achievement->ProgressCurrent,max);
-                    if(!progress.TryGetValue(id,out var known) || known.Current!=current || known.Max!=max)progress[id]=new(current,max,now);
+                    if(!progress.TryGetValue(id,out var known) || known.Current!=current || known.Max!=max)
+                    {
+                        progress[id]=new(current,max,now);
+                        if(AchievementProgressStore.JustCompleted(known,progress[id]) && tracked?.Invoke(id)==true)completed?.Invoke(id);
+                        if(file is not null && character!=0)
+                        {
+                            all[character]=new(progress);
+                            var text=AchievementProgressStore.Write(all);var path=file;
+                            writer.Enqueue("Achievement progress could not be saved.",()=>AtomicFile.Write(path,text));
+                        }
+                    }
                 }
             warned=false;
         }
@@ -86,6 +104,7 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
+        writer.Flush(TimeSpan.FromSeconds(3));
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }

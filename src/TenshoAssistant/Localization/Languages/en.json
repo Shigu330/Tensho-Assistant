@@ -5686,6 +5686,7 @@
     "Flag": "Flag"
   },
   "AchievementProgress": {
+    "Completed": "Tracked achievement complete: {0}.",
     "Track": "Track this achievement",
     "TrackTip": "Adds this achievement to the « Tracked achievements » list, at the top of the Achievements tab.",
     "Line": "Progress: {0} / {1} (seen at {2})",

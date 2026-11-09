@@ -5686,6 +5686,7 @@
     "Flag": "Drapeau"
   },
   "AchievementProgress": {
+    "Completed": "Succès suivi terminé : {0}.",
     "Track": "Suivre ce succès",
     "TrackTip": "Ajoute ce succès à la liste « Succès suivis », en tête de l'onglet Succès.",
     "Line": "Progression : {0} / {1} (vue à {2})",
