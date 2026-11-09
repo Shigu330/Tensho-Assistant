@@ -1,3 +1,310 @@
+# Crafting and gathering: improvement proposals (audit of 2026-11-02, step e)
+
+> *Traduction française plus bas.*
+
+List drawn up by a read-only multi-agent audit (0.329). **Nothing was implemented** at the time of the audit (reread on 2026-11-03: the proposals made since then, at step g, carry a "State" line): you choose what gets added
+(rule of 2026-11-02, [ROADMAP](ROADMAP.md) "Decisions postponed to the end"). The defects found by the same audit are fixed in
+0.330 ([CHANGELOG](../../CHANGELOG.md)). Several proposals overlap with gaps already kept for step g)
+([GAPS](GAPS.md), I-*): they say so.
+
+Value and size are the audit's estimates. "Probe": a read of the game or an in-game survey is needed before coding.
+
+## C0 — K1 — A-01, part brought forward: choose the target quality in the crafting log panel
+
+- **State (reread on 2026-11-05)**: already present: `DrawCraftLogTarget` and `CraftLogTargets`, a target per recipe in the crafting log panel, found during the code review.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.CraftLog.cs`.
+- **What the player gets**: In the panel beside the crafting log, you choose the target: maximum quality (as today), a typed value or a percentage of the maximum. For an item handed in as NQ, a collectable with a low tier or a level-up, the proposed macro becomes shorter and costs less CP. The exact collectable tiers will come later with A-01, after the probe.
+- **How, size, dependencies**: "Crafting log target" setting (maximum / value / %), with tooltip and ↺; it goes into CraftLogInput.Options, so into the cache key (CraftLogSession.CacheKey). Show "target: N / max" above the macros. Size S. Dependencies: none; the collectable tiers (CollectablesShopRefine…) stay for A-01. Probe: none for this part. Decision: default value (recommended: maximum, as today).
+- **Source**: GAPS.md:72 (A-01, small, high value, Choice "Add"): the solver already accepts a typed target, only the crafting log assistant imposes maximum quality. Code: MainWindow.CraftLog.cs:55 passes recipe.Simulation!.Quality as the target; CraftSolver.cs:3 (CraftSolveOptions.TargetQuality) and MainWindow.CraftSolver.cs:124-125 (typed target in the simulator) already exist.
+
+## C1 — K2 — X-11, brought forward: Manipulation in the proposed macro when learned
+
+- **State (reread on 2026-11-03)**: DONE 0.419 (X-11).
+- **Value**: high; main file: `src/TenshoAssistant/Craft/CraftLogObservation.cs`.
+- **What the player gets**: From level 65, the macro proposed by the crafting log panel can use Manipulation, like those a crafter really uses: more durability, often more quality or fewer steps.
+- **How, size, dependencies**: Step 1 (S, no probe): "Manipulation learned" checkbox per character, off by default, with tooltip and ↺, passed to CraftLogContext.Resolve. Step 2 (S, after probe): read the real unlock on the framework thread (Action.UnlockLink and the FFXIVClientStructs unlock state, to be probed), guarded by R-14, the checkbox remaining as a fallback. Size S. Dependencies: none. Decision: step 1 only or both (recommended: both).
+- **Source**: GAPS.md:203 (X-11, small, high value): the proposed macro never uses Manipulation. Code: CraftLogObservation.cs:35 creates CraftStats with ManipulationAllowed=false; CraftSolver.cs:28 then removes Manipulation from the actions; the simulator already has a checkbox (MainWindow.CraftSimulation.cs:131).
+
+## C2 — K3 — Try your saved sequences on all recipes
+
+- **State (reread on 2026-11-05)**: DONE 0.552.
+- **Value**: high; main file: `src/TenshoAssistant/Craft/CraftLogSession.cs`.
+- **What the player gets**: The crafting log panel also tries your recorded sequences for other recipes (the same macro often serves a whole series of recipes of the same difficulty, whatever the job) and shows the best one that finishes and reaches the target, with its name and the recipe it was recorded for. A library of a few generic macros is then enough.
+- **How, size, dependencies**: In CraftLogSession.Build (already on a cancellable worker), simulate all valid sequences, keep the best ones by CraftSolver.BetterCompletion, label "Sequence X (recorded for Y)". Setting "Try sequences from other recipes" (on, tooltip, ↺). The same in the simulator ("Try my sequences"). Size S. Probe: none. Decision: on by default (recommended: yes).
+- **Source**: CraftLogSession.cs:105-106: a sequence is tried only if RecipeId, ResultItemId and CraftTypeId are those of the displayed recipe. Actions are stored by type (CraftActionKind) and exist for all 8 jobs (CraftActionCatalog.cs:198, 26 × 8 rows). At most 100 sequences (CraftPresets.cs:133). docs/evidence/0.318-plugin-gaps.json (Craftimizer): macro library = partial.
+
+## C3 — K4 — Simulate another job without wearing it: last attributes surveyed per job and planned attributes of the Gear page
+
+- **State (reread on 2026-11-05)**: DONE 0.554.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
+- **What the player gets**: The game's crafting log lets you browse the recipes of all jobs. The panel then calculates with the last surveyed attributes of the recipe's job (marked "surveyed on …"), instead of saying "Equip the job". The simulator offers the same values, and a "Simulate with these attributes" button on the Gear page sends the planned Craftsmanship, Control and CP (chosen pieces and materia) to the simulator.
+- **How, size, dependencies**: Keep, per character and per job, the last survey (Craftsmanship, Control, CP, level, date) in the configuration (user data, like the sequences). Resolution: worn job first, otherwise the marked survey, recalculated as soon as the job is worn. Button on the Gear page when the displayed job is a crafter. Size S. Probe: none. Decision: use the surveys in the crafting log panel (recommended: yes, always marked, any food included in the survey).
+- **Source**: CraftLogObservation.cs:26 and 29: calculation refused if the worn job is not the recipe's. MainWindow.CraftSimulation.cs:110-121: "Copy" requires the worn job. MainWindow.Gear.cs:286-288 already calculates the planned values (GearRules.Planned), Craftsmanship, Control and CP included for a crafter (Gear/GearCatalog.cs:148-149).
+
+## C4 — K5 — Attribute thresholds of a sequence: minimum Craftsmanship, Control and CP
+
+- **State (reread on 2026-11-05)**: DONE 0.553.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
+- **What the player gets**: Under a finished simulation: "This sequence holds with at least 3,950 Craftsmanship, 3,820 Control and 590 CP (margin: +120, +45, +12)". You know at once whether a cheaper meal, materia or piece is enough, or what is missing to reach the target.
+- **How, size, dependencies**: Pure function CraftStatThresholds: bisection on Craftsmanship (the sequence finishes), on Control (quality ≥ target), CP = sum of the costs; bounds from the recipe (RequiredCraftsmanship, RequiredControl). Calculated on a task cancelled when the result changes, never in Draw. Size S. Dependencies: CraftSimulation.Run. Probe: none (no new data). Decision: none.
+- **Source**: No such function in Craft/ (CraftSimulation, CraftSolver, CraftConditionEnvelope). The simulator gives only the final state (MainWindow.CraftSimulation.cs:180-188). ROADMAP.md:209 (CRAFT-001 PARTIAL). Progress depends only on Craftsmanship and quality only on Control in the model (CraftSimulation.cs:51-54), which allows a bisection search with the same engine.
+
+## C5 — K6 — Follow your sequence during the synthesis: next action and gap from the plan
+
+- **State (reread on 2026-11-05)**: DONE 0.589.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.CraftLive.cs`.
+- **What the player gets**: A small panel beside the game's synthesis window follows the chosen sequence (the one from the crafting log panel or the simulator): "Step 7/22: Innovation", expected progress and quality against the game's, and a warning when a Good, Excellent or Poor condition has made the synthesis diverge. Useful for anyone crafting by hand without a macro. Display only, nothing is executed.
+- **How, size, dependencies**: Reuse CraftLiveReader (opt-in observation already guarded): compare native.Step and the resources with the matching step of the simulation, show the next action and the gap. Panel attached to the Synthesis window like the crafting log one, setting with tooltip and ↺. Size M. Dependencies: "Craft" observation; A-04 will later replace the next action with a new calculation. Probe: none; in-game survey afterwards. Decision: which sequence to follow (recommended: the crafting log panel's for this recipe, otherwise the simulator's).
+- **Source**: MainWindow.CraftLive.cs:8-11: the live synthesis is a page of the main window, with no panel near the game window; CraftLiveProjection.cs (summary l.15) projects only one move. docs/evidence/0.318-plugin-gaps.json: Craft Remaining (remaining progress and quality in the synthesis window) = partial; Craftimizer (next moves during the synthesis) = partial. GAPS.md:75 (A-04) remains the solver version.
+
+## C6 — K7 — Level-adjusted recipes, required-quality recipes and Cosmic Exploration
+
+- **Value**: high; main file: `src/TenshoAssistant/Craft/CraftSimulation.cs`.
+- **What the player gets**: The simulator, the crafting log panel and the live synthesis accept the recipes now refused as "adjusted" or "required quality", including those of Cosmic Exploration, the crafters' current content, with their mission thresholds.
+- **How, size, dependencies**: Probe first (tools/ApiProbe, then an in-game survey in docs/evidence): effect of MaxAdjustableJobLevel on level and attributes, meaning of RequiredQuality (failure or NQ item), WKS* sheets (recipes, thresholds). Then: accept these recipes in Unsupported with the proven rules, thresholds as targets. Size M-L. Dependencies: K1 (target), A-07 if a recipe is also expert. Decision: scope (recommended: adjusted and required-quality recipes first, Cosmic Exploration afterwards).
+- **Source**: CraftSimulation.cs:32-33 refuses LevelScaled (RecipeSimulationCopy.Lumina.cs:15: MaxAdjustableJobLevel) and RequiredQuality>0, in addition to expert and specialist recipes. docs/evidence/0.318-plugin-gaps.json (Craftimizer): "Level-adjusted recipes and Cosmic Exploration (WKS notebook, synced level, mission thresholds)" = missing, no read of WKSRecipeNotebook. Absent from the A-* of GAPS.md (A-07 covers only expert recipes). ROADMAP.md:209: special recipes to complete.
+
+## C7 — G1 — R-13, part brought forward: timed nodes open now or soon
+
+- **State (reread on 2026-11-05)**: DONE 0.588.
+- **State (reread on 2026-11-03)**: partly 0.415 (R-13: alarm item tracking window); "open now or soon" list not done.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.GatheringBrowser.cs`.
+- **What the player gets**: On the Gathering page, a "Now" tab lists all timed nodes (Miner, Botanist) open in ET, then those opening within the real hour, sorted by next window, with countdown, zone, level and alarm button. Filters: job, level, hidden items. You know where to go without searching item by item.
+- **How, size, dependencies**: Index of Limited timed sources, next window calculated once a minute in ET (cache, never every frame), existing ItemCell and alarm (DrawGatheringAlarmButton). Fish excluded until R-02 (weather) is done. Size S-M. Dependencies: none; R-13 will reuse the list for its pinned window. Probe: none. Decision: "soon" horizon (recommended: one real hour, setting with tooltip and ↺).
+- **Source**: GAPS.md:104 (R-13, pinned window of tracked items, medium). MainWindow.GatheringBrowser.cs:65-70: the list filters only by name, zone and type, with no schedule or level. The schedules are already copied (GatheringSchedule, GatheringTime.Next). docs/evidence/0.318-plugin-gaps.json (GatherBuddy): pinned window sorted by next window = partial.
+
+## C8 — G2 — GP plan of the gathering panel: observed quantity and effects already active
+
+- **State (reread on 2026-11-05)**: DONE 0.515–0.517 (plan per node and place effects; triage of 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
+- **What the player gets**: The GP plan of the in-game panel takes into account what is already bought on the node (Bountiful Yield, "Don de la terre", "Bonne augure"…) and the displayed quantity: it no longer proposes an action already active and no longer counts its effect twice. The displayed expected gain becomes reliable.
+- **How, size, dependencies**: Probe first: ids of the statuses applied by each action (Lumina Status, with tools/GatheringActionsProbe), then a read of the player's statuses in GatheringObservationReader (framework, guarded by R-14). Fill GpActiveEffects and the base yield (displayed quantity minus the active effect); "active effects unknown" if the read fails. Size S-M. Dependencies: R-09 (Solid Reason, Eureka) will complete the model. Decision: none.
+- **Source**: MainWindow.GatheringPanel.cs:80: GpOptimizer.Solve with a base yield of 1 and no active effect (GpActiveEffects.None), whereas the displayed rates include the bought effects (GpOptimizer.cs:43, comment). The displayed quantity is read (GatheringObservation.cs:12, DisplayedQuantity) but only shown in the observation table (MainWindow.GatheringObservation.cs:55). ROADMAP.md:214 (GP-001: native decoder to complete).
+
+## C9 — G3 — R-02, part brought forward: "possible now?" in the fishing help
+
+- **State (reread on 2026-11-05)**: DONE 0.568.
+- **State (reread on 2026-11-03)**: partly 0.396 (R-02: next windows on the fish sheet); not in the fishing help.
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
+- **What the player gets**: Each fish in the fishing help and in "How to catch it" shows three badges: ET window open, current weather matching, previous weather matching (✓ / ✗ / ?). You see at once which fish are possible here, now, without cross-checking yourself with the Weather page.
+- **How, size, dependencies**: Current and previous weather of the territory calculated once per 1,400 s period (cache, like MainWindow.Weather.cs), compared with the GatherBuddy ids; window by GatheringTime. Size S. Dependencies: none; the list of the next real windows stays for R-02. Probe: none. Decision: none.
+- **Source**: GAPS.md:93 (R-02, small, high value): the sheet shows the ET range and the weathers separately. Code: MainWindow.FishingPanel.cs (FishRow) and MainWindow.GatheringFish.cs:57-58 display the weathers as text, with no comparison; WeatherCatalog.Forecast exists (Gathering/WeatherForecast.cs).
+
+## C10 — G4 — Bite timer restarted on its own at each cast
+
+- **State (2026-11-09)**: DONE 0.1011, before 1.0.0 (nothing more is planned afterwards). Cast signal: the line's CastingOut state, proven in game in 0.887 (docs/evidence/0.887-fishing-bite.md), read every frame in `Gathering/FishingBaitReader.Dalamud.cs`; the timers of the fishing help and of ocean fishing restart from that moment; the manual button stays.
+
+- **Value**: high; main file: `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
+- **What the player gets**: The fishing help timer, compared with the Teamcraft bite times, restarts from zero at each cast, without clicking "Restart". The green "it may bite" range becomes right for each cast.
+- **How, size, dependencies**: Probe first: a reliable cast signal (condition flags during the cast and the wait, or the FFXIVClientStructs fishing manager state), surveyed in game in docs/evidence. Then: copy on the framework thread, guarded by R-14; the manual button stays. Size S after the probe. Dependencies: G15 (reads outside Draw). Decision: none.
+- **Source**: MainWindow.FishingPanel.cs:47: the timer starts only on the switch to the "fishing" state; l.55: restart by hand. Plugin.cs:199 reads only ConditionFlag.Fishing. TESTING.md:117 (0.232, to validate).
+
+## C11 — K8 — A-13, part brought forward: simulate specialist recipes without the specialist actions
+
+- **State (reread on 2026-11-03)**: DONE 0.434-0.435 (A-13: "Specialist" setting, specialist recipes accepted).
+- **Value**: medium; main file: `src/TenshoAssistant/Craft/CraftSimulation.cs`.
+- **What the player gets**: Recipes reserved for specialists (non-expert) are no longer refused: the simulator, the search and the crafting log panel calculate them with the ordinary actions, with the note "specialist actions not modelled". The macro stays valid, just less optimised.
+- **How, size, dependencies**: Accept Specialist when Expert, LevelScaled and RequiredQuality are false; warning text translated in the three views. Size S. Dependencies: A-13 will add the actions afterwards. Probe: none; one specialist synthesis compared in game. Decision: none.
+- **Source**: CraftSimulation.cs:32 refuses Specialist just like Expert. GAPS.md:84 (A-13): "Specialist recipes are refused"; the specialist actions only add choices. RecipeSimulationCopy.Lumina.cs:15 copies IsSpecializationRequired with no other parameter of its own.
+
+## C12 — K9 — Starting quality calculated from the chosen HQ ingredients
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
+- **What the player gets**: In the simulator, you state how many HQ ingredients you use; the starting quality is calculated instead of typed. You compare "3 more HQ" against "one more step" without calculating by hand.
+- **How, size, dependencies**: Source to cite first: calculation rule (Craftimizer, MIT) surveyed in docs/evidence and checked in game against the starting quality read by the crafting log panel (comparison shown in developer mode). Then one row per ingredient that can be HQ (0 to quantity), cap MaxStartingQuality. Size S. Dependencies: none. Decision: none.
+- **Source**: MainWindow.CraftSimulation.cs:130: starting quality typed, bounded by MaxStartingQuality. docs/evidence/0.318-plugin-gaps.json (Craftimizer): "Starting quality calculated from the number of HQ ingredients chosen" = partial. The crafting log panel already reads the real value from the game (CraftLogObservation.StartingQuality), which allows the check.
+
+## C13 — K10 — HQ chance of a final quality
+
+- **Value**: medium; main file: `src/TenshoAssistant/Craft/CraftSimulation.cs`.
+- **What the player gets**: For a recipe that can be HQ and finishes under the maximum: "Quality 7,200 / 9,000, HQ chance ≈ 55%". Useful for levelling and for hand-ins without mandatory HQ, and to stop a search earlier.
+- **How, size, dependencies**: Source first: survey the HQ chance shown by the synthesis window (AtkValue index to probe) at several quality percentages, and compare it with the Craftimizer table (MIT); record in docs/evidence. Then: pure function quality % → HQ %, shown in the simulator and the crafting log panel. Size S after the source. Dependencies: none. Decision: accept the Craftimizer table checked by surveys (recommended), or only the surveys.
+- **Source**: No trace of an HQ chance in the code (search HqChance / HQ % empty). CraftLiveReader.Dalamud.cs:30-31 already reads AtkValues of the synthesis window, which shows the game's HQ chance. Rule "never invent" (the maintainer's notes (not in the repository), Method).
+
+## C14 — K11 — A-12, part brought forward: complete recipe sheet (master recipe book, Quick Synthesis, HQ, prerequisites, figures for the gap)
+
+- **State (reread on 2026-11-05)**: DONE 0.600.
+- **State (reread on 2026-11-03)**: partly 0.427 (A-12: level, Craftsmanship, Control against the character, "Equip"); master recipe book, Quick Synthesis and HQ not done.
+- **Value**: medium; main file: `src/TenshoAssistant/Craft/RecipeCatalogLoader.Dalamud.cs`.
+- **What the player gets**: The recipe (Craft tab of the item sheet and crafting log panel) says: master recipe book required (and whether it is read), Quick Synthesis possible, HQ possible, specialist required, item or status required, and the figured gap "Craftsmanship 3,950 / 4,000: −50". You know why a recipe cannot be made.
+- **How, size, dependencies**: Copy these Recipe columns into RecipeDefinition (catalog cache version to raise). Show in DrawCraftBook and the panel. "Read" state of the book after a probe (FFXIVClientStructs client state, to be probed), otherwise "not checked". Size S. Dependencies: the whole-set change on click stays in A-12 (step g). Decision: none.
+- **Source**: GAPS.md:83 (A-12, small): CraftLogContext reports only the wrong job and the minimum. Code: CraftLogObservation.cs:33-34 (message with no gap); RecipeCatalogLoader.Dalamud.cs:131 copies neither SecretRecipeBook, nor CanQuickSynth, nor ItemRequired, nor StatusRequired (empty search in the code). The master recipe book is not named anywhere in GAPS (only as a collection type, C-04).
+
+## C15 — K12 — More direct simulator: recipe choice in the page, result recalculated on its own, drag and drop
+
+- **State (reread on 2026-11-05)**: DONE 0.572.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftSimulation.cs`.
+- **What the player gets**: The simulator has its own recipe search (name, job, level); the result updates with each action added, moved or removed, without clicking "Simulate"; actions move by drag and drop; two bars show progress and quality.
+- **How, size, dependencies**: Search reusing the item catalog and RecipeCatalog.ForResult (index calculated once). Simulation restarted once per change (key of the sequence and attributes), at most 100 actions, never every frame. ImGui drag and drop. Setting "Simulate automatically" (on, tooltip, ↺). Size S. Probe: none. Decision: automatic recalculation by default (recommended: yes).
+- **Source**: MainWindow.CraftSimulation.cs:97: without a recipe, the page says to go through the item sheet; l.169-171: simulation on click only; l.205-206: moving by ↑/↓ buttons. docs/evidence/0.318-plugin-gaps.json (Craftimizer): macro editor = partial.
+
+## C16 — K13 — Sequence library: search, rename, duplicate, copy and paste as text (A-08, text part)
+
+- **State (reread on 2026-11-05)**: DONE 0.590.
+- **State (reread on 2026-11-03)**: partly 0.425 (A-08: import of a pasted macro); search, rename, duplicate not done.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftPresets.cs`.
+- **What the player gets**: The page of saved sequences can be searched by name, item or job and sorted; a sequence can be renamed, duplicated, copied as macro text and, the other way round, a pasted /ac macro becomes a sequence that can be checked in the simulator.
+- **How, size, dependencies**: Filters and sort cached; pure Rename and Duplicate in CraftPresets (same Commit); copy by CraftMacroExporter; parsing of the /ac lines against the catalog's action names in the client language, unknown lines reported. Size S-M. Dependencies: the online links of A-08 stay for step g. Probe: none. Decision: none new.
+- **Source**: MainWindow.CraftPresets.cs:40-63: raw list (Load, Delete), with no search or renaming; CraftPresets.cs:137-155: Create, Add, Remove only. GAPS.md:79 (A-08, Choice: pasted text and Teamcraft / Craftingway links). docs/evidence/0.318-plugin-gaps.json (Craftimizer): library (rename, copy, save as) = partial.
+
+## C17 — K14 — Macro export options: separate waits (X-12), sound, final echo, icon
+
+- **State (reread on 2026-11-05)**: DONE 0.573.
+- **State (reread on 2026-11-03)**: partly 0.419 (X-12: separate wait for buffs); sound, final echo, icon not done.
+- **Value**: medium; main file: `src/TenshoAssistant/Craft/CraftMacroExport.cs`.
+- **What the player gets**: You set the wait of the actions and that of the effects separately, choose the end sound (or none), the echo on every page or only on the last one, and the icon of the macros written in the game instead of the imposed "?".
+- **How, size, dependencies**: Fields in CraftSearchSettings (configuration), each with tooltip and ↺, same bounds as the current wait; they go into the crafting log cache key. Icon: list of the game's macro icons (sheet to probe) or that of the crafted item if valid. Size S. Probe: macro icon sheet. Decision: default values (recommended: unchanged).
+- **Source**: GAPS.md:204 (X-12): fixed waits of 2 s / 3 s and a single extra (CraftMacroExport.cs:13-17, 34). CraftMacroExport.cs:42: echo with fixed <se.1> on every page. Macros/MacroWriter.Dalamud.cs:16: icon 66001 imposed. docs/evidence/0.318-plugin-gaps.json (Craftimizer, Macro Mate): export options and icon choice = partial / missing.
+
+## C18 — K15 — Crafting chain: buttons per step, identical steps grouped, "done" checkboxes
+
+- **State (reread on 2026-11-05)**: DONE 0.591.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftChain.cs`.
+- **What the player gets**: Each step of the chain has its "Log" buttons (opens the game's crafting log on the recipe) and "Simulate"; repeated steps of the same recipe are shown grouped (×N in total); you tick the steps done during the session.
+- **How, size, dependencies**: Grouping at display only (sum by RecipeId, order of first appearance), the calculation does not change. Buttons reusing OpenCraftLog (on click). Checkboxes kept for the session (or in the configuration, to be chosen). Size S-M. Dependencies: A-05 (multi-item lists) will take over the view. Probe: none. Decision: checkboxes kept between sessions or not (recommended: session only).
+- **Source**: MainWindow.CraftChain.cs:53-62: a step = icon and text, with no action. Craft/CraftChain.cs:93: "Do not merge repeated steps" (order kept for the dependencies). OpenCraftLog and OpenCraftSimulation already exist (MainWindow.CraftLog.cs:26, MainWindow.CraftSimulation.cs:74).
+
+## C19 — K16 — Where are my materials: detail per storage in the preparation and the chain
+
+- **State (reread on 2026-11-05)**: DONE 0.559.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftPlan.cs`.
+- **What the player gets**: On hovering "Surveyed" of an ingredient: "Bags 12 · Retainer Lune 40 (surveyed 01/11) · Saddlebag 8". You know which retainer to call before crafting, without opening the sheet of each item.
+- **How, size, dependencies**: Common tooltip (same rendering as the Stocks tab of the sheet) on the cells of the preparation and of the chain's materials, from the Rows already calculated; nothing recalculated every frame. Size S. Probe: none. Decision: none.
+- **Source**: MainWindow.CraftPlan.cs:61: only the total is shown; the chain shows only what is missing (MainWindow.CraftChain.cs:66-86). ItemHoldingsSummary already keeps the detail (Inventory/ItemHoldings.cs:11-17, StorageHolding: category, name, coverage).
+
+## C20 — K17 — A-09, part brought forward: open the preparation or the chain in Teamcraft
+
+- **State (reread on 2026-11-03)**: DONE 0.423 (A-09: Teamcraft link from the preparation).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftChain.cs`.
+- **What the player gets**: A "Teamcraft" button copies (or opens on click) the import link of the prepared item and its quantity; the list appears in Teamcraft with its sub-crafts. Tensho itself sends nothing.
+- **How, size, dependencies**: Pure link-building function (tested), button in DrawCraftPlan and DrawCraftChain; the browser is opened on click only. Size S. Dependencies: A-05 will extend this to several items. Probe: one link tried by hand. Decision: copy or open (recommended: both buttons).
+- **Source**: GAPS.md:80 (A-09, small, Choice "Add"): public format https://ffxivteamcraft.com/import/ + base64 of "itemId,recipeId,quantity" separated by ";", with no network request. No trace in the code (search for ffxivteamcraft.com/import empty according to docs/evidence/0.318-plugin-gaps.json).
+
+## C21 — K18 — "What can I craft?" with my stocks
+
+- **State (reread on 2026-11-05)**: DONE 0.592.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Items.cs`.
+- **What the player gets**: A list of the recipes that can be made right now with your bags and the saved Bank, filtered by job and level, with the number of possible crafts. Handy for using up materials or levelling a job.
+- **How, size, dependencies**: Calculation on a cancellable worker on click (all recipes, direct ingredients), result kept as long as the inventory and the Bank do not change; lower bound (≥) when a stock is unknown, as today. Size M. Dependencies: none. Probe: none. Decision: direct ingredients only or sub-crafts included (recommended: direct first).
+- **Source**: MainWindow.Items.cs:637 (GetCraftableCount) serves only the displayed recipe (l.389). docs/evidence/0.318-plugin-gaps.json: WachuMakeyMaking? (recipes that can be made with one's resources) = partial; LazyCrafter (catalog of recipes that can be made) = partial.
+
+## C22 — K19 — Free company workshop projects: materials per part and per phase
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.FreeCompany.cs`.
+- **What the player gets**: For a submarine or airship part, or another workshop project, the Free Company page lists the materials of each phase against your stocks, with a link to the crafting chain of each.
+- **How, size, dependencies**: Probe first: columns of CompanyCraftSequence, CompanyCraftPart, CompanyCraftProcess, CompanyCraftSupplyItem (tools/ApiProbe), recorded in docs/evidence. Then copy on the framework, "Workshop" tab of the Free Company page, stocks by ItemHoldings, links to the chain. Size M. Dependencies: R-07. Decision: location (recommended: tab of the Free Company page).
+- **Source**: docs/evidence/0.318-plugin-gaps.json (Artisan): "Free company workshop projects: materials per project, part and phase" = missing, no trace of CompanyCraft*; absent from the A-* of GAPS.md. MainWindow.VesselBuilds.cs covers only the parts' statistics (R-07).
+
+## C23 — K20 — Next action highlighted on the hotbars
+
+- **State (reread on 2026-11-05)**: DISCARDED at the review with the user ([global plan](GLOBAL-PLAN.md)).
+- **Value**: medium; main file: `src/TenshoAssistant/Craft/CraftLiveReader.Dalamud.cs`.
+- **What the player gets**: During a followed synthesis (K6, then A-04), the advised action flashes on your bars like a combo action of the game. You craft by hand without taking your eyes off the bars. Nothing is executed.
+- **How, size, dependencies**: New read/return-only hook (ActionManager.IsActionHighlighted), created only when the setting is on (off by default, tooltip, ↺), guarded by R-14 (cleanly disabled if the signature changes), released on Dispose. Size M. Dependencies: K6 or A-04 for the advised action. Probe: signature in FFXIVClientStructs. Decision: accept a new hook (recommended: yes, off by default).
+- **Source**: docs/evidence/0.318-plugin-gaps.json (Craftimizer): highlight of the suggested action on the bars (IsActionHighlighted hook) = missing. GAPS.md:75 (A-04, display only). Craftimizer, which does it, is in D17 (GAPS.md:74, note).
+
+## C24 — G8 — Remaining need of the preparation in the gathering and fishing helps
+
+- **State (reread on 2026-11-05)**: DONE 0.560.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.GatheringPanel.cs`.
+- **What the player gets**: At the gathering or fishing spot, the item useful for your last crafting chain is marked: "14 more for Ingot of…". The number goes down as you gather.
+- **How, size, dependencies**: Remaining = shortfall at the calculation − (current stock − stock at the calculation), bounded at 0; read from the chain session state, with no recalculation. Same note in the fishing help. Size S. Dependencies: none; A-05 (lists) will extend it. Probe: none. Decision: none.
+- **Source**: MainWindow.GatheringPanel.cs:44-60: an item's row shows success, boon, Bountiful and stock, with no link to the preparation. The chain keeps the shortfalls and the stocks of the moment of the calculation (Craft/CraftChain.cs:9-14, Materials and Observations).
+
+## C25 — G9 — R-14 (gathering), part brought forward: source type of the chain's raw materials
+
+- **State (reread on 2026-11-03)**: DONE 0.416 (R-14: raw materials of the chain as a gathering list by zone, those without a location apart).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.CraftChain.cs`.
+- **What the player gets**: Each missing raw material carries its sources as icons (Miner, Botanist, fishing with a schedule or not, NPC vendor, monster, market) and a grouping by zone at the top. You see at a glance what is gathered, bought or hunted.
+- **How, size, dependencies**: Labels calculated once per chain result (cache by result identity), grouping by zone of the gathering sources; detailed schedules and the route stay for R-14. Size S. Dependencies: I3 (NPC prices) for the price next to the vendor. Probe: none. Decision: none.
+- **Source**: GAPS.md:105 (R-14: gathering list by zone from a chain, medium). MainWindow.CraftChain.cs:79-81: a "Places" button opens the materials one by one. The data exist: GatheringCatalog.ForItem, NPC vendor catalog, LuminaSupplemental.
+
+## C26 — G5 — R-04, part brought forward: bait stock in the fishing help
+
+- **State (reread on 2026-11-03)**: DONE 0.398 (R-04: bait in hand and its stock).
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
+- **What the player gets**: Under each bait of the route: "×37", in red at zero. You no longer go fishing a fish without its bait. Detection of the bait worn will come with R-04.
+- **How, size, dependencies**: Same GetRecipeHoldings as for the fish (existing cache), in the fishing help and in "How to catch it". Size S. Dependencies: R-04 for the bait worn (probe PlayerState.FishingBait). Probe: none for this part. Decision: none.
+- **Source**: GAPS.md:95 (R-04, small, high value: bait in hand and "how many are left"). MainWindow.FishingPanel.cs:85: the bait tooltip gives the name and the right click, with no stock; the fish already have their stock (l.76-77, GetRecipeHoldings).
+
+## C27 — G6 — Node class (normal, ephemeral, legendary…) and folklore tome required
+
+- **Value**: medium; main file: `src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs`.
+- **What the player gets**: Each node states its class and, for a legendary node, the folklore tome needed (and whether it is read). You no longer make the trip to a node you cannot open.
+- **How, size, dependencies**: Probe first: values of GatheringPoint.Type and the link GatheringPoint.GatheringSubCategory → FolkloreBook (tools/GatheringProbe), "tome read" state (client state to probe). Copy into GatheringSource (cache version to raise), show in the sheet and the list. Size S. Dependencies: none. Decision: none.
+- **Source**: ROADMAP.md:212 (GATHER-001: "Intuition/prerequisites to complete"). The folklore tome is read only for fish (Gathering/FishingNotebookCopy.Lumina.cs:11); GatheringCatalogLoader.Dalamud.cs:221 handles type 8 apart without naming it; GatheringSource has no node class (Gathering/GatheringCatalog.cs:5-7).
+
+## C28 — G7 — Intuition duration and countdown
+
+- **Value**: medium; main file: `src/TenshoAssistant/Community/GatherBuddyFish.cs`.
+- **What the player gets**: For a fish with predators: "Intuition: 350 s after 3 × X". When Intuition is active, the fishing help shows the time remaining. Essential for big fish.
+- **How, size, dependencies**: First check in the GatherBuddy source (Apache-2.0) that this first number is the duration in seconds, and record it in docs/evidence; then read it. Countdown: Intuition status to probe (Lumina Status), read on the framework. GatherBuddy cache version to raise. Size S. Dependencies: none. Decision: none.
+- **Source**: Community/GatherBuddyFish.cs:76-78: only the (fish, number) pairs of the predators are kept, the first number of the call is ignored. docs/evidence/0.318-plugin-gaps.json (GatherBuddy): "Intuition duration (predators)" = partial. ROADMAP.md:212: "Intuition to complete".
+
+## C29 — G10 — R-15, part brought forward: spearfishing fish in the Gathering page
+
+- **State (reread on 2026-11-03)**: partly: spearfishing log on the Gathering page (0.402) and spearfishing help beside the game window (0.417).
+- **Value**: medium; main file: `src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs`.
+- **What the player gets**: Spearfishing fish appear in the search of the Gathering page with their location, like the other resources. The help on the spearfishing window will come with R-15.
+- **How, size, dependencies**: Probe first (tools/GatheringProbe): number of SpearfishingItem references, link with SpearfishingNotebook and the locations, recorded in docs/evidence. Then "spearfishing" source rows (Fisher job, AlarmSchedule.JobOf already ready). Size S-M. Dependencies: none. Decision: none.
+- **Source**: GAPS.md:106 (R-15). GatheringCatalogLoader.Dalamud.cs:179 ignores any node reference that is not a GatheringItem; no read of SpearfishingItem in the code (empty search). docs/evidence/0.203-gathering-jobs.md: types 4-5 (spearfishing) exist with placeholder names.
+
+## C30 — G11 — Local record of your catches and personal bite times
+
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.FishingPanel.cs`.
+- **What the player gets**: Tensho notes at your end each catch (fish, place, bait, bite time, hookset) and shows your own ranges beside Teamcraft's, per place. Nothing is sent.
+- **How, size, dependencies**: Probe first: source of the catch event (game message in the chat, or a read of the fishing state), recorded in docs/evidence. Separate file like the Bank, writing outside Draw, bounded. Size M. Dependencies: G4 (cast detected). Decision: source of the event (recommended: game message, no hook) and retention period.
+- **Source**: docs/evidence/0.318-plugin-gaps.json (GatherBuddy): "Local records of catches (time, bait, size, hookset, chum), statistics per place" = missing; absent from the R-* of GAPS.md. The timer already exists (MainWindow.FishingPanel.cs:47-56).
+
+## C31 — G12 — Weather of several zones in one table (favourite zones)
+
+- **State (reread on 2026-11-05)**: DONE 0.563.
+- **Value**: medium; main file: `src/TenshoAssistant/MainWindow.Weather.cs`.
+- **What the player gets**: The Weather page shows the current and next weather of your favourite zones, or of all the zones of an expansion, on a single grid. Useful for chaining fish and nodes according to the weather.
+- **How, size, dependencies**: List of favourite zones in the configuration (user data), grid recalculated once per 1,400 s period; click on a zone = current view. Size S. Dependencies: none. Probe: none. Decision: number of periods (recommended: 6).
+- **Source**: MainWindow.Weather.cs:15-35: a single zone at a time. docs/evidence/0.318-plugin-gaps.json: GatherBuddy (forecasts of all zones in a table) = partial; Kangas Tweaks (60 periods, favourite zones) = partial.
+
+## C32 — G13 — Commands "/tensho recolte" and "/tensho recette" (follow-up of I16)
+
+- **State (reread on 2026-11-05)**: DONE 0.555, with I16.
+- **Value**: medium; main file: `src/TenshoAssistant/Plugin.cs`.
+- **What the player gets**: "/tensho recolte minerai de fer" opens the Gathering page on the item, "/tensho recette …" opens its Craft tab; also usable in a game macro, like GatherBuddy's /gather.
+- **How, size, dependencies**: Same argument parsing as I16, OpenGathering and the Craft tab; French and English words; command help translated. Size S. Dependencies: I16. Probe: none. Decision: keywords (recommended: recolte/gather and recette/recipe).
+- **Source**: Plugin.cs:376-380: only "peche" is recognised. ITEMS-PROPOSALS.md:122-127 (I16: "/tensho objet" and "/tensho prix"). docs/evidence/0.318-plugin-gaps.json (GatherBuddy): search by name with /gather = partial.
+
+## C33 — G14 — A single in-game survey session for crafting and gathering, before coding
+
+- **Value**: medium; main file: `docs/project/TESTING.md`.
+- **What the player gets**: A guided session surveys at once, in developer mode, the game values on which several proposals and retained gaps depend. The following versions then move forward without waiting for one survey each.
+- **How, size, dependencies**: Survey screen in developer mode, read-only: copy on the framework thread, guarded by R-14, "Copy" button; results recorded in docs/evidence. The in-game validations stay for step h (user's rule). Size S-M. Dependencies: none. Decision: time of the session (recommended: just before step g, Gathering).
+- **Source**: Surveys requested: K2 (Manipulation unlock), K7 (adjusted level, WKS), K10 (HQ chance shown), K11 (master recipe book read), G2 (statuses of GP actions), G4 (cast), G6 (node type, folklore), G7 (Intuition), G10 (spearfishing); GAPS.md:72 (A-01, CollectablesShopRefine), GAPS.md:95-96 (R-04 PlayerState.FishingBait, R-05 IsFishCaught). ROADMAP.md:85: estimated Bountiful bonus to compare in game.
+
+## C34 — K21 — Today's Grand Company supply and provisioning missions
+
+- **State (reread on 2026-11-05)**: DONE 0.469 (`Items/GcSupplyToday.cs`; triage of 2026-11-05, [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md)).
+- **Value**: low; main file: `src/TenshoAssistant/MainWindow.Reminders.cs`.
+- **What the player gets**: The list of items requested today by your Grand Company (crafters and gatherers), with your stocks and a link to the recipe or the gathering. Handy for levelling.
+- **How, size, dependencies**: Probe first: where the client keeps the day's list after the supply window or the timers is opened (FFXIVClientStructs, to probe), no request triggered by Tensho. Then copy on the framework, guarded by R-14, shown on the Reminders page. Size M. Dependencies: none. Decision: location (recommended: Reminders page).
+- **Source**: No trace in the code or in GAPS.md (search for "approvisionnement" empty; C-14 covers only guildleves, GAPS.md:145). List drawn from the server: readable only after the player opens the window (GAPS.md:45-47).
+
+## C35 — G15 — Fishing help: game reads and first tables outside Draw
+
+- **State (reread on 2026-11-05)**: DONE 0.604.
+- **Value**: low; main file: `src/TenshoAssistant/Plugin.cs`.
+- **What the player gets**: Nothing visible, except no stutter at the first opening of the fishing help or the gathering panel, and a help that stays in line with the project's rules after an update.
+- **How, size, dependencies**: Copy job, territory, position and fishing state on IFramework.Update (like the other readers); build the two tables with the gathering catalog (worker, cache), then read without an Excel sheet. Size S. Probe: none. Decision: none.
+- **Source**: ARCHITECTURE.md:110-116 (known gaps, undecided): fishing help (player, territory, condition at every frame; FishingSpot table built at the first call), Bountiful II base built at the first call. Plugin.cs:195-218 and 222-232. The maintainer's notes (not in the repository), line 9 (nothing massive in Draw).
+
+## C36 — G16 — R-14, crafting and gathering part: an unreadable help says so instead of disappearing
+
+- **State (reread on 2026-11-05)**: DONE 0.601.
+- **Value**: low; main file: `src/TenshoAssistant/Craft/CraftLogReader.Dalamud.cs`.
+- **What the player gets**: After a game update, the crafting log panel, the gathering help or the live synthesis show "unavailable after a game update" in their usual place, and Diagnostics says which read failed. Today, the panel disappears without a word.
+- **How, size, dependencies**: Status per reader (log, synthesis, gathering, fishing) published with the state, short translated message at the panel's location, line in Diagnostics. Size S. Dependencies: full R-14 pass at step g2. Probe: none. Decision: none.
+- **Source**: USER-REQUESTS.md:32 (R-14) and ROADMAP.md:65 (g2). CraftLogReader.Dalamud.cs:83 clears the observation: the panel is no longer shown, the error appears only in the preparation (MainWindow.CraftPlan.cs:188). MainWindow.GatheringPanel.cs:21-22 hides itself on an observation in error. Same approach as MAP-PROPOSALS.md:115 (P15, map part).
+
+---
+
 # Artisanat et récolte : propositions d'amélioration (audit du 2026-11-02, étape e)
 
 Liste établie par un audit multi-agents en lecture seule (0.329). **Rien n'était implémenté** à l'audit (relu le 2026-11-03 : les propositions faites depuis, à l'étape g, portent une ligne « État ») : vous choisissez ce qu'on ajoute

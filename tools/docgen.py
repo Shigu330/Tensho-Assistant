@@ -10,10 +10,12 @@ Three generators, each written between its marks and nowhere else:
             such as « checked on …, version 0.971 » is refused
   settings  docs/project/SETTINGS.md (plan 4.16): every settings control of the code (BoolSetting, IntSetting, SliderSetting,
             ComboSetting, the map's SettingBox), the Configuration property it writes with its type and default, where it is and its
-            label and tooltip in English and French; then the settings of « restore every setting » that no control writes
+            label and tooltip; then the settings of « restore every setting » that no control writes; one block per language
+            (settings in the English half, settings-fr in the French half)
   network   SECURITY.md (English and French): the sources the plugin contacts, from the list NETWORK checked against the code
             (every file that makes a request is in a row, every host it names is a host of a row) and the setting that turns each off
-  decisions docs/project/DECISIONS.md: the index, one row per DEC with its date and problem
+  decisions docs/project/DECISIONS.md: the index, one row per DEC with its date and problem, in each half (decisions-en reads the
+            English entries « ID: DEC-NNN », decisions the French entries « DEC-ID: DEC-NNN »; both halves must list the same DECs)
   evidence  docs/evidence/README.md: one row per evidence file with the tracked files that cite it
 A block is
     <!-- docgen:KEY -->
@@ -453,14 +455,24 @@ def settings_rows():
         key = path or f"({label})"
         tab = tabs.get(label)
         page = file[len("MainWindow."):-3] if file.startswith("MainWindow.") else file
-        title = text_of(en, f"PageHelp.{page}Title")
-        place = f"Settings › {tab}" if tab else f"page {title.strip()}" if title else f"`{file}`"
+        place = (tab, page, file)
         row = rows.setdefault(key, {"path": path, "places": [], "label": label, "tip": tip, "settings": False})
         if place not in row["places"]:
             row["places"].append(place)
         if tab and not row["settings"]:  # the texts of the Settings page win over a page's own copy
             row.update(label=label, tip=tip, settings=True)
     out = []
+
+    def where(lang, code):
+        def one(place):
+            tab, page, file = place
+            if tab:
+                return (f"Settings › {tab}" if code == "en" else
+                        f"{(text_of(lang, 'PageHelp.SettingsTitle') or 'Paramètres').strip()} › "
+                        f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()}")
+            title = text_of(lang, f"PageHelp.{page}Title")
+            return f"page {title.strip()}" if title else f"`{file}`"
+        return one
     for key in sorted(rows, key=str.lower):
         row = rows[key]
         kind, default = (resolve(classes, row["path"]) or ("?", "?")) if row["path"] else ("—", "—")
@@ -469,26 +481,41 @@ def settings_rows():
             label = text_of(lang, row["label"]) or row["label"]
             tip = text_of(lang, row["tip"]) if row["tip"] else None
             return f"**{cell(label)}**" + (f" — {cell(tip)}" if tip else "")
-        out.append((key, kind, default, row["places"], texts(en), texts(fr), bool(row["path"])))
+        places = {"en": [where(en, "en")(p) for p in row["places"]], "fr": [where(fr, "fr")(p) for p in row["places"]]}
+        out.append((key, kind, default, places, texts(en), texts(fr), bool(row["path"])))
     return out
 
 
-def settings_block():
+SETTINGS_WORDS = {
+    "en": ("| Setting | Type | Default | Where | Label and tooltip |",
+           "Settings reset by « Restore every setting » without a control in the interface ({n}): state of the interface, choices "
+           "written by a page or migration marks.",
+           "| Setting | Type | Default |",
+           "Counted: {rows} controls ({linked} linked to `Configuration`, {other} to another file), {hidden} settings without a control."),
+    "fr": ("| Réglage | Type | Défaut | Où | Libellé et info-bulle |",
+           "Réglages remis par « Tout remettre par défaut » sans case dans l'interface ({n}) : état de l'interface, choix "
+           "écrits par une page ou marques de migration.",
+           "| Réglage | Type | Défaut |",
+           "Compté : {rows} cases ({linked} reliées à `Configuration`, {other} à un autre fichier), {hidden} réglages sans case."),
+}
+
+
+def settings_block(code):
+    """The settings inventory in one language (English block « settings », French block « settings-fr »)."""
     rows = settings_rows()
     covered = {row[0].split(".")[0] for row in rows if row[6]}
     classes = declarations()
-    lines = ["| Réglage | Type | Défaut | Où | Libellé et info-bulle (en) | Libellé et info-bulle (fr) |", "|---|---|---|---|---|---|"]
+    head, hidden_line, hidden_head, counted_line = SETTINGS_WORDS[code]
+    lines = [head, "|---|---|---|---|---|"]
     for key, kind, default, places, en, fr, _ in rows:
-        lines.append(f"| `{key}` | {cell(kind)} | {cell(default)} | {cell(' · '.join(places))} | {en} | {fr} |")
+        lines.append(f"| `{key}` | {cell(kind)} | {cell(default)} | {cell(' · '.join(places[code]))} | {en if code == 'en' else fr} |")
     hidden = [name for name in sorted(reset_names(), key=str.lower) if name not in covered]
-    lines += ["", f"Réglages remis par « Tout remettre par défaut » sans case dans l'interface ({len(hidden)}) : état de l'interface, choix "
-              "écrits par une page ou marques de migration.", "", "| Réglage | Type | Défaut |", "|---|---|---|"]
+    lines += ["", hidden_line.format(n=len(hidden)), "", hidden_head, "|---|---|---|"]
     for name in hidden:
         kind, default = resolve(classes, name) or ("?", "?")
         lines.append(f"| `{name}` | {cell(kind)} | {cell(default)} |")
     counted = sum(1 for row in rows if row[6])
-    lines += ["", f"Compté : {len(rows)} cases ({counted} reliées à `Configuration`, {len(rows) - counted} à un autre fichier), "
-              f"{len(hidden)} réglages sans case."]
+    lines += ["", counted_line.format(rows=len(rows), linked=counted, other=len(rows) - counted, hidden=len(hidden))]
     return "\n".join(lines)
 
 
@@ -627,9 +654,21 @@ def decisions():
     return out
 
 
-def decisions_block():
-    rows = ["| DEC | Date | Problème |", "|---|---|---|"]
-    rows += [f"| {dec} | {date} | {cell(problem)} |" for dec, date, problem in decisions()]
+def decisions_en():
+    """[(DEC-NNN, date, problem)] of the English half (entries « ID: DEC-NNN », before the French half)."""
+    text = DECISIONS.read_text(encoding="utf-8").replace("\r\n", "\n")
+    out = []
+    for block in re.finditer(r"^ID: (DEC-\d+)\n(.*?)(?=^ID: |^---$|^DEC-ID: |\Z)", text, re.M | re.S):
+        date = re.search(r"^Timestamp: (\d{4}-\d{2}-\d{2})", block.group(2), re.M)
+        problem = re.search(r"^Problem: (.+)$", block.group(2), re.M)
+        out.append((block.group(1), date.group(1) if date else "?", problem.group(1).strip() if problem else "?"))
+    return out
+
+
+def decisions_block(code="fr"):
+    """The index of the DECs: « decisions » in the French half, « decisions-en » in the English half."""
+    rows = ["| DEC | Date | Problème |" if code == "fr" else "| DEC | Date | Problem |", "|---|---|---|"]
+    rows += [f"| {dec} | {date} | {cell(problem)} |" for dec, date, problem in (decisions() if code == "fr" else decisions_en())]
     return "\n".join(rows)
 
 
@@ -641,6 +680,13 @@ def decisions_problems():
         seen.add(dec)
         if "?" in (date, problem):
             problems.append(f"decisions: {dec} has no Timestamp or no Problem line")
+    french, english = [row[:2] for row in decisions()], [row[:2] for row in decisions_en()]
+    if english != french:  # a translated document changes in both halves (phase 7)
+        missing = [dec for dec, _ in french if dec not in {d for d, _ in english}]
+        problems.append("decisions: the English half of docs/project/DECISIONS.md (« ID: DEC-NNN » entries) does not have the same DECs, "
+                        "dates and order as the French half" + (f"; missing: {', '.join(missing[:5])}" if missing else ""))
+    problems += [f"decisions: {dec} has no Timestamp or no Problem line in the English half" for dec, date, problem in decisions_en()
+                 if "?" in (date, problem)]
     return problems
 
 
@@ -690,9 +736,11 @@ BLOCKS = [
     ("README.md", "pages-fr", lambda: pages_block("fr")),
     ("Localization/README.md", "languages-en", lambda: languages_block("en")),
     ("Localization/README.md", "languages-fr", lambda: languages_block("fr")),
-    ("docs/project/SETTINGS.md", "settings", settings_block),
+    ("docs/project/SETTINGS.md", "settings", lambda: settings_block("en")),
+    ("docs/project/SETTINGS.md", "settings-fr", lambda: settings_block("fr")),
     ("SECURITY.md", "network-en", lambda: network_block("en")),
     ("SECURITY.md", "network-fr", lambda: network_block("fr")),
+    ("docs/project/DECISIONS.md", "decisions-en", lambda: decisions_block("en")),
     ("docs/project/DECISIONS.md", "decisions", decisions_block),
     ("docs/evidence/README.md", "evidence", evidence_block),
 ]
