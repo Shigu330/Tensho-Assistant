@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.983.0
+- Plan global, Verify : Positions (X-111, votre demande : partout où il y a une position, pouvoir placer le drapeau et l'éthérite la plus proche) : Tensho a déjà un menu commun pour ça depuis la 0.704 (clic droit sur une position : drapeau, éthérite la plus proche avec le coût, carte Tensho, météo), présent à 21 endroits. L'inventaire de toutes les pages qui écrivent des coordonnées n'a trouvé qu'un manque : la page des conditions des rangs S (lieu donné par la communauté et ALÉA vus en jeu), qui l'a maintenant. Un test l'exige désormais pour toute page qui écrit des coordonnées. Non validé en jeu.
+- Tests : Positions983Tests. Verify.ps1 (agent) : 1616/1616, 0 avertissement, 0 erreur ; DLL 0.983.0.0. Non validé en jeu.
+### English
+- Positions (X-111, your request: wherever there is a position, be able to place the flag and the nearest aetheryte): Tensho has had a common menu for it since 0.704 (right click on a position: flag, nearest aetheryte with its cost, Tensho map, weather), in 21 places. The inventory of every page writing coordinates found one gap only: the S rank conditions page (the community's place and FATEs seen in game), which now has it. A test now requires it for any page writing coordinates. Not validated in game.
+
 ## 0.982.0
 - Plan global, Verify : Pêche (X-97, votre signalement : les poissons de collection ne semblaient pas pris en compte, vu dans l'aide à la pêche) : sous chaque poisson collectionnable, l'aide à la pêche montre maintenant ses trois paliers de collectabilité, et au survol les assignats de chacun et l'échange concerné, tirés des données du jeu (les mêmes règles que le panneau « Collectionnable » de la récolte). Non validé en jeu.
 - Tests : FishCollectable982Tests. Verify.ps1 (agent) : 1614/1614, 0 avertissement, 0 erreur ; DLL 0.982.0.0. Non validé en jeu.

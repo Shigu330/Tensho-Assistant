@@ -1606,6 +1606,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.982) Aide à la pêche dans un lieu avec un poisson collectionnable : ligne « Collectionnable : … / … / … », survol : assignats de chaque palier.
 
+- [ ] (0.983) Cartes › Conditions des rangs S : clic droit sur le texte d'une condition avec un lieu, ou sur « ALÉA … vu en jeu » : menu avec drapeau et éthérite la plus proche.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

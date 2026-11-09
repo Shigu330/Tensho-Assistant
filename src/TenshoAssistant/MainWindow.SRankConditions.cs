@@ -65,6 +65,14 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,$"{row.Name} · {row.Zone}");
         ImGui.TextWrapped(row.Text);
         var mark=row.Mark;
+        // X-111 (0.983, user request: wherever a position shows, the flag and the nearest aetheryte): the community's place of the condition (« x, y »),
+        // on the mark's zone map, gets the common place menu (right click).
+        if(mark.Place is { } said && SRankConditions.PlaceOf(said) is { } placed && mark.Territory!=0
+           && maps.State.Catalog?.Entries.FirstOrDefault(entry=>entry.TerritoryId==mark.Territory) is { } markMap)
+        {
+            Tip("EntityMenu.RightClickPlace");
+            PlaceMenu($"SRankPlace{mark.Name}",markMap,placed,row.Name);
+        }
         var window=localization.Format("SRank.Window",mark.Minimum,mark.Maximum,mark.MaintenanceMinimum,mark.MaintenanceMaximum);
         ImGui.TextDisabled(mark.Odds switch{SRankOdds.Guaranteed=>window+" · "+localization.Get("SRank.Sure"),SRankOdds.Chance=>window+" · "+localization.Get("SRank.Random"),_=>window});
         // X-91 (0.971, planned in X-75.5, docs/evidence/x91-parsers-check.md): where the condition's FATE was seen in game (yours or shared), from the discoveries.
@@ -75,6 +83,8 @@ internal sealed partial class MainWindow
                     {
                         var at=MapProjection.CoordinateFromWorld(new System.Numerics.Vector3(fact.X,0,fact.Z),seenMap);
                         ImGui.TextDisabled(localization.Format("SRank.FateSeen",DiscoveryFateName(fate.Id),MapProjection.CoordinateNumber(at.X),MapProjection.CoordinateNumber(at.Y),Discoveries.DiscoveryFact.TimesOf(fact)));
+                        Tip("EntityMenu.RightClickPlace");
+                        PlaceMenu($"SRankFate{fate.Id}{fact.CellX}{fact.CellZ}",seenMap,at,DiscoveryFateName(fate.Id));
                     }
     }
 }
