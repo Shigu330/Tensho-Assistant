@@ -24,6 +24,8 @@
     <Compile Include="../../src/TenshoAssistant/Help/*.cs" Link="Help/%(Filename)%(Extension)" />
     <!-- X-119: the desktop application's pure parts (page policy, version check, install paths). -->
     <Compile Include="../../src/TenshoAssistant.Desktop/DesktopPages.cs;../../src/TenshoAssistant.Desktop/DesktopVersionCheck.cs;../../src/TenshoAssistant.Desktop/DesktopPaths.cs" Link="Desktop/%(Filename)%(Extension)" />
+    <!-- X-120: the plugin UI test tool's pure parts (Dalamud and game paths, command line and refusals, report). -->
+    <Compile Include="../../tools/PluginUiTest/src/PluginUiTest.Host/DalamudPaths.cs;../../tools/PluginUiTest/src/PluginUiTest/Options.cs;../../tools/PluginUiTest/src/PluginUiTest/Report.cs" Link="PluginUiTest/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Diagnostics/*.cs" Exclude="../../src/TenshoAssistant/Diagnostics/*.Dalamud.cs" Link="Diagnostics/%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../src/TenshoAssistant/Localization/Languages/*.json" LogicalName="TenshoAssistant.Localization.Languages.%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Caching/*.cs" Exclude="../../src/TenshoAssistant/Caching/*.Dalamud.cs" Link="Caching/%(Filename)%(Extension)" />

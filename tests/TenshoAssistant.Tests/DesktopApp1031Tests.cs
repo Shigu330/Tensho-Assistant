@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using PluginUiTest.Host;
 using TenshoAssistant.Desktop;
 
 // X-119 (plan 4, step 1, R33): the desktop application src/TenshoAssistant.Desktop (was tools/DesktopProbe, X-118). Its pure parts are
@@ -88,10 +89,11 @@ internal static class DesktopApp1031Tests
         }),
         ("Desktop paths: Dalamud and the game read where installed (DALAMUD_HOME, XIVLauncher, launcher GamePath, Steam), languages follow the settings",() =>
         {
-            Check(DesktopPaths.Hooks(null,@"C:\A") == Path.Combine(@"C:\A","XIVLauncher","addon","Hooks","dev") && DesktopPaths.Hooks(@"D:\dalamud",@"C:\A") == @"D:\dalamud","DALAMUD_HOME first, as the plugin build");
-            var sqpack = DesktopPaths.SqpackCandidates(@"E:\given","""{"GamePath":"F:\\FFXIV"}""");
-            Check(sqpack.SequenceEqual([@"E:\given",Path.Combine(@"F:\FFXIV","game","sqpack"),DesktopPaths.SteamSqpack]),"--sqpack, launcher GamePath, Steam: "+string.Join(" | ",sqpack));
-            Check(DesktopPaths.SqpackCandidates(null,"{broken").SequenceEqual([DesktopPaths.SteamSqpack]),"a broken launcher file leaves Steam's folder");
+            // X-120: the generic paths moved to the plugin UI test tool's library (DalamudPaths), used by the app.
+            Check(DalamudPaths.Hooks(null,@"C:\A") == Path.Combine(@"C:\A","XIVLauncher","addon","Hooks","dev") && DalamudPaths.Hooks(@"D:\dalamud",@"C:\A") == @"D:\dalamud","DALAMUD_HOME first, as the plugin build");
+            var sqpack = DalamudPaths.SqpackCandidates(@"E:\given","""{"GamePath":"F:\\FFXIV"}""");
+            Check(sqpack.SequenceEqual([@"E:\given",Path.Combine(@"F:\FFXIV","game","sqpack"),DalamudPaths.SteamSqpack]),"--sqpack, launcher GamePath, Steam: "+string.Join(" | ",sqpack));
+            Check(DalamudPaths.SqpackCandidates(null,"{broken").SequenceEqual([DalamudPaths.SteamSqpack]),"a broken launcher file leaves Steam's folder");
             Check(DesktopPaths.TextLanguage("FR ","en") == "fr" && DesktopPaths.TextLanguage(null,"de") == "de","saved language first, then Windows");
             Check(DesktopPaths.GameLanguage("fr") == "French" && DesktopPaths.GameLanguage("ja") == "Japanese" && DesktopPaths.GameLanguage("es") == "English","game data language");
             Check(DesktopPaths.PluginConfig(@"C:\A").EndsWith(Path.Combine("pluginConfigs","TenshoAssistant.json"),StringComparison.Ordinal),"the plugin's saved settings");
@@ -113,8 +115,8 @@ internal static class DesktopApp1031Tests
             Check(Regex.Matches(release,@"\$desktopZip").Count >= 4 && release.Contains("Assert-DesktopZip",StringComparison.Ordinal),"the GitHub release carries the app next to latest.zip, checked first (normal and resumed)");
             var program = Read("src/TenshoAssistant.Desktop/Program.cs");
             Check(program.Contains("FreeConsole()",StringComparison.Ordinal) && program.Contains("internal const int Skip=4;",StringComparison.Ordinal),"double-click frees the console; skip code for Verify");
-            var rewrite = Read("src/TenshoAssistant.Desktop/Rewrite.cs");
-            Check(rewrite.Contains("TEMPORARY (X-119 step 1)",StringComparison.Ordinal) && rewrite.Contains("LOCALAPPDATA",StringComparison.Ordinal),"the IconFont rewrite is temporary and outside the repository");
+            // X-120: the rewrite itself moved to tools/PluginUiTest (generic); the app's use of it stays marked temporary, its copy outside the repository.
+            Check(program.Contains("TEMPORARY (X-119 step 1)",StringComparison.Ordinal) && program.Contains("LOCALAPPDATA",StringComparison.Ordinal) && program.Contains("Rewrite.Plugin(",StringComparison.Ordinal),"the IconFont rewrite is temporary and outside the repository");
         }),
     ];
 }

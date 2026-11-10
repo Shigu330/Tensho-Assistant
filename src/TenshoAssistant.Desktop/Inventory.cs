@@ -1,6 +1,7 @@
 using System.Text;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using PluginUiTest.Host;
 
 /// <summary>
 /// --inventory: per page, what of Dalamud its draw code can reach, read from the built plugin's IL (Mono.Cecil, from the installed Dalamud).
@@ -8,6 +9,7 @@ using Mono.Cecil.Cil;
 /// call graph is followed through the plugin's own code (calls, delegates, lambdas, async and iterator state machines); every member of
 /// Dalamud (except its ImGui bindings) and of FFXIVClientStructs met on the way is kept, grouped by type. Virtual calls through the plugin's
 /// own interfaces are not followed (none of the pages' services are interfaces). "Can reach" is an upper bound: a branch may never run.
+/// The walk is PluginUiTest.Host's CallGraph (X-120).
 /// </summary>
 internal static class Inventory
 {
@@ -88,23 +90,12 @@ internal static class Inventory
 
     public static List<(string Page,SortedDictionary<string,SortedSet<string>> Reached)> Rows=[];
 
+    /// <summary>The walk itself is PluginUiTest.Host's CallGraph (moved there in X-120): inside the plugin's module, stopping at the other
+    /// pages' draw methods and at the game-link types (kept by name).</summary>
     private static (SortedDictionary<string,SortedSet<string>>,int) Reach(MethodDefinition start,ModuleDefinition module,HashSet<MethodDefinition> draws,HashSet<string> linkTypes)
     {
         var reached=new SortedDictionary<string,SortedSet<string>>(StringComparer.Ordinal);
-        var seen=new HashSet<MethodDefinition>();var queue=new Queue<MethodDefinition>();
         static TypeDefinition Outer(TypeDefinition type){while(type.IsNested)type=type.DeclaringType;return type;}
-        void Visit(MethodDefinition? method)
-        {
-            if(method is null || method.Module!=module || (method!=start && draws.Contains(method)))return;
-            var owner=Outer(method.DeclaringType).Name.Split('`')[0];
-            if(linkTypes.Contains(owner))
-            {
-                if(!reached.TryGetValue("link:"+owner,out var calls))reached["link:"+owner]=calls=new(StringComparer.Ordinal);
-                calls.Add(method.Name.Replace("get_","").Replace("set_",""));
-                return;
-            }
-            if(seen.Add(method))queue.Enqueue(method);
-        }
         void Keep(MemberReference member)
         {
             var type=member.DeclaringType;
@@ -117,35 +108,30 @@ internal static class Inventory
             if(!reached.TryGetValue(name,out var members))reached[name]=members=new(StringComparer.Ordinal);
             members.Add(member.Name.Replace("get_","").Replace("set_",""));
         }
-        Visit(start);
-        while(queue.TryDequeue(out var method))
+        var graph=new CallGraph(method=>method.Module==module && (method==start || !draws.Contains(method)))
         {
-            // Async and iterator methods: their body is the state machine's MoveNext.
-            foreach(var attribute in method.CustomAttributes.Where(a=>a.AttributeType.Name is "AsyncStateMachineAttribute" or "IteratorStateMachineAttribute"))
-                if(attribute.ConstructorArguments[0].Value is TypeReference machine)Visit(machine.Resolve()?.Methods.FirstOrDefault(m=>m.Name=="MoveNext"));
-            if(!method.HasBody)continue;
-            foreach(var instruction in method.Body.Instructions)
-                switch(instruction.Operand)
-                {
-                    case MethodReference called:
-                        if(Resolve(called) is { } definition && definition.Module==module)Visit(definition);
-                        else Keep(called);
-                        break;
-                    case FieldReference field:
-                        if(Owner(field.DeclaringType)!=module)Keep(field);
-                        break;
-                }
-        }
-        return (reached,seen.Count);
-    }
-
-    private static MethodDefinition? Resolve(MethodReference method)
-    {
-        try{return method.Resolve();}catch{return null;}
-    }
-
-    private static ModuleDefinition? Owner(TypeReference type)
-    {
-        try{return type.Resolve()?.Module;}catch{return null;}
+            Enter=method=>
+            {
+                var owner=Outer(method.DeclaringType).Name.Split('`')[0];
+                if(!linkTypes.Contains(owner))return true;
+                if(!reached.TryGetValue("link:"+owner,out var calls))reached["link:"+owner]=calls=new(StringComparer.Ordinal);
+                calls.Add(method.Name.Replace("get_","").Replace("set_",""));
+                return false;
+            },
+        };
+        var count=graph.Walk(start,(_,instruction)=>
+        {
+            switch(instruction.Operand)
+            {
+                case MethodReference called when CallGraph.Resolve(called) is not { } definition || definition.Module!=module:
+                    Keep(called);
+                    break;
+                case FieldReference field when CallGraph.Owner(field.DeclaringType)!=module:
+                    Keep(field);
+                    break;
+            }
+            return false;
+        });
+        return (reached,count);
     }
 }

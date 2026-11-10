@@ -187,7 +187,8 @@ try {
     $taskDesktopArchive = [IO.Compression.ZipFile]::OpenRead($taskDesktopZip)
     try {
         $taskDesktopEntries = @($taskDesktopArchive.Entries | ForEach-Object { $_.FullName })
-        foreach ($taskRequired in @('TenshoAssistant.Desktop.exe', 'TenshoAssistant.Desktop.dll', 'TenshoAssistant.Desktop.runtimeconfig.json', 'hostfxr.dll', 'hostpolicy.dll', 'System.Private.CoreLib.dll',
+        # X-120: PluginUiTest.Host.dll is our own library (the generic part of drawing a plugin without the game, tools/PluginUiTest).
+        foreach ($taskRequired in @('TenshoAssistant.Desktop.exe', 'TenshoAssistant.Desktop.dll', 'TenshoAssistant.Desktop.runtimeconfig.json', 'PluginUiTest.Host.dll', 'hostfxr.dll', 'hostpolicy.dll', 'System.Private.CoreLib.dll',
                 'plugin/TenshoAssistant.dll', 'plugin/TenshoAssistant.json', 'plugin/Raphael.Net.dll', 'plugin/raphael_bindings.dll')) {
             if ($taskRequired -notin $taskDesktopEntries) { throw "TenshoAssistant.Desktop.zip misses $taskRequired." }
         }

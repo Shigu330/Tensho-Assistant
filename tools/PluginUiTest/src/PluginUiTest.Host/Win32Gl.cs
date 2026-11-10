@@ -2,12 +2,15 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Dalamud.Bindings.ImGui;
 
+namespace PluginUiTest.Host;
+
 /// <summary>
 /// A plain Win32 window with an OpenGL 1.1 context (opengl32.dll, gdi32.dll and user32.dll ship with Windows: no package, no download)
 /// and an ImGui renderer in the fixed pipeline, as Dear ImGui's own OpenGL 2 example backend does (written here, not copied): textured
 /// triangles with a scissor per draw command. Input: mouse, wheel, characters and the editing keys, enough for the plugin's pages.
+/// Moved from src/TenshoAssistant.Desktop in X-120 (generic: no plugin code in it).
 /// </summary>
-internal sealed unsafe class Win32Gl:IDisposable
+public sealed unsafe class Win32Gl:IDisposable
 {
     public IntPtr Hwnd { get; private set; }
     public bool Closed { get; private set; }
@@ -19,7 +22,7 @@ internal sealed unsafe class Win32Gl:IDisposable
     {
         proc=Procedure;
         var instance=GetModuleHandleW(null);
-        var name="TenshoDesktopProbe";
+        var name="PluginUiTestHostWindow";
         var cls=new WNDCLASSEXW{cbSize=(uint)Marshal.SizeOf<WNDCLASSEXW>(),style=0x20 /*CS_OWNDC*/,lpfnWndProc=Marshal.GetFunctionPointerForDelegate(proc),hInstance=instance,
             hCursor=LoadCursorW(IntPtr.Zero,32512),lpszClassName=name};
         if(RegisterClassExW(ref cls)==0 && Marshal.GetLastWin32Error()!=1410)throw new InvalidOperationException("RegisterClassEx failed");

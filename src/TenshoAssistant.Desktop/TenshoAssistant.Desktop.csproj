@@ -27,4 +27,9 @@
     <Reference Include="Newtonsoft.Json"><HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="System.Reflection.MetadataLoadContext"><HintPath>$(DalamudLibPath)System.Reflection.MetadataLoadContext.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
+  <ItemGroup>
+    <!-- X-120: the generic part (Dalamud and game paths, run-time resolution, service stand-ins, headless ImGui, font rewrite, IL call graph,
+         Win32 + OpenGL window) lives in the plugin UI test tool's library; its own DLL (PluginUiTest.Host.dll) ships with the app. -->
+    <ProjectReference Include="..\..\tools\PluginUiTest\src\PluginUiTest.Host\PluginUiTest.Host.csproj" />
+  </ItemGroup>
 </Project>

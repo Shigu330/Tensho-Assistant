@@ -14,19 +14,21 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Loader;
+using PluginUiTest.Host;
 using TenshoAssistant.Desktop;
 
 internal static class Program
 {
     private static readonly string AppData=Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    internal static readonly string Hooks=DesktopPaths.Hooks(Environment.GetEnvironmentVariable("DALAMUD_HOME"),AppData);
+    internal static readonly string Hooks=DalamudPaths.Hooks(Environment.GetEnvironmentVariable("DALAMUD_HOME"),AppData);
     internal static readonly string Own=DesktopPaths.Own(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-    internal static readonly string FontFolder=DesktopPaths.Fonts(AppData);
+    internal static readonly string FontFolder=DalamudPaths.Fonts(AppData);
     /// <summary>The folder of the plugin copy the app runs (set once the copy is made; the resolvers read it).</summary>
     internal static string? PluginFolder;
     internal static readonly Version AppVersion=typeof(Program).Assembly.GetName().Version ?? new Version(0,0,0);
     internal static string? Option(string[] args,string prefix)=>args.FirstOrDefault(a=>a.StartsWith(prefix,StringComparison.Ordinal))?[prefix.Length..];
+    /// <summary>The plugin's own files the copy carries beside the DLL (as in latest.zip).</summary>
+    internal static readonly string[] PluginSiblings=["Raphael.Net.dll","raphael_bindings.dll","TenshoAssistant.json"];
     /// <summary>Exit code of a run that could not happen here (no Dalamud install or no game data): Verify.ps1 prints SKIP, -Release refuses it.</summary>
     internal const int Skip=4;
 
@@ -52,24 +54,9 @@ internal static class Program
         if(!diagnostic && GetConsoleProcessList(new uint[2],2)==1)FreeConsole();
         if(!File.Exists(Path.Combine(Hooks,"Dalamud.Bindings.ImGui.dll")) || !File.Exists(Path.Combine(Hooks,"cimgui.dll")))
             return Stop(diagnostic,Skip,$"SKIP desktop: no Dalamud install in {Hooks} (XIVLauncher with Dalamud is needed: the app reads Dalamud's ImGui and Lumina there, nothing is shipped).");
-        AssemblyLoadContext.Default.Resolving+=(context,name)=>
-        {
-            foreach(var dir in new[]{Hooks,PluginFolder})
-            {
-                if(dir is null)continue;
-                var path=Path.Combine(dir,name.Name+".dll");
-                if(File.Exists(path))return context.LoadFromAssemblyPath(path);
-            }
-            return null;
-        };
-        // cimgui.dll (Dalamud's native ImGui build) is loaded from the installed Dalamud, never copied (R05); raphael_bindings.dll from the plugin copy.
-        AssemblyLoadContext.Default.ResolvingUnmanagedDll+=(_,name)=>
-        {
-            var file=name.EndsWith(".dll",StringComparison.OrdinalIgnoreCase) ? name : name+".dll";
-            foreach(var dir in new[]{Hooks,PluginFolder})
-                if(dir is not null && File.Exists(Path.Combine(dir,file)))return NativeLibrary.Load(Path.Combine(dir,file));
-            return IntPtr.Zero;
-        };
+        // Dalamud's assemblies and cimgui.dll (Dalamud's native ImGui build) from the installed Dalamud, never copied (R05); the plugin's
+        // own files (raphael_bindings.dll) from the plugin copy (PluginUiTest.Host's DalamudRuntime, X-120).
+        DalamudRuntime.Install(Hooks,()=>[PluginFolder]);
         try{return Run(args,diagnostic);}
         catch(Exception error) when(!diagnostic)
         {
@@ -93,9 +80,9 @@ internal static class Program
         var plugin=PluginPath(args);
         if(plugin is null || !File.Exists(plugin))return Stop(diagnostic,1,$"FAIL plugin not found: {plugin ?? "plugin\\TenshoAssistant.dll next to the app, or src/TenshoAssistant/bin/x64/Release"} (run .\\scripts\\Verify.ps1 once)");
         if(args.Contains("--inventory"))return Inventory.Run(plugin,Option(args,"--inventory-out="));
-        var launcher=DesktopPaths.XivLauncher(AppData);
+        var launcher=DalamudPaths.XivLauncher(AppData);
         var given=Option(args,"--sqpack=");
-        var candidates=DesktopPaths.SqpackCandidates(given,ReadText(Path.Combine(launcher,"launcherConfigV3.json")));
+        var candidates=DalamudPaths.SqpackCandidates(given,ReadText(Path.Combine(launcher,"launcherConfigV3.json")));
         var sqpack=candidates.FirstOrDefault(Directory.Exists);
         if(given is not null && !Directory.Exists(given))return Stop(diagnostic,1,$"FAIL --sqpack={given}: no such folder");
         if(sqpack is null)return Stop(diagnostic,Skip,$"SKIP desktop: no game data found (tried {string.Join("; ",candidates)}); install the game or pass --sqpack=<game\\sqpack folder>.");
@@ -108,7 +95,12 @@ internal static class Program
         var headless=args.Contains("--headless");
         var (w,h,pixels)=StartUi(headless,out var window);
         Console.WriteLine($"PASS imgui: Dalamud.Bindings.ImGui {typeof(Dalamud.Bindings.ImGui.ImGui).Assembly.GetName().Version}, Dear ImGui {Dalamud.Bindings.ImGui.ImGui.GetVersion()}, font atlas {w}x{h}{(window is null ? "" : ", "+window.GlInfo)}");
-        var copy=Rewrite.Plugin(plugin,Path.Combine(Own,"plugin"));
+        // TEMPORARY (X-119 step 1): Dalamud's font statics block outside the game; the plugin is copied to %LOCALAPPDATA%\TenshoAssistant\Desktop\plugin
+        // (never the repository nor the installed plugin) and those calls are pointed at the desktop atlas (PluginUiTest.Host's Rewrite). For
+        // Tensho this is replaced by a real seam in the plugin after the post-7.58 release (the fonts read from one property of the plugin's UI
+        // components, set by Plugin.cs from UiBuilder and by this app from its atlas; a ratchet test forbids new direct uses). Until then the
+        // plugin's source is not changed (frozen until Dalamud is ready for 7.58).
+        var copy=Rewrite.Plugin(plugin,Path.Combine(Own,"plugin"),Hooks,AppVersion.ToString(),PluginSiblings);
         PluginFolder=Path.GetDirectoryName(copy);
         Console.WriteLine($"PASS fonts: Dalamud font statics pointed at the desktop atlas in a copy of the plugin ({PluginFolder}): {string.Join(", ",Rewrite.Sites.Select(p=>$"{p.Key} {p.Value} sites"))}");
         var settings=args.Contains("--new-settings") ? null : DesktopPaths.PluginConfig(AppData);
@@ -130,12 +122,12 @@ internal static class Program
     private static unsafe (int,int,IntPtr) StartUi(bool headless,out Win32Gl? window)
     {
         window=headless ? null : new Win32Gl($"Tensho Assistant {DesktopVersionCheck.Three(AppVersion)}",1280,860,true);
-        var (w,h,pixels)=Ui.Start(17f);
-        if(window is null){Ui.SetFontTexture(1);Host.Upload=null;}
+        var (w,h,pixels)=ImGuiHeadless.Start(17f,FontFolder);
+        if(window is null){ImGuiHeadless.SetFontTexture(1);GameIcons.Upload=null;}
         else
         {
-            Ui.SetFontTexture(Win32Gl.Texture(w,h,(byte*)pixels,false));
-            Host.Upload=(width,height,bytes)=>Win32Gl.Texture(width,height,bytes.Pointer,true);
+            ImGuiHeadless.SetFontTexture(Win32Gl.Texture(w,h,(byte*)pixels,false));
+            GameIcons.Upload=(width,height,bytes)=>Win32Gl.Texture(width,height,bytes.Pointer,true);
         }
         return (w,h,pixels);
     }
