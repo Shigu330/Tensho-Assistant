@@ -1668,6 +1668,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1012) Rien à essayer en jeu : texte de l'avertissement « Connecter GitHub » (Monde › Découvertes) qui mentionne CC0-1.0.
 
+- [ ] (0.1014) Accueil, « Tous les outils » : chaque page a sa ligne (Champs de Bozja et Eurêka, Lexique, Île, Jardin, etc.), « Ouvrir » mène à la page, « Détails » montre son but ; les anciennes lignes (Craftimizer, Banque, Item Use) ouvrent toujours leur onglet
+
+- [ ] (0.1014) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : liste des outils de l'accueil : une ligne par page qui n'en avait pas ; visite du guide inchangée (D-132), 34 pages hors visite avec leur raison
+
+- [ ] (0.1015) Aide, « Questions fréquentes » : 15 questions en français (puis en anglais après changement de langue) ; taper « dépôt » ou « langue » dans la recherche de l'Aide ne garde que les questions qui en parlent ; « Comment changer la langue ? » montre un bouton « Ouvrir cette page » qui mène aux Paramètres ; une recherche sans réponse dit « Aucune question pour cette recherche. »
+
+- [ ] (0.1031) Application de bureau, jeu fermé : décompresser TenshoAssistant.Desktop.zip (ou ouvrir src/TenshoAssistant.Desktop/bin/package) et lancer TenshoAssistant.Desktop.exe par un double-clic, sans rien installer : la fenêtre s'ouvre sans console, les catalogues se chargent (« Lecture des données du jeu : N catalogues prêts sur 12 »)
+
+- [ ] (0.1031) Application de bureau : la barre d'état en bas dit « Tensho Assistant bureau 0.1031.0 · Plugin installé : même version (0.1031.0) » quand le plugin installé est de la même release, sinon les deux numéros
+
+- [ ] (0.1031) Application de bureau : page Météo, Hautes terres du Coerthas central : 12 périodes avec leurs icônes, barre d'état « Jeu non relié : les parties en direct de cette page (alarmes) restent vides ; les actions sont coupées »
+
+- [ ] (0.1031) Application de bureau : une page qui a besoin du jeu (Objets ou Rangements) montre sa barre d'état « Jeu non relié » avec ses parties en direct ; une page telle quelle (Lexique) n'en montre pas ; la Carte n'est pas dans la navigation et la tuile Carte de l'accueil ramène à l'accueil avec « « Carte » reste dans le jeu »
+
+- [ ] (0.1032) Application de bureau après le déplacement de son code commun dans PluginUiTest.Host : TenshoAssistant.Desktop.exe s'ouvre toujours par un double-clic, page Météo avec ses icônes, barre d'état avec la version 0.1032.0
+
+- [ ] (0.1033) Application de bureau 0.1033 : la barre d'état a une ligne de mise à jour (boutons « Mise à jour automatique : active », « Chercher une mise à jour » ; texte « cette application est en 0.1033.0, la version du plugin installé » ou « pas encore de release ») ; un clic sur « Mise à jour automatique » la coupe et le garde au démarrage suivant
+
+- [ ] (0.1033) Après la première release qui porte l'application : une application plus ancienne lancée se met à jour seule vers la version du plugin installé (téléchargement, puis ouverture au démarrage suivant ou sur « Redémarrer maintenant ») ; « Version d'avant » revient à la précédente
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

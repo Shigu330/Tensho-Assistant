@@ -62,7 +62,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.315-vessel-builds.md](0.315-vessel-builds.md) | `src/TenshoAssistant/FreeCompany/VesselBuilds.cs`, `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/Program.cs`, `tests/TenshoAssistant.Tests/Sectors334Tests.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.318-plugin-gaps.json](0.318-plugin-gaps.json) | — | `CHANGELOG.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/DECISIONS.md`, `docs/project/GAPS.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.320-credits.json](0.320-credits.json) | `src/TenshoAssistant/Credits/CreditCatalog.cs` | `CHANGELOG.md` |
-| [0.332-squadron-probe.md](0.332-squadron-probe.md) | `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/SquadronTests.cs` | `CHANGELOG.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
+| [0.332-squadron-probe.md](0.332-squadron-probe.md) | `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/SquadronTests.cs` | `CHANGELOG.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.332-uld-window-frame.md](0.332-uld-window-frame.md) | `tools/README.md` | `CHANGELOG.md` |
 | [0.333-ehcatl-probe.md](0.333-ehcatl-probe.md) | — | `CHANGELOG.md` |
 | [0.335-submarine-tiers.md](0.335-submarine-tiers.md) | `tests/TenshoAssistant.Tests/Routes335Tests.cs` | `CHANGELOG.md` |
@@ -265,7 +265,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x76-9-comparison.md](x76-9-comparison.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [x93-load-test.md](x93-load-test.md) | `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md` | — |
+| [x93-load-test.md](x93-load-test.md) | `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
 
 Counted · compté : 259 files · fichiers ; 192 cited by the code or the tests · citées par le code ou les tests ; 11 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
