@@ -9,9 +9,10 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 |---|---|---|
 | [0.1004-discoveries-check.md](0.1004-discoveries-check.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs` | `CHANGELOG.md` |
 | [0.1006-submarine-functions.md](0.1006-submarine-functions.md) | `src/TenshoAssistant/FreeCompany/SubmarineVoyageProbe.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING-ROUTE.md`, `repo.json` |
-| [0.1009-dalamud-api16-watch.md](0.1009-dalamud-api16-watch.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `repo.json` |
+| [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING-ROUTE.md` |
+| [0.1009-dalamud-api16-watch.md](0.1009-dalamud-api16-watch.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.103.0-maps-probe.log](0.103.0-maps-probe.log) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `CHANGELOG.md` |
+| [0.1038-game-font-glyphs.md](0.1038-game-font-glyphs.md) | `tools/README.md` | — |
 | [0.105.0-zones-probe.log](0.105.0-zones-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `CHANGELOG.md` |
 | [0.107.0-aetheryte-probe.log](0.107.0-aetheryte-probe.log) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `CHANGELOG.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.114.0-local-probe.log](0.114.0-local-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `CHANGELOG.md` |
@@ -267,5 +268,5 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
 
-Counted · compté : 259 files · fichiers ; 192 cited by the code or the tests · citées par le code ou les tests ; 11 cited nowhere · citées nulle part.
+Counted · compté : 260 files · fichiers ; 193 cited by the code or the tests · citées par le code ou les tests ; 11 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using TenshoAssistant.FreeCompany;
 
 namespace TenshoAssistant;
@@ -164,7 +165,13 @@ internal sealed partial class MainWindow
             ImGui.TableNextColumn();ImGui.TextDisabled(now);
             ImGui.TableNextColumn();ImGui.TextColored(problem ? Error:Text,later);
             ImGui.TableNextColumn();
-            if(problem)ImGui.TextColored(Error,localization.Get("VesselBuilds.Problem"));
+            // 0.1038: the warning sign is missing from the game font (it showed « = »): the icon font's one.
+            if(problem)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                try{ImGui.TextColored(Error,FontAwesomeIcon.ExclamationTriangle.ToIconString());}
+                finally{ImGui.PopFont();}
+            }
         }
     }
 

@@ -22,7 +22,7 @@ A check mark: the game confirms it; a cross: it says no; a question mark: it has
 
 ## How do I change the language?
 
-Settings › Interface › Language. English and French are complete; in another language, a text not translated yet shows in English. Game data (item, place and quest names) stays in the game client's language.
+Settings › General › Language. English and French are complete; in another language, a text not translated yet shows in English. Game data (item, place and quest names) stays in the game client's language.
 
 ## What goes on the Internet?
 
@@ -96,7 +96,7 @@ Une coche : le jeu le confirme ; une croix : il dit non ; un point d'interrogati
 
 ## Comment changer la langue ?
 
-Paramètres › Interface › Langue. L'anglais et le français sont complets ; dans une autre langue, un texte pas encore traduit s'affiche en anglais. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
+Paramètres › Général › Langue. L'anglais et le français sont complets ; dans une autre langue, un texte pas encore traduit s'affiche en anglais. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
 
 ## Qu'est-ce qui part sur Internet ?
 

@@ -261,7 +261,8 @@ internal sealed partial class MainWindow
                 _=>null
             };
             ImGui.TextWrapped(detailKey is null ? ToolText(tool.Description) : localization.Get("ToolDetails."+detailKey));
-            if(developerMode)ImGui.TextDisabled(tool.Reference);
+            // 0.1038 (night test T-0.1014-1): « Tensho: Lexicon » showed in English; the reference line is a translated text.
+            if(developerMode)ImGui.TextDisabled(tool.Reference.StartsWith("Tensho: ",StringComparison.Ordinal) ? localization.Get("ToolDetails.OwnTool"):localization.Format("ToolDetails.Reference",tool.Reference));
             if(tool.Reference=="Item Use")DrawItemUsePreview();
             if(tool.Reference=="Craftimizer")
             {

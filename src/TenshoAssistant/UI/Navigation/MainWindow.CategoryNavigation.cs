@@ -15,13 +15,14 @@ internal sealed partial class MainWindow
     }
 
     // One sidebar category: a header that folds its entries (state kept in the configuration); a folded category holding the
-    // current page shows its header highlighted.
+    // current page shows its header highlighted. 0.1038 (night test T-0.912-1): the title takes the theme's text colour, not the muted one,
+    // which the thin TrumpGothic strokes made almost invisible in the light theme.
     private bool NavigationCategory(string key,params Page[] pages)
     {
         var collapsed=configuration.NavigationCollapsed?.Contains(key)==true;
         ImGui.Spacing();
         var holdsPage=pages.Contains(NavigationPage(page));
-        ImGui.PushStyleColor(ImGuiCol.Text,collapsed && holdsPage ? Accent:Muted);
+        ImGui.PushStyleColor(ImGuiCol.Text,collapsed && holdsPage ? Accent:Text);
         bool clicked;
         try
         {

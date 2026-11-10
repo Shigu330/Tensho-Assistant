@@ -98,7 +98,7 @@ internal sealed class ItemContextMenuBridge : IDisposable
                         {
                             Name=new SeStringBuilder().AddText(label).Build(),PrefixChar='T',IsSubmenu=true,
                             OnClicked=group=>group.OpenSubmenu(lines.SelectMany(line=>line.Flag is { } flag
-                                ? new IMenuItem[]{Action(line.Text.Trim(),line.Open),Action("  ↳ "+localization.Get("SourceLinks.Flag"),flag)}
+                                ? new IMenuItem[]{Action(line.Text.Trim(),line.Open),Action("  → "+localization.Get("SourceLinks.Flag"),flag)}
                                 :[Action(line.Text.Trim(),line.Open)]).ToArray()),
                         });
                     // 0.349 (g, X-07): the item on the wiki and the Lodestone, opened in the browser on this click.

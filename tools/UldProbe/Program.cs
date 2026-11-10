@@ -7,6 +7,22 @@ using Lumina.Data.Files;
 // uses. The plugin may only load paths this probe proved (project rule: never invent game data).
 if(args.Length<1)throw new ArgumentException("Supply the installed game's sqpack directory.");
 using var data=new GameData(args[0]);
+// 0.1038: --fdt game-path: the characters a game font (.fdt) has a glyph for, one code point per line (U+XXXX). Dalamud's default
+// font and Tensho's game fonts are the game's AXIS family, so a text character missing here shows as the fallback mark.
+if(args.Length>2 && args[1]=="--fdt")
+{
+    var bytes=data.GetFile(args[2])!.Data;
+    var table=BitConverter.ToInt32(bytes,0x08);
+    var count=BitConverter.ToInt32(bytes,table+0x04);
+    for(var index=0;index<count;index++)
+    {
+        var packed=BitConverter.ToUInt32(bytes,table+0x20+index*0x10);
+        var utf8=BitConverter.GetBytes(packed).Reverse().SkipWhile(value=>value==0).ToArray();
+        var text=System.Text.Encoding.UTF8.GetString(utf8);
+        if(text.Length>0)Console.WriteLine($"U+{char.ConvertToUtf32(text,0):X4}");
+    }
+    return;
+}
 // --parts layout texture-prefix: the parts (U, V, width, height) the game cuts from those textures in that layout.
 if(args.Length>3 && args[1]=="--parts")
 {

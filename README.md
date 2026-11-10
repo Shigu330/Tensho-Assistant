@@ -65,7 +65,7 @@ and the help text of each page (the « ? » beside its title):
 | References | **Lexicon** | Find a word of the game in French and in English: items, actions, places, monsters, quests and the interface's own words. |
 |  | **Help** | All of Tensho's help: search it, read the frequent questions, or open a page. The « ? » beside the title explains the page you are on. |
 |  | **Credits** | Who Tensho owes its data and libraries to, with their licences. |
-| Preferences | **Settings** | All of Tensho's options, grouped by domain. Each has a tooltip, and ↺ puts it back to its default. |
+| Preferences | **Settings** | All of Tensho's options, grouped by domain. Each has a tooltip, and the reset button (curved arrow) next to a changed option puts it back to its default. |
 |  | **Diagnostics** *(developer mode only)* | For checks and bug reports, in developer mode: what is loaded, what Tensho read, draw times, and the self-check. |
 <!-- /docgen:pages-en -->
 
@@ -522,7 +522,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Références | **Lexique** | Trouver un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface. |
 |  | **Aide** | Toute l'aide de Tensho : cherchez-y, lisez les questions fréquentes ou ouvrez une page. Le « ? » à côté du titre explique la page où vous êtes. |
 |  | **Crédits** | À qui Tensho doit ses données et ses bibliothèques, avec leurs licences. |
-| Préférences | **Paramètres** | Toutes les options de Tensho, groupées par domaine. Chacune a son infobulle, et ↺ la remet par défaut. |
+| Préférences | **Paramètres** | Toutes les options de Tensho, groupées par domaine. Chacune a son infobulle, et le bouton de retour au défaut (flèche courbe), à côté d'une option changée, la remet par défaut. |
 |  | **Diagnostics** *(mode développeur seulement)* | Pour les vérifications et les rapports de bug, en mode développeur : ce qui est chargé, ce que Tensho a lu, les temps d'affichage et l'auto-contrôle. |
 <!-- /docgen:pages-fr -->
 

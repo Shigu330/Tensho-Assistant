@@ -330,7 +330,8 @@ internal sealed partial class MainWindow : Window, IDisposable
                     if(entry.Visible?.Invoke()!=false)Navigation(entry.Label!(),entry.Page);
         ImGui.Spacing();
         ImGui.Separator();
-        using (TenshoAssistant.UI.UiComponents.PushSectionFont()) ImGui.TextDisabled(localization.Get("Navigation.ContextItem"));
+        // 0.1038 (T-0.912-1): the theme's text colour, readable in the light theme too.
+        using (TenshoAssistant.UI.UiComponents.PushSectionFont()) ImGui.TextColored(Text,localization.Get("Navigation.ContextItem"));
         if (SelectedItem is { } selected)
         {
             DrawItemIcon(selected, new Vector2(32));
