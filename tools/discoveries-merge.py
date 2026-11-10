@@ -9,6 +9,10 @@ Usage:
       Rebuilds discoveries.json from community-discoveries/players/*.json.
   python tools/discoveries-merge.py check <file.json|file.zip|gist:ID>
       Validates one file and prints its report, without writing.
+  python tools/discoveries-merge.py recheck [--changes FILE] [--local] [--limit N]
+      X-116: the facts « to recheck » after a game patch: seen last before the patch day, in a zone or a 50-yalm cell (or next to one) that the
+      client comparison says changed (tools/client-snapshot.py patch writes changes-from-<old>.json; the latest one by default), or about an NPC
+      or FATE the patch moved or removed. Read-only; --local adds this PC's own Discoveries.json. `sync --dry-run` ends with it.
   python tools/discoveries-merge.py notice <issue> merged <version> <facts> [--dry-run]
   python tools/discoveries-merge.py notice <issue> flag <refused> <total> [--dry-run]
       Comments the ticket in English then French (tools/bilingual.py): facts merged into a version, or a share not merged because over 5 % of
@@ -22,8 +26,10 @@ brought to the day. Shared discoveries are published under CC0-1.0 (community-di
 X-76 E1 (0.916, docs/evidence/0.916-discoveries-format.md): files of version 1 and 2 are read, the common file is written as version 2. Version 2 adds two
 optional fields: Hq (how many sightings were HQ) and Values (value seen -> count, at most 32 values, ValueCounts in the plugin); the common file holds their
 sums over the players (a new value past 32 is counted under the nearest value kept, the lower one on a tie). ImportedHq and ImportedValues (what the player
-imported, never shared by the plugin) are accepted and dropped."""
-import base64,collections,gzip,json,math,os,re,subprocess,sys,urllib.request,zipfile
+imported, never shared by the plugin) are accepted and dropped.
+X-113 (0.1029): a ticket whose gist brings nothing new (same facts as its player file) is reported « nothing new »: its file is not written again,
+and it gets no « Merged into » comment; discoveries.json is written only when its facts change (not for a new date alone)."""
+import base64,collections,gzip,importlib.util,json,math,os,re,subprocess,sys,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
@@ -129,8 +135,21 @@ def rebuild():
             if f.get("Hq",0)>0:known["Hq"]=min(known.get("Hq",0)+f["Hq"],sum(known["Values"].values()))
     common={"Version":VERSION,"Producer":"Tensho Assistant community","Written":datetime.now(timezone.utc).isoformat(),
             "Facts":sorted(merged.values(),key=lambda f:(f["Kind"],f["Subject"],f["Detail"],f["Territory"],f["Map"],f["CellX"],f["CellZ"]))}
+    players=len([n for n in os.listdir(PLAYERS) if n.endswith(".json")]) if os.path.isdir(PLAYERS) else 0
+    try:before=json.load(open(COMMON,encoding="utf-8"))
+    except (OSError,ValueError):before={}
+    # X-113: the same facts are not written again (the date alone changed in 0.1027).
+    if before.get("Version")==VERSION and before.get("Facts")==common["Facts"]:
+        print(f"discoveries.json: unchanged, {len(common['Facts'])} facts from {players} players");return False
     json.dump(common,open(COMMON,"w",encoding="utf-8",newline="\n"),ensure_ascii=False,separators=(",",":"))
-    print(f"discoveries.json: {len(common['Facts'])} facts from {len(os.listdir(PLAYERS)) if os.path.isdir(PLAYERS) else 0} players")
+    print(f"discoveries.json: {len(common['Facts'])} facts from {players} players");return True
+
+def news(issue,facts):
+    """X-113: (new or changed, gone) facts of a ticket against its player file: (0, 0) is « nothing new »."""
+    try:kept=json.load(open(os.path.join(PLAYERS,f"{issue}.json"),encoding="utf-8"))["Facts"]
+    except (OSError,ValueError,KeyError):kept=[]
+    old={key(f):json.dumps(f,sort_keys=True) for f in kept};new={key(f):json.dumps(f,sort_keys=True) for f in facts}
+    return sum(1 for k,v in new.items() if old.get(k)!=v),sum(1 for k in old if k not in new)
 
 def sync(dry):
     issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--label","discoveries","--state","open","--limit","500",
@@ -142,10 +161,111 @@ def sync(dry):
         try:facts,report=clean(from_gist(found.group(1)))
         except Exception as error:print(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
         total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
-        print(f"#{issue['number']} {issue['title']} (author {issue['author']['login']}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']}{flag}")
-        if dry or flag:continue
+        added,gone=news(issue["number"],facts)
+        what=" nothing new (same facts as its player file): no write, no « Merged » comment" if (added,gone)==(0,0) else f" {added} new or changed, {gone} gone"
+        print(f"#{issue['number']} {issue['title']} (author {issue['author']['login']}): {report['facts']} facts, {report['refused']} refused, kinds {report['kinds']};{what}{flag}")
+        if dry or flag or (added,gone)==(0,0):continue
         json.dump({"Issue":issue["number"],"Facts":facts},open(os.path.join(PLAYERS,f"{issue['number']}.json"),"w",encoding="utf-8",newline="\n"),ensure_ascii=False,separators=(",",":"))
     if not dry:rebuild()
+    else:
+        print();print(recheck_report())
+
+# ---------- X-116: facts to recheck after a game patch ----------
+CELL_KINDS=PLACED  # every fact with a place: a changed layout cell can change what was seen there
+ZONE_KINDS={"maps":PLACED,"gathering sources":{10,23,28,29,30}}  # a change with no position: the whole zone, for the kinds it touches
+SUBJECT_KINDS={19:"enpc",3:"fate"}  # a fact about an NPC or a FATE the patch moved or removed, wherever it was seen
+
+def snapshots_module():
+    spec=importlib.util.spec_from_file_location("client_snapshot",os.path.join(ROOT,"tools","client-snapshot.py"))
+    mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);return mod
+
+def latest_changes(cs=None):
+    """The newest changes-from-*.json of the snapshot store (tools/client-snapshot.py patch), or None."""
+    cs=cs or snapshots_module();found=[]
+    for d,meta in cs.snapshots(cs.default_root()):
+        found+=sorted(d.glob("changes-from-*.json"))
+    return found[-1] if found else None
+
+def recheck(changes,facts):
+    """[(source, fact, reasons)] of the facts seen last before the patch day in a changed cell or zone, or about a moved or removed subject."""
+    day=changes.get("PatchDate","")
+    cells,zones,subjects={},{},{}
+    for pl in changes.get("Places",[]):
+        if pl["x"] is None:zones.setdefault(pl["territory"],[]).append(pl)
+        else:cells.setdefault((pl["territory"],math.floor(pl["x"]/CELL),math.floor(pl["z"]/CELL)),[]).append(pl)
+        if pl.get("subject") and pl["part"] in ("moved","removed"):subjects.setdefault(tuple(pl["subject"]),[]).append(pl)
+    out=[]
+    for source,f in facts:
+        if f.get("Kind") not in PLACED or not f.get("Map") or not day or f["Last"][:10]>=day:continue
+        reasons=[]
+        for dx in (-1,0,1):
+            for dz in (-1,0,1):
+                for pl in cells.get((f["Territory"],f["CellX"]+dx,f["CellZ"]+dz),[]):reasons.append(f"cell: {pl['title']} {pl['part']} — {pl['label']}")
+        for pl in zones.get(f["Territory"],[]):
+            if f["Kind"] in ZONE_KINDS.get(pl["title"],()):reasons.append(f"zone: {pl['title']} {pl['part']} — {pl['label']}")
+        fam=SUBJECT_KINDS.get(f["Kind"])
+        for pl in subjects.get((fam,f["Subject"]),[]) if fam else []:reasons.append(f"subject: {pl['title']} {pl['part']} — {pl['label']}")
+        if reasons:out.append((source,f,sorted(set(reasons))))
+    return out
+
+def facts_of(local=False):
+    out=[("community",f) for f in json.load(open(COMMON,encoding="utf-8")).get("Facts",[])] if os.path.exists(COMMON) else []
+    if local:
+        path=os.path.join(os.environ.get("APPDATA",""),"XIVLauncher","pluginConfigs","TenshoAssistant","Discoveries","Discoveries.json")
+        try:out+=[("local",f) for f in json.load(open(path,encoding="utf-8")).get("Facts",[])]
+        except (OSError,ValueError):pass
+    return out
+
+def recheck_report(changes_path=None,local=False,limit=40):
+    """Text report (English, maintainer tool)."""
+    path=changes_path or latest_changes()
+    if not path:return "To recheck: no client comparison yet (tools/client-snapshot.py patch)."
+    changes=json.load(open(path,encoding="utf-8"));rows=recheck(changes,facts_of(local))
+    head=f"To recheck after the patch {changes['Old']} → {changes['New']} (day {changes['PatchDate']}, {len(changes.get('Places',[]))} changed places): {len(rows)} facts"
+    if changes.get("Missing"):head+=f"; not compared (missing from one snapshot): {', '.join(changes['Missing'])}"
+    lines=[head]
+    by=collections.Counter(f["Kind"] for _,f,_ in rows)
+    if by:lines.append("by kind: "+", ".join(f"{k}: {n}" for k,n in sorted(by.items())))
+    for source,f,reasons in rows[:limit]:
+        lines.append(f"- kind {f['Kind']} subject {f['Subject']} territory {f['Territory']} cell {f['CellX']},{f['CellZ']} last {f['Last'][:10]} ({source}): {reasons[0]}"+(f" (+{len(reasons)-1})" if len(reasons)>1 else ""))
+    if len(rows)>limit:lines.append(f"- … and {len(rows)-limit} more")
+    return "\n".join(lines)
+
+def selftest():
+    """recheck and news on made-up data (no network, no game)."""
+    ok=total=0
+    def check(cond,what):
+        nonlocal ok,total;total+=1;ok+=bool(cond)
+        if not cond:print("FAIL",what)
+    f=lambda kind,subject,t,x,z,last:{"Kind":kind,"Subject":subject,"Detail":0,"Territory":t,"Map":1,"CellX":math.floor(x/CELL),"CellZ":math.floor(z/CELL),"X":x,"Z":z,
+        "LevelMin":1,"LevelMax":1,"Seen":0,"Imported":1,"First":last,"Last":last}
+    changes={"Old":"a","New":"b","PatchDate":"2026-11-03","Places":[
+        {"title":"NPC placements","part":"moved","territory":128,"x":10.0,"z":120.0,"subject":["enpc",7],"label":"npc"},
+        {"title":"maps","part":"changed","territory":129,"x":None,"z":None,"subject":None,"label":"map"},
+        {"title":"gathering sources","part":"added","territory":130,"x":None,"z":None,"subject":["item",5],"label":"src"}]}
+    facts=[("c",f(1,1,128,60.0,140.0,"2026-11-01T00:00:00+00:00")),  # next cell, before: recheck
+           ("c",f(1,1,128,60.0,140.0,"2026-11-03T00:00:00+00:00")),  # seen on the patch day: no
+           ("c",f(1,1,128,300.0,300.0,"2026-11-01T00:00:00+00:00")),  # far cell: no
+           ("c",f(19,7,999,0.0,0.0,"2026-11-01T00:00:00+00:00")),  # the NPC moved, seen elsewhere: subject
+           ("c",f(3,2,129,0.0,0.0,"2026-11-01T00:00:00+00:00")),  # map changed: zone
+           ("c",f(1,1,130,0.0,0.0,"2026-11-01T00:00:00+00:00")),  # gathering zone change does not touch monsters
+           ("c",f(10,9,130,0.0,0.0,"2026-11-01T00:00:00+00:00")),  # but touches fishing
+           ("c",{**f(4,1,128,10.0,120.0,"2026-11-01T00:00:00+00:00"),"Map":0})]  # no place: never
+    got=[(r[1]["Kind"],r[1]["Territory"],r[1]["Last"][:10]) for r in recheck(changes,facts)]
+    check(got==[(1,128,"2026-11-01"),(19,999,"2026-11-01"),(3,129,"2026-11-01"),(10,130,"2026-11-01")],f"recheck rows {got}")
+    check(recheck({**changes,"PatchDate":""},facts)==[],"no patch day: nothing")
+    global PLAYERS
+    import tempfile
+    saved=PLAYERS
+    with tempfile.TemporaryDirectory() as tmp:
+        PLAYERS=tmp
+        a=f(1,1,128,60.0,140.0,"2026-11-01T00:00:00+00:00");b=f(1,2,128,60.0,140.0,"2026-11-01T00:00:00+00:00")
+        check(news(5,[a])==(1,0),"no player file: all new")
+        json.dump({"Issue":5,"Facts":[a,b]},open(os.path.join(tmp,"5.json"),"w",encoding="utf-8"))
+        check(news(5,[b,a])==(0,0),"same facts in another order: nothing new")
+        check(news(5,[a,{**b,"LevelMax":3}])==(1,0) and news(5,[a])==(0,1),"changed and gone")
+    PLAYERS=saved
+    print(f"discoveries-merge selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
 def notice(argv):
     sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
@@ -168,4 +288,8 @@ if __name__=="__main__":
     elif command=="rebuild":rebuild()
     elif command=="check" and len(sys.argv)==3:print(clean(read(sys.argv[2]))[1])
     elif command=="notice":sys.exit(notice(sys.argv[2:]))
+    elif command=="recheck":
+        argv=sys.argv[2:];changes=argv[argv.index("--changes")+1] if "--changes" in argv else None
+        print(recheck_report(changes,"--local" in argv,int(argv[argv.index("--limit")+1]) if "--limit" in argv else 40))
+    elif command=="--selftest":sys.exit(selftest())
     else:print(__doc__);sys.exit(2)
