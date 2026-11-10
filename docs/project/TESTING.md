@@ -1688,6 +1688,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1033) Après la première release qui porte l'application : une application plus ancienne lancée se met à jour seule vers la version du plugin installé (téléchargement, puis ouverture au démarrage suivant ou sur « Redémarrer maintenant ») ; « Version d'avant » revient à la précédente
 
+- [ ] (0.1037) Charger Tensho 0.1037 (recompilé pour le patch 7.58, Dalamud 15.0.4.0) : /tensho s'ouvre, auto-contrôle propre dans dalamud.log (logread.py), carte : régions non découvertes toujours affichées (MapDiscoveryManager agrandi)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
