@@ -1,22 +1,38 @@
+using System.Security.Cryptography;
 using Dalamud.Bindings.ImGui;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 /// <summary>
 /// Dalamud's font statics (UiBuilder.IconFont, IconFontFixedWidth, DefaultFont, MonoFont) wait for Dalamud's interface service, which never
-/// starts outside the game: the first call blocks forever (measured 2026-11-10: InterfaceManager.WhenFontsReady → Service&lt;InterfaceManager&gt;).
-/// The probe copies the built plugin to a temporary folder (never into the repository) and points those calls at the desktop fonts below,
-/// with Mono.Cecil. In the real application this is one seam in the plugin's own code (the fonts read from UiComponents, set by the
-/// plugin from UiBuilder and by the application from its atlas), not a rewrite: the probe only counts the sites and proves the rest draws.
+/// starts outside the game: the first call blocks forever (measured 2026-11-10: InterfaceManager.WhenFontsReady → Service&lt;InterfaceManager&gt;,
+/// docs/evidence/x118-desktop-probe.md). The app copies the built plugin to its own folder (%LOCALAPPDATA%\TenshoAssistant\Desktop\plugin,
+/// never the repository nor the installed plugin) and points those calls at the desktop fonts below, with Mono.Cecil (read from Dalamud's
+/// install, not shipped).
+/// TEMPORARY (X-119 step 1): this rewrite is replaced by a real seam in the plugin after the post-7.58 release (the fonts read from one
+/// property of the plugin's UI components, set by Plugin.cs from UiBuilder and by this app from its atlas; a ratchet test forbids new
+/// direct uses). Until then the plugin's source is not changed (frozen until Dalamud is ready for 7.58).
 /// </summary>
 internal static class Rewrite
 {
     public static readonly Dictionary<string,int> Sites=[];
+    /// <summary>The plugin's own files the copy carries beside the DLL (as in latest.zip).</summary>
+    private static readonly string[] Siblings=["Raphael.Net.dll","raphael_bindings.dll","TenshoAssistant.json"];
 
-    public static string Plugin(string plugin)
+    /// <summary>The rewritten copy of the plugin, in a folder named after the DLL's content (two apps can run at once, a copy in use is never overwritten).</summary>
+    public static string Plugin(string plugin,string root)
     {
-        var folder=Path.Combine(Path.GetTempPath(),"TenshoDesktopProbe","plugin");
+        var hash=Convert.ToHexString(SHA256.HashData([..File.ReadAllBytes(plugin),..System.Text.Encoding.UTF8.GetBytes(Program.AppVersion.ToString())]))[..16];
+        var folder=Path.Combine(root,hash);
         Directory.CreateDirectory(folder);
+        foreach(var old in Directory.GetDirectories(root).Where(d=>!string.Equals(d,folder,StringComparison.OrdinalIgnoreCase)))
+            try{Directory.Delete(old,true);}catch(IOException){}catch(UnauthorizedAccessException){}// in use by another run: left for later
+        foreach(var sibling in Siblings)
+        {
+            var source=Path.Combine(Path.GetDirectoryName(plugin)!,sibling);
+            var copy=Path.Combine(folder,sibling);
+            if(File.Exists(source) && !File.Exists(copy))File.Copy(source,copy);
+        }
         var target=Path.Combine(folder,Path.GetFileName(plugin));
         var resolver=new DefaultAssemblyResolver();
         resolver.AddSearchDirectory(Program.Hooks);resolver.AddSearchDirectory(Path.GetDirectoryName(plugin)!);
@@ -39,7 +55,7 @@ internal static class Rewrite
                         var key=called.DeclaringType.Name+"."+called.Name.Replace("get_","");
                         Sites[key]=Sites.GetValueOrDefault(key)+1;
                     }
-        module.Write(target);
+        if(!File.Exists(target))module.Write(target);
         return target;
     }
 }

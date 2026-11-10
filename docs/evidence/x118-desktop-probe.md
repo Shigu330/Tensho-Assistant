@@ -125,6 +125,8 @@ icons: read from the installed client, never stored in the repository (the two c
 
 ## Reproduce
 
+X-119: the probe became the desktop application `src/TenshoAssistant.Desktop` (same options; see [x119-desktop-app.md](x119-desktop-app.md)); the commands below are those of 0.1030.
+
 ```powershell
 .\scripts\Verify.ps1   # builds src/TenshoAssistant/bin/x64/Release/TenshoAssistant.dll
 dotnet build -c Release tools/DesktopProbe

@@ -520,7 +520,9 @@
     "QuestionAsk": "Where can I ask a question?",
     "AnswerAsk": "On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in a ticket (« Report a problem or help » on the Help page).",
     "QuestionTranslate": "How can I help translate Tensho?",
-    "AnswerTranslate": "In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in Localization/README.md on GitHub."
+    "AnswerTranslate": "In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in Localization/README.md on GitHub.",
+    "QuestionDesktop": "Can I see Tensho without the game?",
+    "AnswerDesktop": "Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ."
   },
   "Guide": {
     "Title": "Tensho: first steps",
@@ -7560,5 +7562,31 @@
     "Unrestricted": "No ET time restriction",
     "NoWindow": "No ET window given",
     "Invalid": "ET schedule cannot be read"
+  },
+  "Desktop": {
+    "AppVersion": "Tensho Assistant desktop {0}",
+    "VersionSame": "Installed plugin: same version ({0}).",
+    "VersionDifferent": "Installed plugin {0}, this app {1}: the two are updated together, from the same release; take both from one release.",
+    "VersionNotFound": "No installed Tensho Assistant plugin found (this app is {0}).",
+    "NotLinked": "Game not linked: the live parts of this page ({0}) stay empty; actions are off.",
+    "InGameOnly": "« {0} » stays in the game: open it in Tensho in the game.",
+    "Loading": "Reading the game data: {0} of {1} catalogues ready.",
+    "LiveHome": "alarms, character status, timers, squadron",
+    "LiveItems": "bags, recipe log, collectables, alarms",
+    "LiveStorage": "bags, gearsets, currencies, gil journal",
+    "LiveCraftSimulation": "collectables, craft recording, macros written in the game",
+    "LiveGathering": "gathering log, collectables, alarms",
+    "LiveGatheringCollectables": "collectables of the character",
+    "LiveOceanFishing": "alarms",
+    "LiveIslandSanctuary": "island animals",
+    "LiveWeather": "alarms",
+    "LiveReminders": "timers, roulettes, Wondrous Tails, treasure maps, squadron, alarms",
+    "LiveFreeCompany": "airships, alarms",
+    "LiveEvents": "events read in the game",
+    "LiveCollections": "achievement progress, titles",
+    "LiveBlueMagic": "achievement progress, titles",
+    "LiveHelp": "self-check, alarms",
+    "LiveSettings": "alarms, map markers",
+    "LiveDiagnostics": "self-check, alarms"
   }
 }

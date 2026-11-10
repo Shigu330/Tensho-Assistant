@@ -253,8 +253,10 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x115-client-diff-7.57-7.58.md](x115-client-diff-7.57-7.58.md) | — | — |
 | [x116-client-placements.md](x116-client-placements.md) | `tools/ClientSnapshot/Program.cs`, `tools/README.md`, `tools/client-snapshot.py` | — |
 | [x118-desktop-lexicon.png](x118-desktop-lexicon.png) | — | — |
-| [x118-desktop-probe.md](x118-desktop-probe.md) | `tools/README.md` | — |
+| [x118-desktop-probe.md](x118-desktop-probe.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/Rewrite.cs`, `tools/README.md` | — |
 | [x118-desktop-weather.png](x118-desktop-weather.png) | — | — |
+| [x119-desktop-app.md](x119-desktop-app.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj`, `tools/README.md` | — |
+| [x119-desktop-weather.png](x119-desktop-weather.png) | — | — |
 | [x76-0-baseline.md](x76-0-baseline.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x76-2-duplicates.md](x76-2-duplicates.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x76-2bc-plan.md](x76-2bc-plan.md) | — | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/GLOBAL-PLAN.md` |
@@ -262,5 +264,5 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 
-Counted · compté : 254 files · fichiers ; 188 cited by the code or the tests · citées par le code ou les tests ; 10 cited nowhere · citées nulle part.
+Counted · compté : 256 files · fichiers ; 189 cited by the code or the tests · citées par le code ou les tests ; 11 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

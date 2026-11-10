@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- X-119 (plan 4 of the desktop application, step 1; was tools/DesktopProbe, X-118): the plugin's own pages in a desktop window, game
+       closed. It loads the built plugin (TenshoAssistant.dll) and Dalamud's ImGui bindings (Dalamud.Bindings.ImGui + cimgui.dll) from the
+       installed Dalamud, opens a plain Win32 window rendered with OpenGL 1.1 (opengl32.dll, part of Windows: no package to download),
+       feeds the pages' services from Lumina through stand-ins and draws the real pages. R05: nothing of Dalamud or of the game is copied
+       into the repository or into the package: every Dalamud, Lumina, ImGui, HexaGen, Mono.Cecil and Newtonsoft reference is Private=false
+       and resolved at run time from the XIVLauncher install (DALAMUD_HOME if set, else %APPDATA%\XIVLauncher\addon\Hooks\dev, as the
+       plugin build); game data from the user's sqpack. Evidence: docs/evidence/x119-desktop-app.md. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net10.0-windows</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks><NoWarn>CA1416</NoWarn><TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>TenshoAssistant.Desktop</AssemblyName><RootNamespace>TenshoAssistant.Desktop</RootNamespace>
+    <!-- One version source (R33): the plugin's <Version>, read here; scripts/agent/new-version.py writes the plugin's csproj only. -->
+    <TenshoPluginProject>$(MSBuildThisFileDirectory)..\TenshoAssistant\TenshoAssistant.csproj</TenshoPluginProject>
+    <Version>$([System.Text.RegularExpressions.Regex]::Replace($([System.IO.File]::ReadAllText($(TenshoPluginProject))), '(?s)^.*?&lt;Version&gt;\s*([^&lt;\s]+)\s*&lt;/Version&gt;.*$', '$1'))</Version>
+    <DalamudLibPath Condition="'$(DalamudLibPath)' == '' and '$(DALAMUD_HOME)' != ''">$(DALAMUD_HOME)\</DalamudLibPath>
+    <DalamudLibPath Condition="'$(DalamudLibPath)' == ''">$(APPDATA)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Lumina"><HintPath>$(DalamudLibPath)Lumina.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Lumina.Excel"><HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Dalamud"><HintPath>$(DalamudLibPath)Dalamud.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Dalamud.Bindings.ImGui"><HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="HexaGen.Runtime"><HintPath>$(DalamudLibPath)HexaGen.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(DalamudLibPath)Mono.Cecil.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="System.Reflection.MetadataLoadContext"><HintPath>$(DalamudLibPath)System.Reflection.MetadataLoadContext.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

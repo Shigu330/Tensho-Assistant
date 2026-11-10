@@ -1,15 +1,18 @@
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using Dalamud.Bindings.ImGui;
 using Lumina;
 using Lumina.Data;
 using Lumina.Data.Files;
+using TenshoAssistant.Desktop;
 
 /// <summary>
 /// The plugin's real main window (TenshoAssistant.MainWindow from the built DLL), built with its real constructor: services the plugin
 /// creates are created the same way, Dalamud services are stand-ins. IDataManager, IFramework and IPluginLog as in tools/ClientSnapshot;
 /// ITextureProvider reads the game icon (.tex) through Lumina and uploads it to the desktop renderer; any other Dalamud interface is an
-/// "absent" stand-in that answers default values and records each member the page code reached (the inventory's evidence).
+/// "absent" stand-in that answers default values and records each member the page code reached (X-118's inventory evidence).
+/// The plugin's saved settings (pluginConfigs\TenshoAssistant.json) are read as Dalamud reads them, read-only: the app never saves them.
 /// </summary>
 internal sealed class Host
 {
@@ -17,6 +20,11 @@ internal sealed class Host
     public readonly GameData Data;
     public readonly DataManagerStub DataStub;
     public readonly object Window;
+    public readonly string SettingsNote;
+    public readonly string TextCode;
+    public readonly Language GameLanguage;
+    private readonly object localization;
+    private readonly MethodInfo format,has;
     private readonly Dictionary<Type,object?> made=[];
     private readonly List<object> loaders=[];
     private readonly Type pageType;
@@ -25,23 +33,36 @@ internal sealed class Host
     public static readonly Dictionary<uint,(ulong Id,int W,int H)?> Icons=[];
     public static GameData? IconData;
 
-    public Host(string pluginPath,string sqpack,Language language,string pluginLanguage,string pluginDirectory)
+    /// <summary>The plugin's catalogue loaders that need only (service, IDataManager, IFramework, IPluginLog[, DataCache]) (Plugin.cs).</summary>
+    public static readonly string[] Loaders=["MapCatalogLoader","WeatherCatalogLoader","DutyCatalogLoader","GpCatalogLoader","CraftActionCatalogLoader","FashionHintLoader",
+        "ItemUseCatalogLoader","ItemCatalogLoader","RecipeCatalogLoader","GatheringCatalogLoader","NpcVendorLoader","MapLocalIndexLoader"];
+
+    public Host(string pluginPath,string sqpack,string? gameLanguage,string? textLanguage,string? settingsPath)
     {
         Plugin=System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(pluginPath);
-        Data=new GameData(sqpack,new LuminaOptions{DefaultExcelLanguage=language,CacheFileResources=false,PanicOnSheetChecksumMismatch=false});
+        var pluginDirectory=Path.GetDirectoryName(pluginPath)!;
+        var configurationType=Plugin.GetType("TenshoAssistant.Configuration",true)!;
+        var saved=ReadSettings(settingsPath,configurationType,out SettingsNote);
+        if(saved is not null)made[configurationType]=saved;
+        var savedCode=saved is null ? null : configurationType.GetProperty("LanguageCode")?.GetValue(saved) as string;
+        TextCode=DesktopPaths.TextLanguage(textLanguage ?? savedCode,CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+        GameLanguage=Enum.Parse<Language>(gameLanguage ?? DesktopPaths.GameLanguage(TextCode),true);
+        Data=new GameData(sqpack,new LuminaOptions{DefaultExcelLanguage=GameLanguage,CacheFileResources=false,PanicOnSheetChecksumMismatch=false});
         IconData=Data;
-        DataStub=new DataManagerStub(Data,language);
-        // Dalamud's scale is set by its interface manager; 1 here (no DPI scaling in the probe).
+        DataStub=new DataManagerStub(Data,GameLanguage);
+        // Dalamud's scale is set by its interface manager; 1 here (no DPI scaling yet).
         typeof(Dalamud.Interface.Utility.ImGuiHelpers).GetProperty("GlobalScale",BindingFlags.Static|BindingFlags.Public)!.GetSetMethod(true)?.Invoke(null,[1f]);
         var mainType=Plugin.GetType("TenshoAssistant.MainWindow",true)!;
         pageType=mainType.GetNestedType("Page",BindingFlags.NonPublic)!;
         pageField=mainType.GetField("page",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var localizationType=Plugin.GetType("TenshoAssistant.Localization.LocalizationManager",true)!;
-        var localization=Activator.CreateInstance(localizationType,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,null,
+        localization=Activator.CreateInstance(localizationType,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,null,
             [(Action<Exception,string>)((e,m)=>Console.WriteLine($"  localization warning: {m}: {e.Message}")),pluginDirectory],null)!;
-        localizationType.GetMethod("SelectInitialLanguage")!.Invoke(localization,[pluginLanguage,language.ToString()]);
+        localizationType.GetMethod("SelectInitialLanguage")!.Invoke(localization,[TextCode,GameLanguage.ToString()]);
+        format=localizationType.GetMethod("Format")!;has=localizationType.GetMethod("Has")!;
         made[localizationType]=localization;
         var ctor=mainType.GetConstructors(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Single();
+        // The save action does nothing: the app reads the plugin's settings and never writes them.
         var args=ctor.GetParameters().Select(p=>p.ParameterType==typeof(Action) ? (Action)(()=>{}) : Make(p.ParameterType,0)).ToArray();
         Window=ctor.Invoke(args);
         // Data the plugin fills after building the window (Plugin.cs): the lexicon, read off the frame from the sheets.
@@ -50,13 +71,83 @@ internal sealed class Host
             lexicon.SetValue(Window,Delegate.CreateDelegate(lexicon.PropertyType,DataStub,read));
     }
 
+    /// <summary>The plugin's saved settings read as Dalamud reads them (Newtonsoft, type names), or null (no file, or unreadable).</summary>
+    private object? ReadSettings(string? path,Type configurationType,out string note)
+    {
+        if(path is null){note="new (asked)";return null;}
+        if(!File.Exists(path)){note="new (no saved settings at "+path+")";return null;}
+        try
+        {
+            var settings=new Newtonsoft.Json.JsonSerializerSettings
+            {
+                TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,
+                TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,
+                SerializationBinder=new PluginBinder(Plugin),
+            };
+            var value=Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(path),configurationType,settings);
+            note=value is null ? "new (saved settings empty)" : "read from "+path+" (read-only)";
+            return value;
+        }
+        catch(Exception error){note=$"new (saved settings unreadable: {error.GetType().Name}: {error.Message})";return null;}
+    }
+
+    /// <summary>Type names of the saved settings: the plugin's own from the loaded plugin (its copy), the others as Newtonsoft does.</summary>
+    private sealed class PluginBinder(Assembly plugin):Newtonsoft.Json.Serialization.DefaultSerializationBinder
+    {
+        public override Type BindToType(string? assemblyName,string typeName)
+            => assemblyName=="TenshoAssistant" && plugin.GetType(typeName) is { } type ? type : base.BindToType(assemblyName,typeName);
+    }
+
     public IEnumerable<string> Pages=>Enum.GetNames(pageType);
     public void SetPage(string name)=>pageField.SetValue(Window,Enum.Parse(pageType,name));
     public string CurrentPage=>pageField.GetValue(Window)!.ToString()!;
     public object? Service(string fullName)=>made.FirstOrDefault(pair=>pair.Key.FullName==fullName).Value;
 
-    /// <summary>Runs one catalogue loader of the plugin (service, IDataManager, IFramework, IPluginLog[, DataCache]) until it unsubscribes.</summary>
-    public string RunLoader(string loaderName,string cacheDir)
+    /// <summary>A text of the plugin's language files, in the plugin's language (LocalizationManager.Format).</summary>
+    public string Text(string key,params object[] args)=>(string)format.Invoke(localization,[key,args])!;
+    public bool HasText(string key)=>(bool)has.Invoke(localization,[key])!;
+
+    /// <summary>The pages that stay in the game leave the navigation (their entry's Visible answers false), before the first frame.</summary>
+    public void HideInGamePages()
+    {
+        var mainType=Window.GetType();
+        var entries=(Array)mainType.GetProperty("PageEntries",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(Window)!;
+        var copy=Array.CreateInstance(entries.GetType().GetElementType()!,entries.Length);
+        for(var i=0;i<entries.Length;i++)
+        {
+            var entry=entries.GetValue(i)!;
+            var page=entry.GetType().GetProperty("Page")!.GetValue(entry)!.ToString()!;
+            if(DesktopPages.Kind(page)==DesktopPageKind.InGame)
+            {
+                entry=entry.GetType().GetMethod("<Clone>$")!.Invoke(entry,null)!;
+                entry.GetType().GetField("<Visible>k__BackingField",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(entry,(Func<bool>)(()=>false));
+            }
+            copy.SetValue(entry,i);
+        }
+        mainType.GetField("pageEntries",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(Window,copy);
+        mainType.GetField("pageGroups",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(Window,null);
+    }
+
+    /// <summary>One catalogue loader of the plugin, ticked as the game's framework would until it unsubscribes.</summary>
+    public sealed class LoaderRun(string name,FrameworkProxy framework,System.Diagnostics.Stopwatch clock,Action dispose)
+    {
+        public string Name=>name;
+        public int Ticks;
+        public string? Result;
+        public bool Done=>Result is not null;
+        /// <summary>One framework tick; true when the loader is done (its catalogue published or its error logged).</summary>
+        public bool Tick()
+        {
+            if(Done)return true;
+            if(framework.Handlers is { } handlers){handlers((Dalamud.Plugin.Services.IFramework)(object)framework);Ticks++;return false;}
+            dispose();
+            Result=$"{name}: done in {clock.Elapsed.TotalSeconds:0.0} s, {Ticks} framework ticks{(LogProxy.LastError is { } e ? " (error: "+e+")":"")}";
+            return true;
+        }
+    }
+
+    /// <summary>Starts one catalogue loader of the plugin (service, IDataManager, IFramework, IPluginLog[, DataCache]).</summary>
+    public LoaderRun StartLoader(string loaderName,string cacheDir)
     {
         var loaderType=Plugin.GetType(loaderName) ?? Plugin.GetTypes().Single(t=>t.Name==loaderName);
         var ctor=loaderType.GetConstructors(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance).OrderBy(c=>c.GetParameters().Length).First();
@@ -69,16 +160,11 @@ internal sealed class Host
             "TenshoAssistant.Caching.DataCache"=>Activator.CreateInstance(p.ParameterType,cacheDir),
             _=>Make(p.ParameterType,0),
         }).ToArray();
-        var started=System.Diagnostics.Stopwatch.StartNew();
-        var loader=ctor.Invoke(args);
-        var host=(FrameworkProxy)(object)framework;
-        var ticks=0;
-        var deadline=DateTime.UtcNow.AddMinutes(5);
-        while(host.Handlers is { } handlers){handlers(framework);ticks++;if(DateTime.UtcNow>deadline)return $"{loaderType.Name}: TIMEOUT";}
-        foreach(var arg in args.OfType<IDisposable>().Where(a=>a.GetType().FullName=="TenshoAssistant.Caching.DataCache"))arg.Dispose();
+        var clock=System.Diagnostics.Stopwatch.StartNew();
         // Kept alive: a loader's Dispose clears its service (the plugin disposes it only when unloading).
-        loaders.Add(loader);
-        return $"{loaderType.Name}: done in {started.Elapsed.TotalSeconds:0.0} s, {ticks} framework ticks{(LogProxy.LastError is { } e ? " (error: "+e+")":"")}";
+        loaders.Add(ctor.Invoke(args));
+        return new LoaderRun(loaderType.Name,(FrameworkProxy)(object)framework,clock,
+            ()=>{foreach(var arg in args.OfType<IDisposable>().Where(a=>a.GetType().FullName=="TenshoAssistant.Caching.DataCache"))arg.Dispose();});
     }
 
     /// <summary>A value for a constructor parameter: Dalamud stand-ins for interfaces, the plugin's own classes built recursively (one per type).</summary>

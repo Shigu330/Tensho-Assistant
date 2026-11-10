@@ -299,6 +299,7 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 ```text
 .
 ├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access; UI/Components = shared templates)
+├── src/TenshoAssistant.Desktop/  desktop application: the plugin's pages with the game closed (built and drawn by Verify.ps1)
 ├── tests/                    managed tests (pure logic)
 ├── tools/                    read-only data probes (game sheets, APIs) and data scripts
 ├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps),
@@ -334,6 +335,8 @@ The run must end green with no warnings; it prints `VERSION x.y.z (DLL x.y.z.0)`
 
 - DLL: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
 - Package: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
+- Desktop app: `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, same version; Verify draws every page of it without a window
+  (`artifacts\desktop-headless.md`), or prints `SKIP desktop headless` without the game data or XIVLauncher (`-Release` refuses that)
 
 `-Commit`, `-Release` and `-DryRun` (maintainer only) are described in [CONTRIBUTING.md](CONTRIBUTING.md#versions-and-releases-maintainer).
 
@@ -351,6 +354,15 @@ Experimental › Custom Plugin Repositories, then install « Tensho Assistant »
 ```
 
 4. Validate preferences, reload behavior, and unloading behavior.
+
+## Desktop app (game closed)
+
+Each release also carries `TenshoAssistant.Desktop.zip`: the same pages in a Windows window, with the game closed (step 1 of the desktop
+application; the link to a running game comes later). Unzip it anywhere and start `TenshoAssistant.Desktop.exe`. It needs XIVLauncher with
+Dalamud and the game installed (it reads Dalamud's ImGui and the game data where they are installed; nothing of them is shipped); it carries
+its own .NET runtime, nothing else to install. It reads your saved Tensho settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are
+off, as its status bar says; the map, live synthesis and the Fashion Report stay in the game. The app and the plugin carry the same version
+and are released together: the app says at start when the installed plugin's version differs. Code: `src/TenshoAssistant.Desktop`.
 
 ## Localization
 
@@ -767,6 +779,8 @@ Le résultat doit être vert, sans avertissement ; il affiche `VERSION x.y.z (DL
 
 - DLL : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
 - Paquet : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
+- Application de bureau : `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, même version ; Verify en dessine chaque page sans
+  fenêtre (`artifacts\desktop-headless.md`), ou affiche `SKIP desktop headless` sans les données du jeu ou XIVLauncher (`-Release` le refuse)
 
 `-Commit`, `-Release` et `-DryRun` (mainteneur) : voir [CONTRIBUTING.md](CONTRIBUTING.md#versions-and-releases-maintainer).
 
@@ -784,6 +798,16 @@ Expérimental › Dépôts de plugins personnalisés, puis installer « Tensho A
 ```
 
 4. Vérifier le comportement des préférences, du rechargement et du déchargement.
+
+## Application de bureau (jeu fermé)
+
+Chaque release porte aussi `TenshoAssistant.Desktop.zip` : les mêmes pages dans une fenêtre Windows, jeu fermé (étape 1 de l'application de
+bureau ; le lien avec le jeu lancé viendra ensuite). Décompressez-le où vous voulez et lancez `TenshoAssistant.Desktop.exe`. Il lui faut
+XIVLauncher avec Dalamud et le jeu installés (elle lit l'ImGui de Dalamud et les données du jeu là où ils sont installés ; rien d'eux n'est
+livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos réglages Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
+restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le
+jeu. L'application et le plugin portent le même numéro de version et sont publiés ensemble : l'application signale au démarrage une version
+différente du plugin installé. Code : `src/TenshoAssistant.Desktop`.
 
 ## Localisation
 

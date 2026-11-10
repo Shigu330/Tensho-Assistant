@@ -93,7 +93,7 @@ if ($TestsOnly) {
 $taskFingerprint = Get-TaskFingerprint
 $taskSkip = $false
 # 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
-if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'))) {
+if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'))) {
     $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
 }
@@ -145,6 +145,67 @@ try {
     }
     finally { $taskZip.Dispose() }
     Write-Output 'PASS package identity, API, version, exact canonical ZIP hashes, language files and host assembly exclusion'
+    # X-119 (R33): the desktop application (src/TenshoAssistant.Desktop) goes with the plugin: published here self-contained (win-x64, with
+    # Microsoft's MIT .NET runtime, so a double-click works on a PC that has only XIVLauncher), with the plugin's own files under plugin\;
+    # that very folder is run headless (every page drawn: a page that breaks the app fails Verify, so publish.sh and the release), then
+    # zipped as TenshoAssistant.Desktop.zip with the same version. Without the game data or XIVLauncher's Dalamud (CI, contributors) the
+    # headless run is an explicit SKIP; -Release refuses it.
+    $taskDesktopPackage = Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\package'
+    if (Test-Path -LiteralPath $taskDesktopPackage) { Remove-Item -LiteralPath $taskDesktopPackage -Recurse -Force }
+    & $DotNet publish src/TenshoAssistant.Desktop -c Release -r win-x64 --self-contained -p:DebugType=none -o $taskDesktopPackage --nologo
+    if ($LASTEXITCODE -ne 0) { throw 'Desktop application publish failed (src/TenshoAssistant.Desktop).' }
+    $taskDesktopPlugin = Join-Path $taskDesktopPackage 'plugin'
+    New-Item -ItemType Directory -Force -Path $taskDesktopPlugin | Out-Null
+    foreach ($taskName in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll')) { Copy-Item -LiteralPath (Join-Path $taskOutput $taskName) -Destination $taskDesktopPlugin }
+    $taskDesktopVersion = [Reflection.AssemblyName]::GetAssemblyName((Join-Path $taskDesktopPackage 'TenshoAssistant.Desktop.dll')).Version.ToString()
+    if ($taskDesktopVersion -ne $taskAssemblyVersion) { throw "Desktop application version $taskDesktopVersion differs from the plugin's $taskAssemblyVersion (one version source: the plugin's csproj)." }
+    $taskHeadlessReport = Join-Path $taskRoot 'artifacts\desktop-headless.md'
+    # stderr read as text: under 'Stop', Windows PowerShell 5.1 would turn the app's SKIP or FAIL line into a terminating error.
+    $taskPreference = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try {
+        # The shipped exe itself, with its own runtime and its plugin/ folder: what is released is what is drawn.
+        $taskHeadless = & (Join-Path $taskDesktopPackage 'TenshoAssistant.Desktop.exe') --headless "--out=$taskHeadlessReport" 2>&1 | ForEach-Object { "$_" }
+        $taskHeadlessCode = $LASTEXITCODE
+    }
+    finally { $ErrorActionPreference = $taskPreference }
+    $taskHeadless | Where-Object { $_ -notmatch '^\s+\S+\s+(AsIs|NeedsLink|InGame)\s+drawn\s' } | ForEach-Object { Write-Output "  desktop: $_" }
+    if ($taskHeadlessCode -eq 4) {
+        Write-Output "SKIP desktop headless: no game data or no Dalamud install here; the app was built and packaged but its pages were not drawn."
+        if ($Release) { throw 'SKIP desktop headless: -Release refuses a release whose desktop application was not drawn (run Verify where the game and XIVLauncher are installed).' }
+    }
+    elseif ($taskHeadlessCode -ne 0) { throw "Desktop headless run failed (exit $taskHeadlessCode): a page throws, blocks or is not classified in src/TenshoAssistant.Desktop/DesktopPages.cs; report: $taskHeadlessReport" }
+    else { Write-Output "PASS desktop headless: every page classified and drawn by the packaged exe (report artifacts/desktop-headless.md)" }
+    # The package: the published app (with the .NET runtime) and the plugin's own files of latest.zip under plugin/; never Dalamud, Lumina,
+    # ImGui, cimgui, HexaGen, Mono.Cecil, Newtonsoft or the game's files, read where the user installed them (R05).
+    $taskDesktopZip = Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'
+    if (Test-Path -LiteralPath $taskDesktopZip) { Remove-Item -LiteralPath $taskDesktopZip }
+    # Entries named with '/' (Windows PowerShell's CreateFromDirectory would write '\', which other unzip tools read as part of a file name).
+    $taskDesktopFiles = @(Get-ChildItem -LiteralPath $taskDesktopPackage -Recurse -File | ForEach-Object { $_.FullName.Substring($taskDesktopPackage.Length + 1).Replace([char]92, [char]47) })
+    $taskDesktopArchive = [IO.Compression.ZipFile]::Open($taskDesktopZip, [IO.Compression.ZipArchiveMode]::Create)
+    try { foreach ($taskName in $taskDesktopFiles) { [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($taskDesktopArchive, (Join-Path $taskDesktopPackage $taskName), $taskName, [IO.Compression.CompressionLevel]::Optimal) } }
+    finally { $taskDesktopArchive.Dispose() }
+    $taskDesktopArchive = [IO.Compression.ZipFile]::OpenRead($taskDesktopZip)
+    try {
+        $taskDesktopEntries = @($taskDesktopArchive.Entries | ForEach-Object { $_.FullName })
+        foreach ($taskRequired in @('TenshoAssistant.Desktop.exe', 'TenshoAssistant.Desktop.dll', 'TenshoAssistant.Desktop.runtimeconfig.json', 'hostfxr.dll', 'hostpolicy.dll', 'System.Private.CoreLib.dll',
+                'plugin/TenshoAssistant.dll', 'plugin/TenshoAssistant.json', 'plugin/Raphael.Net.dll', 'plugin/raphael_bindings.dll')) {
+            if ($taskRequired -notin $taskDesktopEntries) { throw "TenshoAssistant.Desktop.zip misses $taskRequired." }
+        }
+        $taskForbidden = @($taskDesktopEntries | Where-Object { $_ -match '(^|/)(Dalamud|Lumina|HexaGen|Mono\.Cecil|Newtonsoft|FFXIVClientStructs|InteropGenerator|ImGuiScene|cimgui|System\.Reflection\.MetadataLoadContext)[^/]*$|\.(dat\d*|index2?|tex|exd|exh|scd)$' })
+        if ($taskForbidden.Count) { throw "TenshoAssistant.Desktop.zip must not carry Dalamud, Lumina, ImGui, cimgui, Mono.Cecil, Newtonsoft or game files (R05): $($taskForbidden -join ', ')" }
+        if ($taskDesktopEntries.Count -ne $taskDesktopFiles.Count) { throw "TenshoAssistant.Desktop.zip holds $($taskDesktopEntries.Count) files, the package folder $($taskDesktopFiles.Count)." }
+        foreach ($taskName in @('TenshoAssistant.Desktop.exe', 'TenshoAssistant.Desktop.dll', 'plugin/TenshoAssistant.dll')) {
+            $taskZipStream = $taskDesktopArchive.GetEntry($taskName).Open()
+            $taskHasher = [Security.Cryptography.SHA256]::Create()
+            try { $taskZipHash = [BitConverter]::ToString($taskHasher.ComputeHash($taskZipStream)).Replace('-', '') }
+            finally { $taskHasher.Dispose(); $taskZipStream.Dispose() }
+            $taskSource = if ($taskName -eq 'plugin/TenshoAssistant.dll') { Join-Path $taskOutput 'TenshoAssistant.dll' } else { Join-Path $taskDesktopPackage $taskName }
+            if ($taskZipHash -ne (Get-FileHash -LiteralPath $taskSource -Algorithm SHA256).Hash) { throw "TenshoAssistant.Desktop.zip entry differs from the build output: $taskName" }
+        }
+    }
+    finally { $taskDesktopArchive.Dispose() }
+    $taskDesktopSize = [math]::Round((Get-Item -LiteralPath $taskDesktopZip).Length / 1MB, 1)
+    Write-Output "PASS desktop package: $taskDesktopZip ($($taskDesktopEntries.Count) files, $taskDesktopSize MB: the self-contained app and plugin/TenshoAssistant.dll of the same version $taskDesktopVersion, nothing of Dalamud or the game)"
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
     [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8

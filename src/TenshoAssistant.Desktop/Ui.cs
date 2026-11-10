@@ -9,7 +9,7 @@ using Dalamud.Bindings.ImGui;
 /// </summary>
 internal static unsafe class Ui
 {
-    public static readonly string Assets=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"XIVLauncher","dalamudAssets","dev","UIRes");
+    public static readonly string Assets=Program.FontFolder;
     private static ushort* textRanges,iconRanges;
 
     public static (int W,int H,IntPtr Pixels) Start(float size)
@@ -51,18 +51,19 @@ internal static unsafe class Ui
 
     public static void SetFontTexture(ulong id)=>ImGui.GetIO().Fonts.SetTexID(0,id);
 
-    /// <summary>One frame of the plugin's main window filling the desktop window; the exception of the page, if any.</summary>
-    public static Exception? Frame(Host host,Vector2 display,float delta)
+    /// <summary>One frame of the plugin's main window filling the desktop window above the status bar; the exception of the page, if any.</summary>
+    public static Exception? Frame(Host host,StatusBar status,Vector2 display,float delta)
     {
         var io=ImGui.GetIO();
         io.DisplaySize=display;io.DeltaTime=Math.Max(delta,1/1000f);
         Trace("NewFrame");ImGui.NewFrame();
         Exception? failure=null;
         var window=(Dalamud.Interface.Windowing.Window)host.Window;
+        var lines=status.Lines();
         try
         {
             Trace("PreDraw");window.PreDraw();
-            ImGui.SetNextWindowPos(Vector2.Zero);ImGui.SetNextWindowSize(display);
+            ImGui.SetNextWindowPos(Vector2.Zero);ImGui.SetNextWindowSize(new Vector2(display.X,Math.Max(100,display.Y-status.Height(lines.Count))));
             var shown=ImGui.Begin(window.WindowName,ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.NoSavedSettings);
             Trace("Draw");try{if(shown)window.Draw();}
             finally{ImGui.End();}
@@ -73,6 +74,8 @@ internal static unsafe class Ui
             try{window.PostDraw();}catch(Exception e){failure??=e;}
         }
         Trace("Recover");ImGuiP.ErrorCheckEndFrameRecover(null!);
+        Trace("Status");
+        try{status.Draw(display,lines);}catch(Exception e){failure??=e;}
         Trace("Render");
         ImGui.Render();
         return failure;

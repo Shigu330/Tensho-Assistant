@@ -520,7 +520,9 @@
     "QuestionAsk": "Où poser une question ?",
     "AnswerAsk": "Sur le GitHub du projet, dans Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). Une question qui revient rejoint cette liste. Un problème ou une idée va dans un ticket (« Signaler un problème ou aider » de la page Aide).",
     "QuestionTranslate": "Comment aider à traduire Tensho ?",
-    "AnswerTranslate": "Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub."
+    "AnswerTranslate": "Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub.",
+    "QuestionDesktop": "Puis-je voir Tensho sans le jeu ?",
+    "AnswerDesktop": "Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent."
   },
   "Guide": {
     "Title": "Tensho : premiers pas",
@@ -7560,5 +7562,31 @@
     "Unrestricted": "Sans restriction horaire ET",
     "NoWindow": "Aucune fenêtre ET renseignée",
     "Invalid": "Horaire ET non interprétable"
+  },
+  "Desktop": {
+    "AppVersion": "Tensho Assistant bureau {0}",
+    "VersionSame": "Plugin installé : même version ({0}).",
+    "VersionDifferent": "Plugin installé {0}, cette application {1} : les deux se mettent à jour ensemble, depuis la même release ; prenez-les dans une même release.",
+    "VersionNotFound": "Aucun plugin Tensho Assistant installé trouvé (cette application est la {0}).",
+    "NotLinked": "Jeu non relié : les parties en direct de cette page ({0}) restent vides ; les actions sont coupées.",
+    "InGameOnly": "« {0} » reste dans le jeu : ouvrez-la dans Tensho en jeu.",
+    "Loading": "Lecture des données du jeu : {0} catalogues prêts sur {1}.",
+    "LiveHome": "alarmes, état du personnage, minuteurs, escouade",
+    "LiveItems": "sacs, carnet d'artisanat, collectionnables, alarmes",
+    "LiveStorage": "sacs, équipements enregistrés, monnaies, journal des gils",
+    "LiveCraftSimulation": "collectionnables, enregistrement des fabrications, macros écrites dans le jeu",
+    "LiveGathering": "carnet de récolte, collectionnables, alarmes",
+    "LiveGatheringCollectables": "collectionnables du personnage",
+    "LiveOceanFishing": "alarmes",
+    "LiveIslandSanctuary": "animaux de l'île",
+    "LiveWeather": "alarmes",
+    "LiveReminders": "minuteurs, missions aléatoires, Livre d'or des défis, cartes au trésor, escouade, alarmes",
+    "LiveFreeCompany": "dirigeables, alarmes",
+    "LiveEvents": "fêtes lues dans le jeu",
+    "LiveCollections": "avancée des succès, titres",
+    "LiveBlueMagic": "avancée des succès, titres",
+    "LiveHelp": "auto-contrôle, alarmes",
+    "LiveSettings": "alarmes, marques de la carte",
+    "LiveDiagnostics": "auto-contrôle, alarmes"
   }
 }

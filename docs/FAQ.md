@@ -64,6 +64,10 @@ Use « Report a problem or help » on the Help page: it fills in the GitHub form
 
 In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in Localization/README.md on GitHub.
 
+## Can I see Tensho without the game?
+
+Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
+
 Français :
 
 # Questions fréquentes
@@ -129,3 +133,7 @@ Utilisez « Signaler un problème ou aider » de la page Aide : cela remplit le 
 ## Comment aider à traduire Tensho ?
 
 Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub.
+
+## Puis-je voir Tensho sans le jeu ?
+
+Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
