@@ -24,3 +24,5 @@ CLAUDE.md
 docs/ai/
 docs/goals/
 scripts/agent/
+# X-115: client snapshots are Square Enix data, never in git (tools/client-snapshot.py keeps them outside the repository)
+client-snapshots/

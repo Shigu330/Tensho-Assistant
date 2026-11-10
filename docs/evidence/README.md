@@ -250,6 +250,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.99.0-crystal-probe.log](0.99.0-crystal-probe.log) | — | `CHANGELOG.md` |
 | [0.99.0-maelstrom-probe.log](0.99.0-maelstrom-probe.log) | — | — |
 | [craft-log-api-probe.log](craft-log-api-probe.log) | — | — |
+| [x115-client-diff-7.57-7.58.md](x115-client-diff-7.57-7.58.md) | — | — |
 | [x76-0-baseline.md](x76-0-baseline.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x76-2-duplicates.md](x76-2-duplicates.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x76-2bc-plan.md](x76-2bc-plan.md) | — | `CHANGELOG.md`, `docs/project/DECISIONS.md`, `docs/project/GLOBAL-PLAN.md` |
@@ -257,5 +258,5 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 
-Counted · compté : 249 files · fichiers ; 186 cited by the code or the tests · citées par le code ou les tests ; 7 cited nowhere · citées nulle part.
+Counted · compté : 250 files · fichiers ; 186 cited by the code or the tests · citées par le code ou les tests ; 8 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
