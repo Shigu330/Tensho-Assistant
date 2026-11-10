@@ -9,7 +9,7 @@ using PluginUiTest.Host;
 internal static class PluginUiTest1032Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
-    private static string Read(string file) => File.ReadAllText(Path.GetFullPath(file));
+    private static string Read(string file) => File.ReadAllText(Path.GetFullPath(file)).Replace("\r\n","\n");
     private const string Root = "tools/PluginUiTest/";
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
