@@ -1,3 +1,973 @@
+# References
+
+> *Traduction française plus bas.*
+
+## External sources used by the code — state at 0.315.0 (2026-11-02, checked against the code; replaces the state at 0.154.0)
+
+Order (DEC-011): game data first (Lumina / sqpack, FFXIVClientStructs structures), then community sources. A community source
+that is missing or turned off gives "unknown", never a guessed value. Switches: Settings › Advanced › Community
+sources (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Universalis hover prices).
+
+### Read at run time (network)
+
+| Service | Licence | Address called | File | Trigger | Cache |
+|---|---|---|---|---|---|
+| Universalis | public API (licence not recorded) | `universalis.app/api/v2/aggregated/{monde}/{objet}` ; `/api/v2/{monde, centre ou région}/{objet}?listings=…&entries=…` ; `/api/v2/data-centers` | `Market/MarketService.cs`, `Market/MarketBoardService.cs` | prices: click or hover (option); listings and history: Market page only (0.270) | "Prices"; listings also on disk `market-board` (0.281) |
+| Garland Tools | MIT (code, REF-QUEST-REWARDS-003) | `garlandtools.org/db/doc/{route}/{id}.json` (items, duties, monsters) | `Community/GarlandClient.cs`, `Duties/DutyLootService.cs`, `Monsters/MonsterLootService.cs` | item sources only when no game source is known; duty and monster loot | "Sources" (`sources`); loot 30 min in memory |
+| FFXIV Wiki (consolegameswiki) | content licence not recorded | `parse` API and `index.php?action=raw` | `Monsters/WikiMonsterSources.cs`, `Community/WikiItemAcquisition.cs`, `Maps/WikiVistas.cs` | hover or lookup; sightseeing log when hovering a map marker | "Sources" (`wiki-items`, `wiki-monsters`, `wiki-vistas`) |
+| LuminaSupplemental (Critical-Impact) | GPL-3.0 | `raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/src/LuminaSupplemental.Excel/Generated/*.csv` | `Community/LuminaSupplemental.cs` | first use: duty loot (chests, bosses), item sources (monsters, FATEs, ventures, ItemSupplement, shop, NPCs) | "Sources" (`lumina-supplemental`) |
+| GatherBuddy (Ottermandias) | Apache-2.0 | `api.github.com/repos/Ottermandias/GatherBuddy/contents/…/Data/Fish` then `raw.githubusercontent.com/…/Data/Fish/Data*.cs` | `Community/GatherBuddyFish.cs` | fishing help, Gathering (fish); files read as data (REF-FISH-GATHERBUDDY) | "Sources" (`gatherbuddy-fish`) |
+| Teamcraft (bite times) | MIT (code); public records from its users, data licence not recorded | `gubal.ffxivteamcraft.com/graphql` | `Community/FishBiteTimes.cs` | one request per fishing spot (0.231) | "Sources" (`teamcraft-bites`) |
+| FFXIVGachaSpreadsheet (Infi) | MIT | `raw.githubusercontent.com/Infiziert90/FFXIVGachaSpreadsheet/refs/heads/master/website/static/data/` (`FashionReport.json`, `LastUpdate.json`) | `Fashion/FashionDataService.cs` | Fashion Report tab | "Fashion Report" (`fashion`) |
+
+Rejected source: EorzeaWorld (`eorzeaworld.com`, checked on 2026-11-06). Its About page forbids the use of its data in third-party plugins, addons and tools that the FFXIV rules forbid, and the reuse of its content and scripts without prior permission; its content pages answer with a human check, which must not be bypassed. None of its data is in the plugin, unless its author agrees in writing.
+
+Limits: Garland, wiki, LuminaSupplemental, GatherBuddy and Fashion Report go through `Community/BoundedHttp.cs` (bounded size and
+duration); Universalis has its own limits (`MarketService` 1 MB / 12 s; `MarketBoardService` 4 MB / 15 s, one request at a time,
+3 s apart); Teamcraft: 20 s timeout, response refused beyond one million characters (check made after reading). Shared disk
+cache `Caching/DataCache.cs`, durations in Settings › Data and sources (including "Never (on request only)", 0.281); 5 min
+wait after a failure and expired copy as a fallback (0.246). None of them contacts the game servers. Details:
+[0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+
+### Embedded in the DLL (community data under a compatible licence, DEC-021)
+
+| Data | Source and licence | Embedded file | Licence notice | Since |
+|---|---|---|---|---|
+| Submarine sector loot breakpoints (143 rows: T2 / T3, Normal / Optimal, favor) | SubmarineTracker `Data/Sectors.cs` MapBreakpoints, commit 04c54d770f815cd416bbade1ac5b178b551a32b5, MIT (c) 2023 Infi; originally the "Submersible Loot Spreadsheet" sheet (Elena / saerielle, no licence) | `FreeCompany/Data/submarine-breakpoints.csv` | full MIT text at the top of the file; README | 0.315 |
+| Average loot per submarine sector (55 KB since 0.335, pools per tier) | FFXIVGachaSpreadsheet `website/static/data/Submarines.json` (community records), MIT (c) 2023 Infi; downloaded on 2026-11-02, SHA-256 ca900aef1a12425699f870c4ab273795fff4ed2b36f6f5a4abf581205353d44c | `FreeCompany/Data/submarine-loot.json`, produced by `tools/submarine-loot.py` | "Source" line (licence and copyright) in the file, without the full MIT text; README | 0.309 |
+| Airship sector unlock tree (24 rows) and possible loot (261 rows, no quantity or rate) | LuminaSupplemental `src/LuminaSupplemental.Excel/Generated/AirshipUnlock.csv` and `AirshipDrop.csv`, commit bd265c2b39868387937ae5b0c038593af997e0f9, GPL-3.0 (Critical-Impact); SHA-256 in the header of each file | `FreeCompany/Data/airship-unlock.csv`, `FreeCompany/Data/airship-drop.csv` | GPL-3.0 notice at the top of the files (same licence as Tensho, full text: LICENSE); README | 0.336 |
+| Main stat modifier, levels 1 to 100 | Character Panel Refined (Kouzukii) `LevelModifiers.cs`, MIT | table in `Character/StatFormulas.cs` | source comment (MIT) without the licence text; README, Settings › Advanced | 0.184 |
+
+The data files are `EmbeddedResource` items (`TenshoAssistant.csproj`): nothing is shipped next to the DLL (DEC-017).
+
+### Community rules taken as facts (original code, shown as estimates, DEC-022)
+
+| Rule | Source | Code | Status |
+|---|---|---|---|
+| Bountiful Harvest II bonus (+3 / +2 / +1 depending on ⌊base × 1.1⌋ and ⌊base × 0.9⌋) | frozen_rabbit_tome (no licence, fact recorded); GatheringOptimizer (MIT) leaves the value manual | GP tool, "estimated", editable | 0.224; [evidence](../evidence/0.224-bountiful-base.md); to be validated in game |
+| Distance and duration of a submarine voyage (legs, surveys, fixed 12 h, 5 sectors at most) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, read | `FreeCompany/VoyagePlanner.cs` | 0.309; real duration not verified in game |
+| Wear: (335 + sector rank − part rank) × 7 per sector, 30,000 per part | "Submersibles durability damage" sheet, taken up by SubmarineTracker | `FreeCompany/VesselBuilds.cs` | 0.315; estimate |
+| Total part cost ≤ capacity | community tools (SubmarineTracker, Argus), consistent with 11 published airship builds | `FreeCompany/VesselBuilds.cs` | 0.315; not verified in game below rank 50 |
+| Short name of a build ("SSUC++") | community convention | `FreeCompany/VesselBuilds.cs` | 0.315 |
+| Glamour: any armor or accessory, whatever the job or level; weapons and tools tied to the job | patch 7.4 (December 2025): press (PC Gamer, Game Informer) and patch notes, cited in CHANGELOG 0.311; no probe of the game data | `Gear/GearCatalog.cs` (`AllJobs`), DEC-020 | 0.311; page validated in game (user report 2026-11-02, 0.310–0.314) |
+
+### References read, without copying code
+
+Facts read only: Mappy (AGPL-3.0, off-screen host map and list of hovered icons), SortaKinda (AGPL-3.0),
+AvantGarde (AGPL-3.0, REF-FASHION-AVANTGARDE), GatherBuddy (Apache-2.0), Garland Tools (MIT), FFXIVClientStructs (MIT according to
+[0.307-fc-voyages.md](../evidence/0.307-fc-voyages.md); `AgentMap`, `MapMarkerData`, `Utf8String`, `PlayerState`, Free Company
+workshop, `MirageManager`, `UIState.Cabinet`, `AgentTryon`). Since 0.235: SubmarineTracker (MIT, 0.309 formulas; its breakpoints
+are embedded in 0.315, see above), AutoRetainer (0.307, not copied, licence not recorded), Argus (MIT, licence not recorded in the evidence; 0.315, rule
+"cost ≤ capacity"; its airship breakpoints come from unlicensed sources and are not reused), HimbeertoniRaidTool (MIT,
+0.310), Glamourer (Apache-2.0, 0.310), xivgear.app (no published licence: read only, 0.310). Allagan Tools is not used
+(DEC-013). The evidence of reading the game sheets is in [docs/evidence/](../evidence/).
+
+## Records 0.184 → 0.315 (checked against the code on 2026-11-02)
+
+> Records 0.213 (REF-FASHION-AVANTGARDE) and 0.227 (REF-FISH-GATHERBUDDY) are at the end of the archive below.
+
+### REF-FC-VOYAGES (0.307, 0.309, 0.315) — game data
+SOURCE: FFXIVClientStructs (MIT): `HousingManager.Instance()->WorkshopTerritory` (null outside the workshop),
+`HousingWorkshopSubmersibleSubData` (rank, return, experience, name, voyage sectors, loot, Base and Bonus stats, part
+keys), `HousingWorkshopAirshipSubData` (totals), `HousingManager.IsSubmarineExplorationUnlocked(byte)`. Sheets:
+SubmarineExploration, SubmarineRank, SubmarinePart, SubmarineSpecCategory, AirshipExplorationPart / Point / Level /
+ParamType; part ↔ item through `Item.FilterGroup` 36 / 28 and `Item.AdditionalData`.
+EVIDENCE: [0.307-fc-voyages.md](../evidence/0.307-fc-voyages.md), [0.309-submarine-routes.md](../evidence/0.309-submarine-routes.md),
+[0.315-vessel-builds.md](../evidence/0.315-vessel-builds.md) (`tools/ApiProbe`, `tools/ShopCurrencyProbe` PROBE_SUBROUTES /
+PROBE_VESSELPARTS, read only).
+CODE: `FreeCompany/VoyageWatcher.Dalamud.cs` (read inside the workshop), `Voyages.cs`, `VoyagePlanner.cs`, `VesselBuilds.cs`.
+LIMITS (not verified in game): when the game fills these data (entering the workshop or the voyage control panel); Base = sum
+of the parts and Bonus = rank bonus (the page shows ⚠ when they differ); real duration of a voyage; reading of the unlocked sectors.
+
+### REF-FC-SUBMARINETRACKER (0.309 read, 0.315 embedded data)
+REPOSITORY: https://github.com/Infiziert90/SubmarineTracker — MIT, (c) 2023 Infi.
+COMMIT_OR_VERSION: 04c54d770f815cd416bbade1ac5b178b551a32b5 for the copy of the breakpoints (0.315); commit of the 0.309 reading not recorded.
+FILES_READ: `SubExplPretty.cs` (distance and duration of a leg), `Data/Voyage.cs` (fixed 12 h, minimum-distance order, 5 sectors
+at most), `Data/Sectors.cs` (MapBreakpoints).
+USAGE: formulas understood, original Tensho code (0.309); MapBreakpoints copied as is with the MIT notice (0.315), shown as
+"community breakpoints". Intended difference: a sector without a breakpoint makes the voyage "unknown" (SubmarineTracker returns 0).
+LIMITS: against the observed minimums of FFXIVGachaSpreadsheet, 75 sectors out of 143 identical; the embedded value is below all
+observations in 19 sectors (list in the 0.315 evidence): a tier "reached" there is not confirmed by any record.
+
+### REF-FC-GACHASPREADSHEET (0.309)
+REPOSITORY: https://github.com/Infiziert90/FFXIVGachaSpreadsheet — MIT, (c) 2023 Infi.
+USAGE: (1) at run time, `FashionReport.json` for the Fashion Report (before 0.235); (2) embedded in 0.309: `Submarines.json`
+(143 sectors, about 200 million items recorded, fingerprint above) reduced by `tools/submarine-loot.py` to the number of records and
+the total seen per item, all tiers combined. Value of a sector = Σ (Total ÷ Records) × `Item.PriceLow` (game data).
+LIMITS: loot is not in the game data (decided on the server side); average value over all tiers; no equivalent public
+record for airships.
+
+### REF-FC-ARGUS (0.315)
+LICENSE: MIT according to the 0.315 research team, but neither the licence, nor the repository, nor the commit is recorded in the evidence (to be recorded); read only.
+USAGE: confirmation of the "cost ≤ capacity" rule. Its airship breakpoints come from unlicensed sources: not reused, hence
+no airship voyage planner (the LuminaSupplemental airship unlock tree, GPL-3.0, has been
+embedded since 0.336, DEC-023).
+
+### REF-GEAR-R11 (0.310 → 0.314) — game data
+SOURCE: Item (EquipSlotCategory, ClassJobCategory, LevelEquip, LevelItem, MateriaSlotCount, IsAdvancedMeldingPermitted,
+BaseParam / values), EquipSlotCategory, ClassJobCategory, BaseParam (percentages per slot), ItemLevel, Materia;
+`InventoryItem.GetMateriaId` / `GetMateriaGrade`; `AgentTryon.TryOn` (static).
+EVIDENCE: [0.310-gear-sheets.md](../evidence/0.310-gear-sheets.md), [0.312-materia.md](../evidence/0.312-materia.md) (PROBE_GEAR,
+PROBE_MELD, read only).
+RULES: cap = round(ItemLevel[stat] × BaseParam[slot] / 1000), equal to the highest secondary stat of the
+piece (34830: 111; 43047: 374); grades VI, VIII, X and XII excluded from overmelding; glamour since 7.4 (table above).
+READ_ONLY: HimbeertoniRaidTool (MIT), Glamourer (Apache-2.0), xivgear.app (no licence) — ideas only; repositories, commits and
+files read not recorded.
+LIMITS: overmelding success rate not modelled; cap of a piece covering several slots (body
+percentage) not verified in game. Pages 0.310–0.314 validated in game (user report 2026-11-02).
+
+### REF-BANK-STORAGES (0.235 → 0.240) — game data
+SOURCE: Armoury Chest `InventoryType` (3500, 3200–3203, 3205–3209, 3300, 3400; ids checked by reflection on FFXIVClientStructs);
+`MirageManager.PrismBoxLoaded` / `PrismBoxItemIds` (+1,000,000 HQ, +500,000 collectable); `UIState.Cabinet.IsCabinetLoaded` /
+`IsItemInCabinet` with the Cabinet sheet; MirageStoreSetItem sheet (pieces of an outfit, 0.240).
+CODE: `Inventory/BankInventoryBridge.Dalamud.cs`, `Inventory/BankModels.cs` (virtual containers 25000 and 25001).
+LIMITS: glamour dresser and armoire known only after they are opened in game; 0.234–0.240 to be validated in game. No other plugin needed (DEC-013).
+
+### REF-MARKET-BOARD (0.270, 0.281)
+SOURCE: Universalis API, fields probed on 2026-11-02 ([0.270-universalis-listings.md](../evidence/0.270-universalis-listings.md)):
+`listings[]`, `recentHistory[]`, sale velocities; world scope without `worldName`. Game rule: a listing is bought whole.
+CODE: `Market/MarketBoard.cs`, `Market/MarketBoardService.cs`.
+STATUS: validated in game (user report 2026-11-02, 0.270–0.271).
+
+### REF-FISH-TEAMCRAFT (0.231)
+REPOSITORY: ffxiv-teamcraft (MIT); public GraphQL API of its client (`apps/client/src/app/apollo-client-factory.ts`), query
+"BiteTimesPerFishPerSpotQuery" (`apps/client/src/app/pages/db/service/fish-data.gql.ts`).
+USAGE: `Community/FishBiteTimes.cs` keeps, per fish, the seconds with at least 3 records and 2 % of the fish's records;
+range and most frequent second shown. Evidence: [0.231-teamcraft-bite-times.md](../evidence/0.231-teamcraft-bite-times.md).
+STATUS: validated in game (screenshot 2026-11-01).
+
+### REF-CHAR-CPR-LEVELMOD (0.184)
+REPOSITORY: Character Panel Refined (Kouzukii), `CharacterPanelRefined/LevelModifiers.cs`, MIT, read on 2026-10-31.
+USAGE: main modifier per level (missing from the game sheets) embedded in `Character/StatFormulas.cs`; secondary and divisor
+columns match ParamGrow at levels 50/70/80/90/100 ([0.182.0-paramgrow-probe.log](../evidence/0.182.0-paramgrow-probe.log)).
+STATUS: validated in game (« c'est ok » ("it's ok"), 2026-10-31).
+
+### Game data evidence 0.246 → 0.300 (read-only probes)
+
+| Version | Evidence | Established fact |
+|---|---|---|
+| 0.246 | [0.246-r05-window-order.md](../evidence/0.246-r05-window-order.md) | Dalamud draws plugin windows after the game interface, with no API to interleave them (DEC-014) |
+| 0.278 | [0.278-triad-ex-cards.md](../evidence/0.278-triad-ex-cards.md) | `TripleTriadCardResident.UIPriority` ≠ 0 marks the 15 Ex cards. |
+| 0.283 | [0.283-quest-journal-sections.md](../evidence/0.283-quest-journal-sections.md) | `Quest.JournalGenre` → `JournalCategory` → `JournalSection` |
+| 0.285 | [0.285-quest-start-cities.md](../evidence/0.285-quest-start-cities.md) | "Close to Home" roots per starting city, `PreviousQuest` chains |
+| 0.286 | [0.286-quest-alternatives.md](../evidence/0.286-quest-alternatives.md) | `QuestLock` and `PreviousQuestJoin` (a single previous quest is enough) |
+| 0.292 | [0.292-draw-times.md](../evidence/0.292-draw-times.md) | draw times recorded in game by the user (medians under 0.5 ms) |
+| 0.295 | [0.295-fcc-shops.md](../evidence/0.295-fcc-shops.md) | `FccShop`: item, cost in company credits, required rank |
+| 0.300 | [0.300-calendar-resets.md](../evidence/0.300-calendar-resets.md) | reset times of the game for the Calendar (user screenshot) |
+
+## Reference records (archive)
+
+> Records written on the date given in each `VERIFIED_AT`; commits, test counts and statuses are those of that date.
+
+## REF-QUEST-CURRENCIES-005-STUDY
+
+DOMAIN: QuestTracker / currency identities.
+NAME: Fifteen quest currencies without a direct Item, company hypotheses ruled out.
+REPOSITORY: Primary sources of REF-QUEST-REWARDS-003; Critical-Impact/InventoryTools and local API.
+COMMIT_OR_VERSION: SaintCoinach 0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd; Garland 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; InventoryTools 70a9f410d9a8ab97bef6bcf795415ea2d7c75097; installed files of 2026-10-29.
+LICENSE: Licences recorded in REF-QUEST-REWARDS-003/REF-INVENTORY; targeted facts only, no implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED census; identity UNKNOWN; runtime UNKNOWN.
+SOURCE: [Quest definition](https://github.com/xivapi/SaintCoinach/blob/0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd/SaintCoinach/Definitions/Quest.json), [InventoryTools renderer](https://github.com/Critical-Impact/InventoryTools/blob/70a9f410d9a8ab97bef6bcf795415ea2d7c75097/InventoryTools/Logic/ItemRenderers/ItemQuestSourceRenderer.cs).
+FILES_READ: Three InventoryTools files cited in the study; currency/GC definitions, GrandCompany/Item/Quest metadata and search for bindings; detailed native census.
+TECHNICAL_FACTS: CurrencyReward and GCTypeReward null in fifteen cases; nine explicit GC prerequisites, six without GC. The known direct currencies have a null Item.GrandCompany and the Other category; no unique resolution relation shown.
+LOCAL_COMPATIBILITY: Extended probe passing, production 0.68 unchanged; quantities kept and partial coverage made explicit, no invented Item.
+NOTES: Study and limits in the maintainer's notes (outside the repository). Unknown locally, no global blocker; continue the base audit.
+
+## REF-QUEST-ITEM-SOURCES-004
+
+DOMAIN: QuestTracker / Item Use / shared snapshots.
+NAME: Managed reverse index of quest rewards.
+REPOSITORY: Original Tensho models/projections; primary sources of REF-QUEST-REWARDS-003 reused.
+COMMIT_OR_VERSION: 0.68.0.0, installed native data of 2026-10-29; no new external source.
+LICENSE: Project code; licences of the fact sources recorded in REF-QUEST-REWARDS-003, no external implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: Projection and limits, and index/lifecycle, in the maintainer's notes (outside the repository).
+FILES_READ: QuestService/Reader, QuestRewards, uses/records and existing tests; native snapshots through QuestRewardsProbe.
+TECHNICAL_FACTS: Item/quest grouped without losing variants, complete indices and explicit coverage; managed worker, generation/snapshot/cancellation prevent a stale publication, index errors separate from progress.
+LOCAL_COMPATIBILITY: 434 tests/package green; 3,496 Items/8,288 associations and every variant match the direct projection; Potion 25 candidate quests; outside a character, no confirmed progress.
+NOTES: No availability, choice or acquisition inferred; fifteen unlinked currencies and four unknown quantities kept. In-game UI/callbacks not observed.
+
+## REF-QUEST-REWARDS-003
+
+DOMAIN: QuestTracker / shared Item and context.
+NAME: Polymorphic native rewards and variants.
+REPOSITORY: ufx/GarlandTools; xivapi/SaintCoinach; installed native API and files.
+COMMIT_OR_VERSION: Garland 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; SaintCoinach 0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd; local data of 2026-10-29.
+LICENSE: Garland MIT already checked; SaintCoinach WTFPL v2 checked in LICENSE. Targeted facts, no implementation/database imported.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED projection; primary sources reread at the pinned commits; runtime UNKNOWN.
+SOURCE: [Garland Quests](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/Quests.cs), [QuestRewards](https://github.com/xivapi/SaintCoinach/blob/0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd/SaintCoinach/Xiv/QuestRewards.cs), [Quest definition](https://github.com/xivapi/SaintCoinach/blob/0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd/SaintCoinach/Definitions/Quest.json).
+FILES_READ: Quests.cs, QuestRewards/Item/ItemGroup/GroupType, Quest/BeastRankBonus definitions and licence; Quest/ClassJobReward/BeastRankBonus/TomestonesItem/SubrowExcelSheet API and native data.
+TECHNICAL_FACTS: Seven fixed native slots, four per job; Item rewards/job table/rank bonus kept separate. Allagan tomestones linked through Tomestones, not by row number. Alternatives/conditions kept with no maximum/stacking and no inferred receipt.
+LOCAL_COMPATIBILITY: 426 tests/package; 5,373 snapshots/9,313 projected rows, Item/dye identities resolved; unknowns 4 quantities/15 currencies kept.
+NOTES: Contracts and limits in the maintainer's notes (outside the repository). Current rank/gender/job, choice, availability and bonus not computed.
+
+## REF-COLL-003
+
+DOMAIN: Collections / load evidence and rewards.
+NAME: Native titles and achievements, three-state acquisition.
+REPOSITORY: goatcorp/Dalamud; Lumina and installed game files.
+COMMIT_OR_VERSION: Source 1e514694497ae448fca8e8a46f7b63642ad1e5ad reread; native API and sqpack installed on 2026-10-29.
+LICENSE: AGPL according to the historical REF-DALAMUD; targeted facts, no native implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED signatures/projection; primary source reread at the pinned commit; runtime UNKNOWN.
+SOURCE: [UnlockState](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448fca8e8a46f7b63642ad1e5ad/Dalamud/Game/UnlockState/UnlockState.cs).
+FILES_READ: Title/Achievement getters, load properties, OnLogin/Logout/AgentUpdate and signal detours; Title/Achievement/Category/Kind/Target and UnlockDelegate metadata; native data through CollectionProbe.
+TECHNICAL_FACTS: A positive individual acquisition can come before the complete list; a negative cannot be interpreted without coverage. TitleList.DataReceived, Achievement.IsLoaded and getter identities kept separate. A Title/Item reward does not prove ownership/claim.
+LOCAL_COMPATIBILITY: 421 tests/package green; 885 titles/4,003 achievements, 83 categories, 192 Item/891 Title rewards and icons resolved, foreign joins refused.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). No load/callback/player state observed in game; hidden availability and numeric progress not computed.
+
+## REF-COLL-002
+
+DOMAIN: Collections / shared Item and context.
+NAME: Orchestrion catalogue and confirmations.
+REPOSITORY: goatcorp/Dalamud; Lumina/FFXIVClientStructs and installed game files.
+COMMIT_OR_VERSION: Dalamud source 1e514694497ae448fca8e8a46f7b63642ad1e5ad reread; metadata installed on 2026-10-29.
+LICENSE: AGPL v3 according to the historical REF-DALAMUD for the studied code; targeted facts, no native implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED signatures/projection; primary file reread at the pinned commit; runtime UNKNOWN.
+SOURCE: [UnlockState](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448fca8e8a46f7b63642ad1e5ad/Dalamud/Game/UnlockState/UnlockState.cs), [contract](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448fca8e8a46f7b63642ad1e5ad/Dalamud/Plugin/Services/IUnlockState.cs).
+FILES_READ: UnlockState.cs Orchestrion getter and Item path; IUnlockState, Orchestrion/Uiparam/Category, Item/AdditionalData metadata; native files through CollectionProbe.
+TECHNICAL_FACTS: Acquisition by Orchestrion.RowId, Item linked by AdditionalData typed as Orchestrion; 886 distinct Item/roll identities, 12 native categories. No dedicated orchestrion flag exposed; negative not confirmed. A foreign UI/category does not provide metadata.
+LOCAL_COMPATIBILITY: 416 tests/package green; 886 projections/links/icons checked outside the game; existing reader/service/contexts extended, category errors isolated.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). No player state or native interaction validated; additional types kept under study.
+
+## REF-GATHER-FISH-FORECAST-010
+
+DOMAIN: GatherBuddy / shared forecasts and clock.
+NAME: Intersection of only the fishing criteria that are provided.
+REPOSITORY: ufx/GarlandTools for the semantics; original WeatherCatalog/GatheringTime models and installed native files.
+COMMIT_OR_VERSION: 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; local data and API responses consulted on 2026-10-29.
+LICENSE: MIT verified for the primary sources studied; no external implementation/database copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [time consumer and previous period](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Web/bell/gt.bell.js), [source 8753](https://www.garlandtools.org/db/doc/item/fr/3/8753.json), [source 4915](https://www.garlandtools.org/db/doc/item/fr/3/4915.json).
+FILES_READ: Primary references already verified in 0.62/0.63; WeatherForecast, GatheringTimeline, FishingConditions; targeted native responses/probes.
+TECHNICAL_FACTS: ET time and previous weather period are distinct; missing criteria are not treated as unrestricted. Compatible segments establish only the reported criteria, with explicit coverage; unknown and incompatible are distinct.
+LOCAL_COMPATIBILITY: 412 tests/package green; independent oracle and real probes with dated fixtures for weather/previous 8753 and time-only 4915.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). No capture/prerequisite/forced weather observed; native code 2 unchanged.
+
+## REF-GATHER-FISH-WEATHER-009
+
+DOMAIN: GatherBuddy / shared native weather.
+NAME: Mapping of the source's English names to native Weather within a territory.
+REPOSITORY: ufx/GarlandTools; API and installed native files.
+COMMIT_OR_VERSION: 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; assemblies and sqpack installed on 2026-10-29.
+LICENSE: MIT verified for the Garland code studied; targeted facts, no external database/implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [Weather.cs](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/Weather.cs), [fishing conditions](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/FishingSpots.cs), [document 8753](https://www.garlandtools.org/db/doc/item/fr/3/8753.json).
+FILES_READ: Primary sources already consulted in 0.62; Weather/French and English, local TerritoryType/WeatherRate; WeatherCatalogLoader and shared projection/probes.
+TECHNICAL_FACTS: English names from the source; 43 native labels globally ambiguous, including Clear Skies IDs 1/91/209. Unique exact match only within the territory's positive rates; missing metadata or local ambiguity kept as unknown.
+LOCAL_COMPATIBILITY: 405 tests/package; WeatherProbe 214 rows and earlier checks passing; real lookup of 8753 linked to territory 137 and Weather 1/7/8, native names/icons.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). No intersection/availability or sky observation; native code 2 still unknown.
+
+## REF-GATHER-FISH-WINDOWS-008
+
+DOMAIN: GatherBuddy / shared times and weather.
+NAME: ET hours and community conditions per location.
+REPOSITORY: ufx/GarlandTools.
+COMMIT_OR_VERSION: 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; API documents consulted on 2026-10-29.
+LICENSE: MIT verified for the code studied; no implementation/database redistributed.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [generator](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/FishingSpots.cs), [time/weather consumer](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Web/bell/gt.bell.js), [Mahi-Mahi document](https://www.garlandtools.org/db/doc/item/fr/3/4915.json), [transition](https://www.garlandtools.org/db/doc/item/fr/3/8753.json).
+FILES_READ: FishingSpots.cs, Weather.cs, gt.bell.js, fish.js and targeted lines of the TSV; API examples 7685,7686,7690,7705,4915,8753.
+TECHNICAL_FACTS: during in whole ET hours; start included/end excluded, circular midnight; transition = weather of the previous period, weather = current alternatives. Missing values not inferred; divergence between pinned source/API 7685 kept unknown.
+LOCAL_COMPATIBILITY: 401 tests/package green, probes 4915 and 8753 linked to native locations/baits, shared UTC time calculation; FashionProbe compiled.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Weather names not yet linked to local IDs, no intersection/availability, native code 2 unknown.
+
+## REF-GATHER-FISH-SOURCES-007
+
+DOMAIN: GatherBuddy / shared item sources.
+NAME: Community baits and chains per location.
+REPOSITORY: ufx/GarlandTools; FFXIV-CombatReborn/GatherBuddyReborn; xivapi/SaintCoinach.
+COMMIT_OR_VERSION: GarlandTools 04cadd2e1e0de86c20aa9303faa082c7971f8d8b; GatherBuddy a204f2f45cb98302dbe938921255c3a6d617c775; SaintCoinach definition consulted on 2026-10-29.
+LICENSE: MIT verified in LICENSE for the Garland code consulted, Apache-2.0 verified for GatherBuddy; targeted facts, no implementation or complete database redistributed.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [fishing generator](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/FishingSpots.cs), [item document](https://www.garlandtools.org/db/doc/item/fr/3/4869.json).
+FILES_READ: FishingSpots.cs, gt.fishing.js, LICENSE; SaintCoinach FishingNoteInfo.json; item 4869 response and example 7902; GatherBuddy Fish/CatchData already read.
+TECHNICAL_FACTS: chain alternatives ordered per location, initial bait then intermediates. The native weather flag 2 is not explained: tests >0 and ==1 differ between producers; Unknown kept.
+LOCAL_COMPATIBILITY: 396 tests/package, seven new groups; real lookup of 4869 with 19 native locations and two bait IDs resolved. Existing item service/cache/transport shared.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Weather/time fields not interpreted, no availability guaranteed; native rendering/interaction not observed.
+
+## REF-GATHER-FISH-006
+
+DOMAIN: GatherBuddy / shared catalogue.
+NAME: Native Fishing Log references.
+REPOSITORY: FFXIV-CombatReborn/GatherBuddyReborn.
+COMMIT_OR_VERSION: a204f2f45cb98302dbe938921255c3a6d617c775; installed Lumina API and sqpack.
+LICENSE: Apache-2.0 according to historical reference REF-GATHER; targeted facts only, no database or implementation copied.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [Classes/Fish.cs](https://github.com/FFXIV-CombatReborn/GatherBuddyReborn/blob/a204f2f45cb98302dbe938921255c3a6d617c775/GatherBuddy.GameData/Classes/Fish.cs).
+FILES_READ: Fish.cs, Fish.CatchData.cs, FishRestrictions.cs, Data/Fish/DataBase.cs, Data2.0.cs; installed FishParameter/FishingNoteInfo/GatheringSubCategory metadata.
+TECHNICAL_FACTS: entry by FishParameter.RowId, identical standard Item; code 1 flagged, 0 not flagged, others unknown in Tensho. Baits/detailed conditions enriched by additional data in the reference project. Weather code 2 not explained, not treated as absence.
+LOCAL_COMPATIBILITY: 389 tests/package; original projection shared with the probe: 2,461 entries and matching log entries, 296 tomes, 491 unknown weather restrictions. Earlier GatheringProbe passing.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Static data is distinct from catches/unlocks/availability; in-game rendering/framework not observed.
+
+## REF-SORT-TEMPLATES-007
+
+DOMAIN: SortaKinda / shared configuration / delivery.
+NAME: Rule templates without observation identity.
+COMMIT_OR_VERSION: Tensho 0.59.0.0, configuration and templates v1.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: original managed implementation, shared validation and local delivery checks; no native API added.
+TECHNICAL_FACTS: exact geometry, rebind to the current scope only, copy of lists and no observation data. Loaded as a draft without capture/application. ZIP checked by SHA-256 against the canonical DLL/manifest.
+LOCAL_COMPATIBILITY: 385 tests/package, six template groups and Newtonsoft three modes passing; canonical output 0.59.0.0.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Native rendering/application/persistence not observed; 17 domains PARTIAL.
+
+## REF-SORT-FILTERS-006
+
+DOMAIN: SortaKinda / shared Item catalogue / equipment.
+NAME: Property filters and native slots.
+COMMIT_OR_VERSION: Tensho 0.58.0.0; installed Lumina bindings and local game files.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: ItemCatalogLoader, installed Item/EquipSlotCategory; ApiProbe and FashionProbe without --fetch. Original implementation.
+TECHNICAL_FACTS: MainHand/OffHand/SoulCrystal fields are sbyte, only positive values affect the mask. Static CanBeHq and market classification prove neither the character's ability nor that the stack can be sold. Missing metadata stays unknown.
+LOCAL_COMPATIBILITY: 379 tests/package; Newtonsoft three modes; native probe: 20,238 Wearable, 7,804 MainHand, 984 OffHand, 31 SoulCrystal and 51 garments blocking Head, negative OffHand excluded.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). No network added; native capture/rendering/application not observed.
+
+## REF-SORT-PROTECTED-005
+
+DOMAIN: SortaKinda / shared preview.
+NAME: Position protection and reversed fill.
+COMMIT_OR_VERSION: Tensho 0.57.0.0; configuration v1 compatible.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: original managed model on the visual indices already observed by InventoryNativeReader; no new native API or external implementation imported.
+TECHNICAL_FACTS: protection before filter selection, empty slots kept empty, full permutation with real empty physical slots; missing or ambiguous indices refused. Fill reversal independent of sort direction.
+LOCAL_COMPATIBILITY: 374 tests/package, five groups including 20 multi-scope scenes with oracles; Newtonsoft three modes and old v1 defaults passing.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Native rendering/writing/persistence not observed; 17 domains PARTIAL.
+
+## REF-SORT-RULES-004
+
+DOMAIN: SortaKinda / shared catalogue.
+NAME: Profiles and positioned preview.
+COMMIT_OR_VERSION: Tensho 0.56.0.0; configuration v1 kept.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: original managed implementation on the existing ItemCatalog, InventorySortPreview and permutation; no new native API or assumed external formula.
+TECHNICAL_FACTS: categories and names taken from the shared native ItemDefinition; gaps represented explicitly then assigned to real empty physical slots, all stacks checked. Rules and per-scope saving distinct from application.
+LOCAL_COMPATIBILITY: 369 tests/package, eight additional groups including 24 multi-scope scenes; Newtonsoft None/Auto/Objects passing with nested lists and historical v1.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Native display and application not observed; the 17 domains remain PARTIAL.
+
+## REF-SORT-SCOPES-003
+
+DOMAIN: SortaKinda / shared bank.
+NAME: Native scopes and direct capture.
+COMMIT_OR_VERSION: plugin 0.55.0.0, installed bindings API 15; external permutation source REF-SORT-NATIVE-002 unchanged.
+VERIFIED_AT: 2026-10-29.
+STATUS: LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: BankStorageScope, InventoryNativeReader and ItemOrderModule/GetActiveRetainerSorter/ActiveRetainerId metadata already inspected; direct accesses compiled.
+TECHNICAL_FACTS: 4 × 35 personal, 2 × 35 per saddlebag, 7 × 25 retainer; native owner of the retainer distinct from the character. Window/loading/identities rechecked on the framework, direct capture receipt independent of an imported cache.
+LOCAL_COMPATIBILITY: 361 tests/package, including 144 scope scenarios and cache/identity/freshness/lifecycle checks; zero warnings/errors.
+NOTES: Contract and limits in the maintainer's notes (outside the repository). Window detection, real capture, writing and persistence not observed in game. No external code imported.
+
+## REF-SORT-NATIVE-002
+
+DOMAIN: SortaKinda / shared inventory.
+NAME: Native visual order.
+REPOSITORY: MidoriKami/SortaKinda.
+COMMIT_OR_VERSION: 95a1bf9161f4bc595c21094eeaae9fda556f4b4b.
+LICENSE: AGPL v3 or later, LICENSE read; API facts only, original implementation.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [SortingController](https://github.com/MidoriKami/SortaKinda/blob/95a1bf9161f4bc595c21094eeaae9fda556f4b4b/SortaKinda/Classes/SortingController.cs).
+FILES_READ: SortingController.cs, ItemOrderModuleSorterExtensions.cs, InventoryTypeExtensions.cs, ItemSlotInfo.cs, SortaKinda.cs, LICENSE; installed ItemOrderModule/Sorter/ItemEntry/PreviousOrder/SortFunction/StdVector metadata.
+TECHNICAL_FACTS: visual order by Page/Slot of entries; permutation of integer values, HasChanges after processing. The reference code uses workers and hooks, which are not reused.
+LOCAL_COMPATIBILITY: original bridge on framework.Update, 140 personal slots, owner/age/coverage/permutation/order/pointer guards; compilation and 355 tests/package passing.
+NOTES: native application, rendering and persistence not observed; no REPLACEABLE claim. Contract and limits in the maintainer's notes (outside the repository).
+
+## REF-USE-CONTEXT-004
+
+DOMAIN: Item Use / shared context.
+NAME: Dalamud inventory context menu.
+REPOSITORY: goatcorp/Dalamud.
+COMMIT_OR_VERSION: 1e514694497ae448fca8e8a46f7b63642ad1e5ad; local SDK API 15.
+LICENSE: AGPL v3; API facts only, original code.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED; runtime UNKNOWN.
+SOURCE: [MenuTargetInventory](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448fca8e8a46f7b63642ad1e5ad/Dalamud/Game/Gui/ContextMenu/MenuTargetInventory.cs).
+FILES_READ: MenuTargetInventory.cs, GameInventoryItem.cs, MenuItem.cs, MenuOpenedArgs.cs, MenuArgs.cs, ContextMenu.cs; installed IContextMenu/IMenuOpenedArgs/IMenuItemClickedArgs metadata.
+TECHNICAL_FACTS: TargetItem builds a GameInventoryItem copy of the targeted slot; read the target in the callback. OpenSubmenu is provided to OnClicked; the AddonContextSub branch does not emit a new OnMenuOpened. Tensho's closures keep only normalised managed values.
+LOCAL_COMPATIBILITY: 0.53 compilation without warnings/errors, 349 tests/package and Newtonsoft three modes passing.
+NOTES: owner/revision/age and option checks are independent; no native validation observed. Contract and protocol in the maintainer's notes (outside the repository).
+
+## REF-USE-HOVER-003
+
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED — 2026-10-29. Evidence and limits in the maintainer's notes (outside the repository).
+SOURCE: goatcorp/Dalamud ItemUtil commit1e514694497ae448fca8e8a46f7b63642ad1e5ad, NQ/collectable500000/HQ1000000 markers and EventItem IDs not subtracted; installed metadata confirmed. Original standard normalisation, explicit rejection of special IDs ≥2000000; no name parser or modulo.
+VALIDATION: 343/343 tests/package, simulated HTTP and scope/priorities; Newtonsoft v1 three modes and GatheringProbe with game data passing. No new native rendering/hover observed.
+
+## REF-USE-002
+
+STATUS: LOCAL_VERIFIED / CURRENT_VERIFIED — 2026-10-29. Evidence and limits in the maintainer's notes (outside the repository).
+SOURCE: PunishedPineapple/ItemUse commit2e7dfc5f7eb122aea5b8705706d4bd8c5000f42d, ItemCategorizer (AGPL-3.0, facts only). Installed CraftLeve/Leve/GCSupplyDuty/AquariumFish sheets and metadata; original projection shared with the probe.
+FACTS: 1,240 linked leves, 54 with multiple rows, Repeats0/2/5 parameters kept without interpretation; 2,516 GC candidates, 263 fish. Static reference distinct from current request/acceptance.
+VALIDATION: 334/334 tests/package, 3,280 Item and leve icons resolved on sqpack; no Dalamud rendering or loading observed.
+
+## REF-GP-ACTIVE-005
+
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED —2026-10-29. Evidence and limits in the maintainer's notes (outside the repository).
+SOURCE: LazyGatherer0bb8ec9a47dc4521411c705221cdeda361015d75, Yield/Gift/Tidings families and Bountiful attempts; targeted facts only, AGPL, no implementation imported. Installed Actions/ActionTransient and shared probe; empty StatusGainSelf stays an unknown association.
+FACTS: permanent families already active are not selected again; Tidings boon 2, capped bonus applied once. Declared model and original oracle; no invented native state.
+VALIDATION:327/327 tests/package, oracle128 scenarios and MIN/BTN probes with game actions passing. Real rendering and effects not validated.
+
+## REF-GATHER-NATIVE-004
+
+STATUS: LOCAL_VERIFIED / CURRENT_VERIFIED — 2026-10-29. Evidence and limits in the maintainer's notes (outside the repository).
+SOURCE: installed GUI signatures; FFXIVClientStructs AddonGathering/AtkResNode 385b0821bc4573b77fbde84c930774eeca8283ec; LazyGatherer GatheringItemComponent/GatheringController 0bb8ec9a47dc4521411c705221cdeda361015d75 for read facts only (AGPL, no implementation imported).
+FACTS: installed Gathering.uld contains 8 CheckBox rows component1010, texts10/16 and icon31→component1005, quantity text7. Probe uses the production GatheringUiLayout; 35/12 nodes, bound256. Empty/dash/malformed texts stay unknown; displayed rates not inferred as base values.
+VALIDATION: 320/320 tests/package green and GatheringUiProbe passing; no native capture or visual validation.
+
+## REF-CACT-LIVE-002
+
+See also CACT-LIVE-002 in the maintainer's notes (outside the repository): local AddonLotteryDaily metadata and FFXIVClientStructs source 385b0821bc4573b77fbde84c930774eeca8283ec verified; nine integer indexers in row/column order. Historical reference MidoriKami/EzMiniCactpot 63173afb3eff69aa64a3edc613a377c4053d26fa for GameNumbers and removal at the end of the ticket; no implementation imported, no LICENSE file found in that tree. Old daemitus URL 404. API compiled and 311 tests/package green; native runtime not validated. Statuses LOCAL_VERIFIED / HISTORICAL_VERIFIED, 2026-10-29.
+
+## REF-CRAFT-CONDITIONS-004 / RANGE-005
+
+STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED — 2026-10-29. Sources and limits for CRAFT-CONDITIONS-004 and CRAFT-CONDITION-RANGE-005 in the maintainer's notes (outside the repository).
+SOURCE: Craftimizer commit 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86, Gearsets and Simulator (StepCondition, quality factors), read from the primary repository; local metadata and sqpack.
+FACTS: known English tool description × 1.75; 136 markers in 928 main tools, none elsewhere. Good/Poor → Normal; Excellent → Poor; from Normal, conservative Normal/Good/Excellent envelope without probability. Per-condition bounds compared with an exhaustive enumeration on small scenarios.
+VALIDATION: 302/302 tests/package green. Observation of the tool actually equipped and in-game rendering remain unvalidated; projection and Macro Chain tests deferred.
+
+## REF-CRAFT-LIVE-003
+
+DOMAIN: Craft; experimental native immediate projection.
+NAME: Typed Synthesis values and action eligibility.
+REPOSITORY: WorkingRobot/Craftimizer; aers/FFXIVClientStructs; local assemblies API 15.
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86; ActionManager 385b0821bc4573b77fbde84c930774eeca8283ec.
+LICENSE: Sources studied for facts; original implementation, no hook or offset reused.
+VERIFIED_AT: 2026-10-29.
+STATUS: CURRENT_VERIFIED for the schema/conventions studied; LOCAL_VERIFIED for signatures; runtime UNKNOWN, test deferred by the user.
+SOURCE: evidence and limits in the maintainer's notes (outside the repository).
+FILES_READ: SynthesisValues, Condition, SynthHelper, Hooks; ActionManager and AtkValue/ActionType/CraftCondition metadata.
+TECHNICAL_FACTS: Normal addon0 and handler1, UI step minus one; GetActionStatus without recast check; GetActionCost not used because the meaning of the four additional parameters is not established. Projection of possible states, without a full rotation.
+LOCAL_COMPATIBILITY: Verify.ps1 0.45.0.0, 290/290 tests/package green; GatheringProbe and CraftSimulationProbe passing.
+NOTES: The projection test and Macro Chain are deferred by the user; no new request. User quota reserve 5%.
+
+## REF-GATHER-WEATHER-001
+
+DOMAIN: Gathering / Maps; zone weather.
+NAME: Native weather weights and forecasts of ET periods.
+REPOSITORY: FFXIV-CombatReborn/GatherBuddyReborn; installed native sheets.
+COMMIT_OR_VERSION: a204f2f45cb98302dbe938921255c3a6d617c775; local Lumina API 15.
+LICENSE: Apache-2.0 for the reference; facts studied, original implementation.
+VERIFIED_AT: 2026-10-28.
+STATUS: CURRENT_VERIFIED for calculation/rates; LOCAL_VERIFIED for joins and icons; runtime UNKNOWN.
+SOURCE: evidence and limits in the maintainer's notes (outside the repository).
+FILES_READ: WeatherManager.Computation.cs, CumulativeWeatherRates.cs; WeatherRate, Weather, TerritoryType via ApiProbe and sqpack.
+TECHNICAL_FACTS: Eight-hour ET period, 32-bit mixing and cumulative rates; 1290 territories/72 weathers, 24 individual zones; Empyreum total90 kept unknown for the missing mass.
+LOCAL_COMPATIBILITY: Verify.ps1 0.42.0.0, 275/275 tests/package green; WeatherProbe passing without warnings.
+NOTES: Calculated forecast, not observed native weather; events and resource prerequisites out of scope.
+
+## REF-CRAFT-LIVE-002
+
+DOMAIN: Craft; observed effects.
+NAME: Status identities, Param, counters and single history.
+REPOSITORY: WorkingRobot/Craftimizer; installed native sheets and assemblies.
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86; local API 15.
+LICENSE: MIT for the source studied; facts used, no hook/code reused.
+VERIFIED_AT: 2026-10-28.
+STATUS: CURRENT_VERIFIED for Param/IDs/studied convention; LOCAL_VERIFIED for twelve statuses/icons; runtime UNKNOWN.
+SOURCE: evidence and limits in the maintainer's notes (outside the repository).
+FILES_READ: SynthHelper, SimulatorUtils, SynthesisValues; StatusList.Length, Status.Param and the game's Status sheets.
+TECHNICAL_FACTS: Counters via Param, twelve recognised IDs and native icons, presence of Trained Perfection distinct from its history. The primary reader tracks its ActionStates through actions; native procs are not converted without evidence.
+LOCAL_COMPATIBILITY: Verify.ps1 0.41.0.0, 270/270 tests and package green; probe of twelve statuses and 208 actions passing.
+NOTES: No complete advice state reconstructed; runtime test deferred, other domains can move forward.
+
+## REF-CRAFT-LIVE-001
+
+DOMAIN: Craft; native observation.
+NAME: CraftEventHandler, AddonSynthesis and current CP.
+REPOSITORY: Installed local Dalamud/FFXIVClientStructs assemblies; no external code copied.
+COMMIT_OR_VERSION: API 15; signatures and fields verified via ApiProbe.
+LICENSE: Metadata inspected, no host assembly redistributed.
+VERIFIED_AT: 2026-10-28.
+STATUS: LOCAL_VERIFIED for access availability; runtime UNKNOWN.
+SOURCE: evidence and protocol in the maintainer's notes (outside the repository).
+FILES_READ: EventFramework/CraftEventHandler/CraftCondition/CraftFlags types, AddonSynthesis/CraftEffect, AtkTextNode/AtkResNode/Utf8String, IObjectTable/ICharacter/IBattleChara and statuses; existing experimental reader as the lifecycle convention.
+TECHNICAL_FACTS: Handler present, unlike the assumed CraftingManager; named recipe/step/condition fields, UI texts and effects, CurrentCp/MaxCp. Status time/stack parameters not interpreted.
+LOCAL_COMPATIBILITY: Verify.ps1 0.40.0.0, 265/265 tests and package green; no capture of the running client performed.
+NOTES: Temporary read-only access disabled by default; no advice or complete native state claimed.
+
+## REF-CRAFT-ACTIONS-002
+
+DOMAIN: Craft; advanced normal actions.
+NAME: Nine actions, traits, Inner Quiet and durability protection.
+REPOSITORY: WorkingRobot/Craftimizer.
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86; installed native sheets API 15.
+LICENSE: MIT; facts studied, original implementation.
+VERIFIED_AT: 2026-10-28.
+STATUS: LOCAL_VERIFIED for 208 metadata entries/icons; CURRENT_VERIFIED for the model's constraints/traits; runtime UNKNOWN.
+SOURCE: action table, evidence and limits in the maintainer's notes (outside the repository).
+FILES_READ: DelicateSynthesis, PreparatoryTouch, PrudentSynthesis/Touch, RefinedTouch, TrainedEye/Finesse/Perfection, ImmaculateMend; Simulator and Effects.
+TECHNICAL_FACTS: Separate trait 94, two stacks/combo, Waste Not prohibition, opener/level and ten stacks, full restoration, persistent protection consumed only once.
+LOCAL_COMPATIBILITY: Verify.ps1 0.39.0.0, 260/260 tests and package green; probe of 208 variants, level100 recipe and replay passing.
+NOTES: Level100 proposal below target explicitly reported; proves neither impossibility nor the logged-in character's ability. No native reading of the synthesis.
+
+## REF-CRAFT-MACRO-001
+
+DOMAIN: Craft; manual export.
+NAME: Localised commands, capacity and proposed waits.
+REPOSITORY: WorkingRobot/Craftimizer.
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86.
+LICENSE: MIT; facts studied, original implementation.
+VERIFIED_AT: 2026-10-28.
+STATUS: CURRENT_VERIFIED; action metadata LOCAL_VERIFIED; in-game activation UNKNOWN.
+SOURCE: evidence and limits in the maintainer's notes (outside the repository).
+FILES_READ: MacroCopy.cs, BaseAction.cs, BaseBuffAction.cs, Observe.cs, MastersMend.cs, MuscleMemory.cs, Reflect.cs; existing native macro reader.
+TECHNICAL_FACTS: 15 lines, /ac with native name and wait; effects 2s, other modelled actions 3s. Export convention, not a latency guarantee.
+LOCAL_COMPATIBILITY: Release 0.37.0.0, 243/243 tests and package green; probe of the eight crafter classes passing.
+NOTES: Text copy per block only; no native execution or writing.
+
+## REF-CRAFT-SIM-001
+
+DOMAIN: Craft; normal manual simulation.
+NAME: Recipe parameters and deterministic actions.
+REPOSITORY: WorkingRobot/Craftimizer; ffxiv-teamcraft/simulator.
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86; 74e167a05ba279526d2ddd457a048e234bedbad9; local assemblies API 15.
+LICENSE: Craftimizer MIT; sources studied for facts, no external code embedded.
+VERIFIED_AT: 2026-10-28.
+STATUS: LOCAL_VERIFIED for fields/joins/actions/icons; CURRENT_VERIFIED for comparison of the formulas of these commits; runtime UNKNOWN.
+SOURCE: file and evidence in the maintainer's notes (outside the repository).
+FILES_READ: Craftimizer SimulationInput and actions/effects; Teamcraft quality-action, progress-action, AdvancedTouch; Lumina Recipe/RecipeLevelTable/CraftAction/Action/ActionTransient from the installed game.
+TECHNICAL_FACTS: Bases truncated before action, additive buffs, conditional combos, durations and stops; 136 native variants verified; 11,361 recipes accepted / 2,531 explicitly excluded from the initial model.
+LOCAL_COMPATIBILITY: Release 0.36.0.0, Verify.ps1 239/239 and package green; CraftSimulationProbe passing.
+NOTES: Normal condition only, manual/copied attributes, no HQ rate and no commanded synthesis; see exact scope and deferred test.
+
+Current state 0.19.0 (2026-10-28): multi-tool base, sub-recipes, maps, map favourites, hover prices and macro sequences, described in the maintainer's notes (outside the repository). 119/119 tests and package verified. The user will test Macro Chain later; native validation deferred, no acceptance assumed.
+
+REF-ID: REF-GATHER-LOCAL-20261027
+DOMAIN: Gathering/fishing
+SOURCE: Installed Lumina assemblies, installed game sqpack read by tools/GatheringProbe.
+STATUS: LOCAL_VERIFIED — API compilation; LOCAL_DATA_VERIFIED — joins executed on game files.
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+FILES_READ: Metadata of GatheringItem, GatheringItemPoint (subrows), GatheringPointBase, GatheringPoint, GatheringType, TerritoryType, PlaceName, FishingSpot and Map; local data of the same sheets.
+TECHNICAL_FACTS: Untyped RowRefs are checked by RowType. GatheringItemPoint.RowId identifies GatheringItem and its subrows reference GatheringPoint; this link provides the sources of hidden items missing from GatheringPointBase.Item. FishingSpot.Item is directly typed Item.
+NOTES: No external plugin code copied. Map opened at the zone centre only; no exact position or availability inferred. Counting evidence in TESTING.md.
+
+REF-ID: INVENTORY-VISUAL-ORDER-20261027
+DOMAIN: Inventory
+NAME: ItemOrderModule and ItemOrderModuleSorter
+SOURCE: https://github.com/aers/FFXIVClientStructs/blob/main/FFXIVClientStructs/FFXIV/Client/UI/Misc/ItemOrderModule.cs
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED — fields present in the installed assembly and access compiled; runtime to be confirmed.
+TECHNICAL_FACTS: InventorySorter, SaddleBagSorter, PremiumSaddleBagSorter and GetActiveRetainerSorter expose Items; each entry references a physical Page and Slot. This permutation is distinct from the physical IGameInventory order.
+NOTES: The previous claim that changing row/column was enough was incorrect. The projection now consumes this table; no native writing.
+
+
+## REF-MACRO-BRIDGE-20261028
+
+REF-ID: REF-MACRO-BRIDGE-20261028
+DOMAIN: Macro Chain
+NAME: Local adapter with end marker and owned call
+REPOSITORY: Original Tensho sources; primary references https://github.com/Caraxi/MacroChain and https://github.com/aers/FFXIVClientStructs
+COMMIT_OR_VERSION: Local assemblies API 15 compiled in 0.18.0; external readings of 2026-10-27 kept in the maintainer's notes (outside the repository)
+LICENSE: No external implementation copied; host SDK/assemblies not redistributed
+VERIFIED_AT: 2026-10-28 Europe/Brussels
+STATUS: LOCAL_VERIFIED for signatures/compilation; NATIVE_BEHAVIOR_UNVERIFIED
+SOURCE: ApiProbe, local Dalamud.xml and the adapter's sources
+FILES_READ: RaptureMacroModule.Macro/GetMacro, Utf8String, RaptureShellModule.ExecuteMacro/MacroLines/MacroName/MacroCurrentLine, IGameInteropProvider.HookFromAddress, IFramework.IsInFrameworkUpdateThread
+TECHNICAL_FACTS: Macro is a native type with 15 lines; books 0/1 and index 0–99. Hook at the address provided by the typed members, no offset/signature added. Names/lines copied on the framework are managed. IsInFrameworkUpdateThread checks the game thread, not only the scope of the Update callback.
+LOCAL_COMPATIBILITY: 0.18.0 compiled and 114 tests/package verified; owned scopes, commands and hook. No call to the game made during these tests.
+NOTES: Line index at the marker callback still to be confirmed. The protocol accepts the footer line or its immediate consumption; any disagreement stops the sequence. No macro action success is inferred from the marker.
+
+BASELINE_REFERENCE_DATE: 2026-10-27
+
+The eleven historical blocks below are transcribed from the maintainer's former master prompt (outside the repository), and not rechecked against their repositories. The licences are those reported by that source. No external plugin source was copied. FILES_READ distinguishes what was actually read here from concepts reported historically.
+
+## REF-DALAMUD
+
+REF-ID: REF-DALAMUD
+DOMAIN: Foundation
+NAME: Dalamud
+REPOSITORY: https://github.com/goatcorp/Dalamud
+COMMIT_OR_VERSION: 1e514694497ae448fca8e8a46f7b63642ad1e5ad
+LICENSE: AGPL v3 (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: IFramework; IUnlockState; IGameInventory; IAddonLifecycle; WindowSystem; GameInventory.
+TECHNICAL_FACTS: IFramework exposes IsInFrameworkUpdateThread, RunOnTick, RunOnFrameworkThread. Copy ReadOnlySpan<GameInventoryItem> before deferred processing. Unlock loading indicators: false may remain unknown. InventoryChanged invalidates, it does not prove completeness.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-SAMPLE
+
+REF-ID: REF-SAMPLE
+DOMAIN: Bootstrap
+NAME: SamplePlugin
+REPOSITORY: https://github.com/goatcorp/SamplePlugin
+COMMIT_OR_VERSION: b8477daaa678a5dd72cdcd4a32bc249d3c23a598
+LICENSE: AGPL v3 (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: Plugin; configuration; windows.
+TECHNICAL_FACTS: IDalamudPlugin, PluginService, ICommandManager, WindowSystem, UiBuilder.Draw/OpenConfigUi/OpenMainUi, IPluginConfiguration/SavePluginConfig, Dispose. SDK observed 15.0.0, without assuming it is still valid today.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-CRAFT
+
+REF-ID: REF-CRAFT
+DOMAIN: Craftimizer #5
+NAME: Craftimizer
+REPOSITORY: https://github.com/WorkingRobot/Craftimizer
+COMMIT_OR_VERSION: 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86
+LICENSE: MIT (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: RecipeData; RecipeNote; WKSRecipeNotebook; simulator; solver.
+TECHNICAL_FACTS: Join Recipe/RecipeLevelTable/Item/collectable thresholds. Initial quality depends on HQ, item levels and MaterialQualityFactor. Byregot/Inner Quiet, Innovation/Great Strides, steps and randomness. Cancellable solver with bounded parallelism, genetic/MCTS/Raphael; no universal exhaustiveness demonstrated. Offsets to recheck before use.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-ARTISAN
+
+REF-ID: REF-ARTISAN
+DOMAIN: Secondary crafting
+NAME: Artisan
+REPOSITORY: https://github.com/PunishXIV/Artisan
+COMMIT_OR_VERSION: 247c2df1fad7eb83fa7af584e8340f4f987b12de
+LICENSE: BSD-3-Clause (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: CraftState; StepState; Simulator; Calculations; ISolver; TrackConditions; RecipeWindowUI.
+TECHNICAL_FACTS: Calculations based on RecipeLevelTable factors/divisors. Separate simulation from action selection. Secondary reference, not an additional plugin.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-GATHER
+
+REF-ID: REF-GATHER
+DOMAIN: GatherBuddy #8
+NAME: GatherBuddyReborn
+REPOSITORY: https://github.com/FFXIV-CombatReborn/GatherBuddyReborn
+COMMIT_OR_VERSION: a204f2f45cb98302dbe938921255c3a6d617c775
+LICENSE: Apache-2.0 (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: GameData; Gatherable; TimeInterval; BitfieldUptime; UptimeManager; WeatherManager.
+TECHNICAL_FACTS: Sheets Item, GatheringItem, GatheringItemPoint, GatheringPoint, GatheringPointBase, Aetheryte, TerritoryType, Weather, WeatherRate, FishingSpot. MIN/BTN, level, stars, location. Distinguish Item/Gathering/GatheringPoint IDs and Always/Never/Invalid. Static existence does not prove character prerequisites.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-SORT
+
+REF-ID: REF-SORT
+DOMAIN: SortaKinda #16
+NAME: SortaKinda
+REPOSITORY: https://github.com/MidoriKami/SortaKinda
+COMMIT_OR_VERSION: 95a1bf9161f4bc595c21094eeaae9fda556f4b4b
+LICENSE: AGPL v3+ (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: Rules; slot sets; configuration; InventoryRenderer; preview.
+TECHNICAL_FACTS: Filtering, ordering, slot sets, global/character configuration, preview. Do not couple saving with the native sort action. Study the current behaviour at integration time.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+PREVIOUS: 95a1bf9161f4bc595c21094eeaae9fda556f4b4b HISTORICAL_VERIFIED
+PREVIOUS_VERIFIED_AT: 2026-10-27
+CURRENT: HEAD unchanged 95a1bf9161f4bc595c21094eeaae9fda556f4b4b (commit of 2026-08-29), CURRENT_VERIFIED
+CURRENT_VERIFIED_AT: 2026-10-30
+EVIDENCE: git clone --depth 1 of the public repository; LICENSE AGPL v3+; FilterRules, OrderRules, SortingController, SystemConfiguration, InventoryItemExtensions read.
+DECISION: gaps recorded in the maintainer's notes (outside the repository); Lumina columns to confirm locally before use.
+REASON: prepare the remaining SortaKinda slices without copying code.
+
+## REF-INVENTORY
+
+REF-ID: REF-INVENTORY
+DOMAIN: Secondary inventory
+NAME: InventoryTools
+REPOSITORY: https://github.com/Critical-Impact/InventoryTools
+COMMIT_OR_VERSION: 70a9f410d9a8ab97bef6bcf795415ea2d7c75097
+LICENSE: GPL v3 (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: ItemSearchService; ItemObtainabilityService; CraftListTrackingService; ListFilterService.
+TECHNICAL_FACTS: Owner/retainer/container/NQ-HQ scope. Absence from an incomplete snapshot does not mean a quantity of zero. Shared inventory service.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-SHINIES
+
+REF-ID: REF-SHINIES
+DOMAIN: Secondary collections
+NAME: XIV-Shinies
+REPOSITORY: https://github.com/XIV-Shinies/xiv-shinies-plugin
+COMMIT_OR_VERSION: e6f4341200f11db6d1bc827eee7fa16ad7aec55a
+LICENSE: MIT (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: CollectorRegistry; CollectResult; CollectorRunner; ExcelUnlockCollector; GameThread; QuestSequenceCollector; CollectionStatusMemory.
+TECHNICAL_FACTS: Collectors per domain, skip reasons, explicit coverage, isolated errors and appropriate thread. Empty does not mean complete.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-TOMESTONE
+
+REF-ID: REF-TOMESTONE
+DOMAIN: Secondary collections
+NAME: Tomestone
+REPOSITORY: https://github.com/TomestoneGG/Dalamud.Tomestone
+COMMIT_OR_VERSION: d9e69687d4453899d8d419ab3964383afa6e58a5
+LICENSE: AGPL v3 (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: BuddyEquip; Achievement; Companion; Mount; Orchestrion; TripleTriadCard; CharaMakeCustomize; Item; AozAction.
+TECHNICAL_FACTS: Candidate collection domains. A collection candidate never proves ownership.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-QUEST
+
+REF-ID: REF-QUEST
+DOMAIN: Secondary quests
+NAME: ffxiv-todo
+REPOSITORY: https://github.com/datamachine/ffxiv-todo
+COMMIT_OR_VERSION: ef5f5bab3b0b2c601a14d6c00d2088f1a40f1894
+LICENSE: MIT (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: Catalogue; unlock resolver; PreviousQuest; overrides.
+TECHNICAL_FACTS: Preserve Unknown. ALL/ANY and AND/OR prerequisites to be distinguished according to evidence; do not simplify arbitrarily.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-SNAPSHOT
+
+REF-ID: REF-SNAPSHOT
+DOMAIN: Secondary snapshots
+NAME: Tsukimichi
+REPOSITORY: https://github.com/xenofei/Tsukimichi
+COMMIT_OR_VERSION: a82116abee83a0fbf0356f3eaa29d5bb9fd800c1
+LICENSE: MIT (historical observation provided)
+VERIFIED_AT: 2026-10-27
+STATUS: HISTORICAL_VERIFIED
+SOURCE: the maintainer's former master prompt (outside the repository)
+FILES_READ: Master prompt only in this session; files/concepts reported: GameStateReader; SnapshotService; CharacterSnapshot; QuestRecord; QuestQuery; SnapshotDiff; DailyOfferBook; GameResets; JsonSnapshotStore.
+TECHNICAL_FACTS: Any important dynamic data must express freshness and scope; separate observation, network acquisition, computation and update.
+LOCAL_COMPATIBILITY: UNKNOWN for these historical commits; the bootstrap build is recorded separately.
+NOTES: Keep only the technical facts. No product conclusion taken from another project.
+
+## REF-SCOPE
+
+REF-ID: REF-SCOPE
+DOMAIN: Scope
+NAME: Authoritative list of the 17 plugins
+REPOSITORY: N/A — user prompt
+COMMIT_OR_VERSION: SHA256 76B22632FEDCCA6D127FBDFE848AC87C9BC75663D0C36B238F985B23F2B38B9C
+LICENSE: N/A — user instructions; no redistribution licence assumed
+VERIFIED_AT: 2026-10-27
+STATUS: LOCAL_VERIFIED
+SOURCE: Two identical user attachments, copied into the maintainer's former master prompt (outside the repository)
+FILES_READ: Full master prompt; fingerprints of both files verified
+TECHNICAL_FACTS: 17 priority plugins; CORE-000 limited to the bootstrap; persistent context and checkpoints.
+LOCAL_COMPATIBILITY: Applied to ROADMAP.md; all plugins remain NOT_STARTED after the foundation.
+NOTES: Current sources of the other plugins: NEEDS_STUDY during their GOAL, without an initial global study.
+
+## REF-LOCAL-001
+
+REF-ID: REF-LOCAL-001
+DOMAIN: Toolchain and bootstrap
+NAME: Compiled local environment
+REPOSITORY: N/A — installed assemblies
+COMMIT_OR_VERSION: Dalamud 15.0.3.9; commit 30509c3b4fd00edd9a3d65b7bbf16433d84be03b; Dalamud SDK 15.0.0; .NET SDK 10.0.403 / runtime 10.0.14
+LICENSE: Installation licences in Hooks/15.0.3.9/licenses.txt; not re-audited
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: dotnet --info; NuGet cache; Hooks/dev and Hooks/15.0.3.9; Release build and tests
+FILES_READ: Sdk/Sdk.props, Sdk/Sdk.targets, Sdk/SdkPackageVersions.props; Dalamud.xml (interfaces/command/UI sections); Dalamud.runtimeconfig.json; version.json of the stable folder; commit_hash.txt dev/stable; DalamudPackager targets
+TECHNICAL_FACTS: The Dalamud SDK targets net10.0-windows/C#14/x64, resolves Hooks/dev by default and allows DALAMUD_HOME. The .NET on the PATH is 9.0.302; SDK 10.0.403 available in C:/ia-code/.tools/dotnet10. Stable and dev report the same commit. The stable version.json reports game 2026.10.16.0000.0000 and runtime 10.0.14. The plugin compiles with constructor injection, IDalamudPlugin, AddHandler, UiBuilder and WindowSystem.
+LOCAL_COMPATIBILITY: COMPILED Release with no warning or error; 5/5 managed tests. No Dalamud/FFXIV runtime test.
+NOTES: No assumption about offset, inventory or unlock compatibility. Do not copy host assemblies into the package.
+
+## REF-DOTNET-DOCS
+
+REF-ID: REF-DOTNET-DOCS
+DOMAIN: Tooling
+NAME: Microsoft documentation, Windows installation
+REPOSITORY: https://learn.microsoft.com/en-us/dotnet/core/install/windows
+COMMIT_OR_VERSION: Page consulted on 2026-10-27
+LICENSE: Microsoft documentation; no code reused
+VERIFIED_AT: 2026-10-27
+STATUS: CURRENT_VERIFIED
+SOURCE: Targeted web search while locating the SDK
+FILES_READ: Windows installation section (search result)
+TECHNICAL_FACTS: SDKs can be installed or extracted into an explicit folder.
+LOCAL_COMPATIBILITY: Installation became unnecessary: an existing SDK was found locally.
+NOTES: The local evidence, not the version cited by the page, determines global.json.
+
+## REF-INV-MODEL
+
+REF-ID: REF-INV-MODEL
+DOMAIN: Shared inventory foundation
+NAME: Semantics of the CORE-001 managed snapshot
+REPOSITORY: N/A — original local sources Tensho--Assistant
+COMMIT_OR_VERSION: CORE-001
+LICENSE: Original local code; no external source copied
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Managed sources and Verify.ps1 run successfully
+FILES_READ: src/TenshoAssistant/Inventory/InventorySnapshot.cs; InventoryService.cs; tests/TenshoAssistant.Tests/InventoryTests.cs
+TECHNICAL_FACTS: Frozen snapshots, distinct identifier types, queries with explicit scope, minimum bound and nullable exactness, per-container coverage, atomic publication of the latest batch and full invalidation. Eight inventory tests pass, 13/13 with the foundation.
+LOCAL_COMPATIBILITY: Release build .NET 10.0.403 and Dalamud SDK 15.0.0; no native read and no in-game validation.
+NOTES: Verification of the original code, not a new validation of the historical references. The read/completeness guarantees of IGameInventory remain to be studied in INV-001.
+
+## REF-INV-API
+
+REF-ID: REF-INV-API
+DOMAIN: Bag acquisition and lifecycle
+NAME: Local public contract IGameInventory / identity / framework
+REPOSITORY: N/A — installed assemblies; associated repository https://github.com/goatcorp/Dalamud
+COMMIT_OR_VERSION: Hooks/dev, commit 30509c3b4fd00edd9a3d65b7bbf16433d84be03b (installation recorded in REF-LOCAL-001)
+LICENSE: Assemblies of the existing installation; no Dalamud code copied
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Installed Dalamud.xml; metadata inspection via tools/ApiProbe; compilation of the new adapter
+FILES_READ: Dalamud.xml sections IGameInventory, IPlayerState; Dalamud.dll metadata: GameInventoryType, GameInventoryItem, IGameInventory and InventoryChangelogDelegate, IFramework and OnUpdateDelegate, IClientState and LogoutDelegate; local sources of the adapter and coordinator
+TECHNICAL_FACTS: GetInventoryItems(GameInventoryType) returns ReadOnlySpan<GameInventoryItem>. Inventory1–4 are 0–3. Slots expose IsEmpty, ContainerType, BaseItemId, IsHq and Quantity (Int32). InventoryChanged receives IReadOnlyCollection<InventoryEventArgs>. Update receives IFramework; Logout receives two Int32. IPlayerState exposes IsLoaded and ContentId; IsLoaded can be true without a LocalPlayer object. No public completeness/container-loading indicator in the inspected IGameInventory.
+LOCAL_COMPATIBILITY: Adapter compiled with service injection; managed coordinator tested, 20/20 tests in total. Runtime unknown; no Complete emitted. The public contract alone does not justify proof of absence from an empty span.
+NOTES: XML and metadata do not prove live behaviour. Empty span classified Unknown, non-empty Partial. Events are used only to invalidate; event data is not kept. The historical source remains unchanged.
+
+## REF-INV-LOAD
+
+REF-ID: REF-INV-LOAD
+DOMAIN: Bag loading and proof of completeness
+NAME: Local InventoryManager / InventoryContainer
+REPOSITORY: N/A — installed assembly FFXIVClientStructs.dll
+COMMIT_OR_VERSION: SHA256 F5A2C68CCECD3E199BDA572050E98902B2E7594066C95DC7826C2D4297CD0564
+LICENSE: Assembly of the existing installation; no external code copied
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Metadata of Hooks/dev/FFXIVClientStructs.dll via ApiProbe; compilation of the adapter against this assembly
+FILES_READ: Metadata of InventoryManager and InventoryContainer; installed XML; InventoryReadEvidence.cs and associated tests
+TECHNICAL_FACTS: InventoryManager.Instance() returns InventoryManager*; GetInventoryContainer(InventoryType) returns InventoryContainer*. InventoryContainer exposes Items (InventoryItem*), Type, Size (Int32) and IsLoaded (Boolean). These typed members make it possible to cross-check loading, container identity, buffer stability and the number of slots read. No new numeric offset is used.
+LOCAL_COMPATIBILITY: Release build 0.1.1.0 succeeded; 25/25 managed tests and package verified. Added native calls not yet validated in game.
+NOTES: Complements REF-INV-API, which remains correct about the absence of an indicator in IGameInventory alone. The native semantics are those of the installed members; their live confirmation remains RUNTIME-001.
+
+PREVIOUS: Adapter 0.1.0 emits only Partial/Unknown for lack of loading proof via IGameInventory.
+PREVIOUS_VERIFIED_AT: 2026-10-27
+CURRENT: 0.1.1 emits Complete for a bag only if loaded headers are valid before/after, the buffer is stable and the slots read equal Size; otherwise Partial/Unknown.
+CURRENT_VERIFIED_AT: 2026-10-27 Europe/Brussels
+EVIDENCE: Members of the installed assembly, compiled code and InventoryReadEvidenceTests tests.
+DECISION: Use this additional proof for an exact total of the four bags; no global total across all storage.
+REASON: Fix the always-unknown label without turning an empty span into proof of a zero quantity.
+
+## REF-ITEM-API
+
+REF-ID: REF-ITEM-API
+DOMAIN: Shared Item catalogue
+NAME: Lumina Item source and generation metadata
+REPOSITORY: N/A — installed Dalamud/Lumina/Lumina.Excel assemblies
+COMMIT_OR_VERSION: Installation REF-LOCAL-001; Lumina.Excel schema and repository versions captured in each ItemCatalogMetadata at load time
+LICENSE: Existing assemblies; no external code reused, catalogue built from the local game data
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Metadata via tools/ApiProbe, local XML documentation and Release 0.1.4 build
+FILES_READ: Item.RowId/Name/CanBeHq in Lumina.Excel.dll; Lumina.GameData.Repositories and Lumina.Data.Repository.Name/Version in Lumina.dll; XML IDataManager.GetExcelSheet and ExcelSheet.Count/GetRowAt/Language; ReadOnlySeString.ExtractText
+TECHNICAL_FACTS: GetRowAt uses a sequential index distinct from RowId. Name is a ReadOnlySeString extracted immediately into a string. The sheet exposes its language; the repositories expose copyable versions. The published definitions/indexes contain no sheet, Lumina row or native pointer. The build can therefore work only on copied managed data.
+LOCAL_COMPATIBILITY: Plugin 0.1.4 compiled, 31/31 managed tests and package green. No real loading of this new source in the client has been observed yet.
+NOTES: The framework copy budget is flexible; neither real latency nor compatibility with a future game version is claimed. The language/generation of the catalogue must not be confused with ownership of an item in the inventory.
+
+RUNTIME_EVIDENCE_AT: 2026-10-27 Europe/Brussels
+RUNTIME_EVIDENCE: User screenshot codex-clipboard-e454bd2e-7f41-4788-87bf-0ced362301f8.png and feedback « tous est OK » ("everything is OK"). Catalogue loaded: 50,880 items, French; search for "sirop", selection of result 12892 and diagnostic 0 NQ/156 HQ/total 156 visible. Real source and rendering confirmed within this scope; do not extrapolate to performance or error scenarios. Details in TESTING.md.
+
+## REF-UI-ICONS
+
+REF-ID: REF-UI-ICONS
+DOMAIN: Interface / tools directory
+NAME: Native Dalamud IconButton and FontAwesome
+REPOSITORY: N/A — local Dalamud installation, see REF-LOCAL-001
+COMMIT_OR_VERSION: Installed assembly used by the 0.2.1 build; Dalamud commit recorded in REF-LOCAL-001
+LICENSE: Resources already provided by the host; no external asset copied or redistributed
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Dalamud XML documentation and FontAwesomeIcon metadata via ApiProbe
+FILES_READ: Dalamud.xml, ImGuiComponents.IconButton(string, FontAwesomeIcon, Vector2); FontAwesomeIcon fields used; MainWindow.Tools.cs
+TECHNICAL_FACTS: An icon button can be created from an identifier, a FontAwesome glyph and a Vector2 size. The 17 glyphs of the future modules and BoxOpen exist locally. The font is managed by the host.
+LOCAL_COMPATIBILITY: Release 0.2.1 build with no warning; 31/31 tests and package green. Rendering and clicks in the client still to be validated.
+NOTES: Opening and rendering an ImGui popup must use the same ID stack level; the code opens the item card outside the scope of the table.
+
+## REF-BANK-API
+
+REF-ID: REF-BANK-API
+DOMAIN: Retainer/chocobo inventories and manual import
+NAME: Contexts, identities and positions of the inventory menus
+REPOSITORY: N/A — local Dalamud and FFXIVClientStructs assemblies, installation REF-LOCAL-001
+COMMIT_OR_VERSION: Installed assemblies against which 0.3.0 compiles; FFXIVClientStructs SHA256 recorded in REF-INV-LOAD
+LICENSE: Existing assemblies; no external code or asset copied
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Metadata via ApiProbe, local XML documentation and compilation of the new adapter
+FILES_READ: RetainerManager and Retainer (RetainerId, NameString, IsReady), XML GetActiveRetainer/LastSelectedRetainerId; IGameGui.GetAddonByName; AtkUnitBasePtr.IsNull/IsReady/IsVisible/Position/ScaledWidth; types AddonInventoryRetainer, AddonInventoryRetainerLarge, AddonInventoryBuddy; GameInventoryType groups already inspected
+TECHNICAL_FACTS: GetActiveRetainer returns the retainer referenced by LastSelectedRetainerId, not standalone proof of an open menu. RetainerPage1–7 correspond to IDs 10000–10006; saddlebags 4000/4001 and premium 4100/4101. The addon wrapper provides visibility and copyable coordinates. The shared native reader reuses stable IsLoaded/type/size/buffer before publishing a complete group.
+LOCAL_COMPATIBILITY: Build 0.3.0 succeeded, 43/43 managed tests and package verified. Managed bank/save/search tested; menus, real identities and retainer/chocobo containers not yet validated in the client.
+NOTES: The runtime names InventoryRetainer/InventoryRetainerLarge/InventoryBuddy are chosen from the local types; InventoryBuddy2 is a fallback candidate. This mapping and the anchoring remain UNKNOWN on the runtime-observation side, to be confirmed by BANK-001-RUNTIME. No usable addon-name attribute was observed on these types during the probe. No numeric offset added, no server request or item-move action executed.
+
+RUNTIME_EVIDENCE_AT: 2026-10-27 Europe/Brussels
+RUNTIME_EVIDENCE: Screenshot 55b7452f-db39-4732-aca5-13ee28923f23: v0.3.0, Chocobo Saddlebag cache shown with 26 HQ and UTC date, bags with 182 NQ, recorded total 208. This confirms viewing a chocobo import in the search, not the anchoring, the retainers or persistence after reload. Details in TESTING.md.
+
+## REF-ITEM-TEXTURES
+
+REF-ID: REF-ITEM-TEXTURES
+DOMAIN: Item catalogue and UI icons
+NAME: Item.Icon / ITextureProvider / ISharedImmediateTexture
+REPOSITORY: N/A — local Lumina.Excel and Dalamud assemblies
+COMMIT_OR_VERSION: Installation REF-LOCAL-001, API compiled in 0.4.0; the catalogue keeps the data/schema versions in its metadata
+LICENSE: Game assets loaded by the existing host; no image file copied or redistributed
+VERIFIED_AT: 2026-10-27 Europe/Brussels
+STATUS: LOCAL_VERIFIED
+SOURCE: Item metadata and texture interfaces, local XML documentation, catalogue build and tests
+FILES_READ: Item.Icon; GameIconLookup (IconId/ItemHq/HiRes), ITextureProvider.TryGetFromGameIcon, ISharedImmediateTexture.TryGetWrap, IDalamudTextureWrap.Handle/Size; documentation on lifetimes and UI-thread usage
+TECHNICAL_FACTS: The base icon is an identifier distinct from Item.RowId. Lookup requested in high resolution, without forcing an HQ variant. TryGetWrap provides a wrap valid for the current frame only, without waiting; do not keep it across frames. Ownership of the resource stays with the host. The code passes Handle to ImGui.Image and reserves the size if the texture is not yet available.
+LOCAL_COMPATIBILITY: Release 0.4.0 compiled with no warning; 55/55 tests and package green. IconId is preserved by search/lookup in the tests. No icon rendering of this version observed in game yet.
+NOTES: The test fixtures check that an icon number is passed through, not that an asset exists or how it looks. No texture is loaded in the catalogue worker.
+
+## REF-CRAFT-LOCAL-API
+
+REF-ID: REF-CRAFT-LOCAL-API
+DOMAIN: Recipe catalogue
+STATUS: LOCAL_VERIFIED / 2026-10-27 Europe/Brussels
+SOURCE: ApiProbe on the local Dalamud/Lumina assemblies, then compilation of the 0.5.0 adapter
+TECHNICAL_FACTS: Recipe provides ItemResult, Ingredient, AmountResult, AmountIngredient, CraftType and RecipeLevelTable. CraftType provides Name; RecipeLevelTable provides ClassJobLevel. RowRefs are resolved by RowId via the corresponding sheets.
+LIMITS: Values and IDs are copied into managed data; no validation of the appearance or completeness of the catalogue is claimed before the in-game test.
+
+
+## REF-FASHION-AVANTGARDE (0.213)
+REPOSITORY: github.com/NeNeppie/AvantGarde — AGPL-3.0 licence: read for understanding, no code copied (Tensho is GPL v3, original code).
+FILES_READ: AvantGarde.cs, UI/MainWindow.cs, UI/SlotWindow.cs, Managers/DataManager.cs, Utilities/EnumItemSlot.cs (2026-10-31).
+TECHNICAL_FACTS: game window "FashionCheck"; category of slot n = string AtkValue at index 2 + 11 × n; 11 slots
+(weapon, head, body, hands, legs, feet, ears, neck, wrists, right ring, left ring); weeks since 30/01/2018 8:00 UTC,
+FashionCheckWeeklyTheme = week + 9; equipment data from FFXIVGachaSpreadsheet (FashionReport.json, already used by Tensho).
+UX taken over (idea only): list per slot, owned items first, unowned items greyed out, sorted by popularity, panel near the window.
+LIMITS: AtkValues reading to confirm in game (developer mode log); dyes not taken over; glamour dresser and armoire not read.
+
+## REF-FISH-GATHERBUDDY (0.227)
+REPOSITORY: github.com/Ottermandias/GatherBuddy — Apache-2.0 licence (reuse allowed with attribution).
+FILES_READ: GatherBuddy.GameData/Data/Fish/Data*.cs (36 files, 1,183 "data.Apply(…)" statements, read on 2026-11-01).
+USAGE: files downloaded at runtime and read as data (`Community/GatherBuddyFish.cs`, original parser, nothing is compiled or
+copied into Tensho): Bait, Mooch, Bite (HookSet, BiteType), Time (ET minutes), Weather / Transition (ids from the Weather sheet), Lure,
+Predators, Snag. Credit in README and in the fishing help. Garland remains the fallback source.
+
+---
+
 # Références
 
 ## Sources externes utilisées par le code — état au 0.315.0 (2026-11-02, relu contre le code ; remplace l'état au 0.154.0)
