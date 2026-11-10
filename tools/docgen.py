@@ -146,7 +146,7 @@ INDEX_LEFT_OUT = {
     "publish/d17/PULL_REQUEST.md": "linked from the publish/d17 row",
     "publish/github/README.md": "the publish/github row",
     "tools/README.md": "the tools row",
-    "tools/PluginUiTest/README.md": "the plugin UI test tool, linked from tools/README.md (the tools row)",
+    "tools/PluginUiTest/README.md": "the pinned copy of the plugin UI test library (source: Shigu330/PluginUiTest), linked from tools/README.md (the tools row)",
 }
 
 

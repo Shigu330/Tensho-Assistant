@@ -105,7 +105,21 @@ dotnet run -c Release --project tools/PluginUiTest/src/PluginUiTest -- tools\Plu
 dotnet run -c Release --project tools/PluginUiTest/src/PluginUiTest -- src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll "--run-anyway=*" --out=tensho.md
 ```
 
-## What remains before a separate repository
+## Moved to its own repository (X-124, 2026-11-10)
+
+The tool now lives in [Shigu330/PluginUiTest](https://github.com/Shigu330/PluginUiTest) (public, GPL v3, the user's approval of
+2026-11-10). First commit `28f3160`: the library, the tool, the sample, the CI example (now downloading the release zip), tests of the
+pure parts (`tests/PluginUiTest.Tests`, taken from this repository's PluginUiTest1032Tests, plus the JSON report's shape) and a JSON
+schema of the report (`docs/report.schema.json`, `schemaVersion` 1: camelCase names, outcomes in lower case, `label`, `tool`). Its CI
+(`.github/workflows/ci.yml`, windows-latest, Dalamud's distribution downloaded) builds the library, the tool, the sample and the tests,
+runs the tests, publishes the zip (nothing of Dalamud in it, checked), runs the tool from the zip on the sample with `--no-game-data` and
+checks the outcomes and the schema. First run, measured (run 42893995549, Dalamud.dll 15.0.3.9, ImGui's default font: no Dalamud
+assets in CI): tests 4/4; `constructor -> created`, `Fine window -> drawn`, `Throwing window -> threw`, `Memory reader -> skipped`;
+exit 1 as expected; the JSON report matches its schema. Rulesets: `main` (no deletion, no force push) and `v*` tags (no deletion, update
+or force push), as Tensho's. In this repository only `tools/PluginUiTest/src/PluginUiTest.Host` stays, as a pinned copy (its `.cs` files
+the same as at `28f3160`), referenced by the desktop application; the commands below name paths that are now in the other repository.
+
+## What remained before a separate repository (done in X-124, except the wider measures)
 
 - Copy `tools/PluginUiTest` (library, tool, sample, docs) to its own repository; replace the desktop application's `ProjectReference` to
   `PluginUiTest.Host` with a package reference (NuGet) or a pinned copy, so this repository builds without the other one.

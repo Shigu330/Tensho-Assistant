@@ -29,7 +29,8 @@
   </ItemGroup>
   <ItemGroup>
     <!-- X-120: the generic part (Dalamud and game paths, run-time resolution, service stand-ins, headless ImGui, font rewrite, IL call graph,
-         Win32 + OpenGL window) lives in the plugin UI test tool's library; its own DLL (PluginUiTest.Host.dll) ships with the app. -->
+         Win32 + OpenGL window) lives in the plugin UI test tool's library; its own DLL (PluginUiTest.Host.dll) ships with the app.
+         X-124: a pinned copy of that library (source: Shigu330/PluginUiTest), so this repository builds without the other one. -->
     <ProjectReference Include="..\..\tools\PluginUiTest\src\PluginUiTest.Host\PluginUiTest.Host.csproj" />
   </ItemGroup>
 </Project>

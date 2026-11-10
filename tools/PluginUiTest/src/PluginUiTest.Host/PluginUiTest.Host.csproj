@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- X-120: the generic part of drawing a Dalamud plugin's windows without the game (moved out of src/TenshoAssistant.Desktop, X-119):
+  <!-- Pinned copy (X-124) of PluginUiTest v0.1.0, commit 28f3160, from https://github.com/Shigu330/PluginUiTest (the source: change it
+       there first, then copy it back here with the new version and commit; tools/PluginUiTest/README.md).
+       X-120: the generic part of drawing a Dalamud plugin's windows without the game (moved out of src/TenshoAssistant.Desktop, X-119):
        where Dalamud and the game data are (DalamudPaths), the run-time resolution of Dalamud's assemblies and of cimgui.dll from the user's
        install (DalamudRuntime), the service stand-ins (StandIns), a headless ImGui context with fonts (ImGuiHeadless), the rewrite of
        UiBuilder's font statics in a temporary copy (Rewrite), the IL call graph (CallGraph) and the Win32 + OpenGL 1.1 window (Win32Gl).
-       Used by src/TenshoAssistant.Desktop and tools/PluginUiTest/src/PluginUiTest. R05: nothing of Dalamud or of the game is copied:
+       Used here by src/TenshoAssistant.Desktop; in its own repository by the PluginUiTest tool. R05: nothing of Dalamud or of the game is copied:
        every Dalamud, Lumina, ImGui, HexaGen and Mono.Cecil reference is Private=false and resolved at run time. -->
   <PropertyGroup>
     <OutputType>Library</OutputType><TargetFramework>net10.0-windows</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>

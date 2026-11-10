@@ -257,7 +257,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [x118-desktop-weather.png](x118-desktop-weather.png) | — | — |
 | [x119-desktop-app.md](x119-desktop-app.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj`, `tools/README.md` | — |
 | [x119-desktop-weather.png](x119-desktop-weather.png) | — | — |
-| [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/PluginUiTest/src/PluginUiTest/Program.cs`, `tools/README.md` | — |
+| [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | — |
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
 | [x76-0-baseline.md](x76-0-baseline.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x76-2-duplicates.md](x76-2-duplicates.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
