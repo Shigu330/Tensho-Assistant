@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1027.0
+- Documents et données partagées seulement, rien ne change dans le plugin. Découvertes partagées : le ticket du seul joueur qui partage (1453 faits, 1 refusé, sortes connues) est revérifié et la base commune refaite ; son partage n'a pas changé depuis la 0.1012, les faits restent les mêmes. Phase 7, point 4 : décision de l'utilisateur, la liste des essais en jeu (docs/project/TESTING.md) et leur parcours (docs/project/TESTING-ROUTE.md) restent en français seul, car l'outil des essais les écrit et les lit ligne par ligne ; décision notée dans les deux moitiés du plan global. Forme bilingue : 33 documents conformes sur 35, les 2 autres gardés en français par cette décision.
+- Tests : DiscoveriesPrivacy1012Tests. Verify.ps1 (agent) : 1666/1666, 0 avertissement, 0 erreur ; DLL 0.1027.0.0. Rien à essayer en jeu.
+### English
+- Documents and shared data only, nothing changes in the plugin. Shared discoveries: the ticket of the only player who shares (1453 facts, 1 refused, known kinds) is checked again and the common base rebuilt; the share has not changed since 0.1012, the facts stay the same. Phase 7, point 4: user's decision, the in-game test list (docs/project/TESTING.md) and its route (docs/project/TESTING-ROUTE.md) stay in French only, because the test tool writes and reads them line by line; the decision is noted in both halves of the global plan. Bilingual form: 33 conform documents of 35, the other 2 kept in French by this decision.
+
 ## 0.1026.0
 - Documents seulement, rien ne change dans le plugin : phase 7, point 4, quatrième lot. Les références (docs/project/REFERENCES.md : sources externes, fiches de référence et leur archive) passent en deux langues, l'anglais d'abord puis le texte français d'origine, avec les mêmes titres et les mêmes lignes de tableau. Les noms des sources, les adresses, les versions et les identifiants restent tels quels ; les chemins vers les notes du mainteneur (hors dépôt) ne sont pas recopiés dans la moitié anglaise. Forme bilingue : 33 documents conformes sur 35 ; restent le parcours des essais et les vérifications, lus par l'outil des essais.
 - Tests : DocsGen1018Tests. Verify.ps1 (agent) : 1666/1666, 0 avertissement, 0 erreur ; DLL 0.1026.0.0. Rien à essayer en jeu.
