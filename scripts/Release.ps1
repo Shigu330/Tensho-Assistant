@@ -9,8 +9,9 @@
 # Git steps after a green Verify.ps1 (called by Verify.ps1 -Commit / -Release; see CONTRIBUTING.md 'Versions et releases').
 #   Commit  : on Devloppement, commits every change as 'x.y.z' with the CHANGELOG entry as body, then pushes Devloppement.
 #   Release : from a clean, pushed Devloppement whose CI is green, commits repo.json (Dalamud custom repository) and tags it
-#             Stable-x.y.z (local steps); then pushes the tag, creates the GitHub release with latest.zip and TenshoAssistant.Desktop.zip
-#             (the desktop application, X-119, R33; GitHub CLI 'gh'), moves
+#             Stable-x.y.z (local steps); then pushes the tag, creates the GitHub release with latest.zip, TenshoAssistant.Desktop.zip
+#             (the desktop application, X-119, R33) and its SHA-256 TenshoAssistant.Desktop.zip.sha256 (its automatic update, X-121;
+#             GitHub CLI 'gh'), moves
 #             main to the same commit last (fast-forward only: no merge commit, no branch change), and pushes Devloppement.
 #             A release stopped halfway (tag pushed, GitHub release or main missing) is resumed by running the same command again:
 #             only the missing steps run.
@@ -140,8 +141,15 @@ function Assert-RepoJson([string]$Text, [string]$Version, [string]$Download) {
 # X-119 (R33): the desktop application goes in every release next to latest.zip, with the plugin's version (built, drawn headless and
 # checked by Verify.ps1, which -Release runs first). A release without it, or with another version inside, is refused.
 $desktopZip = Join-Path $root 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'
+# X-121: the app updates itself from the release and installs a zip only when its SHA-256 is the one this file publishes beside it.
+$desktopHash = "$desktopZip.sha256"
 function Assert-DesktopZip([string]$Version) {
     if (-not (Test-Path -LiteralPath $desktopZip)) { throw "Desktop application package not found: $desktopZip (run .\scripts\Verify.ps1 first): a release carries it next to latest.zip (R33)." }
+    # X-121: -Release refuses a release without the SHA-256 of the app (or with another one): the app's automatic update needs it.
+    if (-not (Test-Path -LiteralPath $desktopHash)) { throw "TenshoAssistant.Desktop.zip.sha256 not found: Release.ps1 refuses a release without the SHA-256 of the desktop application (run .\scripts\Verify.ps1 again)." }
+    $published = [regex]::Match([IO.File]::ReadAllText($desktopHash), '^([0-9a-fA-F]{64})  TenshoAssistant\.Desktop\.zip\r?\n?$')
+    $actual = (Get-FileHash -LiteralPath $desktopZip -Algorithm SHA256).Hash
+    if (-not $published.Success -or $published.Groups[1].Value.ToUpperInvariant() -ne $actual) { throw "TenshoAssistant.Desktop.zip.sha256 is not the SHA-256 of TenshoAssistant.Desktop.zip ($actual): Release.ps1 refuses a release without the SHA-256 of the app it carries (run .\scripts\Verify.ps1 again)." }
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $archive = [IO.Compression.ZipFile]::OpenRead($desktopZip)
     $temp = Join-Path ([IO.Path]::GetTempPath()) ('tensho-desktop-' + [guid]::NewGuid().ToString('N'))
@@ -157,7 +165,7 @@ function Assert-DesktopZip([string]$Version) {
         }
     }
     finally { $archive.Dispose(); Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue }
-    Write-Output "TenshoAssistant.Desktop.zip checked: the app and its plugin are $Version."
+    Write-Output "TenshoAssistant.Desktop.zip checked: the app and its plugin are $Version; its SHA-256 $($actual.ToLowerInvariant()) is in TenshoAssistant.Desktop.zip.sha256."
 }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
 function Add-HotfixNote([string]$Notes) {
@@ -302,13 +310,14 @@ try {
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
         Assert-NoAgentFiles $commit
         if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
-        if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip" { & $gh release create $tag $zip $desktopZip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
+        if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256" { & $gh release create $tag $zip $desktopZip $desktopHash --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
         else {
-            # A release created before its desktop package was attached gets it now (R33).
+            # A release created before its desktop package (R33) or its SHA-256 (X-121) was attached gets them now.
             $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
             try { $assets = @(& $gh release view $tag --repo $repository --json assets --jq '.assets[].name' 2>$null) }
             finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
             if ('TenshoAssistant.Desktop.zip' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip" { & $gh release upload $tag $desktopZip --repo $repository } }
+            if ('TenshoAssistant.Desktop.zip.sha256' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip.sha256" { & $gh release upload $tag $desktopHash --repo $repository } }
         }
         # Fast-forward only: GitHub refuses a push of main that is not one (no force anywhere).
         Step "git push origin ${commit}:$releaseBranch (fast-forward)" { git push origin "${commit}:refs/heads/$releaseBranch" }
@@ -370,7 +379,7 @@ try {
     # fast-forward (origin/main is an ancestor of Devloppement, checked above; GitHub refuses anything else, no force anywhere),
     # then Devloppement.
     Step "git push origin $tag" { git push origin $tag }
-    Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip" { & $gh release create $tag $zip $desktopZip --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
+    Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256" { & $gh release create $tag $zip $desktopZip $desktopHash --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
     Step "git push origin HEAD:$releaseBranch (fast-forward)" { git push origin "HEAD:refs/heads/$releaseBranch" }
     Step "git push origin $developBranch" { git push origin $developBranch }
     Write-Output ($(if ($DryRun) { "DRY RUN: nothing was committed, tagged or published ($tag)." } else { "RELEASE $tag published: https://github.com/$repository/releases/tag/$tag" }))

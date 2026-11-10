@@ -68,6 +68,10 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
 
+## Does the desktop app update itself?
+
+Yes, with no step from you. At start (and on « Check for update ») it asks this repository's GitHub release of the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
+
 Français :
 
 # Questions fréquentes
@@ -137,3 +141,7 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 ## Puis-je voir Tensho sans le jeu ?
 
 Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
+
+## L'application de bureau se met-elle à jour seule ?
+
+Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jour »), elle lit la release GitHub de ce dépôt qui a la version du plugin installé, sinon la dernière release Stable : HTTPS, aucune donnée du joueur. Elle télécharge TenshoAssistant.Desktop.zip, compare son SHA-256 à TenshoAssistant.Desktop.zip.sha256 de la même release, l'installe à côté (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) et garde la version d'avant. L'application en cours n'est jamais écrasée ni redémarrée pendant que vous l'utilisez : la nouvelle version s'ouvre au prochain démarrage, ou avec « Redémarrer maintenant ». « Version d'avant » revient en arrière ; « Mise à jour automatique : active » la coupe. Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.

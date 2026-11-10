@@ -362,7 +362,11 @@ application; the link to a running game comes later). Unzip it anywhere and star
 Dalamud and the game installed (it reads Dalamud's ImGui and the game data where they are installed; nothing of them is shipped); it carries
 its own .NET runtime, nothing else to install. It reads your saved Tensho settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are
 off, as its status bar says; the map, live synthesis and the Fashion Report stay in the game. The app and the plugin carry the same version
-and are released together: the app says at start when the installed plugin's version differs. Code: `src/TenshoAssistant.Desktop`.
+and are released together: the app says at start when the installed plugin's version differs.
+It updates itself (X-121): at start it asks GitHub for the release of the installed plugin's version (else the latest one), checks the
+zip's SHA-256 published in that release, installs it beside and keeps the version before (« Previous version »); it never restarts while
+you use it, and « Automatic update » turns it off. The app is not code-signed: the SHA-256 protects against a damaged download, not
+against a stolen GitHub account (`SECURITY.md`). Code: `src/TenshoAssistant.Desktop`.
 
 ## Localization
 
@@ -807,7 +811,11 @@ XIVLauncher avec Dalamud et le jeu installés (elle lit l'ImGui de Dalamud et le
 livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos réglages Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
 restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le
 jeu. L'application et le plugin portent le même numéro de version et sont publiés ensemble : l'application signale au démarrage une version
-différente du plugin installé. Code : `src/TenshoAssistant.Desktop`.
+différente du plugin installé.
+Elle se met à jour seule (X-121) : au démarrage, elle demande à GitHub la release de la version du plugin installé (sinon la dernière),
+vérifie le SHA-256 du zip publié dans cette release, l'installe à côté et garde la version d'avant (« Version d'avant ») ; elle ne
+redémarre jamais pendant que vous l'utilisez, et « Mise à jour automatique » la coupe. L'application n'est pas signée : le SHA-256 protège
+d'un téléchargement abîmé, pas d'un compte GitHub volé (`SECURITY.md`). Code : `src/TenshoAssistant.Desktop`.
 
 ## Localisation
 

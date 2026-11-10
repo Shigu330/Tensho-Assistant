@@ -40,7 +40,15 @@ What the plugin does that matters for security (read against the code of the `De
 | **This repository**: community tool gallery and help videos, on a click, data only, never code | `raw.githubusercontent.com` | — (on a click) | `MyTools/ToolGallery.cs`, `Help/CommunityHelp.cs` |
 | **Shared discoveries exchange**: the common file of this repository; after « Connect GitHub » only, the player's own sightings to a secret gist and one issue (described below); on « Exchange now » or with « Automatic exchange » | `raw.githubusercontent.com`, `api.github.com`, `github.com`, `gist.github.com` | « Automatic exchange » | `Discoveries/GitHubExchange.cs`, `Discoveries/CommunityDiscoveries.cs` |
 | **Discord webhook**: HTTPS POST of alarms and alerts to the player's own webhook (described below) | `discord.com`, `discordapp.com`, `ptb.discord.com`, `canary.discord.com` | « Post alarms to Discord » | `Alarms/DiscordNotifier.cs`, `Alarms/DiscordWebhook.cs` |
+| **Desktop app update**: desktop app only: at its start and on « Check for update », this repository's release of the installed plugin's version (else the latest Stable one), then TenshoAssistant.Desktop.zip and its SHA-256 from that release; GET only, no player data (limit described below) | `api.github.com`, `github.com` | « Automatic update: on » | `TenshoAssistant.Desktop/DesktopUpdater.cs`, `TenshoAssistant.Desktop/DesktopUpdate.cs` |
 <!-- /docgen:network-en -->
+
+  The desktop application (`src/TenshoAssistant.Desktop`, X-121) updates itself from this repository's releases (row « Desktop app
+  update »): it installs a new `TenshoAssistant.Desktop.zip` beside the running one (`%LOCALAPPDATA%\TenshoAssistant\Desktop\versions`)
+  only when the release is a published `Stable-x.y.z` of this repository, the file comes from this repository's download address, and its
+  SHA-256 is the one in `TenshoAssistant.Desktop.zip.sha256` of the same release; the copy before it stays for going back. **Limit:** the
+  application is not code-signed, so the SHA-256 protects against a damaged or incomplete download, not against a stolen GitHub account,
+  which could publish both a bad zip and its matching SHA-256.
 
   All are GET requests except Teamcraft's query, the GitHub sign-in and uploads of the exchange, and the Discord webhook. Requests carry
   item, world, spot or page identifiers only; no player data, no telemetry (the exchange and Discord are the player's choice, below).
@@ -175,7 +183,15 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 | **This repository** : galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code | `raw.githubusercontent.com` | — (sur un clic) | `MyTools/ToolGallery.cs`, `Help/CommunityHelp.cs` |
 | **Shared discoveries exchange** : le fichier commun de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist secret et un ticket (décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique » | `raw.githubusercontent.com`, `api.github.com`, `github.com`, `gist.github.com` | « Échange automatique » | `Discoveries/GitHubExchange.cs`, `Discoveries/CommunityDiscoveries.cs` |
 | **Discord webhook** : envoi HTTPS POST des alarmes et alertes vers le webhook du joueur (décrit plus bas) | `discord.com`, `discordapp.com`, `ptb.discord.com`, `canary.discord.com` | « Envoyer les alarmes sur Discord » | `Alarms/DiscordNotifier.cs`, `Alarms/DiscordWebhook.cs` |
+| **Desktop app update** : application de bureau seulement : à son démarrage et sur « Chercher une mise à jour », la release de ce dépôt qui a la version du plugin installé (sinon la dernière Stable), puis TenshoAssistant.Desktop.zip et son SHA-256 de cette release ; GET seulement, aucune donnée du joueur (limite décrite plus bas) | `api.github.com`, `github.com` | « Mise à jour automatique : active » | `TenshoAssistant.Desktop/DesktopUpdater.cs`, `TenshoAssistant.Desktop/DesktopUpdate.cs` |
 <!-- /docgen:network-fr -->
+
+  L'application de bureau (`src/TenshoAssistant.Desktop`, X-121) se met à jour depuis les releases de ce dépôt (ligne « Desktop app
+  update ») : elle installe un nouveau `TenshoAssistant.Desktop.zip` à côté de celle qui tourne (`%LOCALAPPDATA%\TenshoAssistant\Desktop\versions`)
+  seulement si la release est une `Stable-x.y.z` publiée de ce dépôt, si le fichier vient de l'adresse de téléchargement de ce dépôt et
+  si son SHA-256 est celui de `TenshoAssistant.Desktop.zip.sha256` de la même release ; la copie d'avant reste pour revenir en arrière.
+  **Limite :** l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé ou incomplet, pas d'un
+  compte GitHub volé, qui pourrait publier à la fois un mauvais zip et le SHA-256 qui va avec.
 
   Toutes sont des requêtes GET, sauf celle de Teamcraft, la connexion et les envois de l'échange GitHub, et le webhook Discord. Les
   requêtes ne portent que des numéros d'objet, de monde, de lieu ou de page ; aucune donnée du joueur, aucune télémétrie (l'échange et

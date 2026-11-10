@@ -522,7 +522,9 @@
     "QuestionTranslate": "Comment aider à traduire Tensho ?",
     "AnswerTranslate": "Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub.",
     "QuestionDesktop": "Puis-je voir Tensho sans le jeu ?",
-    "AnswerDesktop": "Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent."
+    "AnswerDesktop": "Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.",
+    "QuestionDesktopUpdate": "L'application de bureau se met-elle à jour seule ?",
+    "AnswerDesktopUpdate": "Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jour »), elle lit la release GitHub de ce dépôt qui a la version du plugin installé, sinon la dernière release Stable : HTTPS, aucune donnée du joueur. Elle télécharge TenshoAssistant.Desktop.zip, compare son SHA-256 à TenshoAssistant.Desktop.zip.sha256 de la même release, l'installe à côté (%LOCALAPPDATA%\\TenshoAssistant\\Desktop\\versions) et garde la version d'avant. L'application en cours n'est jamais écrasée ni redémarrée pendant que vous l'utilisez : la nouvelle version s'ouvre au prochain démarrage, ou avec « Redémarrer maintenant ». « Version d'avant » revient en arrière ; « Mise à jour automatique : active » la coupe. Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé."
   },
   "Guide": {
     "Title": "Tensho : premiers pas",
@@ -7587,6 +7589,27 @@
     "LiveBlueMagic": "avancée des succès, titres",
     "LiveHelp": "auto-contrôle, alarmes",
     "LiveSettings": "alarmes, marques de la carte",
-    "LiveDiagnostics": "auto-contrôle, alarmes"
+    "LiveDiagnostics": "auto-contrôle, alarmes",
+    "UpdateOff": "Mise à jour automatique : coupée.",
+    "UpdateChecking": "Mise à jour : question posée à GitHub…",
+    "UpdateCurrent": "Mise à jour : cette application est en {0}, la version du plugin installé.",
+    "UpdatePluginOlder": "Mise à jour : le plugin installé ({0}) est plus ancien que cette application ({1}) ; l'application ne revient jamais en arrière seule : mettez le plugin à jour dans le jeu.",
+    "UpdateSkipped": "Mise à jour : {0} a été mise de côté après le retour à la version d'avant ; cette application reste en {1}.",
+    "UpdateNoRelease": "Mise à jour : pas encore de release {0} sur GitHub ; cette application reste en {1}.",
+    "UpdateLatest": "Mise à jour : à jour (dernière release {0}, cette application {1}).",
+    "UpdateDownloading": "Mise à jour : téléchargement de {0} ({1} sur {2} Mo)…",
+    "UpdateUnpacking": "Mise à jour : {0} téléchargée, son SHA-256 est celui publié ; décompression…",
+    "UpdateInstalled": "Mise à jour : {0} installée à côté de celle-ci ; elle s'ouvre au prochain démarrage, ou tout de suite avec « Redémarrer maintenant ».",
+    "UpdateRestarting": "Mise à jour : démarrage de {0}…",
+    "UpdateErrorRelease": "Mise à jour : release {0} inutilisable (pas une release Stable publiée, ou un fichier manque) ; cette application reste en {1}.",
+    "UpdateErrorAddress": "Mise à jour : release {0} refusée, un fichier est hors des téléchargements de ce dépôt ; cette application reste en {1}.",
+    "UpdateErrorHash": "Mise à jour : {0} refusée, son SHA-256 n'est pas celui publié dans la release (téléchargement abîmé) ; cette application reste en {1}.",
+    "UpdateErrorPackage": "Mise à jour : {0} refusée, le paquet est trop gros ou ses versions ne correspondent pas ; cette application reste en {1}.",
+    "UpdateErrorNetwork": "Mise à jour : pas de réponse de {0} (réseau ou disque) ; cette application reste en {1}.",
+    "UpdateAutoOn": "Mise à jour automatique : active",
+    "UpdateAutoOff": "Mise à jour automatique : coupée",
+    "UpdateCheck": "Chercher une mise à jour",
+    "UpdateRestart": "Redémarrer maintenant",
+    "UpdatePrevious": "Version d'avant ({0})"
   }
 }

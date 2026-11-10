@@ -29,6 +29,7 @@ public static class Faq
         new("Report"),
         new("Translate"),
         new("Desktop"),
+        new("DesktopUpdate"),
     ];
 
     /// <summary>The page an answer names, or null.</summary>

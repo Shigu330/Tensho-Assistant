@@ -66,6 +66,9 @@ INDEX = [
     ([("../SECURITY.md", None)], "everyone", "tout le monde",
      "reporting a vulnerability, sensitive surfaces of the plugin (network, local files, actions in the game)",
      "signaler une vulnérabilité, surfaces sensibles du plugin (réseau, fichiers locaux, actions dans le jeu)"),
+    ([("../CODE_OF_CONDUCT.md", None)], "everyone", "tout le monde",
+     "how we behave in the project's issues, discussions and pull requests, and how to report a problem (English, then French)",
+     "comment se comporter dans les tickets, discussions et demandes de fusion du projet, et comment signaler un problème (anglais, puis français)"),
     ([("../CHANGELOG.md", None)], "everyone", "tout le monde",
      "what changed in each version (French, then `### English`)",
      "ce qui a changé à chaque version (français, puis `### English`)"),
@@ -143,6 +146,7 @@ INDEX_LEFT_OUT = {
     "publish/d17/PULL_REQUEST.md": "linked from the publish/d17 row",
     "publish/github/README.md": "the publish/github row",
     "tools/README.md": "the tools row",
+    "tools/PluginUiTest/README.md": "the plugin UI test tool, linked from tools/README.md (the tools row)",
 }
 
 
@@ -575,7 +579,30 @@ NETWORK = [
      ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],
      "HTTPS POST of alarms and alerts to the player's own webhook (described below)",
      "envoi HTTPS POST des alarmes et alertes vers le webhook du joueur (décrit plus bas)"),
+    # X-121: the desktop application (not the plugin): its own files are named « TenshoAssistant.Desktop/… », its switch is a Desktop.* text.
+    ("Desktop app update", ["api.github.com", "github.com"], "Desktop.UpdateAutoOn",
+     ["TenshoAssistant.Desktop/DesktopUpdater.cs", "TenshoAssistant.Desktop/DesktopUpdate.cs"],
+     "desktop app only: at its start and on « Check for update », this repository's release of the installed plugin's version (else the "
+     "latest Stable one), then TenshoAssistant.Desktop.zip and its SHA-256 from that release; GET only, no player data (limit described below)",
+     "application de bureau seulement : à son démarrage et sur « Chercher une mise à jour », la release de ce dépôt qui a la version du plugin "
+     "installé (sinon la dernière Stable), puis TenshoAssistant.Desktop.zip et son SHA-256 de cette release ; GET seulement, aucune donnée du "
+     "joueur (limite décrite plus bas)"),
 ]
+# X-121: the desktop application's sources, checked as the plugin's (a file of it that makes a request is in a row).
+DESKTOP_SOURCE = ROOT / "src/TenshoAssistant.Desktop"
+
+
+def network_path(file):
+    """A file of a NETWORK row: « TenshoAssistant.Desktop/… » under src/, else under src/TenshoAssistant."""
+    return ROOT / "src" / file if file.startswith("TenshoAssistant.Desktop/") else SOURCE / file
+
+
+def network_files():
+    """(row name of the file, path) of every source file that may make a request: the plugin's and the desktop application's."""
+    plugin = [(path.relative_to(SOURCE).as_posix(), path) for path in source_files()]
+    desktop = [("TenshoAssistant.Desktop/" + path.relative_to(DESKTOP_SOURCE).as_posix(), path)
+               for path in sorted(DESKTOP_SOURCE.rglob("*.cs")) if "obj" not in path.parts and "bin" not in path.parts]
+    return plugin + desktop
 # Files that hold an HTTP client or a request without contacting a source of their own, with the reason.
 NETWORK_LEFT_OUT = {
     "Community/BoundedHttp.cs": "the bounded reader every request goes through (timeout, size limit)",
@@ -598,7 +625,7 @@ def network_block(code):
     rows = ["| Source | Hosts | Off with | Code |" if en else "| Source | Hôtes | Coupée par | Code |", "|---|---|---|---|"]
     for name, hosts, setting, files, what_en, what_fr in NETWORK:
         if setting:
-            label = text_of(texts, labels.get(setting, "")) or setting
+            label = text_of(texts, setting if setting.startswith("Desktop.") else labels.get(setting, "")) or setting
             switch = f"« {cell(label)} »"
         else:
             switch = "— (on a click)" if en else "— (sur un clic)"
@@ -614,28 +641,31 @@ def network_problems():
         hosts.update(row_hosts)
         named = set()
         for file in files:
-            path = SOURCE / file
+            path = network_path(file)
             if not path.exists():
-                problems.append(f"network: {name}: src/TenshoAssistant/{file} does not exist")
+                problems.append(f"network: {name}: {path.relative_to(ROOT).as_posix()} does not exist")
                 continue
             listed[file] = name
             named.update(group for found in HOST.finditer(read_source(path)) for group in found.groups() if group)
         for host in row_hosts:
             if host not in named:
                 problems.append(f"network: {name}: no file of the row names {host}")
-        if setting and setting not in {path for path, *_ in controls()}:
+        if setting and setting.startswith("Desktop."):
+            if not all(text_of(language(code), setting) for code in ("en", "fr")):
+                problems.append(f"network: {name}: {setting} is not a text of en.json and fr.json")
+        elif setting and setting not in {path for path, *_ in controls()}:
             problems.append(f"network: {name}: {setting} is not a setting of a control")
-    for path in source_files():
-        file = path.relative_to(SOURCE).as_posix()
+    for file, path in network_files():
         text = read_source(path)
+        shown = path.relative_to(ROOT).as_posix()
         if not REQUEST.search(text) or file in NETWORK_LEFT_OUT:
             continue
         if file not in listed:
-            problems.append(f"network: src/TenshoAssistant/{file} makes requests but is in no row (tools/docgen.py, NETWORK)")
+            problems.append(f"network: {shown} makes requests but is in no row (tools/docgen.py, NETWORK)")
         for found in HOST.finditer(text):
             host = found.group(1) or found.group(2)
             if host not in hosts and host not in NOT_CONTACTED:
-                problems.append(f"network: src/TenshoAssistant/{file} names {host}, in no row (tools/docgen.py, NETWORK or NOT_CONTACTED)")
+                problems.append(f"network: {shown} names {host}, in no row (tools/docgen.py, NETWORK or NOT_CONTACTED)")
     return problems
 
 

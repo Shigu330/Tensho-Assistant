@@ -12,6 +12,8 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
 {
     /// <summary>Catalogues ready of the total while they load, else null.</summary>
     public (int Ready,int Total)? Loading;
+    /// <summary>X-121: the automatic update (null for a diagnostic or headless run): one more row, its state and its buttons.</summary>
+    public DesktopUpdater? Updater;
     private string? redirected;
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
@@ -45,7 +47,38 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     private string PageName(string page)=>host.HasText("PageHelp."+page+"Title") ? host.Text("PageHelp."+page+"Title") : page;
 
     /// <summary>Height of the bar for this frame, in pixels.</summary>
-    public float Height(int lines)=>lines*ImGui.GetTextLineHeightWithSpacing()+ImGui.GetStyle().WindowPadding.Y*2;
+    public float Height(int lines)=>(lines+(Updater is null ? 0 : 1))*ImGui.GetTextLineHeightWithSpacing()+ImGui.GetStyle().WindowPadding.Y*2;
+
+    /// <summary>The update row's text: its state in the plugin's language.</summary>
+    public (string Text,bool Warning)? UpdateLine()
+    {
+        if(Updater is null)return null;
+        var (key,args,warning)=Updater.Status;
+        return (host.Text(key,args),warning);
+    }
+
+    /// <summary>X-121: « Automatic update: on/off », « Check for update », « Restart now » (an installed version), « Previous version (x) », then the state.</summary>
+    private void DrawUpdate()
+    {
+        if(Updater is null || UpdateLine() is not var (text,warning))return;
+        var state=Updater.State;
+        if(ImGui.SmallButton(host.Text(state.AutoUpdate ? "Desktop.UpdateAutoOn" : "Desktop.UpdateAutoOff")+"##TenshoUpdateAuto"))Updater.SetAuto(!state.AutoUpdate);
+        ImGui.SameLine();
+        if(ImGui.SmallButton(host.Text("Desktop.UpdateCheck")+"##TenshoUpdateCheck"))Updater.Check(manual:true);
+        if(Updater.Pending is not null)
+        {
+            ImGui.SameLine();
+            if(ImGui.SmallButton(host.Text("Desktop.UpdateRestart")+"##TenshoUpdateRestart"))Updater.RestartNow();
+        }
+        if(state.Previous is { } previous)
+        {
+            ImGui.SameLine();
+            if(ImGui.SmallButton(host.Text("Desktop.UpdatePrevious",previous.Version)+"##TenshoUpdatePrevious"))Updater.GoBack();
+        }
+        ImGui.SameLine();
+        if(warning)ImGui.TextColored(new Vector4(1f,0.78f,0.35f,1f),text);
+        else ImGui.TextUnformatted(text);
+    }
 
     /// <summary>Draws the bar at the bottom of the display.</summary>
     public void Draw(Vector2 display,IReadOnlyList<(string Text,bool Warning)> lines)
@@ -59,6 +92,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
                 if(warning)ImGui.TextColored(new Vector4(1f,0.78f,0.35f,1f),text);
                 else ImGui.TextUnformatted(text);
             }
+        DrawUpdate();
         ImGui.End();
     }
 }

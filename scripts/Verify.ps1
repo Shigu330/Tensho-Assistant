@@ -93,7 +93,7 @@ if ($TestsOnly) {
 $taskFingerprint = Get-TaskFingerprint
 $taskSkip = $false
 # 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
-if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'))) {
+if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip.sha256'))) {
     $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
 }
@@ -207,6 +207,26 @@ try {
     finally { $taskDesktopArchive.Dispose() }
     $taskDesktopSize = [math]::Round((Get-Item -LiteralPath $taskDesktopZip).Length / 1MB, 1)
     Write-Output "PASS desktop package: $taskDesktopZip ($($taskDesktopEntries.Count) files, $taskDesktopSize MB: the self-contained app and plugin/TenshoAssistant.dll of the same version $taskDesktopVersion, nothing of Dalamud or the game)"
+    # X-121 (R33): the app updates itself from the GitHub release: the release carries the zip's SHA-256 beside it (TenshoAssistant.Desktop.zip.sha256,
+    # « hex  name » as sha256sum writes it), which the app compares before installing; Release.ps1 refuses a release without it.
+    $taskDesktopHash = "$taskDesktopZip.sha256"
+    $taskDesktopHex = (Get-FileHash -LiteralPath $taskDesktopZip -Algorithm SHA256).Hash.ToLowerInvariant()
+    [IO.File]::WriteAllText($taskDesktopHash, "$taskDesktopHex  TenshoAssistant.Desktop.zip`n", [Text.UTF8Encoding]::new($false))
+    # The update tried on a fake local release (no network): a GitHub-shaped release JSON with this repository's download addresses, the two
+    # files read from its folder; the packaged exe installs it beside in a temporary folder, hands over, goes back, refuses a damaged zip.
+    $taskFakeTag = "Stable-$taskProjectVersion"
+    $taskFakeBase = "https://github.com/Shigu330/Tensho-Assistant/releases/download/$taskFakeTag"
+    $taskFakeRelease = Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\fake-release.json'
+    $taskFake = [ordered]@{ tag_name = $taskFakeTag; draft = $false; prerelease = $false; assets = @(
+        [ordered]@{ name = 'TenshoAssistant.Desktop.zip'; browser_download_url = "$taskFakeBase/TenshoAssistant.Desktop.zip"; size = (Get-Item -LiteralPath $taskDesktopZip).Length },
+        [ordered]@{ name = 'TenshoAssistant.Desktop.zip.sha256'; browser_download_url = "$taskFakeBase/TenshoAssistant.Desktop.zip.sha256"; size = (Get-Item -LiteralPath $taskDesktopHash).Length }) }
+    [IO.File]::WriteAllText($taskFakeRelease, ($taskFake | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+    $taskUpdateOwn = Join-Path $taskRoot 'artifacts\update-selftest'
+    $taskUpdate = & (Join-Path $taskDesktopPackage 'TenshoAssistant.Desktop.exe') "--update-selftest=$taskFakeRelease" "--update-own=$taskUpdateOwn" 2>&1 | ForEach-Object { "$_" }
+    $taskUpdateCode = $LASTEXITCODE
+    $taskUpdate | Where-Object { $_ -match '^(FAIL|PASS update selftest)' } | ForEach-Object { Write-Output "  desktop: $_" }
+    if ($taskUpdateCode -ne 0) { $taskUpdate | ForEach-Object { Write-Host "  desktop: $_" }; throw "Desktop update selftest failed (exit $taskUpdateCode): the app could not install, hand over to or go back from a fake release of $taskProjectVersion." }
+    Write-Output "PASS desktop update: $taskDesktopHash written; the packaged exe installed a fake release $taskFakeTag beside, handed over, went back, refused a damaged zip"
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
     [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8

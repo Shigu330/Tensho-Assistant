@@ -7,6 +7,10 @@
 //        TenshoAssistant.Desktop --headless --step=A,B | --step=entries   (diagnostic: which MainWindow call blocks, each on a worker with a 5 s limit)
 //        TenshoAssistant.Desktop --inventory [--inventory-out=<md>]   (per page: what of Dalamud its draw code can reach, by IL call graph of the built plugin)
 //        TenshoAssistant.Desktop --api=Type[:filter] | --il=Type::Method   (Dalamud's metadata, or the IL of one of its methods)
+//        TenshoAssistant.Desktop --update-selftest=<release.json> [--update-own=<folder>]   (X-121: the update on a fake local release, Verify.ps1)
+//        TenshoAssistant.Desktop --update-probe   (X-121: the real GitHub request for the latest Stable release, read and checked, nothing downloaded)
+//        TenshoAssistant.Desktop --print-version   (prints the version and stops)
+// X-121: --no-update turns the update off for this run (no request, no hand-over); --no-forward starts this copy even when a newer one is installed.
 // PROBE_TRACE=1 prints each step of a frame; PROBE_LOG=1 prints the plugin's log warnings.
 using System.Diagnostics;
 using System.Globalization;
@@ -49,9 +53,14 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if(args.Contains("--print-version")){Console.WriteLine($"TenshoAssistant.Desktop {DesktopVersionCheck.Three(AppVersion)}");return 0;}
+        if(Option(args,"--update-selftest=") is { } fakeRelease)return UpdateSelfTest.Run(fakeRelease,Option(args,"--update-own="));
+        if(args.Contains("--update-probe"))return UpdateSelfTest.Probe();
         var diagnostic=args.Any(a=>a is "--headless" or "--inventory" || a.StartsWith("--api=",StringComparison.Ordinal) || a.StartsWith("--il=",StringComparison.Ordinal));
         // Started by a double-click: Windows made a console for this process alone; it is let go so only the window stays.
         if(!diagnostic && GetConsoleProcessList(new uint[2],2)==1)FreeConsole();
+        // X-121: the copy the user started hands over to the newest installed copy (versions\<version> of the app's own folder), if any.
+        if(Updates(args,diagnostic) && DesktopUpdater.Forward(Own,AppVersion,AppContext.BaseDirectory,args))return 0;
         if(!File.Exists(Path.Combine(Hooks,"Dalamud.Bindings.ImGui.dll")) || !File.Exists(Path.Combine(Hooks,"cimgui.dll")))
             return Stop(diagnostic,Skip,$"SKIP desktop: no Dalamud install in {Hooks} (XIVLauncher with Dalamud is needed: the app reads Dalamud's ImGui and Lumina there, nothing is shipped).");
         // Dalamud's assemblies and cimgui.dll (Dalamud's native ImGui build) from the installed Dalamud, never copied (R05); the plugin's
@@ -60,9 +69,14 @@ internal static class Program
         try{return Run(args,diagnostic);}
         catch(Exception error) when(!diagnostic)
         {
-            return Stop(false,1,$"Tensho Assistant (desktop) stopped: {(error.InnerException ?? error).GetType().Name}: {(error.InnerException ?? error).Message}");
+            // X-121: an updated copy that fails goes back to the previous one at the next start (its version set aside).
+            var back=DesktopUpdater.RollBackAfterFailure(Own,AppContext.BaseDirectory);
+            return Stop(false,1,$"Tensho Assistant (desktop) stopped: {(error.InnerException ?? error).GetType().Name}: {(error.InnerException ?? error).Message}"+(back is null ? "" : "\n"+back));
         }
     }
+
+    /// <summary>X-121: the update runs for a window opened by the player, not for a diagnostic, a capture or --no-update.</summary>
+    private static bool Updates(string[] args,bool diagnostic)=>!diagnostic && !args.Contains("--no-update") && Option(args,"--capture=") is null;
 
     /// <summary>A stop before the window: printed for a diagnostic run, shown in a message box for a double-click.</summary>
     private static int Stop(bool console,int code,string text)
@@ -109,6 +123,12 @@ internal static class Program
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
         if(headless)return Headless.Run(host,status,cache,args);
+        if(Updates(args,diagnostic))
+        {
+            // X-121: at start, in the background (« Automatic update » of update.json turns it off; the button still works).
+            status.Updater=new DesktopUpdater(Own,AppVersion,AppContext.BaseDirectory,args,version,new GitHubReleases());
+            status.Updater.Check(manual:false);
+        }
         return Interactive(host,status,cache,window!,args);
     }
 
@@ -145,7 +165,7 @@ internal static class Program
             host.Window.GetType().GetField(fieldName,BindingFlags.Instance|BindingFlags.NonPublic)?.SetValue(host.Window,fieldValue);
         var capture=Option(args,"--capture=");
         var frames=int.TryParse(Option(args,"--frames="),out var n) ? n : capture is null ? int.MaxValue : 90;
-        var clock=Stopwatch.StartNew();var last=0.0;string? lastError=null;var readyAt=-1;
+        var clock=Stopwatch.StartNew();var last=0.0;string? lastError=null;var readyAt=-1;var used=false;
         for(var frame=0;!window.Closed;frame++)
         {
             window.Pump();
@@ -168,6 +188,11 @@ internal static class Program
             var now=clock.Elapsed.TotalSeconds;
             var failure=Ui.Frame(host,status,window.Size,(float)(now-last));last=now;
             if(failure is not null && failure.Message!=lastError){lastError=failure.Message;Console.WriteLine($"  page {host.CurrentPage}: {failure.GetType().Name}: {failure.Message}");}
+            // X-121: an installed update restarts the app only while the window is untouched and the catalogues are loaded.
+            used|=Dalamud.Bindings.ImGui.ImGui.IsAnyItemActive() || Dalamud.Bindings.ImGui.ImGui.GetIO().WantTextInput
+                || Dalamud.Bindings.ImGui.ImGui.IsMouseDown(Dalamud.Bindings.ImGui.ImGuiMouseButton.Left) || Dalamud.Bindings.ImGui.ImGui.IsMouseDown(Dalamud.Bindings.ImGui.ImGuiMouseButton.Right);
+            status.Updater?.Tick(loaders.Count>0,used);
+            if(status.Updater?.ExitRequested==true)break;
             window.Render(Dalamud.Bindings.ImGui.ImGui.GetDrawData(),new Vector4(0.08f,0.08f,0.1f,1));
             // A capture waits for the catalogues and 30 frames more, so the picture shows the page as the player sees it.
             var end=capture is not null ? readyAt>=0 && frame>=Math.Max(frames-1,readyAt+30) : frame>=frames-1;

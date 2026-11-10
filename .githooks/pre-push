@@ -1,7 +1,11 @@
 #!/bin/sh
-# Optional local hook (0.323): runs .\scripts\Verify.ps1 before every push and stops the push when it fails.
-# Not active by default. To turn it on, once, from the repository root:  git config core.hooksPath .githooks
-# To turn it off:  git config --unset core.hooksPath
+# Local hook (0.323; turned on in 0.1033, D-100): runs .\scripts\Verify.ps1 before every push and stops the push when it fails.
+# On the maintainer's PC it is on (git config core.hooksPath .githooks); a contributor turns it on once, from the repository root:
+#   git config core.hooksPath .githooks          (off again: git config --unset core.hooksPath)
+# No second build: Verify.ps1 runs here with no switch, so when the same sources already passed (its stamp artifacts/verify-stamp.json:
+# version, SHA-256 of the files, Dalamud and SDK versions), as just after publish.sh or Verify.ps1 -Commit, it prints
+# « SKIP checks » in a few seconds instead of building and testing again. Any change since that run builds and tests everything.
+echo "pre-push: Verify.ps1 (skips when its stamp matches the same sources)"
 if command -v pwsh >/dev/null 2>&1; then
   pwsh -NoProfile -File ./scripts/Verify.ps1
 else
