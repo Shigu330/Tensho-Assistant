@@ -4,10 +4,12 @@
 
 ## Open — state at 0.315.0 (2026-11-02), corrections of 2026-11-04 (0.512)
 
-The queue has been dealt with since (ROADMAP, CHANGELOG); a line may be done without being marked here. What remains for 1.0.0: [PUBLISHING](PUBLISHING.md).
+**Frozen state, no longer updated:** the current plan and state are in the [global plan](GLOBAL-PLAN.md).
+
+The queue has been dealt with since (ROADMAP, CHANGELOG); a line may be done without being marked here. What remains for 1.0.0: the [global plan](GLOBAL-PLAN.md).
 
 The points waiting for a decision or an in-game survey are grouped in the [ROADMAP](ROADMAP.md), section "To decide / to
-review"; the in-game tests waiting, in its section "Tests to run in game". The order of work is in
+review"; the in-game tests waiting are in [TESTING](TESTING.md). The order of work is in
 the maintainer's status file ("Next action").
 
 Map (MAP-001, plan: MAP-016-PLAN (maintainer's notes, not in the repository))
@@ -31,12 +33,12 @@ Inventory and sort: armoury, glamour dresser and armoire read as storages (0.235
 uses) not done, small gain.
 
 Gathering: Bountiful bonus **done in 0.224** as an estimate (community rule cited, displayed "estimated", editable), to
-validate in game; the old note "do not invent a formula" remains true: no official formula. Ocean fishing not covered
-(no usable data source).
+validate in game; the old note "do not invent a formula" remains true: no official formula. Ocean fishing: covered since
+0.392 (Ocean fishing page).
 
 Free company, Reminders, Gear (R-07, R-08, R-11): remainders and open choices in the ROADMAP ("To decide / to review"):
 table of submarine thresholds, airship unlock tree (LuminaSupplemental, GPL-3.0), airship route
-planner, capacity rule under rank 50, squadron and Planeurs d'Ehcatl, step 4 of R-11. R-09 (events): not started.
+planner, capacity rule under rank 50, squadron and Planeurs d'Ehcatl, step 4 of R-11. R-09 (events): done in 0.342 (Events page).
 
 Publication (PUBLISH-018, see [PUBLISHING](PUBLISHING.md)): no submission since DEC-039 (custom repository only). Code side done
 (0.156–0.157): icon `src/TenshoAssistant/images/icon.png` (AI-generated, declared), `manifest.toml` ready, PR draft with the
@@ -138,10 +140,12 @@ UPDATE 2026-10-27 / 0.5.27: the old READY/TODO states of CRAFT-001A below are ou
 
 ## Ouvert — état au 0.315.0 (2026-11-02), corrections du 2026-11-04 (0.512)
 
-La file a été traitée depuis (ROADMAP, CHANGELOG) ; une ligne peut être faite sans être marquée ici. Ce qui reste pour la 1.0.0 : [PUBLISHING](PUBLISHING.md).
+**État figé, plus mis à jour :** le plan et l'état courants sont dans le [plan global](GLOBAL-PLAN.md).
+
+La file a été traitée depuis (ROADMAP, CHANGELOG) ; une ligne peut être faite sans être marquée ici. Ce qui reste pour la 1.0.0 : le [plan global](GLOBAL-PLAN.md).
 
 Les points qui attendent une décision ou un relevé en jeu sont regroupés dans la [ROADMAP](ROADMAP.md), section « À décider / à
-revoir » ; les tests en jeu en attente, dans sa section « Tests à faire en jeu ». L'ordre de passage est dans
+revoir » ; les tests en jeu en attente sont dans [TESTING](TESTING.md). L'ordre de passage est dans
 le fichier d'état du mainteneur (« Prochaine action »).
 
 Carte (MAP-001, plan : MAP-016-PLAN, notes du mainteneur (hors du dépôt))
@@ -165,12 +169,12 @@ Inventaire et tri : arsenal, coffre à apparence et armoire lus comme rangements
 usages) non fait, gain faible.
 
 Récolte : bonus d'Abondance **fait en 0.224** comme estimation (règle communautaire citée, affichée « estimé », modifiable), à
-valider en jeu ; l'ancienne note « ne pas inventer de formule » reste vraie : aucune formule officielle. Pêche en mer non couverte
-(pas de source de données utilisable).
+valider en jeu ; l'ancienne note « ne pas inventer de formule » reste vraie : aucune formule officielle. Pêche en mer : couverte depuis
+la 0.392 (page Pêche en mer).
 
 Compagnie libre, Rappels, Équipement (R-07, R-08, R-11) : restes et choix ouverts dans la ROADMAP (« À décider / à revoir ») :
 table des seuils de sous-marin, arbre de déblocage des dirigeables (LuminaSupplemental, GPL-3.0), planificateur de trajets de
-dirigeable, règle de capacité sous le rang 50, escouade et Planeurs d'Ehcatl, étape 4 de R-11. R-09 (événements) : pas commencé.
+dirigeable, règle de capacité sous le rang 50, escouade et Planeurs d'Ehcatl, étape 4 de R-11. R-09 (événements) : fait en 0.342 (page Événements).
 
 Publication (PUBLISH-018, voir [PUBLISHING](PUBLISHING.md)) : pas de soumission depuis DEC-039 (dépôt personnalisé seulement). Côté code fait
 (0.156–0.157) : icône `src/TenshoAssistant/images/icon.png` (générée par IA, déclarée), `manifest.toml` prêt, brouillon de PR avec la

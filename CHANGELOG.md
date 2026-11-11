@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1068.0
+- Constat d'audit A048 (partie BACKLOG) : BACKLOG est un état du 0.315 corrigé au 0.512, encore lu comme actuel. Il disait la pêche en mer non couverte (page depuis la 0.392) et R-09 pas commencé (page Événements depuis la 0.342), renvoyait à une section de ROADMAP qui n'existe pas et donnait PUBLISHING comme ce qui reste pour la 1.0.0. Il s'ouvre maintenant sur un bandeau « état figé, plus mis à jour » et ces lignes sont corrigées, dans les deux langues. Un test les vérifie.
+- Tests : BacklogFrozen1068Tests. Verify.ps1 (agent) : 1750/1750, 0 avertissement, 0 erreur ; DLL 0.1068.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A048 (BACKLOG part): BACKLOG is a state of 0.315 corrected at 0.512, still read as current. It said ocean fishing was not covered (page since 0.392) and R-09 not started (Events page since 0.342), sent readers to a ROADMAP section that does not exist and gave PUBLISHING as what remains for 1.0.0. It now opens with a « frozen state, no longer updated » banner and these lines are corrected, in both languages. A test checks them.
+
 ## 0.1067.0
 - Constat d'audit A049 : PROPOSALS-TRIAGE est un instantané du 2026-11-05 dont la classe « Après la 1.0.0 » contredit le plan global (rien ne vient après la 1.0.0) et dont la plupart des points sont faits ; le plan global y renvoyait encore pour « le détail de chaque point ». Le tri s'ouvre maintenant, dans ses deux langues, sur un bandeau « instantané figé, plus mis à jour », et le plan global le présente comme l'origine de chaque point. Un test vérifie le bandeau et le renvoi.
 - Tests : TriageFrozen1067Tests. Verify.ps1 (agent) : 1749/1749, 0 avertissement, 0 erreur ; DLL 0.1067.0.0. Rien à essayer en jeu.
