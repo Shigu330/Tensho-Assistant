@@ -86,6 +86,10 @@ internal sealed class CompetitiveWatcher : IDisposable
     // X-109 (0.979, DEC-047): developer reading inside the labyrinth only, to prove when a fight starts (nothing else runs there).
     private string labyrinthSeen="";
     private DateTimeOffset labyrinthNext;
+    // X-135 (0.1116, R06): the numbers of the labyrinth's own windows last written, and how many lines each got this visit (20 at most).
+    private readonly Dictionary<string,string> labyrinthValues=[];
+    private readonly Dictionary<string,int> labyrinthValueLines=[];
+    private const int LabyrinthValueLines=20,LabyrinthValueCount=400;
     public CompetitiveWatcher(IFramework framework,IClientState client,IDataManager data,IPluginLog log,IGameGui gui,ICondition condition)
     {
         this.framework=framework;this.client=client;this.log=log;this.gui=gui;this.condition=condition;
@@ -131,6 +135,7 @@ internal sealed class CompetitiveWatcher : IDisposable
         if(board!=CompetitiveGate.LabyrinthBoard){CompetitiveGate.SetLabyrinthBoard(board);log.Information("Labyrinth board panel {0}: territory {1}.",board ? "on":"off",client.TerritoryType);}
         if(CompetitiveGate.Developer?.Invoke()==true && CompetitiveZones.IsLabyrinth((uint)client.TerritoryType))
             try{ReadLabyrinth();}catch(Exception error){if(labyrinthSeen!="failed"){labyrinthSeen="failed";log.Warning(error,"Labyrinth reading failed.");}}
+        else if(labyrinthValueLines.Count>0){labyrinthValueLines.Clear();labyrinthValues.Clear();}
         var now=Decide();
         if(now==CompetitiveGate.Cut)return;
         log.Information("Competitive cut {0}: territory {1}, PvP {2}.",now ? "on":"off",client.TerritoryType,client.IsPvP);
@@ -160,6 +165,7 @@ internal sealed class CompetitiveWatcher : IDisposable
                     if(unit==null || !unit->IsVisible)continue;
                     var name=unit->NameString;
                     if(name.Length>0)names.Add(name);
+                    if(name.StartsWith("XBM",StringComparison.Ordinal))LabyrinthValues(unit,name);
                 }
             }
         }
@@ -169,6 +175,35 @@ internal sealed class CompetitiveWatcher : IDisposable
         labyrinthSeen=seen;
         log.Information("Labyrinth reading: {0}",seen);
     }
+    /// <summary>
+    /// X-135 (0.1116, R06): one of the labyrinth's own windows (« XBM… »): its numbers only (Int, UInt, Bool, by index; never a text, which may
+    /// name the character), written on change, <see cref="LabyrinthValueLines"/> lines per window and visit at most. Developer mode, labyrinth only.
+    /// </summary>
+    private unsafe void LabyrinthValues(FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase* unit,string name)
+    {
+        if(unit->AtkValues==null)return;
+        var values=new List<string>();
+        for(var index=0;index<Math.Min((int)unit->AtkValuesCount,LabyrinthValueCount);index++)
+        {
+            var value=unit->AtkValues[index];
+            var text=value.Type switch
+            {
+                FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Int=>value.Int.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.UInt=>value.UInt.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                FFXIVClientStructs.FFXIV.Component.GUI.AtkValueType.Bool=>value.Byte!=0 ? "true" : "false",
+                _=>null,
+            };
+            if(text is not null)values.Add($"{index}:{text}");
+        }
+        var line=string.Join(";",values);
+        if(labyrinthValues.GetValueOrDefault(name)==line)return;
+        labyrinthValues[name]=line;
+        var written=labyrinthValueLines.GetValueOrDefault(name);
+        if(written>=LabyrinthValueLines)return;
+        labyrinthValueLines[name]=written+1;
+        log.Information("Labyrinth window {0}: values={1}",name,line);
+    }
+
     public void Dispose()
     {
         framework.Update-=Tick;

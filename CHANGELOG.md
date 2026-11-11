@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1116.0
+- Dédale bestial, première étape de la lecture du résultat du plateau (X-135, R06 : valeurs pas encore connues) : en mode développeur et dans le Dédale seulement, les nombres des fenêtres du Dédale (noms « XBM… », celle du résultat comprise) sont écrits dans le journal quand ils changent, 20 lignes par fenêtre et par visite au plus ; jamais un texte (une fenêtre de résultat peut nommer le personnage).
+- Tests : LabyrinthValues1116Tests. Verify.ps1 (agent) : 1824/1824, 0 avertissement, 0 erreur ; DLL 0.1116.0.0. Non validé en jeu.
+### English
+- Beast labyrinth, first step of reading the board's result (X-135, R06: values not known yet): in developer mode and in the labyrinth only, the numbers of the labyrinth's windows (names « XBM… », the result's included) are written to the log when they change, 20 lines per window and visit at most; never a text (a result window may name the character).
+
 ## 0.1115.0
 - Plan global, X-137 : Dédale bestial : Tensho n'y est plus coupé (choix de l'utilisateur du 11/11, aucun classement vu) ; ses territoires restent reconnus pour le panneau d'équipe. La coupure reste en JcJ, aux tournois de Triple Triade, au Mahjong et dans les donjons profonds. DEC-038 complétée (deux langues), ARCHITECTURE suit.
 - Tests : LabyrinthOpen1115Tests. Verify.ps1 (agent) : 1823/1823, 0 avertissement, 0 erreur ; DLL 0.1115.0.0. Non validé en jeu.
