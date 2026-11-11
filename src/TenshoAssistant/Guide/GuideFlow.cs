@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Guide;
 
 public enum GuideStep { Welcome, Sources, Settings, Interests, Windows, Visit, End }
-public enum GuideInterest { Crafting, Gathering, Collections, TripleTriad, FreeCompany, Market }
+public enum GuideInterest { Crafting, Gathering, Collections, TripleTriad, FreeCompany, Market, Content, GoldSaucer, GardenAndIsland }
 /// <summary>A page shown during the visit; no interest: for everyone.</summary>
 public sealed record GuideStop(string Page, GuideInterest? Interest = null);
 /// <summary>A game window to open once, for what it lets Tensho read; no interest: for everyone.</summary>
@@ -15,51 +15,33 @@ public readonly record struct GuidePosition(GuideStep Step, int Stop);
 /// </summary>
 public static class GuideFlow
 {
+    // D-132 (user decision of 2026-11-10, X-122, 0.1045): the pages that were left out are stops too, each with the interest that keeps it, so
+    // the visit stays short for a player who ticks a few interests. A page with no interest is shown to everyone. The order follows the
+    // side bar's families: items, storage, crafting, gathering, map and reminders, content, collections, gear, Gold Saucer, garden and island.
     private static readonly GuideStop[] AllStops =
     [
-        new("Items"), new("Storage"), new("Market", GuideInterest.Market), new("CraftSimulation", GuideInterest.Crafting), new("Gathering", GuideInterest.Gathering),
-        new("OceanFishing", GuideInterest.Gathering), new("Maps"), new("Alarms"), new("Reminders"), new("Discoveries"), new("FreeCompany", GuideInterest.FreeCompany),
-        new("Quests"), new("Collections", GuideInterest.Collections),
-        new("Gear"), new("TripleTriad", GuideInterest.TripleTriad), new("Settings"), new("Help"),
+        new("Items"), new("NpcVendors"), new("DutyLoot", GuideInterest.Content), new("MonsterLoot", GuideInterest.Content),
+        new("Storage"), new("SortPreview"), new("Market", GuideInterest.Market),
+        new("CraftSimulation", GuideInterest.Crafting), new("CraftLive", GuideInterest.Crafting), new("CraftPresets", GuideInterest.Crafting), new("MacroChain", GuideInterest.Crafting),
+        new("Gathering", GuideInterest.Gathering), new("GatheringGp", GuideInterest.Gathering), new("GatheringCollectables", GuideInterest.Gathering),
+        new("OceanFishing", GuideInterest.Gathering), new("Weather", GuideInterest.Gathering),
+        new("Maps"), new("Alarms"), new("Reminders"), new("MyTools"), new("Discoveries"), new("FreeCompany", GuideInterest.FreeCompany),
+        new("Quests"), new("Events"), new("Leves", GuideInterest.Content), new("HuntingLog", GuideInterest.Content), new("Fates", GuideInterest.Content),
+        new("AlliedSocieties", GuideInterest.Content), new("GrandCompanies", GuideInterest.Content), new("SpecialDeliveries", GuideInterest.Content),
+        new("CustomDeliveries", GuideInterest.Content), new("FieldContent", GuideInterest.Content), new("DeepDungeons", GuideInterest.Content),
+        new("RelicWeapons", GuideInterest.Content), new("Beastmaster", GuideInterest.Content),
+        new("Collections", GuideInterest.Collections), new("BlueMagic", GuideInterest.Collections), new("MaskedCarnivale", GuideInterest.Collections),
+        new("Gear"), new("Chocobo", GuideInterest.Collections),
+        new("TripleTriad", GuideInterest.TripleTriad), new("Fashion", GuideInterest.GoldSaucer), new("MiniCactpot", GuideInterest.GoldSaucer),
+        new("Garden", GuideInterest.GardenAndIsland), new("IslandSanctuary", GuideInterest.GardenAndIsland),
+        new("Lexicon"), new("Settings"), new("Help"), new("Credits"),
     ];
     // System plan 4.13: every page is a stop of the visit or is left out here with its reason; a test (PageCoverageTests) refuses a page in
-    // neither. The visit shows what a new player needs to start; the rest is found from the navigation and the Home tool directory.
+    // neither. Since D-132 only two pages stay out: the visit cannot stop where it starts and ends, nor on a page most players never see.
     private static readonly Dictionary<string, string> LeftOut = new()
     {
         ["Home"] = "the guide starts and ends there",
-        ["CraftLive"] = "a tab of Crafting, shown at its stop",
-        ["CraftPresets"] = "a tab of Crafting, shown at its stop",
-        ["GatheringGp"] = "a tab of Gathering, shown at its stop",
-        ["GatheringCollectables"] = "a tab of Gathering, shown at its stop",
-        ["BlueMagic"] = "a tab of Collections, shown at its stop",
         ["Diagnostics"] = "developer mode only",
-        ["Credits"] = "sources and thanks, not a first step",
-        ["SortPreview"] = "useful once the bags are full; listed in the Home tool directory",
-        ["MacroChain"] = "for players who already craft with macros; listed in the Home tool directory",
-        ["Weather"] = "the map and gathering pages show the weather they need",
-        ["Garden"] = "for players with a garden; listed in the Home tool directory",
-        ["IslandSanctuary"] = "for players who unlocked the island; listed in the Home tool directory",
-        ["NpcVendors"] = "reached from an item's sources",
-        ["DutyLoot"] = "reached from an item's sources",
-        ["MonsterLoot"] = "reached from an item's sources",
-        ["Fates"] = "content found while playing; listed in the Home tool directory",
-        ["Events"] = "seasonal; Home shows the running events",
-        ["Chocobo"] = "a side page of Gear",
-        ["Leves"] = "content found while playing; listed in the Home tool directory",
-        ["HuntingLog"] = "content found while playing; listed in the Home tool directory",
-        ["AlliedSocieties"] = "content found while playing; listed in the Home tool directory",
-        ["GrandCompanies"] = "content found while playing; listed in the Home tool directory",
-        ["SpecialDeliveries"] = "content found while playing; listed in the Home tool directory",
-        ["CustomDeliveries"] = "content found while playing; listed in the Home tool directory",
-        ["MaskedCarnivale"] = "content found while playing; listed in the Home tool directory",
-        ["RelicWeapons"] = "content found while playing; listed in the Home tool directory",
-        ["FieldContent"] = "content found while playing; listed in the Home tool directory",
-        ["DeepDungeons"] = "content found while playing; listed in the Home tool directory",
-        ["Beastmaster"] = "content found while playing; listed in the Home tool directory",
-        ["Fashion"] = "a weekly Gold Saucer event; listed in the Home tool directory",
-        ["MiniCactpot"] = "a daily Gold Saucer game; listed in the Home tool directory",
-        ["Lexicon"] = "looked up when needed; listed in the Home tool directory",
-        ["MyTools"] = "Home shows it at the top of the navigation",
     };
     /// <summary>Pages that are not stops of the visit, with the reason.</summary>
     public static IReadOnlyDictionary<string, string> LeftOutOfVisit => LeftOut;
