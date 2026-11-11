@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1041.0
+- Plan global, X-112 : Carte, repères au bord pour les points de récolte à horaire (X-112, constat n° 0 de l'audit des tests) : l'accès du personnage au point (tome lu, niveau) se lit désormais par le même chemin que les info-bulles de la carte, qui ne cherche jamais un lieu de pêche comme un point de récolte. Avant, un lieu de pêche à horaire pouvait être lu comme le point de récolte de même numéro, et son repère au bord masqué ou montré à tort. Le test qui gardait cet appel comme exception nommée n'en permet plus aucune.
+- Tests : FishingWiringTests. Verify.ps1 (agent) : 1702/1702, 0 avertissement, 0 erreur ; DLL 0.1041.0.0. Non validé en jeu.
+### English
+- Map, edge markers for timed gathering points (X-112, finding no. 0 of the test audit): the character's access to the point (tome read, level) is now read through the same path as the map tooltips, which never looks up a fishing spot as a gathering point. Before, a timed fishing spot could be read as the gathering point with the same number, and its edge marker hidden or shown wrongly. The test that kept this call as a named exception no longer allows any.
+
 ## 0.1040.0
 - Plan global, X-93 : Découvertes, tenue en charge (X-93, partie 2, suite) : l'enregistrement de la base ne fige plus le jeu. Avant, toute la base était copiée sur l'image du jeu une fois par minute quand elle avait changé (21 ms à 100 000 faits, 339 ms à un million : une image perdue dès 50 000 à 80 000 faits) ; elle est désormais copiée hors de l'image, par tranches de 5 000 faits. Le chargement au démarrage et l'import d'un fichier (2,2 s à un million de faits) vérifient les faits hors du verrou puis les ajoutent par tranches : une page ou une info-bulle n'attend plus que quelques dizaines de millisecondes au pire (mesuré : 20 à 49 ms à un million de faits, proche des pauses du ramasse-miettes), au lieu de tout le fichier. Une sorte de découvertes partagées ne peut plus être chargée deux fois quand un import la demande pendant qu'elle se charge déjà. Les résultats sont inchangés (mêmes faits, mêmes comptes) ; une découverte vue pendant la copie part à l'enregistrement suivant.
 - Tests : DiscoveriesSlices1040Tests. Verify.ps1 (agent) : 1702/1702, 0 avertissement, 0 erreur ; DLL 0.1040.0.0. Non validé en jeu.

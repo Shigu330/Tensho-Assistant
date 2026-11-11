@@ -95,15 +95,13 @@ internal static class FishingWiringTests
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             Check(map.Contains("private static bool IsGatheringPointBase(MapLocalGatheringPoint point)=>point.TypeId!=100;"),"type 100 is a fishing spot");
             Check(map.Contains("var access=PointAccess(point);") && map.Contains("if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId)"),"kind and access guarded");
-            // 0.1019 (test audit #0): every GatherAccess call outside PointAccess is counted, none allowed except the one known exception below.
+            // 0.1019 (test audit #0): every GatherAccess call outside PointAccess is counted; since 0.1041 (X-112) none is allowed.
             Check(map.Contains("private TenshoAssistant.Gathering.GatherPointAccess? PointAccess(MapLocalGatheringPoint point)=>IsGatheringPointBase(point) ? GatherAccess?.Invoke(point.BaseId):null;"),"PointAccess guards the read");
-            // Known exception, to fix after the post-patch release (GLOBAL-PLAN X-112): the map-edge arrows of timed points call GatherAccess
-            // without IsGatheringPointBase. Listed by name so that any other unguarded call fails.
-            const string knownEdge="point.ActiveAt(minutes) && GatherAccess?.Invoke(point.BaseId)?.TomeMissing is null";
-            var unguarded=System.Text.RegularExpressions.Regex.Matches(map,@"GatherAccess\?\.Invoke\(point\.BaseId\)").Count
-                -System.Text.RegularExpressions.Regex.Matches(map,@"IsGatheringPointBase\(point\) \? GatherAccess\?\.Invoke\(point\.BaseId\):null").Count
-                -(map.Contains(knownEdge) ? 1:0);
-            Check(unguarded==0,$"one guarded access: {unguarded} unguarded GatherAccess?.Invoke(point.BaseId) outside PointAccess");
+            // X-112 (0.1041): the map-edge arrows of timed points go through PointAccess too (no named exception left).
+            Check(map.Contains("point.ActiveAt(minutes) && PointAccess(point)?.TomeMissing is null"),"edge arrows read access through PointAccess");
+            var unguarded=System.Text.RegularExpressions.Regex.Matches(map,@"GatherAccess\?\.Invoke\(").Count
+                -System.Text.RegularExpressions.Regex.Matches(map,@"IsGatheringPointBase\(point\) \? GatherAccess\?\.Invoke\(point\.BaseId\):null").Count;
+            Check(unguarded==0,$"one guarded access: {unguarded} unguarded GatherAccess?.Invoke(...) outside PointAccess");
         }),
     ];
 }

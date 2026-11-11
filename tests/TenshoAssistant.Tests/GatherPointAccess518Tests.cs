@@ -32,7 +32,7 @@ internal static class GatherPointAccess518Tests
             var map=Read("MainWindow.MapView.cs");
             Check(map.Split("DrawPointAvailability(point);").Length==3,"both tooltips");
             Check(map.Contains("\"MapView.TimedOpenNoTome\"") && map.Contains("\"MapView.TomeMissing\"") && map.Contains("\"MapView.PointLevelLow\""),"said");
-            Check(map.Contains("point.ActiveAt(minutes) && GatherAccess?.Invoke(point.BaseId)?.TomeMissing is null"),"no edge marker for a point closed to the player");
+            Check(map.Contains("point.ActiveAt(minutes) && PointAccess(point)?.TomeMissing is null"),"no edge marker for a point closed to the player (X-112: through PointAccess)");
             Check(map.Contains("ImGui.GetColorU32(TimedPointColor(timedPoint))"),"nor a green clock");
             var reader=Read("Gathering/GatherKnowledgeReader.Dalamud.cs");
             Check(reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);") && reader.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update)") && reader.Contains("failed=true;known=null;"),"owned, fails to unknown");
