@@ -8,7 +8,7 @@ and reminders, free company voyages, quests, collections, character stats, a gea
 the island sanctuary, side content (Eureka and Bozja, deep dungeons, relics, Masked Carnivale), a local base of what you discover
 while playing, a French–English lexicon of the game's words, your own tools, and diagnostics.
 
-These documents were produced for version <!-- docgen:version -->0.1116<!-- /docgen:version -->; the version being built is the `<Version>` of
+These documents were produced for version <!-- docgen:version -->0.1118<!-- /docgen:version -->; the version being built is the `<Version>` of
 `src/TenshoAssistant/TenshoAssistant.csproj`. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
@@ -241,7 +241,7 @@ d'équipement, aides du Gold Saucer, enchaînement de macros, la Félicité insu
 profonds, reliques, La Grande Mascarade), une base locale de ce que vous découvrez en jouant, un lexique français–anglais des mots du
 jeu, vos propres outils, et des diagnostics.
 
-Ces documents ont été produits pour la version <!-- docgen:version -->0.1116<!-- /docgen:version --> ; la version en cours est le `<Version>` de
+Ces documents ont été produits pour la version <!-- docgen:version -->0.1118<!-- /docgen:version --> ; la version en cours est le `<Version>` de
 `src/TenshoAssistant/TenshoAssistant.csproj`. Les changements de chaque version sont dans
 [CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).

@@ -2,6 +2,36 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1115.0
+- Plan global, X-137 : Dédale bestial : Tensho n'y est plus coupé (choix de l'utilisateur du 11/11, aucun classement vu) ; ses territoires restent reconnus pour le panneau d'équipe. La coupure reste en JcJ, aux tournois de Triple Triade, au Mahjong et dans les donjons profonds. DEC-038 complétée (deux langues), ARCHITECTURE suit.
+- Tests : LabyrinthOpen1115Tests. Verify.ps1 (agent) : 1823/1823, 0 avertissement, 0 erreur ; DLL 0.1115.0.0. Non validé en jeu.
+### English
+- Beast labyrinth: Tensho is no longer cut there (the user's choice of 11/11, no ranking seen); its territories stay known for the team panel. The cut stays in PvP, Triple Triad tournaments, Mahjong and deep dungeons. DEC-038 completed (both languages), ARCHITECTURE follows.
+
+## 0.1114.0
+- Lien local avec l'application de bureau, protocole 2 (X-119 étape 2 suite, partie 1) : en plus de qui et où, le plugin envoie sa classe et son niveau, ses PR et les places libres des sacs, et les noms des fichiers enregistrés de Tensho que le jeu vient d'écrire (jamais leur contenu ; bornes : 16 noms de 160 caractères, ligne de 8 Ko). L'application relit elle-même le fichier de réglages du plugin quand le jeu l'enregistre (ses pages suivent les réglages du jeu) et montre ces états dans sa barre d'état. Info-bulle du réglage et FAQ du lien mises à jour.
+- Tests : LinkLive1114Tests. Verify.ps1 (agent) : 1822/1822, 0 avertissement, 0 erreur ; DLL 0.1114.0.0. Non validé en jeu.
+### English
+- Local link with the desktop application, protocol 2 (X-119 step 2 suite, part 1): besides who and where, the plugin sends its job and level, GP and the bags' free slots, and the names of Tensho's saved files the game just wrote (never their content; bounds: 16 names of 160 characters, 8 KB line). The application reads the plugin's settings file again itself when the game saves it (its pages follow the game's settings) and shows those states in its status bar. The setting's tooltip and the link's FAQ are updated.
+
+## 0.1113.0
+- Plan global, X-126 : Application de bureau installable depuis Paramètres › Avancé › Application de bureau (facultatif, décision D-137) : état face au plugin (pas installée, plus ancienne, à jour, plus récente), dossier d'installation, « Installer » ou « Mettre à jour » (release GitHub de la version du plugin, sinon la dernière Stable ; SHA-256 vérifié avec celui de la release ; dépaquetée à côté), « Ouvrir l'application de bureau » (jamais lancée sans ce clic), « Ouvrir son dossier », « Page de la release », « Mise à jour automatique de l'application de bureau ». Aucune requête sans clic. L'installation est un seul code partagé avec la mise à jour de l'application (DesktopInstall.cs). Une compilation avec TenshoDesktopInstall=false la retire. FAQ « Tensho peut-il installer l'application de bureau pour moi ? », source réseau dans SECURITY.
+- Tests : DesktopInstall1113Tests. Verify.ps1 (agent) : 1819/1819, 0 avertissement, 0 erreur ; DLL 0.1113.0.0. Non validé en jeu.
+### English
+- Desktop application installable from Settings › Advanced › Desktop application (optional, decision D-137): state against the plugin (not installed, older, up to date, newer), install folder, « Install » or « Update » (GitHub release of the plugin's version, else the latest Stable one; SHA-256 checked against the release's; unpacked beside), « Open the desktop app » (never started without that click), « Open its folder », « Release page », « Automatic update of the desktop app ». No request without a click. The install is one code shared with the app's own update (DesktopInstall.cs). A build with TenshoDesktopInstall=false leaves it out. FAQ « Can Tensho install the desktop app for me? », network source in SECURITY.
+
+## 0.1112.0
+- Vérification : quand seuls des documents suivis (CHANGELOG, README, docs/) ont changé depuis la dernière vérification verte, Verify.ps1 (et donc -Commit et le hook avant push) relance les tests managés au lieu de tout sauter ; la compilation reste sautée (plan système 4.21 : 096963e était parti avec 3 tests de documents en échec).
+- Tests : VerifyDocuments1112Tests. Verify.ps1 (agent) : 1816/1816, 0 avertissement, 0 erreur ; DLL 0.1112.0.0. Rien à essayer en jeu.
+### English
+- Verification: when only tracked documents (CHANGELOG, README, docs/) changed since the last green run, Verify.ps1 (so -Commit and the pre-push hook) runs the managed tests again instead of skipping every check; the build is still skipped (system plan 4.21: 096963e had left with 3 failing document tests).
+
+## 0.1111.0
+- Carte : le code de ses propres types (catalogues, projection, calques, lecteurs) est préparé en premier lui aussi, une demi-seconde après le chargement de Tensho (X-01, suite de 0.1104 : première image de la carte encore à 293 ms, surtout de la compilation).
+- Tests : MapWarmup1111Tests. Verify.ps1 (agent) : 1815/1815, 0 avertissement, 0 erreur ; DLL 0.1111.0.0. Rien à essayer en jeu.
+### English
+- Map: the code of its own types (catalogues, projection, layers, readers) is prepared first too, half a second after Tensho loads (X-01, after 0.1104: the map's first frame still at 293 ms, mostly compiling).
+
 ## 0.1110.0
 - Jardin : le mode développeur ne recopie plus dans le journal de Dalamud chaque ligne du chat lue dans un quartier résidentiel ; l'entretien et la récolte sont reconnus (0.616, 0.978) et ce qu'une récolte donne reste dans les lignes de gains d'objets (#36).
 - Tests : GardenCapture1110Tests. Verify.ps1 (agent) : 1814/1814, 0 avertissement, 0 erreur ; DLL 0.1110.0.0. Rien à essayer en jeu.

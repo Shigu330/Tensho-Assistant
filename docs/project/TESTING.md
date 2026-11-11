@@ -1706,6 +1706,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1116) Mode développeur activé, jouer un plateau du Dédale jusqu'au résultat : dalamud.log contient « Labyrinth reading: … windows: … » avec le nom de la fenêtre du résultat et des lignes « Labyrinth window XBM…: values=… » (nombres seulement) ; les donner à l'agent pour coder X-135
 
+- [ ] (0.1117) Paramètres › Avancé › Application de bureau : créer à la main un dossier vide nommé comme la version (ex. 0.1117.0) dans le dossier choisi, cliquer Installer : message « le dossier … existe déjà et n'est pas une copie installée par Tensho », dossier intact ; le retirer, Installer : l'application s'installe et s'ouvre
+
+- [ ] (0.1117) Application de bureau ouverte : cocher puis décocher « Mise à jour automatique » dans le plugin, puis lancer « Vérifier » dans l'application : le choix du plugin est respecté
+
+- [ ] (0.1118) Deux jeux lancés sur le même PC (deux personnages, même profil Dalamud) : ouvrir le sac de selle avec l'un puis avec l'autre, puis un servant avec le premier ; Stockage › Personnages montre toujours les deux personnages, après un redémarrage aussi
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
