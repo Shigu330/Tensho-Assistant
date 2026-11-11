@@ -250,7 +250,7 @@ the character's are left out (unknown company = everything shown). The market is
 windows, disposable scopes for the panels. `LocalizationManager` loads the embedded JSON (English = reference and fallback, French
 complete, German and Japanese partial); a test fails Verify if a setting tooltip named in the code is missing in English or French. Game
 data (items, actions, places) comes from the game's catalogue, in the game's language; Tensho's own texts are in the plugin's language.
-See [Localization/README.md](../../Localization/README.md). Dates shown in local time; computations in UTC and Eorzea time.
+See [Localization/README.md](../../src/TenshoAssistant/Localization/README.md). Dates shown in local time; computations in UTC and Eorzea time.
 
 The build and the managed tests do not validate the ImGui rendering nor the native reads: only the in-game test does (state per version:
 [global plan](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
@@ -545,7 +545,7 @@ menu de l'inventaire du jeu.
 scopes jetables pour les panneaux. `LocalizationManager` charge les JSON embarqués (anglais = référence et repli, français complet,
 allemand et japonais partiels) ; un test fait échouer Verify si une infobulle de réglage citée dans le code manque en anglais ou en
 français. Les données du jeu (objets, actions, lieux) viennent du catalogue du jeu, dans la langue du jeu ; les textes propres à Tensho
-sont dans la langue du plugin. Voir [Localization/README.md](../../Localization/README.md). Dates affichées en heure locale ; calculs en
+sont dans la langue du plugin. Voir [Localization/README.md](../../src/TenshoAssistant/Localization/README.md). Dates affichées en heure locale ; calculs en
 UTC et heure d'Éorzéa.
 
 La compilation et les tests managés ne valident pas le rendu ImGui ni la lecture native : seul l'essai en jeu le fait (état par version :

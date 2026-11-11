@@ -520,7 +520,7 @@
     "QuestionAsk": "Où poser une question ?",
     "AnswerAsk": "Sur le GitHub du projet, dans Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). Une question qui revient rejoint cette liste. Un problème ou une idée va dans un ticket (« Signaler un problème ou aider » de la page Aide).",
     "QuestionTranslate": "Comment aider à traduire Tensho ?",
-    "AnswerTranslate": "Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub.",
+    "AnswerTranslate": "Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans src/TenshoAssistant/Localization/README.md sur GitHub.",
     "QuestionDesktop": "Puis-je voir Tensho sans le jeu ?",
     "AnswerDesktop": "Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.",
     "QuestionDesktopUpdate": "L'application de bureau se met-elle à jour seule ?",

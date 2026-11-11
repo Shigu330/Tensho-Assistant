@@ -6,7 +6,7 @@ Three generators, each written between its marks and nowhere else:
   pages     README.md, the table of the pages (English and French), from the page list src/TenshoAssistant/MainWindow.Pages.cs
             (order, group, developer mode) and the help texts PageHelp.<Page>Title and PageHelp.<Page>Purpose of en.json and fr.json
   versions  the version the documents were produced for (inline marks), from the <Version> of the csproj, and the state of the
-            translations in Localization/README.md, counted in the language files; a version number written by hand in a sentence
+            translations in src/TenshoAssistant/Localization/README.md, counted in the language files; a version number written by hand in a sentence
             such as « checked on …, version 0.971 » is refused
   settings  docs/project/SETTINGS.md (plan 4.16): every settings control of the code (BoolSetting, IntSetting, SliderSetting,
             ComboSetting, the map's SettingBox), the Configuration property it writes with its type and default, where it is and its
@@ -51,7 +51,7 @@ VERSION_MARK = re.compile(r"<!-- docgen:version -->([^<]*)<!-- /docgen:version -
 HAND_VERSION = re.compile(r"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu|relue|relues|state at|état au)\b[^.\n]{0,60}"
                           r"\b0\.\d{3,4}\b", re.I)
 # Public documents scanned for versions written by hand (the CHANGELOG, the evidence and the French working documents are history).
-NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "Localization/README.md", "docs/README.md", "docs/FAQ.md",
+NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "src/TenshoAssistant/Localization/README.md", "docs/README.md", "docs/FAQ.md",
                    "tools/README.md", "publish/d17/PULL_REQUEST.md", "community-help/README.md",
                    "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md",
                    # 0.1084 (audit A060): the living documents of docs/project carry a date, never a version stamp.
@@ -88,7 +88,7 @@ INDEX = [
      "[index](evidence/README.md) of the files that cite each",
      "sorties de sondes et extraits de journaux cités par le code (preuves des liens de données), le plus souvent nommés "
      "`<version>-<sujet>` ; [index](evidence/README.md) des fichiers qui citent chacune"),
-    ([("../Localization/README.md", None)], "translators", "traducteurs",
+    ([("../src/TenshoAssistant/Localization/README.md", None)], "translators", "traducteurs",
      "adding or completing a language", "ajouter ou compléter une langue"),
     ([("../community-help/README.md", None), ("../community-templates/README.md", None), ("../community-discoveries/README.md", None)],
      "community", "communauté",
@@ -766,8 +766,8 @@ BLOCKS = [
     ("docs/README.md", "index-fr", lambda: index_block("fr")),
     ("README.md", "pages-en", lambda: pages_block("en")),
     ("README.md", "pages-fr", lambda: pages_block("fr")),
-    ("Localization/README.md", "languages-en", lambda: languages_block("en")),
-    ("Localization/README.md", "languages-fr", lambda: languages_block("fr")),
+    ("src/TenshoAssistant/Localization/README.md", "languages-en", lambda: languages_block("en")),
+    ("src/TenshoAssistant/Localization/README.md", "languages-fr", lambda: languages_block("fr")),
     ("docs/project/SETTINGS.md", "settings", lambda: settings_block("en")),
     ("docs/project/SETTINGS.md", "settings-fr", lambda: settings_block("fr")),
     ("SECURITY.md", "network-en", lambda: network_block("en")),

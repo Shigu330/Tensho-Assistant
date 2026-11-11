@@ -228,7 +228,7 @@ Options: Keep the files alongside; embed everything in the DLL.
 Decision: Languages and data embedded in the DLL (EmbeddedResource); the package contains only TenshoAssistant.dll, TenshoAssistant.json and TenshoAssistant.deps.json; Verify.ps1 refuses a shipped language file. A Localization/Languages folder placed by hand next to the DLL is still read as an override, to test a translation.
 Reason: Installation and update in a single file.
 Consequences: The embedded community data (0.309, 0.315) follow the same rule (src/TenshoAssistant/TenshoAssistant.csproj).
-References: scripts/Verify.ps1 (check 0.248), Localization/README.md, CHANGELOG.md 0.248
+References: scripts/Verify.ps1 (check 0.248), src/TenshoAssistant/Localization/README.md, CHANGELOG.md 0.248
 
 ID: DEC-018
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.249, 0.258, 0.287, 0.289, 0.315)
@@ -799,7 +799,7 @@ Options: Garder les fichiers à côté ; tout intégrer à la DLL.
 Decision: Langues et données intégrées à la DLL (EmbeddedResource) ; le paquet contient seulement TenshoAssistant.dll, TenshoAssistant.json et TenshoAssistant.deps.json ; Verify.ps1 refuse un fichier de langue livré. Un dossier Localization/Languages posé à la main à côté de la DLL reste lu en surcharge, pour tester une traduction.
 Reason: Installation et mise à jour en un seul fichier.
 Consequences: Les données communautaires embarquées (0.309, 0.315) suivent la même règle (src/TenshoAssistant/TenshoAssistant.csproj).
-References: scripts/Verify.ps1 (contrôle 0.248), Localization/README.md, CHANGELOG.md 0.248
+References: scripts/Verify.ps1 (contrôle 0.248), src/TenshoAssistant/Localization/README.md, CHANGELOG.md 0.248
 
 DEC-ID: DEC-018
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.249, 0.258, 0.287, 0.289, 0.315)

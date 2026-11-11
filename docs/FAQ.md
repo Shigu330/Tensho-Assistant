@@ -62,7 +62,7 @@ Use « Report a problem or help » on the Help page: it fills in the GitHub form
 
 ## How can I help translate Tensho?
 
-In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in Localization/README.md on GitHub.
+In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in src/TenshoAssistant/Localization/README.md on GitHub.
 
 ## Can I see Tensho without the game?
 
@@ -140,7 +140,7 @@ Utilisez « Signaler un problème ou aider » de la page Aide : cela remplit le 
 
 ## Comment aider à traduire Tensho ?
 
-Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans Localization/README.md sur GitHub.
+Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans src/TenshoAssistant/Localization/README.md sur GitHub.
 
 ## Puis-je voir Tensho sans le jeu ?
 

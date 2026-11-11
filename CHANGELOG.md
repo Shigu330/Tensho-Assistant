@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1089.0
+- Constat d'audit A084 (décision D-138 de l'utilisateur) : le guide de traduction était seul dans un dossier racine (Localization/), loin des fichiers de langue. Il va à côté d'eux, src/TenshoAssistant/Localization/README.md ; tous les renvois suivent : réponse de la FAQ du plugin (anglais et français), formulaire de traduction, README, carte des documents, ARCHITECTURE, DECISIONS, tests et docgen. La branche main ne change qu'à une release, qui livre le plugin avec le nouveau chemin.
+- Tests : LocalizationGuide1089Tests. Verify.ps1 (agent) : 1775/1775, 0 avertissement, 0 erreur ; DLL 0.1089.0.0. Non validé en jeu.
+### English
+- Audit finding A084 (user decision D-138): the translation guide sat alone in a root folder (Localization/), away from the language files. It moves next to them, src/TenshoAssistant/Localization/README.md; every pointer follows: the plugin's FAQ answer (English and French), the translation form, README, the documents' map, ARCHITECTURE, DECISIONS, tests and docgen. The main branch only changes at a release, which ships the plugin with the new path.
+
 ## 0.1088.0
 - Constat d'audit A048 (décision D-138 de l'utilisateur) : BACKLOG (état figé de 0.315) et USER-REQUESTS (toutes lignes FAIT ou CLOS) sont retirés ; git les garde. Le tableau des demandes R-01 à R-14 reste une seule fois, dans la ROADMAP, avec la version qui a fait chacune ; PROJECT y renvoie au lieu de répéter R-07 à R-11 ; une nouvelle demande va dans le plan global comme point X-NN. Tous les renvois suivent.
 - Tests : RequestsOnce1088Tests. Verify.ps1 (agent) : 1774/1774, 0 avertissement, 0 erreur ; DLL 0.1088.0.0. Rien à essayer en jeu.

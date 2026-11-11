@@ -520,7 +520,7 @@
     "QuestionAsk": "Where can I ask a question?",
     "AnswerAsk": "On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in a ticket (« Report a problem or help » on the Help page).",
     "QuestionTranslate": "How can I help translate Tensho?",
-    "AnswerTranslate": "In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in Localization/README.md on GitHub.",
+    "AnswerTranslate": "In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in src/TenshoAssistant/Localization/README.md on GitHub.",
     "QuestionDesktop": "Can I see Tensho without the game?",
     "AnswerDesktop": "Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.",
     "QuestionDesktopUpdate": "Does the desktop app update itself?",

@@ -64,7 +64,7 @@ internal static class PublicDocsTests
             var hand=new Regex(@"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu)\b[^.\n]{0,60}\b0\.\d{3,4}\b",RegexOptions.IgnoreCase);
             var mark=new Regex(@"<!-- docgen:version -->([^<]*)<!-- /docgen:version -->");
             var marks=new HashSet<string>();
-            foreach(var file in new[]{"README.md","CONTRIBUTING.md","SECURITY.md","Localization/README.md","docs/README.md","docs/FAQ.md","tools/README.md",
+            foreach(var file in new[]{"README.md","CONTRIBUTING.md","SECURITY.md","src/TenshoAssistant/Localization/README.md","docs/README.md","docs/FAQ.md","tools/README.md",
                 "publish/d17/PULL_REQUEST.md","community-help/README.md","community-templates/README.md","community-discoveries/README.md"})
             {
                 var text=Read(file);
@@ -72,10 +72,10 @@ internal static class PublicDocsTests
                 var hit=hand.Match(mark.Replace(text,""));
                 Check(!hit.Success,$"{file}: « {hit.Value} » is a version written by hand (a version mark of tools/docgen.py, or no version)");
             }
-            Check(marks.Count==1,"the version marks agree, in README.md and Localization/README.md"+Write);
+            Check(marks.Count==1,"the version marks agree, in README.md and src/TenshoAssistant/Localization/README.md"+Write);
             var parts=marks.Single().Split('.').Select(int.Parse).ToArray();
             Check(new Version(parts[0],parts[1],parts.Length>2 ? parts[2] : 0)<=now,"a version mark is newer than the csproj");
-            var languages=Read("Localization/README.md");
+            var languages=Read("src/TenshoAssistant/Localization/README.md");
             Check(Block(languages,"languages-en").Contains("English and French are complete") && Block(languages,"languages-fr").Contains("l'anglais et le français sont complets"),
                 "the state of the translations is counted by tools/docgen.py");
         }),

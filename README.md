@@ -298,7 +298,8 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 
 ```text
 .
-├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access; UI/Components = shared templates)
+├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access; UI/Components = shared templates);
+│                             Localization/README.md: translation guide, next to the language files
 ├── src/TenshoAssistant.Desktop/  desktop application: the plugin's pages with the game closed (built and drawn by Verify.ps1)
 ├── tests/                    managed tests (pure logic)
 ├── tools/                    read-only data probes (game sheets, APIs) and data scripts
@@ -315,7 +316,6 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 ├── docs/                     documentation map: docs/README.md
 │   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
 │   └── evidence/             probe outputs cited by the code
-├── Localization/README.md    translation guide
 ├── README.md · CONTRIBUTING.md · SECURITY.md · CHANGELOG.md · LICENSE
 └── global.json · TenshoAssistant.sln
 ```
@@ -369,7 +369,7 @@ against a stolen GitHub account (`SECURITY.md`). Code: `src/TenshoAssistant.Desk
 
 ## Localization
 
-Rules: [Localization/README.md](Localization/README.md). In short:
+Rules: [Localization/README.md](src/TenshoAssistant/Localization/README.md). In short:
 
 - copy `src/TenshoAssistant/Localization/Languages/en.json`, rename it with the language code, translate the values;
 - keep the translation keys unchanged; English is the reference and the fallback for missing keys;
@@ -384,7 +384,7 @@ Rules: [Localization/README.md](Localization/README.md). In short:
 - [CHANGELOG.md](CHANGELOG.md) — what changed in each version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) — the plan, what is done and what is validated in game
 - [docs/project/ROADMAP.md](docs/project/ROADMAP.md) · [ARCHITECTURE.md](docs/project/ARCHITECTURE.md) · [TESTING.md](docs/project/TESTING.md) · [REFERENCES.md](docs/project/REFERENCES.md)
-- [Localization/README.md](Localization/README.md) — localization workflow
+- [Localization/README.md](src/TenshoAssistant/Localization/README.md) — localization workflow
 - [SECURITY.md](SECURITY.md) — reporting a vulnerability
 
 ## AI usage disclosure
@@ -818,7 +818,7 @@ d'un téléchargement abîmé, pas d'un compte GitHub volé (`SECURITY.md`). Cod
 
 ## Localisation
 
-Règles : [Localization/README.md](Localization/README.md). En bref :
+Règles : [Localization/README.md](src/TenshoAssistant/Localization/README.md). En bref :
 
 - copier `src/TenshoAssistant/Localization/Languages/en.json`, le renommer avec le code de la langue, traduire les valeurs ;
 - conserver les clés ; l'anglais est la référence et le secours des clés manquantes ;
@@ -832,7 +832,7 @@ Règles : [Localization/README.md](Localization/README.md). En bref :
 - [CONTRIBUTING.md](CONTRIBUTING.md) : compiler, tester, règles du projet, publication Dalamud
 - [CHANGELOG.md](CHANGELOG.md) : changements par version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) : le plan, ce qui est fait et validé en jeu
-- [Localization/README.md](Localization/README.md) : contribution à la localisation
+- [Localization/README.md](src/TenshoAssistant/Localization/README.md) : contribution à la localisation
 - [SECURITY.md](SECURITY.md) : signaler une vulnérabilité
 
 ## Usage de l'IA
