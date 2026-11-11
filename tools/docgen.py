@@ -120,6 +120,7 @@ PROJECT_WORKING = [
     ("BACKLOG", None, None),
     ("USER-REQUESTS", "user requests", "demandes de l'utilisateur"),
     ("DECISIONS", None, None),
+    ("IDS", "registry of the identifier families (X-, DEC-, frozen ones, collisions)", "registre des familles d'identifiants (X-, DEC-, familles figées, collisions)"),
     ("GAPS", "gaps against other Dalamud plugins and choices made", "manques face aux autres plugins Dalamud et choix retenus"),
     ("REFERENCES", "verified APIs and sources", "API et sources vérifiées"),
     ("PROPOSALS-TRIAGE", "sorting of the proposals", "tri des propositions"),

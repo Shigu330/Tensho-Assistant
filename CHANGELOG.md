@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1083.0
+- Constat d'audit A046 (décision D-138 de l'utilisateur) : le même identifiant nommait des choses différentes (R-14, X-03, X-14, P1, C-…). Nouveau registre des familles d'identifiants, docs/project/IDS.md (deux langues) : seules X- (plan global) et DEC- (décisions) prennent de nouveaux numéros, les autres familles sont figées, les collisions connues disent comment citer. Les anciens identifiants restent tels quels. Un test garde chaque numéro X- et DEC- unique dans chaque moitié.
+- Tests : IdRegistry1083Tests. Verify.ps1 (agent) : 1771/1771, 0 avertissement, 0 erreur ; DLL 0.1083.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A046 (user decision D-138): the same identifier named different things (R-14, X-03, X-14, P1, C-…). New registry of the identifier families, docs/project/IDS.md (both languages): only X- (global plan) and DEC- (decisions) take new numbers, the other families are frozen, the known collisions say how to cite them. Old identifiers stay as they are. A test keeps each X- and DEC- number unique in each half.
+
 ## 0.1082.0
 - Constat d'audit A039 (décision D-138 de l'utilisateur) : aucune DEC ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore « l'utilisateur fait les commits ». Nouvelle DEC-051 dans les deux moitiés de DECISIONS ; DEC-010 marquée modifiée.
 - Tests : AgentFilesDec1082Tests. Verify.ps1 (agent) : 1769/1769, 0 avertissement, 0 erreur ; DLL 0.1082.0.0. Rien à essayer en jeu.
