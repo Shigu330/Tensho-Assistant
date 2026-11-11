@@ -785,6 +785,13 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,configuration,id=>mainWindow.TerritoryName?.Invoke(id),
                 typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log);mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
                 ()=>{mainWindow.DesktopLinkStatus=null;linkFeed?.Dispose();linkFeed=null;});
+            // X-126 (0.1113, D-137): the desktop app installed from Settings › Advanced, on a click only; left out of a build made with
+            // TenshoDesktopInstall=false. Requests only on « Install » / « Update » (this repository's release, docs/evidence/x126-desktop-install.md).
+            if(Link.DesktopInstallRules.Enabled)
+                registrations.Register(()=>mainWindow.DesktopInstaller=new Link.DesktopInstaller(
+                        TenshoAssistant.Desktop.DesktopInstall.OwnFolder(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)),
+                        typeof(Plugin).Assembly.GetName().Version ?? new Version(0,0,0),new TenshoAssistant.Desktop.GitHubReleases(),message=>log.Information(message)),
+                    ()=>{mainWindow.DesktopInstaller?.Dispose();mainWindow.DesktopInstaller=null;});
             // X-89 (0.970): expansions from the game's sheets (TerritoryType.ExVersion, Quest.Expansion), for the item tooltips' origin line.
             mainWindow.TerritoryExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } expansionTerritory && expansionTerritory.ExVersion.IsValid
                 ? expansionTerritory.ExVersion.Value.Name.ExtractText():null;

@@ -8,6 +8,7 @@ public static class SettingsIndex
 {
     public static readonly (string Key,string Tab)[] Entries=
     [
+        ("Advanced.DesktopAutoUpdate","Advanced"),
         ("Advanced.DesktopLink","Advanced"),
         ("Advanced.ShowIds","Advanced"),
         ("Advanced.Fashion","Data"),

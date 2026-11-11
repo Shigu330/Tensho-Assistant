@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1113.0
+- Plan global, X-126 : Application de bureau installable depuis Paramètres › Avancé › Application de bureau (facultatif, décision D-137) : état face au plugin (pas installée, plus ancienne, à jour, plus récente), dossier d'installation, « Installer » ou « Mettre à jour » (release GitHub de la version du plugin, sinon la dernière Stable ; SHA-256 vérifié avec celui de la release ; dépaquetée à côté), « Ouvrir l'application de bureau » (jamais lancée sans ce clic), « Ouvrir son dossier », « Page de la release », « Mise à jour automatique de l'application de bureau ». Aucune requête sans clic. L'installation est un seul code partagé avec la mise à jour de l'application (DesktopInstall.cs). Une compilation avec TenshoDesktopInstall=false la retire. FAQ « Tensho peut-il installer l'application de bureau pour moi ? », source réseau dans SECURITY.
+- Tests : DesktopInstall1113Tests. Verify.ps1 (agent) : 1819/1819, 0 avertissement, 0 erreur ; DLL 0.1113.0.0. Non validé en jeu.
+### English
+- Desktop application installable from Settings › Advanced › Desktop application (optional, decision D-137): state against the plugin (not installed, older, up to date, newer), install folder, « Install » or « Update » (GitHub release of the plugin's version, else the latest Stable one; SHA-256 checked against the release's; unpacked beside), « Open the desktop app » (never started without that click), « Open its folder », « Release page », « Automatic update of the desktop app ». No request without a click. The install is one code shared with the app's own update (DesktopInstall.cs). A build with TenshoDesktopInstall=false leaves it out. FAQ « Can Tensho install the desktop app for me? », network source in SECURITY.
+
 ## 0.1112.0
 - Vérification : quand seuls des documents suivis (CHANGELOG, README, docs/) ont changé depuis la dernière vérification verte, Verify.ps1 (et donc -Commit et le hook avant push) relance les tests managés au lieu de tout sauter ; la compilation reste sautée (plan système 4.21 : 096963e était parti avec 3 tests de documents en échec).
 - Tests : VerifyDocuments1112Tests. Verify.ps1 (agent) : 1816/1816, 0 avertissement, 0 erreur ; DLL 0.1112.0.0. Rien à essayer en jeu.

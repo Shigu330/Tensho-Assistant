@@ -76,6 +76,10 @@ Yes, with no step from you. At start (and on « Check for update ») it asks thi
 
 In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions.
 
+## Can Tensho install the desktop app for me?
+
+Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
+
 ## Where is my wishlist?
 
 In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
@@ -157,6 +161,10 @@ Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jou
 ## Comment relier l'application de bureau au jeu ?
 
 Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes.
+
+## Tensho peut-il installer l'application de bureau pour moi ?
+
+Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.
 
 ## Où est ma liste de souhaits ?
 

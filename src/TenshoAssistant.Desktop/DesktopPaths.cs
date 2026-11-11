@@ -9,7 +9,7 @@ public static class DesktopPaths
 {
     public static string PluginConfig(string appData)=>Path.Combine(PluginUiTest.Host.DalamudPaths.XivLauncher(appData),"pluginConfigs","TenshoAssistant.json");
 
-    public static string Own(string localAppData)=>Path.Combine(localAppData,"TenshoAssistant","Desktop");
+    public static string Own(string localAppData)=>DesktopInstall.OwnFolder(localAppData);
 
     /// <summary>The plugin's text language: the saved one (Configuration.LanguageCode), else Windows' display language.</summary>
     public static string TextLanguage(string? saved,string windowsTwoLetter)

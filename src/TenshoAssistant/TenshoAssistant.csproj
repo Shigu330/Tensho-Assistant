@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1112.0</Version>
+    <Version>0.1113.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -12,9 +12,17 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>$(MSBuildProjectDirectory)\bin\x64\$(Configuration)\</OutputPath>
+    <!-- X-126 (D-137): the desktop app installed from Settings › Advanced. A build for the official repository would pass
+         -p:TenshoDesktopInstall=false: no installer, the section only links to the release page. -->
+    <TenshoDesktopInstall Condition="'$(TenshoDesktopInstall)' == ''">true</TenshoDesktopInstall>
+    <DefineConstants Condition="'$(TenshoDesktopInstall)' != 'true'">$(DefineConstants);TENSHO_NO_DESKTOP_INSTALL</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Raphael.Net" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- X-126 (0.1113): the desktop app's release rules and install, one source shared with the app (src/TenshoAssistant.Desktop). -->
+    <Compile Include="..\TenshoAssistant.Desktop\DesktopUpdate.cs;..\TenshoAssistant.Desktop\DesktopVersionCheck.cs;..\TenshoAssistant.Desktop\DesktopInstall.cs" Link="Desktop\%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <!-- 0.248: languages live only inside the DLL (embedded); an optional Localization/Languages folder still overrides them. -->

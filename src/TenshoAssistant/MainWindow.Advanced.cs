@@ -85,6 +85,8 @@ internal sealed partial class MainWindow
         if(DesktopLinkStatus?.Invoke() is var (linkState,linkProblem))
             ImGui.TextColored(linkState is TenshoAssistant.Link.LocalLinkState.Busy or TenshoAssistant.Link.LocalLinkState.Unavailable ? Warning : Muted,
                 localization.Format("Advanced.DesktopLinkState"+linkState,linkProblem ?? ""));
+        // X-126 (0.1113, D-137): install, update and open the desktop app from here, on a click only.
+        DrawDesktopInstall();
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));

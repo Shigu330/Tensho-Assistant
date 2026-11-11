@@ -16,6 +16,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 <!-- docgen:settings -->
 | Setting | Type | Default | Where | Label and tooltip |
 |---|---|---|---|---|
+| `(Advanced.DesktopAutoUpdate)` | — | — | Settings › Advanced | **Automatic update of the desktop app** — The desktop app updates itself at its start to the installed plugin's version (from the same GitHub release, SHA-256 checked); kept in the app's own file, as its « Automatic update » button. Default: on. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Game data and what you observed only** — Turns off the eight community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay. Default: off. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Size** — Size in pixels (10 to 40). Default: 24 for titles, 19 for sections, 17 for text. |
 | `(MapView.ShowLockedQuests)` | — | — | Settings › Map | **Quests not available yet** — Shows the quest markers the game draws locked (quests you cannot take yet). Greyed while « Quests and objectives » is off. Default: on. |
@@ -269,7 +270,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (31): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (32): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -280,6 +281,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `CraftListPanelName` | string | "" |
 | `CraftStockSaleDays` | int | 7 |
 | `CurrencyThresholds` | Dictionary<uint,int>? | null |
+| `DesktopInstallFolder` | string | "" |
 | `DeveloperMode` | bool | false |
 | `Fonts` | FontSettings? | null |
 | `GameDataOnly` | bool | false |
@@ -305,7 +307,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 252 controls (246 linked to `Configuration`, 6 to another file), 31 settings without a control.
+Counted: 253 controls (246 linked to `Configuration`, 7 to another file), 32 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -327,6 +329,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 <!-- docgen:settings-fr -->
 | Réglage | Type | Défaut | Où | Libellé et info-bulle |
 |---|---|---|---|---|
+| `(Advanced.DesktopAutoUpdate)` | — | — | Paramètres › Avancé | **Mise à jour automatique de l'application de bureau** — L'application de bureau se met à jour à son démarrage vers la version du plugin installé (depuis la même release GitHub, SHA-256 vérifié) ; gardé dans le fichier de l'application, comme son bouton « Mise à jour automatique ». Par défaut : activé. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Données du jeu et observées seulement** — Coupe d’un coup les huit sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent. Par défaut : désactivé. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Taille** — Taille en pixels (10 à 40). Par défaut : 24 pour les titres, 19 pour les sections, 17 pour le texte. |
 | `(MapView.ShowLockedQuests)` | — | — | Paramètres › Carte | **Quêtes pas encore disponibles** — Montre les marqueurs de quête que le jeu dessine verrouillés (quêtes que vous ne pouvez pas encore prendre). Grisé tant que « Quêtes et objectifs » est coupé. Par défaut : activé. |
@@ -580,7 +583,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Demande Universalis activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (31) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (32) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -591,6 +594,7 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `CraftListPanelName` | string | "" |
 | `CraftStockSaleDays` | int | 7 |
 | `CurrencyThresholds` | Dictionary<uint,int>? | null |
+| `DesktopInstallFolder` | string | "" |
 | `DeveloperMode` | bool | false |
 | `Fonts` | FontSettings? | null |
 | `GameDataOnly` | bool | false |
@@ -616,5 +620,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 252 cases (246 reliées à `Configuration`, 6 à un autre fichier), 31 réglages sans case.
+Compté : 253 cases (246 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
 <!-- /docgen:settings-fr -->

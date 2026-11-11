@@ -98,7 +98,8 @@ internal static class DesktopUpdate1033Tests
             Check(release.Contains("refuses a release without the SHA-256",StringComparison.Ordinal),"Release.ps1 refuses a release without it");
             var program = Read("src/TenshoAssistant.Desktop/Program.cs");
             Check(program.Contains("DesktopUpdater.Forward(",StringComparison.Ordinal) && program.Contains("RollBackAfterFailure",StringComparison.Ordinal) && program.Contains("--no-update",StringComparison.Ordinal),"hand-over, going back after a failure, the switch");
-            var updater = Read("src/TenshoAssistant.Desktop/DesktopUpdater.cs");
+            // X-126 (0.1113): the GitHub source and the install moved to DesktopInstall.cs, shared with the plugin.
+            var updater = Read("src/TenshoAssistant.Desktop/DesktopInstall.cs");
             Check(updater.Contains("https://api.github.com/repos/",StringComparison.Ordinal) && !Regex.IsMatch(updater,@"Authorization|Bearer|GITHUB_TOKEN",RegexOptions.IgnoreCase),"GitHub's public API, no token");
             Check(updater.Contains("SHA256.HashDataAsync",StringComparison.Ordinal) && updater.Contains("ExtractToDirectory(zip,partial)",StringComparison.Ordinal) && updater.Contains("CheckCopy(partial",StringComparison.Ordinal),"hash, unpack beside, versions checked before it is recorded");
             var docgen = Read("tools/docgen.py");

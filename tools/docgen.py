@@ -576,12 +576,21 @@ NETWORK = [
      "envoi HTTPS POST des alarmes et alertes vers le webhook du joueur (décrit plus bas)"),
     # X-121: the desktop application (not the plugin): its own files are named « TenshoAssistant.Desktop/… », its switch is a Desktop.* text.
     ("Desktop app update", ["api.github.com", "github.com"], "Desktop.UpdateAutoOn",
-     ["TenshoAssistant.Desktop/DesktopUpdater.cs", "TenshoAssistant.Desktop/DesktopUpdate.cs"],
+     ["TenshoAssistant.Desktop/DesktopUpdater.cs", "TenshoAssistant.Desktop/DesktopInstall.cs", "TenshoAssistant.Desktop/DesktopUpdate.cs"],
      "desktop app only: at its start and on « Check for update », this repository's release of the installed plugin's version (else the "
      "latest Stable one), then TenshoAssistant.Desktop.zip and its SHA-256 from that release; GET only, no player data (limit described below)",
      "application de bureau seulement : à son démarrage et sur « Chercher une mise à jour », la release de ce dépôt qui a la version du plugin "
      "installé (sinon la dernière Stable), puis TenshoAssistant.Desktop.zip et son SHA-256 de cette release ; GET seulement, aucune donnée du "
-     "joueur (limite décrite plus bas)"),
+       "joueur (limite décrite plus bas)"),
+    # X-126 (D-137): the plugin installs the desktop app from Settings › Advanced, on a click only (same release, same checks as X-121).
+    ("Desktop app install", ["api.github.com", "github.com"], None,
+     ["Link/DesktopInstaller.cs", "TenshoAssistant.Desktop/DesktopInstall.cs", "TenshoAssistant.Desktop/DesktopUpdate.cs"],
+     "plugin, on « Install » or « Update » in Settings › Advanced › Desktop application only: this repository's release of the plugin's version "
+     "(else the latest Stable one), then TenshoAssistant.Desktop.zip and its SHA-256 from that release, unpacked beside; GET only, no player "
+     "data; the app is never started without a click",
+     "plugin, seulement sur « Installer » ou « Mettre à jour » dans Paramètres › Avancé › Application de bureau : la release de ce dépôt qui a "
+     "la version du plugin (sinon la dernière Stable), puis TenshoAssistant.Desktop.zip et son SHA-256 de cette release, dépaquetés à côté ; "
+     "GET seulement, aucune donnée du joueur ; l'application n'est jamais lancée sans un clic"),
 ]
 # X-121: the desktop application's sources, checked as the plugin's (a file of it that makes a request is in a row).
 DESKTOP_SOURCE = ROOT / "src/TenshoAssistant.Desktop"

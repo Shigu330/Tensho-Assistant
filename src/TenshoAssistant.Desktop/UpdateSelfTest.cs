@@ -54,7 +54,7 @@ internal static class UpdateSelfTest
             var installed=updater.Pending;
             var target=Path.Combine(DesktopUpdater.VersionsFolder(own),three);
             Check(installed is not null && DesktopUpdate.SameFolder(installed.Folder,target),$"installed beside in {target} (status {updater.Status.Key})");
-            Check(DesktopUpdater.CheckCopy(target,version) is null,"the unpacked app and its plugin are "+three);
+            Check(DesktopInstall.CheckCopy(target,version) is null,"the unpacked app and its plugin are "+three);
             var state=DesktopUpdater.Load(own);
             Check(state.Current?.Version==three && DesktopUpdate.SameFolder(state.Previous?.Folder,startedFolder) && state.Previous?.Version=="0.0.1","update.json: current "+three+", previous the started copy");
             Check(!Directory.Exists(Path.Combine(own,"downloads")) || !Directory.EnumerateFiles(Path.Combine(own,"downloads")).Any(),"the download is removed once unpacked");

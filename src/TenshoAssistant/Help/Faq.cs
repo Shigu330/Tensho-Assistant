@@ -31,6 +31,7 @@ public static class Faq
         new("Desktop"),
         new("DesktopUpdate"),
         new("DesktopLink", "Settings"),
+        new("DesktopInstall", "Settings"),
         new("Wishlist", "Wishlist"),
     ];
 
