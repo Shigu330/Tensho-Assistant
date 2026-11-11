@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1112.0
+- Vérification : quand seuls des documents suivis (CHANGELOG, README, docs/) ont changé depuis la dernière vérification verte, Verify.ps1 (et donc -Commit et le hook avant push) relance les tests managés au lieu de tout sauter ; la compilation reste sautée (plan système 4.21 : 096963e était parti avec 3 tests de documents en échec).
+- Tests : VerifyDocuments1112Tests. Verify.ps1 (agent) : 1816/1816, 0 avertissement, 0 erreur ; DLL 0.1112.0.0. Rien à essayer en jeu.
+### English
+- Verification: when only tracked documents (CHANGELOG, README, docs/) changed since the last green run, Verify.ps1 (so -Commit and the pre-push hook) runs the managed tests again instead of skipping every check; the build is still skipped (system plan 4.21: 096963e had left with 3 failing document tests).
+
 ## 0.1111.0
 - Carte : le code de ses propres types (catalogues, projection, calques, lecteurs) est préparé en premier lui aussi, une demi-seconde après le chargement de Tensho (X-01, suite de 0.1104 : première image de la carte encore à 293 ms, surtout de la compilation).
 - Tests : MapWarmup1111Tests. Verify.ps1 (agent) : 1815/1815, 0 avertissement, 0 erreur ; DLL 0.1111.0.0. Rien à essayer en jeu.

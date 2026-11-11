@@ -36,6 +36,8 @@ if (-not $DotNet) {
 # changed since that run (e.g. -Commit after a plain run; never -Release since 0.1020) and the DLL is still there, the build/tests/package checks are not run again.
 # 0.323: the Dalamud version (Dalamud.dll in DALAMUD_HOME, else XIVLauncher's dev hooks) and the SDK version are part of the stamp, so
 # an update of either runs every check again.
+# 0.1112 (system plan 4.21): the documents left out above (*.md, docs/, repo.json) have their own SHA-256 in the stamp (Documents): when only
+# they changed, the build is still skipped but the managed tests run again (many of them read those documents), then the stamp is updated.
 function Get-TaskEnvironment {
     $dalamudHome = if ($env:DALAMUD_HOME) { $env:DALAMUD_HOME } else { Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev' }
     $dalamud = Join-Path $dalamudHome 'Dalamud.dll'
@@ -43,11 +45,11 @@ function Get-TaskEnvironment {
     $sdk = try { (& $DotNet --version 2>$null | Select-Object -First 1) } catch { 'unknown' }
     return "dalamud=$dalamudVersion;sdk=$sdk"
 }
-function Get-TaskFingerprint {
-    $files = & git -C $taskRoot ls-files -co --exclude-standard | Where-Object { $_ -notmatch '(\.md$|^docs/|^repo\.json$)' } | Sort-Object
+function Get-TaskFingerprint([switch]$Documents) {
+    $files = & git -C $taskRoot ls-files -co --exclude-standard | Where-Object { ($_ -match '(\.md$|^docs/|^repo\.json$)') -eq [bool]$Documents } | Sort-Object
     $hasher = [Security.Cryptography.SHA256]::Create()
     try {
-        $environment = [Text.Encoding]::UTF8.GetBytes((Get-TaskEnvironment) + "`n"); [void]$hasher.TransformBlock($environment, 0, $environment.Length, $null, 0)
+        if (-not $Documents) { $environment = [Text.Encoding]::UTF8.GetBytes((Get-TaskEnvironment) + "`n"); [void]$hasher.TransformBlock($environment, 0, $environment.Length, $null, 0) }
         foreach ($file in $files) {
             $path = Join-Path $taskRoot $file
             if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
@@ -94,13 +96,30 @@ if ($TestsOnly) {
     exit 0
 }
 $taskFingerprint = Get-TaskFingerprint
+$taskDocuments = Get-TaskFingerprint -Documents
 $taskSkip = $false
 # 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
 if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip.sha256'))) {
     $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
 }
-if ($taskSkip) { Write-Output "SKIP checks: version $taskVersionNow already verified green on $($taskStamp.VerifiedAt) with the same sources (-Force to run again)." }
+if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
+    # 0.1112 (4.21): same sources, other documents: no build, but the managed tests again (they read CHANGELOG, README, docs/).
+    Write-Output "SKIP build: version $taskVersionNow already built green on $($taskStamp.VerifiedAt) with the same sources; tracked documents changed: managed tests run again."
+    Push-Location $taskRoot
+    try {
+        if (-not (Test-Path -LiteralPath (Join-Path $taskRoot 'tests\TenshoAssistant.Tests\bin\Release\net10.0\TenshoAssistant.Tests.dll'))) {
+            & $DotNet build tests/TenshoAssistant.Tests -c Release --nologo
+            if ($LASTEXITCODE -ne 0) { throw 'Test project build failed.' }
+        }
+        & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build
+        if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed (tracked documents changed since the last green run).' }
+    }
+    finally { Pop-Location }
+    $taskStamp | Add-Member -NotePropertyName Documents -NotePropertyValue $taskDocuments -Force
+    $taskStamp | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
+}
+elseif ($taskSkip) { Write-Output "SKIP checks: version $taskVersionNow already verified green on $($taskStamp.VerifiedAt) with the same sources and documents (-Force to run again)." }
 else {
 Push-Location $taskRoot
 try {
@@ -232,7 +251,7 @@ try {
     Write-Output "PASS desktop update: $taskDesktopHash written; the packaged exe installed a fake release $taskFakeTag beside, handed over, went back, refused a damaged zip"
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
-    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
+    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
 finally { Pop-Location }
 }

@@ -2,6 +2,7 @@
 # Local hook (0.323; turned on in 0.1033, D-100): runs .\scripts\Verify.ps1 before every push and stops the push when it fails.
 # On the maintainer's PC it is on (git config core.hooksPath .githooks); a contributor turns it on once, from the repository root:
 #   git config core.hooksPath .githooks          (off again: git config --unset core.hooksPath)
+# 0.1112: when only tracked documents changed since that run, it runs the managed tests again (no build) before the push.
 # No second build: Verify.ps1 runs here with no switch, so when the same sources already passed (its stamp artifacts/verify-stamp.json:
 # version, SHA-256 of the files, Dalamud and SDK versions), as just after publish.sh or Verify.ps1 -Commit, it prints
 # « SKIP checks » in a few seconds instead of building and testing again. Any change since that run builds and tests everything.
