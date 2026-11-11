@@ -255,6 +255,35 @@ See [Localization/README.md](../../Localization/README.md). Dates shown in local
 The build and the managed tests do not validate the ImGui rendering nor the native reads: only the in-game test does (state per version:
 [global plan](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
 
+### Competitive switch-off (`Competitive/`, DEC-038)
+
+Coded in 0.610; the plan of 2026-11-05 was folded here and into DEC-038 in 0.1087 (git history keeps it). Zones and flags read from the
+game data: [0.600-competitive-inventory](../evidence/0.600-competitive-inventory.md).
+
+| Level | Content | How it is known |
+|---|---|---|
+| Game flags | PvP, Lord of Verminion, deep dungeons (ranked on the Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` and its content type 21 (`CompetitiveZones.Build`): new maps are covered without an update; `IsPvP` alone is false at the Battlehall (579) and at Lord of Verminion |
+| Arena only | Triple Triad Battlehall (579), whose public hall has PvE matches | `GameMain.IsInPvPInstance` (0.612); the log writes `Competitive arena check` |
+| Listed in the code | Triple Triad tournaments (940, 941), Mahjong (831), Crucible of the Unbroken (1339 to 1343) | `CompetitiveZones.Listed`; the beastmaster's team panel is the one exception (DEC-047) |
+| Outside a zone | Triple Triad against a player in a normal zone | only the Triple Triad part switches off (DEC-038, D5) |
+
+What « switched off » means, as coded (`CompetitiveGate`): Tensho stays loaded and one guard, on the framework thread, keeps only the
+reading of the zone. The framework subscriptions go through it (a test refuses one that would bypass it), the chat readers too (0.615),
+and the reading of market offers during a sale listing (0.926). Display, commands (one line saying Tensho is off), context menu and
+server bar are off; the game's map is given back; what was waiting for Discord is dropped; one chat line on entry, nothing on leaving.
+Nothing is erased. Still active, without reading the game in combat: the « inventory changed » notice (it only marks a reread for later)
+and the change of the system theme setting. In case of doubt (unknown zone during a loading, sheet unreadable after a game update),
+Tensho stays off; loaded while already in PvP, it starts off.
+
+Known gaps:
+
+- The hooks stay in place (macro, sequence recording) but let the game's call through without doing anything; they are not removed.
+- A web request that has already left finishes normally; no new one leaves. It is not cancelled.
+- An inventory sort or a macro write already in progress stops in the middle and resumes on leaving. Not tried.
+- An alarm whose time falls during the match does not ring afterwards; one whose advance notice begins during the match and whose
+  time falls after rings on leaving.
+- If the game sheets become unreadable after an update, Tensho stays off everywhere while connected, with a warning in the log only.
+
 ---
 
 # Architecture (français)
@@ -521,3 +550,34 @@ UTC et heure d'Éorzéa.
 
 La compilation et les tests managés ne valident pas le rendu ImGui ni la lecture native : seul l'essai en jeu le fait (état par version :
 [plan global](GLOBAL-PLAN.md), [TESTING](TESTING.md), [CHANGELOG](../../CHANGELOG.md)).
+
+### Coupure en JcJ et en contenu classé (`Competitive/`, DEC-038)
+
+Codée en 0.610 ; le plan du 2026-11-05 a été fondu ici et dans DEC-038 en 0.1087 (l'historique git le garde). Zones et drapeaux lus
+dans les données du jeu : [0.600-competitive-inventory](../evidence/0.600-competitive-inventory.md).
+
+| Niveau | Contenu | Comment on le sait |
+|---|---|---|
+| Drapeaux du jeu | JcJ, Lord of Verminion, donjons profonds (classés sur le Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` et son type de contenu 21 (`CompetitiveZones.Build`) : les nouvelles cartes sont couvertes sans mise à jour ; `IsPvP` seul est faux au Battlehall (579) et à Lord of Verminion |
+| Arène seulement | Battlehall de Triple Triade (579), dont la salle publique a des matchs JcE | `GameMain.IsInPvPInstance` (0.612) ; le journal écrit `Competitive arena check` |
+| Listé dans le code | Tournois de Triple Triade (940, 941), Mahjong (831), Dédale bestial (1339 à 1343) | `CompetitiveZones.Listed` ; le panneau d'équipe du dresseur est la seule exception (DEC-047) |
+| Hors d'une zone | Triple Triade contre un joueur dans une zone normale | seule la partie Triple Triade se coupe (DEC-038, D5) |
+
+Ce que « coupé » veut dire, tel que codé (`CompetitiveGate`) : Tensho reste chargé et un seul gardien, sur le thread du framework, ne
+garde que la lecture de la zone. Les abonnements au framework passent par lui (un test refuse celui qui le contournerait), les lecteurs
+du chat aussi (0.615), et la lecture des offres du marché pendant une mise en vente (0.926). Affichage, commandes (une ligne qui dit que
+Tensho est coupé), menu contextuel et barre de serveur sont coupés ; la carte du jeu est rendue ; ce qui attendait Discord est abandonné ;
+une ligne dans le chat à l'entrée, rien à la sortie. Rien n'est effacé. Restent actifs, sans lire le jeu en combat : l'avis « inventaire
+modifié » (il ne fait que marquer une relecture pour après) et le changement de réglage système du thème. En cas de doute (zone inconnue
+pendant un chargement, feuille illisible après une mise à jour du jeu), Tensho reste coupé ; chargé alors qu'on est déjà en JcJ, il
+démarre coupé.
+
+Écarts connus :
+
+- Les hooks restent posés (macro, enregistrement de séquence) mais laissent passer l'appel du jeu sans rien faire ; ils ne sont pas retirés.
+- Une requête web déjà partie finit normalement ; aucune nouvelle ne part. Elle n'est pas annulée.
+- Un tri d'inventaire ou une écriture de macro déjà en cours s'arrête au milieu et reprend à la sortie. Pas essayé.
+- Une alarme dont l'heure tombe pendant le match ne sonne pas ensuite ; celle dont le préavis commence pendant le match et dont l'heure
+  tombe après sonne à la sortie.
+- Si les feuilles du jeu deviennent illisibles après une mise à jour, Tensho reste coupé partout tant qu'on est connecté, avec un
+  avertissement dans le journal seulement.

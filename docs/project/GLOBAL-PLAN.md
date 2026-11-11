@@ -139,7 +139,7 @@ C12 moves to phase 5: its calculation rule must be compared with the initial qua
 
 ## Before phase 5: switch-off in PvP and in ranked content
 
-Tensho switches itself off and back on by itself, with no setting (DEC-038). ~~To code~~ done in 0.610: [plan, gaps and in-game tests](COMPETITIVE-OFF-PLAN.md). In-game test: first point of phase 5.
+Tensho switches itself off and back on by itself, with no setting (DEC-038). ~~To code~~ done in 0.610: [how it works and known gaps](ARCHITECTURE.md), D1 to D5 in DEC-038. In-game test: first point of phase 5.
 
 ## Phase 5: in-game surveys, then code
 
@@ -735,7 +735,7 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 
 ## Avant la phase 5 : coupure en JcJ et en contenu classé
 
-Tensho se coupe tout seul et repart tout seul, sans réglage (DEC-038). ~~À coder~~ fait en 0.610 : [plan, écarts et essais en jeu](COMPETITIVE-OFF-PLAN.md). Essai en jeu : premier point de la phase 5.
+Tensho se coupe tout seul et repart tout seul, sans réglage (DEC-038). ~~À coder~~ fait en 0.610 : [fonctionnement et écarts connus](ARCHITECTURE.md), D1 à D5 dans DEC-038. Essai en jeu : premier point de la phase 5.
 
 ## Phase 5 : relevés en jeu, puis code
 

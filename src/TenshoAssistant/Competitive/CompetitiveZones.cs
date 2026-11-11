@@ -19,7 +19,7 @@ public static class CompetitiveZones
     public static bool IsLabyrinth(uint territory)=>Labyrinth.Contains(territory) || LabyrinthFound.Contains(territory);
     /// <summary>
     /// 0.612 (user report, in game): territory 579 is also a public hall with PvE matches, so neither the place nor a match proves anything: stopped only in
-    /// the arena's own instance. What marks it is measured in game (the watcher logs it): docs/project/COMPETITIVE-OFF-PLAN.md.
+    /// the arena's own instance. What marks it is measured in game (the watcher logs it): docs/project/ARCHITECTURE.md, « Competitive switch-off ».
     /// </summary>
     public static readonly IReadOnlySet<uint> InstanceOnly=new HashSet<uint>{579};
 

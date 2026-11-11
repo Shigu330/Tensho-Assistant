@@ -139,7 +139,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.585-classjob-empty-rows.md](0.585-classjob-empty-rows.md) | — | `CHANGELOG.md` |
 | [0.586-flight-sets.md](0.586-flight-sets.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.596-map-label-orientation.md](0.596-map-label-orientation.md) | `src/TenshoAssistant/Maps/MapLabels.cs`, `tests/TenshoAssistant.Tests/MapLabels596Tests.cs` | `CHANGELOG.md` |
-| [0.600-competitive-inventory.md](0.600-competitive-inventory.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/project/COMPETITIVE-OFF-PLAN.md`, `docs/project/DECISIONS.md` |
+| [0.600-competitive-inventory.md](0.600-competitive-inventory.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/project/ARCHITECTURE.md`, `docs/project/DECISIONS.md` |
 | [0.608-universalis-batch.md](0.608-universalis-batch.md) | `src/TenshoAssistant/Market/MarketService.cs`, `tests/TenshoAssistant.Tests/MarketServiceTests.cs` | `CHANGELOG.md`, `docs/evidence/0.710-market-pace.md` |
 | [0.628-quest-target-on-world-map.md](0.628-quest-target-on-world-map.md) | `src/TenshoAssistant/Maps/MapCatalog.cs` | — |
 | [0.631-region-zone-images.md](0.631-region-zone-images.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | — |

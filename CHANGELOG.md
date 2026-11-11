@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1087.0
+- Constat d'audit A062 (décision D-138 de l'utilisateur) : COMPETITIVE-OFF-PLAN était un plan fini (codé en 0.610). Sa partie de référence (où Tensho se coupe, ce que « coupé » veut dire tel que codé, les écarts connus) va dans ARCHITECTURE (section « Coupure en JcJ et en contenu classé », deux moitiés) et les réponses D1 à D5 dans DEC-038 (deux moitiés) ; le plan est retiré (git le garde) et tous les renvois suivent.
+- Tests : CompetitiveFolded1087Tests. Verify.ps1 (agent) : 1776/1776, 0 avertissement, 0 erreur ; DLL 0.1087.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A062 (user decision D-138): COMPETITIVE-OFF-PLAN was a finished plan (coded in 0.610). Its reference part (where Tensho switches off, what « switched off » means as coded, the known gaps) goes into ARCHITECTURE (section « Competitive switch-off », both halves) and the D1 to D5 answers into DEC-038 (both halves); the plan is removed (git keeps it) and every pointer follows.
+
 ## 0.1086.0
 - Constat d'audit A072 (décision D-138 de l'utilisateur) : docs/evidence mêlait des audits et plans du travail aux sorties de sondes. Les sept (plan et relevés du nettoyage X-76, règles réseau, couverture des sondes, carte communautaire) vont dans docs/project/audits/ (historique git gardé) ; tous les chemins qui les nommaient suivent. docs/evidence garde les sorties de sondes, les captures et leurs rapports.
 - Tests : AuditsFolder1086Tests. Verify.ps1 (agent) : 1775/1775, 0 avertissement, 0 erreur ; DLL 0.1086.0.0. Rien à essayer en jeu.

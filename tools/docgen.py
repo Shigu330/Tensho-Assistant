@@ -133,7 +133,6 @@ PROJECT_WORKING = [
     ("CRAFT-GATHER-PROPOSALS", "crafting, gathering", "artisanat, récolte"),
     ("TOOLS-PROPOSALS", "alarms, free company, quests, gear, mini-games", "alarmes, compagnie libre, quêtes, équipement, mini-jeux"),
     ("G-PROPOSALS", "proposals and provisional choices of step g", "propositions et choix provisoires de l'étape g"),
-    ("COMPETITIVE-OFF-PLAN", "Tensho stops in PvP and ranked content, DEC-038", "Tensho se coupe en JcJ et en contenu classé, DEC-038"),
     ("audits/", "audits and plans of the work (X-76 cleanup, network rules, probe coverage, community map)",
      "audits et plans du travail (nettoyage X-76, règles réseau, couverture des sondes, carte communautaire)"),
     ("archive/", "older sections moved out of the plan and the decisions", "anciennes sections sorties du plan et des décisions"),

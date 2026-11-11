@@ -26,7 +26,7 @@ the older documents cite them) and no new one is created.
 | `T0` to `T29` | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) | alarms, free company, quests, gear and mini-game proposals |
 | `W-NN` | [GLOBAL-PLAN](GLOBAL-PLAN.md) | topics added on 2026-11-06 |
 | `H1` to `H10`, parsers `P1` to `P10`, `E1` to `E5` | [GLOBAL-PLAN](GLOBAL-PLAN.md) (full cleanup, X-76) | harmonisation steps, parsers, extra steps |
-| `D1` to `D5` | COMPETITIVE-OFF-PLAN (switch-off in PvP and ranked content) | questions of that plan, answered by DEC-038 |
+| `D1` to `D5` | [DECISIONS](DECISIONS.md), DEC-038 | questions of the switch-off in PvP and ranked content (plan folded into DEC-038 in 0.1087) |
 | `REF-…`, `<MODULE>-NNN` (`UI-`, `ONBOARD-`…) | [REFERENCES](REFERENCES.md), [TESTING](TESTING.md) | verified sources; in-game test protocols |
 
 ## Known collisions
@@ -69,7 +69,7 @@ quels (le CHANGELOG et les anciens documents les citent) et aucun nouveau n'est 
 | `T0` à `T29` | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) | propositions alarmes, compagnie libre, quêtes, équipement et mini-jeux |
 | `W-NN` | [GLOBAL-PLAN](GLOBAL-PLAN.md) | sujets ajoutés le 2026-11-06 |
 | `H1` à `H10`, parseurs `P1` à `P10`, `E1` à `E5` | [GLOBAL-PLAN](GLOBAL-PLAN.md) (nettoyage complet, X-76) | étapes d'harmonisation, parseurs, étapes ajoutées |
-| `D1` à `D5` | COMPETITIVE-OFF-PLAN (coupure en JcJ et en contenu classé) | questions de ce plan, tranchées par DEC-038 |
+| `D1` à `D5` | [DECISIONS](DECISIONS.md), DEC-038 | questions de la coupure en JcJ et en contenu classé (plan fondu dans DEC-038 en 0.1087) |
 | `REF-…`, `<MODULE>-NNN` (`UI-`, `ONBOARD-`…) | [REFERENCES](REFERENCES.md), [TESTING](TESTING.md) | sources vérifiées ; protocoles d'essai en jeu |
 
 ## Collisions connues
