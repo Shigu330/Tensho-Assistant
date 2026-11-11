@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1048.0
+- Plan global, X-117 : Après un patch du jeu, partie 2b (X-117) : Paramètres › Données › cache compte maintenant, sous « ce qui a changé », les découvertes à revérifier : celles vues pour la dernière fois avant le patch dans une cellule de 50 yalms (ou à côté) où une position de la carte a été ajoutée, déplacée ou retirée, ou sur un marchand dont la ligne a changé (même règle que l'outil de fusion des découvertes). Le compte se fait hors de l'image, une fois par patch ; les découvertes restent telles quelles, à revoir en jeu.
+- Tests : PatchRecheck1048Tests. Verify.ps1 (agent) : 1719/1719, 0 avertissement, 0 erreur ; DLL 0.1048.0.0. Non validé en jeu.
+### English
+- After a game patch, part 2b (X-117): Settings › Data › cache now counts, under « what changed », the discoveries to recheck: those seen for the last time before the patch in or next to a 50-yalm cell where a map position was added, moved or removed, or about a vendor whose row changed (the same rule as the discoveries merge tool). The count is made off the frame, once per patch; the discoveries stay as they are, to be seen again in game.
+
 ## 0.1047.0
 - Plan global, X-117 : Après un patch du jeu, partie 2a (X-117) : Paramètres › Données › cache montre maintenant « ce qui a changé » au dernier patch dans les catalogues gardés : une ligne par catalogue (objets, recettes, points de récolte, positions de la carte, marchands) avec l'ancienne et la nouvelle version du jeu et le nombre de lignes ajoutées, retirées et changées, ou « non comparé » quand le format gardé a changé ; « Aucun patch du jeu vu » tant qu'il n'y en a pas eu. Le marquage des découvertes à revérifier suit dans une prochaine version.
 - Tests : PatchShow1047Tests. Verify.ps1 (agent) : 1716/1716, 0 avertissement, 0 erreur ; DLL 0.1047.0.0. Non validé en jeu.

@@ -2462,6 +2462,8 @@
     "PatchGathering": "Gathering points",
     "PatchMapPositions": "Map positions",
     "PatchVendors": "Vendors",
+    "PatchRecheck": "Discoveries to recheck: {0} (place changed: {1}, vendor changed: {2}).",
+    "PatchRecheckTip": "Your discoveries and the imported ones seen for the last time before this patch, in or next to a 50-yalm cell where a map position (quest giver, gathering point, fishing spot, vista, aether current) was added, moved or removed, or about a vendor whose row changed. They stay as they are: see them again in game to confirm them.",
     "Clear": "Empty the cache…",
     "ClearTip": "Removes every cached download and calculation (prices, quests, sources, craft…); they are fetched again when needed. A zip copy is taken first in the Backups folder (the last 5 are kept).",
     "ClearSure": "Empty the cache? A zip copy is taken first.",

@@ -67,6 +67,28 @@ internal sealed partial class MainWindow
                 ? localization.Format("CacheUi.PatchLine",label,summary.OldGame ?? "?",summary.NewGame ?? "?",summary.Added,summary.Removed,summary.Changed)
                 : localization.Format("CacheUi.PatchSkipped",label,summary.OldGame ?? "?",summary.NewGame ?? "?"));
         }
+        DrawPatchRecheck(reports);
+    }
+
+    // X-117 part 2b (0.1048): the discoveries to recheck after the patch, counted off the frame (a sliced copy of the facts, then
+    // PatchRecheck.Find) once per new report list and once the discoveries are loaded; the line shows the last count.
+    private IReadOnlyList<PatchCatalogReport>? patchRecheckFor;private volatile PatchRecheckResult? patchRecheck;private int patchRecheckRunning;
+    private void DrawPatchRecheck(IReadOnlyList<PatchCatalogReport> reports)
+    {
+        if(DiscoveryStore is not { } discoveries || !DiscoveriesLoaded)return;
+        if(!ReferenceEquals(reports,patchRecheckFor) && Interlocked.CompareExchange(ref patchRecheckRunning,1,0)==0)
+        {
+            patchRecheckFor=reports;
+            _=Task.Run(()=>
+            {
+                try{patchRecheck=PatchRecheck.Find(reports,discoveries.Snapshot(DateTimeOffset.UtcNow,saving:false).Facts);}
+                catch(Exception error){log.Warning(error,"The discoveries to recheck after the game patch could not be counted.");}
+                finally{Volatile.Write(ref patchRecheckRunning,0);}
+            });
+        }
+        if(patchRecheck is not { } result)return;
+        ImGui.TextWrapped(localization.Format("CacheUi.PatchRecheck",result.Facts,result.Places,result.Vendors));
+        Tip("CacheUi.PatchRecheckTip");
     }
 
     // X-76 step 3 (0.945, user request): empty the cache, a zip copy taken just before (Backups folder).

@@ -2462,6 +2462,8 @@
     "PatchGathering": "Points de récolte",
     "PatchMapPositions": "Positions de la carte",
     "PatchVendors": "Marchands",
+    "PatchRecheck": "Découvertes à revérifier : {0} (lieu changé : {1}, marchand changé : {2}).",
+    "PatchRecheckTip": "Vos découvertes et celles importées vues pour la dernière fois avant ce patch, dans une cellule de 50 yalms (ou à côté) où une position de la carte (donneur de quête, point de récolte, zone de pêche, panorama, courant éthéré) a été ajoutée, déplacée ou retirée, ou sur un marchand dont la ligne a changé. Elles restent telles quelles : revoyez-les en jeu pour les confirmer.",
     "Clear": "Vider le cache…",
     "ClearTip": "Retire tous les téléchargements et calculs gardés (prix, quêtes, sources, artisanat…) ; ils sont redemandés au besoin. Une copie zip est faite avant dans le dossier Backups (les 5 dernières sont gardées).",
     "ClearSure": "Vider le cache ? Une copie zip est faite avant.",
