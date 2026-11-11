@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1094.0
+- Pêche en mer : ce que Tensho lit du voyage en cours (prises de chaque escale avec leurs points, progression des missions, contrôle de l'horaire et ligne de résultat faits) est gardé dans un petit fichier à côté des réglages (OceanVoyage.json) et relu après un rechargement du plugin quand c'est le même voyage (même route, escale pas en arrière, moins de 25 minutes) ; le contrôle de l'horaire n'est plus refait à chaque rechargement. En version de développement ou en mode développeur, Tensho écrit aussi PlayState.json (en mission, en pêche en mer, en contenu classé) pour que les scripts du développeur ne remplacent pas la DLL pendant ce temps ; rien n'est envoyé.
+- Tests : VoyageReload1094Tests. Verify.ps1 (agent) : 1784/1784, 0 avertissement, 0 erreur ; DLL 0.1094.0.0. Non validé en jeu.
+### English
+- Ocean fishing: what Tensho reads of the voyage in progress (catches of each stop with their points, mission progress, schedule check and result line done) is kept in a small file beside the settings (OceanVoyage.json) and read again after a reload of the plugin when it is the same voyage (same route, stop not behind, under 25 minutes); the schedule check is no longer done again at each reload. In a development build or in developer mode, Tensho also writes PlayState.json (in a duty, an ocean voyage, competitive content) so that the developer's scripts do not replace the DLL meanwhile; nothing is sent.
+
 ## 0.1093.0
 - Constat d'audit A070 (décision D-138 de l'utilisateur) : le CHANGELOG faisait 1 Mo (1 059 entrées). CHANGELOG.md garde la dernière release (0.1037.0) et toutes les versions suivantes ; les 1 003 entrées plus anciennes sont dans docs/changelog/, un fichier par centaine de versions, liens réécrits. Nouvel outil tools/changelog.py (archive, check) ; le script de release refuse des notes si CHANGELOG.md ne garde plus les versions depuis la dernière release, et Verify.ps1 -Release lance la vérification. Les tests qui lisent tout l'historique lisent aussi l'archive.
 - Tests : ChangelogSplit1093Tests. Verify.ps1 (agent) : 1779/1779, 0 avertissement, 0 erreur ; DLL 0.1093.0.0. Rien à essayer en jeu.

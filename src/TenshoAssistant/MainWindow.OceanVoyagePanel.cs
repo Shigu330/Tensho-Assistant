@@ -25,6 +25,9 @@ internal sealed partial class MainWindow
     {
         if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;
         oceanRouteChecked=frame.RouteId;
+        // 0.1094: once per voyage, a reload of the plugin included (the voyage record keeps it).
+        if(frame.ScheduleChecked)return;
+        OceanVoyage?.MarkScheduleChecked();
         var slot=(long)Math.Floor((DateTimeOffset.UtcNow+OceanSchedule.Boarding-OceanSchedule.LoopStart)/OceanSchedule.Step);
         var expected=timetable.At(Math.Max(0,slot));
         if(expected.Aldenard?.Id==frame.RouteId || expected.Othard?.Id==frame.RouteId)

@@ -10,6 +10,10 @@ public sealed record OceanVoyageFrame(uint RouteId,int Zone,int Status,bool Spec
 {
     /// <summary>X-85 V2 (0.964): the fish caught at the current stop this voyage (FishData of the zone: item, NQ, HQ, points earned with it).</summary>
     public IReadOnlyList<(uint Item,int Nq,int Hq,int Points)> ZoneFish { get; init; }=[];
+    /// <summary>0.1094: the catches of every stop so far this voyage (kept across a reload of the plugin).</summary>
+    public IReadOnlyList<OceanZoneCatch> Catches { get; init; }=[];
+    /// <summary>0.1094: the schedule check of this voyage was already done (before a reload).</summary>
+    public bool ScheduleChecked { get; init; }
 }
 
 /// <summary>An ocean fishing place (IKDSpot): its name and its two fishing spots, the usual one and the spectral current's.</summary>

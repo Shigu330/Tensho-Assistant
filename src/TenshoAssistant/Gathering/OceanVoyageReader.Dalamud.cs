@@ -25,9 +25,23 @@ internal sealed class OceanVoyageReader : IDisposable
     /// </summary>
     public Action<uint,int>? CatchPoints { get; set; }
     private readonly Dictionary<uint,(int Count,int Points)> zoneSeen=[];private int zoneSeenFor=-1;private bool scripsLogged;
+    // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, read again after a reload of the same voyage.
+    private readonly string? recordPath;private readonly BackgroundWriter? writer;
+    private OceanVoyageRecord? record;private bool scheduleCheckedAsked;
+    /// <summary>0.1094: the voyage as kept (catches of every stop, missions), or null outside a voyage.</summary>
+    public OceanVoyageRecord? Record{get{lock(gate)return frame is null ? null:record;}}
 
-    public OceanVoyageReader(IFramework framework,IClientState client,IPluginLog log)
-    {this.framework=framework;this.client=client;this.log=log;TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}
+    public OceanVoyageReader(IFramework framework,IClientState client,IPluginLog log,string? recordPath=null,BackgroundWriter? writer=null)
+    {
+        this.framework=framework;this.client=client;this.log=log;this.recordPath=recordPath;this.writer=writer;
+        if(recordPath is not null)
+            try{record=File.Exists(recordPath) ? OceanVoyageRecord.FromJson(File.ReadAllText(recordPath)):null;}
+            catch(Exception error){log.Warning(error,"Ocean voyage record unreadable; the voyage is read from the game alone.");}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);
+    }
+
+    /// <summary>0.1094: the schedule check of this voyage is done (kept across a reload, so it is not logged again).</summary>
+    public void MarkScheduleChecked(){lock(gate)scheduleCheckedAsked=true;}
 
     private unsafe void Update(IFramework unused)
     {
@@ -57,10 +71,27 @@ internal sealed class OceanVoyageReader : IDisposable
                         voyage->Mission1Progress,voyage->Mission2Progress,voyage->Mission3Progress);
                 }
                 // X-85 V2 (0.964): the current stop's fish counts and points (FirstZoneFishData, SecondZoneFishData, ThirdZoneFishData), copied.
+                // 0.1094: the three stops are copied, for the voyage record (and the totals of the voyage).
+                var gameCatches=new List<OceanZoneCatch>();
+                for(var stop=0;stop<=zone;stop++)
+                {
+                    var stopData=stop switch{0=>voyage->FirstZoneFishData,1=>voyage->SecondZoneFishData,_=>voyage->ThirdZoneFishData};
+                    foreach(ref readonly var fish in stopData)
+                        if(fish.ItemId!=0)gameCatches.Add(new(stop,fish.ItemId%1_000_000,fish.NqAmount+fish.HqAmount,(int)Math.Min(fish.TotalPoints,int.MaxValue)));
+                }
                 var zoneData=zone switch{0=>voyage->FirstZoneFishData,1=>voyage->SecondZoneFishData,_=>voyage->ThirdZoneFishData};
                 var zoneFish=new List<(uint,int,int,int)>();
                 foreach(ref readonly var fish in zoneData)
                     if(fish.ItemId!=0)zoneFish.Add((fish.ItemId%1_000_000,fish.NqAmount,fish.HqAmount,(int)Math.Min(fish.TotalPoints,int.MaxValue)));
+                var nowAt=DateTimeOffset.UtcNow;
+                if(record?.SameVoyage(voyage->CurrentRoute,zone,nowAt)!=true){scripsLogged=false;scheduleCheckedAsked=false;}
+                var kept=OceanVoyageRecord.Merge(record,voyage->CurrentRoute,zone,gameCatches,[voyage->Mission1Progress,voyage->Mission2Progress,voyage->Mission3Progress],nowAt);
+                if(scheduleCheckedAsked || scripsLogged)kept=kept with{ScheduleChecked=kept.ScheduleChecked || scheduleCheckedAsked,ResultLogged=kept.ResultLogged || scripsLogged};
+                if(kept.ResultLogged)scripsLogged=true;
+                // A stop the game no longer lists after a reload keeps what was saved for it.
+                foreach(var saved in kept.At(zone))
+                    if(!zoneFish.Any(fish=>fish.Item1==saved.Item))zoneFish.Add((saved.Item,saved.Count,0,saved.Points));
+                SaveRecord(kept,nowAt);
                 if(zone!=zoneSeenFor){zoneSeen.Clear();zoneSeenFor=zone;foreach(var (item,nq,hq,points) in zoneFish)zoneSeen[item]=(nq+hq,points);}
                 else
                     foreach(var (item,nq,hq,points) in zoneFish)
@@ -75,10 +106,11 @@ internal sealed class OceanVoyageReader : IDisposable
                     scripsLogged=true;var result=voyage->IndividualResult;
                     log.Information("Ocean voyage result: route {0}, points {1}, experience {2}, scrip1 {3}, scrip2 {4}.",voyage->CurrentRoute,result.TotalPoints,result.ExperiencePoints,result.Scrip1Amount,result.Scrip2Amount);
                 }
-                if(status!=4)scripsLogged=false;
+                var progress=record!.Missions;
                 Volatile.Write(ref frame,new OceanVoyageFrame(voyage->CurrentRoute,zone,status,voyage->SpectralCurrentActive,voyage->WeatherId,
-                    [(voyage->Mission1Type,voyage->Mission1Progress),(voyage->Mission2Type,voyage->Mission2Progress),(voyage->Mission3Type,voyage->Mission3Progress)],
-                    player.TotalPoints,player.CaughtFish,DateTimeOffset.UtcNow){ZoneFish=zoneFish});
+                    [(voyage->Mission1Type,progress.Count>0 ? progress[0]:voyage->Mission1Progress),(voyage->Mission2Type,progress.Count>1 ? progress[1]:voyage->Mission2Progress),
+                     (voyage->Mission3Type,progress.Count>2 ? progress[2]:voyage->Mission3Progress)],
+                    player.TotalPoints,player.CaughtFish,DateTimeOffset.UtcNow){ZoneFish=zoneFish,Catches=record.Catches,ScheduleChecked=record.ScheduleChecked});
             }
             catch(Exception error)
             {
@@ -86,6 +118,16 @@ internal sealed class OceanVoyageReader : IDisposable
                 if(Interlocked.Exchange(ref warned,1)==0)log.Warning(error,"Ocean fishing voyage unavailable; retry in five seconds.");
             }
         }
+    }
+
+    /// <summary>0.1094: keeps the record, and saves it in the background when its content changed or every two minutes (so it stays recent).</summary>
+    private void SaveRecord(OceanVoyageRecord kept,DateTimeOffset now)
+    {
+        var changed=!kept.SameContent(record) || record is null || now-record.Updated>=TimeSpan.FromMinutes(2);
+        if(changed)record=kept;
+        if(!changed || recordPath is null || writer is null)return;
+        var json=kept.ToJson();var path=recordPath;
+        writer.Enqueue("Ocean voyage record could not be saved.",()=>AtomicFile.Write(path,json));
     }
 
     public void Dispose(){lock(gate){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref frame,null);}}

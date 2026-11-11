@@ -682,8 +682,14 @@ public sealed class Plugin : IDalamudPlugin
             });
             mainWindow.OceanVoyageData=()=>oceanVoyageData.Value;
             OceanVoyageReader? oceanVoyageReader=null;
-            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log){Developer=()=>configuration.DeveloperMode,
+            // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, and the play state for the developer's scripts.
+            var voyageWriter=new BackgroundWriter((error,message)=>log.Warning(error,message));
+            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log,
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"OceanVoyage.json"),voyageWriter){Developer=()=>configuration.DeveloperMode,
                 CatchPoints=(item,points)=>{if(configuration.Discovery.Enabled && configuration.Discovery.Fishing)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.FishPoints,item,0,Math.Min(points,100_000),DateTimeOffset.UtcNow,client.TerritoryType);}},()=>oceanVoyageReader?.Dispose());
+            Diagnostics.PlayStateWriter? playState=null;
+            registrations.Register(()=>playState=new Diagnostics.PlayStateWriter(framework,condition,pluginInterface.GetPluginConfigDirectory(),
+                ()=>pluginInterface.IsDev || configuration.DeveloperMode,()=>oceanVoyageReader?.Frame is not null,voyageWriter),()=>playState?.Dispose());
             // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
             Inventory.InventoryWindowReader? inventoryWindow=null;
             registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());
