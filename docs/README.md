@@ -9,7 +9,7 @@
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | contributors | build, test, conventions, evidence, licences, adding a tool, versions and releases, Dalamud rules |
 | [../SECURITY.md](../SECURITY.md) | everyone | reporting a vulnerability, sensitive surfaces of the plugin (network, local files, actions in the game) |
 | [../CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) | everyone | how we behave in the project's issues, discussions and pull requests, and how to report a problem (English, then French) |
-| [../CHANGELOG.md](../CHANGELOG.md) | everyone | what changed in each version (French, then `### English`) |
+| [../CHANGELOG.md](../CHANGELOG.md) | everyone | what changed in each version (French, then `### English` from 0.219.0 on; older entries are in French only) |
 | [FAQ.md](FAQ.md) | everyone | frequent questions, English then French, written by `tools/faq.py` from the plugin's list (the Help page shows the same); new questions in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a) |
 | [project/](project/) | contributors and agent | [PROJECT](project/PROJECT.md) (scope), [ROADMAP](project/ROADMAP.md) (the 17 reference plugins and the user requests R-01 to R-14), [ARCHITECTURE](project/ARCHITECTURE.md) (code map), [PUBLISHING](project/PUBLISHING.md) (Dalamud rules kept), and the working documents listed below |
 | [evidence/](evidence/) | contributors and agent | probe outputs and log excerpts cited by the code (evidence of the data links), most named `<version>-<subject>`; [index](evidence/README.md) of the files that cite each |
@@ -37,7 +37,7 @@ Some documents of `project/` still name old goal sheets (`goals/`) and agent fil
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | contributeurs | compiler, tester, conventions, preuves, licences, ajouter un outil, versions et releases, règles Dalamud |
 | [../SECURITY.md](../SECURITY.md) | tout le monde | signaler une vulnérabilité, surfaces sensibles du plugin (réseau, fichiers locaux, actions dans le jeu) |
 | [../CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md) | tout le monde | comment se comporter dans les tickets, discussions et demandes de fusion du projet, et comment signaler un problème (anglais, puis français) |
-| [../CHANGELOG.md](../CHANGELOG.md) | tout le monde | ce qui a changé à chaque version (français, puis `### English`) |
+| [../CHANGELOG.md](../CHANGELOG.md) | tout le monde | ce qui a changé à chaque version (français, puis `### English` depuis 0.219.0 ; les entrées plus anciennes sont en français seulement) |
 | [FAQ.md](FAQ.md) | tout le monde | questions fréquentes, en anglais puis en français, écrites par `tools/faq.py` depuis la liste du plugin (la page Aide montre les mêmes) ; nouvelles questions dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a) |
 | [project/](project/) | contributeurs et agent | [PROJECT](project/PROJECT.md) (périmètre), [ROADMAP](project/ROADMAP.md) (les 17 plugins de référence et les demandes R-01 à R-14), [ARCHITECTURE](project/ARCHITECTURE.md) (carte du code), [PUBLISHING](project/PUBLISHING.md) (règles Dalamud tenues), et les documents de travail listés plus bas |
 | [evidence/](evidence/) | contributeurs et agent | sorties de sondes et extraits de journaux cités par le code (preuves des liens de données), le plus souvent nommés `<version>-<sujet>` ; [index](evidence/README.md) des fichiers qui citent chacune |

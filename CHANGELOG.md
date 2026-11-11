@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1056.0
+- Constat d'audit A069 : la carte des documents (docs/README.md) disait que chaque entrée du CHANGELOG a une partie anglaise, alors que les 188 entrées jusqu'à 0.218.0 sont en français seulement. Elle dit maintenant « partie anglaise depuis 0.219.0 », dans ses deux langues (texte produit par tools/docgen.py). Un test vérifie la règle sur tout le CHANGELOG et sur la carte. La ligne des preuves ne prétend plus à une langue.
+- Tests : ChangelogLanguages1056Tests. Verify.ps1 (agent) : 1736/1736, 0 avertissement, 0 erreur ; DLL 0.1056.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A069: the map of the documents (docs/README.md) said that every CHANGELOG entry has an English part, while the 188 entries up to 0.218.0 are in French only. It now says "English part from 0.219.0 on", in both languages (text written by tools/docgen.py). A test checks the rule over the whole CHANGELOG and in the map. The evidence row no longer claims a language.
+
 ## 0.1055.0
 - Constat d'audit A038 (suite) : BACKLOG parlait encore d'une soumission D17 éventuelle et COMPETITIVE-OFF-PLAN de « l'examen de la soumission ». Depuis DEC-039, il n'y a pas de soumission (dépôt personnalisé seulement, règles Dalamud tenues) : les deux documents le disent, dans leurs deux langues. Un test vérifie ces deux documents et l'ouverture de PUBLISHING.
 - Tests : NoSubmission1055Tests. Verify.ps1 (agent) : 1735/1735, 0 avertissement, 0 erreur ; DLL 0.1055.0.0. Rien à essayer en jeu.
