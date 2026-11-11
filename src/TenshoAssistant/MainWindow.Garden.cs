@@ -162,7 +162,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("Garden.TendTip");
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Garden.Remove")))removed=bed;
+        if(DeleteButton("Garden.Remove"))removed=bed;
         Tip("Garden.RemoveTip");
     }
 

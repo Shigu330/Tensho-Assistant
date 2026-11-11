@@ -49,7 +49,7 @@ internal sealed partial class MainWindow
         ImGui.EndDisabled();
         ImGui.SameLine();
         ImGui.BeginDisabled(set is not {Others.Count:>0});
-        if(ImGui.SmallButton(localization.Get("Gear.PlanDelete")) && set is not null && GearPlanSets.Delete(set) is { } next){LoadGearPlan(job,next);gearPlanEdit=GearPlanEdit.None;SaveGearPlan();}
+        if(DeleteButton("Gear.PlanDelete") && set is not null && GearPlanSets.Delete(set) is { } next){LoadGearPlan(job,next);gearPlanEdit=GearPlanEdit.None;SaveGearPlan();}
         ImGui.EndDisabled();
         Tip("Gear.PlanDeleteTip");
         if(gearPlanEdit==GearPlanEdit.None)return;

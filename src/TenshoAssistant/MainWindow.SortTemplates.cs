@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
             ImGui.BeginDisabled(selected is null || !InventorySortTemplates.Compatible(selected,scope));
             try{if(ImGui.Button(localization.Get("SortUi.UpdateTemplate")))SaveSortTemplate(scope,draft,selected!.Id);}
             finally{ImGui.EndDisabled();}
-            if(ImGui.Button(localization.Get("SortUi.DeleteTemplate")))
+            if(DeleteButton("SortUi.DeleteTemplate",small:false))
             {
                 var previous=configuration.InventorySortTemplates;
                 try{configuration.InventorySortTemplates=InventorySortTemplates.Delete(previous,selected!.Id);save();selectedSortTemplate=Guid.Empty;sortRulesError=null;}

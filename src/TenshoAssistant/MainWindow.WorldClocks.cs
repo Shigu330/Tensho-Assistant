@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,time.ToString("t"));
                 ImGui.SameLine();ImGui.TextUnformatted(name);
                 ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("WorldClocks.Remove")))removed=id;
+                if(DeleteButton("WorldClocks.Remove"))removed=id;
                 Tip("WorldClocks.RemoveTip");
             }
             finally{ImGui.PopID();}

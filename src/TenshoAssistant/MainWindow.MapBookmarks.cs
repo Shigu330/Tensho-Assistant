@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
                                 }
                                 finally { ImGui.EndDisabled(); }
                                 ImGui.SameLine();
-                                if (ImGui.SmallButton(localization.Get("MapsUi.Remove"))) remove = index;
+                                if (DeleteButton("MapsUi.Remove")) remove = index;
                                 Tip("MapsUi.RemoveTip");
                                 ImGui.SameLine();
                                 ImGui.TextUnformatted((point?.Group is { } group ? $"[{group}] " : "") + (string.IsNullOrWhiteSpace(point?.Name) ? localization.Get("MapsUi.Unnamed") : point.Name));

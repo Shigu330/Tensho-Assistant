@@ -216,7 +216,7 @@ internal sealed partial class MainWindow
                             Unique=(InventoryPropertyFilter)traits[0],Untradable=(InventoryPropertyFilter)traits[1],Dyeable=(InventoryPropertyFilter)traits[2],
                             Repairable=(InventoryPropertyFilter)traits[3],Collectable=(InventoryPropertyFilter)traits[4]};
                         if(index>0){if(ImGui.SmallButton(localization.Get("SortUi.Priority"))){(zones[index-1],zones[index])=(zones[index],zones[index-1]);changed=true;}Tip("SortUi.PriorityTip");}
-                        ImGui.SameLine();if(ImGui.SmallButton(localization.Get("SortUi.DeleteZone"))){zones.RemoveAt(index);changed=true;break;}
+                        ImGui.SameLine();if(DeleteButton("SortUi.DeleteZone")){zones.RemoveAt(index);changed=true;break;}
                     }
                     finally{ImGui.TreePop();}
                 }

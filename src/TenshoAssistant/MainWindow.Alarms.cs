@@ -395,7 +395,7 @@ internal sealed partial class MainWindow
                                         if(ImGui.SmallButton(localization.Format("Alarms.Snooze",snooze)+"##AlarmSnooze"))added.Add(AlarmSchedule.Snooze(alarm,now,snooze));
                                         Tip("Alarms.SnoozeTip");
                                         ImGui.SameLine();
-                                        if(ImGui.SmallButton(localization.Get("Alarms.Delete")))remove.Add(alarm);
+                                        if(DeleteButton("Alarms.Delete"))remove.Add(alarm);
                                         if(alarmEditing==alarm.Id)DrawAlarmEdit(alarm,now,ref changed);
                                         Tip("Alarms.DeleteTip");
                                     }

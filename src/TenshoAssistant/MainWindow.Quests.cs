@@ -403,7 +403,7 @@ internal sealed partial class MainWindow
                         ImGui.PushID(index);
                         try
                         {
-                            if (ImGui.SmallButton(localization.Get("CraftPresets.Remove"))) remove = id;
+                            if (DeleteButton("CraftPresets.Remove")) remove = id;
                             ImGui.SameLine(); DrawQuestLink(id, "followed");
                         }
                         finally { ImGui.PopID(); }

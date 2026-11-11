@@ -62,7 +62,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 if(ImGui.SmallButton(localization.Get("TriadDecks.Show")))triadShownDeck=deck.Name;
                 ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("TriadDecks.Delete")))remove=deck.Name;
+                if(DeleteButton("TriadDecks.Delete"))remove=deck.Name;
                 Tip("TriadDecks.DeleteTip");
                 foreach(var id in deck.Cards)
                 {

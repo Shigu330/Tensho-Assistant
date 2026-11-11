@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 if(task.Period==TaskPeriod.Counter && task.Count>0 && ImGui.SmallButton(localization.Get("PersonalTasks.ResetCounter"))){task.Count=0;changed=true;}
                 if(task.Period==TaskPeriod.Counter && task.Count>0){Tip("PersonalTasks.ResetCounterTip");ImGui.SameLine();}
-                if(ImGui.SmallButton(localization.Get("PersonalTasks.Remove")))removed=task;
+                if(DeleteButton("PersonalTasks.Remove"))removed=task;
                 Tip("PersonalTasks.RemoveTip");
             }
             finally{ImGui.PopID();}

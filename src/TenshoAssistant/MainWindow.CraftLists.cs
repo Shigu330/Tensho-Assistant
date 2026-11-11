@@ -32,7 +32,7 @@ internal sealed partial class MainWindow
             }
             Tip("CraftLists.ListTip");
             ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("CraftLists.Delete")) && ImGui.GetIO().KeyCtrl){store.Set(craftListIndex,null);craftListIndex=0;return;}
+            if(DeleteButton("CraftLists.Delete")){store.Set(craftListIndex,null);craftListIndex=0;return;}
             Tip("CraftLists.DeleteTip");
         }
         ImGui.SetNextItemWidth(200);
@@ -71,7 +71,7 @@ internal sealed partial class MainWindow
                 if(ImGui.InputInt("###CraftListQuantity",ref quantity,0))store.Set(craftListIndex,CraftLists.SetQuantity(list,entry.ItemId,quantity));
                 Tip("CraftLists.QuantityTip");
                 ImGui.SameLine();
-                if(ImGui.SmallButton(localization.Get("CraftLists.Remove"))){store.Set(craftListIndex,CraftLists.Remove(list,entry.ItemId));return;}
+                if(DeleteButton("CraftLists.Remove")){store.Set(craftListIndex,CraftLists.Remove(list,entry.ItemId));return;}
             }
             finally{ImGui.PopID();}
         }

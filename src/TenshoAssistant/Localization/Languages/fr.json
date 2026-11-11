@@ -1015,7 +1015,7 @@
     "Load": "Charger dans le simulateur",
     "Remove": "Retirer",
     "NameTip": "Nom de la séquence, de 1 à 80 caractères, unique pour cette recette (majuscules ignorées).",
-    "RemoveTip": "Supprime cette séquence tout de suite, sans confirmation."
+    "RemoveTip": "Supprime cette séquence. Demande un second clic."
   },
   "CraftPresetMessages": {
     "RenameFailed": "Impossible de renommer cette séquence : le nom doit faire de 1 à 80 caractères et être unique pour cette recette.",
@@ -1588,7 +1588,7 @@
     "RightClickTensho": "(clic droit sur le nom : Tensho)",
     "DeleteGroupTip": "Supprime toutes les alarmes de ce groupe ; un second clic le confirme.",
     "DeleteGroupConfirm": "Confirmer : supprimer {0} alarme(s)",
-    "DeleteTip": "Supprime cette alarme tout de suite, sans confirmation.",
+    "DeleteTip": "Supprime cette alarme. Demande un second clic.",
     "ManualLabelTip": "Nom de l'alarme ; vide : « Alarme ».",
     "ManualHourTip": "Heure d'Éorzéa (0 à 23).",
     "ManualMinuteTip": "Minute d'Éorzéa (0 à 59).",
@@ -2253,7 +2253,7 @@
     "SearchTip": "Chaque mot doit figurer dans la région, la zone, la sous-zone ou l'identifiant de la carte ; accents et majuscules ignorés.",
     "CoordinatesTip": "Coordonnée X ou Y sur la carte choisie, comme le jeu l'affiche (une décimale).",
     "BookmarkNameTip": "Facultatif, 80 caractères au plus. Sans nom, le favori s'appelle « Zone · X, Y ».",
-    "RemoveTip": "Retire ce favori tout de suite, sans confirmation.",
+    "RemoveTip": "Retire ce favori. Demande un second clic.",
     "BookmarkInvalidName": "Favori non enregistré : le nom doit contenir de 1 à 80 caractères, sans saut de ligne.",
     "BookmarkDuplicate": "Favori non enregistré : un autre favori a déjà ce nom et ces coordonnées sur cette carte.",
     "BookmarkFull": "Favori non ajouté : la liste est pleine (200 favoris). Retirez-en un d'abord.",
@@ -2865,7 +2865,7 @@
     "Show": "Afficher dans l'éditeur",
     "Delete": "Supprimer",
     "NpcFallback": "PNJ {0}",
-    "DeleteTip": "Supprime ce deck tout de suite, sans confirmation."
+    "DeleteTip": "Supprime ce deck. Demande un second clic."
   },
   "TriadRequest": {
     "RulesUnknown": "Les règles n'ont pas pu être lues : pas d'estimation pour ce match.",
@@ -3963,7 +3963,7 @@
     "RemoveChipTip": "Clic : retire cet élément de la zone.",
     "TemplateTip": "Modèles enregistrés, avec leur nombre de sacs × cases par sac. Choisir un modèle reprend son nom ci-dessous ; il ne se charge que si cette géométrie correspond à ce rangement.",
     "TemplateNameTip": "Nom pour créer ou mettre à jour un modèle ; obligatoire et unique (majuscules ignorées).",
-    "DeleteTemplateTip": "Supprime le modèle choisi tout de suite, sans confirmation."
+    "DeleteTemplateTip": "Supprime le modèle choisi. Demande un second clic."
   },
   "BankUi": {
     "OtherCharacters": "Sur vos autres personnages :",
@@ -5039,7 +5039,8 @@
   "Common": {
     "Copied": "Copié",
     "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud.",
-    "Dismiss": "Masquer ce message"
+    "Dismiss": "Masquer ce message",
+    "DeleteConfirm": "Cliquer encore pour supprimer"
   },
   "CraftDebug": {
     "Flags": "Drapeaux état 0x{0:X8} · synthèse 0x{1:X2}",
@@ -5949,7 +5950,7 @@
     "Tend": "Entretenu",
     "TendTip": "Vous venez de l’entretenir : le prochain entretien compte depuis maintenant. Grisé sans intervalle d’entretien.",
     "Remove": "Retirer",
-    "RemoveTip": "Retire tout de suite cette parcelle du journal.",
+    "RemoveTip": "Retire cette parcelle du journal. Demande un second clic.",
     "PlaceHint": "Lieu (maison, pot 1…)",
     "PlaceTip": "Où se trouve la parcelle ou le pot, avec vos mots (1 à 40 caractères).",
     "SeedHint": "Graine",
@@ -6004,7 +6005,7 @@
     "ResetCounter": "Remettre à 0",
     "ResetCounterTip": "Remet le compteur à zéro.",
     "Remove": "Retirer",
-    "RemoveTip": "Retire cette tâche.",
+    "RemoveTip": "Retire cette tâche. Demande un second clic.",
     "NameHint": "Nouvelle tâche…",
     "NameTip": "Nom de la tâche, 60 caractères au plus.",
     "PeriodTip": "Quand la tâche revient.",
@@ -6090,7 +6091,7 @@
     "SearchTip": "Filtre la liste des fuseaux horaires par nom.",
     "Title": "Horloges ({0})",
     "Remove": "Retirer",
-    "RemoveTip": "Retire cette horloge.",
+    "RemoveTip": "Retire cette horloge. Demande un second clic.",
     "Add": "Ajouter un fuseau horaire…",
     "Search": "Chercher (ville, UTC+…)",
     "AddTip": "Ajoute l'heure d'un autre fuseau horaire (6 au plus), utile pour un groupe ou une statique d'un autre pays. Fuseaux de Windows.",
@@ -6565,7 +6566,7 @@
     "List": "Liste",
     "ListTip": "Liste affichée, et celle qui reçoit « Ajouter à la liste » de la Préparation.",
     "Delete": "Supprimer",
-    "DeleteTip": "Ctrl + clic : supprime la liste affichée.",
+    "DeleteTip": "Supprime la liste affichée. Demande un second clic.",
     "NewName": "Nom d’une nouvelle liste",
     "NewNameTip": "Nom de 1 à 40 caractères ; 32 listes au plus.",
     "Create": "Créer",
@@ -7086,7 +7087,7 @@
     "NextFlag": "Drapeau suivant",
     "Copy": "Copier la liste",
     "Clear": "Effacer",
-    "ClearTip": "Ctrl + clic : efface la liste.",
+    "ClearTip": "Efface la liste. Demande un second clic.",
     "Stop": "{0}. {1} ({2}) · {3} ( {4} , {5} ) · {6}",
     "Flag": "Drapeau"
   },
@@ -7098,7 +7099,7 @@
     "ApartmentRoom": "Appartement",
     "Copy": "Copier",
     "Remove": "Retirer",
-    "RemoveTip": "Ctrl + clic : retire ce lieu.",
+    "RemoveTip": "Retire ce lieu. Demande un second clic.",
     "Name": "Nom (maison, boutique…)",
     "NameTip": "Nom du lieu, 1 à 60 caractères.",
     "World": "Monde",
@@ -7230,7 +7231,7 @@
     "PlanNewTip": "Commence un nouveau plan, copie de celui-ci, qui reste dans la liste.",
     "PlanRename": "Renommer",
     "PlanDelete": "Supprimer ce plan",
-    "PlanDeleteTip": "Supprime tout de suite le plan affiché, sans confirmation, et en prend un autre. Le dernier plan d'un job reste : « Effacer » le vide.",
+    "PlanDeleteTip": "Supprime le plan affiché (demande un second clic) et en prend un autre. Le dernier plan d'un job reste : « Effacer » le vide.",
     "PlanName": "Nom du plan",
     "PlanNameTip": "De 1 à 40 caractères, un nom pas encore utilisé pour ce job (majuscules ignorées).",
     "PlanOk": "OK",

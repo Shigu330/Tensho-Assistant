@@ -1015,7 +1015,7 @@
     "Load": "Load into simulator",
     "Remove": "Remove",
     "NameTip": "Sequence name, 1 to 80 characters, unique for this recipe (case ignored).",
-    "RemoveTip": "Deletes this sequence at once, without confirmation."
+    "RemoveTip": "Deletes this sequence. Asks for a second click."
   },
   "CraftPresetMessages": {
     "RenameFailed": "Could not rename this sequence: the name must be 1 to 80 characters and unique for this recipe.",
@@ -1588,7 +1588,7 @@
     "RightClickTensho": "(right click on the name: Tensho)",
     "DeleteGroupTip": "Deletes every alarm of this group; a second click confirms.",
     "DeleteGroupConfirm": "Confirm: delete {0} alarm(s)",
-    "DeleteTip": "Deletes this alarm at once, without confirmation.",
+    "DeleteTip": "Deletes this alarm. Asks for a second click.",
     "ManualLabelTip": "Alarm name; empty: « Alarm ».",
     "ManualHourTip": "Eorzea hour (0 to 23).",
     "ManualMinuteTip": "Eorzea minute (0 to 59).",
@@ -2253,7 +2253,7 @@
     "SearchTip": "Every word must appear in the region, zone, subzone or map ID; accents and case ignored.",
     "CoordinatesTip": "X or Y coordinate on the chosen map, as the game shows it (one decimal).",
     "BookmarkNameTip": "Optional, 80 characters at most. Without a name, the bookmark is called « Zone · X, Y ».",
-    "RemoveTip": "Removes this bookmark at once, without confirmation.",
+    "RemoveTip": "Removes this bookmark. Asks for a second click.",
     "BookmarkInvalidName": "Bookmark not saved: the name must have 1 to 80 characters, without line breaks.",
     "BookmarkDuplicate": "Bookmark not saved: another bookmark already has this name and these coordinates on this map.",
     "BookmarkFull": "Bookmark not added: the list is full (200 bookmarks). Remove one first.",
@@ -2865,7 +2865,7 @@
     "Show": "Show in the editor",
     "Delete": "Delete",
     "NpcFallback": "NPC {0}",
-    "DeleteTip": "Deletes this deck at once, without confirmation."
+    "DeleteTip": "Deletes this deck. Asks for a second click."
   },
   "TriadRequest": {
     "RulesUnknown": "The rules could not be read: no odds for this match.",
@@ -3963,7 +3963,7 @@
     "RemoveChipTip": "Click: removes it from the zone.",
     "TemplateTip": "Saved templates, with their bag count × slots per bag. Choosing one copies its name below; it loads only if that layout matches this storage.",
     "TemplateNameTip": "Name used to create or update a template; required and unique (case ignored).",
-    "DeleteTemplateTip": "Deletes the chosen template at once, without confirmation."
+    "DeleteTemplateTip": "Deletes the chosen template. Asks for a second click."
   },
   "BankUi": {
     "OtherCharacters": "On your other characters:",
@@ -5039,7 +5039,8 @@
   "Common": {
     "Copied": "Copied",
     "SaveError": "Save failed. Try again; details are in the Dalamud log.",
-    "Dismiss": "Hide this message"
+    "Dismiss": "Hide this message",
+    "DeleteConfirm": "Click again to delete"
   },
   "CraftDebug": {
     "Flags": "State flags 0x{0:X8} · synthesis 0x{1:X2}",
@@ -5949,7 +5950,7 @@
     "Tend": "Tended",
     "TendTip": "You tended it now: the next tending is counted from now. Greyed without a tending interval.",
     "Remove": "Remove",
-    "RemoveTip": "Removes this bed from the journal at once.",
+    "RemoveTip": "Removes this bed from the journal. Asks for a second click.",
     "PlaceHint": "Place (house, pot 1…)",
     "PlaceTip": "Where the bed or pot is, in your own words (1 to 40 characters).",
     "SeedHint": "Seed",
@@ -6004,7 +6005,7 @@
     "ResetCounter": "Reset to 0",
     "ResetCounterTip": "Sets the counter back to zero.",
     "Remove": "Remove",
-    "RemoveTip": "Removes this task.",
+    "RemoveTip": "Removes this task. Asks for a second click.",
     "NameHint": "New task…",
     "NameTip": "Task name, 60 characters at most.",
     "PeriodTip": "When the task comes back.",
@@ -6090,7 +6091,7 @@
     "SearchTip": "Filters the time zone list by name.",
     "Title": "Clocks ({0})",
     "Remove": "Remove",
-    "RemoveTip": "Removes this clock.",
+    "RemoveTip": "Removes this clock. Asks for a second click.",
     "Add": "Add a time zone…",
     "Search": "Search (city, UTC+…)",
     "AddTip": "Adds the time of another time zone (6 at most), handy for a group or static from another country. Windows time zones.",
@@ -6565,7 +6566,7 @@
     "List": "List",
     "ListTip": "List shown, and the one « Add to the list » of Preparation fills.",
     "Delete": "Delete",
-    "DeleteTip": "Ctrl + click: deletes the list shown.",
+    "DeleteTip": "Deletes the list shown. Asks for a second click.",
     "NewName": "Name of a new list",
     "NewNameTip": "Name of 1 to 40 characters; 32 lists at most.",
     "Create": "Create",
@@ -7086,7 +7087,7 @@
     "NextFlag": "Next flag",
     "Copy": "Copy the list",
     "Clear": "Clear",
-    "ClearTip": "Ctrl + click: clears the list.",
+    "ClearTip": "Clears the list. Asks for a second click.",
     "Stop": "{0}. {1} ({2}) · {3} ( {4} , {5} ) · {6}",
     "Flag": "Flag"
   },
@@ -7098,7 +7099,7 @@
     "ApartmentRoom": "Apartment",
     "Copy": "Copy",
     "Remove": "Remove",
-    "RemoveTip": "Ctrl + click: removes this place.",
+    "RemoveTip": "Removes this place. Asks for a second click.",
     "Name": "Name (house, shop…)",
     "NameTip": "Place name, 1 to 60 characters.",
     "World": "World",
@@ -7230,7 +7231,7 @@
     "PlanNewTip": "Starts a new plan as a copy of this one, which stays in the list.",
     "PlanRename": "Rename",
     "PlanDelete": "Delete this plan",
-    "PlanDeleteTip": "Deletes the plan shown at once, without confirmation, and takes another one. The last plan of a job stays: « Clear » empties it.",
+    "PlanDeleteTip": "Deletes the plan shown (asks for a second click) and takes another one. The last plan of a job stays: « Clear » empties it.",
     "PlanName": "Plan name",
     "PlanNameTip": "1 to 40 characters, a name not already used for this job (capitals ignored).",
     "PlanOk": "OK",

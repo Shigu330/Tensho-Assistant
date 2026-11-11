@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
         if(settings.WebhookUrl.Length>0)
         {
             ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("Discord.Clear")+"###DiscordClear")){SaveSetting("Discord.Url",()=>configuration.Discord.WebhookUrl,value=>configuration.Discord.WebhookUrl=value,"");discordUrlEdit=null;}
+            if(DeleteButton("Discord.Clear")){SaveSetting("Discord.Url",()=>configuration.Discord.WebhookUrl,value=>configuration.Discord.WebhookUrl=value,"");discordUrlEdit=null;}
             Tip("Discord.ClearTip");
         }
         // A new or cleared address: what was queued for the old one is not sent.

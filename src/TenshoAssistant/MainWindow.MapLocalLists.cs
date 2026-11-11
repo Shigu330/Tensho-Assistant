@@ -291,7 +291,7 @@ internal sealed partial class MainWindow
                 ImGui.PushID(index);
                 try
                 {
-                    if(ImGui.SmallButton(localization.Get("MapsUi.Remove")))remove=index;
+                    if(DeleteButton("MapsUi.Remove"))remove=index;
                     Tip("MapLocal.FavoriteRemoveTip");
                     ImGui.SameLine();
                     var name=(point.Group is { } group ? $"[{group}] ":"")+point.Name.Replace("##","# #");

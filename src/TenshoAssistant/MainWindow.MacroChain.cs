@@ -77,7 +77,7 @@ internal sealed partial class MainWindow
                     var remove = false;
                     try
                     {
-                        if (ImGui.SmallButton(localization.Get("MacroUi.Remove"))) remove = true;
+                        if (DeleteButton("MacroUi.Remove")) remove = true;
                         ImGui.SameLine();
                         if (index > 0)
                         {

@@ -147,7 +147,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         // 0.331: the planned materia are part of the plan (they also apply to worn pieces): cleared too, the button active while either is set.
         ImGui.BeginDisabled(plan.Count==0 && configuration.GearMateria?.GetValueOrDefault(state.JobId) is not { Count:>0 });
-        if(ImGui.Button(localization.Get("Gear.ClearPlan"))){configuration.GearPlans?.Remove(state.JobId);configuration.GearMateria?.Remove(state.JobId);SaveGearPlan();}
+        if(DeleteButton("Gear.ClearPlan",small:false)){configuration.GearPlans?.Remove(state.JobId);configuration.GearMateria?.Remove(state.JobId);SaveGearPlan();}
         ImGui.EndDisabled();
         Tip("Gear.ClearPlanTip");
         ImGui.SameLine();

@@ -91,7 +91,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         CopyButton(localization.Get("HuntTrain.Copy"),()=>HuntTrain.Export(huntTrain));
         ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("HuntTrain.Clear")) && ImGui.GetIO().KeyCtrl){huntTrain=[];huntTrainCalled=null;return;}
+        if(DeleteButton("HuntTrain.Clear")){huntTrain=[];huntTrainCalled=null;return;}
         Tip("HuntTrain.ClearTip");
         for(var index=0;index<huntTrain.Count;index++)
         {

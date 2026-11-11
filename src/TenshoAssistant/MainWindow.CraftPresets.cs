@@ -97,7 +97,7 @@ internal sealed partial class MainWindow
                     }
                     Tip("CraftPresets.CopyTextTip");
                 }
-                ImGui.SameLine();if(ImGui.SmallButton(localization.Get("CraftPresets.Remove")))remove=index;Tip("CraftPresets.RemoveTip");
+                ImGui.SameLine();if(DeleteButton("CraftPresets.Remove"))remove=index;Tip("CraftPresets.RemoveTip");
                 if(preset is not null && craftPresetRenaming==preset.Id)
                 {
                     ImGui.SetNextItemWidth(260);

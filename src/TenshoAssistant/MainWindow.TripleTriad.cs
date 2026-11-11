@@ -327,7 +327,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 ImGui.TextUnformatted(entry is null ? localization.Format("UiFragments.CardUnavailable",id) : $"{entry.Card!.Label} · {entry.Name} · {new string('★', entry.Card.Stars)}");
                 ImGui.SameLine();
-                if (ImGui.SmallButton(localization.Get("TriadUi.Remove"))) remove = index;
+                if (DeleteButton("TriadUi.Remove")) remove = index;
                 ImGui.TextColored(entry?.ConfirmedUnlocked == true ? Success : Muted, entry?.ConfirmedUnlocked == true ? localization.Get("TriadUi.Acquired") : localization.Get("TriadUi.Unknown"));
             }
             finally { ImGui.PopID(); }

@@ -117,7 +117,7 @@ internal sealed partial class MainWindow
                 Tip("Wishlist.PriceTip");
                 if(ImGui.IsItemDeactivatedAfterEdit())TrySave("Wishlist.ColumnPrice");
                 ImGui.TableNextColumn();
-                if(ImGui.SmallButton(localization.Get("Wishlist.RemoveShort")+$"##WishRemove{id}"))remove=id;
+                if(DeleteButton("Wishlist.RemoveShort",$"{id}"))remove=id;
             }
         }
         finally{ImGui.EndTable();}
