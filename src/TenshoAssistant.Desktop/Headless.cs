@@ -189,6 +189,15 @@ internal static class Headless
             report.Rows.Add(new(page,kind,errors.Count==0,vertices,icons,reached,errors,DesktopPages.LiveKey(page) is { } live ? host.Text(live) : "-",times[0],settled,jitMs,jitMethods));
             Console.WriteLine($"  {page,-22} {kind,-9} {(errors.Count==0 ? "drawn":"THROWS"),-7} vtx {vertices,6} icons {icons,4} {string.Create(System.Globalization.CultureInfo.InvariantCulture,$"first {times[0],7:0.0} ms (jit {jitMs,6:0.0} ms, {jitMethods,4} methods) settled {settled,5:0.0} ms")}  absent: {(reached.Length==0 ? "-" : string.Join(", ",reached))}{(errors.Count==0 ? "" : "  | "+string.Join("; ",errors))}");
         }
+        // X-119 step 2 (0.1081): the status bar's texts of the local link (linked, paused, no character, a zone), on a page that needs it.
+        host.SetPage("Home");
+        foreach(var snapshot in new TenshoAssistant.Link.LinkSnapshot[]{new(1,"0.0.0",true,false,132,"Test",1),new(1,"0.0.0",false,false,0,"",2),new(1,"0.0.0",false,true,0,"",3)})
+        {
+            status.Link=()=>snapshot;
+            foreach(var (line,_) in status.Lines())
+                if(line.Contains("[Desktop.",StringComparison.Ordinal)){report.Fail("status bar link text missing: "+Short(line));failed++;}
+        }
+        status.Link=null;
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
     }

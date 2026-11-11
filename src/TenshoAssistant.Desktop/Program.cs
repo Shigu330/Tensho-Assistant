@@ -10,6 +10,7 @@
 //        TenshoAssistant.Desktop --update-selftest=<release.json> [--update-own=<folder>]   (X-121: the update on a fake local release, Verify.ps1)
 //        TenshoAssistant.Desktop --update-probe   (X-121: the real GitHub request for the latest Stable release, read and checked, nothing downloaded)
 //        TenshoAssistant.Desktop --print-version   (prints the version and stops)
+// X-119 step 2: --no-link leaves the local link with the plugin closed for this run.
 // X-121: --no-update turns the update off for this run (no request, no hand-over); --no-forward starts this copy even when a newer one is installed.
 // PROBE_TRACE=1 prints each step of a frame; PROBE_LOG=1 prints the plugin's log warnings.
 using System.Diagnostics;
@@ -123,6 +124,9 @@ internal static class Program
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
         if(headless)return Headless.Run(host,status,cache,args);
+        // X-119 step 2 (0.1081): the local link, read-only: connects when the plugin offers it (Settings › Advanced, off by default).
+        using var link=args.Contains("--no-link") ? null : new TenshoAssistant.Link.LocalLinkClient(TenshoAssistant.Link.LocalLinkProtocol.PipeName());
+        if(link is not null)status.Link=()=>link.Current;
         if(Updates(args,diagnostic))
         {
             // X-121: at start, in the background (« Automatic update » of update.json turns it off; the button still works).

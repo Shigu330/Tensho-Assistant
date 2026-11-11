@@ -65,6 +65,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `CurrencyServerBar` | bool | true | Settings › Tracking · Settings › Tracking | **In the server bar** — Shows « number of currencies over their threshold » in the server bar; a click opens this tab. Default: on. |
 | `CurrencyValueMarket` | bool | true | `MainWindow.CurrencyValue.cs` | **Look up market prices** — On: choosing a currency asks Universalis for the prices of what it buys. Off: nothing is asked, and a search under way stops. Default: on. |
 | `CurrencyWeeklyCapAlert` | bool | true | `MainWindow.Currencies.cs` | **Alert at the weekly tomestone limit** — With the alerts above: says once when the limited tomestones of the week reach their limit, in chat, by sound and on Discord like the other currency alerts. Default: on. |
+| `DesktopLink` | bool | false | Settings › Advanced | **Link with the desktop app** — Lets the Tensho desktop app (TenshoAssistant.Desktop.zip, in each GitHub release) see that the game runs: once a second, whether you are logged in and the zone you are in. A local named pipe of this PC, open to your Windows user only: no network port, nothing sent over the internet, and the app cannot send anything back. The live pages and actions come in later versions. Default: off. |
 | `Discord.Currencies` | bool | true | Settings › Tracking | **Currencies** — Sends the currency cap alerts (Storage › Currencies) to this channel. Greyed while « Cap alerts » (Storage › Currencies) is off: there is nothing to send then. Default: on. |
 | `Discord.DutyPop` | bool | true | Settings › Tracking | **Duty ready** — Sends the « duty ready » alert (Alarms) when it is on. Greyed while « Alert when a duty is ready » (Alarms settings) is off: there is nothing to send then. Default: on. |
 | `Discord.Enabled` | bool | false | Settings › Tracking | **Post alarms to Discord** — When a Tensho alarm rings, its message is also posted in the webhook's channel below (network: Discord, over HTTPS). Turning it off drops the messages still waiting. Default: off. |
@@ -303,7 +304,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 250 controls (245 linked to `Configuration`, 5 to another file), 31 settings without a control.
+Counted: 251 controls (246 linked to `Configuration`, 5 to another file), 31 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -374,6 +375,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `CurrencyServerBar` | bool | true | Paramètres › Suivi et notifications · Paramètres › Suivi et notifications | **Dans la barre du serveur** — Affiche « nombre de monnaies au-dessus du seuil » dans la barre du serveur ; un clic ouvre cet onglet. Par défaut : activé. |
 | `CurrencyValueMarket` | bool | true | `MainWindow.CurrencyValue.cs` | **Chercher les prix du marché** — Activé : choisir une monnaie demande à Universalis les prix de ce qu'elle achète. Désactivé : rien n'est demandé, et une recherche en cours s'arrête. Par défaut : activé. |
 | `CurrencyWeeklyCapAlert` | bool | true | `MainWindow.Currencies.cs` | **Alerte au plafond hebdomadaire des mémoquartz** — Avec les alertes ci-dessus : prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord comme les autres alertes de monnaies. Par défaut : activé. |
+| `DesktopLink` | bool | false | Paramètres › Avancé | **Lien avec l'application de bureau** — Permet à l'application de bureau de Tensho (TenshoAssistant.Desktop.zip, dans chaque release GitHub) de voir que le jeu tourne : une fois par seconde, si vous êtes connecté et la zone où vous êtes. Un canal nommé local à ce PC, ouvert à votre seul utilisateur Windows : aucun port réseau, rien n'est envoyé sur Internet, et l'application ne peut rien renvoyer. Les pages en direct et les actions viendront dans des versions suivantes. Par défaut : désactivé. |
 | `Discord.Currencies` | bool | true | Paramètres › Suivi et notifications | **Monnaies** — Envoie les alertes de plafond des monnaies (Rangements › Monnaies) dans ce salon. Grisé tant que « Alertes de plafond » (Rangements › Monnaies) est désactivé : il n'y a alors rien à envoyer. Par défaut : activé. |
 | `Discord.DutyPop` | bool | true | Paramètres › Suivi et notifications | **Mission prête** — Envoie l'alerte « mission prête » (Alarmes) quand elle est activée. Grisé tant que « Alerte quand une mission est prête » (réglages des alarmes) est désactivé : il n'y a alors rien à envoyer. Par défaut : activé. |
 | `Discord.Enabled` | bool | false | Paramètres › Suivi et notifications | **Envoyer les alarmes sur Discord** — Quand une alarme Tensho sonne, son message est aussi envoyé dans le salon du webhook ci-dessous (réseau : Discord, en HTTPS). Le couper abandonne les messages encore en attente. Par défaut : désactivé. |
@@ -612,5 +614,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 250 cases (245 reliées à `Configuration`, 5 à un autre fichier), 31 réglages sans case.
+Compté : 251 cases (246 reliées à `Configuration`, 5 à un autre fichier), 31 réglages sans case.
 <!-- /docgen:settings-fr -->

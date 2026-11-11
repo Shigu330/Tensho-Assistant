@@ -35,6 +35,8 @@ public sealed class Plugin : IDalamudPlugin
     private GuideWindow? guideWindow;
     private PanelWindow[] panelWindows = [];
     private AttachedPanels? attachedPanels;
+    // X-119 step 2 (0.1081): the local link with the desktop application (off by default).
+    private Link.LocalLinkFeed? linkFeed;
     private readonly WindowSystem windows = new("TenshoAssistant");
     // X-109 (0.981, DEC-047): the Beastmaster board's team panel, the only window drawn during a cut, and only while the labyrinth's board is open.
     private readonly WindowSystem boardWindows = new("TenshoBeastBoard");
@@ -760,6 +762,11 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
                 ? territory.PlaceName.Value.Name.ExtractText():null;
+            // X-119 step 2 (0.1081): the local link with the desktop application: a named pipe for the current user only, opened only while
+            // Settings › Advanced « Link with the desktop app » is on; once a second, who and where (docs/evidence/x119-desktop-link.md).
+            registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,configuration,id=>mainWindow.TerritoryName?.Invoke(id),
+                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log);mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
+                ()=>{mainWindow.DesktopLinkStatus=null;linkFeed?.Dispose();linkFeed=null;});
             // X-89 (0.970): expansions from the game's sheets (TerritoryType.ExVersion, Quest.Expansion), for the item tooltips' origin line.
             mainWindow.TerritoryExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } expansionTerritory && expansionTerritory.ExVersion.IsValid
                 ? expansionTerritory.ExVersion.Value.Name.ExtractText():null;

@@ -14,6 +14,8 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     public (int Ready,int Total)? Loading;
     /// <summary>X-121: the automatic update (null for a diagnostic or headless run): one more row, its state and its buttons.</summary>
     public DesktopUpdater? Updater;
+    /// <summary>X-119 step 2 (0.1081): the last fresh snapshot of the local link (LocalLinkClient.Current), null when not linked.</summary>
+    public Func<TenshoAssistant.Link.LinkSnapshot?>? Link;
     private string? redirected;
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
@@ -38,11 +40,19 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         var lines=new List<(string,bool)>();
         var page=host.CurrentPage;
         if(redirected is not null)lines.Add((host.Text("Desktop.InGameOnly",PageName(redirected)),true));
-        if(DesktopPages.LiveKey(page) is { } live)lines.Add((host.Text("Desktop.NotLinked",host.Text(live)),true));
+        var linked=Link?.Invoke();
+        if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked)),false));
+        if(DesktopPages.LiveKey(page) is { } live)lines.Add((host.Text(linked is null ? "Desktop.NotLinked" : "Desktop.LinkedNotLive",host.Text(live)),true));
         if(Loading is { } loading)lines.Add((host.Text("Desktop.Loading",loading.Ready,loading.Total),false));
         lines.Add((host.Text("Desktop.AppVersion",DesktopVersionCheck.Three(Program.AppVersion))+"  ·  "+VersionText,version.State!=DesktopVersionState.Same));
         return lines;
     }
+
+    /// <summary>Where the linked game is: paused (competitive cut), no character, or the zone's name (its number when it has none).</summary>
+    private string Place(TenshoAssistant.Link.LinkSnapshot linked)
+        => linked.Paused ? host.Text("Desktop.LinkPaused")
+            : !linked.LoggedIn ? host.Text("Desktop.LinkNotLoggedIn")
+            : host.Text("Desktop.LinkZone",linked.Zone.Length>0 ? linked.Zone : "#"+linked.Territory);
 
     private string PageName(string page)=>host.HasText("PageHelp."+page+"Title") ? host.Text("PageHelp."+page+"Title") : page;
 

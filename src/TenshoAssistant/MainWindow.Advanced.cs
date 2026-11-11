@@ -48,6 +48,9 @@ internal sealed partial class MainWindow
         BoolSetting("Tracker.Setting","Tracker.SettingTip",()=>configuration.TrackerWindow,value=>configuration.TrackerWindow=value,c=>c.TrackerWindow);
     }
 
+    /// <summary>X-119 step 2 (0.1081): the local link's state and why it failed, set by Plugin.cs (null in the desktop application).</summary>
+    internal Func<(TenshoAssistant.Link.LocalLinkState State,string? Problem)>? DesktopLinkStatus { get; set; }
+
     private void DrawAdvancedSettings()
     {
         ImGui.TextWrapped(localization.Get("Advanced.Help"));
@@ -73,6 +76,15 @@ internal sealed partial class MainWindow
         try{BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);}
         finally{ImGui.EndDisabled();}
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
+
+        // X-119 step 2 (0.1081): the local link with the desktop application, off by default; its state under the box (the desktop app,
+        // which draws this page too, has no link status: the line is left out there).
+        ImGui.Separator();
+        ImGui.TextColored(Accent,localization.Get("Advanced.DesktopTitle"));
+        BoolSetting("Advanced.DesktopLink","Advanced.DesktopLinkTip",()=>configuration.DesktopLink,value=>configuration.DesktopLink=value,c=>c.DesktopLink);
+        if(DesktopLinkStatus?.Invoke() is var (linkState,linkProblem))
+            ImGui.TextColored(linkState is TenshoAssistant.Link.LocalLinkState.Busy or TenshoAssistant.Link.LocalLinkState.Unavailable ? Warning : Muted,
+                localization.Format("Advanced.DesktopLinkState"+linkState,linkProblem ?? ""));
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));

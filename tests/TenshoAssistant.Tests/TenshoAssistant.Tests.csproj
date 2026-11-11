@@ -16,6 +16,7 @@
     <Compile Include="../../src/TenshoAssistant/Fields/*.cs" Exclude="../../src/TenshoAssistant/Fields/*.Dalamud.cs" Link="Fields/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/DeepDungeons/*.cs" Exclude="../../src/TenshoAssistant/DeepDungeons/*.Dalamud.cs" Link="DeepDungeons/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Lexicon/*.cs" Exclude="../../src/TenshoAssistant/Lexicon/*.Dalamud.cs" Link="Lexicon/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant/Link/*.cs" Exclude="../../src/TenshoAssistant/Link/*.Dalamud.cs" Link="Link/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Relics/*.cs" Exclude="../../src/TenshoAssistant/Relics/*.Dalamud.cs" Link="Relics/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Deliveries/*.cs" Exclude="../../src/TenshoAssistant/Deliveries/*.Dalamud.cs" Link="Deliveries/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Island/*.cs" Exclude="../../src/TenshoAssistant/Island/*.Dalamud.cs" Link="Island/%(Filename)%(Extension)" />

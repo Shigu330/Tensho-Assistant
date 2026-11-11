@@ -72,6 +72,10 @@ Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zi
 
 Yes, with no step from you. At start (and on « Check for update ») it asks this repository's GitHub release of the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
 
+## How do I link the desktop app to the game?
+
+In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions.
+
 Français :
 
 # Questions fréquentes
@@ -145,3 +149,7 @@ Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à cô
 ## L'application de bureau se met-elle à jour seule ?
 
 Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jour »), elle lit la release GitHub de ce dépôt qui a la version du plugin installé, sinon la dernière release Stable : HTTPS, aucune donnée du joueur. Elle télécharge TenshoAssistant.Desktop.zip, compare son SHA-256 à TenshoAssistant.Desktop.zip.sha256 de la même release, l'installe à côté (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) et garde la version d'avant. L'application en cours n'est jamais écrasée ni redémarrée pendant que vous l'utilisez : la nouvelle version s'ouvre au prochain démarrage, ou avec « Redémarrer maintenant ». « Version d'avant » revient en arrière ; « Mise à jour automatique : active » la coupe. Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.
+
+## Comment relier l'application de bureau au jeu ?
+
+Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes.

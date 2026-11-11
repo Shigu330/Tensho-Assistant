@@ -33,4 +33,8 @@
          X-124: a pinned copy of that library (source: Shigu330/PluginUiTest), so this repository builds without the other one. -->
     <ProjectReference Include="..\..\tools\PluginUiTest\src\PluginUiTest.Host\PluginUiTest.Host.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- X-119 step 2 (0.1081): the local link's one source (protocol, the plugin's server, this app's client), shared with the plugin. -->
+    <Compile Include="..\TenshoAssistant\Link\LocalLink.cs" Link="Link\LocalLink.cs" />
+  </ItemGroup>
 </Project>

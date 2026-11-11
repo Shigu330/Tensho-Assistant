@@ -262,6 +262,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x118-desktop-probe.md](x118-desktop-probe.md) | `src/TenshoAssistant.Desktop/DesktopPages.cs`, `src/TenshoAssistant.Desktop/Program.cs`, `tools/PluginUiTest/src/PluginUiTest.Host/Rewrite.cs`, `tools/README.md` | — |
 | [x118-desktop-weather.png](x118-desktop-weather.png) | — | — |
 | [x119-desktop-app.md](x119-desktop-app.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj`, `tools/README.md` | — |
+| [x119-desktop-link.md](x119-desktop-link.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Plugin.cs` | `SECURITY.md` |
 | [x119-desktop-weather.png](x119-desktop-weather.png) | — | — |
 | [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | — |
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
@@ -273,5 +274,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
 
-Counted · compté : 261 files · fichiers ; 196 cited by the code or the tests · citées par le code ou les tests ; 10 cited nowhere · citées nulle part.
+Counted · compté : 262 files · fichiers ; 197 cited by the code or the tests · citées par le code ou les tests ; 10 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

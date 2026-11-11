@@ -77,6 +77,10 @@ What the plugin does that matters for security (read against the code of the `De
   in the plugin configuration on the player's PC, masked in the settings, never written to the logs nor to the support report (which only
   says whether it is valid) (`src/TenshoAssistant/Alarms/DiscordNotifier.cs`, `DiscordWebhook.cs`). Clearing it or turning sending off
   drops the queued messages.
+- **Local link with the desktop application (X-119)**: off by default. While Settings › Advanced « Link with the desktop app » is on,
+  the plugin offers a local named pipe, out only, open to the current Windows user and denied to network logons (no network port);
+  once a second it writes whether a character is logged in and the zone's name, nothing else, and reads nothing back. The desktop
+  application connects to it as the same user only (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Links opened in the browser**: item pages on Universalis, Garland Tools, Teamcraft, the FFXIV Console Games Wiki or the Lodestone,
   a Teamcraft list import link (built locally), the Partake events page, the prefilled GitHub form of « report a problem », help
   videos (YouTube, or this repository), a link of a « My tools » tool, and GitHub's sign-in page of the discoveries exchange. They open in
@@ -224,6 +228,11 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   du joueur, masquée dans les réglages, jamais écrite dans les journaux ni dans le rapport d'assistance (qui dit seulement si elle est
   valide) (`src/TenshoAssistant/Alarms/DiscordNotifier.cs`, `DiscordWebhook.cs`). L'effacer ou couper l'envoi vide les messages en
   attente.
+- **Lien local avec l'application de bureau (X-119)** : désactivé par défaut. Tant que Paramètres › Avancé « Lien avec l'application de
+  bureau » est activé, le plugin ouvre un canal nommé local, en sortie seulement, ouvert à l'utilisateur Windows courant et refusé aux
+  connexions réseau (aucun port réseau) ; une fois par seconde il écrit si un personnage est connecté et le nom de la zone, rien d'autre,
+  et ne lit rien en retour. L'application de bureau s'y connecte sous le même utilisateur seulement
+  (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Liens ouverts dans le navigateur** : pages d'objet sur Universalis, Garland Tools, Teamcraft, le FFXIV Console Games Wiki ou le
   Lodestone, un lien d'import de liste Teamcraft (construit sur place), la page d'événements de Partake, le formulaire GitHub prérempli
   de « Signaler un problème », les vidéos d'aide (YouTube, ou ce dépôt), un lien d'un outil de « Mes outils », et la page de connexion
