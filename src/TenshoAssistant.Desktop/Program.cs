@@ -126,7 +126,7 @@ internal static class Program
         if(headless)return Headless.Run(host,status,cache,args);
         // X-119 step 2 (0.1081): the local link, read-only: connects when the plugin offers it (Settings › Advanced, off by default).
         using var link=args.Contains("--no-link") ? null : new TenshoAssistant.Link.LocalLinkClient(TenshoAssistant.Link.LocalLinkProtocol.PipeName());
-        if(link is not null)status.Link=()=>link.Current;
+        if(link is not null){status.Link=()=>link.Current;status.OtherProtocol=()=>link.OtherProtocol;}
         if(Updates(args,diagnostic))
         {
             // X-121: at start, in the background (« Automatic update » of update.json turns it off; the button still works).

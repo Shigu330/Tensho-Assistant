@@ -16,6 +16,8 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     public DesktopUpdater? Updater;
     /// <summary>X-119 step 2 (0.1081): the last fresh snapshot of the local link (LocalLinkClient.Current), null when not linked.</summary>
     public Func<TenshoAssistant.Link.LinkSnapshot?>? Link;
+    /// <summary>X-149 (0.1119): the link protocol of a plugin that offers another one than this app's (LocalLinkClient.OtherProtocol), else null.</summary>
+    public Func<int?>? OtherProtocol;
     private string? redirected;
     // X-119 step 2 (0.1114): the saved files the link says changed, each read once; when the settings were read again and whether it worked.
     private readonly TenshoAssistant.Link.LinkChangeReader changes=new();
@@ -28,16 +30,13 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     /// </summary>
     public void Poll()
     {
-        var files=changes.Take(Link?.Invoke());
-        if(!files.Contains(SettingsFile))return;
+        var categories=changes.Take(Link?.Invoke());
+        if(!categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))return;
         var note=host.ReloadSettings();
         Console.WriteLine("Link: plugin settings "+note);
         reloadedAt=DateTime.Now;
         reloadProblem=note.StartsWith("read again",StringComparison.Ordinal) ? null : note;
     }
-
-    /// <summary>The plugin's settings file as the link names it (pluginConfigs\TenshoAssistant.json).</summary>
-    public const string SettingsFile="TenshoAssistant.json";
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
 
@@ -63,6 +62,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(redirected is not null)lines.Add((host.Text("Desktop.InGameOnly",PageName(redirected)),true));
         var linked=Link?.Invoke();
         if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked))+Live(linked),false));
+        else if(OtherProtocol?.Invoke() is { } other)lines.Add((host.Text("Desktop.LinkOtherProtocol",other,TenshoAssistant.Link.LocalLinkProtocol.Version),true));
         if(linked is not null && reloadedAt is { } at)
             lines.Add((reloadProblem is null ? host.Text("Desktop.SettingsReloaded",at.ToString("HH:mm:ss")) : host.Text("Desktop.SettingsReloadFailed",reloadProblem),reloadProblem is not null));
         if(DesktopPages.LiveKey(page) is { } live)lines.Add((host.Text(linked is null ? "Desktop.NotLinked" : "Desktop.LinkedNotLive",host.Text(live)),true));

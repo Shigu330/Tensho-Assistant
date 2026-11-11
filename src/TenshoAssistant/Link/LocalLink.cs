@@ -16,24 +16,38 @@ namespace TenshoAssistant.Link;
 //  - Current user only: the pipe's access list allows the user who runs the game and denies network logons; the application connects with
 //    PipeOptions.CurrentUserOnly, so a pipe of the same name made by another user is refused.
 //  - One line of JSON per message, at most MaxLine bytes, protocol number checked; the application drops anything else.
-//  - Protocol 2 (0.1114): small live states (LinkLive: job, level, GP, bags' free slots) and the names of the plugin's saved files that
+//  - Protocol 2 (0.1114): small live states (LinkLive: job, level, GP, bags' free slots) and notices of the plugin's saved files that
 //    changed (LinkChange), never a file's content: the application reads those files itself, read-only.
+//  - Protocol 3 (0.1119, X-149): a notice carries a category of a closed list (LocalLinkProtocol.Categories: « settings », « bank »…),
+//    never a file name (the bank's and the characters' files are named by the character's id). Another protocol number is refused; the
+//    application, finding no pipe of its own protocol but one of another for the same user, says so (OtherProtocol).
 
 /// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
-/// (0.1114): also the small live states and the saved files that changed.</summary>
+/// (0.1114): also the small live states and the saved files that changed. Protocol 3 (0.1119): those as categories only.</summary>
 public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence,
     LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null);
 
 /// <summary>The link's wire format: one JSON line per snapshot, bounded and checked.</summary>
 public static class LocalLinkProtocol
 {
-    public const int Version=2;
-    /// <summary>Longest line accepted, in bytes (a snapshot is about 150, 2 500 with sixteen long file names).</summary>
+    public const int Version=3;
+    /// <summary>Longest line accepted, in bytes (a snapshot is about 150, 800 with every category).</summary>
     public const int MaxLine=8192;
     public const int MaxJob=16;
-    /// <summary>Saved files named in one snapshot, at most, and the longest name.</summary>
+    /// <summary>Change notices in one snapshot, at most (one per category).</summary>
     public const int MaxChanges=16;
-    public const int MaxFile=160;
+    /// <summary>The category of the plugin's settings file (the only one the application reads again so far).</summary>
+    public const string SettingsCategory="settings";
+
+    /// <summary>
+    /// X-149 (0.1119): the closed list of what a change notice may say, by the plugin's saved file or folder it comes from (pluginConfigs\
+    /// TenshoAssistant\…; the file's name up to its first dot): never a file name, never a character's id. Anything else is not sent.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string,string> Categories=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["InventoryBank"]="bank",["Characters"]="characters",["GilJournal"]="gil-journal",["CraftLists"]="craft-lists",["MyTools"]="my-tools",
+        ["VoyageHistory"]="voyages",["AchievementProgress"]="achievements",["BeastTeams"]="beast-teams",["DutyProgress"]="duties",["Discoveries"]="discoveries",
+    };
     public const int MaxPlugin=32;
     public const int MaxZone=128;
     private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};
@@ -62,32 +76,49 @@ public static class LocalLinkProtocol
         if(read.Live is { } live && (live.Job is null || live.Job.Length>MaxJob || live.Level is < -1 or > 1000 || live.Gp is < -1 or > 100_000
             || live.MaxGp is < -1 or > 100_000 || live.BagSize is < -1 or > 1000 || live.BagFree<-1 || live.BagFree>Math.Max(live.BagSize,0)))
             {error="live state out of bounds";return false;}
-        if(read.Changes is { } changes && (changes.Count>MaxChanges || changes.Any(change=>change is null || !ValidFile(change.File) || change.Generation<1)))
+        if(read.Changes is { } changes && (changes.Count>MaxChanges || changes.Any(change=>change is null || !ValidCategory(change.Category) || change.Generation<1)))
             {error="change list refused";return false;}
         snapshot=read;return true;
     }
 
     /// <summary>
-    /// A saved file's name as the link sends it: the settings file itself (pluginConfigs\TenshoAssistant.json), or « TenshoAssistant/… » for a
-    /// file under the plugin's folder (pluginConfigs\TenshoAssistant), « / » between folders; null for anything else, a temporary file, the
-    /// data cache and the play state (written for the agent's scripts).
+    /// X-149 (0.1119): the category a saved file's change is sent as: « settings » for the settings file itself (pluginConfigs\
+    /// TenshoAssistant.json), else the category of the plugin folder's file or sub-folder it is in (Categories); null for anything else,
+    /// a temporary or lock file, the data cache and the play state.
     /// </summary>
-    public static string? ChangeName(string settingsFile,string folder,string path)
+    public static string? ChangeCategory(string settingsFile,string folder,string path)
     {
         var full=Path.GetFullPath(path);
-        if(string.Equals(full,Path.GetFullPath(settingsFile),StringComparison.OrdinalIgnoreCase))return Path.GetFileName(full);
+        if(string.Equals(full,Path.GetFullPath(settingsFile),StringComparison.OrdinalIgnoreCase))return SettingsCategory;
         var root=Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder));
         if(!full.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))return null;
-        var name=full[(root.Length+1)..].Replace('\\','/');
-        if(name.EndsWith(".tmp",StringComparison.OrdinalIgnoreCase) || name.StartsWith("DataCache",StringComparison.OrdinalIgnoreCase)
-           || string.Equals(name,"PlayState.json",StringComparison.OrdinalIgnoreCase))return null;
-        name=Path.GetFileName(root)+"/"+name;
-        return ValidFile(name) ? name : null;
+        if(full.EndsWith(".tmp",StringComparison.OrdinalIgnoreCase) || full.EndsWith(".lock",StringComparison.OrdinalIgnoreCase))return null;
+        var first=full[(root.Length+1)..].Split(Path.DirectorySeparatorChar)[0];
+        var stem=first.Split('.')[0];
+        return Categories.TryGetValue(stem,out var category) ? category : null;
     }
 
-    /// <summary>A file name the link may carry: relative, « / » only, no « . » or « .. » part, not empty, at most MaxFile characters.</summary>
-    public static bool ValidFile(string? file)
-        => file is { Length: >0 and <=MaxFile } && file.IndexOfAny(['\\',':'])<0 && !file.Split('/').Any(part=>part is "" or "." or "..");
+    /// <summary>A category the link may carry: « settings » or one of Categories, nothing else.</summary>
+    public static bool ValidCategory(string? category)
+        => category==SettingsCategory || category is not null && Categories.Values.Contains(category,StringComparer.Ordinal);
+
+    /// <summary>
+    /// X-149 (0.1119): the protocol number of another Tensho link offered to this user (pipe names « TenshoAssistant.Link.&lt;n&gt;.&lt;user&gt; »
+    /// of another number), or null: the plugin and the app speak different protocols (one of them is older).
+    /// </summary>
+    public static int? OtherProtocol(IEnumerable<string> pipes,string user)
+    {
+        var own=PipeName(user);
+        var tail="."+own[(own.LastIndexOf('.')+1)..];
+        foreach(var pipe in pipes)
+        {
+            var name=Path.GetFileName(pipe);
+            if(!name.StartsWith("TenshoAssistant.Link.",StringComparison.Ordinal) || !name.EndsWith(tail,StringComparison.Ordinal) || name==own)continue;
+            var middle=name["TenshoAssistant.Link.".Length..^tail.Length];
+            if(int.TryParse(middle,System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out var number) && number!=Version)return number;
+        }
+        return null;
+    }
 }
 
 /// <summary>Where the plugin's end of the link stands.</summary>
@@ -232,6 +263,16 @@ public sealed class LocalLinkClient:IDisposable
     public LinkSnapshot? Current=>last is { } received && Environment.TickCount64-received.At<Fresh.TotalMilliseconds ? received.Snapshot : null;
     /// <summary>The last line refused or connection error (English), else null.</summary>
     public string? Problem=>problem;
+    /// <summary>X-149: the protocol of a Tensho link of another number offered to this user while none of this one is, else null.</summary>
+    public int? OtherProtocol{get;private set;}
+
+    private static int? Other()
+    {
+        try{return LocalLinkProtocol.OtherProtocol(Directory.GetFiles(@"\\.\pipe\"),Environment.UserDomainName+"\\"+Environment.UserName);}
+        catch(IOException){return null;}
+        catch(UnauthorizedAccessException){return null;}
+        catch(ArgumentException){return null;}
+    }
 
     private async Task Run(CancellationToken token)
     {
@@ -241,11 +282,11 @@ public sealed class LocalLinkClient:IDisposable
             {
                 using var pipe=new NamedPipeClientStream(".",name,PipeDirection.In,PipeOptions.Asynchronous|PipeOptions.CurrentUserOnly);
                 await pipe.ConnectAsync(1000,token).ConfigureAwait(false);
-                problem=null;
+                problem=null;OtherProtocol=null;
                 await Read(pipe,token).ConfigureAwait(false);
             }
             catch(OperationCanceledException){return;}
-            catch(TimeoutException){}// no plugin offers the link
+            catch(TimeoutException){OtherProtocol=Other();}// no plugin offers the link (or one of another protocol: said)
             catch(IOException e){problem=e.Message;}
             catch(UnauthorizedAccessException e){problem="refused: "+e.Message;}
             try{await Task.Delay(2000,token).ConfigureAwait(false);}
@@ -288,9 +329,9 @@ public sealed class LocalLinkClient:IDisposable
 /// points (GP), the four bags' free slots. -1 when not read (no character, a reading that failed).</summary>
 public sealed record LinkLive(string Job,int Level,int Gp,int MaxGp,int BagFree,int BagSize);
 
-/// <summary>X-119 step 2 (0.1114, protocol 2): one saved file of the plugin that changed (its name under pluginConfigs, « / » between
-/// folders) and the generation it changed in; the application reads the file again itself (never sent over the link).</summary>
-public sealed record LinkChange(string File,long Generation);
+/// <summary>X-119 step 2 (0.1114, protocol 2): a kind of saved file of the plugin that changed and the generation it changed in; X-149
+/// (0.1119, protocol 3): its category (LocalLinkProtocol.Categories), never its name; the application reads the file again itself.</summary>
+public sealed record LinkChange(string Category,long Generation);
 
 /// <summary>
 /// X-119 step 2 (0.1114): the saved files of the plugin that changed lately, filled from a file watcher's threads, read by the feed once a
@@ -302,13 +343,13 @@ public sealed class LinkChangeLog
     private readonly List<LinkChange> changes=[];
     private long generation;
 
-    /// <summary>Any thread: a saved file changed (name as <see cref="LocalLinkProtocol.ChangeName"/> gives it).</summary>
-    public void Add(string file)
+    /// <summary>Any thread: a saved file changed (its category as <see cref="LocalLinkProtocol.ChangeCategory"/> gives it).</summary>
+    public void Add(string category)
     {
         lock(gate)
         {
-            changes.RemoveAll(change=>change.File==file);
-            changes.Add(new(file,++generation));
+            changes.RemoveAll(change=>change.Category==category);
+            changes.Add(new(category,++generation));
             if(changes.Count>LocalLinkProtocol.MaxChanges)changes.RemoveRange(0,changes.Count-LocalLinkProtocol.MaxChanges);
         }
     }
@@ -322,15 +363,15 @@ public sealed class LinkChangeReader
 {
     private long seen;
 
-    /// <summary>The files changed since the last call (a new plugin start counts again from zero); empty when nothing new.</summary>
+    /// <summary>The categories changed since the last call (a new plugin start counts again from zero); empty when nothing new.</summary>
     public IReadOnlyList<string> Take(LinkSnapshot? snapshot)
     {
         if(snapshot?.Changes is not { Count: >0 } changes)return [];
         var newest=changes.Max(change=>change.Generation);
         // The plugin started again (its generations count from 1 again): every name it sends is new.
         if(newest<seen)seen=0;
-        var files=changes.Where(change=>change.Generation>seen).Select(change=>change.File).Distinct().ToArray();
+        var categories=changes.Where(change=>change.Generation>seen).Select(change=>change.Category).Distinct().ToArray();
         seen=Math.Max(seen,newest);
-        return files;
+        return categories;
     }
 }

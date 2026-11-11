@@ -114,7 +114,7 @@ internal sealed class LocalLinkFeed:IDisposable
     // A watcher's thread: only a name added to the log (thread-safe); nothing of the game is touched.
     private void OnFile(object? sender,FileSystemEventArgs change)
     {
-        if(LocalLinkProtocol.ChangeName(settingsFile,folder,change.FullPath) is { } name)changes.Add(name);
+        if(LocalLinkProtocol.ChangeCategory(settingsFile,folder,change.FullPath) is { } category)changes.Add(category);
     }
 
     private void Unwatch()

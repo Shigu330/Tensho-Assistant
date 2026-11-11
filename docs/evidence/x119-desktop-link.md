@@ -30,6 +30,19 @@ only the small live states pass whole »):
 | Change notices (`LinkChange`) | Two file watchers while the link is on: the settings file (`pluginConfigs\TenshoAssistant.json`) and the plugin's folder (`pluginConfigs\TenshoAssistant`); their events only add a name and a generation to a log. Temporary files, the data cache and `PlayState.json` are left out. Never a file's content. | 16 names per snapshot (newest generation of each), 160 characters each, relative, « / » only, no « . » or « .. » part |
 | Application | `LinkChangeReader` takes each new name once (a new plugin start counts again); for the settings file, `Host.ReloadSettings` reads it again into the window's own settings (Newtonsoft populate, lists replaced), between frames, read-only; the status bar says when. The other saved files are not read by the app yet. | Line ≤ 8 192 bytes; another protocol number is refused (the pipe's name carries it) |
 
+## Protocol 3 (0.1119, X-149)
+
+GPT's review of 2026-11-11 (accepted by the user): protocol 2 sent the names of the saved files that changed, and the bank's and the
+characters' files are named by the character's id, while the application only reads the settings again. Protocol 3 sends categories:
+
+| Part | What | Bounds |
+|---|---|---|
+| Change notices (`LinkChange(Category, Generation)`) | `LocalLinkProtocol.ChangeCategory`: the settings file gives `settings`; a file or sub-folder of the plugin's folder gives the category of its name up to the first dot (`InventoryBank` → `bank`, `Characters` → `characters`, `GilJournal` → `gil-journal`, `CraftLists` → `craft-lists`, `MyTools` → `my-tools`, `VoyageHistory` → `voyages`, `AchievementProgress` → `achievements`, `BeastTeams` → `beast-teams`, `DutyProgress` → `duties`, `Discoveries` → `discoveries`); anything else (temporary and lock files, data cache, play state, unknown files) is not sent. | A category outside the closed list is refused by the application (« change list refused ») |
+| Compatibility | The pipe's name carries the protocol (`TenshoAssistant.Link.3.…`): a plugin and an app of different protocols never exchange a line. The app, when no pipe of its protocol answers, lists the local pipes and, if one of another number exists for the same user (`LocalLinkProtocol.OtherProtocol`), its status bar says so and asks to install the app of the plugin's version. | Only the names of local pipes are read |
+
+Behaviour test: `LinkCategories1119Tests` (real files of a plugin folder named by a character id, their notices through a real pipe, the bytes
+received searched for any file name or id).
+
 ## How it is checked without the game
 
 - `tests/TenshoAssistant.Tests/LocalLink1081Tests.cs`: the wire format both ways and its refusals; a real pipe on Windows (a unique test

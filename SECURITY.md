@@ -80,8 +80,12 @@ What the plugin does that matters for security (read against the code of the `De
   drops the queued messages.
 - **Local link with the desktop application (X-119)**: off by default. While Settings › Advanced « Link with the desktop app » is on,
   the plugin offers a local named pipe, out only, open to the current Windows user and denied to network logons (no network port);
-  once a second it writes whether a character is logged in and the zone's name, nothing else, and reads nothing back. The desktop
-  application connects to it as the same user only (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
+  once a second it writes exactly this, and reads nothing back: the plugin's version; whether a character is logged in; whether Tensho
+  is paused (PvP, ranked content); the zone's number and name; the job's abbreviation and level, the gathering points and their maximum,
+  the free slots of the four bags and their size; and notices that a kind of saved data changed, as categories of a closed list
+  (`settings`, `bank`, `characters`, `gil-journal`, `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`,
+  `discoveries`), never a file name, a file's content, a character's name or id. The desktop application connects to it as the same
+  user only and reads the plugin's settings file itself, read-only (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Links opened in the browser**: item pages on Universalis, Garland Tools, Teamcraft, the FFXIV Console Games Wiki or the Lodestone,
   a Teamcraft list import link (built locally), the Partake events page, the prefilled GitHub form of « report a problem », help
   videos (YouTube, or this repository), a link of a « My tools » tool, and GitHub's sign-in page of the discoveries exchange. They open in
@@ -232,9 +236,13 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   attente.
 - **Lien local avec l'application de bureau (X-119)** : désactivé par défaut. Tant que Paramètres › Avancé « Lien avec l'application de
   bureau » est activé, le plugin ouvre un canal nommé local, en sortie seulement, ouvert à l'utilisateur Windows courant et refusé aux
-  connexions réseau (aucun port réseau) ; une fois par seconde il écrit si un personnage est connecté et le nom de la zone, rien d'autre,
-  et ne lit rien en retour. L'application de bureau s'y connecte sous le même utilisateur seulement
-  (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
+  connexions réseau (aucun port réseau) ; une fois par seconde il écrit exactement ceci, et ne lit rien en retour : la version du
+  plugin ; si un personnage est connecté ; si Tensho est en pause (JcJ, contenu classé) ; le numéro et le nom de la zone ; l'abréviation
+  et le niveau de la classe, les points de récolte et leur maximum, les places libres des quatre sacs et leur taille ; et des avis qu'un
+  genre de données enregistrées a changé, en catégories d'une liste fermée (`settings`, `bank`, `characters`, `gil-journal`,
+  `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`, `discoveries`), jamais un nom de fichier, le contenu
+  d'un fichier, le nom ou l'identifiant d'un personnage. L'application de bureau s'y connecte sous le même utilisateur seulement et
+  lit elle-même le fichier de réglages du plugin, en lecture seule (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Liens ouverts dans le navigateur** : pages d'objet sur Universalis, Garland Tools, Teamcraft, le FFXIV Console Games Wiki ou le
   Lodestone, un lien d'import de liste Teamcraft (construit sur place), la page d'événements de Partake, le formulaire GitHub prérempli
   de « Signaler un problème », les vidéos d'aide (YouTube, ou ce dépôt), un lien d'un outil de « Mes outils », et la page de connexion
