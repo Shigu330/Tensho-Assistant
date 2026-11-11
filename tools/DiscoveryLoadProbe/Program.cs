@@ -164,6 +164,20 @@ static class Measure
     public static void Settle(){GC.Collect();GC.WaitForPendingFinalizers();GC.Collect();}
 
     private static double Time(Action action){var watch=Stopwatch.StartNew();action();return watch.Elapsed.TotalMilliseconds;}
+    // X-93 part 2 (0.1040): a reader thread calls a cheap lock-taking read (Find through the index) over and over while the action runs: its longest call.
+    private static double LongestWait(DiscoveryStore store,Action action,bool locked=true)
+    {
+        var longest=0.0;var done=0;
+        var reader=new Thread(()=>
+        {
+            var watch=new Stopwatch();
+            while(Volatile.Read(ref done)==0){watch.Restart();if(locked)store.Find(DiscoveryKind.FishCatch,1u,1);else GC.KeepAlive(new byte[64]);longest=Math.Max(longest,watch.Elapsed.TotalMilliseconds);}
+        });
+        reader.Start();Thread.Sleep(5);
+        action();
+        Volatile.Write(ref done,1);reader.Join();
+        return longest;
+    }
     /// <summary>The median time of one call, over <paramref name="count"/> calls of <paramref name="action"/>(i).</summary>
     private static double PerCall(int count,Action<int> action)
     {
@@ -194,12 +208,20 @@ static class Measure
         add("own: 3 file read, DiscoveryFiles.Read (ms)",Time(()=>file=DiscoveryFiles.Read(path)));
         if(file is null)add("own: 3 file read past the bound, same deserializer (ms)",Time(()=>file=JsonSerializer.Deserialize<DiscoveryFile>(File.ReadAllText(path))));
         var store=new DiscoveryStore();
-        add("own: 4 DiscoveryStore.Load (ms, holds the lock)",Time(()=>store.Load(file!)));
+        add("own: 4 DiscoveryStore.Load (ms, by slices since 0.1040)",Time(()=>store.Load(file!)));
+        // X-93 part 2 (0.1040): the longest a cheap read (a tooltip's Find) waits for the store's lock while the base loads into another store.
+        var loading=new DiscoveryStore();
+        add("own: 4 longest lock wait of a read during Load (ms)",LongestWait(loading,()=>loading.Load(file!)));
+        loading=new DiscoveryStore();
+        add("own: 4 longest pause of a lock-free loop during Load, GC (ms)",LongestWait(loading,()=>loading.Load(file!),false));
+        loading=null;
         file=null;Settle();var after=GC.GetTotalMemory(true);
         add("own: 5 memory held by the store (MB)",(after-before)/1_048_576.0);
         add("own: 5 memory a fact (bytes)",(after-before)/(double)Total(store));
         DiscoveryFile? snapshot=null;
-        add("own: 6 Snapshot (ms, ON THE FRAME every minute when dirty)",Time(()=>snapshot=store.Snapshot(DateTimeOffset.UtcNow)));
+        add("own: 6 Snapshot (ms, off the frame since 0.1040, by slices)",Time(()=>snapshot=store.Snapshot(DateTimeOffset.UtcNow)));
+        add("own: 6 longest lock wait of a read during Snapshot (ms)",LongestWait(store,()=>store.Snapshot(DateTimeOffset.UtcNow)));
+        add("own: 6 longest pause of a lock-free loop during Snapshot, GC (ms)",LongestWait(store,()=>store.Snapshot(DateTimeOffset.UtcNow),false));
         var written=new Dictionary<DiscoveryKind,string>();
         add("own: 7 WriteSplit (ms, off the frame)",Time(()=>DiscoveryFiles.WriteSplit(path,snapshot!,written,store.SharedKindsHeld())));
         // The share sent to your gist (GitHubExchange: Snapshot, Mine, Encode), off the frame.
@@ -225,10 +247,15 @@ static class Measure
         common="";Settle();
         var store=new DiscoveryStore();
         var first=(Added:0,Joined:0,Refused:0);var second=first;
-        add("shared: 3 Merge into an empty base (ms, holds the lock)",Time(()=>first=store.Merge(file!.Facts)));
+        add("shared: 3 Merge into an empty base (ms, by slices since 0.1040)",Time(()=>first=store.Merge(file!.Facts)));
         add("shared: 3 facts held after the merge",Total(store));
         add("shared: 3 facts left out by the 200 000-per-kind bound",store.LeftOut);
-        add("shared: 4 Merge again, all joined (ms, holds the lock)",Time(()=>second=store.Merge(file!.Facts)));
+        add("shared: 4 Merge again, all joined (ms, by slices since 0.1040)",Time(()=>second=store.Merge(file!.Facts)));
+        var merging=new DiscoveryStore();
+        add("shared: 4 longest lock wait of a read during Merge (ms)",LongestWait(merging,()=>merging.Merge(file!.Facts)));
+        merging=new DiscoveryStore();
+        add("shared: 4 longest pause of a lock-free loop during Merge, GC (ms)",LongestWait(merging,()=>merging.Merge(file!.Facts),false));
+        merging=null;
         file=null;Settle();
         var path=Path.Combine(folder,"shared","Discoveries.json");Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var snapshot=store.Snapshot(DateTimeOffset.UtcNow);var written=new Dictionary<DiscoveryKind,string>();

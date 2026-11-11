@@ -221,7 +221,9 @@ public sealed class DiscoveryStore
         {
             DiscoveryFile? file=null;
             try{file=source(kind);}catch(Exception){file=null;}
-            lock(gate){if(file is not null)LoadLocked(file,false);sharedWaiting.Remove(kind);sharedLoading.Remove(kind);revision++;}
+            // X-93 part 2 (0.1040): checked outside the lock; put in only if no import read the kind meanwhile (it was loaded twice before).
+            var prepared=file is null ? null:Prepare(file);
+            lock(gate){if(prepared is not null && sharedWaiting.Contains(kind))Apply(prepared,false);sharedWaiting.Remove(kind);sharedLoading.Remove(kind);revision++;}
         });
     }
     /// <summary>Reads at once the shared kinds still on disk among <paramref name="kinds"/> (before an import joins facts to them); the file read outside the lock.</summary>
@@ -234,7 +236,8 @@ public sealed class DiscoveryStore
         {
             DiscoveryFile? file=null;
             try{file=source(kind);}catch(Exception){file=null;}
-            lock(gate){if(sharedWaiting.Contains(kind)){if(file is not null)LoadLocked(file,false);sharedWaiting.Remove(kind);revision++;}}
+            var prepared=file is null ? null:Prepare(file);
+            lock(gate){if(sharedWaiting.Contains(kind)){if(prepared is not null)Apply(prepared,false);sharedWaiting.Remove(kind);revision++;}}
         }
     }
     /// <summary>X-93 (0.939): shared facts left out since the start because the shared part was full.</summary>
@@ -352,14 +355,26 @@ public sealed class DiscoveryStore
         // X-93 (0.941): the kinds of the file are read first, so a fact already shared is joined, never doubled.
         var list=imported as IReadOnlyCollection<DiscoveryFact> ?? imported.ToArray();
         NeedNow(list.Where(fact=>fact is not null).Select(fact=>fact.Kind));
+        // X-93 part 2 (0.1040): the facts checked and moved to their cells outside the lock (0.855: an older file's cells are moved to ours first), then put
+        // in by slices of Slice facts, so a page or tooltip never waits for the whole import (2.2 s at a million facts, docs/evidence/x93-load-test.md).
+        var ready=new List<DiscoveryFact>(list.Count);
+        foreach(var original in list)
+        {
+            var source=original is null ? null:Recell(original);
+            if(source is null || !Valid(source)){refused++;continue;}
+            ready.Add(source);
+        }
+        Dictionary<DiscoveryKind,int> shared;
+        lock(gate)shared=SharedHeld();
+        for(var start=0;start<ready.Count;start+=Slice)
+        {
+        if(start>0)LetOthersIn();
         lock(gate)
         {
-            var shared=SharedHeld();
-            foreach(var original in list)
+            var before=added+joined;
+            for(var at=start;at<Math.Min(ready.Count,start+Slice);at++)
             {
-                // 0.855: an older file's cells are moved to ours first.
-                var source=original is null ? null:Recell(original);
-                if(source is null || !Valid(source)){refused++;continue;}
+                var source=ready[at];
                 if(facts.TryGetValue(source.Key,out var known))
                 {
                     known.Imported++;
@@ -378,7 +393,8 @@ public sealed class DiscoveryStore
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 Put(copy);added++;
             }
-            if(added+joined>0){Dirty=true;revision++;}
+            if(added+joined>before){Dirty=true;revision++;}
+        }
         }
         return (added,joined,refused);
     }
@@ -429,34 +445,89 @@ public sealed class DiscoveryStore
         && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues)
         && !(fact.Kind==DiscoveryKind.QuestItemAsked && fact.Last<QuestItemAsks.Fixed);
 
-    public void Load(DiscoveryFile file){lock(gate)LoadLocked(file,true);}
-    private void LoadLocked(DiscoveryFile file,bool count)
+    /// <summary>
+    /// X-93 part 2 (0.1040, load test docs/evidence/x93-load-test.md): the most facts put in or copied in one hold of the lock. Load, Merge and Snapshot work by
+    /// slices of this size and let go of the lock between them, so a sighting, a page or a tooltip waits a few slices at most, never the whole base
+    /// (Load and Merge 2.2 s, Snapshot 339 ms at a million facts; measured after: a read waits 20 to 49 ms at most, close to the GC pauses).
+    /// </summary>
+    public const int Slice=5_000;
+    /// <summary>
+    /// X-93 part 2 (0.1040): between two slices, a short pause (50 µs) so that a thread waiting for the lock gets it: the lock is not fair, and without the
+    /// pause the loop took it back before a waiting read woke up (load test: a read waited 100 to 200 ms at 100 000 to a million facts).
+    /// </summary>
+    private static void LetOthersIn()
     {
-        {
-            // 0.855: each fact moved to its 50-yalm cell; those meeting in one are joined, and the base is written again, smaller.
-            var read=0;var refused=0;var shared=SharedHeld();
-            foreach(var original in file.Facts)
-            {
-                if(original is null)continue;
-                var fact=Recell(original);
-                if(!Valid(fact)){refused++;continue;}
-                read++;
-                if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
-                // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
-                if(fact.Seen>0)Put(fact);
-                else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
-                else LeftOut++;
-            }
-            // 0.1005: a refused fact (one written before a fix) is gone from the file at the next save, not only from memory.
-            if(count && (read>facts.Count || refused>0) || file.Facts.Any(fact=>fact is not null && Cell(fact.X,fact.Z)!=(fact.CellX,fact.CellZ)))Dirty=true;
-            revision++;
-        }
+        var until=System.Diagnostics.Stopwatch.GetTimestamp()+System.Diagnostics.Stopwatch.Frequency/20_000;
+        while(System.Diagnostics.Stopwatch.GetTimestamp()<until)Thread.SpinWait(20);
     }
 
-    /// <summary>A copy of the base; « saving » marks it as written (an export does not).</summary>
+    // X-93 part 2 (0.1040): a file's facts moved to their 50-yalm cells and checked, outside the lock.
+    private sealed record Prepared(List<DiscoveryFact> Facts,int Refused,bool Moved);
+    private static Prepared Prepare(DiscoveryFile file)
+    {
+        var ready=new List<DiscoveryFact>(file.Facts.Count);var refused=0;var moved=false;
+        foreach(var original in file.Facts)
+        {
+            if(original is null)continue;
+            if(Cell(original.X,original.Z)!=(original.CellX,original.CellZ))moved=true;
+            var fact=Recell(original);
+            if(!Valid(fact)){refused++;continue;}
+            ready.Add(fact);
+        }
+        return new(ready,refused,moved);
+    }
+    // Under the lock: prepared facts from start to end put in; « shared » counts the shared facts held per kind.
+    private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared)
+    {
+        for(var at=start;at<end;at++)
+        {
+            var fact=ready[at];
+            // 0.855: facts meeting in one cell are joined, and the base is written again, smaller.
+            if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
+            // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
+            if(fact.Seen>0)Put(fact);
+            else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
+            else LeftOut++;
+        }
+    }
+    // Under the lock, after the facts: 0.1005, a refused fact (one written before a fix) is gone from the file at the next save, not only from memory.
+    private void Finish(Prepared prepared,bool count)
+    {
+        if(count && (prepared.Facts.Count>facts.Count || prepared.Refused>0) || prepared.Moved)Dirty=true;
+        revision++;
+    }
+    // Under the lock: a shared kind's file put in at once (bounded by MaxFacts; the kind is claimed and loaded in the same hold).
+    private void Apply(Prepared prepared,bool count){PutRange(prepared.Facts,0,prepared.Facts.Count,SharedHeld());Finish(prepared,count);}
+
+    /// <summary>X-93 part 2 (0.1040): the base read at start; checked outside the lock, then put in by slices (<see cref="Slice"/>).</summary>
+    public void Load(DiscoveryFile file)
+    {
+        var prepared=Prepare(file);
+        Dictionary<DiscoveryKind,int> shared;
+        lock(gate)shared=SharedHeld();
+        for(var start=0;start<prepared.Facts.Count;start+=Slice)
+        {
+            if(start>0)LetOthersIn();
+            lock(gate){PutRange(prepared.Facts,start,Math.Min(prepared.Facts.Count,start+Slice),shared);revision++;}
+        }
+        lock(gate)Finish(prepared,true);
+    }
+
+    /// <summary>
+    /// A copy of the base; « saving » marks it as written (an export does not). X-93 part 2 (0.1040): copied by slices (<see cref="Slice"/>), the lock let go
+    /// between them; it is marked written before the copy, so a fact seen or changed meanwhile marks it again and goes in the next save.
+    /// </summary>
     public DiscoveryFile Snapshot(DateTimeOffset at,bool saving=true)
     {
-        lock(gate){if(saving)Dirty=false;return new DiscoveryFile{Written=at,Facts=facts.Values.Select(fact=>fact.Copy()).ToList()};}
+        DiscoveryFact[] held;
+        lock(gate){if(saving)Dirty=false;held=[..facts.Values];}
+        var copies=new List<DiscoveryFact>(held.Length);
+        for(var start=0;start<held.Length;start+=Slice)
+        {
+            if(start>0)LetOthersIn();
+            lock(gate)for(var n=start;n<Math.Min(held.Length,start+Slice);n++)copies.Add(held[n].Copy());
+        }
+        return new DiscoveryFile{Written=at,Facts=copies};
     }
 
     public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();Dirty=true;revision++;}}

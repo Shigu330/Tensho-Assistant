@@ -175,3 +175,31 @@ two measured points (100 000 and 1 000 000), linearly unless said otherwise; the
   (`from_gist`) and keeps at most 200 000 facts of one share (`clean`): a player's share is cut from about **200 000 own facts**.
 
 **(8) Format of DEC-042 version 2 — unchanged by this test.** Every measure above uses the frozen format as it is.
+
+## X-93 part 2 (0.1040): slices, measured again
+
+Measured on 2026-11-11 with the same `tools/DiscoveryLoadProbe` (one run each, same machine), after the change: `Load` and `Merge` check the
+facts and move them to their cells outside the store's lock, then put them in by slices of `DiscoveryStore.Slice` (5 000) facts, letting go of
+the lock between slices with a 50 µs pause (the lock is not fair: without the pause the loop took it back before a waiting read woke up);
+`Snapshot` copies by slices the same way, and the plugin's save calls it off the frame, inside its background write. The probe now also
+measures the longest wait of a cheap read (`Find` through the index, as a tooltip does) called over and over on another thread during each
+operation, and, for comparison, the longest pause of a loop that takes no lock (garbage collection, which also stops the game's own code).
+
+| Measure | 100 000 facts | 1 000 000 facts |
+|---|---|---|
+| `Load` (off the frame, at start) | 377 ms | 1 900 ms |
+| longest wait of a read during `Load` (before: the whole `Load`) | 48 ms | 44 ms |
+| longest pause without any lock during `Load` (GC) | 19 ms | 24 ms |
+| `Snapshot` (now off the frame; before: on the frame, 21 ms and 339 ms) | 28 ms | 447 ms |
+| longest wait of a read during `Snapshot` | 20 ms | 20 ms |
+| longest pause without any lock during `Snapshot` (GC) | 16 ms | 16 ms |
+| `Merge` into an empty base / again, all joined | 486 / 420 ms | 3 148 / 2 523 ms |
+| longest wait of a read during `Merge` (before: the whole `Merge`) | 42 ms | 49 ms |
+| longest pause without any lock during `Merge` (GC) | 30 ms | 39 ms |
+
+What it means: the save no longer costs the frame anything for the copy; a read waits at most a few tens of milliseconds while a large base
+loads or an import runs, close to the garbage-collection pauses those operations cause anyway, instead of the whole operation (seconds at a
+million facts). The rest of the wait is the dictionary growing under the lock (one resize copies every entry) and garbage collection; both
+appear only far above today's base (1 772 facts, one slice). A sighting or change made while a copy runs either goes into that copy or marks
+the base to save again, so nothing is lost (test DiscoveriesSlices1040Tests). The 64 MB bound of `Discoveries.json` is unchanged: a valid file
+over it is set aside (0.1039), not read; reading it in parts is left to part (5).

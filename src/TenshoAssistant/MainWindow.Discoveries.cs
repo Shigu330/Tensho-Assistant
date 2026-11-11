@@ -78,12 +78,13 @@ internal sealed partial class MainWindow
     {
         if(DiscoveryStore is not { } store || DiscoveryFolder is null || !DiscoveriesLoaded || DiscoveriesWriteBlocked || Interlocked.Exchange(ref discoverySaving,1)==1)return;
         discoveriesSavedAt=Environment.TickCount64;
-        var held=store.SharedKindsHeld();var file=store.Snapshot(DateTimeOffset.UtcNow);var path=DiscoveryBase;
+        var path=DiscoveryBase;
         var prices=SeenPrices is { Dirty:true } seen ? seen.Snapshot():null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
         void Write()
         {
-            // X-93 (0.940): yours in Discoveries.json, the shared ones apart, by kind, compressed (DiscoveryFiles.WriteSplit).
-            try{lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
+            // X-93 (0.940): yours in Discoveries.json, the shared ones apart, by kind, compressed (DiscoveryFiles.WriteSplit). X-93 part 2 (0.1040): the base is
+            // copied here, off the frame and by slices (DiscoveryStore.Snapshot): on the frame it was 21 ms at 100 000 facts, 339 ms at a million.
+            try{var held=store.SharedKindsHeld();var file=store.Snapshot(DateTimeOffset.UtcNow);lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
             catch(Exception error){log.Warning(error,"The discoveries could not be saved.");}
             finally{Volatile.Write(ref discoverySaving,0);}
         }
