@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1064.0
+- Constats d'audit A075 et A025 (BACKLOG et GAPS) : ces deux documents citaient encore des fichiers qui ne vivent que sur le disque du mainteneur (fiche d'objectif du moment, fichier d'état, fiches d'étude), liens morts sur GitHub. Ils nomment maintenant les notes du mainteneur (hors du dépôt), dans les deux langues. Le test des liens de 0.1063 couvre aussi ces deux documents (le fichier de licence d'un autre plugin, cité dans GAPS, est mis à part).
+- Tests : BacklogLinks1064Tests. Verify.ps1 (agent) : 1746/1746, 0 avertissement, 0 erreur ; DLL 0.1064.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A075 and A025 (BACKLOG and GAPS): these two documents still cited files that live only on the maintainer's disk (goal sheet of the time, status file, study sheets), dead links on GitHub. They now name the maintainer's notes (outside the repository), in both languages. The link test of 0.1063 now also covers these two documents (another plugin's licence file, quoted in GAPS, is set aside).
+
 ## 0.1063.0
 - Constats d'audit A054, A075 et A025 (cinq documents du projet) : PROJECT et ROADMAP donnaient le prompt maître archivé comme source qui fait foi, avec son chemin sur le disque du mainteneur ; USER-REQUESTS, MAP-PROPOSALS et CRAFT-GATHER-PROPOSALS citaient des fichiers qui ne vivent que là (liens morts sur GitHub). Ils nomment maintenant « les notes du mainteneur (hors du dépôt) » ou « les règles de l'agent », et le prompt maître est une source historique : les décisions de l'utilisateur et DECISIONS priment depuis le 2026-11-09. Un test vérifie que ces documents ne citent que des fichiers Markdown du dépôt.
 - Tests : ProjectLinks1063Tests. Verify.ps1 (agent) : 1745/1745, 0 avertissement, 0 erreur ; DLL 0.1063.0.0. Rien à essayer en jeu.

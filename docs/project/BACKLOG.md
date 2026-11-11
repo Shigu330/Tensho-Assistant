@@ -93,7 +93,7 @@ State at 0.75.0 (2026-10-29, archive): shared cache and adjustable staleness (CA
 - COLL-003 IMPLEMENTED / TESTED in 0.66: titles/achievements, categories/sheets/rewards, three-state proof of acquisition and coalesced refresh; 421 tests and native probe passing, no runtime claimed.
 - QUEST-REWARDS-003 IMPLEMENTED / TESTED in 0.67: native conditional rewards and Item/stocks link; 426 tests and probe 5,373 quests/9,313 rows passing. Four quantities, fifteen currencies and current-rank association explicitly unknown.
 - QUEST-ITEM-SOURCES-004 IMPLEMENTED / TESTED in 0.68: shared Item → quests index, variants/coverage kept and atomic/cancellable publication; 434 tests, 3,496 Items/8,288 associations verified.
-- NEXT QUEST-CURRENCIES-005-STUDY: fifteen currencies without a direct Item, GC keys and variants on evidence; do not choose company/currency by convention. The older NEXT entries below are historical; GOAL.md determines the current next step.
+- NEXT QUEST-CURRENCIES-005-STUDY: fifteen currencies without a direct Item, GC keys and variants on evidence; do not choose company/currency by convention. The older NEXT entries below are historical; the maintainer's notes determine the current next step.
 
 - SORT-TEMPLATES-007 IMPLEMENTED / TESTED in 0.59: bounded common library, compatible geometry, loading as a draft, copies without observations; 385 tests/package, Newtonsoft three modes and ZIP identical to the canonical outputs.
 - NEXT BASE-AUDIT-002: targeted audit of the scope of the 17 tools, documents/paths and limits. Counter to check before any new big slice; 5% reserve.
@@ -113,7 +113,7 @@ State at 0.75.0 (2026-10-29, archive): shared cache and adjustable staleness (CA
 - SORT-NATIVE-002 IMPLEMENTED / TESTED in 0.54: explicit visual application of the four bags, recent snapshot revalidated, full swap. 355 tests/package; native/rendering/persistence not observed.
 - NEXT SORT-SCOPES-003: capture live the opened saddlebags/retainers before proposing the application to the storage; the imported cache alone allows no writing.
 
-UPDATE 2026-10-27 / 0.5.27: the old READY/TODO states of CRAFT-001A below are outdated. Catalogue, notebook and preparation implemented, 63 tests passed and user confirmation received. This old checkpoint is closed; GOAL.md describes the current slice. The unobserved runtime scenarios remain kept in TESTING.md.
+UPDATE 2026-10-27 / 0.5.27: the old READY/TODO states of CRAFT-001A below are outdated. Catalogue, notebook and preparation implemented, 63 tests passed and user confirmation received. This old checkpoint is closed; the maintainer's notes describe the current slice. The unobserved runtime scenarios remain kept in TESTING.md.
 
 - CORE-001 DONE: managed snapshot and InventoryService with owner/containers/NQ-HQ scope, coverage and observations; eight inventory tests pass.
 - INV-001 DONE (implementation/tests): adapter of the four bags integrated, framework reading, invalidation and Partial/Unknown snapshots. No Complete assumed.
@@ -142,9 +142,9 @@ La file a été traitée depuis (ROADMAP, CHANGELOG) ; une ligne peut être fait
 
 Les points qui attendent une décision ou un relevé en jeu sont regroupés dans la [ROADMAP](ROADMAP.md), section « À décider / à
 revoir » ; les tests en jeu en attente, dans sa section « Tests à faire en jeu ». L'ordre de passage est dans
-[STATUS](../ai/STATUS.md) (« Prochaine action »).
+le fichier d'état du mainteneur (« Prochaine action »).
 
-Carte (MAP-001, plan : [MAP-016-PLAN](../goals/MAP-016-PLAN.md))
+Carte (MAP-001, plan : MAP-016-PLAN, notes du mainteneur (hors du dépôt))
 - Icônes des commissionnaires (ex. commises de Rowena) : corrigé en 0.155 (MAP-017), validé en jeu 2026-10-31.
 - Repères d'exploration : **clos** (était « en pause » au 0.154) ; météo du wiki citée, affichée et utilisée par les alarmes depuis 0.201.
 - Icône de type de quête approximative (71141 calculé contre 71151 vu en jeu) ; correspondance `ObjectiveId` en partie non prouvée.
@@ -158,7 +158,7 @@ Objets et collections
 - Marchands PNJ : monnaies codées et InclusionShop déjà traités (ligne périmée au 0.154) ; boutiques de compagnie libre (FccShop)
   **faites en 0.295**, validées en jeu. Ligne close.
 - Injection du texte dans l'infobulle native du jeu : **abandonnée** (décision utilisateur 2026-11-01).
-- Monnaies de quête sans objet direct : inconnu documenté ([QUEST-CURRENCIES-005-STUDY](../goals/QUEST-CURRENCIES-005-STUDY.md)).
+- Monnaies de quête sans objet direct : inconnu documenté (QUEST-CURRENCIES-005-STUDY, notes du mainteneur (hors du dépôt)).
 
 Inventaire et tri : arsenal, coffre à apparence et armoire lus comme rangements (0.235–0.240, à valider en jeu) ; leur tri
 (SORT-ARMOURY-009, HEAVY) et SORT-AUTO-010 (opt-in) : après publication. Cache disque des petits catalogues (cartes, donjons,
@@ -209,14 +209,14 @@ Suivi au 0.315 (2026-11-02) ajouté en fin de chaque décision : seul le point d
 - HOVER-TOOLTIP-013 TESTED en 0.85 (panneau sous l'infobulle native, moins cher du centre de données, stock/obtention/usages). Option future HEAVY : injection du texte dans l'infobulle native.
 - SORT-ITEM-PROPS-008 TESTED en 0.84 (niveaux, rareté, prix, ID, unique/non échangeable/teinture/réparable/collectionnable). Suite SortaKinda : SORT-ARMOURY-009 (HEAVY), SORT-AUTO-010 opt-in.
 
-- QUEST-CURRENCIES-005-STUDY clôturée sur UNKNOWN documenté : quinze monnaies sans Item/clé GC de récompense, aucune relation unique trouvée ; quantités conservées, pas de compagnie inventée. Voir docs/goals/QUEST-CURRENCIES-005-STUDY.md. BASE-AUDIT-003 terminé : cohérence/livraison 0.69 et diagnostics améliorés ; suite indépendante selon quota, sans blocage global.
+- QUEST-CURRENCIES-005-STUDY clôturée sur UNKNOWN documenté : quinze monnaies sans Item/clé GC de récompense, aucune relation unique trouvée ; quantités conservées, pas de compagnie inventée. Voir QUEST-CURRENCIES-005-STUDY (notes du mainteneur (hors du dépôt)). BASE-AUDIT-003 terminé : cohérence/livraison 0.69 et diagnostics améliorés ; suite indépendante selon quota, sans blocage global.
 
-- BASE-AUDIT-002 terminé dans son périmètre de contrôle : 17 références présentes, 17 couvertures PARTIAL, 71 liens locaux/61 Markdown résolus, DLL et paquet 0.59.0.0 concordants. Voir docs/goals/BASE-AUDIT-002.md. Prochaine étude indépendante : catalogue GatherBuddy/pêche, après contrôle du quota ; ne pas inventer les appâts/prérequis absents.
+- BASE-AUDIT-002 terminé dans son périmètre de contrôle : 17 références présentes, 17 couvertures PARTIAL, 71 liens locaux/61 Markdown résolus, DLL et paquet 0.59.0.0 concordants. Voir BASE-AUDIT-002 (notes du mainteneur (hors du dépôt)). Prochaine étude indépendante : catalogue GatherBuddy/pêche, après contrôle du quota ; ne pas inventer les appâts/prérequis absents.
 
 - USE-CONTEXT-004 IMPLEMENTED / TESTED en 0.53 : menu d’inventaire opt-in, cinq routes partagées, garde de propriétaire/révision/âge, aucune requête réseau par le menu. Rendu natif à confirmer ; liens de discussion et cibles Default hors de cette tranche.
-- SORT-NATIVE-002-STUDY OBSOLÈTE (2026-10-30) : application native livrée en 0.54–0.59. Remplacée par docs/goals/SORT-GAP-008-STUDY.md : 1) validation en jeu du tri natif (jamais observé), 2) SORT-ITEM-PROPS-008 (LIGHT, propriétés Item statiques), 3) SORT-ARMOURY-009, 4) SORT-AUTO-010 opt-in.
+- SORT-NATIVE-002-STUDY OBSOLÈTE (2026-10-30) : application native livrée en 0.54–0.59. Remplacée par SORT-GAP-008-STUDY (notes du mainteneur (hors du dépôt)) : 1) validation en jeu du tri natif (jamais observé), 2) SORT-ITEM-PROPS-008 (LIGHT, propriétés Item statiques), 3) SORT-ARMOURY-009, 4) SORT-AUTO-010 opt-in.
 
-État au 0.75.0 (2026-10-29, archive) : [cache partagé et péremption réglable](../goals/CACHE-001.md). Prix, quêtes, collections, sources communautaires, Revue de mode et calculs du carnet réutilisent des instantanés persistants datés. Durées indépendantes dans Réglages : 5 min, 1 h, 24 h ou 7 j ; actualisation forcée depuis les outils. Les imports restent manuels et signalent leur péremption ; les observations en direct gardent une invalidation courte. 466/466 tests/package/SHA-256 passants, zéro avertissement/erreur ; validation en jeu de ce cache encore à faire.
+État au 0.75.0 (2026-10-29, archive) : cache partagé et péremption réglable (CACHE-001, notes du mainteneur (hors du dépôt)). Prix, quêtes, collections, sources communautaires, Revue de mode et calculs du carnet réutilisent des instantanés persistants datés. Durées indépendantes dans Réglages : 5 min, 1 h, 24 h ou 7 j ; actualisation forcée depuis les outils. Les imports restent manuels et signalent leur péremption ; les observations en direct gardent une invalidation courte. 466/466 tests/package/SHA-256 passants, zéro avertissement/erreur ; validation en jeu de ce cache encore à faire.
 
 - GATHER-FISH-006 IMPLEMENTED / TESTED en 0.60 : carnet natif, 2 461 fiches, restrictions et tomes ; 389 tests/package et probes natifs passants. 491 codes météo restent inconnus.
 - GATHER-FISH-SOURCES-007 IMPLEMENTED / TESTED en 0.61 : appâts/chaînes par lieu, cache/transport communs, 396 tests et consultation réelle 4869 passants. Code météo natif 2 non expliqué, Unknown conservé.
@@ -227,7 +227,7 @@ Suivi au 0.315 (2026-11-02) ajouté en fin de chaque décision : seul le point d
 - COLL-003 IMPLEMENTED / TESTED en 0.66 : titres/succès, catégories/fiches/récompenses, preuve d’acquisition à trois états et refresh coalescé ; 421 tests et probe natif passants, aucun runtime revendiqué.
 - QUEST-REWARDS-003 IMPLEMENTED / TESTED en 0.67 : récompenses conditionnelles natives et lien Item/stocks ; 426 tests et probe 5 373 quêtes/9 313 lignes passants. Quatre quantités, quinze monnaies et association de rang courant inconnus explicitement.
 - QUEST-ITEM-SOURCES-004 IMPLEMENTED / TESTED en 0.68 : index partagé Item → quêtes, variantes/couverture conservées et publication atomique/cancellable ; 434 tests, 3 496 Items/8 288 associations vérifiées.
-- NEXT QUEST-CURRENCIES-005-STUDY : quinze monnaies sans Item direct, clés GC et variantes sur preuve ; ne pas choisir compagnie/monnaie par convention. Les anciennes entrées NEXT ci-dessous sont historiques ; GOAL.md détermine la suite courante.
+- NEXT QUEST-CURRENCIES-005-STUDY : quinze monnaies sans Item direct, clés GC et variantes sur preuve ; ne pas choisir compagnie/monnaie par convention. Les anciennes entrées NEXT ci-dessous sont historiques ; les notes du mainteneur déterminent la suite courante.
 
 - SORT-TEMPLATES-007 IMPLEMENTED / TESTED en 0.59 : bibliothèque commune bornée, géométrie compatible, chargement en brouillon, copies sans observations ; 385 tests/package, Newtonsoft trois modes et ZIP identique aux sorties canoniques.
 - NEXT BASE-AUDIT-002 : audit ciblé du périmètre des 17 outils, documents/chemins et limites. Compteur à vérifier avant toute nouvelle grosse tranche ; réserve 5 %.
@@ -247,7 +247,7 @@ Suivi au 0.315 (2026-11-02) ajouté en fin de chaque décision : seul le point d
 - SORT-NATIVE-002 IMPLEMENTED / TESTED en 0.54 : application visuelle explicite des quatre sacs, snapshot récent revalidé, permutation intégrale. 355 tests/package ; natif/rendu/persistance non observés.
 - NEXT SORT-SCOPES-003 : capturer en direct les sacoches/servants ouverts avant de proposer l’application au rangement ; le cache importé seul ne permet aucune écriture.
 
-MISE À JOUR 2026-10-27 / 0.5.27 : les anciens états READY/TODO de CRAFT-001A ci-dessous sont dépassés. Catalogue, carnet et préparation implémentés, 63 tests réussis et confirmation utilisateur reçue. Cet ancien checkpoint est clos ; GOAL.md décrit la tranche actuelle. Les scénarios runtime non observés restent conservés dans TESTING.md.
+MISE À JOUR 2026-10-27 / 0.5.27 : les anciens états READY/TODO de CRAFT-001A ci-dessous sont dépassés. Catalogue, carnet et préparation implémentés, 63 tests réussis et confirmation utilisateur reçue. Cet ancien checkpoint est clos ; les notes du mainteneur décrivent la tranche actuelle. Les scénarios runtime non observés restent conservés dans TESTING.md.
 
 - CORE-001 DONE : snapshot managé et InventoryService avec portée propriétaire/conteneurs/NQ-HQ, couverture et observations ; huit tests inventaire passent.
 - INV-001 DONE (implémentation/tests) : adaptateur des quatre sacs intégré, lecture framework, invalidation et snapshots Partial/Unknown. Aucun Complete supposé.

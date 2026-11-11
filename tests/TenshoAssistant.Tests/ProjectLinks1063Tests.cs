@@ -8,7 +8,8 @@ internal static class ProjectLinks1063Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
     private static readonly string[] Documents = ["docs/project/PROJECT.md","docs/project/ROADMAP.md","docs/project/USER-REQUESTS.md",
-        "docs/project/MAP-PROPOSALS.md","docs/project/CRAFT-GATHER-PROPOSALS.md","docs/project/DECISIONS.md"];
+        "docs/project/MAP-PROPOSALS.md","docs/project/CRAFT-GATHER-PROPOSALS.md","docs/project/DECISIONS.md",
+        "docs/project/BACKLOG.md","docs/project/GAPS.md"];
 
     private static HashSet<string> Tracked()
     {
@@ -42,6 +43,7 @@ internal static class ProjectLinks1063Tests
                 foreach(Match match in Regex.Matches(text,@"(?<![\w./-])((?:[\w.-]+/)*[\w-]+\.md)(?!\w)"))
                 {
                     var path = match.Groups[1].Value;
+                    if(path == "LICENSE.md") continue; // the licence file of another plugin's repository, quoted in GAPS
                     if(!tracked.Contains(Normal(path)) && !tracked.Contains(Normal("docs/project/" + path))) dead.Add(document + ": " + path);
                 }
             }
