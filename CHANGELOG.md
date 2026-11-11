@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1090.0
+- Constat d'audit A080 (décision D-138 de l'utilisateur : « maintenir ce qui permet d'avoir un custom repot sinon le reste pour soumission peux etre retirer »). Vérifié avant de retirer : le dépôt personnalisé (repo.json, icône prise dans src/TenshoAssistant/images), le script de release, Verify et la CI ne lisent rien dans publish/d17. Ce dossier (brouillon de PR, manifest.toml au commit vide, copie de l'icône) ne servait qu'à une soumission au dépôt officiel : retiré (git le garde). Gardés : l'icône du plugin, repo.json, le script de release, le job CI « Build like the Dalamud repository » et le modèle de manifest.toml de PUBLISHING.
+- Tests : NoD17Draft1090Tests. Verify.ps1 (agent) : 1776/1776, 0 avertissement, 0 erreur ; DLL 0.1090.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A080 (user decision D-138: keep what the custom repository needs, the rest made for a submission can go). Checked before removing: the custom repository (repo.json, icon taken from src/TenshoAssistant/images), the release script, Verify and the CI read nothing in publish/d17. That folder (pull request draft, manifest.toml with an empty commit, a copy of the icon) only served a submission to the official repository: removed (git keeps it). Kept: the plugin icon, repo.json, the release script, the CI job « Build like the Dalamud repository » and the manifest.toml template of PUBLISHING.
+
 ## 0.1089.0
 - Constat d'audit A084 (décision D-138 de l'utilisateur) : le guide de traduction était seul dans un dossier racine (Localization/), loin des fichiers de langue. Il va à côté d'eux, src/TenshoAssistant/Localization/README.md ; tous les renvois suivent : réponse de la FAQ du plugin (anglais et français), formulaire de traduction, README, carte des documents, ARCHITECTURE, DECISIONS, tests et docgen. La branche main ne change qu'à une release, qui livre le plugin avec le nouveau chemin.
 - Tests : LocalizationGuide1089Tests. Verify.ps1 (agent) : 1775/1775, 0 avertissement, 0 erreur ; DLL 0.1089.0.0. Non validé en jeu.

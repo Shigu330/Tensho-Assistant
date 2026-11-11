@@ -52,7 +52,7 @@ HAND_VERSION = re.compile(r"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu
                           r"\b0\.\d{3,4}\b", re.I)
 # Public documents scanned for versions written by hand (the CHANGELOG, the evidence and the French working documents are history).
 NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "src/TenshoAssistant/Localization/README.md", "docs/README.md", "docs/FAQ.md",
-                   "tools/README.md", "publish/d17/PULL_REQUEST.md", "community-help/README.md",
+                   "tools/README.md", "community-help/README.md",
                    "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md",
                    # 0.1084 (audit A060): the living documents of docs/project carry a date, never a version stamp.
                    "docs/project/ARCHITECTURE.md", "docs/project/ROADMAP.md", "docs/project/PROJECT.md",
@@ -94,11 +94,6 @@ INDEX = [
      "community", "communauté",
      "videos and guides of the Help · gallery of « My tools » · shared discoveries (exchange through GitHub, file format)",
      "vidéos et guides de l'aide · galerie de « Mes outils » · découvertes partagées (échange par GitHub, format du fichier)"),
-    ([("../publish/d17/", None)], "author", "auteur",
-     "draft of a submission to the official Dalamud repository, not planned (DEC-039): [PULL_REQUEST](../publish/d17/PULL_REQUEST.md), "
-     "`testing/live/TenshoAssistant/manifest.toml`, icon",
-     "brouillon d'une soumission au dépôt officiel Dalamud, non prévue (DEC-039) : [PULL_REQUEST](../publish/d17/PULL_REQUEST.md), "
-     "`testing/live/TenshoAssistant/manifest.toml`, icône"),
     ([("../tools/", "../tools/README.md")], "contributors", "contributeurs",
      "read-only data probes (`ShopCurrencyProbe`, `ApiProbe`…) and data scripts (`discoveries-merge.py`: shared discoveries; "
      "`faq.py` and `docgen.py`: the generated parts of the documents) · `../scripts/`: `Verify.ps1` (checks), `Release.ps1` (commit and "
@@ -144,7 +139,6 @@ WORKING_INTRO = {
 # Public .md files that are not rows of the index, with the reason.
 INDEX_LEFT_OUT = {
     ".github/pull_request_template.md": "the pull request form, opened by GitHub",
-    "publish/d17/PULL_REQUEST.md": "linked from the publish/d17 row",
     "tools/README.md": "the tools row",
     "tools/PluginUiTest/README.md": "the pinned copy of the plugin UI test library (source: Shigu330/PluginUiTest), linked from tools/README.md (the tools row)",
 }

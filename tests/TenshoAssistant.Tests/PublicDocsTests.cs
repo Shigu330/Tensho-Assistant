@@ -65,7 +65,7 @@ internal static class PublicDocsTests
             var mark=new Regex(@"<!-- docgen:version -->([^<]*)<!-- /docgen:version -->");
             var marks=new HashSet<string>();
             foreach(var file in new[]{"README.md","CONTRIBUTING.md","SECURITY.md","src/TenshoAssistant/Localization/README.md","docs/README.md","docs/FAQ.md","tools/README.md",
-                "publish/d17/PULL_REQUEST.md","community-help/README.md","community-templates/README.md","community-discoveries/README.md"})
+                "community-help/README.md","community-templates/README.md","community-discoveries/README.md"})
             {
                 var text=Read(file);
                 foreach(Match found in mark.Matches(text))marks.Add(found.Groups[1].Value);

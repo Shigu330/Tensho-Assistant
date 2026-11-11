@@ -1,7 +1,0 @@
-[plugin]
-repository = "https://github.com/Shigu330/Tensho-Assistant.git"
-# Public commit to build: replace with the hash of the pushed commit before opening the pull request.
-commit = "REPLACE_WITH_PUSHED_COMMIT_HASH"
-owners = ["Shigu330"]
-project_path = "src/TenshoAssistant"
-changelog = "First submission: everyday tools in one window, with a guide and help on every page: items and storage, sorting rules, market prices, retainer sale prices, crafting simulator and solver, gathering and fishing, a map replacing the game map, weather, alarms and reminders, free company voyages and builds, quests, collections with how to obtain items, a gear planner, loot, Beastmaster information, Fashion Report, Mini Cactpot, Triple Triad against NPCs, character stats, macro chains, an optional Discord webhook for alarms (off by default) and a Credits page."
