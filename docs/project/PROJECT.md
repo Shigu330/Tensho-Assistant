@@ -31,16 +31,8 @@ PvE only ([DEC-032](DECISIONS.md)); game advice in PvE only ([DEC-033](DECISIONS
 ## Extensions asked for by the user
 
 The requests of [USER-REQUESTS](USER-REQUESTS.md) and the [global plan](GLOBAL-PLAN.md) add domains outside the 17 plugins, without
-removing any. In the code today (version 0.971, 2026-11-09), they are these pages of the navigation (`MainWindow.Pages.cs`), besides the
-pages of the 17 plugins:
-
-| Group | Pages added |
-|---|---|
-| Items | Storage, Lexicon |
-| Production | Ocean fishing, Island sanctuary, Custom deliveries |
-| World | Weather, FATEs, Alarms, Reminders, Garden, Free company, NPC vendors, Discoveries |
-| Progression | Events, Masked Carnivale, Relics, Allied societies, Grand Companies, Special deliveries, Eureka and Bozja, Deep dungeons, Gear, Chocobo, Guildleves, Hunting log, Beastmaster |
-| Preferences and top of the list | Help, Credits, My tools |
+removing any. Every page of the code, by group, is in the table of the [README](../../README.md) (« Overview »), written from the page list
+(`MainWindow.Pages.cs`) by `tools/docgen.py` at every version.
 
 The first of these requests, as they were planned:
 
@@ -90,16 +82,8 @@ tenues ([DEC-039](DECISIONS.md), [PUBLISHING](PUBLISHING.md)).
 ## Extensions demandées par l'utilisateur
 
 Les demandes de [USER-REQUESTS](USER-REQUESTS.md) et le [plan global](GLOBAL-PLAN.md) ajoutent des domaines hors des 17 plugins, sans en
-retirer aucun. Dans le code aujourd'hui (version 0.971, 2026-11-09), ce sont ces pages de la navigation (`MainWindow.Pages.cs`), en plus
-des pages des 17 plugins :
-
-| Groupe | Pages ajoutées |
-|---|---|
-| Objets | Rangements, Lexique |
-| Production | Pêche en mer, Félicité insulaire, Commandes spéciales |
-| Monde | Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs, Découvertes |
-| Progression | Événements, La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur |
-| Préférences et haut de la liste | Aide, Crédits, Mes outils |
+retirer aucun. Toutes les pages du code, par groupe, sont dans le tableau du [README](../../README.md) (« Vue d'ensemble »), écrit depuis la liste
+des pages (`MainWindow.Pages.cs`) par `tools/docgen.py` à chaque version.
 
 Les premières de ces demandes, telles qu'elles ont été prévues :
 

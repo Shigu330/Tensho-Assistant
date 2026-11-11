@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1066.0
+- Constat d'audit A051 : PROJECT et ROADMAP recopiaient à la main les pages ajoutées à côté des 17 plugins, telles qu'elles étaient à la 0.971 (groupes renommés et déplacés depuis). Le tableau du README est écrit depuis la liste des pages du code (MainWindow.Pages.cs) par tools/docgen.py à chaque version : les deux documents y renvoient maintenant, dans leurs deux langues, au lieu de garder une copie qui vieillit. Un test vérifie les renvois.
+- Tests : PageLists1066Tests. Verify.ps1 (agent) : 1748/1748, 0 avertissement, 0 erreur ; DLL 0.1066.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A051: PROJECT and ROADMAP copied by hand the pages added beside the 17 plugins, as they were at 0.971 (groups renamed and moved since). The README table is written from the code's page list (MainWindow.Pages.cs) by tools/docgen.py at every version: both documents now point to it, in both languages, instead of keeping a copy that goes stale. A test checks the pointers.
+
 ## 0.1065.0
 - Constats d'audit A054 et A075 (archive de REFERENCES) : l'archive française des fiches de référence avait une quarantaine de liens vers des fiches d'objectif qui ne vivent que sur le disque du mainteneur (liens morts sur GitHub). Ces liens deviennent de simples noms, et la note d'en-tête de l'archive dit où sont ces fiches. REFERENCES entre dans le test des liens morts de 0.1063.
 - Tests : ReferencesArchive1065Tests. Verify.ps1 (agent) : 1747/1747, 0 avertissement, 0 erreur ; DLL 0.1065.0.0. Rien à essayer en jeu.

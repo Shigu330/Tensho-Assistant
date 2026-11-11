@@ -70,10 +70,8 @@ game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repos
 
 ## Pages outside the 17 plugins
 
-The navigation of the code today (`MainWindow.Pages.cs`, version 0.971) has these pages besides those of the 17 plugins: Storage, Lexicon;
-Ocean fishing, Island sanctuary, Custom deliveries; Weather, FATEs, Alarms, Reminders, Garden, Free company, NPC vendors, Discoveries;
-Events, Masked Carnivale, Relics, Allied societies, Grand Companies, Special deliveries, Eureka and Bozja, Deep dungeons, Gear, Chocobo,
-Guildleves, Hunting log, Beastmaster; Help, Credits, My tools. The Character page was removed in 0.341 (the Gear page shows the same real
+Every page of the code, by group, is in the table of the [README](../../README.md) (« Overview »), written from the page list
+(`MainWindow.Pages.cs`) by `tools/docgen.py` at every version. The Character page was removed in 0.341 (the Gear page shows the same real
 values; the panel beside the game's Character window stays). Since 0.882 the Discoveries page also exchanges the players'
 in-game readings through GitHub, on the player's click or the opt-in daily exchange (no data taken from websites).
 
@@ -176,10 +174,8 @@ plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt
 
 ## Pages hors des 17 plugins
 
-La navigation du code aujourd'hui (`MainWindow.Pages.cs`, version 0.971) a ces pages en plus de celles des 17 plugins : Rangements,
-Lexique ; Pêche en mer, Félicité insulaire, Commandes spéciales ; Météo, ALÉA, Alarmes, Rappels, Jardinage, Compagnie libre, PNJ vendeurs,
-Découvertes ; Événements, La Grande Mascarade, Reliques, Peuples alliés, Grandes compagnies, Livraisons spéciales, Eureka et Bozja, Donjons
-profonds, Équipement, Chocobo, Mandats, Bestiaire, Dresseur ; Aide, Crédits, Mes outils. La page Personnage a été retirée en 0.341 (la page
+Toutes les pages du code, par groupe, sont dans le tableau du [README](../../README.md) (« Vue d'ensemble »), écrit depuis la liste
+des pages (`MainWindow.Pages.cs`) par `tools/docgen.py` à chaque version. La page Personnage a été retirée en 0.341 (la page
 Équipement montre les mêmes valeurs réelles ; le panneau à côté de la fenêtre Personnage du jeu reste). Depuis la 0.882, la page
 Découvertes échange aussi les relevés en jeu des joueurs par GitHub, sur clic du joueur ou par l'échange quotidien sur option (aucune
 donnée prise sur des sites web).
