@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1101.0
+- Découvertes partagées : le ticket #43 est fusionné dans le fichier commun (1967 faits, 0 refusé, 260 nouveaux ou changés) ; ils arrivent chez tous les joueurs avec la prochaine release.
+- Tests : CommunityMerge1101Tests. Verify.ps1 (agent) : 1795/1795, 0 avertissement, 0 erreur ; DLL 0.1101.0.0. Rien à essayer en jeu.
+### English
+- Shared discoveries: ticket #43 merged into the common file (1967 facts, 0 refused, 260 new or changed); they reach every player with the next release.
+
 ## 0.1100.0
 - Campagne d'essais en jeu triée : 114 essais retirés (rien à voir, doublons, remplacés par un essai plus récent sur le même code, déjà faits, migrations passées, textes que les tests prouvent, arrêts un par un de la visite guidée, testée en entier) ; TESTING et TESTING-ROUTE produits de nouveau avec les essais des versions récentes. Aucun essai déclaré validé.
 - Tests : TestingTriage1100Tests. Verify.ps1 (agent) : 1794/1794, 0 avertissement, 0 erreur ; DLL 0.1100.0.0. Rien à essayer en jeu.
