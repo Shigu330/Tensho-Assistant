@@ -240,6 +240,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         try
         {
             if(chat is not null)registrations.Register(()=>chat.ChatMessageUnhandled+=OnSpearChat,()=>chat.ChatMessageUnhandled-=OnSpearChat);
+            // 0.1096: the game's log messages that say where items came from (voyages, squadron), by row, in any language.
+            if(chat is not null)registrations.Register(()=>chat.LogMessage+=OnLogMessage,()=>chat.LogMessage-=OnLogMessage);
             registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update));
         }
         catch{registrations.Dispose();throw;}
@@ -269,6 +271,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
                 ReadFate(now);ReadTarget(now,at,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
+            SettleGains(now);
             var (counts,hqCounts)=Counts();
             if(before is null || beforeHq is null){before=counts;beforeHq=hqCounts;return;}
             var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);before=counts;
@@ -288,9 +291,10 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same),
                 field,deepDungeon);
             // 0.1003 (the check of the user's base: no monster drop noted): developer mode, the inputs of a gain put down to nothing, to find why.
+            // 0.1096: such a gain first waits a few seconds for its source (venture, voyage, squadron); see SettleGains.
             if(cause==ItemGains.Cause.None && debug())
-                log.Information("Item gain not attributed: {0}; busy {1}, duty {2}, own target dead {3} ms ago, FATE {4} ended {5} ms ago, spent {6}.",
-                    string.Join(", ",gains.Select(pair=>$"{pair.Key}x{pair.Value}")),busy || !wanted.ItemSources,duty,now-death.At,fateId,now-fateEndedAt,spent?.ToString() ?? "none");
+                unexplained.Add((string.Join(", ",gains.Select(pair=>$"{pair.Key}x{pair.Value}")),
+                    FormattableString.Invariant($"busy {busy || !wanted.ItemSources}, duty {duty}, own target dead {now-death.At} ms ago, FATE {fateId} ended {now-fateEndedAt} ms ago, spent {spent?.ToString() ?? "none"}")),now);
             foreach(var (item,count) in gains)
             {
                 var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;var hq=hqGains.ContainsKey(item);
@@ -352,6 +356,41 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                     if(slot.IsHq)hq[slot.BaseItemId]=hq.GetValueOrDefault(slot.BaseItemId)+slot.Quantity;
                 }
         return (counts,hq);
+    }
+
+    // 0.1096 (user report, 11/11 15 h): gains no cause explained, waiting for their source; and the log messages that name one.
+    private readonly PendingGains<(string Items,string Inputs)> unexplained=new();
+    private readonly object logGate=new();private readonly List<(GainSource Source,uint Detail,string? Note,long At)> logSources=[];
+
+    private void OnLogMessage(Dalamud.Game.Chat.ILogMessage message)
+    {
+        if(disposed || TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
+        try
+        {
+            var id=message.LogMessageId;
+            var source=GainLogMessages.SourceOf(id);var note=GainLogMessages.VoyageNote(id);
+            if(source==GainSource.None && note is null)return;
+            var detail=message.TryGetIntParameter(0,out var first) && first>0 ? (uint)first:0u;
+            if(note is not null && message.TryGetIntParameter(1,out var second) && second>0)detail=(uint)second;
+            lock(logGate){if(logSources.Count<32)logSources.Add((source,detail,note,Environment.TickCount64));}
+        }
+        catch(Exception){}
+    }
+
+    private void SettleGains(long now)
+    {
+        (GainSource Source,uint Detail,string? Note,long At)[] seen;
+        lock(logGate){seen=[..logSources];logSources.Clear();}
+        foreach(var (source,detail,note,at) in seen)
+        {
+            unexplained.Source(source,detail,at);
+            if(note is not null && debug())log.Information("Discovery: {0} {1} (game log message).",note,detail);
+        }
+        if(unexplained.Waiting==0)return;
+        var (explained,alone)=unexplained.Settle(now);
+        if(!debug())return;
+        foreach(var ((items,_),source,detail) in explained)log.Information("Item gain attributed: {0} from {1} {2}.",items,source,detail);
+        foreach(var (items,inputs) in alone)log.Information("Item gain not attributed: {0}; {1}.",items,inputs);
     }
 
     private void ReadSalvage(DateTimeOffset at)
@@ -528,6 +567,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(rewards.Count==0 || signature==ventureSeen)return;
         ventureSeen=signature;
         foreach(var (item,count,hq) in rewards)store.SeeSource(DiscoveryKind.Venture,item,task,count,at,hq:hq);
+        unexplained.Source(GainSource.Venture,task,Environment.TickCount64);
         if(debug())log.Information("Discovery: venture {0}.",signature);
     }
 
