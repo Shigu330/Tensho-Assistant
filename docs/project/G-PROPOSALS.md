@@ -3,7 +3,8 @@
 > *Traduction française plus bas.*
 
 This document is kept during the development of step g) (the gaps of GAPS.md). It records the ideas spotted while coding and the
-choices made provisionally, to review them together with the user (step h and the decisions at the end). Nothing here is decided yet.
+choices made provisionally, to review them together with the user (step h and the decisions at the end). What has been decided since is marked
+as such (DEC-026 and later); the rest is still open.
 The provisional choices are also recalled in the [ROADMAP](ROADMAP.md), "Decisions postponed to the end".
 Reread on 2026-11-03 (0.446): an alternative done since then is marked "DONE x.y" in its column; what remains is the choice itself to confirm.
 **DECIDED 2026-11-03 (DEC-026)**: all the provisional choices below are confirmed by the user, except X-13 (sending to the chat on click
@@ -73,6 +74,11 @@ Finding (0.991): the navigation has 8 groups; "Progression" has 16 pages and "Wo
 Settings: each setting also stays next to its tool (as today), and the Settings page groups them by the same groups as the navigation:
 General (language, theme, fonts, chat, sounds) · Panels beside the game's windows (gathering, crafting, collectable, retainers' sales, mission search, Fashion Report, Triple Triad, beastmaster board…) · Map · Tracking and notifications (alarms, reminders, Discord, server bar: currencies, gil) · Data and sources (community sources, cache, discoveries) · Advanced · Debug.
 Plus a search field at the top of the Settings that finds any setting by its name (all 320) and opens its tab.
+
+## Proposal 11 (X-40): nearby monsters, other uses — **decided (DEC-049)**, coded in 0.1002
+
+| No. | Proposal | Alternatives |
+|---|---|---|
 | 11 | Nearby monsters, other uses (X-40); today: your lists, hunting log, FATEs, blue mage, missing collections, beastmaster, guildleve targets | Add (each one a layer of the map, ticked in Settings › Map and on its page): a) the monster drops an ingredient of one of your crafting lists (loot seen in game, then wiki); b) target of a relic book in progress (Zodiac: "defeat N …"); c) the monster drops an item from your wishes | Only a); or nothing |
 
 ---
@@ -80,8 +86,8 @@ Plus a search field at the top of the Settings that finds any setting by its nam
 # Propositions et choix provisoires de l'étape g) — à revoir ensemble
 
 Ce document est tenu pendant le développement de l'étape g) (les écarts de GAPS.md). On y note les idées repérées en codant et les
-choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (étape h et décisions de la fin). Rien ici n'est encore
-décidé. Les choix provisoires sont aussi rappelés dans la [ROADMAP](ROADMAP.md), « Décisions reportées à la fin ».
+choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (étape h et décisions de la fin). Ce qui a été décidé
+depuis est marqué comme tel (DEC-026 et suivantes) ; le reste est encore ouvert. Les choix provisoires sont aussi rappelés dans la [ROADMAP](ROADMAP.md), « Décisions reportées à la fin ».
 Relu le 2026-11-03 (0.446) : une alternative faite depuis est marquée « FAIT x.y » dans sa colonne ; il reste alors le choix lui-même à confirmer.
 **DÉCIDÉ 2026-11-03 (DEC-026)** : tous les choix provisoires ci-dessous sont confirmés par l'utilisateur, sauf X-13 (envoi au chat sur clic
 ajouté en 0.447) ; leurs alternatives restent des idées. X-04 : simple lien (0.447). Écarts : A-03 / A-04 étudiés en séance ; N-06 et N-14 :
@@ -150,4 +156,9 @@ Constat (0.991) : la navigation a 8 groupes ; « Progression » compte 16 pages 
 Réglages : chaque réglage reste aussi à côté de son outil (comme aujourd'hui), et la page Paramètres les regroupe par les mêmes groupes que la navigation :
 Général (langue, thème, polices, discussion, sons) · Panneaux à côté des fenêtres du jeu (récolte, artisanat, collectionnable, ventes des servants, recherche de mission, revue de mode, Triple Triade, plateau du dresseur…) · Carte · Suivi et notifications (alarmes, rappels, Discord, barre du serveur : monnaies, gils) · Données et sources (sources communautaires, cache, découvertes) · Avancé · Débogage.
 Plus un champ de recherche en haut des Paramètres qui trouve n'importe quel réglage par son nom (les 320) et ouvre son onglet.
+
+## Proposition 11 (X-40) : monstres proches, autres usages — **décidée (DEC-049)**, codée en 0.1002
+
+| N° | Proposition | Autres choix |
+|---|---|---|
 | 11 | Monstres proches, autres usages (X-40) ; aujourd'hui : vos listes, carnet de chasse, ALÉA, mage bleu, collections manquantes, dresseur, cibles de mandat | Ajouter (chacun une couche de la carte, cochée dans Paramètres › Carte et sur sa page) : a) le monstre fait tomber un ingrédient d'une de vos listes d'artisanat (butin vu en jeu, puis wiki) ; b) cible d'un livre de relique en cours (Zodiaque : « vaincre N … ») ; c) le monstre fait tomber un objet de vos souhaits | Seulement a) ; ou rien |

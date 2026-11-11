@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1059.0
+- Constat d'audit A055 (forme) : G-PROPOSALS s'ouvrait sur « rien ici n'est encore décidé » juste au-dessus de la ligne disant que DEC-026 a confirmé les choix provisoires, et la proposition n° 11 (X-40, monstres proches) était une ligne de tableau collée à la fin du texte de X-100, sans tableau. L'ouverture dit maintenant que ce qui est décidé est marqué ; la proposition 11 a son titre (décidée par DEC-049, codée en 0.1002) et son en-tête de tableau, dans les deux langues. Un test vérifie l'ouverture et qu'aucune ligne de tableau n'est hors d'un tableau.
+- Tests : ProposalsShape1059Tests. Verify.ps1 (agent) : 1740/1740, 0 avertissement, 0 erreur ; DLL 0.1059.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A055 (shape): G-PROPOSALS opened with "nothing here is decided yet" right above the line saying DEC-026 confirmed the provisional choices, and proposal no. 11 (X-40, nearby monsters) was a table row glued to the end of the X-100 text, without a table. The opening now says that what is decided is marked; proposal 11 has its heading (decided by DEC-049, coded in 0.1002) and its table header, in both languages. A test checks the opening and that no table row sits outside a table.
+
 ## 0.1058.0
 - Constat d'audit A062 (partie CONTENT-TOOLS) : les trois questions de fin de CONTENT-TOOLS semblaient ouvertes alors que DEC-045 (2026-11-09, point 8) a répondu aux deux premières (notes et schéma de l'arène dans la fenêtre de Tensho, hors combat ; bestiaire avec les notes du wiki, hors du donjon). Les réponses suivent maintenant les questions, dans les deux langues ; la troisième (suivi partagé des NM d'Eurêka par un site tiers) n'était pas dans ce lot et reste ouverte. Un test vérifie les deux moitiés.
 - Tests : ContentToolsAnswers1058Tests. Verify.ps1 (agent) : 1738/1738, 0 avertissement, 0 erreur ; DLL 0.1058.0.0. Rien à essayer en jeu.
