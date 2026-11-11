@@ -22,7 +22,7 @@ livré à côté de la DLL depuis 0.248 ; aucune assembly de l'hôte redistribu�
   dépôt**, avec le SDK que choisit Verify.ps1 (le plus récent `%USERPROFILE%\.codex\dotnet-10.*\dotnet.exe` s'il existe, sinon
   `C:\ia-code\.tools\dotnet10\dotnet.exe`, sinon `dotnet`). Le test des infobulles de réglages lit `src/TenshoAssistant` et ses langues ; ceux de la compagnie libre lisent
   `src/TenshoAssistant/FreeCompany/Data/`.
-- Dernier passage : voir [STATUS](../ai/STATUS.md), première ligne. En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
+- Dernier passage : ligne « Tests » de la dernière entrée du [CHANGELOG](../../CHANGELOG.md). En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
 
 Les tests couvrent la logique pure : 87 fichiers `*Tests.cs` (un par domaine : inventaire, banque et tri, artisanat et macros, récolte et
 pêche, météo et alarmes, carte et projection, marchands PNJ, collections, quêtes, sources Garland / wiki / LuminaSupplemental, cache
@@ -32,65 +32,11 @@ Ils ne couvrent pas : lecture de la mémoire du jeu (sacs, atelier de la compagn
 réelles (vérifiées par les sondes de `tools/`, sorties dans [docs/evidence/](../evidence/)), rendu ImGui et clics, requêtes HTTP réelles
 (Universalis, Garland, wiki, GitHub, Teamcraft : transport simulé ou extraits enregistrés).
 
-### Inventaire des tests (569 au 0.315.0 ; liste non reprise depuis, le nombre courant est dans STATUS)
+### Inventaire des tests
 
-Sortie : une ligne `PASS <nom>` (ou `FAIL <nom>: …`) par test, puis `N/N passed`. Depuis le dernier inventaire de cette page (0.154.0,
-532 tests), **37 tests ajoutés**, aucun retiré : sortie actuelle comparée aux sources de `checkpoints/TenshoAssistant-0.153.0-source.zip`
-(dossier local). Version = première version du CHANGELOG à ce nombre de tests, ou version citée par le CHANGELOG.
-
-**0.232 → 0.315 : 12 tests, écrits dans `Program.cs`**
-
-| Version | Domaine | Nom (sortie `PASS`) |
-|---|---|---|
-| 0.270 | Marché : annonces et ventes | Market board parses listings and sales, names the world of a world scope and keeps the tax |
-| 0.270 | Marché : filtres | Market filter applies quality, quantity, price and world bounds |
-| 0.270 | Marché : coût pour N unités | Cheapest plan buys whole listings, may skip the lowest unit price and says when units are missing |
-| 0.277 | Triple Triade : score (cartes Ex. ajoutées en 0.278) | Triad card score follows the stated formula for each rule |
-| 0.285 | Quêtes : cités de départ | Starting-city quests are those whose chain leads back to one city only; the played city is the one with a completed quest |
-| 0.286 | Quêtes : options non prises | Options not taken (locks, branches) are unplayable, with propagation, and completed quests never are |
-| 0.287 | Infobulles des réglages (en / fr) | Every setting tooltip named in the code exists in English and French (R-06 step 5) |
-| 0.300 | Rappels : remises à zéro | Reminder resets follow the game's calendar times in UTC |
-| 0.307 | Compagnie libre : expéditions | Free company voyages: state, experience, merge by house and change detection (R-07) |
-| 0.309 | Compagnie libre : trajets | Submarine route planner: distance, time, best order, range and loot value (R-07) |
-| 0.310 | Équipement (complété 0.311 mirage, 0.312 matérias et plafonds) | Gear planner: level window, candidates, totals, planned stats and build codes (R-11) |
-| 0.315 | Compagnie libre : montages | Vessel builds: stats, capacity, ranks, breakpoints, wear, build names and best builds (R-11 step 3) |
-
-**0.155 → 0.231 : 25 tests, dans les fichiers de domaine**
-
-- `TriadMatchAdvisorTests` (0.160) :
-  - Triad advice fills hidden NPC cards from the deck and plays the card imposed by Chaos
-  - Triad advice maps rules and refuses unclear matches instead of guessing
-  - Triad frame keeps match context copies and drops incomplete rectangles
-- `TriadMatchSimulatorTests` :
-  - Triad simulation is reproducible and ranks a strong deck above a weak one
-  - Triad deck generator respects rarity limits and does not do worse than its start
-- `TriadNpcCatalogTests` : Triad NPCs to face: not beaten or with missing cards first, unknown counts as not beaten
-- `TriadCardTests` (+1) : Triad NPC decks persist with their NPC name and older configuration has none
-- `MiniCactpotObservationTests` (+1) : Cactpot overlay keeps button rectangles only when complete and maps solver lines to game buttons
-- `CompletionMemoryTests` :
-  - Titles and achievements keep obtained states and keep not-obtained only while fresh
-  - Retainers and saddlebags are saved automatically unless turned off, older configurations included
-- `StatFormulaTests` : Combat stats give real values with the game rounding and only the stats of the job
-- `MapProjectionTests` (+2) :
-  - Map variants of one territory with the same scale and offset share positions
-  - Vendor joins the game icon it stands by: shops at 16 pixels, unlabelled services at 8
-- `DutyLootTests` (+1, 0.187) : Duty loot keeps the boss coffer of a real Garland raid document (A4S, 2026-10-31)
-- `LuminaSupplementalTests` :
-  - LuminaSupplemental gives boss coffers, boss drops and chests of a duty by its ContentFinderCondition id
-  - LuminaSupplemental item uses: what an item gives, the quests asking for it, and the NPCs of unlinked shops (0.209)
-  - GatherBuddy fish data: bait, mooch route, bite, ET window, weathers, lure and predators read from its source files (0.227 ; ancien
-    format ajouté en 0.229)
-  - Teamcraft bite times: range of the well reported seconds, usual second, few stray reports ignored (0.231)
-- `MacroSlotPlanTests` (0.191) : Crafting macros only go into the chosen range, into empty or Tensho slots unless overwriting is allowed
-- `AlarmScheduleTests` (à partir de 0.201) :
-  - Daily ET alarms recur every 70 real minutes at the ET time and ring once per occurrence within their lead
-  - Alarms with weather conditions skip occurrences without that weather and treat an unknown forecast as no match
-  - Window alarms are one per ET start, single alarms expire, and the list is bounded
-  - Game alarm commands use the game's /alarm syntax with an ET daily time, a 0-60 reminder, a sound and a 20-character name
-  - Fashion Report weeks start on Tuesday 08:00 UTC and the slots follow the game window
-  - Bountiful II estimate: +3 from 110 % of the base, +2 from 90 %, else +1, unknown without rating or base (0.224)
-
-Tests existants mis à jour sans changer le nombre : 0.289 (nouvelles valeurs par défaut de la carte : suivi du zoom 15 %, priorités).
+Sortie : une ligne `PASS <nom>` (ou `FAIL <nom>: …`) par test, puis `N/N passed`. Le nombre courant est donné par `Verify.ps1` et
+repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELOG.md). L'ancien inventaire (569 tests au 0.315.0) a
+été retiré en 0.1075 : il reste dans l'historique git (version 0.1074.0 : `git show 8bda2ca:docs/project/TESTING.md`).
 
 ### Essai en jeu
 
@@ -99,7 +45,7 @@ Tests existants mis à jour sans changer le nombre : 0.289 (nouvelles valeurs pa
 2. Suivre la liste ci-dessous, ou le protocole de la version dans [CHANGELOG.md](../../CHANGELOG.md) / le document d'objectif
    (`docs/goals/<ID>.md`).
 3. Rapporter : version, ce qui a été observé, captures si possible, et `dalamud.log` / `dalamud.crashhandler.log` en cas d'erreur.
-   Seul ce rapport permet d'écrire « validé en jeu » ; la liste à jour est dans [STATUS](../ai/STATUS.md).
+   Seul ce rapport permet d'écrire « validé en jeu » ; il se reporte en cochant la case de l'essai sur cette page.
 
 Contrôles de base à refaire après un changement de cycle de vie : rechargement/déchargement répété sans double callback ni commande
 orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu (touche M) revient normale une fois le plugin déchargé.
@@ -108,7 +54,7 @@ orpheline ; préférence « ouvrir au chargement » respectée ; la carte du jeu
 
 Parcours de la campagne de la phase 6, les mêmes essais rangés par activité : [TESTING-ROUTE.md](TESTING-ROUTE.md) (2026-11-09).
 
-Non validé en jeu d'après [STATUS](../ai/STATUS.md) : 0.232–0.302, 0.307–0.309, 0.315. Dans cette plage, déjà rapporté OK par
+Non validé en jeu au 2026-11-02 : 0.232–0.302, 0.307–0.309, 0.315. Dans cette plage, déjà rapporté OK par
 l'utilisateur le 2026-11-02 (ne pas refaire) : 0.265–0.271, 0.276–0.279, 0.283–0.289, 0.290–0.292 (légèreté seulement), 0.293–0.299 ;
 hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagnie, pas de sous-marin…) se rapporte « non essayé », pas « OK ».
 0.234 ne change que l'outil de release : rien à essayer en jeu.

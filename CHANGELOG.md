@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1075.0
+- Constat d'audit A043, deuxième partie : TESTING gardait un inventaire des tests figé au 0.315.0 (569 tests, une soixantaine de lignes, qui citait une archive locale) et renvoyait trois fois au fichier d'état du mainteneur, absent du dépôt. L'inventaire est remplacé par un paragraphe (nombre courant : sortie de Verify.ps1 et ligne « Tests » de chaque entrée du CHANGELOG ; ancienne liste : historique git), et les trois renvois disent maintenant où trouver l'information (CHANGELOG, cases de la page). Aucune case d'essai ne change. Un test vérifie le retrait et l'absence de lien vers les notes du mainteneur.
+- Tests : TestingInventory1075Tests. Verify.ps1 (agent) : 1758/1758, 0 avertissement, 0 erreur ; DLL 0.1075.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A043, second part: TESTING kept a test inventory frozen at 0.315.0 (569 tests, about sixty lines, citing a local archive) and sent readers three times to the maintainer's state file, which is not in the repository. The inventory is replaced by one paragraph (current count: the Verify.ps1 output and the « Tests » line of each CHANGELOG entry; old list: git history), and the three pointers now say where the information is (CHANGELOG, boxes of the page). No test box changes. A test checks the removal and that no link to the maintainer's notes is left.
+
 ## 0.1074.0
 - Constats d'audit A043 et A045, vocabulaire : l'ancienne file de travail a) à h) a été remplacée par les phases du plan global, et sa dernière étape, « étape h » (la campagne d'essais en jeu de la fin), est la phase 6. TESTING disait encore « étape h » dans 150 titres, et trois documents de propositions une fois dans chaque langue : ils disent maintenant « phase 6 » (les preuves gardent leurs mots, elles datent de leur jour). Seuls des titres changent, aucune case d'essai. Un test vérifie qu'« étape h » ne revient pas.
 - Tests : StepH1074Tests. Verify.ps1 (agent) : 1757/1757, 0 avertissement, 0 erreur ; DLL 0.1074.0.0. Rien à essayer en jeu.
