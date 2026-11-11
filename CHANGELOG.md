@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1078.0
+- Constat d'audit A070, en partie : le CHANGELOG avait trois versions avec deux titres chacune (0.59.0, 0.50.0, 0.49.0), le second vide (ou les deux). Les titres vides en double sont retirés ; un test garde chaque titre de version unique. Le découpage du CHANGELOG, que lit le script de release, reste ouvert.
+- Tests : ChangelogHeadings1078Tests. Verify.ps1 (agent) : 1761/1761, 0 avertissement, 0 erreur ; DLL 0.1078.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A070, in part: the CHANGELOG had three versions with two headings each (0.59.0, 0.50.0, 0.49.0), the second one (or both) empty. The empty duplicate headings are removed; a test keeps each version heading unique. Splitting the CHANGELOG, which the release script reads, stays open.
+
 ## 0.1077.0
 - Constat d'audit A055, reste : G-PROPOSALS listait six « idées repérées en codant (non faites) ». Relues une par une contre le CHANGELOG et le code, cinq sont faites (alerte du plafond hebdomadaire des mémoquartz en 0.606, liste des objets annotés en 0.607, stocks des autres personnages dans la fiche d'objet en 0.609, rangement inchangé non réécrit en 0.605, gils des servants dans la page Personnages en 0.767) et une ne l'est pas (prix moyen de vente récent avant de coller un prix de sous-cotation). La section donne maintenant l'état de chaque idée, dans les deux langues. Un test vérifie les états et que les textes cités existent toujours.
 - Tests : CodingIdeas1077Tests. Verify.ps1 (agent) : 1760/1760, 0 avertissement, 0 erreur ; DLL 0.1077.0.0. Rien à essayer en jeu.
@@ -8791,8 +8797,6 @@ No code change: an agent error published this number with the fix not applied an
 - DLL canonique : C:\Plugins-ff14\src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll ; version 0.59.0.0.
 - Seule autre copie sous bin : archive legacy-Release-20261027 0.5.22.0, laissée intacte ; aucun ancien bin/Release actif.
 
-## 0.59.0
-
 ## 0.58.0
 - ConfigSerializationProbe : Newtonsoft None/Auto/Objects avec filtres et masque combiné passants.
 - FashionProbe natif sans réseau : 269 indices, 20 238 Wearable, 7 804 MainHand, 984 OffHand, 31 SoulCrystal, 51 vêtements bloquant Head ; OffHand négatifs exclus.
@@ -8838,10 +8842,6 @@ No code change: an agent error published this number with the fix not applied an
 ## 0.51.0
 
 ## 0.50.0
-
-## 0.50.0
-
-## 0.49.0
 
 ## 0.49.0
 
