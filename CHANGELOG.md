@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1080.0
+- Constats d'audit A075, A025 et A100, liens : après les lots du relais précédent, une lecture de tous les fichiers Markdown suivis trouve encore deux liens vers les notes du mainteneur, hors dépôt, dans d'anciennes entrées du CHANGELOG (0.159, 0.469) ; ils deviennent de simples noms. Un test à cliquet refuse désormais tout lien Markdown d'un fichier suivi vers un chemin que git ne suit pas (la liste vient de git, elle ne nomme aucun chemin local), sur le PC comme dans la CI.
+- Tests : TrackedLinks1080Tests. Verify.ps1 (agent) : 1764/1764, 0 avertissement, 0 erreur ; DLL 0.1080.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A075, A025 and A100, links: after the previous relay's batches, a reading of every tracked Markdown file still finds two links to the maintainer's notes, outside the repository, in old CHANGELOG entries (0.159, 0.469); they become plain names. A ratchet test now refuses any Markdown link of a tracked file to a path that git does not track (the list comes from git, it names no local path), on the PC as in the CI.
+
 ## 0.1079.0
 - Constat d'audit A043, fin : dans TESTING, le titre « 0.537 : s'effacer devant les fenêtres du jeu » était suivi de ses quatre essais puis d'environ 950 lignes d'essais à partir de 0.538, qui semblaient lui appartenir. Un titre ouvre maintenant ces essais (chacun porte sa version). Les cases cochées restent : l'outil des essais les coche avant une release et elles sont la trace publique de ce qui a été validé ; les cases « rien à faire » restent aussi, ce sont des lectures du journal faites par l'agent, et les cases « aucun essai » sont déjà comptées à part par l'outil. Un test vérifie l'ordre des titres.
 - Tests : TestingHeading1079Tests. Verify.ps1 (agent) : 1762/1762, 0 avertissement, 0 erreur ; DLL 0.1079.0.0. Rien à essayer en jeu.
@@ -3781,7 +3787,7 @@ No code change: an agent error published this number with the fix not applied an
 - Demande de l'utilisateur : dans le carnet, Manipulation est une case et l'icône du skill, sans texte. Repas et remède ont l'icône et la bulle de l'objet (aussi dans le simulateur) ; seuls ceux qui ont un bonus d'artisanat comptent, un autre repas se lit « aucun ».
 - Demande de l'utilisateur (« restyliser la fenêtre liée au carnet ») : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité, section de séquence enregistrée masquée s'il n'y en a pas, explications dans la bulle de « (?) ». Le texte « Manipulation exclue : déblocage non observé » datait d'avant la détection : retiré.
 - Tests : GcSupply469Tests (6). Verify.ps1 (agent) : 885/885, 0 avertissement, 0 erreur ; DLL 0.469.0.0. Non validé en jeu.
-- Plans ajoutés, sans code : chat personnalisable (CHAT-001 (document retiré depuis)) et modèles communautaires ([TEMPLATES-001](docs/goals/TEMPLATES-001.md)), avec les décisions à prendre.
+- Plans ajoutés, sans code : chat personnalisable (CHAT-001 (document retiré depuis)) et modèles communautaires (TEMPLATES-001, notes du mainteneur hors dépôt), avec les décisions à prendre.
 ### English
 - Plans added, without code: customisable chat and community templates, with the decisions to take.
 - Today's Grand Company request is now read from the game's supply missions window; item tooltips say requested, not among what was opened, or how to open it.
@@ -8319,7 +8325,7 @@ No code change: an agent error published this number with the fix not applied an
 - Tests : 3 groupes `TriadMatchAdvisorTests` sur la position réelle de 14:39:58 (cartes cachées = Cid et Sadu, révélées ensuite ; carte
   imposée respectée ; refus). Verify.ps1 (agent) : 537/537, 0 avertissement, 0 erreur ; DLL 0.160.0.0. VALIDATED_IN_GAME : « test ok » (utilisateur, 2026-10-31).
 ## 0.159.0
-- Demande : « commence Triad » (TRIAD-003, finir l'outil comme TriadBuddy ; plan : [docs/goals/TRIAD-003-PLAN.md](docs/goals/TRIAD-003-PLAN.md)).
+- Demande : « commence Triad » (TRIAD-003, finir l'outil comme TriadBuddy ; plan : TRIAD-003-PLAN, notes du mainteneur hors dépôt).
 - Preuve hors jeu : sonde `PROBE_TRIAD` — 146 lignes TripleTriad, 144 PNJ liés par ENpcData, règles (Roulette, Toutes/Trois sur table,
   Identique, Mort subite, Plus, Aléatoire, Ordre, Chaos, Inversion, Tueur d'as, Bonus, Malus, Échange, Draft), cartes fixes et variables,
   récompenses, 46 PNJ aux règles régionales ([docs/evidence/0.159.0-triad-npc-probe.log](docs/evidence/0.159.0-triad-npc-probe.log)).
