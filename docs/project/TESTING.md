@@ -1690,6 +1690,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1109) Jardin › journal, un potager planté (au moins deux parcelles voisines de graines qui se croisent) : sous la parcelle plantée en second, « Peut donner : … (avec la parcelle N, …) » ; une graine pas possédée ou souhaitée est redite en couleur ; la ligne « Prévisions : … » sous la grille
 
+- [ ] (0.1113) Paramètres › Avancé › Application de bureau : l'état dit « pas installée » (ou la version installée) ; « Installer l'application de bureau » : la ligne passe par « demande à GitHub », « téléchargement », « dépaquetage », puis « installée » ; l'application ne s'ouvre pas seule
+
+- [ ] (0.1113) Même section : « Ouvrir l'application de bureau » lance l'application (barre d'état : version du plugin, même version) ; « Ouvrir son dossier » ouvre le dossier de la version ; « Page de la release » ouvre GitHub
+
+- [ ] (0.1113) Même section : un dossier d'installation tapé (par exemple D:\Tensho) est gardé ; un chemin pas complet est signalé en orange ; la case « Mise à jour automatique de l'application de bureau » suit celle de l'application
+
+- [ ] (0.1114) Lien activé (Paramètres › Avancé), application de bureau ouverte : la barre d'état dit la zone, la classe et son niveau, les PR (récolteur) et les places libres des sacs ; ils suivent le jeu en une ou deux secondes
+
+- [ ] (0.1114) Lien activé : changer un réglage de Tensho dans le jeu (par exemple une alarme ou un thème), l'application dit « Réglages du plugin relus à … » et la page montre le changement
+
+- [ ] (0.1114) Contenu classé ou JcJ : l'application dit « en pause », sans états en direct
+
+- [ ] (0.1115) Dédale bestial (dresseur) : à l'entrée, pas de ligne « Tensho en pause » dans le chat ; les pages et panneaux de Tensho restent ouverts pendant le plateau et les combats ; en JcJ, la coupure se fait toujours
+
+- [ ] (0.1116) Mode développeur activé, jouer un plateau du Dédale jusqu'au résultat : dalamud.log contient « Labyrinth reading: … windows: … » avec le nom de la fenêtre du résultat et des lignes « Labyrinth window XBM…: values=… » (nombres seulement) ; les donner à l'agent pour coder X-135
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
