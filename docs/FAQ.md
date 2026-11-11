@@ -74,7 +74,7 @@ Yes, with no step from you. At start (and on « Check for update ») it asks thi
 
 ## How do I link the desktop app to the game?
 
-In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions.
+In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in, your job and level, GP and your bags' free slots. When the game saves Tensho's settings, the app reads them again (its pages follow). The link is a local named pipe open to your Windows user only, with no network port; the app only reads. The other live parts of the pages and the actions come in later versions.
 
 ## Can Tensho install the desktop app for me?
 
@@ -160,7 +160,7 @@ Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jou
 
 ## Comment relier l'application de bureau au jeu ?
 
-Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes.
+Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes, votre classe et son niveau, vos PR et les places libres de vos sacs. Quand le jeu enregistre les réglages de Tensho, l'application les relit (ses pages suivent). Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Les autres parties en direct des pages et les actions viendront dans des versions suivantes.
 
 ## Tensho peut-il installer l'application de bureau pour moi ?
 

@@ -782,7 +782,7 @@ public sealed class Plugin : IDalamudPlugin
                 ? territory.PlaceName.Value.Name.ExtractText():null;
             // X-119 step 2 (0.1081): the local link with the desktop application: a named pipe for the current user only, opened only while
             // Settings › Advanced « Link with the desktop app » is on; once a second, who and where (docs/evidence/x119-desktop-link.md).
-            registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,configuration,id=>mainWindow.TerritoryName?.Invoke(id),
+            registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,id=>mainWindow.TerritoryName?.Invoke(id),
                 typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log);mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
                 ()=>{mainWindow.DesktopLinkStatus=null;linkFeed?.Dispose();linkFeed=null;});
             // X-126 (0.1113, D-137): the desktop app installed from Settings › Advanced, on a click only; left out of a build made with

@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1114.0
+- Lien local avec l'application de bureau, protocole 2 (X-119 étape 2 suite, partie 1) : en plus de qui et où, le plugin envoie sa classe et son niveau, ses PR et les places libres des sacs, et les noms des fichiers enregistrés de Tensho que le jeu vient d'écrire (jamais leur contenu ; bornes : 16 noms de 160 caractères, ligne de 8 Ko). L'application relit elle-même le fichier de réglages du plugin quand le jeu l'enregistre (ses pages suivent les réglages du jeu) et montre ces états dans sa barre d'état. Info-bulle du réglage et FAQ du lien mises à jour.
+- Tests : LinkLive1114Tests. Verify.ps1 (agent) : 1822/1822, 0 avertissement, 0 erreur ; DLL 0.1114.0.0. Non validé en jeu.
+### English
+- Local link with the desktop application, protocol 2 (X-119 step 2 suite, part 1): besides who and where, the plugin sends its job and level, GP and the bags' free slots, and the names of Tensho's saved files the game just wrote (never their content; bounds: 16 names of 160 characters, 8 KB line). The application reads the plugin's settings file again itself when the game saves it (its pages follow the game's settings) and shows those states in its status bar. The setting's tooltip and the link's FAQ are updated.
+
 ## 0.1113.0
 - Plan global, X-126 : Application de bureau installable depuis Paramètres › Avancé › Application de bureau (facultatif, décision D-137) : état face au plugin (pas installée, plus ancienne, à jour, plus récente), dossier d'installation, « Installer » ou « Mettre à jour » (release GitHub de la version du plugin, sinon la dernière Stable ; SHA-256 vérifié avec celui de la release ; dépaquetée à côté), « Ouvrir l'application de bureau » (jamais lancée sans ce clic), « Ouvrir son dossier », « Page de la release », « Mise à jour automatique de l'application de bureau ». Aucune requête sans clic. L'installation est un seul code partagé avec la mise à jour de l'application (DesktopInstall.cs). Une compilation avec TenshoDesktopInstall=false la retire. FAQ « Tensho peut-il installer l'application de bureau pour moi ? », source réseau dans SECURITY.
 - Tests : DesktopInstall1113Tests. Verify.ps1 (agent) : 1819/1819, 0 avertissement, 0 erreur ; DLL 0.1113.0.0. Non validé en jeu.

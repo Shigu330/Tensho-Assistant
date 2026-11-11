@@ -180,6 +180,8 @@ internal static class Program
             if(loaders.Count==0 && readyAt<0)readyAt=frame;
             // --zone: once the weather catalogue is there (the page's own « open a zone » call).
             if(zone is { } wanted && loaders.All(l=>l.Name!="WeatherCatalogLoader")){Headless.OpenZone(host,wanted);zone=null;}
+            // X-119 step 2 (0.1114): the plugin's settings read again when the game saved them (a notice of the link).
+            status.Poll();
             status.Redirect();
             // --click=x,y: a left click at that point of the window, on frames 30 to 32 (through ImGui's input queue, as the window's own mouse).
             if(Option(args,"--click=") is { } click && click.Split(',') is [var cx,var cy] && frame is >=30 and <=32)

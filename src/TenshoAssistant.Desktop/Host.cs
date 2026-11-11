@@ -30,6 +30,8 @@ internal sealed class Host
     private readonly List<object> loaders=[];
     private readonly Type pageType;
     private readonly FieldInfo pageField;
+    private readonly string? settingsPath;
+    private readonly Type configurationType;
 
     /// <summary>The plugin's catalogue loaders that need only (service, IDataManager, IFramework, IPluginLog[, DataCache]) (Plugin.cs).</summary>
     public static readonly string[] Loaders=["MapCatalogLoader","WeatherCatalogLoader","DutyCatalogLoader","GpCatalogLoader","CraftActionCatalogLoader","FashionHintLoader",
@@ -39,7 +41,8 @@ internal sealed class Host
     {
         Plugin=System.Runtime.Loader.AssemblyLoadContext.Default.LoadFromAssemblyPath(pluginPath);
         var pluginDirectory=Path.GetDirectoryName(pluginPath)!;
-        var configurationType=Plugin.GetType("TenshoAssistant.Configuration",true)!;
+        configurationType=Plugin.GetType("TenshoAssistant.Configuration",true)!;
+        this.settingsPath=settingsPath;
         var saved=ReadSettings(settingsPath,configurationType,out SettingsNote);
         if(saved is not null)made[configurationType]=saved;
         var savedCode=saved is null ? null : configurationType.GetProperty("LanguageCode")?.GetValue(saved) as string;
@@ -87,6 +90,32 @@ internal sealed class Host
             return value;
         }
         catch(Exception error){note=$"new (saved settings unreadable: {error.GetType().Name}: {error.Message})";return null;}
+    }
+
+    /// <summary>
+    /// X-119 step 2 (0.1114): the plugin's saved settings read again into the window's own Configuration when the link says the game saved
+    /// them, so the pages follow the game; read-only as at start (Newtonsoft's populate, lists and objects replaced, not merged). On the UI
+    /// thread, between frames. A note in English of what happened (« not read again » when the file was being written: the next save retries).
+    /// </summary>
+    public string ReloadSettings()
+    {
+        if(settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null)return "not read again: no saved settings were read at start";
+        try
+        {
+            var settings=new Newtonsoft.Json.JsonSerializerSettings
+            {
+                TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,
+                TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,
+                SerializationBinder=new PluginBinder(Plugin),
+                ObjectCreationHandling=Newtonsoft.Json.ObjectCreationHandling.Replace,
+            };
+            Newtonsoft.Json.JsonConvert.PopulateObject(File.ReadAllText(settingsPath),target,settings);
+            return "read again from "+settingsPath;
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or Newtonsoft.Json.JsonException)
+        {
+            return $"not read again ({error.GetType().Name}: {error.Message})";
+        }
     }
 
     /// <summary>Type names of the saved settings: the plugin's own from the loaded plugin (its copy), the others as Newtonsoft does.</summary>

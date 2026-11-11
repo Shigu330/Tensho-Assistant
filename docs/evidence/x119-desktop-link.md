@@ -19,6 +19,17 @@ not done. Not validated in game: the in-game checks are in the final campaign (R
 No network port is opened: a named pipe is local to the PC, and network logons are denied by the access list. The link carries no
 other player's data, no chat, no position: who (logged in or not) and where (the zone).
 
+## Protocol 2 (0.1114, X-119 step 2 suite)
+
+The user's default of 2026-11-11 (« the plugin sends a notice "this file changed" and the application reads the plugin's saved files again;
+only the small live states pass whole »):
+
+| Part | What | Bounds |
+|---|---|---|
+| Small live states (`LinkLive`) | Job abbreviation and level, GP and maximum GP (gatherers), free slots of the four bags and their size; read with the snapshot on the framework thread, copied; a reading that fails once is left out for the session (R08). | Job ≤ 16 characters, level ≤ 1000, GP ≤ 100 000, bag size ≤ 1000, free ≤ size |
+| Change notices (`LinkChange`) | Two file watchers while the link is on: the settings file (`pluginConfigs\TenshoAssistant.json`) and the plugin's folder (`pluginConfigs\TenshoAssistant`); their events only add a name and a generation to a log. Temporary files, the data cache and `PlayState.json` are left out. Never a file's content. | 16 names per snapshot (newest generation of each), 160 characters each, relative, « / » only, no « . » or « .. » part |
+| Application | `LinkChangeReader` takes each new name once (a new plugin start counts again); for the settings file, `Host.ReloadSettings` reads it again into the window's own settings (Newtonsoft populate, lists replaced), between frames, read-only; the status bar says when. The other saved files are not read by the app yet. | Line ≤ 8 192 bytes; another protocol number is refused (the pipe's name carries it) |
+
 ## How it is checked without the game
 
 - `tests/TenshoAssistant.Tests/LocalLink1081Tests.cs`: the wire format both ways and its refusals; a real pipe on Windows (a unique test

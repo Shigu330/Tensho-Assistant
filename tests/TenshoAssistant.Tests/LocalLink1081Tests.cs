@@ -28,7 +28,7 @@ internal static class LocalLink1081Tests
             Check(LocalLinkProtocol.TryParse(line,out var back,out var error) && back==Sample(),"round trip: "+error);
             Check(LocalLinkProtocol.PipeName("PC\\Alice")==LocalLinkProtocol.PipeName("pc\\alice"),"case does not matter");
             Check(LocalLinkProtocol.PipeName("PC\\Alice")!=LocalLinkProtocol.PipeName("PC\\Bob"),"two users, two pipes");
-            Check(Regex.IsMatch(LocalLinkProtocol.PipeName("PC\\Alice"),@"^TenshoAssistant\.Link\.1\.[0-9A-F]{16}$"),"name shape: "+LocalLinkProtocol.PipeName("PC\\Alice"));
+            Check(Regex.IsMatch(LocalLinkProtocol.PipeName("PC\\Alice"),@"^TenshoAssistant\.Link\."+LocalLinkProtocol.Version+@"\.[0-9A-F]{16}$"),"name shape: "+LocalLinkProtocol.PipeName("PC\\Alice"));
         }),
         ("Local link 1081: the protocol refuses an empty, too long, malformed, other-protocol or oversized line",() =>
         {
@@ -37,7 +37,7 @@ internal static class LocalLink1081Tests
             Check(!LocalLinkProtocol.TryParse("{not json",out _,out _),"malformed");
             Check(!LocalLinkProtocol.TryParse("[1,2]",out _,out _),"not an object");
             Check(!LocalLinkProtocol.TryParse("{\"Protocol\":1}",out _,out _),"missing fields");
-            Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample() with {Protocol=2}),out _,out var other) && other!.Contains("protocol 2"),"other protocol: "+other);
+            Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample() with {Protocol=1}),out _,out var other) && other!.Contains("protocol 1"),"other protocol: "+other);
             Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample() with {Zone=new string('z',LocalLinkProtocol.MaxZone+1)}),out _,out _),"zone too long");
             Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample() with {Plugin=new string('9',LocalLinkProtocol.MaxPlugin+1)}),out _,out _),"version too long");
         }),

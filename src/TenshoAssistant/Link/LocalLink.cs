@@ -16,16 +16,24 @@ namespace TenshoAssistant.Link;
 //  - Current user only: the pipe's access list allows the user who runs the game and denies network logons; the application connects with
 //    PipeOptions.CurrentUserOnly, so a pipe of the same name made by another user is refused.
 //  - One line of JSON per message, at most MaxLine bytes, protocol number checked; the application drops anything else.
+//  - Protocol 2 (0.1114): small live states (LinkLive: job, level, GP, bags' free slots) and the names of the plugin's saved files that
+//    changed (LinkChange), never a file's content: the application reads those files itself, read-only.
 
-/// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where, nothing else.</summary>
-public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence);
+/// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
+/// (0.1114): also the small live states and the saved files that changed.</summary>
+public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence,
+    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null);
 
 /// <summary>The link's wire format: one JSON line per snapshot, bounded and checked.</summary>
 public static class LocalLinkProtocol
 {
-    public const int Version=1;
-    /// <summary>Longest line accepted, in bytes (a snapshot is about 150).</summary>
-    public const int MaxLine=4096;
+    public const int Version=2;
+    /// <summary>Longest line accepted, in bytes (a snapshot is about 150, 2 500 with sixteen long file names).</summary>
+    public const int MaxLine=8192;
+    public const int MaxJob=16;
+    /// <summary>Saved files named in one snapshot, at most, and the longest name.</summary>
+    public const int MaxChanges=16;
+    public const int MaxFile=160;
     public const int MaxPlugin=32;
     public const int MaxZone=128;
     private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};
@@ -51,8 +59,35 @@ public static class LocalLinkProtocol
         if(read is null || read.Plugin is null || read.Zone is null){error="not a snapshot";return false;}
         if(read.Protocol!=Version){error=$"protocol {read.Protocol}, this end speaks {Version}";return false;}
         if(read.Plugin.Length>MaxPlugin || read.Zone.Length>MaxZone){error="field too long";return false;}
+        if(read.Live is { } live && (live.Job is null || live.Job.Length>MaxJob || live.Level is < -1 or > 1000 || live.Gp is < -1 or > 100_000
+            || live.MaxGp is < -1 or > 100_000 || live.BagSize is < -1 or > 1000 || live.BagFree<-1 || live.BagFree>Math.Max(live.BagSize,0)))
+            {error="live state out of bounds";return false;}
+        if(read.Changes is { } changes && (changes.Count>MaxChanges || changes.Any(change=>change is null || !ValidFile(change.File) || change.Generation<1)))
+            {error="change list refused";return false;}
         snapshot=read;return true;
     }
+
+    /// <summary>
+    /// A saved file's name as the link sends it: the settings file itself (pluginConfigs\TenshoAssistant.json), or « TenshoAssistant/… » for a
+    /// file under the plugin's folder (pluginConfigs\TenshoAssistant), « / » between folders; null for anything else, a temporary file, the
+    /// data cache and the play state (written for the agent's scripts).
+    /// </summary>
+    public static string? ChangeName(string settingsFile,string folder,string path)
+    {
+        var full=Path.GetFullPath(path);
+        if(string.Equals(full,Path.GetFullPath(settingsFile),StringComparison.OrdinalIgnoreCase))return Path.GetFileName(full);
+        var root=Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder));
+        if(!full.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))return null;
+        var name=full[(root.Length+1)..].Replace('\\','/');
+        if(name.EndsWith(".tmp",StringComparison.OrdinalIgnoreCase) || name.StartsWith("DataCache",StringComparison.OrdinalIgnoreCase)
+           || string.Equals(name,"PlayState.json",StringComparison.OrdinalIgnoreCase))return null;
+        name=Path.GetFileName(root)+"/"+name;
+        return ValidFile(name) ? name : null;
+    }
+
+    /// <summary>A file name the link may carry: relative, « / » only, no « . » or « .. » part, not empty, at most MaxFile characters.</summary>
+    public static bool ValidFile(string? file)
+        => file is { Length: >0 and <=MaxFile } && file.IndexOfAny(['\\',':'])<0 && !file.Split('/').Any(part=>part is "" or "." or "..");
 }
 
 /// <summary>Where the plugin's end of the link stands.</summary>
@@ -246,5 +281,56 @@ public sealed class LocalLinkClient:IDisposable
         cancel.Cancel();
         try{loop.Wait(TimeSpan.FromSeconds(1));}
         catch(AggregateException){}
+    }
+}
+
+/// <summary>X-119 step 2 (0.1114, protocol 2): the small live states sent whole, read on the framework thread and copied: job, level, gathering
+/// points (GP), the four bags' free slots. -1 when not read (no character, a reading that failed).</summary>
+public sealed record LinkLive(string Job,int Level,int Gp,int MaxGp,int BagFree,int BagSize);
+
+/// <summary>X-119 step 2 (0.1114, protocol 2): one saved file of the plugin that changed (its name under pluginConfigs, « / » between
+/// folders) and the generation it changed in; the application reads the file again itself (never sent over the link).</summary>
+public sealed record LinkChange(string File,long Generation);
+
+/// <summary>
+/// X-119 step 2 (0.1114): the saved files of the plugin that changed lately, filled from a file watcher's threads, read by the feed once a
+/// second. At most <see cref="LocalLinkProtocol.MaxChanges"/> names, the newest generation of each; the oldest names leave first.
+/// </summary>
+public sealed class LinkChangeLog
+{
+    private readonly object gate=new();
+    private readonly List<LinkChange> changes=[];
+    private long generation;
+
+    /// <summary>Any thread: a saved file changed (name as <see cref="LocalLinkProtocol.ChangeName"/> gives it).</summary>
+    public void Add(string file)
+    {
+        lock(gate)
+        {
+            changes.RemoveAll(change=>change.File==file);
+            changes.Add(new(file,++generation));
+            if(changes.Count>LocalLinkProtocol.MaxChanges)changes.RemoveRange(0,changes.Count-LocalLinkProtocol.MaxChanges);
+        }
+    }
+
+    /// <summary>The names to send now (oldest first), or null when nothing changed since the log began.</summary>
+    public IReadOnlyList<LinkChange>? Snapshot(){lock(gate)return changes.Count==0 ? null : changes.ToArray();}
+}
+
+/// <summary>X-119 step 2 (0.1114): the application's side of the change notices: which files to read again, each once.</summary>
+public sealed class LinkChangeReader
+{
+    private long seen;
+
+    /// <summary>The files changed since the last call (a new plugin start counts again from zero); empty when nothing new.</summary>
+    public IReadOnlyList<string> Take(LinkSnapshot? snapshot)
+    {
+        if(snapshot?.Changes is not { Count: >0 } changes)return [];
+        var newest=changes.Max(change=>change.Generation);
+        // The plugin started again (its generations count from 1 again): every name it sends is new.
+        if(newest<seen)seen=0;
+        var files=changes.Where(change=>change.Generation>seen).Select(change=>change.File).Distinct().ToArray();
+        seen=Math.Max(seen,newest);
+        return files;
     }
 }

@@ -191,7 +191,9 @@ internal static class Headless
         }
         // X-119 step 2 (0.1081): the status bar's texts of the local link (linked, paused, no character, a zone), on a page that needs it.
         host.SetPage("Home");
-        foreach(var snapshot in new TenshoAssistant.Link.LinkSnapshot[]{new(1,"0.0.0",true,false,132,"Test",1),new(1,"0.0.0",false,false,0,"",2),new(1,"0.0.0",false,true,0,"",3)})
+        const int protocol=TenshoAssistant.Link.LocalLinkProtocol.Version;
+        foreach(var snapshot in new TenshoAssistant.Link.LinkSnapshot[]{new(protocol,"0.0.0",true,false,132,"Test",1),new(protocol,"0.0.0",false,false,0,"",2),new(protocol,"0.0.0",false,true,0,"",3),
+                    new(protocol,"0.0.0",true,false,132,"Test",4,new("MIN",100,650,700,20,140))})
         {
             status.Link=()=>snapshot;
             foreach(var (line,_) in status.Lines())

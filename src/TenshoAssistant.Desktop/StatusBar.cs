@@ -17,6 +17,27 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     /// <summary>X-119 step 2 (0.1081): the last fresh snapshot of the local link (LocalLinkClient.Current), null when not linked.</summary>
     public Func<TenshoAssistant.Link.LinkSnapshot?>? Link;
     private string? redirected;
+    // X-119 step 2 (0.1114): the saved files the link says changed, each read once; when the settings were read again and whether it worked.
+    private readonly TenshoAssistant.Link.LinkChangeReader changes=new();
+    private DateTime? reloadedAt;
+    private string? reloadProblem;
+
+    /// <summary>
+    /// Once per frame, before the window is drawn: the files the game saved since the last frame; the plugin's settings file is read again
+    /// into the window (Host.ReloadSettings). The other saved files are not read by the app yet (their pages, X-119).
+    /// </summary>
+    public void Poll()
+    {
+        var files=changes.Take(Link?.Invoke());
+        if(!files.Contains(SettingsFile))return;
+        var note=host.ReloadSettings();
+        Console.WriteLine("Link: plugin settings "+note);
+        reloadedAt=DateTime.Now;
+        reloadProblem=note.StartsWith("read again",StringComparison.Ordinal) ? null : note;
+    }
+
+    /// <summary>The plugin's settings file as the link names it (pluginConfigs\TenshoAssistant.json).</summary>
+    public const string SettingsFile="TenshoAssistant.json";
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
 
@@ -41,7 +62,9 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         var page=host.CurrentPage;
         if(redirected is not null)lines.Add((host.Text("Desktop.InGameOnly",PageName(redirected)),true));
         var linked=Link?.Invoke();
-        if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked)),false));
+        if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked))+Live(linked),false));
+        if(linked is not null && reloadedAt is { } at)
+            lines.Add((reloadProblem is null ? host.Text("Desktop.SettingsReloaded",at.ToString("HH:mm:ss")) : host.Text("Desktop.SettingsReloadFailed",reloadProblem),reloadProblem is not null));
         if(DesktopPages.LiveKey(page) is { } live)lines.Add((host.Text(linked is null ? "Desktop.NotLinked" : "Desktop.LinkedNotLive",host.Text(live)),true));
         if(Loading is { } loading)lines.Add((host.Text("Desktop.Loading",loading.Ready,loading.Total),false));
         lines.Add((host.Text("Desktop.AppVersion",DesktopVersionCheck.Three(Program.AppVersion))+"  ·  "+VersionText,version.State!=DesktopVersionState.Same));
@@ -53,6 +76,17 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         => linked.Paused ? host.Text("Desktop.LinkPaused")
             : !linked.LoggedIn ? host.Text("Desktop.LinkNotLoggedIn")
             : host.Text("Desktop.LinkZone",linked.Zone.Length>0 ? linked.Zone : "#"+linked.Territory);
+
+    /// <summary>X-119 step 2 (0.1114): the small live states after the place: job and level, GP, the bags' free slots (each only when read).</summary>
+    private string Live(TenshoAssistant.Link.LinkSnapshot linked)
+    {
+        if(linked.Paused || !linked.LoggedIn || linked.Live is not { } live)return "";
+        var parts=new List<string>();
+        if(live.Job.Length>0 && live.Level>0)parts.Add(host.Text("Desktop.LinkLiveJob",live.Job,live.Level));
+        if(live.MaxGp>0 && live.Gp>=0)parts.Add(host.Text("Desktop.LinkLiveGp",live.Gp,live.MaxGp));
+        if(live.BagSize>0 && live.BagFree>=0)parts.Add(host.Text("Desktop.LinkLiveBags",live.BagFree,live.BagSize));
+        return parts.Count==0 ? "" : "  ·  "+string.Join("  ·  ",parts);
+    }
 
     private string PageName(string page)=>host.HasText("PageHelp."+page+"Title") ? host.Text("PageHelp."+page+"Title") : page;
 
