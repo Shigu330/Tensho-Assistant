@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1072.0
+- Constat d'audit A045 : le plan global rangeait les phases 6 puis 7 tout en disant que « l'étape 7 passe avant la phase 6 », plaçait le nettoyage X-76 « après les essais en jeu » alors qu'il a été fait avant, et « étape 7 » avait plusieurs sens. Le tableau des phases gagne une colonne « État » dans ses deux langues (phases 1 à 4 faites, 5 en cours, 6 à faire en une seule campagne, 7 faite en grande partie avant la 6), « étape 7 » devient « phase 7 » partout où elle était nue, et l'ordre de X-76 dit ce qui s'est passé. Un test vérifie la colonne et l'absence d'« étape 7 » nue.
+- Tests : PhaseOrder1072Tests. Verify.ps1 (agent) : 1755/1755, 0 avertissement, 0 erreur ; DLL 0.1072.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A045: the global plan ordered phases 6 then 7 while saying that « step 7 comes before phase 6 », placed the X-76 cleanup « after the in-game tests » although it was done before them, and « step 7 » had several meanings. The phase table gains a « State » column in both languages (phases 1 to 4 done, 5 in progress, 6 to do as a single campaign, 7 mostly done before 6), a bare « step 7 » becomes « phase 7 » everywhere, and the X-76 order says what happened. A test checks the column and that no bare « step 7 » is left.
+
 ## 0.1071.0
 - Constat d'audit A061 : les relevés en jeu en attente (sous-marins, jardin avec croisement, Eurêka Anemos, pages des champs…) étaient listés à trois endroits avec des mots différents. Le tableau des rappels de relevés du plan global devient la seule liste : il gagne les trois relevés qui n'y étaient pas (fenêtre d'extraction de matéria, coffre d'une carte au trésor, lignes « Item gain not attributed » après un combat) et le dit dans ses deux langues ; l'étape 0 du parcours des essais y renvoie au lieu de répéter la liste. Le plan global est aussi reproduit depuis sa source (points X-112, X-114, X-117 et X-122 marqués faits, X-126 ajouté). Un test vérifie le renvoi et que le tableau garde chaque relevé.
 - Tests : Readings1071Tests. Verify.ps1 (agent) : 1754/1754, 0 avertissement, 0 erreur ; DLL 0.1071.0.0. Rien à essayer en jeu.

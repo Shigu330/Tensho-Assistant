@@ -9,16 +9,16 @@ Plan dated 2026-11-05, at version 0.539.0, drawn from the review done with the u
 **Everything that requires playing comes last, one point at a time** (user's request, 2026-11-05). Phases 1 to 4 are done without them: `Verify.ps1` green, commit and push, no in-game test. A full build reloads the DLL if the game is running: they have nothing to do for that.
 
 <!-- gen:plan:phases-en -->
-| Phase | Content | Points | Need to play? |
-|---|---|---:|---|
-| 1 | Fixes without the game | 3 | No |
-| 2 | Small proposals | 43 | No |
-| 3 | Medium proposals | 19 | No |
-| 4 | Ideas, web probe and sources without the game | 6 | No |
-| 5 | In-game readings, then the code that depends on them | 29 | Yes, one after the other |
-| 6 | In-game tests of everything above | 1 | Yes, one after the other |
-| 7 | Just before 1.0.0: tool lists, documents, help |  | No |
-| Then | Version 1.0.0, on the custom repository (no submission, DEC-039) |  |  |
+| Phase | Content | Points | Need to play? | State |
+|---|---|---:|---|---|
+| 1 | Fixes without the game | 3 | No | Done |
+| 2 | Small proposals | 43 | No | Done |
+| 3 | Medium proposals | 19 | No | Done |
+| 4 | Ideas, web probe and sources without the game | 6 | No | Done |
+| 5 | In-game readings, then the code that depends on them | 29 | Yes, one after the other | In progress: the in-game readings are left |
+| 6 | In-game tests of everything above | 1 | Yes, one after the other | To do: every test in one campaign, as late as possible |
+| 7 | Just before 1.0.0: tool lists, documents, help |  | No | Mostly done before phase 6, at the user's request; last review just before 1.0.0 |
+| Then | Version 1.0.0, on the custom repository (no submission, DEC-039) |  |  | When the user decides |
 
 Total before 1.0.0 (phases 1 to 6): 101 points, a count produced by a script from the plan's source.
 <!-- /gen:plan:phases-en -->
@@ -244,7 +244,7 @@ User's request (2026-11-05): bring everything up to date once the plan is coded,
 5. On Git and GitHub, two languages, English first then French (user's decision of 2026-11-09, which replaces "everything in English if possible"): commit bodies, issue comments, release notes, announcements; short titles, labels and milestones in English only. A single format, `tools/bilingual.py`, followed by `scripts/Release.ps1` (commit bodies) and `tools/discoveries-merge.py notice`; the release notes follow with the release chain. Open issues get the French when they are touched.
 
 **Plan review (2026-11-08, night instruction X-74), to match the code of 0.865:**
-- Step 7 comes before phase 6 (in-game tests), at the user's request; what changes at the tests will only touch the texts concerned.
+- Phase 7 comes before phase 6 (in-game tests), at the user's request; what changes at the tests will only touch the texts concerned.
 - 1. Credits: `Credits/CreditCatalog.cs` against the sources actually called (folders `Community/`, `Market/`, `Monsters/`, `Fashion/`, `Maps/`, embedded files); the discoveries base (X-43, X-72 to X-74) is not an outside source, it is described in the help, not in the credits. **0.866: every host called is credited; 14 references read for ideas (cited in the code) were missing: added, checked at the source (docs/evidence/0.866-credit-references.md).**
 - 2. List of tools: the home page (`MainWindow.Pages.cs`), the README and everywhere a list appears, with the tools added since 0.539 (Discoveries, list panels, list alarms, etc.), in English and in French (language files).
 - 3. Help and getting started: `Guide/GuideFlow.cs` and `MainWindow.Guide.cs`, to be reread against the list of step 2. **0.866: the help had one entry per page; outdated texts corrected (Discoveries, storage, crafting, company, map, island, deliveries, reminders), one question "What does Tensho keep on my PC?", two more stops in the guide (Discoveries, ocean fishing).**
@@ -257,8 +257,8 @@ User's request (2026-11-05): bring everything up to date once the plan is coded,
 
 ## Full cleanup before 1.0.0 (X-76, detailed plan of 2026-11-08) — approved by the user (« Oui, ce plan » ("Yes, this plan"))
 
-User's request: « un nettoyage qui te semblerait plus complet et cohérent avant une version 1.0.0 » ("a cleanup that seems more complete and consistent to you before a version 1.0.0"). Order: after the necessary in-game tests,
-before the `.md` documents (rechecked against the code then translated). Ultracode granted. Rule for the whole step: **nothing is removed without proof that it is useless**,
+User's request: « un nettoyage qui te semblerait plus complet et cohérent avant une version 1.0.0 » ("a cleanup that seems more complete and consistent to you before a version 1.0.0"). Order first planned: after the necessary in-game tests,
+before the `.md` documents (rechecked against the code then translated); done in fact before phase 6, like phase 7. Ultracode granted. Rule for the whole step: **nothing is removed without proof that it is useless**,
 one family of changes per version, `Verify` green each time, zip backup in `checkpoints/` before starting.
 
 **Progress:** step 0 done (0.904: `docs/evidence/x76-0-baseline.md`, backup `checkpoints/backup-20261108-1450-x76-start.zip`); step 1, first pass done (0.904: `docs/evidence/0.904-dead-code.md`, 91 items removed); what remains in step 1 is the parts of the capture already proven (after the travel and extraction surveys). Step 2: 37 findings (`docs/evidence/x76-2-duplicates.md`), handled by families; 0.905: map coordinates; 0.906: Eorzea times and durations; 0.907: game windows and web requests; 0.908: discoveries ("seen in game"); 0.909: French removed from the code, comments put back in place. French title "Tensho Assistant · Monnaies" of the server info bar: renamed "Tensho Assistant (Currencies)" in 0.910 with the user's agreement (« effacer les réglages n'est pas grave, il n'y a que moi qui utilise le plugin » ("erasing the settings does not matter, I am the only one using the plugin")).
@@ -464,7 +464,7 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-73.16 | Location of vendors missing from the sheets: noted when their shop opens (target, zone, position) | 0.872: targeted NPC noted with its location when a shop window opens (once per opening) … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7316) |
 | X-73.17 | Loot from the chests of Deep Dungeons, Eureka and Bozja | 0.873: in Eureka, Bozja, the Occult Crescent and Deep Dungeons (recognized by the game itself), an item received right after a defeated monster counts as loot from that … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7317) |
 | X-73.18 | After the X-73.13 readings: bite time and type, mooch, Intuition and predators; aetherial reduction; quest items | 0.887: the user's fishing reading (`docs/evidence/0.887-fishing-bite.md`): bite type (animation 7: 292 !, 293 !!, 294 !!!), time since the cast (the … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7318) |
-| X-74 | Night instruction (2026-11-08, the user is asleep): add as many coherent parsers as possible (« mieux vaut prendre plus et retirer ensuite » ("better to take more and remove afterwards")), complete the dataset according to our needs, review the step 7 plan so it matches the current code, then move on to step 7 once the plans are in place; ultracode allowed if needed | Done for the night (0.857 to 0.867); 0.860: observer of items obtained (ItemDiscoveryWatcher): desynthesis, ventures, duty chests, FATE rewards, loot of … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-74) |
+| X-74 | Night instruction (2026-11-08, the user is asleep): add as many coherent parsers as possible (« mieux vaut prendre plus et retirer ensuite » ("better to take more and remove afterwards")), complete the dataset according to our needs, review the phase 7 plan so it matches the current code, then move on to phase 7 once the plans are in place; ultracode allowed if needed | Done for the night (0.857 to 0.867); 0.860: observer of items obtained (ItemDiscoveryWatcher): desynthesis, ventures, duty chests, FATE rewards, loot of … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-74) |
 | X-75 | Request of 2026-11-08: a test for each probe; recheck that no probe is missing for discovering in game the data taken from somewhere other than the game's sheets. Placement: after the current plan (X-73.15 to X-73.17), before the translation of the living documents | Done by X-75.1 to X-75.8 (0.874–0.903); rechecked by X-91 (0.971, docs/evidence/x91-parsers-check.md): each piece of data taken outside the sheets has an in-game reading or a … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-75) |
 | X-75.1 | A test for each probe: list of the parts of the capture frozen by a test, text test for each probe and parser that has none; in-game readings added to TESTING and to the reminders | 0.874: report `docs/evidence/0.874-probe-coverage.md` (64 sources, 46 probes) … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-751) |
 | X-75.2 | « Seen in game » first everywhere the learned data already exists: Monsters page, nearby monsters (loot, beasts), right-click menu, collection sources, « what it gives », Deep Dungeons, duty chests | 0.875: Monsters page (« Seen it drop »), nearby monsters (loot seen, beasts tamed even without the wiki), sources (duties whose chest gave it, items from which … [details](archive/GLOBAL-PLAN-X-2026-11-09.md#x-752) |
@@ -605,16 +605,16 @@ Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisa
 **Tout ce qui demande de jouer vient en dernier, un point à la fois** (demande de l'utilisateur, 2026-11-05). Les phases 1 à 4 se font sans lui : `Verify.ps1` vert, commit et poussée, sans essai en jeu. Une compilation complète recharge la DLL si le jeu tourne : il n'a rien à faire pour autant.
 
 <!-- gen:plan:phases -->
-| Phase | Contenu | Points | Il faut jouer ? |
-|---|---|---:|---|
-| 1 | Corrections sans le jeu | 3 | Non |
-| 2 | Petites propositions | 43 | Non |
-| 3 | Propositions moyennes | 19 | Non |
-| 4 | Idées, sonde web et sources sans le jeu | 6 | Non |
-| 5 | Relevés en jeu, puis le code qui en dépend | 29 | Oui, l'un après l'autre |
-| 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre |
-| 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide |  | Non |
-| Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) |  |  |
+| Phase | Contenu | Points | Il faut jouer ? | État |
+|---|---|---:|---|---|
+| 1 | Corrections sans le jeu | 3 | Non | Fait |
+| 2 | Petites propositions | 43 | Non | Fait |
+| 3 | Propositions moyennes | 19 | Non | Fait |
+| 4 | Idées, sonde web et sources sans le jeu | 6 | Non | Fait |
+| 5 | Relevés en jeu, puis le code qui en dépend | 29 | Oui, l'un après l'autre | En cours : il reste les relevés en jeu |
+| 6 | Tests en jeu de tout ce qui précède | 1 | Oui, l'un après l'autre | À faire : tous les essais en une seule campagne, le plus tard possible |
+| 7 | Juste avant la 1.0.0 : listes d'outils, documents, aide |  | Non | Faite en grande partie avant la phase 6, à la demande de l'utilisateur ; dernière relecture juste avant la 1.0.0 |
+| Ensuite | Version 1.0.0, sur le dépôt personnalisé (pas de soumission, DEC-039) |  |  | Quand l'utilisateur le décide |
 
 Total avant la 1.0.0 (phases 1 à 6) : 101 points, compte produit par script depuis la source du plan.
 <!-- /gen:plan:phases -->
@@ -840,7 +840,7 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 5. Sur Git et GitHub, deux langues, l'anglais d'abord puis le français (décision de l'utilisateur du 2026-11-09, qui remplace « tout en anglais si possible ») : corps des commits, commentaires des issues, notes de release, annonces ; titres courts, étiquettes et jalons en anglais seulement. Un seul format, `tools/bilingual.py`, que suivent `scripts/Release.ps1` (corps des commits) et `tools/discoveries-merge.py notice` ; les notes de release suivent avec la chaîne de release. Les issues ouvertes reçoivent le français quand elles sont touchées.
 
 **Revue du plan (2026-11-08, consigne de nuit X-74), pour coller au code de la 0.865 :**
-- L'étape 7 passe avant la phase 6 (essais en jeu), à la demande de l'utilisateur ; ce qui changera aux essais retouchera seulement les textes concernés.
+- La phase 7 passe avant la phase 6 (essais en jeu), à la demande de l'utilisateur ; ce qui changera aux essais retouchera seulement les textes concernés.
 - 1. Crédits : `Credits/CreditCatalog.cs` contre les sources réellement appelées (dossiers `Community/`, `Market/`, `Monsters/`, `Fashion/`, `Maps/`, fichiers embarqués) ; la base de découvertes (X-43, X-72 à X-74) n'est pas une source extérieure, elle se décrit dans l'aide, pas dans les crédits. **0.866 : chaque hôte appelé est crédité ; 14 références lues pour des idées (citées dans le code) manquaient : ajoutées, vérifiées à la source (docs/evidence/0.866-credit-references.md).**
 - 2. Liste des outils : l'accueil (`MainWindow.Pages.cs`), le README et partout où une liste apparaît, avec les outils ajoutés depuis la 0.539 (Découvertes, panneaux des listes, alarmes des listes, etc.), en anglais et en français (fichiers de langue).
 - 3. Aide et prise en main : `Guide/GuideFlow.cs` et `MainWindow.Guide.cs`, à relire contre la liste de l'étape 2. **0.866 : l'aide avait une entrée par page ; textes dépassés corrigés (Découvertes, rangements, artisanat, compagnie, carte, île, livraisons, rappels), une question « Que garde Tensho sur mon PC ? », deux arrêts de plus au guide (Découvertes, pêche océanique).**
@@ -853,8 +853,8 @@ Demande de l'utilisateur (2026-11-05) : tout remettre à jour une fois le plan c
 
 ## Nettoyage complet avant la 1.0.0 (X-76, plan détaillé du 2026-11-08) — approuvé par l'utilisateur (« Oui, ce plan »)
 
-Demande de l'utilisateur : « un nettoyage qui te semblerait plus complet et cohérent avant une version 1.0.0 ». Ordre : après les essais en jeu nécessaires,
-avant les documents `.md` (revérifiés contre le code puis traduits). Ultracode accordé. Règle de toute l'étape : **rien n'est retiré sans preuve qu'il est inutile**,
+Demande de l'utilisateur : « un nettoyage qui te semblerait plus complet et cohérent avant une version 1.0.0 ». Ordre prévu d'abord : après les essais en jeu nécessaires,
+avant les documents `.md` (revérifiés contre le code puis traduits) ; fait en réalité avant la phase 6, comme la phase 7. Ultracode accordé. Règle de toute l'étape : **rien n'est retiré sans preuve qu'il est inutile**,
 une famille de changements par version, `Verify` vert à chaque fois, sauvegarde zip dans `checkpoints/` avant de commencer.
 
 **Avancement :** étape 0 faite (0.904 : `docs/evidence/x76-0-baseline.md`, sauvegarde `checkpoints/backup-20261108-1450-x76-start.zip`) ; étape 1, première passe faite (0.904 : `docs/evidence/0.904-dead-code.md`, 91 éléments retirés) ; restent dans l'étape 1 les parties de la capture déjà prouvées (après les relevés de voyage et d'extraction). Étape 2 : 37 constats (`docs/evidence/x76-2-duplicates.md`), traités par familles ; 0.905 : coordonnées de carte ; 0.906 : heures d'Eorzéa et durées ; 0.907 : fenêtres du jeu et requêtes web ; 0.908 : découvertes (« vu en jeu ») ; 0.909 : français retiré du code, commentaires remis en place. Titre français « Tensho Assistant · Monnaies » de la barre d'infos du serveur : renommé « Tensho Assistant (Currencies) » en 0.910 avec l'accord de l'utilisateur (« effacer les réglages n'est pas grave, il n'y a que moi qui utilise le plugin »).
@@ -1060,7 +1060,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-73.16 | Lieu des marchands absents des feuilles : noté à l'ouverture de leur boutique (cible, zone, position) | 0.872 : PNJ ciblé noté avec son lieu quand une fenêtre de boutique s'ouvre (une fois par ouverture) … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7316) |
 | X-73.17 | Butin des coffres des donjons sans fond, d'Eurêka et de Bozja | 0.873 : en Eurêka, Bozja, Croissant occulte et donjon sans fond (reconnus par le jeu lui-même), un objet reçu juste après un monstre vaincu compte comme butin de ce … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7317) |
 | X-73.18 | Après les relevés de X-73.13 : temps et type de touche, mooch, Intuition et prédateurs ; réduction éthérée ; objets de quête | 0.887 : relevé de pêche de l'utilisateur (`docs/evidence/0.887-fishing-bite.md`) : type de touche (animation 7 : 292 !, 293 !!, 294 !!!), temps depuis le lancer (les … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-7318) |
-| X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter le plus de parseurs cohérents possible (« mieux vaut prendre plus et retirer ensuite »), compléter le jeu de données selon nos besoins, revoir le plan de l'étape 7 pour qu'il colle au code actuel, puis passer à l'étape 7 une fois les plans en place ; ultracode autorisé au besoin | Fait pour la nuit (0.857 à 0.867) ; 0.860 : observateur des objets obtenus (ItemDiscoveryWatcher) : désynthèse, tâches, coffres de mission, récompenses d'ALÉA, butin de … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-74) |
+| X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter le plus de parseurs cohérents possible (« mieux vaut prendre plus et retirer ensuite »), compléter le jeu de données selon nos besoins, revoir le plan de la phase 7 pour qu'il colle au code actuel, puis passer à la phase 7 une fois les plans en place ; ultracode autorisé au besoin | Fait pour la nuit (0.857 à 0.867) ; 0.860 : observateur des objets obtenus (ItemDiscoveryWatcher) : désynthèse, tâches, coffres de mission, récompenses d'ALÉA, butin de … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-74) |
 | X-75 | Demande du 2026-11-08 : un test pour chaque sonde ; revérifier qu'aucune sonde ne manque pour découvrir en jeu les données prises ailleurs que dans les feuilles du jeu. Placement : après le plan en cours (X-73.15 à X-73.17), avant la traduction des documents vivants | Fait par X-75.1 à X-75.8 (0.874–0.903) ; revérifié par X-91 (0.971, docs/evidence/x91-parsers-check.md) : chaque donnée prise hors des feuilles a un relevé en jeu ou une … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-75) |
 | X-75.1 | Un test pour chaque sonde : liste des parties de la capture figée par un test, test de texte pour chaque sonde et parseur qui n'en a pas ; relevés en jeu ajoutés à TESTING et aux rappels | 0.874 : rapport `docs/evidence/0.874-probe-coverage.md` (64 sources, 46 sondes) … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-751) |
 | X-75.2 | « Vu en jeu » d'abord partout où la donnée apprise existe déjà : page Monstres, monstres proches (butin, bêtes), menu clic droit, provenances des collections, « ce qu'il donne », donjons sans fond, coffres de missions | 0.875 : page Monstres (« Vu le laisser »), monstres proches (butin vu, bêtes apprivoisées même sans le wiki), provenances (missions dont un coffre l'a donné, objets d'où … [détail](archive/GLOBAL-PLAN-X-2026-11-09.md#x-752) |
