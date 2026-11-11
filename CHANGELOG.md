@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1102.0
+- Journal des gils : les gils des missions de la pêche en mer ont leur catégorie, « Pêche en mer (missions) », au lieu de « Autre ». Découvertes : un secteur d'aéronef débloqué (message du jeu « Une nouvelle destination à explorer a été découverte ») est noté, comme ceux des sous-marins, seulement si la feuille du jeu connaît ce secteur.
+- Tests : GainParsers1102Tests. Verify.ps1 (agent) : 1797/1797, 0 avertissement, 0 erreur ; DLL 0.1102.0.0. Non validé en jeu.
+### English
+- Gil journal: the gil of the ocean fishing missions have their own category, « Ocean fishing (missions) », instead of « Other ». Discoveries: an airship sector unlocked (the game's message « A new destination to explore has been discovered ») is recorded, as the submarines' are, only when the game sheet knows that sector.
+
 ## 0.1101.0
 - Découvertes partagées : le ticket #43 est fusionné dans le fichier commun (1967 faits, 0 refusé, 260 nouveaux ou changés) ; ils arrivent chez tous les joueurs avec la prochaine release.
 - Tests : CommunityMerge1101Tests. Verify.ps1 (agent) : 1795/1795, 0 avertissement, 0 erreur ; DLL 0.1101.0.0. Rien à essayer en jeu.

@@ -7,7 +7,8 @@ public enum GilSource { Character, Retainers, Company }
 
 /// <summary>What the change most likely was, from the game window open when it happened (Other when none matched).</summary>
 // 0.903 (X-84): Mail: gil taken from a letter or attached to one (LetterViewer, LetterEditor). Added last: the saved numbers stay the same.
-public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail }
+// 0.1102: OceanFishing: the gil of an ocean fishing voyage's missions (IKDMission, IKDFishingLog), added last too.
+public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail, OceanFishing }
 
 /// <summary>One change of a gil balance: when, by how much, the balance after it, whose, and its category.</summary>
 public sealed record GilEntry(DateTimeOffset At,long Delta,long Balance,GilSource Source,GilCategory Category);
@@ -32,6 +33,9 @@ public static class GilJournal
         ("FreeCompanyChest",GilCategory.Company),
         // 0.903 (X-84, user's test, docs/evidence/0.903-letters.md): the log showed « Gil other: +1, windows seen in the last 15 s: LetterList, LetterViewer … ».
         ("LetterViewer",GilCategory.Mail),("LetterEditor",GilCategory.Mail),
+        // 0.1102 (relais 20, dalamud.log of 11/11 15:12:48 and 15:21:02): « Gil other: +2,000 / +1,000, windows seen in the last 15 s: Bait,
+        // IKDFishingLog, IKDMission, Catch… »: the reward of a voyage's mission, while its windows are open.
+        ("IKDMission",GilCategory.OceanFishing),("IKDFishingLog",GilCategory.OceanFishing),
         // 0.775 (X-18): the game takes the teleport's price on arrival, after its window closed: the log showed « Gil other: -1,240, windows seen in the last
         // 15 s: NowLoading » with the chat line « Vous avez dépensé 1240 gils pour vous téléporter ». Only a spending counts (see GilWatcher).
         ("NowLoading",GilCategory.Teleport),

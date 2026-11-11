@@ -20,7 +20,7 @@ internal static class CommunityMerge1101Tests
                 foreach (var member in fact.EnumerateObject())
                     Check(Fields.Contains(member.Name),"unknown field in a fact: " + member.Name);
                 var kind = fact.GetProperty("Kind").GetInt32();
-                Check(kind is >= 1 and <= 37 and not 26 and not 27,"known kind (" + kind + ")");
+                Check(kind is >= 1 and <= 38 and not 26 and not 27,"known kind (" + kind + ")");
             }
             using var player = JsonDocument.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/players/43.json")));
             Check(player.RootElement.GetProperty("Issue").GetInt32() == 43 && player.RootElement.GetProperty("Facts").GetArrayLength() == 1967,

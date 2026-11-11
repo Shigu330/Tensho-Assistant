@@ -66,7 +66,10 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
     // X-73 (0.1003, user request « the parsers we lack to complete what we still take from the community »): AirshipDrop: Subject = an item an airship
     // brought back, Detail = the AirshipExplorationPoint row (sector) it came from, levels = the quantity. The sector comes from the voyage log's route
     // (T26), paired with the stops in order: noted only with a single airship and as many stops with loot as sectors in the route.
-    AirshipDrop=37 }
+    AirshipDrop=37,
+    // 0.1102 (relais 21, parsers missing after relais 20): AirshipUnlock: Subject = the AirshipExplorationPoint row an airship's voyage unlocked (the game's
+    // log message 4163, the row checked against the sheet), Detail = 0 (the message does not say which sector's voyage unlocked it). The airships' VoyageUnlock.
+    AirshipUnlock=38 }
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported

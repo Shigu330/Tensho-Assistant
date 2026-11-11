@@ -25,6 +25,7 @@ internal sealed partial class MainWindow
         GilCategory.Retainer=>Dalamud.Interface.FontAwesomeIcon.UserTie,
         GilCategory.Company=>Dalamud.Interface.FontAwesomeIcon.Users,
         GilCategory.Mail=>Dalamud.Interface.FontAwesomeIcon.Envelope,
+        GilCategory.OceanFishing=>Dalamud.Interface.FontAwesomeIcon.Fish,
         _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
     };
     private void DrawGilJournal()

@@ -365,6 +365,10 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     // 0.1096 (user report, 11/11 15 h): gains no cause explained, waiting for their source; and the log messages that name one.
     private readonly PendingGains<(string Items,string Inputs)> unexplained=new();
     private readonly object logGate=new();private readonly List<(GainSource Source,uint Detail,string? Note,long At)> logSources=[];
+    // 0.1102: airship sectors unlocked (log message 4163), handed to AirshipPointUnlocked on the framework thread.
+    private readonly List<uint> airshipUnlocks=[];
+    /// <summary>0.1102: an airship sector the game says was unlocked (AirshipExplorationPoint row, not checked here).</summary>
+    public Action<uint>? AirshipPointUnlocked { get; set; }
 
     private void OnLogMessage(Dalamud.Game.Chat.ILogMessage message)
     {
@@ -376,15 +380,21 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(source==GainSource.None && note is null)return;
             var detail=message.TryGetIntParameter(0,out var first) && first>0 ? (uint)first:0u;
             if(note is not null && message.TryGetIntParameter(1,out var second) && second>0)detail=(uint)second;
-            lock(logGate){if(logSources.Count<32)logSources.Add((source,detail,note,Environment.TickCount64));}
+            var unlocked=GainLogMessages.UnlockedAirshipPoint(id,message.TryGetIntParameter(0,out var point) ? point:null);
+            lock(logGate)
+            {
+                if(logSources.Count<32)logSources.Add((source,detail,note,Environment.TickCount64));
+                if(unlocked!=0 && airshipUnlocks.Count<8)airshipUnlocks.Add(unlocked);
+            }
         }
         catch(Exception){}
     }
 
     private void SettleGains(long now)
     {
-        (GainSource Source,uint Detail,string? Note,long At)[] seen;
-        lock(logGate){seen=[..logSources];logSources.Clear();}
+        (GainSource Source,uint Detail,string? Note,long At)[] seen;uint[] unlocks;
+        lock(logGate){seen=[..logSources];logSources.Clear();unlocks=[..airshipUnlocks];airshipUnlocks.Clear();}
+        foreach(var point in unlocks)AirshipPointUnlocked?.Invoke(point);
         foreach(var (source,detail,note,at) in seen)
         {
             unexplained.Source(source,detail,at);

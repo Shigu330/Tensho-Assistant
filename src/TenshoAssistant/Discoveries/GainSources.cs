@@ -22,6 +22,9 @@ public static class GainLogMessages
         _=>GainSource.None,
     };
 
+    /// <summary>0.1102: the airship sector a log message says was unlocked (4163, its first number: <c>sheet(AirshipExplorationPoint,lnum1,0)</c>), or 0.</summary>
+    public static uint UnlockedAirshipPoint(uint logMessage,int? first)=>logMessage==AirshipNewPoint && first is > 0 ? (uint)first.Value:0;
+
     /// <summary>The voyage lines read for the log (new destination, rank), not gains: their name for the developer's log, or null.</summary>
     public static string? VoyageNote(uint logMessage)=>logMessage switch
     {

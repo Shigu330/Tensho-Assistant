@@ -110,7 +110,7 @@ var kindNames=new Dictionary<int,string>{[1]="MonsterPlace",[2]="HuntMarkPlace",
     [9]="ItemFromItem",[10]="FishCatch",[11]="FishCondition",[12]="FashionEvaluation",[13]="VoyageDrop",[14]="VoyageUnlock",[15]="BlueSpellLearned",[16]="BeastTamed",[17]="FestivalSeen",
     [18]="VistaSeen",[19]="NpcPlace",[20]="FishLure",[21]="FishTransition",[22]="BlueSpellCaster",[23]="FishBite",[24]="Reduction",[25]="QuestItemAsked",[28]="SpearShadow",
     // 0.1004: the kinds added since 0.933 (DiscoveriesModel.cs), and those that keep a place (DiscoveryStore.HasPlace, tools/discoveries-merge.py PLACED).
-    [29]="FishBiteBait",[30]="IntuitionStart",[31]="IntuitionCatch",[32]="VoyageVisit",[33]="MonsterKill",[34]="DutyChestOpened",[35]="SpectralBefore",[36]="FishPoints",[37]="AirshipDrop"};
+    [29]="FishBiteBait",[30]="IntuitionStart",[31]="IntuitionCatch",[32]="VoyageVisit",[33]="MonsterKill",[34]="DutyChestOpened",[35]="SpectralBefore",[36]="FishPoints",[37]="AirshipDrop",[38]="AirshipUnlock"};
 var placeKinds=new HashSet<int>{1,2,3,8,10,19,22,23,28,29,30};
 var report=new SortedDictionary<int,KindReport>();
 KindReport For(int kind)=>report.TryGetValue(kind,out var found) ? found:report[kind]=new KindReport();

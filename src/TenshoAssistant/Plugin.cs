@@ -479,6 +479,13 @@ public sealed class Plugin : IDalamudPlugin
                 itemWatcher.BlueSpellOfAction=action=>blueActions.GetValueOrDefault(action);
                 // X-96 (0.959): the check uses the standard table even where the zone has a story weather, and records whether the game agrees there.
                 itemWatcher.ForecastWeather=(territory,at)=>weather.State.Catalog?.Forecast(territory,at,1,true) is { Count:>0 } current ? current[0].Weather?.Id ?? 0:0;
+                // 0.1102: an airship sector unlocked (log message 4163), kept only when the sheet names that row.
+                itemWatcher.AirshipPointUnlocked=point=>
+                {
+                    if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources
+                       && data.GetExcelSheet<Lumina.Excel.Sheets.AirshipExplorationPoint>().GetRowOrDefault(point) is { } row && !row.Name.IsEmpty)
+                        mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.AirshipUnlock,point,0,1,DateTimeOffset.UtcNow);
+                };
                 itemWatcher.WeatherChecked=(territory,matched)=>
                 {
                     if(weather.State.Catalog?.Zone(territory) is not { Individual:true })return;
