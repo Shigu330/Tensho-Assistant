@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1060.0
+- Constat d'audit A057 (partie réseau) : le tableau des sources réseau de REFERENCES, écrit au 0.315, ne contient pas les sources ajoutées depuis (PaissaDB, échange des découvertes partagées, fichiers de ce dépôt, webhook Discord, mise à jour de l'application de bureau). REFERENCES renvoie maintenant, dans ses deux langues, à la liste complète produite depuis le code dans SECURITY.md, et garde son tableau pour les licences et les caches. Un test vérifie le renvoi et la présence de ces sources dans la liste produite.
+- Tests : ReferencesNetwork1060Tests. Verify.ps1 (agent) : 1741/1741, 0 avertissement, 0 erreur ; DLL 0.1060.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A057 (network part): the network sources table of REFERENCES, written at 0.315, misses the sources added since (PaissaDB, shared discoveries exchange, files of this repository, Discord webhook, desktop app update). REFERENCES now points, in both languages, to the complete list produced from the code in SECURITY.md, and keeps its table for the licences and caches. A test checks the pointer and that these sources are in the produced list.
+
 ## 0.1059.0
 - Constat d'audit A055 (forme) : G-PROPOSALS s'ouvrait sur « rien ici n'est encore décidé » juste au-dessus de la ligne disant que DEC-026 a confirmé les choix provisoires, et la proposition n° 11 (X-40, monstres proches) était une ligne de tableau collée à la fin du texte de X-100, sans tableau. L'ouverture dit maintenant que ce qui est décidé est marqué ; la proposition 11 a son titre (décidée par DEC-049, codée en 0.1002) et son en-tête de tableau, dans les deux langues. Un test vérifie l'ouverture et qu'aucune ligne de tableau n'est hors d'un tableau.
 - Tests : ProposalsShape1059Tests. Verify.ps1 (agent) : 1740/1740, 0 avertissement, 0 erreur ; DLL 0.1059.0.0. Rien à essayer en jeu.

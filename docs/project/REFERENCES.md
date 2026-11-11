@@ -10,6 +10,10 @@ sources (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Universalis 
 
 ### Read at run time (network)
 
+The complete list, produced from the code at every version, is in [SECURITY.md](../../SECURITY.md) (« Scope », network: hosts,
+setting that turns each source off, files). The table below was written at 0.315 for the licences and the caches; it misses the
+sources added since (PaissaDB, the shared discoveries exchange, the files of this repository, the Discord webhook, the desktop app update).
+
 | Service | Licence | Address called | File | Trigger | Cache |
 |---|---|---|---|---|---|
 | Universalis | public API (licence not recorded) | `universalis.app/api/v2/aggregated/{monde}/{objet}` ; `/api/v2/{monde, centre ou région}/{objet}?listings=…&entries=…` ; `/api/v2/data-centers` | `Market/MarketService.cs`, `Market/MarketBoardService.cs` | prices: click or hover (option); listings and history: Market page only (0.270) | "Prices"; listings also on disk `market-board` (0.281) |
@@ -977,6 +981,11 @@ communautaire absente ou désactivée donne « inconnu », jamais une valeur dev
 communautaires (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, prix au survol Universalis).
 
 ### Lues à l'exécution (réseau)
+
+La liste complète, produite depuis le code à chaque version, est dans [SECURITY.md](../../SECURITY.md) (« Périmètre », réseau : hôtes,
+réglage qui coupe chaque source, fichiers). Le tableau ci-dessous a été écrit au 0.315 pour les licences et les caches ; il ne contient
+pas les sources ajoutées depuis (PaissaDB, l'échange des découvertes partagées, les fichiers de ce dépôt, le webhook Discord, la mise à
+jour de l'application de bureau).
 
 | Service | Licence | Adresse appelée | Fichier | Déclenchement | Cache |
 |---|---|---|---|---|---|
