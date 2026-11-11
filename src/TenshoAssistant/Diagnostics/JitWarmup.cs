@@ -45,14 +45,19 @@ public sealed class JitWarmup : IDisposable
     public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null)
         =>new(roots,delay,finished,early);
 
-    /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.</summary>
+    /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
+    /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).</summary>
     public static bool MapFirst(MethodBase method)
     {
+        if(method.DeclaringType?.Namespace==MapNamespace)return true;
         if(!method.Name.Contains("Map",StringComparison.Ordinal))return false;
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
             if(type.Name=="MainWindow")return true;
         return false;
     }
+
+    /// <summary>X-01 (0.1111): the namespace of the map's types (catalogues, projection, layers, live readers).</summary>
+    public const string MapNamespace="TenshoAssistant.Maps";
 
     /// <summary>X-01 (0.1104): the early methods first, then the others, each part in its former order.</summary>
     public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)

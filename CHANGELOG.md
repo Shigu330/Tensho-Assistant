@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1111.0
+- Carte : le code de ses propres types (catalogues, projection, calques, lecteurs) est préparé en premier lui aussi, une demi-seconde après le chargement de Tensho (X-01, suite de 0.1104 : première image de la carte encore à 293 ms, surtout de la compilation).
+- Tests : MapWarmup1111Tests. Verify.ps1 (agent) : 1815/1815, 0 avertissement, 0 erreur ; DLL 0.1111.0.0. Rien à essayer en jeu.
+### English
+- Map: the code of its own types (catalogues, projection, layers, readers) is prepared first too, half a second after Tensho loads (X-01, after 0.1104: the map's first frame still at 293 ms, mostly compiling).
+
 ## 0.1110.0
 - Jardin : le mode développeur ne recopie plus dans le journal de Dalamud chaque ligne du chat lue dans un quartier résidentiel ; l'entretien et la récolte sont reconnus (0.616, 0.978) et ce qu'une récolte donne reste dans les lignes de gains d'objets (#36).
 - Tests : GardenCapture1110Tests. Verify.ps1 (agent) : 1814/1814, 0 avertissement, 0 erreur ; DLL 0.1110.0.0. Rien à essayer en jeu.

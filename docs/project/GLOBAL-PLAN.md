@@ -150,7 +150,7 @@ A piece of data is not proven: the survey comes before the code. Order: by activ
 <!-- gen:plan:phase-5-corrections-en -->
 | Where | What to survey | Issue |
 |---|---|---|
-| Garden | One upkeep and one harvest, to recognise their messages; then remove the capture log lines | #36 |
+| Garden | One upkeep and one harvest, to recognise their messages; then remove the capture log lines | Done in 0.1110 |
 | Gathering | GP regeneration during a gathering read on 2026-11-06: no increase within the window, +8 every 3 s outside, nothing to code (evidence) | Done |
 <!-- /gen:plan:phase-5-corrections-en -->
 
@@ -526,10 +526,10 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-124 | The user's approval of 2026-11-10 ("I give you the approval for everything") for the rest of X-120: a separate GitHub repository for… | Done in 0.1035 |
 | X-125 | The user's approval of 2026-11-10 ("yes"): PluginUiTest tried on 4 or 5 popular open-source Dalamud plugins (built from their sources… | Done in 0.1036 |
 | X-126 | The user's request of 2026-11-11: install the desktop application from Tensho, never mandatory, only from Settings, section "Desktop application" (made precise on 2026-11-11), with the interface settings that go with it ("installed / version / up to date" state, Install or Update button, install folder, X-121's automatic update, link to the release; en/fr texts, FAQ). Download from the repository's GitHub release, SHA-256 checked (X-121), installed beside, never started by the plugin without a click of the user. Decision D-137 (2026-11-11): an accepted exception to Dalamud's plugin rules for our application, Tensho being on a custom repository; should Tensho ever aim at the official repository, this install can be turned off in the submitted build. Changes X-119's rule "never started nor contained by the plugin". | After X-119 is finished (steps 2 to 4: local link, actions, per-page setting); not before |
-| X-127 | Request of 2026-11-11: the wishlist as a tool of its own, with its entry in Tensho's menu (out of the Collections tab); an « added to your wishlist » line with a link that opens the list; « Where is my wishlist? » in the FAQ; for each gatherable item, where to gather it (job, zone, node, hours or weather); a button that sets in one click the alarms of the list's items that have a timed node, without duplicates | To do (after relay 21) |
-| X-128 | Request of 2026-11-11 (screenshot): Tensho map, the « Quests not available yet » box sits in the right-click menu above the tabs instead of the Quests tab, and unticking it does not remove unavailable quests from the list | To do |
-| X-129 | Request of 2026-11-11 (screenshot, Glowing apple seeds): gathering help, a hidden item revealed after a GP spend has « no plan » (« read after a GP spend on this node ») while the node's other items have one; it got no bonus: compute its plan from the GP left | To do |
-| X-130 | Request of 2026-11-11: garden, crossbreed forecasts from the planted garden (Tensho's journal: seed and place of each bed in the 3 × 3 grid): for each bed, the seeds it can give with its planted neighbours, those you lack or wish for highlighted; an unknown seed said, never guessed; community source cited (your own readings with X-108) | To do |
+| X-127 | Request of 2026-11-11: the wishlist as a tool of its own, with its entry in Tensho's menu (out of the Collections tab); an « added to your… | Done in 0.1106 |
+| X-128 | Request of 2026-11-11 (screenshot): Tensho map, the « Quests not available yet » box sits in the right-click menu above the tabs instead of… | Done in 0.1107 |
+| X-129 | Request of 2026-11-11 (screenshot, Glowing apple seeds): gathering help, a hidden item revealed after a GP spend has « no plan » (« read… | Done in 0.1108 |
+| X-130 | Request of 2026-11-11: garden, crossbreed forecasts from the planted garden (Tensho's journal: seed and place of each bed in the 3 × 3… | Done in 0.1109 |
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -751,7 +751,7 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 <!-- gen:plan:phase-5-corrections -->
 | Où | Ce qu'il faut relever | Issue |
 |---|---|---|
-| Jardin | Un entretien et une récolte, pour reconnaître leurs messages ; puis retirer les lignes de journal de capture | #36 |
+| Jardin | Un entretien et une récolte, pour reconnaître leurs messages ; puis retirer les lignes de journal de capture | Fait en 0.1110 |
 | Récolte | La régénération de PR pendant une récolte relevée le 2026-11-06 : aucune hausse dans la fenêtre, +8 toutes les 3 s dehors, rien à coder… | Fait |
 <!-- /gen:plan:phase-5-corrections -->
 
@@ -1127,10 +1127,10 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-124 | Accord de l'utilisateur du 2026-11-10 (« je te donne l'accord pour tout ») pour la suite de X-120 : dépôt GitHub séparé pour… | Fait en 0.1035 |
 | X-125 | Accord de l'utilisateur du 2026-11-10 (« oui ») : PluginUiTest essayé sur 4 ou 5 plugins Dalamud open source populaires (compilés depuis… | Fait en 0.1036 |
 | X-126 | Demande de l'utilisateur du 2026-11-11 : installer l'application de bureau depuis Tensho, jamais obligatoire, seulement depuis Paramètres, section « Application de bureau » (précision du 2026-11-11), avec les réglages d'interface qui vont avec (état « installée / version / à jour », bouton Installer ou Mettre à jour, dossier d'installation, mise à jour automatique de X-121, lien vers la release ; textes en/fr, FAQ). Téléchargement depuis la release GitHub du dépôt, empreinte SHA-256 vérifiée (X-121), installé à côté, jamais lancé par le plugin sans un clic de l'utilisateur. Décision D-137 (2026-11-11) : exception assumée aux règles des plugins Dalamud pour notre application, Tensho étant sur un dépôt personnalisé ; si Tensho vise un jour le dépôt officiel, pouvoir couper cette installation dans la version soumise. Change la règle de X-119 « jamais lancée ni contenue par le plugin ». | Après X-119 terminé (étapes 2 à 4 : lien local, actions, réglage par page) ; pas avant |
-| X-127 | Demande du 2026-11-11 : liste de souhaits en outil à part, avec son entrée dans le menu de Tensho (sortie de l'onglet de Collections) ; ligne « ajouté à vos souhaits » avec un lien qui ouvre la liste ; question « Où est ma liste de souhaits ? » dans la FAQ ; pour chaque objet récoltable, où le récolter (métier, zone, point, heures ou météo) ; bouton qui pose en 1 clic les alarmes des objets de la liste qui ont un point limité, sans doublon | À faire (après le relais 21) |
-| X-128 | Demande du 2026-11-11 (capture) : carte de Tensho, la case « Quêtes pas encore disponibles » est dans le menu du clic droit au-dessus des onglets au lieu de l'onglet Quêtes, et la décocher ne retire pas les quêtes indisponibles de la liste | À faire |
-| X-129 | Demande du 2026-11-11 (capture, Graines de pommier luisant) : aide à la récolte, un objet caché révélé après une dépense de PR n'a « aucun plan » (« lu après une dépense de PR sur ce point ») alors que les autres objets du point en ont un ; il n'a reçu aucun bonus : calculer son plan avec les PR restants | À faire |
-| X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à partir du jardin planté (journal de Tensho : graine et place de chaque emplacement dans la grille 3 × 3) : pour chaque emplacement, les graines possibles avec ses voisins plantés, celles que vous n'avez pas ou qui sont dans vos souhaits mises en avant ; graine inconnue dite, jamais devinée ; source communautaire citée (relevés à soi avec X-108) | À faire |
+| X-127 | Demande du 2026-11-11 : liste de souhaits en outil à part, avec son entrée dans le menu de Tensho (sortie de l'onglet de Collections)… | Fait en 0.1106 |
+| X-128 | Demande du 2026-11-11 (capture) : carte de Tensho, la case « Quêtes pas encore disponibles » est dans le menu du clic droit au-dessus des… | Fait en 0.1107 |
+| X-129 | Demande du 2026-11-11 (capture, Graines de pommier luisant) : aide à la récolte, un objet caché révélé après une dépense de PR n'a « aucun… | Fait en 0.1108 |
+| X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à partir du jardin planté (journal de Tensho : graine et place de chaque… | Fait en 0.1109 |
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment

@@ -1678,6 +1678,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1102) Aéronef : au retour d'un voyage qui débloque une nouvelle destination (message du jeu dans le chat) : Monde › Découvertes, « Secteurs d'aéronef débloqués » compte 1 de plus et la recherche du secteur montre « … débloqué (aéronef) ».
 
+- [ ] (0.1106) Barre latérale, OBJETS › Souhaits : la page s'ouvre (plus d'onglet Souhaits dans Collections) ; clic droit sur un objet › « Ajouter à mes souhaits » : la ligne « ajouté à vos souhaits » en bas de la fenêtre, son bouton ouvre la liste
+
+- [ ] (0.1106) Souhaits avec un objet récolté sur un point limité (ex. un objet de légende) : sous son nom, « Récolte : métier · zone · point · heures » ; « Ajouter les alarmes (N) » les pose, un deuxième clic n'en ajoute pas
+
+- [ ] (0.1106) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : guide : arrêt « Souhaits » ajouté à la visite (GuideFlow, pour tous) ; aide : textes PageHelp Wishlist (en, fr) et question de la FAQ « Où est ma liste de souhaits ? » ; liste des outils de l'accueil : produite des pages, la page y entre seule
+
+- [ ] (0.1107) Carte de Tensho, clic droit › onglet Quêtes : la case « Quêtes pas encore disponibles » y est (plus au-dessus des onglets) ; décochée, les quêtes pas encore disponibles quittent la liste et leurs icônes la carte
+
+- [ ] (0.1108) Récolte avec un objet caché (ex. Graines de pommier luisant) révélé après une dépense de PR : le panneau donne un plan pour lui, avec la ligne « Objet révélé après une dépense de PR : plan établi avec ce qui restait… »
+
+- [ ] (0.1109) Jardin › journal, un potager planté (au moins deux parcelles voisines de graines qui se croisent) : sous la parcelle plantée en second, « Peut donner : … (avec la parcelle N, …) » ; une graine pas possédée ou souhaitée est redite en couleur ; la ligne « Prévisions : … » sous la grille
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
