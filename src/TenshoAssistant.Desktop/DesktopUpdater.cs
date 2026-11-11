@@ -71,17 +71,15 @@ internal sealed class DesktopUpdater
 
     public static UpdateState Load(string own)=>DesktopInstall.Load(own);
 
-    private void Save(UpdateState state)
-    {
-        DesktopInstall.Save(own,state);
-        State=state;
-    }
+    /// <summary>X-140: update.json read again, changed and written under the lock shared with the plugin; State follows the disk.</summary>
+    private void Change(Func<UpdateState,UpdateState> change,int waitMs=DesktopInstall.LockWaitMs)=>State=DesktopInstall.Update(own,change,waitMs);
 
     private void Set(string key,bool warning=false,params object[] values){lock(gate)status=(key,values,warning);}
 
     /// <summary>Starts a check in the background (at start when the setting is on, or on the button); one at a time.</summary>
     public void Check(bool manual)
     {
+        if(!Busy)State=Load(own); // X-140: the plugin may have changed the setting since
         lock(gate)
         {
             if(work is { IsCompleted: false } || pending is not null)return;
@@ -94,7 +92,7 @@ internal sealed class DesktopUpdater
 
     public void SetAuto(bool on)
     {
-        try{Save(State with {AutoUpdate=on});}
+        try{Change(state=>state with {AutoUpdate=on},DesktopInstall.ClickWaitMs);}
         catch(IOException){}
         catch(UnauthorizedAccessException){}
         if(!on && !Busy && Pending is null)Set("Desktop.UpdateOff");
@@ -143,13 +141,13 @@ internal sealed class DesktopUpdater
                 case InstallStep.Downloading:Set("Desktop.UpdateDownloading",false,version,done,total);break;
                 case InstallStep.Unpacking:Set("Desktop.UpdateUnpacking",false,version);break;
                 case InstallStep.ErrorHash:Set("Desktop.UpdateErrorHash",true,version,three);break;
+                case InstallStep.ErrorFolder:Set("Desktop.UpdateErrorFolder",true,version,done,three);break;
                 default:Set("Desktop.UpdateErrorPackage",true,version,three);break;
             }
         },message=>Console.WriteLine(message),cancel).ConfigureAwait(false);
         if(installed is null)return null;
-        Save(DesktopUpdate.AfterInstall(State,installed,new InstalledCopy(three,runningFolder)));
-        foreach(var old in DesktopUpdate.Obsolete(State,Directory.GetDirectories(VersionsFolder(own)),runningFolder))
-            try{Directory.Delete(old,true);}catch(IOException){}catch(UnauthorizedAccessException){}
+        Change(state=>DesktopUpdate.AfterInstall(state,installed,new InstalledCopy(three,runningFolder)));
+        foreach(var old in DesktopInstall.Clean(own,runningFolder))Console.WriteLine($"Update: old copy removed {old}");
         Console.WriteLine($"Update: previous copy {runningFolder}");
         return installed;
     }
@@ -166,8 +164,11 @@ internal sealed class DesktopUpdater
     /// <summary>« Previous version »: back to the previous copy, the version left set aside, and restart into it.</summary>
     public void GoBack()
     {
-        if(DesktopUpdate.RollBack(State) is not { } back || back.Current is not { } current)return;
-        Save(back);
+        UpdateState? back=null;
+        try{Change(state=>(back=DesktopUpdate.RollBack(state)) ?? state,2000);}
+        catch(IOException){Set("Desktop.UpdateErrorNetwork",true,"update.json",DesktopVersionCheck.Three(running));return;}
+        catch(UnauthorizedAccessException){Set("Desktop.UpdateErrorNetwork",true,"update.json",DesktopVersionCheck.Three(running));return;}
+        if(back?.Current is not { } current)return;
         lock(gate)pending=null;
         if(DesktopUpdate.SameFolder(current.Folder,runningFolder)){Set("Desktop.UpdateSkipped",false,back.Skipped ?? "",DesktopVersionCheck.Three(running));return;}
         Restart(current);
@@ -202,15 +203,19 @@ internal sealed class DesktopUpdater
     /// <summary>A copy started as Current that fails before its window: back to the previous copy (version set aside); the text to show, or null.</summary>
     public static string? RollBackAfterFailure(string own,string runningFolder)
     {
-        var state=Load(own);
-        if(state.Current is not { } current || !DesktopUpdate.SameFolder(current.Folder,runningFolder) || DesktopUpdate.RollBack(state) is not { } back)return null;
+        // X-140: under the lock shared with the plugin, the state read again, written whole through a temporary file.
+        InstalledCopy? failed=null;UpdateState? back=null;
         try
         {
-            Directory.CreateDirectory(own);
-            File.WriteAllText(StatePath(own),DesktopUpdate.WriteState(back));
+            DesktopInstall.Update(own,state=>
+            {
+                if(state.Current is not { } current || !DesktopUpdate.SameFolder(current.Folder,runningFolder) || DesktopUpdate.RollBack(state) is not { } rolled)return state;
+                failed=current;back=rolled;return rolled;
+            });
         }
         catch(IOException){return null;}
         catch(UnauthorizedAccessException){return null;}
-        return $"Tensho Assistant (desktop) {current.Version} could not start: the next start goes back to {back.Current!.Version}.";
+        if(failed is null || back?.Current is null)return null;
+        return $"Tensho Assistant (desktop) {failed.Version} could not start: the next start goes back to {back.Current.Version}.";
     }
 }

@@ -101,7 +101,7 @@ internal static class DesktopUpdate1033Tests
             // X-126 (0.1113): the GitHub source and the install moved to DesktopInstall.cs, shared with the plugin.
             var updater = Read("src/TenshoAssistant.Desktop/DesktopInstall.cs");
             Check(updater.Contains("https://api.github.com/repos/",StringComparison.Ordinal) && !Regex.IsMatch(updater,@"Authorization|Bearer|GITHUB_TOKEN",RegexOptions.IgnoreCase),"GitHub's public API, no token");
-            Check(updater.Contains("SHA256.HashDataAsync",StringComparison.Ordinal) && updater.Contains("ExtractToDirectory(zip,partial)",StringComparison.Ordinal) && updater.Contains("CheckCopy(partial",StringComparison.Ordinal),"hash, unpack beside, versions checked before it is recorded");
+            Check(updater.Contains("SHA256.HashDataAsync",StringComparison.Ordinal) && updater.Contains("Unpack(file,partial,MaxEntries,MaxUnpackedBytes) ?? CheckCopy(partial",StringComparison.Ordinal),"hash, unpack beside (X-140: from the hashed file, bounded), versions checked before it is recorded");
             var docgen = Read("tools/docgen.py");
             Check(docgen.Contains("TenshoAssistant.Desktop/DesktopUpdater.cs",StringComparison.Ordinal) && docgen.Contains("Desktop.UpdateAutoOn",StringComparison.Ordinal),"the network source is declared (SECURITY)");
             Check(Regex.IsMatch(Read("src/TenshoAssistant/Help/Faq.cs"),@"new\(""DesktopUpdate""\)"),"the FAQ answers it (R32)");

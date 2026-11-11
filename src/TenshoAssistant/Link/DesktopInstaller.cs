@@ -140,10 +140,12 @@ internal sealed class DesktopInstaller : IDisposable
                 InstallStep.Downloading=>"Advanced.DesktopInstallDownloading",
                 InstallStep.Unpacking=>"Advanced.DesktopInstallUnpacking",
                 InstallStep.ErrorHash=>"Advanced.DesktopInstallErrorHash",
+                InstallStep.ErrorFolder=>"Advanced.DesktopInstallErrorFolder",
                 _=>"Advanced.DesktopInstallErrorPackage",
-            },step is InstallStep.ErrorHash or InstallStep.ErrorPackage,version,done,total),log,cancel).ConfigureAwait(false);
+            },step is InstallStep.ErrorHash or InstallStep.ErrorPackage or InstallStep.ErrorFolder,version,done,total),log,cancel).ConfigureAwait(false);
             if(copy is null)return;
-            DesktopInstall.Save(own,DesktopInstallRules.AfterInstall(DesktopInstall.Load(own),copy));
+            // X-140: update.json read again and changed under the lock shared with the app (never a state read before the download).
+            DesktopInstall.Update(own,state=>DesktopInstallRules.AfterInstall(state,copy));
             Set(DesktopUpdate.Three(Version.Parse(copy.Version))==DesktopUpdate.Three(plugin) ? "Advanced.DesktopInstallDone" : "Advanced.DesktopInstallDoneOther",false,copy.Version,DesktopVersionCheck.Three(plugin));
         }
         catch(OperationCanceledException) when(cancel.IsCancellationRequested){}
@@ -157,7 +159,7 @@ internal sealed class DesktopInstaller : IDisposable
     /// <summary>« Automatic update » of the app (X-121), kept in its update.json; false when it could not be written.</summary>
     public bool SetAutoUpdate(bool on)
     {
-        try{DesktopInstall.Save(own,State with {AutoUpdate=on});return true;}
+        try{DesktopInstall.Update(own,state=>state with {AutoUpdate=on},DesktopInstall.ClickWaitMs);return true;}
         catch(IOException){return false;}
         catch(UnauthorizedAccessException){return false;}
     }

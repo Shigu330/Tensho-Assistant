@@ -180,10 +180,11 @@ public static class DesktopUpdate
         return exists(exe) ? exe : null;
     }
 
-    /// <summary>The folders of versions\ to delete: every one but Current, Previous and the running copy's.</summary>
+    /// <summary>The folders of versions\ to delete: every one but Current, Previous and the running copy's, and an install's own places
+    /// (*.partial, *.old); DesktopInstall.Clean then keeps only Tensho's copies (X-140).</summary>
     public static IReadOnlyList<string> Obsolete(UpdateState state,IEnumerable<string> versionFolders,string runningFolder)
         => versionFolders.Where(folder=>!SameFolder(folder,runningFolder) && !SameFolder(folder,state.Current?.Folder) && !SameFolder(folder,state.Previous?.Folder)
-            && !folder.EndsWith(".partial",StringComparison.OrdinalIgnoreCase)).ToArray();
+            && !folder.EndsWith(".partial",StringComparison.OrdinalIgnoreCase) && !folder.EndsWith(".old",StringComparison.OrdinalIgnoreCase)).ToArray();
 
     public static bool SameFolder(string? a,string? b)
         => a is not null && b is not null && string.Equals(Path.TrimEndingDirectorySeparator(Path.GetFullPath(a)),Path.TrimEndingDirectorySeparator(Path.GetFullPath(b)),StringComparison.OrdinalIgnoreCase);
