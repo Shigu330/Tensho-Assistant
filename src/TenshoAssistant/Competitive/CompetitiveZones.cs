@@ -2,18 +2,20 @@ namespace TenshoAssistant.Competitive;
 
 /// <summary>
 /// DEC-038: where the whole plugin stops. From the game's data where it says so: PvP zones, content flagged PvP (Triple Triad Battlehall, Lord of
-/// Verminion) and deep dungeons, ranked on the Lodestone. Listed by hand where nothing flags it: Triple Triad tournaments, Mahjong, the Beastmaster
-/// labyrinth (docs/evidence/0.600-competitive-inventory.md). No setting avoids it, and in doubt it stays stopped.
+/// Verminion) and deep dungeons, ranked on the Lodestone. Listed by hand where nothing flags it: Triple Triad tournaments, Mahjong
+/// (docs/evidence/0.600-competitive-inventory.md). No setting avoids it, and in doubt it stays stopped.
+/// X-137 (0.1115, user's choice of 2026-11-11, DEC-038 completed): the Beastmaster labyrinth is no longer cut (no ranking); its territories stay
+/// known (<see cref="IsLabyrinth"/>) for the board panel and the developer reading.
 /// </summary>
 public static class CompetitiveZones
 {
     public const uint DeepDungeonContentType=21;
-    public static readonly IReadOnlySet<uint> Listed=new HashSet<uint>{940,941,831,1339,1340,1341,1342,1343};
+    public static readonly IReadOnlySet<uint> Listed=new HashSet<uint>{940,941,831};
     /// <summary>X-109 (0.979, DEC-047): the Beastmaster labyrinth's territories (one per board; 1339 read in game on 2026-11-09 at the 1st board's entry).</summary>
     public static readonly IReadOnlySet<uint> Labyrinth=new HashSet<uint>{1339,1340,1341,1342,1343};
     /// <summary>
     /// X-92 (0.1001, « plan for future content »): the labyrinth's territories found in the game's sheets (XBMContent column 0 → ContentFinderCondition →
-    /// TerritoryType), so a board added by a game update is cut too; the list above stays (in doubt, stopped).
+    /// TerritoryType), so a board added by a game update is known too; the list above stays. Not cut since X-137 (0.1115).
     /// </summary>
     public static IReadOnlySet<uint> LabyrinthFound { get; private set; } = new HashSet<uint>();
     public static bool IsLabyrinth(uint territory)=>Labyrinth.Contains(territory) || LabyrinthFound.Contains(territory);
@@ -26,9 +28,8 @@ public static class CompetitiveZones
     public static HashSet<uint> Build(IEnumerable<(uint Territory,bool PvpZone)> territories,IEnumerable<(uint Territory,bool PvP,uint ContentType)> content,IEnumerable<uint>? labyrinth=null)
     {
         var zones=new HashSet<uint>(Listed);
-        var found=(labyrinth ?? []).Where(territory=>territory!=0).ToHashSet();
-        LabyrinthFound=found;
-        zones.UnionWith(found);
+        // X-137 (0.1115): the labyrinth's boards are remembered (IsLabyrinth), not cut.
+        LabyrinthFound=(labyrinth ?? []).Where(territory=>territory!=0).ToHashSet();
         foreach(var (territory,pvpZone) in territories)if(pvpZone)zones.Add(territory);
         foreach(var (territory,pvp,type) in content)if(territory!=0 && (pvp || type==DeepDungeonContentType))zones.Add(territory);
         return zones;

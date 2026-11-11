@@ -264,7 +264,7 @@ game data: [0.600-competitive-inventory](../evidence/0.600-competitive-inventory
 |---|---|---|
 | Game flags | PvP, Lord of Verminion, deep dungeons (ranked on the Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` and its content type 21 (`CompetitiveZones.Build`): new maps are covered without an update; `IsPvP` alone is false at the Battlehall (579) and at Lord of Verminion |
 | Arena only | Triple Triad Battlehall (579), whose public hall has PvE matches | `GameMain.IsInPvPInstance` (0.612); the log writes `Competitive arena check` |
-| Listed in the code | Triple Triad tournaments (940, 941), Mahjong (831), Crucible of the Unbroken (1339 to 1343) | `CompetitiveZones.Listed`; the beastmaster's team panel is the one exception (DEC-047) |
+| Listed in the code | Triple Triad tournaments (940, 941), Mahjong (831); the Crucible of the Unbroken (1339 to 1343) was listed until 0.1115, no longer cut since (X-137, DEC-038 completed on 2026-11-11) | `CompetitiveZones.Listed`; the labyrinth's territories stay known (`IsLabyrinth`) |
 | Outside a zone | Triple Triad against a player in a normal zone | only the Triple Triad part switches off (DEC-038, D5) |
 
 What « switched off » means, as coded (`CompetitiveGate`): Tensho stays loaded and one guard, on the framework thread, keeps only the
@@ -560,7 +560,7 @@ dans les données du jeu : [0.600-competitive-inventory](../evidence/0.600-compe
 |---|---|---|
 | Drapeaux du jeu | JcJ, Lord of Verminion, donjons profonds (classés sur le Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` et son type de contenu 21 (`CompetitiveZones.Build`) : les nouvelles cartes sont couvertes sans mise à jour ; `IsPvP` seul est faux au Battlehall (579) et à Lord of Verminion |
 | Arène seulement | Battlehall de Triple Triade (579), dont la salle publique a des matchs JcE | `GameMain.IsInPvPInstance` (0.612) ; le journal écrit `Competitive arena check` |
-| Listé dans le code | Tournois de Triple Triade (940, 941), Mahjong (831), Dédale bestial (1339 à 1343) | `CompetitiveZones.Listed` ; le panneau d'équipe du dresseur est la seule exception (DEC-047) |
+| Listé dans le code | Tournois de Triple Triade (940, 941), Mahjong (831) ; le Dédale bestial (1339 à 1343) y était jusqu'en 0.1115, il n'est plus coupé depuis (X-137, DEC-038 complétée le 2026-11-11) | `CompetitiveZones.Listed` ; les territoires du Dédale restent connus (`IsLabyrinth`) |
 | Hors d'une zone | Triple Triade contre un joueur dans une zone normale | seule la partie Triple Triade se coupe (DEC-038, D5) |
 
 Ce que « coupé » veut dire, tel que codé (`CompetitiveGate`) : Tensho reste chargé et un seul gardien, sur le thread du framework, ne

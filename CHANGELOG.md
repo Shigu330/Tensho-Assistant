@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1115.0
+- Plan global, X-137 : Dédale bestial : Tensho n'y est plus coupé (choix de l'utilisateur du 11/11, aucun classement vu) ; ses territoires restent reconnus pour le panneau d'équipe. La coupure reste en JcJ, aux tournois de Triple Triade, au Mahjong et dans les donjons profonds. DEC-038 complétée (deux langues), ARCHITECTURE suit.
+- Tests : LabyrinthOpen1115Tests. Verify.ps1 (agent) : 1823/1823, 0 avertissement, 0 erreur ; DLL 0.1115.0.0. Non validé en jeu.
+### English
+- Beast labyrinth: Tensho is no longer cut there (the user's choice of 11/11, no ranking seen); its territories stay known for the team panel. The cut stays in PvP, Triple Triad tournaments, Mahjong and deep dungeons. DEC-038 completed (both languages), ARCHITECTURE follows.
+
 ## 0.1114.0
 - Lien local avec l'application de bureau, protocole 2 (X-119 étape 2 suite, partie 1) : en plus de qui et où, le plugin envoie sa classe et son niveau, ses PR et les places libres des sacs, et les noms des fichiers enregistrés de Tensho que le jeu vient d'écrire (jamais leur contenu ; bornes : 16 noms de 160 caractères, ligne de 8 Ko). L'application relit elle-même le fichier de réglages du plugin quand le jeu l'enregistre (ses pages suivent les réglages du jeu) et montre ces états dans sa barre d'état. Info-bulle du réglage et FAQ du lien mises à jour.
 - Tests : LinkLive1114Tests. Verify.ps1 (agent) : 1822/1822, 0 avertissement, 0 erreur ; DLL 0.1114.0.0. Non validé en jeu.

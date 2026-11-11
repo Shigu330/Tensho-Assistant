@@ -15,8 +15,9 @@ internal static class CompetitiveCut610Tests
         ("Competitive: the zones come from the flags, deep dungeons and the list",() =>
         {
             var zones=CompetitiveZones.Build([(250,true),(100,false)],[(579,true,9),(561,false,CompetitiveZones.DeepDungeonContentType),(132,false,2),(0,true,5)]);
-            foreach(var territory in new uint[]{250,579,561,940,941,831,1339,1343})Check(zones.Contains(territory),$"{territory} cut");
-            foreach(var territory in new uint[]{100,132,0})Check(!zones.Contains(territory),$"{territory} free");
+            foreach(var territory in new uint[]{250,579,561,940,941,831})Check(zones.Contains(territory),$"{territory} cut");
+            // X-137 (0.1115): the Beastmaster labyrinth (1339 to 1343) is no longer cut.
+            foreach(var territory in new uint[]{100,132,0,1339,1343})Check(!zones.Contains(territory),$"{territory} free");
         }),
         ("Competitive: the decision; in doubt, stopped",() =>
         {
