@@ -150,11 +150,11 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.647-gather-point-kinds.md](0.647-gather-point-kinds.md) | `src/TenshoAssistant/Gathering/GatherPointAccess.cs` | — |
 | [0.648-duty-unlocks.md](0.648-duty-unlocks.md) | `src/TenshoAssistant/Duties/DutyCatalog.cs` | — |
 | [0.649-spearfishing-sources.md](0.649-spearfishing-sources.md) | `src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs` | — |
-| [0.650-gp-while-gathering.md](0.650-gp-while-gathering.md) | — | `docs/evidence/0.728-gather-next.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
+| [0.650-gp-while-gathering.md](0.650-gp-while-gathering.md) | — | `docs/evidence/0.728-gather-next.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.651-company-actions.md](0.651-company-actions.md) | `src/TenshoAssistant/Reminders/CompanyBenefits.cs` | — |
 | [0.652-leve-markers.md](0.652-leve-markers.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | `docs/evidence/0.653-markers-during-journal-request.md` |
 | [0.653-markers-during-journal-request.md](0.653-markers-during-journal-request.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | `docs/evidence/0.654-leve-area-memory.md` |
-| [0.654-leve-area-memory.md](0.654-leve-area-memory.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs` | `docs/evidence/0.793-game-leve-markers.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
+| [0.654-leve-area-memory.md](0.654-leve-area-memory.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs` | `docs/evidence/0.793-game-leve-markers.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.656-gp-alert-teleport.md](0.656-gp-alert-teleport.md) | `src/TenshoAssistant/Gathering/RegenTick.cs`, `src/TenshoAssistant/Gathering/RegenTickReader.Dalamud.cs` | — |
 | [0.657-leve-area-from-journal.md](0.657-leve-area-from-journal.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `docs/evidence/0.890-spearfishing.md` |
 | [0.658-map-after-teleport.md](0.658-map-after-teleport.md) | `src/TenshoAssistant/Maps/MapResume.cs` | — |
@@ -168,43 +168,43 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.668-hq-chance.md](0.668-hq-chance.md) | `src/TenshoAssistant/Craft/CraftSimulation.cs` | `docs/project/audits/0.874-probe-coverage.md` |
 | [0.669-starting-quality.md](0.669-starting-quality.md) | `src/TenshoAssistant/Craft/CraftSimulation.cs` | — |
 | [0.670-srank-conditions.md](0.670-srank-conditions.md) | `src/TenshoAssistant/Hunting/SRankConditions.cs`, `src/TenshoAssistant/MainWindow.SRankConditions.cs` | `docs/project/audits/0.874-probe-coverage.md` |
-| [0.671-island-workshop.md](0.671-island-workshop.md) | `src/TenshoAssistant/Island/IslandCatalog.cs`, `src/TenshoAssistant/MainWindow.IslandSanctuary.cs` | `docs/evidence/0.672-island-agenda.md`, `docs/project/G-PROPOSALS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
+| [0.671-island-workshop.md](0.671-island-workshop.md) | `src/TenshoAssistant/Island/IslandCatalog.cs`, `src/TenshoAssistant/MainWindow.IslandSanctuary.cs` | `docs/evidence/0.672-island-agenda.md`, `docs/project/G-PROPOSALS.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.672-island-agenda.md](0.672-island-agenda.md) | `src/TenshoAssistant/Island/IslandPlanner.cs` | — |
 | [0.673-island-materials.md](0.673-island-materials.md) | `src/TenshoAssistant/Island/IslandMaterials.cs` | `docs/project/G-PROPOSALS.md` |
 | [0.674-island-groove.md](0.674-island-groove.md) | `src/TenshoAssistant/Island/IslandPlanner.cs` | `docs/project/audits/0.874-probe-coverage.md` |
-| [0.675-custom-deliveries.md](0.675-custom-deliveries.md) | `src/TenshoAssistant/Deliveries/CustomDeliveries.cs`, `src/TenshoAssistant/MainWindow.CustomDeliveries.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [0.675-custom-deliveries.md](0.675-custom-deliveries.md) | `src/TenshoAssistant/Deliveries/CustomDeliveries.cs`, `src/TenshoAssistant/MainWindow.CustomDeliveries.cs` | — |
 | [0.679-island-map.md](0.679-island-map.md) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | — |
-| [0.683-masked-carnivale.md](0.683-masked-carnivale.md) | `src/TenshoAssistant/Carnivale/MaskedCarnivale.cs`, `src/TenshoAssistant/MainWindow.MaskedCarnivale.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [0.683-masked-carnivale.md](0.683-masked-carnivale.md) | `src/TenshoAssistant/Carnivale/MaskedCarnivale.cs`, `src/TenshoAssistant/MainWindow.MaskedCarnivale.cs` | — |
 | [0.684-island-kinds.md](0.684-island-kinds.md) | `src/TenshoAssistant/Maps/IslandResources.cs` | — |
-| [0.685-island-animals.md](0.685-island-animals.md) | `src/TenshoAssistant/Island/IslandAnimals.cs`, `src/TenshoAssistant/MainWindow.IslandPasture.cs` | `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
+| [0.685-island-animals.md](0.685-island-animals.md) | `src/TenshoAssistant/Island/IslandAnimals.cs`, `src/TenshoAssistant/MainWindow.IslandPasture.cs` | `docs/project/audits/0.874-probe-coverage.md` |
 | [0.686-island-workshops.md](0.686-island-workshops.md) | `src/TenshoAssistant/Island/IslandCatalog.cs` | — |
 | [0.688-beast-places.md](0.688-beast-places.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | `docs/evidence/0.804-beast-wiki.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.694-workshop-sets.md](0.694-workshop-sets.md) | `src/TenshoAssistant/FreeCompany/WorkshopProjects.cs` | — |
-| [0.708-relic-weapons.md](0.708-relic-weapons.md) | `src/TenshoAssistant/MainWindow.RelicWeapons.cs`, `src/TenshoAssistant/Relics/RelicWeapons.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [0.708-relic-weapons.md](0.708-relic-weapons.md) | `src/TenshoAssistant/MainWindow.RelicWeapons.cs`, `src/TenshoAssistant/Relics/RelicWeapons.cs` | — |
 | [0.710-market-pace.md](0.710-market-pace.md) | `src/TenshoAssistant/Market/MarketService.cs` | — |
-| [0.713-allied-societies.md](0.713-allied-societies.md) | `src/TenshoAssistant/MainWindow.AlliedSocieties.cs`, `src/TenshoAssistant/Societies/AlliedSocieties.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.714-grand-company.md](0.714-grand-company.md) | `src/TenshoAssistant/GrandCompanies/GrandCompanies.cs`, `src/TenshoAssistant/MainWindow.GrandCompanies.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.715-special-deliveries.md](0.715-special-deliveries.md) | `src/TenshoAssistant/Deliveries/SpecialDeliveries.cs`, `src/TenshoAssistant/MainWindow.SpecialDeliveries.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.716-relic-families.md](0.716-relic-families.md) | `src/TenshoAssistant/Relics/RelicWeapons.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.717-eureka-bozja.md](0.717-eureka-bozja.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `src/TenshoAssistant/Fields/FieldBoard.cs`, `src/TenshoAssistant/MainWindow.FieldContent.cs` | `docs/evidence/0.721-fates.md`, `docs/project/GLOBAL-PLAN.md` |
-| [0.718-deep-dungeons.md](0.718-deep-dungeons.md) | `src/TenshoAssistant/DeepDungeons/DeepDungeonBoard.cs`, `src/TenshoAssistant/MainWindow.DeepDungeons.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.719-lexicon.md](0.719-lexicon.md) | `src/TenshoAssistant/Lexicon/LexiconBoard.cs`, `src/TenshoAssistant/MainWindow.Lexicon.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.720-relic-armour.md](0.720-relic-armour.md) | `src/TenshoAssistant/MainWindow.RelicWeapons.cs`, `src/TenshoAssistant/Relics/RelicWeapons.cs` | `docs/project/GLOBAL-PLAN.md` |
-| [0.721-fates.md](0.721-fates.md) | `src/TenshoAssistant/Fields/FieldBoard.cs`, `src/TenshoAssistant/MainWindow.Fates.cs`, `tools/DiscoveryCheckProbe/Program.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [0.713-allied-societies.md](0.713-allied-societies.md) | `src/TenshoAssistant/MainWindow.AlliedSocieties.cs`, `src/TenshoAssistant/Societies/AlliedSocieties.cs` | — |
+| [0.714-grand-company.md](0.714-grand-company.md) | `src/TenshoAssistant/GrandCompanies/GrandCompanies.cs`, `src/TenshoAssistant/MainWindow.GrandCompanies.cs` | — |
+| [0.715-special-deliveries.md](0.715-special-deliveries.md) | `src/TenshoAssistant/Deliveries/SpecialDeliveries.cs`, `src/TenshoAssistant/MainWindow.SpecialDeliveries.cs` | — |
+| [0.716-relic-families.md](0.716-relic-families.md) | `src/TenshoAssistant/Relics/RelicWeapons.cs` | — |
+| [0.717-eureka-bozja.md](0.717-eureka-bozja.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `src/TenshoAssistant/Fields/FieldBoard.cs`, `src/TenshoAssistant/MainWindow.FieldContent.cs` | `docs/evidence/0.721-fates.md` |
+| [0.718-deep-dungeons.md](0.718-deep-dungeons.md) | `src/TenshoAssistant/DeepDungeons/DeepDungeonBoard.cs`, `src/TenshoAssistant/MainWindow.DeepDungeons.cs` | — |
+| [0.719-lexicon.md](0.719-lexicon.md) | `src/TenshoAssistant/Lexicon/LexiconBoard.cs`, `src/TenshoAssistant/MainWindow.Lexicon.cs` | — |
+| [0.720-relic-armour.md](0.720-relic-armour.md) | `src/TenshoAssistant/MainWindow.RelicWeapons.cs`, `src/TenshoAssistant/Relics/RelicWeapons.cs` | — |
+| [0.721-fates.md](0.721-fates.md) | `src/TenshoAssistant/Fields/FieldBoard.cs`, `src/TenshoAssistant/MainWindow.Fates.cs`, `tools/DiscoveryCheckProbe/Program.cs` | — |
 | [0.722-selfcheck-pages.md](0.722-selfcheck-pages.md) | `src/TenshoAssistant/MainWindow.SelfCheckPages.cs` | — |
 | [0.724-page-sweep.md](0.724-page-sweep.md) | `src/TenshoAssistant/Diagnostics/PageSweepWindow.Dalamud.cs`, `src/TenshoAssistant/MainWindow.GatheringBrowser.cs` | `docs/project/DECISIONS.md` |
 | [0.725-sales-speed.md](0.725-sales-speed.md) | `src/TenshoAssistant/Market/MarketQuote.cs` | — |
 | [0.728-gather-next.md](0.728-gather-next.md) | `src/TenshoAssistant/Gathering/ActionBarLocator.Dalamud.cs`, `src/TenshoAssistant/Gathering/GpNextAction.cs` | — |
-| [0.730-delivery-rewards.md](0.730-delivery-rewards.md) | `src/TenshoAssistant/Deliveries/CustomDeliveries.cs`, `src/TenshoAssistant/MainWindow.CustomDeliveries.cs`, `tests/TenshoAssistant.Tests/DeliveryRewards730Tests.cs` | `docs/evidence/0.675-custom-deliveries.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.730-delivery-rewards.md](0.730-delivery-rewards.md) | `src/TenshoAssistant/Deliveries/CustomDeliveries.cs`, `src/TenshoAssistant/MainWindow.CustomDeliveries.cs`, `tests/TenshoAssistant.Tests/DeliveryRewards730Tests.cs` | `docs/evidence/0.675-custom-deliveries.md` |
 | [0.740-list-blink.md](0.740-list-blink.md) | `src/TenshoAssistant/Inventory/InventoryService.cs`, `src/TenshoAssistant/MainWindow.ListPanels.cs` | — |
 | [0.75.0-config-json-probe.log](0.75.0-config-json-probe.log) | — | `CHANGELOG.md` |
-| [0.766-map-discovery.md](0.766-map-discovery.md) | `tools/README.md` | `docs/evidence/0.803-map-discovery-layout.md`, `docs/project/GLOBAL-PLAN.md` |
-| [0.767-retainer-gil-crystals.md](0.767-retainer-gil-crystals.md) | `src/TenshoAssistant/Inventory/BankModels.cs` | `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
-| [0.782-raphael-freeze.md](0.782-raphael-freeze.md) | — | `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.787-workshop-delivered.md](0.787-workshop-delivered.md) | `src/TenshoAssistant/FreeCompany/WorkshopDeliveryReader.Dalamud.cs`, `src/TenshoAssistant/FreeCompany/WorkshopProjects.cs`, `tests/TenshoAssistant.Tests/WorkshopDelivered787Tests.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [0.766-map-discovery.md](0.766-map-discovery.md) | `tools/README.md` | `docs/evidence/0.803-map-discovery-layout.md` |
+| [0.767-retainer-gil-crystals.md](0.767-retainer-gil-crystals.md) | `src/TenshoAssistant/Inventory/BankModels.cs` | `docs/project/audits/0.874-probe-coverage.md` |
+| [0.782-raphael-freeze.md](0.782-raphael-freeze.md) | — | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
+| [0.787-workshop-delivered.md](0.787-workshop-delivered.md) | `src/TenshoAssistant/FreeCompany/WorkshopDeliveryReader.Dalamud.cs`, `src/TenshoAssistant/FreeCompany/WorkshopProjects.cs`, `tests/TenshoAssistant.Tests/WorkshopDelivered787Tests.cs` | — |
 | [0.793-game-leve-markers.md](0.793-game-leve-markers.md) | `src/TenshoAssistant/Maps/MapLabels.cs`, `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.803-map-discovery-layout.md](0.803-map-discovery-layout.md) | `src/TenshoAssistant/Maps/MapDiscovery.cs`, `tests/TenshoAssistant.Tests/MapDiscovery803Tests.cs`, `tools/README.md` | `docs/project/GLOBAL-PLAN.md` |
-| [0.804-beast-wiki.md](0.804-beast-wiki.md) | `src/TenshoAssistant/Monsters/BeastWikiIndex.cs` | `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
+| [0.803-map-discovery-layout.md](0.803-map-discovery-layout.md) | `src/TenshoAssistant/Maps/MapDiscovery.cs`, `tests/TenshoAssistant.Tests/MapDiscovery803Tests.cs`, `tools/README.md` | — |
+| [0.804-beast-wiki.md](0.804-beast-wiki.md) | `src/TenshoAssistant/Monsters/BeastWikiIndex.cs` | `docs/project/audits/0.874-probe-coverage.md` |
 | [0.811-conditional-npcs.md](0.811-conditional-npcs.md) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.812-alarm-link.md](0.812-alarm-link.md) | `src/TenshoAssistant/Plugin.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.833-zone-entries.md](0.833-zone-entries.md) | `src/TenshoAssistant/Maps/ZoneEntries.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
@@ -213,7 +213,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.849-height-chevron.md](0.849-height-chevron.md) | `src/TenshoAssistant/Maps/MapHeight.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.866-credit-references.md](0.866-credit-references.md) | — | `docs/project/GLOBAL-PLAN.md` |
 | [0.871-regions.md](0.871-regions.md) | `src/TenshoAssistant/Market/MarketBoardService.cs` | `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/FishingWiringTests.cs` | `CHANGELOG.md`, `docs/evidence/0.933-fishing-intuition.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md`, `docs/project/audits/x76-2bc-plan.md` |
+| [0.887-fishing-bite.md](0.887-fishing-bite.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/FishingWiringTests.cs` | `CHANGELOG.md`, `docs/evidence/0.933-fishing-intuition.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md`, `docs/project/audits/x76-2bc-plan.md` |
 | [0.888-aetherial-reduction.md](0.888-aetherial-reduction.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.889-hand-in.md](0.889-hand-in.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.890-spearfishing.md](0.890-spearfishing.md) | — | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
@@ -222,7 +222,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.896-spearfishing-lag.md](0.896-spearfishing-lag.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Gathering/Spearfishing.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.899-overmeld-rates.md](0.899-overmeld-rates.md) | — | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.901-island-animals.md](0.901-island-animals.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [0.903-letters.md](0.903-letters.md) | `src/TenshoAssistant/Inventory/GilJournal.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
+| [0.903-letters.md](0.903-letters.md) | `src/TenshoAssistant/Inventory/GilJournal.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.904-dead-code.md](0.904-dead-code.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.911-discoveries-check.md](0.911-discoveries-check.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/x76-2bc-plan.md` |
 | [0.916-discoveries-format.md](0.916-discoveries-format.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/DiscoveriesFormat916Tests.cs`, `tools/discoveries-merge.py` | `CHANGELOG.md` |
@@ -233,16 +233,16 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.933-fishing-intuition.md](0.933-fishing-intuition.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `docs/project/audits/x76-2bc-plan.md` |
 | [0.938-discoveries-load.md](0.938-discoveries-load.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs` | `CHANGELOG.md`, `docs/evidence/x93-load-test.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.94.0-shop-currency-probe.log](0.94.0-shop-currency-probe.log) | — | `CHANGELOG.md` |
-| [0.946-ocean-time.md](0.946-ocean-time.md) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.946-ocean-time.md](0.946-ocean-time.md) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `CHANGELOG.md` |
 | [0.95.0-shop-currency-probe.log](0.95.0-shop-currency-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `CHANGELOG.md`, `docs/evidence/0.730-delivery-rewards.md` |
-| [0.950-map-slow-frames.md](0.950-map-slow-frames.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
-| [0.959-individual-weather.md](0.959-individual-weather.md) | `src/TenshoAssistant/Gathering/WeatherForecast.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.950-map-slow-frames.md](0.950-map-slow-frames.md) | — | `CHANGELOG.md` |
+| [0.959-individual-weather.md](0.959-individual-weather.md) | `src/TenshoAssistant/Gathering/WeatherForecast.cs` | `CHANGELOG.md` |
 | [0.96.0-wolf-probe.log](0.96.0-wolf-probe.log) | — | `CHANGELOG.md` |
 | [0.961-ocean-missions.md](0.961-ocean-missions.md) | `src/TenshoAssistant/Gathering/OceanMissions.cs` | `CHANGELOG.md` |
 | [0.97.0-wolf-npc-probe.log](0.97.0-wolf-npc-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `CHANGELOG.md` |
 | [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `CHANGELOG.md` |
 | [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `CHANGELOG.md` |
-| [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` | `docs/evidence/0.980-beast-teams.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` | `docs/evidence/0.980-beast-teams.md` |
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.980-beast-teams.md](0.980-beast-teams.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `src/TenshoAssistant/MainWindow.Beastmaster.cs` | — |
 | [0.99.0-consigneur-probe.log](0.99.0-consigneur-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | — |
@@ -257,7 +257,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x119-desktop-weather.png](x119-desktop-weather.png) | — | `docs/evidence/x119-desktop-app.md` |
 | [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | — |
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
-| [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
+| [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
 

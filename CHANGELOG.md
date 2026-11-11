@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1092.0
+- Constat d'audit A044 (décision D-138 de l'utilisateur) : GLOBAL-PLAN gardait les notes de chaque version dans les lignes des points faits (236 Ko avec la moitié anglaise). L'outil du plan écrit maintenant un point fait comme son numéro, un titre court et « Fait en 0.xxx » ; les points ouverts gardent leur texte complet. Le détail reste dans la source du plan et dans le CHANGELOG. GLOBAL-PLAN passe de 236 à 147 Ko, mêmes lignes, deux moitiés ; un test garde un budget de taille.
+- Tests : PlanCompact1092Tests. Verify.ps1 (agent) : 1778/1778, 0 avertissement, 0 erreur ; DLL 0.1092.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A044 (user decision D-138): GLOBAL-PLAN kept each version's notes in the rows of the done points (236 KB with the English half). The plan tool now writes a done point as its number, a short title and « Done in 0.xxx »; open points keep their full text. The detail stays in the plan's source and in the CHANGELOG. GLOBAL-PLAN goes from 236 to 147 KB, same rows, both halves; a test keeps a size budget.
+
 ## 0.1091.0
 - Constat d'audit A078 (décision D-138 de l'utilisateur) : le README faisait 881 lignes ; la liste des fonctions (~200 lignes par langue) vieillissait et doublait l'aide du plugin. Par langue, les sections « Architecture » et « Domaines fonctionnels » deviennent une courte section « Fonctions » (aide de chaque page dans le plugin, FAQ, plan global, ARCHITECTURE) ; « Notes » et « Résumé » sont retirés. Gardés : tableau des pages produit par docgen, commandes, structure, compilation, installation, application de bureau, localisation, documents, déclaration d'IA et crédits. Le README reste un seul fichier bilingue (A079). Environ 230 et 200 lignes par langue.
 - Tests : ReadmeShort1091Tests. Verify.ps1 (agent) : 1777/1777, 0 avertissement, 0 erreur ; DLL 0.1091.0.0. Rien à essayer en jeu.
