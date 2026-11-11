@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1054.0
+- Constat d'audit A038 (partie décisions) : DEC-012, DEC-023, DEC-024 et DEC-037 parlaient encore d'une soumission au dépôt officiel de Dalamud sans dire que DEC-039 l'a remplacée. Chacune porte maintenant, dans ses deux langues, la mention de ce que DEC-039 remplace (cadre de publication, partie soumission, sens de la 1.0.0 : fin du plan global sur le dépôt personnalisé). Les références françaises touchées, et celles de DEC-010, ne nomment plus les notes de l'agent, comme la moitié anglaise. Un test vérifie ces renvois dans les deux moitiés.
+- Tests : DecisionsSuperseded1054Tests. Verify.ps1 (agent) : 1733/1733, 0 avertissement, 0 erreur ; DLL 0.1054.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A038 (decisions part): DEC-012, DEC-023, DEC-024 and DEC-037 still spoke of a submission to the official Dalamud repository without saying that DEC-039 replaced it. Each now states, in both languages, what DEC-039 replaces (publication setting, submission part, meaning of 1.0.0: end of the global plan on the custom repository). The French references touched, and those of DEC-010, no longer name the agent's notes, like the English half. A test checks these pointers in both halves.
+
 ## 0.1053.0
 - Constat d'audit A041 : des dates écrites à la main dans les documents publics avaient pris de l'avance sur le jour réel (DEC-048, DEC-049 et des lignes du plan global datées du lendemain). Un test refuse désormais toute date postérieure au lendemain (UTC) dans un document Markdown public ; les fichiers de l'agent, les points de contrôle et les sorties de compilation ne sont pas lus. Aucune date fausse n'est trouvée aujourd'hui.
 - Tests : FutureDates1053Tests. Verify.ps1 (agent) : 1732/1732, 0 avertissement, 0 erreur ; DLL 0.1053.0.0. Rien à essayer en jeu.

@@ -177,7 +177,7 @@ Options: Handle everything before publication; publish as is; sort point by poin
 Decision: Do: estimated Bountiful bonus (0.224), glamour dresser and armoire in "owned" (0.235–0.240), free company shops (0.295), quest icons 71141 / 71151 only with an in-game reading. Do not do: Fashion Report score (no data, it would be invented), deleting a game alarm from Tensho (DeleteAlarm not proven, risk of erasing the wrong one), remaining unknown sources (unknown documented). Dropped: injecting text into the game's native tooltip.
 Reason: Deliver only what is proven by game data or a cited source; avoid risky actions on the game state.
 Consequences: The "Do not do" items are not reopened without a new source or a new request. The additions to the 17 tools come after publication, case by case.
-References: docs/project/BACKLOG.md, the maintainer's notes (not in the repository) ("PLAN BEFORE PUBLICATION"), CHANGELOG.md 0.224, 0.235–0.240, 0.295
+References: docs/project/BACKLOG.md, the maintainer's notes (not in the repository) ("PLAN BEFORE PUBLICATION"), CHANGELOG.md 0.224, 0.235–0.240, 0.295; publication setting replaced by DEC-039 (custom repository, no submission)
 
 ID: DEC-013
 Timestamp: 2026-11-01 Europe/Brussels (0.236)
@@ -287,7 +287,7 @@ Options: Those listed in ROADMAP at 0.316, one question per point.
 Decision: (1) Submersible thresholds: keep the SubmarineTracker table and flag the 19 sectors where it is below all observations ("not confirmed by readings"). (2) Airship unlock tree: LuminaSupplemental data (GPL-3.0) embedded in the DLL with the licence notice. (3) Airships: route planner by distance and duration, loot shown as "unknown". (4) Value of submersible voyages: market price (Universalis) in addition to the NPC price, and surveillance / retrieval tiers if the source separates readings by tier (probe first). (5) R-11 step 4: chocobo barding and squadron (probe first for the squadron). (6) Reminders for the squadron and the Ehcatl gliders: probe a readable time in the game memory, otherwise leave aside. (7) R-09: after the queue c) → f), game data probed first. (8) Materia: overmelding success rate read from the game data (sheet to probe). (9) D17 publication: at version 1.0.0, moment set by the author. (10) German and Japanese translations: kept in the package, English fallback. (11) Game frames and textures (ULD): before D17. (12) French texts: formal "vous".
 Reason: User answers of 2026-11-02 (« D'abord les décisions » ("Decisions first")).
 Consequences: DEC-021 changes on two points: the GPL-3.0 unlock tree is embedded (same licence as Tensho, notice in the file) and an airship planner without loot is offered. The remaining roadmap points wait for an in-game reading or a step of the queue. The `FilteredTable` model is removed from the plan (agent's choice, rule "no premature abstraction"; to create at the first real repeated need). The formal "vous" is guarded by an automatic test.
-References: docs/project/ROADMAP.md, the maintainer's notes (not in the repository), docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/Program.cs ("French texts address the player with « vous »")
+References: docs/project/ROADMAP.md, the maintainer's notes (not in the repository), docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/Program.cs ("French texts address the player with « vous »"); submission part replaced by DEC-039
 
 ID: DEC-024
 Timestamp: 2026-11-02 Europe/Brussels (0.318)
@@ -297,7 +297,7 @@ Options: Free numbering; classic SemVer (major, minor, patch); the user's rule.
 Decision: X.y.z = big milestones, on the user's decision only (1.0.0 = first publication on the official Dalamud repository, DEC-023); x.Y.0 = versions of the user and the agent (the third number goes back to 0); x.y.Z = community versions (outside contributions, number set by the maintainer at merge, a PR may propose it).
 Reason: User decision; the current numbering (0.317.0) already follows it.
 Consequences: The agent raises only the second number; never the first without a request; the third is reserved for contributions. Documented in the maintainer's notes, not in the repository ("With each version delivered") and CONTRIBUTING.md ("Versions and releases").
-References: the maintainer's notes (not in the repository), CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj; modified by DEC-050 (releases by the agent, `-Major` reserved to the user)
+References: the maintainer's notes (not in the repository), CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj; modified by DEC-050 (releases by the agent, `-Major` reserved to the user); meaning of 1.0.0 replaced by DEC-039 (end of the global plan on the custom repository)
 
 ID: DEC-025
 Timestamp: 2026-11-02 Europe/Brussels (0.318)
@@ -426,7 +426,7 @@ Options: After phase 2 (recommended by the agent: earlier publication, less code
 Decision: 1.0.0 and the submission come after the whole global plan, in-game test campaign included.
 Reason: User decision: « Si c'est refuser pour la taille je pourrais rien y faire mais je veux faire un plugin complet » ("If it is refused for its size I can do nothing about it, but I want to make a complete plugin").
 Consequences: Publication comes later and the submission is bigger to examine; the Dalamud team may refuse it if it judges it too heavy (PUBLISHING, point 6). Everything that requires playing comes last, one point at a time.
-References: docs/project/GLOBAL-PLAN.md
+References: docs/project/GLOBAL-PLAN.md; submission part replaced by DEC-039
 
 ID: DEC-038
 Timestamp: 2026-11-05 Europe/Brussels
@@ -717,7 +717,7 @@ Options: Garder checkpoints/ suivi ; l'ignorer entièrement. Documents à la rac
 Decision: `checkpoints/` entièrement ignoré par git (local), plus de zip par version ; preuves citées par le code dans `docs/evidence/` ; historique par version dans `CHANGELOG.md` ; documents rangés en `docs/ai/`, `docs/project/`, `docs/goals/` avec la carte `docs/README.md` ; `CONTRIBUTING.md` (règles, licences, publication Dalamud et politique IA). Remplace la conséquence « zips créés à chaque version » de DEC-009.
 Reason: L'historique git conserve le code de chaque version ; une entrée par public (joueur, contributeur, agent) rend la reprise plus sûre.
 Consequences: L'utilisateur fait les commits (GitHub Desktop). Les zips déjà présents dans l'historique git n'en sont retirés que sur demande explicite (réécriture d'historique). Les gros documents de `docs/project/` gardent leur partie historique, marquée comme archive.
-References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, CLAUDE.md ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent)
+References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent)
 
 DEC-ID: DEC-011
 Timestamp: 2026-10-31 Europe/Brussels
@@ -737,7 +737,7 @@ Options: Tout traiter avant publication ; publier en l'état ; trier point par p
 Decision: Faire : bonus d'Abondance estimé (0.224), coffre à apparence et armoire dans « possédé » (0.235–0.240), boutiques de compagnie libre (0.295), icônes de quête 71141 / 71151 seulement avec un relevé en jeu. Ne pas faire : score de la Revue de mode (aucune donnée, serait inventé), suppression d'une alarme du jeu depuis Tensho (DeleteAlarm non prouvé, risque d'effacer la mauvaise), sources inconnues restantes (inconnu documenté). Abandonné : injection de texte dans l'infobulle native du jeu.
 Reason: Ne livrer que ce qui est prouvé par les données du jeu ou une source citée ; éviter les actions à risque sur l'état du jeu.
 Consequences: Les « Ne pas faire » ne sont pas rouverts sans nouvelle source ou nouvelle demande. Les compléments des 17 outils viennent après la publication, au cas par cas.
-References: docs/project/BACKLOG.md, docs/ai/STATUS.md (« PLAN AVANT PUBLICATION »), CHANGELOG.md 0.224, 0.235–0.240, 0.295
+References: docs/project/BACKLOG.md, notes du mainteneur (hors du dépôt) (« PLAN AVANT PUBLICATION »), CHANGELOG.md 0.224, 0.235–0.240, 0.295 ; cadre de publication remplacé par DEC-039 (dépôt personnalisé, pas de soumission)
 
 DEC-ID: DEC-013
 Timestamp: 2026-11-01 Europe/Brussels (0.236)
@@ -847,7 +847,7 @@ Options: Celles listées dans ROADMAP au 0.316, une question par point.
 Decision: (1) Seuils des sous-marins : garder la table SubmarineTracker et signaler les 19 secteurs où elle est sous toutes les observations (« non confirmé par les relevés »). (2) Arbre de déblocage des dirigeables : données de LuminaSupplemental (GPL-3.0) embarquées dans la DLL avec l'avis de licence. (3) Dirigeables : planificateur de trajets par distance et durée, butin affiché « inconnu ». (4) Valeur des trajets de sous-marin : prix du marché (Universalis) en plus du prix PNJ, et paliers de surveillance / récupération si la source sépare les relevés par palier (sonde d'abord). (5) R-11 étape 4 : barde de chocobo et escouade (sonde d'abord pour l'escouade). (6) Rappels de l'escouade et des Planeurs d'Ehcatl : sonder une heure lisible dans la mémoire du jeu, sinon laisser de côté. (7) R-09 : après la file c) → f), données du jeu sondées d'abord. (8) Matérias : taux de réussite de la surmatérialisation lu dans les données du jeu (feuille à sonder). (9) Publication D17 : à la version 1.0.0, moment fixé par l'auteur. (10) Traductions allemande et japonaise : gardées dans le paquet, repli anglais. (11) Cadres et textures du jeu (ULD) : avant D17. (12) Textes français : vouvoiement.
 Reason: Réponses de l'utilisateur du 2026-11-02 (« D'abord les décisions »).
 Consequences: DEC-021 change sur deux points : l'arbre de déblocage GPL-3.0 est embarqué (même licence que Tensho, avis dans le fichier) et un planificateur de dirigeable sans butin est proposé. Les points restants de la feuille de route attendent un relevé en jeu ou une étape de la file. Le modèle `FilteredTable` est retiré du plan (choix de l'agent, règle « pas d'abstraction prématurée » ; à créer au premier besoin réel répété). Le vouvoiement est gardé par un test automatique.
-References: docs/project/ROADMAP.md, docs/ai/STATUS.md, docs/goals/R-11.md, docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/Program.cs (« French texts address the player with « vous » »)
+References: docs/project/ROADMAP.md, notes du mainteneur (hors du dépôt), docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/Program.cs (« French texts address the player with « vous » ») ; partie soumission remplacée par DEC-039
 
 DEC-ID: DEC-024
 Timestamp: 2026-11-02 Europe/Brussels (0.318)
@@ -857,7 +857,7 @@ Options: Numérotation libre ; SemVer classique (majeur, mineur, correctif) ; r�
 Decision: X.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt officiel Dalamud, DEC-023) ; x.Y.0 = versions de l'utilisateur et de l'agent (le troisième nombre revient à 0) ; x.y.Z = versions de la communauté (contributions extérieures, numéro fixé par le mainteneur à la fusion, une PR peut le proposer).
 Reason: Décision de l'utilisateur ; la numérotation actuelle (0.317.0) la suit déjà.
 Consequences: L'agent monte seulement le deuxième nombre ; jamais le premier sans demande ; le troisième est réservé aux contributions. Documenté dans CLAUDE.md (« À chaque version livrée ») et CONTRIBUTING.md (« Versions and releases »).
-References: CLAUDE.md, CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj ; modifiée par DEC-050 (releases par l'agent, `-Major` réservé à l'utilisateur)
+References: notes du mainteneur (hors du dépôt), CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj ; modifiée par DEC-050 (releases par l'agent, `-Major` réservé à l'utilisateur) ; sens de la 1.0.0 remplacé par DEC-039 (fin du plan global sur le dépôt personnalisé)
 
 DEC-ID: DEC-025
 Timestamp: 2026-11-02 Europe/Brussels (0.318)
@@ -986,7 +986,7 @@ Options: Après la phase 2 (recommandé par l'agent : publication plus tôt, moi
 Decision: La 1.0.0 et la soumission viennent après tout le plan global, campagne de tests en jeu comprise.
 Reason: Décision de l'utilisateur : « Si c'est refuser pour la taille je pourrais rien y faire mais je veux faire un plugin complet ».
 Consequences: La publication arrive plus tard et la soumission est plus grosse à examiner ; l'équipe Dalamud peut la refuser si elle la juge trop lourde (PUBLISHING, point 6). Tout ce qui demande de jouer vient en dernier, un point à la fois.
-References: docs/project/GLOBAL-PLAN.md
+References: docs/project/GLOBAL-PLAN.md ; partie soumission remplacée par DEC-039
 
 DEC-ID: DEC-038
 Timestamp: 2026-11-05 Europe/Brussels
