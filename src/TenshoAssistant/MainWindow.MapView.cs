@@ -1481,6 +1481,25 @@ internal sealed partial class MainWindow
                     draw.AddText(font,label.FontSize,label.At+shift,ImGui.GetColorU32(new Vector4(0.05f,0.05f,0.05f,0.9f)),label.Text);
                 draw.AddText(font,label.FontSize,label.At,ImGui.GetColorU32(overLink ? new Vector4(0.8f,1,1,1):label.MapLink ? new Vector4(0.45f,0.9f,0.95f,1):new Vector4(0.97f,0.95f,0.9f,1)),label.Text);
             }
+            // X-114 (0.1049, user request): the current weather of each zone, only while the mouse is over the map; built once per map and period.
+            if(hovered)
+            {
+                var weatherCatalog=weather.State.Catalog;var mapCatalog=maps.State.Catalog;var weatherTime=DateTimeOffset.UtcNow;
+                var weatherMarks=mapWeather.For(map.MapId,weatherTime.ToUnixTimeSeconds(),weatherCatalog is not null && mapCatalog is not null,()=>MapWeatherIcons.Build(map.TerritoryId,
+                    markers.Where(marker=>marker.Icon!=0 && marker.LinkMapId!=0).Select(marker=>(new Vector2(marker.X,marker.Y),marker.LinkMapId)).ToArray(),
+                    linked=>mapCatalog?.Find(linked)?.TerritoryId ?? 0,
+                    zone=>weatherCatalog?.Forecast(zone,weatherTime,1) is [ { Weather:{ } current } ] ? current:null));
+                var weatherSize=Math.Max(16,baseIcon*0.9f);
+                foreach(var mark in weatherMarks)
+                {
+                    if(!textures.TryGetFromGameIcon(new GameIconLookup(mark.Icon),out var weatherShared) || !weatherShared.TryGetWrap(out var weatherImage,out _) || weatherImage is null)continue;
+                    var weatherCentre=mark.At is { } zonePixel ? origin+mapPan+zonePixel*mapZoom-new Vector2(0,weatherSize):origin+size-new Vector2(weatherSize/2+12,weatherSize/2+44);
+                    var weatherHalf=new Vector2(weatherSize/2);
+                    draw.AddCircleFilled(weatherCentre,weatherSize*0.62f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                    draw.AddImage(weatherImage.Handle,weatherCentre-weatherHalf,weatherCentre+weatherHalf);
+                    if(Vector2.Distance(io.MousePos,weatherCentre)<=weatherSize/2){tooltip=localization.Format("MapView.VistaWeatherNow",mark.Name);tooltipPoint=null;}
+                }
+            }
             // Every icon under the cursor (or whose area holds it) is listed in one tooltip, topmost first (0.132, as Mappy does).
             hits.Reverse();
             // Nearby coffers with the game's treasure coffer map icon (0.210), and gathering points the game streams for your current job
@@ -2049,6 +2068,7 @@ internal sealed partial class MainWindow
     private WikiVistaSource? wikiVistas;
     // Earliest next wiki retry after a failed read (0.328: one minute after the first hover, then once a minute).
     private DateTimeOffset mapVistaRetryAt;
+    private readonly MapWeatherIcons mapWeather=new();
     internal void ConfigureWikiVistas(WikiVistaSource source)=>wikiVistas=source;
     private (object? Document,object? Index,IReadOnlyDictionary<uint,WikiVista> Rows) wikiVistaMatch=(null,null,new Dictionary<uint,WikiVista>());
     // Wiki row of a vista, matched once per wiki document and position index (coordinates on the vista's own map).

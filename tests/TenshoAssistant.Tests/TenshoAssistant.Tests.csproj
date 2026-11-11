@@ -53,6 +53,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapPartySmoother.cs" Link="Maps/MapPartySmoother.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapZoomMemory.cs" Link="Maps/MapZoomMemory.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapLabels.cs" Link="Maps/MapLabels.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/MapWeatherIcons.cs" Link="Maps/MapWeatherIcons.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapDiscovery.cs" Link="Maps/MapDiscovery.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/ZoneEntries.cs" Link="Maps/ZoneEntries.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapHeight.cs" Link="Maps/MapHeight.cs" />

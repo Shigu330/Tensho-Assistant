@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1049.0
+- Plan global, X-114 : Carte de Tensho (X-114) : quand la souris est sur la carte, une icône de la météo actuelle de la zone apparaît dans le coin bas-droit de la carte d'une zone ; sur une carte de région, une icône par zone affichée, au-dessus de son image. L'info-bulle de l'icône donne le nom de la météo. Météo tirée de la prévision du jeu, comme celle des panoramas ; une zone à météo individuelle ou forcée (X-96) n'a pas d'icône. La liste se calcule une fois par carte et par période de météo, hors du dessin de chaque image. La carte du jeu ne change pas (sa boussole montre déjà la météo).
+- Tests : MapWeather1049Tests. Verify.ps1 (agent) : 1723/1723, 0 avertissement, 0 erreur ; DLL 0.1049.0.0. Non validé en jeu.
+### English
+- Tensho's map (X-114): while the mouse is over the map, an icon of the zone's current weather appears in the bottom-right corner of a zone map; on a region map, one icon per zone shown, above its picture. The icon's tooltip gives the weather's name. Weather from the game's forecast, like the vistas'; a zone with individual or forced weather (X-96) gets no icon. The list is computed once per map and weather period, not in every frame. The game's map is unchanged (its compass already shows the weather).
+
 ## 0.1048.0
 - Plan global, X-117 : Après un patch du jeu, partie 2b (X-117) : Paramètres › Données › cache compte maintenant, sous « ce qui a changé », les découvertes à revérifier : celles vues pour la dernière fois avant le patch dans une cellule de 50 yalms (ou à côté) où une position de la carte a été ajoutée, déplacée ou retirée, ou sur un marchand dont la ligne a changé (même règle que l'outil de fusion des découvertes). Le compte se fait hors de l'image, une fois par patch ; les découvertes restent telles quelles, à revoir en jeu.
 - Tests : PatchRecheck1048Tests. Verify.ps1 (agent) : 1719/1719, 0 avertissement, 0 erreur ; DLL 0.1048.0.0. Non validé en jeu.
