@@ -1239,7 +1239,6 @@
     "DocsTitle": "Documents to read",
     "DocReadme": "overview and install",
     "DocContributing": "contribution and Dalamud publishing rules",
-    "DocAgent": "working method (also for AI agents)",
     "DocArchitecture": "code layout and decisions",
     "DocReferences": "data sources and licences",
     "DocEvidence": "probe evidence cited by the code",

@@ -229,7 +229,7 @@ internal sealed partial class MainWindow
         {
             try
             {
-                foreach(var (file,key) in new[]{("README.md","Readme"),("CONTRIBUTING.md","Contributing"),("CLAUDE.md","Agent"),("docs/project/ARCHITECTURE.md","Architecture"),
+                foreach(var (file,key) in new[]{("README.md","Readme"),("CONTRIBUTING.md","Contributing"),("docs/project/ARCHITECTURE.md","Architecture"),
                     ("docs/project/REFERENCES.md","References"),("docs/evidence/","Evidence"),("CHANGELOG.md","Changelog")})
                 {
                     ImGui.TextUnformatted(file);Tip("Contributor.Doc"+key);

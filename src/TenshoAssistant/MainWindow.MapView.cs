@@ -8,7 +8,7 @@ using TenshoAssistant.Maps;
 namespace TenshoAssistant;
 
 /// <summary>
-/// Tensho map window (MAP-VIEW-016, docs/goals/MAP-016-PLAN.md; drawn by MapViewWindow): the game map texture with its fixed icons,
+/// Tensho map window (MAP-VIEW-016, CHANGELOG 0.101.0 onwards; drawn by MapViewWindow): the game map texture with its fixed icons,
 /// the player arrow (optional vision cone), the flag, quest / FATE / gathering / vendor / vista markers and edge markers for points
 /// off screen. Layout like the game map: region / zone / floor menus on top, tool column on the left (zoom, follow, settings), or
 /// both drawn over the map (0.303 option). Icons have their own right-click menu and a list tooltip of what is under the mouse.

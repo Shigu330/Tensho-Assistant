@@ -7,7 +7,7 @@ namespace TenshoAssistant.Maps;
 /// <summary>
 /// Copies quest-giver and gathering-point positions in bounded framework batches (2 ms per tick), then indexes on a worker.
 /// The rows are kept in DataCache (family catalog-map-positions) until the client data, the language or the copy shape changes,
-/// like the item, recipe, gathering and NPC vendor catalogues (docs/goals/CATALOG-CACHE-012.md).
+/// like the item, recipe, gathering and NPC vendor catalogues (CHANGELOG 0.114.0).
 /// </summary>
 internal sealed class MapLocalIndexLoader : IDisposable
 {

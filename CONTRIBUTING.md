@@ -96,7 +96,7 @@ Discuss the idea first with the « Tool proposal » issue form. Then, from the r
 .\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
 ```
 
-`-Category` is one of the navigation groups: `Objects`, `Production`, `World`, `Progression`, `GoldSaucer`, `Preferences`. Without
+`-Category` is one of the navigation groups: `Objects`, `Production`, `World`, `Tracking`, `Progression`, `Content`, `GoldSaucer`, `References`, `Preferences`. Without
 `-DryRun`, `scripts/New-Tool.ps1` creates and registers the skeleton:
 
 - `MainWindow.<Name>.cs`: the page, its method `Draw<Name>`;
@@ -316,7 +316,7 @@ Discutez d'abord de l'idée avec le formulaire de ticket « Tool proposal ». Pu
 .\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
 ```
 
-`-Category` est l'un des groupes de la navigation : `Objects`, `Production`, `World`, `Progression`, `GoldSaucer`, `Preferences`. Sans
+`-Category` est l'un des groupes de la navigation : `Objects`, `Production`, `World`, `Tracking`, `Progression`, `Content`, `GoldSaucer`, `References`, `Preferences`. Sans
 `-DryRun`, `scripts/New-Tool.ps1` crée et enregistre le squelette :
 
 - `MainWindow.<Name>.cs` : la page, sa méthode `Draw<Name>` ;

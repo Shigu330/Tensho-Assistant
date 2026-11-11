@@ -9,7 +9,7 @@
 #>
 param(
     [Parameter(Mandatory)][string]$Name,
-    [Parameter(Mandatory)][ValidateSet('Objects','Production','World','Progression','GoldSaucer','Preferences')][string]$Category,
+    [Parameter(Mandatory)][ValidateSet('Objects','Production','World','Tracking','Progression','Content','GoldSaucer','References','Preferences')][string]$Category,
     [Parameter(Mandatory)][string]$LabelEn,
     [Parameter(Mandatory)][string]$LabelFr,
     [switch]$DryRun
