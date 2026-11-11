@@ -210,6 +210,9 @@ try {
     }
     function Get-NotesSince([string]$Since, [switch]$French) {
         $from = if ($Since) { [version]$Since } else { [version]'0.0.0' }
+        # 0.1093 (audit A070): older entries live in docs/changelog/ (tools/changelog.py); the versions since the last release must stay here.
+        $oldest = @($entries.Keys | Sort-Object { [version]$_ } | Select-Object -First 1)
+        if ($Since -and $oldest.Count -gt 0 -and [version]$oldest[0] -gt $from) { throw "CHANGELOG.md starts after ${Since}: keep every version since the last release in it (tools/changelog.py moves only older ones)." }
         $covered = @($entries.Keys | Where-Object { [version]$_ -gt $from -and [version]$_ -le [version]$version } | Sort-Object { [version]$_ } -Descending)
         if ($covered.Count -le 1) { return $(if ($French) { $notesFr } else { $notes }) }
         $source = if ($French) { $entriesFr } else { $entries }

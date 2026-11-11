@@ -74,6 +74,9 @@ if ($taskTopEntry -ne "## $taskVersionNow") { Write-Host "WARNING: the top entry
 if ($Release) {
     & python -I -X utf8 (Join-Path $taskRoot 'tools\docgen.py') check --release
     if ($LASTEXITCODE -ne 0) { throw 'Documents not produced for this version: python -I -X utf8 tools/docgen.py write, then Verify again.' }
+    # 0.1093 (audit A070): the release notes cover every version since the last release; CHANGELOG.md must still hold them.
+    & python -I -X utf8 (Join-Path $taskRoot 'tools\changelog.py') check
+    if ($LASTEXITCODE -ne 0) { throw 'CHANGELOG.md and docs/changelog/ disagree: python -I -X utf8 tools/changelog.py check.' }
 }
 if ($TestsOnly) {
     Push-Location $taskRoot

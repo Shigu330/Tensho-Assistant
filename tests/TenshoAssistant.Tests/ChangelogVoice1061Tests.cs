@@ -14,7 +14,7 @@ internal static class ChangelogVoice1061Tests
             var english = false;
             var wrong = new List<string>();
             var number = 0;
-            foreach(var line in File.ReadAllText(Path.GetFullPath("CHANGELOG.md")).Replace("\r\n","\n").Split('\n'))
+            foreach(var line in ChangelogSplit1093Tests.All().Split('\n'))
             {
                 number++;
                 if(line.StartsWith("## ",StringComparison.Ordinal)) english = false;

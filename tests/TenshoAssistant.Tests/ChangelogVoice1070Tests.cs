@@ -10,7 +10,7 @@ internal static class ChangelogVoice1070Tests
         {
             var test = File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/ChangelogVoice1061Tests.cs"));
             Check(test.Contains("\"your report\",\"tonight\",\"your go-ahead\""),"the 0.1061 test refuses the report and tonight phrasings");
-            var text = File.ReadAllText(Path.GetFullPath("CHANGELOG.md"));
+            var text = ChangelogSplit1093Tests.All();
             Check(text.Contains("« Your notes and arena drawing »"),"the player-facing label is kept");
         }),
     ];

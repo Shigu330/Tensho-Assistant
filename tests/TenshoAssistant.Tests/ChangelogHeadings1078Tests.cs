@@ -7,7 +7,7 @@ internal static class ChangelogHeadings1078Tests
     [
         ("CHANGELOG: one heading per version",() =>
         {
-            var lines = File.ReadAllText(Path.GetFullPath("CHANGELOG.md")).Replace("\r\n","\n").Split('\n');
+            var lines = ChangelogSplit1093Tests.All().Split('\n');
             var headings = lines.Where(l => System.Text.RegularExpressions.Regex.IsMatch(l,@"^## \d+\.\d+\.\d+")).Select(l => l.Trim()).ToList();
             var twice = headings.GroupBy(h => h).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
             Check(twice.Count == 0,"versions with two headings: " + string.Join(", ",twice));

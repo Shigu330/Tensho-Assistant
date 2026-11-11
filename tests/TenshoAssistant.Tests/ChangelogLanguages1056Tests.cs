@@ -10,7 +10,7 @@ internal static class ChangelogLanguages1056Tests
     [
         ("Changelog: English part from 0.219.0 on, as the map of the documents says",() =>
         {
-            var text = File.ReadAllText(Path.GetFullPath("CHANGELOG.md")).Replace("\r\n","\n");
+            var text = ChangelogSplit1093Tests.All();
             var entries = Regex.Split(text,"^(?=## )",RegexOptions.Multiline).Where(part => part.StartsWith("## ",StringComparison.Ordinal)).ToList();
             Check(entries.Count > 900,"CHANGELOG entries read: " + entries.Count);
             var missing = new List<string>();

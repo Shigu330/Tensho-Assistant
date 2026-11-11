@@ -73,9 +73,9 @@ INDEX = [
     ([("../CODE_OF_CONDUCT.md", None)], "everyone", "tout le monde",
      "how we behave in the project's issues, discussions and pull requests, and how to report a problem (English, then French)",
      "comment se comporter dans les tickets, discussions et demandes de fusion du projet, et comment signaler un problème (anglais, puis français)"),
-    ([("../CHANGELOG.md", None)], "everyone", "tout le monde",
-     "what changed in each version (French, then `### English` from 0.219.0 on; older entries are in French only)",
-     "ce qui a changé à chaque version (français, puis `### English` depuis 0.219.0 ; les entrées plus anciennes sont en français seulement)"),
+    ([("../CHANGELOG.md", None), ("changelog/", None)], "everyone", "tout le monde",
+     "what changed in each version (French, then `### English` from 0.219.0 on; older entries are in French only); the last release and the versions after it, older ones in `changelog/` (`tools/changelog.py archive`)",
+     "ce qui a changé à chaque version (français, puis `### English` depuis 0.219.0 ; les entrées plus anciennes sont en français seulement) ; la dernière release et les versions qui suivent, les plus anciennes dans `changelog/` (`tools/changelog.py archive`)"),
     ([("FAQ.md", None)], "everyone", "tout le monde",
      f"frequent questions, English then French, written by `tools/faq.py` from the plugin's list (the Help page shows the same); "
      f"new questions in [Discussions › Q&A]({QA})",
