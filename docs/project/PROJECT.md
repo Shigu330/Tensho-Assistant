@@ -18,7 +18,8 @@ Mage Helper/Duty Loot Preview/Item Use/Mappy/TriadBuddy; D Character Panel Refin
 Architecture: a thin Dalamud adapter, shared managed data and domain services added in small useful slices. First chain aimed at: recipe →
 ingredients → inventory → missing items → sources → gathering → map → availability → price. Code map: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Source: the master prompt given on 2026-10-27, kept in the agent's files (`docs/ai/PROMPT-MAITRE.md`, outside the repository). Inherited
+Source: the master prompt given on 2026-10-27, kept in the maintainer's notes (outside the repository); a historical source since
+2026-11-09: the user's decisions and [DECISIONS](DECISIONS.md) prevail. Inherited
 references give technical facts, never an old roadmap.
 
 Out of scope (2026-10-31): ACT/IINACT and combat parsers ([DEC-009](DECISIONS.md)); any game automation or any advantage in combat or PvP
@@ -76,7 +77,8 @@ Architecture : un adaptateur Dalamud fin, des données managées communes et des
 Première chaîne visée : recette → ingrédients → inventaire → manquants → sources → récolte → carte → disponibilité → prix. Carte du code :
 [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Source : prompt maître fourni le 2026-10-27, conservé dans les fichiers de l'agent (`docs/ai/PROMPT-MAITRE.md`, hors du dépôt). Les
+Source : prompt maître fourni le 2026-10-27, conservé dans les notes du mainteneur (hors du dépôt) ; source historique depuis le
+2026-11-09 : les décisions de l'utilisateur et [DECISIONS](DECISIONS.md) priment. Les
 références héritées fournissent des faits techniques, jamais une ancienne feuille de route.
 
 Hors périmètre (2026-10-31) : ACT/IINACT et parsers de combat ([DEC-009](DECISIONS.md)) ; toute automatisation de jeu ou tout avantage en

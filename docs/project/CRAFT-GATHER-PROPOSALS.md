@@ -424,7 +424,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Craft/CraftSimulation.cs`.
 - **Ce que le joueur obtient** : Pour une recette HQ possible qui termine sous le maximum : « Qualité 7 200 / 9 000, chance HQ ≈ 55 % ». Utile pour la montée en niveau et les livraisons sans HQ obligatoire, et pour arrêter une recherche plus tôt.
 - **Comment, taille, dépendances** : Source d'abord : relever la chance HQ affichée par la fenêtre de synthèse (index d'AtkValue à sonder) à plusieurs pourcentages de qualité, et la comparer à la table de Craftimizer (MIT) ; consigner dans docs/evidence. Ensuite : fonction pure qualité % → HQ %, affichée dans le simulateur et le panneau du carnet. Taille S après la source. Dépendances : aucune. Décision : accepter la table de Craftimizer vérifiée par relevés (recommandé), ou seulement les relevés.
-- **Source** : Aucune trace de chance HQ dans le code (recherche HqChance / HQ % vide). CraftLiveReader.Dalamud.cs:30-31 lit déjà des AtkValues de la fenêtre de synthèse, qui affiche la chance HQ du jeu. Règle « ne jamais inventer » (CLAUDE.md, Méthode).
+- **Source** : Aucune trace de chance HQ dans le code (recherche HqChance / HQ % vide). CraftLiveReader.Dalamud.cs:30-31 lit déjà des AtkValues de la fenêtre de synthèse, qui affiche la chance HQ du jeu. Règle « ne jamais inventer » (règles de l'agent, hors du dépôt).
 
 ## C14 — K11 — A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse rapide, HQ, prérequis, écart chiffré)
 
@@ -598,7 +598,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Plugin.cs`.
 - **Ce que le joueur obtient** : Rien de visible, sinon l'absence d'à-coup à la première ouverture de l'aide à la pêche ou du panneau de récolte, et une aide qui reste conforme aux règles du projet après une mise à jour.
 - **Comment, taille, dépendances** : Copier job, territoire, position et état de pêche sur IFramework.Update (comme les autres lecteurs) ; construire les deux tables avec le catalogue de récolte (worker, cache), lues ensuite sans feuille Excel. Taille S. Sonde : aucune. Décision : aucune.
-- **Source** : ARCHITECTURE.md:110-116 (écarts connus, non tranchés) : aide à la pêche (joueur, territoire, condition à chaque image ; table FishingSpot construite au premier appel), base d'Abondance II construite au premier appel. Plugin.cs:195-218 et 222-232. docs/ai/RULES.md:9 (rien de massif dans Draw).
+- **Source** : ARCHITECTURE.md:110-116 (écarts connus, non tranchés) : aide à la pêche (joueur, territoire, condition à chaque image ; table FishingSpot construite au premier appel), base d'Abondance II construite au premier appel. Plugin.cs:195-218 et 222-232. règles de l'agent, hors du dépôt (rien de massif dans Draw).
 
 ## C36 — G16 — R-14, partie artisanat et récolte : une aide illisible le dit au lieu de disparaître
 

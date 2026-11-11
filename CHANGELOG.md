@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1063.0
+- Constats d'audit A054, A075 et A025 (cinq documents du projet) : PROJECT et ROADMAP donnaient le prompt maître archivé comme source qui fait foi, avec son chemin sur le disque du mainteneur ; USER-REQUESTS, MAP-PROPOSALS et CRAFT-GATHER-PROPOSALS citaient des fichiers qui ne vivent que là (liens morts sur GitHub). Ils nomment maintenant « les notes du mainteneur (hors du dépôt) » ou « les règles de l'agent », et le prompt maître est une source historique : les décisions de l'utilisateur et DECISIONS priment depuis le 2026-11-09. Un test vérifie que ces documents ne citent que des fichiers Markdown du dépôt.
+- Tests : ProjectLinks1063Tests. Verify.ps1 (agent) : 1745/1745, 0 avertissement, 0 erreur ; DLL 0.1063.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A054, A075 and A025 (five project documents): PROJECT and ROADMAP gave the archived master prompt as their authoritative source, with its path on the maintainer's disk; USER-REQUESTS, MAP-PROPOSALS and CRAFT-GATHER-PROPOSALS cited files that live only there (dead links on GitHub). They now name "the maintainer's notes (outside the repository)" or "the agent's rules", and the master prompt is a historical source: the user's decisions and DECISIONS prevail since 2026-11-09. A test checks that these documents cite only Markdown files of the repository.
+
 ## 0.1062.0
 - Constats d'audit A075 et A025 (partie DECISIONS) : la moitié française de DECISIONS citait encore treize fois des fichiers qui ne vivent que sur le disque du mainteneur (liens morts sur GitHub), alors que la moitié anglaise dit déjà « the maintainer's notes (not in the repository) ». Elle dit maintenant « notes du mainteneur (hors du dépôt) ». Un test vérifie que chaque fichier Markdown cité par DECISIONS est un fichier du dépôt.
 - Tests : DecisionsLinks1062Tests. Verify.ps1 (agent) : 1743/1743, 0 avertissement, 0 erreur ; DLL 0.1062.0.0. Rien à essayer en jeu.

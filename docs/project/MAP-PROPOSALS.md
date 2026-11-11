@@ -63,7 +63,7 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 - **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **What the player gets**: A corner of the map permanently shows the character's X/Y coordinates, and those of the flag if there is one. The tooltips of the cursor, of the icons and of the edge markers give the distance from the character, in a straight line (relief is not counted).
 - **How, size, dependencies**: Add MapProjection.WorldFromPixel, with round-trip tests. Distance on X/Z from live.Position. The displayed unit is that of the game world; its name (yalms) is to be confirmed in game against a known distance, assuming nothing. A "coordinates and distances" setting with tooltip and ↺. Size S. Probe: an in-game check of the unit. No decision, except the display corner (recommended: bottom right, facing the cursor coordinates).
-- **Source**: STATUS.md:129: request of 2026-11-01 for the edge markers, "possible distance", not done. Version 0.297 kept only the name (MainWindow.MapView.cs:1480). Lines 1039-1046: only the cursor coordinates are displayed, and only on hover. MapProjection.cs has no pixel → world conversion.
+- **Source**: the maintainer's notes (outside the repository): request of 2026-11-01 for the edge markers, "possible distance", not done. Version 0.297 kept only the name (MainWindow.MapView.cs:1480). Lines 1039-1046: only the cursor coordinates are displayed, and only on hover. MapProjection.cs has no pixel → world conversion.
 
 ## P7 — Unattuned aetherytes flagged and cost on hover
 
@@ -245,7 +245,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : haute ; fichier principal : `src/TenshoAssistant/Maps/NativeMapReplacer.Dalamud.cs`.
 - **Ce que le joueur obtient** : Aujourd'hui, si l'on appuie sur M pendant que la carte Tensho est masquée, aucune carte ne s'affiche. C'est le cas en combat ou en mission avec « Masquer en combat » ou « Masquer en mission » cochés, ou quand le catalogue des cartes n'est pas encore chargé ou a échoué. Avec le repli, la carte du jeu reste visible chaque fois que la carte Tensho ne peut pas se dessiner.
 - **Comment, taille, dépendances** : Passer au remplaçant une fonction « carte Tensho affichable » (catalogue chargé et pas de masquage en cours) à la place de MapViewOpen. Si elle répond non quand AreaMap apparaît, garder la carte du jeu (keepGameMap). Si la carte Tensho se masque pendant l'hébergement (début d'un combat), appeler Restore(unit). Taille S. Aucune sonde. Test en jeu : appuyer sur M en combat avec l'option cochée. Une décision : si l'utilisateur préfère « aucune carte en combat », ce choix devient un réglage (avec infobulle et ↺).
-- **Source** : Constaté en lisant le code, pas reproduit en jeu. Plugin.cs:145 : le remplaçant reçoit tenshoOpen = MainWindow.MapViewOpen, qui ne dit que si la carte est ouverte, pas si elle est visible. MainWindow.MapView.cs:76-82 (MapViewVisible) et MapViewWindow.cs:21 (DrawConditions) : la fenêtre n'est pas dessinée si le catalogue est absent ou si l'un des masquages s'applique. NativeMapReplacer.Dalamud.cs:50-62 : la carte du jeu est quand même placée hors écran (hosted). Règle R-14 de docs/ai/RULES.md : échouer proprement.
+- **Source** : Constaté en lisant le code, pas reproduit en jeu. Plugin.cs:145 : le remplaçant reçoit tenshoOpen = MainWindow.MapViewOpen, qui ne dit que si la carte est ouverte, pas si elle est visible. MainWindow.MapView.cs:76-82 (MapViewVisible) et MapViewWindow.cs:21 (DrawConditions) : la fenêtre n'est pas dessinée si le catalogue est absent ou si l'un des masquages s'applique. NativeMapReplacer.Dalamud.cs:50-62 : la carte du jeu est quand même placée hors écran (hosted). Règle R-14 des règles de l'agent (hors du dépôt) : échouer proprement.
 
 ## P1 — Zoom à l'ouverture, réglable et gardé entre les sessions
 
@@ -293,7 +293,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Un coin de la carte montre en permanence les coordonnées X/Y du personnage, et celles du drapeau s'il y en a un. Les infobulles du curseur, des icônes et des repères au bord donnent la distance depuis le personnage, en ligne droite (le relief n'est pas compté).
 - **Comment, taille, dépendances** : Ajouter MapProjection.WorldFromPixel, avec des tests aller-retour. Distance sur X/Z depuis live.Position. L'unité affichée est celle du monde du jeu ; son nom (yalms) est à confirmer en jeu contre une distance connue, sans rien supposer. Un réglage « coordonnées et distances » avec infobulle et ↺. Taille S. Sonde : une vérification en jeu de l'unité. Pas de décision, sauf le coin d'affichage (recommandé : en bas à droite, face aux coordonnées du curseur).
-- **Source** : STATUS.md:129 : demande du 2026-11-01 pour les repères au bord, « distance éventuelle », non faite. La version 0.297 n'a gardé que le nom (MainWindow.MapView.cs:1480). Lignes 1039-1046 : seules les coordonnées du curseur s'affichent, et seulement au survol. MapProjection.cs n'a pas de conversion pixel → monde.
+- **Source** : notes du mainteneur (hors du dépôt) : demande du 2026-11-01 pour les repères au bord, « distance éventuelle », non faite. La version 0.297 n'a gardé que le nom (MainWindow.MapView.cs:1480). Lignes 1039-1046 : seules les coordonnées du curseur s'affichent, et seulement au survol. MapProjection.cs n'a pas de conversion pixel → monde.
 
 ## P7 — Éthérites non harmonisées signalées et coût au survol
 
@@ -331,7 +331,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : Comme la carte du jeu, la carte Tensho cache ou grise les zones et les régions que le personnage n'a pas encore découvertes. On évite ainsi de dévoiler des lieux.
 - **Comment, taille, dépendances** : Sonde d'abord (tools/ApiProbe, puis un relevé en jeu sur une zone à moitié découverte, à consigner dans docs/evidence). Ensuite : lecture sur le framework, copiée par carte, et dessin d'un voile sur les sous-régions non découvertes, ou grisé des entrées de menu. Si la lecture échoue : tout reste visible et le message « état de découverte indisponible » s'affiche (R-14). Taille M. Décision : masquer, griser, ou laisser un réglage (recommandé : réglage, activé par défaut comme le jeu).
-- **Source** : docs/goals/MAP-016-PLAN.md:57, 68 et 69 : « cartes non découvertes masquées comme le jeu », toujours parmi les restes. Noms trouvés dans les DLL locales, sens à sonder : colonnes Lumina Map.DiscoveryIndex, DiscoveryArrayByte et DiscoveryFlag (Lumina.Excel.dll) ; FFXIVClientStructs MapDiscoveryManager.IsMapRegionDiscovered(uint, byte) et IsRegionDiscovered (FFXIVClientStructs.xml, Hooks/dev). La texture ou le masque de brouillard du jeu sont inconnus.
+- **Source** : notes du mainteneur (hors du dépôt), plan de la carte : « cartes non découvertes masquées comme le jeu », toujours parmi les restes. Noms trouvés dans les DLL locales, sens à sonder : colonnes Lumina Map.DiscoveryIndex, DiscoveryArrayByte et DiscoveryFlag (Lumina.Excel.dll) ; FFXIVClientStructs MapDiscoveryManager.IsMapRegionDiscovered(uint, byte) et IsRegionDiscovered (FFXIVClientStructs.xml, Hooks/dev). La texture ou le masque de brouillard du jeu sont inconnus.
 
 ## P12 — Noms écrits à côté des icônes, comme la carte du jeu
 
@@ -363,7 +363,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour de FF14, la carte indique précisément ce qui ne marche plus (« marqueurs de quête indisponibles après une mise à jour du jeu », « téléportation indisponible »), au lieu d'une carte vide sans explication. Le reste continue de fonctionner.
 - **Comment, taille, dépendances** : Un statut par partie (position, drapeau, marqueurs, ALEA, objets, groupe, collectés, téléportation, remplacement), publié avec l'état. Chaque lecture est isolée dans son propre try, pour qu'une panne ne coupe pas les autres. Une ligne discrète sur la carte, et le même statut dans Diagnostics. Lié au repli sur la carte du jeu. Taille S à M. Pas de sonde. Décision : faire la partie carte maintenant ou l'intégrer à l'étape g2 R-14 (recommandé : maintenant, puisque e) commence par la carte).
-- **Source** : docs/ai/RULES.md (R-14). MapLiveReader.Dalamud.cs:104 : toute erreur efface tout l'état (state=null) et ne laisse qu'un message dans le journal. La flèche, le drapeau, les marqueurs et le groupe disparaissent ensemble, sans rien dire à l'écran. NativeMapReplacer : catch avec journal seulement. Écriture native : ClearFlag (FlagMarkerCount=0).
+- **Source** : règles de l'agent (R-14, hors du dépôt). MapLiveReader.Dalamud.cs:104 : toute erreur efface tout l'état (state=null) et ne laisse qu'un message dans le journal. La flèche, le drapeau, les marqueurs et le groupe disparaissent ensemble, sans rien dire à l'écran. NativeMapReplacer : catch avec journal seulement. Écriture native : ClearFlag (FlagMarkerCount=0).
 
 ## P16 — Option : clic gauche sur la carte pour poser le drapeau
 
@@ -378,7 +378,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `docs/project/BACKLOG.md`.
 - **Ce que le joueur obtient** : Les mandats forment une catégorie juste dans les repères au bord et dans les couleurs de zones, au lieu d'être mêlés aux « autres événements ».
 - **Comment, taille, dépendances** : Relevé en jeu : mandat accepté, carte ouverte, mode développeur. La ligne « Map event marker icon … type … » est déjà écrite dans le journal (MapLiveReader.Dalamud.cs, ReadEvents). Copier ce relevé dans docs/evidence, puis faire du type une catégorie d'interrupteur EdgeEvents et une couleur de zone. Taille S. Relevé en jeu d'abord. Pas de décision.
-- **Source** : BACKLOG.md:14 et ROADMAP.md:82 : type de marqueur des mandats inconnu. TESTING.md:234 : relevé demandé. docs/goals/MAP-016-PLAN.md:57 et 69 : « confirmation des zones de mandats ». Dans docs/evidence/0.135.0-marker-evidence.log et 0.136.0-marker-evidence.log, seuls les types 0, 3 et 4 apparaissent, sans dire lequel désigne un mandat.
+- **Source** : BACKLOG.md:14 et ROADMAP.md:82 : type de marqueur des mandats inconnu. TESTING.md:234 : relevé demandé. notes du mainteneur (plan de la carte) : « confirmation des zones de mandats ». Dans docs/evidence/0.135.0-marker-evidence.log et 0.136.0-marker-evidence.log, seuls les types 0, 3 et 4 apparaissent, sans dire lequel désigne un mandat.
 
 ## P18 — Cadres et textures du jeu (ULD), en commençant par la carte
 
@@ -386,7 +386,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La fenêtre de la carte (boutons d'outils, cadre, menus) reprend les cadres et textures de l'interface du jeu, dans la même DLL et sans ressource externe. Les autres fenêtres suivent ensuite.
 - **Comment, taille, dépendances** : Sonde d'abord : chemins .uld et numéros de parties des boutons et du cadre de la carte du jeu (tools/ApiProbe), avec une capture, consignés dans docs/evidence. Ensuite : chargement unique hors Draw, une partie par bouton, et repli sur le dessin ImGui actuel si une partie manque (R-14). Taille M pour la carte, L pour toute l'interface. Décision : périmètre (carte seule ou tout de suite tout) et degré d'imitation (boutons, cadre, fond).
-- **Source** : BACKLOG.md:15 ; ROADMAP.md:46 (étape e) ; ROADMAP.md:53 et 119 (DEC-023 : avant D17) ; docs/goals/R-06.md:137 (priorité aux .tex et .uld du jeu). Aucun ULD n'est lu aujourd'hui (aucune occurrence dans src/). API présente dans Dalamud.xml (Hooks/dev) : UiBuilder.LoadUld(string) et UldWrapper.LoadTexturePart(string, int).
+- **Source** : BACKLOG.md:15 ; ROADMAP.md:46 (étape e) ; ROADMAP.md:53 et 119 (DEC-023 : avant D17) ; notes du mainteneur (plan R-06) (priorité aux .tex et .uld du jeu). Aucun ULD n'est lu aujourd'hui (aucune occurrence dans src/). API présente dans Dalamud.xml (Hooks/dev) : UiBuilder.LoadUld(string) et UldWrapper.LoadTexturePart(string, int).
 
 ## P19 — Tests en jeu de la carte encore en attente
 

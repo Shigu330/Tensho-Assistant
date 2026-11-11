@@ -11,7 +11,8 @@ the official repository, DEC-039).
 The step queue a) to h) (2026-11-02 to 2026-11-04) and the foundation notes (2026-10-27 to 2026-10-28) were history; they were removed from
 this file on 2026-11-08 and stay readable in git (this file at version 0.865.0, commit `2da535d`).
 
-Authoritative source: the master prompt, §4 (agent file `docs/ai/PROMPT-MAITRE.md`, outside the repository). Every row is kept. State
+Origin: the master prompt, §4 (maintainer's notes, outside the repository; a historical source since 2026-11-09, the user's
+decisions and [DECISIONS](DECISIONS.md) prevail). Every row is kept. State
 describes the work; Coverage describes the capacity actually validated. TODO/READY/ACTIVE/BLOCKED/DONE; NOT_STARTED/PARTIAL/FUNCTIONAL/
 REPLACEABLE. NEEDS_STUDY is a note of uncertainty, not a removal. No arbitrary percentage.
 
@@ -115,7 +116,8 @@ décisions prises en route. Les 17 lignes restent PARTIAL : aucune validation en
 La file d'étapes a) à h) (2026-11-02 au 2026-11-04) et les notes de fondation (2026-10-27 au 2026-10-28) étaient de l'historique ; elles
 ont été retirées de ce fichier le 2026-11-08 et restent lisibles dans git (ce fichier à la version 0.865.0, commit `2da535d`).
 
-Source qui fait foi : le prompt maître, §4 (fichier de l'agent `docs/ai/PROMPT-MAITRE.md`, hors du dépôt). Toutes les lignes sont
+Origine : le prompt maître, §4 (notes du mainteneur, hors du dépôt ; source historique depuis le 2026-11-09, les décisions de
+l'utilisateur et [DECISIONS](DECISIONS.md) priment). Toutes les lignes sont
 conservées. State décrit le travail ; Coverage décrit la capacité réellement validée. TODO/READY/ACTIVE/BLOCKED/DONE ;
 NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitude, pas une suppression. Aucun pourcentage arbitraire.
 
