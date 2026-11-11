@@ -4,26 +4,34 @@ namespace TenshoAssistant.Inventory;
 /// g, I-03 (0.345, user's choice: one file per character): the bank kept as one file per character, InventoryBank/&lt;id&gt;.json,
 /// each read and written by its own <see cref="FileInventoryBankStore"/> (same bounds and checks, .bak copy, a corrupt file fails
 /// closed). The id is the local character id the game gives the logged-in character (ContentId), never an Account ID.
-/// Only the characters whose entries changed are written; a character no longer in the list (erased) has its files deleted.
 /// The former shared file (InventoryBank.json) is split once: written into a temporary folder, moved into place only when complete,
 /// then kept beside as « .migrated »; a failed or interrupted split leaves the former file untouched and is redone at the next load.
+/// X-141 (0.1118, audit A02): two game clients on the same profile share this folder. Every change is targeted (Apply): under a lock file
+/// of the profile (InventoryBank.lock, beside the folder, held by one process at a time), only the character concerned is read again from
+/// its file, changed (one storage written or forgotten) and written back, so what the other client saved is kept; a character's files
+/// are deleted only on the player's explicit « Erase this character ». A whole-list Save never deletes anything. Load and the split of
+/// the former file run under the same lock.
 /// </summary>
 public sealed class PerCharacterBankStore : IInventoryBankStore
 {
     private readonly string folder;
     private readonly string legacy;
+    private readonly int lockWaitMs;
     private readonly object gate=new();
     private readonly Dictionary<ulong,FileInventoryBankStore> stores=[];
-    private readonly Dictionary<ulong,BankEntry[]> saved=[];
     private bool loadFailed;
 
-    public PerCharacterBankStore(string folder,string legacyFile)
+    /// <param name="lockWaitMs">How long a change waits for the other client's lock before it fails (nothing written).</param>
+    public PerCharacterBankStore(string folder,string legacyFile,int lockWaitMs=10_000)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folder);ArgumentException.ThrowIfNullOrWhiteSpace(legacyFile);
-        this.folder=Path.GetFullPath(folder);legacy=Path.GetFullPath(legacyFile);
+        this.folder=Path.GetFullPath(folder);legacy=Path.GetFullPath(legacyFile);this.lockWaitMs=lockWaitMs;
     }
 
     public static string FileName(ulong character)=>character.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json";
+
+    /// <summary>X-141: the profile's lock file (beside the folder: the folder's absence still means « not split yet »).</summary>
+    public string LockPath=>Path.TrimEndingDirectorySeparator(folder)+".lock";
 
     public BankEntry[] Load()
     {
@@ -31,44 +39,94 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
         {
             try
             {
-                Migrate();
-                var all=new List<BankEntry>();
-                saved.Clear();
-                foreach(var id in Characters())
+                return Locked(()=>
                 {
-                    var entries=Store(id).Load();
-                    if(entries.Any(entry=>entry.Key.CharacterId!=id))throw new InvalidDataException("A character's bank file holds another character's entries.");
-                    if(entries.Length>0)saved[id]=entries;
-                    all.AddRange(entries);
-                }
-                var result=all.ToArray();
-                InventoryBankService.ValidateEntries(result);
-                return result;
+                    Migrate();
+                    var all=new List<BankEntry>();
+                    foreach(var id in Characters())all.AddRange(Read(id));
+                    var result=all.ToArray();
+                    InventoryBankService.ValidateEntries(result);
+                    return result;
+                });
             }
             catch{loadFailed=true;throw;}
         }
     }
 
+    /// <summary>X-141: the characters present in the list are written when their file differs; nothing is ever deleted here (erasing is Apply with Erase).</summary>
     public void Save(IReadOnlyList<BankEntry> entries)
     {
         lock(gate)
         {
             if(loadFailed)throw new InvalidOperationException("A failed bank load prevents overwriting saved data.");
             InventoryBankService.ValidateEntries(entries);
-            var groups=entries.GroupBy(entry=>entry.Key.CharacterId).ToDictionary(group=>group.Key,group=>group.ToArray());
-            foreach(var (id,list) in groups)
+            Locked(()=>
             {
-                if(saved.TryGetValue(id,out var before) && before.SequenceEqual(list))continue;
-                Store(id).Save(list);
-                saved[id]=list;
-            }
-            // Erased characters: their file and its copy go (an erased character must not come back at the next load).
-            foreach(var id in Characters().Concat(saved.Keys).Distinct().Where(id=>!groups.ContainsKey(id)).ToArray())
+                foreach(var group in entries.GroupBy(entry=>entry.Key.CharacterId))
+                {
+                    var list=group.ToArray();
+                    if(!Read(group.Key).SequenceEqual(list))Store(group.Key).Save(list);
+                }
+                return 0;
+            });
+        }
+    }
+
+    /// <summary>
+    /// X-141: one change of one character under the profile's lock: its file read again (what the other client wrote stays), the storage
+    /// written or forgotten, the file written only when it differs; Erase (the player's command) deletes its file and its copy. The entries
+    /// to show: the other characters as this client has them, this one as now saved.
+    /// </summary>
+    public BankEntry[] Apply(BankChange change,IReadOnlyList<BankEntry> memory)
+    {
+        var id=change.Character;
+        if(id==0)throw new ArgumentException("Unknown character.");
+        lock(gate)
+        {
+            if(loadFailed)throw new InvalidOperationException("A failed bank load prevents overwriting saved data.");
+            var saved=Locked(()=>
             {
-                var path=Path.Combine(folder,FileName(id));
-                File.Delete(path);File.Delete(path+".bak");
-                stores.Remove(id);saved.Remove(id);
-            }
+                if(change.Erase!=0)
+                {
+                    var path=Path.Combine(folder,FileName(id));
+                    File.Delete(path);File.Delete(path+".bak");
+                    stores.Remove(id);
+                    return Array.Empty<BankEntry>();
+                }
+                var before=Read(id);
+                var after=change.On(before);
+                InventoryBankService.ValidateEntries(after);
+                if(!before.SequenceEqual(after))Store(id).Save(after);
+                return after;
+            });
+            var result=memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
+            InventoryBankService.ValidateEntries(result);
+            return result;
+        }
+    }
+
+    /// <summary>One character's entries as on disk (a file holding another character's entries fails closed).</summary>
+    private BankEntry[] Read(ulong id)
+    {
+        var entries=Store(id).Load();
+        if(entries.Any(entry=>entry.Key.CharacterId!=id))throw new InvalidDataException("A character's bank file holds another character's entries.");
+        return entries;
+    }
+
+    /// <summary>
+    /// X-141: work done while holding the profile's lock file (opened without sharing: the other client, or another store here, waits);
+    /// tried again every 50 ms up to lockWaitMs, then the IOException of the busy file (nothing changed).
+    /// </summary>
+    private T Locked<T>(Func<T> work)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(LockPath)!);
+        var until=Environment.TickCount64+lockWaitMs;
+        while(true)
+        {
+            FileStream held;
+            try{held=new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
+            catch(IOException) when(Environment.TickCount64<until){Thread.Sleep(50);continue;}
+            using(held)return work();
         }
     }
 

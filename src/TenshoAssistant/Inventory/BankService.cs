@@ -128,18 +128,21 @@ public sealed class InventoryBankService : IDisposable
             await foreach (var request in requests.Reader.ReadAllAsync().ConfigureAwait(false))
             {
                 BankEntry[] next;
+                BankEntry[] memory;
+                // X-141 (0.1118): the change itself goes to the store (only the character concerned is written; erasing only on Erase).
+                var change = request.Forget is { } forgotten ? new BankChange(Forget: forgotten)
+                    : request.Erase != 0 ? new BankChange(Erase: request.Erase) : new BankChange(Put: request.Entry);
                 lock (gate)
                 {
                     if (disposed) return;
-                    next = request.Forget is { } forgotten ? state.Entries.Where(e => e.Key != forgotten).ToArray()
-                        : request.Erase != 0 ? state.Entries.Where(e => e.Key.CharacterId != request.Erase).ToArray()
-                        : state.Entries.Where(e => e.Key != request.Entry!.Key).Append(request.Entry!).ToArray();
+                    memory = state.Entries.ToArray();
+                    next = change.On(memory);
                 }
                 string? error = null;
                 // 0.605: the date is new in memory, the file is only rewritten when the contents changed or the saved date grows old.
                 var unchanged = false;
                 lock (gate) unchanged = request.Entry is { } incoming && BankEntryCompare.CanSkipSave(state.Entries.FirstOrDefault(e => e.Key == incoming.Key), incoming, savedAt);
-                try { if (!unchanged) { store.Save(Array.AsReadOnly(next)); if (request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; } }
+                try { if (!unchanged) { next = store.Apply(change, Array.AsReadOnly(memory)); if (request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; } }
                 catch (Exception ex) { error = $"Bank save failed: {ex.Message}"; }
                 lock (gate)
                 {

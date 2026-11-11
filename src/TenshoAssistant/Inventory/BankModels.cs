@@ -110,4 +110,28 @@ public interface IInventoryBankStore
 {
     BankEntry[] Load();
     void Save(IReadOnlyList<BankEntry> entries);
+
+    /// <summary>
+    /// X-141 (0.1118): one targeted change persisted (a storage written or forgotten, or a character erased on the player's command) and
+    /// the entries to show afterwards. This default saves the whole list (one file, one writer); PerCharacterBankStore reads the character
+    /// again under the profile's lock so that what another client saved is kept.
+    /// </summary>
+    BankEntry[] Apply(BankChange change, IReadOnlyList<BankEntry> memory)
+    {
+        var next = change.On(memory);
+        Save(Array.AsReadOnly(next));
+        return next;
+    }
+}
+
+/// <summary>X-141 (0.1118): one change of the bank: Put (a storage read), Forget (one storage, on a click) or Erase (every storage of one
+/// character, on « Erase this character » only).</summary>
+public sealed record BankChange(BankEntry? Put = null, BankKey? Forget = null, ulong Erase = 0)
+{
+    public ulong Character => Put?.Key.CharacterId ?? Forget?.CharacterId ?? Erase;
+
+    /// <summary>The change applied to a list of entries.</summary>
+    public BankEntry[] On(IEnumerable<BankEntry> entries) => Forget is { } forgotten ? entries.Where(e => e.Key != forgotten).ToArray()
+        : Erase != 0 ? entries.Where(e => e.Key.CharacterId != Erase).ToArray()
+        : entries.Where(e => e.Key != Put!.Key).Append(Put!).ToArray();
 }

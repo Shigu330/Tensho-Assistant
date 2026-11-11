@@ -38,7 +38,9 @@ internal static class Characters345Tests
                 Check(!File.Exists(legacy) && File.Exists(legacy + ".migrated"),"former file kept beside, not deleted");
                 Check(!Directory.Exists(folder + ".migrating"),"temporary folder moved into place");
                 store.Save(loaded.Where(entry => entry.Key.CharacterId != 11).ToArray());
-                Check(!File.Exists(Path.Combine(folder,"11.json")) && File.Exists(Path.Combine(folder,"22.json")),"erased character: its file deleted, the other kept");
+                Check(File.Exists(Path.Combine(folder,"11.json")),"X-141: a whole list without a character never deletes it");
+                store.Apply(new BankChange(Erase: 11),loaded);
+                Check(!File.Exists(Path.Combine(folder,"11.json")) && File.Exists(Path.Combine(folder,"22.json")),"erased character (explicit command): its file deleted, the other kept");
                 var again = new PerCharacterBankStore(folder,legacy).Load();
                 Check(again.Length == 2 && again.All(entry => entry.Key.CharacterId == 22),"reloaded from the remaining file; no second migration");
             }
@@ -69,7 +71,7 @@ internal static class Characters345Tests
             Check(!BankStorageScope.Sortable(BankStorageKind.Bags) && BankStorageScope.Sortable(BankStorageKind.Retainer),"sort preview: sortable storages only");
             Check(Read("MainWindow.SortPreview.cs").Contains("BankStorageScope.Sortable(entry.Key.Kind)",StringComparison.Ordinal),"sort preview uses the list");
             Check(Read("MainWindow.Bank.cs").Contains("(!live || !BankStorageScope.IsCharacterOwn(entry.Key.Kind))",StringComparison.Ordinal),"no double count for the logged-in character");
-            Check(Read("Inventory/BankService.cs").Contains("request.Erase != 0 ? state.Entries.Where(e => e.Key.CharacterId != request.Erase)",StringComparison.Ordinal),"erase on the bank's own queue");
+            Check(Read("Inventory/BankService.cs").Contains("request.Erase != 0 ? new BankChange(Erase: request.Erase)",StringComparison.Ordinal),"erase on the bank's own queue");
             Check(Read("Plugin.cs").Contains("new PerCharacterBankStore(",StringComparison.Ordinal),"plugin uses one file per character");
             Check(Read("MainWindow.Characters.cs").Contains("characterEraseArmed==summary.Id",StringComparison.Ordinal),"erase needs a second click");
         }),

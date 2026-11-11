@@ -233,7 +233,7 @@ internal static class InventoryBankTests
             var bank=Read("MainWindow.Bank.cs");
             Check(bank.Contains("if(!armed)bankForgetArmed=entry.Key;") && bank.Contains("bank.ForgetAsync(entry.Key)"),"two clicks");
             Check(bank.Contains("listed.All(known=>known.Id!=entry.Key.StorageId)"),"said when the bell does not list it");
-            Check(Read("Inventory/BankService.cs").Contains("state.Entries.Where(e => e.Key != forgotten)"),"only that read");
+            Check(Read("Inventory/BankService.cs").Contains("new BankChange(Forget: forgotten)") && Read("Inventory/BankModels.cs").Contains("entries.Where(e => e.Key != forgotten)"),"only that read");
         }),
     ];
 
