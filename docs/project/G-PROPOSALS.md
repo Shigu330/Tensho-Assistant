@@ -3,7 +3,7 @@
 > *Traduction française plus bas.*
 
 This document is kept during the development of step g) (the gaps of GAPS.md). It records the ideas spotted while coding and the
-choices made provisionally, to review them together with the user (step h and the decisions at the end). What has been decided since is marked
+choices made provisionally, to review them together with the user (phase 6 and the decisions at the end). What has been decided since is marked
 as such (DEC-026 and later); the rest is still open.
 The provisional choices are also recalled in the [ROADMAP](ROADMAP.md), "Decisions postponed to the end".
 Reread on 2026-11-03 (0.446): an alternative done since then is marked "DONE x.y" in its column; what remains is the choice itself to confirm.
@@ -86,7 +86,7 @@ Plus a search field at the top of the Settings that finds any setting by its nam
 # Propositions et choix provisoires de l'étape g) — à revoir ensemble
 
 Ce document est tenu pendant le développement de l'étape g) (les écarts de GAPS.md). On y note les idées repérées en codant et les
-choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (étape h et décisions de la fin). Ce qui a été décidé
+choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (phase 6 et décisions de la fin). Ce qui a été décidé
 depuis est marqué comme tel (DEC-026 et suivantes) ; le reste est encore ouvert. Les choix provisoires sont aussi rappelés dans la [ROADMAP](ROADMAP.md), « Décisions reportées à la fin ».
 Relu le 2026-11-03 (0.446) : une alternative faite depuis est marquée « FAIT x.y » dans sa colonne ; il reste alors le choix lui-même à confirmer.
 **DÉCIDÉ 2026-11-03 (DEC-026)** : tous les choix provisoires ci-dessous sont confirmés par l'utilisateur, sauf X-13 (envoi au chat sur clic

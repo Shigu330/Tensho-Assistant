@@ -163,7 +163,7 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 - **Value**: medium; main file: `docs/project/TESTING.md`.
 - **What the player gets**: Before adding functions to the map, we confirm that the latest changes work. Otherwise, an old defect and a new one risk getting mixed up.
 - **How, size, dependencies**: A short guided check of these five points (about 10 minutes in game), before the first map version of step e) or just after. Size S. In-game capture. Decision: do it now or keep it for h) (recommended: now, since e) precisely modifies the map).
-- **Source**: TESTING.md:146-156: 0.242–0.243 (R-01, journal target), 0.244 (R-03, Triple Triad), 0.245 (R-04, menu specific to each icon), 0.259 and 0.262 (tooltips and ↺), 0.308 (zoom level background). ROADMAP.md:136 and 144. The user's instruction places the tests at the end of the queue (step h).
+- **Source**: TESTING.md:146-156: 0.242–0.243 (R-01, journal target), 0.244 (R-03, Triple Triad), 0.245 (R-04, menu specific to each icon), 0.259 and 0.262 (tooltips and ↺), 0.308 (zoom level background). ROADMAP.md:136 and 144. The user's instruction places the tests at the end of the queue (phase 6).
 
 ## P20 — "Layers" button to show or hide everything in one click
 
@@ -393,7 +393,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `docs/project/TESTING.md`.
 - **Ce que le joueur obtient** : Avant d'ajouter des fonctions à la carte, on confirme que les derniers changements fonctionnent. Sinon, un défaut ancien et un nouveau risquent de se mélanger.
 - **Comment, taille, dépendances** : Une courte vérification guidée de ces cinq points (environ 10 minutes en jeu), avant la première version de carte de l'étape e) ou juste après. Taille S. Relevé en jeu. Décision : la faire maintenant ou la garder pour h) (recommandé : maintenant, puisque e) modifie justement la carte).
-- **Source** : TESTING.md:146-156 : 0.242–0.243 (R-01, cible du journal), 0.244 (R-03, Triple Triad), 0.245 (R-04, menu propre à chaque icône), 0.259 et 0.262 (infobulles et ↺), 0.308 (fond du niveau de zoom). ROADMAP.md:136 et 144. La consigne de l'utilisateur place les tests en fin de file (étape h).
+- **Source** : TESTING.md:146-156 : 0.242–0.243 (R-01, cible du journal), 0.244 (R-03, Triple Triad), 0.245 (R-04, menu propre à chaque icône), 0.259 et 0.262 (infobulles et ↺), 0.308 (fond du niveau de zoom). ROADMAP.md:136 et 144. La consigne de l'utilisateur place les tests en fin de file (phase 6).
 
 ## P20 — Bouton « Couches » pour tout afficher ou masquer en un clic
 

@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1074.0
+- Constats d'audit A043 et A045, vocabulaire : l'ancienne file de travail a) à h) a été remplacée par les phases du plan global, et sa dernière étape, « étape h » (la campagne d'essais en jeu de la fin), est la phase 6. TESTING disait encore « étape h » dans 150 titres, et trois documents de propositions une fois dans chaque langue : ils disent maintenant « phase 6 » (les preuves gardent leurs mots, elles datent de leur jour). Seuls des titres changent, aucune case d'essai. Un test vérifie qu'« étape h » ne revient pas.
+- Tests : StepH1074Tests. Verify.ps1 (agent) : 1757/1757, 0 avertissement, 0 erreur ; DLL 0.1074.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A043 and A045, wording: the old work queue a) to h) was replaced by the phases of the global plan, and its last step, « step h » (the in-game test campaign at the end), is phase 6. TESTING still said « step h » in 150 headings, and three proposal documents once in each language: they now say « phase 6 » (evidence files keep their wording, they record their day). Only headings change, no test box. A test checks that « step h » does not come back.
+
 ## 0.1073.0
 - Constat d'audit A043, première partie : TESTING.md gardait, après son dernier essai, environ 610 lignes du journal de vérification par version jusqu'au 0.99 (27 au 31 octobre 2026), déjà dans le CHANGELOG et dans git, sans aucune case ouverte. Cette archive est retirée ; une note dit où elle reste (historique git). Les essais, les numéros de ligne du parcours des essais (tous avant l'archive) et l'outil des essais ne changent pas. Un test vérifie la note et qu'il ne reste rien de l'ancien journal.
 - Tests : TestingArchive1073Tests. Verify.ps1 (agent) : 1756/1756, 0 avertissement, 0 erreur ; DLL 0.1073.0.0. Rien à essayer en jeu.

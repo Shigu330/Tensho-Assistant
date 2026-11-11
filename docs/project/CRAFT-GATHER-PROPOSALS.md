@@ -276,7 +276,7 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 
 - **Value**: medium; main file: `docs/project/TESTING.md`.
 - **What the player gets**: A guided session surveys at once, in developer mode, the game values on which several proposals and retained gaps depend. The following versions then move forward without waiting for one survey each.
-- **How, size, dependencies**: Survey screen in developer mode, read-only: copy on the framework thread, guarded by R-14, "Copy" button; results recorded in docs/evidence. The in-game validations stay for step h (user's rule). Size S-M. Dependencies: none. Decision: time of the session (recommended: just before step g, Gathering).
+- **How, size, dependencies**: Survey screen in developer mode, read-only: copy on the framework thread, guarded by R-14, "Copy" button; results recorded in docs/evidence. The in-game validations stay for phase 6 (user's rule). Size S-M. Dependencies: none. Decision: time of the session (recommended: just before step g, Gathering).
 - **Source**: Surveys requested: K2 (Manipulation unlock), K7 (adjusted level, WKS), K10 (HQ chance shown), K11 (master recipe book read), G2 (statuses of GP actions), G4 (cast), G6 (node type, folklore), G7 (Intuition), G10 (spearfishing); GAPS.md:72 (A-01, CollectablesShopRefine), GAPS.md:95-96 (R-04 PlayerState.FishingBait, R-05 IsFishCaught). ROADMAP.md:85: estimated Bountiful bonus to compare in game.
 
 ## C34 — K21 — Today's Grand Company supply and provisioning missions
@@ -581,7 +581,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 - **Valeur** : moyenne ; fichier principal : `docs/project/TESTING.md`.
 - **Ce que le joueur obtient** : Une séance guidée relève en une fois, en mode développeur, les valeurs du jeu dont dépendent plusieurs propositions et manques retenus. Les versions suivantes avancent ensuite sans attendre un relevé chacune.
-- **Comment, taille, dépendances** : Écran de relevés en mode développeur, en lecture seule : copie sur le thread du framework, gardée R-14, bouton « Copier » ; résultats consignés dans docs/evidence. Les validations en jeu restent pour l'étape h (règle de l'utilisateur). Taille S-M. Dépendances : aucune. Décision : moment de la séance (recommandé : juste avant l'étape g, Récolte).
+- **Comment, taille, dépendances** : Écran de relevés en mode développeur, en lecture seule : copie sur le thread du framework, gardée R-14, bouton « Copier » ; résultats consignés dans docs/evidence. Les validations en jeu restent pour la phase 6 (règle de l'utilisateur). Taille S-M. Dépendances : aucune. Décision : moment de la séance (recommandé : juste avant l'étape g, Récolte).
 - **Source** : Relevés demandés : K2 (déblocage de Manipulation), K7 (niveau ajusté, WKS), K10 (chance HQ affichée), K11 (livre de maître lu), G2 (statuts des actions PA), G4 (lancer), G6 (type de point, folklore), G7 (intuition), G10 (harpon) ; GAPS.md:72 (A-01, CollectablesShopRefine), GAPS.md:95-96 (R-04 PlayerState.FishingBait, R-05 IsFishCaught). ROADMAP.md:85 : bonus d'Abondance estimé à comparer en jeu.
 
 ## C34 — K21 — Missions d'approvisionnement de la Grande Compagnie du jour

@@ -244,7 +244,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   couverte.
 - [ ] 0.230 — Page Récolte : outils de l'objet en tête ; pour un poisson, « Comment le pêcher · GatherBuddy » en premier.
 
-**Webhook Discord (R-12, 0.319)** — à faire pendant la campagne de tests en jeu de la fin (étape h de la file), avec un salon de test
+**Webhook Discord (R-12, 0.319)** — à faire pendant la campagne de tests en jeu de la fin (phase 6), avec un salon de test
 
 - [x] Paramètres › Alarmes › Discord : coller l'adresse d'un webhook d'un salon de test, quitter le champ : « Adresse enregistrée :
   https://discord.com/api/webhooks/1234…/*** » ; une adresse d'un autre site reste dans le champ avec le message rouge, non enregistrée.
@@ -257,7 +257,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] « Effacer » l'adresse pendant un envoi : rien de plus n'arrive ; le rapport de diagnostic (Diagnostics › Copier le rapport) ne
   contient pas l'adresse (ligne « Discord on · webhook valid… »).
 
-**Page Crédits (R-13, 0.320)** — pendant la campagne de tests en jeu de la fin (étape h)
+**Page Crédits (R-13, 0.320)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Préférences › Crédits : sept sections (le jeu, bibliothèques, données intégrées, données en ligne, règles reprises, plugins et
   sites lus, outils), 72 entrées ; textes en français et, langue anglaise choisie, en anglais (noms et auteurs identiques).
@@ -267,7 +267,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   Discord suit Paramètres › Alarmes › Discord. Depuis 0.324, aucune ligne ne dit « réglage partiel ».
 - [ ] « Copier l'adresse du dépôt » en bas de page.
 
-**Point d) — 0.321** — pendant la campagne de tests en jeu de la fin (étape h)
+**Point d) — 0.321** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
   valeurs restent ; le bouton ↺ remet chacune ; la case « Aide du carnet » s'enregistre au clic et montre son infobulle au survol.
@@ -277,7 +277,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Marché hors ligne (réseau coupé) : le bouton de portée « Région » reste grisé, avec son infobulle ; pas de ralentissement.
 - [ ] Cabine d'essayage et Rappels : fonctionnent comme avant (aucun changement visible attendu).
 
-**Point d) — 0.324 : interrupteurs de sources** — pendant la campagne de tests en jeu de la fin (étape h)
+**Point d) — 0.324 : interrupteurs de sources** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Paramètres › Avancé › « Universalis (prix du marché) » décoché : « Prix au survol » est grisé ; la page Marché ne charge plus
   rien de neuf, montre les prix déjà en cache et dit « Source désactivée » sinon ; « Actualiser » est grisé avec son infobulle ;
@@ -290,7 +290,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   des alarmes, copie des macros, options de la Revue de mode, zones de la carte (la couleur a son infobulle) : changer une valeur
   fait apparaître ↺, un clic remet la valeur par défaut, et elle reste après rechargement du plugin.
 
-**Point d) — 0.325 : infobulles, confirmations** — pendant la campagne de tests en jeu de la fin (étape h)
+**Point d) — 0.325 : infobulles, confirmations** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survol des filtres, recherches, tris et champs de saisie des pages (Banque, Collections, Butin, Quêtes, Récolte, Objets,
   Artisanat, Marché, Cartes, Rangement, Triple Triad, Revue de mode, Équipement, Météo…) : chacun montre une infobulle, en
@@ -301,7 +301,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   champs de l'alarme manuelle et bouton « Ajouter » avec infobulle.
 - [ ] Carte › tailles des icônes : le bouton de remise à zéro porte un libellé exact, avec une infobulle par portée.
 
-**Point d) — 0.326 : corrections de la revue** — pendant la campagne de tests en jeu de la fin (étape h)
+**Point d) — 0.326 : corrections de la revue** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survoler plusieurs objets, puis couper le wiki ou Garland (Paramètres › Avancé) : plus de téléchargement (journal Dalamud) ;
   rallumer : les sources de ces objets reviennent au survol suivant.
@@ -313,7 +313,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Banque (client anglais) : les titres des cadres de la sacoche et de l'arsenal sont en anglais.
 - [ ] Première vraie release avec Verify.ps1 -Release : suivre la sortie de près (ordre et reprise vérifiés par l'analyse de syntaxe seulement).
 
-**Étape e) — 0.327 : réglages** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape e) — 0.327 : réglages** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Paramètres › Interface : nombre de résultats à 50 → la recherche d'objets en liste 50 et l'avis dit 50 ; ↺ remet 30.
 - [ ] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
@@ -324,7 +324,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Carnet d'artisanat : « calcul automatique » décoché → bouton « Calculer » ; le décocher pendant un calcul garde « Calcul… ».
 - [ ] Alarmes : « pas de ligne de discussion en mission » coché (sous « Pas de son en mission ») → aucune ligne [Tensho] en donjon.
 
-**Étape e) — 0.328 : carte** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape e) — 0.328 : carte** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] « Remplacer la carte du jeu » et « Masquer en combat » cochés : M en combat montre la carte du jeu (plus d'écran sans carte).
 - [x] Carte Tensho ouverte par M, bouton « Ouvrir la carte du jeu » : la carte du jeu revient à l'écran.
@@ -337,7 +337,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Liste des panoramas (clic droit) : clic droit sur une ligne → alarme proposée ; numéro identique à l'infobulle.
 - [ ] Ville chargée : la carte reste fluide (vendeurs mis en cache), temps à relever dans Diagnostics si besoin.
 
-**Étape e) — 0.329 : objets, banque, tri, marché** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape e) — 0.329 : objets, banque, tri, marché** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] « Enregistrement automatique » décoché : ouvrir l'arsenal et le coffre à apparence → ils apparaissent quand même dans la Banque,
   sans message « import » dans le panneau des servants.
@@ -350,18 +350,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **Étape e) — 0.332 : cadre du jeu** — retiré en 0.510 (DEC-033), plus rien à tester
 
 
-**Étape f) — 0.333 : escouade** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.333 : escouade** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Mission d'escouade lancée : Rappels › « Mission d'escouade » donne son nom et une heure de fin égale à celle du jeu ; la cloche crée
   une alarme qui sonne à ce moment ; une fois finie, « Terminé (à récupérer à la caserne) ».
 - [ ] Même chose pour un entraînement d'escouade ; sans mission ni entraînement : « Aucun en cours ».
 
-**Étape f) — 0.334 : seuils des sous-marins** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.334 : seuils des sous-marins** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Montages, trajet passant par le secteur 86 ou 130 : la ligne « Palier non confirmé par les relevés » s'affiche avec son infobulle ;
   trajet sans ces secteurs : pas de ligne.
 
-**Étape f) — 0.335 : valeur des trajets** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.335 : valeur des trajets** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Meilleurs trajets, « Prix » sur « PNJ ou marché » : le bouton « Prix du marché (n sur m manquants) » récupère au plus 32 prix, puis
   le classement est refait ; les valeurs avec « ≥ » ont encore des prix manquants ; au survol, chaque objet donne son prix PNJ et marché.
@@ -369,14 +369,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   mêmes valeurs qu'en 0.334.
 - [ ] « Surveillance » sur « Palier 3 » : le classement change ; un trajet avec un secteur sans relevé à ce palier le dit au survol.
 
-**Étape f) — 0.336 : secteurs de dirigeable** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.336 : secteurs de dirigeable** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Compagnie › « Secteurs de dirigeable » : 23 secteurs de la Mer de nuages (pas le Diadème), rang, céruleum, durée de relevé et
   expérience égaux au panneau de vol du jeu ; « Débloqué par » cohérent avec l'ordre de découverte en jeu.
 - [ ] Survol de « n objets » : liste d'objets avec icône, sans quantité ; le filtre trouve un secteur par le nom d'un objet.
 - [ ] Paramètres › Crédits : LuminaSupplemental apparaît deux fois (téléchargé ; embarqué pour les dirigeables).
 
-**Étape f) — 0.337 : planificateur de dirigeables (appelle les fonctions de calcul du jeu)** — pendant la campagne de tests en jeu (étape h)
+**Étape f) — 0.337 : planificateur de dirigeables (appelle les fonctions de calcul du jeu)** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Secteurs de dirigeable, connecté : choisir un dirigeable lu à l'atelier ; plus de « Calcul des étapes par le jeu… » après une seconde ;
   aucun plantage, rien dans le journal Dalamud.
@@ -387,14 +387,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Sous-marins, « PNJ ou marché » : survoler des objets ailleurs entre deux clics « Prix du marché » ne fait pas revenir « ≥ » sur
   les prix déjà récupérés ; un objet sans offre NQ dit « aucune offre NQ » et n'est plus redemandé.
 
-**Étape f) — 0.338 : taux de surmatérialisation** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.338 : taux de surmatérialisation** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Équipement, pièce avec surmatérialisation : dans l'éditeur, chaque grade d'un emplacement avancé donne son taux ; les mêmes que
   la fenêtre de pose du jeu (ex. : matéria IX, premier emplacement, pièce HQ : 17 %).
 - [ ] Grades VI, VIII, X et XII proposés dans le premier emplacement avancé seulement ; XI et XII : taux « selon Teamcraft », égal à
   celui de la fenêtre de pose du jeu (ex. : XII, premier emplacement, pièce HQ : 17 %).
 
-**Étape f) — 0.340 : barde de chocobo** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.340 : barde de chocobo** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Équipement › « Barde de chocobo » : nom, rang et couleur du chocobo comme dans le jeu ; « Porte » donne la bonne barde pour la tête,
   le corps et les jambes (l'ordre est supposé ; s'il est faux, le noter).
@@ -402,14 +402,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] 0.341 : page « Chocobo » dans Progression (plus en bas d'Équipement) ; ✓ / ✗ bien dessinés ; la croix « possédé » sur la ligne de
   l'objet ; déconnecté : « hors ligne ». Plus de page Personnage ; le panneau à côté de la fenêtre Personnage du jeu est toujours là.
 
-**Étape f) — 0.342 : événements saisonniers** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape f) — 0.342 : événements saisonniers** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Progression › Événements, pendant une fête : son nom français (« Veillée des saints »…) et la ligne « Nom tiré du PNJ guide » ;
   plus de « Special Event Flag » ; les événements sans nom disent d'où viendrait le nom.
 - [ ] Quêtes de la fête : ✓ pour celles faites, « Ouvrir » mène à la quête dans la page Quêtes.
 - [ ] Boutiques de l'événement : le vendeur de la fête, ses villes, ce qu'il vend et le prix ; comparer avec la boutique en jeu.
 
-**Étape g) — 0.343 : I-01 infobulle de prix complète** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.343 : I-01 infobulle de prix complète** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survol d'un objet vendable : sous chaque prix, « Dernière vente · moyenne · ventes par jour » ; les mêmes que la page de l'objet
   sur universalis.app pour votre monde.
@@ -417,7 +417,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] « Le moins cher de la région » n'apparaît que s'il est moins cher que le centre de données, avec le nom du monde.
 - [ ] Ctrl+Alt pendant le survol : la date « Récupéré à » change ; maintenu, une seule demande ; Paramètres › Avancé, l'éteindre.
 
-**Étape g) — 0.344 : I-02 monnaies et alertes de plafond** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.344 : I-02 monnaies et alertes de plafond** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rangements › Monnaies : soldes et plafonds identiques à la fenêtre Monnaies du jeu (sceaux de votre compagnie au plafond de votre
   rang, Centurio, gemmes bicolores, assignats, mémoquartz) ; « Mémoquartz limités cette semaine » égal au jeu.
@@ -427,7 +427,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Changer de personnage : pas de fausse alerte ; l'onglet n'affiche pas l'ancien personnage.
 - [ ] Taper un seuil : enregistré en quittant le champ ; ↺ revient à 80 % ; 0 = plus d'alerte pour cette monnaie.
 
-**Étape g) — 0.345 : I-03 vue de tous ses personnages** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.345 : I-03 vue de tous ses personnages** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Au premier chargement : le dossier pluginConfigs/TenshoAssistant/InventoryBank/ contient un fichier par personnage, l'ancien
   InventoryBank.json est renommé « .migrated » ; la banque montre les mêmes rangements qu'avant.
@@ -437,14 +437,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] « Effacer » (deux clics) sur l'autre personnage : il disparaît et son fichier est supprimé.
 - [ ] L'aperçu de tri ne propose que les servants et les sacoches.
 
-**Étape g) — 0.346 : I-06 prix PNJ, I-07 sous-cotation** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.346 : I-06 prix PNJ, I-07 sous-cotation** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survol d'une pile vendable au PNJ : « Vente au PNJ (NQ) : X gils l'unité, pile de N : Y » ; comparer avec la vente à un PNJ.
 - [ ] Paramètres › Avancé › « Copier l'offre la plus basse moins 1 » activé : ouvrir les offres d'un objet au tableau des ventes ; le
   chat dit « offre la plus basse … prix copié … » et Ctrl+V colle ce prix ; une offre de vos servants n'est pas prise ; désactivé :
   rien n'est copié.
 
-**Étape g) — 0.347 : I-08 notes et étiquettes d'objets** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.347 : I-08 notes et étiquettes d'objets** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Fiche d'un objet › onglet « Note » : écrire une note, cocher « Important » et « À vendre au PNJ » ; la note s'affiche au survol
   de l'objet dans le jeu.
@@ -452,162 +452,162 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   importants … » dans le chat ; une seule fois par ouverture ; avec « Son pour les objets importants », le son des alarmes.
 - [ ] « Restaurer tous les réglages » garde les notes.
 
-**Étape g) — 0.348 : I-10 rapport de rangement** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.348 : I-10 rapport de rangement** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Mettre un même objet en deux piles incomplètes dans les sacs : Rangements › Rapport le liste, avec « 1 case libérable ».
 - [ ] « Arsenal : pièces hors des sets » : le nombre de sets lu égale vos sets ; une pièce d'un set n'y est pas ; une pièce sans set y
   est (le rapport ne déplace rien).
 
-**Étape g) — 0.349 : X-07 liens wiki et Lodestone** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.349 : X-07 liens wiki et Lodestone** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Clic droit sur un objet › Tensho : « Wiki (anglais) » et « Lodestone » ouvrent la bonne page dans le navigateur.
 - [ ] Fiche d'objet : les deux boutons font de même ; « /tensho wiki minerai de fer » et « /tensho lodestone fer » ouvrent la page ;
   un nom inconnu donne un message dans le chat.
 
-**Étape g) — 0.350 : I-09 coffre de compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.350 : I-09 coffre de compagnie** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Ouvrir le coffre de compagnie : le panneau Tensho apparaît à côté ; tant qu'un onglet n'a pas été affiché, il le dit ; après les
   cinq onglets (et les cristaux), « Enregistrer » ; avec l'enregistrement automatique, c'est fait seul.
 - [x] Banque : un onglet « Coffre de compagnie » ; le stock d'un objet du coffre (fiche d'objet, survol) compte la ligne « Coffre de
   compagnie ».
 
-**Étape g) — 0.351 : I-04 journal des gils** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.351 : I-04 journal des gils** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Acheter à un PNJ, vendre à un PNJ, réparer, se téléporter : Rangements › Gils montre chaque variation avec la bonne catégorie
   (Boutique PNJ, Réparation, Téléportation).
 - [x] Ouvrir la cloche des servants : le solde des servants apparaît ; ouvrir le coffre de compagnie : son solde apparaît.
 - [ ] Changer de personnage : chaque personnage a son journal ; la première lecture n'est pas comptée comme un gain.
 
-**Étape g) — 0.352 : I-11 conditions des articles de boutique** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.352 : I-11 conditions des articles de boutique** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Page Marchands, un marchand dont un article demande une quête : « Après la quête … (fait / à faire) » après le prix, juste
   selon votre journal ; un article lié à un haut fait affiche son nom.
 - [ ] Le premier chargement après la mise à jour reconstruit l'annuaire des marchands (une fois).
 
-**Étape g) — 0.353 : I-12 recherche d'objets avec filtres** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.353 : I-12 recherche d'objets avec filtres** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Page Objets › « Filtres » : catégorie « Tête », niveau d'équipement 90 à 100 : la liste ne montre que ces casques, sans rien
   écrire ; avec un mot en plus, la liste se réduit ; « Effacer les filtres ».
 - [ ] « Objets clés » (recherche vide) : un nom d'objet de quête le trouve, avec son icône.
 - [ ] « /tensho wiki » avec un nom très courant (ex. « fer ») ouvre une page sans erreur.
 
-**Étape g) — 0.354 : I-13 valeur des monnaies** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.354 : I-13 valeur des monnaies** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rangements › Monnaies › « Que faire ? » sur les sceaux de compagnie : la liste de ce qu'ils achètent, avec le prix en sceaux ;
   « Prix du marché » remplit les prix et « Gils par unité », classés du plus rentable ; une monture déjà possédée dit « possédée ».
 
-**Étape g) — 0.355 : C-01 contenus débloqués / terminés** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.355 : C-01 contenus débloqués / terminés** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Monde › Butin des contenus : la colonne « État » dit « Terminé » pour un donjon fait (ex. Sastasha), « Débloqué » pour un contenu
   ouvert mais pas fait, « Verrouillé » pour un contenu pas encore ouvert ; le compteur « X terminés sur Y lus » est plausible.
 - [ ] Filtre « Avancement › Non terminés » : les donjons faits disparaissent ; déconnecté, le filtre est grisé et l'état « — ».
 
-**Étape g) — 0.356 : C-02 missions aléatoires du jour** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.356 : C-02 missions aléatoires du jour** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Monde › Rappels › « Missions aléatoires du jour » : faire une mission aléatoire (ex. gain de niveaux) ; elle passe à « Faite »,
   les autres restent « À faire » ; le compteur et l'heure de remise à zéro sont justes.
 - [ ] Ouvrir l'outil de recherche de mission : la colonne « Bonus de rôle » montre les mêmes rôles que le jeu pour chaque mission
   aléatoire (sinon : l'index du bonus est faux, docs/evidence/0.356-roulettes.md).
 
-**Étape g) — 0.357 : C-03 objets à ranger dans l'armoire** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.357 : C-03 objets à ranger dans l'armoire** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Ouvrir l'armoire et le coffre à apparence une fois (auberge). Rangements › Rapport › « Peut aller dans l'armoire » : un objet
   d'armoire gardé dans les sacs ou le coffre y figure ; s'il est aussi dans l'armoire, il est marqué « copie en trop ».
 - [ ] Une pièce utilisée par un set d'équipement n'est jamais proposée.
 
-**Étape g) — 0.358 : C-07 apparences identiques du coffre** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.358 : C-07 apparences identiques du coffre** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rangements › Rapport › « Coffre à apparence : apparences identiques » : chaque groupe montre des objets qui ont vraiment la même
   apparence en jeu (essayer deux d'entre eux) ; le nombre de teintures affiché est juste.
 
-**Étape g) — 0.359 : C-08 filtre des collections par source** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.359 : C-08 filtre des collections par source** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Collections › Montures › Source « Marchands (gils) » puis « Succès » : les montures listées ont bien cette source dans leur menu
   du clic droit ; combiné avec « Non confirmés », la liste se réduit.
 - [x] Le premier choix du filtre sur l'Orchestrion ne fait pas saccader le jeu de façon gênante (sinon : calcul à étaler).
 
-**Étape g) — 0.360 : C-09 liste de souhaits** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.360 : C-09 liste de souhaits** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
   avec « Pas encore obtenu » ; clic droit sur la ligne donne ses sources ; « Retirer » l'enlève.
 - [ ] Un objet ordinaire ajouté montre « Possédé ×N » ou « Pas possédé » ; la liste reste après un redémarrage et après
   « Réinitialiser les réglages ».
 
-**Étape g) — 0.361 : C-11 carnet d'exploration** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.361 : C-11 carnet d'exploration** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Carte › listes › « Carnet d'exploration » : le compteur « X découverts sur Y » correspond au carnet du jeu ; une zone à gauche
   montre ses panoramas à droite avec leur numéro ; un clic pose le drapeau.
 - [ ] « Possibles maintenant » : un panorama marqué « possible maintenant » peut vraiment être fait à cette heure (heure et météo).
 
-**Étape g) — 0.362 : C-05 tenues du coffre à apparence** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.362 : C-05 tenues du coffre à apparence** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Ouvrir le coffre à apparence une fois. Collections › Tenues : une tenue déjà rangée dit « rangée » ; une tenue dont toutes les
   pièces sont dans le coffre dit « prête à ranger » (le jeu propose bien de la créer) ; les pièces ouvertes disent où elles sont.
 - [ ] Filtres « Incomplètes », « Toutes les pièces », « Rangées » et la recherche par nom.
 
-**Étape g) — 0.363 : C-14 mandats** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.363 : C-14 mandats** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Progression › Mandats : les allocations restantes et le nombre de mandats acceptés sont ceux du jeu ; un mandat déjà fait dit
   « Terminé » ; filtres type, mandateur, niveau min/max et état.
 - [ ] Accepter un mandat d'artisanat : il dit « Accepté » et apparaît dans « Mandats d'artisanat acceptés » avec l'objet demandé et
   les copies possédées.
 
-**Étape g) — 0.364 : C-12 carnet de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.364 : C-12 carnet de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Progression › Carnet de chasse, carnet de votre classe : « Le jeu en est au rang N » est le rang du carnet du jeu ; les victimes
   d'une entrée en cours sont les mêmes que dans le jeu (tuer un monstre : le compteur monte en 2 secondes).
 - [ ] Le carnet de votre grande compagnie et celui d'une autre classe montrent aussi le bon rang (sinon l'ordre en mémoire est faux,
   docs/evidence/0.364-hunting-log.md).
 
-**Étape g) — 0.365 : C-04 nouveaux types de collection** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.365 : C-04 nouveaux types de collection** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Collections : les onglets Coiffures, Accessoires de mode, Lunettes, Bardes, Portraits, Livres de maître, Objets de collection,
   Archives occultes se remplissent en quelques secondes ; une coiffure ou un accessoire que vous avez dit « Obtenu », un autre non.
 - [ ] Les filtres Obtenu / Non confirmés et la recherche marchent dans ces onglets.
 
-**Étape g) — 0.366 : C-10 alerte « mission prête »** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.366 : C-10 alerte « mission prête »** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Alarmes › réglages › « Alerte quand une mission est prête » cochée : à l'ouverture de la mission, la ligne « Mission prête : … »
   et le son ; décochée, rien.
 - [ ] Discord réglé avec « Mission prête » coché : le message arrive ; décoché : rien n'est envoyé.
 
-**Étape g) — 0.367 : C-13 monstres des sorts de mage bleu** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.367 : C-13 monstres des sorts de mage bleu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Mage bleu › un sort (ex. Mauvaise haleine) › « Chercher sur le wiki » : la liste des monstres arrive ; « Drapeau » pose le drapeau
   au bon endroit (ex. Forêt de l'est 23.1, 20.4).
 - [ ] Un sort appris par quête (Canon à eau) dit qu'aucun monstre n'est listé ; interrupteur du wiki coupé : rien n'est demandé.
 
-**Étape g) — 0.368 : C-15 progression des succès** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.368 : C-15 progression des succès** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Ouvrir un succès en cours dans la fenêtre des succès du jeu : dans Tensho, sa fenêtre montre « Progression : x / y ».
 - [ ] « Demander » sur un autre succès : la progression arrive en une seconde ; deux clics rapides : le second demande d'attendre.
 - [ ] « Suivre ce succès » : il apparaît dans « Succès suivis » en tête de l'onglet Succès ; « Retirer » l'enlève.
 
-**Étape g) — 0.369 : X-03 titres** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.369 : X-03 titres** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
   « Titre au hasard » en met un autre.
 - [ ] « Titre de <job> » puis « Changer de titre avec le job » coché : changer de job porte le titre choisi ; décoché : rien ne change.
 
-**Étape g) — 0.370 : X-02 musique en cours, rouleaux favoris** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.370 : X-02 musique en cours, rouleaux favoris** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Collections › Orchestrion : « Musique en cours » nomme la musique qu'on entend (en ville, puis en combat, puis dans une maison
   avec un orchestrion) ; « Fiche » ouvre son rouleau.
 - [ ] Case « Favori » dans la fiche d'un rouleau : il apparaît dans « Rouleaux favoris ».
 
-**Étape g) — 0.371 : M-01 alarmes automatiques** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.371 : M-01 alarmes automatiques** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Ouvrir la liste des servants à une cloche : dans les 30 secondes, une alarme « Venture de … terminée » par servant en venture
   apparaît dans Alarmes, à la bonne heure ; elle sonne à la fin.
 - [x] Envoyer un vaisseau à l'atelier : une alarme « Retour de … » apparaît ; « Alarmes automatiques » décochée : plus aucune n'est créée.
 
-**Étape g) — 0.372 : M-02 compteurs hebdomadaires** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.372 : M-02 compteurs hebdomadaires** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rappels : « Livre d'or des défis » montre les vignettes et points du livre de Khloe, avec son expiration ; « Contrats de chasse »
   le nombre de contrats en main ; « Cartes au trésor » l'heure de la prochaine carte du jeu (sans bouton « ouverte »).
 - [ ] Outil de recherche de mission, une mission aléatoire choisie : le panneau Tensho dit « Faite » ou « À faire » comme le jeu.
 
-**Étape g) — 0.373 : M-03 liens de carte du chat** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.373 : M-03 liens de carte du chat** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Envoyer un lien de carte (drapeau puis <flag>) en équipe et en compagnie libre : il apparaît dans Cartes › « Liens de carte du
   chat », avec le bon lieu, les bonnes coordonnées et le bon canal au survol ; le filtre de canal le cache et le remontre.
@@ -615,34 +615,34 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   la plus proche avec son coût ; « Non » ne téléporte pas ; « Oui » téléporte.
 - [ ] Sur une carte sans éthérite (ou non harmonisée) : message clair au survol de la carte. Déconnexion : la liste est vide.
 
-**Étape g) — 0.374 : M-04 vos personnages** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.374 : M-04 vos personnages** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Se connecter avec deux personnages l'un après l'autre (ouvrir la liste des servants avec chacun) : Rappels › « Vos personnages »
   montre les deux, ventures, carte au trésor, Livre d'or, contrats et missions aléatoires justes, « Connecté » sur le bon.
 - [ ] Cocher « fait » sur une ligne des Rappels avec le premier, se connecter avec le second : la case n'y est pas cochée ; revenir au
   premier : elle l'est encore. « Effacer » puis « Confirmer » sur l'autre personnage : sa ligne et son fichier disparaissent.
 
-**Étape g) — 0.375 : M-05 vos tâches et panneau à l'écran** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.375 : M-05 vos tâches et panneau à l'écran** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rappels › « Vos tâches » : ajouter une tâche par jour, une toutes les 2 heures et un compteur à 3 ; les cocher, monter le compteur
   avec « + » : chacune dit quand elle revient ; flèches pour changer l'ordre ; « Retirer ».
 - [ ] Cocher « Panneau à faire à l'écran » : le panneau montre les tâches non faites, se déplace, se cache en combat ; cocher une tâche
   dans le panneau la fait disparaître ; fermer le panneau décoche le réglage.
 
-**Étape g) — 0.376 : M-06 usure et symbiose** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.376 : M-06 usure et symbiose** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Équipement › « Usure et symbiose » : l'état et la symbiose de chaque pièce sont ceux de la fenêtre du jeu (la symbiose surtout :
   échelle à confirmer).
 - [ ] Mettre « Réparer sous » au-dessus de l'état actuel : un message dans le chat, une seule fois ; réparer puis redescendre : il
   revient. « Barre d'usure à l'écran » : la barre montre l'état le plus bas et la symbiose la plus haute, elle se déplace.
 
-**Étape g) — 0.377 : M-07 comparaison au survol** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.377 : M-07 comparaison au survol** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survoler une pièce d'équipement dans l'inventaire et au marché : sous l'infobulle, « Comparé à l'équipement porté » donne le
   niveau d'objet et les statistiques en plus (vert) et en moins (rouge) par rapport à la pièce portée ; une bague : deux lignes.
 - [ ] Survoler la pièce portée elle-même : pas de comparaison. Décocher la case dans les réglages du panneau : elle disparaît.
 
-**Étape g) — 0.378 : M-08 favoris sur la carte** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.378 : M-08 favoris sur la carte** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Carte Tensho, clic droit › nom › « Ajouter aux favoris » : une étoile apparaît à cet endroit ; survol : nom, coordonnées ;
   clic : le drapeau du jeu se pose dessus.
@@ -650,52 +650,52 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] « Copier le code de partage », le coller dans un autre client (ou après avoir retiré un favori) puis « Importer » : seuls les
   favoris absents sont ajoutés.
 
-**Étape g) — 0.379 : M-10 historique du butin** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.379 : M-10 historique du butin** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Après le retour d'un sous-marin, passer à l'atelier : Compagnie libre › Historique montre le voyage (retour, vaisseau, trajet,
   objets) ; le rendement par trajet compte un voyage ; un second passage n'ajoute pas de doublon.
 - [ ] « Copier en CSV » puis coller dans un tableur : une ligne par objet, colonnes lisibles.
 
-**Étape g) — 0.380 : M-09 paliers de statistiques** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.380 : M-09 paliers de statistiques** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Page Équipement (ou panneau près de la fenêtre Personnage) : la colonne « +N palier » est présente ; ajouter une matéria qui
   donne au moins N points de la statistique : la valeur réelle change ; moins de N : elle ne change pas.
 
-**Étape g) — 0.381 : X-01 tâches libres** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.381 : X-01 tâches libres** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Taper « /tensho todo Acheter des potions » : le chat confirme, la tâche apparaît dans Rappels › Vos tâches (type « Une fois ») ;
   cochée, elle reste faite le lendemain ; « /tensho todo » seul affiche l'utilisation.
 
-**Étape g) — 0.382 : M-11 autres compteurs** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.382 : M-11 autres compteurs** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Ouvrir le carnet d'objectifs du jeu : la ligne « Carnet d'objectifs » des Rappels donne le bon nombre de défis faits (indice des
   lignes à confirmer).
 - [ ] Passer à l'Enclave de Doman, faire un don : la ligne « Enclave de Doman » montre le don et le plafond de la semaine.
 
-**Étape g) — 0.383 : M-12 ensembles d'équipement** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.383 : M-12 ensembles d'équipement** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Équipement › « Ensembles d'équipement du jeu » : tous vos ensembles, avec numéro, nom, job et niveau d'objet du jeu.
 - [ ] Mettre dans un sac une pièce meilleure pour un autre job : son ensemble dit « 1 amélioration possédée », déplié la pièce et le
   gain ; une pièce HQ est marquée HQ. « Copier le code » puis coller dans la page Équipement (import) : les pièces reviennent.
 
-**Étape g) — 0.384 : M-14 carte au trésor** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.384 : M-14 carte au trésor** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Déchiffrer une carte au trésor : dans les 5 secondes, Rappels › Cartes au trésor montre « Voir sur la carte » ; le bouton ouvre
   la carte Tensho sur le bon endroit (comparer avec la carte du jeu) et y pose le drapeau ; l'icône gemme est au même endroit.
 - [ ] Ouvrir le coffre : l'icône et le bouton disparaissent.
 
-**Étape g) — 0.385 : X-08 job au hasard** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.385 : X-08 job au hasard** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Équipement › Ensembles du jeu › « Job au hasard » plusieurs fois : des jobs différents, jamais un job au niveau le plus haut
   quand la case est cochée ; « Équiper » porte l'ensemble tiré (comme dans le jeu) ; en combat le jeu refuse, sans erreur.
 
-**Étape g) — 0.386 : X-10 horloges et alarme à date** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.386 : X-10 horloges et alarme à date** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Alarmes › Horloges : ajouter « Tokyo » et « New York » : les heures sont justes ; « Retirer » enlève une horloge.
 - [ ] Taper une date dans deux minutes (« AAAA-MM-JJ HH:MM ») et « Ajouter à cette date » : l'alarme apparaît dans « Alarmes à date »
   et sonne à l'heure.
 
-**0.387 : signalements corrigés** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.387 : signalements corrigés** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Grimoire du mage bleu, « Mauvaise haleine » › « Chercher sur le wiki » : les monstres (Capricious Cassie, Halitostroper…) avec
   « Drapeau » pour ceux qui ont des coordonnées ; un sort appris par quête dit « aucun monstre » avec l'adresse de la page.
@@ -703,12 +703,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   : les sources. Lunettes, Portraits, Objets de collection, Archives : l'infobulle dit « obtention inconnue ». Tenues : survol d'une
   tenue ou d'une pièce = infobulle de l'objet.
 
-**Étape g) — 0.391 : X-06 tic de PR** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.391 : X-06 tic de PR** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page PR › cocher « Barre du tic de PR à l'écran », en mineur avec des PR pas pleins : la barre se remplit en 3 secondes et repart
   à chaque gain de PR ; elle disparaît à PR pleins, en combat et sur un autre job.
 
-**Étape g) — 0.392 : R-01 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.392 : R-01 pêche en mer** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page Pêche en mer : l'heure du prochain départ et les trajets (Indigo, Rubis) sont ceux du PNJ du port ; « Embarquement ouvert »
   pendant les 15 minutes ; filtre d'un trajet ; une alarme sonne avant le départ.
@@ -1885,30 +1885,30 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Coffre à apparence ouvert avec une tenue complète : ses pièces comptent toujours comme possédées. Avec une tenue partielle : seules les pièces rangées comptent. Le journal donne `Dresser outfit … slots held` (preuve à verser dans docs/evidence).
 - [ ] Carte : panoramas et courants éthérés comme avant.
 
-**0.490 : onglet Favoris de la carte** — pendant la campagne de tests en jeu (étape h)
+**0.490 : onglet Favoris de la carte** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Clic droit sur la carte Tensho : « Favoris » est le premier onglet, avant Quêtes et ALÉA. Les favoris de cette carte d'abord, puis les autres. Un clic pose le drapeau ou ouvre l'autre carte ; « Retirer » enlève le favori et son étoile.
 
-**0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (étape h)
+**0.489 : temps d'affichage de la carte** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Mode développeur, carte Tensho ouverte : Diagnostics a une ligne « Map », et elle reste une fois la carte fermée.
 
-**0.488 : clignotement, Raison solide, temps avant le plein** — pendant la campagne de tests en jeu (étape h)
+**0.488 : clignotement, Raison solide, temps avant le plein** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Panneau Collectionnable : il ne clignote plus au début ni entre deux actions.
 - [x] Raison solide : conseillée seulement à la dernière tentative, puis le jeu l'accepte. Sinon le panneau dit d'attendre.
 - [x] Barre de tic : quelques secondes après la remontée des PR, le temps avant le plein correspond à l'attente réelle. Paramètres › Modules › Récolte donne la base mesurée et les traits de chaque métier ; comparer sur deux métiers.
 - [x] Aides : une action grisée dans la fenêtre du jeu ou non apprise par le métier n'est jamais conseillée (Toucher d'amorçage sous le niveau 95, action de quête non faite).
 
-**0.486 : barre de tic** — pendant la campagne de tests en jeu (étape h)
+**0.486 : barre de tic** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] La barre se remplit vers les PR pleins, une petite marque dorée défile en bas à chaque tic, le texte donne le temps avant le plein. Comparer ce temps à l'attente réelle. Tant que les PR par tic ne sont pas mesurés, le texte reste « tic dans… ». La bulle donne le prochain tic.
 
-**0.486 : temps d'affichage des panneaux** — pendant la campagne de tests en jeu (étape h)
+**0.486 : temps d'affichage des panneaux** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Mode développeur, Diagnostics : la section « panneaux à côté du jeu » liste le panneau de récolte, Collectionnable et les autres une fois ouverts, et leurs temps restent après la fermeture (0.487).
 
-**0.484 : risque accepté** — pendant la campagne de tests en jeu (étape h)
+**0.484 : risque accepté** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Barre de tic : à l'ouverture d'une fenêtre de récolte, après quelques secondes, elle affiche « pause » ; en la quittant, elle repart. Paramètres › Modules › Récolte montre les PR par tic mesurés.
 - [x] Carte Tensho ouverte, plugin rechargé : elle revient seule, sans M deux fois. Carte du jeu hors combat : pas d'autre effet.
@@ -1916,22 +1916,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] Panneau Collectionnable, curseur « Risque accepté » : à 0 %, plus de Sélection instinctive sans nécessité et un « au pire » élevé ; à 100 %, le plan vise la meilleure moyenne. Le réglage reste après rechargement, et existe aussi dans Paramètres › Modules › Récolte.
 
-**0.483 : Raison solide selon le jeu** — pendant la campagne de tests en jeu (étape h)
+**0.483 : Raison solide selon le jeu** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Plan avec Raison solide : quand les tentatives sont sous le maximum et que le jeu la refuse, elle n'est plus conseillée ni comptée. Mode développeur : la ligne `Collectable restore action` du journal donne la réponse du jeu.
 
-**0.482 : ordre des actions du plan** — pendant la campagne de tests en jeu (étape h)
+**0.482 : ordre des actions du plan** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Début de passe avec des PR : Inspection rigoureuse est conseillée d'abord si le plan en a besoin. Le gain affiché est le gain réel, pas celui de la case du jeu.
 
-**0.481 : Inspection, Œil et Intuition comptés** — pendant la campagne de tests en jeu (étape h)
+**0.481 : Inspection, Œil et Intuition comptés** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Cocher une fois « Avec Inspection rigoureuse » et « Avec Intuition » : les deux avertissements disparaissent et le plan change. Les cases peuvent rester cochées, le conseil ne change pas.
 - [x] Inspection rigoureuse conseillée quand elle rapporte plus ; après usage, l'action suivante n'est pas une deuxième Inspection et le gain affiché la contient.
 - [x] Œil du collectionneur conseillé quand il rapporte plus ; après usage, le pourcentage d'Intuition du jeu monte et il n'est plus conseillé.
 - [x] Panneau plus court, méthode dans la bulle de « Comment est-ce calculé ? ».
 
-**0.480 : bonus dans le plan de collection** — pendant la campagne de tests en jeu (étape h)
+**0.480 : bonus dans le plan de collection** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Cocher « Avec Inspection rigoureuse » puis décocher, même chose pour « Avec Intuition » : les messages disparaissent, le plan ne change pas tant qu'une case reste cochée.
 - [x] Plan avec Inspection : elle est conseillée seulement si elle rapporte plus ; les PR annoncés sont justes. Une fois utilisée, le gain affiché la contient et le conseil suivant passe à l'action.
@@ -1941,14 +1941,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Œil du collectionneur : proposé en option quand une Intuition atteindrait le palier suivant.
 - [x] Mode développeur : le journal `Collectable window values` contient le pourcentage d'Intuition.
 
-**0.479 : plan de collection, PR et bonus de nœud** — pendant la campagne de tests en jeu (étape h)
+**0.479 : plan de collection, PR et bonus de nœud** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Fenêtre Collectionnable : barre de collectabilité juste, palier juste, prochaine action avec icône et gain ; le plan se refait après chaque action. Comparer les gains affichés à ceux du jeu.
 - [x] Plus aucune chance d'atteindre le seuil bas (par exemple 0 avec une seule tentative) : le panneau le dit, sans parler de tirage.
 - [x] Bien noter si un conseil paraît mauvais, avec les chiffres du panneau.
 - [x] Liste de fabrication : nœud normal, « récolte simple » et PR gardés ; un nœud avec une tentative ou une quantité de plus : « Bonus majeur », les PR se dépensent. Décocher le réglage redonne le partage égal.
 
-**0.478 : retours du lot 6, récolte** — pendant la campagne de tests en jeu (étape h)
+**0.478 : retours du lot 6, récolte** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Fenêtre Collectionnable sur « Minerai de durium noble collectionnable » : nom complet, seuils 400 / 700 / 1000. Rien à faire de plus. En mode développeur, faire quelques actions : le journal note les valeurs de la fenêtre.
 - [x] Aide à la récolte : plus de texte coupé ; le nom, puis les taux dessous. Sur un collectionnable : pas de « plan non calculé » mais un message clair.
@@ -1982,18 +1982,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Lien : le clic demande confirmation et montre l'adresse complète. Rien ne s'ouvre sans « Ouvrir ».
 - [x] Copier pour partager, coller la ligne dans un autre personnage ou après retrait : même outil, progression à zéro.
 
-**0.470 : liste unique des pages** — pendant la campagne de tests en jeu (étape h)
+**0.470 : liste unique des pages** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Navigation : mêmes groupes, mêmes pages, même ordre qu'avant ; chaque page s'ouvre. Artisanat reste sélectionné sur Synthèse en cours et Séquences, Récolte sur PR, Collection sur Magie bleue. Diagnostics seulement en mode développeur.
 
-**0.469 : demande du jour de la Grande Compagnie, icônes du carnet** — pendant la campagne de tests en jeu (étape h)
+**0.469 : demande du jour de la Grande Compagnie, icônes du carnet** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Ouvrir le calendrier du jeu puis les missions de ravitaillement : la bulle d'un objet demandé dit « demandée aujourd'hui ». Un autre objet possible dit « absente des demandes du jour que vous avez ouvertes ». Le journal Dalamud donne une ligne `Grand Company supply window`.
 - [ ] Après 20:00 UTC, ou avec un autre personnage : retour au message qui invite à ouvrir la fenêtre.
 - [ ] Carnet : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité verte si la cible est atteinte ; explications dans la bulle de « (?) ».
 - [ ] Carnet : Manipulation est une case et l'icône du skill, sans texte ; la bulle dit ce qui est détecté. Repas et remède : icône et bulle de l'objet, « aucun » pour un repas sans bonus d'artisanat.
 
-**0.468 : carnet (cible, état, meilleure séquence) et cache de Raphael** — pendant la campagne de tests en jeu (étape h)
+**0.468 : carnet (cible, état, meilleure séquence) et cache de Raphael** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Raphael choisi, carnet : une recette calculée puis re-sélectionnée revient tout de suite, le tampon dit « Cache disque ». Après un changement d'option de macro ou une nouvelle version de la DLL : « Solveur : Raphael (séquence déjà calculée…) ».
 - [ ] Simulateur › Recherche avec Raphael : relancer la même recherche répond tout de suite, avec « déjà calculée » et un bouton « Recalculer ». La séquence calculée dans le carnet y est retrouvée à attributs et cible égaux.
@@ -2002,77 +2002,77 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Carnet : « Enregistrer comme meilleure séquence », puis la séquence apparaît dans la section enregistrée et rien n'est calculé ; une cible plus haute relance la recherche ; « Recalculer » aussi.
 - [ ] Réglages › Modules › Artisanat : la case de la fenêtre « Comparer les prochains coups » ; pendant une synthèse, la croix de la fenêtre la ferme et décoche le réglage.
 
-**0.467 : Raphael dans le carnet** — pendant la campagne de tests en jeu (étape h)
+**0.467 : Raphael dans le carnet** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Raphael choisi : le panneau du carnet affiche « Solveur : Raphael » et sa proposition ; changer vite de recette n'accumule pas de calculs et le jeu reste fluide ; retour à Tensho : le panneau suit.
 
-**0.465 : solveur Raphael** — pendant la campagne de tests en jeu (étape h)
+**0.465 : solveur Raphael** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Artisanat › Recherche : choisir « Raphael », lancer : une séquence arrive, « Annuler » fonctionne ; le jeu reste fluide pendant le calcul.
 - [ ] La séquence jouée en jeu donne le résultat annoncé. Retour à « Tensho » : la recherche d'avant.
 - [ ] Le plugin se recharge sans erreur après un calcul.
 
-**0.464 : retours du lot 5** — pendant la campagne de tests en jeu (étape h)
+**0.464 : retours du lot 5** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Simulateur, métier porté : attributs copiés d'office, ligne « Détecté » juste (repas, remède, Manipulation, spécialiste) ; valeurs en vert ou rouge selon la recette ; « Conserver la séquence » après la palette.
 - [ ] Onglet « Liste de fabrication » : icônes, infobulle complète au survol, manquants en rouge.
 - [ ] Pendant une synthèse : la fenêtre de projection s'ouvre à côté de celle du jeu, se ferme avec elle, et ses chiffres correspondent au résultat de l'action jouée.
 
-**0.462 : retours du lot 3** — pendant la campagne de tests en jeu (étape h)
+**0.462 : retours du lot 3** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Survol d'une pièce d'équipement : la comparaison est lisible, les statistiques en grille.
 - [ ] Clic droit sur un objet › Tensho : plus de « Tous les outils avec cet objet » ; le reste du menu est là.
 - [x] Ouvrir le coffre de compagnie, puis tous ses onglets : Banque › Coffre de compagnie liste les objets, plus de message « ordre visuel » (0.463) ; les quantités sont justes.
 
-**0.461 : grille du journal** — pendant la campagne de tests en jeu (étape h)
+**0.461 : grille du journal** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Monde › Jardinage : le potager est une grille ; la plante est dans la bonne case par rapport au vrai potager (emplacement 6 en bas au milieu) ; sinon, dire où elle est.
 - [ ] « Entretenu » et « Retirer » marchent depuis la case ; plus de « Replanter ». Les pots restent en liste.
 
-**0.460 : plantations détectées depuis le chat** — pendant la campagne de tests en jeu (étape h)
+**0.460 : plantations détectées depuis le chat** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Planter dans un potager : une ligne « Jardin : … noté dans le journal » arrive ; la page Jardinage montre le bon potager, le bon emplacement, la bonne graine et les durées.
 - [ ] Replanter au même emplacement : la ligne est remplacée, pas doublée. Un pot : une ligne « pot ».
 - [ ] Un joueur qui écrit la même phrase dans le chat n'ajoute rien. Réglage décoché : plus rien n'est noté.
 - [ ] Entretenir et récolter : envoyer le résultat à l'agent, qui lit les lignes « Garden chat capture » de dalamud.log pour trouver leurs messages.
 
-**0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (étape h)
+**0.459 : icône des terminés, page Jardinage** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Barre du serveur : trois icônes au plus : horloge (alarmes actives), rappels (reste à faire), terminés (visible seulement s'il y en a) ; chaque infobulle a sa liste.
 - [x] Monde › Jardinage : le journal et les croisements y sont, ils ne sont plus dans Rappels ; les parcelles déjà notées sont toujours là.
 
-**0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (étape h)
+**0.458 : icône des rappels, ce qui reste à faire** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Barre du serveur : le nombre et l'infobulle « Reste à faire » listent les rappels non cochés ; cocher « Fait » sur la page Rappels fait baisser le nombre (5 s au plus).
 - [x] Décocher « Barre » sur une ligne : elle disparaît de l'infobulle ; recocher : elle revient ; le choix reste après un rechargement du plugin.
 - [ ] Une tâche personnelle affichée à l'écran apparaît dans la liste ; une tâche servant ou un vaisseau fini aussi.
 
-**0.457 : icônes des compétences** — pendant la campagne de tests en jeu (étape h)
+**0.457 : icônes des compétences** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Réglages › Artisanat › Actions interdites : chaque ligne a son icône, et la case se coche toujours.
 - [ ] Enregistreur d'artisanat : les actions notées s'affichent en icônes dans l'ordre ; le survol donne le numéro et le nom ; la ligne revient à la ligne si besoin.
 
-**0.456 : plan de plantation des croisements** — pendant la campagne de tests en jeu (étape h)
+**0.456 : plan de plantation des croisements** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Croisements › « Ce qui donne cette graine » : les paires à « seulement cette graine » sont en tête ; le survol donne les autres graines.
 - [x] Clic sur une paire : grille 3 × 3 sans centre ; la disposition correspond à votre potager de luxe (sinon, dire comment il est) ; noms des graines et de la terre en français.
 - [ ] Planter une paire selon le plan : des graines croisées apparaissent à la récolte, sauf sur la parcelle 1.
 
-**0.455 : retours du lot 1** — pendant la campagne de tests en jeu (étape h)
+**0.455 : retours du lot 1** — pendant la campagne de tests en jeu (phase 6)
 
 - [x] Journal de l'or (Stockage › Gils) : tableaux lisibles, plus de « = » ; une dépense apparaît en « - ».
 - [x] Barre du serveur : deux icônes, l'horloge des alarmes (nombre d'alarmes actives) et celle des rappels (nombre de terminés) ; survol = la
   liste ; clic = la bonne page ; le réglage Avancé masque celle des rappels.
 - [ ] Mission ou entraînement d'escouade lancé : une alarme automatique apparaît dans la page Alarmes et sonne à la fin ; l'icône des rappels monte de 1.
 
-**0.454 : R-14, indisponible plutôt que « lecture »** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.454 : R-14, indisponible plutôt que « lecture »** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Titre par classe : réglé sur un personnage ; sur un autre qui ne le possède pas, changer de classe ne change pas le titre.
 - [ ] Objets de collection et carnets : affichés comme avant, sans message d'indisponibilité.
 - [ ] Carte Tensho à la place de la carte du jeu : fonctionne comme avant.
 - [x] Inventaire d'un servant : l'ordre affiché suit toujours celui du jeu.
 
-**0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.453 : R-14, valeurs inconnues** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Journal de l'or : à la connexion, aucune fausse entrée « + tout l'or » ; un achat est bien noté.
 - [ ] Rappels à l'écran titre ou de sélection : pas de zéros ni de rôle ; une fois connecté, les compteurs apparaissent.
@@ -2080,7 +2080,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Revue de mode : les catégories s'affichent comme avant.
 - [ ] Téléportation : coûts affichés ; mandats, collections supplémentaires et chocobo lus une fois connecté.
 
-**0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Alarme sur un objet : la laisser sonner deux fois de suite ; la ligne de chat, le son et Discord arrivent à chaque sonnerie.
 - [ ] Enregistreur d'artisanat sur une classe autre que Charpentier : Veneration, Innovation, Great Strides, Waste Not, Manipulation et Final
@@ -2090,7 +2090,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Try On depuis le menu d'un objet avec un personnage chargé ; à l'écran de sélection du personnage, rien ne se passe.
 - [x] Musique en cours (orchestrion) et liste des cartes de l'éditeur de Triple Triade toujours lues.
 
-**0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.451 : N-06 missions d'escouade (sonde en jeu)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Hors de la caserne : « Lire l'escouade » affiche « L'escouade n'est pas chargée… ».
 - [x] À la caserne, escouade ouverte : « Lire l'escouade » liste les 8 membres (classe, niveau, « occupé » pour ceux en mission ou à
@@ -2101,26 +2101,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
   jeu et comparer ses totaux et le taux de réussite affiché par le jeu avec « ≈ … % ».
 - [x] « Écrire dans le journal » : copier les lignes « Squadron probe: » du journal de Dalamud dans docs/evidence/ (sonde N-06).
 
-**0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.450 : N-14 croisements** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Rappels › Journal de jardinage › Croisements : « Lecture des paires… » puis la liste ; les graines sont nommées dans la langue
   du jeu ; « Ce qui donne cette graine » et « Ce que cette graine peut donner » montrent des paires cohérentes avec un croisement connu.
 - [x] La ligne grise annonce 3 768 paires et 1 nom écarté (« Gysahl Green Seeds » dans l'infobulle) ; le journal de Dalamud le dit aussi.
 
-**0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.449 : liste des graines du journal de jardinage** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Rappels › Journal de jardinage › « Liste des graines » : les noms sont dans la langue du jeu ; la recherche filtre ; choisir une
   graine remplit son nom, la pousse et l'entretien (par exemple 120 h et 48 h pour les graines de paprika) ; les valeurs restent modifiables.
 - [ ] Comparer une graine plantée en jeu avec l'heure de récolte affichée (données Lotlab, non vérifiées par Tensho).
 
-**0.448 : N-08 journal de jardinage** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.448 : N-08 journal de jardinage** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rappels › Journal de jardinage : ajouter une parcelle (lieu, graine, pousse 1 h, entretien 0) : « Mûr le … » une heure plus tard ;
   à l'heure dite, une seule ligne « Jardin : … est mûr » dans le chat ; « Replanter » repart de zéro ; « Retirer » l'enlève.
 - [ ] Avec un entretien (par exemple 1 h sur une pousse de 3 h) : la ligne « entretenir » arrive une fois ; « Entretenu » repousse le suivant.
 - [ ] Redémarrer le jeu après un rappel : il n'est pas répété.
 
-**0.447 : décisions du 2026-11-03 (DEC-026)** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.447 : décisions du 2026-11-03 (DEC-026)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Train de chasse : « Envoyer » est grisé tant qu'aucun drapeau n'a été posé depuis le train ; après « Drapeau suivant », choisir
   /p (en groupe) puis « Envoyer » : une seule ligne dans le chat du groupe, avec le bon nom, le bon rang, la bonne zone, et <flag> devenu
@@ -2130,89 +2130,89 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] Tri : déplacer un objet dans les sacs pendant que la page Tri est ouverte : l'éditeur de règles reste affiché (ligne « Rangement
   modifié »), l'aperçu revient tout seul.
 
-**0.446 : N-09 alerte des marques, X-13 annonce** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.446 : N-09 alerte des marques, X-13 annonce** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Cartes › Train de chasse : cocher « Annoncer les marques A et S proches » ; près d'une marque A ou S, une seule ligne dans le
   chat (nom, rang, zone, coordonnées justes) et le son des alarmes s'il est activé ; une marque B ne dit rien.
 - [ ] Avec au moins une étape : « Copier l'annonce », coller dans le chat du jeu après avoir posé le drapeau : <flag> devient le lien.
 
-**0.445 : N-05 terrains en vente** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.445 : N-05 terrains en vente** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Cartes › Terrains en vente › « Consulter » sur un monde NA : la liste correspond au jeu (panneau de vente des quartiers) ; cocher
   la surveillance : une parcelle nouvellement libre est annoncée dans le chat à la lecture suivante.
 
-**0.444 : X-09 annuaire des lieux** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.444 : X-09 annuaire des lieux** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Cartes › Annuaire : ajouter une maison (monde, quartier, secteur, parcelle), un appartement ; « Copier » ; le lieu reste après
   un rechargement du plugin et après « Tout remettre par défaut ».
 
-**0.443 : N-02 tâches du Livre d'or** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.443 : N-02 tâches du Livre d'or** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Rappels › Livre d'or : la liste « À faire » correspond aux cases du journal ; une tâche finie passe en « à réclamer » (vert), puis
   disparaît une fois la vignette posée.
 
-**0.442 : N-15 train de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.442 : N-15 train de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Pendant un train : « Enregistrer », chaque marque A/S apparaît une fois avec sa position ; « Drapeau suivant » ; « Copier la
   liste » puis coller dans l'import des favoris : les points tombent au bon endroit.
 
-**0.441 : N-09 marques de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.441 : N-09 marques de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Près d'une marque B, A ou S : elle apparaît sur la carte Tensho avec la bonne couleur et son rang ; morte, elle disparaît ;
   décocher la couche la masque.
 
-**0.440 : N-01 contrats de chasse** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.440 : N-01 contrats de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Avec un contrat de chasse en main : Rappels montre ses cibles et les victimes (comparer au journal des contrats du jeu) ; tuer une
   cible fait monter le compteur ; « Carte » ouvre la bonne zone.
 
-**0.439 : N-03 probabilités du Livre d'or** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.439 : N-03 probabilités du Livre d'or** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Livre d'or avec 3 à 8 vignettes : Rappels affiche les chances de lignes, actuelles et après mélange ; poser une vignette change
   les chances ; à 9 vignettes, plus rien.
 
-**0.438 : actions interdites, équiper depuis le carnet** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.438 : actions interdites, équiper depuis le carnet** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Interdire Œil de l'expert et Manipulation : ni la recherche, ni l'assistant du carnet, ni la synthèse en cours ne les proposent ;
   grisées dans le simulateur. Carnet ouvert avec le mauvais métier : « Équiper (métier) » change d'ensemble et le calcul démarre.
 
-**0.437 : N-11 coordonnées collées** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.437 : N-11 coordonnées collées** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Coller une liste de Siren ou Faloop dans l'import des favoris : un favori par ligne, au bon endroit sur la carte ; lieux inconnus
   comptés dans le message.
 
-**0.436 : A-14 enregistreur de rotation** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.436 : A-14 enregistreur de rotation** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] « Enregistrer », fabriquer à la main (avec un buff, une action de qualité, une de progression), « Arrêter » : la liste est
   exacte et dans l'ordre ; « Utiliser comme séquence » ; le jeu se comporte comme d'habitude pendant l'enregistrement (aucune action
   bloquée) ; après « Arrêter », rien n'est plus noté.
 
-**0.435 : A-07 recettes expertes** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.435 : A-07 recettes expertes** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Recette experte : le simulateur l'accepte et affiche « chaque étape en condition normale ». Pendant une synthèse experte en jeu,
   mode développeur : noter la condition brute affichée pour souple, robuste, malléable, amorcée (pour ouvrir la projection en direct).
 
-**0.434 : A-13 actions du simulateur** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.434 : A-13 actions du simulateur** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Comparer au jeu : Appréciation finale (progression arrêtée à 1 de la fin), Synthèse intensive / Toucher précis après Cœur et âme
   (spécialiste), Innovation éclair, Ficelles du métier (+20 PS). Synthèse en cours avec Appréciation finale active : projection affichée.
 
-**0.433 : A-05 listes de fabrication** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.433 : A-05 listes de fabrication** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Créer une liste, y ajouter deux recettes depuis Préparation, changer une quantité, retirer un objet ; les ingrédients totaux et
   « à compléter » sont justes ; la liste est toujours là après un rechargement du plugin ; lien Teamcraft de la liste.
 
-**0.432 : A-15 collectionnables des sacs** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.432 : A-15 collectionnables des sacs** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Avec des collectionnables dans les sacs (récoltés et fabriqués) : « Dans vos sacs » montre leur collectionnabilité comme le jeu,
   le bon palier et les assignats du marchand.
 
-**0.431 : A-06 bénéfice d'artisanat** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.431 : A-06 bénéfice d'artisanat** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Préparation › « Consulter les prix de la liste » : le prix de l'objet fabriqué apparaît dans « Bénéfice », avec la dernière vente ;
   case « Prix du centre de données » : autre monde affiché ; bénéfice = prix × quantité − achats.
 
-**0.428-0.429 : recette refusée par le carnet du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.428-0.429 : recette refusée par le carnet du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Carnet d'artisanat déjà ouvert sur une autre recette (ou un autre métier) : « Ouvrir dans le carnet » le ferme et le rouvre sur la
   bonne recette, sans message rouge. Objet fabriqué par plusieurs métiers : la recette du métier porté est prise.
@@ -2220,183 +2220,183 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] 0.430 : une recette un peu au-dessus du niveau du métier, visible dans le carnet du jeu, s'ouvre aussi depuis Tensho. Si le
   message rouge revient, noter le message complet (capture).
 
-**0.427 : A-12 prérequis de la recette** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.427 : A-12 prérequis de la recette** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Page Artisanat : niveau, Habileté et Contrôle en vert / rouge selon le personnage ; métier non porté : « ? » et « Équiper (métier) »
   porte le bon ensemble.
 
-**0.426 : fermer Tensho en ouvrant une fenêtre du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.426 : fermer Tensho en ouvrant une fenêtre du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] « Ouvrir dans le carnet d'artisanat » : Tensho se ferme, le carnet s'ouvre sur la recette ; recommencer avec le carnet déjà
   ouvert : il reste ouvert et passe à la recette. Même chose pour le carnet de récolte et la carte du jeu. Réglage décoché : Tensho
   reste ouvert. « Y aller » : Tensho reste ouvert (question de téléportation).
 
-**0.425 : A-08 import de macro** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.425 : A-08 import de macro** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Simulateur › « Importer une macro » : coller une macro du jeu ou de Teamcraft (en français), « Importer » ; la séquence est
   reprise et simulée ; une action mal écrite apparaît dans « Noms inconnus ».
 
-**0.424 : Préparation, stocks et « Retour à l'objet »** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.424 : Préparation, stocks et « Retour à l'objet »** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Ouvrir Artisanat directement (menu d'un objet) : la colonne « Recensé NQ + HQ » montre les stocks ; « Retour à l'objet » ouvre
   la fiche de l'objet de la recette.
 
-**0.423 : lien Artisanat et A-09 Teamcraft** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.423 : lien Artisanat et A-09 Teamcraft** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Menu d'un objet › « Artisanat : (objet) » : la page s'ouvre sur l'onglet Préparation de sa recette. Préparation › « Ouvrir dans
   Teamcraft » : Teamcraft propose d'importer la liste avec l'objet et la quantité.
 
-**0.422 : A-10 Macro Chain** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.422 : A-10 Macro Chain** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Macro Chain chargé, macros enchaînées : la dernière ligne de chaque page est « /nextmacro » et la suite s'exécute ; Macro Chain
   désactivé : retour au marqueur de Tensho.
 
-**0.421 : A-11 recettes jamais fabriquées** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.421 : A-11 recettes jamais fabriquées** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Fiche d'un objet › Craft lié : une recette déjà faite montre « ✓ déjà fabriquée », une jamais faite « jamais fabriquée » (comparer
   au carnet du jeu) ; livre des recettes, case « Jamais fabriquées seulement ».
 
-**0.420 : A-02 repas et remède** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.420 : A-02 repas et remède** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Simulateur : choisir un repas HQ et un remède ; les attributs affichés correspondent à ceux du personnage une fois le repas
   et le remède pris en jeu (sans autre bonus).
 
-**0.419 : A-01, X-11, X-12 (artisanat)** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.419 : A-01, X-11, X-12 (artisanat)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Recette d'un collectionnable : boutons « Bas / Moyen / Haut » dans la recherche, la rotation trouvée atteint le seuil en jeu.
   Assistant du carnet avec Manipulation apprise : la macro proposée peut l'utiliser. Réglage « Attente ajoutée aux buffs » : les
   lignes de buffs de la macro changent seules.
 
-**0.418 : R-07 pêche en mer** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.418 : R-07 pêche en mer** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Pendant une traversée : le panneau montre l'escale, le moment, les poissons avec appât et touche ; pendant un courant spectral,
   le message et les poissons spectraux ; missions avec avancement ; points ; escale suivante. Comparer à l'interface du jeu.
 
-**0.417 : R-15 aide au harpon** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.417 : R-15 aide au harpon** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Pêche au harpon : le panneau est à côté de la fenêtre ; pour chaque poisson, la taille et la vitesse ; le bon poisson de la zone
   en couleur. Mode développeur : noter la vitesse brute et la comparer à la vitesse affichée (valeurs GatherBuddy 100 à 600).
 
-**0.416 : R-14 liste de récolte par zone** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.416 : R-14 liste de récolte par zone** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Artisanat › Préparation d'une recette à plusieurs matières récoltées › « Calculer la chaîne » › « Liste de récolte par zone » :
   zones dans l'ordre, une ligne par matière, horaire, « Y aller » ; matières achetées listées à part.
 
-**0.415 : R-13 fenêtre de suivi** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.415 : R-13 fenêtre de suivi** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Paramètres › « Fenêtre de suivi épinglée » : la fenêtre liste les objets des alarmes actives, la plus proche en premier ;
   le temps restant baisse ; clic sur un nom ; « Carte » ; la croix la ferme ; masquée quand l'interface du jeu est cachée.
 
-**0.414 : R-12 alarme cliquable** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.414 : R-12 alarme cliquable** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Une alarme Tensho d'objet récolté sonne : dans le chat, le lien de carte ouvre la carte du jeu sur le point ; « Ouvrir dans
   Tensho » ouvre la fiche de l'objet (onglet Récolte). Une alarme sans objet : message sans lien.
 
-**0.413 : R-11 tableau des collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.413 : R-11 tableau des collectionnables** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page Récolte › « Collectionnables » : comparer quelques lignes (seuils, assignats) au marchand d'assignats du jeu ; filtre
   « Nv 91 » ; clic sur un objet ; vue Récolte d'un objet collectionnable : ses seuils sous son nom.
 
-**0.411 : R-10 équiper le métier** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.411 : R-10 équiper le métier** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Fiche d'un objet récolté › lieux : « Équiper Mineur » (ou Botaniste, Pêcheur) porte l'ensemble de ce métier au plus petit numéro ;
   sans ensemble pour ce métier, pas de bouton. 0.412 : réglage « Y aller : équiper aussi le métier » coché, « Y aller » équipe aussi.
 
-**0.410 : R-09 optimiseur PR** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.410 : R-09 optimiseur PR** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Outil PR et panneau de récolte : avec beaucoup de PR, le plan propose Raison solide (ou Sagesse du fermier) et Vision claire
   quand elles rapportent ; au niveau 90 et plus, la ligne Eurêka s'affiche ; décocher la case de l'outil PR redonne l'ancien plan.
 
-**0.409 : R-06 collectionnables** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.409 : R-06 collectionnables** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Ouvrir la fenêtre Collectionnable sur un point (mineur ou botaniste) : le panneau « Collectionnable » est à côté, avec l'objet,
   PR et intégrité, les seuils bas/moyen/haut et les assignats par palier comparés au jeu (marchand d'assignats). Mode développeur :
   noter l'index des valeurs brutes qui suit la collectabilité à chaque action (capture), pour l'étape suivante (action conseillée).
 
-**0.408 : préparation dans Artisanat** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.408 : préparation dans Artisanat** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Objets › Craft lié : recette et ingrédients seulement ; « Préparer dans Artisanat » ouvre l'onglet Préparation sur la recette ;
   calculer la chaîne, consulter les prix ; cliquer un ingrédient ouvre sa fiche dans Objets ; « Retour au carnet » revient.
   Alarmes et Vos personnages : « Tâches des servants ».
 
-**0.407 : noms du wiki et de Garland dans la langue du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.407 : noms du wiki et de Garland dans la langue du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Client français : page Monstres (sources du wiki) et grimoire du mage bleu › les monstres et lieux connus du jeu sont en français,
   les coordonnées gardées ; survol d'un matériau lâché par un monstre et lignes Garland (quête, PNJ, ALÉA) en français ; un nom
   inconnu du jeu reste en anglais. Client anglais : rien ne change.
 
-**0.406 : règle des langues** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.406 : règle des langues** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Plugin en anglais, mode développeur coché : les messages et libellés de développeur sont en anglais ; plugin en français : en français.
 
-**0.405 : carnets du jeu** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.405 : carnets du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Clic droit sur un objet artisanal dans Tensho › « Ouvrir dans le carnet d'artisanat (job) » : le carnet du jeu s'ouvre sur la
   recette ; sur un objet récolté, « Ouvrir dans le carnet de récolte » l'ouvre sur l'objet. Même chose avec « Carnet » (page Récolte)
   et « Ouvrir dans le carnet d'artisanat » (page Artisanat).
 
-**Étape g) — 0.403 : R-08 alerte PR** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.403 : R-08 alerte PR** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page PR › cocher « Alerte PR au seuil » (seuil 0) ; dépenser des PR en récolte puis attendre : un message et le son quand les
   PR sont pleins, une seule fois ; seuil 500 : l'alerte vient à 500.
 
-**Étape g) — 0.402 : R-05 carnets** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.402 : R-05 carnets** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page Récolte : les compteurs des carnets sont ceux du jeu (pêche, harpon, récolte) ; un poisson attrapé et un objet récolté ont
   un ✓ ; « Masquer ce qui est déjà au carnet » les cache ; « Copier » et « Enregistrer en CSV » donnent un fichier lisible.
 
-**0.401 : panoramas** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.401 : panoramas** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Survol d'un panorama sur la carte Tensho : plus d'erreur du wiki, la météo demandée est donnée ; le clic droit n'a plus d'onglet
   « Exploration », le « Carnet d'exploration » reste.
 
-**0.400 : onglets du clic droit de la carte** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.400 : onglets du clic droit de la carte** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Clic droit sur la carte Tensho : les 9 onglets (Quêtes … Carnet d'exploration) ont leur nom entier ; sur un petit écran, des
   flèches font défiler les onglets.
 
-**0.399 : « Y aller » sans question** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.399 : « Y aller » sans question** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Réglages › Modules › Récolte, cocher « Y aller : téléporter tout de suite » : « Y aller » téléporte directement (drapeau posé) ;
   vers une zone dont l'éthérite n'est pas harmonisée : la question revient. Décoché : la question habituelle.
 
-**Étape g) — 0.398 : R-04 appât en main** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.398 : R-04 appât en main** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] En pêcheur, aide à la pêche ouverte : « Appât en main » montre l'appât choisi dans le jeu et son stock ; changer d'appât : la
   ligne et les cadres verts suivent (confirme que FishingBait est l'objet).
 
-**Étape g) — 0.397 : R-03 « Y aller »** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.397 : R-03 « Y aller »** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Fiche d'un objet de récolte, « Y aller » sur un lieu : le drapeau se pose sur le point, la carte Tensho s'ouvre dessus et propose
   l'éthérite la plus proche avec son coût ; « Oui » téléporte, « Non » ne fait rien. Même essai sur un lieu de pêche.
 
-**Étape g) — 0.396 : R-02 fenêtres des poissons** — pendant la campagne de tests en jeu de la fin (étape h)
+**Étape g) — 0.396 : R-02 fenêtres des poissons** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Fiche d'un gros poisson à météo (par exemple un poisson légendaire) : « Prochaines fenêtres » donne des heures où la page Météo
   montre bien la bonne météo et la bonne météo précédente, dans la bonne plage ET ; une alarme sonne au début d'une fenêtre.
 
-**0.395 : grimoire trié par niveau de monstre** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.395 : grimoire trié par niveau de monstre** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Ouvrir la page Mage bleu : en quelques secondes « Livre des sorts du wiki : 124 sorts » ; « Ordre : niveau du monstre croissant » :
   la liste entière est triée, chaque sort montre « niv. N » ; Canon à eau et les sorts sans monstre sont à la fin. Fermer et rouvrir :
   aucune nouvelle lecture (copie).
 
-**0.394 : polices** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.394 : polices** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Réglages › Interface › Polices : changer la famille et la taille des titres, des sections et du texte : la fenêtre Tensho change
   tout de suite ; ↺ remet la valeur par défaut ; « Restaurer tous les réglages » remet les trois.
 
-**0.393 : Bestiaire et grande compagnie** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.393 : Bestiaire et grande compagnie** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Page « Bestiaire » : seul le carnet de votre compagnie est dans la liste (Maelstrom pour l'utilisateur), choisi à l'ouverture ;
   ses victimes sont celles du jeu.
 
-**0.390 : monstres du grimoire triés par niveau** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.390 : monstres du grimoire triés par niveau** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [ ] Fiche de « Mauvaise haleine », monstres lus sur le wiki : « Niveau croissant » met Halitostroper (31) en premier ; « Niveau
   décroissant » Polluting Morbol (90) ; les monstres sans niveau restent à la fin.
 
-**0.388 : bouton « Trier » de l'inventaire** — pendant la campagne de tests en jeu de la fin (étape h)
+**0.388 : bouton « Trier » de l'inventaire** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Ouvrir l'inventaire (les trois dispositions : normale, grande, étendue) : le bouton « Trier » est en bas à gauche, sur la ligne
   des gils, et suit la fenêtre quand on la déplace ou qu'on change son échelle (dire si le placement doit être ajusté).
