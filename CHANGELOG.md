@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1084.0
+- Constat d'audit A060 (décision D-138 de l'utilisateur) : les tampons « état au 0.xxx » écrits à la main dans les documents vivants vieillissaient à la version suivante. Ils deviennent des dates (« relu contre le code le … »), jamais une version ; les renvois à l'historique git nomment le commit. Le contrôle de docgen qui refuse une version écrite à la main reconnaît aussi « state at / état au » et couvre ARCHITECTURE, ROADMAP, PROJECT, PUBLISHING, REFERENCES et G-PROPOSALS.
+- Tests : VersionStamps1084Tests. Verify.ps1 (agent) : 1773/1773, 0 avertissement, 0 erreur ; DLL 0.1084.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A060 (user decision D-138): the « state at 0.xxx » stamps written by hand in the living documents went stale at the next version. They become dates (« checked against the code on … »), never a version; references to the git history name the commit. The docgen check that refuses a hand-written version also knows « state at / état au » and covers ARCHITECTURE, ROADMAP, PROJECT, PUBLISHING, REFERENCES and G-PROPOSALS.
+
 ## 0.1083.0
 - Constat d'audit A046 (décision D-138 de l'utilisateur) : le même identifiant nommait des choses différentes (R-14, X-03, X-14, P1, C-…). Nouveau registre des familles d'identifiants, docs/project/IDS.md (deux langues) : seules X- (plan global) et DEC- (décisions) prennent de nouveaux numéros, les autres familles sont figées, les collisions connues disent comment citer. Les anciens identifiants restent tels quels. Un test garde chaque numéro X- et DEC- unique dans chaque moitié.
 - Tests : IdRegistry1083Tests. Verify.ps1 (agent) : 1771/1771, 0 avertissement, 0 erreur ; DLL 0.1083.0.0. Rien à essayer en jeu.

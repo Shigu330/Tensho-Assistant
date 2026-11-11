@@ -1,6 +1,6 @@
 # Vérifications
 
-## Comment vérifier — relu le 2026-11-04 (0.512)
+## Comment vérifier (relu le 2026-11-04)
 
 ### Tests automatiques
 

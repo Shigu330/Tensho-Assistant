@@ -2,12 +2,12 @@
 
 > *Traduction française plus bas.*
 
-## Overview — state at 0.971 (2026-11-09)
+## Overview (checked against the code on 2026-11-09)
 
 > A map of the code, not a journal: the detail of each version is in the [CHANGELOG](../../CHANGELOG.md), the in-game state in the
 > [global plan](GLOBAL-PLAN.md) and [TESTING](TESTING.md). The code is the reference. The design notes written for each goal from
 > 2026-10-27 to 2026-10-29 (the « History of the domains and versions » archive) were removed from this file on 2026-11-08: their names,
-> counters and states belonged to their date. They stay readable in git (this file at version 0.865.0, commit `2da535d`).
+> counters and states belonged to their date. They stay readable in git (this file in commit `2da535d`, 0.865.0).
 
 One plugin project (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, a single DLL, plus the native library of the optional Raphael
 solver next to it) and a test program without native dependency (`tests/TenshoAssistant.Tests`) that compiles the pure C# files of the
@@ -259,12 +259,12 @@ The build and the managed tests do not validate the ImGui rendering nor the nati
 
 # Architecture (français)
 
-## Vue d'ensemble — état au 0.971 (2026-11-09)
+## Vue d'ensemble (relue contre le code le 2026-11-09)
 
 > Carte du code, pas un journal : le détail par version est dans le [CHANGELOG](../../CHANGELOG.md), l'état en jeu dans le
 > [plan global](GLOBAL-PLAN.md) et [TESTING](TESTING.md). Le code fait foi. Les notes de conception écrites pour chaque objectif du
 > 2026-10-27 au 2026-10-29 (l'archive « Historique des domaines et des versions ») ont été retirées de ce fichier le 2026-11-08 : leurs
-> noms, compteurs et états étaient ceux de leur date. Elles restent lisibles dans git (ce fichier à la version 0.865.0, commit `2da535d`).
+> noms, compteurs et états étaient ceux de leur date. Elles restent lisibles dans git (ce fichier au commit `2da535d`, 0.865.0).
 
 Un projet plugin (`src/TenshoAssistant`, .NET 10, Dalamud.NET.Sdk 15, une seule DLL, plus à côté la bibliothèque native du solveur
 Raphael facultatif) et un programme de tests sans dépendance native (`tests/TenshoAssistant.Tests`) qui compile par lien les fichiers C#

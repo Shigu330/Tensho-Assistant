@@ -2,14 +2,14 @@
 
 > *Traduction française plus bas.*
 
-State on 2026-11-09 (version 0.971): the work plan now lives in the [global plan](GLOBAL-PLAN.md), and the history of each version in
+Since 2026-11-09, the work plan now lives in the [global plan](GLOBAL-PLAN.md), and the history of each version in
 [CHANGELOG.md](../../CHANGELOG.md). This file keeps the authoritative list of the 17 reference plugins and what Tensho covers of each, the
 user requests R-01 to R-14, the pages added outside the 17 plugins, the open questions and the decisions taken along the way. The
 17 rows stay PARTIAL: no complete in-game validation. Release: the custom repository, see [PUBLISHING](PUBLISHING.md) (no submission to
 the official repository, DEC-039).
 
 The step queue a) to h) (2026-11-02 to 2026-11-04) and the foundation notes (2026-10-27 to 2026-10-28) were history; they were removed from
-this file on 2026-11-08 and stay readable in git (this file at version 0.865.0, commit `2da535d`).
+this file on 2026-11-08 and stay readable in git (this file in commit `2da535d`, 0.865.0).
 
 Origin: the master prompt, §4 (maintainer's notes, outside the repository; a historical source since 2026-11-09, the user's
 decisions and [DECISIONS](DECISIONS.md) prevail). Every row is kept. State
@@ -46,7 +46,7 @@ The domain IDs name the overall capacity, cut into small goals when it is starte
 macros and suggestions; GATHER-001 with the places, then time windows/weather/fishing; SORT-001 with the preview before any native
 application. The other capacities follow the same principle, without declaring the plugin covered from the first slice.
 
-## User requests R-01 to R-14 (state at 0.512)
+## User requests R-01 to R-14
 
 Detail of the requests: [USER-REQUESTS](USER-REQUESTS.md). « Validated » = report or screenshot of the user; otherwise, to validate in
 game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repository.
@@ -62,7 +62,7 @@ game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repos
 | R-07 | Free company | page and expeditions 0.307, best routes 0.309, builds 0.315; DEC-023 follow-up done: flagged sectors 0.334, market prices and tiers 0.335, airships 0.336–0.337; history 0.379 | no | to validate in game |
 | R-08 | Reminders | page 0.300, icon and tooltip in the server bar 0.300–0.302, expeditions 0.307, squadron 0.333; then step g (M-01 to M-05, N-01 to N-03) | no | Ehcatl Gliders left out (nothing readable, 0.334); to validate in game |
 | R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | to validate; no future dates (no reliable source) |
-| R-10 | Cache audit | 0.246 ([audit](../evidence/0.246-cache-audit.md)), checked again 0.281 (« Never » duration) | — | — |
+| R-10 | Cache audit | 0.246 ([audit](../evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
 | R-11 | Gear | step 1 (0.310), glamour (0.311), materia and caps (0.312–0.313), sources and ownership (0.314), vessel builds (0.315) | 0.310–0.314 | 0.315 and 0.340 to validate; step 4: chocobo barding DONE 0.340, Chocobo page 0.341 (squadron left out, recommended default, decision at the end) |
 | R-12 | Discord webhook for alarms ([request](USER-REQUESTS.md)) | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
 | R-13 | Full « Credits » page in the plugin ([request](USER-REQUESTS.md)) | 0.320 | no | to validate in game |
@@ -105,14 +105,14 @@ Combat/ACT/IINACT: removed from the project (user decision 2026-10-31).
 
 # Feuille de route des 17 plugins
 
-État au 2026-11-09 (version 0.971) : le plan de travail vit maintenant dans le [plan global](GLOBAL-PLAN.md), et l'historique de chaque
+Depuis le 2026-11-09, le plan de travail vit maintenant dans le [plan global](GLOBAL-PLAN.md), et l'historique de chaque
 version dans [CHANGELOG.md](../../CHANGELOG.md). Ce fichier garde la liste qui fait foi des 17 plugins de référence et ce que Tensho
 couvre de chacun, les demandes de l'utilisateur R-01 à R-14, les pages ajoutées hors des 17 plugins, les questions ouvertes et les
 décisions prises en route. Les 17 lignes restent PARTIAL : aucune validation en jeu complète. Diffusion : le dépôt personnalisé, voir
 [PUBLISHING](PUBLISHING.md) (pas de soumission au dépôt officiel, DEC-039).
 
 La file d'étapes a) à h) (2026-11-02 au 2026-11-04) et les notes de fondation (2026-10-27 au 2026-10-28) étaient de l'historique ; elles
-ont été retirées de ce fichier le 2026-11-08 et restent lisibles dans git (ce fichier à la version 0.865.0, commit `2da535d`).
+ont été retirées de ce fichier le 2026-11-08 et restent lisibles dans git (ce fichier au commit `2da535d`, 0.865.0).
 
 Origine : le prompt maître, §4 (notes du mainteneur, hors du dépôt ; source historique depuis le 2026-11-09, les décisions de
 l'utilisateur et [DECISIONS](DECISIONS.md) priment). Toutes les lignes sont
@@ -150,7 +150,7 @@ Les ID métier désignent la capacité globale, découpée en petits objectifs a
 catalogue, puis simulation, macros et suggestions ; GATHER-001 par les lieux, puis horaires/météo/pêche ; SORT-001 par l'aperçu avant
 toute application native. Les autres capacités suivent le même principe, sans déclarer le plugin couvert dès la première tranche.
 
-## Demandes utilisateur R-01 à R-14 (état au 0.512)
+## Demandes utilisateur R-01 à R-14
 
 Détail des demandes : [USER-REQUESTS](USER-REQUESTS.md). « Validé » = rapport ou capture de l'utilisateur ; sinon, à valider en jeu. Les
 plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt.

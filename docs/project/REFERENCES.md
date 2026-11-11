@@ -2,12 +2,12 @@
 
 > *Traduction française plus bas.*
 
-## External sources used by the code — state at 0.315.0 (2026-11-02, checked against the code; replaces the state at 0.154.0)
+## External sources used by the code (checked against the code on 2026-11-02)
 
 Order (DEC-011): game data first (Lumina / sqpack, FFXIVClientStructs structures), then community sources. A community source
 that is missing or turned off gives "unknown", never a guessed value. Switches: Settings › Advanced › Community
 sources, one per source (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Fashion Report, PaissaDB, Universalis),
-and « Game data and what you observed only » turns the eight off at once (checked against the code at 0.1076).
+and « Game data and what you observed only » turns the eight off at once (checked against the code on 2026-11-11).
 
 ### Read at run time (network)
 
@@ -975,12 +975,12 @@ Predators, Snag. Credit in README and in the fishing help. Garland remains the f
 
 # Références
 
-## Sources externes utilisées par le code — état au 0.315.0 (2026-11-02, relu contre le code ; remplace l'état au 0.154.0)
+## Sources externes utilisées par le code (relues contre le code le 2026-11-02)
 
 Ordre (DEC-011) : données du jeu d'abord (Lumina / sqpack, structures FFXIVClientStructs), puis sources communautaires. Une source
 communautaire absente ou désactivée donne « inconnu », jamais une valeur devinée. Interrupteurs : Paramètres › Avancé › Sources
 communautaires, un par source (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Revue de mode, PaissaDB, Universalis),
-et « Données du jeu et observées seulement » coupe les huit d'un coup (relu contre le code au 0.1076).
+et « Données du jeu et observées seulement » coupe les huit d'un coup (relu contre le code le 2026-11-11).
 
 ### Lues à l'exécution (réseau)
 

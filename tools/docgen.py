@@ -48,11 +48,15 @@ LANGUAGES = ROOT / "src/TenshoAssistant/Localization/Languages"
 QA = "https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a"
 VERSION_MARK = re.compile(r"<!-- docgen:version -->([^<]*)<!-- /docgen:version -->")
 # A version written by hand in a sentence: « version 0.971 », « checked …, 0.971 ». Feature notes such as « (0.1000) » stay allowed.
-HAND_VERSION = re.compile(r"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu)\b[^.\n]{0,60}\b0\.\d{3,4}\b", re.I)
+HAND_VERSION = re.compile(r"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu|relue|relues|state at|état au)\b[^.\n]{0,60}"
+                          r"\b0\.\d{3,4}\b", re.I)
 # Public documents scanned for versions written by hand (the CHANGELOG, the evidence and the French working documents are history).
 NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "Localization/README.md", "docs/README.md", "docs/FAQ.md",
                    "tools/README.md", "publish/d17/PULL_REQUEST.md", "community-help/README.md",
-                   "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md")
+                   "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md",
+                   # 0.1084 (audit A060): the living documents of docs/project carry a date, never a version stamp.
+                   "docs/project/ARCHITECTURE.md", "docs/project/ROADMAP.md", "docs/project/PROJECT.md",
+                   "docs/project/PUBLISHING.md", "docs/project/REFERENCES.md", "docs/project/G-PROPOSALS.md")
 
 # ---------------------------------------------------------------------------------------------------------------------------- index
 # One row per document or folder; paths are relative to docs/. (links, for whom en/fr, content en/fr).

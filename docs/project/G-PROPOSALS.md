@@ -6,7 +6,7 @@ This document is kept during the development of step g) (the gaps of GAPS.md). I
 choices made provisionally, to review them together with the user (phase 6 and the decisions at the end). What has been decided since is marked
 as such (DEC-026 and later); the rest is still open.
 The provisional choices are also recalled in the [ROADMAP](ROADMAP.md), "Decisions postponed to the end".
-Reread on 2026-11-03 (0.446): an alternative done since then is marked "DONE x.y" in its column; what remains is the choice itself to confirm.
+Reread on 2026-11-03: an alternative done since then is marked "DONE x.y" in its column; what remains is the choice itself to confirm.
 **DECIDED 2026-11-03 (DEC-026)**: all the provisional choices below are confirmed by the user, except X-13 (sending to the chat on click
 added in 0.447); their alternatives remain ideas. X-04: simple link (0.447). Gaps: A-03 / A-04 studied in session; N-06 and N-14:
 community source to look for, licence first; N-08: journal with typed durations (0.448).
@@ -19,7 +19,7 @@ The choices noted in this file are settled: DEC-023, DEC-026, DEC-032, DEC-033, 
 
 ## Ideas spotted while coding
 
-State checked against the code on 2026-11-11 (0.1077).
+State checked against the code on 2026-11-11.
 
 | Spotted in | Idea | State |
 |---|---|---|
@@ -90,7 +90,7 @@ Plus a search field at the top of the Settings that finds any setting by its nam
 Ce document est tenu pendant le développement de l'étape g) (les écarts de GAPS.md). On y note les idées repérées en codant et les
 choix faits à titre provisoire, pour les revoir ensemble avec l'utilisateur (phase 6 et décisions de la fin). Ce qui a été décidé
 depuis est marqué comme tel (DEC-026 et suivantes) ; le reste est encore ouvert. Les choix provisoires sont aussi rappelés dans la [ROADMAP](ROADMAP.md), « Décisions reportées à la fin ».
-Relu le 2026-11-03 (0.446) : une alternative faite depuis est marquée « FAIT x.y » dans sa colonne ; il reste alors le choix lui-même à confirmer.
+Relu le 2026-11-03 : une alternative faite depuis est marquée « FAIT x.y » dans sa colonne ; il reste alors le choix lui-même à confirmer.
 **DÉCIDÉ 2026-11-03 (DEC-026)** : tous les choix provisoires ci-dessous sont confirmés par l'utilisateur, sauf X-13 (envoi au chat sur clic
 ajouté en 0.447) ; leurs alternatives restent des idées. X-04 : simple lien (0.447). Écarts : A-03 / A-04 étudiés en séance ; N-06 et N-14 :
 source communautaire à chercher, licence d'abord ; N-08 : journal avec durées tapées (0.448).
@@ -103,7 +103,7 @@ Les choix notés dans ce fichier sont tranchés : DEC-023, DEC-026, DEC-032, DEC
 
 ## Idées repérées en codant
 
-État relu contre le code le 2026-11-11 (0.1077).
+État relu contre le code le 2026-11-11.
 
 | Repérée en | Idée | État |
 |---|---|---|
