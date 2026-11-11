@@ -676,7 +676,7 @@ Evidence: Fonctions disponibles validées jusqu'à 0.1.4 ; les 17 modules métie
 Options: Dix-sept onglets placeholders ; navigation par espaces existants et répertoire unifié du périmètre futur.
 Decision: Cinq pages réelles avec sélection d'objet partagée. Les sept domaines futurs sont décrits dans un seul répertoire filtrable des 17 références, toutes marquées à venir. Réglages et provenance technique isolés dans leurs pages dédiées. Conserver le style Dalamud de l'utilisateur.
 Reason: Prépare l'arrivée des outils sans fausse fonctionnalité, dupliquer les services ou mélanger les diagnostics avec l'usage courant.
-Consequences: Version 0.2.0 ; contrôle visuel requis. CRAFT-001A reste READY et son plan est conservé dans docs/goals/CRAFT-001A.md.
+Consequences: Version 0.2.0 ; contrôle visuel requis. CRAFT-001A reste READY et son plan est conservé dans les notes du mainteneur (hors du dépôt).
 References: ROADMAP.md, TESTING.md UI-003, ARCHITECTURE.md
 
 DEC-ID: DEC-007
@@ -707,14 +707,14 @@ Options: Garder ACT en étude facultative ; le retirer du périmètre. Garder le
 Decision: ACT/IINACT et Combat retirés du projet (docs mises à jour, aucun code concerné). Archives checkpoints/*.zip ignorées par git (gardées sur disque) ; logs et notes de vérification restent suivis.
 Reason: Décision de périmètre de l'utilisateur ; l'historique git conserve déjà chaque version du code.
 Consequences: Les zips restent créés à chaque version mais hors dépôt. Les commits sont faits automatiquement par l'application de bureau, pas par l'agent. Les zips déjà présents dans l'historique local ne sont pas réécrits.
-References: .gitignore, docs/ai/PROMPT-MAITRE.md §5, CLAUDE.md ; modifiée par DEC-050 (commits et releases par l'agent)
+References: .gitignore, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (commits et releases par l'agent)
 
 DEC-ID: DEC-010
 Timestamp: 2026-10-31 Europe/Brussels
 Problem: Les sauvegardes (zips de points de contrôle) et la documentation à plat devenaient lourdes et peu lisibles une fois le dépôt sur GitHub ; il fallait aussi accueillir des contributeurs.
 Evidence: Demande utilisateur 2026-10-31 : « les backup ne sont plus utile si on utilise github », « réorganiser les md … suivi complet et reprise IA complète », « prendre en compte dev par la communauté open source », règles D17.
 Options: Garder checkpoints/ suivi ; l'ignorer entièrement. Documents à la racine ; rangement par public.
-Decision: `checkpoints/` entièrement ignoré par git (local), plus de zip par version ; preuves citées par le code dans `docs/evidence/` ; historique par version dans `CHANGELOG.md` ; documents rangés en `docs/ai/`, `docs/project/`, `docs/goals/` avec la carte `docs/README.md` ; `CONTRIBUTING.md` (règles, licences, publication Dalamud et politique IA). Remplace la conséquence « zips créés à chaque version » de DEC-009.
+Decision: `checkpoints/` entièrement ignoré par git (local), plus de zip par version ; preuves citées par le code dans `docs/evidence/` ; historique par version dans `CHANGELOG.md` ; documents rangés dans les notes du mainteneur (hors du dépôt) et `docs/project/`, avec la carte `docs/README.md` ; `CONTRIBUTING.md` (règles, licences, publication Dalamud et politique IA). Remplace la conséquence « zips créés à chaque version » de DEC-009.
 Reason: L'historique git conserve le code de chaque version ; une entrée par public (joueur, contributeur, agent) rend la reprise plus sûre.
 Consequences: L'utilisateur fait les commits (GitHub Desktop). Les zips déjà présents dans l'historique git n'en sont retirés que sur demande explicite (réécriture d'historique). Les gros documents de `docs/project/` gardent leur partie historique, marquée comme archive.
 References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent)
@@ -772,12 +772,12 @@ References: src/TenshoAssistant/Community/BoundedHttp.cs, src/TenshoAssistant/Ca
 DEC-ID: DEC-016
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.247–0.269, 0.315)
 Problem: Infobulles réduites et complètes empilées pour un même objet, menus de clic droit en double ou différents selon l'endroit.
-Evidence: Retours en jeu (captures) 0.250, 0.251, 0.252, 0.269 ; plan docs/goals/R-06.md étape 1.
+Evidence: Retours en jeu (captures) 0.250, 0.251, 0.252, 0.269 ; plan des notes du mainteneur (hors du dépôt), étape 1.
 Options: Corriger liste par liste ; modèles communs.
 Decision: Modèles communs (src/TenshoAssistant/UI/Components/ItemCell.cs, EntityMenus.cs, DetailPage.cs, SettingRow.cs). Toute icône d'objet donne l'infobulle complète et le menu des outils et des sources ; une seule infobulle d'objet par image (ItemCell.cs) et une seule infobulle par ligne de trajet (0.315) ; chaque menu attaché a un identifiant unique et stable (UniqueMenuId, 0.269) ; un menu par type de chose (quête, PNJ, monstre, lieu) ; même contenu pour l'infobulle Tensho et le panneau sous l'infobulle de l'inventaire du jeu (DrawItemInfoBody, 0.257), mêmes sources pour les deux menus de clic droit (SourceLines, 0.256).
 Reason: Même comportement partout, moins de code dupliqué, moins de travail par image.
 Consequences: Une nouvelle liste réutilise ces modèles ; pas d'infobulle « nom seul » ni de second menu superposé. Pas d'injection dans l'infobulle native (DEC-012).
-References: CHANGELOG.md 0.247–0.269, 0.315 ; docs/goals/R-06.md
+References: CHANGELOG.md 0.247–0.269, 0.315 ; notes du mainteneur (hors du dépôt)
 
 DEC-ID: DEC-017
 Timestamp: 2026-11-01/02 Europe/Brussels (0.248 ; date exacte non relevée)
@@ -802,7 +802,7 @@ References: src/TenshoAssistant/UI/Components/SettingRow.cs, tests/TenshoAssista
 DEC-ID: DEC-019
 Timestamp: 2026-11-02 Europe/Brussels (0.275–0.315)
 Problem: Plusieurs vues transformaient une donnée non lue en « aucun », « non obtenu » ou 0.
-Evidence: Règle durable (docs/ai/RULES.md, DEC-003) ; cas relevés en 0.275, 0.282, 0.285, 0.296, 0.298, 0.315 ; SubmarineTracker renvoie 0 pour un secteur sans seuil (docs/evidence/0.315-vessel-builds.md).
+Evidence: Règle durable (notes du mainteneur, hors du dépôt ; DEC-003) ; cas relevés en 0.275, 0.282, 0.285, 0.296, 0.298, 0.315 ; SubmarineTracker renvoie 0 pour un secteur sans seuil (docs/evidence/0.315-vessel-builds.md).
 Options: Valeur par défaut (0, croix, onglet masqué) ; état « inconnu » explicite.
 Decision: Inconnu reste inconnu dans l'interface : pas de pastille ✓/✗ tant que les collections ne sont pas lues (0.275) ; un catalogue pas encore chargé garde son onglet (0.282) ; sans quête confirmée, aucune quête d'une autre cité n'est masquée (0.285) ; Grande Compagnie inconnue ou aucune : tous les sceaux restent affichés (0.296) ; type de marqueur des mandats non deviné, à relever en jeu (0.298) ; seuils d'un trajet « inconnus » si un secteur manque, jamais 0, nom de montage « ? » si une pièce manque, compagnie non lue = pas de filtre des secteurs débloqués (0.315).
 Reason: Une valeur devinée est pire qu'un manque signalé.
@@ -817,7 +817,7 @@ Options: Garder les listes du job ; ouvrir toutes les pièces sans distinction ;
 Decision: Filtre « Tous les jobs (mirage) », désactivé par défaut : armures et accessoires de tous les jobs et niveaux ; les armes restent celles du job ; une pièce que le personnage ne peut pas porter est marquée « Mirage », essayable et partageable, et les statistiques gardent la pièce portée.
 Reason: Suivre la règle du jeu actuelle sans fausser les statistiques prévues.
 Consequences: Si la règle du jeu change, mettre à jour GearCatalog (AllJobs) ; page validée en jeu par l'utilisateur (rapport 2026-11-02, 0.310–0.314).
-References: src/TenshoAssistant/Gear/GearCatalog.cs, src/TenshoAssistant/Configuration.cs, docs/goals/R-11.md étape 1b
+References: src/TenshoAssistant/Gear/GearCatalog.cs, src/TenshoAssistant/Configuration.cs, notes du mainteneur (hors du dépôt), étape 1b
 
 DEC-ID: DEC-021
 Timestamp: 2026-11-02 Europe/Brussels (0.309, 0.315)
@@ -856,7 +856,7 @@ Evidence: Message de l'utilisateur du 2026-11-02 : « 0.. = numéro de version d
 Options: Numérotation libre ; SemVer classique (majeur, mineur, correctif) ; règle de l'utilisateur.
 Decision: X.y.z = grandes étapes, sur décision de l'utilisateur seulement (1.0.0 = première publication sur le dépôt officiel Dalamud, DEC-023) ; x.Y.0 = versions de l'utilisateur et de l'agent (le troisième nombre revient à 0) ; x.y.Z = versions de la communauté (contributions extérieures, numéro fixé par le mainteneur à la fusion, une PR peut le proposer).
 Reason: Décision de l'utilisateur ; la numérotation actuelle (0.317.0) la suit déjà.
-Consequences: L'agent monte seulement le deuxième nombre ; jamais le premier sans demande ; le troisième est réservé aux contributions. Documenté dans CLAUDE.md (« À chaque version livrée ») et CONTRIBUTING.md (« Versions and releases »).
+Consequences: L'agent monte seulement le deuxième nombre ; jamais le premier sans demande ; le troisième est réservé aux contributions. Documenté dans les notes du mainteneur, hors du dépôt (« À chaque version livrée ») et CONTRIBUTING.md (« Versions and releases »).
 References: notes du mainteneur (hors du dépôt), CONTRIBUTING.md, src/TenshoAssistant/TenshoAssistant.csproj ; modifiée par DEC-050 (releases par l'agent, `-Major` réservé à l'utilisateur) ; sens de la 1.0.0 remplacé par DEC-039 (fin du plan global sur le dépôt personnalisé)
 
 DEC-ID: DEC-025
@@ -866,7 +866,7 @@ Evidence: docs/project/GAPS.md (103 manques : 17 plugins de référence, dépôt
 Options: Pour chaque manque : ajouter, plus tard ou non ; ordre par valeur ou par domaine ; choix précis maintenant ou à chaque ajout.
 Decision: 101 manques retenus sur 103 ; plus tard : I-14 (tri de l'arsenal et tri automatique) et X-05 (bulles des PNJ dans le chat). Ordre : domaine par domaine, Inventaire et marché → Collections → Monde → Récolte → Artisanat → Nouveaux domaines ; dans un domaine, valeur haute et petite taille d'abord. Choix précis tranchés maintenant (colonne « Choix » de GAPS.md), notamment : solveur d'artisanat optimal proposé en deux versions au choix par un réglage (C# original dans la DLL, Raphael natif) ; si Macro Chain est actif, Tensho s'appuie sur lui ; Universalis seulement au survol ou à la demande pour les prix et les ventes des servants ; un fichier par personnage, jamais d'Account ID ; alarmes d'échéance créées d'office (alarmes Tensho, jamais /alarm d'office) ; pêche en mer dans la page Récolte, aide complète d'un coup ; rotations de collectionnables propres à Tensho selon les seuils de remise ; événements saisonniers par les données du jeu seulement ; Faux Hollows : données du jeu d'abord, puis licence compatible, sinon relevés ; PaissaDB accepté en surveillance régulière (réglage), lecture seule. Licence EUPL-1.2 : compatible avec la GPL v3 (avis requis).
 Reason: Choix de l'utilisateur, lot par lot dans la conversation (2026-11-02).
-Consequences: Étape g) de la file (docs/project/ROADMAP.md, docs/ai/STATUS.md), après R-12, d), e) et f) ; chaque manque est une version vérifiable à part. Toute fonction qui agit d'office reste désactivable et respecte les règles Dalamud relevées dans GAPS.md (pas de requête serveur sans action du joueur, données lues seulement après ouverture par le joueur). Le solveur Raphael ajoute un fichier natif hors de la DLL : exception voulue par l'utilisateur, en option.
+Consequences: Étape g) de la file (docs/project/ROADMAP.md, notes du mainteneur hors du dépôt), après R-12, d), e) et f) ; chaque manque est une version vérifiable à part. Toute fonction qui agit d'office reste désactivable et respecte les règles Dalamud relevées dans GAPS.md (pas de requête serveur sans action du joueur, données lues seulement après ouverture par le joueur). Le solveur Raphael ajoute un fichier natif hors de la DLL : exception voulue par l'utilisateur, en option.
 References: docs/project/GAPS.md, docs/project/ROADMAP.md (étape g), docs/evidence/0.318-plugin-gaps.json, CONTRIBUTING.md (licences) ; EUPL-1.2 confirmée par DEC-050
 
 DEC-ID: DEC-026
@@ -901,12 +901,12 @@ References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, G
 DEC-ID: DEC-029
 Timestamp: 2026-11-04 Europe/Brussels (séance de décisions pendant la campagne en jeu)
 Problem: Portée et ordre du chat personnalisable (CHAT-001) et des modèles communautaires (TEMPLATES-001).
-Evidence: CHAT-001 (document retiré avec le chat, DEC-030 ; voir git), docs/goals/TEMPLATES-001.md (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
+Evidence: CHAT-001 (document retiré avec le chat, DEC-030 ; voir git), notes du mainteneur (hors du dépôt) (relevé de Chat 2, Simple Tweaks, TidyChat, NoSoliciting, Chat Bubbles, addons WoW, règles de Dalamud).
 Options: Tableaux de décisions des deux plans, avec recommandations.
 Decision: Chat : C1 remplacement complet (contre la recommandation par couches) ; C2 tout de suite (contre la recommandation) ; C3 prévenir sans bloquer si Chat 2 est actif ; C4 ne pas demander à l'équipe Dalamud (contre la recommandation) ; C5 hooks au besoin, avec repli ; C6 historique en fichiers locaux, désactivé par défaut ; C7 couleur par métier seulement si le jeu la montre ; C8 Discord par règle choisie, nom masqué ; C9 traduction et émoticônes externes sur option, désactivées (service à choisir, contre la recommandation) ; C10 règles locales et liste partagée ; C11 code original ; C12 sections repliées et vue « essentiels ». Modèles : T1 les deux, code d'abord ; T2 tout de suite (contre la recommandation) ; T3 registre des pages tout de suite (contre la recommandation) ; T4 dossier dans ce dépôt ; T5 CC0 ; T6 galerie dans le plugin, sur clic ; T7 validation automatique et relecture ; T8 réglages en liste blanche ; T9 sept blocs en première version. T10 (case IA dans la pull request) : recommandation appliquée, le modèle la demandait déjà.
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: La campagne de tests en jeu (lots 6 à 10) passe après ces travaux, ou s'y intercale. Risques acceptés : doublon de Chat 2 possible à la publication 1.0.0 sans question préalable ; hooks de saisie à maintenir ; registre des pages refait pendant la campagne. Lignes rouges inchangées : aucun envoi automatique, code original, pas de combat. Reste à choisir pour C9 : le service de traduction et celui des émoticônes, à la phase 8.
-References: CHAT-001 (document retiré, voir git), docs/goals/TEMPLATES-001.md
+References: CHAT-001 (document retiré, voir git), notes du mainteneur (hors du dépôt)
 
 DEC-ID: DEC-030
 Timestamp: 2026-11-04 Europe/Brussels
@@ -916,7 +916,7 @@ Options: Garder le code sans le poursuivre, ou le retirer.
 Decision: Chat personnalisable abandonné et retiré : page, fenêtre, réglages, textes, tests et plan CHAT-001. Annule les points C1 à C12 de DEC-029 et le point « chat » de T8. Les fonctions qui lisent les lignes du chat pour autre chose restent : liens de carte (ChatMapLinkWatcher), détection du jardinage (GardenChatWatcher), annonce de train de chasse et alarmes.
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: 0.472. L'ancien plan et le code restent dans l'historique git (commit bf30b72, 0.471.0). Les modèles communautaires (TEMPLATES-001) continuent.
-References: docs/project/DECISIONS.md (DEC-029), docs/goals/TEMPLATES-001.md
+References: docs/project/DECISIONS.md (DEC-029), notes du mainteneur (hors du dépôt)
 
 DEC-ID: DEC-031
 Timestamp: 2026-11-04 Europe/Brussels
@@ -926,7 +926,7 @@ Options: Les choix recommandés du plan, ou les changer un par un.
 Decision: Tous les choix recommandés : l'aide avant le guide ; une proposition unique aux joueurs existants ; sources présentées, défauts inchangés ; visite selon les métiers ; formulaire GitHub prérempli, sans jeton ni serveur ; YouTube d'abord ; vidéos relues par l'utilisateur ; bandeau de première visite activé avec option ; anglais et français ; après le conseil Dresseur, avant D17. Les issues sont tenues à chaque version. Une règle Dalamud en jeu : résumé et accord de l'utilisateur.
 Reason: Décision de l'utilisateur.
 Consequences: Issues #11, #12, #15, #16, #30 fermées sur rapport ou preuve ; BST-001, ONBOARD-001 et deux issues de suivi ouvertes ; étiquette ultracode retirée. Exception à DEC-009 pour le conseil d'équipe du dresseur : pas décidée, soumise à l'accord de l'utilisateur.
-References: docs/goals/ONBOARD-001.md, docs/ai/STATUS.md, CLAUDE.md
+References: notes du mainteneur (hors du dépôt)
 
 DEC-ID: DEC-032
 Timestamp: 2026-11-04 Europe/Brussels

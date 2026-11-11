@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1062.0
+- Constats d'audit A075 et A025 (partie DECISIONS) : la moitié française de DECISIONS citait encore treize fois des fichiers qui ne vivent que sur le disque du mainteneur (liens morts sur GitHub), alors que la moitié anglaise dit déjà « the maintainer's notes (not in the repository) ». Elle dit maintenant « notes du mainteneur (hors du dépôt) ». Un test vérifie que chaque fichier Markdown cité par DECISIONS est un fichier du dépôt.
+- Tests : DecisionsLinks1062Tests. Verify.ps1 (agent) : 1743/1743, 0 avertissement, 0 erreur ; DLL 0.1062.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A075 and A025 (DECISIONS part): the French half of DECISIONS still cited, thirteen times, files that live only on the maintainer's disk (dead links on GitHub), while the English half already says "the maintainer's notes (not in the repository)". It now says the same in French. A test checks that every Markdown file cited by DECISIONS is a file of the repository.
+
 ## 0.1061.0
 - Constat d'audit A100 (formulation) : quinze lignes de la partie anglaise du CHANGELOG s'adressaient à l'utilisateur (« at your request », « your choice DEC-048 ») ; cette partie devient le corps des commits et les notes de release publiques, où « you » se lit comme le joueur. Elles disent maintenant « the user », à la voix neutre. Un test garde ces tournures hors des parties anglaises.
 - Tests : ChangelogVoice1061Tests. Verify.ps1 (agent) : 1742/1742, 0 avertissement, 0 erreur ; DLL 0.1061.0.0. Rien à essayer en jeu.
