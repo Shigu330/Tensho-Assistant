@@ -57,6 +57,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-048 | 2026-11-10 | Proposals 9 (X-101, "wish on sale" alert, automatic network call) and 10 (X-100, grouping of tools and settings) of G-PROPOSALS. |
 | DEC-049 | 2026-11-10 | Proposal 11 of G-PROPOSALS (X-40): other uses of nearby monsters. |
 | DEC-050 | 2026-11-09 | Topics entrusted to the agent on 2026-11-09: releases, Dalamud AI policy, EUPL-1.2 licence, icon. Some DECs and public documents still said the opposite: commits made by the desktop application (DEC-009, DEC-010), release after a game session (DEC-033), AI policy followed (DEC-010, DEC-039), EUPL "to be accepted by the user" (GAPS), icon "to keep or replace" (PUBLISHING, point 7). |
+| DEC-051 | 2026-11-11 | No decision recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said that the user makes the commits (GitHub Desktop) and that no zip is made any more. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -156,8 +157,8 @@ Evidence: User request 2026-10-31: « les backup ne sont plus utile si on utilis
 Options: Keep checkpoints/ tracked; ignore it entirely. Documents at the root; arrangement by audience.
 Decision: `checkpoints/` entirely ignored by git (local), no more zip per version; evidence cited by the code in `docs/evidence/`; history per version in `CHANGELOG.md`; documents sorted into the maintainer's notes (not in the repository) and `docs/project/`, with the map `docs/README.md`; `CONTRIBUTING.md` (rules, licences, Dalamud publication and AI policy). Replaces the consequence "zips created at each version" of DEC-009.
 Reason: Git history keeps the code of each version; one entry per audience (player, contributor, agent) makes resumption safer.
-Consequences: The user makes the commits (GitHub Desktop). Zips already in the git history are removed from it only on explicit request (history rewrite). The big documents in `docs/project/` keep their historical part, marked as an archive.
-References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, the maintainer's notes (not in the repository); modified by DEC-050 (AI policy no longer followed, commits by the agent)
+Consequences: The user makes the commits (GitHub Desktop) (amended by DEC-050 and DEC-051: the agent makes the commits; local zip backups before a large change). Zips already in the git history are removed from it only on explicit request (history rewrite). The big documents in `docs/project/` keep their historical part, marked as an archive.
+References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, the maintainer's notes (not in the repository); modified by DEC-050 (AI policy no longer followed, commits by the agent) and DEC-051 (agent files out of git since 0.802, commits by the agent)
 
 ID: DEC-011
 Timestamp: 2026-10-31 Europe/Brussels
@@ -558,6 +559,16 @@ Reason: User decisions (points 1 and 2, and delegation of points 3 and 4); offic
 Consequences: Modifies DEC-009 and DEC-010 (commits and releases made by the agent, no longer by the desktop application or the user), DEC-024 (releases by the agent; the first number stays with the user, guarded by `-Major`; 1.0.0 marks the end of the global plan on the custom repository, DEC-039), DEC-033 ("release after a game session" becomes point 1 above), DEC-039 and DEC-010 (the AI policy leaves the rules followed). PUBLISHING: points 6 and 7 closed, point 4 aligned with DEC-047. GAPS: EUPL-1.2 "compatible with notice" everywhere. CONTRIBUTING and README say who tests in game and when a release goes out.
 References: DEC-009, DEC-010, DEC-024, DEC-025, DEC-033, DEC-039, DEC-047, scripts/Release.ps1, scripts/Verify.ps1, docs/project/PUBLISHING.md, docs/project/GAPS.md, CONTRIBUTING.md, README.md
 
+ID: DEC-051
+Timestamp: 2026-11-11 Europe/Brussels (0.1082)
+Problem: No decision recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said that the user makes the commits (GitHub Desktop) and that no zip is made any more.
+Evidence: User request of 2026-11-07 (CHANGELOG 0.802.0): remove from the repository the content made for the AI agent; the files stay on the author's disk. User agreement of 2026-11-03, widened on 2026-11-09 (DEC-050): the agent manages git (commits and pushes on Devloppement at each version). User decision of 2026-11-11 (audit of 2026-11-09, finding A039): record it in a DEC.
+Options: Leave DEC-010 as it is; record the split and the commits in a new DEC that amends DEC-010.
+Decision: 1) The agent's working files (instructions, settings, rules, status, notes, its own scripts) are not tracked by git since 0.802 and are ignored by `.gitignore` (block "0.802"); they live on the author's disk only, with local backups. A tracked file never points to them; `scripts/Release.ps1` refuses to publish them. 2) The agent makes the commits and pushes on the work branch at each version, and the releases (DEC-050); never a forced push, a history rewrite or a deleted tag or branch. 3) Local zip backups stay outside git (`checkpoints/` ignored, DEC-010): before a large change, not at each version.
+Reason: The repository holds what players and contributors use; the agent's notes are its own and change at every turn. Recording it in a DEC removes the contradiction with DEC-010.
+Consequences: Modifies DEC-010 (commits by the agent, not by the user; local backups before a large change). The documents' map (`docs/README.md`) and CONTRIBUTING describe only tracked files.
+References: DEC-009, DEC-010, DEC-050, .gitignore, scripts/Release.ps1, CHANGELOG.md (0.802.0)
+
 ---
 
 # Décisions durables
@@ -617,6 +628,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-048 | 2026-11-10 | Propositions 9 (X-101, alerte « souhait en vente », appel réseau automatique) et 10 (X-100, regroupement des outils et des réglages) de G-PROPOSALS. |
 | DEC-049 | 2026-11-10 | Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches. |
 | DEC-050 | 2026-11-09 | Sujets confiés à l'agent le 2026-11-09 : releases, politique IA de Dalamud, licence EUPL-1.2, icône. Des DEC et des documents publics disaient encore le contraire : commits faits par l'application de bureau (DEC-009, DEC-010), release après une séance de jeu (DEC-033), politique IA suivie (DEC-010, DEC-039), EUPL « à accepter par l'utilisateur » (GAPS), icône « à garder ou remplacer » (PUBLISHING, point 7). |
+| DEC-051 | 2026-11-11 | Aucune décision ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore que l'utilisateur fait les commits (GitHub Desktop) et qu'aucun zip n'est plus fait. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -716,8 +728,8 @@ Evidence: Demande utilisateur 2026-10-31 : « les backup ne sont plus utile si o
 Options: Garder checkpoints/ suivi ; l'ignorer entièrement. Documents à la racine ; rangement par public.
 Decision: `checkpoints/` entièrement ignoré par git (local), plus de zip par version ; preuves citées par le code dans `docs/evidence/` ; historique par version dans `CHANGELOG.md` ; documents rangés dans les notes du mainteneur (hors du dépôt) et `docs/project/`, avec la carte `docs/README.md` ; `CONTRIBUTING.md` (règles, licences, publication Dalamud et politique IA). Remplace la conséquence « zips créés à chaque version » de DEC-009.
 Reason: L'historique git conserve le code de chaque version ; une entrée par public (joueur, contributeur, agent) rend la reprise plus sûre.
-Consequences: L'utilisateur fait les commits (GitHub Desktop). Les zips déjà présents dans l'historique git n'en sont retirés que sur demande explicite (réécriture d'historique). Les gros documents de `docs/project/` gardent leur partie historique, marquée comme archive.
-References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent)
+Consequences: L'utilisateur fait les commits (GitHub Desktop) (modifié par DEC-050 et DEC-051 : l'agent fait les commits ; sauvegardes zip locales avant une grosse modification). Les zips déjà présents dans l'historique git n'en sont retirés que sur demande explicite (réécriture d'historique). Les gros documents de `docs/project/` gardent leur partie historique, marquée comme archive.
+References: .gitignore, CHANGELOG.md, docs/README.md, CONTRIBUTING.md, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (politique IA plus suivie, commits par l'agent) et DEC-051 (fichiers de l'agent hors git depuis 0.802, commits par l'agent)
 
 DEC-ID: DEC-011
 Timestamp: 2026-10-31 Europe/Brussels
@@ -1117,3 +1129,13 @@ Decision: 1) Releases par l'agent, seulement par `Verify.ps1 -Release` : plugin 
 Reason: Décisions de l'utilisateur (points 1 et 2, et délégation des points 3 et 4) ; texte officiel de l'EUPL lu pour le point 3 ; pour le point 4, rien ne demande de la refaire : elle est déclarée, et la préférence pour une icône faite main venait de la politique IA retirée.
 Consequences: Modifie DEC-009 et DEC-010 (commits et releases faits par l'agent, plus par l'application de bureau ni par l'utilisateur), DEC-024 (releases par l'agent ; le premier numéro reste à l'utilisateur, garde `-Major` ; la 1.0.0 marque la fin du plan global sur le dépôt personnalisé, DEC-039), DEC-033 (« release après une session de jeu » devient le point 1 ci-dessus), DEC-039 et DEC-010 (la politique IA sort des règles suivies). PUBLISHING : points 6 et 7 fermés, point 4 aligné sur DEC-047. GAPS : EUPL-1.2 « compatible avec avis » partout. CONTRIBUTING et README disent qui essaie en jeu et quand une release part.
 References: DEC-009, DEC-010, DEC-024, DEC-025, DEC-033, DEC-039, DEC-047, scripts/Release.ps1, scripts/Verify.ps1, docs/project/PUBLISHING.md, docs/project/GAPS.md, CONTRIBUTING.md, README.md
+
+DEC-ID: DEC-051
+Timestamp: 2026-11-11 Europe/Brussels (0.1082)
+Problem: Aucune décision ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore que l'utilisateur fait les commits (GitHub Desktop) et qu'aucun zip n'est plus fait.
+Evidence: Demande de l'utilisateur du 2026-11-07 (CHANGELOG 0.802.0) : retirer du dépôt le contenu fait pour l'agent IA ; les fichiers restent sur le disque de l'auteur. Accord de l'utilisateur du 2026-11-03, élargi le 2026-11-09 (DEC-050) : l'agent gère git (commits et push sur Devloppement à chaque version). Décision de l'utilisateur du 2026-11-11 (audit du 2026-11-09, constat A039) : le noter dans une DEC.
+Options: Laisser DEC-010 telle quelle ; noter la séparation et les commits dans une nouvelle DEC qui modifie DEC-010.
+Decision: 1) Les fichiers de travail de l'agent (consignes, réglages, règles, état, notes, ses propres scripts) ne sont plus suivis par git depuis 0.802 et sont ignorés par `.gitignore` (bloc « 0.802 ») ; ils vivent seulement sur le disque de l'auteur, avec des sauvegardes locales. Un fichier suivi n'y renvoie jamais ; `scripts/Release.ps1` refuse de les publier. 2) L'agent fait les commits et les push sur la branche de travail à chaque version, et les releases (DEC-050) ; jamais de push forcé, de réécriture d'historique ni de suppression de tag ou de branche. 3) Les sauvegardes zip locales restent hors de git (`checkpoints/` ignoré, DEC-010) : avant une grosse modification, pas à chaque version.
+Reason: Le dépôt contient ce que joueurs et contributeurs utilisent ; les notes de l'agent sont les siennes et changent à chaque tour. Le noter dans une DEC lève la contradiction avec DEC-010.
+Consequences: Modifie DEC-010 (commits par l'agent, plus par l'utilisateur ; sauvegardes locales avant une grosse modification). La carte des documents (`docs/README.md`) et CONTRIBUTING ne décrivent que des fichiers suivis.
+References: DEC-009, DEC-010, DEC-050, .gitignore, scripts/Release.ps1, CHANGELOG.md (0.802.0)

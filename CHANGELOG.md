@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1082.0
+- Constat d'audit A039 (décision D-138 de l'utilisateur) : aucune DEC ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore « l'utilisateur fait les commits ». Nouvelle DEC-051 dans les deux moitiés de DECISIONS ; DEC-010 marquée modifiée.
+- Tests : AgentFilesDec1082Tests. Verify.ps1 (agent) : 1769/1769, 0 avertissement, 0 erreur ; DLL 0.1082.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A039 (user decision D-138): no DEC recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said "the user makes the commits". New DEC-051 in both halves of DECISIONS; DEC-010 marked as amended.
+
 ## 0.1081.0
 - Plan global, X-119 : Application de bureau, X-119 étape 2, partie 1 : lien local avec le plugin. Un nouveau réglage, Paramètres › Avancé › « Lien avec l'application de bureau », désactivé par défaut, ouvre un canal nommé local à ce PC : en sortie seulement (le plugin écrit, rien de ce que l'application envoie n'est lu), ouvert au seul utilisateur Windows courant et refusé aux connexions réseau, aucun port réseau. Une fois par seconde, sur le thread du jeu et derrière la coupure du contenu compétitif, le plugin copie si un personnage est connecté et le nom de la zone, puis un travailleur les écrit hors du thread ; au début d'une coupure, l'application reçoit « en pause » sans donnée du jeu. Sous le réglage, son état : désactivé, en attente, relié, occupé (un autre client du jeu du même utilisateur), indisponible. L'application de bureau se connecte sous le même utilisateur seulement et sa barre d'état indique « Relié au jeu : plugin x, à <zone> » ; les parties en direct des pages et les actions viendront dans les étapes suivantes. Une seule source pour les deux côtés (Link/LocalLink.cs), une question de la FAQ, une ligne de SECURITY, une preuve dans docs/evidence (lien local). Non validé en jeu.
 - Tests : LocalLink1081Tests. Verify.ps1 (agent) : 1768/1768, 0 avertissement, 0 erreur ; DLL 0.1081.0.0. Non validé en jeu.
