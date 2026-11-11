@@ -125,7 +125,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.494-selfcheck-first-pass.log](0.494-selfcheck-first-pass.log) | — | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.498-xbm-sheets.md](0.498-xbm-sheets.md) | — | `docs/evidence/0.500-xbm-columns.md` |
 | [0.500-xbm-columns.md](0.500-xbm-columns.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastCatalogTests.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/evidence/0.688-beast-places.md`, `docs/project/DECISIONS.md` |
-| [0.508-retainer-sales.md](0.508-retainer-sales.md) | `src/TenshoAssistant/Market/RetainerSalesReader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/TESTING.md` |
+| [0.508-retainer-sales.md](0.508-retainer-sales.md) | `src/TenshoAssistant/Market/RetainerSalesReader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.510-triad-competitive.md](0.510-triad-competitive.md) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md` |
 | [0.512-d17-build.md](0.512-d17-build.md) | `.github/workflows/build.yml` | `CONTRIBUTING.md`, `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md`, `docs/project/PUBLISHING.md`, `docs/project/TESTING.md` |
 | [0.515-node-effects.md](0.515-node-effects.md) | `src/TenshoAssistant/Gathering/GatherNodeEffects.cs`, `src/TenshoAssistant/Gathering/GatheringObservationReader.Dalamud.cs`, `src/TenshoAssistant/Plugin.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md` |

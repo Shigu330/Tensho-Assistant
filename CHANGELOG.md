@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1100.0
+- Campagne d'essais en jeu triée : 114 essais retirés (rien à voir, doublons, remplacés par un essai plus récent sur le même code, déjà faits, migrations passées, textes que les tests prouvent, arrêts un par un de la visite guidée, testée en entier) ; TESTING et TESTING-ROUTE produits de nouveau avec les essais des versions récentes. Aucun essai déclaré validé.
+- Tests : TestingTriage1100Tests. Verify.ps1 (agent) : 1794/1794, 0 avertissement, 0 erreur ; DLL 0.1100.0.0. Rien à essayer en jeu.
+### English
+- In-game test campaign sorted: 114 tests retired (nothing to see, duplicates, replaced by a later test of the same code, already done, past migrations, texts proven by the tests, single stops of the guided tour, which is tested as a whole); TESTING and TESTING-ROUTE produced again with the tests of the recent versions. No test declared validated.
+
 ## 0.1099.0
 - Découvertes (journal du développeur) : les prises de récolte (récolte abondante, objets de collection) et le résultat d'une synthèse sont attribués à la récolte et à l'artisanat ; un objet sorti de la sacoche, d'un servant, d'un coffre, d'une boutique ou d'un échange n'est plus compté comme un gain non attribué (rien n'est noté). Une fenêtre de ce genre n'explique un gain que si rien d'autre ne le fait (le résultat d'une tâche de servant reste attribué à la tâche).
 - Tests : GainSources1096Tests. Verify.ps1 (agent) : 1793/1793, 0 avertissement, 0 erreur ; DLL 0.1099.0.0. Non validé en jeu.
