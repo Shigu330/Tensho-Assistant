@@ -309,7 +309,6 @@ What the code does today. In-game validation of each part is tracked in [docs/pr
 ├── .github/                  CodeQL and build workflows, Dependabot settings, issue and pull request templates
 ├── publish/d17/              draft for the official Dalamud repository, not submitted: custom repository only (DEC-039,
 │                             docs/project/PUBLISHING.md)
-├── publish/github/           copies of the files that live in .github/
 ├── community-help/           help videos and guides listed in the plugin
 ├── community-templates/      community tool gallery (data only)
 ├── community-discoveries/    shared discoveries: the common file and each player's merged file (tools/discoveries-merge.py)

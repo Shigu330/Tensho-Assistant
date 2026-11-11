@@ -151,7 +151,7 @@ confirmed; choices of g) (G-PROPOSALS) confirmed as a block. The other rows rema
 | Fashion Report: source turned off (0.321) | No more download; a recent copy kept on disk stays shown. | `Fashion/FashionDataService.cs` |
 | « Reset everything to default » (0.321) | The folded groups of the navigation are kept (interface state); the map settings, including the icon sizes and priorities per map, are reset. | `Configuration.cs` (ConfigurationReset) |
 | New order of Release.ps1 (0.323) | Checks, tag and GitHub release with the zip, then main (repo.json) last; resumes if the tag exists without a release. | `scripts/Release.ps1` |
-| GitHub Actions and Dependabot (0.323) | **Turned on in 0.447** (DEC-026); job building like Dalamud added in 0.512. | `.github/`, [publish/github](../../../publish/github/README.md) |
+| GitHub Actions and Dependabot (0.323) | **Turned on in 0.447** (DEC-026); job building like Dalamud added in 0.512. | `.github/` (the publish/github drafts were removed in 0.1052) |
 | Protections of the GitHub repository (0.323) | **Turned on in 0.447** (DEC-026): force push and deletion forbidden on main and Devloppement, Stable-* tags protected. | GitHub settings |
 | Line endings eol=lf (0.323) | **Nothing to normalize** (DEC-026). | `.gitattributes` |
 | Code of conduct, CODEOWNERS, pre-push hook (0.323) | Not created (code of conduct, CODEOWNERS); hook ready, inactive (`git config core.hooksPath .githooks` to turn it on). | `.githooks/pre-push` |
@@ -223,7 +223,7 @@ mémoquartz : 80 % confirmé ; choix de g) (G-PROPOSALS) confirmés en bloc. Les
 | Revue de mode : source coupée (0.321) | Plus aucun téléchargement ; une copie récente gardée sur disque reste affichée. | `Fashion/FashionDataService.cs` |
 | « Tout remettre par défaut » (0.321) | Les groupes repliés de la navigation sont gardés (état de l'interface) ; les réglages de la carte, dont les tailles et priorités d'icônes par carte, sont remis à zéro. | `Configuration.cs` (ConfigurationReset) |
 | Nouvel ordre de Release.ps1 (0.323) | Contrôles, tag et release GitHub avec le zip, puis main (repo.json) en dernier ; reprise si le tag existe sans release. | `scripts/Release.ps1` |
-| GitHub Actions et Dependabot (0.323) | **Activés en 0.447** (DEC-026) ; job de compilation à la manière de Dalamud ajouté en 0.512. | `.github/`, [publish/github](../../../publish/github/README.md) |
+| GitHub Actions et Dependabot (0.323) | **Activés en 0.447** (DEC-026) ; job de compilation à la manière de Dalamud ajouté en 0.512. | `.github/` (les brouillons de publish/github sont retirés en 0.1052) |
 | Protections du dépôt GitHub (0.323) | **Activées en 0.447** (DEC-026) : push forcé et suppression interdits sur main et Devloppement, tags Stable-* protégés. | réglages GitHub |
 | Fins de ligne eol=lf (0.323) | **Rien à normaliser** (DEC-026). | `.gitattributes` |
 | Code de conduite, CODEOWNERS, hook pre-push (0.323) | Non créés (code de conduite, CODEOWNERS) ; hook prêt, inactif (`git config core.hooksPath .githooks` pour l'activer). | `.githooks/pre-push` |

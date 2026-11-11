@@ -18,14 +18,12 @@ internal static class Tooling323Tests
             var missing = classes.Where(name => !Regex.IsMatch(program,$@"\b{Regex.Escape(name)}\.Cases\b")).ToArray();
             Check(missing.Length == 0,"test classes not in the list (add .Concat(<Class>.Cases)): " + string.Join(", ",missing));
         }),
-        ("Git ignores per-user and generated files; GitHub drafts stay inactive outside .github",()=>
+        ("Git ignores per-user and generated files; GitHub templates live in .github",()=>
         {
             var ignore = File.ReadAllLines(Path.Combine(Root,".gitignore")).Select(line => line.Trim()).ToHashSet();
             // Agent files (CLAUDE.md, .claude/, docs/ai/, scripts/agent/): NoAgentFiles802Tests (audit #71).
             foreach (var entry in new[] { "**/bin/","**/obj/","checkpoints/","artifacts/","Thumbs.db","desktop.ini","__pycache__/" })
                 Check(ignore.Contains(entry),".gitignore lists " + entry);
-            foreach (var draft in new[] { "workflows/CodeQL.yml","workflows/build.yml","dependabot.yml","README.md" })
-                Check(File.Exists(Path.Combine(Root,"publish","github",draft)),"draft kept in publish/github: " + draft);
             foreach (var template in new[] { "ISSUE_TEMPLATE/bug_report.yml","ISSUE_TEMPLATE/feature_request.yml","ISSUE_TEMPLATE/translation.yml","ISSUE_TEMPLATE/config.yml","pull_request_template.md" })
                 Check(File.Exists(Path.Combine(Root,".github",template)),"GitHub template: " + template);
             Check(File.Exists(Path.Combine(Root,"tools","README.md")),"probes documented");

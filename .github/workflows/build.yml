@@ -1,4 +1,4 @@
-# Activated in 0.447 (draft of 0.323, publish/github).
+# Activated in 0.447 (draft of 0.323).
 # Builds the plugin, runs the tests and the language checks and packages it on every push and pull request, like .\scripts\Verify.ps1
 # on a contributor's PC. Dalamud's assemblies come from goatcorp's public distribution (the same files XIVLauncher installs).
 name: "Build and test"

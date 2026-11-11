@@ -51,7 +51,7 @@ VERSION_MARK = re.compile(r"<!-- docgen:version -->([^<]*)<!-- /docgen:version -
 HAND_VERSION = re.compile(r"\bversion\s+0\.\d{3,4}\b|\b(?:checked|vérifié|relu)\b[^.\n]{0,60}\b0\.\d{3,4}\b", re.I)
 # Public documents scanned for versions written by hand (the CHANGELOG, the evidence and the French working documents are history).
 NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "Localization/README.md", "docs/README.md", "docs/FAQ.md",
-                   "tools/README.md", "publish/d17/PULL_REQUEST.md", "publish/github/README.md", "community-help/README.md",
+                   "tools/README.md", "publish/d17/PULL_REQUEST.md", "community-help/README.md",
                    "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md")
 
 # ---------------------------------------------------------------------------------------------------------------------------- index
@@ -95,9 +95,6 @@ INDEX = [
      "`testing/live/TenshoAssistant/manifest.toml`, icon",
      "brouillon d'une soumission au dépôt officiel Dalamud, non prévue (DEC-039) : [PULL_REQUEST](../publish/d17/PULL_REQUEST.md), "
      "`testing/live/TenshoAssistant/manifest.toml`, icône"),
-    ([("../publish/github/", "../publish/github/README.md")], "maintainer", "mainteneur",
-     "the 0.323 drafts of the GitHub workflows (the active ones are in `.github/`)",
-     "les brouillons de la 0.323 des workflows GitHub (les actifs sont dans `.github/`)"),
     ([("../tools/", "../tools/README.md")], "contributors", "contributeurs",
      "read-only data probes (`ShopCurrencyProbe`, `ApiProbe`…) and data scripts (`discoveries-merge.py`: shared discoveries; "
      "`faq.py` and `docgen.py`: the generated parts of the documents) · `../scripts/`: `Verify.ps1` (checks), `Release.ps1` (commit and "
@@ -144,7 +141,6 @@ WORKING_INTRO = {
 INDEX_LEFT_OUT = {
     ".github/pull_request_template.md": "the pull request form, opened by GitHub",
     "publish/d17/PULL_REQUEST.md": "linked from the publish/d17 row",
-    "publish/github/README.md": "the publish/github row",
     "tools/README.md": "the tools row",
     "tools/PluginUiTest/README.md": "the pinned copy of the plugin UI test library (source: Shigu330/PluginUiTest), linked from tools/README.md (the tools row)",
 }
@@ -172,7 +168,8 @@ def index_block(code):
 
 def git_files(pattern):
     out = subprocess.run(["git", "ls-files", pattern], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
-    return [line for line in out.stdout.splitlines() if line]
+    # A tracked file deleted in the working tree (not yet committed) is no longer a document to index (0.1052).
+    return [line for line in out.stdout.splitlines() if line and (ROOT / line).exists()]
 
 
 def index_problems():

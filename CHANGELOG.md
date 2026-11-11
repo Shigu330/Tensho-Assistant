@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1052.0
+- Constat d'audit A065 : le dossier publish/github, qui gardait les brouillons de la 0.323 des workflows GitHub, est retiré (l'historique git le garde). Il n'était plus tenu à jour depuis l'activation des workflows dans .github/ (0.447), et le README le décrivait à tort comme une copie des fichiers actifs. Le test qui exigeait ces brouillons, la ligne de l'arborescence du README, la phrase de CONTRIBUTING (deux langues) et la ligne de l'index de docs/README.md sont retirés. Un test vérifie que le dossier est parti, que les fichiers actifs de .github/ sont là et qu'aucun document public n'y renvoie.
+- Tests : PublishDrafts1052Tests. Verify.ps1 (agent) : 1730/1730, 0 avertissement, 0 erreur ; DLL 0.1052.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A065: the publish/github folder, which kept the 0.323 drafts of the GitHub workflows, is removed (git history keeps it). It had not been kept in step since the workflows were turned on in .github/ (0.447), and the README wrongly described it as a copy of the active files. The test that required the drafts, the README tree line, the CONTRIBUTING sentence (both languages) and the docs/README.md index row are removed. A test checks that the folder is gone, that the active files of .github/ are there and that no public document points to it.
+
 ## 0.1051.0
 - Constats d'audit A076, C033 et A067 : la liste des documents du panneau Contributeurs (mode développeur) ne cite plus le fichier de travail de l'agent, un fichier qui n'est plus dans le dépôt depuis la 0.802, et deux commentaires du code ne renvoient plus vers des plans hors du dépôt. scripts/New-Tool.ps1 accepte maintenant les neuf groupes de la navigation (Tracking, Content et References manquaient depuis la 0.998), et CONTRIBUTING les nomme tous dans ses deux langues. Un test vérifie qu'aucun fichier du code ne renvoie vers les fichiers de travail et que le script et CONTRIBUTING suivent les groupes du code.
 - Tests : AgentPointers1051Tests. Verify.ps1 (agent) : 1728/1728, 0 avertissement, 0 erreur ; DLL 0.1051.0.0. Non validé en jeu.

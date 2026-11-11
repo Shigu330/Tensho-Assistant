@@ -122,7 +122,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.500-xbm-columns.md](0.500-xbm-columns.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastCatalogTests.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md` |
 | [0.508-retainer-sales.md](0.508-retainer-sales.md) | `src/TenshoAssistant/Market/RetainerSalesReader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/TESTING.md` |
 | [0.510-triad-competitive.md](0.510-triad-competitive.md) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md` |
-| [0.512-d17-build.md](0.512-d17-build.md) | `.github/workflows/build.yml` | `CHANGELOG.md`, `CONTRIBUTING.md`, `docs/project/DECISIONS.md`, `docs/project/PUBLISHING.md`, `docs/project/TESTING.md`, `publish/github/README.md`, `publish/github/workflows/build.yml` |
+| [0.512-d17-build.md](0.512-d17-build.md) | `.github/workflows/build.yml` | `CHANGELOG.md`, `CONTRIBUTING.md`, `docs/project/DECISIONS.md`, `docs/project/PUBLISHING.md`, `docs/project/TESTING.md` |
 | [0.515-node-effects.md](0.515-node-effects.md) | `src/TenshoAssistant/Gathering/GatherNodeEffects.cs`, `src/TenshoAssistant/Gathering/GatheringObservationReader.Dalamud.cs`, `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md`, `docs/project/DECISIONS.md` |
 | [0.517-gp-action-unlocks.md](0.517-gp-action-unlocks.md) | `src/TenshoAssistant/Plugin.cs` | `CHANGELOG.md` |
 | [0.518-gather-tomes.md](0.518-gather-tomes.md) | `src/TenshoAssistant/Gathering/GatherKnowledgeReader.Dalamud.cs`, `src/TenshoAssistant/Gathering/GatherPointAccess.cs` | `CHANGELOG.md` |

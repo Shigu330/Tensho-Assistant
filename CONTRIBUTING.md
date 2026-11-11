@@ -30,7 +30,7 @@ maintainer's tooling and falls back to the PATH when they are absent.
 Other help for contributors: the read-only probes that prove game facts are described in [tools/README.md](tools/README.md); issue and
 pull request templates are in `.github/`; an optional pre-push hook runs `Verify.ps1` before every push
 (`git config core.hooksPath .githooks`); editor defaults are in `.editorconfig`; the CI workflows (build, CodeQL, Dependabot) are in
-`.github/`, with their history in [publish/github](publish/github/README.md).
+`.github/`.
 
 The script, run from the repository root, builds `TenshoAssistant.sln` in Release, runs the managed tests (`tests/TenshoAssistant.Tests`),
 validates the language files, and checks the package (manifest identity, API level 15, version, exact ZIP content, no language file and no
@@ -245,7 +245,7 @@ du mainteneur et se replie sur le PATH quand ils sont absents.
 Autres aides pour les contributeurs : les sondes en lecture seule qui prouvent les faits du jeu sont décrites dans
 [tools/README.md](tools/README.md) ; les modèles de tickets et de pull requests sont dans `.github/` ; un hook pre-push facultatif lance
 `Verify.ps1` avant chaque push (`git config core.hooksPath .githooks`) ; les réglages de l'éditeur sont dans `.editorconfig` ; les
-workflows de CI (compilation, CodeQL, Dependabot) sont dans `.github/`, avec leur historique dans [publish/github](publish/github/README.md).
+workflows de CI (compilation, CodeQL, Dependabot) sont dans `.github/`.
 
 Le script, lancé depuis la racine du dépôt, compile `TenshoAssistant.sln` en Release, lance les tests managés
 (`tests/TenshoAssistant.Tests`), valide les fichiers de langue et contrôle le paquet (identité du manifeste, niveau d'API 15, version,
