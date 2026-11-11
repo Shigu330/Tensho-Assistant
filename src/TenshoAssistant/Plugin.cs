@@ -123,6 +123,12 @@ public sealed class Plugin : IDalamudPlugin
             // 0.750 (X-02): once, the longer cache defaults; saved with the other settings at their next save.
             if (!configuration.CacheLongerDefaults) { configuration.Cache.LongerDefaults(); configuration.CacheLongerDefaults = true; }
             dataCache=new DataCache(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"DataCache-v1"));
+            // X-117 (0.1046): what a game patch changed in the catalogue copies, written once to the log when first seen, then at each load.
+            dataCache.PatchReported=report=>log.Information("Patch changes: {0}",PatchCatalogDiff.Describe(report));
+            _=dataCache.LoadPatchReportsAsync().ContinueWith(task=>
+            {
+                if(task.IsCompletedSuccessfully)foreach(var report in task.Result)log.Information("Patch changes (kept): {0}",PatchCatalogDiff.Describe(report));
+            },TaskScheduler.Default);
             market.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
             marketBoard.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Prices),dataCache);
             garland.ConfigureCache(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache);

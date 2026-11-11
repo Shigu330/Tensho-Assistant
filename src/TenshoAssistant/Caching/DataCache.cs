@@ -37,6 +37,16 @@ public sealed class DataCache : IDisposable
     private readonly object gate=new();
     private Task writes=Task.CompletedTask;
     private Task reads=Task.CompletedTask;
+    // X-117 (0.1046): a catalogue copy replaced by one from a new game version is kept in « previous » (one per family + scope)
+    // and compared with the new one; the reports live in previous/patch-reports.json.
+    private sealed record PatchMove(string Family,string Scope,string Previous,string Current);
+    private IReadOnlyList<PatchCatalogReport> patchReports=[];
+    /// <summary>X-117 (0.1046): what the last game patch changed in each catalogue copy (newest report per family + scope).</summary>
+    public IReadOnlyList<PatchCatalogReport> PatchReports=>Volatile.Read(ref patchReports);
+    /// <summary>X-117 (0.1046): called off the framework thread with each new report.</summary>
+    public Action<PatchCatalogReport>? PatchReported{get;set;}
+    private string PreviousFolder=>Path.Combine(root,"previous");
+    private string PatchReportsPath=>Path.Combine(PreviousFolder,"patch-reports.json");
     private bool disposed;
     private string? error;
     public string? Error=>Volatile.Read(ref error);
@@ -91,6 +101,7 @@ public sealed class DataCache : IDisposable
                 {
                     await previous.ConfigureAwait(false);
                     var path=FileName(family,scope,version);var token=lifetime.Token;
+                    List<PatchMove> moved;
                     await io.WaitAsync(token).ConfigureAwait(false);
                     try
                     {
@@ -101,9 +112,11 @@ public sealed class DataCache : IDisposable
                         Directory.CreateDirectory(root);temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
                         await File.WriteAllBytesAsync(temporary,bytes,token).ConfigureAwait(false);
                         File.Move(temporary,path,true);temporary=null;
-                        Trim();Volatile.Write(ref error,null);return true;
+                        moved=Trim();Volatile.Write(ref error,null);
                     }
                     finally{io.Release();}
+                    if(moved.Count>0)Report(moved);
+                    return true;
                 }
                 catch(Exception failure){if(failure is not OperationCanceledException)Volatile.Write(ref error,"Local cache not saved: "+failure.Message);return false;}
                 finally{if(temporary is not null)try{File.Delete(temporary);}catch(Exception cleanup) when(cleanup is IOException or UnauthorizedAccessException){} }
@@ -115,14 +128,28 @@ public sealed class DataCache : IDisposable
     // oldest-first rule then deleted the catalogues and the Garland sources, which were read again each time. Now: only the
     // newest file of each family + scope is kept (a new version replaces the old one); « catalog-* » files are never removed
     // by the file count; other entries (sources, wiki…) keep up to MaximumFiles; the byte limit removes small entries first.
-    private void Trim()
+    // X-117 (0.1046): the newest older copy of a « catalog-* » file from another game version is moved to « previous » instead.
+    private List<PatchMove> Trim()
     {
         var files=new DirectoryInfo(root).EnumerateFiles("*.json").Where(file=>file.Name.Length==69 && file.Name[..64].All(Uri.IsHexDigit))
             .OrderByDescending(file=>file.LastWriteTimeUtc).Select(file=>(File:file,Identity:Identity(file))).ToArray();
-        var seen=new HashSet<(string,string)>();var kept=new List<(FileInfo File,bool Catalogue)>();
+        var seen=new Dictionary<(string,string),(string? Game,string Path)>();var kept=new List<(FileInfo File,bool Catalogue)>();
+        var moved=new List<PatchMove>();var keptOld=new HashSet<(string,string)>();
         foreach(var (file,identity) in files)
         {
-            if(identity is { } key && !seen.Add(key)){Delete(file);continue;}
+            if(identity is { } id)
+            {
+                var key=(id.Family,id.Scope);
+                if(seen.TryGetValue(key,out var newest))
+                {
+                    if(id.Family.StartsWith("catalog-",StringComparison.Ordinal) && id.Game is not null && newest.Game is not null && id.Game!=newest.Game
+                        && keptOld.Add(key) && KeepPrevious(file,PreviousPath(id.Family,id.Scope)))
+                        moved.Add(new(id.Family,id.Scope,PreviousPath(id.Family,id.Scope),newest.Path));
+                    else Delete(file);
+                    continue;
+                }
+                seen[key]=(id.Game,file.FullName);
+            }
             kept.Add((file,identity?.Family.StartsWith("catalog-",StringComparison.Ordinal)==true));
         }
         var others=0;long bytes=kept.Where(entry=>entry.Catalogue).Sum(entry=>entry.File.Length);
@@ -132,18 +159,65 @@ public sealed class DataCache : IDisposable
             bytes+=file.Length;
             if(++others>MaximumFiles || bytes>MaximumDiskBytes)Delete(file);
         }
+        return moved;
     }
-    private static void Delete(FileInfo file){try{file.Delete();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}}
-    // Family and scope from the file header ({"Schema":1,"Family":"…","Scope":"…",…}); null when unreadable (then only the limits apply).
-    private static (string Family,string Scope)? Identity(FileInfo file)
+    private string PreviousPath(string family,string scope)=>
+        Path.Combine(PreviousFolder,Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"previous",family,scope})))+".json");
+    private static bool KeepPrevious(FileInfo file,string path)
+    {
+        try{Directory.CreateDirectory(Path.GetDirectoryName(path)!);File.Move(file.FullName,path,true);return true;}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
+    }
+    // Off the io lock: both copies are read again (each at most MaximumEntryBytes) and compared once, when the patch is first seen.
+    private void Report(List<PatchMove> moved)
     {
         try
         {
-            using var stream=file.OpenRead();var buffer=new byte[4096];var read=stream.Read(buffer,0,buffer.Length);
+            var reports=ReadReports().ToList();
+            foreach(var move in moved)
+            {
+                var before=ReadEnvelope(move.Previous);var after=ReadEnvelope(move.Current);
+                if(before is null || after is null)continue;
+                var report=PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow);
+                reports.RemoveAll(row=>row.Family==report.Family && row.Scope==report.Scope);reports.Add(report);
+                Volatile.Write(ref patchReports,reports.ToArray());
+                try{PatchReported?.Invoke(report);}catch(Exception){}
+            }
+            AtomicFile.Write(PatchReportsPath,JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions));
+        }
+        catch(Exception failure) when(failure is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
+        {Volatile.Write(ref error,"Patch comparison not saved: "+failure.Message);}
+    }
+    private static Envelope? ReadEnvelope(string path)
+    {
+        if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return null;
+        return JsonSerializer.Deserialize<Envelope>(File.ReadAllBytes(path),JsonOptions) is {Schema:1} envelope ? envelope:null;
+    }
+    private IReadOnlyList<PatchCatalogReport> ReadReports()
+    {
+        var path=PatchReportsPath;
+        if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return [];
+        return JsonSerializer.Deserialize<List<PatchCatalogReport>>(File.ReadAllBytes(path),JsonOptions) ?? [];
+    }
+    /// <summary>X-117 (0.1046): the reports kept from the last game patch, read off the framework thread.</summary>
+    public Task<IReadOnlyList<PatchCatalogReport>> LoadPatchReportsAsync()=>Task.Run(()=>
+    {
+        try{var reports=ReadReports();Volatile.Write(ref patchReports,reports);return reports;}
+        catch(Exception failure) when(failure is IOException or UnauthorizedAccessException or JsonException)
+        {Volatile.Write(ref error,"Patch comparison unreadable: "+failure.Message);return (IReadOnlyList<PatchCatalogReport>)[];}
+    });
+    private static void Delete(FileInfo file){try{file.Delete();}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}}
+    // Family, scope and game version from the file header ({"Schema":1,"Family":"…","Scope":"…","Version":"…",…}); null when unreadable
+    // (then only the limits apply).
+    private static (string Family,string Scope,string? Game)? Identity(FileInfo file)
+    {
+        try
+        {
+            using var stream=file.OpenRead();var buffer=new byte[8192];var read=stream.ReadAtLeast(buffer,buffer.Length,false);
             var head=System.Text.Encoding.UTF8.GetString(buffer,0,read);
             var family=System.Text.RegularExpressions.Regex.Match(head,@"""Family"":""((?:[^""\\]|\\.)*)""");
             var scope=System.Text.RegularExpressions.Regex.Match(head,@"""Scope"":""((?:[^""\\]|\\.)*)""");
-            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value):null;
+            return family.Success && scope.Success ? (family.Groups[1].Value,scope.Groups[1].Value,PatchCatalogDiff.GameVersion(head)):null;
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return null;}
     }
