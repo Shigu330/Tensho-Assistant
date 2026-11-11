@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Plan dated 2026-11-05, at version 0.539.0, drawn from the review done with the user and reorganised at their request; detail of each point: [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **In progress since 2026-11-05 (green light from the user).** The order of the phases and points is a proposal from the agent.
+Plan dated 2026-11-05, at version 0.539.0, drawn from the review done with the user and reorganised at their request; origin of each point: [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md) (frozen snapshot of that day). **In progress since 2026-11-05 (green light from the user).** The order of the phases and points is a proposal from the agent.
 
 **Since [DEC-039](DECISIONS.md): no submission to the official repository, custom repository only, Dalamud rules kept.** **1.0.0 comes after the whole plan** (user's decision, [DEC-037](DECISIONS.md)): they want a complete plugin, and accept that a submission judged too big may be refused ([PUBLISHING](PUBLISHING.md), point 6).
 
@@ -592,7 +592,7 @@ Do not redo without a new request:
 
 # Plan global
 
-Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; détail de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md). **En cours depuis le 2026-11-05 (feu vert de l'utilisateur).** L'ordre des phases et des points est une proposition de l'agent.
+Plan du 2026-11-05, à la version 0.539.0, issu de la revue faite avec l'utilisateur et réorganisé à sa demande ; origine de chaque point : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md) (instantané figé de ce jour). **En cours depuis le 2026-11-05 (feu vert de l'utilisateur).** L'ordre des phases et des points est une proposition de l'agent.
 
 **Depuis [DEC-039](DECISIONS.md) : pas de soumission au dépôt officiel, dépôt personnalisé seulement, règles Dalamud gardées.** **La 1.0.0 vient après tout le plan** (décision de l'utilisateur, [DEC-037](DECISIONS.md)) : il veut un plugin complet, et accepte qu'une soumission jugée trop grosse puisse être refusée ([PUBLISHING](PUBLISHING.md), point 6).
 

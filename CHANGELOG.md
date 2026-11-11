@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1067.0
+- Constat d'audit A049 : PROPOSALS-TRIAGE est un instantané du 2026-11-05 dont la classe « Après la 1.0.0 » contredit le plan global (rien ne vient après la 1.0.0) et dont la plupart des points sont faits ; le plan global y renvoyait encore pour « le détail de chaque point ». Le tri s'ouvre maintenant, dans ses deux langues, sur un bandeau « instantané figé, plus mis à jour », et le plan global le présente comme l'origine de chaque point. Un test vérifie le bandeau et le renvoi.
+- Tests : TriageFrozen1067Tests. Verify.ps1 (agent) : 1749/1749, 0 avertissement, 0 erreur ; DLL 0.1067.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A049: PROPOSALS-TRIAGE is a snapshot of 2026-11-05 whose class « After 1.0.0 » contradicts the global plan (nothing comes after 1.0.0) and whose points are mostly done; the global plan still sent readers there for « the detail of each point ». The triage now opens, in both languages, with a « frozen snapshot, no longer updated » banner, and the global plan presents it as the origin of each point. A test checks the banner and the pointer.
+
 ## 0.1066.0
 - Constat d'audit A051 : PROJECT et ROADMAP recopiaient à la main les pages ajoutées à côté des 17 plugins, telles qu'elles étaient à la 0.971 (groupes renommés et déplacés depuis). Le tableau du README est écrit depuis la liste des pages du code (MainWindow.Pages.cs) par tools/docgen.py à chaque version : les deux documents y renvoient maintenant, dans leurs deux langues, au lieu de garder une copie qui vieillit. Un test vérifie les renvois.
 - Tests : PageLists1066Tests. Verify.ps1 (agent) : 1748/1748, 0 avertissement, 0 erreur ; DLL 0.1066.0.0. Rien à essayer en jeu.

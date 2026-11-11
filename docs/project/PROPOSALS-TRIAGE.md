@@ -2,6 +2,9 @@
 
 > *Traduction française plus bas.*
 
+**Frozen snapshot of 2026-11-05, no longer updated.** Its class « After 1.0.0 » is replaced by the [global plan](GLOBAL-PLAN.md),
+where nothing comes after 1.0.0, and most of its points are done since; the current state of each point is in the global plan.
+
 Triage of 2026-11-05, at version 0.539.0, of the 95 proposals left open in [MAP-PROPOSALS](MAP-PROPOSALS.md), [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md), [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) and [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md). The detail of each proposal stays in those documents, under the same number.
 
 **Method and limits.** The status comes from a search in the code and in the interface texts, without reading every function or trying in game: a « not done » may be partly done. Value and size (S, M) are the audits' estimates. The ranking is a recommendation by the agent: nothing is decided until the user has chosen. None of these proposals is required for 1.0.0 ([PUBLISHING](PUBLISHING.md)).
@@ -282,6 +285,9 @@ The alternatives to the choices already applied stay as ideas: [G-PROPOSALS](G-P
 ---
 
 # Tri des propositions d'audit
+
+**Instantané figé du 2026-11-05, plus mis à jour.** Sa classe « Après la 1.0.0 » est remplacée par le [plan global](GLOBAL-PLAN.md),
+où rien ne vient après la 1.0.0, et la plupart de ses points sont faits depuis ; l'état courant de chaque point est dans le plan global.
 
 Tri du 2026-11-05, à la version 0.539.0, des 95 propositions restées ouvertes dans [MAP-PROPOSALS](MAP-PROPOSALS.md), [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md), [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) et [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md). Le détail de chaque proposition reste dans ces documents, sous le même numéro.
 
