@@ -6,7 +6,8 @@
 
 Order (DEC-011): game data first (Lumina / sqpack, FFXIVClientStructs structures), then community sources. A community source
 that is missing or turned off gives "unknown", never a guessed value. Switches: Settings › Advanced › Community
-sources (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Universalis hover prices).
+sources, one per source (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Fashion Report, PaissaDB, Universalis),
+and « Game data and what you observed only » turns the eight off at once (checked against the code at 0.1076).
 
 ### Read at run time (network)
 
@@ -49,7 +50,7 @@ The data files are `EmbeddedResource` items (`TenshoAssistant.csproj`): nothing 
 | Rule | Source | Code | Status |
 |---|---|---|---|
 | Bountiful Harvest II bonus (+3 / +2 / +1 depending on ⌊base × 1.1⌋ and ⌊base × 0.9⌋) | frozen_rabbit_tome (no licence, fact recorded); GatheringOptimizer (MIT) leaves the value manual | GP tool, "estimated", editable | 0.224; [evidence](../evidence/0.224-bountiful-base.md); to be validated in game |
-| Distance and duration of a submarine voyage (legs, surveys, fixed 12 h, 5 sectors at most) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, read | `FreeCompany/VoyagePlanner.cs` | 0.309; real duration not verified in game |
+| Distance and duration of a submarine voyage (legs, surveys, fixed 12 h, 5 sectors at most) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, read | `FreeCompany/VoyagePlanner.cs` | 0.309; real duration not verified in game; the game's own functions replace the formula once a probe proves they only calculate (DEC-043, reading pending) |
 | Wear: (335 + sector rank − part rank) × 7 per sector, 30,000 per part | "Submersibles durability damage" sheet, taken up by SubmarineTracker | `FreeCompany/VesselBuilds.cs` | 0.315; estimate |
 | Total part cost ≤ capacity | community tools (SubmarineTracker, Argus), consistent with 11 published airship builds | `FreeCompany/VesselBuilds.cs` | 0.315; not verified in game below rank 50 |
 | Short name of a build ("SSUC++") | community convention | `FreeCompany/VesselBuilds.cs` | 0.315 |
@@ -978,7 +979,8 @@ Predators, Snag. Credit in README and in the fishing help. Garland remains the f
 
 Ordre (DEC-011) : données du jeu d'abord (Lumina / sqpack, structures FFXIVClientStructs), puis sources communautaires. Une source
 communautaire absente ou désactivée donne « inconnu », jamais une valeur devinée. Interrupteurs : Paramètres › Avancé › Sources
-communautaires (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, prix au survol Universalis).
+communautaires, un par source (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Revue de mode, PaissaDB, Universalis),
+et « Données du jeu et observées seulement » coupe les huit d'un coup (relu contre le code au 0.1076).
 
 ### Lues à l'exécution (réseau)
 
@@ -1022,7 +1024,7 @@ Les fichiers de données sont des `EmbeddedResource` (`TenshoAssistant.csproj`) 
 | Règle | Source | Code | Statut |
 |---|---|---|---|
 | Bonus de Récolte abondante II (+3 / +2 / +1 selon ⌊base × 1,1⌋ et ⌊base × 0,9⌋) | frozen_rabbit_tome (sans licence, fait relevé) ; GatheringOptimizer (MIT) laisse la valeur manuelle | outil PR, « estimé », modifiable | 0.224 ; [preuve](../evidence/0.224-bountiful-base.md) ; à valider en jeu |
-| Distance et durée d'un trajet de sous-marin (étapes, relevés, 12 h fixes, 5 secteurs au plus) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, lus | `FreeCompany/VoyagePlanner.cs` | 0.309 ; durée réelle non vérifiée en jeu |
+| Distance et durée d'un trajet de sous-marin (étapes, relevés, 12 h fixes, 5 secteurs au plus) | SubmarineTracker (MIT) `SubExplPretty.cs`, `Data/Voyage.cs`, lus | `FreeCompany/VoyagePlanner.cs` | 0.309 ; durée réelle non vérifiée en jeu ; les fonctions du jeu remplacent la formule une fois prouvé qu'elles ne font que calculer (DEC-043, relevé en attente) |
 | Usure : (335 + rang du secteur − rang de la pièce) × 7 par secteur, 30 000 par pièce | feuille « Submersibles durability damage », reprise par SubmarineTracker | `FreeCompany/VesselBuilds.cs` | 0.315 ; estimation |
 | Coût total des pièces ≤ capacité | outils communautaires (SubmarineTracker, Argus), cohérente avec 11 montages de dirigeables publiés | `FreeCompany/VesselBuilds.cs` | 0.315 ; non vérifiée en jeu sous le rang 50 |
 | Nom court d'un montage (« SSUC++ ») | convention communautaire | `FreeCompany/VesselBuilds.cs` | 0.315 |

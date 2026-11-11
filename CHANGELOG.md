@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1076.0
+- Constat d'audit A057, reste : REFERENCES nommait six interrupteurs de sources communautaires alors que Paramètres › Avancé en a huit (la Revue de mode et PaissaDB manquaient), plus « Données du jeu et observées seulement » qui les coupe tous ; sa ligne des durées de sous-marins ne disait pas que DEC-043 prévoit de remplacer la formule par les fonctions du jeu une fois prouvé qu'elles ne font que calculer. Les deux lignes sont corrigées dans les deux langues. Les fiches d'archive restent : une preuve des crédits les cite comme relevés des licences des sources lues. Un test vérifie la liste contre le code et le renvoi à DEC-043.
+- Tests : ReferencesSwitches1076Tests. Verify.ps1 (agent) : 1759/1759, 0 avertissement, 0 erreur ; DLL 0.1076.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A057, rest: REFERENCES named six community source switches while Settings › Advanced has eight (Fashion Report and PaissaDB were missing), plus « Game data and what you observed only » that turns them all off; its submarine duration row did not say that DEC-043 plans to replace the formula by the game's functions once they are proven to only calculate. Both rows are corrected in both languages. The archive sheets stay: an evidence file of the credits cites them as the licence records of the sources read. A test checks the list against the code and the pointer to DEC-043.
+
 ## 0.1075.0
 - Constat d'audit A043, deuxième partie : TESTING gardait un inventaire des tests figé au 0.315.0 (569 tests, une soixantaine de lignes, qui citait une archive locale) et renvoyait trois fois au fichier d'état du mainteneur, absent du dépôt. L'inventaire est remplacé par un paragraphe (nombre courant : sortie de Verify.ps1 et ligne « Tests » de chaque entrée du CHANGELOG ; ancienne liste : historique git), et les trois renvois disent maintenant où trouver l'information (CHANGELOG, cases de la page). Aucune case d'essai ne change. Un test vérifie le retrait et l'absence de lien vers les notes du mainteneur.
 - Tests : TestingInventory1075Tests. Verify.ps1 (agent) : 1758/1758, 0 avertissement, 0 erreur ; DLL 0.1075.0.0. Rien à essayer en jeu.
