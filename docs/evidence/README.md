@@ -4,6 +4,10 @@ Probe outputs and log excerpts cited by the code: each data link the plugin reli
 
 Français : sorties de sondes et extraits de journaux cités par le code : chaque lien de données dont le plugin dépend renvoie à l'un de ces fichiers (règle : aucune donnée inventée ; un test vérifie les chemins cités). Le tableau ci-dessous est produit par `tools/docgen.py` depuis les fichiers suivis qui nomment chaque fichier ; un fichier cité nulle part reste comme historique.
 
+Naming: `<version>-<subject>.<ext>` with the two-part version (e.g. `0.1004-discoveries-check.md`), or `x<plan point>-<subject>.<ext>` for the report of a global plan point (e.g. `x93-load-test.md`). The three-part names before 0.183 (`0.99.0-…`) and `craft-log-api-probe.log` stay as they are, since the code cites them; a test (Evidence1069Tests) refuses any other name.
+
+Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres (ex. `0.1004-discoveries-check.md`), ou `x<point du plan>-<sujet>.<ext>` pour le rapport d'un point du plan global (ex. `x93-load-test.md`). Les noms à trois nombres d'avant la 0.183 (`0.99.0-…`) et `craft-log-api-probe.log` restent tels quels, car le code les cite ; un test (Evidence1069Tests) refuse tout autre nom.
+
 <!-- docgen:evidence -->
 | Evidence · Preuve | Code and tests · Code et tests | Documents |
 |---|---|---|

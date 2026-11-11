@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1069.0
+- Constat d'audit A074 : les preuves de docs/evidence suivaient trois formes de nom (version à deux nombres, version à trois nombres avant la 0.183, rapports x<point du plan>) et un nom sans version, sans règle écrite nulle part. La règle est maintenant écrite une fois, dans les deux langues, en tête de docs/evidence/README.md (hors du bloc produit), et un test refuse tout autre nom ; les anciens noms restent, car le code les cite.
+- Tests : Evidence1069Tests. Verify.ps1 (agent) : 1752/1752, 0 avertissement, 0 erreur ; DLL 0.1069.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A074: the evidence files of docs/evidence followed three name forms (two-part version, three-part version before 0.183, x<plan point> reports) and one name without a version, with no rule written anywhere. The rule is now written once, in both languages, at the top of docs/evidence/README.md (outside the produced block), and a test refuses any other name; the old names stay, since the code cites them.
+
 ## 0.1068.0
 - Constat d'audit A048 (partie BACKLOG) : BACKLOG est un état du 0.315 corrigé au 0.512, encore lu comme actuel. Il disait la pêche en mer non couverte (page depuis la 0.392) et R-09 pas commencé (page Événements depuis la 0.342), renvoyait à une section de ROADMAP qui n'existe pas et donnait PUBLISHING comme ce qui reste pour la 1.0.0. Il s'ouvre maintenant sur un bandeau « état figé, plus mis à jour » et ces lignes sont corrigées, dans les deux langues. Un test les vérifie.
 - Tests : BacklogFrozen1068Tests. Verify.ps1 (agent) : 1750/1750, 0 avertissement, 0 erreur ; DLL 0.1068.0.0. Rien à essayer en jeu.
