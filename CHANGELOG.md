@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1055.0
+- Constat d'audit A038 (suite) : BACKLOG parlait encore d'une soumission D17 éventuelle et COMPETITIVE-OFF-PLAN de « l'examen de la soumission ». Depuis DEC-039, il n'y a pas de soumission (dépôt personnalisé seulement, règles Dalamud tenues) : les deux documents le disent, dans leurs deux langues. Un test vérifie ces deux documents et l'ouverture de PUBLISHING.
+- Tests : NoSubmission1055Tests. Verify.ps1 (agent) : 1735/1735, 0 avertissement, 0 erreur ; DLL 0.1055.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A038 (continued): BACKLOG still spoke of a possible D17 submission and COMPETITIVE-OFF-PLAN of "the review of the submission". Since DEC-039 there is no submission (custom repository only, Dalamud rules kept): both documents now say so, in both languages. A test checks these two documents and the opening of PUBLISHING.
+
 ## 0.1054.0
 - Constat d'audit A038 (partie décisions) : DEC-012, DEC-023, DEC-024 et DEC-037 parlaient encore d'une soumission au dépôt officiel de Dalamud sans dire que DEC-039 l'a remplacée. Chacune porte maintenant, dans ses deux langues, la mention de ce que DEC-039 remplace (cadre de publication, partie soumission, sens de la 1.0.0 : fin du plan global sur le dépôt personnalisé). Les références françaises touchées, et celles de DEC-010, ne nomment plus les notes de l'agent, comme la moitié anglaise. Un test vérifie ces renvois dans les deux moitiés.
 - Tests : DecisionsSuperseded1054Tests. Verify.ps1 (agent) : 1733/1733, 0 avertissement, 0 erreur ; DLL 0.1054.0.0. Rien à essayer en jeu.

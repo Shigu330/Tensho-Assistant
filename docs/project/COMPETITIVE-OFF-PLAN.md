@@ -92,7 +92,7 @@ In-game tests: Wolves' Den dock; custom Crystalline Conflict match; Frontline; T
 Crucible of the Unbroken panel: abandoned here, then taken up again as a limited exception by DEC-047 (X-109): the team panel in front of the board, between
 fights only, switched off from the start of each fight. The rest of the beastmaster remains a list of information, outside the Crucible of the Unbroken.
 
-Question to the Dalamud team on what counts as competitive: not retained for the moment. The rule gives no list: the review of the submission may therefore judge otherwise.
+Question to the Dalamud team on what counts as competitive: not retained for the moment. The rule gives no list: the Dalamud team may therefore judge otherwise (no submission since DEC-039, the rules are still kept).
 
 Inventory: the deep dungeons have a ranking (Lodestone), so they switch Tensho off; ocean fishing, Ishgard and cosmic exploration have none according to this page.
 
@@ -202,7 +202,7 @@ Essais en jeu : quai de Wolves' Den ; match personnalisé de Crystalline Conflic
 Panneau du Dédale : abandonné ici, puis repris en exception limitée par DEC-047 (X-109) : le panneau d'équipe devant le plateau, entre
 les combats seulement, coupé dès le début de chaque combat. Le reste du dresseur reste une liste d'informations, hors du Dédale.
 
-Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'examen de la soumission peut donc juger autrement.
+Question à l'équipe Dalamud sur ce qui compte comme compétitif : pas retenue pour le moment. La règle n'en donne pas de liste : l'équipe Dalamud peut donc juger autrement (pas de soumission depuis DEC-039, les règles restent tenues).
 
 Inventaire : les donjons profonds ont un classement (Lodestone), donc ils coupent Tensho ; la pêche en mer, Ishgard et l'exploration cosmique n'en ont pas d'après cette page.
 

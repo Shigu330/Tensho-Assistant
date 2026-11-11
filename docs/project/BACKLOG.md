@@ -38,7 +38,7 @@ Free company, Reminders, Gear (R-07, R-08, R-11): remainders and open choices in
 table of submarine thresholds, airship unlock tree (LuminaSupplemental, GPL-3.0), airship route
 planner, capacity rule under rank 50, squadron and Planeurs d'Ehcatl, step 4 of R-11. R-09 (events): not started.
 
-Publication (PUBLISH-018, see [PUBLISHING](PUBLISHING.md)): possible D17 submission (user's decision). Code side done
+Publication (PUBLISH-018, see [PUBLISHING](PUBLISHING.md)): no submission since DEC-039 (custom repository only). Code side done
 (0.156–0.157): icon `src/TenshoAssistant/images/icon.png` (AI-generated, declared), `manifest.toml` ready, PR draft with the
 AI declaration. The old mention "`images/icon.png`, `manifest.toml` and the AI declaration are missing" is outdated since 0.157.
 What remains for the author: commit and push, commit hash in `manifest.toml`, PR text and declaration rewritten by him (see
@@ -172,7 +172,7 @@ Compagnie libre, Rappels, Équipement (R-07, R-08, R-11) : restes et choix ouver
 table des seuils de sous-marin, arbre de déblocage des dirigeables (LuminaSupplemental, GPL-3.0), planificateur de trajets de
 dirigeable, règle de capacité sous le rang 50, escouade et Planeurs d'Ehcatl, étape 4 de R-11. R-09 (événements) : pas commencé.
 
-Publication (PUBLISH-018, voir [PUBLISHING](PUBLISHING.md)) : soumission D17 éventuelle (décision de l'utilisateur). Côté code fait
+Publication (PUBLISH-018, voir [PUBLISHING](PUBLISHING.md)) : pas de soumission depuis DEC-039 (dépôt personnalisé seulement). Côté code fait
 (0.156–0.157) : icône `src/TenshoAssistant/images/icon.png` (générée par IA, déclarée), `manifest.toml` prêt, brouillon de PR avec la
 déclaration d'IA. L'ancienne mention « il manque `images/icon.png`, `manifest.toml` et la déclaration d'IA » est périmée depuis 0.157.
 Reste à l'auteur : commit et push, hash du commit dans `manifest.toml`, texte de PR et déclaration réécrits par lui (voir
