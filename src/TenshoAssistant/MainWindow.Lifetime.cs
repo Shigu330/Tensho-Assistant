@@ -8,6 +8,7 @@ internal sealed partial class MainWindow
     {
         if(windowDisposed)return;
         windowDisposed=true;cactpotGeneration++;
+        jitWarmup.Dispose();
         // 0.327 (queue step e): the last page used is written once more when the plugin unloads with the window open.
         SaveLastPage();
         craftChain.Dispose();

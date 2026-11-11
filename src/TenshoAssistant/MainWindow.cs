@@ -176,7 +176,12 @@ internal sealed partial class MainWindow : Window, IDisposable
             MinimumSize = new Vector2(760, 480),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
         };
+        // X-01 (0.1050): the window's code compiled ahead off the frame (Diagnostics/JitWarmup.cs): the first frame of a page was mostly JIT.
+        jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
+            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped.")));
     }
+
+    private readonly Diagnostics.JitWarmup jitWarmup;
 
     // 0.394 (user request): the chosen text font for the whole window, pushed after the theme and popped first.
     private IDisposable? bodyFontScope;

@@ -112,6 +112,23 @@ internal static class Headless
             if(!published){report.Fail($"{service}: no catalogue");return 1;}
         }
         var size=new System.Numerics.Vector2(1280,820);
+        // X-01 (0.1050): the window's JIT warm-up (Diagnostics/JitWarmup) finished before the pages are timed, as in the game where a page is
+        // opened seconds after loading; --cold stops it first, to time the pages as they were before it (the same build, before and after).
+        if(host.Window.GetType().GetField("jitWarmup",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)?.GetValue(host.Window) is IDisposable warmup)
+        {
+            if(args.Contains("--cold")){warmup.Dispose();report.Warmup="stopped (--cold)";}
+            else
+            {
+                Beat("JIT warm-up",TimeSpan.FromSeconds(120));
+                var waited=warmup.GetType().GetMethod("Wait")?.Invoke(warmup,[TimeSpan.FromSeconds(110)]) is true;
+                string Read(string name)=>Convert.ToString(warmup.GetType().GetProperty(name)?.GetValue(warmup),System.Globalization.CultureInfo.InvariantCulture) ?? "?";
+                report.Warmup=waited ? $"{Read("Prepared")} methods compiled ahead in {Read("Elapsed")}, {Read("Skipped")} skipped" : "not finished in 110 s";
+            }
+            // Its memory cost: the process working set at this point (compare with --cold).
+            GC.Collect();GC.WaitForPendingFinalizers();GC.Collect();
+            report.Warmup+=$"; working set {Environment.WorkingSet/1048576} MB after a full collection";
+            Console.WriteLine("  JIT warm-up: "+report.Warmup);
+        }
         // Frames before measuring, so the constructor-time and first-frame calls (the window, the navigation) are not charged to the first page.
         Beat("first frames",TimeSpan.FromSeconds(60));
         for(var i=0;i<3;i++)Ui.Frame(host,status,size,1/60f);
@@ -121,6 +138,9 @@ internal static class Headless
         lock(AbsentProxy.Reached)common.UnionWith(AbsentProxy.Reached);
         report.Common=common.Order().ToArray();
         var failed=0;
+        // --jit-names: the methods compiled during each page's first frame, counted by declaring type (runtime JIT events, this thread):
+        // what the warm-up does not cover yet. Diagnostic only, off by default.
+        using var jitNames=args.Contains("--jit-names") ? new JitNames() : null;
         foreach(var page in host.Pages)
         {
             lock(AbsentProxy.Reached)AbsentProxy.Reached.Clear();
@@ -128,10 +148,27 @@ internal static class Headless
             host.SetPage(page);
             if(page=="Weather" && uint.TryParse(Program.Option(args,"--zone=") ?? "155",out var zone))OpenZone(host,zone);
             var errors=new List<string>();var vertices=0;
+            // X-01 (0.1050): the first frame of a page and its settled frames timed, as the plugin's "Selftest draw" lines do in the game
+            // (first, settled): what a page costs on opening is measured here without the game, before and after a change.
+            var times=new double[20];
+            double jitMs=0;long jitMethods=0;
+            var jitBefore=System.Runtime.JitInfo.GetCompilationTime(true);var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
             for(var frame=0;frame<20;frame++)
             {
                 Beat($"page {page}, frame {frame}",TimeSpan.FromSeconds(30));
-                if(Ui.Frame(host,status,size,1/60f) is { } failure)
+                var frameStart=System.Diagnostics.Stopwatch.GetTimestamp();
+                if(frame==0)jitNames?.Begin();
+                var failed1=Ui.Frame(host,status,size,1/60f);
+                if(frame==0 && jitNames is not null && jitNames.End() is { Count:>0 } compiled)
+                    Console.WriteLine($"    jit {page}: "+string.Join(", ",compiled.GroupBy(name=>name).OrderByDescending(group=>group.Count()).Take(12).Select(group=>$"{group.Key} {group.Count()}")));
+                times[frame]=System.Diagnostics.Stopwatch.GetElapsedTime(frameStart).TotalMilliseconds;
+                if(frame==0)
+                {
+                    // The part of the first frame spent compiling the page's code (JIT, once per process): what is left is the page's own work.
+                    jitMs=(System.Runtime.JitInfo.GetCompilationTime(true)-jitBefore).TotalMilliseconds;
+                    jitMethods=System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore;
+                }
+                if(failed1 is { } failure)
                 {
                     var at=new System.Diagnostics.StackTrace(failure,false).GetFrames().Select(f=>f.GetMethod()).FirstOrDefault(m=>m?.DeclaringType?.Assembly==host.Plugin);
                     var text=$"{failure.GetType().Name}: {Short(failure.Message)}{(at is null ? "" : $" (in {at.DeclaringType?.Name}.{at.Name})")}";
@@ -148,8 +185,9 @@ internal static class Headless
             var icons=TextureProviderProxy.Served+TextureProviderProxy.Missing-iconsBefore;
             if(errors.Count>0)failed++;
             var kind=DesktopPages.Kind(page)!.Value;
-            report.Rows.Add(new(page,kind,errors.Count==0,vertices,icons,reached,errors,DesktopPages.LiveKey(page) is { } live ? host.Text(live) : "-"));
-            Console.WriteLine($"  {page,-22} {kind,-9} {(errors.Count==0 ? "drawn":"THROWS"),-7} vtx {vertices,6} icons {icons,4}  absent: {(reached.Length==0 ? "-" : string.Join(", ",reached))}{(errors.Count==0 ? "" : "  | "+string.Join("; ",errors))}");
+            var settled=Settled(times);
+            report.Rows.Add(new(page,kind,errors.Count==0,vertices,icons,reached,errors,DesktopPages.LiveKey(page) is { } live ? host.Text(live) : "-",times[0],settled,jitMs,jitMethods));
+            Console.WriteLine($"  {page,-22} {kind,-9} {(errors.Count==0 ? "drawn":"THROWS"),-7} vtx {vertices,6} icons {icons,4} {string.Create(System.Globalization.CultureInfo.InvariantCulture,$"first {times[0],7:0.0} ms (jit {jitMs,6:0.0} ms, {jitMethods,4} methods) settled {settled,5:0.0} ms")}  absent: {(reached.Length==0 ? "-" : string.Join(", ",reached))}{(errors.Count==0 ? "" : "  | "+string.Join("; ",errors))}");
         }
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
@@ -157,7 +195,34 @@ internal static class Headless
 
     internal static string Short(string text)=>(text.Length>140 ? text[..140]+"…" : text).Replace("|","/").Replace("\n"," ");
 
-    private sealed record Row(string Page,DesktopPageKind Kind,bool Drawn,int Vertices,int Icons,string[] Reached,List<string> Errors,string Live);
+    /// <summary>Runtime JIT events (MethodJittingStarted) between Begin and End (the frame; other threads' few compilations included), as "namespace.type" of each compiled method.</summary>
+    private sealed class JitNames : System.Diagnostics.Tracing.EventListener
+    {
+        private readonly List<string> names=[];
+        private int thread=-1;
+        public void Begin(){lock(names){names.Clear();thread=Environment.CurrentManagedThreadId;}}
+        // The runtime's events reach the listener a little later, on its own thread: the window is closed after a short wait.
+        public List<string> End(){Thread.Sleep(300);lock(names){thread=-1;return [..names];}}
+        protected override void OnEventSourceCreated(System.Diagnostics.Tracing.EventSource source)
+        {
+            if(source.Name=="Microsoft-Windows-DotNETRuntime")EnableEvents(source,System.Diagnostics.Tracing.EventLevel.Verbose,(System.Diagnostics.Tracing.EventKeywords)0x10);
+        }
+        protected override void OnEventWritten(System.Diagnostics.Tracing.EventWrittenEventArgs data)
+        {
+            if(data.EventName!="MethodJittingStarted_V1" || data.Payload is null || data.PayloadNames is null)return;
+            var space=data.Payload[data.PayloadNames.IndexOf("MethodNamespace")] as string ?? "?";
+            lock(names)if(thread!=-1)names.Add(space.Length>70 ? space[..70] : space);
+        }
+    }
+
+    /// <summary>Median of the last ten frames of a page (the frame after the off-frame loads had time to finish).</summary>
+    internal static double Settled(double[] times)
+    {
+        var last=times.Skip(Math.Max(0,times.Length-10)).Order().ToArray();
+        return last.Length==0 ? 0 : last[last.Length/2];
+    }
+
+    private sealed record Row(string Page,DesktopPageKind Kind,bool Drawn,int Vertices,int Icons,string[] Reached,List<string> Errors,string Live,double FirstMs,double SettledMs,double JitMs,long JitMethods);
 
     /// <summary>The markdown report of the run (the evidence of X-119 quotes it) and the summary line Verify.ps1 reads.</summary>
     private sealed class Report(Host host,StatusBar status,string output)
@@ -165,6 +230,7 @@ internal static class Headless
         public readonly List<string> Loaders=[];
         public readonly List<Row> Rows=[];
         public string[] Common=[];
+        public string Warmup="-";
         private readonly object gate=new();
         private bool written;
 
@@ -192,6 +258,7 @@ internal static class Headless
                 text.AppendLine($"- {status.VersionEnglish}");
                 text.AppendLine($"- Text language `{host.TextCode}`, game data `{host.GameLanguage}`");
                 text.AppendLine($"- Result: **{summary}**");
+                text.AppendLine($"- JIT warm-up of the window: {Warmup}");
                 text.AppendLine();
                 text.AppendLine("## Catalogue loaders");
                 text.AppendLine();
@@ -199,10 +266,10 @@ internal static class Headless
                 text.AppendLine();
                 text.AppendLine("## Pages (20 frames each)");
                 text.AppendLine();
-                text.AppendLine("| Page | Kind | Drawn without exception | Vertices (max) | Icons asked | Live parts named by the status bar | Dalamud members reached (absent stand-ins) | Exception |");
-                text.AppendLine("|---|---|---|---|---|---|---|---|");
+                text.AppendLine("| Page | Kind | Drawn without exception | Vertices (max) | Icons asked | First frame (ms) | Of which compiling (ms, methods) | Settled (ms) | Live parts named by the status bar | Dalamud members reached (absent stand-ins) | Exception |");
+                text.AppendLine("|---|---|---|---|---|---|---|---|---|---|---|");
                 foreach(var row in Rows)
-                    text.AppendLine($"| {row.Page} | {row.Kind} | {(row.Drawn ? "yes" : "NO")} | {row.Vertices} | {row.Icons} | {row.Live} | {(row.Reached.Length==0 ? "-" : string.Join(", ",row.Reached))} | {(row.Errors.Count==0 ? "-" : string.Join("; ",row.Errors))} |");
+                    text.AppendLine($"| {row.Page} | {row.Kind} | {(row.Drawn ? "yes" : "NO")} | {row.Vertices} | {row.Icons} | {row.FirstMs.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)} | {row.JitMs.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)}, {row.JitMethods} | {row.SettledMs.ToString("0.0",System.Globalization.CultureInfo.InvariantCulture)} | {row.Live} | {(row.Reached.Length==0 ? "-" : string.Join(", ",row.Reached))} | {(row.Errors.Count==0 ? "-" : string.Join("; ",row.Errors))} |");
                 text.AppendLine();
                 text.AppendLine($"Reached by the window on every page (header, navigation, Home): {(Common.Length==0 ? "-" : string.Join(", ",Common))}");
                 try
