@@ -1,7 +1,14 @@
 # Journal des versions / Changelog
 
-Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
+Résumé par version, en français puis `### English` (partie anglaise obligatoire depuis 0.219.0) ; la partie anglaise sert aussi de corps
+aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
+
+## 0.1057.0
+- Constat d'audit A085 : l'en-tête du CHANGELOG renvoyait aux commits git pour l'historique détaillé, alors que le corps des commits et les notes de release sont écrits depuis la partie anglaise du CHANGELOG lui-même. Il dit maintenant le format (français puis « ### English », partie anglaise obligatoire depuis 0.219.0) et ce qui lit la partie anglaise. Un test vérifie l'en-tête.
+- Tests : ChangelogHeader1057Tests. Verify.ps1 (agent) : 1737/1737, 0 avertissement, 0 erreur ; DLL 0.1057.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A085: the CHANGELOG header sent the reader to the git commits for the detailed history, while the commit bodies and the release notes are written from the CHANGELOG's own English part. It now states the format (French, then "### English", English part required since 0.219.0) and what reads the English part. A test checks the header.
 
 ## 0.1056.0
 - Constat d'audit A069 : la carte des documents (docs/README.md) disait que chaque entrée du CHANGELOG a une partie anglaise, alors que les 188 entrées jusqu'à 0.218.0 sont en français seulement. Elle dit maintenant « partie anglaise depuis 0.219.0 », dans ses deux langues (texte produit par tools/docgen.py). Un test vérifie la règle sur tout le CHANGELOG et sur la carte. La ligne des preuves ne prétend plus à une langue.
