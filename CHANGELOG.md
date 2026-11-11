@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1107.0
+- Plan global, X-128 : Carte de Tensho : la case « Quêtes pas encore disponibles » est passée du menu du clic droit à l'onglet Quêtes ; décochée, elle retire aussi de la liste de l'onglet les quêtes pas encore disponibles (pas commencées, avec une quête d'avant pas encore faite), en plus de leurs icônes sur la carte.
+- Tests : MapLockedQuests1107Tests. Verify.ps1 (agent) : 1808/1808, 0 avertissement, 0 erreur ; DLL 0.1107.0.0. Non validé en jeu.
+### English
+- Tensho map: the « Quests not available yet » box moved from the right-click menu to the Quests tab; unticked, it also takes the quests not available yet (not started, with an earlier quest not done yet) out of the tab's list, besides their icons on the map.
+
 ## 0.1106.0
 - Plan global, X-127 : Souhaits : la liste de souhaits devient un outil à part (OBJETS › Souhaits, ce n'est plus un onglet de Collections) ; « ajouté à vos souhaits » s'affiche en bas de la fenêtre avec un bouton qui ouvre la liste ; sous chaque objet récolté, où le récolter (métier, zone, point, heures, ou heures et météo d'un poisson) ; « Ajouter les alarmes » pose en un clic les alarmes des points limités de ce qui manque, sans doublon ; question « Où est ma liste de souhaits ? » dans la FAQ.
 - Tests : WishlistTool1106Tests. Verify.ps1 (agent) : 1806/1806, 0 avertissement, 0 erreur ; DLL 0.1106.0.0. Non validé en jeu.

@@ -18,6 +18,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 |---|---|---|---|---|
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Game data and what you observed only** — Turns off the eight community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay. Default: off. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Size** — Size in pixels (10 to 40). Default: 24 for titles, 19 for sections, 17 for text. |
+| `(MapView.ShowLockedQuests)` | — | — | Settings › Map | **Quests not available yet** — Shows the quest markers the game draws locked (quests you cannot take yet). Greyed while « Quests and objectives » is off. Default: on. |
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
 | `(ModuleSettings.MacroChain)` | — | — | Settings › Panels | **Chain the pages (Tensho Macro Chain: /tenshonext as the last line)** — Ends each page with /tenshonext so Tensho's Macro chain starts the next page (long rotations). Default: on. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Settings › Panels | **Allow overwriting existing macros in the range** — Ticked: the copy may replace any macro in the chosen slots. Unticked: only empty slots or slots Tensho copied before. Default: off. |
@@ -304,7 +305,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 251 controls (246 linked to `Configuration`, 5 to another file), 31 settings without a control.
+Counted: 252 controls (246 linked to `Configuration`, 6 to another file), 31 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -328,6 +329,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 |---|---|---|---|---|
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Données du jeu et observées seulement** — Coupe d’un coup les huit sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent. Par défaut : désactivé. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Taille** — Taille en pixels (10 à 40). Par défaut : 24 pour les titres, 19 pour les sections, 17 pour le texte. |
+| `(MapView.ShowLockedQuests)` | — | — | Paramètres › Carte | **Quêtes pas encore disponibles** — Montre les marqueurs de quête que le jeu dessine verrouillés (quêtes que vous ne pouvez pas encore prendre). Grisé tant que « Quêtes et objectifs » est coupé. Par défaut : activé. |
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
 | `(ModuleSettings.MacroChain)` | — | — | Paramètres › Panneaux à côté du jeu | **Chaîner les pages (Macro Chain de Tensho : /tenshonext en dernière ligne)** — Termine chaque page par /tenshonext, pour que l'Enchaînement de macros de Tensho lance la page suivante (rotations longues). Par défaut : activé. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Paramètres › Panneaux à côté du jeu | **Autoriser l'écrasement de macros existantes dans la plage** — Coché : la copie peut remplacer n'importe quelle macro dans les emplacements choisis. Décoché : seulement les emplacements vides ou déjà copiés par Tensho. Par défaut : désactivé. |
@@ -614,5 +616,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 251 cases (246 reliées à `Configuration`, 5 à un autre fichier), 31 réglages sans case.
+Compté : 252 cases (246 reliées à `Configuration`, 6 à un autre fichier), 31 réglages sans case.
 <!-- /docgen:settings-fr -->

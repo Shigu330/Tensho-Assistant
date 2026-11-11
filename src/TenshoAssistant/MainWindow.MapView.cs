@@ -1795,11 +1795,7 @@ internal sealed partial class MainWindow
             {
                 var coordinate=MapProjection.CoordinateFromPixel(mapContextPixel,map);
                 ImGui.TextDisabled(localization.Format("MapView.Cursor",MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
-                // X-86 (0.966, user request): quests not available yet, shown or hidden from the right-click menu too.
-                var contextSettings=configuration.MapView;
-                ImGui.BeginDisabled(!contextSettings.ShowQuests);
-                try{if(SettingBox("MapView.ShowLockedQuests",contextSettings.ShowLockedQuests,value=>contextSettings.ShowLockedQuests=value))SaveMapSettings();}
-                finally{ImGui.EndDisabled();}
+                // X-128 (0.1107, user capture): the box of the quests not available yet moved from here to the Quests tab below.
                 ImGui.Separator();
                 ImGui.BeginDisabled(map.TerritoryId==0);
                 try{if(ImGui.Selectable(localization.Get("MapView.Flag")))FlagFromMap(map,coordinate.X,coordinate.Y);}

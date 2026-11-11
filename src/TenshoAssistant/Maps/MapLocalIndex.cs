@@ -120,11 +120,15 @@ public sealed record MapLocalGatheringPoint(uint BaseId,string Type,int Level,st
 /// <summary>Lists of the right-click menu, by tab: quests whose giver stands on the map, gathering points of the map.</summary>
 public static class MapLocalLists
 {
-    /// <summary>Quests by journal category (sorted by name), each by level then name; completed ones only on request.</summary>
-    public static IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Quests(IEnumerable<QuestEntry> entries,MapLocalIndex index,uint mapId,bool includeComplete)
+    /// <summary>Quests by journal category (sorted by name), each by level then name; completed ones only on request. X-128 (0.1107): without
+    /// <paramref name="includeLocked"/>, the quests not available yet are left out (not started and not <see cref="QuestList.Available"/>).</summary>
+    public static IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Quests(IEnumerable<QuestEntry> entries,MapLocalIndex index,uint mapId,bool includeComplete,bool includeLocked=true)
     {
         ArgumentNullException.ThrowIfNull(entries);ArgumentNullException.ThrowIfNull(index);
-        return entries.Where(entry=>includeComplete || entry.Progress!=QuestProgress.Complete)
+        var all=entries as IReadOnlyCollection<QuestEntry> ?? entries.ToArray();
+        var links=includeLocked ? null:new QuestLinks(all);
+        return all.Where(entry=>includeComplete || entry.Progress!=QuestProgress.Complete)
+            .Where(entry=>links is null || entry.Progress!=QuestProgress.Unconfirmed || QuestList.Available(links,entry))
             .Select(entry=>index.Quest(entry.Id) is { } position && position.MapId==mapId ? new MapLocalQuest(entry,position):null).OfType<MapLocalQuest>()
             .GroupBy(item=>item.Quest.Category.Length>0 ? item.Quest.Category:"—")
             .OrderBy(group=>group.Key,StringComparer.CurrentCultureIgnoreCase)

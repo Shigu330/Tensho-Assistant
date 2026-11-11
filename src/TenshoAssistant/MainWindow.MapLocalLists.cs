@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     private string mapLocalQuestCategory="",mapLocalGatheringType="";
     // 0.328: the lists of the shown tab, rebuilt only when what they are made of changes (the menu stays open for seconds; quests and
     // gathering sources are walked in full, MapCatalog.Equivalent walks every map).
-    private (object? Entries,object? Index,uint MapId,bool Complete,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,[]);
+    private (object? Entries,object? Index,uint MapId,bool Complete,bool Locked,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,true,[]);
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Groups) mapLocalGatheringCache=(0,null,null,[]);
     private (object? Catalog,uint MapId,IReadOnlySet<uint> Ids) mapLocalEquivalentCache=(null,0,new HashSet<uint>());
     private (object? Maps,object? Index,MapLocalKind Kind,MapLocalPosition[] Rows) mapLocalCollectibleCache=(null,null,default,[]);
@@ -78,9 +78,14 @@ internal sealed partial class MainWindow
         var state=quests.State;
         if(state.Entries.Count==0){ImGui.TextDisabled(localization.Get(state.Loading ? "MapLocal.QuestsLoading":"MapLocal.QuestsNone"));return;}
         ImGui.Checkbox(localization.Get("MapLocal.ShowComplete"),ref mapLocalShowComplete);Tip("MapLocal.ShowCompleteTip");
+        // X-128 (0.1107, user capture): the box of the quests not available yet lives in this tab; it hides them from this list and from the map.
+        var settings=configuration.MapView;
+        ImGui.SameLine();
+        if(SettingBox("MapView.ShowLockedQuests",settings.ShowLockedQuests,value=>settings.ShowLockedQuests=value))SaveMapSettings();
+        var locked=settings.ShowLockedQuests;
         var cache=mapLocalQuestCache;
-        if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete)
-            mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete));
+        if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete || cache.Locked!=locked)
+            mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked));
         var groups=mapLocalQuestCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         DrawSplitView("Quest",groups,ref mapLocalQuestCategory,item=>
