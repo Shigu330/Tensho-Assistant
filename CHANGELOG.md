@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1091.0
+- Constat d'audit A078 (décision D-138 de l'utilisateur) : le README faisait 881 lignes ; la liste des fonctions (~200 lignes par langue) vieillissait et doublait l'aide du plugin. Par langue, les sections « Architecture » et « Domaines fonctionnels » deviennent une courte section « Fonctions » (aide de chaque page dans le plugin, FAQ, plan global, ARCHITECTURE) ; « Notes » et « Résumé » sont retirés. Gardés : tableau des pages produit par docgen, commandes, structure, compilation, installation, application de bureau, localisation, documents, déclaration d'IA et crédits. Le README reste un seul fichier bilingue (A079). Environ 230 et 200 lignes par langue.
+- Tests : ReadmeShort1091Tests. Verify.ps1 (agent) : 1777/1777, 0 avertissement, 0 erreur ; DLL 0.1091.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A078 (user decision D-138): the README was 881 lines; the feature list (~200 lines per language) went stale and doubled the plugin's help. Per language, the « Architecture » and « Main feature domains » sections become one short « Features » section (each page's help in the plugin, FAQ, global plan, ARCHITECTURE); « Notes » and « Summary » are removed. Kept: the page table produced by docgen, commands, structure, build, installation, desktop app, localization, documents, AI disclosure and credits. The README stays one bilingual file (A079). About 230 and 200 lines per language.
+
 ## 0.1090.0
 - Constat d'audit A080 (décision D-138 de l'utilisateur : « maintenir ce qui permet d'avoir un custom repot sinon le reste pour soumission peux etre retirer »). Vérifié avant de retirer : le dépôt personnalisé (repo.json, icône prise dans src/TenshoAssistant/images), le script de release, Verify et la CI ne lisent rien dans publish/d17. Ce dossier (brouillon de PR, manifest.toml au commit vide, copie de l'icône) ne servait qu'à une soumission au dépôt officiel : retiré (git le garde). Gardés : l'icône du plugin, repo.json, le script de release, le job CI « Build like the Dalamud repository » et le modèle de manifest.toml de PUBLISHING.
 - Tests : NoD17Draft1090Tests. Verify.ps1 (agent) : 1776/1776, 0 avertissement, 0 erreur ; DLL 0.1090.0.0. Rien à essayer en jeu.
