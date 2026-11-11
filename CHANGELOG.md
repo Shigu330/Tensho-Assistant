@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1073.0
+- Constat d'audit A043, première partie : TESTING.md gardait, après son dernier essai, environ 610 lignes du journal de vérification par version jusqu'au 0.99 (27 au 31 octobre 2026), déjà dans le CHANGELOG et dans git, sans aucune case ouverte. Cette archive est retirée ; une note dit où elle reste (historique git). Les essais, les numéros de ligne du parcours des essais (tous avant l'archive) et l'outil des essais ne changent pas. Un test vérifie la note et qu'il ne reste rien de l'ancien journal.
+- Tests : TestingArchive1073Tests. Verify.ps1 (agent) : 1756/1756, 0 avertissement, 0 erreur ; DLL 0.1073.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A043, first part: TESTING.md kept, after its last test, about 610 lines of the per-version verification journal up to 0.99 (27 to 31 October 2026), already in the CHANGELOG and in git, with no open box. That archive is removed; a note says where it stays (git history). The tests, the line numbers of the test route (all before the archive) and the test tool do not change. A test checks the note and that nothing of the old journal is left.
+
 ## 0.1072.0
 - Constat d'audit A045 : le plan global rangeait les phases 6 puis 7 tout en disant que « l'étape 7 passe avant la phase 6 », plaçait le nettoyage X-76 « après les essais en jeu » alors qu'il a été fait avant, et « étape 7 » avait plusieurs sens. Le tableau des phases gagne une colonne « État » dans ses deux langues (phases 1 à 4 faites, 5 en cours, 6 à faire en une seule campagne, 7 faite en grande partie avant la 6), « étape 7 » devient « phase 7 » partout où elle était nue, et l'ordre de X-76 dit ce qui s'est passé. Un test vérifie la colonne et l'absence d'« étape 7 » nue.
 - Tests : PhaseOrder1072Tests. Verify.ps1 (agent) : 1755/1755, 0 avertissement, 0 erreur ; DLL 0.1072.0.0. Rien à essayer en jeu.
