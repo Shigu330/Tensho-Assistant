@@ -733,18 +733,19 @@ def evidence_files():
 
 @functools.cache
 def evidence_citations():
-    """{evidence file: (code files, documents)} from the tracked files that name it (the evidence folder itself left out)."""
+    """{evidence file: (code files, documents)} from the tracked files that name it (another evidence file counts as a document;
+    the evidence index and the file itself do not, 0.1085)."""
     names = evidence_files()
     cited = {name: ([], []) for name in names}
     for path in git_files("*"):
-        if path.startswith("docs/evidence/") or not path.endswith((".cs", ".py", ".ps1", ".md", ".json", ".yml", ".csproj", ".txt")):
+        if path == "docs/evidence/README.md" or not path.endswith((".cs", ".py", ".ps1", ".md", ".json", ".yml", ".csproj", ".txt")):
             continue
         try:
             text = (ROOT / path).read_text(encoding="utf-8-sig")
         except (OSError, UnicodeDecodeError):
             continue
         for name in names:
-            if name in text:
+            if name in text and path != "docs/evidence/" + name:
                 cited[name][0 if path.startswith(CODE_ROOTS) else 1].append(path)
     return cited
 

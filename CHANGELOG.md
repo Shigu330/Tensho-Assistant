@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1085.0
+- Constat d'audit A073 (décision D-138 de l'utilisateur) : l'index de docs/evidence est déjà produit par docgen (0.1069). Six preuves n'étaient citées par aucun fichier suivi (code, tests, documents, CHANGELOG, autre preuve) : retirées (git les garde). Une citation par une autre preuve compte désormais (captures citées par leur rapport) ; l'index compte 0 preuve citée nulle part, et un test le garde à 0.
+- Tests : EvidenceCited1085Tests. Verify.ps1 (agent) : 1774/1774, 0 avertissement, 0 erreur ; DLL 0.1085.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A073 (user decision D-138): the index of docs/evidence is already produced by docgen (0.1069). Six evidence files were cited by no tracked file (code, tests, documents, CHANGELOG, other evidence): removed (git keeps them). A citation from another evidence file now counts (captures cited by their report); the index counts 0 evidence cited nowhere, and a test keeps it at 0.
+
 ## 0.1084.0
 - Constat d'audit A060 (décision D-138 de l'utilisateur) : les tampons « état au 0.xxx » écrits à la main dans les documents vivants vieillissaient à la version suivante. Ils deviennent des dates (« relu contre le code le … »), jamais une version ; les renvois à l'historique git nomment le commit. Le contrôle de docgen qui refuse une version écrite à la main reconnaît aussi « state at / état au » et couvre ARCHITECTURE, ROADMAP, PROJECT, PUBLISHING, REFERENCES et G-PROPOSALS.
 - Tests : VersionStamps1084Tests. Verify.ps1 (agent) : 1773/1773, 0 avertissement, 0 erreur ; DLL 0.1084.0.0. Rien à essayer en jeu.
