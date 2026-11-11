@@ -4,7 +4,8 @@ internal static class ChangelogVoice1061Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
-    private static readonly string[] Phrases = ["at your request","your choice","your decision","your request","your agreement","your answer","you asked"];
+    private static readonly string[] Phrases = ["at your request","your choice","your decision","your request","your agreement","your answer","you asked",
+        "your report","tonight","your go-ahead","your harvest","your notes from","your capture"];
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [

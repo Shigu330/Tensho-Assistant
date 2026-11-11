@@ -11,7 +11,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 <!-- docgen:evidence -->
 | Evidence · Preuve | Code and tests · Code et tests | Documents |
 |---|---|---|
-| [0.1004-discoveries-check.md](0.1004-discoveries-check.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs` | `CHANGELOG.md` |
+| [0.1004-discoveries-check.md](0.1004-discoveries-check.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs` | `CHANGELOG.md` |
 | [0.1006-submarine-functions.md](0.1006-submarine-functions.md) | `src/TenshoAssistant/FreeCompany/SubmarineVoyageProbe.Dalamud.cs` | `CHANGELOG.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING-ROUTE.md` |
 | [0.1009-dalamud-api16-watch.md](0.1009-dalamud-api16-watch.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
@@ -253,9 +253,9 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.980-beast-teams.md](0.980-beast-teams.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `src/TenshoAssistant/MainWindow.Beastmaster.cs` | — |
 | [0.99.0-consigneur-probe.log](0.99.0-consigneur-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | — |
-| [0.99.0-crystal-probe.log](0.99.0-crystal-probe.log) | — | `CHANGELOG.md` |
+| [0.99.0-crystal-probe.log](0.99.0-crystal-probe.log) | `tests/TenshoAssistant.Tests/Evidence1069Tests.cs` | `CHANGELOG.md` |
 | [0.99.0-maelstrom-probe.log](0.99.0-maelstrom-probe.log) | — | — |
-| [craft-log-api-probe.log](craft-log-api-probe.log) | — | — |
+| [craft-log-api-probe.log](craft-log-api-probe.log) | `tests/TenshoAssistant.Tests/Evidence1069Tests.cs` | — |
 | [x115-client-diff-7.57-7.58.md](x115-client-diff-7.57-7.58.md) | — | — |
 | [x116-client-placements.md](x116-client-placements.md) | `tools/ClientSnapshot/Program.cs`, `tools/README.md`, `tools/client-snapshot.py` | — |
 | [x118-desktop-lexicon.png](x118-desktop-lexicon.png) | — | — |
@@ -271,7 +271,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x76-9-comparison.md](x76-9-comparison.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
+| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
 
-Counted · compté : 261 files · fichiers ; 194 cited by the code or the tests · citées par le code ou les tests ; 11 cited nowhere · citées nulle part.
+Counted · compté : 261 files · fichiers ; 196 cited by the code or the tests · citées par le code ou les tests ; 10 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
