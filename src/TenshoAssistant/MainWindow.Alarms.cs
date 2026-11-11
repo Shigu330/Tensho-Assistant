@@ -468,7 +468,7 @@ internal sealed partial class MainWindow
     {
         var options=configuration.AlarmOptions??=new();
         var lead=options.LeadMinutes;var sound=options.Sound;var play=options.PlaySound;var chat=options.Chat;var mute=options.MuteInDuties;var changed=false;
-        var useGame=options.UseGameAlarms;var gameWeather=options.GameIncludeWeather;var muteChat=options.MuteChatInDuties;
+        var useGame=options.UseGameAlarms;var gameWeather=options.GameIncludeWeather;var gameDiscord=options.GameAlarmsToDiscord;var muteChat=options.MuteChatInDuties;
         // 0.324: « ↺ » after each option.
         var defaults=DefaultConfiguration.AlarmOptions;
         // X-76 H3 (0.914): nothing is written into the saved options before their save (a failed save could not bring them back).
@@ -514,6 +514,9 @@ internal sealed partial class MainWindow
             ImGui.Indent();
             changed|=ImGui.Checkbox(localization.Get("Alarms.GameWeather"),ref gameWeather);Tip("Advanced.GameWeatherTip");
             if(DefaultButton("AlarmGameWeather",gameWeather!=defaults.GameIncludeWeather)){gameWeather=defaults.GameIncludeWeather;changed=true;}
+            // D-102 (X-122, 0.1042): Discord for the alarms copied into the game, unticked by default.
+            changed|=ImGui.Checkbox(localization.Get("Alarms.GameDiscord"),ref gameDiscord);Tip("Alarms.GameDiscordTip");
+            if(DefaultButton("AlarmGameDiscord",gameDiscord!=defaults.GameAlarmsToDiscord)){gameDiscord=defaults.GameAlarmsToDiscord;changed=true;}
             ImGui.Unindent();
         }
         // 0.366 (g, C-10): duty ready alert, saved on its own (kept when the options above are saved).
@@ -531,7 +534,7 @@ internal sealed partial class MainWindow
         // a copy keeps it with every other field (duty ready alert, automatic alarms, and any field added later).
         var next=configuration.AlarmOptions.Copy();
         next.LeadMinutes=Math.Clamp(lead,0,1440);next.Sound=Math.Clamp(sound,0,5);next.PlaySound=play;next.Chat=chat;next.MuteInDuties=mute;next.MuteChatInDuties=muteChat;
-        next.UseGameAlarms=useGame;next.GameIncludeWeather=gameWeather;next.SnoozeMinutes=Math.Clamp(snooze,1,1440);next.RingOnTime=onTime;
+        next.UseGameAlarms=useGame;next.GameIncludeWeather=gameWeather;next.GameAlarmsToDiscord=gameDiscord;next.SnoozeMinutes=Math.Clamp(snooze,1,1440);next.RingOnTime=onTime;
         SaveAlarmOptions(next);
     }
 

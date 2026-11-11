@@ -98,7 +98,7 @@ internal static class SettingRows915Tests
     {
         // The alarm options are edited on a copy and saved together (X-76 H3), several rows greyed by the others.
         "MainWindow.Alarms.cs|play","MainWindow.Alarms.cs|chat","MainWindow.Alarms.cs|onTime","MainWindow.Alarms.cs|mute",
-        "MainWindow.Alarms.cs|muteChat","MainWindow.Alarms.cs|useGame","MainWindow.Alarms.cs|gameWeather",
+        "MainWindow.Alarms.cs|muteChat","MainWindow.Alarms.cs|useGame","MainWindow.Alarms.cs|gameWeather","MainWindow.Alarms.cs|gameDiscord",
         // Ticks in saved lists (one entry per achievement, tune, home line or tile, reminder row), not on/off settings.
         "MainWindow.AchievementProgress.cs|tracked","MainWindow.OrchestrionPlayer.cs|favorite","MainWindow.HomeToday.cs|shown",
         "MainWindow.Reminders.cs|inBar","MainWindow.Reminders.cs|toDiscord",

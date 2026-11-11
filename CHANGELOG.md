@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1042.0
+- Plan global, X-122 : Alarmes copiées dans la liste du jeu et Discord (X-122, décision D-102 de l'utilisateur du 2026-11-10) : nouvelle case « Envoyer aussi sur Discord » sous « Créer aussi les alarmes dans le jeu », décochée par défaut. Décochée, une alarme copiée dans le jeu sonne seulement dans le jeu ; cochée, elle part aussi sur Discord (webhook activé et case Discord de l'alarme cochée), comme avant. Changement de comportement : avant, ces alarmes partaient toujours sur Discord.
+- Tests : GameAlarmDiscord1042Tests. Verify.ps1 (agent) : 1703/1703, 0 avertissement, 0 erreur ; DLL 0.1042.0.0. Non validé en jeu.
+### English
+- Alarms copied into the game's list and Discord (X-122, user decision D-102 of 2026-11-10): new box « Also send to Discord » under « Also create the alarms in the game », unticked by default. Unticked, an alarm copied into the game rings in the game only; ticked, it is also sent to Discord (webhook on and the alarm's Discord box ticked), as before. Behaviour change: before, these alarms were always sent to Discord.
+
 ## 0.1041.0
 - Plan global, X-112 : Carte, repères au bord pour les points de récolte à horaire (X-112, constat n° 0 de l'audit des tests) : l'accès du personnage au point (tome lu, niveau) se lit désormais par le même chemin que les info-bulles de la carte, qui ne cherche jamais un lieu de pêche comme un point de récolte. Avant, un lieu de pêche à horaire pouvait être lu comme le point de récolte de même numéro, et son repère au bord masqué ou montré à tort. Le test qui gardait cet appel comme exception nommée n'en permet plus aucune.
 - Tests : FishingWiringTests. Verify.ps1 (agent) : 1702/1702, 0 avertissement, 0 erreur ; DLL 0.1041.0.0. Non validé en jeu.

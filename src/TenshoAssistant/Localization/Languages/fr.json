@@ -1508,6 +1508,8 @@
     "UseGame": "Créer aussi les alarmes dans le jeu (commande /alarm)",
     "UseGameHelp": "Les alarmes « chaque jour ET » sont ajoutées à la fenêtre « Alarmes » du jeu avec sa propre commande (/alarm, alias /alerte) : nom, et rp HHmm, rappel (60 min au plus), son et silencieux en mission. Le jeu sonne alors lui-même ; Tensho ne sonne plus pour celles-là. 30 alarmes au plus dans le jeu.",
     "GameWeather": "Inclure les alarmes avec condition météo (le jeu ne vérifie pas la météo)",
+    "GameDiscord": "Envoyer aussi sur Discord",
+    "GameDiscordTip": "Les alarmes copiées dans le jeu sonnent dans le jeu. Cochée : elles sont aussi envoyées sur Discord (webhook activé et case Discord de l'alarme cochée). Décochée : elles restent dans le jeu seulement.\nPar défaut : désactivé.",
     "GameQueued": "{0} envoyée(s) au jeu.",
     "GameSkippedWeather": "{0} avec condition météo gardée(s) dans Tensho.",
     "SendGroup": "Envoyer au jeu",

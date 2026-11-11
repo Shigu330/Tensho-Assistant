@@ -67,6 +67,8 @@ public sealed class AlarmSettings
     // the game not checking the weather.
     public bool UseGameAlarms { get; set; }
     public bool GameIncludeWeather { get; set; }
+    // D-102 (X-122, 0.1042, user's choice of 2026-11-10): alarms copied into the game's list still go to Discord only when ticked; off by default.
+    public bool GameAlarmsToDiscord { get; set; }
     // Delay between two « /alarm » commands sent to the game (Settings › Advanced, 250–5000 ms).
     public int GameCommandDelayMs { get; set; } = 500;
     // 0.366 (g, C-10): a chat line and the alarm sound when a duty is ready (Duty Finder pop); off by default.

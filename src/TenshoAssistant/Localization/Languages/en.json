@@ -1508,6 +1508,8 @@
     "UseGame": "Also create the alarms in the game (/alarm command)",
     "UseGameHelp": "« Every ET day » alarms are added to the game's « Alarms » window with its own command (/alarm): name, et rp HHmm, reminder (60 min at most), sound and mute in duties. The game then rings them; Tensho no longer does for those. 30 alarms at most in the game.",
     "GameWeather": "Include weather-conditioned alarms (the game does not check the weather)",
+    "GameDiscord": "Also send to Discord",
+    "GameDiscordTip": "Alarms copied into the game ring in the game. Ticked: they are also sent to Discord (webhook on and the alarm's Discord box ticked). Unticked: they stay in the game only.\nDefault: off.",
     "GameQueued": "{0} sent to the game.",
     "GameSkippedWeather": "{0} with a weather condition kept in Tensho.",
     "SendGroup": "Send to the game",

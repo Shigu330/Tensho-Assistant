@@ -175,9 +175,10 @@ internal sealed class AlarmService : IDisposable
         var changed = AlarmSchedule.RemoveExpired(alarms, now) > 0;
         foreach (var alarm in alarms)
         {
-            // Alarms copied into the game ring there (the game's own sound and message), not twice; only Discord still gets them (R-12).
+            // Alarms copied into the game ring there (the game's own sound and message), not twice; Discord still gets them only when
+            // « Also send to Discord » is ticked (D-102, X-122, 0.1042; before, they always went to Discord, R-12).
             var inGame = alarm.GameName.Length > 0;
-            var discord = toDiscord is not null && (wantsDiscord?.Invoke(alarm) ?? false);
+            var discord = toDiscord is not null && (!inGame || settings.GameAlarmsToDiscord) && (wantsDiscord?.Invoke(alarm) ?? false);
             if (inGame && !discord) continue;
             // 0.331: a weather condition is not checked before the weather catalogue is known; the occurrence is left for later, not skipped.
             if (catalog is null && alarm.Weathers.Count + alarm.PreviousWeathers.Count > 0) continue;
