@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1079.0
+- Constat d'audit A043, fin : dans TESTING, le titre « 0.537 : s'effacer devant les fenêtres du jeu » était suivi de ses quatre essais puis d'environ 950 lignes d'essais à partir de 0.538, qui semblaient lui appartenir. Un titre ouvre maintenant ces essais (chacun porte sa version). Les cases cochées restent : l'outil des essais les coche avant une release et elles sont la trace publique de ce qui a été validé ; les cases « rien à faire » sont déjà comptées à part par l'outil. Un test vérifie l'ordre des titres.
+- Tests : TestingHeading1079Tests. Verify.ps1 (agent) : 1762/1762, 0 avertissement, 0 erreur ; DLL 0.1079.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A043, end: in TESTING, the heading « 0.537: step aside for the game's windows » was followed by its four checks and then by about 950 lines of checks from 0.538 on, which seemed to belong to it. A heading now opens those checks (each one carries its version). The ticked boxes stay: the test tool ticks them before a release and they are the public record of what was validated; the « nothing to do » boxes are already counted apart by the tool. A test checks the order of the headings.
+
 ## 0.1078.0
 - Constat d'audit A070, en partie : le CHANGELOG avait trois versions avec deux titres chacune (0.59.0, 0.50.0, 0.49.0), le second vide (ou les deux). Les titres vides en double sont retirés ; un test garde chaque titre de version unique. Le découpage du CHANGELOG, que lit le script de release, reste ouvert.
 - Tests : ChangelogHeadings1078Tests. Verify.ps1 (agent) : 1761/1761, 0 avertissement, 0 erreur ; DLL 0.1078.0.0. Rien à essayer en jeu.
