@@ -105,11 +105,11 @@ internal static class GardenJournalTests
             Check(GardenJournal.At(beds,"Mist 1-1").Length==0 && GardenJournal.At(beds,null).Length==0 && GardenJournal.At(null,"Mist 1-1").Length==0,"none, or unknown place");
             Check(GardenJournal.At(beds,"Ma note").Length==1,"a place written alone");
         }),
-        ("Garden care: several beds are not guessed, one is acted on; the capture stays for the harvest",() =>
+        ("Garden care: several beds are not guessed, one is acted on; no capture line any more (#36, 0.1110)",() =>
         {
             var view=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Garden.cs"));
             Check(view.Contains("if(here.Length>1){ChatNotice?.Invoke(localization.Get(\"Garden.CareSeveral\"));return;}"),"several: said, nothing changed");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs")).Contains("Garden chat capture"),"the harvest line is still to capture");
+            Check(!File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs")).Contains("Garden chat capture"),"tending and harvest recognized: the capture line is gone");
         }),
         // From GardenHarvest978Tests: #36 (0.978, docs/evidence/0.978-garden-harvest.md): a harvest is an item gain line while a garden bed is the target.
         ("Garden harvest 978: gain line on a bed only, no sender, wired to the journal",() =>

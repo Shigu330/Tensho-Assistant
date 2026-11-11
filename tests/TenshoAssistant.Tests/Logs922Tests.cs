@@ -21,7 +21,8 @@ internal static class Logs922Tests
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
             Check(Read("Duties/DutyFinderReader.Dalamud.cs").Contains("if (!failureLogged) { failureLogged = true;") && Read("Items/ItemHoverReader.Dalamud.cs").Contains("if(!failureLogged){failureLogged=true;")
                 && Read("Maps/MapLiveReader.Dalamud.cs").Contains("if(!positionFailureLogged){positionFailureLogged=true;"),"warn once");
-            Check(Read("Reminders/GardenChatWatcher.Dalamud.cs").Contains("if(developer?.Invoke()==true && sender.Length==0") && Read("Items/GcSupplyReader.Dalamud.cs").Contains("if(developer?.Invoke()==true)log.Information(\"Grand Company supply window")
+            // #36 (0.1110): the garden's capture is gone (GardenCapture1110Tests).
+            Check(Read("Items/GcSupplyReader.Dalamud.cs").Contains("if(developer?.Invoke()==true)log.Information(\"Grand Company supply window")
                 && Read("Market/RetainerSalesReader.Dalamud.cs").Contains("developer?.Invoke() == true && capture != lastRaw"),"developer captures");
         }),
     ];

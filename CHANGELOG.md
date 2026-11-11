@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1110.0
+- Jardin : le mode développeur ne recopie plus dans le journal de Dalamud chaque ligne du chat lue dans un quartier résidentiel ; l'entretien et la récolte sont reconnus (0.616, 0.978) et ce qu'une récolte donne reste dans les lignes de gains d'objets (#36).
+- Tests : GardenCapture1110Tests. Verify.ps1 (agent) : 1814/1814, 0 avertissement, 0 erreur ; DLL 0.1110.0.0. Rien à essayer en jeu.
+### English
+- Garden: developer mode no longer copies every chat line read in a housing ward to the Dalamud log; tending and harvesting are recognized (0.616, 0.978) and what a harvest gives stays in the item gain lines (#36). Issues: #36.
+
 ## 0.1109.0
 - Plan global, X-130 : Jardin : sous chaque parcelle plantée d'un potager du journal, ce qu'elle peut donner (graines possibles avec la voisine avec laquelle elle croise : la première compatible déjà là, à droite, en bas, en haut, à gauche) ; les graines pas possédées ou souhaitées mises en avant ; une graine inconnue des paires est dite, jamais devinée ; source citée (wiki Console Games et paires de nick75g/FFXIV-Crossbreed-Helper).
 - Tests : GardenForecast1109Tests. Verify.ps1 (agent) : 1813/1813, 0 avertissement, 0 erreur ; DLL 0.1109.0.0. Non validé en jeu.

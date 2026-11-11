@@ -31,13 +31,11 @@ internal sealed class GardenChatWatcher : IDisposable
     private DateTimeOffset chosenAt,nextPoll;
 
     /// <param name="planted">Event, seed item when known, and the place (« zone ward-plot ») when readable.</param>
-    // X-76 H9 (0.922): developer captures are logged in developer mode only.
-    private readonly Func<bool>? developer;
     // #36 (0.978): the target's object id (0: none), to see a harvest.
     private readonly Func<uint>? target;
     private DateTimeOffset lastHarvest;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<bool>? developer=null,Func<uint>? target=null)
-    {this.developer=developer;this.target=target;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null)
+    {this.target=target;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
@@ -111,7 +109,7 @@ internal sealed class GardenChatWatcher : IDisposable
         try
         {
             var sender=message.Sender.TextValue.Trim();var text=message.Message.TextValue;
-            if(developer?.Invoke()==true && sender.Length==0 && InHousing())log.Information("Garden chat capture: [{0}] {1}",(int)message.LogKind,text);
+            // #36 (0.1110): the capture of every housing chat line is gone, tending and harvesting being recognized (0.616, 0.978).
             // 0.997 (review): one harvest can print several gain lines (crop, seeds): the first one counts, the others within 5 s are the same harvest.
             if(target is not null && InHousing() && GardenChat.IsHarvest((int)message.LogKind,sender,target()))
             {
