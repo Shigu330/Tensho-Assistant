@@ -9,7 +9,7 @@ internal static class ProjectLinks1063Tests
 
     private static readonly string[] Documents = ["docs/project/PROJECT.md","docs/project/ROADMAP.md","docs/project/USER-REQUESTS.md",
         "docs/project/MAP-PROPOSALS.md","docs/project/CRAFT-GATHER-PROPOSALS.md","docs/project/DECISIONS.md",
-        "docs/project/BACKLOG.md","docs/project/GAPS.md"];
+        "docs/project/BACKLOG.md","docs/project/GAPS.md","docs/project/REFERENCES.md"];
 
     private static HashSet<string> Tracked()
     {

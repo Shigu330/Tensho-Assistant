@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1065.0
+- Constats d'audit A054 et A075 (archive de REFERENCES) : l'archive française des fiches de référence avait une quarantaine de liens vers des fiches d'objectif qui ne vivent que sur le disque du mainteneur (liens morts sur GitHub). Ces liens deviennent de simples noms, et la note d'en-tête de l'archive dit où sont ces fiches. REFERENCES entre dans le test des liens morts de 0.1063.
+- Tests : ReferencesArchive1065Tests. Verify.ps1 (agent) : 1747/1747, 0 avertissement, 0 erreur ; DLL 0.1065.0.0. Rien à essayer en jeu.
+### English
+- Audit findings A054 and A075 (REFERENCES archive): the French archive of the reference records had about forty links to goal sheets that live only on the maintainer's disk (dead links on GitHub). These links become plain names, and the archive's header note says where those sheets are. REFERENCES joins the dead link test of 0.1063.
+
 ## 0.1064.0
 - Constats d'audit A075 et A025 (BACKLOG et GAPS) : ces deux documents citaient encore des fichiers qui ne vivent que sur le disque du mainteneur (fiche d'objectif du moment, fichier d'état, fiches d'étude), liens morts sur GitHub. Ils nomment maintenant les notes du mainteneur (hors du dépôt), dans les deux langues. Le test des liens de 0.1063 couvre aussi ces deux documents (le fichier de licence d'un autre plugin, cité dans GAPS, est mis à part).
 - Tests : BacklogLinks1064Tests. Verify.ps1 (agent) : 1746/1746, 0 avertissement, 0 erreur ; DLL 0.1064.0.0. Rien à essayer en jeu.
