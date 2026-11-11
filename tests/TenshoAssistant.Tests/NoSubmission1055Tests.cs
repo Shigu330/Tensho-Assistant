@@ -8,12 +8,6 @@ internal static class NoSubmission1055Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Submission: BACKLOG follows DEC-039 in both halves",() =>
-        {
-            var backlog = Read("docs/project/BACKLOG.md");
-            Check(!backlog.Contains("possible D17 submission") && !backlog.Contains("soumission D17 éventuelle"),"BACKLOG no longer offers a D17 submission");
-            Check(backlog.Contains("no submission since DEC-039") && backlog.Contains("pas de soumission depuis DEC-039"),"BACKLOG points to DEC-039 in both halves");
-        }),
         ("Submission: PUBLISHING opens with DEC-039 in both halves",() =>
         {
             var publishing = Read("docs/project/PUBLISHING.md");

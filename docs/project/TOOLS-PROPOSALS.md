@@ -159,7 +159,7 @@ Value and size are the audit's estimates. « Probe »: a read of the game or an 
 - **Value**: medium; main file: `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **What the player gets**: In a shared free company channel, each member reads the alarm time in their own time zone (and « in 5 minutes »). Your messages can also give the zone, the item and the Eorzea time.
 - **How, size, dependencies**: New tags [discordtime] (<t:unix:t>), [relative] (<t:unix:R>), [zone], [objet] and [et]. The names are resolved on the framework thread when the alarm rings, then passed to the notifier. [time] does not change. Format tests. Size S. Dependencies: none. Probe: none (Discord syntax). Decision: change the default template (recommended: no, keep the current one).
-- **Source**: Alarms/DiscordWebhook.cs:116: [time] is your local time in HH:mm format. Only tags: [label], [minutes], [time], [character]. TenshoAlarm already keeps TerritoryId, ItemId and EtMinute (Alarms/TenshoAlarm.cs:23-28). USER-REQUESTS.md R-12: « see more if possible or interesting ».
+- **Source**: Alarms/DiscordWebhook.cs:116: [time] is your local time in HH:mm format. Only tags: [label], [minutes], [time], [character]. TenshoAlarm already keeps TerritoryId, ItemId and EtMinute (Alarms/TenshoAlarm.cs:23-28). USER-REQUESTS R-12 (removed in 0.1088, git history): « see more if possible or interesting ».
 
 ## T19 — Alarms: edit the name and the time, and « Remind me again after 5 min »
 
@@ -206,7 +206,7 @@ Value and size are the audit's estimates. « Probe »: a read of the game or an 
 - **Value**: medium; main file: `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **What the player gets**: Vessel returns go to the free company channel, your gathering alarms to your private channel.
 - **How, size, dependencies**: Optional address per category (empty = main address). Each one is masked, checked by IsValidUrl, never written in the logs nor in the Diagnostics report. Queue and rate pause specific to each address; « Send a test » per address. Size M. Dependencies: none. Probe: none. Decision: number of addresses (recommended: one per existing category).
-- **Source**: Alarms/DiscordWebhook.cs:14-30: a single address for all categories. USER-REQUESTS.md R-12 puts « several webhooks » to study.
+- **Source**: Alarms/DiscordWebhook.cs:14-30: a single address for all categories. R-12 (ROADMAP; its wording was in USER-REQUESTS, removed in 0.1088) puts « several webhooks » to study.
 
 ## T25 — Gear: several named plans per job
 
@@ -407,7 +407,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Dans un salon partagé de compagnie libre, chaque membre lit l'heure de l'alarme dans son propre fuseau (et « dans 5 minutes »). Vos messages peuvent aussi donner la zone, l'objet et l'heure d'Éorzéa.
 - **Comment, taille, dépendances** : Nouvelles balises [discordtime] (<t:unix:t>), [relative] (<t:unix:R>), [zone], [objet] et [et]. Les noms sont résolus sur le thread du framework quand l'alarme sonne, puis passés au notificateur. [time] ne change pas. Tests de Format. Taille S. Dépendances : aucune. Sonde : aucune (syntaxe de Discord). Décision : changer le modèle par défaut (recommandé : non, garder l'actuel).
-- **Source** : Alarms/DiscordWebhook.cs:116 : [time] est votre heure locale au format HH:mm. Seules balises : [label], [minutes], [time], [character]. TenshoAlarm garde déjà TerritoryId, ItemId et EtMinute (Alarms/TenshoAlarm.cs:23-28). USER-REQUESTS.md R-12 : « voir plus si possible ou intéressant ».
+- **Source** : Alarms/DiscordWebhook.cs:116 : [time] est votre heure locale au format HH:mm. Seules balises : [label], [minutes], [time], [character]. TenshoAlarm garde déjà TerritoryId, ItemId et EtMinute (Alarms/TenshoAlarm.cs:23-28). USER-REQUESTS R-12 (retiré en 0.1088, historique git) : « voir plus si possible ou intéressant ».
 
 ## T19 — Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min »
 
@@ -454,7 +454,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/Alarms/DiscordWebhook.cs`.
 - **Ce que le joueur obtient** : Les retours de vaisseaux partent dans le salon de la compagnie libre, vos alarmes de récolte dans votre salon privé.
 - **Comment, taille, dépendances** : Adresse facultative par catégorie (vide = adresse principale). Chacune est masquée, vérifiée par IsValidUrl, jamais écrite dans les journaux ni dans le rapport de Diagnostics. File et pause de débit propres à chaque adresse ; « Envoyer un test » par adresse. Taille M. Dépendances : aucune. Sonde : aucune. Décision : nombre d'adresses (recommandé : une par catégorie existante).
-- **Source** : Alarms/DiscordWebhook.cs:14-30 : une seule adresse pour toutes les catégories. USER-REQUESTS.md R-12 met « plusieurs webhooks » à étudier.
+- **Source** : Alarms/DiscordWebhook.cs:14-30 : une seule adresse pour toutes les catégories. R-12 (ROADMAP ; son libellé était dans USER-REQUESTS, retiré en 0.1088) met « plusieurs webhooks » à étudier.
 
 ## T25 — Équipement : plusieurs plans nommés par job
 

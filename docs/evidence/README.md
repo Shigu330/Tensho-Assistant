@@ -48,18 +48,18 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.203-gathering-jobs.md](0.203-gathering-jobs.md) | `src/TenshoAssistant/Alarms/TenshoAlarm.cs` | `CHANGELOG.md`, `docs/project/CRAFT-GATHER-PROPOSALS.md` |
 | [0.205-alarm-command.md](0.205-alarm-command.md) | `src/TenshoAssistant/Alarms/GameAlarmCommand.cs` | `CHANGELOG.md`, `docs/project/TOOLS-PROPOSALS.md` |
 | [0.211-event-icons.md](0.211-event-icons.md) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `CHANGELOG.md`, `docs/evidence/0.665-quest-icon-variants.md`, `docs/project/MAP-PROPOSALS.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
-| [0.224-bountiful-base.md](0.224-bountiful-base.md) | `src/TenshoAssistant/Gathering/BountifulEstimate.cs`, `src/TenshoAssistant/MainWindow.GatheringGp.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/GpOptimizerTests.cs` | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/BACKLOG.md`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
+| [0.224-bountiful-base.md](0.224-bountiful-base.md) | `src/TenshoAssistant/Gathering/BountifulEstimate.cs`, `src/TenshoAssistant/MainWindow.GatheringGp.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/GpOptimizerTests.cs` | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.226-fishing-spot-coordinates.md](0.226-fishing-spot-coordinates.md) | — | `CHANGELOG.md`, `docs/project/ROADMAP.md` |
 | [0.231-teamcraft-bite-times.md](0.231-teamcraft-bite-times.md) | — | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
-| [0.246-cache-audit.md](0.246-cache-audit.md) | — | `CHANGELOG.md`, `docs/project/ARCHITECTURE.md`, `docs/project/DECISIONS.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/USER-REQUESTS.md` |
-| [0.246-r05-window-order.md](0.246-r05-window-order.md) | — | `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md`, `docs/project/USER-REQUESTS.md` |
+| [0.246-cache-audit.md](0.246-cache-audit.md) | — | `CHANGELOG.md`, `docs/project/ARCHITECTURE.md`, `docs/project/DECISIONS.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
+| [0.246-r05-window-order.md](0.246-r05-window-order.md) | — | `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.270-universalis-listings.md](0.270-universalis-listings.md) | `src/TenshoAssistant/Market/MarketBoard.cs`, `tests/TenshoAssistant.Tests/Program.cs` | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.278-triad-ex-cards.md](0.278-triad-ex-cards.md) | `src/TenshoAssistant/Collections/CollectionReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/Program.cs` | `CHANGELOG.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.283-quest-journal-sections.md](0.283-quest-journal-sections.md) | `src/TenshoAssistant/Quests/QuestService.cs` | `CHANGELOG.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.285-quest-start-cities.md](0.285-quest-start-cities.md) | `src/TenshoAssistant/MainWindow.Quests.cs`, `src/TenshoAssistant/Quests/QuestStartCities.cs` | `CHANGELOG.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.286-quest-alternatives.md](0.286-quest-alternatives.md) | `src/TenshoAssistant/Quests/QuestAlternatives.cs` | `CHANGELOG.md`, `docs/project/REFERENCES.md`, `docs/project/ROADMAP.md` |
 | [0.292-draw-times.md](0.292-draw-times.md) | — | `CHANGELOG.md`, `docs/project/ITEMS-PROPOSALS.md`, `docs/project/MAP-PROPOSALS.md`, `docs/project/REFERENCES.md` |
-| [0.295-fcc-shops.md](0.295-fcc-shops.md) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/BACKLOG.md`, `docs/project/REFERENCES.md` |
+| [0.295-fcc-shops.md](0.295-fcc-shops.md) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `CHANGELOG.md`, `docs/project/REFERENCES.md` |
 | [0.300-calendar-resets.md](0.300-calendar-resets.md) | `src/TenshoAssistant/Reminders/ResetSchedule.cs` | `CHANGELOG.md`, `docs/evidence/0.333-ehcatl-probe.md`, `docs/project/REFERENCES.md`, `docs/project/TOOLS-PROPOSALS.md` |
 | [0.307-fc-voyages.md](0.307-fc-voyages.md) | — | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/REFERENCES.md`, `docs/project/TOOLS-PROPOSALS.md` |
 | [0.309-submarine-routes.md](0.309-submarine-routes.md) | `src/TenshoAssistant/FreeCompany/VoyagePlanner.cs` | `CHANGELOG.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md`, `docs/project/audits/0.874-probe-coverage.md` |
@@ -139,7 +139,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.585-classjob-empty-rows.md](0.585-classjob-empty-rows.md) | — | `CHANGELOG.md` |
 | [0.586-flight-sets.md](0.586-flight-sets.md) | `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | `CHANGELOG.md` |
 | [0.596-map-label-orientation.md](0.596-map-label-orientation.md) | `src/TenshoAssistant/Maps/MapLabels.cs`, `tests/TenshoAssistant.Tests/MapLabels596Tests.cs` | `CHANGELOG.md` |
-| [0.600-competitive-inventory.md](0.600-competitive-inventory.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/project/ARCHITECTURE.md`, `docs/project/DECISIONS.md` |
+| [0.600-competitive-inventory.md](0.600-competitive-inventory.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs`, `tests/TenshoAssistant.Tests/CompetitiveFolded1087Tests.cs` | `docs/project/ARCHITECTURE.md`, `docs/project/DECISIONS.md` |
 | [0.608-universalis-batch.md](0.608-universalis-batch.md) | `src/TenshoAssistant/Market/MarketService.cs`, `tests/TenshoAssistant.Tests/MarketServiceTests.cs` | `CHANGELOG.md`, `docs/evidence/0.710-market-pace.md` |
 | [0.628-quest-target-on-world-map.md](0.628-quest-target-on-world-map.md) | `src/TenshoAssistant/Maps/MapCatalog.cs` | — |
 | [0.631-region-zone-images.md](0.631-region-zone-images.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | — |
@@ -152,7 +152,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.649-spearfishing-sources.md](0.649-spearfishing-sources.md) | `src/TenshoAssistant/Gathering/GatheringCatalogLoader.Dalamud.cs` | — |
 | [0.650-gp-while-gathering.md](0.650-gp-while-gathering.md) | — | `docs/evidence/0.728-gather-next.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.651-company-actions.md](0.651-company-actions.md) | `src/TenshoAssistant/Reminders/CompanyBenefits.cs` | — |
-| [0.652-leve-markers.md](0.652-leve-markers.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | `docs/evidence/0.653-markers-during-journal-request.md`, `docs/project/BACKLOG.md` |
+| [0.652-leve-markers.md](0.652-leve-markers.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | `docs/evidence/0.653-markers-during-journal-request.md` |
 | [0.653-markers-during-journal-request.md](0.653-markers-during-journal-request.md) | `src/TenshoAssistant/Maps/MapLabels.cs` | `docs/evidence/0.654-leve-area-memory.md` |
 | [0.654-leve-area-memory.md](0.654-leve-area-memory.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs` | `docs/evidence/0.793-game-leve-markers.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.656-gp-alert-teleport.md](0.656-gp-alert-teleport.md) | `src/TenshoAssistant/Gathering/RegenTick.cs`, `src/TenshoAssistant/Gathering/RegenTickReader.Dalamud.cs` | — |

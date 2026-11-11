@@ -173,12 +173,12 @@ References: docs/project/ARCHITECTURE.md (Item sources), CHANGELOG.md 0.123–0.
 ID: DEC-012
 Timestamp: 2026-11-01 Europe/Brussels (before 0.224)
 Problem: Fix what remains to be done before the D17 publication and what will not be done.
-Evidence: Review of the open points with the user (docs/project/BACKLOG.md, "Review of open points (2026-11-01)"); sources checked per point (GatheringOptimizer MIT, frozen_rabbit_tome without licence, FccShop sheet, /alarm subcommands).
+Evidence: Review of the open points with the user (BACKLOG, "Review of open points (2026-11-01)", removed in 0.1088, git history); sources checked per point (GatheringOptimizer MIT, frozen_rabbit_tome without licence, FccShop sheet, /alarm subcommands).
 Options: Handle everything before publication; publish as is; sort point by point.
 Decision: Do: estimated Bountiful bonus (0.224), glamour dresser and armoire in "owned" (0.235–0.240), free company shops (0.295), quest icons 71141 / 71151 only with an in-game reading. Do not do: Fashion Report score (no data, it would be invented), deleting a game alarm from Tensho (DeleteAlarm not proven, risk of erasing the wrong one), remaining unknown sources (unknown documented). Dropped: injecting text into the game's native tooltip.
 Reason: Deliver only what is proven by game data or a cited source; avoid risky actions on the game state.
 Consequences: The "Do not do" items are not reopened without a new source or a new request. The additions to the 17 tools come after publication, case by case.
-References: docs/project/BACKLOG.md, the maintainer's notes (not in the repository) ("PLAN BEFORE PUBLICATION"), CHANGELOG.md 0.224, 0.235–0.240, 0.295; publication setting replaced by DEC-039 (custom repository, no submission)
+References: BACKLOG (removed in 0.1088, git history), the maintainer's notes (not in the repository) ("PLAN BEFORE PUBLICATION"), CHANGELOG.md 0.224, 0.235–0.240, 0.295; publication setting replaced by DEC-039 (custom repository, no submission)
 
 ID: DEC-013
 Timestamp: 2026-11-01 Europe/Brussels (0.236)
@@ -198,7 +198,7 @@ Options: A. automatic fade (Tensho window almost transparent when a game window 
 Decision: C, user decision; R-05 closed with no code.
 Reason: A real display order is impossible; the Dalamud tool is enough.
 Consequences: When a game tooltip is hidden by a Tensho window, Tensho draws its own (server information bar, 0.300–0.301).
-References: docs/project/USER-REQUESTS.md (R-05), CHANGELOG.md 0.301
+References: ROADMAP (R-05), CHANGELOG.md 0.301
 
 ID: DEC-015
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.246, 0.270, 0.281)
@@ -744,12 +744,12 @@ References: docs/project/ARCHITECTURE.md (Sources d'objets), CHANGELOG.md 0.123�
 DEC-ID: DEC-012
 Timestamp: 2026-11-01 Europe/Brussels (avant 0.224)
 Problem: Fixer ce qui reste à faire avant la publication D17 et ce qui ne sera pas fait.
-Evidence: Revue des points ouverts avec l'utilisateur (docs/project/BACKLOG.md, « Revue des points ouverts (2026-11-01) ») ; sources vérifiées par point (GatheringOptimizer MIT, frozen_rabbit_tome sans licence, feuille FccShop, sous-commandes /alarm).
+Evidence: Revue des points ouverts avec l'utilisateur (BACKLOG, « Revue des points ouverts (2026-11-01) », retiré en 0.1088, historique git) ; sources vérifiées par point (GatheringOptimizer MIT, frozen_rabbit_tome sans licence, feuille FccShop, sous-commandes /alarm).
 Options: Tout traiter avant publication ; publier en l'état ; trier point par point.
 Decision: Faire : bonus d'Abondance estimé (0.224), coffre à apparence et armoire dans « possédé » (0.235–0.240), boutiques de compagnie libre (0.295), icônes de quête 71141 / 71151 seulement avec un relevé en jeu. Ne pas faire : score de la Revue de mode (aucune donnée, serait inventé), suppression d'une alarme du jeu depuis Tensho (DeleteAlarm non prouvé, risque d'effacer la mauvaise), sources inconnues restantes (inconnu documenté). Abandonné : injection de texte dans l'infobulle native du jeu.
 Reason: Ne livrer que ce qui est prouvé par les données du jeu ou une source citée ; éviter les actions à risque sur l'état du jeu.
 Consequences: Les « Ne pas faire » ne sont pas rouverts sans nouvelle source ou nouvelle demande. Les compléments des 17 outils viennent après la publication, au cas par cas.
-References: docs/project/BACKLOG.md, notes du mainteneur (hors du dépôt) (« PLAN AVANT PUBLICATION »), CHANGELOG.md 0.224, 0.235–0.240, 0.295 ; cadre de publication remplacé par DEC-039 (dépôt personnalisé, pas de soumission)
+References: BACKLOG (retiré en 0.1088, historique git), notes du mainteneur (hors du dépôt) (« PLAN AVANT PUBLICATION »), CHANGELOG.md 0.224, 0.235–0.240, 0.295 ; cadre de publication remplacé par DEC-039 (dépôt personnalisé, pas de soumission)
 
 DEC-ID: DEC-013
 Timestamp: 2026-11-01 Europe/Brussels (0.236)
@@ -769,7 +769,7 @@ Options: A. retrait automatique (fenêtre Tensho presque transparente quand une 
 Decision: C, décision de l'utilisateur ; R-05 clos sans code.
 Reason: Un vrai ordre d'affichage est impossible ; l'outil de Dalamud suffit.
 Consequences: Quand une infobulle du jeu est cachée par une fenêtre Tensho, Tensho dessine la sienne (barre d'informations du serveur, 0.300–0.301).
-References: docs/project/USER-REQUESTS.md (R-05), CHANGELOG.md 0.301
+References: ROADMAP (R-05), CHANGELOG.md 0.301
 
 DEC-ID: DEC-015
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.246, 0.270, 0.281)

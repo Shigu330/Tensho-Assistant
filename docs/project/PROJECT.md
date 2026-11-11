@@ -30,21 +30,14 @@ PvE only ([DEC-032](DECISIONS.md)); game advice in PvE only ([DEC-033](DECISIONS
 
 ## Extensions asked for by the user
 
-The requests of [USER-REQUESTS](USER-REQUESTS.md) and the [global plan](GLOBAL-PLAN.md) add domains outside the 17 plugins, without
+The user requests (R-01 to R-14, table of [ROADMAP](ROADMAP.md)) and the [global plan](GLOBAL-PLAN.md) add domains outside the 17 plugins, without
 removing any. Every page of the code, by group, is in the table of the [README](../../README.md) (« Overview »), written from the page list
 (`MainWindow.Pages.cs`) by `tools/docgen.py` at every version.
 
-The first of these requests, as they were planned:
-
-| Request | Domain | Where in the code |
-|---|---|---|
-| R-07 | Free company: vessels read in the workshop, best submarine routes, builds | Free company page (vessels, best routes, builds, airship sectors and planner, voyage history) |
-| R-08 | Reminders: timers of the game's calendar, alarm icon in the server info bar | Reminders page; server info bar entries (`Alarms/*DtrEntry.Dalamud.cs`) |
-| R-09 | Seasonal events | Events page |
-| R-11 | Gear: planner in the style of the Character window, glamour, materia, sources and ownership, try on, sharing; the same style for vessels | Gear page; vessel builds; chocobo barding (Chocobo page) |
+The first of these requests (R-07 free company, R-08 reminders, R-09 seasonal events, R-11 gear) are in the table of [ROADMAP](ROADMAP.md), with the version that did each one.
 
 Whether each one is validated in game: the boxes of [TESTING](TESTING.md) and the [global plan](GLOBAL-PLAN.md). Fixes and interface
-requests (R-01 to R-06, R-10) are followed in [USER-REQUESTS](USER-REQUESTS.md). Order of item sources: game data first
+requests (R-01 to R-06, R-10) are followed in the same table of [ROADMAP](ROADMAP.md). Order of item sources: game data first
 ([DEC-011](DECISIONS.md)).
 
 ---
@@ -81,19 +74,12 @@ tenues ([DEC-039](DECISIONS.md), [PUBLISHING](PUBLISHING.md)).
 
 ## Extensions demandées par l'utilisateur
 
-Les demandes de [USER-REQUESTS](USER-REQUESTS.md) et le [plan global](GLOBAL-PLAN.md) ajoutent des domaines hors des 17 plugins, sans en
+Les demandes de l'utilisateur (R-01 à R-14, tableau de la [ROADMAP](ROADMAP.md)) et le [plan global](GLOBAL-PLAN.md) ajoutent des domaines hors des 17 plugins, sans en
 retirer aucun. Toutes les pages du code, par groupe, sont dans le tableau du [README](../../README.md) (« Vue d'ensemble »), écrit depuis la liste
 des pages (`MainWindow.Pages.cs`) par `tools/docgen.py` à chaque version.
 
-Les premières de ces demandes, telles qu'elles ont été prévues :
-
-| Demande | Domaine | Où dans le code |
-|---|---|---|
-| R-07 | Compagnie libre : vaisseaux lus dans l'atelier, meilleurs trajets de sous-marin, montages | page Compagnie libre (vaisseaux, meilleurs trajets, montages, secteurs et planificateur des dirigeables, historique des voyages) |
-| R-08 | Rappels : minuteurs du calendrier du jeu, icône d'alarme dans la barre d'infos du serveur | page Rappels ; entrées de la barre d'infos du serveur (`Alarms/*DtrEntry.Dalamud.cs`) |
-| R-09 | Événements saisonniers | page Événements |
-| R-11 | Équipement : planificateur façon fenêtre Personnage, mirage, matérias, sources et possession, essayage, partage ; même style pour les vaisseaux | page Équipement ; montages de vaisseaux ; barde de chocobo (page Chocobo) |
+Les premières de ces demandes (R-07 compagnie libre, R-08 rappels, R-09 événements saisonniers, R-11 équipement) sont dans le tableau de la [ROADMAP](ROADMAP.md), avec la version qui a fait chacune.
 
 Validation en jeu de chacune : les cases de [TESTING](TESTING.md) et le [plan global](GLOBAL-PLAN.md). Les corrections et l'interface
-(R-01 à R-06, R-10) sont suivies dans [USER-REQUESTS](USER-REQUESTS.md). Ordre des sources d'objets : données du jeu d'abord
+(R-01 à R-06, R-10) sont suivies dans le même tableau de la [ROADMAP](ROADMAP.md). Ordre des sources d'objets : données du jeu d'abord
 ([DEC-011](DECISIONS.md)).

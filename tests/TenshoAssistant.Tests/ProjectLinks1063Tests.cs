@@ -7,9 +7,9 @@ internal static class ProjectLinks1063Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
-    private static readonly string[] Documents = ["docs/project/PROJECT.md","docs/project/ROADMAP.md","docs/project/USER-REQUESTS.md",
+    private static readonly string[] Documents = ["docs/project/PROJECT.md","docs/project/ROADMAP.md",
         "docs/project/MAP-PROPOSALS.md","docs/project/CRAFT-GATHER-PROPOSALS.md","docs/project/DECISIONS.md",
-        "docs/project/BACKLOG.md","docs/project/GAPS.md","docs/project/REFERENCES.md"];
+        "docs/project/GAPS.md","docs/project/REFERENCES.md"]; // BACKLOG and USER-REQUESTS removed in 0.1088 (A048)
 
     private static HashSet<string> Tracked()
     {

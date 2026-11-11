@@ -301,7 +301,7 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 - **Value**: low; main file: `src/TenshoAssistant/Craft/CraftLogReader.Dalamud.cs`.
 - **What the player gets**: After a game update, the crafting log panel, the gathering help or the live synthesis show "unavailable after a game update" in their usual place, and Diagnostics says which read failed. Today, the panel disappears without a word.
 - **How, size, dependencies**: Status per reader (log, synthesis, gathering, fishing) published with the state, short translated message at the panel's location, line in Diagnostics. Size S. Dependencies: full R-14 pass at step g2. Probe: none. Decision: none.
-- **Source**: USER-REQUESTS.md:32 (R-14) and ROADMAP.md:65 (g2). CraftLogReader.Dalamud.cs:83 clears the observation: the panel is no longer shown, the error appears only in the preparation (MainWindow.CraftPlan.cs:188). MainWindow.GatheringPanel.cs:21-22 hides itself on an observation in error. Same approach as MAP-PROPOSALS.md:115 (P15, map part).
+- **Source**: ROADMAP (R-14) and ROADMAP.md:65 (g2). CraftLogReader.Dalamud.cs:83 clears the observation: the panel is no longer shown, the error appears only in the preparation (MainWindow.CraftPlan.cs:188). MainWindow.GatheringPanel.cs:21-22 hides itself on an observation in error. Same approach as MAP-PROPOSALS.md:115 (P15, map part).
 
 ---
 
@@ -606,4 +606,4 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : basse ; fichier principal : `src/TenshoAssistant/Craft/CraftLogReader.Dalamud.cs`.
 - **Ce que le joueur obtient** : Après une mise à jour du jeu, le panneau du carnet, l'aide à la récolte ou la synthèse en direct affichent « indisponible après une mise à jour du jeu » à leur place habituelle, et Diagnostics dit quelle lecture a échoué. Aujourd'hui, le panneau disparaît sans rien dire.
 - **Comment, taille, dépendances** : Statut par lecteur (carnet, synthèse, récolte, pêche) publié avec l'état, court message traduit à l'emplacement du panneau, ligne dans Diagnostics. Taille S. Dépendances : passage complet R-14 à l'étape g2. Sonde : aucune. Décision : aucune.
-- **Source** : USER-REQUESTS.md:32 (R-14) et ROADMAP.md:65 (g2). CraftLogReader.Dalamud.cs:83 efface l'observation : le panneau ne s'affiche plus, l'erreur n'apparaît que dans la préparation (MainWindow.CraftPlan.cs:188). MainWindow.GatheringPanel.cs:21-22 se masque sur une observation en erreur. Même démarche que MAP-PROPOSALS.md:115 (P15, partie carte).
+- **Source** : ROADMAP (R-14) et ROADMAP.md:65 (g2). CraftLogReader.Dalamud.cs:83 efface l'observation : le panneau ne s'affiche plus, l'erreur n'apparaît que dans la préparation (MainWindow.CraftPlan.cs:188). MainWindow.GatheringPanel.cs:21-22 se masque sur une observation en erreur. Même démarche que MAP-PROPOSALS.md:115 (P15, partie carte).

@@ -47,7 +47,7 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 | `garden-data.py` | Not a probe: rebuilds `src/TenshoAssistant/Reminders/Data/garden-seeds.csv` from FFXIV Gardening Tracker (GPL-3.0) and `garden-crosses.csv` from FFXIV Crossbreed Helper (MIT), with the source, commit and licence notice written into each file. Run it with `python -I`. |
 
 Each probe prints `PASS …` / `FAIL …` lines or the raw rows it read. A probe that breaks after a game update is a signal: the fact
-it proved may have changed, so the code that relies on it must be checked (see R-14 in `docs/project/USER-REQUESTS.md`).
+it proved may have changed, so the code that relies on it must be checked (see R-14 in `docs/project/ROADMAP.md`).
 
 ---
 
@@ -101,4 +101,4 @@ dotnet run --project tools/ShopCurrencyProbe -- "C:\Program Files (x86)\SquareEn
 
 Chaque sonde affiche des lignes `PASS …` / `FAIL …` ou les lignes brutes qu'elle a lues. Une sonde qui casse après une mise à jour du jeu
 est un signal : le fait qu'elle prouvait a pu changer, donc le code qui s'y fie doit être vérifié (voir R-14 dans
-`docs/project/USER-REQUESTS.md`).
+`docs/project/ROADMAP.md`).

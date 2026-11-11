@@ -121,8 +121,6 @@ PROJECT_WORKING = [
     ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",
      "inventaire des réglages, produit depuis le code : défaut, où, libellé et info-bulle"),
     ("CONTENT-TOOLS", "content tools study, X-90", "étude des outils de contenus, X-90"),
-    ("BACKLOG", None, None),
-    ("USER-REQUESTS", "user requests", "demandes de l'utilisateur"),
     ("DECISIONS", None, None),
     ("IDS", "registry of the identifier families (X-, DEC-, frozen ones, collisions)", "registre des familles d'identifiants (X-, DEC-, familles figées, collisions)"),
     ("GAPS", "gaps against other Dalamud plugins and choices made", "manques face aux autres plugins Dalamud et choix retenus"),

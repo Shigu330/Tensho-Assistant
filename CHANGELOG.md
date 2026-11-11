@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1088.0
+- Constat d'audit A048 (décision D-138 de l'utilisateur) : BACKLOG (état figé de 0.315) et USER-REQUESTS (toutes lignes FAIT ou CLOS) sont retirés ; git les garde. Le tableau des demandes R-01 à R-14 reste une seule fois, dans la ROADMAP, avec la version qui a fait chacune ; PROJECT y renvoie au lieu de répéter R-07 à R-11 ; une nouvelle demande va dans le plan global comme point X-NN. Tous les renvois suivent.
+- Tests : RequestsOnce1088Tests. Verify.ps1 (agent) : 1774/1774, 0 avertissement, 0 erreur ; DLL 0.1088.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A048 (user decision D-138): BACKLOG (a frozen state of 0.315) and USER-REQUESTS (every row DONE or CLOSED) are removed; git keeps them. The table of the requests R-01 to R-14 stays once, in ROADMAP, with the version that did each one; PROJECT points to it instead of repeating R-07 to R-11; a new request goes to the global plan as an X-NN point. Every pointer follows.
+
 ## 0.1087.0
 - Constat d'audit A062 (décision D-138 de l'utilisateur) : COMPETITIVE-OFF-PLAN était un plan fini (codé en 0.610). Sa partie de référence (où Tensho se coupe, ce que « coupé » veut dire tel que codé, les écarts connus) va dans ARCHITECTURE (section « Coupure en JcJ et en contenu classé », deux moitiés) et les réponses D1 à D5 dans DEC-038 (deux moitiés) ; le plan est retiré (git le garde) et tous les renvois suivent.
 - Tests : CompetitiveFolded1087Tests. Verify.ps1 (agent) : 1776/1776, 0 avertissement, 0 erreur ; DLL 0.1087.0.0. Rien à essayer en jeu.

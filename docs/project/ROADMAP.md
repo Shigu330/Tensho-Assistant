@@ -48,7 +48,7 @@ application. The other capacities follow the same principle, without declaring t
 
 ## User requests R-01 to R-14
 
-Detail of the requests: [USER-REQUESTS](USER-REQUESTS.md). « Validated » = report or screenshot of the user; otherwise, to validate in
+This table is the only list of the requests R-01 to R-14 (their detailed wording was in USER-REQUESTS, removed in 0.1088; git history keeps it); a new request goes to the [global plan](GLOBAL-PLAN.md) as an X-NN point ([IDS](IDS.md)). « Validated » = report or screenshot of the user; otherwise, to validate in
 game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repository.
 
 | No. | Subject | Done | Validated in game | Left |
@@ -64,9 +64,9 @@ game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repos
 | R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | to validate; no future dates (no reliable source) |
 | R-10 | Cache audit | 0.246 ([audit](../evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
 | R-11 | Gear | step 1 (0.310), glamour (0.311), materia and caps (0.312–0.313), sources and ownership (0.314), vessel builds (0.315) | 0.310–0.314 | 0.315 and 0.340 to validate; step 4: chocobo barding DONE 0.340, Chocobo page 0.341 (squadron left out, recommended default, decision at the end) |
-| R-12 | Discord webhook for alarms ([request](USER-REQUESTS.md)) | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
-| R-13 | Full « Credits » page in the plugin ([request](USER-REQUESTS.md)) | 0.320 | no | to validate in game |
-| R-14 | Resistance to FFXIV updates, in the logic of the code ([request](USER-REQUESTS.md)) | rule for new code (0.319); audit and fixes 0.452–0.454, 0.491–0.492, 0.507; self-check 0.494–0.496 | by the self-check, for what it reads | — |
+| R-12 | Discord webhook for alarms | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
+| R-13 | Full « Credits » page in the plugin | 0.320 | no | to validate in game |
+| R-14 | Resistance to FFXIV updates, in the logic of the code | rule for new code (0.319); audit and fixes 0.452–0.454, 0.491–0.492, 0.507; self-check 0.494–0.496 | by the self-check, for what it reads | — |
 
 ## Pages outside the 17 plugins
 
@@ -86,8 +86,8 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-84 | Community templates: Finished on the code side in 0.476 | In-game validation; gallery visible after a release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
 | D-85 | « Cost ≤ capacity » rule below rank 50: Rule of the community tools. Consistent with 11 published airship builds; not checked in game below rank 50. | In-game record on a vessel below rank 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
 | D-87 | Flag icon 60561: The flag icon id is not proven in docs/evidence (placing the flag is validated in game). | In-game record: flag placed, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` read on the framework (probe), log in docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
-| D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
+| D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
+| D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
 <!-- /gen:decisions:en -->
 
@@ -152,7 +152,7 @@ toute application native. Les autres capacités suivent le même principe, sans 
 
 ## Demandes utilisateur R-01 à R-14
 
-Détail des demandes : [USER-REQUESTS](USER-REQUESTS.md). « Validé » = rapport ou capture de l'utilisateur ; sinon, à valider en jeu. Les
+Ce tableau est la seule liste des demandes R-01 à R-14 (leur libellé détaillé était dans USER-REQUESTS, retiré en 0.1088 ; l'historique git le garde) ; une nouvelle demande va dans le [plan global](GLOBAL-PLAN.md) comme point X-NN ([IDS](IDS.md)). « Validé » = rapport ou capture de l'utilisateur ; sinon, à valider en jeu. Les
 plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt.
 
 | N° | Sujet | Fait | Validé en jeu | Reste |
@@ -168,9 +168,9 @@ plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt
 | R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | à valider ; pas de dates à venir (aucune source fiable) |
 | R-10 | Audit des caches | 0.246 ([audit](../evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
 | R-11 | Équipement | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 et 0.340 à valider ; étape 4 : barde de chocobo FAITE 0.340, page Chocobo 0.341 (escouade retirée, défaut recommandé, décision de la fin) |
-| R-12 | Webhook Discord pour les alarmes ([demande](USER-REQUESTS.md)) | 0.319 | non | à valider en jeu ; utilisé ensuite par C-10, I-02, M-01 |
-| R-13 | Page « Crédits » complète dans le plugin ([demande](USER-REQUESTS.md)) | 0.320 | non | à valider en jeu |
-| R-14 | Résistance aux mises à jour de FF14, dans la logique du code ([demande](USER-REQUESTS.md)) | règle pour le nouveau code (0.319) ; audit et corrections 0.452–0.454, 0.491–0.492, 0.507 ; auto-contrôle 0.494–0.496 | par l'auto-contrôle, pour ce qu'il lit | — |
+| R-12 | Webhook Discord pour les alarmes | 0.319 | non | à valider en jeu ; utilisé ensuite par C-10, I-02, M-01 |
+| R-13 | Page « Crédits » complète dans le plugin | 0.320 | non | à valider en jeu |
+| R-14 | Résistance aux mises à jour de FF14, dans la logique du code | règle pour le nouveau code (0.319) ; audit et corrections 0.452–0.454, 0.491–0.492, 0.507 ; auto-contrôle 0.494–0.496 | par l'auto-contrôle, pour ce qu'il lit | — |
 
 ## Pages hors des 17 plugins
 
@@ -191,8 +191,8 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-84 | Modèles de la communauté : Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
 | D-85 | Règle « coût ≤ capacité » sous le rang 50 : Règle des outils de la communauté. Cohérente avec 11 montages de dirigeables publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
 | D-87 | Icône du drapeau 60561 : L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
-| D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | [BACKLOG](BACKLOG.md) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Bonus d'Abondance estimé (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | [BACKLOG](BACKLOG.md), « Revue des points ouverts » ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
+| D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
+| D-89 | Bonus d'Abondance estimé (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
 <!-- /gen:decisions:fr -->
 

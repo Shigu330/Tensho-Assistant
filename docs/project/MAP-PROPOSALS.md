@@ -145,10 +145,10 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 
 ## P17 — Capture of the marker type of the leves and of their areas
 
-- **Value**: medium; main file: `docs/project/BACKLOG.md`.
+- **Value**: medium; main file: BACKLOG (removed in 0.1088, git history).
 - **What the player gets**: The leves form a proper category in the edge markers and in the area colours, instead of being mixed with the "other events".
 - **How, size, dependencies**: In-game capture: leve accepted, map open, developer mode. The line "Map event marker icon … type …" is already written in the log (MapLiveReader.Dalamud.cs, ReadEvents). Copy this capture into docs/evidence, then make the type a category of the EdgeEvents switch and an area colour. Size S. In-game capture first. No decision.
-- **Source**: BACKLOG.md:14 and ROADMAP.md:82: marker type of the leves unknown. TESTING.md:234: capture requested. MAP-016-PLAN (maintainer's notes, not in the repository), lines 57 and 69: "confirmation of the leve areas". In docs/evidence/0.135.0-marker-evidence.log and 0.136.0-marker-evidence.log, only types 0, 3 and 4 appear, without saying which one designates a leve.
+- **Source**: BACKLOG:14 (removed in 0.1088, git history) and ROADMAP.md:82: marker type of the leves unknown. TESTING.md:234: capture requested. MAP-016-PLAN (maintainer's notes, not in the repository), lines 57 and 69: "confirmation of the leve areas". In docs/evidence/0.135.0-marker-evidence.log and 0.136.0-marker-evidence.log, only types 0, 3 and 4 appear, without saying which one designates a leve.
 
 ## P18 — Game frames and textures (ULD), starting with the map
 
@@ -156,7 +156,7 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 - **Value**: medium; main file: `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **What the player gets**: The map window (tool buttons, frame, menus) takes up the frames and textures of the game interface, in the same DLL and without external resource. The other windows follow afterwards.
 - **How, size, dependencies**: Probe first: .uld paths and part numbers of the buttons and of the frame of the game map (tools/ApiProbe), with a screenshot, recorded in docs/evidence. Then: single loading outside Draw, one part per button, and fallback on the current ImGui drawing if a part is missing (R-14). Size M for the map, L for the whole interface. Decision: scope (map only or everything at once) and degree of imitation (buttons, frame, background).
-- **Source**: BACKLOG.md:15; ROADMAP.md:46 (step e); ROADMAP.md:53 and 119 (DEC-023: before D17); R-06 (maintainer's notes, not in the repository), line 137 (priority to the game's .tex and .uld). No ULD is read today (no occurrence in src/). API present in Dalamud.xml (Hooks/dev): UiBuilder.LoadUld(string) and UldWrapper.LoadTexturePart(string, int).
+- **Source**: BACKLOG:15 (removed in 0.1088, git history); ROADMAP.md:46 (step e); ROADMAP.md:53 and 119 (DEC-023: before D17); R-06 (maintainer's notes, not in the repository), line 137 (priority to the game's .tex and .uld). No ULD is read today (no occurrence in src/). API present in Dalamud.xml (Hooks/dev): UiBuilder.LoadUld(string) and UldWrapper.LoadTexturePart(string, int).
 
 ## P19 — In-game map tests still pending
 
@@ -183,10 +183,10 @@ Value and size are the audit's estimates. "Probe": a read of the game or an in-g
 
 ## P22 — Names of the quest icon variants (71141 / 71151)
 
-- **Value**: low; main file: `docs/project/BACKLOG.md`.
+- **Value**: low; main file: BACKLOG (removed in 0.1088, git history).
 - **What the player gets**: The icon settings display the real meaning of each quest icon variant, instead of "variant n".
 - **How, size, dependencies**: In-game capture: quests of each variant visible on the map, with screenshot and log line, recorded in docs/evidence. Only then, rename the MapView.QuestKind labels. Without a capture, keep "variant n". Size S. In-game capture first. No decision.
-- **Source**: BACKLOG.md:12-13; ROADMAP.md:83; TESTING.md:235; docs/evidence/0.211-event-icons.md. This meaning does not exist in the game data; only an in-game capture gives it. It is the only "before D17" point still open.
+- **Source**: BACKLOG:12-13 (removed in 0.1088, git history); ROADMAP.md:83; TESTING.md:235; docs/evidence/0.211-event-icons.md. This meaning does not exist in the game data; only an in-game capture gives it. It is the only "before D17" point still open.
 
 ## P23 — Nearby friends on the map
 
@@ -375,10 +375,10 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P17 — Relevé du type de marqueur des mandats et de leurs zones
 
-- **Valeur** : moyenne ; fichier principal : `docs/project/BACKLOG.md`.
+- **Valeur** : moyenne ; fichier principal : BACKLOG (retiré en 0.1088, historique git).
 - **Ce que le joueur obtient** : Les mandats forment une catégorie juste dans les repères au bord et dans les couleurs de zones, au lieu d'être mêlés aux « autres événements ».
 - **Comment, taille, dépendances** : Relevé en jeu : mandat accepté, carte ouverte, mode développeur. La ligne « Map event marker icon … type … » est déjà écrite dans le journal (MapLiveReader.Dalamud.cs, ReadEvents). Copier ce relevé dans docs/evidence, puis faire du type une catégorie d'interrupteur EdgeEvents et une couleur de zone. Taille S. Relevé en jeu d'abord. Pas de décision.
-- **Source** : BACKLOG.md:14 et ROADMAP.md:82 : type de marqueur des mandats inconnu. TESTING.md:234 : relevé demandé. notes du mainteneur (plan de la carte) : « confirmation des zones de mandats ». Dans docs/evidence/0.135.0-marker-evidence.log et 0.136.0-marker-evidence.log, seuls les types 0, 3 et 4 apparaissent, sans dire lequel désigne un mandat.
+- **Source** : BACKLOG:14 (retiré en 0.1088, historique git) et ROADMAP.md:82 : type de marqueur des mandats inconnu. TESTING.md:234 : relevé demandé. notes du mainteneur (plan de la carte) : « confirmation des zones de mandats ». Dans docs/evidence/0.135.0-marker-evidence.log et 0.136.0-marker-evidence.log, seuls les types 0, 3 et 4 apparaissent, sans dire lequel désigne un mandat.
 
 ## P18 — Cadres et textures du jeu (ULD), en commençant par la carte
 
@@ -386,7 +386,7 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 - **Valeur** : moyenne ; fichier principal : `src/TenshoAssistant/MainWindow.MapView.cs`.
 - **Ce que le joueur obtient** : La fenêtre de la carte (boutons d'outils, cadre, menus) reprend les cadres et textures de l'interface du jeu, dans la même DLL et sans ressource externe. Les autres fenêtres suivent ensuite.
 - **Comment, taille, dépendances** : Sonde d'abord : chemins .uld et numéros de parties des boutons et du cadre de la carte du jeu (tools/ApiProbe), avec une capture, consignés dans docs/evidence. Ensuite : chargement unique hors Draw, une partie par bouton, et repli sur le dessin ImGui actuel si une partie manque (R-14). Taille M pour la carte, L pour toute l'interface. Décision : périmètre (carte seule ou tout de suite tout) et degré d'imitation (boutons, cadre, fond).
-- **Source** : BACKLOG.md:15 ; ROADMAP.md:46 (étape e) ; ROADMAP.md:53 et 119 (DEC-023 : avant D17) ; notes du mainteneur (plan R-06) (priorité aux .tex et .uld du jeu). Aucun ULD n'est lu aujourd'hui (aucune occurrence dans src/). API présente dans Dalamud.xml (Hooks/dev) : UiBuilder.LoadUld(string) et UldWrapper.LoadTexturePart(string, int).
+- **Source** : BACKLOG:15 (retiré en 0.1088, historique git) ; ROADMAP.md:46 (étape e) ; ROADMAP.md:53 et 119 (DEC-023 : avant D17) ; notes du mainteneur (plan R-06) (priorité aux .tex et .uld du jeu). Aucun ULD n'est lu aujourd'hui (aucune occurrence dans src/). API présente dans Dalamud.xml (Hooks/dev) : UiBuilder.LoadUld(string) et UldWrapper.LoadTexturePart(string, int).
 
 ## P19 — Tests en jeu de la carte encore en attente
 
@@ -413,10 +413,10 @@ Valeur et taille sont les estimations de l'audit. « Sonde » : une lecture du j
 
 ## P22 — Noms des variantes d'icônes de quête (71141 / 71151)
 
-- **Valeur** : basse ; fichier principal : `docs/project/BACKLOG.md`.
+- **Valeur** : basse ; fichier principal : BACKLOG (retiré en 0.1088, historique git).
 - **Ce que le joueur obtient** : Les réglages d'icônes affichent le vrai sens de chaque variante d'icône de quête, au lieu de « variante n ».
 - **Comment, taille, dépendances** : Relevé en jeu : quêtes de chaque variante visibles sur la carte, avec capture et ligne de journal, consignées dans docs/evidence. Ensuite seulement, renommer les libellés MapView.QuestKind. Sans relevé, garder « variante n ». Taille S. Relevé en jeu d'abord. Pas de décision.
-- **Source** : BACKLOG.md:12-13 ; ROADMAP.md:83 ; TESTING.md:235 ; docs/evidence/0.211-event-icons.md. Ce sens n'existe pas dans les données du jeu ; seul un relevé en jeu le donne. C'est le seul point « avant D17 » encore ouvert.
+- **Source** : BACKLOG:12-13 (retiré en 0.1088, historique git) ; ROADMAP.md:83 ; TESTING.md:235 ; docs/evidence/0.211-event-icons.md. Ce sens n'existe pas dans les données du jeu ; seul un relevé en jeu le donne. C'est le seul point « avant D17 » encore ouvert.
 
 ## P23 — Amis proches sur la carte
 
