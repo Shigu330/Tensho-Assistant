@@ -17,26 +17,46 @@ public sealed class JitWarmup : IDisposable
 {
     /// <summary>After loading: the catalogue loaders and the first frames go first.</summary>
     public static readonly TimeSpan Delay=TimeSpan.FromSeconds(5);
+    /// <summary>X-01 (0.1104): the methods compiled first (the map's), this soon after loading: the map open at a reload is drawn about 2 s after it.</summary>
+    public static readonly TimeSpan EarlyDelay=TimeSpan.FromMilliseconds(500);
     private readonly CancellationTokenSource cancellation=new();
     private readonly ManualResetEventSlim done=new(false);
     private readonly Thread? thread;
     private volatile bool disposed;
 
     public int Prepared { get; private set; }
+    /// <summary>X-01 (0.1104): how many of <see cref="Prepared"/> were compiled first.</summary>
+    public int EarlyPrepared { get; private set; }
     public int Skipped { get; private set; }
     public TimeSpan Elapsed { get; private set; }
     public bool Completed { get; private set; }
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early)
     {
         var token=cancellation.Token;
-        thread=new Thread(()=>Run(roots,delay,finished,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
     /// <summary>Starts the warm-up of these types and their nested types (lambdas, closures, local functions), listed on the worker, in this
     /// order; finished is told once, on the worker.</summary>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null)=>new(roots,delay,finished);
+    /// <remarks>X-01 (0.1104): with <paramref name="early"/>, those methods are compiled first, <see cref="EarlyDelay"/> after loading, and the rest
+    /// once <paramref name="delay"/> has passed.</remarks>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null)
+        =>new(roots,delay,finished,early);
+
+    /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.</summary>
+    public static bool MapFirst(MethodBase method)
+    {
+        if(!method.Name.Contains("Map",StringComparison.Ordinal))return false;
+        for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow")return true;
+        return false;
+    }
+
+    /// <summary>X-01 (0.1104): the early methods first, then the others, each part in its former order.</summary>
+    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)
+        =>[..methods.Where(early),..methods.Where(method=>!early(method))];
 
     /// <summary>The first type, then every type of its assembly (those that load: a type whose dependency is missing is left out).</summary>
     public static IReadOnlyList<Type> FirstThenAssembly(Type first)
@@ -77,15 +97,26 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,CancellationToken token)
     {
         try
         {
-            if(token.WaitHandle.WaitOne(delay))return;
+            var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
+            if(token.WaitHandle.WaitOne(early is null ? delay:first))return;
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
-            foreach(var method in Methods(roots()))
+            var methods=Methods(roots());
+            var earlyCount=early is null ? 0:methods.Count(early);
+            var index=0;
+            foreach(var method in early is null ? methods:EarlyFirst(methods,early))
             {
                 if(token.IsCancellationRequested)return;
+                // 0.1104: the early part done, the rest waits until the usual delay after loading.
+                if(index++==earlyCount && early is not null)
+                {
+                    EarlyPrepared=Prepared;
+                    var left=delay-first-System.Diagnostics.Stopwatch.GetElapsedTime(started);
+                    if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
+                }
                 try{RuntimeHelpers.PrepareMethod(method.MethodHandle);Prepared++;}
                 catch(Exception){Skipped++;}
             }

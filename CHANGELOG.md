@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1104.0
+- Carte : son code est préparé en premier, une demi-seconde après le chargement de Tensho, pour que la carte ouverte au rechargement ne fige plus l'image (X-01 ; mesure après 0.1103 : marchands 142 → 82 ms, image encore 358 ms, surtout de la compilation).
+- Tests : MapWarmup1104Tests. Verify.ps1 (agent) : 1801/1801, 0 avertissement, 0 erreur ; DLL 0.1104.0.0. Rien à essayer en jeu.
+### English
+- Map: its code is prepared first, half a second after Tensho loads, so that a map open at a reload no longer freezes the frame (X-01; measured after 0.1103: vendors 142 → 82 ms, frame still 358 ms, mostly compiling).
+
 ## 0.1103.0
 - Carte : la première image après un chargement ne regroupe plus toutes les ventes des marchands du jeu ni ne parcourt tous les marchands : les boutiques et les marchands de chaque carte sont prêts avec le catalogue, hors de l'image (X-01 ; mesure d'avant : 71 à 156 ms pour les marchands à la première image, 2,7 s une fois).
 - Tests : MapVendorIndex1103Tests. Verify.ps1 (agent) : 1799/1799, 0 avertissement, 0 erreur ; DLL 0.1103.0.0. Rien à essayer en jeu.
