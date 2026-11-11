@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1098.0
+- Carte : après chaque téléportation, la carte de Tensho revenait sur une ancienne cible (le journal montrait la même demande « drapeau, carte 700 » à chaque ouverture, même ailleurs) : le jeu garde sa dernière demande de carte et sa carte choisie. Une demande gardée ne demande plus rien et la carte suit le joueur, comme la touche M : un drapeau retiré ou déplacé, la même demande de drapeau qu'à l'ouverture d'avant, ou la carte rouverte par Tensho à la fin d'une téléportation vers une autre zone. Une demande nouvelle (journal, lien, drapeau posé) ouvre toujours sur sa cible.
+- Tests : StaleMapRequest1098Tests. Verify.ps1 (agent) : 1793/1793, 0 avertissement, 0 erreur ; DLL 0.1098.0.0. Non validé en jeu.
+### English
+- Map: after each teleport, Tensho's map went back to an old target (the log showed the same « flag, map 700 » request at each opening, elsewhere too): the game keeps its last map request and its selected map. A kept request no longer asks for anything and the map follows the player, as the M key does: a flag removed or moved, the same flag request as at the opening before, or the map reopened by Tensho at the end of a teleport to another zone. A new request (journal, link, flag placed) still opens on its target.
+
 ## 0.1097.0
 - Macros d'artisanat : le son de la ligne de fin (<se.1> à <se.16>, Paramètres › Artisanat) peut s'écouter avec un bouton « Écouter » à côté du réglage, comme le son des alarmes (même service, joué au prochain passage du jeu) ; grisé à 0 (pas de son).
 - Tests : MacroSound1097Tests. Verify.ps1 (agent) : 1791/1791, 0 avertissement, 0 erreur ; DLL 0.1097.0.0. Non validé en jeu.

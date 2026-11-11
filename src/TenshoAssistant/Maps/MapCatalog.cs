@@ -164,6 +164,22 @@ public sealed record MapCatalogState(MapCatalog? Catalog, int Copied, int Total,
 // QuestLog: the journal or gathering log opened the map, even when it gives no id.
 // Target: world X/Z of the game's first temporary marker (AgentMap.TempMapMarkers[0], X/Y = world × 16), where the game itself
 // centres a quest or gathering link; read the way Mappy does (reference only, AGPL, not copied).
+/// <summary>
+/// 0.1098 (user report, 11/11: after each teleport the Tensho map went back to an old target that no longer existed; dalamud.log from 15:40 on:
+/// every opening said « type FlagMarker, map 700, selected 700 », teleports to other zones included): requests the game keeps that ask for
+/// nothing new, after which the map follows the player as the M key does.
+/// </summary>
+public static class StaleMapRequests
+{
+    /// <param name="type">CurrentOpenMapInfo.Type.</param>
+    /// <param name="requested">CurrentOpenMapInfo.MapId.</param>
+    /// <param name="flagMap">The map of the flag now (FlagMapMarkers[0] while FlagMarkerCount is not 0), 0 without a flag.</param>
+    /// <param name="sameAsLast">The same request as at the last opening (the game kept it).</param>
+    /// <param name="reopenedInAnotherZone">Tensho reopened the map after an event (a teleport) that ended in another zone.</param>
+    public static bool FollowPlayer(string type,uint requested,uint flagMap,bool sameAsLast,bool reopenedInAnotherZone)
+        =>reopenedInAnotherZone || type=="FlagMarker" && (flagMap==0 || flagMap!=requested || sameAsLast);
+}
+
 public sealed record GameMapRequest(uint Selected, uint Requested, uint Territory, uint Current, uint QuestId = 0, uint AetheryteId = 0, uint FateId = 0, bool QuestLog = false,
     System.Numerics.Vector2? Target = null, uint TargetIcon = 0, uint RouteMap = 0, System.Numerics.Vector2? Route = null, uint RouteIcon = 0, string Title = "", int TargetScale = 0)
 {

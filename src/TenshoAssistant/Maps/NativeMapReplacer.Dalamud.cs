@@ -31,6 +31,8 @@ internal sealed class NativeMapReplacer : IDisposable
     // 0.625: the game closes its map when a talk or an event starts: it comes back at the end.
     private readonly MapResume resume=new();
     private string lastPointed="";
+    // 0.1098: the territory where an event (a teleport) closed the map, and whether Tensho reopened it at the end of that event.
+    private uint closedByEventIn;private bool reopenedAfterEvent;
     private readonly MapClickMemory clicks=new();
     private bool mouseWasDown;
     [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -87,7 +89,7 @@ internal sealed class NativeMapReplacer : IDisposable
             if(client.IsLoggedIn && resume.ShouldReopen(ClosedByEvent(),visible,client.TerritoryType,now) && AgentMap.Instance() is var again && again!=null)
             {
                 log.Information("The event is over: the map opens again.");
-                again->Show();
+                again->Show();reopenedAfterEvent=true;
             }
             // 0.328: handled once the addon is read. A hosted game map is brought back on screen and no longer hosted (Show did
             // nothing on a map already open, and bypass is only read when the map appears); the Tensho map stays open.
@@ -116,7 +118,16 @@ internal sealed class NativeMapReplacer : IDisposable
                 if(!keepGameMap)
                 {
                     hosted=true;
+                    var before=lastRequest;
                     var (request,signature)=ReadRequest(true);lastRequest=signature;
+                    // 0.1098 (user report: after each teleport the map went back to an old flag): a request the game kept, or the reopening after a
+                    // teleport to another zone, asks for nothing: the map follows the player.
+                    var moved=reopenedAfterEvent && closedByEventIn!=0 && closedByEventIn!=client.TerritoryType;reopenedAfterEvent=false;
+                    if(StaleMapRequests.FollowPlayer(staleType,staleRequested,FlagMapNow(),signature==before,moved))
+                    {
+                        log.Information("Game map request kept from before ({0}, map {1}{2}): the Tensho map follows the player.",staleType,staleRequested,moved ? ", after a teleport":"");
+                        request=request.Plain();
+                    }
                     var clicked=clicks.Take(now);
                     // 0.636: the Tensho map stayed open after a click closed the game's: the map key now closes it, as if the game's were open.
                     if(detached && !clicked && tenshoOpen())
@@ -157,6 +168,7 @@ internal sealed class NativeMapReplacer : IDisposable
                     else
                     {
                         resume.GameClosedMap(ClosedByEvent());
+                        closedByEventIn=ClosedByEvent() ? client.TerritoryType:0u;reopenedAfterEvent=false;
                         log.Information("The game closed its map window: the Tensho map closes with it; occupied: {0}, event: {1}.",Occupied(),ClosedByEvent());
                         closeTensho();
                     }
@@ -198,11 +210,19 @@ internal sealed class NativeMapReplacer : IDisposable
             }
             quest=agent->CurrentOpenMapInfo.QuestId;aetheryte=agent->CurrentOpenMapInfo.AetheryteId;fate=agent->CurrentOpenMapInfo.FateId;
         }
+        staleType=type;staleRequested=requested;
         var title=questLog && agent!=null ? MapLiveReader.TooltipText(&agent->CurrentOpenMapInfo.TitleString):"";
         if(log)this.log.Information("Game map hosted: type {0}, map {1}, territory {2}, selected {3}, quest {4}, aetheryte {5}, fate {6}, target {7}, title \"{8}\", scale {9}, icon {10}.",type,requested,territory,selected,quest,aetheryte,fate,target?.ToString() ?? "none",title,targetScale,targetIcon);
         var route=questLog && agent!=null ? FindRoute(agent):(0u,null,0u);
         if(log && route.MapId!=0)this.log.Information("Game map route: event marker on map {0} at {1}.",route.MapId,route.Position?.ToString() ?? "none");
         return (new(selected,requested,territory,client.MapId,quest,aetheryte,fate,questLog,target,targetIcon,route.MapId,route.Position,route.Icon,title,targetScale),$"{type}|{requested}|{territory}|{quest}|{aetheryte}|{fate}|{target}");
+    }
+    private string staleType="";private uint staleRequested;
+    // 0.1098: the map of the flag now, 0 without one (read on the framework thread, copied).
+    private static unsafe uint FlagMapNow()
+    {
+        var agent=AgentMap.Instance();
+        return agent==null || agent->FlagMarkerCount==0 ? 0:agent->FlagMapMarkers[0].MapId;
     }
     // 0.633 (log, docs/evidence/0.633-quest-route.md): a quest beyond a zone-change NPC has its event marker on that NPC, under the quest's name.
     private static unsafe (uint MapId,System.Numerics.Vector2? Position,uint Icon) FindRoute(AgentMap* agent)
