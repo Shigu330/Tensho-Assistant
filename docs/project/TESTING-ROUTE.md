@@ -39,9 +39,8 @@ Détail : [docs/evidence/0.1008-game-update-inventory.md](../evidence/0.1008-gam
 - [ ] Carte du jeu remplacée par la carte Tensho, puis rendue normale (touche M, plugin déchargé).
 - [ ] Cabine d'essayage, carnet d'artisanat et carnet de récolte ouverts depuis Tensho.
 - [ ] Progression d'un succès demandée et affichée.
-- [ ] Relevés en attente, au fil du jeu : extraction de matéria ; atelier de compagnie et fenêtre des sous-marins (« Submarine voyage check ») ;
-  jardin (récolte avec croisement, X-108) ; coffres des cartes au trésor ; retour d'aéronef (butin) ; carte d'Eurêka Anemos (X-86) ;
-  pages des champs (X-90) ; lignes « Item gain not attributed » après un combat.
+- [ ] Relevés en attente, au fil du jeu : la liste et le moment de chacun sont dans la seule table des
+  [rappels de relevés en jeu](GLOBAL-PLAN.md#rappels-de-relevés-en-jeu-par-moment) du plan global.
 - [ ] Panneau du Dédale bestial (X-109) devant le plateau, puis disparu au début du combat.
 - [ ] Couches des monstres proches (X-40) : bouclier sur les cibles d'un livre du Zodiaque, cœur sur un monstre qui fait tomber un souhait.
 

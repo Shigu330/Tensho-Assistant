@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1071.0
+- Constat d'audit A061 : les relevés en jeu en attente (sous-marins, jardin avec croisement, Eurêka Anemos, pages des champs…) étaient listés à trois endroits avec des mots différents. Le tableau des rappels de relevés du plan global devient la seule liste : il gagne les trois relevés qui n'y étaient pas (fenêtre d'extraction de matéria, coffre d'une carte au trésor, lignes « Item gain not attributed » après un combat) et le dit dans ses deux langues ; l'étape 0 du parcours des essais y renvoie au lieu de répéter la liste. Le plan global est aussi reproduit depuis sa source (points X-112, X-114, X-117 et X-122 marqués faits, X-126 ajouté). Un test vérifie le renvoi et que le tableau garde chaque relevé.
+- Tests : Readings1071Tests. Verify.ps1 (agent) : 1754/1754, 0 avertissement, 0 erreur ; DLL 0.1071.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A061: the pending in-game readings (submarines, garden crossbreeding, Eureka Anemos, field pages…) were listed in three places with different wording. The reminders table of the global plan becomes the one list: it gains the three readings it lacked (materia extraction window, treasure map chest, « Item gain not attributed » lines after a fight) and says so in both languages; step 0 of the test route points to it instead of repeating the list. The global plan is also regenerated from its source (points X-112, X-114, X-117 and X-122 marked done, X-126 added). A test checks the pointer and that the table keeps every reading.
+
 ## 0.1070.0
 - Constat d'audit A071 : après la 0.1061, la partie anglaise du CHANGELOG s'adressait encore au mainteneur à onze endroits (« your report », « tonight's test », « your go-ahead ») ; les lecteurs des notes de release ne sont pas ce « you ». Ces lignes parlent maintenant de l'utilisateur, et le test de la 0.1061 refuse aussi ces tournures. Les libellés de l'interface comme « Your notes and arena drawing » restent.
 - Tests : ChangelogVoice1070Tests. Verify.ps1 (agent) : 1753/1753, 0 avertissement, 0 erreur ; DLL 0.1070.0.0. Rien à essayer en jeu.
