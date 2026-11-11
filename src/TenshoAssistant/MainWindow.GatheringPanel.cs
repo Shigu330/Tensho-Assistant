@@ -26,7 +26,8 @@ internal sealed partial class MainWindow
         public int? LastAttempts {get;set;}=frame.Attempts;
         public uint Gp {get;set;}=frame.Gp;public int? Attempts {get;set;}=frame.Attempts;public bool Frozen {get;set;}
         // Success and boon of each slot (index, raw item) as first read; Late: first read after GP was spent at the node.
-        public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity)> Slots {get;}=[];
+        // X-129 (0.1108): with the GP and attempts left when the slot was first read (its plan's start when it came late).
+        public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity,int Gp,int? Attempts)> Slots {get;}=[];
     }
 
     /// <summary>0.560 (C24): what the last crafting chain still needs of this item; from the chain's state, nothing is computed again.</summary>
@@ -247,8 +248,8 @@ internal sealed partial class MainWindow
         foreach(var slot in frame.Slots)
         {
             var at=(slot.Index,slot.RawItemId);
-            if(!start.Slots.TryGetValue(at,out var first))start.Slots[at]=(slot.SuccessPercent,slot.BoonPercent,start.Frozen,slot.DisplayedQuantity);
-            else if(!start.Frozen && (first.Success is null || first.Boon is null))start.Slots[at]=(first.Success ?? slot.SuccessPercent,first.Boon ?? slot.BoonPercent,false,first.Quantity ?? slot.DisplayedQuantity);
+            if(!start.Slots.TryGetValue(at,out var first))start.Slots[at]=(slot.SuccessPercent,slot.BoonPercent,start.Frozen,slot.DisplayedQuantity,(int)frame.Gp,frame.Attempts);
+            else if(!start.Frozen && (first.Success is null || first.Boon is null))start.Slots[at]=(first.Success ?? slot.SuccessPercent,first.Boon ?? slot.BoonPercent,false,first.Quantity ?? slot.DisplayedQuantity,first.Gp,first.Attempts);
         }
     }
 
@@ -269,7 +270,9 @@ internal sealed partial class MainWindow
         var first=start.Slots.GetValueOrDefault((slot.Index,slot.RawItemId));
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
         var auto=GatheringAutoGather?.Invoke()==true;
-        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,(int)start.Gp,start.Attempts,first.Late,first.Success,first.Boon,bountiful,catalog,auto);
+        // X-129 (0.1108): an item first read after GP was spent (a hidden item revealed) is planned from what was left when it appeared.
+        var (planGp,planAttempts)=GatheringNodes.PlanStart(first.Late,start.Gp,start.Attempts,first.Gp,first.Attempts);
+        var key=(start.JobId,start.Level,slot.Index,slot.ItemId,planGp,planAttempts,first.Late,first.Success,first.Boon,bountiful,catalog,auto);
         // 0.515: the node's effects, and what else can change the plan without changing the node.
         var perception=GatheringPerception(start.JobId);
         var extraKey=$"{GpForbiddenFor(start.JobId)}|{first.Quantity}|{frame.NodeId}|{frame.MaxGp}|{rating}|{perception}";
@@ -282,15 +285,15 @@ internal sealed partial class MainWindow
             // panel names what is missing. An unknown Bountiful bonus uses the rule's floor, +1 (BountifulEstimate « else +1 »): a lower
             // bound, said under the plan, not a guess (review 0.330).
             var missing=new List<string>();
-            if(start.Attempts is null)missing.Add("GatheringPanel.MissingAttempts");
+            if(planAttempts is null)missing.Add("GatheringPanel.MissingAttempts");
             if(first.Success is null)missing.Add("GatheringPanel.MissingSuccess");
             if(first.Boon is null)missing.Add("GatheringPanel.MissingBoon");
             gatheringPanelMissing=[..missing];gatheringPanelBountifulFloor=start.Level>=68 && bountiful is null;
-            if(missing.Count==0 && !first.Late && first.Success is { } success && first.Boon is { } boon && start.Attempts is { } attempts && attempts>=1)
+            if(missing.Count==0 && first.Success is { } success && first.Boon is { } boon && planAttempts is { } attempts && attempts>=1)
             {
                 // 0.479: the quantity the game shows per gather; a node where it was not read counts one.
                 var quantity=Math.Clamp(first.Quantity ?? 1,1,20);
-                var scenario=new GpScenario(start.JobId,start.Level,(int)start.Gp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId),AutoGather:auto);
+                var scenario=new GpScenario(start.JobId,start.Level,planGp,attempts,quantity,success,boon,bountiful ?? 1,MoreActions:true,Forbidden:GpForbiddenFor(start.JobId),AutoGather:auto);
                 var effects=NodeEffects(frame).Where(effect=>GatherNodeEffects.Missing(effect,(int)frame.MaxGp,rating,perception)>0)
                     .Select(effect=>(Effect:effect,Better:GatherNodeEffects.With(scenario,effect))).Where(pair=>pair.Better is not null).ToArray();
                 // 0.747 (X-01): solved off the frame: the slow-frame log of 0.745 measured this panel at 97 ms on the frame a node opened.
@@ -331,7 +334,8 @@ internal sealed partial class MainWindow
         // 0.515 (user request): the crafting list only says what it still needs; the plan is for this node.
         if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
-        if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
+        if(gatheringPanelLate)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanLate",plan.Scenario.Budget,plan.Scenario.Attempts));
+        else if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(plan.Scenario.AutoGather)ImGui.TextColored(Accent,localization.Get("GatheringPanel.AutoGatherPlan"));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
         DrawGatheringNext(plan,slot,start,frame,items?.Find(gatheringPanelItem)?.Name ?? gatheringPanelItem.ToString(),out var next);

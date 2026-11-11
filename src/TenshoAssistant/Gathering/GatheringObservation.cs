@@ -45,6 +45,11 @@ public sealed class GatheringObservedFrame
 /// <summary>0.831 (X-61): another node row (both read), or more attempts left than last read, is another node.</summary>
 public static class GatheringNodes
 {
+    /// <summary>X-129 (0.1108): the GP and attempts a slot's plan starts from: the node as it opened, or, for an item first read after GP was
+    /// spent (a hidden item revealed), what was left when it appeared.</summary>
+    public static (int Gp,int? Attempts) PlanStart(bool late,uint openGp,int? openAttempts,int seenGp,int? seenAttempts)
+        =>late ? (seenGp,seenAttempts):((int)openGp,openAttempts);
+
     public static bool IsNew(uint startNode,int? lastAttempts,uint node,int? attempts)
         =>startNode!=0 && node!=0 && startNode!=node || lastAttempts is { } last && attempts is { } now && now>last;
 }

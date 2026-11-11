@@ -1448,6 +1448,7 @@
     "ListHighlightTip": "At a node, a green frame on the rows of the game's window whose item the crafting list, the workshop or the preparation shown on screen still needs. Drawn only.\nDefault: on.",
     "AutoGatherPlan": "« Gather automatically » is ticked: only what is used before the first gather counts.",
     "PlanAtStart": "Plan made when the node opened ({0} GP): the actions already used are part of it.",
+    "PlanLate": "Item revealed after GP was spent: plan made from what was left when it appeared ({0} GP, {1} attempts), with its rates as read then.",
     "BountifulFloor": "Bountiful bonus unknown (gathering rating or item base not read): the plan counts +1, the rule's minimum."
   },
   "FishingPanel": {

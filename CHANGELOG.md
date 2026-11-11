@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1108.0
+- Plan global, X-129 : Aide à la récolte : un objet caché révélé après une dépense de PR n'a plus « aucun plan » ; son plan est calculé avec ce qui restait à son apparition (PR et essais), avec ses taux lus à ce moment, et le panneau le dit.
+- Tests : LatePlan1108Tests. Verify.ps1 (agent) : 1810/1810, 0 avertissement, 0 erreur ; DLL 0.1108.0.0. Non validé en jeu.
+### English
+- Gathering help: a hidden item revealed after GP was spent no longer has « no plan »; its plan is computed from what was left when it appeared (GP and attempts), with its rates as read then, and the panel says so.
+
 ## 0.1107.0
 - Plan global, X-128 : Carte de Tensho : la case « Quêtes pas encore disponibles » est passée du menu du clic droit à l'onglet Quêtes ; décochée, elle retire aussi de la liste de l'onglet les quêtes pas encore disponibles (pas commencées, avec une quête d'avant pas encore faite), en plus de leurs icônes sur la carte.
 - Tests : MapLockedQuests1107Tests. Verify.ps1 (agent) : 1808/1808, 0 avertissement, 0 erreur ; DLL 0.1107.0.0. Non validé en jeu.
