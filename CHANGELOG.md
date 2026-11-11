@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1103.0
+- Carte : la première image après un chargement ne regroupe plus toutes les ventes des marchands du jeu ni ne parcourt tous les marchands : les boutiques et les marchands de chaque carte sont prêts avec le catalogue, hors de l'image (X-01 ; mesure d'avant : 71 à 156 ms pour les marchands à la première image, 2,7 s une fois).
+- Tests : MapVendorIndex1103Tests. Verify.ps1 (agent) : 1799/1799, 0 avertissement, 0 erreur ; DLL 0.1103.0.0. Rien à essayer en jeu.
+### English
+- Map: the first frame after a load no longer groups every NPC sale of the game nor scans every vendor: the shops and the vendors of each map are ready with the catalogue, off the frame (X-01; measured before: 71 to 156 ms for the vendors on the first frame, 2.7 s once).
+
 ## 0.1102.0
 - Journal des gils : les gils des missions de la pêche en mer ont leur catégorie, « Pêche en mer (missions) », au lieu de « Autre ». Découvertes : un secteur d'aéronef débloqué (message du jeu « Une nouvelle destination à explorer a été découverte ») est noté, comme ceux des sous-marins, seulement si la feuille du jeu connaît ce secteur.
 - Tests : GainParsers1102Tests. Verify.ps1 (agent) : 1797/1797, 0 avertissement, 0 erreur ; DLL 0.1102.0.0. Non validé en jeu.

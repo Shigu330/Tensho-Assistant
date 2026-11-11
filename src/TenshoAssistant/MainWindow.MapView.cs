@@ -2201,15 +2201,17 @@ internal sealed partial class MainWindow
         var festivalKey=string.Join(',',running.Order());
         if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog) || mapVendorCache.Festivals!=festivalKey)
         {
-            var shops=ReferenceEquals(mapVendorCache.Catalog,catalog) ? mapVendorCache.Shops
-:catalog.Sales.GroupBy(sale=>sale.ShopId).ToDictionary(group=>group.Key,group=>(group.First().ShopName,group.First().Kind,group.Select(sale=>sale.ItemId).Distinct().Count()));
+            // X-01 (0.1103, first map frame after a load: « canvas vendors » 71 to 156 ms, once 2 729 ms): the shops and the vendors of the map come
+            // from the catalogue's indexes, built off the frame, instead of grouping every sale and scanning every vendor here.
+            var shops=catalog.ShopSummaries;
             var same=(maps.State.Catalog?.Equivalent(map) ?? [map.MapId]).ToHashSet();
-            var rows=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running)).Take(1).Select(spot=>(vendor,spot))).ToArray();
+            var nearby=catalog.VendorsOnAny(same);
+            var rows=nearby.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running)).Take(1).Select(spot=>(vendor,spot))).ToArray();
             mapVendorCache=(map.MapId,catalog,rows,shops,festivalKey);
             // 0.823 (X-45): developer mode, the vendors drawn on this map with their place's condition, and those left out.
             if(developerMode)
             {
-                var hidden=catalog.Vendors.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && !Npcs.NpcShopLinks.Present(spot,running)).Take(1)).Count();
+                var hidden=nearby.SelectMany(vendor=>vendor.Locations.Where(spot=>same.Contains(spot.MapId) && !Npcs.NpcShopLinks.Present(spot,running)).Take(1)).Count();
                 log.Information("Map vendors on map {0}: {1} shown, {2} left out (festivals running: {3}); shown: {4}.",map.MapId,rows.Length,hidden,festivalKey,
                     string.Join(", ",rows.Take(30).Select(row=>$"{row.vendor.NpcId} {row.vendor.Name} c{row.spot.Condition}")));
             }

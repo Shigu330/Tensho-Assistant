@@ -130,12 +130,34 @@ public sealed class NpcVendorCatalog
         // Shops keep the order of their first sale in Sales, sales their order in Sales (as the page's former GroupBy did).
         var shops=sales.GroupBy(sale=>sale.ShopId).Select((group,order)=>(group.Key,Order:order,Sales:(IReadOnlyList<NpcShopSale>)Array.AsReadOnly(group.ToArray()))).ToArray();
         salesByShop=shops.ToFrozenDictionary(shop=>shop.Key,shop=>shop.Sales);
+        // X-01 (0.1103): what the map's vendor labels need per shop, built here (off the frame) instead of grouping every sale in the map's frame.
+        ShopSummaries=shops.ToFrozenDictionary(shop=>shop.Key,shop=>(shop.Sales[0].ShopName,shop.Sales[0].Kind,shop.Sales.Select(sale=>sale.ItemId).Distinct().Count()));
+        // X-01 (0.1103): the vendors that stand on each map (index in Vendors), so a map change no longer scans every vendor's places.
+        var onMap=new Dictionary<uint,List<int>>();
+        for(var index=0;index<vendors.Count;index++)
+            foreach(var map in vendors[index].Locations.Select(spot=>spot.MapId).Distinct())
+            {
+                if(!onMap.TryGetValue(map,out var list))onMap[map]=list=[];
+                list.Add(index);
+            }
+        vendorsOnMap=onMap.ToFrozenDictionary(pair=>pair.Key,pair=>pair.Value.ToArray());
         var shopOrder=shops.ToDictionary(shop=>shop.Key,shop=>shop.Order);
         vendorByNpc=vendors.GroupBy(vendor=>vendor.NpcId).ToFrozenDictionary(group=>group.Key,group=>group.First());
         shopsByNpc=vendorByNpc.ToFrozenDictionary(pair=>pair.Key,pair=>(IReadOnlyList<IReadOnlyList<NpcShopSale>>)Array.AsReadOnly(pair.Value.ShopIds.Distinct()
             .Where(shopOrder.ContainsKey).OrderBy(shop=>shopOrder[shop]).Select(shop=>salesByShop[shop]).ToArray()));
     }
     private readonly FrozenDictionary<uint,IReadOnlyList<NpcShopSale>> salesByShop;
+    private readonly FrozenDictionary<uint,int[]> vendorsOnMap;
+    /// <summary>X-01 (0.1103): each shop that sells something: its name and kind (those of its first sale) and how many different items it sells.</summary>
+    public IReadOnlyDictionary<uint,(string Name,NpcShopKind Kind,int Items)> ShopSummaries{get;}
+    /// <summary>X-01 (0.1103): the vendors with at least one place on one of these maps, in the order of <see cref="Vendors"/>.</summary>
+    public IReadOnlyList<NpcVendor> VendorsOnAny(IEnumerable<uint> maps)
+    {
+        var indexes=new SortedSet<int>();
+        foreach(var map in maps)
+            if(vendorsOnMap.TryGetValue(map,out var found))indexes.UnionWith(found);
+        return indexes.Select(index=>Vendors[index]).ToArray();
+    }
     private readonly FrozenDictionary<uint,NpcVendor> vendorByNpc;
     private readonly FrozenDictionary<uint,IReadOnlyList<IReadOnlyList<NpcShopSale>>> shopsByNpc;
     /// <summary>Every sale of one shop, in the order of Sales; empty when the shop sells nothing.</summary>
