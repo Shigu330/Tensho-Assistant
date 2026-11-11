@@ -34,6 +34,11 @@ internal static class GainSources1096Tests
             pending.Source(GainSource.Venture,584,50_000);pending.Source(GainSource.SubmarineReturn,0,53_500);
             pending.Add("12923x24",53_000);
             Check(pending.Settle(53_600).Explained.Single().Source==GainSource.SubmarineReturn,"the closest source wins");
+            // 0.1099: a window explains a gain only when nothing else does (the venture's result window is a window too).
+            pending.Source(GainSource.Window,0,70_000);pending.Source(GainSource.Venture,584,70_000);pending.Add("5825x7",70_000);
+            Check(pending.Settle(70_100).Explained.Single().Source==GainSource.Venture,"venture over its window");
+            pending.Source(GainSource.Window,0,90_000);pending.Add("44106x212",90_400);
+            Check(pending.Settle(90_500).Explained.Single().Source==GainSource.Window,"taken out of the saddlebag: a window, never noted");
         }),
         ("Gain sources 1096: wiring",() =>
         {
@@ -42,6 +47,8 @@ internal static class GainSources1096Tests
             Check(watcher.Contains("unexplained.Source(GainSource.Venture,task,"),"the venture result is a source");
             Check(watcher.Contains("SettleGains(now);") && watcher.Contains("\"Item gain attributed: {0} from {1} {2}.\"") && watcher.Contains("\"Item gain not attributed: {0}; {1}.\""),"settled every pass, both lines in the developer log");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.1096-gain-sources.md")),"evidence");
+            Check(watcher.Contains("unexplained.Source(crafting ? GainSource.Craft:gathering ? GainSource.Gathering:windowOpen ? GainSource.Window:GainSource.None,0,now);")
+                  && watcher.Contains("if(source!=GainSource.Window)log.Information(\"Item gain attributed"),"0.1099: craft, gathering and windows; windows silent");
         }),
     ];
 }

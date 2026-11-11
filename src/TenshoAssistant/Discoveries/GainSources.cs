@@ -1,7 +1,9 @@
 namespace TenshoAssistant.Discoveries;
 
 /// <summary>0.1096: where a gain of items came from when it is none of the causes of <see cref="ItemGains.Attribute"/>.</summary>
-public enum GainSource { None, Venture, AirshipReturn, SubmarineReturn, Squadron, SquadronTraining }
+/// <remarks>0.1099 (dalamud.log of 11/11 15:41-15:54): Craft (a synthesis), Gathering (a gathering point, its collectables included) and Window (an item
+/// moved out of the saddlebag, a retainer, a chest, a shop or a trade: not a gain, never noted).</remarks>
+public enum GainSource { None, Venture, AirshipReturn, SubmarineReturn, Squadron, SquadronTraining, Craft, Gathering, Window }
 
 /// <summary>
 /// 0.1096 (user report, 11/11 15 h: « Item gain not attributed » for retainer ventures, an airship and a submarine back, and squadron titles):
@@ -56,7 +58,9 @@ public sealed class PendingGains<T>
         for(var index=0;index<pending.Count;index++)
         {
             var (at,gain)=pending[index];
-            var near=sources.Where(seen=>Math.Abs(seen.At-at)<=Hold).OrderBy(seen=>Math.Abs(seen.At-at)).Select(seen=>((GainSource,uint)?)(seen.Source,seen.Detail)).FirstOrDefault();
+            // 0.1099: an open window (saddlebag, retainer, shop) explains a gain only when nothing else does (a venture's result window is one too).
+            var near=sources.Where(seen=>Math.Abs(seen.At-at)<=Hold).OrderBy(seen=>seen.Source==GainSource.Window ? 1:0).ThenBy(seen=>Math.Abs(seen.At-at))
+                .Select(seen=>((GainSource,uint)?)(seen.Source,seen.Detail)).FirstOrDefault();
             if(near is { } found)explained.Add((gain,found.Item1,found.Item2));
             else if(now-at>=Hold)alone.Add(gain);
             else continue;

@@ -279,8 +279,12 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             var hqGains=ItemGains.Gains(beforeHq,hqCounts);beforeHq=hqCounts;
             if(gains.Count==0 || gains.Count>16)return;
             var fishing=wanted.Fishing && condition[ConditionFlag.Fishing];
-            var busy=!fishing && (condition[ConditionFlag.Crafting] || condition[ConditionFlag.Gathering] || condition[ConditionFlag.PreparingToCraft]
-                || BusyWindows.Any(name=>gui.GetAddonByName(name) is { IsNull:false,IsVisible:true }));
+            var crafting=condition[ConditionFlag.Crafting] || condition[ConditionFlag.PreparingToCraft];var gathering=condition[ConditionFlag.Gathering];
+            var windowOpen=BusyWindows.Any(name=>gui.GetAddonByName(name) is { IsNull:false,IsVisible:true });
+            var busy=!fishing && (crafting || gathering || windowOpen);
+            // 0.1099 (dalamud.log of 11/11: a synthesis's result, gathering yields and items taken out of the saddlebag were « not attributed »):
+            // what the player is doing is the source; an item moved out of a storage window is no gain and is never noted.
+            if(!fishing)unexplained.Source(crafting ? GainSource.Craft:gathering ? GainSource.Gathering:windowOpen ? GainSource.Window:GainSource.None,0,now);
             var spent=ItemGains.SingleSpent(losses);
             // X-73.17 (0.873): field content and deep dungeons, told by the game's own directors (no territory list).
             var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
@@ -389,7 +393,8 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(unexplained.Waiting==0)return;
         var (explained,alone)=unexplained.Settle(now);
         if(!debug())return;
-        foreach(var ((items,_),source,detail) in explained)log.Information("Item gain attributed: {0} from {1} {2}.",items,source,detail);
+        foreach(var ((items,_),source,detail) in explained)
+            if(source!=GainSource.Window)log.Information("Item gain attributed: {0} from {1} {2}.",items,source,detail);
         foreach(var (items,inputs) in alone)log.Information("Item gain not attributed: {0}; {1}.",items,inputs);
     }
 

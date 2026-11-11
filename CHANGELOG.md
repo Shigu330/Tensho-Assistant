@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1099.0
+- Découvertes (journal du développeur) : les prises de récolte (récolte abondante, objets de collection) et le résultat d'une synthèse sont attribués à la récolte et à l'artisanat ; un objet sorti de la sacoche, d'un servant, d'un coffre, d'une boutique ou d'un échange n'est plus compté comme un gain non attribué (rien n'est noté). Une fenêtre de ce genre n'explique un gain que si rien d'autre ne le fait (le résultat d'une tâche de servant reste attribué à la tâche).
+- Tests : GainSources1096Tests. Verify.ps1 (agent) : 1793/1793, 0 avertissement, 0 erreur ; DLL 0.1099.0.0. Non validé en jeu.
+### English
+- Discoveries (developer log): gathering yields (bountiful yield, collectables) and a synthesis's result are put down to gathering and crafting; an item taken out of the saddlebag, a retainer, a chest, a shop or a trade is no longer counted as an unattributed gain (nothing is noted). Such a window explains a gain only when nothing else does (a venture's result stays put down to the venture).
+
 ## 0.1098.0
 - Carte : après chaque téléportation, la carte de Tensho revenait sur une ancienne cible (le journal montrait la même demande « drapeau, carte 700 » à chaque ouverture, même ailleurs) : le jeu garde sa dernière demande de carte et sa carte choisie. Une demande gardée ne demande plus rien et la carte suit le joueur, comme la touche M : un drapeau retiré ou déplacé, la même demande de drapeau qu'à l'ouverture d'avant, ou la carte rouverte par Tensho à la fin d'une téléportation vers une autre zone. Une demande nouvelle (journal, lien, drapeau posé) ouvre toujours sur sa cible.
 - Tests : StaleMapRequest1098Tests. Verify.ps1 (agent) : 1793/1793, 0 avertissement, 0 erreur ; DLL 0.1098.0.0. Non validé en jeu.
