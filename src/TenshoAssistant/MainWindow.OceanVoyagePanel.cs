@@ -20,10 +20,12 @@ internal sealed partial class MainWindow
     /// the log gives the slot, the loop row and the shifts still possible, for the evidence.
     /// </summary>
     private uint oceanRouteChecked;
+    /// <summary>0.1095: the timetable once read in the background (null until then): the check waits for it instead of reading the sheets in the frame.</summary>
+    internal Func<OceanSchedule?>? OceanTimetableNow { get; set; }
     internal (int Matches,int Mismatches) OceanScheduleChecks { get; private set; }
     private void CheckOceanSchedule(OceanVoyageFrame frame)
     {
-        if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;
+        if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || (OceanTimetableNow ?? OceanTimetable)?.Invoke() is not { } timetable)return;
         oceanRouteChecked=frame.RouteId;
         // 0.1094: once per voyage, a reload of the plugin included (the voyage record keeps it).
         if(frame.ScheduleChecked)return;
@@ -59,6 +61,43 @@ internal sealed partial class MainWindow
             slot,slot%Math.Max(1,timetable.Count),port,route,state.Sightings,state.Candidates.Count,state.Check,string.Join(", ",state.Candidates.Take(24)));
     }
 
+    // 0.1095 (user report: TenshoOceanVoyage 160 to 260 ms per frame after each reload): what the panel shows of each fish that does not change
+    // from one frame to the next (the GatherBuddy row, the points seen in game) and the fish caught before a spectral current at this stop, built
+    // once and kept three seconds instead of being rebuilt on every frame for every fish.
+    private readonly Dictionary<(uint Fish,uint Spot),((IReadOnlyList<uint> Route,string? Bite,string? HookSet) Row,Discoveries.DiscoveryFact? Points)> oceanFishCache=[];
+    private IReadOnlyList<Discoveries.DiscoveryFact> oceanSpectralSeen=[];private uint oceanSpectralFor;private long oceanCacheAt=-100_000;
+
+    private void OceanCacheTick()
+    {
+        var now=Environment.TickCount64;
+        if(now-oceanCacheAt<3_000)return;
+        oceanCacheAt=now;oceanFishCache.Clear();oceanSpectralFor=0;
+    }
+
+    private ((IReadOnlyList<uint> Route,string? Bite,string? HookSet) Row,Discoveries.DiscoveryFact? Points) OceanFish(uint fishId,uint spotId)
+    {
+        if(oceanFishCache.TryGetValue((fishId,spotId),out var known))return known;
+        var row=FishRow(fishId,spotId);
+        var points=DiscoveryStore is { } pointsStore && DiscoveriesLoaded ? pointsStore.Find(Discoveries.DiscoveryKind.FishPoints,fishId,1).FirstOrDefault():null;
+        return oceanFishCache[(fishId,spotId)]=((row.Route,row.Bite,row.HookSet),points);
+    }
+
+    private IReadOnlyList<Discoveries.DiscoveryFact> OceanSpectralSeen(OceanStopView stop)
+    {
+        if(oceanSpectralFor==stop.Spot.Id+1)return oceanSpectralSeen;
+        oceanSpectralFor=stop.Spot.Id+1;
+        var stopFish=stop.Fish.ToHashSet();
+        return oceanSpectralSeen=DiscoveryStore is { } seenStore && DiscoveriesLoaded ? seenStore.Find(Discoveries.DiscoveryKind.SpectralBefore,fish=>stopFish.Contains(fish),3):[];
+    }
+
+    /// <summary>0.1095: in developer mode, a part of the panel's frame for the « Slow frame » line (measured before and after in game).</summary>
+    private void OceanPart(string part,Action draw)
+    {
+        var started=developerMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
+        try{draw();}
+        finally{if(started!=0)SlowFrames.Add(ImGui.GetFrameCount(),part,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);}
+    }
+
     // X-85 V2 (0.918): stopwatch of the voyage panel (started when a cast starts, as the usual fishing help, which is off at sea).
     private DateTimeOffset? oceanFishingSince;private bool oceanFishingBefore;
 
@@ -77,7 +116,7 @@ internal sealed partial class MainWindow
             ImGui.TableHeadersRow();
             foreach(var fishId in fishList)
             {
-                var row=FishRow(fishId,spotId);var fish=items?.Find(fishId);
+                var cached=OceanFish(fishId,spotId);var row=cached.Row;var fish=items?.Find(fishId);
                 ImGui.PushID((int)fishId);
                 try
                 {
@@ -85,7 +124,7 @@ internal sealed partial class MainWindow
                     var stock=GetRecipeHoldings(fishId);
                     ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
                     // X-85 V2 (0.964): points this fish brings, as seen in game (one catch), and what it earned this voyage at this stop.
-                    var seenPoints=DiscoveryStore is { } pointsStore && DiscoveriesLoaded ? pointsStore.Find(Discoveries.DiscoveryKind.FishPoints,fishId,1).FirstOrDefault():null;
+                    var seenPoints=cached.Points;
                     var earned=OceanVoyage?.Frame?.ZoneFish.FirstOrDefault(entry=>entry.Item==fishId) is { Item:not 0 } here ? here:default;
                     if(seenPoints is not null || earned.Points>0)
                     {
@@ -157,6 +196,7 @@ internal sealed partial class MainWindow
         Panels?.Show("TenshoOceanVoyage",localization.Get("OceanVoyage.Title"),ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoCollapse|ImGuiWindowFlags.AlwaysAutoResize,()=>{ImGui.SetNextWindowPos(new Vector2(60,300),ImGuiCond.FirstUseEver);},()=>
         {
             if(OceanVoyages.Current(data,frame) is not { } stop){ImGui.TextDisabled(localization.Get("OceanVoyage.Unknown"));return;}
+            OceanCacheTick();
             ImGui.TextColored(Accent,localization.Format("OceanVoyage.Stop",stop.Index+1,stop.Spot.Place,localization.Get("OceanFishing.Time"+stop.Time)));
             if(stop.Spectral)ImGui.TextColored(UI.FfxivTheme.Success,localization.Get("OceanVoyage.Spectral"));
             if(stop.NextSpot is { } next)ImGui.TextDisabled(localization.Format("OceanVoyage.Next",next.Place,localization.Get("OceanFishing.Time"+stop.NextTime)));
@@ -187,12 +227,12 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(localization.Get("FishingPanel.BaitInHand"));ImGui.SameLine();
                 ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{baitStock.Total:N0}":"")}");
                 ImGui.SameLine();
-                ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",stop.Fish.Count(fish=>FishRow(fish,spotId).Route is [var first,..] && first==held)));
+                ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",stop.Fish.Count(fish=>OceanFish(fish,spotId).Row.Route is [var first,..] && first==held)));
             }
             var missionsNow=frame.Missions.Where(mission=>mission.Type!=0 && data.Missions.ContainsKey(mission.Type))
                 .Select(mission=>(data.Missions[mission.Type].Text,mission.Progress,data.Missions[mission.Type].Target,data.Missions[mission.Type].Criterion)).ToArray();
             IReadOnlyList<string> CountsFor(uint fish,string? bite)=>OceanMissionRules.CountsFor(fish,data.FishBonuses,bite,missionsNow);
-            DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed,CountsFor);
+            OceanPart("ocean fish table",()=>DrawOceanFishTable("OceanVoyageFish",stop.Fish,spotId,inHand,elapsed,CountsFor));
             // The spectral current's fish, highlighted, folded while the current is not there (they are never in the usual spot: IKDSpot.SpotSub).
             if(!stop.Spectral && stop.Spot.SpectralSpot!=0 && data.SpotFish.GetValueOrDefault(stop.Spot.SpectralSpot) is { Count:>0 } spectralFish)
             {
@@ -202,15 +242,14 @@ internal sealed partial class MainWindow
                 Tip("OceanVoyage.SpectralFishTip");
                 if(open)
                 {
-                    try{DrawOceanFishTable("OceanSpectralFish",spectralFish,stop.Spot.SpectralSpot,inHand,null,CountsFor);}
+                    try{OceanPart("ocean spectral table",()=>DrawOceanFishTable("OceanSpectralFish",spectralFish,stop.Spot.SpectralSpot,inHand,null,CountsFor));}
                     finally{ImGui.TreePop();}
                 }
             }
             // X-85 V4 (0.962, user's priority 1): what was caught just before a spectral current at this stop (yours and shared), most seen first.
-            if(!stop.Spectral && DiscoveryStore is { } seenStore && DiscoveriesLoaded)
+            if(!stop.Spectral)
             {
-                var stopFish=stop.Fish.ToHashSet();
-                var before=seenStore.Find(Discoveries.DiscoveryKind.SpectralBefore,fish=>stopFish.Contains(fish),3);
+                var before=OceanSpectralSeen(stop);
                 if(before.Count>0)
                 {
                     ImGui.TextColored(Accent,localization.Get("OceanVoyage.SpectralSeenTitle"));
@@ -229,7 +268,8 @@ internal sealed partial class MainWindow
                     ImGui.TextColored(progress>=target && target>0 ? UI.FfxivTheme.Success:Muted,localization.Format("OceanVoyage.Mission",text,target>0 ? Math.Min(progress,target):progress,target));
             }
             ImGui.Separator();
-            if(OceanVoyages.Plausible(frame))ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",frame.Points.ToString("N0"),frame.Caught));
+            if(OceanVoyages.ShowTotals(frame) && OceanVoyages.Totals(frame) is var (points,caught))
+                ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",points.ToString("N0"),caught));
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
             Tip("OceanVoyage.Credit");
         });

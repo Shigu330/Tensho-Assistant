@@ -7,7 +7,7 @@ internal static class GameChecks880Tests
         ("Game checks: one ocean check per voyage (boarding counted in the slot), weather 10 s after entering an open zone",() =>
         {
             var panel=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.OceanVoyagePanel.cs"));
-            Check(panel.Contains("if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || OceanTimetable?.Invoke() is not { } timetable)return;")
+            Check(panel.Contains("if(frame.RouteId==0 || frame.RouteId==oceanRouteChecked || (OceanTimetableNow ?? OceanTimetable)?.Invoke() is not { } timetable)return;")
                 && panel.Contains("(DateTimeOffset.UtcNow+OceanSchedule.Boarding-OceanSchedule.LoopStart)/OceanSchedule.Step"),"ocean");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
             Check(watcher.Contains("weatherCheckAt=duty==0 ? now+10_000:-100_000;") && watcher.Contains("if(expected==0 || actual==0)return;"),"weather");

@@ -24,7 +24,7 @@ internal sealed class OceanVoyageReader : IDisposable
     /// territory. Called on the framework thread.
     /// </summary>
     public Action<uint,int>? CatchPoints { get; set; }
-    private readonly Dictionary<uint,(int Count,int Points)> zoneSeen=[];private int zoneSeenFor=-1;private bool scripsLogged;
+    private readonly Dictionary<uint,(int Count,int Points)> zoneSeen=[];private int zoneSeenFor=-1;private bool scripsLogged;private int resultWait;
     // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, read again after a reload of the same voyage.
     private readonly string? recordPath;private readonly BackgroundWriter? writer;
     private OceanVoyageRecord? record;private bool scheduleCheckedAsked;
@@ -101,10 +101,20 @@ internal sealed class OceanVoyageReader : IDisposable
                         zoneSeen[item]=(nq+hq,points);
                     }
                 // X-85 V6 (0.964): the voyage's result, logged once in developer mode to prove which scrip field is which (orange or purple).
+                // 0.1095 (user report: « points 0, experience 0 » at 15:30:08, the first reading of status 4): the result is filled a moment
+                // later; logged once it holds something, or after 30 s of status 4 with what is there, beside Tensho's own count.
+                if(status!=4)resultWait=0;
                 if(status==4 && !scripsLogged && Developer?.Invoke()==true)
                 {
-                    scripsLogged=true;var result=voyage->IndividualResult;
-                    log.Information("Ocean voyage result: route {0}, points {1}, experience {2}, scrip1 {3}, scrip2 {4}.",voyage->CurrentRoute,result.TotalPoints,result.ExperiencePoints,result.Scrip1Amount,result.Scrip2Amount);
+                    var result=voyage->IndividualResult;
+                    var filled=result.TotalPoints>0 || result.ExperiencePoints>0 || result.Scrip1Amount>0 || result.Scrip2Amount>0;
+                    if(filled || ++resultWait>=60)
+                    {
+                        scripsLogged=true;
+                        var counted=OceanVoyages.Totals(new OceanVoyageFrame(voyage->CurrentRoute,zone,status,false,0,[],player.TotalPoints,player.CaughtFish,nowAt){Catches=record!.Catches});
+                        log.Information("Ocean voyage result: route {0}, points {1}, experience {2}, scrip1 {3}, scrip2 {4}; Tensho counted {5} points, {6} fish{7}.",voyage->CurrentRoute,
+                            result.TotalPoints,result.ExperiencePoints,result.Scrip1Amount,result.Scrip2Amount,counted.Points,counted.Caught,filled ? "":" (result still empty after 30 s)");
+                    }
                 }
                 var progress=record!.Missions;
                 Volatile.Write(ref frame,new OceanVoyageFrame(voyage->CurrentRoute,zone,status,voyage->SpectralCurrentActive,voyage->WeatherId,

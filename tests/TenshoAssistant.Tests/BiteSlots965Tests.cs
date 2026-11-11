@@ -8,7 +8,7 @@ internal static class BiteSlots965Tests
         ("Bite slots 965: logged when the strength is unknown, developer mode only",() =>
         {
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs"));
-            Check(watcher.Contains("if(biteStrength==0 && debug())") && watcher.Contains("Discovery: bite strength unknown; timeline slots {0}."),"logged");
+            Check(watcher.Contains("biteStrength==0 && biteSlots is not null && debug()") && watcher.Contains("Discovery: bite strength unknown; timeline slots {0}."),"logged");
         }),
     ];
 }

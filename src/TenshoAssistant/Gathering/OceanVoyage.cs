@@ -59,6 +59,20 @@ public static class OceanVoyages
     /// </summary>
     public static bool Plausible(OceanVoyageFrame frame)=>frame.Points is >= 0 and <= 30_000 && frame.Caught is >= 0 and <= 400;
 
+    /// <summary>
+    /// 0.1095 (user report, 11/11 15 h: the panel's line said « Points: 0 · fish caught: 0 » while its table showed 20 and 22 points, 42 in the
+    /// game): the game's line for the player stays empty for most of the voyage. The points and fish of the voyage are the sum of the catches
+    /// of every stop (the zones' FishData, kept across a reload); the player's line wins once it is filled, plausible and not below that sum.
+    /// </summary>
+    public static (int Points,int Caught) Totals(OceanVoyageFrame frame)
+    {
+        var points=(int)Math.Min(frame.Catches.Sum(fish=>(long)fish.Points),int.MaxValue);var caught=frame.Catches.Sum(fish=>fish.Count);
+        return Plausible(frame) && frame.Points>0 && frame.Points>=points ? (frame.Points,Math.Max(frame.Caught,caught)):(points,caught);
+    }
+
+    /// <summary>0.1095: the line is shown when it can be true: catches counted, or the game's line plausible.</summary>
+    public static bool ShowTotals(OceanVoyageFrame frame)=>frame.Catches.Count>0 || Plausible(frame);
+
     /// <summary>The missions as (text, progress, target); a type the data does not know is left out.</summary>
     public static IReadOnlyList<(string Text,int Progress,int Target)> Missions(OceanVoyageData data,OceanVoyageFrame frame)
         =>frame.Missions.Where(mission=>mission.Type!=0 && data.Missions.ContainsKey(mission.Type))

@@ -102,24 +102,33 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         var events=FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.Instance();
         var handler=events==null ? null:events->EventHandlerModule.FishingEventHandler;
         var state=handler==null ? -1:(int)handler->State;
-        if(state==lineState)return;
+        var character=(FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)me.Address;
+        if(state==lineState)
+        {
+            // 0.1095 (dalamud.log of 11/11 15:09: the line reading saw 7:293 at the bite, this one 100 ms later only 0:277): the bite's
+            // animation can be set a frame after the state or be gone soon after; read again on every frame while the line bites.
+            if(state==5 && castStarted>0 && biteStrength==0)biteStrength=ItemGains.BiteStrength(character->Timeline.TimelineSequencer.TimelineIds[7]);
+            return;
+        }
+        // X-98 (5) (0.965): at sea the strength was often unknown; in developer mode the timeline slots seen at the bite are logged when the bite
+        // ends still unknown, to find where it is.
+        if(lineState==5 && castStarted>0 && biteStrength==0 && biteSlots is not null && debug())
+            log.Information("Discovery: bite strength unknown; timeline slots {0}.",biteSlots);
         lineState=state;
         if(state==1){castStarted=now;bitAt=-100_000;castChum=me.StatusList.Any(status=>status.StatusId==763);}
         else if(state==5 && castStarted>0)
         {
             bitAt=now;
-            var character=(FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)me.Address;
             biteStrength=ItemGains.BiteStrength(character->Timeline.TimelineSequencer.TimelineIds[7]);
-            // X-98 (5) (0.965): at sea the strength is often unknown; in developer mode the timeline slots are logged then, to find where the bite is.
-            if(biteStrength==0 && debug())
-            {
-                var slots=new List<string>();
-                for(var slot=0;slot<character->Timeline.TimelineSequencer.TimelineIds.Length;slot++)
-                    if(character->Timeline.TimelineSequencer.TimelineIds[slot] is var id and not 0)slots.Add($"{slot}:{id}");
-                log.Information("Discovery: bite strength unknown; timeline slots {0}.",string.Join(" ",slots));
-            }
+            var slots=new List<string>();
+            for(var slot=0;slot<character->Timeline.TimelineSequencer.TimelineIds.Length;slot++)
+                if(character->Timeline.TimelineSequencer.TimelineIds[slot] is var id and not 0)slots.Add($"{slot}:{id}");
+            biteSlots=string.Join(" ",slots);
         }
     }
+    private string? biteSlots;
+    // 0.1095: the fishing line is read on every frame (one pointer read) while the rest of the watcher reads every 100 ms.
+    private bool lineEveryFrame;
     /// <summary>
     /// X-75.6 (0.880): the weather formula (WeatherCatalog, rule read in the community tools) checked against the game: 10 s after entering a zone, the forecast
     /// for now against WeatherManager.GetCurrentWeather. Zones with their own weather (some quests and duties) can differ: counted, logged in the debug log only.
@@ -240,9 +249,15 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     {
         if(disposed)return;
         var now=Environment.TickCount64;
-        if(now<nextRead)return;
+        if(now<nextRead)
+        {
+            if(lineEveryFrame && objects.LocalPlayer is { } fisher && fisher.ClassJob.RowId==18)
+                try{ReadLine(now,fisher);}catch(Exception){lineEveryFrame=false;}
+            return;
+        }
         nextRead=now+100;
         var wanted=settings();
+        lineEveryFrame=wanted.Enabled && wanted.Fishing;
         if(!wanted.Enabled || !wanted.ItemSources && !wanted.Fishing || !client.IsLoggedIn || objects.LocalPlayer is not { } me){before=null;return;}
         try
         {

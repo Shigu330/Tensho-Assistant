@@ -680,7 +680,10 @@ public sealed class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
             });
-            mainWindow.OceanVoyageData=()=>oceanVoyageData.Value;
+            // 0.1095 (user report: OceanVoyage 75 to 90 ms on the first frame after each reload): the sheets are read in the background; the panel
+            // and the schedule check wait for them (null until then) instead of reading them in the frame.
+            mainWindow.OceanVoyageData=InBackground(oceanVoyageData);
+            mainWindow.OceanTimetableNow=InBackground(ocean);
             OceanVoyageReader? oceanVoyageReader=null;
             // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, and the play state for the developer's scripts.
             var voyageWriter=new BackgroundWriter((error,message)=>log.Warning(error,message));
@@ -1622,6 +1625,18 @@ public sealed class Plugin : IDalamudPlugin
         catch(Exception error){log.Warning(error,"Sheet {0} unavailable (perhaps after a game update); its feature stays off.",name);return unavailable;}
     }
     private readonly HashSet<string> brokenOverlays=[];
+
+    /// <summary>0.1095: a lazy value built on a worker the first time it is asked; null until it is ready (never built in the frame).</summary>
+    private static Func<T?> InBackground<T>(Lazy<T?> lazy) where T:class
+    {
+        Task? building=null;
+        return ()=>
+        {
+            if(lazy.IsValueCreated)return lazy.Value;
+            building??=Task.Run(()=>_=lazy.Value);
+            return null;
+        };
+    }
 
     public void Dispose()
     {
