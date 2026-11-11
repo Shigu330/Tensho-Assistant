@@ -45,6 +45,10 @@ The plugins quoted were looked at for their functions only (public pages), never
 2. Deep dungeons (no. 4): a bestiary page outside the dungeon, without combat tips? or with the community's tips, outside the dungeon only?
 3. Shared tracking of the Eureka NMs through a third-party site: left to the existing plugins? (recommended: yes, Tensho stays without a third-party site)
 
+Answers ([DEC-045](DECISIONS.md), 2026-11-09, point 8): 1. yes: written notes and an arena diagram in the Tensho window, out of combat,
+never over the game, no marker placed in the game; 2. a bestiary with the wiki notes, outside the dungeon only. Question 3 was not in that
+batch and stays open; Tensho has no third-party site.
+
 ---
 
 # Outils de contenus (X-90, X-92) — étude du 2026-11-09
@@ -91,3 +95,7 @@ Les plugins cités ont été regardés pour leurs fonctions seulement (pages pub
 1. Tableaux stratégiques (n° 5) : de simples notes écrites par vous, masquées en combat, sans rien dessiner sur l'écran du jeu ? (recommandé)
 2. Donjons profonds (n° 4) : une page bestiaire hors du donjon, sans conseil de combat ? ou avec les conseils de la communauté, hors du donjon seulement ?
 3. Suivi partagé des NM d'Eurêka par un site tiers : laissé aux plugins existants ? (recommandé : oui, Tensho reste sans site tiers)
+
+Réponses ([DEC-045](DECISIONS.md), 2026-11-09, point 8) : 1. oui : notes écrites et schéma de l'arène dans la fenêtre de Tensho, hors
+combat, jamais par-dessus le jeu, aucun marqueur posé dans le jeu ; 2. un bestiaire avec les notes du wiki, hors du donjon seulement. La
+question 3 n'était pas dans ce lot et reste ouverte ; Tensho n'a aucun site tiers.

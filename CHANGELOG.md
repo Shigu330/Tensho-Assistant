@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1058.0
+- Constat d'audit A062 (partie CONTENT-TOOLS) : les trois questions de fin de CONTENT-TOOLS semblaient ouvertes alors que DEC-045 (2026-11-09, point 8) a répondu aux deux premières (notes et schéma de l'arène dans la fenêtre de Tensho, hors combat ; bestiaire avec les notes du wiki, hors du donjon). Les réponses suivent maintenant les questions, dans les deux langues ; la troisième (suivi partagé des NM d'Eurêka par un site tiers) n'était pas dans ce lot et reste ouverte. Un test vérifie les deux moitiés.
+- Tests : ContentToolsAnswers1058Tests. Verify.ps1 (agent) : 1738/1738, 0 avertissement, 0 erreur ; DLL 0.1058.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A062 (CONTENT-TOOLS part): the three questions at the end of CONTENT-TOOLS looked open although DEC-045 (2026-11-09, point 8) answered the first two (notes and arena diagram in the Tensho window, out of combat; bestiary with the wiki notes, outside the dungeon). The answers now follow the questions, in both languages; the third one (shared tracking of the Eureka NMs through a third-party site) was not in that batch and stays open. A test checks both halves.
+
 ## 0.1057.0
 - Constat d'audit A085 : l'en-tête du CHANGELOG renvoyait aux commits git pour l'historique détaillé, alors que le corps des commits et les notes de release sont écrits depuis la partie anglaise du CHANGELOG lui-même. Il dit maintenant le format (français puis « ### English », partie anglaise obligatoire depuis 0.219.0) et ce qui lit la partie anglaise. Un test vérifie l'en-tête.
 - Tests : ChangelogHeader1057Tests. Verify.ps1 (agent) : 1737/1737, 0 avertissement, 0 erreur ; DLL 0.1057.0.0. Rien à essayer en jeu.
