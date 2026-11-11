@@ -16,6 +16,47 @@ internal sealed partial class MainWindow
     private string gardenCrossSearch="";
     private (uint Seed,IReadOnlyList<GardenCrossPair> Pairs)? gardenBestPairs;
     private GardenCrossPair? gardenPair;
+    // X-130 (0.1109): the pairs' index, built once per catalogue; the seeds' ids by their journal name (game language).
+    private (GardenCrossData? Data,IReadOnlyDictionary<(uint,uint),uint[]> Pairs,IReadOnlySet<uint> Known,IReadOnlyDictionary<string,uint> Ids,IReadOnlyDictionary<uint,string> Names)? gardenForecastIndex;
+
+    /// <summary>X-130: the forecasts of one patch, or null while the crossbreed pairs are not read (asked here the first time).</summary>
+    private IReadOnlyList<GardenForecast>? GardenGridForecasts(IReadOnlyList<(int Number,GardenBed Bed)> planted)
+    {
+        if(GardenCrossCatalog?.Invoke() is not { IsCompletedSuccessfully:true } task)return null;
+        var (data,names)=task.Result;
+        if(gardenForecastIndex is not { } index || !ReferenceEquals(index.Data,data))
+        {
+            var ids=new Dictionary<string,uint>(StringComparer.CurrentCultureIgnoreCase);
+            foreach(var (seed,name) in GardenSeedCatalog?.Invoke() ?? [])if(name.Length>0)ids.TryAdd(name,seed.SeedId);
+            foreach(var (id,name) in names)if(name.Length>0)ids.TryAdd(name,id);
+            index=(data,GardenForecasts.Index(data),data.Seeds.ToHashSet(),ids,names);
+            // An empty seed catalogue may still be loading: built again until it has names.
+            if(ids.Count>0)gardenForecastIndex=index;
+        }
+        var known=index.Known;
+        return GardenForecasts.For(planted.Select(entry=>(entry.Number,index.Ids.TryGetValue(entry.Bed.Seed,out var id) ? id:(uint?)null,entry.Bed.PlantedAt)).ToArray(),
+            index.Pairs,seed=>known.Contains(seed));
+    }
+
+    private void DrawGardenForecast(GardenForecast forecast,IReadOnlyList<(int Number,GardenBed Bed)> planted)
+    {
+        string Name(uint id)=>gardenForecastIndex?.Names.TryGetValue(id,out var name)==true && name.Length>0 ? name:"#"+id;
+        string BedSeed(int? number)=>planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
+        switch(forecast.Kind)
+        {
+            case GardenForecastKind.Crosses:
+                ImGui.TextWrapped(localization.Format("Garden.ForecastGives",string.Join(", ",forecast.Outcomes.Select(Name)),forecast.Partner ?? 0,Name(forecast.PartnerSeed)));
+                // The seeds not held (bags and storages read) or on the wishlist, put forward.
+                RefreshRecipeHoldingsCache();
+                var wanted=forecast.Outcomes.Where(seed=>configuration.Wishlist?.Contains(seed)==true || GetRecipeHoldings(seed) is { HasObservation:true,Total:0 }).Select(Name).ToArray();
+                if(wanted.Length>0)ImGui.TextColored(Accent,localization.Format("Garden.ForecastWanted",string.Join(", ",wanted)));
+                break;
+            case GardenForecastKind.NoPartner:ImGui.TextDisabled(localization.Get("Garden.ForecastNone"));break;
+            case GardenForecastKind.UnknownSeed:ImGui.TextDisabled(localization.Get("Garden.ForecastUnknownSeed"));break;
+            case GardenForecastKind.UnknownNeighbour:ImGui.TextDisabled(localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));break;
+        }
+    }
+
     // Topsoil that promotes crossbreeding (Item rows, docs/evidence/0.456-garden-grid.md).
     internal const uint GardenTopsoil3=7766,GardenTopsoil2=7765;
 

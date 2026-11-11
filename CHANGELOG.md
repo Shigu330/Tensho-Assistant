@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1109.0
+- Plan global, X-130 : Jardin : sous chaque parcelle plantée d'un potager du journal, ce qu'elle peut donner (graines possibles avec la voisine avec laquelle elle croise : la première compatible déjà là, à droite, en bas, en haut, à gauche) ; les graines pas possédées ou souhaitées mises en avant ; une graine inconnue des paires est dite, jamais devinée ; source citée (wiki Console Games et paires de nick75g/FFXIV-Crossbreed-Helper).
+- Tests : GardenForecast1109Tests. Verify.ps1 (agent) : 1813/1813, 0 avertissement, 0 erreur ; DLL 0.1109.0.0. Non validé en jeu.
+### English
+- Garden: under each planted bed of a patch in the journal, what it may give (the seeds possible with the neighbour it crosses with: the first compatible one already there, right, down, up, left); the seeds not held or wished put forward; a seed missing from the pairs is said, never guessed; source cited (Console Games Wiki and nick75g/FFXIV-Crossbreed-Helper's pairs).
+
 ## 0.1108.0
 - Plan global, X-129 : Aide à la récolte : un objet caché révélé après une dépense de PR n'a plus « aucun plan » ; son plan est calculé avec ce qui restait à son apparition (PR et essais), avec ses taux lus à ce moment, et le panneau le dit.
 - Tests : LatePlan1108Tests. Verify.ps1 (agent) : 1810/1810, 0 avertissement, 0 erreur ; DLL 0.1108.0.0. Non validé en jeu.

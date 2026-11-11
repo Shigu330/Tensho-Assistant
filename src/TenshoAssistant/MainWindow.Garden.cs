@@ -95,9 +95,13 @@ internal sealed partial class MainWindow
         BoolSetting("Garden.Detect","Garden.DetectTip",()=>configuration.GardenDetect,value=>configuration.GardenDetect=value,c=>c.GardenDetect);
         var now=DateTimeOffset.UtcNow;GardenBed? removed=null;var changed=false;
         // 0.461 (user request, in-game campaign): each patch as a grid; the rest (pots, places typed by hand) stays a list.
+        var forecastShown=false;
         foreach(var (zone,patch,planted) in GardenJournal.Grids(beds))
         {
             ImGui.TextColored(Accent,localization.Format("Garden.GridTitle",zone,patch));
+            // X-130 (0.1109): what each planted bed may give, by the wiki's rule and the community pairs (null until the pairs are read).
+            var forecasts=GardenGridForecasts(planted);
+            forecastShown|=forecasts is not null;
             if(!ImGui.BeginTable($"GardenGrid{zone}{patch}",3,ImGuiTableFlags.Borders|ImGuiTableFlags.SizingStretchSame))continue;
             try
             {
@@ -118,6 +122,7 @@ internal sealed partial class MainWindow
                             finally{ImGui.PopStyleColor();}
                             ImGui.TextDisabled(GardenTimes(bed,now));
                             DrawBedButtons(bed,now,ref changed,ref removed);
+                            if(forecasts?.FirstOrDefault(forecast=>forecast.Bed==number) is { } forecast)DrawGardenForecast(forecast,planted);
                         }
                         finally{ImGui.PopID();}
                     }
@@ -125,6 +130,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndTable();}
         }
+        if(forecastShown)ImGui.TextDisabled(localization.Get("Garden.ForecastSource"));
         foreach(var bed in beds.Where(bed=>GardenJournal.Slot(bed) is null))
         {
             ImGui.PushID(bed.Id.ToString());
