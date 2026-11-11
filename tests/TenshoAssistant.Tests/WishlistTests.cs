@@ -17,7 +17,7 @@ internal static class WishlistTests
             Check(Wishlist.Toggle(full,9999) is null && Wishlist.Toggle(full,1)!.Count == Wishlist.MaximumItems - 1,"full: refused, removal still works");
             Check(TenshoAssistant.ConfigurationReset.Kept.Contains("Wishlist"),"kept on reset");
             Check(Read("MainWindow.DutyFinder.cs").Contains("DrawWishlistToggle(item);",StringComparison.Ordinal)
-                && Read("MainWindow.Collections.cs").Contains("if(collectionWishlistTab){DrawWishlist();return;}",StringComparison.Ordinal),"menu entry and Collections tab");
+                && Read("MainWindow.Pages.cs").Contains("new(Page.Wishlist,\"Objects\",PageLabel(\"Navigation.Wishlist\"),DrawWishlistPage,",StringComparison.Ordinal),"menu entry and its own page (X-127, 0.1106)");
         }),
         // From OutfitLists989Tests: X-104 (0.989): an outfit's missing pieces into the wishlist or a crafting list, in one click.
         ("Outfit lists 989: added at the end once each, refused when over the limit",() =>

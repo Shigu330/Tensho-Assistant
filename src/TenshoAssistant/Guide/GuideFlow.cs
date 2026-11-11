@@ -21,7 +21,7 @@ public static class GuideFlow
     private static readonly GuideStop[] AllStops =
     [
         new("Items"), new("NpcVendors"), new("DutyLoot", GuideInterest.Content), new("MonsterLoot", GuideInterest.Content),
-        new("Storage"), new("SortPreview"), new("Market", GuideInterest.Market),
+        new("Storage"), new("SortPreview"), new("Market", GuideInterest.Market), new("Wishlist"),
         new("CraftSimulation", GuideInterest.Crafting), new("CraftLive", GuideInterest.Crafting), new("CraftPresets", GuideInterest.Crafting), new("MacroChain", GuideInterest.Crafting),
         new("Gathering", GuideInterest.Gathering), new("GatheringGp", GuideInterest.Gathering), new("GatheringCollectables", GuideInterest.Gathering),
         new("OceanFishing", GuideInterest.Gathering), new("Weather", GuideInterest.Gathering),

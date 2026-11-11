@@ -33,12 +33,12 @@ internal static class DesktopApp1031Tests
         ("Desktop pages: every page of the plugin is classified once (31 as is, 17 need the link, 3 in game); an unknown page is named",() =>
         {
             var pages = PluginPages();
-            Check(pages.Length == 51,"51 pages in the plugin: "+pages.Length);
+            Check(pages.Length == 52,"52 pages in the plugin (the wishlist since 0.1106): "+pages.Length);
             Check(DesktopPages.Unclassified(pages).Count == 0,"unclassified: "+string.Join(", ",DesktopPages.Unclassified(pages)));
             var all = DesktopPages.AsIs.Concat(DesktopPages.NeedsLink).Concat(DesktopPages.InGame).ToArray();
             Check(all.Length == all.Distinct().Count(),"a page in one list only");
             Check(all.Order().SequenceEqual(pages.Order()),"no list names a page that does not exist");
-            Check(DesktopPages.AsIs.Count == 31 && DesktopPages.NeedsLink.Count == 17 && DesktopPages.InGame.Count == 3,"31 / 17 / 3 as measured in X-118");
+            Check(DesktopPages.AsIs.Count == 31 && DesktopPages.NeedsLink.Count == 18 && DesktopPages.InGame.Count == 3,"31 / 17 / 3 as measured in X-118, and the wishlist (0.1106) with the link");
             Check(DesktopPages.InGame.SequenceEqual(["Maps","CraftLive","Fashion"]),"the user's three in-game pages");
             Check(DesktopPages.Kind("NewPage") is null && DesktopPages.Unclassified(["Home","NewPage"]).SequenceEqual(["NewPage"]),"a new page is unclassified");
             var message = DesktopPages.UnclassifiedMessage(["NewPage"]);

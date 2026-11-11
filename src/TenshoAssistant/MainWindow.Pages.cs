@@ -23,6 +23,8 @@ internal sealed partial class MainWindow
         new(Page.Storage,"Objects",PageLabel("Navigation.Storage"),DrawStorage,"MainWindow.Storage.cs, MainWindow.Bank.cs"),
         new(Page.SortPreview,"Objects",PageLabel("Category.Sorting"),DrawSortPreview,"MainWindow.Sort*.cs, Inventory/"),
         new(Page.Market,"Objects",PageLabel("Navigation.Market"),DrawMarket,"MainWindow.Market*.cs, Market/"),
+        // X-127 (0.1106): the wishlist, a tool of its own (it was a tab of Collections).
+        new(Page.Wishlist,"Objects",PageLabel("Navigation.Wishlist"),DrawWishlistPage,"MainWindow.Wishlist.cs, Items/Wishlist*.cs"),
         new(Page.CraftSimulation,"Production",PageLabel("Navigation.Crafting"),DrawCraftSimulation,"MainWindow.Craft*.cs, Craft/"),
         new(Page.CraftLive,"Production",null,DrawCraftLive,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation),
         new(Page.CraftPresets,"Production",null,DrawCraftPresets,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation),

@@ -1,15 +1,20 @@
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Collections;
+using TenshoAssistant.Gathering;
 using TenshoAssistant.Items;
 
 namespace TenshoAssistant;
 
 // g, C-09 (0.360): the wishlist — « Add to my wishlist » in every item's right-click menu, and the « Wishlist » tab of Collections: each
 // item with its collection state (mount, minion, roll, card) or the copies the character holds, its sources on right click, and removal.
+// X-127 (0.1106, user request of 2026-11-11): a page of its own (ITEMS › Wishlist) instead of a Collections tab; « added to your wishlist »
+// in the window's footer with a button that opens it; where each gatherable wish is gathered; the alarms of its timed points in one click.
 internal sealed partial class MainWindow
 {
-    private bool collectionWishlistTab;
+    /// <summary>X-127: how long the footer says « added to your wishlist ».</summary>
+    private const long WishAddedShownMs=15_000;
+    private (string Text,long At)? wishAdded;
 
     private void DrawWishlistToggle(ItemDefinition item)
     {
@@ -20,8 +25,70 @@ internal sealed partial class MainWindow
     private void ToggleWish(uint itemId)
     {
         if(Wishlist.Toggle(configuration.Wishlist,itemId) is not { } next){saveError=localization.Format("Wishlist.Full",Wishlist.MaximumItems);return;}
+        var added=next.Contains(itemId) && configuration.Wishlist?.Contains(itemId)!=true;
         SaveSetting("Wishlist.Title",()=>configuration.Wishlist,value=>configuration.Wishlist=value,next.Count==0 ? null:next);
+        if(added)SayWishAdded(localization.Format("Wishlist.Added",itemCatalog.State.Catalog?.Find(itemId)?.Name ?? $"#{itemId}"));
     }
+
+    /// <summary>X-127: the footer's line « added to your wishlist », for a while.</summary>
+    private void SayWishAdded(string text)=>wishAdded=(text,Environment.TickCount64);
+
+    /// <summary>X-127: the footer's line after an addition, with a button that opens the list; false when there is nothing to say.</summary>
+    private bool DrawWishAdded()
+    {
+        if(wishAdded is not { } added)return false;
+        if(Environment.TickCount64-added.At>WishAddedShownMs){wishAdded=null;return false;}
+        ImGui.TextColored(Success,added.Text);
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("Wishlist.Open")+"###WishAddedOpen")){page=Page.Wishlist;wishAdded=null;}
+        Tip("Wishlist.OpenTip");
+        return true;
+    }
+
+    // X-127: where each wish is gathered, worked out once per catalogue (and again every minute, for the language), never in every frame.
+    private object? wishPlacesCatalog;
+    private long wishPlacesAt;
+    private readonly Dictionary<uint,(int Count,string[] Lines)> wishPlaces=[];
+    private (int Count,string[] Lines) WishPlaces(uint itemId)
+    {
+        var catalog=gatheringCatalog.State.Catalog;
+        var now=Environment.TickCount64;
+        if(!ReferenceEquals(catalog,wishPlacesCatalog) || now-wishPlacesAt>60_000){wishPlaces.Clear();wishPlacesCatalog=catalog;wishPlacesAt=now;}
+        if(catalog is null)return (0,[]);
+        if(wishPlaces.TryGetValue(itemId,out var known))return known;
+        var places=WishlistGathering.Places(catalog.ForItem(itemId));
+        known=(places.Count,places.Take(WishlistGathering.Shown).Select(place=>WishPlaceText(itemId,place)).ToArray());
+        wishPlaces[itemId]=known;
+        return known;
+    }
+
+    private string WishPlaceText(uint itemId,WishlistGathering.Place place)
+    {
+        var parts=new List<string>{place.IsHidden ? localization.Format("GatheringDetails.Hidden",place.TypeName):place.TypeName,place.Zone};
+        if(place.Node.Length>0)parts.Add(place.Node);
+        // A fish: GatherBuddy's hours and weathers when the game data gives no window (as the Gathering page does).
+        if(place.IsFishing && place.Timing.Kind!=GatheringScheduleKind.Limited && gatherBuddyFish?.State.Data?.Find(itemId) is { } fish)
+        {
+            parts.Add(fish.StartMinute is { } start && fish.EndMinute is { } stop
+                ? ScheduleText(GatheringSchedule.FromEphemeral((ushort)(start/60*100+start%60),(ushort)(stop/60%24*100+stop%60)))
+                : localization.Get("GatheringFish.AnyTime"));
+            var weathers=weather.State.Catalog;
+            if(fish.Weathers.Count>0)parts.Add(localization.Format("FishingPanel.Weather",string.Join(", ",fish.Weathers.Select(id=>weathers?.Weather(id)?.Name ?? id.ToString()))));
+        }
+        else parts.Add(ScheduleText(place.Timing));
+        return localization.Format("Wishlist.GatherAt",string.Join(" · ",parts));
+    }
+
+    private void DrawWishPlaces(uint itemId)
+    {
+        var (count,lines)=WishPlaces(itemId);
+        foreach(var line in lines)ImGui.TextDisabled(line);
+        if(count>lines.Length)ImGui.TextDisabled(localization.Format("Wishlist.MorePlaces",count-lines.Length));
+    }
+
+    /// <summary>X-127: a wish whose collection entry is acquired needs no alarm; the copies held are checked by ListAlarms.</summary>
+    private bool WishObtained(uint itemId)
+        =>CollectionOf(itemCatalog.State.Catalog?.Find(itemId)) is { } entry && CollectionStateOf(entry)==CollectionAcquisition.Acquired;
 
     // X-101 (0.1000, DEC-048): the check, from the frame (not during a cut: the plugin draws nothing then); the request runs off the frame.
     private DateTimeOffset wishSalesNext;
@@ -60,9 +127,9 @@ internal sealed partial class MainWindow
         });
     }
 
-    private void DrawWishlist()
+    private void DrawWishlistPage()
     {
-        ImGui.TextWrapped(localization.Get("Wishlist.Help"));
+        TenshoAssistant.UI.UiComponents.SectionHeader(localization.Get("Wishlist.Title"),localization.Get("Wishlist.Help"));
         // X-101 (0.1000, DEC-048): the sale alert, off by default; it needs Universalis on.
         ImGui.BeginDisabled(!configuration.CommunityUniversalis);
         try{BoolSetting("Wishlist.SaleAlert","Wishlist.SaleAlertTip",()=>configuration.WishlistSaleAlert,value=>configuration.WishlistSaleAlert=value,c=>c.WishlistSaleAlert);}
@@ -72,6 +139,9 @@ internal sealed partial class MainWindow
         var items=itemCatalog.State.Catalog;
         RefreshRecipeHoldingsCache();
         ImGui.TextDisabled(localization.Format("Wishlist.Count",list.Count,Wishlist.MaximumItems));
+        // X-127: the alarms of every timed point of the wishes still to get, in one click (same button and rules as a list's).
+        ImGui.SameLine();
+        DrawListPanelAlarms("Wishlist",WishlistGathering.AlarmLines(list,WishObtained));
         if(!ImGui.BeginTable("Wishlist",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         uint? remove=null;
         try
@@ -90,6 +160,7 @@ internal sealed partial class MainWindow
                 ImGui.Selectable((definition?.Name ?? $"#{id}")+$"##WishItem{id}");
                 ItemLinksMenu($"WishMenu{id}",definition);
                 Tip("Wishlist.RowTip");
+                DrawWishPlaces(id);
                 ImGui.TableNextColumn();
                 if(CollectionOf(definition) is { } entry)
                 {

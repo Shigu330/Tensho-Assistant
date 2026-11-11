@@ -27,6 +27,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Storage** | Where your items are: character, retainers, saddlebags, armoury, glamour dresser, armoire, company chest; also crystals, currencies with what they buy, a gil journal, a report of what could free space, and your other characters. |
 |  | **Inventory sorting** | Preview a sorting rule, then apply it to your storage. Nothing moves until you click. |
 |  | **Market** | Prices of the selected item from Universalis: summary, listings for your world, data centre or region, and sale history. |
+|  | **Wishlist** | The items you want to get, in one list: their state (obtained, or the copies you hold), your price for a sale alert and, for the items that are gathered, where to gather them (job, zone, node, hours or weather). |
 | Production | **Crafting** | Simulate a recipe step by step, search a sequence, prepare the materials, and make a macro to copy or write into the game. Other tabs: crafting lists (with an on-screen panel of what they still need) and « What can I craft? » from your stocks. |
 |  | **Gathering** | Find where and when a resource can be gathered or fished, with your notebooks, an Eorzean clock and the fishing help. |
 |  | **Ocean fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
@@ -259,6 +260,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Rangements** | Où sont vos objets : personnage, servants, sacoches, arsenal, coffre à apparence, armoire, coffre de compagnie ; aussi les cristaux, les monnaies avec ce qu'elles achètent, un journal des gils, un rapport de ce qui pourrait libérer de la place, et vos autres personnages. |
 |  | **Tri de l’inventaire** | Prévisualisez une règle de tri, puis appliquez-la à vos rangements. Rien ne bouge sans votre clic. |
 |  | **Marché** | Les prix de l'objet choisi, depuis Universalis : résumé, offres de votre monde, centre de données ou région, historique des ventes. |
+|  | **Souhaits** | Les objets que vous voulez obtenir, en une liste : leur état (obtenu, ou les exemplaires que vous avez), votre prix pour l'alerte de vente et, pour les objets qui se récoltent, où les récolter (métier, zone, point, heures ou météo). |
 | Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes de fabrication (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
 |  | **Récolte** | Trouvez où et quand récolter ou pêcher une ressource, avec vos carnets, l'horloge d'Éorzéa et l'aide à la pêche. |
 |  | **Pêche en mer** | Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée. |

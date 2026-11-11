@@ -31,6 +31,7 @@ public static class Faq
         new("Desktop"),
         new("DesktopUpdate"),
         new("DesktopLink", "Settings"),
+        new("Wishlist", "Wishlist"),
     ];
 
     /// <summary>The page an answer names, or null.</summary>

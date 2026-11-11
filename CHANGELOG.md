@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1106.0
+- Plan global, X-127 : Souhaits : la liste de souhaits devient un outil à part (OBJETS › Souhaits, ce n'est plus un onglet de Collections) ; « ajouté à vos souhaits » s'affiche en bas de la fenêtre avec un bouton qui ouvre la liste ; sous chaque objet récolté, où le récolter (métier, zone, point, heures, ou heures et météo d'un poisson) ; « Ajouter les alarmes » pose en un clic les alarmes des points limités de ce qui manque, sans doublon ; question « Où est ma liste de souhaits ? » dans la FAQ.
+- Tests : WishlistTool1106Tests. Verify.ps1 (agent) : 1806/1806, 0 avertissement, 0 erreur ; DLL 0.1106.0.0. Non validé en jeu.
+### English
+- Wishlist: the wishlist becomes a tool of its own (ITEMS › Wishlist, no longer a Collections tab); « added to your wishlist » shows at the bottom of the window with a button that opens the list; under each gathered item, where to gather it (job, zone, node, hours, or a fish's hours and weather); « Add the alarms » sets in one click the alarms of the timed nodes of what is missing, without duplicates; « Where is my wishlist? » in the FAQ.
+
 ## 0.1105.0
 - Releases : Tensho écrit sa version dans le journal de Dalamud au chargement, pour que la vérification du lancement la retrouve ; les notes d'une release (hors correctif urgent) disent « Vérifié au lancement, pas encore essayé en détail » (R20 changée le 11/11).
 - Tests : LaunchCheck1105Tests. Verify.ps1 (agent) : 1803/1803, 0 avertissement, 0 erreur ; DLL 0.1105.0.0. Rien à essayer en jeu.

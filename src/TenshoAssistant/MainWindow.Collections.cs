@@ -58,8 +58,8 @@ internal sealed partial class MainWindow
         if (state.Error is { } error) DrawDataError(error,"CollectionsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
         if(!blueMagic)DrawCollectionRecent(state);
-        // 0.360 (g, C-09): the Wishlist tab, set again by its tab on every frame it is shown.
-        collectionWishlistTab=false;collectionOutfitTab=false;
+        // 0.360 (g, C-09): the Outfits tab, set again by its tab on every frame it is shown. X-127 (0.1106): the wishlist has its own page.
+        collectionOutfitTab=false;
         if (!blueMagic && ImGui.BeginTabBar("CollectionKinds"))
         {
             try
@@ -73,11 +73,9 @@ internal sealed partial class MainWindow
                 foreach(var extraKind in ExtraKinds)
                     if (ImGui.BeginTabItem(localization.Get("ExtraCollections."+extraKind)+"###Collection"+extraKind)) { collectionKind=extraKind; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("Outfits.Title")+"###CollectionOutfits")) { collectionOutfitTab=true; ImGui.EndTabItem(); }
-                if (ImGui.BeginTabItem(localization.Get("Wishlist.Title")+"###CollectionWishlist")) { collectionWishlistTab=true; ImGui.EndTabItem(); }
             }
             finally { ImGui.EndTabBar(); }
         }
-        if(collectionWishlistTab){DrawWishlist();return;}
         if(collectionOutfitTab){DrawOutfits();return;}
         var kind = blueMagic ? CollectionKind.BlueMagic : collectionKind;
         var extra = ExtraKinds.Contains(kind) ? ExtraCollections?.Invoke() : null;

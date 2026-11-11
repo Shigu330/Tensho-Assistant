@@ -227,6 +227,10 @@
     "Bonuses": "Score bonuses"
   },
   "PageHelp": {
+    "WishlistTitle": "Wishlist",
+    "WishlistPurpose": "The items you want to get, in one list: their state (obtained, or the copies you hold), your price for a sale alert and, for the items that are gathered, where to gather them (job, zone, node, hours or weather).",
+    "WishlistStart": "Right-click any item in Tensho › « Add to my wishlist »; the line at the bottom of the window then opens the list. « Add the alarms » sets in one click the alarms of the timed nodes of what you still lack.",
+    "WishlistEmpty": "No wishes yet: right-click an item in Tensho › « Add to my wishlist », or add an outfit's missing pieces from Collections › Outfits.",
     "DiscoveriesTitle": "Discoveries",
     "DiscoveriesPurpose": "What you discover while playing, kept on your disk only: where monsters, hunt marks and FATEs were seen; where the items you get come from (desynthesis, ventures, duty chests, FATE rewards, monster drops, opened items, voyages); fish caught; Fashion Report judgements; blue magic spells learned, beasts tamed, festivals and vistas seen; market board prices. The hunting log, monster loot and the item hover show what you saw.",
     "DiscoveriesStart": "Play with « Note discoveries » on; each kind below it can be turned off. Search the name of a monster, a FATE or an item to see what was noted; export to share, import to join a friend's file.",
@@ -526,7 +530,9 @@
     "QuestionDesktopUpdate": "Does the desktop app update itself?",
     "AnswerDesktopUpdate": "Yes, with no step from you. At start (and on « Check for update ») it asks this repository's GitHub release of the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\\TenshoAssistant\\Desktop\\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.",
     "QuestionDesktopLink": "How do I link the desktop app to the game?",
-    "AnswerDesktopLink": "In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions."
+    "AnswerDesktopLink": "In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions.",
+    "QuestionWishlist": "Where is my wishlist?",
+    "AnswerWishlist": "In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list."
   },
   "Guide": {
     "Title": "Tensho: first steps",
@@ -784,6 +790,7 @@
     "ClearNo": "No"
   },
   "Navigation": {
+    "Wishlist": "Wishlist",
     "Discoveries": "Discoveries",
     "Fates": "FATEs",
     "Lexicon": "Lexicon",
@@ -5671,7 +5678,13 @@
     "Missing": "Not obtained yet",
     "Held": "Held ×{0}",
     "NotHeld": "Not held",
-    "RowTip": "Right click: the item's tools and sources."
+    "RowTip": "Right click: the item's tools and sources.",
+    "Added": "« {0} » added to your wishlist.",
+    "AddedMany": "{0} items added to your wishlist.",
+    "Open": "Open the wishlist",
+    "OpenTip": "Opens the Wishlist page (ITEMS › Wishlist).",
+    "GatherAt": "Gathered: {0}",
+    "MorePlaces": "… and {0} more places (Gathering page)"
   },
   "VistaLog": {
     "Tab": "Sightseeing log",
@@ -7649,6 +7662,7 @@
     "LiveEvents": "events read in the game",
     "LiveCollections": "achievement progress, titles",
     "LiveBlueMagic": "achievement progress, titles",
+    "LiveWishlist": "collection state, copies held, alarms",
     "LiveHelp": "self-check, alarms",
     "LiveSettings": "alarms, map markers",
     "LiveDiagnostics": "self-check, alarms",

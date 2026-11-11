@@ -227,6 +227,10 @@
     "Bonuses": "Bonus de score"
   },
   "PageHelp": {
+    "WishlistTitle": "Souhaits",
+    "WishlistPurpose": "Les objets que vous voulez obtenir, en une liste : leur état (obtenu, ou les exemplaires que vous avez), votre prix pour l'alerte de vente et, pour les objets qui se récoltent, où les récolter (métier, zone, point, heures ou météo).",
+    "WishlistStart": "Clic droit sur n'importe quel objet de Tensho › « Ajouter à mes souhaits » ; la ligne en bas de la fenêtre ouvre alors la liste. « Ajouter les alarmes » pose en un clic les alarmes des points limités de ce qui vous manque encore.",
+    "WishlistEmpty": "Aucun souhait pour l'instant : clic droit sur un objet de Tensho › « Ajouter à mes souhaits », ou ajoutez les pièces manquantes d'une tenue depuis Collections › Tenues.",
     "DiscoveriesTitle": "Découvertes",
     "DiscoveriesPurpose": "Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les monstres de chasse et les ALÉA ; d'où viennent les objets obtenus (désynthèse, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, voyages) ; les poissons pris ; les jugements de la Fashion Report ; les sorts de mage bleu appris, les bêtes apprivoisées, les fêtes et les panoramas vus ; les prix du tableau des ventes. Le carnet de chasse, le butin des monstres et l'info-bulle des objets montrent ce que vous avez vu.",
     "DiscoveriesStart": "Jouez avec « Noter les découvertes » activé ; chaque sorte en dessous peut être coupée. Cherchez le nom d'un monstre, d'une ALÉA ou d'un objet pour voir ce qui a été noté ; exportez pour partager, importez pour joindre le fichier d'un ami.",
@@ -526,7 +530,9 @@
     "QuestionDesktopUpdate": "L'application de bureau se met-elle à jour seule ?",
     "AnswerDesktopUpdate": "Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jour »), elle lit la release GitHub de ce dépôt qui a la version du plugin installé, sinon la dernière release Stable : HTTPS, aucune donnée du joueur. Elle télécharge TenshoAssistant.Desktop.zip, compare son SHA-256 à TenshoAssistant.Desktop.zip.sha256 de la même release, l'installe à côté (%LOCALAPPDATA%\\TenshoAssistant\\Desktop\\versions) et garde la version d'avant. L'application en cours n'est jamais écrasée ni redémarrée pendant que vous l'utilisez : la nouvelle version s'ouvre au prochain démarrage, ou avec « Redémarrer maintenant ». « Version d'avant » revient en arrière ; « Mise à jour automatique : active » la coupe. Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.",
     "QuestionDesktopLink": "Comment relier l'application de bureau au jeu ?",
-    "AnswerDesktopLink": "Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes."
+    "AnswerDesktopLink": "Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes.",
+    "QuestionWishlist": "Où est ma liste de souhaits ?",
+    "AnswerWishlist": "Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste."
   },
   "Guide": {
     "Title": "Tensho : premiers pas",
@@ -784,6 +790,7 @@
     "ClearNo": "Non"
   },
   "Navigation": {
+    "Wishlist": "Souhaits",
     "Discoveries": "Découvertes",
     "Fates": "ALEA",
     "Lexicon": "Lexique",
@@ -5671,7 +5678,13 @@
     "Missing": "Pas encore obtenu",
     "Held": "Possédé ×{0}",
     "NotHeld": "Pas possédé",
-    "RowTip": "Clic droit : outils et sources de l'objet."
+    "RowTip": "Clic droit : outils et sources de l'objet.",
+    "Added": "« {0} » ajouté à vos souhaits.",
+    "AddedMany": "{0} objets ajoutés à vos souhaits.",
+    "Open": "Ouvrir les souhaits",
+    "OpenTip": "Ouvre la page Souhaits (OBJETS › Souhaits).",
+    "GatherAt": "Récolte : {0}",
+    "MorePlaces": "… et {0} autres endroits (page Récolte)"
   },
   "VistaLog": {
     "Tab": "Carnet d'exploration",
@@ -7649,6 +7662,7 @@
     "LiveEvents": "fêtes lues dans le jeu",
     "LiveCollections": "avancée des succès, titres",
     "LiveBlueMagic": "avancée des succès, titres",
+    "LiveWishlist": "état des collections, exemplaires possédés, alarmes",
     "LiveHelp": "auto-contrôle, alarmes",
     "LiveSettings": "alarmes, marques de la carte",
     "LiveDiagnostics": "auto-contrôle, alarmes",

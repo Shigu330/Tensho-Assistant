@@ -29,7 +29,12 @@ internal sealed partial class MainWindow
         if(missing.Length==0)return;
         if(ImGui.SmallButton(localization.Format("Outfits.ToWishlist",missing.Length)+$"##OutfitWish{row.Outfit.SetItemId}"))
         {
-            if(Items.Wishlist.AddAll(configuration.Wishlist,missing) is { } next)SaveSetting("Wishlist.Title",()=>configuration.Wishlist,value=>configuration.Wishlist=value,next);
+            if(Items.Wishlist.AddAll(configuration.Wishlist,missing) is { } next)
+            {
+                var added=next.Count-(configuration.Wishlist?.Count ?? 0);
+                SaveSetting("Wishlist.Title",()=>configuration.Wishlist,value=>configuration.Wishlist=value,next);
+                if(added>0)SayWishAdded(localization.Format("Wishlist.AddedMany",added));
+            }
             else saveError=localization.Format("Wishlist.Full",Items.Wishlist.MaximumItems);
         }
         Tip("Outfits.ToWishlistTip");

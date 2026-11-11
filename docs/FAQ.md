@@ -76,6 +76,10 @@ Yes, with no step from you. At start (and on « Check for update ») it asks thi
 
 In the game, turn on Settings › Advanced › « Link with the desktop app » (off by default), then start the desktop app: its status bar says « Linked to the game » with the zone you are in. The link is a local named pipe open to your Windows user only, with no network port; the app only reads. For now it shows who and where; the live pages and actions come in later versions.
 
+## Where is my wishlist?
+
+In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
+
 Français :
 
 # Questions fréquentes
@@ -153,3 +157,7 @@ Oui, sans geste de votre part. Au démarrage (et sur « Chercher une mise à jou
 ## Comment relier l'application de bureau au jeu ?
 
 Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de bureau » (désactivé par défaut), puis lancez l'application de bureau : sa barre d'état indique « Relié au jeu » avec la zone où vous êtes. Le lien est un canal nommé local ouvert à votre seul utilisateur Windows, sans port réseau ; l'application ne fait que lire. Pour l'instant il montre qui et où ; les pages en direct et les actions viendront dans des versions suivantes.
+
+## Où est ma liste de souhaits ?
+
+Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
