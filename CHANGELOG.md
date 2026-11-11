@@ -4,6 +4,12 @@ Résumé par version, en français puis `### English` (partie anglaise obligatoi
 aux commits et aux notes de release sur GitHub. Preuves citées : docs/evidence/.
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1077.0
+- Constat d'audit A055, reste : G-PROPOSALS listait six « idées repérées en codant (non faites) ». Relues une par une contre le CHANGELOG et le code, cinq sont faites (alerte du plafond hebdomadaire des mémoquartz en 0.606, liste des objets annotés en 0.607, stocks des autres personnages dans la fiche d'objet en 0.609, rangement inchangé non réécrit en 0.605, gils des servants dans la page Personnages en 0.767) et une ne l'est pas (prix moyen de vente récent avant de coller un prix de sous-cotation). La section donne maintenant l'état de chaque idée, dans les deux langues. Un test vérifie les états et que les textes cités existent toujours.
+- Tests : CodingIdeas1077Tests. Verify.ps1 (agent) : 1760/1760, 0 avertissement, 0 erreur ; DLL 0.1077.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A055, rest: G-PROPOSALS listed six « ideas spotted while coding (not done) ». Checked one by one against the CHANGELOG and the code, five are done (weekly tomestone cap alert in 0.606, annotated items list in 0.607, other characters' stocks in the item sheet in 0.609, unchanged storage not rewritten in 0.605, retainers' gil on the Characters page in 0.767) and one is not (recent average sale price before pasting an undercut price). The section now gives the state of each idea, in both languages. A test checks the states and that the cited texts still exist.
+
 ## 0.1076.0
 - Constat d'audit A057, reste : REFERENCES nommait six interrupteurs de sources communautaires alors que Paramètres › Avancé en a huit (la Revue de mode et PaissaDB manquaient), plus « Données du jeu et observées seulement » qui les coupe tous ; sa ligne des durées de sous-marins ne disait pas que DEC-043 prévoit de remplacer la formule par les fonctions du jeu une fois prouvé qu'elles ne font que calculer. Les deux lignes sont corrigées dans les deux langues. Les fiches d'archive restent : une preuve des crédits les cite comme relevés des licences des sources lues. Un test vérifie la liste contre le code et le renvoi à DEC-043.
 - Tests : ReferencesSwitches1076Tests. Verify.ps1 (agent) : 1759/1759, 0 avertissement, 0 erreur ; DLL 0.1076.0.0. Rien à essayer en jeu.

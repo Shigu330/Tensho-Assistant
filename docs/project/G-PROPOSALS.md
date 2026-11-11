@@ -17,16 +17,18 @@ community source to look for, licence first; N-08: journal with typed durations 
 The choices noted in this file are settled: DEC-023, DEC-026, DEC-032, DEC-033, DEC-035, DEC-045, DEC-048 ([DECISIONS](DECISIONS.md)). Original text of the sections: [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md). What remains open is listed in the [ROADMAP](ROADMAP.md), "To decide / to review".
 <!-- /gen:decisions:g-en -->
 
-## Ideas spotted while coding (not done)
+## Ideas spotted while coding
 
-| Spotted in | Idea | Why not yet |
+State checked against the code on 2026-11-11 (0.1077).
+
+| Spotted in | Idea | State |
 |---|---|---|
-| 0.344 | Alert on the weekly cap of tomestones (in addition to the total cap) | Outside the user's choice for I-02 |
-| 0.345 | "Where is this item?" on all characters (tooltip and item sheet), by extending ItemHoldings | Big change to the stocks; to do after in-game validation of I-03 |
-| 0.345 | Retainers' gil in the characters view | The game only gives it when the bell is opened; to probe |
-| 0.347 | List of all annotated items (Items page) with a filter by label | Small; to do with the other item lists (I-12) |
-| 0.346 | Undercutting: also show the recent average sale price before pasting (safeguard against an offer that is too low) | Needs one more Universalis call |
-| 0.345 | Only rewrite a character's file if its quantities changed | Saves disk writes; today one write every 2 minutes per storage read automatically |
+| 0.344 | Alert on the weekly cap of tomestones (in addition to the total cap) | Done in 0.606 (alert once when the week's capped tomestones reach their cap) |
+| 0.345 | "Where is this item?" on all characters (tooltip and item sheet), by extending ItemHoldings | Done in 0.609, compact form: « On your other characters » in the item sheet, from what the Bank saved |
+| 0.345 | Retainers' gil in the characters view | Done in 0.767: kept when a retainer is recorded, shown as « (+N with retainers) » on the Characters page |
+| 0.347 | List of all annotated items (Items page) with a filter by label | Done in 0.607 (« Annotated items » section, filter by label and text) |
+| 0.346 | Undercutting: also show the recent average sale price before pasting (safeguard against an offer that is too low) | Not done: needs one more Universalis call (the undercut price reads only the offers) |
+| 0.345 | Only rewrite a character's file if its quantities changed | Done in 0.605 (written only when its content changes, or once an hour for its date) |
 
 Triage of the proposals of the four audits (2026-11-05): [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
 Review of 2026-11-05 with the user: [global plan](GLOBAL-PLAN.md). I-15, N-13 and X-14 are set aside; N-10 is taken up again.
@@ -99,16 +101,18 @@ source communautaire à chercher, licence d'abord ; N-08 : journal avec durées 
 Les choix notés dans ce fichier sont tranchés : DEC-023, DEC-026, DEC-032, DEC-033, DEC-035, DEC-045, DEC-048 ([DECISIONS](DECISIONS.md)). Texte d'origine des sections : [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md). Ce qui reste ouvert est listé dans [ROADMAP](ROADMAP.md), « À décider / à revoir ».
 <!-- /gen:decisions:g -->
 
-## Idées repérées en codant (non faites)
+## Idées repérées en codant
 
-| Repérée en | Idée | Pourquoi pas encore |
+État relu contre le code le 2026-11-11 (0.1077).
+
+| Repérée en | Idée | État |
 |---|---|---|
-| 0.344 | Alerte sur le plafond hebdomadaire des mémoquartz (en plus du plafond total) | Hors du choix de l'utilisateur pour I-02 |
-| 0.345 | « Où est cet objet ? » sur tous les personnages (infobulle et fiche d'objet), en étendant ItemHoldings | Gros changement des stocks ; à faire après validation en jeu de I-03 |
-| 0.345 | Gils des servants dans la vue des personnages | Le jeu ne les donne qu'à l'ouverture de la cloche ; à sonder |
-| 0.347 | Liste de tous les objets annotés (page Objets) avec filtre par étiquette | Petit ; à faire avec les autres listes d'objets (I-12) |
-| 0.346 | Sous-cotation : afficher aussi le prix moyen de vente récent avant de coller (garde-fou contre une offre trop basse) | Demande un appel Universalis de plus |
-| 0.345 | Ne réécrire le fichier d'un personnage que si ses quantités ont changé | Économie d'écritures disque ; aujourd'hui une écriture toutes les 2 minutes par rangement relevé d'office |
+| 0.344 | Alerte sur le plafond hebdomadaire des mémoquartz (en plus du plafond total) | Fait en 0.606 (alerte une fois quand les mémoquartz limités de la semaine atteignent leur plafond) |
+| 0.345 | « Où est cet objet ? » sur tous les personnages (infobulle et fiche d'objet), en étendant ItemHoldings | Fait en 0.609, en version compacte : « Sur vos autres personnages » dans la fiche d'objet, d'après ce que la Banque a enregistré |
+| 0.345 | Gils des servants dans la vue des personnages | Fait en 0.767 : gardés à l'enregistrement d'un servant, montrés « (+N chez les servants) » dans la page Personnages |
+| 0.347 | Liste de tous les objets annotés (page Objets) avec filtre par étiquette | Fait en 0.607 (section « Objets annotés », filtre par étiquette et par texte) |
+| 0.346 | Sous-cotation : afficher aussi le prix moyen de vente récent avant de coller (garde-fou contre une offre trop basse) | Pas fait : demande un appel Universalis de plus (le prix de sous-cotation ne lit que les offres) |
+| 0.345 | Ne réécrire le fichier d'un personnage que si ses quantités ont changé | Fait en 0.605 (écrit seulement si son contenu change, ou une fois par heure pour sa date) |
 
 Tri des propositions des quatre audits (2026-11-05) : [PROPOSALS-TRIAGE](PROPOSALS-TRIAGE.md).
 Revue du 2026-11-05 avec l'utilisateur : [plan global](GLOBAL-PLAN.md). I-15, N-13 et X-14 sont écartés ; N-10 est repris.
