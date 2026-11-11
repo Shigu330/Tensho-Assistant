@@ -2452,6 +2452,16 @@
     "MenuHelp": "On right-clicking an item (inventory, shops, exchanges, item lists), the « Tensho — item » entry opens the tools useful for that item (uses, stocks, crafting, gathering, NPC vendors, market, duty and monster loot, quest, collection, « How to obtain » sheet, all tools), then its sources grouped by kind. This menu does not request prices. Chat links and special items are not covered.\nDefault: off."
   },
   "CacheUi": {
+    "PatchTitle": "Changes from the last game patch in the cached catalogues:",
+    "PatchTip": "When a game patch makes Tensho rebuild a cached catalogue (items, recipes, gathering points, map positions, vendors), the copy from before the patch is kept and compared once with the new one, row by row.",
+    "PatchNone": "No game patch seen since these catalogues were cached.",
+    "PatchLine": "{0}: game {1} → {2}, {3} added, {4} removed, {5} changed.",
+    "PatchSkipped": "{0}: game {1} → {2}, not compared (the cached format changed).",
+    "PatchItems": "Items",
+    "PatchRecipes": "Recipes",
+    "PatchGathering": "Gathering points",
+    "PatchMapPositions": "Map positions",
+    "PatchVendors": "Vendors",
     "Clear": "Empty the cache…",
     "ClearTip": "Removes every cached download and calculation (prices, quests, sources, craft…); they are fetched again when needed. A zip copy is taken first in the Backups folder (the last 5 are kept).",
     "ClearSure": "Empty the cache? A zip copy is taken first.",

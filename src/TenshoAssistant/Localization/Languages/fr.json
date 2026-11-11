@@ -2452,6 +2452,16 @@
     "MenuHelp": "Au clic droit d'un objet (inventaire, boutiques, échanges, listes d'objets), l'entrée « Tensho — objet » ouvre les outils utiles à cet objet (usages, stocks, fabrication, récolte, PNJ vendeurs, marché, butin des contenus et des monstres, quête, collection, fiche « Comment l'obtenir », tous les outils), puis ses sources groupées par type. Aucun prix n'est demandé par ce menu. Les liens de discussion et objets spéciaux ne sont pas couverts.\nPar défaut : désactivé."
   },
   "CacheUi": {
+    "PatchTitle": "Changements du dernier patch du jeu dans les catalogues gardés :",
+    "PatchTip": "Quand un patch du jeu fait refaire à Tensho un catalogue gardé (objets, recettes, points de récolte, positions de la carte, marchands), la copie d'avant le patch est gardée et comparée une fois à la nouvelle, ligne par ligne.",
+    "PatchNone": "Aucun patch du jeu vu depuis la mise en cache de ces catalogues.",
+    "PatchLine": "{0} : jeu {1} → {2}, {3} ajoutés, {4} retirés, {5} changés.",
+    "PatchSkipped": "{0} : jeu {1} → {2}, non comparé (le format gardé a changé).",
+    "PatchItems": "Objets",
+    "PatchRecipes": "Recettes",
+    "PatchGathering": "Points de récolte",
+    "PatchMapPositions": "Positions de la carte",
+    "PatchVendors": "Marchands",
     "Clear": "Vider le cache…",
     "ClearTip": "Retire tous les téléchargements et calculs gardés (prix, quêtes, sources, artisanat…) ; ils sont redemandés au besoin. Une copie zip est faite avant dans le dossier Backups (les 5 dernières sont gardées).",
     "ClearSure": "Vider le cache ? Une copie zip est faite avant.",

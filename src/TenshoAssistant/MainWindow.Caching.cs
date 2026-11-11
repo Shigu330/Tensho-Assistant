@@ -45,7 +45,28 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Get("CacheUi.NativeHelp"));
         ImGui.TextWrapped(localization.Get("CacheUi.LiveHelp"));
         if(dataCacheStore?.Error is { } errorText)DrawDataError(errorText,"ServiceErrors.Cache");
+        DrawPatchChanges();
         DrawCacheClear();
+    }
+
+    // X-117 part 2 (0.1047): what the last game patch changed in the cached catalogues, for every player; summaries made again only
+    // when the store hands a new list (read off the framework thread by DataCache).
+    private IReadOnlyList<PatchCatalogReport>? patchReportsShown;private IReadOnlyList<PatchFamilySummary> patchSummaries=[];
+    private void DrawPatchChanges()
+    {
+        if(dataCacheStore is not { } store)return;
+        var reports=store.PatchReports;
+        if(!ReferenceEquals(reports,patchReportsShown)){patchReportsShown=reports;patchSummaries=PatchCatalogDiff.Summaries(reports);}
+        ImGui.TextWrapped(localization.Get("CacheUi.PatchTitle"));
+        Tip("CacheUi.PatchTip");
+        if(patchSummaries.Count==0){EmptyState("CacheUi.PatchNone");return;}
+        foreach(var summary in patchSummaries)
+        {
+            var label=summary.Key is { } key ? localization.Get("CacheUi.Patch"+key):summary.Family;
+            ImGui.TextWrapped(summary.Compared
+                ? localization.Format("CacheUi.PatchLine",label,summary.OldGame ?? "?",summary.NewGame ?? "?",summary.Added,summary.Removed,summary.Changed)
+                : localization.Format("CacheUi.PatchSkipped",label,summary.OldGame ?? "?",summary.NewGame ?? "?"));
+        }
     }
 
     // X-76 step 3 (0.945, user request): empty the cache, a zip copy taken just before (Backups folder).

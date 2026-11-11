@@ -16,6 +16,9 @@ public sealed record PatchCatalogReport(string Family,string Scope,string? OldGa
     public int Changed=>Arrays.Sum(array=>array.Changed);
 }
 
+/// <summary>X-117 part 2 (0.1047): one line of « what the last game patch changed » per catalogue family (scopes summed).</summary>
+public sealed record PatchFamilySummary(string Family,string? Key,string? OldGame,string? NewGame,bool Compared,int Added,int Removed,int Changed);
+
 /// <summary>X-117 (0.1046): compares the catalogue copy kept from before a game patch with the one built from the new client.
 /// Pure: works on the cached JSON, so every catalogue family is compared the same way, without its loader.</summary>
 public static class PatchCatalogDiff
@@ -84,6 +87,29 @@ public static class PatchCatalogDiff
         foreach(var row in array.EnumerateArray()){var text=row.GetRawText();rows.TryAdd(text,text);}
         return rows;
     }
+
+    /// <summary>X-117 part 2 (0.1047): the language key of a catalogue family (« catalog-items » → « Items »), or null for an unknown one.</summary>
+    public static string? FamilyKey(string family)=>family switch
+    {
+        "catalog-items"=>"Items",
+        "catalog-recipes"=>"Recipes",
+        "catalog-gathering"=>"Gathering",
+        "catalog-map-positions"=>"MapPositions",
+        "catalog-npc-vendors"=>"Vendors",
+        _=>null,
+    };
+
+    /// <summary>X-117 part 2 (0.1047): one summary per family, in family order; a family counts as compared when one of its scopes was.
+    /// Game versions: the oldest « before » and the newest « after » of the family.</summary>
+    public static IReadOnlyList<PatchFamilySummary> Summaries(IEnumerable<PatchCatalogReport> reports)=>
+        reports.GroupBy(report=>report.Family,StringComparer.Ordinal).OrderBy(group=>group.Key,StringComparer.Ordinal).Select(group=>
+        {
+            var compared=group.Where(report=>report.Skipped is null).ToList();
+            return new PatchFamilySummary(group.Key,FamilyKey(group.Key),
+                group.Select(report=>report.OldGame).Where(game=>game is not null).Min(StringComparer.Ordinal),
+                group.Select(report=>report.NewGame).Where(game=>game is not null).Max(StringComparer.Ordinal),
+                compared.Count>0,compared.Sum(report=>report.Added),compared.Sum(report=>report.Removed),compared.Sum(report=>report.Changed));
+        }).ToList();
 
     /// <summary>One English line per report, for the log.</summary>
     public static string Describe(PatchCatalogReport report)=>report.Skipped is { } reason

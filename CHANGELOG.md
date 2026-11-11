@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1047.0
+- Plan global, X-117 : Après un patch du jeu, partie 2a (X-117) : Paramètres › Données › cache montre maintenant « ce qui a changé » au dernier patch dans les catalogues gardés : une ligne par catalogue (objets, recettes, points de récolte, positions de la carte, marchands) avec l'ancienne et la nouvelle version du jeu et le nombre de lignes ajoutées, retirées et changées, ou « non comparé » quand le format gardé a changé ; « Aucun patch du jeu vu » tant qu'il n'y en a pas eu. Le marquage des découvertes à revérifier suit dans une prochaine version.
+- Tests : PatchShow1047Tests. Verify.ps1 (agent) : 1716/1716, 0 avertissement, 0 erreur ; DLL 0.1047.0.0. Non validé en jeu.
+### English
+- After a game patch, part 2a (X-117): Settings › Data › cache now shows « what changed » at the last patch in the cached catalogues: one line per catalogue (items, recipes, gathering points, map positions, vendors) with the old and new game version and the number of rows added, removed and changed, or « not compared » when the cached format changed; « No game patch seen » until there has been one. The marking of discoveries to recheck follows in a later version.
+
 ## 0.1046.0
 - Plan global, X-117 : Après un patch du jeu, partie 1 (X-117, suite de X-115) : quand un catalogue mis en cache (objets, recettes, récolte, positions de la carte, marchands) est refait pour une nouvelle version du jeu, l'ancienne copie n'est plus effacée : elle est gardée à part (une par catalogue) et comparée une fois à la nouvelle, ligne par ligne (ajoutées, retirées, changées), sans dépendre du code de chaque catalogue. Le résultat est enregistré à côté du cache et écrit dans le journal de Dalamud (« Patch changes: … »), au premier chargement après le patch puis à chaque chargement. La page « ce qui a changé » et le marquage des découvertes à revérifier suivent dans une prochaine version.
 - Tests : PatchChanges1046Tests. Verify.ps1 (agent) : 1714/1714, 0 avertissement, 0 erreur ; DLL 0.1046.0.0. Non validé en jeu.
