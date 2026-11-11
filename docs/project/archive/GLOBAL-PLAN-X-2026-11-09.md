@@ -196,7 +196,7 @@ Fait par X-75.1 à X-75.8 (0.874–0.903) ; revérifié par X-91 (0.971, docs/ev
 
 ## X-75.1
 
-0.874 : rapport `docs/evidence/0.874-probe-coverage.md` (64 sources, 46 sondes) ; `ProbeSet874Tests` fige les 17 parties de la capture et teste les gardes des sondes qui n'en avaient pas ; relevés en jeu de chaque sonde listés dans TESTING (0.874)
+0.874 : rapport `docs/project/audits/0.874-probe-coverage.md` (64 sources, 46 sondes) ; `ProbeSet874Tests` fige les 17 parties de la capture et teste les gardes des sondes qui n'en avaient pas ; relevés en jeu de chaque sonde listés dans TESTING (0.874)
 
 ## X-75.2
 

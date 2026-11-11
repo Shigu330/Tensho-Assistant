@@ -472,7 +472,7 @@ References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLA
 ID: DEC-042
 Timestamp: 2026-11-08 Europe/Brussels
 Problem: The format of the discoveries file has no room for HQ, per-value counters or denominators (future loot rates); changing it after 1.0.0 would force migrating every player's files.
-Evidence: Plan X-76 2c (step E1, docs/evidence/x76-2bc-plan.md); user answer: « Fais-le au plus vite » ("Do it as soon as possible").
+Evidence: Plan X-76 2c (step E1, docs/project/audits/x76-2bc-plan.md); user answer: « Fais-le au plus vite » ("Do it as soon as possible").
 Options: Before 1.0.0; later.
 Decision: Format fixed right now: optional fields added, format version raised, reading of old files kept, merge tool updated.
 Reason: User decision.
@@ -487,7 +487,7 @@ Options: Game functions if they only calculate; keep the formula.
 Decision: The game functions are called only if they only calculate (no action, nothing sent to the server, no state changed), on the framework thread; otherwise the formula stays, checked against the game.
 Reason: User decision.
 Consequences: A probe first proves the nature of the function; proof in docs/evidence.
-References: X-75.6, docs/evidence/0.874-probe-coverage.md
+References: X-75.6, docs/project/audits/0.874-probe-coverage.md
 
 ID: DEC-044
 Timestamp: 2026-11-08 Europe/Brussels
@@ -1043,7 +1043,7 @@ References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLA
 DEC-ID: DEC-042
 Timestamp: 2026-11-08 Europe/Brussels
 Problem: Le format du fichier des découvertes n'a pas de place pour le HQ, des compteurs par valeur ou des dénominateurs (taux de butin futurs) ; le changer après la 1.0.0 obligerait à migrer les fichiers de tous les joueurs.
-Evidence: Plan X-76 2c (étape E1, docs/evidence/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
+Evidence: Plan X-76 2c (étape E1, docs/project/audits/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
 Options: Avant la 1.0.0 ; plus tard.
 Decision: Format fixé tout de suite : champs facultatifs ajoutés, version du format montée, lecture des anciens fichiers gardée, outil de fusion mis à jour.
 Reason: Décision de l'utilisateur.
@@ -1058,7 +1058,7 @@ Options: Fonctions du jeu si elles ne font que calculer ; garder la formule.
 Decision: Les fonctions du jeu sont appelées seulement si elles ne font que calculer (aucune action, aucun envoi au serveur, aucun état modifié), sur le fil du framework ; sinon la formule reste, contrôlée contre le jeu.
 Reason: Décision de l'utilisateur.
 Consequences: Une sonde prouve d'abord la nature de la fonction ; preuve dans docs/evidence.
-References: X-75.6, docs/evidence/0.874-probe-coverage.md
+References: X-75.6, docs/project/audits/0.874-probe-coverage.md
 
 DEC-ID: DEC-044
 Timestamp: 2026-11-08 Europe/Brussels

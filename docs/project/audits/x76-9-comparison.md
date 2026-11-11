@@ -1,6 +1,6 @@
 # X-76 step 9 — comparison with the starting point (2026-11-09, version 0.956)
 
-Starting point: docs/evidence/x76-0-baseline.md (2026-11-08, version 0.903). Same script ideas (source tree src/TenshoAssistant, bin and obj left out).
+Starting point: docs/project/audits/x76-0-baseline.md (2026-11-08, version 0.903). Same script ideas (source tree src/TenshoAssistant, bin and obj left out).
 
 | Figure | 0.903 (start) | 0.956 (now) | Note |
 |---|---|---|---|
@@ -8,7 +8,7 @@ Starting point: docs/evidence/x76-0-baseline.md (2026-11-08, version 0.903). Sam
 | C# lines | 69,148 | 70,818 | +2.4 % for 53 versions (0.904–0.956) adding features (ocean fishing V1–V2, airship route, fishing facts, discoveries load handling) |
 | Language keys en / fr | 6,925 / 6,925 | 6,905 / 6,905 | duplicates removed (H8), keys never asked removed (step 1); en and fr still equal |
 | Language keys de / ja | 40 / 40 | 35 / 35 | partial files, as planned |
-| Hosts written in the code | 27 | 27 | same list; every one sorted in docs/evidence/0.949-network-rules.md |
+| Hosts written in the code | 27 | 27 | same list; every one sorted in docs/project/audits/0.949-network-rules.md |
 | Developer capture parts | 20 | 20 | same parts (the proven ones stay until their readers replace them) |
 | Warnings disabled | none | none | no pragma, no NoWarn |
 | Test files / cases | 427 / 1,483 | 475 / 1,584 | every version added its test; 0 duplicate case names |

@@ -11,7 +11,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 namespace TenshoAssistant.Discoveries;
 
 /// <summary>
-/// X-74 (0.860, user request, the night of 2026-11-08: « add as many coherent parsers as possible », after the community map docs/evidence/0.857-community-map.md):
+/// X-74 (0.860, user request, the night of 2026-11-08: « add as many coherent parsers as possible », after the community map docs/project/audits/0.857-community-map.md):
 /// where the items the player gets come from, read on the framework thread ten times a second, copied, written to the local discoveries base only.
 /// - Desynthesis: AgentSalvage.DesynthItemId and DesynthResults (ItemId, Quantity) while its result is open.
 /// - Ventures: AgentRetainerTask.RetainerData (RewardRetainerTaskId, RewardItemIds, RewardItemCount) while « RetainerTaskResult » shows.

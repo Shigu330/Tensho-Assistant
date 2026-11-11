@@ -18,7 +18,7 @@ internal static class ReadingCaptureTests
             Check(capture.Contains("if(disposed || !enabled())return;"),"developer mode only");
         }),
         // From ProbeSet874Tests: 0.874 (X-75.1, user request « un test pour chaque sonde »): every in-game probe and parser has a test. The capture's parts are a fixed list: a part added or
-        // removed fails here until the list (and docs/evidence/0.874-probe-coverage.md) says so.
+        // removed fails here until the list (and docs/project/audits/0.874-probe-coverage.md) says so.
         ("Probe set: the capture writes exactly the listed parts, each with a line limit",() =>
         {
             var capture=Read("Diagnostics/ReadingCapture.Dalamud.cs");
