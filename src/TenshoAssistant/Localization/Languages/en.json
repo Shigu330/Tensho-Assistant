@@ -753,6 +753,8 @@
     "OpenFolderTip": "Opens the discoveries folder, with its « Import » and « Export » folders.",
     "Working": "Working…",
     "FileFailed": "The file could not be handled; see the log.",
+    "BaseSetAside": "Your discoveries file could not be read (over 64 MB or damaged). It is kept apart, untouched, as {0} in the discoveries folder; new discoveries go into a new file.",
+    "BaseBlocked": "Your discoveries file could not be read nor set apart. So that it is never overwritten, nothing is saved this session; see the log ({0}).",
     "Search": "Monster, FATE, item…",
     "SearchTip": "Part of a name, two letters at least: a monster, a hunt mark, a FATE, an item or its source (desynthesis, chest, venture, sector…).",
     "SearchFirst": "Type a monster's name to see its places.",

@@ -31,6 +31,9 @@ internal sealed partial class MainWindow
     internal Market.SeenPriceStore? SeenPrices { get; set; }
     /// <summary>Set once the saved base is read (or found missing): nothing is written before, so that a slow read never loses it.</summary>
     internal volatile bool DiscoveriesLoaded;
+    /// <summary>X-93 part 2 (0.1039): the unreadable base set aside at load (its new name), and whether it could not be moved (then nothing is saved).</summary>
+    internal volatile string? DiscoveriesSetAside;
+    internal volatile bool DiscoveriesWriteBlocked;
     private long discoveriesAt=-100_000,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
     private string discoverySearch="",discoverySearched="\u0001";private int discoveryShownRevision=-1;
     private IReadOnlyList<DiscoveryFact> discoveryRows=[];private string? discoveryMessage;private bool discoveryClearAsked;
@@ -73,7 +76,7 @@ internal sealed partial class MainWindow
     /// <summary>The base written off the frame (on unload: at once).</summary>
     private void SaveDiscoveries(bool now)
     {
-        if(DiscoveryStore is not { } store || DiscoveryFolder is null || !DiscoveriesLoaded || Interlocked.Exchange(ref discoverySaving,1)==1)return;
+        if(DiscoveryStore is not { } store || DiscoveryFolder is null || !DiscoveriesLoaded || DiscoveriesWriteBlocked || Interlocked.Exchange(ref discoverySaving,1)==1)return;
         discoveriesSavedAt=Environment.TickCount64;
         var held=store.SharedKindsHeld();var file=store.Snapshot(DateTimeOffset.UtcNow);var path=DiscoveryBase;
         var prices=SeenPrices is { Dirty:true } seen ? seen.Snapshot():null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
@@ -318,6 +321,12 @@ internal sealed partial class MainWindow
     private void DrawDiscoveries()
     {
         TenshoAssistant.UI.UiComponents.SectionHeader(localization.Get("DiscoveriesUi.Title"),localization.Get("DiscoveriesUi.Help"));
+        if(DiscoveriesSetAside is { } setAside)
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text,DiscoveriesWriteBlocked ? Error:Warning);
+            ImGui.TextWrapped(localization.Format(DiscoveriesWriteBlocked ? "DiscoveriesUi.BaseBlocked":"DiscoveriesUi.BaseSetAside",Path.GetFileName(setAside)));
+            ImGui.PopStyleColor();
+        }
         if(DiscoveryStore is not { } store || DiscoveryFolder is not { } folder || !DiscoveriesLoaded){ImGui.TextDisabled(localization.Get("DiscoveriesUi.Loading"));return;}
         BoolSetting("DiscoveriesUi.Enabled","DiscoveriesUi.EnabledTip",()=>configuration.Discovery.Enabled,value=>configuration.Discovery.Enabled=value,c=>c.Discovery.Enabled);
         if(configuration.Discovery.Enabled)

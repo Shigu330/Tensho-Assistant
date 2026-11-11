@@ -536,6 +536,38 @@ public static class DiscoveryFiles
         return DiscoveryFile.Readable(file) ? file:null;
     }
 
+    /// <summary>
+    /// X-93 part 2 (0.1039): the base read at load. A file that is there but cannot be used (over <paramref name="max"/>, damaged, unknown version) is set
+    /// aside under a dated name that never replaces an earlier one, and reported through <paramref name="broken"/>: the next save starts a new file instead of
+    /// writing an empty base over it. <c>Unsafe</c> is true when it could not even be moved: then nothing may be written this session.
+    /// </summary>
+    public static (DiscoveryFile? File,string? SetAside,bool Unsafe) ReadBase(string path,DateTimeOffset now,Action<string,Exception> broken,long max=MaxBytes)
+    {
+        if(!File.Exists(path))return (null,null,false);
+        DiscoveryFile? file=null;Exception? error=null;
+        try
+        {
+            if(new FileInfo(path).Length>max)throw new InvalidDataException($"Discoveries file over {max:N0} bytes.");
+            file=JsonSerializer.Deserialize<DiscoveryFile>(File.ReadAllText(path),Options);
+            if(!DiscoveryFile.Readable(file))throw new InvalidDataException("Unknown discoveries file.");
+        }
+        catch(Exception caught){error=caught;}
+        if(error is null)return (file,null,false);
+        var aside=SetAsideName(path,now);
+        broken(aside,error);
+        try{File.Move(path,aside,false);return (null,aside,false);}
+        catch(Exception){return (null,aside,true);}
+    }
+
+    /// <summary>X-93 part 2 (0.1039): « Discoveries.json.broken-yyyyMMdd-HHmmss », with « -2 », « -3 »… when that name is taken.</summary>
+    public static string SetAsideName(string path,DateTimeOffset now)
+    {
+        var name=$"{path}.broken-{now.ToUniversalTime():yyyyMMdd-HHmmss}";
+        var aside=name;
+        for(var number=2;File.Exists(aside);number++)aside=$"{name}-{number}";
+        return aside;
+    }
+
     public static void Write(string path,DiscoveryFile file)
     {
         AtomicFile.Write(path,JsonSerializer.Serialize(file,Options));

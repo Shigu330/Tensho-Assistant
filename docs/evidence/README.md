@@ -12,7 +12,7 @@ Français : sorties de sondes et extraits de journaux cités par le code : chaqu
 | [0.1008-game-update-inventory.md](0.1008-game-update-inventory.md) | `tests/TenshoAssistant.Tests/GameUpdateInventory1008Tests.cs` | `CHANGELOG.md`, `docs/project/TESTING-ROUTE.md` |
 | [0.1009-dalamud-api16-watch.md](0.1009-dalamud-api16-watch.md) | — | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.103.0-maps-probe.log](0.103.0-maps-probe.log) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `CHANGELOG.md` |
-| [0.1038-game-font-glyphs.md](0.1038-game-font-glyphs.md) | `tools/README.md` | — |
+| [0.1038-game-font-glyphs.md](0.1038-game-font-glyphs.md) | `tests/TenshoAssistant.Tests/FontGlyphs1038Tests.cs`, `tools/README.md` | — |
 | [0.105.0-zones-probe.log](0.105.0-zones-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `CHANGELOG.md` |
 | [0.107.0-aetheryte-probe.log](0.107.0-aetheryte-probe.log) | `src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs` | `CHANGELOG.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.114.0-local-probe.log](0.114.0-local-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `CHANGELOG.md` |

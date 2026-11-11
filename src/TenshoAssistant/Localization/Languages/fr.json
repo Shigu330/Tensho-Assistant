@@ -753,6 +753,8 @@
     "OpenFolderTip": "Ouvre le dossier des découvertes, avec ses dossiers « Import » et « Export ».",
     "Working": "En cours…",
     "FileFailed": "Le fichier n'a pas pu être traité ; voir le journal.",
+    "BaseSetAside": "Votre fichier de découvertes n'a pas pu être lu (plus de 64 Mo ou abîmé). Il est gardé de côté, intact, sous le nom {0} dans le dossier des découvertes ; les nouvelles découvertes vont dans un nouveau fichier.",
+    "BaseBlocked": "Votre fichier de découvertes n'a pu être ni lu ni mis de côté. Pour qu'il ne soit jamais écrasé, rien n'est enregistré pendant cette session ; voir le journal ({0}).",
     "Search": "Monstre, ALÉA, objet…",
     "SearchTip": "Une partie d'un nom, deux lettres au moins : un monstre, un monstre de chasse, une ALÉA, un objet ou sa provenance (désynthèse, coffre, tâche, secteur…).",
     "SearchFirst": "Tapez le nom d'un monstre pour voir ses lieux.",

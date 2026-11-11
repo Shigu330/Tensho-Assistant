@@ -243,12 +243,16 @@ public sealed class Plugin : IDalamudPlugin
                 try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
                 catch(Exception error){log.Warning(error,"The market prices seen could not be read; the file is kept as .broken.");try{File.Move(Path.Combine(discoveryFolder,"MarketSeen.json"),Path.Combine(discoveryFolder,"MarketSeen.json.broken"),true);}catch(Exception){}}
                 var saved=Path.Combine(discoveryFolder,"Discoveries.json");
-                try{if(Discoveries.DiscoveryFiles.Read(saved) is { } file)discoveries.Load(file);}
-                catch(Exception error)
+                // X-93 part 2 (0.1039): a base that cannot be read (over 64 MB, damaged) is set aside under a dated name and said in the chat and on the page,
+                // never overwritten by an empty base; if it cannot even be moved, nothing is saved this session.
+                var read=Discoveries.DiscoveryFiles.ReadBase(saved,DateTimeOffset.UtcNow,(aside,error)=>log.Warning(error,"The discoveries could not be read; the file is set aside as {0}.",Path.GetFileName(aside)));
+                if(read.File is { } file)discoveries.Load(file);
+                if(read.Unsafe){mainWindow.DiscoveriesWriteBlocked=true;log.Error("The discoveries file could not be set aside: nothing is saved this session.");}
+                if(read.SetAside is { } setAside)
                 {
-                    // A file that cannot be read is set aside, never overwritten.
-                    log.Warning(error,"The discoveries could not be read; the file is kept as .broken.");
-                    try{File.Move(saved,saved+".broken",true);}catch(Exception){}
+                    mainWindow.DiscoveriesSetAside=setAside;
+                    var said=localization.Format(read.Unsafe ? "DiscoveriesUi.BaseBlocked":"DiscoveriesUi.BaseSetAside",Path.GetFileName(setAside));
+                    _=framework.RunOnFrameworkThread(()=>chat.PrintError("[Tensho] "+said));
                 }
                 // X-93 (0.941): the shared discoveries, kept apart by kind, read only when a page asks for their kind (an unreadable file is set aside).
                 discoveries.UseSharedSource(kind=>Discoveries.DiscoveryFiles.ReadSharedKind(saved,kind,(path,error)=>log.Warning(error,"Shared discoveries {0} could not be read; the file is kept as .broken.",Path.GetFileName(path))),
