@@ -3,6 +3,12 @@
 Résumé par version, tiré des notes de vérification (historique détaillé : commits git ; preuves citées : docs/evidence/).
 Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la validation en jeu est indiquée quand l'utilisateur l'a rapportée.
 
+## 0.1053.0
+- Constat d'audit A041 : des dates écrites à la main dans les documents publics avaient pris de l'avance sur le jour réel (DEC-048, DEC-049 et des lignes du plan global datées du lendemain). Un test refuse désormais toute date postérieure au lendemain (UTC) dans un document Markdown public ; les fichiers de l'agent, les points de contrôle et les sorties de compilation ne sont pas lus. Aucune date fausse n'est trouvée aujourd'hui.
+- Tests : FutureDates1053Tests. Verify.ps1 (agent) : 1732/1732, 0 avertissement, 0 erreur ; DLL 0.1053.0.0. Rien à essayer en jeu.
+### English
+- Audit finding A041: dates written by hand in the public documents had run ahead of the real day (DEC-048, DEC-049 and global plan rows dated the next day). A test now refuses any date later than tomorrow (UTC) in a public Markdown document; the agent's files, checkpoints and build outputs are not read. No wrong date is found today.
+
 ## 0.1052.0
 - Constat d'audit A065 : le dossier publish/github, qui gardait les brouillons de la 0.323 des workflows GitHub, est retiré (l'historique git le garde). Il n'était plus tenu à jour depuis l'activation des workflows dans .github/ (0.447), et le README le décrivait à tort comme une copie des fichiers actifs. Le test qui exigeait ces brouillons, la ligne de l'arborescence du README, la phrase de CONTRIBUTING (deux langues) et la ligne de l'index de docs/README.md sont retirés. Un test vérifie que le dossier est parti, que les fichiers actifs de .github/ sont là et qu'aucun document public n'y renvoie.
 - Tests : PublishDrafts1052Tests. Verify.ps1 (agent) : 1730/1730, 0 avertissement, 0 erreur ; DLL 0.1052.0.0. Rien à essayer en jeu.
