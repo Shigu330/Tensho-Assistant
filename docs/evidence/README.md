@@ -228,7 +228,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.911-discoveries-check.md](0.911-discoveries-check.md) | — | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/audits/x76-2bc-plan.md` |
 | [0.916-discoveries-format.md](0.916-discoveries-format.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/DiscoveriesFormat916Tests.cs`, `tools/discoveries-merge.py` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [0.917-ocean-timetable.md](0.917-ocean-timetable.md) | — | `docs/changelog/CHANGELOG-0.900-0.999.md` |
-| [0.919-airship-reading-2026-11-08.log](0.919-airship-reading-2026-11-08.log) | `src/TenshoAssistant/FreeCompany/AirshipSectors.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.919-airship-reading-2026-11-08.log](0.919-airship-reading-2026-11-08.log) | `src/TenshoAssistant/FreeCompany/AirshipSectors.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [0.92.0-shop-currency-probe.log](0.92.0-shop-currency-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md` |
 | [0.931-srank-check.md](0.931-srank-check.md) | `tests/TenshoAssistant.Tests/SRankCheck931Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/audits/x76-2bc-plan.md` |
 | [0.933-fishing-intuition.md](0.933-fishing-intuition.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs` | `docs/project/audits/x76-2bc-plan.md` |
@@ -260,7 +260,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
-| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/project/GLOBAL-PLAN.md` |
+| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | — |
 
 Counted · compté : 250 files · fichiers ; 196 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

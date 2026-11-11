@@ -1023,14 +1023,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.723) Masked Carnivale : l'auto-contrôle lit 0 épreuve faite ; dire si c'est juste pour votre personnage.
 
 
-- [ ] (0.725) Que puis-je fabriquer ? › tri par marché : relancez les prix, les ventes par jour doivent s'afficher et le haut de la liste doit se vendre.
+- [x] (0.725) Que puis-je fabriquer ? › tri par marché : relancez les prix, les ventes par jour doivent s'afficher et le haut de la liste doit se vendre.
 
 
 - [ ] (0.727) Atelier › Coque de type Bronco : le bouton doit dire 4 parties ; retirez la base de tours et le mur avec leur croix.
 
-- [ ] (0.728) À un point de récolte, suivez le plan : la ligne « Ensuite » et le cadre sur la barre doivent suivre chaque étape.
+- [x] (0.728) À un point de récolte, suivez le plan : la ligne « Ensuite » et le cadre sur la barre doivent suivre chaque étape.
 
-- [ ] (0.729) À un point de récolte : une ligne doit séparer « Ensuite » du plan.
+- [x] (0.729) À un point de récolte : une ligne doit séparer « Ensuite » du plan.
 
 - [ ] (0.730) Commandes spéciales › Récompenses : comparez un client à sa fenêtre en jeu, surtout les objets liés aux rangs.
 
@@ -1039,7 +1039,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.733) À un point de récolte : un cadre doré doit clignoter sur la case de l'action « Ensuite » ; Sagesse du fermier seulement après une récolte.
 
-- [ ] (0.734) À un point de récolte : le cadre doit se poser sur Récolte abondante, même placée en version I sur la barre.
+- [x] (0.734) À un point de récolte : le cadre doit se poser sur Récolte abondante, même placée en version I sur la barre.
 
 
 
@@ -1064,9 +1064,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.750) Paramètres › Cache & péremption : vérifiez les nouvelles durées.
 
-- [ ] (0.751) Point de récolte avec un objet de votre liste d'atelier : ligne « Vos listes en demandent encore » et cadre vert dans la fenêtre du jeu.
+- [x] (0.751) Point de récolte avec un objet de votre liste d'atelier : ligne « Vos listes en demandent encore » et cadre vert dans la fenêtre du jeu.
 
-- [ ] (0.752) Liste de l'atelier : sous Récolte, une ligne par zone avec ses objets.
+- [x] (0.752) Liste de l'atelier : sous Récolte, une ligne par zone avec ses objets.
 
 - [ ] (0.753) Point de récolte : cochez « Récolter automatiquement » ; le plan change et le dit.
 
@@ -1107,7 +1107,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.772) Liste de l'atelier : le nombre d'alarmes ne compte plus que le Minerai de sombracier.
 
 
-- [ ] (0.774) À la prochaine alarme : clic droit sur le nom de l'objet dans le chat ; le menu doit proposer Tensho.
+- [x] (0.774) À la prochaine alarme : clic droit sur le nom de l'objet dans le chat ; le menu doit proposer Tensho.
 
 - [ ] (0.775) Téléportez-vous : la dépense doit aller dans Téléportation.
 
@@ -1118,9 +1118,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.779) Rechargez le plugin : les objets de monstres sont dans « Monstres » dès l'ouverture de la liste.
 
-- [ ] (0.780) À la prochaine alarme : clic droit n'importe où sur « Minerai de sombracier (clic droit : Tensho) ».
+- [x] (0.780) À la prochaine alarme : clic droit n'importe où sur « Minerai de sombracier (clic droit : Tensho) ».
 
-- [ ] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
+- [x] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
 
 - [ ] (0.782) Rouvrez le carnet d'artisan sur la recette 5623 en cuisinier : plus de gel.
 
@@ -1176,7 +1176,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.812) À la prochaine alarme : clic droit sur le nom de l'objet : menu de l'objet avec « Tensho ».
+- [x] (0.812) À la prochaine alarme : clic droit sur le nom de l'objet : menu de l'objet avec « Tensho ».
 
 - [ ] (0.813) Cliquez une quête dans le journal, validez l'étape : la cible quitte la carte Tensho.
 
@@ -1674,6 +1674,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1099) Récolte, artisanat et sacoche (mode développeur, journal des découvertes) : dalamud.log écrit « Item gain attributed: … from Gathering » pendant une récolte, « from Craft » à la fin d'une synthèse, et rien quand on sort des objets de la sacoche ; plus de « Item gain not attributed » dans ces trois cas.
 
+- [ ] (0.1102) Pêche en mer : réussir une mission du voyage (gils gagnés) : Rangements › Gils, la ligne est dans « Pêche en mer (missions) », pas dans « Autre ».
+
+- [ ] (0.1102) Aéronef : au retour d'un voyage qui débloque une nouvelle destination (message du jeu dans le chat) : Monde › Découvertes, « Secteurs d'aéronef débloqués » compte 1 de plus et la recherche du secteur montre « … débloqué (aéronef) ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
@@ -1797,7 +1801,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.508 : ventes des servants (I-05)** — à voir en jouant, à la sonnette
 
-- [ ] Ouvrir la liste de ventes d'un servant : le panneau « Vos ventes » s'affiche à côté, avec objets, quantités et prix comme le jeu, HQ compris.
+- [x] Ouvrir la liste de ventes d'un servant : le panneau « Vos ventes » s'affiche à côté, avec objets, quantités et prix comme le jeu, HQ compris.
 - [ ] « Comparer aux autres vendeurs » : l'autre vendeur le plus bas et l'état de chaque ligne. Vos autres servants ne comptent pas comme concurrents. Le bouton de prix copie la valeur ; aucun prix ne change dans le jeu.
 
 **0.506 : vidéos et guides de la communauté (ONBOARD-001, lots 7 et 8)** — après une release
