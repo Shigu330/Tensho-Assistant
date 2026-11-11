@@ -96,6 +96,8 @@ public sealed class Plugin : IDalamudPlugin
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
         this.log = log;
+        // 0.1105 (R20, plan 4.20): the version loaded, read by the agent's launch check (scripts/agent/logread.py launch).
+        log.Information("Tensho Assistant {0} loaded; logged in: {1}, territory {2}.",typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",client.IsLoggedIn,client.TerritoryType);
         chatGui = chat;
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
         dutyLoot = new DutyLootService(garland);

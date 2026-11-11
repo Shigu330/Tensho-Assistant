@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1105.0
+- Releases : Tensho écrit sa version dans le journal de Dalamud au chargement, pour que la vérification du lancement la retrouve ; les notes d'une release (hors correctif urgent) disent « Vérifié au lancement, pas encore essayé en détail » (R20 changée le 11/11).
+- Tests : LaunchCheck1105Tests. Verify.ps1 (agent) : 1803/1803, 0 avertissement, 0 erreur ; DLL 0.1105.0.0. Rien à essayer en jeu.
+### English
+- Releases: Tensho writes its version to the Dalamud log at load, so that the launch check can find it; the notes of a release (other than an urgent fix) say « Checked at launch, not tried in detail yet » (R20 changed on 11/11).
+
 ## 0.1104.0
 - Carte : son code est préparé en premier, une demi-seconde après le chargement de Tensho, pour que la carte ouverte au rechargement ne fige plus l'image (X-01 ; mesure après 0.1103 : marchands 142 → 82 ms, image encore 358 ms, surtout de la compilation).
 - Tests : MapWarmup1104Tests. Verify.ps1 (agent) : 1801/1801, 0 avertissement, 0 erreur ; DLL 0.1104.0.0. Rien à essayer en jeu.

@@ -169,7 +169,12 @@ function Assert-DesktopZip([string]$Version) {
 }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
 function Add-HotfixNote([string]$Notes) {
-    if (-not $Hotfix) { return $Notes }
+    # 0.1105 (R20 changed on 2026-11-11): without -Hotfix, the release goes out on the « lancement ok » of its version (q.py release-check,
+    # run by guard.py): Tensho loaded in game at this version, character logged in, self-test without failure, no error in the log.
+    if (-not $Hotfix) {
+        return "**Checked at launch, not tried in detail yet**: Tensho loaded in game with this version, a character logged in, its self-test passed and the log showed no error; the detailed in-game tests come later.`n" +
+            "**Vérifié au lancement, pas encore essayé en détail** : Tensho s'est chargé en jeu à cette version, personnage connecté, son autotest est passé et le journal n'a montré aucune erreur ; les essais détaillés en jeu viendront ensuite.`n`n$Notes"
+    }
     $reason = $Hotfix.Trim()
     return "**Urgent fix** ($reason): released without waiting for the in-game tests; not validated in game.`n" +
         "**Correctif urgent** ($reason) : publié sans attendre les essais en jeu ; non validé en jeu.`n`n$Notes"
