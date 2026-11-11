@@ -47,7 +47,7 @@ internal static class Routes335Tests
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.RoutePlanner.cs"));
             Check(page.Contains("var values=BuildRouteValues(catalog,map,world.WorldId);",StringComparison.Ordinal),"values built before the worker");
             Check(page.Contains("routePrices.StartListAsync(market,character,world.WorldId,wanted.Take(32))",StringComparison.Ordinal),"bounded list on a click");
-            Check(page.Contains("configuration.CommunityUniversalis",StringComparison.Ordinal),"honours the Universalis switch");
+            Check(page.Contains("SourceOn(SourceUse.UniversalisToolPrices)",StringComparison.Ordinal),"honours the Universalis switch");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Lifetime.cs")).Contains("routePrices.Dispose();",StringComparison.Ordinal),"session disposed");
         }),
     ];

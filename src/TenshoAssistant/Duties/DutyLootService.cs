@@ -13,6 +13,8 @@ public sealed class DutyLootService : IDisposable
     public static readonly TimeSpan RequestInterval = GarlandClient.RequestInterval;
     private readonly object gate = new();
     private readonly GarlandClient transport;
+    /// <summary>X-122, D-101: the « duty loot » use of Garland Tools; off, only a kept copy is read.</summary>
+    public Func<bool>? Enabled { get; set; }
     private readonly bool ownsTransport;
     private readonly TimeProvider clock;
     private readonly Dictionary<uint, DutyLootDocument> cache = [];
@@ -68,7 +70,7 @@ public sealed class DutyLootService : IDisposable
         }
         try
         {
-            var response = await transport.ReadDocumentAsync(GarlandResource.Instance,duty.InstanceId,source.Token,force).ConfigureAwait(false);
+            var response = await transport.ReadDocumentAsync(GarlandResource.Instance,duty.InstanceId,source.Token,force,Enabled?.Invoke()!=false).ConfigureAwait(false);
             var parsed = DutyLootParser.Parse(response.Json,duty.InstanceId,response.FetchedAt,source.Token);
             lock (gate)
             {

@@ -12,6 +12,8 @@ public sealed class MonsterLootService : IDisposable
     public const int MonsterCacheCapacity = 32;
     private readonly object gate = new();
     private readonly GarlandClient transport;
+    /// <summary>X-122, D-101: the « monster drops » use of Garland Tools; off, only a kept copy is read.</summary>
+    public Func<bool>? Enabled { get; set; }
     private readonly TimeProvider clock;
     private readonly Dictionary<uint,MonsterItemDocument> items = [];
     private readonly Dictionary<ulong,MonsterDocument> monsters = [];
@@ -74,7 +76,7 @@ public sealed class MonsterLootService : IDisposable
         try
         {
             var resource=detail ? GarlandResource.Monster:GarlandResource.Item;var identity=detail ? monsterId:itemId;
-            var response = await transport.ReadDocumentAsync(resource,identity,source.Token,force).ConfigureAwait(false);
+            var response = await transport.ReadDocumentAsync(resource,identity,source.Token,force,Enabled?.Invoke()!=false).ConfigureAwait(false);
             var item = detail ? null : MonsterDocuments.ParseItem(response.Json,itemId,response.FetchedAt,source.Token);
             var monster = detail ? MonsterDocuments.ParseMonster(response.Json,monsterId,response.FetchedAt,source.Token) : null;
             lock (gate)

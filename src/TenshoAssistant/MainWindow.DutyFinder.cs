@@ -47,7 +47,7 @@ internal sealed partial class MainWindow
             if(loot.State.Duty?.DutyId!=duty.DutyId){loot.Select(duty);dutyFinderQuery="";}
             // One request per selected duty (the player's selection), served from the cache when fresh; 0.326: asked once more when
             // Garland is turned back on after a refusal of the switch.
-            if(configuration.CommunityGarland && !loot.State.Loading && SourceOff(loot.State.Error))dutyFinderRequested=0;
+            if(SourceOn(SourceUse.GarlandDutyLoot) && !loot.State.Loading && SourceOff(loot.State.Error))dutyFinderRequested=0;
             if(dutyFinderRequested!=duty.DutyId && loot.State is { Loading:false, Document:null })
             {dutyFinderRequested=duty.DutyId;_=loot.RequestAsync();}
             DrawDutyFinderLoot(loot,duty);
@@ -73,13 +73,13 @@ internal sealed partial class MainWindow
         var refreshHovered=false;
         try
         {
-            ImGui.BeginDisabled(state.Loading || !configuration.CommunityGarland);
+            ImGui.BeginDisabled(state.Loading || !SourceOn(SourceUse.GarlandDutyLoot));
             try{if(ImGui.SmallButton(FontAwesomeIcon.SyncAlt.ToIconString()+"##DutyFinderRefresh"))_=loot.RequestAsync(true);}
             finally{ImGui.EndDisabled();}
             refreshHovered=ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled);
         }
         finally{ImGui.PopFont();}
-        if(refreshHovered)WrappedTooltip(localization.Get(configuration.CommunityGarland ? "DutyFinder.RefreshTip":"Advanced.SourceOffTip"));
+        if(refreshHovered)WrappedTooltip(localization.Get(SourceOn(SourceUse.GarlandDutyLoot) ? "DutyFinder.RefreshTip":"Advanced.SourceOffTip"));
         ImGui.SameLine();
         if(state.Document is { HasRewards:true, HasFights:true, HasCoffers:true })HelpMarker("DutyUi.Source");
         else HelpMarkerText(localization.Get("DutyUi.Source")+"\n"+localization.Get("DutyUi.Partial"));

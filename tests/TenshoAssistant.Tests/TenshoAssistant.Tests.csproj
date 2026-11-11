@@ -148,6 +148,7 @@
     <Compile Include="../../src/TenshoAssistant/OnceSet.cs" Link="OnceSet.cs" />
     <Compile Include="../../src/TenshoAssistant/BackupZip.cs" Link="BackupZip.cs" />
     <Compile Include="../../src/TenshoAssistant/CommunitySources.cs" Link="CommunitySources.cs" />
+    <Compile Include="../../src/TenshoAssistant/CommunitySourceUses.cs" Link="CommunitySourceUses.cs" />
     <Compile Include="../../src/TenshoAssistant/Inventory/*.cs" Exclude="../../src/TenshoAssistant/Inventory/*.Dalamud.cs" Link="Inventory/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Items/*.cs" Exclude="../../src/TenshoAssistant/Items/*.Dalamud.cs;../../src/TenshoAssistant/Items/*.Lumina.cs" Link="Items/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Craft/RecipeCatalog.cs" Link="Craft/RecipeCatalog.cs" />

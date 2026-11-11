@@ -25,14 +25,16 @@ public sealed class GarlandClient : IDisposable
     // alike (it stopped item sources only); copies kept on disk are still read.
     public Func<bool>? Enabled { get; set; }
     public void ConfigureCache(Func<TimeSpan> lifetime,DataCache store){lock(gate){cacheLifetime=lifetime;disk=store;}}
-    public async Task<GarlandResponse> ReadDocumentAsync(GarlandResource resource,ulong id,CancellationToken token,bool force=false)
+    public async Task<GarlandResponse> ReadDocumentAsync(GarlandResource resource,ulong id,CancellationToken token,bool force=false,bool useOn=true)
     {
         var key=$"{resource}:{id}";
         if(!force && disk is { } store)
         {
             var saved=await store.ReadAsync<string>("sources",key,"garland-routes-fr3-en2-v1",token).ConfigureAwait(false);
-            if(saved is not null && (CacheAge.Fresh(saved.RecordedAt,clock.GetUtcNow(),CacheLifetime) || Enabled?.Invoke()==false))return new(saved.Value,saved.RecordedAt);
+            if(saved is not null && (CacheAge.Fresh(saved.RecordedAt,clock.GetUtcNow(),CacheLifetime) || Enabled?.Invoke()==false || !useOn))return new(saved.Value,saved.RecordedAt);
         }
+        // X-122, D-101: the use's own switch (duty loot, monster loot) stops the request like the source's.
+        if(!useOn)throw new SourceDisabledException("Garland Tools");
         var json=await ReadAsync(resource,id,token).ConfigureAwait(false);
         return new(json,clock.GetUtcNow());
     }

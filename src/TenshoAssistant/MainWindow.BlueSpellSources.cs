@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
                 if(missing>0)
                 {
                     ImGui.SameLine();
-                    if(SourceButton(localization.Format("BlueSpellSources.NearbyFetch",missing),configuration.CommunityWiki,true))index.FetchMissing(spells);
+                    if(SourceButton(localization.Format("BlueSpellSources.NearbyFetch",missing),SourceOn(SourceUse.WikiBlueMagic),true))index.FetchMissing(spells);
                     Tip("BlueSpellSources.NearbyFetchTip");
                 }
                 if(index.Error=="disabled")ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
@@ -87,7 +87,7 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         if(index.Book is { } book)ImGui.TextDisabled(localization.Format("BlueSpellSources.IndexDone",book.Rows.Count,book.FetchedAt.ToLocalTime().ToString("g")));
         else if(index.Running)ImGui.TextDisabled(localization.Get("BlueSpellSources.IndexReading"));
-        else if(!configuration.CommunityWiki || index.Error=="disabled")ImGui.TextDisabled(localization.Get("BlueSpellSources.IndexOff"));
+        else if(!SourceOn(SourceUse.WikiBlueMagic) || index.Error=="disabled")ImGui.TextDisabled(localization.Get("BlueSpellSources.IndexOff"));
         else if(index.Error is not null)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("BlueSpellSources.IndexFailed"));
     }
     /// <summary>0.777 (X-22, user report): every place row with this English name; the game has several for some (« Mor Dhona »: 26, 67, 509).</summary>
@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(view.Loading);
         try
         {
-            if(SourceButton(localization.Get("BlueSpellSources.Fetch"),configuration.CommunityWiki,true))_=wiki.RequestAsync();
+            if(SourceButton(localization.Get("BlueSpellSources.Fetch"),SourceOn(SourceUse.WikiBlueMagic),true))_=wiki.RequestAsync();
         }
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));

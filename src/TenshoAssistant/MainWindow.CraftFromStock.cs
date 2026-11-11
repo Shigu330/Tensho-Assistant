@@ -134,7 +134,7 @@ internal sealed partial class MainWindow
             return;
         }
         if(world==0 || character==0){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));return;}
-        if(!configuration.CommunityUniversalis){ImGui.SameLine();ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));return;}
+        if(!SourceOn(SourceUse.UniversalisToolPrices)){ImGui.SameLine();ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));return;}
         if(missing.Length==0){fromStockLoadAll=false;return;}
         var batch=missing.Take(TenshoAssistant.Market.MarketService.BatchMaximum).ToArray();
         fromStockAsked.UnionWith(batch);

@@ -59,7 +59,7 @@ internal static class SourceSwitch324Tests
             var plugin = File.ReadAllText(Path.Combine(Source,"Plugin.cs"));
             foreach (var wire in new[] { "garland.Enabled=()=>configuration.CommunityGarland","market.Enabled=()=>configuration.CommunityUniversalis","marketBoard.Enabled=()=>configuration.CommunityUniversalis" })
                 Check(plugin.Contains(wire,StringComparison.Ordinal),wire);
-            Check(Regex.Matches(plugin,@"\{Enabled=\(\)=>configuration\.CommunityWiki\}").Count == 6,"wiki monsters, item acquisition, vistas, blue magic spells (0.367), island animals (0.685) and duty guides (0.994) get the wiki switch");
+            Check(Regex.Matches(plugin,@"\{Enabled=\(\)=>CommunitySources\.Allowed\(configuration,SourceUse\.Wiki\w+\)\}").Count == 6,"wiki monsters, item acquisition, vistas, blue magic spells (0.367), island animals (0.685) and duty guides (0.994) get the wiki switch");
             var hover = File.ReadAllText(Path.Combine(Source,"Items","ItemHoverReader.Dalamud.cs")) + File.ReadAllText(Path.Combine(Source,"MainWindow.MarketHover.cs"));
             Check(Regex.Matches(hover,@"configuration\.CommunityUniversalis && configuration\.MarketPricesOnHover").Count == 2,"hover prices follow Universalis");
             // 0.447 (decided 2026-11-03): the dead « monsters on hover » setting and its wiki lookup are gone.

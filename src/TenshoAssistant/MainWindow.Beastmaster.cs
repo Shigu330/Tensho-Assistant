@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(wiki.Book is { } book ? localization.Format("BeastUi.WikiKnown", book.Rows.Count, book.FetchedAt.ToLocalTime().ToString("g")) : localization.Get("BeastUi.WikiNone"));
                 ImGui.SameLine();
-                if (SourceButton(localization.Get(wiki.Book is null ? "BeastUi.WikiFetch" : "BeastUi.WikiRefresh"), configuration.CommunityWiki, true)) wiki.Fetch();
+                if (SourceButton(localization.Get(wiki.Book is null ? "BeastUi.WikiFetch" : "BeastUi.WikiRefresh"), SourceOn(SourceUse.WikiBeastmaster), true)) wiki.Fetch();
                 Tip("BeastUi.WikiFetchTip");
                 if (wiki.Error == "disabled") ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
                 else if (wiki.Error is not null) ImGui.TextColored(UI.FfxivTheme.Warning, localization.Get("BeastUi.WikiFailed"));

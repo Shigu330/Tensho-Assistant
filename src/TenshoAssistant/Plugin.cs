@@ -129,6 +129,9 @@ public sealed class Plugin : IDalamudPlugin
             // 0.324: each source switch stops every request of its source (it used to cover part of it only).
             garland.Enabled=()=>configuration.CommunityGarland;
             market.Enabled=()=>configuration.CommunityUniversalis;
+            // X-122, D-101: duty and monster loot follow their own use of Garland Tools too.
+            dutyLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandDutyLoot);
+            monsterLoot.Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandMonsterLoot);
             marketBoard.Enabled=()=>configuration.CommunityUniversalis;
             // X-73.15 (0.871): the region of each data centre from the game sheet, so that Universalis' table is asked only for what the game does not name.
             marketBoard.GameRegions=data.GetExcelSheet<Lumina.Excel.Sheets.WorldDCGroupType>().Where(row=>row.Name.ExtractText().Length>0 && row.Region.RowId!=0)
@@ -159,12 +162,12 @@ public sealed class Plugin : IDalamudPlugin
             UI.GameThemeReader? themeReader=null;
             registrations.Register(()=>themeReader=new UI.GameThemeReader(gameConfig,log),()=>themeReader?.Dispose());
             mainWindow.ConfigureTheme(()=>themeReader?.GameValue);
-            var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiMonsters)};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);
             // X-90 (0.994): duty guides from the wiki, by the duty's English name (ContentFinderCondition, English sheet).
             var dutyGuides=new Duties.WikiDutyGuides(id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>(Dalamud.Game.ClientLanguage.English).GetRowOrDefault(id)?.Name.ExtractText() is { Length:>0 } english
-                ? char.ToUpperInvariant(english[0])+english[1..]:null,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+                ? char.ToUpperInvariant(english[0])+english[1..]:null,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiDutyGuides)};
             registrations.Register(()=>{},dutyGuides.Dispose);
             mainWindow.DutyGuides=dutyGuides;
             mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
@@ -174,19 +177,19 @@ public sealed class Plugin : IDalamudPlugin
             // Action sheet by row; family « -2 » drops the empty answers cached under the wrong title.
             var blueWiki=new WikiMonsterSources(id=>data.GetExcelSheet<Lumina.Excel.Sheets.AozAction>().GetRowOrDefault(id) is { Action.RowId:not 0 } aoz
                     ? data.GetExcelSheet<Lumina.Excel.Sheets.Action>(Dalamud.Game.ClientLanguage.English).GetRowOrDefault(aoz.Action.RowId)?.Name.ExtractText():null,
-                ()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,family:"wiki-blue-spells-2"){Enabled=()=>configuration.CommunityWiki};
+                ()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,family:"wiki-blue-spells-2"){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiBlueMagic)};
             registrations.Register(()=>{},blueWiki.Dispose);
             mainWindow.BlueSpellWiki=blueWiki;
             // 0.798 (X-38): the monsters that teach each spell, for the nearby monsters; English monster names matched to BNpcName rows once, off the frame.
             var englishMonsters=new Lazy<IReadOnlyDictionary<string,uint[]>>(()=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>(Dalamud.Game.ClientLanguage.English)
                 .Select(row=>(Name:row.Singular.ExtractText().Trim(),Id:row.RowId)).Where(row=>row.Name.Length>0)
                 .GroupBy(row=>row.Name,StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.Select(row=>row.Id).ToArray(),StringComparer.OrdinalIgnoreCase));
-            var blueNearby=new Monsters.BlueSpellMonsterIndex(blueWiki,name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[],()=>configuration.CommunityWiki);
+            var blueNearby=new Monsters.BlueSpellMonsterIndex(blueWiki,name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[],()=>CommunitySources.Allowed(configuration,SourceUse.WikiBlueMagic));
             registrations.Register(()=>{},blueNearby.Dispose);
             mainWindow.BlueSpellNearby=blueNearby;
             // 0.804 (X-39): the same English names for the Beastmaster's wiki bestiary.
             mainWindow.EnglishMonsterIds=name=>englishMonsters.Value.TryGetValue(name,out var ids) ? ids:[];
-            var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>configuration.CommunityWiki);
+            var beastWiki=new Monsters.BeastWikiIndex(dataCache,()=>CommunitySources.Allowed(configuration,SourceUse.WikiBeastmaster));
             registrations.Register(()=>{},beastWiki.Dispose);
             mainWindow.BeastWiki=beastWiki;
             // X-54 (0.820): the storage windows' cells holding what the lists need.
@@ -260,7 +263,7 @@ public sealed class Plugin : IDalamudPlugin
                 mainWindow.DiscoveriesLoaded=true;
             });
             // 0.395 (user request): the wiki's spellbook table (one page for every spell) read when the Blue magic page opens, copy first.
-            var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>configuration.CommunityWiki);
+            var blueIndex=new BlueSpellWikiIndex(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,()=>CommunitySources.Allowed(configuration,SourceUse.WikiBlueMagic));
             registrations.Register(()=>{},blueIndex.Dispose);
             mainWindow.BlueSpellIndex=blueIndex;
             mainWindow.GameNames=new Items.GameNames(data,log);
@@ -274,17 +277,17 @@ public sealed class Plugin : IDalamudPlugin
             Maps.MapLocalIndexLoader? mapLocalLoader=null;
             registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
             mainWindow.ConfigureMapView(mapLive!,new Maps.MapMarkerSource(data,log),mapLocal);
-            var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>configuration.CommunityGarland};
+            var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandItemSources)};
             registrations.Register(()=>{},itemSources.Dispose);
             mainWindow.ConfigureItemSources(itemSources);
-            var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            var wikiItems=new Community.WikiItemAcquisitionService(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiItemAcquisition)};
             registrations.Register(()=>{},wikiItems.Dispose);
             mainWindow.ConfigureWikiItems(wikiItems);
-            var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            var wikiVistas=new Maps.WikiVistaSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiVistas)};
             registrations.Register(()=>{},wikiVistas.Dispose);
             mainWindow.ConfigureWikiVistas(wikiVistas);
             // W-04 (0.685): the island's animals on the wiki, on the player's click only.
-            var islandAnimalBook=new Island.IslandAnimalSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityWiki};
+            var islandAnimalBook=new Island.IslandAnimalSource(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiIslandAnimals)};
             registrations.Register(()=>{},islandAnimalBook.Dispose);
             mainWindow.IslandAnimalBookSource=islandAnimalBook;
             Maps.NativeMapReplacer? mapReplacer=null;
@@ -451,7 +454,7 @@ public sealed class Plugin : IDalamudPlugin
             var dutyFinder=new Duties.DutyFinderService();
             Duties.DutyFinderReader? dutyFinderReader=null;
             registrations.Register(()=>dutyFinderReader=new Duties.DutyFinderReader(dutyFinder,framework,gameGui,log,()=>mainWindow.DeveloperMode),()=>dutyFinderReader?.Dispose());
-            var dutyFinderLoot=new DutyLootService(garland);registrations.Register(()=>{},dutyFinderLoot.Dispose);
+            var dutyFinderLoot=new DutyLootService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandDutyLoot)};registrations.Register(()=>{},dutyFinderLoot.Dispose);
             mainWindow.ConfigureDutyFinder(dutyFinder,dutyFinderLoot);
             var triadNpcs=new TriadNpcService();
             TriadNpcLoader? triadNpcLoader=null;
@@ -486,7 +489,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>retainerSales=new Market.RetainerSalesReader(framework,gameGui,client,player,log,()=>configuration.RetainerSalesPanel,()=>configuration.DeveloperMode),()=>retainerSales?.Dispose());
             mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
             Market.RetainerCompareService? retainerCompare=null;
-            registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>configuration.CommunityUniversalis},()=>retainerCompare?.Dispose());
+            registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerCompare?.Dispose());
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead),()=>boardReader?.Dispose());

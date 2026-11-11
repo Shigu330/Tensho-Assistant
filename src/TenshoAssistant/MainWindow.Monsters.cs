@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         {
             if(ImGui.SmallButton(localization.Get("WikiMonsters.Fetch")))_=wiki.RequestAsync();
             ImGui.SameLine();
-            if(SourceButton(localization.Get("WikiMonsters.Refresh"),configuration.CommunityWiki,true))_=wiki.RequestAsync(true);
+            if(SourceButton(localization.Get("WikiMonsters.Refresh"),SourceOn(SourceUse.WikiMonsters),true))_=wiki.RequestAsync(true);
         }
         finally{ImGui.EndDisabled();}
         if(view.Loading)ImGui.TextDisabled(localization.Get("WikiMonsters.Loading"));
@@ -94,7 +94,7 @@ internal sealed partial class MainWindow
         {
             if (ImGui.Button(localization.Get("MonsterUi.Fetch"))) _ = monsterLoot.RequestItemAsync();
             if (state.Item is not null)
-            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.Refresh")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestItemAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.Refresh")+"##Monster",SourceOn(SourceUse.GarlandMonsterLoot),true)) _ = monsterLoot.RequestItemAsync(true); }
         }
         if (state.Error is { } error) DrawDataError(error,"MonsterUi.Error");
         ImGui.TextWrapped(localization.Get("MonsterUi.Source"));
@@ -147,7 +147,7 @@ internal sealed partial class MainWindow
         {
             if (ImGui.Button(localization.Get("MonsterUi.FetchMonster"))) _ = monsterLoot.RequestMonsterAsync();
             if (state.Monster is not null)
-            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.RefreshMonster")+"##Monster",configuration.CommunityGarland,true)) _ = monsterLoot.RequestMonsterAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("MonsterUi.RefreshMonster")+"##Monster",SourceOn(SourceUse.GarlandMonsterLoot),true)) _ = monsterLoot.RequestMonsterAsync(true); }
         }
         finally { ImGui.EndDisabled(); }
         if (state.Monster is not { } detail) return;

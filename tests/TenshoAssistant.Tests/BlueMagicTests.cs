@@ -49,7 +49,7 @@ internal static class BlueMagicTests
         {
             var index=Read("Monsters/BlueSpellMonsterIndex.cs");
             Check(index.Contains("await Task.Delay(WikiMonsterSources.RequestInterval+TimeSpan.FromMilliseconds(100),token)") && index.Contains("public void LoadCached(") && index.Contains("ReadCachedAsync"),"cadence, disk first");
-            Check(Read("MainWindow.BlueSpellSources.cs").Contains("if(SourceButton(localization.Format(\"BlueSpellSources.NearbyFetch\",missing),configuration.CommunityWiki,true))index.FetchMissing(spells);"),"click only");
+            Check(Read("MainWindow.BlueSpellSources.cs").Contains("if(SourceButton(localization.Format(\"BlueSpellSources.NearbyFetch\",missing),SourceOn(SourceUse.WikiBlueMagic),true))index.FetchMissing(spells);"),"click only");
             Check(Read("MainWindow.NearbyMonsters.cs").Contains("(configuration.MapView.BlueMageMonstersAlways || characterStats.State.JobId==BlueMageJob)"),"job");
             Check(!new TenshoAssistant.MapViewSettings().BlueMageMonstersAlways,"off by default");
         }),
@@ -95,7 +95,7 @@ internal static class BlueMagicTests
             Check(BlueSpellSources.Parse("Urqopacha (8.5,23.4,2.7)") is { Place:"Urqopacha",X:8.5f,Y:23.4f },"height ignored");
             Check(BlueSpellSources.Parse(" The Void Ark") is { Place:"The Void Ark",X:null,Y:null },"duty without coordinates");
             // 0.1019 (test audit #9): the cache family and the spell table are checked in the BlueSpellName387 cases of this file.
-            Check(Read("Plugin.cs").Contains("Enabled=()=>configuration.CommunityWiki",StringComparison.Ordinal),"wiki switch honoured");
+            Check(Read("Plugin.cs").Contains("Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiBlueMagic)",StringComparison.Ordinal),"wiki switch honoured");
         }),
     ];
 }

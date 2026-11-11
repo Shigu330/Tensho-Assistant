@@ -147,14 +147,14 @@ internal sealed partial class MainWindow
             }
             var refresh=false;
             if(world.WorldId==0 || character==0)ImGui.TextDisabled(localization.Get("CurrencyValue.NoWorld"));
-            else if(!configuration.CommunityUniversalis)ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
+            else if(!SourceOn(SourceUse.UniversalisToolPrices))ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
             else if(missing.Length>0 && !currencyPricesWanted && prices.Error is null)
             {
                 refresh=ImGui.SmallButton(localization.Format("CurrencyValue.Fetch",missing.Length));
                 Tip("CurrencyValue.FetchTip");
             }
             if(refresh)currencyPricesWanted=true;
-            if(currencyPricesWanted && missing.Length>0 && (prices.Error is null || refresh) && world.WorldId!=0 && character!=0 && configuration.CommunityUniversalis)
+            if(currencyPricesWanted && missing.Length>0 && (prices.Error is null || refresh) && world.WorldId!=0 && character!=0 && SourceOn(SourceUse.UniversalisToolPrices))
                 try
                 {
                     var batch=missing.Take(MarketService.BatchMaximum).ToArray();

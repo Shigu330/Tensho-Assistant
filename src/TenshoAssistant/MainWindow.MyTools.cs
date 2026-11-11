@@ -304,7 +304,7 @@ internal sealed partial class MainWindow
         if(batch.Loading)ImGui.TextDisabled(localization.Format("MyToolsUi.PricesLoading",batch.Completed,batch.Items.Count));
         else if(unpriced.Count>0 && character!=0 && worldId!=0)
         {
-            if(SourceButton(localization.Format("MyToolsUi.AskPrices",Math.Min(unpriced.Count,ToolItemCost.MaximumAsked)),configuration.CommunityUniversalis,true))
+            if(SourceButton(localization.Format("MyToolsUi.AskPrices",Math.Min(unpriced.Count,ToolItemCost.MaximumAsked)),SourceOn(SourceUse.UniversalisToolPrices),true))
                 try{_=toolPrices.StartListAsync(market,character,worldId,unpriced.Take(ToolItemCost.MaximumAsked));}
                 catch(Exception error){log.Warning(error,"My Tools prices could not be started.");}
             Tip("MyToolsUi.AskPricesTip");

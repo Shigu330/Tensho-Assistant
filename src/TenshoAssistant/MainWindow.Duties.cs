@@ -156,7 +156,7 @@ internal sealed partial class MainWindow
         if(InCombatNow?.Invoke()==true){EmptyState("DutyGuide.InCombat");return;}
         var view=guides.State;
         ImGui.BeginDisabled(view.Loading);
-        try{if(SourceButton(localization.Get(view.Document is null ? "DutyGuide.Fetch":"DutyGuide.Refresh"),configuration.CommunityWiki,true))_=guides.RequestAsync(view.Document is not null);}
+        try{if(SourceButton(localization.Get(view.Document is null ? "DutyGuide.Fetch":"DutyGuide.Refresh"),SourceOn(SourceUse.WikiDutyGuides),true))_=guides.RequestAsync(view.Document is not null);}
         finally{ImGui.EndDisabled();}
         Tip("DutyGuide.FetchTip");
         if(view.Loading)ImGui.TextDisabled(localization.Get("DutyGuide.Loading"));
@@ -273,7 +273,7 @@ internal sealed partial class MainWindow
         {
             if (ImGui.Button(localization.Get("DutyUi.Fetch"))) _ = dutyLoot.RequestAsync();
             if (state.Document is not null)
-            { ImGui.SameLine(); if (SourceButton(localization.Get("DutyUi.Refresh"),configuration.CommunityGarland)) _ = dutyLoot.RequestAsync(true); }
+            { ImGui.SameLine(); if (SourceButton(localization.Get("DutyUi.Refresh"),SourceOn(SourceUse.GarlandDutyLoot))) _ = dutyLoot.RequestAsync(true); }
         }
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Duty");
         ImGui.TextWrapped(localization.Get("DutyUi.Source"));

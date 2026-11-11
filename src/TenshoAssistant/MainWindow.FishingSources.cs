@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(state.Loading);
         try
         {
-            if(SourceButton(localization.Get(state.Item is null ? "FishingSources.Fetch":"FishingSources.Refresh"),state.Item is null || configuration.CommunityGarland))_ = monsterLoot.RequestItemAsync(state.Item is not null);
+            if(SourceButton(localization.Get(state.Item is null ? "FishingSources.Fetch":"FishingSources.Refresh"),state.Item is null || SourceOn(SourceUse.GarlandMonsterLoot)))_ = monsterLoot.RequestItemAsync(state.Item is not null);
         }
         finally{ImGui.EndDisabled();}
         if(state.Loading)ImGui.TextDisabled(localization.Get("FishingSources.Loading"));

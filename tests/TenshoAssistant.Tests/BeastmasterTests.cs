@@ -49,7 +49,7 @@ internal static class BeastmasterTests
         }),
         ("Beast wiki: asked on a click only; as Beastmaster (job 43) unless always; the job icon above the head",() =>
         {
-            Check(Read("MainWindow.Beastmaster.cs").Contains("SourceButton(localization.Get(wiki.Book is null ? \"BeastUi.WikiFetch\" : \"BeastUi.WikiRefresh\"), configuration.CommunityWiki, true)) wiki.Fetch();"),"click");
+            Check(Read("MainWindow.Beastmaster.cs").Contains("SourceButton(localization.Get(wiki.Book is null ? \"BeastUi.WikiFetch\" : \"BeastUi.WikiRefresh\"), SourceOn(SourceUse.WikiBeastmaster), true)) wiki.Fetch();"),"click");
             Check(Read("MainWindow.NearbyMonsters.cs").Contains("internal const uint BeastmasterJob=43;") && Read("MainWindow.NearbyMonsters.cs").Contains("!tamed.Contains(beast)"),"job, not tamed");
             Check(Read("MainWindow.MonsterIcons.cs").Contains("BeastmasterIcon=62100+BeastmasterJob"),"icon");
             var settings=new TenshoAssistant.MapViewSettings();

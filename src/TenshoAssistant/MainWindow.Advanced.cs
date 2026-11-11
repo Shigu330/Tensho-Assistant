@@ -83,6 +83,40 @@ internal sealed partial class MainWindow
         Tip("Advanced.CopyRepositoryTip");
     }
 
+    // X-122, D-101 (user's decision of 2026-11-10): one switch per use of Garland Tools, under its switch, greyed while it is off.
+    private void DrawGarlandUses()
+    {
+        ImGui.Indent();
+        var off=!configuration.CommunityGarland;
+        if(off)ImGui.BeginDisabled();
+        try
+        {
+            BoolSetting("Advanced.UseGarlandDutyLoot","Advanced.UseGarlandDutyLootTip",()=>configuration.SourceUses.GarlandDutyLoot,value=>configuration.SourceUses.GarlandDutyLoot=value,c=>c.SourceUses.GarlandDutyLoot);
+            BoolSetting("Advanced.UseGarlandMonsterLoot","Advanced.UseGarlandMonsterLootTip",()=>configuration.SourceUses.GarlandMonsterLoot,value=>configuration.SourceUses.GarlandMonsterLoot=value,c=>c.SourceUses.GarlandMonsterLoot);
+            BoolSetting("Advanced.UseGarlandItemSources","Advanced.UseGarlandItemSourcesTip",()=>configuration.SourceUses.GarlandItemSources,value=>configuration.SourceUses.GarlandItemSources=value,c=>c.SourceUses.GarlandItemSources);
+        }
+        finally{if(off)ImGui.EndDisabled();ImGui.Unindent();}
+    }
+
+    // X-122, D-101: one switch per use of the wiki, under its switch, greyed while it is off.
+    private void DrawWikiUses()
+    {
+        ImGui.Indent();
+        var off=!configuration.CommunityWiki;
+        if(off)ImGui.BeginDisabled();
+        try
+        {
+            BoolSetting("Advanced.UseWikiMonsters","Advanced.UseWikiMonstersTip",()=>configuration.SourceUses.WikiMonsters,value=>configuration.SourceUses.WikiMonsters=value,c=>c.SourceUses.WikiMonsters);
+            BoolSetting("Advanced.UseWikiDutyGuides","Advanced.UseWikiDutyGuidesTip",()=>configuration.SourceUses.WikiDutyGuides,value=>configuration.SourceUses.WikiDutyGuides=value,c=>c.SourceUses.WikiDutyGuides);
+            BoolSetting("Advanced.UseWikiBlueMagic","Advanced.UseWikiBlueMagicTip",()=>configuration.SourceUses.WikiBlueMagic,value=>configuration.SourceUses.WikiBlueMagic=value,c=>c.SourceUses.WikiBlueMagic);
+            BoolSetting("Advanced.UseWikiBeastmaster","Advanced.UseWikiBeastmasterTip",()=>configuration.SourceUses.WikiBeastmaster,value=>configuration.SourceUses.WikiBeastmaster=value,c=>c.SourceUses.WikiBeastmaster);
+            BoolSetting("Advanced.UseWikiItemAcquisition","Advanced.UseWikiItemAcquisitionTip",()=>configuration.SourceUses.WikiItemAcquisition,value=>configuration.SourceUses.WikiItemAcquisition=value,c=>c.SourceUses.WikiItemAcquisition);
+            BoolSetting("Advanced.UseWikiVistas","Advanced.UseWikiVistasTip",()=>configuration.SourceUses.WikiVistas,value=>configuration.SourceUses.WikiVistas=value,c=>c.SourceUses.WikiVistas);
+            BoolSetting("Advanced.UseWikiIslandAnimals","Advanced.UseWikiIslandAnimalsTip",()=>configuration.SourceUses.WikiIslandAnimals,value=>configuration.SourceUses.WikiIslandAnimals=value,c=>c.SourceUses.WikiIslandAnimals);
+        }
+        finally{if(off)ImGui.EndDisabled();ImGui.Unindent();}
+    }
+
     // X-100 (0.999, DEC-048): the community sources, now in « Data and sources ».
     private void DrawSourceSettings()
     {
@@ -93,7 +127,9 @@ internal sealed partial class MainWindow
         if(configuration.GameDataOnly)ImGui.BeginDisabled();
         BoolSetting("Advanced.Lumina","Advanced.LuminaTip",()=>configuration.CommunityLumina,value=>configuration.CommunityLumina=value,c=>c.CommunityLumina);
         BoolSetting("Advanced.Garland","Advanced.GarlandTip",()=>configuration.CommunityGarland,value=>configuration.CommunityGarland=value,c=>c.CommunityGarland);
+        DrawGarlandUses();
         BoolSetting("Advanced.Wiki","Advanced.WikiTip",()=>configuration.CommunityWiki,value=>configuration.CommunityWiki=value,c=>c.CommunityWiki);
+        DrawWikiUses();
         BoolSetting("Advanced.GatherBuddy","Advanced.GatherBuddyTip",()=>configuration.CommunityGatherBuddy,value=>configuration.CommunityGatherBuddy=value,c=>c.CommunityGatherBuddy);
         BoolSetting("Advanced.Teamcraft","Advanced.TeamcraftTip",()=>configuration.CommunityTeamcraftBites,value=>configuration.CommunityTeamcraftBites=value,c=>c.CommunityTeamcraftBites);
         // 0.321 (review 0.316, point 2): the Fashion Report source had no switch.
@@ -114,6 +150,9 @@ internal sealed partial class MainWindow
             ImGui.BeginDisabled(!configuration.MarketPricesOnHover);
             try{BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);}
             finally{ImGui.EndDisabled();ImGui.Unindent();}
+            // X-122, D-101: the other uses of Universalis, each with its switch.
+            BoolSetting("Advanced.UseUniversalisRetainerCompare","Advanced.UseUniversalisRetainerCompareTip",()=>configuration.SourceUses.UniversalisRetainerCompare,value=>configuration.SourceUses.UniversalisRetainerCompare=value,c=>c.SourceUses.UniversalisRetainerCompare);
+            BoolSetting("Advanced.UseUniversalisToolPrices","Advanced.UseUniversalisToolPricesTip",()=>configuration.SourceUses.UniversalisToolPrices,value=>configuration.SourceUses.UniversalisToolPrices=value,c=>c.SourceUses.UniversalisToolPrices);
         }
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
         // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.

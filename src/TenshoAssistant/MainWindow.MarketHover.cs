@@ -266,7 +266,7 @@ internal sealed partial class MainWindow
         known=DrawWikiAcquisition(itemId);
         if(known!=0 || wikiItems?.Get(itemId) is not { Loading:false })return;
         // 0.329: a source turned off (Settings › Advanced) was not asked: say so instead of naming it among the sources looked up.
-        ImGui.TextDisabled(localization.Get((configuration.CommunityGarland,configuration.CommunityWiki) switch
+        ImGui.TextDisabled(localization.Get((SourceOn(SourceUse.GarlandItemSources),SourceOn(SourceUse.WikiItemAcquisition)) switch
         {
             (true,true)=>"HoverUi.CollectionNoSource",(false,true)=>"HoverUi.CollectionNoSourceGarlandOff",
             (true,false)=>"HoverUi.CollectionNoSourceWikiOff",_=>"HoverUi.CollectionNoSourceOff",

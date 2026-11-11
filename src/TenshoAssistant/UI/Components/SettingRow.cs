@@ -169,6 +169,9 @@ internal sealed partial class MainWindow
     /// 0.324: a button that asks a community source. While that source is turned off (Settings › Advanced) it is greyed, explains why
     /// on hover and never reports a click.
     /// </summary>
+    /// <summary>X-122, D-101: whether a use of a community source may ask it (its source's switch and its own).</summary>
+    private bool SourceOn(SourceUse use)=>CommunitySources.Allowed(configuration,use);
+
     private bool SourceButton(string label,bool sourceOn,bool small=false)
     {
         if(!sourceOn)ImGui.BeginDisabled();

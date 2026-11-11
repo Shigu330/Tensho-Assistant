@@ -230,7 +230,7 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(world.WorldId==0 || character==0 || wanted.Length==0);
         try
         {
-            if(SourceButton(localization.Format("RoutePlanner.FetchPrices",Math.Min(32,wanted.Length),wanted.Length),configuration.CommunityUniversalis,true))
+            if(SourceButton(localization.Format("RoutePlanner.FetchPrices",Math.Min(32,wanted.Length),wanted.Length),SourceOn(SourceUse.UniversalisToolPrices),true))
             {
                 try{_=routePrices.StartListAsync(market,character,world.WorldId,wanted.Take(32));}
                 catch(Exception error){log.Warning(error,"Route market prices could not be started.");}

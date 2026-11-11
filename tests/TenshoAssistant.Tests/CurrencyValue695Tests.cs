@@ -15,7 +15,7 @@ internal static class CurrencyValue695Tests
         {
             var page=Read("MainWindow.CurrencyValue.cs");
             Check(page.Contains("currencyPricesWanted=true;"),"the choice asks");
-            Check(page.Contains("&& configuration.CommunityUniversalis)"),"source switch");
+            Check(page.Contains("&& SourceOn(SourceUse.UniversalisToolPrices))"),"source switch");
             Check(page.Contains("!currencyPricesAsked.Contains(row.ItemId)"),"asked once");
             Check(page.Contains("missing.Take(MarketService.BatchMaximum)"),"bounded batches");
             Check(page.Contains("CurrencyValue.FetchFailed"),"failure shown");

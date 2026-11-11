@@ -51,14 +51,14 @@ internal sealed partial class MainWindow
         var fresh = compare is { Items: not null } && compare.World == state.HomeWorld ? compare.Items : null;
         var seen = RetainerSeenOffers(state, fresh);
         if (!state.AtHome) ImGui.TextWrapped(localization.Get("RetainerSales.NotHome"));
-        ImGui.BeginDisabled(RetainerCompare is null || compare is { Loading: true } || !state.AtHome || !configuration.CommunityUniversalis);
+        ImGui.BeginDisabled(RetainerCompare is null || compare is { Loading: true } || !state.AtHome || !SourceOn(SourceUse.UniversalisRetainerCompare));
         try
         {
             if (ImGui.SmallButton(localization.Get("RetainerSales.Compare")))
                 RetainerCompare?.Request(state.HomeWorld, state.Listings.Select(listing => listing.ItemId), DateTimeOffset.UtcNow);
         }
         finally { ImGui.EndDisabled(); }
-        Tip(configuration.CommunityUniversalis ? "RetainerSales.CompareTip" : "RetainerSales.SourceOffTip");
+        Tip(SourceOn(SourceUse.UniversalisRetainerCompare) ? "RetainerSales.CompareTip" : "RetainerSales.SourceOffTip");
         ImGui.SameLine();
         ImGui.TextDisabled(compare is { Loading: true } ? localization.Get("RetainerSales.Loading")
             : compare?.Error is { } error ? localization.Get("RetainerSales.Error" + error)
