@@ -230,6 +230,12 @@ internal sealed partial class MainWindow
             try
             {
                 IntSetting("ModuleSettings.EchoSound","ModuleSettings.EchoSoundTip",()=>search.EchoSound,value=>search.EchoSound=value,0,16,searchDefaults.EchoSound);
+                // 0.1097 (user request): try the sound, as the alarms' « Listen » button (same service, same texts).
+                ImGui.SameLine();
+                ImGui.BeginDisabled(!Alarms.MacroSound.Valid(search.EchoSound));
+                try{if(ImGui.SmallButton(localization.Get("Alarms.Try")+"##EchoSoundTry"))alarmService?.PreviewChatSound(search.EchoSound);}
+                finally{ImGui.EndDisabled();}
+                Tip("Advanced.TryTip");
                 BoolSetting("ModuleSettings.EchoLastOnly","ModuleSettings.EchoLastOnlyTip",()=>configuration.CraftSearch.EchoLastOnly,value=>configuration.CraftSearch.EchoLastOnly=value,c=>c.CraftSearch.EchoLastOnly);
             }
             finally{ImGui.EndDisabled();ImGui.Unindent();}

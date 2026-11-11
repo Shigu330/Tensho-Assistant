@@ -40,6 +40,7 @@
     <Compile Include="../../src/TenshoAssistant/Macros/MacroObservationService.cs" Link="Macros/MacroObservationService.cs" />
     <Compile Include="../../src/TenshoAssistant/Macros/MacroSlotPlan.cs" Link="Macros/MacroSlotPlan.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/TenshoAlarm.cs" Link="Alarms/TenshoAlarm.cs" />
+    <Compile Include="../../src/TenshoAssistant/Alarms/MacroSound.cs" Link="Alarms/MacroSound.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/GameAlarmCommand.cs" Link="Alarms/GameAlarmCommand.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/DiscordWebhook.cs" Link="Alarms/DiscordWebhook.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/AutoAlarms.cs" Link="Alarms/AutoAlarms.cs" />

@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1097.0
+- Macros d'artisanat : le son de la ligne de fin (<se.1> à <se.16>, Paramètres › Artisanat) peut s'écouter avec un bouton « Écouter » à côté du réglage, comme le son des alarmes (même service, joué au prochain passage du jeu) ; grisé à 0 (pas de son).
+- Tests : MacroSound1097Tests. Verify.ps1 (agent) : 1791/1791, 0 avertissement, 0 erreur ; DLL 0.1097.0.0. Non validé en jeu.
+### English
+- Crafting macros: the end-line sound (<se.1> to <se.16>, Settings › Crafting) can be heard with a « Listen » button beside the setting, as the alarms' sound (same service, played on the game's next update); greyed at 0 (no sound).
+
 ## 0.1096.0
 - Découvertes : les gains d'objets des tâches des servants, des retours d'aéronef et de sous-marin et des missions d'escouade n'étaient attribués à rien dans le journal du développeur. Un gain sans cause attend maintenant quelques secondes sa source : la fenêtre du résultat de tâche, ou les messages du jeu lus par leur numéro de ligne (fin d'expédition d'aéronef ou de sous-marin, mission ou entraînement d'escouade réussi), quelle que soit la langue du client. Les messages « nouvelle destination découverte » et « atteint le rang » des aéronefs et sous-marins sont aussi lus (journal du développeur). Le butin lui-même restait déjà noté par les lecteurs des voyages et des tâches ; les récompenses d'escouade sont dans les feuilles du jeu.
 - Tests : GainSources1096Tests. Verify.ps1 (agent) : 1789/1789, 0 avertissement, 0 erreur ; DLL 0.1096.0.0. Non validé en jeu.

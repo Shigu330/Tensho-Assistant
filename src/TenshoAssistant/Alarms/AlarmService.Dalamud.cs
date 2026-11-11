@@ -37,6 +37,8 @@ internal sealed class AlarmService : IDisposable
     private long nextCheck;
     private bool openGameWindow;
     private (int Sound, bool Pending) preview;
+    // 0.1097 (user request, 11/11): the macros' end-line sound (<se.1> to <se.16>) tried like the alarm's, through the same queue.
+    private (int Sound, bool Pending) chatPreview;
     private readonly Queue<(Guid Id, string Name, string Command)> outgoing = new();
     private long nextSend;
     private string? gameStatus;
@@ -73,6 +75,9 @@ internal sealed class AlarmService : IDisposable
     public void OpenGameWindow() { lock (gate) openGameWindow = true; }
     public void PreviewSound(int sound) { lock (gate) preview = (sound, true); }
 
+    /// <summary>0.1097: plays a macro sound <c>&lt;se.N&gt;</c> (1 to 16) once, on the next framework update; 0 or out of range plays nothing.</summary>
+    public void PreviewChatSound(int sound) { if (MacroSound.Valid(sound)) lock (gate) chatPreview = (sound, true); }
+
     /// <summary>Weather id of the period containing that time in the territory, or null when unknown.</summary>
     public static uint? WeatherAt(WeatherCatalog? catalog, uint territory, DateTimeOffset time)
     {
@@ -84,8 +89,9 @@ internal sealed class AlarmService : IDisposable
     private unsafe void OnUpdate(IFramework _)
     {
         if (!framework.IsInFrameworkUpdateThread) return;
-        bool open; (int Sound, bool Pending) play;
-        lock (gate) { open = openGameWindow; openGameWindow = false; play = preview; preview = default; }
+        bool open; (int Sound, bool Pending) play; (int Sound, bool Pending) chatPlay;
+        lock (gate) { open = openGameWindow; openGameWindow = false; play = preview; preview = default; chatPlay = chatPreview; chatPreview = default; }
+        if (chatPlay.Pending) PlayChatSound(chatPlay.Sound, log);
         try
         {
             var agent = AgentAlarm.Instance();
@@ -223,6 +229,14 @@ internal sealed class AlarmService : IDisposable
     {
         try { var agent = AgentAlarm.Instance(); if (agent != null) agent->PlayAlarmSoundEffect((AlarmSoundEffect)Math.Clamp(sound, 0, 5)); }
         catch (Exception error) { log.Warning(error, "Game alarm sound could not be played."); }
+    }
+
+    /// <summary>0.1097: the chat sound effect a macro's <c>&lt;se.N&gt;</c> plays (UIGlobals.PlayChatSoundEffect), framework thread.</summary>
+    public static unsafe void PlayChatSound(int sound, IPluginLog log)
+    {
+        if (!MacroSound.Valid(sound)) return;
+        try { FFXIVClientStructs.FFXIV.Client.UI.UIGlobals.PlayChatSoundEffect((uint)sound); }
+        catch (Exception error) { log.Warning(error, "Macro sound could not be played."); }
     }
 
     public void Dispose() { TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate); }
