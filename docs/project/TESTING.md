@@ -1742,6 +1742,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1134) Monde › Découvertes : l'aide de l'échange et l'info-bulle de « Connecter GitHub » disent qu'un poisson pris ou une touche porte l'endroit exact du personnage ; « Échanger maintenant » (connecté) envoie sans erreur
 
+- [ ] (0.1136) Après le chargement de 0.1136 : dalamud.log dit « Discoveries: SQLite 3.54… database, N facts of yours… the files of before kept in before-sqlite-… » ; Monde › Découvertes montre les mêmes totaux qu'avant ; le dossier Discoveries contient Discoveries.db et before-sqlite-<date> (Discoveries.json d'avant intact)
+
+- [ ] (0.1136) Un relevé nouveau (monstre, poisson) apparaît sur la page et reste après un rechargement du plugin
+
+- [ ] (0.1137) Monde › Découvertes, connecté à GitHub, « Échanger maintenant » : message sans erreur ; sur github.com, votre gist contient index.json et des fichiers kind-NN.jsonl.gz.b64, plus l'ancien tensho-discoveries.b64 ; un deuxième échange sans nouveau relevé n'envoie rien (« déjà envoyé »)
+
+- [ ] (0.1138) Monde › Découvertes, connecté à GitHub (application OAuth, rien ne change tant que l'App n'existe pas) : « Échanger maintenant » envoie sans erreur et le gist reste secret
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
