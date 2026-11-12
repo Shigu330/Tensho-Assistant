@@ -1623,7 +1623,6 @@
     "Slots": "Créneaux ({0})",
     "ManualTitle": "Alarme personnelle",
     "CopyRaw": "Copier le relevé des alarmes du jeu",
-    "VistaNext": "Prochaine fenêtre (heure ET et météo) : {0} (dans {1} min)",
     "VistaRightClick": "Clic droit : créer une alarme pour ce repère.",
     "VistaNone": "Ce repère n'a ni créneau ET ni météo connue.",
     "VistaAdd": "Alarme chaque jour ET : repère « {0} » (créneau et météo)",
@@ -3828,7 +3827,16 @@
     "VistaWikiError": "La lecture du wiki a échoué ; nouvel essai au plus une fois par minute pendant le survol d'un repère (détails en mode développeur).",
     "PositionUnknown": "Position du personnage inconnue : personnage non connecté, ou lecture du jeu en échec (peut-être après une mise à jour du jeu).",
     "MarkersUnavailable": "Icônes de cette carte indisponibles : lecture des données du jeu en échec (peut-être après une mise à jour du jeu).",
-    "TeleportCostFailed": "Coût indisponible : lecture du jeu en échec (peut-être après une mise à jour du jeu)."
+    "TeleportCostFailed": "Coût indisponible : lecture du jeu en échec (peut-être après une mise à jour du jeu).",
+    "VistaOpenUntil": "Possible maintenant, jusqu'à {0}.",
+    "VistaOpenAlways": "Possible maintenant (ni heure ni météo demandées).",
+    "VistaTimeOnly": "Heure bonne, météo inconnue.",
+    "VistaMissingTime": "Pas maintenant : hors de son heure d'Éorzéa.",
+    "VistaMissingWeather": "Pas maintenant : la météo n'est pas celle demandée.",
+    "VistaMissingBoth": "Pas maintenant : ni son heure d'Éorzéa ni sa météo.",
+    "VistaOpens": "Prochaine fenêtre : {0} (dans {1} min).",
+    "VistaNoWindow": "Aucune fenêtre dans les {0} prochains jours.",
+    "VistaSearching": "Recherche de la prochaine fenêtre…"
   },
   "Theme": {
     "Dark": "Sombre",
@@ -5742,7 +5750,8 @@
     "CountUnknown": "{0} panoramas · état non lu (connectez-vous)",
     "None": "Aucun panorama pour ces filtres.",
     "Now": "possible maintenant",
-    "TimeOnly": "heure OK, météo inconnue"
+    "TimeOnly": "heure OK, météo inconnue",
+    "NowUntil": "possible maintenant, jusqu'à {0}"
   },
   "Outfits": {
     "Title": "Tenues",

@@ -1623,7 +1623,6 @@
     "Slots": "Slots ({0})",
     "ManualTitle": "Personal alarm",
     "CopyRaw": "Copy the game alarms' readout",
-    "VistaNext": "Next window (ET time and weather): {0} (in {1} min)",
     "VistaRightClick": "Right click: create an alarm for this vista.",
     "VistaNone": "This vista has no known ET window or weather.",
     "VistaAdd": "Alarm every ET day: vista « {0} » (window and weather)",
@@ -3828,7 +3827,16 @@
     "VistaWikiError": "The wiki read failed; retried at most once a minute while a vista is hovered (details in developer mode).",
     "PositionUnknown": "Character position unknown: not logged in, or the game read failed (maybe after a game update).",
     "MarkersUnavailable": "Icons of this map unavailable: the game data read failed (maybe after a game update).",
-    "TeleportCostFailed": "Cost unavailable: the game read failed (maybe after a game update)."
+    "TeleportCostFailed": "Cost unavailable: the game read failed (maybe after a game update).",
+    "VistaOpenUntil": "Possible now, until {0}.",
+    "VistaOpenAlways": "Possible now (no time and no weather needed).",
+    "VistaTimeOnly": "Time right, weather not known.",
+    "VistaMissingTime": "Not now: outside its Eorzea time.",
+    "VistaMissingWeather": "Not now: the weather is not the one needed.",
+    "VistaMissingBoth": "Not now: neither its Eorzea time nor its weather.",
+    "VistaOpens": "Next window: {0} (in {1} min).",
+    "VistaNoWindow": "No window in the next {0} days.",
+    "VistaSearching": "Searching for the next window…"
   },
   "Theme": {
     "Dark": "Dark",
@@ -5742,7 +5750,8 @@
     "CountUnknown": "{0} vistas · state not read (log in)",
     "None": "No vista for these filters.",
     "Now": "possible now",
-    "TimeOnly": "time OK, weather unknown"
+    "TimeOnly": "time OK, weather unknown",
+    "NowUntil": "possible now, until {0}"
   },
   "Outfits": {
     "Title": "Outfits",

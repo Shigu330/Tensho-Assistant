@@ -189,27 +189,7 @@ internal sealed partial class MainWindow
         return new TenshoAlarm{Label=localization.Format("MapView.Vista",vista.Name),Group=localization.Format("MapView.Vista",vista.Name),Repeat=AlarmRepeat.EorzeaDaily,EtMinute=hasTime ? start:0,
             LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead),TerritoryId=territory,Weathers=[..weathers]};
     }
-    // Next real time the vista's ET window opens with a matching weather (within 40 ET days), or null, also when the weather is not
-    // known (0.328: a window computed without it is not the « ET time and weather » the text says); cached per vista, minute, wiki row
-    // and weather catalogue.
-    private (uint Id,long Minute,object? Wiki,object? Weather,DateTimeOffset? At) vistaNextCache;
-    private DateTimeOffset? NextVistaWindow(MapLocalPosition vista,uint territory)
-    {
-        var minute=DateTimeOffset.UtcNow.ToUnixTimeSeconds()/60;
-        var wiki=WikiVistaFor(vista);var catalog=weather.State.Catalog;
-        if(vistaNextCache.Id==vista.Id && vistaNextCache.Minute==minute && ReferenceEquals(vistaNextCache.Wiki,wiki) && ReferenceEquals(vistaNextCache.Weather,catalog))
-            return vistaNextCache.At;
-        DateTimeOffset? found=null;
-        if(VistaAlarm(vista,territory,out var weatherNote) is { } alarm && weatherNote is null)
-        {
-            var starts=alarm.Weathers.Count>0 && vista.MinTime==0 && vista.MaxTime==0 ? [0,480,960]:new[]{alarm.EtMinute};
-            found=starts.SelectMany(start=>AlarmSchedule.Occurrences(new TenshoAlarm{Repeat=AlarmRepeat.EorzeaDaily,EtMinute=start},DateTimeOffset.UtcNow.AddMinutes(-1),40))
-                .Where(time=>alarm.Weathers.Count==0 || AlarmService.WeatherAt(catalog,territory,time) is { } id && alarm.Weathers.Contains(id))
-                .Order().Select(time=>(DateTimeOffset?)time).FirstOrDefault();
-        }
-        vistaNextCache=(vista.Id,minute,wiki,catalog,found);
-        return found;
-    }
+    // X-158 (0.1128): the vista's next window is VistaWindow's (MainWindow.VistaLog.cs, NextVistaWindow), the same calculation as « possible now ».
     private void DrawVistaAlarmEntry(MapLocalPosition vista,uint territory)
     {
         if(VistaAlarm(vista,territory,out var weatherNote) is not { } alarm){ImGui.TextDisabled(localization.Get("Alarms.VistaNone"));return;}

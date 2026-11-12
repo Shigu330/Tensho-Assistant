@@ -2092,16 +2092,18 @@ internal sealed partial class MainWindow
         {
             ImGui.TextColored(Accent,localization.Format("MapView.Vista",vista.Name));
             ImGui.TextDisabled(localization.Get(done switch{true=>"MapView.VistaDone",false=>"MapView.VistaTodo",_=>"MapView.CollectedUnknown"}));
+            // X-158 (0.1128): every « now » of this tooltip comes from one calculation (VistaWindow): the time line, the weather line and
+            // the state line agree with the list's « possible now » and with the next window.
+            var territory=maps.State.Catalog?.Find(vista.MapId)?.TerritoryId ?? 0;
+            var stateNow=VistaStateAt(vista,territory,DateTimeOffset.UtcNow,false);
             // Conditions from the game data: Eorzea time window and emote; the weather is not in the data.
             if(vista.MinTime!=0 || vista.MaxTime!=0)
-            {
-                var now=EorzeaMinutes();
                 ImGui.TextUnformatted(localization.Format("MapView.VistaTime",$"{vista.MinTime/100:00}:{vista.MinTime%100:00}",$"{vista.MaxTime/100:00}:{vista.MaxTime%100:00}")
-                    +(vista.InWindow(now) ? " "+localization.Get("MapView.VistaNow"):""));
-            }
+                    +(stateNow.TimeOk ? " "+localization.Get("MapView.VistaNow"):""));
             if(vista.Extra.Length>0)ImGui.TextUnformatted(localization.Format("MapView.VistaEmote",vista.Extra));
+            var (stateText,stateColour)=VistaStateLine(stateNow,stateNow.State==VistaOpen.Open ? stateNow:NextVistaWindow(vista,territory));
+            ImGui.TextColored(stateColour,stateText);
             // Weather now in the vista's zone, compared with the weather the wiki gives (absent from the game data).
-            var territory=maps.State.Catalog?.Find(vista.MapId)?.TerritoryId ?? 0;
             var weatherNow=territory!=0 && weather.State.Catalog?.Forecast(territory,DateTimeOffset.UtcNow,1) is [ { Weather:{ } current } ] ? current:null;
             if(weatherNow is not null)ImGui.TextUnformatted(localization.Format("MapView.VistaWeatherNow",weatherNow.Name));
             var utcNow=DateTimeOffset.UtcNow;
@@ -2116,15 +2118,12 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent,VistaNumber(vista) is { Length:>0 } number ? number:localization.Format(wiki.Section==0 ? "MapView.VistaNumberArr":"MapView.VistaNumberEx",wiki.Number,ExpansionName(wiki.Section)));
                 if(wiki.Weathers.Count>0)
                 {
-                    var names=wiki.Weathers.Select(name=>weather.State.Catalog?.WeatherBySourceName(name,territory) is { } known ? (known.Name,known.Id):(name,0u)).ToArray();
-                    var matches=weatherNow is not null && names.Any(entry=>entry.Item2==weatherNow.Id);
-                    ImGui.TextColored(weatherNow is null ? UI.FfxivTheme.Text:matches ? UI.FfxivTheme.Success:UI.FfxivTheme.Error,
-                        localization.Format("MapView.VistaWeatherNeeded",string.Join(", ",names.Select(entry=>entry.Item1)))
-                        +(weatherNow is null ? "":" "+localization.Get(matches ? "MapView.VistaWeatherOk":"MapView.VistaWeatherWait")));
+                    var names=wiki.Weathers.Select(name=>weather.State.Catalog?.WeatherBySourceName(name,territory) is { } known ? known.Name:name).ToArray();
+                    ImGui.TextColored(stateNow.WeatherOk switch{true=>UI.FfxivTheme.Success,false=>UI.FfxivTheme.Error,_=>UI.FfxivTheme.Text},
+                        localization.Format("MapView.VistaWeatherNeeded",string.Join(", ",names))
+                        +(stateNow.WeatherOk is { } weatherOk ? " "+localization.Get(weatherOk ? "MapView.VistaWeatherOk":"MapView.VistaWeatherWait"):""));
                 }
                 else ImGui.TextDisabled(localization.Get("MapView.VistaNoWeather"));
-                if(NextVistaWindow(vista,territory) is { } nextWindow)
-                    ImGui.TextUnformatted(localization.Format("Alarms.VistaNext",nextWindow.ToLocalTime().ToString("g"),Math.Max(0,(int)(nextWindow-DateTimeOffset.UtcNow).TotalMinutes)));
                 ImGui.TextDisabled(localization.Get("Alarms.VistaRightClick"));
                 if(wiki.Comment.Length>0)
                 {

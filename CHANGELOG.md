@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1128.0
+- Plan global, X-158 : Carnet d'exploration, une seule source (demande de l'utilisateur du 12/11, cas du Viaduc) : « possible maintenant », la couleur de la ligne, le filtre « Possibles maintenant », les lignes de l'infobulle et la prochaine fenêtre viennent d'un même calcul (heure d'Éorzéa du panorama et périodes de météo de la zone, sauts d'un changement à l'autre). La liste dit « possible maintenant, jusqu'à HH:MM » ; l'infobulle dit « Possible maintenant, jusqu'à HH:MM », ou ce qui manque (l'heure, la météo, ou les deux) et quand la prochaine fenêtre s'ouvre, cherchée sur 30 jours hors de l'image, sinon « Aucune fenêtre dans les 30 prochains jours » : jamais de ligne vide. Une météo inconnue n'est jamais dite « possible ».
+- Tests : VistaWindow1128Tests. Verify.ps1 (agent) : 1864/1864, 0 avertissement, 0 erreur ; DLL 0.1128.0.0. Non validé en jeu.
+### English
+- Sightseeing log, one source (user request of 12/11, the Highbridge case): « possible now », the row's colour, the « Possible now » filter, the tooltip's lines and the next window come from one calculation (the vista's Eorzea time and the zone's weather periods, jumping from one change to the next). The list says « possible now, until HH:MM »; the tooltip says « Possible now, until HH:MM », or what is missing (the time, the weather or both) and when the next window opens, searched over 30 days off the frame, otherwise « No window in the next 30 days »: never an empty line. An unknown weather is never called « possible ».
+
 ## 0.1127.0
 - Plan global, X-144 : Suite de la preuve de lancement : la première preuve écrite en jeu par 0.1126 avait une empreinte de DLL vide (Dalamud charge le plugin depuis la mémoire, l'emplacement de l'assembly est vide) ; le fichier de la DLL vient maintenant de Dalamud (AssemblyLocation), si bien que la note « Vérifié au lancement » peut de nouveau être prouvée.
 - Tests : LaunchProof1126Tests. Verify.ps1 (agent) : 1861/1861, 0 avertissement, 0 erreur ; DLL 0.1127.0.0. Rien à essayer en jeu.

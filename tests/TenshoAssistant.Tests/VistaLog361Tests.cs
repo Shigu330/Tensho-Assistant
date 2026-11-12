@@ -10,9 +10,8 @@ internal static class VistaLog361Tests
         {
             var page = Read("MainWindow.VistaLog.cs");
             Check(page.Contains("index.All(MapLocalKind.Sightseeing)",StringComparison.Ordinal),"every vista");
-            Check(page.Contains("if(WikiVistaFor(vista) is not { } wiki)return VistaNow.TimeOnly;",StringComparison.Ordinal)
-                && page.Contains("if(current is null)return VistaNow.TimeOnly;",StringComparison.Ordinal)
-                && page.Contains("row.Now!=VistaNow.No",StringComparison.Ordinal),"unknown weather is not « impossible »");
+            // 0.1128 (X-158): unknown weather is VistaWindow's TimeOnly (VistaWindow1128Tests), kept by the filter.
+            Check(page.Contains("row.Now.State!=VistaOpen.Closed",StringComparison.Ordinal),"unknown weather is not « impossible »");
             Check(page.Contains("var minute=DateTimeOffset.UtcNow.ToUnixTimeSeconds()/60;",StringComparison.Ordinal)
                 && page.Contains("if(!Equals(key,vistaLogKey))",StringComparison.Ordinal),"rows cached by sources and minute");
             Check(Read("MainWindow.MapLocalLists.cs").Contains("DrawVistaLog(live)",StringComparison.Ordinal),"tab of the map lists");
