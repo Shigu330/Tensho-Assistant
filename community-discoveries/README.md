@@ -31,7 +31,9 @@ the sums over the players. Version 1 files (without them) are still read.
 `{"Format":"tensho-discoveries","Version":3,"Written":…,"Files":[{"Name":"kind-NN.jsonl.gz","Kind":N,"Count":n,"Bytes":b,"Sha256":"HEX"}]}`, `Bytes` and
 `Sha256` being those of the compressed file. A kind file is gzip of UTF-8 lines: line 1 a header
 `{"Format":"tensho-discoveries","Version":3,"Kind":N,"Count":n,"Producer":…,"Written":…}`, then one fact per line, with the fields of version 2 above
-(optional ones left out when empty, nothing else). Readers check the size and the SHA-256 against the index before use and read the lines as a stream
+(optional ones left out when empty, nothing else). Since Tensho 0.1170 the plugin ignores a name it does not know when it reads `v3/` (a field
+added later needs no version 4), but refuses a line that holds `Own` or `Key` (a player's own part); the merge tool stays strict on the players' gists
+(any other name refuses the line). Readers check the size and the SHA-256 against the index before use and read the lines as a stream
 within bounds (32 MB compressed, 256 MB decompressed, 64 KB per line, 200 000 facts per kind); a bad line is refused and counted, a file whose refusals
 pass 5 % is refused. A player's gist holds the same set, `index.json` and each kind file in base64 (`kind-NN.jsonl.gz.b64`). The tool writes the same
 facts as the same bytes. Version 2 (`discoveries.json`, and the gist's single `tensho-discoveries.b64`) is still written and read for a while, for
@@ -70,7 +72,9 @@ avec la valeur gardée la plus proche). Dans `discoveries.json`, ce sont les som
 `{"Format":"tensho-discoveries","Version":3,"Written":…,"Files":[{"Name":"kind-NN.jsonl.gz","Kind":N,"Count":n,"Bytes":b,"Sha256":"HEX"}]}`, `Bytes` et
 `Sha256` étant ceux du fichier compressé. Un fichier de genre est un gzip de lignes UTF-8 : ligne 1 un en-tête
 `{"Format":"tensho-discoveries","Version":3,"Kind":N,"Count":n,"Producer":…,"Written":…}`, puis un fait par ligne, avec les champs de la version 2
-ci-dessus (les facultatifs omis quand ils sont vides, rien d'autre). Les lecteurs vérifient la taille et le SHA-256 contre l'index avant tout usage et
+ci-dessus (les facultatifs omis quand ils sont vides, rien d'autre). Depuis Tensho 0.1170, le plugin ignore un nom qu'il ne connaît pas quand il
+lit `v3/` (un champ ajouté plus tard ne demande pas de version 4), mais refuse une ligne qui contient `Own` ou `Key` (la part propre d'un joueur) ;
+l'outil de fusion reste strict sur les gists des joueurs (tout autre nom fait refuser la ligne). Les lecteurs vérifient la taille et le SHA-256 contre l'index avant tout usage et
 lisent les lignes en flux, dans des bornes (32 Mo compressés, 256 Mo décompressés, 64 Ko par ligne, 200 000 faits par genre) ; une ligne fausse est
 refusée et comptée, un fichier dont les refus dépassent 5 % est refusé. Le gist d'un joueur contient le même ensemble, `index.json` et chaque fichier de
 genre en base64 (`kind-NN.jsonl.gz.b64`). L'outil écrit les mêmes faits avec les mêmes octets. La version 2 (`discoveries.json`, et le fichier unique

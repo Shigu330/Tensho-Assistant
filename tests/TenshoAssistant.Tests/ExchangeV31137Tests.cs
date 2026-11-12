@@ -162,7 +162,7 @@ internal static class ExchangeV31137Tests
             var unknown=good[2].Replace("\"Kind\":5","\"Kind\":5,\"Name\":\"someone\"");var otherKind=good[3].Replace("\"Kind\":5","\"Kind\":4");
             (bytes,entry)=KindFile(DiscoveryKind.Venture,80,[Header(DiscoveryKind.Venture,80),..FactLines(76),withOwn,withKey,unknown,otherKind]);
             read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);
-            Check(read.Refused==4 && read.Facts.Count==76,$"Own, Key, an unknown name or another kind: each line refused ({read.Refused})");
+            Check(read.Refused==3 && read.Facts.Count==77,$"Own, Key or another kind: each line refused; an unknown name ignored since 0.1170 (X-186) ({read.Refused})");
             (bytes,entry)=KindFile(DiscoveryKind.Venture,3,[Header(DiscoveryKind.Venture,3),good[0],"{bad","{bad"]);
             Check(Refused(()=>ExchangeV3.ReadKind(new MemoryStream(bytes),entry)),"over 5 % refused: the file refused");
             (bytes,entry)=KindFile(DiscoveryKind.Venture,1,[Header(DiscoveryKind.FishCatch,1),good[0]]);

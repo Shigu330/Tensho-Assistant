@@ -63,17 +63,31 @@ public static class ExchangeV3
     public static string Sha256(byte[] bytes)=>Convert.ToHexString(SHA256.HashData(bytes));
 
     // A fact line holds the shared fields only: the computed Key, your own part (X-167) and the imported counts are not in its contract, so writing leaves
-    // them out and a line that holds one (or any other unknown name) is refused when read.
+    // them out. X-186 (0.1170, user's choice of 12/11 « Oui, ignore-les », night review N31): when the plugin reads the common file, a name it does not
+    // know is ignored (a field added later needs no version 4), but a line that holds Own or Key (the fields tied to a player's privacy) is refused;
+    // the merge tool stays strict on the players' gists (tools/discoveries-merge.py: any other name refuses the line).
     private static readonly string[] NotShared=["Key","Own","ImportedHq","ImportedValues"];
-    private static readonly JsonSerializerOptions LineOptions=new()
+    private static readonly string[] Private=["Own","Key"];
+    private static readonly IJsonTypeInfoResolver SharedFields=new DefaultJsonTypeInfoResolver{Modifiers={info=>
     {
-        UnmappedMemberHandling=JsonUnmappedMemberHandling.Disallow,
-        TypeInfoResolver=new DefaultJsonTypeInfoResolver{Modifiers={info=>
-        {
-            if(info.Type!=typeof(DiscoveryFact))return;
-            foreach(var property in info.Properties.Where(property=>NotShared.Contains(property.Name)).ToList())info.Properties.Remove(property);
-        }}},
-    };
+        if(info.Type!=typeof(DiscoveryFact))return;
+        foreach(var property in info.Properties.Where(property=>NotShared.Contains(property.Name)).ToList())info.Properties.Remove(property);
+    }}};
+    private static readonly JsonSerializerOptions LineOptions=new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Disallow,TypeInfoResolver=SharedFields};
+    private static readonly JsonSerializerOptions ReadOptions=new(){UnmappedMemberHandling=JsonUnmappedMemberHandling.Skip,TypeInfoResolver=SharedFields};
+
+    /// <summary>X-186 (0.1170): whether a fact line names Own or Key at its top level (any case): such a line is refused, never read in part.</summary>
+    public static bool NamesPrivate(ReadOnlySpan<byte> line)
+    {
+        var reader=new Utf8JsonReader(line,new JsonReaderOptions{MaxDepth=16});
+        while(reader.Read())
+            if(reader.TokenType==JsonTokenType.PropertyName && reader.CurrentDepth==1)
+            {
+                var name=reader.GetString();
+                if(Private.Any(field=>string.Equals(field,name,StringComparison.OrdinalIgnoreCase)))return true;
+            }
+        return false;
+    }
 
     /// <summary>The set of these facts: one kind file per kind, facts in key order, dated by their newest day; the same facts give the same bytes.</summary>
     public static ExchangeV3Set Build(DiscoveryFile file)
@@ -179,7 +193,7 @@ public static class ExchangeV3
             }
             if(++count>header.Count)throw new InvalidDataException("Shared discoveries file with more facts than its header says.");
             DiscoveryFact? fact;
-            try{fact=line is null ? null:JsonSerializer.Deserialize<DiscoveryFact>(line,LineOptions);}catch(JsonException){fact=null;}
+            try{fact=line is null || NamesPrivate(line) ? null:JsonSerializer.Deserialize<DiscoveryFact>(line,ReadOptions);}catch(JsonException){fact=null;}
             if(fact is null || fact.Kind!=entry.Kind || !DiscoveryStore.Valid(fact)){refused++;return;}
             facts.Add(fact);
         }
