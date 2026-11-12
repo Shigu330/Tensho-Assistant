@@ -138,7 +138,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     var rowsBefore=change.Erase!=0 ? []:Rows(open,transaction,id);
                     var rowsAfter=change.Erase!=0 ? []:change.On(rowsBefore);
                     InventoryBankService.ValidateEntries(rowsAfter);
-                    if(change.Erase!=0 || !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
+                    if(change.Erase!=0 || !StillSaved(change,rowsBefore) && !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
                     transaction.Commit();
                     return rowsAfter;
                 }
@@ -152,7 +152,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 var before=Read(id);
                 var after=change.On(before);
                 InventoryBankService.ValidateEntries(after);
-                if(!before.SequenceEqual(after))Store(id).Save(after);
+                if(!StillSaved(change,before) && !before.SequenceEqual(after))Store(id).Save(after);
                 return after;
             });
             var result=memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
@@ -185,15 +185,67 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             var all=Characters().SelectMany(Read).ToArray();
             InventoryBankService.ValidateEntries(all);
             using var transaction=open.BeginTransaction();
-            foreach(var group in all.GroupBy(entry=>entry.Key.CharacterId))WriteRows(open,transaction,group.Key,group.ToArray());
+            // X-182 (0.1173, N3): rows already there without the mark (saved while no file of before existed, then an older version wrote the
+            // folder) are joined, never replaced by the file alone.
+            foreach(var group in all.GroupBy(entry=>entry.Key.CharacterId))
+            {
+                var rows=Rows(open,transaction,group.Key);
+                WriteRows(open,transaction,group.Key,rows.Length==0 ? group.ToArray():MergeNewest(rows,group.ToArray()));
+            }
             TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
             DuringConversion?.Invoke();
             transaction.Commit();
             stores.Clear();
         }
+        // X-182 (0.1173, night review N3): a character file written again after the conversion (an older version still running, which found no
+        // folder and saved only what it saw since): merged storage by storage, the newest reading of each kept; never WriteRows of the file alone.
+        else if(bankFiles && TenshoDataDatabase.ConvertedAt(open,Family) is { } converted)MergeWrittenAgain(open,converted);
         foreach(var path in new[]{folder,legacy,legacy+".bak"})
             if(Directory.Exists(path) || File.Exists(path))data!.SetAside(path,now,"bank");
     }
+
+    // X-182 (0.1173, N3): each character file newer than the conversion and not a copy already set aside, read with the file's checks; one that
+    // cannot be read (moved meanwhile, damaged) is left to be set aside as it is (kept, never removed).
+    private void MergeWrittenAgain(SqliteConnection open,DateTimeOffset converted)
+    {
+        var keptIn=Path.GetFileName(folder);
+        foreach(var id in Characters())
+        {
+            var path=Path.Combine(folder,FileName(id));
+            if(!TenshoDataFile.WrittenAgain(path,converted,keptIn))continue;
+            BankEntry[]? again;
+            try{again=TenshoDataFile.StillThere(()=>new FileInventoryBankStore(path).Load());}
+            catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or ArgumentException or UnauthorizedAccessException){again=null;}
+            if(again is null || again.Any(entry=>entry.Key.CharacterId!=id))continue;
+            using var transaction=open.BeginTransaction();
+            var rows=Rows(open,transaction,id);
+            var merged=MergeNewest(rows,again);
+            InventoryBankService.ValidateEntries(merged);
+            if(!rows.SequenceEqual(merged))WriteRows(open,transaction,id,merged);
+            transaction.Commit();
+        }
+    }
+
+    /// <summary>X-182 (0.1173, N3): two readings of one character joined storage by storage: the newest (ObservedAt) of each kept, the others all stay.</summary>
+    internal static BankEntry[] MergeNewest(IReadOnlyList<BankEntry> saved,IReadOnlyList<BankEntry> found)
+    {
+        var result=saved.ToList();
+        foreach(var entry in found)
+        {
+            var index=result.FindIndex(kept=>kept.Key==entry.Key);
+            if(index<0)result.Add(entry);
+            else if(entry.Snapshot.ObservedAt>result[index].Snapshot.ObservedAt)result[index]=entry;
+        }
+        return [.. result];
+    }
+
+    /// <summary>
+    /// X-182 (0.1173, night review N26): « unchanged, not written again » decided here, against what is saved (under the lock), never against the
+    /// client's memory: the same storage stored with the same contents and a date under an hour older. Another client that forgot or changed it
+    /// meanwhile makes the reading written.
+    /// </summary>
+    private static bool StillSaved(BankChange change,IReadOnlyList<BankEntry> stored)
+        => change.SkipWhenSame && change.Put is { } put && stored.FirstOrDefault(entry=>entry.Key==put.Key) is { } kept && BankEntryCompare.StillSaved(kept,put);
 
     // A character's rows replaced whole (none: the character erased), in the caller's transaction.
     private static void WriteRows(SqliteConnection open,SqliteTransaction transaction,ulong id,IReadOnlyList<BankEntry> entries)

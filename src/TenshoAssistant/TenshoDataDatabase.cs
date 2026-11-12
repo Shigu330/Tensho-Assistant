@@ -242,14 +242,19 @@ public sealed class TenshoDataFile
     /// X-182 (0.1169, night review N3): a file of before found again after its family was converted, written after the conversion (by an older
     /// version of the plugin, or another client still running one) and not a copy already set aside: its entries are merged, never dropped.
     /// </summary>
-    public static bool WrittenAgain(string file,DateTimeOffset converted)
+    /// <param name="keptIn">X-182 (0.1173, N3): the folder of the file when it was set aside whole (the bank's InventoryBank/): its copies are looked
+    /// for in before-sqlite-*/&lt;folder&gt;*/ beside that folder.</param>
+    public static bool WrittenAgain(string file,DateTimeOffset converted,string? keptIn=null)
     {
         try
         {
             if(!File.Exists(file) || File.GetLastWriteTimeUtc(file)<=converted.UtcDateTime)return false;
             var length=new FileInfo(file).Length;
             var name=System.IO.Path.GetFileNameWithoutExtension(file);var extension=System.IO.Path.GetExtension(file);
-            foreach(var aside in Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!,"before-sqlite-*"))
+            var directory=System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!;
+            var places=keptIn is null ? Directory.EnumerateDirectories(directory,"before-sqlite-*")
+                : Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(directory)!,"before-sqlite-*").SelectMany(aside=>Directory.EnumerateDirectories(aside,keptIn+"*"));
+            foreach(var aside in places)
                 foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
                     if(new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file)))return false;
             return true;

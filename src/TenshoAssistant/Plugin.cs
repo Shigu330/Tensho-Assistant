@@ -294,7 +294,8 @@ public sealed class Plugin : IDalamudPlugin
                 Discoveries.DiscoveryDatabase? database=null;
                 try
                 {
-                    var aside=Discoveries.DiscoveryDatabase.ConvertFiles(discoveryFolder,DateTimeOffset.UtcNow,(path,error)=>log.Warning(error,"Discoveries {0} could not be read while converting; set aside.",Path.GetFileName(path)));
+                    var aside=Discoveries.DiscoveryDatabase.ConvertFiles(discoveryFolder,DateTimeOffset.UtcNow,(path,error)=>log.Warning(error,"Discoveries {0} could not be read while converting; set aside.",Path.GetFileName(path)),
+                        merged=>log.Information("Discoveries: Discoveries.json written again after the conversion (an older version); {0} facts merged into the database.",merged));
                     database=new Discoveries.DiscoveryDatabase(databasePath);
                     var (mine,sharedCount)=database.Count();
                     log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared{3}.",database.LibraryVersion(),mine,sharedCount,

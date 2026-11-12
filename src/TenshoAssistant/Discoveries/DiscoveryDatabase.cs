@@ -108,20 +108,48 @@ public sealed class DiscoveryDatabase
             var key=delete.Parameters.Add("$key",SqliteType.Text);
             foreach(var gone in remove){key.Value=gone;delete.ExecuteNonQuery();}
         }
-        if(write.Count>0)
-        {
-            using var upsert=open.CreateCommand();upsert.Transaction=transaction;
-            upsert.CommandText="INSERT INTO facts(key,kind,shared,fact) VALUES($key,$kind,$shared,$fact) ON CONFLICT(key) DO UPDATE SET kind=excluded.kind,shared=excluded.shared,fact=excluded.fact;";
-            var key=upsert.Parameters.Add("$key",SqliteType.Text);var kind=upsert.Parameters.Add("$kind",SqliteType.Integer);
-            var shared=upsert.Parameters.Add("$shared",SqliteType.Integer);var json=upsert.Parameters.Add("$fact",SqliteType.Text);
-            foreach(var fact in write)
-            {
-                key.Value=fact.Key;kind.Value=(int)fact.Kind;shared.Value=fact.Seen==0 ? 1:0;
-                json.Value=JsonSerializer.Serialize(fact.Seen==0 && fact.Own is not null ? WithoutOwn(fact):fact,Options);
-                upsert.ExecuteNonQuery();
-            }
-        }
+        if(write.Count>0)Upsert(open,transaction,write);
         transaction.Commit();
+    }
+    private static void Upsert(SqliteConnection open,SqliteTransaction transaction,IEnumerable<DiscoveryFact> write)
+    {
+        using var upsert=open.CreateCommand();upsert.Transaction=transaction;
+        upsert.CommandText="INSERT INTO facts(key,kind,shared,fact) VALUES($key,$kind,$shared,$fact) ON CONFLICT(key) DO UPDATE SET kind=excluded.kind,shared=excluded.shared,fact=excluded.fact;";
+        var key=upsert.Parameters.Add("$key",SqliteType.Text);var kind=upsert.Parameters.Add("$kind",SqliteType.Integer);
+        var shared=upsert.Parameters.Add("$shared",SqliteType.Integer);var json=upsert.Parameters.Add("$fact",SqliteType.Text);
+        foreach(var fact in write)
+        {
+            key.Value=fact.Key;kind.Value=(int)fact.Kind;shared.Value=fact.Seen==0 ? 1:0;
+            json.Value=JsonSerializer.Serialize(fact.Seen==0 && fact.Own is not null ? WithoutOwn(fact):fact,Options);
+            upsert.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>
+    /// X-182 (0.1173, night review N3): facts of a Discoveries.json written again after the conversion, merged in one transaction: a cell the file
+    /// alone knows is added; a cell in both keeps the fact seen more often (the latest last sighting when even), never the two added up: the older
+    /// version may have saved its whole base read before the conversion, which the database already holds (counts never doubled; a few sightings
+    /// of a cell seen by both clients may be lost, never a cell). Facts that fail the checks are left out. Returns how many rows were written.
+    /// </summary>
+    public int MergeFound(IEnumerable<DiscoveryFact> found)
+    {
+        using var open=Open();
+        using var transaction=open.BeginTransaction();
+        using var select=open.CreateCommand();select.Transaction=transaction;
+        select.CommandText="SELECT fact FROM facts WHERE key=$key;";
+        var key=select.Parameters.Add("$key",SqliteType.Text);
+        var write=new List<DiscoveryFact>();
+        foreach(var fact in found)
+        {
+            if(!DiscoveryStore.Valid(fact))continue;
+            key.Value=fact.Key;
+            DiscoveryFact? known=null;
+            if(select.ExecuteScalar() is string text)try{known=JsonSerializer.Deserialize<DiscoveryFact>(text,Options);}catch(JsonException){}
+            if(known is null || fact.Seen>known.Seen || fact.Seen==known.Seen && fact.Last>known.Last)write.Add(fact);
+        }
+        Upsert(open,transaction,write);
+        transaction.Commit();
+        return write.Count;
     }
     private static DiscoveryFact WithoutOwn(DiscoveryFact fact){var copy=fact.Copy();copy.Own=null;return copy;}
 
@@ -134,7 +162,8 @@ public sealed class DiscoveryDatabase
     /// removed, into « before-sqlite-yyyyMMdd-HHmmss » beside it. A stop at any step leaves either the old files or the database whole: the next
     /// start goes on from there. Returns the folder of the old files when it moved some.
     /// </summary>
-    public static string? ConvertFiles(string folder,DateTimeOffset now,Action<string,Exception> broken)
+    /// <param name="merged">X-182 (0.1173, N3): told how many facts of a Discoveries.json written again after the conversion were merged.</param>
+    public static string? ConvertFiles(string folder,DateTimeOffset now,Action<string,Exception> broken,Action<int>? merged=null)
     {
         var target=System.IO.Path.Combine(folder,FileName);
         var main=System.IO.Path.Combine(folder,"Discoveries.json");var shared=DiscoveryFiles.SharedFolder(main);
@@ -161,11 +190,25 @@ public sealed class DiscoveryDatabase
                 foreach(var mine in new[]{temporary,temporary+"-wal",temporary+"-shm"})if(File.Exists(mine))File.Delete(mine);
             }
         }
+        // X-182 (0.1173, night review N3): the database is there and Discoveries.json came back (an older version still running, or a build of an
+        // older commit, found no file and saved again): written after the database (a minute of margin; merging is never additive) and not a copy
+        // already set aside, its facts are merged before it is set aside. Read while another client moves it: nothing merged, nothing lost.
+        else if(File.Exists(main) && TenshoDataFile.WrittenAgain(main,new DateTimeOffset(File.GetCreationTimeUtc(target),TimeSpan.Zero).AddMinutes(-1)))
+        {
+            var read=DiscoveryFiles.ReadBase(main,now,(path,error)=>{if(File.Exists(main))broken(path,error);});
+            if(read.File is { } again)merged?.Invoke(new DiscoveryDatabase(target).MergeFound(again.Facts));
+        }
         if(!old)return null;
         var aside=System.IO.Path.Combine(folder,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
         Directory.CreateDirectory(aside);
-        try{if(File.Exists(main))File.Move(main,System.IO.Path.Combine(aside,"Discoveries.json"));}catch(IOException) when(!File.Exists(main)){}
-        try{if(Directory.Exists(shared))Directory.Move(shared,System.IO.Path.Combine(aside,"Shared"));}catch(IOException) when(!Directory.Exists(shared)){}
+        // X-182 (0.1173): a name already taken there (two moves in one second) gets a suffix; the move is never refused for it.
+        try{if(File.Exists(main))File.Move(main,Free(System.IO.Path.Combine(aside,"Discoveries.json")));}catch(IOException) when(!File.Exists(main)){}
+        try{if(Directory.Exists(shared))Directory.Move(shared,Free(System.IO.Path.Combine(aside,"Shared")));}catch(IOException) when(!Directory.Exists(shared)){}
         return aside;
+    }
+    private static string Free(string path)
+    {
+        if(!File.Exists(path) && !Directory.Exists(path))return path;
+        return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path)!,System.IO.Path.GetFileNameWithoutExtension(path)+"-"+Guid.NewGuid().ToString("N")[..8]+System.IO.Path.GetExtension(path));
     }
 }

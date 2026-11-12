@@ -160,9 +160,13 @@ public sealed class InventoryBankService : IDisposable
                 }
                 string? error = null;
                 // 0.605: the date is new in memory, the file is only rewritten when the contents changed or the saved date grows old.
+                // X-182 (0.1173, night review N26): the memory only hints; the store decides under its lock, against what is saved (another
+                // client may have forgotten or changed that storage meanwhile). The lock held elsewhere for an unchanged reading: nothing to say.
                 var unchanged = false;
                 lock (gate) unchanged = request.Entry is { } incoming && BankEntryCompare.CanSkipSave(state.Entries.FirstOrDefault(e => e.Key == incoming.Key), incoming, savedAt);
-                try { if (!unchanged) { next = store.Apply(change, Array.AsReadOnly(memory)); if (request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; } }
+                if (unchanged) change = change with { SkipWhenSame = true };
+                try { next = store.Apply(change, Array.AsReadOnly(memory)); if (!unchanged && request.Entry is { } saved) savedAt[saved.Key] = saved.Snapshot.ObservedAt; }
+                catch (BankLockBusyException) when (unchanged) { }
                 catch (Exception ex) { error = $"Bank save failed: {ex.Message}"; }
                 lock (gate)
                 {

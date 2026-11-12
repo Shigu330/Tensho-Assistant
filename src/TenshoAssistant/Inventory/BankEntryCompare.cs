@@ -18,5 +18,9 @@ public static class BankEntryCompare
     /// <summary>Only for an entry written in this session: after a restart the first reading is always written.</summary>
     public static bool CanSkipSave(BankEntry? current, BankEntry incoming, IReadOnlyDictionary<BankKey, DateTimeOffset> savedAt)
         => current is not null && savedAt.TryGetValue(incoming.Key, out var saved) && incoming.Snapshot.ObservedAt - saved < LongestWithoutSave && incoming.Snapshot.ObservedAt >= saved && SameContents(current, incoming);
+
+    /// <summary>X-182 (0.1173, night review N26): the reading matches what is stored (same contents, the stored date under an hour older).</summary>
+    public static bool StillSaved(BankEntry stored, BankEntry incoming)
+        => incoming.Snapshot.ObservedAt >= stored.Snapshot.ObservedAt && incoming.Snapshot.ObservedAt - stored.Snapshot.ObservedAt < LongestWithoutSave && SameContents(stored, incoming);
 }
 

@@ -119,6 +119,8 @@ public interface IInventoryBankStore
     BankEntry[] Apply(BankChange change, IReadOnlyList<BankEntry> memory)
     {
         var next = change.On(memory);
+        // 0.605: one file, one writer: the memory is what is saved, an unchanged reading needs no disk.
+        if (change.SkipWhenSame) return next;
         Save(Array.AsReadOnly(next));
         return next;
     }
@@ -126,7 +128,8 @@ public interface IInventoryBankStore
 
 /// <summary>X-141 (0.1118): one change of the bank: Put (a storage read), Forget (one storage, on a click) or Erase (every storage of one
 /// character, on « Erase this character » only).</summary>
-public sealed record BankChange(BankEntry? Put = null, BankKey? Forget = null, ulong Erase = 0)
+/// <remarks>X-182 (0.1173, night review N26): SkipWhenSame, a reading the client believes unchanged: the store writes it only when what is saved differs.</remarks>
+public sealed record BankChange(BankEntry? Put = null, BankKey? Forget = null, ulong Erase = 0, bool SkipWhenSame = false)
 {
     public ulong Character => Put?.Key.CharacterId ?? Forget?.CharacterId ?? Erase;
 

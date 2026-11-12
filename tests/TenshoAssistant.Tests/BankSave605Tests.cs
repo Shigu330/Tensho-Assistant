@@ -24,7 +24,7 @@ internal static class BankSave605Tests
             Check(!BankEntryCompare.CanSkipSave(Entry(1,At),Entry(1,At.AddMinutes(2)),new Dictionary<BankKey,DateTimeOffset>()),"not written in this session");
             Check(!BankEntryCompare.CanSkipSave(null,Entry(1,At),new Dictionary<BankKey,DateTimeOffset>{[Entry(1,At).Key]=At}),"erased since");
             var service=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/BankService.cs"));
-            Check(service.Contains("next = store.Apply(change, Array.AsReadOnly(memory)); if (request.Entry is { } saved) savedAt[saved.Key]"),"remembered only after the write succeeded");
+            Check(service.Contains("next = store.Apply(change, Array.AsReadOnly(memory)); if (!unchanged && request.Entry is { } saved) savedAt[saved.Key]"),"remembered only after the write succeeded");
         }),
     ];
 }
