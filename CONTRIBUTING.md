@@ -185,8 +185,11 @@ requires, among other things (restrictions and AI policy re-read on 2026-11-04):
   follows the AI policy, as it submits nothing (DEC-050); its AI use stays disclosed.
 
 **Current project status:** the code is written with an AI agent (level "Auto") under the direction of its author, who tries the changes
-in game. Releases are made by the agent once what changed is validated in game; an urgent fix (game patch, privacy) may go out first and
-says « not validated in game » in its notes (DEC-050).
+in game. Each release is built and tested automatically (compilation, tests, the desktop app drawn without a window), then loaded
+once in game with its self-check, which its notes say (« checked at launch, not tried in detail yet »); the detailed in-game tests
+come after, grouped in campaigns, and CHANGELOG.md says for each version whether it was validated in game. An urgent fix
+(game patch, privacy) may go out before that launch check, and its notes say so. Release notes are one line per version in players' words (the « For players: » line of each
+CHANGELOG entry); the details stay in CHANGELOG.md (DEC-050).
 No submission to the official repository is planned (DEC-039): the plugin stays on its custom repository, and the rules above are still
 followed. The state of every requirement: [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md).
 How the Dalamud repository builds a plugin (Linux, SDK 10.0.101, no network, lock file) and what the `Build like the Dalamud repository`
@@ -410,8 +413,11 @@ demande entre autres (restrictions et politique IA relues le 2026-11-04) :
   son usage de l'IA reste déclaré.
 
 **État actuel du projet :** le code est écrit avec un agent IA (niveau « Auto ») sous la direction de son auteur, qui essaie les
-changements en jeu. Les releases sont faites par l'agent une fois ce qui a changé validé en jeu ; un correctif urgent (patch du jeu,
-confidentialité) peut partir avant et le dit dans ses notes (« non validé en jeu », DEC-050). Aucune soumission au dépôt officiel n'est prévue (DEC-039) : le plugin reste sur son dépôt personnalisé, et les règles ci-dessus
+changements en jeu. Chaque release est compilée et testée automatiquement (compilation, tests, application de bureau dessinée sans fenêtre), puis
+chargée une fois en jeu avec son auto-contrôle, ce que disent ses notes (« vérifié au lancement, pas encore essayé en détail ») ; les
+essais détaillés en jeu viennent après, groupés en campagnes, et CHANGELOG.md dit pour chaque version si elle a été
+validée en jeu. Un correctif urgent (patch du jeu, confidentialité) peut partir avant cette vérification au lancement, et ses notes le disent. Les notes de release tiennent en une ligne par version, en mots de joueur (la ligne
+« Pour les joueurs : » de chaque entrée du CHANGELOG) ; le détail reste dans CHANGELOG.md (DEC-050). Aucune soumission au dépôt officiel n'est prévue (DEC-039) : le plugin reste sur son dépôt personnalisé, et les règles ci-dessus
 sont toujours suivies. L'état de chaque exigence : [docs/project/PUBLISHING.md](docs/project/PUBLISHING.md). Comment le dépôt Dalamud
 compile un plugin (Linux, SDK 10.0.101, sans réseau, fichier de verrouillage) et ce que contrôle le job de CI
 `Build like the Dalamud repository` : [docs/evidence/0.512-d17-build.md](docs/evidence/0.512-d17-build.md). Quand vous ajoutez du code,

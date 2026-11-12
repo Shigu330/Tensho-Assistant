@@ -237,6 +237,27 @@ try {
         if (-not $French.Trim()) { return $English.Trim() }
         return "$($English.Trim())`n`n$bilingualMarker`n`n$($French.Trim())"
     }
+    # 0.1182 (X-252, « first player » review of 12/11, G2): what a player reads in the installer (repo.json's Changelog) and on the GitHub
+    # release is the « For players: » line of each version since the last release, in players' words, without the agent's identifiers; a
+    # version without that line changed nothing a player sees (developer mode, documents, tools). The full entries stay in CHANGELOG.md
+    # and in the commit bodies.
+    $playerLines = @{}; $playerLinesFr = @{}
+    foreach ($number in $entries.Keys) {
+        $found = @(($entries[$number] -split "`n") | Where-Object { $_ -match '^- For players: (.+)$' } | ForEach-Object { $Matches[1].Trim() })
+        if ($found.Count) { $playerLines[$number] = $found[0] }
+        $foundFr = @(($entriesFr[$number] -split "`n") | Where-Object { $_ -match '^- Pour les joueurs : (.+)$' } | ForEach-Object { $Matches[1].Trim() })
+        if ($foundFr.Count) { $playerLinesFr[$number] = $foundFr[0] }
+    }
+    function Get-PlayerNotesSince([string]$Since) {
+        $from = if ($Since) { [version]$Since } else { [version]'0.0.0' }
+        $covered = @($entries.Keys | Where-Object { [version]$_ -gt $from -and [version]$_ -le [version]$version } | Sort-Object { [version]$_ } -Descending)
+        $english = @($covered | Where-Object { $playerLines.ContainsKey($_) } | ForEach-Object { "- $(([version]$_).ToString(2)): $($playerLines[$_])" })
+        $french = @($covered | Where-Object { $playerLinesFr.ContainsKey($_) } | ForEach-Object { "- $(([version]$_).ToString(2)) : $($playerLinesFr[$_])" })
+        $details = "https://github.com/$repository/blob/$releaseBranch/CHANGELOG.md"
+        $en = if ($english.Count) { "What changes for players:`n" + ($english -join "`n") } else { 'Nothing a player sees changed in these versions.' }
+        $fr = if ($french.Count) { "Ce qui change pour les joueurs :`n" + ($french -join "`n") } else { 'Rien de visible pour un joueur dans ces versions.' }
+        return Join-Bilingual "$en`n`nDetails: $details" "$fr`n`nDétail : $details"
+    }
 
     $branch = (Invoke-Git @('rev-parse', '--abbrev-ref', 'HEAD')).Trim()
     if ($branch -ne $developBranch) { throw "Current branch is '$branch': commits and releases start from '$developBranch' only." }
@@ -353,7 +374,7 @@ try {
         Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
         $commit = (Invoke-Git @('rev-list', '-n', '1', $tag)).Trim()
         $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
-        if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0] }
+        $notes = Get-PlayerNotesSince $(if ($lastReleased.Count -gt 0) { $lastReleased[0] } else { '' })
         $notes = Add-HotfixNote $notes
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
         Assert-NoAgentFiles $commit
@@ -394,7 +415,8 @@ try {
     # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
     $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
-    if ($lastReleased.Count -gt 0) { $notes = Get-NotesSince $lastReleased[0]; Write-Output "Release notes cover the versions after $($lastReleased[0])." }
+    $notes = Get-PlayerNotesSince $(if ($lastReleased.Count -gt 0) { $lastReleased[0] } else { '' })
+    if ($lastReleased.Count -gt 0) { Write-Output "Release notes cover the versions after $($lastReleased[0]) (their « For players: » lines)." }
     # 0.1020: a new major number (1.0.0 first) is released only on the maintainer's word (-Major).
     $lastMajor = if ($lastReleased.Count -gt 0) { ([version]$lastReleased[0]).Major } else { 0 }
     if (([version]$version).Major -gt $lastMajor -and -not $Major) { Stop-Release "Stopped: $version raises the major number (last release $($lastReleased[0])); that is the maintainer's decision: -Major." }
@@ -425,7 +447,10 @@ try {
     # Local steps first: repo.json committed on Devloppement and tagged. Nothing is public yet. No branch change (0.1017).
     Step "write repo.json ($version)" { [IO.File]::WriteAllText((Join-Path $root 'repo.json'), $json + "`n", [Text.UTF8Encoding]::new($false)) }
     if (-not $DryRun) { Assert-RepoJson ([IO.File]::ReadAllText((Join-Path $root 'repo.json'))) $version $download }
-    Step "git commit repo.json" { git add repo.json; git commit -m "$version · repo.json" }
+    # 0.1182 (system plan 4.23): the produced indexes (evidence, links) read every tracked file, repo.json included: they are written again
+    # before its commit, so the release leaves no index out of date (relay 33 needed a « x.y.z · docs » commit after its release).
+    Step "docgen write --blocks (indexes with repo.json)" { & python -I -X utf8 (Join-Path $root 'tools\docgen.py') write --blocks }
+    Step "git commit repo.json" { git add repo.json; git add -u; git commit -m "$version · repo.json" }
     if (-not $DryRun) { Assert-NoAgentFiles 'HEAD' }
     Step "git tag -a $tag" { git tag -a $tag -m "Tensho Assistant $version" }
     # Public steps: the tag and the GitHub release with the zip, then main (repo.json) last, moved to the tagged commit as a
