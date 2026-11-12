@@ -5,8 +5,11 @@
 `discoveries.json` holds the discoveries players shared through World › Discoveries › « Exchange with other players (GitHub) »: each connected player's
 own sightings go to a secret gist of theirs, with one « Discoveries: <login> » issue in this repository pointing to it. Tensho downloads this file during
 an exchange (automatic once a day when turned on, or « Exchange now ») and joins it to the base as imported. A discovery holds game rows and places only:
-never a player's name, position or id; what leaves the PC carries the day of each sighting, never its time, and the files of this folder keep the day
-only too (since Tensho 0.1012).
+never a player's name or id, nor anything about other players; what leaves the PC carries the day of each sighting, never its time, and the files of
+this folder keep the day only too (since Tensho 0.1012). A fish caught or a bite is noted at the character's exact place (the precision chosen in
+DEC-045, useful for other players' maps): with its day and the « Discoveries: <login> » issue, it can tell where that GitHub account fished on a given
+day. Only the fields a player read themself are sent: dates, levels and places that came from an import are kept apart and never sent (since Tensho
+0.1134).
 
 **Licence.** The shared discoveries (`discoveries.json` and `players/`) are published under CC0-1.0 (public domain dedication,
 https://creativecommons.org/publicdomain/zero/1.0/): anyone may reuse them for any purpose without asking. A player agrees to it when connecting
@@ -30,8 +33,11 @@ the sums over the players. Version 1 files (without them) are still read.
 `discoveries.json` contient les découvertes partagées par les joueurs avec Monde › Découvertes › « Échange avec les autres joueurs (GitHub) » : ce que
 chaque joueur connecté a vu lui-même part dans un gist secret à son nom, avec un ticket « Discoveries: <login> » dans ce dépôt qui y renvoie. Tensho
 télécharge ce fichier lors d'un échange (automatique une fois par jour quand il est activé, ou « Échanger maintenant ») et le joint à la base comme importé.
-Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom, la position ni l'identifiant d'un joueur ; ce qui quitte le PC porte le jour
-de chaque observation, jamais son heure, et les fichiers de ce dossier ne gardent eux aussi que le jour (depuis Tensho 0.1012).
+Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom ni l'identifiant d'un joueur, ni rien sur les autres joueurs ; ce qui quitte
+le PC porte le jour de chaque observation, jamais son heure, et les fichiers de ce dossier ne gardent eux aussi que le jour (depuis Tensho 0.1012). Un
+poisson pris ou une touche est noté à l'endroit exact du personnage (la précision choisie par DEC-045, utile aux cartes des autres joueurs) : avec son
+jour et le ticket « Discoveries: <login> », il peut dire où ce compte GitHub a pêché un jour donné. Seuls les champs relevés par le joueur lui-même
+partent : les dates, niveaux et lieux venus d'un import sont gardés à part et ne partent jamais (depuis Tensho 0.1134).
 
 **Licence.** Les découvertes partagées (`discoveries.json` et `players/`) sont publiées sous CC0-1.0 (renonciation au droit d'auteur,
 https://creativecommons.org/publicdomain/zero/1.0/deed.fr) : chacun peut les reprendre pour tout usage sans demander. Un joueur l'accepte en connectant

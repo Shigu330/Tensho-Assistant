@@ -31,8 +31,17 @@ public static class CommunityDiscoveries
     public static DateTimeOffset Day(DateTimeOffset at)=>new(at.UtcDateTime.Date,TimeSpan.Zero);
     public static DiscoveryFile Mine(DiscoveryFile all)
     {
-        // X-76 step 5 (0.949, user's go-ahead): what leaves the PC carries the day only, never the time of a sighting.
-        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>{var copy=fact.Copy();copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;copy.First=Day(copy.First);copy.Last=Day(copy.Last);return copy;})
+        // X-76 step 5 (0.949, user's go-ahead): what leaves the PC carries the day only, never the time of a sighting. X-167 (0.1134, audit R03): a fact
+        // that mixes yours with an import's sends your own dates, levels and place only (DiscoveryFact.Own), never the import's; a copy that would not
+        // hold (DiscoveryStore.Valid) is not sent.
+        var facts=all.Facts.Where(fact=>fact.Seen>0).Select(fact=>
+            {
+                var copy=fact.Copy();
+                if(copy.Own is { } own){copy.First=own.First;copy.Last=own.Last;copy.LevelMin=own.LevelMin;copy.LevelMax=own.LevelMax;copy.X=own.X;copy.Z=own.Z;}
+                copy.Own=null;copy.Imported=0;copy.ImportedHq=0;copy.ImportedValues=null;
+                return copy;
+            })
+            .Where(DiscoveryStore.Valid).Select(copy=>{copy.First=Day(copy.First);copy.Last=Day(copy.Last);return copy;})
             .OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList();
         return new(){Written=facts.Count==0 ? DateTimeOffset.UnixEpoch:facts.Max(fact=>fact.Last),Producer=all.Producer,Facts=facts};
     }

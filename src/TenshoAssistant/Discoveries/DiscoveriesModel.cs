@@ -73,7 +73,8 @@ public enum DiscoveryKind { MonsterPlace=1, HuntMarkPlace=2, FateSeen=3, Desynth
 
 /// <summary>
 /// X-43 (0.807, user request): one thing seen in game, kept locally, with where it came from: seen by the player (Seen, how many separate times), imported
-/// (Imported, how many files had it). Only game rows and places: never a player's name, position or id.
+/// (Imported, how many files had it). Only game rows and places: never a player's name or id, nothing about other players. X-167 (0.1134): a fish caught or
+/// a bite is noted at the character's own exact place (DEC-045), so with its day it can tell where you fished that day; the texts say so.
 /// MonsterPlace: Subject = BNpcName row, Detail = BNpcBase row, the territory and map, the 50-yalm cell (CellSize), the first exact place, the levels seen.
 /// </summary>
 public sealed class DiscoveryFact
@@ -107,15 +108,57 @@ public sealed class DiscoveryFact
     /// <summary>The imported values: per value, the largest count an imported file gave.</summary>
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
     public Dictionary<int,int>? ImportedValues { get; set; }
+    /// <summary>
+    /// X-167 (0.1134, audit R03): set when the dates, levels or place above mix yours with an import's (an import joined to your fact, or your first
+    /// sighting of an imported fact): what you read yourself, the only fields sent to GitHub (CommunityDiscoveries.Mine). Absent: the fields are all yours
+    /// (or, written before 0.1134, taken as yours). Kept in your local file only, never in a shared file or a gist.
+    /// </summary>
+    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+    public OwnPart? Own { get; set; }
     public string Key=>$"{(int)Kind}:{Subject}:{Detail}:{Territory}:{Map}:{CellX}:{CellZ}";
     public DiscoveryFact Copy()
     {
         var copy=(DiscoveryFact)MemberwiseClone();
         copy.Values=Values is null ? null:new(Values);copy.ImportedValues=ImportedValues is null ? null:new(ImportedValues);
+        copy.Own=Own?.Copy();
         return copy;
     }
+    /// <summary>X-167: your part of a fact you saw (null when you never saw it): its own part when mixed, else its fields.</summary>
+    public static OwnPart? OwnOf(DiscoveryFact fact)=>fact.Seen==0 ? null:fact.Own?.Copy() ?? new(){First=fact.First,Last=fact.Last,LevelMin=fact.LevelMin,LevelMax=fact.LevelMax,X=fact.X,Z=fact.Z};
     /// <summary>X-76 (0.908): how many times a fact was seen in game, yours and imported together (static: nothing more is written in the files).</summary>
     public static int TimesOf(DiscoveryFact fact)=>fact.Seen+fact.Imported;
+}
+
+/// <summary>X-167 (0.1134, audit R03): the dates, levels and exact place of a fact as you read them yourself, apart from any import.</summary>
+public sealed class OwnPart
+{
+    public DateTimeOffset First { get; set; }
+    public DateTimeOffset Last { get; set; }
+    public int LevelMin { get; set; }
+    public int LevelMax { get; set; }
+    public float X { get; set; }
+    public float Z { get; set; }
+    public OwnPart Copy()=>(OwnPart)MemberwiseClone();
+    /// <summary>One more sighting of yours: the dates and, when known, the level widened (<paramref name="zeroUnknown"/>: a level of 0 is « not known »).</summary>
+    public void Saw(DateTimeOffset at,int level,bool zeroUnknown)
+    {
+        if(!zeroUnknown){LevelMin=Math.Min(LevelMin,level);LevelMax=Math.Max(LevelMax,level);}
+        else if(level>0){LevelMin=LevelMin==0 ? level:Math.Min(LevelMin,level);LevelMax=Math.Max(LevelMax,level);}
+        if(at<First)First=at;
+        if(at>Last)Last=at;
+    }
+    /// <summary>Two parts of yours made one (two facts joined in one cell): the widest dates and levels, the earliest exact place.</summary>
+    public static OwnPart? Join(OwnPart? first,OwnPart? second)
+    {
+        if(first is null)return second?.Copy();
+        if(second is null)return first.Copy();
+        var joined=first.Copy();
+        if(second.LevelMin>0)joined.LevelMin=joined.LevelMin==0 ? second.LevelMin:Math.Min(joined.LevelMin,second.LevelMin);
+        joined.LevelMax=Math.Max(joined.LevelMax,second.LevelMax);
+        if(second.First<joined.First){joined.First=second.First;joined.X=second.X;joined.Z=second.Z;}
+        if(second.Last>joined.Last)joined.Last=second.Last;
+        return joined;
+    }
 }
 
 /// <summary>
@@ -340,6 +383,9 @@ public sealed class DiscoveryStore
         {
             if(facts.TryGetValue(fact.Key,out var known))
             {
+                // X-167 (0.1134, audit R03): your first sighting of an imported fact: its fields are the import's, yours kept apart (Own).
+                if(known.Seen==0)known.Own=new(){First=at,Last=at,LevelMin=value,LevelMax=value,X=position.X,Z=position.Z};
+                else known.Own?.Saw(at,value,false);
                 known.LevelMin=Math.Min(known.LevelMin,value);known.LevelMax=Math.Max(known.LevelMax,value);known.Seen++;
                 var values=known.Values;ValueCounts.Add(ref values,value);known.Values=values;
                 if(hq)known.Hq++;
@@ -378,11 +424,17 @@ public sealed class DiscoveryStore
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 if(level>0){known.LevelMin=known.LevelMin==0 ? level:Math.Min(known.LevelMin,level);known.LevelMax=Math.Max(known.LevelMax,level);}
-                if(at-known.Last>=gap)
+                // X-167 (0.1134, audit R03): the gap is measured from your own last sighting, never from an imported date (a later imported date kept your
+                // sighting from being counted); your first sighting of an imported fact always counts, its fields kept apart (Own).
+                var wasShared=known.Seen==0;
+                var ownLast=wasShared ? (DateTimeOffset?)null:known.Own?.Last ?? known.Last;
+                if(ownLast is null || at-ownLast.Value>=gap)
                 {
                     known.Seen++;
                     if(counted){var values=known.Values;ValueCounts.Add(ref values,level);known.Values=values;}
                 }
+                if(wasShared)known.Own=new(){First=at,Last=at,LevelMin=level,LevelMax=level,X=position.X,Z=position.Z};
+                else known.Own?.Saw(at,level,true);
                 if(at>known.Last)known.Last=at;
                 Dirty=true;
                 return false;
@@ -425,6 +477,8 @@ public sealed class DiscoveryStore
                 var source=ready[at];
                 if(facts.TryGetValue(source.Key,out var known))
                 {
+                    // X-167 (0.1134, audit R03): your fact's own fields kept apart before the import widens them.
+                    if(known.Seen>0)known.Own??=DiscoveryFact.OwnOf(known);
                     known.Imported++;
                     if(source.LevelMin>0)known.LevelMin=known.LevelMin==0 ? source.LevelMin:Math.Min(known.LevelMin,source.LevelMin);
                     known.LevelMax=Math.Max(known.LevelMax,source.LevelMax);
@@ -437,7 +491,7 @@ public sealed class DiscoveryStore
                     continue;
                 }
                 if(shared.GetValueOrDefault(source.Kind)>=MaxFacts){LeftOut++;continue;}
-                var copy=source.Copy();copy.Seen=0;copy.Imported=1;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
+                var copy=source.Copy();copy.Seen=0;copy.Imported=1;copy.Own=null;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 Put(copy);added++;
             }
@@ -467,6 +521,10 @@ public sealed class DiscoveryStore
     /// </summary>
     public static void Join(DiscoveryFact known,DiscoveryFact other)
     {
+        // X-167 (0.1134, audit R03): your parts joined apart when either fact mixes yours with an import's, or only one of them is yours.
+        var mixed=known.Own is not null || other.Own is not null || known.Seen>0!=other.Seen>0;
+        var own=mixed ? OwnPart.Join(DiscoveryFact.OwnOf(known),DiscoveryFact.OwnOf(other)):null;
+        known.Own=own;
         known.Seen+=other.Seen;known.Imported+=other.Imported;
         known.Values=ValueCounts.Sum(known.Values,other.Values);known.ImportedValues=ValueCounts.Sum(known.ImportedValues,other.ImportedValues);
         known.Hq=ValueCounts.AtMostTotal((long)known.Hq+other.Hq,known.Values);known.ImportedHq=ValueCounts.AtMostTotal((long)known.ImportedHq+other.ImportedHq,known.ImportedValues);
@@ -519,6 +577,8 @@ public sealed class DiscoveryStore
             if(original is null)continue;
             if(Cell(original.X,original.Z)!=(original.CellX,original.CellZ))moved=true;
             var fact=Recell(original);
+            // X-167: only a fact you saw has a part of yours.
+            if(fact.Seen==0)fact.Own=null;
             if(!Valid(fact)){refused++;continue;}
             ready.Add(fact);
         }

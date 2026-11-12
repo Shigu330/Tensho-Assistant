@@ -64,7 +64,9 @@ What the plugin does that matters for security (read against the code of the `De
   presses « Connect GitHub » and approves the code shown on github.com (GitHub's device sign-in, no password in the game), it also sends
   the player's own sightings, never imported ones, to a secret gist of theirs, with one issue in this repository titled with their GitHub
   login (`api.github.com`); a warning says so before connecting. A sighting holds game rows and places with the day only, never the
-  time, and never a player's name, position or id; the files this repository publishes from them keep the day only too, and are under
+  time, and never a player's name or id; a fish caught or a bite holds the character's exact place (DEC-045), so with the day and the
+  issue it can tell where that GitHub account fished on a given day; only fields the player read themself are sent, never dates, levels or
+  places that came from an import (0.1134); the files this repository publishes from them keep the day only too, and are under
   CC0-1.0, which the warning and the player's issue state (0.1012). The token is kept on the player's PC, encrypted for the Windows user (DPAPI);
   « Disconnect » deletes it (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `CommunityDiscoveries.cs`).
 - **Developer mode page sweep (DEC-040)**: in developer mode only, after the self-check, Tensho draws every page once, at most once every
@@ -218,7 +220,9 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   affiché (connexion par appareil de GitHub, aucun mot de passe dans le jeu), il envoie aussi ce que le joueur a vu lui-même, jamais ce
   qu'il a importé, dans un gist secret à son nom, avec un ticket dans ce dépôt titré de son identifiant GitHub (`api.github.com`) ; un
   avertissement le dit avant la connexion. Une observation contient des lignes et des lieux du jeu avec le jour seulement, jamais
-  l'heure, et jamais le nom, la position ou l'identifiant d'un joueur ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
+  l'heure, et jamais le nom ou l'identifiant d'un joueur ; un poisson pris ou une touche porte l'endroit exact du personnage (DEC-045),
+  donc avec le jour et le ticket elle peut dire où ce compte GitHub a pêché un jour donné ; seuls les champs relevés par le joueur
+  lui-même partent, jamais des dates, niveaux ou lieux venus d'un import (0.1134) ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
   jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). Le jeton est gardé sur le PC du joueur, chiffré pour
   l'utilisateur Windows (DPAPI) ; « Déconnecter » l'efface (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`,
   `CommunityDiscoveries.cs`).
