@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1123.0
+- Plan global, X-143 : Échéances des téléchargements, première partie (audit A06) : une réponse dont les en-têtes sont arrivés mais dont le corps ne vient plus ne bloque plus une page pour toujours. Les requêtes communautaires (aide communautaire, échange GitHub des découvertes, Garland Tools, wiki, Universalis des ventes de servant, galerie de Mes outils…) ont une échéance qui couvre aussi le corps : le délai du client quand il est plus court, sinon 2 minutes ; le téléchargement de l'application de bureau, 10 minutes. Passé ce délai, l'erreur est une expiration et une nouvelle tentative est possible ; une annulation demandée reste une annulation.
+- Tests : HttpDeadline1123Tests. Verify.ps1 (agent) : 1852/1852, 0 avertissement, 0 erreur ; DLL 0.1123.0.0. Rien à essayer en jeu.
+### English
+- Download deadlines, part one (audit A06): a reply whose headers arrived but whose body stops coming no longer blocks a page for good. Community requests (community help, the GitHub exchange of discoveries, Garland Tools, wikis, Universalis for retainer sales, the My tools gallery…) have a deadline that covers the body too: the client's timeout when shorter, else 2 minutes; the desktop app's download, 10 minutes. Past it, the error is a timeout and a new try is possible; a cancellation asked stays a cancellation.
+
 ## 0.1122.0
 - Plan global, X-142 : Sauvegardes plus sûres, seconde partie (audit A05) : « Vider le cache » fait la copie de sauvegarde et la purge en une seule opération de la file d'écriture du cache : la copie contient toutes les écritures demandées avant, la purge suit sans qu'aucune lecture ni écriture ne passe entre les deux, et une écriture demandée pendant ce temps attend puis reste après la purge (elle n'est plus perdue ni effacée). Si la copie échoue, rien n'est retiré. Un fichier en cours d'utilisation qui ne peut pas être retiré est compté et le message le dit (« vidé en partie »).
 - Tests : CacheClear1122Tests. Verify.ps1 (agent) : 1849/1849, 0 avertissement, 0 erreur ; DLL 0.1122.0.0. Non validé en jeu.

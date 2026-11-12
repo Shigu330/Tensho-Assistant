@@ -15,27 +15,51 @@ public static class BoundedHttp
     /// <summary>X-76 (step 2): Tensho's one User-Agent, « TenshoAssistant/x.y.z », for every request it sends (the market clients and Discord use it too).</summary>
     public static readonly string UserAgent=$"TenshoAssistant/{typeof(BoundedHttp).Assembly.GetName().Version?.ToString(3) ?? "1.0.0"}";
 
+    /// <summary>
+    /// X-143 (0.1123, audit A06): the longest a request may take, headers and body together, when its client has no shorter timeout. With
+    /// ResponseHeadersRead, HttpClient.Timeout stops at the headers: a reply that stops coming would otherwise hang its page for good.
+    /// </summary>
+    public static readonly TimeSpan DefaultDeadline=TimeSpan.FromMinutes(2);
+
     public static Task<string> ReadAsync(HttpClient client,Uri uri,int maximumBytes,CancellationToken cancellation)=>
         SendAsync(client,new HttpRequestMessage(HttpMethod.Get,uri),maximumBytes,cancellation);
 
-    /// <summary>Sends any request (0.321: POST for Teamcraft's GraphQL) and reads its reply within <paramref name="maximumBytes"/>.</summary>
-    public static async Task<string> SendAsync(HttpClient client,HttpRequestMessage request,int maximumBytes,CancellationToken cancellation)
+    /// <summary>The deadline of a request: the client's timeout when it is finite and shorter, else DefaultDeadline.</summary>
+    public static TimeSpan Deadline(HttpClient client)=>client.Timeout>TimeSpan.Zero && client.Timeout<DefaultDeadline ? client.Timeout : DefaultDeadline;
+
+    /// <summary>
+    /// Sends any request (0.321: POST for Teamcraft's GraphQL) and reads its reply within <paramref name="maximumBytes"/>. X-143 (0.1123):
+    /// within Deadline(client) too, body included; past it, a TaskCanceledException holding a TimeoutException (as HttpClient's own
+    /// timeout); the caller's own cancellation stays an OperationCanceledException of its token.
+    /// </summary>
+    public static async Task<string> SendAsync(HttpClient client,HttpRequestMessage request,int maximumBytes,CancellationToken cancellation,TimeSpan? deadline=null)
     {
         using var message=request;
         if(maximumBytes<=0) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
         SentByHost.AddOrUpdate(message.RequestUri?.Host ?? "?",1,(_,count)=>count+1);
         message.Headers.UserAgent.ParseAdd(UserAgent);
-        using var response=await client.SendAsync(message,HttpCompletionOption.ResponseHeadersRead,cancellation).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-        if(response.Content.Headers.ContentLength>maximumBytes) throw new InvalidDataException("Community response too large.");
-        await using var stream=await response.Content.ReadAsStreamAsync(cancellation).ConfigureAwait(false);
-        using var buffer=new MemoryStream(); var bytes=new byte[8192]; int read;
-        while((read=await stream.ReadAsync(bytes,cancellation).ConfigureAwait(false))>0)
+        var limit=deadline ?? Deadline(client);
+        using var timeout=CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+        timeout.CancelAfter(limit);
+        var token=timeout.Token;
+        try
         {
-            if(buffer.Length+read>maximumBytes) throw new InvalidDataException("Community response too large.");
-            buffer.Write(bytes,0,read);
+            using var response=await client.SendAsync(message,HttpCompletionOption.ResponseHeadersRead,token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            if(response.Content.Headers.ContentLength>maximumBytes) throw new InvalidDataException("Community response too large.");
+            await using var stream=await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false);
+            using var buffer=new MemoryStream(); var bytes=new byte[8192]; int read;
+            while((read=await stream.ReadAsync(bytes,token).ConfigureAwait(false))>0)
+            {
+                if(buffer.Length+read>maximumBytes) throw new InvalidDataException("Community response too large.");
+                buffer.Write(bytes,0,read);
+            }
+            token.ThrowIfCancellationRequested();
+            return new UTF8Encoding(false,true).GetString(buffer.GetBuffer(),0,(int)buffer.Length);
         }
-        cancellation.ThrowIfCancellationRequested();
-        return new UTF8Encoding(false,true).GetString(buffer.GetBuffer(),0,(int)buffer.Length);
+        catch(OperationCanceledException error) when(!cancellation.IsCancellationRequested && timeout.IsCancellationRequested)
+        {
+            throw new TaskCanceledException($"Request to {message.RequestUri?.Host} timed out after {limit.TotalSeconds:0} s (body included).",new TimeoutException(error.Message));
+        }
     }
 }

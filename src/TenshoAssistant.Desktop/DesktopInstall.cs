@@ -27,7 +27,15 @@ internal interface IReleaseSource
 internal sealed class GitHubReleases : IReleaseSource
 {
     private const string Api="https://api.github.com/repos/"+DesktopUpdate.Repository+"/releases/";
-    private static readonly HttpClient Client=Create();
+    private static readonly HttpClient Shared=Create();
+    private readonly HttpClient Client;
+    /// <summary>X-143 (0.1123, audit A06): the longest the zip's download may take, body included (HttpClient.Timeout stops at the headers
+    /// with ResponseHeadersRead); a download that stalls ends there instead of keeping the update busy for good.</summary>
+    private readonly TimeSpan downloadDeadline;
+
+    public GitHubReleases():this(Shared,TimeSpan.FromMinutes(10)){}
+    /// <summary>Tests: another client (a fake handler) and deadline.</summary>
+    internal GitHubReleases(HttpClient client,TimeSpan downloadDeadline){Client=client;this.downloadDeadline=downloadDeadline;}
 
     private static HttpClient Create()
     {
@@ -58,10 +66,18 @@ internal sealed class GitHubReleases : IReleaseSource
 
     public async Task Download(ReleaseAsset asset,Stream target,Action<long> progress,CancellationToken cancel)
     {
-        using var response=await Client.GetAsync(Checked(asset.Url),HttpCompletionOption.ResponseHeadersRead,cancel).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-        await using var source=await response.Content.ReadAsStreamAsync(cancel).ConfigureAwait(false);
-        await DesktopInstall.Copy(source,target,progress,cancel).ConfigureAwait(false);
+        using var timeout=CancellationTokenSource.CreateLinkedTokenSource(cancel);timeout.CancelAfter(downloadDeadline);
+        try
+        {
+            using var response=await Client.GetAsync(Checked(asset.Url),HttpCompletionOption.ResponseHeadersRead,timeout.Token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            await using var source=await response.Content.ReadAsStreamAsync(timeout.Token).ConfigureAwait(false);
+            await DesktopInstall.Copy(source,target,progress,timeout.Token).ConfigureAwait(false);
+        }
+        catch(OperationCanceledException error) when(!cancel.IsCancellationRequested && timeout.IsCancellationRequested)
+        {
+            throw new TaskCanceledException($"download of {asset.Name} timed out after {downloadDeadline.TotalMinutes:0} min (body included)",new TimeoutException(error.Message));
+        }
     }
 
     /// <summary>Only this repository's release downloads are fetched (checked again here, after DesktopUpdate.Refusal).</summary>
