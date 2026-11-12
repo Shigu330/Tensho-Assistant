@@ -106,8 +106,12 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         nextBell=now.AddSeconds(1);
         rang.RemoveAll(line=>line.Until<now);
         var front=DesktopGame.InFront();
+        // X-163 (0.1156): the game's held counts of the alarms' items first (none when not linked: the bags are not seen, the alarm rings).
+        var linked=Link?.Invoke();
+        var held=linked?.Held ?? [];
+        host.AlarmHeld([.. held.Select(item=>item.Item)],[.. held.Select(item=>item.Count)]);
         var (lines,sound)=host.DueAlarms(now,front);
-        if(linkNotices.Take(Link?.Invoke(),now.ToUnixTimeMilliseconds()) is { Count: >0 } received)
+        if(linkNotices.Take(linked,now.ToUnixTimeMilliseconds()) is { Count: >0 } received)
         {
             var (more,moreSound)=host.LinkNotices([.. received],front);
             lines=[.. lines,.. more];sound|=moreSound;

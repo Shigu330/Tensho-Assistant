@@ -69,6 +69,18 @@ internal sealed partial class MainWindow
         RefreshRecipeHoldingsCache();
         return GetRecipeHoldings(alarm.ItemId) is { HasObservation:true } held && AlarmSchedule.Gathered(alarm,held.Total);
     }
+    /// <summary>
+    /// X-163 (0.1156): for the desktop application (by the link), how many of each item of the enabled alarms with a quantity needed the
+    /// character holds, only the items seen (the same count as AlarmGathered), at most LocalLinkProtocol.MaxHeld. Framework thread.
+    /// </summary>
+    internal IReadOnlyList<Link.LinkHeld> AlarmHeldItems()
+    {
+        var items=(configuration.Alarms ?? []).Where(alarm=>alarm.Enabled && alarm.Needed>0 && alarm.ItemId!=0).Select(alarm=>alarm.ItemId).Distinct().Take(Link.LocalLinkProtocol.MaxHeld).ToArray();
+        if(items.Length==0)return [];
+        RefreshRecipeHoldingsCache();
+        return [.. items.Select(item=>(item,held:GetRecipeHoldings(item))).Where(pair=>pair.held.HasObservation)
+            .Select(pair=>new Link.LinkHeld(pair.item,Math.Clamp((long)pair.held.Total,0,Link.LocalLinkProtocol.MaxHeldCount)))];
+    }
     private void AddAlarms(IReadOnlyList<TenshoAlarm> added)
     {
         configuration.Alarms??=[];

@@ -24,11 +24,13 @@ namespace TenshoAssistant.Link;
 //  - Protocol 3, optional part (0.1155, X-163): the plugin's alerts that rang in the game (LinkNotice: currencies, duty ready, GP, gear
 //    wear, important items, hunt marks), in the plugin's words, at most MaxNotices of MaxNoticeText characters, kept two minutes; an
 //    application of before 0.1155 ignores them (an unknown field), so the protocol number does not change.
+//  - Protocol 3, optional part (0.1156, X-163): how many of each item of the alarms with a quantity needed the character holds (LinkHeld,
+//    bags included, only when seen), so the application stays silent as the game does when the item is already gathered (X-62).
 
 /// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
 /// (0.1114): also the small live states and the saved files that changed. Protocol 3 (0.1119): those as categories only.</summary>
 public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence,
-    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null,IReadOnlyList<LinkNotice>? Notices=null);
+    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null,IReadOnlyList<LinkNotice>? Notices=null,IReadOnlyList<LinkHeld>? Held=null);
 
 /// <summary>The link's wire format: one JSON line per snapshot, bounded and checked.</summary>
 public static class LocalLinkProtocol
@@ -43,6 +45,9 @@ public static class LocalLinkProtocol
     /// character escaped by the JSON writer: LinkNotices1155Tests).</summary>
     public const int MaxNotices=4;
     public const int MaxNoticeText=200;
+    /// <summary>X-163 (0.1156): items of the alarms whose held count is sent, at most, and the largest count accepted.</summary>
+    public const int MaxHeld=32;
+    public const long MaxHeldCount=100_000_000;
     /// <summary>The category of the plugin's settings file (the only one the application reads again so far).</summary>
     public const string SettingsCategory="settings";
 
@@ -97,6 +102,8 @@ public static class LocalLinkProtocol
             {error="change list refused";return false;}
         if(read.Notices is { } notices && (notices.Count>MaxNotices || notices.Any(notice=>notice is null || notice.Id<1 || notice.Text is null || notice.Text.Length>MaxNoticeText)))
             {error="notice list refused";return false;}
+        if(read.Held is { } held && (held.Count>MaxHeld || held.Any(item=>item is null || item.Item==0 || item.Count is < 0 or > MaxHeldCount)))
+            {error="held list refused";return false;}
         snapshot=read;return true;
     }
 
@@ -382,6 +389,10 @@ public sealed class LinkChangeLog
 /// <summary>X-163 (0.1155): an alert of the plugin that rang in the game: its number (counting from 1 at each plugin start), when (Unix ms) and
 /// its text in the plugin's language, as the chat line said it (without « [Tensho] »).</summary>
 public sealed record LinkNotice(long Id,long At,string Text);
+
+/// <summary>X-163 (0.1156): how many of an item of the alarms the character holds (ItemHoldings: bags, armoury, saddlebags, retainers…),
+/// sent only when it was seen; the application's bell stays silent for an alarm whose quantity is met (AlarmSchedule.Gathered).</summary>
+public sealed record LinkHeld(uint Item,long Count);
 
 /// <summary>
 /// X-163 (0.1155): the plugin's alerts to send, filled where they ring (framework thread), read by the feed once a second. The newest

@@ -11,7 +11,9 @@ public sealed class AlarmBell
 {
     private readonly HashSet<(string Key,DateTimeOffset Occurrence)> rung=[];
 
-    public IReadOnlyList<(TenshoAlarm Alarm,DateTimeOffset Occurrence)> Due(IEnumerable<TenshoAlarm>? alarms,DateTimeOffset now,Func<TenshoAlarm,DateTimeOffset,uint?>? weatherAt)
+    /// <summary>The alarms to ring now, each occurrence once. X-163 (0.1156): <paramref name="held"/> gives how many of an alarm's item the
+    /// character holds when known (null: unknown); an alarm whose quantity is met is marked rung and stays silent, as in the game (X-62).</summary>
+    public IReadOnlyList<(TenshoAlarm Alarm,DateTimeOffset Occurrence)> Due(IEnumerable<TenshoAlarm>? alarms,DateTimeOffset now,Func<TenshoAlarm,DateTimeOffset,uint?>? weatherAt,Func<uint,long?>? held=null)
     {
         var due=new List<(TenshoAlarm,DateTimeOffset)>();
         foreach(var alarm in alarms ?? [])
@@ -20,6 +22,7 @@ public sealed class AlarmBell
             if(weatherAt is null && alarm.Weathers.Count+alarm.PreviousWeathers.Count>0)continue;
             var (check,occurrence)=AlarmSchedule.Check(alarm,now,weatherAt is null ? null:time=>weatherAt(alarm,time),ownMemory:true);
             if(check!=AlarmCheck.Fire || !rung.Add((Key(alarm),occurrence)))continue;
+            if(alarm.Needed>0 && held?.Invoke(alarm.ItemId) is { } count && AlarmSchedule.Gathered(alarm,count))continue;
             due.Add((alarm,occurrence));
         }
         // Old occurrences are forgotten (a day after), so the memory stays small.

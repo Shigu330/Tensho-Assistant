@@ -845,7 +845,7 @@ public sealed class Plugin : IDalamudPlugin
             // X-119 step 2 (0.1081): the local link with the desktop application: a named pipe for the current user only, opened only while
             // Settings › Advanced « Link with the desktop app » is on; once a second, who and where (docs/evidence/x119-desktop-link.md).
             registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,id=>mainWindow.TerritoryName?.Invoke(id),
-                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log,linkNotices);mainWindow.LinkNotice=linkNotices.Add;mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
+                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log,linkNotices){Held=mainWindow.AlarmHeldItems};mainWindow.LinkNotice=linkNotices.Add;mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
                 ()=>{mainWindow.DesktopLinkStatus=null;mainWindow.LinkNotice=null;linkFeed?.Dispose();linkFeed=null;});
             // X-126 (0.1113, D-137): the desktop app installed from Settings › Advanced, on a click only; left out of a build made with
             // TenshoDesktopInstall=false. Requests only on « Install » / « Update » (this repository's release, docs/evidence/x126-desktop-install.md).

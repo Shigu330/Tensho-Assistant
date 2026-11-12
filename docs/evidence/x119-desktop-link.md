@@ -53,9 +53,11 @@ computed by the application itself (AlarmBell 0.1132, GardenBell 0.1153); the ot
 | Alerts (`LinkNotice(Id, At, Text)`, field `Notices` of the snapshot) | Filled by `Plugin.cs` where an alert rings in the game (chat line or sound allowed): currency thresholds, duty ready, GP threshold, gear to repair or materia to extract, important items at a shop (when their sound is on), A and S hunt marks; never a Tensho alarm or the garden (rung by the application's own rule). Text in the plugin's language, as the chat line said it; no character name. | `LinkNoticeLog`: the newest 4, 200 characters each, kept 2 minutes; the application refuses more (« notice list refused »); the worst line stays under 8 192 bytes (test) |
 | Application | `LinkNoticeReader`: each alert once by its number; at the first snapshot and after a plugin start (sequence counting again), only the alerts of the last 30 seconds; a lost link keeps the memory. `MainWindow.DesktopLinkNotices` rings them with the alarms' options (only when the game is not in front, Windows sound, Windows notification). | Read once a second with the bell |
 | Compatibility | Optional field of protocol 3: an application of before 0.1155 ignores it, a plugin of before sends none. | — |
+| Items held (0.1156, `LinkHeld(Item, Count)`, field `Held`) | `MainWindow.AlarmHeldItems`: for each item of the enabled alarms with a quantity needed, the character's count as the game's alarm check reads it (`ItemHoldings`, bags included), only when seen; sent with a character only. The application's bell (`AlarmBell.Due`, `held`) marks an occurrence whose quantity is met rung without ringing, as the game does (X-62); unknown counts (not linked, game closed) still ring. | At most 32 items, counts 0 to 100,000,000 (« held list refused ») |
 
 Behaviour test: `LinkNotices1155Tests` (alerts through a real pipe, read by the application's reader: once each, history not rung, a plugin
 started again rings its new ones; worst line measured).
+`AlarmHeld1156Tests` (counts through a real pipe decide what the application's bell rings).
 
 ## Settings read by the application (0.1120, X-150)
 

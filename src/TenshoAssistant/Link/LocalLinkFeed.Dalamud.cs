@@ -27,6 +27,8 @@ internal sealed class LocalLinkFeed:IDisposable
     private readonly LinkChangeLog changes=new();
     // X-163 (0.1155): the alerts that rang in the game, filled by Plugin.cs where they ring.
     private readonly LinkNoticeLog notices;
+    // X-163 (0.1156): the held counts of the alarms' items (MainWindow.AlarmHeldItems, framework thread), null before it is set.
+    public Func<IReadOnlyList<LinkHeld>?>? Held;
     private static readonly GameInventoryType[] Bags=[GameInventoryType.Inventory1,GameInventoryType.Inventory2,GameInventoryType.Inventory3,GameInventoryType.Inventory4];
     private FileSystemWatcher? settingsWatcher,folderWatcher;
     private bool liveFailed;
@@ -62,7 +64,16 @@ internal sealed class LocalLinkFeed:IDisposable
         var zone=territory==0 ? "" : zoneName(territory) ?? "";
         if(zone.Length>LocalLinkProtocol.MaxZone)zone=zone[..LocalLinkProtocol.MaxZone];
         server.Publish(new LinkSnapshot(LocalLinkProtocol.Version,version,loggedIn,false,territory,zone,++sequence,ReadLive(loggedIn),changes.Snapshot(),
-            notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())));
+            notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),loggedIn ? ReadHeld():null));
+    }
+
+    /// <summary>X-163 (0.1156): the alarms' held counts, on the framework thread; null when unknown or after a reading failed once (R08).</summary>
+    private bool heldFailed;
+    private IReadOnlyList<LinkHeld>? ReadHeld()
+    {
+        if(heldFailed || Held is null)return null;
+        try{return Held() is { Count: >0 } held ? held:null;}
+        catch(Exception error){heldFailed=true;log.Warning(error,"Local link: the alarms' held counts could not be read; not sent until the plugin starts again.");return null;}
     }
 
     /// <summary>The small live states, on the framework thread, copied (R07); null without a character or after a reading failed once (R08).</summary>

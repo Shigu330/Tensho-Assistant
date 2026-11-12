@@ -178,6 +178,14 @@ internal sealed class Host
     }
     private MethodInfo? notices;
 
+    /// <summary>X-163 (0.1156): the held counts of the alarms' items brought by the link, to MainWindow.DesktopAlarmHeld (by its name); nothing when it is missing.</summary>
+    public void AlarmHeld(uint[] items,long[] counts)
+    {
+        held??=Window.GetType().GetMethod("DesktopAlarmHeld",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(uint[]),typeof(long[])]);
+        held?.Invoke(Window,[items,counts]);
+    }
+    private MethodInfo? held;
+
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
 

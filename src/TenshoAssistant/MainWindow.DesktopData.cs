@@ -204,13 +204,24 @@ internal sealed partial class MainWindow
         if(texts.Length==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
         return (texts,options.DesktopSound);
     }
+    // X-163 (0.1156): the held counts of the alarms' items the link brought (the game's own count, bags included); empty when not linked.
+    // Called by the application once a second, before DesktopDueAlarms, by its name (AlarmHeld1156Tests).
+    private Dictionary<uint,long> desktopHeld=[];
+    internal void DesktopAlarmHeld(uint[] items,long[] counts)
+    {
+        var held=new Dictionary<uint,long>();
+        for(var index=0;index<Math.Min(items.Length,counts.Length);index++)held[items[index]]=counts[index];
+        desktopHeld=held;
+    }
     private Alarms.AlarmBell? desktopBell;
     private Reminders.GardenBell? desktopGarden;
     internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)
     {
         var options=configuration.AlarmOptions ?? new();
         var catalog=weather.State.Catalog;
-        var due=(desktopBell??=new()).Due(configuration.Alarms,now,catalog is null ? null:(alarm,time)=>Alarms.AlarmService.WeatherAt(catalog,alarm.TerritoryId,time));
+        var held=desktopHeld;
+        var due=(desktopBell??=new()).Due(configuration.Alarms,now,catalog is null ? null:(alarm,time)=>Alarms.AlarmService.WeatherAt(catalog,alarm.TerritoryId,time),
+            item=>held.TryGetValue(item,out var count) ? count:null);
         // X-163 (0.1153): the garden beds ripe or to tend too, when the garden reminders are on (GardenBell: the journal's rule, the application's own
         // memory; a bed the plugin already said is not said again), in the same words as the game's chat line.
         var garden=configuration.GardenAlerts ? (desktopGarden??=new()).Due(configuration.GardenBeds,now):[];
