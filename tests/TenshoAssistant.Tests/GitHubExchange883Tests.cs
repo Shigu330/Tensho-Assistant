@@ -23,7 +23,7 @@ internal static class GitHubExchange883Tests
             }
             finally{if(Directory.Exists(folder))Directory.Delete(folder,true);}
             var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
-            Check(code.Contains("File.WriteAllBytes(TokenPath,UserSecret.Protect(") && !code.Contains("client_secret"),"token protected, no secret");
+            Check(code.Contains("AtomicFile.Write(TokenPath,UserSecret.Protect(") && code.Contains("AtomicFile.Write(RefreshPath,UserSecret.Protect(") && !code.Contains("client_secret"),"token and refresh token protected, no secret");
             Check(code.Contains("if(upload && Connected)") && code.Contains("CommunityDiscoveries.Mine("),"own sightings, connected only");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(page.Contains("if(settings.Enabled && settings.AutoExchange && DiscoveryExchange is { } exchange && exchange.Due(DateTimeOffset.UtcNow))"),"automatic only when turned on");

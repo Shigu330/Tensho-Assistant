@@ -545,8 +545,8 @@ internal sealed partial class MainWindow
         ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("DiscoveriesUi.ClearSure"));
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes")))
         {
-            // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token), then the base emptied.
-            try{DiscoveryDatabase?.Checkpoint();BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,new HashSet<string>{"github.token"});}
+            // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token nor its refresh token, X-175), then the base emptied.
+            try{DiscoveryDatabase?.Checkpoint();BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,GitHubExchange.SecretFiles);}
             catch(Exception error){log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");discoveryClearAsked=false;return;}
             store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;
         }

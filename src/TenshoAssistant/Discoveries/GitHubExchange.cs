@@ -19,6 +19,18 @@ public sealed class GitHubExchangeMeta
     public DateTimeOffset? Exchanged { get; set; }
     /// <summary>X-174 (0.1137): the files the last upload put in the gist (empty: a gist of before 0.1137, holding the v2 file only).</summary>
     public List<string> GistFiles { get; set; }=[];
+    /// <summary>X-175 (1138): the client id that gave the token (empty: before 1138, the OAuth app); a token of another sign-in is forgotten.</summary>
+    public string ClientId { get; set; }="";
+    /// <summary>X-175: when the token and its refresh token expire (null: never, the OAuth app's tokens).</summary>
+    public DateTimeOffset? TokenExpires { get; set; }
+    public DateTimeOffset? RefreshExpires { get; set; }
+}
+
+/// <summary>X-175 (1138): an exchange stopped with a message of its own (App not installed, sign-in expired), the token forgotten when <paramref name="Forget"/>.</summary>
+internal sealed class ExchangeRefused(string key,bool forget):Exception(key)
+{
+    public string Key{get;}=key;
+    public bool Forget{get;}=forget;
 }
 
 /// <summary>
@@ -28,16 +40,24 @@ public sealed class GitHubExchangeMeta
 /// (once per version of the file), then, when connected, the player's own sightings (never imported ones) written to one secret gist of theirs, updated each
 /// time, and one issue per player in the repository pointing to it. Started by a click, or once a day by the opt-in setting « automatic exchange ».
 /// A discovery never holds a player's name, position or id; the issue's title holds the GitHub login of the account the player connected.
+/// X-175 (1138): the sign-in (OAuth app today, GitHub App once its client id is given) comes from GitHubSignIn, the one switch; an expiring token
+/// is renewed before an upload with its refresh token, kept protected the same way (github.refresh).
 /// </summary>
 public sealed class GitHubExchange : IDisposable
 {
-    public const string ClientId="Ov23liBmk4RCUYw6pU6Z",Scopes="gist public_repo",Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
+    public const string Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
+    /// <summary>X-175: the files that hold a secret, never put in a backup copy.</summary>
+    public static readonly IReadOnlySet<string> SecretFiles=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"github.token","github.refresh"};
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
     private readonly string folder;
     private readonly HttpClient client;
+    private readonly GitHubSignIn signIn;
+    private readonly Func<DateTimeOffset> clock;
     private readonly CancellationTokenSource stop=new();
     private readonly object gate=new(),marks=new();
-    private string? token;private GitHubExchangeMeta meta=new();private DateTimeOffset tried;private bool busy;
+    private string? token,refresh;private GitHubExchangeMeta meta=new();private DateTimeOffset tried;private bool busy;
+    /// <summary>X-175: the shortest wait between two polls of the device flow (GitHub asks 5 seconds; the behaviour tests wait less).</summary>
+    internal TimeSpan PollFloor { get; init; }=TimeSpan.FromSeconds(5);
     private string? userCode,verifyAddress;private ExchangeMessage? message;
 
     public bool Busy{get{lock(gate)return busy;}}
@@ -48,21 +68,30 @@ public sealed class GitHubExchange : IDisposable
     public string Login{get{lock(gate)return meta.Login;}}
     public DateTimeOffset? Exchanged{get{lock(gate)return meta.Exchanged;}}
     private string TokenPath=>Path.Combine(folder,"github.token");
+    private string RefreshPath=>Path.Combine(folder,"github.refresh");
     private string MetaPath=>Path.Combine(folder,"github.json");
     private string CommonMarker=>Path.Combine(folder,"community.sha256");
     /// <summary>X-174 (0.1137): the hash of each v3 kind file taken, by kind number ({"10":"HEX",…}), noted once a save holds its facts.</summary>
     private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
 
     public GitHubExchange(string folder):this(folder,null){}
-    /// <summary>X-174: <paramref name="handler"/> answers the requests instead of the network (behaviour tests).</summary>
-    internal GitHubExchange(string folder,HttpMessageHandler? handler)
+    /// <summary>
+    /// X-174: <paramref name="handler"/> answers the requests instead of the network (behaviour tests). X-175: <paramref name="signIn"/> (default
+    /// GitHubSignIn.Current) and <paramref name="clock"/> (default the UTC time) given by the behaviour tests.
+    /// </summary>
+    internal GitHubExchange(string folder,HttpMessageHandler? handler,GitHubSignIn? signIn=null,Func<DateTimeOffset>? clock=null)
     {
         this.folder=folder;
+        this.signIn=signIn ?? GitHubSignIn.Current;
+        this.clock=clock ?? (()=>DateTimeOffset.UtcNow);
         client=handler is null ? new(){Timeout=TimeSpan.FromSeconds(30)}:new(handler){Timeout=TimeSpan.FromSeconds(30)};
         // X-76 H10 (0.923): an unreadable file is kept aside as « .broken » before a new one is started (it was written over later).
         try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)) ?? new();}
         catch(Exception){meta=new();try{File.Move(MetaPath,MetaPath+".broken",true);}catch(Exception){}}
         try{if(File.Exists(TokenPath))token=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(TokenPath)));}catch(Exception){token=null;}
+        try{if(token is not null && File.Exists(RefreshPath))refresh=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(RefreshPath)));}catch(Exception){refresh=null;}
+        // X-175: a token of the other sign-in (the OAuth app's, once the GitHub App is in place) is forgotten: the player connects again, to the App.
+        if(token is not null && !this.signIn.Owns(meta.ClientId)){Disconnect();message=new("ExchangeSignInChanged");}
     }
 
     /// <summary>The automatic exchange is due: none for <see cref="Every"/>, and no attempt for <see cref="Retry"/> (a failure is not retried every second).</summary>
@@ -76,6 +105,7 @@ public sealed class GitHubExchange : IDisposable
             ExchangeMessage result;
             try{result=await work().ConfigureAwait(false);}
             catch(OperationCanceledException){result=new("ExchangeStopped");}
+            catch(ExchangeRefused refused){if(refused.Forget)Disconnect();result=new(refused.Key);}
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){Disconnect();result=new("ExchangeUnauthorized");}
             catch(Exception error){result=new("ExchangeFailed",error.GetType().Name);}
             lock(gate){message=result;busy=false;userCode=null;}
@@ -86,39 +116,74 @@ public sealed class GitHubExchange : IDisposable
     public bool Connect()=>Start(ConnectAsync);
     public bool Exchange(DiscoveryStore store,bool upload)=>Start(()=>ExchangeAsync(store,upload));
 
-    /// <summary>Forgets the token on this PC (the authorization itself is revoked on github.com › Settings › Applications).</summary>
+    /// <summary>Forgets the token on this PC, and its refresh token (the authorization itself is revoked on github.com › Settings › Applications).</summary>
     public void Disconnect()
     {
-        lock(gate){token=null;meta.Login="";}
+        lock(gate){token=null;refresh=null;meta.Login="";meta.ClientId="";meta.TokenExpires=null;meta.RefreshExpires=null;}
         try{File.Delete(TokenPath);}catch(Exception){}
+        try{File.Delete(RefreshPath);}catch(Exception){}
         SaveMeta();
+    }
+
+    /// <summary>
+    /// X-175: keeps a token on this PC, protected for this Windows user (DPAPI). The refresh token first: GitHub ends the old one at each refresh, so a
+    /// stop between the two writes leaves the new refresh token beside an old access token, renewed again at the next use (never the reverse).
+    /// </summary>
+    private void Keep(GitHubToken granted,string? login=null)
+    {
+        Directory.CreateDirectory(folder);
+        if(granted.Refresh is { } renewal)AtomicFile.Write(RefreshPath,UserSecret.Protect(Encoding.UTF8.GetBytes(renewal)));
+        else try{File.Delete(RefreshPath);}catch(Exception){}
+        AtomicFile.Write(TokenPath,UserSecret.Protect(Encoding.UTF8.GetBytes(granted.Access)));
+        lock(gate)
+        {
+            token=granted.Access;refresh=granted.Refresh;
+            meta.ClientId=signIn.ClientId;meta.TokenExpires=granted.Expires;meta.RefreshExpires=granted.RefreshExpires;
+            if(login is not null)meta.Login=login;
+        }
+        SaveMeta();
+    }
+
+    /// <summary>
+    /// X-175: an expiring token (GitHub App) is renewed before use with its refresh token. No refresh token, one past its end, or a refresh refused
+    /// by GitHub: the sign-in has ended, the token is forgotten and the player is asked to connect again. GitHub not reached: the exchange fails, the
+    /// token is kept for the next try.
+    /// </summary>
+    private async Task Fresh()
+    {
+        string? renewal;DateTimeOffset? expires,ends;
+        lock(gate){renewal=refresh;expires=meta.TokenExpires;ends=meta.RefreshExpires;}
+        var now=clock();
+        if(!GitHubSignIn.Due(expires,now))return;
+        if(renewal is null || GitHubSignIn.Ended(ends,now))throw new ExchangeRefused("ExchangeExpired",true);
+        JsonObject answer;
+        try{answer=await Form("https://github.com/login/oauth/access_token",signIn.RefreshFields(renewal)).ConfigureAwait(false);}
+        catch(HttpRequestException error) when(error.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+        {throw new ExchangeRefused("ExchangeExpired",true);}
+        Keep(GitHubSignIn.ReadToken(answer,clock()) ?? throw new ExchangeRefused("ExchangeExpired",true));
     }
 
     private async Task<ExchangeMessage> ConnectAsync()
     {
-        var code=await Form("https://github.com/login/device/code",new(){["client_id"]=ClientId,["scope"]=Scopes}).ConfigureAwait(false);
+        var code=await Form("https://github.com/login/device/code",signIn.DeviceCodeFields()).ConfigureAwait(false);
         var device=code["device_code"]?.GetValue<string>() ?? throw new InvalidDataException("No device code.");
-        var interval=Math.Max(5,code["interval"]?.GetValue<int>() ?? 5);
+        var interval=TimeSpan.FromSeconds(Math.Max(PollFloor.TotalSeconds,code["interval"]?.GetValue<int>() ?? 5));
         var expires=DateTimeOffset.UtcNow.AddSeconds(Math.Min(900,code["expires_in"]?.GetValue<int>() ?? 900));
         lock(gate){userCode=code["user_code"]?.GetValue<string>();verifyAddress=code["verification_uri"]?.GetValue<string>() ?? "https://github.com/login/device";}
         while(DateTimeOffset.UtcNow<expires)
         {
-            await Task.Delay(TimeSpan.FromSeconds(interval),stop.Token).ConfigureAwait(false);
-            var answer=await Form("https://github.com/login/oauth/access_token",
-                new(){["client_id"]=ClientId,["device_code"]=device,["grant_type"]="urn:ietf:params:oauth:grant-type:device_code"}).ConfigureAwait(false);
-            if(answer["access_token"]?.GetValue<string>() is { Length:>0 } granted)
+            await Task.Delay(interval,stop.Token).ConfigureAwait(false);
+            var answer=await Form("https://github.com/login/oauth/access_token",signIn.PollFields(device)).ConfigureAwait(false);
+            if(GitHubSignIn.ReadToken(answer,clock()) is { } granted)
             {
-                var user=await Api(HttpMethod.Get,"https://api.github.com/user",null,granted).ConfigureAwait(false);
-                Directory.CreateDirectory(folder);
-                File.WriteAllBytes(TokenPath,UserSecret.Protect(Encoding.UTF8.GetBytes(granted)));
-                lock(gate){token=granted;meta.Login=user?["login"]?.GetValue<string>() ?? "";}
-                SaveMeta();
+                var user=await Api(HttpMethod.Get,"https://api.github.com/user",null,granted.Access).ConfigureAwait(false);
+                Keep(granted,user?["login"]?.GetValue<string>() ?? "");
                 return new("ConnectDone",Login);
             }
             switch(answer["error"]?.GetValue<string>())
             {
                 case "authorization_pending":continue;
-                case "slow_down":interval+=5;continue;
+                case "slow_down":interval+=TimeSpan.FromSeconds(5);continue;
                 case "access_denied":return new("ConnectDenied");
                 default:return new("ConnectExpired");
             }
@@ -139,7 +204,7 @@ public sealed class GitHubExchange : IDisposable
             string known;lock(gate)known=meta.UploadHash;
             if(mine.Facts.Count==0)sent="ShareEmpty";
             else if(hash==known)sent="SentSame";
-            else{await Upload(files).ConfigureAwait(false);lock(gate)meta.UploadHash=hash;sent="Sent";}
+            else{await Fresh().ConfigureAwait(false);await Upload(files).ConfigureAwait(false);lock(gate)meta.UploadHash=hash;sent="Sent";}
         }
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
@@ -237,16 +302,26 @@ public sealed class GitHubExchange : IDisposable
             lock(gate){meta.GistId=gist;meta.Issue=0;}
         }
         lock(gate)meta.GistFiles=[..contents.Keys];
+        // X-175: the gist kept before the issue, so a refused issue does not make a second gist at the next exchange.
+        SaveMeta();
         int issue;lock(gate)issue=meta.Issue;
         if(issue==0)
         {
             var version=typeof(GitHubExchange).Assembly.GetName().Version?.ToString(3) ?? "?";
-            var opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",new JsonObject
+            JsonNode? opened;
+            try
             {
-                ["title"]=$"Discoveries: {Login}",
-                ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.",
-                ["labels"]=new JsonArray("discoveries"),
-            }).ConfigureAwait(false);
+                opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",new JsonObject
+                {
+                    ["title"]=$"Discoveries: {Login}",
+                    ["body"]=$"Shared from Tensho Assistant {version} (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gist}\n\n- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.",
+                    ["labels"]=new JsonArray("discoveries"),
+                }).ConfigureAwait(false);
+            }
+            // X-175: with the GitHub App, a refused issue (403, or 404 for a repository the App cannot see) means the App is not installed on the
+            // repository: the maintainer has to install it; nothing else is sent, the token is kept.
+            catch(HttpRequestException error) when(signIn.App && error.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.NotFound)
+            {throw new ExchangeRefused("ExchangeAppMissing",false);}
             lock(gate)meta.Issue=opened?["number"]?.GetValue<int>() ?? 0;
         }
         SaveMeta();

@@ -69,8 +69,14 @@ What the plugin does that matters for security (read against the code of the `De
   time, and never a player's name or id; a fish caught or a bite holds the character's exact place (DEC-045), so with the day and the
   issue it can tell where that GitHub account fished on a given day; only fields the player read themself are sent, never dates, levels or
   places that came from an import (0.1134); the files this repository publishes from them keep the day only too, and are under
-  CC0-1.0, which the warning and the player's issue state (0.1012). The token is kept on the player's PC, encrypted for the Windows user (DPAPI);
-  « Disconnect » deletes it (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `CommunityDiscoveries.cs`).
+  CC0-1.0, which the warning and the player's issue state (0.1012). The sign-in is today the repository's OAuth app, which asks the scopes
+  `gist` and `public_repo` (GitHub gives no narrower ones: all the account's gists, and the public repositories it can write to); Tensho uses
+  them only for the player's one gist, always created secret, and the one issue. Once the GitHub App is in place (X-175, its client id given by
+  the maintainer): the App asks only Issues (read and write), on this repository alone, and the account's Gists (read and write), nothing else;
+  a token of the OAuth app is then forgotten and the player connects again; the App's token expires after 8 hours and is renewed before an
+  upload with its refresh token (6 months), without any client secret; a refused renewal disconnects. The token, and the refresh token,
+  are kept on the player's PC, encrypted for the Windows user (DPAPI), never in a backup copy; « Disconnect » deletes them
+  (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `GitHubSignIn.cs`, `CommunityDiscoveries.cs`).
 - **Developer mode page sweep (DEC-040)**: in developer mode only, after the self-check, Tensho draws every page once, at most once every
   two hours. A page may then make the requests it makes when the player opens it, within the player's source switches; the Market page
   (Universalis) is left out. Outside developer mode, nothing runs.
@@ -101,7 +107,7 @@ What the plugin does that matters for security (read against the code of the `De
   (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
   imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
-  `community.sha256` and the encrypted `github.token`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, notebook exports
+  `community.sha256`, the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, notebook exports
   (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
   only the GitHub exchange above sends anything. Translators can put language JSON files beside the DLL; they are validated when
@@ -229,9 +235,15 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   l'heure, et jamais le nom ou l'identifiant d'un joueur ; un poisson pris ou une touche porte l'endroit exact du personnage (DEC-045),
   donc avec le jour et le ticket elle peut dire où ce compte GitHub a pêché un jour donné ; seuls les champs relevés par le joueur
   lui-même partent, jamais des dates, niveaux ou lieux venus d'un import (0.1134) ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
-  jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). Le jeton est gardé sur le PC du joueur, chiffré pour
-  l'utilisateur Windows (DPAPI) ; « Déconnecter » l'efface (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`,
-  `CommunityDiscoveries.cs`).
+  jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). La connexion passe aujourd'hui par l'application OAuth
+  du dépôt, qui demande les droits `gist` et `public_repo` (GitHub n'en donne pas de plus étroits : tous les gists du compte, et les dépôts
+  publics où il peut écrire) ; Tensho ne s'en sert que pour le seul gist du joueur, toujours créé secret, et le seul ticket. Une fois
+  l'application GitHub en place (X-175, son identifiant client donné par le mainteneur) : elle ne demande que Issues (lecture et écriture),
+  sur ce seul dépôt, et les Gists du compte (lecture et écriture), rien d'autre ; un jeton de l'application OAuth est alors oublié et le
+  joueur se reconnecte ; le jeton de l'application expire après 8 heures et se renouvelle avant un envoi par son jeton de renouvellement
+  (6 mois), sans aucun secret client ; un renouvellement refusé déconnecte. Le jeton, et le jeton de renouvellement, sont gardés sur le PC
+  du joueur, chiffrés pour l'utilisateur Windows (DPAPI), jamais dans une copie de sauvegarde ; « Déconnecter » les efface
+  (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `GitHubSignIn.cs`, `CommunityDiscoveries.cs`).
 - **Passage des pages en mode développeur (DEC-040)** : en mode développeur seulement, après l'auto-contrôle, Tensho dessine une fois
   chaque page, au plus une fois toutes les deux heures. Une page peut alors faire les requêtes qu'elle fait quand le joueur l'ouvre, dans
   les interrupteurs de sources du joueur ; la page Marché (Universalis) est exclue. Hors mode développeur, rien ne se lance.
@@ -266,7 +278,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   une base SQLite, `Discoveries.db`, ce que le joueur a vu lui-même et ce qu'il a importé, écrite ligne par ligne ; les fichiers d'avant,
   `Discoveries.json` et `Shared/`, sont gardés une fois dans `before-sqlite-<date>/` ; les prix vus au tableau des
   ventes dans `MarketSeen.json`, sans nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur, les
-  dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community.sha256` et le `github.token` chiffré) ;
+  dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community.sha256`, le `github.token` chiffré et, avec l'application GitHub, le `github.refresh` chiffré) ;
   `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
   `SelfCheckSeen.json` et `PageSweepLast.txt`. La base de découvertes ne garde que des lignes du jeu et des lieux, jamais le nom, la
   position ou l'identifiant d'un autre joueur ; l'import fusionne les fichiers que le joueur place dans `Import/`, l'export écrit un
