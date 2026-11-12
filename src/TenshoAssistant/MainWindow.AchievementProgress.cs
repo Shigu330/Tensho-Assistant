@@ -24,11 +24,16 @@ internal sealed partial class MainWindow
         DrawProgressLine(entry.Id);
     }
 
+    // X-119 with X-173 (0.1150): in the desktop application (no watcher there: no game), the progress read from its copy of the player's data file
+    // (MainWindow.DesktopData.cs, UseDesktopAchievements); the « Ask » button only where the game can be asked.
+    private IReadOnlyDictionary<uint,AchievementProgress>? desktopAchievements;
+
     private void DrawProgressLine(uint id)
     {
-        var seen=AchievementProgressSource?.Progress.GetValueOrDefault(id);
+        var seen=(AchievementProgressSource?.Progress ?? Volatile.Read(ref desktopAchievements))?.GetValueOrDefault(id);
         if(seen is not null)ImGui.TextColored(Accent,localization.Format("AchievementProgress.Line",seen.Current.ToString("N0"),seen.Max.ToString("N0"),seen.SeenAt.ToLocalTime().ToString("t")));
         else ImGui.TextDisabled(localization.Get("AchievementProgress.Unknown"));
+        if(AchievementProgressSource is null)return;
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("AchievementProgress.Ask")+$"##Ask{id}") && AchievementProgressSource?.Request(id)==false)
             saveError=localization.Get("AchievementProgress.Wait");

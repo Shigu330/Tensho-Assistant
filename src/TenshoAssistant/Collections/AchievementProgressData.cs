@@ -54,6 +54,14 @@ public sealed class AchievementProgressData
         ReplaceAll(open,[(character,progress)],null);
     }
 
+    /// <summary>
+    /// X-119 with X-173 (0.1150): the character whose progress was seen last (ties: the smaller id), or null when none was seen: the desktop
+    /// application, with no character logged in, shows that one (as the gil journal, choice D-142).
+    /// </summary>
+    public static ulong? Latest(IReadOnlyDictionary<ulong,Dictionary<uint,AchievementProgress>> all)
+        => all.Where(pair=>pair.Value.Count>0).OrderByDescending(pair=>pair.Value.Values.Max(seen=>seen.SeenAt)).ThenBy(pair=>pair.Key)
+            .Select(pair=>(ulong?)pair.Key).FirstOrDefault();
+
     /// <summary>The data file's journal folded in (at unload).</summary>
     public void Checkpoint()=>data.Checkpoint();
 

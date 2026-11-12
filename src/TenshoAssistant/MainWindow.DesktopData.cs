@@ -36,6 +36,7 @@ internal sealed partial class MainWindow
                 UseDesktopPlayerData(folder,warn);
                 UseDesktopVoyages(folder,warn);
                 UseDesktopBank(folder,warn);
+                UseDesktopAchievements(folder,warn);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");
@@ -45,7 +46,7 @@ internal sealed partial class MainWindow
     // X-119 with X-173 (0.1147): the player's data file, the application's copy (TenshoDataDatabase.CopyForDesktop, SQLite's backup): Storage › Gil
     // shows the journal of the character with the newest entry (no character is logged in; choice D-142), its balances as last recorded. Read
     // off the frame; a newer reading replaces an older one, never the reverse. No copy: the page says offline, as before. The achievement
-    // progress stays in the game for now (its page reads the game's watcher).
+    // progress: since 0.1150 from the same copy (UseDesktopAchievements).
     // X-173 (0.1148): the voyage history from the copy of the data file once the plugin converted it (no VoyageHistory.json left to copy), from
     // the JSON copy before (the application never converts its copy itself: the next copy of the data file would undo it).
     private void UseDesktopVoyages(string folder,Action<Exception,string> warn)
@@ -64,6 +65,30 @@ internal sealed partial class MainWindow
         var previousBank=bank;
         bank=new InventoryBankService(new PerCharacterBankStore(files,legacy,data:!json && File.Exists(file) ? new TenshoDataFile(file,warn):null));
         previousBank?.Dispose();
+    }
+
+    // X-119 with X-173 (0.1150): the achievement progress from the copy of the data file (Collection › Achievements and the tracked list): the
+    // character whose progress was seen last (no character is logged in; as the gil journal, D-142). Read off the frame; a newer reading replaces
+    // an older one, never the reverse. The copy holds only what the plugin converted: the application never converts (the file of before is not
+    // copied). No copy: « not seen yet », as before.
+    private int desktopAchievementsGeneration;
+    private void UseDesktopAchievements(string folder,Action<Exception,string> warn)
+    {
+        var generation=Interlocked.Increment(ref desktopAchievementsGeneration);
+        var file=Path.Combine(folder,TenshoDataDatabase.FileName);
+        if(!File.Exists(file)){Volatile.Write(ref desktopAchievements,null);return;}
+        var progress=new Collections.AchievementProgressData(Path.Combine(folder,"AchievementProgress.json"),new TenshoDataFile(file,warn));
+        _=Task.Run(()=>
+        {
+            IReadOnlyDictionary<uint,Collections.AchievementProgress>? seen=null;
+            try
+            {
+                var all=progress.Load(DateTimeOffset.UtcNow);
+                if(Collections.AchievementProgressData.Latest(all) is { } character)seen=all[character];
+            }
+            catch(Exception error){warn(error,"The achievement progress could not be read from the copy of the Tensho data file.");return;}
+            if(Volatile.Read(ref desktopAchievementsGeneration)==generation)Volatile.Write(ref desktopAchievements,seen);
+        });
     }
 
     private Inventory.GilJournalState? desktopGil;
