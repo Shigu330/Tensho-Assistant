@@ -126,19 +126,23 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
             lock(gate)
                 if(File.Exists(file))
                 {
+                    var marked=false;
                     using(var open=opened.Open())
                     using(var transaction=open.BeginTransaction(deferred:false))
                     {
                         var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
+                        marked=converted is not null;
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value))
+                           && TenshoDataFile.StillThere(()=>VoyageHistory.Read(file)) is { } found)
                         {
-                            Write(open,transaction,VoyageHistory.Read(file),keep:true);
+                            Write(open,transaction,found,keep:true);
                             if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                            marked=true;
                         }
                         DuringSave?.Invoke();
                         transaction.Commit();
                     }
-                    data.SetAside(file,now,"voyage history");
+                    if(marked)data.SetAside(file,now,"voyage history");
                 }
         return ReadRows(opened);
     }

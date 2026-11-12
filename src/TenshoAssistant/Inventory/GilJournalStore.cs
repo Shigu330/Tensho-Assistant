@@ -40,13 +40,19 @@ public sealed class GilJournalStore
             lock(gate)
                 if(File.Exists(json))
                 {
+                    var marked=true;
                     using(var open=opened.Open())
                     {
-                        if(ConvertedAt(open,character) is not { } converted)WriteRows(open,character,GilJournal.Read(json),now);
+                        if(ConvertedAt(open,character) is not { } converted)
+                        {
+                            if(TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } found)WriteRows(open,character,found,now);
+                            else marked=false;
+                        }
                         // X-182 (0.1169, night review N3): written again after the conversion (an older version still running): merged.
-                        else if(TenshoDataFile.WrittenAgain(json,converted))WriteRows(open,character,Merge(ReadRows(opened,character),GilJournal.Read(json)),null);
+                        else if(TenshoDataFile.WrittenAgain(json,converted) && TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } again)
+                            WriteRows(open,character,Merge(ReadRows(opened,character),again),null);
                     }
-                    data.SetAside(json,now,"gil journal");
+                    if(marked)data.SetAside(json,now,"gil journal");
                 }
         return ReadRows(opened,character);
     }

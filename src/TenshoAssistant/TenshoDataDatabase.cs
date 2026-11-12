@@ -244,13 +244,27 @@ public sealed class TenshoDataFile
     /// </summary>
     public static bool WrittenAgain(string file,DateTimeOffset converted)
     {
-        if(!File.Exists(file) || File.GetLastWriteTimeUtc(file)<=converted.UtcDateTime)return false;
-        var length=new FileInfo(file).Length;
-        var name=System.IO.Path.GetFileNameWithoutExtension(file);var extension=System.IO.Path.GetExtension(file);
-        foreach(var aside in Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!,"before-sqlite-*"))
-            foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
-                if(new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file)))return false;
-        return true;
+        try
+        {
+            if(!File.Exists(file) || File.GetLastWriteTimeUtc(file)<=converted.UtcDateTime)return false;
+            var length=new FileInfo(file).Length;
+            var name=System.IO.Path.GetFileNameWithoutExtension(file);var extension=System.IO.Path.GetExtension(file);
+            foreach(var aside in Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!,"before-sqlite-*"))
+                foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
+                    if(new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file)))return false;
+            return true;
+        }
+        catch(Exception error) when(error is FileNotFoundException or DirectoryNotFoundException){return false;}
+    }
+
+    /// <summary>
+    /// X-182 (0.1171, found by the CI on 0.1169): a file of before read while another client may be moving it aside (it converted first): gone or
+    /// held meanwhile (not found, in use), it gives null and nothing is written nor marked; the file is moved only by a client that saw it converted.
+    /// </summary>
+    public static T? StillThere<T>(Func<T> read) where T:class
+    {
+        try{return read();}
+        catch(IOException){return null;}
     }
 
     /// <summary>

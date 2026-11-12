@@ -35,19 +35,23 @@ public sealed class AchievementProgressData
                 {
                     // X-182 (0.1169, night review N3): read in an immediate transaction; a file written again after the conversion (an older
                     // version still running) is merged the same way as a save: the newest reading of each achievement wins.
+                    var marked=false;
                     using(var open=opened.Open())
                     using(var transaction=open.BeginTransaction(deferred:false))
                     {
                         var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
+                        marked=converted is not null;
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value))
+                           && TenshoDataFile.StillThere(ReadFile) is { } found)
                         {
-                            Upsert(open,transaction,ReadFile().Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
+                            Upsert(open,transaction,found.Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
                             if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                            marked=true;
                         }
                         DuringSave?.Invoke();
                         transaction.Commit();
                     }
-                    data.SetAside(file,now,"achievement progress");
+                    if(marked)data.SetAside(file,now,"achievement progress");
                 }
         return ReadRows(opened);
     }

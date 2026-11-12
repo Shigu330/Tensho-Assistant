@@ -24,6 +24,8 @@ public sealed class GitHubExchangeMeta
     /// <summary>X-175: when the token and its refresh token expire (null: never, the OAuth app's tokens).</summary>
     public DateTimeOffset? TokenExpires { get; set; }
     public DateTimeOffset? RefreshExpires { get; set; }
+    /// <summary>X-181 (0.1171, night review N30): the login that owns the gist and the issue (empty: not known, before 0.1171).</summary>
+    public string GistLogin { get; set; }="";
 }
 
 /// <summary>X-175 (1138): an exchange stopped with a message of its own (App not installed, sign-in expired), the token forgotten when <paramref name="Forget"/>.</summary>
@@ -56,6 +58,14 @@ public sealed class GitHubExchange : IDisposable
     private readonly CancellationTokenSource stop=new();
     private readonly object gate=new(),marks=new();
     private string? token,refresh;private GitHubExchangeMeta meta=new();private DateTimeOffset tried;private bool busy;
+    // X-181 (0.1171, night review N2, N7, N8): Disconnect changes the generation: a work started before keeps nothing and sends nothing after it.
+    // The secrets are written under their own gate (never after a Disconnect removed them); a write that failed is tried again (the pair stays in
+    // memory). A renewal runs under a lock file shared by every client of this profile, not tied to the plugin's stop.
+    private int generation,workGeneration;private bool secretsUnsaved;private Task? refreshing;
+    private readonly object secretsGate=new();
+    /// <summary>X-181: the longest wait for the other client's renewal (beyond the renewal's own deadline).</summary>
+    internal TimeSpan LockWait { get; init; }=TimeSpan.FromSeconds(45);
+    internal static readonly TimeSpan RefreshDeadline=TimeSpan.FromSeconds(30);
     /// <summary>X-175: the shortest wait between two polls of the device flow (GitHub asks 5 seconds; the behaviour tests wait less).</summary>
     internal TimeSpan PollFloor { get; init; }=TimeSpan.FromSeconds(5);
     private string? userCode,verifyAddress;private ExchangeMessage? message;
@@ -70,6 +80,7 @@ public sealed class GitHubExchange : IDisposable
     private string TokenPath=>Path.Combine(folder,"github.token");
     private string RefreshPath=>Path.Combine(folder,"github.refresh");
     private string MetaPath=>Path.Combine(folder,"github.json");
+    private string LockPath=>Path.Combine(folder,"github.lock");
     private string CommonMarker=>Path.Combine(folder,"community.sha256");
     /// <summary>X-174 (0.1137): the hash of each v3 kind file taken, by kind number ({"10":"HEX",…}), noted once a save holds its facts.</summary>
     private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
@@ -99,14 +110,14 @@ public sealed class GitHubExchange : IDisposable
 
     private bool Start(Func<Task<ExchangeMessage>> work)
     {
-        lock(gate){if(busy)return false;busy=true;message=null;tried=DateTimeOffset.UtcNow;}
+        lock(gate){if(busy)return false;busy=true;message=null;tried=DateTimeOffset.UtcNow;workGeneration=generation;}
         _=Task.Run(async()=>
         {
             ExchangeMessage result;
             try{result=await work().ConfigureAwait(false);}
             catch(OperationCanceledException){result=new("ExchangeStopped");}
             catch(ExchangeRefused refused){if(refused.Forget)Disconnect();result=new(refused.Key);}
-            catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){Disconnect();result=new("ExchangeUnauthorized");}
+            catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){ForgetIfStill(null);result=new("ExchangeUnauthorized");}
             catch(Exception error){result=new("ExchangeFailed",error.GetType().Name);}
             lock(gate){message=result;busy=false;userCode=null;}
         });
@@ -119,29 +130,101 @@ public sealed class GitHubExchange : IDisposable
     /// <summary>Forgets the token on this PC, and its refresh token (the authorization itself is revoked on github.com › Settings › Applications).</summary>
     public void Disconnect()
     {
-        lock(gate){token=null;refresh=null;meta.Login="";meta.ClientId="";meta.TokenExpires=null;meta.RefreshExpires=null;}
-        try{File.Delete(TokenPath);}catch(Exception){}
-        try{File.Delete(RefreshPath);}catch(Exception){}
+        lock(secretsGate)
+        {
+            lock(gate){generation++;token=null;refresh=null;secretsUnsaved=false;meta.Login="";meta.ClientId="";meta.TokenExpires=null;meta.RefreshExpires=null;}
+            try{File.Delete(TokenPath);}catch(Exception){}
+            try{File.Delete(RefreshPath);}catch(Exception){}
+        }
         SaveMeta();
+    }
+
+    /// <summary>
+    /// X-181 (0.1171, night review N2): a refusal forgets the sign-in only when the files still hold what this client used (the refresh token
+    /// refused, or with none given, the token); another client that renewed meanwhile left a new pair: it is taken, never removed.
+    /// </summary>
+    private void ForgetIfStill(string? usedRefresh)
+    {
+        string? used;lock(gate)used=usedRefresh is null ? token:usedRefresh;
+        var disk=ReadSecrets();
+        if(disk is { } found && (usedRefresh is null ? found.Token!=used:found.Refresh!=used)){Adopt(found);return;}
+        Disconnect();
+    }
+
+    private sealed record Secrets(string Token,string? Refresh,DateTimeOffset? Expires,DateTimeOffset? RefreshExpires,string ClientId);
+    /// <summary>X-181: the pair as this profile's files hold it now (another client may have renewed it), or null without a token file.</summary>
+    private Secrets? ReadSecrets()
+    {
+        try
+        {
+            if(!File.Exists(TokenPath))return null;
+            var access=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(TokenPath)));
+            var renewal=File.Exists(RefreshPath) ? Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(RefreshPath))):null;
+            var saved=File.Exists(MetaPath) ? JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)):null;
+            return new(access,renewal,saved?.TokenExpires,saved?.RefreshExpires,saved?.ClientId ?? "");
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or System.ComponentModel.Win32Exception or System.Security.Cryptography.CryptographicException){return null;}
+    }
+    private void Adopt(Secrets found)
+    {
+        lock(gate){token=found.Token;refresh=found.Refresh;meta.TokenExpires=found.Expires;meta.RefreshExpires=found.RefreshExpires;if(found.ClientId.Length>0)meta.ClientId=found.ClientId;}
+    }
+
+    /// <summary>X-181: the lock file shared by every client of this profile around a renewal (one renewal at a time); IOException past <see cref="LockWait"/>.</summary>
+    private async Task<FileStream> HoldLock()
+    {
+        Directory.CreateDirectory(folder);
+        var until=DateTime.UtcNow+LockWait;
+        while(true)
+        {
+            try{return new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
+            catch(IOException) when(DateTime.UtcNow<until){await Task.Delay(50).ConfigureAwait(false);}
+        }
     }
 
     /// <summary>
     /// X-175: keeps a token on this PC, protected for this Windows user (DPAPI). The refresh token first: GitHub ends the old one at each refresh, so a
     /// stop between the two writes leaves the new refresh token beside an old access token, renewed again at the next use (never the reverse).
     /// </summary>
-    private void Keep(GitHubToken granted,string? login=null)
+    /// <remarks>X-181 (0.1171, night review N7, N8, N30): nothing kept when the player disconnected since the work began (false); the pair in memory
+    /// first, then written (a write that fails is tried again before the next use, the pair is never lost); another login than the gist's owner
+    /// starts a gist and an issue of its own.</remarks>
+    private bool Keep(GitHubToken granted,int started,string? login=null)
     {
-        Directory.CreateDirectory(folder);
-        if(granted.Refresh is { } renewal)AtomicFile.Write(RefreshPath,UserSecret.Protect(Encoding.UTF8.GetBytes(renewal)));
-        else try{File.Delete(RefreshPath);}catch(Exception){}
-        AtomicFile.Write(TokenPath,UserSecret.Protect(Encoding.UTF8.GetBytes(granted.Access)));
         lock(gate)
         {
-            token=granted.Access;refresh=granted.Refresh;
+            if(started!=generation)return false;
+            token=granted.Access;refresh=granted.Refresh;secretsUnsaved=true;
             meta.ClientId=signIn.ClientId;meta.TokenExpires=granted.Expires;meta.RefreshExpires=granted.RefreshExpires;
-            if(login is not null)meta.Login=login;
+            if(login is not null)
+            {
+                meta.Login=login;
+                if(meta.GistLogin.Length>0 && login.Length>0 && !string.Equals(meta.GistLogin,login,StringComparison.OrdinalIgnoreCase))
+                {meta.GistId="";meta.Issue=0;meta.GistFiles=[];meta.UploadHash="";meta.GistLogin="";}
+            }
         }
+        WriteSecrets();
         SaveMeta();
+        return true;
+    }
+    /// <summary>X-181: the pair in memory written to the files (refresh token first), unless a Disconnect came since; false when the write failed.</summary>
+    private bool WriteSecrets()
+    {
+        lock(secretsGate)
+        {
+            string? access,renewal;
+            lock(gate){if(!secretsUnsaved || token is null)return true;access=token;renewal=refresh;}
+            try
+            {
+                Directory.CreateDirectory(folder);
+                if(renewal is not null)AtomicFile.Write(RefreshPath,UserSecret.Protect(Encoding.UTF8.GetBytes(renewal)));
+                else if(File.Exists(RefreshPath))File.Delete(RefreshPath);
+                AtomicFile.Write(TokenPath,UserSecret.Protect(Encoding.UTF8.GetBytes(access)));
+                lock(gate)if(token==access && refresh==renewal)secretsUnsaved=false;
+                return true;
+            }
+            catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
+        }
     }
 
     /// <summary>
@@ -149,18 +232,40 @@ public sealed class GitHubExchange : IDisposable
     /// by GitHub: the sign-in has ended, the token is forgotten and the player is asked to connect again. GitHub not reached: the exchange fails, the
     /// token is kept for the next try.
     /// </summary>
-    private async Task Fresh()
+    /// <remarks>X-181 (0.1171, night review N2, N8, N29): under the profile's lock file, the files read again first: a pair renewed by another client
+    /// is taken without asking GitHub; a refusal forgets the sign-in only when the files still hold the refresh token refused. The request has its
+    /// own deadline, not the plugin's stop: a renewal GitHub accepted is kept even when the plugin unloads meanwhile (Dispose waits for it a little).
+    /// <paramref name="force"/>: renewed even when not due (a 401 with a refresh token in hand).</remarks>
+    private async Task Fresh(bool force=false)
     {
-        string? renewal;DateTimeOffset? expires,ends;
-        lock(gate){renewal=refresh;expires=meta.TokenExpires;ends=meta.RefreshExpires;}
-        var now=clock();
-        if(!GitHubSignIn.Due(expires,now))return;
-        if(renewal is null || GitHubSignIn.Ended(ends,now))throw new ExchangeRefused("ExchangeExpired",true);
+        string? renewal;DateTimeOffset? expires,ends;int started;
+        lock(gate){renewal=refresh;expires=meta.TokenExpires;ends=meta.RefreshExpires;started=workGeneration;}
+        if(!force && !GitHubSignIn.Due(expires,clock()))return;
+        using var held=await HoldLock().ConfigureAwait(false);
+        if(ReadSecrets() is { } disk && disk.Refresh is not null && disk.Refresh!=renewal)
+        {
+            Adopt(disk);
+            if(!GitHubSignIn.Due(disk.Expires,clock()))return;
+            (renewal,ends)=(disk.Refresh,disk.RefreshExpires);
+        }
+        lock(gate)if(started!=generation)throw new OperationCanceledException("Disconnected.");
+        if(renewal is null || GitHubSignIn.Ended(ends,clock())){ForgetIfStill(renewal);throw new ExchangeRefused("ExchangeExpired",false);}
+        var work=RenewAndKeep(renewal,started);
+        lock(gate)refreshing=work;
+        bool? kept;
+        try{kept=await work.ConfigureAwait(false);}
+        finally{lock(gate)refreshing=null;}
+        if(kept is null){ForgetIfStill(renewal);throw new ExchangeRefused("ExchangeExpired",false);}
+        if(kept==false)throw new OperationCanceledException("Disconnected.");
+    }
+    // The renewal asked and its pair kept, as one task Dispose can wait for: true kept, false disconnected meanwhile, null refused by GitHub.
+    private async Task<bool?> RenewAndKeep(string renewal,int started)
+    {
         JsonObject answer;
-        try{answer=await Form("https://github.com/login/oauth/access_token",signIn.RefreshFields(renewal)).ConfigureAwait(false);}
-        catch(HttpRequestException error) when(error.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
-        {throw new ExchangeRefused("ExchangeExpired",true);}
-        Keep(GitHubSignIn.ReadToken(answer,clock()) ?? throw new ExchangeRefused("ExchangeExpired",true));
+        using(var deadline=new CancellationTokenSource(RefreshDeadline))
+            try{answer=await Form("https://github.com/login/oauth/access_token",signIn.RefreshFields(renewal),deadline.Token).ConfigureAwait(false);}
+            catch(HttpRequestException error) when(error.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden){return null;}
+        return GitHubSignIn.ReadToken(answer,clock()) is { } granted ? Keep(granted,started):null;
     }
 
     private async Task<ExchangeMessage> ConnectAsync()
@@ -177,7 +282,8 @@ public sealed class GitHubExchange : IDisposable
             if(GitHubSignIn.ReadToken(answer,clock()) is { } granted)
             {
                 var user=await Api(HttpMethod.Get,"https://api.github.com/user",null,granted.Access).ConfigureAwait(false);
-                Keep(granted,user?["login"]?.GetValue<string>() ?? "");
+                int started;lock(gate)started=workGeneration;
+                if(!Keep(granted,started,user?["login"]?.GetValue<string>() ?? ""))return new("ExchangeStopped");
                 return new("ConnectDone",Login);
             }
             switch(answer["error"]?.GetValue<string>())
@@ -204,7 +310,17 @@ public sealed class GitHubExchange : IDisposable
             string known;lock(gate)known=meta.UploadHash;
             if(mine.Facts.Count==0)sent="ShareEmpty";
             else if(hash==known)sent="SentSame";
-            else{await Fresh().ConfigureAwait(false);await Upload(files).ConfigureAwait(false);lock(gate)meta.UploadHash=hash;sent="Sent";}
+            else
+            {
+                // X-181 (0.1171): a pair whose write failed before is written again first (night review N8).
+                WriteSecrets();
+                await Fresh().ConfigureAwait(false);
+                // N29: a 401 with a refresh token in hand (a PC clock late, a token ended early): renewed once, sent once more, before forgetting.
+                try{await Upload(files).ConfigureAwait(false);}
+                catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
+                {await Fresh(force:true).ConfigureAwait(false);await Upload(files).ConfigureAwait(false);}
+                lock(gate)meta.UploadHash=hash;sent="Sent";
+            }
         }
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
@@ -301,7 +417,7 @@ public sealed class GitHubExchange : IDisposable
             gist=created?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
             lock(gate){meta.GistId=gist;meta.Issue=0;}
         }
-        lock(gate)meta.GistFiles=[..contents.Keys];
+        lock(gate){meta.GistFiles=[..contents.Keys];if(meta.Login.Length>0)meta.GistLogin=meta.Login;}
         // X-175: the gist kept before the issue, so a refused issue does not make a second gist at the next exchange.
         SaveMeta();
         int issue;lock(gate)issue=meta.Issue;
@@ -327,11 +443,13 @@ public sealed class GitHubExchange : IDisposable
         SaveMeta();
     }
 
-    private async Task<JsonObject> Form(string address,Dictionary<string,string> fields)
+    private bool HasRefresh{get{lock(gate)return refresh is not null;}}
+
+    private async Task<JsonObject> Form(string address,Dictionary<string,string> fields,CancellationToken? cancel=null)
     {
         var request=new HttpRequestMessage(HttpMethod.Post,address){Content=new FormUrlEncodedContent(fields)};
         request.Headers.Accept.ParseAdd("application/json");
-        var text=await Community.BoundedHttp.SendAsync(client,request,64*1024,stop.Token).ConfigureAwait(false);
+        var text=await Community.BoundedHttp.SendAsync(client,request,64*1024,cancel ?? stop.Token).ConfigureAwait(false);
         return JsonNode.Parse(text)?.AsObject() ?? throw new InvalidDataException("Empty answer.");
     }
 
@@ -340,7 +458,13 @@ public sealed class GitHubExchange : IDisposable
         var request=new HttpRequestMessage(method,address);
         request.Headers.Accept.ParseAdd("application/vnd.github+json");
         request.Headers.Add("X-GitHub-Api-Version","2022-11-28");
-        string? bearer;lock(gate)bearer=with ?? token;
+        // X-181 (0.1171, night review N7): after a Disconnect nothing is sent with the player's token (no gist, no issue).
+        string? bearer;
+        lock(gate)
+        {
+            if(with is null && (token is null || workGeneration!=generation))throw new OperationCanceledException("Disconnected.");
+            bearer=with ?? token;
+        }
         if(bearer is not null)request.Headers.Authorization=new AuthenticationHeaderValue("Bearer",bearer);
         if(body is not null)request.Content=new StringContent(body.ToJsonString(),Encoding.UTF8,"application/json");
         var text=await Community.BoundedHttp.SendAsync(client,request,4*1024*1024,stop.Token).ConfigureAwait(false);
@@ -357,7 +481,15 @@ public sealed class GitHubExchange : IDisposable
         catch(Exception){}
     }
 
-    public void Dispose(){stop.Cancel();client.Dispose();}
+    /// <summary>X-181 (0.1171, night review N8): a renewal in flight is given a few seconds to finish and be kept before the client closes.</summary>
+    public void Dispose()
+    {
+        stop.Cancel();
+        Task? pending;lock(gate)pending=refreshing;
+        try{pending?.Wait(TimeSpan.FromSeconds(5));}catch(AggregateException){}
+        WriteSecrets();
+        client.Dispose();
+    }
 }
 
 /// <summary>X-77.1 (0.883): a secret kept on this PC for this Windows user only (DPAPI, CryptProtectData), so the token is never written in clear.</summary>

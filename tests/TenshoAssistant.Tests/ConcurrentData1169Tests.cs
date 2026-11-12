@@ -103,8 +103,11 @@ internal static class ConcurrentData1169Tests
             Check(journal.SequenceEqual([one, two]) && !File.Exists(gil), "gils: both entries, in time order, once");
             Check(GilJournalStore.Merge([one, two], [two, one]).SequenceEqual([one, two]), "merge: every entry once");
         })),
-        ("Concurrent data 1169: a second client loading during the conversion counts every voyage once (N28)", () => InTemp(root =>
+        ("Concurrent data 1169: a second client loading during the conversion counts every voyage once (N28; 0.1171: 20 times, the file moved under it)", () => InTemp(top =>
         {
+          for (var round = 0; round < 20; round++)
+          {
+            var root = Path.Combine(top, "round" + round); Directory.CreateDirectory(root);
             var file = Path.Combine(root, "VoyageHistory.json");
             VoyageHistory.Write(file, [Record(100, 0, At, 21), Record(100, 1, At.AddHours(1), 22), Record(200, 0, At.AddHours(2), 23)]);
             Task<List<VoyageRecord>>? other = null;
@@ -114,6 +117,7 @@ internal static class ConcurrentData1169Tests
             Check(other is not null && other.Wait(TimeSpan.FromSeconds(20)) && other.Result.Count == 3, "the second client: three voyages, never an empty history");
             using var open = new TenshoDataDatabase(Path.Combine(root, TenshoDataDatabase.FileName)).Open();
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM voyage_records;")) == 3, "three rows");
+          }
         })),
         ("Concurrent data 1169: two conversions of the discoveries at once: one whole base, the old files kept once, no temporary file left (N11)", () => InTemp(root =>
         {
