@@ -203,26 +203,28 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>Text for an issue: version, language, data states and errors, settings that change behaviour; no character data.</summary>
-    private string BugReport()
+    // 0.1125 (X-143 part 3, audit A08): built from a closed list of fields (ProblemReport.DiagnosticFields), each cleaned and bounded there;
+    // the error texts of the catalogues are free text, so they go through the same cleaning as the rest.
+    private string BugReport() => TenshoAssistant.Help.ProblemReport.Diagnostic(BugReportFields());
+
+    private IEnumerable<(string Field, string Value)> BugReportFields()
     {
-        var text=new StringBuilder();
-        text.AppendLine($"Tensho Assistant {BuildVersion} · {localization.CurrentCode} · page {page}");
-        text.AppendLine($"Items {itemCatalog.State.Catalog?.Count.ToString() ?? "loading"} {itemCatalog.State.Error}");
-        text.AppendLine($"Recipes {recipeCatalog.State.Catalog?.Count.ToString() ?? "loading"} {recipeCatalog.State.Error}");
-        text.AppendLine($"Gathering {gatheringCatalog.State.Catalog?.Count.ToString() ?? "loading"} {gatheringCatalog.State.Error}");
-        text.AppendLine($"Maps {maps.State.Catalog?.Entries.Count.ToString() ?? "loading"} {maps.State.Error}");
-        text.AppendLine($"Weather {weather.State.Catalog?.ZoneCount.ToString() ?? "loading"} {weather.State.Error}");
-        text.AppendLine($"Vendors {npcVendors?.State.Catalog?.VendorCount.ToString() ?? "loading"} {npcVendors?.State.Error}");
-        text.AppendLine($"Duties {duties.State.Catalog?.Entries.Count.ToString() ?? "loading"}");
-        text.AppendLine($"Lumina {(configuration.CommunityLumina ? "on":"off")} {(lumina?.State.Data is { } data ? data.Duties+" duties":lumina?.State.Error ?? "not loaded")}");
-        text.AppendLine($"Garland {(configuration.CommunityGarland ? "on":"off")} · Wiki {(configuration.CommunityWiki ? "on":"off")} · Universalis {(configuration.CommunityUniversalis ? "on":"off")} · Market hover {configuration.MarketPricesOnHover} ({market.State.WorldName}) {market.State.Error}");
-        text.AppendLine($"Quests {quests.State.Entries.Count} {quests.State.Error} · Collections {collections.State.Entries.Count} {collections.State.Error}");
-        text.AppendLine($"Alarms {configuration.Alarms?.Count ?? 0} · in game {configuration.Alarms?.Count(alarm=>alarm.GameName.Length>0) ?? 0} · game list {alarmService?.GameAlarms?.Count.ToString() ?? "?"} · status {alarmService?.GameStatus}");
+        yield return ("Tensho", $"{BuildVersion} · {localization.CurrentCode} · page {page}");
+        yield return ("Items", $"{itemCatalog.State.Catalog?.Count.ToString() ?? "loading"} {itemCatalog.State.Error}");
+        yield return ("Recipes", $"{recipeCatalog.State.Catalog?.Count.ToString() ?? "loading"} {recipeCatalog.State.Error}");
+        yield return ("Gathering", $"{gatheringCatalog.State.Catalog?.Count.ToString() ?? "loading"} {gatheringCatalog.State.Error}");
+        yield return ("Maps", $"{maps.State.Catalog?.Entries.Count.ToString() ?? "loading"} {maps.State.Error}");
+        yield return ("Weather", $"{weather.State.Catalog?.ZoneCount.ToString() ?? "loading"} {weather.State.Error}");
+        yield return ("Vendors", $"{npcVendors?.State.Catalog?.VendorCount.ToString() ?? "loading"} {npcVendors?.State.Error}");
+        yield return ("Duties", duties.State.Catalog?.Entries.Count.ToString() ?? "loading");
+        yield return ("Lumina", $"{(configuration.CommunityLumina ? "on":"off")} {(lumina?.State.Data is { } data ? data.Duties+" duties":lumina?.State.Error ?? "not loaded")}");
+        yield return ("Community", $"Garland {(configuration.CommunityGarland ? "on":"off")} · Wiki {(configuration.CommunityWiki ? "on":"off")} · Universalis {(configuration.CommunityUniversalis ? "on":"off")} · Market hover {configuration.MarketPricesOnHover} ({market.State.WorldName}) {market.State.Error}");
+        yield return ("Quests", $"{quests.State.Entries.Count} {quests.State.Error} · Collections {collections.State.Entries.Count} {collections.State.Error}");
+        yield return ("Alarms", $"{configuration.Alarms?.Count ?? 0} · in game {configuration.Alarms?.Count(alarm=>alarm.GameName.Length>0) ?? 0} · game list {alarmService?.GameAlarms?.Count.ToString() ?? "?"} · status {alarmService?.GameStatus}");
         // R-12: the webhook address is a secret and never appears here, only whether one is set.
         var discordState=discordNotifier?.State;
-        text.AppendLine($"Discord {(configuration.Discord?.Enabled==true ? "on":"off")} · webhook {(string.IsNullOrEmpty(configuration.Discord?.WebhookUrl) ? "empty":DiscordWebhookShape())} · sent {discordState?.Sent ?? 0} failed {discordState?.Failed ?? 0} dropped {discordState?.Dropped ?? 0} · last {discordState?.Status} {discordState?.Code}");
-        text.AppendLine($"Context item {itemId}");
-        return text.ToString();
+        yield return ("Discord", $"{(configuration.Discord?.Enabled==true ? "on":"off")} · webhook {(string.IsNullOrEmpty(configuration.Discord?.WebhookUrl) ? "empty":DiscordWebhookShape())} · sent {discordState?.Sent ?? 0} failed {discordState?.Failed ?? 0} dropped {discordState?.Dropped ?? 0} · last {discordState?.Status} {discordState?.Code}");
+        yield return ("Context item", itemId.ToString());
     }
 
     // Developer mode: help for contributors (open source), at the top of Diagnostics.

@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1125.0
+- Plan global, X-143 : Rapport de problème sans fuite (audit A08) : Aide › Signaler un problème montre d'abord un aperçu de ce qui sera envoyé (les textes exacts mis dans l'adresse du formulaire, et dans le presse-papiers quand ils sont trop longs) ; le navigateur ne s'ouvre qu'après « Ouvrir dans mon navigateur », et un champ changé ferme l'aperçu. Le rapport de diagnostic est construit d'une liste fermée de champs, une ligne chacun, bornée. Les chemins sont masqués en entier, dossiers avec espaces et chemins réseau compris, ainsi que les noms d'utilisateur et d'ordinateur Windows ; l'auto-contrôle utilise le même nettoyage.
+- Tests : ReportPrivacy1125Tests. Verify.ps1 (agent) : 1859/1859, 0 avertissement, 0 erreur ; DLL 0.1125.0.0. Non validé en jeu.
+### English
+- Problem report without leaks (audit A08): Help › Report a problem first shows a preview of what will be sent (the exact texts put in the form's address, and in the clipboard when they are too long); the browser opens only after « Open in my browser », and a changed field closes the preview. The diagnosis is built from a closed list of fields, one bounded line each. Paths are masked whole, folders with spaces and network paths included, and so are the Windows user and computer names; the self-check uses the same cleaning.
+
 ## 0.1124.0
 - Plan global, X-143 : Universalis coupé pour de bon (audit A07) : une requête qui attendait son créneau (la pause de 3 secondes entre deux requêtes) ne part plus si Universalis vient d'être désactivé dans Paramètres › Avancé : le réglage est relu juste avant chaque envoi, pour le tableau du marché, les prix des listes et la vitesse de vente qui les suit ; le tableau dit alors que la source est coupée et montre ce qui était connu.
 - Tests : UniversalisOff1124Tests. Verify.ps1 (agent) : 1854/1854, 0 avertissement, 0 erreur ; DLL 0.1124.0.0. Non validé en jeu.

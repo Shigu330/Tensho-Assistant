@@ -61,7 +61,7 @@ internal static class HelpTests
             Check(ProblemReport.Link(new(ProblemKind.Bug,"See C:\\Users\\Me\\a","","","","v","c")).Url.Contains("%3Cpath%3E"),"also in the title");
             Check(ProblemReport.SearchAddress("map flag").EndsWith("/issues?q=is%3Aissue%20map%20flag",StringComparison.Ordinal),"search");
             var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
-            Check(!help.Contains("HttpClient") && help.Contains("Dalamud.Utility.Util.OpenLink(link.Url)"),"the browser opens, the plugin sends nothing");
+            Check(!help.Contains("HttpClient") && help.Contains("Dalamud.Utility.Util.OpenLink(preview.Send.Url)"),"the browser opens, the plugin sends nothing");
         }),
         ("Community guides: hosts, rows and order; a broken list is refused whole",() =>
         {

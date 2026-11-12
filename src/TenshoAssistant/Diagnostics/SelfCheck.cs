@@ -62,7 +62,8 @@ public static partial class SelfCheck
     /// <summary>One line, bounded, without the paths that would name the user's folders.</summary>
     public static string Clean(string? text)
     {
-        var line = PathPattern().Replace((text ?? "unknown error").ReplaceLineEndings(" "), "<path>").Trim();
+        // 0.1125 (X-143 part 3, audit A08): the same cleaning as a problem report (folders with spaces, network paths, user and computer names).
+        var line = TenshoAssistant.Help.ProblemReport.Clean((text ?? "unknown error").ReplaceLineEndings(" ")).Trim();
         return line.Length <= MaximumError ? line : line[..MaximumError] + "…";
     }
 
@@ -71,9 +72,6 @@ public static partial class SelfCheck
         int Count(SelfCheckStatus status) => lines.Count(line => line.Status == status);
         return $"Selftest done ({reason}): {Count(SelfCheckStatus.Ok)} ok, {Count(SelfCheckStatus.Seen)} seen earlier, {Count(SelfCheckStatus.NotRead)} not read, {Count(SelfCheckStatus.Suspect)} suspect, {Count(SelfCheckStatus.Failed)} failed.";
     }
-
-    [GeneratedRegex(@"[A-Za-z]:[\\/][^\s""']+")]
-    private static partial Regex PathPattern();
 }
 
 /// <summary>

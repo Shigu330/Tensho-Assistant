@@ -199,11 +199,16 @@ internal sealed partial class MainWindow
     private int problemKind;
     private string problemTitle = string.Empty, problemWhat = string.Empty, problemExpected = string.Empty, problemReport = string.Empty;
     private bool problemLeftOut;
+    // 0.1125 (X-143 part 3, audit A08): the browser opens only from the preview, which shows the exact strings of the address and the clipboard;
+    // a change to the draft after the preview drops it (the player confirms what is sent, not an older text).
+    private (ProblemDraft Draft, ProblemSend Send)? problemPreview;
+    private ProblemDraft ProblemDraftNow(ProblemKind kind)
+        => new(kind, problemTitle, problemWhat, problemExpected, problemReport, BuildVersion, kind == ProblemKind.Translation ? localization.CurrentCode : $"Plugin language {localization.CurrentCode}");
 
     private string ProblemReportText()
     {
         var text = new StringBuilder(BugReport());
-        if (SelfCheck?.LastLines is { Count: > 0 } lines) foreach (var line in lines) text.AppendLine(line.Format());
+        if (SelfCheck?.LastLines is { Count: > 0 } lines) foreach (var line in lines) text.AppendLine(ProblemReport.Clean(line.Format()));
         text.AppendLine("Sent from the in-game form.");
         return ProblemReport.Clean(text.ToString());
     }
@@ -246,14 +251,34 @@ internal sealed partial class MainWindow
         {
             if (ImGui.SmallButton(localization.Get("Help.FormOpen")))
             {
-                var link = ProblemReport.Link(new(kind, problemTitle, problemWhat, problemExpected, problemReport, BuildVersion, kind == ProblemKind.Translation ? localization.CurrentCode : $"Plugin language {localization.CurrentCode}"));
-                problemLeftOut = link.ReportLeftOut;
-                if (link.ReportLeftOut) ImGui.SetClipboardText(ProblemReport.Clean($"{problemWhat}\n\n{problemExpected}\n\n{problemReport}"));
-                Dalamud.Utility.Util.OpenLink(link.Url);
+                var draft = ProblemDraftNow(kind);
+                problemPreview = (draft, ProblemReport.Prepare(draft));
+                problemLeftOut = false;
             }
         }
         finally { ImGui.EndDisabled(); }
         Tip("Help.FormOpenTip");
+        if (problemPreview is { } preview)
+        {
+            if (ProblemDraftNow(kind) != preview.Draft) problemPreview = null;
+            else
+            {
+                ImGui.TextColored(Accent, localization.Get("Help.FormPreview"));
+                var shown = preview.Send.Preview();
+                ImGui.InputTextMultiline("##ProblemPreview", ref shown, Math.Max(shown.Length + 1, 16), new Vector2(size.X, 150), ImGuiInputTextFlags.ReadOnly); Tip("Help.FormPreviewTip");
+                if (ImGui.SmallButton(localization.Get("Help.FormSend")))
+                {
+                    problemLeftOut = preview.Send.ReportLeftOut;
+                    if (preview.Send.Clipboard is { } clipboard) ImGui.SetClipboardText(clipboard);
+                    Dalamud.Utility.Util.OpenLink(preview.Send.Url);
+                    problemPreview = null;
+                }
+                Tip("Help.FormSendTip");
+                ImGui.SameLine();
+                if (ImGui.SmallButton(localization.Get("Help.FormCancel"))) problemPreview = null;
+                Tip("Help.FormCancelTip");
+            }
+        }
         if (problemLeftOut) ImGui.TextColored(Accent, localization.Get("Help.FormLeftOut"));
         if (ImGui.SmallButton(localization.Get("Help.FormSecurity"))) Dalamud.Utility.Util.OpenLink(ProblemReport.SecurityAddress);
         Tip("Help.FormSecurityTip");
