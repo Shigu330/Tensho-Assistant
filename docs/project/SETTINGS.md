@@ -18,6 +18,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 |---|---|---|---|---|
 | `(Advanced.DesktopAutoUpdate)` | — | — | Settings › Advanced | **Automatic update of the desktop app** — The desktop app updates itself at its start to the installed plugin's version (from the same GitHub release, SHA-256 checked); kept in the app's own file, as its « Automatic update » button. Default: on. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Game data and what you observed only** — Turns off the eight community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you untick it. Your discoveries and the shared ones stay. Default: off. |
+| `(Advanced.PagePlace)` | — | — | Settings › Advanced | **Listed in** — Where this page is listed in the navigation: in the game and in the desktop app, in the game only, or in the desktop app only. A page left out of a navigation still opens from a link, a command or another page. Default: game and app. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Size** — Size in pixels (10 to 40). Default: 24 for titles, 19 for sections, 17 for text. |
 | `(MapView.ShowLockedQuests)` | — | — | Settings › Map | **Quests not available yet** — Shows the quest markers the game draws locked (quests you cannot take yet). Greyed while « Quests and objectives » is off. Default: on. |
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
@@ -70,7 +71,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `CurrencyServerBar` | bool | true | Settings › Tracking · Settings › Tracking | **In the server bar** — Shows « number of currencies over their threshold » in the server bar; a click opens this tab. Default: on. |
 | `CurrencyValueMarket` | bool | true | `MainWindow.CurrencyValue.cs` | **Look up market prices** — On: choosing a currency asks Universalis for the prices of what it buys. Off: nothing is asked, and a search under way stops. Default: on. |
 | `CurrencyWeeklyCapAlert` | bool | true | `MainWindow.Currencies.cs` | **Alert at the weekly tomestone limit** — With the alerts above: says once when the limited tomestones of the week reach their limit, in chat, by sound and on Discord like the other currency alerts. Default: on. |
-| `DesktopLink` | bool | false | Settings › Advanced | **Link with the desktop app** — Lets the Tensho desktop app (TenshoAssistant.Desktop.zip, in each GitHub release) follow the game: once a second, whether you are logged in, the zone you are in, your job and level, GP and your bags' free slots; and which kind of Tensho's saved data the game just saved (settings, bank, lists…: never a file name, a content or a character id; the app reads its settings file again itself). A local named pipe of this PC, open to your Windows user only: no network port, nothing sent over the internet, and the app cannot send anything back. Default: off. |
+| `DesktopLink` | bool | false | Settings › Advanced | **Link with the desktop app** — Lets the Tensho desktop app (TenshoAssistant.Desktop.zip, in each GitHub release) follow the game: once a second, whether you are logged in, the zone you are in, your job and level, GP and your bags' free slots; and which kind of Tensho's saved data the game just saved (settings, bank, lists…: never a file name, a content or a character id; the app reads its settings file again itself); the alerts that just rang in the game (other than Tensho's alarms) and how many of your alarms' items you hold, so the app rings or stays silent as the game does. A local named pipe of this PC, open to your Windows user only: no network port, nothing sent over the internet, and the app cannot send anything back. Default: off. |
 | `Discord.Currencies` | bool | true | Settings › Tracking | **Currencies** — Sends the currency cap alerts (Storage › Currencies) to this channel. Greyed while « Cap alerts » (Storage › Currencies) is off: there is nothing to send then. Default: on. |
 | `Discord.DutyPop` | bool | true | Settings › Tracking | **Duty ready** — Sends the « duty ready » alert (Alarms) when it is on. Greyed while « Alert when a duty is ready » (Alarms settings) is off: there is nothing to send then. Default: on. |
 | `Discord.Enabled` | bool | false | Settings › Tracking | **Post alarms to Discord** — When a Tensho alarm rings, its message is also posted in the webhook's channel below (network: Discord, over HTTPS). Turning it off drops the messages still waiting. Default: off. |
@@ -274,7 +275,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (32): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (33): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -297,6 +298,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `LastPage` | string? | null |
 | `ListPanelsCurrenciesOn` | List<uint>? | null |
 | `MacroCopy` | MacroCopySettings | (object) |
+| `PagePlaces` | Dictionary<string,string> | (empty) |
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
 | `PreparationPanelTarget` | int | 0 |
@@ -311,7 +313,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 257 controls (250 linked to `Configuration`, 7 to another file), 32 settings without a control.
+Counted: 258 controls (250 linked to `Configuration`, 8 to another file), 33 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -335,6 +337,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 |---|---|---|---|---|
 | `(Advanced.DesktopAutoUpdate)` | — | — | Paramètres › Avancé | **Mise à jour automatique de l'application de bureau** — L'application de bureau se met à jour à son démarrage vers la version du plugin installé (depuis la même release GitHub, SHA-256 vérifié) ; gardé dans le fichier de l'application, comme son bouton « Mise à jour automatique ». Par défaut : activé. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Données du jeu et observées seulement** — Coupe d’un coup les huit sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les info-bulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent. Par défaut : désactivé. |
+| `(Advanced.PagePlace)` | — | — | Paramètres › Avancé | **Listée dans** — Où cette page est listée dans la navigation : dans le jeu et dans l'application de bureau, dans le jeu seulement, ou dans l'application seulement. Une page absente d'une navigation s'ouvre toujours depuis un lien, une commande ou une autre page. Par défaut : jeu et application. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Taille** — Taille en pixels (10 à 40). Par défaut : 24 pour les titres, 19 pour les sections, 17 pour le texte. |
 | `(MapView.ShowLockedQuests)` | — | — | Paramètres › Carte | **Quêtes pas encore disponibles** — Montre les marqueurs de quête que le jeu dessine verrouillés (quêtes que vous ne pouvez pas encore prendre). Grisé tant que « Quêtes et objectifs » est coupé. Par défaut : activé. |
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
@@ -387,7 +390,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `CurrencyServerBar` | bool | true | Paramètres › Suivi et notifications · Paramètres › Suivi et notifications | **Dans la barre du serveur** — Affiche « nombre de monnaies au-dessus du seuil » dans la barre du serveur ; un clic ouvre cet onglet. Par défaut : activé. |
 | `CurrencyValueMarket` | bool | true | `MainWindow.CurrencyValue.cs` | **Chercher les prix du marché** — Activé : choisir une monnaie demande à Universalis les prix de ce qu'elle achète. Désactivé : rien n'est demandé, et une recherche en cours s'arrête. Par défaut : activé. |
 | `CurrencyWeeklyCapAlert` | bool | true | `MainWindow.Currencies.cs` | **Alerte au plafond hebdomadaire des mémoquartz** — Avec les alertes ci-dessus : prévient une fois quand les mémoquartz limités de la semaine atteignent leur plafond, dans le chat, par un son et sur Discord comme les autres alertes de monnaies. Par défaut : activé. |
-| `DesktopLink` | bool | false | Paramètres › Avancé | **Lien avec l'application de bureau** — Permet à l'application de bureau de Tensho (TenshoAssistant.Desktop.zip, dans chaque release GitHub) de suivre le jeu : une fois par seconde, si vous êtes connecté, la zone où vous êtes, votre classe et son niveau, vos PR et les places libres de vos sacs ; et quel genre de données de Tensho le jeu vient d'enregistrer (réglages, banque, listes… : jamais un nom de fichier, un contenu ni un identifiant de personnage ; l'application relit elle-même son fichier de réglages). Un canal nommé local à ce PC, ouvert à votre seul utilisateur Windows : aucun port réseau, rien n'est envoyé sur Internet, et l'application ne peut rien renvoyer. Par défaut : désactivé. |
+| `DesktopLink` | bool | false | Paramètres › Avancé | **Lien avec l'application de bureau** — Permet à l'application de bureau de Tensho (TenshoAssistant.Desktop.zip, dans chaque release GitHub) de suivre le jeu : une fois par seconde, si vous êtes connecté, la zone où vous êtes, votre classe et son niveau, vos PR et les places libres de vos sacs ; et quel genre de données de Tensho le jeu vient d'enregistrer (réglages, banque, listes… : jamais un nom de fichier, un contenu ni un identifiant de personnage ; l'application relit elle-même son fichier de réglages) ; les alertes qui viennent de sonner en jeu (autres que les alarmes de Tensho) et combien vous possédez des objets de vos alarmes, pour que l'application sonne ou se taise comme le jeu. Un canal nommé local à ce PC, ouvert à votre seul utilisateur Windows : aucun port réseau, rien n'est envoyé sur Internet, et l'application ne peut rien renvoyer. Par défaut : désactivé. |
 | `Discord.Currencies` | bool | true | Paramètres › Suivi et notifications | **Monnaies** — Envoie les alertes de plafond des monnaies (Rangements › Monnaies) dans ce salon. Grisé tant que « Alertes de plafond » (Rangements › Monnaies) est désactivé : il n'y a alors rien à envoyer. Par défaut : activé. |
 | `Discord.DutyPop` | bool | true | Paramètres › Suivi et notifications | **Mission prête** — Envoie l'alerte « mission prête » (Alarmes) quand elle est activée. Grisé tant que « Alerte quand une mission est prête » (réglages des alarmes) est désactivé : il n'y a alors rien à envoyer. Par défaut : activé. |
 | `Discord.Enabled` | bool | false | Paramètres › Suivi et notifications | **Envoyer les alarmes sur Discord** — Quand une alarme Tensho sonne, son message est aussi envoyé dans le salon du webhook ci-dessous (réseau : Discord, en HTTPS). Le couper abandonne les messages encore en attente. Par défaut : désactivé. |
@@ -591,7 +594,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Demande Universalis activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (32) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (33) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -614,6 +617,7 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `LastPage` | string? | null |
 | `ListPanelsCurrenciesOn` | List<uint>? | null |
 | `MacroCopy` | MacroCopySettings | (object) |
+| `PagePlaces` | Dictionary<string,string> | (empty) |
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
 | `PreparationPanelTarget` | int | 0 |
@@ -628,5 +632,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 257 cases (250 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
+Compté : 258 cases (250 reliées à `Configuration`, 8 à un autre fichier), 33 réglages sans case.
 <!-- /docgen:settings-fr -->

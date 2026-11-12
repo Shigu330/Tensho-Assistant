@@ -10,6 +10,7 @@ public static class SettingsIndex
     [
         ("Advanced.DesktopAutoUpdate","Advanced"),
         ("Advanced.DesktopLink","Advanced"),
+        ("Advanced.PagePlace","Advanced"),
         ("Advanced.ShowIds","Advanced"),
         ("Advanced.Fashion","Data"),
         ("Advanced.Garland","Data"),

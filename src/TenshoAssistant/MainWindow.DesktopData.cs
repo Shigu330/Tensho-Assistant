@@ -9,6 +9,10 @@ namespace TenshoAssistant;
 // changed. Categories: LocalLinkProtocol.DesktopCategories.
 internal sealed partial class MainWindow
 {
+    // X-119 step 4 (0.1158): this window is drawn by the desktop application (set by its host once built, by its name: DesktopContract).
+    private bool inDesktopApp;
+    internal void DesktopMode()=>inDesktopApp=true;
+
     internal void UseDesktopData(string folder,string category,Action<Exception,string> warn)
     {
         switch(category)

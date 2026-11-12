@@ -336,7 +336,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         foreach(var group in PageGroups)
             if(group.Category is null || NavigationCategory(group.Category,group.Pages))
                 foreach(var entry in group.Entries)
-                    if(entry.Visible?.Invoke()!=false)Navigation(entry.Label!(),entry.Page);
+                    if(entry.Visible?.Invoke()!=false && ListedHere(entry.Page))Navigation(entry.Label!(),entry.Page);
         ImGui.Spacing();
         ImGui.Separator();
         // 0.1038 (T-0.912-1): the theme's text colour, readable in the light theme too.
@@ -352,6 +352,10 @@ internal sealed partial class MainWindow : Window, IDisposable
         else if (itemId > 0) ImGui.TextWrapped(localization.Format("BankUi.Item",itemId));
         else ImGui.TextWrapped(localization.Get("Navigation.SelectItem"));
     }
+
+    // X-119 step 4 (0.1158): a page chosen for the other side only is not listed here (it still opens from a link or a command).
+    private bool ListedHere(Page page)=>inDesktopApp ? Desktop.DesktopPages.InAppNavigation(configuration.PagePlaces,page.ToString())
+        : Desktop.DesktopPages.InGameNavigation(configuration.PagePlaces,page.ToString());
 
     private Page NavigationPage(Page current)=>PageEntryFor(current)?.Parent ?? current;
 

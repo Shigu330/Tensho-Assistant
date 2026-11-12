@@ -92,6 +92,8 @@ internal sealed partial class MainWindow
                 localization.Format("Advanced.DesktopLinkState"+linkState,linkProblem ?? ""));
         // X-126 (0.1113, D-137): install, update and open the desktop app from here, on a click only.
         DrawDesktopInstall();
+        // X-119 step 4 (0.1158): where each page is listed: in the game and the app, or one of them.
+        DrawPagePlaces();
 
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
@@ -100,6 +102,37 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         CopyButton(localization.Get("Advanced.CopyRepository"),()=>RepositoryUrl);
         Tip("Advanced.CopyRepositoryTip");
+    }
+
+    // X-119 step 4 (0.1158): one choice per page of the navigation (Home, Settings and the pages that stay in the game are not offered).
+    private void DrawPagePlaces()
+    {
+        if(!ImGui.TreeNode(localization.Get("Advanced.PagePlacesTitle")+"###PagePlaces"))return;
+        try
+        {
+            ImGui.TextDisabled(localization.Get("Advanced.PagePlacesHelp"));
+            var options=new (Desktop.PagePlace Value,string Label)[]
+            {
+                (Desktop.PagePlace.Both,localization.Get("Advanced.PagePlaceBoth")),(Desktop.PagePlace.Game,localization.Get("Advanced.PagePlaceGame")),
+                (Desktop.PagePlace.App,localization.Get("Advanced.PagePlaceApp")),
+            };
+            foreach(var entry in PageEntries.Where(entry=>entry.Label is not null && entry.Parent is null && entry.Visible?.Invoke()!=false))
+            {
+                var name=entry.Page.ToString();
+                if(!Desktop.DesktopPages.Choosable(name))continue;
+                ImGui.PushID(name);
+                try
+                {
+                    ComboSetting("Advanced.PagePlace","Advanced.PagePlaceTip",()=>Desktop.DesktopPages.Place(configuration.PagePlaces,name),
+                        value=>{configuration.PagePlaces??=[];if(value==Desktop.PagePlace.Both)configuration.PagePlaces.Remove(name);else configuration.PagePlaces[name]=value.ToString();},
+                        options,Desktop.PagePlace.Both,showLabel:false);
+                    ImGui.SameLine();
+                    ImGui.TextUnformatted(entry.Label!());
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.TreePop();}
     }
 
     // X-122, D-101 (user's decision of 2026-11-10): one switch per use of Garland Tools, under its switch, greyed while it is off.

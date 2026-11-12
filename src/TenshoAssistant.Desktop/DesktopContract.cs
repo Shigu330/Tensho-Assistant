@@ -42,6 +42,7 @@ internal static class DesktopContract
         new(Main,Kind.Method,"DesktopAlarmNotification",false,[],"the Windows notification"),
         new(Main,Kind.Method,"DesktopLinkNotices",false,["System.String[]","System.Boolean"],"the game's other alerts ring"),
         new(Main,Kind.Method,"DesktopAlarmHeld",false,["System.UInt32[]","System.Int64[]"],"an item already gathered stays silent"),
+        new(Main,Kind.Method,"DesktopMode",false,[],"the navigation follows the page choices of the desktop app"),
         new(Main,Kind.Method,"OpenWeather",false,null,"--zone (diagnostic)"),
         new(Main,Kind.Field,"jitWarmup",false,null,"the headless timing"),
         new("TenshoAssistant.Diagnostics.JitWarmup",Kind.Method,"Wait",false,["System.TimeSpan"],"the headless timing"),

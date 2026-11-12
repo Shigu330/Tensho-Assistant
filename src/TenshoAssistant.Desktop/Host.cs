@@ -66,6 +66,8 @@ internal sealed class Host
         // The save action does nothing: the app reads the plugin's settings and never writes them.
         var args=ctor.GetParameters().Select(p=>p.ParameterType==typeof(Action) ? (Action)(()=>{}) : Make(p.ParameterType,0)).ToArray();
         Window=ctor.Invoke(args);
+        // X-119 step 4 (0.1158): the window knows it is drawn by the desktop application (its navigation follows the player's page choices).
+        mainType.GetMethod("DesktopMode",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes)?.Invoke(Window,null);
         // Data the plugin fills after building the window (Plugin.cs): the lexicon, read off the frame from the sheets.
         if(Plugin.GetType("TenshoAssistant.Lexicon.LexiconLoader")?.GetMethod("Read",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic) is { } read
            && mainType.GetProperty("LexiconLoad",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic) is { } lexicon)
