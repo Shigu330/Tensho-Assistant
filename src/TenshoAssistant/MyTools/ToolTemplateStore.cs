@@ -47,9 +47,12 @@ public sealed class ToolTemplateStore:IDisposable
     public int RefusedCount{get{lock(gate)return refused.Count;}}
     public IReadOnlyList<InstalledTool> Tools{get{lock(gate)return tools;}}
 
-    public ToolTemplateStore(string path,Action<Exception,string> warn)
+    /// <summary>X-180 (0.1168): read-only (the desktop application's copy, overwritten from the game): nothing is added, removed, changed or written.</summary>
+    public bool ReadOnly{get;}
+
+    public ToolTemplateStore(string path,Action<Exception,string> warn,bool readOnly=false)
     {
-        this.path=path;this.warn=warn;
+        this.path=path;this.warn=warn;ReadOnly=readOnly;
         try
         {
             if(!File.Exists(path))return;
@@ -66,12 +69,12 @@ public sealed class ToolTemplateStore:IDisposable
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or NotSupportedException)
         {Unavailable=true;tools=[];warn(error,"My tools could not be read; the file is left as it is.");}
     }
-    /// <summary>Adds a tool, or replaces the one with its id. Its progress stays only if the file is the same. False when the store is unavailable or full.</summary>
+    /// <summary>Adds a tool, or replaces the one with its id. Its progress stays only if the file is the same. False when the store is unavailable, read-only or full.</summary>
     public bool Install(ToolTemplate template,string json)
     {
         lock(gate)
         {
-            if(disposed || Unavailable)return false;
+            if(disposed || Unavailable || ReadOnly)return false;
             var index=tools.FindIndex(tool=>tool.Template.Id==template.Id);
             if(index<0 && tools.Count+refused.Count>=MaxTools)return false;
             var same=index>=0 && tools[index].Json==json;
@@ -86,7 +89,7 @@ public sealed class ToolTemplateStore:IDisposable
     {
         lock(gate)
         {
-            if(disposed || Unavailable)return;
+            if(disposed || Unavailable || ReadOnly)return;
             tools=tools.Where(tool=>tool.Template.Id!=id).ToList();Save();
         }
     }
@@ -105,7 +108,7 @@ public sealed class ToolTemplateStore:IDisposable
     {
         lock(gate)
         {
-            if(disposed || Unavailable)return;
+            if(disposed || Unavailable || ReadOnly)return;
             var index=tools.FindIndex(tool=>tool.Template.Id==id);
             if(index<0)return;
             var next=tools.ToList();next[index]=edit(next[index]);tools=next;Save();

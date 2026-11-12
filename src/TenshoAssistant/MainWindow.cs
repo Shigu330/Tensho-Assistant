@@ -135,7 +135,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         BankInventoryBridge bankBridge, ITextureProvider textures, IGameGui gameGui, DutyCatalogService duties, DutyLootService dutyLoot, MonsterLootService monsterLoot,GpCatalogService gpActions,FashionHintService fashionHints,FashionDataService fashionData,CraftActionCatalogService craftActions,CraftLiveService craftLive,WeatherCatalogService weather,MiniCactpotObservationService cactpotObservation,GatheringObservationService gatheringObservation,ItemUseCatalogService itemUses,InventoryVisualSortService visualSort) : base("Tensho Assistant###TenshoMain")
     {
         this.configuration = configuration;
-        this.save = save;
+        // X-180 (0.1168): refused while the desktop application draws this window (its copy would be overwritten from the game).
+        this.save = TenshoAssistant.UI.DesktopReadOnly.Guard(() => inDesktopApp, save);
         this.log = log;
         this.localization = localization;
         this.inventory = inventory;
@@ -239,7 +240,7 @@ internal sealed partial class MainWindow : Window, IDisposable
     private void SaveLastPage()
     {
         RememberPage();
-        if(!lastPageDirty)return;
+        if(!lastPageDirty || inDesktopApp)return;
         try{save();lastPageDirty=false;}
         catch(Exception error){log.Warning(error,"The last page used could not be saved.");}
     }

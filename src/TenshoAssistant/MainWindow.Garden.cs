@@ -150,8 +150,9 @@ internal sealed partial class MainWindow
             {
                 ImGui.SameLine();
                 ImGui.PushID($"TendPatch{zone}{patch}");
+                DesktopEditBegin();
                 try{if(ImGui.SmallButton(localization.Get("Garden.TendPatch"))){foreach(var (_,bed) in planted)if(GardenJournal.TendAt(bed) is not null)GardenJournal.Tend(bed,now);changed=true;}}
-                finally{ImGui.PopID();}
+                finally{DesktopEditEnd();ImGui.PopID();}
                 Tip("Garden.TendPatchTip");
             }
             // X-130 (0.1109): what each planted bed may give, by the wiki's rule and the community pairs (null until the pairs are read).
@@ -218,6 +219,14 @@ internal sealed partial class MainWindow
 
     private void DrawBedButtons(GardenBed bed,DateTimeOffset now,ref bool changed,ref GardenBed? removed)
     {
+        // X-180 (0.1168): greyed in the desktop application (nothing is saved there).
+        DesktopEditBegin();
+        try{DrawBedButtonsCore(bed,now,ref changed,ref removed);}
+        finally{DesktopEditEnd();}
+    }
+
+    private void DrawBedButtonsCore(GardenBed bed,DateTimeOffset now,ref bool changed,ref GardenBed? removed)
+    {
         ImGui.BeginDisabled(GardenJournal.TendAt(bed) is null);
         try{if(ImGui.SmallButton(localization.Get("Garden.Tend"))){GardenJournal.Tend(bed,now);changed=true;}}
         finally{ImGui.EndDisabled();}
@@ -228,6 +237,14 @@ internal sealed partial class MainWindow
     }
 
     private void DrawNewBed(List<GardenBed> beds)
+    {
+        // X-180 (0.1168): greyed in the desktop application (nothing is saved there).
+        DesktopEditBegin();
+        try{DrawNewBedCore(beds);}
+        finally{DesktopEditEnd();}
+    }
+
+    private void DrawNewBedCore(List<GardenBed> beds)
     {
         ImGui.SetNextItemWidth(160);
         ImGui.InputTextWithHint("##NewBedPlace",localization.Get("Garden.PlaceHint"),ref newBedPlace,GardenJournal.MaximumText);

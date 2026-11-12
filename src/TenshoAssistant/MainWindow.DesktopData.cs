@@ -1,3 +1,4 @@
+using Dalamud.Bindings.ImGui;
 using TenshoAssistant.Inventory;
 
 namespace TenshoAssistant;
@@ -13,6 +14,15 @@ internal sealed partial class MainWindow
     private bool inDesktopApp;
     internal void DesktopMode()=>inDesktopApp=true;
 
+    // X-180 (0.1168, night review N1): what the desktop application would save lands on its copy of the plugin's folder and settings, then is
+    // overwritten from the game without a word. There every save of this window throws (DesktopReadOnly.Guard), the stores are read-only, the
+    // controls that create or change something are greyed (DesktopEditBegin) and the status bar says why (DesktopPages.Editing).
+    /// <summary>X-180: the text of a failed save: « not saved here, do it in the game » for the desktop application, else the caller's key.</summary>
+    private string SaveFailedText(Exception error,string key)=>localization.Get(error is TenshoAssistant.UI.DesktopReadOnlyException ? "Desktop.NotSaved":key);
+    /// <summary>X-180: greys what follows in the desktop application (until DesktopEditEnd), where nothing is saved.</summary>
+    private void DesktopEditBegin()=>ImGui.BeginDisabled(inDesktopApp);
+    private static void DesktopEditEnd()=>ImGui.EndDisabled();
+
     internal void UseDesktopData(string folder,string category,Action<Exception,string> warn)
     {
         switch(category)
@@ -21,11 +31,11 @@ internal sealed partial class MainWindow
                 UseDesktopBank(folder,warn);
                 break;
             case "craft-lists":
-                CraftListStore=new Craft.CraftListStore(Path.Combine(folder,"CraftLists.json"),warn);
+                CraftListStore=new Craft.CraftListStore(Path.Combine(folder,"CraftLists.json"),warn,readOnly:true);
                 break;
             case "my-tools":
                 var previousTools=MyToolsStore;
-                MyToolsStore=new MyTools.ToolTemplateStore(Path.Combine(folder,"MyTools.json"),warn);
+                MyToolsStore=new MyTools.ToolTemplateStore(Path.Combine(folder,"MyTools.json"),warn,readOnly:true);
                 previousTools?.Dispose();
                 break;
             case "voyages":

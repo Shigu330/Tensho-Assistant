@@ -166,6 +166,8 @@ internal sealed partial class MainWindow
     }
     private void SaveBeastPlans()
     {
+        // X-180 (0.1168): never in the desktop application (its copy is overwritten from the game; the plans stay in memory there).
+        if (inDesktopApp) return;
         try { if (beastPlans is not null && BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
         catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
     }

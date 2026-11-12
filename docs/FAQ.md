@@ -66,7 +66,7 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 ## Can I see Tensho without the game?
 
-Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
+Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them: what you create or change in the app (tools, alarms, garden, craft presets, settings) is not saved, its controls are greyed and the status bar says so; make changes in the game. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
 
 ## Does the desktop app update itself?
 
@@ -152,7 +152,7 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 
 ## Puis-je voir Tensho sans le jeu ?
 
-Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
+Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer : ce que vous créez ou changez dans l'application (outils, alarmes, potager, préréglages d'artisanat, réglages) n'est pas enregistré, ses contrôles sont grisés et la barre d'état le dit ; faites les changements dans le jeu. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
 
 ## L'application de bureau se met-elle à jour seule ?
 

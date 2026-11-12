@@ -88,10 +88,12 @@ public static class CraftLists
 }
 
 /// <summary>Owner of the lists file (window thread). A file that cannot be read is never written over.</summary>
-public sealed class CraftListStore(string path,Action<Exception,string> warn)
+public sealed class CraftListStore(string path,Action<Exception,string> warn,bool readOnly=false)
 {
     private List<CraftList>? lists;
     private bool failed;
+    /// <summary>X-180 (0.1168): read-only (the desktop application's copy, overwritten from the game): Set changes and writes nothing.</summary>
+    public bool ReadOnly=>readOnly;
     public bool Unavailable{get{Load();return failed;}}
     public IReadOnlyList<CraftList> Lists{get{Load();return lists!.ToArray();}}
 
@@ -99,7 +101,7 @@ public sealed class CraftListStore(string path,Action<Exception,string> warn)
     public bool Set(int index,CraftList? list)
     {
         Load();
-        if(failed || index<0 || index>lists!.Count)return false;
+        if(failed || readOnly || index<0 || index>lists!.Count)return false;
         var next=lists.ToList();
         if(list is null){if(index==next.Count)return false;next.RemoveAt(index);}
         else if(index==next.Count){if(next.Count>=CraftLists.MaxLists)return false;next.Add(list);}

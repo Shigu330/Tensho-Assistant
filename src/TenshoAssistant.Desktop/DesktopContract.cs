@@ -63,6 +63,15 @@ internal static class DesktopContract
         new("TenshoAssistant.Gathering.WeatherCatalogService",Kind.Property,"State",false,null,"the headless check of the weather catalogue"),
         new("TenshoAssistant.Gathering.WeatherCatalogState",Kind.Property,"Catalog",false,null,"the headless check of the weather catalogue"),
         new("TenshoAssistant.Gathering.WeatherCatalogState",Kind.Property,"Error",false,null,"the headless check of the weather catalogue"),
+        new(Main,Kind.Field,"save",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new(Main,Kind.Field,"configuration",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new(Main,Kind.Field,"alarmStatus",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new(Main,Kind.Method,"AddAlarms",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new(Main,Kind.Property,"MyToolsStore",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new("TenshoAssistant.MyTools.ToolTemplateStore",Kind.Property,"ReadOnly",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new("TenshoAssistant.Configuration",Kind.Property,"Alarms",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new("TenshoAssistant.Alarms.TenshoAlarm",Kind.Type,"",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new("TenshoAssistant.Alarms.TenshoAlarm",Kind.Property,"Label",false,null,"the headless check that nothing is saved in the app (X-180)"),
     ];
 
     private const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic;

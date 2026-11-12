@@ -96,7 +96,7 @@ internal sealed partial class MainWindow
             save();alarmStatus=localization.Format("Alarms.Added",configuration.Alarms.Count-before);
             if(configuration.AlarmOptions is { UseGameAlarms:true } options)SendAlarmsToGame(configuration.Alarms.Skip(before).ToArray(),options);
         }
-        catch(Exception error){configuration.Alarms.RemoveRange(before,configuration.Alarms.Count-before);log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
+        catch(Exception error){configuration.Alarms.RemoveRange(before,configuration.Alarms.Count-before);log.Warning(error,"Alarms could not be saved.");alarmStatus=SaveFailedText(error,"Alarms.SaveFailed");}
     }
 
     // Daily ET alarms into the game's list (0.205); weather-conditioned ones only when the setting allows it.
@@ -261,22 +261,28 @@ internal sealed partial class MainWindow
         // Manual daily alarm at an ET time.
         ImGui.Separator();
         ImGui.TextColored(Accent,localization.Get("Alarms.ManualTitle"));
-        ImGui.SetNextItemWidth(160);ImGui.InputTextWithHint("##AlarmLabel",localization.Get("Alarms.ManualLabel"),ref alarmManualLabel,40);
-        Tip("Alarms.ManualLabelTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
-        Tip("Alarms.ManualHourTip");
-        ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
-        Tip("Alarms.ManualMinuteTip");
-        alarmManualHour=Math.Clamp(alarmManualHour,0,23);alarmManualMinute=Math.Clamp(alarmManualMinute,0,59);
-        ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
-            AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
-        // 0.386 (g, X-10): the same label at a real local date, once.
-        DrawManualDateAlarm();
+        // X-180 (0.1168): greyed in the desktop application (nothing is saved there).
+        DesktopEditBegin();
+        try
+        {
+            ImGui.SetNextItemWidth(160);ImGui.InputTextWithHint("##AlarmLabel",localization.Get("Alarms.ManualLabel"),ref alarmManualLabel,40);
+            Tip("Alarms.ManualLabelTip");
+            ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
+            Tip("Alarms.ManualHourTip");
+            ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
+            Tip("Alarms.ManualMinuteTip");
+            alarmManualHour=Math.Clamp(alarmManualHour,0,23);alarmManualMinute=Math.Clamp(alarmManualMinute,0,59);
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
+                AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
+            // 0.386 (g, X-10): the same label at a real local date, once.
+            DrawManualDateAlarm();
+        }
+        finally{DesktopEditEnd();}
         if(added.Count>0)AddAlarms(added);
         if(changed)
-            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
+            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=SaveFailedText(error,"Alarms.SaveFailed");}
         DrawGameAlarms();
     }
 
@@ -465,7 +471,7 @@ internal sealed partial class MainWindow
         foreach(var alarm in remove){alarms.Remove(alarm);changed=true;}
         if(added.Count>0)AddAlarms(added);
         if(changed)
-            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
+            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=SaveFailedText(error,"Alarms.SaveFailed");}
     }
 
     // Short link to the Alarms module, where alarms are created.

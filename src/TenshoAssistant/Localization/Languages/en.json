@@ -537,7 +537,7 @@
     "QuestionTranslate": "How can I help translate Tensho?",
     "AnswerTranslate": "In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in src/TenshoAssistant/Localization/README.md on GitHub.",
     "QuestionDesktop": "Can I see Tensho without the game?",
-    "AnswerDesktop": "Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.",
+    "AnswerDesktop": "Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them: what you create or change in the app (tools, alarms, garden, craft presets, settings) is not saved, its controls are greyed and the status bar says so; make changes in the game. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.",
     "QuestionDesktopUpdate": "Does the desktop app update itself?",
     "AnswerDesktopUpdate": "Yes, with no step from you. At start (and on « Check for update ») it asks this repository's GitHub release of the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\\TenshoAssistant\\Desktop\\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.",
     "QuestionDesktopLink": "How do I link the desktop app to the game?",
@@ -7741,6 +7741,8 @@
   },
   "Desktop": {
     "AppVersion": "Tensho Assistant desktop {0}",
+    "NotSaved": "Not saved: the desktop app does not change Tensho's data; make this change in the game.",
+    "ReadOnlyHere": "Read only: what you create or change here is not saved (the app shows a copy of the game's data); make changes in the game.",
     "VersionSame": "Installed plugin: same version ({0}).",
     "VersionDifferent": "Installed plugin {0}, this app {1}: the two are updated together, from the same release; take both from one release.",
     "VersionNotFound": "No installed Tensho Assistant plugin found (this app is {0}).",

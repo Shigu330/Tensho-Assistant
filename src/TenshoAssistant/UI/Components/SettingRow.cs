@@ -121,6 +121,8 @@ internal sealed partial class MainWindow
     {
         if(UI.SettingSave.Run(save,rollback) is not { } error){saveError=null;return true;}
         saveError=localization.Get("Common.SaveError");
+        // X-180 (0.1168): in the desktop application nothing is saved: said as such.
+        if(error is TenshoAssistant.UI.DesktopReadOnlyException)saveError=SaveFailedText(error,"Common.SaveError");
         log.Warning(error,"{What} could not be saved.",what);
         return false;
     }

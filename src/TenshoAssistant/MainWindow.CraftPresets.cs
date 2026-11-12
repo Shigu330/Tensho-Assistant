@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
     private void EditCraftPresets(Func<IReadOnlyList<CraftPreset>,IReadOnlyList<CraftPreset>> change,string failure)
     {
         try{CraftPresets.Commit(configuration,save,change);craftPresetError=null;craftPresetRenaming=null;}
-        catch(Exception error){craftPresetError=failure;log.Warning(error,"Could not change the saved craft sequences.");}
+        catch(Exception error){craftPresetError=error is TenshoAssistant.UI.DesktopReadOnlyException ? "Desktop.NotSaved":failure;log.Warning(error,"Could not change the saved craft sequences.");}
     }
     private string craftPresetName="";private string? craftPresetError;private bool craftPresetSaved;private CraftPreset? lastSavedCraftPreset;
     private void SaveCraftPreset()
@@ -33,14 +33,16 @@ internal sealed partial class MainWindow
             var preset=CraftPresets.Create(simulationRecipe!,craftPresetName,simulationActions);
             CraftPresets.Commit(configuration,save,rows=>CraftPresets.Add(rows,preset));craftPresetError=null;craftPresetSaved=true;lastSavedCraftPreset=preset;
         }
-        catch(Exception error){craftPresetError="CraftPresetMessages.SaveFailed";craftPresetSaved=false;log.Warning(error,"Could not save craft sequence.");}
+        catch(Exception error){craftPresetError=error is TenshoAssistant.UI.DesktopReadOnlyException ? "Desktop.NotSaved":"CraftPresetMessages.SaveFailed";craftPresetSaved=false;log.Warning(error,"Could not save craft sequence.");}
     }
     private void DrawCraftPresetSave()
     {
         if(ImGui.SmallButton(localization.Get("CraftPresets.Browse")))page=Page.CraftPresets;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftPresets.SaveSection")+"###SaveCraftPreset"))return;
         ImGui.SetNextItemWidth(260);if(ImGui.InputText(localization.Get("CraftPresets.Name")+"###CraftPresetName",ref craftPresetName,160))craftPresetSaved=false;Tip("CraftPresets.NameTip");
-        if(ImGui.Button(localization.Get("CraftPresets.Save")))SaveCraftPreset();
+        DesktopEditBegin();
+        try{if(ImGui.Button(localization.Get("CraftPresets.Save")))SaveCraftPreset();}
+        finally{DesktopEditEnd();}
         ImGui.TextDisabled(localization.Get("CraftPresets.Help"));
         if(craftPresetSaved && lastSavedCraftPreset is { } saved && saved.RecipeId==simulationRecipe?.RecipeId && saved.Actions.SequenceEqual(simulationActions))ImGui.TextColored(Success,localization.Get("CraftPresets.Saved"));
         if(craftPresetError is { } error)ImGui.TextWrapped(localization.Get(error));
@@ -84,9 +86,14 @@ internal sealed partial class MainWindow
                 if(preset is not null)
                 {
                     ImGui.SameLine();
-                    if(ImGui.SmallButton(localization.Get("CraftPresets.Rename"))){craftPresetRenaming=preset.Id;craftPresetRenameText=preset.Name;}
-                    ImGui.SameLine();
-                    if(ImGui.SmallButton(localization.Get("CraftPresets.Duplicate")))duplicate=index;
+                    DesktopEditBegin();
+                    try
+                    {
+                        if(ImGui.SmallButton(localization.Get("CraftPresets.Rename"))){craftPresetRenaming=preset.Id;craftPresetRenameText=preset.Name;}
+                        ImGui.SameLine();
+                        if(ImGui.SmallButton(localization.Get("CraftPresets.Duplicate")))duplicate=index;
+                    }
+                    finally{DesktopEditEnd();}
                     Tip("CraftPresets.DuplicateTip");
                     ImGui.SameLine();
                     if(ImGui.SmallButton(localization.Get("CraftPresets.CopyText")))
@@ -97,7 +104,7 @@ internal sealed partial class MainWindow
                     }
                     Tip("CraftPresets.CopyTextTip");
                 }
-                ImGui.SameLine();if(DeleteButton("CraftPresets.Remove"))remove=index;Tip("CraftPresets.RemoveTip");
+                ImGui.SameLine();DesktopEditBegin();try{if(DeleteButton("CraftPresets.Remove"))remove=index;}finally{DesktopEditEnd();}Tip("CraftPresets.RemoveTip");
                 if(preset is not null && craftPresetRenaming==preset.Id)
                 {
                     ImGui.SetNextItemWidth(260);
@@ -116,7 +123,7 @@ internal sealed partial class MainWindow
         if(remove>=0)
         {
             try{CraftPresets.Commit(configuration,save,source=>CraftPresets.Remove(source,remove));craftPresetError=null;}
-            catch(Exception saveError){craftPresetError="CraftPresetMessages.RemoveFailed";log.Warning(saveError,"Could not remove saved craft sequence.");}
+            catch(Exception saveError){craftPresetError=saveError is TenshoAssistant.UI.DesktopReadOnlyException ? "Desktop.NotSaved":"CraftPresetMessages.RemoveFailed";log.Warning(saveError,"Could not remove saved craft sequence.");}
         }
     }
 }

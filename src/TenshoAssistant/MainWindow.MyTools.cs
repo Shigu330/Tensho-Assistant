@@ -27,17 +27,23 @@ internal sealed partial class MainWindow
         if(store.Unavailable){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MyToolsUi.Unavailable"));return;}
         if(store.RefusedCount>0)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.Refused",store.RefusedCount));
         DrawMyToolsThemeReturn(store);
-        if(myToolDraft is { } draft){DrawMyToolEditor(store,draft);return;}
-        if(ImGui.SmallButton(localization.Get("MyToolsUi.Create"))){myToolDraft=ToolDraft.New();myToolDraftProblem=null;return;}
-        Tip("MyToolsUi.CreateTip");
-        ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get(myToolsImporting ? "MyToolsUi.ImportClose":"MyToolsUi.Import"))){myToolsImporting=!myToolsImporting;myToolsPreview=null;}
-        Tip("MyToolsUi.ImportTip");
-        ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get(myToolsGalleryOpen ? "MyToolsUi.GalleryClose":"MyToolsUi.Gallery")))myToolsGalleryOpen=!myToolsGalleryOpen;
-        Tip("MyToolsUi.GalleryTip");
-        if(myToolsImporting)DrawMyToolsImport(store);
-        if(myToolsGalleryOpen)DrawMyToolsGallery(store);
+        // X-180 (0.1168): a read-only store (the desktop application's copy): nothing created, imported, installed or changed there.
+        if(myToolDraft is { } draft && !store.ReadOnly){DrawMyToolEditor(store,draft);return;}
+        DesktopEditBegin();
+        try
+        {
+            if(ImGui.SmallButton(localization.Get("MyToolsUi.Create"))){myToolDraft=ToolDraft.New();myToolDraftProblem=null;return;}
+            Tip("MyToolsUi.CreateTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get(myToolsImporting ? "MyToolsUi.ImportClose":"MyToolsUi.Import"))){myToolsImporting=!myToolsImporting;myToolsPreview=null;}
+            Tip("MyToolsUi.ImportTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get(myToolsGalleryOpen ? "MyToolsUi.GalleryClose":"MyToolsUi.Gallery")))myToolsGalleryOpen=!myToolsGalleryOpen;
+            Tip("MyToolsUi.GalleryTip");
+            if(myToolsImporting)DrawMyToolsImport(store);
+            if(myToolsGalleryOpen)DrawMyToolsGallery(store);
+        }
+        finally{DesktopEditEnd();}
         var tools=store.Tools;
         if(tools.Count==0){ImGui.Spacing();ImGui.TextDisabled(localization.Get("MyToolsUi.Empty"));return;}
         ImGui.Spacing();
@@ -48,13 +54,17 @@ internal sealed partial class MainWindow
         ImGui.Separator();
         DrawMyToolActions(store,tool);
         ImGui.Spacing();
-        DrawMyToolBlocks(tool.Template,tool,store);
+        DesktopEditBegin();
+        try{DrawMyToolBlocks(tool.Template,tool,store);}
+        finally{DesktopEditEnd();}
     }
 
     private void DrawMyToolActions(ToolTemplateStore store,InstalledTool tool)
     {
         if(tool.Template.Author is { } author){ImGui.TextDisabled(localization.Format("MyToolsUi.Author",author));ImGui.SameLine();}
-        if(ImGui.SmallButton(localization.Get("MyToolsUi.Edit"))){myToolDraft=ToolDraft.From(tool.Template);myToolDraftProblem=null;return;}
+        DesktopEditBegin();
+        try{if(ImGui.SmallButton(localization.Get("MyToolsUi.Edit"))){myToolDraft=ToolDraft.From(tool.Template);myToolDraftProblem=null;return;}}
+        finally{DesktopEditEnd();}
         Tip("MyToolsUi.EditTip");
         ImGui.SameLine();
         CopyButton(localization.Get("MyToolsUi.Share"),()=>ToolTemplateFormat.Encode(tool.Json));
@@ -63,12 +73,17 @@ internal sealed partial class MainWindow
         CopyButton(localization.Get("MyToolsUi.CopyJson"),()=>tool.Json);
         Tip("MyToolsUi.CopyJsonTip");
         ImGui.SameLine();
-        if(myToolRemoveArmed!=tool.Template.Id)
+        DesktopEditBegin();
+        try
         {
-            if(ImGui.SmallButton(localization.Get("MyToolsUi.Remove")))myToolRemoveArmed=tool.Template.Id;
-            Tip("MyToolsUi.RemoveTip");
+            if(myToolRemoveArmed!=tool.Template.Id)
+            {
+                if(ImGui.SmallButton(localization.Get("MyToolsUi.Remove")))myToolRemoveArmed=tool.Template.Id;
+                Tip("MyToolsUi.RemoveTip");
+            }
+            else if(ImGui.SmallButton(localization.Get("MyToolsUi.RemoveConfirm"))){store.Remove(tool.Template.Id);myToolSelected=null;myToolRemoveArmed=null;}
         }
-        else if(ImGui.SmallButton(localization.Get("MyToolsUi.RemoveConfirm"))){store.Remove(tool.Template.Id);myToolSelected=null;myToolRemoveArmed=null;}
+        finally{DesktopEditEnd();}
         // T8: a tool only proposes; the setting changes on this click, and the button at the top of the page brings it back.
         if(tool.Template.Theme is { } theme && configuration.ThemeMode!=ToolTemplateFormat.ThemeMode(theme))
         {

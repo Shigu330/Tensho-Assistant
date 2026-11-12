@@ -204,8 +204,61 @@ internal static class Headless
                 if(line.Contains("[Desktop.",StringComparison.Ordinal)){report.Fail("status bar link text missing: "+Short(line));failed++;}
         }
         status.Link=null;
+        failed+=ReadOnlyCheck(host,report);
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
+    }
+
+    /// <summary>
+    /// X-180 (0.1168, night review N1; R28 behaviour test): the window built as the application builds it saves nothing: the stores built on a
+    /// copy are read-only and leave its files as they are, the window's save refuses (DesktopReadOnlyException), and an alarm added there is
+    /// taken back with « not saved » instead of « added ». The number of failures.
+    /// </summary>
+    private static int ReadOnlyCheck(Host host,Report report)
+    {
+        const System.Reflection.BindingFlags Flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+        var failed=0;
+        void Fail(string why){report.Fail("read-only in the app: "+why);failed++;}
+        var folder=Path.Combine(Path.GetTempPath(),"Tensho-Desktop-ReadOnly-"+Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        try
+        {
+            var tools=Path.Combine(folder,"MyTools.json");
+            File.WriteAllText(tools,"{\"Schema\":1,\"Tools\":[]}");
+            var before=File.ReadAllBytes(tools);
+            var window=host.Window;var type=window.GetType();
+            var note=host.UseData(folder,"my-tools");
+            var store=type.GetProperty("MyToolsStore",Flags)?.GetValue(window);
+            if(store?.GetType().GetProperty("ReadOnly")?.GetValue(store) is not true)Fail("my tools are not read-only on the copy ("+note+")");
+            if(type.GetField("save",Flags)?.GetValue(window) is not System.Action save)Fail("the window has no save");
+            else
+            {
+                var refused=false;
+                try{save();}catch(Exception error) when(error.GetType().Name=="DesktopReadOnlyException"){refused=true;}
+                if(!refused)Fail("the window's save did not refuse");
+            }
+            var configuration=type.GetField("configuration",Flags)?.GetValue(window);
+            var alarms=configuration?.GetType().GetProperty("Alarms");
+            var alarmType=host.Plugin.GetType("TenshoAssistant.Alarms.TenshoAlarm");
+            if(configuration is null || alarms is null || alarmType is null || type.GetMethod("AddAlarms",Flags) is not { } add)Fail("the alarms could not be reached");
+            else
+            {
+                var count=(alarms.GetValue(configuration) as System.Collections.IList)?.Count ?? 0;
+                var added=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(alarmType))!;
+                var alarm=Activator.CreateInstance(alarmType)!;alarmType.GetProperty("Label")?.SetValue(alarm,"Read-only check");added.Add(alarm);
+                add.Invoke(window,[added]);
+                var after=(alarms.GetValue(configuration) as System.Collections.IList)?.Count ?? 0;
+                if(after!=count)Fail($"an alarm added in the app stayed ({count} before, {after} after)");
+                if(type.GetField("alarmStatus",Flags)?.GetValue(window) is not string said || said!=host.Text("Desktop.NotSaved"))Fail("the alarms do not say « not saved »");
+            }
+            if(!File.ReadAllBytes(tools).AsSpan().SequenceEqual(before))Fail("MyTools.json of the copy changed");
+            Console.WriteLine(failed==0 ? "  read-only in the app: nothing saved (my tools, the window's save, an alarm)" : $"  read-only in the app: {failed} failure(s)");
+        }
+        finally
+        {
+            try{Directory.Delete(folder,true);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        }
+        return failed;
     }
 
     internal static string Short(string text)=>(text.Length>140 ? text[..140]+"…" : text).Replace("|","/").Replace("\n"," ");

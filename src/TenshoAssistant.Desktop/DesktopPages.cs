@@ -68,6 +68,13 @@ public static class DesktopPages
     public static bool InAppNavigation(IReadOnlyDictionary<string,string>? places,string page)
         => Kind(page)!=DesktopPageKind.InGame && Place(places,page)!=PagePlace.Game;
 
+    /// <summary>
+    /// X-180 (0.1168, night review N1): the pages where the player creates or changes something saved. The application works on a copy of the
+    /// plugin's data, overwritten from the game, so nothing is saved there (the window's save refuses, the stores are read-only, the controls
+    /// greyed); the status bar says so on these pages (Desktop.ReadOnlyHere).
+    /// </summary>
+    public static readonly IReadOnlyList<string> Editing=["MyTools","Alarms","Garden","CraftPresets","Reminders","Settings","SortPreview","Wishlist","Quests"];
+
     /// <summary>The language key naming the live parts of a NeedsLink page (Desktop.Live&lt;Page&gt;), or null for the other pages.</summary>
     public static string? LiveKey(string page)=>Kind(page)==DesktopPageKind.NeedsLink ? "Desktop.Live"+page : null;
 }
