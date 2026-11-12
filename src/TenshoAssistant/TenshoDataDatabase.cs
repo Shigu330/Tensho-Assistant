@@ -7,7 +7,8 @@ namespace TenshoAssistant;
 /// X-173 (0.1139, user's choice of 12/11: « two SQLite files, an erasable cache and the data to protect »): the player's data file,
 /// <c>TenshoData.db</c>, at the root of the plugin's configuration folder. The families of X-173 move into it one at a time, each with its own
 /// tables, its files of before converted once and kept aside: the gil journal (0.1139, <see cref="Inventory.GilJournalStore"/>), the achievement
-/// progress (0.1140, <see cref="Collections.AchievementProgressData"/>), the voyage history (0.1148, <see cref="FreeCompany.VoyageHistoryData"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db,
+/// progress (0.1140, <see cref="Collections.AchievementProgressData"/>), the voyage history (0.1148, <see cref="FreeCompany.VoyageHistoryData"/>), the bank and
+/// inventories (0.1149, <see cref="Inventory.PerCharacterBankStore"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db,
 /// X-172; choice noted as D-141). WAL journal: a stop in the middle of a save leaves the last one whole, another process may read while the game
 /// writes. Every call opens its own connection: safe from any thread.
 /// </summary>
@@ -48,6 +49,10 @@ public sealed class TenshoDataDatabase
             Run(open,"CREATE TABLE IF NOT EXISTS voyage_records(house INTEGER NOT NULL,kind INTEGER NOT NULL,slot INTEGER NOT NULL,registered INTEGER NOT NULL,"
                 +"vessel TEXT NOT NULL,rank INTEGER NOT NULL,return_at INTEGER,points TEXT NOT NULL,route TEXT NOT NULL,loot TEXT NOT NULL,"
                 +"PRIMARY KEY(house,kind,slot,registered)) WITHOUT ROWID;",transaction);
+            // 0.1149: the bank and inventories, one row per stored place (character, kind, retainer or 0) in the character's order (seq); each
+            // row holds the entry as the bank file wrote it (JSON, same names and bounds), checked again when read.
+            Run(open,"CREATE TABLE IF NOT EXISTS bank_entries(character INTEGER NOT NULL,kind INTEGER NOT NULL,storage INTEGER NOT NULL,seq INTEGER NOT NULL,"
+                +"entry TEXT NOT NULL,PRIMARY KEY(character,kind,storage)) WITHOUT ROWID;",transaction);
             if(version<Schema)Run(open,$"PRAGMA user_version={Schema};",transaction);
             transaction.Commit();
         }
@@ -178,7 +183,7 @@ public sealed class TenshoDataFile
                 catch(Exception error)
                 {
                     database=null;
-                    if(File.Exists(path)){blocked=error;warn(error,"The Tensho data file could not be opened: the gil journal and the achievement progress are not written this session.");}
+                    if(File.Exists(path)){blocked=error;warn(error,"The Tensho data file could not be opened: the gil journal, the achievement progress, the voyage history and the bank are not written this session.");}
                     else warn(error,"The Tensho data file could not be created: the JSON files stay in use this session.");
                 }
             }
@@ -203,18 +208,21 @@ public sealed class TenshoDataFile
 
     /// <summary>
     /// A file of before moved beside itself into before-sqlite-yyyyMMdd-HHmmss/, never removed (a name already taken there gets a suffix). A move
-    /// that fails is said and retried at the next start (the « converted » mark keeps the file from being read again).
+    /// that fails is said and retried at the next start (the « converted » mark keeps the file from being read again). 0.1149: a folder of before
+    /// (the bank's InventoryBank/) is moved the same way, whole.
     /// </summary>
     public void SetAside(string file,DateTimeOffset now,string what)
     {
         try
         {
-            var aside=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
+            file=System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(file));
+            var folder=Directory.Exists(file);
+            var aside=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(file)!,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
             Directory.CreateDirectory(aside);
             var target=System.IO.Path.Combine(aside,System.IO.Path.GetFileName(file));
-            if(File.Exists(target))
+            if(File.Exists(target) || Directory.Exists(target))
                 target=System.IO.Path.Combine(aside,System.IO.Path.GetFileNameWithoutExtension(file)+"-"+Guid.NewGuid().ToString("N")[..8]+System.IO.Path.GetExtension(file));
-            File.Move(file,target);
+            if(folder)Directory.Move(file,target);else File.Move(file,target);
             info?.Invoke($"Tensho data: the {what} file of before moved to {TenshoDataDatabase.FileName}, kept in {System.IO.Path.GetFileName(aside)}.");
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException)

@@ -1,3 +1,5 @@
+using Microsoft.Data.Sqlite;
+
 namespace TenshoAssistant.Inventory;
 
 /// <summary>
@@ -11,27 +13,43 @@ namespace TenshoAssistant.Inventory;
 /// its file, changed (one storage written or forgotten) and written back, so what the other client saved is kept; a character's files
 /// are deleted only on the player's explicit « Erase this character ». A whole-list Save never deletes anything. Load and the split of
 /// the former file run under the same lock.
+/// X-173 (0.1149, user's choice of 12/11): with the player's data file (<see cref="TenshoDataFile"/>, TenshoData.db), the bank and inventories are
+/// kept there instead: one row per stored place, a character's rows replaced whole in one transaction (a stop in the middle leaves the last save
+/// whole), still under the profile's lock and still one character at a time. The files of before (the folder, and the former shared file split
+/// first as before) are converted the first time they are met, under the lock: every character read with the file's checks (one that cannot be
+/// read fails the whole conversion: nothing written, files left), then all rows and a « bank » mark in one transaction; then the folder is moved,
+/// never removed, into before-sqlite-&lt;date&gt;/. A data file that is there but unusable is never replaced (the bank is unavailable, nothing written);
+/// when it cannot be created, or none is given, the files stay in use as before.
 /// </summary>
 public sealed class PerCharacterBankStore : IInventoryBankStore
 {
+    public const string Family="bank";
     private readonly string folder;
     private readonly string legacy;
     private readonly int lockWaitMs;
+    private readonly TenshoDataFile? data;
     private readonly object gate=new();
     private readonly Dictionary<ulong,FileInventoryBankStore> stores=[];
     private bool loadFailed;
 
     /// <param name="lockWaitMs">How long a change waits for the other client's lock before it fails (nothing written).</param>
-    public PerCharacterBankStore(string folder,string legacyFile,int lockWaitMs=10_000)
+    /// <param name="data">X-173 (0.1149): the player's data file; null keeps the files.</param>
+    public PerCharacterBankStore(string folder,string legacyFile,int lockWaitMs=10_000,TenshoDataFile? data=null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(folder);ArgumentException.ThrowIfNullOrWhiteSpace(legacyFile);
-        this.folder=Path.GetFullPath(folder);legacy=Path.GetFullPath(legacyFile);this.lockWaitMs=lockWaitMs;
+        this.folder=Path.GetFullPath(folder);legacy=Path.GetFullPath(legacyFile);this.lockWaitMs=lockWaitMs;this.data=data;
     }
 
     public static string FileName(ulong character)=>character.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json";
 
     /// <summary>X-141: the profile's lock file (beside the folder: the folder's absence still means « not split yet »).</summary>
     public string LockPath=>Path.TrimEndingDirectorySeparator(folder)+".lock";
+
+    /// <summary>X-173: « sqlite », « json » or « blocked » (see <see cref="TenshoDataFile.Mode"/>); « json » without a data file.</summary>
+    public string Mode=>data?.Mode ?? "json";
+
+    /// <summary>Test hook: run inside the conversion's transaction, after its rows and before the commit (a stop or an error there).</summary>
+    internal Action? DuringConversion { get; set; }
 
     public BankEntry[] Load()
     {
@@ -41,10 +59,20 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             {
                 return Locked(()=>
                 {
-                    Migrate();
-                    var all=new List<BankEntry>();
-                    foreach(var id in Characters())all.AddRange(Read(id));
-                    var result=all.ToArray();
+                    BankEntry[] result;
+                    if(data?.Database() is { } opened)
+                    {
+                        using var open=opened.Open();
+                        Convert(open);
+                        result=[.. Rows(open,null)];
+                    }
+                    else
+                    {
+                        Migrate();
+                        var all=new List<BankEntry>();
+                        foreach(var id in Characters())all.AddRange(Read(id));
+                        result=all.ToArray();
+                    }
                     InventoryBankService.ValidateEntries(result);
                     return result;
                 });
@@ -64,6 +92,19 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             InventoryBankService.ValidateEntries(entries);
             Locked(()=>
             {
+                if(data?.Database() is { } opened)
+                {
+                    using var open=opened.Open();
+                    Convert(open);
+                    using var transaction=open.BeginTransaction();
+                    foreach(var group in entries.GroupBy(entry=>entry.Key.CharacterId))
+                    {
+                        var list=group.ToArray();
+                        if(!Rows(open,transaction,group.Key).SequenceEqual(list))WriteRows(open,transaction,group.Key,list);
+                    }
+                    transaction.Commit();
+                    return 0;
+                }
                 foreach(var group in entries.GroupBy(entry=>entry.Key.CharacterId))
                 {
                     var list=group.ToArray();
@@ -77,7 +118,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
     /// <summary>
     /// X-141: one change of one character under the profile's lock: its file read again (what the other client wrote stays), the storage
     /// written or forgotten, the file written only when it differs; Erase (the player's command) deletes its file and its copy. The entries
-    /// to show: the other characters as this client has them, this one as now saved.
+    /// to show: the other characters as this client has them, this one as now saved. X-173 (0.1149): the same with the character's rows of the
+    /// data file, read again and written in one transaction.
     /// </summary>
     public BankEntry[] Apply(BankChange change,IReadOnlyList<BankEntry> memory)
     {
@@ -88,6 +130,18 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             if(loadFailed)throw new InvalidOperationException("A failed bank load prevents overwriting saved data.");
             var saved=Locked(()=>
             {
+                if(data?.Database() is { } opened)
+                {
+                    using var open=opened.Open();
+                    Convert(open);
+                    using var transaction=open.BeginTransaction();
+                    var rowsBefore=change.Erase!=0 ? []:Rows(open,transaction,id);
+                    var rowsAfter=change.Erase!=0 ? []:change.On(rowsBefore);
+                    InventoryBankService.ValidateEntries(rowsAfter);
+                    if(change.Erase!=0 || !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
+                    transaction.Commit();
+                    return rowsAfter;
+                }
                 if(change.Erase!=0)
                 {
                     var path=Path.Combine(folder,FileName(id));
@@ -116,9 +170,83 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
     }
 
     /// <summary>
+    /// X-173: the files of before (the folder, the former shared file split into it first, as before) converted once into the data file, under the
+    /// profile's lock (the caller holds it): every character read with the file's checks, then all rows and the « bank » mark in one transaction.
+    /// Then, or when already converted, the files of before are set aside (moved, never removed); a move that fails is retried at the next load.
+    /// </summary>
+    private void Convert(SqliteConnection open)
+    {
+        var bankFiles=Directory.Exists(folder) && Directory.EnumerateFileSystemEntries(folder).Any();
+        if(!bankFiles && !File.Exists(legacy) && !File.Exists(legacy+".bak"))return;
+        var now=DateTimeOffset.UtcNow;
+        if(!TenshoDataDatabase.Converted(open,Family))
+        {
+            Migrate();
+            var all=Characters().SelectMany(Read).ToArray();
+            InventoryBankService.ValidateEntries(all);
+            using var transaction=open.BeginTransaction();
+            foreach(var group in all.GroupBy(entry=>entry.Key.CharacterId))WriteRows(open,transaction,group.Key,group.ToArray());
+            TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+            DuringConversion?.Invoke();
+            transaction.Commit();
+            stores.Clear();
+        }
+        foreach(var path in new[]{folder,legacy,legacy+".bak"})
+            if(Directory.Exists(path) || File.Exists(path))data!.SetAside(path,now,"bank");
+    }
+
+    // A character's rows replaced whole (none: the character erased), in the caller's transaction.
+    private static void WriteRows(SqliteConnection open,SqliteTransaction transaction,ulong id,IReadOnlyList<BankEntry> entries)
+    {
+        if(entries.Any(entry=>entry.Key.CharacterId!=id))throw new ArgumentException("Entries of another character.");
+        var rows=FileInventoryBankStore.EntryRows(entries);
+        using(var delete=open.CreateCommand())
+        {
+            delete.Transaction=transaction;delete.CommandText="DELETE FROM bank_entries WHERE character=$character;";
+            delete.Parameters.AddWithValue("$character",unchecked((long)id));
+            delete.ExecuteNonQuery();
+        }
+        using var insert=open.CreateCommand();
+        insert.Transaction=transaction;
+        insert.CommandText="INSERT INTO bank_entries(character,kind,storage,seq,entry) VALUES($character,$kind,$storage,$seq,$entry);";
+        var character=insert.Parameters.Add("$character",SqliteType.Integer);var kind=insert.Parameters.Add("$kind",SqliteType.Integer);
+        var storage=insert.Parameters.Add("$storage",SqliteType.Integer);var seq=insert.Parameters.Add("$seq",SqliteType.Integer);
+        var entry=insert.Parameters.Add("$entry",SqliteType.Text);
+        for(var index=0;index<entries.Count;index++)
+        {
+            var key=entries[index].Key;
+            character.Value=unchecked((long)id);kind.Value=(long)key.Kind;storage.Value=unchecked((long)key.StorageId);seq.Value=(long)index;entry.Value=rows[index];
+            insert.ExecuteNonQuery();
+        }
+    }
+
+    // The rows of one character (or of all, in character order), each checked as a bank file is; a row whose key columns disagree with its entry fails closed.
+    private static BankEntry[] Rows(SqliteConnection open,SqliteTransaction? transaction,ulong? id=null)
+    {
+        using var command=open.CreateCommand();
+        command.Transaction=transaction;
+        command.CommandText="SELECT character,kind,storage,entry FROM bank_entries"+(id is null ? "":" WHERE character=$character")+" ORDER BY character,seq;";
+        if(id is { } one)command.Parameters.AddWithValue("$character",unchecked((long)one));
+        var read=new List<(ulong Character,long Kind,ulong Storage,string Entry)>();
+        using(var reader=command.ExecuteReader())
+            while(reader.Read())read.Add((unchecked((ulong)reader.GetInt64(0)),reader.GetInt64(1),unchecked((ulong)reader.GetInt64(2)),reader.GetString(3)));
+        var result=new List<BankEntry>();
+        // Characters in the files' order (unsigned id; SQLite sorts the stored signed number).
+        foreach(var group in read.GroupBy(row=>row.Character).OrderBy(group=>group.Key))
+        {
+            var entries=FileInventoryBankStore.FromRows([.. group.Select(row=>row.Entry)]);
+            if(entries.Zip(group).Any(pair=>pair.First.Key!=new BankKey(pair.Second.Character,(BankStorageKind)pair.Second.Kind,pair.Second.Storage)))
+                throw new InvalidDataException("A bank row's key disagrees with its entry.");
+            result.AddRange(entries);
+        }
+        return [.. result];
+    }
+
+    /// <summary>
     /// X-141: work done while holding the profile's lock file (opened without sharing: the other client, or another store here, waits);
     /// tried again every 50 ms up to lockWaitMs, then <see cref="BankLockBusyException"/> (nothing changed; X-170, 0.1142: its own type, so the
-    /// service can tell « the other client holds the lock » from a file that cannot be read).
+    /// service can tell « the other client holds the lock » from a file that cannot be read). X-173 (0.1149): the data file kept busy by another
+    /// writer past SQLite's wait is the same case (nothing changed, tried again).
     /// </summary>
     private T Locked<T>(Func<T> work)
     {
@@ -130,7 +258,11 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             try{held=new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
             catch(IOException) when(Environment.TickCount64<until){Thread.Sleep(50);continue;}
             catch(IOException error){throw new BankLockBusyException(LockPath,error);}
-            using(held)return work();
+            using(held)
+            {
+                try{return work();}
+                catch(SqliteException error) when(error.SqliteErrorCode is 5 or 6){throw new BankLockBusyException(LockPath,error);}
+            }
         }
     }
 

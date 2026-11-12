@@ -10,6 +10,7 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
 {
     private const int MaximumBytes = 16 * 1024 * 1024;
     private const int MaximumItems = 131072;
+    private const int MaximumEntries = 4096;
     // 0.329: one bound for a container's slots and items, checked on save and on load. The glamour dresser holds 800 slots plus up
     // to 11 pieces per stored outfit (800 × 12 = 9600): the old 4096, checked only on load, let a saved file block the whole bank.
     private const int MaximumContainerSlots = 16384;
@@ -109,7 +110,7 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
             var dto = document.Deserialize<FileDto>(JsonOptions) ?? throw new InvalidDataException("Missing bank document.");
             if (dto.SchemaVersion != 1) throw new InvalidDataException("Unsupported bank schema version.");
             if (dto.SavedAtUtc == default || dto.SavedAtUtc.Offset != TimeSpan.Zero || dto.Entries is null
-                || dto.Entries.Length > 4096)
+                || dto.Entries.Length > MaximumEntries)
                 throw new InvalidDataException("Invalid bank metadata or entry count.");
             ValidateItemBounds(dto);
             var entries = dto.Entries.Select(FromDto).ToArray();
@@ -119,6 +120,48 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
         catch (Exception ex) when (ex is JsonException or ArgumentException or OverflowException or NullReferenceException)
         {
             throw new InvalidDataException("Invalid bank file.", ex);
+        }
+    }
+
+    /// <summary>
+    /// X-173 (0.1149): one character's entries as the rows of the player's data file (PerCharacterBankStore): each row the JSON of one entry as
+    /// the bank file writes it, with the bounds of a whole file (entries, items, slots, size), checked before anything is written.
+    /// </summary>
+    internal static string[] EntryRows(IReadOnlyList<BankEntry> entries)
+    {
+        InventoryBankService.ValidateEntries(entries);
+        var dtos = entries.Select(ToDto).ToArray();
+        if (dtos.Length > MaximumEntries) throw new InvalidDataException("Too many bank entries.");
+        ValidateItemBounds(new FileDto { SchemaVersion = 1, SavedAtUtc = DateTimeOffset.UtcNow, Entries = dtos });
+        var rows = dtos.Select(dto => JsonSerializer.Serialize(dto, JsonOptions)).ToArray();
+        if (rows.Sum(row => (long)System.Text.Encoding.UTF8.GetByteCount(row)) > MaximumBytes) throw new InvalidDataException("Bank entries exceed the size limit.");
+        return rows;
+    }
+
+    /// <summary>X-173 (0.1149): one character's rows read back, with every check a bank file gets when read (a row that fails them fails the whole read).</summary>
+    internal static BankEntry[] FromRows(IReadOnlyList<string> rows)
+    {
+        if (rows.Count > MaximumEntries) throw new InvalidDataException("Invalid bank entry count.");
+        try
+        {
+            long size = 0;
+            var dtos = new EntryDto[rows.Count];
+            for (var index = 0; index < rows.Count; index++)
+            {
+                size += System.Text.Encoding.UTF8.GetByteCount(rows[index]);
+                if (size > MaximumBytes) throw new InvalidDataException("Bank entries exceed the size limit.");
+                using var document = JsonDocument.Parse(rows[index], new JsonDocumentOptions { MaxDepth = 16 });
+                RejectDuplicateProperties(document.RootElement);
+                dtos[index] = document.Deserialize<EntryDto>(JsonOptions) ?? throw new InvalidDataException("Missing bank entry.");
+            }
+            ValidateItemBounds(new FileDto { SchemaVersion = 1, SavedAtUtc = DateTimeOffset.UtcNow, Entries = dtos });
+            var entries = dtos.Select(FromDto).ToArray();
+            InventoryBankService.ValidateEntries(entries);
+            return entries;
+        }
+        catch (Exception ex) when (ex is JsonException or ArgumentException or OverflowException or NullReferenceException)
+        {
+            throw new InvalidDataException("Invalid bank entry.", ex);
         }
     }
 

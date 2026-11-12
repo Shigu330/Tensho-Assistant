@@ -153,10 +153,14 @@ public sealed class Plugin : IDalamudPlugin
             fashionData.Enabled=()=>configuration.CommunityFashion;
             MarketWorldReader? marketReader = null;
             registrations.Register(() => marketReader = new MarketWorldReader(market, framework, player, client, log, data), () => marketReader?.Dispose());
-            // 0.345 (g, I-03): one file per character (InventoryBank/<id>.json); the former shared file is split once.
+            // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress, voyage history,
+            // bank), opened on first use. 0.1149: made here, before the bank.
+            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+            // 0.345 (g, I-03): one file per character (InventoryBank/<id>.json); the former shared file is split once. X-173 (0.1149): kept in
+            // TenshoData.db, the files of before converted at the first load and kept aside.
             var bank = new InventoryBankService(new PerCharacterBankStore(
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank"),
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json")));
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json"), data: tenshoData));
             registrations.Register(() => { }, bank.Dispose);
             IReadOnlyList<(uint,uint)>? cabinet = null;
             var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log, () => configuration.AutoBankCapture,
@@ -628,9 +632,6 @@ public sealed class Plugin : IDalamudPlugin
             this.alarmBar=()=>alarmBar;
             this.currencyBar=()=>currencyBar;
             FreeCompany.VoyageWatcher? voyages=null;
-            // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress, voyage history),
-            // opened on first use. 0.1148: opened here, before the voyage history.
-            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
             // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
             // converted at its first load and kept aside.
             var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);

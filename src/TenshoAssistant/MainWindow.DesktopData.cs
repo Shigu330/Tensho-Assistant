@@ -14,9 +14,7 @@ internal sealed partial class MainWindow
         switch(category)
         {
             case "bank":
-                var previousBank=bank;
-                bank=new InventoryBankService(new PerCharacterBankStore(Path.Combine(folder,"InventoryBank"),Path.Combine(folder,"InventoryBank.json")));
-                previousBank?.Dispose();
+                UseDesktopBank(folder,warn);
                 break;
             case "craft-lists":
                 CraftListStore=new Craft.CraftListStore(Path.Combine(folder,"CraftLists.json"),warn);
@@ -37,6 +35,7 @@ internal sealed partial class MainWindow
             case "data":
                 UseDesktopPlayerData(folder,warn);
                 UseDesktopVoyages(folder,warn);
+                UseDesktopBank(folder,warn);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");
@@ -53,6 +52,18 @@ internal sealed partial class MainWindow
     {
         var json=Path.Combine(folder,"VoyageHistory.json");var file=Path.Combine(folder,TenshoDataDatabase.FileName);
         VoyageHistorySource=new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null);
+    }
+
+    // X-173 (0.1149): the bank and inventories from the copy of the data file once the plugin converted them (no bank file left in the copy:
+    // DesktopMirror removes the copies of files gone from the plugin's folder), from the copy of the files before; the application never
+    // converts its copy itself (the data file is given only when no bank file is left, so there is nothing to convert).
+    private void UseDesktopBank(string folder,Action<Exception,string> warn)
+    {
+        var files=Path.Combine(folder,"InventoryBank");var legacy=Path.Combine(folder,"InventoryBank.json");var file=Path.Combine(folder,TenshoDataDatabase.FileName);
+        var json=File.Exists(legacy) || Directory.Exists(files) && Directory.EnumerateFiles(files,"*.json*").Any();
+        var previousBank=bank;
+        bank=new InventoryBankService(new PerCharacterBankStore(files,legacy,data:!json && File.Exists(file) ? new TenshoDataFile(file,warn):null));
+        previousBank?.Dispose();
     }
 
     private Inventory.GilJournalState? desktopGil;

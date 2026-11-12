@@ -104,7 +104,8 @@ What the plugin does that matters for security (read against the code of the `De
   the player's own browser only on a click or a `/tensho wiki|lodestone` command; help videos and tool links ask for a confirmation
   that shows the address first. Tensho itself sends nothing.
 - **Local files**, in the plugin's Dalamud configuration folder: the configuration (through Dalamud); the disk cache (`DataCache-v1/`);
-  the saved storages (`InventoryBank/`, one file per character; a former `InventoryBank.json` is kept as `.migrated`); the gil journal
+  the saved storages (since 0.1149 in the player's data file `TenshoData.db`, saved per character in one transaction; the files of before,
+  `InventoryBank/` with one file per character, are kept once in `before-sqlite-<date>/`, a former `InventoryBank.json` as `.migrated`); the gil journal
   (90 days and 20,000 entries per character at most; since 0.1139 in the player's data file `TenshoData.db`, one SQLite database at the
   root of the folder, saved whole per character in one transaction; the files of before, `GilJournal/<id>.json`, are kept once in
   `GilJournal/before-sqlite-<date>/`); the achievement progress seen per character (since 0.1140 in `TenshoData.db` too; the file of
@@ -112,7 +113,8 @@ What the plugin does that matters for security (read against the code of the `De
   (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
   imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
-  `community.sha256`, the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, notebook exports
+  `community.sha256`, the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); the voyage history (since 0.1148 in `TenshoData.db`;
+  the file of before, `VoyageHistory.json`, is kept once in `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, notebook exports
   (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
   only the GitHub exchange above sends anything. Translators can put language JSON files beside the DLL; they are validated when
@@ -279,8 +281,9 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   `/tensho wiki|lodestone` ; les vidéos d'aide et les liens des outils demandent d'abord une confirmation qui montre l'adresse. Tensho
   lui-même n'envoie rien.
 - **Fichiers locaux**, dans le dossier de configuration Dalamud du plugin : la configuration (par Dalamud) ; le cache disque
-  (`DataCache-v1/`) ; les rangements enregistrés (`InventoryBank/`, un fichier par personnage ; un ancien `InventoryBank.json` est gardé
-  en `.migrated`) ; le journal des gils (90 jours et 20 000 entrées par personnage au plus ; depuis 0.1139 dans le fichier de données du joueur,
+  (`DataCache-v1/`) ; les rangements enregistrés (depuis 0.1149 dans le fichier de données du joueur `TenshoData.db`, enregistrés par personnage en une
+  transaction ; les fichiers d'avant, `InventoryBank/` avec un fichier par personnage, sont gardés une fois dans `before-sqlite-<date>/`,
+  un ancien `InventoryBank.json` en `.migrated`) ; le journal des gils (90 jours et 20 000 entrées par personnage au plus ; depuis 0.1139 dans le fichier de données du joueur,
   `TenshoData.db`, une base SQLite à la racine du dossier, enregistré en entier par personnage en une transaction ; les fichiers d'avant,
   `GilJournal/<id>.json`, sont gardés une fois dans `GilJournal/before-sqlite-<date>/`) ; la progression des succès vue, par personnage
   (depuis 0.1140 dans `TenshoData.db` aussi ; le fichier d'avant, `AchievementProgress.json`, est gardé une fois dans `before-sqlite-<date>/`) ; ce que Tensho a
@@ -289,7 +292,8 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   `Discoveries.json` et `Shared/`, sont gardés une fois dans `before-sqlite-<date>/` ; les prix vus au tableau des
   ventes dans `MarketSeen.json`, sans nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur, les
   dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community.sha256`, le `github.token` chiffré et, avec l'application GitHub, le `github.refresh` chiffré) ;
-  `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
+  `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; l'historique des voyages (depuis 0.1148 dans `TenshoData.db` ;
+  le fichier d'avant, `VoyageHistory.json`, est gardé une fois dans `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
   `SelfCheckSeen.json` et `PageSweepLast.txt`. La base de découvertes ne garde que des lignes du jeu et des lieux, jamais le nom, la
   position ou l'identifiant d'un autre joueur ; l'import fusionne les fichiers que le joueur place dans `Import/`, l'export écrit un
   fichier dans `Export/` ; seul l'échange GitHub ci-dessus envoie quelque chose. Les traducteurs peuvent poser des fichiers de langue JSON à côté de la DLL ; ils sont validés au rechargement.
