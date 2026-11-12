@@ -112,6 +112,8 @@ internal sealed partial class MainWindow
                 DrawStateMark(known); ImGui.SameLine();
                 ImGui.TextColored(known == true ? Success : known == false ? Muted : Accent, beast.Name);
                 if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("BeastUi.Tooltip", beast.Id, beast.Assault, beast.Volley));
+                // X-135 (0.1163): the beast's rank when read (team window or board result).
+                if (BeastRanks?.TryGetValue(beast.Id, out var rankKnown) == true) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.KnownRank", rankKnown)); }
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.Family);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                 var stats = beast.At(beastRank);
@@ -150,7 +152,8 @@ internal sealed partial class MainWindow
     private bool beastPlansLoaded;
     private Task<BoardPlan>? beastPlanTask;
     private (uint Board, string Key)? beastPlanFor;
-    internal BoardPlan? BeastPlanFor(Board board, BeastState state)
+    /// <summary>X-135 (0.1163): read once, before the first draw or the first ranks read (before, ranks read before the page was opened were lost).</summary>
+    private BeastTeams.SavedPlans LoadBeastPlans()
     {
         if (!beastPlansLoaded)
         {
@@ -159,6 +162,16 @@ internal sealed partial class MainWindow
             catch (Exception error) { log.Warning(error, "Beast team plans unreadable."); }
             beastPlans ??= new([], []);
         }
+        return beastPlans!;
+    }
+    private void SaveBeastPlans()
+    {
+        try { if (beastPlans is not null && BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+        catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+    }
+    internal BoardPlan? BeastPlanFor(Board board, BeastState state)
+    {
+        LoadBeastPlans();
         var key = BeastTeams.Key(state.Obtained, BeastRanks);
         if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
         {
@@ -166,8 +179,7 @@ internal sealed partial class MainWindow
             if (done.IsCompletedSuccessfully)
             {
                 beastPlans!.Plans[wanted.Board] = done.Result; beastPlans.Keys[wanted.Board] = wanted.Key;
-                try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
-                catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+                SaveBeastPlans();
             }
         }
         if (beastPlans!.Keys.GetValueOrDefault(board.Id) == key && beastPlans.Plans.TryGetValue(board.Id, out var plan)) return plan;
@@ -180,18 +192,38 @@ internal sealed partial class MainWindow
         return beastPlans.Plans.GetValueOrDefault(board.Id);
     }
     /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
-    internal IReadOnlyDictionary<uint, int>? BeastRanks => beastPlans?.Ranks;
+    internal IReadOnlyDictionary<uint, int>? BeastRanks => LoadBeastPlans().Ranks;
     /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change.</summary>
     internal void BeastRanksRead(Dictionary<uint, int> ranks)
     {
-        if (beastPlans is null) return;
-        var known = beastPlans.Ranks ?? [];
+        var plans = LoadBeastPlans();
+        var known = plans.Ranks ?? [];
         if (ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)) return;
         var merged = new Dictionary<uint, int>(known);
         foreach (var (beast, rank) in ranks) merged[beast] = rank;
-        beastPlans = beastPlans with { Ranks = merged };
-        try { if (BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
-        catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+        beastPlans = plans with { Ranks = merged };
+        SaveBeastPlans();
+    }
+    /// <summary>X-135 (0.1163): the board's result read in the game's result window: kept as the last result, its « after » ranks over those known.</summary>
+    internal void BeastResultRead(BoardResult result)
+    {
+        var plans = LoadBeastPlans();
+        if (BeastResults.Same(plans.Result, result)) return;
+        beastPlans = plans with { Result = result, Ranks = BeastResults.Merge(plans.Ranks, result) };
+        SaveBeastPlans();
+    }
+    /// <summary>X-135 (0.1163): the last board's result: score, then each beast's rank and experience before and after.</summary>
+    private void DrawBeastResult(BeastCatalog catalog)
+    {
+        if (LoadBeastPlans().Result is not { } result) { ImGui.TextDisabled(localization.Get("BeastUi.ResultNone")); return; }
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
+        foreach (var gain in result.Beasts)
+        {
+            var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);
+            if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); }
+            ImGui.TextUnformatted(localization.Format("BeastUi.ResultBeast", beast?.Name ?? $"#{gain.Beast}", gain.RankBefore, gain.ExpBefore, gain.RankAfter, gain.ExpAfter));
+            if (gain.RankAfter > gain.RankBefore) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.ResultRanks", gain.RankAfter - gain.RankBefore)); }
+        }
     }
     /// <summary>X-109 (0.981): the board of a labyrinth territory (its ContentFinderCondition); null outside.</summary>
     internal Func<uint, uint>? BeastBoardOfTerritory { get; set; }
@@ -221,6 +253,7 @@ internal sealed partial class MainWindow
         var board = DrawBeastBoardChoice(catalog);
         BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
         ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
+        DrawBeastResult(catalog);
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null);
     }
