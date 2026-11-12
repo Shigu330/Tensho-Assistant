@@ -17,7 +17,9 @@ internal static class PlanCompact1092Tests
             Check(heavy.Count == 0,"a done row stays short: " + string.Join(" / ",heavy.Select(l => l[..40])));
             Check(rows.Any(l => l.StartsWith("| X-01 |") && l.Length > 320),"an open point (X-01) keeps its full text");
             var size = new FileInfo(path).Length;
-            Check(size < 160_000,"GLOBAL-PLAN stays under its budget (160 KB, both languages): " + size);
+            // 0.1135 (relais 26): 160 KB → 200 KB: the open points added since 0.1118 (X-165 to X-176, about 18 KB in both languages) keep their full text
+            // by design; done rows stay short (checked above).
+            Check(size < 200_000,"GLOBAL-PLAN stays under its budget (200 KB, both languages): " + size);
         }),
     ];
 }

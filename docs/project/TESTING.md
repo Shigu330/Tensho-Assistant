@@ -1712,6 +1712,36 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1118) Deux jeux lancés sur le même PC (deux personnages, même profil Dalamud) : ouvrir le sac de selle avec l'un puis avec l'autre, puis un servant avec le premier ; Stockage › Personnages montre toujours les deux personnages, après un redémarrage aussi
 
+- [ ] (0.1119) Lien activé, application de bureau de la même version ouverte : changer un réglage dans le jeu, l'application dit « Réglages du plugin relus à … » (avis « settings »)
+
+- [ ] (0.1119) Lien activé avec une application de bureau plus ancienne (0.1116) : la nouvelle dit « le jeu offre le protocole de lien 2 / 3 » selon le côté, sans planter
+
+- [ ] (0.1120) Lien activé, application de bureau ouverte : changer plusieurs réglages de suite dans le jeu ; l'application dit une fois « Réglages du plugin relus à … » et ses pages suivent ; la page Discord de l'application ne montre aucune adresse
+
+- [ ] (0.1122) Paramètres › Cache : « Vider le cache », Oui : le message dit le nombre de fichiers retirés et la copie (dossier Backups) ; les pages qui lisent le cache se rechargent ensuite normalement
+
+- [ ] (0.1124) Ouvrir le tableau du marché d'un objet, puis d'un autre aussitôt et désactiver Universalis (Paramètres › Avancé) pendant les 3 secondes : le second dit « source coupée », aucune requête ne part
+
+- [ ] (0.1125) Aide › Signaler un problème : remplir un bug avec un chemin « C:\Users\Nom Prénom\x » dans le titre, « Préparer le formulaire GitHub » : l'aperçu montre <path>, rien ne s'ouvre ; changer un champ ferme l'aperçu ; « Ouvrir dans mon navigateur » ouvre le formulaire avec exactement le texte de l'aperçu (ne pas l'envoyer)
+
+- [ ] (0.1126) Après le rechargement de 0.1126 et l'auto-contrôle (mode développeur, personnage connecté) : %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\LaunchProof.json existe, version 0.1126.0, Failed 0, empreinte égale à celle de la DLL compilée (vérifiable par l'agent sans le joueur)
+
+- [ ] (0.1128) Carte › Carnet d'exploration : un panorama dont la fenêtre est ouverte dit « possible maintenant, jusqu'à HH:MM » et le jeu l'accepte ; un panorama hors de son heure n'est pas dans « Possibles maintenant » ; son infobulle dit ce qui manque et la prochaine fenêtre (Le Viaduc 020 : 05:00–07:59 ET, Ciel dégagé ou Beau temps)
+
+- [ ] (0.1128) Infobulle d'un panorama à météo rare (La Cité invisible 019, Nuages) : une prochaine fenêtre est donnée, ou « Aucune fenêtre dans les 30 prochains jours », jamais rien
+
+- [ ] (0.1129) Barre d'infos du serveur avec les alarmes, les rappels, les monnaies et les gils : chaque infobulle s'ouvre juste sous son entrée, sans sortir de l'écran ; avec « Au-dessus de l'entrée » coché et la barre en haut de l'écran, elles restent en dessous (pas de place au-dessus)
+
+- [ ] (0.1130) Carte de Tensho : les icônes de la colonne d'outils sont centrées dans leurs boutons ; cliquer le pourcentage, taper 150 puis Entrée : zoom à 150 % ; « 100% » sous le pourcentage remet 100 % ; la colonne reste lisible sur la carte (superposée) et dans une petite fenêtre
+
+- [ ] (0.1131) Application de bureau, jeu lancé, lien activé : Stockage, Listes d'artisanat, Mes outils, Historique des voyages montrent les données du personnage ; changer une liste d'artisanat en jeu : l'application la montre quelques secondes après ; le dossier pluginConfigs\TenshoAssistant n'est pas modifié par l'application
+
+- [ ] (0.1132) Application de bureau ouverte, jeu derrière : une alarme Tensho (non copiée dans le jeu) sonne dans l'application (son Windows, ligne « Alarme : … » dans la barre d'état) ; le jeu au premier plan : rien dans l'application (réglage par défaut) ; décocher « seulement si le jeu n'est pas au premier plan » : elle sonne des deux côtés
+
+- [ ] (0.1133) Découvertes › Importer : un fichier posé dans le dossier Import est joint ; il garde son nom « .json » jusqu'à la sauvegarde suivante (une minute au plus), puis devient « .json.imported » ; un deuxième clic sur Importer entre-temps ne le joint pas deux fois
+
+- [ ] (0.1134) Monde › Découvertes : l'aide de l'échange et l'info-bulle de « Connecter GitHub » disent qu'un poisson pris ou une touche porte l'endroit exact du personnage ; « Échanger maintenant » (connecté) envoie sans erreur
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.

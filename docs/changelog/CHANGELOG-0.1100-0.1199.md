@@ -2,6 +2,18 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1117.0
+- Plan global, X-140 : Installateur de l'application de bureau (audit A01 et A03) : un dossier qui porte le nom d'une version mais qu'il n'a pas installé n'est plus jamais supprimé ni remplacé ; l'installation s'arrête avec un message qui nomme le dossier, laissé tel quel. Chaque copie installée porte une marque ; une copie valide de Tensho déjà là est gardée telle quelle ; la copie en service, la précédente et celle qui tourne ne sont jamais remplacées. Chaque téléchargement et chaque dépaquetage a son propre emplacement temporaire, retiré après un échec ; le zip est dépaqueté depuis le fichier même dont l'empreinte a été vérifiée, avec un plafond de 2 000 entrées et 1 Go décompressé. update.json et le nettoyage des anciennes copies passent par un verrou partagé entre le plugin et l'application : l'état est relu avant chaque changement, plus aucun réglage perdu entre les deux. Le nettoyage ne touche que les copies de Tensho.
+- Tests : DesktopInstall1117Tests. Verify.ps1 (agent) : 1830/1830, 0 avertissement, 0 erreur ; DLL 0.1117.0.0. Non validé en jeu.
+### English
+- Desktop application installer (audit A01 and A03): a folder named like a version that it did not install is never deleted nor replaced any more; the install stops with a message naming the folder, left as it is. Every installed copy carries a mark; a valid Tensho copy already there is kept as it is; the copy in use, the previous one and the running one are never replaced. Every download and unpacking has its own temporary place, removed after a failure; the zip is unpacked from the very file whose hash was checked, capped at 2,000 entries and 1 GB unpacked. update.json and the clean-up of old copies go through a lock shared by the plugin and the application: the state is read again before each change, no setting is lost between the two. The clean-up touches only Tensho's copies.
+
+## 0.1116.0
+- Dédale bestial, première étape de la lecture du résultat du plateau (X-135, R06 : valeurs pas encore connues) : en mode développeur et dans le Dédale seulement, les nombres des fenêtres du Dédale (noms « XBM… », celle du résultat comprise) sont écrits dans le journal quand ils changent, 20 lignes par fenêtre et par visite au plus ; jamais un texte (une fenêtre de résultat peut nommer le personnage).
+- Tests : LabyrinthValues1116Tests. Verify.ps1 (agent) : 1824/1824, 0 avertissement, 0 erreur ; DLL 0.1116.0.0. Non validé en jeu.
+### English
+- Beast labyrinth, first step of reading the board's result (X-135, R06: values not known yet): in developer mode and in the labyrinth only, the numbers of the labyrinth's windows (names « XBM… », the result's included) are written to the log when they change, 20 lines per window and visit at most; never a text (a result window may name the character).
+
 ## 0.1115.0
 - Plan global, X-137 : Dédale bestial : Tensho n'y est plus coupé (choix de l'utilisateur du 11/11, aucun classement vu) ; ses territoires restent reconnus pour le panneau d'équipe. La coupure reste en JcJ, aux tournois de Triple Triade, au Mahjong et dans les donjons profonds. DEC-038 complétée (deux langues), ARCHITECTURE suit.
 - Tests : LabyrinthOpen1115Tests. Verify.ps1 (agent) : 1823/1823, 0 avertissement, 0 erreur ; DLL 0.1115.0.0. Non validé en jeu.
