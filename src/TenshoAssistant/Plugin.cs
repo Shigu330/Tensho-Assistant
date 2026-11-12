@@ -1619,8 +1619,8 @@ public sealed class Plugin : IDalamudPlugin
             {
                 SayLoad("10 s later");
                 if(!configuration.DeveloperMode)return;
-                // 0.1191: every name for an instance whose hubs were emptied (what an outside root still reaches), the first 24 otherwise.
-                foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,Diagnostics.UnloadWatch.IsEmptied(earlier.Value) ? 400:24));
+                // 0.1196: one short line per earlier instance: « 0 of N parts alive » when it was collected whole, else its first 24 parts held.
+                foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,24));
                 // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static
                 // fields still hold something an instance could hang from (read only, nothing of that instance is run or changed).
                 if(instances.Skip(1).Select(earlier=>(earlier.Key,Plugin:earlier.Value.GetValueOrDefault("plugin")?.Target)).FirstOrDefault(earlier=>earlier.Plugin is not null) is { Plugin:{ } alive } held)
@@ -1628,10 +1628,6 @@ public sealed class Plugin : IDalamudPlugin
                     log.Information("Earlier instance {0}: {1}.",held.Key,Diagnostics.UnloadWatch.Released(alive));
                     foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information("Earlier instance {0}: static {1}.",held.Key,line);
                 }
-                // 0.1189: the instances unloaded at least one whole load ago (never the one just unloaded) have their hubs emptied, once:
-                // what an outside root still holds no longer reaches the rest, and the lines of the next loads name what stays alive.
-                foreach(var old in instances.Skip(2))
-                    if(Diagnostics.UnloadWatch.EmptyHubs(old.Value) is var emptied and >0)log.Information("Earlier instance {0}: hubs emptied ({1} fields).",old.Key,emptied);
             },TaskScheduler.Default);
         }
         catch
@@ -1825,9 +1821,6 @@ public sealed class Plugin : IDalamudPlugin
             Diagnostics.UnloadWatch.Note(parts,"locals",developerAtUnload.Target,typeof(Plugin).Assembly);
             // 0.1191: and the closure of the constructor's outer scope behind it (its parameters and this).
             Diagnostics.UnloadWatch.Note(parts,"locals0",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target),typeof(Plugin).Assembly);
-            // 0.1192: and the plugin's own objects behind them, three levels deep, each under its path: what a root holds gets a name.
-            foreach(var (hub,owner) in new (string,object?)[]{("plugin",this),("window",mainWindow),("locals",developerAtUnload.Target),("locals0",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target))})
-                Diagnostics.UnloadWatch.NoteGraph(parts,hub,owner,typeof(Plugin).Assembly);
         }
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }

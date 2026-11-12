@@ -2,8 +2,7 @@ using System.Runtime.CompilerServices;
 using TenshoAssistant.Diagnostics;
 
 // 0.1191. X-01 C2.2: the hunting log's entries and the English monster names are built on a worker at load, not by the first frame with
-// monsters around. X-01 C1.3: the closure of the constructor's outer scope is noted and emptied with the other hubs, and an emptied
-// instance's line names every part still alive.
+// monsters around. X-01 C1.3: the closure of the constructor's outer scope is noted with the other hubs (0.1196: no longer emptied).
 internal static class MonsterSheets1191Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
@@ -26,6 +25,21 @@ internal static class MonsterSheets1191Tests
         }
     }
 
+    // The closures noted as the plugin notes its constructor's at unload; only « keep » holds the inner one afterwards.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static (Dictionary<string, WeakReference> Parts, WeakReference OuterValue, WeakReference InnerValue, bool Found) NotedClosures(List<object> keep)
+    {
+        var (inner, outerValue, innerValue) = Closures();
+        var closure = inner.Target!;
+        var outer = UnloadWatch.OuterClosure(closure);
+        var found = outer is not null && outer != closure && UnloadWatch.OuterClosure(outer) is null && UnloadWatch.OuterClosure(null) is null;
+        var parts = new Dictionary<string, WeakReference>(StringComparer.Ordinal);
+        UnloadWatch.Note(parts, "locals", closure, typeof(MonsterSheets1191Tests).Assembly);
+        UnloadWatch.Note(parts, "locals0", outer, typeof(MonsterSheets1191Tests).Assembly);
+        keep.Add(inner);
+        return (parts, outerValue, innerValue, found);
+    }
+
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
         ("Monster sheets 1191: wiring: both sheets are lazy and thread-safe, read ahead on a worker at load, a failure said once; the window asks the same value", () =>
@@ -37,39 +51,23 @@ internal static class MonsterSheets1191Tests
             var ahead = plugin.IndexOf("try{_=huntEntries.Value.Count;", StringComparison.Ordinal);
             Check(plugin.LastIndexOf("_=Task.Run(()=>", ahead, StringComparison.Ordinal) > ahead - 80, "on a worker, not in the constructor's thread");
         }),
-        ("Unload 1191: behaviour: the outer closure is found behind an inner one; emptied with the hubs, what it captured is collected", () =>
+        ("Unload 1191: behaviour: the outer closure is found behind an inner one and noted as a hub; let go, the closures and what they captured are collected", () =>
         {
-            var (inner, outerValue, innerValue) = Closures();
-            var closure = inner.Target!;
-            var outer = UnloadWatch.OuterClosure(closure);
-            Check(outer is not null && outer != closure && UnloadWatch.OuterClosure(outer) is null && UnloadWatch.OuterClosure(null) is null, "one scope around, none further");
-            var parts = new Dictionary<string, WeakReference>(StringComparer.Ordinal);
-            UnloadWatch.Note(parts, "locals", closure, typeof(MonsterSheets1191Tests).Assembly);
-            UnloadWatch.Note(parts, "locals0", outer, typeof(MonsterSheets1191Tests).Assembly);
-            Check(parts.Keys.Any(key => key.StartsWith("locals." + UnloadWatch.ClosureField, StringComparison.Ordinal)), "the inner closure's field to the outer one is noted: " + string.Join(",", parts.Keys));
+            var keep = new List<object>();
+            var (parts, outerValue, innerValue, found) = NotedClosures(keep);
+            Check(found, "one scope around, none further");
+            Check(parts.ContainsKey("locals0") && parts.Keys.Any(key => key.StartsWith("locals." + UnloadWatch.ClosureField, StringComparison.Ordinal)), "the outer closure is a hub, and the inner closure's field to it is noted: " + string.Join(",", parts.Keys));
             for (var round = 0; round < 3; round++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
-            Check(outerValue.IsAlive && innerValue.IsAlive, "held by the closures while they are whole");
-            Check(!UnloadWatch.IsEmptied(parts) && UnloadWatch.EmptyHubs(parts) > 0 && UnloadWatch.IsEmptied(parts), "emptied, marked");
+            Check(outerValue.IsAlive && innerValue.IsAlive && parts.Values.All(part => part.IsAlive), "held by the closures while a root holds the inner one");
+            keep.Clear();
             for (var round = 0; round < 10 && (outerValue.IsAlive || innerValue.IsAlive); round++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
-            Check(!outerValue.IsAlive && !innerValue.IsAlive, "the closures emptied (still held here), what they captured is collected");
-            GC.KeepAlive(inner); GC.KeepAlive(outer);
+            Check(!outerValue.IsAlive && !innerValue.IsAlive, "let go, what the closures captured is collected");
+            Check(UnloadWatch.Describe("x", parts) == $"x: context unknown, 0 of {parts.Count} parts alive", UnloadWatch.Describe("x", parts));
         }),
-        ("Unload 1191: an instance noted before « locals0 » existed: its outer closure, noted as a field of « locals », is emptied too", () =>
-        {
-            var (inner, outerValue, _) = Closures();
-            var parts = new Dictionary<string, WeakReference>(StringComparer.Ordinal);
-            UnloadWatch.Note(parts, "locals", inner.Target, typeof(MonsterSheets1191Tests).Assembly);
-            parts["!emptied"] = new WeakReference(null);
-            Check(UnloadWatch.IsEmptied(parts) && UnloadWatch.EmptyHubs(parts) > 0, "the first pass's mark does not stop the second pass");
-            for (var round = 0; round < 10 && outerValue.IsAlive; round++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
-            Check(!outerValue.IsAlive, "the outer closure's capture is collected");
-            Check(UnloadWatch.EmptyHubs(parts) == 0, "once per pass");
-            GC.KeepAlive(inner);
-        }),
-        ("Unload 1191: wiring: an emptied instance's line names every part alive; the outer closure is noted at unload", () =>
+        ("Unload 1191: wiring: the outer closure is noted at unload; a line names 24 parts at most", () =>
         {
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,Diagnostics.UnloadWatch.IsEmptied(earlier.Value) ? 400:24)", StringComparison.Ordinal), "every name once emptied");
+            Check(plugin.Contains("Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,24)", StringComparison.Ordinal), "a short line");
             Check(plugin.Contains("Diagnostics.UnloadWatch.Note(parts,\"locals0\",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target),typeof(Plugin).Assembly);", StringComparison.Ordinal), "outer closure noted");
         }),
     ];

@@ -34,7 +34,7 @@ internal static class UnloadShared1195Tests
         for (var round = 0; round < 10 && alive(); round++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
     }
 
-    // An instance noted as the plugin notes itself at unload (its fields, then its graph); nothing of it is kept unless « keep » says so.
+    // An instance noted as the plugin notes itself at unload (its own fields); nothing of it is kept unless « keep » says so.
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static Dictionary<string, WeakReference> Noted(bool keep)
     {
@@ -42,7 +42,6 @@ internal static class UnloadShared1195Tests
         if (keep) OutsideRoot.Add(hub.Service);
         var parts = new Dictionary<string, WeakReference>(StringComparer.Ordinal);
         UnloadWatch.Note(parts, "plugin", hub, typeof(UnloadShared1195Tests).Assembly);
-        UnloadWatch.NoteGraph(parts, "plugin", hub, typeof(UnloadShared1195Tests).Assembly);
         return parts;
     }
 
@@ -75,14 +74,14 @@ internal static class UnloadShared1195Tests
             var cache = new Dictionary<Type, HashSet<object>>();
             Check(UnloadWatch.Shared(hub.Fallback, typeof(Hub), cache) && cache.ContainsKey(typeof(Hub)) && UnloadWatch.Shared(hub.Notes, typeof(Hub), cache), "the static values of a type are read once per pass");
         }),
-        ("Unload shared 1195: the parts noted at unload leave out the shared values, by field and by graph", () =>
+        ("Unload shared 1195: the parts noted at unload leave out the shared values", () =>
         {
             OutsideRoot.Clear();
             try
             {
                 var parts = Noted(true);
                 var names = string.Join(" | ", parts.Keys.Order(StringComparer.Ordinal));
-                Check(names == "plugin | plugin.Own | plugin.OwnNotes | plugin.Rows | plugin.Service | plugin.Service.Leaf", names);
+                Check(names == "plugin | plugin.Own | plugin.OwnNotes | plugin.Rows | plugin.Service", names);
             }
             finally { OutsideRoot.Clear(); }
         }),
@@ -93,7 +92,7 @@ internal static class UnloadShared1195Tests
             {
                 var parts = Noted(false);
                 Collect(() => parts.Values.Any(part => part.IsAlive));
-                Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 0 of 6 parts alive", UnloadWatch.Describe("i", parts));
+                Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 0 of 5 parts alive", UnloadWatch.Describe("i", parts));
                 // The same instance as noted before 0.1195: collected as well, and its shared values are counted apart, not as held.
                 var before = NotedBefore(false);
                 Collect(() => before["plugin"].IsAlive || before["plugin.Service"].IsAlive);
@@ -108,7 +107,7 @@ internal static class UnloadShared1195Tests
             {
                 var parts = Noted(true);
                 Collect(() => parts["plugin"].IsAlive);
-                Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 2 of 6 parts alive: plugin.Service, plugin.Service.Leaf", UnloadWatch.Describe("i", parts));
+                Check(UnloadWatch.Describe("i", parts) == "i: context unknown, 1 of 5 parts alive: plugin.Service", UnloadWatch.Describe("i", parts));
                 var before = NotedBefore(true);
                 Collect(() => before["plugin"].IsAlive);
                 Check(UnloadWatch.Describe("o", before) == "o: context unknown, 5 of 6 parts alive, 4 shared (empty arrays: 3, static values: 1), 1 held: plugin.Service", UnloadWatch.Describe("o", before));

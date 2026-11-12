@@ -5,10 +5,13 @@ namespace TenshoAssistant.Diagnostics;
 /// <summary>
 /// X-01 C1.3 (0.1187, the root of the leak of unloaded instances): what the log says, ten seconds after a load, about the instances loaded
 /// before in the same game process: their load context alive or collected, and which named parts of each (the plugin object, the window,
-/// their fields that hold objects of the plugin's own code) are still alive. Weak references only, kept in a process-wide slot made of
-/// runtime types only, so the watch itself never keeps an instance or its context alive; nothing is collected or forced.
+/// the constructor's closures, and their fields that hold objects of the plugin's own code) are still alive. Weak references only, kept
+/// in a process-wide slot made of runtime types only, so the watch itself never keeps an instance or its context alive; nothing of an
+/// earlier instance is run, written, collected or forced.
 /// Reading: a context that stays alive while its parts are collected costs little (code and static tables); parts that stay alive name what
 /// still holds the instance. Roots found out of the game and readings: docs/evidence/0.1187-unload-roots.md.
+/// 0.1196: the root was found and fixed (0.1194) and the fix read in the game (0.1195: « 0 held »), so the tools of the search are gone:
+/// the emptying of old instances (0.1189) and the notes three levels deep (0.1192). One short line per earlier instance stays.
 /// </summary>
 public static class UnloadWatch
 {
@@ -18,16 +21,8 @@ public static class UnloadWatch
     public const int Kept=5;
     /// <summary>The name of the load context among an instance's parts.</summary>
     public const string Context="context";
-    /// <summary>0.1189: the mark of an instance whose hubs were emptied by a later load (names starting with « ! » are marks, not parts).</summary>
-    public const string Emptied="!emptied2";
-    /// <summary>0.1189: the objects everything else of an instance hangs from: the plugin, its window, the constructor's captured locals;
-    /// 0.1191: and the closure of the constructor's outer scope (« locals0 », or the closure field of « locals » for an instance noted before).</summary>
-    public static readonly IReadOnlyList<string> Hubs=["plugin","window","locals","locals0"];
     /// <summary>0.1191: how the compiler names the field of a closure that holds the closure of the scope around it.</summary>
     public const string ClosureField="CS$<>8__locals";
-
-    /// <summary>0.1191: whether a later load emptied this instance's hubs (any pass).</summary>
-    public static bool IsEmptied(IReadOnlyDictionary<string,WeakReference> parts)=>parts.Keys.Any(key=>key.StartsWith("!emptied",StringComparison.Ordinal));
 
     /// <summary>0.1191: the closure of the scope around a closure (the first field the compiler named so); null when there is none.</summary>
     public static object? OuterClosure(object? closure)
@@ -83,7 +78,7 @@ public static class UnloadWatch
     }
 
     /// <summary>Notes an owner and each of its fields that holds an object of the plugin's own code, weakly, under « name » and « name.field »
-    /// (0.1195: but a value shared by construction, see <see cref="Shared"/>).</summary>
+    /// (0.1195: but a value shared by construction, see <see cref="Shared"/>). One level only: the hubs' own fields (0.1196).</summary>
     public static void Note(Dictionary<string,WeakReference> parts,string name,object? owner,Assembly assembly)
     {
         if(owner is null)return;
@@ -100,56 +95,14 @@ public static class UnloadWatch
         }
     }
 
-    /// <summary>
-    /// 0.1192 (after the hubs were emptied, the plugin, the window, the data cache and the outer closure stayed alive, and no captured
-    /// service: what holds them is an object that no field of a hub names): notes the plugin's own objects reachable from an owner, to a
-    /// given depth, each under its path (« locals.service.field », « window.field→Target » through a delegate), so that an emptied
-    /// instance's line names the chain an outside root still holds. Objects of the plugin's classes and delegates' targets only (no
-    /// collection is walked), breadth first, each object once, <paramref name="cap"/> at most. Returns the objects noted.
-    /// </summary>
-    public static int NoteGraph(Dictionary<string,WeakReference> parts,string name,object? owner,Assembly assembly,int depth=3,int cap=3000)
-    {
-        if(owner is null)return 0;
-        var seen=new HashSet<object>(ReferenceEqualityComparer.Instance){owner};
-        var queue=new Queue<(string Path,object Value,int Level)>();
-        queue.Enqueue((name,owner,0));
-        var noted=0;
-        var statics=new Dictionary<Type,HashSet<object>>();
-        while(queue.Count>0 && noted<cap)
-        {
-            var (path,value,level)=queue.Dequeue();
-            if(parts.TryAdd(path,new WeakReference(value)))noted++;
-            if(level>=depth)continue;
-            for(var type=value.GetType();type is not null && type.Assembly==assembly;type=type.BaseType)
-                foreach(var field in type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
-                {
-                    if(field.FieldType.IsValueType || field.FieldType.IsPointer || field.FieldType==typeof(string))continue;
-                    object? held;
-                    try{held=field.GetValue(value);}
-                    catch(Exception error) when(error is NotSupportedException or FieldAccessException or TargetException){continue;}
-                    if(held is Delegate hook)
-                    {
-                        foreach(var target in hook.GetInvocationList().Select(one=>one.Target))
-                            if(target is not null && target.GetType().Assembly==assembly && !CompilerSingleton(target.GetType()) && seen.Add(target))
-                                queue.Enqueue(($"{path}.{field.Name}→{target.GetType().Name}",target,level+1));
-                        continue;
-                    }
-                    // 0.1195: a value shared by construction (an empty array, a static value) is not a part of the instance.
-                    if(held is null || held.GetType().Assembly!=assembly || held.GetType().IsEnum || Shared(held,type,statics) || !seen.Add(held))continue;
-                    queue.Enqueue(($"{path}.{field.Name}",held,level+1));
-                }
-        }
-        return noted;
-    }
-
     /// <summary>One line for an earlier instance: its context, and its parts still alive out of those noted (the first names, in order).</summary>
     public static string Describe(string label,IReadOnlyDictionary<string,WeakReference> parts,int names=24)
     {
         var context=parts.TryGetValue(Context,out var held) ? (held.IsAlive ? "alive":"collected"):"unknown";
-        var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith('!')).ToList();
+        var noted=parts.Where(part=>part.Key!=Context).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
-        // 0.1195: each part read once (a target taken is alive for the line); the parts shared by construction are counted apart from
-        // those a root holds, since an instance noted before 0.1195 has its empty arrays and static values among its parts.
+        // 0.1195: each part read once (a target taken is alive for the line); a part shared by construction is counted apart from those a
+        // root holds (an instance noted before 0.1195 has its empty arrays and static values among its parts; none is noted since).
         var alive=new List<string>();
         var collected=new List<string>();
         int empties=0,statics=0;
@@ -162,55 +115,12 @@ public static class UnloadWatch
             else alive.Add(part.Key);
         }
         var shared=empties+statics;
-        var head=$"{label}: context {context}{(IsEmptied(parts) ? ", hubs emptied":"")}, {alive.Count+shared} of {noted.Count} parts alive";
+        var head=$"{label}: context {context}, {alive.Count+shared} of {noted.Count} parts alive";
         if(shared>0)head+=$", {shared} shared (empty arrays: {empties}, static values: {statics})"+(alive.Count>0 ? $", {alive.Count} held":"");
         if(alive.Count==0)return head;
         // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
         var (word,list)=collected.Count>0 && collected.Count<alive.Count ? ("; collected: ",collected):(": ",alive);
         return head+word+string.Join(", ",list.Take(names))+(list.Count>names ? ", …":"");
-    }
-
-    /// <summary>
-    /// 0.1189 (the second measure of 0.1188: unload finished, no static of the assembly holds an instance, and yet 463 of 471 parts alive:
-    /// the root is outside the plugin's code): empties one object of an instance unloaded earlier: each reference field declared by the
-    /// plugin's own types is set to null, so that what an outside root still holds no longer reaches the rest. The parts that stay alive
-    /// afterwards are what the root holds, and the rest of that instance can be collected. Returns the fields emptied.
-    /// Only for an instance whose unload finished at least one whole load ago: nothing of it runs any more.
-    /// </summary>
-    public static int Empty(object? owner,Assembly assembly)
-    {
-        if(owner is null)return 0;
-        var emptied=0;
-        for(var type=owner.GetType();type is not null && type.Assembly==assembly;type=type.BaseType)
-            foreach(var field in type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
-            {
-                if(field.FieldType.IsValueType || field.FieldType.IsPointer || field.FieldType==typeof(string))continue;
-                try
-                {
-                    if(field.GetValue(owner) is null)continue;
-                    field.SetValue(owner,null);
-                    emptied++;
-                }
-                catch(Exception error) when(error is FieldAccessException or TargetException or NotSupportedException or ArgumentException){}
-            }
-        return emptied;
-    }
-
-    /// <summary>0.1189: empties the hubs of one earlier instance, once (marked); the fields emptied, 0 when already done or nothing alive.</summary>
-    public static int EmptyHubs(Dictionary<string,WeakReference> parts)
-    {
-        lock(parts)
-        {
-            if(parts.ContainsKey(Emptied))return 0;
-            var emptied=0;
-            foreach(var hub in Hubs)
-                if(parts.GetValueOrDefault(hub)?.Target is { } target)emptied+=Empty(target,target.GetType().Assembly);
-            // 0.1191: the outer closures noted as fields of a hub (an instance noted before « locals0 » existed).
-            foreach(var (name,part) in parts.ToArray())
-                if(name.Contains("."+ClosureField,StringComparison.Ordinal) && part.Target is { } closure)emptied+=Empty(closure,closure.GetType().Assembly);
-            if(emptied>0)parts[Emptied]=new WeakReference(null);
-            return emptied;
-        }
     }
 
     /// <summary>
