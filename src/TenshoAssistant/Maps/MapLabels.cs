@@ -131,6 +131,8 @@ public static class MapLabels
     /// own icon, so the name decides: an icon named like a map (services have no name). Not plain place names (icon 0). See docs/evidence/0.639-instance-markers.md.
     /// </summary>
     public static bool OpensNamedMap(uint icon,uint dataType)=>dataType==0 && icon!=0;
+    /// <summary>X-138 (0.1166): the name a marker shows in menus and tooltips: the game's label, else its own title (an aetheryte's name).</summary>
+    public static string MenuName(string label,string title)=>label.Length>0 ? label:title;
     /// <summary>0.642 (user capture, too large once zoomed out): a place name's height on the map, read on the game's own map (about 18 px at zoom 0.39): it never exceeds this.</summary>
     public const float PlaceNameMapHeight=46f;
     public static float PlaceNameSize(float size,float zoom,float scale)=>Math.Max(6,Math.Min(size*PlaceNameShare,PlaceNameMapHeight*zoom*scale));

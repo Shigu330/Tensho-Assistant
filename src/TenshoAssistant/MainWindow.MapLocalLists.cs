@@ -333,8 +333,8 @@ internal sealed partial class MainWindow
         foreach(var marker in aetherytes)
         {
             DrawSmallGameIcon(marker.Icon);
-            if(ImGui.Selectable($"{marker.Label}##Aetheryte{marker.AetheryteId}"))
-            {mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
+            if(ImGui.Selectable($"{marker.Shown}##Aetheryte{marker.AetheryteId}"))
+            {mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Shown);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;ImGui.CloseCurrentPopup();}
             Tip("MapView.TeleportHint");
         }
     }

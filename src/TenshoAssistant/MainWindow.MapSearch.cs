@@ -38,7 +38,7 @@ internal sealed partial class MainWindow
                     token.ThrowIfCancellationRequested();
                     var map=group.First();
                     foreach(var marker in markers?.Read(group.Key) ?? [])
-                        hits.Add(new(marker.AetheryteId!=0 ? MapSearchKind.Aetheryte:MapSearchKind.Place,marker.Label,map.Zone,map.MapId,new(marker.X,marker.Y)));
+                        hits.Add(new(marker.AetheryteId!=0 ? MapSearchKind.Aetheryte:MapSearchKind.Place,marker.Shown,map.Zone,map.MapId,new(marker.X,marker.Y)));
                 }
                 foreach(var vendor in vendors?.Vendors ?? [])
                 foreach(var spot in vendor.Locations)

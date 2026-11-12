@@ -1395,7 +1395,7 @@ internal sealed partial class MainWindow
             MapMark("canvas vendors");
             foreach(var marker in settings.ShowFixedIcons ? markers.Where(marker=>marker.Icon!=0):[])
             {
-                var label=marker.Label.Length>0 ? marker.Label:null;Vector2? vendorFlag=null;
+                var label=marker.Shown.Length>0 ? marker.Shown:null;Vector2? vendorFlag=null;
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
             }
@@ -1716,7 +1716,7 @@ internal sealed partial class MainWindow
                     // Aetherytes: a click asks for the teleport, like the game map (normal teleport cost).
                     if(marker.AetheryteId!=0 && settings.TeleportOnClick)
                     {
-                        if(released){mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Label);mapLive?.RefreshTeleportCosts();ImGui.OpenPopup("MapTeleport");}
+                        if(released){mapTeleportNote=null;mapTeleportTarget=(marker.AetheryteId,marker.Shown);mapLive?.RefreshTeleportCosts();ImGui.OpenPopup("MapTeleport");}
                     }
                 }
                 if(chosen.Flag is { } vendorSpot && released)FlagFromMap(map,vendorSpot.X,vendorSpot.Y);
@@ -1875,7 +1875,7 @@ internal sealed partial class MainWindow
             if(live?.Flag is not null && ImGui.Selectable(localization.Get("MapView.RemoveFlag")+"##IconRemoveFlag"))mapLive?.RemoveFlag();
             DrawNearestAetheryteEntry(map);
             if(item.Fixed is { AetheryteId:not 0 } aetheryte && ImGui.Selectable(localization.Get("MapView.IconTeleport")))
-                {mapTeleportNote=null;mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Label);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
+                {mapTeleportNote=null;mapTeleportTarget=(aetheryte.AetheryteId,aetheryte.Shown);mapLive?.RefreshTeleportCosts();mapTeleportRequested=true;}
             if(item.Fixed is { LinkMapId:not 0 } linked && ImGui.Selectable(localization.Get("MapView.IconOpenMap")))NavigateMap(linked.LinkMapId);
             if(item.Point is { } point && point.Items.Count>0)
             {

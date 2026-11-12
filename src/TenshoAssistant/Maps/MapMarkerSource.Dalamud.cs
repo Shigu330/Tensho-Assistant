@@ -7,7 +7,13 @@ namespace TenshoAssistant.Maps;
 // LinkMapId: on region and world maps, DataType 1 markers open that map (probe: docs/evidence/0.103.0-maps-probe.log).
 // AetheryteId: DataType 3 markers are aetherytes (DataKey = Aetheryte row; probe docs/evidence/0.107.0-aetheryte-probe.log).
 // Orientation: where the game writes the label (MapMarker SubtextOrientation, Maps/MapLabels.cs).
-public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0,byte Orientation=0);
+// X-138 (0.1166, user capture, Central Shroud): an aetheryte marker without a subtext (MapMarker 5.16, Bentbranch) has no Label, the game drawing the
+// place's name with another marker; Title is then the aetheryte's own name (Aetheryte sheet), for menus, tooltips and search, never drawn on the map.
+public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0,byte Orientation=0,string Title="")
+{
+    /// <summary>The name to show in menus and tooltips: the game's label, else the aetheryte's name.</summary>
+    public string Shown=>MapLabels.MenuName(Label,Title);
+}
 
 /// <summary>
 /// Game data for the map window, copied once per key: fixed markers per range, and the overview maps (regions, world)
@@ -38,7 +44,7 @@ internal sealed class MapMarkerSource
     /// <summary>0.597 (P10): the markers with a name, for work off the frame: touches neither the frame's cache nor its failures.</summary>
     public IReadOnlyList<MapIconMarker> Read(uint range)
     {
-        try{return range==0 ? []:Copy(range).Where(marker=>marker.Label.Length>0).ToArray();}
+        try{return range==0 ? []:Copy(range).Where(marker=>marker.Shown.Length>0).ToArray();}
         catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);return [];}
     }
     private (Dictionary<uint,(uint Map,uint Range)> ByPlace,Dictionary<string,(uint Map,uint Range)> ByName)? namedMaps;
@@ -71,7 +77,8 @@ internal sealed class MapMarkerSource
             foreach(var row in rows)
             {
                 var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
-                if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:NamedMap(row.Icon,row.DataType,row.PlaceNameSubtext.RowId,label,range),row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation));
+                if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:NamedMap(row.Icon,row.DataType,row.PlaceNameSubtext.RowId,label,range),row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation,
+                    row.DataType==3 && label.Length==0 ? AetheryteName(row.DataKey.RowId):""));
             }
         return markers.AsReadOnly();
     }
@@ -120,6 +127,13 @@ internal sealed class MapMarkerSource
     }
     public MapDefinition? Overview(uint mapId){LoadOverviews();return overviews!.GetValueOrDefault(mapId);}
     private IReadOnlyList<AetheryteRow>? aetherytes;
+    private Dictionary<uint,string>? aetheryteNames;
+    /// <summary>X-138 (0.1166): an aetheryte's name (its place, or its aethernet name for a shard); empty when unknown.</summary>
+    private string AetheryteName(uint id)
+    {
+        var names=aetheryteNames ??= Aetherytes.GroupBy(row=>row.Id).ToDictionary(group=>group.Key,group=>group.First().Name);
+        return names.GetValueOrDefault(id,"");
+    }
     /// <summary>0.833 (X-63): every Aetheryte row, main or aethernet shard, with its Level position; copied once, empty when the read fails.</summary>
     public IReadOnlyList<AetheryteRow> Aetherytes
     {

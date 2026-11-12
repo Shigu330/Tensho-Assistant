@@ -149,7 +149,7 @@ internal sealed partial class MainWindow
             mapOpenError=localization.Get(markers.Count==0 ? "ChatLinks.NoAetheryte":"ChatLinks.NoAttuned");mapErrorUntil=now.AddSeconds(5);
             return;
         }
-        var label=markers.First(marker=>marker.AetheryteId==found).Label;
+        var label=markers.First(marker=>marker.AetheryteId==found).Shown;
         // 0.399 (user request): « Go there » with « teleport at once » — straight to the aetheryte when the game's teleport list has its
         // cost (attuned); otherwise the usual question below.
         if(request.Direct && !failed && costs?.ContainsKey(found)==true){mapLive?.Teleport(found);return;}
