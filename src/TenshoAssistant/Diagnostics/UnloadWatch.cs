@@ -18,6 +18,10 @@ public static class UnloadWatch
     public const int Kept=5;
     /// <summary>The name of the load context among an instance's parts.</summary>
     public const string Context="context";
+    /// <summary>0.1189: the mark of an instance whose hubs were emptied by a later load (names starting with « ! » are marks, not parts).</summary>
+    public const string Emptied="!emptied";
+    /// <summary>0.1189: the objects everything else of an instance hangs from: the plugin, its window, the constructor's captured locals.</summary>
+    public static readonly IReadOnlyList<string> Hubs=["plugin","window","locals"];
 
     /// <summary>This instance first (its context noted weakly), then the earlier ones read from the slot, <see cref="Kept"/> at most.</summary>
     public static List<KeyValuePair<string,Dictionary<string,WeakReference>>> Push(object? slot,string label,object? context)
@@ -54,15 +58,55 @@ public static class UnloadWatch
     public static string Describe(string label,IReadOnlyDictionary<string,WeakReference> parts,int names=24)
     {
         var context=parts.TryGetValue(Context,out var held) ? (held.IsAlive ? "alive":"collected"):"unknown";
-        var noted=parts.Where(part=>part.Key!=Context).ToList();
+        var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith('!')).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
         var alive=noted.Where(part=>part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
-        var head=$"{label}: context {context}, {alive.Count} of {noted.Count} parts alive";
+        var head=$"{label}: context {context}{(parts.ContainsKey(Emptied) ? ", hubs emptied":"")}, {alive.Count} of {noted.Count} parts alive";
         if(alive.Count==0)return head;
         // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
         var collected=noted.Where(part=>!part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
         var (word,list)=collected.Count>0 && collected.Count<alive.Count ? ("; collected: ",collected):(": ",alive);
         return head+word+string.Join(", ",list.Take(names))+(list.Count>names ? ", …":"");
+    }
+
+    /// <summary>
+    /// 0.1189 (the second measure of 0.1188: unload finished, no static of the assembly holds an instance, and yet 463 of 471 parts alive:
+    /// the root is outside the plugin's code): empties one object of an instance unloaded earlier: each reference field declared by the
+    /// plugin's own types is set to null, so that what an outside root still holds no longer reaches the rest. The parts that stay alive
+    /// afterwards are what the root holds, and the rest of that instance can be collected. Returns the fields emptied.
+    /// Only for an instance whose unload finished at least one whole load ago: nothing of it runs any more.
+    /// </summary>
+    public static int Empty(object? owner,Assembly assembly)
+    {
+        if(owner is null)return 0;
+        var emptied=0;
+        for(var type=owner.GetType();type is not null && type.Assembly==assembly;type=type.BaseType)
+            foreach(var field in type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
+            {
+                if(field.FieldType.IsValueType || field.FieldType.IsPointer || field.FieldType==typeof(string))continue;
+                try
+                {
+                    if(field.GetValue(owner) is null)continue;
+                    field.SetValue(owner,null);
+                    emptied++;
+                }
+                catch(Exception error) when(error is FieldAccessException or TargetException or NotSupportedException or ArgumentException){}
+            }
+        return emptied;
+    }
+
+    /// <summary>0.1189: empties the hubs of one earlier instance, once (marked); the fields emptied, 0 when already done or nothing alive.</summary>
+    public static int EmptyHubs(Dictionary<string,WeakReference> parts)
+    {
+        lock(parts)
+        {
+            if(parts.ContainsKey(Emptied))return 0;
+            var emptied=0;
+            foreach(var hub in Hubs)
+                if(parts.GetValueOrDefault(hub)?.Target is { } target)emptied+=Empty(target,target.GetType().Assembly);
+            if(emptied>0)parts[Emptied]=new WeakReference(null);
+            return emptied;
+        }
     }
 
     /// <summary>

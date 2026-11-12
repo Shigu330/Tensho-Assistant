@@ -85,7 +85,8 @@ internal static class UnloadStatics1188Tests
             Check(plugin.Contains("foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information(\"Earlier instance {0}: static {1}.\",held.Key,line);", StringComparison.Ordinal), "statics of the earlier assembly");
             Check(plugin.Contains("Diagnostics.UnloadWatch.Note(parts,\"locals\",developerAtUnload.Target,typeof(Plugin).Assembly);", StringComparison.Ordinal), "captured locals noted");
             var watch = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/UnloadWatch.cs"));
-            Check(!watch.Contains(".SetValue(", StringComparison.Ordinal) && !watch.Contains(".Invoke(", StringComparison.Ordinal) && !watch.Contains("GC.Collect", StringComparison.Ordinal), "read only: nothing of an earlier instance is changed, run or collected");
+            // 0.1189: one write only, in Empty (the hubs of an instance unloaded at least one whole load ago); still nothing run or collected.
+            Check(watch.Split(".SetValue(").Length == 2 && watch.Contains("field.SetValue(owner,null);", StringComparison.Ordinal) && !watch.Contains(".Invoke(", StringComparison.Ordinal) && !watch.Contains("GC.Collect", StringComparison.Ordinal), "nothing of an earlier instance is run or collected; one write, in Empty");
         }),
     ];
 }

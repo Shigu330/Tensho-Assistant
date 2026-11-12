@@ -1617,6 +1617,10 @@ public sealed class Plugin : IDalamudPlugin
                     log.Information("Earlier instance {0}: {1}.",held.Key,Diagnostics.UnloadWatch.Released(alive));
                     foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information("Earlier instance {0}: static {1}.",held.Key,line);
                 }
+                // 0.1189: the instances unloaded at least one whole load ago (never the one just unloaded) have their hubs emptied, once:
+                // what an outside root still holds no longer reaches the rest, and the lines of the next loads name what stays alive.
+                foreach(var old in instances.Skip(2))
+                    if(Diagnostics.UnloadWatch.EmptyHubs(old.Value) is var emptied and >0)log.Information("Earlier instance {0}: hubs emptied ({1} fields).",old.Key,emptied);
             },TaskScheduler.Default);
         }
         catch

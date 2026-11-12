@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
         nearbyMonstersAt=now;
         nearbyDroppedItems=NoDroppedItems;nearbyMonsterNotes=NoMonsterNotes;
         var monsters=mapLive?.State?.Monsters ?? [];
-        if(monsters.Count==0){NearbyMonstersLog($"no monster read (map state {(mapLive?.State is null ? "none":"read")})");return;}
+        if(monsters.Count==0){if(developerMode)NearbyMonstersLog($"no monster read (map state {(mapLive?.State is null ? "none":"read")})");return;}
         var ids=monsters.Select(monster=>monster.NameId).Distinct().ToArray();
         var notes=new Dictionary<uint,List<MonsterNote>>();
         void Note(uint id,MonsterNoteKind kind,string text){if(!notes.TryGetValue(id,out var list))notes[id]=list=[];list.Add(new(kind,text));}
@@ -130,11 +130,11 @@ internal sealed partial class MainWindow
                         Note(id,MonsterNoteKind.Wish,localization.Format("MapView.MonsterWish",string.Join(", ",wished.Select(item=>itemCatalog.State.Catalog?.Find(item)?.Name ?? item.ToString()))));
             if(configuration.ListPanelsNearbyMonsters)nearbyDroppedItems=NearbyMonsters.DroppedNearby(monsters.Select(monster=>(monster.NameId,monster.Name)),Drops,needed);
             // 0.818 (X-53, user report: the woolly yak, the loaghtan not marked): what the chain sees, in developer mode, when it changes.
-            NearbyMonstersLog($"{monsters.Count} monsters ({string.Join(", ",monsters.Select(monster=>$"{monster.Name} {monster.NameId}").Distinct().Take(8))}); list needs {needed.Count} items; "
+            if(developerMode)NearbyMonstersLog($"{monsters.Count} monsters ({string.Join(", ",monsters.Select(monster=>$"{monster.Name} {monster.NameId}").Distinct().Take(8))}); list needs {needed.Count} items; "
                 +$"drops matched for {notes.Count(pair=>pair.Value.Any(note=>note.Kind==MonsterNoteKind.List))} monsters ({string.Join(", ",ids.Take(8).Select(id=>$"{id}:{data.ItemsDroppedBy(id).Count}/{Drops(id).Count}"))}); wiki {wikiDrops.Count}; "
                 +$"panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}, above {configuration.MapView.AboveList}");
         }
-        else NearbyMonstersLog($"{monsters.Count} monsters; drop data {(lumina?.State.Data is null ? "not loaded":"loaded")}, panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}");
+        else if(developerMode)NearbyMonstersLog($"{monsters.Count} monsters; drop data {(lumina?.State.Data is null ? "not loaded":"loaded")}, panel {configuration.ListPanelsNearbyMonsters}, map {configuration.MapView.ShowListMonsters}");
         // X-40 (0.1002, DEC-049): the monsters the relic book under way still asks for, by name (the book's names are the game's, in its language).
         if(configuration.MapView.ShowRelicMonsters && RelicNeeds() is { Count:>0 } relicNeeds)
             foreach(var monster in monsters.GroupBy(monster=>monster.NameId).Select(group=>group.First()))
@@ -196,6 +196,8 @@ internal sealed partial class MainWindow
     private (int Revision,object? Names) beastMonstersFor;private IReadOnlyDictionary<uint,IReadOnlyList<uint>> beastMonsters=new Dictionary<uint,IReadOnlyList<uint>>();
     internal BlueSpellMonsterIndex? BlueSpellNearby { get; set; }
     private string nearbyMonstersLogged="";
+    // X-177 C6 (0.1189, analysis of 12/11: 8 722 lines in 3.5 days, and the text was built every second out of developer mode too, the
+    // « list needs » one calling Drops again for 8 monsters): each caller asks developerMode before it builds the text.
     private void NearbyMonstersLog(string line)
     {
         if(!developerMode || line==nearbyMonstersLogged)return;
