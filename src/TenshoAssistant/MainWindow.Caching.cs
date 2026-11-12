@@ -108,9 +108,11 @@ internal sealed partial class MainWindow
                 {
                     try
                     {
-                        var copy=BackupZip.Create(root,backups,"cache",DateTimeOffset.UtcNow);
-                        var removed=await store.ClearAsync().ConfigureAwait(false);
-                        cacheClearMessage=localization.Format("CacheUi.Cleared",removed,copy ?? "—");
+                        // X-142 part 2 (0.1122): the copy and the purge as one operation of the cache's queue.
+                        var done=await store.ClearAsync(()=>BackupZip.Create(root,backups,"cache",DateTimeOffset.UtcNow)).ConfigureAwait(false);
+                        cacheClearMessage=done.Failed>0 ? localization.Format("CacheUi.ClearedPartial",done.Removed,done.Failed,done.Backup ?? "—")
+                            : localization.Format("CacheUi.Cleared",done.Removed,done.Backup ?? "—");
+                        if(done.Failed>0)log.Warning("Cache emptied in part: {0} file(s) removed, {1} could not be (in use).",done.Removed,done.Failed);
                     }
                     catch(Exception error){log.Warning(error,"The cache could not be emptied.");cacheClearMessage=localization.Get("CacheUi.ClearFailed");}
                 });

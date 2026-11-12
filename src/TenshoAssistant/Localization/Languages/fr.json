@@ -2528,6 +2528,7 @@
     "ClearNo": "Annuler",
     "Clearing": "Vidage du cache…",
     "Cleared": "{0} fichier(s) du cache retiré(s) ; copie : {1}",
+    "ClearedPartial": "Cache vidé en partie : {0} fichier(s) retiré(s), {1} n'ont pas pu l'être (en cours d'utilisation ; réessayez après un redémarrage du jeu) ; copie : {2}",
     "ClearFailed": "Le cache n’a pas pu être vidé (détails dans le journal de Dalamud).",
     "Completion": "Titres et succès (états conservés)",
     "Title": "Cache & péremption",

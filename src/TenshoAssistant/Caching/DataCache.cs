@@ -51,6 +51,8 @@ public sealed class DataCache : IDisposable
     private string? error;
     public string? Error=>Volatile.Read(ref error);
     public DataCache(string directory)=>root=Path.GetFullPath(directory);
+    /// <summary>X-142 part 2 (0.1122): what a purge did: files removed, files that could not be (in use), the copy taken before.</summary>
+    public sealed record CacheClearResult(int Removed,int Failed,string? Backup);
     private string FileName(string family,string scope,string version)
     {
         if(string.IsNullOrWhiteSpace(family) || family.Length>40 || scope.Length>2048 || version.Length>4096)throw new ArgumentException("Invalid cache identity.");
@@ -224,18 +226,36 @@ public sealed class DataCache : IDisposable
     public Task FlushAsync(){lock(gate)return writes;}
     /// <summary>X-76 step 3 (0.945): the cache folder.</summary>
     public string Root=>root;
-    /// <summary>X-76 step 3 (0.945): every cached file removed, once the writes asked before are done; the count removed.</summary>
-    public async Task<int> ClearAsync()
+    /// <summary>
+    /// X-76 step 3 (0.945): every cached file removed. X-142 part 2 (0.1122, audit A05): the copy and the purge are one operation of the write
+    /// queue: after every write asked before, holding the disk lock (no read or write runs meanwhile), the copy is taken (backup, when given),
+    /// then every file removed; a write asked after starts once the purge is done, so it is neither lost in the copy nor removed. A copy that
+    /// fails removes nothing (its exception is the task's). The files that could not be removed are counted: a partial purge is said.
+    /// </summary>
+    public Task<CacheClearResult> ClearAsync(Func<string?>? backup=null)
     {
-        Task pending;lock(gate)pending=writes;
-        try{await pending.ConfigureAwait(false);}catch(Exception){}
         lock(gate)
         {
-            var removed=0;
-            if(Directory.Exists(root))
-                foreach(var file in Directory.GetFiles(root,"*",SearchOption.AllDirectories))
-                    try{File.Delete(file);removed++;}catch(IOException){}catch(UnauthorizedAccessException){}
-            return removed;
+            if(disposed)return Task.FromResult(new CacheClearResult(0,0,null));
+            var previous=writes;
+            var pending=Task.Run(async()=>
+            {
+                try{await previous.ConfigureAwait(false);}catch(Exception){}
+                await io.WaitAsync(lifetime.Token).ConfigureAwait(false);
+                try
+                {
+                    var copy=backup?.Invoke();
+                    int removed=0,failed=0;
+                    if(Directory.Exists(root))
+                        foreach(var file in Directory.GetFiles(root,"*",SearchOption.AllDirectories))
+                            try{File.Delete(file);removed++;}catch(IOException){failed++;}catch(UnauthorizedAccessException){failed++;}
+                    return new CacheClearResult(removed,failed,copy);
+                }
+                finally{io.Release();}
+            });
+            // The writes after it wait for it, never for its failure.
+            writes=pending.ContinueWith(static _=>{},CancellationToken.None,TaskContinuationOptions.None,TaskScheduler.Default);
+            return pending;
         }
     }
     public Task<bool> InvalidateAsync(string family,string scope,string version)=>WriteAsync<object?>(family,scope,version,null,DateTimeOffset.MinValue);

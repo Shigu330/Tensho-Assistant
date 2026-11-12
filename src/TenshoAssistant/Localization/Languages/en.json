@@ -2528,6 +2528,7 @@
     "ClearNo": "Cancel",
     "Clearing": "Emptying the cache…",
     "Cleared": "{0} cached file(s) removed; copy: {1}",
+    "ClearedPartial": "Cache emptied in part: {0} file(s) removed, {1} could not be (in use; try again after a restart of the game); copy: {2}",
     "ClearFailed": "The cache could not be emptied (details in the Dalamud log).",
     "Completion": "Titles and achievements (states kept)",
     "Title": "Cache & expiry",

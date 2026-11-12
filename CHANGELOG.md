@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1122.0
+- Plan global, X-142 : Sauvegardes plus sûres, seconde partie (audit A05) : « Vider le cache » fait la copie de sauvegarde et la purge en une seule opération de la file d'écriture du cache : la copie contient toutes les écritures demandées avant, la purge suit sans qu'aucune lecture ni écriture ne passe entre les deux, et une écriture demandée pendant ce temps attend puis reste après la purge (elle n'est plus perdue ni effacée). Si la copie échoue, rien n'est retiré. Un fichier en cours d'utilisation qui ne peut pas être retiré est compté et le message le dit (« vidé en partie »).
+- Tests : CacheClear1122Tests. Verify.ps1 (agent) : 1849/1849, 0 avertissement, 0 erreur ; DLL 0.1122.0.0. Non validé en jeu.
+### English
+- Safer saves, part two (audit A05): « Empty the cache » takes the backup copy and the purge as one operation of the cache's write queue: the copy holds every write asked before, the purge follows with no read nor write in between, and a write asked meanwhile waits then stays after the purge (it is no longer lost nor erased). If the copy fails, nothing is removed. A file in use that cannot be removed is counted and the message says so (« emptied in part »).
+
 ## 0.1121.0
 - Plan global, X-142 : Sauvegardes plus sûres, première partie (audit A04 et A09) : les découvertes et les prix vus ne sont plus marqués « enregistrés » avant l'écriture, mais seulement une fois le fichier écrit ; une écriture qui échoue (disque plein, fichier bloqué) les garde à enregistrer et une nouvelle tentative suit une minute plus tard ; ce qui change pendant la copie part dans l'enregistrement suivant. À la fermeture, un enregistrement en cours est attendu (5 s au plus) avant d'écrire le reste. L'enregistreur d'artisanat appelle la fonction du jeu par l'appel sûr aussi pendant la coupure JcJ et contenu classé. La partie 2 (cache : archive et purge en une seule opération) suit.
 - Tests : DiscoveriesSave1121Tests. Verify.ps1 (agent) : 1846/1846, 0 avertissement, 0 erreur ; DLL 0.1121.0.0. Rien à essayer en jeu.
