@@ -56,18 +56,46 @@ public static class UnloadWatch
         type.Assembly==assembly || (type.IsArray && type.GetElementType() is { } element && Ours(element,assembly)) ||
         (type.IsGenericType && type.GetGenericArguments().Any(argument=>Ours(argument,assembly)));
 
-    /// <summary>Notes an owner and each of its fields that holds an object of the plugin's own code, weakly, under « name » and « name.field ».</summary>
+    /// <summary>
+    /// 0.1195 (the first reload after 0.1194: the plugin, the window and the closures of the unloaded instance were collected, and 225 of
+    /// its 1689 parts stayed alive, every one read a field initialised with « [] » or with a static value): whether a value is shared by
+    /// construction, so alive as long as the load context whatever became of the instance: an empty array (the one « [] » of its type, which
+    /// holds nothing), or the value a static field of its own type or of its owner's type holds (« None », « Empty », a static default).
+    /// Such a value says nothing about a leak: it is not noted at unload, and a note made before says « shared ».
+    /// </summary>
+    public static bool Shared(object value,Type? owner=null,Dictionary<Type,HashSet<object>>? cache=null)=>
+        value is Array { Length:0 } || StaticValues(value.GetType(),cache).Contains(value) || (owner is not null && StaticValues(owner,cache).Contains(value));
+
+    /// <summary>0.1195: the objects the static fields of a type and of its base types hold now (by reference); the runtime's own types have none to tell.</summary>
+    private static HashSet<object> StaticValues(Type type,Dictionary<Type,HashSet<object>>? cache)
+    {
+        if(cache is not null && cache.TryGetValue(type,out var known))return known;
+        var values=new HashSet<object>(ReferenceEqualityComparer.Instance);
+        for(var current=type;current is not null && current.Assembly!=typeof(object).Assembly;current=current.BaseType)
+            foreach(var field in current.GetFields(BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
+            {
+                if(field.IsLiteral || field.FieldType.IsValueType || field.FieldType==typeof(string) || field.FieldType.IsPointer)continue;
+                try{if(field.GetValue(null) is { } value)values.Add(value);}
+                catch(Exception error) when(error is TargetInvocationException or TypeInitializationException or NotSupportedException or FieldAccessException or InvalidOperationException or ArgumentException){}
+            }
+        if(cache is not null)cache[type]=values;
+        return values;
+    }
+
+    /// <summary>Notes an owner and each of its fields that holds an object of the plugin's own code, weakly, under « name » and « name.field »
+    /// (0.1195: but a value shared by construction, see <see cref="Shared"/>).</summary>
     public static void Note(Dictionary<string,WeakReference> parts,string name,object? owner,Assembly assembly)
     {
         if(owner is null)return;
         parts[name]=new WeakReference(owner);
+        var statics=new Dictionary<Type,HashSet<object>>();
         foreach(var field in owner.GetType().GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic))
         {
             if(field.FieldType.IsValueType || field.FieldType==typeof(string) || field.FieldType.IsPointer)continue;
             object? value;
             try{value=field.GetValue(owner);}
             catch(Exception error) when(error is NotSupportedException or FieldAccessException or TargetException){continue;}
-            if(value is null || !Ours(value.GetType(),assembly))continue;
+            if(value is null || !Ours(value.GetType(),assembly) || Shared(value,owner.GetType(),statics))continue;
             parts[name+"."+field.Name]=new WeakReference(value);
         }
     }
@@ -86,6 +114,7 @@ public static class UnloadWatch
         var queue=new Queue<(string Path,object Value,int Level)>();
         queue.Enqueue((name,owner,0));
         var noted=0;
+        var statics=new Dictionary<Type,HashSet<object>>();
         while(queue.Count>0 && noted<cap)
         {
             var (path,value,level)=queue.Dequeue();
@@ -105,7 +134,8 @@ public static class UnloadWatch
                                 queue.Enqueue(($"{path}.{field.Name}→{target.GetType().Name}",target,level+1));
                         continue;
                     }
-                    if(held is null || held.GetType().Assembly!=assembly || held.GetType().IsEnum || !seen.Add(held))continue;
+                    // 0.1195: a value shared by construction (an empty array, a static value) is not a part of the instance.
+                    if(held is null || held.GetType().Assembly!=assembly || held.GetType().IsEnum || Shared(held,type,statics) || !seen.Add(held))continue;
                     queue.Enqueue(($"{path}.{field.Name}",held,level+1));
                 }
         }
@@ -118,11 +148,24 @@ public static class UnloadWatch
         var context=parts.TryGetValue(Context,out var held) ? (held.IsAlive ? "alive":"collected"):"unknown";
         var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith('!')).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
-        var alive=noted.Where(part=>part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
-        var head=$"{label}: context {context}{(IsEmptied(parts) ? ", hubs emptied":"")}, {alive.Count} of {noted.Count} parts alive";
+        // 0.1195: each part read once (a target taken is alive for the line); the parts shared by construction are counted apart from
+        // those a root holds, since an instance noted before 0.1195 has its empty arrays and static values among its parts.
+        var alive=new List<string>();
+        var collected=new List<string>();
+        int empties=0,statics=0;
+        var cache=new Dictionary<Type,HashSet<object>>();
+        foreach(var part in noted.OrderBy(part=>part.Key,StringComparer.Ordinal))
+        {
+            if(part.Value.Target is not { } target){collected.Add(part.Key);continue;}
+            if(target is Array { Length:0 })empties++;
+            else if(Shared(target,null,cache))statics++;
+            else alive.Add(part.Key);
+        }
+        var shared=empties+statics;
+        var head=$"{label}: context {context}{(IsEmptied(parts) ? ", hubs emptied":"")}, {alive.Count+shared} of {noted.Count} parts alive";
+        if(shared>0)head+=$", {shared} shared (empty arrays: {empties}, static values: {statics})"+(alive.Count>0 ? $", {alive.Count} held":"");
         if(alive.Count==0)return head;
         // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
-        var collected=noted.Where(part=>!part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
         var (word,list)=collected.Count>0 && collected.Count<alive.Count ? ("; collected: ",collected):(": ",alive);
         return head+word+string.Join(", ",list.Take(names))+(list.Count>names ? ", …":"");
     }
