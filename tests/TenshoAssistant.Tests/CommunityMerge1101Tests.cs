@@ -23,8 +23,8 @@ internal static class CommunityMerge1101Tests
                 Check(kind is >= 1 and <= 38 and not 26 and not 27,"known kind (" + kind + ")");
             }
             using var player = JsonDocument.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/players/43.json")));
-            Check(player.RootElement.GetProperty("Issue").GetInt32() == 43 && player.RootElement.GetProperty("Facts").GetArrayLength() == 1967,
-                  "the player file of ticket #43 holds its 1967 facts");
+            Check(player.RootElement.GetProperty("Issue").GetInt32() == 43 && player.RootElement.GetProperty("Facts").GetArrayLength() >= 1967,
+                  "the player file of ticket #43 holds at least its 1967 facts of 0.1101 (2421 since the merge of 12/11)");
         }),
     ];
 }
