@@ -1475,6 +1475,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1186) Après un rechargement de Tensho, carte ouverte : les vendeurs (et ceux des fêtes en cours) apparaissent sur la carte comme avant ; page Événements : les PNJ des fêtes se chargent toujours
 
+- [ ] (0.1187) Mode développeur : après trois rechargements de Tensho ou plus, dalamud.log, lignes « Earlier instance … » dix secondes après un chargement : pour les instances de deux chargements ou plus en arrière, « 0 of N parts alive » (le contexte peut rester « alive ») ; si des parties restent vivantes, rapporter leurs noms. Aucune ligne « framework subscriptions were still registered at unload »
+
+- [ ] (0.1188) Mode développeur : après un rechargement de Tensho, carte ouverte, dalamud.log : la première image de la carte (« Slow frame … map canvas ») n'a plus « canvas vendors » ni « icon list » en tête ; lignes « Earlier instance … » : parties collectées, état du déchargement, champs statiques
+
+- [ ] (0.1189) Hors mode développeur, en plein air avec des monstres autour : icônes et notes des monstres (listes, souhaits, journal de chasse) comme avant. Mode développeur : lignes « Nearby monsters » toujours écrites ; après trois rechargements, lignes « Earlier instance … hubs emptied, N of M parts alive » : rapporter les parties encore vivantes
+
+- [ ] (0.1190) Mode développeur : jouer quelques minutes (ville, plein air, carte ouverte), puis dalamud.log, lignes « Steady frames over 60 s » : rapporter les postes dont la moyenne dépasse 1 ms ou dont le 95e centile dépasse 5 ms
+
+- [ ] (0.1191) En plein air avec des monstres autour, juste après un rechargement de Tensho : icônes au-dessus des monstres et notes « journal de chasse » comme avant ; mode développeur : la première image des overlays (« Slow frame ») n'a plus « MonsterIcons » à 50 ms ou plus
+
+- [ ] (0.1192) Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance 0.1192… hubs emptied, N of M parts alive: … » : rapporter les chemins encore vivants (ils nomment ce qui retient l'ancienne instance)
+
+- [ ] (0.1193) Page Tenues du jeu : « Équiper » une tenue fonctionne comme avant ; mode développeur : plus de ligne « Slow reader: GameGearsetReader… » au moment où la tenue change
+
+- [ ] (0.1194) Carnet d'artisanat et simulateur : une rotation calculée par Raphael s'affiche comme avant, et un second calcul de la même recette revient vite (séquence gardée sur le disque). Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance … » de l'instance d'avant la dernière (sans « hubs emptied ») : quelques parties vivantes seulement, au lieu de 463 sur 471 ; rapporter le nombre
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
