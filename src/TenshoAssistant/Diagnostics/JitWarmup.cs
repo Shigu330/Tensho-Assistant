@@ -151,6 +151,43 @@ public sealed class JitWarmup : IDisposable
         return methods;
     }
 
+    /// <summary>X-177 C4.2 (0.1198): the class a handler belongs to: the outermost type around its method (a lambda's closure is nested in it).</summary>
+    public static Type? Owner(MethodBase handler)
+    {
+        var type=handler.DeclaringType;
+        while(type?.DeclaringType is { } outer)type=outer;
+        return type;
+    }
+
+    /// <summary>X-177 C4.2 (0.1198): a class with more methods than this is not compiled whole when one of its handlers subscribes (the window, the plugin).</summary>
+    public const int OwnerCap=600;
+
+    /// <summary>
+    /// X-177 C4.2 (0.1198): compiles now, on the calling thread, the code a handler's class runs: the methods of its outermost class and of
+    /// the types nested in it; when that is more than <paramref name="cap"/> methods, only those of the handler's own type (its closure).
+    /// Returns how many were compiled; a method that cannot be prepared is skipped, never an error for the subscription.
+    /// </summary>
+    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap)
+    {
+        IReadOnlyList<MethodBase> methods;
+        try
+        {
+            methods=Owner(handler) is { } owner ? Methods([owner]):[];
+            if(methods.Count>cap)methods=handler.DeclaringType is { } own ? Methods([own]):[];
+            if(methods.Count>cap)return 0;
+        }
+        catch(Exception){return 0;}
+        var prepared=0;
+        foreach(var method in methods)
+            try{RuntimeHelpers.PrepareMethod(method.MethodHandle);prepared++;}
+            catch(Exception){}
+        return prepared;
+    }
+
+    /// <summary>X-177 C4.2 (0.1198): the part of a slow pass spent compiling, for its line of the log; nothing when nothing was compiled.</summary>
+    public static string CompiledText(double milliseconds,long methods)=>
+        methods<=0 ? "":string.Create(System.Globalization.CultureInfo.InvariantCulture,$" ({milliseconds:0} ms of it compiling {methods} methods)");
+
     internal static bool Compilable(MethodBase method)
     {
         if(method.IsAbstract || method.ContainsGenericParameters)return false;

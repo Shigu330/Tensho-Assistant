@@ -22,6 +22,7 @@ internal static partial class CompetitiveGate
     /// <summary>X-109 (0.981, DEC-047): a subscription that runs out of a cut, and during one only while the labyrinth's board is open (the team panel).</summary>
     public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
+        CompileAhead(handler);
         void Guarded(IFramework running){if(!cut || labyrinthBoard)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
@@ -36,16 +37,45 @@ internal static partial class CompetitiveGate
     {
         if(Developer?.Invoke()!=true){handler(running);return;}
         // X-177 C4.4 (0.1193): the reader's own time: what it spends inside a function of the game (GameCallStarted / GameCallEnded) is left out.
+        // X-177 C4.2 (0.1198): what this thread compiled during the pass (the runtime's own count for the calling thread): a slow pass that
+        // is mostly compiling is code met for the first time, not work to move.
+        var compiledBefore=System.Runtime.JitInfo.GetCompilationTime(true);
+        var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
         var started=MeasureStart();
         handler(running);
         var spent=MeasureOwn(started);
         if(spent<=50)return;
         var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
         if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;
-        SlowSubscription?.Invoke(name,spent,worst);
+        SlowSubscription?.Invoke(name+Diagnostics.JitWarmup.CompiledText((System.Runtime.JitInfo.GetCompilationTime(true)-compiledBefore).TotalMilliseconds,
+            System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore),spent,worst);
     }
+
+    /// <summary>
+    /// X-177 C4.2 (0.1198; at a reload, the first pass of a reader took 125 to 276 ms of one frame: its code compiled the first time it
+    /// ran, on the game's thread): a reader's own code is compiled when it subscribes, on the thread that subscribes it (the one that builds
+    /// the plugin, not the game's), before the game's thread first calls it: the methods of its class and of the types nested in it (lambdas,
+    /// closures, local functions). A class too large for that (the window, the plugin itself) gives only the handler's own type. Each class
+    /// once. What a reader calls in other classes is still compiled on first use (the warm-up reaches it later).
+    /// </summary>
+    private static void CompileAhead(IFramework.OnUpdateDelegate handler)
+    {
+        var owner=Diagnostics.JitWarmup.Owner(handler.Method);
+        lock(Gate){if(owner is null || !compiledOwners.Add(owner))return;}
+        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        var methods=Diagnostics.JitWarmup.PrepareOwner(handler.Method);
+        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        lock(Gate){aheadReaders++;aheadMethods+=methods;aheadMs+=spent;}
+    }
+    private static readonly HashSet<Type> compiledOwners=[];
+    private static int aheadReaders,aheadMethods;
+    private static double aheadMs;
+    /// <summary>X-177 C4.2 (0.1198): the readers compiled when they subscribed, so far: how many classes, methods, and the time it took off the game's thread.</summary>
+    internal static (int Readers,int Methods,double Milliseconds) CompiledAhead{get{lock(Gate)return (aheadReaders,aheadMethods,aheadMs);}}
+
     public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
+        CompileAhead(handler);
         void Guarded(IFramework running){if(!cut)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
@@ -56,7 +86,7 @@ internal static partial class CompetitiveGate
         lock(Gate){if(!Wrappers.Remove(handler,out guarded))return;}
         framework.Update-=guarded;
     }
-    public static void AddAlways(IFramework framework,IFramework.OnUpdateDelegate handler)=>framework.Update+=handler;
+    public static void AddAlways(IFramework framework,IFramework.OnUpdateDelegate handler){CompileAhead(handler);framework.Update+=handler;}
     public static void RemoveAlways(IFramework framework,IFramework.OnUpdateDelegate handler)=>framework.Update-=handler;
 
     internal static void Set(bool value,bool notify)

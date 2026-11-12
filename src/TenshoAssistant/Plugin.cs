@@ -1616,6 +1616,12 @@ public sealed class Plugin : IDalamudPlugin
             unloadParts=instances[0].Value;
             developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
+            // X-177 C4.2 (0.1198): the readers' own code compiled as they subscribed, off the game's thread (CompetitiveGate.CompileAhead).
+            if(configuration.DeveloperMode)
+            {
+                var ahead=TenshoAssistant.Competitive.CompetitiveGate.CompiledAhead;
+                log.Information("Readers compiled ahead: {0} classes, {1} methods in {2:0} ms on the loading thread.",ahead.Readers,ahead.Methods,ahead.Milliseconds);
+            }
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
             {
                 SayLoad("10 s later");
