@@ -47,10 +47,14 @@ public static class LocalLinkProtocol
     {
         ["InventoryBank"]="bank",["Characters"]="characters",["GilJournal"]="gil-journal",["CraftLists"]="craft-lists",["MyTools"]="my-tools",
         ["VoyageHistory"]="voyages",["AchievementProgress"]="achievements",["BeastTeams"]="beast-teams",["DutyProgress"]="duties",["Discoveries"]="discoveries",
+        // X-119 with X-173 (0.1147): the player's data file TenshoData.db (gil journal, achievement progress since 0.1139 and 0.1140).
+        ["TenshoData"]="data",
     };
+    /// <summary>X-119 with X-173 (0.1147): the category of the player's data file, copied by SQLite's backup (TenshoDataDatabase.CopyForDesktop).</summary>
+    public const string DataCategory="data";
     /// <summary>X-119 step 2, part 2 (0.1131): the categories the desktop application copies from the plugin's folder and reads
-    /// (DesktopMirror, MainWindow.UseDesktopData); the others stay in the game for now.</summary>
-    public static readonly IReadOnlyList<string> DesktopCategories=["bank","craft-lists","my-tools","voyages","beast-teams"];
+    /// (DesktopMirror, MainWindow.UseDesktopData); the others stay in the game for now. 0.1147: « data » too.</summary>
+    public static readonly IReadOnlyList<string> DesktopCategories=["bank","craft-lists","my-tools","voyages","beast-teams",DataCategory];
     public const int MaxPlugin=32;
     public const int MaxZone=128;
     private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};
@@ -96,6 +100,8 @@ public static class LocalLinkProtocol
         var root=Path.TrimEndingDirectorySeparator(Path.GetFullPath(folder));
         if(!full.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))return null;
         if(full.EndsWith(".tmp",StringComparison.OrdinalIgnoreCase) || full.EndsWith(".lock",StringComparison.OrdinalIgnoreCase))return null;
+        // 0.1147: a SQLite file's shared-memory index (-shm) changes when a reader (the desktop application's copy) reads: not a change of data.
+        if(full.EndsWith("-shm",StringComparison.OrdinalIgnoreCase))return null;
         var first=full[(root.Length+1)..].Split(Path.DirectorySeparatorChar)[0];
         var stem=first.Split('.')[0];
         return Categories.TryGetValue(stem,out var category) ? category : null;

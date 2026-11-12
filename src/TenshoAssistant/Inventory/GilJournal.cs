@@ -76,6 +76,16 @@ public static class GilJournal
         return kept;
     }
 
+    /// <summary>
+    /// X-119 (0.1147): the balances last recorded in a journal, per source (character, retainers, company chest), for the desktop application
+    /// which reads no balance from the game: the newest entry of each source, null when the journal holds none (never a guessed zero, R06).
+    /// </summary>
+    public static (long? Gil,long? Retainers,long? Company) LastBalances(IEnumerable<GilEntry> entries)
+    {
+        long? Last(GilSource source)=>entries.Where(entry=>entry.Source==source).OrderBy(entry=>entry.At).Select(entry=>(long?)entry.Balance).LastOrDefault();
+        return (Last(GilSource.Character),Last(GilSource.Retainers),Last(GilSource.Company));
+    }
+
     /// <summary>Gains and spendings per category since a time, for one source.</summary>
     /// <summary>X-107 (0.986): the character's gil gained and spent since local midnight, transfers with retainers and the company chest left out.</summary>
     public static (long Gained,long Spent) Today(IEnumerable<GilEntry> entries,DateTimeOffset now)

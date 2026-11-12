@@ -89,6 +89,55 @@ public sealed class TenshoDataDatabase
 
     /// <summary>The journal folded into the file (at unload), so the folder holds one file when the game is closed.</summary>
     public void Checkpoint(){using var open=Open();Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");}
+
+    /// <summary>The largest player's data file the desktop application copies.</summary>
+    public const long MaxDesktopCopy=256L<<20;
+
+    /// <summary>
+    /// X-119 with X-173 (0.1147): the desktop application's own copy of the player's data file (its mirror folder, never the plugin's), made by
+    /// SQLite's online backup: the plugin's file is opened read-only and copied whole as of one moment, even while the game writes it (a plain
+    /// file copy of a WAL database could take half a save); the copy is written in one step under SQLite's lock, so a reader of the copy sees
+    /// the old copy or the new one. No file in the plugin's folder: the copy goes too. Called by the application by its name (Host.CopyData,
+    /// DesktopData1147Tests); the number of files copied (0 or 1) and the problems met (English, for the log).
+    /// </summary>
+    public static (int Copied,IReadOnlyList<string> Problems) CopyForDesktop(string source,string target)
+    {
+        var problems=new List<string>();
+        var from=System.IO.Path.GetFullPath(source);var to=System.IO.Path.GetFullPath(target);
+        if(string.Equals(from,to,StringComparison.OrdinalIgnoreCase))return (0,[$"{FileName}: the copy and the plugin's file are the same, nothing copied"]);
+        try
+        {
+            if(!File.Exists(from))
+            {
+                foreach(var path in new[]{to,to+"-wal",to+"-shm"})if(File.Exists(path))File.Delete(path);
+                return (0,problems);
+            }
+            if(new FileInfo(from).Length>MaxDesktopCopy)return (0,[$"{FileName}: larger than {MaxDesktopCopy>>20} MB, not copied"]);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(to)!);
+            try{Backup(from,to);}
+            // The application's own copy damaged (not a database, corrupt): it is only a copy, made again from scratch once.
+            catch(SqliteException error) when(error.SqliteErrorCode is 11 or 26)
+            {
+                foreach(var path in new[]{to,to+"-wal",to+"-shm"})if(File.Exists(path))File.Delete(path);
+                Backup(from,to);
+            }
+            return (1,problems);
+        }
+        catch(SqliteException error){problems.Add($"{FileName}: not copied (SQLite error {error.SqliteErrorCode})");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){problems.Add($"{FileName}: not copied ({error.GetType().Name})");}
+        return (0,problems);
+    }
+
+    private static void Backup(string from,string to)
+    {
+        using var reader=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=from,Mode=SqliteOpenMode.ReadOnly,Pooling=false}.ToString());
+        reader.Open();
+        Run(reader,"PRAGMA busy_timeout=5000;");
+        using var writer=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=to,Mode=SqliteOpenMode.ReadWriteCreate,Pooling=false}.ToString());
+        writer.Open();
+        Run(writer,"PRAGMA busy_timeout=5000;");
+        reader.BackupDatabase(writer);
+    }
 }
 
 /// <summary>

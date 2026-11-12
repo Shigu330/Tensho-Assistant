@@ -116,6 +116,24 @@ internal sealed class Host
         catch(TargetInvocationException error){return $"{category}: not read ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})";}
     }
 
+    /// <summary>
+    /// X-119 with X-173 (0.1147): the player's data file (TenshoData.db) copied into the mirror by the plugin's own
+    /// TenshoDataDatabase.CopyForDesktop (SQLite's backup, the plugin's file read-only; called by its name, DesktopData1147Tests). Any thread.
+    /// </summary>
+    public (int Copied,IReadOnlyList<string> Problems) CopyData(string source,string mirror)
+    {
+        copyData??=Plugin.GetType("TenshoAssistant.TenshoDataDatabase")?.GetMethod("CopyForDesktop",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)]);
+        if(copyData is null)return (0,["TenshoData.db: the plugin has no CopyForDesktop (another version?)"]);
+        try
+        {
+            if(copyData.Invoke(null,[Path.Combine(source,"TenshoData.db"),Path.Combine(mirror,"TenshoData.db")]) is System.Runtime.CompilerServices.ITuple { Length:2 } result)
+                return ((int)result[0]!,(IReadOnlyList<string>)result[1]!);
+            return (0,["TenshoData.db: no answer from CopyForDesktop"]);
+        }
+        catch(TargetInvocationException error){return (0,[$"TenshoData.db: not copied ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})"]);}
+    }
+    private MethodInfo? copyData;
+
     /// <summary>X-163 (0.1132): the alarms to ring now, from the plugin's MainWindow.DesktopDueAlarms (called by its name); none when it is missing.</summary>
     public (string[] Lines,bool Sound) DueAlarms(DateTimeOffset now,bool gameInFront)
     {

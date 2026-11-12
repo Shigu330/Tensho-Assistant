@@ -58,6 +58,18 @@ public sealed class GilJournalStore
         WriteRows(open,character,entries,null);
     }
 
+    /// <summary>
+    /// X-119 with X-173 (0.1147): the character whose journal holds the newest entry, or null (none, or the JSON files in use): the desktop
+    /// application, with no character logged in, shows that one (choice noted in the plugin's decisions).
+    /// </summary>
+    public ulong? Latest()
+    {
+        if(data.Database() is not { } opened)return null;
+        using var open=opened.Open();using var command=open.CreateCommand();
+        command.CommandText="SELECT character FROM gil_entries ORDER BY at DESC, character LIMIT 1;";
+        return command.ExecuteScalar() is long id ? unchecked((ulong)id):null;
+    }
+
     /// <summary>The data file's journal folded in (at unload); nothing when the JSON files are in use.</summary>
     public void Checkpoint()=>data.Checkpoint();
 

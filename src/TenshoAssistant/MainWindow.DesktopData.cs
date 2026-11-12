@@ -34,9 +34,43 @@ internal sealed partial class MainWindow
                 BeastTeamsFile=()=>teams;
                 beastPlans=null;beastPlansLoaded=false;
                 break;
+            case "data":
+                UseDesktopPlayerData(folder,warn);
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");
         }
+    }
+
+    // X-119 with X-173 (0.1147): the player's data file, the application's copy (TenshoDataDatabase.CopyForDesktop, SQLite's backup): Storage › Gil
+    // shows the journal of the character with the newest entry (no character is logged in; choice D-142), its balances as last recorded. Read
+    // off the frame; a newer reading replaces an older one, never the reverse. No copy: the page says offline, as before. The achievement
+    // progress stays in the game for now (its page reads the game's watcher).
+    private Inventory.GilJournalState? desktopGil;
+    private int desktopGilGeneration;
+    private void UseDesktopPlayerData(string folder,Action<Exception,string> warn)
+    {
+        var generation=Interlocked.Increment(ref desktopGilGeneration);
+        var file=Path.Combine(folder,TenshoDataDatabase.FileName);
+        GilJournalState=()=>Volatile.Read(ref desktopGil);
+        if(!File.Exists(file)){Volatile.Write(ref desktopGil,null);return;}
+        var journal=new Inventory.GilJournalStore(Path.Combine(folder,"GilJournal"),new TenshoDataFile(file,warn));
+        _=Task.Run(()=>
+        {
+            Inventory.GilJournalState? state=null;
+            try
+            {
+                var now=DateTimeOffset.UtcNow;
+                if(journal.Latest() is { } character)
+                {
+                    var entries=Inventory.GilJournal.Prune(journal.Load(character,now),now);
+                    var (gil,retainers,company)=Inventory.GilJournal.LastBalances(entries);
+                    state=new Inventory.GilJournalState(character,entries.ToArray(),gil,retainers,company,false);
+                }
+            }
+            catch(Exception error){warn(error,"The gil journal could not be read from the copy of the Tensho data file.");return;}
+            if(Volatile.Read(ref desktopGilGeneration)==generation)Volatile.Write(ref desktopGil,state);
+        });
     }
 
     // X-163 (0.1132): the alarms the desktop application rings now (AlarmBell: the plugin's rule, the application's own memory), as lines

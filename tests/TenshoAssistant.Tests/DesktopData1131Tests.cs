@@ -55,7 +55,7 @@ internal static class DesktopData1131Tests
         }),
         ("Desktop data: one entry in the plugin for the stores, the categories from the link's closed list",() =>
         {
-            Check(LocalLinkProtocol.DesktopCategories.All(category=>LocalLinkProtocol.Categories.Values.Contains(category)) && LocalLinkProtocol.DesktopCategories.Count==5,"desktop categories are link categories");
+            Check(LocalLinkProtocol.DesktopCategories.All(category=>LocalLinkProtocol.Categories.Values.Contains(category)) && LocalLinkProtocol.DesktopCategories.Count==6,"desktop categories are link categories (0.1147: « data »)");
             foreach(var category in LocalLinkProtocol.DesktopCategories)Check(DesktopMirror.Stems(category).Count>0,"stems of "+category);
             var data=Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(data.Contains("internal void UseDesktopData(string folder,string category,Action<Exception,string> warn)"),"the entry's signature");
