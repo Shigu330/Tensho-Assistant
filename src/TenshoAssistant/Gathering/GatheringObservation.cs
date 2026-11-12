@@ -47,8 +47,16 @@ public static class GatheringNodes
 {
     /// <summary>X-129 (0.1108): the GP and attempts a slot's plan starts from: the node as it opened, or, for an item first read after GP was
     /// spent (a hidden item revealed), what was left when it appeared.</summary>
-    public static (int Gp,int? Attempts) PlanStart(bool late,uint openGp,int? openAttempts,int seenGp,int? seenAttempts)
-        =>late ? (seenGp,seenAttempts):((int)openGp,openAttempts);
+    /// <summary>
+    /// Where an item's plan starts: from the node as it opened; from what was left when it appeared (late, X-129); X-134 (0.1167, user's captures of
+    /// 2026-11-12: after the one take of a rare item the plan of the next item kept the node's 6 attempts): from what was left when the plan went to
+    /// another item than the one first worked on (rest).
+    /// </summary>
+    public static (int Gp,int? Attempts) PlanStart(bool late,uint openGp,int? openAttempts,int seenGp,int? seenAttempts,(int Gp,int? Attempts)? rest=null)
+        =>late ? (seenGp,seenAttempts):rest ?? ((int)openGp,openAttempts);
+
+    /// <summary>X-134 (0.1167): an item planned after GP or attempts went on another one at this node is planned on what is left.</summary>
+    public static bool PlansRest(uint workedOn,uint item)=>workedOn!=0 && item!=0 && item!=workedOn;
 
     public static bool IsNew(uint startNode,int? lastAttempts,uint node,int? attempts)
         =>startNode!=0 && node!=0 && startNode!=node || lastAttempts is { } last && attempts is { } now && now>last;

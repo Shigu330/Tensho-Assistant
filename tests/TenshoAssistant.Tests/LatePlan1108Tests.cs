@@ -18,7 +18,7 @@ internal static class LatePlan1108Tests
         {
             var panel=Read("MainWindow.GatheringPanel.cs");
             Check(panel.Contains("(slot.SuccessPercent,slot.BoonPercent,start.Frozen,slot.DisplayedQuantity,(int)frame.Gp,frame.Attempts)"),"GP and attempts kept at the first read");
-            Check(panel.Contains("var (planGp,planAttempts)=GatheringNodes.PlanStart(first.Late,start.Gp,start.Attempts,first.Gp,first.Attempts);"),"the plan's start");
+            Check(panel.Contains("var (planGp,planAttempts)=GatheringNodes.PlanStart(first.Late,start.Gp,start.Attempts,first.Gp,first.Attempts,"),"the plan's start (0.1167: and the rest of the node for a later item)");
             Check(!panel.Contains("missing.Count==0 && !first.Late"),"a late item is no longer refused");
             Check(panel.Contains("new GpScenario(start.JobId,start.Level,planGp,attempts,"),"solved from what was left");
             Check(panel.Contains("localization.Format(\"GatheringPanel.PlanLate\",plan.Scenario.Budget,plan.Scenario.Attempts)"),"said under the plan");

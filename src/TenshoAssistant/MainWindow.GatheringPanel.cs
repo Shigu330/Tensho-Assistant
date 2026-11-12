@@ -16,6 +16,7 @@ internal sealed partial class MainWindow
     private (uint Job,int Level,int Slot,uint Item,int Gp,int? Attempts,bool Late,int? Success,int? Boon,int? Bountiful,GpActionCatalog Catalog,bool Auto)? gatheringPanelKey;
     private GpOptimization? gatheringPanelPlan;private uint gatheringPanelItem;private string[] gatheringPanelMissing=[];private bool gatheringPanelLate,gatheringPanelBountifulFloor;
     private GatheringNodeStart? gatheringPanelStart;
+    private bool gatheringPanelRest;
 
     // 0.330 (audit 8): the node as it opened, before any GP spent at it (TrackGatheringNode).
     private sealed class GatheringNodeStart(ulong owner,GatheringObservedFrame frame)
@@ -28,6 +29,9 @@ internal sealed partial class MainWindow
         // Success and boon of each slot (index, raw item) as first read; Late: first read after GP was spent at the node.
         // X-129 (0.1108): with the GP and attempts left when the slot was first read (its plan's start when it came late).
         public Dictionary<(int Index,uint RawItemId),(int? Success,int? Boon,bool Late,int? Quantity,int Gp,int? Attempts)> Slots {get;}=[];
+        // X-134 (0.1167): the item planned when GP or an attempt was first spent here, and the start of another item's plan (what was left when it came).
+        public uint WorkedOn {get;set;}
+        public (uint Item,int Gp,int? Attempts)? Rest {get;set;}
     }
 
     /// <summary>0.560 (C24): what the last crafting chain still needs of this item; from the chain's state, nothing is computed again.</summary>
@@ -102,11 +106,13 @@ internal sealed partial class MainWindow
     private void DrawGatheringNext(GpOptimization optimization,GatheringObservedSlot slot,GatheringNodeStart start,GatheringObservedFrame frame,string itemName,out GpNextStep? step)
     {
         step=null;
-        if(start.Attempts is not { } startAttempts || frame.Attempts is not { } attempts)return;
+        if(start.Attempts is null || frame.Attempts is not { } attempts)return;
         var plan=optimization.Best;
+        // X-134 (0.1167): the steps done are counted from the plan's own start (the node's opening, or what was left for a late or later item).
+        var startAttempts=optimization.Scenario.Attempts;
         if(gatheringNextCache is not { } known || !ReferenceEquals(known.Plan,plan) || known.Gp!=(int)frame.Gp || known.Attempts!=attempts || known.Boon!=slot.BoonPercent)
         {
-            var found=GpNextAction.Next(plan,(int)start.Gp,(int)frame.Gp,startAttempts,attempts);
+            var found=GpNextAction.Next(plan,optimization.Scenario.Budget,(int)frame.Gp,startAttempts,attempts);
             gatheringNextCache=known=(plan,(int)frame.Gp,attempts,slot.BoonPercent,found);
             // 0.731 (user report): the end of the plan, with what is left; 0.747: solved off the frame, the plain step shown meanwhile.
             if(found is { Kind:GpNextKind.Gather,Finished:true } && !optimization.Scenario.AutoGather && slot.SuccessPercent is { } successNow && slot.BoonPercent is { } boonNow && gpActions.State.Catalog is { } catalog)
@@ -271,7 +277,11 @@ internal sealed partial class MainWindow
         var bountiful=bountifulBase?.Invoke(slot.ItemId) is { } baseValue ? BountifulEstimate.Bonus(rating,baseValue):null;
         var auto=GatheringAutoGather?.Invoke()==true;
         // X-129 (0.1108): an item first read after GP was spent (a hidden item revealed) is planned from what was left when it appeared.
-        var (planGp,planAttempts)=GatheringNodes.PlanStart(first.Late,start.Gp,start.Attempts,first.Gp,first.Attempts);
+        // X-134 (0.1167): another item than the one first worked on (a rare item taken once, then the next one) is planned on what is left then.
+        if(start.Frozen && start.WorkedOn==0)start.WorkedOn=gatheringPanelItem!=0 ? gatheringPanelItem:slot.ItemId;
+        var rest=!first.Late && GatheringNodes.PlansRest(start.WorkedOn,slot.ItemId);
+        if(rest && start.Rest?.Item!=slot.ItemId)start.Rest=(slot.ItemId,(int)frame.Gp,frame.Attempts);
+        var (planGp,planAttempts)=GatheringNodes.PlanStart(first.Late,start.Gp,start.Attempts,first.Gp,first.Attempts,rest && start.Rest is { } left ? (left.Gp,left.Attempts):null);
         var key=(start.JobId,start.Level,slot.Index,slot.ItemId,planGp,planAttempts,first.Late,first.Success,first.Boon,bountiful,catalog,auto);
         // 0.515: the node's effects, and what else can change the plan without changing the node.
         var perception=GatheringPerception(start.JobId);
@@ -280,7 +290,7 @@ internal sealed partial class MainWindow
         if(key!=gatheringPanelKey)
         {
             gatheringPanelEffectWith.Clear();
-            gatheringPanelKey=key;gatheringPanelItem=slot.ItemId;gatheringPanelPlan=null;gatheringPanelLate=first.Late;
+            gatheringPanelKey=key;gatheringPanelItem=slot.ItemId;gatheringPanelPlan=null;gatheringPanelLate=first.Late;gatheringPanelRest=rest;
             // 0.330 (audit 7): an unread success, boon or attempt count is never replaced (it was 100 % success, 0 % boon): no plan, and the
             // panel names what is missing. An unknown Bountiful bonus uses the rule's floor, +1 (BountifulEstimate « else +1 »): a lower
             // bound, said under the plan, not a guess (review 0.330).
@@ -335,6 +345,7 @@ internal sealed partial class MainWindow
         if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
         if(gatheringPanelLate)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanLate",plan.Scenario.Budget,plan.Scenario.Attempts));
+        else if(gatheringPanelRest)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanRest",plan.Scenario.Budget,plan.Scenario.Attempts));
         else if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
         if(plan.Scenario.AutoGather)ImGui.TextColored(Accent,localization.Get("GatheringPanel.AutoGatherPlan"));
         if(gatheringPanelBountifulFloor)ImGui.TextDisabled(localization.Get("GatheringPanel.BountifulFloor"));
