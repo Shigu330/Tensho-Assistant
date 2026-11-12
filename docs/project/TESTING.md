@@ -1451,6 +1451,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1177) Barre d'usure et page Équipement › Usure et symbiose : une pièce peu portée affiche le même pourcentage que la fiche du personnage du jeu (1 % et non 0 %) ; l'info-bulle de la page donne la valeur exacte ; près de 100 %, comparer avec le jeu (99 % tant que l'extraction n'est pas possible)
 
+- [ ] (0.1178) Sur l'île de Lunule : le panneau apparaît (job de soutien porté en doré, niveau, barre d'expérience, « Ensuite : … », barre du savoir, pièces) et disparaît en quittant l'île ; ses nombres comme ceux du jeu ; il se déplace à la souris
+
+- [ ] (0.1178) Eurêka et Bozja › onglet de l'île : décocher « Panneau sur l'île » le cache ; les boutons « Ce que permet d'acheter : pièce d'argent / d'or des douze cités » ouvrent Rangements › Que faire avec ? sur la bonne pièce
+
+- [ ] (0.1178) Eurêka et Bozja › onglet de l'île : « Archives occultes lues : N / M » comme dans le jeu ; « Voir ce qui manque » ouvre Collections › Archives occultes, filtre non confirmées
+
+- [ ] (0.1179) Sur l'île de Lunule, hors combat : à l'annonce du jeu « Nouvelle confrontation critique ! Début dans 1:07 », une ligne [Tensho] « Confrontation critique : … — inscriptions ouvertes, encore 1:07 — zone ( X , Y ) » ; le temps et le lieu comme sur la carte du jeu ; une seule fois
+
+- [ ] (0.1179) Sur l'île : un ALÉA qui commence donne une ligne « ALÉA : nom (niveau N) — encore m:ss — zone ( X , Y ) », une seule fois ; l'application de bureau reçoit les mêmes lignes
+
+- [ ] (0.1179) Sur l'île, en combat : aucune ligne ni panneau ; à la fin du combat, la confrontation encore ouverte est dite
+
+- [ ] (0.1179) Mode développeur, sur l'île : dalamud.log, lignes « Reading occultevents » à chaque nouvelle confrontation et changement d'étape (inscription, préparation, combat) : comparer « left » au compte à rebours du jeu
+
+- [ ] (0.1180) Monde › Découvertes : l'avertissement avant « Connecter GitHub » parle de l'endroit exact d'un poisson pris ; l'info-bulle de « Échange automatique » dit « rien n'est envoyé automatiquement »
+
+- [ ] (0.1183) Après « Tout réinitialiser » (ou sur une installation neuve) : la première touche M ouvre la carte de Tensho et une ligne [Tensho] dans le chat dit comment retrouver celle du jeu ; la deuxième M ne la répète pas
+
+- [ ] (0.1183) Aide › FAQ : « M ouvre une autre carte : comment retrouver celle du jeu ? » ouvre les Paramètres ; « Tensho joue-t-il à ma place ? » cite la carte sur M et le titre selon le job
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
