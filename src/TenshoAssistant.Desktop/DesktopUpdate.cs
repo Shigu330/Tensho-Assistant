@@ -149,11 +149,16 @@ public static class DesktopUpdate
     /// <summary>The text of a .sha256 file for a hash (as Verify.ps1 writes it).</summary>
     public static string HashLine(string hex,string fileName)=>hex.ToLowerInvariant()+"  "+fileName+"\n";
 
-    public static UpdateState ReadState(string? json)
+    public static UpdateState ReadState(string? json)=>TryReadState(json,out var state) ? state : new();
+
+    /// <summary>X-170 (0.1143, GPT audit): false when there is a text that is not a state (damaged): never to be taken for a new install.</summary>
+    public static bool TryReadState(string? json,out UpdateState state)
     {
-        if(string.IsNullOrWhiteSpace(json))return new();
-        try{return JsonSerializer.Deserialize<UpdateState>(json,Options) ?? new();}
-        catch(JsonException){return new();}
+        state=new();
+        if(string.IsNullOrWhiteSpace(json))return true;
+        try{if(JsonSerializer.Deserialize<UpdateState>(json,Options) is { } read){state=read;return true;}}
+        catch(JsonException){}
+        return false;
     }
 
     public static string WriteState(UpdateState state)=>JsonSerializer.Serialize(state,Options);

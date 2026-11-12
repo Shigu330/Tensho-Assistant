@@ -132,11 +132,20 @@ public static class DesktopInstall
     /// <summary>The wait of a change asked from a window (a checkbox, a button): short, a busy lock says « not saved » instead of freezing a frame.</summary>
     public const int ClickWaitMs=500;
 
-    public static UpdateState Load(string own)
+    public static UpdateState Load(string own)=>LoadReadable(own) ?? new();
+
+    /// <summary>
+    /// X-170 (0.1143, GPT audit): the state, or null when update.json is there but cannot be read (damaged, or refused by Windows). An
+    /// unreadable state is never taken for a new install: it is not written over (<see cref="Update"/> throws), the clean-up removes no copy,
+    /// and no existing folder is replaced (<see cref="Place"/>). A missing file is a new install (an empty state).
+    /// </summary>
+    public static UpdateState? LoadReadable(string own)
     {
-        try{return DesktopUpdate.ReadState(File.Exists(StatePath(own)) ? File.ReadAllText(StatePath(own)) : null);}
-        catch(IOException){return new();}
-        catch(UnauthorizedAccessException){return new();}
+        string? text;
+        try{text=File.Exists(StatePath(own)) ? File.ReadAllText(StatePath(own)) : null;}
+        catch(IOException){return null;}
+        catch(UnauthorizedAccessException){return null;}
+        return DesktopUpdate.TryReadState(text,out var state) ? state : null;
     }
 
     /// <summary>
@@ -147,7 +156,7 @@ public static class DesktopInstall
     public static UpdateState Update(string own,Func<UpdateState,UpdateState> change,int waitMs=LockWaitMs)
         => Locked(own,waitMs,()=>
         {
-            var before=Load(own);
+            var before=LoadReadable(own) ?? throw new UpdateStateUnreadableException(StatePath(own));
             var after=change(before);
             if(!ReferenceEquals(after,before))Write(own,after);
             return after;
@@ -227,7 +236,7 @@ public static class DesktopInstall
                 return null;
             }
             File.WriteAllText(Path.Combine(partial,Marker),version+" "+actual);
-            var placed=Locked(own,LockWaitMs,()=>Place(partial,target,release.Version!,Load(own),runningFolder));
+            var placed=Locked(own,LockWaitMs,()=>Place(partial,target,release.Version!,LoadReadable(own),runningFolder));
             if(placed==Placement.Refused)
             {
                 log($"Desktop install: {release.Tag} not installed: {target} exists and is not a copy Tensho may replace; left untouched");
@@ -247,13 +256,14 @@ public static class DesktopInstall
     /// <summary>
     /// X-140, under the lock: the checked copy moved to target when it is free; Tensho's valid copy already there kept; Tensho's damaged copy,
     /// unused, set aside (renamed, then removed) and replaced; else refused. Tensho's = holding the Marker, or recorded in update.json, or the
-    /// running copy; a recorded or running copy is never replaced.
+    /// running copy; a recorded or running copy is never replaced. X-170 (0.1143): state null (update.json unreadable): every existing copy
+    /// counts as in use (kept when valid, else refused).
     /// </summary>
-    internal static Placement Place(string partial,string target,Version version,UpdateState state,string? runningFolder)
+    internal static Placement Place(string partial,string target,Version version,UpdateState? state,string? runningFolder)
     {
         if(!Directory.Exists(target) && !File.Exists(target)){Directory.Move(partial,target);return Placement.Moved;}
         if(File.Exists(target))return Placement.Refused;
-        var inUse=DesktopUpdate.SameFolder(target,state.Current?.Folder) || DesktopUpdate.SameFolder(target,state.Previous?.Folder) || DesktopUpdate.SameFolder(target,runningFolder);
+        var inUse=state is null || DesktopUpdate.SameFolder(target,state.Current?.Folder) || DesktopUpdate.SameFolder(target,state.Previous?.Folder) || DesktopUpdate.SameFolder(target,runningFolder);
         if(!inUse && !File.Exists(Path.Combine(target,Marker)))return Placement.Refused;
         if(CheckCopy(target,version) is null)return Placement.Kept;
         if(inUse)return Placement.Refused;
@@ -305,6 +315,8 @@ public static class DesktopInstall
     /// Tensho's (Marker, or a copy named by its version holding the exe, as installed before 0.1117) and is neither Current, Previous nor the
     /// running copy is set aside (renamed *.old), then removed after the lock; leftovers of a stopped install (*.old; *.partial older than an
     /// hour; downloads not in use) removed too. A folder that is not Tensho's is never touched. The folders removed.
+    /// X-170 (0.1143, GPT audit): an unreadable update.json removes no copy (Current and Previous unknown); a leftover is removed only when it
+    /// is Tensho's (<see cref="OwnedLeftover"/>: the unique name Tensho gives it, and for *.old a copy Tensho installed).
     /// </summary>
     public static IReadOnlyList<string> Clean(string own,string runningFolder)
     {
@@ -312,7 +324,7 @@ public static class DesktopInstall
         if(!Directory.Exists(versions))return [];
         var aside=Locked(own,LockWaitMs,()=>
         {
-            var state=Load(own);
+            if(LoadReadable(own) is not { } state)return new List<string>();
             var moved=new List<string>();
             foreach(var old in DesktopUpdate.Obsolete(state,Directory.GetDirectories(versions),runningFolder).Where(Owned))
             {
@@ -323,11 +335,27 @@ public static class DesktopInstall
             }
             return moved;
         });
-        foreach(var old in Directory.GetDirectories(versions,"*.old"))TryDeleteFolder(old);
-        foreach(var stale in Directory.GetDirectories(versions,"*.partial").Where(dir=>Directory.GetCreationTimeUtc(dir)<DateTime.UtcNow.AddHours(-1)))TryDeleteFolder(stale);
+        foreach(var old in Directory.GetDirectories(versions,"*.old").Where(OwnedLeftover))TryDeleteFolder(old);
+        foreach(var stale in Directory.GetDirectories(versions,"*.partial").Where(dir=>OwnedLeftover(dir) && Directory.GetCreationTimeUtc(dir)<DateTime.UtcNow.AddHours(-1)))TryDeleteFolder(stale);
         var downloads=Path.Combine(own,"downloads");
-        if(Directory.Exists(downloads))foreach(var file in Directory.GetFiles(downloads,"*.partial"))TryDelete(file);
+        if(Directory.Exists(downloads))
+            foreach(var file in Directory.GetFiles(downloads,"*.partial").Where(file=>UniqueLeftover.IsMatch(Path.GetFileName(file)) && Path.GetFileName(file).StartsWith(DesktopUpdate.ZipName+".",StringComparison.OrdinalIgnoreCase)))
+                TryDelete(file);
         return aside;
+    }
+
+    /// <summary>X-170 (0.1143): the names Tensho gives its leftovers: « &lt;name&gt;.&lt;32 hex digits&gt;.old » or « .partial ».</summary>
+    private static readonly System.Text.RegularExpressions.Regex UniqueLeftover=new(@"\.[0-9a-f]{32}\.(?:old|partial)$",System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// X-170 (0.1143, GPT audit): a leftover of the versions folder that Tensho may remove: named as Tensho names them (unique part), and for a
+    /// copy set aside (*.old) one that holds Tensho's Marker or the exe (an old copy); a folder of another name is never touched.
+    /// </summary>
+    internal static bool OwnedLeftover(string folder)
+    {
+        var name=Path.GetFileName(Path.TrimEndingDirectorySeparator(folder));
+        if(!UniqueLeftover.IsMatch(name))return false;
+        return name.EndsWith(".partial",StringComparison.Ordinal) || File.Exists(Path.Combine(folder,Marker)) || File.Exists(Path.Combine(folder,DesktopUpdate.ExeName));
     }
 
     /// <summary>X-140: a copy in the app's own versions folder that Tensho installed: its Marker, or (before 0.1117) named by a version and holding the exe.</summary>
@@ -379,3 +407,6 @@ public static class DesktopInstall
         progress(done);
     }
 }
+
+/// <summary>X-170 (0.1143): update.json is there but cannot be read: it is not written over (an unreadable state is never a new install).</summary>
+public sealed class UpdateStateUnreadableException(string path) : IOException($"{Path.GetFileName(path)} cannot be read: it is not written over.");

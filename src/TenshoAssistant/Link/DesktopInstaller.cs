@@ -49,6 +49,10 @@ public static class DesktopInstallRules
     public static string? FolderProblem(string? chosen)
         => string.IsNullOrWhiteSpace(chosen) || Path.IsPathFullyQualified(chosen.Trim()) && chosen.Trim().IndexOfAny(Path.GetInvalidPathChars())<0 ? null : "Advanced.DesktopInstallFolderBad";
 
+    /// <summary>X-170 (0.1143): the copy to start when Windows refuses the current one: the previous version, when it is another folder and its exe is there.</summary>
+    public static InstalledCopy? Fallback(UpdateState state,string refusedFolder,Func<string,bool> exists)
+        => state.Previous is { } previous && !DesktopUpdate.SameFolder(previous.Folder,refusedFolder) && exists(Path.Combine(previous.Folder,DesktopUpdate.ExeName)) ? previous : null;
+
     /// <summary>After an install from the plugin: the new copy is Current, the copy that was current becomes Previous (the app's « previous
     /// version »); a version the app had set aside is forgotten once the player installs it on purpose.</summary>
     public static UpdateState AfterInstall(UpdateState state,InstalledCopy installed)
@@ -169,16 +173,25 @@ internal sealed class DesktopInstaller : IDisposable
     {
         var view=View();
         if(view.Kind is DesktopInstallKind.NotInstalled or DesktopInstallKind.Missing || view.Folder is null)return "Advanced.DesktopInstallOpenNone";
-        try
-        {
-            var exe=Path.Combine(view.Folder,DesktopUpdate.ExeName);
-            using var process=Process.Start(new ProcessStartInfo(exe){UseShellExecute=false,WorkingDirectory=view.Folder});
-            return process is null ? "Advanced.DesktopInstallOpenFailed" : null;
-        }
+        try{return Start(view.Folder) ? null : "Advanced.DesktopInstallOpenFailed";}
         catch(Exception error) when(error is System.ComponentModel.Win32Exception or IOException or InvalidOperationException)
         {
             log($"Desktop app could not start: {error.Message}");
+            // X-170 (0.1143, GPT audit): Windows refused the new copy (protection, blocked file): the last usable copy, the previous version
+            // kept in update.json, is started instead; nothing is removed.
+            if(DesktopInstallRules.Fallback(State,view.Folder,File.Exists) is { } previous)
+                try{if(Start(previous.Folder)){log($"Desktop app: the previous copy {previous.Version} was started instead.");return null;}}
+                catch(Exception second) when(second is System.ComponentModel.Win32Exception or IOException or InvalidOperationException)
+                {
+                    log($"Desktop app: the previous copy could not start either: {second.Message}");
+                }
             return "Advanced.DesktopInstallOpenFailed";
+        }
+
+        static bool Start(string folder)
+        {
+            using var process=Process.Start(new ProcessStartInfo(Path.Combine(folder,DesktopUpdate.ExeName)){UseShellExecute=false,WorkingDirectory=folder});
+            return process is not null;
         }
     }
 
