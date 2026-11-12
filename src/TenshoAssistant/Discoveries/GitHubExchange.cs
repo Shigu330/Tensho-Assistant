@@ -126,11 +126,13 @@ public sealed class GitHubExchange : IDisposable
         {
             var json=await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.Address),CommunityDiscoveries.MaxBytes,stop.Token).ConfigureAwait(false);
             var hash=CommunityDiscoveries.Hash(json);
-            if(File.Exists(CommonMarker) && File.ReadAllText(CommonMarker).Trim()==hash)common="CommonSame";
+            if(File.Exists(CommonMarker) && File.ReadAllText(CommonMarker).Trim()==hash || store.ImportWaiting("common:"+hash))common="CommonSame";
             else if(CommunityDiscoveries.Parse(json) is { } file)
             {
                 var result=store.Merge(file.Facts);added=result.Added;joined=result.Joined;
-                Directory.CreateDirectory(folder);File.WriteAllText(CommonMarker,hash);common="CommonTaken";
+                // X-166 (0.1133, audit R01): the hash is noted only once a save holds the merged facts; a stop before leaves the file to take again.
+                store.WhenImportSaved("common:"+hash,()=>{Directory.CreateDirectory(folder);AtomicFile.Write(CommonMarker,hash);});
+                common="CommonTaken";
             }
             else common="CommonUnreadable";
         }

@@ -274,8 +274,43 @@ public sealed class DiscoveryStore
         private set{if(value)Interlocked.Increment(ref changes);}
     }
 
-    /// <summary>X-142: a save of the copy that held this stamp (SnapshotToSave) is written: the base is clean unless it changed since.</summary>
-    public void MarkSaved(long stamp){lock(gate)if(stamp>Interlocked.Read(ref saved))Interlocked.Exchange(ref saved,stamp);}
+    /// <summary>
+    /// X-142: a save of the copy that held this stamp (SnapshotToSave) is written: the base is clean unless it changed since. X-166 (0.1133, audit R01):
+    /// the imports waiting for this save are marked done (their file renamed, the shared file's hash noted), outside the lock.
+    /// </summary>
+    public void MarkSaved(long stamp)
+    {
+        List<Action> done=[];
+        lock(gate)
+        {
+            if(stamp>Interlocked.Read(ref saved))Interlocked.Exchange(ref saved,stamp);
+            var now=Interlocked.Read(ref saved);
+            for(var at=importsWaiting.Count-1;at>=0;at--)
+                if(importsWaiting[at].Stamp<=now){done.Add(importsWaiting[at].Done);importsWaiting.RemoveAt(at);}
+        }
+        foreach(var action in done)
+            try{action();}catch(Exception){}
+    }
+
+    // X-166 (0.1133, audit R01): an import is marked done (its file renamed « .imported », the shared file's hash noted) only once a save holds what it
+    // brought; before, a stop between the merge and the save lost the import and the mark kept it from being taken again.
+    private readonly List<(string Key,long Stamp,Action Done)> importsWaiting=[];
+    /// <summary>X-166: true while an import of this key is merged but not yet saved (so the same file is not joined twice meanwhile).</summary>
+    public bool ImportWaiting(string key){lock(gate)return importsWaiting.Any(import=>import.Key==key);}
+    /// <summary>
+    /// X-166: called right after <see cref="Merge"/>: <paramref name="done"/> runs once a save holds every change made so far (at once when the base
+    /// is already saved). A stop before that save leaves the import not done, so it is taken again at the next start; a base cleared on purpose and
+    /// saved marks it done, so a deleted import is not brought back.
+    /// </summary>
+    public void WhenImportSaved(string key,Action done)
+    {
+        lock(gate)
+        {
+            var stamp=Interlocked.Read(ref changes);
+            if(Interlocked.Read(ref saved)<stamp){importsWaiting.Add((key,stamp,done));return;}
+        }
+        try{done();}catch(Exception){}
+    }
 
     public static (int X,int Z) Cell(float x,float z)=>((int)MathF.Floor(x/CellSize),(int)MathF.Floor(z/CellSize));
 
@@ -490,11 +525,15 @@ public sealed class DiscoveryStore
         return new(ready,refused,moved);
     }
     // Under the lock: prepared facts from start to end put in; « shared » counts the shared facts held per kind.
-    private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared)
+    private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared,bool sharedFile=false)
     {
         for(var at=start;at<end;at++)
         {
             var fact=ready[at];
+            // X-166 (0.1133, audit R01): a shared kind's file may still hold, as shared, a fact that became yours: the save writes your file first, and a
+            // stop before the shared files leaves the old copy there. Yours already holds it (its imports included): the old copy is left out, never added
+            // to it, and the next save writes the shared file without it.
+            if(sharedFile && fact.Seen==0 && facts.TryGetValue(fact.Key,out var mine) && mine.Seen>0){Dirty=true;continue;}
             // 0.855: facts meeting in one cell are joined, and the base is written again, smaller.
             if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
             // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
@@ -510,7 +549,7 @@ public sealed class DiscoveryStore
         revision++;
     }
     // Under the lock: a shared kind's file put in at once (bounded by MaxFacts; the kind is claimed and loaded in the same hold).
-    private void Apply(Prepared prepared,bool count){PutRange(prepared.Facts,0,prepared.Facts.Count,SharedHeld());Finish(prepared,count);}
+    private void Apply(Prepared prepared,bool count){PutRange(prepared.Facts,0,prepared.Facts.Count,SharedHeld(),true);Finish(prepared,count);}
 
     /// <summary>X-93 part 2 (0.1040): the base read at start; checked outside the lock, then put in by slices (<see cref="Slice"/>).</summary>
     public void Load(DiscoveryFile file)
@@ -667,10 +706,15 @@ public static class DiscoveryFiles
     /// format as an exported file; the main file keeps your facts only (with their imported counts). A kind file is written again only when its content changed
     /// (<paramref name="written"/> holds the last content written per kind, for this session), and removed when the kind has no shared fact any more.
     /// </summary>
-    public static void WriteSplit(string mainPath,DiscoveryFile all,Dictionary<DiscoveryKind,string> written,IReadOnlySet<DiscoveryKind>? held=null)
+    public static void WriteSplit(string mainPath,DiscoveryFile all,Dictionary<DiscoveryKind,string> written,IReadOnlySet<DiscoveryKind>? held=null,Action? between=null)
     {
-        // X-93 (0.941): the shared files first, then yours: a stop between the two never loses a shared fact. Kinds still on disk (not held) are left alone.
+        // X-166 (0.1133, audit R01): yours first, then the shared files. A fact only moves one way, from shared to yours (seen once by you), so a stop
+        // between the two leaves it in both files (the old shared copy is left out when read, DiscoveryStore.PutRange), never in neither: the order of
+        // 0.941 (shared first) removed it from the shared file before your file held it. Kinds still on disk (not held) are left alone. « between » is
+        // the test's stop between the two writes.
         var mine=all.Facts.Where(fact=>fact.Seen>0).ToList();
+        Write(mainPath,new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=mine});
+        between?.Invoke();
         var folder=SharedFolder(mainPath);
         var byKind=all.Facts.Where(fact=>fact.Seen==0).GroupBy(fact=>fact.Kind).ToDictionary(group=>group.Key,group=>group.OrderBy(fact=>fact.Key,StringComparer.Ordinal).ToList());
         foreach(var (kind,facts) in byKind)
@@ -690,7 +734,6 @@ public static class DiscoveryFiles
         if(Directory.Exists(folder))
             foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz"))
                 if(KindOf(path) is { } kind && !byKind.ContainsKey(kind) && (held is null || held.Contains(kind))){File.Delete(path);written.Remove(kind);}
-        Write(mainPath,new DiscoveryFile{Version=all.Version,Producer=all.Producer,Written=all.Written,Facts=mine});
     }
 
     /// <summary>X-93 (0.941): the shared kinds that have a file next to the main file.</summary>
@@ -738,19 +781,25 @@ public static class DiscoveryFiles
 
     public static string ExportName(DateTimeOffset at)=>$"Discoveries-{at.ToUniversalTime():yyyyMMdd-HHmmss}.json";
 
-    /// <summary>Every file of the import folder joined to the store; each one read is renamed « .imported » so that it is not joined twice.</summary>
+    /// <summary>
+    /// Every file of the import folder joined to the store; each one read is renamed « .imported » so that it is not joined twice. X-166 (0.1133, audit
+    /// R01): renamed only once a save holds it (DiscoveryStore.WhenImportSaved); until then it is not joined again, and a stop before the save leaves it
+    /// to be taken at the next import.
+    /// </summary>
     public static (int Files,int Added,int Joined,int Refused,int Unreadable) Import(string folder,DiscoveryStore store)
     {
         int files=0,added=0,joined=0,refused=0,unreadable=0;
         if(!Directory.Exists(folder))return (0,0,0,0,0);
         foreach(var path in Directory.GetFiles(folder,"*.json").Order(StringComparer.Ordinal))
         {
+            var key="file:"+Path.GetFullPath(path);
+            if(store.ImportWaiting(key))continue;
             DiscoveryFile? file;
             try{file=Read(path);}catch(Exception){file=null;}
             if(file is null){unreadable++;continue;}
             var result=store.Merge(file.Facts);
             files++;added+=result.Added;joined+=result.Joined;refused+=result.Refused;
-            File.Move(path,path+".imported",true);
+            store.WhenImportSaved(key,()=>File.Move(path,path+".imported",true));
         }
         return (files,added,joined,refused,unreadable);
     }

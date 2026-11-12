@@ -45,8 +45,10 @@ internal static class DiscoveriesTests
                 Check(store.Dirty,"an export does not mark the base saved");
                 var other=new DiscoveryStore();
                 var first=DiscoveryFiles.Import(Path.Combine(folder,"Import"),other);
-                Check(first==(1,1,0,0,1) && File.Exists(Path.Combine(folder,"Import","a.json.imported")),"read once, renamed");
+                Check(first==(1,1,0,0,1) && File.Exists(Path.Combine(folder,"Import","a.json")),"read once, kept until saved (0.1133, X-166)");
                 Check(DiscoveryFiles.Import(Path.Combine(folder,"Import"),other).Files==0,"not twice");
+                var saved=other.SnapshotToSave(At,out var stamp);other.MarkSaved(stamp);
+                Check(File.Exists(Path.Combine(folder,"Import","a.json.imported")),"renamed once saved");
                 Check(DiscoveryFiles.Read(Path.Combine(folder,"Import","a.json.imported"))?.Facts.Count==1,"round trip");
             }
             finally{if(Directory.Exists(folder))Directory.Delete(folder,true);}
