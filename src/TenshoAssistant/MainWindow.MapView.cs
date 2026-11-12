@@ -62,6 +62,13 @@ internal sealed partial class MainWindow
     internal void CloseMapFromGame()=>Volatile.Write(ref mapViewOpen,false);
     internal void ShowMapFromGame(GameMapRequest request)
     {
+        // X-253 (0.1183, « first player » review B6): the first time M opens the Tensho map instead of the game's, one chat line says so and where to turn it off.
+        if(!configuration.MapReplaceNoticeSaid)
+        {
+            configuration.MapReplaceNoticeSaid=true;
+            ChatNotice?.Invoke(localization.Get("MapView.ReplacedNotice"));
+            TrySave("Map notice");
+        }
         if(DateTimeOffset.UtcNow<mapOwnFlagUntil){mapOwnFlagUntil=default;mapViewOpen=true;mapViewToFront=true;return;}
         var mapId=maps.State.Catalog is { } catalog ? request.Resolve(catalog):request.Selected==request.Current ? 0:request.Selected;
         // A quest, aetheryte or FATE was asked (journal, link): never the M toggle, the map opens focused on it.

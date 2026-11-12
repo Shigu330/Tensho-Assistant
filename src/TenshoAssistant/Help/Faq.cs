@@ -22,6 +22,8 @@ public static class Faq
         new("Offline", "Settings"),
         new("Saved"),
         new("Actions"),
+        // X-253 (0.1183): M opens Tensho's map by default.
+        new("Map", "Settings"),
         new("Pause"),
         new("Reset", "Settings"),
         new("Official"),

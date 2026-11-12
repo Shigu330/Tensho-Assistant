@@ -277,7 +277,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (33): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (34): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -300,6 +300,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `LastPage` | string? | null |
 | `ListPanelsCurrenciesOn` | List<uint>? | null |
 | `MacroCopy` | MacroCopySettings | (object) |
+| `MapReplaceNoticeSaid` | bool | false |
 | `PagePlaces` | Dictionary<string,string> | (empty) |
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
@@ -315,7 +316,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 260 controls (252 linked to `Configuration`, 8 to another file), 33 settings without a control.
+Counted: 260 controls (252 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -598,7 +599,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans la discussion quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Demande Universalis activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (33) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (34) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -621,6 +622,7 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `LastPage` | string? | null |
 | `ListPanelsCurrenciesOn` | List<uint>? | null |
 | `MacroCopy` | MacroCopySettings | (object) |
+| `MapReplaceNoticeSaid` | bool | false |
 | `PagePlaces` | Dictionary<string,string> | (empty) |
 | `PreparationPanelItem` | uint | 0 |
 | `PreparationPanelRecipe` | uint | 0 |
@@ -636,5 +638,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 260 cases (252 reliées à `Configuration`, 8 à un autre fichier), 33 réglages sans case.
+Compté : 260 cases (252 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

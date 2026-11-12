@@ -38,7 +38,11 @@ What the game has shown it (storages, collections, progress), your settings, not
 
 ## Does Tensho play for me?
 
-No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens on your click.
+No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens on your click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and wearing the title you chose for a job when you change job (off by default).
+
+## M opens another map: how do I get the game's back?
+
+That map is Tensho's: by default it replaces the game's on the M key, with the same markers and more. Settings › Map › « Replace the game map (M key) » gives the game's map back; Tensho's map stays in the Tensho window.
 
 ## Why does Tensho stop in PvP or in a deep dungeon?
 
@@ -124,7 +128,11 @@ Ce que le jeu lui a montré (rangements, collections, progression), vos réglage
 
 ## Tensho joue-t-il à ma place ?
 
-Non. Il lit et il affiche. Ce qui agit sur le jeu, comme se téléporter, trier ou écrire une macro, ne se fait que sur votre clic.
+Non. Il lit et il affiche. Ce qui agit sur le jeu, comme se téléporter, trier ou écrire une macro, ne se fait que sur votre clic. Deux réglages agissent sans clic : la touche M ouvre la carte de Tensho au lieu de celle du jeu (activé par défaut), et le titre choisi pour un job se porte quand vous changez de job (désactivé par défaut).
+
+## M ouvre une autre carte : comment retrouver celle du jeu ?
+
+Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la touche M, avec les mêmes repères et d'autres. Paramètres › Carte › « Remplacer la carte du jeu (touche M) » rend la carte du jeu ; celle de Tensho reste dans la fenêtre de Tensho.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ ou en donjon profond ?
 
