@@ -43,6 +43,14 @@ characters' files are named by the character's id, while the application only re
 Behaviour test: `LinkCategories1119Tests` (real files of a plugin folder named by a character id, their notices through a real pipe, the bytes
 received searched for any file name or id).
 
+## Settings read by the application (0.1120, X-150)
+
+On a `settings` notice the application reads the plugin's settings off the frame (`Grouped`: a burst of notices is one reading), into a
+new object: the file read whole and bounded to 8 MB while the game may write it (`SettingsGuard.ReadBounded`), the Discord addresses
+(`WebhookUrl`, `CategoryUrls`) taken out at any depth (`SettingsGuard.Project`), then Newtonsoft with type names whose binder accepts
+only the plugin's types, primitives and collections of those (`SettingsGuard.AllowedType`, audit A15). A valid reading is applied at once
+between two frames (`Host.ApplySettings`); a failed one is said and the last valid settings stay. Behaviour test: `SettingsRead1120Tests`.
+
 ## How it is checked without the game
 
 - `tests/TenshoAssistant.Tests/LocalLink1081Tests.cs`: the wire format both ways and its refusals; a real pipe on Windows (a unique test

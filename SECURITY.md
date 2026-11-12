@@ -85,7 +85,7 @@ What the plugin does that matters for security (read against the code of the `De
   the free slots of the four bags and their size; and notices that a kind of saved data changed, as categories of a closed list
   (`settings`, `bank`, `characters`, `gil-journal`, `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`,
   `discoveries`), never a file name, a file's content, a character's name or id. The desktop application connects to it as the same
-  user only and reads the plugin's settings file itself, read-only (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
+  user only and reads the plugin's settings file itself, read-only, bounded, without the Discord addresses and with a closed list of types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Links opened in the browser**: item pages on Universalis, Garland Tools, Teamcraft, the FFXIV Console Games Wiki or the Lodestone,
   a Teamcraft list import link (built locally), the Partake events page, the prefilled GitHub form of « report a problem », help
   videos (YouTube, or this repository), a link of a « My tools » tool, and GitHub's sign-in page of the discoveries exchange. They open in
@@ -242,7 +242,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   genre de données enregistrées a changé, en catégories d'une liste fermée (`settings`, `bank`, `characters`, `gil-journal`,
   `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`, `discoveries`), jamais un nom de fichier, le contenu
   d'un fichier, le nom ou l'identifiant d'un personnage. L'application de bureau s'y connecte sous le même utilisateur seulement et
-  lit elle-même le fichier de réglages du plugin, en lecture seule (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
+  lit elle-même le fichier de réglages du plugin, en lecture seule, borné, sans les adresses Discord et avec une liste fermée de types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
 - **Liens ouverts dans le navigateur** : pages d'objet sur Universalis, Garland Tools, Teamcraft, le FFXIV Console Games Wiki ou le
   Lodestone, un lien d'import de liste Teamcraft (construit sur place), la page d'événements de Partake, le formulaire GitHub prérempli
   de « Signaler un problème », les vidéos d'aide (YouTube, ou ce dépôt), un lien d'un outil de « Mes outils », et la page de connexion

@@ -24,15 +24,22 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     private DateTime? reloadedAt;
     private string? reloadProblem;
 
+    /// <summary>X-150 (0.1120): the settings read again off the frame, the link's notices grouped (one reading for a burst of saves).</summary>
+    private Grouped<object?>? reload;
+
     /// <summary>
-    /// Once per frame, before the window is drawn: the files the game saved since the last frame; the plugin's settings file is read again
-    /// into the window (Host.ReloadSettings). The other saved files are not read by the app yet (their pages, X-119).
+    /// Once per frame, before the window is drawn: a « settings » notice of the link asks a reading of the plugin's settings off the frame
+    /// (Host.ReadSettingsAgain: bounded, without secrets, closed list of types); a finished reading is applied at once between frames
+    /// (Host.ApplySettings); a reading that failed keeps the last valid settings and is said. The other saved data are not read by the app
+    /// yet (their pages, X-119).
     /// </summary>
     public void Poll()
     {
         var categories=changes.Take(Link?.Invoke());
-        if(!categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))return;
-        var note=host.ReloadSettings();
+        if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();
+        if(reload?.Take() is not { } result)return;
+        var note=result.Error is { } error ? $"not read again ({error.GetType().Name}: {error.Message}); the last valid settings stay"
+            : result.Value is { } fresh ? host.ApplySettings(fresh) : "not read again: no saved settings were read at start";
         Console.WriteLine("Link: plugin settings "+note);
         reloadedAt=DateTime.Now;
         reloadProblem=note.StartsWith("read again",StringComparison.Ordinal) ? null : note;

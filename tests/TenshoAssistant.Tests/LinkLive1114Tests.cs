@@ -46,11 +46,11 @@ internal static class LinkLive1114Tests
             Check(feed.Contains("private void OnFile(object? sender,FileSystemEventArgs change)\n    {\n        if(LocalLinkProtocol.ChangeCategory(settingsFile,folder,change.FullPath) is { } category)changes.Add(category);\n    }"),"a watcher's event only adds a category (X-149)");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,"),"the plugin's own files watched");
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
-            Check(host.Contains("Newtonsoft.Json.JsonConvert.PopulateObject(File.ReadAllText(settingsPath),target,settings);") && host.Contains("ObjectCreationHandling=Newtonsoft.Json.ObjectCreationHandling.Replace"),"settings read again into the same object, lists replaced");
+            Check(host.Contains("public string ApplySettings(object fresh)") && host.Contains("property.SetValue(target,property.GetValue(fresh));"),"X-150: settings read into a new object, then applied at once to the window's own");
             Check(!host.Contains("File.WriteAllText") && !host.Contains("File.Write("),"the app never writes the plugin's settings");
             var program=Read("src/TenshoAssistant.Desktop/Program.cs");
             Check(program.IndexOf("status.Poll();",StringComparison.Ordinal) is var poll and >0 && poll<program.IndexOf("Ui.Frame(host,status",StringComparison.Ordinal),"between frames, before drawing");
-            Check(Read("src/TenshoAssistant.Desktop/StatusBar.cs").Contains("if(!categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))return;"),"the settings are what is read again");
+            Check(Read("src/TenshoAssistant.Desktop/StatusBar.cs").Contains("if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();"),"the settings are what is read again");
             Check(Read("src/TenshoAssistant.Desktop/Headless.cs").Contains("new(\"MIN\",100,650,700,20,140)"),"Verify's headless run draws the live line");
         }),
     ];

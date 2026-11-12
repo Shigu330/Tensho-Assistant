@@ -79,50 +79,58 @@ internal sealed class Host
         if(!File.Exists(path)){note="new (no saved settings at "+path+")";return null;}
         try
         {
-            var settings=new Newtonsoft.Json.JsonSerializerSettings
-            {
-                TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,
-                TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,
-                SerializationBinder=new PluginBinder(Plugin),
-            };
-            var value=Newtonsoft.Json.JsonConvert.DeserializeObject(File.ReadAllText(path),configurationType,settings);
-            note=value is null ? "new (saved settings empty)" : "read from "+path+" (read-only)";
+            var value=Parse(path);
+            note=value is null ? "new (saved settings empty)" : "read from "+path+" (read-only, without the Discord addresses)";
             return value;
         }
         catch(Exception error){note=$"new (saved settings unreadable: {error.GetType().Name}: {error.Message})";return null;}
     }
 
     /// <summary>
-    /// X-119 step 2 (0.1114): the plugin's saved settings read again into the window's own Configuration when the link says the game saved
-    /// them, so the pages follow the game; read-only as at start (Newtonsoft's populate, lists and objects replaced, not merged). On the UI
-    /// thread, between frames. A note in English of what happened (« not read again » when the file was being written: the next save retries).
+    /// X-150 (0.1120): one reading of the plugin's settings into a new Configuration, never into the live one: the file read whole and
+    /// bounded (SettingsGuard.ReadBounded), its secrets taken out (SettingsGuard.Project), then Newtonsoft with type names whose binder
+    /// accepts the closed list of SettingsGuard.AllowedType only. Any thread (the app reads it off the frame). Throws when it is not valid.
     /// </summary>
-    public string ReloadSettings()
+    public object? Parse(string path)
     {
-        if(settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null)return "not read again: no saved settings were read at start";
-        try
+        var settings=new Newtonsoft.Json.JsonSerializerSettings
         {
-            var settings=new Newtonsoft.Json.JsonSerializerSettings
-            {
-                TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,
-                TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,
-                SerializationBinder=new PluginBinder(Plugin),
-                ObjectCreationHandling=Newtonsoft.Json.ObjectCreationHandling.Replace,
-            };
-            Newtonsoft.Json.JsonConvert.PopulateObject(File.ReadAllText(settingsPath),target,settings);
-            return "read again from "+settingsPath;
-        }
-        catch(Exception error) when(error is IOException or UnauthorizedAccessException or Newtonsoft.Json.JsonException)
-        {
-            return $"not read again ({error.GetType().Name}: {error.Message})";
-        }
+            TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects,
+            TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,
+            SerializationBinder=new PluginBinder(Plugin),
+            MaxDepth=64,
+        };
+        return Newtonsoft.Json.JsonConvert.DeserializeObject(SettingsGuard.Project(SettingsGuard.ReadBounded(path)),configurationType,settings);
     }
 
-    /// <summary>Type names of the saved settings: the plugin's own from the loaded plugin (its copy), the others as Newtonsoft does.</summary>
+    /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
+    public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
+
+    /// <summary>
+    /// X-119 step 2 (0.1114), X-150 (0.1120): a settings object read and checked off the frame (ReadSettingsAgain) applied at once to the
+    /// window's own Configuration, on the UI thread between frames: every public property and field copied from it, so a reading that
+    /// failed never leaves the live settings half changed (the last valid ones stay). A note in English of what happened.
+    /// </summary>
+    public string ApplySettings(object fresh)
+    {
+        if(!made.TryGetValue(configurationType,out var target) || target is null)return "not read again: no saved settings were read at start";
+        if(fresh.GetType()!=configurationType)return "not read again: not the plugin's settings";
+        foreach(var property in configurationType.GetProperties(BindingFlags.Instance|BindingFlags.Public).Where(p=>p.CanRead && p.CanWrite && p.GetIndexParameters().Length==0))
+            property.SetValue(target,property.GetValue(fresh));
+        foreach(var field in configurationType.GetFields(BindingFlags.Instance|BindingFlags.Public).Where(f=>!f.IsInitOnly))
+            field.SetValue(target,field.GetValue(fresh));
+        return "read again from "+settingsPath;
+    }
+
+    /// <summary>Type names of the saved settings: the plugin's own from the loaded plugin (its copy), the others as Newtonsoft does; X-150
+    /// (audit A15): any type outside SettingsGuard.AllowedType refused (the reading fails, nothing applied).</summary>
     private sealed class PluginBinder(Assembly plugin):Newtonsoft.Json.Serialization.DefaultSerializationBinder
     {
         public override Type BindToType(string? assemblyName,string typeName)
-            => assemblyName=="TenshoAssistant" && plugin.GetType(typeName) is { } type ? type : base.BindToType(assemblyName,typeName);
+        {
+            var type=assemblyName=="TenshoAssistant" && plugin.GetType(typeName) is { } own ? own : base.BindToType(assemblyName,typeName);
+            return SettingsGuard.AllowedType(type,plugin) ? type : throw new Newtonsoft.Json.JsonSerializationException("type not allowed in the settings: "+type.FullName);
+        }
     }
 
     public IEnumerable<string> Pages=>Enum.GetNames(pageType);
