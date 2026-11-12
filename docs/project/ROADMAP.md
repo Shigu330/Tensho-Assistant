@@ -90,6 +90,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
 | D-140 | X-172 : cache des données téléchargées laissé en fichiers (essai docs/evidence/x172-sqlite-trial.md : écriture 4 fois plus lente en SQLite, lecture un peu plus lente, même taille, place rendue seulement après VACUUM) ; les découvertes passent en SQLite | Cache en fichiers comme aujourd'hui (un seul fichier SQLite, celui des découvertes) |  |
+| D-141 | X-173 : fichier des données du joueur. Les familles de X-173 entrent dans un seul fichier SQLite, TenshoData.db, à la racine du dossier de configuration (le journal des gils d'abord) ; les découvertes gardent pour l'instant leur fichier Discoveries/Discoveries.db (rien déplacé cette nuit) ; le cache reste en fichiers (D-140) | Un seul fichier de données TenshoData.db pour les familles de X-173, découvertes dans leur fichier à part ; on pourra les y déplacer plus tard (copie SQLite vers SQLite, avant l'annonce) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -196,6 +197,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-89 | Bonus d'Abondance estimé (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
 | D-140 | X-172 : cache des données téléchargées laissé en fichiers (essai docs/evidence/x172-sqlite-trial.md : écriture 4 fois plus lente en SQLite, lecture un peu plus lente, même taille, place rendue seulement après VACUUM) ; les découvertes passent en SQLite | Cache en fichiers comme aujourd'hui (un seul fichier SQLite, celui des découvertes) |  |
+| D-141 | X-173 : fichier des données du joueur. Les familles de X-173 entrent dans un seul fichier SQLite, TenshoData.db, à la racine du dossier de configuration (le journal des gils d'abord) ; les découvertes gardent pour l'instant leur fichier Discoveries/Discoveries.db (rien déplacé cette nuit) ; le cache reste en fichiers (D-140) | Un seul fichier de données TenshoData.db pour les familles de X-173, découvertes dans leur fichier à part ; on pourra les y déplacer plus tard (copie SQLite vers SQLite, avant l'annonce) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

@@ -1750,6 +1750,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1138) Monde › Découvertes, connecté à GitHub (application OAuth, rien ne change tant que l'App n'existe pas) : « Échanger maintenant » envoie sans erreur et le gist reste secret
 
+- [ ] (0.1139) Stockage › Journal des gils, après la mise à jour : les entrées d'avant sont toutes là ; dalamud.log dit « Gil journal: SQLite … data file TenshoData.db » puis « a character's file of before moved to TenshoData.db » ; GilJournal/before-sqlite-<date>/ contient l'ancien fichier
+
+- [ ] (0.1139) Stockage › Journal des gils : une dépense (téléportation, réparation) s'ajoute, puis reste après un rechargement du plugin ou un redémarrage du jeu
+
+- [ ] (0.1140) Collection › Succès, après la mise à jour : la progression vue avant est toujours là ; dalamud.log dit « Tensho data: the achievement progress file of before moved to TenshoData.db » ; before-sqlite-<date>/AchievementProgress.json existe à la racine du dossier du plugin
+
+- [ ] (0.1140) Collection › Succès : demander la progression d'un succès suivi, recharger le plugin : la progression reste ; le journal des gils marche toujours (une dépense s'ajoute)
+
+- [ ] (0.1141) Paramètres, mode développeur, Découvertes › vider la base deux fois de suite dans la même seconde n'est pas faisable à la main : vérifier seulement que Backups/ contient une copie par vidage et que dalamud.log ne montre aucune erreur
+
+- [ ] (0.1141) Salle de jeu de la Triple Triade (Gold Saucer, 579) : Tensho reste allumé dans la salle publique et se coupe dans un match de l'arène ; dalamud.log montre « Competitive arena check » sans avertissement
+
+- [ ] (0.1142) Deux clients du jeu sur le même profil : lancer le second pendant que le premier enregistre la banque ; Stockage › Banque du second dit d'abord « attend », puis se charge seul en quelques secondes
+
+- [ ] (0.1142) Application de bureau liée au jeu : recharger le plugin pendant que l'application est fermée puis la rouvrir ; un changement de liste d'artisanat fait ensuite dans le jeu apparaît dans l'application
+
+- [ ] (0.1143) Paramètres › Avancé › « Ouvrir l'application de bureau » : l'application s'ouvre comme avant ; dalamud.log sans « Desktop app could not start »
+
+- [ ] (0.1144) Collection › Magie bleue : la liste du grimoire se remplit comme avant ; « Lire les pages manquantes » avance page par page ; dalamud.log sans erreur
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
