@@ -14,67 +14,35 @@ namespace TenshoAssistant.Inventory;
 /// </summary>
 public sealed class GilJournalStore
 {
-    private readonly string folder,databasePath;
-    private readonly Action<Exception,string> warn;
-    private readonly Action<string>? info;
+    private readonly string folder;
+    private readonly TenshoDataFile data;
     private readonly object gate=new();
-    private bool tried;
-    private TenshoDataDatabase? database;
-    private Exception? blocked;
 
     /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
     internal Action? DuringSave { get; set; }
 
-    public GilJournalStore(string folder,string databasePath,Action<Exception,string> warn,Action<string>? info=null)
-    {
-        this.folder=folder;this.databasePath=databasePath;this.warn=warn;this.info=info;
-    }
+    /// <summary>0.1140: the plugin's one data file, shared with the other families.</summary>
+    public GilJournalStore(string folder,TenshoDataFile data){this.folder=folder;this.data=data;}
+    public GilJournalStore(string folder,string databasePath,Action<Exception,string> warn,Action<string>? info=null):this(folder,new TenshoDataFile(databasePath,warn,info)){}
 
     /// <summary>The file of before of a character (local character id, never an Account ID).</summary>
     public static string FileName(ulong character)=>character.ToString(CultureInfo.InvariantCulture)+".json";
 
     /// <summary>« sqlite », « json » (data file could not be created) or « blocked » (data file there but unusable); opens it on first use.</summary>
-    public string Mode
-    {
-        get{try{return Database() is null ? "json":"sqlite";}catch(IOException){return "blocked";}}
-    }
-
-    private TenshoDataDatabase? Database()
-    {
-        lock(gate)
-        {
-            if(!tried)
-            {
-                tried=true;
-                try
-                {
-                    database=new TenshoDataDatabase(databasePath);
-                    info?.Invoke($"Gil journal: SQLite {database.LibraryVersion()} data file {TenshoDataDatabase.FileName}.");
-                }
-                catch(Exception error)
-                {
-                    database=null;
-                    if(File.Exists(databasePath)){blocked=error;warn(error,"The Tensho data file could not be opened: the gil journal is not written this session.");}
-                    else warn(error,"The Tensho data file could not be created: the gil journal stays in its JSON files this session.");
-                }
-            }
-            if(blocked is not null)throw new IOException("The Tensho data file could not be opened.",blocked);
-            return database;
-        }
-    }
+    public string Mode=>data.Mode;
 
     /// <summary>A character's journal, oldest first (throws when it cannot be read: the caller then never writes over it).</summary>
     public List<GilEntry> Load(ulong character,DateTimeOffset now)
     {
         var json=Path.Combine(folder,FileName(character));
-        if(Database() is not { } opened)return GilJournal.Read(json);
+        if(data.Database() is not { } opened)return GilJournal.Read(json);
         if(File.Exists(json))
             lock(gate)
                 if(File.Exists(json))
                 {
                     using(var open=opened.Open())
                         if(!Converted(open,character))WriteRows(open,character,GilJournal.Read(json),now);
-                    SetAside(json,now);
+                    data.SetAside(json,now,"gil journal");
                 }
         return ReadRows(opened,character);
     }
@@ -83,7 +51,7 @@ public sealed class GilJournalStore
     public void Save(ulong character,IReadOnlyList<GilEntry> entries)
     {
         var json=Path.Combine(folder,FileName(character));
-        if(Database() is not { } opened){GilJournal.Write(json,entries);return;}
+        if(data.Database() is not { } opened){GilJournal.Write(json,entries);return;}
         using var open=opened.Open();
         if(File.Exists(json) && !Converted(open,character))
             throw new InvalidOperationException("The gil journal file of before is not converted yet; nothing written over it.");
@@ -91,12 +59,7 @@ public sealed class GilJournalStore
     }
 
     /// <summary>The data file's journal folded in (at unload); nothing when the JSON files are in use.</summary>
-    public void Checkpoint()
-    {
-        TenshoDataDatabase? opened;
-        lock(gate)opened=blocked is null ? database:null;
-        opened?.Checkpoint();
-    }
+    public void Checkpoint()=>data.Checkpoint();
 
     private static long Id(ulong character)=>unchecked((long)character);
 
@@ -154,24 +117,5 @@ public sealed class GilJournalStore
         while(reader.Read())
             entries.Add(new GilEntry(new DateTimeOffset(reader.GetInt64(0),TimeSpan.Zero),reader.GetInt64(1),reader.GetInt64(2),(GilSource)reader.GetInt32(3),(GilCategory)reader.GetInt32(4)));
         return entries;
-    }
-
-    // The file of before moved beside, never removed; a name already taken gets a suffix. A move that fails is retried at the next load (the mark
-    // in the data file keeps it from being read again).
-    private void SetAside(string json,DateTimeOffset now)
-    {
-        try
-        {
-            var aside=Path.Combine(folder,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
-            Directory.CreateDirectory(aside);
-            var target=Path.Combine(aside,Path.GetFileName(json));
-            if(File.Exists(target))target=Path.Combine(aside,Path.GetFileNameWithoutExtension(json)+"-"+Guid.NewGuid().ToString("N")[..8]+".json");
-            File.Move(json,target);
-            info?.Invoke($"Gil journal: a character's file of before moved to {TenshoDataDatabase.FileName}, kept in {Path.GetFileName(aside)}.");
-        }
-        catch(Exception error) when(error is IOException or UnauthorizedAccessException)
-        {
-            warn(error,"The gil journal file of before could not be set aside; it is not read again.");
-        }
     }
 }

@@ -793,8 +793,9 @@ public sealed class Plugin : IDalamudPlugin
             // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db, the files of before (GilJournal/<id>.json)
             // converted when their character is first loaded and kept aside.
             Inventory.GilWatcher? gilWatcher=null;
-            var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+            // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress), opened on first use.
+            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+            var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
@@ -922,7 +923,7 @@ public sealed class Plugin : IDalamudPlugin
             // g, C-15 (0.368): achievement progress, read passively; asked from the server only on the player's click.
             Collections.AchievementProgressWatcher? achievementProgress=null;
             registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log,
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"AchievementProgress.json"),id=>configuration.TrackedAchievements?.Contains(id)==true,mainWindow.AchievementCompleted),
+                new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"AchievementProgress.json"),tenshoData),id=>configuration.TrackedAchievements?.Contains(id)==true,mainWindow.AchievementCompleted),
                 ()=>achievementProgress?.Dispose());
             // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
             Collections.ExtraCollectionReader? extraCollections=null;

@@ -105,7 +105,8 @@ What the plugin does that matters for security (read against the code of the `De
   the saved storages (`InventoryBank/`, one file per character; a former `InventoryBank.json` is kept as `.migrated`); the gil journal
   (90 days and 20,000 entries per character at most; since 0.1139 in the player's data file `TenshoData.db`, one SQLite database at the
   root of the folder, saved whole per character in one transaction; the files of before, `GilJournal/<id>.json`, are kept once in
-  `GilJournal/before-sqlite-<date>/`); what Tensho last read for each of the player's characters
+  `GilJournal/before-sqlite-<date>/`); the achievement progress seen per character (since 0.1140 in `TenshoData.db` too; the file of
+  before, `AchievementProgress.json`, is kept once in `before-sqlite-<date>/`); what Tensho last read for each of the player's characters
   (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
   imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
@@ -277,7 +278,8 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   (`DataCache-v1/`) ; les rangements enregistrés (`InventoryBank/`, un fichier par personnage ; un ancien `InventoryBank.json` est gardé
   en `.migrated`) ; le journal des gils (90 jours et 20 000 entrées par personnage au plus ; depuis 0.1139 dans le fichier de données du joueur,
   `TenshoData.db`, une base SQLite à la racine du dossier, enregistré en entier par personnage en une transaction ; les fichiers d'avant,
-  `GilJournal/<id>.json`, sont gardés une fois dans `GilJournal/before-sqlite-<date>/`) ; ce que Tensho a
+  `GilJournal/<id>.json`, sont gardés une fois dans `GilJournal/before-sqlite-<date>/`) ; la progression des succès vue, par personnage
+  (depuis 0.1140 dans `TenshoData.db` aussi ; le fichier d'avant, `AchievementProgress.json`, est gardé une fois dans `before-sqlite-<date>/`) ; ce que Tensho a
   lu en dernier pour chacun des personnages du joueur (`Characters/`) ; la base locale de découvertes (`Discoveries/` : depuis 0.1136
   une base SQLite, `Discoveries.db`, ce que le joueur a vu lui-même et ce qu'il a importé, écrite ligne par ligne ; les fichiers d'avant,
   `Discoveries.json` et `Shared/`, sont gardés une fois dans `before-sqlite-<date>/` ; les prix vus au tableau des

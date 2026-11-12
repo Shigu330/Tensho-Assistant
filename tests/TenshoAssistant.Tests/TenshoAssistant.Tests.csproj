@@ -115,6 +115,7 @@
     <Compile Include="../../src/TenshoAssistant/Collections/Outfits.cs" Link="Collections/Outfits.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/CollectionRecent.cs" Link="Collections/CollectionRecent.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressStore.cs" Link="Collections/AchievementProgressStore.cs" />
+    <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressData.cs" Link="Collections/AchievementProgressData.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LeveCatalog.cs" Link="Leves/LeveCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LevePrepare.cs" Link="Leves/LevePrepare.cs" />
     <Compile Include="../../src/TenshoAssistant/SettingsIndex.cs" Link="SettingsIndex.cs" />

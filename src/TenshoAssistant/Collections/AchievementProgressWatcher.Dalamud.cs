@@ -23,20 +23,22 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     private DateTimeOffset nextRead,lastRequest;
     private bool disposed,warned;
 
-    // X-102 (0.987, user choice DEC-045, from C-15): what was seen is kept on disk per character (AchievementProgress.json), and a tracked
-    // achievement seen reaching its maximum is said once (completed).
-    private readonly string? file;
+    // X-102 (0.987, user choice DEC-045, from C-15): what was seen is kept on disk per character, and a tracked achievement seen reaching its
+    // maximum is said once (completed). X-173 (0.1140): kept in TenshoData.db through AchievementProgressData (AchievementProgress.json
+    // converted once), read off the frame at start; nothing is read nor written before it is there.
+    private readonly AchievementProgressData? data;
+    private Task<Dictionary<ulong,Dictionary<uint,AchievementProgress>>>? loading;
+    private bool saveBlocked;
     private readonly Func<uint,bool>? tracked;
     private readonly Action<uint>? completed;
     private readonly BackgroundWriter writer;
     private Dictionary<ulong,Dictionary<uint,AchievementProgress>> all=[];
-    public AchievementProgressWatcher(IFramework framework,IClientState client,IPlayerState player,IPluginLog log,string? file=null,Func<uint,bool>? tracked=null,Action<uint>? completed=null)
+    public AchievementProgressWatcher(IFramework framework,IClientState client,IPlayerState player,IPluginLog log,AchievementProgressData? data=null,Func<uint,bool>? tracked=null,Action<uint>? completed=null)
     {
-        this.framework=framework;this.client=client;this.player=player;this.log=log;this.file=file;this.tracked=tracked;this.completed=completed;
+        this.framework=framework;this.client=client;this.player=player;this.log=log;this.data=data;this.tracked=tracked;this.completed=completed;
         writer=new((error,what)=>log.Warning(error,"{0}",what));
-        // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it.
-        try{if(file is not null && File.Exists(file)){if(AchievementProgressStore.Read(File.ReadAllText(file)) is { } read)all=read;else{log.Warning("Saved achievement progress unreadable: kept as is, not written over.");this.file=null;}}}
-        catch(Exception error){log.Warning(error,"Saved achievement progress unreadable: kept as is, not written over.");file=null;this.file=null;}
+        // 0.997 (review): a file that does not read (another shape, damaged) is kept as is: nothing is written over it (saveBlocked).
+        loading=data is null ? null:Task.Run(()=>data.Load(DateTimeOffset.UtcNow));
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
@@ -64,6 +66,17 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
         if(now<failedUntil)return;
         try
         {
+            if(loading is { } read)
+            {
+                if(!read.IsCompleted)return;
+                loading=null;
+                lock(gate)
+                {
+                    if(read.IsCompletedSuccessfully)all=read.Result;
+                    else{saveBlocked=true;log.Warning(read.Exception?.GetBaseException(),"Saved achievement progress unreadable: kept as is, not written over.");}
+                    character=0;progress=[];
+                }
+            }
             var achievement=Achievement.Instance();
             if(achievement==null)return;
             uint request;
@@ -85,11 +98,12 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
                     {
                         progress[id]=new(current,max,now);
                         if(AchievementProgressStore.JustCompleted(known,progress[id]) && tracked?.Invoke(id)==true)completed?.Invoke(id);
-                        if(file is not null && character!=0)
+                        if(data is { } store && !saveBlocked && character!=0)
                         {
                             all[character]=new(progress);
-                            var text=AchievementProgressStore.Write(all);var path=file;
-                            writer.Enqueue("Achievement progress could not be saved.",()=>AtomicFile.Write(path,text));
+                            var who=character;var mine=new Dictionary<uint,AchievementProgress>(progress);
+                            var snapshot=all.ToDictionary(pair=>pair.Key,pair=>new Dictionary<uint,AchievementProgress>(pair.Value));
+                            writer.Enqueue("Achievement progress could not be saved.",()=>store.Save(who,mine,snapshot));
                         }
                     }
                 }
@@ -105,7 +119,8 @@ public sealed unsafe class AchievementProgressWatcher : IDisposable
     public void Dispose()
     {
         lock(gate){if(disposed)return;disposed=true;}
-        writer.Flush(TimeSpan.FromSeconds(3));
+        if(writer.Flush(TimeSpan.FromSeconds(3)))
+            try{data?.Checkpoint();}catch(Exception error){log.Warning(error,"The Tensho data file's journal could not be folded in; SQLite does it at the next start.");}
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
     }
 }
