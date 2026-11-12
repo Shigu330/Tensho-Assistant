@@ -95,7 +95,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
     /// <summary>Draws Tensho's tooltip below the entry while the mouse is over it (ImGui, from the plugin's draw).</summary>
     public void DrawTooltip()
     {
-        if(disposed || !configuration.AlarmBarTooltip || !entry.Shown || !TooltipScope.UnderBox(bounds))return;
+        if(disposed || !configuration.AlarmBarTooltip || !entry.Shown || !TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove))return;
         using(TooltipScope.Begin())
         {
             if(upcoming.Count==0){ImGui.TextUnformatted(text("Alarms.BarNone"));return;}

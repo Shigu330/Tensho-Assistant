@@ -51,7 +51,7 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "ShowBeastBoardPanel", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "ShowBeastBoardPanel", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
@@ -445,6 +445,8 @@ public sealed partial class Configuration
     // 0.301: Tensho's own tooltip under the bar icon (the game's is hidden by plugin windows) and how many alarms it lists.
     public bool AlarmBarTooltip { get; set; } = true;
     public int AlarmBarTooltipCount { get; set; } = 5;
+    // X-162 (0.1129, user request): Tensho's server bar tooltips above their entry instead of under it (under by default).
+    public bool ServerBarTooltipAbove { get; set; }
     // 0.300 (R-08): reminders ticked « done » (key → time, kept until the next reset) and the last treasure map opened.
     public Dictionary<string,DateTimeOffset>? ReminderDone { get; set; }
     public DateTimeOffset? TreasureMapAt { get; set; }

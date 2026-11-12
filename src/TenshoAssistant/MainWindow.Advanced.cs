@@ -30,7 +30,7 @@ internal sealed partial class MainWindow
         // X-76 step 3 (0.952): the server bar tooltip belongs to the three bar entries above (not to the tracking window it sat under):
         // greyed while none of them is on; its count is read by the alarm entry only, greyed while that entry or the tooltip is off.
         ImGui.Indent();
-        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar);
+        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar);
         try
         {
             BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);
@@ -39,6 +39,11 @@ internal sealed partial class MainWindow
             // 0.331 (audit): the sliders follow the drag in memory and save once, when released (no disk write per frame); X-76 H4 (0.914): SliderSetting.
             try{SliderSetting("Advanced.AlarmBarTooltipCount","Advanced.AlarmBarTooltipCountTip",()=>configuration.AlarmBarTooltipCount,value=>configuration.AlarmBarTooltipCount=value,
                 1,10,DefaultConfiguration.AlarmBarTooltipCount,width:120);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+            // X-162 (0.1129): one side for all of Tensho's server bar tooltips.
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.AlarmBarTooltip);
+            try{BoolSetting("Advanced.ServerBarTooltipAbove","Advanced.ServerBarTooltipAboveTip",()=>configuration.ServerBarTooltipAbove,value=>configuration.ServerBarTooltipAbove=value,c=>c.ServerBarTooltipAbove);}
             finally{ImGui.EndDisabled();ImGui.Unindent();}
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}

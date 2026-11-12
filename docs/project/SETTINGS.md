@@ -23,7 +23,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
 | `(ModuleSettings.MacroChain)` | — | — | Settings › Panels | **Chain the pages (Tensho Macro Chain: /tenshonext as the last line)** — Ends each page with /tenshonext so Tensho's Macro chain starts the next page (long rotations). Default: on. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Settings › Panels | **Allow overwriting existing macros in the range** — Ticked: the copy may replace any macro in the chosen slots. Unticked: only empty slots or slots Tensho copied before. Default: off. |
-| `AlarmBarTooltip` | bool | true | Settings › General | **Tensho tooltip under the icon** — Hovering the alarm icon or one of the two reminder icons of the server bar shows Tensho's own tooltip just below it, above every window (the game's goes under plugin windows such as the Tensho map). Unticked: the game's tooltip. Default: on. |
+| `AlarmBarTooltip` | bool | true | Settings › General | **Tensho tooltip under the icon** — Hovering one of Tensho's server bar entries (alarms, reminders, currencies, gil) shows Tensho's own tooltip next to it, above every window (the game's goes under plugin windows such as the Tensho map, and it may open on either side). Unticked: the game's tooltip. Default: on. |
 | `AlarmBarTooltipCount` | int | 5 | Settings › General | **Alarms listed** — Number of upcoming alarms shown in the tooltip (1 to 10). Default: 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Settings › Tracking | **Automatic alarms (retainer ventures, vessels, squadron)** — Creates a Tensho alarm at the end of each retainer venture (known once the retainer list was opened) and at each vessel's return (known after the workshop). The time follows the readings; the alarm goes an hour after it rang. No game alarm is ever made automatically. Default: on. |
 | `AlarmOptions.DutyPopAlert` | bool | false | Settings › Tracking | **Alert when a duty is ready** — A chat line and the alarm sound when the Duty Finder finds your party (same silence rules in duties). Also sent to Discord when its « Duty ready » category is ticked. Default: off. |
@@ -242,6 +242,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `RemindersFromGame` | bool | true | page Reminders | **Tick from the game** — When the game reads 0 tribal quests or 0 special deliveries left, the box ticks itself until the reset. An unknown counter ticks nothing. Default: on. |
 | `RetainerSalesPanel` | bool | true | Settings › Data | **Panel beside the retainer sale list** — While a retainer's sale list is open, shows your prices beside it. It reads the list and changes nothing. Comparing with other sellers asks Universalis, only on your click. Default: on. |
 | `RouteUnlockedOnly` | bool | true | `MainWindow.RoutePlanner.cs` | **Unlocked sectors only** — Offers only the sectors read as unlocked in the company workshop. Default: on. |
+| `ServerBarTooltipAbove` | bool | false | Settings › General | **Above the entry** — Tensho's server bar tooltips open above their entry instead of below it. When that side lacks room, they open on the other one: never off the screen. Default: off (below). |
 | `ShowBeastBoardPanel` | bool | true | page Beastmaster | **Team panel beside the board** — Shows the team panel beside the game's board window: before entering, and in the labyrinth only in front of the board, never during a fight (DEC-047). Default: on. |
 | `ShowCharacterPanel` | bool | true | Settings › Panels | **Show real stats (%) beside the game's Character window** — Opens the real stats panel (%) next to the game's Character window. Default: on. |
 | `ShowDutyFinderLoot` | bool | true | Settings › Panels | **Show the loot of the duty selected in the game's Duty Finder** — Opens the loot panel next to the game's duty finder window. Default: on. |
@@ -307,7 +308,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 253 controls (246 linked to `Configuration`, 7 to another file), 32 settings without a control.
+Counted: 254 controls (247 linked to `Configuration`, 7 to another file), 32 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -336,7 +337,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
 | `(ModuleSettings.MacroChain)` | — | — | Paramètres › Panneaux à côté du jeu | **Chaîner les pages (Macro Chain de Tensho : /tenshonext en dernière ligne)** — Termine chaque page par /tenshonext, pour que l'Enchaînement de macros de Tensho lance la page suivante (rotations longues). Par défaut : activé. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Paramètres › Panneaux à côté du jeu | **Autoriser l'écrasement de macros existantes dans la plage** — Coché : la copie peut remplacer n'importe quelle macro dans les emplacements choisis. Décoché : seulement les emplacements vides ou déjà copiés par Tensho. Par défaut : désactivé. |
-| `AlarmBarTooltip` | bool | true | Paramètres › Général | **Infobulle Tensho sous l'icône** — Au survol de l'icône d'alarme ou de l'une des deux icônes de rappels de la barre du serveur, Tensho affiche sa propre infobulle juste en dessous, par-dessus toutes les fenêtres (celle du jeu passe sous les fenêtres des plugins, dont la carte Tensho). Décoché : l'infobulle du jeu. Par défaut : activé. |
+| `AlarmBarTooltip` | bool | true | Paramètres › Général | **Infobulle Tensho sous l'icône** — Au survol d'une entrée de Tensho dans la barre du serveur (alarmes, rappels, monnaies, gils), Tensho affiche sa propre infobulle contre elle, par-dessus toutes les fenêtres (celle du jeu passe sous les fenêtres des plugins, dont la carte Tensho, et peut s'ouvrir d'un côté ou de l'autre). Décoché : l'infobulle du jeu. Par défaut : activé. |
 | `AlarmBarTooltipCount` | int | 5 | Paramètres › Général | **Alarmes listées** — Nombre de prochaines alarmes affichées dans l'infobulle (1 à 10). Par défaut : 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Paramètres › Suivi et notifications | **Alarmes automatiques (tâches de servant, vaisseaux, escouade)** — Crée d'office une alarme Tensho à la fin de chaque tâche de servant (connue après avoir ouvert la liste des servants) et au retour de chaque vaisseau (connu après l'atelier). L'heure suit les relevés ; l'alarme disparaît une heure après avoir sonné. Aucune alarme du jeu n'est créée d'office. Par défaut : activé. |
 | `AlarmOptions.DutyPopAlert` | bool | false | Paramètres › Suivi et notifications | **Alerte quand une mission est prête** — Une ligne dans la discussion et le son des alarmes quand l'outil de recherche de mission trouve votre groupe (mêmes règles de silence en mission). Envoyée aussi à Discord si la catégorie « Mission prête » y est cochée. Par défaut : désactivé. |
@@ -555,6 +556,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `RemindersFromGame` | bool | true | page Rappels | **Cocher d'après le jeu** — Quand le jeu indique 0 quête de tribu ou 0 commande spéciale restante, la case se coche seule jusqu'à la remise. Un compteur inconnu ne coche rien. Par défaut : activé. |
 | `RetainerSalesPanel` | bool | true | Paramètres › Données et sources | **Panneau à côté de la liste de ventes des servants** — Quand la liste de ventes d'un servant est ouverte, affiche vos prix à côté. Il lit la liste et ne change rien. Comparer aux autres vendeurs interroge Universalis, seulement sur votre clic. Par défaut : activé. |
 | `RouteUnlockedOnly` | bool | true | `MainWindow.RoutePlanner.cs` | **Secteurs débloqués seulement** — Ne propose que les secteurs lus comme débloqués dans l'atelier de la compagnie. Par défaut : activé. |
+| `ServerBarTooltipAbove` | bool | false | Paramètres › Général | **Au-dessus de l'entrée** — Les infobulles de Tensho dans la barre du serveur s'ouvrent au-dessus de leur entrée au lieu d'en dessous. Quand ce côté manque de place, elles s'ouvrent de l'autre : jamais hors de l'écran. Par défaut : désactivé (en dessous). |
 | `ShowBeastBoardPanel` | bool | true | page Dresseur | **Panneau d'équipe à côté du plateau** — Montre le panneau d'équipe à côté de la fenêtre du plateau du jeu : avant d'entrer, et dans le Dédale seulement devant le plateau, jamais pendant un combat (DEC-047). Par défaut : activé. |
 | `ShowCharacterPanel` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher les stats réelles (%) à côté de la fenêtre Personnage du jeu** — Ouvre le panneau des stats réelles (%) à côté de la fenêtre Personnage du jeu. Par défaut : activé. |
 | `ShowDutyFinderLoot` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher le butin du contenu sélectionné à côté de l'outil de mission du jeu** — Ouvre le panneau des butins à côté de la fenêtre de recherche de mission du jeu. Par défaut : activé. |
@@ -620,5 +622,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 253 cases (246 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
+Compté : 254 cases (247 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
 <!-- /docgen:settings-fr -->

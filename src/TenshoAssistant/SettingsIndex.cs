@@ -45,6 +45,7 @@ public static class SettingsIndex
         ("Advanced.HomeTools","General"),
         ("Advanced.ReminderFinishedServerBar","General"),
         ("Advanced.ReminderServerBar","General"),
+        ("Advanced.ServerBarTooltipAbove","General"),
         ("ModuleSettings.ShowEnglishItemName","General"),
         ("Settings.ContextMenu","General"),
         ("Settings.HelpBanners","General"),

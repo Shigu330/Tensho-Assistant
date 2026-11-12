@@ -65,13 +65,15 @@ internal readonly struct TooltipScope : IDisposable
         return new TooltipScope(true);
     }
 
-    /// <summary>True when the mouse is over the box; the next tooltip is then placed under it (server bar entries).</summary>
-    public static bool UnderBox((Vector2 Min,Vector2 Max)? bounds)
+    /// <summary>True when the mouse is over the box; the next tooltip is then placed under it, or above it (server bar entries; X-162:
+    /// BarTooltipPlace, never off the screen).</summary>
+    public static bool UnderBox((Vector2 Min,Vector2 Max)? bounds,bool above=false)
     {
         if(bounds is not { } box)return false;
         var mouse=ImGui.GetIO().MousePos;
         if(mouse.X<box.Min.X || mouse.X>box.Max.X || mouse.Y<box.Min.Y || mouse.Y>box.Max.Y)return false;
-        ImGui.SetNextWindowPos(new Vector2(box.Min.X,box.Max.Y+4));
+        var (position,pivot)=TenshoAssistant.UI.BarTooltipPlace.For(box.Min,box.Max,ImGui.GetIO().DisplaySize,above);
+        ImGui.SetNextWindowPos(position,ImGuiCond.Always,pivot);
         return true;
     }
 

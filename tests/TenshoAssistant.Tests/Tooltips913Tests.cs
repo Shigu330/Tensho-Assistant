@@ -53,8 +53,8 @@ internal static class Tooltips913Tests
             Check(!Source("MainWindow.Advanced.cs").Contains("void WrappedTooltip(",StringComparison.Ordinal),"moved out of Advanced");
             foreach(var (name,text) in Files())
                 if(name!="UI/Components/Tooltip.cs")Check(!text.Contains("ImGui.BeginTooltip()",StringComparison.Ordinal),name+": BeginTooltip by hand, use TooltipScope.Begin()");
-            Check(Source("Alarms/AlarmDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds)",StringComparison.Ordinal)
-                && Source("Alarms/ReminderDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds)",StringComparison.Ordinal),"server bar tooltips placed by one helper");
+            Check(Source("Alarms/AlarmDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove)",StringComparison.Ordinal)
+                && Source("Alarms/ReminderDtrEntry.Dalamud.cs").Contains("TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove)",StringComparison.Ordinal),"server bar tooltips placed by one helper");
             var log=Source("MainWindow.CraftLog.cs");
             Check(log.Contains("HelpMarkerText(help);",StringComparison.Ordinal) && !log.Contains("TextDisabled(\"(?)\")",StringComparison.Ordinal),"craft log help marker");
             Check(Source("MainWindow.DutyFinder.cs").Contains("HelpMarker(\"DutyUi.Source\");",StringComparison.Ordinal),"duty finder help marker");

@@ -93,7 +93,7 @@ public sealed class ReminderDtrEntry : IDisposable
 
     private void Tooltip((Vector2 Min,Vector2 Max)? bounds,string title,IEnumerable<string> lines)
     {
-        if(!TooltipScope.UnderBox(bounds))return;
+        if(!TooltipScope.UnderBox(bounds,configuration.ServerBarTooltipAbove))return;
         using(TooltipScope.Begin())
         {
             ImGui.TextColored(UI.FfxivTheme.Gold,title);

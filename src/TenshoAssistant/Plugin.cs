@@ -82,6 +82,9 @@ public sealed class Plugin : IDalamudPlugin
     private int commandLocalizationRevision=-1;
     private Func<Alarms.AlarmDtrEntry?>? alarmBar;
     private Func<Alarms.ReminderDtrEntry?>? reminderBar;
+    // X-162 (0.1129): the currency and gil entries draw Tensho's tooltip too.
+    private Func<Alarms.CurrencyDtrEntry?>? currencyBar;
+    private Func<Inventory.GilDtrEntry?>? gilBar;
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
@@ -586,8 +589,9 @@ public sealed class Plugin : IDalamudPlugin
             }
             registrations.Register(()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop);
             Alarms.CurrencyDtrEntry? currencyBar=null;
-            registrations.Register(()=>currencyBar=new Alarms.CurrencyDtrEntry(dtrBar,framework,configuration,()=>currencies?.State,localization.Get,mainWindow.OpenCurrencies),()=>currencyBar?.Dispose());
+            registrations.Register(()=>currencyBar=new Alarms.CurrencyDtrEntry(dtrBar,framework,gameGui,configuration,()=>currencies?.State,localization.Get,mainWindow.OpenCurrencies),()=>currencyBar?.Dispose());
             this.alarmBar=()=>alarmBar;
+            this.currencyBar=()=>currencyBar;
             FreeCompany.VoyageWatcher? voyages=null;
             // g, M-10 (0.379): voyage loot history, one local file (VoyageHistory.json), 180 days.
             var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message));
@@ -757,7 +761,8 @@ public sealed class Plugin : IDalamudPlugin
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
             Inventory.GilDtrEntry? gilBar=null;
-            registrations.Register(()=>gilBar=new Inventory.GilDtrEntry(dtrBar,framework,()=>configuration.GilServerBar,()=>gilWatcher?.State?.Entries,localization.Get,mainWindow.OpenGilJournal),()=>gilBar?.Dispose());
+            registrations.Register(()=>gilBar=new Inventory.GilDtrEntry(dtrBar,framework,gameGui,configuration,()=>configuration.GilServerBar,()=>gilWatcher?.State?.Entries,localization.Get,mainWindow.OpenGilJournal),()=>gilBar?.Dispose());
+            this.gilBar=()=>gilBar;
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
             // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
             Items.ItemNoteShopReminder? shopReminder=null;
@@ -1589,6 +1594,8 @@ public sealed class Plugin : IDalamudPlugin
             ("RegenTick",mainWindow.ObserveRegenTick),
             ("AlarmBar",()=>alarmBar?.Invoke()?.DrawTooltip()),
             ("ReminderBar",()=>reminderBar?.Invoke()?.DrawTooltip()),
+            ("CurrencyBar",()=>currencyBar?.Invoke()?.DrawTooltip()),
+            ("GilBar",()=>gilBar?.Invoke()?.DrawTooltip()),
             ("TriadOverlay",mainWindow.DrawTriadOverlay),
             ("TriadRequest",mainWindow.DrawTriadRequestPanel),
             ("TriadDeck",mainWindow.DrawTriadDeckReminder),

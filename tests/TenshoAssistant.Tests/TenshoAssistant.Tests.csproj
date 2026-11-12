@@ -133,6 +133,7 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/Notebooks.cs" Link="Gathering/Notebooks.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/FontSettings.cs" Link="UI/FontSettings.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SettingSave.cs" Link="UI/SettingSave.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/BarTooltipPlace.cs" Link="UI/BarTooltipPlace.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/DeleteConfirm.cs" Link="UI/DeleteConfirm.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="Gathering/WeatherForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="Gathering/FishingForecast.cs" />

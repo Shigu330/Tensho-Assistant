@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1129.0
+- Plan global, X-162 : Infobulles de la barre d'infos du serveur (demande de l'utilisateur du 12/11) : les entrées des monnaies et des gils ont maintenant l'infobulle de Tensho, comme les alarmes et les rappels, accrochée à leur entrée ; toutes s'ouvrent du même côté, en dessous par défaut, au-dessus avec le nouveau réglage « Au-dessus de l'entrée » (Paramètres › Général, sous l'infobulle de Tensho) ; quand ce côté manque de place elles passent de l'autre, et sur la moitié droite de l'écran leur bord droit suit celui de l'entrée : jamais hors de l'écran. Sans l'infobulle de Tensho, celle du jeu reste.
+- Tests : BarTooltips1129Tests. Verify.ps1 (agent) : 1866/1866, 0 avertissement, 0 erreur ; DLL 0.1129.0.0. Non validé en jeu.
+### English
+- Server info bar tooltips (user request of 12/11): the currency and gil entries now have Tensho's tooltip, like the alarms and reminders, attached to their entry; all open on the same side, below by default, above with the new setting « Above the entry » (Settings › General, under Tensho's tooltip); when that side lacks room they open on the other one, and on the right half of the screen their right edge follows the entry's: never off the screen. Without Tensho's tooltip, the game's stays.
+
 ## 0.1128.0
 - Plan global, X-158 : Carnet d'exploration, une seule source (demande de l'utilisateur du 12/11, cas du Viaduc) : « possible maintenant », la couleur de la ligne, le filtre « Possibles maintenant », les lignes de l'infobulle et la prochaine fenêtre viennent d'un même calcul (heure d'Éorzéa du panorama et périodes de météo de la zone, sauts d'un changement à l'autre). La liste dit « possible maintenant, jusqu'à HH:MM » ; l'infobulle dit « Possible maintenant, jusqu'à HH:MM », ou ce qui manque (l'heure, la météo, ou les deux) et quand la prochaine fenêtre s'ouvre, cherchée sur 30 jours hors de l'image, sinon « Aucune fenêtre dans les 30 prochains jours » : jamais de ligne vide. Une météo inconnue n'est jamais dite « possible ».
 - Tests : VistaWindow1128Tests. Verify.ps1 (agent) : 1864/1864, 0 avertissement, 0 erreur ; DLL 0.1128.0.0. Non validé en jeu.
