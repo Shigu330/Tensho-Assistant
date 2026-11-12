@@ -34,8 +34,16 @@ internal sealed class GardenChatWatcher : IDisposable
     // #36 (0.978): the target's object id (0: none), to see a harvest.
     private readonly Func<uint>? target;
     private DateTimeOffset lastHarvest;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null)
-    {this.target=target;
+    // X-179 (0.1165): the game's menu on a bed (its title names the patch and the bed), read while it is open, for the care line that follows.
+    private static readonly string[] MenuWindows=["SelectString","SelectIconString"];
+    private readonly IGameGui? gui;
+    private readonly Func<bool>? developer;
+    private readonly GardenMenuMemory menuMemory=new();
+    private GardenMenuTitle? menuTitle;
+    private bool menuTitleFailed;
+    private string? menuSeen;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null)
+    {this.target=target;this.gui=gui;this.developer=developer;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
@@ -69,7 +77,9 @@ internal sealed class GardenChatWatcher : IDisposable
     private unsafe void OnUpdate(IFramework _)
     {
         var now=DateTimeOffset.UtcNow;
-        if(disposed || now<nextPoll || !framework.IsInFrameworkUpdateThread)return;
+        if(disposed || !framework.IsInFrameworkUpdateThread)return;
+        ReadMenu(now);
+        if(now<nextPoll)return;
         nextPoll=now.AddMilliseconds(500);
         if(!enabled() || !client.IsLoggedIn)return;
         try
@@ -84,6 +94,47 @@ internal sealed class GardenChatWatcher : IDisposable
         {
             nextPoll=now.AddSeconds(60);
             if(!warned){warned=true;log.Warning(error,"The planting window could not be read (perhaps after a game update); the seed stays unknown.");}
+        }
+    }
+
+    /// <summary>
+    /// X-179 (0.1165): each frame in housing, the game's choice window when it is open: a title that reads as « patch N, bed M » (Addon 6420 in the
+    /// client's language) is remembered with the place. Texts are only compared, never kept; in developer mode the window's name is written once per opening.
+    /// </summary>
+    private unsafe void ReadMenu(DateTimeOffset now)
+    {
+        if(gui is null || menuTitleFailed || !enabled() || !client.IsLoggedIn || !InHousing())return;
+        try
+        {
+            foreach(var name in MenuWindows)
+            {
+                var addon=gui.GetAddonByName(name);
+                if(addon.IsNull || !addon.IsVisible)continue;
+                if(menuTitle is null)
+                {
+                    var macro=data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRowOrDefault(GardenMenuTitle.AddonRow)?.Text.ToMacroString();
+                    menuTitle=GardenMenuTitle.From(macro);
+                    if(menuTitle is null){menuTitleFailed=true;log.Warning("Garden: the bed menu's title could not be understood (Addon {0}; perhaps after a game update): care lines keep their old rule.",GardenMenuTitle.AddonRow);return;}
+                }
+                var unit=(FFXIVClientStructs.FFXIV.Component.GUI.AtkUnitBase*)addon.Address;
+                var texts=new List<string>();
+                TenshoAssistant.Beastmaster.BeastWindowProbe.Texts(&unit->UldManager,0,texts);
+                foreach(var text in texts)
+                {
+                    if(menuTitle.Read(text) is not { } slot)continue;
+                    var place=Place();
+                    menuMemory.Seen(slot.Patch,slot.Bed,place,now);
+                    var seen=$"{name}:{place}:{slot.Patch}:{slot.Bed}";
+                    if(seen!=menuSeen){menuSeen=seen;if(developer?.Invoke()==true)log.Information("Garden menu read: window {0}, patch {1}, bed {2}.",name,slot.Patch,slot.Bed);}
+                    return;
+                }
+            }
+            menuSeen=null;
+        }
+        catch(Exception error)
+        {
+            menuTitleFailed=true;
+            log.Warning(error,"Garden: the bed menu could not be read (perhaps after a game update): care lines keep their old rule.");
         }
     }
 
@@ -114,11 +165,24 @@ internal sealed class GardenChatWatcher : IDisposable
             if(target is not null && InHousing() && GardenChat.IsHarvest((int)message.LogKind,sender,target()))
             {
                 var at=DateTimeOffset.UtcNow;
-                if(at-lastHarvest>=TimeSpan.FromSeconds(5)){lastHarvest=at;planted(new(GardenChatKind.Harvested,null,null),null,Place());}
+                if(at-lastHarvest>=TimeSpan.FromSeconds(5))
+                {
+                    lastHarvest=at;
+                    var place=Place();
+                    var slot=menuMemory.Take(place,at);
+                    planted(new(GardenChatKind.Harvested,slot?.Patch,slot?.Bed),null,place);
+                }
                 return;
             }
             if(Rules()?.Read(sender,text) is not { } found)return;
-            if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted){planted(found,null,Place());return;}
+            if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted)
+            {
+                var place=Place();
+                // X-179 (0.1165): the bed of the menu just before, when it was read at this place.
+                if(menuMemory.Take(place,DateTimeOffset.UtcNow) is { } slot)found=found with{Patch=slot.Patch,Bed=slot.Bed};
+                planted(found,null,place);
+                return;
+            }
             var seed=chosenSeed!=0 && DateTimeOffset.UtcNow-chosenAt<TimeSpan.FromSeconds(60) ? chosenSeed:(uint?)null;
             chosenSeed=0;
             planted(found,seed,Place());

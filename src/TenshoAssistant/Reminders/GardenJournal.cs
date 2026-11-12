@@ -87,6 +87,17 @@ public static class GardenJournal
     public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>
+    /// X-179 (0.1165): the beds a care line (tending, uprooting, harvest) may be about. With the bed read in the game's menu: that bed alone, at that
+    /// place and in that patch, or none when it is not noted (never another bed). Without it: every bed noted at the place (the caller acts only on one).
+    /// </summary>
+    public static GardenBed[] CareTargets(IEnumerable<GardenBed>? beds,string? place,(int Patch,int Bed)? menu)
+    {
+        var here=At(beds,place);
+        if(menu is not { } slot)return here;
+        return here.Where(bed=>Slot(bed) is { } seen && seen.Zone==place && seen.Patch==slot.Patch && seen.Bed==slot.Bed).Take(1).ToArray();
+    }
+
+    /// <summary>
     /// X-132 (0.1160, user request of 11/11): the garden's alarms still to ring, as the Garden tool's « Alarms » tab lists them: per bed its
     /// next tending (when it comes before the harvest) and its harvest, ordered by time, then by place. A passed one is not listed (it was said
     /// in the chat; the journal shows the bed's state); a bed planted in the future (clock change) neither.

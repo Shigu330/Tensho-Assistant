@@ -58,3 +58,69 @@ public sealed class GardenChat
         return bed is >= 1 and <= 8 && patch is >= 1 and <= 3 ? new(GardenChatKind.PlantedBed,patch,bed):null;
     }
 }
+
+/// <summary>
+/// X-179 (0.1165, user's finding of 2026-11-12): the title of the game's menu on a garden bed (« Potager 1, emplacement 6 »), Addon row 6420 in the
+/// client's language, read with its own numbers: lnum1 is the patch, lnum2 the bed, in every language (« <ordinal(lnum2)> Bed, <ordinal(lnum1)> Patch »
+/// in English, « Beet <num(lnum1)>, Furche <num(lnum2)> » in German; docs/evidence/0.1165-garden-menu.md). A row with any other macro is not used: nothing is guessed.
+/// </summary>
+public sealed class GardenMenuTitle
+{
+    public const uint AddonRow=6420;
+    private readonly Regex pattern;
+    private readonly int patchGroup,bedGroup;
+    private GardenMenuTitle(Regex pattern,int patchGroup,int bedGroup){this.pattern=pattern;this.patchGroup=patchGroup;this.bedGroup=bedGroup;}
+
+    /// <summary>From the row's macro text (Lumina's ToMacroString); null when it is not exactly text, the patch number and the bed number.</summary>
+    public static GardenMenuTitle? From(string? macro)
+    {
+        if(string.IsNullOrWhiteSpace(macro))return null;
+        var tokens=Regex.Matches(macro,@"<[^>]*>",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+        var built=new System.Text.StringBuilder("^");
+        var at=0;int patch=0,bed=0,group=0;
+        foreach(Match token in tokens)
+        {
+            built.Append(Regex.Escape(macro[at..token.Index]));
+            at=token.Index+token.Length;
+            var number=Regex.Match(token.Value,@"^<(num|ordinal)\(lnum([12])\)>$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+            if(!number.Success)return null;
+            group++;
+            if(number.Groups[2].Value=="1"){if(patch!=0)return null;patch=group;}else{if(bed!=0)return null;bed=group;}
+            built.Append(number.Groups[1].Value=="ordinal" ? @"(\d+)(?:st|nd|rd|th)?":@"(\d+)");
+        }
+        built.Append(Regex.Escape(macro[at..])).Append('$');
+        if(patch==0 || bed==0)return null;
+        return new(new Regex(built.ToString(),RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50)),patch,bed);
+    }
+
+    /// <summary>The patch (1 to 3) and bed (1 to 8) a menu title names, or null.</summary>
+    public (int Patch,int Bed)? Read(string? text)
+    {
+        if(text is null || text.Length is 0 or >80)return null;
+        var match=pattern.Match(text.Trim());
+        if(!match.Success || !int.TryParse(match.Groups[patchGroup].Value,out var patch) || !int.TryParse(match.Groups[bedGroup].Value,out var bed))return null;
+        return patch is >= 1 and <= 3 && bed is >= 1 and <= 8 ? (patch,bed):null;
+    }
+}
+
+/// <summary>
+/// X-179 (0.1165): the last garden bed whose menu was seen, for the tending or uprooting line that follows (the line itself does not say which bed).
+/// Used once, at the same place only, within 30 seconds; otherwise forgotten.
+/// </summary>
+public sealed class GardenMenuMemory
+{
+    public static readonly TimeSpan Window=TimeSpan.FromSeconds(30);
+    private readonly object gate=new();
+    private (int Patch,int Bed,string? Place,DateTimeOffset At)? last;
+    public void Seen(int patch,int bed,string? place,DateTimeOffset at){lock(gate)last=(patch,bed,place,at);}
+    public (int Patch,int Bed)? Take(string? place,DateTimeOffset now)
+    {
+        lock(gate)
+        {
+            if(last is not { } seen)return null;
+            last=null;
+            if(now<seen.At || now-seen.At>Window || string.IsNullOrEmpty(place) || seen.Place!=place)return null;
+            return (seen.Patch,seen.Bed);
+        }
+    }
+}

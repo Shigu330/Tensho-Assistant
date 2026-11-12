@@ -1220,7 +1220,8 @@ public sealed class Plugin : IDalamudPlugin
             Reminders.GardenChatWatcher? gardenWatcher=null;
             registrations.Register(()=>gardenWatcher=new Reminders.GardenChatWatcher(chatGui,framework,data,client,log,()=>configuration.GardenDetect,
                 id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,mainWindow.GardenPlanted,
-                target:()=>targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventObj } bedObject ? bedObject.BaseId:0u),()=>gardenWatcher?.Dispose());
+                target:()=>targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventObj } bedObject ? bedObject.BaseId:0u,
+                gui:gameGui,developer:()=>configuration.DeveloperMode),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

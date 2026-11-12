@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
     /// </summary>
     internal void GardenPlanted(GardenChatEvent found,uint? seedId,string? zone)
     {
-        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted or GardenChatKind.Harvested){GardenCared(found.Kind,zone);return;}
+        if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted or GardenChatKind.Harvested){GardenCared(found,zone);return;}
         var seeds=GardenSeedCatalog?.Invoke() ?? [];
         var known=seedId is { } id ? seeds.FirstOrDefault(row=>row.Seed.SeedId==id):default;
         if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
@@ -50,10 +50,15 @@ internal sealed partial class MainWindow
         SaveReminders();
     }
 
-    /// <summary>0.616: tending or uprooting read from the chat. The line does not say which bed: with one bed noted here it is that one, with several nothing is guessed.</summary>
-    private void GardenCared(GardenChatKind kind,string? zone)
+    /// <summary>
+    /// 0.616: tending or uprooting read from the chat. The line does not say which bed: with one bed noted here it is that one, with several nothing is guessed.
+    /// X-179 (0.1165): the bed named by the game's menu just before (found.Patch, found.Bed) is that bed alone; not noted: nothing changes.
+    /// </summary>
+    private void GardenCared(GardenChatEvent found,string? zone)
     {
-        var here=GardenJournal.At(configuration.GardenBeds,zone);
+        var kind=found.Kind;
+        var menu=found.Patch is { } patch && found.Bed is { } number ? (patch,number):((int,int)?)null;
+        var here=GardenJournal.CareTargets(configuration.GardenBeds,zone,menu);
         if(here.Length==0)return;
         // #36 (0.978): a harvest is of a ripe bed: the only one ripe here is that one; none ripe (0.997, review): nothing is removed, the player is told.
         if(kind==GardenChatKind.Harvested)
@@ -140,6 +145,15 @@ internal sealed partial class MainWindow
         foreach(var (zone,patch,planted) in GardenJournal.Grids(beds))
         {
             ImGui.TextColored(Accent,localization.Format("Garden.GridTitle",zone,patch));
+            // X-179 (0.1165): the whole patch tended at once, when the game's menu was not read (several beds, one tending line each).
+            if(planted.Any(entry=>GardenJournal.TendAt(entry.Bed) is not null))
+            {
+                ImGui.SameLine();
+                ImGui.PushID($"TendPatch{zone}{patch}");
+                try{if(ImGui.SmallButton(localization.Get("Garden.TendPatch"))){foreach(var (_,bed) in planted)if(GardenJournal.TendAt(bed) is not null)GardenJournal.Tend(bed,now);changed=true;}}
+                finally{ImGui.PopID();}
+                Tip("Garden.TendPatchTip");
+            }
             // X-130 (0.1109): what each planted bed may give, by the wiki's rule and the community pairs (null until the pairs are read).
             var forecasts=GardenGridForecasts(planted);
             forecastShown|=forecasts is not null;
