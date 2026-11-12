@@ -67,7 +67,12 @@ internal static class FieldCatalogLoader
         }
         var addon=data.GetExcelSheet<Addon>();
         string Label(uint row)=>addon.GetRowOrDefault(row)?.Text.ExtractText() ?? "";
-        return new(zones,records,actions.OrderBy(row=>row.Order).ToArray()){OccultJobs=jobs,OccultLabels=new(Label(16607),Label(16611),Label(16608),Label(16618))};
+        // X-190 (0.1178): the coins of each part of the island (MKDData.CurrencyItem; row 1, the southern part: 45043 silver, 45044 gold), docs/evidence/0.1178-occult-panel.md.
+        var coins=new List<OccultCoin>();
+        foreach(var part in data.GetExcelSheet<MKDData>())
+            foreach(var coin in part.CurrencyItem)
+                if(coin.RowId!=0 && coin.ValueNullable is { } item && !item.Name.IsEmpty)coins.Add(new(coin.RowId,item.Name.ExtractText()));
+        return new(zones,records,actions.OrderBy(row=>row.Order).ToArray()){OccultJobs=jobs,OccultLabels=new(Label(16607),Label(16611),Label(16608),Label(16618)),OccultCoins=OccultCrescent.Coins(coins)};
     }
 
     private static List<FieldLayoutEntry> Entries(IDataManager data,IPluginLog log,TerritoryType territory)

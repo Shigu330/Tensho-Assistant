@@ -70,8 +70,9 @@ internal sealed partial class MainWindow
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Orchestrion")+"###CollectionMusic",focusOrchestrionTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusOrchestrionTab=false;collectionKind = CollectionKind.Orchestrion; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Titles")+"###CollectionTitles",focusTitleTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusTitleTab=false;collectionKind=CollectionKind.Title;ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("CollectionsBrowser.Achievements")+"###CollectionAchievements",focusAchievementTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { focusAchievementTab=false;collectionKind=CollectionKind.Achievement;ImGui.EndTabItem(); }
+                // X-190 (0.1178): these tabs follow a jump too (a jump to one of them stayed on the tab shown before).
                 foreach(var extraKind in ExtraKinds)
-                    if (ImGui.BeginTabItem(localization.Get("ExtraCollections."+extraKind)+"###Collection"+extraKind)) { collectionKind=extraKind; ImGui.EndTabItem(); }
+                    if (ImGui.BeginTabItem(localization.Get("ExtraCollections."+extraKind)+"###Collection"+extraKind,focusCollectionKind==extraKind ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None)) { collectionKind=extraKind; if(focusCollectionKind==extraKind)focusCollectionKind=null; ImGui.EndTabItem(); }
                 if (ImGui.BeginTabItem(localization.Get("Outfits.Title")+"###CollectionOutfits")) { collectionOutfitTab=true; ImGui.EndTabItem(); }
             }
             finally { ImGui.EndTabBar(); }

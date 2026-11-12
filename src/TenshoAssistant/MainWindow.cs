@@ -212,6 +212,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     internal void OpenReminders(){page=Page.Reminders;IsOpen=true;}
     // 0.344 (g, I-02): from the currency entry of the server bar.
     internal void OpenCurrencies(){page=Page.Storage;focusCurrencyTab=true;IsOpen=true;}
+    // X-190 (0.1178): Storage › What to do with it, for one currency (the island's coins).
+    internal void OpenCurrencyValue(uint currency){page=Page.Storage;ChooseCurrencyValue(currency);focusCurrencyValueTab=true;IsOpen=true;}
     /// <summary>X-107 (0.986): the server bar's gil entry opens the storage page (gil journal tab).</summary>
     internal void OpenGilJournal(){page=Page.Storage;IsOpen=true;}
 

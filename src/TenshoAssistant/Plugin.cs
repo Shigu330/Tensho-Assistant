@@ -1092,6 +1092,7 @@ public sealed class Plugin : IDalamudPlugin
             Fields.OccultCrescentReader? occultReader=null;
             registrations.Register(()=>occultReader=new Fields.OccultCrescentReader(framework,log),()=>occultReader?.Dispose());
             mainWindow.OccultStateRead=()=>occultReader?.State;
+            mainWindow.OccultOnIsland=()=>occultReader?.OnIsland==true;
             mainWindow.FieldCatalogLoad=()=>
             {
                 try{return Fields.FieldCatalogLoader.Read(data,log);}

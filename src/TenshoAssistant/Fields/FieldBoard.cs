@@ -15,6 +15,8 @@ public sealed record FieldCatalog(IReadOnlyList<FieldZone> Zones,IReadOnlyList<F
     /// <summary>X-188 (0.1176): the Occult Crescent's phantom jobs (MKDSupportJob, MKDTrait) and the game's words for them.</summary>
     public IReadOnlyList<OccultJob> OccultJobs { get; init; }=[];
     public OccultLabels? OccultLabels { get; init; }
+    /// <summary>X-190 (0.1178): the island's coins (MKDData.CurrencyItem of every part), each once, with the item's name.</summary>
+    public IReadOnlyList<OccultCoin> OccultCoins { get; init; }=[];
 }
 /// <summary>A layout entry, or a sheet row that a layout entry can place.</summary>
 public readonly record struct FieldLayoutEntry(uint Instance,float X,float Z);

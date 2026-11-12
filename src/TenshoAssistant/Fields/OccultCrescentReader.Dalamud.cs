@@ -14,6 +14,9 @@ public sealed unsafe class OccultCrescentReader : IDisposable
     private readonly IFramework framework;private readonly IPluginLog log;
     private OccultState? state;private long nextRead=-100_000;private bool disposed,warned;
     public OccultState? State=>Volatile.Read(ref state);
+    /// <summary>X-188 (0.1178): the island's director was there at the last reading (the panel on the island shows only then).</summary>
+    public bool OnIsland=>Volatile.Read(ref onIsland);
+    private bool onIsland;
 
     public OccultCrescentReader(IFramework framework,IPluginLog log)
     {
@@ -29,6 +32,7 @@ public sealed unsafe class OccultCrescentReader : IDisposable
         try
         {
             var director=EventFramework.GetPublicContentDirectorByType(PublicContentDirectorType.OccultCrescent);
+            Volatile.Write(ref onIsland,director!=null);
             if(director==null)return;
             var held=((PublicContentOccultCrescent*)director)->State;
             var levels=new int[held.SupportJobLevels.Length];
@@ -42,6 +46,7 @@ public sealed unsafe class OccultCrescentReader : IDisposable
         catch(Exception error)
         {
             nextRead=now+60_000;
+            Volatile.Write(ref onIsland,false);
             if(!warned){warned=true;log.Warning(error,"The Occult Crescent state could not be read (perhaps after a game update).");}
         }
     }

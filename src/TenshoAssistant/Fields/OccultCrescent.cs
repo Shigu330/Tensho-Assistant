@@ -13,6 +13,9 @@ public sealed record OccultLabels(string Knowledge,string PhantomJob,string Mast
 public sealed record OccultState(DateTimeOffset At,uint Knowledge,uint KnowledgeNeeded,int CurrentJob,IReadOnlyList<int> Levels,IReadOnlyList<uint> Experience,
     uint NeededJobExperience,int Silver,int Gold);
 
+/// <summary>X-190 (0.1178): a coin of the island (MKDData.CurrencyItem), what « what it buys » opens.</summary>
+public sealed record OccultCoin(uint ItemId,string Name);
+
 /// <summary>X-188 (0.1176): the phantom jobs as the page shows them (docs/evidence/0.1176-occult-jobs.md).</summary>
 public static class OccultCrescent
 {
@@ -29,6 +32,33 @@ public static class OccultCrescent
 
     /// <summary>A share between 0 and 1 (nothing needed: 0).</summary>
     public static float Share(uint have,uint need)=>need==0 ? 0:Math.Clamp((float)have/need,0,1);
+
+    /// <summary>X-188 (0.1178): the job worn, for the panel on the island (null: none worn, or not in the sheets).</summary>
+    public static OccultJob? Worn(IEnumerable<OccultJob> jobs,OccultState state)=>state.CurrentJob<0 ? null:jobs.FirstOrDefault(job=>job.Id==(uint)state.CurrentJob);
+
+    /// <summary>X-188 (0.1178): the worn job's experience and what it needs (null: mastered, or not read).</summary>
+    public static (uint Have,uint Need)? WornExperience(OccultJob job,OccultState state)
+    {
+        var level=LevelOf(state,job.Id);
+        if(level>=job.MaxLevel || state.NeededJobExperience==0 || job.Id>=state.Experience.Count)return null;
+        return (state.Experience[(int)job.Id],state.NeededJobExperience);
+    }
+
+    /// <summary>X-190 (0.1178): each coin once (the northern part's rows repeat theirs), in the sheet's order, no empty row.</summary>
+    public static IReadOnlyList<OccultCoin> Coins(IEnumerable<OccultCoin> coins)=>coins.Where(coin=>coin.ItemId!=0 && coin.Name.Length>0).DistinctBy(coin=>coin.ItemId).ToArray();
+
+    /// <summary>X-190 (0.1178): the occult records the game says are read, out of all of them (MKDLore rows with a name).</summary>
+    public static (int Read,int Total) Lore(IEnumerable<TenshoAssistant.Collections.CollectionEntry> entries)
+    {
+        var read=0;var total=0;
+        foreach(var entry in entries)
+        {
+            if(entry.Kind!=TenshoAssistant.Collections.CollectionKind.OccultLore)continue;
+            total++;
+            if(entry.ConfirmedUnlocked)read++;
+        }
+        return (read,total);
+    }
 
     /// <summary>The first reading after entering the island holds only zeros (dalamud.log of 12/11 14:57:32): not a state.</summary>
     public static bool Empty(OccultState state)=>state.Knowledge==0 && state.KnowledgeNeeded==0 && state.Levels.All(level=>level==0);
