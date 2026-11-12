@@ -169,6 +169,15 @@ internal sealed class Host
     }
     private MethodInfo? notification;
 
+    /// <summary>X-163 (0.1155): the plugin's alerts received by the link, as MainWindow.DesktopLinkNotices rings them (by its name); none when it is missing.</summary>
+    public (string[] Lines,bool Sound) LinkNotices(string[] texts,bool gameInFront)
+    {
+        notices??=Window.GetType().GetMethod("DesktopLinkNotices",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string[]),typeof(bool)]);
+        if(notices?.Invoke(Window,[texts,gameInFront]) is not System.Runtime.CompilerServices.ITuple { Length:2 } result)return ([],false);
+        return ((string[])result[0]!,(bool)result[1]!);
+    }
+    private MethodInfo? notices;
+
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
 

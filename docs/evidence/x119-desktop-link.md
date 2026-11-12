@@ -43,6 +43,20 @@ characters' files are named by the character's id, while the application only re
 Behaviour test: `LinkCategories1119Tests` (real files of a plugin folder named by a character id, their notices through a real pipe, the bytes
 received searched for any file name or id).
 
+## Alerts of the game (0.1155, X-163)
+
+The user asked (12/11) that the reminders ringing in the game also ring in the desktop application. The Tensho alarms and the garden are
+computed by the application itself (AlarmBell 0.1132, GardenBell 0.1153); the other alerts need the game, so the plugin sends them:
+
+| Part | What | Bounds |
+|---|---|---|
+| Alerts (`LinkNotice(Id, At, Text)`, field `Notices` of the snapshot) | Filled by `Plugin.cs` where an alert rings in the game (chat line or sound allowed): currency thresholds, duty ready, GP threshold, gear to repair or materia to extract, important items at a shop (when their sound is on), A and S hunt marks; never a Tensho alarm or the garden (rung by the application's own rule). Text in the plugin's language, as the chat line said it; no character name. | `LinkNoticeLog`: the newest 4, 200 characters each, kept 2 minutes; the application refuses more (« notice list refused »); the worst line stays under 8 192 bytes (test) |
+| Application | `LinkNoticeReader`: each alert once by its number; at the first snapshot and after a plugin start (sequence counting again), only the alerts of the last 30 seconds; a lost link keeps the memory. `MainWindow.DesktopLinkNotices` rings them with the alarms' options (only when the game is not in front, Windows sound, Windows notification). | Read once a second with the bell |
+| Compatibility | Optional field of protocol 3: an application of before 0.1155 ignores it, a plugin of before sends none. | — |
+
+Behaviour test: `LinkNotices1155Tests` (alerts through a real pipe, read by the application's reader: once each, history not rung, a plugin
+started again rings its new ones; worst line measured).
+
 ## Settings read by the application (0.1120, X-150)
 
 On a `settings` notice the application reads the plugin's settings off the frame (`Grouped`: a burst of notices is one reading), into a

@@ -37,6 +37,8 @@ public sealed class Plugin : IDalamudPlugin
     private AttachedPanels? attachedPanels;
     // X-119 step 2 (0.1081): the local link with the desktop application (off by default).
     private Link.LocalLinkFeed? linkFeed;
+    // X-163 (0.1155): the alerts that rang in the game, sent to the desktop application by the link (only while it is on).
+    private readonly Link.LinkNoticeLog linkNotices=new();
     private readonly WindowSystem windows = new("TenshoAssistant");
     // X-109 (0.981, DEC-047): the Beastmaster board's team panel, the only window drawn during a cut, and only while the labyrinth's board is open.
     private readonly WindowSystem boardWindows = new("TenshoBeastBoard");
@@ -579,6 +581,7 @@ public sealed class Plugin : IDalamudPlugin
                 var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
                 if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
                 if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);
                 var settings=configuration.Discord;
                 if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.Currency))
                     try
@@ -616,6 +619,7 @@ public sealed class Plugin : IDalamudPlugin
                     var message=localization.Format("DutyPop.Message",name.Length>0 ? name:localization.Get("DutyPop.Roulette"));
                     if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
                     if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                    if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);
                     var settings=configuration.Discord;
                     if(Alarms.DiscordWebhook.ShouldSend(settings,Alarms.AlarmSource.DutyPop))
                     {
@@ -683,8 +687,10 @@ public sealed class Plugin : IDalamudPlugin
                     log.Information("GP alert: {0} / {1}.",gp,max);
                     var options=configuration.AlarmOptions ?? new();
                     var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-                    if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+localization.Format("GpTick.Alert",gp,max));
+                    var message=localization.Format("GpTick.Alert",gp,max);
+                    if(options.ChatAllowed(inDuty))chat.Print("[Tensho] "+message);
                     if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                    if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);
                 },
             },()=>regenTick?.Dispose());
             mainWindow.RegenTick=()=>regenTick?.State;
@@ -757,12 +763,19 @@ public sealed class Plugin : IDalamudPlugin
             {
                 var options=configuration.AlarmOptions ?? new();
                 var inDuty=options.MuteInDuties && condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+                var repairText=repair ? localization.Format("GearWear.AlertRepair",state.ToRepair,state.LowestCondition ?? 0):null;
+                var extractText=extract ? localization.Format("GearWear.AlertExtract",state.ToExtract):null;
                 if(options.ChatAllowed(inDuty))
                 {
-                    if(repair)chat.Print("[Tensho] "+localization.Format("GearWear.AlertRepair",state.ToRepair,state.LowestCondition ?? 0));
-                    if(extract)chat.Print("[Tensho] "+localization.Format("GearWear.AlertExtract",state.ToExtract));
+                    if(repairText is not null)chat.Print("[Tensho] "+repairText);
+                    if(extractText is not null)chat.Print("[Tensho] "+extractText);
                 }
                 if(options.SoundAllowed(inDuty))Alarms.AlarmService.PlaySound(options.Sound,log);
+                if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))
+                {
+                    if(repairText is not null)linkNotices.Add(repairText);
+                    if(extractText is not null)linkNotices.Add(extractText);
+                }
             }},()=>gearWear?.Dispose());
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
@@ -817,8 +830,9 @@ public sealed class Plugin : IDalamudPlugin
                     if(toSell.Count>0)chat.Print("[Tensho] "+localization.Format("ItemNotes.ShopToSell",Names(toSell)));
                     if(important.Count>0)
                     {
-                        chat.Print("[Tensho] "+localization.Format("ItemNotes.ShopImportant",Names(important)));
-                        if(configuration.ItemNoteImportantSound)Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);
+                        var message=localization.Format("ItemNotes.ShopImportant",Names(important));
+                        chat.Print("[Tensho] "+message);
+                        if(configuration.ItemNoteImportantSound){Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);linkNotices.Add(message);}
                     }
                 },log),()=>shopReminder?.Dispose());
             // 0.346 (g, I-07): lowest offer minus 1 copied to the clipboard when the player opens an item's offers (off by default).
@@ -831,8 +845,8 @@ public sealed class Plugin : IDalamudPlugin
             // X-119 step 2 (0.1081): the local link with the desktop application: a named pipe for the current user only, opened only while
             // Settings › Advanced « Link with the desktop app » is on; once a second, who and where (docs/evidence/x119-desktop-link.md).
             registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,id=>mainWindow.TerritoryName?.Invoke(id),
-                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log);mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
-                ()=>{mainWindow.DesktopLinkStatus=null;linkFeed?.Dispose();linkFeed=null;});
+                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log,linkNotices);mainWindow.LinkNotice=linkNotices.Add;mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
+                ()=>{mainWindow.DesktopLinkStatus=null;mainWindow.LinkNotice=null;linkFeed?.Dispose();linkFeed=null;});
             // X-126 (0.1113, D-137): the desktop app installed from Settings › Advanced, on a click only; left out of a build made with
             // TenshoDesktopInstall=false. Requests only on « Install » / « Update » (this repository's release, docs/evidence/x126-desktop-install.md).
             if(Link.DesktopInstallRules.Enabled)

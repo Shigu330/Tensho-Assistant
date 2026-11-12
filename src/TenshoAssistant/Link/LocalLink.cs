@@ -21,11 +21,14 @@ namespace TenshoAssistant.Link;
 //  - Protocol 3 (0.1119, X-149): a notice carries a category of a closed list (LocalLinkProtocol.Categories: « settings », « bank »…),
 //    never a file name (the bank's and the characters' files are named by the character's id). Another protocol number is refused; the
 //    application, finding no pipe of its own protocol but one of another for the same user, says so (OtherProtocol).
+//  - Protocol 3, optional part (0.1155, X-163): the plugin's alerts that rang in the game (LinkNotice: currencies, duty ready, GP, gear
+//    wear, important items, hunt marks), in the plugin's words, at most MaxNotices of MaxNoticeText characters, kept two minutes; an
+//    application of before 0.1155 ignores them (an unknown field), so the protocol number does not change.
 
 /// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
 /// (0.1114): also the small live states and the saved files that changed. Protocol 3 (0.1119): those as categories only.</summary>
 public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence,
-    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null);
+    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null,IReadOnlyList<LinkNotice>? Notices=null);
 
 /// <summary>The link's wire format: one JSON line per snapshot, bounded and checked.</summary>
 public static class LocalLinkProtocol
@@ -36,6 +39,10 @@ public static class LocalLinkProtocol
     public const int MaxJob=16;
     /// <summary>Change notices in one snapshot, at most (one per category).</summary>
     public const int MaxChanges=16;
+    /// <summary>X-163 (0.1155): alerts in one snapshot, at most, and their longest text (a line stays under MaxLine even with every
+    /// character escaped by the JSON writer: LinkNotices1155Tests).</summary>
+    public const int MaxNotices=4;
+    public const int MaxNoticeText=200;
     /// <summary>The category of the plugin's settings file (the only one the application reads again so far).</summary>
     public const string SettingsCategory="settings";
 
@@ -88,6 +95,8 @@ public static class LocalLinkProtocol
             {error="live state out of bounds";return false;}
         if(read.Changes is { } changes && (changes.Count>MaxChanges || changes.Any(change=>change is null || !ValidCategory(change.Category) || change.Generation<1)))
             {error="change list refused";return false;}
+        if(read.Notices is { } notices && (notices.Count>MaxNotices || notices.Any(notice=>notice is null || notice.Id<1 || notice.Text is null || notice.Text.Length>MaxNoticeText)))
+            {error="notice list refused";return false;}
         snapshot=read;return true;
     }
 
@@ -368,6 +377,75 @@ public sealed class LinkChangeLog
 
     /// <summary>The names to send now (oldest first), or null when nothing changed since the log began.</summary>
     public IReadOnlyList<LinkChange>? Snapshot(){lock(gate)return changes.Count==0 ? null : changes.ToArray();}
+}
+
+/// <summary>X-163 (0.1155): an alert of the plugin that rang in the game: its number (counting from 1 at each plugin start), when (Unix ms) and
+/// its text in the plugin's language, as the chat line said it (without « [Tensho] »).</summary>
+public sealed record LinkNotice(long Id,long At,string Text);
+
+/// <summary>
+/// X-163 (0.1155): the plugin's alerts to send, filled where they ring (framework thread), read by the feed once a second. The newest
+/// MaxNotices, each kept Keep; a text cut at MaxNoticeText.
+/// </summary>
+public sealed class LinkNoticeLog
+{
+    public static readonly TimeSpan Keep=TimeSpan.FromMinutes(2);
+    private readonly object gate=new();
+    private readonly List<LinkNotice> notices=[];
+    private long id;
+
+    /// <summary>Any thread: an alert rang; a blank text is left out.</summary>
+    public void Add(string text)=>Add(text,DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+
+    public void Add(string text,long now)
+    {
+        text=(text ?? "").Trim();
+        if(text.Length==0)return;
+        if(text.Length>LocalLinkProtocol.MaxNoticeText)text=text[..(LocalLinkProtocol.MaxNoticeText-1)].TrimEnd()+"…";
+        lock(gate)
+        {
+            notices.Add(new(++id,now,text));
+            if(notices.Count>LocalLinkProtocol.MaxNotices)notices.RemoveRange(0,notices.Count-LocalLinkProtocol.MaxNotices);
+        }
+    }
+
+    /// <summary>The alerts to send now (oldest first), those older than Keep left out; null when none.</summary>
+    public IReadOnlyList<LinkNotice>? Snapshot(long now)
+    {
+        lock(gate)
+        {
+            notices.RemoveAll(notice=>now-notice.At>Keep.TotalMilliseconds);
+            return notices.Count==0 ? null : notices.ToArray();
+        }
+    }
+}
+
+/// <summary>
+/// X-163 (0.1155): the application's side of the alerts: each new one once. At the first snapshot (the app starts) and when the plugin starts
+/// again (its snapshots count again from the start), only the alerts of the last Fresh are new, so an old one is not rung; then every number
+/// above the last seen. A lost link keeps the memory, so an alert already rung is not rung again when it comes back.
+/// </summary>
+public sealed class LinkNoticeReader
+{
+    public static readonly TimeSpan Fresh=TimeSpan.FromSeconds(30);
+    // -1: nothing read since the link came.
+    private long seen=-1,lastSequence;
+
+    public IReadOnlyList<string> Take(LinkSnapshot? snapshot,long now)
+    {
+        // A lost link keeps the memory: the same plugin goes on with its numbers (a new start is seen by its sequence).
+        if(snapshot is null)return [];
+        if(snapshot.Sequence<lastSequence)seen=-1;
+        lastSequence=snapshot.Sequence;
+        var notices=snapshot.Notices ?? [];
+        var start=seen<0;
+        var newest=notices.Count==0 ? 0 : notices.Max(notice=>notice.Id);
+        // The plugin's numbers went back without a new start seen: take them as a new start.
+        if(!start && newest<seen){start=true;}
+        var taken=notices.Where(notice=>start ? now-notice.At<=Fresh.TotalMilliseconds : notice.Id>seen).OrderBy(notice=>notice.Id).Select(notice=>notice.Text).ToArray();
+        seen=start ? newest : Math.Max(seen,newest);
+        return taken;
+    }
 }
 
 /// <summary>X-119 step 2 (0.1114): the application's side of the change notices: which files to read again, each once.</summary>

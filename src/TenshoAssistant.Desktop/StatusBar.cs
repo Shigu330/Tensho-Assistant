@@ -31,6 +31,8 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     /// <summary>X-163 (0.1154): the application's window, owner of the notification icon (zero: no notification, e.g. headless).</summary>
     public IntPtr Window;
     private readonly DesktopNotice notice=new();
+    // X-163 (0.1155): the plugin's other alerts received by the link, each once.
+    private readonly TenshoAssistant.Link.LinkNoticeReader linkNotices=new();
     private DateTimeOffset nextBell;
     private readonly List<(string Text,DateTimeOffset Until)> rang=[];
     /// <summary>X-119 step 2, part 2 (0.1131): the plugin's folder and the app's copy of it (null: the saved data are not read, e.g. headless).</summary>
@@ -103,7 +105,13 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(!Bell || now<nextBell)return;
         nextBell=now.AddSeconds(1);
         rang.RemoveAll(line=>line.Until<now);
-        var (lines,sound)=host.DueAlarms(now,DesktopGame.InFront());
+        var front=DesktopGame.InFront();
+        var (lines,sound)=host.DueAlarms(now,front);
+        if(linkNotices.Take(Link?.Invoke(),now.ToUnixTimeMilliseconds()) is { Count: >0 } received)
+        {
+            var (more,moreSound)=host.LinkNotices([.. received],front);
+            lines=[.. lines,.. more];sound|=moreSound;
+        }
         if(lines.Length==0)return;
         foreach(var line in lines){rang.Add((line,now.AddMinutes(1)));Console.WriteLine("Alarm: "+line);}
         if(sound)DesktopGame.Beep();

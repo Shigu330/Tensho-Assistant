@@ -94,7 +94,9 @@ What the plugin does that matters for security (read against the code of the `De
   is paused (PvP, ranked content); the zone's number and name; the job's abbreviation and level, the gathering points and their maximum,
   the free slots of the four bags and their size; and notices that a kind of saved data changed, as categories of a closed list
   (`settings`, `bank`, `characters`, `gil-journal`, `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`,
-  `discoveries`, `data`), never a file name, a file's content, a character's name or id. The desktop application connects to it as the same
+  `discoveries`, `data`), never a file name, a file's content, a character's name or id; and, since 0.1155, the last alerts that rang in
+  the game apart from the Tensho alarms (currencies, duty ready, GP, gear wear, important items, hunt marks: at most 4, 200 characters
+  each, as the chat line said them, kept 2 minutes), for the application to ring them too. The desktop application connects to it as the same
   user only and reads the plugin's settings file itself, read-only, bounded, without the Discord addresses and with a closed list of types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
   It copies the saved data it shows into its own folder (%LOCALAPPDATA%\TenshoAssistant\Desktop\mirror), the plugin's folder only read;
   the player's data file `TenshoData.db` by SQLite's backup, opened read-only (0.1147); the discoveries database `Discoveries/Discoveries.db` the
@@ -271,7 +273,9 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   et le niveau de la classe, les points de récolte et leur maximum, les places libres des quatre sacs et leur taille ; et des avis qu'un
   genre de données enregistrées a changé, en catégories d'une liste fermée (`settings`, `bank`, `characters`, `gil-journal`,
   `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`, `discoveries`, `data`), jamais un nom de fichier, le contenu
-  d'un fichier, le nom ou l'identifiant d'un personnage. L'application de bureau s'y connecte sous le même utilisateur seulement et
+  d'un fichier, le nom ou l'identifiant d'un personnage ; et, depuis 0.1155, les dernières alertes qui ont sonné en jeu en dehors des
+  alarmes Tensho (monnaies, mission prête, PR, usure de l'équipement, objets importants, marques de chasse : 4 au plus, 200 caractères
+  chacune, telles que la ligne du chat les a dites, gardées 2 minutes), pour que l'application les fasse sonner aussi. L'application de bureau s'y connecte sous le même utilisateur seulement et
   lit elle-même le fichier de réglages du plugin, en lecture seule, borné, sans les adresses Discord et avec une liste fermée de types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
   Elle copie les données enregistrées qu'elle montre dans son propre dossier (%LOCALAPPDATA%\TenshoAssistant\Desktop\mirror), le dossier
   du plugin seulement lu ; le fichier de données du joueur `TenshoData.db` par la sauvegarde de SQLite, ouvert en lecture seule (0.1147) ; la base

@@ -38,9 +38,12 @@ internal sealed partial class MainWindow
             {
                 if(!huntMarksAnnounced.Add($"{map.MapId}/{item.Name}"))continue;
                 var coordinate=MapProjection.CoordinateFromWorld(item.Position,map);
-                ChatNotice?.Invoke(localization.Format("HuntTrain.MarkAlert",item.Name,item.Level==3 ? "S":"A",map.Zone,
-                    MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y)));
+                var alert=localization.Format("HuntTrain.MarkAlert",item.Name,item.Level==3 ? "S":"A",map.Zone,
+                    MapProjection.CoordinateNumber(coordinate.X),MapProjection.CoordinateNumber(coordinate.Y));
+                ChatNotice?.Invoke(alert);
                 if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
+                // X-163 (0.1155): to the desktop application too, by the link.
+                LinkNotice?.Invoke(alert);
             }
         if(huntMarksAnnounced.Count>200)huntMarksAnnounced.Clear();
         if(!huntTrainRecording)return;

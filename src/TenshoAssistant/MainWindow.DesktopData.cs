@@ -194,6 +194,16 @@ internal sealed partial class MainWindow
     // An alarm due while the game is in front is marked rung and not shown when DesktopOnlyGameBehind is on: it rings in the game.
     // X-163 (0.1154): whether the application also shows a Windows notification for them; called by its name (DesktopNotice1154Tests).
     internal bool DesktopAlarmNotification()=>(configuration.AlarmOptions ?? new()).DesktopNotification;
+    // X-163 (0.1155): the plugin's other alerts that rang in the game (currencies, duty ready, GP, gear wear, important items, hunt marks),
+    // received by the application through the link (LinkNoticeReader: each once), rung with the same options as the alarms. Called by its
+    // name (LinkNotices1155Tests). Set by Plugin.cs in the game: where those alerts go (the link's notice log).
+    internal Action<string>? LinkNotice;
+    internal (string[] Lines,bool Sound) DesktopLinkNotices(string[] texts,bool gameInFront)
+    {
+        var options=configuration.AlarmOptions ?? new();
+        if(texts.Length==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
+        return (texts,options.DesktopSound);
+    }
     private Alarms.AlarmBell? desktopBell;
     private Reminders.GardenBell? desktopGarden;
     internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)

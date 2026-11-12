@@ -25,6 +25,8 @@ internal sealed class LocalLinkFeed:IDisposable
     private readonly IObjectTable objects;
     private readonly string settingsFile,folder;
     private readonly LinkChangeLog changes=new();
+    // X-163 (0.1155): the alerts that rang in the game, filled by Plugin.cs where they ring.
+    private readonly LinkNoticeLog notices;
     private static readonly GameInventoryType[] Bags=[GameInventoryType.Inventory1,GameInventoryType.Inventory2,GameInventoryType.Inventory3,GameInventoryType.Inventory4];
     private FileSystemWatcher? settingsWatcher,folderWatcher;
     private bool liveFailed;
@@ -35,8 +37,9 @@ internal sealed class LocalLinkFeed:IDisposable
     private bool disposed;
 
     public LocalLinkFeed(IFramework framework,IClientState client,IPlayerState player,IGameInventory inventory,IObjectTable objects,string settingsFile,string folder,
-        Configuration configuration,Func<uint,string?> zoneName,string version,IPluginLog log)
+        Configuration configuration,Func<uint,string?> zoneName,string version,IPluginLog log,LinkNoticeLog notices)
     {
+        this.notices=notices;
         this.framework=framework;this.client=client;this.player=player;this.configuration=configuration;this.zoneName=zoneName;this.version=version;this.log=log;
         this.inventory=inventory;this.objects=objects;this.settingsFile=settingsFile;this.folder=folder;
         CompetitiveGate.Add(framework,OnUpdate);
@@ -58,7 +61,8 @@ internal sealed class LocalLinkFeed:IDisposable
         var territory=loggedIn ? (uint)client.TerritoryType : 0;
         var zone=territory==0 ? "" : zoneName(territory) ?? "";
         if(zone.Length>LocalLinkProtocol.MaxZone)zone=zone[..LocalLinkProtocol.MaxZone];
-        server.Publish(new LinkSnapshot(LocalLinkProtocol.Version,version,loggedIn,false,territory,zone,++sequence,ReadLive(loggedIn),changes.Snapshot()));
+        server.Publish(new LinkSnapshot(LocalLinkProtocol.Version,version,loggedIn,false,territory,zone,++sequence,ReadLive(loggedIn),changes.Snapshot(),
+            notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())));
     }
 
     /// <summary>The small live states, on the framework thread, copied (R07); null without a character or after a reading failed once (R08).</summary>
