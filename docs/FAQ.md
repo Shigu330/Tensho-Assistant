@@ -34,7 +34,7 @@ Yes: Settings › Advanced › « Game data and what you observed only » turns 
 
 ## What does Tensho keep on my PC?
 
-What the game has shown it (storages, collections, progress), your settings, notes, lists and alarms, a gil journal (90 days), the voyage history (180 days) and the discoveries base. These files stay on this PC; the discoveries only leave it through an export you share yourself.
+What the game has shown it (storages, collections, progress), your settings, notes, lists and alarms, a gil journal (90 days), the voyage history (180 days) and the discoveries base. These files stay on this PC; your discoveries leave it only through the GitHub exchange, after you connect GitHub (or as a file you export and share yourself), and alarms only through the Discord webhook, if you set one.
 
 ## Does Tensho play for me?
 
@@ -120,7 +120,7 @@ Oui : Paramètres › Avancé › « Données du jeu et observées seulement » 
 
 ## Que garde Tensho sur mon PC ?
 
-Ce que le jeu lui a montré (rangements, collections, progression), vos réglages, notes, listes et alarmes, un journal des gils (90 jours), l'historique des voyages (180 jours) et la base des découvertes. Ces fichiers restent sur ce PC ; les découvertes n'en sortent que par un export que vous partagez vous-même.
+Ce que le jeu lui a montré (rangements, collections, progression), vos réglages, notes, listes et alarmes, un journal des gils (90 jours), l'historique des voyages (180 jours) et la base des découvertes. Ces fichiers restent sur ce PC ; vos découvertes n'en sortent que par l'échange GitHub, après la connexion de GitHub (ou par un fichier que vous exportez et partagez vous-même), et les alarmes seulement par le webhook Discord, si vous en indiquez un.
 
 ## Tensho joue-t-il à ma place ?
 

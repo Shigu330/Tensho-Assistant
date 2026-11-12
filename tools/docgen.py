@@ -566,9 +566,9 @@ NETWORK = [
      "galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code"),
     ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com"], "Discovery.AutoExchange",
      ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs"],
-     "the common files of this repository; after « Connect GitHub » only, the player's own sightings to a secret gist and one issue "
+     "the common files of this repository; after « Connect GitHub » only, the player's own sightings to an unlisted gist and one issue that links it "
      "(described below); on « Exchange now » or with « Automatic exchange »",
-     "les fichiers communs de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist secret et un ticket "
+     "les fichiers communs de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist non répertorié et un ticket qui y renvoie "
      "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique »"),
     ("Discord webhook", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled",
      ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],
