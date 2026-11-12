@@ -69,11 +69,10 @@ What the plugin does that matters for security (read against the code of the `De
   time, and never a player's name or id; a fish caught or a bite holds the character's exact place (DEC-045), so with the day and the
   issue it can tell where that GitHub account fished on a given day; only fields the player read themself are sent, never dates, levels or
   places that came from an import (0.1134); the files this repository publishes from them keep the day only too, and are under
-  CC0-1.0, which the warning and the player's issue state (0.1012). The sign-in is today the repository's OAuth app, which asks the scopes
-  `gist` and `public_repo` (GitHub gives no narrower ones: all the account's gists, and the public repositories it can write to); Tensho uses
-  them only for the player's one gist, always created secret, and the one issue. Once the GitHub App is in place (X-175, its client id given by
-  the maintainer): the App asks only Issues (read and write), on this repository alone, and the account's Gists (read and write), nothing else;
-  a token of the OAuth app is then forgotten and the player connects again; the App's token expires after 8 hours and is renewed before an
+  CC0-1.0, which the warning and the player's issue state (0.1012). Since 0.1161 the sign-in is the repository's GitHub App (X-175): it asks
+  only Issues (read and write), on this repository alone, and the account's Gists (read and write), nothing else; Tensho uses them only for the
+  player's one gist, always created secret, and the one issue. Before 0.1161 it was the repository's OAuth app, with the scopes `gist` and
+  `public_repo` (GitHub gives no narrower ones): a token of that OAuth app is forgotten and the player connects again; the App's token expires after 8 hours and is renewed before an
   upload with its refresh token (6 months), without any client secret; a refused renewal disconnects. The token, and the refresh token,
   are kept on the player's PC, encrypted for the Windows user (DPAPI), never in a backup copy; « Disconnect » deletes them
   (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `GitHubSignIn.cs`, `CommunityDiscoveries.cs`).
@@ -247,12 +246,11 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   l'heure, et jamais le nom ou l'identifiant d'un joueur ; un poisson pris ou une touche porte l'endroit exact du personnage (DEC-045),
   donc avec le jour et le ticket elle peut dire où ce compte GitHub a pêché un jour donné ; seuls les champs relevés par le joueur
   lui-même partent, jamais des dates, niveaux ou lieux venus d'un import (0.1134) ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
-  jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). La connexion passe aujourd'hui par l'application OAuth
-  du dépôt, qui demande les droits `gist` et `public_repo` (GitHub n'en donne pas de plus étroits : tous les gists du compte, et les dépôts
-  publics où il peut écrire) ; Tensho ne s'en sert que pour le seul gist du joueur, toujours créé secret, et le seul ticket. Une fois
-  l'application GitHub en place (X-175, son identifiant client donné par le mainteneur) : elle ne demande que Issues (lecture et écriture),
-  sur ce seul dépôt, et les Gists du compte (lecture et écriture), rien d'autre ; un jeton de l'application OAuth est alors oublié et le
-  joueur se reconnecte ; le jeton de l'application expire après 8 heures et se renouvelle avant un envoi par son jeton de renouvellement
+  jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). Depuis 0.1161 la connexion passe par l'application GitHub
+  du dépôt (X-175) : elle ne demande que Issues (lecture et écriture), sur ce seul dépôt, et les Gists du compte (lecture et écriture),
+  rien d'autre ; Tensho ne s'en sert que pour le seul gist du joueur, toujours créé secret, et le seul ticket. Avant 0.1161 c'était
+  l'application OAuth du dépôt, avec les droits `gist` et `public_repo` (GitHub n'en donne pas de plus étroits) : un jeton de cette
+  application OAuth est oublié et le joueur se reconnecte ; le jeton de l'application expire après 8 heures et se renouvelle avant un envoi par son jeton de renouvellement
   (6 mois), sans aucun secret client ; un renouvellement refusé déconnecte. Le jeton, et le jeton de renouvellement, sont gardés sur le PC
   du joueur, chiffrés pour l'utilisateur Windows (DPAPI), jamais dans une copie de sauvegarde ; « Déconnecter » les efface
   (`src/TenshoAssistant/Discoveries/GitHubExchange.cs`, `GitHubSignIn.cs`, `CommunityDiscoveries.cs`).

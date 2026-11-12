@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1161.0
+- Plan global, X-175 : Échange des découvertes (X-175, fin) : la connexion à GitHub passe maintenant par l'application GitHub de Tensho, créée et installée par le mainteneur le 12/11 (droits vérifiés : tickets et gists en lecture et écriture, métadonnées en lecture). Elle ne demande que les tickets de ce seul dépôt et les gists du compte, au lieu des droits « gist » et « public_repo » de l'ancienne application OAuth. Un jeton de l'ancienne application est oublié sur ce PC et un message demande de se reconnecter ; le jeton de l'application expire après 8 heures et se renouvelle seul (6 mois), sans secret client. SECURITY.md (deux moitiés) à jour.
+- Tests : GitHubAppOn1161Tests. Verify.ps1 (agent) : 1979/1979, 0 avertissement, 0 erreur ; DLL 0.1161.0.0. Non validé en jeu.
+### English
+- Discoveries exchange (X-175, end): the GitHub sign-in now goes through Tensho's GitHub App, created and installed by the maintainer on 12/11 (permissions checked: issues and gists read and write, metadata read). It asks only this repository's issues and the account's gists, instead of the former OAuth app's « gist » and « public_repo » scopes. A token of the former app is forgotten on this PC and a message asks to connect again; the App's token expires after 8 hours and renews itself (6 months), without a client secret. SECURITY.md (both halves) updated.
+
 ## 0.1160.0
 - Plan global, X-132 : Jardinage (X-132, demande du 11/11) : les alarmes du jardin ont leur onglet « Alarmes » dans l'outil Jardinage : pour chaque lit ou pot du journal, son prochain entretien (quand il vient avant la récolte) et sa récolte, dans l'ordre du temps, avec l'heure et le temps restant ; leur nombre s'affiche à côté de « Jardinage » dans le menu des outils, tant que « Me le rappeler dans le chat » est activé. Le journal et les croisements sont dans l'onglet « Jardin ». Ces alarmes n'ont jamais été des alarmes Tensho : l'outil Alarmes et son chiffre ne les comptent pas. Elles sonnent comme avant (chat, et application de bureau).
 - Tests : GardenAlarms1160Tests. Verify.ps1 (agent) : 1978/1978, 0 avertissement, 0 erreur ; DLL 0.1160.0.0. Non validé en jeu.

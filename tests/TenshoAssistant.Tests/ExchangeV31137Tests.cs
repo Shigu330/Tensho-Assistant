@@ -219,7 +219,8 @@ internal static class ExchangeV31137Tests
         ("Exchange v3 1137: the upload is a v3 gist built from Mine (never Own nor imported counts), the old v2 file removed; the same facts send nothing",() => InTemp(root =>
         {
             Directory.CreateDirectory(root);
-            File.WriteAllText(Path.Combine(root,"github.json"),JsonSerializer.Serialize(new GitHubExchangeMeta{Login="tester",GistId="g1",Issue=7}));
+            File.WriteAllText(Path.Combine(root,"github.json"),JsonSerializer.Serialize(new GitHubExchangeMeta{Login="tester",GistId="g1",Issue=7,ClientId=GitHubSignIn.Current.ClientId}));
+            // 0.1161: a token of the sign-in in use (the GitHub App since X-175); one of the former OAuth app is forgotten (GitHubApp1138Tests).
             File.WriteAllBytes(Path.Combine(root,"github.token"),UserSecret.Protect(Encoding.UTF8.GetBytes("token")));
             using var server=new Server();
             using var exchange=new GitHubExchange(root,server);

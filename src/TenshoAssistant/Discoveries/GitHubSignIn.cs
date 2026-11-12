@@ -14,8 +14,9 @@ namespace TenshoAssistant.Discoveries;
 public sealed record GitHubSignIn(string ClientId,string Scopes,bool App)
 {
     public const string OAuthClientId="Ov23liBmk4RCUYw6pU6Z",OAuthScopes="gist public_repo";
-    /// <summary>The GitHub App's client id: empty until the maintainer has created and installed it; the OAuth app is used meanwhile.</summary>
-    public const string AppClientId="";
+    /// <summary>The GitHub App's client id (X-175, 0.1161: created and installed by the maintainer on 12/11, permissions checked: Issues and Gists
+    /// read and write, Metadata read); empty would bring the OAuth app back.</summary>
+    public const string AppClientId="Iv23lizJ9lSmYOfu12ML";
     /// <summary>A token is renewed this long before it expires (a request started just before the end is not refused halfway).</summary>
     public static readonly TimeSpan Margin=TimeSpan.FromMinutes(5);
     public static readonly GitHubSignIn OAuth=new(OAuthClientId,OAuthScopes,false);
