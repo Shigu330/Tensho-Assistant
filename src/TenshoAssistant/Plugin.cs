@@ -1088,6 +1088,10 @@ public sealed class Plugin : IDalamudPlugin
             // X-92 (0.972): what is new in the game's sheets since the last load (log and self-check).
             var gameDataCheck=Diagnostics.GameDataWatch.Start(data,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GameDataSnapshot.json"),log,gameDataCancel.Token);
             mainWindow.GameDataCheck=()=>gameDataCheck;
+            // X-188 (0.1176): the Occult Crescent's state, read on the island (the field content page shows the phantom jobs).
+            Fields.OccultCrescentReader? occultReader=null;
+            registrations.Register(()=>occultReader=new Fields.OccultCrescentReader(framework,log),()=>occultReader?.Dispose());
+            mainWindow.OccultStateRead=()=>occultReader?.State;
             mainWindow.FieldCatalogLoad=()=>
             {
                 try{return Fields.FieldCatalogLoader.Read(data,log);}

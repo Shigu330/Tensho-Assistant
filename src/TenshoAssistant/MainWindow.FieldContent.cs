@@ -14,6 +14,8 @@ internal sealed partial class MainWindow
     private bool fieldFailed;
     private string? fieldTab,fieldZoneTab;
     private string fieldQuery="";
+    /// <summary>X-188 (0.1176): the Occult Crescent's state last read on the island (null: not read this session, or the desktop application).</summary>
+    internal Func<OccultState?>? OccultStateRead { get; set; }
 
     private void DrawFieldContent()
     {
@@ -30,12 +32,59 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(240);
         ImGui.InputTextWithHint("###FieldQuery",localization.Get("FieldContent.Search"),ref fieldQuery,100);
         Tip("FieldContent.SearchTip");
-        DetailTabs("FieldTabs",
-        [
+        var tabs=new List<(string,string,Action)>
+        {
             ("Zones",localization.Get("FieldContent.TabZones"),()=>DrawFieldZones(catalog)),
             ("Records",localization.Get("FieldContent.TabRecords"),()=>DrawFieldRecords(catalog)),
             ("Actions",localization.Get("FieldContent.TabActions"),()=>DrawFieldActions(catalog)),
-        ],ref fieldTab);
+        };
+        // X-188 (0.1176): the Occult Crescent's phantom jobs, under the island's name (game data).
+        if(catalog.OccultJobs.Count>0 && catalog.OccultLabels is { } labels && catalog.Zones.FirstOrDefault(zone=>zone.Use==OccultUse) is { } island)
+            tabs.Add(("Occult",island.Name,()=>DrawFieldOccult(catalog.OccultJobs,labels)));
+        DetailTabs("FieldTabs",tabs,ref fieldTab);
+    }
+
+    /// <summary>X-188 (0.1176): TerritoryIntendedUse 61, the Occult Crescent (FieldBoard.FieldZoneUses).</summary>
+    private const uint OccultUse=61;
+
+    // X-188 (0.1176): knowledge, coins and each phantom job: level, what it learns next and at which level, the worn job's experience.
+    private void DrawFieldOccult(IReadOnlyList<OccultJob> jobs,OccultLabels labels)
+    {
+        ImGui.TextDisabled(localization.Get("FieldContent.OccultHint"));
+        if(OccultStateRead?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("FieldContent.OccultNotRead"));return;}
+        ImGui.TextDisabled(localization.Format("FieldContent.OccultReadAt",state.At.ToLocalTime().ToString("t")));
+        ImGui.TextUnformatted(labels.Knowledge);
+        ImGui.SameLine();
+        ImGui.ProgressBar(OccultCrescent.Share(state.Knowledge,state.KnowledgeNeeded),new Vector2(-1,ImGui.GetFrameHeight()),$"{state.Knowledge:N0} / {state.KnowledgeNeeded:N0}");
+        ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0"),state.Gold.ToString("N0")));
+        if(!ImGui.BeginTable("###FieldOccult",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
+        try
+        {
+            ImGui.TableSetupColumn(labels.PhantomJob);ImGui.TableSetupColumn(localization.Get("FieldContent.ColumnLevel"));
+            ImGui.TableSetupColumn(localization.Get("FieldContent.ColumnNext"));ImGui.TableSetupColumn(labels.Experience);
+            ImGui.TableHeadersRow();
+            foreach(var job in OccultCrescent.Ordered(jobs,state))
+            {
+                var level=OccultCrescent.LevelOf(state,job.Id);var worn=job.Id==(uint)state.CurrentJob;
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                if(worn)ImGui.TextColored(UI.FfxivTheme.Gold,job.Name);else ImGui.TextUnformatted(job.Name);
+                ImGui.TableNextColumn();
+                if(level>0)ImGui.TextUnformatted($"{level} / {job.MaxLevel}");else ImGui.TextDisabled("—");
+                ImGui.TableNextColumn();
+                if(OccultCrescent.Next(job,level) is { } next)
+                {
+                    DrawSmallGameIcon(next.Icon);ImGui.TextUnformatted(localization.Format("FieldContent.OccultNext",next.Name,next.Level));
+                    if(ImGui.IsItemHovered() && next.Description.Length>0)WrappedTooltip(next.Description);
+                }
+                else if(level>=job.MaxLevel && level>0)ImGui.TextColored(UI.FfxivTheme.Success,labels.Mastered);
+                else ImGui.TextDisabled("—");
+                ImGui.TableNextColumn();
+                if(worn && state.NeededJobExperience>0 && job.Id<state.Experience.Count)ImGui.TextUnformatted($"{state.Experience[(int)job.Id]:N0} / {state.NeededJobExperience:N0}");
+                else ImGui.TextDisabled("—");
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 
     private void DrawFieldZones(FieldCatalog catalog)

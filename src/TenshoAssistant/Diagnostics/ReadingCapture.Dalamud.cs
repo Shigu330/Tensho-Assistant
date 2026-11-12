@@ -200,7 +200,10 @@ public sealed unsafe class ReadingCapture : IDisposable
             var state=occult->State;
             var levels=new StringBuilder();
             foreach(var level in state.SupportJobLevels)levels.Append(' ').Append(level);
-            text=$"occult knowledge {state.CurrentKnowledge}/{state.NeededKnowledge} sync {state.KnowledgeLevelSync}, support job {state.CurrentSupportJob} levels{levels}, silver {state.Silver} gold {state.Gold}";
+            // X-188 (0.1176): each job's experience and what the worn job needs, to check the page against the game.
+            var experience=new StringBuilder();
+            foreach(var points in state.SupportJobExperience)experience.Append(' ').Append(points);
+            text=$"occult knowledge {state.CurrentKnowledge}/{state.NeededKnowledge} sync {state.KnowledgeLevelSync}, support job {state.CurrentSupportJob} levels{levels}, experience{experience} needed {state.NeededJobExperience}, silver {state.Silver} gold {state.Gold}";
         }
         if(text==fieldState)return;
         fieldState=text;

@@ -51,7 +51,23 @@ internal static class FieldCatalogLoader
         foreach(var row in data.GetExcelSheet<MYCTemporaryItem>())
             if(row.RowId!=0 && row.Action.ValueNullable is { } action && !action.Name.IsEmpty)
                 actions.Add(new(row.RowId,row.Order,action.Name.ExtractText(),row.Category.ValueNullable?.Name.ExtractText() ?? "",row.Max,descriptions.GetRowOrDefault(action.RowId)?.Description.ExtractText() ?? "",action.Icon));
-        return new(zones,records,actions.OrderBy(row=>row.Order).ToArray());
+        // X-188 (0.1176): the phantom jobs: each level's action (MKDSupportJob.Actions) and trait (MKDTrait), docs/evidence/0.1176-occult-jobs.md.
+        var traits=data.GetExcelSheet<MKDTrait>().Where(row=>row.RowId!=0 && !row.Name.IsEmpty).ToArray();
+        var jobs=new List<OccultJob>();
+        foreach(var job in data.GetExcelSheet<MKDSupportJob>())
+        {
+            if(job.Name.IsEmpty)continue;
+            var unlocks=new List<OccultUnlock>();
+            foreach(var step in job.Actions)
+                if(step.LevelUnlock>0 && step.Action.ValueNullable is { } action && !action.Name.IsEmpty)
+                    unlocks.Add(new(step.LevelUnlock,action.Name.ExtractText(),descriptions.GetRowOrDefault(action.RowId)?.Description.ExtractText() ?? "",action.Icon,false));
+            foreach(var trait in traits)
+                if(trait.MKDSupportJob.RowId==job.RowId && trait.LevelUnlock>0)unlocks.Add(new(trait.LevelUnlock,trait.Name.ExtractText(),trait.Description.ExtractText(),(uint)Math.Max(0,trait.Icon),true));
+            jobs.Add(new(job.RowId,job.Name.ExtractText(),job.LevelMax,unlocks.OrderBy(unlock=>unlock.Level).ThenBy(unlock=>unlock.Trait).ToArray()));
+        }
+        var addon=data.GetExcelSheet<Addon>();
+        string Label(uint row)=>addon.GetRowOrDefault(row)?.Text.ExtractText() ?? "";
+        return new(zones,records,actions.OrderBy(row=>row.Order).ToArray()){OccultJobs=jobs,OccultLabels=new(Label(16607),Label(16611),Label(16608),Label(16618))};
     }
 
     private static List<FieldLayoutEntry> Entries(IDataManager data,IPluginLog log,TerritoryType territory)

@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
         selfCheckPages=
         [
             Page("Eureka and Bozja",()=>Task.FromResult(FieldCatalogLoad?.Invoke() is { } field && field.Zones.Sum(zone=>zone.Events.Count)>0
-                ? Diagnostics.SelfCheck.Ok("Eureka and Bozja",$"{string.Join("+",field.Zones.Select(zone=>zone.Events.Count))} places, {field.Records.Count} records, {field.Actions.Count} actions")
+                ? Diagnostics.SelfCheck.Ok("Eureka and Bozja",$"{string.Join("+",field.Zones.Select(zone=>zone.Events.Count))} places, {field.Records.Count} records, {field.Actions.Count} actions, {field.OccultJobs.Count} phantom jobs")
                 :Diagnostics.SelfCheck.Failed("Eureka and Bozja","nothing read"))),
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")

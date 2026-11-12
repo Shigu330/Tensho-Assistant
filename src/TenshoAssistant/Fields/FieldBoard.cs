@@ -10,7 +10,12 @@ public sealed record FieldZone(uint Territory,uint Map,string Name,IReadOnlyList
 }
 public sealed record FieldRecord(uint Id,int Number,string Name,string Description,int Rarity,string Quest,uint Icon);
 public sealed record FieldAction(uint Id,int Order,string Name,string Category,int Most,string Description,uint Icon);
-public sealed record FieldCatalog(IReadOnlyList<FieldZone> Zones,IReadOnlyList<FieldRecord> Records,IReadOnlyList<FieldAction> Actions);
+public sealed record FieldCatalog(IReadOnlyList<FieldZone> Zones,IReadOnlyList<FieldRecord> Records,IReadOnlyList<FieldAction> Actions)
+{
+    /// <summary>X-188 (0.1176): the Occult Crescent's phantom jobs (MKDSupportJob, MKDTrait) and the game's words for them.</summary>
+    public IReadOnlyList<OccultJob> OccultJobs { get; init; }=[];
+    public OccultLabels? OccultLabels { get; init; }
+}
 /// <summary>A layout entry, or a sheet row that a layout entry can place.</summary>
 public readonly record struct FieldLayoutEntry(uint Instance,float X,float Z);
 public sealed record FieldEventRow(FieldEventKind Kind,uint Id,uint Instance,string Name,string Description,int? Level,int Participants);
