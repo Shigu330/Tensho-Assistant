@@ -27,6 +27,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1174-defeat-treasure.md](0.1174-defeat-treasure.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Discoveries/ItemGains.cs`, `tests/TenshoAssistant.Tests/TreasureDefeat1174Tests.cs` | `CHANGELOG.md`, `repo.json` |
 | [0.1176-occult-jobs.md](0.1176-occult-jobs.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `src/TenshoAssistant/Fields/OccultCrescent.cs`, `tests/TenshoAssistant.Tests/OccultJobs1176Tests.cs` | `CHANGELOG.md`, `repo.json` |
 | [0.1178-occult-panel.md](0.1178-occult-panel.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `tests/TenshoAssistant.Tests/OccultPanel1178Tests.cs` | `CHANGELOG.md` |
+| [0.1179-occult-alerts.md](0.1179-occult-alerts.md) | `tests/TenshoAssistant.Tests/OccultAlerts1179Tests.cs` | `CHANGELOG.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.127.0-sightseeing-probe.log](0.127.0-sightseeing-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -270,5 +271,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 258 files · fichiers ; 204 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 259 files · fichiers ; 205 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

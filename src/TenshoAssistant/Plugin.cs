@@ -1696,6 +1696,7 @@ public sealed class Plugin : IDalamudPlugin
             ("OceanVoyage",mainWindow.DrawOceanVoyagePanel),
             ("GameLogRequest",mainWindow.ProcessGameLogRequest),
             ("HuntTrain",mainWindow.ObserveHuntTrain),
+            ("OccultAlerts",mainWindow.ObserveOccultAlerts),
             ("Garden",mainWindow.ObserveGarden),
             ("WishlistSales",mainWindow.WatchWishlistSales),
             ("PlotWatch",mainWindow.WatchPlots),

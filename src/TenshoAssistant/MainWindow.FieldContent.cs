@@ -61,6 +61,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextDisabled(localization.Get("FieldContent.OccultHint"));
         BoolSetting("FieldContent.OccultPanel","FieldContent.OccultPanelTip",()=>configuration.OccultPanel,value=>configuration.OccultPanel=value,c=>c.OccultPanel);
+        BoolSetting("FieldContent.OccultAlerts","FieldContent.OccultAlertsTip",()=>configuration.OccultAlerts,value=>configuration.OccultAlerts=value,c=>c.OccultAlerts);
         DrawOccultCoinButtons();
         DrawOccultLore();
         if(OccultStateRead?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("FieldContent.OccultNotRead"));return;}
@@ -140,6 +141,8 @@ internal sealed partial class MainWindow
     {
         occultPanelState=null;
         if(windowDisposed || OccultOnIsland?.Invoke()!=true || OccultStateRead?.Invoke() is not { } state)return false;
+        // DEC-041: nothing shown during a fight.
+        if(mapLive?.State is { InCombat:true })return false;
         if(FieldCatalogReady() is not { OccultJobs.Count:>0,OccultLabels:not null })return false;
         occultPanelState=state;
         return true;
@@ -171,6 +174,46 @@ internal sealed partial class MainWindow
         TipText(labels.Knowledge);
         ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0"),state.Gold.ToString("N0")));
         Tip("FieldContent.OccultPanelTip");
+    }
+
+    // X-189 (0.1179, user request of 12/11): on the island, a critical engagement that opens its registration and a FATE that starts are said
+    // in the chat and sent to the desktop application, with the place and the time left; the alarms' sound if it is on. DEC-041: nothing during a
+    // fight: what opened then is said once the fight is over, if it is still open. Checked once a second.
+    private readonly HashSet<int> occultEngagementsSaid=[];
+    private readonly HashSet<uint> occultFatesSaid=[];
+    private DateTimeOffset occultAlertsAt;
+    internal void ObserveOccultAlerts()
+    {
+        if(windowDisposed || !configuration.OccultAlerts)return;
+        var now=DateTimeOffset.UtcNow;
+        if(now<occultAlertsAt)return;
+        occultAlertsAt=now.AddSeconds(1);
+        if(OccultOnIsland?.Invoke()!=true){occultEngagementsSaid.Clear();occultFatesSaid.Clear();return;}
+        var live=mapLive?.State;
+        if(live is { InCombat:true })return;
+        var catalog=maps.State.Catalog;
+        if(OccultStateRead?.Invoke() is { } state)
+            foreach(var engagement in OccultAlerts.Engagements(state.Events,occultEngagementsSaid))
+            {
+                var map=catalog?.Find(engagement.MapId);
+                var at=map is null ? (Vector2?)null:MapProjection.CoordinateFromWorld(new Vector3(engagement.X,0,engagement.Z),map);
+                SayOccultAlert(localization.Format("FieldContent.OccultEngagementAlert",engagement.Name,OccultAlerts.Clock(engagement.SecondsLeft),map?.Zone ?? "",
+                    at is { } place ? MapProjection.CoordinateNumber(place.X):"?",at is { } same ? MapProjection.CoordinateNumber(same.Y):"?"));
+            }
+        if(live is { Fates:{ } fates } && catalog?.Find(live.MapId) is { } fateMap)
+            foreach(var fate in OccultAlerts.Fates(fates,fate=>fate.Id,occultFatesSaid))
+            {
+                var at=MapProjection.CoordinateFromWorld(fate.Position,fateMap);
+                SayOccultAlert(localization.Format("FieldContent.OccultFateAlert",fate.Name,fate.Level,OccultAlerts.Clock(fate.SecondsLeft),fateMap.Zone,
+                    MapProjection.CoordinateNumber(at.X),MapProjection.CoordinateNumber(at.Y)));
+            }
+    }
+
+    private void SayOccultAlert(string alert)
+    {
+        ChatNotice?.Invoke(alert);
+        if(configuration.AlarmOptions.PlaySound)Alarms.AlarmService.PlaySound(configuration.AlarmOptions.Sound,log);
+        LinkNotice?.Invoke(alert);
     }
 
     private void DrawFieldZones(FieldCatalog catalog)

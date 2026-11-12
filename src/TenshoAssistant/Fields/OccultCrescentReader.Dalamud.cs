@@ -38,7 +38,7 @@ public sealed unsafe class OccultCrescentReader : IDisposable
             var levels=new int[held.SupportJobLevels.Length];
             for(var index=0;index<levels.Length;index++)levels[index]=held.SupportJobLevels[index];
             var read=new OccultState(DateTimeOffset.UtcNow,held.CurrentKnowledge,held.NeededKnowledge,held.CurrentSupportJob,levels,held.SupportJobExperience.ToArray(),
-                held.NeededJobExperience,held.Silver,held.Gold);
+                held.NeededJobExperience,held.Silver,held.Gold){Events=ReadEvents()};
             if(OccultCrescent.Empty(read))return;
             Volatile.Write(ref state,read);
             warned=false;
@@ -49,6 +49,21 @@ public sealed unsafe class OccultCrescentReader : IDisposable
             Volatile.Write(ref onIsland,false);
             if(!warned){warned=true;log.Warning(error,"The Occult Crescent state could not be read (perhaps after a game update).");}
         }
+    }
+
+    // X-189 (0.1179): the critical engagements that are not inactive, copied (the container belongs to the island's director, looked up only while it exists).
+    private static OccultEvent[] ReadEvents()
+    {
+        var container=DynamicEventContainer.GetInstance();
+        if(container==null)return [];
+        var events=new List<OccultEvent>();
+        for(var index=0;index<container->Events.Length;index++)
+        {
+            ref var held=ref container->Events[index];
+            if(held.State==DynamicEventState.Inactive || held.DynamicEventId==0)continue;
+            events.Add(new(held.DynamicEventId,held.Name.ToString(),(int)held.State,held.SecondsLeft,held.StartTimestamp,held.MapMarker.MapId,held.MapMarker.Position.X,held.MapMarker.Position.Z));
+        }
+        return events.ToArray();
     }
 
     public void Dispose()

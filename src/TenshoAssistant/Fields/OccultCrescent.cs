@@ -11,7 +11,46 @@ public sealed record OccultLabels(string Knowledge,string PhantomJob,string Mast
 /// the phantom job worn, each job's level and experience (by job index), the experience the worn job needs, the silver and gold coins.
 /// </summary>
 public sealed record OccultState(DateTimeOffset At,uint Knowledge,uint KnowledgeNeeded,int CurrentJob,IReadOnlyList<int> Levels,IReadOnlyList<uint> Experience,
-    uint NeededJobExperience,int Silver,int Gold);
+    uint NeededJobExperience,int Silver,int Gold)
+{
+    /// <summary>X-189 (0.1179): the island's critical engagements that are not inactive (DynamicEventContainer of the island's director).</summary>
+    public IReadOnlyList<OccultEvent> Events { get; init; }=[];
+}
+
+/// <summary>
+/// X-189 (0.1179): a critical engagement as the game holds it (ClientStructs DynamicEvent: DynamicEventId, State 1 Register, 2 Warmup, 3 Battle,
+/// SecondsLeft, StartTimestamp, map marker's map and position), copied on the framework thread.
+/// </summary>
+public sealed record OccultEvent(int Id,string Name,int State,uint SecondsLeft,int Start,uint MapId,float X,float Z);
+
+/// <summary>
+/// X-189 (0.1179, user request of 12/11): when to say that a critical engagement opened its registration, or that a FATE started, on the island.
+/// Each one is said once while it lasts (the set keeps only those still there, so the next one with the same id is said again).
+/// </summary>
+public static class OccultAlerts
+{
+    /// <summary>DynamicEventState.Register: the engagement takes players (« Starts in 1:07 » in the game).</summary>
+    public const int Register=1;
+
+    /// <summary>The engagements open for registration not said yet; the set forgets those no longer open, then keeps the new ones.</summary>
+    public static IReadOnlyList<OccultEvent> Engagements(IEnumerable<OccultEvent> events,HashSet<int> said)
+    {
+        var open=events.Where(item=>item.State==Register && item.Id!=0).ToArray();
+        said.IntersectWith(open.Select(item=>item.Id));
+        return open.Where(item=>said.Add(item.Id)).ToArray();
+    }
+
+    /// <summary>The FATEs not said yet, by id; the set forgets those that ended.</summary>
+    public static IReadOnlyList<T> Fates<T>(IEnumerable<T> fates,Func<T,uint> id,HashSet<uint> said)
+    {
+        var running=fates.ToArray();
+        said.IntersectWith(running.Select(id));
+        return running.Where(fate=>said.Add(id(fate))).ToArray();
+    }
+
+    /// <summary>Minutes and seconds, as the game writes a countdown (1:07).</summary>
+    public static string Clock(long seconds)=>seconds<=0 ? "0:00":$"{seconds/60}:{seconds%60:00}";
+}
 
 /// <summary>X-190 (0.1178): a coin of the island (MKDData.CurrencyItem), what « what it buys » opens.</summary>
 public sealed record OccultCoin(uint ItemId,string Name);

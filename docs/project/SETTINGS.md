@@ -234,6 +234,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `MapView.WheelInvert` | bool | false | Settings › Map | **Invert the mouse wheel** — Rolling up zooms out, and rolling down zooms in. Default: off. |
 | `MarketBoardScope` | MarketScope | Market.MarketScope.DataCenter | Settings › General | **Market page scope** — Scope the Market page opens on: your world, data center or region (listings and sales read from Universalis). The choice made on the Market page is saved here too. Default: data center. |
 | `MarketPricesOnHover` | bool | false | Settings › Data | **Show prices when hovering items in game** — Universalis prices of the current world when hovering an item (network). Default: off. |
+| `OccultAlerts` | bool | true | page Eureka and Bozja | **Alerts for critical engagements and FATEs** — On the island, a line in the chat (and in the desktop application) when a critical engagement opens its registration or a FATE starts, with its place and the time left; the alarms' sound if it is on. Nothing during a fight: what opened then is said once it is over, if it is still open. Default: on. |
 | `OccultPanel` | bool | true | page Eureka and Bozja | **Panel on the island** — A small panel while you are on the island: the phantom job you wear, its level and experience, what it learns next, your knowledge and your coins. It moves with the mouse; the rest is on this page. Default: on. |
 | `OpenOnLastPage` | bool | false | Settings › General | **Open on the last page used** — Unticked: Tensho opens on Home when the plugin loads; during a session, the reopened window keeps its page. Ticked: the last page shown comes back, even after reloading Tensho or restarting the game (it is saved when the window or the plugin closes). The Diagnostics page only comes back in developer mode. Default: off (Home). |
 | `OpenOnLoad` | bool | false | Settings › General | **Open when the plugin loads** — When Tensho Assistant is activated or reloaded. Default: off. |
@@ -314,7 +315,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 259 controls (251 linked to `Configuration`, 8 to another file), 33 settings without a control.
+Counted: 260 controls (252 linked to `Configuration`, 8 to another file), 33 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -554,6 +555,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `MapView.WheelInvert` | bool | false | Paramètres › Carte | **Inverser la molette** — Rouler vers le haut dézoome, et rouler vers le bas zoome. Par défaut : désactivé. |
 | `MarketBoardScope` | MarketScope | Market.MarketScope.DataCenter | Paramètres › Général | **Portée de la page Marché** — Portée sur laquelle s'ouvre la page Marché : votre monde, votre centre de données ou votre région (annonces et ventes lues sur Universalis). Le choix fait sur la page Marché est gardé ici aussi. Par défaut : centre de données. |
 | `MarketPricesOnHover` | bool | false | Paramètres › Données et sources | **Afficher les prix au survol des objets en jeu** — Prix Universalis du monde actuel au survol d'un objet (réseau). Par défaut : désactivé. |
+| `OccultAlerts` | bool | true | page Eureka et Bozja | **Alertes des confrontations critiques et des ALÉA** — Sur l'île, une ligne dans le chat (et dans l'application de bureau) quand une confrontation critique ouvre ses inscriptions ou qu'un ALÉA commence, avec son lieu et le temps restant ; le son des alarmes s'il est activé. Rien pendant un combat : ce qui s'est ouvert pendant ce temps est dit à la fin du combat, si c'est encore ouvert. Par défaut : activé. |
 | `OccultPanel` | bool | true | page Eureka et Bozja | **Panneau sur l'île** — Un petit panneau pendant que vous êtes sur l'île : le job de soutien porté, son niveau et son expérience, ce qu'il apprend ensuite, votre savoir et vos pièces. Il se déplace à la souris ; le reste est sur cette page. Par défaut : activé. |
 | `OpenOnLastPage` | bool | false | Paramètres › Général | **Ouvrir sur la dernière page utilisée** — Décoché : Tensho s'ouvre sur l'Accueil au chargement du plugin ; pendant une session, la fenêtre rouverte garde sa page. Coché : la dernière page affichée revient, même après un rechargement de Tensho ou une relance du jeu (elle est enregistrée à la fermeture de la fenêtre ou du plugin). La page Diagnostics ne revient qu'en mode développeur. Par défaut : désactivé (Accueil). |
 | `OpenOnLoad` | bool | false | Paramètres › Général | **Ouvrir au chargement du plugin** — À l’activation ou au rechargement de Tensho Assistant. Par défaut : désactivé. |
@@ -634,5 +636,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 259 cases (251 reliées à `Configuration`, 8 à un autre fichier), 33 réglages sans case.
+Compté : 260 cases (252 reliées à `Configuration`, 8 à un autre fichier), 33 réglages sans case.
 <!-- /docgen:settings-fr -->

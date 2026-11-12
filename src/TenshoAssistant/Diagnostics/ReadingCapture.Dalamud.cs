@@ -204,11 +204,38 @@ public sealed unsafe class ReadingCapture : IDisposable
             var experience=new StringBuilder();
             foreach(var points in state.SupportJobExperience)experience.Append(' ').Append(points);
             text=$"occult knowledge {state.CurrentKnowledge}/{state.NeededKnowledge} sync {state.KnowledgeLevelSync}, support job {state.CurrentSupportJob} levels{levels}, experience{experience} needed {state.NeededJobExperience}, silver {state.Silver} gold {state.Gold}";
+            ReadOccultEvents();
         }
+        else occultEvents="";
         if(text==fieldState)return;
         fieldState=text;
         if(text.Length>0)Line("fields",120,text);
     }
+    // X-189 (0.1179): the island's critical engagements before the alerts are coded (DynamicEventContainer of the island's director, members
+    // checked with tools/ApiProbe): each event that is not inactive, its id, type, state, times, participants, progress and map marker. Written
+    // when an event appears, changes state or progress, or goes; the seconds left ride along without making a line of their own.
+    private string occultEvents="";
+    private void ReadOccultEvents()
+    {
+        var container=FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.DynamicEventContainer.GetInstance();
+        if(container==null)return;
+        var key=new StringBuilder();var line=new StringBuilder($"current {container->CurrentEventId} index {container->CurrentEventIndex}");
+        for(var index=0;index<container->Events.Length;index++)
+        {
+            ref var dynamicEvent=ref container->Events[index];
+            if(dynamicEvent.State==FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.DynamicEventState.Inactive || dynamicEvent.DynamicEventId==0)continue;
+            var marker=dynamicEvent.MapMarker;
+            key.Append($" {dynamicEvent.DynamicEventId}/{dynamicEvent.State}/{dynamicEvent.Progress}");
+            line.Append($" [{index}: id {dynamicEvent.DynamicEventId} type {dynamicEvent.DynamicEventType} event {dynamicEvent.EventType} state {dynamicEvent.State} start {dynamicEvent.StartTimestamp} left {dynamicEvent.SecondsLeft}/{dynamicEvent.SecondsDuration}")
+                .Append($" participants {dynamicEvent.Participants}/{dynamicEvent.MaxParticipants} progress {dynamicEvent.Progress} map range {dynamicEvent.LGBMapRange} name {dynamicEvent.Name}")
+                .Append($" marker icon {marker.IconId} map {marker.MapId} at {marker.Position.X:0.0},{marker.Position.Z:0.0} radius {marker.Radius:0.0} end {marker.EndTimestamp} state {marker.EventState}]");
+        }
+        var all=key.ToString();
+        if(all==occultEvents)return;
+        occultEvents=all;
+        Line("occultevents",120,line.ToString());
+    }
+
     private void ReadIslandObjects()
     {
         if((nint)MJIManager.StaticAddressPointers.ppInstance==0)return;
