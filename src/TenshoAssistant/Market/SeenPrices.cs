@@ -155,7 +155,13 @@ public sealed class SeenPriceStore
     public const int MaxEntries=50_000;
     private readonly object gate=new();
     private readonly Dictionary<(uint World,uint Item),SeenMarketEntry> entries=[];
-    public bool Dirty { get; private set; }
+    // X-142 (0.1121, audit A04): changes counted, acknowledged only once written (MarkSaved): a failed write keeps them to save.
+    private long changes,saved;
+    public bool Dirty
+    {
+        get{lock(gate)return changes!=saved;}
+        private set{if(value)changes++;}
+    }
     public int Count{get{lock(gate)return entries.Count;}}
     /// <summary>X-73.12 (0.868): grows at each change, so that a page works its view out again only then.</summary>
     public long Revision{get{lock(gate)return revision;}}
@@ -250,7 +256,13 @@ public sealed class SeenPriceStore
             ListingsRequest=entry.ListingsRequest,OwnKnown=entry.OwnKnown,Sales=[..entry.Sales],SalesAt=entry.SalesAt}:null;
     }
 
-    public List<SeenMarketEntry> Snapshot(){lock(gate){Dirty=false;return entries.Values.Select(entry=>Get(entry.World,entry.Item)!).ToList();}}
+    public List<SeenMarketEntry> Snapshot()=>SnapshotToSave(out _);
+
+    /// <summary>X-142 (0.1121): the entries to write and the change stamp they hold; MarkSaved(stamp) once written.</summary>
+    public List<SeenMarketEntry> SnapshotToSave(out long stamp){lock(gate){stamp=changes;return entries.Values.Select(entry=>Get(entry.World,entry.Item)!).ToList();}}
+
+    /// <summary>X-142: the copy holding this stamp is written.</summary>
+    public void MarkSaved(long stamp){lock(gate)if(stamp>saved)saved=stamp;}
 
     public void Load(IEnumerable<SeenMarketEntry> saved)
     {

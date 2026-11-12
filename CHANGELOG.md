@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1121.0
+- Plan global, X-142 : Sauvegardes plus sûres, première partie (audit A04 et A09) : les découvertes et les prix vus ne sont plus marqués « enregistrés » avant l'écriture, mais seulement une fois le fichier écrit ; une écriture qui échoue (disque plein, fichier bloqué) les garde à enregistrer et une nouvelle tentative suit une minute plus tard ; ce qui change pendant la copie part dans l'enregistrement suivant. À la fermeture, un enregistrement en cours est attendu (5 s au plus) avant d'écrire le reste. L'enregistreur d'artisanat appelle la fonction du jeu par l'appel sûr aussi pendant la coupure JcJ et contenu classé. La partie 2 (cache : archive et purge en une seule opération) suit.
+- Tests : DiscoveriesSave1121Tests. Verify.ps1 (agent) : 1846/1846, 0 avertissement, 0 erreur ; DLL 0.1121.0.0. Rien à essayer en jeu.
+### English
+- Safer saves, part one (audit A04 and A09): discoveries and seen prices are no longer marked « saved » before the write, only once the file is written; a write that fails (full disk, locked file) keeps them to save and another try follows a minute later; what changes during the copy goes in the next save. At unload, a save already running is waited for (5 s at most) before the rest is written. The crafting recorder calls the game's function through the safe call during the PvP and ranked-content cut too. Part 2 (cache: archive and purge as one operation) follows.
+
 ## 0.1120.0
 - Plan global, X-150 : Application de bureau, lecture des réglages du plugin (revue de sécurité, audit A15) : à un avis « réglages » du lien, elle les relit hors du dessin, dans un objet neuf, jamais dans celui qui sert : fichier lu en entier avec une borne de 8 Mo pendant que le jeu peut l'écrire, adresses Discord retirées (l'application n'envoie rien), types limités à une liste fermée (ceux de Tensho, nombres, textes, listes et dictionnaires de ceux-ci). Une rafale d'avis donne une seule lecture ; une lecture valide s'applique d'un coup entre deux images ; une lecture ratée est dite et les derniers réglages valides restent. Le démarrage lit de la même façon. SECURITY.md et la preuve x119 le disent.
 - Tests : SettingsRead1120Tests. Verify.ps1 (agent) : 1843/1843, 0 avertissement, 0 erreur ; DLL 0.1120.0.0. Non validé en jeu.

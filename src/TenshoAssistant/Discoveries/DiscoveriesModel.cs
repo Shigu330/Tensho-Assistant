@@ -265,7 +265,17 @@ public sealed class DiscoveryStore
     }
     private int revision;
     public int Revision=>Volatile.Read(ref revision);
-    public bool Dirty { get; private set; }
+    // X-142 (0.1121, audit A04): « to save » is a count of changes and the count a written save holds; it is acknowledged only once the
+    // save is on disk (MarkSaved), so a failed write leaves the base to save and a change during the copy goes in the next save.
+    private long changes,saved;
+    public bool Dirty
+    {
+        get=>Interlocked.Read(ref changes)!=Interlocked.Read(ref saved);
+        private set{if(value)Interlocked.Increment(ref changes);}
+    }
+
+    /// <summary>X-142: a save of the copy that held this stamp (SnapshotToSave) is written: the base is clean unless it changed since.</summary>
+    public void MarkSaved(long stamp){lock(gate)if(stamp>Interlocked.Read(ref saved))Interlocked.Exchange(ref saved,stamp);}
 
     public static (int X,int Z) Cell(float x,float z)=>((int)MathF.Floor(x/CellSize),(int)MathF.Floor(z/CellSize));
 
@@ -517,13 +527,18 @@ public sealed class DiscoveryStore
     }
 
     /// <summary>
-    /// A copy of the base; « saving » marks it as written (an export does not). X-93 part 2 (0.1040): copied by slices (<see cref="Slice"/>), the lock let go
-    /// between them; it is marked written before the copy, so a fact seen or changed meanwhile marks it again and goes in the next save.
+    /// A copy of the base (an export, a check: nothing is marked). X-93 part 2 (0.1040): copied by slices (<see cref="Slice"/>), the lock let go
+    /// between them. X-142 (0.1121): a save takes SnapshotToSave and marks it written only after the write (MarkSaved).
     /// </summary>
-    public DiscoveryFile Snapshot(DateTimeOffset at,bool saving=true)
+    public DiscoveryFile Snapshot(DateTimeOffset at,bool saving=false)=>Copy(at,out _);
+
+    /// <summary>X-142 (0.1121): the copy to write and the change stamp it holds (taken before the copy, so a change meanwhile goes in the next save).</summary>
+    public DiscoveryFile SnapshotToSave(DateTimeOffset at,out long stamp)=>Copy(at,out stamp);
+
+    private DiscoveryFile Copy(DateTimeOffset at,out long stamp)
     {
         DiscoveryFact[] held;
-        lock(gate){if(saving)Dirty=false;held=[..facts.Values];}
+        lock(gate){stamp=Interlocked.Read(ref changes);held=[..facts.Values];}
         var copies=new List<DiscoveryFact>(held.Length);
         for(var start=0;start<held.Length;start+=Slice)
         {

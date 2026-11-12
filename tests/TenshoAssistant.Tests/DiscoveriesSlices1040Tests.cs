@@ -54,8 +54,10 @@ internal static class DiscoveriesSlices1040Tests
             store.Load(new DiscoveryFile{Facts=Enumerable.Range(1,DiscoveryStore.Slice*2+1).Select(subject=>Fact((uint)subject)).ToList()});
             store.SeeSource(DiscoveryKind.FestivalSeen,1,1,6,At.AddDays(1));
             Check(store.Dirty,"changed");
-            var file=store.Snapshot(At.AddDays(2));
-            Check(file.Facts.Count==DiscoveryStore.Slice*2+1 && !store.Dirty,"whole copy, marked written");
+            var file=store.SnapshotToSave(At.AddDays(2),out var stamp);
+            Check(file.Facts.Count==DiscoveryStore.Slice*2+1 && store.Dirty,"whole copy, not marked before it is written (X-142)");
+            store.MarkSaved(stamp);
+            Check(!store.Dirty,"marked written once saved");
             file.Facts[0].Seen=99;
             Check(store.Find(DiscoveryKind.FestivalSeen,file.Facts[0].Subject,5).Single().Seen!=99,"a copy, not the base's fact");
             store.Snapshot(At.AddDays(2),false);
@@ -81,7 +83,7 @@ internal static class DiscoveriesSlices1040Tests
             var save=page[page.IndexOf("private void SaveDiscoveries(bool now)",StringComparison.Ordinal)..];
             save=save[..save.IndexOf("if(now)Write();else _=Task.Run(Write);",StringComparison.Ordinal)];
             var write=save.IndexOf("void Write()",StringComparison.Ordinal);
-            var copy=save.IndexOf("store.Snapshot(DateTimeOffset.UtcNow)",StringComparison.Ordinal);
+            var copy=save.IndexOf("store.SnapshotToSave(DateTimeOffset.UtcNow,",StringComparison.Ordinal);
             Check(write>0 && copy>write,"Snapshot inside Write, off the frame");
             var model=Source("Discoveries/DiscoveriesModel.cs");
             Check(!model.Contains("LoadLocked",StringComparison.Ordinal) && !model.Contains("facts.Values.Select(fact=>fact.Copy())",StringComparison.Ordinal),"no whole-file hold left");

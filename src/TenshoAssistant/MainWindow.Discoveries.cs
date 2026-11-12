@@ -73,19 +73,35 @@ internal sealed partial class MainWindow
         if(settings.Enabled && settings.AutoExchange && DiscoveryExchange is { } exchange && exchange.Due(DateTimeOffset.UtcNow))exchange.Exchange(store,exchange.Connected);
     }
 
+    /// <summary>
+    /// X-142 (0.1121, audit A04): at unload, a save already running is waited for (5 s at most), then what is still to save is written at
+    /// once; a write that fails is logged (the file on disk stays the last good one).
+    /// </summary>
+    private void FlushDiscoveries()
+    {
+        var until=Environment.TickCount64+5_000;
+        while(Volatile.Read(ref discoverySaving)==1 && Environment.TickCount64<until)Thread.Sleep(20);
+        if(DiscoveryStore?.Dirty==true || SeenPrices?.Dirty==true)SaveDiscoveries(true);
+    }
+
     /// <summary>The base written off the frame (on unload: at once).</summary>
     private void SaveDiscoveries(bool now)
     {
         if(DiscoveryStore is not { } store || DiscoveryFolder is null || !DiscoveriesLoaded || DiscoveriesWriteBlocked || Interlocked.Exchange(ref discoverySaving,1)==1)return;
         discoveriesSavedAt=Environment.TickCount64;
         var path=DiscoveryBase;
-        var prices=SeenPrices is { Dirty:true } seen ? seen.Snapshot():null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
+        // X-142 (0.1121, audit A04): each copy is marked written only after its write; a failed write keeps it to save (retried a minute later).
+        long pricesStamp=0;
+        var seenPrices=SeenPrices;
+        var prices=seenPrices is { Dirty:true } seen ? seen.SnapshotToSave(out pricesStamp):null;var pricesPath=Path.Combine(DiscoveryFolder,"MarketSeen.json");
         void Write()
         {
             // X-93 (0.940): yours in Discoveries.json, the shared ones apart, by kind, compressed (DiscoveryFiles.WriteSplit). X-93 part 2 (0.1040): the base is
             // copied here, off the frame and by slices (DiscoveryStore.Snapshot): on the frame it was 21 ms at 100 000 facts, 339 ms at a million.
-            try{var held=store.SharedKindsHeld();var file=store.Snapshot(DateTimeOffset.UtcNow);lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);if(prices is not null)Market.SeenPriceStore.Write(pricesPath,prices);}
-            catch(Exception error){log.Warning(error,"The discoveries could not be saved.");}
+            try{var held=store.SharedKindsHeld();var file=store.SnapshotToSave(DateTimeOffset.UtcNow,out var stamp);lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);store.MarkSaved(stamp);}
+            catch(Exception error){log.Warning(error,"The discoveries could not be saved; kept to save again.");}
+            try{if(prices is not null){Market.SeenPriceStore.Write(pricesPath,prices);seenPrices!.MarkSaved(pricesStamp);}}
+            catch(Exception error){log.Warning(error,"The seen prices could not be saved; kept to save again.");}
             finally{Volatile.Write(ref discoverySaving,0);}
         }
         if(now)Write();else _=Task.Run(Write);

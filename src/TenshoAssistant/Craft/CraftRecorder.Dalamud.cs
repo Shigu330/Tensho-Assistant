@@ -46,9 +46,10 @@ public sealed unsafe class CraftRecorder : IDisposable
 
     private bool OnUseAction(ActionManager* manager,ActionType type,uint actionId,ulong targetId,uint extraParam,ActionManager.UseActionMode mode,uint comboRouteId,bool* outOptAreaTargeted)
     {
-        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return hook!.Original(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
-        // A-14 (0.452, review): OriginalDisposeSafe: Original throws into the game's frames once the hook is disposed.
+        // A-14 (0.452, review): OriginalDisposeSafe: Original throws into the game's frames once the hook is disposed. X-142 (0.1121, audit A09):
+        // the same safe call in the competitive cut, which only skips the observation.
         var result=hook!.OriginalDisposeSafe(manager,type,actionId,targetId,extraParam,mode,comboRouteId,outOptAreaTargeted);
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return result;
         try
         {
             // An action only queued returns true, then returns true again when the queue replays it (mode Queue): it is noted when it runs, once.

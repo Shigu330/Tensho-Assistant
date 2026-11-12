@@ -13,8 +13,8 @@ internal sealed partial class MainWindow
         SaveLastPage();
         craftChain.Dispose();
         DisposeMapDiscovery();
-        // X-43: the discoveries written once more when the plugin unloads.
-        if(DiscoveryStore?.Dirty==true || SeenPrices?.Dirty==true)SaveDiscoveries(true);
+        // X-43: the discoveries written once more when the plugin unloads; X-142 (0.1121): after a save that was running.
+        FlushDiscoveries();
         mapFindCancel?.Cancel();mapFindCancel?.Dispose();mapFindCancel=null;
         fromStockCancel?.Cancel();fromStockCancel?.Dispose();fromStockCancel=null;
         craftSolve.Dispose();
