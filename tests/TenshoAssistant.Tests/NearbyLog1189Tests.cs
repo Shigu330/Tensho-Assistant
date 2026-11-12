@@ -78,7 +78,7 @@ internal static class NearbyLog1189Tests
             Check(UnloadWatch.Empty(null, typeof(NearbyLog1189Tests).Assembly) == 0, "nothing");
             var parts = new Dictionary<string, WeakReference>(StringComparer.Ordinal) { ["plugin"] = new WeakReference(null) };
             Check(UnloadWatch.EmptyHubs(parts) == 0 && !parts.ContainsKey(UnloadWatch.Emptied), "no mark");
-            Check(string.Join(",", UnloadWatch.Hubs) == "plugin,window,locals", "the three hubs noted at unload");
+            Check(string.Join(",", UnloadWatch.Hubs) == "plugin,window,locals,locals0", "the hubs noted at unload (0.1191: the outer closure too)");
         }),
         ("Unload 1189: wiring: developer mode, ten seconds after a load, only the instances two loads back or more are emptied, after their lines", () =>
         {

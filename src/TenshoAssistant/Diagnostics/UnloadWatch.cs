@@ -19,9 +19,27 @@ public static class UnloadWatch
     /// <summary>The name of the load context among an instance's parts.</summary>
     public const string Context="context";
     /// <summary>0.1189: the mark of an instance whose hubs were emptied by a later load (names starting with « ! » are marks, not parts).</summary>
-    public const string Emptied="!emptied";
-    /// <summary>0.1189: the objects everything else of an instance hangs from: the plugin, its window, the constructor's captured locals.</summary>
-    public static readonly IReadOnlyList<string> Hubs=["plugin","window","locals"];
+    public const string Emptied="!emptied2";
+    /// <summary>0.1189: the objects everything else of an instance hangs from: the plugin, its window, the constructor's captured locals;
+    /// 0.1191: and the closure of the constructor's outer scope (« locals0 », or the closure field of « locals » for an instance noted before).</summary>
+    public static readonly IReadOnlyList<string> Hubs=["plugin","window","locals","locals0"];
+    /// <summary>0.1191: how the compiler names the field of a closure that holds the closure of the scope around it.</summary>
+    public const string ClosureField="CS$<>8__locals";
+
+    /// <summary>0.1191: whether a later load emptied this instance's hubs (any pass).</summary>
+    public static bool IsEmptied(IReadOnlyDictionary<string,WeakReference> parts)=>parts.Keys.Any(key=>key.StartsWith("!emptied",StringComparison.Ordinal));
+
+    /// <summary>0.1191: the closure of the scope around a closure (the first field the compiler named so); null when there is none.</summary>
+    public static object? OuterClosure(object? closure)
+    {
+        if(closure is null)return null;
+        try
+        {
+            return closure.GetType().GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)
+                .FirstOrDefault(field=>field.Name.StartsWith(ClosureField,StringComparison.Ordinal))?.GetValue(closure);
+        }
+        catch(Exception error) when(error is FieldAccessException or TargetException or NotSupportedException){return null;}
+    }
 
     /// <summary>This instance first (its context noted weakly), then the earlier ones read from the slot, <see cref="Kept"/> at most.</summary>
     public static List<KeyValuePair<string,Dictionary<string,WeakReference>>> Push(object? slot,string label,object? context)
@@ -61,7 +79,7 @@ public static class UnloadWatch
         var noted=parts.Where(part=>part.Key!=Context && !part.Key.StartsWith('!')).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
         var alive=noted.Where(part=>part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
-        var head=$"{label}: context {context}{(parts.ContainsKey(Emptied) ? ", hubs emptied":"")}, {alive.Count} of {noted.Count} parts alive";
+        var head=$"{label}: context {context}{(IsEmptied(parts) ? ", hubs emptied":"")}, {alive.Count} of {noted.Count} parts alive";
         if(alive.Count==0)return head;
         // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
         var collected=noted.Where(part=>!part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
@@ -104,6 +122,9 @@ public static class UnloadWatch
             var emptied=0;
             foreach(var hub in Hubs)
                 if(parts.GetValueOrDefault(hub)?.Target is { } target)emptied+=Empty(target,target.GetType().Assembly);
+            // 0.1191: the outer closures noted as fields of a hub (an instance noted before « locals0 » existed).
+            foreach(var (name,part) in parts.ToArray())
+                if(name.Contains("."+ClosureField,StringComparison.Ordinal) && part.Target is { } closure)emptied+=Empty(closure,closure.GetType().Assembly);
             if(emptied>0)parts[Emptied]=new WeakReference(null);
             return emptied;
         }

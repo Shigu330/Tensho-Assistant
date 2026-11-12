@@ -987,14 +987,22 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};
             mainWindow.ExtraCollectionsUnavailable=()=>extraCollections?.Unavailable==true;
             // g, C-12 (0.364): hunting log (MonsterNote, copied once) and the kills the game holds, read while the page shows them.
-            IReadOnlyList<Hunting.HuntEntry>? huntEntries=null;
-            mainWindow.HuntEntries=()=>huntEntries??=data.GetExcelSheet<Lumina.Excel.Sheets.MonsterNote>().Where(row=>!row.Name.IsEmpty && row.RowId>=10000)
+            // X-01 C2.2 (0.1191, analysis of 12/11: MonsterIcons took 55 to 133 ms on its first frame in the open air, 5 to 9 ms in town:
+            // the first pass with monsters around copied the whole MonsterNote sheet, and the whole English BNpcName sheet for a Blue Mage or
+            // a Beastmaster, inside the frame): both are built once on a worker at load; a frame that asks sooner waits for that one build.
+            var huntEntries=new Lazy<IReadOnlyList<Hunting.HuntEntry>>(()=>data.GetExcelSheet<Lumina.Excel.Sheets.MonsterNote>().Where(row=>!row.Name.IsEmpty && row.RowId>=10000)
                 .Select(row=>new Hunting.HuntEntry(row.RowId,row.Name.ExtractText(),row.MonsterNoteTarget.Select((target,index)=>(target,index))
                     .Where(pair=>pair.target.RowId!=0 && pair.index<row.Count.Count && row.Count[pair.index]>0 && pair.target.ValueNullable is not null)
                     .Select(pair=>new Hunting.HuntTarget(pair.target.Value.BNpcName.ValueNullable?.Singular.ExtractText() ?? "",row.Count[pair.index],
                         string.Join(" / ",pair.target.Value.PlaceNameZone.Where(zone=>zone.RowId!=0).Select(zone=>zone.ValueNullable?.Name.ExtractText() ?? "").Where(name=>name.Length>0)),pair.target.Value.BNpcName.RowId))
                     .ToArray()))
-                .Where(entry=>entry.Targets.Count>0).ToArray();
+                .Where(entry=>entry.Targets.Count>0).ToArray());
+            mainWindow.HuntEntries=()=>huntEntries.Value;
+            _=Task.Run(()=>
+            {
+                try{_=huntEntries.Value.Count;_=englishMonsters.Value.Count;}
+                catch(Exception error){log.Warning(error,"Monster sheets not read ahead (perhaps after a game update); they are read when first asked.");}
+            });
             Hunting.HuntingLogReader? huntReader=null;
             registrations.Register(()=>huntReader=new Hunting.HuntingLogReader(framework,client,log),()=>huntReader?.Dispose());
             mainWindow.HuntGrandCompany=()=>huntReader?.GrandCompany;
@@ -1609,7 +1617,8 @@ public sealed class Plugin : IDalamudPlugin
             {
                 SayLoad("10 s later");
                 if(!configuration.DeveloperMode)return;
-                foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value));
+                // 0.1191: every name for an instance whose hubs were emptied (what an outside root still reaches), the first 24 otherwise.
+                foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,Diagnostics.UnloadWatch.IsEmptied(earlier.Value) ? 400:24));
                 // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static
                 // fields still hold something an instance could hang from (read only, nothing of that instance is run or changed).
                 if(instances.Skip(1).Select(earlier=>(earlier.Key,Plugin:earlier.Value.GetValueOrDefault("plugin")?.Target)).FirstOrDefault(earlier=>earlier.Plugin is not null) is { Plugin:{ } alive } held)
@@ -1812,6 +1821,8 @@ public sealed class Plugin : IDalamudPlugin
             Diagnostics.UnloadWatch.Note(parts,"window",mainWindow,typeof(Plugin).Assembly);
             // 0.1188: the constructor's captured locals (most services live there, not in fields): the closure object behind this delegate.
             Diagnostics.UnloadWatch.Note(parts,"locals",developerAtUnload.Target,typeof(Plugin).Assembly);
+            // 0.1191: and the closure of the constructor's outer scope behind it (its parameters and this).
+            Diagnostics.UnloadWatch.Note(parts,"locals0",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target),typeof(Plugin).Assembly);
         }
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }

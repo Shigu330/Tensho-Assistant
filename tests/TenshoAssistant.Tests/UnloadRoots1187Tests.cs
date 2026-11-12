@@ -161,7 +161,7 @@ internal static class UnloadRoots1187Tests
             var note = dispose.IndexOf("Diagnostics.UnloadWatch.Note(parts,\"plugin\",this,typeof(Plugin).Assembly);", StringComparison.Ordinal);
             Check(note > 0 && note < dispose.IndexOf("registrations.Dispose()", StringComparison.Ordinal) && dispose.Contains("developerAtUnload()", StringComparison.Ordinal), "noted before the release, developer mode only");
             Check(plugin.Contains("AppDomain.CurrentDomain.SetData(Diagnostics.UnloadWatch.Slot,instances);", StringComparison.Ordinal)
-                && plugin.Contains("foreach(var earlier in instances.Skip(1))log.Information(\"Earlier instance {0}.\",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value));", StringComparison.Ordinal), "the lines");
+                && plugin.Contains("foreach(var earlier in instances.Skip(1))log.Information(\"Earlier instance {0}.\",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,", StringComparison.Ordinal), "the lines");
             Check(!plugin.Contains("GC.Collect(", StringComparison.Ordinal), "no collection forced by the plugin");
             var gate = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
             Check(gate.Contains("lock(Gate){left=[..Wrappers.Values];Wrappers.Clear();}", StringComparison.Ordinal) && gate.Contains("foreach(var guarded in left)framework.Update-=guarded;", StringComparison.Ordinal), "ReleaseAll takes each wrapper off the framework");
