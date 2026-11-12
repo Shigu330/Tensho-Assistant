@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1127.0
+- Plan global, X-144 : Suite de la preuve de lancement : la première preuve écrite en jeu par 0.1126 avait une empreinte de DLL vide (Dalamud charge le plugin depuis la mémoire, l'emplacement de l'assembly est vide) ; le fichier de la DLL vient maintenant de Dalamud (AssemblyLocation), si bien que la note « Vérifié au lancement » peut de nouveau être prouvée.
+- Tests : LaunchProof1126Tests. Verify.ps1 (agent) : 1861/1861, 0 avertissement, 0 erreur ; DLL 0.1127.0.0. Rien à essayer en jeu.
+### English
+- Launch proof follow-up: the first proof written in game by 0.1126 had an empty DLL hash (Dalamud loads the plugin from memory, the assembly's location is empty); the DLL's file now comes from Dalamud (AssemblyLocation), so the « Checked at launch » note can be proven again.
+
 ## 0.1126.0
 - Plan global, X-144 : Note « Vérifié au lancement » sur preuve (audit A13) : après chaque auto-contrôle fait avec un personnage connecté, le plugin écrit LaunchProof.json dans son dossier de configuration (sa version, l'empreinte SHA-256 de la DLL chargée par le jeu, l'heure et les comptes de l'auto-contrôle ; aucun nom ni chemin). Le script de release (scripts/LaunchProof.ps1) n'écrit « Vérifié au lancement, pas encore essayé en détail » que si cette preuve est celle de la version publiée, de la DLL même de latest.zip, sans échec, personnage connecté, de moins de 14 jours ; sinon la note dit « Pas encore vérifié en jeu », quel que soit le chemin de la release (commit-release.bat compris). Chaque release porte aussi release-proof.json : commit construit et contrôlé, empreintes des paquets livrés, versions de Dalamud et du SDK .NET, CI du commit et preuve de lancement lue.
 - Tests : LaunchProof1126Tests. Verify.ps1 (agent) : 1861/1861, 0 avertissement, 0 erreur ; DLL 0.1126.0.0. Non validé en jeu.

@@ -518,7 +518,7 @@ public sealed class Plugin : IDalamudPlugin
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),Diagnostics.LaunchProof.FileName)),()=>selfCheck?.Dispose());
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(),Diagnostics.LaunchProof.FileName),pluginInterface.AssemblyLocation.FullName),()=>selfCheck?.Dispose());
             mainWindow.SelfCheck=selfCheck;
             mainWindow.ConfigureMarketBoard(marketBoard);
             Alarms.AlarmDtrEntry? alarmBar=null;

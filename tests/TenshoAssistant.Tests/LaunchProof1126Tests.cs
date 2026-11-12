@@ -75,7 +75,8 @@ internal static class LaunchProof1126Tests
             Check(release.Split("$releaseProof --repo $repository").Length==4,"release-proof.json attached (new, resumed, missing asset)");
             var runner=Read("src/TenshoAssistant/Diagnostics/SelfCheckRunner.Dalamud.cs");
             Check(runner.Contains("if (loggedIn) WriteProof(now, lines);") && runner.Contains("dllHash = Task.Run(() => LaunchProof.Hash(location));") && runner.Contains("AtomicFile.Write(file, text)"),"plugin side");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("Diagnostics.LaunchProof.FileName"),"wired");
+            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("Diagnostics.LaunchProof.FileName),pluginInterface.AssemblyLocation.FullName)"),"wired, with the DLL's file from Dalamud");
+            Check(!runner.Contains("Assembly.Location"),"0.1127: never Assembly.Location (empty for a plugin loaded from memory)");
         }),
     ];
 }

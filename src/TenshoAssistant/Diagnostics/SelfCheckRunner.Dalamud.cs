@@ -38,10 +38,12 @@ internal sealed class SelfCheckRunner : IDisposable
 
     public SelfCheckRunner(IFramework framework, IClientState client, IPlayerState player, IPluginLog log, Func<bool> developerMode, Func<bool> ready,
         Action prepare, Func<bool, IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> probes,
-        Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows, string memoryFile, string gameVersion, string? proofFile = null)
+        Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows, string memoryFile, string gameVersion, string? proofFile = null, string? assemblyFile = null)
     {
         this.proofFile = proofFile;
-        var location = typeof(SelfCheckRunner).Assembly.Location;
+        // 0.1127: Dalamud loads the plugin from memory (the assembly's own location is empty, seen in the first proof of 0.1126): the file comes from
+        // IDalamudPluginInterface.AssemblyLocation, given by Plugin.cs.
+        var location = assemblyFile;
         dllHash = Task.Run(() => LaunchProof.Hash(location));
         this.framework = framework; this.client = client; this.player = player; this.log = log;
         this.developerMode = developerMode; this.ready = ready; this.prepare = prepare; this.probes = probes;
