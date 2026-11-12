@@ -44,6 +44,8 @@ internal sealed partial class MainWindow
             ("Roulettes",localization.Get("Reminders.TabRoulettes"),()=>DrawDailyRoulettes(timers)),
             ("Squadron",localization.Get("Reminders.TabSquadron"),()=>DrawSquadronPlanner()),
             ("Status",localization.Get("Reminders.TabStatus"),()=>DrawCharacterStatuses()),
+            // X-133 (0.1159): the reminders' alarms, apart from the Alarms tool.
+            ("Alarms",localization.Format("Reminders.TabAlarms",ReminderAlarmCount),()=>DrawReminderAlarms()),
         ],ref reminderTabFocus);
     }
 

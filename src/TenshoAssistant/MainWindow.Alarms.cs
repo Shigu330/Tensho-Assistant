@@ -241,7 +241,9 @@ internal sealed partial class MainWindow
     {
         configuration.Alarms??=[];
         var alarms=configuration.Alarms;
-        Heading(localization.Get("Alarms.PageTitle"),localization.Format("Alarms.Title",alarms.Count));
+        // X-133 (0.1159, user request of 11/11): the reminders' alarms are in the Reminders tool (its « Alarms » tab), not here nor in this count.
+        var shown=alarms.Where(alarm=>!IsReminderAlarm(alarm)).ToList();
+        Heading(localization.Get("Alarms.PageTitle"),localization.Format("Alarms.Title",shown.Count));
         DrawGatheringClock();
         DrawWorldClocks();
         ImGui.TextWrapped(localization.Get("Alarms.Help"));
@@ -250,7 +252,49 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;var changed=false;var remove=new List<TenshoAlarm>();var added=new List<TenshoAlarm>();
         // 0.326: an armed « Delete all » not drawn on the previous frame (page left, header folded, group gone) is dropped.
         if(alarmGroupDeleteArmed is not null && ImGui.GetFrameCount()>alarmGroupDeleteSeenFrame+1)alarmGroupDeleteArmed=null;
-        if(alarms.Count==0)ImGui.TextDisabled(localization.Get("Alarms.Empty"));
+        if(shown.Count==0)ImGui.TextDisabled(localization.Get("Alarms.Empty"));
+        changed|=DrawAlarmGroups(shown,now,remove,added);
+        if(remove.Any(alarm=>alarm.GameName.Length>0))alarmStatus=localization.Get("Alarms.DeleteInGame");
+        foreach(var alarm in remove){alarms.Remove(alarm);changed=true;}
+        if(alarmService?.GameStatus is { } gameState)
+            ImGui.TextColored(gameState is "Done" or "Sending" ? Success:Accent,localization.Format("Alarms.GameState"+gameState,alarmService.Pending,GameAlarmCommand.GameMaximum));
+        // Manual daily alarm at an ET time.
+        ImGui.Separator();
+        ImGui.TextColored(Accent,localization.Get("Alarms.ManualTitle"));
+        ImGui.SetNextItemWidth(160);ImGui.InputTextWithHint("##AlarmLabel",localization.Get("Alarms.ManualLabel"),ref alarmManualLabel,40);
+        Tip("Alarms.ManualLabelTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
+        Tip("Alarms.ManualHourTip");
+        ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
+        Tip("Alarms.ManualMinuteTip");
+        alarmManualHour=Math.Clamp(alarmManualHour,0,23);alarmManualMinute=Math.Clamp(alarmManualMinute,0,59);
+        ImGui.SameLine();
+        if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
+            AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
+        // 0.386 (g, X-10): the same label at a real local date, once.
+        DrawManualDateAlarm();
+        if(added.Count>0)AddAlarms(added);
+        if(changed)
+            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
+        DrawGameAlarms();
+    }
+
+    /// <summary>X-133 (0.1159): an alarm of the Reminders tool (a reminder's bell, or an automatic alarm of ventures, voyages or the squadron).</summary>
+    internal static bool IsReminderAlarm(TenshoAlarm alarm)=>DiscordWebhook.ReminderRowOf(alarm).Length>0;
+
+    /// <summary>X-133 (0.1159): the number of alarms the Alarms tool lists (the navigation's count).</summary>
+    private int AlarmsToolCount=>configuration.Alarms?.Count(alarm=>!IsReminderAlarm(alarm)) ?? 0;
+    /// <summary>X-133 (0.1159): the number of the reminders' alarms (the Reminders tool's count).</summary>
+    private int ReminderAlarmCount=>configuration.Alarms?.Count(IsReminderAlarm) ?? 0;
+
+    /// <summary>
+    /// The alarms in sections by gathering job and groups (0.202, 0.203), with their buttons; one list for the Alarms tool and the Reminders
+    /// tool's « Alarms » tab (X-133, 0.1159). Removals and additions go to the caller's lists; true when an alarm changed.
+    /// </summary>
+    private bool DrawAlarmGroups(IEnumerable<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added)
+    {
+        var changed=false;
         // Sections by gathering job (0.203: miner, botanist, fisher, then the other alarms), groups ordered by their next ringing time.
         foreach(var section in alarms.GroupBy(AlarmJob).OrderBy(section=>section.Key==0 ? uint.MaxValue:section.Key))
         {
@@ -402,30 +446,26 @@ internal sealed partial class MainWindow
                 finally{ImGui.PopID();}
             }
         }
+        return changed;
+    }
+
+    /// <summary>X-133 (0.1159): the Reminders tool's « Alarms » tab: the reminders' alarms, drawn as in the Alarms tool, saved the same way.</summary>
+    private void DrawReminderAlarms()
+    {
+        configuration.Alarms??=[];
+        var alarms=configuration.Alarms;
+        var shown=alarms.Where(IsReminderAlarm).ToList();
+        ImGui.TextWrapped(localization.Get("Reminders.AlarmsHelp"));
+        if(alarmStatus.Length>0)ImGui.TextColored(Accent,alarmStatus);
+        if(alarmGroupDeleteArmed is not null && ImGui.GetFrameCount()>alarmGroupDeleteSeenFrame+1)alarmGroupDeleteArmed=null;
+        if(shown.Count==0)ImGui.TextDisabled(localization.Get("Reminders.AlarmsEmpty"));
+        var now=DateTimeOffset.UtcNow;var remove=new List<TenshoAlarm>();var added=new List<TenshoAlarm>();
+        var changed=DrawAlarmGroups(shown,now,remove,added);
         if(remove.Any(alarm=>alarm.GameName.Length>0))alarmStatus=localization.Get("Alarms.DeleteInGame");
         foreach(var alarm in remove){alarms.Remove(alarm);changed=true;}
-        if(alarmService?.GameStatus is { } gameState)
-            ImGui.TextColored(gameState is "Done" or "Sending" ? Success:Accent,localization.Format("Alarms.GameState"+gameState,alarmService.Pending,GameAlarmCommand.GameMaximum));
-        // Manual daily alarm at an ET time.
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Alarms.ManualTitle"));
-        ImGui.SetNextItemWidth(160);ImGui.InputTextWithHint("##AlarmLabel",localization.Get("Alarms.ManualLabel"),ref alarmManualLabel,40);
-        Tip("Alarms.ManualLabelTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("##AlarmHour",ref alarmManualHour,0);
-        Tip("Alarms.ManualHourTip");
-        ImGui.SameLine();ImGui.TextUnformatted(":");ImGui.SameLine();ImGui.SetNextItemWidth(70);ImGui.InputInt("ET##AlarmMinute",ref alarmManualMinute,0);
-        Tip("Alarms.ManualMinuteTip");
-        alarmManualHour=Math.Clamp(alarmManualHour,0,23);alarmManualMinute=Math.Clamp(alarmManualMinute,0,59);
-        ImGui.SameLine();
-        if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
-            AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
-        // 0.386 (g, X-10): the same label at a real local date, once.
-        DrawManualDateAlarm();
         if(added.Count>0)AddAlarms(added);
         if(changed)
             try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=localization.Get("Alarms.SaveFailed");}
-        DrawGameAlarms();
     }
 
     // Short link to the Alarms module, where alarms are created.

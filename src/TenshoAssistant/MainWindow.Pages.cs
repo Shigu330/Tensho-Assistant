@@ -41,8 +41,8 @@ internal sealed partial class MainWindow
         new(Page.DutyLoot,"World",PageLabel("Category.DutyLoot"),DrawDutyLoot,"MainWindow.Duties.cs, Duties/"),
         new(Page.MonsterLoot,"World",PageLabel("Category.MonsterLoot"),DrawMonsterLoot,"MainWindow.Monsters.cs, Monsters/"),
         // X-100 (0.998, DEC-048): « Tracking », the timers and reminders together.
-        new(Page.Alarms,"Tracking",()=>localization.Format("Navigation.Alarms",configuration.Alarms?.Count ?? 0),DrawAlarmsPage,"MainWindow.Alarms.cs, Alarms/"),
-        new(Page.Reminders,"Tracking",PageLabel("Navigation.Reminders"),DrawReminders,"MainWindow.Reminders.cs, Reminders/"),
+        new(Page.Alarms,"Tracking",()=>localization.Format("Navigation.Alarms",AlarmsToolCount),DrawAlarmsPage,"MainWindow.Alarms.cs, Alarms/"),
+        new(Page.Reminders,"Tracking",()=>ReminderAlarmCount is var reminderAlarms and >0 ? localization.Format("Navigation.RemindersCount",reminderAlarms):localization.Get("Navigation.Reminders"),DrawReminders,"MainWindow.Reminders.cs, Reminders/"),
         new(Page.Garden,"Tracking",PageLabel("Navigation.Garden"),DrawGardenPage,"MainWindow.Garden.cs, MainWindow.GardenCrosses.cs"),
         new(Page.FreeCompany,"Tracking",PageLabel("Navigation.FreeCompany"),DrawFreeCompany,"MainWindow.FreeCompany.cs, MainWindow.RoutePlanner.cs, MainWindow.VesselBuilds.cs, FreeCompany/"),
         // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.

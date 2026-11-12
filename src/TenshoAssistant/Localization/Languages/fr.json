@@ -801,6 +801,7 @@
     "ClearNo": "Non"
   },
   "Navigation": {
+    "RemindersCount": "Rappels ({0})",
     "Wishlist": "Souhaits",
     "Discoveries": "Découvertes",
     "Fates": "ALEA",
@@ -5189,6 +5190,9 @@
     "Here": "Position"
   },
   "Reminders": {
+    "TabAlarms": "Alarmes ({0})",
+    "AlarmsHelp": "Les alarmes des rappels : celles posées avec une cloche de cette page et les automatiques (servants, voyages, escouade). Elles sonnent comme les autres alarmes (réglages de l'outil Alarmes) ; l'outil Alarmes liste les autres.",
+    "AlarmsEmpty": "Aucune alarme de rappel. Posez-en une avec la cloche à côté d'un minuteur, ou activez les alarmes automatiques dans les réglages de l'outil Alarmes.",
     "TabTimers": "Minuteurs",
     "TabTasks": "Mes tâches",
     "TabRoulettes": "Roulettes",

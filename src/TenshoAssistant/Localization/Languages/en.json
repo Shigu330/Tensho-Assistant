@@ -801,6 +801,7 @@
     "ClearNo": "No"
   },
   "Navigation": {
+    "RemindersCount": "Reminders ({0})",
     "Wishlist": "Wishlist",
     "Discoveries": "Discoveries",
     "Fates": "FATEs",
@@ -5189,6 +5190,9 @@
     "Here": "Position"
   },
   "Reminders": {
+    "TabAlarms": "Alarms ({0})",
+    "AlarmsHelp": "The alarms of the reminders: those set with a bell of this page and the automatic ones (ventures, voyages, squadron). They ring as the other alarms (Alarms tool settings); the Alarms tool lists the others.",
+    "AlarmsEmpty": "No reminder alarm. Set one with the bell beside a timer, or turn on the automatic alarms in the Alarms tool settings.",
     "TabTimers": "Timers",
     "TabTasks": "My tasks",
     "TabRoulettes": "Roulettes",
