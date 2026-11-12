@@ -33,10 +33,11 @@ internal static class CompetitiveGate
 
     /// <summary>
     /// 0.992 (the log shows « Long CompetitiveGate…Guarded » hitches at each load, 90 to 144 ms, without saying which reader): in developer mode, a
-    /// subscription that takes more than 50 ms is named in the log, once per reader.
+    /// subscription that takes more than 50 ms is named in the log, once per reader. X-177 (0.1162): at most every 5 minutes per reader, with its
+    /// worst time meanwhile (SlowNotes), so a reader slow at each zone change is seen again.
     /// </summary>
-    internal static Action<string,double>? SlowSubscription { get; set; }
-    private static readonly HashSet<string> slowNamed=[];
+    internal static Action<string,double,double>? SlowSubscription { get; set; }
+    private static readonly Diagnostics.SlowNotes slowNotes=new(TimeSpan.FromMinutes(5));
     private static void Timed(IFramework.OnUpdateDelegate handler,IFramework running)
     {
         if(Developer?.Invoke()!=true){handler(running);return;}
@@ -45,8 +46,8 @@ internal static class CompetitiveGate
         var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
         if(spent<=50)return;
         var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
-        lock(Gate){if(!slowNamed.Add(name))return;}
-        SlowSubscription?.Invoke(name,spent);
+        if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;
+        SlowSubscription?.Invoke(name,spent,worst);
     }
     public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)
     {

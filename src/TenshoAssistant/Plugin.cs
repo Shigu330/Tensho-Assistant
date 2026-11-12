@@ -124,7 +124,18 @@ public sealed class Plugin : IDalamudPlugin
             var newInstall = saved is null;
             var configuration = saved ?? new Configuration();
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
-            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (named once).",name,spent);
+            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
+            // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
+            // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.
+            var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
+            void SaveTimed(string what)
+            {
+                var started=System.Diagnostics.Stopwatch.GetTimestamp();
+                pluginInterface.SavePluginConfig(configuration);
+                var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+                if(saveNotes.Note(what,spent,Environment.TickCount64) is { } worst)
+                    log.Information("Slow settings save: {0} took {1:0} ms (worst {2:0} ms; named at most every 5 minutes).",what,spent,worst);
+            }
             autoBankCapture = () => configuration.AutoBankCapture;
             fontSettings = () => configuration.Fonts;
             if (configuration.Version != 1)
@@ -174,7 +185,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(() => { }, bankBridge.Dispose);
             bankOverlay = new BankImportOverlay(bank, bankBridge, localization);
             localization.SelectInitialLanguage(configuration.LanguageCode,client.ClientLanguage.ToString());
-            mainWindow = new MainWindow(configuration, () => pluginInterface.SavePluginConfig(configuration), log, localization,
+            mainWindow = new MainWindow(configuration, () => SaveTimed("window"), log, localization,
                 inventoryService, itemCatalog, recipeCatalog, gatheringCatalog, collections, market, itemHover, quests, characterStats, maps, macroObservations, macroChain, triadObservation, bank, bankBridge, textures, gameGui, duties, dutyLoot, monsterLoot,gpActions,fashionHints,fashionData,craftActions,craftLive,weather,cactpotObservation,gatheringObservation,itemUses,visualSort) { IsOpen = configuration.OpenOnLoad };
             registrations.Register(() => { }, mainWindow.Dispose);
             mainWindow.ConfigureDataCache(dataCache);
@@ -368,7 +379,7 @@ public sealed class Plugin : IDalamudPlugin
             if(migrated)try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
-            registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
+            registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>SaveTimed("alarms"),
                 ()=>weather.State.Catalog,(alarm,line)=>
                 {
                     // « label|minutes|local time » from the service, localized here.
@@ -639,7 +650,7 @@ public sealed class Plugin : IDalamudPlugin
             // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
             // converted at its first load and kept aside.
             var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);
-            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe,
+            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>SaveTimed("voyages"),log){Observed=voyageHistory.Observe,
                 // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
                 AirshipLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.AirshipDrop,item%1_000_000,sector,count,DateTimeOffset.UtcNow,hq:item>=1_000_000);},
                 SectorLoot=(item,sector,count,hq)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow,hq:hq);},
@@ -884,7 +895,7 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.ChallengeRows=()=>challengeRows;
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
-            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),
+            registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>SaveTimed("character status"),
                 ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters")),()=>characterStatus?.Dispose());
             mainWindow.CharacterStatusSource=characterStatus;
             // g, C-03 (0.357): items the armoire takes, for the storage report.
@@ -912,7 +923,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
             mainWindow.ChatLinkHistory=chatLinks?.History;
             Alarms.AutoAlarmWatcher? autoAlarms=null;
-            registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>pluginInterface.SavePluginConfig(configuration),localization.Get),
+            registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
             // g, X-02 (0.370): the music playing now (BGMSystem, memory only) and its roll (BGM file = OrchestrionPath file).
             Collections.BgmReader? bgm=null;
