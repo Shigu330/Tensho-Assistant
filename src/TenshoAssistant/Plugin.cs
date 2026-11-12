@@ -311,7 +311,8 @@ public sealed class Plugin : IDalamudPlugin
                 try
                 {
                     var aside=Discoveries.DiscoveryDatabase.ConvertFiles(discoveryFolder,DateTimeOffset.UtcNow,(path,error)=>log.Warning(error,"Discoveries {0} could not be read while converting; set aside.",Path.GetFileName(path)),
-                        merged=>log.Information("Discoveries: Discoveries.json written again after the conversion (an older version); {0} facts merged into the database.",merged));
+                        merged=>log.Information("Discoveries: Discoveries.json written again after the conversion (an older version); {0} facts merged into the database.",merged),
+                        (path,error)=>log.Information("Discoveries: {0} is held by another program for now and stays where it is; the next start sets it aside ({1}).",Path.GetFileName(path),error.Message));
                     database=new Discoveries.DiscoveryDatabase(databasePath);
                     var (mine,sharedCount)=database.Count();
                     log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared{3}.",database.LibraryVersion(),mine,sharedCount,
@@ -343,7 +344,7 @@ public sealed class Plugin : IDalamudPlugin
                 // never overwritten by an empty base; if it cannot even be moved, nothing is saved this session.
                 var read=Discoveries.DiscoveryFiles.ReadBase(saved,DateTimeOffset.UtcNow,(aside,error)=>log.Warning(error,"The discoveries could not be read; the file is set aside as {0}.",Path.GetFileName(aside)));
                 if(read.File is { } file)discoveries.Load(file);
-                if(read.Unsafe){mainWindow.DiscoveriesWriteBlocked=true;log.Error("The discoveries file could not be set aside: nothing is saved this session.");}
+                if(read.Unsafe){mainWindow.DiscoveriesWriteBlocked=true;log.Error("The discoveries file could not be read nor set aside: nothing is saved this session.");}
                 if(read.SetAside is { } setAside)
                 {
                     mainWindow.DiscoveriesSetAside=setAside;

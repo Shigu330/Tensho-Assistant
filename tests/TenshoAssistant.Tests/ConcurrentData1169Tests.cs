@@ -119,17 +119,25 @@ internal static class ConcurrentData1169Tests
             Check(Convert.ToInt64(TenshoDataDatabase.Scalar(open, "SELECT COUNT(*) FROM voyage_records;")) == 3, "three rows");
           }
         })),
-        ("Concurrent data 1169: two conversions of the discoveries at once: one whole base, the old files kept once, no temporary file left (N11)", () => InTemp(root =>
+        // 0.1197: this test failed once on a file « in use »: one conversion moved Discoveries.json aside while the other read it. Whatever
+        // the order the two threads take, the outcome is now the same (each race is replayed by hand in ConversionRaces1197Tests): twenty
+        // times here, where once showed little.
+        ("Concurrent data 1169: two conversions of the discoveries at once, 20 times: one whole base, the old files kept once, no temporary file left (N11)", () => InTemp(top =>
         {
+          for (var round = 0; round < 20; round++)
+          {
+            var root = Path.Combine(top, "round" + round); Directory.CreateDirectory(root);
             var main = Path.Combine(root, "Discoveries.json");
             var store = new DiscoveryStore(); store.Merge([Fact(4869), Fact(4870)]);
             DiscoveryFiles.WriteSplit(main, store.Snapshot(At), []);
             var errors = new System.Collections.Concurrent.ConcurrentBag<Exception>();
             Parallel.For(0, 2, _ => { try { DiscoveryDatabase.ConvertFiles(root, At, (_, error) => throw error); } catch (Exception error) { errors.Add(error); } });
-            Check(errors.IsEmpty, "no conversion failed: " + string.Join("; ", errors.Select(error => error.Message)));
-            Check(new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Count().Shared == 2, "the base holds both facts");
-            Check(Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*").Length == 0, "no temporary file left");
-            Check(!File.Exists(main) && Aside(root).Count(path => Path.GetFileName(path) == "Discoveries.json") == 1, "the old file kept aside once");
+            Check(errors.IsEmpty, $"round {round}: no conversion failed: " + string.Join("; ", errors.Select(error => error.Message)));
+            Check(new DiscoveryDatabase(Path.Combine(root, DiscoveryDatabase.FileName)).Count().Shared == 2, $"round {round}: the base holds both facts");
+            Check(Directory.GetFiles(root, DiscoveryDatabase.FileName + ".converting*").Length == 0, $"round {round}: no temporary file left");
+            Check(!File.Exists(main) && Aside(root).Count(path => Path.GetFileName(path) == "Discoveries.json") == 1, $"round {round}: the old file kept aside once");
+            Check(!Directory.Exists(DiscoveryFiles.SharedFolder(main)) && Directory.GetDirectories(root, "before-sqlite-*").SelectMany(Directory.GetDirectories).Count(path => Path.GetFileName(path).StartsWith("Shared", StringComparison.Ordinal)) == 1, $"round {round}: the shared files kept aside once");
+          }
         })),
         ("Concurrent data 1169: wiring (a file of before moved only once the data file is synced; read in an immediate transaction)", () =>
         {

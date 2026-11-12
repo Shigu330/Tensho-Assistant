@@ -114,12 +114,35 @@ internal static class DiscoveriesSqlite1136Tests
         {
             var path=Path.Combine(root,DiscoveryDatabase.FileName);
             var writer=new DiscoveryDatabase(path);var reader=new DiscoveryDatabase(path);
-            var store=new DiscoveryStore();var errors=0;var reads=0;
-            var stop=DateTime.UtcNow.AddSeconds(2);
-            var reading=Task.Run(()=>{while(DateTime.UtcNow<stop){try{_=reader.Count();reads++;}catch(SqliteException){errors++;}}});
-            for(uint round=0;DateTime.UtcNow<stop;round++){for(uint n=0;n<50;n++)store.SeeSource(DiscoveryKind.Desynthesis,round*50+n+1,1,1,At);Save(store,writer);}
-            reading.Wait();
-            Check(reads>10 && errors==0,$"reads {reads}, errors {errors}");
+            var store=new DiscoveryStore();
+            for(uint n=1;n<=50;n++)store.SeeSource(DiscoveryKind.Desynthesis,n,1,1,At);
+            Save(store,writer);
+            // 0.1197: no clock in the proof (it counted the reads of two seconds and wanted more than ten: a slow machine made four, « reads 4,
+            // errors 0 »). A write under way for sure: rows written on a connection of its own and not committed yet; the other reader reads at
+            // once, and reads the last save whole; then the write once committed.
+            using(var open=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=path,Pooling=false}.ToString()))
+            {
+                open.Open();using var transaction=open.BeginTransaction();using var command=open.CreateCommand();command.Transaction=transaction;
+                command.CommandText="DELETE FROM facts;";command.ExecuteNonQuery();
+                Check(reader.Count()==(50,0),"read in the middle of a write: the last save, whole");
+                transaction.Commit();
+            }
+            Check(reader.Count()==(0,0),"and the write, once committed");
+            // Then the game saving forty times in a row while the other reader reads without a pause: as many reads as the machine manages
+            // (one at least, whatever its speed), none refused, and every save in the file.
+            var errors=0;var reads=0;var saves=0;
+            var saving=Task.Run(()=>
+            {
+                for(uint round=0;round<40;round++)
+                {
+                    for(uint n=0;n<50;n++)store.SeeSource(DiscoveryKind.Desynthesis,1000+round*50+n,1,1,At);
+                    Save(store,writer);Interlocked.Increment(ref saves);
+                }
+            });
+            do{try{_=reader.Count();reads++;}catch(SqliteException){errors++;}}while(!saving.IsCompleted);
+            saving.Wait();
+            Check(errors==0 && reads>=1 && saves==40,$"reads {reads}, errors {errors}, saves {saves}");
+            Check(reader.Count()==(2000,0),"every save is in the file: "+reader.Count());
             using(var open=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=path,Pooling=false}.ToString()))
             {open.Open();using var command=open.CreateCommand();command.CommandText="PRAGMA user_version=2;";command.ExecuteNonQuery();}
             var refused=false;

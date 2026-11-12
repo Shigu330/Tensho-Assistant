@@ -792,11 +792,22 @@ public static class DiscoveryFiles
         }
         catch(Exception caught){error=caught;}
         if(error is null)return (file,null,false);
+        // X-182 (0.1197): gone while it was read (another client of the game set it aside): not there. Held by another program for now:
+        // not a damaged file, so neither reported as one nor renamed (the rename would succeed the instant it is let go, and an empty base
+        // would take its place): left as it is, nothing may be written this session.
+        if(Away(error))return (null,null,false);
+        if(Busy(error))return (null,null,true);
         var aside=SetAsideName(path,now);
         broken(aside,error);
         try{File.Move(path,aside,false);return (null,aside,false);}
         catch(Exception){return (null,aside,true);}
     }
+
+    /// <summary>X-182 (0.1197): the file went away between the moment it was seen and the moment it was read.</summary>
+    public static bool Away(Exception error)=>error is FileNotFoundException or DirectoryNotFoundException;
+    /// <summary>X-182 (0.1197): the file is there but cannot be opened for now: another program holds it without sharing it (Windows'
+    /// sharing and lock violations, 32 and 33), or access is refused. Its content is not in question.</summary>
+    public static bool Busy(Exception error)=>error is UnauthorizedAccessException || error is IOException && (error.HResult&0xFFFF) is 32 or 33;
 
     /// <summary>X-93 part 2 (0.1039): « Discoveries.json.broken-yyyyMMdd-HHmmss », with « -2 », « -3 »… when that name is taken.</summary>
     public static string SetAsideName(string path,DateTimeOffset now)
@@ -854,18 +865,21 @@ public static class DiscoveryFiles
     public static DiscoveryFile? ReadSharedKind(string mainPath,DiscoveryKind kind,Action<string,Exception> broken)
     {
         var path=SharedPath(SharedFolder(mainPath),kind);
-        return File.Exists(path) ? ReadSharedFile(path,broken):null;
+        return File.Exists(path) ? ReadSharedFile(path,broken,null):null;
     }
 
-    /// <summary>X-93 (0.940): every shared kind file next to the main file (unreadable ones reported through <paramref name="broken"/> and set aside).</summary>
-    public static IEnumerable<DiscoveryFile> ReadShared(string mainPath,Action<string,Exception> broken)
+    /// <summary>X-93 (0.940): every shared kind file next to the main file (unreadable ones reported through <paramref name="broken"/> and set aside).
+    /// X-182 (0.1197): a file gone while read is left out; one held by another program for now is told through <paramref name="busy"/> and left as it is.</summary>
+    public static IEnumerable<DiscoveryFile> ReadShared(string mainPath,Action<string,Exception> broken,Action<string,Exception>? busy=null)
     {
         var folder=SharedFolder(mainPath);
-        if(!Directory.Exists(folder))yield break;
-        foreach(var path in Directory.GetFiles(folder,"kind-*.json.gz").Order(StringComparer.Ordinal))
-            if(ReadSharedFile(path,broken) is { } file)yield return file;
+        string[] paths;
+        try{paths=Directory.Exists(folder) ? Directory.GetFiles(folder,"kind-*.json.gz"):[];}
+        catch(DirectoryNotFoundException){paths=[];}
+        foreach(var path in paths.Order(StringComparer.Ordinal))
+            if(ReadSharedFile(path,broken,busy) is { } file)yield return file;
     }
-    private static DiscoveryFile? ReadSharedFile(string path,Action<string,Exception> broken)
+    private static DiscoveryFile? ReadSharedFile(string path,Action<string,Exception> broken,Action<string,Exception>? busy)
     {
         {
             DiscoveryFile? file=null;
@@ -880,7 +894,13 @@ public static class DiscoveryFiles
                 file=JsonSerializer.Deserialize<DiscoveryFile>(bounded.ToArray(),Options);
                 if(!DiscoveryFile.Readable(file))throw new InvalidDataException("Unknown shared discoveries file.");
             }
-            catch(Exception error){broken(path,error);try{File.Move(path,path+".broken",true);}catch(Exception){}return null;}
+            catch(Exception error)
+            {
+                // X-182 (0.1197): gone while read, or held for now: not a damaged file; never renamed « .broken » for it.
+                if(Away(error))return null;
+                if(Busy(error)){busy?.Invoke(path,error);return null;}
+                broken(path,error);try{File.Move(path,path+".broken",true);}catch(Exception){}return null;
+            }
             return file;
         }
     }

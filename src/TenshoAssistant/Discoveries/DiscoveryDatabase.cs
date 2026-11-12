@@ -163,31 +163,49 @@ public sealed class DiscoveryDatabase
     /// start goes on from there. Returns the folder of the old files when it moved some.
     /// </summary>
     /// <param name="merged">X-182 (0.1173, N3): told how many facts of a Discoveries.json written again after the conversion were merged.</param>
-    public static string? ConvertFiles(string folder,DateTimeOffset now,Action<string,Exception> broken,Action<int>? merged=null)
+    /// <param name="stayed">X-182 (0.1197): told when a file of before could not be moved aside for now (held by another program): it stays, the next start moves it.</param>
+    /// <param name="between">The test's stop between the temporary database and its move into place (given the temporary path).</param>
+    public static string? ConvertFiles(string folder,DateTimeOffset now,Action<string,Exception> broken,Action<int>? merged=null,Action<string,Exception>? stayed=null,Action<string>? between=null)
     {
         var target=System.IO.Path.Combine(folder,FileName);
         var main=System.IO.Path.Combine(folder,"Discoveries.json");var shared=DiscoveryFiles.SharedFolder(main);
-        var old=File.Exists(main) || Directory.Exists(shared) && Directory.GetFiles(shared,"kind-*.json.gz").Length>0;
+        // X-182 (0.1169, night review N11): leftovers of a stopped conversion removed once they are old. 0.1197: at every start (a lost race
+        // whose temporary file could not be removed at once had no later conversion to remove it), and never an error.
+        if(Directory.Exists(folder))
+            foreach(var leftover in Directory.EnumerateFiles(folder,FileName+".converting*"))
+                try{if(DateTime.UtcNow-File.GetLastWriteTimeUtc(leftover)>TimeSpan.FromMinutes(30))File.Delete(leftover);}
+                catch(IOException){}catch(UnauthorizedAccessException){}
+        var old=File.Exists(main) || HasKinds(shared);
         if(!File.Exists(target) && old)
         {
-            // X-182 (0.1169, night review N11): a temporary name of this conversion only (a second client converting at the same time never removes
-            // it); leftovers of a stopped conversion removed once they are old; the result moved without overwriting: the first one in stays.
+            // X-182 (0.1169, N11): a temporary name of this conversion only (a second client converting at the same time never removes it);
+            // the result moved without overwriting: the first one in stays.
             var temporary=target+".converting-"+Guid.NewGuid().ToString("N");
-            foreach(var leftover in Directory.EnumerateFiles(folder,FileName+".converting*"))
-                if(DateTime.UtcNow-File.GetLastWriteTimeUtc(leftover)>TimeSpan.FromMinutes(30))try{File.Delete(leftover);}catch(IOException){}
             var store=new DiscoveryStore();
+            Exception? busy=null;
             var read=DiscoveryFiles.ReadBase(main,now,broken);
-            if(read.Unsafe)throw new IOException("The discoveries file could not be read nor set aside: nothing converted.");
             if(read.File is { } file)store.Load(file);
-            foreach(var kind in DiscoveryFiles.ReadShared(main,broken))store.LoadShared(kind);
-            var database=new DiscoveryDatabase(temporary);
-            database.Write(store.Snapshot(now).Facts,[],false);
-            database.Checkpoint();
-            SqliteConnection.ClearAllPools();
-            try{File.Move(temporary,target);}
-            catch(IOException) when(File.Exists(target))
+            foreach(var kind in DiscoveryFiles.ReadShared(main,broken,(_,error)=>busy??=error))store.LoadShared(kind);
+            // X-182 (0.1197): the files of before are moved aside only once a database is in place, so a file that went away while this
+            // client read it means the other client's database is in: this one's, read from what was left, is never put in place (the move
+            // below does not overwrite). A file held for now: nothing is converted from a part of the base; the next start tries again.
+            if((read.Unsafe || busy is not null) && !File.Exists(target))
+                throw new IOException("A discoveries file of before could not be read nor set aside for now: nothing converted, the next start tries again.",busy);
+            if(!File.Exists(target))
             {
-                foreach(var mine in new[]{temporary,temporary+"-wal",temporary+"-shm"})if(File.Exists(mine))File.Delete(mine);
+                try
+                {
+                    var database=new DiscoveryDatabase(temporary);
+                    database.Write(store.Snapshot(now).Facts,[],false);
+                    database.Checkpoint();
+                    SqliteConnection.ClearAllPools();
+                    between?.Invoke(temporary);
+                    AtomicFile.MoveWhenFree(temporary,target);
+                }
+                catch(IOException) when(File.Exists(target)){}
+                // 0.1197: this conversion's own temporary files never stay in the way nor fail the conversion (what cannot be removed now is
+                // a leftover, removed at a later start).
+                finally{foreach(var mine in new[]{temporary,temporary+"-wal",temporary+"-shm"})AtomicFile.DeleteWhenFree(mine);}
             }
         }
         // X-182 (0.1173, night review N3): the database is there and Discoveries.json came back (an older version still running, or a build of an
@@ -197,14 +215,27 @@ public sealed class DiscoveryDatabase
         {
             var read=DiscoveryFiles.ReadBase(main,now,(path,error)=>{if(File.Exists(main))broken(path,error);});
             if(read.File is { } again)merged?.Invoke(new DiscoveryDatabase(target).MergeFound(again.Facts));
+            // 0.1197: held for now: nothing merged, and the file is not set aside before it could be read: the next start merges it.
+            else if(read.Unsafe && read.SetAside is null)return null;
         }
         if(!old)return null;
         var aside=System.IO.Path.Combine(folder,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
-        Directory.CreateDirectory(aside);
+        var moved=false;
         // X-182 (0.1173): a name already taken there (two moves in one second) gets a suffix; the move is never refused for it.
-        try{if(File.Exists(main))File.Move(main,Free(System.IO.Path.Combine(aside,"Discoveries.json")));}catch(IOException) when(!File.Exists(main)){}
-        try{if(Directory.Exists(shared))Directory.Move(shared,Free(System.IO.Path.Combine(aside,"Shared")));}catch(IOException) when(!Directory.Exists(shared)){}
-        return aside;
+        // 0.1197: a file of before that cannot be moved for now (the other client is still reading it, a scanner holds it) stays where it is:
+        // the database is whole and the next start sets the file aside; the conversion never fails for it (a failure here, the database
+        // in place, read as « the database could not be opened » and nothing was saved that session). The folder is made only for a move.
+        try{if(File.Exists(main)){Directory.CreateDirectory(aside);File.Move(main,Free(System.IO.Path.Combine(aside,"Discoveries.json")));moved=true;}}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){if(File.Exists(main))stayed?.Invoke(main,error);}
+        try{if(Directory.Exists(shared)){Directory.CreateDirectory(aside);Directory.Move(shared,Free(System.IO.Path.Combine(aside,"Shared")));moved=true;}}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){if(Directory.Exists(shared))stayed?.Invoke(shared,error);}
+        return moved ? aside:null;
+    }
+    // 0.1197: the folder can be moved aside by the other client between the two looks.
+    private static bool HasKinds(string shared)
+    {
+        try{return Directory.Exists(shared) && Directory.GetFiles(shared,"kind-*.json.gz").Length>0;}
+        catch(DirectoryNotFoundException){return false;}
     }
     private static string Free(string path)
     {
