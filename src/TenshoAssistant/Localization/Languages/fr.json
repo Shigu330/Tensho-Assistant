@@ -801,6 +801,7 @@
     "ClearNo": "Non"
   },
   "Navigation": {
+    "GardenCount": "Jardinage ({0})",
     "RemindersCount": "Rappels ({0})",
     "Wishlist": "Souhaits",
     "Discoveries": "Découvertes",
@@ -6064,6 +6065,17 @@
     "Logged": "Escouade écrite dans le journal de Dalamud."
   },
   "Garden": {
+    "TabGarden": "Jardin",
+    "TabAlarms": "Alarmes ({0})",
+    "AlarmsHelp": "Les alarmes du jardin encore à venir, d'après le journal : le prochain entretien de chaque lit et sa récolte. Elles sonnent dans le chat (et dans l'application de bureau) tant que « Me le rappeler dans le chat » est activé (onglet Jardin, journal).",
+    "AlarmsOff": "Les rappels du jardin sont désactivés : aucune alarme du jardin ne sonne. Activez « Me le rappeler dans le chat » dans l'onglet Jardin (journal).",
+    "AlarmsEmpty": "Aucune alarme du jardin à venir : notez une plantation dans le journal (onglet Jardin).",
+    "AlarmsWhen": "Quand",
+    "AlarmsWhat": "Alarme",
+    "AlarmsSeed": "Graine",
+    "AlarmsPlace": "Lieu",
+    "AlarmRipe": "Mûr",
+    "AlarmTend": "À soigner",
     "CareSeveral": "Jardin : plusieurs emplacements sont notés ici et le jeu ne dit pas lequel : mettez-le à jour dans la page Jardin.",
     "HarvestNoneRipe": "Jardin : récolte vue, mais aucun emplacement noté ici n'est mûr : rien n'est retiré du journal.",
     "HarvestedNotice": "Jardin : {0} récolté, retiré du journal — {1}.",

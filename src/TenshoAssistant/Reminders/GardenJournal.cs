@@ -87,6 +87,23 @@ public static class GardenJournal
     public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>
+    /// X-132 (0.1160, user request of 11/11): the garden's alarms still to ring, as the Garden tool's « Alarms » tab lists them: per bed its
+    /// next tending (when it comes before the harvest) and its harvest, ordered by time, then by place. A passed one is not listed (it was said
+    /// in the chat; the journal shows the bed's state); a bed planted in the future (clock change) neither.
+    /// </summary>
+    public static IReadOnlyList<(GardenBed Bed,GardenState Kind,DateTimeOffset At)> Alarms(IEnumerable<GardenBed>? beds,DateTimeOffset now)
+    {
+        var alarms=new List<(GardenBed Bed,GardenState Kind,DateTimeOffset At)>();
+        foreach(var bed in beds ?? [])
+        {
+            if(bed.PlantedAt>now)continue;
+            if(TendAt(bed) is { } tend && tend>now)alarms.Add((bed,GardenState.ToTend,tend));
+            if(RipeAt(bed) is var ripe && ripe>now)alarms.Add((bed,GardenState.Ripe,ripe));
+        }
+        return [.. alarms.OrderBy(alarm=>alarm.At).ThenBy(alarm=>alarm.Bed.Place,StringComparer.Ordinal)];
+    }
+
+    /// <summary>
     /// The reminders due now, each said once: a bed that became ripe, or whose tending came due. Marks them said on the beds (the
     /// caller saves). A bed planted in the future (clock change) says nothing.
     /// </summary>

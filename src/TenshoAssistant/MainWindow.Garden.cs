@@ -82,8 +82,49 @@ internal sealed partial class MainWindow
     private void DrawGardenPage()
     {
         Heading(localization.Get("Garden.PageTitle"),localization.Get("Garden.PageDescription"));
-        DrawGardenJournal();
-        DrawGardenCrosses();
+        // X-132 (0.1160, user request of 11/11): the garden's alarms in their own tab, their number beside « Garden » in the tools' menu.
+        DetailTabs("GardenTabs",
+        [
+            ("Garden",localization.Get("Garden.TabGarden"),()=>{DrawGardenJournal();DrawGardenCrosses();}),
+            ("Alarms",localization.Format("Garden.TabAlarms",GardenAlarmCount),()=>DrawGardenAlarms()),
+        ],ref gardenTabFocus);
+    }
+
+    private string? gardenTabFocus;
+
+    /// <summary>X-132 (0.1160): the garden's alarms still to ring while the garden reminders are on (0 when they are off).</summary>
+    private int GardenAlarmCount=>configuration.GardenAlerts ? GardenJournal.Alarms(configuration.GardenBeds,DateTimeOffset.UtcNow).Count:0;
+
+    /// <summary>X-132 (0.1160): the « Alarms » tab: each coming tending and harvest of the journal's beds, with its time.</summary>
+    private void DrawGardenAlarms()
+    {
+        ImGui.TextWrapped(localization.Get("Garden.AlarmsHelp"));
+        if(!configuration.GardenAlerts){ImGui.TextColored(Warning,localization.Get("Garden.AlarmsOff"));return;}
+        var now=DateTimeOffset.UtcNow;
+        var alarms=GardenJournal.Alarms(configuration.GardenBeds,now);
+        if(alarms.Count==0){EmptyState("Garden.AlarmsEmpty");return;}
+        if(!ImGui.BeginTable("GardenAlarms",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.SizingStretchProp))return;
+        try
+        {
+            ImGui.TableSetupColumn(localization.Get("Garden.AlarmsWhen"));
+            ImGui.TableSetupColumn(localization.Get("Garden.AlarmsWhat"));
+            ImGui.TableSetupColumn(localization.Get("Garden.AlarmsSeed"));
+            ImGui.TableSetupColumn(localization.Get("Garden.AlarmsPlace"));
+            ImGui.TableHeadersRow();
+            foreach(var (bed,kind,at) in alarms)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(InText(at,now));
+                ImGui.TableNextColumn();
+                ImGui.TextColored(kind==GardenState.Ripe ? Success:Accent,localization.Get(kind==GardenState.Ripe ? "Garden.AlarmRipe":"Garden.AlarmTend"));
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(bed.Seed);
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(bed.Place);
+            }
+        }
+        finally{ImGui.EndTable();}
     }
 
     private void DrawGardenJournal()

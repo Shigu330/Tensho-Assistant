@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1160.0
+- Plan global, X-132 : Jardinage (X-132, demande du 11/11) : les alarmes du jardin ont leur onglet « Alarmes » dans l'outil Jardinage : pour chaque lit ou pot du journal, son prochain entretien (quand il vient avant la récolte) et sa récolte, dans l'ordre du temps, avec l'heure et le temps restant ; leur nombre s'affiche à côté de « Jardinage » dans le menu des outils, tant que « Me le rappeler dans le chat » est activé. Le journal et les croisements sont dans l'onglet « Jardin ». Ces alarmes n'ont jamais été des alarmes Tensho : l'outil Alarmes et son chiffre ne les comptent pas. Elles sonnent comme avant (chat, et application de bureau).
+- Tests : GardenAlarms1160Tests. Verify.ps1 (agent) : 1978/1978, 0 avertissement, 0 erreur ; DLL 0.1160.0.0. Non validé en jeu.
+### English
+- Garden (X-132, request of 11/11): the garden's alarms have their « Alarms » tab in the Garden tool: for each bed or pot of the journal, its next tending (when it comes before the harvest) and its harvest, in time order, with the time and the time left; their number shows beside « Garden » in the tools' menu while « Remind me in the chat » is on. The journal and the crossbreeds are in the « Garden » tab. Those alarms were never Tensho alarms: the Alarms tool and its count do not hold them. They ring as before (chat, and the desktop application).
+
 ## 0.1159.0
 - Plan global, X-133 : Rappels et Alarmes (X-133, demande du 11/11) : les alarmes de rappel (posées avec une cloche de l'outil Rappels, et les alarmes automatiques des servants, voyages et escouade) sont listées dans un nouvel onglet « Alarmes » de l'outil Rappels, avec les mêmes boutons que l'outil Alarmes (activer, délai, rappeler plus tard, supprimer…), et leur nombre s'affiche à côté de « Rappels » dans le menu des outils. L'outil Alarmes garde les autres alarmes, sans les alarmes de rappel ni dans sa liste ni dans son chiffre. Elles sonnent comme avant. Une seule façon de dessiner les alarmes sert les deux outils.
 - Tests : ReminderAlarms1159Tests. Verify.ps1 (agent) : 1976/1976, 0 avertissement, 0 erreur ; DLL 0.1159.0.0. Non validé en jeu.

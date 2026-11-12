@@ -801,6 +801,7 @@
     "ClearNo": "No"
   },
   "Navigation": {
+    "GardenCount": "Garden ({0})",
     "RemindersCount": "Reminders ({0})",
     "Wishlist": "Wishlist",
     "Discoveries": "Discoveries",
@@ -6064,6 +6065,17 @@
     "Logged": "Squadron written to the Dalamud log."
   },
   "Garden": {
+    "TabGarden": "Garden",
+    "TabAlarms": "Alarms ({0})",
+    "AlarmsHelp": "The garden's alarms still to ring, from the journal: each bed's next tending and its harvest. They ring in the chat (and in the desktop app) while « Remind me in the chat » is on (Garden tab, journal).",
+    "AlarmsOff": "The garden reminders are off: no garden alarm rings. Turn on « Remind me in the chat » in the Garden tab (journal).",
+    "AlarmsEmpty": "No garden alarm to come: note a planting in the journal (Garden tab).",
+    "AlarmsWhen": "When",
+    "AlarmsWhat": "Alarm",
+    "AlarmsSeed": "Seed",
+    "AlarmsPlace": "Place",
+    "AlarmRipe": "Ripe",
+    "AlarmTend": "To tend",
     "CareSeveral": "Garden: several beds are noted here and the game does not say which one: update it in the Garden page.",
     "HarvestNoneRipe": "Garden: a harvest seen, but no bed noted here is ripe: nothing removed from the journal.",
     "HarvestedNotice": "Garden: {0} harvested, removed from the journal — {1}.",
