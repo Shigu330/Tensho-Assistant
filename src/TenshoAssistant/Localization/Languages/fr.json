@@ -1696,7 +1696,9 @@
     "DesktopSound": "Application de bureau : son Windows",
     "DesktopSoundTip": "Quand l'application de bureau fait sonner une alarme (une ligne dans sa barre d'état), elle joue aussi le son « exclamation » de Windows.\nPar défaut : activé.",
     "DesktopOnlyGameBehind": "Application de bureau : seulement si le jeu n'est pas au premier plan",
-    "DesktopOnlyGameBehindTip": "L'application de bureau ne fait sonner une alarme que si le jeu n'est pas la fenêtre au premier plan (le jeu la fait sonner alors). Décoché : elle sonne des deux côtés.\nPar défaut : activé."
+    "DesktopOnlyGameBehindTip": "L'application de bureau ne fait sonner une alarme que si le jeu n'est pas la fenêtre au premier plan (le jeu la fait sonner alors). Décoché : elle sonne des deux côtés.\nPar défaut : activé.",
+    "DesktopNotification": "Application de bureau : notification Windows",
+    "DesktopNotificationTip": "Quand l'application de bureau fait sonner une alarme, elle montre aussi une notification Windows (depuis son icône de la zone de notification ; le mode « ne pas déranger » de Windows s'applique). Sans son : le son est celui de l'option « son Windows ».\nPar défaut : activé."
   },
   "CraftMacro": {
     "MacroChain": "Macro Chain (Caraxi) est chargé : les pages enchaînées finissent par « /nextmacro », géré par Macro Chain, au lieu du marqueur de Tensho.",

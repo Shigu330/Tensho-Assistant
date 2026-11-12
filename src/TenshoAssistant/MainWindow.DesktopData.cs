@@ -192,6 +192,8 @@ internal sealed partial class MainWindow
     // X-163 (0.1132): the alarms the desktop application rings now (AlarmBell: the plugin's rule, the application's own memory), as lines
     // in the plugin's language, and whether it plays a sound. Called by the application once a second, by its name (DesktopData1131Tests).
     // An alarm due while the game is in front is marked rung and not shown when DesktopOnlyGameBehind is on: it rings in the game.
+    // X-163 (0.1154): whether the application also shows a Windows notification for them; called by its name (DesktopNotice1154Tests).
+    internal bool DesktopAlarmNotification()=>(configuration.AlarmOptions ?? new()).DesktopNotification;
     private Alarms.AlarmBell? desktopBell;
     private Reminders.GardenBell? desktopGarden;
     internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)

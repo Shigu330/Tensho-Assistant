@@ -129,6 +129,8 @@ internal static class Program
         // X-119 step 2, part 2 (0.1131): the plugin's saved data, read from the app's own copy of the plugin's folder (never in a headless run).
         // X-163 (0.1132): the application rings the alarms (never in a headless run).
         status.Bell=true;
+        // X-163 (0.1154): its Windows notification, from the application's own window.
+        status.Window=window!.Hwnd;
         if(settings is not null){status.Data=(Path.Combine(Path.GetDirectoryName(settings)!,"TenshoAssistant"),Path.Combine(Own,"mirror"));status.ReadData();}
         // X-119 step 2 (0.1081): the local link, read-only: connects when the plugin offers it (Settings › Advanced, off by default).
         using var link=args.Contains("--no-link") ? null : new TenshoAssistant.Link.LocalLinkClient(TenshoAssistant.Link.LocalLinkProtocol.PipeName());
@@ -217,6 +219,7 @@ internal static class Program
             if(capture is not null)Thread.Sleep(16);
             if(end)break;
         }
+        status.Close();
         window.Dispose();
         return 0;
     }

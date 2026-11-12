@@ -26,6 +26,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `AlarmBarTooltip` | bool | true | Settings › General | **Tensho tooltip under the icon** — Hovering one of Tensho's server bar entries (alarms, reminders, currencies, gil) shows Tensho's own tooltip next to it, above every window (the game's goes under plugin windows such as the Tensho map, and it may open on either side). Unticked: the game's tooltip. Default: on. |
 | `AlarmBarTooltipCount` | int | 5 | Settings › General | **Alarms listed** — Number of upcoming alarms shown in the tooltip (1 to 10). Default: 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Settings › Tracking | **Automatic alarms (retainer ventures, vessels, squadron)** — Creates a Tensho alarm at the end of each retainer venture (known once the retainer list was opened) and at each vessel's return (known after the workshop). The time follows the readings; the alarm goes an hour after it rang. No game alarm is ever made automatically. Default: on. |
+| `AlarmOptions.DesktopNotification` | bool | true | Settings › Tracking | **Desktop app: Windows notification** — When the desktop application rings an alarm, it also shows a Windows notification (from its icon in the notification area; Windows' do not disturb applies). Silent: the sound is the « Windows sound » option's. Default: on. |
 | `AlarmOptions.DesktopOnlyGameBehind` | bool | true | Settings › Tracking | **Desktop app: only when the game is not in front** — The desktop application rings an alarm only while the game is not the window in front (the game rings it then). Unticked: it rings in both. Default: on. |
 | `AlarmOptions.DesktopSound` | bool | true | Settings › Tracking | **Desktop app: Windows sound** — When the desktop application rings an alarm (a line in its status bar), it also plays Windows' exclamation sound. Default: on. |
 | `AlarmOptions.DutyPopAlert` | bool | false | Settings › Tracking | **Alert when a duty is ready** — A chat line and the alarm sound when the Duty Finder finds your party (same silence rules in duties). Also sent to Discord when its « Duty ready » category is ticked. Default: off. |
@@ -310,7 +311,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 256 controls (249 linked to `Configuration`, 7 to another file), 32 settings without a control.
+Counted: 257 controls (250 linked to `Configuration`, 7 to another file), 32 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -342,6 +343,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `AlarmBarTooltip` | bool | true | Paramètres › Général | **Infobulle Tensho sous l'icône** — Au survol d'une entrée de Tensho dans la barre du serveur (alarmes, rappels, monnaies, gils), Tensho affiche sa propre infobulle contre elle, par-dessus toutes les fenêtres (celle du jeu passe sous les fenêtres des plugins, dont la carte Tensho, et peut s'ouvrir d'un côté ou de l'autre). Décoché : l'infobulle du jeu. Par défaut : activé. |
 | `AlarmBarTooltipCount` | int | 5 | Paramètres › Général | **Alarmes listées** — Nombre de prochaines alarmes affichées dans l'infobulle (1 à 10). Par défaut : 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Paramètres › Suivi et notifications | **Alarmes automatiques (tâches de servant, vaisseaux, escouade)** — Crée d'office une alarme Tensho à la fin de chaque tâche de servant (connue après avoir ouvert la liste des servants) et au retour de chaque vaisseau (connu après l'atelier). L'heure suit les relevés ; l'alarme disparaît une heure après avoir sonné. Aucune alarme du jeu n'est créée d'office. Par défaut : activé. |
+| `AlarmOptions.DesktopNotification` | bool | true | Paramètres › Suivi et notifications | **Application de bureau : notification Windows** — Quand l'application de bureau fait sonner une alarme, elle montre aussi une notification Windows (depuis son icône de la zone de notification ; le mode « ne pas déranger » de Windows s'applique). Sans son : le son est celui de l'option « son Windows ». Par défaut : activé. |
 | `AlarmOptions.DesktopOnlyGameBehind` | bool | true | Paramètres › Suivi et notifications | **Application de bureau : seulement si le jeu n'est pas au premier plan** — L'application de bureau ne fait sonner une alarme que si le jeu n'est pas la fenêtre au premier plan (le jeu la fait sonner alors). Décoché : elle sonne des deux côtés. Par défaut : activé. |
 | `AlarmOptions.DesktopSound` | bool | true | Paramètres › Suivi et notifications | **Application de bureau : son Windows** — Quand l'application de bureau fait sonner une alarme (une ligne dans sa barre d'état), elle joue aussi le son « exclamation » de Windows. Par défaut : activé. |
 | `AlarmOptions.DutyPopAlert` | bool | false | Paramètres › Suivi et notifications | **Alerte quand une mission est prête** — Une ligne dans la discussion et le son des alarmes quand l'outil de recherche de mission trouve votre groupe (mêmes règles de silence en mission). Envoyée aussi à Discord si la catégorie « Mission prête » y est cochée. Par défaut : désactivé. |
@@ -626,5 +628,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 256 cases (249 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
+Compté : 257 cases (250 reliées à `Configuration`, 7 à un autre fichier), 32 réglages sans case.
 <!-- /docgen:settings-fr -->

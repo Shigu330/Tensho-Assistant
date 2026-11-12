@@ -510,6 +510,9 @@ internal sealed partial class MainWindow
             value=>(configuration.AlarmOptions??=new()).DesktopSound=value,c=>c.AlarmOptions?.DesktopSound!=false);
         BoolSetting("Alarms.DesktopOnlyGameBehind","Alarms.DesktopOnlyGameBehindTip",()=>configuration.AlarmOptions?.DesktopOnlyGameBehind!=false,
             value=>(configuration.AlarmOptions??=new()).DesktopOnlyGameBehind=value,c=>c.AlarmOptions?.DesktopOnlyGameBehind!=false);
+        // X-163 (0.1154): the desktop application's Windows notification.
+        BoolSetting("Alarms.DesktopNotification","Alarms.DesktopNotificationTip",()=>configuration.AlarmOptions?.DesktopNotification!=false,
+            value=>(configuration.AlarmOptions??=new()).DesktopNotification=value,c=>c.AlarmOptions?.DesktopNotification!=false);
         // R-12 (0.319): Discord webhook, saved on its own.
         DrawDiscordSettings();
         if(page!=Page.Alarms && ImGui.SmallButton(localization.Get("Alarms.Open"))){page=Page.Alarms;}

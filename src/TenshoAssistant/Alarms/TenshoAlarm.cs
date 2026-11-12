@@ -79,6 +79,8 @@ public sealed class AlarmSettings
     // the game is not the window in front (it rings in the game then).
     public bool DesktopSound { get; set; } = true;
     public bool DesktopOnlyGameBehind { get; set; } = true;
+    // X-163 (0.1154): and a Windows notification (the application's notification-area icon), on by default like the sound.
+    public bool DesktopNotification { get; set; } = true;
 
     /// <summary>
     /// X-76 H3 (0.914): a separate copy with every field (all are values). The settings page edits the copy and saves it, so the saved

@@ -28,6 +28,9 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     private Grouped<object?>? reload;
     /// <summary>X-163 (0.1132): the application rings the alarms (off in a headless run); the lines shown for a minute after they rang.</summary>
     public bool Bell;
+    /// <summary>X-163 (0.1154): the application's window, owner of the notification icon (zero: no notification, e.g. headless).</summary>
+    public IntPtr Window;
+    private readonly DesktopNotice notice=new();
     private DateTimeOffset nextBell;
     private readonly List<(string Text,DateTimeOffset Until)> rang=[];
     /// <summary>X-119 step 2, part 2 (0.1131): the plugin's folder and the app's copy of it (null: the saved data are not read, e.g. headless).</summary>
@@ -104,7 +107,11 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(lines.Length==0)return;
         foreach(var line in lines){rang.Add((line,now.AddMinutes(1)));Console.WriteLine("Alarm: "+line);}
         if(sound)DesktopGame.Beep();
+        if(Window!=IntPtr.Zero && host.AlarmNotification())notice.Show(Window,lines);
     }
+
+    /// <summary>X-163 (0.1154): the notification icon removed when the application closes.</summary>
+    public void Close()=>notice.Remove();
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
 

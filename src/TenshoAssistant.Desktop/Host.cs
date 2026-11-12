@@ -161,6 +161,14 @@ internal sealed class Host
     }
     private MethodInfo? due;
 
+    /// <summary>X-163 (0.1154): whether the alarms rung also show a Windows notification, from MainWindow.DesktopAlarmNotification (by its name); false when it is missing.</summary>
+    public bool AlarmNotification()
+    {
+        notification??=Window.GetType().GetMethod("DesktopAlarmNotification",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes);
+        return notification?.Invoke(Window,null) is true;
+    }
+    private MethodInfo? notification;
+
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
 

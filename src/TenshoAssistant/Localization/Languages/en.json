@@ -1696,7 +1696,9 @@
     "DesktopSound": "Desktop app: Windows sound",
     "DesktopSoundTip": "When the desktop application rings an alarm (a line in its status bar), it also plays Windows' exclamation sound.\nDefault: on.",
     "DesktopOnlyGameBehind": "Desktop app: only when the game is not in front",
-    "DesktopOnlyGameBehindTip": "The desktop application rings an alarm only while the game is not the window in front (the game rings it then). Unticked: it rings in both.\nDefault: on."
+    "DesktopOnlyGameBehindTip": "The desktop application rings an alarm only while the game is not the window in front (the game rings it then). Unticked: it rings in both.\nDefault: on.",
+    "DesktopNotification": "Desktop app: Windows notification",
+    "DesktopNotificationTip": "When the desktop application rings an alarm, it also shows a Windows notification (from its icon in the notification area; Windows' do not disturb applies). Silent: the sound is the « Windows sound » option's.\nDefault: on."
   },
   "CraftMacro": {
     "MacroChain": "Macro Chain (Caraxi) is loaded: chained pages end with « /nextmacro », handled by Macro Chain, instead of Tensho’s marker.",
