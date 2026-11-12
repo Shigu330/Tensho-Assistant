@@ -23,7 +23,9 @@ internal static class RandomJob385Tests
             Check(GameGearsets.RandomJob([],levels,true,_=>0) is null,"no set");
             var reader = Read("Gear/GameGearsetReader.Dalamud.cs");
             Check(reader.Contains("(nint)RaptureGearsetModule.MemberFunctionPointers.EquipGearset!=0",StringComparison.Ordinal)
-                && reader.Contains("gearsets->IsValidGearset(wanted))gearsets->EquipGearset(wanted,0);",StringComparison.Ordinal),"checked call");
+                // 0.1193 (X-177 C4.4): the call sits in a block that marks the game's own time; still one call, after the validity check.
+                && reader.ReplaceLineEndings("\n").Contains("gearsets->IsValidGearset(wanted))\n                {",StringComparison.Ordinal)
+                && reader.Contains("try{gearsets->EquipGearset(wanted,0);}",StringComparison.Ordinal) && reader.Split("EquipGearset(wanted,0)").Length==2,"checked call");
             Check(Read("MainWindow.Gearsets.cs").Contains("if(ImGui.SmallButton(localization.Get(\"GameGearsets.Equip\"))){source.Equip(drawn.Number);",StringComparison.Ordinal),"click only");
         }),
     ];

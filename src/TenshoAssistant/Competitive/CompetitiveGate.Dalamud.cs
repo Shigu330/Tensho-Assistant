@@ -35,9 +35,10 @@ internal static partial class CompetitiveGate
     private static void Timed(IFramework.OnUpdateDelegate handler,IFramework running)
     {
         if(Developer?.Invoke()!=true){handler(running);return;}
-        var started=System.Diagnostics.Stopwatch.GetTimestamp();
+        // X-177 C4.4 (0.1193): the reader's own time: what it spends inside a function of the game (GameCallStarted / GameCallEnded) is left out.
+        var started=MeasureStart();
         handler(running);
-        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        var spent=MeasureOwn(started);
         if(spent<=50)return;
         var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
         if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;

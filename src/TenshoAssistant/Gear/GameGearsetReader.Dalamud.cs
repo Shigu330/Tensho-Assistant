@@ -53,7 +53,13 @@ public sealed unsafe class GameGearsetReader : IDisposable
             {
                 var gearsets=RaptureGearsetModule.Instance();
                 if(gearsets!=null && (nint)RaptureGearsetModule.MemberFunctionPointers.EquipGearset!=0 && (nint)RaptureGearsetModule.MemberFunctionPointers.IsValidGearset!=0
-                   && gearsets->IsValidGearset(wanted))gearsets->EquipGearset(wanted,0);
+                   && gearsets->IsValidGearset(wanted))
+                {
+                    // X-177 C4.4 (0.1193): the game's own function changes the gear (354 ms once in the log): its time is not this reader's.
+                    var call=TenshoAssistant.Competitive.CompetitiveGate.GameCallStarted();
+                    try{gearsets->EquipGearset(wanted,0);}
+                    finally{TenshoAssistant.Competitive.CompetitiveGate.GameCallEnded(call);}
+                }
                 else log.Information("Gear set {0} could not be worn (not valid or game function not resolved).",wanted+1);
             }
             catch(Exception error){log.Warning(error,"A gear set could not be worn.");}

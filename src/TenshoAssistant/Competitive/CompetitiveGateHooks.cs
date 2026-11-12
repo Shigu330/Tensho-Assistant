@@ -23,6 +23,29 @@ internal static partial class CompetitiveGate
     /// <summary>Whether a hook still holds something of an instance (the unload's own check, and the tests').</summary>
     internal static bool HoldsInstance=>Developer is not null || SlowSubscription is not null || Changed is not null;
 
+    // X-177 C4.4 (0.1193, analysis of 12/11: « GameGearsetReader 354 ms » in the slow readers was the game's own EquipGearset, which
+    // changes the gear): the time a subscription spends inside a function of the game it calls on the player's request is told apart
+    // from the reader's own time. Framework thread only (the subscriptions run one after the other there).
+    private static double gameCallMs;
+
+    /// <summary>Before a call into a function of the game from a subscription: the moment, to give back to <see cref="GameCallEnded"/>.</summary>
+    internal static long GameCallStarted()=>System.Diagnostics.Stopwatch.GetTimestamp();
+
+    /// <summary>After that call (in a finally): its time is the game's, taken out of the subscription's measured time.</summary>
+    internal static void GameCallEnded(long started)=>gameCallMs+=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+
+    /// <summary>Starts the measure of one subscription: nothing of the game counted yet.</summary>
+    internal static long MeasureStart(){gameCallMs=0;return System.Diagnostics.Stopwatch.GetTimestamp();}
+
+    /// <summary>The subscription's own time in milliseconds since <see cref="MeasureStart"/>: the whole, less the game's own functions.</summary>
+    internal static double MeasureOwn(long started)
+    {
+        var total=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+        var game=Math.Min(total,gameCallMs);
+        gameCallMs=0;
+        return total-game;
+    }
+
     /// <summary>X-01 C1.3 (0.1187): at unload, nothing of the instance stays reachable from the gate's static hooks.</summary>
     internal static void ForgetInstance()
     {
