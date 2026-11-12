@@ -1770,6 +1770,44 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1144) Collection › Magie bleue : la liste du grimoire se remplit comme avant ; « Lire les pages manquantes » avance page par page ; dalamud.log sans erreur
 
+- [ ] (0.1147) Application de bureau, jeu lancé puis fermé : Stockage › Gils montre le journal du dernier personnage joué et ses soldes ; après une dépense en jeu, l'application le montre en une minute environ ; sa console dit « data: read from the copy (1 file(s) copied) »
+
+- [ ] (0.1148) Atelier de la compagnie › historique des voyages : après le rechargement, la même liste qu'avant ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; au prochain retour d'un sous-marin, le voyage s'ajoute
+
+- [ ] (0.1148) Application de bureau : Compagnie › historique des voyages montre les mêmes voyages que le jeu
+
+- [ ] (0.1149) Stockage › Banque (tous les personnages, servants, sacoches, arsenal, coffre de compagnie) : après le rechargement, tout ce qui était enregistré est là ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; before-sqlite-<date>/InventoryBank/ existe à la racine du dossier du plugin ; une nouvelle lecture d'un servant s'enregistre
+
+- [ ] (0.1149) Stockage › Banque : « Oublier » un rangement et « Effacer ce personnage » marchent comme avant
+
+- [ ] (0.1149) Application de bureau : Stockage montre la même banque que le jeu
+
+- [ ] (0.1150) Application de bureau : Collection › Succès, un succès en cours vu dans le jeu montre la même progression (« x / y, vu à … ») ; la liste des succès suivis aussi ; pas de bouton « Demander » dans l'application
+
+- [ ] (0.1150) Jeu : Collection › Succès, le bouton « Demander » est toujours là et marche comme avant
+
+- [ ] (0.1151) Application de bureau : Rappels › Personnages montre les mêmes personnages que le jeu (servants, carte au trésor, livret, contrats, missions aléatoires), sans bouton « Effacer »
+
+- [ ] (0.1151) Application de bureau : Butin des missions, filtre « non terminées » : le même avancement que le jeu déconnecté ; après une mission terminée en jeu, l'application suit
+
+- [ ] (0.1152) Application de bureau : page Découvertes, la recherche montre les mêmes découvertes que le jeu ; une découverte faite en jeu apparaît dans l'application au plus 5 minutes plus tard ; le dossier %LOCALAPPDATA%\TenshoAssistant\Desktop\mirror\Discoveries ne contient que Discoveries.db (et ses fichiers -wal, -shm)
+
+- [ ] (0.1153) Application de bureau, jeu fermé ou en arrière-plan : un lit du journal du jardin qui mûrit (ou à soigner) est dit dans la barre avec le son, une seule fois ; jeu au premier plan avec l'option par défaut : rien dans l'application
+
+- [ ] (0.1154) Application de bureau, jeu fermé ou en arrière-plan : une alarme Tensho qui sonne montre aussi une notification Windows « Tensho Assistant » avec sa ligne, sans son en plus ; option « Application de bureau : notification Windows » décochée dans le jeu (puis réglages relus par l'application) : plus de notification, le son et la ligne restent ; à la fermeture de l'application, l'icône quitte la zone de notification
+
+- [ ] (0.1155) Lien avec l'application activé, jeu en arrière-plan : une mission prête (alerte « mission prête » activée), un seuil de PR ou de monnaie atteint s'affiche dans la barre de l'application avec le son et la notification Windows, une seule fois ; jeu au premier plan avec l'option par défaut : rien dans l'application ; relancer l'application juste après : l'alerte n'est pas redite
+
+- [ ] (0.1156) Lien activé, jeu en arrière-plan : une alarme de récolte avec une quantité voulue déjà dans les sacs ne sonne ni en jeu ni dans l'application ; avec moins que la quantité, elle sonne des deux côtés (selon l'option « seulement si le jeu n'est pas au premier plan »)
+
+- [ ] (0.1158) Paramètres › Avancé › Application de bureau › « Pages dans le jeu et dans l'application de bureau » : mettre « Objets » sur « Application seulement » : la page quitte la navigation du jeu et reste dans celle de l'application ; « Marché » sur « Jeu seulement » : l'inverse ; Accueil, Paramètres, la carte, l'artisanat en direct et la Revue de mode ne sont pas proposés ; « ↺ » remet « Jeu et application »
+
+- [ ] (0.1159) Rappels › onglet « Alarmes (N) » : les alarmes posées avec une cloche des minuteurs et les alarmes automatiques (servants, voyages, escouade) y sont, avec leurs boutons ; « Rappels (N) » dans le menu ; l'outil Alarmes ne les liste plus et son chiffre ne les compte plus ; elles sonnent toujours
+
+- [ ] (0.1160) Jardinage › onglet « Alarmes (N) » : chaque lit noté au journal montre son prochain entretien et sa récolte avec l'heure ; « Jardinage (N) » dans le menu ; « Me le rappeler dans le chat » décoché : l'onglet le dit et le chiffre disparaît
+
+- [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Équilibré grisé : pas de clic possible, l'infobulle dit pourquoi ; Sûr apparaît choisi.
