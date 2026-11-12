@@ -72,6 +72,10 @@ internal static class Headless
             report.Fail(DesktopPages.UnclassifiedMessage(unclassified));
             return 1;
         }
+        // X-151 (0.1157): every member of the plugin the application reaches by name exists, with its parameters (DesktopContract).
+        var broken=DesktopContract.Missing(host.Plugin);
+        if(broken.Count>0){report.Fail("contract: the plugin lacks "+string.Join("; ",broken));return 1;}
+        Console.WriteLine($"PASS contract: the {DesktopContract.Members.Length} members of the plugin the app reaches by name exist");
         var code=-1;
         var worker=new Thread(()=>{try{code=Body(host,status,cache,args,report);}catch(Exception error){report.Fail($"{error.GetType().Name}: {error.Message}");code=1;}}){IsBackground=true,Name="headless"};
         worker.Start();
