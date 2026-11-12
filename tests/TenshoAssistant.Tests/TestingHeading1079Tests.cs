@@ -9,7 +9,8 @@ internal static class TestingHeading1079Tests
         {
             var testing = File.ReadAllText(Path.GetFullPath("docs/project/TESTING.md")).Replace("\r\n","\n");
             var heading = testing.IndexOf("**0.538 et suivantes : un essai par ligne, marqué de sa version**");
-            var first = testing.IndexOf("- [ ] (0.538) Une infobulle ou un menu du jeu");
+            // 0.1172 (relais 32): the 0.538 check was retired by the triage of 12/11; the first check under the heading stands for it.
+            var first = heading < 0 ? -1 : testing.IndexOf("\n- [", heading, StringComparison.Ordinal);
             var previous = testing.IndexOf("**0.537 : s'effacer devant les fenêtres du jeu**");
             Check(previous >= 0 && heading > previous && first > heading,"0.537's heading, then the new heading, then the 0.538 check");
         }),

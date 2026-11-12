@@ -80,10 +80,10 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.340-chocobo-barding.md](0.340-chocobo-barding.md) | `src/TenshoAssistant/Gear/ChocoboBarding.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md` |
 | [0.342-festivals.md](0.342-festivals.md) | `src/TenshoAssistant/Events/Festivals.cs`, `src/TenshoAssistant/MainWindow.Events.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/project/audits/0.874-probe-coverage.md` |
 | [0.344-currencies.md](0.344-currencies.md) | `src/TenshoAssistant/Inventory/Currencies.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md` |
-| [0.356-roulettes.md](0.356-roulettes.md) | `src/TenshoAssistant/Plugin.cs`, `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/Roulettes356Tests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/project/TESTING.md` |
+| [0.356-roulettes.md](0.356-roulettes.md) | `src/TenshoAssistant/Plugin.cs`, `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/Roulettes356Tests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.357-armoire.md](0.357-armoire.md) | — | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.363-leves.md](0.363-leves.md) | — | `docs/changelog/CHANGELOG-0.300-0.399.md` |
-| [0.364-hunting-log.md](0.364-hunting-log.md) | `src/TenshoAssistant/Hunting/HuntingLog.cs`, `tests/TenshoAssistant.Tests/HuntTests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/project/TESTING.md` |
+| [0.364-hunting-log.md](0.364-hunting-log.md) | `src/TenshoAssistant/Hunting/HuntingLog.cs`, `tests/TenshoAssistant.Tests/HuntTests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.367-blue-spell-wiki.md](0.367-blue-spell-wiki.md) | — | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.368-achievement-progress.md](0.368-achievement-progress.md) | — | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.369-titles.md](0.369-titles.md) | — | `docs/changelog/CHANGELOG-0.300-0.399.md` |

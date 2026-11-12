@@ -19,7 +19,9 @@ internal static class PlanCompact1092Tests
             var size = new FileInfo(path).Length;
             // 0.1135 (relais 26): 160 KB → 200 KB: the open points added since 0.1118 (X-165 to X-176, about 18 KB in both languages) keep their full text
             // by design; done rows stay short (checked above).
-            Check(size < 200_000,"GLOBAL-PLAN stays under its budget (200 KB, both languages): " + size);
+            // 0.1172 (relais 32): 200 KB → 250 KB: the open points of the night review and the user's requests of 12/11 (X-177 to X-190, about 30 KB
+            // in both languages) keep their full text by design.
+            Check(size < 250_000,"GLOBAL-PLAN stays under its budget (250 KB, both languages): " + size);
         }),
     ];
 }

@@ -14,8 +14,11 @@ internal static class TestingTriage1100Tests
             var empty = new Regex(@"^- \[ \] (\([0-9.]+\) )?(Rien à faire\.?|Rien de visible\.?|Rien à essayer en jeu\.?|Aucun essai.*|Visite guidée, arrêt .*)$");
             var bad = lines.Where(l => empty.IsMatch(l.TrimEnd())).ToList();
             Check(bad.Count == 0,"empty or single-stop boxes are back in TESTING.md: " + string.Join(" | ",bad.Take(3)));
-            Check(lines.Count(l => l.StartsWith("- [ ] ",StringComparison.Ordinal)) > 500,"TESTING.md still holds the campaign");
-            Check(lines.Any(l => l.Contains("Prise en main : relancer le guide",StringComparison.Ordinal)),"the guided tour is still tested as a whole");
+            // 0.1172 (relais 32): 500 → 300: the triage of 12/11 retired 439 checks (382 left open, docs/ai/essais.jsonl), TESTING keeps the open ones.
+            Check(lines.Count(l => l.StartsWith("- [ ] ",StringComparison.Ordinal)) > 300,"TESTING.md still holds the campaign");
+            // 0.1172 (relais 32): the triage of 12/11 merged « Prise en main : relancer le guide » into the guided tour check (T-0.1045-1, « Visite guidée »).
+            Check(lines.Any(l => l.Contains("Prise en main : relancer le guide",StringComparison.Ordinal) || l.StartsWith("- [ ] (0.1045) Visite guidée",StringComparison.Ordinal)),
+                "the guided tour is still tested as a whole");
         }),
     ];
 }
