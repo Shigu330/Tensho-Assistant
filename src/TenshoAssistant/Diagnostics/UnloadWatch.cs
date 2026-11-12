@@ -72,6 +72,46 @@ public static class UnloadWatch
         }
     }
 
+    /// <summary>
+    /// 0.1192 (after the hubs were emptied, the plugin, the window, the data cache and the outer closure stayed alive, and no captured
+    /// service: what holds them is an object that no field of a hub names): notes the plugin's own objects reachable from an owner, to a
+    /// given depth, each under its path (« locals.service.field », « window.field→Target » through a delegate), so that an emptied
+    /// instance's line names the chain an outside root still holds. Objects of the plugin's classes and delegates' targets only (no
+    /// collection is walked), breadth first, each object once, <paramref name="cap"/> at most. Returns the objects noted.
+    /// </summary>
+    public static int NoteGraph(Dictionary<string,WeakReference> parts,string name,object? owner,Assembly assembly,int depth=3,int cap=3000)
+    {
+        if(owner is null)return 0;
+        var seen=new HashSet<object>(ReferenceEqualityComparer.Instance){owner};
+        var queue=new Queue<(string Path,object Value,int Level)>();
+        queue.Enqueue((name,owner,0));
+        var noted=0;
+        while(queue.Count>0 && noted<cap)
+        {
+            var (path,value,level)=queue.Dequeue();
+            if(parts.TryAdd(path,new WeakReference(value)))noted++;
+            if(level>=depth)continue;
+            for(var type=value.GetType();type is not null && type.Assembly==assembly;type=type.BaseType)
+                foreach(var field in type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
+                {
+                    if(field.FieldType.IsValueType || field.FieldType.IsPointer || field.FieldType==typeof(string))continue;
+                    object? held;
+                    try{held=field.GetValue(value);}
+                    catch(Exception error) when(error is NotSupportedException or FieldAccessException or TargetException){continue;}
+                    if(held is Delegate hook)
+                    {
+                        foreach(var target in hook.GetInvocationList().Select(one=>one.Target))
+                            if(target is not null && target.GetType().Assembly==assembly && !CompilerSingleton(target.GetType()) && seen.Add(target))
+                                queue.Enqueue(($"{path}.{field.Name}→{target.GetType().Name}",target,level+1));
+                        continue;
+                    }
+                    if(held is null || held.GetType().Assembly!=assembly || held.GetType().IsEnum || !seen.Add(held))continue;
+                    queue.Enqueue(($"{path}.{field.Name}",held,level+1));
+                }
+        }
+        return noted;
+    }
+
     /// <summary>One line for an earlier instance: its context, and its parts still alive out of those noted (the first names, in order).</summary>
     public static string Describe(string label,IReadOnlyDictionary<string,WeakReference> parts,int names=24)
     {

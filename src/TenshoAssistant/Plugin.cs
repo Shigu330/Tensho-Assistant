@@ -1823,6 +1823,9 @@ public sealed class Plugin : IDalamudPlugin
             Diagnostics.UnloadWatch.Note(parts,"locals",developerAtUnload.Target,typeof(Plugin).Assembly);
             // 0.1191: and the closure of the constructor's outer scope behind it (its parameters and this).
             Diagnostics.UnloadWatch.Note(parts,"locals0",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target),typeof(Plugin).Assembly);
+            // 0.1192: and the plugin's own objects behind them, three levels deep, each under its path: what a root holds gets a name.
+            foreach(var (hub,owner) in new (string,object?)[]{("plugin",this),("window",mainWindow),("locals",developerAtUnload.Target),("locals0",Diagnostics.UnloadWatch.OuterClosure(developerAtUnload.Target))})
+                Diagnostics.UnloadWatch.NoteGraph(parts,hub,owner,typeof(Plugin).Assembly);
         }
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }
