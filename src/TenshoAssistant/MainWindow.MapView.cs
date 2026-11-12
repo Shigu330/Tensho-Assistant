@@ -479,14 +479,15 @@ internal sealed partial class MainWindow
         // 0.305 (user feedback: the column was cut in small windows, the zoom % lost): the column fits the room it has — the zoom
         // slider shrinks, then goes, then the buttons wrap into more columns. Over the map (0.303) it is only as tall as its
         // buttons, so the rest of the map stays draggable.
-        var style=ImGui.GetStyle();var step=26+style.ItemSpacing.Y;var label=ImGui.GetTextLineHeightWithSpacing();
+        // X-164 (0.1130): under the buttons, the typed percentage and the « 100% » button (two frame rows).
+        var style=ImGui.GetStyle();var step=26+style.ItemSpacing.Y;var label=2*ImGui.GetFrameHeightWithSpacing();
         var room=maxHeight>0 ? maxHeight:ImGui.GetContentRegionAvail().Y;
         var slider=Math.Clamp(room-9*step-label-2*style.ItemSpacing.Y-style.WindowPadding.Y*2,0,80);
         if(slider<30)slider=0;
         const int buttons=9;
         var perColumn=slider>0 ? buttons:Math.Clamp((int)((room-label-style.WindowPadding.Y*2)/step),1,buttons);
         var columns=(buttons+perColumn-1)/perColumn;
-        var width=34+(columns-1)*30;
+        var width=Math.Max(34,ImGui.CalcTextSize("100%").X+style.FramePadding.X+style.WindowPadding.X)+(columns-1)*30;
         var height=!overlay ? 0:slider>0 ? buttons*step+slider+label+2*style.ItemSpacing.Y+style.WindowPadding.Y*2
             :Math.Min(perColumn,buttons)*step+label+style.WindowPadding.Y*2;
         if(!ImGui.BeginChild("MapTools",new Vector2(width,height),false,ImGuiWindowFlags.NoScrollbar|(overlay ? ImGuiWindowFlags.NoBackground:ImGuiWindowFlags.None))){ImGui.EndChild();return width;}
@@ -527,19 +528,26 @@ internal sealed partial class MainWindow
                 Tip("MapView.ZoomTip");
             }
             Place();if(ToolButton(FontAwesomeIcon.Minus,"MapView.ZoomOut",true))ZoomTo(mapZoom/1.25f);
+            // X-164 (0.1130, user request): the percentage is typed with the keyboard (Enter applies it, clamped to 15–400 %), and
+            // « 100% » under it, a button like the others, puts the zoom back to 100 %.
             var text=$"{mapZoom*100:0}%";
             var lastColumn=slider>0 ? 0:(buttons-1)/perColumn;
             if(slider<=0)ImGui.SetCursorPosY(top+((buttons-1)%perColumn+1)*step);
-            ImGui.SetCursorPosX(Math.Max(0,left+lastColumn*30+(26-ImGui.CalcTextSize(text).X)/2));
-            if(overlay)
+            var columnX=left+lastColumn*30;
+            var fieldWidth=Math.Max(26,ImGui.CalcTextSize("100%").X+style.FramePadding.X);
+            ImGui.SetCursorPosX(Math.Max(0,columnX));
+            if(overlay)ImGui.PushStyleColor(ImGuiCol.Text,MapOverlayText);
+            try
             {
-                // 0.308 (user feedback: nearly invisible on the map): dark backdrop like the names' band, light text.
-                var at=ImGui.GetCursorScreenPos();var size=ImGui.CalcTextSize(text);
-                ImGui.GetWindowDrawList().AddRectFilled(at-new Vector2(3,1),at+size+new Vector2(3,1),ImGui.GetColorU32(new Vector4(0,0,0,0.72f)),3);
-                ImGui.TextColored(MapOverlayText,text);
+                ImGui.SetNextItemWidth(fieldWidth);
+                var typed=text;
+                if(ImGui.InputText("##MapZoomTyped",ref typed,8,ImGuiInputTextFlags.CharsDecimal|ImGuiInputTextFlags.AutoSelectAll|ImGuiInputTextFlags.EnterReturnsTrue)
+                   && MapProjection.ZoomFromPercent(typed) is { } typedZoom)ZoomTo(typedZoom);
             }
-            else ImGui.TextDisabled(text);
+            finally{if(overlay)ImGui.PopStyleColor();}
             Tip("MapView.ZoomLevel");
+            ImGui.SetCursorPosX(Math.Max(0,columnX));
+            if(TextToolButton("100%","MapView.Zoom100"))ZoomTo(1);
         }
         finally{ImGui.EndChild();}
         return width;

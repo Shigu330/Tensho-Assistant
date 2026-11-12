@@ -31,4 +31,11 @@ public static class MapProjection
     public static bool OnMap(Vector2 pixel)=>pixel.X>=0 && pixel.Y>=0 && pixel.X<=TextureSize && pixel.Y<=TextureSize;
     /// <summary>Zoom kept between 0.15× and 4× of the 2048-pixel texture.</summary>
     public static float ClampZoom(float zoom)=>Math.Clamp(float.IsFinite(zoom) ? zoom:1,0.15f,4f);
+    /// <summary>X-164 (0.1130): a zoom typed as a percentage (« 150 », « 150% », « 87,5 ») as a zoom factor, clamped; null when it is not a number.</summary>
+    public static float? ZoomFromPercent(string? text)
+    {
+        var cleaned=(text ?? "").Replace('%',' ').Replace(',','.').Trim();
+        return float.TryParse(cleaned,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out var percent) && float.IsFinite(percent) && percent>0
+            ? ClampZoom(percent/100):null;
+    }
 }

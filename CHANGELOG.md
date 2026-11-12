@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1130.0
+- Plan global, X-164 : Barre d'outils de la carte (demande de l'utilisateur du 12/11, capture) : les icônes sont centrées dans leurs boutons (le dessin de chaque icône est centré, pas sa largeur de caractère), dans toutes les barres d'outils ; le pourcentage de zoom se tape au clavier (Entrée l'applique, de 15 à 400 %) ; un bouton « 100% » dans le style des autres, sous le pourcentage, remet le zoom à 100 %.
+- Tests : MapToolbar1130Tests. Verify.ps1 (agent) : 1868/1868, 0 avertissement, 0 erreur ; DLL 0.1130.0.0. Non validé en jeu.
+### English
+- Map tool column (user request of 12/11, capture): icons are centred in their buttons (each icon's drawing is centred, not its character width), in every tool bar; the zoom percentage is typed with the keyboard (Enter applies it, 15 to 400 %); a « 100% » button in the style of the others, under the percentage, puts the zoom back to 100 %.
+
 ## 0.1129.0
 - Plan global, X-162 : Infobulles de la barre d'infos du serveur (demande de l'utilisateur du 12/11) : les entrées des monnaies et des gils ont maintenant l'infobulle de Tensho, comme les alarmes et les rappels, accrochée à leur entrée ; toutes s'ouvrent du même côté, en dessous par défaut, au-dessus avec le nouveau réglage « Au-dessus de l'entrée » (Paramètres › Général, sous l'infobulle de Tensho) ; quand ce côté manque de place elles passent de l'autre, et sur la moitié droite de l'écran leur bord droit suit celui de l'entrée : jamais hors de l'écran. Sans l'infobulle de Tensho, celle du jeu reste.
 - Tests : BarTooltips1129Tests. Verify.ps1 (agent) : 1866/1866, 0 avertissement, 0 erreur ; DLL 0.1129.0.0. Non validé en jeu.
