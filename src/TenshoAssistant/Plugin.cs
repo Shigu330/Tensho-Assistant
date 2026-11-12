@@ -128,10 +128,21 @@ public sealed class Plugin : IDalamudPlugin
             // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
             // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.
             var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
+            // X-177 step 2 (0.1164): Dalamud's save is the cost (64 to 71 ms each time, 371 to 648 ms the first time after a load; the text
+            // itself about 2 ms once warm): only the text is made here, a checked copy is written off the game's thread (SettingsSaver).
+            var saveText=new Newtonsoft.Json.JsonSerializerSettings{TypeNameAssemblyFormatHandling=Newtonsoft.Json.TypeNameAssemblyFormatHandling.Simple,TypeNameHandling=Newtonsoft.Json.TypeNameHandling.Objects};
+            var saver=new SettingsSaver<Configuration>(configuration,
+                live=>Newtonsoft.Json.JsonConvert.SerializeObject(live,saveText),
+                text=>Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(text),
+                copy=>pluginInterface.SavePluginConfig(copy),
+                action=>_=framework.RunOnFrameworkThread(action),
+                (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
+            registrations.Register(()=>_=saver.Warm(()=>pluginInterface.ConfigFile is { Exists: true } file ? File.ReadAllText(file.FullName) : null),
+                ()=>{if(!saver.Flush(TimeSpan.FromSeconds(5)))log.Warning("The last settings save was still running after 5 s at unload; the settings were saved again.");});
             void SaveTimed(string what)
             {
                 var started=System.Diagnostics.Stopwatch.GetTimestamp();
-                pluginInterface.SavePluginConfig(configuration);
+                saver.Save();
                 var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
                 if(saveNotes.Note(what,spent,Environment.TickCount64) is { } worst)
                     log.Information("Slow settings save: {0} took {1:0} ms (worst {2:0} ms; named at most every 5 minutes).",what,spent,worst);
@@ -376,7 +387,7 @@ public sealed class Plugin : IDalamudPlugin
             var migrated=false;
             foreach(var alarm in configuration.Alarms ?? [])
                 migrated|=Alarms.DiscordWebhook.AssignLegacySource(alarm,localization.Get("Reminders.Title"),localization.Get("FreeCompany.Title"));
-            if(migrated)try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
+            if(migrated)try{saver.Save();}catch(Exception error){log.Warning(error,"Alarm sources could not be saved.");}
             Alarms.AlarmService? alarms=null;
             registrations.Register(()=>{},()=>{chat.RemoveChatLinkHandler();alarmLinks.Clear();});
             registrations.Register(()=>alarms=new Alarms.AlarmService(framework,condition,log,configuration,()=>SaveTimed("alarms"),
@@ -549,7 +560,7 @@ public sealed class Plugin : IDalamudPlugin
                     var zones=configuration.WeatherStoryZones ??= [];
                     if(matched==zones.Contains(territory))return;
                     if(matched)zones.Add(territory);else zones.Remove(territory);
-                    try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"The confirmed story weather zones could not be saved.");}
+                    try{saver.Save();}catch(Exception error){log.Warning(error,"The confirmed story weather zones could not be saved.");}
                 };
                 Gathering.WeatherCatalog.StoryWeatherConfirmed=territory=>configuration.WeatherStoryZones?.Contains(territory)==true;
                 itemWatcher.PreviousWeather=(territory,at)=>weather.State.Catalog?.Forecast(territory,at.AddSeconds(-1400),1) is { Count:>0 } before ? before[0].Weather?.Id ?? 0:0;}
@@ -1487,7 +1498,7 @@ public sealed class Plugin : IDalamudPlugin
             registrations.Register(()=>gcSupplyReader=new Items.GcSupplyReader(framework,gameGui,client,player,data,log,()=>itemUses.State.Catalog,mainWindow.GcSupply,seen=>
             {
                 configuration.GcSupplySeen=seen;
-                try{pluginInterface.SavePluginConfig(configuration);}catch(Exception error){log.Warning(error,"Today's Grand Company request could not be saved.");}
+                try{saver.Save();}catch(Exception error){log.Warning(error,"Today's Grand Company request could not be saved.");}
             },developer:()=>configuration.DeveloperMode),()=>gcSupplyReader?.Dispose());
             registrations.Register(() => catalogLoader = new ItemCatalogLoader(itemCatalog, data, framework, log, dataCache),
                 () => catalogLoader?.Dispose());

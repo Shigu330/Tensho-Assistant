@@ -154,6 +154,7 @@
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />
+    <Compile Include="../../src/TenshoAssistant/SettingsSaver.cs" Link="SettingsSaver.cs" />
     <Compile Include="../../src/TenshoAssistant/TenshoDataDatabase.cs" Link="TenshoDataDatabase.cs" />
     <Compile Include="../../src/TenshoAssistant/OnceSet.cs" Link="OnceSet.cs" />
     <Compile Include="../../src/TenshoAssistant/BackupZip.cs" Link="BackupZip.cs" />
