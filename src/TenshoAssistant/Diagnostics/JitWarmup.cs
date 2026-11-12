@@ -56,6 +56,40 @@ public sealed class JitWarmup : IDisposable
         return false;
     }
 
+    /// <summary>
+    /// X-01 C2.1 (0.1185, analysis of 12/11: the overlays' first frame came about 1.9 s after the warm-up started, before the « everything
+    /// else » part, and took 145 to 564 ms): the methods each frame calls outside the window, compiled early with the map's. The methods named
+    /// in Plugin's overlay table (and their lambdas, which carry the outer name in angle brackets), the free panels (PanelWindow, the tracker,
+    /// the bars) and the bank overlay.
+    /// </summary>
+    public static readonly IReadOnlyList<string> OverlayMethods=["DrawCraftLogHelper","DrawMonsterOverheadIcons","CollectDiscoveries","DrawStorageHighlight","DrawItemHover",
+        "DrawCactpotOverlay","DrawCraftLivePanel","DrawInventorySortButton","ObserveRegenTick","DrawTriadOverlay","DrawTriadRequestPanel","DrawTriadDeckReminder","DrawCharacterPanel",
+        "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
+        "ProcessGameLogRequest","ObserveHuntTrain","ObserveOccultAlerts","ObserveGarden","WatchWishlistSales","WatchPlots","DrawFishingPanel","RefreshNearbyMonsters"];
+    /// <summary>Words of the main window's methods that belong to the free panels and bars drawn every frame (tracker, wear bar, alarm and reminder bars).</summary>
+    public static readonly IReadOnlyList<string> OverlayWords=["Tracker","Panel","Bar","Overlay"];
+
+    /// <summary>X-01 C2.1 (0.1185): an overlay method (see <see cref="OverlayMethods"/>), a free panel's or a bar's.</summary>
+    public static bool OverlayFirst(MethodBase method)
+    {
+        if(method.DeclaringType is not { } declaring)return false;
+        for(var type=declaring;type is not null;type=type.DeclaringType)
+            if(type.Name is "PanelWindow" or "BankImportOverlay")return true;
+        var inWindow=false;
+        for(var type=declaring;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow"){inWindow=true;break;}
+        if(!inWindow)return false;
+        var name=method.Name;
+        foreach(var overlay in OverlayMethods)
+            if(name==overlay || name.Contains("<"+overlay+">",StringComparison.Ordinal))return true;
+        foreach(var word in OverlayWords)
+            if(name.Contains(word,StringComparison.Ordinal))return true;
+        return false;
+    }
+
+    /// <summary>X-01 C2.1 (0.1185): what the early phase compiles: the map's methods and the overlays'.</summary>
+    public static bool EarlyMethod(MethodBase method)=>MapFirst(method) || OverlayFirst(method);
+
     /// <summary>X-01 (0.1111): the namespace of the map's types (catalogues, projection, layers, live readers).</summary>
     public const string MapNamespace="TenshoAssistant.Maps";
 

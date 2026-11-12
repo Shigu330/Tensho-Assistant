@@ -180,8 +180,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         };
         // X-01 (0.1050): the window's code compiled ahead off the frame (Diagnostics/JitWarmup.cs): the first frame of a page was mostly JIT.
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
-            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map first.")),
-            Diagnostics.JitWarmup.MapFirst);
+            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first.")),
+            Diagnostics.JitWarmup.EarlyMethod);
     }
 
     private readonly Diagnostics.JitWarmup jitWarmup;

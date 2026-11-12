@@ -38,7 +38,7 @@ internal static class MapWarmup1104Tests
             }
             Check(told == 1,"told once");
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.cs"));
-            Check(window.Contains("Diagnostics.JitWarmup.MapFirst);",StringComparison.Ordinal) && window.Contains("of the map first.",StringComparison.Ordinal),"the window starts it with the map first");
+            Check(window.Contains("Diagnostics.JitWarmup.EarlyMethod);",StringComparison.Ordinal) && window.Contains("of the map and the overlays first.",StringComparison.Ordinal),"the window starts it with the map first");
         }),
     ];
 }
