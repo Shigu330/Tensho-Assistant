@@ -88,6 +88,17 @@ public static class InventorySortRules
         next.Add(Copy(profile));return next;
     }
 
+    /// <summary>
+    /// X-187 (0.1172, user request of 12/11): the order the sorted stacks fill the display positions. The player's four bags in the order 1, 3, 2, 4,
+    /// so the sorted order reads coherently on the game's screen; the other storages (retainers, saddlebags) one position after the other, as before.
+    /// Zones keep the positions they name; only the stacks outside them follow this order.
+    /// </summary>
+    public static int[] FillOrder(InventorySortScope scope)
+    {
+        if(scope.Storage is not null || scope.ContainerCount!=4)return Enumerable.Range(0,scope.Capacity).ToArray();
+        return new[]{0,2,1,3}.SelectMany(bag=>Enumerable.Range(bag*scope.SlotsPerContainer,scope.SlotsPerContainer)).ToArray();
+    }
+
     public static InventorySortResult Build(IEnumerable<InventoryContainerSnapshot> containers,InventorySortScope scope,InventorySortProfile profile,
         Func<uint,(string Name,uint Category)> describe)
     {
@@ -104,7 +115,15 @@ public static class InventorySortRules
         {if(!metadata.TryGetValue(id,out var value)){value=describe(id);metadata.Add(id,value);}return value;}
         var source=containers.ToArray();
         var all=InventorySortPreview.Build(source,scope.Capacity,profile.Criteria,Describe);
-        if(profile.Zones.Count==0)return all;
+        var fill=FillOrder(scope);
+        if(profile.Zones.Count==0)
+        {
+            if(scope.Storage is not null)return all;
+            // X-187 (0.1172): the bags filled in the order 1, 3, 2, 4 (FillOrder), the preview included.
+            var placed=new InventoryPreviewStack?[scope.Capacity];
+            for(var index=0;index<all.Stacks.Count;index++)placed[fill[index]]=all.Stacks[index];
+            return new(scope.Capacity,Array.AsReadOnly(placed.OfType<InventoryPreviewStack>().ToArray()),Array.AsReadOnly(placed));
+        }
         var slots=new InventoryPreviewStack?[scope.Capacity];var reserved=new bool[scope.Capacity];
         var remaining=all.Stacks.ToList();
         foreach(var zone in profile.Zones)
@@ -129,7 +148,7 @@ public static class InventorySortRules
             if(zone.ShareUnused)
                 for(var slot=zone.Start;slot<zone.Start+zone.Count;slot++)if(slots[slot] is null)reserved[slot]=false;
         }
-        var free=Enumerable.Range(0,scope.Capacity).Where(slot=>!reserved[slot]).ToArray();
+        var free=fill.Where(slot=>!reserved[slot]).ToArray();
         if(remaining.Count>free.Length)
             throw new InvalidOperationException("The unreserved slots are not enough for the other stacks. Shrink the zones or free some slots.");
         for(var index=0;index<remaining.Count;index++)slots[free[index]]=remaining[index];
