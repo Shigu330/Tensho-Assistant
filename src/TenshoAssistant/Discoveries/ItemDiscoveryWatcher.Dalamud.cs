@@ -49,6 +49,15 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private string salvageSeen="",ventureSeen="";private readonly OnceSet<(uint Chest,uint Index,uint Item)> lootSeen=new(1024);private uint lootTerritory;
     private uint fateId;private long fateEndedAt=-100_000;
     private (uint Name,uint Territory,uint Map,Vector3 Place,int Level,long At) death=(0,0,0,default,0,-100_000);
+    // X-159 (0.1174, docs/evidence/0.1174-defeat-treasure.md): the game's « defeat » messages waiting for their corpse (handled on the next read), the corpses
+    // already credited (a kill counted once, read from the target or from the message), the last moment a treasure hunt's chest or monster was seen
+    // (TreasureHuntDirector event) and the map it is for (the deciphered map held, kept a while: it is gone once dug).
+    private readonly List<(string Source,bool SourcePlayer,string Target,bool TargetPlayer,uint ObjStr,long At)> defeats=[];
+    private readonly OnceSet<ulong> creditedKills=new(512);
+    private long treasureHuntAt=-1_000_000,treasureReadAt=-100_000,treasureMapAt=-10_000_000;private uint treasureMapItem;
+    private const long TreasureHuntKept=120_000,TreasureMapKept=1_800_000;
+    /// <summary>X-159 (0.1174): the item of the deciphered treasure map held (TreasureHuntRank.ItemName), or 0.</summary>
+    public Func<uint>? TreasureMapItem { get; set; }
     // X-73.9 (0.863): blue magic spells learned (IUnlockState.Unlock, AozAction rows, handled on the next read) and beasts tamed (the Beastmaster's obtained set).
     public Func<IReadOnlySet<uint>?>? Beasts { get; set; }
     // X-73.12 (0.864): the festivals running (once a day each: their first and last days seen) and the vistas registered (with the weather and the Eorzea minute).
@@ -269,7 +278,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             if(wanted.ItemSources)
             {
                 ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,at,territory,map);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
+                ReadFate(now);ReadTarget(now,at,territory,map);ReadDefeats(at,territory,map,me);ReadTreasureHunt(now);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
             }
             SettleGains(now);
             var (counts,hqCounts)=Counts();
@@ -293,12 +302,12 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                 || FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.Bozja)!=null
                 || FFXIVClientStructs.FFXIV.Client.Game.Event.EventFramework.GetPublicContentDirectorByType(FFXIVClientStructs.FFXIV.Client.Game.InstanceContent.PublicContentDirectorType.OccultCrescent)!=null);
             var cause=ItemGains.Attribute(fishing,busy || !wanted.ItemSources,now,fateEndedAt,fateId,death.At,duty!=0,spent,spent is { } used && usable(used),spent is { } same && gains.ContainsKey(same),
-                field,deepDungeon);
+                field,deepDungeon,duty==0 && now-treasureHuntAt<=TreasureHuntKept);
             // 0.1003 (the check of the user's base: no monster drop noted): developer mode, the inputs of a gain put down to nothing, to find why.
             // 0.1096: such a gain first waits a few seconds for its source (venture, voyage, squadron); see SettleGains.
             if(cause==ItemGains.Cause.None && debug())
                 unexplained.Add((string.Join(", ",gains.Select(pair=>$"{pair.Key}x{pair.Value}")),
-                    FormattableString.Invariant($"busy {busy || !wanted.ItemSources}, duty {duty}, own target dead {now-death.At} ms ago, FATE {fateId} ended {now-fateEndedAt} ms ago, spent {spent?.ToString() ?? "none"}")),now);
+                    FormattableString.Invariant($"busy {busy || !wanted.ItemSources}, duty {duty}, own kill {now-death.At} ms ago, treasure hunt {now-treasureHuntAt} ms ago, FATE {fateId} ended {now-fateEndedAt} ms ago, spent {spent?.ToString() ?? "none"}")),now);
             foreach(var (item,count) in gains)
             {
                 var quantity=(int)Math.Min(count,100_000);var added=false;var kind=DiscoveryKind.ItemFromItem;var hq=hqGains.ContainsKey(item);
@@ -334,6 +343,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
                         added=store.SeeSource(DiscoveryKind.MonsterDrop,item,death.Name,quantity,at,death.Territory,death.Map,death.Place,hq);kind=DiscoveryKind.MonsterDrop;break;
                     case ItemGains.Cause.Opened:
                         added=store.SeeSource(DiscoveryKind.ItemFromItem,item,spent!.Value,quantity,at,hq:hq);break;
+                    case ItemGains.Cause.TreasureChest:
+                        // X-159 (0.1174): what the map gives, like a coffer opened (ItemFromItem: the map's item as the source); never noted without the map.
+                        if(treasureMapItem==0 || now-treasureMapAt>TreasureMapKept)
+                        {
+                            if(debug())log.Information("Discovery: treasure hunt chest item {0} ×{1}, the map is not known: not noted.",item,quantity);
+                            continue;
+                        }
+                        added=store.SeeSource(DiscoveryKind.ItemFromItem,item,treasureMapItem,quantity,at,hq:hq);break;
                     case ItemGains.Cause.DungeonCoffer:
                         // 0.911 (X-76): with the territory, like the duty's loot window (ReadLoot): one fact per item and duty.
                         added=store.SeeSource(DiscoveryKind.DutyChest,item,duty,quantity,at,territory,hq:hq);kind=DiscoveryKind.DutyChest;break;
@@ -376,6 +393,13 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         try
         {
             var id=message.LogMessageId;
+            // X-159 (0.1174): « <source> defeats <target> », kept with its two entities for the next read (ReadDefeats).
+            if(id==ItemGains.DefeatMessage)
+            {
+                if(message.SourceEntity is { } from && message.TargetEntity is { } to)
+                    lock(logGate)if(defeats.Count<32)defeats.Add((from.Name.ExtractText(),from.IsPlayer,to.Name.ExtractText(),to.IsPlayer,to.ObjStrId,Environment.TickCount64));
+                return;
+            }
             var source=GainLogMessages.SourceOf(id);var note=GainLogMessages.VoyageNote(id);
             if(source==GainSource.None && note is null)return;
             var detail=message.TryGetIntParameter(0,out var first) && first>0 ? (uint)first:0u;
@@ -616,10 +640,50 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private void ReadTarget(long now,DateTimeOffset at,uint territory,uint map)
     {
         if(targets.Target is not IBattleNpc { BattleNpcKind:BattleNpcSubKind.Combatant } npc || npc.CurrentHp!=0 || npc.NameId==0)return;
-        if(death.Name==npc.NameId && now-death.At<5_000)return;
+        // X-159 (0.1174): each corpse credited once (it was credited again every 5 s while it stayed targeted).
+        if(!creditedKills.Add(npc.GameObjectId))return;
         death=(npc.NameId,territory,map,npc.Position,npc.Level,now);
         // X-76 P8 (0.935): the same deaths MonsterDrop credits, counted: the denominator of a drop rate.
         store.SeeSource(DiscoveryKind.MonsterKill,npc.NameId,0,npc.Level,at,territory);
+    }
+
+    // X-159 (0.1174): a « you defeat » message matched to its corpse among the dead monsters near you (by name, the nearest not credited yet): the kill is
+    // the one MonsterDrop credits and MonsterKill counts, even when the monster was not your target. Not matched: left out, said in developer mode.
+    private void ReadDefeats(DateTimeOffset at,uint territory,uint map,Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter me)
+    {
+        (string Source,bool SourcePlayer,string Target,bool TargetPlayer,uint ObjStr,long At)[] seen;
+        lock(logGate){if(defeats.Count==0)return;seen=[..defeats];defeats.Clear();}
+        var name=me.Name.TextValue;
+        foreach(var defeat in seen)
+        {
+            if(!ItemGains.DefeatedByMe(ItemGains.DefeatMessage,defeat.SourcePlayer,defeat.Source,defeat.TargetPlayer,defeat.Target,name))continue;
+            var dead=objects.OfType<IBattleNpc>().Where(npc=>npc.BattleNpcKind==BattleNpcSubKind.Combatant && npc.CurrentHp==0 && npc.NameId!=0).ToList();
+            var corpse=ItemGains.Corpse(dead,npc=>npc.Name.TextValue,npc=>Vector3.DistanceSquared(npc.Position,me.Position),npc=>creditedKills.Contains(npc.GameObjectId),defeat.Target);
+            if(corpse is null)
+            {
+                if(debug() && !dead.Any(npc=>string.Equals(npc.Name.TextValue.Trim(),defeat.Target.Trim(),StringComparison.OrdinalIgnoreCase)))
+                    log.Information("Discovery: defeat of {0} (ObjStr {1}) not matched to a corpse.",defeat.Target,defeat.ObjStr);
+                continue;
+            }
+            creditedKills.Add(corpse.GameObjectId);
+            death=(corpse.NameId,territory,map,corpse.Position,corpse.Level,defeat.At);
+            store.SeeSource(DiscoveryKind.MonsterKill,corpse.NameId,0,corpse.Level,at,territory);
+            if(debug())log.Information("Discovery: defeat of {0} read from the game's message: name {1} (ObjStr {2}).",defeat.Target,corpse.NameId,defeat.ObjStr);
+        }
+    }
+
+    // X-159 (0.1174): once a second, whether a treasure hunt runs here (an object carrying the game's TreasureHuntDirector event: its chest or its monsters)
+    // and the deciphered map's item.
+    private void ReadTreasureHunt(long now)
+    {
+        if(now-treasureReadAt<1_000)return;
+        treasureReadAt=now;
+        if(TreasureMapItem?.Invoke() is { } held and not 0){treasureMapItem=held;treasureMapAt=now;}
+        foreach(var item in objects)
+        {
+            var native=(FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)item.Address;
+            if(native!=null && native->EventId.ContentId==FFXIVClientStructs.FFXIV.Client.Game.Event.EventHandlerContent.TreasureHuntDirector){treasureHuntAt=now;return;}
+        }
     }
 
     public void Dispose()

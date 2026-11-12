@@ -930,6 +930,8 @@ public sealed class Plugin : IDalamudPlugin
             Maps.TreasureMapReader? treasureMap=null;
             registrations.Register(()=>treasureMap=new Maps.TreasureMapReader(framework,client,data,log),()=>treasureMap?.Dispose());
             mainWindow.TreasureMap=()=>treasureMap?.Spot;
+            // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
+            if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
             // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
             Maps.ChatMapLinkWatcher? chatLinks=null;
             registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());

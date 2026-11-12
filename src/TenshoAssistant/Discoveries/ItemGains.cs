@@ -52,25 +52,50 @@ public static class ItemGains
     /// <summary>X-73.18 (0.887): the bite strength from the player's animation slot 7 at the bite (FishingHookStrength 292 !, 293 !!, 294 !!!); 0 unknown.</summary>
     public static uint BiteStrength(ushort timeline)=>timeline switch{292=>1,293=>2,294=>3,_=>0};
 
+    /// <summary>
+    /// X-159 (0.1174): the game's log message « &lt;source&gt; defeats &lt;target&gt; » (LogMessage row 557, chat kind 58; French « Vous avez vaincu … »), with its
+    /// two entities: a kill of yours when the source is you (a player of your name) and the target is not a player. It names the monster even when it
+    /// was not your target (the old reading needed it targeted at the moment it died, and missed almost every kill).
+    /// </summary>
+    public const uint DefeatMessage=557;
+    public static bool DefeatedByMe(uint logMessage,bool sourcePlayer,string source,bool targetPlayer,string target,string me)
+        => logMessage==DefeatMessage && sourcePlayer && !targetPlayer && target.Length>0 && me.Length>0 && string.Equals(source,me,StringComparison.Ordinal);
+
+    /// <summary>
+    /// X-159 (0.1174): the corpse a defeat message names: among the dead monsters near you, those of that name (case ignored) not credited yet, the nearest;
+    /// null when none (left uncounted rather than guessed).
+    /// </summary>
+    public static T? Corpse<T>(IEnumerable<T> dead,Func<T,string> name,Func<T,float> distance,Func<T,bool> credited,string target) where T:class
+        => dead.Where(corpse=>!credited(corpse) && string.Equals(name(corpse).Trim(),target.Trim(),StringComparison.OrdinalIgnoreCase)).MinBy(distance);
+
     /// <summary>The one item spent, by exactly one unit, in a change (an opened coffer, a used bag); null when anything else was spent too.</summary>
     public static uint? SingleSpent(IReadOnlyDictionary<uint,long> losses)=>losses.Count==1 && losses.First().Value==1 ? losses.First().Key:null;
 
     /// <summary>What a gain is put down to.</summary>
-    public enum Cause { None, Fishing, FateReward, MonsterDrop, Opened, DungeonCoffer }
+    public enum Cause { None, Fishing, FateReward, MonsterDrop, Opened, DungeonCoffer, TreasureChest }
+
+    /// <summary>
+    /// X-159 (0.1174, dalamud.log of 12/11 00:35, docs/evidence/0.1174-defeat-treasure.md): how long after a monster's death its drop may come into the
+    /// bags. Seen: 3.6 and 3.7 s after the game's « You defeat » message (it was 3 s, so drops were never put down to the kill).
+    /// </summary>
+    public const long MonsterDropWindow=6_000;
     /// <summary>
     /// What a gain is put down to, in this order; the moments (milliseconds) are the watcher's clock. X-73.17 (0.873): field content (Eureka, Bozja, Occult
     /// Crescent, deep dungeons) is a duty where monsters still drop into the bags, so a kill counts there; in a deep dungeon a gain with nothing spent and no kill
     /// is a coffer of the floor (DungeonCoffer).
     /// </summary>
+    /// <param name="treasureHunt">X-159 (0.1174): a treasure hunt of the open world running (its chest or monsters seen with the game's TreasureHuntDirector
+    /// event a moment ago): a gain no kill nor item explains is the chest's.</param>
     public static Cause Attribute(bool fishing,bool busy,long now,long fateEndedAt,uint fate,long deathAt,bool inDuty,uint? spent,bool spentUsable,bool spentGained,
-        bool field=false,bool deepDungeon=false)
+        bool field=false,bool deepDungeon=false,bool treasureHunt=false)
     {
         if(fishing)return Cause.Fishing;
         if(busy)return Cause.None;
         if(fate!=0 && now-fateEndedAt is >= 0 and <= 15_000)return Cause.FateReward;
-        if((!inDuty || field || deepDungeon) && now-deathAt is >= 0 and <= 3_000)return Cause.MonsterDrop;
+        if((!inDuty || field || deepDungeon) && now-deathAt is >= 0 and <= MonsterDropWindow)return Cause.MonsterDrop;
         if(spent is not null && spentUsable && !spentGained)return Cause.Opened;
         if(deepDungeon && spent is null)return Cause.DungeonCoffer;
+        if(treasureHunt && !inDuty && spent is null)return Cause.TreasureChest;
         return Cause.None;
     }
 }

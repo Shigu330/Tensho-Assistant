@@ -19,5 +19,8 @@ public sealed class OnceSet<T>(int capacity) where T:notnull
         return true;
     }
 
+    /// <summary>X-159 (0.1174): whether the value was seen (and not forgotten yet).</summary>
+    public bool Contains(T value)=>seen.Contains(value);
+
     public void Clear(){seen.Clear();order.Clear();}
 }
