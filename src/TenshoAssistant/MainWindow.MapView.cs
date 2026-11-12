@@ -2207,6 +2207,10 @@ internal sealed partial class MainWindow
         var festivals=Festivals?.Invoke();festivals?.Want();
         // X-95 (0.950): not read yet (logging in, a reload): the last known list stands, instead of « none » then the list again.
         var festivalState=festivals?.State;
+        // X-01 C3.1 (0.1186, analysis of 12/11: « Map vendors » built twice at each first map after a load, without then with the festivals):
+        // after a load the festivals' state comes a tick later; until then nothing is built (the map shows its vendors a tick later).
+        if(festivals is not null && festivalState is null && !festivals.Unavailable && mapVendorCache.Festivals.Length==0)
+            return mapVendorCache.MapId==map.MapId && ReferenceEquals(mapVendorCache.Catalog,catalog) ? mapVendorCache.Rows:[];
         var running=festivalState?.Active.Select(festival=>festival.Id).ToHashSet() ?? (mapVendorCache.Festivals is { Length:>0 } kept ? kept.Split(',').Select(uint.Parse).ToHashSet():[]);
         var festivalKey=string.Join(',',running.Order());
         if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog) || mapVendorCache.Festivals!=festivalKey)

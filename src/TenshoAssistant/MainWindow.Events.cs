@@ -31,7 +31,7 @@ internal sealed partial class MainWindow
         Tip("Events.PartakeTip");
         if(characterStats.State.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
         var reader=Festivals?.Invoke();
-        reader?.Want();
+        reader?.WantLayouts();
         var state=reader?.State;
         if(reader?.Unavailable==true){ImGui.TextDisabled(localization.Get("Events.Unavailable"));return;}
         if(state is null){ImGui.TextDisabled(localization.Get("Events.Loading"));return;}

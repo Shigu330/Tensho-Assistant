@@ -67,10 +67,14 @@ public sealed unsafe class FestivalReader : IDisposable
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
 
-    /// <summary>Called by the page while it is shown (UI thread): keeps the reads going for 5 seconds; the first call reads the layouts.</summary>
-    public void Want()
+    /// <summary>Called while the festivals are shown (UI thread): keeps the reads of the running festivals going for 5 seconds.</summary>
+    /// <remarks>X-01 C3.2 (0.1186): the map asks for this only; the event layouts (about 1 100 files) are read by <see cref="WantLayouts"/>.</remarks>
+    public void Want()=>Volatile.Write(ref wantedUntilTicks,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
+
+    /// <summary>X-01 C3.2 (0.1186): the Events page: <see cref="Want"/>, and the first call reads the festivals' NPC layouts, off the frame.</summary>
+    public void WantLayouts()
     {
-        Volatile.Write(ref wantedUntilTicks,DateTimeOffset.UtcNow.AddSeconds(5).UtcTicks);
+        Want();
         if(Interlocked.Exchange(ref layoutsStarted,1)!=0)return;
         var token=cancellation.Token;
         _=Task.Run(()=>

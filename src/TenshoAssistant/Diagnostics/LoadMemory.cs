@@ -1,10 +1,10 @@
 namespace TenshoAssistant.Diagnostics;
 
 /// <summary>
-/// X-01 C1.1 (0.1184, docs/ai analysis of 12/11: 87 % of the slow frames follow repeated hot reloads; full collections of 1.3 to 3.7 s grow with
+/// X-01 C1.1 (0.1184, analysis of the slow frames of 12/11: 87 % of the slow frames follow repeated hot reloads; full collections of 1.3 to 3.7 s grow with
 /// the reload's rank): what the load lines of the log add to measure it: the managed heap, the load contexts that carry Tensho's name (an
 /// unloaded instance that stays alive is a leak), and whether the previous instance's context was still alive ten seconds after this load.
-/// Measurement only: nothing is collected or forced here.
+/// Measurement only: nothing is collected or forced here. Readings: docs/evidence/0.1186-load-measures.md.
 /// </summary>
 public static class LoadMemory
 {
