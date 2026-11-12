@@ -36,7 +36,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     // destinations and results, submarine results, overmeld rate, spiritbond extraction, letters' attachments), the Fashion Report preview and best score
     // (dyes, evaluations), and the island's wild animals. Numbers only: no text is written, so no name (a letter's sender) can reach the log.
     private static readonly string[] ProbedWindows=["SpearFishing","AirShipExploration","AirShipExplorationResult","SubmarineExplorationResult","MateriaAttachDialog",
-        "Materialize","LetterViewer"];
+        "Materialize","LetterViewer","Gathering"];
     private readonly Dictionary<string,string> windowValues=[];private string fashionSeen="",islandObjects="";
     private long slowAt;
 
@@ -135,7 +135,9 @@ public sealed unsafe class ReadingCapture : IDisposable
             if(handle.IsNull || !handle.IsVisible){windowValues.Remove(name);continue;}
             var unit=(AtkUnitBase*)handle.Address;
             var values=new StringBuilder();
-            AppendValues(values,unit,96);
+            // X-134 (0.1175): the gathering window's numbers, up to 200: which one marks the item gathered only once (« RARE »). Never a window's
+            // texts (0.881: a letter's text is the player's).
+            AppendValues(values,unit,name=="Gathering" ? 200:96);
             // 0.890 (X-73.18): the spearfishing shadows in sight (AddonSpearFishing.Fish), to check the catch's shadow against the window.
             if(name=="SpearFishing")
             {

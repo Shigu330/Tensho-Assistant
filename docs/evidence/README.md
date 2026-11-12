@@ -24,7 +24,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.114.0-local-probe.log](0.114.0-local-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1163-beast-result.md](0.1163-beast-result.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs`, `tests/TenshoAssistant.Tests/BeastResult1163Tests.cs` | — |
 | [0.1165-garden-menu.md](0.1165-garden-menu.md) | `src/TenshoAssistant/Reminders/GardenChat.cs` | — |
-| [0.1174-defeat-treasure.md](0.1174-defeat-treasure.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Discoveries/ItemGains.cs` | `CHANGELOG.md` |
+| [0.1174-defeat-treasure.md](0.1174-defeat-treasure.md) | `src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs`, `src/TenshoAssistant/Discoveries/ItemGains.cs`, `tests/TenshoAssistant.Tests/TreasureDefeat1174Tests.cs` | `CHANGELOG.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.127.0-sightseeing-probe.log](0.127.0-sightseeing-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

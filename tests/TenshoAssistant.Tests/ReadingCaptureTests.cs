@@ -67,7 +67,7 @@ internal static class ReadingCaptureTests
             var capture=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs"));
             var windows=capture[capture.IndexOf("private void ReadWindows()",StringComparison.Ordinal)..capture.IndexOf("private void ReadFashion()",StringComparison.Ordinal)];
             Check(!windows.Contains("AtkValueType.String") && !windows.Contains("IsText("),"no text from windows");
-            Check(windows.Contains("AppendValues(values,unit,96);") && capture.Contains("index<Math.Min((int)unit->AtkValuesCount,max)") && windows.Contains("if(windowValues.GetValueOrDefault(name)==all)continue;"),"bounded, on change");
+            Check(windows.Contains("AppendValues(values,unit,name==\"Gathering\" ? 200:96);") && capture.Contains("index<Math.Min((int)unit->AtkValuesCount,max)") && windows.Contains("if(windowValues.GetValueOrDefault(name)==all)continue;"),"bounded, on change");
             Check(capture.Contains("if(all==fashionSeen)return;") && capture.Contains("if(all==islandObjects)return;"),"on change");
         }),
         // From QuestMarkers792Tests: 0.792 (X-32): the game's own quest and leve markers, captured to see if they hold the areas while the game map is closed.

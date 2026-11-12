@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1175.0
+- Plan global, X-134 : Aide à la récolte (X-134, étape suivante) : en mode développeur, les valeurs de la fenêtre de récolte du jeu (Gathering : nombres et textes, jusqu'à 200) sont écrites au journal quand elles changent, pour trouver laquelle marque l'objet récoltable une seule fois (« RARE ») avant de ne plus proposer de PR pour sa quantité.
+- Tests : GatherWindow1175Tests. Verify.ps1 (agent) : 2034/2034, 0 avertissement, 0 erreur ; DLL 0.1175.0.0. Non validé en jeu.
+### English
+- Gathering help (X-134, next step): in developer mode, the values of the game's gathering window (Gathering: numbers and texts, up to 200) are written to the log when they change, to find which one marks the item gathered only once (« RARE ») before no longer proposing GP for its quantity.
+
 ## 0.1174.0
 - Plan global, X-159 : Découvertes d'objets (X-159, chasse au trésor de l'utilisateur du 12/11) : le butin d'un monstre est rattaché au monstre vaincu d'après le message du jeu « Vous avez vaincu … » (ligne 557 de LogMessage, ses deux entités), même quand le monstre n'était pas votre cible ; son cadavre est retrouvé par son nom parmi les monstres morts proches, le plus près, et chaque cadavre ne compte qu'une fois. Le butin arrive 3,6 à 3,7 s après le message : la fenêtre passe de 3 à 6 s (aucun butin n'était jamais rattaché). Le coffre d'une chasse au trésor en extérieur (objets portant l'événement TreasureHuntDirector du jeu) est noté comme « obtenu de » la carte déchiffrée (son objet, TreasureHuntRank) ; sans carte connue, rien n'est noté. Preuve : docs/evidence/0.1174-defeat-treasure.md.
 - Tests : TreasureDefeat1174Tests. Verify.ps1 (agent) : 2033/2033, 0 avertissement, 0 erreur ; DLL 0.1174.0.0. Non validé en jeu.
