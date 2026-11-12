@@ -364,12 +364,18 @@ public sealed class LinkChangeLog
 /// <summary>X-119 step 2 (0.1114): the application's side of the change notices: which files to read again, each once.</summary>
 public sealed class LinkChangeReader
 {
-    private long seen;
+    private long seen,lastSequence;
 
     /// <summary>The categories changed since the last call (a new plugin start counts again from zero); empty when nothing new.</summary>
     public IReadOnlyList<string> Take(LinkSnapshot? snapshot)
     {
-        if(snapshot?.Changes is not { Count: >0 } changes)return [];
+        // X-170 (0.1142, GPT audit): the plugin may start again while the link is down, its generations counting from 1 again up to the one seen
+        // (then « newest < seen » does not tell it and its first notices were dropped): a lost link, or snapshots counting again from the start
+        // (Sequence), makes everything it sends next new. Reading a file again is harmless; missing a change is not.
+        if(snapshot is null){seen=0;lastSequence=0;return [];}
+        if(snapshot.Sequence<lastSequence)seen=0;
+        lastSequence=snapshot.Sequence;
+        if(snapshot.Changes is not { Count: >0 } changes)return [];
         var newest=changes.Max(change=>change.Generation);
         // The plugin started again (its generations count from 1 again): every name it sends is new.
         if(newest<seen)seen=0;

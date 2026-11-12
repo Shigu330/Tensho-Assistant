@@ -15,8 +15,13 @@ public static class SettingsGuard
     /// <summary>The largest settings file read (the user's is about 64 KB).</summary>
     public const long MaxBytes=8L*1024*1024;
 
-    /// <summary>The properties never carried into the app: secrets of the plugin's settings (DiscordSettings), whatever object holds them.</summary>
-    public static readonly IReadOnlySet<string> Secrets=new HashSet<string>(StringComparer.Ordinal){"WebhookUrl","CategoryUrls"};
+    /// <summary>The properties never carried into the app: secrets of the plugin's settings (DiscordSettings), whatever object holds them.
+    /// X-170 (0.1142, GPT audit): whatever their case (Newtonsoft fills a property from a name of any case).</summary>
+    public static readonly IReadOnlySet<string> Secrets=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"WebhookUrl","CategoryUrls"};
+    /// <summary>X-170 (0.1142): a Discord webhook address in any other text of the settings (a note, a copied line), whatever its case.</summary>
+    public static readonly System.Text.RegularExpressions.Regex WebhookAddress=new(@"discord(?:app)?\.com/api/(?:v[0-9]{1,2}/)?webhooks/",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase|System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+    private static bool HoldsWebhook(JsonNode? node)=>node is JsonValue value && value.TryGetValue<string>(out var text) && WebhookAddress.IsMatch(text);
 
     /// <summary>The file's text, read while the game may be writing it (shared), refused over MaxBytes.</summary>
     public static string ReadBounded(string path)
@@ -37,7 +42,7 @@ public static class SettingsGuard
 
     /// <summary>
     /// The settings as the app may see them: the same JSON (order, numbers and type names kept) without the Secrets properties at any
-    /// depth. JsonException when it is not one JSON object.
+    /// depth, and with any other text holding a Discord webhook address emptied (X-170). JsonException when it is not one JSON object.
     /// </summary>
     public static string Project(string json)
     {
@@ -50,9 +55,12 @@ public static class SettingsGuard
             {
                 case JsonObject node:
                     foreach(var secret in node.Select(pair=>pair.Key).Where(Secrets.Contains).ToArray())node.Remove(secret);
+                    // X-170 (0.1142): a webhook address held by any other property is emptied (the app sends nothing).
+                    foreach(var key in node.Where(pair=>HoldsWebhook(pair.Value)).Select(pair=>pair.Key).ToArray())node[key]="";
                     foreach(var (_,child) in node)if(child is not null)stack.Push(child);
                     break;
                 case JsonArray list:
+                    for(var index=0;index<list.Count;index++)if(HoldsWebhook(list[index]))list[index]="";
                     foreach(var child in list)if(child is not null)stack.Push(child);
                     break;
             }

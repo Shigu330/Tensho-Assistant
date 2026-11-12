@@ -49,6 +49,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     return result;
                 });
             }
+            // X-170 (0.1142): a lock held elsewhere read nothing: not a failed read (the service tries again); anything else protects the files.
+            catch(BankLockBusyException){throw;}
             catch{loadFailed=true;throw;}
         }
     }
@@ -115,7 +117,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
 
     /// <summary>
     /// X-141: work done while holding the profile's lock file (opened without sharing: the other client, or another store here, waits);
-    /// tried again every 50 ms up to lockWaitMs, then the IOException of the busy file (nothing changed).
+    /// tried again every 50 ms up to lockWaitMs, then <see cref="BankLockBusyException"/> (nothing changed; X-170, 0.1142: its own type, so the
+    /// service can tell « the other client holds the lock » from a file that cannot be read).
     /// </summary>
     private T Locked<T>(Func<T> work)
     {
@@ -126,6 +129,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             FileStream held;
             try{held=new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
             catch(IOException) when(Environment.TickCount64<until){Thread.Sleep(50);continue;}
+            catch(IOException error){throw new BankLockBusyException(LockPath,error);}
             using(held)return work();
         }
     }
@@ -169,3 +173,6 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
         return candidate;
     }
 }
+
+/// <summary>X-170 (0.1142): the profile's bank lock stayed held by another process (the other game client, the desktop application) for the whole wait.</summary>
+public sealed class BankLockBusyException(string path,Exception inner) : IOException($"The bank lock ({Path.GetFileName(path)}) is held by another program.",inner);

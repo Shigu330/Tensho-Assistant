@@ -16,10 +16,13 @@ public sealed class InventoryBankService : IDisposable
     private ImportRequest? pending;
     private bool disposed;
     private bool loadFailed;
+    private readonly TimeSpan busyRetry;
 
-    public InventoryBankService(IInventoryBankStore store)
+    /// <param name="busyRetry">X-170 (0.1142): the pause before the load is tried again while another client holds the bank's lock (5 s by default).</param>
+    public InventoryBankService(IInventoryBankStore store, TimeSpan? busyRetry = null)
     {
         this.store = store ?? throw new ArgumentNullException(nameof(store));
+        this.busyRetry = busyRetry ?? TimeSpan.FromSeconds(5);
         _ = Task.Run(RunAsync);
     }
 
@@ -103,25 +106,42 @@ public sealed class InventoryBankService : IDisposable
     {
         try
         {
-            try
+            // X-170 (0.1142, GPT audit): the other game client (or the desktop application) holds the profile's lock at start: the load is tried
+            // again after a pause, the bank staying « loading » meanwhile (nothing can be changed, nothing is written); before, the bank stayed
+            // blocked for the whole session. Any other failure (a file that cannot be read) blocks it as before, to protect the file.
+            while (true)
             {
-                var loaded = store.Load();
-                ValidateEntries(loaded);
-                lock (gate)
+                try
                 {
-                    if (disposed) return;
-                    Publish(new(loaded, false, false, null));
-                    ready.TrySetResult();
+                    var loaded = store.Load();
+                    ValidateEntries(loaded);
+                    lock (gate)
+                    {
+                        if (disposed) return;
+                        Publish(new(loaded, false, false, null));
+                        ready.TrySetResult();
+                    }
+                    break;
                 }
-            }
-            catch (Exception ex)
-            {
-                lock (gate)
+                catch (BankLockBusyException ex)
                 {
-                    if (disposed) return;
-                    loadFailed = true;
-                    Publish(new(state.Entries, false, false, $"The bank could not be loaded: {ex.Message}"));
-                    ready.TrySetResult();
+                    lock (gate)
+                    {
+                        if (disposed) return;
+                        Publish(new(state.Entries, true, false, $"The bank waits for another program to release it: {ex.Message}"));
+                    }
+                    await Task.Delay(busyRetry).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    lock (gate)
+                    {
+                        if (disposed) return;
+                        loadFailed = true;
+                        Publish(new(state.Entries, false, false, $"The bank could not be loaded: {ex.Message}"));
+                        ready.TrySetResult();
+                    }
+                    break;
                 }
             }
 
