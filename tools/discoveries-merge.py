@@ -2,9 +2,13 @@
 
 Usage:
   python tools/discoveries-merge.py sync [--dry-run]
-      Reads every open « Discoveries » issue (label discoveries) through the GitHub CLI, fetches the gist it points to, keeps the player's valid facts
+      Reads every open « Discoveries » issue through the GitHub CLI, fetches the gist it points to, keeps the player's valid facts
       in community-discoveries/players/<issue>.json (replacing that player's previous file: an updated gist is never counted twice), then rebuilds
       discoveries.json from all player files. --dry-run: report only, nothing written.
+      X-168 (0.1146): GitHub drops the « discoveries » label of an issue opened by a player without rights on the repository, so issues are found
+      by the label, or by their title « Discoveries: <login> », or by their content (« Shared from Tensho Assistant » with a gist link). Before
+      anything is read, each one must hold one gist link only, the CC0-1.0 sharing ticked, a title naming its author (when it names one), and a gist
+      owned by the issue's author; otherwise it is left for manual triage (MANUAL, never merged) with the notice command to tell the player.
   python tools/discoveries-merge.py rebuild
       Rebuilds discoveries.json and the v3 set community-discoveries/v3/ from community-discoveries/players/*.json.
   python tools/discoveries-merge.py check <file.json|file.zip|v3 folder|gist:ID>
@@ -15,8 +19,9 @@ Usage:
       or FATE the patch moved or removed. Read-only; --local adds this PC's own Discoveries.json. `sync --dry-run` ends with it.
   python tools/discoveries-merge.py notice <issue> merged <version> <facts> [--dry-run]
   python tools/discoveries-merge.py notice <issue> flag <refused> <total> [--dry-run]
-      Comments the ticket in English then French (tools/bilingual.py): facts merged into a version, or a share not merged because over 5 % of
-      its facts were refused. --dry-run: prints the comment only.
+  python tools/discoveries-merge.py notice <issue> manual <gist|cc0|title|owner> [--dry-run]
+      Comments the ticket in English then French (tools/bilingual.py): facts merged into a version, a share not merged because over 5 % of
+      its facts were refused, or (X-168) a share left for manual triage and why. --dry-run: prints the comment only.
 
 Rules mirror DiscoveryStore.Valid (src/TenshoAssistant/Discoveries/DiscoveriesModel.cs): a fact that does not hold is refused; any property the plugin does
 not write is refused (the computed « Key » is accepted and dropped). In the common file each fact has Seen 0 and Imported = the number of players who have it;
@@ -202,11 +207,16 @@ def fetch_gist_raw(url,limit):
     if len(data)>limit:raise ValueError("too large")
     return data
 
+def gist_listing(gist):
+    """X-168: a gist's owner login and files ({name: {"raw_url": …}}), through the GitHub CLI; nothing of its content is read here."""
+    listed=json.loads(subprocess.run(["gh","api",f"gists/{gist}","--jq","{owner:(.owner.login // \"\"),files:(.files|map_values({raw_url:.raw_url}))}"],
+        capture_output=True,text=True,check=True).stdout)
+    return listed.get("owner") or "",listed.get("files") or {}
+
 def from_gist(reference):
     """A gist id or URL: its files listed through the GitHub CLI, then read in v3 or v2 (from_gist_files)."""
     gist=reference.removeprefix("gist:").rstrip("/").split("/")[-1]
-    listed=subprocess.run(["gh","api",f"gists/{gist}","--jq",".files|map_values({raw_url:.raw_url})"],capture_output=True,text=True,check=True).stdout
-    return from_gist_files(json.loads(listed),fetch_gist_raw)
+    return from_gist_files(gist_listing(gist)[1],fetch_gist_raw)
 
 def read(path):
     if path.startswith("gist:") or "gist.github.com" in path:return from_gist(path)
@@ -287,14 +297,56 @@ def news(issue,facts):
     old={key(f):json.dumps(f,sort_keys=True) for f in kept};new={key(f):json.dumps(f,sort_keys=True) for f in facts}
     return sum(1 for k,v in new.items() if old.get(k)!=v),sum(1 for k in old if k not in new)
 
+# ---------- X-168 (0.1146): which issues are shares, and which can be merged without a look by hand ----------
+DISCOVERIES_TITLE=re.compile(r"^\s*Discoveries:\s*(\S+)\s*$",re.I)
+GIST_LINK=re.compile(r"https://gist\.github\.com/(?:[A-Za-z0-9-]{1,39}/)?([0-9a-f]{20,40})\b")
+CC0_TICKED=re.compile(r"^\s*[-*]\s*\[[xX]\]\s*I share these discoveries under CC0-1\.0\b",re.M)
+SHARED_FROM="Shared from Tensho Assistant"
+DOUBTS={"gist":"no gist link, or more than one","cc0":"the CC0-1.0 sharing is not ticked","title":"the title names another account than the issue's author",
+        "owner":"the gist is not owned by the issue's author"}
+
+def login(issue):return ((issue.get("author") or {}).get("login") or "").strip()
+
+def is_share(issue):
+    """X-168: a share by its label, its title « Discoveries: <login> », or its content (GitHub drops the label of a player without rights)."""
+    labels={(l.get("name") or "").lower() for l in issue.get("labels") or []}
+    body=issue.get("body") or ""
+    return "discoveries" in labels or bool(DISCOVERIES_TITLE.match(issue.get("title") or "")) or (SHARED_FROM in body and bool(GIST_LINK.search(body)))
+
+def triage(issue):
+    """X-168: (gist id, None) when the issue can be read, else (None, doubt) for manual triage. The gist's owner is checked by owner_doubt."""
+    body=issue.get("body") or ""
+    gists={m.group(1) for m in GIST_LINK.finditer(body)}
+    if len(gists)!=1:return None,"gist"
+    if not CC0_TICKED.search(body):return None,"cc0"
+    named=DISCOVERIES_TITLE.match(issue.get("title") or "")
+    if named and named.group(1).lower()!=login(issue).lower():return None,"title"
+    return gists.pop(),None
+
+def owner_doubt(owner,issue):
+    """X-168: the gist must belong to the account that opened the issue (GitHub logins ignore case)."""
+    return None if owner and login(issue) and owner.lower()==login(issue).lower() else "owner"
+
+def short(text,limit=60):text=" ".join((text or "").split());return text if len(text)<=limit else text[:limit-1]+"…"
+
 def sync(dry):
-    issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--label","discoveries","--state","open","--limit","500",
-        "--json","number,title,body,author"],capture_output=True,text=True,check=True).stdout)
+    # X-168: every open issue is listed (no label filter), then is_share picks the shares.
+    issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--state","open","--limit","500",
+        "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True).stdout)
     os.makedirs(PLAYERS,exist_ok=True)
     for issue in issues:
-        found=re.search(r"https://gist\.github\.com/([0-9a-f]{20,40})",issue.get("body") or "")
-        if not found:print(f"#{issue['number']} {issue['title']}: no gist link, skipped");continue
-        try:facts,report=clean(from_gist(found.group(1)))
+        if not is_share(issue):continue
+        issue["title"]=short(issue.get("title"))
+        def manual(doubt):
+            print(f"#{issue['number']} {issue['title']}: MANUAL ({DOUBTS[doubt]}): not merged; tell the player: "
+                  f"python -I -X utf8 tools/discoveries-merge.py notice {issue['number']} manual {doubt}")
+        gist,doubt=triage(issue)
+        if doubt:manual(doubt);continue
+        try:owner,files=gist_listing(gist)
+        except Exception as error:print(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
+        doubt=owner_doubt(owner,issue)
+        if doubt:manual(doubt);continue
+        try:facts,report=clean(from_gist_files(files,fetch_gist_raw))
         except Exception as error:print(f"#{issue['number']} {issue['title']}: gist unreadable ({type(error).__name__}), skipped");continue
         total=report["facts"]+report["refused"];flag=" FLAG: refusals over 5 %" if total and report["refused"]/total>0.05 else ""
         added,gone=news(issue["number"],facts)
@@ -401,6 +453,23 @@ def selftest():
         check(news(5,[b,a])==(0,0),"same facts in another order: nothing new")
         check(news(5,[a,{**b,"LevelMax":3}])==(1,0) and news(5,[a])==(0,1),"changed and gone")
     PLAYERS=saved
+    # X-168: shares found without their label, gist owner and CC0 checked, doubt left to manual triage.
+    gid="0123456789abcdef0123";other="fedcba9876543210fedc"
+    body=(f"Shared from Tensho Assistant 0.1146.0 (World › Discoveries › automatic exchange).\n\nGist: https://gist.github.com/{gid}\n\n"
+          "- [x] I share these discoveries under CC0-1.0 (public domain, https://creativecommons.org/publicdomain/zero/1.0/).\n\nThe gist is updated at each exchange; this issue stays the same.")
+    share=lambda **k:{"number":7,"title":"Discoveries: Ann","body":body,"author":{"login":"Ann"},"labels":[],**k}
+    check(is_share(share()) and is_share(share(labels=[{"name":"discoveries"}])),"a share without its label is found by its title")
+    check(is_share(share(title="my discoveries")),"by its content when the title was changed")
+    check(not is_share({"number":8,"title":"Map is wrong","body":f"see https://gist.github.com/{gid}","author":{"login":"Bo"},"labels":[{"name":"bug"}]}),"a bug report with a gist is not a share")
+    check(triage(share())==(gid,None) and triage(share(author={"login":"ann"}))==(gid,None),"the plugin's issue passes (login case ignored)")
+    check(triage(share(body=body.replace(f"gist.github.com/{gid}",f"gist.github.com/Ann/{gid}")))==(gid,None),"a gist link with its owner's name")
+    check(triage(share(body=body.replace("- [x] I share","- [ ] I share")))==(None,"cc0"),"CC0 not ticked: manual")
+    check(triage(share(body=body.replace("- [x] I share these discoveries under CC0-1.0","I share")))==(None,"cc0"),"CC0 sentence gone: manual")
+    check(triage(share(title="Discoveries: Bob"))==(None,"title"),"title naming another account: manual")
+    check(triage(share(body=body+f"\nalso https://gist.github.com/{other}"))==(None,"gist") and triage(share(body="hello"))==(None,"gist"),"two gists, or none: manual")
+    check(owner_doubt("Ann",share()) is None and owner_doubt("ANN",share()) is None,"gist of the author")
+    check(owner_doubt("Bob",share())=="owner" and owner_doubt("",share())=="owner" and owner_doubt("Ann",share(author={}))=="owner","someone else's gist, or unknown: manual")
+    check(short("x"*80).endswith("…") and len(short("x"*80))==60 and short("a\nb")=="a b","titles cut to one line")
     # X-174: the v3 format.
     def refused(run):
         try:run();return False
@@ -455,12 +524,35 @@ def selftest():
         check(sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)==sorted(held,key=sort_key),"v3: the repository's set holds the facts of discoveries.json")
     print(f"discoveries-merge selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
+# X-168: the player is told why a share was not taken (English then French).
+MANUAL_NOTICES={
+    "gist":("Not merged: this issue should hold exactly one link to your discoveries gist. Please share again from Tensho Assistant (World › Discoveries › Exchange now).",
+            "Pas fusionné : ce ticket doit contenir un seul lien vers votre gist de découvertes. Merci de partager à nouveau depuis Tensho Assistant (Monde › Découvertes › Échanger maintenant)."),
+    "cc0":("Not merged: the CC0-1.0 sharing is not ticked in this issue, and shared discoveries are published under CC0-1.0 only. Tick it (or share again from Tensho Assistant) if you agree.",
+           "Pas fusionné : le partage sous CC0-1.0 n'est pas coché dans ce ticket, et les découvertes partagées ne sont publiées que sous CC0-1.0. Cochez-le (ou partagez à nouveau depuis Tensho Assistant) si vous êtes d'accord."),
+    "title":("Not merged yet: the title of this issue names another account than the one that opened it. The maintainer will look at it by hand.",
+             "Pas encore fusionné : le titre de ce ticket nomme un autre compte que celui qui l'a ouvert. Le mainteneur va le regarder à la main."),
+    "owner":("Not merged yet: the linked gist does not belong to the account that opened this issue. The maintainer will look at it by hand; sharing from Tensho Assistant with your own account avoids this.",
+             "Pas encore fusionné : le gist lié n'appartient pas au compte qui a ouvert ce ticket. Le mainteneur va le regarder à la main ; partager depuis Tensho Assistant avec votre propre compte l'évite."),
+}
+
+def notice_manual(issue,doubt,dry):
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+    from bilingual import compose
+    if doubt not in MANUAL_NOTICES:print(__doc__);return 2
+    body=compose(*MANUAL_NOTICES[doubt])
+    if dry:print(body);return 0
+    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True)
+    print(f"#{issue}: {'commented' if out.returncode==0 else 'comment failed'}");return out.returncode
+
 def notice(argv):
     sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
     from bilingual import compose
     dry="--dry-run" in argv;argv=[a for a in argv if a!="--dry-run"]
-    if len(argv)!=4 or argv[1] not in ("merged","flag") or not argv[0].isdigit():print(__doc__);return 2
+    if len(argv)==3 and argv[1]=="manual" and argv[2] in MANUAL_NOTICES:argv=argv+[""]
+    if len(argv)!=4 or argv[1] not in ("merged","flag","manual") or not argv[0].isdigit():print(__doc__);return 2
     issue,what,a,b=argv
+    if what=="manual":return notice_manual(issue,a,dry)
     if what=="merged":body=compose(f"Merged into {a}: {b} facts. Thank you! They reach every player with the next release.",
                                    f"Fusionné dans la {a} : {b} faits. Merci ! Ils arrivent chez tous les joueurs avec la prochaine release.")
     else:body=compose(f"Not merged: {a} of {b} facts were refused (over 5 %). Please update Tensho Assistant, export again and update the gist.",
