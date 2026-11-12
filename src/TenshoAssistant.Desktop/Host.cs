@@ -116,6 +116,15 @@ internal sealed class Host
         catch(TargetInvocationException error){return $"{category}: not read ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})";}
     }
 
+    /// <summary>X-163 (0.1132): the alarms to ring now, from the plugin's MainWindow.DesktopDueAlarms (called by its name); none when it is missing.</summary>
+    public (string[] Lines,bool Sound) DueAlarms(DateTimeOffset now,bool gameInFront)
+    {
+        due??=Window.GetType().GetMethod("DesktopDueAlarms",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(DateTimeOffset),typeof(bool)]);
+        if(due?.Invoke(Window,[now,gameInFront]) is not System.Runtime.CompilerServices.ITuple { Length:2 } result)return ([],false);
+        return ((string[])result[0]!,(bool)result[1]!);
+    }
+    private MethodInfo? due;
+
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
 

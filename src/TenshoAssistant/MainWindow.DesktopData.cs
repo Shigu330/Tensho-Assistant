@@ -38,4 +38,17 @@ internal sealed partial class MainWindow
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");
         }
     }
+
+    // X-163 (0.1132): the alarms the desktop application rings now (AlarmBell: the plugin's rule, the application's own memory), as lines
+    // in the plugin's language, and whether it plays a sound. Called by the application once a second, by its name (DesktopData1131Tests).
+    // An alarm due while the game is in front is marked rung and not shown when DesktopOnlyGameBehind is on: it rings in the game.
+    private Alarms.AlarmBell? desktopBell;
+    internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)
+    {
+        var options=configuration.AlarmOptions ?? new();
+        var catalog=weather.State.Catalog;
+        var due=(desktopBell??=new()).Due(configuration.Alarms,now,catalog is null ? null:(alarm,time)=>Alarms.AlarmService.WeatherAt(catalog,alarm.TerritoryId,time));
+        if(due.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
+        return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((item.Occurrence-now).TotalMinutes))))],options.DesktopSound);
+    }
 }

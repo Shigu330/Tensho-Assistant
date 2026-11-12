@@ -1689,7 +1689,11 @@
     "GameStateNameTaken": "Sending to the game: one or more alarms are not sent, as another Tensho alarm already has their game name (same start of name, same ET time); Tensho keeps ringing them ({0} left).",
     "RingInTensho": "Ring with Tensho",
     "RingInTenshoTip": "The copy is not in the game's alarm list (deleted in the game, or the command was ignored). Tensho rings this alarm again and « Send to the game » comes back. Check the game's « Alarms » window first: if the copy is there, the alarm would ring twice.",
-    "GameCopyUnchanged": "The copy in the game is not changed: change it in the game's « Alarms » window."
+    "GameCopyUnchanged": "The copy in the game is not changed: change it in the game's « Alarms » window.",
+    "DesktopSound": "Desktop app: Windows sound",
+    "DesktopSoundTip": "When the desktop application rings an alarm (a line in its status bar), it also plays Windows' exclamation sound.\nDefault: on.",
+    "DesktopOnlyGameBehind": "Desktop app: only when the game is not in front",
+    "DesktopOnlyGameBehindTip": "The desktop application rings an alarm only while the game is not the window in front (the game rings it then). Unticked: it rings in both.\nDefault: on."
   },
   "CraftMacro": {
     "MacroChain": "Macro Chain (Caraxi) is loaded: chained pages end with « /nextmacro », handled by Macro Chain, instead of Tensho’s marker.",
@@ -7757,6 +7761,7 @@
     "UpdateAutoOff": "Automatic update: off",
     "UpdateCheck": "Check for update",
     "UpdateRestart": "Restart now",
-    "UpdatePrevious": "Previous version ({0})"
+    "UpdatePrevious": "Previous version ({0})",
+    "AlarmLine": "Alarm: {0} · {1} (in {2} min)"
   }
 }

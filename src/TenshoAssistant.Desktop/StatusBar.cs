@@ -26,6 +26,10 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
 
     /// <summary>X-150 (0.1120): the settings read again off the frame, the link's notices grouped (one reading for a burst of saves).</summary>
     private Grouped<object?>? reload;
+    /// <summary>X-163 (0.1132): the application rings the alarms (off in a headless run); the lines shown for a minute after they rang.</summary>
+    public bool Bell;
+    private DateTimeOffset nextBell;
+    private readonly List<(string Text,DateTimeOffset Until)> rang=[];
     /// <summary>X-119 step 2, part 2 (0.1131): the plugin's folder and the app's copy of it (null: the saved data are not read, e.g. headless).</summary>
     public (string Source,string Mirror)? Data;
     private readonly Dictionary<string,Grouped<(int Copied,IReadOnlyList<string> Problems)>> copies=[];
@@ -51,6 +55,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     /// </summary>
     public void Poll()
     {
+        Ring(DateTimeOffset.UtcNow);
         var categories=changes.Take(Link?.Invoke());
         if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();
         // X-119 step 2, part 2 (0.1131): a category the app reads is copied again off the frame (a burst of notices = one copy), then its
@@ -77,6 +82,18 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         reloadProblem=note.StartsWith("read again",StringComparison.Ordinal) ? null : note;
     }
 
+    // X-163 (0.1132): once a second, the alarms due (the plugin's rule, AlarmBell), a Windows sound and a line in the bar.
+    private void Ring(DateTimeOffset now)
+    {
+        if(!Bell || now<nextBell)return;
+        nextBell=now.AddSeconds(1);
+        rang.RemoveAll(line=>line.Until<now);
+        var (lines,sound)=host.DueAlarms(now,DesktopGame.InFront());
+        if(lines.Length==0)return;
+        foreach(var line in lines){rang.Add((line,now.AddMinutes(1)));Console.WriteLine("Alarm: "+line);}
+        if(sound)DesktopGame.Beep();
+    }
+
     public string VersionEnglish=>DesktopVersionCheck.English(version);
 
     public string VersionText
@@ -99,6 +116,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         var lines=new List<(string,bool)>();
         var page=host.CurrentPage;
         if(redirected is not null)lines.Add((host.Text("Desktop.InGameOnly",PageName(redirected)),true));
+        foreach(var (text,_) in rang)lines.Add((text,true));
         var linked=Link?.Invoke();
         if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked))+Live(linked),false));
         else if(OtherProtocol?.Invoke() is { } other)lines.Add((host.Text("Desktop.LinkOtherProtocol",other,TenshoAssistant.Link.LocalLinkProtocol.Version),true));

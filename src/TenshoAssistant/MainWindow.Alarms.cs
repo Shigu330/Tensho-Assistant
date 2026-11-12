@@ -505,6 +505,11 @@ internal sealed partial class MainWindow
         // 0.371 (g, M-01): automatic alarms, saved on its own (kept when the options above are saved).
         BoolSetting("AutoAlarms.Setting","AutoAlarms.SettingTip",()=>configuration.AlarmOptions?.AutoAlarms!=false,
             value=>(configuration.AlarmOptions??=new()).AutoAlarms=value,c=>c.AlarmOptions?.AutoAlarms!=false);
+        // X-163 (0.1132): the desktop application's bell, saved on its own (kept when the options above are saved).
+        BoolSetting("Alarms.DesktopSound","Alarms.DesktopSoundTip",()=>configuration.AlarmOptions?.DesktopSound!=false,
+            value=>(configuration.AlarmOptions??=new()).DesktopSound=value,c=>c.AlarmOptions?.DesktopSound!=false);
+        BoolSetting("Alarms.DesktopOnlyGameBehind","Alarms.DesktopOnlyGameBehindTip",()=>configuration.AlarmOptions?.DesktopOnlyGameBehind!=false,
+            value=>(configuration.AlarmOptions??=new()).DesktopOnlyGameBehind=value,c=>c.AlarmOptions?.DesktopOnlyGameBehind!=false);
         // R-12 (0.319): Discord webhook, saved on its own.
         DrawDiscordSettings();
         if(page!=Page.Alarms && ImGui.SmallButton(localization.Get("Alarms.Open"))){page=Page.Alarms;}

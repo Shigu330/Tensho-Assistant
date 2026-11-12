@@ -176,6 +176,8 @@ public static class SettingsIndex
         ("ModuleSettings.Wait","Panels"),
         ("ModuleSettings.Width","Panels"),
         ("Advanced.CommandDelay","Tracking"),
+        ("Alarms.DesktopOnlyGameBehind","Tracking"),
+        ("Alarms.DesktopSound","Tracking"),
         ("Alarms.DutyPop","Tracking"),
         ("AutoAlarms.Setting","Tracking"),
         ("Currencies.ServerBar","Tracking"),

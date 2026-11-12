@@ -1689,7 +1689,11 @@
     "GameStateNameTaken": "Envoi au jeu : une ou plusieurs alarmes ne sont pas envoyées, car une autre alarme Tensho a déjà leur nom de jeu (même début de nom, même heure ET) ; Tensho continue de les faire sonner ({0} restante(s)).",
     "RingInTensho": "Faire sonner par Tensho",
     "RingInTenshoTip": "La copie n'est pas dans la liste des alarmes du jeu (supprimée dans le jeu, ou commande ignorée). Tensho fait de nouveau sonner cette alarme et « Envoyer au jeu » revient. Vérifiez d'abord la fenêtre « Alarmes » du jeu : si la copie y est, l'alarme sonnerait deux fois.",
-    "GameCopyUnchanged": "La copie dans le jeu n'est pas modifiée : changez-la dans la fenêtre « Alarmes » du jeu."
+    "GameCopyUnchanged": "La copie dans le jeu n'est pas modifiée : changez-la dans la fenêtre « Alarmes » du jeu.",
+    "DesktopSound": "Application de bureau : son Windows",
+    "DesktopSoundTip": "Quand l'application de bureau fait sonner une alarme (une ligne dans sa barre d'état), elle joue aussi le son « exclamation » de Windows.\nPar défaut : activé.",
+    "DesktopOnlyGameBehind": "Application de bureau : seulement si le jeu n'est pas au premier plan",
+    "DesktopOnlyGameBehindTip": "L'application de bureau ne fait sonner une alarme que si le jeu n'est pas la fenêtre au premier plan (le jeu la fait sonner alors). Décoché : elle sonne des deux côtés.\nPar défaut : activé."
   },
   "CraftMacro": {
     "MacroChain": "Macro Chain (Caraxi) est chargé : les pages enchaînées finissent par « /nextmacro », géré par Macro Chain, au lieu du marqueur de Tensho.",
@@ -7757,6 +7761,7 @@
     "UpdateAutoOff": "Mise à jour automatique : coupée",
     "UpdateCheck": "Chercher une mise à jour",
     "UpdateRestart": "Redémarrer maintenant",
-    "UpdatePrevious": "Version d'avant ({0})"
+    "UpdatePrevious": "Version d'avant ({0})",
+    "AlarmLine": "Alarme : {0} · {1} (dans {2} min)"
   }
 }

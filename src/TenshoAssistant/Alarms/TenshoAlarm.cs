@@ -75,6 +75,10 @@ public sealed class AlarmSettings
     public bool DutyPopAlert { get; set; }
     // 0.371 (g, M-01): automatic alarms at the ventures' end and the vessels' return (user's choice: on by default).
     public bool AutoAlarms { get; set; } = true;
+    // X-163 (0.1132, user request): the desktop application rings the alarms too: a Windows sound and a line in its status bar, only while
+    // the game is not the window in front (it rings in the game then).
+    public bool DesktopSound { get; set; } = true;
+    public bool DesktopOnlyGameBehind { get; set; } = true;
 
     /// <summary>
     /// X-76 H3 (0.914): a separate copy with every field (all are values). The settings page edits the copy and saves it, so the saved
@@ -134,12 +138,13 @@ public static class AlarmSchedule
     /// Whether the alarm rings now: its next occurrence is within the lead and not handled yet. With weather conditions, an occurrence whose
     /// period (or previous period) does not have them is skipped; an unknown forecast (null) is not a match.
     /// </summary>
-    public static (AlarmCheck Check, DateTimeOffset Occurrence) Check(TenshoAlarm alarm, DateTimeOffset now, Func<DateTimeOffset, uint?>? weatherAt = null)
+    public static (AlarmCheck Check, DateTimeOffset Occurrence) Check(TenshoAlarm alarm, DateTimeOffset now, Func<DateTimeOffset, uint?>? weatherAt = null, bool ownMemory = false)
     {
         ArgumentNullException.ThrowIfNull(alarm);
         // 0.331: an occurrence up to 30 s past is still due (with a lead of 0 it rang only within one second, which a long frame or a
-        // loading screen could skip); LastOccurrence keeps it from ringing twice.
-        if (!alarm.Enabled || Next(alarm, now.AddSeconds(-30)) is not { } occurrence || occurrence == alarm.LastOccurrence) return (AlarmCheck.None, default);
+        // loading screen could skip); LastOccurrence keeps it from ringing twice. X-163 (0.1132): ownMemory, for the desktop application's
+        // bell (AlarmBell), which keeps its own memory: the plugin's LastOccurrence says what the game rang, not what the application did.
+        if (!alarm.Enabled || Next(alarm, now.AddSeconds(-30)) is not { } occurrence || (!ownMemory && occurrence == alarm.LastOccurrence)) return (AlarmCheck.None, default);
         if (occurrence.AddMinutes(-ClampLead(alarm.Repeat, alarm.LeadMinutes)) > now) return (AlarmCheck.None, occurrence);
         if (alarm.Weathers.Count > 0 && (weatherAt?.Invoke(occurrence) is not { } weather || !alarm.Weathers.Contains(weather))) return (AlarmCheck.SkipWeather, occurrence);
         if (alarm.PreviousWeathers.Count > 0 && (weatherAt?.Invoke(occurrence.AddSeconds(-1400)) is not { } previous || !alarm.PreviousWeathers.Contains(previous)))
