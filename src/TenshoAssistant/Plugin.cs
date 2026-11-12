@@ -1570,8 +1570,18 @@ public sealed class Plugin : IDalamudPlugin
             };
             registrations.Register(() => client.Login += openOnLogin,
                 () => client.Login -= openOnLogin);
-            void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}.",
-                when,(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,(long)(GC.GetTotalPauseDuration()-pausesBefore).TotalMilliseconds,GC.CollectionCount(2)-gen2Before,framework.IsInFrameworkUpdateThread ? "framework":"other");
+            // X-01 C1.1 (0.1184): the heap and the load contexts with each load line; the previous instance's context is held weakly in a
+            // process-wide slot, read before this one replaces it (measurement only, no collection forced).
+            var previousContext=AppDomain.CurrentDomain.GetData(Diagnostics.LoadMemory.PreviousSlot) as WeakReference;
+            AppDomain.CurrentDomain.SetData(Diagnostics.LoadMemory.PreviousSlot,new WeakReference(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly)));
+            string Memory()
+            {
+                var contexts=System.Runtime.Loader.AssemblyLoadContext.All.Select(context=>context.Name).ToArray();
+                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive);
+            }
+            void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",
+                when,(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,(long)(GC.GetTotalPauseDuration()-pausesBefore).TotalMilliseconds,GC.CollectionCount(2)-gen2Before,framework.IsInFrameworkUpdateThread ? "framework":"other",Memory());
+            log.Information("Load context of this instance: {0}.",System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly)?.Name ?? "?");
             SayLoad("created");
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>SayLoad("10 s later"),TaskScheduler.Default);
         }
