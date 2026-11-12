@@ -9,11 +9,14 @@ public sealed class SlowFrame
     public const double Limit=100;
     private readonly List<(string Name,double Ms)> parts=[];
     private int frame=-1;
+    /// <summary>X-01 (0.1190): the steady state: every part added here also goes to the running totals (one line a minute, developer mode).</summary>
+    public SteadyFrames Steady { get; }=new();
 
     public void Add(int currentFrame,string name,double milliseconds)
     {
         if(currentFrame!=frame){frame=currentFrame;parts.Clear();}
         parts.Add((name,milliseconds));
+        Steady.Add(name,milliseconds);
     }
 
     /// <summary>Null under the limit; else the frame's cost, its four costliest parts, what is left, and the runtime's pauses meanwhile.</summary>

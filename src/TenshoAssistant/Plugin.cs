@@ -1693,8 +1693,12 @@ public sealed class Plugin : IDalamudPlugin
         try{DrawFrame();}
         finally
         {
-            if(mainWindow.SlowFrames.Report(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds,(GC.GetTotalPauseDuration()-paused).TotalMilliseconds) is { } slow)
+            var total=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+            if(mainWindow.SlowFrames.Report(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),total,(GC.GetTotalPauseDuration()-paused).TotalMilliseconds) is { } slow)
                 log.Information(slow);
+            // X-01 (0.1190): the steady state, one line a minute in developer mode: what each part costs on ordinary frames.
+            mainWindow.SlowFrames.Steady.Add(Diagnostics.SteadyFrames.Frame,total);
+            if(mainWindow.SlowFrames.Steady.Take(Environment.TickCount64) is { } steady)log.Information(steady);
         }
     }
     private void DrawFrame()
