@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1124.0
+- Plan global, X-143 : Universalis coupé pour de bon (audit A07) : une requête qui attendait son créneau (la pause de 3 secondes entre deux requêtes) ne part plus si Universalis vient d'être désactivé dans Paramètres › Avancé : le réglage est relu juste avant chaque envoi, pour le tableau du marché, les prix des listes et la vitesse de vente qui les suit ; le tableau dit alors que la source est coupée et montre ce qui était connu.
+- Tests : UniversalisOff1124Tests. Verify.ps1 (agent) : 1854/1854, 0 avertissement, 0 erreur ; DLL 0.1124.0.0. Non validé en jeu.
+### English
+- Universalis off for good (audit A07): a request waiting for its slot (the 3-second pause between two requests) no longer leaves if Universalis was just turned off in Settings › Advanced: the setting is read again right before each send, for the market board, the list prices and the sale speed that follows them; the board then says the source is off and shows what was known.
+
 ## 0.1123.0
 - Plan global, X-143 : Échéances des téléchargements, première partie (audit A06) : une réponse dont les en-têtes sont arrivés mais dont le corps ne vient plus ne bloque plus une page pour toujours. Les requêtes communautaires (aide communautaire, échange GitHub des découvertes, Garland Tools, wiki, Universalis des ventes de servant, galerie de Mes outils…) ont une échéance qui couvre aussi le corps : le délai du client quand il est plus court, sinon 2 minutes ; le téléchargement de l'application de bureau, 10 minutes. Passé ce délai, l'erreur est une expiration et une nouvelle tentative est possible ; une annulation demandée reste une annulation.
 - Tests : HttpDeadline1123Tests. Verify.ps1 (agent) : 1852/1852, 0 avertissement, 0 erreur ; DLL 0.1123.0.0. Rien à essayer en jeu.

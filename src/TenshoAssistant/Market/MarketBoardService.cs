@@ -117,6 +117,8 @@ public sealed class MarketBoardService : IDisposable
                     if(wait>TimeSpan.Zero && state.Scope==scope && state.ItemId==itemId)state=new(scope,itemId,known,true,null,true,known is not null);
                 }
                 if(wait>TimeSpan.Zero)await Task.Delay(wait,token).ConfigureAwait(false);
+                // X-143 part 2 (0.1124, audit A07): turned off during the pause: the request does not leave.
+                if(Enabled?.Invoke()==false){Publish(scope,itemId,known,SourceOff,known is not null);return;}
                 lock(gate)lastRequest=Stopwatch.GetTimestamp();
                 var url=$"https://universalis.app/api/v2/{Uri.EscapeDataString(scope)}/{itemId}?listings={MarketBoard.MaximumOffers}&entries={MarketBoard.MaximumSales}";
                 var json=await client.GetStringAsync(url,token).ConfigureAwait(false);

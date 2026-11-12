@@ -63,6 +63,8 @@ public sealed class MarketService : IDisposable
         uint world;uint[] missing;
         while(true)
         {
+            // X-143 part 2 (0.1124, audit A07): the setting read again at each turn, after every wait: turned off meanwhile, nothing leaves.
+            if(Enabled?.Invoke()==false)return null;
             TimeSpan wait;
             lock(gate)
             {
@@ -124,6 +126,8 @@ public sealed class MarketService : IDisposable
     // 0.725: the second answer of a price request. Refused or failed: the prices stay, the speed stays unknown, and a server asking for room gets it.
     private async Task<string?> SpeedAsync(uint world,IReadOnlyCollection<uint> ids,CancellationToken token)
     {
+        // X-143 part 2 (0.1124, audit A07): the second request (sale speed) asks the setting again too.
+        if(Enabled?.Invoke()==false)return null;
         try
         {
             using var response=await client.GetAsync(MarketQuote.SpeedUrl(world,ids),token).ConfigureAwait(false);
