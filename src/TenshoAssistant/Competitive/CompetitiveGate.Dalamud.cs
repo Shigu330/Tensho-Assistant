@@ -9,10 +9,8 @@ namespace TenshoAssistant.Competitive;
 /// is true, none runs, so nothing is read from the game. A test refuses a subscription that goes around it. <see cref="AddAlways"/> is only for
 /// what must undo something when the cut starts: the server bar entries and the game map.
 /// </summary>
-internal static class CompetitiveGate
+internal static partial class CompetitiveGate
 {
-    /// <summary>X-109 (0.979): developer mode, given once the configuration is loaded (the gate starts before it).</summary>
-    internal static Func<bool>? Developer { get; set; }
     private static readonly object Gate=new();
     private static readonly Dictionary<IFramework.OnUpdateDelegate,IFramework.OnUpdateDelegate> Wrappers=[];
     private static volatile bool cut;
@@ -28,15 +26,11 @@ internal static class CompetitiveGate
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }
-    /// <summary>On the framework thread, when the cut starts (true) or ends (false).</summary>
-    public static event Action<bool>? Changed;
-
     /// <summary>
     /// 0.992 (the log shows « Long CompetitiveGate…Guarded » hitches at each load, 90 to 144 ms, without saying which reader): in developer mode, a
     /// subscription that takes more than 50 ms is named in the log, once per reader. X-177 (0.1162): at most every 5 minutes per reader, with its
     /// worst time meanwhile (SlowNotes), so a reader slow at each zone change is seen again.
     /// </summary>
-    internal static Action<string,double,double>? SlowSubscription { get; set; }
     private static readonly Diagnostics.SlowNotes slowNotes=new(TimeSpan.FromMinutes(5));
     private static void Timed(IFramework.OnUpdateDelegate handler,IFramework running)
     {
@@ -70,7 +64,17 @@ internal static class CompetitiveGate
         cut=value;
         if(notify)Changed?.Invoke(value);
     }
-    internal static void ClearSubscribers()=>Changed=null;
+    /// <summary>
+    /// X-01 C1.3 (0.1187): at unload, what is still subscribed through the gate is taken off the framework and forgotten; the count left says
+    /// which unload forgot a reader (0 when every reader released its own).
+    /// </summary>
+    internal static int ReleaseAll(IFramework framework)
+    {
+        IFramework.OnUpdateDelegate[] left;
+        lock(Gate){left=[..Wrappers.Values];Wrappers.Clear();}
+        foreach(var guarded in left)framework.Update-=guarded;
+        return left.Length;
+    }
 }
 
 /// <summary>Reads the zones once, decides before any other service starts, then checks at each tick. Reads only what Dalamud's client state already holds.</summary>

@@ -586,5 +586,5 @@ internal sealed class MapLiveReader : IDisposable
         var agent=AgentMap.Instance();
         if(agent!=null)agent->FlagMarkerCount=0;
     }
-    public void Dispose(){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref state,null);}
+    public void Dispose(){if(disposed)return;disposed=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,Update);Volatile.Write(ref state,null);Log=null;}
 }

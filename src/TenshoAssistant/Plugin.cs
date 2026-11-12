@@ -26,6 +26,9 @@ public sealed class Plugin : IDalamudPlugin
 {
     private const string Command = "/tensho";
     private readonly RegistrationScope registrations = new();
+    // X-01 C1.3 (0.1187): this instance's parts, noted weakly at unload in developer mode (Diagnostics.UnloadWatch).
+    private Dictionary<string,WeakReference>? unloadParts;
+    private Func<bool> developerAtUnload=()=>false;
     private readonly IPluginLog log;
     // X-92 (0.972): the game data check after a game update, cancelled when the plugin unloads.
     private readonly CancellationTokenSource gameDataCancel=new();
@@ -111,6 +114,17 @@ public sealed class Plugin : IDalamudPlugin
         {
             // DEC-038: decided first: no service starts in PvP or ranked content.
             chatForCut=chat;
+            // X-01 C1.3 (0.1187): registered first, so run last at unload: the static hooks given below as closures (developer mode, slow
+            // reader line, story weather) hold the constructor's locals, that is the whole instance; a static lives as long as the load
+            // context, which stays alive in the game process after an unload (docs/evidence/0.1187-unload-roots.md). Emptied here, the
+            // unloaded instance can be collected; a reader that forgot its own framework subscription is released and counted.
+            registrations.Register(()=>{},()=>
+            {
+                var left=TenshoAssistant.Competitive.CompetitiveGate.ReleaseAll(framework);
+                if(left>0)log.Warning("{0} framework subscriptions were still registered at unload: released.",left);
+                TenshoAssistant.Competitive.CompetitiveGate.ForgetInstance();
+                Gathering.WeatherCatalog.StoryWeatherConfirmed=null;
+            });
             TenshoAssistant.Competitive.CompetitiveWatcher? competitive=null;
             registrations.Register(()=>competitive=new TenshoAssistant.Competitive.CompetitiveWatcher(framework,client,data,log,gameGui,condition),()=>competitive?.Dispose());
             registrations.Register(()=>{},()=>dataCache?.Dispose());
@@ -1582,8 +1596,21 @@ public sealed class Plugin : IDalamudPlugin
             void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",
                 when,(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,(long)(GC.GetTotalPauseDuration()-pausesBefore).TotalMilliseconds,GC.CollectionCount(2)-gen2Before,framework.IsInFrameworkUpdateThread ? "framework":"other",Memory());
             log.Information("Load context of this instance: {0}.",System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly)?.Name ?? "?");
+            // X-01 C1.3 (0.1187): the instances loaded before in this process (weak references in a slot of runtime types only); ten seconds
+            // after the load, developer mode, one line each: context alive or not, parts still alive (noted by each instance at its unload).
+            var instances=Diagnostics.UnloadWatch.Push(AppDomain.CurrentDomain.GetData(Diagnostics.UnloadWatch.Slot),
+                $"{typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?"} loaded at {DateTime.Now.ToString("HH:mm:ss",System.Globalization.CultureInfo.InvariantCulture)}",
+                System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly));
+            AppDomain.CurrentDomain.SetData(Diagnostics.UnloadWatch.Slot,instances);
+            unloadParts=instances[0].Value;
+            developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
-            _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>SayLoad("10 s later"),TaskScheduler.Default);
+            _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
+            {
+                SayLoad("10 s later");
+                if(!configuration.DeveloperMode)return;
+                foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value));
+            },TaskScheduler.Default);
         }
         catch
         {
@@ -1762,6 +1789,13 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        // X-01 C1.3 (0.1187): developer mode: the plugin, the window and their fields that hold the plugin's own objects are noted weakly
+        // before anything is released; the next loads say which ones are still alive.
+        if(unloadParts is { } parts && developerAtUnload())
+        {
+            Diagnostics.UnloadWatch.Note(parts,"plugin",this,typeof(Plugin).Assembly);
+            Diagnostics.UnloadWatch.Note(parts,"window",mainWindow,typeof(Plugin).Assembly);
+        }
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }
         catch (AggregateException error) { log.Error(error, "Failed to release some Tensho registrations."); }
