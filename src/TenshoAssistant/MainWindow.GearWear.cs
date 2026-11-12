@@ -37,7 +37,12 @@ internal sealed partial class MainWindow
                 if(piece.Condition is { } condition)ImGui.TextColored(condition<settings.Repair ? UI.FfxivTheme.Error:Success,$"{condition} %");
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
-                if(GearWear.SpiritbondPercent(piece.Spiritbond) is { } percent)ImGui.TextColored(percent>=settings.Spiritbond ? Accent:Muted,$"{percent:0.0} %");
+                if(GearWear.SpiritbondPercent(piece.Spiritbond) is { } percent)
+                {
+                    // X-191 (0.1177): the whole percent as the game shows it; the exact value in the tip.
+                    ImGui.TextColored(percent>=settings.Spiritbond ? Accent:Muted,$"{GearWear.ShownSpiritbond(percent)} %");
+                    TipText($"{percent:0.00} %");
+                }
                 else ImGui.TextDisabled("—");
             }
         }
@@ -68,7 +73,7 @@ internal sealed partial class MainWindow
         if(state.HighestSpiritbond is { } bond)
         {
             if(state.LowestCondition is not null)ImGui.SameLine();
-            ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",bond.ToString("0")));
+            ImGui.TextColored(state.ToExtract>0 ? Accent:Muted,localization.Format("GearWear.BarSpiritbond",GearWear.ShownSpiritbond(bond)));
             Tip("GearWear.BarSpiritbondTip");
         }
     }

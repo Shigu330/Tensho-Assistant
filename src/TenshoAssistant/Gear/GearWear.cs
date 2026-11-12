@@ -25,6 +25,12 @@ public static class GearWear
     /// </summary>
     public static double? SpiritbondPercent(int? raw)=>raw is >= 0 and <= 10000 ? raw.Value/100.0:null;
 
+    /// <summary>
+    /// X-191 (0.1177, user's report of 12/11: « Symbiose 0 % » while the game showed 1 %): the whole percent shown, as the game shows it: any bond
+    /// started counts at least 1 % (rounded up), and 100 % only once the materia can be extracted (99 % below it). The exact value stays in the tip.
+    /// </summary>
+    public static int ShownSpiritbond(double percent)=>percent>=100 ? 100:percent<=0 ? 0:Math.Min(99,(int)Math.Ceiling(percent-1e-9));
+
     public static GearWearState Evaluate(IEnumerable<EquippedPiece> pieces,GearWearSettings settings)
     {
         int repair=0,extract=0;int? lowest=null;double? highest=null;

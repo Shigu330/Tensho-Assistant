@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1177.0
+- Plan global, X-191 : Usure et symbiose (X-191, constat de l'utilisateur du 12/11 : « Symbiose 0 % » sur la barre alors que le jeu affichait 1 %) : la barre et la page Équipement montrent la symbiose en pour cent entier comme le jeu : toute symbiose commencée compte au moins 1 % (arrondi vers le haut), et 100 % seulement quand la matéria peut être extraite (99 % juste en dessous) ; la page garde la valeur exacte dans l'info-bulle. Choix noté (D-143), à corriger si le jeu affiche autrement près de 100 %.
+- Tests : Spiritbond1177Tests. Verify.ps1 (agent) : 2039/2039, 0 avertissement, 0 erreur ; DLL 0.1177.0.0. Non validé en jeu.
+### English
+- Wear and spiritbond (X-191, user report of 11/12: « Spiritbond 0 % » on the bar while the game showed 1 %): the bar and the Gear page show spiritbond as a whole percent as the game does: any bond started counts at least 1 % (rounded up), and 100 % only once the materia can be extracted (99 % just below); the page keeps the exact value in the tooltip. Choice noted (D-143), to be corrected if the game shows otherwise near 100 %.
+
 ## 0.1176.0
 - Plan global, X-188 : Île de Lunule (X-188, demande de l'utilisateur du 12/11) : nouvel onglet au nom de l'île dans la page Eurêka et Bozja : le savoir (barre de progression, par exemple 465 / 2800), les pièces d'argent et d'or, et chaque job de soutien : niveau sur le niveau maximal, ce qu'il apprend ensuite (action ou trait, avec sa description) et à quel niveau, « MAÎTRISÉ » à son dernier niveau, l'expérience du job porté ; le job porté en premier. Les niveaux viennent de l'état du jeu lu une fois par seconde sur l'île (le dernier relevé est gardé pour la séance, avec son heure) ; les apprentissages, des feuilles MKDSupportJob et MKDTrait ; les intitulés, des mots du jeu (feuille Addon). Le mode développeur écrit aussi l'expérience de chaque job. Preuve : docs/evidence/0.1176-occult-jobs.md. Le panneau sur l'île reste à faire.
 - Tests : OccultJobs1176Tests. Verify.ps1 (agent) : 2037/2037, 0 avertissement, 0 erreur ; DLL 0.1176.0.0. Non validé en jeu.
