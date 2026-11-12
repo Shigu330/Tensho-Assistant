@@ -28,7 +28,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1176-occult-jobs.md](0.1176-occult-jobs.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `src/TenshoAssistant/Fields/OccultCrescent.cs`, `tests/TenshoAssistant.Tests/OccultJobs1176Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `repo.json` |
 | [0.1178-occult-panel.md](0.1178-occult-panel.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `tests/TenshoAssistant.Tests/OccultPanel1178Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.1179-occult-alerts.md](0.1179-occult-alerts.md) | `tests/TenshoAssistant.Tests/OccultAlerts1179Tests.cs` | `CHANGELOG.md` |
-| [0.1186-load-measures.md](0.1186-load-measures.md) | `src/TenshoAssistant/Diagnostics/LoadMemory.cs` | `CHANGELOG.md` |
+| [0.1186-load-measures.md](0.1186-load-measures.md) | `src/TenshoAssistant/Diagnostics/LoadMemory.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.127.0-sightseeing-probe.log](0.127.0-sightseeing-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

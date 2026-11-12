@@ -1471,6 +1471,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1183) Aide › FAQ : « M ouvre une autre carte : comment retrouver celle du jeu ? » ouvre les Paramètres ; « Tensho joue-t-il à ma place ? » cite la carte sur M et le titre selon le job
 
+- [ ] (0.1184) Mode développeur : après deux ou trois rechargements de Tensho, dalamud.log, lignes « Load created » et « Load 10 s later » : « heap … MB, Tensho load contexts N of M, previous instance … » ; si N grandit à chaque rechargement ou si l'instance d'avant reste « still alive », une fuite est vue (à rapporter)
+
+- [ ] (0.1186) Après un rechargement de Tensho, carte ouverte : les vendeurs (et ceux des fêtes en cours) apparaissent sur la carte comme avant ; page Événements : les PNJ des fêtes se chargent toujours
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
