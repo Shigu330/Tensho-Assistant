@@ -147,7 +147,7 @@ try {
     $taskZip = [IO.Compression.ZipFile]::OpenRead((Join-Path $taskOutput 'TenshoAssistant\latest.zip'))
     try {
         $taskEntries = @($taskZip.Entries.FullName)
-        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll')) {
+        foreach ($taskExpected in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll', 'Microsoft.Data.Sqlite.dll', 'SQLitePCLRaw.core.dll', 'SQLitePCLRaw.batteries_v2.dll', 'SQLitePCLRaw.provider.e_sqlite3.dll', 'e_sqlite3.dll')) {
             if ($taskExpected -notin $taskEntries) { throw "Missing package entry: $taskExpected" }
             if (@($taskEntries | Where-Object { $_ -ceq $taskExpected }).Count -ne 1) { throw "Duplicate package entry: $taskExpected" }
             $taskZipStream = $taskZip.GetEntry($taskExpected).Open()
@@ -178,7 +178,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Desktop application publish failed (src/TenshoAssistant.Desktop).' }
     $taskDesktopPlugin = Join-Path $taskDesktopPackage 'plugin'
     New-Item -ItemType Directory -Force -Path $taskDesktopPlugin | Out-Null
-    foreach ($taskName in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll')) { Copy-Item -LiteralPath (Join-Path $taskOutput $taskName) -Destination $taskDesktopPlugin }
+    foreach ($taskName in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll', 'Microsoft.Data.Sqlite.dll', 'SQLitePCLRaw.core.dll', 'SQLitePCLRaw.batteries_v2.dll', 'SQLitePCLRaw.provider.e_sqlite3.dll', 'e_sqlite3.dll')) { Copy-Item -LiteralPath (Join-Path $taskOutput $taskName) -Destination $taskDesktopPlugin }
     $taskDesktopVersion = [Reflection.AssemblyName]::GetAssemblyName((Join-Path $taskDesktopPackage 'TenshoAssistant.Desktop.dll')).Version.ToString()
     if ($taskDesktopVersion -ne $taskAssemblyVersion) { throw "Desktop application version $taskDesktopVersion differs from the plugin's $taskAssemblyVersion (one version source: the plugin's csproj)." }
     $taskHeadlessReport = Join-Path $taskRoot 'artifacts\desktop-headless.md'
@@ -211,7 +211,7 @@ try {
         $taskDesktopEntries = @($taskDesktopArchive.Entries | ForEach-Object { $_.FullName })
         # X-120: PluginUiTest.Host.dll is our own library (the generic part of drawing a plugin without the game, tools/PluginUiTest).
         foreach ($taskRequired in @('TenshoAssistant.Desktop.exe', 'TenshoAssistant.Desktop.dll', 'TenshoAssistant.Desktop.runtimeconfig.json', 'PluginUiTest.Host.dll', 'hostfxr.dll', 'hostpolicy.dll', 'System.Private.CoreLib.dll',
-                'plugin/TenshoAssistant.dll', 'plugin/TenshoAssistant.json', 'plugin/Raphael.Net.dll', 'plugin/raphael_bindings.dll')) {
+                'plugin/TenshoAssistant.dll', 'plugin/TenshoAssistant.json', 'plugin/Raphael.Net.dll', 'plugin/raphael_bindings.dll', 'plugin/e_sqlite3.dll', 'plugin/Microsoft.Data.Sqlite.dll')) {
             if ($taskRequired -notin $taskDesktopEntries) { throw "TenshoAssistant.Desktop.zip misses $taskRequired." }
         }
         $taskForbidden = @($taskDesktopEntries | Where-Object { $_ -match '(^|/)(Dalamud|Lumina|HexaGen|Mono\.Cecil|Newtonsoft|FFXIVClientStructs|InteropGenerator|ImGuiScene|cimgui|System\.Reflection\.MetadataLoadContext)[^/]*$|\.(dat\d*|index2?|tex|exd|exh|scd)$' })

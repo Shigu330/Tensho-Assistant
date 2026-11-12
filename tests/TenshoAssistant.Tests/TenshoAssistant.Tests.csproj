@@ -199,4 +199,9 @@
   <ItemGroup>
     <None Include="Fixtures\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- X-172 (0.1136): Discoveries/DiscoveryDatabase.cs, linked with Discoveries/*.cs, uses SQLite: the plugin's packages. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.14" />
+  </ItemGroup>
 </Project>

@@ -384,6 +384,7 @@ public sealed class DiscoveryStore
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 // X-167 (0.1134, audit R03): your first sighting of an imported fact: its fields are the import's, yours kept apart (Own).
+                changedKeys.Add(known.Key);
                 if(known.Seen==0)known.Own=new(){First=at,Last=at,LevelMin=value,LevelMax=value,X=position.X,Z=position.Z};
                 else known.Own?.Saw(at,value,false);
                 known.LevelMin=Math.Min(known.LevelMin,value);known.LevelMax=Math.Max(known.LevelMax,value);known.Seen++;
@@ -394,7 +395,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             // X-93 (0.939): your own sighting is never refused.
-            Put(fact);Dirty=true;revision++;
+            Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
             return true;
         }
     }
@@ -426,6 +427,7 @@ public sealed class DiscoveryStore
                 if(level>0){known.LevelMin=known.LevelMin==0 ? level:Math.Min(known.LevelMin,level);known.LevelMax=Math.Max(known.LevelMax,level);}
                 // X-167 (0.1134, audit R03): the gap is measured from your own last sighting, never from an imported date (a later imported date kept your
                 // sighting from being counted); your first sighting of an imported fact always counts, its fields kept apart (Own).
+                changedKeys.Add(known.Key);
                 var wasShared=known.Seen==0;
                 var ownLast=wasShared ? (DateTimeOffset?)null:known.Own?.Last ?? known.Last;
                 if(ownLast is null || at-ownLast.Value>=gap)
@@ -440,7 +442,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             // X-93 (0.939): your own sighting is never refused.
-            Put(fact);Dirty=true;revision++;
+            Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
             return true;
         }
     }
@@ -487,13 +489,13 @@ public sealed class DiscoveryStore
                     // X-76 E1 (0.916): the file's HQ sightings and values (its own and its imported ones) kept apart from yours, the largest per value.
                     var (hq,values)=ImportedPart(source);
                     known.ImportedValues=ValueCounts.Max(known.ImportedValues,values);known.ImportedHq=ValueCounts.AtMostTotal(Math.Max(known.ImportedHq,hq),known.ImportedValues);
-                    joined++;
+                    changedKeys.Add(known.Key);joined++;
                     continue;
                 }
                 if(shared.GetValueOrDefault(source.Kind)>=MaxFacts){LeftOut++;continue;}
                 var copy=source.Copy();copy.Seen=0;copy.Imported=1;copy.Own=null;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
-                Put(copy);added++;
+                Put(copy);changedKeys.Add(copy.Key);added++;
             }
             if(added+joined>before){Dirty=true;revision++;}
         }
@@ -568,10 +570,11 @@ public sealed class DiscoveryStore
     }
 
     // X-93 part 2 (0.1040): a file's facts moved to their 50-yalm cells and checked, outside the lock.
-    private sealed record Prepared(List<DiscoveryFact> Facts,int Refused,bool Moved);
+    // X-172 (0.1136): Gone, the keys of facts refused or moved to another cell (their rows go); MovedTo, the keys they moved to (their rows are written).
+    private sealed record Prepared(List<DiscoveryFact> Facts,int Refused,bool Moved,List<string> Gone,List<string> MovedTo);
     private static Prepared Prepare(DiscoveryFile file)
     {
-        var ready=new List<DiscoveryFact>(file.Facts.Count);var refused=0;var moved=false;
+        var ready=new List<DiscoveryFact>(file.Facts.Count);var refused=0;var moved=false;List<string> gone=[],movedTo=[];
         foreach(var original in file.Facts)
         {
             if(original is null)continue;
@@ -579,10 +582,11 @@ public sealed class DiscoveryStore
             var fact=Recell(original);
             // X-167: only a fact you saw has a part of yours.
             if(fact.Seen==0)fact.Own=null;
-            if(!Valid(fact)){refused++;continue;}
+            if(!Valid(fact)){refused++;gone.Add(original.Key);continue;}
+            if(fact.Key!=original.Key){gone.Add(original.Key);movedTo.Add(fact.Key);}
             ready.Add(fact);
         }
-        return new(ready,refused,moved);
+        return new(ready,refused,moved,gone,movedTo);
     }
     // Under the lock: prepared facts from start to end put in; « shared » counts the shared facts held per kind.
     private void PutRange(List<DiscoveryFact> ready,int start,int end,Dictionary<DiscoveryKind,int> shared,bool sharedFile=false)
@@ -592,10 +596,11 @@ public sealed class DiscoveryStore
             var fact=ready[at];
             // X-166 (0.1133, audit R01): a shared kind's file may still hold, as shared, a fact that became yours: the save writes your file first, and a
             // stop before the shared files leaves the old copy there. Yours already holds it (its imports included): the old copy is left out, never added
-            // to it, and the next save writes the shared file without it.
-            if(sharedFile && fact.Seen==0 && facts.TryGetValue(fact.Key,out var mine) && mine.Seen>0){Dirty=true;continue;}
+            // to it, and the next save writes the shared file without it. 0.1136: only when yours holds an import already (it came from that copy); a fact you
+            // saw while its shared kind was not read yet (shared kinds are read when asked) has none, and is joined to the shared copy as before.
+            if(sharedFile && fact.Seen==0 && facts.TryGetValue(fact.Key,out var mine) && mine.Seen>0 && mine.Imported>0){changedKeys.Add(mine.Key);Dirty=true;continue;}
             // 0.855: facts meeting in one cell are joined, and the base is written again, smaller.
-            if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);continue;}
+            if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);changedKeys.Add(known.Key);continue;}
             // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
             if(fact.Seen>0)Put(fact);
             else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
@@ -606,6 +611,10 @@ public sealed class DiscoveryStore
     private void Finish(Prepared prepared,bool count)
     {
         if(count && (prepared.Facts.Count>facts.Count || prepared.Refused>0) || prepared.Moved)Dirty=true;
+        // X-172 (0.1136): a refused or moved fact's row goes, the cell it moved to is written; a change kept waiting for its kind (ChangesToSave) is
+        // written now that the kind is read.
+        changedKeys.UnionWith(prepared.Gone);changedKeys.UnionWith(prepared.MovedTo);
+        if(prepared.Gone.Count>0 || changedKeys.Count>0)Dirty=true;
         revision++;
     }
     // Under the lock: a shared kind's file put in at once (bounded by MaxFacts; the kind is claimed and loaded in the same hold).
@@ -647,7 +656,49 @@ public sealed class DiscoveryStore
         return new DiscoveryFile{Written=at,Facts=copies};
     }
 
-    public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();Dirty=true;revision++;}}
+    public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();changedKeys.Clear();changedAll=true;Dirty=true;revision++;}}
+
+    /// <summary>X-172 (0.1136): a shared kind read from a file or the database at once (the conversion): a fact of yours already there keeps the rule of PutRange.</summary>
+    public void LoadShared(DiscoveryFile file){var prepared=Prepare(file);lock(gate)Apply(prepared,false);}
+
+    // X-172 (0.1136, the database written row by row): the keys changed since the last save taken; changedAll after a base cleared on purpose.
+    private readonly HashSet<string> changedKeys=new(StringComparer.Ordinal);
+    private bool changedAll;
+    /// <summary>X-172: what a save of the database writes (rows to put in, rows to take out, everything first when cleared).</summary>
+    public sealed record Changes(List<DiscoveryFact> Write,List<string> Remove,bool All);
+    /// <summary>
+    /// X-172 (0.1136): the facts changed since the last save taken, copied, and the change stamp they hold (MarkSaved after the write; SaveFailed when it
+    /// fails, so they are taken again). A change of a shared kind not read yet (X-93) waits for the kind: its row may hold the shared copy, which the
+    /// kind's reading joins to it first; the kind is asked for at once.
+    /// </summary>
+    public Changes ChangesToSave(out long stamp)
+    {
+        lock(gate)
+        {
+            stamp=Interlocked.Read(ref changes);
+            var all=changedAll;changedAll=false;
+            var write=new List<DiscoveryFact>();var remove=new List<string>();var waiting=new List<string>();
+            foreach(var key in all ? facts.Keys.ToList():changedKeys.ToList())
+            {
+                if(!facts.TryGetValue(key,out var fact)){remove.Add(key);continue;}
+                if(!all && sharedWaiting.Contains(fact.Kind)){waiting.Add(key);Want(fact.Kind);continue;}
+                write.Add(fact.Copy());
+            }
+            changedKeys.Clear();changedKeys.UnionWith(waiting);
+            if(waiting.Count>0)Dirty=true;
+            return new(write,remove,all);
+        }
+    }
+    /// <summary>X-172: a save that failed: its changes are taken again by the next one.</summary>
+    public void SaveFailed(Changes failed)
+    {
+        lock(gate)
+        {
+            if(failed.All)changedAll=true;
+            foreach(var fact in failed.Write)changedKeys.Add(fact.Key);
+            changedKeys.UnionWith(failed.Remove);
+        }
+    }
 
     /// <summary>Per kind: the facts, those seen by the player, those only imported.</summary>
     public IReadOnlyList<(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)> Summary()

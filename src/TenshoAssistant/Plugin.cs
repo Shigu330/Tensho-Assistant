@@ -259,6 +259,41 @@ public sealed class Plugin : IDalamudPlugin
                 try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
                 catch(Exception error){log.Warning(error,"The market prices seen could not be read; the file is kept as .broken.");try{File.Move(Path.Combine(discoveryFolder,"MarketSeen.json"),Path.Combine(discoveryFolder,"MarketSeen.json.broken"),true);}catch(Exception){}}
                 var saved=Path.Combine(discoveryFolder,"Discoveries.json");
+                // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite), the files of before converted once
+                // and kept aside. A database that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is
+                // saved this session; without a database (conversion failed), the JSON files stay in use as before.
+                var databasePath=Path.Combine(discoveryFolder,Discoveries.DiscoveryDatabase.FileName);
+                Discoveries.DiscoveryDatabase? database=null;
+                try
+                {
+                    var aside=Discoveries.DiscoveryDatabase.ConvertFiles(discoveryFolder,DateTimeOffset.UtcNow,(path,error)=>log.Warning(error,"Discoveries {0} could not be read while converting; set aside.",Path.GetFileName(path)));
+                    database=new Discoveries.DiscoveryDatabase(databasePath);
+                    var (mine,sharedCount)=database.Count();
+                    log.Information("Discoveries: SQLite {0} database, {1} facts of yours, {2} shared{3}.",database.LibraryVersion(),mine,sharedCount,
+                        aside is null ? "":$"; the files of before kept in {Path.GetFileName(aside)}");
+                }
+                catch(Exception error)
+                {
+                    database=null;
+                    if(File.Exists(databasePath))
+                    {
+                        mainWindow.DiscoveriesWriteBlocked=true;
+                        log.Error(error,"The discoveries database could not be opened: nothing is saved this session.");
+                        var said=localization.Format("DiscoveriesUi.BaseBlocked",Discoveries.DiscoveryDatabase.FileName);
+                        _=framework.RunOnFrameworkThread(()=>chat.PrintError("[Tensho] "+said));
+                        mainWindow.DiscoveriesLoaded=true;
+                        return;
+                    }
+                    log.Error(error,"The discoveries could not be moved to SQLite: the JSON files stay in use this session.");
+                }
+                mainWindow.DiscoveryDatabase=database;
+                if(database is { } opened)
+                {
+                    discoveries.Load(opened.ReadMine((key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)));
+                    discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),opened.SharedKinds());
+                    mainWindow.DiscoveriesLoaded=true;
+                    return;
+                }
                 // X-93 part 2 (0.1039): a base that cannot be read (over 64 MB, damaged) is set aside under a dated name and said in the chat and on the page,
                 // never overwritten by an empty base; if it cannot even be moved, nothing is saved this session.
                 var read=Discoveries.DiscoveryFiles.ReadBase(saved,DateTimeOffset.UtcNow,(aside,error)=>log.Warning(error,"The discoveries could not be read; the file is set aside as {0}.",Path.GetFileName(aside)));

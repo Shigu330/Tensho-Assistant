@@ -198,6 +198,8 @@ Framework and tools:
 - Final Fantasy XIV and its game data (sheets read through Dalamud / Lumina), Dalamud and FFXIVClientStructs
 - Dalamud.NET SDK, .NET SDK and runtime, PowerShell scripts for verification and release
 - [Raphael.Net](https://github.com/WorkingRobot/Raphael.Net) by Asriel (MIT, NuGet, native library) and raphael-rs by KonaeAkira (Apache-2.0): the crafting solver
+- [Microsoft.Data.Sqlite](https://github.com/dotnet/efcore) (.NET Foundation, MIT, NuGet), [SQLitePCLRaw](https://github.com/ericsink/SQLitePCL.raw)
+  by Eric Sink (Apache-2.0, NuGet, native library `e_sqlite3.dll`) and [SQLite](https://sqlite.org/) (public domain): the local discoveries database
 
 Community data used by the plugin (licence compatible with GPL-3.0, or service API):
 
@@ -412,7 +414,7 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   (Infi, MIT : Revue de mode téléchargée, butin moyen des sous-marins embarqué) ; SubmarineTracker (Infi, MIT : seuils des secteurs
   embarqués, avis dans `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`, à l'origine la feuille communautaire
   « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules de voyage comprises en lisant son code ; usure d'après la feuille
-  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT) et raphael-rs (KonaeAkira, Apache-2.0) : solveur d'artisanat ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
+  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT) et raphael-rs (KonaeAkira, Apache-2.0) : solveur d'artisanat ; Microsoft.Data.Sqlite (.NET Foundation, MIT), SQLitePCLRaw (Eric Sink, Apache-2.0, bibliothèque native `e_sqlite3.dll`) et SQLite (domaine public) : base locale des découvertes ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
   [Universalis](https://universalis.app/), [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/),
   [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative) ;
   ce dépôt sur GitHub (CC0-1.0 : découvertes partagées, sur « Échanger maintenant » ou par l'échange automatique facultatif, et galerie

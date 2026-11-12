@@ -96,14 +96,16 @@ What the plugin does that matters for security (read against the code of the `De
 - **Local files**, in the plugin's Dalamud configuration folder: the configuration (through Dalamud); the disk cache (`DataCache-v1/`);
   the saved storages (`InventoryBank/`, one file per character; a former `InventoryBank.json` is kept as `.migrated`); the gil journal
   (`GilJournal/`, one file per character, 90 days and 20,000 entries at most); what Tensho last read for each of the player's characters
-  (`Characters/`); the local discoveries base (`Discoveries/`: the player's own sightings in `Discoveries.json`, the imported ones in
-  `Shared/`, one compressed file per kind, the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
+  (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
+  imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
   `community.sha256` and the encrypted `github.token`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, notebook exports
   (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
   only the GitHub exchange above sends anything. Translators can put language JSON files beside the DLL; they are validated when
   reloaded.
+- **Native libraries** beside the DLL: Raphael's crafting solver (`raphael_bindings.dll`) and SQLite (`e_sqlite3.dll`, from SQLitePCLRaw
+  2.1.14, SQLite 3.54, 0.1136). They run in the game's process, open only the files named above and make no network request.
 - **Game**: game memory is read on the framework thread and copied. The actions that reach the game start on a click: teleport, applying
   an inventory sort, macro chains, writing crafting macros into the game's macros, opening the Try On window, equipping a gearset, wearing
   a title, sending the hunt train call to the chat channel the player picks, and `/alarm` chat commands for game alarms (when the player
@@ -256,14 +258,18 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 - **Fichiers locaux**, dans le dossier de configuration Dalamud du plugin : la configuration (par Dalamud) ; le cache disque
   (`DataCache-v1/`) ; les rangements enregistrés (`InventoryBank/`, un fichier par personnage ; un ancien `InventoryBank.json` est gardé
   en `.migrated`) ; le journal des gils (`GilJournal/`, un fichier par personnage, 90 jours et 20 000 entrées au plus) ; ce que Tensho a
-  lu en dernier pour chacun des personnages du joueur (`Characters/`) ; la base locale de découvertes (`Discoveries/` : ce que le joueur
-  a vu lui-même dans `Discoveries.json`, ce qu'il a importé dans `Shared/`, un fichier compressé par sorte, les prix vus au tableau des
+  lu en dernier pour chacun des personnages du joueur (`Characters/`) ; la base locale de découvertes (`Discoveries/` : depuis 0.1136
+  une base SQLite, `Discoveries.db`, ce que le joueur a vu lui-même et ce qu'il a importé, écrite ligne par ligne ; les fichiers d'avant,
+  `Discoveries.json` et `Shared/`, sont gardés une fois dans `before-sqlite-<date>/` ; les prix vus au tableau des
   ventes dans `MarketSeen.json`, sans nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur, les
   dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community.sha256` et le `github.token` chiffré) ;
   `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; `VoyageHistory.json`, `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
   `SelfCheckSeen.json` et `PageSweepLast.txt`. La base de découvertes ne garde que des lignes du jeu et des lieux, jamais le nom, la
   position ou l'identifiant d'un autre joueur ; l'import fusionne les fichiers que le joueur place dans `Import/`, l'export écrit un
   fichier dans `Export/` ; seul l'échange GitHub ci-dessus envoie quelque chose. Les traducteurs peuvent poser des fichiers de langue JSON à côté de la DLL ; ils sont validés au rechargement.
+- **Bibliothèques natives** à côté de la DLL : le solveur d'artisanat de Raphael (`raphael_bindings.dll`) et SQLite (`e_sqlite3.dll`,
+  de SQLitePCLRaw 2.1.14, SQLite 3.54, 0.1136). Elles tournent dans le processus du jeu, n'ouvrent que les fichiers nommés plus haut et ne
+  font aucune requête réseau.
 - **Jeu** : la mémoire du jeu est lue sur le thread framework et copiée. Les actions qui atteignent le jeu partent d'un clic :
   téléportation, application d'un tri d'inventaire, chaînes de macros, écriture des macros d'artisanat dans les macros du jeu, ouverture
   de la cabine d'essayage, équiper un ensemble d'équipement, porter un titre, envoyer l'appel du train de chasse dans le canal choisi par

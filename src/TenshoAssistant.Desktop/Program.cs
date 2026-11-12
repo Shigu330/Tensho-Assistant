@@ -33,7 +33,9 @@ internal static class Program
     internal static readonly Version AppVersion=typeof(Program).Assembly.GetName().Version ?? new Version(0,0,0);
     internal static string? Option(string[] args,string prefix)=>args.FirstOrDefault(a=>a.StartsWith(prefix,StringComparison.Ordinal))?[prefix.Length..];
     /// <summary>The plugin's own files the copy carries beside the DLL (as in latest.zip).</summary>
-    internal static readonly string[] PluginSiblings=["Raphael.Net.dll","raphael_bindings.dll","TenshoAssistant.json"];
+    // X-172 (0.1136): and SQLite (the discoveries database): its managed DLLs and the native e_sqlite3.dll.
+    internal static readonly string[] PluginSiblings=["Raphael.Net.dll","raphael_bindings.dll","TenshoAssistant.json","Microsoft.Data.Sqlite.dll","SQLitePCLRaw.core.dll",
+        "SQLitePCLRaw.batteries_v2.dll","SQLitePCLRaw.provider.e_sqlite3.dll","e_sqlite3.dll"];
     /// <summary>Exit code of a run that could not happen here (no Dalamud install or no game data): Verify.ps1 prints SKIP, -Release refuses it.</summary>
     internal const int Skip=4;
 

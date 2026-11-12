@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1135.0</Version>
+    <Version>0.1136.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -19,6 +19,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Raphael.Net" Version="5.0.0" />
+    <!-- X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in SQLite (Discoveries/DiscoveryDatabase.cs). The bundle brings the
+         native e_sqlite3.dll, next to the DLL like Raphael's; set above the 2.1.13 Microsoft.Data.Sqlite asks for: NuGet flags lib.e_sqlite3 up to
+         2.1.11 as vulnerable (GHSA-2m69-gcr7-jv3q). -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.14" />
   </ItemGroup>
   <ItemGroup>
     <!-- X-126 (0.1113): the desktop app's release rules and install, one source shared with the app (src/TenshoAssistant.Desktop). -->

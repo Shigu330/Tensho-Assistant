@@ -11,6 +11,8 @@ internal sealed partial class MainWindow
 {
     internal DiscoveryStore? DiscoveryStore { get; set; }
     internal string? DiscoveryFolder { get; set; }
+    /// <summary>X-172 (0.1136): the SQLite database of the discoveries, once opened (null: the JSON files of before, when it could not be made).</summary>
+    internal DiscoveryDatabase? DiscoveryDatabase { get; set; }
     /// <summary>X-77.1 (0.883): the exchange with the repository through GitHub (connection by code, opt-in automatic exchange).</summary>
     internal GitHubExchange? DiscoveryExchange { get; set; }
     internal Func<uint,string>? MonsterName { get; set; }
@@ -82,6 +84,8 @@ internal sealed partial class MainWindow
         var until=Environment.TickCount64+5_000;
         while(Volatile.Read(ref discoverySaving)==1 && Environment.TickCount64<until)Thread.Sleep(20);
         if(DiscoveryStore?.Dirty==true || SeenPrices?.Dirty==true)SaveDiscoveries(true);
+        // X-172 (0.1136): the journal folded into the database file at unload.
+        try{DiscoveryDatabase?.Checkpoint();}catch(Exception error){log.Warning(error,"The discoveries database journal could not be folded in; SQLite does it at the next start.");}
     }
 
     /// <summary>The base written off the frame (on unload: at once).</summary>
@@ -98,7 +102,18 @@ internal sealed partial class MainWindow
         {
             // X-93 (0.940): yours in Discoveries.json, the shared ones apart, by kind, compressed (DiscoveryFiles.WriteSplit). X-93 part 2 (0.1040): the base is
             // copied here, off the frame and by slices (DiscoveryStore.Snapshot): on the frame it was 21 ms at 100 000 facts, 339 ms at a million.
-            try{var held=store.SharedKindsHeld();var file=store.SnapshotToSave(DateTimeOffset.UtcNow,out var stamp);lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);store.MarkSaved(stamp);}
+            // X-172 (0.1136): with the database, only the rows changed since the last save, in one transaction; a failed write keeps them to save.
+            try
+            {
+                if(DiscoveryDatabase is { } database)
+                {
+                    var changed=store.ChangesToSave(out var stamp);
+                    try{database.Write(changed.Write,changed.Remove,changed.All);}
+                    catch(Exception){store.SaveFailed(changed);throw;}
+                    store.MarkSaved(stamp);
+                }
+                else{var held=store.SharedKindsHeld();var file=store.SnapshotToSave(DateTimeOffset.UtcNow,out var stamp);lock(sharedWritten)DiscoveryFiles.WriteSplit(path,file,sharedWritten,held);store.MarkSaved(stamp);}
+            }
             catch(Exception error){log.Warning(error,"The discoveries could not be saved; kept to save again.");}
             try{if(prices is not null){Market.SeenPriceStore.Write(pricesPath,prices);seenPrices!.MarkSaved(pricesStamp);}}
             catch(Exception error){log.Warning(error,"The seen prices could not be saved; kept to save again.");}
@@ -531,7 +546,7 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("DiscoveriesUi.ClearYes")))
         {
             // X-76 step 3 (0.945, user request): a zip copy of the Discoveries folder first (never the GitHub token), then the base emptied.
-            try{BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,new HashSet<string>{"github.token"});}
+            try{DiscoveryDatabase?.Checkpoint();BackupZip.Create(folder,Path.Combine(Path.GetDirectoryName(folder) ?? folder,"Backups"),"discoveries",DateTimeOffset.UtcNow,new HashSet<string>{"github.token"});}
             catch(Exception error){log.Warning(error,"The discoveries copy before emptying failed; nothing was removed.");discoveryClearAsked=false;return;}
             store.Clear();SaveDiscoveries(false);discoveryClearAsked=false;
         }

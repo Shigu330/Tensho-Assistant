@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- X-172 part 1: SQLite trial for the local storage, measured against the plugin's present JSON files; offline, writes only to a temporary folder; not run by Verify. -->
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <!-- Published on NuGet 2026-10-25 and 2026-10-13, over two weeks before the trial (2026-11-12). bundle_e_sqlite3 2.1.14 rather than the 2.1.13 that
+         Microsoft.Data.Sqlite 10.0.14 asks for at least: NuGet flags lib.e_sqlite3 up to 2.1.11 as vulnerable (GHSA-2m69-gcr7-jv3q), 2.1.12 and later are not. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/Discoveries/DiscoveriesModel.cs" Link="Linked/DiscoveriesModel.cs" />
+    <Compile Include="../../src/TenshoAssistant/Discoveries/ItemGains.cs" Link="Linked/ItemGains.cs" />
+    <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="Linked/AtomicFile.cs" />
+  </ItemGroup>
+</Project>
