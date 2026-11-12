@@ -168,12 +168,20 @@ function Assert-DesktopZip([string]$Version) {
     Write-Output "TenshoAssistant.Desktop.zip checked: the app and its plugin are $Version; its SHA-256 $($actual.ToLowerInvariant()) is in TenshoAssistant.Desktop.zip.sha256."
 }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
+. (Join-Path $PSScriptRoot 'LaunchProof.ps1')
+$launchProof = $null
 function Add-HotfixNote([string]$Notes) {
     # 0.1105 (R20 changed on 2026-11-11): without -Hotfix, the release goes out on the « lancement ok » of its version (q.py release-check,
     # run by guard.py): Tensho loaded in game at this version, character logged in, self-test without failure, no error in the log.
+    # 0.1126 (X-144, audit A13): the note says so only on a launch proof bound to this version and to the very DLL of latest.zip
+    # (scripts/LaunchProof.ps1); without one, whichever way the release was started, the note says it was not checked in game.
     if (-not $Hotfix) {
-        return "**Checked at launch, not tried in detail yet**: Tensho loaded in game with this version, a character logged in, its self-test passed and the log showed no error; the detailed in-game tests come later.`n" +
-            "**Vérifié au lancement, pas encore essayé en détail** : Tensho s'est chargé en jeu à cette version, personnage connecté, son autotest est passé et le journal n'a montré aucune erreur ; les essais détaillés en jeu viendront ensuite.`n`n$Notes"
+        if ($launchProof -and $launchProof.Ok) {
+            return "**Checked at launch, not tried in detail yet**: Tensho loaded in game with this version, a character logged in, its self-test passed and the log showed no error; the detailed in-game tests come later.`n" +
+                "**Vérifié au lancement, pas encore essayé en détail** : Tensho s'est chargé en jeu à cette version, personnage connecté, son autotest est passé et le journal n'a montré aucune erreur ; les essais détaillés en jeu viendront ensuite.`n`n$Notes"
+        }
+        return "**Not checked in game yet**: no launch proof for this build; the in-game tests come later.`n" +
+            "**Pas encore vérifié en jeu** : aucune preuve de lancement pour cette compilation ; les essais en jeu viendront ensuite.`n`n$Notes"
     }
     $reason = $Hotfix.Trim()
     return "**Urgent fix** ($reason): released without waiting for the in-game tests; not validated in game.`n" +
@@ -307,7 +315,33 @@ try {
     $zip = Join-Path $root 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip'
     if (-not (Test-Path -LiteralPath $zip)) { throw "Package not found: $zip (run .\scripts\Verify.ps1 first)." }
     Assert-DesktopZip $version
+    $launchProof = Get-LaunchProof $version $zip
+    Write-Output "Launch proof: $(if ($launchProof.Ok) { 'accepted' } else { 'none' }) ($($launchProof.Reason))."
     $notesFile = Join-Path ([IO.Path]::GetTempPath()) "tensho-notes-$version.md"
+    # 0.1126 (X-144): the release's own proof, attached to it: the commit built and checked, the SHA-256 of what is delivered, the Dalamud and
+    # .NET SDK versions of the build, the CI of the commit and the launch proof read above. Facts only, no path of this PC.
+    $proofFolder = Join-Path ([IO.Path]::GetTempPath()) "tensho-proof-$version"
+    New-Item -ItemType Directory -Force -Path $proofFolder | Out-Null
+    $releaseProof = Join-Path $proofFolder 'release-proof.json'
+    function Write-ReleaseProof([string]$Commit) {
+        $hash = { param($Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant() }
+        $library = if ($env:DALAMUD_HOME) { $env:DALAMUD_HOME } else { Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev' }
+        $dalamudDll = Join-Path $library 'Dalamud.dll'
+        $dalamud = if (Test-Path -LiteralPath $dalamudDll) { (Get-Item -LiteralPath $dalamudDll).VersionInfo.FileVersion } else { 'unknown' }
+        $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+        try { $sdk = "$(& dotnet --version 2>$null)".Trim(); $runs = & $gh run list --repo $repository --commit $Commit --json 'workflowName,status,conclusion,databaseId' 2>$null }
+        finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
+        $ci = @(); if ($runs) { $ci = @(($runs -join "`n") | ConvertFrom-Json | ForEach-Object { [ordered]@{ workflow = $_.workflowName; status = $_.status; conclusion = $_.conclusion; run = $_.databaseId } }) }
+        $launch = if ($launchProof.Proof) { [ordered]@{ accepted = [bool]$launchProof.Ok; reason = $launchProof.Reason; version = "$($launchProof.Proof.Version)"; dll = "$($launchProof.Proof.Dll)"; at = "$($launchProof.Proof.At)"; ok = $launchProof.Proof.Ok; failed = $launchProof.Proof.Failed } } else { [ordered]@{ accepted = $false; reason = $launchProof.Reason } }
+        $document = [ordered]@{
+            format = 1; version = $version; tag = $tag; commit = $Commit; created = [DateTimeOffset]::UtcNow.ToString('o'); hotfix = "$Hotfix"
+            files = [ordered]@{ 'latest.zip' = (& $hash $zip); 'TenshoAssistant.dll (in latest.zip)' = $launchProof.Dll; 'TenshoAssistant.Desktop.zip' = (& $hash $desktopZip) }
+            build = [ordered]@{ dalamud = "$dalamud"; dotnetSdk = $(if ($sdk) { $sdk } else { 'unknown' }) }
+            ci = $ci; launch = $launch
+        }
+        [IO.File]::WriteAllText($releaseProof, (ConvertTo-Json $document -Depth 5), [Text.UTF8Encoding]::new($false))
+        Write-Output "Release proof written: commit $($Commit.Substring(0, 7)), $($ci.Count) CI run(s), launch proof $(if ($launchProof.Ok) { 'accepted' } else { 'none' })."
+    }
 
     if ($resume) {
         Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
@@ -317,8 +351,9 @@ try {
         $notes = Add-HotfixNote $notes
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
         Assert-NoAgentFiles $commit
+        Write-ReleaseProof $commit
         if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
-        if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256" { & $gh release create $tag $zip $desktopZip $desktopHash --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
+        if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256 release-proof.json" { & $gh release create $tag $zip $desktopZip $desktopHash $releaseProof --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
         else {
             # A release created before its desktop package (R33) or its SHA-256 (X-121) was attached gets them now.
             $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
@@ -326,6 +361,7 @@ try {
             finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
             if ('TenshoAssistant.Desktop.zip' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip" { & $gh release upload $tag $desktopZip --repo $repository } }
             if ('TenshoAssistant.Desktop.zip.sha256' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip.sha256" { & $gh release upload $tag $desktopHash --repo $repository } }
+            if ('release-proof.json' -notin $assets) { Step "gh release upload $tag release-proof.json" { & $gh release upload $tag $releaseProof --repo $repository } }
         }
         # Fast-forward only: GitHub refuses a push of main that is not one (no force anywhere).
         Step "git push origin ${commit}:$releaseBranch (fast-forward)" { git push origin "${commit}:refs/heads/$releaseBranch" }
@@ -345,6 +381,7 @@ try {
     }
     Assert-NoAgentFiles 'HEAD'; Assert-NoSecret
     Assert-CiGreen ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
+    Write-ReleaseProof ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
 
     # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
@@ -387,7 +424,7 @@ try {
     # fast-forward (origin/main is an ancestor of Devloppement, checked above; GitHub refuses anything else, no force anywhere),
     # then Devloppement.
     Step "git push origin $tag" { git push origin $tag }
-    Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256" { & $gh release create $tag $zip $desktopZip $desktopHash --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
+    Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256 release-proof.json" { & $gh release create $tag $zip $desktopZip $desktopHash $releaseProof --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag }
     Step "git push origin HEAD:$releaseBranch (fast-forward)" { git push origin "HEAD:refs/heads/$releaseBranch" }
     Step "git push origin $developBranch" { git push origin $developBranch }
     Write-Output ($(if ($DryRun) { "DRY RUN: nothing was committed, tagged or published ($tag)." } else { "RELEASE $tag published: https://github.com/$repository/releases/tag/$tag" }))

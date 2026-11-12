@@ -31,11 +31,18 @@ internal sealed class SelfCheckRunner : IDisposable
     private readonly SelfCheckMemory memory;
     private DateTimeOffset nextWatch;
     private bool saveFailed;
+    // 0.1126 (X-144, audit A13): the launch proof a release reads; the DLL's hash is read once at load, off the framework thread.
+    private readonly string? proofFile;
+    private readonly Task<string> dllHash;
+    private bool proofFailed;
 
     public SelfCheckRunner(IFramework framework, IClientState client, IPlayerState player, IPluginLog log, Func<bool> developerMode, Func<bool> ready,
         Action prepare, Func<bool, IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> probes,
-        Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows, string memoryFile, string gameVersion)
+        Func<IReadOnlyList<(string Domain, Func<SelfCheckLine> Probe)>> windows, string memoryFile, string gameVersion, string? proofFile = null)
     {
+        this.proofFile = proofFile;
+        var location = typeof(SelfCheckRunner).Assembly.Location;
+        dllHash = Task.Run(() => LaunchProof.Hash(location));
         this.framework = framework; this.client = client; this.player = player; this.log = log;
         this.developerMode = developerMode; this.ready = ready; this.prepare = prepare; this.probes = probes;
         this.windows = windows; this.memoryFile = memoryFile;
@@ -94,12 +101,30 @@ internal sealed class SelfCheckRunner : IDisposable
             log.Information("{0}", SelfCheck.Summary(reason, lines));
             Volatile.Write(ref lastLines, lines);
             Volatile.Write(ref run, null);
+            if (loggedIn) WriteProof(now, lines);
         }
         catch (Exception error)
         {
             startAt = null; Volatile.Write(ref run, null);
             log.Warning(error, "Self-check stopped.");
         }
+    }
+
+    private void WriteProof(DateTimeOffset now, IReadOnlyCollection<SelfCheckLine> lines)
+    {
+        if (proofFile is null) return;
+        var version = typeof(SelfCheckRunner).Assembly.GetName().Version?.ToString(3) ?? "?";
+        var hash = dllHash.IsCompletedSuccessfully ? dllHash.Result : string.Empty;
+        var text = LaunchProof.Make(version, hash, now, true, reason, lines).Serialize();
+        var file = proofFile;
+        _ = Task.Run(() =>
+        {
+            try { AtomicFile.Write(file, text); proofFailed = false; }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                if (!proofFailed) { proofFailed = true; log.Warning(error, "Launch proof could not be saved."); }
+            }
+        });
     }
 
     public void Dispose() => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
