@@ -1610,6 +1610,13 @@ public sealed class Plugin : IDalamudPlugin
                 SayLoad("10 s later");
                 if(!configuration.DeveloperMode)return;
                 foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value));
+                // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static
+                // fields still hold something an instance could hang from (read only, nothing of that instance is run or changed).
+                if(instances.Skip(1).Select(earlier=>(earlier.Key,Plugin:earlier.Value.GetValueOrDefault("plugin")?.Target)).FirstOrDefault(earlier=>earlier.Plugin is not null) is { Plugin:{ } alive } held)
+                {
+                    log.Information("Earlier instance {0}: {1}.",held.Key,Diagnostics.UnloadWatch.Released(alive));
+                    foreach(var line in Diagnostics.UnloadWatch.Statics(alive.GetType().Assembly))log.Information("Earlier instance {0}: static {1}.",held.Key,line);
+                }
             },TaskScheduler.Default);
         }
         catch
@@ -1795,6 +1802,8 @@ public sealed class Plugin : IDalamudPlugin
         {
             Diagnostics.UnloadWatch.Note(parts,"plugin",this,typeof(Plugin).Assembly);
             Diagnostics.UnloadWatch.Note(parts,"window",mainWindow,typeof(Plugin).Assembly);
+            // 0.1188: the constructor's captured locals (most services live there, not in fields): the closure object behind this delegate.
+            Diagnostics.UnloadWatch.Note(parts,"locals",developerAtUnload.Target,typeof(Plugin).Assembly);
         }
         gameDataCancel.Cancel();
         try { registrations.Dispose(); }

@@ -46,13 +46,36 @@ public sealed class JitWarmup : IDisposable
         =>new(roots,delay,finished,early);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
-    /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).</summary>
+    /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
+    /// X-01 C3.3 (0.1188): and what the map's canvas calls on its first frame without saying Map: see <see cref="MapPathMethods"/>.</summary>
     public static bool MapFirst(MethodBase method)
     {
-        if(method.DeclaringType?.Namespace==MapNamespace)return true;
-        if(!method.Name.Contains("Map",StringComparison.Ordinal))return false;
+        if(method.DeclaringType?.Namespace is MapNamespace or VendorNamespace)return true;
+        if(method.DeclaringType?.Name=="Configuration" && MapPathSettings.Contains(method.Name))return true;
+        var name=method.Name;
+        if(!name.Contains("Map",StringComparison.Ordinal) && !OnMapPath(name))return false;
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
             if(type.Name=="MainWindow")return true;
+        return false;
+    }
+
+    /// <summary>
+    /// X-01 C3.3 (0.1188, analysis of 12/11: « canvas vendors » took 32 to 40 ms for 9 vendors on the map's first frame, so the cost was
+    /// the compiling, not the data): the main window's methods on the canvas's path whose name does not say Map (vendors, event and FATE
+    /// labels, edge markers, glyphs, the player's arrow, the beasts' places, the quest index), compiled early with the map's; their lambdas
+    /// and local functions carry the outer name in angle brackets. A test checks that each name is still declared in the sources.
+    /// </summary>
+    public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
+        "DrawEdgeMarkers","DrawGlyph","DrawPlayerArrow","BeastPlacesOf","RefreshQuestIndex"];
+    /// <summary>X-01 C3.3 (0.1188): the settings' methods the canvas calls for each icon (size and priority, per map).</summary>
+    public static readonly IReadOnlyList<string> MapPathSettings=["SizeOf","PriorityOf","CleanSize"];
+    /// <summary>X-01 C3.3 (0.1188): the namespace of the vendors' catalogue, read by the canvas for its vendor icons.</summary>
+    public const string VendorNamespace="TenshoAssistant.Npcs";
+
+    private static bool OnMapPath(string name)
+    {
+        foreach(var path in MapPathMethods)
+            if(name==path || name.Contains("<"+path+">",StringComparison.Ordinal))return true;
         return false;
     }
 

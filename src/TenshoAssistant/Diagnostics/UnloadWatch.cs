@@ -57,7 +57,77 @@ public static class UnloadWatch
         var noted=parts.Where(part=>part.Key!=Context).ToList();
         if(noted.Count==0)return $"{label}: context {context}, parts not noted";
         var alive=noted.Where(part=>part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
-        return $"{label}: context {context}, {alive.Count} of {noted.Count} parts alive"+
-            (alive.Count==0 ? "":": "+string.Join(", ",alive.Take(names))+(alive.Count>names ? ", …":""));
+        var head=$"{label}: context {context}, {alive.Count} of {noted.Count} parts alive";
+        if(alive.Count==0)return head;
+        // 0.1188: the shorter list tells more: the parts collected when most are alive (what the root does not reach), the parts alive otherwise.
+        var collected=noted.Where(part=>!part.Value.IsAlive).Select(part=>part.Key).Order(StringComparer.Ordinal).ToList();
+        var (word,list)=collected.Count>0 && collected.Count<alive.Count ? ("; collected: ",collected):(": ",alive);
+        return head+word+string.Join(", ",list.Take(names))+(list.Count>names ? ", …":"");
     }
+
+    /// <summary>
+    /// 0.1188: whether an earlier instance's plugin object finished its unload: its registration scope disposed and how many releases were
+    /// left in it (read by name, without running anything of that instance); « unknown » when the fields are not there.
+    /// </summary>
+    public static string Released(object plugin)
+    {
+        const BindingFlags any=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;
+        try
+        {
+            if(plugin.GetType().GetField("registrations",any)?.GetValue(plugin) is not { } scope)return "registrations unknown";
+            var disposed=scope.GetType().GetField("disposed",any)?.GetValue(scope);
+            var left=scope.GetType().GetField("cleanup",any)?.GetValue(scope) is System.Collections.ICollection cleanup ? cleanup.Count.ToString(System.Globalization.CultureInfo.InvariantCulture):"?";
+            return $"registrations disposed: {disposed ?? "?"}, releases left: {left}";
+        }
+        catch(Exception error) when(error is FieldAccessException or TargetException or NotSupportedException){return "registrations unknown";}
+    }
+
+    /// <summary>
+    /// 0.1188: the static fields of an assembly that hold something an instance could hang from: a delegate with a target, an object of the
+    /// assembly's own classes that has reference fields, a non-empty collection of such objects or of delegates. One text per field
+    /// (« Type.field: what »), the first <paramref name="max"/>. Read only; a field that cannot be read is skipped.
+    /// </summary>
+    public static List<string> Statics(Assembly assembly,int max=40)
+    {
+        var found=new List<string>();
+        Type[] types;
+        try{types=assembly.GetTypes();}
+        catch(ReflectionTypeLoadException error){types=error.Types.Where(type=>type is not null).ToArray()!;}
+        foreach(var type in types.OrderBy(type=>type.FullName,StringComparer.Ordinal))
+        {
+            if(type.ContainsGenericParameters)continue;
+            foreach(var field in type.GetFields(BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly))
+            {
+                if(field.IsLiteral || field.FieldType.IsValueType || field.FieldType==typeof(string) || field.FieldType.IsPointer)continue;
+                object? value;
+                try{value=field.GetValue(null);}
+                catch(Exception error) when(error is TargetInvocationException or TypeInitializationException or NotSupportedException or FieldAccessException or InvalidOperationException){continue;}
+                if(Holds(value,assembly,type) is not { } what)continue;
+                found.Add($"{type.FullName}.{field.Name}: {what}");
+                if(found.Count>=max)return found;
+            }
+        }
+        return found;
+    }
+
+    private static string? Holds(object? value,Assembly assembly,Type declaring)
+    {
+        switch(value)
+        {
+            case null:return null;
+            case Delegate hook:
+                var targets=hook.GetInvocationList().Select(one=>one.Target).Where(target=>target is not null && !CompilerSingleton(target!.GetType())).Select(target=>target!.GetType().Name).Distinct().ToList();
+                return targets.Count==0 ? null:"delegate on "+string.Join(", ",targets);
+            case System.Collections.ICollection { Count:>0 } many when value.GetType().IsGenericType && value.GetType().GetGenericArguments().Any(argument=>typeof(Delegate).IsAssignableFrom(argument) || (argument.IsClass && argument.Assembly==assembly)):
+                return $"{many.Count} items of {value.GetType().Name}<{string.Join(",",value.GetType().GetGenericArguments().Select(argument=>argument.Name))}>";
+        }
+        var type=value.GetType();
+        // An object of the assembly's own classes counts when it has fields that can hold other objects (a record of numbers and texts cannot hold an instance).
+        if(type.Assembly!=assembly || type==declaring || CompilerSingleton(type) || type.IsEnum)return null;
+        var holders=type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Count(field=>!field.FieldType.IsValueType && field.FieldType!=typeof(string));
+        return holders==0 ? null:$"{type.Name} ({holders} reference fields)";
+    }
+
+    // The compiler's « <>c » singletons hold static lambdas only: no instance behind them.
+    private static bool CompilerSingleton(Type type)=>type.Name.StartsWith("<>c",StringComparison.Ordinal) && !type.Name.StartsWith("<>c__DisplayClass",StringComparison.Ordinal);
 }
