@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Data.Sqlite;
 
 namespace TenshoAssistant.FreeCompany;
 
@@ -94,11 +95,103 @@ public static class VoyageHistory
 }
 
 /// <summary>
-/// g, M-10 (0.379): owner of the history file. <see cref="Observe"/> is called by VoyageWatcher on the framework thread after a workshop
-/// read; the page reads <see cref="Records"/>. A file that cannot be read is never written over.
+/// X-173 (0.1148, user's choice of 12/11): where the voyage history is kept. Since this version, in the player's data file (<see cref="TenshoDataFile"/>,
+/// TenshoData.db): one row per voyage, the history replaced whole in one transaction at each save (a stop in the middle leaves the last save
+/// whole). The file of before (VoyageHistory.json) is converted the first time it is loaded (its rows and a « converted » mark written together),
+/// then moved, never removed, into before-sqlite-&lt;date&gt;/ beside it. A file of before that cannot be read stays in place and nothing is written
+/// (as before); a data file that is there but unusable is never replaced (nothing written this session); when the data file cannot be created, or
+/// none is given, the JSON file stays in use as before.
 /// </summary>
-public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn)
+public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
 {
+    public const string Family="voyages";
+    private readonly object gate=new();
+    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+
+    /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
+    internal Action? DuringSave { get; set; }
+
+    /// <summary>« sqlite », « json » or « blocked » (see <see cref="TenshoDataFile.Mode"/>); « json » without a data file.</summary>
+    public string Mode=>data?.Mode ?? "json";
+
+    /// <summary>The history, as saved (throws when it cannot be read: the caller then never writes over it).</summary>
+    public List<VoyageRecord> Load(DateTimeOffset now)
+    {
+        if(data?.Database() is not { } opened)return VoyageHistory.Read(file);
+        if(File.Exists(file))
+            lock(gate)
+                if(File.Exists(file))
+                {
+                    using(var open=opened.Open())
+                        if(!TenshoDataDatabase.Converted(open,Family))ReplaceAll(open,VoyageHistory.Read(file),now);
+                    data.SetAside(file,now,"voyage history");
+                }
+        return ReadRows(opened);
+    }
+
+    /// <summary>The history saved whole (replaces what was there); refused while the file of before is not converted.</summary>
+    public void Save(IReadOnlyList<VoyageRecord> records)
+    {
+        if(data?.Database() is not { } opened){VoyageHistory.Write(file,records);return;}
+        using var open=opened.Open();
+        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family))
+            throw new InvalidOperationException("The voyage history file of before is not converted yet; nothing written over it.");
+        ReplaceAll(open,records,null);
+    }
+
+    // Every row replaced in one transaction; at a conversion (converted set) with the « converted » mark: the whole file is in, or none of it.
+    private void ReplaceAll(SqliteConnection open,IReadOnlyList<VoyageRecord> records,DateTimeOffset? converted)
+    {
+        using var transaction=open.BeginTransaction();
+        TenshoDataDatabase.Run(open,"DELETE FROM voyage_records;",transaction);
+        using(var insert=open.CreateCommand())
+        {
+            insert.Transaction=transaction;
+            insert.CommandText="INSERT OR REPLACE INTO voyage_records(house,kind,slot,registered,vessel,rank,return_at,points,route,loot) "
+                +"VALUES($house,$kind,$slot,$registered,$vessel,$rank,$return,$points,$route,$loot);";
+            var house=insert.Parameters.Add("$house",SqliteType.Integer);var kind=insert.Parameters.Add("$kind",SqliteType.Integer);
+            var slot=insert.Parameters.Add("$slot",SqliteType.Integer);var registered=insert.Parameters.Add("$registered",SqliteType.Integer);
+            var vessel=insert.Parameters.Add("$vessel",SqliteType.Text);var rank=insert.Parameters.Add("$rank",SqliteType.Integer);
+            var back=insert.Parameters.Add("$return",SqliteType.Integer);var points=insert.Parameters.Add("$points",SqliteType.Text);
+            var route=insert.Parameters.Add("$route",SqliteType.Text);var loot=insert.Parameters.Add("$loot",SqliteType.Text);
+            foreach(var record in records)
+            {
+                house.Value=unchecked((long)record.HouseId);kind.Value=(long)record.Kind;slot.Value=(long)record.Slot;registered.Value=record.RegisteredAt.UtcTicks;
+                vessel.Value=record.Vessel;rank.Value=(long)record.Rank;back.Value=record.ReturnAt is { } at ? at.UtcTicks:DBNull.Value;
+                points.Value=JsonSerializer.Serialize(record.Points,Json);route.Value=JsonSerializer.Serialize(record.Route,Json);loot.Value=JsonSerializer.Serialize(record.Loot,Json);
+                insert.ExecuteNonQuery();
+            }
+        }
+        if(converted is { } when)TenshoDataDatabase.MarkConverted(open,transaction,Family,when);
+        DuringSave?.Invoke();
+        transaction.Commit();
+    }
+
+    private static List<VoyageRecord> ReadRows(TenshoDataDatabase opened)
+    {
+        using var open=opened.Open();using var command=open.CreateCommand();
+        command.CommandText="SELECT house,kind,slot,registered,vessel,rank,return_at,points,route,loot FROM voyage_records ORDER BY registered,house,kind,slot;";
+        var records=new List<VoyageRecord>();
+        using var reader=command.ExecuteReader();
+        while(reader.Read())
+            records.Add(new VoyageRecord(unchecked((ulong)reader.GetInt64(0)),(VesselKind)reader.GetInt64(1),(int)reader.GetInt64(2),
+                reader.GetString(4),(int)reader.GetInt64(5),new DateTimeOffset(reader.GetInt64(3),TimeSpan.Zero),
+                reader.IsDBNull(6) ? null:new DateTimeOffset(reader.GetInt64(6),TimeSpan.Zero),
+                JsonSerializer.Deserialize<uint[]>(reader.GetString(7),Json) ?? throw new InvalidDataException("Voyage sectors unreadable."),
+                JsonSerializer.Deserialize<string[]>(reader.GetString(8),Json) ?? throw new InvalidDataException("Voyage route unreadable."),
+                JsonSerializer.Deserialize<VoyageLoot[]>(reader.GetString(9),Json) ?? throw new InvalidDataException("Voyage loot unreadable.")));
+        return records;
+    }
+}
+
+/// <summary>
+/// g, M-10 (0.379): owner of the history. <see cref="Observe"/> is called by VoyageWatcher on the framework thread after a workshop
+/// read; the page reads <see cref="Records"/>. A history that cannot be read is never written over. Since 0.1148 (X-173) kept through
+/// <see cref="VoyageHistoryData"/> (TenshoData.db when a data file is given, else the JSON file as before).
+/// </summary>
+public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn,TenshoDataFile? data=null)
+{
+    private readonly VoyageHistoryData source=new(path,data);
     private readonly object gate=new();
     private List<VoyageRecord>? records;
     private bool failed;
@@ -117,14 +210,14 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
             if(!VoyageHistory.Record(records!,vessels))return;
             records=VoyageHistory.Prune(records!,DateTimeOffset.UtcNow);
             var copy=records.ToArray();
-            writer.Enqueue("Voyage history could not be saved.",()=>VoyageHistory.Write(path,copy));
+            writer.Enqueue("Voyage history could not be saved.",()=>source.Save(copy));
         }
     }
 
     private void Load()
     {
         if(records is not null)return;
-        try{records=VoyageHistory.Prune(VoyageHistory.Read(path),DateTimeOffset.UtcNow);}
+        try{var now=DateTimeOffset.UtcNow;records=VoyageHistory.Prune(source.Load(now),now);}
         catch(Exception error){records=[];failed=true;warn(error,"Voyage history could not be read; it is not written over.");}
     }
 }

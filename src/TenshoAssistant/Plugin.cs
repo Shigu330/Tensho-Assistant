@@ -628,8 +628,12 @@ public sealed class Plugin : IDalamudPlugin
             this.alarmBar=()=>alarmBar;
             this.currencyBar=()=>currencyBar;
             FreeCompany.VoyageWatcher? voyages=null;
-            // g, M-10 (0.379): voyage loot history, one local file (VoyageHistory.json), 180 days.
-            var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message));
+            // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress, voyage history),
+            // opened on first use. 0.1148: opened here, before the voyage history.
+            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+            // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
+            // converted at its first load and kept aside.
+            var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);
             registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>pluginInterface.SavePluginConfig(configuration),log){Observed=voyageHistory.Observe,
                 // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
                 AirshipLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.AirshipDrop,item%1_000_000,sector,count,DateTimeOffset.UtcNow,hq:item>=1_000_000);},
@@ -793,8 +797,6 @@ public sealed class Plugin : IDalamudPlugin
             // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db, the files of before (GilJournal/<id>.json)
             // converted when their character is first loaded and kept aside.
             Inventory.GilWatcher? gilWatcher=null;
-            // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress), opened on first use.
-            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
             var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());

@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
                 previousTools?.Dispose();
                 break;
             case "voyages":
-                VoyageHistorySource=new FreeCompany.VoyageHistoryStore(Path.Combine(folder,"VoyageHistory.json"),warn);
+                UseDesktopVoyages(folder,warn);
                 break;
             case "beast-teams":
                 var teams=Path.Combine(folder,"BeastTeams.json");
@@ -36,6 +36,7 @@ internal sealed partial class MainWindow
                 break;
             case "data":
                 UseDesktopPlayerData(folder,warn);
+                UseDesktopVoyages(folder,warn);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");
@@ -46,6 +47,14 @@ internal sealed partial class MainWindow
     // shows the journal of the character with the newest entry (no character is logged in; choice D-142), its balances as last recorded. Read
     // off the frame; a newer reading replaces an older one, never the reverse. No copy: the page says offline, as before. The achievement
     // progress stays in the game for now (its page reads the game's watcher).
+    // X-173 (0.1148): the voyage history from the copy of the data file once the plugin converted it (no VoyageHistory.json left to copy), from
+    // the JSON copy before (the application never converts its copy itself: the next copy of the data file would undo it).
+    private void UseDesktopVoyages(string folder,Action<Exception,string> warn)
+    {
+        var json=Path.Combine(folder,"VoyageHistory.json");var file=Path.Combine(folder,TenshoDataDatabase.FileName);
+        VoyageHistorySource=new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null);
+    }
+
     private Inventory.GilJournalState? desktopGil;
     private int desktopGilGeneration;
     private void UseDesktopPlayerData(string folder,Action<Exception,string> warn)

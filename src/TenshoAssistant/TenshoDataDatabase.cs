@@ -7,7 +7,7 @@ namespace TenshoAssistant;
 /// X-173 (0.1139, user's choice of 12/11: « two SQLite files, an erasable cache and the data to protect »): the player's data file,
 /// <c>TenshoData.db</c>, at the root of the plugin's configuration folder. The families of X-173 move into it one at a time, each with its own
 /// tables, its files of before converted once and kept aside: the gil journal (0.1139, <see cref="Inventory.GilJournalStore"/>), the achievement
-/// progress (0.1140, <see cref="Collections.AchievementProgressData"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db,
+/// progress (0.1140, <see cref="Collections.AchievementProgressData"/>), the voyage history (0.1148, <see cref="FreeCompany.VoyageHistoryData"/>). The discoveries keep their own file for now (Discoveries/Discoveries.db,
 /// X-172; choice noted as D-141). WAL journal: a stop in the middle of a save leaves the last one whole, another process may read while the game
 /// writes. Every call opens its own connection: safe from any thread.
 /// </summary>
@@ -44,6 +44,10 @@ public sealed class TenshoDataDatabase
             // 0.1140: the achievement progress seen, one row per character and achievement.
             Run(open,"CREATE TABLE IF NOT EXISTS achievement_progress(character INTEGER NOT NULL,achievement INTEGER NOT NULL,current INTEGER NOT NULL,"
                 +"max INTEGER NOT NULL,seen_at INTEGER NOT NULL,PRIMARY KEY(character,achievement)) WITHOUT ROWID;",transaction);
+            // 0.1148: the voyage history, one row per voyage (house, kind, slot, registration); its lists (sectors, route, loot) as JSON text.
+            Run(open,"CREATE TABLE IF NOT EXISTS voyage_records(house INTEGER NOT NULL,kind INTEGER NOT NULL,slot INTEGER NOT NULL,registered INTEGER NOT NULL,"
+                +"vessel TEXT NOT NULL,rank INTEGER NOT NULL,return_at INTEGER,points TEXT NOT NULL,route TEXT NOT NULL,loot TEXT NOT NULL,"
+                +"PRIMARY KEY(house,kind,slot,registered)) WITHOUT ROWID;",transaction);
             if(version<Schema)Run(open,$"PRAGMA user_version={Schema};",transaction);
             transaction.Commit();
         }
