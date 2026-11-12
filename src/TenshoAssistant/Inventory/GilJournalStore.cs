@@ -1,0 +1,177 @@
+using System.Globalization;
+using Microsoft.Data.Sqlite;
+
+namespace TenshoAssistant.Inventory;
+
+/// <summary>
+/// X-173 (0.1139, user's choice of 12/11): where the gil journal is kept. Since this version, in the player's data file
+/// (<see cref="TenshoDataDatabase"/>, <c>TenshoData.db</c>): one row per entry, a character's journal replaced whole in one transaction at each
+/// save (at most once a minute), so a stop in the middle leaves the last save whole. The file of before (GilJournal/&lt;id&gt;.json) is converted
+/// the first time its character is loaded: its rows and a « converted » mark written in one transaction, then the file moved, never removed, into
+/// GilJournal/before-sqlite-yyyyMMdd-HHmmss/. A file that cannot be read is left where it is and the journal is not written (as before). A data
+/// file that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: the journal is unavailable and nothing is
+/// written this session; when the data file cannot be created at all, the JSON files stay in use as before.
+/// </summary>
+public sealed class GilJournalStore
+{
+    private readonly string folder,databasePath;
+    private readonly Action<Exception,string> warn;
+    private readonly Action<string>? info;
+    private readonly object gate=new();
+    private bool tried;
+    private TenshoDataDatabase? database;
+    private Exception? blocked;
+
+    /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
+    internal Action? DuringSave { get; set; }
+
+    public GilJournalStore(string folder,string databasePath,Action<Exception,string> warn,Action<string>? info=null)
+    {
+        this.folder=folder;this.databasePath=databasePath;this.warn=warn;this.info=info;
+    }
+
+    /// <summary>The file of before of a character (local character id, never an Account ID).</summary>
+    public static string FileName(ulong character)=>character.ToString(CultureInfo.InvariantCulture)+".json";
+
+    /// <summary>« sqlite », « json » (data file could not be created) or « blocked » (data file there but unusable); opens it on first use.</summary>
+    public string Mode
+    {
+        get{try{return Database() is null ? "json":"sqlite";}catch(IOException){return "blocked";}}
+    }
+
+    private TenshoDataDatabase? Database()
+    {
+        lock(gate)
+        {
+            if(!tried)
+            {
+                tried=true;
+                try
+                {
+                    database=new TenshoDataDatabase(databasePath);
+                    info?.Invoke($"Gil journal: SQLite {database.LibraryVersion()} data file {TenshoDataDatabase.FileName}.");
+                }
+                catch(Exception error)
+                {
+                    database=null;
+                    if(File.Exists(databasePath)){blocked=error;warn(error,"The Tensho data file could not be opened: the gil journal is not written this session.");}
+                    else warn(error,"The Tensho data file could not be created: the gil journal stays in its JSON files this session.");
+                }
+            }
+            if(blocked is not null)throw new IOException("The Tensho data file could not be opened.",blocked);
+            return database;
+        }
+    }
+
+    /// <summary>A character's journal, oldest first (throws when it cannot be read: the caller then never writes over it).</summary>
+    public List<GilEntry> Load(ulong character,DateTimeOffset now)
+    {
+        var json=Path.Combine(folder,FileName(character));
+        if(Database() is not { } opened)return GilJournal.Read(json);
+        if(File.Exists(json))
+            lock(gate)
+                if(File.Exists(json))
+                {
+                    using(var open=opened.Open())
+                        if(!Converted(open,character))WriteRows(open,character,GilJournal.Read(json),now);
+                    SetAside(json,now);
+                }
+        return ReadRows(opened,character);
+    }
+
+    /// <summary>A character's journal saved whole (replaces what was there); refused while its file of before is not converted.</summary>
+    public void Save(ulong character,IReadOnlyList<GilEntry> entries)
+    {
+        var json=Path.Combine(folder,FileName(character));
+        if(Database() is not { } opened){GilJournal.Write(json,entries);return;}
+        using var open=opened.Open();
+        if(File.Exists(json) && !Converted(open,character))
+            throw new InvalidOperationException("The gil journal file of before is not converted yet; nothing written over it.");
+        WriteRows(open,character,entries,null);
+    }
+
+    /// <summary>The data file's journal folded in (at unload); nothing when the JSON files are in use.</summary>
+    public void Checkpoint()
+    {
+        TenshoDataDatabase? opened;
+        lock(gate)opened=blocked is null ? database:null;
+        opened?.Checkpoint();
+    }
+
+    private static long Id(ulong character)=>unchecked((long)character);
+
+    private static bool Converted(SqliteConnection open,ulong character)
+    {
+        using var command=open.CreateCommand();
+        command.CommandText="SELECT COUNT(*) FROM gil_converted WHERE character=$character;";
+        command.Parameters.AddWithValue("$character",Id(character));
+        return System.Convert.ToInt64(command.ExecuteScalar(),CultureInfo.InvariantCulture)>0;
+    }
+
+    private void WriteRows(SqliteConnection open,ulong character,IReadOnlyList<GilEntry> entries,DateTimeOffset? converted)
+    {
+        using var transaction=open.BeginTransaction();
+        using(var delete=open.CreateCommand())
+        {
+            delete.Transaction=transaction;delete.CommandText="DELETE FROM gil_entries WHERE character=$character;";
+            delete.Parameters.AddWithValue("$character",Id(character));
+            delete.ExecuteNonQuery();
+        }
+        using(var insert=open.CreateCommand())
+        {
+            insert.Transaction=transaction;
+            insert.CommandText="INSERT INTO gil_entries(character,seq,at,delta,balance,source,category) VALUES($character,$seq,$at,$delta,$balance,$source,$category);";
+            insert.Parameters.AddWithValue("$character",Id(character));
+            var seq=insert.Parameters.Add("$seq",SqliteType.Integer);var at=insert.Parameters.Add("$at",SqliteType.Integer);
+            var delta=insert.Parameters.Add("$delta",SqliteType.Integer);var balance=insert.Parameters.Add("$balance",SqliteType.Integer);
+            var source=insert.Parameters.Add("$source",SqliteType.Integer);var category=insert.Parameters.Add("$category",SqliteType.Integer);
+            for(var index=0;index<entries.Count;index++)
+            {
+                var entry=entries[index];
+                seq.Value=index;at.Value=entry.At.UtcTicks;delta.Value=entry.Delta;balance.Value=entry.Balance;
+                source.Value=(int)entry.Source;category.Value=(int)entry.Category;
+                insert.ExecuteNonQuery();
+            }
+        }
+        if(converted is { } when)
+        {
+            using var mark=open.CreateCommand();
+            mark.Transaction=transaction;mark.CommandText="INSERT OR REPLACE INTO gil_converted(character,at) VALUES($character,$at);";
+            mark.Parameters.AddWithValue("$character",Id(character));mark.Parameters.AddWithValue("$at",when.UtcTicks);
+            mark.ExecuteNonQuery();
+        }
+        DuringSave?.Invoke();
+        transaction.Commit();
+    }
+
+    private static List<GilEntry> ReadRows(TenshoDataDatabase opened,ulong character)
+    {
+        using var open=opened.Open();using var command=open.CreateCommand();
+        command.CommandText="SELECT at,delta,balance,source,category FROM gil_entries WHERE character=$character ORDER BY seq;";
+        command.Parameters.AddWithValue("$character",Id(character));
+        var entries=new List<GilEntry>();
+        using var reader=command.ExecuteReader();
+        while(reader.Read())
+            entries.Add(new GilEntry(new DateTimeOffset(reader.GetInt64(0),TimeSpan.Zero),reader.GetInt64(1),reader.GetInt64(2),(GilSource)reader.GetInt32(3),(GilCategory)reader.GetInt32(4)));
+        return entries;
+    }
+
+    // The file of before moved beside, never removed; a name already taken gets a suffix. A move that fails is retried at the next load (the mark
+    // in the data file keeps it from being read again).
+    private void SetAside(string json,DateTimeOffset now)
+    {
+        try
+        {
+            var aside=Path.Combine(folder,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
+            Directory.CreateDirectory(aside);
+            var target=Path.Combine(aside,Path.GetFileName(json));
+            if(File.Exists(target))target=Path.Combine(aside,Path.GetFileNameWithoutExtension(json)+"-"+Guid.NewGuid().ToString("N")[..8]+".json");
+            File.Move(json,target);
+            info?.Invoke($"Gil journal: a character's file of before moved to {TenshoDataDatabase.FileName}, kept in {Path.GetFileName(aside)}.");
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException)
+        {
+            warn(error,"The gil journal file of before could not be set aside; it is not read again.");
+        }
+    }
+}

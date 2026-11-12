@@ -10,15 +10,16 @@ public sealed record GilJournalState(ulong Character,IReadOnlyList<GilEntry> Ent
 /// g, I-04 (0.351): watches the gil on the framework thread once a second while logged in — the character's (InventoryManager.GetGil),
 /// the retainers' total once the game has sent them (RetainerManager, summoning bell), the company chest's while it is loaded
 /// (GetFreeCompanyGil) — and records every change with the category of the game window open just before. The first read of a character
-/// is a starting point, never a change. One file per character (GilJournal/&lt;id&gt;.json, local character id, never an Account ID),
-/// written at most once a minute and on dispose. Functions called only when the game resolved them; reads guarded (R-14).
+/// is a starting point, never a change. Kept per character (local character id, never an Account ID; since 0.1139 in TenshoData.db, X-173,
+/// through <see cref="GilJournalStore"/>), written at most once a minute and on dispose. Functions called only when the game resolved them;
+/// reads guarded (R-14).
 /// </summary>
 public sealed unsafe class GilWatcher : IDisposable
 {
     private readonly IFramework framework;
     private readonly IPlayerState player;
     private readonly IGameGui gui;
-    private readonly string folder;
+    private readonly GilJournalStore store;
     private readonly IPluginLog log;
     private readonly Dictionary<string,DateTimeOffset> seen=[];
     private ulong character;
@@ -35,13 +36,11 @@ public sealed unsafe class GilWatcher : IDisposable
     private readonly Func<bool> developerMode;
     private readonly Dictionary<string,DateTimeOffset> seenAny=[];
     private long retainerDeposits;
-    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,string folder,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null)
+    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,GilJournalStore store,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null)
     {
-        this.framework=framework;this.player=player;this.gui=gui;this.folder=folder;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);
+        this.framework=framework;this.player=player;this.gui=gui;this.store=store;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
     }
-
-    public static string FileName(ulong character)=>character.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json";
 
     private void OnUpdate(IFramework _)
     {
@@ -146,8 +145,7 @@ public sealed unsafe class GilWatcher : IDisposable
     private void Switch(ulong id,DateTimeOffset now)
     {
         character=id;gil=null;retainers=null;company=null;dirty=false;loadFailed=false;entries=[];
-        var path=Path.Combine(folder,FileName(id));
-        loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(GilJournal.Read(path),now));
+        loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id,now),now));
         Volatile.Write(ref state,null);
     }
 
@@ -156,8 +154,8 @@ public sealed unsafe class GilWatcher : IDisposable
         nextSave=now.AddMinutes(1);
         if(!dirty || character==0 || loadFailed)return;
         // X-76 H10 (0.925): a copy is written off the framework thread.
-        var path=Path.Combine(folder,FileName(character));var copy=GilJournal.Prune(entries,now).ToArray();
-        (writer??=new((error,message)=>log.Warning(error,message))).Enqueue("Gil journal could not be saved.",()=>GilJournal.Write(path,copy));
+        var id=character;var copy=GilJournal.Prune(entries,now).ToArray();
+        (writer??=new((error,message)=>log.Warning(error,message))).Enqueue("Gil journal could not be saved.",()=>store.Save(id,copy));
         dirty=false;
     }
 
@@ -168,6 +166,8 @@ public sealed unsafe class GilWatcher : IDisposable
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);
         if(writer?.Flush(TimeSpan.FromSeconds(3))==false)log.Warning("Gil journal: the last write did not finish before the plugin closed.");
+        // X-173 (0.1139): the data file's journal folded in, so the folder holds one file when the game is closed (SQLite does it at the next start otherwise).
+        else try{store.Checkpoint();}catch(Exception error){log.Warning(error,"The Tensho data file's journal could not be folded in; SQLite does it at the next start.");}
     }
     private BackgroundWriter? writer;
 }

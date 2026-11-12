@@ -790,9 +790,12 @@ public sealed class Plugin : IDalamudPlugin
             // 0.911 (X-76): a key item's name (EventItem row), for the hand-ins seen in game.
             mainWindow.KeyItemNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.AchievementNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Achievement>().GetRowOrDefault(id)?.Name.ExtractText();
-            // 0.351 (g, I-04): gil journal, one file per character (GilJournal/<id>.json), kept 90 days.
+            // 0.351 (g, I-04): gil journal per character, kept 90 days; since 0.1139 (X-173) in TenshoData.db, the files of before (GilJournal/<id>.json)
+            // converted when their character is first loaded and kept aside.
             Inventory.GilWatcher? gilWatcher=null;
-            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),log,
+            var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),
+                Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
+            registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
             Inventory.GilDtrEntry? gilBar=null;
