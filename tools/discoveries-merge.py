@@ -6,9 +6,9 @@ Usage:
       in community-discoveries/players/<issue>.json (replacing that player's previous file: an updated gist is never counted twice), then rebuilds
       discoveries.json from all player files. --dry-run: report only, nothing written.
   python tools/discoveries-merge.py rebuild
-      Rebuilds discoveries.json from community-discoveries/players/*.json.
-  python tools/discoveries-merge.py check <file.json|file.zip|gist:ID>
-      Validates one file and prints its report, without writing.
+      Rebuilds discoveries.json and the v3 set community-discoveries/v3/ from community-discoveries/players/*.json.
+  python tools/discoveries-merge.py check <file.json|file.zip|v3 folder|gist:ID>
+      Validates one file (or a v3 set) and prints its report, without writing.
   python tools/discoveries-merge.py recheck [--changes FILE] [--local] [--limit N]
       X-116: the facts « to recheck » after a game patch: seen last before the patch day, in a zone or a 50-yalm cell (or next to one) that the
       client comparison says changed (tools/client-snapshot.py patch writes changes-from-<old>.json; the latest one by default), or about an NPC
@@ -28,17 +28,28 @@ optional fields: Hq (how many sightings were HQ) and Values (value seen -> count
 sums over the players (a new value past 32 is counted under the nearest value kept, the lower one on a tie). ImportedHq and ImportedValues (what the player
 imported, never shared by the plugin) are accepted and dropped.
 X-113 (0.1029): a ticket whose gist brings nothing new (same facts as its player file) is reported « nothing new »: its file is not written again,
-and it gets no « Merged into » comment; discoveries.json is written only when its facts change (not for a new date alone)."""
-import base64,collections,gzip,importlib.util,json,math,os,re,subprocess,sys,urllib.request,zipfile
+and it gets no « Merged into » comment; discoveries.json is written only when its facts change (not for a new date alone).
+X-174 (0.1137, DEC-052): exchange format v3. A set is index.json and one kind-NN.jsonl.gz per kind (gzip of UTF-8 lines: a header line, then one
+fact per line), each listed in the index with its fact count, compressed size and SHA-256; read bounded (compressed and decompressed size, line
+length, facts per kind) and checked against the index's hash first; a bad line is counted as refused. A player's gist is read in v3 (index.json and
+kind-NN.jsonl.gz.b64, base64 of the gzip bytes) or in v2 (the single tensho-discoveries.b64, still read for a while). The player files stay v2 JSON
+(players/<issue>.json); rebuild writes both the v2 discoveries.json (plugins before 0.1137) and the v3 set community-discoveries/v3/, the same facts
+giving the same bytes (gzip mtime 0, facts and fields in a fixed order, dated by their newest day)."""
+import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,subprocess,sys,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
+V3_DIR=os.path.join(ROOT,"community-discoveries","v3")
 QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)
 QUEST_ASKED_FIXED_DAY=datetime(2026,11,9,tzinfo=timezone.utc)  # 0.1012: a date kept to the day only passes the fix if it is on a later day
 KINDS=set(range(1,39))-{26,27};PLACED={1,2,3,8,10,19,22,23,28,29,30}  # 26, 27: 0.890's and 0.891's wrong spearfishing shadows
-CELL=50;MAX_FACTS=200_000;VERSIONS={1,2};VERSION=2
+CELL=50;MAX_FACTS=200_000;VERSIONS={1,2,3};VERSION=2
 FIELDS={"Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"}
 MAX_VALUES=32;MAX_VALUE=100_000;MAX_COUNT=100_000_000
+# X-174: the v3 format and its bounds (ExchangeV3 in the plugin).
+V3_FORMAT="tensho-discoveries";V3_VERSION=3;V3_INDEX="index.json";GIST_V2="tensho-discoveries.b64";GIST_SUFFIX=".b64"
+MAX_COMPRESSED=32*1024*1024;MAX_DECOMPRESSED=256*1024*1024;MAX_LINE=64*1024;MAX_INDEX=1024*1024
+ORDER=["Kind","Subject","Detail","Territory","Map","CellX","CellZ","X","Z","LevelMin","LevelMax","Seen","Imported","First","Last","Hq","Values"]
 
 def key(f):return f"{f['Kind']}:{f['Subject']}:{f['Detail']}:{f['Territory']}:{f['Map']}:{f['CellX']}:{f['CellZ']}"
 def whole(n):return isinstance(n,int) and not isinstance(n,bool)
@@ -79,17 +90,127 @@ def valid(f):
         return when(f["First"])<=when(f["Last"])<=datetime.now(timezone.utc)+timedelta(days=1)
     except Exception:return False
 
+# ---------- X-174: exchange format v3 ----------
+def sort_key(f):return (f["Kind"],f["Subject"],f["Detail"],f["Territory"],f["Map"],f["CellX"],f["CellZ"])
+def v3_name(kind):return f"kind-{kind:02d}.jsonl.gz"
+def newest(facts):return max((f["Last"] for f in facts),key=when,default="1970-01-01T00:00:00+00:00")
+def v3_line(obj):return json.dumps(obj,ensure_ascii=False,separators=(",",":"))
+
+def v3_kind_bytes(kind,facts,producer):
+    """One kind file: the header line, then each fact (fields in ORDER) on its line, gzip with mtime 0: the same facts give the same bytes."""
+    facts=sorted(facts,key=sort_key)
+    header={"Format":V3_FORMAT,"Version":V3_VERSION,"Kind":kind,"Count":len(facts),"Producer":producer,"Written":newest(facts)}
+    text="".join(v3_line(o)+"\n" for o in [header]+[{k:f[k] for k in ORDER if k in f} for f in facts])
+    return gzip.compress(text.encode("utf-8"),compresslevel=9,mtime=0)
+
+def v3_build(facts,producer):
+    """(index.json text, {name: gzip bytes}) of a v3 set."""
+    by=collections.defaultdict(list)
+    for f in facts:by[f["Kind"]].append(f)
+    files={};entries=[]
+    for kind in sorted(by):
+        data=v3_kind_bytes(kind,by[kind],producer);files[v3_name(kind)]=data
+        entries.append({"Name":v3_name(kind),"Kind":kind,"Count":len(by[kind]),"Bytes":len(data),"Sha256":hashlib.sha256(data).hexdigest().upper()})
+    index={"Format":V3_FORMAT,"Version":V3_VERSION,"Written":newest(facts),"Files":entries}
+    return json.dumps(index,ensure_ascii=False,indent=1)+"\n",files
+
+def v3_index(text):
+    """The entries of an index (ExchangeV3.ParseIndex): another format or version, or a malformed entry, refuses the set."""
+    if len(text.encode("utf-8"))>MAX_INDEX:raise ValueError("index too large")
+    index=json.loads(text)
+    if not isinstance(index,dict) or index.get("Format")!=V3_FORMAT or index.get("Version")!=V3_VERSION:raise ValueError("unknown index format or version")
+    seen=set();out=[]
+    for e in index.get("Files") or []:
+        if not (isinstance(e,dict) and whole(e.get("Kind")) and e["Kind"] not in seen and e.get("Name")==v3_name(e["Kind"])
+                and whole(e.get("Count")) and 0<=e["Count"]<=MAX_FACTS and whole(e.get("Bytes")) and 1<=e["Bytes"]<=MAX_COMPRESSED
+                and isinstance(e.get("Sha256"),str) and re.fullmatch(r"[0-9A-Fa-f]{64}",e["Sha256"])):raise ValueError("malformed index entry")
+        seen.add(e["Kind"]);out.append(e)
+    return out
+
+def v3_kind(data,entry,max_decompressed=MAX_DECOMPRESSED,max_line=MAX_LINE):
+    """(facts as read, unreadable lines) of one kind file: size and SHA-256 checked against the index first, then decompressed line by line, bounded.
+    A line that is not a JSON object of the file's kind is counted unreadable (its fields are checked later by clean); over 5 % refuses the file."""
+    if len(data)!=entry["Bytes"] or len(data)>MAX_COMPRESSED:raise ValueError("size differs from the index")
+    if hashlib.sha256(data).hexdigest().upper()!=entry["Sha256"].upper():raise ValueError("hash differs from the index")
+    facts=[];bad=0;header=None;lines=0;total=0
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as z:
+        while True:
+            raw=z.readline(max_line+1)
+            if not raw:break
+            total+=len(raw)
+            too_long=len(raw)>max_line and not raw.endswith(b"\n")  # a line longer than max_line: skipped to its end, counted
+            while too_long and not raw.endswith(b"\n"):
+                raw=z.readline(max_line+1)
+                if not raw:break
+                total+=len(raw)
+                if total>max_decompressed:raise ValueError("too large once decompressed")
+            if total>max_decompressed:raise ValueError("too large once decompressed")
+            line=None if too_long else raw.rstrip(b"\n")
+            try:obj=json.loads(line.decode("utf-8")) if line is not None else None
+            except ValueError:obj=None
+            if header is None:
+                if not isinstance(obj,dict) or obj.get("Format")!=V3_FORMAT:raise ValueError("no header")
+                if obj.get("Version")!=V3_VERSION:raise ValueError("unknown version")
+                if obj.get("Kind")!=entry["Kind"] or obj.get("Count")!=entry["Count"]:raise ValueError("header of another kind or count than the index")
+                header=obj;continue
+            lines+=1
+            if lines>header["Count"]:raise ValueError("more facts than the header says")
+            if not isinstance(obj,dict) or obj.get("Kind")!=entry["Kind"]:bad+=1;continue
+            facts.append(obj)
+    if header is None:raise ValueError("no header")
+    if lines!=header["Count"]:raise ValueError("fewer facts than the header says")
+    if bad*20>lines:raise ValueError("over 5 % of the lines unreadable")
+    return facts,bad
+
+def v3_read(fetch_index,fetch_kind):
+    """A v3 set as a file to clean: {"Version":3,"Facts":[…],"Unreadable":n}."""
+    facts=[];bad=0
+    for e in v3_index(fetch_index()):
+        got,unreadable=v3_kind(fetch_kind(e),e);facts+=got;bad+=unreadable
+    return {"Version":3,"Facts":facts,"Unreadable":bad}
+
+def from_v3_dir(path):
+    """A v3 set in a folder (community-discoveries/v3, or a gist's files saved): kind-NN.jsonl.gz, or kind-NN.jsonl.gz.b64."""
+    def kind_file(e):
+        p=os.path.join(path,e["Name"])
+        if os.path.exists(p):
+            if os.path.getsize(p)>MAX_COMPRESSED:raise ValueError("too large")
+            return open(p,"rb").read()
+        return base64.b64decode(open(p+GIST_SUFFIX,"rb").read(MAX_COMPRESSED*2).strip(),validate=True)
+    return v3_read(lambda:open(os.path.join(path,V3_INDEX),"rb").read(MAX_INDEX+1).decode("utf-8"),kind_file)
+
+def gunzip_bounded(data,limit):
+    with gzip.GzipFile(fileobj=io.BytesIO(data)) as z:out=z.read(limit+1)
+    if len(out)>limit:raise ValueError("too large once decompressed")
+    return out
+
+def from_gist_files(files,fetch):
+    """A gist's files ({name: {"raw_url": …}}), fetched by fetch(url, limit) -> bytes: v3 (index.json and the kind files in base64) or v2 (one file)."""
+    if V3_INDEX in files:
+        def kind_file(e):
+            name=e["Name"]+GIST_SUFFIX
+            if name not in files:raise ValueError(f"{name} missing from the gist")
+            return base64.b64decode(fetch(files[name]["raw_url"],(MAX_COMPRESSED+2)//3*4+64).strip(),validate=True)
+        return v3_read(lambda:fetch(files[V3_INDEX]["raw_url"],MAX_INDEX).decode("utf-8"),kind_file)
+    if GIST_V2 in files:  # v2, still read for a while: base64 of gzip of JSON
+        return json.loads(gunzip_bounded(base64.b64decode(fetch(files[GIST_V2]["raw_url"],64*1024*1024).strip()),64*1024*1024).decode("utf-8"))
+    raise ValueError("no discoveries file in the gist")
+
+def fetch_gist_raw(url,limit):
+    if not url.startswith("https://gist.githubusercontent.com/"):raise ValueError("unexpected gist file address")
+    with urllib.request.urlopen(url) as answer:data=answer.read(limit+1)
+    if len(data)>limit:raise ValueError("too large")
+    return data
+
 def from_gist(reference):
-    """A gist id or URL; the file is base64 of gzip of JSON (GitHubExchange.GistFile)."""
+    """A gist id or URL: its files listed through the GitHub CLI, then read in v3 or v2 (from_gist_files)."""
     gist=reference.removeprefix("gist:").rstrip("/").split("/")[-1]
-    raw=subprocess.run(["gh","api",f"gists/{gist}","--jq",'.files["tensho-discoveries.b64"].raw_url'],capture_output=True,text=True,check=True).stdout.strip()
-    if not raw.startswith("https://gist.githubusercontent.com/"):raise ValueError("unexpected gist file address")
-    data=gzip.decompress(base64.b64decode(urllib.request.urlopen(raw).read().decode().strip()))
-    if len(data)>64*1024*1024:raise ValueError("too large")
-    return json.loads(data.decode("utf-8"))
+    listed=subprocess.run(["gh","api",f"gists/{gist}","--jq",".files|map_values({raw_url:.raw_url})"],capture_output=True,text=True,check=True).stdout
+    return from_gist_files(json.loads(listed),fetch_gist_raw)
 
 def read(path):
     if path.startswith("gist:") or "gist.github.com" in path:return from_gist(path)
+    if os.path.isdir(path):return from_v3_dir(path)
     if path.endswith(".zip"):
         with zipfile.ZipFile(path) as z:
             name=next(n for n in z.namelist() if n.endswith(".json"))
@@ -100,8 +221,8 @@ def read(path):
 def clean(data):
     """The valid facts of a shared file (Seen 0, Imported 1) and a report."""
     if data.get("Version") not in VERSIONS:return [],{"facts":0,"refused":0,"kinds":{},"error":"version"}
-    facts={};refused=0
-    for f in data.get("Facts",[])[:MAX_FACTS]:
+    facts={};refused=data.get("Unreadable",0) if data.get("Version")==3 else 0  # X-174: v3 lines that were not a fact of their file's kind
+    for f in data.get("Facts",[])[:MAX_FACTS*len(KINDS) if data.get("Version")==3 else MAX_FACTS]:
         # 0.1012: checked on the time as sent, then kept to the day (an older gist with times is accepted and brought to the day, not refused).
         if not valid(f) or not valid(daily(dict(f))):refused+=1;continue
         g=daily(dict(f));g["Seen"]=0;g["Imported"]=1;facts[key(g)]=g
@@ -134,15 +255,30 @@ def rebuild():
             if "Values" in f:known["Values"]=histogram_sum(known.get("Values"),f["Values"])
             if f.get("Hq",0)>0:known["Hq"]=min(known.get("Hq",0)+f["Hq"],sum(known["Values"].values()))
     common={"Version":VERSION,"Producer":"Tensho Assistant community","Written":datetime.now(timezone.utc).isoformat(),
-            "Facts":sorted(merged.values(),key=lambda f:(f["Kind"],f["Subject"],f["Detail"],f["Territory"],f["Map"],f["CellX"],f["CellZ"]))}
+            "Facts":sorted(merged.values(),key=sort_key)}
     players=len([n for n in os.listdir(PLAYERS) if n.endswith(".json")]) if os.path.isdir(PLAYERS) else 0
+    v3=write_v3(common["Facts"],V3_DIR)  # X-174: the v3 set, same facts
     try:before=json.load(open(COMMON,encoding="utf-8"))
     except (OSError,ValueError):before={}
     # X-113: the same facts are not written again (the date alone changed in 0.1027).
     if before.get("Version")==VERSION and before.get("Facts")==common["Facts"]:
-        print(f"discoveries.json: unchanged, {len(common['Facts'])} facts from {players} players");return False
+        print(f"discoveries.json: unchanged, {len(common['Facts'])} facts from {players} players");return v3
     json.dump(common,open(COMMON,"w",encoding="utf-8",newline="\n"),ensure_ascii=False,separators=(",",":"))
     print(f"discoveries.json: {len(common['Facts'])} facts from {players} players");return True
+
+def write_v3(facts,folder,say=print):
+    """X-174: the v3 set of these facts in folder: a file written only when its bytes change, a kind file no longer in the set removed. True if changed."""
+    index,files=v3_build(facts,"Tensho Assistant community");files={**files,V3_INDEX:index.encode("utf-8")}
+    os.makedirs(folder,exist_ok=True);changed=0
+    for name,data in files.items():
+        path=os.path.join(folder,name)
+        try:same=open(path,"rb").read()==data
+        except OSError:same=False
+        if not same:open(path,"wb").write(data);changed+=1
+    for name in os.listdir(folder):
+        if re.fullmatch(r"kind-\d+\.jsonl\.gz",name) and name not in files:os.remove(os.path.join(folder,name));changed+=1
+    say(f"v3: {len(files)-1} kind files, {len(facts)} facts, "+(f"{changed} files written" if changed else "unchanged"))
+    return changed>0
 
 def news(issue,facts):
     """X-113: (new or changed, gone) facts of a ticket against its player file: (0, 0) is « nothing new »."""
@@ -265,6 +401,58 @@ def selftest():
         check(news(5,[b,a])==(0,0),"same facts in another order: nothing new")
         check(news(5,[a,{**b,"LevelMax":3}])==(1,0) and news(5,[a])==(0,1),"changed and gone")
     PLAYERS=saved
+    # X-174: the v3 format.
+    def refused(run):
+        try:run();return False
+        except ValueError:return True
+    a=f(1,1,128,60.0,140.0,"2026-11-01T00:00:00+00:00");b={**f(10,9,130,0.0,0.0,"2026-11-02T00:00:00+00:00"),"Values":{"3":2},"Hq":1}
+    c=f(1,2,128,60.0,140.0,"2026-11-01T00:00:00+00:00")
+    index,files=v3_build([b,c,a],"test")
+    check((index,files)==v3_build([a,b,c],"test"),"v3: the same facts give the same bytes, whatever their order")
+    entries=v3_index(index);by={e["Name"]:e for e in entries}
+    got=v3_read(lambda:index,lambda e:files[e["Name"]])
+    check(got["Unreadable"]==0 and sorted(got["Facts"],key=sort_key)==sorted([a,b,c],key=sort_key),"v3: round trip")
+    check(clean(got)[1]["facts"]==3 and clean(got)[1]["refused"]==0,"v3: the facts read are clean")
+    e1=by[v3_name(1)]
+    check(refused(lambda:v3_kind(files[v3_name(1)],{**e1,"Sha256":"0"*64})),"v3: a hash that differs from the index is refused")
+    check(refused(lambda:v3_kind(files[v3_name(1)][:-1],e1)),"v3: a size that differs from the index is refused")
+    check(refused(lambda:v3_index(index.replace(f'"Bytes": {e1["Bytes"]}',f'"Bytes": {MAX_COMPRESSED+1}'))),"v3: an index entry over the bound is refused")
+    check(refused(lambda:v3_kind(files[v3_name(1)],e1,max_decompressed=100)),"v3: a file over the decompressed bound is refused")
+    check(refused(lambda:v3_index(index.replace('"Version": 3','"Version": 4'))),"v3: an unknown index version is refused")
+    def kind_file(lines):
+        data=gzip.compress("".join(l+"\n" for l in lines).encode("utf-8"),mtime=0)
+        return data,{"Name":v3_name(1),"Kind":1,"Count":len(lines)-1,"Bytes":len(data),"Sha256":hashlib.sha256(data).hexdigest().upper()}
+    head=lambda n,kind=1,version=3:v3_line({"Format":V3_FORMAT,"Version":version,"Kind":kind,"Count":n,"Producer":"t","Written":a["Last"]})
+    many=[v3_line({**a,"Subject":s}) for s in range(1,40)]
+    data,entry=kind_file([head(40)]+many+["x"*400])
+    facts,bad=v3_kind(data,entry,max_line=300)
+    check(len(facts)==39 and bad==1,f"v3: a line too long is counted, not the whole file ({len(facts)}, {bad})")
+    data,entry=kind_file([head(40)]+many+["{not json"])
+    check(v3_kind(data,entry)[1]==1,"v3: a bad line is counted")
+    data,entry=kind_file([head(3)]+many[:1]+["{bad","{bad"])
+    check(refused(lambda:v3_kind(data,entry)),"v3: over 5 % of bad lines refuses the file")
+    data,entry=kind_file([head(1,kind=10)]+many[:1])
+    check(refused(lambda:v3_kind(data,entry)),"v3: a header of another kind is refused")
+    data,entry=kind_file([head(1,version=4)]+many[:1])
+    check(refused(lambda:v3_kind(data,entry)),"v3: an unknown header version is refused")
+    data,entry=kind_file([head(1)]+[v3_line({**a,"Own":{"First":a["First"]}})])
+    check(clean(v3_read(lambda:json.dumps({"Format":V3_FORMAT,"Version":3,"Files":[entry]}),lambda e:data))[1]["refused"]==1,"v3: a fact holding Own is refused")
+    # Gists: v3 (index.json and the kind files in base64) and v2 (one file), read the same.
+    store={"u/i":index.encode("utf-8"),**{"u/"+n:base64.b64encode(d) for n,d in files.items()},
+           "u/v2":base64.b64encode(gzip.compress(json.dumps({"Version":2,"Facts":[a,b,c]}).encode("utf-8")))}
+    fetch=lambda url,limit:store[url]
+    v3gist=from_gist_files({V3_INDEX:{"raw_url":"u/i"},**{n+GIST_SUFFIX:{"raw_url":"u/"+n} for n in files}},fetch)
+    v2gist=from_gist_files({GIST_V2:{"raw_url":"u/v2"}},fetch)
+    check(sorted(clean(v3gist)[0],key=sort_key)==sorted(clean(v2gist)[0],key=sort_key) and len(clean(v2gist)[0])==3,"v3 gist and v2 gist read the same facts")
+    check(refused(lambda:from_gist_files({V3_INDEX:{"raw_url":"u/i"}},fetch)),"v3 gist: a kind file missing is refused")
+    with tempfile.TemporaryDirectory() as tmp:
+        quiet=lambda *_:None
+        check(write_v3([a,b,c],tmp,quiet) and not write_v3([c,b,a],tmp,quiet),"v3: written once, then unchanged")
+        check(write_v3([a],tmp,quiet) and sorted(os.listdir(tmp))==[V3_INDEX,v3_name(1)],"v3: a kind gone is removed")
+        check(sorted(from_v3_dir(tmp)["Facts"],key=sort_key)==[a],"v3: a folder reads back")
+    if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)) and os.path.isfile(COMMON):
+        held=json.load(open(COMMON,encoding="utf-8"))["Facts"]
+        check(sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)==sorted(held,key=sort_key),"v3: the repository's set holds the facts of discoveries.json")
     print(f"discoveries-merge selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
 def notice(argv):

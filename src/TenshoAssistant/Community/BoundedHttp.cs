@@ -33,6 +33,13 @@ public static class BoundedHttp
     /// timeout); the caller's own cancellation stays an OperationCanceledException of its token.
     /// </summary>
     public static async Task<string> SendAsync(HttpClient client,HttpRequestMessage request,int maximumBytes,CancellationToken cancellation,TimeSpan? deadline=null)
+        =>new UTF8Encoding(false,true).GetString(await ReceiveAsync(client,request,maximumBytes,cancellation,deadline).ConfigureAwait(false));
+
+    /// <summary>X-174 (0.1137): the same bounded read of a GET, its bytes as they came (a compressed file of the shared discoveries).</summary>
+    public static Task<byte[]> ReadBytesAsync(HttpClient client,Uri uri,int maximumBytes,CancellationToken cancellation)=>
+        ReceiveAsync(client,new HttpRequestMessage(HttpMethod.Get,uri),maximumBytes,cancellation,null);
+
+    private static async Task<byte[]> ReceiveAsync(HttpClient client,HttpRequestMessage request,int maximumBytes,CancellationToken cancellation,TimeSpan? deadline)
     {
         using var message=request;
         if(maximumBytes<=0) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
@@ -55,7 +62,7 @@ public static class BoundedHttp
                 buffer.Write(bytes,0,read);
             }
             token.ThrowIfCancellationRequested();
-            return new UTF8Encoding(false,true).GetString(buffer.GetBuffer(),0,(int)buffer.Length);
+            return buffer.ToArray();
         }
         catch(OperationCanceledException error) when(!cancellation.IsCancellationRequested && timeout.IsCancellationRequested)
         {

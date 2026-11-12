@@ -3,3 +3,5 @@
 # cmd needs Windows line endings in batch files.
 *.bat text eol=crlf
 *.cmd text eol=crlf
+# X-174: the compressed files of the shared discoveries (community-discoveries/v3) are bytes, hashed as they are.
+*.gz binary

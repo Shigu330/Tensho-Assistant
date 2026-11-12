@@ -58,6 +58,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-049 | 2026-11-10 | Proposal 11 of G-PROPOSALS (X-40): other uses of nearby monsters. |
 | DEC-050 | 2026-11-09 | Topics entrusted to the agent on 2026-11-09: releases, Dalamud AI policy, EUPL-1.2 licence, icon. Some DECs and public documents still said the opposite: commits made by the desktop application (DEC-009, DEC-010), release after a game session (DEC-033), AI policy followed (DEC-010, DEC-039), EUPL "to be accepted by the user" (GAPS), icon "to keep or replace" (PUBLISHING, point 7). |
 | DEC-051 | 2026-11-11 | No decision recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said that the user makes the commits (GitHub Desktop) and that no zip is made any more. |
+| DEC-052 | 2026-11-12 | The shared discoveries are exchanged as one JSON file (DEC-042, version 2): the common file of the repository (`community-discoveries/discoveries.json`) and the single gist file of each player (`tensho-discoveries.b64`, base64 of gzip of JSON) are read whole, and a change to one kind makes every player download everything again; changing the format after the public announcement would force migrating every player's files. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -477,7 +478,7 @@ Options: Before 1.0.0; later.
 Decision: Format fixed right now: optional fields added, format version raised, reading of old files kept, merge tool updated.
 Reason: User decision.
 Consequences: Done before X-85.
-References: DEC-039, tools/discoveries-merge.py
+References: DEC-039, tools/discoveries-merge.py; exchange format replaced by DEC-052 (v3: one compressed file per kind, 0.1137)
 
 ID: DEC-043
 Timestamp: 2026-11-08 Europe/Brussels
@@ -569,6 +570,16 @@ Reason: The repository holds what players and contributors use; the agent's note
 Consequences: Modifies DEC-010 (commits by the agent, not by the user; local backups before a large change). The documents' map (`docs/README.md`) and CONTRIBUTING describe only tracked files.
 References: DEC-009, DEC-010, DEC-050, .gitignore, scripts/Release.ps1, CHANGELOG.md (0.802.0)
 
+ID: DEC-052
+Timestamp: 2026-11-12 Europe/Brussels (0.1137)
+Problem: The shared discoveries are exchanged as one JSON file (DEC-042, version 2): the common file of the repository (`community-discoveries/discoveries.json`) and the single gist file of each player (`tensho-discoveries.b64`, base64 of gzip of JSON) are read whole, and a change to one kind makes every player download everything again; changing the format after the public announcement would force migrating every player's files.
+Evidence: User choice of 2026-11-12 (« option 3 »): formats change now, before the public announcement, while the user is the only one with data (RULES R26, X-172 to X-175); plan X-174.
+Options: Keep version 2; split the JSON file per kind only; JSON lines, compressed, one file per kind with a hash, read as a stream and bounded.
+Decision: Exchange format v3: a set is `index.json` (format, version 3, date, and for each file its kind, fact count, compressed size and SHA-256) and one `kind-NN.jsonl.gz` per kind present (gzip of UTF-8 lines: a header line, then one fact per line with the names of version 2, optional fields left out when empty, never the player's own part nor the imported counts). Read as a stream and bounded: compressed size (at most 32 MB, and the size the index gives), SHA-256 checked against the index before use, decompressed size, line length, facts per kind (200 000); a bad line is refused and counted, a file whose refusals pass 5 % is refused, as is an unknown version or a header of another kind. The plugin reads `community-discoveries/v3/` first and downloads only the kind files whose hash changed, each hash noted once a save holds its facts; it sends its own sightings as a v3 gist (`index.json` and one `kind-NN.jsonl.gz.b64` per kind) and removes the old v2 file from the gist. The merge tool reads v3 and v2 gists and writes both the v3 set and the v2 file; version 2 is still read (plugin and tool) for a while, then dropped.
+Reason: User decision; a large common file is no longer read whole, a change to one kind costs one small download, and a damaged or oversized file is refused before it is used.
+Consequences: Replaces DEC-042 on the format (its version 2 fields stay, in the lines of v3). The v2 common file is written beside the v3 set for plugins before 0.1137 until version 2 is dropped. community-discoveries/README.md and SECURITY.md describe the v3 set.
+References: DEC-042, tools/discoveries-merge.py, src/TenshoAssistant/Discoveries/ExchangeV3.cs, src/TenshoAssistant/Discoveries/GitHubExchange.cs, community-discoveries/README.md, GLOBAL-PLAN X-174
+
 ---
 
 # Décisions durables
@@ -629,6 +640,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-049 | 2026-11-10 | Proposition 11 de G-PROPOSALS (X-40) : autres usages des monstres proches. |
 | DEC-050 | 2026-11-09 | Sujets confiés à l'agent le 2026-11-09 : releases, politique IA de Dalamud, licence EUPL-1.2, icône. Des DEC et des documents publics disaient encore le contraire : commits faits par l'application de bureau (DEC-009, DEC-010), release après une séance de jeu (DEC-033), politique IA suivie (DEC-010, DEC-039), EUPL « à accepter par l'utilisateur » (GAPS), icône « à garder ou remplacer » (PUBLISHING, point 7). |
 | DEC-051 | 2026-11-11 | Aucune décision ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore que l'utilisateur fait les commits (GitHub Desktop) et qu'aucun zip n'est plus fait. |
+| DEC-052 | 2026-11-12 | Les découvertes partagées s'échangent en un seul fichier JSON (DEC-042, version 2) : le fichier commun du dépôt (`community-discoveries/discoveries.json`) et le fichier unique du gist de chaque joueur (`tensho-discoveries.b64`, base64 d'un gzip de JSON) se lisent en entier, et un changement d'un seul genre fait tout retélécharger à chaque joueur ; changer le format après l'annonce publique obligerait à migrer les fichiers de tous les joueurs. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -1048,7 +1060,7 @@ Options: Avant la 1.0.0 ; plus tard.
 Decision: Format fixé tout de suite : champs facultatifs ajoutés, version du format montée, lecture des anciens fichiers gardée, outil de fusion mis à jour.
 Reason: Décision de l'utilisateur.
 Consequences: Fait avant X-85.
-References: DEC-039, tools/discoveries-merge.py
+References: DEC-039, tools/discoveries-merge.py ; format d'échange remplacé par DEC-052 (v3 : un fichier compressé par genre, 0.1137)
 
 DEC-ID: DEC-043
 Timestamp: 2026-11-08 Europe/Brussels
@@ -1139,3 +1151,13 @@ Decision: 1) Les fichiers de travail de l'agent (consignes, réglages, règles, 
 Reason: Le dépôt contient ce que joueurs et contributeurs utilisent ; les notes de l'agent sont les siennes et changent à chaque tour. Le noter dans une DEC lève la contradiction avec DEC-010.
 Consequences: Modifie DEC-010 (commits par l'agent, plus par l'utilisateur ; sauvegardes locales avant une grosse modification). La carte des documents (`docs/README.md`) et CONTRIBUTING ne décrivent que des fichiers suivis.
 References: DEC-009, DEC-010, DEC-050, .gitignore, scripts/Release.ps1, CHANGELOG.md (0.802.0)
+
+DEC-ID: DEC-052
+Timestamp: 2026-11-12 Europe/Brussels (0.1137)
+Problem: Les découvertes partagées s'échangent en un seul fichier JSON (DEC-042, version 2) : le fichier commun du dépôt (`community-discoveries/discoveries.json`) et le fichier unique du gist de chaque joueur (`tensho-discoveries.b64`, base64 d'un gzip de JSON) se lisent en entier, et un changement d'un seul genre fait tout retélécharger à chaque joueur ; changer le format après l'annonce publique obligerait à migrer les fichiers de tous les joueurs.
+Evidence: Choix de l'utilisateur du 2026-11-12 (« option 3 ») : les formats changent maintenant, avant l'annonce publique, tant que l'utilisateur est le seul à avoir des données (RULES R26, X-172 à X-175) ; plan X-174.
+Options: Garder la version 2 ; découper seulement le fichier JSON par genre ; lignes JSON, compressées, un fichier par genre avec une empreinte, lu en flux et borné.
+Decision: Format d'échange v3 : un ensemble est `index.json` (format, version 3, date et, pour chaque fichier, son genre, son nombre de faits, sa taille compressée et son SHA-256) et un `kind-NN.jsonl.gz` par genre présent (gzip de lignes UTF-8 : une ligne d'en-tête, puis un fait par ligne avec les noms de la version 2, champs facultatifs omis quand ils sont vides, jamais la part propre du joueur ni les comptes importés). Lu en flux et borné : taille compressée (32 Mo au plus, et la taille que donne l'index), SHA-256 vérifié contre l'index avant tout usage, taille décompressée, longueur de ligne, faits par genre (200 000) ; une ligne fausse est refusée et comptée, un fichier dont les refus dépassent 5 % est refusé, comme une version inconnue ou un en-tête d'un autre genre. Le plugin lit d'abord `community-discoveries/v3/` et ne télécharge que les fichiers de genre dont l'empreinte a changé, chaque empreinte notée une fois qu'une sauvegarde contient ses faits ; il envoie ses propres observations en gist v3 (`index.json` et un `kind-NN.jsonl.gz.b64` par genre) et retire l'ancien fichier v2 du gist. L'outil de fusion lit les gists v3 et v2 et écrit à la fois l'ensemble v3 et le fichier v2 ; la version 2 reste lue (plugin et outil) un temps, puis sera retirée.
+Reason: Décision de l'utilisateur ; un gros fichier commun n'est plus lu en entier, un changement d'un genre coûte un petit téléchargement, et un fichier abîmé ou trop gros est refusé avant d'être utilisé.
+Consequences: Remplace DEC-042 pour le format (ses champs de version 2 restent, dans les lignes de la v3). Le fichier commun v2 est écrit à côté de l'ensemble v3 pour les plugins d'avant 0.1137 jusqu'au retrait de la version 2. community-discoveries/README.md et SECURITY.md décrivent l'ensemble v3.
+References: DEC-042, tools/discoveries-merge.py, src/TenshoAssistant/Discoveries/ExchangeV3.cs, src/TenshoAssistant/Discoveries/GitHubExchange.cs, community-discoveries/README.md, GLOBAL-PLAN X-174

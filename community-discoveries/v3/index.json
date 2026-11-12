@@ -1,0 +1,175 @@
+{
+ "Format": "tensho-discoveries",
+ "Version": 3,
+ "Written": "2026-11-11T00:00:00+00:00",
+ "Files": [
+  {
+   "Name": "kind-01.jsonl.gz",
+   "Kind": 1,
+   "Count": 1197,
+   "Bytes": 22375,
+   "Sha256": "39EA1E1B8A2795747DF8705722431F286B5474BB16BE709B30A13D0C992E6E8E"
+  },
+  {
+   "Name": "kind-02.jsonl.gz",
+   "Kind": 2,
+   "Count": 6,
+   "Bytes": 448,
+   "Sha256": "14BFD17EA3C4C6DC090F1117CB3079E1E6900F2BEC7B09D0F42F6431727A8F4B"
+  },
+  {
+   "Name": "kind-03.jsonl.gz",
+   "Kind": 3,
+   "Count": 140,
+   "Bytes": 3575,
+   "Sha256": "57ED8740C2404CBF18552A51BA3B649B3E8D07BC46FA693EA737C468C4D4FE2B"
+  },
+  {
+   "Name": "kind-04.jsonl.gz",
+   "Kind": 4,
+   "Count": 34,
+   "Bytes": 525,
+   "Sha256": "47CA56BCD25E84B5B1FC2185F79683B9290A60DBC8E7C1A6752FEA3F712DBAFD"
+  },
+  {
+   "Name": "kind-05.jsonl.gz",
+   "Kind": 5,
+   "Count": 6,
+   "Bytes": 322,
+   "Sha256": "814E7921BFAF934322029E80B2CA87AA023FC4DDE20054737DBE1B55BDECF516"
+  },
+  {
+   "Name": "kind-10.jsonl.gz",
+   "Kind": 10,
+   "Count": 90,
+   "Bytes": 795,
+   "Sha256": "EEB4E85A83480B52E0C30E9D832C75B3B52407C402A59351218568E899E9AD91"
+  },
+  {
+   "Name": "kind-11.jsonl.gz",
+   "Kind": 11,
+   "Count": 82,
+   "Bytes": 1515,
+   "Sha256": "6C359B34C1BBAD3E674A1264C2CD64E0DF1E7360461E80788BDC074959DEC3EB"
+  },
+  {
+   "Name": "kind-12.jsonl.gz",
+   "Kind": 12,
+   "Count": 31,
+   "Bytes": 412,
+   "Sha256": "29E593CFD8315F4F373D61D225B3B85B57412068AAFDFB9DBBA04CBE85429F2C"
+  },
+  {
+   "Name": "kind-13.jsonl.gz",
+   "Kind": 13,
+   "Count": 8,
+   "Bytes": 355,
+   "Sha256": "8A997D4D4645A7BF3941FE67AE7280E7874CD7B89D62F0A779F735EDBDCDE3FD"
+  },
+  {
+   "Name": "kind-14.jsonl.gz",
+   "Kind": 14,
+   "Count": 3,
+   "Bytes": 254,
+   "Sha256": "675223CA4386A395C52CB5D35519C2E2739B1C4637A59ED4CEA85850D2264596"
+  },
+  {
+   "Name": "kind-15.jsonl.gz",
+   "Kind": 15,
+   "Count": 10,
+   "Bytes": 276,
+   "Sha256": "AD59B75D780CE3E2A2EA419F3D1CC8F334FEC3F9439C9FE5DCB43FF49588C913"
+  },
+  {
+   "Name": "kind-17.jsonl.gz",
+   "Kind": 17,
+   "Count": 13,
+   "Bytes": 366,
+   "Sha256": "2088E4E29DCB03F6C0FFF33D26A07C805B6FE53F321EDA305CA0DF8D4BE76C4D"
+  },
+  {
+   "Name": "kind-19.jsonl.gz",
+   "Kind": 19,
+   "Count": 17,
+   "Bytes": 647,
+   "Sha256": "8C9026247264864467CC63E04818B69C7A1045B24B2026B7A5777AD72B4DE5AB"
+  },
+  {
+   "Name": "kind-20.jsonl.gz",
+   "Kind": 20,
+   "Count": 31,
+   "Bytes": 438,
+   "Sha256": "8E275A8D8CB071A21A6AD9BF53ECF0D7DF5654A6956FCB4D61BA8AFCA2B9BC23"
+  },
+  {
+   "Name": "kind-21.jsonl.gz",
+   "Kind": 21,
+   "Count": 73,
+   "Bytes": 1361,
+   "Sha256": "8804030B9A6298B6EE7D74DFCF9D0B3E4854ECEB0622DECF7EC2EA823C6EF821"
+  },
+  {
+   "Name": "kind-23.jsonl.gz",
+   "Kind": 23,
+   "Count": 93,
+   "Bytes": 1603,
+   "Sha256": "55952E4A2B5C78CD42DAA0A7D4EFD083C950AB16B148CDB010F14CE984660FA1"
+  },
+  {
+   "Name": "kind-28.jsonl.gz",
+   "Kind": 28,
+   "Count": 47,
+   "Bytes": 769,
+   "Sha256": "198A17EC164E437953704ABACB49B90562356360EF72A669B8626BD558869781"
+  },
+  {
+   "Name": "kind-29.jsonl.gz",
+   "Kind": 29,
+   "Count": 55,
+   "Bytes": 1189,
+   "Sha256": "F7703C932DCA8C5779EFA8A27645FAA8BDAB5E718D4B5A1D7BD6F1A1329CDC43"
+  },
+  {
+   "Name": "kind-30.jsonl.gz",
+   "Kind": 30,
+   "Count": 1,
+   "Bytes": 267,
+   "Sha256": "2B13873445A4B23C248812E78E28A12220A382D79D490FE9C050397362CB7CF2"
+  },
+  {
+   "Name": "kind-31.jsonl.gz",
+   "Kind": 31,
+   "Count": 1,
+   "Bytes": 242,
+   "Sha256": "DEC35A4252E8F34C0101804042B259CF84431A639C85297F43F0B3AB30CC8943"
+  },
+  {
+   "Name": "kind-32.jsonl.gz",
+   "Kind": 32,
+   "Count": 3,
+   "Bytes": 249,
+   "Sha256": "D8A9CB700A9A3AB34B10F974DA5223BD1D858BFA61B85372405DA3F58822ABF1"
+  },
+  {
+   "Name": "kind-35.jsonl.gz",
+   "Kind": 35,
+   "Count": 2,
+   "Bytes": 260,
+   "Sha256": "53FEFB434B1E683F5F815A1CC60563788BEB62B12BAFC9CA00E3A0B9D9D25C5D"
+  },
+  {
+   "Name": "kind-36.jsonl.gz",
+   "Kind": 36,
+   "Count": 21,
+   "Bytes": 525,
+   "Sha256": "916C5BCA53CB6FCBD87C3083317E439D3E4D88F5C627BEDCDF0DC17B0CF39233"
+  },
+  {
+   "Name": "kind-37.jsonl.gz",
+   "Kind": 37,
+   "Count": 3,
+   "Bytes": 279,
+   "Sha256": "0FBEEE2A9D15BFE3F446258D8D9572D9D9B0669E3AA7B32327CBA3E08FC3F0A0"
+  }
+ ]
+}

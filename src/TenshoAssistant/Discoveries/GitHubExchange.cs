@@ -17,6 +17,8 @@ public sealed class GitHubExchangeMeta
     public int Issue { get; set; }
     public string UploadHash { get; set; }="";
     public DateTimeOffset? Exchanged { get; set; }
+    /// <summary>X-174 (0.1137): the files the last upload put in the gist (empty: a gist of before 0.1137, holding the v2 file only).</summary>
+    public List<string> GistFiles { get; set; }=[];
 }
 
 /// <summary>
@@ -32,9 +34,9 @@ public sealed class GitHubExchange : IDisposable
     public const string ClientId="Ov23liBmk4RCUYw6pU6Z",Scopes="gist public_repo",Repository="Shigu330/Tensho-Assistant",GistFile="tensho-discoveries.b64";
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
     private readonly string folder;
-    private readonly HttpClient client=new(){Timeout=TimeSpan.FromSeconds(30)};
+    private readonly HttpClient client;
     private readonly CancellationTokenSource stop=new();
-    private readonly object gate=new();
+    private readonly object gate=new(),marks=new();
     private string? token;private GitHubExchangeMeta meta=new();private DateTimeOffset tried;private bool busy;
     private string? userCode,verifyAddress;private ExchangeMessage? message;
 
@@ -48,10 +50,15 @@ public sealed class GitHubExchange : IDisposable
     private string TokenPath=>Path.Combine(folder,"github.token");
     private string MetaPath=>Path.Combine(folder,"github.json");
     private string CommonMarker=>Path.Combine(folder,"community.sha256");
+    /// <summary>X-174 (0.1137): the hash of each v3 kind file taken, by kind number ({"10":"HEX",…}), noted once a save holds its facts.</summary>
+    private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
 
-    public GitHubExchange(string folder)
+    public GitHubExchange(string folder):this(folder,null){}
+    /// <summary>X-174: <paramref name="handler"/> answers the requests instead of the network (behaviour tests).</summary>
+    internal GitHubExchange(string folder,HttpMessageHandler? handler)
     {
         this.folder=folder;
+        client=handler is null ? new(){Timeout=TimeSpan.FromSeconds(30)}:new(handler){Timeout=TimeSpan.FromSeconds(30)};
         // X-76 H10 (0.923): an unreadable file is kept aside as « .broken » before a new one is started (it was written over later).
         try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)) ?? new();}
         catch(Exception){meta=new();try{File.Move(MetaPath,MetaPath+".broken",true);}catch(Exception){}}
@@ -121,6 +128,69 @@ public sealed class GitHubExchange : IDisposable
 
     private async Task<ExchangeMessage> ExchangeAsync(DiscoveryStore store,bool upload)
     {
+        var (common,added,joined)=await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store).ConfigureAwait(false);
+        var sent="";
+        if(upload && Connected)
+        {
+            var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
+            // X-174 (0.1137, DEC-052): sent as a v3 set: index.json and one kind-NN.jsonl.gz.b64 per kind (base64: a gist holds text). The index holds each
+            // file's hash, so the same facts give the same index and nothing is sent again.
+            var files=ExchangeV3.GistFiles(ExchangeV3.Build(mine));var hash=CommunityDiscoveries.Hash(files[ExchangeV3.IndexName]);
+            string known;lock(gate)known=meta.UploadHash;
+            if(mine.Facts.Count==0)sent="ShareEmpty";
+            else if(hash==known)sent="SentSame";
+            else{await Upload(files).ConfigureAwait(false);lock(gate)meta.UploadHash=hash;sent="Sent";}
+        }
+        lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
+        SaveMeta();
+        return new("ExchangeDone",added.ToString("N0"),joined.ToString("N0"),common,sent);
+    }
+
+    /// <summary>
+    /// X-174 (0.1137, DEC-052): the v3 set of the repository: its index, then only the kind files whose hash differs from the one noted for that kind, each
+    /// downloaded within the size its index gives, checked (ExchangeV3.ReadKind) and merged; its hash is noted only once a save holds its facts (X-166:
+    /// WhenImportSaved, ImportWaiting against a double merge meanwhile). Null when there is no index this version reads: the v2 file is read instead.
+    /// </summary>
+    private async Task<(string Common,int Added,int Joined)?> TakeCommonV3(DiscoveryStore store)
+    {
+        ExchangeV3Index? index;
+        try{index=ExchangeV3.ParseIndex(await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.AddressV3+ExchangeV3.IndexName),ExchangeV3.MaxIndexBytes,stop.Token).ConfigureAwait(false));}
+        catch(Exception error) when(error is HttpRequestException or InvalidDataException or DecoderFallbackException){return null;}
+        if(index is null)return null;
+        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0;
+        foreach(var entry in index.Files)
+        {
+            var kind=(int)entry.Kind;var hash=entry.Sha256.ToUpperInvariant();var key=$"common-v3:{kind}:{hash}";
+            if(noted.GetValueOrDefault(kind)==hash || store.ImportWaiting(key))continue;
+            try
+            {
+                var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
+                var read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);
+                var result=store.Merge(read.Facts);added+=result.Added;joined+=result.Joined;taken++;
+                store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
+            }
+            catch(Exception error) when(error is HttpRequestException or InvalidDataException){unreadable++;}
+        }
+        return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":"CommonSame",added,joined);
+    }
+    private Dictionary<int,string> CommonV3Marks()
+    {
+        lock(marks)
+            try{return File.Exists(CommonV3Marker) ? JsonSerializer.Deserialize<Dictionary<int,string>>(File.ReadAllText(CommonV3Marker)) ?? []:[];}
+            catch(Exception){return [];}
+    }
+    private void NoteCommonV3(int kind,string hash)
+    {
+        lock(marks)
+        {
+            var noted=CommonV3Marks();noted[kind]=hash;
+            Directory.CreateDirectory(folder);AtomicFile.Write(CommonV3Marker,JsonSerializer.Serialize(noted));
+        }
+    }
+
+    /// <summary>X-174 (0.1137): the v2 common file, read while the v3 set is missing (« v2 still read for a while »).</summary>
+    private async Task<(string Common,int Added,int Joined)> TakeCommonV2(DiscoveryStore store)
+    {
         var added=0;var joined=0;string common;
         try
         {
@@ -137,28 +207,28 @@ public sealed class GitHubExchange : IDisposable
             else common="CommonUnreadable";
         }
         catch(HttpRequestException){common="CommonMissing";}
-        var sent="";
-        if(upload && Connected)
-        {
-            var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
-            var payload=CommunityDiscoveries.Encode(mine);var hash=CommunityDiscoveries.Hash(payload);
-            string known;lock(gate)known=meta.UploadHash;
-            if(mine.Facts.Count==0)sent="ShareEmpty";
-            else if(hash==known)sent="SentSame";
-            else{await Upload(payload).ConfigureAwait(false);lock(gate)meta.UploadHash=hash;sent="Sent";}
-        }
-        lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
-        SaveMeta();
-        return new("ExchangeDone",added.ToString("N0"),joined.ToString("N0"),common,sent);
+        return (common,added,joined);
     }
 
-    private async Task Upload(string payload)
+    private async Task Upload(IReadOnlyDictionary<string,string> contents)
     {
-        var files=new JsonObject{[GistFile]=new JsonObject{["content"]=payload}};
-        string gist;lock(gate)gist=meta.GistId;
+        var files=new JsonObject();
+        foreach(var (name,content) in contents)files[name]=new JsonObject{["content"]=content};
+        string gist;List<string> before;lock(gate){gist=meta.GistId;before=meta.GistFiles.Count>0 ? [..meta.GistFiles]:[GistFile];}
         if(gist.Length>0)
-            try{await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=files}).ConfigureAwait(false);}
+        {
+            // X-174 (0.1137): the files of before that this upload does not hold (the v2 file GistFile, a kind gone) are removed from the gist: GitHub
+            // removes a file set to null. Refused (a file already gone by hand): sent again without the removals.
+            var patch=(JsonObject)files.DeepClone();var removed=0;
+            foreach(var name in before.Where(name=>!contents.ContainsKey(name))){patch[name]=null;removed++;}
+            try{await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=patch}).ConfigureAwait(false);}
+            catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.UnprocessableEntity && removed>0)
+            {
+                try{await Api(HttpMethod.Patch,$"https://api.github.com/gists/{gist}",new JsonObject{["files"]=files.DeepClone()}).ConfigureAwait(false);}
+                catch(HttpRequestException missing) when(missing.StatusCode==HttpStatusCode.NotFound){gist="";}
+            }
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){gist="";}
+        }
         if(gist.Length==0)
         {
             var created=await Api(HttpMethod.Post,"https://api.github.com/gists",
@@ -166,6 +236,7 @@ public sealed class GitHubExchange : IDisposable
             gist=created?["id"]?.GetValue<string>() ?? throw new InvalidDataException("No gist id.");
             lock(gate){meta.GistId=gist;meta.Issue=0;}
         }
+        lock(gate)meta.GistFiles=[..contents.Keys];
         int issue;lock(gate)issue=meta.Issue;
         if(issue==0)
         {
