@@ -48,6 +48,9 @@ public static class LocalLinkProtocol
         ["InventoryBank"]="bank",["Characters"]="characters",["GilJournal"]="gil-journal",["CraftLists"]="craft-lists",["MyTools"]="my-tools",
         ["VoyageHistory"]="voyages",["AchievementProgress"]="achievements",["BeastTeams"]="beast-teams",["DutyProgress"]="duties",["Discoveries"]="discoveries",
     };
+    /// <summary>X-119 step 2, part 2 (0.1131): the categories the desktop application copies from the plugin's folder and reads
+    /// (DesktopMirror, MainWindow.UseDesktopData); the others stay in the game for now.</summary>
+    public static readonly IReadOnlyList<string> DesktopCategories=["bank","craft-lists","my-tools","voyages","beast-teams"];
     public const int MaxPlugin=32;
     public const int MaxZone=128;
     private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};

@@ -103,6 +103,19 @@ internal sealed class Host
         return Newtonsoft.Json.JsonConvert.DeserializeObject(SettingsGuard.Project(SettingsGuard.ReadBounded(path)),configurationType,settings);
     }
 
+    /// <summary>
+    /// X-119 step 2, part 2 and X-151 (0.1131): the plugin's stores of a category built on the application's copy of the plugin's folder,
+    /// by the plugin's own MainWindow.UseDesktopData (the one entry, called by its name; DesktopData1131Tests checks it exists). On the UI
+    /// thread, between frames. A note in English for the log.
+    /// </summary>
+    public string UseData(string mirror,string category)
+    {
+        var use=Window.GetType().GetMethod("UseDesktopData",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string),typeof(string),typeof(Action<Exception,string>)]);
+        if(use is null)return $"{category}: the plugin has no UseDesktopData (another version?)";
+        try{use.Invoke(Window,[mirror,category,(Action<Exception,string>)((error,message)=>Console.WriteLine($"  {category}: {message} ({error.GetType().Name})"))]);return $"{category}: read from the copy";}
+        catch(TargetInvocationException error){return $"{category}: not read ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})";}
+    }
+
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
 

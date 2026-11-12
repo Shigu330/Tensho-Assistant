@@ -24,7 +24,7 @@
     <Compile Include="../../src/TenshoAssistant/Guide/*.cs" Link="Guide/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Help/*.cs" Link="Help/%(Filename)%(Extension)" />
     <!-- X-119: the desktop application's pure parts (page policy, version check, install paths). -->
-    <Compile Include="../../src/TenshoAssistant.Desktop/DesktopPages.cs;../../src/TenshoAssistant.Desktop/DesktopVersionCheck.cs;../../src/TenshoAssistant.Desktop/DesktopPaths.cs;../../src/TenshoAssistant.Desktop/DesktopUpdate.cs;../../src/TenshoAssistant.Desktop/DesktopInstall.cs;../../src/TenshoAssistant.Desktop/SettingsGuard.cs" Link="Desktop/%(Filename)%(Extension)" />
+    <Compile Include="../../src/TenshoAssistant.Desktop/DesktopPages.cs;../../src/TenshoAssistant.Desktop/DesktopVersionCheck.cs;../../src/TenshoAssistant.Desktop/DesktopPaths.cs;../../src/TenshoAssistant.Desktop/DesktopUpdate.cs;../../src/TenshoAssistant.Desktop/DesktopInstall.cs;../../src/TenshoAssistant.Desktop/SettingsGuard.cs;../../src/TenshoAssistant.Desktop/DesktopMirror.cs" Link="Desktop/%(Filename)%(Extension)" />
     <!-- X-120: the plugin UI test tool's pure parts (Dalamud and game paths, command line and refusals, report). -->
     <Compile Include="../../tools/PluginUiTest/src/PluginUiTest.Host/DalamudPaths.cs" Link="PluginUiTest/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Diagnostics/*.cs" Exclude="../../src/TenshoAssistant/Diagnostics/*.Dalamud.cs" Link="Diagnostics/%(Filename)%(Extension)" />

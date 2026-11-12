@@ -26,6 +26,22 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
 
     /// <summary>X-150 (0.1120): the settings read again off the frame, the link's notices grouped (one reading for a burst of saves).</summary>
     private Grouped<object?>? reload;
+    /// <summary>X-119 step 2, part 2 (0.1131): the plugin's folder and the app's copy of it (null: the saved data are not read, e.g. headless).</summary>
+    public (string Source,string Mirror)? Data;
+    private readonly Dictionary<string,Grouped<(int Copied,IReadOnlyList<string> Problems)>> copies=[];
+
+    /// <summary>X-119 step 2, part 2: at start, every category the app reads copied then built (UI thread, before the first frame).</summary>
+    public void ReadData()
+    {
+        if(Data is not { } data)return;
+        foreach(var category in TenshoAssistant.Link.LocalLinkProtocol.DesktopCategories)Apply(category,DesktopMirror.Copy(data.Source,data.Mirror,category));
+    }
+
+    private void Apply(string category,(int Copied,IReadOnlyList<string> Problems) copy)
+    {
+        foreach(var problem in copy.Problems)Console.WriteLine($"Mirror: {category}: {problem}");
+        Console.WriteLine("Data: "+host.UseData(Data!.Value.Mirror,category)+$" ({copy.Copied} file(s) copied)");
+    }
 
     /// <summary>
     /// Once per frame, before the window is drawn: a « settings » notice of the link asks a reading of the plugin's settings off the frame
@@ -37,6 +53,22 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     {
         var categories=changes.Take(Link?.Invoke());
         if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();
+        // X-119 step 2, part 2 (0.1131): a category the app reads is copied again off the frame (a burst of notices = one copy), then its
+        // stores are built again here, between frames.
+        if(Data is { } data)
+        {
+            foreach(var category in categories.Where(TenshoAssistant.Link.LocalLinkProtocol.DesktopCategories.Contains))
+            {
+                if(!copies.TryGetValue(category,out var grouped))copies[category]=grouped=new(()=>DesktopMirror.Copy(data.Source,data.Mirror,category));
+                grouped.Request();
+            }
+            foreach(var (category,grouped) in copies)
+                if(grouped.Take() is { } copied)
+                {
+                    if(copied.Error is { } failed)Console.WriteLine($"Mirror: {category}: not copied ({failed.GetType().Name})");
+                    else Apply(category,copied.Value);
+                }
+        }
         if(reload?.Take() is not { } result)return;
         var note=result.Error is { } error ? $"not read again ({error.GetType().Name}: {error.Message}); the last valid settings stay"
             : result.Value is { } fresh ? host.ApplySettings(fresh) : "not read again: no saved settings were read at start";

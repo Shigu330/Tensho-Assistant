@@ -124,6 +124,8 @@ internal static class Program
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
         if(headless)return Headless.Run(host,status,cache,args);
+        // X-119 step 2, part 2 (0.1131): the plugin's saved data, read from the app's own copy of the plugin's folder (never in a headless run).
+        if(settings is not null){status.Data=(Path.Combine(Path.GetDirectoryName(settings)!,"TenshoAssistant"),Path.Combine(Own,"mirror"));status.ReadData();}
         // X-119 step 2 (0.1081): the local link, read-only: connects when the plugin offers it (Settings › Advanced, off by default).
         using var link=args.Contains("--no-link") ? null : new TenshoAssistant.Link.LocalLinkClient(TenshoAssistant.Link.LocalLinkProtocol.PipeName());
         if(link is not null){status.Link=()=>link.Current;status.OtherProtocol=()=>link.OtherProtocol;}

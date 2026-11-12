@@ -81,7 +81,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     private bool focusGatherTab;
     private uint? gatheringTypeFilter;
     private BankKey? sortPreviewOrigin;
-    private readonly InventoryBankService bank;
+    // X-119 (0.1131): replaced by the desktop application when it reads its copy of the bank (UseDesktopData); the plugin sets it once.
+    private InventoryBankService bank;
     private readonly BankInventoryBridge bankBridge;
     private readonly ITextureProvider textures;
     private readonly IGameGui gameGui;
