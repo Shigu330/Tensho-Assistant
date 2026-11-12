@@ -123,6 +123,8 @@ public sealed class RetainerCompareService : IDisposable
     private async Task Fetch(string world, IReadOnlyList<uint> asked)
     {
         RetainerCompareState result;
+        // X-170 (0.1144, GPT audit): the setting read again at departure: turned off since the click, nothing leaves and what was known stays.
+        if (Enabled?.Invoke() == false) { lock (gate) if (!disposed) state = state with { Loading = false }; return; }
         try
         {
             // X-76 (step 2): the shared bounded reader (size limit, Tensho's User-Agent, strict UTF-8).

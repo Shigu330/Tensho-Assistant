@@ -67,6 +67,8 @@ public sealed class MarketBoardService : IDisposable
         {
             try
             {
+                // X-170 (0.1144, GPT audit): the setting read again at departure (turned off since the call: nothing leaves, asked again later).
+                if(Enabled?.Invoke()==false){lock(gate)regionsRequested=false;return;}
                 var json=await client.GetStringAsync("https://universalis.app/api/v2/data-centers",disposal.Token).ConfigureAwait(false);
                 using var document=JsonDocument.Parse(json);
                 var table=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);

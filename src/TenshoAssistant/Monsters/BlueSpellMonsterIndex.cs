@@ -63,7 +63,10 @@ public sealed class BlueSpellMonsterIndex : IDisposable
                         catch(ObjectDisposedException){return;}
                         catch(SourceDisabledException){Volatile.Write(ref error,"disabled");return;}
                         catch(InvalidOperationException) when(attempt<5){await Task.Delay(1000,token).ConfigureAwait(false);}
-                        catch(OperationCanceledException){throw;}
+                        // X-170 (0.1144, GPT audit): a page that runs out of time waits the same retry delay (before, the whole reading stopped
+                        // silently); only the plugin's own stop ends it.
+                        catch(OperationCanceledException) when(!token.IsCancellationRequested && attempt<5){await Task.Delay(1000,token).ConfigureAwait(false);}
+                        catch(OperationCanceledException) when(token.IsCancellationRequested){throw;}
                         catch(Exception){Interlocked.Increment(ref failed);break;}
                     }
                     Rebuild();

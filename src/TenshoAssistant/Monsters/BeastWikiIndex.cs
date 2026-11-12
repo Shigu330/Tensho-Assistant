@@ -99,7 +99,8 @@ public sealed class BeastWikiIndex(DataCache? disk,Func<bool> enabled,HttpClient
                 Publish(fetched);Volatile.Write(ref error,null);
                 if(disk is not null)_=disk.WriteAsync(Family,"all",Version,fetched,fetched.FetchedAt);
             }
-            catch(OperationCanceledException){}
+            // X-170 (0.1144): a request out of time is said like any failure; only the plugin's own stop is quiet.
+            catch(OperationCanceledException) when(token.IsCancellationRequested){}
             catch(Exception failure){Volatile.Write(ref error,failure.Message);}
             finally{Volatile.Write(ref running,0);}
         },token);

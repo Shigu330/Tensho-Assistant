@@ -93,7 +93,9 @@ public sealed class BlueSpellWikiIndex(Func<TimeSpan> lifetime,DataCache? disk,F
             Publish(fetched);Volatile.Write(ref error,null);
             if(disk is not null)_=disk.WriteAsync(Family,"all",Version,fetched,fetched.FetchedAt);
         }
-        catch(OperationCanceledException){}
+        // X-170 (0.1144, GPT audit): only the plugin's own stop is quiet; a request that runs out of time (HttpClient or BoundedHttp deadline, also an
+        // OperationCanceledException) is a failure like the others: said, and the next try waits a minute (before, the page asked again at every frame).
+        catch(OperationCanceledException) when(token.IsCancellationRequested){}
         catch(Exception failure){Volatile.Write(ref error,failure.Message);nextTry=DateTimeOffset.UtcNow.AddMinutes(1);}
         finally{Volatile.Write(ref running,0);}
     }
