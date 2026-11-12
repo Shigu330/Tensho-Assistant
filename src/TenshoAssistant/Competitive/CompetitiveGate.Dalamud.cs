@@ -115,17 +115,26 @@ internal sealed class CompetitiveWatcher : IDisposable
         framework.Update+=Tick;
     }
     // Only looked at in the places that need it. The values are logged when they change: they tell the public hall from the arena's instance in game.
+    // X-169 (0.1141, GPT audit R06): called only in the arena's place (IsCut asks it there); the game's PvP instance is the one read that decides
+    // (a failure there is caught by IsCut: stopped); the others are for the log only, and their failure never reaches the decision.
     private unsafe bool InArenaInstance()
     {
-        if(!CompetitiveZones.InstanceOnly.Contains((uint)client.TerritoryType))return false;
-        var pvpInstance=GameMain.IsInPvPInstance();var bound=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
-        var main=GameMain.Instance();
-        var seen=$"instance area {(main!=null && main->IsInInstanceArea())}, PvP instance {pvpInstance}, bound by duty {bound}, content row {(main!=null && main->CurrentContentFinderConditionRow!=null)}, match window {gui.GetAddonByName("TripleTriad") is {IsNull:false,IsVisible:true}}";
-        if(seen!=arenaSeen){arenaSeen=seen;log.Information("Competitive arena check, territory {0}: {1}.",client.TerritoryType,seen);}
         // Measured in the public hall (0.612 log): bound by duty and content row are true there, so only the game's PvP instance can tell.
+        var pvpInstance=GameMain.IsInPvPInstance();
+        try
+        {
+            var bound=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+            var main=GameMain.Instance();
+            var seen=$"instance area {(main!=null && main->IsInInstanceArea())}, PvP instance {pvpInstance}, bound by duty {bound}, content row {(main!=null && main->CurrentContentFinderConditionRow!=null)}, match window {gui.GetAddonByName("TripleTriad") is {IsNull:false,IsVisible:true}}";
+            if(seen!=arenaSeen){arenaSeen=seen;log.Information("Competitive arena check, territory {0}: {1}.",client.TerritoryType,seen);}
+        }
+        catch(Exception error)
+        {
+            if(arenaSeen!="failed"){arenaSeen="failed";log.Warning(error,"Competitive arena check: the reading for the log failed; the decision does not use it.");}
+        }
         return pvpInstance;
     }
-    private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance());
+    private bool Decide()=>CompetitiveZones.IsCut(client.IsLoggedIn,(uint)client.TerritoryType,client.IsPvP,zones,CompetitiveGate.Cut,InArenaInstance);
     private void Tick(IFramework _)
     {
         // X-109 (0.981, DEC-047): the board is open (its window visible) and the player not in combat; anything else, or a failed read, is no board.

@@ -37,10 +37,19 @@ public static class CompetitiveZones
 
     /// <summary>Zones null: the data could not be read, so stopped. Territory 0: a loading screen, the state stays. Logged out: nothing to protect.</summary>
     public static bool IsCut(bool loggedIn,uint territory,bool isPvP,IReadOnlySet<uint>? zones,bool previous,bool inInstance=false)
+        =>IsCut(loggedIn,territory,isPvP,zones,previous,()=>inInstance);
+
+    /// <summary>
+    /// X-169 (0.1141, GPT audit R06): the decision rests only on the reads it needs. The arena's instance is read only in its own place (never
+    /// elsewhere, where a failing read could stop the decision), and a read that fails there counts as « in the arena »: in doubt, stopped.
+    /// </summary>
+    public static bool IsCut(bool loggedIn,uint territory,bool isPvP,IReadOnlySet<uint>? zones,bool previous,Func<bool> inInstance)
     {
         if(!loggedIn)return false;
         if(isPvP || zones is null)return true;
         if(territory==0)return previous;
-        return InstanceOnly.Contains(territory) ? inInstance:zones.Contains(territory);
+        if(!InstanceOnly.Contains(territory))return zones.Contains(territory);
+        try{return inInstance();}
+        catch(Exception){return true;}
     }
 }
