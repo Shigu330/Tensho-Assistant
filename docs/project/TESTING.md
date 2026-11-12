@@ -1437,6 +1437,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1172) Objets › Organisation, sacs du personnage : l'aperçu remplit le sac 1, puis le sac 3, puis le 2, puis le 4 ; « Appliquer » range les sacs du jeu de la même façon ; une sacoche ou un servant se range comme avant
 
+- [ ] (0.1174) Mode développeur, en extérieur : vaincre un monstre qui laisse un objet, même sans le cibler : dalamud.log montre « Discovery: defeat of … read from the game's message » puis « Discovery: MonsterDrop item … » (plus de « Item gain not attributed » pour ce butin)
+
+- [ ] (0.1174) Mode développeur, chasse au trésor en extérieur (carte déchiffrée, sans portail) : le butin du coffre donne « Discovery: ItemFromItem item … » avec l'objet de la carte ; Découvertes › la carte au trésor montre ces objets
+
+- [ ] (0.1175) Mode développeur, sur un point de récolte où un objet porte « RARE » (terreau III, par exemple) : ouvrir le point, faire une récolte sur l'objet RARE puis une autre ; dalamud.log a des lignes « addons » Gathering: …, à garder pour le relevé (logread.py)
+
+- [ ] (0.1176) Sur l'île de Lunule : Tensho › Eurêka et Bozja › onglet de l'île : le savoir (465 / 2800 par exemple) et les pièces comme dans le jeu ; le job de soutien porté en premier, en doré, avec le même niveau que la fenêtre des jobs de soutien du jeu ; « appris ensuite » donne l'action ou le trait du niveau suivant (info-bulle : sa description) ; l'expérience du job porté comme dans le jeu
+
+- [ ] (0.1176) Hors de l'île, après y être passé pendant la séance : l'onglet garde le dernier relevé avec son heure ; sans passage : « Pas encore lus pendant cette séance »
+
+- [ ] (0.1176) Mode développeur, sur l'île : dalamud.log, ligne « fields » : « experience … needed … » à comparer avec l'expérience du jeu (pour savoir si elle compte depuis le début du niveau)
+
+- [ ] (0.1177) Barre d'usure et page Équipement › Usure et symbiose : une pièce peu portée affiche le même pourcentage que la fiche du personnage du jeu (1 % et non 0 %) ; l'info-bulle de la page donne la valeur exacte ; près de 100 %, comparer avec le jeu (99 % tant que l'extraction n'est pas possible)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
