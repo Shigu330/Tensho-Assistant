@@ -33,17 +33,29 @@ public sealed class AchievementProgressData
             lock(gate)
                 if(File.Exists(file))
                 {
+                    // X-182 (0.1169, night review N3): read in an immediate transaction; a file written again after the conversion (an older
+                    // version still running) is merged the same way as a save: the newest reading of each achievement wins.
                     using(var open=opened.Open())
-                        if(!TenshoDataDatabase.Converted(open,Family))
-                            ReplaceAll(open,ReadFile().Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList(),now);
+                    using(var transaction=open.BeginTransaction(deferred:false))
+                    {
+                        var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
+                        {
+                            Upsert(open,transaction,ReadFile().Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
+                            if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                        }
+                        DuringSave?.Invoke();
+                        transaction.Commit();
+                    }
                     data.SetAside(file,now,"achievement progress");
                 }
         return ReadRows(opened);
     }
 
     /// <summary>
-    /// A character's progress saved whole (replaces that character's rows; <paramref name="all"/> is what the JSON file holds when it is still in
-    /// use); refused while the file of before is not converted.
+    /// A character's progress saved (<paramref name="all"/> is what the JSON file holds when it is still in use); refused while the file of before
+    /// is not converted. X-182 (0.1169, night review N9): each achievement written only when newer than the one saved (seen later), never the
+    /// character's rows deleted: a client left open with an older reading never takes back what another client saw since.
     /// </summary>
     public void Save(ulong character,IReadOnlyDictionary<uint,AchievementProgress> progress,Dictionary<ulong,Dictionary<uint,AchievementProgress>> all)
     {
@@ -51,7 +63,10 @@ public sealed class AchievementProgressData
         using var open=opened.Open();
         if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family))
             throw new InvalidOperationException("The achievement progress file of before is not converted yet; nothing written over it.");
-        ReplaceAll(open,[(character,progress)],null);
+        using var transaction=open.BeginTransaction(deferred:false);
+        Upsert(open,transaction,[(character,progress)]);
+        DuringSave?.Invoke();
+        transaction.Commit();
     }
 
     /// <summary>
@@ -73,24 +88,20 @@ public sealed class AchievementProgressData
 
     private static long Id(ulong character)=>unchecked((long)character);
 
-    // Characters' rows replaced in one transaction; at a conversion (converted set) every character of the file of before is in the same transaction
-    // as the « converted » mark: either the whole file is in the database, or none of it.
-    private void ReplaceAll(SqliteConnection open,IReadOnlyList<(ulong Character,IReadOnlyDictionary<uint,AchievementProgress> Progress)> characters,DateTimeOffset? converted)
+    // Rows written in the caller's transaction, each only when newer than the one saved (X-182); at a conversion the « converted » mark is in the
+    // same transaction: either the whole file is in the database, or none of it.
+    private static void Upsert(SqliteConnection open,SqliteTransaction transaction,IReadOnlyList<(ulong Character,IReadOnlyDictionary<uint,AchievementProgress> Progress)> characters)
     {
-        using var transaction=open.BeginTransaction();
-        using(var delete=open.CreateCommand())
         using(var insert=open.CreateCommand())
         {
-            delete.Transaction=transaction;delete.CommandText="DELETE FROM achievement_progress WHERE character=$character;";
-            var gone=delete.Parameters.Add("$character",SqliteType.Integer);
             insert.Transaction=transaction;
-            insert.CommandText="INSERT INTO achievement_progress(character,achievement,current,max,seen_at) VALUES($character,$achievement,$current,$max,$seen);";
+            insert.CommandText="INSERT INTO achievement_progress(character,achievement,current,max,seen_at) VALUES($character,$achievement,$current,$max,$seen) "
+                +"ON CONFLICT(character,achievement) DO UPDATE SET current=excluded.current,max=excluded.max,seen_at=excluded.seen_at WHERE excluded.seen_at>achievement_progress.seen_at;";
             var who=insert.Parameters.Add("$character",SqliteType.Integer);var achievement=insert.Parameters.Add("$achievement",SqliteType.Integer);
             var current=insert.Parameters.Add("$current",SqliteType.Integer);var max=insert.Parameters.Add("$max",SqliteType.Integer);
             var seen=insert.Parameters.Add("$seen",SqliteType.Integer);
             foreach(var (character,progress) in characters)
             {
-                gone.Value=Id(character);delete.ExecuteNonQuery();
                 foreach(var (id,value) in progress)
                 {
                     who.Value=Id(character);achievement.Value=(long)id;current.Value=(long)value.Current;max.Value=(long)value.Max;seen.Value=value.SeenAt.UtcTicks;
@@ -98,9 +109,6 @@ public sealed class AchievementProgressData
                 }
             }
         }
-        if(converted is { } when)TenshoDataDatabase.MarkConverted(open,transaction,Family,when);
-        DuringSave?.Invoke();
-        transaction.Commit();
     }
 
     private static Dictionary<ulong,Dictionary<uint,AchievementProgress>> ReadRows(TenshoDataDatabase opened)

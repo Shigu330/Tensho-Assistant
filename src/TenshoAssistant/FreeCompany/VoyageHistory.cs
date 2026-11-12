@@ -36,7 +36,7 @@ public static class VoyageHistory
         }
         return changed;
     }
-    private static bool Same(VoyageRecord a,VoyageRecord b)=>a.Vessel==b.Vessel && a.Rank==b.Rank && a.ReturnAt==b.ReturnAt
+    public static bool Same(VoyageRecord a,VoyageRecord b)=>a.Vessel==b.Vessel && a.Rank==b.Rank && a.ReturnAt==b.ReturnAt
         && a.Points.SequenceEqual(b.Points) && a.Route.SequenceEqual(b.Route) && a.Loot.SequenceEqual(b.Loot);
 
     /// <summary>Records kept: the last 180 days (by registration), the newest 5 000 at most, oldest first.</summary>
@@ -114,7 +114,11 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     /// <summary>« sqlite », « json » or « blocked » (see <see cref="TenshoDataFile.Mode"/>); « json » without a data file.</summary>
     public string Mode=>data?.Mode ?? "json";
 
-    /// <summary>The history, as saved (throws when it cannot be read: the caller then never writes over it).</summary>
+    /// <summary>
+    /// The history, as saved (throws when it cannot be read: the caller then never writes over it). X-182 (0.1169, night review N3, N28): the
+    /// file of before is read inside an immediate transaction (a second client waits, then finds it converted); found again after the conversion
+    /// and written since (an older version still running), its voyages not in the database are added, never dropped.
+    /// </summary>
     public List<VoyageRecord> Load(DateTimeOffset now)
     {
         if(data?.Database() is not { } opened)return VoyageHistory.Read(file);
@@ -123,31 +127,57 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
                 if(File.Exists(file))
                 {
                     using(var open=opened.Open())
-                        if(!TenshoDataDatabase.Converted(open,Family))ReplaceAll(open,VoyageHistory.Read(file),now);
+                    using(var transaction=open.BeginTransaction(deferred:false))
+                    {
+                        var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
+                        {
+                            Write(open,transaction,VoyageHistory.Read(file),keep:true);
+                            if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                        }
+                        DuringSave?.Invoke();
+                        transaction.Commit();
+                    }
                     data.SetAside(file,now,"voyage history");
                 }
         return ReadRows(opened);
     }
 
-    /// <summary>The history saved whole (replaces what was there); refused while the file of before is not converted.</summary>
-    public void Save(IReadOnlyList<VoyageRecord> records)
+    /// <summary>
+    /// X-182 (0.1169, night review N4): the voyages that changed written by their key (house, kind, slot, registration), the others left as they
+    /// are (another client's company is never erased); then what is older than the history keeps (180 days, the newest 5 000) is removed. The
+    /// JSON file, when it is still in use, is written whole from <paramref name="all"/>. Refused while the file of before is not converted.
+    /// </summary>
+    public void Save(IReadOnlyList<VoyageRecord> all,IReadOnlyList<VoyageRecord>? changed=null,DateTimeOffset? now=null)
     {
-        if(data?.Database() is not { } opened){VoyageHistory.Write(file,records);return;}
+        if(data?.Database() is not { } opened){VoyageHistory.Write(file,all);return;}
         using var open=opened.Open();
         if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family))
             throw new InvalidOperationException("The voyage history file of before is not converted yet; nothing written over it.");
-        ReplaceAll(open,records,null);
+        using var transaction=open.BeginTransaction(deferred:false);
+        Write(open,transaction,changed ?? all,keep:false);
+        var at=now ?? DateTimeOffset.UtcNow;
+        using(var purge=open.CreateCommand())
+        {
+            purge.Transaction=transaction;
+            purge.CommandText="DELETE FROM voyage_records WHERE registered<$oldest OR registered>$latest;"
+                +"DELETE FROM voyage_records WHERE registered<(SELECT registered FROM voyage_records ORDER BY registered DESC LIMIT 1 OFFSET $over);";
+            purge.Parameters.AddWithValue("$oldest",(at-TimeSpan.FromDays(VoyageHistory.KeepDays)).UtcTicks);
+            purge.Parameters.AddWithValue("$latest",at.AddDays(1).UtcTicks);
+            purge.Parameters.AddWithValue("$over",VoyageHistory.MaximumRecords-1);
+            purge.ExecuteNonQuery();
+        }
+        DuringSave?.Invoke();
+        transaction.Commit();
     }
 
-    // Every row replaced in one transaction; at a conversion (converted set) with the « converted » mark: the whole file is in, or none of it.
-    private void ReplaceAll(SqliteConnection open,IReadOnlyList<VoyageRecord> records,DateTimeOffset? converted)
+    // Rows written by key in the caller's transaction: replaced (a save: the voyage read again), or kept when already there (keep: a file of before).
+    private static void Write(SqliteConnection open,SqliteTransaction transaction,IReadOnlyList<VoyageRecord> records,bool keep)
     {
-        using var transaction=open.BeginTransaction();
-        TenshoDataDatabase.Run(open,"DELETE FROM voyage_records;",transaction);
         using(var insert=open.CreateCommand())
         {
             insert.Transaction=transaction;
-            insert.CommandText="INSERT OR REPLACE INTO voyage_records(house,kind,slot,registered,vessel,rank,return_at,points,route,loot) "
+            insert.CommandText=(keep ? "INSERT OR IGNORE":"INSERT OR REPLACE")+" INTO voyage_records(house,kind,slot,registered,vessel,rank,return_at,points,route,loot) "
                 +"VALUES($house,$kind,$slot,$registered,$vessel,$rank,$return,$points,$route,$loot);";
             var house=insert.Parameters.Add("$house",SqliteType.Integer);var kind=insert.Parameters.Add("$kind",SqliteType.Integer);
             var slot=insert.Parameters.Add("$slot",SqliteType.Integer);var registered=insert.Parameters.Add("$registered",SqliteType.Integer);
@@ -162,9 +192,6 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
                 insert.ExecuteNonQuery();
             }
         }
-        if(converted is { } when)TenshoDataDatabase.MarkConverted(open,transaction,Family,when);
-        DuringSave?.Invoke();
-        transaction.Commit();
     }
 
     private static List<VoyageRecord> ReadRows(TenshoDataDatabase opened)
@@ -201,6 +228,10 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
     public bool Unavailable{get{lock(gate){Load();return failed;}}}
     public IReadOnlyList<VoyageRecord> Records{get{lock(gate){Load();return records!.ToArray();}}}
 
+    // X-182 (0.1169): the voyages as last read or written by this client, so a save writes only those that changed (night review N4).
+    private Dictionary<(ulong,VesselKind,int,DateTimeOffset),VoyageRecord> written=[];
+    private static (ulong,VesselKind,int,DateTimeOffset) Key(VoyageRecord record)=>(record.HouseId,record.Kind,record.Slot,record.RegisteredAt);
+
     public void Observe(IEnumerable<VoyageVessel> vessels)
     {
         lock(gate)
@@ -208,16 +239,19 @@ public sealed class VoyageHistoryStore(string path,Action<Exception,string> warn
             Load();
             if(failed)return;
             if(!VoyageHistory.Record(records!,vessels))return;
-            records=VoyageHistory.Prune(records!,DateTimeOffset.UtcNow);
+            var now=DateTimeOffset.UtcNow;
+            records=VoyageHistory.Prune(records!,now);
             var copy=records.ToArray();
-            writer.Enqueue("Voyage history could not be saved.",()=>source.Save(copy));
+            var changed=copy.Where(record=>!written.TryGetValue(Key(record),out var known) || !VoyageHistory.Same(known,record)).ToArray();
+            foreach(var record in changed)written[Key(record)]=record;
+            writer.Enqueue("Voyage history could not be saved.",()=>source.Save(copy,changed,now));
         }
     }
 
     private void Load()
     {
         if(records is not null)return;
-        try{var now=DateTimeOffset.UtcNow;records=VoyageHistory.Prune(source.Load(now),now);}
+        try{var now=DateTimeOffset.UtcNow;records=VoyageHistory.Prune(source.Load(now),now);written=records.ToDictionary(Key);}
         catch(Exception error){records=[];failed=true;warn(error,"Voyage history could not be read; it is not written over.");}
     }
 }

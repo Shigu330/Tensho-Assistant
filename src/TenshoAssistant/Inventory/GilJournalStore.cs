@@ -41,7 +41,11 @@ public sealed class GilJournalStore
                 if(File.Exists(json))
                 {
                     using(var open=opened.Open())
-                        if(!Converted(open,character))WriteRows(open,character,GilJournal.Read(json),now);
+                    {
+                        if(ConvertedAt(open,character) is not { } converted)WriteRows(open,character,GilJournal.Read(json),now);
+                        // X-182 (0.1169, night review N3): written again after the conversion (an older version still running): merged.
+                        else if(TenshoDataFile.WrittenAgain(json,converted))WriteRows(open,character,Merge(ReadRows(opened,character),GilJournal.Read(json)),null);
+                    }
                     data.SetAside(json,now,"gil journal");
                 }
         return ReadRows(opened,character);
@@ -75,13 +79,18 @@ public sealed class GilJournalStore
 
     private static long Id(ulong character)=>unchecked((long)character);
 
-    private static bool Converted(SqliteConnection open,ulong character)
+    private static bool Converted(SqliteConnection open,ulong character)=>ConvertedAt(open,character) is not null;
+    private static DateTimeOffset? ConvertedAt(SqliteConnection open,ulong character)
     {
         using var command=open.CreateCommand();
-        command.CommandText="SELECT COUNT(*) FROM gil_converted WHERE character=$character;";
+        command.CommandText="SELECT at FROM gil_converted WHERE character=$character;";
         command.Parameters.AddWithValue("$character",Id(character));
-        return System.Convert.ToInt64(command.ExecuteScalar(),CultureInfo.InvariantCulture)>0;
+        return command.ExecuteScalar() is long at ? new DateTimeOffset(at,TimeSpan.Zero):null;
     }
+
+    /// <summary>X-182 (0.1169): two journals of a character as one: every entry once (same time, change, balance, source and kind), in time order.</summary>
+    public static List<GilEntry> Merge(IReadOnlyList<GilEntry> saved,IReadOnlyList<GilEntry> found)
+        =>saved.Concat(found).Distinct().OrderBy(entry=>entry.At).ToList();
 
     private void WriteRows(SqliteConnection open,ulong character,IReadOnlyList<GilEntry> entries,DateTimeOffset? converted)
     {

@@ -84,6 +84,14 @@ public sealed class TenshoDataDatabase
         command.Parameters.AddWithValue("$family",family);
         return System.Convert.ToInt64(command.ExecuteScalar(),CultureInfo.InvariantCulture)>0;
     }
+    /// <summary>X-182 (0.1169): when a family was converted (its « converted » mark), or null when it is not.</summary>
+    public static DateTimeOffset? ConvertedAt(SqliteConnection open,string family,SqliteTransaction? transaction=null)
+    {
+        using var command=open.CreateCommand();command.Transaction=transaction;
+        command.CommandText="SELECT at FROM converted WHERE family=$family;";
+        command.Parameters.AddWithValue("$family",family);
+        return command.ExecuteScalar() is long at ? new DateTimeOffset(at,TimeSpan.Zero):null;
+    }
     /// <summary>Marks a family converted, inside the transaction that wrote its rows.</summary>
     public static void MarkConverted(SqliteConnection open,SqliteTransaction transaction,string family,DateTimeOffset at)
     {
@@ -95,6 +103,18 @@ public sealed class TenshoDataDatabase
 
     /// <summary>The SQLite library's version (for the log).</summary>
     public string LibraryVersion(){using var open=Open();return Scalar(open,"SELECT sqlite_version();") as string ?? "";}
+
+    /// <summary>
+    /// X-182 (0.1169, night review N27): the journal written into the file and synced (a full checkpoint), so a conversion's commit survives a
+    /// power cut before its file of before is moved; false when another connection kept it from finishing (the move then waits for the next start).
+    /// </summary>
+    public bool Durable()
+    {
+        using var open=Open();using var command=open.CreateCommand();
+        command.CommandText="PRAGMA wal_checkpoint(FULL);";
+        using var reader=command.ExecuteReader();
+        return reader.Read() && reader.GetInt64(0)==0;
+    }
 
     /// <summary>The journal folded into the file (at unload), so the folder holds one file when the game is closed.</summary>
     public void Checkpoint(){using var open=Open();Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");}
@@ -219,6 +239,21 @@ public sealed class TenshoDataFile
     }
 
     /// <summary>
+    /// X-182 (0.1169, night review N3): a file of before found again after its family was converted, written after the conversion (by an older
+    /// version of the plugin, or another client still running one) and not a copy already set aside: its entries are merged, never dropped.
+    /// </summary>
+    public static bool WrittenAgain(string file,DateTimeOffset converted)
+    {
+        if(!File.Exists(file) || File.GetLastWriteTimeUtc(file)<=converted.UtcDateTime)return false;
+        var length=new FileInfo(file).Length;
+        var name=System.IO.Path.GetFileNameWithoutExtension(file);var extension=System.IO.Path.GetExtension(file);
+        foreach(var aside in Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(file))!,"before-sqlite-*"))
+            foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
+                if(new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file)))return false;
+        return true;
+    }
+
+    /// <summary>
     /// A file of before moved beside itself into before-sqlite-yyyyMMdd-HHmmss/, never removed (a name already taken there gets a suffix). A move
     /// that fails is said and retried at the next start (the « converted » mark keeps the file from being read again). 0.1149: a folder of before
     /// (the bank's InventoryBank/) is moved the same way, whole.
@@ -229,6 +264,11 @@ public sealed class TenshoDataFile
         {
             file=System.IO.Path.TrimEndingDirectorySeparator(System.IO.Path.GetFullPath(file));
             var folder=Directory.Exists(file);
+            // X-182 (0.1169): already moved by another client; N27: never moved before the rows that replace it are synced to the disk.
+            if(!folder && !File.Exists(file))return;
+            TenshoDataDatabase? opened;
+            lock(gate)opened=blocked is null ? database:null;
+            if(opened is not null && !opened.Durable()){info?.Invoke($"Tensho data: the {what} file of before stays until the next start (the data file was busy).");return;}
             var aside=System.IO.Path.Combine(System.IO.Path.GetDirectoryName(file)!,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
             Directory.CreateDirectory(aside);
             var target=System.IO.Path.Combine(aside,System.IO.Path.GetFileName(file));

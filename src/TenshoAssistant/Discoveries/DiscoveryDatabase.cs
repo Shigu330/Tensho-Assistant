@@ -141,8 +141,11 @@ public sealed class DiscoveryDatabase
         var old=File.Exists(main) || Directory.Exists(shared) && Directory.GetFiles(shared,"kind-*.json.gz").Length>0;
         if(!File.Exists(target) && old)
         {
-            var temporary=target+".converting";
-            foreach(var leftover in new[]{temporary,temporary+"-wal",temporary+"-shm"})if(File.Exists(leftover))File.Delete(leftover);
+            // X-182 (0.1169, night review N11): a temporary name of this conversion only (a second client converting at the same time never removes
+            // it); leftovers of a stopped conversion removed once they are old; the result moved without overwriting: the first one in stays.
+            var temporary=target+".converting-"+Guid.NewGuid().ToString("N");
+            foreach(var leftover in Directory.EnumerateFiles(folder,FileName+".converting*"))
+                if(DateTime.UtcNow-File.GetLastWriteTimeUtc(leftover)>TimeSpan.FromMinutes(30))try{File.Delete(leftover);}catch(IOException){}
             var store=new DiscoveryStore();
             var read=DiscoveryFiles.ReadBase(main,now,broken);
             if(read.Unsafe)throw new IOException("The discoveries file could not be read nor set aside: nothing converted.");
@@ -152,13 +155,17 @@ public sealed class DiscoveryDatabase
             database.Write(store.Snapshot(now).Facts,[],false);
             database.Checkpoint();
             SqliteConnection.ClearAllPools();
-            File.Move(temporary,target);
+            try{File.Move(temporary,target);}
+            catch(IOException) when(File.Exists(target))
+            {
+                foreach(var mine in new[]{temporary,temporary+"-wal",temporary+"-shm"})if(File.Exists(mine))File.Delete(mine);
+            }
         }
         if(!old)return null;
         var aside=System.IO.Path.Combine(folder,$"before-sqlite-{now.ToUniversalTime():yyyyMMdd-HHmmss}");
         Directory.CreateDirectory(aside);
-        if(File.Exists(main))File.Move(main,System.IO.Path.Combine(aside,"Discoveries.json"));
-        if(Directory.Exists(shared))Directory.Move(shared,System.IO.Path.Combine(aside,"Shared"));
+        try{if(File.Exists(main))File.Move(main,System.IO.Path.Combine(aside,"Discoveries.json"));}catch(IOException) when(!File.Exists(main)){}
+        try{if(Directory.Exists(shared))Directory.Move(shared,System.IO.Path.Combine(aside,"Shared"));}catch(IOException) when(!Directory.Exists(shared)){}
         return aside;
     }
 }

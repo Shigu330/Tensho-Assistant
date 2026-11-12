@@ -48,9 +48,9 @@ internal static class VoyageSqlite1148Tests
             Check(Same(data.Load(At),Sample()),"same voyages after the conversion (ids above long.MaxValue, no return time, quotes in names)");
             Check(!File.Exists(file) && Aside(root) is [var kept] && File.ReadAllBytes(kept).SequenceEqual(bytes),"the file of before kept aside, unchanged");
             Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"after a restart");
-            var newer=Sample().Skip(1).Append(Voyage(17,3,At.AddHours(3),At.AddHours(30),(5,5))).ToList();
-            data.Save(newer);
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),newer),"a save replaces the whole history");
+            var added=Voyage(17,3,At.AddHours(3),At.AddHours(30),(5,5));
+            data.Save(Sample().Skip(1).Append(added).ToList());
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample().Append(added).ToList()),"a save writes its voyages by key, the others kept (X-182)");
             using var open=new TenshoDataDatabase(database).Open();
             Check(TenshoDataDatabase.Converted(open,VoyageHistoryData.Family),"marked converted");
         })),
@@ -71,7 +71,7 @@ internal static class VoyageSqlite1148Tests
         {
             VoyageHistory.Write(file,Sample());
             var data=new VoyageHistoryData(file,Data(database));data.Load(At);
-            var newer=Sample().Take(1).ToList();data.Save(newer);
+            var newer=Sample();newer[0]=newer[0] with {Loot=[new VoyageLoot(7,7)]};data.Save(newer);
             File.Copy(Aside(root)[0],file);
             Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),newer),"newer history kept");
             Check(!File.Exists(file) && Aside(root).Length==2,"the old file set aside again, both copies kept");
@@ -104,7 +104,7 @@ internal static class VoyageSqlite1148Tests
             a.Load(At);
             Parallel.For(0,40,index=>{if(index%2==0)a.Save(first);else b.Save(second);});
             var saved=new VoyageHistoryData(file,Data(database)).Load(At);
-            Check(Same(saved,first) || Same(saved,second),"one whole save, never a mix: "+saved.Count);
+            Check(Same(saved,Sample().Append(second[^1]).ToList()),"neither erases the other's voyages (X-182): "+saved.Count);
             var mirror=Path.Combine(root,"mirror");
             var copy=TenshoDataDatabase.CopyForDesktop(database,Path.Combine(mirror,TenshoDataDatabase.FileName));
             Check(copy.Copied==1,"copied: "+string.Join("; ",copy.Problems));
