@@ -176,10 +176,8 @@ function Add-HotfixNote([string]$Notes) {
     # 0.1126 (X-144, audit A13): the note says so only on a launch proof bound to this version and to the very DLL of latest.zip
     # (scripts/LaunchProof.ps1); without one, whichever way the release was started, the note says it was not checked in game.
     if (-not $Hotfix) {
-        if ($launchProof -and $launchProof.Ok) {
-            return "**Checked at launch, not tried in detail yet**: Tensho loaded in game with this version, a character logged in, its self-test passed and the log showed no error; the detailed in-game tests come later.`n" +
-                "**Vérifié au lancement, pas encore essayé en détail** : Tensho s'est chargé en jeu à cette version, personnage connecté, son autotest est passé et le journal n'a montré aucune erreur ; les essais détaillés en jeu viendront ensuite.`n`n$Notes"
-        }
+        # 0.1145 (X-170): the positive note says only what the proof holds (scripts/LaunchProof.ps1, Format-LaunchNote).
+        if ($launchProof -and $launchProof.Ok) { return "$(Format-LaunchNote $launchProof)`n`n$Notes" }
         return "**Not checked in game yet**: no launch proof for this build; the in-game tests come later.`n" +
             "**Pas encore vérifié en jeu** : aucune preuve de lancement pour cette compilation ; les essais en jeu viendront ensuite.`n`n$Notes"
     }
@@ -323,6 +321,14 @@ try {
     $proofFolder = Join-Path ([IO.Path]::GetTempPath()) "tensho-proof-$version"
     New-Item -ItemType Directory -Force -Path $proofFolder | Out-Null
     $releaseProof = Join-Path $proofFolder 'release-proof.json'
+    # 0.1145 (X-170, end of X-144): latest.zip and the desktop package are uploaded only when Verify built them from the sources of the
+    # commit released (its stamp: version, commit, clean tree), new release or resumed one; otherwise stop before anything public.
+    $packages = $null
+    function Assert-PackagesFromCommit([string]$Commit) {
+        $script:packages = Test-PackagesFromCommit $version $Commit (Join-Path $root 'artifacts\verify-stamp.json') $root
+        if (-not $script:packages.Ok) { Stop-Release "Stopped: $($script:packages.Reason). The packages must come from the commit released ($($Commit.Substring(0, 7)))." }
+        Write-Output "Packages: $($script:packages.Reason)."
+    }
     function Write-ReleaseProof([string]$Commit) {
         $hash = { param($Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant() }
         $library = if ($env:DALAMUD_HOME) { $env:DALAMUD_HOME } else { Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev' }
@@ -334,7 +340,7 @@ try {
         $ci = @(); if ($runs) { $ci = @(($runs -join "`n") | ConvertFrom-Json | ForEach-Object { [ordered]@{ workflow = $_.workflowName; status = $_.status; conclusion = $_.conclusion; run = $_.databaseId } }) }
         $launch = if ($launchProof.Proof) { [ordered]@{ accepted = [bool]$launchProof.Ok; reason = $launchProof.Reason; version = "$($launchProof.Proof.Version)"; dll = "$($launchProof.Proof.Dll)"; at = "$($launchProof.Proof.At)"; ok = $launchProof.Proof.Ok; failed = $launchProof.Proof.Failed } } else { [ordered]@{ accepted = $false; reason = $launchProof.Reason } }
         $document = [ordered]@{
-            format = 1; version = $version; tag = $tag; commit = $Commit; created = [DateTimeOffset]::UtcNow.ToString('o'); hotfix = "$Hotfix"
+            format = 1; version = $version; tag = $tag; commit = $Commit; built = "$($packages.Built)"; created = [DateTimeOffset]::UtcNow.ToString('o'); hotfix = "$Hotfix"
             files = [ordered]@{ 'latest.zip' = (& $hash $zip); 'TenshoAssistant.dll (in latest.zip)' = $launchProof.Dll; 'TenshoAssistant.Desktop.zip' = (& $hash $desktopZip) }
             build = [ordered]@{ dalamud = "$dalamud"; dotnetSdk = $(if ($sdk) { $sdk } else { 'unknown' }) }
             ci = $ci; launch = $launch
@@ -351,6 +357,7 @@ try {
         $notes = Add-HotfixNote $notes
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
         Assert-NoAgentFiles $commit
+        Assert-PackagesFromCommit $commit
         Write-ReleaseProof $commit
         if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
         if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256 release-proof.json" { & $gh release create $tag $zip $desktopZip $desktopHash $releaseProof --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
@@ -381,6 +388,7 @@ try {
     }
     Assert-NoAgentFiles 'HEAD'; Assert-NoSecret
     Assert-CiGreen ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
+    Assert-PackagesFromCommit ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
     Write-ReleaseProof ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
 
     # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).

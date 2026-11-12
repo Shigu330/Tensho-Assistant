@@ -25,11 +25,15 @@ internal static class LaunchCheck1105Tests
             var release=Read("scripts/Release.ps1");
             var function=release.IndexOf("function Add-HotfixNote",StringComparison.Ordinal);
             var branch=release.IndexOf("if (-not $Hotfix) {",function,StringComparison.Ordinal);
-            var english=release.IndexOf("**Checked at launch, not tried in detail yet**",branch,StringComparison.Ordinal);
-            var french=release.IndexOf("**Vérifié au lancement, pas encore essayé en détail**",branch,StringComparison.Ordinal);
+            // 0.1145 (X-170): the positive note is built from the proof by Format-LaunchNote (scripts/LaunchProof.ps1).
+            var call=release.IndexOf("Format-LaunchNote $launchProof",branch,StringComparison.Ordinal);
+            var shared=Read("scripts/LaunchProof.ps1");
+            var note=shared.IndexOf("function Format-LaunchNote",StringComparison.Ordinal);
+            var english=shared.IndexOf("**Checked at launch, not tried in detail yet**",note,StringComparison.Ordinal);
+            var french=shared.IndexOf("**Vérifié au lancement, pas encore essayé en détail**",note,StringComparison.Ordinal);
             var hotfix=release.IndexOf("**Urgent fix** ($reason)",function,StringComparison.Ordinal);
-            Check(function>0 && branch>function && english>branch && french>english,"both notes, English first, when -Hotfix is not given");
-            Check(french<hotfix,"the urgent fix keeps its own note");
+            Check(function>0 && branch>function && call>branch && note>0 && english>note && french>english,"both notes, English first, when -Hotfix is not given");
+            Check(call<hotfix,"the urgent fix keeps its own note");
             Check(Regex.Matches(release,@"\$notes = Add-HotfixNote \$notes").Count==2,"new release and resumed release");
         }),
     ];

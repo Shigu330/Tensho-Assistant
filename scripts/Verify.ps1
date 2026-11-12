@@ -97,6 +97,11 @@ if ($TestsOnly) {
 }
 $taskFingerprint = Get-TaskFingerprint
 $taskDocuments = Get-TaskFingerprint -Documents
+# 0.1145 (X-170, end of X-144): the stamp also says which commit was built and whether the tree was clean, read before the build; a
+# release (new or resumed) uploads its packages only when they come from the sources of the commit it publishes (scripts/LaunchProof.ps1).
+$taskPrevious = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+try { $taskHead = "$(& git -C $taskRoot rev-parse HEAD 2>$null)".Trim(); $taskClean = -not (& git -C $taskRoot status --porcelain 2>$null) }
+finally { $ErrorActionPreference = $taskPrevious; $global:LASTEXITCODE = 0 }
 $taskSkip = $false
 # 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
 if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip.sha256'))) {
@@ -251,7 +256,7 @@ try {
     Write-Output "PASS desktop update: $taskDesktopHash written; the packaged exe installed a fake release $taskFakeTag beside, handed over, went back, refused a damaged zip"
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
-    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
+    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]$taskClean; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
 finally { Pop-Location }
 }

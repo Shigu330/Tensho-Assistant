@@ -69,7 +69,7 @@ internal static class LaunchProof1126Tests
             Check(release.Contains(". (Join-Path $PSScriptRoot 'LaunchProof.ps1')"),"the check is the shared script");
             var function=release.IndexOf("function Add-HotfixNote",StringComparison.Ordinal);
             var guard=release.IndexOf("if ($launchProof -and $launchProof.Ok) {",function,StringComparison.Ordinal);
-            Check(guard>function && guard<release.IndexOf("**Checked at launch, not tried in detail yet**",function,StringComparison.Ordinal),"« Checked at launch » only behind the proof");
+            Check(guard>function && guard<release.IndexOf("Format-LaunchNote $launchProof",function,StringComparison.Ordinal),"« Checked at launch » only behind the proof (0.1145: note built from it)");
             Check(release.Contains("**Not checked in game yet**") && release.Contains("**Pas encore vérifié en jeu**"),"otherwise said, in both languages");
             Check(release.IndexOf("$launchProof = Get-LaunchProof $version $zip",StringComparison.Ordinal)<release.IndexOf("$notes = Add-HotfixNote $notes",StringComparison.Ordinal),"read before the notes");
             Check(release.Split("$releaseProof --repo $repository").Length==4,"release-proof.json attached (new, resumed, missing asset)");
