@@ -16,6 +16,16 @@ public sealed class RaphaelSequenceCache(Func<RecipeDefinition,CraftStats,int,Cr
     private Func<TimeSpan> lifetime=()=>TimeSpan.FromDays(1);
     private DataCache? store;
     public void Configure(Func<TimeSpan> duration,DataCache cache){lock(gate){lifetime=duration;store=cache;}}
+    /// <summary>
+    /// X-01 C1.3 (0.1194, the root of the leak of unloaded instances): the window keeps this cache in a static field and configures it with
+    /// the data cache and a duration read from its settings, that is a delegate on the window: a static lives as long as the load context,
+    /// which stays alive in the game process, so each unloaded instance stayed whole in memory behind it (measured: the window, the data
+    /// cache and what hangs from them were the only parts left once everything else was emptied). Called at unload: nothing of the
+    /// instance stays; a solve still running goes on without the disk.
+    /// </summary>
+    public void Forget(){lock(gate){lifetime=static ()=>TimeSpan.FromDays(1);store=null;}}
+    /// <summary>Whether a data cache is configured (false at first and after <see cref="Forget"/>).</summary>
+    public bool Configured{get{lock(gate)return store is not null;}}
     public CraftSolveResult Solve(RecipeDefinition recipe,CraftStats stats,int startingQuality,CraftSolveOptions options,CancellationToken token)
     {
         DataCache? cache;Func<TimeSpan> duration;

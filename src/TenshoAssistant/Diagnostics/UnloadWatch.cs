@@ -229,8 +229,26 @@ public static class UnloadWatch
         var type=value.GetType();
         // An object of the assembly's own classes counts when it has fields that can hold other objects (a record of numbers and texts cannot hold an instance).
         if(type.Assembly!=assembly || type==declaring || CompilerSingleton(type) || type.IsEnum)return null;
-        var holders=type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Count(field=>!field.FieldType.IsValueType && field.FieldType!=typeof(string));
-        return holders==0 ? null:$"{type.Name} ({holders} reference fields)";
+        var fields=type.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Where(field=>!field.FieldType.IsValueType && field.FieldType!=typeof(string) && !field.FieldType.IsPointer).ToArray();
+        if(fields.Length==0)return null;
+        // 0.1194 (« RaphaelSequenceCache (4 reference fields) » was the root and read like a table of data): one level inside, what the
+        // object's fields hold now: a delegate with a target, or another object of the assembly that has reference fields.
+        var inside=new List<string>();
+        foreach(var field in fields)
+        {
+            object? held;
+            try{held=field.GetValue(value);}
+            catch(Exception error) when(error is NotSupportedException or FieldAccessException or TargetException){continue;}
+            if(held is Delegate inner)
+            {
+                var on=inner.GetInvocationList().Select(one=>one.Target).Where(target=>target is not null && !CompilerSingleton(target!.GetType())).Select(target=>target!.GetType().Name).Distinct().ToList();
+                if(on.Count>0)inside.Add($"{field.Name}: delegate on {string.Join(", ",on)}");
+            }
+            else if(held is not null && held.GetType() is var heldType && heldType.Assembly==assembly && !heldType.IsEnum && !CompilerSingleton(heldType)
+                && heldType.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Any(one=>!one.FieldType.IsValueType && one.FieldType!=typeof(string)))
+                inside.Add($"{field.Name}: {heldType.Name}");
+        }
+        return inside.Count>0 ? $"{type.Name} holding {string.Join("; ",inside)}":$"{type.Name} ({fields.Length} reference fields)";
     }
 
     // The compiler's « <>c » singletons hold static lambdas only: no instance behind them.

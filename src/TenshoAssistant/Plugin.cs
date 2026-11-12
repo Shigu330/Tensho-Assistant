@@ -124,6 +124,8 @@ public sealed class Plugin : IDalamudPlugin
                 if(left>0)log.Warning("{0} framework subscriptions were still registered at unload: released.",left);
                 TenshoAssistant.Competitive.CompetitiveGate.ForgetInstance();
                 Gathering.WeatherCatalog.StoryWeatherConfirmed=null;
+                // 0.1194: the root the measure named: the window's static cache of Raphael's sequences held the window and the data cache.
+                MainWindow.ForgetInstance();
             });
             TenshoAssistant.Competitive.CompetitiveWatcher? competitive=null;
             registrations.Register(()=>competitive=new TenshoAssistant.Competitive.CompetitiveWatcher(framework,client,data,log,gameGui,condition),()=>competitive?.Dispose());

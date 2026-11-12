@@ -17,6 +17,8 @@ internal sealed partial class MainWindow
     // 0.467 (user request, in-game campaign): the crafting log follows the solver chosen in the settings.
     // 0.468: Raphael's sequences are kept (RaphaelSequenceCache), shared with the simulator's search.
     private static readonly RaphaelSequenceCache RaphaelSequences=new(RaphaelCraftSolver.Solve);
+    /// <summary>X-01 C1.3 (0.1194): at unload, the static cache of Raphael's sequences forgets this window and its data cache.</summary>
+    internal static void ForgetInstance()=>RaphaelSequences.Forget();
     private readonly CraftLogSession craftLogSession=new((input,token)=>CraftLogSession.Build(input,token,RaphaelSequences.Solve));
     private string? loggedCraftLogRaphaelError;
     internal const string RaphaelNotCalled="Raphael not called:";
