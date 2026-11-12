@@ -193,12 +193,17 @@ internal sealed partial class MainWindow
     // in the plugin's language, and whether it plays a sound. Called by the application once a second, by its name (DesktopData1131Tests).
     // An alarm due while the game is in front is marked rung and not shown when DesktopOnlyGameBehind is on: it rings in the game.
     private Alarms.AlarmBell? desktopBell;
+    private Reminders.GardenBell? desktopGarden;
     internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)
     {
         var options=configuration.AlarmOptions ?? new();
         var catalog=weather.State.Catalog;
         var due=(desktopBell??=new()).Due(configuration.Alarms,now,catalog is null ? null:(alarm,time)=>Alarms.AlarmService.WeatherAt(catalog,alarm.TerritoryId,time));
-        if(due.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
-        return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((item.Occurrence-now).TotalMinutes))))],options.DesktopSound);
+        // X-163 (0.1153): the garden beds ripe or to tend too, when the garden reminders are on (GardenBell: the journal's rule, the application's own
+        // memory; a bed the plugin already said is not said again), in the same words as the game's chat line.
+        var garden=configuration.GardenAlerts ? (desktopGarden??=new()).Due(configuration.GardenBeds,now):[];
+        if(due.Count+garden.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
+        return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((item.Occurrence-now).TotalMinutes)))),
+            .. garden.Select(item=>localization.Format(item.State==Reminders.GardenState.Ripe ? "Garden.RipeNotice":"Garden.TendNotice",item.Bed.Seed,item.Bed.Place))],options.DesktopSound);
     }
 }

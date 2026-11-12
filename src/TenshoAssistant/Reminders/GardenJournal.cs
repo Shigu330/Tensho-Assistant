@@ -92,6 +92,7 @@ public static class GardenJournal
     /// </summary>
     public static IReadOnlyList<(GardenBed Bed,GardenState State)> Due(IEnumerable<GardenBed>? beds,DateTimeOffset now)
     {
+        // X-163 (0.1153): the desktop application rings them too, by GardenBell (its own memory, the beds never changed).
         var due=new List<(GardenBed,GardenState)>();
         foreach(var bed in beds ?? [])
         {
@@ -100,6 +101,33 @@ public static class GardenJournal
             if(state==GardenState.Ripe && !bed.RipeSaid){bed.RipeSaid=true;due.Add((bed,state));}
             else if(state==GardenState.ToTend && TendAt(bed) is { } at && bed.TendSaidFor!=at){bed.TendSaidFor=at;due.Add((bed,state));}
         }
+        return due;
+    }
+}
+
+/// <summary>
+/// X-163 (0.1153, user's request of 12/11): the garden beds the desktop application rings, ripe or to tend, by the garden journal's own rule
+/// (GardenJournal.State, TendAt): each once, in the application's own memory; a bed the plugin already said (RipeSaid, TendSaidFor in the saved
+/// settings it reads) is not said again; the beds are never changed (the application never writes the plugin's settings). A bed gone from the
+/// journal is forgotten, so the memory stays small. Not thread-safe: one caller (the application's bell, once a second).
+/// </summary>
+public sealed class GardenBell
+{
+    private readonly HashSet<(Guid Bed,GardenState State,DateTimeOffset At)> rung=[];
+
+    public IReadOnlyList<(GardenBed Bed,GardenState State)> Due(IEnumerable<GardenBed>? beds,DateTimeOffset now)
+    {
+        var due=new List<(GardenBed,GardenState)>();
+        var present=new HashSet<Guid>();
+        foreach(var bed in beds ?? [])
+        {
+            present.Add(bed.Id);
+            if(bed.PlantedAt>now)continue;
+            var state=GardenJournal.State(bed,now);
+            if(state==GardenState.Ripe && !bed.RipeSaid && rung.Add((bed.Id,state,GardenJournal.RipeAt(bed))))due.Add((bed,state));
+            else if(state==GardenState.ToTend && GardenJournal.TendAt(bed) is { } at && bed.TendSaidFor!=at && rung.Add((bed.Id,state,at)))due.Add((bed,state));
+        }
+        rung.RemoveWhere(entry=>!present.Contains(entry.Bed));
         return due;
     }
 }

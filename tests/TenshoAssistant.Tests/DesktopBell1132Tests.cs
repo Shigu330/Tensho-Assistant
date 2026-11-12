@@ -38,7 +38,7 @@ internal static class DesktopBell1132Tests
         {
             var data=Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(data.Contains("internal (string[] Lines,bool Sound) DesktopDueAlarms(DateTimeOffset now,bool gameInFront)")
-                && data.Contains("if(due.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);"),"the plugin's entry");
+                && data.Contains("if(due.Count+garden.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);"),"the plugin's entry");
             Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"DesktopDueAlarms\",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(DateTimeOffset),typeof(bool)])"),"called by that signature");
             var program=Read("src/TenshoAssistant.Desktop/Program.cs");
             Check(program.IndexOf("status.Bell=true;",StringComparison.Ordinal)>program.IndexOf("if(headless)return Headless.Run(",StringComparison.Ordinal),"never in a headless run");
