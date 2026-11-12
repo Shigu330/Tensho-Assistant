@@ -29,6 +29,13 @@ public static class DutyProgress
     }
     public sealed record SavedFile(Dictionary<ulong,Saved> All,ulong Last);
 
+    /// <summary>
+    /// X-119 (0.1151): the state a saved file holds for its last character (what the game shows logged out, and the desktop application from its
+    /// copy), null when it holds none; throws when the text does not read.
+    /// </summary>
+    public static DutyProgressState? LastShown(string text)=>Read(text) is not { } read ? throw new InvalidDataException("Saved duty progress unreadable.")
+        : read.All.TryGetValue(read.Last,out var last) ? new(last.ByInstance,last.ReadAt,true):null;
+
     public static bool Matches(DutyProgressFilter filter,DutyStatus? status)=>filter switch
     {
         DutyProgressFilter.NotCompleted=>status is not DutyStatus.Completed,

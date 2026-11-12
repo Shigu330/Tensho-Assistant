@@ -15,12 +15,17 @@ internal sealed partial class MainWindow
 
     private void DrawCharacterStatuses()
     {
-        if(CharacterStatusSource is not { } source)return;
-        var all=source.All;
+        // X-119 (0.1151): in the desktop application (no watcher: no game), the characters read from its copy (MainWindow.DesktopData.cs), by name,
+        // none logged in, without the erase button (erasing stays in the game).
+        var source=CharacterStatusSource;
+        IReadOnlyList<CharacterStatus> all;
+        if(source is not null)all=source.All;
+        else if(Volatile.Read(ref desktopCharacters) is { } copy)all=[.. copy.OrderBy(status=>status.Name)];
+        else return;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.Title",all.Count)+"###CharacterStatuses",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
         if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
-        var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source.Current;
+        var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source?.Current ?? 0;
         var lastWeekly=ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour);
         if(!ImGui.BeginTable("CharacterStatuses",8,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollX,
                new Vector2(0,Math.Min(260,(all.Count+1)*ImGui.GetFrameHeightWithSpacing()+8))))return;
@@ -37,7 +42,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var name=status.Name.Length>0 ? status.Name:localization.Get("CharacterStatus.Unnamed");
                     if(status.ContentId==current)ImGui.TextColored(Accent,name);else ImGui.TextUnformatted(name);
-                    if(status.ContentId!=current)
+                    if(source is not null && status.ContentId!=current)
                     {
                         ImGui.SameLine();
                         if(characterErasePending==status.ContentId)

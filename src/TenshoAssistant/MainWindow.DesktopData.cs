@@ -32,6 +32,12 @@ internal sealed partial class MainWindow
                 BeastTeamsFile=()=>teams;
                 beastPlans=null;beastPlansLoaded=false;
                 break;
+            case "characters":
+                UseDesktopCharacters(folder,warn);
+                break;
+            case "duties":
+                UseDesktopDuties(folder,warn);
+                break;
             case "data":
                 UseDesktopPlayerData(folder,warn);
                 UseDesktopVoyages(folder,warn);
@@ -88,6 +94,43 @@ internal sealed partial class MainWindow
             }
             catch(Exception error){warn(error,"The achievement progress could not be read from the copy of the Tensho data file.");return;}
             if(Volatile.Read(ref desktopAchievementsGeneration)==generation)Volatile.Write(ref desktopAchievements,seen);
+        });
+    }
+
+    // X-119 (0.1151): the player's characters (Reminders › Characters) from the copy of Characters/ (one file per character, as the plugin wrote
+    // them), read off the frame; a file that does not read is left out and said (the plugin keeps it); a newer reading replaces an older one,
+    // never the reverse. Erasing a character stays in the game (the application's copy is not the plugin's file).
+    private IReadOnlyList<Character.CharacterStatus>? desktopCharacters;
+    private int desktopCharactersGeneration;
+    private void UseDesktopCharacters(string folder,Action<Exception,string> warn)
+    {
+        var generation=Interlocked.Increment(ref desktopCharactersGeneration);
+        var characters=Path.Combine(folder,"Characters");
+        _=Task.Run(()=>
+        {
+            IReadOnlyList<Character.CharacterStatus> read;
+            try{read=[.. Character.CharacterStatuses.ReadAll(characters,(_,error)=>warn(error,"A character file of the copy could not be read; it is left out."))];}
+            catch(Exception error){warn(error,"The characters could not be read from the copy.");return;}
+            if(Volatile.Read(ref desktopCharactersGeneration)==generation)Volatile.Write(ref desktopCharacters,read);
+        });
+    }
+
+    // X-119 (0.1151): the duty progress (Duties, Deep dungeons) from the copy of DutyProgress.json: the state saved for the last character, as the
+    // game shows it logged out (DutyProgress.LastShown), read off the frame; a newer reading replaces an older one. A file that does not read:
+    // unknown, as before.
+    private Duties.DutyProgressState? desktopDuties;
+    private int desktopDutiesGeneration;
+    private void UseDesktopDuties(string folder,Action<Exception,string> warn)
+    {
+        var generation=Interlocked.Increment(ref desktopDutiesGeneration);
+        var file=Path.Combine(folder,"DutyProgress.json");
+        DutyProgressSource=()=>Volatile.Read(ref desktopDuties);
+        _=Task.Run(()=>
+        {
+            Duties.DutyProgressState? state=null;
+            try{if(File.Exists(file))state=Duties.DutyProgress.LastShown(File.ReadAllText(file));}
+            catch(Exception error){warn(error,"The duty progress could not be read from the copy.");}
+            if(Volatile.Read(ref desktopDutiesGeneration)==generation)Volatile.Write(ref desktopDuties,state);
         });
     }
 
