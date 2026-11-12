@@ -68,7 +68,7 @@ The tests read files by relative path (`src/TenshoAssistant/...`): run them from
   sources use `Community/BoundedHttp.cs`; the Universalis clients (`Market/MarketService.cs`, `Market/MarketBoardService.cs`) have their
   own `HttpClient` with a timeout and a response size limit, and the Teamcraft client (`Community/FishBiteTimes.cs`) also goes through
   `BoundedHttp.SendAsync` (POST, read within 1 MiB). Requests start from a player action or a page that needs the data, never in a loop after a
-  failure. Each source has its switch in Settings › Advanced, and « Game data and what you observed only » turns them all off at once.
+  failure. Each source has its switch in Settings › Data and sources, and « Game data and what you observed only » turns them all off at once.
   The shared discoveries exchange (`Discoveries/GitHubExchange.cs`) sends something only after the player connects GitHub.
 - Every subscription, task, or window has an owner and cleanup (proper plugin shutdown/unsubscription).
 - Interface: text belongs in `src/TenshoAssistant/Localization/Languages/*.json` (English is the reference, French must be complete); no hardcoded text.
@@ -287,7 +287,7 @@ Les tests lisent des fichiers par chemin relatif (`src/TenshoAssistant/...`) : l
   `Market/MarketBoardService.cs`) ont leur propre `HttpClient` avec un délai et une limite de taille de réponse, et le client Teamcraft
   (`Community/FishBiteTimes.cs`) passe aussi par `BoundedHttp.SendAsync` (POST, lu dans 1 Mio). Les requêtes partent d'une action du
   joueur ou d'une page qui a besoin des données, jamais en boucle après un échec. Chaque source a son interrupteur dans
-  Paramètres › Avancé, et « Données du jeu et observées seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
+  Paramètres › Données et sources, et « Données du jeu et observées seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
   (`Discoveries/GitHubExchange.cs`) n'envoie quelque chose qu'après la connexion du joueur à GitHub.
 - Chaque abonnement, tâche ou fenêtre a un propriétaire et un nettoyage (arrêt et désabonnement propres du plugin).
 - Interface : le texte va dans `src/TenshoAssistant/Localization/Languages/*.json` (l'anglais est la référence, le français doit être

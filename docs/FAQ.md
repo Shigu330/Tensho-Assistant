@@ -26,11 +26,11 @@ Settings › General › Language. English and French are complete; in another l
 
 ## What goes on the Internet?
 
-Prices, loot, wiki pages and community data are asked of those community sites, with the item or page you are looking at. Each source can be turned off in Settings › Advanced. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
+Prices, loot, wiki pages and community data are asked of those community sites, with the item or page you are looking at. Each source can be turned off in Settings › Data and sources. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
 
 ## Can I turn off the community data?
 
-Yes: Settings › Advanced › « Game data and what you observed only » turns off every community source at once (prices, loot, wiki…); each one can also be turned off on its own there. The discoveries exchange is off unless you turn it on, and the community guides are only read on your click.
+Yes: Settings › Data and sources › « Game data and what you observed only » turns off every community source at once (prices, loot, wiki…); each one can also be turned off on its own there. The discoveries exchange is off unless you turn it on, and the community guides are only read on your click.
 
 ## What does Tensho keep on my PC?
 
@@ -112,11 +112,11 @@ Paramètres › Général › Langue. L'anglais et le français sont complets ; 
 
 ## Qu'est-ce qui part sur Internet ?
 
-Les prix, le butin, les pages du wiki et les données communautaires sont demandés à ces sites, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Avancé. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
+Les prix, le butin, les pages du wiki et les données communautaires sont demandés à ces sites, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Données et sources. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
 
 ## Puis-je couper les données communautaires ?
 
-Oui : Paramètres › Avancé › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
+Oui : Paramètres › Données et sources › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
 
 ## Que garde Tensho sur mon PC ?
 

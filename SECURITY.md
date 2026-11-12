@@ -54,7 +54,7 @@ What the plugin does that matters for security (read against the code of the `De
   All are GET requests except Teamcraft's query, the GitHub sign-in and uploads of the exchange, and the Discord webhook. Requests carry
   item, world, spot or page identifiers only; no player data, no telemetry (the exchange and Discord are the player's choice, below).
   LuminaSupplemental, GatherBuddy, Teamcraft, the Fashion Report data (FFXIVGachaSpreadsheet), Universalis, Garland Tools and the wiki
-  can each be turned off (Settings › Advanced); a switch stops every request to its source, requests already queued included. PaissaDB
+  can each be turned off (Settings › Data and sources); a switch stops every request to its source, requests already queued included. PaissaDB
   has its own switch there too, and « Game data and what you observed only » turns these eight sources off at once (each one's choice
   comes back when it is unticked). Copies already kept stay visible for Universalis (Market page), Garland duty and monster loot, wiki
   monsters and the sightseeing log, and a recent Fashion Report copy; Garland item sources, wiki item acquisition, Teamcraft,
@@ -229,7 +229,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   Toutes sont des requêtes GET, sauf celle de Teamcraft, la connexion et les envois de l'échange GitHub, et le webhook Discord. Les
   requêtes ne portent que des numéros d'objet, de monde, de lieu ou de page ; aucune donnée du joueur, aucune télémétrie (l'échange et
   Discord sont au choix du joueur, ci-dessous). LuminaSupplemental, GatherBuddy, Teamcraft, les données de la Revue de mode
-  (FFXIVGachaSpreadsheet), Universalis, Garland Tools et le wiki se coupent chacun (Paramètres › Avancé) ; un interrupteur arrête toute
+  (FFXIVGachaSpreadsheet), Universalis, Garland Tools et le wiki se coupent chacun (Paramètres › Données et sources) ; un interrupteur arrête toute
   requête vers sa source, y compris celles déjà en file. PaissaDB y a aussi son interrupteur, et « Données du jeu et observées
   seulement » coupe ces huit sources d'un coup (le choix de chacune revient quand la case est décochée). Les copies déjà gardées restent
   visibles pour Universalis (page Marché), le butin des contenus et des monstres de Garland, les monstres du wiki et le carnet
