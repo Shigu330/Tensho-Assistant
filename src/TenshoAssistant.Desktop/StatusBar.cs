@@ -39,11 +39,19 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     {
         if(Data is not { } data)return;
         foreach(var category in TenshoAssistant.Link.LocalLinkProtocol.DesktopCategories)Apply(category,Copy(data,category));
+        discoveriesNext=DateTime.UtcNow+DesktopMirror.DiscoveriesEvery;
     }
 
     // X-119 with X-173 (0.1147): the player's data file is copied by SQLite's backup (the plugin's own code), the other categories file by file.
+    // X-119 (0.1152): the discoveries' database by SQLite's backup too, that file only.
     private (int Copied,IReadOnlyList<string> Problems) Copy((string Source,string Mirror) data,string category)
-        => category==TenshoAssistant.Link.LocalLinkProtocol.DataCategory ? host.CopyData(data.Source,data.Mirror) : DesktopMirror.Copy(data.Source,data.Mirror,category);
+        => category==TenshoAssistant.Link.LocalLinkProtocol.DataCategory ? host.CopyData(data.Source,data.Mirror)
+            : category==TenshoAssistant.Link.LocalLinkProtocol.DiscoveriesCategory ? host.CopyDiscoveries(data.Source,data.Mirror)
+            : DesktopMirror.Copy(data.Source,data.Mirror,category);
+
+    // X-119 (0.1152): when the discoveries may be copied again, and whether a notice waits for that turn (DesktopMirror.Due).
+    private DateTime discoveriesNext;
+    private bool discoveriesWaiting;
 
     private void Apply(string category,(int Copied,IReadOnlyList<string> Problems) copy)
     {
@@ -66,7 +74,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         // stores are built again here, between frames.
         if(Data is { } data)
         {
-            foreach(var category in categories.Where(TenshoAssistant.Link.LocalLinkProtocol.DesktopCategories.Contains))
+            foreach(var category in DesktopMirror.Due(categories,DateTime.UtcNow,ref discoveriesNext,ref discoveriesWaiting))
             {
                 if(!copies.TryGetValue(category,out var grouped))copies[category]=grouped=new(()=>Copy(data,category));
                 grouped.Request();

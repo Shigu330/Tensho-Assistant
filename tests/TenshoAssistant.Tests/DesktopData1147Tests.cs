@@ -109,7 +109,7 @@ internal static class DesktopData1147Tests
                 && LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"Discoveries","Discoveries.db-shm")) is null,"a reader's shared-memory index is no change (the app's copy would wake itself)");
             Check(LocalLinkProtocol.DesktopCategories.Contains(LocalLinkProtocol.DataCategory) && LocalLinkProtocol.ValidCategory("data"),"a category of the closed list, read by the app");
             var bar=Read("src/TenshoAssistant.Desktop/StatusBar.cs");
-            Check(bar.Contains("category==TenshoAssistant.Link.LocalLinkProtocol.DataCategory ? host.CopyData(data.Source,data.Mirror) : DesktopMirror.Copy(data.Source,data.Mirror,category)")
+            Check(bar.Contains("category==TenshoAssistant.Link.LocalLinkProtocol.DataCategory ? host.CopyData(data.Source,data.Mirror)") && bar.Contains(": DesktopMirror.Copy(data.Source,data.Mirror,category);")
                 && bar.Contains("Apply(category,Copy(data,category));") && bar.Contains("new(()=>Copy(data,category))"),"the app copies « data » by the backup, at start and on notice");
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
             Check(host.Contains("GetMethod(\"CopyForDesktop\",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)])"),"called by its name and signature");

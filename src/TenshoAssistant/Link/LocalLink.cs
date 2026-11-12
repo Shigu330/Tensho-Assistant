@@ -53,8 +53,11 @@ public static class LocalLinkProtocol
     /// <summary>X-119 with X-173 (0.1147): the category of the player's data file, copied by SQLite's backup (TenshoDataDatabase.CopyForDesktop).</summary>
     public const string DataCategory="data";
     /// <summary>X-119 step 2, part 2 (0.1131): the categories the desktop application copies from the plugin's folder and reads
-    /// (DesktopMirror, MainWindow.UseDesktopData); the others stay in the game for now. 0.1147: « data » too. 0.1151: « characters » and « duties ».</summary>
-    public static readonly IReadOnlyList<string> DesktopCategories=["bank","craft-lists","my-tools","voyages","beast-teams",DataCategory,"characters","duties"];
+    /// (DesktopMirror, MainWindow.UseDesktopData); the others stay in the game for now. 0.1147: « data » too. 0.1151: « characters » and « duties ». 0.1152: « discoveries »
+    /// (its database only, copied by SQLite's backup, TenshoDataDatabase.CopyDiscoveriesForDesktop).</summary>
+    public static readonly IReadOnlyList<string> DesktopCategories=["bank","craft-lists","my-tools","voyages","beast-teams",DataCategory,"characters","duties",DiscoveriesCategory];
+    /// <summary>X-119 (0.1152): the category of the discoveries (Discoveries/), whose database alone the desktop application copies, at most every 5 minutes.</summary>
+    public const string DiscoveriesCategory="discoveries";
     public const int MaxPlugin=32;
     public const int MaxZone=128;
     private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};

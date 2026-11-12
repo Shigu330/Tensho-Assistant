@@ -15,6 +15,21 @@ public static class DesktopMirror
     public const long MaxFile=64L<<20;
     public const int MaxFiles=2000;
 
+    /// <summary>X-119 (0.1152): the discoveries' database is large and saved every minute while playing: copied again at most this often.</summary>
+    public static readonly TimeSpan DiscoveriesEvery=TimeSpan.FromMinutes(5);
+
+    /// <summary>
+    /// X-119 (0.1152): the categories of a burst of notices to copy now (the application's, once each); the discoveries wait for their turn, a notice
+    /// in between is kept (waiting) and copied when the turn comes, never lost.
+    /// </summary>
+    public static List<string> Due(IEnumerable<string> asked,DateTime now,ref DateTime next,ref bool waiting)
+    {
+        var due=asked.Where(LocalLinkProtocol.DesktopCategories.Contains).Distinct().ToList();
+        if(due.Remove(LocalLinkProtocol.DiscoveriesCategory))waiting=true;
+        if(waiting && now>=next){waiting=false;next=now+DiscoveriesEvery;due.Add(LocalLinkProtocol.DiscoveriesCategory);}
+        return due;
+    }
+
     /// <summary>The stems (file or folder names) of a category, from the link's closed list.</summary>
     public static IReadOnlyList<string> Stems(string category)
         => [.. LocalLinkProtocol.Categories.Where(pair=>string.Equals(pair.Value,category,StringComparison.Ordinal)).Select(pair=>pair.Key)];

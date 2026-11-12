@@ -38,6 +38,9 @@ internal sealed partial class MainWindow
             case "duties":
                 UseDesktopDuties(folder,warn);
                 break;
+            case "discoveries":
+                UseDesktopDiscoveries(folder,warn);
+                break;
             case "data":
                 UseDesktopPlayerData(folder,warn);
                 UseDesktopVoyages(folder,warn);
@@ -131,6 +134,31 @@ internal sealed partial class MainWindow
             try{if(File.Exists(file))state=Duties.DutyProgress.LastShown(File.ReadAllText(file));}
             catch(Exception error){warn(error,"The duty progress could not be read from the copy.");}
             if(Volatile.Read(ref desktopDutiesGeneration)==generation)Volatile.Write(ref desktopDuties,state);
+        });
+    }
+
+    // X-119 (0.1152): the discoveries (the Discoveries page, an item's sources) from the application's copy of Discoveries.db (SQLite's backup of the
+    // plugin's file, never the folder's other files), read off the frame into a new store, then shown; a newer reading replaces an older one. Never
+    // written: the copy is not the plugin's base (DiscoveriesWriteBlocked; no GitHub exchange in the application). No copy: « loading », as before.
+    private int desktopDiscoveriesGeneration;
+    private void UseDesktopDiscoveries(string folder,Action<Exception,string> warn)
+    {
+        var generation=Interlocked.Increment(ref desktopDiscoveriesGeneration);
+        var discoveries=Path.Combine(folder,"Discoveries");var file=Path.Combine(discoveries,Discoveries.DiscoveryDatabase.FileName);
+        DiscoveriesWriteBlocked=true;
+        if(!File.Exists(file))return;
+        _=Task.Run(()=>
+        {
+            var store=new Discoveries.DiscoveryStore();
+            try
+            {
+                var database=new Discoveries.DiscoveryDatabase(file);
+                store.Load(database.ReadMine((_,error)=>warn(error,"A discovery row of the copy could not be read; it is left out.")));
+                store.UseSharedSource(kind=>database.ReadShared(kind,(_,error)=>warn(error,"A discovery row of the copy could not be read; it is left out.")),database.SharedKinds());
+            }
+            catch(Exception error){warn(error,"The discoveries could not be read from the copy.");return;}
+            if(Volatile.Read(ref desktopDiscoveriesGeneration)!=generation)return;
+            DiscoveryFolder=discoveries;DiscoveryStore=store;DiscoveriesLoaded=true;
         });
     }
 

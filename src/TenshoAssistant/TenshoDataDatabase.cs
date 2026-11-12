@@ -109,11 +109,23 @@ public sealed class TenshoDataDatabase
     /// the old copy or the new one. No file in the plugin's folder: the copy goes too. Called by the application by its name (Host.CopyData,
     /// DesktopData1147Tests); the number of files copied (0 or 1) and the problems met (English, for the log).
     /// </summary>
-    public static (int Copied,IReadOnlyList<string> Problems) CopyForDesktop(string source,string target)
+    public static (int Copied,IReadOnlyList<string> Problems) CopyForDesktop(string source,string target)=>CopyDatabase(source,target,FileName,MaxDesktopCopy);
+
+    /// <summary>X-119 (0.1152): the largest discoveries database the desktop application copies.</summary>
+    public const long MaxDiscoveriesCopy=512L<<20;
+
+    /// <summary>
+    /// X-119 (0.1152): the discoveries database (Discoveries/Discoveries.db) copied for the desktop application the same way: that one file only,
+    /// never the folder's other files (the GitHub exchange's sign-in, imports, exports). Called by the application by its name (Host.CopyDiscoveries).
+    /// </summary>
+    public static (int Copied,IReadOnlyList<string> Problems) CopyDiscoveriesForDesktop(string source,string target)
+        =>CopyDatabase(source,target,Discoveries.DiscoveryDatabase.FileName,MaxDiscoveriesCopy);
+
+    private static (int Copied,IReadOnlyList<string> Problems) CopyDatabase(string source,string target,string name,long max)
     {
         var problems=new List<string>();
         var from=System.IO.Path.GetFullPath(source);var to=System.IO.Path.GetFullPath(target);
-        if(string.Equals(from,to,StringComparison.OrdinalIgnoreCase))return (0,[$"{FileName}: the copy and the plugin's file are the same, nothing copied"]);
+        if(string.Equals(from,to,StringComparison.OrdinalIgnoreCase))return (0,[$"{name}: the copy and the plugin's file are the same, nothing copied"]);
         try
         {
             if(!File.Exists(from))
@@ -121,7 +133,7 @@ public sealed class TenshoDataDatabase
                 foreach(var path in new[]{to,to+"-wal",to+"-shm"})if(File.Exists(path))File.Delete(path);
                 return (0,problems);
             }
-            if(new FileInfo(from).Length>MaxDesktopCopy)return (0,[$"{FileName}: larger than {MaxDesktopCopy>>20} MB, not copied"]);
+            if(new FileInfo(from).Length>max)return (0,[$"{name}: larger than {max>>20} MB, not copied"]);
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(to)!);
             try{Backup(from,to);}
             // The application's own copy damaged (not a database, corrupt): it is only a copy, made again from scratch once.
@@ -132,8 +144,8 @@ public sealed class TenshoDataDatabase
             }
             return (1,problems);
         }
-        catch(SqliteException error){problems.Add($"{FileName}: not copied (SQLite error {error.SqliteErrorCode})");}
-        catch(Exception error) when(error is IOException or UnauthorizedAccessException){problems.Add($"{FileName}: not copied ({error.GetType().Name})");}
+        catch(SqliteException error){problems.Add($"{name}: not copied (SQLite error {error.SqliteErrorCode})");}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){problems.Add($"{name}: not copied ({error.GetType().Name})");}
         return (0,problems);
     }
 

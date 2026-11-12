@@ -134,6 +134,24 @@ internal sealed class Host
     }
     private MethodInfo? copyData;
 
+    /// <summary>
+    /// X-119 (0.1152): the discoveries' database (Discoveries/Discoveries.db, that file only) copied into the mirror by the plugin's own
+    /// TenshoDataDatabase.CopyDiscoveriesForDesktop (SQLite's backup, the plugin's file read-only; called by its name). Any thread.
+    /// </summary>
+    public (int Copied,IReadOnlyList<string> Problems) CopyDiscoveries(string source,string mirror)
+    {
+        copyDiscoveries??=Plugin.GetType("TenshoAssistant.TenshoDataDatabase")?.GetMethod("CopyDiscoveriesForDesktop",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)]);
+        if(copyDiscoveries is null)return (0,["Discoveries.db: the plugin has no CopyDiscoveriesForDesktop (another version?)"]);
+        try
+        {
+            if(copyDiscoveries.Invoke(null,[Path.Combine(source,"Discoveries","Discoveries.db"),Path.Combine(mirror,"Discoveries","Discoveries.db")]) is System.Runtime.CompilerServices.ITuple { Length:2 } result)
+                return ((int)result[0]!,(IReadOnlyList<string>)result[1]!);
+            return (0,["Discoveries.db: no answer from CopyDiscoveriesForDesktop"]);
+        }
+        catch(TargetInvocationException error){return (0,[$"Discoveries.db: not copied ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})"]);}
+    }
+    private MethodInfo? copyDiscoveries;
+
     /// <summary>X-163 (0.1132): the alarms to ring now, from the plugin's MainWindow.DesktopDueAlarms (called by its name); none when it is missing.</summary>
     public (string[] Lines,bool Sound) DueAlarms(DateTimeOffset now,bool gameInFront)
     {

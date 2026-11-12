@@ -97,7 +97,8 @@ What the plugin does that matters for security (read against the code of the `De
   `discoveries`, `data`), never a file name, a file's content, a character's name or id. The desktop application connects to it as the same
   user only and reads the plugin's settings file itself, read-only, bounded, without the Discord addresses and with a closed list of types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
   It copies the saved data it shows into its own folder (%LOCALAPPDATA%\TenshoAssistant\Desktop\mirror), the plugin's folder only read;
-  the player's data file `TenshoData.db` by SQLite's backup, opened read-only (0.1147).
+  the player's data file `TenshoData.db` by SQLite's backup, opened read-only (0.1147); the discoveries database `Discoveries/Discoveries.db` the
+  same way, that file only (never the folder's GitHub sign-in, imports or exports), at most every 5 minutes, and never written back (0.1152).
 - **Links opened in the browser**: item pages on Universalis, Garland Tools, Teamcraft, the FFXIV Console Games Wiki or the Lodestone,
   a Teamcraft list import link (built locally), the Partake events page, the prefilled GitHub form of « report a problem », help
   videos (YouTube, or this repository), a link of a « My tools » tool, and GitHub's sign-in page of the discoveries exchange. They open in
@@ -273,7 +274,9 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   d'un fichier, le nom ou l'identifiant d'un personnage. L'application de bureau s'y connecte sous le même utilisateur seulement et
   lit elle-même le fichier de réglages du plugin, en lecture seule, borné, sans les adresses Discord et avec une liste fermée de types (`src/TenshoAssistant/Link/LocalLink.cs`, `docs/evidence/x119-desktop-link.md`).
   Elle copie les données enregistrées qu'elle montre dans son propre dossier (%LOCALAPPDATA%\TenshoAssistant\Desktop\mirror), le dossier
-  du plugin seulement lu ; le fichier de données du joueur `TenshoData.db` par la sauvegarde de SQLite, ouvert en lecture seule (0.1147).
+  du plugin seulement lu ; le fichier de données du joueur `TenshoData.db` par la sauvegarde de SQLite, ouvert en lecture seule (0.1147) ; la base
+  des découvertes `Discoveries/Discoveries.db` de la même façon, ce fichier seulement (jamais la connexion GitHub, les imports ni les exports du
+  dossier), au plus toutes les 5 minutes, et jamais réécrite (0.1152).
 - **Liens ouverts dans le navigateur** : pages d'objet sur Universalis, Garland Tools, Teamcraft, le FFXIV Console Games Wiki ou le
   Lodestone, un lien d'import de liste Teamcraft (construit sur place), la page d'événements de Partake, le formulaire GitHub prérempli
   de « Signaler un problème », les vidéos d'aide (YouTube, ou ce dépôt), un lien d'un outil de « Mes outils », et la page de connexion
