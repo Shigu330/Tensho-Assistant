@@ -5,6 +5,12 @@ namespace TenshoAssistant.Monsters;
 /// <summary>0.795 (X-34, X-35): what a nearby monster means for the player; information only, from the game's data and the player's lists.</summary>
 public static class NearbyMonsters
 {
+    /// <summary>
+    /// X-160 (0.1268): the side of a living combatant in a running FATE, from the game's own « hostile » flag: an enemy of the FATE, or an
+    /// ally fighting beside the players (an escort, the guards of a defence). Outside a FATE: no side.
+    /// </summary>
+    public static FateSide SideOf(uint fateId,bool hostile)=>fateId==0 ? FateSide.None:hostile ? FateSide.Enemy:FateSide.Ally;
+
     /// <summary>The items this monster drops that the tracking lists still need, each once, in the order of its drops.</summary>
     public static IReadOnlyList<uint> ListDrops(uint nameId,Func<uint,IReadOnlyList<uint>> drops,IReadOnlySet<uint> needed)
         =>needed.Count==0 ? []:drops(nameId).Where(needed.Contains).Distinct().ToArray();
@@ -26,6 +32,9 @@ public static class NearbyMonsters
         return result.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<string>)pair.Value);
     }
 }
+
+/// <summary>X-160 (0.1268): whether a combatant of a FATE fights against the players or beside them.</summary>
+public enum FateSide { None, Enemy, Ally }
 
 /// <summary>X-76 (0.956): the collection entries still missing that a nearby monster's drop can unlock, built once per published collections state.</summary>
 public sealed record NearbyMissingCollections(IReadOnlySet<uint> Mounts,IReadOnlySet<uint> Minions,IReadOnlySet<uint> Rolls)

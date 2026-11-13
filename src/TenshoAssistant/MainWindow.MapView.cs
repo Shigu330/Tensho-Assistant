@@ -182,7 +182,7 @@ internal sealed partial class MainWindow
     {
         MonsterNoteKind.List=>settings.ShowListMonsters,
         MonsterNoteKind.HuntLog=>settings.ShowHuntLogMonsters,
-        MonsterNoteKind.Fate=>settings.ShowFateMonsters,
+        MonsterNoteKind.Fate or MonsterNoteKind.FateAlly=>settings.ShowFateMonsters,
         MonsterNoteKind.BlueSpell=>settings.ShowBlueMageMonsters,
         MonsterNoteKind.Collection=>settings.ShowCollectionMonsters,
         MonsterNoteKind.Beast=>settings.ShowBeastMonsters,
@@ -1577,9 +1577,15 @@ internal sealed partial class MainWindow
                     if(first is null)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
                     var glyph=Math.Max(4,baseIcon*0.6f*monsterSize);
-                    var (symbol,colour)=MonsterGlyph(first.Kind);
-                    draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
-                    draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
+                    // X-160 (0.1268): a FATE's enemy carries the game's icon of its FATE; the glyph while the texture is not there.
+                    if(first.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(first.Icon),out var fateShared) && fateShared.TryGetWrap(out var fateIcon,out _) && fateIcon is not null)
+                        draw.AddImage(fateIcon.Handle,at-new Vector2(glyph*0.7f),at+new Vector2(glyph*0.7f));
+                    else
+                    {
+                        var (symbol,colour)=MonsterGlyph(first.Kind);
+                        draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
+                        draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
+                    }
                     if(hovered && Vector2.Distance(io.MousePos,at)<=glyph)
                     {
                         tooltip=localization.Format("MapView.MonsterLabel",monster.Name,monster.Level)+"\n"+string.Join("\n",notes.Where(note=>MonsterNoteShown(note,settings)).Select(note=>note.Text));

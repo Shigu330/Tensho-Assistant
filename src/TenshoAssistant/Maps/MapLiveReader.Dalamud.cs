@@ -24,7 +24,8 @@ public sealed record MapObjectMarker(MapObjectKind Kind,string Name,Vector3 Posi
 /// <summary>0.813 (X-49): one point of an accepted quest as the game's own Map holds it (MarkerInfo.ObjectiveId, MapMarkerData map and place).</summary>
 public sealed record MapQuestPoint(uint Quest,uint MapId,float X,float Z);
 /// <summary>0.795 (X-34): a living enemy the game streams around the player: its name row, base row, name, place and level. Information only.</summary>
-public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0,float Height=0);
+// X-160 (0.1268): Hostile is the game's own flag (Dalamud StatusFlags.Hostile): false for the allied combatants of a FATE.
+public sealed record MapMonster(uint NameId,uint BaseId,string Name,Vector3 Position,int Level,uint FateId=0,uint EventId=0,float Height=0,bool Hostile=true);
 
 // FATE running in the current zone (IFateTable): FATEs have no static map position in the game data (0.114 probe), only live ones.
 public sealed record MapFateMarker(uint Id,string Name,int Level,uint Icon,Vector3 Position,float Radius,int Progress,long SecondsLeft,string State,bool HasBonus=false);
@@ -281,7 +282,8 @@ internal sealed class MapLiveReader : IDisposable
             var native=(FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)npc.Address;
             // 0.799 (X-38): its height, for an icon above its head (a field, no game function called).
             var height=native==null || !float.IsFinite(native->Height) ? 0:Math.Clamp(native->Height,0,50);
-            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level,native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id,height));
+            var hostile=(npc.StatusFlags & Dalamud.Game.ClientState.Objects.Enums.StatusFlags.Hostile)!=0;
+            result.Add(new(npc.NameId,npc.BaseId,npc.Name.TextValue,npc.Position,npc.Level,native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id,height,hostile));
         }
         return result.AsReadOnly();
     }

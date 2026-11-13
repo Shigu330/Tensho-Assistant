@@ -30,7 +30,10 @@ internal sealed partial class MainWindow
             foreach(var note in notes)if(MonsterIconAbove(note.Kind,settings)){first=note;break;}
             if(first is null || !gameGui.WorldToScreen(monster.Position+new Vector3(0,monster.Height+0.6f,0),out var screen))continue;
             var corner=screen-new Vector2(size/2,size);
-            if(first.Kind is MonsterNoteKind.BlueSpell or MonsterNoteKind.Beast && textures.TryGetFromGameIcon(new GameIconLookup(first.Kind==MonsterNoteKind.Beast ? BeastmasterIcon:BlueMageIcon),out var shared) && shared.TryGetWrap(out var icon,out _) && icon is not null)
+            // X-160 (0.1268): a FATE's enemy carries the game's icon of its FATE.
+            if(first.Icon!=0 && textures.TryGetFromGameIcon(new GameIconLookup(first.Icon),out var fateShared) && fateShared.TryGetWrap(out var fateIcon,out _) && fateIcon is not null)
+                draw.AddImage(fateIcon.Handle,corner,corner+new Vector2(size));
+            else if(first.Kind is MonsterNoteKind.BlueSpell or MonsterNoteKind.Beast && textures.TryGetFromGameIcon(new GameIconLookup(first.Kind==MonsterNoteKind.Beast ? BeastmasterIcon:BlueMageIcon),out var shared) && shared.TryGetWrap(out var icon,out _) && icon is not null)
                 draw.AddImage(icon.Handle,corner,corner+new Vector2(size));
             else
             {
@@ -48,7 +51,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.BlueSpell=>settings.AboveBlueSpell,
         MonsterNoteKind.List=>settings.AboveList,
         MonsterNoteKind.HuntLog=>settings.AboveHuntLog,
-        MonsterNoteKind.Fate=>settings.AboveFate,
+        MonsterNoteKind.Fate or MonsterNoteKind.FateAlly=>settings.AboveFate,
         MonsterNoteKind.Collection=>settings.AboveCollection,
         MonsterNoteKind.Beast=>settings.AboveBeast,
         MonsterNoteKind.Relic=>settings.AboveRelic,
@@ -64,6 +67,7 @@ internal sealed partial class MainWindow
         MonsterNoteKind.Beast=>(FontAwesomeIcon.Dragon,new Vector4(0.45f,0.85f,0.55f,1)),
         MonsterNoteKind.Relic=>(FontAwesomeIcon.ShieldAlt,new Vector4(0.95f,0.75f,0.30f,1)),
         MonsterNoteKind.Wish=>(FontAwesomeIcon.Heart,new Vector4(0.95f,0.40f,0.55f,1)),
+        MonsterNoteKind.FateAlly=>(FontAwesomeIcon.HandsHelping,new Vector4(0.45f,0.85f,0.55f,1)),
         _=>(FontAwesomeIcon.Paw,new Vector4(0.98f,0.55f,0.35f,1)),
     };
 }

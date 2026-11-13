@@ -6,8 +6,9 @@ using TenshoAssistant.Monsters;
 namespace TenshoAssistant;
 
 /// <summary>0.796: why a nearby monster is shown; the first note picks its map icon.</summary>
-internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection, Beast, Relic, Wish }
-internal sealed record MonsterNote(MonsterNoteKind Kind,string Text);
+internal enum MonsterNoteKind { List, HuntLog, Fate, BlueSpell, Collection, Beast, Relic, Wish, FateAlly }
+// Icon (X-160, 0.1268): the game's own icon of the FATE, for a FATE's enemy; 0 = the kind's glyph.
+internal sealed record MonsterNote(MonsterNoteKind Kind,string Text,uint Icon=0);
 
 // 0.795 (X-34, X-35), 0.796 (X-36), user requests: what each nearby monster means for the player, worked out once a second, drawn every frame.
 internal sealed partial class MainWindow
@@ -208,7 +209,13 @@ internal sealed partial class MainWindow
     {
         var byName=nearbyMonsterNotes.TryGetValue(monster.NameId,out var notes) ? notes:[];
         if(monster.FateId==0 || !configuration.MapView.ShowFateMonsters)return byName;
-        var fate=fates?.FirstOrDefault(running=>running.Id==monster.FateId)?.Name;
-        return [new MonsterNote(MonsterNoteKind.Fate,localization.Format("MapView.MonsterFate",fate ?? monster.FateId.ToString())),..byName];
+        var fate=fates?.FirstOrDefault(running=>running.Id==monster.FateId);
+        // X-160 (0.1268): an enemy of the FATE carries the FATE's own game icon (its type), an ally fighting beside the players its own mark.
+        if(NearbyMonsters.SideOf(monster.FateId,monster.Hostile)==FateSide.Ally)
+        {
+            if(developerMode)NearbyMonstersLog($"FATE {monster.FateId}: {monster.Name} is not hostile, shown as an ally.");
+            return [new MonsterNote(MonsterNoteKind.FateAlly,localization.Format("MapView.MonsterFateAlly",fate?.Name ?? monster.FateId.ToString())),..byName];
+        }
+        return [new MonsterNote(MonsterNoteKind.Fate,localization.Format("MapView.MonsterFate",fate?.Name ?? monster.FateId.ToString()),fate?.Icon ?? 0),..byName];
     }
 }

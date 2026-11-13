@@ -10,7 +10,7 @@ internal static class FateMonsters797Tests
             Check(Read("Maps/MapLiveReader.Dalamud.cs").Contains("native==null ? 0u:native->FateId,native==null ? 0u:native->EventId.Id"),"read");
             var notes=Read("MainWindow.NearbyMonsters.cs");
             Check(notes.Contains("if(monster.FateId==0 || !configuration.MapView.ShowFateMonsters)return byName;"),"per monster, setting");
-            Check(Read("MainWindow.MapView.cs").Contains("MonsterNoteKind.Fate=>settings.ShowFateMonsters,"),"map filter");
+            Check(Read("MainWindow.MapView.cs").Contains("MonsterNoteKind.Fate or MonsterNoteKind.FateAlly=>settings.ShowFateMonsters,"),"map filter");
         }),
         ("Leve targets: captured in developer mode before anything is told",() =>
         {
