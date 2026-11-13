@@ -38,8 +38,9 @@ internal static class DesktopInstall1117Tests
         using(var archive=new ZipArchive(memory,ZipArchiveMode.Create,leaveOpen:true))
         {
             using(var exe=new StreamWriter(archive.CreateEntry(DesktopUpdate.ExeName).Open()))exe.Write("exe");
-            archive.CreateEntryFromFile(assembly,"TenshoAssistant.Desktop.dll");
-            archive.CreateEntryFromFile(assembly,"plugin/TenshoAssistant.dll");
+            // 0.1202: stored, not compressed (the same real zip and files; packing two 7 MB DLLs at each install was most of the time).
+            archive.CreateEntryFromFile(assembly,"TenshoAssistant.Desktop.dll",CompressionLevel.NoCompression);
+            archive.CreateEntryFromFile(assembly,"plugin/TenshoAssistant.dll",CompressionLevel.NoCompression);
             extra?.Invoke(archive);
         }
         return (memory.ToArray(),version);

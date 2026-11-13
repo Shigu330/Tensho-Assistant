@@ -44,6 +44,29 @@ public static class AtomicFile
         }
     }
 
+    /// <summary>
+    /// 0.1202 (« Bank 1118 » failed in a full run: « Unable to remove the file to be replaced »): a saved file replaced by its new version, the
+    /// old one kept as « backup » (File.Replace), or moved in place when there is none yet; tried again a few times while another program
+    /// (a scanner) holds the file an instant. Tried again only while the new version is still there: a failed attempt changed nothing that
+    /// counts (or left the old file as the backup and no file in place, which the next attempt fills). « wait » is the test's clock.
+    /// </summary>
+    public static void ReplaceWhenFree(string from,string to,string? backup,int attempts=6,Action<int>? wait=null)
+    {
+        for(var attempt=1;;attempt++)
+        {
+            try
+            {
+                if(File.Exists(to))File.Replace(from,to,backup,ignoreMetadataErrors:true);
+                else File.Move(from,to);
+                return;
+            }
+            catch(Exception error) when(attempt<attempts && error is IOException or UnauthorizedAccessException && File.Exists(from))
+            {
+                if(wait is not null)wait(attempt);else Thread.Sleep(50*attempt);
+            }
+        }
+    }
+
     /// <summary>X-182 (0.1197): the same for a file to remove, and never an error: false when it is still there after the last attempt.</summary>
     public static bool DeleteWhenFree(string path,int attempts=6,Action<int>? wait=null)
     {

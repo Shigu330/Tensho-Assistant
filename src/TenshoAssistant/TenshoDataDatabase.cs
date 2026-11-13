@@ -169,14 +169,18 @@ public sealed class TenshoDataDatabase
         return (0,problems);
     }
 
+    /// <summary>0.1202: how long a copy waits for the other side (a save of the plugin, a read of the application's copy) before it gives
+    /// up and keeps the last whole copy: 5 s. DesktopData1147Tests shortens it to see the same refusal in a fraction of the time.</summary>
+    internal static int CopyBusyWait=5000;
+
     private static void Backup(string from,string to)
     {
         using var reader=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=from,Mode=SqliteOpenMode.ReadOnly,Pooling=false}.ToString());
         reader.Open();
-        Run(reader,"PRAGMA busy_timeout=5000;");
+        Run(reader,$"PRAGMA busy_timeout={CopyBusyWait};");
         using var writer=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=to,Mode=SqliteOpenMode.ReadWriteCreate,Pooling=false}.ToString());
         writer.Open();
-        Run(writer,"PRAGMA busy_timeout=5000;");
+        Run(writer,$"PRAGMA busy_timeout={CopyBusyWait};");
         reader.BackupDatabase(writer);
     }
 }

@@ -45,7 +45,8 @@ internal static class DesktopInstall1113Tests
         File.Copy(assembly,Path.Combine(folder,"TenshoAssistant.Desktop.dll"));
         File.Copy(assembly,Path.Combine(folder,"plugin","TenshoAssistant.dll"));
         var zip=Path.Combine(temp,"package.zip");
-        ZipFile.CreateFromDirectory(folder,zip);
+        // 0.1202: stored, not compressed (the same real zip and files, made in a fraction of the time).
+        ZipFile.CreateFromDirectory(folder,zip,CompressionLevel.NoCompression,includeBaseDirectory:false);
         return (File.ReadAllBytes(zip),version);
     }
 

@@ -31,6 +31,10 @@ public sealed class MarketService : IDisposable
     private int generation;
     private bool disposed;
     private long? lastRequest;
+    /// <summary>The pause between two Universalis requests: 3 s (their API's usual courtesy). 0.1202: one place for it, per service; a test may
+    /// shorten it to see the same waits in less time (VerifySpeed1202Tests checks the 3 s of every service the plugin makes).</summary>
+    public static readonly TimeSpan UsualRequestPause=TimeSpan.FromSeconds(3);
+    internal TimeSpan RequestPause{get;init;}=UsualRequestPause;
     private bool requestActive;
     private Purpose activePurpose;
     private MarketBackgroundState? backgroundState;
@@ -70,7 +74,7 @@ public sealed class MarketService : IDisposable
             {
                 if(disposed || state.WorldId==0 || expectedWorld!=state.WorldId || expectedOwner==0 || expectedOwner!=owner)return null;
                 if(serverPauseUntil is { } until && Stopwatch.GetTimestamp()<until && bulk)return "Universalis asked for a pause.";
-                var pause=bulk ? ListPause:TimeSpan.FromSeconds(3);
+                var pause=bulk ? ListPause:RequestPause;
                 var since=lastRequest is { } last ? Stopwatch.GetElapsedTime(last):pause;
                 wait=requestActive ? TimeSpan.FromMilliseconds(250):since<pause ? pause-since:TimeSpan.Zero;
                 if(wait==TimeSpan.Zero || !bulk)
@@ -248,13 +252,13 @@ public sealed class MarketService : IDisposable
                 else if (purpose == Purpose.Manual) state = state with { ItemId = itemId, Quote = quote, Loading = false, Error = null };
                 return new(MarketFetchStatus.Success,quote);
             }
-            if (lastRequest is { } last && Stopwatch.GetElapsedTime(last) < TimeSpan.FromSeconds(3))
+            if (lastRequest is { } last && Stopwatch.GetElapsedTime(last) < RequestPause)
             {
                 // 0.329: the 3 s pause is not a failure: the hover panel shows « pending » (the tracker asks again at its next slot, no
                 // error for 5 s) and a manual lookup keeps the quote already known, as a failed read does (0.281).
                 if (purpose == Purpose.Hover) backgroundState = null;
                 else if (purpose == Purpose.Manual) state = state with { ItemId = itemId, Quote = cache.GetValueOrDefault((world, itemId)), Loading = false, Error = "Wait a few seconds before a new request." };
-                return new(MarketFetchStatus.Cooldown,RetryAfter:TimeSpan.FromSeconds(3)-Stopwatch.GetElapsedTime(last));
+                return new(MarketFetchStatus.Cooldown,RetryAfter:RequestPause-Stopwatch.GetElapsedTime(last));
             }
             lastRequest = Stopwatch.GetTimestamp();
             request?.Dispose();

@@ -61,7 +61,10 @@ internal static class DesktopData1147Tests
                     reading.Open();
                     using var transaction=reading.BeginTransaction();
                     using(var command=reading.CreateCommand()){command.Transaction=transaction;command.CommandText="SELECT COUNT(*) FROM gil_entries;";command.ExecuteScalar();}
-                    copy=TenshoDataDatabase.CopyForDesktop(source,target);
+                    // 0.1202: the same wait and refusal in 0.3 s instead of the plugin's 5 s (the test took 5.8 s).
+                    var wait=TenshoDataDatabase.CopyBusyWait;TenshoDataDatabase.CopyBusyWait=300;
+                    try{copy=TenshoDataDatabase.CopyForDesktop(source,target);}
+                    finally{TenshoDataDatabase.CopyBusyWait=wait;}
                     transaction.Commit();
                 }
                 // A read of the copy under way: the backup waits, then gives up (SQLite busy) and the copy stays the last whole one; the next notice copies.

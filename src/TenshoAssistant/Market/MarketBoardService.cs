@@ -26,6 +26,8 @@ public sealed class MarketBoardService : IDisposable
     private DataCache? disk;
     private MarketBoardState state=new("",0,null,false,null);
     private long? lastRequest;
+    /// <summary>0.1202: the pause between two requests of this board, 3 s like the other Universalis requests (MarketService.UsualRequestPause).</summary>
+    internal TimeSpan RequestPause{get;init;}=MarketService.UsualRequestPause;
     private bool busy,disposed;
     private IReadOnlyDictionary<string,string>? regions;
     private bool regionsRequested;
@@ -115,7 +117,7 @@ public sealed class MarketBoardService : IDisposable
                 TimeSpan wait;
                 lock(gate)
                 {
-                    wait=lastRequest is { } last ? TimeSpan.FromSeconds(3)-Stopwatch.GetElapsedTime(last):TimeSpan.Zero;
+                    wait=lastRequest is { } last ? RequestPause-Stopwatch.GetElapsedTime(last):TimeSpan.Zero;
                     if(wait>TimeSpan.Zero && state.Scope==scope && state.ItemId==itemId)state=new(scope,itemId,known,true,null,true,known is not null);
                 }
                 if(wait>TimeSpan.Zero)await Task.Delay(wait,token).ConfigureAwait(false);

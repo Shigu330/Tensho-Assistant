@@ -49,8 +49,21 @@ internal static class ReleaseProof1145Tests
     private static void Stamp(string path,string version,string commit,bool clean)=>
         File.WriteAllText(path,$"{{\"Version\":\"{version}\",\"Fingerprint\":\"X\",\"Commit\":\"{commit}\",\"Clean\":{(clean?"true":"false")},\"VerifiedAt\":\"2026-11-12T08:00:00\"}}");
 
-    private static string Packages(string version,string commit,string stamp,string root)=>
-        PowerShell($"$r = Test-PackagesFromCommit {Quote(version)} {Quote(commit)} {Quote(stamp)} {Quote(root)}; Write-Output ('{{0}}|{{1}}' -f $r.Ok, $r.Reason)");
+    // 0.1202: every case in one Windows PowerShell (one start of about half a second instead of ten); each answer comes back whole
+    // (« Ok|Reason », its UTF-8 in base64 on its own line), in the order asked.
+    private static string[] Packages(string root,params (string Version,string Commit,string Stamp)[] cases)
+    {
+        var command=string.Join("; ",cases.Select(row=>$"$r = Test-PackagesFromCommit {Quote(row.Version)} {Quote(row.Commit)} {Quote(row.Stamp)} {Quote(root)}; Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(('{{0}}|{{1}}' -f $r.Ok, $r.Reason))))"));
+        var answers=PowerShell(command).Replace("\r\n","\n").Split('\n',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(line=>Encoding.UTF8.GetString(Convert.FromBase64String(line))).ToArray();
+        Check(answers.Length==cases.Length,$"one answer per case: {answers.Length} for {cases.Length}");
+        return answers;
+    }
+    private static string Stamped(string folder,string name,string version,string commit,bool clean)
+    {
+        var path=Path.Combine(folder,name);
+        Stamp(path,version,commit,clean);
+        return path;
+    }
 
     private static string Temporary()
     {
@@ -102,31 +115,35 @@ internal static class ReleaseProof1145Tests
                 Directory.CreateDirectory(repository);
                 Git(repository,"init","-q");
                 var built=Commit(repository,"src/Plugin.cs","class A {}");
-                var stamp=Path.Combine(folder,"verify-stamp.json");
-                Stamp(stamp,"0.1145.0",built,true);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("True|built from "+built[..7],StringComparison.Ordinal),"same commit");
                 var documents=Commit(repository,"repo.json","{}");
                 Commit(repository,"docs/a.md","a");
                 var tagged=Commit(repository,"CHANGELOG.md","b");
-                Check(Packages("0.1145.0",tagged,stamp,repository).StartsWith("True|",StringComparison.Ordinal),"only repo.json and documents differ (the release's own repo.json commit)");
-                Check(Packages("0.1145.0",documents,stamp,repository).StartsWith("True|",StringComparison.Ordinal),"resumed tag on the repo.json commit");
                 var code=Commit(repository,"src/Other.cs","class B {}");
-                var refused=Packages("0.1145.0",code,stamp,repository);
+                // One stamp per case (each read as the release reads it), asked in one run.
+                var stamp=Stamped(folder,"verify-stamp.json","0.1145.0",built,true);
+                var damaged=Path.Combine(folder,"damaged-stamp.json");
+                File.WriteAllText(damaged,"{ not json");
+                var answers=Packages(repository,
+                    ("0.1145.0",built,stamp),("0.1145.0",tagged,stamp),("0.1145.0",documents,stamp),("0.1145.0",code,stamp),
+                    ("0.1145.0",built,Stamped(folder,"newer.json","0.1145.0",code,true)),
+                    ("0.1145.0",built,Stamped(folder,"dirty.json","0.1145.0",built,false)),
+                    ("0.1145.0",built,Stamped(folder,"older-version.json","0.1144.0",built,true)),
+                    ("0.1145.0",built,Stamped(folder,"no-commit.json","0.1145.0","",true)),
+                    ("0.1145.0",built,Stamped(folder,"unknown.json","0.1145.0",new string('a',40),true)),
+                    ("0.1145.0",built,damaged),
+                    ("0.1145.0",built,Path.Combine(folder,"missing.json")));
+                Check(answers[0].StartsWith("True|built from "+built[..7],StringComparison.Ordinal),"same commit");
+                Check(answers[1].StartsWith("True|",StringComparison.Ordinal),"only repo.json and documents differ (the release's own repo.json commit)");
+                Check(answers[2].StartsWith("True|",StringComparison.Ordinal),"resumed tag on the repo.json commit");
+                var refused=answers[3];
                 Check(refused.StartsWith("False|the packages were built from "+built[..7]+", whose sources differ",StringComparison.Ordinal) && refused.Contains("src/Other.cs"),"another source: "+refused);
-                Stamp(stamp,"0.1145.0",code,true);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|",StringComparison.Ordinal),"a resumed tag older than the build is refused too");
-                Stamp(stamp,"0.1145.0",built,false);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|the packages were built from uncommitted changes",StringComparison.Ordinal),"dirty tree");
-                Stamp(stamp,"0.1144.0",built,true);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|the packages were built for 0.1144.0",StringComparison.Ordinal),"another version");
-                Stamp(stamp,"0.1145.0","",true);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|the build stamp does not say which commit",StringComparison.Ordinal),"stamp before 0.1145");
-                Stamp(stamp,"0.1145.0",new string('a',40),true);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|the commit built",StringComparison.Ordinal),"unknown commit");
-                File.WriteAllText(stamp,"{ not json");
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|the build stamp cannot be read",StringComparison.Ordinal),"damaged stamp");
-                File.Delete(stamp);
-                Check(Packages("0.1145.0",built,stamp,repository).StartsWith("False|no build stamp",StringComparison.Ordinal),"no stamp");
+                Check(answers[4].StartsWith("False|",StringComparison.Ordinal),"a resumed tag older than the build is refused too");
+                Check(answers[5].StartsWith("False|the packages were built from uncommitted changes",StringComparison.Ordinal),"dirty tree");
+                Check(answers[6].StartsWith("False|the packages were built for 0.1144.0",StringComparison.Ordinal),"another version");
+                Check(answers[7].StartsWith("False|the build stamp does not say which commit",StringComparison.Ordinal),"stamp before 0.1145");
+                Check(answers[8].StartsWith("False|the commit built",StringComparison.Ordinal),"unknown commit");
+                Check(answers[9].StartsWith("False|the build stamp cannot be read",StringComparison.Ordinal),"damaged stamp");
+                Check(answers[10].StartsWith("False|no build stamp",StringComparison.Ordinal),"no stamp");
             }
             finally { Remove(folder); }
         }),

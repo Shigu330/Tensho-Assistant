@@ -11,17 +11,27 @@ internal static class LaunchProof1126Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string path)=>File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n","\n");
 
-    private static string Run(string zip,string proof,string version)
+    // 0.1202: every case in one Windows PowerShell (one start of about half a second instead of eight); each answer comes back whole
+    // (« Ok|Reason », its UTF-8 in base64 on its own line), in the order asked.
+    private static string[] Run(string zip,params (string Proof,string Version)[] cases)
     {
         var script=Path.GetFullPath("scripts/LaunchProof.ps1").Replace("'","''");
-        var command=$". '{script}'; $r = Get-LaunchProof '{version}' '{zip.Replace("'","''")}' '{proof.Replace("'","''")}'; Write-Output ('{{0}}|{{1}}' -f $r.Ok, $r.Reason)";
+        var command=$". '{script}'; "+string.Join("; ",cases.Select(row=>$"$r = Get-LaunchProof '{row.Version}' '{zip.Replace("'","''")}' '{row.Proof.Replace("'","''")}'; Write-Output ([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(('{{0}}|{{1}}' -f $r.Ok, $r.Reason))))"));
         var start=new ProcessStartInfo("powershell.exe"){RedirectStandardOutput=true,RedirectStandardError=true,UseShellExecute=false};
         foreach(var argument in new[]{"-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-Command",command})start.ArgumentList.Add(argument);
         using var process=Process.Start(start) ?? throw new Exception("powershell.exe could not be started");
         var output=process.StandardOutput.ReadToEnd(); var error=process.StandardError.ReadToEnd();
         process.WaitForExit();
         Check(process.ExitCode==0,"powershell: "+error);
-        return output.Trim();
+        var answers=output.Replace("\r\n","\n").Split('\n',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(line=>System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(line))).ToArray();
+        Check(answers.Length==cases.Length,$"one answer per case: {answers.Length} for {cases.Length}");
+        return answers;
+    }
+    private static string Written(string folder,string name,LaunchProof proof)
+    {
+        var path=Path.Combine(folder,name);
+        Write(path,proof);
+        return path;
     }
 
     private static void Write(string path,LaunchProof proof)=>File.WriteAllText(path,proof.Serialize());
@@ -48,18 +58,17 @@ internal static class LaunchProof1126Tests
                 Write(proof,good);
                 var text=File.ReadAllText(proof);
                 Check(!text.Contains(folder,StringComparison.OrdinalIgnoreCase) && !text.Contains("Users",StringComparison.Ordinal),"no path in the proof");
-                Check(Run(zip,proof,"0.1126.0").StartsWith("True|self-check of ",StringComparison.Ordinal),"accepted: "+Run(zip,proof,"0.1126.0"));
-                Check(Run(zip,proof,"0.1127.0").StartsWith("False|the proof is for 0.1126.0",StringComparison.Ordinal),"another version");
-                Write(proof,good with { Dll=LaunchProof.Hash(zip) });
-                Check(Run(zip,proof,"0.1126.0").StartsWith("False|the proof is for another build",StringComparison.Ordinal),"another DLL");
-                Write(proof,good with { Failed=1 });
-                Check(Run(zip,proof,"0.1126.0").StartsWith("False|the self-check had 1 failure",StringComparison.Ordinal),"a failure");
-                Write(proof,good with { LoggedIn=false });
-                Check(Run(zip,proof,"0.1126.0").StartsWith("False|no character",StringComparison.Ordinal),"no character");
-                Write(proof,good with { At=DateTimeOffset.UtcNow.AddDays(-20) });
-                Check(Run(zip,proof,"0.1126.0").StartsWith("False|the proof is older than 14 days",StringComparison.Ordinal),"old");
-                File.Delete(proof);
-                Check(Run(zip,proof,"0.1126.0").StartsWith("False|no launch proof",StringComparison.Ordinal),"no file");
+                // One proof file per case (each read as the release reads it), asked in one run.
+                var answers=Run(zip,(proof,"0.1126.0"),(proof,"0.1127.0"),(Written(folder,"other-dll.json",good with { Dll=LaunchProof.Hash(zip) }),"0.1126.0"),
+                    (Written(folder,"failure.json",good with { Failed=1 }),"0.1126.0"),(Written(folder,"no-character.json",good with { LoggedIn=false }),"0.1126.0"),
+                    (Written(folder,"old.json",good with { At=DateTimeOffset.UtcNow.AddDays(-20) }),"0.1126.0"),(Path.Combine(folder,"missing.json"),"0.1126.0"));
+                Check(answers[0].StartsWith("True|self-check of ",StringComparison.Ordinal),"accepted: "+answers[0]);
+                Check(answers[1].StartsWith("False|the proof is for 0.1126.0",StringComparison.Ordinal),"another version");
+                Check(answers[2].StartsWith("False|the proof is for another build",StringComparison.Ordinal),"another DLL");
+                Check(answers[3].StartsWith("False|the self-check had 1 failure",StringComparison.Ordinal),"a failure");
+                Check(answers[4].StartsWith("False|no character",StringComparison.Ordinal),"no character");
+                Check(answers[5].StartsWith("False|the proof is older than 14 days",StringComparison.Ordinal),"old");
+                Check(answers[6].StartsWith("False|no launch proof",StringComparison.Ordinal),"no file");
             }
             finally { Directory.Delete(folder,true); }
         }),

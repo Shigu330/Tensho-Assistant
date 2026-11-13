@@ -67,8 +67,8 @@ public sealed class FileInventoryBankStore : IInventoryBankStore
                     file.Write(bytes);
                     file.Flush(flushToDisk: true);
                 }
-                if (File.Exists(path)) File.Replace(temporary, path, path + ".bak", ignoreMetadataErrors: true);
-                else File.Move(temporary, path);
+                // 0.1202: tried again while another program holds the file an instant (AtomicFile.ReplaceWhenFree).
+                AtomicFile.ReplaceWhenFree(temporary, path, path + ".bak");
             }
             finally
             {

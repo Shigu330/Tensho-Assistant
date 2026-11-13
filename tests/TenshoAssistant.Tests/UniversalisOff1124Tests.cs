@@ -25,7 +25,8 @@ internal static class UniversalisOff1124Tests
         {
             var server=new Counting();
             var on=true;
-            using var board=new MarketBoardService(new HttpClient(server)){Enabled=()=>Volatile.Read(ref on)};
+            // 0.1202: the board's pause at 1.5 s instead of 3 (the same wait, half the time; the 3 s is checked by VerifySpeed1202Tests).
+            using var board=new MarketBoardService(new HttpClient(server)){Enabled=()=>Volatile.Read(ref on),RequestPause=TimeSpan.FromSeconds(1.5)};
             board.Request("Chaos",5057);
             Check(SpinWait.SpinUntil(()=>Volatile.Read(ref server.Sent)==1 && !board.State.Loading,5000),"the first request leaves: "+server.Sent);
             board.Request("Chaos",5058);

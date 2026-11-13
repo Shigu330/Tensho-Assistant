@@ -133,6 +133,14 @@ public static class CollectableAdvisor
     private const int BrazenSteps=5,LaterBrazenSteps=3,MaxStates=40000;
     private sealed record Gains(int Scour,int BrazenMin,int BrazenMax,int Meticulous,int Later);
     private readonly record struct Outcome(decimal Score,decimal Mean,decimal Worst,CollectableMove Move);
+    // 0.1202: the memo's key, compared and hashed field by field without the seven-field tuple's general path (the same states, found faster).
+    private readonly struct State(int value,int left,int gp,int flags):IEquatable<State>
+    {
+        private readonly int value=value,left=left,gp=gp,flags=flags;
+        public bool Equals(State other)=>value==other.value && left==other.left && gp==other.gp && flags==other.flags;
+        public override bool Equals(object? other)=>other is State state && Equals(state);
+        public override int GetHashCode()=>((value*397^gp)*397^left)*397^flags;
+    }
 
     /// <summary>This turn's gains without what a box or a Scrutiny on adds; the Scrutiny's own bonus is added by the search.</summary>
     private static Gains Sure(CollectableTurn turn,CollectableBonuses bonuses)
@@ -171,7 +179,7 @@ public static class CollectableAdvisor
         var focusOn=shownChance>usualChance*1.4m;
         // 0.531 (user capture: Safe 65.9 on average, Balanced 70.2, both 40 at worst): a little of the average always counts, so that between two moves with the same floor the better one is taken.
         var caution=Math.Min(0.99m,1m-Math.Clamp(bonuses.RiskTolerance,0,100)/100m);
-        var memo=new Dictionary<(int Value,int Attempts,int Gp,bool Active,bool Focus,bool First,bool Priming),Outcome>();
+        var memo=new Dictionary<State,Outcome>();
         // Collecting: the attempts left, and those the GP left can restore on the way, each with its chance of a free one on average.
         Outcome Collecting(int value,int left,int gp)
         {
@@ -180,11 +188,20 @@ public static class CollectableAdvisor
             return new((1-caution)*mean+caution*sure,mean,sure,CollectableMove.Collect);
         }
         // A roll: its score mixes the average and the worst branch; average and worst of what is chosen are kept apart, to be shown.
+        // 0.1202: one loop instead of five LINQ passes (the same sums, in the same order: the same decimals to the last digit).
         Outcome Roll(CollectableMove move,params (decimal Weight,Outcome Branch)[] branches)
         {
-            var kept=branches.Where(row=>row.Weight>0).ToArray();
-            var mean=kept.Sum(row=>row.Weight*row.Branch.Score);
-            return new((1-caution)*mean+caution*kept.Min(row=>row.Branch.Score),kept.Sum(row=>row.Weight*row.Branch.Mean),kept.Min(row=>row.Branch.Worst),move);
+            decimal mean=0,average=0,lowest=0,worst=0;var any=false;
+            foreach(var (weight,branch) in branches)
+            {
+                if(weight<=0)continue;
+                mean+=weight*branch.Score;average+=weight*branch.Mean;
+                if(!any || branch.Score<lowest)lowest=branch.Score;
+                if(!any || branch.Worst<worst)worst=branch.Worst;
+                any=true;
+            }
+            if(!any)throw new InvalidOperationException("A roll without a branch.");
+            return new((1-caution)*mean+caution*lowest,average,worst,move);
         }
 
         Outcome Best(int value,int left,int gp,bool active,bool focus,bool first,bool priming)
@@ -193,7 +210,7 @@ public static class CollectableAdvisor
             // Nothing more to gain past the high threshold or the maximum. This also ends the search: a free Meticulous at the maximum would otherwise come back to the same state for ever, and a stack
             // overflow closes the game without a message (in-game report, 0.480). The memo and the bound on states keep it finite in every case.
             if(value>=turn.Maximum || value>=rule.High || left<=0 || memo.Count>MaxStates)return Collecting(value,left,gp);
-            var key=(value,left,gp,active,focus,first,priming);
+            var key=new State(value,left,gp,(active ? 1:0)|(focus ? 2:0)|(first ? 4:0)|(priming ? 8:0));
             if(memo.TryGetValue(key,out var known))return known;
             var plus=active ? bonus:0;
             var scour=(first ? gains.Scour:gains.Later)+plus;

@@ -6,6 +6,9 @@ internal static class CollectablesTests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file)).Replace("\r\n","\n");
+    // 0.1202: independent plans worked out at the same time (each search is its own: no shared state), then checked one by one in
+    // their order, so a failure says the same case as before. Nothing is taken from the tests: 17 s to a few for this file.
+    internal static TResult[] Each<T,TResult>(IEnumerable<T> cases,Func<T,TResult> work)=>cases.AsParallel().AsOrdered().Select(work).ToArray();
     private static CollectableRule Rule(uint id,string name,int level,int high,int reward,string group="G")=>new(id,name,level,level+1,high/2,high*3/4,high,1,2,reward,true,group);
     private static GpActionCatalog Catalog()=>new(GpActionCatalog.Specs.Select(spec=>new GpAction(spec,$"Action {spec.Id}",0,"Text")),"fixture");
     private static GpOptimization Node(int budget,string forbidden="",int attempts=4,int success=100)=>GpOptimizer.Solve(new(16,90,budget,attempts,1,success,0,1,MoreActions:true,Forbidden:forbidden),Catalog());
@@ -30,40 +33,40 @@ internal static class CollectablesTests
             var raw=Raw(0,200,100,300,150,false);raw[52]="52:text 24 %";
             var turn=CollectableTurn.Parse(raw)! with {IntuitionChance=40};
             var gains=new CollectableBonuses(250,100,625,200,100,false,true,300,4,40,0,0.5m,false,100,24);
-            var safe=CollectableAdvisor.Advise(turn,4,herb,gains)!;
-            var luck=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=100})!;
-            var middle=CollectableAdvisor.Advise(turn,4,herb,gains with {RiskTolerance=50})!;
+            var full=gains with {Gp=823};var capture=gains with {Gp=589};
+            var third=gains with {Gp=423,ScrutinyActive=true,MeticulousBase=8};var thirdTurn=turn with {MeticulousChance=8};
+            var steps=new[]{100,200,300,423,523,623,723,823}.SelectMany(gp=>new[]{false,true},(gp,on)=>(gp,on)).ToArray();
+            var paths=(from risk in CollectableRisk.Caps from gp in new[]{0,300,423,625,823} select (risk,gp)).ToArray();
+            // 0.1202: every plan of this test worked out at once (73 searches), then checked below in the same order as before.
+            var named=new (CollectableTurn Turn,CollectableBonuses Bonuses)[]{(turn,gains),(turn,gains with {RiskTolerance=100}),(turn,gains with {RiskTolerance=50}),(turn,full),
+                (turn,full with {RiskTolerance=50}),(turn,capture),(turn,capture with {RiskTolerance=50}),(turn,capture with {RiskTolerance=100}),(thirdTurn,third),(thirdTurn,third with {RiskTolerance=50})};
+            var stepJobs=steps.SelectMany(step=>new[]{0,50,100}.Select(risk=>(turn,gains with {Gp=step.gp,ScrutinyActive=step.on,RiskTolerance=risk})));
+            var pathJobs=paths.Select(path=>(turn,gains with {Gp=path.gp,RiskTolerance=path.risk}));
+            var plans=Each(named.Concat(stepJobs).Concat(pathJobs),job=>CollectableAdvisor.Advise(job.Item1,4,herb,job.Item2)!);
+            var safe=plans[0];var luck=plans[1];var middle=plans[2];
             Check(safe.Worst>=20 && safe.Expected>=safe.Worst,$"Safe: at least what is certain on the capture: {safe}");
             Check(luck.Expected>safe.Expected-0.001m && luck.Worst<=safe.Worst,$"Try your luck: a better average for a lower floor: {luck} against {safe}");
             Check(middle.Expected<=luck.Expected && middle.Worst>=luck.Worst,$"Uncertain, in between: {middle}");
             // 0.531: the capture at 823 GP: Safe had 65.9 on average and Balanced 70.2, both 40 at worst.
-            var full=gains with {Gp=823};
-            var safeFull=CollectableAdvisor.Advise(turn,4,herb,full)!;var middleFull=CollectableAdvisor.Advise(turn,4,herb,full with {RiskTolerance=50})!;
+            var safeFull=plans[3];var middleFull=plans[4];
             Check(safeFull.Worst>=middleFull.Worst && safeFull.Expected>=middleFull.Expected-0.001m,$"Safe is not worse than Balanced on the same floor: {safeFull} against {middleFull}");
             // 0.532: on no amount of GP does a step earn less than a safer one for the same floor.
-            foreach(var gp in new[]{100,200,300,423,523,623,723,823})foreach(var on in new[]{false,true})
+            foreach(var ((gp,on),(s,b,l)) in steps.Select((step,at)=>(step,(plans[10+3*at],plans[11+3*at],plans[12+3*at]))))
             {
-                var plain=gains with {Gp=gp,ScrutinyActive=on};
-                var s=CollectableAdvisor.Advise(turn,4,herb,plain)!;var b=CollectableAdvisor.Advise(turn,4,herb,plain with {RiskTolerance=50})!;var l=CollectableAdvisor.Advise(turn,4,herb,plain with {RiskTolerance=100})!;
                 Check(!(s.Worst>=b.Worst && s.Expected>b.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Safe {s.Expected}/{s.Worst} beats Balanced {b.Expected}/{b.Worst}");
                 Check(!(b.Worst>=l.Worst && b.Expected>l.Expected+0.01m),$"{gp} GP, Scrutiny {on}: Balanced {b.Expected}/{b.Worst} beats Luck {l.Expected}/{l.Worst}");
             }
             // 0.534: Safe and Balanced are the same on the capture (589 GP, two results only); they differ where a third result exists.
-            var capture=gains with {Gp=589};
-            Check(CollectableRisk.Same(CollectableAdvisor.Advise(turn,4,herb,capture),CollectableAdvisor.Advise(turn,4,herb,capture with {RiskTolerance=50})),"the capture: the same");
-            Check(!CollectableRisk.Same(CollectableAdvisor.Advise(turn,4,herb,capture),CollectableAdvisor.Advise(turn,4,herb,capture with {RiskTolerance=100})),"the capture: Try your luck differs");
-            var third=gains with {Gp=423,ScrutinyActive=true,MeticulousBase=8};
-            var thirdTurn=turn with {MeticulousChance=8};
-            var thirdSafe=CollectableAdvisor.Advise(thirdTurn,4,herb,third)!;var thirdMiddle=CollectableAdvisor.Advise(thirdTurn,4,herb,third with {RiskTolerance=50})!;
+            Check(CollectableRisk.Same(plans[5],plans[6]),"the capture: the same");
+            Check(!CollectableRisk.Same(plans[5],plans[7]),"the capture: Try your luck differs");
+            var thirdSafe=plans[8];var thirdMiddle=plans[9];
             Check(!CollectableRisk.Same(thirdSafe,thirdMiddle),$"a node where Balanced has its own plan: {thirdSafe.Worst}/{thirdSafe.Expected} and {thirdMiddle.Worst}/{thirdMiddle.Expected}");
             Check(CollectableRisk.Same(null,thirdSafe)==false,"nothing to compare");
             var greyed=Read("MainWindow.CollectablePanel.cs");
             Check(greyed.Contains("var same=balancedOff && cap==50;") && greyed.Contains("\"CollectablePanel.BalancedSame\""),"greyed, said in its tooltip");
             // 0.533: every step has its moves, ends with what it gathers, never spends more GP than there is, nor gathers more than there are attempts.
-            foreach(var risk in CollectableRisk.Caps)foreach(var gp in new[]{0,300,423,625,823})
+            foreach(var ((risk,gp),advice) in paths.Zip(plans.Skip(10+3*steps.Length)))
             {
-                var plain=gains with {Gp=gp,RiskTolerance=risk};
-                var advice=CollectableAdvisor.Advise(turn,4,herb,plain)!;
                 Check(advice.Path is {Steps.Count:>0},$"moves at {risk}, {gp} GP");
                 Check(advice.Path!.Gp<=gp,$"GP at {risk}, {gp} GP: {advice.Path.Gp}");
                 var restores=advice.Path.Steps.Where(step=>step.Move==CollectableMove.Restore).Sum(step=>step.Count);
@@ -324,9 +327,10 @@ internal static class CollectablesTests
             // 0.531: nothing is certain here, so a roll costs nothing on the floor: Safe may take it, and it is not called impossible.
             Check(lucky is {Impossible:false,Worst:0},$"not called impossible: {lucky}");
             Check(At(300,90,45,135,67,2,100).Move==CollectableMove.Brazen,"at 100 the roll is taken");
-            foreach(var risk in new[]{0,25,50,75,100})
+            var risks=new[]{0,25,50,75,100};
+            var riskPlans=Each(risks,risk=>CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))! with {IntuitionChance=13},4,ore,new(175,88,809,200,100,false,true,300,4,13,risk))!);
+            foreach(var (risk,plan) in risks.Zip(riskPlans))
             {
-                var plan=CollectableAdvisor.Advise(CollectableTurn.Parse(Raw(0,177,88,265,132,false))! with {IntuitionChance=13},4,ore,new(175,88,809,200,100,false,true,300,4,13,risk))!;
                 Check(plan.Worst<=plan.Expected && plan.Expected>=20 && plan.Worst>=7,$"real run at {risk} %: {plan}");
             }
             var panel=Read("MainWindow.CollectablePanel.cs");

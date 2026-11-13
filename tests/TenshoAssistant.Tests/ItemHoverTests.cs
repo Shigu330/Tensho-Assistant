@@ -84,7 +84,8 @@ internal static class ItemHoverTests
         ("Refresh key (0.524): a press of one tick is answered, within the 5 s bound, and forgotten on another item",()=>
         {
             var calls=0;using var http=new HttpClient(new MarketTestHandler((_,_)=>{calls++;return Task.FromResult(Response());}));
-            using var market=new MarketService(http);market.SetWorld(7,71,"World");using var context=new ItemHoverService();using var coordinator=new ItemHoverCoordinator(context,market);
+            // 0.1202: the market's pause at 1.5 s instead of 3 (the same waits, half the time; the 3 s is checked by VerifySpeed1202Tests).
+            using var market=new MarketService(http){RequestPause=TimeSpan.FromSeconds(1.5)};market.SetWorld(7,71,"World");using var context=new ItemHoverService();using var coordinator=new ItemHoverCoordinator(context,market);
             var now=DateTimeOffset.UtcNow;
             coordinator.Observe(true,true,7,71,42,Catalog(),now);
             coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(600))!.GetAwaiter().GetResult();
@@ -93,9 +94,9 @@ internal static class ItemHoverTests
             for(var tick=0;tick<100;tick++)Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(5700+tick*16)) is null,"fresh: nothing asked");
             var pressed=coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(7400),true);
             Check(pressed is not null,"the press of one tick is answered");
-            // The market's own 3 s pause (real time) is not the end of the press: it waits for the next slot, with no new press.
+            // The market's own pause (real time) is not the end of the press: it waits for the next slot, with no new press.
             Check(pressed!.GetAwaiter().GetResult().Status==MarketFetchStatus.Cooldown && calls==1,"inside the market's pause");
-            Thread.Sleep(3100);
+            Thread.Sleep(1600);
             Check(coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(9000)) is null && calls==1,"inside the 5 s bound");
             var waited=coordinator.Observe(true,true,7,71,42,Catalog(),now.AddMilliseconds(12400));
             Check(waited is not null,"then answered");waited!.GetAwaiter().GetResult();
