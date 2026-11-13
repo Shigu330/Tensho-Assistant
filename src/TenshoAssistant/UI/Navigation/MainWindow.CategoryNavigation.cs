@@ -19,7 +19,8 @@ internal sealed partial class MainWindow
     // which the thin TrumpGothic strokes made almost invisible in the light theme.
     private bool NavigationCategory(string key,params Page[] pages)
     {
-        var collapsed=configuration.NavigationCollapsed?.Contains(key)==true;
+        // 0.1222 (X-257): secondary groups folded until the player chooses (Guide/FirstScreen.cs).
+        var collapsed=TenshoAssistant.Guide.FirstScreen.Folded(configuration.NavigationCollapsed).Contains(key);
         ImGui.Spacing();
         var holdsPage=pages.Contains(NavigationPage(page));
         ImGui.PushStyleColor(ImGuiCol.Text,collapsed && holdsPage ? Accent:Text);
@@ -38,7 +39,7 @@ internal sealed partial class MainWindow
         Tip(collapsed ? "Navigation.Expand":"Navigation.Collapse");
         if(clicked)
         {
-            var set=configuration.NavigationCollapsed??=[];
+            var set=configuration.NavigationCollapsed=TenshoAssistant.Guide.FirstScreen.ToSave(configuration.NavigationCollapsed);
             if(!set.Remove(key))set.Add(key);
             try{save();}catch(Exception error){log.Warning(error,"Navigation state could not be saved.");}
             collapsed=!collapsed;

@@ -15,7 +15,7 @@ internal static class GuideVisit1045Tests
         {
             var pages=Regex.Match(Read("src/TenshoAssistant/MainWindow.cs"),@"enum Page \{([^}]*)\}").Groups[1].Value
                 .Split(',',StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries);
-            var all=GuideFlow.Stops(null).Select(stop=>stop.Page).ToArray();
+            var all=GuideFlow.EveryStop.Select(stop=>stop.Page).ToArray();
             Check(all.Length==all.Distinct().Count(),"a page is a stop twice");
             Check(GuideFlow.LeftOutOfVisit.Keys.OrderBy(key=>key).SequenceEqual(new[]{"Diagnostics","Home"}),"only Home and Diagnostics stay out");
             foreach(var page in pages.Where(page=>page is not "Home" and not "Diagnostics"))Check(all.Contains(page),"not a stop: "+page);
@@ -23,12 +23,12 @@ internal static class GuideVisit1045Tests
         }),
         ("Guide visit 1045: each interest keeps its own stops and the common ones, and drops the others",() =>
         {
-            var everyone=Pages(null);
+            var everyone=GuideFlow.EveryStop.Select(stop=>stop.Page).ToHashSet();
             foreach(var interest in Enum.GetValues<GuideInterest>())
             {
                 var kept=Pages(new HashSet<GuideInterest>{interest});
                 Check(kept.Count<everyone.Count,interest+" drops something");
-                Check(GuideFlow.Stops(null).Any(stop=>stop.Interest==interest),interest+" has a stop of its own");
+                Check(GuideFlow.EveryStop.Any(stop=>stop.Interest==interest),interest+" has a stop of its own");
                 Check(kept.Contains("Items") && kept.Contains("Maps") && kept.Contains("Lexicon") && kept.Contains("Help"),interest+" keeps the common stops");
             }
             var craft=Pages(new HashSet<GuideInterest>{GuideInterest.Crafting});
@@ -44,7 +44,7 @@ internal static class GuideVisit1045Tests
         }),
         ("Guide visit 1045: a position saved with the old, shorter visit still comes back inside it",() =>
         {
-            var count=GuideFlow.Stops(null).Count;
+            var count=GuideFlow.EveryStop.Count;
             Check(count>=49,"the visit has its new stops");
             Check(GuideFlow.Valid((int)GuideStep.Visit,16,count)==new GuidePosition(GuideStep.Visit,16),"an old position");
             Check(GuideFlow.Valid((int)GuideStep.Visit,count+5,count)==new GuidePosition(GuideStep.Visit,count-1),"beyond the end");

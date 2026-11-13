@@ -107,6 +107,8 @@ It updates itself: at start it asks GitHub for the release of the installed plug
 zip's SHA-256 published in that release, installs it beside and keeps the version before (« Previous version »); it never restarts while
 you use it, and « Automatic update » turns it off. The app is not code-signed: the SHA-256 protects against a damaged download, not
 against a stolen GitHub account (`SECURITY.md`). Code: `src/TenshoAssistant.Desktop`.
+Its own files are in `%LOCALAPPDATA%\TenshoAssistant\` (a copy of Tensho's data, its cache and its versions): they stay when you delete
+the app, so delete that folder too to remove everything. Tensho's files: [docs/FAQ.md](docs/FAQ.md) (« Where are my files »).
 
 ## Localization
 
@@ -300,6 +302,8 @@ Elle se met à jour seule : au démarrage, elle demande à GitHub la release de 
 vérifie le SHA-256 du zip publié dans cette release, l'installe à côté et garde la version d'avant (« Version d'avant ») ; elle ne
 redémarre jamais pendant que vous l'utilisez, et « Mise à jour automatique » la coupe. L'application n'est pas signée : le SHA-256 protège
 d'un téléchargement abîmé, pas d'un compte GitHub volé (`SECURITY.md`). Code : `src/TenshoAssistant.Desktop`.
+Ses propres fichiers sont dans `%LOCALAPPDATA%\TenshoAssistant\` (une copie des données de Tensho, son cache et ses versions) : ils restent quand
+vous supprimez l'application, supprimez donc aussi ce dossier pour tout retirer. Fichiers de Tensho : [docs/FAQ.md](docs/FAQ.md) (« Où sont mes fichiers »).
 
 ## Localisation
 

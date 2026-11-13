@@ -1,6 +1,8 @@
 namespace TenshoAssistant.Guide;
 
-public enum GuideStep { Welcome, Sources, Settings, Interests, Windows, Visit, End }
+// 0.1222 (X-256, first-player review G5): « Panels » after « Settings »: the panels Tensho adds next to the game's windows, with a
+// switch for all of them. A saved position from before comes back one step earlier at most (Valid).
+public enum GuideStep { Welcome, Sources, Settings, Panels, Interests, Windows, Visit, End }
 public enum GuideInterest { Crafting, Gathering, Collections, TripleTriad, FreeCompany, Market, Content, GoldSaucer, GardenAndIsland }
 /// <summary>A page shown during the visit; no interest: for everyone.</summary>
 public sealed record GuideStop(string Page, GuideInterest? Interest = null);
@@ -50,10 +52,16 @@ public static class GuideFlow
         new("Retainer"), new("Dresser"), new("Armoire"), new("CompanyChest", GuideInterest.FreeCompany), new("Workshop", GuideInterest.FreeCompany),
         new("CraftingLog", GuideInterest.Crafting), new("Titles", GuideInterest.Collections), new("Achievements", GuideInterest.Collections), new("Bestiary", GuideInterest.Collections),
     ];
+    // 0.1222 (X-257, first-player review G6): nothing ticked keeps only what is for everyone (it showed all 50 stops); each interest
+    // ticked adds its pages and windows.
     private static IEnumerable<T> Kept<T>(IEnumerable<T> all, Func<T, GuideInterest?> of, IReadOnlySet<GuideInterest>? chosen)
-        => chosen is not { Count: > 0 } ? all : all.Where(row => of(row) is not { } interest || chosen.Contains(interest));
+        => all.Where(row => of(row) is not { } interest || chosen?.Contains(interest) == true);
 
-    /// <summary>Nothing chosen: everything is shown. Nothing is ever hidden outside the guide.</summary>
+    /// <summary>Every stop and every window, whatever is chosen (the page coverage and the texts are checked on them).</summary>
+    public static IReadOnlyList<GuideStop> EveryStop => AllStops;
+    public static IReadOnlyList<GuideWindowTask> EveryWindow => AllWindows;
+
+    /// <summary>Nothing chosen: the pages for everyone only. Nothing is ever hidden outside the guide.</summary>
     public static IReadOnlyList<GuideStop> Stops(IReadOnlySet<GuideInterest>? chosen) => Array.AsReadOnly(Kept(AllStops, stop => stop.Interest, chosen).ToArray());
     public static IReadOnlyList<GuideWindowTask> Windows(IReadOnlySet<GuideInterest>? chosen) => Array.AsReadOnly(Kept(AllWindows, task => task.Interest, chosen).ToArray());
 

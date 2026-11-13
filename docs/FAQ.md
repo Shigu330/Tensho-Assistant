@@ -4,9 +4,9 @@
 
 The same questions are in the plugin, on the Help page (`/tensho`, then Help), in your language, and its search finds them. Ask a new question in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a); a question that comes back joins this list. A problem or an idea goes in [a ticket](https://github.com/Shigu330/Tensho-Assistant/issues/new/choose).
 
-## How do I install Tensho?
+## Where do I start?
 
-In Dalamud › Settings › Experimental › Custom Plugin Repositories, add https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json and save, then install « Tensho Assistant » from the plugin installer. /tensho opens the window.
+With the guide: Help › « Start the guide » shows the main pages in a few minutes, and you can leave it at any step. Then Home has one tile per main tool with its state. Anywhere in Tensho, right-click an item for its sheet and its tools; the « ? » next to a page's title explains it.
 
 ## A page is empty or says « not read ».
 
@@ -32,9 +32,17 @@ Prices, loot, wiki pages and community data are asked of those community sites, 
 
 Yes: Settings › Data and sources › « Game data and what you observed only » turns off every community source at once (prices, loot, wiki…); each one can also be turned off on its own there. The discoveries exchange is off unless you turn it on, and the community guides are only read on your click.
 
+## Is Tensho safe, and is it allowed?
+
+Tensho follows Dalamud's plugin rules: it reads and shows, acts on the game only when you click (see « Does Tensho play for me? »), and stops by itself in PvP and ranked content. Its code is open (GPL-3.0) on GitHub. Like every third-party tool, Dalamud and its plugins are not allowed by Square Enix's terms of service: use them discreetly and never talk about them in the game.
+
 ## What does Tensho keep on my PC?
 
 What the game has shown it (storages, collections, progress), your settings, notes, lists and alarms, a gil journal (90 days), the voyage history (180 days) and the discoveries base. These files stay on this PC; your discoveries leave it only through the GitHub exchange, after you connect GitHub (or as a file you export and share yourself), and alarms only through the Discord webhook, if you set one.
+
+## Where are my files, and how do I erase everything (and what I shared)?
+
+Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the folder %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, the discoveries, a cache). The desktop app adds %LOCALAPPDATA%\TenshoAssistant\ (its copy of the data, its cache and versions), which stays after you delete the app. To erase everything: remove Tensho in Dalamud, then delete that file and those folders. One character only: Storage › Characters › « Erase ». What you shared: « Disconnect » keeps your gist and your ticket on GitHub; delete the gist on github.com and close the ticket. Discoveries already merged into the shared base (CC0) stay in it: ask on GitHub to have yours withdrawn.
 
 ## Does Tensho play for me?
 
@@ -44,9 +52,17 @@ No. It reads and shows. What acts on the game, such as teleporting, sorting or w
 
 That map is Tensho's: by default it replaces the game's on the M key, with the same markers and more. Settings › Map › « Replace the game map (M key) » gives the game's map back; Tensho's map stays in the Tensho window.
 
+## How do I remove the panels around the game's windows?
+
+Tensho adds small panels next to some game windows (character sheet, Duty Finder, retainer sales, synthesis, gathering, fishing, the Sort button, Triple Triad) and lines in the server bar. The guide's step « Panels next to the game's windows » turns them all off or on at once (Help › « Start the guide »); each one also has its switch in Settings, and the reset button (curved arrow) puts it back.
+
 ## Why does Tensho stop in PvP or in a deep dungeon?
 
 In PvP zones, deep dungeons and other ranked content, the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this.
+
+## How do I update Tensho?
+
+Nothing to do: Dalamud updates it like any other plugin, when the game starts or from the plugin installer (/xlplugins › « Update »). What changed in each version is in CHANGELOG.md on GitHub. The desktop app updates itself.
 
 ## How do I start over?
 
@@ -68,6 +84,14 @@ Use « Report a problem or help » on the Help page: it fills in the GitHub form
 
 In « Report a problem or help » on the Help page, choose « A translation »: it opens the GitHub form. To translate a whole language, the steps are in src/TenshoAssistant/Localization/README.md on GitHub.
 
+## Where is my wishlist?
+
+In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
+
+## How do I install Tensho?
+
+In Dalamud › Settings › Experimental › Custom Plugin Repositories, add https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json and save, then install « Tensho Assistant » from the plugin installer. /tensho opens the window.
+
 ## Can I see Tensho without the game?
 
 Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them: what you create or change in the app (tools, alarms, garden, craft presets, settings) is not saved, its controls are greyed and the status bar says so; make changes in the game. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
@@ -84,19 +108,15 @@ In the game, turn on Settings › Advanced › « Link with the desktop app » (
 
 Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
 
-## Where is my wishlist?
-
-In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
-
 Français :
 
 # Questions fréquentes
 
 Les mêmes questions sont dans le plugin, sur la page Aide (`/tensho`, puis Aide), dans votre langue, et sa recherche les trouve. Posez une nouvelle question dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a) ; une question qui revient rejoint cette liste. Un problème ou une idée va dans [un ticket](https://github.com/Shigu330/Tensho-Assistant/issues/new/choose).
 
-## Comment installer Tensho ?
+## Par où commencer ?
 
-Dans Dalamud › Settings › Experimental › Custom Plugin Repositories, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
+Par le guide : Aide › « Lancer le guide » montre les pages principales en quelques minutes, et vous pouvez le quitter à n'importe quelle étape. Ensuite, l'Accueil a une tuile par outil principal avec son état. Partout dans Tensho, un clic droit sur un objet ouvre sa fiche et ses outils ; le « ? » à côté du titre d'une page l'explique.
 
 ## Une page est vide ou dit « non lu ».
 
@@ -122,9 +142,17 @@ Les prix, le butin, les pages du wiki et les données communautaires sont demand
 
 Oui : Paramètres › Données et sources › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
 
+## Tensho est-il sûr, et est-il permis ?
+
+Tensho suit les règles des plugins de Dalamud : il lit et montre, n'agit sur le jeu que sur votre clic (voir « Tensho joue-t-il à ma place ? »), et s'arrête de lui-même en JcJ et en contenu classé. Son code est ouvert (GPL-3.0) sur GitHub. Comme tout outil tiers, Dalamud et ses plugins ne sont pas permis par les conditions d'utilisation de Square Enix : utilisez-les discrètement et n'en parlez jamais dans le jeu.
+
 ## Que garde Tensho sur mon PC ?
 
 Ce que le jeu lui a montré (rangements, collections, progression), vos réglages, notes, listes et alarmes, un journal des gils (90 jours), l'historique des voyages (180 jours) et la base des découvertes. Ces fichiers restent sur ce PC ; vos découvertes n'en sortent que par l'échange GitHub, après la connexion de GitHub (ou par un fichier que vous exportez et partagez vous-même), et les alarmes seulement par le webhook Discord, si vous en indiquez un.
+
+## Où sont mes fichiers, et comment tout effacer (y compris ce que j'ai partagé) ?
+
+Réglages : %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Données : le dossier %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, les découvertes, un cache). L'application de bureau ajoute %LOCALAPPDATA%\TenshoAssistant\ (sa copie des données, son cache et ses versions), qui reste après la suppression de l'application. Pour tout effacer : retirez Tensho dans Dalamud, puis supprimez ce fichier et ces dossiers. Un seul personnage : Rangements › Personnages › « Effacer ». Ce que vous avez partagé : « Déconnecter » garde votre gist et votre ticket sur GitHub ; supprimez le gist sur github.com et fermez le ticket. Les découvertes déjà fusionnées dans la base commune (CC0) y restent : demandez sur GitHub que les vôtres soient retirées.
 
 ## Tensho joue-t-il à ma place ?
 
@@ -134,9 +162,17 @@ Non. Il lit et il affiche. Ce qui agit sur le jeu, comme se téléporter, trier 
 
 Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la touche M, avec les mêmes repères et d'autres. Paramètres › Carte › « Remplacer la carte du jeu (touche M) » rend la carte du jeu ; celle de Tensho reste dans la fenêtre de Tensho.
 
+## Comment retirer les panneaux autour des fenêtres du jeu ?
+
+Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
+
 ## Pourquoi Tensho s'arrête-t-il en JcJ ou en donjon profond ?
 
 Dans les zones JcJ, les donjons profonds et les autres contenus classés, tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela.
+
+## Comment mettre Tensho à jour ?
+
+Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage du jeu ou depuis l'installateur de plugins (/xlplugins › « Mettre à jour »). Les changements de chaque version sont dans CHANGELOG.md sur GitHub. L'application de bureau se met à jour seule.
 
 ## Comment repartir de zéro ?
 
@@ -158,6 +194,14 @@ Utilisez « Signaler un problème ou aider » de la page Aide : cela remplit le 
 
 Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une traduction » : cela ouvre le formulaire GitHub. Pour traduire toute une langue, la marche à suivre est dans src/TenshoAssistant/Localization/README.md sur GitHub.
 
+## Où est ma liste de souhaits ?
+
+Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
+
+## Comment installer Tensho ?
+
+Dans Dalamud › Settings › Experimental › Custom Plugin Repositories, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
+
 ## Puis-je voir Tensho sans le jeu ?
 
 Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer : ce que vous créez ou changez dans l'application (outils, alarmes, potager, préréglages d'artisanat, réglages) n'est pas enregistré, ses contrôles sont grisés et la barre d'état le dit ; faites les changements dans le jeu. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
@@ -173,7 +217,3 @@ Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de b
 ## Tensho peut-il installer l'application de bureau pour moi ?
 
 Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.
-
-## Où est ma liste de souhaits ?
-
-Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.

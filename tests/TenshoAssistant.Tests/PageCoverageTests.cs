@@ -17,7 +17,7 @@ internal static class PageCoverageTests
         {
             var pages=Pages();
             Check(pages.Length>=50 && pages.Contains("Help"),"the list of pages is read");
-            var stops=GuideFlow.Stops(null).Select(stop=>stop.Page).ToHashSet();
+            var stops=GuideFlow.EveryStop.Select(stop=>stop.Page).ToHashSet();
             var leftOut=GuideFlow.LeftOutOfVisit;
             foreach(var page in pages)
             {

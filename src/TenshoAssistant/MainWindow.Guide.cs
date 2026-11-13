@@ -99,6 +99,49 @@ internal sealed partial class MainWindow
         }
     }
 
+    // 0.1222 (X-256, first-player review G5): the panels Tensho adds next to the game's windows, on by default: one switch for all of them,
+    // then each one, with the same rows (and the same side effects) as in Settings.
+    private void SetGuidePanels(bool shown)
+    {
+        configuration.ShowCharacterPanel = shown; configuration.ShowDutyFinderLoot = shown; configuration.RetainerSalesPanel = shown;
+        configuration.FishingPanel = shown; configuration.InventorySortButton = shown; configuration.TriadMatchOverlay = shown;
+        configuration.TriadChallengePanel = shown; configuration.AlarmServerBar = shown; configuration.ReminderServerBar = shown;
+        configuration.OccultPanel = shown; configuration.ShowBeastBoardPanel = shown;
+        configuration.CraftLivePanel = shown;
+        craftLive.SetEnabled(CraftLiveWanted(configuration));
+        // The gathering help also needs its observation (one save, rolled back together); hiding it leaves the observation as it is.
+        SaveGatheringChoice(shown ? true : null, shown);
+        SaveGuide();
+    }
+
+    private void DrawGuidePanels()
+    {
+        if (ImGui.Button(localization.Get("Guide.PanelsAllOff"))) SetGuidePanels(false);
+        Tip("Guide.PanelsAllOffTip");
+        ImGui.SameLine();
+        if (ImGui.Button(localization.Get("Guide.PanelsAllOn"))) SetGuidePanels(true);
+        Tip("Guide.PanelsAllOnTip");
+        ImGui.Spacing();
+        BoolSetting("CharacterStats.Setting", "Advanced.CharacterPanelTip", () => configuration.ShowCharacterPanel, value => configuration.ShowCharacterPanel = value, c => c.ShowCharacterPanel);
+        BoolSetting("DutyFinder.Setting", "Advanced.DutyFinderTip", () => configuration.ShowDutyFinderLoot, value => configuration.ShowDutyFinderLoot = value, c => c.ShowDutyFinderLoot);
+        BoolSetting("Advanced.RetainerSales", "Advanced.RetainerSalesTip", () => configuration.RetainerSalesPanel, value => configuration.RetainerSalesPanel = value, c => c.RetainerSalesPanel);
+        BoolSetting("CraftLiveUi.Panel", "CraftLiveUi.PanelTip", () => configuration.CraftLivePanel, value => { configuration.CraftLivePanel = value; craftLive.SetEnabled(CraftLiveWanted(configuration)); }, c => c.CraftLivePanel);
+        var gatheringPanel = configuration.GatheringPanel;
+        // The same row as in Settings (one save with its observation, rolled back together).
+        if (ImGui.Checkbox(localization.Get("GatheringPanel.Setting") + "###GuideGatheringPanel", ref gatheringPanel)) SaveGatheringChoice(gatheringPanel ? true : null, gatheringPanel);
+        Tip("GatheringPanel.SettingTip");
+        if (DefaultButton("GuideGatheringPanel", configuration.GatheringPanel != DefaultConfiguration.GatheringPanel, OnOff(DefaultConfiguration.GatheringPanel)))
+            SaveGatheringChoice(DefaultConfiguration.GatheringPanel ? true : null, DefaultConfiguration.GatheringPanel);
+        BoolSetting("FishingPanel.Setting", "FishingPanel.SettingTip", () => configuration.FishingPanel, value => configuration.FishingPanel = value, c => c.FishingPanel);
+        BoolSetting("SortButton.Setting", "SortButton.SettingTip", () => configuration.InventorySortButton, value => configuration.InventorySortButton = value, c => c.InventorySortButton);
+        BoolSetting("ModuleSettings.TriadMatchOverlay", "ModuleSettings.TriadMatchOverlayTip", () => configuration.TriadMatchOverlay, value => configuration.TriadMatchOverlay = value, c => c.TriadMatchOverlay);
+        BoolSetting("ModuleSettings.TriadChallengePanel", "ModuleSettings.TriadChallengePanelTip", () => configuration.TriadChallengePanel, value => configuration.TriadChallengePanel = value, c => c.TriadChallengePanel);
+        BoolSetting("Advanced.AlarmServerBar", "Advanced.AlarmServerBarTip", () => configuration.AlarmServerBar, value => configuration.AlarmServerBar = value, c => c.AlarmServerBar);
+        BoolSetting("Advanced.ReminderServerBar", "Advanced.ReminderServerBarTip", () => configuration.ReminderServerBar, value => configuration.ReminderServerBar = value, c => c.ReminderServerBar);
+        BoolSetting("FieldContent.OccultPanel", "FieldContent.OccultPanelTip", () => configuration.OccultPanel, value => configuration.OccultPanel = value, c => c.OccultPanel);
+        BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
+    }
+
     // Home, until it is finished or hidden: what is left to open in the game.
     private void DrawGuideOnHome()
     {
@@ -186,6 +229,8 @@ internal sealed partial class MainWindow
                 BoolSetting("Advanced.GatherBuddy", "Advanced.GatherBuddyTip", () => configuration.CommunityGatherBuddy, value => configuration.CommunityGatherBuddy = value, c => c.CommunityGatherBuddy);
                 BoolSetting("Advanced.Teamcraft", "Advanced.TeamcraftTip", () => configuration.CommunityTeamcraftBites, value => configuration.CommunityTeamcraftBites = value, c => c.CommunityTeamcraftBites);
                 BoolSetting("Advanced.Fashion", "Advanced.FashionTip", () => configuration.CommunityFashion, value => configuration.CommunityFashion = value, c => c.CommunityFashion);
+                // 0.1222 (X-257, D6): the eighth source, as in Settings › Data and sources.
+                BoolSetting("Advanced.Paissa", "Advanced.PaissaTip", () => configuration.CommunityPaissa, value => configuration.CommunityPaissa = value, c => c.CommunityPaissa);
                 break;
             case GuideStep.Settings:
                 // X-76 H5 (0.915): « ↺ » on these rows too, and the map row has the same tooltip as in Settings › Map.
@@ -195,6 +240,9 @@ internal sealed partial class MainWindow
                 BoolSetting("BankUi.AutoSetting", "BankUi.AutoSettingHelp", () => configuration.AutoBankCapture, value => configuration.AutoBankCapture = value, c => c.AutoBankCapture);
                 BoolSetting("Settings.OpenOnLogin", "Settings.OpenOnLoginHelp", () => configuration.OpenOnLogin, value => configuration.OpenOnLogin = value, c => c.OpenOnLogin);
                 BoolSetting("Settings.HelpBanners", "SettingTips.HelpBanners", () => configuration.HelpBanners, value => configuration.HelpBanners = value, c => c.HelpBanners);
+                break;
+            case GuideStep.Panels:
+                DrawGuidePanels();
                 break;
             case GuideStep.Interests:
                 foreach (var interest in Enum.GetValues<GuideInterest>())

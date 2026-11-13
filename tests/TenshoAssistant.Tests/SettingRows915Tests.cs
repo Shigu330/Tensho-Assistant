@@ -104,6 +104,8 @@ internal static class SettingRows915Tests
         "MainWindow.Reminders.cs|inBar","MainWindow.Reminders.cs|toDiscord",
         // The gathering help also saves the gathering observation, in one save rolled back together (SaveGatheringChoice).
         "MainWindow.Settings.cs|gatheringPanel",
+        // 0.1222 (X-256): the same gathering help row in the guide's Panels step (one save with its observation, SaveGatheringChoice).
+        "MainWindow.Guide.cs|gatheringPanel",
     };
     private static readonly Regex RawCheckbox=new(@"ImGui\.Checkbox\([^;]*?,\s*ref\s+(\w+)\)");
     private static readonly Regex Member=new(@"^\s{4}(private|internal|public|protected)\b");

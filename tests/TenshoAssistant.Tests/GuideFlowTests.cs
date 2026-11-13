@@ -15,7 +15,7 @@ internal static class GuideFlowTests
             Check(GuideFlow.Previous(at,3)==at,"nothing before the first");
             var seen=new List<GuidePosition>{at};
             while(at.Step!=GuideStep.End){at=GuideFlow.Next(at,3);seen.Add(at);}
-            Check(seen.Count==6+3,"six steps and the three stops");
+            Check(seen.Count==7+3,"seven steps (Panels since 0.1222) and the three stops");
             Check(seen.Count(position=>position.Step==GuideStep.Visit)==3 && seen.Where(position=>position.Step==GuideStep.Visit).Select(position=>position.Stop).SequenceEqual([0,1,2]),"the stops in order");
             Check(GuideFlow.Next(at,3)==at,"nothing after the last");
             foreach(var position in Enumerable.Reverse(seen).Skip(1)){at=GuideFlow.Previous(at,3);Check(at==position,"back: "+position);}
@@ -30,10 +30,10 @@ internal static class GuideFlowTests
             Check(GuideFlow.Valid((int)GuideStep.Visit,9,3)==new GuidePosition(GuideStep.Visit,2),"fewer stops");
             Check(GuideFlow.Valid((int)GuideStep.Visit,0,0).Step==GuideStep.End,"no stop left");
         }),
-        ("Guide: interests keep what matches; nothing chosen shows everything",() =>
+        ("Guide: interests keep what matches; nothing chosen keeps the pages for everyone (0.1222)",() =>
         {
             var everyone=GuideFlow.Stops(null);
-            Check(everyone.Count==GuideFlow.Stops(new HashSet<GuideInterest>()).Count && everyone.Any(stop=>stop.Page=="TripleTriad"),"nothing chosen");
+            Check(everyone.Count==GuideFlow.Stops(new HashSet<GuideInterest>()).Count && everyone.All(stop=>stop.Interest is null) && everyone.Count==GuideFlow.EveryStop.Count(stop=>stop.Interest is null) && everyone.All(stop=>stop.Page!="TripleTriad"),"nothing chosen");
             var craft=GuideFlow.Stops(new HashSet<GuideInterest>{GuideInterest.Crafting});
             Check(craft.Any(stop=>stop.Page=="CraftSimulation") && craft.Any(stop=>stop.Page=="Maps") && craft.All(stop=>stop.Page!="TripleTriad"),"its stops and the common ones");
             var windows=GuideFlow.Windows(new HashSet<GuideInterest>{GuideInterest.FreeCompany});
@@ -53,11 +53,11 @@ internal static class GuideFlowTests
                 var guide=document.RootElement.GetProperty("Guide");
                 foreach(var step in Enum.GetValues<GuideStep>())Check(guide.TryGetProperty($"Step{step}Title",out _),$"{language} step title {step}");
                 foreach(var step in Enum.GetValues<GuideStep>().Where(step=>step!=GuideStep.Visit))Check(guide.TryGetProperty($"Step{step}Text",out _),$"{language} step text {step}");
-                foreach(var task in GuideFlow.Windows(null))Check(guide.TryGetProperty($"Window{task.Key}",out _) && guide.TryGetProperty($"Window{task.Key}Where",out _),$"{language} window {task.Key}");
+                foreach(var task in GuideFlow.EveryWindow)Check(guide.TryGetProperty($"Window{task.Key}",out _) && guide.TryGetProperty($"Window{task.Key}Where",out _),$"{language} window {task.Key}");
                 foreach(var interest in Enum.GetValues<GuideInterest>())Check(guide.TryGetProperty($"Interest{interest}",out _),$"{language} interest {interest}");
             }
             var pages=Read("src/TenshoAssistant/MainWindow.cs");
-            foreach(var stop in GuideFlow.Stops(null))Check(pages.Contains(" "+stop.Page+",") || pages.Contains(" "+stop.Page+" }"),"a stop that is not a page: "+stop.Page);
+            foreach(var stop in GuideFlow.EveryStop)Check(pages.Contains(" "+stop.Page+",") || pages.Contains(" "+stop.Page+" }"),"a stop that is not a page: "+stop.Page);
         }),
         ("Guide and help: what runs in Draw stays light and follows the language",() =>
         {

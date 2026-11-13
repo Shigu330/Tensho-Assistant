@@ -13,28 +13,35 @@ public static class Faq
 {
     public static readonly IReadOnlyList<FaqEntry> Entries =
     [
-        new("Install"),
+        // 0.1222 (X-256, first-player review G12): where to start first; the install and the desktop app last (a player in the game
+        // has installed it already, and the app is optional).
+        new("WhereStart", "Help"),
         new("EmptyPage"),
         new("WhyOpen"),
         new("Marks"),
         new("Language", "Settings"),
         new("Internet", "Settings"),
         new("Offline", "Settings"),
+        new("Safe"),
         new("Saved"),
+        new("Files", "Storage"),
         new("Actions"),
         // X-253 (0.1183): M opens Tensho's map by default.
         new("Map", "Settings"),
+        new("Panels", "Settings"),
         new("Pause"),
+        new("Update"),
         new("Reset", "Settings"),
         new("Official"),
         new("Ask"),
         new("Report"),
         new("Translate"),
+        new("Wishlist", "Wishlist"),
+        new("Install"),
         new("Desktop"),
         new("DesktopUpdate"),
         new("DesktopLink", "Settings"),
         new("DesktopInstall", "Settings"),
-        new("Wishlist", "Wishlist"),
     ];
 
     /// <summary>The page an answer names, or null.</summary>

@@ -112,7 +112,7 @@ internal static class HelpTests
         ("Help: first-visit banner once per page, kept across a reset, with its setting",() =>
         {
             var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
-            Check(help.Contains("configuration.HelpSeen?.Contains(page.ToString())==true".Replace("==true"," == true")) && help.Contains("(configuration.HelpSeen ??= []).Add(page.ToString());"),"once per page");
+            Check(help.Contains("configuration.HelpSeen?.Contains(shown.ToString()) != true") && help.Contains("if (!HelpBannerShows(page)) return;") && help.Contains("(configuration.HelpSeen ??= []).Add(page.ToString());"),"once per page");
             Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("DrawHelpBanner();"),"drawn above the page");
         }),
         ("Help: « ? » on every page, and a page in the navigation",() =>

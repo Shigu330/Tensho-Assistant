@@ -41,11 +41,14 @@ internal sealed partial class MainWindow
     }
 
     // 0.503 (lot 2, G8): the first time a page is opened, two lines on it; it does not come back. Setting in General.
+    private bool HelpBannerShows(Page shown) => configuration.HelpBanners && shown != Page.Help && configuration.HelpSeen?.Contains(shown.ToString()) != true;
+
     private void DrawHelpBanner()
     {
-        if (!configuration.HelpBanners || page == Page.Help || configuration.HelpSeen?.Contains(page.ToString()) == true) return;
+        if (!HelpBannerShows(page)) return;
         ImGui.TextColored(Accent, localization.Get("Help.BannerTitle"));
-        ImGui.TextWrapped(localization.Get($"PageHelp.{page}Purpose"));
+        // 0.1222 (X-257, D5): on Home, where to start rather than what the page is.
+        ImGui.TextWrapped(localization.Get(page == Page.Home ? "PageHelp.HomeStart" : $"PageHelp.{page}Purpose"));
         void Seen()
         {
             (configuration.HelpSeen ??= []).Add(page.ToString());

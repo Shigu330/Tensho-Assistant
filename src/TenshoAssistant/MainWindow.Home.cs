@@ -15,7 +15,8 @@ internal sealed partial class MainWindow
 {
     private void DrawHome()
     {
-        Heading(localization.Get("Home.Title"),localization.Get("Home.Description"));
+        // 0.1222 (X-257, D5): one description: while the first-visit banner shows, it says where to start, and the heading has none.
+        Heading(localization.Get("Home.Title"),HelpBannerShows(Page.Home) ? "" : localization.Get("Home.Description"));
         MeasureMap("home guide",DrawGuideOnHome);
         var items=itemCatalog.State;var recipes=recipeCatalog.State;
         var ready=items.Catalog is not null && recipes.Catalog is not null;
