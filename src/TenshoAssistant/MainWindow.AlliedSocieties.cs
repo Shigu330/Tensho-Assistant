@@ -63,8 +63,8 @@ internal sealed partial class MainWindow
                 else if(AlliedBoard.AtMax(society,standing))ImGui.TextColored(Success,AlliedBoard.RankName(catalog.RankNames,standing.Rank));
                 else ImGui.TextUnformatted(AlliedBoard.RankName(catalog.RankNames,standing.Rank));
                 ImGui.TableNextColumn();
-                if(standing.Rank>0 && standing.Needed>0)ImGui.TextUnformatted($"{standing.Reputation:N0} / {standing.Needed:N0}");
-                else if(standing.Rank>0)ImGui.TextDisabled(standing.Reputation.ToString("N0"));
+                if(standing.Rank>0 && standing.Needed>0)ImGui.TextUnformatted($"{(standing.Reputation).ToString("N0",Numbers)} / {(standing.Needed).ToString("N0",Numbers)}");
+                else if(standing.Rank>0)ImGui.TextDisabled(standing.Reputation.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
                 if(items?.Find(society.Currency) is { } currency)
                 {
@@ -72,7 +72,7 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(currency.Id);
                     ImGui.SameLine();
                     var held=GetRecipeHoldings(currency.Id);
-                    ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0"):"?");
+                    ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0",Numbers):"?");
                 }
             }
         }

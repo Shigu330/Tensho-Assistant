@@ -11,7 +11,7 @@ internal static class StatTiers380Tests
     {
         var rows = StatFormulas.Combat(new Dictionary<string,int>{["CriticalHit"]=x,["DirectHitRate"]=x,["Determination"]=x,["SkillSpeed"]=x,["Tenacity"]=x,
             ["Piety"]=x,["Defense"]=x,["MagicDefense"]=x},30,1,Level100);
-        return double.Parse(rows.Single(row=>row.Key==key).Value.Split(' ')[0],System.Globalization.CultureInfo.CurrentCulture);
+        return double.Parse(rows.Single(row=>row.Key==key).Value.Split(' ')[0].TrimEnd('%'),TenshoAssistant.Localization.TenshoCulture.Current);
     }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>

@@ -96,10 +96,10 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
                     ImGui.SameLine();ImGui.TextUnformatted(ingredient?.Name ?? $"ID {itemId}");
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(itemId);
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(required.ToString("N0"));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0"):"?");
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(required.ToString("N0",Numbers));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0",Numbers):"?");
                     ImGui.TableNextColumn();
-                    if(missing is { } short_)ImGui.TextColored(short_>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,short_.ToString("N0"));
+                    if(missing is { } short_)ImGui.TextColored(short_>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,short_.ToString("N0",Numbers));
                     else ImGui.TextDisabled("?");
                 }
             }

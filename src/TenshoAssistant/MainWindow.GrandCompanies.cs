@@ -77,12 +77,12 @@ internal sealed partial class MainWindow
                 var own=GcBoard.Rank(catalog,rank);
                 ImGui.TextUnformatted(rank==0 ? localization.Get("GrandCompany.NoGrade"):own?.Names.ElementAtOrDefault(company-1) ?? rank.ToString());
                 ImGui.TableNextColumn();
-                ImGui.TextUnformatted(rank==0 ? "":$"{current.Seals[company-1]:N0} / {current.MaxSeals[company-1]:N0}");
+                ImGui.TextUnformatted(rank==0 ? "":$"{(current.Seals[company-1]).ToString("N0",Numbers)} / {(current.MaxSeals[company-1]).ToString("N0",Numbers)}");
                 ImGui.TableNextColumn();
                 if(rank==0)continue;
                 if(GcBoard.Next(catalog,company,rank) is not { } next){ImGui.TextDisabled(localization.Get("GrandCompany.Last"));continue;}
                 var quest=next.PromotionQuests.ElementAtOrDefault(company-1) ?? "";
-                var text=localization.Format("GrandCompany.Next",next.Names[company-1],(own?.RequiredSeals ?? 0).ToString("N0"));
+                var text=localization.Format("GrandCompany.Next",next.Names[company-1],(own?.RequiredSeals ?? 0).ToString("N0",Numbers));
                 ImGui.TextWrapped(quest.Length>0 ? text+" · "+quest:text);
             }
         }
@@ -107,7 +107,7 @@ internal sealed partial class MainWindow
         var rank=gcMyRank && current.Ranks.Count>=gcShopCompany ? current.Ranks[gcShopCompany-1]:(int?)null;
         var rows=GcBoard.Shop(catalog,gcShopCompany,rank).Where(row=>gcQuery.Length==0 || items?.Find(row.Item)?.Name.Contains(gcQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
         var held=current.Seals.Count>=gcShopCompany ? current.Seals[gcShopCompany-1]:0;
-        ImGui.TextDisabled(localization.Format("GrandCompany.ShopCount",rows.Length,held.ToString("N0")));
+        ImGui.TextDisabled(localization.Format("GrandCompany.ShopCount",rows.Length,held.ToString("N0",Numbers)));
         if(rows.Length==0 || !ImGui.BeginTable("###GcShop",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.ScrollY,new Vector2(0,Math.Max(160,ImGui.GetContentRegionAvail().Y))))return;
         try
         {
@@ -123,7 +123,7 @@ internal sealed partial class MainWindow
                 if(ImGui.IsItemHovered())DrawItemInfoTooltip(row.Item);
                 ImGui.SameLine();ImGui.TextUnformatted(item?.Name ?? $"#{row.Item}");
                 ImGui.TableNextColumn();
-                if(row.Cost<=held)ImGui.TextUnformatted(row.Cost.ToString("N0"));else ImGui.TextColored(UI.FfxivTheme.Warning,row.Cost.ToString("N0"));
+                if(row.Cost<=held)ImGui.TextUnformatted(row.Cost.ToString("N0",Numbers));else ImGui.TextColored(UI.FfxivTheme.Warning,row.Cost.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(GcBoard.Rank(catalog,row.RequiredRank)?.Names.ElementAtOrDefault(gcShopCompany-1) ?? row.RequiredRank.ToString());
             }
         }

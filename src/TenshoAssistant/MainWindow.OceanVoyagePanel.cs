@@ -122,7 +122,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(fishId);
-                    ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                    ItemCell(fish,fishId,22,$"{fish?.Name ?? fishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{(stock.Total).ToString("N0",Numbers)}":"")}");
                     // X-85 V2 (0.964): points this fish brings, as seen in game (one catch), and what it earned this voyage at this stop.
                     var seenPoints=cached.Points;
                     var earned=OceanVoyage?.Frame?.ZoneFish.FirstOrDefault(entry=>entry.Item==fishId) is { Item:not 0 } here ? here:default;
@@ -130,7 +130,7 @@ internal sealed partial class MainWindow
                     {
                         ImGui.SameLine();
                         ImGui.TextColored(Muted,seenPoints is { } seen ? localization.Format("OceanVoyage.FishPoints",LevelRange(seen.LevelMin,seen.LevelMax)):"");
-                        if(earned.Points>0)TipText(localization.Format("OceanVoyage.FishEarned",earned.Nq+earned.Hq,earned.Points.ToString("N0")));
+                        if(earned.Points>0)TipText(localization.Format("OceanVoyage.FishEarned",earned.Nq+earned.Hq,earned.Points.ToString("N0",Numbers)));
                         else TipText(localization.Get("OceanVoyage.FishPointsTip"));
                     }
                     // X-85 V5 (0.963): a fish that needs Fisher's Intuition (GatherBuddy predators): an eye, the fish to catch first in its tooltip.
@@ -225,7 +225,7 @@ internal sealed partial class MainWindow
             {
                 var baitItem=items?.Find(held);var baitStock=GetRecipeHoldings(held);
                 ImGui.TextDisabled(localization.Get("FishingPanel.BaitInHand"));ImGui.SameLine();
-                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{baitStock.Total:N0}":"")}");
+                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{(baitStock.Total).ToString("N0",Numbers)}":"")}");
                 ImGui.SameLine();
                 ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",stop.Fish.Count(fish=>OceanFish(fish,spotId).Row.Route is [var first,..] && first==held)));
             }
@@ -269,7 +269,7 @@ internal sealed partial class MainWindow
             }
             ImGui.Separator();
             if(OceanVoyages.ShowTotals(frame) && OceanVoyages.Totals(frame) is var (points,caught))
-                ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",points.ToString("N0"),caught));
+                ImGui.TextUnformatted(localization.Format("OceanVoyage.Points",points.ToString("N0",Numbers),caught));
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
             Tip("OceanVoyage.Credit");
         });

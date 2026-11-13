@@ -62,8 +62,8 @@ internal sealed partial class MainWindow
         if(raw.Tool is { } tool)ImGui.TextWrapped(localization.Format("LiveDetails.Tool",itemCatalog.State.Catalog?.Find(tool.ItemId)?.Name ?? localization.Format("BankUi.Item",tool.ItemId),tool.GoodQualityPercent is { } percent ? $"× {percent/100m:0.00}":localization.Get("LiveDetails.Unknown")));
         else ImGui.TextDisabled(localization.Get("CraftLiveUi.NoTool"));
         if(frame.Animating)ImGui.TextDisabled(localization.Get("CraftLiveUi.Animating"));
-        ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Progress",frame.Progress?.ToString("N0") ?? "—",raw.Numbers.MaxProgress));
-        ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Quality",frame.Quality?.ToString("N0") ?? "—",raw.Numbers.MaxQuality));
+        ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Progress",frame.Progress?.ToString("N0",Numbers) ?? "—",raw.Numbers.MaxProgress));
+        ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Quality",frame.Quality?.ToString("N0",Numbers) ?? "—",raw.Numbers.MaxQuality));
         ImGui.TextUnformatted(localization.Format("CraftLiveCounts.Durability",frame.Durability?.ToString() ?? "—",raw.Numbers.MaxDurability));
         ImGui.TextUnformatted(localization.Format("LiveDetails.Stats",raw.Cp,raw.MaxCp,raw.Stats.Craftsmanship,raw.Stats.Control,raw.Stats.Level));
         DrawCraftProjection(state);

@@ -59,12 +59,12 @@ internal sealed partial class MainWindow
             var (query,type)=wanted;
             lexiconSearch=Task.Run(()=>LexiconBoard.Search(words,query,type));
         }
-        if(lexiconQuery.Trim().Length<LexiconBoard.MinimumQuery){ImGui.TextDisabled(localization.Format("Lexicon.Hint",words.Count.ToString("N0")));return;}
+        if(lexiconQuery.Trim().Length<LexiconBoard.MinimumQuery){ImGui.TextDisabled(localization.Format("Lexicon.Hint",words.Count.ToString("N0",Numbers)));return;}
         if(lexiconSearch is not null && lexiconFound.Rows.Count==0){ImGui.TextDisabled(localization.Get("Lexicon.Searching"));return;}
         if(lexiconFound.Total==0){ImGui.TextDisabled(localization.Get("Lexicon.None"));return;}
         var (rows,page,pages)=CraftFromStock.Paged(lexiconFound.Rows,lexiconPage,LexiconPageSize);
         lexiconPage=page;
-        ImGui.TextColored(Accent,localization.Format(lexiconFound.Total>lexiconFound.Rows.Count ? "Lexicon.CountMore":"Lexicon.Count",lexiconFound.Total.ToString("N0"),lexiconFound.Rows.Count.ToString("N0")));
+        ImGui.TextColored(Accent,localization.Format(lexiconFound.Total>lexiconFound.Rows.Count ? "Lexicon.CountMore":"Lexicon.Count",lexiconFound.Total.ToString("N0",Numbers),lexiconFound.Rows.Count.ToString("N0",Numbers)));
         ImGui.SameLine();
         ImGui.BeginDisabled(lexiconPage<=0);
         try{if(ImGui.SmallButton("<###LexiconPrevious"))lexiconPage--;}

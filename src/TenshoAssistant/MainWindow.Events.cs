@@ -138,7 +138,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted(entry?.Name ?? $"#{id}");
             if(entry?.Rewards is { } rewards)
             {
-                if(rewards.Gil>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("Events.Gil",rewards.Gil.ToString("N0")));}
+                if(rewards.Gil>0){ImGui.SameLine();ImGui.TextDisabled(localization.Format("Events.Gil",rewards.Gil.ToString("N0",Numbers)));}
                 foreach(var reward in rewards.Items.Take(4))
                 {
                     var definition=items?.Find(reward.ItemId);

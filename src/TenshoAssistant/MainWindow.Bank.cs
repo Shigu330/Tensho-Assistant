@@ -67,7 +67,7 @@ internal sealed partial class MainWindow
                 foreach (var row in rows)
                 {
                     string Count(long count) => row.Coverage == InventoryCoverage.Unknown ? "—"
-                        : row.Coverage == InventoryCoverage.Partial ? $"≥ {count:N0}" : count.ToString("N0");
+                        : row.Coverage == InventoryCoverage.Partial ? $"≥ {(count).ToString("N0",Numbers)}" : count.ToString("N0",Numbers);
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn(); ImGui.TextWrapped(StorageRowName(row));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(Count(row.Nq));
@@ -489,7 +489,7 @@ internal sealed partial class MainWindow
             ImGui.SetCursorScreenPos(slotMin + new Vector2(3));
             DrawItemIcon(item, new Vector2(slotSize - 6));
             if (select && ImGui.IsItemClicked()) SelectItem(row.ItemId);
-            var count = checked(row.Nq + row.Hq).ToString("N0");
+            var count = checked(row.Nq + row.Hq).ToString("N0",Numbers);
             var countSize = ImGui.CalcTextSize(count);
             var countPosition = new Vector2(slotMax.X - countSize.X - 3, slotMax.Y - countSize.Y - 2);
             drawList.AddRectFilled(countPosition - new Vector2(2, 1), slotMax - new Vector2(1, 1), ImGui.GetColorU32(ImGuiCol.PopupBg));

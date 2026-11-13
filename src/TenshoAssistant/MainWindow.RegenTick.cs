@@ -33,10 +33,10 @@ internal sealed partial class MainWindow
         if(regenTickShown is not { } tick)return;
         var gainPerTick=GpRegenFor(tick.JobId);
         var full=RegenTickTracker.ToFull(tick,gainPerTick);
-        var text=tick.Stalled ? localization.Format("GpTick.Stalled",tick.Gp,tick.MaxGp):full is { } rest ? localization.Format("GpTick.Full",tick.Gp,tick.MaxGp,$"{(int)rest.TotalMinutes}:{rest.Seconds:00}"):tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0")):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
+        var text=tick.Stalled ? localization.Format("GpTick.Stalled",tick.Gp,tick.MaxGp):full is { } rest ? localization.Format("GpTick.Full",tick.Gp,tick.MaxGp,$"{(int)rest.TotalMinutes}:{rest.Seconds:00}"):tick.SecondsLeft is { } left ? localization.Format("GpTick.Bar",tick.Gp,tick.MaxGp,left.ToString("0.0",Numbers)):localization.Format("GpTick.Waiting",tick.Gp,tick.MaxGp);
         // 0.486 (user request): the bar fills towards full GP; a small highlight runs along its foot for the tick.
         ImGui.ProgressBar(tick.MaxGp>0 ? Math.Clamp((float)tick.Gp/tick.MaxGp,0,1):0,new Vector2(180,ImGui.GetFrameHeight()),text);
-        if(ImGui.IsItemHovered())WrappedTooltip(tick.SecondsLeft is { } tip ? localization.Format("GpTick.Next",tip.ToString("0.0"))+Environment.NewLine+localization.Get("GpTick.Tip"):localization.Get("GpTick.Tip"));
+        if(ImGui.IsItemHovered())WrappedTooltip(tick.SecondsLeft is { } tip ? localization.Format("GpTick.Next",tip.ToString("0.0",Numbers))+Environment.NewLine+localization.Get("GpTick.Tip"):localization.Get("GpTick.Tip"));
         if(tick.Progress is { } running)
         {
             var from=ImGui.GetItemRectMin();var to=ImGui.GetItemRectMax();

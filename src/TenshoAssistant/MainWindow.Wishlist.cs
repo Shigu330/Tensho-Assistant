@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
                 {
                     var cheapest=WishlistSales.Cheapest(market.GetCached(world,id));
                     if(!WishlistSales.Say(id,cheapest,target,wishSalesSaid))continue;
-                    lines.Add(localization.Format("Wishlist.OnSale",items?.Find(id)?.Name ?? $"#{id}",cheapest!.Price.ToString("N0"),WorldName?.Invoke(cheapest.WorldId) ?? "?",target.ToString("N0")));
+                    lines.Add(localization.Format("Wishlist.OnSale",items?.Find(id)?.Name ?? $"#{id}",cheapest!.Price.ToString("N0",Numbers),WorldName?.Invoke(cheapest.WorldId) ?? "?",target.ToString("N0",Numbers)));
                 }
             return (IReadOnlyList<string>)lines;
         });

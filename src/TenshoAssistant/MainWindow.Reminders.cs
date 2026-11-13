@@ -103,14 +103,14 @@ internal sealed partial class MainWindow
                     ImGui.TextDisabled(localization.Format("Reminders.BingoOdds",Percent(odds.AtLeastOne),Percent(odds.AtLeastTwo),Percent(odds.Three)));
                     ImGui.TextDisabled(localization.Format("Reminders.BingoShuffle",Percent(shuffled.AtLeastOne),Percent(shuffled.AtLeastTwo),Percent(shuffled.Three)));
                     Tip("Reminders.BingoOddsHelp");
-                    static string Percent(double value)=>(value*100).ToString("0.#");
+                    static string Percent(double value)=>(value*100).ToString("0.#",Numbers);
                 });
             Row("HuntBills",FontAwesomeIcon.Crosshairs,timers?.HuntBillsHeld is { } bills ? localization.Format("Reminders.HuntBillsState",bills):localization.Get("Reminders.Unknown"),
                 weekly,lastWeekly,()=>DrawHuntBills(timers?.HuntBills));
             // 0.382 (g, M-11): challenge log (once the game loaded it) and Doman Enclave donations, weekly.
             Row("ChallengeLog",FontAwesomeIcon.ClipboardList,timers?.ChallengeLog is { } challenge ? localization.Format("Reminders.ChallengeLogState",challenge.Done,challenge.Total)
                 :localization.Get("Reminders.ChallengeLogUnknown"),weekly,lastWeekly);
-            Row("DomanEnclave",FontAwesomeIcon.Coins,timers?.DomanEnclave is { } doman ? localization.Format("Reminders.DomanEnclaveState",doman.Donated.ToString("N0"),doman.Allowance.ToString("N0"))
+            Row("DomanEnclave",FontAwesomeIcon.Coins,timers?.DomanEnclave is { } doman ? localization.Format("Reminders.DomanEnclaveState",doman.Donated.ToString("N0",Numbers),doman.Allowance.ToString("N0",Numbers))
                 :localization.Get("Reminders.DomanEnclaveUnknown"),weekly,lastWeekly);
             // 0.307 (R-07): free company voyages, as last read in the workshop; « Details » = the Free company page.
             var voyages=configuration.Voyages;

@@ -525,7 +525,7 @@
     "QuestionInstall": "Comment installer Tensho ?",
     "AnswerInstall": "Dans Dalamud › Settings › Experimental › Custom Plugin Repositories, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.",
     "QuestionLanguage": "Comment changer la langue ?",
-    "AnswerLanguage": "Paramètres › Général › Langue. L'anglais et le français sont complets ; dans une autre langue, un texte pas encore traduit s'affiche en anglais. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.",
+    "AnswerLanguage": "Paramètres › Général › Langue. L'anglais et le français sont complets. L'allemand et le japonais sont partiels (marqués « (partiel) » dans le menu) : seuls quelques titres sont traduits et le reste s'affiche en anglais, donc Tensho démarre en anglais avec un client du jeu allemand ou japonais ; vous pouvez quand même les choisir. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.",
     "QuestionOffline": "Puis-je couper les données communautaires ?",
     "AnswerOffline": "Oui : Paramètres › Données et sources › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.",
     "QuestionPause": "Pourquoi Tensho s'arrête-t-il en JcJ ou en donjon profond ?",
@@ -876,7 +876,7 @@
     "PlayerIconScale": "Taille de la flèche qui montre votre position sur la carte Tensho. Par défaut : 100 %.",
     "ViewConeScale": "Longueur du cône de vision devant votre position. Par défaut : 100 %.",
     "ViewConeOpacity": "Opacité du cône de vision : 0 % = invisible, 100 % = plein. Par défaut : 50 %.",
-    "Language": "Langue de Tensho. Par défaut : celle du jeu. Les textes manquants d'une langue s'affichent en anglais.",
+    "Language": "Langue de Tensho. Par défaut : celle du jeu quand Tensho y est complet (anglais ou français), sinon l'anglais. Une langue partielle est marquée « (partiel) » ; ses textes manquants s'affichent en anglais.",
     "Theme": "Couleurs de Tensho. « Suivre le jeu » reprend le thème choisi dans les options du jeu. Par défaut : suivre le jeu.",
     "CraftLog": "Panneau d'aide aux macros à côté du carnet de synthèse du jeu, pour la recette ouverte.\nPar défaut : activé.",
     "Steps": "Nombre maximal d'actions qu'explore la recherche de rotation d'artisanat. Plus haut = plus long à calculer. Sert à la recherche de Tensho : quand Raphael est désactivé, ou quand Raphael échoue (grisé tant que Raphael est activé).\nPar défaut : 40.",
@@ -968,6 +968,7 @@
   },
   "Localization": {
     "LoadedLanguages": "{0} langues chargées",
+    "PartialLanguage": "{0} (partiel)",
     "ReferenceSummary": "Clés de référence : {0} · langues : {1}"
   },
   "CraftStock": {
@@ -1956,6 +1957,7 @@
     "Error": "Ces plages ne peuvent pas être calculées. Les détails techniques sont disponibles en mode développeur."
   },
   "WeatherDetails": {
+    "Share": "{0} : {1}",
     "Loading": "Lecture des tables météo du jeu…",
     "Error": "Les données météo sont indisponibles. Les détails techniques sont disponibles en mode développeur.",
     "Unknown": "Météo inconnue",

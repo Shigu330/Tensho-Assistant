@@ -169,7 +169,7 @@ internal sealed partial class MainWindow
                 }
                 if(dim)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,0.45f);
                 ImGui.SameLine();
-                var stock=owned==true ? $" · ×{GetRecipeHoldings(id).Total:N0}":"";
+                var stock=owned==true ? $" · ×{(GetRecipeHoldings(id).Total).ToString("N0",Numbers)}":"";
                 clicked|=ImGui.Selectable($"{item?.Name ?? localization.Format("BankUi.Item",id)}{stock}##FashionWeekItem{hint}/{id}",itemId==id);
                 var hovered=ImGui.IsItemHovered();
                 // 0.214: the tooltip and the menu are drawn without the dimming (they inherited the row's alpha).
@@ -177,8 +177,8 @@ internal sealed partial class MainWindow
                 if(hovered && item is not null)DrawItemInfoTooltip(id);
                 if(item is not null)ItemLinksMenu($"FashionWeekLinks{hint}/{id}",item);
                 // Report count kept short at the end of the row; the full wording is in the tooltip of the count.
-                ImGui.SameLine();ImGui.TextDisabled($"×{entry.Match.Reports:N0}");
-                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FashionWeek.Reports",entry.Match.Reports.ToString("N0")));
+                ImGui.SameLine();ImGui.TextDisabled($"×{(entry.Match.Reports).ToString("N0",Numbers)}");
+                if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FashionWeek.Reports",entry.Match.Reports.ToString("N0",Numbers)));
                 // 0.581 (T15): this piece for the week's outfit.
                 var weekStart=FashionWeek.Bounds(DateTimeOffset.UtcNow).Start;
                 var inOutfit=TenshoAssistant.Fashion.FashionOutfit.Current(configuration.FashionOutfit,weekStart).GetValueOrDefault(slot)==id;
@@ -211,7 +211,7 @@ internal sealed partial class MainWindow
             var colour=new Vector4(((rgb>>16)&0xFF)/255f,((rgb>>8)&0xFF)/255f,(rgb&0xFF)/255f,1);
             ImGui.ColorButton($"##Dye{slot}/{dye.StainId}",colour,ImGuiColorEditFlags.NoTooltip|ImGuiColorEditFlags.NoDragDrop,new Vector2(ImGui.GetTextLineHeight()));
             ImGui.SameLine();
-            ImGui.TextUnformatted(localization.Format("FashionWeek.Dye",stain?.Name is { Length:>0 } name ? name:dye.StainId.ToString(),(dye.Share*100).ToString("0.#"),dye.Reports));
+            ImGui.TextUnformatted(localization.Format("FashionWeek.Dye",stain?.Name is { Length:>0 } name ? name:dye.StainId.ToString(),(dye.Share*100).ToString("0.#",Numbers),dye.Reports));
         }
     }
 

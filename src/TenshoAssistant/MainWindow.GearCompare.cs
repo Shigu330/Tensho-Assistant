@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
                 {
                     var color=delta>0 ? Success:UI.FfxivTheme.Error;
                     ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("Gear.Param"+param));
-                    ImGui.TableNextColumn();ImGui.TextColored(color,$"{(delta>0 ? "+":"")}{delta:N0}");
+                    ImGui.TableNextColumn();ImGui.TextColored(color,$"{(delta>0 ? "+":"")}{(delta).ToString("N0",Numbers)}");
                 }
             }
             finally{ImGui.EndTable();}

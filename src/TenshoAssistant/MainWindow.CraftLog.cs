@@ -120,7 +120,7 @@ internal sealed partial class MainWindow
                 CraftLogSection(localization.Get("CraftLogUi.SectionTarget"));
                 DrawCraftLogTarget(aimed);
             }
-            CraftLogSection(localization.Get("CraftLogUi.SectionResult"),localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0"))
+            CraftLogSection(localization.Get("CraftLogUi.SectionResult"),localization.Format("CraftLogUi.Assumptions",context.StartingQuality.ToString("N0",Numbers))
                 +(context.Recipe?.Simulation?.Collectable==true ? localization.Get("CraftLogUi.CollectableHelp"):localization.Get("CraftLogUi.NoHq"))+"\n"+localization.Get("CraftLogUi.Objective"));
             var state=craftLogSession.State;
             if(state.Result is { } solved)
@@ -183,9 +183,9 @@ internal sealed partial class MainWindow
             if(macro.Name!="Suggested macro")ImGui.TextWrapped(macro.Name);
             var simulation=macro.Simulation;var maximum=craftLogInput!.Recipe.Simulation!.Quality;var target=craftLogInput.Options.TargetQuality;var quality=simulation.Final.Quality;
             ImGui.PushStyleColor(ImGuiCol.PlotHistogram,quality>=target ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning);
-            try{ImGui.ProgressBar(maximum>0 ? Math.Clamp((float)quality/maximum,0,1):1,new Vector2(-1,ImGui.GetFrameHeight()),$"{quality:N0} / {maximum:N0}");}
+            try{ImGui.ProgressBar(maximum>0 ? Math.Clamp((float)quality/maximum,0,1):1,new Vector2(-1,ImGui.GetFrameHeight()),$"{(quality).ToString("N0",Numbers)} / {(maximum).ToString("N0",Numbers)}");}
             finally{ImGui.PopStyleColor();}
-            ImGui.TextUnformatted(localization.Format("CraftLogUi.ResultLine",macro.Export.Actions,macro.Export.WaitSeconds)+(target<maximum ? localization.Format("CraftLogUi.ResultTarget",target.ToString("N0")):""));
+            ImGui.TextUnformatted(localization.Format("CraftLogUi.ResultLine",macro.Export.Actions,macro.Export.WaitSeconds)+(target<maximum ? localization.Format("CraftLogUi.ResultTarget",target.ToString("N0",Numbers)):""));
             var job=craftLogInput.Recipe.CraftTypeId+8;var steps=simulation.Steps;
             const float iconSize=28,iconGap=3;
             var perRow=Math.Max(1,(int)((ImGui.GetContentRegionAvail().X+iconGap)/(iconSize+iconGap)));
@@ -255,7 +255,7 @@ internal sealed partial class MainWindow
         if(!ImGui.BeginTable("###CraftLogFigures",4,ImGuiTableFlags.SizingStretchSame))return;
         try
         {
-            void Cell(string key,int value){ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get(key));ImGui.TextUnformatted(value.ToString("N0"));}
+            void Cell(string key,int value){ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get(key));ImGui.TextUnformatted(value.ToString("N0",Numbers));}
             if(recipe?.Simulation is { } parameters)
             {
                 Cell("CraftLogUi.FigureProgress",parameters.Progress);Cell("CraftLogUi.FigureQuality",parameters.Quality);

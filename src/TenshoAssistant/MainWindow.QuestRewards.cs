@@ -48,7 +48,7 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null)DrawItemInfoTooltip(item.Id);
                     ItemLinksMenu($"RewardLinks{line.Slot}",item);
                     if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("QuestRewards.Quality",line.HighQuality is null ? localization.Get("QuestRewards.Unspecified"):line.HighQuality==true ? "HQ":"NQ")+"\n"+localization.Get(line.StainId==0 ? "QuestRewards.NoStain":"QuestRewards.Stain")+"\n"+localization.Get("QuestRewards.Click"));
-                    ImGui.SameLine();ImGui.TextDisabled(line.Quantity is { } quantity ? $"× {quantity:N0}{(line.HighQuality==true ? " HQ":"")}":localization.Get("QuestRewards.Quantity"));
+                    ImGui.SameLine();ImGui.TextDisabled(line.Quantity is { } quantity ? $"× {(quantity).ToString("N0",Numbers)}{(line.HighQuality==true ? " HQ":"")}":localization.Get("QuestRewards.Quantity"));
                     if(clicked && item is not null){SelectItem(item.Id);page=Page.Items;focusStocksTab=true;}
                 }
             }
@@ -65,7 +65,7 @@ internal sealed partial class MainWindow
                 "Tomestone type missing or ambiguous."=>"QuestRewardDetails.Tomestone",
                 _=>"QuestRewards.Unknown",
             };
-            ImGui.TextWrapped(localization.Get(key)+(unresolved.Quantity is { } quantity ? localization.Format("UiFragments.UnresolvedQuantity",quantity.ToString("N0")):""));
+            ImGui.TextWrapped(localization.Get(key)+(unresolved.Quantity is { } quantity ? localization.Format("UiFragments.UnresolvedQuantity",quantity.ToString("N0",Numbers)):""));
             if(developerMode)ImGui.TextWrapped(RawMessage(unresolved.Reason));
         }
         if(rewards.HasAdditionalRewards)ImGui.TextWrapped(localization.Get("QuestRewards.Additional"));

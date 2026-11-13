@@ -111,7 +111,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(item.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(item.Category);
-                ImGui.TableNextColumn();ImGui.TextUnformatted(item.Amount.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(item.Amount.ToString(Numbers));
             }
         }
         finally{ImGui.EndTable();}
@@ -119,7 +119,7 @@ internal sealed partial class MainWindow
 
     private string IslandAgendaText(IslandAgenda agenda)
     {
-        var culture=System.Globalization.CultureInfo.CurrentCulture;
+        var culture=Numbers;
         var lines=new List<string>();
         foreach(var chain in agenda.Chains)
         {
@@ -151,11 +151,11 @@ internal sealed partial class MainWindow
                         var row=islandRows[index];
                         ImGui.TableNextRow();
                         ImGui.TableNextColumn();ImGui.TextUnformatted(row.Craft.Name);
-                        ImGui.TableNextColumn();ImGui.TextUnformatted(row.Craft.Hours.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                        ImGui.TableNextColumn();ImGui.TextUnformatted(row.Craft.Hours.ToString(Numbers));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(string.Join(", ",row.Craft.Themes.Select(theme=>catalog.ThemeNames.GetValueOrDefault(theme) ?? "#"+theme)));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(row.Popularity is { } popularity ? localization.Get("Island.Popularity"+popularity):"—");
                         ImGui.TableNextColumn();ImGui.TextUnformatted((row.Supply is { } supply ? localization.Get("Island.Supply"+supply):"—")+(row.Demand is { } demand ? " · "+localization.Get("Island.Demand"+demand):""));
-                        ImGui.TableNextColumn();ImGui.TextUnformatted(row.Value is { } value ? "~"+value.ToString("0",System.Globalization.CultureInfo.CurrentCulture):"—");
+                        ImGui.TableNextColumn();ImGui.TextUnformatted(row.Value is { } value ? "~"+value.ToString("0",Numbers):"—");
                         ImGui.TableNextColumn();ImGui.TextUnformatted(index<islandMaterialTexts.Length ? islandMaterialTexts[index]:"");
                     }
                 clipper.End();

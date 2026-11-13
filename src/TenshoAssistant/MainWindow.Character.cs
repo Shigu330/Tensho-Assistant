@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
                 if(ImGui.IsItemHovered())DrawStatHelp(row,state.Modifiers);
                 ImGui.TableNextColumn();ImGui.TextColored(Success,row.Value);
                 if(ImGui.IsItemHovered())DrawStatHelp(row,state.Modifiers);
-                if(withRaw){ImGui.TableNextColumn();ImGui.TextDisabled(row.Raw.ToString("N0"));}
+                if(withRaw){ImGui.TableNextColumn();ImGui.TextDisabled(row.Raw.ToString("N0",Numbers));}
                 ImGui.TableNextColumn();
                 if(StatFormulas.Tier(row.Key,row.Raw,state.Modifiers) is { } tier)
                 {

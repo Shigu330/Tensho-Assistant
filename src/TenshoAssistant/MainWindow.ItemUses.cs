@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
                         var bought=items?.Find(offer.Sale.ItemId);
                         var cost=offer.Sale.Costs.FirstOrDefault(entry=>entry.CurrencyItemId==id);
                         ImGui.PushID((int)offer.Sale.ShopId);
-                        try{if(ItemCell(bought,offer.Sale.ItemId,20,$"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0") ?? "?"}"))focusUsesTab=false;}
+                        try{if(ItemCell(bought,offer.Sale.ItemId,20,$"{bought?.Name ?? offer.Sale.ItemId.ToString()} · {cost?.Amount.ToString("N0",Numbers) ?? "?"}"))focusUsesTab=false;}
                         finally{ImGui.PopID();}
                     }
                     ImGui.Unindent();

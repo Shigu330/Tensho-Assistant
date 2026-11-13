@@ -54,7 +54,7 @@ public sealed class GilDtrEntry : IDisposable
         {
             shown=today;
             entry.Text=new SeStringBuilder().AddText(label).Build();
-            tip=string.Format(System.Globalization.CultureInfo.CurrentCulture,text("GilJournal.BarTip"),today.Gained.ToString("N0"),today.Spent.ToString("N0"));
+            tip=string.Format(TenshoAssistant.Localization.TenshoCulture.Current,text("GilJournal.BarTip"),today.Gained.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),today.Spent.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current));
         }
         entry.Tooltip=configuration.AlarmBarTooltip && bounds is not null ? null:new SeStringBuilder().AddText(tip).Build();
     }

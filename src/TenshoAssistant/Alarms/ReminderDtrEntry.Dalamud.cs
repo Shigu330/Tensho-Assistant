@@ -59,7 +59,7 @@ public sealed class ReminderDtrEntry : IDisposable
             var finished=ReminderCounts.Finished(timers.Ventures?.Select(venture=>venture.Done),configuration.Voyages,
                 timers.SquadronMission is { } mission ? (mission.Id,mission.Done):null,timers.SquadronTraining is { } training ? (training.Id,training.Done):null,
                 configuration.GardenBeds,now).Where(item=>configuration.ReminderBarHidden?.Contains(item.Kind.ToString())!=true).ToArray();
-            finishedLines=finished.Select(item=>string.Format(System.Globalization.CultureInfo.CurrentCulture,text("Reminders.Bar"+item.Kind),item.Count)).ToArray();
+            finishedLines=finished.Select(item=>string.Format(TenshoAssistant.Localization.TenshoCulture.Current,text("Reminders.Bar"+item.Kind),item.Count)).ToArray();
             todoLines=todo(now);
             todoBounds=Show(todoEntry,configuration.ReminderServerBar,SeIconChar.QuestRepeatable,todoLines.Count,text("Reminders.BarTitle"),todoLines.Count==0 ? [text("Reminders.BarNone")]:todoLines);
             finishedBounds=Show(finishedEntry,configuration.ReminderFinishedServerBar && finished.Length>0,SeIconChar.BoxedStar,finished.Sum(item=>item.Count),text("Reminders.BarFinishedTitle"),finishedLines);

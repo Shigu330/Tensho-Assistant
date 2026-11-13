@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
         if(preparationPanelShown is not { } recipe)return;
         RefreshRecipeHoldingsCache();
         var name=itemCatalog.State.Catalog?.Find(recipe.ResultItemId)?.Name ?? recipe.ResultItemId.ToString();
-        ImGui.TextColored(Accent,$"{name} ×{configuration.PreparationPanelTarget:N0}");
+        ImGui.TextColored(Accent,$"{name} ×{(configuration.PreparationPanelTarget).ToString("N0",Numbers)}");
         DrawListPanelEntries("Preparation",PreparationLines);
     }
 
@@ -236,7 +236,7 @@ internal sealed partial class MainWindow
                     if(craft.Recipe.CraftTypeId<8)
                     {
                         DrawGameIcon(62108+craft.Recipe.CraftTypeId,new Vector2(ImGui.GetTextLineHeight()));
-                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0")));
+                        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.CraftRuns",craft.Recipe.CraftType,craft.Runs.ToString("N0",Numbers)));
                         ImGui.SameLine();
                     }
                     DrawListPanelLine(key+"Crafts",craft.Item,craft.Needed,GetRecipeHoldings(craft.Item));
@@ -334,9 +334,9 @@ internal sealed partial class MainWindow
     {
         var size=new Vector2(ImGui.GetTextLineHeight());
         ImGui.SameLine();DrawGameIcon(TeleportIcon,size);
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.ZoneCost",gil.ToString("N0")));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("ListPanels.ZoneCost",gil.ToString("N0",Numbers)));
         ImGui.SameLine();DrawItemIcon(itemCatalog.State.Catalog?.Find(1) ?? new Items.ItemDefinition(1,"",false,65002),size);
-        ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0"));
+        ImGui.SameLine();ImGui.TextUnformatted(gil.ToString("N0",Numbers));
     }
     private sealed record ListLayout(long At,string? Here,(ItemOrigin Origin,(uint Item,long Needed)[] Lines)[] Origins,ListZoneGroup[]? Zones);
     private readonly Dictionary<string,ListLayout> listPanelLayouts=[];
@@ -514,7 +514,7 @@ internal sealed partial class MainWindow
         var onMe=stock.Rows.Where(row=>row.Category==Inventory.StorageCategory.PlayerBags).Sum(row=>row.Nq+row.Hq);
         if(onMe>=required)return null;
         var away=stock.Rows.Where(row=>row.Category!=Inventory.StorageCategory.PlayerBags && row.Nq+row.Hq>0).ToArray();
-        return away.Length==0 ? null:string.Join(", ",away.Select(row=>$"{StorageRowName(row)} {(row.Nq+row.Hq):N0}"));
+        return away.Length==0 ? null:string.Join(", ",away.Select(row=>$"{StorageRowName(row)} {((row.Nq+row.Hq)).ToString("N0",Numbers)}"));
     }
     private void DrawListPanelLine(string list,uint itemId,long required,Inventory.ItemHoldingsSummary stock)
     {
@@ -539,9 +539,9 @@ internal sealed partial class MainWindow
         ImGui.SameLine();
         ImGui.TextUnformatted(item?.Name ?? itemId.ToString());
         ImGui.SameLine();
-        if(!stock.HasObservation)ImGui.TextDisabled($"— / {required:N0}");
-        else if(stock.Total<required)ImGui.TextColored(UI.FfxivTheme.Warning,$"{stock.Total:N0} / {required:N0}");
-        else ImGui.TextColored(Success,$"{stock.Total:N0} / {required:N0}");
+        if(!stock.HasObservation)ImGui.TextDisabled($"— / {(required).ToString("N0",Numbers)}");
+        else if(stock.Total<required)ImGui.TextColored(UI.FfxivTheme.Warning,$"{(stock.Total).ToString("N0",Numbers)} / {(required).ToString("N0",Numbers)}");
+        else ImGui.TextColored(Success,$"{(stock.Total).ToString("N0",Numbers)} / {(required).ToString("N0",Numbers)}");
         // 0.822 (X-55, user request): part of the count is not on the character (a retainer, the saddlebag, the company chest…) and the bags alone do not cover the need.
         if(stock.HasObservation && ListPanelElsewhere(stock,required) is { } elsewhere)
         {

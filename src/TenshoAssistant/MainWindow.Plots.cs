@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         paissa.Request(market.State.WorldId,(previous,current)=>
         {
             foreach(var plot in PaissaDb.New(previous,current).Where(PlotMatches))
-                PlotAlert?.Invoke(localization.Format("Plots.Alert",world,PlotDistrict(plot),plot.Ward,plot.Plot,PlotSize(plot.Size),plot.Price.ToString("N0")));
+                PlotAlert?.Invoke(localization.Format("Plots.Alert",world,PlotDistrict(plot),plot.Ward,plot.Plot,PlotSize(plot.Size),plot.Price.ToString("N0",Numbers)));
         });
     }
 
@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
         var shown=plots.Where(PlotMatches).ToArray();
         if(shown.Length==0){ImGui.TextDisabled(localization.Get("Plots.None"));return;}
         foreach(var plot in shown.Take(80))
-            ImGui.TextUnformatted(localization.Format("Plots.Row",PlotDistrict(plot),plot.Ward,plot.Plot,PlotSize(plot.Size),plot.Price.ToString("N0"),
+            ImGui.TextUnformatted(localization.Format("Plots.Row",PlotDistrict(plot),plot.Ward,plot.Plot,PlotSize(plot.Size),plot.Price.ToString("N0",Numbers),
                 localization.Get(plot.Lottery ? "Plots.Lottery":"Plots.FirstCome"),plot.LottoEntries?.ToString() ?? "?"));
         if(shown.Length>80)ImGui.TextDisabled(localization.Format("Events.More",shown.Length-80));
         ImGui.TextDisabled(localization.Get("Plots.Credit"));

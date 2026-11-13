@@ -31,7 +31,7 @@ internal sealed partial class MainWindow
     private void DrawProgressLine(uint id)
     {
         var seen=(AchievementProgressSource?.Progress ?? Volatile.Read(ref desktopAchievements))?.GetValueOrDefault(id);
-        if(seen is not null)ImGui.TextColored(Accent,localization.Format("AchievementProgress.Line",seen.Current.ToString("N0"),seen.Max.ToString("N0"),seen.SeenAt.ToLocalTime().ToString("t")));
+        if(seen is not null)ImGui.TextColored(Accent,localization.Format("AchievementProgress.Line",seen.Current.ToString("N0",Numbers),seen.Max.ToString("N0",Numbers),seen.SeenAt.ToLocalTime().ToString("t")));
         else ImGui.TextDisabled(localization.Get("AchievementProgress.Unknown"));
         if(AchievementProgressSource is null)return;
         ImGui.SameLine();

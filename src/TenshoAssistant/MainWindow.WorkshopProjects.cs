@@ -137,12 +137,12 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();ImGui.TableNextColumn();
                 ItemCell(itemCatalog.State.Catalog?.Find(item),item);
                 ImGui.TableNextColumn();ImGui.TextDisabled(sets ?? "");
-                ImGui.TableNextColumn();ImGui.TextUnformatted(total.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(total.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
                 var stock=GetRecipeHoldings(item);
                 if(!stock.HasObservation)ImGui.TextDisabled("—");
-                else if(WorkshopStock.Missing(total,stock.Total)>0)ImGui.TextColored(UI.FfxivTheme.Warning,stock.Total.ToString("N0"));
-                else ImGui.TextUnformatted(stock.Total.ToString("N0"));
+                else if(WorkshopStock.Missing(total,stock.Total)>0)ImGui.TextColored(UI.FfxivTheme.Warning,stock.Total.ToString("N0",Numbers));
+                else ImGui.TextUnformatted(stock.Total.ToString("N0",Numbers));
             }
         }
         finally{ImGui.EndTable();}

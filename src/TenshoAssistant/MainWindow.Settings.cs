@@ -74,12 +74,12 @@ internal sealed partial class MainWindow
     {
         var languageCode = localization.CurrentCode;
         var currentLanguage = localization.AvailableLanguages.FirstOrDefault(language => language.Code == languageCode);
-        if (ImGui.BeginCombo(localization.Get("Settings.Language") + "###InterfaceLanguage", string.IsNullOrEmpty(currentLanguage.NativeName) ? languageCode : currentLanguage.NativeName))
+        if (ImGui.BeginCombo(localization.Get("Settings.Language") + "###InterfaceLanguage", string.IsNullOrEmpty(currentLanguage.NativeName) ? languageCode : LanguageLabel(currentLanguage)))
         {
             try
             {
                 foreach (var language in localization.AvailableLanguages)
-                    if (ImGui.Selectable(language.NativeName, language.Code == languageCode))
+                    if (ImGui.Selectable(LanguageLabel(language) + "###Language" + language.Code, language.Code == languageCode))
                     {
                         var previousLanguage = configuration.LanguageCode;
                         configuration.LanguageCode = language.Code;
@@ -92,6 +92,10 @@ internal sealed partial class MainWindow
         }
         Tip("SettingTips.Language");
     }
+
+    // 0.1220 (X-258): a partial language says so in the menu (« Deutsch (partial) »).
+    private string LanguageLabel(TenshoAssistant.Localization.LocalizationLanguage language)
+        => language.Partial ? localization.Format("Localization.PartialLanguage", language.NativeName) : language.NativeName;
 
     private void DrawInterfaceSettings()
     {

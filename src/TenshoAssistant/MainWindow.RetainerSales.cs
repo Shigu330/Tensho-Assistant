@@ -81,8 +81,8 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted((catalog?.Find(listing.ItemId)?.Name ?? $"#{listing.ItemId}") + (listing.Hq ? " HQ" : ""));
                 if (ImGui.IsItemHovered()) DrawItemInfoTooltip(listing.ItemId);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.Quantity.ToString());
-                ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.UnitPrice?.ToString("N0") ?? "?");
-                ImGui.TableNextColumn(); ImGui.TextUnformatted(verdict.Lowest?.ToString("N0") ?? "—");
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(listing.UnitPrice?.ToString("N0",Numbers) ?? "?");
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(verdict.Lowest?.ToString("N0",Numbers) ?? "—");
                 if (verdict.Competitor is { Length: > 0 } seller && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RetainerSales.Seller", seller, offers?.DataAt?.ToLocalTime().ToString("g") ?? "?"));
                 else if (verdict.Lowest is not null && offers?.Offers.FirstOrDefault()?.Seen == true && ImGui.IsItemHovered()) WrappedTooltip(localization.Format("RetainerSales.SeenAt", offers.DataAt?.ToLocalTime().ToString("g") ?? "?"));
                 ImGui.TableNextColumn();
@@ -95,7 +95,7 @@ internal sealed partial class MainWindow
                     RetainerVerdictKind.PriceUnknown => ("RetainerSales.PriceUnknown", Muted),
                     _ => ("RetainerSales.Unknown", Muted),
                 };
-                ImGui.TextColored(color, verdict.Kind == RetainerVerdictKind.Undercut ? localization.Format(key, verdict.Gap?.ToString("N0") ?? "?") : localization.Get(key));
+                ImGui.TextColored(color, verdict.Kind == RetainerVerdictKind.Undercut ? localization.Format(key, verdict.Gap?.ToString("N0",Numbers) ?? "?") : localization.Get(key));
                 ImGui.TableNextColumn();
                 if (verdict.Paste is { } paste)
                 {

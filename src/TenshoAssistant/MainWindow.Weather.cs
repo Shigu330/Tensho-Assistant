@@ -128,7 +128,7 @@ internal sealed partial class MainWindow
         if(catalog.Zone(weatherTerritory) is { } zone && TenshoAssistant.UI.UiComponents.Header(localization.Get("WeatherDetails.Coverage")+"###WeatherCoverage"))
         {
             var total=zone.Shares.Sum(share=>(long)share.Chance);ImGui.TextUnformatted(localization.Format("WeatherDetails.Rates",total));
-            foreach(var share in zone.Shares)ImGui.TextUnformatted($"{catalog.Weather(share.WeatherId)?.Name ?? localization.Get("WeatherDetails.Unknown")} : {share.Chance} %");
+            foreach(var share in zone.Shares)ImGui.TextUnformatted(localization.Format("WeatherDetails.Share",catalog.Weather(share.WeatherId)?.Name ?? localization.Get("WeatherDetails.Unknown"),TenshoAssistant.Localization.TenshoCulture.Percent(share.Chance)));
             if(total!=100)ImGui.TextWrapped(localization.Get("WeatherDetails.Incomplete"));
             if(zone.Individual)ImGui.TextWrapped(localization.Get("WeatherDetails.Individual"));
         }

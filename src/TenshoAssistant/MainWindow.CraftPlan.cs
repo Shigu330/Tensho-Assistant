@@ -29,8 +29,8 @@ internal sealed partial class MainWindow
     private void DrawStorageDetail(Inventory.ItemHoldingsSummary holdings)
     {
         var lines=holdings.Rows.Where(row=>row.Nq+row.Hq>0).Select(row=>row.IsCached && row.ObservedAt is { } seen
-            ? localization.Format("PlanUi.StoredCached",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"),seen.ToLocalTime().ToString("d"))
-            : localization.Format("PlanUi.Stored",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0"))).ToArray();
+            ? localization.Format("PlanUi.StoredCached",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0",Numbers),seen.ToLocalTime().ToString("d"))
+            : localization.Format("PlanUi.Stored",Inventory.StorageNames.Of(localization,row),(row.Nq+row.Hq).ToString("N0",Numbers))).ToArray();
         WrappedTooltip(lines.Length>0 ? string.Join("\n",lines):localization.Get("PlanUi.StoredNone"));
     }
     private void OpenCraftPreparation(RecipeDefinition recipe)
@@ -68,8 +68,8 @@ internal sealed partial class MainWindow
             configuration.PreparationPanelItem = recipe.ResultItemId; configuration.PreparationPanelRecipe = recipe.RecipeId; configuration.PreparationPanelTarget = craftPlanTarget;
             SaveReminders();
         }
-        ImGui.TextColored(Accent, localization.Format("PlanUi.Summary",plan.Crafts.ToString("N0"),plan.Produced.ToString("N0")));
-        if (plan.Produced > plan.Requested) ImGui.TextDisabled(localization.Format("PlanUi.Surplus",(plan.Produced-plan.Requested).ToString("N0")));
+        ImGui.TextColored(Accent, localization.Format("PlanUi.Summary",plan.Crafts.ToString("N0",Numbers),plan.Produced.ToString("N0",Numbers)));
+        if (plan.Produced > plan.Requested) ImGui.TextDisabled(localization.Format("PlanUi.Surplus",(plan.Produced-plan.Requested).ToString("N0",Numbers)));
         if (plan.Materials.Count == 0)
         {
             ImGui.TextDisabled(localization.Get("PlanUi.NoIngredients"));
@@ -100,13 +100,13 @@ internal sealed partial class MainWindow
                         if (ImGui.SmallButton(localization.Get("PlanUi.Locations"))) OpenGathering(material.ItemId);
                     }
                     finally { ImGui.PopID(); }
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(material.Required.ToString("N0"));
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(material.Required.ToString("N0",Numbers));
                     ImGui.TableNextColumn();
-                    ImGui.TextUnformatted(material.Holdings.HasObservation ? material.Holdings.Total.ToString("N0") : localization.Get("PlanUi.Unknown"));
+                    ImGui.TextUnformatted(material.Holdings.HasObservation ? material.Holdings.Total.ToString("N0",Numbers) : localization.Get("PlanUi.Unknown"));
                     if (ImGui.IsItemHovered()) DrawStorageDetail(material.Holdings);
                     ImGui.TableNextColumn();
                     if (!material.Holdings.HasObservation) ImGui.TextDisabled(localization.Get("PlanUi.Verify"));
-                    else ImGui.TextColored(material.Uncovered == 0 ? Success : Accent, material.Uncovered.ToString("N0"));
+                    else ImGui.TextColored(material.Uncovered == 0 ? Success : Accent, material.Uncovered.ToString("N0",Numbers));
                 }
             }
             finally { ImGui.EndTable(); }

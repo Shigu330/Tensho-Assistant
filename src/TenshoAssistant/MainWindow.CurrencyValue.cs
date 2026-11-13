@@ -123,7 +123,7 @@ internal sealed partial class MainWindow
         // 0.794 (X-33, user request): the same days of sales as « What can I craft? », and the balance they are counted against.
         SaleDaysSetting("CurrencyValueDays","CurrencyValue.SaleDaysTip");
         ImGui.SameLine();
-        ImGui.TextDisabled(balance is { } held ? localization.Format("CurrencyValue.Balance",held.ToString("N0")):localization.Get("CurrencyValue.BalanceUnknown"));
+        ImGui.TextDisabled(balance is { } held ? localization.Format("CurrencyValue.Balance",held.ToString("N0",Numbers)):localization.Get("CurrencyValue.BalanceUnknown"));
         BoolSetting("CurrencyValue.Market","CurrencyValue.MarketTip",()=>configuration.CurrencyValueMarket,value=>
         {
             configuration.CurrencyValueMarket=value;
@@ -202,19 +202,19 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawItemIcon(definition,size);ImGui.SameLine();
                 ImGui.TextUnformatted((definition?.Name ?? $"#{row.ItemId}")+(row.Hq ? " HQ":"")+(row.Quantity>1 ? $" ×{row.Quantity}":""));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(row.Cost.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(row.Cost.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
-                if(row.MarketPrice is { } price)ImGui.TextUnformatted(price.ToString("N0"));
+                if(row.MarketPrice is { } price)ImGui.TextUnformatted(price.ToString("N0",Numbers));
                 else ImGui.TextDisabled(definition is { IsMarketable:false } ? localization.Get("CurrencyValue.NotSold"):currencyPricesAsked.Contains(row.ItemId) && !prices.Loading && prices.Error is null ? localization.Get("CurrencyValue.NoOffer"):"—");
                 ImGui.TableNextColumn();
-                if(row.PerDay is { } perDay)ImGui.TextUnformatted(perDay.ToString("0.##",System.Globalization.CultureInfo.CurrentCulture));else ImGui.TextDisabled("—");
+                if(row.PerDay is { } perDay)ImGui.TextUnformatted(perDay.ToString("0.##",Numbers));else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
-                if(row.GilPerUnit is { } perUnit)ImGui.TextColored(Success,perUnit.ToString("N1"));else ImGui.TextDisabled("—");
+                if(row.GilPerUnit is { } perUnit)ImGui.TextColored(Success,perUnit.ToString("N1",Numbers));else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
                 if(row.Worth(balance,days) is { } worth)
                 {
-                    ImGui.TextColored(worth>0 ? Success:Muted,worth.ToString("N0"));
-                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CurrencyValue.WorthTip",(row.Sellable(balance,days) ?? 0).ToString("N0"),days));
+                    ImGui.TextColored(worth>0 ? Success:Muted,worth.ToString("N0",Numbers));
+                    if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("CurrencyValue.WorthTip",(row.Sellable(balance,days) ?? 0).ToString("N0",Numbers),days));
                 }
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();

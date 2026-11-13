@@ -121,8 +121,8 @@ internal sealed partial class MainWindow
         if(gpResult is not { } result) return;
         var best=result.Best;
         ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Format("GpUi.Best",best.ExpectedYield.ToString("0.00"),best.Cost));
-        ImGui.TextDisabled(localization.Format("GpUi.Baseline",result.Baseline.ToString("0.00"),(best.ExpectedYield-result.Baseline).ToString("0.00"),result.Scenario.Budget-best.Cost));
+        ImGui.TextColored(Accent,localization.Format("GpUi.Best",best.ExpectedYield.ToString("0.00",Numbers),best.Cost));
+        ImGui.TextDisabled(localization.Format("GpUi.Baseline",result.Baseline.ToString("0.00",Numbers),(best.ExpectedYield-result.Baseline).ToString("0.00",Numbers),result.Scenario.Budget-best.Cost));
         if(result.Scenario.Effects.FirstAttemptBonus>0)ImGui.TextWrapped(localization.Format("GpUi.Paid",result.Scenario.Effects.FirstAttemptBonus));
         ImGui.TextWrapped(localization.Get("GpUi.Expectation"));
         if(best.Actions.Count==0) ImGui.TextUnformatted(localization.Get("GpUi.Keep"));
@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
         if(best.Actions.Any(use=>use.Action.Spec.Effect==GpEffect.Attempt) && result.Scenario.Level>=GpScenario.EurekaLevel)
             ImGui.TextWrapped(localization.Get("GpUi.Eureka"));
         if(result.NextUpgrade is { } next)
-            ImGui.TextColored(Accent,localization.Format("GpUi.Next",next.Cost,next.Cost-result.Scenario.Budget,next.ExpectedYield.ToString("0.00")));
+            ImGui.TextColored(Accent,localization.Format("GpUi.Next",next.Cost,next.Cost-result.Scenario.Budget,next.ExpectedYield.ToString("0.00",Numbers)));
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("GpUi.Thresholds")))
         {
             if(ImGui.BeginTable("GpFrontier",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
@@ -153,8 +153,8 @@ internal sealed partial class MainWindow
                     foreach(var plan in result.Frontier)
                     {
                         ImGui.TableNextRow(); ImGui.TableNextColumn(); ImGui.TextUnformatted(plan.Cost.ToString());
-                        ImGui.TableNextColumn(); ImGui.TextUnformatted($"{plan.ExpectedYield:0.00}");
-                        ImGui.TableNextColumn(); ImGui.TextUnformatted($"{plan.ExpectedYield-result.Baseline:0.00}");
+                        ImGui.TableNextColumn(); ImGui.TextUnformatted($"{(plan.ExpectedYield).ToString("0.00",Numbers)}");
+                        ImGui.TableNextColumn(); ImGui.TextUnformatted($"{(plan.ExpectedYield-result.Baseline).ToString("0.00",Numbers)}");
                     }
                 }
                 finally { ImGui.EndTable(); }

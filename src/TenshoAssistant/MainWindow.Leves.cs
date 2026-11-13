@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
             $"{localization.Get("Leves.ColumnLevel")} {leve.Level} · {leve.Type}",
             $"{localization.Get("Leves.ColumnClient")} : {leve.Client}",
             $"{localization.Get("Leves.ColumnZone")} : {leve.Zone}",
-            $"{localization.Get("Leves.ColumnGil")} : {leve.Gil:N0}",
+            $"{localization.Get("Leves.ColumnGil")} : {(leve.Gil).ToString("N0",Numbers)}",
             localization.Format("Leves.TooltipAllowances",leve.Allowances),
         };
         if(developerMode)lines.Add($"Leve {leve.Id}");
@@ -157,7 +157,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Type);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Client);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Zone);
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Gil.ToString("N0"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(leve.Gil.ToString("N0",Numbers));
                     ImGui.TableNextColumn();
                     if(progress?.Accepted.Contains(leve.Id)==true)ImGui.TextColored(Accent,localization.Get("Leves.Accepted"));
                     else if(progress?.Completed is { } completed)
@@ -215,7 +215,7 @@ internal sealed partial class MainWindow
                 var definition=items?.Find(request.ItemId);
                 DrawItemIcon(definition,size);ImGui.SameLine();
                 var holdings=GetRecipeHoldings(request.ItemId);
-                var held=holdings.HasObservation ? holdings.Total.ToString("N0"):"?";
+                var held=holdings.HasObservation ? holdings.Total.ToString("N0",Numbers):"?";
                 ImGui.Selectable(localization.Format("Leves.CraftLine",leve.Name,definition?.Name ?? $"#{request.ItemId}",request.Quantity?.ToString() ?? "?",held)
                     +$"##LeveCraft{leve.RowId}/{request.ItemId}");
                 ItemLinksMenu($"LeveCraftMenu{leve.RowId}/{request.ItemId}",definition);

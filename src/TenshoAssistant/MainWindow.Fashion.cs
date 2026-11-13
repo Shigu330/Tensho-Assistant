@@ -155,10 +155,10 @@ internal sealed partial class MainWindow
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled) && item is not null) DrawItemInfoTooltip(id);
                     ItemLinksMenu($"FashionLinks{id}",item);
                     if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled)) WrappedTooltip(localization.Format("UiFragments.Equipment",item?.Name ?? localization.Get("FashionUi.Unresolved"),item is null ? localization.Get("UiFragments.Unknown"):FashionSlotNames(item.Equipment))+(developerMode ? $"\nID {id}":""));
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0"));
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(entry.Match.Reports.ToString("N0",Numbers));
                     ImGui.TableNextColumn();
                     var stock=GetRecipeHoldings(id);
-                    ImGui.TextUnformatted(!stock.HasObservation ? localization.Get("FashionUi.Unknown") : $"{stock.Total:N0}{(stock.HasCached ? localization.Get("UiFragments.CacheSuffix"):"")}{(stock.HasUnknown ? localization.Get("UiFragments.PartialSuffix"):"")}");
+                    ImGui.TextUnformatted(!stock.HasObservation ? localization.Get("FashionUi.Unknown") : $"{(stock.Total).ToString("N0",Numbers)}{(stock.HasCached ? localization.Get("UiFragments.CacheSuffix"):"")}{(stock.HasUnknown ? localization.Get("UiFragments.PartialSuffix"):"")}");
                     Tip("FashionUi.StockHelp");
                 }
             }

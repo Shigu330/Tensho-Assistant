@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Craft");
         if (state.Result is not { } result) return;
         var stale = !ReferenceEquals(state.Input.Live, inventory.Current) || !ReferenceEquals(state.Input.Bank, bank.State);
-        ImGui.TextDisabled(localization.Format("ChainUi.Calculated",state.CalculatedAt?.ToLocalTime().ToString("T") ?? "—",result.Requested.ToString("N0"),result.Produced.ToString("N0")));
+        ImGui.TextDisabled(localization.Format("ChainUi.Calculated",state.CalculatedAt?.ToLocalTime().ToString("T") ?? "—",result.Requested.ToString("N0",Numbers),result.Produced.ToString("N0",Numbers)));
         if (stale) ImGui.TextColored(Accent, localization.Get("ChainUi.Stale"));
         if (state.Input.ChoiceRevision != craftChainChoiceRevision)
             ImGui.TextColored(Accent, localization.Get("ChainUi.ChoicesChanged"));
@@ -85,7 +85,7 @@ internal sealed partial class MainWindow
                     ImGui.SameLine();
                     DrawChainItem(step.Recipe.ResultItemId);
                     ImGui.SameLine();
-                    ImGui.TextDisabled(localization.Format("ChainUi.Step",step.Crafts.ToString("N0"),step.Produced.ToString("N0"),step.Recipe.CraftType,step.Recipe.Level));
+                    ImGui.TextDisabled(localization.Format("ChainUi.Step",step.Crafts.ToString("N0",Numbers),step.Produced.ToString("N0",Numbers),step.Recipe.CraftType,step.Recipe.Level));
                 }
                 finally { ImGui.PopID(); }
             });
@@ -101,7 +101,7 @@ internal sealed partial class MainWindow
                 {
                     DrawChainItem(material.ItemId);
                     ImGui.SameLine(); ImGui.TextColored(material.Reason == CraftChainReason.RawMaterial ? Muted : Accent,
-                        $"× {material.Amount:N0} · {ChainReason(material.Reason)}");
+                        $"× {(material.Amount).ToString("N0",Numbers)} · {ChainReason(material.Reason)}");
                     if (ImGui.IsItemHovered() && result.Observations.TryGetValue(material.ItemId, out var stored)) DrawStorageDetail(stored);
                     ImGui.SameLine();
                     if (ImGui.SmallButton(localization.Get("ChainUi.Locations"))) OpenGathering(material.ItemId);

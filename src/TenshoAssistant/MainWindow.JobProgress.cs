@@ -28,7 +28,7 @@ internal sealed partial class MainWindow
                 }
                 ImGui.TextUnformatted(JobName(row.Job));ImGui.TableNextColumn();ImGui.TextUnformatted(row.Level.ToString());ImGui.TableNextColumn();
                 if(row.Needed<=0)ImGui.TextDisabled(localization.Get("GameGearsets.JobsMax"));
-                else ImGui.ProgressBar(row.Fraction,new Vector2(-1,0),$"{row.Experience:N0} / {row.Needed:N0}");
+                else ImGui.ProgressBar(row.Fraction,new Vector2(-1,0),$"{(row.Experience).ToString("N0",Numbers)} / {(row.Needed).ToString("N0",Numbers)}");
             }
         }
         finally{ImGui.EndTable();}

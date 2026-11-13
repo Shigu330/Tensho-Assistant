@@ -126,7 +126,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(route.Seconds)));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(AirshipExp(route));
                 if(route.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
-                ImGui.TableNextColumn();ImGui.TextUnformatted((route.UnknownExp>0 ? "≥ ":"")+route.ExpPerDay.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted((route.UnknownExp>0 ? "≥ ":"")+route.ExpPerDay.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##AirshipUse{index}")){airshipChosen.Clear();airshipChosen.AddRange(route.Sectors);}
                 Tip("AirshipPlanner.UseTip");
@@ -136,10 +136,10 @@ internal sealed partial class MainWindow
     }
 
     // « H h mm » of a voyage or survey time, on the airship and submarine pages.
-    private static string HoursMinutes(TimeSpan time)=>$"{(int)time.TotalHours} h {time.Minutes:00}";
+    private static string HoursMinutes(TimeSpan time)=>TenshoAssistant.Localization.TenshoCulture.Hours((int)time.TotalHours,time.Minutes);
 
     // Experience of a route; « ≥ » when a sector's experience is not known (0 in the game data).
-    private static string AirshipExp(AirshipRoute route)=>(route.UnknownExp>0 ? "≥ ":"")+route.Exp.ToString("N0");
+    private static string AirshipExp(AirshipRoute route)=>(route.UnknownExp>0 ? "≥ ":"")+route.Exp.ToString("N0",Numbers);
 
     private static string AirshipRouteNames(AirshipCatalog catalog,AirshipRoute route)
         =>string.Join(" › ",route.Sectors.Select(id=>catalog.Find(id)?.ShortName ?? id.ToString()));

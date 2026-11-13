@@ -289,21 +289,21 @@ internal sealed partial class MainWindow
                 if(item is not null)ImGui.TextUnformatted(item.Name);
                 else if(catalog is not null)ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("MyToolsUi.UnknownItem",row.Id));
                 else ImGui.TextDisabled($"ID {row.Id}");
-                ImGui.TableNextColumn();ImGui.TextUnformatted(row.Wanted.ToString("N0"));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0"):"?");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(row.Wanted.ToString("N0",Numbers));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(held.HasObservation ? held.Total.ToString("N0",Numbers):"?");
                 ImGui.TableNextColumn();
                 if(!held.HasObservation)ImGui.TextDisabled("?");
                 else
                 {
                     var missing=Math.Max(0,row.Wanted-held.Total);
-                    ImGui.TextColored(missing>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,missing.ToString("N0"));
+                    ImGui.TextColored(missing>0 ? UI.FfxivTheme.Error:UI.FfxivTheme.Success,missing.ToString("N0",Numbers));
                 }
                 // 0.541 (issue #37): the price of one piece, as the shared cache knows it. Nothing is asked without the button.
                 ImGui.TableNextColumn();
                 var quote=worldId==0 ? null:market.GetCached(worldId,row.Id);
                 var price=quote is null ? null:ToolItemCost.Lowest(quote.Nq.Minimum,quote.Hq.Minimum);
                 if(item is {IsMarketable:false})ImGui.TextDisabled("—");
-                else if(price is { } known)ImGui.TextUnformatted(known.ToString("N0"));
+                else if(price is { } known)ImGui.TextUnformatted(known.ToString("N0",Numbers));
                 else ImGui.TextDisabled("?");
                 if(item is {IsMarketable:true})
                 {
@@ -314,7 +314,7 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         var (cost,unknown)=ToolItemCost.Missing(costRows);
-        if(cost>0 || unknown>0)ImGui.TextDisabled(localization.Format(unknown>0 ? "MyToolsUi.MissingCostUnknown":"MyToolsUi.MissingCost",cost.ToString("N0"),unknown));
+        if(cost>0 || unknown>0)ImGui.TextDisabled(localization.Format(unknown>0 ? "MyToolsUi.MissingCostUnknown":"MyToolsUi.MissingCost",cost.ToString("N0",Numbers),unknown));
         var character=bankBridge.State.CharacterId;var batch=toolPrices.State;
         if(batch.Loading)ImGui.TextDisabled(localization.Format("MyToolsUi.PricesLoading",batch.Completed,batch.Items.Count));
         else if(unpriced.Count>0 && character!=0 && worldId!=0)

@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
                         if(status.BingoExpires is { } expires && ImGui.IsItemHovered())WrappedTooltip(localization.Format("CharacterStatus.BingoExpires",expires.ToLocalTime().ToString("g")));
                     }
                     ImGui.TableNextColumn();
-                    if(status.HuntBills is { } bills)ImGui.TextUnformatted(bills.ToString(System.Globalization.CultureInfo.CurrentCulture));
+                    if(status.HuntBills is { } bills)ImGui.TextUnformatted(bills.ToString(Numbers));
                     else ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
                     ImGui.TableNextColumn();
                     if(CharacterStatuses.RoulettesToday(status,lastDaily) is { } roulettes)

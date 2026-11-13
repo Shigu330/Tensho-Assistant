@@ -68,8 +68,8 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("FieldContent.OccultReadAt",state.At.ToLocalTime().ToString("t")));
         ImGui.TextUnformatted(labels.Knowledge);
         ImGui.SameLine();
-        ImGui.ProgressBar(OccultCrescent.Share(state.Knowledge,state.KnowledgeNeeded),new Vector2(-1,ImGui.GetFrameHeight()),$"{state.Knowledge:N0} / {state.KnowledgeNeeded:N0}");
-        ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0"),state.Gold.ToString("N0")));
+        ImGui.ProgressBar(OccultCrescent.Share(state.Knowledge,state.KnowledgeNeeded),new Vector2(-1,ImGui.GetFrameHeight()),$"{(state.Knowledge).ToString("N0",Numbers)} / {(state.KnowledgeNeeded).ToString("N0",Numbers)}");
+        ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0",Numbers),state.Gold.ToString("N0",Numbers)));
         if(!ImGui.BeginTable("###FieldOccult",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {
@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
                 else if(level>=job.MaxLevel && level>0)ImGui.TextColored(UI.FfxivTheme.Success,labels.Mastered);
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
-                if(worn && state.NeededJobExperience>0 && job.Id<state.Experience.Count)ImGui.TextUnformatted($"{state.Experience[(int)job.Id]:N0} / {state.NeededJobExperience:N0}");
+                if(worn && state.NeededJobExperience>0 && job.Id<state.Experience.Count)ImGui.TextUnformatted($"{(state.Experience[(int)job.Id]).ToString("N0",Numbers)} / {(state.NeededJobExperience).ToString("N0",Numbers)}");
                 else ImGui.TextDisabled("—");
             }
         }
@@ -160,7 +160,7 @@ internal sealed partial class MainWindow
             ImGui.TextUnformatted($"{level} / {job.MaxLevel}");
             if(OccultCrescent.WornExperience(job,state) is { } experience)
             {
-                ImGui.ProgressBar(OccultCrescent.Share(experience.Have,experience.Need),new Vector2(width,ImGui.GetFrameHeight()),$"{experience.Have:N0} / {experience.Need:N0}");
+                ImGui.ProgressBar(OccultCrescent.Share(experience.Have,experience.Need),new Vector2(width,ImGui.GetFrameHeight()),$"{(experience.Have).ToString("N0",Numbers)} / {(experience.Need).ToString("N0",Numbers)}");
                 TipText(labels.Experience);
             }
             else if(level>=job.MaxLevel && level>0)ImGui.TextColored(UI.FfxivTheme.Success,labels.Mastered);
@@ -170,9 +170,9 @@ internal sealed partial class MainWindow
                 if(next.Description.Length>0)TipText(next.Description);
             }
         }
-        ImGui.ProgressBar(OccultCrescent.Share(state.Knowledge,state.KnowledgeNeeded),new Vector2(width,ImGui.GetFrameHeight()),$"{state.Knowledge:N0} / {state.KnowledgeNeeded:N0}");
+        ImGui.ProgressBar(OccultCrescent.Share(state.Knowledge,state.KnowledgeNeeded),new Vector2(width,ImGui.GetFrameHeight()),$"{(state.Knowledge).ToString("N0",Numbers)} / {(state.KnowledgeNeeded).ToString("N0",Numbers)}");
         TipText(labels.Knowledge);
-        ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0"),state.Gold.ToString("N0")));
+        ImGui.TextUnformatted(localization.Format("FieldContent.OccultCoins",state.Silver.ToString("N0",Numbers),state.Gold.ToString("N0",Numbers)));
         Tip("FieldContent.OccultPanelTip");
     }
 

@@ -35,9 +35,12 @@ internal sealed class LocalizationManager
     public void SelectInitialLanguage(string? savedCode, string clientLanguage)
     {
         if (!string.IsNullOrWhiteSpace(savedCode)) { SetLanguage(savedCode); return; }
+        // 0.1220 (X-258, first-player review G7): only a complete language is taken from the game client; a German or Japanese
+        // client starts in English (those languages translate a few titles only), and the player can still pick them by hand.
         foreach (var language in AvailableLanguages)
-            if (string.Equals(language.Name, clientLanguage, StringComparison.OrdinalIgnoreCase)
-                || string.Equals(language.Code, clientLanguage, StringComparison.OrdinalIgnoreCase))
+            if (!language.Partial
+                && (string.Equals(language.Name, clientLanguage, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(language.Code, clientLanguage, StringComparison.OrdinalIgnoreCase)))
             { SetLanguage(language.Code); return; }
         SetLanguage("en");
     }
@@ -47,6 +50,7 @@ internal sealed class LocalizationManager
         var normalized = string.IsNullOrWhiteSpace(code) ? "en" : code.Trim().ToLowerInvariant();
         CurrentCode = languages.ContainsKey(normalized) ? normalized : "en";
         selected = languages.GetValueOrDefault(CurrentCode) ?? english;
+        TenshoCulture.Use(CurrentCode);
         Revision++;
     }
 
@@ -58,7 +62,8 @@ internal sealed class LocalizationManager
 
     public string Format(string key, params object[] args)
     {
-        try { return string.Format(System.Globalization.CultureInfo.InvariantCulture, Get(key), args); }
+        // 0.1220 (X-261): numbers in the culture of Tensho's language (TenshoCulture), never Windows'.
+        try { return string.Format(TenshoCulture.For(CurrentCode), Get(key), args); }
         catch (FormatException) { return Get(key); }
     }
 
@@ -111,8 +116,10 @@ internal sealed class LocalizationManager
             }
 
         english = languages.GetValueOrDefault("en") ?? [];
+        var englishTexts = english.Keys.Count(key => !key.StartsWith("_meta.", StringComparison.Ordinal));
         AvailableLanguages = Array.AsReadOnly(languages.Values
-            .Select(values => new LocalizationLanguage(values["_meta.code"].Trim().ToLowerInvariant(), values.GetValueOrDefault("_meta.name", values["_meta.code"]), values.GetValueOrDefault("_meta.nativeName", values["_meta.code"])))
+            .Select(values => new LocalizationLanguage(values["_meta.code"].Trim().ToLowerInvariant(), values.GetValueOrDefault("_meta.name", values["_meta.code"]), values.GetValueOrDefault("_meta.nativeName", values["_meta.code"]),
+                IsPartial(values, englishTexts)))
             .OrderBy(language => language.Code == "en" ? 0 : 1).ThenBy(language => language.NativeName)
             .ToArray());
         // The validator describes editable external files; embedded defaults remain usable
@@ -125,6 +132,11 @@ internal sealed class LocalizationManager
         SetLanguage(CurrentCode);
     }
 
+    /// <summary>0.1220 (X-258): a language that translates less than nine texts in ten of the English ones is partial: it is marked in
+    /// the menu and never taken from the game client.</summary>
+    internal static bool IsPartial(IReadOnlyDictionary<string, string> values, int englishTexts)
+        => englishTexts > 0 && values.Keys.Count(key => !key.StartsWith("_meta.", StringComparison.Ordinal)) * 10L < englishTexts * 9L;
+
     private static void Flatten(JsonElement element, string prefix, Dictionary<string, string> values)
     {
         if (element.ValueKind == JsonValueKind.Object)
@@ -133,4 +145,4 @@ internal sealed class LocalizationManager
     }
 }
 
-internal readonly record struct LocalizationLanguage(string Code, string Name, string NativeName);
+internal readonly record struct LocalizationLanguage(string Code, string Name, string NativeName, bool Partial = false);

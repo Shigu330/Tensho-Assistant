@@ -26,9 +26,9 @@ internal sealed partial class MainWindow
         var profit=CraftProfits.Compute(market.GetCached(worldId,recipe.ResultItemId),profitHq && product.CanBeHq,requested,estimate.KnownSubtotal,estimate.AllCosted,profitDataCenter);
         if(profit.UnitPrice is not { } unit){ImGui.TextDisabled(localization.Get("ProfitUi.NoPrice"));return;}
         var where=profit.PriceWorld is { } world && market.State.NameOf(world) is { Length:>0 } name ? name:"";
-        ImGui.TextUnformatted(localization.Format("ProfitUi.Price",unit.ToString("N0"),where,requested.ToString("N0"),(profit.Revenue ?? 0).ToString("N0")));
-        if(profit.LastSale is { } sale)ImGui.TextDisabled(localization.Format("ProfitUi.LastSale",sale.ToString("N0")));
-        if(profit.Profit is { } gain)ImGui.TextColored(gain>=0 ? Success:UI.FfxivTheme.Error,localization.Format("ProfitUi.Profit",gain.ToString("N0")));
+        ImGui.TextUnformatted(localization.Format("ProfitUi.Price",unit.ToString("N0",Numbers),where,requested.ToString("N0",Numbers),(profit.Revenue ?? 0).ToString("N0",Numbers)));
+        if(profit.LastSale is { } sale)ImGui.TextDisabled(localization.Format("ProfitUi.LastSale",sale.ToString("N0",Numbers)));
+        if(profit.Profit is { } gain)ImGui.TextColored(gain>=0 ? Success:UI.FfxivTheme.Error,localization.Format("ProfitUi.Profit",gain.ToString("N0",Numbers)));
         else ImGui.TextColored(Accent,localization.Get("ProfitUi.CostIncomplete"));
         ImGui.TextDisabled(localization.Get("ProfitUi.Help"));
     }

@@ -219,7 +219,7 @@ internal sealed partial class MainWindow
         // X-73.18 (0.887): the bites seen in game (yours or shared): strength and time from the cast.
         if(store.Find(DiscoveryKind.FishBite,fish,32) is { Count:>0 } bites)
             parts.Add(string.Join(", ",bites.GroupBy(fact=>fact.Detail).OrderBy(group=>group.Key).Select(group=>
-                $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {group.Min(fact=>fact.LevelMin)/10.0:0.0}–{group.Max(fact=>fact.LevelMax)/10.0:0.0} s")));
+                $"{(group.Key switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"})} {(group.Min(fact=>fact.LevelMin)/10.0).ToString("0.0",Numbers)}–{(group.Max(fact=>fact.LevelMax)/10.0).ToString("0.0",Numbers)} s")));
         if(store.Find(DiscoveryKind.FishLure,fish,2) is { Count:>0 } lures)
             parts.Add(string.Join(", ",lures.Select(fact=>localization.Get(fact.Detail==1 ? "FishingPanel.SeenAmbitious":"FishingPanel.SeenModest"))));
         // X-73.18 (0.890, 0.891): the spearfishing shadows it was seen in game with (yours or shared).
@@ -304,7 +304,7 @@ internal sealed partial class MainWindow
         return ItemSourceKinds.Contains(fact.Kind) || fact.Kind==DiscoveryKind.QuestItemAsked ? "×"+range:range;
     }
     // 0.911 (X-76): a bite time range from tenths of a second, « 1.2–3.4 ».
-    private static string BiteRange(int min,int max)=>min==max ? $"{min/10.0:0.0}":$"{min/10.0:0.0}–{max/10.0:0.0}";
+    private static string BiteRange(int min,int max)=>min==max ? $"{(min/10.0).ToString("0.0",Numbers)}":$"{(min/10.0).ToString("0.0",Numbers)}–{(max/10.0).ToString("0.0",Numbers)}";
     private static string BiteMark(uint strength)=>strength switch{1=>"!",2=>"!!",3=>"!!!",_=>"?"};
     private string DiscoveryWeatherName(uint id)=>weather.State.Catalog?.Weather(id)?.Name ?? $"#{id}";
     /// <summary>0.856 (X-72 C): the name shown for a fact: the monster, the hunt mark with its rank, or the FATE. 0.860: the item and its source.</summary>
@@ -380,11 +380,11 @@ internal sealed partial class MainWindow
         var summary=store.Summary();
         // X-93 (0.939): never silent: shared discoveries left out because the shared part is full, or nearly full.
         var sharedHeld=summary.Count==0 ? 0:summary.Max(row=>row.ImportedOnly);
-        if(store.LeftOut>0)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFull",store.LeftOut.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
-        else if(sharedHeld>=Discoveries.DiscoveryStore.MaxFacts*9/10)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedNearlyFull",sharedHeld.ToString("N0"),Discoveries.DiscoveryStore.MaxFacts.ToString("N0")));
+        if(store.LeftOut>0)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFull",store.LeftOut.ToString("N0",Numbers),Discoveries.DiscoveryStore.MaxFacts.ToString("N0",Numbers)));
+        else if(sharedHeld>=Discoveries.DiscoveryStore.MaxFacts*9/10)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedNearlyFull",sharedHeld.ToString("N0",Numbers),Discoveries.DiscoveryStore.MaxFacts.ToString("N0",Numbers)));
         if(summary.Count==0)ImGui.TextDisabled(localization.Get("DiscoveriesUi.Empty"));
-        if(SeenPrices is { Count:>0 } prices)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.SummaryPrices",prices.Count.ToString("N0")));
-        foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0"),seen.ToString("N0"),importedOnly.ToString("N0")));
+        if(SeenPrices is { Count:>0 } prices)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.SummaryPrices",prices.Count.ToString("N0",Numbers)));
+        foreach(var (kind,total,seen,importedOnly) in summary)ImGui.TextUnformatted(localization.Format("DiscoveriesUi.Summary"+kind,total.ToString("N0",Numbers),seen.ToString("N0",Numbers),importedOnly.ToString("N0",Numbers)));
         DrawDiscoveryFiles(store,folder);
         DrawDiscoveryPlaces(store);
         if(developerMode)DrawDiscoveryDebug(store,folder);
@@ -410,7 +410,7 @@ internal sealed partial class MainWindow
                 Run(()=>
                 {
                     var result=DiscoveryFiles.Import(Path.Combine(folder,"Import"),store);
-                    return localization.Format("DiscoveriesUi.ImportDone",result.Files,result.Added.ToString("N0"),result.Joined.ToString("N0"),result.Refused.ToString("N0"),result.Unreadable);
+                    return localization.Format("DiscoveriesUi.ImportDone",result.Files,result.Added.ToString("N0",Numbers),result.Joined.ToString("N0",Numbers),result.Refused.ToString("N0",Numbers),result.Unreadable);
                 });
             Tip("DiscoveriesUi.ImportTip");
         }
@@ -527,8 +527,8 @@ internal sealed partial class MainWindow
                     Tip("DiscoveriesUi.PlaceTip");
                 }
                 ImGui.TableNextColumn();ImGui.TextUnformatted(DiscoveryFactLevel(fact));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Seen.ToString("N0"));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Imported.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Seen.ToString("N0",Numbers));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(fact.Imported.ToString("N0",Numbers));
             }
         }
         finally{ImGui.EndTable();}

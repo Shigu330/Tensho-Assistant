@@ -100,10 +100,10 @@ internal sealed partial class MainWindow
         var summary=hoverHoldings;
         ImGui.TextColored(Accent,localization.Get("HoverUi.Stock"));
         if(!summary.HasObservation){ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
-        ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0"),summary.Nq.ToString("N0"),summary.Hq.ToString("N0")));
+        ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0",Numbers),summary.Nq.ToString("N0",Numbers),summary.Hq.ToString("N0",Numbers)));
         var rows=hoverHoldingRows;
         if(rows.Length>0)
-            ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0"))))
+            ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0",Numbers))))
                 +(rows.Length>4 ? localization.Format("HoverUi.More",rows.Length-4):""));
     }
 
@@ -286,7 +286,7 @@ internal sealed partial class MainWindow
         var catalog=itemCatalog.State.Catalog;
         foreach(var trade in list.Trades ?? [])
         {
-            ImGui.TextUnformatted(localization.Format("HoverUi.GarlandTrade",trade.Amount.ToString("N0"),catalog?.Find(trade.CurrencyId)?.Name ?? $"#{trade.CurrencyId}"));
+            ImGui.TextUnformatted(localization.Format("HoverUi.GarlandTrade",trade.Amount.ToString("N0",Numbers),catalog?.Find(trade.CurrencyId)?.Name ?? $"#{trade.CurrencyId}"));
             if(catalog?.Find(trade.CurrencyId) is { } currency){ImGui.SameLine(0,4);DrawItemIcon(currency,new Vector2(ImGui.GetTextLineHeight()));}
         }
         foreach(var group in list.Sources.GroupBy(source=>source.Type).Take(6))
@@ -365,8 +365,8 @@ internal sealed partial class MainWindow
         {
             var stack=hoverPanel ? itemHover.State.Stack:null;
             ImGui.TextDisabled(stack is > 1 and var count
-                ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0"),count,(sold.SellPrice*(long)count).ToString("N0"))
-                :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0")));
+                ? localization.Format("HoverUi.NpcSaleStack",sold.SellPrice.ToString("N0",Numbers),count,(sold.SellPrice*(long)count).ToString("N0",Numbers))
+                :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0",Numbers)));
         }
         if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
@@ -442,7 +442,7 @@ internal sealed partial class MainWindow
             // The hovered stack at the minimum of its own quality (lowest listing × quantity: an order of size, not a sale).
             if(stack is > 1 and var count && (hovered.Hq ? prices.Hq.Minimum:prices.Nq.Minimum) is { } unit)
             {
-                ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0")));
+                ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0",Numbers)));
                 DrawGilIcon();
             }
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format("HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
@@ -475,16 +475,16 @@ internal sealed partial class MainWindow
 
     private void DrawSaleLine(MarketQualityPrice price)
     {
-        var last=price.RecentSale is { } sale ? sale.ToString("N0")+(price.SaleAt is { } at ? $" ({at.ToLocalTime():g})":""):"—";
-        ImGui.TextDisabled(localization.Format("HoverUi.Sales",last,price.Average is { } average ? average.ToString("N0"):"—",
-            price.Velocity is { } velocity ? velocity.ToString("0.#"):"—"));
+        var last=price.RecentSale is { } sale ? sale.ToString("N0",Numbers)+(price.SaleAt is { } at ? $" ({at.ToLocalTime():g})":""):"—";
+        ImGui.TextDisabled(localization.Format("HoverUi.Sales",last,price.Average is { } average ? average.ToString("N0",Numbers):"—",
+            price.Velocity is { } velocity ? velocity.ToString("0.#",Numbers):"—"));
     }
 
     // Amounts end with the game's Gil icon instead of a currency word.
     private void DrawPriceLine(string quality,decimal? price)
     {
         if(price is not { } value){ImGui.TextUnformatted(localization.Format("HoverUi.NoListing",quality));return;}
-        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,value.ToString("N0")));
+        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,value.ToString("N0",Numbers)));
         DrawGilIcon();
     }
     private void DrawGilIcon()
@@ -497,7 +497,7 @@ internal sealed partial class MainWindow
     {
         if(listing is not { } cheapest){ImGui.TextDisabled(localization.Format("HoverUi.NoListing",quality));return;}
         var world=cheapest.WorldId==state.WorldId ? localization.Get("HoverUi.ThisWorld"):state.NameOf(cheapest.WorldId) ?? WorldName?.Invoke(cheapest.WorldId) ?? localization.Format("HoverUi.WorldId",cheapest.WorldId);
-        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,cheapest.Price.ToString("N0")));
+        ImGui.TextUnformatted(localization.Format("HoverUi.PriceLine",quality,cheapest.Price.ToString("N0",Numbers)));
         DrawGilIcon();ImGui.SameLine(0,6);ImGui.TextUnformatted(localization.Format("HoverUi.CheapestWorld",world));
         if(!MarketQuote.Recent(cheapest.UploadedAt,now))
             ImGui.TextDisabled(cheapest.UploadedAt is { } date ? localization.Format("HoverUi.CheapestOld",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));

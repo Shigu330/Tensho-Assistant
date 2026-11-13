@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
                 return (Page: pair.Key, Median: samples.Length == 0 ? 0 : samples[samples.Length / 2], Max: samples.Length == 0 ? 0 : samples[^1], Count: samples.Length);
             }).OrderByDescending(row => row.Median);
             foreach (var row in rows)
-                ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Page, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
+                ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Page, row.Median.ToString("0.00",Numbers), row.Max.ToString("0.00",Numbers), row.Count));
         }
         // 0.486 (user report): the panels beside the game's windows, which no page counted. Their last real frames stay shown once they close.
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("DiagnosticsUi.OverlayTimes")))
@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
                 return (Name: pair.Key, Median: samples.Length == 0 ? 0 : samples[samples.Length / 2], Max: samples.Length == 0 ? 0 : samples[^1], Count: samples.Length);
             }).OrderByDescending(row => row.Median);
             foreach (var row in rows)
-                ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Name, row.Median.ToString("0.00"), row.Max.ToString("0.00"), row.Count));
+                ImGui.TextUnformatted(localization.Format("DiagnosticsUi.DrawTimeLine", row.Name, row.Median.ToString("0.00",Numbers), row.Max.ToString("0.00",Numbers), row.Count));
         }
         if(MapFailedParts() is { } mapParts)ImGui.TextColored(UI.FfxivTheme.Warning,mapParts);
         // 0.601 (C36): which reading of the crafting and gathering helps fails.
@@ -56,11 +56,11 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Recipes"));
         var recipeState = recipeCatalog.State;
         if (recipeState.Catalog is { } recipes)
-            ImGui.TextColored(Success, localization.Format("DiagnosticsUi.RecipesReady",recipes.Count.ToString("N0"),recipes.Source));
+            ImGui.TextColored(Success, localization.Format("DiagnosticsUi.RecipesReady",recipes.Count.ToString("N0",Numbers),recipes.Source));
         else if (recipeState.Error is { } recipeError)
             ImGui.TextWrapped(localization.Format("DiagnosticsUi.Error",recipeError));
         else if (recipeState.TotalRows > 0)
-            ImGui.TextWrapped(localization.Format("DiagnosticsUi.Copied",recipeState.RowsCopied.ToString("N0"),recipeState.TotalRows.ToString("N0")));
+            ImGui.TextWrapped(localization.Format("DiagnosticsUi.Copied",recipeState.RowsCopied.ToString("N0",Numbers),recipeState.TotalRows.ToString("N0",Numbers)));
         else
             ImGui.TextDisabled(localization.Get("DiagnosticsUi.RecipeLoading"));
         ImGui.Spacing();
@@ -69,26 +69,26 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Gathering"));
         var mapState = maps.State;
         ImGui.TextDisabled(mapState.Catalog is { } mapCatalog ? localization.Format("DiagnosticsUi.Maps",mapCatalog.Entries.Count.ToString("N0"))
-            : mapState.Error ?? localization.Format("DiagnosticsUi.MapLoading",mapState.Copied.ToString("N0"),mapState.Total.ToString("N0")));
+            : mapState.Error ?? localization.Format("DiagnosticsUi.MapLoading",mapState.Copied.ToString("N0",Numbers),mapState.Total.ToString("N0",Numbers)));
         if (gathering.Catalog is { } gathered)
         {
-            ImGui.TextColored(Success, localization.Format("DiagnosticsUi.GatheringReady",gathered.Count.ToString("N0")));
+            ImGui.TextColored(Success, localization.Format("DiagnosticsUi.GatheringReady",gathered.Count.ToString("N0",Numbers)));
             ImGui.TextWrapped(localization.Format("DiagnosticsUi.Source","GatheringItem → GatheringPointBase → GatheringPoint + FishingSpot ; "+gathered.Source));
         }
-        else ImGui.TextWrapped(gathering.Error ?? localization.Format("DiagnosticsUi.GatheringLoading",gathering.Copied.ToString("N0"),gathering.Total.ToString("N0")));
+        else ImGui.TextWrapped(gathering.Error ?? localization.Format("DiagnosticsUi.GatheringLoading",gathering.Copied.ToString("N0",Numbers),gathering.Total.ToString("N0",Numbers)));
         ImGui.Spacing();
         ImGui.TextColored(Accent, localization.Get("DiagnosticsUi.Services"));
-        ImGui.TextDisabled(localization.Format("DiagnosticsUi.CollectionState",collections.State.Entries.Count.ToString("N0"),collections.State.CharacterId,collections.State.Loading));
+        ImGui.TextDisabled(localization.Format("DiagnosticsUi.CollectionState",collections.State.Entries.Count.ToString("N0",Numbers),collections.State.CharacterId,collections.State.Loading));
         if (collections.State.Error is { } collectionError) ImGui.TextWrapped(collectionError);
         var questState = quests.State;
-        ImGui.TextDisabled(localization.Format("DiagnosticsUi.QuestState",questState.Entries.Count.ToString("N0"),questState.CharacterId,questState.Loading));
+        ImGui.TextDisabled(localization.Format("DiagnosticsUi.QuestState",questState.Entries.Count.ToString("N0",Numbers),questState.CharacterId,questState.Loading));
         if (questState.Error is { } questError) ImGui.TextWrapped(questError);
         if (questState.RewardIndexLoading) ImGui.TextDisabled(localization.Get("DiagnosticsUi.RewardsLoading"));
         else if (questState.RewardIndex is { } rewardIndex)
         {
             var coverage = rewardIndex.Coverage;
-            ImGui.TextDisabled(localization.Format("DiagnosticsUi.Rewards",rewardIndex.ItemCount.ToString("N0"),coverage.CoveredQuests.ToString("N0"),coverage.TotalQuests.ToString("N0")));
-            ImGui.TextDisabled(localization.Format("DiagnosticsUi.Unresolved",coverage.UnresolvedReferences.ToString("N0"),coverage.UnknownQuantityLines.ToString("N0"),coverage.UnversionedQuests.ToString("N0")));
+            ImGui.TextDisabled(localization.Format("DiagnosticsUi.Rewards",rewardIndex.ItemCount.ToString("N0",Numbers),coverage.CoveredQuests.ToString("N0",Numbers),coverage.TotalQuests.ToString("N0",Numbers)));
+            ImGui.TextDisabled(localization.Format("DiagnosticsUi.Unresolved",coverage.UnresolvedReferences.ToString("N0",Numbers),coverage.UnknownQuantityLines.ToString("N0",Numbers),coverage.UnversionedQuests.ToString("N0",Numbers)));
             ImGui.TextDisabled(localization.Get("DiagnosticsUi.RewardHelp"));
         }
         else ImGui.TextDisabled(localization.Get("DiagnosticsUi.NoRewardIndex"));

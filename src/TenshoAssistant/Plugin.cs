@@ -655,7 +655,7 @@ public sealed class Plugin : IDalamudPlugin
             {
                 Crossed=crossed=>CurrencyNotice(localization.Format("Currencies.Alert",string.Join(" · ",crossed.Select(Alarms.CurrencyDtrEntry.Line)))),
                 // 0.606: the weekly limit of the limited tomestones reached.
-                WeeklyCapReached=(got,limit)=>CurrencyNotice(localization.Format("Currencies.WeeklyCapAlert",got.ToString("N0"),limit.ToString("N0"))),
+                WeeklyCapReached=(got,limit)=>CurrencyNotice(localization.Format("Currencies.WeeklyCapAlert",got.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),limit.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current))),
             },()=>currencies?.Dispose());
             mainWindow.Currencies=()=>currencies;
             // DEC-038: one chat line on entry, nothing on leaving; what waits for Discord does not leave during the cut.
@@ -897,7 +897,7 @@ public sealed class Plugin : IDalamudPlugin
             // 0.346 (g, I-07): lowest offer minus 1 copied to the clipboard when the player opens an item's offers (off by default).
             registrations.Register(()=>undercut=new Market.UndercutWatcher(marketBoardEvents,framework,configuration,(item,lowest,paste,hq)=>
                 chat.Print("[Tensho] "+localization.Format("Undercut.Copied",data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.Name.ExtractText() ?? $"#{item}",
-                    lowest.ToString("N0"),paste.ToString("N0"),hq ? " HQ":"")),log),()=>undercut?.Dispose());
+                    lowest.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),paste.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),hq ? " HQ":"")),log),()=>undercut?.Dispose());
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
                 ? territory.PlaceName.Value.Name.ExtractText():null;

@@ -22,7 +22,7 @@ A check mark: the game confirms it; a cross: it says no; a question mark: it has
 
 ## How do I change the language?
 
-Settings › General › Language. English and French are complete; in another language, a text not translated yet shows in English. Game data (item, place and quest names) stays in the game client's language.
+Settings › General › Language. English and French are complete. German and Japanese are partial (marked « (partial) » in the menu): only a few titles are translated and the rest shows in English, so Tensho starts in English with a German or Japanese game client; you can still pick them. Game data (item, place and quest names) stays in the game client's language.
 
 ## What goes on the Internet?
 
@@ -112,7 +112,7 @@ Une coche : le jeu le confirme ; une croix : il dit non ; un point d'interrogati
 
 ## Comment changer la langue ?
 
-Paramètres › Général › Langue. L'anglais et le français sont complets ; dans une autre langue, un texte pas encore traduit s'affiche en anglais. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
+Paramètres › Général › Langue. L'anglais et le français sont complets. L'allemand et le japonais sont partiels (marqués « (partiel) » dans le menu) : seuls quelques titres sont traduits et le reste s'affiche en anglais, donc Tensho démarre en anglais avec un client du jeu allemand ou japonais ; vous pouvez quand même les choisir. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
 
 ## Qu'est-ce qui part sur Internet ?
 

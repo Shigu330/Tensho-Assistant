@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sector.CeruleumTanks.ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromMinutes(sector.SurveyMinutes)));
                 Tip("AirshipSectors.SurveyTip");
-                ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Exp>0 ? sector.Exp.ToString("N0"):"—");
+                ImGui.TableNextColumn();ImGui.TextUnformatted(sector.Exp>0 ? sector.Exp.ToString("N0",Numbers):"—");
                 ImGui.TableNextColumn();
                 var unlock=sector.Unlock;
                 var unlockText=unlock is null ? localization.Get("AirshipSectors.UnlockUnknown")

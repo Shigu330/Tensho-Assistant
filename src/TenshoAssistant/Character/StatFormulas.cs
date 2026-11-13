@@ -56,7 +56,7 @@ public static class StatFormulas
     {
         var rows = new List<DerivedStat>();
         int Value(string key) => values.TryGetValue(key, out var value) ? value : 0;
-        static string Percent(double value) => value.ToString("0.0", System.Globalization.CultureInfo.CurrentCulture) + " %";
+        static string Percent(double value) => TenshoAssistant.Localization.TenshoCulture.Percent(value, "0.0");
         if (m.Div <= 0) return rows;
         var crit = Value("CriticalHit");
         rows.Add(new("CritRate", Percent(Math.Floor(200.0 * (crit - m.Sub) / m.Div + 50) / 10), crit, "CriticalHit"));
@@ -72,7 +72,7 @@ public static class StatFormulas
         var speedKey = category == 31 ? "SpellSpeed" : "SkillSpeed";
         var speed = Value(speedKey);
         var gcd = Math.Floor(Math.Floor((1000 + Math.Ceiling(-130.0 * (speed - m.Sub) / m.Div)) * 2500 / 1000) / 10) / 100;
-        rows.Add(new("Gcd", gcd.ToString("0.00", System.Globalization.CultureInfo.CurrentCulture) + " s", speed, speedKey));
+        rows.Add(new("Gcd", gcd.ToString("0.00", TenshoAssistant.Localization.TenshoCulture.Current) + " s", speed, speedKey));
         rows.Add(new("SpeedBonus", Percent(Math.Floor(130.0 * (speed - m.Sub) / m.Div) / 10), speed, speedKey));
         if (role == 1)
         {
@@ -82,7 +82,7 @@ public static class StatFormulas
         if (role == 4 && m.Main > 0)
         {
             var piety = Value("Piety");
-            rows.Add(new("Piety", (200 + Math.Floor(150.0 * (piety - m.Main) / m.Div)).ToString("0", System.Globalization.CultureInfo.CurrentCulture), piety, "Piety"));
+            rows.Add(new("Piety", (200 + Math.Floor(150.0 * (piety - m.Main) / m.Div)).ToString("0", TenshoAssistant.Localization.TenshoCulture.Current), piety, "Piety"));
         }
         var defense = Value("Defense"); var magic = Value("MagicDefense");
         rows.Add(new("Defense", Percent(Math.Floor(15.0 * defense / m.Div)), defense, "Defense"));

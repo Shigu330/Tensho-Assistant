@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();ImGui.TextUnformatted(items.Find(id)?.Name ?? $"#{id}");
                 ImGui.TableNextColumn();
                 if(Held(id) is not { } held)ImGui.TextDisabled("?");
-                else if(held>0)ImGui.TextColored(Success,held.ToString("N0"));
+                else if(held>0)ImGui.TextColored(Success,held.ToString("N0",Numbers));
                 else ImGui.TextDisabled("0");
             }
         }
@@ -135,7 +135,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(set.Name);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0") ?? "?"))));
+                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");
@@ -178,7 +178,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted((index+1).ToString());
                 ImGui.TableNextColumn();ImGui.TextUnformatted(Name(pieces[0]));
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0") ?? "?"))));
+                if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",pieces.Select(piece=>Name(piece)+" : "+(Held(piece)?.ToString("N0",Numbers) ?? "?"))));
                 ImGui.TableNextColumn();
                 var (held,known)=RelicBoard.PiecesHeld(pieces,Held);
                 if(known==0)ImGui.TextDisabled("?");
@@ -223,7 +223,7 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();ImGui.TextUnformatted(Name(line[index]));
                 ImGui.TableNextColumn();
                 if(Held(line[index]) is not { } held)ImGui.TextDisabled("?");
-                else if(held>0)ImGui.TextColored(Success,held.ToString("N0"));
+                else if(held>0)ImGui.TextColored(Success,held.ToString("N0",Numbers));
                 else ImGui.TextDisabled("0");
             }
         }

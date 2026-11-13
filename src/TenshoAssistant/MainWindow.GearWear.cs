@@ -34,14 +34,14 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();ImGui.TableNextColumn();
                 ImGui.TextUnformatted(catalog.Find(piece.ItemId)?.Name ?? $"#{piece.ItemId}");
                 ImGui.TableNextColumn();
-                if(piece.Condition is { } condition)ImGui.TextColored(condition<settings.Repair ? UI.FfxivTheme.Error:Success,$"{condition} %");
+                if(piece.Condition is { } condition)ImGui.TextColored(condition<settings.Repair ? UI.FfxivTheme.Error:Success,TenshoAssistant.Localization.TenshoCulture.Percent(condition));
                 else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();
                 if(GearWear.SpiritbondPercent(piece.Spiritbond) is { } percent)
                 {
                     // X-191 (0.1177): the whole percent as the game shows it; the exact value in the tip.
-                    ImGui.TextColored(percent>=settings.Spiritbond ? Accent:Muted,$"{GearWear.ShownSpiritbond(percent)} %");
-                    TipText($"{percent:0.00} %");
+                    ImGui.TextColored(percent>=settings.Spiritbond ? Accent:Muted,TenshoAssistant.Localization.TenshoCulture.Percent(GearWear.ShownSpiritbond(percent)));
+                    TipText(TenshoAssistant.Localization.TenshoCulture.Percent(percent,"0.00"));
                 }
                 else ImGui.TextDisabled("—");
             }

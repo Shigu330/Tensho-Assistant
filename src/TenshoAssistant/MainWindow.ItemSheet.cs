@@ -55,13 +55,13 @@ internal sealed partial class MainWindow
             // refreshed it: the header said « stock unknown » or kept an old count). Three reference comparisons.
             RefreshRecipeHoldingsCache();
             var stock=GetRecipeHoldings(id);
-            facts.Add(stock.HasObservation ? localization.Format("ItemSheet.Stock",stock.Total.ToString("N0")):localization.Get("ItemSheet.StockUnknown"));
+            facts.Add(stock.HasObservation ? localization.Format("ItemSheet.Stock",stock.Total.ToString("N0",Numbers)):localization.Get("ItemSheet.StockUnknown"));
             ImGui.TextDisabled(string.Join(" · ",facts));
             if(market.GetCached(market.State.WorldId,id) is { } quote && (quote.Nq.Minimum ?? quote.Hq.Minimum) is { } lowest)
             {
                 // 0.329: the date is when Tensho fetched the price (« Fetched », HoverUi.Fetched); an old or undated world upload is flagged as
                 // on the Market page and the hover.
-                ImGui.TextDisabled(localization.Format("ItemSheet.Price",lowest.ToString("N0"),quote.FetchedAt.ToLocalTime().ToString("g")));
+                ImGui.TextDisabled(localization.Format("ItemSheet.Price",lowest.ToString("N0",Numbers),quote.FetchedAt.ToLocalTime().ToString("g")));
                 DrawGilIcon();
                 if(!quote.HasRecentUpload(DateTimeOffset.UtcNow))ImGui.TextColored(Accent,localization.Get("HoverUi.Old"));
             }

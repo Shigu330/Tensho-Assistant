@@ -71,9 +71,11 @@ public sealed class CurrencyDtrEntry : IDisposable
         }
     }
 
-    /// <summary>« Name : 3 400 / 4 000 (85 %) ».</summary>
+    /// <summary>« Name: 3,400 / 4,000 (85%) » in English, « Name : 3 400 / 4 000 (85 %) » in French (0.1220, X-261).</summary>
     public static string Line(CurrencyBalance balance)
-        =>$"{balance.Currency.Name} : {balance.Amount:N0} / {balance.Cap:N0} ({balance.Percent:0} %)";
+        =>$"{balance.Currency.Name}{TenshoAssistant.Localization.TenshoCulture.Colon} {Count(balance.Amount)} / {Count(balance.Cap)} ({(balance.Percent is { } percent ? TenshoAssistant.Localization.TenshoCulture.Percent(percent):"")})";
+
+    private static string Count(long? value)=>value?.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current) ?? "";
 
     public void Dispose()
     {

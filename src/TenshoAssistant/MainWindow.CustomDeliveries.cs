@@ -55,7 +55,7 @@ internal sealed partial class MainWindow
         Tip("CustomDeliveries.RewardClientTip");
         var client=clients[deliveryRewardClient];
         if(client.Rewards is not { Count:>0 } rewards){ImGui.TextDisabled(localization.Get("CustomDeliveries.RewardsNone"));return;}
-        static string Tiers(DeliveryTiers tiers)=>$"{tiers.Low:N0} / {tiers.Mid:N0} / {tiers.High:N0}";
+        static string Tiers(DeliveryTiers tiers)=>$"{(tiers.Low).ToString("N0",Numbers)} / {(tiers.Mid).ToString("N0",Numbers)} / {(tiers.High).ToString("N0",Numbers)}";
         if(ImGui.BeginTable("###DeliveryRewardsTable",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))
         {
             try

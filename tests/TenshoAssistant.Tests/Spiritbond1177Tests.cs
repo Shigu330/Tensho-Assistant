@@ -21,7 +21,7 @@ internal static class Spiritbond1177Tests
         {
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.GearWear.cs"));
             Check(page.Contains("localization.Format(\"GearWear.BarSpiritbond\",GearWear.ShownSpiritbond(bond))", StringComparison.Ordinal), "the bar");
-            Check(page.Contains("$\"{GearWear.ShownSpiritbond(percent)} %\"", StringComparison.Ordinal) && page.Contains("TipText($\"{percent:0.00} %\");", StringComparison.Ordinal), "the page and its tip");
+            Check(page.Contains("TenshoCulture.Percent(GearWear.ShownSpiritbond(percent))", StringComparison.Ordinal) && page.Contains("TipText(TenshoAssistant.Localization.TenshoCulture.Percent(percent,\"0.00\"));", StringComparison.Ordinal), "the page and its tip");
             Check(!page.Contains("bond.ToString(\"0\")", StringComparison.Ordinal), "no rounding to the nearest left");
         }),
     ];

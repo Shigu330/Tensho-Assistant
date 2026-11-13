@@ -107,8 +107,8 @@ internal sealed partial class MainWindow
         ImGui.TextColored(Accent,localization.Format("CharacterDates.Summary",state.Name,state.Job,state.Level));
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Format("Gear.ItemLevels",
-            GearRules.AverageItemLevel(wornPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0"),
-            GearRules.AverageItemLevel(plannedPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0")));
+            GearRules.AverageItemLevel(wornPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0",Numbers),
+            GearRules.AverageItemLevel(plannedPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0",Numbers)));
         DrawGearToolbar(catalog,state,plan,plannedPieces,wornPieces);
         if(!ImGui.BeginTable("GearPlanner",3,ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV))return;
         try
@@ -403,10 +403,10 @@ internal sealed partial class MainWindow
                     if(now==0 && later==0)continue;
                 }
                 ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("Gear.Param"+param));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(now.ToString("N0"));
-                ImGui.TableNextColumn();ImGui.TextColored(later!=now ? UI.FfxivTheme.Gold:Text,later.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(now.ToString("N0",Numbers));
+                ImGui.TableNextColumn();ImGui.TextColored(later!=now ? UI.FfxivTheme.Gold:Text,later.ToString("N0",Numbers));
                 ImGui.TableNextColumn();
-                if(later!=now)ImGui.TextColored(later>now ? Success:Error,$"{(later>now ? "+":"")}{later-now:N0}");
+                if(later!=now)ImGui.TextColored(later>now ? Success:Error,$"{(later>now ? "+":"")}{(later-now).ToString("N0",Numbers)}");
             }
             // Combat jobs: the derived values (critical rate, damage bonus…) in the same columns, same formulas as the Character page.
             if(!combat || state.Modifiers.Div<=0)return;
@@ -468,7 +468,7 @@ internal sealed partial class MainWindow
     // « 12 % (NQ) » from the game data, « 12 % (NQ, Teamcraft) » for grades XI and XII, or « rate unknown ».
     private string OvermeldRateText(GearCatalog catalog,MateriaKind kind,int grade,int advancedIndex,bool hq)
         =>catalog.OvermeldRate(kind,grade,advancedIndex,hq) is { } rate
-            ? localization.Format(rate.Community ? "Gear.OvermeldRateCommunity":"Gear.OvermeldRate",rate.Percent.ToString("0.#"),hq ? "HQ":"NQ")
+            ? localization.Format(rate.Community ? "Gear.OvermeldRateCommunity":"Gear.OvermeldRate",rate.Percent.ToString("0.#",Numbers),hq ? "HQ":"NQ")
             :localization.Get("Gear.OvermeldRateUnknown");
 
     private void DrawMateriaEditor(GearCatalog catalog,CharacterStatsState state,GearSlot slot,GearItem item,bool hq,IReadOnlyList<MeldedMateria> melds)
@@ -635,7 +635,7 @@ internal sealed partial class MainWindow
         {
             if(worn)ImGui.TextColored(Success,localization.Get("Gear.Worn"));
             if(owned is null || !owned.HasObservation){if(!worn)ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
-            foreach(var row in owned.Rows.Where(row=>row.Nq+row.Hq>0))ImGui.TextUnformatted(localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0")));
+            foreach(var row in owned.Rows.Where(row=>row.Nq+row.Hq>0))ImGui.TextUnformatted(localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0",Numbers)));
             if(!have)ImGui.TextDisabled(localization.Get(owned.HasUnknown ? "Gear.NotOwnedPartial":"Gear.NotOwned"));
         }
     }

@@ -50,8 +50,8 @@ internal sealed partial class MainWindow
                         var item=itemCatalog.State.Catalog?.Find(slot.ItemId);
                         if(slot.ItemId==0)ImGui.TextDisabled(localization.Get("GatheringObservation.Special"));
                         else ItemCell(item,slot.ItemId,28,item is null ? localization.Format("BankUi.Item",slot.ItemId):null);
-                        ImGui.TableNextColumn();ImGui.TextUnformatted(slot.SuccessPercent is { } success ? $"{success} %":localization.Get("GatheringObservation.Unknown"));
-                        ImGui.TableNextColumn();ImGui.TextUnformatted(slot.BoonPercent is { } boon ? $"{boon} %":localization.Get("GatheringObservation.Unknown"));
+                        ImGui.TableNextColumn();ImGui.TextUnformatted(slot.SuccessPercent is { } success ? TenshoAssistant.Localization.TenshoCulture.Percent(success):localization.Get("GatheringObservation.Unknown"));
+                        ImGui.TableNextColumn();ImGui.TextUnformatted(slot.BoonPercent is { } boon ? TenshoAssistant.Localization.TenshoCulture.Percent(boon):localization.Get("GatheringObservation.Unknown"));
                         ImGui.TableNextColumn();ImGui.TextUnformatted(slot.DisplayedQuantity?.ToString() ?? localization.Get("GatheringObservation.Unknown"));
                     }
                     finally{ImGui.PopID();}

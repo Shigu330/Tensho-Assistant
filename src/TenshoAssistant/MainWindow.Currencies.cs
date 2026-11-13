@@ -33,7 +33,7 @@ internal sealed partial class MainWindow
         if(state?.Reading is not { } reading || reading.Character!=characterStats.State.CharacterId){ImGui.TextDisabled(localization.Get("Currencies.Loading"));return;}
         ImGui.TextDisabled(reading.WeeklyLimit==0 ? localization.Get("Currencies.WeeklyNone")
             :reading.WeeklyTomestones is { } got && reading.WeeklyLimit is { } limit
-            ? localization.Format("Currencies.Weekly",got.ToString("N0"),limit.ToString("N0")):localization.Get("Currencies.WeeklyUnknown"));
+            ? localization.Format("Currencies.Weekly",got.ToString("N0",Numbers),limit.ToString("N0",Numbers)):localization.Get("Currencies.WeeklyUnknown"));
         if(!reading.Balances.Any(balance=>balance.Currency.Kind==CurrencyKind.Seals))ImGui.TextDisabled(localization.Get("Currencies.NoSeals"));
         if(!ImGui.BeginTable("Currencies",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
@@ -50,18 +50,18 @@ internal sealed partial class MainWindow
                 // 0.354 (g, I-13): what this currency buys and what each unit is worth.
                 DrawCurrencyValueButton(id);
                 ImGui.TableNextColumn();
-                var amount=balance.Amount is { } value ? value.ToString("N0"):localization.Get("Currencies.Unknown");
+                var amount=balance.Amount is { } value ? value.ToString("N0",Numbers):localization.Get("Currencies.Unknown");
                 // 0.344 (review): an unknown cap is « unknown », a cap that is not a real limit (gil-like) is « no cap ».
                 var percentable=balance.Cap is { } cap && CurrencyAlertTracker.Percentable(cap);
                 ImGui.TextUnformatted(balance.Cap is not { } known ? $"{amount} / {localization.Get("Currencies.Unknown")}"
-                    :percentable ? $"{amount} / {known:N0}":$"{amount} ({localization.Get("Currencies.NoCap")})");
+                    :percentable ? $"{amount} / {(known).ToString("N0",Numbers)}":$"{amount} ({localization.Get("Currencies.NoCap")})");
                 ImGui.TableNextColumn();
                 var percent=CurrencyAlertTracker.PercentFor(id,thresholds);
                 if(percentable && balance.Percent is { } share)
                 {
                     var over=percent>0 && share>=percent;
                     // Rounded down, so « 80 % » is shown only when the 80 % threshold is really reached (0.344 fix check).
-                    var shown=$"{Math.Floor(share):0} %";
+                    var shown=TenshoAssistant.Localization.TenshoCulture.Percent(Math.Floor(share));
                     if(over)ImGui.TextColored(UI.FfxivTheme.Gold,shown);else ImGui.TextUnformatted(shown);
                 }
                 else ImGui.TextDisabled("—");

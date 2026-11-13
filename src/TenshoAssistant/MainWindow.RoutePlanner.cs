@@ -192,9 +192,9 @@ internal sealed partial class MainWindow
                 // 0.335: a market price is missing on this route: its items count at the NPC price, the value is a lower bound (≥).
                 var missingPrices=index-1<plannerMissingCounts.Length ? plannerMissingCounts[index-1]:0;
                 var atLeast=missingPrices>0 ? "≥ ":"";
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{atLeast}{route.Value:N0}");
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{atLeast}{route.ValuePerDay:N0}");
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Exp:N0}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted($"{atLeast}{(route.Value).ToString("N0",Numbers)}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted($"{atLeast}{(route.ValuePerDay).ToString("N0",Numbers)}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted($"{(route.Exp).ToString("N0",Numbers)}");
                 // 0.315: open this route in Builds (range, voyage time, breakpoints, best builds) for the chosen submarine.
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("RoutePlanner.ToBuild")+$"##ToBuild{index}"))
@@ -305,10 +305,10 @@ internal sealed partial class MainWindow
                 DrawItemIcon(definition,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
                 var name=definition?.Name ?? item.ToString();var total=(count*Unit(item)).ToString("N0");var npc=catalog.SellPrices.GetValueOrDefault(item).ToString("N0");
                 ImGui.TextUnformatted(values?.Market.TryGetValue(item,out var lowest)==true
-                    ? localization.Format("RoutePlanner.LootLineMarket",name,count.ToString("0.0"),total,npc,lowest.ToString("N0"))
-                    :values?.Missing.Contains(item)==true ? localization.Format("RoutePlanner.LootLineNoPrice",name,count.ToString("0.0"),total,npc)
-                    :values?.NoListing.Contains(item)==true ? localization.Format("RoutePlanner.LootLineNoListing",name,count.ToString("0.0"),total,npc)
-                    :localization.Format("RoutePlanner.LootLine",name,count.ToString("0.0"),total));
+                    ? localization.Format("RoutePlanner.LootLineMarket",name,count.ToString("0.0",Numbers),total,npc,lowest.ToString("N0",Numbers))
+                    :values?.Missing.Contains(item)==true ? localization.Format("RoutePlanner.LootLineNoPrice",name,count.ToString("0.0",Numbers),total,npc)
+                    :values?.NoListing.Contains(item)==true ? localization.Format("RoutePlanner.LootLineNoListing",name,count.ToString("0.0",Numbers),total,npc)
+                    :localization.Format("RoutePlanner.LootLine",name,count.ToString("0.0",Numbers),total));
             }
             if(route.Sectors.Any(id=>!catalog.Loot.ContainsKey(id)))ImGui.TextDisabled(localization.Get("RoutePlanner.NoLoot"));
             if(values is not null && route.Sectors.Any(values.BandFallback.Contains))ImGui.TextDisabled(localization.Get("RoutePlanner.BandFallback"));

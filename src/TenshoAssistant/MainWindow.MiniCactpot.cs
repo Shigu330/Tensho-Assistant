@@ -63,7 +63,7 @@ internal sealed partial class MainWindow
             for(var sum=6;sum<=24;sum++)
             {
                 ImGui.TableNextColumn();ImGui.TextUnformatted(sum.ToString());
-                ImGui.TableNextColumn();ImGui.TextUnformatted(MiniCactpotSolver.RewardOf(sum).ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(MiniCactpotSolver.RewardOf(sum).ToString("N0",Numbers));
             }
         }
         finally{ImGui.EndTable();}

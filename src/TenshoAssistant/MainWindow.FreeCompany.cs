@@ -147,8 +147,8 @@ internal sealed partial class MainWindow
         ImGui.TextUnformatted(localization.Format("FreeCompany.Rank",vessel.Rank));
         ImGui.SameLine();
         var progress=(float)Voyages.ExpProgress(vessel);
-        ImGui.ProgressBar(progress,new Vector2(-1,ImGui.GetTextLineHeight()),$"{progress*100:0} %");
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0"),vessel.NextExp.ToString("N0")));
+        ImGui.ProgressBar(progress,new Vector2(-1,ImGui.GetTextLineHeight()),TenshoAssistant.Localization.TenshoCulture.Percent(progress*100));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("FreeCompany.Exp",vessel.Exp.ToString("N0",Numbers),vessel.NextExp.ToString("N0",Numbers)));
         ImGui.TableNextColumn();
         if(vessel.Route.Count>0)ImGui.TextWrapped(string.Join(" › ",vessel.Route));
         // T26 (0.919): an airship's last voyage, rebuilt from the game's voyage log.
@@ -181,7 +181,7 @@ internal sealed partial class MainWindow
                     foreach(var group in vessel.Loot.GroupBy(found=>found.ItemId))
                     {
                         var item=items?.Find(group.Key);
-                        ItemCell(item,group.Key,24,$"{item?.Name ?? group.Key.ToString()} ×{group.Sum(found=>found.Count):N0}");
+                        ItemCell(item,group.Key,24,$"{item?.Name ?? group.Key.ToString()} ×{(group.Sum(found=>found.Count)).ToString("N0",Numbers)}");
                     }
                 }
                 finally{ImGui.EndPopup();}

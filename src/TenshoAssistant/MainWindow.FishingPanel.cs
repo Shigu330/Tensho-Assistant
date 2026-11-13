@@ -106,7 +106,7 @@ internal sealed partial class MainWindow
             {
                 var baitItem=items?.Find(held);var baitStock=GetRecipeHoldings(held);
                 ImGui.TextDisabled(localization.Get("FishingPanel.BaitInHand"));ImGui.SameLine();
-                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{baitStock.Total:N0}":"")}");
+                ItemCell(baitItem,held,20,$"{baitItem?.Name ?? held.ToString()}{(baitStock.HasObservation ? $" ×{(baitStock.Total).ToString("N0",Numbers)}":"")}");
                 ImGui.SameLine();
                 ImGui.TextColored(Success,localization.Format("FishingPanel.BaitMatches",rows.Count(row=>row.Route.Count>0 && row.Route[0]==held)));
             }
@@ -124,7 +124,7 @@ internal sealed partial class MainWindow
                             ImGui.TableNextRow();
                             ImGui.TableNextColumn();
                             var stock=GetRecipeHoldings(row.FishId);
-                            ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{stock.Total:N0}":"")}");
+                            ItemCell(fish,row.FishId,22,$"{fish?.Name ?? row.FishId.ToString()}{(stock.HasObservation && stock.Total>0 ? $" ×{(stock.Total).ToString("N0",Numbers)}":"")}");
                             if(ChainNeed(row.FishId,stock) is { } need)ImGui.TextColored(Accent,need);
                             DrawFishNow(row.FishId,now.Territory);
                             // X-97 (0.982, user report: « collectable fish not taken into account », seen in the fishing helper; DEC-045): the collectability of each

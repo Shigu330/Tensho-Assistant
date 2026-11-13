@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         return quote.Sold(itemCatalog.State.Catalog?.Find(row.Recipe.ResultItemId)?.CanBeHq==true)?.Price;
     }
     private string FromStockRowText(CraftFromStockRow row)=>
-        localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0"),row.Recipe.Level);
+        localization.Format(row.Chained ? "CraftStock.RowChained":row.LowerBound ? "CraftStock.RowAtLeast":"CraftStock.Row",row.Count.ToString("N0",Numbers),row.Recipe.Level);
     private void DrawFromStockJob(CraftFromStockRow row)
     {
         var recipe=row.Recipe;
@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
         if(FromStockPerDay(row) is not { } perDay)return localization.Format("CraftStock.ValueMarketUnknown",gil(unit));
         if(perDay==0)return localization.Format("CraftStock.ValueMarketNone",pieces,gil(unit));
         var sold=CraftFromStock.Sellable(row,perDay,FromStockDays) ?? 0;
-        return localization.Format("CraftStock.ValueMarket",gil(sold*unit),FromStockDays,sold,pieces,gil(unit),perDay.ToString("0.##",System.Globalization.CultureInfo.CurrentCulture));
+        return localization.Format("CraftStock.ValueMarket",gil(sold*unit),FromStockDays,sold,pieces,gil(unit),perDay.ToString("0.##",Numbers));
     }
 
     // Scrips at the high tier; only rows of one kind of scrip compare, so each kind stays together, by its group's name.
@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
 
     private CraftFromStockRow[] FromStockRanked(CraftFromStockRow[] rows)
     {
-        var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;var culture=System.Globalization.CultureInfo.CurrentCulture;
+        var now=DateTimeOffset.UtcNow;var items=itemCatalog.State.Catalog;var culture=Numbers;
         fromStockValues=[];
         string Gil(decimal value)=>value.ToString("N0",culture);
         switch(fromStockSort)
@@ -220,7 +220,7 @@ internal sealed partial class MainWindow
         var rows=known.Shown;
         DrawFromStockPrices(known.Rows,rows.SelectMany(line=>line.All).ToArray());
         if(fromStockSort!=0)ImGui.TextDisabled(localization.Get("CraftStock.ValueHelp"));
-        ImGui.TextColored(Accent,localization.Format("CraftStock.Count",known.Rows.Length.ToString("N0"),result.Rows.Count.ToString("N0")));
+        ImGui.TextColored(Accent,localization.Format("CraftStock.Count",known.Rows.Length.ToString("N0",Numbers),result.Rows.Count.ToString("N0",Numbers)));
         ImGui.SameLine();
         ImGui.BeginDisabled(fromStockPage<=0);
         try{if(ImGui.SmallButton("<###CraftStockPrevious"))fromStockPage--;}
@@ -232,7 +232,7 @@ internal sealed partial class MainWindow
         try{if(ImGui.SmallButton(">###CraftStockNext"))fromStockPage++;}
         finally{ImGui.EndDisabled();}
         Tip("CraftStock.NextTip");
-        if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0")));
+        if(result.Undecided>0)ImGui.TextDisabled(localization.Format("CraftStock.Undecided",result.Undecided.ToString("N0",Numbers)));
         if(rows.Length==0){ImGui.TextDisabled(localization.Get("CraftStock.Empty"));return;}
         DrawChainList("CraftStockList",rows.Length,index=>
         {

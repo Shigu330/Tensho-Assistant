@@ -29,6 +29,8 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow : Window, IDisposable
 {
     private enum Page { Home, Items, Gathering, Maps, MacroChain, SortPreview, Collections, BlueMagic, TripleTriad, Market, Quests, Chocobo, Events, MiniCactpot, Settings, Diagnostics, DutyLoot, MonsterLoot, GatheringGp, Fashion, CraftSimulation, CraftLive, Weather, CraftPresets, NpcVendors, Alarms, Storage, Reminders, FreeCompany, Gear, Credits, Leves, HuntingLog, OceanFishing, Garden, MyTools, GatheringCollectables, Beastmaster, Help, IslandSanctuary, CustomDeliveries, MaskedCarnivale, RelicWeapons, AlliedSocieties, GrandCompanies, SpecialDeliveries, FieldContent, DeepDungeons, Lexicon, Fates, Discoveries, Wishlist }
+    // 0.1220 (X-261): numbers shown in the culture of Tensho's language, never Windows' (TenshoCulture).
+    private static System.Globalization.CultureInfo Numbers => TenshoAssistant.Localization.TenshoCulture.Current;
     // Read from the active theme each time: the game theme can change while the plugin runs.
     private static Vector4 Accent => FfxivTheme.Gold;
     private static Vector4 Success => FfxivTheme.Success;
@@ -398,7 +400,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         if (state.Catalog is { } catalog)
             ImGui.TextColored(Success, localization.Format("UiFragments.CatalogReady",catalog.Count.ToString("N0"),catalog.Metadata.Language));
         else ImGui.TextWrapped(state.Error ?? (state.TotalRows > 0
-            ? localization.Format("UiFragments.CatalogProgress",state.RowsCopied.ToString("N0"),state.TotalRows.ToString("N0"))
+            ? localization.Format("UiFragments.CatalogProgress",state.RowsCopied.ToString("N0",Numbers),state.TotalRows.ToString("N0",Numbers))
             : localization.Get("UiFragments.CatalogLoading")));
     }
 }

@@ -140,7 +140,7 @@ internal sealed partial class MainWindow
         else if(estimate.Lines.Count==0) ImGui.TextColored(Success,localization.Get("CostUi.NoPurchases"));
         else if(costed==0) ImGui.TextColored(Accent,localization.Get("CostUi.NoPrices"));
         else ImGui.TextColored(estimate.AllCosted ? Success : Accent,
-            localization.Format("CostUi.Summary",localization.Get(estimate.AllCosted ? "CostUi.Total":"CostUi.PartialTotal"),subtotal.ToString("N0"),costed,estimate.Lines.Count));
+            localization.Format("CostUi.Summary",localization.Get(estimate.AllCosted ? "CostUi.Total":"CostUi.PartialTotal"),subtotal.ToString("N0",Numbers),costed,estimate.Lines.Count));
         if(estimate.StockUncertain) ImGui.TextWrapped(localization.Get("CostUi.Uncertain"));
         if(estimate.CachedStock) ImGui.TextDisabled(localization.Get("CostUi.Imported"));
         if(estimate.StalePrices) ImGui.TextColored(Accent,localization.Get("CostUi.OldPrices"));
@@ -165,13 +165,13 @@ internal sealed partial class MainWindow
                     {
                         var item=itemCatalog.State.Catalog?.Find(line.ItemId);
                         ItemCell(item,line.ItemId,22,item is null ? $"ID {line.ItemId}":null);
-                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Quantity?.ToString("N0") ?? localization.Get("CostUi.Verify"));
-                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.UnitPrice is { } unit ? $"{unit:N0} {(line.HighQuality==true ? "HQ" : "NQ")}" : "—");
+                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Quantity?.ToString("N0",Numbers) ?? localization.Get("CostUi.Verify"));
+                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.UnitPrice is { } unit ? $"{(unit).ToString("N0",Numbers)} {(line.HighQuality==true ? "HQ" : "NQ")}" : "—");
                         if(line.BuyWorldId!=0 && market.State.NameOf(line.BuyWorldId) is { } buyOn){ImGui.SameLine();ImGui.TextDisabled(buyOn);}
                         if(line.FromVendor){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CostUi.FromVendor"));}
                         if(ImGui.IsItemHovered() && line.Quote is { } quote)
                             WrappedTooltip(localization.Format("CostUi.Quote",quote.WorldId,quote.FetchedAt.ToLocalTime().ToString("G"),quote.UploadedAt?.ToLocalTime().ToString("G") ?? localization.Get("CostUi.Unknown")));
-                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Cost?.ToString("N0") ?? localization.Get("CostUi.Unknown"));
+                        ImGui.TableNextColumn(); ImGui.TextUnformatted(line.Cost?.ToString("N0",Numbers) ?? localization.Get("CostUi.Unknown"));
                         ImGui.TableNextColumn(); ImGui.TextUnformatted(PreparationPriceStatus(line));
                         if(ImGui.IsItemHovered()) WrappedTooltip(PreparationPriceStatus(line));
                     }

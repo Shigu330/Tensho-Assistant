@@ -37,9 +37,9 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     ImGui.TextWrapped(route.Route.Length>0 ? route.Route:localization.Get("FreeCompany."+route.Kind));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(route.Voyages.ToString("N0"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(route.Voyages.ToString("N0",Numbers));
                     ImGui.TableNextColumn();
-                    ImGui.TextWrapped(string.Join(" · ",route.Items.Take(5).Select(item=>$"{Name(item.ItemId)} ×{item.PerVoyage:0.#}"))
+                    ImGui.TextWrapped(string.Join(" · ",route.Items.Take(5).Select(item=>$"{Name(item.ItemId)} ×{(item.PerVoyage).ToString("0.#",Numbers)}"))
                         +(route.Items.Count>5 ? localization.Format("HoverUi.More",route.Items.Count-5):""));
                 }
             }
@@ -59,7 +59,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted($"{record.Vessel} ({record.Rank})");
                     ImGui.TableNextColumn();ImGui.TextWrapped(string.Join(" → ",record.Route));
                     ImGui.TableNextColumn();
-                    ImGui.TextWrapped(string.Join(" · ",record.Loot.GroupBy(loot=>loot.ItemId).Select(group=>$"{Name(group.Key)} ×{group.Sum(loot=>loot.Count):N0}")));
+                    ImGui.TextWrapped(string.Join(" · ",record.Loot.GroupBy(loot=>loot.ItemId).Select(group=>$"{Name(group.Key)} ×{(group.Sum(loot=>loot.Count)).ToString("N0",Numbers)}")));
                 }
             }
             finally{ImGui.EndTable();}

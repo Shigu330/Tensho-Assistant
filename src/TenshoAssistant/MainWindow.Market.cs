@@ -61,8 +61,8 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item1);
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.Minimum?.ToString("N0") ?? localization.Get("MarketUi.Missing"));
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.RecentSale?.ToString("N0") ?? localization.Get("MarketUi.Missing"));
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.Minimum?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.RecentSale?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.SaleAt?.ToLocalTime().ToString("g") ?? localization.Get("MarketUi.Unknown"));
                 }
             }

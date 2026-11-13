@@ -27,7 +27,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Get("BankUi.OtherCharacters"));
         Tip("BankUi.OtherCharactersTip");
         foreach(var row in otherStocks)
-            ImGui.TextUnformatted(localization.Format("BankUi.OtherCharacterLine",CharacterName(bank.Entries,row.CharacterId),row.Nq.ToString("N0"),row.Hq.ToString("N0"),row.ObservedAt.ToLocalTime().ToString("d")));
+            ImGui.TextUnformatted(localization.Format("BankUi.OtherCharacterLine",CharacterName(bank.Entries,row.CharacterId),row.Nq.ToString("N0",Numbers),row.Hq.ToString("N0",Numbers),row.ObservedAt.ToLocalTime().ToString("d")));
     }
 
     private static string CharacterName(IEnumerable<BankEntry> entries,ulong id)
@@ -75,10 +75,10 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();
                     if(summary.Id==current)ImGui.TextColored(Success,localization.Format("CharactersUi.Current",summary.Name));else ImGui.TextUnformatted(summary.Name);
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.LastSeen.ToLocalTime().ToString("g"));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Gil is { } gil ? gil.ToString("N0"):"—");
-                    if(summary.RetainerGil is { } held){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CharactersUi.RetainerGil",held.ToString("N0")));}
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Items.ToString("N0"));
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Crystals.ToString("N0"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Gil is { } gil ? gil.ToString("N0",Numbers):"—");
+                    if(summary.RetainerGil is { } held){ImGui.SameLine();ImGui.TextDisabled(localization.Format("CharactersUi.RetainerGil",held.ToString("N0",Numbers)));}
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Items.ToString("N0",Numbers));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Crystals.ToString("N0",Numbers));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Retainers.ToString());
                     ImGui.TableNextColumn();
                     if(ImGui.SmallButton(localization.Get("CharactersUi.See"))){bankViewCharacter=summary.Id==current ? null:summary.Id;focusBankTab=true;}

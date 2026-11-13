@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
         if(npcVendors?.State is not { } state)return;
         if(state.Catalog is not { } catalog)
         {
-            ImGui.TextWrapped(state.Error is null ? localization.Format("NpcUi.Loading",state.Copied.ToString("N0")):localization.Get("NpcUi.Error"));
+            ImGui.TextWrapped(state.Error is null ? localization.Format("NpcUi.Loading",state.Copied.ToString("N0",Numbers)):localization.Get("NpcUi.Error"));
             if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             return;
         }
@@ -134,7 +134,7 @@ internal sealed partial class MainWindow
         {
             var cost=sale.Costs[index];
             if(index>0){ImGui.SameLine(0,4);ImGui.TextUnformatted("+");ImGui.SameLine(0,4);}
-            ImGui.TextUnformatted(cost.Amount.ToString("N0"));ImGui.SameLine(0,3);
+            ImGui.TextUnformatted(cost.Amount.ToString("N0",Numbers));ImGui.SameLine(0,3);
             // 0.295: company credits (FccShop) are named, with the company rank the item needs.
             if(cost.CurrencyItemId==NpcCost.CompanyCredits)
             {

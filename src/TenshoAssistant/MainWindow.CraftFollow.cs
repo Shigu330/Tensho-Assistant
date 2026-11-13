@@ -87,8 +87,8 @@ internal sealed partial class MainWindow
         }
         else ImGui.TextColored(Success,localization.Get("CraftProjectionUi.FollowDone"));
         var expected=view.Expected;
-        ImGui.TextDisabled(localization.Format("CraftProjectionUi.FollowPlanned",expected.Progress.ToString("N0"),view.QualityCompared ? expected.Quality.ToString("N0"):"—",expected.Durability,expected.Cp));
-        ImGui.TextUnformatted(localization.Format("CraftProjectionUi.FollowNow",(frame.Progress ?? 0).ToString("N0"),(frame.Quality ?? 0).ToString("N0"),frame.Durability ?? 0,frame.Raw.Cp));
+        ImGui.TextDisabled(localization.Format("CraftProjectionUi.FollowPlanned",expected.Progress.ToString("N0",Numbers),view.QualityCompared ? expected.Quality.ToString("N0",Numbers):"—",expected.Durability,expected.Cp));
+        ImGui.TextUnformatted(localization.Format("CraftProjectionUi.FollowNow",(frame.Progress ?? 0).ToString("N0",Numbers),(frame.Quality ?? 0).ToString("N0",Numbers),frame.Durability ?? 0,frame.Raw.Cp));
         if(!view.QualityCompared)ImGui.TextDisabled(localization.Get("CraftProjectionUi.FollowNoStart"));
         if(view.Diverged)
         {

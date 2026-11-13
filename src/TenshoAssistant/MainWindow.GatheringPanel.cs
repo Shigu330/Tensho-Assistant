@@ -195,7 +195,7 @@ internal sealed partial class MainWindow
                     // 0.478 (user report: lines cut at the panel's width): the name, then its rates under it.
                     var rates=$"{slot.SuccessPercent?.ToString() ?? "?"} % · {localization.Format("GatheringPanel.Boon",slot.BoonPercent?.ToString() ?? "?")}"
                         +(bountiful is { } bonus ? " · "+localization.Format("GatheringPanel.Bountiful",bonus):"")
-                        +(stock.HasObservation ? " · ×"+stock.Total.ToString("N0"):"");
+                        +(stock.HasObservation ? " · ×"+stock.Total.ToString("N0",Numbers):"");
                     ImGui.BeginGroup();
                     if(ImGui.Selectable((item?.Name ?? slot.ItemId.ToString())+"##Slot",ReferenceEquals(slot,chosen)) || clicked)SelectItem(slot.ItemId);
                     if(ImGui.IsItemHovered())DrawItemInfoTooltip(slot.ItemId);
@@ -204,7 +204,7 @@ internal sealed partial class MainWindow
                     // 0.751 (X-04, user request): what the tracking lists (crafting list, workshop, preparation) still need of this item; framed on the game's window too.
                     if(TrackedNeed(slot.ItemId) is > 0 and var tracked)
                     {
-                        ImGui.TextColored(Accent,localization.Format("GatheringPanel.TrackedNeed",tracked.ToString("N0")));
+                        ImGui.TextColored(Accent,localization.Format("GatheringPanel.TrackedNeed",tracked.ToString("N0",Numbers)));
                         if(configuration.GatheringListHighlight && GatheringSlotRects?.Invoke() is { } rects && slot.Index<rects.Count && rects[slot.Index] is { } rect)
                             DrawGatheringSlotFrame(rect);
                     }
@@ -333,7 +333,7 @@ internal sealed partial class MainWindow
         var need=GatherListNeed(slot.ItemId);
         if(gatheringPanelPlan is not { } plan)
         {
-            if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
+            if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0",Numbers)));
             ImGui.TextDisabled(gatheringPanelSolve is not null && Equals(gatheringPanelSolve.Value.Key,gatheringPanelKey) ? localization.Get("GatheringPanel.Solving")
                 :gatheringPanelLate ? localization.Get("GatheringPanel.AfterStart")
                 :gatheringPanelMissing.Length>0 ? localization.Format("GatheringPanel.Missing",string.Join(", ",gatheringPanelMissing.Select(localization.Get)))
@@ -342,8 +342,8 @@ internal sealed partial class MainWindow
         }
         var shown=plan.Best;
         // 0.515 (user request): the crafting list only says what it still needs; the plan is for this node.
-        if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0"),Math.Ceiling(need/shown.ExpectedYield).ToString("N0")):localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
-        ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0"),plan.Baseline.ToString("0.0"),shown.Cost));
+        if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0",Numbers),Math.Ceiling(need/shown.ExpectedYield).ToString("N0",Numbers)):localization.Format("GatheringPanel.ListNeed",need.ToString("N0",Numbers)));
+        ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0",Numbers),plan.Baseline.ToString("0.0",Numbers),shown.Cost));
         if(gatheringPanelLate)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanLate",plan.Scenario.Budget,plan.Scenario.Attempts));
         else if(gatheringPanelRest)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanRest",plan.Scenario.Budget,plan.Scenario.Attempts));
         else if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
@@ -376,7 +376,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextColored(Accent,localization.Format("GatheringPanel.PlanFor",items.Find(slot.ItemId)?.Name ?? slot.ItemId.ToString()));
         var need=GatherListNeed(slot.ItemId);
-        if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0")));
+        if(need>0)ImGui.TextColored(Accent,localization.Format("GatheringPanel.ListNeed",need.ToString("N0",Numbers)));
         // 0.522 (user report): an action still recasting is not advised, and its GP stays for the other; it says when it comes back.
         var cooling=GpCrystals.WithRecast(start.JobId).Select(id=>(Id:id,Left:GatheringRecastLeft?.Invoke(id))).Where(row=>row.Left>0).ToArray();
         var actions=GpCrystals.For(start.JobId,start.Level,(int)start.Gp,cooling.Select(row=>row.Id).ToArray());
@@ -412,7 +412,7 @@ internal sealed partial class MainWindow
             else if(missing>0)
             {
                 ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("GatheringPanel.EffectMissing",effect.Condition,effect.Text,missing));
-                if(gatheringPanelEffectWith.TryGetValue(effect,out var with))ImGui.TextDisabled(localization.Format("GatheringPanel.EffectWith",with.ToString("0.0")));
+                if(gatheringPanelEffectWith.TryGetValue(effect,out var with))ImGui.TextDisabled(localization.Format("GatheringPanel.EffectWith",with.ToString("0.0",Numbers)));
             }
             else if(effect.Kind==GatherEffectKind.Attempts && frame.TotalAttempts is { } total)ImGui.TextColored(Success,localization.Format("GatheringPanel.EffectOnAttempts",effect.Text,total,total-effect.Value));
             else ImGui.TextColored(Success,localization.Format("GatheringPanel.EffectOn",effect.Text));

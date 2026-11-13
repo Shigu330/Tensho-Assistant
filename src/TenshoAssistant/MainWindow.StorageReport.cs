@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
             {
                 DrawItemIcon(items?.Find(entry.ItemId),size);ImGui.SameLine();
                 ImGui.TextUnformatted(localization.Format("StorageReport.MergeLine",items?.Find(entry.ItemId)?.Name ?? $"#{entry.ItemId}",entry.Hq ? " HQ":"",
-                    entry.Storage,entry.Stacks,entry.Quantity.ToString("N0"),entry.Freed));
+                    entry.Storage,entry.Stacks,entry.Quantity.ToString("N0",Numbers),entry.Freed));
             }
             if(storageMergeable.Count>100)ImGui.TextDisabled(localization.Format("Events.More",storageMergeable.Count-100));
         }

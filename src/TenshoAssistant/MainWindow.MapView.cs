@@ -1794,7 +1794,7 @@ internal sealed partial class MainWindow
                     // Price from the game's teleport list; unknown (not attuned or not read yet) is said, never shown as 0.
                     if(mapLive?.TeleportCostsFailed==true)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MapView.TeleportCostFailed"));
                     else if(mapLive?.TeleportCosts is not { } costs)ImGui.TextDisabled(localization.Get("MapView.TeleportCostReading"));
-                    else if(costs.TryGetValue(target.Id,out var cost)){ImGui.TextUnformatted(localization.Format("MapView.TeleportCost",cost.ToString("N0")));DrawGilIcon();}
+                    else if(costs.TryGetValue(target.Id,out var cost)){ImGui.TextUnformatted(localization.Format("MapView.TeleportCost",cost.ToString("N0",Numbers)));DrawGilIcon();}
                     else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MapView.TeleportCostUnknown"));
                     if(ImGui.Button(localization.Get("MapView.TeleportYes"))){mapLive?.Teleport(target.Id);mapTeleportTarget=null;mapTeleportNote=null;ImGui.CloseCurrentPopup();}
                     ImGui.SameLine();
@@ -1939,7 +1939,7 @@ internal sealed partial class MainWindow
                     // 0.645 (P7): the cost on hover, or that it is not attuned.
                     if(hit.Fixed is { AetheryteId:not 0 } crystal && mapLive?.TeleportCostsFailed!=true && mapLive?.TeleportCosts is { Count:>0 } teleportCosts)
                     {
-                        if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0")));
+                        if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0",Numbers)));
                         else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MapView.AetheryteNotAttuned"));
                     }
                     if(hit.Point is { } point)

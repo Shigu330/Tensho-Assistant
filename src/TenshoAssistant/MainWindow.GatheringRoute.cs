@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
                 {
                     DrawChainItem(row.ItemId);
                     ImGui.SameLine();
-                    ImGui.TextDisabled($"× {row.Amount:N0} · {(string.IsNullOrWhiteSpace(row.Source.Place) ? row.Source.Zone:row.Source.Place)} · {ScheduleText(row.Source.Timing)}");
+                    ImGui.TextDisabled($"× {(row.Amount).ToString("N0",Numbers)} · {(string.IsNullOrWhiteSpace(row.Source.Place) ? row.Source.Zone:row.Source.Place)} · {ScheduleText(row.Source.Timing)}");
                     if(GatheringPointPixel(row.Source) is { } target)
                     {
                         ImGui.SameLine();

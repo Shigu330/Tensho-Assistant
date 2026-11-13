@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
             if(developerMode && ImGui.CollapsingHeader(localization.Get("CollectablePanel.Raw")+"###CollectableRaw"))
                 foreach(var value in frame.RawValues)ImGui.TextDisabled(value);
         });
-        static string Shown(int? value)=>value?.ToString("N0") ?? "?";
+        static string Shown(int? value)=>value?.ToString("N0",Numbers) ?? "?";
     }
 
     // 0.484 (user request): the risk accepted, set here. Applied as the slider moves; saved when it is let go.
@@ -91,7 +91,7 @@ internal sealed partial class MainWindow
         }
         ImGui.PushTextWrapPos(0);
         // 0.531 (user report: the description did not follow the change): with a plan in hand, what this step gives on this node, in figures.
-        try{ImGui.TextDisabled(advice is {Impossible:false} && rule is {Scrips:true,RewardHigh:>0} ? localization.Format($"CollectablePanel.Cap{risk}Now",advice.Worst.ToString("0.#"),advice.Expected.ToString("0.0")):localization.Get($"CollectablePanel.Cap{risk}Tip"));}
+        try{ImGui.TextDisabled(advice is {Impossible:false} && rule is {Scrips:true,RewardHigh:>0} ? localization.Format($"CollectablePanel.Cap{risk}Now",advice.Worst.ToString("0.#",Numbers),advice.Expected.ToString("0.0",Numbers)):localization.Get($"CollectablePanel.Cap{risk}Tip"));}
         finally{ImGui.PopTextWrapPos();}
     }
 
@@ -138,7 +138,7 @@ internal sealed partial class MainWindow
             collectableChanceBase.GetValueOrDefault(turn.ItemId),CollectableRisk.Snap(configuration.CollectableRiskTolerance),restore is null ? 0:EurekaChanceFor?.Invoke(job) ?? 0,EurekaReady?.Invoke()==true,
             configuration.CollectableUsePriming && turn.PrimingAction!=0 ? CollectableActionInfo?.Invoke(turn.PrimingAction)?.Cost ?? 0:0,collectableMeticulousBase.GetValueOrDefault(turn.ItemId));
         var tier=rule is null ? CollectableTier.Below:Gathering.Collectables.Tier(rule,turn.Current);
-        ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0"),turn.Maximum.ToString("N0"),localization.Get($"CollectablePanel.Tier{tier}")));
+        ImGui.ProgressBar(Math.Clamp((float)turn.Current/turn.Maximum,0,1),new Vector2(-1,ImGui.GetFrameHeight()),localization.Format("CollectablePanel.Current",turn.Current.ToString("N0",Numbers),turn.Maximum.ToString("N0",Numbers),localization.Get($"CollectablePanel.Tier{tier}")));
         // Worked out when something changes, not at each frame.
         var adviceKey=(turn,attempts,rule,bonuses);
         // Off the draw: a hard case takes most of a second (0.484), and a stale result is not shown.

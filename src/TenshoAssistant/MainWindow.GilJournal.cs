@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
         BoolSetting("GilJournal.ServerBar","GilJournal.ServerBarTip",()=>configuration.GilServerBar,value=>configuration.GilServerBar=value,c=>c.GilServerBar);
         if(GilJournalState?.Invoke() is not { } state){ImGui.TextDisabled(localization.Get("CharacterUi.Offline"));return;}
         if(state.Unavailable)ImGui.TextColored(Accent,localization.Get("GilJournal.Unreadable"));
-        string Amount(long? value)=>value is { } known ? known.ToString("N0"):localization.Get("Currencies.Unknown");
+        string Amount(long? value)=>value is { } known ? known.ToString("N0",Numbers):localization.Get("Currencies.Unknown");
         // 0.768 (X-18, user request): the game's gil icon by the balances.
         DrawItemIcon(itemCatalog.State.Catalog?.Find(1),new Vector2(ImGui.GetTextLineHeight()+2),false);ImGui.SameLine();
         ImGui.TextUnformatted(localization.Format("GilJournal.Balances",Amount(state.Gil),Amount(state.RetainersGil),Amount(state.CompanyGil)));
@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
             gilViewKey=(state,gilPeriod);
         }
         // 0.455 (user request, in-game campaign): tables instead of « +0 / −1 276 » lines; a zero is a dash.
-        static string Part(long value)=>value==0 ? "—":value.ToString("N0");
+        static string Part(long value)=>value==0 ? "—":value.ToString("N0",Numbers);
         foreach(var source in Enum.GetValues<GilSource>())
         {
             var totals=gilTotals[(int)source];
@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(entry.At.ToLocalTime().ToString("g"));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Delta.ToString("+#,0;-#,0"));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Balance.ToString("N0"));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Balance.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+entry.Category));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Short"+entry.Source));
             }

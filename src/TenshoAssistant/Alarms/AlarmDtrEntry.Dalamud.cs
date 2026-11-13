@@ -66,7 +66,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
 
     /// <summary>« 2 h 15 » from one hour on, « 45 min » below, « < 1 min » at the end.</summary>
     public static string Remaining(TimeSpan left)
-        =>left.TotalHours>=1 ? $"{(int)left.TotalHours} h {left.Minutes:00}":left.TotalMinutes>=1 ? $"{(int)left.TotalMinutes} min":"< 1 min";
+        =>left.TotalHours>=1 ? TenshoAssistant.Localization.TenshoCulture.Hours((int)left.TotalHours,left.Minutes):left.TotalMinutes>=1 ? $"{(int)left.TotalMinutes} min":"< 1 min";
 
     // The entry's text node in the server info bar addon: Dalamud adds it under the addon's root; matched by its text.
     internal static (Vector2 Min,Vector2 Max)? FindTextNode(IGameGui gui,string wanted)

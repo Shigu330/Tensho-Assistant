@@ -336,7 +336,7 @@ public sealed class GitHubExchange : IDisposable
         }
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
-        return new("ExchangeDone",added.ToString("N0"),joined.ToString("N0"),common,sent);
+        return new("ExchangeDone",added.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),joined.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),common,sent);
     }
 
     /// <summary>

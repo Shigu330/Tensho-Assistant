@@ -63,9 +63,9 @@ internal sealed partial class MainWindow
                             ImGui.SameLine();
                             if(ImGui.Selectable(item?.Name ?? localization.Format("BankUi.Item",row.ItemId),itemId==(int)row.ItemId))SelectItem(row.ItemId);
                             ImGui.TableNextColumn();ImGui.TextDisabled(item?.UiCategoryName ?? "");
-                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Nq.ToString("N0"));
-                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Hq.ToString("N0"));
-                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Total.ToString("N0"));
+                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Nq.ToString("N0",Numbers));
+                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Hq.ToString("N0",Numbers));
+                            ImGui.TableNextColumn();ImGui.TextUnformatted(row.Total.ToString("N0",Numbers));
                             ImGui.TableNextColumn();ImGui.TextDisabled(string.Join(", ",row.Storages));
                             if(ImGui.IsItemHovered())WrappedTooltip(string.Join("\n",row.Storages));
                         }

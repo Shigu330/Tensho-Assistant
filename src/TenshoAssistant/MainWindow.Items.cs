@@ -143,7 +143,7 @@ internal sealed partial class MainWindow
             ImGui.SetCursorPosX(left + Math.Max(0, (available - iconSize.X) / 2));
             DrawItemIcon(item, iconSize);
             if (ImGui.IsItemClicked()) SelectItem(crystal.ItemId);
-            var label = crystal.Hq > 0 ? $"{crystal.Nq:N0} / {crystal.Hq:N0}" : $"{crystal.Nq:N0}";
+            var label = crystal.Hq > 0 ? $"{(crystal.Nq).ToString("N0",Numbers)} / {(crystal.Hq).ToString("N0",Numbers)}" : $"{(crystal.Nq).ToString("N0",Numbers)}";
             var labelWidth = ImGui.CalcTextSize(label).X;
             ImGui.SetCursorPosX(left + Math.Max(0, (available - labelWidth) / 2));
             ImGui.TextColored(Accent, label);
@@ -275,7 +275,7 @@ internal sealed partial class MainWindow
         if (state.Catalog is not { } catalog)
         {
             ImGui.TextDisabled(state.Error ?? (state.TotalRows > 0
-                ? localization.Format("RecipeUi.CatalogProgress",state.RowsCopied.ToString("N0"),state.TotalRows.ToString("N0"))
+                ? localization.Format("RecipeUi.CatalogProgress",state.RowsCopied.ToString("N0",Numbers),state.TotalRows.ToString("N0",Numbers))
                 : localization.Get("RecipeUi.Loading")));
             return;
         }
@@ -396,7 +396,7 @@ internal sealed partial class MainWindow
                 {
                     var produced = checked(productCount * recipe.ResultAmount);
                     ImGui.SameLine();
-                    ImGui.TextDisabled(craftable.LowerBound ? localization.Format("RecipeUi.Produced","≥ "+produced.ToString("N0")) : localization.Format("RecipeUi.Produced",produced.ToString("N0")));
+                    ImGui.TextDisabled(craftable.LowerBound ? localization.Format("RecipeUi.Produced","≥ "+produced.ToString("N0",Numbers)) : localization.Format("RecipeUi.Produced",produced.ToString("N0",Numbers)));
                 }
                 if (!showOutputs && recipe.Ingredients.Count == 0) ImGui.TextDisabled(localization.Get("RecipeUi.NoIngredients"));
                 else if (!showOutputs)
@@ -653,11 +653,11 @@ internal sealed partial class MainWindow
     private string FormatRecipeHoldings(ItemHoldingsSummary summary, int required)
     {
         if (!summary.HasObservation) return localization.Get("RecipeUi.UnknownStock");
-        var value = $"NQ {summary.Nq:N0} · HQ {summary.Hq:N0}";
+        var value = $"NQ {(summary.Nq).ToString("N0",Numbers)} · HQ {(summary.Hq).ToString("N0",Numbers)}";
         var missing = Math.Max(0, required - summary.Total);
         // 0.735 (user report): a lower bound that already covers the need is enough: crystals held by retainers are never read, yet 490 of 5 is OK.
         if (summary.HasUnknown) return localization.Format(missing == 0 ? "RecipeUi.PartialEnough":"RecipeUi.Partial",value);
-        return missing == 0 ? $"{value} · OK" : localization.Format("RecipeUi.Missing",value,missing.ToString("N0"));
+        return missing == 0 ? $"{value} · OK" : localization.Format("RecipeUi.Missing",value,missing.ToString("N0",Numbers));
     }
 
     private (long? Count, bool LowerBound) GetCraftableCount(RecipeDefinition recipe)
@@ -722,7 +722,7 @@ internal sealed partial class MainWindow
     private void DrawHoldingsSummary(ItemHoldingsSummary summary)
     {
         string Number(long value) => !summary.HasObservation ? localization.Get("HoldingsUi.Unknown")
-            : !summary.HasCached && summary.HasUnknown ? $"≥ {value:N0}" : value.ToString("N0");
+            : !summary.HasCached && summary.HasUnknown ? $"≥ {(value).ToString("N0",Numbers)}" : value.ToString("N0",Numbers);
         if (ImGui.BeginTable("GroupedQuantities", 3, ImGuiTableFlags.SizingStretchSame | ImGuiTableFlags.BordersInnerV))
         {
             try
