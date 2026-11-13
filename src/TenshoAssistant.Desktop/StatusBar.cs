@@ -132,6 +132,9 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
 
     public string VersionEnglish=>DesktopVersionCheck.English(version);
 
+    /// <summary>X-271 (R37): drawing the reference images (the version line fixed).</summary>
+    public bool Pictures { get; set; }
+
     public string VersionText
     {
         get{var (key,args)=DesktopVersionCheck.Text(version);return host.Text(key,args);}
@@ -162,7 +165,9 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(DesktopPages.Editing.Contains(page))lines.Add((host.Text("Desktop.ReadOnlyHere"),false));
         if(DesktopPages.LiveKey(page) is { } live)lines.Add((host.Text(linked is null ? "Desktop.NotLinked" : "Desktop.LinkedNotLive",host.Text(live)),true));
         if(Loading is { } loading)lines.Add((host.Text("Desktop.Loading",loading.Ready,loading.Total),false));
-        lines.Add((host.Text("Desktop.AppVersion",DesktopVersionCheck.Three(Program.AppVersion))+"  ·  "+VersionText,version.State!=DesktopVersionState.Same));
+        // X-271 (R37): the reference images show a fixed number (a picture must not change with each version).
+        if(Pictures)lines.Add((host.Text("Desktop.AppVersion",DesktopVersionCheck.Three(References.Stamp)),false));
+        else lines.Add((host.Text("Desktop.AppVersion",DesktopVersionCheck.Three(Program.AppVersion))+"  ·  "+VersionText,version.State!=DesktopVersionState.Same));
         return lines;
     }
 

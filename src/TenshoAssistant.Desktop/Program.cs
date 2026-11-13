@@ -4,6 +4,8 @@
 //                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH] [--garden-trial] [--dashboard-trial] [--atlas=<png>]
 //        TenshoAssistant.Desktop --headless [--out=<md>]   (all 12 catalogues, every page classified and drawn for 20 frames without a window;
 //                                                           exit 0 only if no page throws, blocks or is unclassified; 4 = SKIP, no game data or Dalamud)
+//        TenshoAssistant.Desktop --references=<folder> [--compare=<folder>]   (X-271, R37: the reference images, hidden window, new settings;
+//                                                           report.json, SSIM against the pictures of --compare)
 //        TenshoAssistant.Desktop --headless --step=A,B | --step=entries   (diagnostic: which MainWindow call blocks, each on a worker with a 5 s limit)
 //        TenshoAssistant.Desktop --inventory [--inventory-out=<md>]   (per page: what of Dalamud its draw code can reach, by IL call graph of the built plugin)
 //        TenshoAssistant.Desktop --api=Type[:filter] | --il=Type::Method   (Dalamud's metadata, or the IL of one of its methods)
@@ -59,7 +61,7 @@ internal static class Program
         if(args.Contains("--print-version")){Console.WriteLine($"TenshoAssistant.Desktop {DesktopVersionCheck.Three(AppVersion)}");return 0;}
         if(Option(args,"--update-selftest=") is { } fakeRelease)return UpdateSelfTest.Run(fakeRelease,Option(args,"--update-own="));
         if(args.Contains("--update-probe"))return UpdateSelfTest.Probe();
-        var diagnostic=args.Any(a=>a is "--headless" or "--inventory" || a.StartsWith("--api=",StringComparison.Ordinal) || a.StartsWith("--il=",StringComparison.Ordinal));
+        var diagnostic=args.Any(a=>a is "--headless" or "--inventory" || a.StartsWith("--api=",StringComparison.Ordinal) || a.StartsWith("--references=",StringComparison.Ordinal) || a.StartsWith("--il=",StringComparison.Ordinal));
         // Started by a double-click: Windows made a console for this process alone; it is let go so only the window stays.
         if(!diagnostic && GetConsoleProcessList(new uint[2],2)==1)FreeConsole();
         // X-121: the copy the user started hands over to the newest installed copy (versions\<version> of the app's own folder), if any.
@@ -110,8 +112,9 @@ internal static class Program
         Console.WriteLine(DesktopVersionCheck.English(version));
         var watch=Stopwatch.StartNew();
         var headless=args.Contains("--headless");
+        var references=Option(args,"--references=");
         WindowSize=ParseSize(Option(args,"--size="));
-        var (w,h,pixels)=StartUi(headless,out var window);
+        var (w,h,pixels)=StartUi(headless,references is not null,out var window);
         // --atlas=<png> (diagnostic): the font atlas as built (white glyphs on black, their coverage as grey), to see what a glyph that
         // draws wrong really holds.
         if(Option(args,"--atlas=") is { } atlasPath)
@@ -128,10 +131,12 @@ internal static class Program
         // Tensho this is replaced by a real seam in the plugin after the post-7.58 release (the fonts read from one property of the plugin's UI
         // components, set by Plugin.cs from UiBuilder and by this app from its atlas; a ratchet test forbids new direct uses). Until then the
         // plugin's source is not changed (frozen until Dalamud is ready for 7.58).
-        var copy=Rewrite.Plugin(plugin,Path.Combine(Own,"plugin"),Hooks,AppVersion.ToString(),PluginSiblings);
+        // X-271 (R37): the reference images draw a copy of their own whose version reads 0.0.0 (a picture must not change with the number).
+        var copy=references is null ? Rewrite.Plugin(plugin,Path.Combine(Own,"plugin"),Hooks,AppVersion.ToString(),PluginSiblings)
+            : Rewrite.Plugin(plugin,Path.Combine(Own,"plugin-references"),Hooks,AppVersion.ToString(),PluginSiblings,stamp:References.Stamp);
         PluginFolder=Path.GetDirectoryName(copy);
         Console.WriteLine($"PASS fonts: Dalamud font statics pointed at the desktop atlas in a copy of the plugin ({PluginFolder}): {string.Join(", ",Rewrite.Sites.Select(p=>$"{p.Key} {p.Value} sites"))}");
-        var settings=args.Contains("--new-settings") ? null : DesktopPaths.PluginConfig(AppData);
+        var settings=args.Contains("--new-settings") || references is not null ? null : DesktopPaths.PluginConfig(AppData);
         var host=new Host(copy,sqpack,Option(args,"--lang="),Option(args,"--ui="),settings);
         Console.WriteLine($"PASS window: {host.Window.GetType().FullName} built with its real constructor ({watch.Elapsed.TotalSeconds:0.0} s); settings: {host.SettingsNote}; text {host.TextCode}, game data {host.GameLanguage}");
         // X-151 (0.1157): a member of the plugin the app reaches by name and does not find turns that part off: said, never silent.
@@ -141,6 +146,8 @@ internal static class Program
         if(int.TryParse(Option(args,"--theme="),out var theme) && !host.SetSetting("ThemeMode",Math.Clamp(theme,0,6)))Console.WriteLine("  --theme: the settings could not be reached");
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
+        // X-271 (R37): the reference images, in a hidden window, before anything of the player is read.
+        if(references is not null)return References.Run(host,status,cache,window!,Path.GetFullPath(references),Option(args,"--compare=") is { } compare ? Path.GetFullPath(compare) : null);
         if(headless)return Headless.Run(host,status,cache,args);
         // X-119 step 2, part 2 (0.1131): the plugin's saved data, read from the app's own copy of the plugin's folder (never in a headless run).
         // X-163 (0.1132): the application rings the alarms (never in a headless run).
@@ -172,9 +179,9 @@ internal static class Program
     internal static (int W,int H) ParseSize(string? text)
         =>text?.Split('x') is [var w,var h] && int.TryParse(w,out var width) && int.TryParse(h,out var height) ? (Math.Clamp(width,320,3840),Math.Clamp(height,240,2160)) : (1280,860);
 
-    private static unsafe (int,int,IntPtr) StartUi(bool headless,out Win32Gl? window)
+    private static unsafe (int,int,IntPtr) StartUi(bool headless,bool hidden,out Win32Gl? window)
     {
-        window=headless ? null : new Win32Gl($"Tensho Assistant {DesktopVersionCheck.Three(AppVersion)}",WindowSize.W,WindowSize.H,true);
+        window=headless ? null : new Win32Gl($"Tensho Assistant {DesktopVersionCheck.Three(AppVersion)}",WindowSize.W,WindowSize.H,!hidden);
         var (w,h,pixels)=ImGuiHeadless.Start(17f,FontFolder);
         if(window is null){ImGuiHeadless.SetFontTexture(1);GameIcons.Upload=null;}
         else

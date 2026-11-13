@@ -21,11 +21,12 @@ public static class Rewrite
     /// (two runs can go at once, a copy in use is never overwritten; the other folders of root are removed when free). <paramref name="siblings"/>:
     /// the plugin's own files copied beside it (the rest of its folder is found by the caller's resolver). <paramref name="windowSystems"/>:
     /// the plugin's own calls to WindowSystem.Draw (which blocks outside the game: it reads Dalamud's configuration service) go to
-    /// HostWindows.Draw (the test tool; the desktop application never runs the plugin's Draw handler).
+    /// HostWindows.Draw (the test tool; the desktop application never runs the plugin's Draw handler). <paramref name="stamp"/>: the copy's
+    /// assembly version replaced (Tensho's reference images, X-271: a picture that does not change with each version number).
     /// </summary>
-    public static string Plugin(string plugin,string root,string hooks,string salt,IEnumerable<string> siblings,bool windowSystems=false)
+    public static string Plugin(string plugin,string root,string hooks,string salt,IEnumerable<string> siblings,bool windowSystems=false,Version? stamp=null)
     {
-        var hash=Convert.ToHexString(SHA256.HashData([..File.ReadAllBytes(plugin),..System.Text.Encoding.UTF8.GetBytes(salt+windowSystems+typeof(HostFonts).Module.ModuleVersionId)]))[..16];
+        var hash=Convert.ToHexString(SHA256.HashData([..File.ReadAllBytes(plugin),..System.Text.Encoding.UTF8.GetBytes(salt+windowSystems+stamp+typeof(HostFonts).Module.ModuleVersionId)]))[..16];
         var folder=Path.Combine(root,hash);
         Directory.CreateDirectory(folder);
         foreach(var old in Directory.GetDirectories(root).Where(d=>!string.Equals(d,folder,StringComparison.OrdinalIgnoreCase)))
@@ -45,6 +46,7 @@ public static class Rewrite
         try{module=ModuleDefinition.ReadModule(plugin,new ReaderParameters{AssemblyResolver=resolver,InMemory=true,ReadSymbols=symbols});}
         catch(Exception) when(symbols){symbols=false;module=ModuleDefinition.ReadModule(plugin,new ReaderParameters{AssemblyResolver=resolver,InMemory=true});}
         using var owned=module;
+        if(stamp is not null)module.Assembly.Name.Version=stamp;
         var map=new Dictionary<string,MethodReference>
         {
             ["get_IconFont"]=module.ImportReference(typeof(HostFonts).GetProperty(nameof(HostFonts.IconFont))!.GetMethod!),

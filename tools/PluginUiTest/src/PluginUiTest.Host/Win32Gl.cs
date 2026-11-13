@@ -43,6 +43,15 @@ public sealed unsafe class Win32Gl:IDisposable
 
     private void UpdateSize(){GetClientRect(Hwnd,out var r);Size=new(Math.Max(1,r.Right-r.Left),Math.Max(1,r.Bottom-r.Top));}
 
+    /// <summary>X-271 (Tensho's reference images): the client area set to width x height (the frame's borders added), shown or not.</summary>
+    public void Resize(int width,int height)
+    {
+        GetWindowRect(Hwnd,out var outer);GetClientRect(Hwnd,out var inner);
+        var borderW=(outer.Right-outer.Left)-(inner.Right-inner.Left);var borderH=(outer.Bottom-outer.Top)-(inner.Bottom-inner.Top);
+        SetWindowPos(Hwnd,IntPtr.Zero,0,0,width+borderW,height+borderH,0x0002|0x0004|0x0010 /*NOMOVE|NOZORDER|NOACTIVATE*/);
+        UpdateSize();
+    }
+
     /// <summary>Messages of the frame, forwarded to ImGui's input queue.</summary>
     public void Pump()
     {
@@ -164,6 +173,8 @@ public sealed unsafe class Win32Gl:IDisposable
     [DllImport("user32")] private static extern bool TranslateMessage(ref MSG msg);
     [DllImport("user32")] private static extern IntPtr DispatchMessageW(ref MSG msg);
     [DllImport("user32")] private static extern bool GetClientRect(IntPtr hwnd,out RECT rect);
+    [DllImport("user32")] private static extern bool GetWindowRect(IntPtr hwnd,out RECT rect);
+    [DllImport("user32")] private static extern bool SetWindowPos(IntPtr hwnd,IntPtr after,int x,int y,int w,int h,uint flags);
     [DllImport("user32")] private static extern IntPtr GetDC(IntPtr hwnd);
     [DllImport("user32")] private static extern int ReleaseDC(IntPtr hwnd,IntPtr dc);
     [DllImport("user32")] private static extern IntPtr SetCapture(IntPtr hwnd);
