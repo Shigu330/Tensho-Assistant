@@ -34,7 +34,7 @@ internal sealed partial class MainWindow
         if(SelectedItem is { } contextItem)
         {
             ImGui.Separator();
-            ImGui.TextColored(Accent,localization.Format("Home.ContextItem",contextItem.Name));
+            UiComponents.SubTitle(localization.Format("Home.ContextItem",contextItem.Name));
             MeasureMap("home context tools",DrawContextTools);
         }
         ImGui.Separator();
@@ -45,9 +45,10 @@ internal sealed partial class MainWindow
     // Work in progress, next alarm and errors, in one short block.
     private void DrawHomeAlerts()
     {
-        if(craftSolve.State.Loading)ImGui.TextColored(Accent,localization.Get("CraftSearch.Loading"));
-        if(craftChain.State.Loading)ImGui.TextColored(Accent,localization.Get("Home.CraftChain"));
-        if(cactpotSolve.State.Loading)ImGui.TextColored(Accent,localization.Get("Home.Cactpot"));
+        // X-154 (0.1254): running computations are the shared « waiting » state.
+        if(craftSolve.State.Loading)StateLine(UiState.Waiting,localization.Get("CraftSearch.Loading"));
+        if(craftChain.State.Loading)StateLine(UiState.Waiting,localization.Get("Home.CraftChain"));
+        if(cactpotSolve.State.Loading)StateLine(UiState.Waiting,localization.Get("Home.Cactpot"));
         // 0.599 (T10): the three next alarms are in « Today »; this line only while that one is hidden.
         if(configuration.HomeTodayHidden?.Contains("Alarms")==true && NextAlarm() is { } next)
         {

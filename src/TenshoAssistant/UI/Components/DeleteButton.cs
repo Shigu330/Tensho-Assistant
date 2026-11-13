@@ -23,4 +23,19 @@ internal sealed partial class MainWindow
         finally{if(armed)ImGui.PopStyleColor();}
         return clicked && deleteConfirm.Click(id,now);
     }
+
+    /// <summary>
+    /// X-154 (0.1254): the same two-click deletion as a square icon button (a row of icons). Armed: the glyph in the error colour and the
+    /// tooltip « Click again to delete »; else the tooltip of the action. Same id rule as DeleteButton.
+    /// </summary>
+    private bool IconDeleteButton(Dalamud.Interface.FontAwesomeIcon icon,string labelKey,string tipKey,string idSuffix="")
+    {
+        var imguiId="###Delete"+labelKey+idSuffix;
+        var id=ImGui.GetID(imguiId);
+        var now=Environment.TickCount64;
+        var armed=deleteConfirm.IsArmed(id,now);
+        var clicked=GlyphButton(imguiId,icon,false,armed ? UI.FfxivTheme.Error:null);
+        Tip(armed ? "Common.DeleteConfirm":tipKey);
+        return clicked && deleteConfirm.Click(id,now);
+    }
 }

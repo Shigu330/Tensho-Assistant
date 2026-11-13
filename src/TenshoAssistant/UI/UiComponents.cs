@@ -66,8 +66,7 @@ internal static class UiComponents
         using (TitleFont is { Available: true } font ? font.Push() : null)
             ImGui.TextColored(FfxivTheme.Gold, title);
         if (!string.IsNullOrWhiteSpace(description)) ImGui.TextWrapped(description);
-        ImGui.Spacing();
-        ImGui.Separator();
-        ImGui.Spacing();
+        // X-154 (0.1254): space under a page title instead of one more line (the panes and the sections already draw theirs).
+        ImGui.Dummy(new Vector2(0, ImGui.GetStyle().ItemSpacing.Y*2));
     }
 }

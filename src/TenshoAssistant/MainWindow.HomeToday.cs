@@ -39,7 +39,7 @@ internal sealed partial class MainWindow
     {
         var now=DateTimeOffset.UtcNow;
         if(now-homeTodayAt>=TimeSpan.FromSeconds(1) || now<homeTodayAt)BuildHomeToday(now);
-        ImGui.TextColored(Accent,localization.Get("Home.TodayTitle"));
+        TenshoAssistant.UI.UiComponents.SubTitle(localization.Get("Home.TodayTitle"));
         ImGui.SameLine();
         if(ImGui.SmallButton(localization.Get("Home.Customize")))ImGui.OpenPopup("HomeCustomize");
         Tip("Home.CustomizeTip");

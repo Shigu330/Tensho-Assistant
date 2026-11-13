@@ -144,7 +144,7 @@ internal sealed partial class MainWindow
         var forecastShown=false;
         foreach(var (zone,patch,planted) in GardenJournal.Grids(beds))
         {
-            ImGui.TextColored(Accent,localization.Format("Garden.GridTitle",zone,patch));
+            TenshoAssistant.UI.UiComponents.SubTitle(localization.Format("Garden.GridTitle",zone,patch));
             // X-179 (0.1165): the whole patch tended at once, when the game's menu was not read (several beds, one tending line each).
             if(planted.Any(entry=>GardenJournal.TendAt(entry.Bed) is not null))
             {
@@ -263,21 +263,17 @@ internal sealed partial class MainWindow
         if(ImGui.InputInt(localization.Get("Garden.TendHours")+"##NewBedTend",ref newBedTend))newBedTend=GardenJournal.ClampTend(newBedTend);
         Tip("Garden.TendHoursTip");
         ImGui.SameLine();
-        ImGui.BeginDisabled(beds.Count>=GardenJournal.Capacity);
-        try
+        // X-154 (0.1254): the form's main action (PrimaryButton, greyed when the journal is full).
+        var full=beds.Count>=GardenJournal.Capacity;
+        if(PrimaryButton("Garden.Plant",full ? "Garden.Full":"Garden.PlantTip",!full))
         {
-            if(ImGui.Button(localization.Get("Garden.Plant")))
+            if(GardenJournal.CleanText(newBedPlace) is not { } place || GardenJournal.CleanText(newBedSeed) is not { } seed)newBedError=localization.Get("Garden.Invalid");
+            else
             {
-                if(GardenJournal.CleanText(newBedPlace) is not { } place || GardenJournal.CleanText(newBedSeed) is not { } seed)newBedError=localization.Get("Garden.Invalid");
-                else
-                {
-                    configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow)];
-                    newBedSeed="";newBedError=null;SaveReminders();
-                }
+                configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow)];
+                newBedSeed="";newBedError=null;SaveReminders();
             }
         }
-        finally{ImGui.EndDisabled();}
-        Tip(beds.Count>=GardenJournal.Capacity ? "Garden.Full":"Garden.PlantTip");
         if(newBedError is { } error)ImGui.TextColored(UI.FfxivTheme.Error,error);
     }
 
