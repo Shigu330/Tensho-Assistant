@@ -7714,6 +7714,8 @@
     "AllJobs": "Tous les jobs (mirage)",
     "AllJobsTip": "Ajoute aux listes les armures et accessoires des autres jobs et de tout niveau : depuis le patch 7.4, ils peuvent tous servir de mirage (les armes et outils restent liés au job). Ces pièces sont marquées « Mirage » : on peut les essayer et les partager, les statistiques gardent la pièce portée.\nPar défaut : désactivé.",
     "GlamourOnly": "Mirage",
+    "TipStats": "Statistiques de base",
+    "TipStatsHq": "Statistiques de base (HQ)",
     "GlamourOnlyTip": "Pièce d'un autre job ou d'un niveau plus élevé : elle compte pour l'apparence (essayage, mirage depuis le patch 7.4) ; les statistiques gardent la pièce portée.",
     "Title": "Équipement",
     "Description": "Planificateur d'équipement façon fenêtre Personnage : l'équipement porté, le plan pour votre job (matérias comprises) et les statistiques réelles (lues dans le jeu), prévues et l'écart ; pièces possédées, pièces à obtenir avec leurs sources, essayage et partage par code.",

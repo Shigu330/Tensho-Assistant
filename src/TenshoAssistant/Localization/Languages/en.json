@@ -7714,6 +7714,8 @@
     "AllJobs": "All jobs (glamour)",
     "AllJobsTip": "Adds other jobs' armour and accessories of any level to the lists: since patch 7.4 they can all be used as glamour (weapons and tools stay job-locked). These pieces are marked « Glamour »: they can be tried on and shared, the stats keep the worn piece.\nDefault: off.",
     "GlamourOnly": "Glamour",
+    "TipStats": "Base stats",
+    "TipStatsHq": "Base stats (HQ)",
     "GlamourOnlyTip": "Piece of another job or of a higher level: it counts for the look (try on, glamour since patch 7.4); the stats keep the worn piece.",
     "Title": "Gear",
     "Description": "Gear planner in the style of the Character window: worn gear, the plan for your job (materia included) and the stats — real (read from the game), planned and the difference; owned pieces, pieces to obtain with their sources, try-on and sharing by code.",

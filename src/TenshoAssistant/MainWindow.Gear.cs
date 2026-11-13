@@ -330,7 +330,7 @@ internal sealed partial class MainWindow
                     while(clipper.Step())
                     for(var index=clipper.DisplayStart;index<clipper.DisplayEnd;index++)
                     {
-                        var (candidate,glamourOnly,differences)=rows[index];
+                        var (candidate,glamourOnly)=rows[index];
                         var definition=items?.Find(candidate.Id);
                         DrawItemIcon(definition,new Vector2(ImGui.GetTextLineHeight()*1.4f));
                         ImGui.SameLine();DrawOwnedMark(candidate.Id);
@@ -341,17 +341,13 @@ internal sealed partial class MainWindow
                             if(current.Item?.Id==candidate.Id)plan.Remove(slot);else plan[slot]=candidate.Id;
                             StoreGearPlan(state.JobId,plan);ImGui.CloseCurrentPopup();
                         }
-                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(candidate.Id);
+                        // X-290 (0.1294, user request of 13/11 about 23:30): the stat differences written at the end of the line went past the list and
+                        // were cut (« +4 I », « -5 Détermination »): they are in the piece's tooltip, with its stats, as the hover comparator shows them.
+                        if(ImGui.IsItemHovered())DrawGearPickTooltip(catalog,candidate,glamourOnly);
                         ItemLinksMenu($"GearPickMenu{candidate.Id}",definition);
-                        ImGui.SameLine();
+                        SameLineOrNext(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
                         ImGui.TextDisabled(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
-                        if(glamourOnly){ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));continue;}
-                        // What it changes against the worn piece (the three largest differences).
-                        foreach(var (param,delta) in differences)
-                        {
-                            ImGui.SameLine();
-                            ImGui.TextColored(delta>0 ? Success:Error,$"{(delta>0 ? "+":"")}{delta} {localization.Get("Gear.Param"+param)}");
-                        }
+                        if(glamourOnly){SameLineOrNext(localization.Get("Gear.GlamourOnly"));ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));}
                     }
                 }
                 finally{clipper.End();clipper.Destroy();}
@@ -361,16 +357,16 @@ internal sealed partial class MainWindow
         finally{ImGui.EndPopup();}
     }
 
-    // 0.331 (« nothing heavy in Draw »): the rows of the open list — filtered, sorted, each with its three largest differences against the
-    // worn piece (one ParamsFor per piece) — rebuilt only when an input changes: catalog, slot, job, level, filters, owned-only, assumed HQ,
-    // what is owned (same key as gearOwned), the worn gear and the other ring.
+    // 0.331 (« nothing heavy in Draw »): the rows of the open list — filtered, sorted — rebuilt only when an input changes: catalog, slot, job,
+    // level, filters, owned-only, assumed HQ, what is owned (same key as gearOwned), the worn gear and the other ring. X-290 (0.1294): the
+    // differences against the worn piece left the rows for the tooltip (DrawGearPickTooltip), worked out for the hovered piece only.
     private readonly record struct GearPickKey(GearCatalog Catalog,GearSlot Slot,uint Job,int Level,GearFilter Filter,bool OwnedOnly,bool AssumeHq,
         (Inventory.InventorySnapshot? Current,Inventory.BankState State,ulong CharacterId) Owned,uint OtherRing);
     private GearPickKey? gearPickKey;
     private IReadOnlyList<EquippedPiece>? gearPickWorn;
-    private (GearItem Item,bool GlamourOnly,(int Param,int Delta)[] Differences)[] gearPickRows=[];
+    private (GearItem Item,bool GlamourOnly)[] gearPickRows=[];
 
-    private (GearItem Item,bool GlamourOnly,(int Param,int Delta)[] Differences)[] GearPickRows(GearCatalog catalog,CharacterStatsState state,GearSlot slot,
+    private (GearItem Item,bool GlamourOnly)[] GearPickRows(GearCatalog catalog,CharacterStatsState state,GearSlot slot,
         Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> worn,Dictionary<GearSlot,uint> plan,GearFilter filter)
     {
         // 0.331: a Unique ring already in the other ring slot of the planned set (planned there, else worn) is left out: the game refuses two.
@@ -381,13 +377,11 @@ internal sealed partial class MainWindow
         var key=new GearPickKey(catalog,slot,state.JobId,state.Level,filter,configuration.GearOwnedOnly,configuration.GearAssumeHq,GearOwnedSource(),otherRing);
         if(gearPickKey!=key || !SameWorn(gearPickWorn,equipped))
         {
-            var reference=worn.TryGetValue(slot,out var current) ? current.Item.ParamsFor(current.Hq):new Dictionary<int,int>();
-            var rows=new List<(GearItem Item,bool GlamourOnly,(int Param,int Delta)[] Differences)>();
+            var rows=new List<(GearItem Item,bool GlamourOnly)>();
             foreach(var candidate in GearRules.Candidates(catalog,slot,state.JobId,state.Level,filter).Where(piece=>!(piece.Unique && piece.Id==otherRing))
                 .Where(piece=>!configuration.GearOwnedOnly || IsWorn(piece.Id) || GearOwned(piece.Id) is { Total:>0 }).Take(300))
             {
-                var glamourOnly=GearRules.GlamourOnly(candidate,state.JobId,state.Level);
-                rows.Add((candidate,glamourOnly,glamourOnly ? Array.Empty<(int Param,int Delta)>():PickDifferences(candidate.ParamsFor(configuration.GearAssumeHq && candidate.CanBeHq),reference)));
+                rows.Add((candidate,GearRules.GlamourOnly(candidate,state.JobId,state.Level)));
             }
             gearPickRows=rows.ToArray();
         }
@@ -395,9 +389,32 @@ internal sealed partial class MainWindow
         return gearPickRows;
     }
 
-    private static (int Param,int Delta)[] PickDifferences(IReadOnlyDictionary<int,int> values,IReadOnlyDictionary<int,int> reference)
-        =>GearStatOrder.Select(param=>(Param:param,Delta:values.GetValueOrDefault(param)-reference.GetValueOrDefault(param)))
-            .Where(entry=>entry.Delta!=0 && entry.Param is not (21 or 24)).OrderByDescending(entry=>Math.Abs(entry.Delta)).Take(3).ToArray();
+    /// <summary>
+    /// X-290 (0.1294): the tooltip of a piece of the list: the common item tooltip (levels, stock, how to get it) with, after its header, the
+    /// piece's base stats (assumed HQ as the list) and the comparison with the worn piece, drawn as under the game's tooltip (DrawStatPairs,
+    /// DrawHoverComparisons). A glamour-only piece keeps the worn stats: only its mark.
+    /// </summary>
+    private void DrawGearPickTooltip(GearCatalog catalog,GearItem candidate,bool glamourOnly)
+    {
+        DrawItemInfoTooltip(candidate.Id,()=>
+        {
+            if(glamourOnly){ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnlyTip"));return;}
+            var hq=configuration.GearAssumeHq && candidate.CanBeHq;
+            var values=candidate.ParamsFor(hq);
+            var stats=GearStatOrder.Where(param=>values.GetValueOrDefault(param)!=0).Select(param=>(param,values[param].ToString("N0",Numbers),Text)).ToArray();
+            if(stats.Length>0){TenshoAssistant.UI.UiComponents.SubTitle(localization.Get(hq ? "Gear.TipStatsHq":"Gear.TipStats"));DrawStatPairs("GearPickStats"+candidate.Id,stats);}
+            var comparisons=GearCompare.Compare(candidate,hq,EquippedGear?.Invoke() ?? [],catalog.Find,GearStatOrder);
+            if(comparisons.Count>0)DrawHoverComparisons(comparisons);
+            else ImGui.TextDisabled(localization.Get("HoverUi.CompareNote"));
+        });
+    }
+
+    /// <summary>X-290 (0.1294): the next text on the same line when it fits in what is left of it, else on the next line: never cut at the edge.</summary>
+    private static void SameLineOrNext(string text)
+    {
+        ImGui.SameLine();
+        if(ImGui.GetContentRegionAvail().X<ImGui.CalcTextSize(text).X)ImGui.NewLine();
+    }
 
     // Same worn pieces (slot, item, HQ): the loader publishes a new list every second, usually with the same content.
     private static bool SameWorn(IReadOnlyList<EquippedPiece>? before,IReadOnlyList<EquippedPiece> now)

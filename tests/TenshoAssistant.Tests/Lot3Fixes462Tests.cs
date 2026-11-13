@@ -9,7 +9,7 @@ internal static class Lot3Fixes462Tests
         ("Gear comparison: stats in a grid, nothing side by side on one line",() =>
         {
             var ui=Read("MainWindow.GearCompare.cs");
-            Check(ui.Contains("ImGui.BeginTable(\"HoverCompare\"+comparison.Worn.Id,4,ImGuiTableFlags.SizingFixedFit)") && !ui.Contains("ImGui.SameLine()"),"table");
+            Check(ui.Contains("ImGui.BeginTable(id,4,ImGuiTableFlags.SizingFixedFit)") && ui.Contains("DrawStatPairs(\"HoverCompare\"+comparison.Worn.Id") && !ui.Contains("ImGui.SameLine()"),"table (X-290: the shared DrawStatPairs)");
         }),
         ("Item menus: the « all tools » entry is no longer offered",() =>
         {
