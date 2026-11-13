@@ -5261,6 +5261,9 @@
     "SourceReference": "Référence source : {0}"
   },
   "Common": {
+    "LeftDays": "{0} j {1} h",
+    "LeftHours": "{0} h {1:00}",
+    "LeftMinutes": "{0} min",
     "StateWaiting": "En attente",
     "StateSourceOff": "Source désactivée",
     "StateStale": "Donnée ancienne",

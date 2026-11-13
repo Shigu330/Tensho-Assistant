@@ -13,6 +13,8 @@ internal sealed partial class MainWindow
     internal Func<IReadOnlyList<(GardenSeed Seed,string Name)>>? GardenSeedCatalog { get; set; }
     private string newBedPlace="",newBedSeed="",gardenSeedSearch="";
     private int newBedGrow=1,newBedTend;
+    // X-178 (0.1256): the item of the seed picked in the list (0 once another name is typed).
+    private uint newBedSeedId;
     private string? newBedError;
     private DateTimeOffset gardenObservedAt;
 
@@ -43,7 +45,7 @@ internal sealed partial class MainWindow
         if(known.Seed is null){ChatNotice?.Invoke(localization.Get("Garden.DetectedUnknown"));return;}
         var at=zone ?? localization.Get("Garden.DetectedHere");
         var place=found.Kind==GardenChatKind.PlantedBed ? localization.Format("Garden.PlaceBed",at,found.Patch ?? 0,found.Bed ?? 0):localization.Format("Garden.PlacePot",at);
-        var beds=GardenJournal.Detected(configuration.GardenBeds,place,known.Name,GardenSeeds.GrowHours(known.Seed),GardenSeeds.TendHours(known.Seed),DateTimeOffset.UtcNow);
+        var beds=GardenJournal.Detected(configuration.GardenBeds,place,known.Name,GardenSeeds.GrowHours(known.Seed),GardenSeeds.TendHours(known.Seed),DateTimeOffset.UtcNow,known.Seed.SeedId);
         if(beds is null){ChatNotice?.Invoke(localization.Get("Garden.Full"));return;}
         configuration.GardenBeds=beds;
         ChatNotice?.Invoke(localization.Format("Garden.DetectedNotice",known.Name,place));
@@ -253,7 +255,7 @@ internal sealed partial class MainWindow
         DrawSeedPicker();
         ImGui.SameLine();
         ImGui.SetNextItemWidth(160);
-        ImGui.InputTextWithHint("##NewBedSeed",localization.Get("Garden.SeedHint"),ref newBedSeed,GardenJournal.MaximumText);
+        if(ImGui.InputTextWithHint("##NewBedSeed",localization.Get("Garden.SeedHint"),ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;
         Tip("Garden.SeedTip");
         ImGui.SetNextItemWidth(110);
         if(ImGui.InputInt(localization.Get("Garden.Grow")+"##NewBedGrow",ref newBedGrow))newBedGrow=GardenJournal.ClampGrow(newBedGrow);
@@ -270,8 +272,8 @@ internal sealed partial class MainWindow
             if(GardenJournal.CleanText(newBedPlace) is not { } place || GardenJournal.CleanText(newBedSeed) is not { } seed)newBedError=localization.Get("Garden.Invalid");
             else
             {
-                configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow)];
-                newBedSeed="";newBedError=null;SaveReminders();
+                configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow,newBedSeedId)];
+                newBedSeed="";newBedSeedId=0;newBedError=null;SaveReminders();
             }
         }
         if(newBedError is { } error)ImGui.TextColored(UI.FfxivTheme.Error,error);
@@ -298,6 +300,7 @@ internal sealed partial class MainWindow
                         if(gardenSeedSearch.Length>0 && !name.Contains(gardenSeedSearch,StringComparison.CurrentCultureIgnoreCase))continue;
                         if(!ImGui.Selectable(name+"##GardenSeed"+seed.SeedId))continue;
                         newBedSeed=GardenSeeds.JournalName(name) ?? newBedSeed;
+                        newBedSeedId=seed.SeedId;
                         newBedGrow=GardenSeeds.GrowHours(seed);
                         newBedTend=GardenSeeds.TendHours(seed);
                     }

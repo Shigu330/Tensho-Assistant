@@ -89,6 +89,7 @@
     <Compile Include="../../src/TenshoAssistant/Reminders/HomeToday.cs" Link="Reminders/HomeToday.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/PersonalTasks.cs" Link="Reminders/PersonalTasks.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenJournal.cs" Link="Reminders/GardenJournal.cs" />
+    <Compile Include="../../src/TenshoAssistant/Reminders/GardenView.cs" Link="Reminders/GardenView.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenSeeds.cs" Link="Reminders/GardenSeeds.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/ReminderCounts.cs" Link="Reminders/ReminderCounts.cs" />
     <Compile Include="../../src/TenshoAssistant/Reminders/GardenChat.cs" Link="Reminders/GardenChat.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/NavigationLayout.cs" Link="UI/NavigationLayout.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SelectionMark.cs" Link="UI/SelectionMark.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/UiStates.cs" Link="UI/UiStates.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/IconWait.cs" Link="UI/IconWait.cs" />
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />

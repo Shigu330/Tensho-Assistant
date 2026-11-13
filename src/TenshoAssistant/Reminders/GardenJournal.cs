@@ -9,6 +9,9 @@ public sealed class GardenBed
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Place { get; set; } = "";
     public string Seed { get; set; } = "";
+    /// <summary>X-178 (0.1256): the seed's item, noted when the planting is read from the chat or the seed picked in the list; 0 = unknown
+    /// (typed by hand, or noted before 0.1256): the icon is then found by the name.</summary>
+    public uint SeedId { get; set; }
     public DateTimeOffset PlantedAt { get; set; }
     public int GrowHours { get; set; } = 1;
     public int TendHours { get; set; }
@@ -66,19 +69,19 @@ public static class GardenJournal
     public static GardenState State(GardenBed bed,DateTimeOffset now)
         =>now>=RipeAt(bed) ? GardenState.Ripe:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
 
-    public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now)
-        =>new(){Place=place,Seed=seed,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
+    public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0)
+        =>new(){Place=place,Seed=seed,SeedId=seedId,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
 
     /// <summary>
     /// 0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.
     /// X-185 (0.1211, N24): « the same place » is also the same slot (zone, patch, bed) noted in another language of the plugin.
     /// </summary>
-    public static List<GardenBed>? Detected(IEnumerable<GardenBed>? beds,string place,string seed,int growHours,int tendHours,DateTimeOffset now)
+    public static List<GardenBed>? Detected(IEnumerable<GardenBed>? beds,string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0)
     {
         var slot=Slot(new GardenBed{Place=place});
         var kept=(beds ?? []).Where(bed=>bed.Place!=place && (slot is null || Slot(bed)!=slot)).ToList();
         if(kept.Count>=Capacity)return null;
-        kept.Add(Plant(place,seed,growHours,tendHours,now));
+        kept.Add(Plant(place,seed,growHours,tendHours,now,seedId));
         return kept;
     }
 
