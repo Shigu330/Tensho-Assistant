@@ -958,6 +958,8 @@ internal sealed partial class MainWindow
         // Tensho's own layers (0.210): treasure coffers (game icon), vistas, aether currents, nearby gathering points, party members.
         if(settings.ShowTreasure)icons.Add(TreasureIcon);
         if(settings.ShowSightseeing)icons.Add(GlyphVista);
+        // X-161 (0.1262): the monsters' marks (every reason: lists, hunting log, FATEs, blue magic…) have their size in the table too.
+        if(settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters || settings.ShowRelicMonsters || settings.ShowWishMonsters)icons.Add(GlyphMonster);
         if(settings.ShowAetherCurrents)icons.Add(GlyphCurrent);
         if(settings.ShowGathering)icons.Add(GlyphNearbyGathering);
         if(settings.ShowIslandAnimals && map.TerritoryId==IslandResources.Territory)icons.Add(GlyphIslandAnimal);
@@ -1563,15 +1565,18 @@ internal sealed partial class MainWindow
             if((settings.ShowListMonsters || settings.ShowHuntLogMonsters || settings.ShowFateMonsters || settings.ShowBlueMageMonsters || settings.ShowCollectionMonsters || settings.ShowBeastMonsters || settings.ShowRelicMonsters || settings.ShowWishMonsters) && live?.Monsters is { Count:>0 } monsters && live.MapId==map.MapId)
             {
                 RefreshNearbyMonsters();
+                // X-161 (0.1262): their size from the icon table (50 % by default; 0 hides them).
+                var monsterSize=settings.SizeOf(GlyphMonster,map.MapId);
                 foreach(var monster in monsters)
                 {
+                    if(monsterSize<=0)break;
                     var notes=MonsterNotes(monster,live.Fates);
                     if(notes.Count==0)continue;
                     MonsterNote? first=null;
                     foreach(var note in notes)if(MonsterNoteShown(note,settings)){first=note;break;}
                     if(first is null)continue;
                     var at=origin+mapPan+MapProjection.PixelFromWorld(monster.Position,map)*mapZoom;
-                    var glyph=Math.Max(4,baseIcon*0.6f);
+                    var glyph=Math.Max(4,baseIcon*0.6f*monsterSize);
                     var (symbol,colour)=MonsterGlyph(first.Kind);
                     draw.AddCircleFilled(at,glyph*0.7f,ImGui.GetColorU32(new Vector4(0,0,0,0.55f)),20);
                     draw.AddText(UiBuilder.IconFont,glyph,at-new Vector2(glyph/2),ImGui.GetColorU32(colour),symbol.ToIconString());
@@ -2037,8 +2042,8 @@ internal sealed partial class MainWindow
     // Treasure coffer map icon of the game (MapSymbol 63852, docs/evidence/0.139.0-symbols-probe.log), used for nearby coffers (0.210).
     private const uint TreasureIcon=63852;
     // Keys of Tensho's own map layers in the icon size/priority tables (outside the game's icon id range).
-    private const uint GlyphVista=0xFFFF0001,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,
-        GlyphIslandAnimal=0xFFFF0007;
+    private const uint GlyphVista=MapViewSettings.VistaGlyph,GlyphCurrent=0xFFFF0002,GlyphNearbyGathering=0xFFFF0003,GlyphParty=0xFFFF0004,GlyphBookmark=0xFFFF0005,GlyphTreasureMap=0xFFFF0006,
+        GlyphIslandAnimal=0xFFFF0007,GlyphMonster=MapViewSettings.MonsterGlyph;
     private static (FontAwesomeIcon Symbol,Vector4 Colour)? TenshoGlyph(uint icon)=>icon switch
     {
         GlyphVista=>(FontAwesomeIcon.Binoculars,new Vector4(0.98f,0.82f,0.30f,1)),
@@ -2048,6 +2053,7 @@ internal sealed partial class MainWindow
         GlyphBookmark=>(FontAwesomeIcon.Star,new Vector4(1f,0.85f,0.35f,1)),
         GlyphTreasureMap=>(FontAwesomeIcon.Gem,new Vector4(0.95f,0.55f,0.25f,1)),
         GlyphIslandAnimal=>(FontAwesomeIcon.Paw,new Vector4(0.85f,0.75f,0.55f,1)),
+        GlyphMonster=>(FontAwesomeIcon.Dragon,new Vector4(0.90f,0.50f,0.45f,1)),
         _=>null,
     };
     private string IconRowName(uint icon)=>icon switch
@@ -2060,6 +2066,7 @@ internal sealed partial class MainWindow
         GlyphBookmark=>localization.Get("MapView.ShowBookmarks"),
         GlyphTreasureMap=>localization.Get("MapView.TreasureMapIcon"),
         GlyphIslandAnimal=>localization.Get("MapView.ShowIslandAnimals"),
+        GlyphMonster=>localization.Get("MapView.IconMonsters"),
         _ when mapMarkers?.SymbolName(icon) is { Length:>0 } known=>known,
         _ when mapMarkers?.QuestIcons.TryGetValue(icon,out var quest)==true=>localization.Format(MapQuestIcons.NamesItsVariant(quest.Locked,quest.Variant) ? "MapView.QuestIconNamed":"MapView.QuestIcon",
             localization.Get("MapView.QuestKind"+(quest.Row is 1 or 3 or 8 or 10 ? quest.Row:0u)),quest.Row,

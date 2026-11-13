@@ -3757,6 +3757,7 @@
     "QuestAvailable": "available",
     "QuestLocked": "locked",
     "IconNearbyGathering": "Nearby gathering points (current job)",
+    "IconMonsters": "Nearby monsters (lists, hunt, FATEs…)",
     "TenshoIconHelp": "Layer added by Tensho (not a game icon): same visibility and size settings as the game's icons.",
     "Title": "Tensho map",
     "NoMap": "Unknown map",

@@ -3757,6 +3757,7 @@
     "QuestAvailable": "disponible",
     "QuestLocked": "non disponible",
     "IconNearbyGathering": "Points de récolte proches (métier actuel)",
+    "IconMonsters": "Monstres proches (listes, chasse, ALÉA…)",
     "TenshoIconHelp": "Couche ajoutée par Tensho (pas une icône du jeu) : même réglage de visibilité et de taille que les icônes du jeu.",
     "Title": "Carte Tensho",
     "NoMap": "Carte inconnue",

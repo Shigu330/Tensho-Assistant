@@ -321,10 +321,14 @@ public sealed class MapViewSettings
     // 0.289 (user request): the user's tuned values become the defaults — party members at 50 %; aetherytes (60453, 60430, 60959)
     // drawn above other icons (+1), 60442 and the side-quest icon 71021 below (−1). Icon ids read from the user's saved settings.
     public const uint PartyGlyph=0xFFFF0004;
-    public static IReadOnlyDictionary<uint,float> DefaultIconSizes { get; }=new Dictionary<uint,float>{[PartyGlyph]=0.5f};
+    // X-161 (0.1262, user request of 12/11): on Tensho's map, the sightseeing marks a little smaller (80 %) and the monsters' marks half
+    // their size (they were fixed, out of this table). A size the player set stays: a default applies only to an icon absent from the
+    // saved table (so it also reaches the players who had the map before).
+    public const uint VistaGlyph=0xFFFF0001,MonsterGlyph=0xFFFF0008;
+    public static IReadOnlyDictionary<uint,float> DefaultIconSizes { get; }=new Dictionary<uint,float>{[PartyGlyph]=0.5f,[VistaGlyph]=0.8f,[MonsterGlyph]=0.5f};
     public static IReadOnlyDictionary<uint,int> DefaultIconPriorities { get; }=new Dictionary<uint,int>{[60959]=1,[60453]=1,[60430]=1,[60442]=-1,[71021]=-1};
     public Dictionary<uint,float> IconSizes { get; set; } = new(DefaultIconSizes);
-    public float SizeOf(uint icon)=>IconSizes is not null && IconSizes.TryGetValue(icon,out var value) ? CleanSize(value):1f;
+    public float SizeOf(uint icon)=>IconSizes is not null && IconSizes.TryGetValue(icon,out var value) ? CleanSize(value):DefaultIconSizes.GetValueOrDefault(icon,1f);
     // 0.119: per-map overrides (map id → icon id → size) on top of the global table, and draw priorities (-9..9, higher on top).
     public Dictionary<uint,Dictionary<uint,float>> MapIconSizes { get; set; } = [];
     public Dictionary<uint,int> IconPriorities { get; set; } = new(DefaultIconPriorities);
