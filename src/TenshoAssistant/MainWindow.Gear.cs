@@ -22,9 +22,10 @@ internal sealed partial class MainWindow
     // 0.331 (R-14): the worn gear could not be read (GearLoader.Unavailable): the planner says so instead of computing on no worn set.
     internal Func<bool>? EquippedGearUnavailable { get; set; }
     private string gearSearch="";
-    private readonly Dictionary<GearSlot,GearItem> gearLooks=[];
-    // 0.312: materia counted per slot this frame (planned materia, else the worn piece's own).
-    private readonly Dictionary<GearSlot,IReadOnlyList<MeldedMateria>> gearMelds=[];
+    // The model's (GearModelFor): another job's pieces shown and tried on, the stats keeping the worn piece.
+    private Dictionary<GearSlot,GearItem> gearLooks=[];
+    // 0.312: materia counted per slot (planned materia, else the worn piece's own); the model's (GearModelFor).
+    private Dictionary<GearSlot,IReadOnlyList<MeldedMateria>> gearMelds=[];
 
     private static readonly GearSlot[] GearLeft=[GearSlot.MainHand,GearSlot.Head,GearSlot.Body,GearSlot.Hands,GearSlot.Legs,GearSlot.Feet];
     private static readonly GearSlot[] GearRight=[GearSlot.OffHand,GearSlot.Ears,GearSlot.Neck,GearSlot.Wrists,GearSlot.RingRight,GearSlot.RingLeft];
@@ -75,12 +76,59 @@ internal sealed partial class MainWindow
         DrawGearPlanPicker(state.JobId);
         var plans=configuration.GearPlans??=[];
         var plan=plans.GetValueOrDefault(state.JobId) ?? [];
+        var model=GearModelFor(catalog,state,worn,plan,otherJob);
+        var (plannedPieces,wornPieces)=(model.Planned,model.Worn);
+        gearLooks=model.Looks;gearMelds=model.Melds;
+
+        ImGui.TextColored(Accent,localization.Format("CharacterDates.Summary",state.Name,state.Job,state.Level));
+        ImGui.SameLine();
+        ImGui.TextDisabled(localization.Format("Gear.ItemLevels",model.WornLevel.ToString("0.0",Numbers),model.PlannedLevel.ToString("0.0",Numbers)));
+        DrawGearToolbar(catalog,state,plan,plannedPieces,wornPieces);
+        if(!ImGui.BeginTable("GearPlanner",3,ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV))return;
+        try
+        {
+            // 0.311 (user feedback): the stats on the left, then both gear columns side by side.
+            ImGui.TableSetupColumn("##Stats",ImGuiTableColumnFlags.WidthStretch,1.2f);
+            ImGui.TableSetupColumn("##Left",ImGuiTableColumnFlags.WidthStretch,1);
+            ImGui.TableSetupColumn("##Right",ImGuiTableColumnFlags.WidthStretch,1);
+            ImGui.TableNextRow();
+            ImGui.TableNextColumn();
+            DrawGearStats(state,model);
+            ImGui.TableNextColumn();
+            foreach(var slot in GearLeft)DrawGearSlot(catalog,state,slot,wornPieces,plannedPieces,plan);
+            ImGui.TableNextColumn();
+            foreach(var slot in GearRight)DrawGearSlot(catalog,state,slot,wornPieces,plannedPieces,plan);
+        }
+        finally{ImGui.EndTable();}
+        DrawGearToObtain(catalog,plannedPieces);
+        ImGui.TextDisabled(localization.Get("Gear.Notes"));
+    }
+
+    // X-01 C5 (0.1242): the planned set, its stats and the derived values are rebuilt only when one of their inputs changes, not in every
+    // frame: the catalog, the character's state as read (a new record on each change), the job and level planned for, « assume HQ », the
+    // worn gear as published (a new list on each reading), the plan and its materia (their exact content, compared each frame: twelve
+    // slots at most, so a change made anywhere is seen at once) and the language (the derived values are texts).
+    private readonly record struct GearModelKey(GearCatalog Catalog,CharacterStatsState Real,uint Job,int Level,bool AssumeHq,IReadOnlyList<EquippedPiece>? Equipped,
+        string Plan,int Language);
+    internal sealed record GearModel(Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> Planned,
+        Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> Worn,Dictionary<GearSlot,GearItem> Looks,
+        Dictionary<GearSlot,IReadOnlyList<MeldedMateria>> Melds,double WornLevel,double PlannedLevel,Dictionary<int,int> WornTotals,
+        Dictionary<int,int> PlannedTotals,Dictionary<string,int> PlannedValues,IReadOnlyList<(string Key,string Value)> CombatNow,
+        IReadOnlyDictionary<string,string> CombatLater);
+    private GearModelKey? gearModelKey;
+    private GearModel? gearModel;
+
+    private GearModel GearModelFor(GearCatalog catalog,CharacterStatsState state,Dictionary<GearSlot,EquippedPiece> worn,Dictionary<GearSlot,uint> plan,bool otherJob)
+    {
         var assumeHq=configuration.GearAssumeHq;
+        var materiaPlan=configuration.GearMateria?.GetValueOrDefault(state.JobId);
+        var key=new GearModelKey(catalog,characterStats.State,state.JobId,state.Level,assumeHq,otherJob ? null:EquippedGear?.Invoke(),
+            GearPlanKey.Signature(plan,materiaPlan),localization.Revision);
+        if(gearModel is { } known && gearModelKey==key)return known;
 
         // The set as planned: a planned item where one is chosen, the worn piece (with its materia) elsewhere.
         var plannedPieces=new Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)>();
-        gearLooks.Clear();gearMelds.Clear();
-        var materiaPlan=configuration.GearMateria?.GetValueOrDefault(state.JobId);
+        var looks=new Dictionary<GearSlot,GearItem>();var meldsBySlot=new Dictionary<GearSlot,IReadOnlyList<MeldedMateria>>();
         var wornPieces=new Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)>();
         foreach(var slot in Enum.GetValues<GearSlot>())
         {
@@ -92,42 +140,30 @@ internal sealed partial class MainWindow
             // with more sockets are neither counted, drawn nor shared (a piece with no socket and no cap counted them all).
             var socketItem=(plan.TryGetValue(slot,out var plannedId) ? catalog.Find(plannedId):null) ?? (wornPieces.TryGetValue(slot,out var socketPiece) ? socketPiece.Item:null);
             if(melds.Count>(socketItem?.SocketCount ?? 0))melds=melds.Take(socketItem?.SocketCount ?? 0).ToArray();
-            gearMelds[slot]=melds;
+            meldsBySlot[slot]=melds;
             if(plan.TryGetValue(slot,out var id) && catalog.Find(id) is { } planned)
             {
                 // 0.311: another job's piece (glamour since 7.4) is shown and tried on, the stats keep the worn piece.
-                if(GearRules.GlamourOnly(planned,state.JobId,state.Level)){gearLooks[slot]=planned;if(wornPieces.TryGetValue(slot,out var keptForStats))plannedPieces[slot]=keptForStats;}
+                if(GearRules.GlamourOnly(planned,state.JobId,state.Level)){looks[slot]=planned;if(wornPieces.TryGetValue(slot,out var keptForStats))plannedPieces[slot]=keptForStats;}
                 else plannedPieces[slot]=(planned,assumeHq && planned.CanBeHq,catalog.MateriaValues(melds));
             }
             else if(wornPieces.TryGetValue(slot,out var kept))plannedPieces[slot]=materiaPlan?.ContainsKey(slot)==true ? (kept.Item,kept.Hq,catalog.MateriaValues(melds)):kept;
         }
         // A planned two-handed weapon frees the off hand.
         if(plannedPieces.TryGetValue(GearSlot.MainHand,out var weapon) && weapon.Item.BlocksOffHand)plannedPieces.Remove(GearSlot.OffHand);
-
-        ImGui.TextColored(Accent,localization.Format("CharacterDates.Summary",state.Name,state.Job,state.Level));
-        ImGui.SameLine();
-        ImGui.TextDisabled(localization.Format("Gear.ItemLevels",
-            GearRules.AverageItemLevel(wornPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0",Numbers),
-            GearRules.AverageItemLevel(plannedPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)).ToString("0.0",Numbers)));
-        DrawGearToolbar(catalog,state,plan,plannedPieces,wornPieces);
-        if(!ImGui.BeginTable("GearPlanner",3,ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV))return;
-        try
-        {
-            // 0.311 (user feedback): the stats on the left, then both gear columns side by side.
-            ImGui.TableSetupColumn("##Stats",ImGuiTableColumnFlags.WidthStretch,1.2f);
-            ImGui.TableSetupColumn("##Left",ImGuiTableColumnFlags.WidthStretch,1);
-            ImGui.TableSetupColumn("##Right",ImGuiTableColumnFlags.WidthStretch,1);
-            ImGui.TableNextRow();
-            ImGui.TableNextColumn();
-            DrawGearStats(state,wornPieces,plannedPieces);
-            ImGui.TableNextColumn();
-            foreach(var slot in GearLeft)DrawGearSlot(catalog,state,slot,wornPieces,plannedPieces,plan);
-            ImGui.TableNextColumn();
-            foreach(var slot in GearRight)DrawGearSlot(catalog,state,slot,wornPieces,plannedPieces,plan);
-        }
-        finally{ImGui.EndTable();}
-        DrawGearToObtain(catalog,plannedPieces);
-        ImGui.TextDisabled(localization.Get("Gear.Notes"));
+        var wornTotals=GearRules.Totals(wornPieces.Values.Select(piece=>(piece.Item,piece.Hq,(IReadOnlyList<(int Param,int Value)>)piece.Materia)));
+        var plannedTotals=GearRules.Totals(plannedPieces.Values.Select(piece=>(piece.Item,piece.Hq,(IReadOnlyList<(int Param,int Value)>)piece.Materia)));
+        var plannedValues=GearRules.Planned(state.Values,wornTotals,plannedTotals);
+        // Combat jobs: the derived values (critical rate, damage bonus…), same formulas as the Character page.
+        var derived=CombatCategory(state.Category) && state.Modifiers.Div>0;
+        var model=new GearModel(plannedPieces,wornPieces,looks,meldsBySlot,
+            GearRules.AverageItemLevel(wornPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)),
+            GearRules.AverageItemLevel(plannedPieces.ToDictionary(pair=>pair.Key,pair=>pair.Value.Item)),
+            wornTotals,plannedTotals,plannedValues,
+            derived ? [.. StatFormulas.Combat(state.Values,state.Category,state.Role,state.Modifiers).Select(row=>(row.Key,row.Value))]:[],
+            derived ? StatFormulas.Combat(plannedValues,state.Category,state.Role,state.Modifiers).ToDictionary(row=>row.Key,row=>row.Value):new Dictionary<string,string>());
+        gearModelKey=key;gearModel=model;
+        return model;
     }
 
     private void DrawGearToolbar(GearCatalog catalog,CharacterStatsState state,Dictionary<GearSlot,uint> plan,
@@ -374,12 +410,10 @@ internal sealed partial class MainWindow
     }
 
     // Stats column: real values (game), planned values (real + planned set − worn set) and the difference; then derived values.
-    private void DrawGearStats(CharacterStatsState state,Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> worn,
-        Dictionary<GearSlot,(GearItem Item,bool Hq,IReadOnlyList<(int,int)> Materia)> planned)
+    // X-01 C5 (0.1242): the totals and the derived values come from the model (GearModelFor), not computed in every frame.
+    private void DrawGearStats(CharacterStatsState state,GearModel model)
     {
-        var wornTotals=GearRules.Totals(worn.Values.Select(piece=>(piece.Item,piece.Hq,(IReadOnlyList<(int Param,int Value)>)piece.Materia)));
-        var plannedTotals=GearRules.Totals(planned.Values.Select(piece=>(piece.Item,piece.Hq,(IReadOnlyList<(int Param,int Value)>)piece.Materia)));
-        var plannedValues=GearRules.Planned(state.Values,wornTotals,plannedTotals);
+        var (wornTotals,plannedTotals,plannedValues)=(model.WornTotals,model.PlannedTotals,model.PlannedValues);
         if(!ImGui.BeginTable("GearStats",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
         try
         {
@@ -410,15 +444,14 @@ internal sealed partial class MainWindow
             }
             // Combat jobs: the derived values (critical rate, damage bonus…) in the same columns, same formulas as the Character page.
             if(!combat || state.Modifiers.Div<=0)return;
-            var laterRows=StatFormulas.Combat(plannedValues,state.Category,state.Role,state.Modifiers).ToDictionary(row=>row.Key);
             ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.Spacing();
-            foreach(var row in StatFormulas.Combat(state.Values,state.Category,state.Role,state.Modifiers))
+            foreach(var (rowKey,rowValue) in model.CombatNow)
             {
-                ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("CharacterStats."+row.Key));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(row.Value);
+                ImGui.TableNextRow();ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("CharacterStats."+rowKey));
+                ImGui.TableNextColumn();ImGui.TextUnformatted(rowValue);
                 ImGui.TableNextColumn();
-                var later=laterRows.GetValueOrDefault(row.Key);
-                ImGui.TextColored(later is not null && later.Value!=row.Value ? UI.FfxivTheme.Gold:Text,later?.Value ?? "—");
+                var later=model.CombatLater.GetValueOrDefault(rowKey);
+                ImGui.TextColored(later is not null && later!=rowValue ? UI.FfxivTheme.Gold:Text,later ?? "—");
             }
         }
         finally{ImGui.EndTable();}
