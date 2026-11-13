@@ -49,7 +49,7 @@ internal static class SlowFrameTests
         ("Slow readers 992: timed only in developer mode, over 50 ms, named once; the cut first",() =>
         {
             var gate=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
-            Check(gate.Contains("void Guarded(IFramework running){if(!cut)Timed(handler,running);}"),"cut first");
+            Check(gate.Contains("void Guarded(IFramework running){if(!cut && ticket.Ready)Timed(handler,running);}"),"cut first");
             Check(gate.Contains("if(Developer?.Invoke()!=true){handler(running);return;}") && gate.Contains("if(spent<=50)return;") && gate.Contains("if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;"),"developer, 50 ms, at most every 5 minutes (0.1162, X-177; was once)");
         }),
         ("Diagnostics: the panels beside the game's windows have their draw time, in developer mode",() =>

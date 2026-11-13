@@ -1616,16 +1616,14 @@ public sealed class Plugin : IDalamudPlugin
             unloadParts=instances[0].Value;
             developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
-            // X-177 C4.2 (0.1198): the readers' own code compiled as they subscribed, off the game's thread (CompetitiveGate.CompileAhead).
-            if(configuration.DeveloperMode)
-            {
-                var ahead=TenshoAssistant.Competitive.CompetitiveGate.CompiledAhead;
-                log.Information("Readers compiled ahead: {0} classes, {1} methods in {2:0} ms on the loading thread.",ahead.Readers,ahead.Methods,ahead.Milliseconds);
-            }
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
             {
                 SayLoad("10 s later");
                 if(!configuration.DeveloperMode)return;
+                // X-177 C4.2 (0.1199): the readers' classes compiled on their own thread, each reader started once its class was ready.
+                if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is { } readers)
+                    log.Information("Readers compiled on their own thread: {0} classes, {1} methods in {2:0} ms, the last one ready {3:0} ms after the first subscribed; {4} still waiting.",
+                        readers.Classes,readers.Methods,readers.Compiling,readers.DoneAfter,readers.Waiting);
                 // 0.1196: one short line per earlier instance: « 0 of N parts alive » when it was collected whole, else its first 24 parts held.
                 foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,24));
                 // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static

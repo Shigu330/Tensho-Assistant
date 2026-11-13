@@ -22,8 +22,8 @@ internal static partial class CompetitiveGate
     /// <summary>X-109 (0.981, DEC-047): a subscription that runs out of a cut, and during one only while the labyrinth's board is open (the team panel).</summary>
     public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
-        CompileAhead(handler);
-        void Guarded(IFramework running){if(!cut || labyrinthBoard)Timed(handler,running);}
+        var ticket=Compiler.Add(handler.Method);
+        void Guarded(IFramework running){if((!cut || labyrinthBoard) && ticket.Ready)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }
@@ -52,31 +52,18 @@ internal static partial class CompetitiveGate
     }
 
     /// <summary>
-    /// X-177 C4.2 (0.1198; at a reload, the first pass of a reader took 125 to 276 ms of one frame: its code compiled the first time it
-    /// ran, on the game's thread): a reader's own code is compiled when it subscribes, on the thread that subscribes it (the one that builds
-    /// the plugin, not the game's), before the game's thread first calls it: the methods of its class and of the types nested in it (lambdas,
-    /// closures, local functions). A class too large for that (the window, the plugin itself) gives only the handler's own type. Each class
-    /// once. What a reader calls in other classes is still compiled on first use (the warm-up reaches it later).
+    /// X-177 C4.2 (0.1198, 0.1199; at a reload, the first pass of a reader took 125 to 276 ms of one frame: its code compiled the first
+    /// time it ran, on the game's thread): a reader's own code is compiled before the game's thread first calls it: the methods of its
+    /// class and of the types nested in it (lambdas, closures, local functions); a class too large for that (the window, the plugin
+    /// itself) gives only the handler's own type. 0.1199: on a thread of its own, not on the one that builds the plugin (the load had
+    /// grown from 2.4 s to 5.6 s): each way to subscribe takes the ticket of the reader's class from <see cref="Compiler"/> and calls
+    /// the reader only once the ticket is ready (class compiled, or guard delay over). What a reader calls in other classes is still
+    /// compiled on first use (the warm-up reaches it later).
     /// </summary>
-    private static void CompileAhead(IFramework.OnUpdateDelegate handler)
-    {
-        var owner=Diagnostics.JitWarmup.Owner(handler.Method);
-        lock(Gate){if(owner is null || !compiledOwners.Add(owner))return;}
-        var started=System.Diagnostics.Stopwatch.GetTimestamp();
-        var methods=Diagnostics.JitWarmup.PrepareOwner(handler.Method);
-        var spent=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
-        lock(Gate){aheadReaders++;aheadMethods+=methods;aheadMs+=spent;}
-    }
-    private static readonly HashSet<Type> compiledOwners=[];
-    private static int aheadReaders,aheadMethods;
-    private static double aheadMs;
-    /// <summary>X-177 C4.2 (0.1198): the readers compiled when they subscribed, so far: how many classes, methods, and the time it took off the game's thread.</summary>
-    internal static (int Readers,int Methods,double Milliseconds) CompiledAhead{get{lock(Gate)return (aheadReaders,aheadMethods,aheadMs);}}
-
     public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)
     {
-        CompileAhead(handler);
-        void Guarded(IFramework running){if(!cut)Timed(handler,running);}
+        var ticket=Compiler.Add(handler.Method);
+        void Guarded(IFramework running){if(!cut && ticket.Ready)Timed(handler,running);}
         lock(Gate)Wrappers[handler]=Guarded;
         framework.Update+=Guarded;
     }
@@ -86,8 +73,16 @@ internal static partial class CompetitiveGate
         lock(Gate){if(!Wrappers.Remove(handler,out guarded))return;}
         framework.Update-=guarded;
     }
-    public static void AddAlways(IFramework framework,IFramework.OnUpdateDelegate handler){CompileAhead(handler);framework.Update+=handler;}
-    public static void RemoveAlways(IFramework framework,IFramework.OnUpdateDelegate handler)=>framework.Update-=handler;
+    // 0.1199: these wait for their class too, through a wrapper kept with the others (Remove and ReleaseAll take it off the framework);
+    // and, the wrapper hiding their name from Dalamud's own slow-call line, a slow one is named like the others (developer mode).
+    public static void AddAlways(IFramework framework,IFramework.OnUpdateDelegate handler)
+    {
+        var ticket=Compiler.Add(handler.Method);
+        void Deferred(IFramework running){if(ticket.Ready)Timed(handler,running);}
+        lock(Gate)Wrappers[handler]=Deferred;
+        framework.Update+=Deferred;
+    }
+    public static void RemoveAlways(IFramework framework,IFramework.OnUpdateDelegate handler)=>Remove(framework,handler);
 
     internal static void Set(bool value,bool notify)
     {

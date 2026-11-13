@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 using TenshoAssistant.Diagnostics;
 
 // 0.1198 (X-177 C4.2): at a reload, the first pass of a reader took 125 to 276 ms of one frame on the game's thread: its code was compiled
-// the first time it ran. A reader's own code is now compiled when it subscribes, on the thread that subscribes it; and a slow pass says
-// how much of it was compiling. Behaviour tests on readers never run before: the runtime's own count of the methods the calling thread
+// the first time it ran. A reader's own code is now compiled before its first pass (0.1198: when it subscribes, on the subscribing thread;
+// 0.1199: on a thread of its own, ReaderStart1199Tests); and a slow pass says how much of it was compiling. Behaviour tests on readers never run before: the runtime's own count of the methods the calling thread
 // compiled tells whether a first pass still compiles its class.
 
 // Readers as the plugin's are: top-level classes, their lambdas nested in them. Each is used by one test only (a class is compiled once).
@@ -104,16 +104,10 @@ internal static class ReaderWarmup1198Tests
             }
             finally { System.Globalization.CultureInfo.CurrentCulture = culture; }
         }),
-        ("Reader warm-up 1198: wiring: every way to subscribe compiles the reader first, each class once; the slow line carries the compiling part; the load says what was compiled ahead", () =>
+        ("Reader warm-up 1198: wiring: a slow pass carries its compiling part, read for the calling thread (0.1199: the subscriptions' own wiring is in ReaderStart1199Tests)", () =>
         {
             var gate = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs")).ReplaceLineEndings("\n");
-            Check(gate.Contains("public static void Add(IFramework framework,IFramework.OnUpdateDelegate handler)\n    {\n        CompileAhead(handler);", StringComparison.Ordinal), "Add");
-            Check(gate.Contains("public static void AddBoard(IFramework framework,IFramework.OnUpdateDelegate handler)\n    {\n        CompileAhead(handler);", StringComparison.Ordinal), "AddBoard");
-            Check(gate.Contains("public static void AddAlways(IFramework framework,IFramework.OnUpdateDelegate handler){CompileAhead(handler);framework.Update+=handler;}", StringComparison.Ordinal), "AddAlways");
-            Check(gate.Contains("if(owner is null || !compiledOwners.Add(owner))return;", StringComparison.Ordinal), "each class once");
             Check(gate.Contains("SlowSubscription?.Invoke(name+Diagnostics.JitWarmup.CompiledText((System.Runtime.JitInfo.GetCompilationTime(true)-compiledBefore).TotalMilliseconds,", StringComparison.Ordinal), "the compiling part of a slow pass, read for the calling thread");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("log.Information(\"Readers compiled ahead: {0} classes, {1} methods in {2:0} ms on the loading thread.\"", StringComparison.Ordinal), "the load line, developer mode");
         }),
     ];
 }

@@ -166,8 +166,10 @@ public sealed class JitWarmup : IDisposable
     /// X-177 C4.2 (0.1198): compiles now, on the calling thread, the code a handler's class runs: the methods of its outermost class and of
     /// the types nested in it; when that is more than <paramref name="cap"/> methods, only those of the handler's own type (its closure).
     /// Returns how many were compiled; a method that cannot be prepared is skipped, never an error for the subscription.
+    /// 0.1199: <paramref name="stop"/> is asked before each method (an unload does not wait for a whole class) and
+    /// <paramref name="prepare"/> compiles one method (the runtime's by default; the tests' own).
     /// </summary>
-    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap)
+    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null)
     {
         IReadOnlyList<MethodBase> methods;
         try
@@ -179,8 +181,15 @@ public sealed class JitWarmup : IDisposable
         catch(Exception){return 0;}
         var prepared=0;
         foreach(var method in methods)
-            try{RuntimeHelpers.PrepareMethod(method.MethodHandle);prepared++;}
+        {
+            if(stop?.Invoke()==true)break;
+            try
+            {
+                if(prepare is null)RuntimeHelpers.PrepareMethod(method.MethodHandle);else prepare(method);
+                prepared++;
+            }
             catch(Exception){}
+        }
         return prepared;
     }
 

@@ -20,6 +20,15 @@ internal static partial class CompetitiveGate
 
     internal static void ClearSubscribers()=>Changed=null;
 
+    // X-177 C4.2 (0.1199): what compiles the readers' classes on a thread of its own (Diagnostics.ReaderCompiler): made at the first
+    // subscription, stopped and forgotten at unload with the hooks. It holds types and flags, nothing of an instance.
+    private static Diagnostics.ReaderCompiler? compiler;
+    private static readonly object CompilerGate=new();
+    /// <summary>The compiler of this load: every subscription takes its ticket from it.</summary>
+    internal static Diagnostics.ReaderCompiler Compiler{get{lock(CompilerGate)return compiler??=new();}}
+    /// <summary>What the readers' compiler did so far, for the log; null when no reader subscribed.</summary>
+    internal static (int Classes,int Methods,double Compiling,double DoneAfter,int Waiting)? CompilerState{get{lock(CompilerGate)return compiler?.State;}}
+
     /// <summary>Whether a hook still holds something of an instance (the unload's own check, and the tests').</summary>
     internal static bool HoldsInstance=>Developer is not null || SlowSubscription is not null || Changed is not null;
 
@@ -52,5 +61,8 @@ internal static partial class CompetitiveGate
         Developer=null;
         SlowSubscription=null;
         Changed=null;
+        Diagnostics.ReaderCompiler? running;
+        lock(CompilerGate){running=compiler;compiler=null;}
+        running?.Dispose();
     }
 }
