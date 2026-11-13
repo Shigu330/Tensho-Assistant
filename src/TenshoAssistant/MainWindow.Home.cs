@@ -20,7 +20,9 @@ internal sealed partial class MainWindow
         MeasureMap("home guide",DrawGuideOnHome);
         var items=itemCatalog.State;var recipes=recipeCatalog.State;
         var ready=items.Catalog is not null && recipes.Catalog is not null;
-        UiComponents.StatusBadge(localization.Get(ready ? "Home.Ready":"Home.Loading"),ready ? Success:Accent);
+        // X-154 (0.1253): loading is the shared « waiting » state; ready keeps its line, with the shared state mark.
+        if(ready){DrawStateMark(true);ImGui.SameLine();ImGui.TextColored(Success,localization.Get("Home.Ready"));}
+        else StateLine(UiState.Waiting,localization.Get("Home.Loading"));
         ImGui.SameLine();
         ImGui.TextDisabled(localization.Format("Home.Catalogues",items.Catalog?.Count ?? 0,recipes.Catalog?.Count ?? 0));
         // X-95 (0.951): each part of Home timed in developer mode (the page reached 119 ms in the slow frame log).

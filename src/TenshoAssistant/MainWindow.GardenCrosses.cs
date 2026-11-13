@@ -64,9 +64,10 @@ internal sealed partial class MainWindow
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Garden.Crosses")+"###GardenCrosses"))return;
         ImGui.TextDisabled(localization.Get("Garden.CrossesHelp"));
-        if(GardenCrossCatalog?.Invoke() is not { } task){ImGui.TextDisabled(localization.Get("Garden.CrossesUnavailable"));return;}
-        if(task.IsFaulted){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Garden.CrossesUnavailable"));return;}
-        if(!task.IsCompletedSuccessfully){ImGui.TextDisabled(localization.Get("Garden.CrossesLoading"));return;}
+        // X-154 (0.1253): the shared states: failed (not offered here, or its read failed), or still being read.
+        if(GardenCrossCatalog?.Invoke() is not { } task){StateLine(UI.UiState.Failed,localization.Get("Garden.CrossesUnavailable"));return;}
+        if(task.IsFaulted){StateLine(UI.UiState.Failed,localization.Get("Garden.CrossesUnavailable"));return;}
+        if(!task.IsCompletedSuccessfully){StateLine(UI.UiState.Waiting,localization.Get("Garden.CrossesLoading"));return;}
         var (data,names)=task.Result;
         string Name(uint id)=>names.TryGetValue(id,out var name) && name.Length>0 ? name:"#"+id;
         if(ImGui.RadioButton(localization.Get("Garden.CrossesGives"),!gardenCrossUses))gardenCrossUses=false;

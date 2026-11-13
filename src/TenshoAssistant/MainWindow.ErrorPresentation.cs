@@ -15,10 +15,9 @@ internal sealed partial class MainWindow
 
     private void DrawDataError(string message,string key)
     {
-        if(SourceOff(message)){ImGui.TextWrapped(localization.Get("Advanced.SourceOffTip"));if(developerMode)ImGui.TextWrapped(RawMessage(message));return;}
-        ImGui.PushTextWrapPos();
-        try{ImGui.TextColored(FfxivTheme.Error,localization.Get(key));}
-        finally{ImGui.PopTextWrapPos();}
+        // X-154 (0.1253): the two states said as everywhere (StateLine): the source turned off, or the failure with the page's sentence.
+        if(SourceOff(message)){StateLine(UiState.SourceOff,localization.Get("Advanced.SourceOffTip"));if(developerMode)ImGui.TextWrapped(RawMessage(message));return;}
+        StateLine(UiState.Failed,localization.Get(key));
         if(developerMode)ImGui.TextWrapped(RawMessage(message));
     }
 

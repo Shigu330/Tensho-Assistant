@@ -5261,6 +5261,10 @@
     "SourceReference": "Source reference: {0}"
   },
   "Common": {
+    "StateWaiting": "Waiting",
+    "StateSourceOff": "Source turned off",
+    "StateStale": "Old data",
+    "StateFailed": "Failed",
     "Copied": "Copied",
     "SaveError": "Save failed. Try again; details are in the Dalamud log.",
     "Dismiss": "Hide this message",

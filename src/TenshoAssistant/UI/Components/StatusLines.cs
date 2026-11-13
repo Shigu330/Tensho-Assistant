@@ -1,4 +1,6 @@
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
+using TenshoAssistant.UI;
 
 namespace TenshoAssistant;
 
@@ -13,6 +15,27 @@ internal sealed partial class MainWindow
     {
         ImGui.PushStyleColor(ImGuiCol.Text,Muted);
         try{ImGui.TextWrapped(localization.Get(key));}
+        finally{ImGui.PopStyleColor();}
+    }
+
+    /// <summary>
+    /// X-154 (0.1253): one of the four states of a page (waiting, source turned off, old data, failed), the same everywhere: its glyph and
+    /// its short word in the state's colour, then the page's own sentence (muted, wrapped). The glyph and the word tell the state, never
+    /// the colour alone (UI/UiStates.cs).
+    /// </summary>
+    private void StateLine(UiState state,string? detail=null)
+    {
+        var colour=UiStates.Colour(state) switch{UiColour.Warning=>Warning,UiColour.Error=>Error,_=>Muted};
+        var icon=state switch{UiState.Waiting=>FontAwesomeIcon.Hourglass,UiState.SourceOff=>FontAwesomeIcon.PowerOff,UiState.Stale=>FontAwesomeIcon.History,_=>FontAwesomeIcon.ExclamationTriangle};
+        ImGui.PushFont(UiBuilder.IconFont);
+        try{ImGui.TextColored(colour,icon.ToIconString());}
+        finally{ImGui.PopFont();}
+        ImGui.SameLine();
+        ImGui.TextColored(colour,localization.Get(UiStates.Key(state)));
+        if(string.IsNullOrWhiteSpace(detail))return;
+        ImGui.SameLine();
+        ImGui.PushStyleColor(ImGuiCol.Text,Muted);
+        try{ImGui.TextWrapped(detail);}
         finally{ImGui.PopStyleColor();}
     }
 

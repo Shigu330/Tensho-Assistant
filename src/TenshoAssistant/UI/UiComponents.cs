@@ -70,11 +70,4 @@ internal static class UiComponents
         ImGui.Separator();
         ImGui.Spacing();
     }
-
-    public static void StatusBadge(string label, Vector4 color)
-    {
-        ImGui.PushStyleColor(ImGuiCol.Text, color);
-        ImGui.TextUnformatted($"◆ {label}");
-        ImGui.PopStyleColor();
-    }
 }

@@ -5261,6 +5261,10 @@
     "SourceReference": "Référence source : {0}"
   },
   "Common": {
+    "StateWaiting": "En attente",
+    "StateSourceOff": "Source désactivée",
+    "StateStale": "Donnée ancienne",
+    "StateFailed": "Échec",
     "Copied": "Copié",
     "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud.",
     "Dismiss": "Masquer ce message",

@@ -83,7 +83,9 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("Navigation.Map")))page=Page.Maps;ImGui.SameLine();if(ImGui.SmallButton(localization.Get("Navigation.Gathering")))page=Page.Gathering;
         if(weather.State.Catalog is not { } catalog)
         {
-            ImGui.TextWrapped(localization.Get(weather.State.Error is null ? "WeatherDetails.Loading":"WeatherDetails.Error"));
+            // X-154 (0.1253): the shared states.
+            if(weather.State.Error is null)StateLine(UI.UiState.Waiting,localization.Get("WeatherDetails.Loading"));
+            else StateLine(UI.UiState.Failed,localization.Get("WeatherDetails.Error"));
             if(developerMode && weather.State.Error is { } error)ImGui.TextWrapped(RawMessage(error));
             DrawAlarmsLink();
             return;
