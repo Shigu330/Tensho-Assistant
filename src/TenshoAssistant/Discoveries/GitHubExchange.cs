@@ -297,9 +297,21 @@ public sealed class GitHubExchange : IDisposable
         return new("ConnectExpired");
     }
 
+    /// <summary>
+    /// X-184 N15 (0.1208, night review of 12/11): what a failed read of the common files may throw besides a refused request: a body cut
+    /// midway (IOException, HttpIOException), a request past its 30 s (TaskCanceledException while the exchange is not being stopped), text or
+    /// JSON that cannot be read. Such a file counts as unreadable; it no longer ends the exchange before the player's own facts are sent.
+    /// </summary>
+    private bool CommonUnreadable(Exception error)
+        =>error is HttpRequestException or IOException or InvalidDataException or DecoderFallbackException or System.Text.Json.JsonException
+            || error is TaskCanceledException && !stop.IsCancellationRequested;
+
     private async Task<ExchangeMessage> ExchangeAsync(DiscoveryStore store,bool upload)
     {
-        var (common,added,joined)=await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store).ConfigureAwait(false);
+        (string Common,int Added,int Joined) taken;
+        try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store).ConfigureAwait(false);}
+        catch(Exception error) when(CommonUnreadable(error)){taken=("CommonUnreadable",0,0);}
+        var (common,added,joined)=taken;
         var sent="";
         if(upload && Connected)
         {
@@ -336,7 +348,7 @@ public sealed class GitHubExchange : IDisposable
     {
         ExchangeV3Index? index;
         try{index=ExchangeV3.ParseIndex(await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.AddressV3+ExchangeV3.IndexName),ExchangeV3.MaxIndexBytes,stop.Token).ConfigureAwait(false));}
-        catch(Exception error) when(error is HttpRequestException or InvalidDataException or DecoderFallbackException){return null;}
+        catch(Exception error) when(CommonUnreadable(error)){return null;}
         if(index is null)return null;
         var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0;
         foreach(var entry in index.Files)
@@ -350,7 +362,7 @@ public sealed class GitHubExchange : IDisposable
                 var result=store.Merge(read.Facts);added+=result.Added;joined+=result.Joined;taken++;
                 store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
             }
-            catch(Exception error) when(error is HttpRequestException or InvalidDataException){unreadable++;}
+            catch(Exception error) when(CommonUnreadable(error)){unreadable++;}
         }
         return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":"CommonSame",added,joined);
     }
@@ -388,6 +400,7 @@ public sealed class GitHubExchange : IDisposable
             else common="CommonUnreadable";
         }
         catch(HttpRequestException){common="CommonMissing";}
+        catch(Exception error) when(CommonUnreadable(error)){common="CommonUnreadable";}
         return (common,added,joined);
     }
 
