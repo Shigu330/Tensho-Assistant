@@ -152,7 +152,7 @@ internal static class ReleaseProof1145Tests
             var verify=Read("scripts/Verify.ps1");
             Check(verify.Contains("$taskHead = \"$(& git -C $taskRoot rev-parse HEAD 2>$null)\".Trim(); $taskClean = -not (& git -C $taskRoot status --porcelain 2>$null)"),"commit and clean tree read before the build");
             Check(verify.IndexOf("$taskClean = ",StringComparison.Ordinal)<verify.IndexOf("& $DotNet build TenshoAssistant.sln",StringComparison.Ordinal),"read before the build");
-            Check(verify.Contains("Commit = $taskHead; Clean = [bool]$taskClean;"),"written in the stamp");
+            Check(verify.Contains("Commit = $taskHead; Clean = [bool]($taskClean -and $taskCleanAfter -and $taskHeadAfter -eq $taskHead);"),"written in the stamp (0.1213: and read again after the build)");
             var release=Read("scripts/Release.ps1");
             Check(!release.Contains("the log showed no error") && !release.Contains("journal n'a montré"),"the note no longer claims what the proof does not hold");
             var resumed=release.IndexOf("Assert-PackagesFromCommit $commit",StringComparison.Ordinal);

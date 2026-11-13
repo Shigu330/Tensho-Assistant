@@ -345,8 +345,16 @@ try {
     # 0.1145 (X-170, end of X-144): latest.zip and the desktop package are uploaded only when Verify built them from the sources of the
     # commit released (its stamp: version, commit, clean tree), new release or resumed one; otherwise stop before anything public.
     $packages = $null
+    # X-185 (0.1213, night review N18): the packages copied once into the proof folder; the copies are checked against the stamp's SHA-256 and
+    # are the only files the release proof and the upload read afterwards (a build in this folder meanwhile changes nothing uploaded).
+    function Copy-Package([string]$Path) {
+        $target = Join-Path $proofFolder ([IO.Path]::GetFileName($Path))
+        if ([IO.Path]::GetFullPath($Path) -ne [IO.Path]::GetFullPath($target)) { Copy-Item -LiteralPath $Path -Destination $target -Force }
+        return $target
+    }
     function Assert-PackagesFromCommit([string]$Commit) {
-        $script:packages = Test-PackagesFromCommit $version $Commit (Join-Path $root 'artifacts\verify-stamp.json') $root
+        $script:zip = Copy-Package $zip; $script:desktopZip = Copy-Package $desktopZip
+        $script:packages = Test-PackagesFromCommit $version $Commit (Join-Path $root 'artifacts\verify-stamp.json') $root @($zip, $desktopZip)
         if (-not $script:packages.Ok) { Stop-Release "Stopped: $($script:packages.Reason). The packages must come from the commit released ($($Commit.Substring(0, 7)))." }
         Write-Output "Packages: $($script:packages.Reason)."
     }
@@ -383,13 +391,18 @@ try {
         if (-not (& git ls-remote --tags origin "refs/tags/$tag")) { Step "git push origin $tag" { git push origin $tag } }
         if (-not $hasRelease) { Step "gh release create $tag latest.zip TenshoAssistant.Desktop.zip TenshoAssistant.Desktop.zip.sha256 release-proof.json" { & $gh release create $tag $zip $desktopZip $desktopHash $releaseProof --repo $repository --title "Tensho Assistant $version" --notes-file $notesFile --verify-tag } }
         else {
-            # A release created before its desktop package (R33) or its SHA-256 (X-121) was attached gets them now.
+            # A release created before its desktop package (R33) or its SHA-256 (X-121) was attached gets them now. X-185 (0.1213, night review
+            # N19): latest.zip too (repo.json points at it); a draft, or a package attached with another size than the one checked here, stops
+            # the resume before main is pushed.
             $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-            try { $assets = @(& $gh release view $tag --repo $repository --json assets --jq '.assets[].name' 2>$null) }
+            try { $view = @(& $gh release view $tag --repo $repository --json 'isDraft,assets' 2>$null) }
             finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
-            if ('TenshoAssistant.Desktop.zip' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip" { & $gh release upload $tag $desktopZip --repo $repository } }
-            if ('TenshoAssistant.Desktop.zip.sha256' -notin $assets) { Step "gh release upload $tag TenshoAssistant.Desktop.zip.sha256" { & $gh release upload $tag $desktopHash --repo $repository } }
-            if ('release-proof.json' -notin $assets) { Step "gh release upload $tag release-proof.json" { & $gh release upload $tag $releaseProof --repo $repository } }
+            $packagesOf = @{ 'latest.zip' = $zip; 'TenshoAssistant.Desktop.zip' = $desktopZip; 'TenshoAssistant.Desktop.zip.sha256' = $desktopHash }
+            $onGitHub = Test-ResumeAssets ($view -join "`n") $packagesOf
+            if (-not $onGitHub.Ok) { Stop-Release "Stopped before $releaseBranch is pushed: $($onGitHub.Reason)." }
+            Write-Output "Release on GitHub: $($onGitHub.Reason)."
+            foreach ($name in $onGitHub.Upload) { $file = $packagesOf[$name]; Step "gh release upload $tag $name" { & $gh release upload $tag $file --repo $repository } }
+            if ('release-proof.json' -notin $onGitHub.Attached) { Step "gh release upload $tag release-proof.json" { & $gh release upload $tag $releaseProof --repo $repository } }
         }
         # Fast-forward only: GitHub refuses a push of main that is not one (no force anywhere).
         Step "git push origin ${commit}:$releaseBranch (fast-forward)" { git push origin "${commit}:refs/heads/$releaseBranch" }

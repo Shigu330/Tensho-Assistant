@@ -282,7 +282,16 @@ try {
     Write-Output ("TIMES " + ($taskTimes -join ', ') + '; whole run ' + $taskWhole.Elapsed.TotalSeconds.ToString('0.0', [Globalization.CultureInfo]::InvariantCulture) + ' s')
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
-    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]$taskClean; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
+    # X-185 (0.1213, night review N18): HEAD and the tree read again after the build (a commit or a change during the run makes the stamp « not
+    # clean »), and the SHA-256 of each package built, which a release compares with the very files it uploads (Test-PackagesFromCommit).
+    $taskPrevious = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $taskHeadAfter = "$(& git -C $taskRoot rev-parse HEAD 2>$null)".Trim(); $taskCleanAfter = -not (& git -C $taskRoot status --porcelain 2>$null) }
+    finally { $ErrorActionPreference = $taskPrevious; $global:LASTEXITCODE = 0 }
+    $taskPackages = [ordered]@{}
+    foreach ($taskPackage in @((Join-Path $taskOutput 'TenshoAssistant\latest.zip'), (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'))) {
+        if (Test-Path -LiteralPath $taskPackage) { $taskPackages[[IO.Path]::GetFileName($taskPackage)] = (Get-FileHash -LiteralPath $taskPackage -Algorithm SHA256).Hash.ToLowerInvariant() }
+    }
+    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]($taskClean -and $taskCleanAfter -and $taskHeadAfter -eq $taskHead); Packages = $taskPackages; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
 finally { Pop-Location }
 }

@@ -63,7 +63,9 @@ function Format-LaunchNote($LaunchProof) {
 # resumed later. Verify.ps1 writes in its stamp the version built, the commit built (Commit) and whether the working tree was clean (Clean).
 # Accepted only for this version, a clean tree, and a built commit whose sources (every file but *.md, docs/ and repo.json, as the stamp's
 # fingerprint) are those of the commit released. Returns @{ Ok = $true/$false; Reason = '…'; Built = '<commit built>' }.
-function Test-PackagesFromCommit([string]$Version, [string]$Commit, [string]$Stamp, [string]$Root) {
+# X-185 (0.1213, night review N18): with -Packages (the very files a release uploads), each one's SHA-256 must be the one Verify wrote in the
+# stamp for the package it built; a renamed source file counts as a source change (--no-renames).
+function Test-PackagesFromCommit([string]$Version, [string]$Commit, [string]$Stamp, [string]$Root, [string[]]$Packages = @()) {
     $result = @{ Ok = $false; Reason = ''; Built = '' }
     if (-not (Test-Path -LiteralPath $Stamp)) { $result.Reason = 'no build stamp: run .\scripts\Verify.ps1 -Release again'; return $result }
     try { $data = [IO.File]::ReadAllText($Stamp) | ConvertFrom-Json -ErrorAction Stop } catch { $result.Reason = 'the build stamp cannot be read: run .\scripts\Verify.ps1 -Release again'; return $result }
@@ -73,7 +75,7 @@ function Test-PackagesFromCommit([string]$Version, [string]$Commit, [string]$Sta
     $result.Built = $built
     if ($data.Clean -ne $true) { $result.Reason = "the packages were built from uncommitted changes on $($built.Substring(0, 7))"; return $result }
     $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-    try { $files = @(& git -C $Root diff --name-only $built $Commit -- 2>$null | ForEach-Object { "$_" }); $code = $LASTEXITCODE }
+    try { $files = @(& git -C $Root diff --no-renames --name-only $built $Commit -- 2>$null | ForEach-Object { "$_" }); $code = $LASTEXITCODE }
     finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
     if ($code -ne 0) { $result.Reason = "the commit built ($($built.Substring(0, 7))) or the commit released ($Commit) is unknown here"; return $result }
     $sources = @($files | Where-Object { $_ -and $_ -notmatch '(\.md$|^docs/|^repo\.json$)' })
@@ -81,7 +83,40 @@ function Test-PackagesFromCommit([string]$Version, [string]$Commit, [string]$Sta
         $result.Reason = "the packages were built from $($built.Substring(0, 7)), whose sources differ from the commit released ($(($sources | Select-Object -First 3) -join ', '))"
         return $result
     }
+    foreach ($package in @($Packages | Where-Object { $_ })) {
+        $name = [IO.Path]::GetFileName($package)
+        $expected = if ($data.Packages) { "$($data.Packages.$name)".ToLowerInvariant() } else { '' }
+        if (-not $expected) { $result.Reason = "the build stamp has no SHA-256 of ${name}: run .\scripts\Verify.ps1 -Release again"; return $result }
+        if (-not (Test-Path -LiteralPath $package)) { $result.Reason = "$name not found"; return $result }
+        # .NET, not Get-FileHash: a Windows PowerShell started from pwsh 7 (Verify, the tests) may not load that cmdlet's module.
+        $sha = [Security.Cryptography.SHA256]::Create(); $stream = [IO.File]::OpenRead($package)
+        try { $actual = ([BitConverter]::ToString($sha.ComputeHash($stream)) -replace '-', '').ToLowerInvariant() } finally { $stream.Dispose(); $sha.Dispose() }
+        if ($actual -ne $expected) { $result.Reason = "$name differs from the package Verify built (SHA-256 $($actual.Substring(0, 12))… instead of $($expected.Substring(0, 12))…)"; return $result }
+    }
     $result.Ok = $true
-    $result.Reason = "built from $($built.Substring(0, 7)), same sources as the commit released"
+    $result.Reason = "built from $($built.Substring(0, 7)), same sources as the commit released" + $(if (@($Packages | Where-Object { $_ }).Count) { ', the files uploaded are the packages built' } else { '' })
+    return $result
+}
+
+# X-185 (0.1213, night review N19): a release resumed while its GitHub release exists: what is attached (the JSON of
+# `gh release view --json isDraft,assets`) is checked before main (repo.json) is pushed: never a draft; each package of $Files (name -> local
+# path) attached with the size of the file checked here, or missing (then to upload); one attached with another size stops the resume.
+# Returns @{ Ok = $true/$false; Reason = '…'; Upload = @(names to upload); Attached = @(names attached) }.
+function Test-ResumeAssets([string]$ViewJson, [hashtable]$Files) {
+    $result = @{ Ok = $false; Reason = ''; Upload = @(); Attached = @() }
+    try { $view = $ViewJson | ConvertFrom-Json -ErrorAction Stop } catch { $view = $null }
+    if ($null -eq $view -or $null -eq $view.isDraft) { $result.Reason = 'the GitHub release cannot be read (gh release view)'; return $result }
+    if ($view.isDraft -eq $true) { $result.Reason = 'the GitHub release is a draft: publish it or delete it on GitHub first'; return $result }
+    $attached = @{}
+    foreach ($asset in @($view.assets)) { if ($asset -and $asset.name) { $attached["$($asset.name)"] = [long]$asset.size } }
+    $result.Attached = @($attached.Keys | Sort-Object)
+    $upload = @()
+    foreach ($name in @($Files.Keys | Sort-Object)) {
+        $size = ([IO.FileInfo]::new($Files[$name])).Length
+        if (-not $attached.ContainsKey($name)) { $upload += $name; continue }
+        if ($attached[$name] -ne $size) { $result.Reason = "$name attached to the release has $($attached[$name]) bytes, the file checked here $size"; return $result }
+    }
+    $result.Ok = $true; $result.Upload = $upload
+    $result.Reason = if ($upload.Count) { "missing on the release: $($upload -join ', ')" } else { 'every package attached, same sizes' }
     return $result
 }
