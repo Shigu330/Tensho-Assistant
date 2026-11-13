@@ -208,6 +208,7 @@ internal static class Headless
         }
         status.Link=null;
         failed+=FoldedNavigation(host,status,report);
+        failed+=GardenViews(host,status,report);
         failed+=ReadOnlyCheck(host,report);
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
@@ -253,6 +254,73 @@ internal static class Headless
         finally{host.SetSetting("NavigationMode",0);io.AddMousePosEvent(-1,-1);Frames(wide,2,"back to the wide window");}
         Console.WriteLine(failed==0 ? "  folded navigation: drawn in a 500 px window, popup opened by its button and closed by a click beside it, both forced modes drawn" : $"  folded navigation: {failed} failure(s)");
         return failed;
+    }
+
+    /// <summary>
+    /// X-178 (0.1257): the garden journal drawn in its two views (icons, then the detailed text) with a trial patch: eight beds given only to
+    /// this run's copy of the settings in memory (never written, never in the application's window): growing, tending later, tending due,
+    /// ripe, a seed whose name matches no item, and an empty bed. The icon view must ask for icons. The number of failures.
+    /// </summary>
+    private static int GardenViews(Host host,StatusBar status,Report report)
+    {
+        var failed=0;
+        void Fail(string why){report.Fail("garden views: "+why);failed++;}
+        var before=host.GetSetting("GardenBeds");var detailedBefore=host.GetSetting("GardenDetailedView");
+        var size=new System.Numerics.Vector2(1280,820);
+        try
+        {
+            if(!GardenTrial(host)){Fail("the trial patch could not be given (GardenBed, or the setting GardenBeds)");return failed;}
+            host.SetPage("Garden");
+            foreach(var detailed in new[]{false,true})
+            {
+                if(!host.SetSetting("GardenDetailedView",detailed)){Fail("the setting GardenDetailedView could not be reached");break;}
+                var icons=TextureProviderProxy.Served+TextureProviderProxy.Missing;
+                Exception? thrown=null;var vertices=0;
+                // 70 frames in icons: past the wait after which a missing icon gives way to the name (UI/IconWait).
+                for(var frame=0;frame<(detailed ? 6 : 70);frame++)
+                {
+                    Beat($"garden {(detailed ? "detailed" : "icon")} view, frame {frame}",TimeSpan.FromSeconds(30));
+                    thrown??=Ui.Frame(host,status,size,1/60f);
+                    vertices=Math.Max(vertices,Dalamud.Bindings.ImGui.ImGui.GetDrawData().TotalVtxCount);
+                }
+                icons=TextureProviderProxy.Served+TextureProviderProxy.Missing-icons;
+                if(thrown is not null)Fail($"{(detailed ? "detailed" : "icon")} view: {thrown.GetType().Name}: {Short(thrown.Message)}");
+                if(!detailed && icons<=0)Fail("the icon view asked for no icon");
+                Console.WriteLine($"  garden {(detailed ? "detailed" : "icon"),-8} view: {(thrown is null ? "drawn" : "THROWS")}, vtx {vertices}, icons {icons}");
+            }
+        }
+        finally{host.SetSetting("GardenBeds",before);host.SetSetting("GardenDetailedView",detailedBefore ?? false);host.SetPage("Home");}
+        return failed;
+    }
+
+    /// <summary>
+    /// X-178 (0.1257): a trial patch given to the copy of the settings in memory (the headless run, or a capture with --garden-trial; never
+    /// written: the application saves nothing): seven beds of one patch, growing, tending later, tending due, ripe, two more, and a seed
+    /// whose name matches no item; bed 7 stays empty. False when the plugin's types cannot be reached.
+    /// </summary>
+    public static bool GardenTrial(Host host)
+    {
+        var bedType=host.Plugin.GetType("TenshoAssistant.Reminders.GardenBed");
+        if(bedType is null)return false;
+        var items=host.Data.Excel.GetSheet<Item>().Where(row=>row.RowId>=7715 && row.Icon!=0 && !row.Name.IsEmpty).Take(6).ToArray();
+        var beds=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(bedType))!;
+        var now=DateTimeOffset.UtcNow;
+        // (bed number, hours since planting, growing hours, tending hours).
+        var trial=new (int Number,double Planted,int Grow,int Tend)[]{(1,1,48,0),(2,2,72,24),(3,30,72,24),(4,60,48,24),(5,10,120,48),(6,0.2,24,0),(8,5,24,0)};
+        for(var i=0;i<trial.Length;i++)
+        {
+            var (number,planted,grow,tend)=trial[i];
+            var bed=Activator.CreateInstance(bedType)!;
+            void Set(string name,object value)=>bedType.GetProperty(name)!.SetValue(bed,value);
+            Set("Place",$"Trial 1-1 · patch 1, bed {number}");
+            // The last one: a name no item bears and no noted item (the icon view writes the name).
+            var known=i<items.Length ? items[i] : (Item?)null;
+            Set("Seed",known?.Name.ExtractText() ?? "No such seed");
+            Set("SeedId",known?.RowId ?? 0u);
+            Set("PlantedAt",now.AddHours(-planted));Set("GrowHours",grow);Set("TendHours",tend);
+            beds.Add(bed);
+        }
+        return host.SetSetting("GardenBeds",beds);
     }
 
     private static bool PopupOpen()=>Dalamud.Bindings.ImGui.ImGui.IsPopupOpen("",Dalamud.Bindings.ImGui.ImGuiPopupFlags.AnyPopupId|Dalamud.Bindings.ImGui.ImGuiPopupFlags.AnyPopupLevel);

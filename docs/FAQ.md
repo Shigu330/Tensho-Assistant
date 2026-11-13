@@ -88,6 +88,10 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
 
+## The garden is shown as icons: how do I get the text back?
+
+Gardening › Garden › Garden journal › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark tells the tending (drop: later, « ! »: due, check: ripe).
+
 ## How do I install Tensho?
 
 In Dalamud › Settings › Experimental › Custom Plugin Repositories, add https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json and save, then install « Tensho Assistant » from the plugin installer. /tensho opens the window.
@@ -197,6 +201,10 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 ## Où est ma liste de souhaits ?
 
 Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
+
+## Le jardin est en icônes : comment retrouver le texte ?
+
+Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque parcelle en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 

@@ -137,10 +137,13 @@ internal sealed partial class MainWindow
     private void DrawGardenJournal()
     {
         var beds=configuration.GardenBeds ?? [];
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Garden.Title",beds.Count)+"###GardenJournal"))return;
+        // X-178 (0.1257): open when the page opens (the patches are what the page is for).
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("Garden.Title",beds.Count)+"###GardenJournal",ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextDisabled(localization.Get("Garden.Help"));
         BoolSetting("Garden.Alerts","Garden.AlertsTip",()=>configuration.GardenAlerts,value=>configuration.GardenAlerts=value,c=>c.GardenAlerts);
         BoolSetting("Garden.Detect","Garden.DetectTip",()=>configuration.GardenDetect,value=>configuration.GardenDetect=value,c=>c.GardenDetect);
+        // X-178 (0.1257): each patch in icons, or in text as before.
+        BoolSetting("Garden.DetailedView","Garden.DetailedViewTip",()=>configuration.GardenDetailedView,value=>configuration.GardenDetailedView=value,c=>c.GardenDetailedView);
         var now=DateTimeOffset.UtcNow;GardenBed? removed=null;var changed=false;
         // 0.461 (user request, in-game campaign): each patch as a grid; the rest (pots, places typed by hand) stays a list.
         var forecastShown=false;
@@ -169,20 +172,12 @@ internal sealed partial class MainWindow
                     for(var column=0;column<3;column++)
                     {
                         ImGui.TableNextColumn();
-                        if(GardenCrosses.BedAt(row,column) is not { } number){ImGui.TextDisabled("—");continue;}
+                        // The centre of a patch has no bed.
+                        if(GardenCrosses.BedAt(row,column) is not { } number){if(configuration.GardenDetailedView)ImGui.TextDisabled("—");continue;}
                         var (_,bed)=planted.FirstOrDefault(entry=>entry.Number==number);
-                        if(bed is null){ImGui.TextDisabled(localization.Format("Garden.GridEmpty",number));continue;}
-                        ImGui.PushID(bed.Id.ToString());
-                        try
-                        {
-                            ImGui.PushStyleColor(ImGuiCol.Text,GardenColor(GardenJournal.State(bed,now)));
-                            try{ImGui.TextWrapped($"{number}. {bed.Seed}");}
-                            finally{ImGui.PopStyleColor();}
-                            ImGui.TextDisabled(GardenTimes(bed,now));
-                            DrawBedButtons(bed,now,ref changed,ref removed);
-                            if(forecasts?.FirstOrDefault(forecast=>forecast.Bed==number) is { } forecast)DrawGardenForecast(forecast,planted);
-                        }
-                        finally{ImGui.PopID();}
+                        // X-178 (0.1257): icons (MainWindow.GardenView.cs), or the text of before with « Detailed view ».
+                        if(configuration.GardenDetailedView)DrawGardenGridText(number,bed,planted,forecasts,now,ref changed,ref removed);
+                        else DrawGardenGridIcons(number,bed,planted,forecasts,now,ref changed,ref removed);
                     }
                 }
             }
@@ -207,6 +202,23 @@ internal sealed partial class MainWindow
         if(removed is not null){configuration.GardenBeds=beds.Where(bed=>bed!=removed).ToList();changed=true;}
         if(changed)SaveReminders();
         DrawNewBed(beds);
+    }
+
+    /// <summary>One cell of a patch in text (the detailed view): number and seed, dates, buttons, forecast.</summary>
+    private void DrawGardenGridText(int number,GardenBed? bed,IReadOnlyList<(int Number,GardenBed Bed)> planted,IReadOnlyList<GardenForecast>? forecasts,DateTimeOffset now,ref bool changed,ref GardenBed? removed)
+    {
+        if(bed is null){ImGui.TextDisabled(localization.Format("Garden.GridEmpty",number));return;}
+        ImGui.PushID(bed.Id.ToString());
+        try
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text,GardenColor(GardenJournal.State(bed,now)));
+            try{ImGui.TextWrapped($"{number}. {bed.Seed}");}
+            finally{ImGui.PopStyleColor();}
+            ImGui.TextDisabled(GardenTimes(bed,now));
+            DrawBedButtons(bed,now,ref changed,ref removed);
+            if(forecasts?.FirstOrDefault(forecast=>forecast.Bed==number) is { } forecast)DrawGardenForecast(forecast,planted);
+        }
+        finally{ImGui.PopID();}
     }
 
     private static System.Numerics.Vector4 GardenColor(GardenState state)=>state switch{GardenState.Ripe=>Success,GardenState.ToTend=>UI.FfxivTheme.Warning,_=>Accent};

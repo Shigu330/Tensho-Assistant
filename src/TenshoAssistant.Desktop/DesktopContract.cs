@@ -59,6 +59,17 @@ internal static class DesktopContract
         new("TenshoAssistant.Configuration",Kind.Property,"Alarms",false,null,"the headless check that nothing is saved in the app (X-180)"),
         new("TenshoAssistant.Alarms.TenshoAlarm",Kind.Type,"",false,null,"the headless check that nothing is saved in the app (X-180)"),
         new("TenshoAssistant.Alarms.TenshoAlarm",Kind.Property,"Label",false,null,"the headless check that nothing is saved in the app (X-180)"),
+        new("TenshoAssistant.Configuration",Kind.Property,"ThemeMode",false,null,"--theme= (X-154)"),
+        new("TenshoAssistant.Configuration",Kind.Property,"NavigationMode",false,null,"the headless folded navigation (X-154)"),
+        new("TenshoAssistant.Configuration",Kind.Property,"GardenBeds",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Configuration",Kind.Property,"GardenDetailedView",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Type,"",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"Place",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"Seed",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"SeedId",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"PlantedAt",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"GrowHours",false,null,"the trial patch of the garden views (X-178)"),
+        new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"TendHours",false,null,"the trial patch of the garden views (X-178)"),
     ];
 
     private const BindingFlags Any=BindingFlags.Public|BindingFlags.NonPublic;

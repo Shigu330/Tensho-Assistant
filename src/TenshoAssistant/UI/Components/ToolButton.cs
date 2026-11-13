@@ -32,9 +32,19 @@ internal sealed partial class MainWindow
     /// the caller. The colour of the text unless one is given (an armed delete button: the error colour).
     /// </summary>
     private unsafe void DrawCentredGlyph(FontAwesomeIcon icon,Vector4? colour)
+        =>DrawGlyphAt(icon,ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),colour is { } given ? ImGui.GetColorU32(given):ImGui.GetColorU32(ImGuiCol.Text),ImGui.GetFontSize());
+
+    /// <summary>X-178 (0.1257): a glyph of the icon font at the centre of a box, at a given size (the garden's round mark); pushes the icon font itself.</summary>
+    private void DrawGlyphIn(FontAwesomeIcon icon,Vector2 min,Vector2 max,Vector4 colour,float size)
     {
-        var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();
-        var font=ImGui.GetFont();var size=ImGui.GetFontSize();var label=icon.ToIconString();
+        ImGui.PushFont(UiBuilder.IconFont);
+        try{DrawGlyphAt(icon,min,max,ImGui.GetColorU32(colour),size);}
+        finally{ImGui.PopFont();}
+    }
+
+    private static unsafe void DrawGlyphAt(FontAwesomeIcon icon,Vector2 min,Vector2 max,uint colour,float size)
+    {
+        var font=ImGui.GetFont();var label=icon.ToIconString();
         var glyph=label.Length>0 ? font.FindGlyph(label[0]):null;
         Vector2 at;
         if(glyph!=null && font.FontSize>0)
@@ -43,8 +53,8 @@ internal sealed partial class MainWindow
             var ink=new Vector2(glyph->X1-glyph->X0,glyph->Y1-glyph->Y0)*scale;
             at=(min+max-ink)/2-new Vector2(glyph->X0,glyph->Y0)*scale;
         }
-        else at=(min+max-ImGui.CalcTextSize(label))/2;
-        ImGui.GetWindowDrawList().AddText(font,size,new Vector2(MathF.Round(at.X),MathF.Round(at.Y)),colour is { } given ? ImGui.GetColorU32(given):ImGui.GetColorU32(ImGuiCol.Text),label);
+        else at=(min+max-ImGui.CalcTextSize(label)*(font.FontSize>0 ? size/font.FontSize:1))/2;
+        ImGui.GetWindowDrawList().AddText(font,size,new Vector2(MathF.Round(at.X),MathF.Round(at.Y)),colour,label);
     }
 
     private bool ToolButton(FontAwesomeIcon icon,string tooltipKey,bool enabled,bool active=false)

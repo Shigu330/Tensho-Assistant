@@ -37,6 +37,8 @@ public static class Faq
         new("Report"),
         new("Translate"),
         new("Wishlist", "Wishlist"),
+        // X-178 (0.1257): the garden in icons, and the way back to the text.
+        new("GardenText", "Garden"),
         new("Install"),
         new("Desktop"),
         new("DesktopUpdate"),

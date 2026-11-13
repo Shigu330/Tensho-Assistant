@@ -98,6 +98,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `FashionOptions.ShowPanel` | bool | true | `MainWindow.FashionWeek.cs` | **Buttons on the game's Fashion Report** — Makes the slot icons of the game window clickable: a click opens, beside the slot, a small window with its gear and dyes. Default: on. |
 | `FishingPanel` | bool | true | Settings › Panels · Settings › Panels | **In-game fishing help** — While fishing (fisher), shows the fish of the nearest fishing spot with their bait (bait → mooch), ET window and weather. Movable window. It also turns on the spearfishing panel and the ocean fishing voyage panel. Default: on. |
 | `GardenAlerts` | bool | true | page Garden | **Remind me in the chat** — A chat line (and the alarms' sound if they play one) when a bed is ripe or needs tending, once each. Default: on. |
+| `GardenDetailedView` | bool | false | page Garden | **Detailed view** — Shows each bed as text (seed, dates, crossbreeds) instead of icons. Easier with a gamepad. Default: off. |
 | `GardenDetect` | bool | true | page Garden | **Note plantings from the chat** — Tensho reads the game's chat lines: when the game says you planted seeds, the bed is added to the journal with its seed (read in the planting window), its time and its hours. Tending and harvesting are not detected yet: the buttons stay. Nothing is sent or done in the game. Default: on. |
 | `GatheringListHighlight` | bool | true | Settings › Panels | **Frame the items my lists need on the game's gathering window** — At a node, a green frame on the rows of the game's window whose item the crafting list, the workshop or the preparation shown on screen still needs. Drawn only. Default: on. |
 | `GatheringNextHighlight` | bool | true | Settings › Panels | **Mark the next action on my hotbars** — At a node, a frame drawn over the slot of the plan's next action. Tensho uses nothing: the action stays yours. Cross hotbars are not covered. Default: on. |
@@ -323,7 +324,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 267 controls (259 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 268 controls (260 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -427,6 +428,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `FashionOptions.ShowPanel` | bool | true | `MainWindow.FashionWeek.cs` | **Boutons sur la Revue de mode du jeu** — Rend les icônes d'emplacement de la fenêtre du jeu cliquables : un clic ouvre, à côté de l'emplacement, une petite fenêtre avec ses pièces et ses teintures. Par défaut : activé. |
 | `FishingPanel` | bool | true | Paramètres › Panneaux à côté du jeu · Paramètres › Panneaux à côté du jeu | **Aide à la pêche en jeu** — Quand vous pêchez (pêcheur), affiche les poissons du lieu de pêche le plus proche avec leurs appâts (appât → poisson à réutiliser), créneau ET et météo. Fenêtre déplaçable. Active aussi le panneau de la pêche au harpon et celui des voyages de pêche en mer. Par défaut : activé. |
 | `GardenAlerts` | bool | true | page Jardinage | **Me le rappeler dans le chat** — Une ligne dans le chat (et le son des alarmes s’il est activé) quand une parcelle est mûre ou à entretenir, une fois chacune. Par défaut : activé. |
+| `GardenDetailedView` | bool | false | page Jardinage | **Vue détaillée** — Montre chaque parcelle en texte (graine, dates, croisements) au lieu des icônes. Plus pratique à la manette. Par défaut : désactivé. |
 | `GardenDetect` | bool | true | page Jardinage | **Noter les plantations depuis le chat** — Tensho lit les lignes du chat du jeu : quand le jeu annonce que vous avez planté des graines, la parcelle s'ajoute au journal avec sa graine (lue dans la fenêtre de plantation), son heure et ses durées. L'entretien et la récolte ne sont pas encore détectés : les boutons restent. Rien n'est envoyé ni fait dans le jeu. Par défaut : activé. |
 | `GatheringListHighlight` | bool | true | Paramètres › Panneaux à côté du jeu | **Encadrer dans la fenêtre de récolte du jeu les objets de mes listes** — Au point de récolte, un cadre vert sur les lignes de la fenêtre du jeu dont la liste d'artisanat, l'atelier ou la préparation affichés à l'écran ont encore besoin. Dessin seulement. Par défaut : activé. |
 | `GatheringNextHighlight` | bool | true | Paramètres › Panneaux à côté du jeu | **Repérer la prochaine action sur mes barres** — Au point de récolte, un cadre dessiné sur la case de la prochaine action du plan. Tensho n'utilise rien : l'action reste la vôtre. Les barres croisées ne sont pas prises en charge. Par défaut : activé. |
@@ -652,5 +654,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 267 cases (259 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 268 cases (260 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

@@ -11,6 +11,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private int itemTooltipFrame=-1;private uint itemTooltipId;
+    private readonly UI.IconWait itemIconWait=new();
     private int menuFrame=-1;
     private readonly Dictionary<uint,int> menuSeen=[];
 
@@ -54,6 +55,36 @@ internal sealed partial class MainWindow
     }
 
     private void DrawItemImage(ItemDefinition? item,Vector2 size)=>DrawGameIcon(item?.IconId ?? 0,size);
+
+    /// <summary>
+    /// X-178 (0.1257): an item as an element the keyboard and the gamepad reach (ImGui.Image is not one): an invisible button of the icon's
+    /// size with the game icon drawn on it. Without an icon (unknown item, or a texture that has not come after 60 frames: UI/IconWait.cs):
+    /// the name as a selectable text in the given colour; while the texture loads: the empty button. The caller draws the tooltip, the menu
+    /// and what goes on the icon from the last item. Returns whether it was clicked.
+    /// </summary>
+    private bool DrawItemIconOrText(ItemDefinition? item,Vector2 size,string name,Vector4 colour,out bool asIcon)
+    {
+        var iconId=item?.IconId ?? 0;
+        var frame=ImGui.GetFrameCount();
+        if(iconId!=0 && textures.TryGetFromGameIcon(new GameIconLookup(iconId,false,true),out var shared)
+           && shared.TryGetWrap(out var texture,out _) && texture is not null)
+        {
+            itemIconWait.ShowText(iconId,true,frame);
+            asIcon=true;
+            var clicked=ImGui.InvisibleButton("##ItemIconOrText",size);
+            ImGui.GetWindowDrawList().AddImage(texture.Handle,ImGui.GetItemRectMin(),ImGui.GetItemRectMax());
+            return clicked;
+        }
+        if(itemIconWait.ShowText(iconId,false,frame))
+        {
+            asIcon=false;
+            ImGui.PushStyleColor(ImGuiCol.Text,colour);
+            try{return ImGui.Selectable(name+"##ItemIconOrText");}
+            finally{ImGui.PopStyleColor();}
+        }
+        asIcon=true;
+        return ImGui.InvisibleButton("##ItemIconOrText",size);
+    }
 
     /// <summary>
     /// X-76 H8 (0.920): a game icon that is not an item (duty, action, job, weather, card…), a plain image. Missing icon: an empty space of the same

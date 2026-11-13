@@ -1,7 +1,7 @@
 // X-119 (plan 4 of the desktop application, step 1; X-118's probe moved here): the plugin's own pages in a desktop window, game closed.
 // Evidence: docs/evidence/x119-desktop-app.md (X-118's measures: docs/evidence/x118-desktop-probe.md).
 // Usage: TenshoAssistant.Desktop [--page=Weather] [--zone=<territory id>] [--field=name=value] [--click=x,y] [--capture=<png>] [--frames=N]
-//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH]
+//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH] [--garden-trial]
 //        TenshoAssistant.Desktop --headless [--out=<md>]   (all 12 catalogues, every page classified and drawn for 20 frames without a window;
 //                                                           exit 0 only if no page throws, blocks or is unclassified; 4 = SKIP, no game data or Dalamud)
 //        TenshoAssistant.Desktop --headless --step=A,B | --step=entries   (diagnostic: which MainWindow call blocks, each on a worker with a 5 s limit)
@@ -187,6 +187,13 @@ internal static class Program
         if(Option(args,"--field=") is { } field && field.Split('=',2) is [var fieldName,var fieldValue])
             host.Window.GetType().GetField(fieldName,BindingFlags.Instance|BindingFlags.NonPublic)?.SetValue(host.Window,fieldValue);
         var capture=Option(args,"--capture=");
+        // X-178 (0.1257): --garden-trial, for a capture only: the trial patch of the headless run instead of the player's beds (in memory).
+        if(capture is not null && args.Contains("--garden-trial"))
+        {
+            // The trial beds are due or ripe: the application does not ring them.
+            status.Bell=false;
+            if(!Headless.GardenTrial(host))Console.WriteLine("  --garden-trial: the trial patch could not be given");
+        }
         var frames=int.TryParse(Option(args,"--frames="),out var n) ? n : capture is null ? int.MaxValue : 90;
         var clock=Stopwatch.StartNew();var last=0.0;string? lastError=null;var readyAt=-1;var used=false;
         for(var frame=0;!window.Closed;frame++)
