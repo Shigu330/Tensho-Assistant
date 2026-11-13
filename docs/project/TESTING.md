@@ -1724,13 +1724,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1290) En dresseur 45, page Équipement, recherche d'une pièce (Tête) : la liste dit « Niveaux 40 à 45 » et propose des pièces ; au niveau 50 (ou un autre job 50/60/…/100) : seulement le niveau exact ; Paramètres, le réglage s'appelle « Niveau exact aux paliers ».
 
-- [ ] (0.1291) Survol d'un objet regardé au tableau des ventes il y a peu, puis Ctrl+Alt : la ligne du monde dit « Vu au tableau des ventes <date> » et « Consulté » prend l'heure de l'appui ; sur un objet jamais ouvert au tableau : « Relevé Universalis <date> » (une date ancienne veut dire que personne ne l'a envoyé depuis).
+- [x] (0.1291) Survol d'un objet regardé au tableau des ventes il y a peu, puis Ctrl+Alt : la ligne du monde dit « Vu au tableau des ventes <date> » et « Consulté » prend l'heure de l'appui ; sur un objet jamais ouvert au tableau : « Relevé Universalis <date> » (une date ancienne veut dire que personne ne l'a envoyé depuis).
 
-- [ ] (0.1292) Page Alarmes › Alarmes à date, une alarme du 01/12 : la ligne dit « prochaine 01/12/2026 00:00 (dans 17 j … h) » ; une alarme d'aujourd'hui : l'heure seule et « dans 3 h 05 » ou « dans 45 min ».
+- [x] (0.1292) Page Alarmes › Alarmes à date, une alarme du 01/12 : la ligne dit « prochaine 01/12/2026 00:00 (dans 17 j … h) » ; une alarme d'aujourd'hui : l'heure seule et « dans 3 h 05 » ou « dans 45 min ».
 
-- [ ] (0.1293) Stockage › Banque, onglet d'un servant (Shirune, Zet-suna) puis vue Globale : une ligne « <servant> · gils : 999 » avec l'icône de gil, plus de case gil dans un « Sac 6 » ; vue en liste : pas de ligne Gil.
+- [x] (0.1293) Stockage › Banque, onglet d'un servant (Shirune, Zet-suna) puis vue Globale : une ligne « <servant> · gils : 999 » avec l'icône de gil, plus de case gil dans un « Sac 6 » ; vue en liste : pas de ligne Gil.
 
-- [ ] (0.1294) Page Équipement, clic sur un emplacement (Main secondaire, niveaux 40 à 45), fenêtre étroite puis large : aucun texte coupé au bout des lignes ; survol d'une pièce : « Statistiques de base », puis « Comparé à l'équipement porté » avec les écarts verts et rouges deux par deux et « Valeurs de base, sans matérias », puis niveau, stock et obtention.
+- [x] (0.1294) Page Équipement, clic sur un emplacement (Main secondaire, niveaux 40 à 45), fenêtre étroite puis large : aucun texte coupé au bout des lignes ; survol d'une pièce : « Statistiques de base », puis « Comparé à l'équipement porté » avec les écarts verts et rouges deux par deux et « Valeurs de base, sans matérias », puis niveau, stock et obtention.
+
+- [ ] (0.1295) Page Équipement : survol du nom de la pièce portée d'un emplacement (boucles d'oreilles) : « Statistiques de base » puis « Valeurs de base, sans matérias » ; survol d'une pièce de la liste : même infobulle avec « Comparé à l'équipement porté ».
+
+- [ ] (0.1295) Rangements (Banque), Objets, Marché et un PNJ vendeur : survol d'une pièce d'équipement : statistiques de base et comparaison avec la pièce portée ; survol d'un objet qui n'est pas de l'équipement (cristal) : pas de bloc de statistiques.
+
+- [ ] (0.1296) Alarmes › Ajouter à cette date : deux alarmes nommées « A » et « B » : deux blocs titrés « A » et « B » (l'alarme « test » déjà enregistrée garde son nom comme titre) ; une troisième sans nom : bloc « Alarme à date · » et sa date.
 
 **0.535 : interfaces** — à voir en jouant
 
