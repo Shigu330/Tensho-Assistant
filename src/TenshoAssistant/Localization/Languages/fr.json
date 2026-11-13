@@ -2745,6 +2745,26 @@
     "Partial": "Catalogue partiel : {0} références de mandat non résolues.",
     "Source": "Données du jeu · {0} · autres usages possibles hors de ces catalogues"
   },
+  "RaceChocobo": {
+    "Title": "Chocobo de course",
+    "NotLoaded": "Pas encore lu : ouvrez la fiche de votre chocobo de course dans le jeu (ou faites une course) ; Tensho ne le lit que quand le jeu l'a, il ne demande jamais rien au serveur.",
+    "Unavailable": "Le chocobo de course n'a pas pu être lu (peut-être après une mise à jour du jeu).",
+    "Summary": "{0} · Cote {1} · Pedigree {2} · {3}",
+    "SummaryTip": "La catégorie vient de la cote et des bornes de catégorie du jeu.",
+    "Female": "Femelle",
+    "Male": "Mâle",
+    "MaxSpeed": "Vitesse maximale",
+    "Acceleration": "Accélération",
+    "Endurance": "Vitalité",
+    "Stamina": "Endurance",
+    "Cunning": "Agilité",
+    "Value": "{0} / {1}",
+    "AtMaximum": "Maximum atteint",
+    "Hereditary": "Aptitude héréditaire : {0}",
+    "Learned": "Aptitude apprise : {0}",
+    "NoAbility": "aucune",
+    "ReadAt": "Lu le {0}."
+  },
   "CactpotUi": {
     "NextGate": "Prochain JACTA : {0} (dans {1} min)",
     "NextGateTip": "Les JACTA commencent toutes les 20 minutes, à :00, :20 et :40 de chaque heure ; le jeu tire lequel au hasard.",

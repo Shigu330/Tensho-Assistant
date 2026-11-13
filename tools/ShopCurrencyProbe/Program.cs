@@ -567,6 +567,23 @@ if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
         Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
     return;
 }
+// PROBE_RACECHOCOBO (X-204, 0.1235): the racing chocobo's ranks (ChocoboRaceRank with GoldSaucerTextData names), abilities (ChocoboRaceAbility),
+// and the game's words for its attributes (Addon), English and French; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_RACECHOCOBO") is { Length:>0 })
+{
+    var textEn=data.Excel.GetSheet<GoldSaucerTextData>(Language.English);var textFr=data.Excel.GetSheet<GoldSaucerTextData>();
+    foreach(var row in data.Excel.GetSheet<ChocoboRaceRank>())
+        Console.WriteLine($"RANK {row.RowId} rating {row.RatingMin}-{row.RatingMax} fee {row.Fee} name {row.Name.RowId} '{textEn.GetRowOrDefault(row.Name.RowId)?.Text.ExtractText()}' / '{textFr.GetRowOrDefault(row.Name.RowId)?.Text.ExtractText()}'");
+    var abilityEn=data.Excel.GetSheet<ChocoboRaceAbility>(Language.English);
+    foreach(var row in data.Excel.GetSheet<ChocoboRaceAbility>().Take(12))
+        Console.WriteLine($"ABILITY {row.RowId} '{abilityEn.GetRowOrDefault(row.RowId)?.Name.ExtractText()}' / '{row.Name.ExtractText()}' value {row.Value} type {row.ChocoboRaceAbilityType.RowId}");
+    Console.WriteLine($"ABILITIES {data.Excel.GetSheet<ChocoboRaceAbility>().Count(row=>!row.Name.IsEmpty)}");
+    var words=new[]{"Maximum Speed","Max Speed","Acceleration","Endurance","Stamina","Cunning","Pedigree","Rating","Hereditary Ability","Learned Ability","Racing Chocobo"};
+    var addonFr=data.Excel.GetSheet<Addon>(Language.French);
+    foreach(var row in data.Excel.GetSheet<Addon>(Language.English).Where(row=>words.Contains(row.Text.ExtractText())).Take(40))
+        Console.WriteLine($"ADDON {row.RowId} '{row.Text.ExtractText()}' / '{addonFr.GetRowOrDefault(row.RowId)?.Text.ExtractText()}'");
+    return;
+}
 // PROBE_WHEEL (X-225, 0.1234): the aetherial wheels (AetherialWheel: unprimed and primed items, grade, hours required); read-only.
 if(Environment.GetEnvironmentVariable("PROBE_WHEEL") is { Length:>0 })
 {

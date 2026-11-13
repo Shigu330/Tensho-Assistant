@@ -2745,6 +2745,26 @@
     "Partial": "Partial catalogue: {0} unresolved leve references.",
     "Source": "Game data · {0} · other uses may exist outside these catalogues"
   },
+  "RaceChocobo": {
+    "Title": "Racing chocobo",
+    "NotLoaded": "Not read yet: open your racing chocobo's details in the game (or race once); Tensho reads it only when the game has it, it never asks the server.",
+    "Unavailable": "The racing chocobo could not be read (perhaps after a game update).",
+    "Summary": "{0} · Rating {1} · Pedigree {2} · {3}",
+    "SummaryTip": "The rank comes from the rating and the game's rank bounds.",
+    "Female": "Female",
+    "Male": "Male",
+    "MaxSpeed": "Maximum Speed",
+    "Acceleration": "Acceleration",
+    "Endurance": "Endurance",
+    "Stamina": "Stamina",
+    "Cunning": "Cunning",
+    "Value": "{0} / {1}",
+    "AtMaximum": "Maximum reached",
+    "Hereditary": "Hereditary ability: {0}",
+    "Learned": "Learned ability: {0}",
+    "NoAbility": "none",
+    "ReadAt": "Read at {0}."
+  },
   "CactpotUi": {
     "NextGate": "Next GATE: {0} (in {1} min)",
     "NextGateTip": "GATEs start every 20 minutes, at :00, :20 and :40 of each hour; which one is drawn at random by the game.",
