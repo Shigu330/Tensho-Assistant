@@ -17,6 +17,8 @@ internal sealed partial class MainWindow
     private Vector2 hoverPanelSize=new(380,300);
     private (uint Item,object? Live,object? Bank,ulong Character) hoverHoldingsKey;
     private ItemHoldingsSummary? hoverHoldings;
+    // X-01 C5 (0.1218): the storages holding the item, sorted once per holdings built (they were sorted at each frame of the tooltip).
+    private StorageHolding[] hoverHoldingRows=[];
     // 0.343 (I-01): world names outside the data center (region cheapest), from the World sheet (set by Plugin).
     internal Func<uint,string?>? WorldName { get; set; }
     public void DrawItemHover()
@@ -93,12 +95,13 @@ internal sealed partial class MainWindow
         {
             hoverHoldings=ItemHoldings.Build(id,character,live,bankState.Entries,StorageFilter.All,includeCrystals:true,crystal:ClassifyCrystal(id) is not null);
             hoverHoldingsKey=(id,live,bankState,character);
+            hoverHoldingRows=hoverHoldings.Rows.Where(row=>row.Nq+row.Hq>0).OrderByDescending(row=>row.Nq+row.Hq).ToArray();
         }
         var summary=hoverHoldings;
         ImGui.TextColored(Accent,localization.Get("HoverUi.Stock"));
         if(!summary.HasObservation){ImGui.TextDisabled(localization.Get("HoverUi.OwnedUnknown"));return;}
         ImGui.TextUnformatted(localization.Format(summary.HasUnknown ? "HoverUi.OwnedPartial":"HoverUi.Owned",summary.Total.ToString("N0"),summary.Nq.ToString("N0"),summary.Hq.ToString("N0")));
-        var rows=summary.Rows.Where(row=>row.Nq+row.Hq>0).OrderByDescending(row=>row.Nq+row.Hq).ToArray();
+        var rows=hoverHoldingRows;
         if(rows.Length>0)
             ImGui.TextDisabled(string.Join(" · ",rows.Take(4).Select(row=>localization.Format("HoverUi.StorageRow",StorageRowName(row),(row.Nq+row.Hq).ToString("N0"))))
                 +(rows.Length>4 ? localization.Format("HoverUi.More",rows.Length-4):""));
