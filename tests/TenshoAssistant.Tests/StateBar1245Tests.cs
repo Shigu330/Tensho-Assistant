@@ -21,7 +21,7 @@ internal static class StateBar1245Tests
         ("State bar 1245: snapshot published from the draw, read by the entry; cut in competitive content; settings, texts",() =>
         {
             var page=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
-            Check(page.Contains("internal void TickDashboard(){if(DashboardWanted)RefreshDashboard();}") && page.Contains("DashboardWanted=>configuration.StateServerBar || "),"measures read only while the entry (or, since 0.1246, the panel or the link) is on");
+            Check(page.Contains("internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();}") && page.Contains("DashboardWanted=>configuration.StateServerBar || "),"measures read only while the entry (or, since 0.1246, the panel or the link) is on");
             Check(page.Contains("Volatile.Write(ref dashboardSnapshot,") && page.Contains("internal DashboardSnapshot? DashboardState=>Volatile.Read(ref dashboardSnapshot);"),"published whole, read whole");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("(\"StateBar\",()=>{mainWindow.TickDashboard();stateBar?.Invoke()?.DrawTooltip();}),"),"ticked by the plugin's draw");
             var entry=Read("src/TenshoAssistant/Alarms/StateDtrEntry.Dalamud.cs");

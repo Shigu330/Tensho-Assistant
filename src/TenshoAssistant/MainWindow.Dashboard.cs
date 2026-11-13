@@ -37,7 +37,13 @@ internal sealed partial class MainWindow
 
     /// <summary>X-165 (0.1245): called by the plugin's draw in every frame; reads the measures (once a second) only while one of their readers
     /// is on: the server bar entry, the panel (0.1246) or the link with the desktop application (0.1246).</summary>
-    internal void TickDashboard(){if(DashboardWanted)RefreshDashboard();}
+    internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();}
+    // X-165 (0.1251): the first reading by the server bar, the panel or the link waits 20 s after the window is built: done on the first
+    // frame after a load it cost 16 to 17 ms there (« StateBar » in the log's slow-frame line of 0.1245 to 0.1250: its code compiled on the
+    // game's thread); the JIT warm-up (from 5 s) compiles it before. The dashboard opened by the player reads at once.
+    private const long DashboardStartDelayMs=20_000;
+    private readonly long dashboardFrom=Environment.TickCount64+DashboardStartDelayMs;
+    private bool DashboardStarted=>Environment.TickCount64-dashboardFrom>=0;
     private bool DashboardWanted=>configuration.StateServerBar || configuration.StatePanel || configuration.DesktopLink;
 
     private string DashboardText(HealthLine line)=>localization.Format(line.Key,[.. line.Values.Select(value=>value is double number ? number.ToString("0.0#",Numbers):value)]);
@@ -101,7 +107,7 @@ internal sealed partial class MainWindow
 
     private bool StatePanelVisible()
     {
-        if(windowDisposed)return false;
+        if(windowDisposed || !DashboardStarted)return false;
         RefreshDashboard();
         return StateBar.Shown(DashboardState?.Overall,configuration.StateServerBarOnlyProblems);
     }

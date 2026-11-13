@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1251.0
+- X-165, suite : la première lecture du tableau de bord pour la barre serveur, le panneau et le lien avec l'application de bureau coûtait 16 à 17 ms sur la première image après chaque chargement (« StateBar » dans la ligne « Slow frame » du journal, de 0.1245 à 0.1250 : son code compilé sur le fil du jeu). Elle attend maintenant 20 s après la création de la fenêtre (le préchauffage JIT commence à 5 s) ; le tableau de bord ouvert par le joueur se lit tout de suite. Test : DashboardStart1251Tests ; test 1245 suivi.
+- Tests : DashboardStart1251Tests. Verify.ps1 (agent) : 2253/2253, 0 avertissement, 0 erreur ; DLL 0.1251.0.0. Rien à essayer en jeu.
+### English
+- X-165, follow-up: the dashboard's first reading for the server bar, the panel and the link with the desktop application cost 16 to 17 ms on the first frame after every load (« StateBar » in the log's « Slow frame » line, 0.1245 to 0.1250: its code compiled on the game's thread). It now waits 20 s after the window is built (the JIT warm-up starts at 5 s); the dashboard the player opens reads at once. Test: DashboardStart1251Tests; test 1245 follows.
+
 ## 0.1250.0
 - Plan global, X-153 : X-153, tranche 5 : famille des découvertes sortie de Plugin.cs (Plugin.Discoveries.cs) : le magasin et son dossier, l'échange par GitHub (un seul chemin d'installation et un seul de libération) et le chargement hors de l'image, déplacés tels quels : prix vus d'abord (MarketSeen.json vit dans le même dossier), puis les découvertes (SQLite, fichiers d'avant convertis une fois ; une base qui ne s'ouvre pas n'est jamais remplacée ; une base illisible est mise de côté, jamais écrasée) ; rien n'est écrit avant d'être lu. Plugin.cs appelle la famille aux mêmes endroits : le magasin avant le guetteur d'objets qui le remplit (resté avec les lecteurs du jeu), le chargement après le lecteur des prix vus. Aucun changement de comportement. Test : DiscoveriesFamily1250Tests (chaque geste une fois, dans son fichier ; ordre d'avant) ; tests 916, 1039 et 1197 suivis (lisent Plugin.Discoveries.cs).
 - Tests : DiscoveriesFamily1250Tests. Verify.ps1 (agent) : 2252/2252, 0 avertissement, 0 erreur ; DLL 0.1250.0.0. Rien à essayer en jeu.
