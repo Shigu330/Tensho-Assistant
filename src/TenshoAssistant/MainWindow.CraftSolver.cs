@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
                 _=craftSolve.StartAsync(input with {Revision=craftSolveRevision});
         }
         finally {ImGui.EndDisabled();}
-        if(state.Loading) {ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSearch.Cancel"))) craftSolve.Cancel(); ImGui.TextDisabled(localization.Get("CraftSearch.Loading"));}
+        if(state.Loading) {ImGui.SameLine(); if(ImGui.SmallButton(localization.Get("CraftSearch.Cancel"))) craftSolve.Cancel(); StateLine(UI.UiState.Waiting,localization.Get("CraftSearch.Loading"));}
         if(state.Error is { } error)
         {
             if(loggedCraftSearchError != error)

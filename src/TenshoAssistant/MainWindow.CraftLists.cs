@@ -78,9 +78,9 @@ internal sealed partial class MainWindow
         // The direct ingredients of every item, against the recorded stocks.
         RefreshRecipeHoldingsCache();
         var plans=CraftListPlans(list);
-        ImGui.TextColored(Accent,localization.Get("CraftLists.Ingredients"));
+        UI.UiComponents.SubTitle(localization.Get("CraftLists.Ingredients"));
         // 0.464 (user request, in-game campaign): a table with icons and the full item tooltip.
-        if(ImGui.BeginTable("CraftListIngredients",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))
+        if(UI.UiComponents.BeginDataTable("CraftListIngredients",4))
         {
             try
             {

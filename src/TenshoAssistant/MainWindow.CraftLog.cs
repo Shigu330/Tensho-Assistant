@@ -114,7 +114,7 @@ internal sealed partial class MainWindow
                 if(wrongJob)DrawEquipRecipeJob(context.Recipe!,"CraftLogEquip");
                 return;
             }
-            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else EmptyState("CraftLogUi.ActionsLoading");return;}
+            if(actions is null){if(craftActions.State.Error is { } failure)DrawDataError(failure,"ServiceErrors.Craft");else StateLine(UI.UiState.Waiting,localization.Get("CraftLogUi.ActionsLoading"));return;}
             if(context.Recipe is {Simulation.Quality:>0} aimed)
             {
                 CraftLogSection(localization.Get("CraftLogUi.SectionTarget"));
@@ -227,7 +227,7 @@ internal sealed partial class MainWindow
     private void CraftLogSection(string title,string? help=null)
     {
         ImGui.Spacing();
-        using(TenshoAssistant.UI.UiComponents.PushSectionFont())ImGui.TextColored(Accent,title);
+        TenshoAssistant.UI.UiComponents.SubTitle(title);
         if(help is not null)
         {
             ImGui.SameLine();HelpMarkerText(help);

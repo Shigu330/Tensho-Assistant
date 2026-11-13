@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(localization.Get("PlanUi.NoIngredients"));
             return;
         }
-        if (ImGui.BeginTable("CraftPlanMaterials", 4, ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.RowBg))
+        if (UI.UiComponents.BeginDataTable("CraftPlanMaterials", 4))
         {
             try
             {

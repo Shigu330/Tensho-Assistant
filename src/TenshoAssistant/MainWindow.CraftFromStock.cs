@@ -164,7 +164,7 @@ internal sealed partial class MainWindow
     private void DrawCraftFromStock()
     {
         ImGui.TextWrapped(localization.Get("CraftStock.Help"));
-        if(recipeCatalog.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("RecipeUi.Loading"));return;}
+        if(recipeCatalog.State.Catalog is not { } catalog){StateLine(UI.UiState.Waiting,localization.Get("RecipeUi.Loading"));return;}
         if(ImGui.Button(localization.Get("CraftStock.Search")))StartCraftFromStock(catalog);
         ImGui.SameLine();
         if(ImGui.Checkbox(localization.Get("CraftStock.Chained"),ref fromStockChained) && fromStockTask is not null)StartCraftFromStock(catalog);
@@ -172,7 +172,7 @@ internal sealed partial class MainWindow
         if(fromStockTask is not { } task)return;
         if(!task.IsCompleted){ImGui.SameLine();ImGui.TextDisabled(localization.Get("CraftStock.Searching"));return;}
         if(!task.IsCompletedSuccessfully || task.Result is not { } result){ImGui.TextWrapped(localization.Get("CraftStock.Failed"));return;}
-        if(!ReferenceEquals(fromStockLive,inventory.Current) || !ReferenceEquals(fromStockBank,bank.State)){ImGui.SameLine();ImGui.TextColored(Accent,localization.Get("CraftStock.Stale"));}
+        if(!ReferenceEquals(fromStockLive,inventory.Current) || !ReferenceEquals(fromStockBank,bank.State)){ImGui.SameLine();StateLine(UI.UiState.Stale,localization.Get("CraftStock.Stale"));}
         ImGui.SetNextItemWidth(170);
         if(ImGui.BeginCombo(localization.Get("CraftStock.Job")+"###CraftStockJob",fromStockJob.Length>0 ? fromStockJob:localization.Get("RecipeUi.AllJobs")))
         {

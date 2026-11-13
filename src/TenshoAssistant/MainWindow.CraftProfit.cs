@@ -14,7 +14,7 @@ internal sealed partial class MainWindow
     {
         if(itemCatalog.State.Catalog?.Find(recipe.ResultItemId) is not { IsMarketable:true } product)return;
         ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("ProfitUi.Title"));
+        UI.UiComponents.SubTitle(localization.Get("ProfitUi.Title"));
         if(product.CanBeHq)
         {
             ImGui.Checkbox(localization.Get("ProfitUi.Hq")+$"###ProfitHq{(chain ? "Chain":"")}",ref profitHq);

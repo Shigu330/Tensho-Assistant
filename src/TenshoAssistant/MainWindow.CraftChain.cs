@@ -47,14 +47,15 @@ internal sealed partial class MainWindow
         if (state.Input?.Recipe.RecipeId != recipe.RecipeId) return;
         ImGui.SameLine();
         if (ImGui.SmallButton(localization.Get("ChainUi.Clear"))) { craftChain.Cancel(); if(preparationPrices.State.Context?.IsChain==true) preparationPrices.Cancel(); return; }
-        if (state.Loading) { ImGui.TextDisabled(localization.Get("ChainUi.Loading")); return; }
+        if (state.Loading) { StateLine(UI.UiState.Waiting,localization.Get("ChainUi.Loading")); return; }
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Craft");
         if (state.Result is not { } result) return;
         var stale = !ReferenceEquals(state.Input.Live, inventory.Current) || !ReferenceEquals(state.Input.Bank, bank.State);
         ImGui.TextDisabled(localization.Format("ChainUi.Calculated",state.CalculatedAt?.ToLocalTime().ToString("T") ?? "—",result.Requested.ToString("N0",Numbers),result.Produced.ToString("N0",Numbers)));
-        if (stale) ImGui.TextColored(Accent, localization.Get("ChainUi.Stale"));
+        // X-156 (0.1265): a chain computed from stocks or choices that changed since is old data, said as everywhere.
+        if (stale) StateLine(UI.UiState.Stale,localization.Get("ChainUi.Stale"));
         if (state.Input.ChoiceRevision != craftChainChoiceRevision)
-            ImGui.TextColored(Accent, localization.Get("ChainUi.ChoicesChanged"));
+            StateLine(UI.UiState.Stale,localization.Get("ChainUi.ChoicesChanged"));
         if (result.HasUnknown) ImGui.TextWrapped(localization.Get("ChainUi.Incomplete"));
         if (result.HasCached) ImGui.TextDisabled(localization.Get("ChainUi.Imported"));
         if (result.HasUnresolved) ImGui.TextColored(Accent, localization.Get("ChainUi.Partial"));

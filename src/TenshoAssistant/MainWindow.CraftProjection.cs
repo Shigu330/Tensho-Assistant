@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         if(!configuration.CraftLiveSuggest || result.Suggest is null)return;
         CraftSuggestion? found;bool loading;
         lock(suggestGate){found=suggestion;loading=suggestLoading;}
-        if(loading){ImGui.TextDisabled(localization.Get("CraftProjectionUi.SuggestLoading"));return;}
+        if(loading){StateLine(UI.UiState.Waiting,localization.Get("CraftProjectionUi.SuggestLoading"));return;}
         if(found is null){ImGui.TextDisabled(localization.Get("CraftProjectionUi.SuggestNone"));return;}
         string Name(CraftActionKind kind)=>catalog.Find(job,kind)?.Name ?? kind.ToString();
         ImGui.PushStyleColor(ImGuiCol.Text,found.TargetReached ? Success:Accent);
@@ -120,7 +120,7 @@ internal sealed partial class MainWindow
             }
         }
         if(state.ObservedAt is not { } date || now<date || now-date>TimeSpan.FromSeconds(2))
-        {ImGui.TextWrapped(localization.Get("CraftProjectionUi.Old"));return;}
+        {StateLine(UI.UiState.Stale,localization.Get("CraftProjectionUi.Old"));return;}
         DrawCraftFollow(frame,catalog);
         if(projectionResult is not { } result)return;
         if(frame.Recipe is { } recipe && projectionRecipe!=recipe.RecipeId)
@@ -135,8 +135,9 @@ internal sealed partial class MainWindow
         DrawCraftSuggestion(result,catalog,frame.Raw.JobId);
         foreach(var issue in result.Issues)DrawCraftIssue(issue);
         if(result.Actions.Count==0){ImGui.TextDisabled(localization.Get("CraftProjectionUi.Empty"));return;}
-        ImGui.TextDisabled(localization.Get("CraftProjectionUi.SortHelp"));
-        if(ImGui.BeginTable("LiveCraftProjection",7,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+        // X-156 (0.1265): the table is computed by Tensho from the state read in game: an estimate, said as everywhere.
+        OriginLine(UI.UiOrigin.Estimated,localization.Get("CraftProjectionUi.SortHelp"));
+        if(UI.UiComponents.BeginDataTable("LiveCraftProjection",7))
         {
             try
             {

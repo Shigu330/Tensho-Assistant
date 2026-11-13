@@ -46,7 +46,9 @@ internal sealed partial class MainWindow
         if(developerMode && state.Error is { } error)ImGui.TextWrapped(RawMessage(error));
         if(state.Frame is not { } frame)return;
         var raw=frame.Raw;var fresh=TenshoAssistant.Caching.CacheAge.Fresh(state.ObservedAt,DateTimeOffset.UtcNow,TimeSpan.FromSeconds(2));
-        ImGui.TextDisabled(localization.Format("CraftLiveCounts.Observed",state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—",localization.Get(fresh ? "CraftLiveCounts.Fresh":"CraftLiveCounts.Old")));
+        // X-156 (0.1265): what follows is read in the game's window (measured); a read older than two seconds is old data.
+        var observedLine=localization.Format("CraftLiveCounts.Observed",state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—",localization.Get(fresh ? "CraftLiveCounts.Fresh":"CraftLiveCounts.Old"));
+        OriginLine(fresh ? UI.UiOrigin.Measured:UI.UiOrigin.Old,observedLine);
         if(frame.Recipe is { } recipe)
         {
             var item=itemCatalog.State.Catalog?.Find(recipe.ResultItemId);DrawItemIcon(item,new Vector2(36));ImGui.SameLine();ImGui.TextColored(Accent,item?.Name ?? raw.ItemName);

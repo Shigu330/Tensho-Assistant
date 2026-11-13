@@ -193,7 +193,7 @@ internal sealed partial class MainWindow
         DrawCraftReadiness(recipe);
         if(preparation) { DrawCraftPlan(recipe); return; }
         if(CraftSimulation.Unsupported(recipe) is { } unsupported) { ImGui.TextWrapped(CraftMessage(unsupported)); return; }
-        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else EmptyState("SimulationHelp.Loading"); return; }
+        if(craftActions.State.Catalog is not { } catalog) { if(craftActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Craft"); else StateLine(UI.UiState.Waiting,localization.Get("SimulationHelp.Loading")); return; }
         var p=recipe.Simulation!; var job=recipe.CraftTypeId+8;
         if(p.Collectable)ImGui.TextColored(Accent,localization.Get("SimulationHelp.Collectable"));
         // A-07 (0.435): expert recipes simulated in the normal condition, said so.
@@ -333,14 +333,14 @@ internal sealed partial class MainWindow
                 ImGui.TextDisabled(localization.Format("CraftSequence.HqChance",CraftHqChance.Percent(state.Quality,hqRecipe.Quality)));
             if(result.InvalidAction is { } invalid) ImGui.TextWrapped(localization.Format("SimulationHelp.Invalid",invalid+1,CraftMessage(result.Error ?? "—")));
             // A-13 (0.434): success assumed for the actions left to chance.
-            if(result.Steps.Any(step=>CraftSimulation.Random(step.Action))) ImGui.TextColored(Accent,localization.Get("CraftSimulation.RandomAssumed"));
+            if(result.Steps.Any(step=>CraftSimulation.Random(step.Action))) OriginLine(UI.UiOrigin.Estimated,localization.Get("CraftSimulation.RandomAssumed"));
             // 0.438 (user request): a sequence (imported, recorded, saved) with a forbidden action is said so.
             if(CraftActionRules.UsesForbidden(simulationActions,craftForbidden)) ImGui.TextColored(Accent,localization.Get("CraftRules.SequenceUsesForbidden"));
             if(result.Steps.Count<result.PlannedActions) ImGui.TextDisabled(localization.Format("CraftSequence.Skipped",result.PlannedActions-result.Steps.Count));
             DrawCraftConditionEnvelope(result);
             DrawCraftMacroExport(result,job,catalog);
         }
-        if(ImGui.BeginTable("CraftSequence",6,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+        if(UI.UiComponents.BeginDataTable("CraftSequence",6))
         {
             try
             {

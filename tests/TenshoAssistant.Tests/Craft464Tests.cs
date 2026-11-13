@@ -31,7 +31,7 @@ internal static class Craft464Tests
         {
             Check(Read("MainWindow.CraftSimulation.cs").Contains("if(listsTab) { DrawCraftLists(); return; }"),"tab");
             var lists=Read("MainWindow.CraftLists.cs");
-            Check(lists.Contains("ImGui.BeginTable(\"CraftListIngredients\",4,") && lists.Contains("DrawItemIcon(ingredient,new Vector2(24));") && lists.Contains("DrawItemInfoTooltip(itemId);"),"table");
+            Check(lists.Contains("UI.UiComponents.BeginDataTable(\"CraftListIngredients\",4)") && lists.Contains("DrawItemIcon(ingredient,new Vector2(24));") && lists.Contains("DrawItemInfoTooltip(itemId);"),"table");
         }),
         ("Live panel: beside the Synthesis window, on by default, reads when its setting or the panel asks, isolated",() =>
         {
