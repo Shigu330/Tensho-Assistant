@@ -59,7 +59,7 @@ internal static class DiscoveriesTests
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
             var page=Read("MainWindow.Discoveries.cs");
             Check(page.Contains("|| !DiscoveriesLoaded)return;") && page.Contains("store.SeeMonster(monster.NameId,monster.BaseId,live.TerritoryId,live.MapId,monster.Position,monster.Level,at)"),"after the read, from the monsters");
-            Check(Read("Plugin.cs").Contains("DiscoveryFiles.ReadBase(saved,"),"a broken file is set aside (0.1039: under a dated name, DiscoveriesBase1039Tests)");
+            Check(Read("Plugin.Discoveries.cs").Contains("DiscoveryFiles.ReadBase(saved,"),"a broken file is set aside (0.1039: under a dated name, DiscoveriesBase1039Tests)");
             // 0.1019 (test audit #2): by reflection, no saved field of a fact (nor of any type of the Discoveries namespace) can carry a player.
             var playerish=new System.Text.RegularExpressions.Regex("Player|Character|ContentId|Account|Retainer|Owner",System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             var factFields=typeof(DiscoveryFact).GetProperties().Select(property=>property.Name).ToList();

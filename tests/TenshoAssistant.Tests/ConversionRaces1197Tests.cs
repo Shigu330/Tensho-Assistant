@@ -173,7 +173,7 @@ internal static class ConversionRaces1197Tests
         })),
         ("Conversion races 1197: wiring: the plugin says a file that stays, and a failure once the database is in place can no longer come from the files of before", () =>
         {
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")); // X-153 (0.1250): the discoveries family
             Check(plugin.Contains("is held by another program for now and stays where it is; the next start sets it aside", StringComparison.Ordinal), "the file that stays is said in the log");
             var database = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/DiscoveryDatabase.cs")).ReplaceLineEndings("\n");
             var convert = database[database.IndexOf("public static string? ConvertFiles(", StringComparison.Ordinal)..database.IndexOf("private static string Free(", StringComparison.Ordinal)];

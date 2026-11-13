@@ -46,7 +46,7 @@ internal static class DiscoveriesBase1039Tests
         })),
         ("Discoveries base 1039: wired at load, said in the chat and on the page, no save when blocked",() =>
         {
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Discoveries.cs")); // X-153 (0.1250): the discoveries family
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(plugin.Contains("DiscoveryFiles.ReadBase(saved,") && !plugin.Contains("File.Move(saved,saved+\".broken\",true)"),"load reads through ReadBase");
             Check(plugin.Contains("chat.PrintError(\"[Tensho] \"+said)") && plugin.Contains("mainWindow.DiscoveriesWriteBlocked=true"),"chat and block");
