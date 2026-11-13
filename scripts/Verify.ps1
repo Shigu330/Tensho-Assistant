@@ -102,6 +102,9 @@ $taskDocuments = Get-TaskFingerprint -Documents
 $taskPrevious = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
 try { $taskHead = "$(& git -C $taskRoot rev-parse HEAD 2>$null)".Trim(); $taskClean = -not (& git -C $taskRoot status --porcelain 2>$null) }
 finally { $ErrorActionPreference = $taskPrevious; $global:LASTEXITCODE = 0 }
+# Measure 7 (0.1201): the time of each step of a full run, said in one line (« TIMES … ») before the version line.
+$taskClock = [Diagnostics.Stopwatch]::StartNew(); $taskWhole = [Diagnostics.Stopwatch]::StartNew(); $taskTimes = New-Object System.Collections.Generic.List[string]
+function Add-TaskTime([string]$Name) { $taskTimes.Add("$Name " + $taskClock.Elapsed.TotalSeconds.ToString('0.0', [Globalization.CultureInfo]::InvariantCulture) + ' s'); $taskClock.Restart() }
 $taskSkip = $false
 # 0.1020: a release always runs every check again (as -Force): what is published is built and tested now, not taken from a stamp.
 if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip.sha256'))) {
@@ -130,12 +133,15 @@ Push-Location $taskRoot
 try {
     & $DotNet build TenshoAssistant.sln -c Release --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
+    Add-TaskTime 'build'
     & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build
     if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed.' }
+    Add-TaskTime 'tests'
     # 0.323: the validator's report (MISSING / UNKNOWN keys) is shown when it fails; it was always discarded.
     $taskLanguages = & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build -- --validate-localization src/TenshoAssistant/Localization/Languages
     if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
     Write-Output 'PASS localization metadata, duplicate keys and format compatibility (partial translations allowed)'
+    Add-TaskTime 'languages'
     $taskOutput = Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release'
     $taskManifest = Get-Content -Raw -LiteralPath (Join-Path $taskOutput 'TenshoAssistant.json') | ConvertFrom-Json
     # The source manifest leaves InternalName/AssemblyVersion/DalamudApiLevel to DalamudPackager (Dalamud plugin metadata rules);
@@ -172,12 +178,15 @@ try {
     }
     finally { $taskZip.Dispose() }
     Write-Output 'PASS package identity, API, version, exact canonical ZIP hashes, language files and host assembly exclusion'
+    Add-TaskTime 'package'
     # X-119 (R33): the desktop application (src/TenshoAssistant.Desktop) goes with the plugin: published here self-contained (win-x64, with
     # Microsoft's MIT .NET runtime, so a double-click works on a PC that has only XIVLauncher), with the plugin's own files under plugin\;
     # that very folder is run headless (every page drawn: a page that breaks the app fails Verify, so publish.sh and the release), then
     # zipped as TenshoAssistant.Desktop.zip with the same version. Without the game data or XIVLauncher's Dalamud (CI, contributors) the
     # headless run is an explicit SKIP; -Release refuses it.
     $taskDesktopPackage = Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\package'
+    # Measure 7 (0.1201, measured: build 8.9 s, tests 104.4 s, languages 1.2 s, package 0.1 s, publish into the emptied folder 3.5 s, pages
+    # 26.3 s, zip 3.2 s, update 1.5 s): emptying this folder at each run costs about 3 s of 149, so it stays emptied (no stale file, ever).
     if (Test-Path -LiteralPath $taskDesktopPackage) { Remove-Item -LiteralPath $taskDesktopPackage -Recurse -Force }
     & $DotNet publish src/TenshoAssistant.Desktop -c Release -r win-x64 --self-contained -p:DebugType=none -o $taskDesktopPackage --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Desktop application publish failed (src/TenshoAssistant.Desktop).' }
@@ -186,6 +195,7 @@ try {
     foreach ($taskName in @('TenshoAssistant.dll', 'TenshoAssistant.json', 'Raphael.Net.dll', 'raphael_bindings.dll', 'Microsoft.Data.Sqlite.dll', 'SQLitePCLRaw.core.dll', 'SQLitePCLRaw.batteries_v2.dll', 'SQLitePCLRaw.provider.e_sqlite3.dll', 'e_sqlite3.dll')) { Copy-Item -LiteralPath (Join-Path $taskOutput $taskName) -Destination $taskDesktopPlugin }
     $taskDesktopVersion = [Reflection.AssemblyName]::GetAssemblyName((Join-Path $taskDesktopPackage 'TenshoAssistant.Desktop.dll')).Version.ToString()
     if ($taskDesktopVersion -ne $taskAssemblyVersion) { throw "Desktop application version $taskDesktopVersion differs from the plugin's $taskAssemblyVersion (one version source: the plugin's csproj)." }
+    Add-TaskTime 'desktop publish'
     $taskHeadlessReport = Join-Path $taskRoot 'artifacts\desktop-headless.md'
     # stderr read as text: under 'Stop', Windows PowerShell 5.1 would turn the app's SKIP or FAIL line into a terminating error.
     $taskPreference = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
@@ -202,6 +212,7 @@ try {
     }
     elseif ($taskHeadlessCode -ne 0) { throw "Desktop headless run failed (exit $taskHeadlessCode): a page throws, blocks or is not classified in src/TenshoAssistant.Desktop/DesktopPages.cs; report: $taskHeadlessReport" }
     else { Write-Output "PASS desktop headless: every page classified and drawn by the packaged exe (report artifacts/desktop-headless.md)" }
+    Add-TaskTime 'desktop pages'
     # The package: the published app (with the .NET runtime) and the plugin's own files of latest.zip under plugin/; never Dalamud, Lumina,
     # ImGui, cimgui, HexaGen, Mono.Cecil, Newtonsoft or the game's files, read where the user installed them (R05).
     $taskDesktopZip = Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'
@@ -239,6 +250,7 @@ try {
     $taskDesktopHash = "$taskDesktopZip.sha256"
     $taskDesktopHex = (Get-FileHash -LiteralPath $taskDesktopZip -Algorithm SHA256).Hash.ToLowerInvariant()
     [IO.File]::WriteAllText($taskDesktopHash, "$taskDesktopHex  TenshoAssistant.Desktop.zip`n", [Text.UTF8Encoding]::new($false))
+    Add-TaskTime 'desktop zip'
     # The update tried on a fake local release (no network): a GitHub-shaped release JSON with this repository's download addresses, the two
     # files read from its folder; the packaged exe installs it beside in a temporary folder, hands over, goes back, refuses a damaged zip.
     $taskFakeTag = "Stable-$taskProjectVersion"
@@ -254,6 +266,8 @@ try {
     $taskUpdate | Where-Object { $_ -match '^(FAIL|PASS update selftest)' } | ForEach-Object { Write-Output "  desktop: $_" }
     if ($taskUpdateCode -ne 0) { $taskUpdate | ForEach-Object { Write-Host "  desktop: $_" }; throw "Desktop update selftest failed (exit $taskUpdateCode): the app could not install, hand over to or go back from a fake release of $taskProjectVersion." }
     Write-Output "PASS desktop update: $taskDesktopHash written; the packaged exe installed a fake release $taskFakeTag beside, handed over, went back, refused a damaged zip"
+    Add-TaskTime 'desktop update'
+    Write-Output ("TIMES " + ($taskTimes -join ', ') + '; whole run ' + $taskWhole.Elapsed.TotalSeconds.ToString('0.0', [Globalization.CultureInfo]::InvariantCulture) + ' s')
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
     [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]$taskClean; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8

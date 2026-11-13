@@ -59,8 +59,12 @@ internal static class BankShared1118Tests
         })),
         ("Bank 1118: two clients capturing at the same time lose nothing (read-modify-write under the profile's lock)",() => InTemp((folder,legacy) =>
         {
-            using var first = Ready(new PerCharacterBankStore(folder,legacy));
-            using var second = Ready(new PerCharacterBankStore(folder,legacy));
+            // 0.1201 (failed once, on a busy machine: « import saved: Bank save failed »): the lock file is asked for every 50 ms, without
+            // a queue, so a client saving 25 times in a row can keep the other one waiting past its 10 s; that bound has its own tests
+            // (AuditFixes1142Tests, BankSqlite1149Tests). Here the wait is longer than the test can last: what is proved is that two
+            // clients writing at once lose nothing, whatever the machine's speed.
+            using var first = Ready(new PerCharacterBankStore(folder,legacy,lockWaitMs: 110_000));
+            using var second = Ready(new PerCharacterBankStore(folder,legacy,lockWaitMs: 110_000));
             var runs = new[] { (Bank: first,Base: 1000UL),(Bank: second,Base: 2000UL) }.Select(side => Task.Run(() =>
             {
                 for (var i = 0UL; i < 25; i++) Import(side.Bank,Entry(4,BankStorageKind.Retainer,side.Base + i));
