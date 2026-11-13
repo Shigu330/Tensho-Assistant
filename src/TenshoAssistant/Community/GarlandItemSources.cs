@@ -11,8 +11,10 @@ public sealed record GarlandItemSource(string Type,ulong Id,string Name);
 // Trades: exchanges listed in « tradeShops » for this item (currency item id and amount), even without a known NPC
 // (e.g. 40382 Cor buffle insulaire ← 50 000 × 37549 Assignat insulaire azur, island sanctuary shop).
 public sealed record GarlandTrade(uint CurrencyId,uint Amount);
+// X-224 (0.1227, K-40): Patch is the game patch that added the item, from the document's « patch » (e.g. 7.3 for 46246, 1.0 for 5057:
+// docs/evidence/0.1227-garland-patch.md); null when absent or outside 1.0–20.0 (never a guessed patch).
 public sealed record GarlandItemSourceList(uint ItemId,IReadOnlyList<GarlandItemSource> Sources,DateTimeOffset FetchedAt,IReadOnlyList<GarlandTrade>? Trades=null,
-    FishingSources? Fishing=null);
+    FishingSources? Fishing=null,double? Patch=null);
 
 public static class GarlandItemSourceParser
 {
@@ -60,8 +62,13 @@ public static class GarlandItemSourceParser
         // Fishing spots with their bait routes (0.226, same item document): used by the in-game fishing help.
         FishingSources? fishing=null;
         try{fishing=FishingSourceParser.Parse(item);}catch(InvalidDataException){}
-        return new(expectedId,sources.AsReadOnly(),fetchedAt,trades.AsReadOnly(),fishing);
+        return new(expectedId,sources.AsReadOnly(),fetchedAt,trades.AsReadOnly(),fishing,PatchOf(item));
     }
+    /// <summary>X-224: the patch that added the item, 1.0 to 20.0, rounded to the hundredth; null otherwise.</summary>
+    public static double? PatchOf(JsonElement item)
+        => item.TryGetProperty("patch",out var value) && value.ValueKind==JsonValueKind.Number && value.TryGetDouble(out var patch)
+           && double.IsFinite(patch) && patch is >= 1.0 and <= 20.0 ? Math.Round(patch,2) : null;
+
     private static bool Contains(JsonElement listing,string name,uint id)=>listing.TryGetProperty(name,out var list) && list.ValueKind==JsonValueKind.Array
         && list.EnumerateArray().Any(entry=>Number(entry,"id")==id);
     // Garland writes ids as text or numbers.

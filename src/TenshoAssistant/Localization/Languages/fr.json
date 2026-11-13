@@ -2661,6 +2661,7 @@
     "Error": "La lecture des macros a échoué. Détails en mode développeur."
   },
   "ItemSheet": {
+    "Patch": "Ajouté au patch {0} (Garland Tools)",
     "Overview": "Aperçu",
     "Stock": "{0} possédé(s)",
     "StockUnknown": "stock inconnu (inventaire pas encore relevé)",

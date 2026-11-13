@@ -56,6 +56,8 @@ internal sealed partial class MainWindow
             RefreshRecipeHoldingsCache();
             var stock=GetRecipeHoldings(id);
             facts.Add(stock.HasObservation ? localization.Format("ItemSheet.Stock",stock.Total.ToString("N0",Numbers)):localization.Get("ItemSheet.StockUnknown"));
+            // X-224 (0.1227, K-40): the patch that added the item, when Garland Tools gave it (already read for the sources: no request here).
+            if(itemSources?.Peek(id)?.List?.Patch is { } patch)facts.Add(localization.Format("ItemSheet.Patch",patch.ToString("0.0#",System.Globalization.CultureInfo.InvariantCulture)));
             ImGui.TextDisabled(string.Join(" · ",facts));
             if(market.GetCached(market.State.WorldId,id) is { } quote && (quote.Nq.Minimum ?? quote.Hq.Minimum) is { } lowest)
             {

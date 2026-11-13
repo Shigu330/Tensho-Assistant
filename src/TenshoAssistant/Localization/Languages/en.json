@@ -2661,6 +2661,7 @@
     "Error": "Macro lookup failed. Details are available in developer mode."
   },
   "ItemSheet": {
+    "Patch": "Added in patch {0} (Garland Tools)",
     "Overview": "Overview",
     "Stock": "{0} owned",
     "StockUnknown": "stock unknown (inventory not read yet)",
