@@ -4285,7 +4285,6 @@
     "Frame": "{0}{2} ({1})",
     "ExpiredSuffix": " · périmé",
     "Bag": "Sac {1} · {0}",
-    "Reimport": "{0} : ordre visuel indisponible. Réimportez le rangement ouvert.",
     "Refresh": "Actualiser : {0}",
     "Cache": "Cache : {0}",
     "CategoryTip": "Ne montre que les objets de cette catégorie du jeu ; la liste ne propose que les catégories présentes dans l'onglet affiché.",

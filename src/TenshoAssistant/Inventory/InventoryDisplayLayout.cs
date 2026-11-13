@@ -9,6 +9,67 @@ public static class InventoryDisplayLayout
     /// </summary>
     public static bool HasNoBagLayout(int container)=>container is >= 3200 and < 4000 or >= 20000 and <= 22001 or >= 25000;
 
+    /// <summary>
+    /// X-275 (0.1285): the containers the game orders visually (bags 0–3, saddlebags, retainer pages 10000–10006). Every other container
+    /// of a storage (a retainer's gil 12000 and crystals 12001 since 0.767, currencies, crystals) is shown in slot order: mixed in the
+    /// visual order, its stacks without a position made the retainer's whole tab fail.
+    /// </summary>
+    public static bool HasBagLayout(int container)=>container is >= 0 and <= 3 or 4000 or 4001 or 4100 or 4101 or >= 10000 and <= 10006;
+
+    /// <summary>One displayed page: its number (1-based, in the storage) and its stacks, Slot being the cell (0–34).</summary>
+    public readonly record struct DisplayPage(int Number, InventoryContainerSnapshot Container);
+
+    /// <summary>The pages of a storage, and whether the bags are shown in their physical slot order (visual order unreadable).</summary>
+    public sealed record DisplayPages(IReadOnlyList<DisplayPage> Pages, bool PhysicalOrder);
+
+    /// <summary>
+    /// X-275 (0.1285): the pages of one storage. The bags with a visual layout follow the game's order; when it cannot be used (a position
+    /// missing, out of range or doubled), each read bag is shown in its own slot order and <see cref="DisplayPages.PhysicalOrder"/> is set
+    /// (0.329 did this for the character's live bags only; a retainer showed nothing). The other containers follow, in slot order, 35 per
+    /// page. No stack is dropped.
+    /// </summary>
+    public static DisplayPages Pages(IEnumerable<InventoryContainerSnapshot> source)
+    {
+        var copied = source.OrderBy(container => container.Location.Container.Value).ToArray();
+        var pages = new List<DisplayPage>();
+        var physical = false;
+        var bags = copied.Where(container => HasBagLayout(container.Location.Container.Value)).ToArray();
+        if (bags.Length > 0)
+        {
+            IReadOnlyList<InventoryStack?[]>? layout;
+            try { layout = Build(bags); }
+            catch (InvalidOperationException) { layout = null; }
+            if (layout is not null)
+            {
+                var coverage = Coverage(bags);
+                foreach (var page in layout)
+                    pages.Add(new(pages.Count + 1, new InventoryContainerSnapshot(bags[0].Location, coverage,
+                        page.Select((stack, index) => (stack, index)).Where(pair => pair.stack.HasValue)
+                            .Select(pair => pair.stack!.Value with { Slot = pair.index }))));
+            }
+            else
+            {
+                physical = true;
+                for (var index = 0; index < bags.Length; index++)
+                    if (bags[index].Coverage != InventoryCoverage.Unknown) pages.Add(new(index + 1, bags[index]));
+            }
+        }
+        var others = copied.Where(container => !HasBagLayout(container.Location.Container.Value)).ToArray();
+        if (others.Length > 0)
+        {
+            var stacks = others.SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();
+            var coverage = Coverage(others);
+            var first = pages.Count == 0 ? 0 : pages.Max(page => page.Number);
+            for (var page = 0; page * 35 < stacks.Length; page++)
+                pages.Add(new(first + page + 1, new InventoryContainerSnapshot(others[0].Location, coverage,
+                    stacks.Skip(page * 35).Take(35).Select((stack, index) => stack with { Slot = index, DisplayIndex = -1 }))));
+        }
+        return new(pages, physical);
+    }
+
+    private static InventoryCoverage Coverage(IEnumerable<InventoryContainerSnapshot> containers) =>
+        containers.All(container => container.Coverage == InventoryCoverage.Complete) ? InventoryCoverage.Complete : InventoryCoverage.Partial;
+
     public static IReadOnlyList<InventoryStack?[]> Build(IEnumerable<InventoryContainerSnapshot> source)
     {
         var containers = source.OrderBy(container => container.Location.Container.Value).ToArray();

@@ -304,7 +304,7 @@ internal sealed partial class MainWindow
                 // 0.329: no grid while no bag is read (they would look like empty bags); one unread bag among read ones keeps the visual
                 // pages, which do not match physical bags.
                 if(bankOriginFilter is null && bankSourcePersonal.Any(container=>container.Coverage!=InventoryCoverage.Unknown))
-                    AddDisplayFrames(localization.Get("BankUi.Character"),bankSourcePersonal,groups,errors,live:true);
+                    AddDisplayFrames(localization.Get("BankUi.Character"),bankSourcePersonal,groups,errors);
                 if(!bankPersonalFilter)
                     foreach(var entry in selectedEntries)
                     {
@@ -329,46 +329,16 @@ internal sealed partial class MainWindow
         DrawInventoryFrames(bankFrameGroups);
     }
 
-    // live: the character's bags 0–3 read now (they cannot be reimported).
+    // X-275 (0.1285): the pages come from InventoryDisplayLayout.Pages (pure, tested): bags in the game's visual order, or in their slot
+    // order with a note when it cannot be used (0.329 for the live bags; a retainer then showed nothing), and the other containers of
+    // the storage (a retainer's gil and crystals, recorded since 0.767, which made its whole tab fail) in slot order after them.
     private void AddDisplayFrames(string name, IEnumerable<InventoryContainerSnapshot> containers,
-        List<(string Name, InventoryContainerSnapshot Container)> frames,List<string> errors,bool live=false)
+        List<(string Name, InventoryContainerSnapshot Container)> frames,List<string> errors)
     {
-        var copied = containers.ToArray();
-        if (copied.Length == 0) return;
-        try
-        {
-            var pages = InventoryDisplayLayout.Build(copied);
-            for (var page = 0; page < pages.Count; page++)
-            {
-                var positioned = pages[page].Select((stack, index) => (stack, index))
-                    .Where(pair => pair.stack.HasValue)
-                    .Select(pair => pair.stack!.Value with { Slot = pair.index });
-                frames.Add((localization.Format("BankUi.Bag",name,page+1), new InventoryContainerSnapshot(
-                    copied[0].Location, copied.All(c => c.Coverage == InventoryCoverage.Complete)
-                        ? InventoryCoverage.Complete : InventoryCoverage.Partial, positioned)));
-            }
-        }
-        catch (InvalidOperationException) when (copied.All(container => InventoryDisplayLayout.HasNoBagLayout(container.Location.Container.Value)))
-        {
-            // Armoury chest, glamour dresser, armoire (0.237) and company chest (0.463) have no bag layout: their pieces in order, 35 per page (5 × 7).
-            var stacks = copied.OrderBy(container => container.Location.Container.Value).SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();
-            var coverage = copied.All(c => c.Coverage == InventoryCoverage.Complete) ? InventoryCoverage.Complete : InventoryCoverage.Partial;
-            for (var page = 0; page * 35 < stacks.Length; page++)
-                frames.Add((localization.Format("BankUi.Bag", name, page + 1), new InventoryContainerSnapshot(copied[0].Location, coverage,
-                    stacks.Skip(page * 35).Take(35).Select((stack, index) => stack with { Slot = index, DisplayIndex = -1 }))));
-        }
-        catch (InvalidOperationException) when (live && copied.All(container => container.Location.Container.Value is >= 0 and <= 3))
-        {
-            // 0.329: the game's visual order of the live bags can be unreadable (a game sort running, a game update): their known
-            // contents are shown anyway, one page per read bag in its own slot order (35 slots), with a note.
-            errors.Add(localization.Format("BankUi.PhysicalOrder", name));
-            foreach (var container in copied.Where(bag => bag.Coverage != InventoryCoverage.Unknown))
-                frames.Add((localization.Format("BankUi.Bag", name, container.Location.Container.Value + 1), container));
-        }
-        catch (InvalidOperationException)
-        {
-            errors.Add(localization.Format("BankUi.Reimport",name));
-        }
+        var layout = InventoryDisplayLayout.Pages(containers);
+        if (layout.PhysicalOrder) errors.Add(localization.Format("BankUi.PhysicalOrder", name));
+        foreach (var page in layout.Pages)
+            frames.Add((localization.Format("BankUi.Bag", name, page.Number), page.Container));
     }
 
     private void DrawInventoryFrames(IReadOnlyList<(string Name, InventoryContainerSnapshot Container)> groups)

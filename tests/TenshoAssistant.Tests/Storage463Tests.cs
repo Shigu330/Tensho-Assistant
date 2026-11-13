@@ -12,7 +12,7 @@ internal static class Storage463Tests
             foreach(var id in new[]{20000,20004,22000,22001,3200,3500,25000})Check(InventoryDisplayLayout.HasNoBagLayout(id),"no layout: "+id);
             foreach(var id in new[]{0,3,4000,4100,10000,10006})Check(!InventoryDisplayLayout.HasNoBagLayout(id),"layout: "+id);
             var bank=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Bank.cs"));
-            Check(bank.Contains("when (copied.All(container => InventoryDisplayLayout.HasNoBagLayout(container.Location.Container.Value)))"),"used by the page");
+            Check(bank.Contains("var layout = InventoryDisplayLayout.Pages(containers);"),"used by the page (X-275: through Pages)");
         }),
     ];
 }

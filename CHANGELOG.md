@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1285.0
+- Plan global, X-275 : Banque : les sacs d'un servant s'affichent de nouveau. Depuis 0.767, ses gils (12000) et ses cristaux (12001) sont relevés avec ses pages ; sans position dans l'ordre visuel du jeu, ils faisaient échouer toute la mise en page (« ordre visuel indisponible, réimportez le rangement ouvert ») et l'onglet ne montrait rien. La mise en page passe par InventoryDisplayLayout.Pages (pure, testée) : les sacs suivent l'ordre visuel du jeu, les autres conteneurs du rangement viennent après dans l'ordre des emplacements ; si l'ordre visuel est inutilisable, chaque sac lu s'affiche dans l'ordre de ses emplacements avec la note, pour un servant comme pour les sacs du personnage (0.329). Le message « réimportez » est retiré.
+- Pour les joueurs : Banque : les sacs d'un servant s'affichent de nouveau après l'avoir lu à la cloche ; ses gils et cristaux apparaissent sur une page après ses sacs.
+- Tests : RetainerPages1285Tests. Verify.ps1 (agent) : 2358/2358, 0 avertissement, 0 erreur ; DLL 0.1285.0.0. Non validé en jeu.
+### English
+- Bank: a retainer's bags are shown again. Since 0.767 its gil (12000) and crystals (12001) are recorded with its pages; having no position in the game's visual order, they failed the whole layout (« visual order unavailable, reimport the open storage ») and the tab showed nothing. The layout now goes through InventoryDisplayLayout.Pages (pure, tested): bags follow the game's visual order, the storage's other containers follow in slot order; when the visual order cannot be used, each read bag is shown in its own slot order with the note, for a retainer as for the character's bags (0.329). The « reimport » message is removed.
+- For players: Bank: a retainer's bags show again after reading it at the summoning bell; its gil and crystals appear on a page after the bags.
+
 ## 0.1284.0
 - Outillage : budget de taille de GLOBAL-PLAN relevé de 250 à 300 Ko (deux langues) : les points ouverts ajoutés le 13/11 (X-273 à X-285, demandes de l'utilisateur et constats des essais du soir) gardent leur texte entier, comme prévu ; 255 Ko mesurés avec eux. Cellule de X-01 résumée (historique dans le CHANGELOG).
 - Tests : PlanCompact1092Tests. Verify.ps1 (agent) : 2354/2354, 0 avertissement, 0 erreur ; DLL 0.1284.0.0. Rien à essayer en jeu.

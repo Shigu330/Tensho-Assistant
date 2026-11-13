@@ -4285,7 +4285,6 @@
     "Frame": "{0}{2} ({1})",
     "ExpiredSuffix": " · expired",
     "Bag": "Bag {1} · {0}",
-    "Reimport": "{0}: visual order unavailable. Reimport the open storage.",
     "Refresh": "Refresh: {0}",
     "Cache": "Cache: {0}",
     "CategoryTip": "Shows only items of this game category; the list offers only the categories found in the current tab.",
