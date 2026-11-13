@@ -50,6 +50,7 @@
     <Compile Include="../../src/TenshoAssistant/Credits/CreditCatalog.cs" Link="Credits/CreditCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Alarms/DiscordNotifier.cs" Link="Alarms/DiscordNotifier.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapCatalog.cs" Link="Maps/MapCatalog.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/BuiltOnce.cs" Link="Maps/BuiltOnce.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/VistaLogNumbers.cs" Link="Maps/VistaLogNumbers.cs" />

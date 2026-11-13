@@ -52,7 +52,8 @@ internal sealed partial class MainWindow
         var selected=requestedSettingsTab==key;
         if(!ImGui.BeginTabItem(localization.Get("SettingsSections."+key)+"###Settings"+key,selected ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None))return;
         if(selected)requestedSettingsTab=null;
-        try{draw();}
+        // X-01 C5 (0.1206, analysis of 12/11: « page Settings 2 099 ms », no tab timed): each tab timed in developer mode (Slow frame line).
+        try{if(DeveloperMode)MeasureMap("settings "+key,draw);else draw();}
         finally{ImGui.EndTabItem();}
     }
 

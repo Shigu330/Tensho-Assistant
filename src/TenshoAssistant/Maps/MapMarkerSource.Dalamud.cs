@@ -31,7 +31,30 @@ internal sealed class MapMarkerSource
     private List<uint>? regionOrder;
     private uint worldMap;
     private uint firstWorldMap;
-    public MapMarkerSource(IDataManager data,IPluginLog log){this.data=data;this.log=log;}
+    public MapMarkerSource(IDataManager data,IPluginLog log)
+    {
+        this.data=data;this.log=log;
+        namedMaps=new(BuildNamedMaps);aetheryteRows=new(BuildAetherytes);
+        aetheryteNames=new(()=>Aetherytes.GroupBy(row=>row.Id).ToDictionary(group=>group.Key,group=>group.First().Name));
+    }
+
+    /// <summary>
+    /// X-01 C5 (0.1206, analysis of 12/11: the first region map took 1 311 ms on the game's thread): the names of every map and the aetheryte
+    /// rows, built off the frame some seconds after loading (Plugin.cs), so the first region map only reads them. Each is built once
+    /// (<see cref="BuiltOnce{T}"/>): a frame that needs one meanwhile waits for it instead of building it again. A failure here is only said:
+    /// the frame builds it when it needs it, as before.
+    /// </summary>
+    public void Warm(CancellationToken token)
+    {
+        try
+        {
+            if(token.IsCancellationRequested)return;
+            _=namedMaps.Value;
+            if(token.IsCancellationRequested)return;
+            _=aetheryteNames.Value;
+        }
+        catch(Exception error){log.Warning(error,"The map names could not be prepared ahead; they are read when a map needs them.");}
+    }
     /// <summary>True when the fixed markers of this range could not be read (For then returns an empty list).</summary>
     public bool Failed(uint range)=>failed.Contains(range);
     public IReadOnlyList<MapIconMarker> For(uint range)
@@ -47,28 +70,27 @@ internal sealed class MapMarkerSource
         try{return range==0 ? []:Copy(range).Where(marker=>marker.Shown.Length>0).ToArray();}
         catch(Exception error){log.Warning(error,"Map markers unavailable for range {0}.",range);return [];}
     }
-    private (Dictionary<uint,(uint Map,uint Range)> ByPlace,Dictionary<string,(uint Map,uint Range)> ByName)? namedMaps;
-    private readonly object namedMapsLock=new();
+    private sealed record NamedMapIndex(Dictionary<uint,(uint Map,uint Range)> ByPlace,Dictionary<string,(uint Map,uint Range)> ByName);
+    // X-01 C5 (0.1206): built once, off the frame after loading (Warm) or by the first who needs it; read off the frame too (Read).
+    private readonly BuiltOnce<NamedMapIndex> namedMaps;
     // 0.639: the map such a marker names: by its place's row, then by the same text (Vallée des Pampas: rows 4918 and 4926). Also read off the frame: Read.
     private uint NamedMap(uint icon,uint dataType,uint place,string label,uint range)
     {
         if(label.Length==0 || !MapLabels.OpensNamedMap(icon,dataType))return 0;
-        lock(namedMapsLock)
+        var named=namedMaps.Value;
+        // A marker named like its own map leads nowhere.
+        return (named.ByPlace.TryGetValue(place,out var found) || named.ByName.TryGetValue(label,out found)) && found.Range!=range ? found.Map:0;
+    }
+    private NamedMapIndex BuildNamedMaps()
+    {
+        var byPlace=new Dictionary<uint,(uint Map,uint Range)>();var byName=new Dictionary<string,(uint Map,uint Range)>(StringComparer.OrdinalIgnoreCase);
+        foreach(var row in data.GetExcelSheet<Map>())
         {
-            if(namedMaps is null)
-            {
-                var byPlace=new Dictionary<uint,(uint Map,uint Range)>();var byName=new Dictionary<string,(uint Map,uint Range)>(StringComparer.OrdinalIgnoreCase);
-                foreach(var row in data.GetExcelSheet<Map>())
-                {
-                    if(row.TerritoryType.RowId==0 || row.SizeFactor==0 || row.PlaceName.RowId==0)continue;
-                    byPlace.TryAdd(row.PlaceName.RowId,(row.RowId,row.MapMarkerRange));
-                    byName.TryAdd(row.PlaceName.Value.Name.ExtractText(),(row.RowId,row.MapMarkerRange));
-                }
-                namedMaps=(byPlace,byName);
-            }
-            // A marker named like its own map leads nowhere.
-            return (namedMaps.Value.ByPlace.TryGetValue(place,out var found) || namedMaps.Value.ByName.TryGetValue(label,out found)) && found.Range!=range ? found.Map:0;
+            if(row.TerritoryType.RowId==0 || row.SizeFactor==0 || row.PlaceName.RowId==0)continue;
+            byPlace.TryAdd(row.PlaceName.RowId,(row.RowId,row.MapMarkerRange));
+            byName.TryAdd(row.PlaceName.Value.Name.ExtractText(),(row.RowId,row.MapMarkerRange));
         }
+        return new(byPlace,byName);
     }
     private IReadOnlyList<MapIconMarker> Copy(uint range)
     {
@@ -126,29 +148,22 @@ internal sealed class MapMarkerSource
         return regionMaps!.GetValueOrDefault(map.RegionPlaceId);
     }
     public MapDefinition? Overview(uint mapId){LoadOverviews();return overviews!.GetValueOrDefault(mapId);}
-    private IReadOnlyList<AetheryteRow>? aetherytes;
-    private Dictionary<uint,string>? aetheryteNames;
+    // X-01 C5 (0.1206): both built once (BuiltOnce): the frame, the work off the frame (Read) and the warm-up may ask at the same time.
+    private readonly BuiltOnce<IReadOnlyList<AetheryteRow>> aetheryteRows;
+    private readonly BuiltOnce<Dictionary<uint,string>> aetheryteNames;
     /// <summary>X-138 (0.1166): an aetheryte's name (its place, or its aethernet name for a shard); empty when unknown.</summary>
-    private string AetheryteName(uint id)
-    {
-        var names=aetheryteNames ??= Aetherytes.GroupBy(row=>row.Id).ToDictionary(group=>group.Key,group=>group.First().Name);
-        return names.GetValueOrDefault(id,"");
-    }
+    private string AetheryteName(uint id)=>aetheryteNames.Value.GetValueOrDefault(id,"");
     /// <summary>0.833 (X-63): every Aetheryte row, main or aethernet shard, with its Level position; copied once, empty when the read fails.</summary>
-    public IReadOnlyList<AetheryteRow> Aetherytes
+    public IReadOnlyList<AetheryteRow> Aetherytes=>aetheryteRows.Value;
+    private IReadOnlyList<AetheryteRow> BuildAetherytes()
     {
-        get
-        {
-            if(aetherytes is not null)return aetherytes;
             try
             {
-                aetherytes=data.GetExcelSheet<Aetheryte>().Where(row=>row.Territory.RowId!=0).Select(row=>new AetheryteRow(row.RowId,row.IsAetheryte,row.AethernetGroup,row.Territory.RowId,
+                return data.GetExcelSheet<Aetheryte>().Where(row=>row.Territory.RowId!=0).Select(row=>new AetheryteRow(row.RowId,row.IsAetheryte,row.AethernetGroup,row.Territory.RowId,
                     (row.IsAetheryte ? row.PlaceName.ValueNullable?.Name.ExtractText():row.AethernetName.ValueNullable?.Name.ExtractText()) ?? "",
                     row.Level[0].ValueNullable is { } level ? new System.Numerics.Vector3(level.X,level.Y,level.Z):null)).ToArray();
             }
-            catch(Exception error){log.Warning(error,"Aetheryte rows unavailable.");aetherytes=[];}
-            return aetherytes;
-        }
+            catch(Exception error){log.Warning(error,"Aetheryte rows unavailable.");return [];}
     }
     /// <summary>One level up: zone → its region map, region → world map, world → none.</summary>
     public uint Parent(MapDefinition map)

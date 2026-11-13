@@ -8,7 +8,7 @@ internal static class CurrencyValue695Tests
     [
         ("Currency value: its own tab, gone from under the currencies",() =>
         {
-            Check(Read("MainWindow.Storage.cs").Contains("DrawCurrencyValueTab();"),"tab");
+            Check(Read("MainWindow.Storage.cs").Contains("MeasureMap(\"storage currency value\", DrawCurrencyValueTab);"),"tab (0.1206: timed)");
             Check(!Read("MainWindow.Currencies.cs").Contains("DrawCurrencyValue();"),"not under the table");
         }),
         ("Currency value: prices follow the choice, under the source switch, an item is asked once, and a failure shows",() =>

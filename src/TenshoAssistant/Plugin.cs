@@ -32,6 +32,8 @@ public sealed class Plugin : IDalamudPlugin
     private readonly IPluginLog log;
     // X-92 (0.972): the game data check after a game update, cancelled when the plugin unloads.
     private readonly CancellationTokenSource gameDataCancel=new();
+    /// <summary>X-01 C5 (0.1206): when the map names are built off the frame, after the loading's own work (readers ready about 9 s after).</summary>
+    internal static readonly TimeSpan MapMarkersWarmDelay=TimeSpan.FromSeconds(12);
     private readonly LocalizationManager localization;
     private readonly MainWindow mainWindow;
     private MapViewWindow? mapWindow;
@@ -373,7 +375,15 @@ public sealed class Plugin : IDalamudPlugin
             var mapLocal=new Maps.MapLocalIndexService();
             Maps.MapLocalIndexLoader? mapLocalLoader=null;
             registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
-            mainWindow.ConfigureMapView(mapLive!,new Maps.MapMarkerSource(data,log),mapLocal);
+            var mapMarkers=new Maps.MapMarkerSource(data,log);
+            mainWindow.ConfigureMapView(mapLive!,mapMarkers,mapLocal);
+            // X-01 C5 (0.1206): the names of every map and the aetheryte rows built off the frame once the loading's own work is done, so the
+            // first region map only reads them (it took 1 311 ms on the game's thread); stopped with the plugin.
+            _=Task.Run(async()=>
+            {
+                try{await Task.Delay(MapMarkersWarmDelay,gameDataCancel.Token).ConfigureAwait(false);mapMarkers.Warm(gameDataCancel.Token);}
+                catch(OperationCanceledException){}
+            });
             var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandItemSources)};
             registrations.Register(()=>{},itemSources.Dispose);
             mainWindow.ConfigureItemSources(itemSources);
