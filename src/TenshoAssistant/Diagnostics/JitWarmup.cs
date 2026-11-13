@@ -51,12 +51,34 @@ public sealed class JitWarmup : IDisposable
     /// panels' 391 methods with their direct callees are 1604, with the next level 3688, then up to 12 762 (the window's code calls itself
     /// from one method to the next); in the game a method takes about 1.1 ms to compile (1894 in 2205 ms), so 2000 fit in the bound.</summary>
     public const int FirstCap=2000;
+    /// <summary>X-01 (0.1282): at most this many methods of the main window's frame and first page with what they call, after the panels'.</summary>
+    public const int WindowCap=1500;
+    /// <summary>X-01 (0.1282): methods of the window's part compiled (those the panels' part had not taken), and when (ms after the warm-up was made; -1 before).</summary>
+    public int WindowPartMethods{get;private set;}
+    public double WindowReadyAfter{get;private set;}=-1;
+
+    /// <summary>X-01 (0.1282): the main window's frame (its draw, navigation, help banner) and the page it opens on (Home), lambdas included.
+    /// A test checks that each name is still declared in the sources.</summary>
+    public static readonly IReadOnlyList<string> WindowMethods=["PreDraw","PostDraw","Draw","DrawMain","DrawNavigation","DrawNavigationPopup","DrawPageHelpButton",
+        "DrawCategoryNavigation","DrawHelpBanner","DrawHome","DrawHomeToday","DrawHomeTiles","DrawHomeAlerts","DrawHomeNextDeadline","DrawHomeCustomize"];
+    /// <summary>X-01 (0.1282): a method of the main window's frame or of its first page (see <see cref="WindowMethods"/>).</summary>
+    public static bool WindowFirst(MethodBase method)
+    {
+        var inWindow=false;
+        for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow"){inWindow=true;break;}
+        if(!inWindow)return false;
+        var name=method.Name;
+        foreach(var window in WindowMethods)
+            if(name==window || name.Contains("<"+window+">",StringComparison.Ordinal))return true;
+        return false;
+    }
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart)
     {
         var token=cancellation.Token;
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -68,8 +90,8 @@ public sealed class JitWarmup : IDisposable
     /// at most: the runtime compiles one method at a time for the plugin, so what the game's thread needs sooner is compiled first.</param>
     /// <param name="firstPart">X-01 (0.1279): with <paramref name="early"/>, the methods compiled before the rest of the early part, together
     /// with what they call in the plugin (<see cref="CallGraph.Closure"/>); <see cref="FirstPartDone"/> tells when.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart);
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -247,7 +269,7 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,CancellationToken token)
     {
         try
         {
@@ -258,6 +280,7 @@ public sealed class JitWarmup : IDisposable
             var types=roots();
             var methods=Methods(types);
             // X-01 (0.1279): the panels' code first, with what it calls in the plugin and the generic code made for its types.
+            var compiled=new HashSet<MethodBase>();
             if(early is not null && firstPart is not null && types.Count>0)
             {
                 var part=CallGraph.Closure(methods.Where(firstPart),types[0].Assembly,FirstCap,()=>token.IsCancellationRequested);
@@ -265,14 +288,28 @@ public sealed class JitWarmup : IDisposable
                 foreach(var method in part)
                 {
                     if(token.IsCancellationRequested)return;
+                    compiled.Add(method);
                     if(CallGraph.Prepare(method))Prepared++;else Skipped++;
                 }
                 FirstPrepared=Prepared;
                 FirstReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
-                var compiled=new HashSet<MethodBase>(part);
-                methods=[..methods.Where(method=>!compiled.Contains(method))];
             }
             firstPartDone=true;
+            // X-01 (0.1282): then the main window's frame and its first page, with what they call: the window open at a load (or soon after)
+            // drew a first frame of 401 to 412 ms (page Home 182 to 204 ms) when its code waited for the warm-up's rest (13/11, 21:14 and 21:21).
+            if(early is not null && windowPart is not null && types.Count>0)
+            {
+                var part=CallGraph.Closure(methods.Where(windowPart),types[0].Assembly,WindowCap+compiled.Count,()=>token.IsCancellationRequested);
+                foreach(var method in part)
+                {
+                    if(token.IsCancellationRequested)return;
+                    if(!compiled.Add(method))continue;
+                    WindowPartMethods++;
+                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                }
+                WindowReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
+            }
+            if(compiled.Count>0)methods=[..methods.Where(method=>!compiled.Contains(method))];
             var earlyCount=early is null ? 0:methods.Count(early);
             var index=0;
             foreach(var method in early is null ? methods:EarlyFirst(methods,early))

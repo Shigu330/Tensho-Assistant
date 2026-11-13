@@ -182,11 +182,13 @@ internal sealed partial class MainWindow : Window, IDisposable
         };
         // X-01 (0.1050): the window's code compiled ahead off the frame (Diagnostics/JitWarmup.cs): the first frame of a page was mostly JIT.
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
-            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first.")),
+            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms.")),
             // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
             holdRest: static ()=>TenshoAssistant.Competitive.CompetitiveGate.CompilerBusy,
             // X-01 (0.1279): the free panels' and the bars' code first, with what it calls: they wait for it (PanelGate).
             firstPart: Diagnostics.JitWarmup.OverlayFirst,
+            // X-01 (0.1282): then the window's frame and its first page, with what they call.
+            windowPart: Diagnostics.JitWarmup.WindowFirst,
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
