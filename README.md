@@ -21,7 +21,7 @@ game up to date.
 Questions: [docs/FAQ.md](docs/FAQ.md) (the same as the plugin's Help page), or ask in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a). Building from source
 and development builds: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-These documents were produced for version <!-- docgen:version -->0.1284<!-- /docgen:version -->. What changed in each version is in
+These documents were produced for version <!-- docgen:version -->0.1289<!-- /docgen:version -->. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
 
@@ -214,7 +214,7 @@ le jeu à jour.
 Questions : [docs/FAQ.md](docs/FAQ.md) (les mêmes que la page Aide du plugin), ou posez-la dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a).
 Compiler depuis les sources et versions de développement : [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Ces documents ont été produits pour la version <!-- docgen:version -->0.1284<!-- /docgen:version -->. Les changements de chaque version sont dans
+Ces documents ont été produits pour la version <!-- docgen:version -->0.1289<!-- /docgen:version -->. Les changements de chaque version sont dans
 [CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).
 
