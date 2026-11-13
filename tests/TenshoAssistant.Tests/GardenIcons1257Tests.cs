@@ -54,7 +54,7 @@ internal static class GardenIcons1257Tests
         {
             var cell=Between(Read("src/TenshoAssistant/UI/Components/ItemCell.cs"),"private bool DrawItemIconOrText(","\n    }");
             Check(cell.Contains("ImGui.InvisibleButton(\"##ItemIconOrText\",size)") && cell.Contains("ImGui.GetWindowDrawList().AddImage(texture.Handle,ImGui.GetItemRectMin(),ImGui.GetItemRectMax());"),"the icon on a button of its size");
-            Check(cell.Contains("if(itemIconWait.ShowText(iconId,false,frame))") && cell.Contains("ImGui.Selectable(name+\"##ItemIconOrText\")") && cell.Contains("itemIconWait.ShowText(iconId,true,frame);"),"the wait decides, and starts again once drawn");
+            Check(cell.Contains("if(itemIconWait.ShowText(iconId,false,frame))") && cell.Contains("ImGui.Selectable(name+\"##ItemIconOrText\",false,ImGuiSelectableFlags.None,new Vector2(ImGui.CalcTextSize(name).X,0))") && cell.Contains("itemIconWait.ShowText(iconId,true,frame);"),"the wait decides, and starts again once drawn");
         }),
         ("Garden icons 1257: texts in both languages, the page's help and a FAQ entry",() =>
         {

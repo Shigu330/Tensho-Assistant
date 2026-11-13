@@ -6203,6 +6203,12 @@
     "Logged": "Escouade écrite dans le journal de Dalamud."
   },
   "Garden": {
+    "CrossWith": "Avec la parcelle {0} ({1})",
+    "CrossWished": "Dans votre liste de souhaits",
+    "CrossNotOwned": "Pas possédé (sacs et stocks lus)",
+    "CrossOwned": "Possédé : {0}",
+    "CrossUnknown": "Possession inconnue : inventaires pas encore lus",
+    "CrossForecast": "Prévision, non vérifiée en jeu",
     "DetailedView": "Vue détaillée",
     "DetailedViewTip": "Montre chaque parcelle en texte (graine, dates, croisements) au lieu des icônes. Plus pratique à la manette.\nPar défaut : désactivé.",
     "EmptyBed": "Parcelle {0} : vide",

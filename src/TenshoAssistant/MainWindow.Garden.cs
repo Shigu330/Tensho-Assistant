@@ -156,9 +156,14 @@ internal sealed partial class MainWindow
                 ImGui.SameLine();
                 ImGui.PushID($"TendPatch{zone}{patch}");
                 DesktopEditBegin();
-                try{if(ImGui.SmallButton(localization.Get("Garden.TendPatch"))){foreach(var (_,bed) in planted)if(GardenJournal.TendAt(bed) is not null)GardenJournal.Tend(bed,now);changed=true;}}
+                try
+                {
+                    // X-178 (0.1259): an icon button in the icon view (its tooltip says what it does), the words in the detailed view.
+                    var tendAll=configuration.GardenDetailedView ? ImGui.SmallButton(localization.Get("Garden.TendPatch")):ToolButton(Dalamud.Interface.FontAwesomeIcon.CheckDouble,"Garden.TendPatchTip",true);
+                    if(configuration.GardenDetailedView)Tip("Garden.TendPatchTip");
+                    if(tendAll){foreach(var (_,bed) in planted)if(GardenJournal.TendAt(bed) is not null)GardenJournal.Tend(bed,now);changed=true;}
+                }
                 finally{DesktopEditEnd();ImGui.PopID();}
-                Tip("Garden.TendPatchTip");
             }
             // X-130 (0.1109): what each planted bed may give, by the wiki's rule and the community pairs (null until the pairs are read).
             var forecasts=GardenGridForecasts(planted);
@@ -189,6 +194,8 @@ internal sealed partial class MainWindow
             ImGui.PushID(bed.Id.ToString());
             try
             {
+                // X-178 (0.1259): a pot or a place typed by hand: the seed's small icon before its name (icon view, when the seed is known).
+                if(!configuration.GardenDetailedView && GardenSeedItem(bed) is { } potSeed){DrawItemIcon(potSeed,new System.Numerics.Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();}
                 ImGui.TextColored(GardenColor(GardenJournal.State(bed,now)),bed.Seed);
                 ImGui.SameLine();
                 ImGui.TextUnformatted(bed.Place);

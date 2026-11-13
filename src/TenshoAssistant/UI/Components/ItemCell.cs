@@ -79,7 +79,8 @@ internal sealed partial class MainWindow
         {
             asIcon=false;
             ImGui.PushStyleColor(ImGuiCol.Text,colour);
-            try{return ImGui.Selectable(name+"##ItemIconOrText");}
+            // As wide as the name: several of them can share a line.
+            try{return ImGui.Selectable(name+"##ItemIconOrText",false,ImGuiSelectableFlags.None,new Vector2(ImGui.CalcTextSize(name).X,0));}
             finally{ImGui.PopStyleColor();}
         }
         asIcon=true;

@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
                 DrawGardenIconButtons(bed,now,ref changed,ref removed);
             }
             finally{ImGui.EndGroup();}
-            if(forecasts?.FirstOrDefault(forecast=>forecast.Bed==number) is { } forecast)DrawGardenForecast(forecast,planted);
+            if(forecasts?.FirstOrDefault(forecast=>forecast.Bed==number) is { } forecast)DrawGardenCrossIcons(forecast,planted);
         }
         finally{ImGui.PopID();}
     }
@@ -159,6 +159,106 @@ internal sealed partial class MainWindow
                 else ImGui.TextUnformatted(localization.Format("Garden.TipTendAt",when));
             }
             if(item is not null)ImGui.TextDisabled(localization.Get("Garden.TipClick"));
+        }
+    }
+
+    /// <summary>The most crossbreed icons shown under a bed; the others are counted (« +N », named in its tooltip).</summary>
+    private const int GardenCrossIconsShown=4;
+
+    /// <summary>
+    /// X-178 (0.1259): what a planted bed may give, under it: one small icon per possible seed (a star: on the wishlist; a disc: not held in
+    /// the bags and storages read), each with its tooltip and menu; a crossed circle when no neighbour was compatible, a question mark when
+    /// a seed is not in the pairs. A forecast, never a result read from the game.
+    /// </summary>
+    private void DrawGardenCrossIcons(GardenForecast forecast,IReadOnlyList<(int Number,GardenBed Bed)> planted)
+    {
+        var side=ImGui.GetFrameHeight();
+        string Name(uint id)=>gardenForecastIndex?.Names.TryGetValue(id,out var name)==true && name.Length>0 ? name:"#"+id;
+        string BedSeed(int? number)=>planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
+        switch(forecast.Kind)
+        {
+            case GardenForecastKind.Crosses:
+                RefreshRecipeHoldingsCache();
+                var shown=Math.Min(forecast.Outcomes.Count,GardenCrossIconsShown);
+                for(var index=0;index<shown;index++)
+                {
+                    var seed=forecast.Outcomes[index];
+                    if(index>0)ImGui.SameLine();
+                    ImGui.PushID((int)seed);
+                    try
+                    {
+                        var item=itemCatalog.State.Catalog?.Find(seed);
+                        var holdings=GetRecipeHoldings(seed);
+                        var wished=configuration.Wishlist?.Contains(seed)==true;
+                        var clicked=DrawItemIconOrText(item,new Vector2(side),Name(seed),Text,out var asIcon);
+                        var hovered=ImGui.IsItemHovered();
+                        var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();
+                        if(item is not null)ItemLinksMenu(UniqueMenuId($"GardenCross{seed}"),item);
+                        if(clicked)SelectItem(seed);
+                        if(hovered)DrawGardenCrossTooltip(item,Name(seed),forecast.Partner ?? 0,BedSeed(forecast.Partner),wished,holdings.HasObservation,holdings.Total);
+                        if(asIcon)DrawGardenCrossMark(GardenView.Mark(wished,holdings.HasObservation,holdings.Total),min,max);
+                    }
+                    finally{ImGui.PopID();}
+                }
+                if(forecast.Outcomes.Count>shown)
+                {
+                    ImGui.SameLine();
+                    ImGui.AlignTextToFramePadding();
+                    ImGui.TextDisabled("+"+(forecast.Outcomes.Count-shown).ToString(Numbers));
+                    TipText(string.Join(", ",forecast.Outcomes.Skip(shown).Select(Name)));
+                }
+                break;
+            case GardenForecastKind.NoPartner:DrawGardenCrossNote(FontAwesomeIcon.Ban,localization.Get("Garden.ForecastNone"));break;
+            case GardenForecastKind.UnknownSeed:DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get("Garden.ForecastUnknownSeed"));break;
+            case GardenForecastKind.UnknownNeighbour:
+                DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));
+                break;
+        }
+    }
+
+    /// <summary>« No crossbreed » or « unknown »: a muted glyph the keyboard and the gamepad reach, the sentence in its tooltip.</summary>
+    private void DrawGardenCrossNote(FontAwesomeIcon icon,string text)
+    {
+        ImGui.InvisibleButton("##GardenCrossNote",new Vector2(ImGui.GetFrameHeight()));
+        TipText(text);
+        DrawGlyphIn(icon,ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),Muted,ImGui.GetFontSize()*0.85f);
+    }
+
+    /// <summary>The marks of a possible crossbreed: a star on the top right (wished), a disc on the top left (not held in what was read).</summary>
+    private void DrawGardenCrossMark(GardenCrossMark mark,Vector2 min,Vector2 max)
+    {
+        var side=max.X-min.X;
+        var draw=ImGui.GetWindowDrawList();
+        var background=ImGui.GetColorU32(UI.FfxivTheme.Background);
+        if(mark is GardenCrossMark.Wished or GardenCrossMark.WishedNotOwned)
+        {
+            var radius=MathF.Round(side*0.3f);
+            var centre=new Vector2(max.X-radius,min.Y+radius);
+            draw.AddCircleFilled(centre,radius,background);
+            DrawGlyphIn(FontAwesomeIcon.Star,centre-new Vector2(radius),centre+new Vector2(radius),Accent,radius*1.5f);
+        }
+        if(mark is GardenCrossMark.NotOwned or GardenCrossMark.WishedNotOwned)
+        {
+            var radius=MathF.Max(3,MathF.Round(side*0.2f));
+            var centre=new Vector2(min.X+radius,min.Y+radius);
+            draw.AddCircleFilled(centre,radius,ImGui.GetColorU32(Warning));
+            draw.AddCircle(centre,radius,background);
+        }
+    }
+
+    private void DrawGardenCrossTooltip(ItemDefinition? item,string name,int partner,string partnerSeed,bool wished,bool observed,long total)
+    {
+        using(TooltipScope.Begin())
+        {
+            if(item is not null){DrawItemIcon(item,new Vector2(32),false);ImGui.SameLine();}
+            ImGui.TextUnformatted(item?.Name ?? name);
+            ImGui.TextUnformatted(localization.Format("Garden.CrossWith",partner,partnerSeed));
+            if(wished)ImGui.TextUnformatted(localization.Get("Garden.CrossWished"));
+            // Held or not only in what was read (bags and storages); nothing read: said, never « not owned » (R06).
+            if(!observed)ImGui.TextDisabled(localization.Get("Garden.CrossUnknown"));
+            else if(total>0)ImGui.TextUnformatted(localization.Format("Garden.CrossOwned",total.ToString("N0",Numbers)));
+            else ImGui.TextColored(Warning,localization.Get("Garden.CrossNotOwned"));
+            ImGui.TextDisabled(localization.Get("Garden.CrossForecast"));
         }
     }
 }

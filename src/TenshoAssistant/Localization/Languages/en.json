@@ -6203,6 +6203,12 @@
     "Logged": "Squadron written to the Dalamud log."
   },
   "Garden": {
+    "CrossWith": "With bed {0} ({1})",
+    "CrossWished": "On your wishlist",
+    "CrossNotOwned": "Not owned (bags and storages read)",
+    "CrossOwned": "Owned: {0}",
+    "CrossUnknown": "Ownership unknown: inventories not read yet",
+    "CrossForecast": "Forecast, not checked in game",
     "DetailedView": "Detailed view",
     "DetailedViewTip": "Shows each bed as text (seed, dates, crossbreeds) instead of icons. Easier with a gamepad.\nDefault: off.",
     "EmptyBed": "Bed {0}: empty",
