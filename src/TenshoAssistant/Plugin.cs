@@ -732,6 +732,21 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // X-218 (0.1228): each character's job levels and gear sets kept in TenshoData.db at login and when they change (Storage › Characters).
+            var characterJobs=new Character.CharacterJobsData(tenshoData);
+            mainWindow.CharacterJobs=characterJobs;
+            var characterJobsWriter=new BackgroundWriter((error,message)=>log.Warning(error,message));
+            Character.CharacterJobs? lastCharacterJobs=null;
+            if(gameGearsets is not null)gameGearsets.Copied=read=>
+            {
+                var id=player.ContentId;
+                if(id==0)return;
+                var jobs=new Character.CharacterJobs(id,DateTimeOffset.UtcNow,new Dictionary<uint,int>(read.JobLevels),
+                    read.Sets.Select(set=>new Character.SavedGearset(set.Number,set.Name.Length>Character.CharacterJobsData.MaxName ? set.Name[..Character.CharacterJobsData.MaxName]:set.Name,set.Job,set.ItemLevel)).ToArray());
+                if(jobs.SameContent(lastCharacterJobs))return;
+                lastCharacterJobs=jobs;
+                characterJobsWriter.Enqueue("The job levels and gear sets of the character could not be saved.",()=>{if(characterJobs.Save(jobs))mainWindow.CharacterJobsChanged();});
+            };
             // 0.650 (phase 5): the in-game readings, in developer mode only. Temporary.
             Diagnostics.ReadingCapture? readingCapture=null;
             registrations.Register(()=>readingCapture=new Diagnostics.ReadingCapture(framework,objects,condition,gameGui,chat,()=>configuration.DeveloperMode,log),()=>readingCapture?.Dispose());

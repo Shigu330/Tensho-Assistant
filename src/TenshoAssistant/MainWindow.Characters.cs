@@ -37,6 +37,7 @@ internal sealed partial class MainWindow
     private void DrawCharactersTab()
     {
         ImGui.TextWrapped(localization.Get("CharactersUi.Help"));
+        RefreshCharacterJobs();
         var state=bank.State;
         if(state.Loading){ImGui.TextDisabled(localization.Get("BankUi.Loading"));return;}
         if(state.Error is { } error)DrawDataError(error,"ServiceErrors.Bank");
@@ -60,10 +61,10 @@ internal sealed partial class MainWindow
         if(characterSummaries.Length==0){ImGui.TextDisabled(localization.Get("CharactersUi.None"));return;}
         var current=bankBridge.State.CharacterId;
         if(characterEraseMessage is { } message)ImGui.TextColored(Accent,message);
-        if(!ImGui.BeginTable("Characters",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!ImGui.BeginTable("Characters",8,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
         try
         {
-            foreach(var column in new[]{"Name","Seen","Gil","Bags","Crystals","Retainers"})ImGui.TableSetupColumn(localization.Get("CharactersUi.Column"+column));
+            foreach(var column in new[]{"Name","Seen","Gil","Bags","Crystals","Retainers","Jobs"})ImGui.TableSetupColumn(localization.Get("CharactersUi.Column"+column));
             ImGui.TableSetupColumn("",ImGuiTableColumnFlags.WidthFixed);
             ImGui.TableHeadersRow();
             foreach(var summary in characterSummaries)
@@ -80,6 +81,7 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Items.ToString("N0",Numbers));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Crystals.ToString("N0",Numbers));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(summary.Retainers.ToString());
+                    ImGui.TableNextColumn();DrawCharacterJobsCell(summary.Id);
                     ImGui.TableNextColumn();
                     if(ImGui.SmallButton(localization.Get("CharactersUi.See"))){bankViewCharacter=summary.Id==current ? null:summary.Id;focusBankTab=true;}
                     Tip("CharactersUi.SeeTip");
@@ -96,7 +98,8 @@ internal sealed partial class MainWindow
                                 characterEraseArmed=0;
                                 if(bankViewCharacter==summary.Id)bankViewCharacter=null;
                                 var id=summary.Id;
-                                _=bank.EraseCharacterAsync(id).ContinueWith(task=>characterEraseMessage=task.Result.Message,TaskScheduler.Default);
+                                _=bank.EraseCharacterAsync(id).ContinueWith(task=>{characterEraseMessage=task.Result.Message;characterJobsStale=true;},TaskScheduler.Default);
+                                if(characterJobsShown==id)characterJobsShown=0;
                             }
                         }
                     }
@@ -108,6 +111,7 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
         if(characterEraseArmed!=0 && !characterSummaries.Any(summary=>summary.Id==characterEraseArmed))characterEraseArmed=0;
+        DrawCharacterJobsDetails(characterSummaries);
         ImGui.TextDisabled(localization.Get("CharactersUi.Privacy"));
     }
 }

@@ -53,6 +53,11 @@ public sealed class TenshoDataDatabase
             // row holds the entry as the bank file wrote it (JSON, same names and bounds), checked again when read.
             Run(open,"CREATE TABLE IF NOT EXISTS bank_entries(character INTEGER NOT NULL,kind INTEGER NOT NULL,storage INTEGER NOT NULL,seq INTEGER NOT NULL,"
                 +"entry TEXT NOT NULL,PRIMARY KEY(character,kind,storage)) WITHOUT ROWID;",transaction);
+            // 0.1228 (X-218): each character's job levels and gear sets as last read (Storage › Characters), replaced whole by a newer reading.
+            Run(open,"CREATE TABLE IF NOT EXISTS character_jobs(character INTEGER NOT NULL,job INTEGER NOT NULL,level INTEGER NOT NULL,seen_at INTEGER NOT NULL,"
+                +"PRIMARY KEY(character,job)) WITHOUT ROWID;",transaction);
+            Run(open,"CREATE TABLE IF NOT EXISTS character_gearsets(character INTEGER NOT NULL,number INTEGER NOT NULL,job INTEGER NOT NULL,item_level INTEGER NOT NULL,"
+                +"name TEXT NOT NULL,seen_at INTEGER NOT NULL,PRIMARY KEY(character,number)) WITHOUT ROWID;",transaction);
             if(version<Schema)Run(open,$"PRAGMA user_version={Schema};",transaction);
             transaction.Commit();
         }
@@ -103,7 +108,7 @@ public sealed class TenshoDataDatabase
 
     /// <summary>The SQLite library's version (for the log).</summary>
     /// <summary>X-185 (0.1211, N10): the tables that keep rows per character (« Erase this character » empties them all for one).</summary>
-    public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress"];
+    public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress","character_jobs","character_gearsets"];
 
     /// <summary>X-185 (0.1211, N10): one character's rows of every per-character table, in the caller's transaction.</summary>
     public static void EraseCharacter(SqliteConnection open,SqliteTransaction transaction,ulong character)

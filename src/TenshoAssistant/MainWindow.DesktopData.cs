@@ -60,6 +60,10 @@ internal sealed partial class MainWindow
                 UseDesktopVoyages(folder,warn);
                 UseDesktopBank(folder,warn);
                 UseDesktopAchievements(folder,warn);
+                // X-218 (0.1228): the job levels and gear sets of each character from the same copy (read only).
+                var jobsFile=Path.Combine(folder,TenshoDataDatabase.FileName);
+                CharacterJobs=File.Exists(jobsFile) ? new Character.CharacterJobsData(new TenshoDataFile(jobsFile,warn)):null;
+                characterJobsStale=true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(category),category,"not a category the desktop application reads");

@@ -10,7 +10,8 @@ namespace TenshoAssistant.Gear;
 /// ExpArrayIndex) every 2 seconds on the framework thread. Field reads only; a set is never changed. Cleared at logout; a failure is
 /// logged once and publishes nothing. 0.385 (g, X-08): <see cref="Equip"/> wears a set on the player's click only, through the game's
 /// EquipGearset (called only once resolved, the set checked with IsValidGearset, 2 seconds apart).
-/// </summary>
+/// X-218 (0.1228): with <see cref="Copied"/> set, the same reading is also made about 10 seconds after a login (or a load) and then every
+/// 5 minutes while logged in, and handed to it on the framework thread (kept per character for Storage › Characters).
 /// </summary>
 public sealed unsafe class GameGearsetReader : IDisposable
 {
@@ -30,6 +31,9 @@ public sealed unsafe class GameGearsetReader : IDisposable
     private int equipRequest=-1;
     private DateTimeOffset nextEquip;
     public GearsetState? State=>Volatile.Read(ref state);
+    /// <summary>X-218 (0.1228): called on the framework thread with each reading made for the copy at login (levels read).</summary>
+    public Action<GearsetState>? Copied { get; set; }
+    private DateTimeOffset nextCopy=DateTimeOffset.UtcNow.AddSeconds(10);
     /// <summary>Asks to wear the set of this game number (1-based) at the next framework update (player's click only).</summary>
     public void Equip(int number)=>Interlocked.Exchange(ref equipRequest,number-1);
 
@@ -64,7 +68,8 @@ public sealed unsafe class GameGearsetReader : IDisposable
             }
             catch(Exception error){log.Warning(error,"A gear set could not be worn.");}
         }
-        if(disposed || now<nextRead || now.UtcTicks>Volatile.Read(ref wantedUntil) || !client.IsLoggedIn)return;
+        var copyDue=Copied is not null && now>=nextCopy;
+        if(disposed || now<nextRead || now.UtcTicks>Volatile.Read(ref wantedUntil) && !copyDue || !client.IsLoggedIn)return;
         nextRead=now.AddSeconds(2);
         try
         {
@@ -106,19 +111,26 @@ public sealed unsafe class GameGearsetReader : IDisposable
             // X-76 (0.955): an unchanged copy keeps the published object (GearsetState in Gear/Gearsets.cs), so the pages' caches keyed on it stay.
             var next=new GearsetState(sets,levels,progress);
             if(!next.SameAs(Volatile.Read(ref state)))Volatile.Write(ref state,next);
+            if(copyDue)
+            {
+                // Levels not read yet (player still loading): tried again in 10 seconds.
+                nextCopy=now.AddSeconds(levels.Count>0 ? 300:10);
+                if(levels.Count>0)Copied?.Invoke(next);
+            }
             unavailable=false;
             warned=false;
         }
         catch(Exception error)
         {
             nextRead=now.AddSeconds(30);
+            nextCopy=now.AddMinutes(5);
             unavailable=true;
             Volatile.Write(ref state,null);
             if(!warned){warned=true;log.Warning(error,"The game's gear sets could not be read.");}
         }
     }
 
-    private void OnLogout(int type,int code){unavailable=false;Volatile.Write(ref state,null);}
+    private void OnLogout(int type,int code){unavailable=false;Volatile.Write(ref state,null);nextCopy=DateTimeOffset.UtcNow.AddSeconds(10);}
 
     public void Dispose()
     {

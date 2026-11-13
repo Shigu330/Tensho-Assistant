@@ -59,6 +59,9 @@ internal static class CharacterErase1212Tests
                 {
                     TenshoDataDatabase.Run(open,$"INSERT INTO gil_entries(character,seq,at,delta,balance,source,category) VALUES({character},1,1,10,10,0,0);");
                     TenshoDataDatabase.Run(open,$"INSERT INTO achievement_progress(character,achievement,current,max,seen_at) VALUES({character},7,1,5,1);");
+                    // 0.1228 (X-218): the job levels and gear sets are per character too.
+                    TenshoDataDatabase.Run(open,$"INSERT INTO character_jobs(character,job,level,seen_at) VALUES({character},19,100,1);");
+                    TenshoDataDatabase.Run(open,$"INSERT INTO character_gearsets(character,number,job,item_level,name,seen_at) VALUES({character},1,19,730,'{(character==5 ? Marker:"other")}',1);");
                 }
             Check(Holds(database,Marker) || Holds(database+"-wal",Marker),"the marker is in the data file before the erase");
             var left=store.Apply(new BankChange(Erase:5),store.Load());
