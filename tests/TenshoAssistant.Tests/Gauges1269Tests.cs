@@ -97,7 +97,7 @@ internal static class Gauges1269Tests
         ("Gauges 1269: wiring: one reading, a point every ten seconds, gauges only inside the opened dashboard, texts in both languages",() =>
         {
             var page=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
-            Check(page.Contains("internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();SampleDashboardHistory();}"),"ticked with the dashboard");
+            Check(page.Contains("internal void TickDashboard(){if(!DashboardStarted)return;if(DashboardWanted)RefreshDashboard();SampleDashboardHistory();}"),"ticked with the dashboard");
             var sample=page[page.IndexOf("private void SampleDashboardHistory()",StringComparison.Ordinal)..page.IndexOf("private const long DashboardStartDelayMs",StringComparison.Ordinal)];
             Check(sample.Contains("if(!DashboardStarted || !dashboardHistory.Due(now))return;") && sample.Contains("RefreshDashboard();") && !sample.Contains("DashboardInputs()"),"after the start delay, when due, from the dashboard's own reading");
             Check(sample.Contains("dashboardSampleMs=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;"),"the cost of a point is timed");

@@ -45,7 +45,9 @@ internal sealed partial class MainWindow
 
     /// <summary>X-165 (0.1245): called by the plugin's draw in every frame; reads the measures (once a second) only while one of their readers
     /// is on: the server bar entry, the panel (0.1246) or the link with the desktop application (0.1246).</summary>
-    internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();SampleDashboardHistory();}
+    // 0.1274: nothing of the dashboard is called before the start delay, so none of its code is compiled on the first frames after a
+    // load (the history's sampling, called there since 0.1269 only to return at once, cost 3 to 6 ms of the first frame: « StateBar »).
+    internal void TickDashboard(){if(!DashboardStarted)return;if(DashboardWanted)RefreshDashboard();SampleDashboardHistory();}
 
     // X-264 (0.1269): one point of history every ten seconds, from the same reading as the dashboard (never a second way to measure);
     // after the same 20 s as the first reading. Its own cost is timed and shown in developer mode.
