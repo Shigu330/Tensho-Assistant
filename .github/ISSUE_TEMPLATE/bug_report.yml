@@ -5,13 +5,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for the report. Please check the [open issues](https://github.com/Shigu330/Tensho-Assistant/issues) first.
+        Thank you for the report. Please check the [open problems](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+-label%3Aroadmap+-label%3Adiscoveries) first.
         Security problems go through the private report instead (see SECURITY.md), never a public issue.
+        You can write in French. / Vous pouvez écrire en français.
   - type: input
     id: version
     attributes:
       label: Tensho version
-      description: First line of the diagnostic report (Settings › Advanced › Help and reporting › Copy the diagnostic report), e.g. « Tensho Assistant 0.323.0 ».
+      description: First line of the diagnostic report (Settings › Advanced › Help and reporting › Copy the diagnostic report), e.g. « Tensho Assistant 0.1200.0 » (yours may differ).
     validations:
       required: true
   - type: input

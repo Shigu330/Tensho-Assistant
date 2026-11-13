@@ -7,7 +7,8 @@ body:
       value: |
         Tensho reads the game's own data first and uses community data only when the game does not have it, always credited.
         Combat, PvP, parsers and anything that automates the game are out of scope (Dalamud's plugin rules).
-        The planned work is in [ROADMAP](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/ROADMAP.md) and the comparison with other plugins in [GAPS](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/GAPS.md).
+        Work in progress, not a promise: the working notes on what is planned are in [ROADMAP](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/ROADMAP.md), and the comparison with other plugins is in [GAPS](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/docs/project/GAPS.md).
+        You can write in French. / Vous pouvez écrire en français.
   - type: dropdown
     id: area
     attributes:

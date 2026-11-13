@@ -40,7 +40,42 @@ then run `/tensho`).
 
 The tests read files by relative path (`src/TenshoAssistant/...`): run them from the repository root, as `Verify.ps1` does.
 
+Outputs:
+
+- DLL: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
+- Package: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
+- Desktop app: `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, same version; Verify draws every page of it without a window
+  (`artifacts\desktop-headless.md`), or prints `SKIP desktop headless` without the game data or XIVLauncher (`-Release` refuses that)
+
+Development builds in game:
+
+1. Add the absolute DLL path to the Dalamud dev plugins list (`/xlsettings` › Experimental).
+2. Load the plugin, then open the window with `/tensho`.
+3. Check preferences, reloading and unloading.
+
 ## Project organization
+
+```text
+.
+├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access; UI/Components = shared templates);
+│                             Localization/README.md: translation guide, next to the language files
+├── src/TenshoAssistant.Desktop/  desktop application: the plugin's pages with the game closed (built and drawn by Verify.ps1)
+├── tests/                    managed tests (pure logic)
+├── tools/                    read-only data probes (game sheets, APIs) and data scripts
+├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps),
+│                             New-Tool.ps1 (skeleton of a new page), Update-ToolGallery.ps1 (gallery index)
+├── commit-release.bat        Verify -Commit then -Release (maintainer)
+├── repo.json                 Dalamud custom repository entry (refreshed by each release)
+├── .github/                  CodeQL and build workflows, Dependabot settings, issue and pull request templates
+├── community-help/           help videos and guides listed in the plugin
+├── community-templates/      community tool gallery (data only)
+├── community-discoveries/    shared discoveries: the common file and each player's merged file (tools/discoveries-merge.py)
+├── docs/                     documentation map: docs/README.md
+│   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
+│   └── evidence/             probe outputs cited by the code
+├── README.md · CONTRIBUTING.md · SECURITY.md · CHANGELOG.md · LICENSE
+└── global.json · TenshoAssistant.sln
+```
 
 - Code: `src/TenshoAssistant/` (one folder per domain; files ending in `*.Dalamud.cs` touch the game, files ending in `*.Lumina.cs` copy
   game sheets, and the others are pure C# and testable). Pages are `MainWindow.<Page>.cs` partial files, listed in `MainWindow.Pages.cs`;
@@ -259,7 +294,22 @@ Une contribution doit laisser le projet **vert, sans avertissement**. DLL produi
 Les tests lisent des fichiers par chemin relatif (`src/TenshoAssistant/...`) : lancez-les depuis la racine du dépôt, comme le fait
 `Verify.ps1`.
 
+Sorties :
+
+- DLL : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
+- Paquet : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
+- Application de bureau : `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, même version ; Verify en dessine chaque page sans
+  fenêtre (`artifacts\desktop-headless.md`), ou affiche `SKIP desktop headless` sans les données du jeu ou XIVLauncher (`-Release` le refuse)
+
+Versions de développement en jeu :
+
+1. Ajouter le chemin complet de la DLL dans la liste des plugins de développement de Dalamud (`/xlsettings` › Expérimental).
+2. Charger le plugin, puis ouvrir la fenêtre avec `/tensho`.
+3. Vérifier les préférences, le rechargement et le déchargement.
+
 ## Organisation du projet
+
+Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
 
 - Code : `src/TenshoAssistant/` (un dossier par domaine ; les fichiers en `*.Dalamud.cs` touchent au jeu, ceux en `*.Lumina.cs` copient
   des feuilles du jeu, et les autres sont du C# pur, testable). Les pages sont des fichiers partiels `MainWindow.<Page>.cs`, listés dans

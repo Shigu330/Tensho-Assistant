@@ -8,8 +8,20 @@ and reminders, free company voyages, quests, collections, character stats, a gea
 the island sanctuary, side content (Eureka and Bozja, deep dungeons, relics, Masked Carnivale), a local base of what you discover
 while playing, a French–English lexicon of the game's words, your own tools, and diagnostics.
 
-These documents were produced for version <!-- docgen:version -->0.1218<!-- /docgen:version -->; the version being built is the `<Version>` of
-`src/TenshoAssistant/TenshoAssistant.csproj`. What changed in each version is in
+## Install
+
+You need FINAL FANTASY XIV on Windows, started through [XIVLauncher](https://goatcorp.github.io/) with Dalamud (plugin API 15), and the
+game up to date.
+
+1. In game, type `/xlsettings`, open Experimental › Custom Plugin Repositories, add
+   `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` with the « + » button, keep it enabled and save.
+2. Open the plugin installer (`/xlplugins`), search for « Tensho Assistant » and install it.
+3. Type `/tensho`: the window opens, with a short guide the first time. Dalamud updates the plugin like any other.
+
+Questions: [docs/FAQ.md](docs/FAQ.md) (the same as the plugin's Help page), or ask in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a). Building from source
+and development builds: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+These documents were produced for version <!-- docgen:version -->0.1218<!-- /docgen:version -->. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
 
@@ -82,64 +94,6 @@ Each page has its own help in the plugin: the « ? » beside its title, the Help
 above says what each page is for. Unknown is not zero: when a value is not known (storage not opened yet, no community data), the plugin
 says so instead of guessing. In-game validation of each part: [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md); how the code is
 organised: [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
-
-## Repository structure
-
-```text
-.
-├── src/TenshoAssistant/      plugin code (one folder per domain; *.Dalamud.cs = game access; UI/Components = shared templates);
-│                             Localization/README.md: translation guide, next to the language files
-├── src/TenshoAssistant.Desktop/  desktop application: the plugin's pages with the game closed (built and drawn by Verify.ps1)
-├── tests/                    managed tests (pure logic)
-├── tools/                    read-only data probes (game sheets, APIs) and data scripts
-├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps),
-│                             New-Tool.ps1 (skeleton of a new page), Update-ToolGallery.ps1 (gallery index)
-├── commit-release.bat        Verify -Commit then -Release (maintainer)
-├── repo.json                 Dalamud custom repository entry (refreshed by each release)
-├── .github/                  CodeQL and build workflows, Dependabot settings, issue and pull request templates
-├── community-help/           help videos and guides listed in the plugin
-├── community-templates/      community tool gallery (data only)
-├── community-discoveries/    shared discoveries: the common file and each player's merged file (tools/discoveries-merge.py)
-├── docs/                     documentation map: docs/README.md
-│   ├── project/              scope, roadmap, architecture, testing, references, decisions, publishing
-│   └── evidence/             probe outputs cited by the code
-├── README.md · CONTRIBUTING.md · SECURITY.md · CHANGELOG.md · LICENSE
-└── global.json · TenshoAssistant.sln
-```
-
-## Build and verification
-
-Requirements: Windows, .NET SDK 10.0 (`global.json` accepts 10.0.100 and newer), Dalamud.NET.Sdk 15 (restored from NuGet during the build; it compiles against your Dalamud install, or `DALAMUD_HOME`). Without the game: `.\scripts\Verify.ps1 -TestsOnly` (tests and languages only).
-
-```powershell
-.\scripts\Verify.ps1                                 # Release build, managed tests, language files, package
-.\scripts\Verify.ps1 -DotNet 'C:\path\to\dotnet.exe' # another SDK location
-.\scripts\Verify.ps1 -Force                          # run every check again even if this exact state already passed
-```
-
-The run must end green with no warnings; it prints `VERSION x.y.z (DLL x.y.z.0)`. Outputs:
-
-- DLL: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
-- Package: `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
-- Desktop app: `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, same version; Verify draws every page of it without a window
-  (`artifacts\desktop-headless.md`), or prints `SKIP desktop headless` without the game data or XIVLauncher (`-Release` refuses that)
-
-`-Commit`, `-Release` and `-DryRun` (maintainer only) are described in [CONTRIBUTING.md](CONTRIBUTING.md#versions-and-releases-maintainer).
-
-## Installation in-game
-
-Released versions: add `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` to Dalamud › Settings ›
-Experimental › Custom Plugin Repositories, then install « Tensho Assistant » from the plugin installer. Development builds:
-
-1. Add the absolute DLL path to the Dalamud dev plugins list.
-2. Load the plugin.
-3. Open the window with:
-
-```text
-/tensho
-```
-
-4. Validate preferences, reload behavior, and unloading behavior.
 
 ## Desktop app (game closed)
 
@@ -245,8 +199,20 @@ d'équipement, aides du Gold Saucer, enchaînement de macros, la Félicité insu
 profonds, reliques, La Grande Mascarade), une base locale de ce que vous découvrez en jouant, un lexique français–anglais des mots du
 jeu, vos propres outils, et des diagnostics.
 
-Ces documents ont été produits pour la version <!-- docgen:version -->0.1218<!-- /docgen:version --> ; la version en cours est le `<Version>` de
-`src/TenshoAssistant/TenshoAssistant.csproj`. Les changements de chaque version sont dans
+## Installation
+
+Il vous faut FINAL FANTASY XIV sur Windows, lancé par [XIVLauncher](https://goatcorp.github.io/) avec Dalamud (API des plugins 15), et
+le jeu à jour.
+
+1. En jeu, tapez `/xlsettings`, ouvrez Expérimental › Dépôts de plugins personnalisés, ajoutez
+   `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` avec le bouton « + », laissez-le activé et enregistrez.
+2. Ouvrez l'installateur de plugins (`/xlplugins`), cherchez « Tensho Assistant » et installez-le.
+3. Tapez `/tensho` : la fenêtre s'ouvre, avec un court guide la première fois. Dalamud met le plugin à jour comme les autres.
+
+Questions : [docs/FAQ.md](docs/FAQ.md) (les mêmes que la page Aide du plugin), ou posez-la dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a).
+Compiler depuis les sources et versions de développement : [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Ces documents ont été produits pour la version <!-- docgen:version -->0.1218<!-- /docgen:version -->. Les changements de chaque version sont dans
 [CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).
 
@@ -320,44 +286,6 @@ ci-dessus dit à quoi sert chaque page. Inconnu n'est pas zéro : quand une vale
 donnée communautaire), le plugin le dit au lieu de deviner. Validation en jeu de chaque partie :
 [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) ; organisation du code :
 [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
-
-## Structure du dépôt
-
-Voir la structure anglaise ci-dessus et la carte des documents [docs/README.md](docs/README.md).
-
-## Build et validation
-
-Prérequis : Windows, SDK .NET 10.0 (`global.json` accepte 10.0.100 et plus), Dalamud.NET.Sdk 15 (restauré depuis NuGet pendant la compilation ; il compile avec votre Dalamud installé, ou `DALAMUD_HOME`). Sans le jeu : `.\scripts\Verify.ps1 -TestsOnly` (tests et langues seulement).
-
-```powershell
-.\scripts\Verify.ps1                                  # compilation Release, tests, fichiers de langue, paquet
-.\scripts\Verify.ps1 -DotNet 'C:\chemin\dotnet.exe'   # autre emplacement du SDK
-.\scripts\Verify.ps1 -Force                           # relancer tous les contrôles même si cet état exact est déjà passé
-```
-
-Le résultat doit être vert, sans avertissement ; il affiche `VERSION x.y.z (DLL x.y.z.0)`. Sorties :
-
-- DLL : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll`
-- Paquet : `src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip`
-- Application de bureau : `src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip`, même version ; Verify en dessine chaque page sans
-  fenêtre (`artifacts\desktop-headless.md`), ou affiche `SKIP desktop headless` sans les données du jeu ou XIVLauncher (`-Release` le refuse)
-
-`-Commit`, `-Release` et `-DryRun` (mainteneur) : voir [CONTRIBUTING.md](CONTRIBUTING.md#versions-and-releases-maintainer).
-
-## Installation en jeu
-
-Versions publiées : ajouter `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` dans Dalamud › Paramètres ›
-Expérimental › Dépôts de plugins personnalisés, puis installer « Tensho Assistant ». Versions de développement :
-
-1. Ajouter le chemin de la DLL dans la liste des plugins de développement de Dalamud.
-2. Charger le plugin.
-3. Ouvrir la fenêtre avec :
-
-```text
-/tensho
-```
-
-4. Vérifier le comportement des préférences, du rechargement et du déchargement.
 
 ## Application de bureau (jeu fermé)
 

@@ -2,6 +2,10 @@ name: Tool proposal
 description: Propose a new tool or page for Tensho Assistant, that you would like to write or see written
 labels: ["tool-proposal"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        You can write in French. / Vous pouvez écrire en français.
   - type: textarea
     id: what
     attributes:
