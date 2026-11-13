@@ -84,8 +84,8 @@ internal sealed partial class MainWindow
         }
         if(TenshoAssistant.UI.UiComponents.Header(localization.Format("StorageReport.Outside",storageOutside.Count),ImGuiTreeNodeFlags.DefaultOpen))
         {
-            if(reader?.Unavailable==true)ImGui.TextDisabled(localization.Get("StorageReport.SetsUnavailable"));
-            else if(sets is null)ImGui.TextDisabled(localization.Get("StorageReport.SetsLoading"));
+            if(reader?.Unavailable==true)StateLine(UI.UiState.Failed,localization.Get("StorageReport.SetsUnavailable"));
+            else if(sets is null)StateLine(UI.UiState.Waiting,localization.Get("StorageReport.SetsLoading"));
             else if(storageArmouryAt is null)ImGui.TextDisabled(localization.Get("StorageReport.NoArmoury"));
             else
             {

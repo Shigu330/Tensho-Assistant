@@ -16,8 +16,7 @@ internal sealed partial class MainWindow
 
     private void DrawBankList(BankSourceViewKey source,IReadOnlyList<BankEntry> selected)
     {
-        var flags=ImGuiTableFlags.Sortable|ImGuiTableFlags.RowBg|ImGuiTableFlags.ScrollY|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV;
-        if(!ImGui.BeginTable("BankList",6,flags,new Vector2(0,Math.Max(220,ImGui.GetContentRegionAvail().Y))))return;
+        if(!UI.UiComponents.BeginDataTable("BankList",6,sortable:true,scrollHeight:Math.Max(220,ImGui.GetContentRegionAvail().Y)))return;
         try
         {
             ImGui.TableSetupScrollFreeze(0,1);

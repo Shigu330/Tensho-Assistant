@@ -5284,6 +5284,8 @@
     "StateWaiting": "Waiting",
     "StateSourceOff": "Source turned off",
     "StateStale": "Old data",
+    "OriginMeasured": "Measured",
+    "OriginEstimated": "Estimate",
     "StateFailed": "Failed",
     "Copied": "Copied",
     "SaveError": "Save failed. Try again; details are in the Dalamud log.",

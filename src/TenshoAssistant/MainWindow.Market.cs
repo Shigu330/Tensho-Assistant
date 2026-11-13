@@ -12,7 +12,7 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("MarketUi.Title"), localization.Get("MarketUi.Description"));
         var state = market.State;
-        ImGui.TextColored(Accent, state.WorldId == 0 ? localization.Get("MarketUi.World") : state.WorldName);
+        UI.UiComponents.SubTitle(state.WorldId == 0 ? localization.Get("MarketUi.World") : state.WorldName);
         if (itemId <= 0) { ImGui.TextWrapped(localization.Get("MarketUi.Select")); return; }
         DrawItemIcon(SelectedItem, new Vector2(40));
         ImGui.SameLine(); ImGui.TextUnformatted(SelectedItem?.Name ?? $"ID {itemId}");
@@ -40,15 +40,17 @@ internal sealed partial class MainWindow
         finally { ImGui.EndDisabled(); }
         ImGui.TextWrapped(localization.Format("MarketDates.Cache",localization.Get("CacheDuration."+CacheChoiceKeys[(int)configuration.Cache.Get(TenshoAssistant.Caching.CacheArea.Prices)])));
         if (state.ItemId != (uint)itemId) return;
-        if (state.Loading) ImGui.TextDisabled(localization.Get("MarketUi.Loading"));
+        if (state.Loading) StateLine(UI.UiState.Waiting,localization.Get("MarketUi.Loading"));
         if (state.Error is { } error) DrawDataError(error,"MarketDates.Error");
         if (state.Quote is not { } quote) return;
         ImGui.TextDisabled(localization.Format("MarketDates.Fetched",quote.FetchedAt.ToLocalTime().ToString("g")));
-        ImGui.TextDisabled(market.IsFresh(quote,DateTimeOffset.UtcNow) ? localization.Get("MarketUi.Fresh"):localization.Get("MarketUi.Expired"));
+        // X-156 (0.1264): a cache past its duration and an old upload are both the « old data » state, said as everywhere.
+        if (market.IsFresh(quote,DateTimeOffset.UtcNow)) ImGui.TextDisabled(localization.Get("MarketUi.Fresh"));
+        else StateLine(UI.UiState.Stale,localization.Get("MarketUi.Expired"));
         ImGui.TextDisabled(quote.UploadedAt is { } date ? localization.Format("MarketDates.Uploaded",date.ToLocalTime().ToString("g")) : localization.Get("MarketUi.NoDate"));
         if (!quote.HasRecentUpload(DateTimeOffset.UtcNow))
-            ImGui.TextColored(Accent, localization.Get("MarketUi.Old"));
-        if (ImGui.BeginTable("MarketPrices", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+            StateLine(UI.UiState.Stale,localization.Get("MarketUi.Old"));
+        if (UI.UiComponents.BeginDataTable("MarketPrices", 4))
         {
             try
             {
@@ -61,8 +63,8 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item1);
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.Minimum?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
-                    ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.RecentSale?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
+                    ImGui.TableNextColumn(); UI.UiComponents.NumberCell(value.Item2.Minimum?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
+                    ImGui.TableNextColumn(); UI.UiComponents.NumberCell(value.Item2.RecentSale?.ToString("N0",Numbers) ?? localization.Get("MarketUi.Missing"));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(value.Item2.SaleAt?.ToLocalTime().ToString("g") ?? localization.Get("MarketUi.Unknown"));
                 }
             }

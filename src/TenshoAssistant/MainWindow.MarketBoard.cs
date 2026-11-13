@@ -128,14 +128,14 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         ImGui.SameLine();
         // 0.281: an old board is shown, dated, when Universalis fails or while the pause between requests runs.
-        if(state.Loading && state.Board is null)ImGui.TextDisabled(localization.Get("MarketUi.Loading"));
+        if(state.Loading && state.Board is null)StateLine(UI.UiState.Waiting,localization.Get("MarketUi.Loading"));
         else if(state.Stale && state.Board is { } old)
         {
-            ImGui.TextColored(Accent,localization.Format(state.Error is null ? "MarketBoard.Waiting":"MarketBoard.StaleCache",old.FetchedAt.ToLocalTime().ToString("g")));
+            StateLine(UI.UiState.Stale,localization.Format(state.Error is null ? "MarketBoard.Waiting":"MarketBoard.StaleCache",old.FetchedAt.ToLocalTime().ToString("g")));
             if(SourceOff(state.Error))ImGui.TextDisabled(localization.Get("Advanced.SourceOffTip"));
             if(state.Error is { } staleError && developerMode){ImGui.SameLine();ImGui.TextDisabled(staleError);}
         }
-        else if(state.Cooldown)ImGui.TextDisabled(localization.Get("MarketBoard.Cooldown"));
+        else if(state.Cooldown)StateLine(UI.UiState.Waiting,localization.Get("MarketBoard.Cooldown"));
         else if(state.Error is { } error)DrawDataError(error,"MarketDates.Error");
         else if(state.Board is { } fetched)ImGui.TextDisabled(localization.Format("MarketDates.Fetched",fetched.FetchedAt.ToLocalTime().ToString("g")));
         var shown=state.ItemId==item && state.Scope==scopeName ? state.Board:null;
@@ -228,7 +228,7 @@ internal sealed partial class MainWindow
         ImGui.TextDisabled(localization.Format("MarketBoard.Count",marketShown.Length,board.Offers.Count));
         if(marketShown.Length==0){ImGui.TextDisabled(localization.Get("MarketBoard.Empty"));return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));
-        if(!ImGui.BeginTable("MarketListings",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.ScrollY|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Sortable,new Vector2(0,Math.Max(160,ImGui.GetContentRegionAvail().Y))))return;
+        if(!UI.UiComponents.BeginDataTable("MarketListings",7,sortable:true,scrollHeight:Math.Max(160,ImGui.GetContentRegionAvail().Y)))return;
         try
         {
             var offerColumns=new[]{"UnitPrice","Quantity","Total","Quality","World","Retainer","Reviewed"};
@@ -276,7 +276,7 @@ internal sealed partial class MainWindow
             ImGui.TextColored(Accent,localization.Format("MarketBoard.Stats",stats.Minimum.ToString("N0",Numbers),stats.Average.ToString("N0",Numbers),stats.Maximum.ToString("N0",Numbers),stats.Sales,stats.Units.ToString("N0",Numbers)));
         else{ImGui.TextDisabled(localization.Get("MarketBoard.NoSales"));return;}
         ImGui.TextDisabled(localization.Get("MarketBoard.SortHelp"));
-        if(!ImGui.BeginTable("MarketSales",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.ScrollY|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.Sortable,new Vector2(0,Math.Max(160,ImGui.GetContentRegionAvail().Y))))return;
+        if(!UI.UiComponents.BeginDataTable("MarketSales",5,sortable:true,scrollHeight:Math.Max(160,ImGui.GetContentRegionAvail().Y)))return;
         try
         {
             var saleColumns=new[]{"Date","UnitPrice","Quantity","Quality","World"};

@@ -64,7 +64,7 @@ internal sealed partial class MainWindow
             : compare?.Error is { } error ? localization.Get("RetainerSales.Error" + error)
             : compare?.FetchedAt is { } at ? localization.Format("RetainerSales.FetchedAt", at.ToLocalTime().ToString("HH:mm"))
             : localization.Get("RetainerSales.NotAsked"));
-        if (!ImGui.BeginTable("RetainerSalesTable", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp)) return;
+        if (!UI.UiComponents.BeginDataTable("RetainerSalesTable", 6)) return;
         try
         {
             foreach (var title in new[] { "RetainerSales.Item", "RetainerSales.Quantity", "RetainerSales.Yours", "RetainerSales.Lowest", "RetainerSales.Verdict", "RetainerSales.Copy" })

@@ -458,7 +458,7 @@ internal sealed partial class MainWindow
                 DrawGilIcon();
             }
             ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format("HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
-            if(!prices.HasRecentUpload(now))ImGui.TextColored(Accent,localization.Get("HoverUi.Old"));
+            if(!prices.HasRecentUpload(now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Old"));
             if(prices.NqCheapest is not null || canBeHq && prices.HqCheapest is not null)
             {
                 ImGui.TextColored(Accent,localization.Format("HoverUi.Cheapest",state.DataCenterName.Length>0 ? state.DataCenterName:localization.Get("HoverUi.DataCenter")));
@@ -474,7 +474,7 @@ internal sealed partial class MainWindow
             }
             // 0.329: date and time, as on the Market page: a quote restored from the disk cache can be from another day.
             ImGui.TextDisabled(localization.Format("HoverUi.Fetched",prices.FetchedAt.ToLocalTime().ToString("G")));
-            if(!market.IsFresh(prices,now))ImGui.TextDisabled(localization.Get("HoverUi.Expired"));
+            if(!market.IsFresh(prices,now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Expired"));
             if(configuration.HoverPriceRefresh)ImGui.TextDisabled(localization.Get("HoverUi.RefreshHint"));
         }
         else ImGui.TextWrapped(background?.ItemId==hovered.ItemId && background.WorldId==state.WorldId

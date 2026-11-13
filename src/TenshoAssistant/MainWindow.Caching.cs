@@ -132,6 +132,9 @@ internal sealed partial class MainWindow
     {
         if(date is not { } observed){ImGui.TextDisabled(localization.Get("CacheUi.NoDate"));return;}
         var duration=configuration.Cache.Duration(area);var fresh=CacheAge.Fresh(observed,DateTimeOffset.UtcNow,duration);
-        ImGui.TextColored(fresh ? Muted:Accent,localization.Format("CacheUi.Stamp",localization.Get(restored ? "CacheUi.Disk":"CacheUi.Latest"),observed.ToLocalTime().ToString("g"),localization.Get(fresh ? "CacheUi.Fresh":"CacheUi.Expired"),localization.Get("CacheDuration."+CacheChoiceKeys[(int)configuration.Cache.Get(area)])));
+        var stamp=localization.Format("CacheUi.Stamp",localization.Get(restored ? "CacheUi.Disk":"CacheUi.Latest"),observed.ToLocalTime().ToString("g"),localization.Get(fresh ? "CacheUi.Fresh":"CacheUi.Expired"),localization.Get("CacheDuration."+CacheChoiceKeys[(int)configuration.Cache.Get(area)]));
+        // X-156 (0.1264): a read past its cache duration is the « old data » state, said as everywhere; a valid one stays a muted line.
+        if(fresh)ImGui.TextColored(Muted,stamp);
+        else StateLine(UI.UiState.Stale,stamp);
     }
 }

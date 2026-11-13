@@ -27,11 +27,44 @@ internal sealed partial class MainWindow
     {
         var colour=UiStates.Colour(state) switch{UiColour.Warning=>Warning,UiColour.Error=>Error,_=>Muted};
         var icon=state switch{UiState.Waiting=>FontAwesomeIcon.Hourglass,UiState.SourceOff=>FontAwesomeIcon.PowerOff,UiState.Stale=>FontAwesomeIcon.History,_=>FontAwesomeIcon.ExclamationTriangle};
+        GlyphLine(icon,colour,localization.Get(UiStates.Key(state)),detail);
+    }
+
+    /// <summary>
+    /// X-156 (0.1264): where the values under this line come from, said the same way everywhere: read (« measured »), computed by Tensho
+    /// from a rule (« estimate »), or read too long ago (the « old data » state itself). The glyph and the word tell it, not the colour.
+    /// </summary>
+    private void OriginLine(UiOrigin origin,string? detail=null)
+    {
+        if(origin==UiOrigin.Old){StateLine(UiState.Stale,detail);return;}
+        var icon=origin switch{UiOrigin.Measured=>FontAwesomeIcon.Eye,_=>FontAwesomeIcon.Calculator};
+        GlyphLine(icon,Muted,localization.Get(UiOrigins.Key(origin)),detail);
+    }
+
+    /// <summary>
+    /// X-156 (0.1264): the same origin beside one value (a table cell, a line): the glyph alone, its word and the reason on hover.
+    /// A measured value carries no mark: only what is not a plain read is flagged.
+    /// </summary>
+    private void OriginMark(UiOrigin origin,string? detail=null)
+    {
+        if(origin==UiOrigin.Measured)return;
+        var icon=origin switch{UiOrigin.Estimated=>FontAwesomeIcon.Calculator,_=>FontAwesomeIcon.History};
+        ImGui.SameLine();
+        ImGui.PushFont(UiBuilder.IconFont);
+        try{ImGui.TextColored(origin==UiOrigin.Old ? Warning:Muted,icon.ToIconString());}
+        finally{ImGui.PopFont();}
+        var word=localization.Get(UiOrigins.Key(origin));
+        TipText(string.IsNullOrWhiteSpace(detail) ? word:word+" · "+detail);
+    }
+
+    // One drawing for the state and origin lines: the glyph and the short word in the colour, then the page's sentence (muted, wrapped).
+    private void GlyphLine(FontAwesomeIcon icon,System.Numerics.Vector4 colour,string word,string? detail)
+    {
         ImGui.PushFont(UiBuilder.IconFont);
         try{ImGui.TextColored(colour,icon.ToIconString());}
         finally{ImGui.PopFont();}
         ImGui.SameLine();
-        ImGui.TextColored(colour,localization.Get(UiStates.Key(state)));
+        ImGui.TextColored(colour,word);
         if(string.IsNullOrWhiteSpace(detail))return;
         ImGui.SameLine();
         ImGui.PushStyleColor(ImGuiCol.Text,Muted);

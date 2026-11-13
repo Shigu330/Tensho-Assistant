@@ -54,8 +54,7 @@ internal sealed partial class MainWindow
                 _ => localization.Get("BankUi.Retainers"),
             };
             if (!TenshoAssistant.UI.UiComponents.Header(label, ImGuiTreeNodeFlags.DefaultOpen)) continue;
-            if (!ImGui.BeginTable($"StorageGroup{category}", 5,
-                    ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.RowBg)) continue;
+            if (!UI.UiComponents.BeginDataTable($"StorageGroup{category}", 5)) continue;
             try
             {
                 ImGui.TableSetupColumn(localization.Get("BankUi.Storage"), ImGuiTableColumnFlags.WidthStretch, 2.2f);
@@ -101,8 +100,8 @@ internal sealed partial class MainWindow
         if (menus.Retainer is null && menus.Saddlebag is null)
             ImGui.TextDisabled(localization.Get("BankUi.NoOpen"));
         if (menus.Message is { } message) DrawServiceMessage(message,"ServiceErrors.Bank");
-        if (menus.ReadsUnavailable) ImGui.TextColored(Accent,localization.Get("ServiceStatus.StorageReadUnavailable"));
-        if (state.Loading) EmptyState("BankUi.Loading");
+        if (menus.ReadsUnavailable) StateLine(UI.UiState.Failed,localization.Get("ServiceStatus.StorageReadUnavailable"));
+        if (state.Loading) StateLine(UI.UiState.Waiting,localization.Get("BankUi.Loading"));
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Bank");
         if (menus.CharacterId == 0)
         {
@@ -120,7 +119,7 @@ internal sealed partial class MainWindow
             DrawCacheStamp(TenshoAssistant.Caching.CacheArea.ImportedStock,entry.Snapshot.ObservedAt,true);
             // 0.576 (I1): a retainer the bell no longer lists is said, never erased by itself; two clicks erase a read.
             if(entry.Key.Kind==BankStorageKind.Retainer && menus.KnownRetainers is { } listed && listed.All(known=>known.Id!=entry.Key.StorageId))
-                ImGui.TextColored(Accent,localization.Get("BankUi.RetainerGone"));
+                StateLine(UI.UiState.Stale,localization.Get("BankUi.RetainerGone"));
             var armed=bankForgetArmed==entry.Key;
             if(ImGui.SmallButton(localization.Get(armed ? "BankUi.ForgetConfirm":"BankUi.Forget")+$"##BankForget{entry.Key.Kind}{entry.Key.StorageId}"))
             {
@@ -140,11 +139,11 @@ internal sealed partial class MainWindow
     private void DrawBankBrowser()
     {
         var bankSnapshot=bank.State;
-        ImGui.TextColored(Accent, localization.Get("BankUi.Title"));
+        UI.UiComponents.SubTitle(localization.Get("BankUi.Title"));
         ImGui.TextDisabled(localization.Get("BankUi.Subtitle"));
         ImGui.Separator();
 
-        if (bankSnapshot.Loading) ImGui.TextDisabled(localization.Get("BankUi.Loading"));
+        if (bankSnapshot.Loading) StateLine(UI.UiState.Waiting,localization.Get("BankUi.Loading"));
         if (bankSnapshot.Error is { } bankError) DrawDataError(bankError,"ServiceErrors.Bank");
         ImGui.TextDisabled(bankPersonalFilter
             ? localization.Get("BankUi.PersonalLive")
@@ -376,7 +375,7 @@ internal sealed partial class MainWindow
     {
         if (groups.Count == 0)
         {
-            if (bankFrameErrors.Count == 0 && bankPersonalNotice is null) ImGui.TextDisabled(localization.Get("BankUi.Unavailable"));
+            if (bankFrameErrors.Count == 0 && bankPersonalNotice is null) StateLine(UI.UiState.Waiting,localization.Get("BankUi.Unavailable"));
             return;
         }
         const int columns = 5;
@@ -502,16 +501,16 @@ internal sealed partial class MainWindow
     private void DrawFirstOpenNotices(IReadOnlyList<BankEntry> entries,BankMenuState menus)
     {
         ImGui.TextWrapped(localization.Get(configuration.AutoBankCapture ? "BankUi.AutoOn":"BankUi.AutoOff"));
-        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Saddlebag))ImGui.TextColored(Accent,localization.Get("BankUi.OpenSaddlebag"));
-        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.GlamourDresser))ImGui.TextColored(Accent,localization.Get("BankUi.OpenDresser"));
-        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Armoire))ImGui.TextColored(Accent,localization.Get("BankUi.OpenArmoire"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Saddlebag))StateLine(UI.UiState.Waiting,localization.Get("BankUi.OpenSaddlebag"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.GlamourDresser))StateLine(UI.UiState.Waiting,localization.Get("BankUi.OpenDresser"));
+        if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Armoire))StateLine(UI.UiState.Waiting,localization.Get("BankUi.OpenArmoire"));
         if(menus.KnownRetainers is { } known)
         {
             foreach(var (id,name) in known)
                 if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Retainer && entry.Key.StorageId==id))
-                    ImGui.TextColored(Accent,localization.Format("BankUi.OpenRetainer",name));
+                    StateLine(UI.UiState.Waiting,localization.Format("BankUi.OpenRetainer",name));
         }
-        else if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Retainer))ImGui.TextColored(Accent,localization.Get("BankUi.OpenBell"));
+        else if(!entries.Any(entry=>entry.Key.Kind==BankStorageKind.Retainer))StateLine(UI.UiState.Waiting,localization.Get("BankUi.OpenBell"));
     }
 
     private void DrawMenuImport(BankMenuContext? context)
@@ -525,6 +524,6 @@ internal sealed partial class MainWindow
                 bankBridge.RequestImport(context.Key);
         }
         finally { ImGui.EndDisabled(); }
-        if (!context.Loaded) ImGui.TextDisabled(localization.Get("BankUi.Waiting"));
+        if (!context.Loaded) StateLine(UI.UiState.Waiting,localization.Get("BankUi.Waiting"));
     }
 }

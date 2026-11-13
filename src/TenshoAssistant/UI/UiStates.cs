@@ -35,3 +35,29 @@ public static class UiStates
         _=>UiColour.Error,
     };
 }
+
+/// <summary>X-156 (0.1264): where a shown value comes from: read (the game, or a source's own figure), computed by Tensho from a rule, or read too long ago.</summary>
+public enum UiOrigin { Measured, Estimated, Old }
+
+/// <summary>
+/// For each origin: its short word, its glyph (a FontAwesomeIcon name, as text) and its colour. An old value says it like the « old data »
+/// state of a page (same word, same glyph, same colour): one way to say « old » everywhere.
+/// </summary>
+public static class UiOrigins
+{
+    public static string Key(UiOrigin origin)=>origin switch
+    {
+        UiOrigin.Measured=>"Common.OriginMeasured",
+        UiOrigin.Estimated=>"Common.OriginEstimated",
+        _=>UiStates.Key(UiState.Stale),
+    };
+
+    public static string Icon(UiOrigin origin)=>origin switch
+    {
+        UiOrigin.Measured=>"Eye",
+        UiOrigin.Estimated=>"Calculator",
+        _=>UiStates.Icon(UiState.Stale),
+    };
+
+    public static UiColour Colour(UiOrigin origin)=>origin==UiOrigin.Old ? UiStates.Colour(UiState.Stale):UiColour.Muted;
+}

@@ -5284,6 +5284,8 @@
     "StateWaiting": "En attente",
     "StateSourceOff": "Source désactivée",
     "StateStale": "Donnée ancienne",
+    "OriginMeasured": "Mesuré",
+    "OriginEstimated": "Estimation",
     "StateFailed": "Échec",
     "Copied": "Copié",
     "SaveError": "Échec de sauvegarde. Réessayez ; les détails sont dans le journal Dalamud.",
