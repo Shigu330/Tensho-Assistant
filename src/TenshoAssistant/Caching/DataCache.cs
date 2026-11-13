@@ -131,10 +131,26 @@ public sealed class DataCache : IDisposable
     // newest file of each family + scope is kept (a new version replaces the old one); « catalog-* » files are never removed
     // by the file count; other entries (sources, wiki…) keep up to MaximumFiles; the byte limit removes small entries first.
     // X-117 (0.1046): the newest older copy of a « catalog-* » file from another game version is moved to « previous » instead.
+    // X-147 (0.1217, audit A14): measured on a copy of a real cache (2 053 files, 69 MB): each write read the header of every file again, about
+    // 150 ms under the disk lock (reads wait behind it). The identity read from a file is now kept while its name, time and size stay the same:
+    // only new or changed files are read again. The copies kept in « previous » count in the byte limit.
+    private readonly Dictionary<string,(DateTime Written,long Length,(string Family,string Scope,string? Game)? Identity)> identities=new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>X-147: how many file headers were read (tests).</summary>
+    internal long HeaderReads;
+    private (string Family,string Scope,string? Game)? KnownIdentity(FileInfo file,Dictionary<string,(DateTime,long,(string,string,string?)?)> next)
+    {
+        var written=file.LastWriteTimeUtc;var length=file.Length;
+        var identity=identities.TryGetValue(file.Name,out var known) && known.Written==written && known.Length==length ? known.Identity:ReadIdentity(file);
+        next[file.Name]=(written,length,identity);
+        return identity;
+    }
+    private (string Family,string Scope,string? Game)? ReadIdentity(FileInfo file){HeaderReads++;return Identity(file);}
     private List<PatchMove> Trim()
     {
+        var next=new Dictionary<string,(DateTime,long,(string,string,string?)?)>(StringComparer.OrdinalIgnoreCase);
         var files=new DirectoryInfo(root).EnumerateFiles("*.json").Where(file=>file.Name.Length==69 && file.Name[..64].All(Uri.IsHexDigit))
-            .OrderByDescending(file=>file.LastWriteTimeUtc).Select(file=>(File:file,Identity:Identity(file))).ToArray();
+            .OrderByDescending(file=>file.LastWriteTimeUtc).Select(file=>(File:file,Identity:KnownIdentity(file,next))).ToArray();
+        identities.Clear();foreach(var (name,known) in next)identities[name]=known;
         var seen=new Dictionary<(string,string),(string? Game,string Path)>();var kept=new List<(FileInfo File,bool Catalogue)>();
         var moved=new List<PatchMove>();var keptOld=new HashSet<(string,string)>();
         foreach(var (file,identity) in files)
@@ -154,7 +170,7 @@ public sealed class DataCache : IDisposable
             }
             kept.Add((file,identity?.Family.StartsWith("catalog-",StringComparison.Ordinal)==true));
         }
-        var others=0;long bytes=kept.Where(entry=>entry.Catalogue).Sum(entry=>entry.File.Length);
+        var others=0;long bytes=kept.Where(entry=>entry.Catalogue).Sum(entry=>entry.File.Length)+PreviousBytes();
         foreach(var (file,catalogue) in kept)
         {
             if(catalogue)continue;
@@ -165,6 +181,11 @@ public sealed class DataCache : IDisposable
     }
     private string PreviousPath(string family,string scope)=>
         Path.Combine(PreviousFolder,Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"previous",family,scope})))+".json");
+    private long PreviousBytes()
+    {
+        try{return Directory.Exists(PreviousFolder) ? new DirectoryInfo(PreviousFolder).EnumerateFiles("*.json").Sum(file=>file.Length):0;}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return 0;}
+    }
     private static bool KeepPrevious(FileInfo file,string path)
     {
         try{Directory.CreateDirectory(Path.GetDirectoryName(path)!);File.Move(file.FullName,path,true);return true;}
