@@ -46,8 +46,11 @@ public sealed class JitWarmup : IDisposable
     public int FirstPartMethods{get;private set;}
     public int FirstPrepared{get;private set;}
     public double FirstReadyAfter{get;private set;}=-1;
-    /// <summary>X-01 (0.1279): at most this many methods in the first part (roots and callees).</summary>
-    public const int FirstCap=8000;
+    /// <summary>X-01 (0.1279): at most this many methods in the first part (roots and callees, breadth first: the nearest callees first).
+    /// 0.1280: 2000, measured: at 8000 (0.1279) the closure reached the cap and was not compiled when the gate's bound came (3 s); the
+    /// panels' 391 methods with their direct callees are 1604, with the next level 3688, then up to 12 762 (the window's code calls itself
+    /// from one method to the next); in the game a method takes about 1.1 ms to compile (1894 in 2205 ms), so 2000 fit in the bound.</summary>
+    public const int FirstCap=2000;
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
 
     private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart)
