@@ -23,6 +23,9 @@ internal sealed partial class MainWindow
     private (AirshipLegTable Table,string Chosen)? airshipChosenKey;
     private AirshipRoute? airshipChosenRoute;
     private (AirshipCatalog Catalog,uint[] Ids)? airshipPointIds;
+    // X-201 (0.1243): the item (loot goal) or the sector (unlock goal) the routes must serve; 0: none chosen yet.
+    private uint airshipLootItem,airshipUnlockSector;
+    private string airshipTargetSearch="";
 
     private void DrawAirshipPlanner(AirshipCatalog catalog)
     {
@@ -56,6 +59,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndCombo();}
         }
         Tip("AirshipPlanner.GoalTip");
+        var targets=DrawAirshipTarget(catalog);
 
         // The game computes the legs for this speed on the framework thread; until then, or when it cannot, say why.
         if(airshipPointIds?.Catalog!=catalog)airshipPointIds=(catalog,catalog.Sectors.Select(sector=>sector.Id).ToArray());
@@ -93,12 +97,12 @@ internal sealed partial class MainWindow
 
         // Best routes: searched on a worker when an input changed; the running search is cancelled.
         var rank=airshipRank==0 ? int.MaxValue:airshipRank;
-        var key=$"{table.Speed}|{rank}|{airshipRange}|{airshipGoal}|{RuntimeHelpers.GetHashCode(table)}";
+        var key=$"{table.Speed}|{rank}|{airshipRange}|{airshipGoal}|{RuntimeHelpers.GetHashCode(table)}|{(targets is null ? "-":string.Join(",",targets))}";
         if(key!=airshipPlanKey)
         {
             airshipPlanKey=key;airshipPlanCancel?.Cancel();airshipPlanCancel?.Dispose();airshipPlanCancel=new CancellationTokenSource();
             var token=airshipPlanCancel.Token;var (range,goal,sectors)=(airshipRange,airshipGoal,catalog.Sectors);
-            airshipPlanTask=Task.Run(()=>AirshipPlanner.Plan(sectors,table,rank,range,goal,15,token),token);
+            airshipPlanTask=Task.Run(()=>AirshipPlanner.Plan(sectors,table,rank,range,goal,15,token,targets),token);
         }
         if(airshipPlanTask is { IsCompleted:true } done)
         {
@@ -133,6 +137,47 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndTable();}
+    }
+
+    // X-201 (0.1243, user request of 2026-11-12): the target of the loot and unlock goals, chosen in a list with a search box; the sectors
+    // the routes must visit (null: no target for this goal; empty: none chosen yet, so no route). Drops and unlocks: LuminaSupplemental.
+    private IReadOnlyCollection<uint>? DrawAirshipTarget(AirshipCatalog catalog)
+    {
+        if(airshipGoal is not (AirshipGoal.Loot or AirshipGoal.Unlock))return null;
+        var loot=airshipGoal==AirshipGoal.Loot;
+        var items=itemCatalog.State.Catalog;
+        string ItemName(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
+        string SectorName(uint id)=>catalog.Find(id)?.ShortName ?? id.ToString();
+        var chosen=loot ? airshipLootItem:airshipUnlockSector;
+        var unlockable=loot ? []:catalog.Sectors.Where(sector=>AirshipSectors.Unlocker(catalog,sector.Id) is not null).ToArray();
+        ImGui.SetNextItemWidth(260);
+        var label=localization.Get(loot ? "AirshipPlanner.LootItem":"AirshipPlanner.UnlockSector");
+        if(ImGui.BeginCombo(label+"##AirshipTarget",chosen==0 ? "—":loot ? ItemName(chosen):SectorName(chosen)))
+        {
+            try
+            {
+                ImGui.SetNextItemWidth(220);ImGui.InputTextWithHint("##AirshipTargetSearch",localization.Get("AirshipPlanner.TargetSearch"),ref airshipTargetSearch,60);Tip("AirshipPlanner.TargetSearchTip");
+                var search=airshipTargetSearch.Trim();
+                var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
+                    :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
+                foreach(var (id,name) in rows.Where(row=>search.Length==0 || row.Name.Contains(search,StringComparison.CurrentCultureIgnoreCase))
+                            .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
+                    if(ImGui.Selectable($"{name}##AirshipTarget{id}",id==chosen)){if(loot)airshipLootItem=id;else airshipUnlockSector=id;}
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip(loot ? "AirshipPlanner.LootItemTip":"AirshipPlanner.UnlockSectorTip");
+        if(chosen==0){ImGui.TextDisabled(localization.Get(loot ? "AirshipPlanner.LootChoose":"AirshipPlanner.UnlockChoose"));return [];}
+        if(loot)
+        {
+            var where=AirshipSectors.DropSectors(catalog,chosen);
+            ImGui.TextDisabled(localization.Format("AirshipPlanner.LootWhere",where.Count==0 ? "—":string.Join(", ",where.Select(SectorName))));
+            return where;
+        }
+        if(AirshipSectors.Unlocker(catalog,chosen) is not { } unlocker){ImGui.TextDisabled(localization.Get("AirshipPlanner.UnlockChoose"));return [];}
+        ImGui.TextWrapped(localization.Format("AirshipPlanner.UnlockBy",SectorName(unlocker.By),unlocker.Rank,unlocker.Surveillance,
+            string.Join(" › ",AirshipSectors.UnlockPath(catalog,chosen).Select(SectorName))));
+        return [unlocker.By];
     }
 
     // « H h mm » of a voyage or survey time, on the airship and submarine pages.

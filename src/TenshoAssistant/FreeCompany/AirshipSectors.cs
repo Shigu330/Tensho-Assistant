@@ -95,6 +95,22 @@ public static class AirshipSectors
         return table.ToDictionary(pair=>pair.Key,pair=>(IReadOnlyList<uint>)pair.Value);
     }
 
+    /// <summary>X-201 (0.1243): the sectors where an item may drop (LuminaSupplemental AirshipDrop), in id order; empty when none is known.</summary>
+    public static IReadOnlyList<uint> DropSectors(AirshipCatalog catalog,uint item)
+        =>[.. catalog.Drops.Where(pair=>pair.Value.Contains(item) && catalog.Find(pair.Key) is not null).Select(pair=>pair.Key).Order()];
+
+    /// <summary>X-201 (0.1243): the items that may drop somewhere (each once, in id order), for the loot goal's list.</summary>
+    public static IReadOnlyList<uint> LootItems(AirshipCatalog catalog)
+        =>[.. catalog.Drops.Where(pair=>catalog.Find(pair.Key) is not null).SelectMany(pair=>pair.Value).Distinct().Order()];
+
+    /// <summary>
+    /// X-201 (0.1243): the sector whose voyage unlocks this one (LuminaSupplemental AirshipUnlock), with the rank and surveillance it asks;
+    /// null for a sector open from the start, unknown, or that names itself.
+    /// </summary>
+    public static (uint By,int Rank,int Surveillance)? Unlocker(AirshipCatalog catalog,uint sector)
+        =>catalog.Find(sector)?.Unlock is { } unlock && unlock.UnlockedBy!=sector && catalog.Find(unlock.UnlockedBy) is not null
+            ? (unlock.UnlockedBy,unlock.Rank,unlock.Surveillance):null;
+
     /// <summary>The chain of sectors to explore first, from the first one to the sector itself (a loop or an unknown link ends it).</summary>
     public static IReadOnlyList<uint> UnlockPath(AirshipCatalog catalog,uint sector)
     {

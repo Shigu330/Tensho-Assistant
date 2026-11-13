@@ -15,7 +15,9 @@ public sealed record AirshipRoute(IReadOnlyList<uint> Sectors,int Distance,int S
     public double ExpPerDay=>Seconds<=0 ? 0:Exp*86400.0/Seconds;
 }
 
-public enum AirshipGoal { ExpPerDay, ExpPerVoyage, Shortest }
+/// <summary>X-201 (0.1243, user request of 2026-11-12): Loot and Unlock rank the routes that visit a target (a sector where the chosen item may
+/// drop, the sector that unlocks the chosen one), shortest first: the target is the point, the experience a bonus.</summary>
+public enum AirshipGoal { ExpPerDay, ExpPerVoyage, Shortest, Loot, Unlock }
 
 /// <summary>
 /// DEC-023, point 3 (0.337): airship routes by distance and duration; the loot stays unknown (no public quantity, docs/evidence/0.336-airship-sectors.md).
@@ -63,9 +65,10 @@ public static class AirshipPlanner
     /// <summary>
     /// Every set of 1 to 5 sectors open at this rank, in its best order, within the range, sorted by the goal (take the first ones).
     /// The experience goals leave out routes with a sector of unknown experience (never ranked as if it gave 0); Shortest keeps them.
+    /// X-201 (0.1243): with targets, only the routes visiting at least one of them are kept (Loot, Unlock); none given: no filter.
     /// </summary>
     public static IReadOnlyList<AirshipRoute> Plan(IEnumerable<AirshipSector> sectors,AirshipLegTable table,int rank,int range,AirshipGoal goal,int take,
-        CancellationToken token=default)
+        CancellationToken token=default,IReadOnlyCollection<uint>? targets=null)
     {
         var candidates=sectors.Where(sector=>sector.RankReq<=rank).OrderBy(sector=>sector.Id).ToArray();
         var found=new List<AirshipRoute>();
@@ -84,11 +87,12 @@ public static class AirshipPlanner
             }
         }
         Extend(0);
-        if(goal!=AirshipGoal.Shortest)found.RemoveAll(route=>route.UnknownExp>0);
+        if(targets is not null)found.RemoveAll(route=>!route.Sectors.Any(targets.Contains));
+        if(goal is AirshipGoal.ExpPerDay or AirshipGoal.ExpPerVoyage)found.RemoveAll(route=>route.UnknownExp>0);
         IOrderedEnumerable<AirshipRoute> sorted=goal switch
         {
             AirshipGoal.ExpPerVoyage=>found.OrderByDescending(route=>route.Exp),
-            AirshipGoal.Shortest=>found.OrderBy(route=>route.Seconds).ThenByDescending(route=>route.Exp),
+            AirshipGoal.Shortest or AirshipGoal.Loot or AirshipGoal.Unlock=>found.OrderBy(route=>route.Seconds).ThenByDescending(route=>route.Exp),
             _=>found.OrderByDescending(route=>route.ExpPerDay),
         };
         return sorted.ThenBy(route=>route.Seconds).Take(take).ToArray();
