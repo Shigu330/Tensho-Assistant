@@ -35,17 +35,17 @@ and the help text of each page (the « ? » beside its title):
 |---|---|---|
 | — | **Home** | An overview: one tile per main tool with its live state, the next alarm, running calculations and errors. |
 |  | **My tools** | Build your own small pages from Tensho's blocks, without code, or install those shared by the community. |
-| Items | **Items** | Find an item and see its sheet: how to get it, your stocks, crafting, uses, gathering, market, your note. |
+| Items | **Items** | Find an item and see its item page: how to get it, your stocks, crafting, uses, gathering, market, your note. |
 |  | **Storage** | Where your items are: character, retainers, saddlebags, armoury, glamour dresser, armoire, company chest; also crystals, currencies with what they buy, a gil journal, a report of what could free space, and your other characters. |
 |  | **Inventory sorting** | Preview a sorting rule, then apply it to your storage. Nothing moves until you click. |
-|  | **Market** | Prices of the selected item from Universalis: summary, listings for your world, data centre or region, and sale history. |
+|  | **Market** | Prices of the selected item from Universalis: summary, listings for your world, Data Center or region, and sale history. |
 |  | **Wishlist** | The items you want to get, in one list: their state (obtained, or the copies you hold), your price for a sale alert and, for the items that are gathered, where to gather them (job, zone, node, hours or weather). |
 | Production | **Crafting** | Simulate a recipe step by step, search a sequence, prepare the materials, and make a macro to copy or write into the game. Other tabs: crafting lists (with an on-screen panel of what they still need) and « What can I craft? » from your stocks. |
 |  | **Gathering** | Find where and when a resource can be gathered or fished, with your notebooks, an Eorzean clock and the fishing help. |
 |  | **Ocean fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
-|  | **Island sanctuary** | Your workshops' crafts with their estimated value, and the animals of your pasture, from what the game has loaded on your island. |
-|  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts on your click. |
-| World | **Map** | The Tensho map, with your position, flags, favorites, vistas, gathering points and quests; also chat map links, plots for sale, a hunt train recorder and the S ranks' spawn conditions. |
+|  | **Island Sanctuary** | Your workshops' crafts with their estimated value, and the animals of your pasture, from what the game has loaded on your island. |
+|  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts when you click. |
+| World | **Map** | The Tensho map, with your position, flags, favourites, vistas, gathering points and quests; also chat map links, plots for sale, a hunt train recorder and the S ranks' spawn conditions. |
 |  | **Weather** | The weather forecast of a zone, and its next windows. |
 |  | **FATEs** | Where each FATE of the open zones takes place, with its level, from the game files. |
 |  | **NPC vendors** | Who sells an item, for what price, and where. |
@@ -55,12 +55,12 @@ and the help text of each page (the « ? » beside its title):
 | Tracking | **Alarms** | Alarms on items, gathering points, dates, voyages and missions, with sound, chat line and Discord if you wish. The clocks are here too. |
 |  | **Reminders** | The game's timers and counters, with « done » boxes: daily and weekly tasks, retainers, voyages, roulettes, squadron, character status, your own tasks. |
 |  | **Garden** | Your beds and pots with their reminders, and seed crossbreeds with a planting plan. |
-|  | **Free company** | Submarines and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
+|  | **Free Company** | Submersibles and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
 | Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
 |  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
 |  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wish list. |
 |  | **Allied societies** | Each allied society: your rank and reputation, its place and its currency. |
-|  | **Grand Companies** | Your grade and seals in each Grand Company, the next promotion, and what seals buy. |
+|  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
 |  | **Custom deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
 |  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
@@ -70,12 +70,12 @@ and the help text of each page (the « ? » beside its title):
 | Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
 |  | **Relics** | Relic weapons and armour, the stages you hold and the Zodiac book in progress. |
 |  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
-|  | **Deep dungeons** | To get ready outside: the floors, their state, the items of each dungeon and what their coffers give. |
+|  | **Deep dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what their coffers give. |
 |  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the labyrinth with their enemies and bonuses. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
 |  | **Triple Triad** | Your cards, decks, a simulator, NPCs with their availability and the cards you lack. With the observation on, advice during a match. |
 |  | **Mini Cactpot** | The best cell to reveal and the best line of a ticket. You always choose yourself. |
-| References | **Lexicon** | Find a word of the game in French and in English: items, actions, places, monsters, quests and the interface's own words. |
+| References | **Lexicon** | Look up in-game terms in French and in English: items, actions, places, monsters, quests and the interface's own words. |
 |  | **Help** | All of Tensho's help: search it, read the frequent questions, or open a page. The « ? » beside the title explains the page you are on. |
 |  | **Credits** | Who Tensho owes its data and libraries to, with their licences. |
 | Preferences | **Settings** | All of Tensho's options, grouped by domain. Each has a tooltip, and the reset button (curved arrow) next to a changed option puts it back to its default. |

@@ -6,7 +6,7 @@ The same questions are in the plugin, on the Help page (`/tensho`, then Help), i
 
 ## Where do I start?
 
-With the guide: Help › « Start the guide » shows the main pages in a few minutes, and you can leave it at any step. Then Home has one tile per main tool with its state. Anywhere in Tensho, right-click an item for its sheet and its tools; the « ? » next to a page's title explains it.
+With the guide: Help › « Start the guide » shows the main pages in a few minutes, and you can leave it at any step. Then Home has one tile per main tool with its state. Anywhere in Tensho, right-click an item for its item page and its tools; the « ? » next to a page's title explains it.
 
 ## A page is empty or says « not read ».
 
@@ -30,7 +30,7 @@ Prices, loot, wiki pages and community data are asked of those community sites, 
 
 ## Can I turn off the community data?
 
-Yes: Settings › Data and sources › « Game data and what you observed only » turns off every community source at once (prices, loot, wiki…); each one can also be turned off on its own there. The discoveries exchange is off unless you turn it on, and the community guides are only read on your click.
+Yes: Settings › Data and sources › « Game data and what you observed only » turns off every community source at once (prices, loot, wiki…); each one can also be turned off on its own there. The discoveries exchange is off unless you turn it on, and the community guides are only read when you click.
 
 ## Is Tensho safe, and is it allowed?
 
@@ -46,7 +46,7 @@ Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the fo
 
 ## Does Tensho play for me?
 
-No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens on your click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and wearing the title you chose for a job when you change job (off by default).
+No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and wearing the title you chose for a job when you change job (off by default).
 
 ## M opens another map: how do I get the game's back?
 
