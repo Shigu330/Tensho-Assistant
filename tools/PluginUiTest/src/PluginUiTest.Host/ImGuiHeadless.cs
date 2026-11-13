@@ -36,7 +36,12 @@ public static unsafe class ImGuiHeadless
         if(DalamudFonts && File.Exists(icons))
         {
             var config=ImGui.ImFontConfig();
-            config.MergeMode=true;config.GlyphMinAdvanceX=size;
+            // The icons are not oversampled (ImGui's default is three times in width). Oversampled, some Font Awesome glyphs (the caret
+            // arrows, the check marks, the droplet, the question mark) drew as the full rectangle of their box, from the first desktop
+            // version to 0.1272; without oversampling they draw right (captures before and after, 0.1273). The atlas itself holds no
+            // full block either way and every glyph has its place (measured): the mechanism is not known, the setting is what matters.
+            // Icons are snapped to the pixel instead.
+            config.MergeMode=true;config.GlyphMinAdvanceX=size;config.OversampleH=1;config.PixelSnapH=true;
             io.Fonts.AddFontFromFileTTF(icons.AsSpan(),size*0.85f,config,iconRanges);
         }
         io.Fonts.Build();

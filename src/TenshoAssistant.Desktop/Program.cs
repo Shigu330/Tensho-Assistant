@@ -1,7 +1,7 @@
 // X-119 (plan 4 of the desktop application, step 1; X-118's probe moved here): the plugin's own pages in a desktop window, game closed.
 // Evidence: docs/evidence/x119-desktop-app.md (X-118's measures: docs/evidence/x118-desktop-probe.md).
 // Usage: TenshoAssistant.Desktop [--page=Weather] [--zone=<territory id>] [--field=name=value] [--click=x,y] [--capture=<png>] [--frames=N]
-//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH] [--garden-trial] [--dashboard-trial]
+//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH] [--garden-trial] [--dashboard-trial] [--atlas=<png>]
 //        TenshoAssistant.Desktop --headless [--out=<md>]   (all 12 catalogues, every page classified and drawn for 20 frames without a window;
 //                                                           exit 0 only if no page throws, blocks or is unclassified; 4 = SKIP, no game data or Dalamud)
 //        TenshoAssistant.Desktop --headless --step=A,B | --step=entries   (diagnostic: which MainWindow call blocks, each on a worker with a 5 s limit)
@@ -112,6 +112,16 @@ internal static class Program
         var headless=args.Contains("--headless");
         WindowSize=ParseSize(Option(args,"--size="));
         var (w,h,pixels)=StartUi(headless,out var window);
+        // --atlas=<png> (diagnostic): the font atlas as built (white glyphs on black, their coverage as grey), to see what a glyph that
+        // draws wrong really holds.
+        if(Option(args,"--atlas=") is { } atlasPath)
+        {
+            var atlasCopy=new byte[w*h*4];
+            System.Runtime.InteropServices.Marshal.Copy(pixels,atlasCopy,0,atlasCopy.Length);
+            for(var at=0;at<atlasCopy.Length;at+=4){atlasCopy[at]=atlasCopy[at+1]=atlasCopy[at+2]=atlasCopy[at+3];atlasCopy[at+3]=255;}
+            Png.Write(atlasPath,w,h,atlasCopy);
+            Console.WriteLine($"Atlas: {w}x{h} written to {atlasPath}");
+        }
         Console.WriteLine($"PASS imgui: Dalamud.Bindings.ImGui {typeof(Dalamud.Bindings.ImGui.ImGui).Assembly.GetName().Version}, Dear ImGui {Dalamud.Bindings.ImGui.ImGui.GetVersion()}, font atlas {w}x{h}{(window is null ? "" : ", "+window.GlInfo)}");
         // TEMPORARY (X-119 step 1): Dalamud's font statics block outside the game; the plugin is copied to %LOCALAPPDATA%\TenshoAssistant\Desktop\plugin
         // (never the repository nor the installed plugin) and those calls are pointed at the desktop atlas (PluginUiTest.Host's Rewrite). For
