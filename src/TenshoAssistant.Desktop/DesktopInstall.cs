@@ -169,9 +169,26 @@ public static class DesktopInstall
         try
         {
             File.WriteAllText(temp,DesktopUpdate.WriteState(state));
-            File.Move(temp,StatePath(own),true);
+            MoveWhenFree(temp,StatePath(own));
         }
         finally{TryDelete(temp);}
+    }
+
+    /// <summary>
+    /// 0.1224 (Verify of 0.1223, « Access to the path is denied » in File.Move): another program (an antivirus, the indexer, a reader
+    /// without delete sharing) can hold update.json for an instant just after it was written; the move is tried again, 6 times with a
+    /// growing pause (50 ms × the attempt), before the error is let through, as AtomicFile.ReplaceWhenFree does for the plugin's files.
+    /// </summary>
+    internal static void MoveWhenFree(string from,string to,int attempts=6,Action<int>? wait=null)
+    {
+        for(var attempt=1;;attempt++)
+        {
+            try{File.Move(from,to,true);return;}
+            catch(Exception error) when(attempt<attempts && error is IOException or UnauthorizedAccessException && File.Exists(from))
+            {
+                if(wait is not null)wait(attempt);else Thread.Sleep(50*attempt);
+            }
+        }
     }
 
     /// <summary>
