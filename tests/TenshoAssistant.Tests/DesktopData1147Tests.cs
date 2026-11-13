@@ -106,8 +106,9 @@ internal static class DesktopData1147Tests
             }
             finally{SqliteConnection.ClearAllPools();Directory.Delete(root,true);}
             var folder=Path.Combine(Path.GetTempPath(),"tensho-1147-link");var settings=Path.Combine(Path.GetTempPath(),"TenshoAssistant.json");
+            // 0.1207 (X-184 N21): the journal (-wal) is no notice any more: every opening makes one (Link1207Tests).
             Check(LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"TenshoData.db"))=="data"
-                && LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"TenshoData.db-wal"))=="data","the data file and its journal: « data »");
+                && LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"TenshoData.db-wal")) is null,"the data file: « data »; its journal: nothing");
             Check(LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"TenshoData.db-shm")) is null
                 && LocalLinkProtocol.ChangeCategory(settings,folder,Path.Combine(folder,"Discoveries","Discoveries.db-shm")) is null,"a reader's shared-memory index is no change (the app's copy would wake itself)");
             Check(LocalLinkProtocol.DesktopCategories.Contains(LocalLinkProtocol.DataCategory) && LocalLinkProtocol.ValidCategory("data"),"a category of the closed list, read by the app");

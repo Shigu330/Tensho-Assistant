@@ -124,6 +124,8 @@ internal static class SettingsSaver1164Tests
             Until(() => slowDisk.Running == 1);
             slowLive.Version = 2;
             Check(!slow.Flush(TimeSpan.FromMilliseconds(20)), "the wait ran out");
+            // 0.1207 (X-184 N22): the unload waits once more until the live settings are on disk (Plugin.cs: Settle).
+            Check(slow.Settle(TimeSpan.FromSeconds(10)) && slowDisk.Last == 2, "settled: on its return, the live settings are on disk: " + slowDisk.Last);
             Until(() => slowDisk.Writes.Count == 2);
             Check(slowDisk.Writes.Select(write => write.Version).SequenceEqual(new[] { 1, 2 }) && slowDisk.Overlaps == 0,
                 "the live settings written anyway, after the write under way, never at the same time: " + string.Join(",", slowDisk.Writes.Select(write => write.Version)));
@@ -139,6 +141,7 @@ internal static class SettingsSaver1164Tests
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
             Check(plugin.Split("SavePluginConfig(").Length == 2 && plugin.Contains("copy=>pluginInterface.SavePluginConfig(copy),"), "one SavePluginConfig left: the saver's");
             Check(plugin.Contains("saver.Flush(TimeSpan.FromSeconds(5))") && plugin.Contains("saver.Warm("), "flushed at unload, warmed at load");
+            Check(plugin.Contains("if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning(") && !plugin.Contains("the settings were saved again"), "0.1207: settled at unload, the log says what happened");
             Check(plugin.Contains("action=>_=framework.RunOnFrameworkThread(action)"), "the fallback runs on the game's thread");
             var saverText = Read("src/TenshoAssistant/SettingsSaver.cs");
             Check(saverText.Contains("if (copy is null || serialize(copy) != text)"), "the copy is checked against the text");

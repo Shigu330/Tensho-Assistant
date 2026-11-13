@@ -60,11 +60,12 @@ internal static class LinkCategories1119Tests
             }
             finally{try{Directory.Delete(root,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
         }),
-        ("Link 1119: a notice out of the closed list (a file name, an id, an unknown word) is refused; protocol 2 is refused",() =>
+        // 0.1207 (X-184 N6): such a notice is left out (never passed on) instead of refusing the whole snapshot (Link1207Tests).
+        ("Link 1119: a notice out of the closed list (a file name, an id, an unknown word) is never passed on; protocol 2 is refused",() =>
         {
             Check(LocalLinkProtocol.Version==3,"protocol 3");
             foreach(var bad in new[]{"TenshoAssistant.json","TenshoAssistant/InventoryBank/18014398509481984.json","18014398509481984","Bank","other","","../x"})
-                Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample([new LinkChange(bad,1)])),out _,out var why) && why=="change list refused","refused: "+bad);
+                Check(LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample([new LinkChange(bad,1)])),out var kept,out _) && kept!.Changes!.Count==0,"left out: "+bad);
             foreach(var good in LocalLinkProtocol.Categories.Values.Append(LocalLinkProtocol.SettingsCategory))
                 Check(LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample([new LinkChange(good,1)])),out _,out _),"accepted: "+good);
             Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample() with {Protocol=2}),out _,out var old) && old!.Contains("protocol 2"),"protocol 2 refused: "+old);

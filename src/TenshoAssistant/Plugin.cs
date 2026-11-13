@@ -159,7 +159,13 @@ public sealed class Plugin : IDalamudPlugin
                 action=>_=framework.RunOnFrameworkThread(action),
                 (error,message)=>{if(error is null)log.Warning(message);else log.Warning(error,message);});
             registrations.Register(()=>_=saver.Warm(()=>pluginInterface.ConfigFile is { Exists: true } file ? File.ReadAllText(file.FullName) : null),
-                ()=>{if(!saver.Flush(TimeSpan.FromSeconds(5)))log.Warning("The last settings save was still running after 5 s at unload; the settings were saved again.");});
+                ()=>
+                {
+                    if(saver.Flush(TimeSpan.FromSeconds(5)))return;
+                    // X-184 N22 (0.1207): the live settings were handed to the writer: waited for, and said as it is.
+                    if(saver.Settle(TimeSpan.FromSeconds(15)))log.Warning("The last settings save took more than 5 s at unload; the settings were written once it ended.");
+                    else log.Warning("The settings were still being written 20 s after the unload began; the last ones may not be on disk.");
+                });
             void SaveTimed(string what)
             {
                 var started=System.Diagnostics.Stopwatch.GetTimestamp();

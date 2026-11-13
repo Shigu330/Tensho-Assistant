@@ -98,8 +98,15 @@ public static class LocalLinkProtocol
         if(read.Live is { } live && (live.Job is null || live.Job.Length>MaxJob || live.Level is < -1 or > 1000 || live.Gp is < -1 or > 100_000
             || live.MaxGp is < -1 or > 100_000 || live.BagSize is < -1 or > 1000 || live.BagFree<-1 || live.BagFree>Math.Max(live.BagSize,0)))
             {error="live state out of bounds";return false;}
-        if(read.Changes is { } changes && (changes.Count>MaxChanges || changes.Any(change=>change is null || !ValidCategory(change.Category) || change.Generation<1)))
-            {error="change list refused";return false;}
+        // X-184 N6 (0.1207, night review of 12/11): a category this end does not know (a newer plugin's) used to refuse the whole snapshot,
+        // and every later one carried it: the link stayed cut for the session, without a word. It is now left out (never passed on, never
+        // read as a file name), the first MaxChanges known ones kept; only a malformed notice (none, generation below 1) refuses the line.
+        if(read.Changes is { } changes)
+        {
+            if(changes.Any(change=>change is null || change.Generation<1)){error="change list refused";return false;}
+            if(changes.Count>MaxChanges || changes.Any(change=>!ValidCategory(change.Category)))
+                read=read with {Changes=changes.Where(change=>ValidCategory(change.Category)).Take(MaxChanges).ToArray()};
+        }
         if(read.Notices is { } notices && (notices.Count>MaxNotices || notices.Any(notice=>notice is null || notice.Id<1 || notice.Text is null || notice.Text.Length>MaxNoticeText)))
             {error="notice list refused";return false;}
         if(read.Held is { } held && (held.Count>MaxHeld || held.Any(item=>item is null || item.Item==0 || item.Count is < 0 or > MaxHeldCount)))
@@ -120,7 +127,10 @@ public static class LocalLinkProtocol
         if(!full.StartsWith(root+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))return null;
         if(full.EndsWith(".tmp",StringComparison.OrdinalIgnoreCase) || full.EndsWith(".lock",StringComparison.OrdinalIgnoreCase))return null;
         // 0.1147: a SQLite file's shared-memory index (-shm) changes when a reader (the desktop application's copy) reads: not a change of data.
-        if(full.EndsWith("-shm",StringComparison.OrdinalIgnoreCase))return null;
+        // X-184 N21 (0.1207, night review of 12/11): nor its journal (-wal, -journal): every opening, a read too, makes and removes -wal, and
+        // each notice made the application copy the whole file. The data file's connections are not pooled: the last one closed folds the
+        // journal into the .db, whose own change is the notice of a real write (Link1207Tests proves it).
+        if(full.EndsWith("-shm",StringComparison.OrdinalIgnoreCase) || full.EndsWith("-wal",StringComparison.OrdinalIgnoreCase) || full.EndsWith("-journal",StringComparison.OrdinalIgnoreCase))return null;
         var first=full[(root.Length+1)..].Split(Path.DirectorySeparatorChar)[0];
         var stem=first.Split('.')[0];
         return Categories.TryGetValue(stem,out var category) ? category : null;

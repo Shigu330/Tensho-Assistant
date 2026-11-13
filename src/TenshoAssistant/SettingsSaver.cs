@@ -120,4 +120,17 @@ public sealed class SettingsSaver<T>(T live, Func<T, string> serialize, Func<str
         if (left) save(live);
         return done;
     }
+
+    /// <summary>
+    /// X-184 N22 (0.1207, night review of 12/11): at unload, after <see cref="Flush"/> handed the live settings to the worker (a write of more
+    /// than its wait: a scanner, OneDrive): waits once more, longer, until the worker has written them; true once they are on disk. Without it
+    /// the plugin's unload went on, the game could close with the last settings never written, and the log said they were saved.
+    /// </summary>
+    public bool Settle(TimeSpan wait)
+    {
+        Task under;
+        lock (gate) under = worker;
+        try { return under.Wait(wait); }
+        catch (AggregateException) { return true; }
+    }
 }
