@@ -1501,6 +1501,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1207) Application de bureau ouverte, jeu lancé : ouvrir puis fermer des pages qui lisent les gils ou les hauts faits sans rien changer : l'application ne recopie plus le fichier de données à chaque fois (pas de rechargement visible) ; un vrai changement (gils gagnés) arrive toujours
 
+- [ ] (0.1211) Jardin : récolter deux emplacements à moins de 5 secondes d'écart (ouvrir le menu de chacun) : les deux sont retirés du journal comme récoltés
+
+- [ ] (0.1212) Rangements › Personnages : « Effacer » un personnage qui n'est pas connecté : il disparaît de la liste, son journal des gils et ses hauts faits ne s'affichent plus pour lui
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
