@@ -48,8 +48,10 @@ X-183 (0.1210, night review of 12/11, N5, N12, N13, N16, N17): each field has th
 by the plugin's reader); a share's facts are its sightings (Seen from 1 to 100 000, at least the values counted) and no date before 2026-11-01; each
 player counts for at most 1 000 sightings of a fact in the common histograms; the exact place is the earliest day's; a player alone far outside the
 others' levels on over 5 % of the facts they share is left out of rebuild (FLAG); one file per GitHub account; every file written whole or not at all;
-issue titles printed without control or format characters."""
-import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,struct,subprocess,sys,tempfile,unicodedata,urllib.request,zipfile
+issue titles printed without control or format characters.
+X-146 (0.1214, audit A10): every remote call (gh, a gist file) has a deadline of 60 s, a slow trickle included; an issue whose gist cannot be read
+in time is reported unreadable and skipped, the batch goes on."""
+import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,struct,subprocess,sys,tempfile,time,unicodedata,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
@@ -64,6 +66,9 @@ MAX_VALUES=32;MAX_VALUE=100_000;MAX_COUNT=100_000_000
 # a share's sightings of one fact are at most MAX_SEEN; each player counts for at most PLAYER_SIGHTINGS sightings of a fact in the common histograms
 # (the shape of theirs kept); a player alone far outside the others' levels on over 5 % of the facts they share (FAR_FACTS at least) is left out.
 UINT=2**32-1;INT=2**31-1;FIRST_DAY=datetime(2026,11,1,tzinfo=timezone.utc)
+# X-146 (0.1214, audit A10): each remote call (gh, a gist file) stops past REMOTE_TIMEOUT seconds, a slow trickle included; the issue is then
+# reported unreadable and skipped, the batch goes on.
+REMOTE_TIMEOUT=60
 MAX_SEEN=100_000;PLAYER_SIGHTINGS=1_000;FAR_FACTS=3
 # X-174: the v3 format and its bounds (ExchangeV3 in the plugin).
 V3_FORMAT="tensho-discoveries";V3_VERSION=3;V3_INDEX="index.json";GIST_V2="tensho-discoveries.b64";GIST_SUFFIX=".b64"
@@ -241,16 +246,24 @@ def from_gist_files(files,fetch):
         return json.loads(gunzip_bounded(base64.b64decode(fetch(files[GIST_V2]["raw_url"],64*1024*1024).strip()),64*1024*1024).decode("utf-8"))
     raise ValueError("no discoveries file in the gist")
 
-def fetch_gist_raw(url,limit):
+def fetch_gist_raw(url,limit,deadline=None,opener=None):
+    """A gist file's bytes, at most limit (over it: refused), within deadline seconds in all (X-146: a server that sends a byte at a time is
+    stopped too), read by chunks of 1 MB."""
     if not url.startswith("https://gist.githubusercontent.com/"):raise ValueError("unexpected gist file address")
-    with urllib.request.urlopen(url) as answer:data=answer.read(limit+1)
+    deadline=REMOTE_TIMEOUT if deadline is None else deadline;end=time.monotonic()+deadline;data=bytearray()
+    with (opener or urllib.request.urlopen)(url,timeout=deadline) as answer:
+        while len(data)<=limit:
+            chunk=answer.read(min(1<<20,limit+1-len(data)))
+            if not chunk:break
+            data+=chunk
+            if time.monotonic()>end:raise TimeoutError("the gist file came too slowly")
     if len(data)>limit:raise ValueError("too large")
-    return data
+    return bytes(data)
 
 def gist_listing(gist):
     """X-168: a gist's owner login and files ({name: {"raw_url": …}}), through the GitHub CLI; nothing of its content is read here."""
     listed=json.loads(subprocess.run(["gh","api",f"gists/{gist}","--jq","{owner:(.owner.login // \"\"),files:(.files|map_values({raw_url:.raw_url}))}"],
-        capture_output=True,text=True,check=True).stdout)
+        capture_output=True,text=True,check=True,timeout=REMOTE_TIMEOUT).stdout)
     return listed.get("owner") or "",listed.get("files") or {}
 
 def from_gist(reference):
@@ -429,7 +442,7 @@ ISSUE_LIMIT=500
 def sync(dry):
     # X-168: every open issue is listed (no label filter), then is_share picks the shares.
     issues=json.loads(subprocess.run(["gh","issue","list","-R","Shigu330/Tensho-Assistant","--state","open","--limit",str(ISSUE_LIMIT),
-        "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True).stdout)
+        "--json","number,title,body,author,labels"],capture_output=True,text=True,check=True,timeout=REMOTE_TIMEOUT).stdout)
     os.makedirs(PLAYERS,exist_ok=True)
     taken={};shares=set()
     # X-183 (N13): the newest issue of an account first; an older one of the same account (a gist made again, a second issue) is not read.
@@ -689,6 +702,20 @@ def selftest():
         finally:os.replace=real
         check(raised and open(target,encoding="utf-8").read()=="old" and not [n for n in os.listdir(tmp) if n.endswith(".tmp")],"N16: a failed write leaves the old file whole and no temporary")
     PLAYERS,COMMON,V3_DIR=saved
+    # X-146: a gist file read within its bound and its time, a slow trickle stopped.
+    class Answer:
+        def __init__(self,data,pause=0.0):self.data=data;self.pause=pause
+        def __enter__(self):return self
+        def __exit__(self,*_):return False
+        def read(self,n):
+            time.sleep(self.pause);n=min(n,1 if self.pause else n);out,self.data=self.data[:n],self.data[n:];return out
+    url="https://gist.githubusercontent.com/a/b/raw/c"
+    check(fetch_gist_raw(url,10,opener=lambda u,timeout:Answer(b"abc"))==b"abc","X-146: a gist file read")
+    check(refused(lambda:fetch_gist_raw(url,2,opener=lambda u,timeout:Answer(b"abc"))),"X-146: over its bound: refused")
+    try:fetch_gist_raw(url,100,deadline=0.2,opener=lambda u,timeout:Answer(b"x"*50,0.02));slow=False
+    except TimeoutError:slow=True
+    check(slow,"X-146: a byte at a time past the deadline: stopped")
+    check(refused(lambda:fetch_gist_raw("https://example.com/x",10,opener=lambda u,timeout:Answer(b"abc"))),"X-146: another address: refused")
     if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)) and os.path.isfile(COMMON):
         held=json.load(open(COMMON,encoding="utf-8"))["Facts"]
         check(sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)==sorted(held,key=sort_key),"v3: the repository's set holds the facts of discoveries.json")
@@ -712,7 +739,7 @@ def notice_manual(issue,doubt,dry):
     if doubt not in MANUAL_NOTICES:print(__doc__);return 2
     body=compose(*MANUAL_NOTICES[doubt])
     if dry:print(body);return 0
-    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True)
+    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True,timeout=REMOTE_TIMEOUT)
     print(f"#{issue}: {'commented' if out.returncode==0 else 'comment failed'}");return out.returncode
 
 def notice(argv):
@@ -728,7 +755,7 @@ def notice(argv):
     else:body=compose(f"Not merged: {a} of {b} facts were refused (over 5 %). Please update Tensho Assistant, export again and update the gist.",
                       f"Pas fusionné : {a} faits refusés sur {b} (plus de 5 %). Merci de mettre Tensho Assistant à jour, d'exporter à nouveau et de mettre le gist à jour.")
     if dry:print(body);return 0
-    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True)
+    out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True,timeout=REMOTE_TIMEOUT)
     print(f"#{issue}: {'commented' if out.returncode==0 else 'comment failed'}");return out.returncode
 
 if __name__=="__main__":
