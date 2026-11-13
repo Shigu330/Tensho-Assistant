@@ -567,6 +567,34 @@ if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
         Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
     return;
 }
+// PROBE_GRACE (X-221, 0.1231): the statuses named « Grace » (English) with their French names, and the items whose ItemAction gives them
+// (ItemAction.Type and Data columns: which one holds the experience cap); read-only.
+if(Environment.GetEnvironmentVariable("PROBE_GRACE") is { Length:>0 })
+{
+    var statusEn=data.Excel.GetSheet<Status>(Language.English);var status=data.Excel.GetSheet<Status>();
+    var graces=statusEn.Where(row=>row.Name.ExtractText().Contains("Grace",StringComparison.OrdinalIgnoreCase) || row.Name.ExtractText().Contains("Manual",StringComparison.OrdinalIgnoreCase)
+        || row.Name.ExtractText().Contains("Guerdon",StringComparison.OrdinalIgnoreCase)).ToArray();
+    foreach(var row in graces)
+        Console.WriteLine($"STATUS {row.RowId} '{row.Name.ExtractText()}' / '{status.GetRowOrDefault(row.RowId)?.Name.ExtractText()}' icon {row.Icon} :: {row.Description.ExtractText().Replace((char)10,' ')}");
+    var ids=graces.Select(row=>row.RowId).ToHashSet();
+    var itemsEn=data.Excel.GetSheet<Item>(Language.English);
+    foreach(var item in data.Excel.GetSheet<Item>())
+    {
+        if(item.ItemAction.RowId==0 || item.ItemAction.ValueNullable is not { } action)continue;
+        var values=action.Data.ToArray();var extra=action.DataHQ.ToArray();
+        var englishName=itemsEn.GetRowOrDefault(item.RowId)?.Name.ExtractText() ?? "";
+        if(!englishName.Contains("Manual",StringComparison.OrdinalIgnoreCase) && !englishName.Contains("Guerdon",StringComparison.OrdinalIgnoreCase))continue;
+        Console.WriteLine($"ITEM {item.RowId} '{itemsEn.GetRowOrDefault(item.RowId)?.Name.ExtractText()}' / '{item.Name.ExtractText()}' action {item.ItemAction.RowId} action {action.Action.RowId} data [{string.Join(",",values)}] hq [{string.Join(",",extra)}] :: {itemsEn.GetRowOrDefault(item.RowId)?.Description.ExtractText().Replace((char)10,' ')}");
+    }
+    // The manuals' ItemAction Data[0] is an ItemFood row: its experience bonus and parameters (BaseParam, value, max).
+    var foods=data.Excel.GetSheet<ItemFood>();var paramsEn=data.Excel.GetSheet<BaseParam>(Language.English);
+    foreach(var row in new uint[]{300,301,302,303,1751,1752,5329,5330,2290,2291})
+        if(foods.GetRowOrDefault(row) is { } food)
+            Console.WriteLine($"FOOD {row} exp {food.EXPBonusPercent}% params {string.Join(" | ",food.Params.Where(entry=>entry.BaseParam.RowId!=0).Select(entry=>$"{entry.BaseParam.RowId} '{paramsEn.GetRowOrDefault(entry.BaseParam.RowId)?.Name.ExtractText()}' value {entry.Value} max {entry.Max} relative {entry.IsRelative} hq {entry.ValueHQ}/{entry.MaxHQ}"))}");
+    foreach(var id in new uint[]{4632,4633,4634,4635,12667,12668,26553,26554})
+        Console.WriteLine($"DESC {id} {itemsEn.GetRowOrDefault(id)?.Description.ExtractText().Replace((char)10,' ')}");
+    return;
+}
 // PROBE_MOUNT (X-219, 0.1229): the Mount sheet's seats (ExtraSeats), riding music (RideBGM -> BGM.File, matched to OrchestrionPath.File for the
 // orchestrion roll's name) and mount actions (MountAction -> Action names); read-only.
 if(Environment.GetEnvironmentVariable("PROBE_MOUNT") is { Length:>0 })

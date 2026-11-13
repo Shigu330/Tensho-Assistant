@@ -29,7 +29,8 @@ internal static class ReadingCaptureTests
         ("Probe set: gatherer statuses, fishing flag and chat, island, synthesis and airship parts keep their guards",() =>
         {
             var capture=Read("Diagnostics/ReadingCapture.Dalamud.cs");
-            Check(capture.Contains("if(job is 16 or 17 or 18)ReadStatuses(local);") && capture.Contains("Line(\"statuses\",200,"),"statuses: gatherers only");
+            // 0.1231 (X-221): crafters too (Grace of a manual), still never a combat job.
+            Check(capture.Contains("if(job is >= 8 and <= 18)ReadStatuses(local);") && capture.Contains("Line(\"statuses\",200,"),"statuses: crafters and gatherers only");
             Check(capture.Contains("if(flag!=fishing){fishing=flag;Line(\"fishing\",200,") && capture.Contains("if(objects.LocalPlayer?.ClassJob.RowId==18)Line(\"fishing\",200,"),"fishing: on change, fishers only");
             Check(capture.Contains("if(manager==null || !manager->IsPlayerInSanctuary)return;") && capture.Contains("Line(\"islandAgenda\",200,"),"island: in the sanctuary only");
             Check(capture.Contains("if(text==synthesis)return;") && capture.Contains("Line(\"synthesis\",150,"),"synthesis: on change");

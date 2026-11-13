@@ -73,7 +73,8 @@ public sealed unsafe class ReadingCapture : IDisposable
             var local=objects.LocalPlayer;
             if(local is null)return;
             var job=local.ClassJob.RowId;
-            if(job is 16 or 17 or 18)ReadStatuses(local);
+            // X-221 (0.1231): crafters too, for the Grace of a manual (statuses 45 and 46: is its param the experience left?).
+            if(job is >= 8 and <= 18)ReadStatuses(local);
             var flag=condition[ConditionFlag.Fishing];
             if(flag!=fishing){fishing=flag;Line("fishing",200,$"fishing flag {flag}");}
             if(job==18)ReadFishingLine(local);
@@ -284,7 +285,8 @@ public sealed unsafe class ReadingCapture : IDisposable
         Line("npctrade",60,all);
     }
 
-    // C28, G2: the statuses of a gatherer, 568 Fisher's Intuition and 2891 Spearfisher's Intuition among them.
+    // C28, G2: the statuses of a gatherer, 568 Fisher's Intuition and 2891 Spearfisher's Intuition among them. X-221 (0.1231): and of a crafter,
+    // for 45 Crafter's Grace and 46 Gatherer's Grace (docs/evidence/0.1231-grace-cap.md): their param and time left, at each change.
     private void ReadStatuses(Dalamud.Game.ClientState.Objects.SubKinds.IPlayerCharacter local)
     {
         var ids=string.Join(",",local.StatusList.Where(status=>status.StatusId!=0).Select(status=>$"{status.StatusId}:{status.Param}").OrderBy(id=>id,StringComparer.Ordinal));

@@ -32,6 +32,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1187-unload-roots.md](0.1187-unload-roots.md) | `src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs`, `src/TenshoAssistant/Diagnostics/UnloadWatch.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/UnloadRoots1187Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/ROADMAP.md` |
 | [0.1227-garland-patch.md](0.1227-garland-patch.md) | `src/TenshoAssistant/Community/GarlandItemSources.cs`, `tests/TenshoAssistant.Tests/GarlandPatch1227Tests.cs` | `CHANGELOG.md` |
 | [0.1229-mount-sheet.md](0.1229-mount-sheet.md) | `src/TenshoAssistant/Collections/CollectionReader.Dalamud.cs`, `src/TenshoAssistant/Collections/CollectionService.cs`, `tests/TenshoAssistant.Tests/MountSheet1229Tests.cs` | `CHANGELOG.md` |
+| [0.1231-grace-cap.md](0.1231-grace-cap.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/GraceReading1231Tests.cs` | `CHANGELOG.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.127.0-sightseeing-probe.log](0.127.0-sightseeing-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -275,5 +276,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 263 files · fichiers ; 209 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 264 files · fichiers ; 210 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
