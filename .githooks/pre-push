@@ -7,6 +7,7 @@
 # version, SHA-256 of the files, Dalamud and SDK versions), as just after publish.sh or Verify.ps1 -Commit, it prints
 # « SKIP checks » in a few seconds instead of building and testing again. Any change since that run builds and tests everything.
 echo "pre-push: Verify.ps1 (skips when its stamp matches the same sources)"
+# X-268 (0.1277): under publish.sh while the player is busy (TENSHO_NORELOAD=1), Verify.ps1 builds beside the game: no reload in a duty.
 if command -v pwsh >/dev/null 2>&1; then
   pwsh -NoProfile -File ./scripts/Verify.ps1
 else

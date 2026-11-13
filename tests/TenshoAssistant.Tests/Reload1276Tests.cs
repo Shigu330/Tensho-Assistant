@@ -26,5 +26,13 @@ internal static class Reload1276Tests
             Check(usual > 0 && other > usual, "the usual folder unless TenshoOutputPath is given (the later one wins)");
             Check(Read(".gitignore").Contains("artifacts/"), "the build beside is never tracked");
         }),
+        ("Reload 1277: under publish.sh while the player is busy (TENSHO_NORELOAD=1), every Verify.ps1 builds beside the game, the pre-push hook's too", () =>
+        {
+            var verify = Read("scripts/Verify.ps1");
+            var env = At(verify, "if ($env:TENSHO_NORELOAD -eq '1' -and -not $Release) { $NoReload = [switch]::Present }");
+            Check(env > 0 && env < At(verify, "if ($NoReload -and $Release) { throw"), "read first, a release never");
+            var hook = Read(".githooks/pre-push");
+            Check(hook.Contains("pwsh -NoProfile -File ./scripts/Verify.ps1\n") && hook.Contains("TENSHO_NORELOAD=1"), "the hook runs Verify.ps1, which reads it");
+        }),
     ];
 }

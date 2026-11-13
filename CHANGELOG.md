@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1277.0
+- Plan global, X-268 : Outillage (R19.3), suite de 0.1276 : l'essai de 0.1276 (joueur en mission simulé) a montré que le crochet pre-push relançait Verify.ps1 sans option et recompilait là où le jeu charge, donc rechargeait le jeu pendant la mission. Verify.ps1 lit maintenant TENSHO_NORELOAD=1 (posé par la publication quand le joueur est occupé, hérité par git et son crochet) comme -NoReload, jamais pour une release.
+- Tests : Reload1276Tests. Verify.ps1 (agent) : 2332/2332, 0 avertissement, 0 erreur ; DLL 0.1277.0.0. Rien à essayer en jeu.
+### English
+- Tooling (R19.3), follow-up of 0.1276: the trial of 0.1276 (player in a duty, simulated) showed the pre-push hook running Verify.ps1 with no switch and building where the game loads, so reloading the game during the duty. Verify.ps1 now reads TENSHO_NORELOAD=1 (set by the publication while the player is busy, inherited by git and its hook) as -NoReload, never for a release.
+
 ## 0.1276.0
 - Plan global, X-268 : Outillage (R19.3) : quand le joueur est en mission, en pêche en mer ou en contenu classé, une version se publie quand même sans recharger le jeu : Verify.ps1 -NoReload compile le plugin dans artifacts\noreload\ (propriété TenshoOutputPath du csproj), toutes les vérifications tournent sur cette compilation, et la publication libre suivante recompile là où le jeu charge. Verify.ps1 refuse -Release avec -NoReload (une release est toujours compilée là où le jeu la charge), et une compilation faite à part n'est jamais reprise pour celle du jeu. Côté agent : dernière version d'un relais prête à publier par publish.sh --last, sauvegarde et contexte dits à la fin de chaque version, release et annonce refusées hors de la session maître.
 - Tests : Reload1276Tests. Verify.ps1 (agent) : 2331/2331, 0 avertissement, 0 erreur ; DLL 0.1276.0.0. Rien à essayer en jeu.

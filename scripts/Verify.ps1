@@ -20,6 +20,9 @@
     [switch]$NoReload
 )
 $ErrorActionPreference = 'Stop'
+# X-268 (0.1277, found by the trial of 0.1276): publish.sh sets TENSHO_NORELOAD=1 while the player is busy, and every Verify.ps1 started under
+# it builds beside the game too: the pre-push hook (.githooks/pre-push runs Verify.ps1 with no switch) had rebuilt where the game loads.
+if ($env:TENSHO_NORELOAD -eq '1' -and -not $Release) { $NoReload = [switch]::Present }
 if ($NoReload -and $Release) { throw '-NoReload builds beside the game: a release is always built where the game loads it (R19.3); run it when the player is free.' }
 if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
