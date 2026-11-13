@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1275.0</Version>
+    <Version>0.1276.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -12,6 +12,8 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>$(MSBuildProjectDirectory)\bin\x64\$(Configuration)\</OutputPath>
+    <!-- X-268 (R19.3): Verify.ps1 -NoReload builds beside the folder the game loads (the player is in a duty): -p:TenshoOutputPath=…. -->
+    <OutputPath Condition="'$(TenshoOutputPath)' != ''">$(TenshoOutputPath)</OutputPath>
     <!-- X-126 (D-137): the desktop app installed from Settings › Advanced. A build for the official repository would pass
          -p:TenshoDesktopInstall=false: no installer, the section only links to the release page. -->
     <TenshoDesktopInstall Condition="'$(TenshoDesktopInstall)' == ''">true</TenshoDesktopInstall>

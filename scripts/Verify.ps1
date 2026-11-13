@@ -13,9 +13,14 @@
     [switch]$Force,
     # 0.323: contributors without the game: builds the test project only (pure logic, no Dalamud), runs the tests and the language
     # validation, skips the plugin build and the package. Not enough for a release.
-    [switch]$TestsOnly
+    [switch]$TestsOnly,
+    # X-268 (R19.3): the player is in a duty (or an ocean voyage, competitive content): the plugin is built into artifacts\noreload\, not
+    # into the folder the game loads, so the game does not reload it now; the next run without it (the next free publish) loads it. Every
+    # check runs the same on that build. A release is always built where the game loads it: refused with -Release.
+    [switch]$NoReload
 )
 $ErrorActionPreference = 'Stop'
+if ($NoReload -and $Release) { throw '-NoReload builds beside the game: a release is always built where the game loads it (R19.3); run it when the player is free.' }
 if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
 if ($Major -and -not $Release) { throw '-Major goes with -Release only.' }
@@ -115,6 +120,8 @@ $taskSkip = $false
 if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release\TenshoAssistant\latest.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip')) -and (Test-Path -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip.sha256'))) {
     $taskStamp = Get-Content -Raw -LiteralPath $taskStampFile | ConvertFrom-Json
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
+    # X-268: a build made beside the game (-NoReload) is never taken for the one the game loads: a run without -NoReload builds again.
+    if ($taskStamp.NoReload -and -not $NoReload) { $taskSkip = $false }
 }
 if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
     # 0.1203 (relay 37, publish.sh measured): publish.sh writes the test count into the new CHANGELOG entry right after the green run;
@@ -144,7 +151,9 @@ else {
 $taskTests = $null
 Push-Location $taskRoot
 try {
-    & $DotNet build TenshoAssistant.sln -c Release --nologo
+    $taskNoReloadOutput = Join-Path $taskRoot 'artifacts\noreload\'
+    if ($NoReload) { & $DotNet build TenshoAssistant.sln -c Release --nologo "-p:TenshoOutputPath=$taskNoReloadOutput" }
+    else { & $DotNet build TenshoAssistant.sln -c Release --nologo }
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
     Add-TaskTime 'build'
     # X-267 (0.1275, R36.2): the managed tests (in parallel by class: tests/TenshoAssistant.Tests/TestRunner.cs) run alongside the other
@@ -160,7 +169,8 @@ try {
     if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
     Write-Output 'PASS localization metadata, duplicate keys and format compatibility (partial translations allowed)'
     Add-TaskTime 'languages'
-    $taskOutput = Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release'
+    $taskOutput = if ($NoReload) { $taskNoReloadOutput.TrimEnd('\') } else { Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release' }
+    if ($NoReload) { Write-Output "NO RELOAD: the plugin was built into $taskOutput (the game keeps the DLL it loaded; the next free publish loads this version)." }
     $taskManifest = Get-Content -Raw -LiteralPath (Join-Path $taskOutput 'TenshoAssistant.json') | ConvertFrom-Json
     # The source manifest leaves InternalName/AssemblyVersion/DalamudApiLevel to DalamudPackager (Dalamud plugin metadata rules);
     # the version comes from <Version> in the csproj only.
@@ -303,7 +313,7 @@ try {
     foreach ($taskPackage in @((Join-Path $taskOutput 'TenshoAssistant\latest.zip'), (Join-Path $taskRoot 'src\TenshoAssistant.Desktop\bin\TenshoAssistant.Desktop.zip'))) {
         if (Test-Path -LiteralPath $taskPackage) { $taskPackages[[IO.Path]::GetFileName($taskPackage)] = (Get-FileHash -LiteralPath $taskPackage -Algorithm SHA256).Hash.ToLowerInvariant() }
     }
-    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]($taskClean -and $taskCleanAfter -and $taskHeadAfter -eq $taskHead); Packages = $taskPackages; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
+    [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]($taskClean -and $taskCleanAfter -and $taskHeadAfter -eq $taskHead); Packages = $taskPackages; NoReload = [bool]$NoReload; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
 finally {
     # X-267: a step that failed while the tests ran alongside never leaves them running.
