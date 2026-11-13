@@ -99,7 +99,7 @@ internal sealed partial class MainWindow
                 if(ImGui.Button(localization.Get("TriadRequest.SaveTensho")))SaveGeneratedDeck(request,generated);
                 ImGui.TextWrapped(localization.Get("TriadRequest.BuildInGame"));
             }
-            ImGui.TextDisabled(localization.Get("TriadRequest.Estimate"));
+            OriginLine(UI.UiOrigin.Estimated,localization.Get("TriadRequest.Estimate"));
         });
     }
     // Deck choice window (0.165), like TriadBuddy: estimated win rate written beside each deck row, best deck framed in green.

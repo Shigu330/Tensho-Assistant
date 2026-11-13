@@ -297,7 +297,8 @@ internal sealed partial class MainWindow
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Triad");
         if (state.Result is not { } result || state.Revision != triadRevision) return;
         if (result.Moves.Count == 0) { ImGui.TextWrapped(localization.Get("TriadSim.NoDepth")); return; }
-        ImGui.TextColored(result.Exact ? Success : Accent, result.Exact ? localization.Get("TriadSim.Exact") : localization.Get("TriadSim.Estimate"));
+        if(result.Exact)ImGui.TextColored(Success,localization.Get("TriadSim.Exact"));
+        else OriginLine(UI.UiOrigin.Estimated,localization.Get("TriadSim.Estimate"));
         ImGui.TextDisabled(localization.Format("TriadSimCounts.Depth",result.CompletedDepth,result.Nodes));
         var best = result.Best(position.Turn);
         foreach (var candidate in best.Take(8))

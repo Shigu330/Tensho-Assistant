@@ -95,10 +95,12 @@ internal sealed partial class MainWindow
         if(FreshTriadFrame() is not { } frame){ImGui.TextDisabled(localization.Get("TriadAdvice.NoMatch"));return;}
         var advice=TriadAdviceFor(frame,out var loading);
         if(loading){ImGui.TextDisabled(localization.Get("TriadAdvice.Calculating"));return;}
-        if(advice is null){ImGui.TextDisabled(localization.Get("TriadAdvice.Waiting"));return;}
+        if(advice is null){StateLine(UI.UiState.Waiting,localization.Get("TriadAdvice.Waiting"));return;}
         if(advice.Problem!=TriadAdviceProblem.None){ImGui.TextWrapped(localization.Get("TriadAdvice."+advice.Problem));return;}
         var best=advice.Best[0];
         ImGui.TextColored(Success,localization.Format("TriadAdvice.Move",best.HandSlot+1,best.Square/3+1,best.Square%3+1,best.AverageDifference.ToString("+0.#;-0.#;0")));
         ImGui.TextDisabled(localization.Format("TriadAdvice.Detail",advice.Hands,advice.Exact ? localization.Get("TriadAdvice.Exact"):localization.Get("TriadAdvice.Approximate")));
+        // X-156 (0.1267): an advice cut by the time limit is an estimate, flagged as everywhere; an exact one carries no mark.
+        if(!advice.Exact)OriginMark(UI.UiOrigin.Estimated,localization.Get("TriadAdvice.Approximate"));
     }
 }

@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
         if(mapFindSources is null || !mapFindSources.Zip(sources).All(pair=>ReferenceEquals(pair.First,pair.Second)))StartMapFind(sources);
         if(mapFindTask is {IsCompleted:true} task && !ReferenceEquals(mapFindHits,task.Result))
         {mapFindHits=task.Result;mapFindShownQuery="\0";}
-        if(mapFindHits is null){ImGui.TextDisabled(localization.Get("MapsUi.FindLoading"));return;}
+        if(mapFindHits is null){StateLine(UI.UiState.Waiting,localization.Get("MapsUi.FindLoading"));return;}
         if(mapFindShownQuery!=mapFindQuery){mapFindResult=MapSearch.Find(mapFindHits,mapFindQuery);mapFindShownQuery=mapFindQuery;}
         var (shown,total)=mapFindResult;
         ImGui.TextDisabled(total>shown.Length ? localization.Format("MapsUi.FindMore",shown.Length,total):localization.Format("MapsUi.FindCount",total));

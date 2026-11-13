@@ -157,7 +157,7 @@ internal sealed partial class MainWindow
         if(listPanelCurrencies.Rows is not { IsCompletedSuccessfully:true } ready)
         {
             if(listPanelCurrencies.Rows is { IsFaulted:true } failed){log.Warning(failed.Exception,"The vendor currencies could not be listed.");listPanelCurrencies=(vendors,recipes,Task.FromResult<(uint,string)[]>([]));}
-            ImGui.TextDisabled(localization.Get("ListPanels.CurrenciesLoading"));
+            StateLine(UI.UiState.Waiting,localization.Get("ListPanels.CurrenciesLoading"));
             return;
         }
         var on=read() ?? [];

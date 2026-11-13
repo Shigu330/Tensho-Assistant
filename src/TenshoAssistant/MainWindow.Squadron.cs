@@ -86,7 +86,7 @@ internal sealed partial class MainWindow
             ImGui.TextDisabled(string.Join(" · ",party.Members.Select(MemberLabel)));
             ImGui.Unindent();
         }
-        ImGui.TextDisabled(localization.Get("Squadron.Estimate"));
+        OriginLine(UI.UiOrigin.Estimated,localization.Get("Squadron.Estimate"));
         if(ImGui.SmallButton(localization.Get("Squadron.Log")))LogSquadronProbe(squadron,members,mission,set,parties);
         Tip("Squadron.LogTip");
     }

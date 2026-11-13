@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
         finally { ImGui.EndChild(); }
         if (catalog.Find(selectedMapId) is not { } selected)
         { ImGui.TextDisabled(localization.Get("MapsUi.Select")); return; }
-        ImGui.TextColored(Accent, selected.Zone);
+        UI.UiComponents.SubTitle(selected.Zone);
         if(ImGui.SmallButton(localization.Get("MapsUi.Weather"))) OpenWeather(selected.TerritoryId,selected.Zone);
         ImGui.TextUnformatted($"{selected.Region} · {selected.Subzone}");
         ImGui.SetNextItemWidth(110); var changedX = ImGui.InputFloat("X##MapX", ref mapX, 0, 0, "%.1f"); Tip("MapsUi.CoordinatesTip");

@@ -58,8 +58,8 @@ internal sealed partial class MainWindow
     {
         var state=mapLocal?.State;
         if(state?.Index is { } index)return index;
-        if(state?.Error is { } error)ImGui.TextColored(UI.FfxivTheme.Error,localization.Format("MapLocal.IndexError",error));
-        else ImGui.TextDisabled(localization.Format("MapLocal.IndexLoading",state?.Copied ?? 0));
+        if(state?.Error is { } error)StateLine(UI.UiState.Failed,localization.Format("MapLocal.IndexError",error));
+        else StateLine(UI.UiState.Waiting,localization.Format("MapLocal.IndexLoading",state?.Copied ?? 0));
         return null;
     }
 
@@ -121,7 +121,7 @@ internal sealed partial class MainWindow
     private void DrawLocalGathering(MapDefinition map)
     {
         if(LocalIndexOrStatus() is not { } index)return;
-        if(gatheringCatalog.State.Catalog is not { } catalog){ImGui.TextDisabled(localization.Get("MapLocal.GatheringLoading"));return;}
+        if(gatheringCatalog.State.Catalog is not { } catalog){StateLine(UI.UiState.Waiting,localization.Get("MapLocal.GatheringLoading"));return;}
         if(mapLocalGatheringCache.MapId!=map.MapId || !ReferenceEquals(mapLocalGatheringCache.Catalog,catalog) || !ReferenceEquals(mapLocalGatheringCache.Index,index))
             mapLocalGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId));
         var groups=mapLocalGatheringCache.Groups;
@@ -233,7 +233,7 @@ internal sealed partial class MainWindow
     // NPC vendors of the map from the cached vendor catalogue, by name; click = flag, hover = shops.
     private void DrawLocalVendors(MapDefinition map)
     {
-        if(npcVendors?.State.Catalog is null){ImGui.TextDisabled(localization.Get("MapLocal.VendorsLoading"));return;}
+        if(npcVendors?.State.Catalog is null){StateLine(UI.UiState.Waiting,localization.Get("MapLocal.VendorsLoading"));return;}
         var rows=MapVendors(map);
         var vendorMarkers=VendorCandidates(mapMarkers?.For(map.MarkerRange) ?? []);
         if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}

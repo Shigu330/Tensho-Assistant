@@ -29,7 +29,7 @@ internal sealed partial class MainWindow
             fatesFailed=fateZones is not { Count:>0 };
         }
         if(fatesFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Fates.Unavailable"));return;}
-        if(fateZones is not { } zones){ImGui.TextDisabled(localization.Get("Fates.Loading"));return;}
+        if(fateZones is not { } zones){StateLine(UI.UiState.Waiting,localization.Get("Fates.Loading"));return;}
         // Once, on first showing: the zone you are in; afterwards, the one you chose.
         if(!fatesPlaced){fatesPlaced=true;fateZone=FieldBoard.ZoneOf(zones,CurrentTerritory?.Invoke() ?? 0);}
         fateZone=Math.Clamp(fateZone,0,zones.Count-1);
