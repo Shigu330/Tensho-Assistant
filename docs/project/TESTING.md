@@ -1555,6 +1555,32 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1237) Événements (une fête en cours) et une boutique dont un objet demande une quête : la coche des quêtes faites est la même qu'avant ; mode développeur : pas de ligne « slow frame » pour Events au changement du journal
 
+- [ ] (0.1238) Application de bureau : elle s'ouvre, la navigation n'a pas les pages laissées au jeu, une page se choisit, une alarme due sonne avec sa notification Windows ; sa console ne dit ni « Contract » ni « Typed contract »
+
+- [ ] (0.1239) Chargement et déchargement du plugin (désactiver puis réactiver dans Dalamud) : aucune erreur Tensho dans dalamud.log ; la banque (Rangements) garde ses sacs et ses servants
+
+- [ ] (0.1240) Barre serveur : alarmes, rappels, monnaies, gils et entrées facultatives au même endroit qu'avant, info-bulles et clics comme avant ; désactiver puis réactiver le plugin : aucune erreur Tensho dans dalamud.log
+
+- [ ] (0.1241) Eurêka et Bozja › Météo et nuit : les quatre zones d'Eurêka, noms d'ALEA et de météo du jeu, une prochaine fenêtre par ligne ; en Eurêka, la fenêtre « maintenant » concorde avec la météo affichée par le jeu
+
+- [ ] (0.1241) Bouton « Alarme » d'un monstre à météo (ex. Pagos, morbole de neige) : alarmes ajoutées dans Alarmes, qui ne sonnent que pendant la météo
+
+- [ ] (0.1241) Paramètres › Avancé › « Données du jeu et observées seulement » coché : l'onglet dit que ces conditions sont masquées
+
+- [ ] (0.1241) dalamud.log : ligne Selftest « Eureka notorious monsters » ok
+
+- [ ] (0.1242) Page Équipement : choisir une pièce, poser une matéria, changer de job prévu, cocher « supposer HQ » : statistiques, niveau d'objet moyen et valeurs dérivées changent aussitôt comme avant ; mode développeur : pas de ligne « slow frame » pour Gear
+
+- [ ] (0.1243) Planificateur des aéronefs, objectif « Butin : un objet » : choisir un objet (recherche), « Peut tomber à » nomme des secteurs, chaque trajet listé passe par l'un d'eux
+
+- [ ] (0.1243) Objectif « Débloquer un secteur » : choisir un secteur, la ligne dit par quel secteur, le rang et l'ordre d'exploration ; chaque trajet passe par ce secteur
+
+- [ ] (0.1244) Mode développeur, Diagnostics : la section « Tableau de bord » en tête, état général et neuf lignes ; les valeurs bougent une fois par seconde ; repliée, rien ne change
+
+- [ ] (0.1245) Paramètres › Général : cocher « État de Tensho dans la barre serveur » : « Tensho : ok · … Mo » dans la barre du jeu, info-bulle avec les lignes, clic qui ouvre les paramètres ; le tableau de bord s'affiche sous le réglage
+
+- [ ] (0.1245) « Seulement en cas de souci » coché : l'entrée disparaît tant que tout va bien
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
