@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1284.0
+- Outillage : budget de taille de GLOBAL-PLAN relevé de 250 à 300 Ko (deux langues) : les points ouverts ajoutés le 13/11 (X-273 à X-285, demandes de l'utilisateur et constats des essais du soir) gardent leur texte entier, comme prévu ; 255 Ko mesurés avec eux. Cellule de X-01 résumée (historique dans le CHANGELOG).
+- Tests : PlanCompact1092Tests. Verify.ps1 (agent) : 2354/2354, 0 avertissement, 0 erreur ; DLL 0.1284.0.0. Rien à essayer en jeu.
+### English
+- Tooling: the size budget of GLOBAL-PLAN raised from 250 to 300 KB (both languages): the open points added on 11/13 (X-273 to X-285, the user's requests and the findings of the evening tests) keep their full text, by design; 255 KB measured with them. X-01's cell summed up (history in the CHANGELOG).
+
 ## 0.1283.0
 - Plan global, X-01 : Lourdeur (X-01), suite de 0.1282, mesurée à son chargement : la partie « fenêtre principale » de l'échauffement prenait 3176 méthodes au lieu de 1500 (sa borne comptait aussi celles des panneaux), prête 7,2 s après le chargement, et la page ouverte à ce moment était Paramètres (158 ms), pas l'Accueil. Elle prend maintenant le cadre de la fenêtre et la page réellement ouverte au chargement (la méthode de dessin de la table des pages ; seule sa poignée est gardée), 1500 méthodes nouvelles au plus. Les premiers passages des lecteurs restent sans ligne « Slow reader » pour le deuxième chargement de suite (X-177).
 - Tests : WindowWarmup1282Tests. Verify.ps1 (agent) : 2354/2354, 0 avertissement, 0 erreur ; DLL 0.1283.0.0. Rien à essayer en jeu.

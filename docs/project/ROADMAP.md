@@ -89,6 +89,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-148 | X-01 (relais 47) : à chaque chargement, attendre aussi pour les observateurs invisibles de la même boucle que les panneaux (repousse, train de chasse, jardin, ventes, terrains, découvertes…), 3 s au plus, en plus des panneaux et barres libres décidés le 13/11 | a) oui, toute la boucle attend (recommandé : leur première exécution coûtait aussi 2 à 16 ms chacun ; ils lisent un état du jeu, rien ne se perd en 1 à 3 s) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -194,6 +195,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Bonus d'Abondance estimé (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-148 | X-01 (relais 47) : à chaque chargement, attendre aussi pour les observateurs invisibles de la même boucle que les panneaux (repousse, train de chasse, jardin, ventes, terrains, découvertes…), 3 s au plus, en plus des panneaux et barres libres décidés le 13/11 | a) oui, toute la boucle attend (recommandé : leur première exécution coûtait aussi 2 à 16 ms chacun ; ils lisent un état du jeu, rien ne se perd en 1 à 3 s) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
