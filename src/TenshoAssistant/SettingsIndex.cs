@@ -55,6 +55,7 @@ public static class SettingsIndex
         ("Advanced.WearServerBar","General"),
         ("ModuleSettings.ShowEnglishItemName","General"),
         ("Settings.ContextMenu","General"),
+        ("Settings.FollowDalamud","General"),
         ("Settings.HelpBanners","General"),
         ("Settings.HoverCollection","General"),
         ("Settings.HoverCompare","General"),

@@ -37,6 +37,24 @@ public static class ThemePalettes
     public static PluginTheme Resolve(int setting,uint? game)
         =>setting>=1 && setting<=All.Count && Enum.IsDefined((PluginTheme)(setting-1)) ? (PluginTheme)(setting-1):FromGame(game);
 
+    /// <summary>
+    /// X-157 (0.1272): the palette of « Follow Dalamud's style »: the neutral roles are the active style's own colours (window, child,
+    /// border, text, muted text, header, hovered header), so Tensho's hand-drawn parts sit on Dalamud's windows; Tensho's identity
+    /// (accent, success, warning, error) comes from the dark or the light Tensho palette, whichever accent reads better on that
+    /// background. A child background the style leaves see-through takes the window's. On a background where neither accent is a
+    /// visible mark (under 3:1: the mid greys), the accent gives way to the style's own text colour: legible before recognisable.
+    /// </summary>
+    public static ThemeColors Follow(Vector4 window,Vector4 child,Vector4 border,Vector4 text,Vector4 muted,Vector4 selected,Vector4 hovered)
+    {
+        var identity=All[FollowIdentity(window)];
+        var accent=Contrast(identity.Accent,window)>=3 ? identity.Accent:text;
+        return new(window,child.W<0.05f ? window:child,border,accent,text,muted,identity.Success,selected,hovered,identity.Warning,identity.Error);
+    }
+
+    /// <summary>X-157 (0.1272): which Tensho palette lends its identity colours over a background: the one whose accent contrasts more.</summary>
+    public static PluginTheme FollowIdentity(Vector4 background)
+        =>Contrast(All[PluginTheme.Dark].Accent,background)>=Contrast(All[PluginTheme.Light].Accent,background) ? PluginTheme.Dark:PluginTheme.Light;
+
     public static double Contrast(Vector4 first,Vector4 second)
     {
         static double Luminance(Vector4 colour)

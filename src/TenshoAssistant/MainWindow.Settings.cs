@@ -108,6 +108,8 @@ internal sealed partial class MainWindow
         ComboSetting("Settings.NavigationMode","Settings.NavigationModeTip",()=>Math.Clamp(configuration.NavigationMode,0,2),value=>configuration.NavigationMode=value,
             [(TenshoAssistant.UI.NavigationLayout.Auto,localization.Get("Settings.NavigationModeAuto")),(TenshoAssistant.UI.NavigationLayout.AlwaysShown,localization.Get("Settings.NavigationModeShown")),
              (TenshoAssistant.UI.NavigationLayout.AlwaysFolded,localization.Get("Settings.NavigationModeFolded"))],DefaultConfiguration.NavigationMode,220);
+        // X-157 (0.1272): the standard controls in Dalamud's active style, Tensho's identity kept in titles and accent.
+        BoolSetting("Settings.FollowDalamud","Settings.FollowDalamudTip",()=>configuration.FollowDalamudStyle,value=>configuration.FollowDalamudStyle=value,c=>c.FollowDalamudStyle);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
         // 0.324: shared setting rows (tooltip and « ↺ »). 0.447: « monsters on hover » removed (it no longer did anything).

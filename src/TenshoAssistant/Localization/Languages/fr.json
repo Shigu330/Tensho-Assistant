@@ -973,6 +973,8 @@
     "HoverSourcesTip": "Sous l'infobulle d'objet du jeu : « Comment l'obtenir » (PNJ vendeurs, quêtes, hauts faits, contenus, monstres, fabrication, récolte…). Désactivé : Garland Tools et le wiki ne sont plus interrogés depuis ce panneau.\nPar défaut : activé.",
     "Theme": "Thème de l’interface",
     "NavigationMode": "Liste des pages",
+    "FollowDalamud": "Suivre le style de Dalamud",
+    "FollowDalamudTip": "Boutons, cases, tableaux, onglets et fenêtres prennent les couleurs et les espacements du style choisi dans les réglages de Dalamud, comme ses autres plugins ; Tensho garde ses titres et sa couleur d'accent. Le thème ci-dessus est alors laissé de côté. En jeu seulement : l'application de bureau garde le thème de Tensho.\nPar défaut : désactivé.",
     "NavigationModeTip": "La liste des pages à gauche de la fenêtre. Automatique : elle se replie derrière un bouton quand la fenêtre est étroite.\nPar défaut : automatique.",
     "NavigationModeAuto": "Automatique",
     "NavigationModeShown": "Toujours visible",

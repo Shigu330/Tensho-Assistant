@@ -8,7 +8,14 @@ internal static class FfxivTheme
 {
     private static ThemeColors current=ThemePalettes.All[PluginTheme.Dark];
     public static PluginTheme Theme{get;private set;}=PluginTheme.Dark;
-    public static void Select(PluginTheme theme){Theme=theme;current=ThemePalettes.All[theme];}
+    public static void Select(PluginTheme theme){Theme=theme;current=ThemePalettes.All[theme];Following=false;}
+
+    /// <summary>X-157 (0.1272): « Follow Dalamud's style »: the standard controls keep the active style (colours, spacing, rounding); only
+    /// Tensho's identity is pushed (PushIdentity), and the hand-drawn parts read the style's own neutral colours (ThemePalettes.Follow).</summary>
+    public static bool Following{get;private set;}
+    public static void Follow(ThemeColors style){current=style;Following=true;}
+    // What each Push pushed, so its Pop takes back the same (the mode may change between two frames, never inside a push; draw thread).
+    private static readonly Stack<bool> pushed=new();
 
     public static Vector4 Background=>current.Background;
     public static Vector4 Panel=>current.Panel;
@@ -24,6 +31,8 @@ internal static class FfxivTheme
 
     public static void Push()
     {
+        pushed.Push(Following);
+        if(Following){PushIdentity();return;}
         var c=current;
         ImGui.PushStyleColor(ImGuiCol.WindowBg, c.Background);
         ImGui.PushStyleColor(ImGuiCol.ChildBg, c.Panel);
@@ -69,9 +78,19 @@ internal static class FfxivTheme
 
     public static void Pop()
     {
+        if(pushed.Count>0 && pushed.Pop()){PopIdentity();return;}
         ImGui.PopStyleVar(6);
         ImGui.PopStyleColor(33);
     }
+
+    // X-157 (0.1272): Tensho's identity over Dalamud's style: the accent on the check mark, the slider and the focus frame; nothing else.
+    private static void PushIdentity()
+    {
+        ImGui.PushStyleColor(ImGuiCol.CheckMark, current.Accent);
+        ImGui.PushStyleColor(ImGuiCol.SliderGrab, current.Accent);
+        ImGui.PushStyleColor(ImGuiCol.NavHighlight, current.Accent);
+    }
+    private static void PopIdentity()=>ImGui.PopStyleColor(3);
 
     public static Scope Apply() { Push();return new Scope(); }
     public readonly struct Scope : IDisposable

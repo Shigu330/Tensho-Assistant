@@ -97,6 +97,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `FashionOptions.OwnedFirst` | bool | true | `MainWindow.FashionWeek.cs` | **Owned first** — Puts on top the pieces in your bags, retainers or Tensho bank, armoury chest, glamour dresser and armoire included (the last two known once opened in the game). Default: on. |
 | `FashionOptions.ShowPanel` | bool | true | `MainWindow.FashionWeek.cs` | **Buttons on the game's Fashion Report** — Makes the slot icons of the game window clickable: a click opens, beside the slot, a small window with its gear and dyes. Default: on. |
 | `FishingPanel` | bool | true | Settings › Panels · Settings › Panels | **In-game fishing help** — While fishing (fisher), shows the fish of the nearest fishing spot with their bait (bait → mooch), ET window and weather. Movable window. It also turns on the spearfishing panel and the ocean fishing voyage panel. Default: on. |
+| `FollowDalamudStyle` | bool | false | Settings › General | **Follow Dalamud's style** — Buttons, boxes, tables, tabs and windows take the colours and the spacing of the style chosen in Dalamud's settings, like its other plugins; Tensho keeps its titles and its accent colour. The theme above is then left aside. In the game only: the desktop app keeps Tensho's theme. Default: off. |
 | `GardenAlerts` | bool | true | page Garden | **Remind me in the chat** — A chat line (and the alarms' sound if they play one) when a bed is ripe or needs tending, once each. Default: on. |
 | `GardenDetailedView` | bool | false | page Garden | **Detailed view** — Shows each bed as text (seed, dates, crossbreeds) instead of icons. Easier with a gamepad. Default: off. |
 | `GardenDetect` | bool | true | page Garden | **Note plantings from the chat** — Tensho reads the game's chat lines: when the game says you planted seeds, the bed is added to the journal with its seed (read in the planting window), its time and its hours. Tending and harvesting are not detected yet: the buttons stay. Nothing is sent or done in the game. Default: on. |
@@ -324,7 +325,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 268 controls (260 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 269 controls (261 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -427,6 +428,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `FashionOptions.OwnedFirst` | bool | true | `MainWindow.FashionWeek.cs` | **Possédés en premier** — Met en haut les pièces présentes dans vos sacs, servants ou banque Tensho, arsenal, coffre à apparence et armoire compris (ces deux derniers connus une fois ouverts dans le jeu). Par défaut : activé. |
 | `FashionOptions.ShowPanel` | bool | true | `MainWindow.FashionWeek.cs` | **Boutons sur la Revue de mode du jeu** — Rend les icônes d'emplacement de la fenêtre du jeu cliquables : un clic ouvre, à côté de l'emplacement, une petite fenêtre avec ses pièces et ses teintures. Par défaut : activé. |
 | `FishingPanel` | bool | true | Paramètres › Panneaux à côté du jeu · Paramètres › Panneaux à côté du jeu | **Aide à la pêche en jeu** — Quand vous pêchez (pêcheur), affiche les poissons du lieu de pêche le plus proche avec leurs appâts (appât → poisson à réutiliser), créneau ET et météo. Fenêtre déplaçable. Active aussi le panneau de la pêche au harpon et celui des voyages de pêche en mer. Par défaut : activé. |
+| `FollowDalamudStyle` | bool | false | Paramètres › Général | **Suivre le style de Dalamud** — Boutons, cases, tableaux, onglets et fenêtres prennent les couleurs et les espacements du style choisi dans les réglages de Dalamud, comme ses autres plugins ; Tensho garde ses titres et sa couleur d'accent. Le thème ci-dessus est alors laissé de côté. En jeu seulement : l'application de bureau garde le thème de Tensho. Par défaut : désactivé. |
 | `GardenAlerts` | bool | true | page Jardinage | **Me le rappeler dans le chat** — Une ligne dans le chat (et le son des alarmes s’il est activé) quand une parcelle est mûre ou à entretenir, une fois chacune. Par défaut : activé. |
 | `GardenDetailedView` | bool | false | page Jardinage | **Vue détaillée** — Montre chaque parcelle en texte (graine, dates, croisements) au lieu des icônes. Plus pratique à la manette. Par défaut : désactivé. |
 | `GardenDetect` | bool | true | page Jardinage | **Noter les plantations depuis le chat** — Tensho lit les lignes du chat du jeu : quand le jeu annonce que vous avez planté des graines, la parcelle s'ajoute au journal avec sa graine (lue dans la fenêtre de plantation), son heure et ses durées. L'entretien et la récolte ne sont pas encore détectés : les boutons restent. Rien n'est envoyé ni fait dans le jeu. Par défaut : activé. |
@@ -654,5 +656,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 268 cases (260 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 269 cases (261 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

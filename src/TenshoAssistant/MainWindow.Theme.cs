@@ -11,7 +11,18 @@ internal sealed partial class MainWindow
     private Func<uint?> gameTheme=()=>null;
     internal void ConfigureTheme(Func<uint?> reader)=>gameTheme=reader;
     // Called once per frame before any plugin window: the game option or the explicit setting picks the palette.
-    internal void ApplyTheme()=>FfxivTheme.Select(ThemePalettes.Resolve(configuration.ThemeMode,gameTheme()));
+    internal void ApplyTheme()
+    {
+        // X-157 (0.1272): « Follow Dalamud's style » (off by default; in the game only: the desktop application has no Dalamud style).
+        // Read here, before any Tensho window pushes anything: the colours are the style Dalamud has made active.
+        if(configuration.FollowDalamudStyle && !inDesktopApp)
+        {
+            static System.Numerics.Vector4 Of(ImGuiCol colour)=>ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(colour));
+            FfxivTheme.Follow(ThemePalettes.Follow(Of(ImGuiCol.WindowBg),Of(ImGuiCol.ChildBg),Of(ImGuiCol.Border),Of(ImGuiCol.Text),Of(ImGuiCol.TextDisabled),Of(ImGuiCol.Header),Of(ImGuiCol.HeaderHovered)));
+            return;
+        }
+        FfxivTheme.Select(ThemePalettes.Resolve(configuration.ThemeMode,gameTheme()));
+    }
 
     private void DrawThemeSetting()
     {
