@@ -11,6 +11,10 @@ public sealed class ItemHoverCoordinator : IDisposable
     private readonly object gate=new();private readonly ItemHoverService context;private readonly MarketService market;
     private readonly MarketHoverTracker tracker=new();private bool disposed;private bool refreshWanted;
     public ItemHoverCoordinator(ItemHoverService context,MarketService market){this.context=context;this.market=market;}
+    /// <summary>X-278 (0.1287): the end of each request the refresh key sent (item, status), for the log; called off the framework thread.</summary>
+    public Action<uint,MarketFetchStatus>? RefreshDone { get; init; }
+    /// <summary>X-278 (0.1287): the refresh key pressed on an item that gets no market price (hover prices off, not sold, no world).</summary>
+    public Action<ulong>? RefreshIgnored { get; init; }
     /// <param name="refresh">0.343 (I-01): the player pressed the refresh key on this item: the price is asked again even if fresh.</param>
     public Task<MarketFetchResult>? Observe(bool prices,bool usages,ulong owner,uint world,ulong raw,ItemCatalog? catalog,DateTimeOffset now,bool refresh=false)
     {
@@ -19,7 +23,7 @@ public sealed class ItemHoverCoordinator : IDisposable
             if(disposed)return null;
             context.Observe(prices || usages,owner,raw,catalog,now);
             if(tracker.Observe(prices,owner,world,context.State.Item,catalog,now)){market.CancelBackground();refreshWanted=false;}
-            if(!prices || tracker.Current is not { } item){refreshWanted=false;return null;}
+            if(!prices || tracker.Current is not { } item){if(refresh)RefreshIgnored?.Invoke(raw);refreshWanted=false;return null;}
             // 0.524 (user report: Ctrl+Alt did nothing): the press lasts one tick, and the 5 s bound was taken on every tick, asked or not, so they almost never met.
             // The press now waits for the bound, and only a real request takes it.
             refreshWanted|=refresh;
@@ -33,7 +37,9 @@ public sealed class ItemHoverCoordinator : IDisposable
             // The market's own 3 s pause, or a request under way, must not lose the press: it waits for the next slot, on this item only.
             if(force)_=request.ContinueWith(done=>
             {
-                if(done.Status!=TaskStatus.RanToCompletion || done.Result.Status is not (MarketFetchStatus.Cooldown or MarketFetchStatus.Busy))return;
+                var status=done.Status==TaskStatus.RanToCompletion ? done.Result.Status:MarketFetchStatus.Failed;
+                try{RefreshDone?.Invoke(item.ItemId,status);}catch(Exception){}
+                if(status is not (MarketFetchStatus.Cooldown or MarketFetchStatus.Busy))return;
                 lock(gate)if(!disposed && tracker.Current?.ItemId==item.ItemId)refreshWanted=true;
             },TaskScheduler.Default);
             return request;

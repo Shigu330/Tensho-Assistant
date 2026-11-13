@@ -16,7 +16,9 @@ internal sealed class ItemHoverReader : IDisposable
         IGameGui gui,IPlayerState player,IClientState client,IFramework framework,IPluginLog log)
     {
         this.configuration=configuration;this.market=market;this.items=items;this.gui=gui;this.player=player;this.client=client;this.framework=framework;this.log=log;this.context=context;
-        coordinator=new(context,market);try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}catch{coordinator.Dispose();throw;}
+        // X-278 (0.1287): each Ctrl+Alt leaves a line in the log: the request sent and how it ended, or why no price is asked for that item.
+        coordinator=new(context,market){RefreshDone=(item,status)=>log.Information("Hover price refresh (Ctrl+Alt): item {0}, {1}.",item,status),
+            RefreshIgnored=raw=>log.Information("Hover price refresh (Ctrl+Alt) on item {0}: no market price asked for it (prices on hover off, not sold on the market, or no world).",raw)};try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,Update);}catch{coordinator.Dispose();throw;}
     }
     /// <summary>e) (audit 2026-11-02): true while bound by duty, from the map's live copy (set by Plugin); no copy counts as « not in a duty ».</summary>
     public Func<bool> InDuty { get; init; } = ()=>false;
