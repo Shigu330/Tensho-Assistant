@@ -567,6 +567,14 @@ if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
         Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
     return;
 }
+// PROBE_WHEEL (X-225, 0.1234): the aetherial wheels (AetherialWheel: unprimed and primed items, grade, hours required); read-only.
+if(Environment.GetEnvironmentVariable("PROBE_WHEEL") is { Length:>0 })
+{
+    var wheelItemsEn=data.Excel.GetSheet<Item>(Language.English);var wheelItems=data.Excel.GetSheet<Item>();
+    foreach(var row in data.Excel.GetSheet<AetherialWheel>().Where(row=>row.ItemUnprimed.RowId!=0))
+        Console.WriteLine($"WHEEL {row.RowId} grade {row.Grade} hours {row.HoursRequired} unprimed {row.ItemUnprimed.RowId} '{wheelItemsEn.GetRowOrDefault(row.ItemUnprimed.RowId)?.Name.ExtractText()}' / '{wheelItems.GetRowOrDefault(row.ItemUnprimed.RowId)?.Name.ExtractText()}' primed {row.ItemPrimed.RowId} '{wheelItemsEn.GetRowOrDefault(row.ItemPrimed.RowId)?.Name.ExtractText()}'");
+    return;
+}
 // PROBE_REGION (X-223, 0.1233): the data centres (WorldDCGroupType) and their region (WorldRegionGroup), for the Jumbo Cactpot's draw time; read-only.
 if(Environment.GetEnvironmentVariable("PROBE_REGION") is { Length:>0 })
 {

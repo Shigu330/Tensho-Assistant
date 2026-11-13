@@ -94,6 +94,7 @@ public sealed unsafe class ReadingCapture : IDisposable
             ReadPurify();
             ReadNpcTrade();
             ReadWindows();
+            ReadWheelWindows();
             ReadFashion();
             ReadIslandObjects();
             ReadFields();
@@ -128,6 +129,33 @@ public sealed unsafe class ReadingCapture : IDisposable
             for(var slot=0;slot<sequencer->TimelineIds.Length;slot++)if(sequencer->TimelineIds[slot]!=0)text.Append($" {slot}:{sequencer->TimelineIds[slot]}");
         }
         Line("fishline",400,text.ToString());
+    }
+
+    // X-225 (0.1234): the aetherial wheel stand's window, whatever the game calls it (any visible window whose name holds « Wheel »): its numbers,
+    // up to 200, at each change, to learn which ones are the wheels set and their time (docs/evidence/0.1234-aetherial-wheels.md). Never its texts.
+    private void ReadWheelWindows()
+    {
+        var manager=RaptureAtkUnitManager.Instance();
+        if(manager==null)return;
+        var layers=manager->AtkUnitManager.DepthLayers;
+        for(var layer=0;layer<layers.Length;layer++)
+        {
+            ref var list=ref layers[layer];
+            var count=Math.Min((int)list.Count,list.Entries.Length);
+            for(var index=0;index<count;index++)
+            {
+                AtkUnitBase* unit=list.Entries[index].Value;
+                if(unit==null || !unit->IsVisible)continue;
+                var name=unit->NameString;
+                if(!name.Contains("Wheel",StringComparison.OrdinalIgnoreCase))continue;
+                var values=new StringBuilder();
+                AppendValues(values,unit,200);
+                var all=values.ToString();
+                if(windowValues.GetValueOrDefault(name)==all)continue;
+                windowValues[name]=all;
+                Line("addons",160,$"{name}:{all}","addons/"+name);
+            }
+        }
     }
 
     private void ReadWindows()
