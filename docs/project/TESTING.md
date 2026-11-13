@@ -1505,6 +1505,30 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1212) Rangements › Personnages : « Effacer » un personnage qui n'est pas connecté : il disparaît de la liste, son journal des gils et ses hauts faits ne s'affichent plus pour lui
 
+- [ ] (0.1220) Paramètres › Général › Langue : Deutsch et 日本語 marqués « (partiel) » ; Tensho en anglais : pourcentages sans espace (usure de l'équipement, statistiques du personnage) et nombres « 1,234 » ; en français : « 1 234 » et « 12,5 % »
+
+- [ ] (0.1220) Barre serveur des monnaies et prochaine alarme : « 3h 05m » en anglais, « 3 h 05 » en français
+
+- [ ] (0.1221) Pied de page de la fenêtre Tensho : « Servants et chocobo : enregistrés à l'ouverture (datés) » ; avec l'enregistrement automatique des rangements coupé : « enregistrés sur demande (datés) »
+
+- [ ] (0.1222) Barre latérale d'une configuration sans groupe replié encore : Progression, Contenus, Gold Saucer et Références repliés ; un clic sur un groupe garde les autres comme ils étaient
+
+- [ ] (0.1222) Guide (Aide › Lancer le guide) : étape « Panneaux à côté des fenêtres du jeu » ; « Tout masquer » coupe les panneaux (fiche du personnage, outil de mission, synthèse, récolte, barre serveur…), « Tout afficher » les remet ; PaissaDB dans l'étape des sources
+
+- [ ] (0.1222) Guide sans intérêt coché : la visite ne montre que les pages pour tous (pas Triple Triade ni Artisanat)
+
+- [ ] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
+
+- [ ] (0.1222) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : guide : nouvelle étape « Panneaux à côté des fenêtres du jeu » (tout masquer ou afficher, puis chaque panneau) et visite réduite aux pages pour tous sans case cochée ; aide : quatre nouvelles questions de la FAQ ; liste des outils de l'accueil : aucun changement (pas de nouvelle page)
+
+- [ ] (0.1223) Tensho en anglais : pages Compagnie libre (Submersible), Grandes compagnies (rank), infobulles « On: / Off: », orthographe britannique ; rien de cassé dans les infobulles et les boutons « Refresh »
+
+- [ ] (0.1226) Paramètres › Général : activer « Sacs », « État de l'équipement » et « Zone et instance » dans la barre serveur ; les trois entrées apparaissent, se mettent à jour (ramasser un objet, changer de zone), clic : Rangements, Équipement, carte
+
+- [ ] (0.1226) Zone à instances (instance 2 par exemple) : la marque d'instance du jeu suit le nom de la zone ; hors instance : le nom seul
+
+- [ ] (0.1227) Fiche d'un objet récent (onglet des sources ouvert une fois) : « Ajouté au patch 7.x (Garland Tools) » dans l'en-tête ; Garland coupé dans Paramètres › Données et sources : la ligne n'apparaît pas
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
