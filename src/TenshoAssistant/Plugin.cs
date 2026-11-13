@@ -38,8 +38,6 @@ public sealed partial class Plugin : IDalamudPlugin
     private readonly MainWindow mainWindow;
     private MapViewWindow? mapWindow;
     private GuideWindow? guideWindow;
-    private PanelWindow[] panelWindows = [];
-    private AttachedPanels? attachedPanels;
     // X-119 step 2 (0.1081): the local link with the desktop application (off by default).
     private Link.LocalLinkFeed? linkFeed;
     // X-163 (0.1155): the alerts that rang in the game, sent to the desktop application by the link (only while it is on).
@@ -1593,8 +1591,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 ()=>{try{File.WriteAllText(sweepFile,DateTimeOffset.UtcNow.ToString("O",System.Globalization.CultureInfo.InvariantCulture));}catch(Exception error) when(error is IOException or UnauthorizedAccessException){log.Warning(error,"Page sweep time could not be saved.");}})), () => { if (pageSweep is not null) windows.RemoveWindow(pageSweep); });
             registrations.Register(() => windows.AddWindow(guideWindow = new GuideWindow(mainWindow)), () => { if (guideWindow is not null) windows.RemoveWindow(guideWindow); guideWindow = null; });
             registrations.Register(() => windows.AddWindow(mapWindow = new MapViewWindow(mainWindow)), () => { if (mapWindow is not null) windows.RemoveWindow(mapWindow); });
-            registrations.Register(() => { attachedPanels = new AttachedPanels(windows, mainWindow); mainWindow.Panels = attachedPanels; bankOverlay.Panels = attachedPanels; }, () => { mainWindow.Panels = null; bankOverlay.Panels = null; attachedPanels?.Dispose(); attachedPanels = null; });
-            registrations.Register(() => { panelWindows = mainWindow.CreatePanelWindows(); foreach (var panel in panelWindows) windows.AddWindow(panel); }, () => { foreach (var panel in panelWindows) windows.RemoveWindow(panel); panelWindows = []; });
+            // X-153 (0.1249): the panel family (Plugin.Panels.cs), after the main window it draws from.
+            RegisterPanels();
             registrations.Register(() =>
             {
                 commandInfo=new CommandInfo(OnCommand){HelpMessage=localization.Get("Plugin.CommandHelp")};

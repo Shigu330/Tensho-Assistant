@@ -18,7 +18,8 @@ internal static class PanelWindows514Tests
         ("Panels: added to the window system, the setting copied before each draw, the close button written back at once",() =>
         {
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("panelWindows = mainWindow.CreatePanelWindows()") && plugin.Contains("windows.AddWindow(panel)") && plugin.Contains("windows.RemoveWindow(panel)"),"owned and cleaned up");
+            var family=Read("Plugin.Panels.cs");
+            Check(family.Contains("panelWindows = mainWindow.CreatePanelWindows()") && family.Contains("windows.AddWindow(panel)") && family.Contains("windows.RemoveWindow(panel)"),"owned and cleaned up (Plugin.Panels.cs since 0.1249)");
             Check(plugin.IndexOf("panel.Follow();",StringComparison.Ordinal)>=0 && plugin.IndexOf("panel.Follow();",StringComparison.Ordinal)<plugin.IndexOf("windows.Draw();",StringComparison.Ordinal),"followed before the draw");
             foreach(var gone in new[]{"DrawTaskPanel","DrawWearBar","DrawRegenTickBar","DrawTrackerWindow"})Check(!plugin.Contains(gone),"drawn once only: "+gone);
             var window=Read("PanelWindow.cs");

@@ -23,7 +23,8 @@ internal static class AttachedPanels516Tests
             var apply=plugin.IndexOf("attachedPanels?.Apply();",StringComparison.Ordinal);var draw=plugin.IndexOf("windows.Draw();",StringComparison.Ordinal);var end=plugin.IndexOf("attachedPanels?.EndFrame();",StringComparison.Ordinal);
             Check(overlays>=0 && overlays<apply && apply<draw && draw<end,"the order");
             Check(plugin.Split("windows.Draw();").Length==2,"drawn once");
-            Check(plugin.Contains("bankOverlay.Panels = attachedPanels") && plugin.Contains("attachedPanels?.Dispose()"),"owned and cleaned up");
+            var family=Read("Plugin.Panels.cs");
+            Check(family.Contains("bankOverlay.Panels = attachedPanels") && family.Contains("attachedPanels?.Dispose()"),"owned and cleaned up (Plugin.Panels.cs since 0.1249)");
         }),
         ("Attached panels: the same ids, position set just before the window, the close button answered, one failure stays alone",() =>
         {
