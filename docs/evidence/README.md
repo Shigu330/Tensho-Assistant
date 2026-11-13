@@ -32,9 +32,9 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1187-unload-roots.md](0.1187-unload-roots.md) | `src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs`, `src/TenshoAssistant/Diagnostics/UnloadWatch.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/UnloadRoots1187Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/ROADMAP.md` |
 | [0.1227-garland-patch.md](0.1227-garland-patch.md) | `src/TenshoAssistant/Community/GarlandItemSources.cs`, `tests/TenshoAssistant.Tests/GarlandPatch1227Tests.cs` | `CHANGELOG.md` |
 | [0.1229-mount-sheet.md](0.1229-mount-sheet.md) | `src/TenshoAssistant/Collections/CollectionReader.Dalamud.cs`, `src/TenshoAssistant/Collections/CollectionService.cs`, `tests/TenshoAssistant.Tests/MountSheet1229Tests.cs` | `CHANGELOG.md` |
-| [0.1231-grace-cap.md](0.1231-grace-cap.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/GraceReading1231Tests.cs` | `CHANGELOG.md` |
+| [0.1231-grace-cap.md](0.1231-grace-cap.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/GraceReading1231Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.1233-gold-saucer-times.md](0.1233-gold-saucer-times.md) | `src/TenshoAssistant/MiniGames/GoldSaucerTimes.cs`, `tests/TenshoAssistant.Tests/GoldSaucerTimes1233Tests.cs` | `CHANGELOG.md` |
-| [0.1234-aetherial-wheels.md](0.1234-aetherial-wheels.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/WheelReading1234Tests.cs` | `CHANGELOG.md` |
+| [0.1234-aetherial-wheels.md](0.1234-aetherial-wheels.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/WheelReading1234Tests.cs` | `CHANGELOG.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.1235-racing-chocobo.md](0.1235-racing-chocobo.md) | `src/TenshoAssistant/MiniGames/RaceChocobo.cs` | `CHANGELOG.md` |
 | [0.1236-page-titles.md](0.1236-page-titles.md) | `tests/TenshoAssistant.Tests/GameTitles1236Tests.cs` | `CHANGELOG.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

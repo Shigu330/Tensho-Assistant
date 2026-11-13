@@ -1529,6 +1529,32 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1227) Fiche d'un objet récent (onglet des sources ouvert une fois) : « Ajouté au patch 7.x (Garland Tools) » dans l'en-tête ; Garland coupé dans Paramètres › Données et sources : la ligne n'apparaît pas
 
+- [ ] (0.1228) Rangements › Personnages, 15 s après la connexion : colonne « Jobs » remplie pour le personnage connecté ; clic : niveaux des jobs et ensembles (numéro, nom, job, niveau d'objet) sous le tableau, mêmes valeurs que le jeu
+
+- [ ] (0.1228) Changer de personnage puis revenir : les jobs et ensembles de l'autre personnage restent affichés ; monter un niveau : la valeur change dans les 5 minutes
+
+- [ ] (0.1228) « Effacer » sur un autre personnage : sa colonne « Jobs » devient « — »
+
+- [ ] (0.1229) Collections › Montures, survol de la baleine lunaire : « Porte 8 personnes », « Sa propre musique de monture » ; survol d'un gobbue : son action de monture, avec le nom du jeu ; survol d'une monture volante courante : « Musique de monture partagée avec 89 autres montures »
+
+- [ ] (0.1230) Fenêtre principale, champ « Chercher dans Tensho… » en haut de la navigation : taper « mine » : pages, objets, quêtes et lieux listés sous le champ ; clic sur un objet : sa page s'ouvre ; clic sur un lieu : la carte de Tensho s'ouvre sur ce lieu ; une lettre seule : rien n'est listé
+
+- [ ] (0.1230) Application de bureau : le même champ ; une page placée « en jeu seulement » n'est pas proposée
+
+- [ ] (0.1231) Mode développeur, artisan ou récolteur : lire un manuel (militaire, commercial ou révisé) puis faire une synthèse ou une récolte : dalamud.log a une ligne « Reading statuses » avec 45 ou 46 et son param à chaque changement (noter le param avant et après quelques gains d'expérience)
+
+- [ ] (0.1232) Dans une zone d'un rang S « vaincre 100 monstres » (Heavensward, Stormblood, Shadowbringers ou Endwalker) : vaincre un monstre de la liste : Cartes › Conditions des rangs S, ligne « Vos monstres vaincus » passe à 1 ; un monstre vaincu par un autre joueur ne compte pas ; « Effacer » remet ce rang à 0 sans toucher aux autres
+
+- [ ] (0.1233) Page Mini Cactpot : « Prochain JACTA » à la prochaine heure :00, :20 ou :40 de l'horloge du PC ; « Tirage du Méga Cactpot » le bon jour à l'heure du PC (Europe : samedi 20:00 en heure d'hiver française) ; cloche du tirage : une alarme hebdomadaire apparaît dans Alarmes
+
+- [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir le support des roues éthérées (une roue posée au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle la roue a été posée et le temps restant que montre le jeu
+
+- [ ] (0.1235) Page Chocobo, section « Chocobo de course » avant toute course : « Pas encore lu » ; ouvrir la fiche du chocobo de course dans le jeu (Gold Saucer, guichet des courses) : catégorie, cote, pedigree, caractéristiques et aptitudes identiques à la fenêtre du jeu
+
+- [ ] (0.1236) Tensho en anglais : la navigation et les titres des pages disent « Allied Societies » et « Custom Deliveries »
+
+- [ ] (0.1237) Événements (une fête en cours) et une boutique dont un objet demande une quête : la coche des quêtes faites est la même qu'avant ; mode développeur : pas de ligne « slow frame » pour Events au changement du journal
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
