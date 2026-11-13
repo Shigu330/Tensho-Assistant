@@ -1589,6 +1589,74 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1248) Compagnie › Aéronefs, après avoir ouvert la liste des aéronefs à l'atelier : ouvrir « Vos aéronefs : meilleur trajet de chacun » : une ligne par aéronef avec son trajet ; changer l'objectif change les lignes ; « Choisir » remplit le planificateur ; aucun à-coup visible à l'ouverture
 
+- [ ] (0.1252) Fenêtre de Tensho rétrécie sous environ 620 px de large : la liste des pages disparaît, un bouton à trois barres en haut à gauche l'ouvre dans une fenêtre surgissante ; choisir une page la referme ; l'en-tête nomme la page
+
+- [ ] (0.1252) Paramètres › Général › « Liste des pages » : « Toujours visible » garde la colonne dans une fenêtre étroite, « Toujours repliée » la replie dans une fenêtre large ; ↺ revient à « Automatique »
+
+- [ ] (0.1252) Page choisie dans la liste : fond de sélection et barre dorée sur le bord gauche, texte de la couleur normale ; sous-pages de Récolte, Artisanat, Collections : barre sous le bouton choisi ; à vérifier aussi en thème clair
+
+- [ ] (0.1252) Échelle de Dalamud à 150 % : la colonne des pages s'élargit avec le texte (plus de noms coupés)
+
+- [ ] (0.1253) Erreur de données (par exemple Marché avec Universalis coupé dans Paramètres › Données et sources) : ligne « Source désactivée » avec un glyphe d'arrêt, grise, puis la phrase d'explication ; une vraie panne réseau : « Échec » en rouge avec un triangle
+
+- [ ] (0.1253) Accueil juste après le chargement du plugin : « En attente » avec un sablier tant que les catalogues se chargent, puis la coche verte « Catalogues d'objets et de recettes prêts »
+
+- [ ] (0.1254) Jardinage › Journal : le bouton « Planter maintenant » se détache (fond de sélection, bord doré) ; le titre de chaque potager est dans la police des sections
+
+- [ ] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
+
+- [ ] (0.1255) Rangements › journal des gils : les colonnes de montants (gagné, dépensé, net, variation, solde) sont alignées à droite, les chiffres les uns sous les autres
+
+- [ ] (0.1255) Météo d'une zone et Liste de souhaits : tableaux avec lignes alternées et un trait fin entre les lignes, rien de coupé
+
+- [ ] (0.1257) Jardinage › Jardin : chaque parcelle d'un potager est l'icône de sa graine avec une barre de pousse, le temps restant et une pastille ; survol d'une graine : infobulle avec lieu, état, plantation, récolte, entretien ; clic : la graine devient l'objet en contexte ; clic droit : son menu
+
+- [ ] (0.1257) Parcelle à entretenir : pastille pleine orange avec « ! » ; parcelle mûre : pastille verte avec une coche, « Mûr » et barre pleine verte ; entretien à venir : pastille au contour gris avec une goutte (vérifier que la goutte et la coche se lisent)
+
+- [ ] (0.1257) Bouton main avec goutte « Entretenu » : la pastille repasse au contour ; bouton corbeille « Retirer » : premier clic, le glyphe passe en rouge et l'infobulle dit de cliquer encore ; second clic, la parcelle disparaît
+
+- [ ] (0.1257) « Vue détaillée » cochée : le texte d'avant (graine, dates, boutons « Entretenu » et « Retirer », croisements) ; décochée : les icônes
+
+- [ ] (0.1257) Parcelle ajoutée à la main avec une graine au nom libre : le nom s'écrit à la place de l'icône, avec « À entretenir » en toutes lettres quand c'est dû
+
+- [ ] (0.1257) Manette ou clavier (navigation de Dalamud activée) : le focus passe d'icône en icône dans l'ordre 1, 2, 3, 8, 4, 7, 6, 5 puis sur les boutons ; l'infobulle s'affiche au focus ; noter si le menu de l'objet s'ouvre
+
+- [ ] (0.1258) Application de bureau › Jardinage : les potagers montrent leurs prévisions de croisement, la section Croisements liste les paires, la liste des graines n'est plus vide (elle reste grisée : rien ne s'enregistre dans l'application)
+
+- [ ] (0.1258) En jeu, après le chargement de cette version : Jardinage › liste des graines et section Croisements comme avant (le code a changé de place)
+
+- [ ] (0.1259) Jardinage, potager avec deux graines voisines compatibles : petites icônes des graines possibles sous la parcelle ; survol : graine, parcelle voisine, possession, « Prévision, non vérifiée en jeu » ; clic : objet en contexte
+
+- [ ] (0.1259) Graine possible dans la liste de souhaits : étoile dorée sur son icône ; graine absente des sacs et des stocks lus : disque orange ; servants jamais ouverts sur ce personnage : ni disque ni « pas possédé », l'infobulle dit « Possession inconnue »
+
+- [ ] (0.1259) Parcelle sans voisine compatible : glyphe barré avec la phrase en infobulle ; graine hors des paires : point d'interrogation
+
+- [ ] (0.1259) Bouton à icône (double coche) à côté du titre du potager : toutes les parcelles à entretenir passent en « entretenu » ; son infobulle l'explique ; vérifier que la double coche se lit
+
+- [ ] (0.1260) Météo d'une zone : bandeau de trois blocs (Maintenant, Ensuite, Après) au-dessus du tableau, avec icône, nom, heures ET ; « Ensuite » et « Après » ont un compte à rebours qui avance à la seconde et l'heure du PC ; la cloche crée la même alarme que celle du tableau
+
+- [ ] (0.1260) Rester sur la page au changement de période (toutes les 23 min 20 s) : le bloc courant change, avec un fondu très bref de son fond ; avec « mouvement réduit » coché dans les réglages de Dalamud : aucun fondu
+
+- [ ] (0.1260) Fenêtre de Tensho étroite : les trois blocs du bandeau s'empilent, rien de coupé
+
+- [ ] (0.1261) Accueil › Aujourd'hui : première ligne « Prochaine échéance : …, dans … » (alarme, retour de vaisseau ou jardin, la plus proche) ; un clic ouvre l'outil ; sous une heure le temps avance à la seconde ; « Personnaliser » permet de la masquer
+
+- [ ] (0.1261) Accueil : chaque tuile réagit d'un seul bloc au survol et au clic (icône, nom et ligne ensemble) ; au clavier ou à la manette, un seul arrêt par tuile
+
+- [ ] (0.1261) Fiche d'un objet (page Objets) : bouton « Ajouter à mes souhaits » sous le nom ; clic : il devient « ✓ Dans mes souhaits » sans changer de largeur, avec un contour vert très bref, et le pied de page dit « ajouté » ; nouveau clic : l'objet est retiré
+
+- [ ] (0.1261) Avec « mouvement réduit » coché dans les réglages de Dalamud : aucun contour bref sur l'Accueil ni sur le bouton des souhaits
+
+- [ ] (0.1262) Carte de Tensho dans une zone avec des monstres suivis (liste, journal de chasse ou ALÉA) : leurs marques sont moitié moins grandes qu'avant ; les repères d'exploration (jumelles) un peu plus petits
+
+- [ ] (0.1262) Carte › tailles des icônes : ligne « Monstres proches » à 50 % et « Repères d'exploration » à 80 % ; changer une taille la garde après rechargement ; 0 masque les marques ; ↺ revient à la valeur par défaut
+
+- [ ] (0.1262) Si vous aviez déjà réglé la taille des repères d'exploration : elle n'a pas changé
+
+- [ ] (0.1263) Grande maison avec deux ou trois potagers plantés : Jardinage montre une grille par potager, titrée « lieu · potager 1 », « potager 2 », « potager 3 », chacune avec ses parcelles
+
+- [ ] (0.1263) Bouton « tout le potager entretenu » d'un potager : seules les parcelles de ce potager passent en « entretenu », celles des autres potagers de la maison ne changent pas
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
