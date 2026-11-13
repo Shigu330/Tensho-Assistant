@@ -155,6 +155,22 @@ internal sealed partial class MainWindow
         Next();StatTile(localization.Get("Dashboard.TileWrites"),failed.ToString("N0",Numbers),failed>0 ? HealthLevel.Problem:HealthLevel.Ok,localization.Get("Dashboard.TileWritesTip"));
         Next();StatTile(localization.Get("Dashboard.TilePanels"),panels.ToString("N0",Numbers),panels>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TilePanelsTip"));
         Next();StatTile(localization.Get("Dashboard.TileReaders"),inputs.Unavailable.Count.ToString("N0",Numbers),inputs.Unavailable.Count>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TileReadersTip"));
+        // X-264 (0.1270): in game the curves stay behind a click: the gauge clicked shows its last hour under the gauges, a second click hides it.
+        if(dashboardCurve is { } chosen)
+        {
+            string Mb(double value)=>localization.Format("Dashboard.UnitMb",Number(value,"N0"));
+            string Ms(double value)=>localization.Format("Dashboard.UnitMs",Number(value,"0.0#"));
+            var (title,values,top,text)=chosen switch
+            {
+                "Memory"=>(localization.Get("Dashboard.GaugeMemory"),history.Series(sample=>sample.HeapMb),memoryTop,(Func<double,string>)Mb),
+                "Page"=>(localization.Get("Dashboard.GaugePage"),history.Series(sample=>sample.PageMs),HealthHistoryScales.FrameMs,Ms),
+                "Frame"=>(localization.Get("Dashboard.GaugeFrame"),history.Series(sample=>sample.FrameAvgMs),HealthHistoryScales.FrameMs,Ms),
+                _=>(localization.Get("Dashboard.GaugeRequests"),history.PerMinute(sample=>sample.Requests),rateTop,value=>Number(value,"0.#")),
+            };
+            if(history.Count<2)ImGui.TextDisabled(localization.Get("Dashboard.CurveEmpty"));
+            else CurvePlot(title,values,top,text,localization.Format("Dashboard.CurveAgo",Math.Max(1,(int)Math.Round(history.SpanMs/60_000.0))),localization.Get("Dashboard.CurveNow"),Accent);
+        }
+        else ImGui.TextDisabled(localization.Get("Dashboard.CurveHint"));
         if(DeveloperMode)
         {
             Next();StatTile(localization.Get("Dashboard.TileSlow"),SlowFrames.Reported.ToString("N0",Numbers),HealthLevel.Ok,localization.Get("Dashboard.TileSlowTip"));

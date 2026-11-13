@@ -30,6 +30,8 @@ public sealed class HealthHistory
     /// <summary>The point at <paramref name="index"/>, 0 being the oldest kept.</summary>
     public HealthSample this[int index]=>index<0 || index>=count ? throw new ArgumentOutOfRangeException(nameof(index)):ring[(next-count+index+2*Capacity)%Capacity];
     public HealthSample? Last=>count==0 ? null:this[count-1];
+    /// <summary>X-264 (0.1270): the time the kept points cover, in milliseconds (0 with fewer than two points).</summary>
+    public long SpanMs=>count<2 ? 0:this[count-1].AtMs-this[0].AtMs;
 
     /// <summary>Whether a new point is due: none yet, ten seconds since the last one, or a clock that went back (kept points are then dropped by Add).</summary>
     public bool Due(long nowMs)=>Last is not { } last || nowMs-last.AtMs>=StepMs || nowMs<last.AtMs;
