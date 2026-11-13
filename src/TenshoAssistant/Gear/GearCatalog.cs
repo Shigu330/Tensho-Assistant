@@ -71,7 +71,7 @@ public sealed record MateriaKind(uint Row,int Param,IReadOnlyList<(int Grade,uin
 /// Filters of the candidate list (settings). AllJobs (0.311): since patch 7.4 any armor or accessory can be a glamour whatever the
 /// job and level; weapons stay job-locked.
 /// </summary>
-public sealed record GearFilter(int LevelsBelow,bool ExactOutsideCaps,int MinItemLevel=0,string Search="",bool AllJobs=false);
+public sealed record GearFilter(int LevelsBelow,bool ExactAtCaps,int MinItemLevel=0,string Search="",bool AllJobs=false);
 
 public sealed class GearCatalog(IReadOnlyList<GearItem> items,IReadOnlyList<MateriaKind>? materia=null,
     IReadOnlyDictionary<int,OvermeldRate>? combatRates=null,IReadOnlyDictionary<int,OvermeldRate>? craftRates=null,IReadOnlyList<BardingSet>? bardings=null)
@@ -117,11 +117,12 @@ public static class GearRules
         =>item.Slot==slot || item.Slot is GearSlot.RingRight or GearSlot.RingLeft && slot is GearSlot.RingRight or GearSlot.RingLeft;
 
     /// <summary>
-    /// Levels shown for a character level: level − N to level; with « exact outside caps », only the character's level when it is not
-    /// an expansion cap (user request: at 50 / 60 / … / 100 the whole window, otherwise the gear of exactly that level).
+    /// Levels shown for a character level: level − N to level; with « exact level at caps », only the character's level when it is an
+    /// expansion cap. X-277 (0.1290, user decision of 13/11: « the 50-60-70-80-90-100 caps must show only 50-60-70-80-90-100, every other
+    /// level the gear close to it »): 0.430 had the rule the wrong way round (exact level outside the caps: a Beastmaster 45 found nothing).
     /// </summary>
     public static (int Min,int Max) LevelWindow(int level,GearFilter filter)
-        =>filter.ExactOutsideCaps && !Caps.Contains(level) ? (level,level):(Math.Max(1,level-Math.Max(0,filter.LevelsBelow)),level);
+        =>filter.ExactAtCaps && Caps.Contains(level) ? (level,level):(Math.Max(1,level-Math.Max(0,filter.LevelsBelow)),level);
 
     /// <summary>« All jobs (glamour) » (0.311): armor and accessories of every job and every level; weapons keep the job and the level window.</summary>
     public static bool AnyJobAndLevel(GearSlot slot,GearFilter filter)=>filter.AllJobs && slot is not (GearSlot.MainHand or GearSlot.OffHand);

@@ -823,14 +823,15 @@ var tests = new (string Name, Action Run)[]
             Gear(4, 90, 560, TenshoAssistant.Gear.GearSlot.RingRight, paladin, (1, 40)),
             Gear(5, 88, 550, TenshoAssistant.Gear.GearSlot.RingRight, paladin, (1, 30))]);
         var exact = new TenshoAssistant.Gear.GearFilter(5, true);
-        Check(TenshoAssistant.Gear.GearRules.LevelWindow(83, exact) == (83, 83) && TenshoAssistant.Gear.GearRules.LevelWindow(90, exact) == (85, 90), "exact level outside caps, window at caps");
-        Check(TenshoAssistant.Gear.GearRules.LevelWindow(83, exact with { ExactOutsideCaps = false }) == (78, 83), "window when the option is off");
-        Check(TenshoAssistant.Gear.GearRules.Candidates(catalog, TenshoAssistant.Gear.GearSlot.Head, 19, 83, exact).Select(item => item.Id).SequenceEqual(new uint[] { 1 }), "only the job's gear of the exact level");
+        // X-277 (0.1290): the rule turned the right way round: window outside the caps, exact level at the caps.
+        Check(TenshoAssistant.Gear.GearRules.LevelWindow(83, exact) == (78, 83) && TenshoAssistant.Gear.GearRules.LevelWindow(90, exact) == (90, 90), "window outside caps, exact level at caps");
+        Check(TenshoAssistant.Gear.GearRules.LevelWindow(90, exact with { ExactAtCaps = false }) == (85, 90), "window when the option is off");
+        Check(TenshoAssistant.Gear.GearRules.Candidates(catalog, TenshoAssistant.Gear.GearSlot.Head, 19, 83, exact).Select(item => item.Id).OrderBy(id => id).SequenceEqual(new uint[] { 1, 2 }), "only the job's gear, from 78 to 83");
         Check(TenshoAssistant.Gear.GearRules.Candidates(catalog, TenshoAssistant.Gear.GearSlot.Head, 19, 83, exact with { AllJobs = true }).Select(item => item.Id).SequenceEqual(new uint[] { 3, 1, 2 }), "all jobs: other jobs' armor of any level (glamour since 7.4)");
         Check(TenshoAssistant.Gear.GearRules.GlamourOnly(catalog.Find(3)!, 19, 83) && TenshoAssistant.Gear.GearRules.GlamourOnly(catalog.Find(4)!, 19, 83) && !TenshoAssistant.Gear.GearRules.GlamourOnly(catalog.Find(1)!, 19, 83), "other job or higher level: look only");
         var weapons = new TenshoAssistant.Gear.GearCatalog([Gear(9, 83, 500, TenshoAssistant.Gear.GearSlot.MainHand, 1UL << 24)]);
         Check(!TenshoAssistant.Gear.GearRules.Candidates(weapons, TenshoAssistant.Gear.GearSlot.MainHand, 19, 83, exact with { AllJobs = true }).Any(), "weapons stay job-locked");
-        Check(TenshoAssistant.Gear.GearRules.Candidates(catalog, TenshoAssistant.Gear.GearSlot.RingLeft, 19, 90, exact).Select(item => item.Id).SequenceEqual(new uint[] { 4, 5 }), "rings fit both ring slots, best item level first");
+        Check(TenshoAssistant.Gear.GearRules.Candidates(catalog, TenshoAssistant.Gear.GearSlot.RingLeft, 19, 91, exact).Select(item => item.Id).SequenceEqual(new uint[] { 4, 5 }), "rings fit both ring slots, best item level first (91: the window, X-277)");
         var head = catalog.Find(1)!;
         Check(head.ParamsFor(true)[27] == 55 && head.ParamsFor(false)[27] == 50, "HQ adds its bonus");
         var worn = TenshoAssistant.Gear.GearRules.Totals([(catalog.Find(2)!, false, new List<(int, int)> { (27, 20) })]);

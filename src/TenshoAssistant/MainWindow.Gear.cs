@@ -241,7 +241,7 @@ internal sealed partial class MainWindow
         // X-76 H4 (0.914): the slider and the field follow the edit in memory and are written once, when released or left (they were
         // written on every frame of a drag and every key press).
         SliderSetting("Gear.LevelsBelow","Gear.LevelsBelowTip",()=>configuration.GearLevelsBelow,value=>configuration.GearLevelsBelow=value,0,30,DefaultConfiguration.GearLevelsBelow,width:140);
-        BoolSetting("Gear.ExactOutsideCaps","Gear.ExactOutsideCapsTip",()=>configuration.GearExactOutsideCaps,value=>configuration.GearExactOutsideCaps=value,c=>c.GearExactOutsideCaps);
+        BoolSetting("Gear.ExactAtCaps","Gear.ExactAtCapsTip",()=>configuration.GearExactAtCaps,value=>configuration.GearExactAtCaps=value,c=>c.GearExactAtCaps);
         IntSetting("Gear.MinItemLevel","Gear.MinItemLevelTip",()=>configuration.GearMinItemLevel,value=>configuration.GearMinItemLevel=value,0,int.MaxValue,DefaultConfiguration.GearMinItemLevel,140);
         BoolSetting("Gear.AssumeHq","Gear.AssumeHqTip",()=>configuration.GearAssumeHq,value=>configuration.GearAssumeHq=value,c=>c.GearAssumeHq);
         BoolSetting("Gear.AllJobs","Gear.AllJobsTip",()=>configuration.GearAllJobs,value=>configuration.GearAllJobs=value,c=>c.GearAllJobs);
@@ -305,7 +305,7 @@ internal sealed partial class MainWindow
         try
         {
             ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.Slot"+slot));
-            var filter=new GearFilter(configuration.GearLevelsBelow,configuration.GearExactOutsideCaps,configuration.GearMinItemLevel,gearSearch.Trim(),configuration.GearAllJobs);
+            var filter=new GearFilter(configuration.GearLevelsBelow,configuration.GearExactAtCaps,configuration.GearMinItemLevel,gearSearch.Trim(),configuration.GearAllJobs);
             var (min,max)=GearRules.LevelWindow(state.Level,filter);
             // 0.331: « All jobs (glamour) » lists armor and accessories of every level: no level window shown for them.
             ImGui.SameLine();ImGui.TextDisabled(GearRules.AnyJobAndLevel(slot,filter) ? localization.Get("Gear.WindowAll"):localization.Format("Gear.Window",min,max));

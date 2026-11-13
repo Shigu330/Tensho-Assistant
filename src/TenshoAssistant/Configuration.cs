@@ -54,7 +54,7 @@ public static class ConfigurationReset
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "StateServerBar", "StateServerBarOnlyProblems", "StatePanel", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
-        "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
+        "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactAtCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
         "Discord", "ThemeMode", "NavigationMode", "FollowDalamudStyle", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CommunityPaissa", "SourceUses", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
@@ -493,7 +493,12 @@ public sealed partial class Configuration
     // 0.602 (T28): by character, what the collections held at the last reading and what was gained since.
     public Dictionary<ulong,TenshoAssistant.Collections.CollectionMemory>? CollectionMemories { get; set; }
     public int GearLevelsBelow { get; set; } = 5;
-    public bool GearExactOutsideCaps { get; set; } = true;
+    // X-277 (0.1290): only the gear of the exact level at the expansion caps, the « Levels below » window at every other level (the rule of
+    // 0.430, « exact level outside caps », was the wrong way round).
+    public bool GearExactAtCaps { get; set; } = true;
+    // X-277 (0.1290): the setting's name before 0.1290; a file saved before is read with it (the player's choice kept: on stays on, off
+    // stays off, the window everywhere), and it is never written again (a property without getter is not saved).
+    public bool GearExactOutsideCaps { set=>GearExactAtCaps=value; }
     public int GearMinItemLevel { get; set; }
     public bool GearAssumeHq { get; set; } = true;
     // 0.311: other jobs' armor and accessories in the lists (glamour since patch 7.4; weapons stay job-locked).

@@ -162,7 +162,7 @@ public static class SettingsIndex
         ("GatheringPanel.Regen","Panels"),
         ("Gear.AllJobs","Panels"),
         ("Gear.AssumeHq","Panels"),
-        ("Gear.ExactOutsideCaps","Panels"),
+        ("Gear.ExactAtCaps","Panels"),
         ("Gear.LevelsBelow","Panels"),
         ("Gear.MinItemLevel","Panels"),
         ("Gear.OwnedOnly","Panels"),
