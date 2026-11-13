@@ -125,6 +125,7 @@
     <Compile Include="../../src/TenshoAssistant/SettingsIndex.cs" Link="SettingsIndex.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/HuntingLog.cs" Link="Hunting/HuntingLog.cs" />
     <Compile Include="../../src/TenshoAssistant/Hunting/SRankConditions.cs" Link="Hunting/SRankConditions.cs" />
+    <Compile Include="../../src/TenshoAssistant/Hunting/SRankKills.cs" Link="Hunting/SRankKills.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalog.cs" Link="Gathering/GatheringCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringCatalogCache.cs" Link="Gathering/GatheringCatalogCache.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingNotebook.cs" Link="Gathering/FishingNotebook.cs" />

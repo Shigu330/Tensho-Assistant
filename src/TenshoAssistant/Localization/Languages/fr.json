@@ -6831,7 +6831,12 @@
   },
   "SRank": {
     "Title": "Conditions des rangs S",
-    "Help": "Comment chaque rang S apparaît, d'après la communauté : ces conditions ne sont pas dans les données du jeu, et une mise à jour peut les changer. Rien n'est compté ici. Sources : page Crédits.",
+    "Help": "Comment chaque rang S apparaît, d'après la communauté : ces conditions ne sont pas dans les données du jeu, et une mise à jour peut les changer. Seuls vos propres monstres vaincus sont comptés, pour les rangs qui demandent d'en vaincre. Sources : page Crédits.",
+    "YourKills": "Vos monstres vaincus : {0}",
+    "KillCount": "{0} {1}/{2}",
+    "YourKillsTip": "Compté depuis le message « Vous avez vaincu » du jeu, dans la zone du rang : vos propres monstres seulement (ceux des autres joueurs comptent aussi pour le rang mais ne sont pas vus). Gardé jusqu'à ce que vous l'effaciez.",
+    "ClearKills": "Effacer",
+    "ClearKillsTip": "Remet à zéro les compteurs de ce rang (après son apparition, par exemple).",
     "Search": "Chercher une marque, une zone, un monstre, un objet…",
     "SearchTip": "Filtre la liste. Les marques de votre zone viennent en premier.",
     "Empty": "Aucun résultat.",

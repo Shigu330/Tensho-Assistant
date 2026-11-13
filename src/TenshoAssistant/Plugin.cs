@@ -732,6 +732,12 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.
+            Hunting.SRankKillWatcher? srankKills=null;
+            registrations.Register(()=>srankKills=new Hunting.SRankKillWatcher(framework,client,objects,chat){Killed=(monster,territory)=>
+            {
+                if(Hunting.SRankKills.KeysFor(monster,territory) is { Count:>0 } keys && Hunting.SRankKills.Add(configuration.SRankKills ??= [],keys))SaveTimed("S rank kills");
+            }},()=>srankKills?.Dispose());
             // X-218 (0.1228): each character's job levels and gear sets kept in TenshoData.db at login and when they change (Storage › Characters).
             var characterJobs=new Character.CharacterJobsData(tenshoData);
             mainWindow.CharacterJobs=characterJobs;

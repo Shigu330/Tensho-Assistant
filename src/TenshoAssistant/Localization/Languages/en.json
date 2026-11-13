@@ -6831,7 +6831,12 @@
   },
   "SRank": {
     "Title": "S rank conditions",
-    "Help": "How each S rank appears, according to the community: these conditions are not in the game's data, and an update can change them. Nothing is counted here. Sources: Credits page.",
+    "Help": "How each S rank appears, according to the community: these conditions are not in the game's data, and an update can change them. Only your own kills are counted, for the marks that ask for kills. Sources: Credits page.",
+    "YourKills": "Your kills: {0}",
+    "KillCount": "{0} {1}/{2}",
+    "YourKillsTip": "Counted from the game's « You defeat » message, in the mark's zone: only your own kills (other players' kills also count for the mark but are not seen). Kept until you clear them.",
+    "ClearKills": "Clear",
+    "ClearKillsTip": "Sets this mark's counters back to zero (after it appeared, for example).",
     "Search": "Search a mark, a zone, a monster, an item…",
     "SearchTip": "Filters the list. The marks of your zone come first.",
     "Empty": "Nothing matches.",

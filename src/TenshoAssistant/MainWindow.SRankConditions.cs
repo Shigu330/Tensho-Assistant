@@ -5,7 +5,8 @@ using TenshoAssistant.Maps;
 namespace TenshoAssistant;
 
 // N-12 (0.670): Maps › « S rank conditions » (folded). Community knowledge, not game data: said on the page. The names come from the game's
-// sheets, in its language. The marks of the player's zone come first. No counter (docs/evidence/0.670-srank-conditions.md).
+// sheets, in its language. The marks of the player's zone come first (docs/evidence/0.670-srank-conditions.md). X-222 (0.1232): the marks counted by
+// kills show the player's own kills (SRankKills), with a button that clears them.
 internal sealed partial class MainWindow
 {
     internal Func<SRankRef,string?>? SRankRefName { get; set; }
@@ -51,6 +52,23 @@ internal sealed partial class MainWindow
         }
     }
 
+    // X-222 (0.1232): « Your kills: A 12/100 · B 0/100 » and a button that clears this mark's counters.
+    private void DrawSRankKills(SRankMark mark)
+    {
+        var counts=configuration.SRankKills;
+        var parts=mark.Refs.Where(item=>item.Kind==SRankRefKind.Mob).Select(item=>localization.Format("SRank.KillCount",SRankRefName?.Invoke(item) ?? "#"+item.Id,SRankKills.Get(counts,mark.Name,item.Id),item.Count));
+        ImGui.TextUnformatted(localization.Format("SRank.YourKills",string.Join(" · ",parts)));
+        Tip("SRank.YourKillsTip");
+        ImGui.SameLine();
+        DesktopEditBegin();
+        try
+        {
+            if(ImGui.SmallButton(localization.Get("SRank.ClearKills")+$"###SRankClear{mark.Name}") && counts is not null && SRankKills.Clear(counts,mark.Name))save();
+            Tip("SRank.ClearKillsTip");
+        }
+        finally{DesktopEditEnd();}
+    }
+
     private SRankRow BuildSRankRow(SRankMark mark)
     {
         string Upper(string? name,string fallback)=>name is { Length:>0 } ? char.ToUpper(name[0],System.Globalization.CultureInfo.CurrentCulture)+name[1..]:fallback;
@@ -73,6 +91,7 @@ internal sealed partial class MainWindow
             Tip("EntityMenu.RightClickPlace");
             PlaceMenu($"SRankPlace{mark.Name}",markMap,placed,row.Name);
         }
+        if(SRankKills.Counted(mark))DrawSRankKills(mark);
         var window=localization.Format("SRank.Window",mark.Minimum,mark.Maximum,mark.MaintenanceMinimum,mark.MaintenanceMaximum);
         ImGui.TextDisabled(mark.Odds switch{SRankOdds.Guaranteed=>window+" · "+localization.Get("SRank.Sure"),SRankOdds.Chance=>window+" · "+localization.Get("SRank.Random"),_=>window});
         // X-91 (0.971, planned in X-75.5, docs/evidence/x91-parsers-check.md): where the condition's FATE was seen in game (yours or shared), from the discoveries.
