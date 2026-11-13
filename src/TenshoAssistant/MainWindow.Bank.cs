@@ -31,6 +31,8 @@ internal sealed partial class MainWindow
     private BankFrameViewKey? bankFrameViewKey;
     private IReadOnlyList<(string Name,InventoryContainerSnapshot Container)> bankFrameGroups=[];
     private IReadOnlyList<string> bankFrameErrors=[];
+    // X-291 (0.1293): the gil of each shown storage (retainer, company chest), built with the frames.
+    private IReadOnlyList<(string Name,long Gil)> bankFrameGil=[];
     private readonly Dictionary<InventoryContainerSnapshot,BankItemRow?[]> bankFrameRows=new(ReferenceEqualityComparer.Instance);
     private bool bankHasVisibleItems;
 
@@ -229,7 +231,8 @@ internal sealed partial class MainWindow
                 : [];
             var sources=personal.Concat(bankPersonalFilter ? [] : selectedEntries.SelectMany(entry=>entry.Snapshot.Containers.Values));
             var aggregated=new Dictionary<uint,(long Nq,long Hq)>();
-            foreach(var source in sources)
+            // X-291 (0.1293): the gil purses are an amount (bankFrameGil), not an item of the lists, searches or filters.
+            foreach(var source in sources.Where(container=>!InventoryDisplayLayout.IsGil(container.Location.Container.Value)))
             foreach(var quantity in source.Quantities)
             {
                 var row=aggregated.GetValueOrDefault(quantity.Key.Id.Value);
@@ -314,10 +317,21 @@ internal sealed partial class MainWindow
                         AddDisplayFrames(localization.Format("BankUi.Frame",BankEntryName(entry),observed.ToString(observed.Date==now.ToLocalTime().Date ? "t":"g"),expired ? localization.Get("BankUi.ExpiredSuffix"):""),entry.Snapshot.Containers.Values,groups,errors);
                     }
             }
+            // X-291 (0.1293): each storage's gil as an exact amount, in the retainer's tab and in the global view, whatever the item filters.
+            var purses=new List<(string Name,long Gil)>();
+            if(!bankPersonalFilter)
+                foreach(var entry in selectedEntries)
+                    if(InventoryDisplayLayout.Gil(entry.Snapshot.Containers.Values) is { } held)purses.Add((BankEntryName(entry),held));
+            bankFrameGil=purses;
             bankFrameGroups=groups;bankFrameErrors=errors;bankFrameRows.Clear();bankFrameViewKey=frameKey;
         }
         // 0.329: an unread inventory and an empty tab are said as such; « no match » only when a filter hides everything.
         if(bankPersonalNotice is { } notice)ImGui.TextDisabled(localization.Get(notice));
+        foreach(var (purseName,held) in bankFrameGil)
+        {
+            ImGui.TextUnformatted(localization.Format("BankUi.GilLine",purseName,held.ToString("N0",Numbers)));
+            DrawGilIcon();
+        }
         if(!bankHasVisibleItems)
         {
             if(BankFiltering)ImGui.TextDisabled(localization.Get("BankUi.Empty"));

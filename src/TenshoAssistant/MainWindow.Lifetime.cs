@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
         buildSearchCancel?.Cancel();buildSearchCancel?.Dispose();buildSearchCancel=null;
         airshipPlanCancel?.Cancel();airshipPlanCancel?.Dispose();airshipPlanCancel=null;
         bankFrameRows.Clear();
-        bankFrameGroups=[];bankFrameErrors=[];
+        bankFrameGroups=[];bankFrameErrors=[];bankFrameGil=[];
         bankSourceRows.Clear();bankSourcePersonal=[];bankSourceCategories=[];
         bankEntriesView=[];bankEntriesSource=null;bankSourceViewKey=null;bankFrameViewKey=null;
         chainCostView=null;chainCostViewKey=null;preparationListSource=null;preparationListCatalog=null;preparationListIds=[];

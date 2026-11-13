@@ -16,6 +16,19 @@ public static class InventoryDisplayLayout
     /// </summary>
     public static bool HasBagLayout(int container)=>container is >= 0 and <= 3 or 4000 or 4001 or 4100 or 4101 or >= 10000 and <= 10006;
 
+    /// <summary>
+    /// X-291 (0.1293, user request of 13/11 about 23:45, Storage › Bank, retainers Shirune and Zet-suna: the gil shown as an item cell, « 999 »,
+    /// in a « Bag 6 »): a storage's gil purse, a retainer's (12000) or the company chest's (22000), is an amount, never an item page.
+    /// </summary>
+    public static bool IsGil(int container)=>container is 12000 or 22000;
+
+    /// <summary>X-291 (0.1293): the gil held by the purses read among these containers; null when none was read (unknown, not zero).</summary>
+    public static long? Gil(IEnumerable<InventoryContainerSnapshot> source)
+    {
+        var purses=source.Where(container=>IsGil(container.Location.Container.Value) && container.Coverage!=InventoryCoverage.Unknown).ToArray();
+        return purses.Length==0 ? null:purses.Sum(container=>container.Stacks.Sum(stack=>stack.Quantity));
+    }
+
     /// <summary>One displayed page: its number (1-based, in the storage) and its stacks, Slot being the cell (0–34).</summary>
     public readonly record struct DisplayPage(int Number, InventoryContainerSnapshot Container);
 
@@ -54,7 +67,8 @@ public static class InventoryDisplayLayout
                     if (bags[index].Coverage != InventoryCoverage.Unknown) pages.Add(new(index + 1, bags[index]));
             }
         }
-        var others = copied.Where(container => !HasBagLayout(container.Location.Container.Value)).ToArray();
+        // X-291 (0.1293): the gil purses are left out of the pages: an amount (Gil), shown on its own line.
+        var others = copied.Where(container => !HasBagLayout(container.Location.Container.Value) && !IsGil(container.Location.Container.Value)).ToArray();
         if (others.Length > 0)
         {
             var stacks = others.SelectMany(container => container.Stacks.OrderBy(stack => stack.Slot)).ToArray();

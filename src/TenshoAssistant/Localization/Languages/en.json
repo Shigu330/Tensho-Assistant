@@ -4296,6 +4296,7 @@
     "SearchTip": "Part of the item name or ID; case is ignored.",
     "UnreadBags": "Some of the character's bags are not read yet: their contents are missing below.",
     "EmptyStorage": "No items in this tab.",
+    "GilLine": "{0} · gil: {1}",
     "PhysicalOrder": "{0}: the game's visual order cannot be read (a sort in progress or a game update); each bag is shown in its actual slot order.",
     "Bags": "Bags",
     "LoggedIn": "Logged-in character",

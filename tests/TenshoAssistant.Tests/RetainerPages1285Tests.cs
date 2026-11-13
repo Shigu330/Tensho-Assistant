@@ -32,9 +32,9 @@ internal static class RetainerPages1285Tests
             var source = Retainer(true);
             var layout = InventoryDisplayLayout.Pages(source);
             Check(!layout.PhysicalOrder, "visual order kept");
-            Check(layout.Pages.Count == 6 && layout.Pages.Select(page => page.Number).SequenceEqual([1, 2, 3, 4, 5, 6]), "5 visual pages, then the extras: " + layout.Pages.Count);
-            Check(layout.Pages[5].Container.Stacks.Single().Item.Id.Value == 1, "gil on the last page");
-            Check(Total(layout.Pages.Select(page => page.Container)) == Total(source), "nothing lost");
+            Check(layout.Pages.Count == 5 && layout.Pages.Select(page => page.Number).SequenceEqual([1, 2, 3, 4, 5]), "5 visual pages; the gil is an amount, not a page (X-291): " + layout.Pages.Count);
+            Check(InventoryDisplayLayout.Gil(source) == 999, "the gil as an amount (X-291)");
+            Check(Total(layout.Pages.Select(page => page.Container)) + 999 == Total(source), "nothing lost");
             var first = layout.Pages[0].Container.Stacks.Single(stack => stack.Slot == 0);
             Check(first.DisplayIndex == 0 && first.Item.Id.Value == 1000, "cell 0 holds the stack the game shows first");
         }),
@@ -43,9 +43,9 @@ internal static class RetainerPages1285Tests
             var source = Retainer(false);
             var layout = InventoryDisplayLayout.Pages(source);
             Check(layout.PhysicalOrder, "note asked");
-            Check(layout.Pages.Count == 8 && layout.Pages[6].Number == 7 && layout.Pages[7].Number == 8, "7 physical pages, then the extras");
+            Check(layout.Pages.Count == 7 && layout.Pages[6].Number == 7, "7 physical pages; the gil apart (X-291)");
             Check(layout.Pages[2].Container.Stacks.Single(stack => stack.Slot == 4).Item.Id.Value == 1054, "slot order of page 3");
-            Check(Total(layout.Pages.Select(page => page.Container)) == Total(source), "nothing lost");
+            Check(Total(layout.Pages.Select(page => page.Container)) + InventoryDisplayLayout.Gil(source) == Total(source), "nothing lost");
         }),
         ("X-275: a doubled position also falls back to the slot order; an unread bag is left out of it", () =>
         {
@@ -63,7 +63,7 @@ internal static class RetainerPages1285Tests
         {
             var chest = Container(20000, Enumerable.Range(0, 40).Select(slot => new InventoryStack(new(new((uint)(500 + slot)), false), 1, slot, -1)).ToArray());
             var layout = InventoryDisplayLayout.Pages([chest, Container(22000, new InventoryStack(new(new(1), false), 50, 0, -1))]);
-            Check(!layout.PhysicalOrder && layout.Pages.Count == 2 && layout.Pages[1].Container.Stacks.Count == 6, "35 then 6");
+            Check(!layout.PhysicalOrder && layout.Pages.Count == 2 && layout.Pages[1].Container.Stacks.Count == 5, "35 then 5, the chest's gil apart (X-291)");
             Check(layout.Pages[0].Container.Stacks[0].Item.Id.Value == 500, "slot order");
         }),
     ];

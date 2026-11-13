@@ -4296,6 +4296,7 @@
     "SearchTip": "Partie du nom ou de l'identifiant de l'objet ; majuscules ignorées.",
     "UnreadBags": "Certains sacs du personnage ne sont pas encore lus : leur contenu manque ci-dessous.",
     "EmptyStorage": "Aucun objet dans cet onglet.",
+    "GilLine": "{0} · gils : {1}",
     "PhysicalOrder": "{0} : ordre visuel du jeu illisible (tri en cours ou mise à jour du jeu) ; chaque sac est affiché dans l'ordre réel de ses cases.",
     "Bags": "Sacs",
     "LoggedIn": "Personnage connecté",

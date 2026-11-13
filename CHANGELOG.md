@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1293.0
+- Plan global, X-291 : Stockage › Banque : les gils d'un servant (et ceux du coffre de compagnie) s'affichent en montant exact, sur une ligne à eux (« Shirune · gils : 1 234 567 », séparateurs de milliers de la langue, icône de gil), dans l'onglet du servant et dans la vue Globale, quels que soient les filtres ; ils ne sont plus une case d'objet dans un « Sac 6 » ni une ligne de la vue en liste, de la recherche ou des catégories. Un porte-monnaie non lu reste inconnu (pas de ligne), jamais zéro. Les cristaux restent des objets (cases, comme dans le jeu).
+- Pour les joueurs : Banque : les gils de vos servants s'affichent en montant sur une ligne à eux, plus comme un objet dans un sac.
+- Tests : RetainerGil1293Tests. Verify.ps1 (agent) : 2386/2386, 0 avertissement, 0 erreur ; DLL 0.1293.0.0. Non validé en jeu.
+### English
+- Storage › Bank: a retainer's gil (and the company chest's) is shown as an exact amount, on a line of its own (« Shirune · gil: 1,234,567 », the language's thousands separators, gil icon), in the retainer's tab and in the Global view, whatever the filters; it is no longer an item cell in a « Bag 6 » nor a row of the list view, the search or the categories. A purse not read stays unknown (no line), never zero. Crystals stay items (cells, as in the game).
+- For players: Bank: your retainers' gil is now shown as an amount on its own line, no longer as an item in a bag.
+
 ## 0.1292.0
 - Plan global, X-279 : Alarmes : la ligne « prochaine » donne le délai au format commun des durées, celui du jardin et de l'accueil (« 17 j 2 h », « 3 h 05 », « 45 min » ; en anglais « 17d 2h », « 3h 05 »), et la date quand la sonnerie n'est pas aujourd'hui (« prochaine 01/12/2026 00:00 (dans 17 j 2 h) »). Les deux sites de la page Alarmes écrivaient les minutes à la main ((int)TotalMinutes, heure seule) : un seul assistant (AlarmNextText) et une classe pure TimeLeft, dont le jardin se sert aussi. Correction trouvée en route : le test GitHubToken1171 (« un renouvellement accepté pendant le déchargement est gardé ») échouait lancé seul ; cause, une course dans GitHubExchange.Fresh : la demande de renouvellement partait avant d'être inscrite (refreshing), et un Dispose arrivé entre les deux ne l'attendait pas, la nouvelle paire de jetons n'était pas écrite. Elle est inscrite avant de partir.
 - Pour les joueurs : Alarmes : la prochaine sonnerie s'écrit « dans 17 j 2 h » au lieu de milliers de minutes, avec sa date quand ce n'est pas aujourd'hui.

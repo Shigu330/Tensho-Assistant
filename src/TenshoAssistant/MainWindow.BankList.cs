@@ -38,7 +38,9 @@ internal sealed partial class MainWindow
             {
                 var items=source.Items;
                 var quantities=bankSourcePersonal.SelectMany(container=>container.Quantities.Select(quantity=>(localization.Get("BankUi.Character"),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)));
-                if(!source.Personal)quantities=quantities.Concat(selected.SelectMany(entry=>entry.Snapshot.Containers.Values.SelectMany(container=>container.Quantities.Select(quantity=>(BankEntryName(entry),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)))));
+                // X-291 (0.1293): the gil purses are an amount on their own line, not a row of the list.
+                if(!source.Personal)quantities=quantities.Concat(selected.SelectMany(entry=>entry.Snapshot.Containers.Values.Where(container=>!InventoryDisplayLayout.IsGil(container.Location.Container.Value))
+                    .SelectMany(container=>container.Quantities.Select(quantity=>(BankEntryName(entry),quantity.Key.Id.Value,quantity.Key.IsHighQuality,quantity.Value)))));
                 bankListRows=BankList.Sorted(BankList.Merge(quantities).Where(row=>MatchesBankFilters(new(row.ItemId,row.Nq,row.Hq))),(BankListSort)bankListSort,bankListDescending,
                     id=>items?.Find(id)?.Name ?? "",id=>items?.Find(id)?.UiCategoryName ?? "");
                 bankListKey=key;
