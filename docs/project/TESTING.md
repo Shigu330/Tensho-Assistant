@@ -1657,6 +1657,62 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1263) Bouton « tout le potager entretenu » d'un potager : seules les parcelles de ce potager passent en « entretenu », celles des autres potagers de la maison ne changent pas
 
+- [ ] (0.1264) Objets › Marché, un objet choisi : pendant la recherche, ligne « En attente » avec son sablier ; un prix au cache expiré ou à l'envoi ancien : ligne « Donnée ancienne » (glyphe d'horloge) ; prix alignés à droite
+
+- [ ] (0.1264) Rangements : un rangement jamais ouvert (sacoche, commode, armoire, servant) s'annonce par « En attente » et sa phrase ; rien d'autre n'a changé dans les listes
+
+- [ ] (0.1264) Survol d'un objet avec un prix ancien : « Donnée ancienne » se lit dans l'infobulle sans la déformer
+
+- [ ] (0.1265) Pendant une synthèse, page de la lecture en direct : ligne « Mesuré » (œil) avec l'heure ; fenêtre du jeu fermée depuis plus de deux secondes : « Donnée ancienne »
+
+- [ ] (0.1265) Tableau des prochaines actions pendant une synthèse : ligne « Estimation » (calculatrice) au-dessus du tableau
+
+- [ ] (0.1265) Simulation avec Travail rapide ou Ouvrage hâtif dans la séquence : ligne « Estimation » avec la phrase sur les actions laissées au hasard
+
+- [ ] (0.1265) « Que puis-je fabriquer ? » après avoir déplacé des objets : « Donnée ancienne » à côté du bouton de recherche
+
+- [ ] (0.1266) Outil PR avec un objet de récolte choisi, en mineur ou botaniste : petite calculatrice après « Estimé : +N » ; au survol « Estimation · calculé par Tensho… »
+
+- [ ] (0.1266) Panneau de récolte devant un point : calculatrice après la ligne du rendement attendu du plan
+
+- [ ] (0.1266) Observation du point (fenêtre de récolte ouverte) : ligne « Mesuré » avec le résumé ; fenêtre fermée : « En attente »
+
+- [ ] (0.1267) Cartes, juste après le chargement : « En attente » avec le compte des positions lues, puis les listes
+
+- [ ] (0.1267) Défi d'un PNJ à la Triple Triade : ligne « Estimation » au-dessus des chances de vos decks ; pendant une partie, un conseil « approximatif » porte une petite calculatrice
+
+- [ ] (0.1267) Escouade, classement des équipes : ligne « Estimation » avec la phrase sur le pourcentage
+
+- [ ] (0.1268) ALÉA en cours, carte de Tensho : ses monstres portent l'icône de l'ALÉA (épées, boss, collecte…) au lieu de l'étoile ; survol : « ALÉA : nom »
+
+- [ ] (0.1268) ALÉA avec des alliés (escorte, défense avec gardes) : les alliés portent la marque verte « mains tendues », survol « Allié de l'ALÉA : nom » ; les ennemis gardent l'icône de l'ALÉA, même avant d'être attaqués
+
+- [ ] (0.1268) Avec « ALÉA » coché dans les icônes au-dessus des têtes : mêmes marques au-dessus des ennemis et des alliés
+
+- [ ] (0.1269) Paramètres › Avancé, « état de Tensho » coché (ou page Diagnostic en mode développeur) : sous « Tableau de bord », une rangée de jauges (mémoire, page la plus lente, requêtes par minute) et des compteurs ; chaque jauge a sa valeur écrite et une aide au survol
+
+- [ ] (0.1269) Fenêtre rétrécie : les jauges passent à la ligne sans se chevaucher ; thème clair : cadran et chiffres lisibles
+
+- [ ] (0.1269) Mode développeur : jauge « Image de Tensho » après une minute, compteur « Images lentes », ligne « Historique : N points ; dernier point lu en X ms »
+
+- [ ] (0.1270) Tableau de bord en jeu : un clic sur la jauge « Mémoire utilisée » montre sa courbe sous les jauges (« il y a N min » à gauche, « maintenant » à droite) ; un second clic la cache ; clic sur une autre jauge : sa courbe remplace la première
+
+- [ ] (0.1270) Survol de la courbe : « Plus bas …, plus haut …, dernier … »
+
+- [ ] (0.1271) Application de bureau reliée au jeu (les deux en 0.1271 ou plus), page Diagnostic ou Paramètres › Avancé : dix secondes après le lien, les jauges du jeu (mémoire, page la plus lente, requêtes par minute) et les compteurs ; après vingt secondes, les courbes se tracent et s'allongent
+
+- [ ] (0.1271) Jeu fermé ou lien coupé : « L'état de Tensho en jeu n'est pas connu ici » ; les courbes déjà vues reviennent au lien suivant tant que l'application reste ouverte
+
+- [ ] (0.1271) En jeu : tableau de bord inchangé (jauges, courbe sur un clic), compteurs sur une ligne sous les jauges
+
+- [ ] (0.1272) Paramètres › Général : cocher « Suivre le style de Dalamud » : la fenêtre de Tensho, la carte et les panneaux prennent les couleurs et espacements des autres fenêtres Dalamud ; les titres restent en couleur d'accent de Tensho ; tout reste lisible (lignes d'état, jardin en icônes, jauges)
+
+- [ ] (0.1272) Décocher : le thème de Tensho revient à l'image suivante, sans décalage ni couleur restée
+
+- [ ] (0.1272) Avec un style Dalamud clair (réglages de Dalamud › Apparence) et l'option cochée : titres et repères lisibles sur fond clair
+
+- [ ] (0.1273) Application de bureau : les flèches des catégories de la navigation (OBJETS, PRODUCTION…) sont des triangles, plus des rectangles ; Jardinage : la goutte et la coche des parcelles se lisent ; tableau de bord : le « ? » des lignes à regarder se lit
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
