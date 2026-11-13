@@ -10,6 +10,13 @@ public sealed record GearComparison(GearItem Worn,bool WornHq,int ItemLevelDelta
 /// </summary>
 public static class GearCompare
 {
+    /// <summary>X-294 (0.1295): a piece's base stats (NQ or HQ values, no materia) in the stats' order, zeros left out: the item tooltip's first block.</summary>
+    public static IReadOnlyList<(int Param,int Value)> BaseStats(GearItem piece,bool hq,IReadOnlyList<int> order)
+    {
+        var values=piece.ParamsFor(hq && piece.CanBeHq);
+        return order.Where(param=>values.GetValueOrDefault(param)!=0).Select(param=>(param,values[param])).ToArray();
+    }
+
     public static IReadOnlyList<GearComparison> Compare(GearItem candidate,bool hq,IReadOnlyList<EquippedPiece> worn,Func<uint,GearItem?> find,IReadOnlyList<int> order)
     {
         var slots=candidate.Slot is GearSlot.RingRight or GearSlot.RingLeft ? new[]{GearSlot.RingRight,GearSlot.RingLeft}:[candidate.Slot];

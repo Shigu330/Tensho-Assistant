@@ -282,7 +282,8 @@ internal sealed partial class MainWindow
                 var clicked=ImGui.Selectable($"{shown.Name}{(hq ? " ":"")}##GearName",false,ImGuiSelectableFlags.None,new Vector2(0,0));
                 ImGui.PopStyleColor();
                 if(clicked){gearSearch="";ImGui.OpenPopup("GearPick");}
-                if(ImGui.IsItemHovered())DrawItemInfoTooltip(shown.Id);
+                // X-294 (0.1295): the slot's piece shows its stats too (the common item tooltip), with its known HQ state.
+                if(ImGui.IsItemHovered())DrawItemInfoTooltip(shown.Id,glamourOnly:look is not null,hq:hq);
                 ItemLinksMenu("GearSlotMenu",definition);
                 ImGui.TextDisabled(localization.Format("Gear.LevelLine",shown.Level,shown.ItemLevel));
                 if(changed || look is not null){ImGui.SameLine();DrawOwnedMark(shown.Id);}
@@ -343,7 +344,7 @@ internal sealed partial class MainWindow
                         }
                         // X-290 (0.1294, user request of 13/11 about 23:30): the stat differences written at the end of the line went past the list and
                         // were cut (« +4 I », « -5 Détermination »): they are in the piece's tooltip, with its stats, as the hover comparator shows them.
-                        if(ImGui.IsItemHovered())DrawGearPickTooltip(catalog,candidate,glamourOnly);
+                        if(ImGui.IsItemHovered())DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly);
                         ItemLinksMenu($"GearPickMenu{candidate.Id}",definition);
                         SameLineOrNext(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
                         ImGui.TextDisabled(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
@@ -359,7 +360,7 @@ internal sealed partial class MainWindow
 
     // 0.331 (« nothing heavy in Draw »): the rows of the open list — filtered, sorted — rebuilt only when an input changes: catalog, slot, job,
     // level, filters, owned-only, assumed HQ, what is owned (same key as gearOwned), the worn gear and the other ring. X-290 (0.1294): the
-    // differences against the worn piece left the rows for the tooltip (DrawGearPickTooltip), worked out for the hovered piece only.
+    // differences against the worn piece left the rows for the tooltip (the common item tooltip since X-294), worked out for the hovered piece only.
     private readonly record struct GearPickKey(GearCatalog Catalog,GearSlot Slot,uint Job,int Level,GearFilter Filter,bool OwnedOnly,bool AssumeHq,
         (Inventory.InventorySnapshot? Current,Inventory.BankState State,ulong CharacterId) Owned,uint OtherRing);
     private GearPickKey? gearPickKey;
@@ -387,26 +388,6 @@ internal sealed partial class MainWindow
         }
         gearPickKey=key;gearPickWorn=equipped;
         return gearPickRows;
-    }
-
-    /// <summary>
-    /// X-290 (0.1294): the tooltip of a piece of the list: the common item tooltip (levels, stock, how to get it) with, after its header, the
-    /// piece's base stats (assumed HQ as the list) and the comparison with the worn piece, drawn as under the game's tooltip (DrawStatPairs,
-    /// DrawHoverComparisons). A glamour-only piece keeps the worn stats: only its mark.
-    /// </summary>
-    private void DrawGearPickTooltip(GearCatalog catalog,GearItem candidate,bool glamourOnly)
-    {
-        DrawItemInfoTooltip(candidate.Id,()=>
-        {
-            if(glamourOnly){ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnlyTip"));return;}
-            var hq=configuration.GearAssumeHq && candidate.CanBeHq;
-            var values=candidate.ParamsFor(hq);
-            var stats=GearStatOrder.Where(param=>values.GetValueOrDefault(param)!=0).Select(param=>(param,values[param].ToString("N0",Numbers),Text)).ToArray();
-            if(stats.Length>0){TenshoAssistant.UI.UiComponents.SubTitle(localization.Get(hq ? "Gear.TipStatsHq":"Gear.TipStats"));DrawStatPairs("GearPickStats"+candidate.Id,stats);}
-            var comparisons=GearCompare.Compare(candidate,hq,EquippedGear?.Invoke() ?? [],catalog.Find,GearStatOrder);
-            if(comparisons.Count>0)DrawHoverComparisons(comparisons);
-            else ImGui.TextDisabled(localization.Get("HoverUi.CompareNote"));
-        });
     }
 
     /// <summary>X-290 (0.1294): the next text on the same line when it fits in what is left of it, else on the next line: never cut at the edge.</summary>

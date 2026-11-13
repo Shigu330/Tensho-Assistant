@@ -18,16 +18,16 @@ internal static class GearPickTip1294Tests
             var gear = Read("MainWindow.Gear.cs");
             var pick = gear[gear.IndexOf("private void DrawGearPick(", StringComparison.Ordinal)..gear.IndexOf("private readonly record struct GearPickKey", StringComparison.Ordinal)];
             Check(!pick.Contains("Gear.Param") && !pick.Contains("in differences"), "no difference text in the list");
-            Check(pick.Contains("SameLineOrNext(localization.Format(\"Gear.LevelLine\"") && pick.Contains("DrawGearPickTooltip(catalog,candidate,glamourOnly)"), "level line wraps; tooltip on hover");
+            Check(pick.Contains("SameLineOrNext(localization.Format(\"Gear.LevelLine\"") && pick.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "level line wraps; tooltip on hover");
             Check(!gear.Contains("PickDifferences"), "the old three differences are gone");
         }),
         ("X-290: one way to draw stats: the comparator and the list's tooltip share DrawStatPairs and the comparison", () =>
         {
             var compare = Read("MainWindow.GearCompare.cs");
             Check(compare.Split("ImGui.BeginTable(").Length - 1 == 1 && compare.Contains("DrawStatPairs(\"HoverCompare\""), "one stats table, used by the comparator");
-            var gear = Read("MainWindow.Gear.cs");
-            Check(gear.Contains("DrawStatPairs(\"GearPickStats\"") && gear.Contains("DrawHoverComparisons(comparisons)") && gear.Contains("GearCompare.Compare(candidate,hq,"), "the list's tooltip uses the same parts");
-            Check(Read("MainWindow.MarketHover.cs").Contains("extra?.Invoke();\n            DrawItemInfoBody(item,id);") || Read("MainWindow.MarketHover.cs").Contains("extra?.Invoke();\r\n            DrawItemInfoBody(item,id);"), "the common item tooltip keeps its body (levels, stock, how to get it)");
+            Check(compare.Contains("DrawStatPairs(\"GearTipStats\"") && compare.Contains("DrawHoverComparisons(comparisons)") && compare.Contains("GearCompare.Compare(piece,hq,"), "the item tooltip's gear part uses the same parts (X-294)");
+            var hover = Read("MainWindow.MarketHover.cs").Replace("\r\n", "\n");
+            Check(hover.Contains("DrawItemGearStats(id,glamourOnly,hq);\n            DrawItemInfoBody(item,id);"), "the common item tooltip keeps its body (levels, stock, how to get it)");
         }),
         ("X-290: the tooltip's comparison: a level 45 off-hand against the worn one, gains and losses per stat, base values", () =>
         {

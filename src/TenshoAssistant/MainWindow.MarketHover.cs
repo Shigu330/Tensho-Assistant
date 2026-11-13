@@ -320,8 +320,13 @@ internal sealed partial class MainWindow
     {
         if(configuration.ShowEnglishItemName && item is {EnglishName.Length:>0} && !string.Equals(item.EnglishName,item.Name,StringComparison.Ordinal))ImGui.TextDisabled(item.EnglishName);
     }
-    /// <param name="extra">X-290 (0.1294): what a page adds after the header (the gear list: stats and comparison), before the common body.</param>
-    private void DrawItemInfoTooltip(uint id,Action? extra=null)
+    /// <summary>
+    /// The one Tensho item tooltip (R10). X-294 (0.1295, user request of 14/11): a gear piece shows its base stats and the comparison with the
+    /// worn piece in every page (DrawItemGearStats), no longer only in the Gear page's list (X-290).
+    /// </summary>
+    /// <param name="glamourOnly">X-290: a piece of the gear plan kept for its look only: its mark instead of the stats.</param>
+    /// <param name="hq">X-294: the HQ state when the caller knows it (a worn or planned piece); else « assume HQ » of the Gear page.</param>
+    private void DrawItemInfoTooltip(uint id,bool glamourOnly=false,bool? hq=null)
     {
         if(ItemTooltipAlreadyDrawn(id))return;
         var item=itemCatalog.State.Catalog?.Find(id);
@@ -335,7 +340,7 @@ internal sealed partial class MainWindow
             ImGui.EndGroup();
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
-            extra?.Invoke();
+            DrawItemGearStats(id,glamourOnly,hq);
             DrawItemInfoBody(item,id);
         }
     }
