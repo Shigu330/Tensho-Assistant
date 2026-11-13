@@ -5489,6 +5489,13 @@
     "ColumnPerDay": "Experience / day",
     "Use": "Choose",
     "UseTip": "Replaces the ticked sectors with this route's.",
+    "Fleet": "Your airships: best route of each",
+    "FleetTip": "Each airship read in the workshop, with its own rank, speed and range, and its best route for the goal (and item or sector) chosen above. The game computes the times of each speed once, while this list is open. Proposed only: nothing is sent to the game.",
+    "FleetNone": "No airship read yet: open the airship list at the company workshop in the game.",
+    "FleetShip": "{0} · rank {1} · speed {2} · range {3}",
+    "FleetRoute": "{0} · {1} / {2} · {3} · exp {4} · {5} a day",
+    "FleetNoRoute": "no route for this goal at its rank and range.",
+    "FleetUseTip": "Chooses this airship above and ticks this route's sectors.",
     "ClearTip": "Unticks every sector of the measured route.",
     "ExpUnknownTip": "At least one sector of this route has no experience in the game data (0): the experience shown is a minimum.",
     "ExpUnknownNote": "Routes through a sector without known experience are only ranked by « Shortest »."

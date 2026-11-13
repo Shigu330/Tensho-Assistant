@@ -5489,6 +5489,13 @@
     "ColumnPerDay": "Expérience / jour",
     "Use": "Choisir",
     "UseTip": "Remplace les secteurs cochés par ceux de ce trajet.",
+    "Fleet": "Vos aéronefs : meilleur trajet de chacun",
+    "FleetTip": "Chaque aéronef lu à l'atelier, avec son rang, sa vitesse et sa portée, et son meilleur trajet pour l'objectif (et l'objet ou le secteur) choisi plus haut. Le jeu calcule les temps de chaque vitesse une fois, tant que cette liste est ouverte. Proposé seulement : rien n'est envoyé au jeu.",
+    "FleetNone": "Aucun aéronef lu pour l'instant : ouvrez la liste des aéronefs à l'atelier de la compagnie, en jeu.",
+    "FleetShip": "{0} · rang {1} · vitesse {2} · portée {3}",
+    "FleetRoute": "{0} · {1} / {2} · {3} · exp. {4} · {5} par jour",
+    "FleetNoRoute": "aucun trajet pour cet objectif à son rang et sa portée.",
+    "FleetUseTip": "Choisit cet aéronef plus haut et coche les secteurs de ce trajet.",
     "ClearTip": "Décoche tous les secteurs du trajet mesuré.",
     "ExpUnknownTip": "Au moins un secteur de ce trajet n'a pas d'expérience dans les données du jeu (0) : l'expérience affichée est un minimum.",
     "ExpUnknownNote": "Les trajets passant par un secteur sans expérience connue ne sont classés que par « Plus court »."

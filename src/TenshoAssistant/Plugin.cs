@@ -697,6 +697,9 @@ public sealed partial class Plugin : IDalamudPlugin
             FreeCompany.SubmarineVoyageProbe? submarineProbe=null;
             registrations.Register(()=>submarineProbe=new FreeCompany.SubmarineVoyageProbe(framework,client,data,log,()=>configuration.DeveloperMode),()=>submarineProbe?.Dispose());
             mainWindow.RequestAirshipTable=(speed,points)=>airshipTable?.Request(speed,points);
+            // X-201 (0.1248): the other speeds (one per registered airship) and their tables, for the fleet list.
+            mainWindow.RequestAirshipSpeeds=speeds=>airshipTable?.RequestAlso(speeds);
+            mainWindow.AirshipTableFor=speed=>airshipTable?.TableFor(speed);
             mainWindow.VoyageReadUnavailable=()=>voyages?.ReadUnavailable==true;
             Gear.GearLoader? gear=null;
             registrations.Register(()=>gear=new Gear.GearLoader(framework,data,client,log),()=>gear?.Dispose());

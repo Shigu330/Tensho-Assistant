@@ -109,3 +109,28 @@ public static class AirshipPlanner
         }
     }
 }
+
+/// <summary>
+/// X-201 (0.1248, slice 2): the leg tables kept by speed, so each registered airship gets its own best route. The game computes one speed at
+/// a time on the framework thread (a few hundred calls of its static voyage functions); the page's own speed first, then the others, one
+/// per framework update, at most MaxSpeeds kept (the ones still wanted first). Pure: the native side (AirshipVoyageTable) only calls these.
+/// </summary>
+public static class AirshipSpeeds
+{
+    public const int MaxSpeeds=8;
+
+    /// <summary>The speeds asked for, clamped as the table does, without repeats, in order (at most MaxSpeeds).</summary>
+    public static int[] Wanted(IEnumerable<int> speeds)=>[.. speeds.Select(speed=>Math.Clamp(speed,1,short.MaxValue)).Distinct().Order().Take(MaxSpeeds)];
+
+    /// <summary>The next speed to compute: the main one when it is not there, else the first other one missing; null when all are there.</summary>
+    public static int? Next(int main,IReadOnlyList<int> others,IReadOnlyDictionary<int,AirshipLegTable> computed)
+        => main>0 && !computed.ContainsKey(main) ? main : others.Cast<int?>().FirstOrDefault(speed=>!computed.ContainsKey(speed!.Value));
+
+    /// <summary>The tables kept once <paramref name="table"/> is added: the main and other wanted speeds first, then the rest, MaxSpeeds at most
+    /// (a new dictionary: the old one may still be read by the page).</summary>
+    public static IReadOnlyDictionary<int,AirshipLegTable> Keep(IReadOnlyDictionary<int,AirshipLegTable> computed,int main,IReadOnlyList<int> others,AirshipLegTable table)
+    {
+        var all=new Dictionary<int,AirshipLegTable>(computed){[table.Speed]=table};
+        return all.OrderBy(pair=>pair.Key==main || pair.Key==table.Speed ? 0 : others.Contains(pair.Key) ? 1 : 2).Take(MaxSpeeds).ToDictionary(pair=>pair.Key,pair=>pair.Value);
+    }
+}

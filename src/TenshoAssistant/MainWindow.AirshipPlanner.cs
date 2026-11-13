@@ -12,6 +12,13 @@ internal sealed partial class MainWindow
 {
     internal Func<AirshipTableState?>? AirshipTable { get; set; }
     internal Action<int,IReadOnlyList<uint>>? RequestAirshipTable { get; set; }
+    /// <summary>X-201 (0.1248): the other speeds whose tables the fleet list needs (an empty list asks none), and a table by speed once computed.</summary>
+    internal Action<IEnumerable<int>>? RequestAirshipSpeeds { get; set; }
+    internal Func<int,AirshipLegTable?>? AirshipTableFor { get; set; }
+    private string? airshipFleetKey;
+    private Task<IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,bool Ready,AirshipRoute? Route)>>? airshipFleetTask;
+    private CancellationTokenSource? airshipFleetCancel;
+    private IReadOnlyList<(string Key,string Name,int Rank,int Speed,int Range,bool Ready,AirshipRoute? Route)> airshipFleet=[];
     private string? airshipVesselKey;
     private int airshipSpeed=1,airshipRange=1;
     private AirshipGoal airshipGoal=AirshipGoal.ExpPerDay;
@@ -94,6 +101,8 @@ internal sealed partial class MainWindow
         if(developerMode)
             ImGui.TextDisabled(localization.Format("AirshipPlanner.Raw",table.Speed,
                 table.Legs.TryGetValue((AirshipPlanner.Start,0),out var first) ? $"{first.Time} / {first.Distance}":"—",table.Survey.TryGetValue(0,out var survey) ? survey.ToString():"—"));
+
+        DrawAirshipFleet(catalog,targets);
 
         // Best routes: searched on a worker when an input changed; the running search is cancelled.
         var rank=airshipRank==0 ? int.MaxValue:airshipRank;
@@ -178,6 +187,55 @@ internal sealed partial class MainWindow
         ImGui.TextWrapped(localization.Format("AirshipPlanner.UnlockBy",SectorName(unlocker.By),unlocker.Rank,unlocker.Surveillance,
             string.Join(" › ",AirshipSectors.UnlockPath(catalog,chosen).Select(SectorName))));
         return [unlocker.By];
+    }
+
+    // X-201 (0.1248, slice 2, user request of 2026-11-12): one line per registered airship, its own best route for the goal and target chosen
+    // above (its rank, speed and range as read in the workshop). Closed by default: only while it is open are the other speeds asked of the
+    // game (one per framework update, AirshipVoyageTable); the routes are searched on a worker, the previous search cancelled. Proposed only:
+    // « Choose » fills the planner, nothing is sent to the game.
+    private void DrawAirshipFleet(AirshipCatalog catalog,IReadOnlyCollection<uint>? targets)
+    {
+        var ships=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==VesselKind.Airship).ToArray();
+        var open=TenshoAssistant.UI.UiComponents.Header(localization.Get("AirshipPlanner.Fleet"));
+        Tip("AirshipPlanner.FleetTip");
+        if(!open){RequestAirshipSpeeds?.Invoke([]);return;}
+        if(ships.Length==0){ImGui.TextDisabled(localization.Get("AirshipPlanner.FleetNone"));return;}
+        RequestAirshipSpeeds?.Invoke(ships.Select(ship=>Math.Max(1,ship.Speed)));
+        var inputs=ships.Select(ship=>(Key:VesselKey(ship),ship.Name,Rank:ship.Rank,Speed:Math.Max(1,ship.Speed),Range:Math.Max(1,ship.Range),
+            Table:AirshipTableFor?.Invoke(Math.Max(1,ship.Speed)))).ToArray();
+        var key=$"{airshipGoal}|{(targets is null ? "-":string.Join(",",targets))}|"+string.Join(";",inputs.Select(ship=>$"{ship.Key},{ship.Rank},{ship.Speed},{ship.Range},{(ship.Table is null ? 0:RuntimeHelpers.GetHashCode(ship.Table))}"));
+        if(key!=airshipFleetKey)
+        {
+            airshipFleetKey=key;airshipFleetCancel?.Cancel();airshipFleetCancel?.Dispose();airshipFleetCancel=new CancellationTokenSource();
+            var token=airshipFleetCancel.Token;var (goal,sectors)=(airshipGoal,catalog.Sectors);
+            airshipFleetTask=Task.Run(()=>(IReadOnlyList<(string,string,int,int,int,bool,AirshipRoute?)>)[.. inputs.Select(ship=>(ship.Key,ship.Name,ship.Rank,ship.Speed,ship.Range,ship.Table is not null,
+                ship.Table is { } table ? AirshipPlanner.Plan(sectors,table,ship.Rank==0 ? int.MaxValue:ship.Rank,ship.Range,goal,1,token,targets).FirstOrDefault():null))],token);
+        }
+        if(airshipFleetTask is { IsCompleted:true } done)
+        {
+            if(done.IsCompletedSuccessfully)airshipFleet=done.Result;
+            else if(done.Exception is { } error)log.Warning(error,"Airship fleet routes could not be planned.");
+            airshipFleetTask=null;
+        }
+        if(airshipFleetTask is not null && airshipFleet.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
+        var index=0;
+        foreach(var (shipKey,name,shipRank,speed,range,ready,route) in airshipFleet)
+        {
+            index++;
+            var head=localization.Format("AirshipPlanner.FleetShip",name,shipRank,speed,range);
+            if(!ready){ImGui.TextDisabled(head+" — "+localization.Get("AirshipPlanner.Computing"));continue;}
+            if(route is null){ImGui.TextDisabled(head+" — "+localization.Get("AirshipPlanner.FleetNoRoute"));continue;}
+            ImGui.TextUnformatted(head+" — "+localization.Format("AirshipPlanner.FleetRoute",AirshipRouteNames(catalog,route),route.Distance,range,
+                HoursMinutes(TimeSpan.FromSeconds(route.Seconds)),AirshipExp(route),(route.UnknownExp>0 ? "≥ ":"")+route.ExpPerDay.ToString("N0",Numbers)));
+            if(route.UnknownExp>0)Tip("AirshipPlanner.ExpUnknownTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("AirshipPlanner.Use")+$"##AirshipFleetUse{index}"))
+            {
+                airshipVesselKey=shipKey;airshipRank=shipRank;airshipSpeed=speed;airshipRange=range;
+                airshipChosen.Clear();airshipChosen.AddRange(route.Sectors);
+            }
+            Tip("AirshipPlanner.FleetUseTip");
+        }
     }
 
     // « H h mm » of a voyage or survey time, on the airship and submarine pages.
