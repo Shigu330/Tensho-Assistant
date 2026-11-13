@@ -23,7 +23,7 @@ internal sealed partial class MainWindow
             if(SourceButton(localization.Get(state.Item is null ? "FishingSources.Fetch":"FishingSources.Refresh"),state.Item is null || SourceOn(SourceUse.GarlandMonsterLoot)))_ = monsterLoot.RequestItemAsync(state.Item is not null);
         }
         finally{ImGui.EndDisabled();}
-        if(state.Loading)ImGui.TextDisabled(localization.Get("FishingSources.Loading"));
+        if(state.Loading)StateLine(UI.UiState.Waiting,localization.Get("FishingSources.Loading"));
         if(state.Error is { } error)DrawDataError(error,"FishingSources.Error");
         if(state.Item is not { } document)return;
         ImGui.TextDisabled(localization.Format("FishingSources.Fetched",document.FetchedAt.ToLocalTime().ToString("g")));
@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
                 if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("FishingSources.Variant",title,index+1)+"###FishingSource"))continue;
                 if(spot.Conditions is { } conditions)
                 {
-                    ImGui.TextColored(Accent,localization.Get("FishingSources.Times"));
+                    UI.UiComponents.SubTitle(localization.Get("FishingSources.Times"));
                     if(conditions.Error is not null)ImGui.TextWrapped(localization.Get("FishingSources.InvalidConditions"));
                     else
                     {
@@ -55,7 +55,7 @@ internal sealed partial class MainWindow
                     ImGui.TextWrapped(localization.Get("FishingSources.TimeHelp"));
                     ImGui.Separator();
                 }
-                ImGui.TextColored(Accent,localization.Get("FishingSources.Baits"));
+                UI.UiComponents.SubTitle(localization.Get("FishingSources.Baits"));
                 if(spot.BaitChains is null)ImGui.TextDisabled(localization.Get("FishingSources.MissingBait"));
                 else if(spot.BaitChains.Count==0)ImGui.TextDisabled(localization.Get("FishingSources.EmptyBait"));
                 else for(var route=0;route<spot.BaitChains.Count;route++)

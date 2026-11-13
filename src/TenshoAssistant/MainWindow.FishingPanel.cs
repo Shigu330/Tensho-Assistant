@@ -185,7 +185,7 @@ internal sealed partial class MainWindow
             // Sources in a tooltip, so the window keeps the width of its table.
             ImGui.TextDisabled(localization.Get("FishingPanel.SourcesShort"));
             Tip(gatherBuddyFish?.State.Data is not null ? "FishingPanel.FooterGatherBuddy":"FishingPanel.Footer");
-            if(gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
+            if(gatherBuddyFish?.State is { Loading:true })StateLine(UI.UiState.Waiting,localization.Get("FishingPanel.GatherBuddyLoading"));
         },fishingPanelManual ? ()=>fishingPanelManual=false:null);
     }
 

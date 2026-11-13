@@ -19,7 +19,8 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;
         if(!state.Fresh(now))
         {
-            ImGui.TextWrapped(localization.Get(state.Status switch
+            // X-156 (0.1266): no recent read is « waiting » (or « failed » on a read error), said as everywhere.
+            StateLine(state.Status==GatheringObservationStatus.Error ? UI.UiState.Failed:UI.UiState.Waiting,localization.Get(state.Status switch
             {
                 GatheringObservationStatus.Offline=>"GatheringObservation.Offline",
                 GatheringObservationStatus.AddonAbsent=>"GatheringObservation.Absent",
@@ -31,12 +32,12 @@ internal sealed partial class MainWindow
             return;
         }
         var frame=state.Frame!;
-        ImGui.TextDisabled(localization.Format("GatheringObservation.Summary",localization.Get(frame.JobId==16 ? "GatheringObservation.Miner":"GatheringObservation.Botanist"),frame.Level,frame.Gp,frame.MaxGp,state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—"));
+        OriginLine(UI.UiOrigin.Measured,localization.Format("GatheringObservation.Summary",localization.Get(frame.JobId==16 ? "GatheringObservation.Miner":"GatheringObservation.Botanist"),frame.Level,frame.Gp,frame.MaxGp,state.ObservedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "—"));
         ImGui.TextWrapped(localization.Format("GatheringObservation.Attempts",frame.Attempts?.ToString() ?? localization.Get("GatheringObservation.Unknown"),frame.TotalAttempts?.ToString() ?? localization.Get("GatheringObservation.Unknown")));
         if(frame.NativeStatus==2)ImGui.TextDisabled(localization.Get("GatheringObservation.Quick"));
         ImGui.TextWrapped(localization.Get("GatheringObservation.Help"));
         if(frame.Slots.Count==0)ImGui.TextDisabled(localization.Get("GatheringObservation.Empty"));
-        if(frame.Slots.Count>0 && ImGui.BeginTable("ObservedGatheringRows",4,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+        if(frame.Slots.Count>0 && UI.UiComponents.BeginDataTable("ObservedGatheringRows",4))
         {
             try
             {

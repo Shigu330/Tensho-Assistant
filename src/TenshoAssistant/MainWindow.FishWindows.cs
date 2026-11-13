@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
             catch(Exception error){fishWindows=null;log.Warning(error,"Fish windows could not be computed.");}
             fishWindowsKey=key;
         }
-        ImGui.TextColored(Accent,localization.Get("FishWindows.Title"));
+        UI.UiComponents.SubTitle(localization.Get("FishWindows.Title"));
         Tip("FishWindows.Help");
         if(fishWindows is not { } windows){ImGui.TextDisabled(localization.Get("FishWindows.Unknown"));return;}
         if(windows.Count==0){ImGui.TextDisabled(localization.Get(fish.Weathers.Count+fish.Transitions.Count==0 && fish.StartMinute is null ? "FishWindows.Always":"FishWindows.None"));return;}

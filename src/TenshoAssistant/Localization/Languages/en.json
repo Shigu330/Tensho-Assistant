@@ -4728,6 +4728,7 @@
     "WithBountiful": " · before the attempts, Bountiful ones first",
     "Eureka": "Level 90 and above: each restored attempt has a 50% chance of Eureka Moment, i.e. a free attempt with Wise to the World; counted on average.",
     "BountifulEstimate": "Estimated: +{0}",
+    "BountifulRule": "computed by Tensho from the game's yields and a community rule for the Bountiful bonus, not read from the game",
     "BountifulUse": "Use",
     "BountifulEstimateNone": "Estimate: —",
     "BountifulEstimateNoneHelp": "To estimate the bonus: pick a gathered item as context item and be on miner or botanist (gathering rating read from the character).",

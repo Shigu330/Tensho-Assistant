@@ -42,7 +42,7 @@ internal sealed partial class MainWindow
         DrawGatheringObservation();
         // 0.330: a catalogue failure (sheet changed by a game update) is shown translated, its detail in developer mode only (R-14).
         if(gpActions.State.Catalog is not { } catalog)
-        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else EmptyState("GpUi.Loading"); return; }
+        { if(gpActions.State.Error is { } failure) DrawDataError(failure,"ServiceErrors.Gp"); else StateLine(UI.UiState.Waiting,localization.Get("GpUi.Loading")); return; }
         ImGui.TextWrapped(localization.Get("GpUi.Help"));
         var stats=characterStats.State;
         var canCopy=stats.CharacterId!=0 && stats.JobId is 16 or 17 && stats.CurrentGp is not null
@@ -145,7 +145,7 @@ internal sealed partial class MainWindow
             ImGui.TextColored(Accent,localization.Format("GpUi.Next",next.Cost,next.Cost-result.Scenario.Budget,next.ExpectedYield.ToString("0.00",Numbers)));
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("GpUi.Thresholds")))
         {
-            if(ImGui.BeginTable("GpFrontier",3,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+            if(UI.UiComponents.BeginDataTable("GpFrontier",3))
             {
                 try
                 {
@@ -190,6 +190,8 @@ internal sealed partial class MainWindow
         var next=BountifulEstimate.NextStep(rating,valueBase);
         if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("GpUi.BountifulEstimateHelp",rating,valueBase,(int)Math.Floor(valueBase*0.9),(int)Math.Floor(valueBase*1.1))
             +(next is { } step ? "\n"+localization.Format("GpUi.BountifulNext",step-rating):""));
+        // X-156 (0.1266): the bonus comes from a community rule, not from the game: flagged as an estimate, as everywhere.
+        OriginMark(UI.UiOrigin.Estimated,localization.Get("GpUi.BountifulRule"));
         ImGui.SameLine();
         return ImGui.SmallButton(localization.Get("GpUi.BountifulUse")+"##BountifulUse") ? bonus:null;
     }

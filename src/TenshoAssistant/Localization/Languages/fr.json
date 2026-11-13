@@ -4728,6 +4728,7 @@
     "WithBountiful": " · avant les essais avec Récolte abondante d’abord",
     "Eureka": "Niveau 90 et plus : chaque essai rendu a 50 % de chance de donner Eurêka, donc un essai gratuit avec Étalage des connaissances ; compté en moyenne.",
     "BountifulEstimate": "Estimé : +{0}",
+    "BountifulRule": "calculé par Tensho à partir des rendements du jeu et d'une règle communautaire pour le bonus d'Abondance, pas lu dans le jeu",
     "BountifulUse": "Utiliser",
     "BountifulEstimateNone": "Estimation : —",
     "BountifulEstimateNoneHelp": "Pour estimer le bonus : choisir un objet récolté comme objet en contexte et être en mineur ou botaniste (valeur de récolte lue sur le personnage).",

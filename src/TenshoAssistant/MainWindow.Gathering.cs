@@ -74,8 +74,8 @@ internal sealed partial class MainWindow
             finally { ImGui.PopID(); }
         }
         ImGui.Spacing();
-        ImGui.TextColored(Accent, gatheringTypeFilter is { } selected ? sources.First(source => source.TypeId == selected).TypeName : localization.Get("GatheringDetails.All"));
-        if (ImGui.BeginTable("GatheringSources", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+        UI.UiComponents.SubTitle(gatheringTypeFilter is { } selected ? sources.First(source => source.TypeId == selected).TypeName : localization.Get("GatheringDetails.All"));
+        if (UI.UiComponents.BeginDataTable("GatheringSources", 6))
         {
             try
             {

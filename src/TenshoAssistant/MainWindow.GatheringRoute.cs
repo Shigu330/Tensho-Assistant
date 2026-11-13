@@ -29,7 +29,7 @@ internal sealed partial class MainWindow
         foreach(var zone in route.Zones)
         {
             ImGui.Spacing();
-            ImGui.TextColored(Accent,localization.Format("ChainUi.RouteZone",zone.Zone,zone.Rows.Count));
+            UI.UiComponents.SubTitle(localization.Format("ChainUi.RouteZone",zone.Zone,zone.Rows.Count));
             foreach(var row in zone.Rows)
             {
                 ImGui.PushID($"Route{zone.TerritoryId}/{row.ItemId}");

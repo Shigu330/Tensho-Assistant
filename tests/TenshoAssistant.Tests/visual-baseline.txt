@@ -1,2 +1,2 @@
-BeginTable=101
-TextColoredAccent=242
+BeginTable=97
+TextColoredAccent=237

@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
         var spots=catalog.ForItem(fishId).Where(source=>source.IsFishing).ToArray();
         if(data?.Find(fishId) is not { } fish)
         {
-            if(spots.Length>0 && gatherBuddyFish?.State is { Loading:true })ImGui.TextDisabled(localization.Get("FishingPanel.GatherBuddyLoading"));
+            if(spots.Length>0 && gatherBuddyFish?.State is { Loading:true })StateLine(UI.UiState.Waiting,localization.Get("FishingPanel.GatherBuddyLoading"));
             return false;
         }
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringFish.Title")+"###GatherBuddyFish",ImGuiTreeNodeFlags.DefaultOpen))return true;

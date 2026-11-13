@@ -344,6 +344,7 @@ internal sealed partial class MainWindow
         // 0.515 (user request): the crafting list only says what it still needs; the plan is for this node.
         if(need>0)ImGui.TextColored(Accent,shown.ExpectedYield>0 ? localization.Format("GatheringPanel.ListNeedNodes",need.ToString("N0",Numbers),Math.Ceiling(need/shown.ExpectedYield).ToString("N0",Numbers)):localization.Format("GatheringPanel.ListNeed",need.ToString("N0",Numbers)));
         ImGui.TextDisabled(localization.Format("GatheringPanel.Expected",shown.ExpectedYield.ToString("0.0",Numbers),plan.Baseline.ToString("0.0",Numbers),shown.Cost));
+        OriginMark(UI.UiOrigin.Estimated,localization.Get("GpUi.BountifulRule"));
         if(gatheringPanelLate)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanLate",plan.Scenario.Budget,plan.Scenario.Attempts));
         else if(gatheringPanelRest)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanRest",plan.Scenario.Budget,plan.Scenario.Attempts));
         else if(start.Frozen)ImGui.TextDisabled(localization.Format("GatheringPanel.PlanAtStart",plan.Scenario.Budget));
