@@ -982,6 +982,14 @@
     "DebugLocalization": "Diagnostic de localisation",
     "ReloadTranslations": "Recharger les traductions"
   },
+  "ServerBarInfo": {
+    "Bags": "Sacs {0}",
+    "BagsTip": "{0} cases libres sur {1} dans vos quatre sacs. Clic : Rangements.",
+    "Wear": "Équipement {0}",
+    "WearTip": "État le plus bas de votre équipement porté : {0}. À réparer : {1} pièce(s) ; matéria à extraire : {2} pièce(s). Clic : Équipement.",
+    "PlaceTip": "{0}. Clic : carte.",
+    "PlaceInstanceTip": "{0}, instance {1}. Clic : carte."
+  },
   "Localization": {
     "LoadedLanguages": "{0} langues chargées",
     "PartialLanguage": "{0} (partiel)",
@@ -1177,6 +1185,12 @@
     "ReminderServerBarTip": "Affiche sa propre icône et le nombre de choses qui restent à faire dans la barre d'informations du jeu : rappels non cochés depuis leur remise à zéro et vos tâches affichées à l'écran ; survol = la liste ; clic = page Rappels. La page Rappels choisit ce qu'elle montre (cases « Barre »).\nPar défaut : activé.",
     "ReminderFinishedServerBar": "Icône des rappels terminés dans la barre du serveur",
     "ReminderFinishedServerBarTip": "Affiche sa propre icône et le nombre de choses terminées (tâches de servant, vaisseaux revenus, escouade, parcelles mûres) dans la barre d'informations du jeu, seulement s'il y en a ; survol = la liste ; clic = page Rappels.\nPar défaut : activé.",
+    "BagsServerBar": "Sacs dans la barre serveur",
+    "BagsServerBarTip": "Montre les cases libres de vos quatre sacs dans la barre d'informations du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes.\nPar défaut : désactivé.",
+    "WearServerBar": "État de l'équipement dans la barre serveur",
+    "WearServerBarTip": "Montre l'état le plus bas de votre équipement porté dans la barre d'informations du serveur ; son infobulle compte les pièces à réparer et celles dont on peut extraire la matéria (seuils de la page Équipement), un clic ouvre Équipement.\nPar défaut : désactivé.",
+    "PlaceServerBar": "Zone et instance dans la barre serveur",
+    "PlaceServerBarTip": "Montre la zone où vous êtes, avec la marque d'instance du jeu dans une zone à instances, dans la barre d'informations du serveur ; un clic ouvre la carte.\nPar défaut : désactivé.",
     "Teamcraft": "Teamcraft (temps de touche)",
     "TeamcraftTip": "Temps entre le lancer et la touche, par poisson et lieu, d'après les relevés publics de Teamcraft (API gubal, licence MIT). Une requête par lieu de pêche, gardée en cache.\nPar défaut : activé.",
     "GatherBuddy": "GatherBuddy (pêche)",

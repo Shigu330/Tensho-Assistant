@@ -877,6 +877,10 @@ public sealed partial class Plugin : IDalamudPlugin
             Inventory.GilDtrEntry? gilBar=null;
             registrations.Register(()=>gilBar=new Inventory.GilDtrEntry(dtrBar,framework,gameGui,configuration,()=>configuration.GilServerBar,()=>gilWatcher?.State?.Entries,localization.Get,mainWindow.OpenGilJournal),()=>gilBar?.Dispose());
             this.gilBar=()=>gilBar;
+            // X-217 (0.1226): bags, gear condition, zone and instance in the server bar (each off by default).
+            Alarms.InfoDtrEntries? infoBar=null;
+            registrations.Register(()=>infoBar=new Alarms.InfoDtrEntries(dtrBar,framework,client,inventory,configuration,()=>gear?.Equipped ?? [],
+                id=>mainWindow.TerritoryName?.Invoke(id),localization.Get,localization.Format,mainWindow.OpenGilJournal,mainWindow.OpenGear,mainWindow.OpenMap),()=>infoBar?.Dispose());
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
             // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
             Items.ItemNoteShopReminder? shopReminder=null;

@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "HoverShowCompare",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
+        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
@@ -447,6 +447,10 @@ public sealed partial class Configuration
     public bool CurrencyServerBar { get=>Volatile.Read(ref currencyServerBar); set=>Volatile.Write(ref currencyServerBar,value); }
     // X-107 (0.986): the gil of the day in the server info bar (off by default).
     public bool GilServerBar { get; set; }
+    // X-217 (0.1226, K-30): optional server bar entries, off by default: bags' free slots, worn gear's lowest condition, zone and instance.
+    public bool BagsServerBar { get; set; }
+    public bool WearServerBar { get; set; }
+    public bool PlaceServerBar { get; set; }
     // 0.606: with the alerts, the weekly limit of the limited tomestones reached.
     public bool CurrencyWeeklyCapAlert { get; set; } = true;
     public Dictionary<uint,int>? CurrencyThresholds { get=>Volatile.Read(ref currencyThresholds); set=>Volatile.Write(ref currencyThresholds,value); }
