@@ -14,6 +14,8 @@ internal sealed partial class MainWindow
         Heading(localization.Get("DiagnosticsUi.Title"), localization.Get("DiagnosticsUi.Help"));
         ImGui.TextUnformatted(localization.Format("DiagnosticsUi.Build",BuildVersion,configuration.Version));
         DrawContributorHelp();
+        // X-165 (0.1244): the dashboard first (MainWindow.Dashboard.cs).
+        DrawDashboard();
         // 0.290 (R-06 step 6): average draw time per page (moving average while the page is open), slowest first.
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("DiagnosticsUi.DrawTimes")))
         {

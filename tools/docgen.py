@@ -612,6 +612,7 @@ NETWORK_LEFT_OUT = {
     "Community/BoundedHttp.cs": "the bounded reader every request goes through (timeout, size limit)",
     "Credits/CreditCatalog.cs": "the credits page: names and links only",
     "Diagnostics/PageSweepWindow.Dalamud.cs": "the developer page sweep: draws the pages, whose own requests are listed here",
+    "MainWindow.Dashboard.cs": "the dashboard (X-165): reads the count of requests already sent (BoundedHttp.Sent), sends none",
 }
 # Hosts named by request files that are never contacted (links shown or sent as text).
 NOT_CONTACTED = {"creativecommons.org": "the CC0 licence link in the exchange's texts",
