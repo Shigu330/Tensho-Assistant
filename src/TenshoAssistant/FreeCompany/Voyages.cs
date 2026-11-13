@@ -50,10 +50,26 @@ public static class Voyages
     public static double ExpProgress(VoyageVessel vessel)
         =>vessel.NextExp==0 ? 1:Math.Clamp(vessel.Exp/(double)vessel.NextExp,0,1);
 
-    /// <summary>A workshop read replaces the vessels of that house; the other houses' vessels are kept. Sorted by house, kind, slot.</summary>
+    /// <summary>
+    /// A workshop read replaces the vessels of that house, kind by kind; the other houses' vessels are kept. Sorted by house, kind, slot.
+    /// X-288 (0.1286): a kind absent from the read keeps its saved vessels. The game fills each list of the workshop when its panel is
+    /// opened (seen on 13/11: the submarine read, then the airship read alone, which dropped the submarine from the page); a read
+    /// that holds one vessel of a kind holds them all, so a vessel removed in the game still goes when its kind is read.
+    /// </summary>
     public static List<VoyageVessel> Merge(IEnumerable<VoyageVessel>? saved,ulong houseId,IEnumerable<VoyageVessel> read)
-        =>(saved ?? []).Where(vessel=>vessel.HouseId!=houseId).Concat(read)
+    {
+        var copied=read.ToList();
+        var kinds=copied.Where(vessel=>vessel.HouseId==houseId).Select(vessel=>vessel.Kind).ToHashSet();
+        return (saved ?? []).Where(vessel=>vessel.HouseId!=houseId || !kinds.Contains(vessel.Kind)).Concat(copied)
             .OrderBy(vessel=>vessel.HouseId).ThenBy(vessel=>vessel.Kind).ThenBy(vessel=>vessel.Slot).ToList();
+    }
+
+    /// <summary>X-288 (0.1286): kinds of that house saved but absent from the read (kept by <see cref="Merge"/>; logged once per visit).</summary>
+    public static IReadOnlyList<VesselKind> KeptKinds(IEnumerable<VoyageVessel>? saved,ulong houseId,IEnumerable<VoyageVessel> read)
+    {
+        var kinds=read.Where(vessel=>vessel.HouseId==houseId).Select(vessel=>vessel.Kind).ToHashSet();
+        return (saved ?? []).Where(vessel=>vessel.HouseId==houseId && !kinds.Contains(vessel.Kind)).Select(vessel=>vessel.Kind).Distinct().OrderBy(kind=>kind).ToArray();
+    }
 
     /// <summary>Same values, the read time aside (during a workshop visit, a new read that changes nothing is not saved again; 0.331: the first read of a visit is).</summary>
     public static bool SameAs(IReadOnlyList<VoyageVessel> left,IReadOnlyList<VoyageVessel> right)

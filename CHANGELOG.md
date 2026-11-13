@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1286.0
+- Plan global, X-288 : Atelier : un dirigeable et un sous-marin partis tous les deux restent tous les deux sur la page Vaisseaux et dans les alarmes. Le jeu remplit chaque liste de l'atelier (sous-marins, dirigeables) à l'ouverture de son panneau ; une lecture qui ne contenait qu'une sorte remplaçait tous les vaisseaux de la maison, et l'autre sorte disparaissait (« pas toujours le même »). Voyages.Merge remplace désormais par maison et par sorte : une sorte absente de la lecture garde ses vaisseaux enregistrés ; une sorte lue est remplacée en entier (un vaisseau retiré dans le jeu disparaît). Le journal le dit une fois par visite (« Workshop read without … »).
+- Pour les joueurs : Atelier : quand un dirigeable et un sous-marin sont partis, les deux restent affichés avec leurs alarmes de retour, quel que soit le dernier panneau ouvert.
+- Tests : VesselKinds1286Tests. Verify.ps1 (agent) : 2363/2363, 0 avertissement, 0 erreur ; DLL 0.1286.0.0. Non validé en jeu.
+### English
+- Workshop: an airship and a submarine both out both stay on the Vessels page and in the alarms. The game fills each workshop list (submarines, airships) when its panel is opened; a read holding one kind replaced every vessel of the house, and the other kind disappeared (« not always the same one »). Voyages.Merge now replaces by house and by kind: a kind absent from the read keeps its saved vessels; a kind that is read is replaced whole (a vessel removed in the game goes). The log says so once per visit (« Workshop read without … »).
+- For players: Workshop: when both an airship and a submarine are out, both now stay listed with their return alarms, whichever panel you opened last.
+
 ## 0.1285.0
 - Plan global, X-275 : Banque : les sacs d'un servant s'affichent de nouveau. Depuis 0.767, ses gils (12000) et ses cristaux (12001) sont relevés avec ses pages ; sans position dans l'ordre visuel du jeu, ils faisaient échouer toute la mise en page (« ordre visuel indisponible, réimportez le rangement ouvert ») et l'onglet ne montrait rien. La mise en page passe par InventoryDisplayLayout.Pages (pure, testée) : les sacs suivent l'ordre visuel du jeu, les autres conteneurs du rangement viennent après dans l'ordre des emplacements ; si l'ordre visuel est inutilisable, chaque sac lu s'affiche dans l'ordre de ses emplacements avec la note, pour un servant comme pour les sacs du personnage (0.329). Le message « réimportez » est retiré.
 - Pour les joueurs : Banque : les sacs d'un servant s'affichent de nouveau après l'avoir lu à la cloche ; ses gils et cristaux apparaissent sur une page après ses sacs.

@@ -33,6 +33,8 @@ public sealed unsafe class VoyageWatcher : IDisposable
     private bool disposed,catalogTried,airshipsWarned,unlockedWarned,airshipLogWarned;
     // 0.331 (audit): house whose read was saved during the current workshop visit (null outside the workshop).
     private ulong? visitSaved;
+    // X-288 (0.1286): house whose kept kinds were logged during the current workshop visit.
+    private ulong? keptLogged;
     private SubmarineCatalog? catalog;
     private VesselPartCatalog? partCatalog;
 
@@ -101,7 +103,7 @@ public sealed unsafe class VoyageWatcher : IDisposable
         try
         {
             var housing=HousingManager.Instance();
-            if(housing==null || housing->WorkshopTerritory==null){visitSaved=null;return;}
+            if(housing==null || housing->WorkshopTerritory==null){visitSaved=null;keptLogged=null;return;}
             var workshop=housing->WorkshopTerritory;
             var houseId=workshop->HouseId.Id;
             var read=new List<VoyageVessel>();
@@ -209,6 +211,9 @@ public sealed unsafe class VoyageWatcher : IDisposable
             reading=false;ReadUnavailable=partial;
             // Nothing registered yet (or the workshop data not received): keep the saved copy.
             if(read.Count==0){if(unlockedChanged)save();return;}
+            // X-288 (0.1286): the list of a kind not opened in the workshop is not filled by the game: its saved vessels are kept (logged once per visit).
+            if(keptLogged!=houseId && Voyages.KeptKinds(configuration.Voyages,houseId,read) is { Count:>0 } kept)
+            {keptLogged=houseId;log.Information("Workshop read without {0}: the saved ones are kept.",string.Join(", ",kept));}
             var merged=Voyages.Merge(configuration.Voyages,houseId,read);
             // 0.331 (audit): the first read of a visit is saved even when nothing changed, so « Read in the workshop » shows this visit;
             // the later 3 s reads that change nothing are not saved again.
