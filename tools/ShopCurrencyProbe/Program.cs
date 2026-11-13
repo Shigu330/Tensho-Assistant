@@ -567,6 +567,39 @@ if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
         Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
     return;
 }
+// PROBE_MOUNT (X-219, 0.1229): the Mount sheet's seats (ExtraSeats), riding music (RideBGM -> BGM.File, matched to OrchestrionPath.File for the
+// orchestrion roll's name) and mount actions (MountAction -> Action names); read-only.
+if(Environment.GetEnvironmentVariable("PROBE_MOUNT") is { Length:>0 })
+{
+    var mountsEn=data.Excel.GetSheet<Mount>(Language.English);
+    var named=data.Excel.GetSheet<Mount>().Where(row=>!row.Singular.IsEmpty).ToArray();
+    Console.WriteLine($"MOUNTS named {named.Length}");
+    foreach(var group in named.GroupBy(row=>row.ExtraSeats).OrderBy(group=>group.Key))
+        Console.WriteLine($"SEATS extra {group.Key}: {group.Count()} e.g. {string.Join(", ",group.Take(4).Select(row=>$"{row.RowId} '{mountsEn.GetRowOrDefault(row.RowId)?.Singular.ExtractText()}'"))}");
+    var bgm=data.Excel.GetSheet<BGM>();
+    var rollByFile=new Dictionary<string,uint>(StringComparer.OrdinalIgnoreCase);
+    foreach(var path in data.Excel.GetSheet<OrchestrionPath>())if(!path.File.IsEmpty)rollByFile.TryAdd(path.File.ExtractText(),path.RowId);
+    var rollsEn=data.Excel.GetSheet<Orchestrion>(Language.English);
+    Console.WriteLine($"ORCHESTRIONPATH files {rollByFile.Count} ride {string.Join(" | ",rollByFile.Where(pair=>pair.Key.Contains("Ride",StringComparison.OrdinalIgnoreCase)).Take(8).Select(pair=>$"{pair.Value} {pair.Key} '{rollsEn.GetRowOrDefault(pair.Value)?.Name.ExtractText()}'"))}");
+    var music=named.GroupBy(row=>row.RideBGM.RowId).OrderByDescending(group=>group.Count()).ToArray();
+    Console.WriteLine($"RIDEBGM distinct {music.Length}");
+    var matched=0;var withMusic=0;
+    foreach(var group in music)
+    {
+        var file=bgm.GetRowOrDefault(group.Key)?.File.ExtractText() ?? "";
+        var roll=rollByFile.TryGetValue(file,out var found) ? found:0u;
+        if(group.Count()>3 || matched<15)Console.WriteLine($"RIDEBGM {group.Key} x{group.Count()} file '{file}' roll {roll} '{(roll!=0 ? rollsEn.GetRowOrDefault(roll)?.Name.ExtractText():"")}' e.g. {string.Join(", ",group.Take(3).Select(row=>mountsEn.GetRowOrDefault(row.RowId)?.Singular.ExtractText()))}");
+        if(group.Key!=0){withMusic+=group.Count();if(roll!=0)matched+=group.Count();}
+    }
+    Console.WriteLine($"RIDEBGM mounts with a row {withMusic}, matched to a roll {matched}");
+    var actionsEn=data.Excel.GetSheet<Lumina.Excel.Sheets.Action>(Language.English);
+    var withActions=named.Where(row=>row.MountAction.RowId!=0).ToArray();
+    Console.WriteLine($"MOUNTACTION mounts {withActions.Length}");
+    foreach(var row in withActions.Take(15))
+        Console.WriteLine($"MOUNTACTION {row.RowId} '{mountsEn.GetRowOrDefault(row.RowId)?.Singular.ExtractText()}' row {row.MountAction.RowId}: {string.Join(", ",row.MountAction.ValueNullable?.Action.Where(action=>action.RowId!=0).Select(action=>$"{action.RowId} '{actionsEn.GetRowOrDefault(action.RowId)?.Name.ExtractText()}'") ?? [])}");
+    Console.WriteLine($"FLYING {named.Count(row=>row.IsFlying!=0)} of {named.Length}");
+    return;
+}
 // PROBE_BARDING (0.340): chocobo barding rows (BuddyEquip) and the items whose ItemAction teaches them (action id, Data[0]).
 if(Environment.GetEnvironmentVariable("PROBE_BARDING") is { Length:>0 })
 {

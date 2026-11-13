@@ -8,11 +8,16 @@ public enum CollectionAcquisition { Unknown, Acquired, NotAcquired }
 public sealed record TitleMetadata(string Masculine,string Feminine,bool IsPrefix,int Order);
 public sealed record AchievementMetadata(uint CategoryId,string CategoryName,int? CategoryOrder,uint KindId,string KindName,int? KindOrder,
     int Order,int Points,uint RewardItemId,uint RewardTitleId,uint HideConditionId,string EnglishName="");
+/// <summary>
+/// X-219 (0.1229, user's request of 12/11, K-34): what the Mount sheet says of a mount (docs/evidence/0.1229-mount-sheet.md): riders (ExtraSeats + 1),
+/// how many named mounts share its riding music (RideBGM: 0 none, 1 its own, more shared), and the names of its mount actions (MountAction).
+/// </summary>
+public sealed record MountMetadata(int Riders,int MusicShared,IReadOnlyList<string> Actions);
 public sealed record OrchestrionMetadata(uint CategoryId,string CategoryName,int? Order,int? CategoryOrder);
 public sealed record CollectionCategoryIssue(CollectionKind Kind,string Reason);
 public sealed record CollectionEntry(CollectionKind Kind, uint Id, string Name, uint IconId, bool ConfirmedUnlocked,
     int Number = 0, int Rank = 0, string Description = "", string Location = "", TriadCardDefinition? Card = null,OrchestrionMetadata? Music=null,
-    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false,uint ItemId=0,int DutyLevel=0)
+    TitleMetadata? Title=null,AchievementMetadata? Achievement=null,bool NegativeConfirmed=false,uint ItemId=0,int DutyLevel=0,MountMetadata? Mount=null)
 {
     public CollectionAcquisition Acquisition=>ConfirmedUnlocked ? CollectionAcquisition.Acquired:NegativeConfirmed ? CollectionAcquisition.NotAcquired:CollectionAcquisition.Unknown;
 }

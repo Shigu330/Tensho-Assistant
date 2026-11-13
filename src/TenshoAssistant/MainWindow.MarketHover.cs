@@ -187,6 +187,18 @@ internal sealed partial class MainWindow
                 localization.Format("HoverUi.Collection",localization.Get("HoverUi.CollectionKind"+entry.Kind),localization.Get("HoverUi.Collection"+acquisition)));
             if(entry.Location.Length>0)ImGui.TextWrapped(localization.Format("HoverUi.CollectionWhere",entry.Location));
             if(entry.Description.Length>0)ImGui.TextDisabled(entry.Description);
+            // X-219 (0.1229): riders, riding music and mount actions from the Mount sheet.
+            if(entry.Mount is { } mount)
+            {
+                ImGui.TextUnformatted(localization.Format(mount.Riders>1 ? "HoverUi.MountRiders":"HoverUi.MountRider",mount.Riders));
+                ImGui.TextUnformatted(mount.MusicShared switch
+                {
+                    0=>localization.Get("HoverUi.MountNoMusic"),
+                    1=>localization.Get("HoverUi.MountOwnMusic"),
+                    var shared=>localization.Format("HoverUi.MountSharedMusic",shared-1),
+                });
+                if(mount.Actions.Count>0)ImGui.TextWrapped(localization.Format("HoverUi.MountActions",string.Join(", ",mount.Actions)));
+            }
             var catalog=itemCatalog.State.Catalog;
             var items=catalog is null ? []:entry.Kind switch
             {

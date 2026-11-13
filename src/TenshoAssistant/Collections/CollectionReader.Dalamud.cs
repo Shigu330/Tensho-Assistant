@@ -18,6 +18,8 @@ internal sealed partial class CollectionReader : IDisposable
     private readonly IUnlockState unlocks;
     private readonly IPluginLog log;
     private ExcelSheet<Mount>? mounts;
+    // X-219 (0.1229): named mounts per riding music row, counted once.
+    private Dictionary<uint,int>? mountMusic;
     private ExcelSheet<Companion>? companions;
     private ExcelSheet<Emote>? emotes;
     private ExcelSheet<AozAction>? blue;
@@ -163,7 +165,7 @@ internal sealed partial class CollectionReader : IDisposable
                     var row = mounts.GetRowAt(position++);
                     var name = row.Singular.ExtractText();
                     if (row.RowId != 0 && !string.IsNullOrWhiteSpace(name))
-                        entries.Add(new(CollectionKind.Mount, row.RowId, name, row.Icon, character != 0 && unlocks.IsMountUnlocked(row)));
+                        entries.Add(new(CollectionKind.Mount, row.RowId, name, row.Icon, character != 0 && unlocks.IsMountUnlocked(row),Mount:MountDetails(row)));
                 }
                 else if (position < mounts.Count + companions.Count)
                 {
@@ -321,6 +323,23 @@ internal sealed partial class CollectionReader : IDisposable
             log.Warning(error, "Tensho collections read failed; retry in thirty seconds.");
         }
     }
+    /// <summary>
+    /// X-219 (0.1229): riders, riding music shared or not, and mount actions, from the Mount sheet (docs/evidence/0.1229-mount-sheet.md); null when
+    /// a column does not read (after a game update), never a guessed value.
+    /// </summary>
+    private MountMetadata? MountDetails(Mount row)
+    {
+        try
+        {
+            mountMusic ??= mounts!.Where(mount=>mount.RowId!=0 && !mount.Singular.IsEmpty).GroupBy(mount=>mount.RideBGM.RowId).ToDictionary(group=>group.Key,group=>group.Count());
+            var music=row.RideBGM.RowId==0 ? 0:mountMusic.GetValueOrDefault(row.RideBGM.RowId);
+            var actions=row.MountAction.RowId==0 ? []:row.MountAction.ValueNullable?.Action.Where(action=>action.RowId!=0)
+                .Select(action=>action.ValueNullable?.Name.ExtractText() ?? "").Where(text=>text.Length>0).Distinct().ToArray() ?? [];
+            return new(row.ExtraSeats+1,music,actions);
+        }
+        catch(Exception error) when(error is not OutOfMemoryException){return null;}
+    }
+
     public void Dispose()
     {
         lock (gate)
