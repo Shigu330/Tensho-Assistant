@@ -127,7 +127,7 @@ internal static class DesktopInstall1113Tests
             Check(installer.Split("Process.Start(").Length==2 && installer.IndexOf("Process.Start(",StringComparison.Ordinal)>installer.IndexOf("public string? Open()",StringComparison.Ordinal),"Process.Start only in Open()");
             foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs"))
                 Check(!File.ReadAllText(file).Contains("Process.Start(",StringComparison.Ordinal),"no start from the window: "+Path.GetFileName(file));
-            var plugin=Read("src/TenshoAssistant/Plugin.cs");
+            var plugin=Read("src/TenshoAssistant/Plugin.Desktop.cs");
             Check(plugin.Contains("if(Link.DesktopInstallRules.Enabled)") && plugin.Contains("mainWindow.DesktopInstaller?.Dispose();mainWindow.DesktopInstaller=null;"),"created only when the build has it, disposed at unload");
             var project=Read("src/TenshoAssistant/TenshoAssistant.csproj");
             Check(project.Contains("TENSHO_NO_DESKTOP_INSTALL") && project.Contains("..\\TenshoAssistant.Desktop\\DesktopInstall.cs"),"switch and shared install in the plugin");

@@ -78,7 +78,7 @@ internal static class LocalLink1081Tests
             var feed=Read("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs");
             Check(feed.Contains("CompetitiveGate.Add(framework,OnUpdate)") && feed.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"behind the competitive gate, removed on dispose");
             Check(feed.Contains("if(!configuration.DesktopLink){Stop();return;}"),"the setting opens and closes the pipe");
-            var plugin=Read("src/TenshoAssistant/Plugin.cs");
+            var plugin=Read("src/TenshoAssistant/Plugin.Desktop.cs");
             Check(plugin.Contains("registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(") && plugin.Contains("linkFeed?.Dispose();linkFeed=null;"),"owned by the plugin's registrations");
             Check(Read("src/TenshoAssistant/MainWindow.Advanced.cs").Contains("BoolSetting(\"Advanced.DesktopLink\""),"the setting is in Settings › Advanced");
             var desktop=Read("src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj");

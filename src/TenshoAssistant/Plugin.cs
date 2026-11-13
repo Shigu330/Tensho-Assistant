@@ -22,7 +22,7 @@ using TenshoAssistant.Localization;
 
 namespace TenshoAssistant;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed partial class Plugin : IDalamudPlugin
 {
     private const string Command = "/tensho";
     private readonly RegistrationScope registrations = new();
@@ -901,18 +901,8 @@ public sealed class Plugin : IDalamudPlugin
             mainWindow.WorldName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText();
             mainWindow.TerritoryName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } territory && territory.PlaceName.RowId!=0
                 ? territory.PlaceName.Value.Name.ExtractText():null;
-            // X-119 step 2 (0.1081): the local link with the desktop application: a named pipe for the current user only, opened only while
-            // Settings › Advanced « Link with the desktop app » is on; once a second, who and where (docs/evidence/x119-desktop-link.md).
-            registrations.Register(()=>{linkFeed=new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,id=>mainWindow.TerritoryName?.Invoke(id),
-                typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",log,linkNotices){Held=mainWindow.AlarmHeldItems};mainWindow.LinkNotice=linkNotices.Add;mainWindow.DesktopLinkStatus=()=>linkFeed?.Status ?? (Link.LocalLinkState.Off,null);},
-                ()=>{mainWindow.DesktopLinkStatus=null;mainWindow.LinkNotice=null;linkFeed?.Dispose();linkFeed=null;});
-            // X-126 (0.1113, D-137): the desktop app installed from Settings › Advanced, on a click only; left out of a build made with
-            // TenshoDesktopInstall=false. Requests only on « Install » / « Update » (this repository's release, docs/evidence/x126-desktop-install.md).
-            if(Link.DesktopInstallRules.Enabled)
-                registrations.Register(()=>mainWindow.DesktopInstaller=new Link.DesktopInstaller(
-                        TenshoAssistant.Desktop.DesktopInstall.OwnFolder(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)),
-                        typeof(Plugin).Assembly.GetName().Version ?? new Version(0,0,0),new TenshoAssistant.Desktop.GitHubReleases(),message=>log.Information(message)),
-                    ()=>{mainWindow.DesktopInstaller?.Dispose();mainWindow.DesktopInstaller=null;});
+            // X-153 (0.1225): the desktop family (local link, installer) is wired in Plugin.Desktop.cs.
+            RegisterDesktop(pluginInterface,configuration,framework,client,player,inventory,objects);
             // X-89 (0.970): expansions from the game's sheets (TerritoryType.ExVersion, Quest.Expansion), for the item tooltips' origin line.
             mainWindow.TerritoryExpansion=id=>data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(id) is { } expansionTerritory && expansionTerritory.ExVersion.IsValid
                 ? expansionTerritory.ExVersion.Value.Name.ExtractText():null;

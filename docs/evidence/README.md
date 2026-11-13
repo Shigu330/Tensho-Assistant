@@ -262,11 +262,11 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x118-desktop-probe.md](x118-desktop-probe.md) | `src/TenshoAssistant.Desktop/DesktopPages.cs`, `src/TenshoAssistant.Desktop/Program.cs`, `tools/PluginUiTest/src/PluginUiTest.Host/Rewrite.cs`, `tools/README.md` | `docs/evidence/x119-desktop-app.md`, `docs/evidence/x120-plugin-ui-test.md` |
 | [x118-desktop-weather.png](x118-desktop-weather.png) | — | `docs/evidence/x118-desktop-probe.md` |
 | [x119-desktop-app.md](x119-desktop-app.md) | `src/TenshoAssistant.Desktop/Program.cs`, `src/TenshoAssistant.Desktop/TenshoAssistant.Desktop.csproj`, `tools/README.md` | `docs/evidence/x118-desktop-probe.md`, `docs/evidence/x120-plugin-ui-test.md` |
-| [x119-desktop-link.md](x119-desktop-link.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Plugin.cs` | `SECURITY.md` |
+| [x119-desktop-link.md](x119-desktop-link.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Plugin.Desktop.cs` | `SECURITY.md` |
 | [x119-desktop-weather.png](x119-desktop-weather.png) | — | `docs/evidence/x119-desktop-app.md` |
 | [x120-plugin-ui-test.md](x120-plugin-ui-test.md) | `tests/TenshoAssistant.Tests/PluginUiTest1032Tests.cs`, `tools/README.md` | — |
 | [x121-desktop-update.md](x121-desktop-update.md) | `src/TenshoAssistant.Desktop/DesktopUpdate.cs` | — |
-| [x126-desktop-install.md](x126-desktop-install.md) | `src/TenshoAssistant/Plugin.cs` | — |
+| [x126-desktop-install.md](x126-desktop-install.md) | `src/TenshoAssistant/Plugin.Desktop.cs` | — |
 | [x158-highbridge-window.md](x158-highbridge-window.md) | `src/TenshoAssistant/Maps/VistaWindow.cs`, `tests/TenshoAssistant.Tests/VistaWindow1128Tests.cs` | — |
 | [x172-sqlite-trial.md](x172-sqlite-trial.md) | `src/TenshoAssistant/Discoveries/DiscoveryDatabase.cs`, `src/TenshoAssistant/Plugin.cs`, `src/TenshoAssistant/TenshoAssistant.csproj`, `tests/TenshoAssistant.Tests/DiscoveriesSqlite1136Tests.cs`, `tools/README.md`, `tools/SqliteTrialProbe/Program.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |

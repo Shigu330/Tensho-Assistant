@@ -44,7 +44,7 @@ internal static class LinkLive1114Tests
             Check(feed.Contains("ReadLive(loggedIn),changes.Snapshot()") && feed.Contains("if(server is null){server=new LocalLinkServer(LocalLinkProtocol.PipeName(),message=>log.Information(message));Watch();}"),"live states and notices in the snapshot; watching starts with the link");
             Check(feed.Split("Unwatch();").Length>=3 && feed.Contains("liveFailed=true;"),"watchers stopped with the link and at unload; a failed reading left out (R08)");
             Check(feed.Contains("private void OnFile(object? sender,FileSystemEventArgs change)\n    {\n        if(LocalLinkProtocol.ChangeCategory(settingsFile,folder,change.FullPath) is { } category)changes.Add(category);\n    }"),"a watcher's event only adds a category (X-149)");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,"),"the plugin's own files watched");
+            Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("new Link.LocalLinkFeed(framework,client,player,inventory,objects,pluginInterface.ConfigFile.FullName,pluginInterface.GetPluginConfigDirectory(),configuration,"),"the plugin's own files watched");
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
             Check(host.Contains("public string ApplySettings(object fresh)") && host.Contains("property.SetValue(target,property.GetValue(fresh));"),"X-150: settings read into a new object, then applied at once to the window's own");
             Check(!host.Contains("File.WriteAllText") && !host.Contains("File.Write("),"the app never writes the plugin's settings");
