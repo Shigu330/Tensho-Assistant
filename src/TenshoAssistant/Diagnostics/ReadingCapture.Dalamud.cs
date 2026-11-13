@@ -60,7 +60,9 @@ public sealed unsafe class ReadingCapture : IDisposable
         var count=lines.GetValueOrDefault(counted);
         if(count>=limit)return;
         lines[counted]=count+1;
-        log.Information("Reading {0}: {1}",part,text);
+        // X-177 C6 (0.1204): the same text at each reload of the plugin: written whole once per game session (SessionOnce), then in one short line.
+        if(TenshoAssistant.Diagnostics.SessionOnce.First("Reading "+part+": "+text))log.Information("Reading {0}: {1}",part,text);
+        else log.Information("Reading {0}: the same as earlier in this game session ({1} characters).",part,text.Length);
     }
 
     private void OnUpdate(IFramework unused)

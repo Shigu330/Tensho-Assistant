@@ -78,10 +78,17 @@ public sealed unsafe class SubmarineVoyageProbe : IDisposable
                     }
                     lines.Add($"Submarine voyage check (territory {triedIn}, point = row - {offset}, speed {speed}): {legs} legs, time equal {timeSame}, distance equal {distanceSame}; {surveys} surveys, equal {surveySame}; differences: {(samples.Count==0 ? "none":string.Join("; ",samples))}");
                 }
-            if(anyValue){done=true;foreach(var line in lines)log.Info(line);}
+            if(anyValue){done=true;Write(lines);}
             else log.Debug("Submarine voyage check (territory {0}): the game's functions give 0 here; tried again in the next zone.",triedIn);
         }
         catch(Exception error){done=true;log.Warning(error,"Submarine voyage check failed.");}
+    }
+
+    // X-177 C6 (0.1204): the same lines at each reload of the plugin: written whole once per game session (SessionOnce), then one short line.
+    private void Write(List<string> lines)
+    {
+        if(TenshoAssistant.Diagnostics.SessionOnce.First(string.Join("\n",lines)))foreach(var line in lines)log.Info(line);
+        else log.Info($"Submarine voyage check (territory {triedIn}): the same {lines.Count} lines as earlier in this game session.");
     }
 
     public void Dispose()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
