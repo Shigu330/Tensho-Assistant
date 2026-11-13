@@ -122,9 +122,21 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     public List<VoyageRecord> Load(DateTimeOffset now)
     {
         if(data?.Database() is not { } opened)return VoyageHistory.Read(file);
-        if(File.Exists(file))
-            lock(gate)
-                if(File.Exists(file))
+        Convert(opened,data,now);
+        return ReadRows(opened);
+    }
+
+    /// <summary>
+    /// The file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert. Relay 37
+    /// (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of the history;
+    /// the next save converts it now that it may be free. One that cannot be read still throws: the history is never written over it.
+    /// </summary>
+    private bool Convert(TenshoDataDatabase opened,TenshoDataFile data,DateTimeOffset now)
+    {
+        if(!File.Exists(file))return true;
+        lock(gate)
+        {
+            if(!File.Exists(file))return true;
                 {
                     var marked=false;
                     using(var open=opened.Open())
@@ -143,8 +155,9 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
                         transaction.Commit();
                     }
                     if(marked)data.SetAside(file,now,"voyage history");
+                    return marked;
                 }
-        return ReadRows(opened);
+        }
     }
 
     /// <summary>
@@ -156,7 +169,9 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
     {
         if(data?.Database() is not { } opened){VoyageHistory.Write(file,all);return;}
         using var open=opened.Open();
-        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family))
+        // Relay 37 (0.1205): held at the load, converted at the first save that finds it free (its voyages kept, then this save's written
+        // by their key over them); still held: refused as before.
+        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family) && !TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,data,now ?? DateTimeOffset.UtcNow),"voyage history"))
             throw new InvalidOperationException("The voyage history file of before is not converted yet; nothing written over it.");
         using var transaction=open.BeginTransaction(deferred:false);
         Write(open,transaction,changed ?? all,keep:false);

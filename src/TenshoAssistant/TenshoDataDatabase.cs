@@ -277,6 +277,19 @@ public sealed class TenshoDataFile
     }
 
     /// <summary>
+    /// Relay 37 (0.1205): a save that finds its family's file of before not converted (held by another program at the load) converts it
+    /// first; false while it is still held. A file of before that cannot be read refuses the save as before (never written over it).
+    /// </summary>
+    public static bool ConvertBeforeSave(Func<bool> convert,string what)
+    {
+        try{return convert();}
+        catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or NotSupportedException or ArgumentException)
+        {
+            throw new InvalidOperationException($"The {what} file of before cannot be read; nothing written over it.",error);
+        }
+    }
+
+    /// <summary>
     /// A file of before moved beside itself into before-sqlite-yyyyMMdd-HHmmss/, never removed (a name already taken there gets a suffix). A move
     /// that fails is said and retried at the next start (the « converted » mark keeps the file from being read again). 0.1149: a folder of before
     /// (the bank's InventoryBank/) is moved the same way, whole.

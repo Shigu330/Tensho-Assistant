@@ -36,9 +36,21 @@ public sealed class GilJournalStore
     {
         var json=Path.Combine(folder,FileName(character));
         if(data.Database() is not { } opened)return GilJournal.Read(json);
-        if(File.Exists(json))
-            lock(gate)
-                if(File.Exists(json))
+        Convert(opened,character,json,now);
+        return ReadRows(opened,character);
+    }
+
+    /// <summary>
+    /// A character's file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert.
+    /// Relay 37 (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of that
+    /// journal; the next save converts it now that it may be free. One that cannot be read still throws: the journal is never written over it.
+    /// </summary>
+    private bool Convert(TenshoDataDatabase opened,ulong character,string json,DateTimeOffset now)
+    {
+        if(!File.Exists(json))return true;
+        lock(gate)
+        {
+            if(!File.Exists(json))return true;
                 {
                     var marked=true;
                     using(var open=opened.Open())
@@ -53,8 +65,9 @@ public sealed class GilJournalStore
                             WriteRows(open,character,Merge(ReadRows(opened,character),again),null);
                     }
                     if(marked)data.SetAside(json,now,"gil journal");
+                    return marked;
                 }
-        return ReadRows(opened,character);
+        }
     }
 
     /// <summary>A character's journal saved whole (replaces what was there); refused while its file of before is not converted.</summary>
@@ -64,7 +77,13 @@ public sealed class GilJournalStore
         if(data.Database() is not { } opened){GilJournal.Write(json,entries);return;}
         using var open=opened.Open();
         if(File.Exists(json) && !Converted(open,character))
-            throw new InvalidOperationException("The gil journal file of before is not converted yet; nothing written over it.");
+        {
+            // Relay 37 (0.1205): held at the load, converted at the first save that finds it free; this save replaces the character's rows,
+            // so what the file held (never loaded this session) is merged in, never dropped. Still held: refused as before.
+            if(!TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,character,json,DateTimeOffset.UtcNow),"gil journal"))
+                throw new InvalidOperationException("The gil journal file of before is not converted yet; nothing written over it.");
+            entries=Merge(ReadRows(opened,character),entries);
+        }
         WriteRows(open,character,entries,null);
     }
 

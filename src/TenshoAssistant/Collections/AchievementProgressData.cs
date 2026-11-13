@@ -29,9 +29,22 @@ public sealed class AchievementProgressData
     public Dictionary<ulong,Dictionary<uint,AchievementProgress>> Load(DateTimeOffset now)
     {
         if(data.Database() is not { } opened)return ReadFile();
-        if(File.Exists(file))
-            lock(gate)
-                if(File.Exists(file))
+        Convert(opened,now);
+        return ReadRows(opened);
+    }
+
+    /// <summary>
+    /// The file of before converted (at a load, and at a save when it was held at the load); true when nothing is left to convert. Relay 37
+    /// (0.1205): a file held by another program at the load (read nothing, nothing marked) left the session without any save of this family;
+    /// the next save converts it now that it may be free. A file of before that cannot be read (damaged) is set aside whole, never written
+    /// over nor removed, and the family goes on (the progress is seen again in game): it used to block every save for good (D-145).
+    /// </summary>
+    private bool Convert(TenshoDataDatabase opened,DateTimeOffset now)
+    {
+        if(!File.Exists(file))return true;
+        lock(gate)
+        {
+            if(!File.Exists(file))return true;
                 {
                     // X-182 (0.1169, night review N3): read in an immediate transaction; a file written again after the conversion (an older
                     // version still running) is merged the same way as a save: the newest reading of each achievement wins.
@@ -42,7 +55,7 @@ public sealed class AchievementProgressData
                         var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
                         marked=converted is not null;
                         if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value))
-                           && TenshoDataFile.StillThere(ReadFile) is { } found)
+                           && TenshoDataFile.StillThere(ReadOrSetAside) is { } found)
                         {
                             Upsert(open,transaction,found.Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
                             if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
@@ -52,8 +65,16 @@ public sealed class AchievementProgressData
                         transaction.Commit();
                     }
                     if(marked)data.SetAside(file,now,"achievement progress");
+                    return marked;
                 }
-        return ReadRows(opened);
+        }
+    }
+
+    // D-145 (0.1205): a damaged file of before counts as nothing to add; Convert then marks the family and sets the file aside whole.
+    private Dictionary<ulong,Dictionary<uint,AchievementProgress>> ReadOrSetAside()
+    {
+        try{return ReadFile();}
+        catch(InvalidDataException){return [];}
     }
 
     /// <summary>
@@ -65,7 +86,8 @@ public sealed class AchievementProgressData
     {
         if(data.Database() is not { } opened){AtomicFile.Write(file,AchievementProgressStore.Write(all));return;}
         using var open=opened.Open();
-        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family))
+        // Relay 37 (0.1205): held at the load, converted at the first save that finds it free; still held: refused as before.
+        if(File.Exists(file) && !TenshoDataDatabase.Converted(open,Family) && !TenshoDataFile.ConvertBeforeSave(()=>Convert(opened,DateTimeOffset.UtcNow),"achievement progress"))
             throw new InvalidOperationException("The achievement progress file of before is not converted yet; nothing written over it.");
         using var transaction=open.BeginTransaction(deferred:false);
         Upsert(open,transaction,[(character,progress)]);

@@ -78,13 +78,16 @@ internal static class AchievementSqlite1140Tests
             Check(Throws<IOException>(()=>restarted.Save(First,changed[First],changed)),"the save fails");
             Check(Same(new AchievementProgressData(file,Data(database)).Load(At),Sample()),"the save of before whole");
         })),
-        ("Achievements SQLite 1140: an unreadable file of before stays in place and is never written over",() => InTemp((root,file,database) =>
+        // D-145 (0.1205, relay 37): it used to block every save of the family for good; it is now set aside whole (never written over nor
+        // removed) and the family goes on: the progress is seen again in game.
+        ("Achievements SQLite 1140: an unreadable file of before is set aside whole, never written over; the progress is saved again",() => InTemp((root,file,database) =>
         {
             File.WriteAllText(file,"{bad");
             var store=new AchievementProgressData(file,Data(database));
-            Check(Throws<InvalidDataException>(()=>store.Load(At)),"the load fails (the watcher then never saves)");
-            Check(Throws<InvalidOperationException>(()=>store.Save(First,Sample()[First],Sample())),"a save is refused");
-            Check(File.ReadAllText(file)=="{bad" && Aside(root).Length==0,"untouched");
+            Check(store.Load(At).Count==0,"nothing read from it, no error");
+            Check(!File.Exists(file) && Aside(root) is [var kept] && File.ReadAllText(kept)=="{bad","set aside byte for byte, never removed");
+            store.Save(First,Sample()[First],Sample());
+            Check(Same(new AchievementProgressData(file,Data(database)).Load(At),new(){[First]=Sample()[First]}),"saved again");
         })),
         ("Achievements SQLite 1140: one damaged data file blocks every family and is never written over; a file that cannot be created keeps JSON",() => InTemp((root,file,database) =>
         {

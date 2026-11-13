@@ -64,8 +64,10 @@ internal static class VoyageSqlite1148Tests
             {
                 Check(!TenshoDataDatabase.Converted(open,VoyageHistoryData.Family) && Convert.ToInt64(TenshoDataDatabase.Scalar(open,"SELECT COUNT(*) FROM voyage_records;"))==0,"no row, no mark");
             }
-            Check(Throws<InvalidOperationException>(()=>new VoyageHistoryData(file,Data(database)).Save(Sample().Take(1).ToList())),"a save never writes over a file of before not converted");
-            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"converted at the next start");
+            // Relay 37 (0.1205): a save that finds it not converted converts it first: its voyages kept, never written over.
+            new VoyageHistoryData(file,Data(database)).Save(Sample().Take(1).ToList());
+            Check(!File.Exists(file) && Aside(root).Length==1,"converted by the save, then set aside");
+            Check(Same(new VoyageHistoryData(file,Data(database)).Load(At),Sample()),"every voyage of the file kept");
         })),
         ("Voyages SQLite 1148: a stop between the conversion and the move never brings the old history back over newer",() => InTemp((root,file,database) =>
         {
