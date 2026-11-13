@@ -37,10 +37,23 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
     public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest)
+    /// <summary>X-01 (0.1279): the first part (the free panels' and the bars' code, with what it calls in the plugin) is compiled, or there is
+    /// none, or the warm-up ended or was stopped: the panels may be drawn (<see cref="PanelGate"/>).</summary>
+    public bool FirstPartDone=>firstPartDone;
+    private volatile bool firstPartDone;
+    /// <summary>X-01 (0.1279): methods of the first part (its roots and what they call), how many of them were compiled, and how long after
+    /// the warm-up was made they were all compiled (ms; -1 before).</summary>
+    public int FirstPartMethods{get;private set;}
+    public int FirstPrepared{get;private set;}
+    public double FirstReadyAfter{get;private set;}=-1;
+    /// <summary>X-01 (0.1279): at most this many methods in the first part (roots and callees).</summary>
+    public const int FirstCap=8000;
+    private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
+
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart)
     {
         var token=cancellation.Token;
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -50,8 +63,10 @@ public sealed class JitWarmup : IDisposable
     /// once <paramref name="delay"/> has passed.</remarks>
     /// <param name="holdRest">X-177 C4.2 (0.1200): while it says true, the rest (everything after the early part) waits, <see cref="RestHold"/>
     /// at most: the runtime compiles one method at a time for the plugin, so what the game's thread needs sooner is compiled first.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null)
-        =>new(roots,delay,finished,early,holdRest);
+    /// <param name="firstPart">X-01 (0.1279): with <paramref name="early"/>, the methods compiled before the rest of the early part, together
+    /// with what they call in the plugin (<see cref="CallGraph.Closure"/>); <see cref="FirstPartDone"/> tells when.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -213,15 +228,32 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,CancellationToken token)
     {
         try
         {
-            if(early is null)earlyDone=true;
+            if(early is null){earlyDone=true;firstPartDone=true;}
             var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
             if(token.WaitHandle.WaitOne(early is null ? delay:first))return;
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
-            var methods=Methods(roots());
+            var types=roots();
+            var methods=Methods(types);
+            // X-01 (0.1279): the panels' code first, with what it calls in the plugin and the generic code made for its types.
+            if(early is not null && firstPart is not null && types.Count>0)
+            {
+                var part=CallGraph.Closure(methods.Where(firstPart),types[0].Assembly,FirstCap,()=>token.IsCancellationRequested);
+                FirstPartMethods=part.Count;
+                foreach(var method in part)
+                {
+                    if(token.IsCancellationRequested)return;
+                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                }
+                FirstPrepared=Prepared;
+                FirstReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
+                var compiled=new HashSet<MethodBase>(part);
+                methods=[..methods.Where(method=>!compiled.Contains(method))];
+            }
+            firstPartDone=true;
             var earlyCount=early is null ? 0:methods.Count(early);
             var index=0;
             foreach(var method in early is null ? methods:EarlyFirst(methods,early))
@@ -247,7 +279,7 @@ public sealed class JitWarmup : IDisposable
             if(!token.IsCancellationRequested)finished?.Invoke(this);
         }
         catch(Exception){Skipped++;}
-        finally{earlyDone=true;done.Set();}
+        finally{firstPartDone=true;earlyDone=true;done.Set();}
     }
     private static bool Held(Func<bool> ask)
     {

@@ -1703,10 +1703,15 @@ public sealed partial class Plugin : IDalamudPlugin
             ("PlotWatch",mainWindow.WatchPlots),
             ("Fishing",mainWindow.DrawFishingPanel),
         ];
+        // X-01 (0.1279): the overlay pass and the free panels wait until their code is compiled, 3 s at most after the load: they were
+        // 152 to 338 ms of first-run compiling in one frame at each load. The frame where they come back is timed once, in every mode.
+        var panelsOpen=mainWindow.PanelsOpen;
+        var panelsFirst=panelsOpen && !panelsOpenedLogged ? System.Diagnostics.Stopwatch.GetTimestamp():0;
         // R-14 (0.452): Dalamud calls this whole method inside one catch (UiBuilder.OnDraw): an overlay that threw (a sheet lost after a game
         // update throws on every call) replaced every Tensho window with Dalamud's error window. Each one now fails alone, logged once.
         for(var index=0;index<overlays.Length;index++)
         {
+            if(!panelsOpen)break;
             var (name,draw)=overlays[index];
             if(brokenOverlays.Contains(name))continue;
             var started=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
@@ -1720,6 +1725,7 @@ public sealed partial class Plugin : IDalamudPlugin
         var windowsStarted=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
         windows.Draw();
         if(windowsStarted!=0)mainWindow.SlowFrames.Add(Dalamud.Bindings.ImGui.ImGui.GetFrameCount(),"all windows",System.Diagnostics.Stopwatch.GetElapsedTime(windowsStarted).TotalMilliseconds);
+        if(panelsFirst!=0){panelsOpenedLogged=true;log.Information(mainWindow.PanelsOpenedText(System.Diagnostics.Stopwatch.GetElapsedTime(panelsFirst).TotalMilliseconds));}
         attachedPanels?.EndFrame();
         DrawBeastBoard(true);
     }
@@ -1738,6 +1744,8 @@ public sealed partial class Plugin : IDalamudPlugin
         catch(Exception error){log.Warning(error,"Sheet {0} unavailable (perhaps after a game update); its feature stays off.",name);return unavailable;}
     }
     private readonly HashSet<string> brokenOverlays=[];
+    /// <summary>X-01 (0.1279): the line « Panels opened … » is written (once per load).</summary>
+    private bool panelsOpenedLogged;
 
     /// <summary>0.1095: a lazy value built on a worker the first time it is asked; null until it is ready (never built in the frame).</summary>
     private static Func<T?> InBackground<T>(Lazy<T?> lazy) where T:class

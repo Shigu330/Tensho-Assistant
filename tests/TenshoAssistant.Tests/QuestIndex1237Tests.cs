@@ -11,7 +11,7 @@ internal static class QuestIndex1237Tests
     [
         ("Quest index 1237: built with the reward index, off the caller's thread; null before and after a logout",() =>
         {
-            var release=new TaskCompletionSource();var builtOn=0;
+            var release=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);var builtOn=0;
             var service=new QuestService((entries,token)=>Task.Run(async()=>{await release.Task;builtOn=Environment.CurrentManagedThreadId;return QuestRewardIndex.Build(entries,token);},token));
             service.Publish(7,[Entry(10,"B",QuestProgress.Complete),Entry(11,"A",QuestProgress.Active)]);
             Check(service.State.ById is null && service.State.RewardIndexLoading,"not built yet: null, not a frame dictionary");

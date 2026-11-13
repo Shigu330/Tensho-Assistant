@@ -185,8 +185,18 @@ internal sealed partial class MainWindow : Window, IDisposable
             $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first.")),
             // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
             holdRest: static ()=>TenshoAssistant.Competitive.CompetitiveGate.CompilerBusy,
+            // X-01 (0.1279): the free panels' and the bars' code first, with what it calls: they wait for it (PanelGate).
+            firstPart: Diagnostics.JitWarmup.OverlayFirst,
             early: Diagnostics.JitWarmup.EarlyMethod);
+        panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
+    /// <summary>X-01 (0.1279): the free panels, the bars and the overlay pass are drawn only once their code is compiled (3 s at most after
+    /// the load; Diagnostics/PanelGate.cs).</summary>
+    internal bool PanelsOpen => panelGate.Open;
+    private readonly Diagnostics.PanelGate panelGate;
+    /// <summary>X-01 (0.1279): the line of the frame where the panels came back, written once by the plugin.</summary>
+    internal string PanelsOpenedText(double frameMs) => FormattableString.Invariant(
+        $"Panels opened {panelGate.OpenedAfter} ms after the load ({(panelGate.ByBound ? "at the bound" : "their code compiled")}: {jitWarmup.FirstPrepared} of {jitWarmup.FirstPartMethods} methods with what they call, ready {jitWarmup.FirstReadyAfter:F0} ms after the load); their first frame {frameMs:F0} ms.");
     /// <summary>X-177 C4.2 (0.1200): the interface's code (map, overlays) is compiled: the readers' classes may be compiled next.</summary>
     internal bool WarmupEarlyDone=>jitWarmup.EarlyDone;
 
