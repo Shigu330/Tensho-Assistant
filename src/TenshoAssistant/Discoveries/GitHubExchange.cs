@@ -359,7 +359,7 @@ public sealed class GitHubExchange : IDisposable
             {
                 var bytes=await Community.BoundedHttp.ReadBytesAsync(client,new Uri(CommunityDiscoveries.AddressV3+entry.Name),(int)entry.Bytes,stop.Token).ConfigureAwait(false);
                 var read=ExchangeV3.ReadKind(new MemoryStream(bytes),entry);
-                var result=store.Merge(read.Facts);added+=result.Added;joined+=result.Joined;taken++;
+                var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;
                 store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
             }
             catch(Exception error) when(CommonUnreadable(error)){unreadable++;}
@@ -392,7 +392,7 @@ public sealed class GitHubExchange : IDisposable
             if(File.Exists(CommonMarker) && File.ReadAllText(CommonMarker).Trim()==hash || store.ImportWaiting("common:"+hash))common="CommonSame";
             else if(CommunityDiscoveries.Parse(json) is { } file)
             {
-                var result=store.Merge(file.Facts);added=result.Added;joined=result.Joined;
+                var result=store.Merge(file.Facts,common:true);added=result.Added;joined=result.Joined;
                 // X-166 (0.1133, audit R01): the hash is noted only once a save holds the merged facts; a stop before leaves the file to take again.
                 store.WhenImportSaved("common:"+hash,()=>{Directory.CreateDirectory(folder);AtomicFile.Write(CommonMarker,hash);});
                 common="CommonTaken";

@@ -20,6 +20,11 @@ The maintainer merges the gists with `python tools/discoveries-merge.py sync` (G
 in `players/<issue>.json`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then `discoveries.json` rebuilt from the
 player files with `rebuild` (each player counts as one import of a fact), with the `v3/` set beside it; then the result is committed.
 The files reach players with the next release (they are read from `main`).
+Since Tensho 0.1210 (X-183): one issue per GitHub account counts (the newest; an older one of the same author is left out); each field must have the
+plugin's type; a player counts for at most 1 000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
+of the earliest day; a player alone far outside the other players' levels on over 5 % of the facts they share is left out and checked by hand.
+**Withdrawing.** Close your « Discoveries » issue (or ask in it): the maintainer removes `players/<issue>.json` with
+`python tools/discoveries-merge.py withdraw <issue>`, and your facts leave the common files at the next release.
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
 `Territory`, `Map`, `CellX`, `CellZ`; it holds the exact first place (`X`, `Z`), the widest values seen (`LevelMin`, `LevelMax`), `Seen`, `Imported`,
@@ -61,6 +66,12 @@ Le mainteneur fusionne les gists avec `python tools/discoveries-merge.py sync` (
 valides de chaque joueur gardés dans `players/<ticket>.json`, les faits invalides refusés, un joueur dont les refus dépassent 5 % signalé et laissé de côté,
 puis `discoveries.json` reconstruit à partir des fichiers des joueurs avec `rebuild` (chaque joueur compte comme un import d'un fait), avec l'ensemble
 `v3/` à côté ; puis le résultat est enregistré dans le dépôt. Les fichiers arrivent chez les joueurs avec la release suivante (lus sur `main`).
+Depuis Tensho 0.1210 (X-183) : un seul ticket par compte GitHub compte (le plus récent ; un plus ancien du même auteur est laissé de côté) ; chaque champ
+doit avoir le type du plugin ; un joueur compte pour 1 000 observations d'un fait au plus dans les histogrammes communs (la forme des siens gardée) ; le
+lieu exact gardé est celui du jour le plus ancien ; un joueur seul très loin des niveaux des autres joueurs sur plus de 5 % des faits qu'il partage avec
+eux est laissé de côté et regardé à la main.
+**Se retirer.** Fermez votre ticket « Discoveries » (ou demandez-le dedans) : le mainteneur retire `players/<ticket>.json` avec
+`python tools/discoveries-merge.py withdraw <ticket>`, et vos faits quittent les fichiers communs à la release suivante.
 
 **Format du fichier (version 2, depuis Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. Un fait est identifié par `Kind`, `Subject`,
 `Detail`, `Territory`, `Map`, `CellX`, `CellZ` ; il contient le premier lieu exact (`X`, `Z`), les valeurs extrêmes vues (`LevelMin`, `LevelMax`), `Seen`,

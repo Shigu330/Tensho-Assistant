@@ -46,7 +46,7 @@ internal static class ExchangeFields1170Tests
         ("Exchange fields 1170: the merge tool stays strict on the players' gists; the README says both", () =>
         {
             var tool = File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("if set(f)-FIELDS or f[\"Kind\"] not in KINDS"), "any name outside its list refuses a gist's line");
+            Check(tool.Contains("if set(f)-FIELDS or not typed(f) or f[\"Kind\"] not in KINDS"), "any name outside its list refuses a gist's line");
             var readme = File.ReadAllText(Path.GetFullPath("community-discoveries/README.md"));
             Check(readme.Contains("Since Tensho 0.1170 the plugin ignores a name it does not know") && readme.Contains("Depuis Tensho 0.1170, le plugin ignore un nom qu'il ne connaît pas"), "README in both languages");
         }),

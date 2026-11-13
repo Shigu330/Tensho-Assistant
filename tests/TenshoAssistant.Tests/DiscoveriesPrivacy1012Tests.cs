@@ -30,7 +30,7 @@ internal static class DiscoveriesPrivacy1012Tests
         ("Discoveries privacy 1012: the merge tool checks the time as sent, then keeps the day, in sync and in rebuild",() =>
         {
             var tool=Source("tools/discoveries-merge.py");
-            Check(tool.Contains("if not valid(f) or not valid(daily(dict(f))):refused+=1;continue") && tool.Contains("g=daily(dict(f));g[\"Seen\"]=0"),"sync");
+            Check(tool.Contains("if not isinstance(f,dict) or not valid(f) or not valid(daily(dict(f))) or player and not sighted(f):refused+=1;continue") && tool.Contains("g=capped(daily(dict(f)));g[\"Seen\"]=0"),"sync");
             Check(tool.Contains("kept=[daily(f) for f in kept]"),"rebuild");
             Check(tool.Contains("QUEST_ASKED_FIXED_DAY=datetime(2026,11,9,tzinfo=timezone.utc)"),"quest rule by day");
         }),

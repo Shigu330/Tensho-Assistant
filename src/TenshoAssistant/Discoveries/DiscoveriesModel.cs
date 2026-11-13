@@ -449,9 +449,10 @@ public sealed class DiscoveryStore
 
     /// <summary>
     /// The facts of an imported file joined to ours: the same fact counts one more import and keeps the widest dates and levels; a new one comes in as imported only.
-    /// A fact that does not hold is left out and counted. Nothing of ours is removed.
+    /// A fact that does not hold is left out and counted. Nothing of ours is removed. X-183 (0.1210, N14): common=true for the community's common file, read
+    /// again at each of its versions: a fact keeps the file's import count (how many players have it), never one more per version read.
     /// </summary>
-    public (int Added,int Joined,int Refused) Merge(IEnumerable<DiscoveryFact> imported)
+    public (int Added,int Joined,int Refused) Merge(IEnumerable<DiscoveryFact> imported,bool common=false)
     {
         int added=0,joined=0,refused=0;
         // X-93 (0.941): the kinds of the file are read first, so a fact already shared is joined, never doubled.
@@ -481,7 +482,7 @@ public sealed class DiscoveryStore
                 {
                     // X-167 (0.1134, audit R03): your fact's own fields kept apart before the import widens them.
                     if(known.Seen>0)known.Own??=DiscoveryFact.OwnOf(known);
-                    known.Imported++;
+                    if(common)known.Imported=Math.Max(known.Imported,source.Imported);else known.Imported++;
                     if(source.LevelMin>0)known.LevelMin=known.LevelMin==0 ? source.LevelMin:Math.Min(known.LevelMin,source.LevelMin);
                     known.LevelMax=Math.Max(known.LevelMax,source.LevelMax);
                     if(source.First<known.First)known.First=source.First;
@@ -493,7 +494,7 @@ public sealed class DiscoveryStore
                     continue;
                 }
                 if(shared.GetValueOrDefault(source.Kind)>=MaxFacts){LeftOut++;continue;}
-                var copy=source.Copy();copy.Seen=0;copy.Imported=1;copy.Own=null;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
+                var copy=source.Copy();copy.Seen=0;copy.Imported=common ? Math.Max(1,source.Imported):1;copy.Own=null;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
                 Put(copy);changedKeys.Add(copy.Key);added++;
             }

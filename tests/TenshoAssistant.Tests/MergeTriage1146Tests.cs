@@ -19,7 +19,7 @@ internal static class MergeTriage1146Tests
             var triage=tool.IndexOf("gist,doubt=triage(issue)",sync,StringComparison.Ordinal);
             var listing=tool.IndexOf("owner,files=gist_listing(gist)",sync,StringComparison.Ordinal);
             var owner=tool.IndexOf("doubt=owner_doubt(owner,issue)",sync,StringComparison.Ordinal);
-            var read=tool.IndexOf("clean(from_gist_files(files,fetch_gist_raw))",sync,StringComparison.Ordinal);
+            var read=tool.IndexOf("clean(from_gist_files(files,fetch_gist_raw),player=True)",sync,StringComparison.Ordinal);
             Check(triage>sync && listing>triage && owner>listing && read>owner,"triage, then the owner, and only then the gist's content");
             Check(tool.Contains("MANUAL ({DOUBTS[doubt]}): not merged; tell the player: ") && tool.Contains("notice {issue['number']} manual {doubt}"),"manual triage says how to tell the player");
             foreach(var doubt in new[]{"\"gist\":(","\"cc0\":(","\"title\":(","\"owner\":("})Check(tool.Contains(doubt),"notice "+doubt);

@@ -274,7 +274,7 @@ internal static class ExchangeV31137Tests
             var common=CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json")))!;
             Check(keys.Count==common.Facts.Count && common.Facts.All(fact=>keys.Contains(fact.Key)),$"the same facts as the v2 file ({keys.Count} and {common.Facts.Count})");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("v3=write_v3(common[\"Facts\"],V3_DIR)"),"the merge tool reads v3 gists and writes the v3 set");
+            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("v3=write_v3(common[\"Facts\"],V3_DIR,say)"),"the merge tool reads v3 gists and writes the v3 set");
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
             Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && exchange.Contains("await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store)"),
                 "the wiring: each kind's hash noted after the save, v3 first, v2 when it is missing");
