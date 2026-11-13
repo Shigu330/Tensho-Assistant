@@ -17,7 +17,7 @@ internal static class Dashboard1244Tests
         ("Dashboard 1244: all fine is Ok; each problem and each thing worth a look raises the overall state",() =>
         {
             var (overall,lines)=HealthBoard.Evaluate(Fine());
-            Check(overall==HealthLevel.Ok && lines.All(line=>line.Level==HealthLevel.Ok) && lines.Count==9,"fine: "+overall);
+            Check(overall==HealthLevel.Ok && lines.All(line=>line.Level==HealthLevel.Ok) && lines.Count==11,"fine (11 lines since 0.1247): "+overall);
             Check(lines[0].Key=="Dashboard.Memory" && (double)lines[0].Values[0]==200.0,"memory in MB");
             foreach(var (name,inputs) in new (string,HealthInputs)[]
             {

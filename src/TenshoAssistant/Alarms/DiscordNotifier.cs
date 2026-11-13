@@ -135,6 +135,7 @@ public sealed class DiscordNotifier : IDisposable
             try
             {
                 using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(post.WebhookUrl.Trim())) { Content = new StringContent(post.Body, Encoding.UTF8, "application/json") };
+                TenshoAssistant.Community.BoundedHttp.Count(request.RequestUri?.Host ?? "?");
                 using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
                 var code = (int)response.StatusCode;
                 if (response.IsSuccessStatusCode) { HoldIfBucketEmpty(response); return Record(DiscordStatus.Sent, code); }

@@ -71,6 +71,7 @@ public sealed class MarketBoardService : IDisposable
             {
                 // X-170 (0.1144, GPT audit): the setting read again at departure (turned off since the call: nothing leaves, asked again later).
                 if(Enabled?.Invoke()==false){lock(gate)regionsRequested=false;return;}
+                Community.BoundedHttp.Count("universalis.app");
                 var json=await client.GetStringAsync("https://universalis.app/api/v2/data-centers",disposal.Token).ConfigureAwait(false);
                 using var document=JsonDocument.Parse(json);
                 var table=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
@@ -125,6 +126,7 @@ public sealed class MarketBoardService : IDisposable
                 if(Enabled?.Invoke()==false){Publish(scope,itemId,known,SourceOff,known is not null);return;}
                 lock(gate)lastRequest=Stopwatch.GetTimestamp();
                 var url=$"https://universalis.app/api/v2/{Uri.EscapeDataString(scope)}/{itemId}?listings={MarketBoard.MaximumOffers}&entries={MarketBoard.MaximumSales}";
+                Community.BoundedHttp.Count(new Uri(url).Host);
                 var json=await client.GetStringAsync(url,token).ConfigureAwait(false);
                 var board=MarketBoard.Parse(json,scope,itemId,DateTimeOffset.UtcNow);
                 if(store is not null)_=store.WriteAsync(Family,$"{scope}:{itemId}",Version,board,board.FetchedAt);

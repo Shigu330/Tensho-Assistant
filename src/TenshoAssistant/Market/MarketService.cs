@@ -93,6 +93,7 @@ public sealed class MarketService : IDisposable
         }
         try
         {
+            Community.BoundedHttp.Count("universalis.app");
             using var response=await client.GetAsync($"https://universalis.app/api/v2/aggregated/{world}/{string.Join(',',missing)}",token).ConfigureAwait(false);
             if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)
             {
@@ -134,6 +135,7 @@ public sealed class MarketService : IDisposable
         if(Enabled?.Invoke()==false)return null;
         try
         {
+            Community.BoundedHttp.Count("universalis.app");
             using var response=await client.GetAsync(MarketQuote.SpeedUrl(world,ids),token).ConfigureAwait(false);
             if(ServerPause((int)response.StatusCode,response.Headers.RetryAfter?.Delta) is { } room)
             {
@@ -271,6 +273,7 @@ public sealed class MarketService : IDisposable
         }
         try
         {
+            Community.BoundedHttp.Count("universalis.app");
             var json = await client.GetStringAsync($"https://universalis.app/api/v2/aggregated/{world}/{itemId}", token).ConfigureAwait(false);
             var quote = MarketQuote.Parse(json, world, itemId, DateTimeOffset.UtcNow).WithSpeed(await SpeedAsync(world,[itemId],token).ConfigureAwait(false));
             lock (gate)

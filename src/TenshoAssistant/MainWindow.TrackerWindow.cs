@@ -100,5 +100,5 @@ internal sealed partial class MainWindow
     internal Vector2 WindowMoved(string addon,float x,float y)=>GameWindowFollow is { } follow ? follow(addon,x,y)-new Vector2(x,y):Vector2.Zero;
     /// <summary>0.516: the panels attached to a game window.</summary>
     internal AttachedPanels? Panels { get; set; }
-    internal void PanelFailed(string name,Exception error)=>log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);
+    internal void PanelFailed(string name,Exception error){log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);NotePanelOff(name);}
 }

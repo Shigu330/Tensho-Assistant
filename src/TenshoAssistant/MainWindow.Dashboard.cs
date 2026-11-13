@@ -59,8 +59,20 @@ internal sealed partial class MainWindow
         var self=SelfCheck?.LastLines ?? [];
         return new HealthInputs(memory.HeapSizeBytes>0 ? memory.HeapSizeBytes:null,GC.GetTotalMemory(false),slowest,worst?.Median,worst?.Max,unavailable,
             dataCacheStore?.Error,bank.State.Error,DiscoveriesWriteBlocked,DiscoveryStore?.Dirty==true,saveError,Community.BoundedHttp.Sent,
-            self.Count(line=>line.Status==SelfCheckStatus.Ok),self.Count(line=>line.Status==SelfCheckStatus.Suspect),self.Count(line=>line.Status==SelfCheckStatus.Failed),self.Count>0);
+            self.Count(line=>line.Status==SelfCheckStatus.Ok),self.Count(line=>line.Status==SelfCheckStatus.Suspect),self.Count(line=>line.Status==SelfCheckStatus.Failed),self.Count>0,
+            [.. panelsOff],Volatile.Read(ref writesFailed),Volatile.Read(ref lastWriteFailure),LoadMilliseconds);
     }
+
+    // X-165 (0.1247, slice 4): measures Tensho took without showing them. The panels and overlays turned off after an error (draw thread:
+    // PanelWindow, AttachedPanels, the plugin's overlays), the saves in the background that failed (a writer's thread), the load's time.
+    private readonly SortedSet<string> panelsOff=new(StringComparer.Ordinal);
+    internal void NotePanelOff(string name)=>panelsOff.Add(name);
+    private int writesFailed;
+    private string? lastWriteFailure;
+    /// <summary>X-165 (0.1247): a save in the background failed (any thread): counted, its message kept for the dashboard.</summary>
+    internal void NoteWriteFailed(string message){Interlocked.Increment(ref writesFailed);Volatile.Write(ref lastWriteFailure,message);}
+    /// <summary>X-165 (0.1247): the plugin's load, from its start to its window ready (the « Load created » line of the log).</summary>
+    internal long? LoadMilliseconds { get; set; }
 
     private void DrawDashboard()
     {

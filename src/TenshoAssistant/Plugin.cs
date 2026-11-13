@@ -721,7 +721,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-218 (0.1228): each character's job levels and gear sets kept in TenshoData.db at login and when they change (Storage › Characters).
             var characterJobs=new Character.CharacterJobsData(tenshoData);
             mainWindow.CharacterJobs=characterJobs;
-            var characterJobsWriter=new BackgroundWriter((error,message)=>log.Warning(error,message));
+            var characterJobsWriter=new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});
             Character.CharacterJobs? lastCharacterJobs=null;
             if(gameGearsets is not null)gameGearsets.Copied=read=>
             {
@@ -806,7 +806,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.OceanTimetableNow=InBackground(ocean);
             OceanVoyageReader? oceanVoyageReader=null;
             // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, and the play state for the developer's scripts.
-            var voyageWriter=new BackgroundWriter((error,message)=>log.Warning(error,message));
+            var voyageWriter=new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});
             registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"OceanVoyage.json"),voyageWriter){Developer=()=>configuration.DeveloperMode,
                 CatchPoints=(item,points)=>{if(configuration.Discovery.Enabled && configuration.Discovery.Fishing)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.FishPoints,item,0,Math.Min(points,100_000),DateTimeOffset.UtcNow,client.TerritoryType);}},()=>oceanVoyageReader?.Dispose());
@@ -1635,6 +1635,7 @@ public sealed partial class Plugin : IDalamudPlugin
             unloadParts=instances[0].Value;
             developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
+            mainWindow.LoadMilliseconds=(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds;
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
             {
                 SayLoad("10 s later");
@@ -1800,7 +1801,7 @@ public sealed partial class Plugin : IDalamudPlugin
             if(brokenOverlays.Contains(name))continue;
             var started=mainWindow.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
             try{draw();}
-            catch(Exception error){brokenOverlays.Add(name);log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);}
+            catch(Exception error){brokenOverlays.Add(name);log.Error(error,"Overlay {0} turned off until the plugin reloads (perhaps after a game update).",name);mainWindow.NotePanelOff(name);}
             // 0.486 (user report): the panels beside the game's windows count too, in developer mode.
             if(started!=0)mainWindow.RecordOverlayDraw(name,System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
         }

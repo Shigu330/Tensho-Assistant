@@ -12,6 +12,9 @@ public static class BoundedHttp
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string,int> SentByHost=new();
     /// <summary>Requests sent so far, by host: the page sweep of the self-check says how many it caused (0.724).</summary>
     public static IReadOnlyDictionary<string,int> Sent=>new Dictionary<string,int>(SentByHost);
+    /// <summary>X-165 (0.1247): a request sent by a client that does not go through this reader (the market prices of Universalis, Discord),
+    /// counted with the others for the dashboard; the host only, never the path (a Discord webhook's path is a secret, R24).</summary>
+    public static void Count(string host)=>SentByHost.AddOrUpdate(host,1,(_,count)=>count+1);
     /// <summary>X-76 (step 2): Tensho's one User-Agent, « TenshoAssistant/x.y.z », for every request it sends (the market clients and Discord use it too).</summary>
     public static readonly string UserAgent=$"TenshoAssistant/{typeof(BoundedHttp).Assembly.GetName().Version?.ToString(3) ?? "1.0.0"}";
 
