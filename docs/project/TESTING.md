@@ -1722,6 +1722,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1289) En dresseur, page Équipement : les cases Arme et Main secondaire montrent la hache (ou le tabar) et le bouclier portés, le niveau d'objet moyen les compte ; recherche d'une pièce (Tête) au niveau du dresseur : des pièces du dresseur sont proposées.
 
+- [ ] (0.1290) En dresseur 45, page Équipement, recherche d'une pièce (Tête) : la liste dit « Niveaux 40 à 45 » et propose des pièces ; au niveau 50 (ou un autre job 50/60/…/100) : seulement le niveau exact ; Paramètres, le réglage s'appelle « Niveau exact aux paliers ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
