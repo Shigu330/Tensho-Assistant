@@ -20,12 +20,18 @@ internal static class PlayerNotes1182Tests
         }),
         ("Player notes 1182: since the last release every version has its two player lines or none, in plain words", () =>
         {
-            var lines = Read("CHANGELOG.md").Split('\n');
+            // 0.1297: CHANGELOG.md keeps only the versions since the last release (tools/changelog.py archive); the older ones are read in the
+            // archives, each version once.
+            var archives = Directory.Exists(Path.GetFullPath("docs/changelog"))
+                ? Directory.GetFiles(Path.GetFullPath("docs/changelog"), "CHANGELOG-*.md").Select(path => File.ReadAllText(path).Replace("\r\n", "\n"))
+                : Enumerable.Empty<string>();
+            var lines = new[] { Read("CHANGELOG.md") }.Concat(archives).SelectMany(text => text.Split('\n')).ToArray();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
             var checkedVersions = 0;
             for (var index = 0; index < lines.Length; index++)
             {
                 var head = Regex.Match(lines[index], @"^## 0\.(\d+)\.0$");
-                if (!head.Success || int.Parse(head.Groups[1].Value) < 1178) continue;
+                if (!head.Success || int.Parse(head.Groups[1].Value) < 1178 || !seen.Add(head.Groups[1].Value)) continue;
                 var end = index + 1;
                 while (end < lines.Length && !lines[end].StartsWith("## ", StringComparison.Ordinal)) end++;
                 var body = lines[(index + 1)..end];
