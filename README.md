@@ -59,10 +59,10 @@ and the help text of each page (the « ? » beside its title):
 | Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
 |  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
 |  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wish list. |
-|  | **Allied societies** | Each allied society: your rank and reputation, its place and its currency. |
+|  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
 |  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
-|  | **Custom deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
+|  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
 |  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
 |  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that teach the others. |
 |  | **Guildleves** | Guildleves and crafting orders, with your allowances, what is done and what is accepted. |

@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1236.0
+- Remarque de X-260 : les titres anglais « Allied Societies » et « Custom Deliveries » (titres des pages, navigation, aide, README) prennent les majuscules du jeu (Addon 5700 « Custom Deliveries », 17052 « Allied Society », lus par la sonde PROBE_RACECHOCOBO, bloc TITLE ; preuve docs/evidence/0.1236-page-titles.md). Les phrases qui les nomment en passant gardent la prose ordinaire. Test : GameTitles1236Tests.
+- Tests : GameTitles1236Tests. Verify.ps1 (agent) : 2215/2215, 0 avertissement, 0 erreur ; DLL 0.1236.0.0. Non validé en jeu.
+### English
+- Remark of X-260: the English titles « Allied Societies » and « Custom Deliveries » (page titles, navigation, help, README) take the game's capitals (Addon 5700 « Custom Deliveries », 17052 « Allied Society », read by the probe PROBE_RACECHOCOBO, TITLE block; evidence docs/evidence/0.1236-page-titles.md). Sentences that name them in passing keep ordinary prose. Test: GameTitles1236Tests.
+
 ## 0.1235.0
 - Plan global, X-204 : X-204 (demande de l'utilisateur du 12/11, comparaison aux plugins, K-33) : page Chocobo, section repliée « Chocobo de course » : catégorie (d'après la cote et les bornes de ChocoboRaceRank, lignes nommées seulement), cote, pedigree, sexe, les cinq caractéristiques actuelles et maximales (« Maximum atteint »), aptitudes héréditaire et apprise (noms et descriptions de ChocoboRaceAbility), heure de lecture. Lu par RaceChocoboReader seulement quand le jeu a chargé le chocobo (RaceChocoboManager à l'état Loaded, joueur chargé, hors changement de zone), par les fonctions du jeu GetRating, GetPedigreeLevel, GetAttributesCurrent et GetAttributesMaximum, chacune vérifiée résolue ; RequestParameters (requête au serveur) n'est jamais appelée. Une lecture hors bornes n'est pas montrée. Mots du jeu par Addon (9378 à 9382, 9393 « Cote », 9374 « Pedigree ») ; sonde PROBE_RACECHOCOBO, preuve docs/evidence/0.1235-racing-chocobo.md ; inventaire des mises à jour du jeu complété. Test : RaceChocobo1235Tests.
 - Pour les joueurs : La page Chocobo montre votre chocobo de course (catégorie, cote, pedigree, caractéristiques, aptitudes) une fois que le jeu l'a chargé.

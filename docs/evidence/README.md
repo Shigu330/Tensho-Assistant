@@ -36,6 +36,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1233-gold-saucer-times.md](0.1233-gold-saucer-times.md) | `src/TenshoAssistant/MiniGames/GoldSaucerTimes.cs`, `tests/TenshoAssistant.Tests/GoldSaucerTimes1233Tests.cs` | `CHANGELOG.md` |
 | [0.1234-aetherial-wheels.md](0.1234-aetherial-wheels.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/WheelReading1234Tests.cs` | `CHANGELOG.md` |
 | [0.1235-racing-chocobo.md](0.1235-racing-chocobo.md) | `src/TenshoAssistant/MiniGames/RaceChocobo.cs` | `CHANGELOG.md` |
+| [0.1236-page-titles.md](0.1236-page-titles.md) | `tests/TenshoAssistant.Tests/GameTitles1236Tests.cs` | `CHANGELOG.md` |
 | [0.126.0-fishing-probe.log](0.126.0-fishing-probe.log) | `src/TenshoAssistant/MainWindow.GatheringGoTo.cs`, `src/TenshoAssistant/Maps/MapLocalIndex.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.127.0-sightseeing-probe.log](0.127.0-sightseeing-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndex.cs`, `tests/TenshoAssistant.Tests/MapLocalIndexTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -279,5 +280,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 267 files · fichiers ; 213 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 268 files · fichiers ; 214 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

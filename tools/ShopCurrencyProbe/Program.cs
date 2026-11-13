@@ -578,6 +578,11 @@ if(Environment.GetEnvironmentVariable("PROBE_RACECHOCOBO") is { Length:>0 })
     foreach(var row in data.Excel.GetSheet<ChocoboRaceAbility>().Take(12))
         Console.WriteLine($"ABILITY {row.RowId} '{abilityEn.GetRowOrDefault(row.RowId)?.Name.ExtractText()}' / '{row.Name.ExtractText()}' value {row.Value} type {row.ChocoboRaceAbilityType.RowId}");
     Console.WriteLine($"ABILITIES {data.Excel.GetSheet<ChocoboRaceAbility>().Count(row=>!row.Name.IsEmpty)}");
+    // 0.1236 (X-260 remark): how the game writes the two page titles.
+    foreach(var row in data.Excel.GetSheet<Addon>(Language.English).Where(row=>row.Text.ExtractText() is var text && (text.Equals("Custom Deliveries",StringComparison.OrdinalIgnoreCase) || text.Contains("Allied Societ",StringComparison.OrdinalIgnoreCase) && text.Length<40)).Take(12))
+        Console.WriteLine($"TITLE {row.RowId} '{row.Text.ExtractText()}'");
+    foreach(var row in data.Excel.GetSheet<MainCommand>(Language.English).Where(row=>row.Name.ExtractText().Contains("Societ",StringComparison.OrdinalIgnoreCase) || row.Name.ExtractText().Contains("Deliver",StringComparison.OrdinalIgnoreCase)))
+        Console.WriteLine($"MAINCOMMAND {row.RowId} '{row.Name.ExtractText()}'");
     var words=new[]{"Maximum Speed","Max Speed","Acceleration","Endurance","Stamina","Cunning","Pedigree","Rating","Hereditary Ability","Learned Ability","Racing Chocobo"};
     var addonFr=data.Excel.GetSheet<Addon>(Language.French);
     foreach(var row in data.Excel.GetSheet<Addon>(Language.English).Where(row=>words.Contains(row.Text.ExtractText())).Take(40))
