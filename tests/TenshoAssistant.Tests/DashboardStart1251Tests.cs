@@ -13,7 +13,7 @@ internal static class DashboardStart1251Tests
             var page=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
             Check(page.Contains("private const long DashboardStartDelayMs=20_000;") && page.Contains("private readonly long dashboardFrom=Environment.TickCount64+DashboardStartDelayMs;"),"20 s from the window's creation");
             Check(page.Contains("private bool DashboardStarted=>Environment.TickCount64-dashboardFrom>=0;"),"compared by difference (no overflow, Timers828Tests)");
-            Check(page.Contains("internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();}"),"the bar and the link wait");
+            Check(page.Contains("internal void TickDashboard(){if(DashboardWanted && DashboardStarted)RefreshDashboard();SampleDashboardHistory();}"),"the bar and the link wait");
             Check(page.Contains("if(windowDisposed || !DashboardStarted)return false;"),"the panel waits");
             var draw=page[page.IndexOf("private void DrawDashboard()",StringComparison.Ordinal)..page.IndexOf("private System.Numerics.Vector4 DashboardColour",StringComparison.Ordinal)];
             Check(!draw.Contains("DashboardStarted") && draw.Contains("RefreshDashboard();"),"the dashboard opened by the player reads at once");

@@ -162,6 +162,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/NavigationLayout.cs" Link="UI/NavigationLayout.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SelectionMark.cs" Link="UI/SelectionMark.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/UiStates.cs" Link="UI/UiStates.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/GaugeMath.cs" Link="UI/GaugeMath.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/IconWait.cs" Link="UI/IconWait.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/Motion.cs" Link="UI/Motion.cs" />
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />

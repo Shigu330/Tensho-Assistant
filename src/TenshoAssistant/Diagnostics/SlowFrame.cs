@@ -11,6 +11,8 @@ public sealed class SlowFrame
     private int frame=-1;
     /// <summary>X-01 (0.1190): the steady state: every part added here also goes to the running totals (one line a minute, developer mode).</summary>
     public SteadyFrames Steady { get; }=new();
+    /// <summary>X-264 (0.1269): how many slow frames were reported this session (each one is a line of the log already).</summary>
+    public int Reported { get; private set; }
 
     public void Add(int currentFrame,string name,double milliseconds)
     {
@@ -23,6 +25,7 @@ public sealed class SlowFrame
     public string? Report(int currentFrame,double total,double gcPauseMs)
     {
         if(total<Limit)return null;
+        Reported++;
         var mine=currentFrame==frame ? parts:[];
         // 0.801 (X-01): ten parts, not four; the four were the nested wholes (all windows, Map, map overlay layout, map canvas) and hid the 0.791 checkpoints.
         // 0.806 (X-01): every part of 1 ms or more (24 at most): ten were still filled by the nested wholes and hid half of the map's checkpoints (20:08:14).

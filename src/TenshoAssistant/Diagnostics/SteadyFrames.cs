@@ -29,6 +29,10 @@ public sealed class SteadyFrames
     // Timers828Tests: never from long.MinValue; -1 = no window started yet.
     private long windowStart=-1;
 
+    /// <summary>X-264 (0.1269): the whole frame over the last finished window (a minute): how many, average, bound of the 95th percentile
+    /// (null: above the last bound), worst. Null until a window with frames has finished. What the dashboard's gauge shows.</summary>
+    public (long Count,double Average,double? P95,double Max)? LastFrame { get; private set; }
+
     public void Add(string name,double milliseconds)
     {
         if(!(milliseconds>=0))return;
@@ -65,6 +69,7 @@ public sealed class SteadyFrames
         var seconds=(nowMs-windowStart)/1000.0;
         windowStart=nowMs;
         if(!parts.TryGetValue(Frame,out var frame) || frame.Count==0){parts.Clear();return null;}
+        LastFrame=(frame.Count,frame.Sum/frame.Count,Percentile95(frame),frame.Max);
         static string One(string name,Part part)
         {
             var bound=Percentile95(part);
