@@ -37,7 +37,8 @@ internal static class VerifyTimes1201Tests
         ("Verify times 1201: wiring: Verify.ps1 says the time of each step in one line before the version; the test run says its slowest tests before the count", () =>
         {
             var verify = File.ReadAllText(Path.GetFullPath("scripts/Verify.ps1")).ReplaceLineEndings("\n");
-            var steps = new[] { "'build'", "'tests'", "'languages'", "'package'", "'desktop publish'", "'desktop pages'", "'desktop zip'", "'desktop update'" };
+            // X-267 (0.1275): the tests run alongside the steps after the build; their step is the wait at the end (and « tests alongside »).
+            var steps = new[] { "'build'", "'languages'", "'package'", "'desktop publish'", "'desktop pages'", "'desktop zip'", "'desktop update'", "'tests'" };
             var last = -1;
             foreach (var step in steps)
             {
@@ -51,8 +52,9 @@ internal static class VerifyTimes1201Tests
             // The measure decided it: the application's folder is still emptied before each publish (about 3 s; no stale file in a package).
             Check(verify.Contains("if (Test-Path -LiteralPath $taskDesktopPackage) { Remove-Item -LiteralPath $taskDesktopPackage -Recurse -Force }\n    & $DotNet publish src/TenshoAssistant.Desktop", StringComparison.Ordinal), "emptied, then published");
             var program = File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/Program.cs")).ReplaceLineEndings("\n");
-            var slowest = program.IndexOf("Console.WriteLine(SlowestTests.Line(testTimes, wholeRun.Elapsed.TotalSeconds));", StringComparison.Ordinal);
-            Check(slowest > 0 && slowest < program.IndexOf("Console.WriteLine($\"{allTests.Length - failures}/{allTests.Length} passed\");", StringComparison.Ordinal), "before the count, which stays the last line");
+            // X-267 (0.1275): the count comes from the parallel run (TestRunner.cs); same order, the count still last.
+            var slowest = program.IndexOf("Console.WriteLine(SlowestTests.Line(run.Times, run.Whole));", StringComparison.Ordinal);
+            Check(slowest > 0 && slowest < program.IndexOf("Console.WriteLine($\"{run.Passed}/{run.Total} passed\");", StringComparison.Ordinal), "before the count, which stays the last line");
         }),
     ];
 }

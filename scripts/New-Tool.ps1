@@ -52,7 +52,7 @@ $changes=@(
     "change  src/TenshoAssistant/MainWindow.cs (enum Page)",
     "change  src/TenshoAssistant/MainWindow.Pages.cs (category $Category)",
     "change  src/TenshoAssistant/Localization/Languages/en.json and fr.json (Navigation.$Name, ${Name}Ui, PageHelp)",
-    "change  tests/TenshoAssistant.Tests/Program.cs and TenshoAssistant.Tests.csproj"
+    "change  tests/TenshoAssistant.Tests/TenshoAssistant.Tests.csproj (the test class is found by itself: Program.cs unchanged)"
 )
 $changes | ForEach-Object {Write-Host $_}
 if($DryRun){Write-Host 'DRY RUN: nothing was written.';return}
@@ -125,12 +125,7 @@ foreach($language in 'en','fr'){
     $text=Replace-Once $text $head "`n  `"${Name}Ui`": {`n    `"Title`": $(Json-Text $row.Title),`n    `"Help`": $(Json-Text $row.Help),`n    `"Count`": $(Json-Text $row.Count)`n  },$head" "$language.json"
     Write-Text $path $text $json.Crlf
 }
-# Tests
-$program=Read-Text (Join-Path $tests 'Program.cs')
-$chain=[regex]::Matches($program.Text,'\.Concat\((\w+)\.Cases\)')
-if($chain.Count -eq 0){throw 'The test list was not found in Program.cs.'}
-$last=$chain[$chain.Count-1].Groups[1].Value
-Write-Text (Join-Path $tests 'Program.cs') (Replace-Once $program.Text ".Concat($last.Cases)" ".Concat($last.Cases).Concat(${Name}Tests.Cases)" 'Program.cs') $program.Crlf
+# Tests: the new class is found by itself (TestRegistry in tests/TenshoAssistant.Tests/TestRunner.cs, since 0.1275): Program.cs is not changed.
 $project=Read-Text (Join-Path $tests 'TenshoAssistant.Tests.csproj')
 $include="    <Compile Include=`"../../src/TenshoAssistant/$Name/*.cs`" Exclude=`"../../src/TenshoAssistant/$Name/*.Dalamud.cs`" Link=`"$Name/%(Filename)%(Extension)`" />`n"
 $anchorProject='    <Compile Include="../../src/TenshoAssistant/Localization/*.cs"'

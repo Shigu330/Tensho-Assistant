@@ -141,14 +141,20 @@ if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
 }
 elseif ($taskSkip) { Write-Output "SKIP checks: version $taskVersionNow already verified green on $($taskStamp.VerifiedAt) with the same sources and documents (-Force to run again)." }
 else {
+$taskTests = $null
 Push-Location $taskRoot
 try {
     & $DotNet build TenshoAssistant.sln -c Release --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
     Add-TaskTime 'build'
-    & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build
-    if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed.' }
-    Add-TaskTime 'tests'
+    # X-267 (0.1275, R36.2): the managed tests (in parallel by class: tests/TenshoAssistant.Tests/TestRunner.cs) run alongside the other
+    # checks (languages, package, the desktop application and its pages), which do not change what they read; waited for after the update
+    # step, their output said then, as before. Measured before (13 November): tests 104.4 s one after the other, then the rest.
+    New-Item -ItemType Directory -Force -Path (Join-Path $taskRoot 'artifacts') | Out-Null
+    $taskTestsOut = Join-Path $taskRoot 'artifacts\tests-output.txt'; $taskTestsErr = Join-Path $taskRoot 'artifacts\tests-errors.txt'
+    $taskTestsClock = [Diagnostics.Stopwatch]::StartNew()
+    $taskTests = Start-Process -FilePath $DotNet -ArgumentList @('run', '--project', 'tests/TenshoAssistant.Tests', '-c', 'Release', '--no-build') -WorkingDirectory $taskRoot -NoNewWindow -PassThru -RedirectStandardOutput $taskTestsOut -RedirectStandardError $taskTestsErr
+    $null = $taskTests.Handle   # kept, so that its exit code can be read once it ended
     # 0.323: the validator's report (MISSING / UNKNOWN keys) is shown when it fails; it was always discarded.
     $taskLanguages = & $DotNet run --project tests/TenshoAssistant.Tests -c Release --no-build -- --validate-localization src/TenshoAssistant/Localization/Languages
     if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
@@ -279,6 +285,12 @@ try {
     if ($taskUpdateCode -ne 0) { $taskUpdate | ForEach-Object { Write-Host "  desktop: $_" }; throw "Desktop update selftest failed (exit $taskUpdateCode): the app could not install, hand over to or go back from a fake release of $taskProjectVersion." }
     Write-Output "PASS desktop update: $taskDesktopHash written; the packaged exe installed a fake release $taskFakeTag beside, handed over, went back, refused a damaged zip"
     Add-TaskTime 'desktop update'
+    $taskTests.WaitForExit(); $taskTestsClock.Stop()
+    Get-Content -LiteralPath $taskTestsOut -Encoding UTF8 | ForEach-Object { Write-Output $_ }
+    Get-Content -LiteralPath $taskTestsErr -Encoding UTF8 | ForEach-Object { Write-Output $_ }
+    if ($taskTests.ExitCode -ne 0) { throw 'Managed tests failed.' }
+    Add-TaskTime 'tests'
+    $taskTimes.Add('tests alongside ' + $taskTestsClock.Elapsed.TotalSeconds.ToString('0.0', [Globalization.CultureInfo]::InvariantCulture) + ' s')
     Write-Output ("TIMES " + ($taskTimes -join ', ') + '; whole run ' + $taskWhole.Elapsed.TotalSeconds.ToString('0.0', [Globalization.CultureInfo]::InvariantCulture) + ' s')
     Write-Output "VERSION $taskProjectVersion (DLL $taskAssemblyVersion)"
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $taskStampFile) | Out-Null
@@ -293,7 +305,11 @@ try {
     }
     [ordered]@{ Version = $taskProjectVersion; Fingerprint = $taskFingerprint; Documents = $taskDocuments; Commit = $taskHead; Clean = [bool]($taskClean -and $taskCleanAfter -and $taskHeadAfter -eq $taskHead); Packages = $taskPackages; VerifiedAt = (Get-Date).ToString('s') } | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
-finally { Pop-Location }
+finally {
+    # X-267: a step that failed while the tests ran alongside never leaves them running.
+    if ($taskTests -and -not $taskTests.HasExited) { $taskPrevious = $ErrorActionPreference; $ErrorActionPreference = 'Continue'; & taskkill.exe /T /F /PID $taskTests.Id 2>&1 | Out-Null; $ErrorActionPreference = $taskPrevious; $global:LASTEXITCODE = 0 }
+    Pop-Location
+}
 }
 # Git steps only after everything above passed (scripts/Release.ps1).
 # The git step's exit code is passed on (2 = expected stop such as 'already released'), so commit-release.bat can stop before releasing.

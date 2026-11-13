@@ -31,8 +31,9 @@ internal static class VerifySpeed1202Tests
             Check(TestFilter.Only(tests, []).Length == 3 && TestFilter.Only(tests, ["--only"]).Length == 3 && TestFilter.Only(tests, ["--only", ""]).Length == 3
                 && TestFilter.Only(tests, ["--other", "a"]).Length == 3, "a full run keeps them all");
             var program = File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/Program.cs")).ReplaceLineEndings("\n");
-            var filter = program.IndexOf("allTests = TestFilter.Only(allTests, args);", StringComparison.Ordinal);
-            Check(filter > 0 && filter < program.IndexOf("foreach (var test in allTests)", StringComparison.Ordinal), "wired before the run");
+            // X-267 (0.1275): the run goes by groups (TestRunner.cs); the filter is applied to each group, still before the run.
+            var filter = program.IndexOf("groups = GroupFilter.Only(groups, args);", StringComparison.Ordinal);
+            Check(filter > 0 && filter < program.IndexOf("var run = ParallelTests.Run(groups,", StringComparison.Ordinal), "wired before the run");
         }),
         ("Verify speed 1202: the Universalis pause stays 3 s in every service the plugin makes; only tests shorten it", () =>
         {

@@ -28,8 +28,10 @@ internal static class CacheTests
             Wait(Cache.FlushAsync());Cache.Dispose();
             if(!Directory.Exists(Root))return;
             // This exclusively-owned flat directory contains no subdirectories; no recursive deletion.
-            foreach(var path in Directory.EnumerateFiles(Root))File.Delete(path);
-            Directory.Delete(Root);
+            // X-267 (0.1275): the clean-up never throws: on the CI of 0.1267 a file held an instant by a scanner made it throw, which hid the
+            // test's own result (the exception of a « using » body is replaced by the one of Dispose). A file left behind is only a temporary file.
+            foreach(var path in Directory.EnumerateFiles(Root))TenshoAssistant.AtomicFile.DeleteWhenFree(path);
+            try{Directory.Delete(Root);}catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
         }
     }
     private sealed class Handler(Func<HttpRequestMessage,string> reply):HttpMessageHandler

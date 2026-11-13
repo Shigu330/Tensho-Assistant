@@ -8,15 +8,19 @@ internal static class Tooling323Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Every test class with Cases is registered in the test list (a forgotten one would never run)",()=>
+        // X-267 (0.1275): the hand list of Program.cs is gone: every class is found by itself (TestRegistry). Same aim (a forgotten class
+        // would never run), checked the other way: every type with a « Cases » member is a class the registry runs, and no hand list is back.
+        ("Every test class with Cases is found by the test registry (a forgotten one would never run); Program.cs keeps no hand list",()=>
         {
             var program = File.ReadAllText(Path.Combine(Root,"tests","TenshoAssistant.Tests","Program.cs"));
-            var classes = typeof(Tooling323Tests).Assembly.GetTypes()
-                .Where(type => type.IsAbstract && type.IsSealed && type.GetProperty("Cases",System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static) is not null)
-                .Select(type => type.Name).ToArray();
-            Check(classes.Length >= 50,"test classes found: " + classes.Length);
-            var missing = classes.Where(name => !Regex.IsMatch(program,$@"\b{Regex.Escape(name)}\.Cases\b")).ToArray();
-            Check(missing.Length == 0,"test classes not in the list (add .Concat(<Class>.Cases)): " + string.Join(", ",missing));
+            const System.Reflection.BindingFlags any = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+            var withCases = typeof(Tooling323Tests).Assembly.GetTypes()
+                .Where(type => type.GetProperty("Cases",any) is not null || type.GetField("Cases",any) is not null).Select(type => type.Name).ToArray();
+            var found = TestRegistry.Classes(typeof(Tooling323Tests).Assembly).Select(type => type.Name).ToHashSet();
+            Check(found.Count >= 600,"test classes found: " + found.Count);
+            var missing = withCases.Where(name => !found.Contains(name)).ToArray();
+            Check(missing.Length == 0,"a « Cases » the registry does not run (a static class with a static property or field of tests): " + string.Join(", ",missing));
+            Check(!Regex.IsMatch(program,@"\.Concat\(\w+\.Cases\)"),"no hand list of classes in Program.cs");
         }),
         ("Git ignores per-user and generated files; GitHub templates live in .github",()=>
         {

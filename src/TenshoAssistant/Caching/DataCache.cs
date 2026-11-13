@@ -113,7 +113,8 @@ public sealed class DataCache : IDisposable
                         if(bytes.Length>MaximumEntryBytes)throw new InvalidDataException("Cache snapshot exceeds size limit.");
                         Directory.CreateDirectory(root);temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
                         await File.WriteAllBytesAsync(temporary,bytes,token).ConfigureAwait(false);
-                        File.Move(temporary,path,true);temporary=null;
+                        // X-267 (0.1275): tried again while a scanner holds the new file or the old one an instant (a lost write before).
+                        AtomicFile.OverwriteWhenFree(temporary,path);temporary=null;
                         moved=Trim();Volatile.Write(ref error,null);
                     }
                     finally{io.Release();}
@@ -121,7 +122,7 @@ public sealed class DataCache : IDisposable
                     return true;
                 }
                 catch(Exception failure){if(failure is not OperationCanceledException)Volatile.Write(ref error,"Local cache not saved: "+failure.Message);return false;}
-                finally{if(temporary is not null)try{File.Delete(temporary);}catch(Exception cleanup) when(cleanup is IOException or UnauthorizedAccessException){} }
+                finally{if(temporary is not null)AtomicFile.DeleteWhenFree(temporary);}
             });
             writes=pending;return pending;
         }

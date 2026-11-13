@@ -44,6 +44,9 @@ internal static class SettingsSaver1164Tests
         return (saver, live, disk, warnings, game);
     }
     private static void Until(Func<bool> done) { var limit = Environment.TickCount64 + 10_000; while (!done() && Environment.TickCount64 < limit) Thread.Sleep(5); }
+    // X-267 (0.1275, failed once in five parallel runs: « said once: 0 »): the saver turns « Direct » on under its lock, then says it, outside
+    // the lock; the test read the warnings in between. It now waits for the warning too (still exactly one), read under the list's lock.
+    private static int Said(List<string> warnings) { Until(() => { lock (warnings) return warnings.Count > 0; }); lock (warnings) return warnings.Count; }
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
@@ -87,7 +90,8 @@ internal static class SettingsSaver1164Tests
             disk.Fail = copy => copy.Version == 2;
             live.Version = 1; saver.Save(); Until(() => disk.Last == 1);
             live.Version = 2; saver.Save(); Until(() => saver.Direct);
-            Check(saver.Direct && warnings.Count == 1, "said once: " + warnings.Count);
+            var said = Said(warnings);
+            Check(saver.Direct && said == 1, "said once: " + said);
             disk.Fail = null;
             live.Version = 5;
             Until(() => !game.IsEmpty);
@@ -97,7 +101,7 @@ internal static class SettingsSaver1164Tests
             Check(disk.Last == 6 && disk.Writes.Last().Thread == Environment.CurrentManagedThreadId, "then saved directly, as before");
             disk.Fail = _ => true;
             var thrown = false; try { saver.Save(); } catch (IOException) { thrown = true; }
-            Check(thrown && warnings.Count == 1, "a direct save fails as before, to its caller; not said again");
+            Check(thrown && Said(warnings) == 1, "a direct save fails as before, to its caller; not said again");
         }),
         ("Settings saver 1164: a copy that does not give the same text is never written", () =>
         {
@@ -107,7 +111,7 @@ internal static class SettingsSaver1164Tests
             Check(disk.Writes.IsEmpty, "the copy that lost a note is not written");
             Until(() => !game.IsEmpty);
             while (game.TryDequeue(out var onGame)) onGame();
-            Check(disk.Last == 7 && warnings.Count == 1, "the live settings written on the game's thread instead");
+            Check(disk.Last == 7 && Said(warnings) == 1, "the live settings written on the game's thread instead");
         }),
         ("Settings saver 1164: unload writes what is left; a write still running after the wait does not stop the last save", () =>
         {

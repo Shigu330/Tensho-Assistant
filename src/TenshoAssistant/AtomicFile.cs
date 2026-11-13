@@ -17,13 +17,25 @@ public static class AtomicFile
         try
         {
             File.WriteAllBytes(temporary,bytes);
-            File.Move(temporary,path,true);
+            OverwriteWhenFree(temporary,path);
         }
-        finally
+        finally{DeleteWhenFree(temporary);}
+    }
+
+    /// <summary>
+    /// X-267 (0.1275, CI of 0.1267 red: « Disk cache survives a new instance… »): a file just written, or the one it replaces, can be held
+    /// for an instant by another program (a scanner reading it): the move over the old file is tried again a few times before it is given
+    /// up. Only while the new file is still there: a failed attempt changed nothing. « wait » is the test's clock (told the attempt that failed).
+    /// </summary>
+    public static void OverwriteWhenFree(string from,string to,int attempts=6,Action<int>? wait=null)
+    {
+        for(var attempt=1;;attempt++)
         {
-            try{if(File.Exists(temporary))File.Delete(temporary);}
-            catch(IOException){}
-            catch(UnauthorizedAccessException){}
+            try{File.Move(from,to,true);return;}
+            catch(Exception error) when(attempt<attempts && error is IOException or UnauthorizedAccessException && File.Exists(from))
+            {
+                if(wait is not null)wait(attempt);else Thread.Sleep(50*attempt);
+            }
         }
     }
 
