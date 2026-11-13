@@ -24,6 +24,14 @@ internal sealed partial class MainWindow
             Page("Eureka and Bozja",()=>Task.FromResult(FieldCatalogLoad?.Invoke() is { } field && field.Zones.Sum(zone=>zone.Events.Count)>0
                 ? Diagnostics.SelfCheck.Ok("Eureka and Bozja",$"{string.Join("+",field.Zones.Select(zone=>zone.Events.Count))} places, {field.Records.Count} records, {field.Actions.Count} actions, {field.OccultJobs.Count} phantom jobs")
                 :Diagnostics.SelfCheck.Failed("Eureka and Bozja","nothing read"))),
+            // X-205 (0.1241): the community table of Eureka's notorious monsters against the game's files (R06): each FATE among its zone's
+            // FATEs, each weather among its zone's weathers.
+            Page("Eureka notorious monsters",()=>Task.FromResult(FieldCatalogLoad?.Invoke() is not { } field || weather.State.Catalog is not { } weathers
+                ? Diagnostics.SelfCheck.NotRead("Eureka notorious monsters","game files or weather catalogue not read yet")
+                :Fields.EurekaNotoriousBoard.Mismatches((territory,fate)=>field.Zones.Any(zone=>zone.Territory==territory && zone.Events.Any(row=>row.Kind==Fields.FieldEventKind.Fate && row.Id==fate)),
+                    (territory,id)=>weathers.Zone(territory)?.Shares.Any(share=>share.WeatherId==id)==true) is { Count:>0 } wrong
+                    ? Diagnostics.SelfCheck.Suspect("Eureka notorious monsters",string.Join("; ",wrong))
+                    :Diagnostics.SelfCheck.Ok("Eureka notorious monsters",$"{Fields.EurekaNotoriousBoard.All.Count} monsters, their FATEs and weathers found in the game's files"))),
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")
                 :Diagnostics.SelfCheck.Failed("FATEs","nothing read"))),

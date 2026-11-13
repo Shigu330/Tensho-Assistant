@@ -47,6 +47,9 @@ internal sealed partial class MainWindow
             ("Records",localization.Get("FieldContent.TabRecords"),()=>DrawFieldRecords(catalog)),
             ("Actions",localization.Get("FieldContent.TabActions"),()=>DrawFieldActions(catalog)),
         };
+        // X-205 (0.1241): Eureka's notorious monsters that need a weather or the night (MainWindow.EurekaNotorious.cs).
+        if(catalog.Zones.Any(zone=>EurekaNotoriousBoard.All.Any(monster=>monster.Territory==zone.Territory)))
+            tabs.Add(("Notorious",localization.Get("FieldContent.TabNotorious"),()=>DrawFieldNotorious(catalog)));
         // X-188 (0.1176): the Occult Crescent's phantom jobs, under the island's name (game data).
         if(catalog.OccultJobs.Count>0 && catalog.OccultLabels is { } labels && catalog.Zones.FirstOrDefault(zone=>zone.Use==OccultUse) is { } island)
             tabs.Add(("Occult",island.Name,()=>DrawFieldOccult(catalog.OccultJobs,labels)));

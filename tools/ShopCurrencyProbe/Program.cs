@@ -589,6 +589,24 @@ if(Environment.GetEnvironmentVariable("PROBE_RACECHOCOBO") is { Length:>0 })
         Console.WriteLine($"ADDON {row.RowId} '{row.Text.ExtractText()}' / '{addonFr.GetRowOrDefault(row.RowId)?.Text.ExtractText()}'");
     return;
 }
+// PROBE_EUREKANM (X-205, 0.1241): the four Eureka zones' weathers (TerritoryType → WeatherRate → Weather, English and French) and the
+// FATE rows of the notorious monsters (English and French names, level) whose conditions the plugin cites; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_EUREKANM") is { Length:>0 })
+{
+    var weatherEn=data.Excel.GetSheet<Weather>(Language.English);var weatherFr=data.Excel.GetSheet<Weather>();
+    foreach(var territory in new uint[]{732,763,795,827})
+    {
+        var row=data.Excel.GetSheet<TerritoryType>().GetRow(territory);
+        var rate=data.Excel.GetSheet<WeatherRate>().GetRow(row.WeatherRate.RowId);
+        var cells=Enumerable.Range(0,rate.Weather.Count).Where(i=>rate.Weather[i].RowId!=0)
+            .Select(i=>$"{rate.Weather[i].RowId} '{weatherEn.GetRow(rate.Weather[i].RowId).Name.ExtractText()}'/'{weatherFr.GetRow(rate.Weather[i].RowId).Name.ExtractText()}' <{rate.Rate[i]}");
+        Console.WriteLine($"ZONE {territory} '{row.PlaceName.ValueNullable?.Name.ExtractText()}' rate {row.WeatherRate.RowId}: {string.Join(", ",cells)}");
+    }
+    var fatesEn=data.Excel.GetSheet<Fate>(Language.English);var fates=data.Excel.GetSheet<Fate>();
+    foreach(var id in new uint[]{1329,1331,1336,1338,1343,1345,1355,1359,1360,1362,1364,1365,1369,1388,1389,1392,1393,1399,1403,1404,1418})
+        Console.WriteLine($"FATE {id} '{fatesEn.GetRowOrDefault(id)?.Name.ExtractText()}' / '{fates.GetRowOrDefault(id)?.Name.ExtractText()}' level {fates.GetRowOrDefault(id)?.ClassJobLevel}");
+    return;
+}
 // PROBE_WHEEL (X-225, 0.1234): the aetherial wheels (AetherialWheel: unprimed and primed items, grade, hours required); read-only.
 if(Environment.GetEnvironmentVariable("PROBE_WHEEL") is { Length:>0 })
 {
