@@ -1368,10 +1368,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1137) Monde › Découvertes, connecté à GitHub, « Échanger maintenant » : message sans erreur ; sur github.com, votre gist contient index.json et des fichiers kind-NN.jsonl.gz.b64, plus l'ancien tensho-discoveries.b64 ; un deuxième échange sans nouveau relevé n'envoie rien (« déjà envoyé »)
 
 
-- [ ] (0.1139) Stockage › Journal des gils, après la mise à jour : les entrées d'avant sont toutes là ; dalamud.log dit « Gil journal: SQLite … data file TenshoData.db » puis « a character's file of before moved to TenshoData.db » ; GilJournal/before-sqlite-<date>/ contient l'ancien fichier
+- [x] (0.1139) Stockage › Journal des gils, après la mise à jour : les entrées d'avant sont toutes là ; dalamud.log dit « Gil journal: SQLite … data file TenshoData.db » puis « a character's file of before moved to TenshoData.db » ; GilJournal/before-sqlite-<date>/ contient l'ancien fichier
 
 
-- [ ] (0.1140) Collection › Succès, après la mise à jour : la progression vue avant est toujours là ; dalamud.log dit « Tensho data: the achievement progress file of before moved to TenshoData.db » ; before-sqlite-<date>/AchievementProgress.json existe à la racine du dossier du plugin
+- [x] (0.1140) Collection › Succès, après la mise à jour : la progression vue avant est toujours là ; dalamud.log dit « Tensho data: the achievement progress file of before moved to TenshoData.db » ; before-sqlite-<date>/AchievementProgress.json existe à la racine du dossier du plugin
 
 
 
@@ -1392,7 +1392,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1150) Jeu : Collection › Succès, le bouton « Demander » est toujours là et marche comme avant
+- [x] (0.1150) Jeu : Collection › Succès, le bouton « Demander » est toujours là et marche comme avant
 
 
 
@@ -1427,11 +1427,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1168) Application de bureau, page Alarmes : alarme manuelle grisée ; page Paramètres : changer un réglage le remet aussitôt et le bas de la fenêtre dit « Non enregistré : … faites ce changement dans le jeu »
 
-- [ ] (0.1168) Dans le jeu : créer une alarme, un outil et un préréglage d'artisanat fonctionne comme avant (rien de grisé)
+- [x] (0.1168) Dans le jeu : créer une alarme, un outil et un préréglage d'artisanat fonctionne comme avant (rien de grisé)
 
 - [ ] (0.1169) Atelier de la compagnie (sous-marins revenus) : l'historique des voyages garde les voyages d'avant après un rechargement du plugin, et les nouveaux s'ajoutent
 
-- [ ] (0.1169) Hauts faits suivis : la progression lue reste après un rechargement ; dalamud.log sans erreur « Tensho data »
+- [x] (0.1169) Hauts faits suivis : la progression lue reste après un rechargement ; dalamud.log sans erreur « Tensho data »
 
 - [ ] (0.1171) Monde › Découvertes, échange GitHub connecté : « Échanger » envoie toujours ; « Déconnecter » efface la connexion (plus de nom affiché) ; dalamud.log sans erreur GitHub
 
@@ -1522,7 +1522,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1223) Tensho en anglais : pages Compagnie libre (Submersible), Grandes compagnies (rank), infobulles « On: / Off: », orthographe britannique ; rien de cassé dans les infobulles et les boutons « Refresh »
 
-- [ ] (0.1226) Paramètres › Général : activer « Sacs », « État de l'équipement » et « Zone et instance » dans la barre serveur ; les trois entrées apparaissent, se mettent à jour (ramasser un objet, changer de zone), clic : Rangements, Équipement, carte
+- [x] (0.1226) Paramètres › Général : activer « Sacs », « État de l'équipement » et « Zone et instance » dans la barre serveur ; les trois entrées apparaissent, se mettent à jour (ramasser un objet, changer de zone), clic : Rangements, Équipement, carte
 
 - [ ] (0.1226) Zone à instances (instance 2 par exemple) : la marque d'instance du jeu suit le nom de la zone ; hors instance : le nom seul
 
@@ -1556,9 +1556,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1238) Application de bureau : elle s'ouvre, la navigation n'a pas les pages laissées au jeu, une page se choisit, une alarme due sonne avec sa notification Windows ; sa console ne dit ni « Contract » ni « Typed contract »
 
-- [ ] (0.1239) Chargement et déchargement du plugin (désactiver puis réactiver dans Dalamud) : aucune erreur Tensho dans dalamud.log ; la banque (Rangements) garde ses sacs et ses servants
+- [x] (0.1239) Chargement et déchargement du plugin (désactiver puis réactiver dans Dalamud) : aucune erreur Tensho dans dalamud.log ; la banque (Rangements) garde ses sacs et ses servants
 
-- [ ] (0.1240) Barre serveur : alarmes, rappels, monnaies, gils et entrées facultatives au même endroit qu'avant, info-bulles et clics comme avant ; désactiver puis réactiver le plugin : aucune erreur Tensho dans dalamud.log
+- [x] (0.1240) Barre serveur : alarmes, rappels, monnaies, gils et entrées facultatives au même endroit qu'avant, info-bulles et clics comme avant ; désactiver puis réactiver le plugin : aucune erreur Tensho dans dalamud.log
 
 - [ ] (0.1241) Eurêka et Bozja › Météo et nuit : les quatre zones d'Eurêka, noms d'ALEA et de météo du jeu, une prochaine fenêtre par ligne ; en Eurêka, la fenêtre « maintenant » concorde avec la météo affichée par le jeu
 
@@ -1576,11 +1576,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1244) Mode développeur, Diagnostics : la section « Tableau de bord » en tête, état général et neuf lignes ; les valeurs bougent une fois par seconde ; repliée, rien ne change
 
-- [ ] (0.1245) Paramètres › Général : cocher « État de Tensho dans la barre serveur » : « Tensho : ok · … Mo » dans la barre du jeu, info-bulle avec les lignes, clic qui ouvre les paramètres ; le tableau de bord s'affiche sous le réglage
+- [x] (0.1245) Paramètres › Général : cocher « État de Tensho dans la barre serveur » : « Tensho : ok · … Mo » dans la barre du jeu, info-bulle avec les lignes, clic qui ouvre les paramètres ; le tableau de bord s'affiche sous le réglage
 
-- [ ] (0.1245) « Seulement en cas de souci » coché : l'entrée disparaît tant que tout va bien
+- [x] (0.1245) « Seulement en cas de souci » coché : l'entrée disparaît tant que tout va bien
 
-- [ ] (0.1246) Paramètres › Général : cocher « État de Tensho dans un panneau » : petit panneau « Tensho : ok · … Mo » déplaçable, bouton Détails qui ouvre les paramètres ; avec « Seulement en cas de souci », le panneau disparaît tant que tout va bien
+- [x] (0.1246) Paramètres › Général : cocher « État de Tensho dans un panneau » : petit panneau « Tensho : ok · … Mo » déplaçable, bouton Détails qui ouvre les paramètres ; avec « Seulement en cas de souci », le panneau disparaît tant que tout va bien
 
 - [ ] (0.1246) Application de bureau reliée au jeu (Paramètres › Avancé) : la barre d'état dit « Tensho : ok · … Mo » après la zone ; Paramètres › Général de l'application montre « En jeu : … » dans le tableau de bord
 
@@ -1709,6 +1709,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1272) Avec un style Dalamud clair (réglages de Dalamud › Apparence) et l'option cochée : titres et repères lisibles sur fond clair
 
+
+- [ ] (0.1279) Au lancement du jeu (ou après une mise à jour de Tensho), les panneaux et barres libres de Tensho apparaissent 1 à 3 s après, sans petit gel de l'image au moment où ils arrivent.
 
 **0.535 : interfaces** — à voir en jouant
 
