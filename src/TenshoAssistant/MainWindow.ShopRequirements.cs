@@ -12,18 +12,17 @@ internal sealed partial class MainWindow
 {
     internal Func<uint,string?>? QuestNameOf { get; set; }
     internal Func<uint,string?>? AchievementNameOf { get; set; }
-    private (IReadOnlyList<QuestEntry> Source,Dictionary<uint,QuestProgress> Progress)? shopQuests;
     private (IReadOnlyList<CollectionEntry> Source,Dictionary<uint,bool> Done)? shopAchievements;
 
     // 0.703: what is known of a sale's quest and achievement: true met, false not met, null not read or none.
     private (bool? Quest,bool? Achievement) SaleRequirementState(NpcShopSale sale)
     {
-        var journal=quests.State.Entries;
-        if(!ReferenceEquals(shopQuests?.Source,journal))shopQuests=(journal,journal.GroupBy(entry=>entry.Id).ToDictionary(group=>group.Key,group=>group.First().Progress));
+        // X-01 C5 (0.1237): the service's index, built off the frame; null while it builds: not read yet.
+        var byId=quests.State.ById;
         var collected=collections.State.Entries;
         if(!ReferenceEquals(shopAchievements?.Source,collected))
             shopAchievements=(collected,collected.Where(entry=>entry.Kind==CollectionKind.Achievement).GroupBy(entry=>entry.Id).ToDictionary(group=>group.Key,group=>group.First().ConfirmedUnlocked));
-        bool? quest=sale.QuestRequired!=0 && shopQuests.Value.Progress.TryGetValue(sale.QuestRequired,out var progress) ? progress==QuestProgress.Complete ? true:quests.State.CharacterId==0 ? null:false:null;
+        bool? quest=sale.QuestRequired!=0 && byId is not null && byId.TryGetValue(sale.QuestRequired,out var found) ? found.Progress==QuestProgress.Complete ? true:quests.State.CharacterId==0 ? null:false:null;
         bool? achievement=sale.AchievementRequired!=0 && shopAchievements.Value.Done.TryGetValue(sale.AchievementRequired,out var done) && done ? true:null;
         return (quest,achievement);
     }

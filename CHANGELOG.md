@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1237.0
+- Plan global, X-01 : X-01 C5, suite : le journal des quêtes se consulte par identifiant dans un index que QuestService construit hors de l'image, avec l'index des récompenses (QuestState.ById, dictionnaire figé ; le premier d'un identifiant répété gardé, jamais d'exception) ; les pages Événements et conditions des boutiques (quête exigée) ne construisent plus leur propre dictionnaire dans l'image à chaque changement du journal (5 000 entrées environ). Tant que l'index se construit, et après une déconnexion, il vaut null : « pas lu », comme avant la lecture. Test : QuestIndex1237Tests (comportement : construit sur un autre fil, nul avant et après une déconnexion).
+- Tests : QuestIndex1237Tests. Verify.ps1 (agent) : 2218/2218, 0 avertissement, 0 erreur ; DLL 0.1237.0.0. Non validé en jeu.
+### English
+- X-01 C5, continued: the quest journal is looked up by id in an index QuestService builds off the frame, with the reward index (QuestState.ById, a frozen dictionary; the first of a repeated id kept, never an exception); the Events page and the shop requirements (quest required) no longer build their own dictionary in the frame each time the journal changes (about 5,000 entries). While the index builds, and after a logout, it is null: « not read », as before the reading. Test: QuestIndex1237Tests (behaviour: built on another thread, null before and after a logout).
+
 ## 0.1236.0
 - Remarque de X-260 : les titres anglais « Allied Societies » et « Custom Deliveries » (titres des pages, navigation, aide, README) prennent les majuscules du jeu (Addon 5700 « Custom Deliveries », 17052 « Allied Society », lus par la sonde PROBE_RACECHOCOBO, bloc TITLE ; preuve docs/evidence/0.1236-page-titles.md). Les phrases qui les nomment en passant gardent la prose ordinaire. Test : GameTitles1236Tests.
 - Tests : GameTitles1236Tests. Verify.ps1 (agent) : 2215/2215, 0 avertissement, 0 erreur ; DLL 0.1236.0.0. Non validé en jeu.

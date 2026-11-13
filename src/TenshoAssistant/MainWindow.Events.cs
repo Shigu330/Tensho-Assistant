@@ -21,7 +21,6 @@ internal sealed partial class MainWindow
     private (NpcVendorCatalog Catalog,FestivalLayouts Layouts)? eventShopKey;
     private readonly Dictionary<uint,(NpcVendor Vendor,string Places,NpcShopSale[] Sales)[]> eventShops=[];
     // Quests by id, rebuilt only when the quest journal copy changes (the Quests page keeps its own index, refreshed only while shown).
-    private (IReadOnlyList<QuestEntry> Source,Dictionary<uint,QuestEntry> ById)? eventQuests;
 
     private void DrawEventsPage()
     {
@@ -116,11 +115,11 @@ internal sealed partial class MainWindow
     private void DrawFestivalQuests(IReadOnlyList<uint> ids)
     {
         var items=itemCatalog.State.Catalog;
-        var journal=quests.State.Entries;
-        if(!ReferenceEquals(eventQuests?.Source,journal))eventQuests=(journal,journal.ToDictionary(entry=>entry.Id));
+        // X-01 C5 (0.1237): looked up in the service's index, built off the frame (null for a moment after the journal changes: not read yet).
+        var byId=quests.State.ById;
         foreach(var id in ids)
         {
-            var entry=eventQuests.Value.ById.GetValueOrDefault(id);
+            var entry=byId?.GetValueOrDefault(id);
             ImGui.PushFont(UiBuilder.IconFont);
             try
             {

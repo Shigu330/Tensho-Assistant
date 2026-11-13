@@ -28,8 +28,19 @@ public sealed record QuestEntry(uint Id, string Name, string Category, uint Icon
     public QuestRewardSnapshot? Rewards {get;init;}
     public string? RewardsError {get;init;}
 }
+/// <param name="ById">X-01 C5 (0.1237): the entries by quest id, built off the frame with the reward index (null until then, and after a logout):
+/// the pages look a quest up there instead of building their own dictionary in the frame each time the journal changes.</param>
 public sealed record QuestState(ulong CharacterId, DateTimeOffset? ObservedAt, IReadOnlyList<QuestEntry> Entries, bool Loading, string? Error,
-    QuestRewardIndex? RewardIndex=null,bool RewardIndexLoading=false,string? RewardIndexError=null,bool FromCache=false);
+    QuestRewardIndex? RewardIndex=null,bool RewardIndexLoading=false,string? RewardIndexError=null,bool FromCache=false,IReadOnlyDictionary<uint,QuestEntry>? ById=null)
+{
+    /// <summary>The first entry of each id (the journal can hold an id once only; a repeat is kept out, never thrown).</summary>
+    public static IReadOnlyDictionary<uint,QuestEntry> Index(IReadOnlyList<QuestEntry> entries)
+    {
+        var byId=new Dictionary<uint,QuestEntry>(entries.Count);
+        foreach(var entry in entries)byId.TryAdd(entry.Id,entry);
+        return System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(byId);
+    }
+}
 
 /// <summary>One immutable, direct-link index per published observation. No recursive traversal.</summary>
 public sealed class QuestLinks
@@ -100,14 +111,16 @@ public sealed class QuestService : IDisposable
         {
             var result=await buildIndex(expected.Entries,cancellation.Token).ConfigureAwait(false);
             if(result is null)throw new InvalidDataException("No quest reward index produced.");
+            var byId=QuestState.Index(expected.Entries);
             lock(gate)if(!disposed && version==generation && !cancellation.IsCancellationRequested && ReferenceEquals(state,expected))
-                Interlocked.Exchange(ref state,expected with {RewardIndex=result,RewardIndexLoading=false});
+                Interlocked.Exchange(ref state,expected with {RewardIndex=result,RewardIndexLoading=false,ById=byId});
         }
         catch(OperationCanceledException) when(cancellation.IsCancellationRequested){}
         catch(Exception error)
         {
+            var byId=QuestState.Index(expected.Entries);
             lock(gate)if(!disposed && version==generation && ReferenceEquals(state,expected))
-                Interlocked.Exchange(ref state,expected with {RewardIndexLoading=false,RewardIndexError=error.Message});
+                Interlocked.Exchange(ref state,expected with {RewardIndexLoading=false,RewardIndexError=error.Message,ById=byId});
         }
         finally
         {
