@@ -279,8 +279,48 @@ public sealed class SeenPriceStore
     }
 
     public static List<SeenMarketEntry>? Read(string path)=>File.Exists(path) && new FileInfo(path).Length<=64L*1024*1024 ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
+    /// <summary>
+    /// X-171 (0.1216, audit of 12/11, R02): two game clients on one profile each held the file's entries of the start and wrote back their whole
+    /// copy: the second write erased what the first client had seen since. The write now holds the profile's lock file (« .lock » beside it) and
+    /// joins what the file holds at that moment (Joined) before replacing it; a file that cannot be read is replaced by this client's entries, as before.
+    /// </summary>
     public static void Write(string path,List<SeenMarketEntry> entries)
     {
-        AtomicFile.Write(path,JsonSerializer.Serialize(entries));
+        using var held=HoldLock(path+".lock");
+        List<SeenMarketEntry>? onDisk;
+        try{onDisk=Read(path);}
+        catch(Exception error) when(error is IOException or JsonException or UnauthorizedAccessException){onDisk=null;}
+        AtomicFile.Write(path,JsonSerializer.Serialize(Joined(entries,onDisk,DateTimeOffset.UtcNow)));
+    }
+
+    /// <summary>
+    /// X-171 (0.1216): this client's entries joined with the file's: an item and world seen by one client only is kept; seen by both, the offers of the
+    /// newer reading and the sales of both without twins (SeenPrices.MergeSales: writing the same entries again never doubles a sale); nothing older
+    /// than KeptFor taken from the file; at most MaxEntries, the most recently seen.
+    /// </summary>
+    public static List<SeenMarketEntry> Joined(IReadOnlyList<SeenMarketEntry> mine,IReadOnlyList<SeenMarketEntry>? onDisk,DateTimeOffset now)
+    {
+        var all=new Dictionary<(uint World,uint Item),SeenMarketEntry>();
+        foreach(var entry in mine)all[(entry.World,entry.Item)]=entry;
+        foreach(var other in onDisk ?? [])
+        {
+            if(other is null || other.World==0 || other.Item==0 || now-other.Seen>SeenPrices.KeptFor)continue;
+            if(!all.TryGetValue((other.World,other.Item),out var kept)){all[(other.World,other.Item)]=other;continue;}
+            var newer=other.ListingsAt>kept.ListingsAt ? other:kept;
+            all[(other.World,other.Item)]=new SeenMarketEntry{World=kept.World,Item=kept.Item,Listings=[..newer.Listings],ListingsAt=newer.ListingsAt,
+                ListingsRequest=newer.ListingsRequest,OwnKnown=newer.OwnKnown,Sales=SeenPrices.MergeSales(kept.Sales,other.Sales,now),
+                SalesAt=kept.SalesAt>other.SalesAt ? kept.SalesAt:other.SalesAt};
+        }
+        return all.Values.OrderByDescending(entry=>entry.Seen).ThenBy(entry=>entry.World).ThenBy(entry=>entry.Item).Take(MaxEntries).ToList();
+    }
+
+    // The lock file held for the read and the write (FileShare.None): the other client waits for it, 10 s at most, then the save fails and is kept.
+    private static FileStream HoldLock(string path)
+    {
+        for(var attempt=0;;attempt++)
+        {
+            try{return new FileStream(path,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
+            catch(IOException) when(attempt<100){Thread.Sleep(100);}
+        }
     }
 }
