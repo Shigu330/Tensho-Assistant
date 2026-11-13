@@ -206,5 +206,27 @@ internal static class DesktopInstall1117Tests
                 Check(text.Contains("\"DesktopInstallErrorFolder\": ") && text.Contains("\"UpdateErrorFolder\": "),"refusal texts in "+lang);
             }
         }),
+        // 0.1209 (X-184 N20, night review of 12/11): CheckCopy looks at the exe and the two DLLs only; a free copy is now kept only when its
+        // marker names the package just checked (its SHA-256), else replaced. Behaviour test (R28): real folders, a real package and install.
+        ("Desktop install 1209: behaviour: a free copy of the version whose marker names another package (a file missing the check does not see) is replaced; one in use is kept",() => InTemp(temp =>
+        {
+            var (zip,version)=Package(temp);var three=DesktopVersionCheck.Three(version);var tag=DesktopUpdate.Tag(version);
+            var own=Path.Combine(temp,"own");var folder=Path.Combine(temp,"apps");var target=Path.Combine(folder,three);
+            var (first,_)=Install(own,folder,new FakeSource(tag,zip),version);
+            var marker=Path.Combine(target,DesktopInstall.Marker);var good=File.ReadAllText(marker);
+            Check(first is not null && good.EndsWith(Convert.ToHexString(SHA256.HashData(zip)).ToLowerInvariant(),StringComparison.Ordinal),"the marker names the package's SHA-256");
+            // Damaged as N20 says: a file outside the check gone, the marker of another package (an older build of the same number).
+            File.WriteAllText(Path.Combine(target,"hostfxr.dll"),"runtime");
+            var (again,_)=Install(own,folder,new FakeSource(tag,zip),version);
+            Check(again is not null && File.Exists(Path.Combine(target,"hostfxr.dll")),"same package: kept as it is");
+            File.Delete(Path.Combine(target,"hostfxr.dll"));File.WriteAllText(marker,three+" "+new string('0',64));
+            var (repaired,steps)=Install(own,folder,new FakeSource(tag,zip),version);
+            Check(repaired is not null && File.ReadAllText(marker)==good && NoLeftovers(own,folder),"another package's copy, free: replaced by the one checked: "+string.Join(",",steps));
+            // In use (recorded as Current): never replaced, still kept when it passes the check.
+            File.WriteAllText(marker,three+" "+new string('0',64));
+            DesktopInstall.Update(own,_=>new UpdateState(Current:new InstalledCopy(three,target)));
+            var (kept,_)=Install(own,folder,new FakeSource(tag,zip),version);
+            Check(kept is not null && File.ReadAllText(marker)!=good,"the copy in use is never replaced");
+        })),
     ];
 }

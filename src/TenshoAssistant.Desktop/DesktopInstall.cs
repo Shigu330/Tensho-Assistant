@@ -265,13 +265,23 @@ public static class DesktopInstall
         if(File.Exists(target))return Placement.Refused;
         var inUse=state is null || DesktopUpdate.SameFolder(target,state.Current?.Folder) || DesktopUpdate.SameFolder(target,state.Previous?.Folder) || DesktopUpdate.SameFolder(target,runningFolder);
         if(!inUse && !File.Exists(Path.Combine(target,Marker)))return Placement.Refused;
-        if(CheckCopy(target,version) is null)return Placement.Kept;
+        // X-184 N20 (0.1209, night review of 12/11): a free copy is kept only when its marker names the very package just checked (version and
+        // SHA-256): CheckCopy looks at the exe and the two DLLs only, so a copy missing another file (a runtime DLL quarantined by a scanner)
+        // was kept for good and « Install » never repaired it. A copy in use is still never replaced (kept when it passes the check).
+        if(CheckCopy(target,version) is null && (inUse || SameMarker(partial,target)))return Placement.Kept;
         if(inUse)return Placement.Refused;
         var aside=target+"."+Guid.NewGuid().ToString("N")+".old";
         Directory.Move(target,aside);
         Directory.Move(partial,target);
         TryDeleteFolder(aside);
         return Placement.Moved;
+    }
+
+    /// <summary>X-184 N20 (0.1209): the copy in place holds the marker of the package just checked (same version, same SHA-256).</summary>
+    private static bool SameMarker(string partial,string target)
+    {
+        try{return File.ReadAllText(Path.Combine(target,Marker))==File.ReadAllText(Path.Combine(partial,Marker));}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
     }
 
     /// <summary>
