@@ -47,15 +47,16 @@ internal sealed partial class MainWindow
         if(ImGui.InputText(localization.Get("Alarms.EditName")+"##AlarmEditName",ref label,100) && label.Trim().Length>0)alarm.Label=label;
         if(ImGui.IsItemDeactivatedAfterEdit())changed=true;
         Tip("Alarms.EditNameTip");
-        if(alarm.Repeat==AlarmRepeat.Once)
+        // X-280 (0.1288): daily and weekly alarms at a real time too (the « Alarms at a date » form makes them), from their next ringing.
+        if(AlarmSchedule.DateEditable(alarm.Repeat))
         {
-            if(alarmEditDateFor!=alarm.Id){alarmEditDateFor=alarm.Id;alarmEditDate=alarm.At.ToLocalTime().ToString("yyyy-MM-dd HH:mm",System.Globalization.CultureInfo.InvariantCulture);}
+            if(alarmEditDateFor!=alarm.Id){alarmEditDateFor=alarm.Id;alarmEditDate=AlarmSchedule.EditShown(alarm,now).ToLocalTime().ToString("yyyy-MM-dd HH:mm",System.Globalization.CultureInfo.InvariantCulture);}
             ImGui.SetNextItemWidth(160);
             ImGui.InputText(localization.Get("Alarms.EditDate")+"##AlarmEditDate",ref alarmEditDate,20);
             Tip("Alarms.EditDateTip");
             if(WorldClocks.ParseLocal(alarmEditDate,now) is { } moved)
             {
-                if(ImGui.IsItemDeactivatedAfterEdit()){alarm.At=moved;alarm.LastOccurrence=default;alarm.LastRung=default;alarm.LastOnTime=default;changed=true;}
+                if(ImGui.IsItemDeactivatedAfterEdit() && AlarmSchedule.Move(alarm,moved)){changed=true;NoteGameCopy([alarm]);}
             }
             else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Alarms.EditDateBad"));
         }

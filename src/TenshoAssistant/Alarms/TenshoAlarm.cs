@@ -154,6 +154,31 @@ public static class AlarmSchedule
         return (AlarmCheck.Fire, occurrence);
     }
 
+    /// <summary>
+    /// X-280 (0.1288): the alarms whose date and time the player can change (« Edit »): one-off, real daily and real weekly, the three
+    /// the « Alarms at a date » form makes with a date (0.577); 0.557 offered the date of a one-off alarm only.
+    /// </summary>
+    public static bool DateEditable(AlarmRepeat repeat) => repeat is AlarmRepeat.Once or AlarmRepeat.RealDaily or AlarmRepeat.RealWeekly;
+
+    /// <summary>X-280 (0.1288): the date shown in the edit field: a one-off alarm's date, a repeating one's next ringing (its first date may be past).</summary>
+    public static DateTimeOffset EditShown(TenshoAlarm alarm, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        return alarm.Repeat == AlarmRepeat.Once ? alarm.At : Next(alarm, now) ?? alarm.At;
+    }
+
+    /// <summary>
+    /// X-280 (0.1288): moves the alarm itself to a new date and time (for a daily or weekly one: its next ringing, so its time of day and
+    /// weekday); what it already rang is forgotten so that the new time rings. The same alarm (same id, nothing added); false when nothing changes.
+    /// </summary>
+    public static bool Move(TenshoAlarm alarm, DateTimeOffset at)
+    {
+        ArgumentNullException.ThrowIfNull(alarm);
+        if (!DateEditable(alarm.Repeat) || alarm.At == at) return false;
+        alarm.At = at; alarm.LastOccurrence = default; alarm.LastRung = default; alarm.LastOnTime = default;
+        return true;
+    }
+
     /// <summary>0.557 (T19): the same alarm once more in a few minutes; the original is left alone.</summary>
     public static TenshoAlarm Snooze(TenshoAlarm alarm, DateTimeOffset now, int minutes)
     {

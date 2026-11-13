@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1288.0
+- Plan global, X-280 : Alarmes : « Modifier » change aussi la date et l'heure d'une alarme quotidienne ou hebdomadaire. Le formulaire « Alarmes à date » crée des alarmes uniques, quotidiennes et hebdomadaires, mais « Modifier » n'offrait le champ de date qu'à une alarme unique : l'heure d'une alarme qui se répète ne pouvait pas changer. Le champ « Date et heure » part de la prochaine sonnerie ; l'alarme elle-même est déplacée (même alarme, rien d'ajouté, son nom, son avance et son envoi Discord gardés) par AlarmSchedule.Move (pure, testée), et sonne ensuite chaque jour à la nouvelle heure ou chaque semaine le nouveau jour.
+- Pour les joueurs : Alarmes : « Modifier » permet maintenant de changer l'heure d'une alarme quotidienne ou hebdomadaire, pas seulement d'une alarme unique.
+- Tests : AlarmEdit1288Tests. Verify.ps1 (agent) : 2370/2370, 0 avertissement, 0 erreur ; DLL 0.1288.0.0. Non validé en jeu.
+### English
+- Alarms: « Edit » also changes the date and time of a daily or weekly alarm. The « Alarms at a date » form makes one-off, daily and weekly alarms, but « Edit » offered the date field to one-off alarms only: a repeating alarm's time could not change. The « Date and time » field starts at the next ringing; the alarm itself is moved (same alarm, nothing added, its name, lead and Discord posting kept) by AlarmSchedule.Move (pure, tested), and then rings every day at the new time or every week on the new day.
+- For players: Alarms: Edit now lets you change the time of a daily or weekly alarm, not only a one-off one.
+
 ## 0.1287.0
 - Plan global, X-278 : Prix au survol : Ctrl+Alt montre bien le nouveau relevé d'Universalis. Le prix affiché venait des prix vus au tableau du marché (X-52 : préférés à Universalis quand ils sont plus récents que son dernier envoi du monde) ; avec la durée de cache des prix réglée sur « jamais », il restait frais, et la réponse d'un Ctrl+Alt s'effaçait de nouveau derrière lui (« Consulté 12-11-26 01:04:37 », lignes des autres mondes anciennes). Un prix redemandé par le joueur (Ctrl+Alt, actualisation de la page Marché) s'affiche désormais tel qu'Universalis l'a rendu, toutes ses lignes ; une consultation ordinaire garde la préférence pour un relevé plus récent au tableau. Chaque Ctrl+Alt laisse une ligne au journal (« Hover price refresh (Ctrl+Alt) : item …, Success / Cooldown… », ou l'objet sans prix du marché) pour la prochaine séance.
 - Pour les joueurs : Prix au survol : Ctrl+Alt affiche bien les nouveaux prix d'Universalis, même pour un objet regardé plus tôt au tableau du marché.
