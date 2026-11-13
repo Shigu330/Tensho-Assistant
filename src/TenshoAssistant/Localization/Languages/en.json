@@ -5507,8 +5507,8 @@
     "SeeTip": "Opens the Bank tab on this character's storages.",
     "Erase": "Erase",
     "EraseConfirm": "Confirm erasing",
-    "EraseTip": "Erases everything Tensho recorded for this character (its file is deleted). A second click confirms.",
-    "EraseCurrentTip": "Erases everything Tensho recorded for the logged-in character; its bags, crystals, currencies and armoury will be recorded again within a few minutes. A second click confirms.",
+    "EraseTip": "Erases what Tensho keeps for this character: its storages, gil journal and achievement progress, and the copies of its former files (the freed space is wiped). The former files shared by every character are kept (InventoryBank.json.migrated, the former achievement file). A second click confirms.",
+    "EraseCurrentTip": "Erases the same for the logged-in character; what this session still holds (bags, crystals, currencies, armoury, gil journal, achievement progress) is recorded again within a few minutes. A second click confirms.",
     "Privacy": "Characters are identified by the local id the game gives the logged-in character, never by the account id; nothing leaves this PC."
   },
   "Undercut": {

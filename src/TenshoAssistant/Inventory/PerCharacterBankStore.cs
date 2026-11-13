@@ -134,6 +134,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 {
                     using var open=opened.Open();
                     Convert(open);
+                    if(change.Erase!=0){EraseEverywhere(open,id);return Array.Empty<BankEntry>();}
                     using var transaction=open.BeginTransaction();
                     var rowsBefore=change.Erase!=0 ? []:Rows(open,transaction,id);
                     var rowsAfter=change.Erase!=0 ? []:change.On(rowsBefore);
@@ -147,6 +148,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     var path=Path.Combine(folder,FileName(id));
                     File.Delete(path);File.Delete(path+".bak");
                     stores.Remove(id);
+                    TenshoDataDatabase.PurgeSetAside(Path.GetDirectoryName(folder)!,id);
                     return Array.Empty<BankEntry>();
                 }
                 var before=Read(id);
@@ -159,6 +161,29 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
             InventoryBankService.ValidateEntries(result);
             return result;
         }
+    }
+
+    /// <summary>
+    /// X-185 (0.1211, night review N10): the player's « Erase this character »: its rows of every family kept per character (storages, gil journal,
+    /// achievement progress) deleted in one transaction with secure_delete on (the freed pages wiped), the journal folded in, then the copies of its
+    /// files of before removed from every before-sqlite-* folder. The former files shared by every character are kept (the tooltip says so).
+    /// </summary>
+    private void EraseEverywhere(SqliteConnection open,ulong id)
+    {
+        var secure=System.Convert.ToInt64(TenshoDataDatabase.Scalar(open,"PRAGMA secure_delete;"),System.Globalization.CultureInfo.InvariantCulture);
+        TenshoDataDatabase.Run(open,"PRAGMA secure_delete=ON;");
+        try
+        {
+            using(var transaction=open.BeginTransaction())
+            {
+                TenshoDataDatabase.EraseCharacter(open,transaction,id);
+                transaction.Commit();
+            }
+            TenshoDataDatabase.Run(open,"PRAGMA wal_checkpoint(TRUNCATE);");
+        }
+        finally{TenshoDataDatabase.Run(open,$"PRAGMA secure_delete={(secure!=0 ? "ON":"OFF")};");}
+        stores.Remove(id);
+        TenshoDataDatabase.PurgeSetAside(Path.GetDirectoryName(folder)!,id);
     }
 
     /// <summary>One character's entries as on disk (a file holding another character's entries fails closed).</summary>

@@ -102,6 +102,45 @@ public sealed class TenshoDataDatabase
     }
 
     /// <summary>The SQLite library's version (for the log).</summary>
+    /// <summary>X-185 (0.1211, N10): the tables that keep rows per character (« Erase this character » empties them all for one).</summary>
+    public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress"];
+
+    /// <summary>X-185 (0.1211, N10): one character's rows of every per-character table, in the caller's transaction.</summary>
+    public static void EraseCharacter(SqliteConnection open,SqliteTransaction transaction,ulong character)
+    {
+        foreach(var table in CharacterTables)
+        {
+            using var delete=open.CreateCommand();
+            delete.Transaction=transaction;delete.CommandText=$"DELETE FROM {table} WHERE character=$character;";
+            delete.Parameters.AddWithValue("$character",unchecked((long)character));
+            delete.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>
+    /// X-185 (0.1211, N10): the copies of one character's files of before (« id.json », « id.json.bak »…) removed from every before-sqlite-* folder
+    /// in the profile folder or one level below it (the bank's and the gil journal's); a file that cannot be removed is left (never an error).
+    /// Returns how many were removed.
+    /// </summary>
+    public static int PurgeSetAside(string root,ulong character)
+    {
+        var name=character.ToString(CultureInfo.InvariantCulture)+".json";var removed=0;
+        if(string.IsNullOrEmpty(root) || !Directory.Exists(root))return 0;
+        try
+        {
+            var kept=Directory.EnumerateDirectories(root,"before-sqlite-*").Concat(Directory.EnumerateDirectories(root).SelectMany(folder=>Directory.EnumerateDirectories(folder,"before-sqlite-*"))).ToArray();
+            foreach(var file in kept.SelectMany(folder=>Directory.EnumerateFiles(folder,"*",SearchOption.AllDirectories)).ToArray())
+            {
+                var own=System.IO.Path.GetFileName(file);
+                if(own!=name && !own.StartsWith(name+".",StringComparison.Ordinal))continue;
+                try{File.Delete(file);removed++;}
+                catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+            }
+        }
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){}
+        return removed;
+    }
+
     public string LibraryVersion(){using var open=Open();return Scalar(open,"SELECT sqlite_version();") as string ?? "";}
 
     /// <summary>

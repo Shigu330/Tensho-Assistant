@@ -5507,8 +5507,8 @@
     "SeeTip": "Ouvre l'onglet Banque sur les rangements de ce personnage.",
     "Erase": "Effacer",
     "EraseConfirm": "Confirmer l'effacement",
-    "EraseTip": "Efface tout ce que Tensho a enregistré pour ce personnage (son fichier est supprimé). Un second clic confirme.",
-    "EraseCurrentTip": "Efface tout ce que Tensho a enregistré pour le personnage connecté ; ses sacs, cristaux, monnaies et arsenal seront relevés de nouveau dans quelques minutes. Un second clic confirme.",
+    "EraseTip": "Efface ce que Tensho garde pour ce personnage : ses rangements, son journal des gils et sa progression des hauts faits, et les copies de ses anciens fichiers (l'espace libéré est remis à zéro). Les anciens fichiers communs à tous les personnages sont gardés (InventoryBank.json.migrated, l'ancien fichier des hauts faits). Un second clic confirme.",
+    "EraseCurrentTip": "Efface la même chose pour le personnage connecté ; ce que cette session garde encore (sacs, cristaux, monnaies, arsenal, journal des gils, progression des hauts faits) est relevé de nouveau dans quelques minutes. Un second clic confirme.",
     "Privacy": "Les personnages sont repérés par l'identifiant local que le jeu donne au personnage connecté, jamais par l'identifiant de compte ; rien ne quitte ce PC."
   },
   "Undercut": {
