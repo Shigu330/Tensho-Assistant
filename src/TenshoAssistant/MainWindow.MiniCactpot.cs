@@ -68,11 +68,37 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
     }
+    // X-223 (0.1233): the next GATE and the next Jumbo Cactpot draw (region of the home world), each with an alarm button.
+    internal Func<uint>? HomeRegion { get; set; }
+    private void DrawGoldSaucerTimes()
+    {
+        var now=DateTimeOffset.UtcNow;
+        var gate=MiniGames.GoldSaucerTimes.NextGate(now);
+        ImGui.TextUnformatted(localization.Format("CactpotUi.NextGate",gate.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((gate-now).TotalMinutes))));
+        Tip("CactpotUi.NextGateTip");
+        ImGui.SameLine();
+        AlarmButton("Gate",localization.Get("CactpotUi.GateAlarmTip"),()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.GateAlarm"),Group=localization.Get("Category.GoldSaucer"),
+            Repeat=Alarms.AlarmRepeat.Once,At=gate,LeadMinutes=Alarms.AlarmSchedule.ClampLead(Alarms.AlarmRepeat.Once,Math.Min(DefaultAlarmLead,5))}]);
+        if(MiniGames.GoldSaucerTimes.NextDraw(HomeRegion?.Invoke() ?? 0,now) is { } draw)
+        {
+            var left=draw-now;
+            ImGui.TextUnformatted(localization.Format("CactpotUi.NextDraw",draw.ToLocalTime().ToString("dddd t",TenshoAssistant.Localization.TenshoCulture.Current),
+                left.TotalHours>=24 ? localization.Format("CactpotUi.InDays",(int)left.TotalDays,left.Hours):localization.Format("CactpotUi.InHours",(int)left.TotalHours,left.Minutes)));
+            Tip("CactpotUi.NextDrawTip");
+            ImGui.SameLine();
+            AlarmButton("JumboDraw",localization.Get("CactpotUi.DrawAlarmTip"),()=>[new Alarms.TenshoAlarm{Label=localization.Get("CactpotUi.DrawAlarm"),Group=localization.Get("Category.GoldSaucer"),
+                Repeat=Alarms.AlarmRepeat.RealWeekly,At=draw,LeadMinutes=Alarms.AlarmSchedule.ClampLead(Alarms.AlarmRepeat.RealWeekly,DefaultAlarmLead)}]);
+        }
+        else ImGui.TextDisabled(localization.Get("CactpotUi.DrawUnknown"));
+        ImGui.Separator();
+    }
+
     private void DrawMiniCactpot()
     {
         DrawMiniCactpotRewards();
         Heading(localization.Get("CactpotUi.Title"),localization.Get("CactpotUi.Description"));
         if(windowDisposed)return;
+        DrawGoldSaucerTimes();
         var observation=cactpotObservation.State;var enabled=observation.Enabled;
         DrawToolSettingsLink("MiniCactpot");
         ImGui.TextDisabled(enabled ? localization.Get("CactpotUi.Observed"):localization.Get("CactpotUi.Manual"));

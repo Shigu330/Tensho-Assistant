@@ -2746,6 +2746,17 @@
     "Source": "Données du jeu · {0} · autres usages possibles hors de ces catalogues"
   },
   "CactpotUi": {
+    "NextGate": "Prochain JACTA : {0} (dans {1} min)",
+    "NextGateTip": "Les JACTA commencent toutes les 20 minutes, à :00, :20 et :40 de chaque heure ; le jeu tire lequel au hasard.",
+    "GateAlarm": "JACTA",
+    "GateAlarmTip": "Une alarme pour ce JACTA seulement.",
+    "NextDraw": "Tirage du Méga Cactpot : {0} ({1})",
+    "NextDrawTip": "Chaque semaine, à une heure fixe selon la région du centre de données de votre monde d'origine, montrée à l'heure de votre PC.",
+    "InDays": "dans {0} j {1} h",
+    "InHours": "dans {0} h {1} min",
+    "DrawAlarm": "Tirage du Méga Cactpot",
+    "DrawAlarmTip": "Une alarme chaque semaine pour le tirage.",
+    "DrawUnknown": "Tirage du Méga Cactpot : heure inconnue pour la région de ce centre de données.",
     "RewardsTitle": "Gains selon la somme de la ligne",
     "RewardsSum": "Somme",
     "RewardsGain": "PGS",

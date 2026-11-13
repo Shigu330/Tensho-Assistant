@@ -732,6 +732,8 @@ public sealed partial class Plugin : IDalamudPlugin
             Gear.GameGearsetReader? gameGearsets=null;
             registrations.Register(()=>gameGearsets=new Gear.GameGearsetReader(framework,client,log,expIndex,jobOrder,expToNext),()=>gameGearsets?.Dispose());
             mainWindow.GearsetSource=gameGearsets;
+            // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
+            mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
             // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.
             Hunting.SRankKillWatcher? srankKills=null;
             registrations.Register(()=>srankKills=new Hunting.SRankKillWatcher(framework,client,objects,chat){Killed=(monster,territory)=>

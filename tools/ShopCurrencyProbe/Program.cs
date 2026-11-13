@@ -567,6 +567,19 @@ if(Environment.GetEnvironmentVariable("PROBE_FESTIVAL") is { Length:>0 })
         Console.WriteLine($"FEST {group.Key} name '{(festivals.TryGetRow(group.Key,out var f) ? f.Name.ExtractText():"?")}' quests {group.Count()}: {string.Join(" | ",group.Take(4).Select(q=>$"{q.RowId} {q.Name.ExtractText()} begin {q.FestivalBegin} end {q.FestivalEnd} gil {q.GilReward} items {string.Join(",",q.Reward.Where(r=>r.RowId!=0).Select(r=>r.RowId).Take(3))}"))}");
     return;
 }
+// PROBE_REGION (X-223, 0.1233): the data centres (WorldDCGroupType) and their region (WorldRegionGroup), for the Jumbo Cactpot's draw time; read-only.
+if(Environment.GetEnvironmentVariable("PROBE_REGION") is { Length:>0 })
+{
+    var regions=data.Excel.GetSheet<WorldRegionGroup>(Language.English);
+    foreach(var row in data.Excel.GetSheet<WorldDCGroupType>(Language.English).Where(row=>!row.Name.IsEmpty))
+        Console.WriteLine($"DC {row.RowId} '{row.Name.ExtractText()}' region {row.Region.RowId} cloud {row.IsCloud}");
+    // The game's own words for GATE and Jumbo Cactpot (Addon), English and French, for the plugin's texts (R09).
+    var addonFr=data.Excel.GetSheet<Addon>(Language.French);
+    foreach(var row in data.Excel.GetSheet<Addon>(Language.English).Where(row=>row.Text.ExtractText() is var text && (text is "GATE" or "GATEs" or "Jumbo Cactpot" || text.StartsWith("Jumbo Cactpot",StringComparison.Ordinal) && text.Length<40)).Take(12))
+        Console.WriteLine($"ADDON {row.RowId} '{row.Text.ExtractText()}' / '{addonFr.GetRowOrDefault(row.RowId)?.Text.ExtractText()}'");
+    foreach(var row in regions)Console.WriteLine($"REGION {row.RowId} {string.Join(" ",typeof(WorldRegionGroup).GetProperties().Where(property=>property.Name is not ("RowId" or "ExcelPage" or "RowOffset")).Select(property=>$"{property.Name}={property.GetValue(row)}"))}");
+    return;
+}
 // PROBE_GRACE (X-221, 0.1231): the statuses named « Grace » (English) with their French names, and the items whose ItemAction gives them
 // (ItemAction.Type and Data columns: which one holds the experience cap); read-only.
 if(Environment.GetEnvironmentVariable("PROBE_GRACE") is { Length:>0 })

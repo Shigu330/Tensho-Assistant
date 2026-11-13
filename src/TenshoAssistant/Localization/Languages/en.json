@@ -2746,6 +2746,17 @@
     "Source": "Game data · {0} · other uses may exist outside these catalogues"
   },
   "CactpotUi": {
+    "NextGate": "Next GATE: {0} (in {1} min)",
+    "NextGateTip": "GATEs start every 20 minutes, at :00, :20 and :40 of each hour; which one is drawn at random by the game.",
+    "GateAlarm": "GATE",
+    "GateAlarmTip": "An alarm for this GATE only.",
+    "NextDraw": "Jumbo Cactpot draw: {0} ({1})",
+    "NextDrawTip": "Every week, at a fixed time for the region of your home world's Data Center, shown in your PC's time.",
+    "InDays": "in {0}d {1}h",
+    "InHours": "in {0}h {1}min",
+    "DrawAlarm": "Jumbo Cactpot draw",
+    "DrawAlarmTip": "A weekly alarm for the draw.",
+    "DrawUnknown": "Jumbo Cactpot draw: time not known for this Data Center's region.",
     "RewardsTitle": "Gains by line sum",
     "RewardsSum": "Sum",
     "RewardsGain": "MGP",
