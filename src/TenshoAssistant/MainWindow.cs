@@ -323,7 +323,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         if(DrawWishAdded())return;
         ImGui.TextDisabled("/tensho");
         ImGui.SameLine();
-        ImGui.TextDisabled(localization.Get("UiFragments.Footer"));
+        // 0.1221 (X-259, first-player review G8): the footer says how retainers and chocobo are really saved (AutoBankCapture).
+        ImGui.TextDisabled(localization.Get(configuration.AutoBankCapture ? "UiFragments.Footer":"UiFragments.FooterManual"));
     }
 
     private void ValidateDrawContext()
