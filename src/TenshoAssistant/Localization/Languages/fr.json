@@ -1855,6 +1855,12 @@
     "Off": "Tensho est en pause ici : JcJ ou contenu classé. Il revient tout seul quand vous en sortez."
   },
   "Home": {
+    "NextDeadline": "Prochaine échéance : {0}, dans {1}",
+    "NextDeadlineTip": "La plus proche de vos alarmes, des retours de vaisseau et des échéances du jardin. Un clic ouvre son outil.",
+    "DeadlineVessel": "retour d'un vaisseau",
+    "DeadlineRipe": "{0} mûr",
+    "DeadlineTend": "entretenir {0}",
+    "TodayLineNext": "Prochaine échéance",
     "TodayTitle": "AUJOURD'HUI",
     "Customize": "Personnaliser",
     "CustomizeTip": "Choisissez les lignes d'« Aujourd'hui » et les tuiles affichées sur cette page.",
@@ -5890,6 +5896,9 @@
     "OnSale": "Souhait en vente : {0} à {1} gils sur {2} (votre prix : {3}).",
     "Title": "Souhaits",
     "Add": "Ajouter à mes souhaits",
+    "InList": "Dans mes souhaits",
+    "InListTip": "Cet objet est dans vos souhaits. Cliquez pour l'en retirer.",
+    "AddTip": "Ajoute cet objet à vos souhaits (page Souhaits).",
     "Remove": "Retirer de mes souhaits",
     "RemoveShort": "Retirer",
     "Full": "Liste de souhaits pleine ({0} objets) : retirez-en un d'abord.",

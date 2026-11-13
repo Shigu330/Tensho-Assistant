@@ -12,7 +12,12 @@ internal sealed partial class MainWindow
     private GameTimerSnapshot? homeTimers;
     private DateTimeOffset homeTodayAt;
     private (string Key,string Text,Page Target,bool Good)[] homeToday=[];
-    private static readonly string[] HomeTodayLines=["Reminders","Finished","Vessels","Quests","Alarms"];
+    private static readonly string[] HomeTodayLines=["Next","Reminders","Finished","Vessels","Quests","Alarms"];
+    // X-155 (0.1261): the nearest deadline, first; a brief outline when another one takes its place (none with reduced motion).
+    private const int HomeNextPulseMs=250;
+    private HomeDeadline? homeNext;
+    private (string Kind,string Label)? homeNextShown;
+    private long homeNextChangedAt=-100_000;
 
     /// <summary>Called with each copy of the game's timers, on the framework thread.</summary>
     private void KeepHomeTimers(GameTimerSnapshot timers)=>Volatile.Write(ref homeTimers,timers);
@@ -33,6 +38,20 @@ internal sealed partial class MainWindow
             .Select(row=>localization.Format("Home.TodayAlarm",row.Label,row.At!.Value.ToLocalTime().ToString("t"))).ToArray();
         if(alarms.Length>0)lines.Add(("Alarms",string.Join(" · ",alarms),Page.Alarms,false));
         homeToday=lines.ToArray();homeTodayAt=now;
+        // X-155 (0.1261): the nearest of the next alarm, the next vessel back and the garden's next tending or harvest (when its reminders are on).
+        var deadlines=new List<HomeDeadline>();
+        if(NextAlarm() is { } nextAlarm)deadlines.Add(new("Alarms",nextAlarm.Alarm.Label,nextAlarm.At));
+        if(Voyages.NextReturn(configuration.Voyages,now) is { } back)deadlines.Add(new("Vessels",localization.Get("Home.DeadlineVessel"),back));
+        if(configuration.GardenAlerts && GardenJournal.Alarms(configuration.GardenBeds,now) is { Count:>0 } garden)
+            deadlines.Add(new("Garden",localization.Format(garden[0].Kind==GardenState.Ripe ? "Home.DeadlineRipe":"Home.DeadlineTend",garden[0].Bed.Seed),garden[0].At));
+        var next=HomeToday.Next(deadlines,now);
+        (string,string)? shown=next is null ? null:(next.Kind,next.Label);
+        if(shown!=homeNextShown)
+        {
+            if(homeNextShown is not null && shown is not null)homeNextChangedAt=Environment.TickCount64;
+            homeNextShown=shown;
+        }
+        homeNext=next;
     }
 
     private void DrawHomeToday()
@@ -44,6 +63,7 @@ internal sealed partial class MainWindow
         if(ImGui.SmallButton(localization.Get("Home.Customize")))ImGui.OpenPopup("HomeCustomize");
         Tip("Home.CustomizeTip");
         DrawHomeCustomize();
+        DrawHomeNextDeadline(now);
         foreach(var (key,text,target,good) in homeToday)
         {
             if(configuration.HomeTodayHidden?.Contains(key)==true)continue;
@@ -51,6 +71,18 @@ internal sealed partial class MainWindow
             try{if(ImGui.Selectable(text+"###Today"+key))page=target;}
             finally{ImGui.PopStyleColor();}
         }
+    }
+
+    /// <summary>X-155 (0.1261): « Next deadline: …, in … » first, one click to its tool; under an hour the time left ticks each second.</summary>
+    private void DrawHomeNextDeadline(DateTimeOffset now)
+    {
+        if(homeNext is not { } next || next.At<=now || configuration.HomeTodayHidden?.Contains("Next")==true)return;
+        var left=next.At-now;
+        var when=left<TimeSpan.FromHours(1) ? TenshoAssistant.UI.Motion.Countdown(left):GardenLeftText(((int)left.TotalDays,left.Hours,left.Minutes));
+        if(ImGui.Selectable(localization.Format("Home.NextDeadline",next.Label,when)+"###TodayNext"))page=next.Kind switch{"Alarms"=>Page.Alarms,"Vessels"=>Page.FreeCompany,_=>Page.Garden};
+        Tip("Home.NextDeadlineTip");
+        var pulse=TenshoAssistant.UI.Motion.Pulse(homeNextChangedAt,Environment.TickCount64,HomeNextPulseMs,ReducedMotion);
+        if(pulse>0)ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),ImGui.GetColorU32(Accent with{W=Accent.W*pulse}));
     }
 
     private void DrawHomeCustomize()

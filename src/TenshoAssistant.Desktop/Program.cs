@@ -185,7 +185,12 @@ internal static class Program
         var zone=Option(args,"--zone=") is { } zoneText && uint.TryParse(zoneText,out var territory) ? territory : (uint?)null;
         // --field=name=value: a text field of the window (a search box), as if typed.
         if(Option(args,"--field=") is { } field && field.Split('=',2) is [var fieldName,var fieldValue])
-            host.Window.GetType().GetField(fieldName,BindingFlags.Instance|BindingFlags.NonPublic)?.SetValue(host.Window,fieldValue);
+            {
+            // X-155 (0.1261): a number field too (the item in context), converted to the field's type.
+            var target=host.Window.GetType().GetField(fieldName,BindingFlags.Instance|BindingFlags.NonPublic);
+            try{target?.SetValue(host.Window,Convert.ChangeType(fieldValue,target.FieldType,CultureInfo.InvariantCulture));}
+            catch(Exception error) when(error is FormatException or InvalidCastException or OverflowException){Console.WriteLine($"  --field={fieldName}: {error.Message}");}
+        }
         var capture=Option(args,"--capture=");
         // X-178 (0.1257): --garden-trial, for a capture only: the trial patch of the headless run instead of the player's beds (in memory).
         if(capture is not null && args.Contains("--garden-trial"))

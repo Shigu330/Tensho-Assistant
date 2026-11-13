@@ -105,18 +105,23 @@ internal sealed partial class MainWindow
                 ImGui.PushID($"Tile{target}");
                 try
                 {
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    bool clicked;
-                    try{clicked=ImGui.Button(icon.ToIconString(),new Vector2(36,36));}
-                    finally{ImGui.PopFont();}
-                    ImGui.SameLine();
-                    ImGui.BeginGroup();
+                    // X-155 (0.1261): one tile, one action: the icon, the name and the live line are one element (it had two: the icon's
+                    // button and the name), with one focus frame; the size follows the text.
+                    var side=MathF.Max(36*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale,ImGui.GetTextLineHeightWithSpacing()*2);
+                    var clicked=ImGui.Selectable("##Tile",false,ImGuiSelectableFlags.None,new Vector2(0,side));
+                    var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();
+                    var draw=ImGui.GetWindowDrawList();
+                    draw.PushClipRect(min,max,true);
                     try
                     {
-                        if(ImGui.Selectable(name,false,ImGuiSelectableFlags.None,new Vector2(0,0)))clicked=true;
-                        ImGui.TextDisabled(line);
+                        draw.AddRect(min,min+new Vector2(side),ImGui.GetColorU32(ImGuiCol.Border),2);
+                        DrawGlyphIn(icon,min,min+new Vector2(side),Text,ImGui.GetFontSize());
+                        var left=min.X+side+ImGui.GetStyle().ItemSpacing.X;
+                        var top=min.Y+MathF.Max(0,(side-ImGui.GetTextLineHeightWithSpacing()*2)/2);
+                        draw.AddText(new Vector2(left,top),ImGui.GetColorU32(ImGuiCol.Text),name);
+                        draw.AddText(new Vector2(left,top+ImGui.GetTextLineHeightWithSpacing()),ImGui.GetColorU32(ImGuiCol.TextDisabled),line);
                     }
-                    finally{ImGui.EndGroup();}
+                    finally{draw.PopClipRect();}
                     if(clicked)page=target;
                 }
                 finally{ImGui.PopID();}

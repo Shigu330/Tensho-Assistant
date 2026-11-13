@@ -15,6 +15,40 @@ internal sealed partial class MainWindow
     /// <summary>X-127: how long the footer says « added to your wishlist ».</summary>
     private const long WishAddedShownMs=15_000;
     private (string Text,long At)? wishAdded;
+    // X-155 (0.1261): the item whose addition was just saved, for a brief outline of its button (none with reduced motion).
+    private const int WishConfirmPulseMs=300;
+    private (uint Item,long At) wishConfirmed=(0,-100_000);
+
+    /// <summary>
+    /// X-155 (0.1261, pilot of the visual plan): the wish button of an item's header: « Add to my wishlist », then on the same spot and at the
+    /// same width « ✓ On my wishlist » once the save is confirmed (a failed save leaves « Add » and says why in the footer). A click on the
+    /// confirmed button takes the item off the list. Greyed in the desktop application (nothing is saved there).
+    /// </summary>
+    private void DrawWishButton(ItemDefinition item)
+    {
+        var wished=configuration.Wishlist?.Contains(item.Id)==true;
+        var add=localization.Get("Wishlist.Add");var inList=localization.Get("Wishlist.InList");
+        var style=ImGui.GetStyle();var glyph=ImGui.GetFontSize();
+        // One width for both labels: the confirmation moves nothing.
+        var width=MathF.Max(ImGui.CalcTextSize(add).X,ImGui.CalcTextSize(inList).X+glyph+style.ItemInnerSpacing.X)+style.FramePadding.X*2;
+        bool clicked;
+        DesktopEditBegin();
+        try{clicked=ImGui.Button($"##WishButton{item.Id}",new Vector2(width,ImGui.GetFrameHeight()));}
+        finally{DesktopEditEnd();}
+        Tip(wished ? "Wishlist.InListTip":"Wishlist.AddTip");
+        var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();
+        var draw=ImGui.GetWindowDrawList();
+        var text=ImGui.GetColorU32(ImGuiCol.Text);
+        if(wished)
+        {
+            DrawGlyphIn(Dalamud.Interface.FontAwesomeIcon.Check,new Vector2(min.X+style.FramePadding.X,min.Y),new Vector2(min.X+style.FramePadding.X+glyph,max.Y),Success,glyph*0.85f);
+            draw.AddText(new Vector2(min.X+style.FramePadding.X+glyph+style.ItemInnerSpacing.X,min.Y+style.FramePadding.Y),text,inList);
+            var pulse=wishConfirmed.Item==item.Id ? TenshoAssistant.UI.Motion.Pulse(wishConfirmed.At,Environment.TickCount64,WishConfirmPulseMs,ReducedMotion):0;
+            if(pulse>0)draw.AddRect(min,max,ImGui.GetColorU32(Success with{W=Success.W*pulse}),style.FrameRounding,ImDrawFlags.None,2);
+        }
+        else draw.AddText(new Vector2(min.X+style.FramePadding.X,min.Y+style.FramePadding.Y),text,add);
+        if(clicked)ToggleWish(item.Id);
+    }
 
     private void DrawWishlistToggle(ItemDefinition item)
     {
@@ -27,6 +61,9 @@ internal sealed partial class MainWindow
         if(Wishlist.Toggle(configuration.Wishlist,itemId) is not { } next){saveError=localization.Format("Wishlist.Full",Wishlist.MaximumItems);return;}
         var added=next.Contains(itemId) && configuration.Wishlist?.Contains(itemId)!=true;
         SaveSetting("Wishlist.Title",()=>configuration.Wishlist,value=>configuration.Wishlist=value,next.Count==0 ? null:next);
+        // X-155 (0.1261): said only once the save is confirmed (a failed save puts the list back: nothing was added).
+        added&=configuration.Wishlist?.Contains(itemId)==true;
+        if(added)wishConfirmed=(itemId,Environment.TickCount64);
         if(added)SayWishAdded(localization.Format("Wishlist.Added",itemCatalog.State.Catalog?.Find(itemId)?.Name ?? $"#{itemId}"));
     }
 

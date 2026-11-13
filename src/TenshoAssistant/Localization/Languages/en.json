@@ -1855,6 +1855,12 @@
     "Off": "Tensho is paused here: PvP or ranked content. It comes back on its own when you leave."
   },
   "Home": {
+    "NextDeadline": "Next deadline: {0}, in {1}",
+    "NextDeadlineTip": "The nearest of your alarms, vessel returns and garden deadlines. A click opens its tool.",
+    "DeadlineVessel": "a vessel returns",
+    "DeadlineRipe": "{0} ripe",
+    "DeadlineTend": "tend {0}",
+    "TodayLineNext": "Next deadline",
     "TodayTitle": "TODAY",
     "Customize": "Customise",
     "CustomizeTip": "Choose the lines of « Today » and the tiles shown on this page.",
@@ -5890,6 +5896,9 @@
     "OnSale": "Wish on sale: {0} at {1} gil on {2} (your price: {3}).",
     "Title": "Wishlist",
     "Add": "Add to my wishlist",
+    "InList": "On my wishlist",
+    "InListTip": "This item is on your wishlist. Click to take it off.",
+    "AddTip": "Adds this item to your wishlist (Wishlist page).",
     "Remove": "Remove from my wishlist",
     "RemoveShort": "Remove",
     "Full": "Wishlist full ({0} items): remove one first.",
