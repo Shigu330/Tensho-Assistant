@@ -97,6 +97,8 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;var period=now.ToUnixTimeSeconds()/1400;
         if(period!=weatherPeriod || !ReferenceEquals(catalog,weatherViewCatalog))
         {weatherForecast=catalog.Forecast(weatherTerritory,now,12);weatherPeriod=period;weatherViewCatalog=catalog;weatherSearchKey=default;}
+        // X-155 (0.1260): now, next and after at a glance, above the detailed table (MainWindow.WeatherBanner.cs).
+        DrawWeatherBanner(now);
         ImGui.TextDisabled(localization.Get("Weather.PeriodHelp"));
         if(UI.UiComponents.BeginDataTable("WeatherForecast",5))
         {
@@ -121,7 +123,7 @@ internal sealed partial class MainWindow
                     // Single alarm at the start of this period (not for the current one, already started).
                     if(i>0 && entry.Weather is { } named)
                         AlarmButton($"Period{entry.StartsAt.ToUnixTimeSeconds()}",localization.Format("Alarms.PeriodTooltip",named.Name,entry.StartsAt.ToLocalTime().ToString("g")),
-                            ()=>[new TenshoAlarm{Label=$"{named.Name} · {weatherZone}",Group=$"{named.Name} · {weatherZone}",IconId=named.Icon,Repeat=AlarmRepeat.Once,At=entry.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),TerritoryId=weatherTerritory}]);
+                            ()=>WeatherPeriodAlarm(entry,named));
                 }
             }
             finally{ImGui.EndTable();}

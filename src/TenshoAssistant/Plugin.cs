@@ -216,6 +216,8 @@ public sealed partial class Plugin : IDalamudPlugin
             UI.GameThemeReader? themeReader=null;
             registrations.Register(()=>themeReader=new UI.GameThemeReader(gameConfig,log),()=>themeReader?.Dispose());
             mainWindow.ConfigureTheme(()=>themeReader?.GameValue);
+            // X-155 (0.1260): Dalamud's « reduced motion » preference, for Tensho's brief highlights.
+            mainWindow.ConfigureMotion(()=>pluginInterface.UiBuilder.ShouldUseReducedMotion);
             var wikiSources=new WikiMonsterSources(id=>itemCatalog.State.Catalog?.Find(id)?.EnglishName,()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.WikiMonsters)};
             registrations.Register(()=>{},wikiSources.Dispose);
             mainWindow.ConfigureWikiSources(wikiSources);

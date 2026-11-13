@@ -1955,6 +1955,14 @@
     "CountdownOpen": "Time until opening: {0:00}:{1:00}:{2:00}"
   },
   "Weather": {
+    "BannerNow": "Now",
+    "BannerNext": "Next",
+    "BannerAfter": "After",
+    "BannerIn": "in {0}",
+    "BannerEt": "{0} ET",
+    "BannerEtPc": "{0} ET · {1}, PC time",
+    "BannerUnavailable": "Forecast unavailable",
+    "BannerComputed": "Computed forecast, not an observation in game.",
     "FavoriteAdd": "Add to my table",
     "FavoriteRemove": "Remove from my table",
     "FavoriteTip": "Your table shows the next periods of several zones, up to 12. A click on a zone shows it here.",

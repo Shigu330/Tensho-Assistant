@@ -1955,6 +1955,14 @@
     "CountdownOpen": "Temps avant l'ouverture : {0:00}:{1:00}:{2:00}"
   },
   "Weather": {
+    "BannerNow": "Maintenant",
+    "BannerNext": "Ensuite",
+    "BannerAfter": "Après",
+    "BannerIn": "dans {0}",
+    "BannerEt": "{0} ET",
+    "BannerEtPc": "{0} ET · {1}, heure PC",
+    "BannerUnavailable": "Prévision indisponible",
+    "BannerComputed": "Prévision calculée, pas une observation en jeu.",
     "FavoriteAdd": "Ajouter à mon tableau",
     "FavoriteRemove": "Retirer de mon tableau",
     "FavoriteTip": "Votre tableau montre les prochaines périodes de plusieurs zones, 12 au plus. Un clic sur une zone l'affiche ici.",

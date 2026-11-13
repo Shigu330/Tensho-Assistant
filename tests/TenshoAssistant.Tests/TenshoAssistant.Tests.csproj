@@ -163,6 +163,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/SelectionMark.cs" Link="UI/SelectionMark.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/UiStates.cs" Link="UI/UiStates.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/IconWait.cs" Link="UI/IconWait.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/Motion.cs" Link="UI/Motion.cs" />
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />
