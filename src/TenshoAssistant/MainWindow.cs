@@ -346,6 +346,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         // R-06 step 2 (0.264): pages grouped by category, each category folds (kept in the configuration); the hub pages of the map
         // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
         // 0.470 (TEMPLATES-001): the pages and their order come from one list, MainWindow.Pages.cs.
+        // X-220 (0.1230): one search over pages, items, quests and maps, above the list.
+        DrawQuickSearch();
         foreach(var group in PageGroups)
             if(group.Category is null || NavigationCategory(group.Category,group.Pages))
                 foreach(var entry in group.Entries)

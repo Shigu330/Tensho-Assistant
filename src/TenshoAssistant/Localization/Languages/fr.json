@@ -5531,6 +5531,16 @@
     "PricesMissing": "{0} objets vendables au marché n'ont pas de prix : comptés au prix PNJ.",
     "LootLineNoListing": "{0} : {1} en moyenne, ~{2} gils (PNJ {3} l'unité, aucune offre NQ sur le marché)"
   },
+  "QuickSearch": {
+    "Hint": "Chercher dans Tensho…",
+    "Tip": "Deux lettres au moins : pages (par leur nom, puis par ce qu'elles font), objets, quêtes et lieux. Un clic ouvre la page, la fiche de l'objet, la quête ou la carte. Rien d'autre n'est fait.",
+    "KindPage": "Pages",
+    "KindItem": "Objets",
+    "KindQuest": "Quêtes",
+    "KindPlace": "Lieux",
+    "None": "Rien trouvé.",
+    "Searching": "Recherche…"
+  },
   "CharactersUi": {
     "RetainerGil": "(+{0} chez les servants)",
     "Tab": "Personnages",

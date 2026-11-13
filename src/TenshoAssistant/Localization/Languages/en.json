@@ -5531,6 +5531,16 @@
     "PricesMissing": "{0} items sold on the market have no price: counted at the NPC price.",
     "LootLineNoListing": "{0}: {1} on average, ~{2} gil (NPC {3} each, no NQ listing on the market)"
   },
+  "QuickSearch": {
+    "Hint": "Search Tensho…",
+    "Tip": "Two letters at least: pages (by name, then by what they do), items, quests and places. A click opens the page, the item's page, the quest or the map. Nothing else is done.",
+    "KindPage": "Pages",
+    "KindItem": "Items",
+    "KindQuest": "Quests",
+    "KindPlace": "Places",
+    "None": "Nothing found.",
+    "Searching": "Searching…"
+  },
   "CharactersUi": {
     "RetainerGil": "(+{0} with retainers)",
     "Tab": "Characters",
