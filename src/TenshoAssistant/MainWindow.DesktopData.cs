@@ -31,6 +31,7 @@ internal sealed partial class MainWindow
         AlarmNotification=DesktopAlarmNotification,
         LinkNotices=DesktopLinkNotices,
         AlarmHeld=DesktopAlarmHeld,
+        GameState=DesktopGameState,
         OpenWeather=OpenWeather,
     }.ToMap();
 

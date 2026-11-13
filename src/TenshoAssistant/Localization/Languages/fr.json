@@ -1193,7 +1193,9 @@
     "StateServerBar": "État de Tensho dans la barre serveur",
     "StateServerBarTip": "Affiche « Tensho : ok · 210 Mo » dans la barre d'informations du serveur : si tout va bien (enregistrements, lectures, auto-contrôle) et la mémoire de Dalamud et de ses plugins ; son info-bulle donne le détail, un clic ouvre ces paramètres. Le tableau de bord s'affiche dessous tant qu'il est activé.\nPar défaut : désactivé.",
     "StateServerBarProblems": "Seulement en cas de souci",
-    "StateServerBarProblemsTip": "Masque l'entrée tant que tout va bien : elle n'apparaît que si quelque chose mérite un coup d'œil ou ne va pas.\nPar défaut : désactivé.",
+    "StateServerBarProblemsTip": "Masque l'entrée et le panneau tant que tout va bien : ils n'apparaissent que si quelque chose mérite un coup d'œil ou ne va pas.\nPar défaut : désactivé.",
+    "StatePanel": "État de Tensho dans un panneau",
+    "StatePanelTip": "Affiche le même état dans un petit panneau que vous pouvez déplacer à l'écran : si tout va bien, la mémoire utilisée, ce qui mérite un coup d'œil, et un bouton Détails qui ouvre ces paramètres.\nPar défaut : désactivé.",
     "PlaceServerBarTip": "Montre la zone où vous êtes, avec la marque d'instance du jeu dans une zone à instances, dans la barre d'informations du serveur ; un clic ouvre la carte.\nPar défaut : désactivé.",
     "Teamcraft": "Teamcraft (temps de touche)",
     "TeamcraftTip": "Temps entre le lancer et la touche, par poisson et lieu, d'après les relevés publics de Teamcraft (API gubal, licence MIT). Une requête par lieu de pêche, gardée en cache.\nPar défaut : activé.",
@@ -7177,7 +7179,12 @@
     "SelfCheck": "Auto-contrôle : {0} ok, {1} suspects, {2} en échec.",
     "NoRequests": "Requêtes : aucune envoyée pendant cette session.",
     "Requests": "Requêtes envoyées pendant cette session : {0} ({1}) ; les prix du marché et Discord ne sont pas encore comptés.",
-    "Help": "Lu une fois par seconde tant qu'il est affiché ; rien n'est mesuré quand il est fermé. Une page au-delà de 4 ms par image mérite un coup d'œil ; un enregistrement ou un auto-contrôle raté est un souci."
+    "Help": "Lu une fois par seconde tant qu'il est affiché ; rien n'est mesuré quand il est fermé. Une page au-delà de 4 ms par image mérite un coup d'œil ; un enregistrement ou un auto-contrôle raté est un souci.",
+    "Details": "Détails",
+    "DetailsTip": "Ouvre Paramètres › Général, où s'affiche le tableau de bord complet.",
+    "DesktopGame": "En jeu :",
+    "DesktopNoState": "L'état de Tensho en jeu n'est pas connu ici : reliez l'application de bureau au jeu (Paramètres › Avancé, en jeu).",
+    "DesktopAllFine": "Rien à signaler."
   },
   "FieldContent": {
     "Title": "Eureka et Bozja",

@@ -13,7 +13,7 @@ internal static class LinkLive1114Tests
     [
         ("Link 1114: the live states both ways; out-of-bounds values refused (X-149, 0.1119: change notices are categories, LinkCategories1119Tests)",() =>
         {
-            Check(LocalLinkProtocol.Version>=2 && LocalLinkProtocol.MaxLine==8192,"protocol 2 or later, 8 KB lines");
+            Check(LocalLinkProtocol.Version>=2 && LocalLinkProtocol.MaxLine>=8192,"protocol 2 or later, 8 KB lines at least (32 KB since 0.1246)");
             var line=LocalLinkProtocol.Serialize(Sample(new("MIN",100,650,700,20,140)));
             Check(LocalLinkProtocol.TryParse(line,out var back,out var error) && back!.Live==new LinkLive("MIN",100,650,700,20,140),"round trip: "+error);
             Check(LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample()),out var bare,out _) && bare!.Live is null && bare.Changes is null,"both parts are optional");

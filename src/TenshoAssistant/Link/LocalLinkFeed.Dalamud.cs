@@ -64,7 +64,18 @@ internal sealed class LocalLinkFeed:IDisposable
         var zone=territory==0 ? "" : zoneName(territory) ?? "";
         if(zone.Length>LocalLinkProtocol.MaxZone)zone=zone[..LocalLinkProtocol.MaxZone];
         server.Publish(new LinkSnapshot(LocalLinkProtocol.Version,version,loggedIn,false,territory,zone,++sequence,ReadLive(loggedIn),changes.Snapshot(),
-            notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),loggedIn ? ReadHeld():null));
+            notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()),loggedIn ? ReadHeld():null,ReadState()));
+    }
+
+    /// <summary>X-165 (0.1246): Tensho's state (the main window's dashboard snapshot, published whole once a second from its draw), null when
+    /// not read yet or after a reading failed once.</summary>
+    public Func<LinkState?>? State;
+    private bool stateFailed;
+    private LinkState? ReadState()
+    {
+        if(stateFailed || State is null)return null;
+        try{return State();}
+        catch(Exception error){stateFailed=true;log.Warning(error,"Local link: Tensho's state could not be read; not sent until the plugin starts again.");return null;}
     }
 
     /// <summary>X-163 (0.1156): the alarms' held counts, on the framework thread; null when unknown or after a reading failed once (R08).</summary>

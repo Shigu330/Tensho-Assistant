@@ -1193,7 +1193,9 @@
     "StateServerBar": "Tensho's state in the server bar",
     "StateServerBarTip": "Shows « Tensho: ok · 210 MB » in the server info bar: whether everything is fine (saves, readings, self-check) and the memory of Dalamud and its plugins; its tooltip gives the details, a click opens these settings. The dashboard is shown below while it is on.\nDefault: off.",
     "StateServerBarProblems": "Only when something is wrong",
-    "StateServerBarProblemsTip": "Hides the entry while everything is fine: it appears only when something is worth a look or is wrong.\nDefault: off.",
+    "StateServerBarProblemsTip": "Hides the entry and the panel while everything is fine: they appear only when something is worth a look or is wrong.\nDefault: off.",
+    "StatePanel": "Tensho's state in a panel",
+    "StatePanelTip": "Shows the same state in a small panel you can move on the screen: whether all is fine, the memory used, what is worth a look, and a Details button opening these settings.\nDefault: off.",
     "PlaceServerBarTip": "Shows the zone you are in, with the game's instance mark in an instanced zone, in the server info bar; a click opens the map.\nDefault: off.",
     "Teamcraft": "Teamcraft (bite times)",
     "TeamcraftTip": "Time between the cast and the bite, per fish and spot, from Teamcraft's public reports (gubal API, MIT licence). One request per fishing spot, cached.\nDefault: on.",
@@ -7177,7 +7179,12 @@
     "SelfCheck": "Self-check: {0} ok, {1} suspect, {2} failed.",
     "NoRequests": "Requests: none sent this session.",
     "Requests": "Requests sent this session: {0} ({1}); market prices and Discord are not counted yet.",
-    "Help": "Read once a second while shown; nothing is measured when it is closed. A page over 4 ms a frame is worth a look; a failed save or self-check is a problem."
+    "Help": "Read once a second while shown; nothing is measured when it is closed. A page over 4 ms a frame is worth a look; a failed save or self-check is a problem.",
+    "Details": "Details",
+    "DetailsTip": "Opens Settings › General, where the whole dashboard is shown.",
+    "DesktopGame": "In the game:",
+    "DesktopNoState": "Tensho's state in the game is not known here: link the desktop app with the game (Settings › Advanced in the game).",
+    "DesktopAllFine": "Nothing to look at."
   },
   "FieldContent": {
     "Title": "Eureka and Bozja",

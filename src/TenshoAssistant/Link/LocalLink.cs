@@ -26,18 +26,38 @@ namespace TenshoAssistant.Link;
 //    application of before 0.1155 ignores them (an unknown field), so the protocol number does not change.
 //  - Protocol 3, optional part (0.1156, X-163): how many of each item of the alarms with a quantity needed the character holds (LinkHeld,
 //    bags included, only when seen), so the application stays silent as the game does when the item is already gathered (X-62).
+//  - Protocol 3, optional part (0.1246, X-165): Tensho's state in the game (LinkState: the dashboard's overall state, the heap, the lines
+//    that are not fine), shown by the application's status bar and its dashboard; a state out of bounds is dropped, never the snapshot.
 
 /// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
 /// (0.1114): also the small live states and the saved files that changed. Protocol 3 (0.1119): those as categories only.</summary>
 public sealed record LinkSnapshot(int Protocol,string Plugin,bool LoggedIn,bool Paused,uint Territory,string Zone,long Sequence,
-    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null,IReadOnlyList<LinkNotice>? Notices=null,IReadOnlyList<LinkHeld>? Held=null);
+    LinkLive? Live=null,IReadOnlyList<LinkChange>? Changes=null,IReadOnlyList<LinkNotice>? Notices=null,IReadOnlyList<LinkHeld>? Held=null,
+    LinkState? State=null);
 
 /// <summary>The link's wire format: one JSON line per snapshot, bounded and checked.</summary>
 public static class LocalLinkProtocol
 {
     public const int Version=3;
     /// <summary>Longest line accepted, in bytes (a snapshot is about 150, 800 with every category).</summary>
-    public const int MaxLine=8192;
+    public const int MaxLine=32768;
+    /// <summary>X-165 (0.1246): the state's lines that are not fine, at most (the dashboard has nine), and their longest text. With them the
+    /// worst line could pass 16 KB (every character escaped by the JSON writer), so MaxLine went from 8192 to 32768 (StatePanel1246Tests).</summary>
+    public const int MaxStateLines=9;
+    public const int MaxStateLine=160;
+    public static readonly IReadOnlyList<string> StateLevels=["Ok","Watch","Problem"];
+
+    /// <summary>X-165 (0.1246): the state to send, bounded: an unknown level is not sent; heap kept only when finite and between 0 and 1 TB;
+    /// at most MaxStateLines lines, each cut at MaxStateLine.</summary>
+    public static LinkState? State(string? overall,double? heapMegabytes,IEnumerable<string> issues)
+        => overall is null || !StateLevels.Contains(overall) ? null
+            : new(overall,heapMegabytes is { } heap && double.IsFinite(heap) && heap is >= 0 and <= 1_048_576 ? Math.Round(heap,1) : null,
+                [.. issues.Where(line=>line is not null).Take(MaxStateLines).Select(line=>line.Length>MaxStateLine ? line[..MaxStateLine] : line)]);
+
+    /// <summary>X-165 (0.1246): whether a state read from the pipe is within bounds (else the application drops it, the snapshot is kept).</summary>
+    public static bool ValidState(LinkState state)
+        => state.Overall is not null && StateLevels.Contains(state.Overall) && state.HeapMegabytes is null or (>= 0 and <= 1_048_576)
+           && state.Issues is { Count: <= MaxStateLines } issues && issues.All(line=>line is not null && line.Length<=MaxStateLine);
     public const int MaxJob=16;
     /// <summary>Change notices in one snapshot, at most (one per category).</summary>
     public const int MaxChanges=16;
@@ -111,6 +131,8 @@ public static class LocalLinkProtocol
             {error="notice list refused";return false;}
         if(read.Held is { } held && (held.Count>MaxHeld || held.Any(item=>item is null || item.Item==0 || item.Count is < 0 or > MaxHeldCount)))
             {error="held list refused";return false;}
+        // X-165 (0.1246): a state out of bounds is left out, the rest of the snapshot kept (the lesson of N6: never cut the link for a part).
+        if(read.State is { } state && !ValidState(state))read=read with {State=null};
         snapshot=read;return true;
     }
 
@@ -403,6 +425,11 @@ public sealed record LinkNotice(long Id,long At,string Text);
 /// <summary>X-163 (0.1156): how many of an item of the alarms the character holds (ItemHoldings: bags, armoury, saddlebags, retainers…),
 /// sent only when it was seen; the application's bell stays silent for an alarm whose quantity is met (AlarmSchedule.Gathered).</summary>
 public sealed record LinkHeld(uint Item,long Count);
+
+/// <summary>X-165 (0.1246, slice 3): Tensho's state in the game for the desktop application: the dashboard's overall state (« Ok »,
+/// « Watch », « Problem »), the heap in MB (null: unknown, R08) and the lines that are not fine, in the plugin's language, bounded
+/// (LocalLinkProtocol.State).</summary>
+public sealed record LinkState(string Overall,double? HeapMegabytes,IReadOnlyList<string> Issues);
 
 /// <summary>
 /// X-163 (0.1155): the plugin's alerts to send, filled where they ring (framework thread), read by the feed once a second. The newest

@@ -33,7 +33,10 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.PlaceServerBar","Advanced.PlaceServerBarTip",()=>configuration.PlaceServerBar,value=>configuration.PlaceServerBar=value,c=>c.PlaceServerBar);
         // X-165 (0.1245): Tensho's state in the server bar (off by default), only when something is wrong (option), and the dashboard here.
         BoolSetting("Advanced.StateServerBar","Advanced.StateServerBarTip",()=>configuration.StateServerBar,value=>configuration.StateServerBar=value,c=>c.StateServerBar);
-        if(configuration.StateServerBar)
+        // X-165 (0.1246, slice 3): the same state in a floating panel; « only when something is wrong » and the dashboard under either. In the
+        // desktop application the dashboard always shows (the game's state brought by the link).
+        BoolSetting("Advanced.StatePanel","Advanced.StatePanelTip",()=>configuration.StatePanel,value=>configuration.StatePanel=value,c=>c.StatePanel);
+        if(configuration.StateServerBar || configuration.StatePanel || inDesktopApp)
         {
             ImGui.Indent();
             try

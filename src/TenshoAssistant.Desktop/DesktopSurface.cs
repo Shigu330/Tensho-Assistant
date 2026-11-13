@@ -35,6 +35,9 @@ internal sealed class DesktopSurface
     public required Func<string[],bool,(string[] Lines,bool Sound)> LinkNotices { get; init; }
     /// <summary>X-163: the held counts of the alarms' items brought by the link (items, counts).</summary>
     public required Action<uint[],long[]> AlarmHeld { get; init; }
+    /// <summary>X-165 (0.1246): Tensho's state in the game brought by the link (overall « Ok », « Watch » or « Problem », or null: none; heap in
+    /// MB; the lines that are not fine), for the window's dashboard. Each frame.</summary>
+    public required Action<string?,double?,string[]> GameState { get; init; }
     /// <summary>--zone (diagnostic): the weather page of a territory (territory, zone name).</summary>
     public required Action<uint,string> OpenWeather { get; init; }
 
@@ -44,7 +47,7 @@ internal sealed class DesktopSurface
         [nameof(Pages)]=Pages,[nameof(CurrentPage)]=CurrentPage,[nameof(SetPage)]=SetPage,[nameof(HidePages)]=HidePages,
         [nameof(DesktopMode)]=DesktopMode,[nameof(UseData)]=UseData,[nameof(CopyData)]=CopyData,[nameof(CopyDiscoveries)]=CopyDiscoveries,
         [nameof(DueAlarms)]=DueAlarms,[nameof(AlarmNotification)]=AlarmNotification,[nameof(LinkNotices)]=LinkNotices,
-        [nameof(AlarmHeld)]=AlarmHeld,[nameof(OpenWeather)]=OpenWeather,
+        [nameof(AlarmHeld)]=AlarmHeld,[nameof(GameState)]=GameState,[nameof(OpenWeather)]=OpenWeather,
     };
 
     /// <summary>
@@ -74,6 +77,7 @@ internal sealed class DesktopSurface
             AlarmNotification=Take<Func<bool>>(nameof(AlarmNotification),()=>false),
             LinkNotices=Take<Func<string[],bool,(string[],bool)>>(nameof(LinkNotices),(_,_)=>([],false)),
             AlarmHeld=Take<Action<uint[],long[]>>(nameof(AlarmHeld),(_,_)=>{}),
+            GameState=Take<Action<string?,double?,string[]>>(nameof(GameState),(_,_,_)=>{}),
             OpenWeather=Take<Action<uint,string>>(nameof(OpenWeather),(_,_)=>{}),
         };
         missing=absent;

@@ -73,7 +73,10 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
     public void Poll()
     {
         Ring(DateTimeOffset.UtcNow);
-        var categories=changes.Take(Link?.Invoke());
+        // X-165 (0.1246): Tensho's state in the game, to the window's dashboard (none when not linked or paused).
+        var current=Link?.Invoke();
+        host.GameState(current is { Paused: false } ? current.State : null);
+        var categories=changes.Take(current);
         if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();
         // X-119 step 2, part 2 (0.1131): a category the app reads is copied again off the frame (a burst of notices = one copy), then its
         // stores are built again here, between frames.
@@ -149,7 +152,7 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(redirected is not null)lines.Add((host.Text("Desktop.InGameOnly",PageName(redirected)),true));
         foreach(var (text,_) in rang)lines.Add((text,true));
         var linked=Link?.Invoke();
-        if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked))+Live(linked),false));
+        if(linked is not null)lines.Add((host.Text("Desktop.Linked",linked.Plugin,Place(linked))+Live(linked)+State(linked),linked is { Paused: false, State.Overall: not "Ok" }));
         else if(OtherProtocol?.Invoke() is { } other)lines.Add((host.Text("Desktop.LinkOtherProtocol",other,TenshoAssistant.Link.LocalLinkProtocol.Version),true));
         if(linked is not null && reloadedAt is { } at)
             lines.Add((reloadProblem is null ? host.Text("Desktop.SettingsReloaded",at.ToString("HH:mm:ss")) : host.Text("Desktop.SettingsReloadFailed",reloadProblem),reloadProblem is not null));
@@ -176,6 +179,14 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         if(live.MaxGp>0 && live.Gp>=0)parts.Add(host.Text("Desktop.LinkLiveGp",live.Gp,live.MaxGp));
         if(live.BagSize>0 && live.BagFree>=0)parts.Add(host.Text("Desktop.LinkLiveBags",live.BagFree,live.BagSize));
         return parts.Count==0 ? "" : "  ·  "+string.Join("  ·  ",parts);
+    }
+
+    /// <summary>X-165 (0.1246): « · Tensho: ok · 210 MB » after the live states, when the plugin sends its state (the dashboard has the lines).</summary>
+    private string State(TenshoAssistant.Link.LinkSnapshot linked)
+    {
+        if(linked.Paused || linked.State is not { } state)return "";
+        var level=host.Text("Dashboard.Bar"+state.Overall);
+        return "  ·  "+(state.HeapMegabytes is { } mb ? host.Text("Dashboard.Bar",level,((long)Math.Round(mb)).ToString(System.Globalization.CultureInfo.InvariantCulture)) : host.Text("Dashboard.BarNoMemory",level));
     }
 
     private string PageName(string page)=>host.HasText("PageHelp."+page+"Title") ? host.Text("PageHelp."+page+"Title") : page;

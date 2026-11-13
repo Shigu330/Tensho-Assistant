@@ -62,7 +62,7 @@ internal static class AlarmHeld1156Tests
         {
             var alarms=Read("src/TenshoAssistant/MainWindow.Alarms.cs");
             Check(alarms.Contains("internal IReadOnlyList<Link.LinkHeld> AlarmHeldItems()") && alarms.Contains("Where(pair=>pair.held.HasObservation)"),"the plugin's count, only when seen");
-            Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("{Held=mainWindow.AlarmHeldItems}"),"given to the feed");
+            Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("{Held=mainWindow.AlarmHeldItems,"),"given to the feed");
             Check(Read("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs").Contains("loggedIn ? ReadHeld():null"),"sent with a character only");
             var data=Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(data.Contains("internal void DesktopAlarmHeld(uint[] items,long[] counts)") && data.Contains("item=>held.TryGetValue(item,out var count) ? count:null);"),"the bell uses the counts");

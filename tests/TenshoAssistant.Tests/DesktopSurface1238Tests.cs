@@ -26,6 +26,7 @@ internal static class DesktopSurface1238Tests
         AlarmNotification=()=>true,
         LinkNotices=(texts,front)=>(texts,front),
         AlarmHeld=(items,counts)=>calls.Add($"held {items.Length} {counts.Length}"),
+        GameState=(overall,heap,issues)=>calls.Add($"state {overall} {heap} {issues.Length}"),
         OpenWeather=(territory,zone)=>calls.Add($"weather {territory} {zone}"),
     };
 
@@ -35,7 +36,7 @@ internal static class DesktopSurface1238Tests
         {
             var calls=new List<string>();
             var map=Recording(calls).ToMap();
-            Check(Entries.Length==13 && map.Count==Entries.Length && Entries.All(entry=>map.ContainsKey(entry.Name)),"every entry is in the map: "+string.Join(",",map.Keys));
+            Check(Entries.Length==14 && map.Count==Entries.Length && Entries.All(entry=>map.ContainsKey(entry.Name)),"every entry is in the map: "+string.Join(",",map.Keys));
             var surface=DesktopSurface.FromMap(map,out var missing);
             Check(missing.Count==0,"nothing missing: "+string.Join("; ",missing));
             Check(surface.Pages().SequenceEqual(["Home","Weather"]) && surface.CurrentPage()=="Home","pages");

@@ -90,7 +90,7 @@ internal static class LinkNotices1155Tests
             Check(plugin.Split("if(options.ChatAllowed(inDuty) || options.SoundAllowed(inDuty))linkNotices.Add(message);").Length==4,"currencies, duty ready, GP");
             Check(plugin.Contains("if(repairText is not null)linkNotices.Add(repairText);") && plugin.Contains("if(extractText is not null)linkNotices.Add(extractText);"),"gear wear");
             Check(plugin.Contains("if(configuration.ItemNoteImportantSound){Alarms.AlarmService.PlaySound((configuration.AlarmOptions ?? new()).Sound,log);linkNotices.Add(message);}"),"important items, when they ring");
-            Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("log,linkNotices){Held=mainWindow.AlarmHeldItems};mainWindow.LinkNotice=linkNotices.Add;"),"the feed sends them; the hunt marks too");
+            Check(Read("src/TenshoAssistant/Plugin.Desktop.cs").Contains("log,linkNotices){Held=mainWindow.AlarmHeldItems,State=mainWindow.DashboardLinkState};mainWindow.LinkNotice=linkNotices.Add;"),"the feed sends them; the hunt marks too");
             Check(Read("src/TenshoAssistant/MainWindow.HuntTrain.cs").Contains("LinkNotice?.Invoke(alert);"),"hunt marks");
             Check(!Read("src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs").Contains("linkNotices") && !Read("src/TenshoAssistant/MainWindow.Garden.cs").Contains("LinkNotice"),
                 "the Tensho alarms and the garden ring in the app by their own rule (AlarmBell, GardenBell): not sent twice");
