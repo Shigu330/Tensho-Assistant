@@ -1491,6 +1491,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1194) Carnet d'artisanat et simulateur : une rotation calculée par Raphael s'affiche comme avant, et un second calcul de la même recette revient vite (séquence gardée sur le disque). Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance … » de l'instance d'avant la dernière (sans « hubs emptied ») : quelques parties vivantes seulement, au lieu de 463 sur 471 ; rapporter le nombre
 
+- [ ] (0.1202) Panneau des collectables (point de récolte collectionnable) : le plan conseillé et ses étapes s'affichent comme avant, un peu plus vite ; Prudent, Équilibré et Tenter sa chance donnent les mêmes conseils qu'avant
+
+- [ ] (0.1204) Mode développeur : après deux rechargements du plugin, dalamud.log n'a plus qu'une ligne courte « Reading eventMarkers: the same as earlier in this game session » (et « Submarine voyage check …: the same 6 lines … ») au lieu du texte entier ; un nouveau texte (autre zone, autre carte) est écrit en entier
+
+- [ ] (0.1206) Carte : quelques secondes après le chargement (plus de 12 s), ouvrir une carte de région (Nocturne, Forêt…) pour la première fois : elle s'affiche sans à-coup ; noms des liens et éthérites présents comme avant
+
+- [ ] (0.1206) Mode développeur : ouvrir Rangements puis Paramètres et changer d'onglet : si une image lente est notée dans dalamud.log, la ligne « Slow frame » nomme l'onglet (« storage … », « settings … »)
+
+- [ ] (0.1207) Application de bureau ouverte, jeu lancé : ouvrir puis fermer des pages qui lisent les gils ou les hauts faits sans rien changer : l'application ne recopie plus le fichier de données à chaque fois (pas de rechargement visible) ; un vrai changement (gils gagnés) arrive toujours
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
