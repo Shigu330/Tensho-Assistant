@@ -17,7 +17,7 @@ internal static class VerifyDocuments1112Tests
         ("Verify 1112: a change of tracked documents alone runs the managed tests again instead of skipping every check",() =>
         {
             var verify=Read("scripts/Verify.ps1");
-            Check(verify.Contains("function Get-TaskFingerprint([switch]$Documents)",StringComparison.Ordinal),"one fingerprint function, two halves");
+            Check(verify.Contains("function Get-TaskFingerprint([switch]$Documents, [switch]$CountPlaceholder)",StringComparison.Ordinal),"one fingerprint function, two halves (0.1203: and the count put back, PublishSpeed1203Tests)");
             Check(verify.Contains("-eq [bool]$Documents }",StringComparison.Ordinal),"the documents half is exactly what the sources half leaves out");
             Check(verify.Contains("$taskDocuments = Get-TaskFingerprint -Documents",StringComparison.Ordinal),"documents measured on every run");
             var documentsRun=At(verify,"if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {");

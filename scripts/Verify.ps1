@@ -45,7 +45,10 @@ function Get-TaskEnvironment {
     $sdk = try { (& $DotNet --version 2>$null | Select-Object -First 1) } catch { 'unknown' }
     return "dalamud=$dalamudVersion;sdk=$sdk"
 }
-function Get-TaskFingerprint([switch]$Documents) {
+# 0.1203: -CountPlaceholder hashes CHANGELOG.md with its first test count put back to the placeholder publish.sh fills after a green run
+# (« Verify.ps1 (agent) : VERIFYCOUNT, 0 avertissement »), byte for byte otherwise: equal to the stamp, that count is the only change since.
+$taskCountLine = [regex]::new('Verify\.ps1 \(agent\) : \d+/\d+, 0 avertissement')
+function Get-TaskFingerprint([switch]$Documents, [switch]$CountPlaceholder) {
     $files = & git -C $taskRoot ls-files -co --exclude-standard | Where-Object { ($_ -match '(\.md$|^docs/|^repo\.json$)') -eq [bool]$Documents } | Sort-Object
     $hasher = [Security.Cryptography.SHA256]::Create()
     try {
@@ -54,7 +57,9 @@ function Get-TaskFingerprint([switch]$Documents) {
             $path = Join-Path $taskRoot $file
             if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
             $name = [Text.Encoding]::UTF8.GetBytes($file + "`n"); [void]$hasher.TransformBlock($name, 0, $name.Length, $null, 0)
-            $bytes = [IO.File]::ReadAllBytes($path); [void]$hasher.TransformBlock($bytes, 0, $bytes.Length, $null, 0)
+            $bytes = [IO.File]::ReadAllBytes($path)
+            if ($CountPlaceholder -and $file -eq 'CHANGELOG.md') { $bytes = [Text.Encoding]::UTF8.GetBytes($taskCountLine.Replace([Text.Encoding]::UTF8.GetString($bytes), 'Verify.ps1 (agent) : VERIFYCOUNT, 0 avertissement', 1)) }
+            [void]$hasher.TransformBlock($bytes, 0, $bytes.Length, $null, 0)
         }
         [void]$hasher.TransformFinalBlock([byte[]]::new(0), 0, 0)
         return [BitConverter]::ToString($hasher.Hash).Replace('-', '')
@@ -112,6 +117,12 @@ if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) 
     $taskSkip = $taskStamp.Version -eq $taskVersionNow -and $taskStamp.Fingerprint -eq $taskFingerprint
 }
 if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
+    # 0.1203 (relay 37, publish.sh measured): publish.sh writes the test count into the new CHANGELOG entry right after the green run;
+    # that alone ran every managed test again at -Commit (about 60 s a version). Only that count changed: nothing to run again.
+    if ((Get-TaskFingerprint -Documents -CountPlaceholder) -eq $taskStamp.Documents) {
+        Write-Output "SKIP checks: version $taskVersionNow already verified green on $($taskStamp.VerifiedAt); since then only the test count was written into CHANGELOG.md."
+    }
+    else {
     # 0.1112 (4.21): same sources, other documents: no build, but the managed tests again (they read CHANGELOG, README, docs/).
     Write-Output "SKIP build: version $taskVersionNow already built green on $($taskStamp.VerifiedAt) with the same sources; tracked documents changed: managed tests run again."
     Push-Location $taskRoot
@@ -124,6 +135,7 @@ if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
         if ($LASTEXITCODE -ne 0) { throw 'Managed tests failed (tracked documents changed since the last green run).' }
     }
     finally { Pop-Location }
+    }
     $taskStamp | Add-Member -NotePropertyName Documents -NotePropertyValue $taskDocuments -Force
     $taskStamp | ConvertTo-Json | Set-Content -LiteralPath $taskStampFile -Encoding UTF8
 }
