@@ -210,7 +210,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         if(unfoldFrames>0){unfoldFrames--;Collapsed=false;CollapsedCondition=ImGuiCond.Always;}
         else Collapsed=null;
     }
-    public override void PreDraw(){UnfoldWhenAsked();FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
+    public override void PreDraw(){UnfoldWhenAsked();if(inDesktopApp)ApplyTheme();FfxivTheme.Push();bodyFontScope=TenshoAssistant.UI.UiComponents.BodyFont is { Available:true } font ? font.Push():null;}
     public override void PostDraw(){bodyFontScope?.Dispose();bodyFontScope=null;FfxivTheme.Pop();}
 
     internal void OpenSettings(){page=Page.Settings;IsOpen=true;}
@@ -270,7 +270,20 @@ internal sealed partial class MainWindow : Window, IDisposable
         RememberPage();
         OpenGuideOnce();
         ValidateDrawContext();
-        ImGui.TextColored(Accent, localization.Get("Plugin.Title").ToUpperInvariant());
+        // X-154 (0.1252): the navigation column follows Dalamud's scale and folds behind a button in a narrow window (or by the setting);
+        // folded, the header names the page instead of the plugin (the window's title bar already names it).
+        var scale = Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
+        var folded = NavigationLayout.Folded(configuration.NavigationMode, ImGui.GetWindowWidth(), scale);
+        var height = Math.Max(260, ImGui.GetContentRegionAvail().Y - ImGui.GetFrameHeightWithSpacing()*3);
+        if (folded)
+        {
+            if (ToolButton(FontAwesomeIcon.Bars, "Navigation.Open", true)) ImGui.OpenPopup("NavigationPopup");
+            DrawNavigationPopup(scale, height);
+            ImGui.SameLine();
+            ImGui.AlignTextToFramePadding();
+            UiComponents.SubTitle(PageEntryFor(NavigationPage(page))?.Label?.Invoke() ?? localization.Get("Plugin.Title"));
+        }
+        else ImGui.TextColored(Accent, localization.Get("Plugin.Title").ToUpperInvariant());
         ImGui.SameLine();
         ImGui.TextDisabled($"v{BuildVersion}");
         if(configuration.ShowHeaderClock){ImGui.SameLine();ImGui.TextDisabled(localization.Format("LocalClock.Header",DateTimeOffset.Now.ToString("HH:mm:ss")));}
@@ -283,20 +296,23 @@ internal sealed partial class MainWindow : Window, IDisposable
         ImGui.TextDisabled(localization.Get("Plugin.Subtitle"));
         ImGui.Separator();
 
-        var height = Math.Max(260, ImGui.GetContentRegionAvail().Y - ImGui.GetFrameHeightWithSpacing());
-        if (ImGui.BeginTable("Workspace", 2, ImGuiTableFlags.SizingStretchProp))
+        height = Math.Max(260, ImGui.GetContentRegionAvail().Y - ImGui.GetFrameHeightWithSpacing());
+        if (ImGui.BeginTable(folded ? "WorkspaceFolded" : "Workspace", folded ? 1 : 2, ImGuiTableFlags.SizingStretchProp))
         {
             try
             {
-                ImGui.TableSetupColumn("Navigation", ImGuiTableColumnFlags.WidthFixed, 200);
+                if (!folded) ImGui.TableSetupColumn("Navigation", ImGuiTableColumnFlags.WidthFixed, NavigationLayout.Width(scale));
                 ImGui.TableSetupColumn("Contenu", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableNextRow();
-                ImGui.TableSetColumnIndex(0);
-                var showNavigation = ImGui.BeginChild("NavigationPane", new Vector2(0, height), true);
-                try { if (showNavigation) DrawNavigation(); }
-                finally { ImGui.EndChild(); }
+                if (!folded)
+                {
+                    ImGui.TableSetColumnIndex(0);
+                    var showNavigation = ImGui.BeginChild("NavigationPane", new Vector2(0, height), true);
+                    try { if (showNavigation) DrawNavigation(); }
+                    finally { ImGui.EndChild(); }
+                }
 
-                ImGui.TableSetColumnIndex(1);
+                ImGui.TableSetColumnIndex(folded ? 0 : 1);
                 var showContent = ImGui.BeginChild("ContentPane", new Vector2(0, height), true);
                 try
                 {
@@ -339,6 +355,22 @@ internal sealed partial class MainWindow : Window, IDisposable
         craftChain.ValidateContext(bankBridge.State.CharacterId, (uint)Math.Max(0, itemId), craftPlanTarget, recipeCatalog.State.Catalog);
         triadSolve.ValidateContext(bankBridge.State.CharacterId, triadRevision);
         preparationPrices.ValidateContext(bankBridge.State.CharacterId,market.State.WorldId,(uint)Math.Max(0,itemId),craftPlanTarget,costBasisIndex,costQualityIndex,craftChainChoiceRevision);
+    }
+
+    // X-154 (0.1252): the folded navigation, in a popup under its button: the same list as the column (DrawNavigation, drawn once per
+    // frame, here or there); choosing a page closes it.
+    private void DrawNavigationPopup(float scale, float height)
+    {
+        if (!ImGui.BeginPopup("NavigationPopup")) return;
+        try
+        {
+            var before = page;
+            var show = ImGui.BeginChild("NavigationPopupPane", new Vector2(NavigationLayout.Width(scale), height), false);
+            try { if (show) DrawNavigation(); }
+            finally { ImGui.EndChild(); }
+            if (page != before) ImGui.CloseCurrentPopup();
+        }
+        finally { ImGui.EndPopup(); }
     }
 
     private void DrawNavigation()

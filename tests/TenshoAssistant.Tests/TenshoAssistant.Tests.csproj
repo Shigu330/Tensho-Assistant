@@ -158,6 +158,8 @@
     <Compile Include="../../src/TenshoAssistant/Gathering/Spearfishing.cs" Link="Gathering/Spearfishing.cs" />
     <Compile Include="../../src/TenshoAssistant/Configuration.cs" Link="Configuration.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/ThemePalettes.cs" Link="UI/ThemePalettes.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/NavigationLayout.cs" Link="UI/NavigationLayout.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/SelectionMark.cs" Link="UI/SelectionMark.cs" />
     <Compile Include="../../src/TenshoAssistant/RegistrationScope.cs" Link="RegistrationScope.cs" />
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="AtomicFile.cs" />
     <Compile Include="../../src/TenshoAssistant/BackgroundWriter.cs" Link="BackgroundWriter.cs" />

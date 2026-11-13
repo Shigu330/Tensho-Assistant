@@ -1,7 +1,7 @@
 // X-119 (plan 4 of the desktop application, step 1; X-118's probe moved here): the plugin's own pages in a desktop window, game closed.
 // Evidence: docs/evidence/x119-desktop-app.md (X-118's measures: docs/evidence/x118-desktop-probe.md).
 // Usage: TenshoAssistant.Desktop [--page=Weather] [--zone=<territory id>] [--field=name=value] [--click=x,y] [--capture=<png>] [--frames=N]
-//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings]
+//                                [--lang=French] [--ui=fr] [--sqpack=<folder>] [--plugin=<dll>] [--new-settings] [--theme=0..6] [--size=WxH]
 //        TenshoAssistant.Desktop --headless [--out=<md>]   (all 12 catalogues, every page classified and drawn for 20 frames without a window;
 //                                                           exit 0 only if no page throws, blocks or is unclassified; 4 = SKIP, no game data or Dalamud)
 //        TenshoAssistant.Desktop --headless --step=A,B | --step=entries   (diagnostic: which MainWindow call blocks, each on a worker with a 5 s limit)
@@ -110,6 +110,7 @@ internal static class Program
         Console.WriteLine(DesktopVersionCheck.English(version));
         var watch=Stopwatch.StartNew();
         var headless=args.Contains("--headless");
+        WindowSize=ParseSize(Option(args,"--size="));
         var (w,h,pixels)=StartUi(headless,out var window);
         Console.WriteLine($"PASS imgui: Dalamud.Bindings.ImGui {typeof(Dalamud.Bindings.ImGui.ImGui).Assembly.GetName().Version}, Dear ImGui {Dalamud.Bindings.ImGui.ImGui.GetVersion()}, font atlas {w}x{h}{(window is null ? "" : ", "+window.GlInfo)}");
         // TEMPORARY (X-119 step 1): Dalamud's font statics block outside the game; the plugin is copied to %LOCALAPPDATA%\TenshoAssistant\Desktop\plugin
@@ -126,6 +127,8 @@ internal static class Program
         // X-151 (0.1157): a member of the plugin the app reaches by name and does not find turns that part off: said, never silent.
         foreach(var missing in DesktopContract.Missing(host.Plugin))Console.WriteLine("Contract: the plugin lacks "+missing+"; that part is off");
         foreach(var missing in host.SurfaceMissing)Console.WriteLine("Typed contract: the plugin does not give "+missing+"; that part is off");
+        // X-154 (0.1252): --theme=N forces a palette for this run (0 follows the game, 1..6 a theme), in memory only: reference captures in each theme.
+        if(int.TryParse(Option(args,"--theme="),out var theme) && !host.SetSetting("ThemeMode",Math.Clamp(theme,0,6)))Console.WriteLine("  --theme: the settings could not be reached");
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
         if(headless)return Headless.Run(host,status,cache,args);
@@ -154,9 +157,14 @@ internal static class Program
         catch(UnauthorizedAccessException){return null;}
     }
 
+    /// <summary>X-154 (0.1252): --size=WxH, the window's size at start (a capture of the folded navigation); 1280x860 otherwise, bounded.</summary>
+    private static (int W,int H) WindowSize=(1280,860);
+    internal static (int W,int H) ParseSize(string? text)
+        =>text?.Split('x') is [var w,var h] && int.TryParse(w,out var width) && int.TryParse(h,out var height) ? (Math.Clamp(width,320,3840),Math.Clamp(height,240,2160)) : (1280,860);
+
     private static unsafe (int,int,IntPtr) StartUi(bool headless,out Win32Gl? window)
     {
-        window=headless ? null : new Win32Gl($"Tensho Assistant {DesktopVersionCheck.Three(AppVersion)}",1280,860,true);
+        window=headless ? null : new Win32Gl($"Tensho Assistant {DesktopVersionCheck.Three(AppVersion)}",WindowSize.W,WindowSize.H,true);
         var (w,h,pixels)=ImGuiHeadless.Start(17f,FontFolder);
         if(window is null){ImGuiHeadless.SetFontTexture(1);GameIcons.Upload=null;}
         else

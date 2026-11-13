@@ -57,7 +57,7 @@ public static class ConfigurationReset
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
-        "Discord", "ThemeMode", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CommunityPaissa", "SourceUses", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
+        "Discord", "ThemeMode", "NavigationMode", "ThemeModeBeforeTool", "GameDataOnly", "CommunityBeforeGameOnly", "CommunityPaissa", "SourceUses", "CraftLogTryAllPresets", "GatherPlanFromList", "GatheringListHighlight", "ListPanelsByZone", "ListPanelsFinishedOnly", "ListPanelsNearbyMonsters", "ListPanelsStorageHighlight", "Discovery", "CollectableUseScrutiny", "CollectableUseRestore", "CollectableUseFocus", "CollectableUsePriming", "CollectableRiskTolerance", "GpRegenPerTick", "GpForbiddenActions", "QuestList", "MapView", "CraftSearch", "OpenOnLogin", "SortPreviewField", "SortPreviewDescending", "CraftLogHelperEnabled", "CraftLogAutoSolve", "MarketBoardScope",
         "MarketPricesOnHover", "ItemContextMenuEnabled", "ItemUsagesOnHover", "HoverPriceRefresh", "UndercutClipboard", "JobTitlesEnabled",
         // 0.347 (g, I-08): the two shop reminder settings (the notes themselves are saved data, kept by « restore every setting »).
         "ItemNoteShopReminder", "ItemNoteImportantSound",
@@ -540,6 +540,8 @@ public sealed partial class Configuration
     public TenshoAssistant.Alarms.DiscordSettings Discord { get; set; } = new();
     // 0 follows the game's interface theme; 1..6 force a PluginTheme (value - 1).
     public int ThemeMode { get; set; }
+    // X-154 (0.1252): the navigation column of the main window: 0 folds under a width, 1 always shown, 2 always folded (UI/NavigationLayout).
+    public int NavigationMode { get; set; }
     // 0.478 (user request, in-game campaign): what the crafting list still needs, in the gathering help; since 0.515 information only.
     public bool GatherPlanFromList { get; set; } = true;
     /// <summary>0.751 (X-04): frame, on the game's gathering window, the items the tracking lists still need.</summary>

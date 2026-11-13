@@ -57,6 +57,8 @@ internal static class FfxivTheme
         ImGui.PushStyleColor(ImGuiCol.TableBorderStrong, c.Border);
         ImGui.PushStyleColor(ImGuiCol.TableBorderLight, c.Panel);
         ImGui.PushStyleColor(ImGuiCol.TableRowBgAlt, new Vector4(c.Accent.X,c.Accent.Y,c.Accent.Z,0.035f));
+        // X-154 (0.1252): the keyboard and gamepad focus frame in the theme's accent (it kept Dalamud's colour).
+        ImGui.PushStyleColor(ImGuiCol.NavHighlight, c.Accent);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 2);
         ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 2);
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 2);
@@ -68,7 +70,7 @@ internal static class FfxivTheme
     public static void Pop()
     {
         ImGui.PopStyleVar(6);
-        ImGui.PopStyleColor(32);
+        ImGui.PopStyleColor(33);
     }
 
     public static Scope Apply() { Push();return new Scope(); }

@@ -67,6 +67,7 @@ public static class SettingsIndex
         ("Settings.HoverVendorsMetOnly","General"),
         ("Settings.ItemSearchLimit","General"),
         ("Settings.MarketScope","General"),
+        ("Settings.NavigationMode","General"),
         ("Settings.OpenOnLastPage","General"),
         ("Settings.OpenOnLoad","General"),
         ("Settings.OpenOnLogin","General"),

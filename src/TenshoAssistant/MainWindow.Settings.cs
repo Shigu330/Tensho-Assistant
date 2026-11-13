@@ -104,6 +104,10 @@ internal sealed partial class MainWindow
         DrawLanguageSetting();
         ImGui.TextDisabled(localization.Format("Localization.LoadedLanguages", localization.AvailableLanguages.Count));
         DrawThemeSetting();
+        // X-154 (0.1252): the navigation column, shown or folded behind its button.
+        ComboSetting("Settings.NavigationMode","Settings.NavigationModeTip",()=>Math.Clamp(configuration.NavigationMode,0,2),value=>configuration.NavigationMode=value,
+            [(TenshoAssistant.UI.NavigationLayout.Auto,localization.Get("Settings.NavigationModeAuto")),(TenshoAssistant.UI.NavigationLayout.AlwaysShown,localization.Get("Settings.NavigationModeShown")),
+             (TenshoAssistant.UI.NavigationLayout.AlwaysFolded,localization.Get("Settings.NavigationModeFolded"))],DefaultConfiguration.NavigationMode,220);
         ImGui.TextColored(Accent, localization.Get("Settings.ObjectsMarket"));
         ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
         // 0.324: shared setting rows (tooltip and « ↺ »). 0.447: « monsters on hover » removed (it no longer did anything).

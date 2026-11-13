@@ -20,14 +20,45 @@ internal static class UiComponents
         using (PushSectionFont()) return ImGui.CollapsingHeader(label, flags);
     }
 
+    private static float Scale=>Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
+
+    /// <summary>
+    /// X-154 (0.1252): one selectable row for every list where a row is chosen. Selected: the theme's selection background and a bar on the
+    /// left edge in the accent colour (SelectionMark); the label keeps the body colour, never the accent on the selection background.
+    /// </summary>
+    public static bool SelectableRow(string label,bool selected,float height=0)
+    {
+        var clicked=ImGui.Selectable(label,selected,ImGuiSelectableFlags.None,new Vector2(0,height));
+        if(selected)
+        {
+            var (min,max)=SelectionMark.SideMark(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),Scale);
+            ImGui.GetWindowDrawList().AddRectFilled(min,max,ImGui.GetColorU32(FfxivTheme.Gold));
+        }
+        return clicked;
+    }
+
     public static bool NavigationItem(string label, bool selected)
-        => ImGui.Selectable(label, selected, ImGuiSelectableFlags.None, new Vector2(0, 26));
+        => SelectableRow(label, selected, 26*Scale);
 
     public static bool CategoryItem(string label,bool selected)
     {
         if(selected)ImGui.PushStyleColor(ImGuiCol.Button,FfxivTheme.Selected);
-        try{return ImGui.SmallButton(label);}
+        bool clicked;
+        try{clicked=ImGui.SmallButton(label);}
         finally{if(selected)ImGui.PopStyleColor();}
+        if(selected)
+        {
+            // X-154: the same mark as a selected row, under the button (the buttons sit side by side).
+            var (min,max)=SelectionMark.UnderMark(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),Scale);
+            ImGui.GetWindowDrawList().AddRectFilled(min,max,ImGui.GetColorU32(FfxivTheme.Gold));
+        }
+        return clicked;
+    }
+
+    /// <summary>X-154 (0.1252): a title inside a page (a block of the page, the page named beside the folded navigation): the section font, accent colour.</summary>
+    public static void SubTitle(string text)
+    {
+        using (PushSectionFont()) ImGui.TextColored(FfxivTheme.Gold,text);
     }
 
     public static void SectionHeader(string title, string? description = null)

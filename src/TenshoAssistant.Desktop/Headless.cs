@@ -207,10 +207,55 @@ internal static class Headless
                 if(line.Contains("[Desktop.",StringComparison.Ordinal)){report.Fail("status bar link text missing: "+Short(line));failed++;}
         }
         status.Link=null;
+        failed+=FoldedNavigation(host,status,report);
         failed+=ReadOnlyCheck(host,report);
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
     }
+
+    /// <summary>
+    /// X-154 (0.1252): the shell in a narrow window (500 px): the navigation folds behind its button, the page is drawn in one column, and the
+    /// same navigation is drawn in the popup once the button is clicked. Then « always shown » in the narrow window and « always folded » in
+    /// the wide one. The number of failures (an exception, or a popup that does not open or close).
+    /// </summary>
+    private static int FoldedNavigation(Host host,StatusBar status,Report report)
+    {
+        var failed=0;
+        void Fail(string why){report.Fail("folded navigation: "+why);failed++;}
+        var narrow=new System.Numerics.Vector2(500,820);var wide=new System.Numerics.Vector2(1280,820);
+        var io=Dalamud.Bindings.ImGui.ImGui.GetIO();
+        host.SetPage("Home");
+        Exception? thrown=null;
+        void Frames(System.Numerics.Vector2 size,int count,string what)
+        {
+            for(var i=0;i<count;i++){Beat("folded navigation, "+what,TimeSpan.FromSeconds(30));thrown??=Ui.Frame(host,status,size,1/60f);}
+        }
+        try
+        {
+            if(!host.SetSetting("NavigationMode",0)){Fail("the setting NavigationMode could not be reached");return failed;}
+            Frames(narrow,3,"narrow window");
+            // A click on the button (first item of the window, under the title bar): through ImGui's input queue, as the window's own mouse.
+            var before=PopupOpen();
+            io.AddMousePosEvent(20,Dalamud.Bindings.ImGui.ImGui.GetFrameHeight()+14);Frames(narrow,2,"pointer on the button");
+            io.AddMouseButtonEvent(0,true);Frames(narrow,1,"button pressed");
+            io.AddMouseButtonEvent(0,false);Frames(narrow,3,"popup open");
+            var opened=PopupOpen();
+            // A click beside the popup (the right edge of the narrow window) closes it.
+            io.AddMousePosEvent(narrow.X-12,narrow.Y/2);Frames(narrow,2,"pointer beside the popup");
+            io.AddMouseButtonEvent(0,true);Frames(narrow,1,"click beside the popup");
+            io.AddMouseButtonEvent(0,false);Frames(narrow,2,"popup closed");
+            if(before || !opened)Fail($"the popup did not open on a click of the button (open before: {before}, after: {opened})");
+            if(PopupOpen())Fail("the popup did not close on a click beside it");
+            host.SetSetting("NavigationMode",1);Frames(narrow,3,"always shown, narrow window");
+            host.SetSetting("NavigationMode",2);Frames(wide,3,"always folded, wide window");
+            if(thrown is not null)Fail($"{thrown.GetType().Name}: {Short(thrown.Message)}");
+        }
+        finally{host.SetSetting("NavigationMode",0);io.AddMousePosEvent(-1,-1);Frames(wide,2,"back to the wide window");}
+        Console.WriteLine(failed==0 ? "  folded navigation: drawn in a 500 px window, popup opened by its button and closed by a click beside it, both forced modes drawn" : $"  folded navigation: {failed} failure(s)");
+        return failed;
+    }
+
+    private static bool PopupOpen()=>Dalamud.Bindings.ImGui.ImGui.IsPopupOpen("",Dalamud.Bindings.ImGui.ImGuiPopupFlags.AnyPopupId|Dalamud.Bindings.ImGui.ImGuiPopupFlags.AnyPopupLevel);
 
     /// <summary>
     /// X-180 (0.1168, night review N1; R28 behaviour test): the window built as the application builds it saves nothing: the stores built on a

@@ -186,6 +186,13 @@ internal sealed class Host
 
     public IEnumerable<string> Pages=>Surface.Pages();
     public void SetPage(string name)=>Surface.SetPage(name);
+    /// <summary>X-154 (0.1252): one setting of the copy in memory (--theme=, the folded navigation of the headless run); never written: the app saves nothing.</summary>
+    public bool SetSetting(string name,object value)
+    {
+        if(!made.TryGetValue(configurationType,out var target) || target is null || configurationType.GetProperty(name) is not { CanWrite:true } property)return false;
+        property.SetValue(target,value);
+        return true;
+    }
     public string CurrentPage=>Surface.CurrentPage();
     public object? Service(string fullName)=>made.FirstOrDefault(pair=>pair.Key.FullName==fullName).Value;
 
