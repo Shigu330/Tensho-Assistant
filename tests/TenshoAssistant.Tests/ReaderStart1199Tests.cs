@@ -107,7 +107,7 @@ internal static class ReaderStart1199Tests
             Interlocked.Add(ref clock, 1);
             Check(ticket.Ready, "the guard delay over: the reader starts, its class compiled or not");
             Interlocked.Add(ref clock, -10_000);
-            Check(ticket.Ready && ReaderCompiler.Guard == TimeSpan.FromSeconds(15), "started is started");
+            Check(ticket.Ready, "started is started");
             held.Release.Set();
             Check(Drained(compiler), "the compiling ends as usual");
         }),

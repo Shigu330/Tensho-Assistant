@@ -30,11 +30,17 @@ public sealed class JitWarmup : IDisposable
     public int Skipped { get; private set; }
     public TimeSpan Elapsed { get; private set; }
     public bool Completed { get; private set; }
+    /// <summary>X-177 C4.2 (0.1200): the early part is compiled (or there is none, or the warm-up ended or was stopped): what waits for the
+    /// interface's code (the readers' classes) may go on.</summary>
+    public bool EarlyDone=>earlyDone;
+    private volatile bool earlyDone;
+    /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
+    public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest)
     {
         var token=cancellation.Token;
-        thread=new Thread(()=>Run(roots,delay,finished,early,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -42,8 +48,10 @@ public sealed class JitWarmup : IDisposable
     /// order; finished is told once, on the worker.</summary>
     /// <remarks>X-01 (0.1104): with <paramref name="early"/>, those methods are compiled first, <see cref="EarlyDelay"/> after loading, and the rest
     /// once <paramref name="delay"/> has passed.</remarks>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null)
-        =>new(roots,delay,finished,early);
+    /// <param name="holdRest">X-177 C4.2 (0.1200): while it says true, the rest (everything after the early part) waits, <see cref="RestHold"/>
+    /// at most: the runtime compiles one method at a time for the plugin, so what the game's thread needs sooner is compiled first.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null)
+        =>new(roots,delay,finished,early,holdRest);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -205,10 +213,11 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,CancellationToken token)
     {
         try
         {
+            if(early is null)earlyDone=true;
             var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
             if(token.WaitHandle.WaitOne(early is null ? delay:first))return;
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
@@ -222,8 +231,13 @@ public sealed class JitWarmup : IDisposable
                 if(index++==earlyCount && early is not null)
                 {
                     EarlyPrepared=Prepared;
+                    earlyDone=true;
                     var left=delay-first-System.Diagnostics.Stopwatch.GetElapsedTime(started);
                     if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
+                    // 0.1200: then whatever is compiled before the rest (the readers' classes), bounded.
+                    var held=System.Diagnostics.Stopwatch.GetTimestamp();
+                    while(holdRest is not null && Held(holdRest) && System.Diagnostics.Stopwatch.GetElapsedTime(held)<RestHold)
+                        if(token.WaitHandle.WaitOne(50))return;
                 }
                 try{RuntimeHelpers.PrepareMethod(method.MethodHandle);Prepared++;}
                 catch(Exception){Skipped++;}
@@ -233,7 +247,12 @@ public sealed class JitWarmup : IDisposable
             if(!token.IsCancellationRequested)finished?.Invoke(this);
         }
         catch(Exception){Skipped++;}
-        finally{done.Set();}
+        finally{earlyDone=true;done.Set();}
+    }
+    private static bool Held(Func<bool> ask)
+    {
+        try{return ask();}
+        catch(Exception){return false;}
     }
 
     /// <summary>For the desktop application's headless run: true once finished within the time.</summary>

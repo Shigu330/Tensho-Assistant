@@ -181,8 +181,12 @@ internal sealed partial class MainWindow : Window, IDisposable
         // X-01 (0.1050): the window's code compiled ahead off the frame (Diagnostics/JitWarmup.cs): the first frame of a page was mostly JIT.
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
             $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first.")),
-            Diagnostics.JitWarmup.EarlyMethod);
+            // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
+            holdRest: static ()=>TenshoAssistant.Competitive.CompetitiveGate.CompilerBusy,
+            early: Diagnostics.JitWarmup.EarlyMethod);
     }
+    /// <summary>X-177 C4.2 (0.1200): the interface's code (map, overlays) is compiled: the readers' classes may be compiled next.</summary>
+    internal bool WarmupEarlyDone=>jitWarmup.EarlyDone;
 
     private readonly Diagnostics.JitWarmup jitWarmup;
 

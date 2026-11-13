@@ -140,6 +140,9 @@ public sealed class Plugin : IDalamudPlugin
             var newInstall = saved is null;
             var configuration = saved ?? new Configuration();
             TenshoAssistant.Competitive.CompetitiveGate.Developer=()=>configuration.DeveloperMode;
+            // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
+            // exists and its warm-up has compiled the interface's code (bounded by ReaderCompiler.MaxHold; dropped at unload).
+            TenshoAssistant.Competitive.CompetitiveGate.Compiler.Hold=()=>mainWindow is not { WarmupEarlyDone:true };
             TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
             // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
             // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.
@@ -1621,9 +1624,15 @@ public sealed class Plugin : IDalamudPlugin
                 SayLoad("10 s later");
                 if(!configuration.DeveloperMode)return;
                 // X-177 C4.2 (0.1199): the readers' classes compiled on their own thread, each reader started once its class was ready.
-                if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is { } readers)
-                    log.Information("Readers compiled on their own thread: {0} classes, {1} methods in {2:0} ms, the last one ready {3:0} ms after the first subscribed; {4} still waiting.",
-                        readers.Classes,readers.Methods,readers.Compiling,readers.DoneAfter,readers.Waiting);
+                void SayReaders()
+                {
+                    if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is { } readers)
+                        log.Information("Readers compiled on their own thread: {0} classes, {1} methods in {2:0} ms, the last one ready {3:0} ms after the first subscribed; {4} still waiting.",
+                            readers.Classes,readers.Methods,readers.Compiling,readers.DoneAfter,readers.Waiting);
+                }
+                SayReaders();
+                // 0.1200: the classes come after the interface's code: said again once they had the time to end.
+                if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState?.Waiting>0)_=Task.Delay(TimeSpan.FromSeconds(20)).ContinueWith(_=>SayReaders(),TaskScheduler.Default);
                 // 0.1196: one short line per earlier instance: « 0 of N parts alive » when it was collected whole, else its first 24 parts held.
                 foreach(var earlier in instances.Skip(1))log.Information("Earlier instance {0}.",Diagnostics.UnloadWatch.Describe(earlier.Key,earlier.Value,24));
                 // 0.1188: the newest earlier instance whose plugin object is still alive: did its unload finish, and which of its static

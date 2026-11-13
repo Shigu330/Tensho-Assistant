@@ -28,9 +28,11 @@ internal static partial class CompetitiveGate
     internal static Diagnostics.ReaderCompiler Compiler{get{lock(CompilerGate)return compiler??=new();}}
     /// <summary>What the readers' compiler did so far, for the log; null when no reader subscribed.</summary>
     internal static (int Classes,int Methods,double Compiling,double DoneAfter,int Waiting)? CompilerState{get{lock(CompilerGate)return compiler?.State;}}
+    /// <summary>X-177 C4.2 (0.1200): readers' classes still wait or are being compiled (the warm-up's rest waits for them); false without a compiler.</summary>
+    internal static bool CompilerBusy{get{Diagnostics.ReaderCompiler? running;lock(CompilerGate)running=compiler;return running is { Idle:false };}}
 
     /// <summary>Whether a hook still holds something of an instance (the unload's own check, and the tests').</summary>
-    internal static bool HoldsInstance=>Developer is not null || SlowSubscription is not null || Changed is not null;
+    internal static bool HoldsInstance=>Developer is not null || SlowSubscription is not null || Changed is not null || compiler is not null;
 
     // X-177 C4.4 (0.1193, analysis of 12/11: « GameGearsetReader 354 ms » in the slow readers was the game's own EquipGearset, which
     // changes the gear): the time a subscription spends inside a function of the game it calls on the player's request is told apart

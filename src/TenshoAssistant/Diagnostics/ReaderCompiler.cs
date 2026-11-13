@@ -12,11 +12,23 @@ namespace TenshoAssistant.Diagnostics;
 /// compiles what it needs itself, as before), or once the compiler is stopped. One class at a time, each class once; the thread ends when
 /// nothing waits and starts again for a later subscription. Stopped at unload: the thread is told and joined (R07), what still waited is
 /// let go, and nothing of the plugin's instance stays behind (types and plain flags only).
+/// 0.1200 (read at the load of 0.1199: the load back to 3.0 s, but 12 slow first passes and a first frame of 596 ms): on this machine's
+/// 32 processors, three threads compiling at once took as long as one after the other (the classes in 8.0 s instead of 4.4 s, the
+/// warm-up in 54 s instead of 32 s): the runtime compiles one method at a time for the plugin, and each thread compiling in the
+/// background makes the game's thread wait longer for its own. So one background thread compiles at a time, in the order of the
+/// need: the interface's code first (the warm-up's early part), then the readers' classes, then the rest. <see cref="Hold"/> is that
+/// order: the classes wait while it says so, <see cref="MaxHold"/> at most.
 /// </summary>
 public sealed class ReaderCompiler : IDisposable
 {
     /// <summary>How long a reader waits at most for its class: past it, the reader starts anyway.</summary>
-    public static readonly TimeSpan Guard=TimeSpan.FromSeconds(15);
+    public static readonly TimeSpan Guard=TimeSpan.FromSeconds(20);
+    /// <summary>0.1200: how long the classes wait at most for what is compiled before them, counted from the first subscription.</summary>
+    public static readonly TimeSpan MaxHold=TimeSpan.FromSeconds(12);
+    /// <summary>0.1200: while this says true the next class is not compiled yet (the interface's code is compiled first); asked on the
+    /// worker. Given by the plugin, dropped at the stop: it is the one thing here that can hold an instance.</summary>
+    public Func<bool>? Hold{get=>hold;set=>hold=value;}
+    private volatile Func<bool>? hold;
 
     /// <summary>What a subscription asks before each call: whether its reader may run yet.</summary>
     public sealed class Ticket
@@ -45,6 +57,8 @@ public sealed class ReaderCompiler : IDisposable
     private readonly Func<long> now;
     private readonly Action<MethodBase> prepare;
     private readonly long guard;
+    private readonly long maxHold;
+    private long firstAdded=-1;
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
     private Thread? worker;
     private volatile bool stopped;
@@ -54,11 +68,27 @@ public sealed class ReaderCompiler : IDisposable
     /// <param name="now">The clock of the guard delay, in milliseconds (the tests' own; the machine's by default).</param>
     /// <param name="prepare">What compiles one method (the tests' own; the runtime's by default).</param>
     /// <param name="guard">The guard delay (<see cref="Guard"/> by default).</param>
-    public ReaderCompiler(Func<long>? now=null,Action<MethodBase>? prepare=null,TimeSpan? guard=null)
+    /// <param name="maxHold">How long <see cref="Hold"/> is listened to (<see cref="MaxHold"/> by default).</param>
+    public ReaderCompiler(Func<long>? now=null,Action<MethodBase>? prepare=null,TimeSpan? guard=null,TimeSpan? maxHold=null)
     {
         this.now=now ?? (static ()=>Environment.TickCount64);
         this.prepare=prepare ?? (static method=>RuntimeHelpers.PrepareMethod(method.MethodHandle));
         this.guard=(long)(guard ?? Guard).TotalMilliseconds;
+        this.maxHold=(long)(maxHold ?? MaxHold).TotalMilliseconds;
+    }
+
+    /// <summary>0.1200: whether the classes still wait for what is compiled before them (never past <see cref="MaxHold"/>, never once stopped).</summary>
+    public bool Held
+    {
+        get
+        {
+            if(stopped || hold is not { } ask)return false;
+            long first;
+            lock(gate)first=firstAdded;
+            if(first>=0 && now()-first>=maxHold)return false;
+            try{return ask();}
+            catch(Exception){return false;}
+        }
     }
 
     /// <summary>Classes compiled so far, their methods, the time spent compiling them on the worker, how long after this compiler was made
@@ -86,6 +116,7 @@ public sealed class ReaderCompiler : IDisposable
             var ticket=new Ticket(now()+guard,now);
             if(stopped || owner is null){ticket.Set();return ticket;}
             tickets[owner]=ticket;
+            if(firstAdded<0)firstAdded=now();
             waiting.Enqueue((ticket,handler));
             if(worker is null)
             {
@@ -100,6 +131,8 @@ public sealed class ReaderCompiler : IDisposable
     {
         while(true)
         {
+            // 0.1200: the interface's code first: nothing is taken while the plugin says to wait (a short sleep, the stop seen at once).
+            while(Held)Thread.Sleep(20);
             (Ticket Ticket,MethodBase Handler) next;
             lock(gate)
             {
@@ -137,6 +170,7 @@ public sealed class ReaderCompiler : IDisposable
         {
             if(stopped)return;
             stopped=true;
+            hold=null;
             foreach(var (ticket,_) in waiting)ticket.Set();
             waiting.Clear();
             foreach(var ticket in tickets.Values)ticket.Set();
