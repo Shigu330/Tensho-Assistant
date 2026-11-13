@@ -108,7 +108,7 @@ internal sealed partial class MainWindow
         var now=DateTimeOffset.UtcNow;
         var alarms=GardenJournal.Alarms(configuration.GardenBeds,now);
         if(alarms.Count==0){EmptyState("Garden.AlarmsEmpty");return;}
-        if(!ImGui.BeginTable("GardenAlarms",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.SizingStretchProp))return;
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("GardenAlarms",4))return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("Garden.AlarmsWhen"));

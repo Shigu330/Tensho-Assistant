@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
             foreach(var territory in favorites.Keys)weatherFavoritesGrid[territory]=catalog.Forecast(territory,now,WeatherFavoritePeriods);
             weatherFavoritesPeriod=period;
         }
-        if(!ImGui.BeginTable("WeatherFavorites",WeatherFavoritePeriods+1,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp))return;
+        if(!UI.UiComponents.BeginDataTable("WeatherFavorites",WeatherFavoritePeriods+1))return;
         try
         {
             ImGui.TableSetupColumn(localization.Get("Weather.Zone"));
@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         if(period!=weatherPeriod || !ReferenceEquals(catalog,weatherViewCatalog))
         {weatherForecast=catalog.Forecast(weatherTerritory,now,12);weatherPeriod=period;weatherViewCatalog=catalog;weatherSearchKey=default;}
         ImGui.TextDisabled(localization.Get("Weather.PeriodHelp"));
-        if(ImGui.BeginTable("WeatherForecast",5,ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+        if(UI.UiComponents.BeginDataTable("WeatherForecast",5))
         {
             try
             {

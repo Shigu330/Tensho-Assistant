@@ -142,7 +142,7 @@ internal sealed partial class MainWindow
         // X-127: the alarms of every timed point of the wishes still to get, in one click (same button and rules as a list's).
         ImGui.SameLine();
         DrawListPanelAlarms("Wishlist",WishlistGathering.AlarmLines(list,WishObtained));
-        if(!ImGui.BeginTable("Wishlist",4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("Wishlist",4))return;
         uint? remove=null;
         try
         {

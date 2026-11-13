@@ -61,7 +61,7 @@ internal sealed partial class MainWindow
             if(totals.Count==0)continue;
             // 0.769 (X-19): transfers with the retainers or the company chest stay out of the net.
             ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
-            if(!ImGui.BeginTable("GilTotals"+source,4,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))continue;
+            if(!UI.UiComponents.BeginDataTable("GilTotals"+source,4))continue;
             try
             {
                 foreach(var column in new[]{"ColumnCategory","ColumnGained","ColumnSpent","ColumnNet"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
@@ -77,22 +77,23 @@ internal sealed partial class MainWindow
                     ImGui.SameLine();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+category));
                     if(GilJournal.IsTransfer(category))
                     {
-                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(gained));
-                        ImGui.TableNextColumn();ImGui.TextDisabled(Part(spent));
+                        ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(gained),Muted);
+                        ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(spent),Muted);
                         ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
                         Tip("GilJournal.TransferTip");
                         continue;
                     }
-                    ImGui.TableNextColumn();if(gained>0)ImGui.TextColored(Success,Part(gained));else ImGui.TextDisabled(Part(gained));
-                    ImGui.TableNextColumn();if(spent>0)ImGui.TextColored(UI.FfxivTheme.Warning,Part(spent));else ImGui.TextDisabled(Part(spent));
-                    ImGui.TableNextColumn();ImGui.TextColored(gained>=spent ? Success:UI.FfxivTheme.Warning,(gained-spent).ToString("+#,0;-#,0;0"));
+                    // X-154 (0.1255): amounts aligned on the right of their column (NumberCell), same colours as before.
+                    ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(gained),gained>0 ? Success:Muted);
+                    ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(spent),spent>0 ? UI.FfxivTheme.Warning:Muted);
+                    ImGui.TableNextColumn();UI.UiComponents.NumberCell((gained-spent).ToString("+#,0;-#,0;0"),gained>=spent ? Success:UI.FfxivTheme.Warning);
                 }
             }
             finally{ImGui.EndTable();}
         }
         if(gilTotals.All(totals=>totals.Count==0))ImGui.TextDisabled(localization.Get("GilJournal.Empty"));
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GilJournal.Latest")))return;
-        if(!ImGui.BeginTable("GilLatest",5,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
+        if(!UI.UiComponents.BeginDataTable("GilLatest",5))return;
         try
         {
             foreach(var column in new[]{"ColumnDate","ColumnChange","ColumnBalance","ColumnCategory","ColumnSource"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
@@ -101,8 +102,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(entry.At.ToLocalTime().ToString("g"));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Delta.ToString("+#,0;-#,0"));
-                ImGui.TableNextColumn();ImGui.TextUnformatted(entry.Balance.ToString("N0",Numbers));
+                ImGui.TableNextColumn();UI.UiComponents.NumberCell(entry.Delta.ToString("+#,0;-#,0"));
+                ImGui.TableNextColumn();UI.UiComponents.NumberCell(entry.Balance.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+entry.Category));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Short"+entry.Source));
             }

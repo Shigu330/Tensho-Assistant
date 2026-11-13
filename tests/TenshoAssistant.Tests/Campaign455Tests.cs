@@ -36,7 +36,7 @@ internal static class Campaign455Tests
         ("Gil journal: tables; the minus sign the game font shows as « = » is gone from the texts",() =>
         {
             var ui=Read("MainWindow.GilJournal.cs");
-            Check(ui.Contains("ImGui.BeginTable(\"GilTotals\"+source,4,") && ui.Contains("ImGui.BeginTable(\"GilLatest\",5,") && !ui.Contains("GilJournal.Line"),"tables");
+            Check(ui.Contains("BeginDataTable(\"GilTotals\"+source,4)") && ui.Contains("BeginDataTable(\"GilLatest\",5)") && !ui.Contains("GilJournal.Line"),"tables");
             foreach(var language in new[]{"de","en","fr","ja"})Check(!Read($"Localization/Languages/{language}.json").Contains('−'),language);
         }),
     ];

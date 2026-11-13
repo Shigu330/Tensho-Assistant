@@ -55,6 +55,30 @@ internal static class UiComponents
         return clicked;
     }
 
+    /// <summary>
+    /// X-154 (0.1255): the one way to open a data table: striped rows, a thin line between rows, columns sharing the width; sortable and
+    /// a scrolling body of a given height on demand. Closed by ImGui.EndTable() as any table (the pages keep their try/finally).
+    /// </summary>
+    public static bool BeginDataTable(string id,int columns,bool sortable=false,float scrollHeight=0)
+    {
+        var flags=ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.SizingStretchProp;
+        if(sortable)flags|=ImGuiTableFlags.Sortable;
+        if(scrollHeight>0)flags|=ImGuiTableFlags.ScrollY;
+        return ImGui.BeginTable(id,columns,flags,new Vector2(0,scrollHeight>0 ? scrollHeight:0));
+    }
+
+    /// <summary>
+    /// X-154 (0.1255): a number in a table cell, aligned on the right edge of its column so the digits line up (ImGui has no tabular
+    /// figures and the font is the player's). The body colour unless one is given.
+    /// </summary>
+    public static void NumberCell(string text,Vector4? colour=null)
+    {
+        var room=ImGui.GetContentRegionAvail().X-ImGui.CalcTextSize(text).X;
+        if(room>0)ImGui.SetCursorPosX(ImGui.GetCursorPosX()+room);
+        if(colour is { } given)ImGui.TextColored(given,text);
+        else ImGui.TextUnformatted(text);
+    }
+
     /// <summary>X-154 (0.1252): a title inside a page (a block of the page, the page named beside the folded navigation): the section font, accent colour.</summary>
     public static void SubTitle(string text)
     {
