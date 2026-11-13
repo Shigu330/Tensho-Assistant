@@ -1709,7 +1709,7 @@
     "Windows": "{0} créneau(x) ET",
     "GatherTooltip": "Créer une alarme chaque jour ET pour les {0} créneau(x) de ce point.",
     "Daily": "Chaque jour ET à {0}",
-    "Next": "prochaine {0} (dans {1} min)",
+    "Next": "prochaine {0} (dans {1})",
     "WeatherCondition": "si la météo correspond",
     "Lead": "min avant",
     "Delete": "Supprimer",

@@ -250,8 +250,13 @@ public sealed class GitHubExchange : IDisposable
         }
         lock(gate)if(started!=generation)throw new OperationCanceledException("Disconnected.");
         if(renewal is null || GitHubSignIn.Ended(ends,clock())){ForgetIfStill(renewal);throw new ExchangeRefused("ExchangeExpired",false);}
-        var work=RenewAndKeep(renewal,started);
+        // X-279 (0.1292, test GitHubToken1171 failing alone): the renewal is registered before its request leaves, so that a Dispose
+        // coming while GitHub answers always finds it to wait for (the request used to start, and could be answered, before this line).
+        var go=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        async Task<bool?> Registered(){await go.Task.ConfigureAwait(false);return await RenewAndKeep(renewal,started).ConfigureAwait(false);}
+        var work=Registered();
         lock(gate)refreshing=work;
+        go.SetResult();
         bool? kept;
         try{kept=await work.ConfigureAwait(false);}
         finally{lock(gate)refreshing=null;}

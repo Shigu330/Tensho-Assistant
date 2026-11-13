@@ -26,13 +26,11 @@ public static class GardenView
     {
         var left=GardenJournal.RipeAt(bed)-now;
         if(left<=TimeSpan.Zero)return null;
-        var minutes=(long)Math.Floor(left.TotalMinutes);
-        return ((int)(minutes/1440),(int)(minutes/60%24),(int)(minutes%60));
+        return TenshoAssistant.UI.TimeLeft.Split(left);
     }
 
     /// <summary>The text of a time left: its key (Common.LeftDays « {0} d {1} h », LeftHours « {0} h {1:00} », LeftMinutes « {0} min ») and its two numbers.</summary>
-    public static (string Key,int First,int Second) LeftText((int Days,int Hours,int Minutes) left)
-        =>left.Days>0 ? ("Common.LeftDays",left.Days,left.Hours):left.Hours>0 ? ("Common.LeftHours",left.Hours,left.Minutes):("Common.LeftMinutes",left.Minutes,0);
+    public static (string Key,int First,int Second) LeftText((int Days,int Hours,int Minutes) left)=>TenshoAssistant.UI.TimeLeft.Text(left);
 
     public static GardenBadge Badge(GardenBed bed,DateTimeOffset now)
     {

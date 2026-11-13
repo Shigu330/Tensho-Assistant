@@ -1709,7 +1709,7 @@
     "Windows": "{0} ET slot(s)",
     "GatherTooltip": "Create an alarm every ET day for the {0} slot(s) of this point.",
     "Daily": "Every ET day at {0}",
-    "Next": "next {0} (in {1} min)",
+    "Next": "next {0} (in {1})",
     "WeatherCondition": "if the weather matches",
     "Lead": "min ahead",
     "Delete": "Delete",

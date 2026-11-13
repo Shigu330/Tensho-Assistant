@@ -299,6 +299,13 @@ internal sealed partial class MainWindow
     /// The alarms in sections by gathering job and groups (0.202, 0.203), with their buttons; one list for the Alarms tool and the Reminders
     /// tool's « Alarms » tab (X-133, 0.1159). Removals and additions go to the caller's lists; true when an alarm changed.
     /// </summary>
+    /// <summary>
+    /// X-279 (0.1292, user report of 13/11): « next 00:00 (in 24631 min) » becomes « next 01/12/2026 00:00 (in 17 d 2 h) »: the time left in the
+    /// common format (TimeLeftText), the date when the ringing is not today.
+    /// </summary>
+    private string AlarmNextText(DateTimeOffset at,DateTimeOffset now)
+        =>localization.Format("Alarms.Next",at.ToLocalTime().ToString(TenshoAssistant.UI.TimeLeft.SameDay(at,now,TimeZoneInfo.Local) ? "t":"g"),TimeLeftText(at-now));
+
     private bool DrawAlarmGroups(IEnumerable<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added)
     {
         var changed=false;
@@ -327,7 +334,7 @@ internal sealed partial class MainWindow
                         var next=members.Where(alarm=>alarm.Enabled).Select(alarm=>NextAlarm(alarm,now)).OfType<DateTimeOffset>().OrderBy(time=>time).FirstOrDefault();
                         ImGui.TextColored(members.Any(alarm=>alarm.Enabled) ? Accent:Muted,title);
                         ImGui.TextDisabled(localization.Format("Alarms.GroupLine",members.Length)
-                            +(next!=default ? " · "+localization.Format("Alarms.Next",next.ToLocalTime().ToString("t"),Math.Max(0,(int)(next-now).TotalMinutes)):"")
+                            +(next!=default ? " · "+AlarmNextText(next,now):"")
                             +(members.Any(alarm=>alarm.Weathers.Count+alarm.PreviousWeathers.Count>0) ? " · "+localization.Get("Alarms.WeatherCondition"):"")
                             +(members.Any(AlarmGathered) ? " · "+localization.Get("Alarms.GatheredSilent"):""));
                         var all=members.All(alarm=>alarm.Enabled);
@@ -408,7 +415,7 @@ internal sealed partial class MainWindow
                                         Tip("SettingTips.AlarmOn");
                                         ImGui.SameLine();
                                         var at=NextAlarm(alarm,now);
-                                        ImGui.TextColored(alarm.Enabled ? Success:Muted,AlarmWhen(alarm)+(at is { } when ? " · "+localization.Format("Alarms.Next",when.ToLocalTime().ToString("t"),Math.Max(0,(int)(when-now).TotalMinutes)):""));
+                                        ImGui.TextColored(alarm.Enabled ? Success:Muted,AlarmWhen(alarm)+(at is { } when ? " · "+AlarmNextText(when,now):""));
                                         if(ImGui.IsItemHovered())WrappedTooltip(alarm.Label+"\n"+string.Join("\n",AlarmSchedule.Occurrences(alarm,now,5).Select(time=>time.ToLocalTime().ToString("g"))));
                                         ImGui.SameLine();ImGui.SetNextItemWidth(90);
                                         var lead=alarm.LeadMinutes;

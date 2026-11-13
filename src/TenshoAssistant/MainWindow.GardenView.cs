@@ -36,9 +36,11 @@ internal sealed partial class MainWindow
 
     private string GardenLeftText((int Days,int Hours,int Minutes) left)
     {
-        var (key,first,second)=GardenView.LeftText(left);
+        var (key,first,second)=TenshoAssistant.UI.TimeLeft.Text(left);
         return localization.Format(key,first,second);
     }
+    /// <summary>X-279 (0.1292): a time left in the common format (« 17 d 2 h », « 3 h 05 », « 45 min »), the one way to write it.</summary>
+    private string TimeLeftText(TimeSpan left)=>GardenLeftText(TenshoAssistant.UI.TimeLeft.Split(left));
 
     /// <summary>One cell of a patch in icons: the bed's number, then the seed (or the empty bed).</summary>
     private void DrawGardenGridIcons(int number,GardenBed? bed,IReadOnlyList<(int Number,GardenBed Bed)> planted,IReadOnlyList<GardenForecast>? forecasts,DateTimeOffset now,ref bool changed,ref GardenBed? removed)

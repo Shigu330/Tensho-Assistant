@@ -145,6 +145,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/DesktopReadOnly.cs" Link="UI/DesktopReadOnly.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/BarTooltipPlace.cs" Link="UI/BarTooltipPlace.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/DeleteConfirm.cs" Link="UI/DeleteConfirm.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/TimeLeft.cs" Link="UI/TimeLeft.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/WeatherForecast.cs" Link="Gathering/WeatherForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/FishingForecast.cs" Link="Gathering/FishingForecast.cs" />
     <Compile Include="../../src/TenshoAssistant/Gathering/GatheringSchedule.cs" Link="Gathering/GatheringSchedule.cs" />
