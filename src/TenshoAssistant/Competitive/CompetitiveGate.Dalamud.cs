@@ -41,6 +41,7 @@ internal static partial class CompetitiveGate
         // is mostly compiling is code met for the first time, not work to move.
         var compiledBefore=System.Runtime.JitInfo.GetCompilationTime(true);
         var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
+        var pausedBefore=GC.GetTotalPauseDuration();
         var started=MeasureStart();
         handler(running);
         var spent=MeasureOwn(started);
@@ -48,7 +49,7 @@ internal static partial class CompetitiveGate
         var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
         if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;
         SlowSubscription?.Invoke(name+Diagnostics.JitWarmup.CompiledText((System.Runtime.JitInfo.GetCompilationTime(true)-compiledBefore).TotalMilliseconds,
-            System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore),spent,worst);
+            System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore)+Diagnostics.JitWarmup.PauseText((GC.GetTotalPauseDuration()-pausedBefore).TotalMilliseconds),spent,worst);
     }
 
     /// <summary>

@@ -1556,6 +1556,9 @@ public sealed partial class Plugin : IDalamudPlugin
                     if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is { } readers)
                         log.Information("Readers compiled on their own thread: {0} classes, {1} methods in {2:0} ms, the last one ready {3:0} ms after the first subscribed; {4} still waiting.",
                             readers.Classes,readers.Methods,readers.Compiling,readers.DoneAfter,readers.Waiting);
+                    // X-177 (0.1281): of those methods, the ones the readers' classes call in other classes (CallGraph).
+                    if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is not null)
+                        log.Information("Readers' callees: {0} methods called from their classes in other classes, compiled with them.",TenshoAssistant.Competitive.CompetitiveGate.CompilerCallees);
                 }
                 SayReaders();
                 // 0.1200: the classes come after the interface's code: said again once they had the time to end.

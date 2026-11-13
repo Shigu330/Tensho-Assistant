@@ -21,6 +21,12 @@ namespace TenshoAssistant.Diagnostics;
 /// </summary>
 public sealed class ReaderCompiler : IDisposable
 {
+    /// <summary>X-177 (0.1281): at most this many methods a reader's class calls elsewhere, compiled with it (measured on 13/11: the four slow
+    /// first passes compiled 27 to 43 methods outside their class; ReminderDtrEntry calls 27 at the first level, 50 at the next).</summary>
+    public const int CalleeCap=80;
+    /// <summary>X-177 (0.1281): how many of the methods compiled were called from a reader's class in another class.</summary>
+    public int Callees{get{lock(gate)return callees;}}
+
     /// <summary>How long a reader waits at most for its class: past it, the reader starts anyway.</summary>
     public static readonly TimeSpan Guard=TimeSpan.FromSeconds(20);
     /// <summary>0.1200: how long the classes wait at most for what is compiled before them, counted from the first subscription.</summary>
@@ -55,7 +61,10 @@ public sealed class ReaderCompiler : IDisposable
     private readonly Queue<(Ticket Ticket,MethodBase Handler)> waiting=new();
     private readonly Dictionary<Type,Ticket> tickets=[];
     private readonly Func<long> now;
-    private readonly Action<MethodBase> prepare;
+    private readonly Action<MethodBase>? prepare;
+    /// <summary>X-177 (0.1281): the methods taken so far, by every class (the worker's alone): a callee shared by several readers is compiled once.</summary>
+    private readonly HashSet<MethodBase> known=[];
+    private int callees;
     private readonly long guard;
     private readonly long maxHold;
     private long firstAdded=-1;
@@ -72,7 +81,8 @@ public sealed class ReaderCompiler : IDisposable
     public ReaderCompiler(Func<long>? now=null,Action<MethodBase>? prepare=null,TimeSpan? guard=null,TimeSpan? maxHold=null)
     {
         this.now=now ?? (static ()=>Environment.TickCount64);
-        this.prepare=prepare ?? (static method=>RuntimeHelpers.PrepareMethod(method.MethodHandle));
+        // 0.1281: none given, the plugin's own (generic code closed over a plugin type compiled with its instantiation).
+        this.prepare=prepare;
         this.guard=(long)(guard ?? Guard).TotalMilliseconds;
         this.maxHold=(long)(maxHold ?? MaxHold).TotalMilliseconds;
     }
@@ -148,7 +158,14 @@ public sealed class ReaderCompiler : IDisposable
             }
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
             var compiled=0;
-            try{compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare);}
+            var before=known.Count;
+            var own=0;
+            try
+            {
+                own=JitWarmup.Methods([JitWarmup.Owner(next.Handler)!]).Count;
+                // X-177 (0.1281): with what the class calls in other classes, nearest first (CalleeCap), each method once for all the readers.
+                compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known);
+            }
             catch(Exception){}
             // Whatever happened to the compiling, the reader is never left waiting.
             finally{next.Ticket.Set();}
@@ -156,6 +173,7 @@ public sealed class ReaderCompiler : IDisposable
             {
                 busy=false;
                 classes++;methods+=compiled;
+                callees+=Math.Max(0,known.Count-before-own);
                 compiling+=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
             }
         }

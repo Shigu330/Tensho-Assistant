@@ -195,23 +195,33 @@ public sealed class JitWarmup : IDisposable
     /// 0.1199: <paramref name="stop"/> is asked before each method (an unload does not wait for a whole class) and
     /// <paramref name="prepare"/> compiles one method (the runtime's by default; the tests' own).
     /// </summary>
-    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null)
+    /// <param name="callees">X-177 (0.1281): besides the class, at most this many methods it calls elsewhere (<see cref="CallGraph.Closure"/>,
+    /// nearest first; measured on 13/11: ReminderDtrEntry compiled 27 to 32 methods on its first pass with its class compiled, and calls 27
+    /// outside it at the first level, 50 at the next). 0: the class alone, as before.</param>
+    /// <param name="known">X-177 (0.1281): methods already taken by an earlier class (shared by the caller, one thread): left out and not
+    /// counted again; the ones taken here are added.</param>
+    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null,int callees=0,ISet<MethodBase>? known=null)
     {
         IReadOnlyList<MethodBase> methods;
         try
         {
-            methods=Owner(handler) is { } owner ? Methods([owner]):[];
+            var owner=Owner(handler);
+            methods=owner is not null ? Methods([owner]):[];
             if(methods.Count>cap)methods=handler.DeclaringType is { } own ? Methods([own]):[];
             if(methods.Count>cap)return 0;
+            if(callees>0 && methods.Count>0 && owner is not null)
+                methods=[..CallGraph.Closure(methods,owner.Assembly,methods.Count+callees,stop).Where(method=>known?.Contains(method)!=true)];
         }
         catch(Exception){return 0;}
         var prepared=0;
         foreach(var method in methods)
         {
             if(stop?.Invoke()==true)break;
+            known?.Add(method);
             try
             {
-                if(prepare is null)RuntimeHelpers.PrepareMethod(method.MethodHandle);else prepare(method);
+                if(prepare is not null)prepare(method);
+                else if(!CallGraph.Prepare(method))continue;
                 prepared++;
             }
             catch(Exception){}
@@ -222,6 +232,12 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-177 C4.2 (0.1198): the part of a slow pass spent compiling, for its line of the log; nothing when nothing was compiled.</summary>
     public static string CompiledText(double milliseconds,long methods)=>
         methods<=0 ? "":string.Create(System.Globalization.CultureInfo.InvariantCulture,$" ({milliseconds:0} ms of it compiling {methods} methods)");
+
+    /// <summary>X-177 (0.1281): the runtime's pauses during a slow pass (a collection stops every thread, the game's included, and lands in
+    /// whichever reader runs then: NativeMapReplacer 976 ms on 13/11 at 21:14 with 3 ms of compiling, right after the load's self-check);
+    /// nothing under 1 ms.</summary>
+    public static string PauseText(double milliseconds)=>
+        milliseconds<1 ? "":string.Create(System.Globalization.CultureInfo.InvariantCulture,$" (runtime pauses {milliseconds:0} ms)");
 
     internal static bool Compilable(MethodBase method)
     {
