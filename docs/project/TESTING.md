@@ -1581,6 +1581,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1245) « Seulement en cas de souci » coché : l'entrée disparaît tant que tout va bien
 
+- [ ] (0.1246) Paramètres › Général : cocher « État de Tensho dans un panneau » : petit panneau « Tensho : ok · … Mo » déplaçable, bouton Détails qui ouvre les paramètres ; avec « Seulement en cas de souci », le panneau disparaît tant que tout va bien
+
+- [ ] (0.1246) Application de bureau reliée au jeu (Paramètres › Avancé) : la barre d'état dit « Tensho : ok · … Mo » après la zone ; Paramètres › Général de l'application montre « En jeu : … » dans le tableau de bord
+
+- [ ] (0.1247) Paramètres › Général, état de Tensho activé : le tableau de bord dit « Démarré en … ms », « Panneaux : aucun coupé » ; après quelques prix du marché affichés, la ligne des requêtes compte universalis.app
+
+- [ ] (0.1248) Compagnie › Aéronefs, après avoir ouvert la liste des aéronefs à l'atelier : ouvrir « Vos aéronefs : meilleur trajet de chacun » : une ligne par aéronef avec son trajet ; changer l'objectif change les lignes ; « Choisir » remplit le planificateur ; aucun à-coup visible à l'ouverture
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
