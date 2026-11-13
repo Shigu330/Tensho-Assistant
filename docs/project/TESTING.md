@@ -1712,17 +1712,25 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1279) Au lancement du jeu (ou après une mise à jour de Tensho), les panneaux et barres libres de Tensho apparaissent 1 à 3 s après, sans petit gel de l'image au moment où ils arrivent.
 
-- [ ] (0.1285) Stockage › Banque, onglet d'un servant relu à la cloche (Shirune, Zet-suna) : ses sacs s'affichent dans l'ordre du jeu, ses gils et cristaux sur une page après les sacs, plus de « réimportez ».
+- [x] (0.1285) Stockage › Banque, onglet d'un servant relu à la cloche (Shirune, Zet-suna) : ses sacs s'affichent dans l'ordre du jeu, ses gils et cristaux sur une page après les sacs, plus de « réimportez ».
 
-- [ ] (0.1286) Atelier de compagnie : ouvrir le panneau des sous-marins puis celui des dirigeables (puis l'inverse) : Atelier › Vaisseaux liste les deux vaisseaux partis, la barre serveur et Alarmes donnent les deux retours ; dalamud.log dit « Workshop read without … » une fois par visite.
+- [x] (0.1286) Atelier de compagnie : ouvrir le panneau des sous-marins puis celui des dirigeables (puis l'inverse) : Atelier › Vaisseaux liste les deux vaisseaux partis, la barre serveur et Alarmes donnent les deux retours ; dalamud.log dit « Workshop read without … » une fois par visite.
 
 - [ ] (0.1287) Survol d'un objet déjà vu au tableau du marché, puis Ctrl+Alt : « Consulté » passe à l'heure présente, les lignes du monde, du centre de données et de la région changent avec ; dalamud.log dit « Hover price refresh (Ctrl+Alt): item …, Success » ; Paramètres › Général, le tableau de bord compte universalis.app.
 
-- [ ] (0.1288) Alarmes › Alarmes à date : créer une alarme quotidienne, « Modifier » : le champ « Date et heure » montre la prochaine sonnerie ; changer l'heure et quitter le champ : la ligne de l'alarme dit la nouvelle heure, une seule alarme dans le groupe, toujours là après un rechargement.
+- [x] (0.1288) Alarmes › Alarmes à date : créer une alarme quotidienne, « Modifier » : le champ « Date et heure » montre la prochaine sonnerie ; changer l'heure et quitter le champ : la ligne de l'alarme dit la nouvelle heure, une seule alarme dans le groupe, toujours là après un rechargement.
 
-- [ ] (0.1289) En dresseur, page Équipement : les cases Arme et Main secondaire montrent la hache (ou le tabar) et le bouclier portés, le niveau d'objet moyen les compte ; recherche d'une pièce (Tête) au niveau du dresseur : des pièces du dresseur sont proposées.
+- [x] (0.1289) En dresseur, page Équipement : les cases Arme et Main secondaire montrent la hache (ou le tabar) et le bouclier portés, le niveau d'objet moyen les compte ; recherche d'une pièce (Tête) au niveau du dresseur : des pièces du dresseur sont proposées.
 
-- [ ] (0.1290) En dresseur 45, page Équipement, recherche d'une pièce (Tête) : la liste dit « Niveaux 40 à 45 » et propose des pièces ; au niveau 50 (ou un autre job 50/60/…/100) : seulement le niveau exact ; Paramètres, le réglage s'appelle « Niveau exact aux paliers ».
+- [x] (0.1290) En dresseur 45, page Équipement, recherche d'une pièce (Tête) : la liste dit « Niveaux 40 à 45 » et propose des pièces ; au niveau 50 (ou un autre job 50/60/…/100) : seulement le niveau exact ; Paramètres, le réglage s'appelle « Niveau exact aux paliers ».
+
+- [ ] (0.1291) Survol d'un objet regardé au tableau des ventes il y a peu, puis Ctrl+Alt : la ligne du monde dit « Vu au tableau des ventes <date> » et « Consulté » prend l'heure de l'appui ; sur un objet jamais ouvert au tableau : « Relevé Universalis <date> » (une date ancienne veut dire que personne ne l'a envoyé depuis).
+
+- [ ] (0.1292) Page Alarmes › Alarmes à date, une alarme du 01/12 : la ligne dit « prochaine 01/12/2026 00:00 (dans 17 j … h) » ; une alarme d'aujourd'hui : l'heure seule et « dans 3 h 05 » ou « dans 45 min ».
+
+- [ ] (0.1293) Stockage › Banque, onglet d'un servant (Shirune, Zet-suna) puis vue Globale : une ligne « <servant> · gils : 999 » avec l'icône de gil, plus de case gil dans un « Sac 6 » ; vue en liste : pas de ligne Gil.
+
+- [ ] (0.1294) Page Équipement, clic sur un emplacement (Main secondaire, niveaux 40 à 45), fenêtre étroite puis large : aucun texte coupé au bout des lignes ; survol d'une pièce : « Statistiques de base », puis « Comparé à l'équipement porté » avec les écarts verts et rouges deux par deux et « Valeurs de base, sans matérias », puis niveau, stock et obtention.
 
 **0.535 : interfaces** — à voir en jouant
 
