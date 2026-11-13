@@ -34,6 +34,7 @@ internal sealed class GardenChatWatcher : IDisposable
     // #36 (0.978): the target's object id (0: none), to see a harvest.
     private readonly Func<uint>? target;
     private DateTimeOffset lastHarvest;
+    private (int Patch,int Bed)? lastHarvestSlot;
     // X-179 (0.1165): the game's menu on a bed (its title names the patch and the bed), read while it is open, for the care line that follows.
     private static readonly string[] MenuWindows=["SelectString","SelectIconString"];
     private readonly IGameGui? gui;
@@ -162,14 +163,15 @@ internal sealed class GardenChatWatcher : IDisposable
             var sender=message.Sender.TextValue.Trim();var text=message.Message.TextValue;
             // #36 (0.1110): the capture of every housing chat line is gone, tending and harvesting being recognized (0.616, 0.978).
             // 0.997 (review): one harvest can print several gain lines (crop, seeds): the first one counts, the others within 5 s are the same harvest.
+            // X-185 (0.1211, N23): the bed read in the menu is taken first: another bed than the last one harvested is a new harvest, even within 5 s.
             if(target is not null && InHousing() && GardenChat.IsHarvest((int)message.LogKind,sender,target()))
             {
                 var at=DateTimeOffset.UtcNow;
-                if(at-lastHarvest>=TimeSpan.FromSeconds(5))
+                var place=Place();
+                var slot=menuMemory.Take(place,at);
+                if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))
                 {
-                    lastHarvest=at;
-                    var place=Place();
-                    var slot=menuMemory.Take(place,at);
+                    lastHarvest=at;lastHarvestSlot=slot;
                     planted(new(GardenChatKind.Harvested,slot?.Patch,slot?.Bed),null,place);
                 }
                 return;

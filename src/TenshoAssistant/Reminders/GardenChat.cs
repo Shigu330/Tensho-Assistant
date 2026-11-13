@@ -104,6 +104,17 @@ public sealed class GardenMenuTitle
 }
 
 /// <summary>
+/// X-185 (0.1211, N23): whether a harvest line is a new harvest. A bed just read in its menu, other than the last one harvested, always is (two beds
+/// harvested within seconds); without it, only 5 s after the last harvest (0.997: one harvest prints several gain lines, the crop then its seeds).
+/// </summary>
+public static class GardenHarvests
+{
+    public static readonly TimeSpan SameHarvest=TimeSpan.FromSeconds(5);
+    public static bool IsNew(DateTimeOffset at,DateTimeOffset lastAt,(int Patch,int Bed)? slot,(int Patch,int Bed)? lastSlot)
+        =>slot is not null && slot!=lastSlot || at-lastAt>=SameHarvest;
+}
+
+/// <summary>
 /// X-179 (0.1165): the last garden bed whose menu was seen, for the tending or uprooting line that follows (the line itself does not say which bed).
 /// Used once, at the same place only, within 30 seconds; otherwise forgotten.
 /// </summary>

@@ -69,10 +69,14 @@ public static class GardenJournal
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now)
         =>new(){Place=place,Seed=seed,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
 
-    /// <summary>0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.</summary>
+    /// <summary>
+    /// 0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.
+    /// X-185 (0.1211, N24): « the same place » is also the same slot (zone, patch, bed) noted in another language of the plugin.
+    /// </summary>
     public static List<GardenBed>? Detected(IEnumerable<GardenBed>? beds,string place,string seed,int growHours,int tendHours,DateTimeOffset now)
     {
-        var kept=(beds ?? []).Where(bed=>bed.Place!=place).ToList();
+        var slot=Slot(new GardenBed{Place=place});
+        var kept=(beds ?? []).Where(bed=>bed.Place!=place && (slot is null || Slot(bed)!=slot)).ToList();
         if(kept.Count>=Capacity)return null;
         kept.Add(Plant(place,seed,growHours,tendHours,now));
         return kept;
@@ -89,12 +93,13 @@ public static class GardenJournal
     /// <summary>
     /// X-179 (0.1165): the beds a care line (tending, uprooting, harvest) may be about. With the bed read in the game's menu: that bed alone, at that
     /// place and in that patch, or none when it is not noted (never another bed). Without it: every bed noted at the place (the caller acts only on one).
+    /// X-185 (0.1211, N24): two beds noted at the same slot (one noted in another language of the plugin): the latest planted, never the older one.
     /// </summary>
     public static GardenBed[] CareTargets(IEnumerable<GardenBed>? beds,string? place,(int Patch,int Bed)? menu)
     {
         var here=At(beds,place);
         if(menu is not { } slot)return here;
-        return here.Where(bed=>Slot(bed) is { } seen && seen.Zone==place && seen.Patch==slot.Patch && seen.Bed==slot.Bed).Take(1).ToArray();
+        return here.Where(bed=>Slot(bed) is { } seen && seen.Zone==place && seen.Patch==slot.Patch && seen.Bed==slot.Bed).OrderByDescending(bed=>bed.PlantedAt).Take(1).ToArray();
     }
 
     /// <summary>

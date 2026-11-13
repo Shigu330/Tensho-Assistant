@@ -543,12 +543,13 @@ public sealed class DiscoveryStore
     /// <summary>
     /// What an imported fact must hold: a known kind, a subject and a map, finite places in their cell, levels and dates that make sense. 0.911 (X-76): a FATE
     /// at exactly (0, 0) is the zero position the game gives for about a second (entering a zone, reloading): refused, read or imported. X-76 E1 (0.916): the
-    /// histograms within their bounds (ValueCounts.Valid), never more HQ sightings than sightings counted in them.
+    /// histograms within their bounds (ValueCounts.Valid), never more HQ sightings than sightings counted in them. X-185 (0.1211, N25): never a lowest level
+    /// above the highest (the check before was always true); a highest level of 0 is « unknown ».
     /// </summary>
     public static bool Valid(DiscoveryFact? fact)=>fact is not null && Enum.IsDefined(fact.Kind) && fact.Subject!=0 && (fact.Map!=0 || !HasPlace(fact.Kind))
         && !(fact.Kind==DiscoveryKind.FateSeen && fact.X==0 && fact.Z==0)
         && float.IsFinite(fact.X) && float.IsFinite(fact.Z) && Math.Abs(fact.X)<=10_000 && Math.Abs(fact.Z)<=10_000 && Cell(fact.X,fact.Z)==(fact.CellX,fact.CellZ)
-        && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && fact.LevelMin<=Math.Max(fact.LevelMin,fact.LevelMax)
+        && fact.LevelMin is >= 0 and <= 100_000 && fact.LevelMax is >= 0 and <= 100_000 && (fact.LevelMax==0 || fact.LevelMin<=fact.LevelMax)
         && fact.Seen>=0 && fact.Imported>=0 && fact.First<=fact.Last && fact.Last<=DateTimeOffset.UtcNow.AddDays(1)
         && ValueCounts.Valid(fact.Values) && ValueCounts.Valid(fact.ImportedValues)
         && fact.Hq>=0 && fact.Hq<=ValueCounts.Total(fact.Values) && fact.ImportedHq>=0 && fact.ImportedHq<=ValueCounts.Total(fact.ImportedValues)

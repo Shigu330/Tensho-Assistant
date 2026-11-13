@@ -114,6 +114,7 @@ def valid(f):
         if not all(math.isfinite(f[n]) and abs(f[n])<=10000 for n in ("X","Z")):return False
         if cell_of(f["X"],f["Z"])!=(f["CellX"],f["CellZ"]):return False
         if not (0<=f["LevelMin"]<=100000 and 0<=f["LevelMax"]<=100000):return False
+        if f["LevelMax"]!=0 and f["LevelMin"]>f["LevelMax"]:return False  # X-185 (N25): DiscoveryStore.Valid, a highest level of 0 being « unknown »
         # 0.916 (version 2): the histogram in its bounds, never more HQ sightings than sightings counted in it.
         if "Values" in f and not histogram_valid(f["Values"]):return False
         if "Hq" in f and not (whole(f["Hq"]) and 0<=f["Hq"]<=sum(f.get("Values",{}).values())):return False
@@ -646,6 +647,7 @@ def selftest():
            {"CellX":1.0},{"X":True},{"Seen":-1},{"Imported":1.5},{"First":20261102},{"CellZ":2**31}]
     check(not [w for w in wrong if valid({**base,**w})],f"N12: wrong types accepted: {[w for w in wrong if valid({**base,**w})]}")
     check(clean({"Version":2,"Facts":[{**base,**w} for w in wrong]})[1]["refused"]==len(wrong),"N12: clean refuses them")
+    check(not valid({**base,"LevelMin":90,"LevelMax":10}) and valid({**base,"LevelMin":90,"LevelMax":0}),"N25: the lowest level never above the highest (0 is unknown)")
     check(valid({**base,"Subject":UINT,"Territory":UINT,"Detail":UINT,"Map":UINT}) and valid({**base,"X":60,"Z":140}),"N12: the plugin's bounds and whole places accepted")
     edge={**f(1,1,128,0.0,0.0,"2026-11-02T00:00:00+00:00"),"X":-50.0000001}
     check(valid({**edge,"CellX":-1}) and not valid({**edge,"CellX":-2}),"N12: the cell computed in single precision, as the plugin does")
