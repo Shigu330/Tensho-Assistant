@@ -295,8 +295,8 @@ internal static class Headless
 
     /// <summary>
     /// X-178 (0.1257): a trial patch given to the copy of the settings in memory (the headless run, or a capture with --garden-trial; never
-    /// written: the application saves nothing): seven beds of one patch, growing, tending later, tending due, ripe, two more, and a seed
-    /// whose name matches no item; bed 7 stays empty. False when the plugin's types cannot be reached.
+    /// written: the application saves nothing): three patches at one place; in the first, seven beds: growing, tending later, tending due,
+    /// ripe, two more, and a seed whose name matches no item (bed 7 stays empty); a few beds in the second and the third. False when the plugin's types cannot be reached.
     /// </summary>
     public static bool GardenTrial(Host host)
     {
@@ -305,16 +305,18 @@ internal static class Headless
         var items=host.Data.Excel.GetSheet<Item>().Where(row=>row.RowId>=7715 && row.Icon!=0 && !row.Name.IsEmpty).Take(6).ToArray();
         var beds=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(bedType))!;
         var now=DateTimeOffset.UtcNow;
-        // (bed number, hours since planting, growing hours, tending hours).
-        var trial=new (int Number,double Planted,int Grow,int Tend)[]{(1,1,48,0),(2,2,72,24),(3,30,72,24),(4,60,48,24),(5,10,120,48),(6,0.2,24,0),(8,5,24,0)};
+        // (patch, bed number, hours since planting, growing hours, tending hours, a seed the game knows). X-178 (0.1263): three patches at
+        // the same place, as at a large house: the first with every state, the second and the third with a few beds.
+        var trial=new (int Patch,int Number,double Planted,int Grow,int Tend,bool Known)[]{(1,1,1,48,0,true),(1,2,2,72,24,true),(1,3,30,72,24,true),(1,4,60,48,24,true),(1,5,10,120,48,true),(1,6,0.2,24,0,true),(1,8,5,24,0,false),
+            (2,1,3,48,24,true),(2,2,40,72,24,true),(2,7,80,48,0,true),(3,5,12,72,24,true),(3,6,50,48,24,true)};
         for(var i=0;i<trial.Length;i++)
         {
-            var (number,planted,grow,tend)=trial[i];
+            var (patch,number,planted,grow,tend,real)=trial[i];
             var bed=Activator.CreateInstance(bedType)!;
             void Set(string name,object value)=>bedType.GetProperty(name)!.SetValue(bed,value);
-            Set("Place",$"Trial 1-1 · patch 1, bed {number}");
+            Set("Place",$"Trial 1-1 · patch {patch}, bed {number}");
             // The last one: a name no item bears and no noted item (the icon view writes the name).
-            var known=i<items.Length ? items[i] : (Item?)null;
+            var known=real && items.Length>0 ? items[i%items.Length] : (Item?)null;
             Set("Seed",known?.Name.ExtractText() ?? "No such seed");
             Set("SeedId",known?.RowId ?? 0u);
             Set("PlantedAt",now.AddHours(-planted));Set("GrowHours",grow);Set("TendHours",tend);

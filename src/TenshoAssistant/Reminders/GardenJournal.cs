@@ -94,6 +94,22 @@ public static class GardenJournal
     public static void Tend(GardenBed bed,DateTimeOffset now){bed.TendedAt=now;bed.TendSaidFor=null;}
 
     /// <summary>
+    /// X-178 (0.1263, user request of 13/11: up to three patches at a large house): « whole patch tended » for one patch of one place: every
+    /// bed of that patch that waits for a tending is tended now; the other patches of the same place, and the other places, are left alone.
+    /// The number of beds tended.
+    /// </summary>
+    public static int TendPatch(IEnumerable<GardenBed>? beds,string zone,int patch,DateTimeOffset now)
+    {
+        var tended=0;
+        foreach(var bed in beds ?? [])
+        {
+            if(Slot(bed) is not { } slot || slot.Zone!=zone || slot.Patch!=patch || TendAt(bed) is null)continue;
+            Tend(bed,now);tended++;
+        }
+        return tended;
+    }
+
+    /// <summary>
     /// X-179 (0.1165): the beds a care line (tending, uprooting, harvest) may be about. With the bed read in the game's menu: that bed alone, at that
     /// place and in that patch, or none when it is not noted (never another bed). Without it: every bed noted at the place (the caller acts only on one).
     /// X-185 (0.1211, N24): two beds noted at the same slot (one noted in another language of the plugin): the latest planted, never the older one.

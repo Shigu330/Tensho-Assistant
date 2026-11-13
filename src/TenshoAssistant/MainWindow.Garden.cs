@@ -161,7 +161,8 @@ internal sealed partial class MainWindow
                     // X-178 (0.1259): an icon button in the icon view (its tooltip says what it does), the words in the detailed view.
                     var tendAll=configuration.GardenDetailedView ? ImGui.SmallButton(localization.Get("Garden.TendPatch")):ToolButton(Dalamud.Interface.FontAwesomeIcon.CheckDouble,"Garden.TendPatchTip",true);
                     if(configuration.GardenDetailedView)Tip("Garden.TendPatchTip");
-                    if(tendAll){foreach(var (_,bed) in planted)if(GardenJournal.TendAt(bed) is not null)GardenJournal.Tend(bed,now);changed=true;}
+                    // X-178 (0.1263): this patch only (a large house has up to three, each with its grid, its title and this button).
+                    if(tendAll){GardenJournal.TendPatch(beds,zone,patch,now);changed=true;}
                 }
                 finally{DesktopEditEnd();ImGui.PopID();}
             }
