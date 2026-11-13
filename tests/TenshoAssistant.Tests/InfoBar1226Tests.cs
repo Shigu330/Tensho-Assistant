@@ -29,7 +29,7 @@ internal static class InfoBar1226Tests
                   && entry.Contains("CompetitiveGate.RemoveAlways(framework,OnUpdate);",StringComparison.Ordinal) && entry.Contains("bags.Remove();wear.Remove();place.Remove();",StringComparison.Ordinal),"cut and removed like the others");
             Check(entry.Contains("state->PublicInstance.TerritoryTypeId,state->PublicInstance.InstanceId",StringComparison.Ordinal) && !entry.Contains("IsInstancedArea(",StringComparison.Ordinal),"fields only, no game function");
             Check(entry.Contains("catch(Exception){instanceFailed=true;return null;}",StringComparison.Ordinal),"a failed read turns the instance off (R08)");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("()=>infoBar?.Dispose());",StringComparison.Ordinal),"owned by the plugin's registrations");
+            Check(Read("src/TenshoAssistant/Plugin.ServerBar.cs").Contains("()=>{info?.Dispose();info=null;});",StringComparison.Ordinal),"owned by the plugin's registrations (server bar family since 0.1240, X-153)");
             var settings = Read("src/TenshoAssistant/MainWindow.Advanced.cs");
             foreach (var name in new[] { "BagsServerBar","WearServerBar","PlaceServerBar" })
             {

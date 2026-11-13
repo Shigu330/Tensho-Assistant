@@ -610,12 +610,6 @@ public sealed partial class Plugin : IDalamudPlugin
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),Diagnostics.LaunchProof.FileName),pluginInterface.AssemblyLocation.FullName),()=>selfCheck?.Dispose());
             mainWindow.SelfCheck=selfCheck;
             mainWindow.ConfigureMarketBoard(marketBoard);
-            Alarms.AlarmDtrEntry? alarmBar=null;
-            registrations.Register(()=>alarmBar=new Alarms.AlarmDtrEntry(dtrBar,framework,gameGui,configuration,localization.Get,mainWindow.OpenAlarms),()=>alarmBar?.Dispose());
-            // 0.455 (user request): reminders apart from alarms in the server bar.
-            Alarms.ReminderDtrEntry? reminderBar=null;
-            registrations.Register(()=>reminderBar=new Alarms.ReminderDtrEntry(dtrBar,framework,gameGui,player,log,configuration,localization.Get,mainWindow.OpenReminders,mainWindow.ReminderTodoLines,mainWindow.TickRemindersFromGame),()=>reminderBar?.Dispose());
-            this.reminderBar=()=>reminderBar;
             // 0.344 (g, I-02): currency balances and threshold alerts (chat and sound with the alarm options, Discord in its own category),
             // and their server bar entry. Registered after the Discord notifier, so released before it.
             Inventory.CurrencyWatcher? currencies=null;
@@ -676,10 +670,6 @@ public sealed partial class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning("Duty ready alert failed ({Error}).",error.GetType().Name);}
             }
             registrations.Register(()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop);
-            Alarms.CurrencyDtrEntry? currencyBar=null;
-            registrations.Register(()=>currencyBar=new Alarms.CurrencyDtrEntry(dtrBar,framework,gameGui,configuration,()=>currencies?.State,localization.Get,mainWindow.OpenCurrencies),()=>currencyBar?.Dispose());
-            this.alarmBar=()=>alarmBar;
-            this.currencyBar=()=>currencyBar;
             FreeCompany.VoyageWatcher? voyages=null;
             // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
             // converted at its first load and kept aside.
@@ -892,13 +882,9 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
                 ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
-            Inventory.GilDtrEntry? gilBar=null;
-            registrations.Register(()=>gilBar=new Inventory.GilDtrEntry(dtrBar,framework,gameGui,configuration,()=>configuration.GilServerBar,()=>gilWatcher?.State?.Entries,localization.Get,mainWindow.OpenGilJournal),()=>gilBar?.Dispose());
-            this.gilBar=()=>gilBar;
-            // X-217 (0.1226): bags, gear condition, zone and instance in the server bar (each off by default).
-            Alarms.InfoDtrEntries? infoBar=null;
-            registrations.Register(()=>infoBar=new Alarms.InfoDtrEntries(dtrBar,framework,client,inventory,configuration,()=>gear?.Equipped ?? [],
-                id=>mainWindow.TerritoryName?.Invoke(id),localization.Get,localization.Format,mainWindow.OpenGilJournal,mainWindow.OpenGear,mainWindow.OpenMap),()=>infoBar?.Dispose());
+            // The server bar's entries (alarms, reminders, currencies, gil, X-217's optional entries), once the services they show exist:
+            // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.
+            RegisterServerBar(dtrBar,framework,gameGui,player,client,inventory,configuration,localization,()=>currencies?.State,()=>gilWatcher?.State?.Entries,()=>gear?.Equipped ?? []);
             mainWindow.StackSizeOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id)?.StackSize ?? 0;
             // 0.347 (g, I-08): at an NPC shop, the bags' items labelled « to sell » and « important » (chat; sound if turned on).
             Items.ItemNoteShopReminder? shopReminder=null;
