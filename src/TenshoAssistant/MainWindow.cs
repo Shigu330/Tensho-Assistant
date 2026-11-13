@@ -181,6 +181,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
         };
         // X-01 (0.1050): the window's code compiled ahead off the frame (Diagnostics/JitWarmup.cs): the first frame of a page was mostly JIT.
+        // X-01 (0.1283): the page the window opens on, compiled with the window's frame (only its method's handle is kept, not the window).
+        var firstPage = PageEntryFor(page)?.Draw.Method.MethodHandle;
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
             $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms.")),
             // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
@@ -188,7 +190,7 @@ internal sealed partial class MainWindow : Window, IDisposable
             // X-01 (0.1279): the free panels' and the bars' code first, with what it calls: they wait for it (PanelGate).
             firstPart: Diagnostics.JitWarmup.OverlayFirst,
             // X-01 (0.1282): then the window's frame and its first page, with what they call.
-            windowPart: Diagnostics.JitWarmup.WindowFirst,
+            windowPart: method => Diagnostics.JitWarmup.WindowFirst(method) || firstPage is { } shown && method.MethodHandle == shown,
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }

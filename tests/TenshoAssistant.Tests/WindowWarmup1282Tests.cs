@@ -40,10 +40,10 @@ internal static class WindowWarmup1282Tests
     [
         ("Window warm-up 1282: the window's frame and its first page are in the window part, their lambdas too; another page, a panel or another class are not", () =>
         {
-            Check(JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawMain")) && JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawHomeToday")), "frame and Home");
+            Check(JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawMain")) && !JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawHomeToday")), "the frame; a page is added by the window (0.1283)");
             var lambda = typeof(MainWindow).GetNestedTypes(BindingFlags.NonPublic).SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                 .Concat(typeof(MainWindow).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)).FirstOrDefault(method => method.Name.Contains("<DrawHomeToday>", StringComparison.Ordinal));
-            Check(lambda is not null && JitWarmup.WindowFirst(lambda), "a lambda of the page");
+            Check(lambda is not null && !JitWarmup.WindowFirst(lambda), "a lambda of a page: the page's own closure takes it");
             Check(!JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawSettingsPage")), "another page waits for the rest");
             Check(!JitWarmup.WindowFirst(Of(typeof(MainWindow), "DrawTrackerContents")), "a panel is the first part's");
             Check(!JitWarmup.WindowFirst(Of(typeof(Other), "DrawMain")), "not outside the window");
@@ -65,11 +65,19 @@ internal static class WindowWarmup1282Tests
             Check(warmup.Prepared == 4, $"four methods in all, none twice ({warmup.Prepared})");
             Check(warmup.WindowReadyAfter >= warmup.FirstReadyAfter && warmup.FirstReadyAfter >= 0, "the window part after the panels'");
         }),
+        ("Window warm-up 1283: behaviour: the window part stops at WindowCap new methods, the panels' ones not counted; the page the window opens on is added", () =>
+        {
+            Check(JitWarmup.WindowCap == 1500, "1500 new methods at most");
+            var source = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/JitWarmup.cs"));
+            Check(source.Contains("if(WindowPartMethods>=WindowCap)break;", StringComparison.Ordinal), "counted on the new ones");
+            var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.cs"));
+            Check(window.Contains("var firstPage = PageEntryFor(page)?.Draw.Method.MethodHandle;", StringComparison.Ordinal), "the page the window opens on, by its handle");
+        }),
         ("Window warm-up 1282: wiring: the window starts its warm-up with the window part after the panels'; the warm-up line says when it was ready", () =>
         {
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.cs"));
             var first = window.IndexOf("firstPart: Diagnostics.JitWarmup.OverlayFirst,", StringComparison.Ordinal);
-            var second = window.IndexOf("windowPart: Diagnostics.JitWarmup.WindowFirst,", StringComparison.Ordinal);
+            var second = window.IndexOf("windowPart: method => Diagnostics.JitWarmup.WindowFirst(method) || firstPage is { } shown && method.MethodHandle == shown,", StringComparison.Ordinal);
             Check(first > 0 && second > first, "panels, then the window");
             Check(window.Contains("Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load", StringComparison.Ordinal), "said in the warm-up line");
         }),

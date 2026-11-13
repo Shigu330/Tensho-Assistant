@@ -57,10 +57,11 @@ public sealed class JitWarmup : IDisposable
     public int WindowPartMethods{get;private set;}
     public double WindowReadyAfter{get;private set;}=-1;
 
-    /// <summary>X-01 (0.1282): the main window's frame (its draw, navigation, help banner) and the page it opens on (Home), lambdas included.
+    /// <summary>X-01 (0.1282): the main window's frame (its draw, navigation, help banner), lambdas included; 0.1283: the page it opens on is
+    /// added by the window itself (its page table's draw method), whatever it is (Settings at the load of 0.1282, not Home).
     /// A test checks that each name is still declared in the sources.</summary>
     public static readonly IReadOnlyList<string> WindowMethods=["PreDraw","PostDraw","Draw","DrawMain","DrawNavigation","DrawNavigationPopup","DrawPageHelpButton",
-        "DrawCategoryNavigation","DrawHelpBanner","DrawHome","DrawHomeToday","DrawHomeTiles","DrawHomeAlerts","DrawHomeNextDeadline","DrawHomeCustomize"];
+        "DrawCategoryNavigation","DrawHelpBanner"];
     /// <summary>X-01 (0.1282): a method of the main window's frame or of its first page (see <see cref="WindowMethods"/>).</summary>
     public static bool WindowFirst(MethodBase method)
     {
@@ -299,10 +300,12 @@ public sealed class JitWarmup : IDisposable
             // drew a first frame of 401 to 412 ms (page Home 182 to 204 ms) when its code waited for the warm-up's rest (13/11, 21:14 and 21:21).
             if(early is not null && windowPart is not null && types.Count>0)
             {
-                var part=CallGraph.Closure(methods.Where(windowPart),types[0].Assembly,WindowCap+compiled.Count,()=>token.IsCancellationRequested);
+                // 0.1283: WindowCap new methods (0.1282 counted the panels' ones too and took 3176, ready 7.2 s after the load); the walk itself bounded.
+                var part=CallGraph.Closure(methods.Where(windowPart),types[0].Assembly,WindowCap*4,()=>token.IsCancellationRequested);
                 foreach(var method in part)
                 {
                     if(token.IsCancellationRequested)return;
+                    if(WindowPartMethods>=WindowCap)break;
                     if(!compiled.Add(method))continue;
                     WindowPartMethods++;
                     if(CallGraph.Prepare(method))Prepared++;else Skipped++;

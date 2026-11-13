@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1283.0
+- Plan global, X-01 : Lourdeur (X-01), suite de 0.1282, mesurée à son chargement : la partie « fenêtre principale » de l'échauffement prenait 3176 méthodes au lieu de 1500 (sa borne comptait aussi celles des panneaux), prête 7,2 s après le chargement, et la page ouverte à ce moment était Paramètres (158 ms), pas l'Accueil. Elle prend maintenant le cadre de la fenêtre et la page réellement ouverte au chargement (la méthode de dessin de la table des pages ; seule sa poignée est gardée), 1500 méthodes nouvelles au plus. Les premiers passages des lecteurs restent sans ligne « Slow reader » pour le deuxième chargement de suite (X-177).
+- Tests : WindowWarmup1282Tests. Verify.ps1 (agent) : 2354/2354, 0 avertissement, 0 erreur ; DLL 0.1283.0.0. Rien à essayer en jeu.
+### English
+- Sluggishness (X-01), continued from 0.1282, measured at its load: the warm-up's « main window » part took 3176 methods instead of 1500 (its cap counted the panels' ones too), ready 7.2 s after the load, and the page open then was Settings (158 ms), not Home. It now takes the window's frame and the page actually open at the load (the page table's draw method; only its handle is kept), 1500 new methods at most. The readers' first passes stay without a « Slow reader » line for the second load in a row (X-177).
+
 ## 0.1282.0
 - Plan global, X-01 : Lourdeur (X-01), suite : la fenêtre principale ouverte au chargement (ou juste après) dessinait une première image de 401 à 412 ms (page Accueil 182 à 204 ms ; dalamud.log du 13/11 à 21 h 14 et 21 h 21) parce que son code attendait la dernière partie de l'échauffement (26 s). L'échauffement compile maintenant, juste après la partie des panneaux, le cadre de la fenêtre (dessin, navigation, bandeau d'aide) et sa première page (Accueil) avec ce qu'ils appellent, 1500 méthodes au plus, sans reprendre celles des panneaux ; la ligne « JIT warm-up » dit quand cette partie était prête.
 - Tests : WindowWarmup1282Tests. Verify.ps1 (agent) : 2353/2353, 0 avertissement, 0 erreur ; DLL 0.1282.0.0. Rien à essayer en jeu.
