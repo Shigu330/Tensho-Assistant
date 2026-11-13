@@ -43,7 +43,7 @@ internal static class SeenPrices817Tests
         {
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
             Check(Read("Market/SeenPriceReader.Dalamud.cs").Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut || !enabled()"),"cut, setting");
-            Check(Read("Market/MarketService.cs").Contains("return asked ? cached : Seen?.Invoke(worldId, itemId, cached) ?? cached;"),"service (X-278: except a price the player asked again)");
+            Check(Read("Market/MarketService.cs").Contains("return Seen?.Invoke(worldId, itemId, cached) ?? cached;"),"service (X-292: one rule, asked again or not)");
             Check(new TenshoAssistant.Discoveries.DiscoverySettings().MarketPrices,"on by default");
         }),
     ];

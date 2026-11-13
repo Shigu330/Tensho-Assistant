@@ -131,12 +131,19 @@ public static class SeenPrices
             listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true,false)).OrderBy(offer=>offer.UnitPrice).ToArray(),entry.ListingsAt);
     }
 
-    /// <summary>The quote of what was seen; Universalis' other worlds and region kept from its own quote when there is one.</summary>
-    public static MarketQuote Quote(SeenMarketEntry entry,MarketQuote? universalis,DateTimeOffset now)=>new(entry.World,entry.Item,entry.Seen,entry.Seen,
-        Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion);
+    /// <summary>
+    /// The quote of what was seen; Universalis' other worlds and region kept from its own quote when there is one.
+    /// X-292 (0.1291): marked SeenAtBoard, dated by the look; its fetch time is the later of the look and Universalis' request, so that
+    /// « Fetched » moves with a Ctrl+Alt even when the look stays the newest reading of the world.
+    /// </summary>
+    public static MarketQuote Quote(SeenMarketEntry entry,MarketQuote? universalis,DateTimeOffset now)=>new(entry.World,entry.Item,
+        universalis is { } asked && asked.FetchedAt>entry.Seen ? asked.FetchedAt:entry.Seen,entry.Seen,
+        Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion,true);
 
     /// <summary>
     /// The seen quote when it is newer than Universalis' data for that world (its upload, else its fetch); otherwise null.
+    /// X-292 (0.1291, user rule of 13/11: for each line, the newest reading wins, the board seen or Universalis, with its date and source): one
+    /// rule, whether the price was asked again (Ctrl+Alt) or not.
     /// 0.821 (user report: the other worlds vanished): with no Universalis quote yet, nothing while Universalis is asked (« waitForUniversalis »), so that the request
     /// is still made and its other worlds and region come back; only with that source off does the seen quote stand alone.
     /// </summary>

@@ -37,6 +37,8 @@ public static class Faq
         new("Report"),
         new("Translate"),
         new("Wishlist", "Wishlist"),
+        // X-292 (0.1291): « old » prices after Ctrl+Alt (essay of 13/11).
+        new("OldPrice"),
         // X-178 (0.1257): the garden in icons, and the way back to the text.
         new("GardenText", "Garden"),
         new("Install"),

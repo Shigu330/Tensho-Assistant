@@ -7,9 +7,10 @@ public sealed record MarketQualityPrice(decimal? Minimum, decimal? RecentSale, D
 // Cheapest listing across the data center of the queried world, with the world that holds it.
 public sealed record MarketListing(decimal Price, uint WorldId, DateTimeOffset? UploadedAt);
 // 0.343 (I-01): NqRegion / HqRegion = cheapest listing of the whole region (Universalis minListing.region), with its world.
+// X-292 (0.1291): SeenAtBoard = the world's lines (UploadedAt their date) are what the player saw at the game's market board, not Universalis' upload.
 public sealed record MarketQuote(uint WorldId, uint ItemId, DateTimeOffset FetchedAt, DateTimeOffset? UploadedAt,
     MarketQualityPrice Nq, MarketQualityPrice Hq, MarketListing? NqCheapest = null, MarketListing? HqCheapest = null,
-    MarketListing? NqRegion = null, MarketListing? HqRegion = null)
+    MarketListing? NqRegion = null, MarketListing? HqRegion = null, bool SeenAtBoard = false)
 {
     /// <summary>
     /// 0.711 (user report): what an item really sold for on this world, not what is asked for it: the lower of the last sale and the average sale, so that one odd sale does not lift it.

@@ -88,6 +88,10 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
 
+## Hover prices still say « old » after Ctrl+Alt: why?
+
+Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. Universalis only knows what players have uploaded, so the world's date is its last upload, by anyone; when nobody has opened that item at the board since, it stays old. For each line Tensho shows the newest reading it knows, Universalis' upload or what you saw yourself at the game's market board (« Seen at the market board »). Open the item at the market board for today's prices.
+
 ## The garden is shown as icons: how do I get the text back?
 
 Gardening › Garden › Garden journal › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark tells the tending (drop: later, « ! »: due, check: ripe).
@@ -201,6 +205,10 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 ## Où est ma liste de souhaits ?
 
 Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
+
+## Les prix au survol disent encore « ancien » après Ctrl+Alt : pourquoi ?
+
+Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de cette demande. Universalis ne connaît que ce que les joueurs ont envoyé : la date du monde est son dernier relevé, par n'importe qui ; si personne n'a ouvert cet objet au tableau des ventes depuis, elle reste ancienne. Pour chaque ligne, Tensho montre le relevé le plus récent qu'il connaît, celui d'Universalis ou ce que vous avez vu vous-même au tableau des ventes du jeu (« Vu au tableau des ventes »). Ouvrez l'objet au tableau des ventes pour les prix du jour.
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 

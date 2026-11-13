@@ -51,9 +51,8 @@ internal static class HoverRefresh1287Tests
             var pressed = coordinator.Observe(true, true, 7, 97, 5057, Catalog(), now.AddMilliseconds(800), true);
             Check(pressed is not null, "Ctrl+Alt sends a request although the price is fresh");
             Check(pressed!.GetAwaiter().GetResult().Status == MarketFetchStatus.Success && calls == 1, "request answered");
-            var shown = market.GetCached(97, 5057);
-            Check(shown is not null && shown != seen && shown.FetchedAt > seen.FetchedAt, "the new answer is shown, not the older look");
-            Check(shown!.Nq.Minimum == 89 && shown.NqCheapest?.Price == 45 && shown.NqRegion?.Price == 40, "world, data centre and region lines from the answer");
+            // X-292 (0.1291): the newest reading wins, asked again or not: the look (a minute ago) is newer than the answer's world upload (3/11).
+            Check(market.GetCached(97, 5057) == seen, "the newer look stays (X-292)");
             Check(TenshoAssistant.Community.BoundedHttp.Sent.GetValueOrDefault("universalis.app") > sentBefore, "the dashboard counts it");
             for (var wait = 0; wait < 50; wait++) { lock (done) if (done.Count > 0) break; Thread.Sleep(20); }
             lock (done) Check(done.SequenceEqual([(5057u, MarketFetchStatus.Success)]), "the log line is given the request's end");

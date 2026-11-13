@@ -181,20 +181,12 @@ public sealed class MarketService : IDisposable
     public MarketQuote? GetCached(uint worldId, uint itemId)
     {
         MarketQuote? cached;
-        bool asked;
-        lock (gate)
-        {
-            if (disposed) return null;
-            cached = cache.GetValueOrDefault((worldId, itemId));
-            asked = cached is not null && refreshed.TryGetValue((worldId, itemId), out var at) && at == cached.FetchedAt;
-        }
-        // X-278 (0.1287): a price the player asked again (Ctrl+Alt, the Market page's refresh) is shown as Universalis gave it, every
-        // line from that answer: the prices seen at the market board earlier no longer replace it (in game on 13/11, a quote seen on
-        // 12/11 01:04 hid the refresh, its world's last upload being older).
-        return asked ? cached : Seen?.Invoke(worldId, itemId, cached) ?? cached;
+        lock (gate) { if (disposed) return null; cached = cache.GetValueOrDefault((worldId, itemId)); }
+        // X-292 (0.1291, user rule of 13/11): the newest reading of the world wins, asked again (Ctrl+Alt) or not: Universalis' upload when it is
+        // newer than the look at the game's board, else that look (SeenPrices.Prefer), marked with its source. 0.1287 showed every forced answer
+        // as it came, an older upload included; « Fetched » now moves with the request either way (SeenPrices.Quote).
+        return Seen?.Invoke(worldId, itemId, cached) ?? cached;
     }
-    // X-278 (0.1287): the fetch time of the quotes asked again by the player (forced), by world and item; in memory only.
-    private readonly Dictionary<(uint World, uint Item), DateTimeOffset> refreshed = [];
     public void CancelBackground()
     {
         lock (gate)
@@ -293,8 +285,6 @@ public sealed class MarketService : IDisposable
                 if (externalCancellation.IsCancellationRequested) { requestActive = false; return new(MarketFetchStatus.Cancelled); }
                 if (!cache.ContainsKey((world,itemId)) && cache.Count >= CacheCapacity) cache.Remove(cache.MinBy(pair => pair.Value.FetchedAt).Key);
                 cache[(world, itemId)] = quote;
-                if (force) { if (refreshed.Count >= CacheCapacity) refreshed.Clear(); refreshed[(world, itemId)] = quote.FetchedAt; }
-                else refreshed.Remove((world, itemId));
                 if(disk is { } diskStore)_=diskStore.WriteAsync("market",$"{world}:{itemId}","universalis-aggregated-v4",quote,quote.FetchedAt);
                 requestActive = false;
                 if (purpose == Purpose.Hover) backgroundState = new(world, itemId, false, null);
@@ -326,7 +316,7 @@ public sealed class MarketService : IDisposable
             disposed = true;
             generation++;
             request?.Cancel(); request?.Dispose();
-            cache.Clear(); refreshed.Clear();
+            cache.Clear();
             requestActive = false; backgroundState = null;
             state = new(0, "", 0, null, false, null);
             if (ownsClient) client.Dispose();

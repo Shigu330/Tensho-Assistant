@@ -457,7 +457,8 @@ internal sealed partial class MainWindow
                 ImGui.TextUnformatted(localization.Format("HoverUi.Stack",count,(unit*count).ToString("N0",Numbers)));
                 DrawGilIcon();
             }
-            ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format("HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
+            // X-292 (0.1291): the world's lines say where they come from: Universalis' upload, or the look at the game's board when newer.
+            ImGui.TextDisabled(prices.UploadedAt is { } date ? localization.Format(prices.SeenAtBoard ? "HoverUi.SeenAtBoard":"HoverUi.Uploaded",date.ToLocalTime().ToString("g")):localization.Get("HoverUi.UnknownDate"));
             if(!prices.HasRecentUpload(now))StateLine(UI.UiState.Stale,localization.Get("HoverUi.Old"));
             if(prices.NqCheapest is not null || canBeHq && prices.HqCheapest is not null)
             {
