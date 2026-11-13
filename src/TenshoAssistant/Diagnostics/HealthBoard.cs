@@ -56,3 +56,9 @@ public static class HealthBoard
 
     private static double Megabytes(long bytes)=>Math.Round(bytes/1048576.0,1);
 }
+
+/// <summary>X-165 (0.1245): when Tensho's state shows in the server bar: once read, always, or only when something is not fine.</summary>
+public static class StateBar
+{
+    public static bool Shown(HealthLevel? overall,bool onlyProblems)=>overall is { } level && (!onlyProblems || level!=HealthLevel.Ok);
+}

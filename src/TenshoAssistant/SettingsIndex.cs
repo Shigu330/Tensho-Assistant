@@ -49,6 +49,8 @@ public static class SettingsIndex
         ("Advanced.ReminderFinishedServerBar","General"),
         ("Advanced.ReminderServerBar","General"),
         ("Advanced.ServerBarTooltipAbove","General"),
+        ("Advanced.StateServerBar","General"),
+        ("Advanced.StateServerBarProblems","General"),
         ("Advanced.WearServerBar","General"),
         ("ModuleSettings.ShowEnglishItemName","General"),
         ("Settings.ContextMenu","General"),

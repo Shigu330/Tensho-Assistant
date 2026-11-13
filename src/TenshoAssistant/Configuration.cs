@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "HoverShowCompare",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
-        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
+        "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "StateServerBar", "StateServerBarOnlyProblems", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactOutsideCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
         "GearOwnedOnly", "ShowHeaderClock", "CraftStockSaleDays", "GatheringNextHighlight", "CacheLongerDefaults", "GatheringPanel", "FishingPanel", "FashionOptions", "ShowHeaderEorzeaTime", "ShowIds", "DeveloperMode",
         "HomeShowTools", "HomeTodayHidden", "HomeTilesHidden", "CommunityLumina", "CommunityGarland", "CommunityWiki", "CommunityGatherBuddy", "CommunityTeamcraftBites", "CommunityFashion", "CommunityUniversalis", "AlarmOptions",
@@ -451,6 +451,9 @@ public sealed partial class Configuration
     public bool BagsServerBar { get; set; }
     public bool WearServerBar { get; set; }
     public bool PlaceServerBar { get; set; }
+    // X-165 (0.1245): Tensho's state in the server bar, off by default; « only when something is wrong » under it.
+    public bool StateServerBar { get; set; }
+    public bool StateServerBarOnlyProblems { get; set; }
     // 0.606: with the alerts, the weekly limit of the limited tomestones reached.
     public bool CurrencyWeeklyCapAlert { get; set; } = true;
     public Dictionary<uint,int>? CurrencyThresholds { get=>Volatile.Read(ref currencyThresholds); set=>Volatile.Write(ref currencyThresholds,value); }

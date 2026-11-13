@@ -11,6 +11,26 @@ internal sealed partial class MainWindow
     // 0.828 rule (Timers828Tests): a « once a second » clock never starts from long.MinValue.
     private long dashboardAt=-100_000;
     private (HealthLevel Overall,IReadOnlyList<HealthLine> Lines)? dashboard;
+    /// <summary>X-165 (0.1245): what the server bar entry shows (framework thread): the overall state, the heap in MB (null: unknown), the lines as texts.</summary>
+    internal sealed record DashboardSnapshot(HealthLevel Overall,double? HeapMegabytes,IReadOnlyList<string> Lines);
+    private DashboardSnapshot? dashboardSnapshot;
+    internal DashboardSnapshot? DashboardState=>Volatile.Read(ref dashboardSnapshot);
+
+    // Once a second at most, on the draw thread (the page times belong to it): the dashboard and the snapshot the server bar reads.
+    private void RefreshDashboard()
+    {
+        var now=Environment.TickCount64;
+        if(dashboard is not null && now-dashboardAt<1000)return;
+        var inputs=DashboardInputs();
+        var evaluated=HealthBoard.Evaluate(inputs);
+        dashboard=evaluated;dashboardAt=now;
+        Volatile.Write(ref dashboardSnapshot,new DashboardSnapshot(evaluated.Overall,inputs.HeapBytes is { } heap ? heap/1048576.0:null,[.. evaluated.Lines.Select(DashboardText)]));
+    }
+
+    /// <summary>X-165 (0.1245): called by the plugin's draw in every frame; reads the measures (once a second) only while the server bar entry is on.</summary>
+    internal void TickDashboard(){if(configuration.StateServerBar)RefreshDashboard();}
+
+    private string DashboardText(HealthLine line)=>localization.Format(line.Key,[.. line.Values.Select(value=>value is double number ? number.ToString("0.0#",Numbers):value)]);
 
     private HealthInputs DashboardInputs()
     {
@@ -35,14 +55,13 @@ internal sealed partial class MainWindow
     private void DrawDashboard()
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Dashboard.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
-        var now=Environment.TickCount64;
-        if(dashboard is null || now-dashboardAt>=1000){dashboard=HealthBoard.Evaluate(DashboardInputs());dashboardAt=now;}
-        var (overall,lines)=dashboard.Value;
+        RefreshDashboard();
+        var (overall,lines)=dashboard!.Value;
         ImGui.TextColored(DashboardColour(overall),localization.Get("Dashboard.Overall"+overall));
         foreach(var line in lines)
         {
             DrawStateMark(line.Level switch { HealthLevel.Problem=>false,HealthLevel.Watch=>null,_=>true });
-            ImGui.SameLine();ImGui.TextWrapped(localization.Format(line.Key,[.. line.Values.Select(value=>value is double number ? number.ToString("0.0#",Numbers):value)]));
+            ImGui.SameLine();ImGui.TextWrapped(DashboardText(line));
         }
         ImGui.TextDisabled(localization.Get("Dashboard.Help"));
     }

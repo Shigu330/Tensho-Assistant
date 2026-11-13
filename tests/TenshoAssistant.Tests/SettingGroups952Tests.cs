@@ -70,7 +70,7 @@ internal static class SettingGroups952Tests
             var advanced=Read("MainWindow.Advanced.cs");
             Greyed(advanced,"ImGui.BeginDisabled(!configuration.MarketPricesOnHover);","BoolSetting(\"Advanced.HoverRefresh\"","refresh key");
             // X-162 (0.1129): the currency and gil entries draw Tensho's tooltip too.
-            const string bars="ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar);";
+            const string bars="ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar && !configuration.StateServerBar);"; // 0.1245: Tensho's state too (X-165).
             Greyed(advanced,bars,"BoolSetting(\"Advanced.AlarmBarTooltip\"","bar tooltip");
             Greyed(advanced,"ImGui.BeginDisabled(!configuration.AlarmBarTooltip || !configuration.AlarmServerBar);","SliderSetting(\"Advanced.AlarmBarTooltipCount\"","bar tooltip count");
             Check(advanced.IndexOf("BoolSetting(\"Advanced.ReminderFinishedServerBar\"",StringComparison.Ordinal)<advanced.IndexOf(bars,StringComparison.Ordinal),"right after the three bar rows");

@@ -37,8 +37,9 @@ internal static class ServerBarFamily1240Tests
                 Check(at > last,entry + ": created in the order of before (the order the game's bar first shows them)");
                 last = at;
             }
-            Check(files.Sum(file => Count(file.Text,@"new (Alarms|Inventory)\.\w*DtrEntr(y|ies)\(")) == 5,"no other server bar entry anywhere");
-            Check(Count(home,@"registrations\.Register\(") == 5,"all through the plugin's registrations");
+            // 0.1245 (X-165): a sixth, Tensho's state, last.
+            Check(files.Sum(file => Count(file.Text,@"new (Alarms|Inventory)\.\w*DtrEntr(y|ies)\(")) == 6,"no other server bar entry anywhere");
+            Check(Count(home,@"registrations\.Register\(") == 6,"all through the plugin's registrations");
             foreach (var reach in new[] { "alarmBar=()=>alarms;","reminderBar=()=>reminders;","currencyBar=()=>currencies;","gilBar=()=>gil;" })
                 Check(home.Contains(reach,StringComparison.Ordinal),"the tooltip reaches it: " + reach);
             var plugin = files.Single(file => file.Name == "Plugin.cs").Text;

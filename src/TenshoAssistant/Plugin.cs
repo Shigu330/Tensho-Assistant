@@ -92,6 +92,8 @@ public sealed partial class Plugin : IDalamudPlugin
     // X-162 (0.1129): the currency and gil entries draw Tensho's tooltip too.
     private Func<Alarms.CurrencyDtrEntry?>? currencyBar;
     private Func<Inventory.GilDtrEntry?>? gilBar;
+    // X-165 (0.1245): Tensho's state in the server bar (Plugin.ServerBar.cs).
+    private Func<Alarms.StateDtrEntry?>? stateBar;
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
@@ -1770,6 +1772,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("ReminderBar",()=>reminderBar?.Invoke()?.DrawTooltip()),
             ("CurrencyBar",()=>currencyBar?.Invoke()?.DrawTooltip()),
             ("GilBar",()=>gilBar?.Invoke()?.DrawTooltip()),
+            ("StateBar",()=>{mainWindow.TickDashboard();stateBar?.Invoke()?.DrawTooltip();}),
             ("TriadOverlay",mainWindow.DrawTriadOverlay),
             ("TriadRequest",mainWindow.DrawTriadRequestPanel),
             ("TriadDeck",mainWindow.DrawTriadDeckReminder),

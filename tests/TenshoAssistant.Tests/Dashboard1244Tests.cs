@@ -47,9 +47,9 @@ internal static class Dashboard1244Tests
         ("Dashboard 1244: in Diagnostics, read once a second while shown, from measures already taken; texts in both languages",() =>
         {
             var page=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
-            Check(page.Contains("private long dashboardAt=-100_000;") && page.Contains("if(dashboard is null || now-dashboardAt>=1000){dashboard=HealthBoard.Evaluate(DashboardInputs());dashboardAt=now;}"),"once a second, clock from -100 000");
+            Check(page.Contains("private long dashboardAt=-100_000;") && page.Contains("if(dashboard is not null && now-dashboardAt<1000)return;"),"once a second, clock from -100 000 (0.1245: RefreshDashboard)");
             var drawStart=page.IndexOf("private void DrawDashboard()",StringComparison.Ordinal);
-            Check(page.IndexOf("if(!TenshoAssistant.UI.UiComponents.Header(",drawStart,StringComparison.Ordinal) < page.IndexOf("DashboardInputs()",drawStart,StringComparison.Ordinal),"nothing read while folded");
+            Check(page.IndexOf("if(!TenshoAssistant.UI.UiComponents.Header(",drawStart,StringComparison.Ordinal) < page.IndexOf("RefreshDashboard();",drawStart,StringComparison.Ordinal),"nothing read while folded");
             Check(page.Contains("Community.BoundedHttp.Sent") && page.Contains("SelfCheck?.LastLines") && page.Contains("pageDrawMs") && page.Contains("FailedReadings()"),"existing measures");
             Check(Read("src/TenshoAssistant/MainWindow.Diagnostics.cs").Contains("        DrawDashboard();\n"),"in Diagnostics");
             var en=Read("src/TenshoAssistant/Localization/Languages/en.json");var fr=Read("src/TenshoAssistant/Localization/Languages/fr.json");

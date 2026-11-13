@@ -31,10 +31,22 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.BagsServerBar","Advanced.BagsServerBarTip",()=>configuration.BagsServerBar,value=>configuration.BagsServerBar=value,c=>c.BagsServerBar);
         BoolSetting("Advanced.WearServerBar","Advanced.WearServerBarTip",()=>configuration.WearServerBar,value=>configuration.WearServerBar=value,c=>c.WearServerBar);
         BoolSetting("Advanced.PlaceServerBar","Advanced.PlaceServerBarTip",()=>configuration.PlaceServerBar,value=>configuration.PlaceServerBar=value,c=>c.PlaceServerBar);
+        // X-165 (0.1245): Tensho's state in the server bar (off by default), only when something is wrong (option), and the dashboard here.
+        BoolSetting("Advanced.StateServerBar","Advanced.StateServerBarTip",()=>configuration.StateServerBar,value=>configuration.StateServerBar=value,c=>c.StateServerBar);
+        if(configuration.StateServerBar)
+        {
+            ImGui.Indent();
+            try
+            {
+                BoolSetting("Advanced.StateServerBarProblems","Advanced.StateServerBarProblemsTip",()=>configuration.StateServerBarOnlyProblems,value=>configuration.StateServerBarOnlyProblems=value,c=>c.StateServerBarOnlyProblems);
+                DrawDashboard();
+            }
+            finally{ImGui.Unindent();}
+        }
         // X-76 step 3 (0.952): the server bar tooltip belongs to the three bar entries above (not to the tracking window it sat under):
         // greyed while none of them is on; its count is read by the alarm entry only, greyed while that entry or the tooltip is off.
         ImGui.Indent();
-        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar);
+        ImGui.BeginDisabled(!configuration.AlarmServerBar && !configuration.ReminderServerBar && !configuration.ReminderFinishedServerBar && !configuration.CurrencyServerBar && !configuration.GilServerBar && !configuration.StateServerBar);
         try
         {
             BoolSetting("Advanced.AlarmBarTooltip","Advanced.AlarmBarTooltipTip",()=>configuration.AlarmBarTooltip,value=>configuration.AlarmBarTooltip=value,c=>c.AlarmBarTooltip);

@@ -270,6 +270,8 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `SourceUses.WikiItemAcquisition` | bool | true | Settings › Data | **Item acquisition** — Item hover panel: the wiki's acquisition page (achievements, notes) when the game data says nothing; English text. Off: not asked any more; a copy already kept is still shown where the page has one. Default: on. |
 | `SourceUses.WikiMonsters` | bool | true | Settings › Data | **Monster pages** — Monsters page: the wiki's page of a monster (where it lives, what it drops), on click. Off: not asked any more; a copy already kept is still shown where the page has one. Default: on. |
 | `SourceUses.WikiVistas` | bool | true | Settings › Data | **Vistas** — Map: where each vista is, from the wiki. Off: not asked any more; a copy already kept is still shown where the page has one. Default: on. |
+| `StateServerBar` | bool | false | Settings › General | **Tensho's state in the server bar** — Shows « Tensho: ok · 210 MB » in the server info bar: whether everything is fine (saves, readings, self-check) and the memory of Dalamud and its plugins; its tooltip gives the details, a click opens these settings. The dashboard is shown below while it is on. Default: off. |
+| `StateServerBarOnlyProblems` | bool | false | Settings › General | **Only when something is wrong** — Hides the entry while everything is fine: it appears only when something is worth a look or is wrong. Default: off. |
 | `TaskPanel` | bool | false | `MainWindow.PersonalTasks.cs` | **On-screen « to do » panel** — Shows on screen, outside the Tensho window, the tasks marked « On screen » that are not done. Hidden in combat. Closing it turns this setting off. Default: off. |
 | `TrackerWindow` | bool | false | Settings › General | **Pinned tracking window** — Small on-screen window with the items of your active Tensho alarms (gathering, fishing), soonest first with the time left; click a name: its item page; « Map »: the game map on the point when known. Hidden with the game’s interface; the cross closes it. Default: off. |
 | `TriadChallengePanel` | bool | true | Settings › Panels · Settings › Panels | **NPC challenge: odds of your decks and generated deck** — Beside an NPC's challenge window, a panel shows the rules, the estimated odds of each of your decks (matches simulated in the background) and can generate a deck for this NPC; in the deck choice window, the odds are written beside each deck and the best one is framed in green. Off: no panel, no odds, and no match is simulated. Acts only while the Triple Triad observation is on. Default: on. |
@@ -319,7 +321,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 263 controls (255 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 265 controls (257 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -595,6 +597,8 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `SourceUses.WikiItemAcquisition` | bool | true | Paramètres › Données et sources | **Acquisition des objets** — Panneau de survol des objets : la page d'acquisition du wiki (succès, notes) quand les données du jeu ne disent rien ; texte en anglais. Désactivé : plus demandé ; une copie déjà gardée reste affichée là où la page en a une. Par défaut : activé. |
 | `SourceUses.WikiMonsters` | bool | true | Paramètres › Données et sources | **Pages des monstres** — Page Monstres : la page du wiki d'un monstre (où il vit, ce qu'il donne), au clic. Désactivé : plus demandé ; une copie déjà gardée reste affichée là où la page en a une. Par défaut : activé. |
 | `SourceUses.WikiVistas` | bool | true | Paramètres › Données et sources | **Repères** — Carte : où se trouve chaque repère, d'après le wiki. Désactivé : plus demandé ; une copie déjà gardée reste affichée là où la page en a une. Par défaut : activé. |
+| `StateServerBar` | bool | false | Paramètres › Général | **État de Tensho dans la barre serveur** — Affiche « Tensho : ok · 210 Mo » dans la barre d'informations du serveur : si tout va bien (enregistrements, lectures, auto-contrôle) et la mémoire de Dalamud et de ses plugins ; son info-bulle donne le détail, un clic ouvre ces paramètres. Le tableau de bord s'affiche dessous tant qu'il est activé. Par défaut : désactivé. |
+| `StateServerBarOnlyProblems` | bool | false | Paramètres › Général | **Seulement en cas de souci** — Masque l'entrée tant que tout va bien : elle n'apparaît que si quelque chose mérite un coup d'œil ou ne va pas. Par défaut : désactivé. |
 | `TaskPanel` | bool | false | `MainWindow.PersonalTasks.cs` | **Panneau « à faire » à l'écran** — Montre à l'écran, hors de la fenêtre Tensho, les tâches cochées « À l'écran » qui ne sont pas faites. Caché en combat. Le fermer décoche ce réglage. Par défaut : désactivé. |
 | `TrackerWindow` | bool | false | Paramètres › Général | **Fenêtre de suivi épinglée** — Petite fenêtre à l’écran avec les objets de vos alarmes Tensho actives (récolte, pêche), la plus proche en premier et le temps restant ; clic sur un nom : la fiche ; « Carte » : la carte du jeu sur le point quand il est connu. Masquée avec l’interface du jeu ; la croix la ferme. Par défaut : désactivé. |
 | `TriadChallengePanel` | bool | true | Paramètres › Panneaux à côté du jeu · Paramètres › Panneaux à côté du jeu | **Défi d'un PNJ : chances de vos decks et deck généré** — À côté de la fenêtre de défi d'un PNJ, un panneau donne les règles, les chances estimées de chacun de vos decks (matchs simulés en arrière-plan) et peut générer un deck pour ce PNJ ; dans la fenêtre de choix du deck, les chances s'écrivent à côté de chaque deck et le meilleur est encadré en vert. Décoché : ni panneau ni chances, et aucun match n'est simulé. Agit seulement quand l'observation Triple Triade est activée. Par défaut : activé. |
@@ -644,5 +648,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 263 cases (255 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 265 cases (257 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
