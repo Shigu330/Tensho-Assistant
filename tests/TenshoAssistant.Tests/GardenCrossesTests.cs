@@ -32,7 +32,8 @@ internal static class GardenCrossesTests
             Check(ui.Contains("newBedGrow=GardenSeeds.GrowHours(seed);") && ui.Contains("newBedTend=GardenSeeds.TendHours(seed);")
                 && ui.Contains("InputInt(localization.Get(\"Garden.Grow\")"),"picker fills, inputs remain");
             Check(Read("TenshoAssistant.csproj").Contains("<EmbeddedResource Include=\"Reminders\\Data\\garden-seeds.csv\" />"),"embedded");
-            var plugin=Read("Plugin.cs");
+            // X-178 (0.1258): built by the window (MainWindow.GardenData.cs), for the plugin and the desktop application alike.
+            var plugin=Read("MainWindow.GardenData.cs");
             Check(plugin.Contains("\"TenshoAssistant.Reminders.Data.garden-seeds.csv\"") && plugin.Contains("data.GetExcelSheet<Lumina.Excel.Sheets.Item>();"),"names from the game's Item sheet");
             Check(Read("Credits/CreditCatalog.cs").Contains("new(\"LotlabGardening\", CreditKind.Embedded"),"credited");
         }),
@@ -60,8 +61,8 @@ internal static class GardenCrossesTests
         }),
         ("Garden crosses: read once off the frame through the English Item sheet, shown in the game's language, embedded and credited",() =>
         {
-            var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("mainWindow.GardenCrossCatalog=()=>gardenCrosses??=Task.Run(()=>") && plugin.Contains("GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English)")
+            var plugin=Read("MainWindow.GardenData.cs");
+            Check(plugin.Contains("GardenCrossCatalog=()=>gardenCrosses??=Task.Run(()=>ReadGardenCrosses(data));") && plugin.Contains("GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English)")
                 && plugin.Contains("\"TenshoAssistant.Reminders.Data.garden-crosses.csv\""),"background, English sheet, embedded file");
             var ui=Read("MainWindow.GardenCrosses.cs");
             Check(ui.Contains("if(!task.IsCompletedSuccessfully)") && !ui.Contains("http") && !ui.Contains("unsafe"),"waits for the task, nothing online, no game memory");
@@ -96,7 +97,7 @@ internal static class GardenCrossesTests
             var ui=Read("MainWindow.GardenCrosses.cs");
             Check(ui.Contains("if(ImGui.Selectable(label+") && ui.Contains("if(gardenPair is { } chosen)DrawGardenPlan(chosen,name);") && !ui.Contains("unsafe"),"click");
             Check(ui.Contains("best.Seed!=gardenCrossSeed"),"pairs kept while the seed stays");
-            Check(Read("Plugin.cs").Contains("crosses.Seeds.Concat([MainWindow.GardenTopsoil3,MainWindow.GardenTopsoil2])"),"soil names in the game's language");
+            Check(Read("MainWindow.GardenData.cs").Contains("crosses.Seeds.Concat([GardenTopsoil3,GardenTopsoil2])"),"soil names in the game's language");
             Check(Read("Credits/CreditCatalog.cs").Contains("new(\"GardeningGuide\", CreditKind.Rule") && File.ReadAllText(Path.GetFullPath("docs/evidence/0.456-garden-grid.md")).Contains("7766"),"credit and evidence");
         }),
         // From GardenGrid461Tests: 0.461 (in-game campaign): the garden journal draws each patch as a grid.

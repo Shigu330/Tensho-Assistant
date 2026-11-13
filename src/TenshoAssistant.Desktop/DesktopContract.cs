@@ -30,6 +30,7 @@ internal static class DesktopContract
         new(Main,Kind.Method,"DesktopSurfaceMap",false,[],"the typed contract (DesktopSurface): pages, data, alarms, notices"),
         new(Main,Kind.Property,"PageEntries",false,null,"the navigation"),
         new(Main,Kind.Property,"LexiconLoad",false,null,"the lexicon"),
+        new(Main,Kind.Method,"ConfigureGarden",false,["Dalamud.Plugin.Services.IDataManager"],"the garden's seed list and crossbreeds (X-178)"),
         new(Main+"+PageEntry",Kind.Property,"Page",false,null,"the navigation"),
         new(Main+"+PageEntry",Kind.Property,"Label",false,null,"--step=entries (diagnostic)"),
         new(Main+"+PageEntry",Kind.Property,"Visible",false,null,"--step=entries (diagnostic)"),

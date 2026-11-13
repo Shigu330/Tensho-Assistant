@@ -72,6 +72,8 @@ internal sealed class Host
         if(map is null)SurfaceMissing=["MainWindow.DesktopSurfaceMap (another version?)"];
         // X-119 step 4 (0.1158): the window knows it is drawn by the desktop application (its navigation follows the player's page choices).
         Surface.DesktopMode();
+        // X-178 (0.1258): the garden's seed list and crossbreeds, built by the window from the sheets as in the game.
+        mainType.GetMethod("ConfigureGarden",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)?.Invoke(Window,[DataStub]);
         // Data the plugin fills after building the window (Plugin.cs): the lexicon, read off the frame from the sheets.
         if(Plugin.GetType("TenshoAssistant.Lexicon.LexiconLoader")?.GetMethod("Read",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic) is { } read
            && mainType.GetProperty("LexiconLoad",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic) is { } lexicon)

@@ -1142,41 +1142,9 @@ public sealed partial class Plugin : IDalamudPlugin
                 _=>null,
             };
             mainWindow.SquadronMissionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyExpedition>().GetRowOrDefault(id)?.Name.ExtractText();
-            // 0.449 (DEC-027): the embedded garden seeds (Lotlab), named in the game's language, read once.
-            IReadOnlyList<(Reminders.GardenSeed,string)>? gardenSeeds=null;
-            mainWindow.GardenSeedCatalog=()=>gardenSeeds??=((Func<IReadOnlyList<(Reminders.GardenSeed,string)>>)(()=>
-            {
-                try
-                {
-                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-seeds.csv")
-                        ?? throw new InvalidOperationException("Embedded garden seeds are missing.");
-                    using var reader=new StreamReader(stream);
-                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
-                    return Reminders.GardenSeeds.Read(reader)
-                        .Select(seed=>(seed,items.GetRowOrDefault(seed.SeedId)?.Name.ExtractText() ?? ""))
-                        .Where(pair=>pair.Item2.Length>0).OrderBy(pair=>pair.Item2,StringComparer.CurrentCultureIgnoreCase).ToArray();
-                }
-                catch(Exception error){log.Warning(error,"Garden seeds unavailable.");return [];}
-            }))();
-            // 0.450 (DEC-027): the crossbreeds (nick75g, English names linked through the English Item sheet), read once off the frame.
-            Task<(Reminders.GardenCrossData,IReadOnlyDictionary<uint,string>)>? gardenCrosses=null;
-            mainWindow.GardenCrossCatalog=()=>gardenCrosses??=Task.Run(()=>
-            {
-                try
-                {
-                    var english=Reminders.GardenCrosses.EnglishIndex(data.GetExcelSheet<Lumina.Excel.Sheets.Item>(Dalamud.Game.ClientLanguage.English)
-                        .Select(row=>(row.RowId,row.Name.ExtractText())));
-                    using var stream=typeof(Plugin).Assembly.GetManifestResourceStream("TenshoAssistant.Reminders.Data.garden-crosses.csv")
-                        ?? throw new InvalidOperationException("Embedded garden crossbreeds are missing.");
-                    using var reader=new StreamReader(stream);
-                    var crosses=Reminders.GardenCrosses.Read(reader,english);
-                    if(crosses.Unmatched.Count>0)log.Information("Garden crossbreeds: {0} source names not in the English Item sheet: {1}.",crosses.Unmatched.Count,string.Join(", ",crosses.Unmatched));
-                    var items=data.GetExcelSheet<Lumina.Excel.Sheets.Item>();
-                    IReadOnlyDictionary<uint,string> names=crosses.Seeds.Concat([MainWindow.GardenTopsoil3,MainWindow.GardenTopsoil2]).Distinct().ToDictionary(id=>id,id=>items.GetRowOrDefault(id)?.Name.ExtractText() ?? "");
-                    return (crosses,names);
-                }
-                catch(Exception error){log.Warning(error,"Garden crossbreeds unavailable.");throw;}
-            });
+            // 0.449, 0.450 (DEC-027): the garden's seed list and crossbreeds. X-178 (0.1258): built by the window itself
+            // (MainWindow.GardenData.cs), so the desktop application gets them the same way.
+            mainWindow.ConfigureGarden(data);
             // 0.451 (DEC-027, N-06): the squadron read on click on the framework thread (loaded by the game in the barracks only), and the
             // sheets of the planner, read once: missions with their six requirement sets, attributes by class and level, class names.
             mainWindow.ReadSquadron=()=>framework.RunOnFrameworkThread(()=>
