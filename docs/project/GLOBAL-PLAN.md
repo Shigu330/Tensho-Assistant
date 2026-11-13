@@ -668,8 +668,8 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-268 | Tooling 1 (R20.3, R19.3, R23, R28.12): a relay's last version made ready to release by the relay (docs.py gen and « suite » commit)… | Done in 0.1276 |
 | X-269 | Tooling 1 (R28.10, R28.9, R26): return script without a model (git and CI check of every relay commit, points done or annotated… | Done in 0.1277 |
 | X-270 | Tooling 1 (audit of 11/13): accurate start: start message without a stale line (patch reference redone after 7.58, master timestamp kept… | Done in 0.1277 |
-| X-271 | Tooling 2 (site 4, R37): reference images of the pages drawn outside the game (themes, sizes, empty, loading, error states, trial garden), compared at each version with tolerance (SSIM); an intended change produces an image to approve; before / after gallery for the user; in-game trials covered by an image removed from his list. Done when: a page changed for no reason fails the publish (tried), the gallery opens, the count of removed trials is given. | Must before the announcement (method plan of 11/13, accepted by the user). To do |
-| X-272 | Tooling 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7): trials by batch (q.py lot: a block's trials by place, 15 to 20 min) and a cap of 15 versions never seen in game; idea box with repeats recognised and counted; sorting class in plan.jsonl and announcement criteria checked; relay and reviewer briefs produced with their reminders; guard on the master's writes while a secondary lives. Done when: each command tried, the cap refusing a version that is not a fix (tried). | Must before the announcement (method plan of 11/13, accepted by the user). To do |
+| X-271 | Tooling 2 (site 4, R37): reference images of the pages drawn outside the game (themes, sizes, empty, loading, error states, trial garden)… | Done in 0.1278 |
+| X-272 | Tooling 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7): trials by batch (q.py lot: a block's trials by place, 15 to 20 min) and a cap… | Done in 0.1278 |
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -1409,8 +1409,8 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-268 | Outillage 1 (R20.3, R19.3, R23, R28.12) : la dernière version d'un relais rendue prête à publier par le relais (docs.py gen et commit «… | Fait en 0.1276 |
 | X-269 | Outillage 1 (R28.10, R28.9, R26) : script de retour sans modèle (contrôle git et CI de tous les commits du relais, points validés ou… | Fait en 0.1277 |
 | X-270 | Outillage 1 (audit du 13/11) : démarrage juste : message de démarrage sans ligne périmée (référence du patch refaite après 7.58, horodatage… | Fait en 0.1277 |
-| X-271 | Outillage 2 (chantier 4, R37) : images de référence des pages dessinées hors du jeu (thèmes, tailles, états vide, chargement, erreur, jardin d'essai), comparées à chaque version avec tolérance (SSIM) ; un changement voulu produit une image à approuver ; galerie avant / après pour l'utilisateur ; essais en jeu couverts par une image retirés de sa liste. Fait quand : une page changée sans raison fait échouer la publication (essai), la galerie s'ouvre, le compte des essais retirés est donné. | Indispensable avant l'annonce (plan de méthode du 13/11, accepté par l'utilisateur). À faire |
-| X-272 | Outillage 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7) : essais par lots (q.py lot : essais d'un bloc par lieu, 15 à 20 min) et plafond de 15 versions jamais vues en jeu ; boîte à idées avec redites reconnues et comptées ; classe de tri dans plan.jsonl et critères d'annonce vérifiés ; consignes du relais et du relecteur produites avec leurs rappels ; garde des écritures de la maître pendant qu'une secondaire vit. Fait quand : chaque commande essayée, plafond refusant une version qui n'est pas une correction (essai). | Indispensable avant l'annonce (plan de méthode du 13/11, accepté par l'utilisateur). À faire |
+| X-271 | Outillage 2 (chantier 4, R37) : images de référence des pages dessinées hors du jeu (thèmes, tailles, états vide, chargement, erreur… | Fait en 0.1278 |
+| X-272 | Outillage 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7) : essais par lots (q.py lot : essais d'un bloc par lieu, 15 à 20 min) et… | Fait en 0.1278 |
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment

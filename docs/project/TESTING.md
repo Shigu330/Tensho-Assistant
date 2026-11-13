@@ -1517,7 +1517,6 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1222) Guide sans intérêt coché : la visite ne montre que les pages pour tous (pas Triple Triade ni Artisanat)
 
-- [ ] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
 
 - [ ] (0.1222) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : guide : nouvelle étape « Panneaux à côté des fenêtres du jeu » (tout masquer ou afficher, puis chaque panneau) et visite réduite aux pages pour tous sans case cochée ; aide : quatre nouvelles questions de la FAQ ; liste des outils de l'accueil : aucun changement (pas de nouvelle page)
 
@@ -1603,7 +1602,6 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1254) Jardinage › Journal : le bouton « Planter maintenant » se détache (fond de sélection, bord doré) ; le titre de chaque potager est dans la police des sections
 
-- [ ] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
 
 - [ ] (0.1255) Rangements › journal des gils : les colonnes de montants (gagné, dépensé, net, variation, solde) sont alignées à droite, les chiffres les uns sous les autres
 
@@ -1711,7 +1709,6 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1272) Avec un style Dalamud clair (réglages de Dalamud › Apparence) et l'option cochée : titres et repères lisibles sur fond clair
 
-- [ ] (0.1273) Application de bureau : les flèches des catégories de la navigation (OBJETS, PRODUCTION…) sont des triangles, plus des rectangles ; Jardinage : la goutte et la coche des parcelles se lisent ; tableau de bord : le « ? » des lignes à regarder se lit
 
 **0.535 : interfaces** — à voir en jouant
 
