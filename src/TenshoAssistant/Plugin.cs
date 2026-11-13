@@ -205,22 +205,8 @@ public sealed partial class Plugin : IDalamudPlugin
             MarketWorldReader? marketReader = null;
             registrations.Register(() => marketReader = new MarketWorldReader(market, framework, player, client, log, data), () => marketReader?.Dispose());
             // X-173 (0.1140): the player's data file, one for every family moved into it (gil journal, achievement progress, voyage history,
-            // bank), opened on first use. 0.1149: made here, before the bank.
-            var tenshoData=new TenshoDataFile(Path.Combine(pluginInterface.GetPluginConfigDirectory(),TenshoDataDatabase.FileName),(error,message)=>log.Warning(error,message),message=>log.Information(message));
-            // 0.345 (g, I-03): one file per character (InventoryBank/<id>.json); the former shared file is split once. X-173 (0.1149): kept in
-            // TenshoData.db, the files of before converted at the first load and kept aside.
-            var bank = new InventoryBankService(new PerCharacterBankStore(
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank"),
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(), "InventoryBank.json"), data: tenshoData));
-            registrations.Register(() => { }, bank.Dispose);
-            IReadOnlyList<(uint,uint)>? cabinet = null;
-            var bankBridge = new BankInventoryBridge(bank, inventory, gameGui, player, client, framework, log, () => configuration.AutoBankCapture,
-                () => cabinet ??= data.GetExcelSheet<Lumina.Excel.Sheets.Cabinet>().Where(row => row.Item.RowId != 0).Select(row => (row.RowId, row.Item.RowId)).ToArray(),
-                set => data.GetExcelSheet<Lumina.Excel.Sheets.MirageStoreSetItem>().TryGetRow(set, out var outfit)
-                    ? new[] { outfit.MainHand.RowId, outfit.OffHand.RowId, outfit.Head.RowId, outfit.Body.RowId, outfit.Hands.RowId, outfit.Legs.RowId,
-                        outfit.Feet.RowId, outfit.Earrings.RowId, outfit.Necklace.RowId, outfit.Bracelets.RowId, outfit.Ring.RowId }
-                    : []);
-            registrations.Register(() => { }, bankBridge.Dispose);
+            // bank), with the bank and its bridge to the game's inventory: the persistence family (X-153, 0.1239: Plugin.Persistence.cs).
+            var (tenshoData,bank,bankBridge)=RegisterPersistence(pluginInterface,configuration,data,inventory,gameGui,player,client,framework);
             bankOverlay = new BankImportOverlay(bank, bankBridge, localization);
             localization.SelectInitialLanguage(configuration.LanguageCode,client.ClientLanguage.ToString());
             mainWindow = new MainWindow(configuration, () => SaveTimed("window"), log, localization,

@@ -117,7 +117,7 @@ internal static class VoyageSqlite1148Tests
                 && window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);".Replace("\n",Environment.NewLine)) || window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);"),
                 "the app reads its copy of the data file once converted, the JSON copy before, never converting it itself");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.IndexOf("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) is var made and >0
+            Check(plugin.IndexOf("var (tenshoData,bank,bankBridge)=RegisterPersistence(",StringComparison.Ordinal) is var made and >0
                 && made<plugin.IndexOf("new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"VoyageHistory.json\"),(error,message)=>log.Warning(error,message),tenshoData)",StringComparison.Ordinal),"the plugin's store on the data file");
         })),
     ];

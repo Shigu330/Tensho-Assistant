@@ -131,7 +131,7 @@ internal static class AchievementSqlite1140Tests
         ("Achievements SQLite 1140: wiring (one data file for the plugin, the progress read off the frame, an unreadable one never written over)",() =>
         {
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) && plugin.Contains("new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"GilJournal\"),tenshoData)",StringComparison.Ordinal)
+            Check(plugin.Contains("var (tenshoData,bank,bankBridge)=RegisterPersistence(",StringComparison.Ordinal) && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Persistence.cs")).Contains("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) && plugin.Contains("new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"GilJournal\"),tenshoData)",StringComparison.Ordinal)
                 && plugin.Contains("new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"AchievementProgress.json\"),tenshoData)",StringComparison.Ordinal),"plugin");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Collections/AchievementProgressWatcher.Dalamud.cs"));
             Check(watcher.Contains("loading=data is null ? null:Task.Run(()=>data.Load(DateTimeOffset.UtcNow));",StringComparison.Ordinal)

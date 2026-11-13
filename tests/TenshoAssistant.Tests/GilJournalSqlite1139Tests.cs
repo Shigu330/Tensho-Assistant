@@ -140,7 +140,7 @@ internal static class GilJournalSqlite1139Tests
         ("Gil SQLite 1139: wiring (the plugin passes TenshoData.db to the watcher, saves and loads through the store, folds the journal in at unload)",() =>
         {
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("new Inventory.GilJournalStore(",StringComparison.Ordinal) && plugin.Contains("TenshoDataDatabase.FileName",StringComparison.Ordinal),"plugin");
+            Check(plugin.Contains("new Inventory.GilJournalStore(",StringComparison.Ordinal) && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Persistence.cs")).Contains("TenshoDataDatabase.FileName",StringComparison.Ordinal),"plugin (the data file in the persistence family since 0.1239, X-153)");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs"));
             Check(watcher.Contains("()=>store.Save(id,copy)",StringComparison.Ordinal) && watcher.Contains("store.Checkpoint();",StringComparison.Ordinal)
                 && watcher.Contains("if(!dirty || character==0 || loadFailed)return;",StringComparison.Ordinal),"watcher");

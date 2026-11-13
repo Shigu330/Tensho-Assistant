@@ -206,9 +206,10 @@ internal static class BankSqlite1149Tests
                 && window.Contains("case \"bank\":\n                UseDesktopBank(folder,warn);")
                 && window.Contains("UseDesktopVoyages(folder,warn);\n                UseDesktopBank(folder,warn);"),
                 "the app reads its copy of the data file once no bank file is left, the copy of the files before, never converting");
-            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            // X-153 (0.1239): made in the persistence family (Plugin.Persistence.cs).
+            var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Persistence.cs"));
             Check(plugin.IndexOf("var tenshoData=new TenshoDataFile(",StringComparison.Ordinal) is var made and > 0
-                && made < plugin.IndexOf("Path.Combine(pluginInterface.GetPluginConfigDirectory(), \"InventoryBank.json\"), data: tenshoData));",StringComparison.Ordinal),"the plugin's bank on the data file, made before it");
+                && made < plugin.IndexOf("Path.Combine(folder,\"InventoryBank.json\"),data:tenshoData)",StringComparison.Ordinal),"the plugin's bank on the data file, made before it");
         })),
     ];
 }

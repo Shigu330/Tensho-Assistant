@@ -210,8 +210,8 @@ internal static class ResilienceTests
             Check(map.Contains("if(player==null)return (null,null);") && map.Contains("adventureRows.Length>bits.Length*8)return (unlocked,null);") && map.Contains("\"Sightseeing rows unavailable.\""),"unknown collected sets");
             var bank=File.ReadAllText(Path.Combine(root,"Inventory/BankInventoryBridge.Dalamud.cs"));
             Check(bank.Contains("mirage->IsSetSlotUnlocked(index, column)") && bank.Contains("held.Any(value => value) ? held : null") && bank.Contains("Dresser outfit {0}: slots held {1}."),"outfit pieces by slot, nothing held = as before, logged");
-            var plugin=File.ReadAllText(Path.Combine(root,"Plugin.cs"));
-            Check(plugin.Contains("outfit.Ring.RowId }") && !plugin.Contains("outfit.Ring.RowId }.Where"),"columns kept in order");
+            var plugin=File.ReadAllText(Path.Combine(root,"Plugin.Persistence.cs"));
+            Check(plugin.Contains("outfit.Ring.RowId}") && !plugin.Contains("outfit.Ring.RowId}.Where"),"columns kept in order (persistence family since 0.1239, X-153)");
         }),
     ];
 }

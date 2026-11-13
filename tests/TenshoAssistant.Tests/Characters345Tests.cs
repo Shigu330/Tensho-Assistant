@@ -72,7 +72,7 @@ internal static class Characters345Tests
             Check(Read("MainWindow.SortPreview.cs").Contains("BankStorageScope.Sortable(entry.Key.Kind)",StringComparison.Ordinal),"sort preview uses the list");
             Check(Read("MainWindow.Bank.cs").Contains("(!live || !BankStorageScope.IsCharacterOwn(entry.Key.Kind))",StringComparison.Ordinal),"no double count for the logged-in character");
             Check(Read("Inventory/BankService.cs").Contains("request.Erase != 0 ? new BankChange(Erase: request.Erase)",StringComparison.Ordinal),"erase on the bank's own queue");
-            Check(Read("Plugin.cs").Contains("new PerCharacterBankStore(",StringComparison.Ordinal),"plugin uses one file per character");
+            Check(Read("Plugin.Persistence.cs").Contains("new PerCharacterBankStore(",StringComparison.Ordinal),"plugin uses one file per character");
             Check(Read("MainWindow.Characters.cs").Contains("characterEraseArmed==summary.Id",StringComparison.Ordinal),"erase needs a second click");
         }),
     ];
