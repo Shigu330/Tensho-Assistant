@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1296.0
+- Plan global, X-295 : Alarmes : chaque alarme à date (Alarmes › Ajouter à cette date) est un bloc à elle, titré du nom qu'on lui a donné ; elles partageaient toutes un seul bloc titré « Alarmes à date ». Sans nom, l'alarme s'appelle « Alarme à date · » et sa date (au lieu de « Alarme »). Les alarmes déjà enregistrées sont reconnues par leur groupe, dans la langue où il a été écrit (anglais ou français) ; les autres blocs (objet, météo, repère, rappels, alarmes chaque jour ET) ne changent pas.
+- Pour les joueurs : Alarmes : chaque alarme à date a son propre bloc, titré de son nom, au lieu d'un bloc « Alarmes à date » commun.
+- Tests : AlarmDatedTitle1296Tests. Verify.ps1 (agent) : 2398/2398, 0 avertissement, 0 erreur ; DLL 0.1296.0.0. Non validé en jeu.
+### English
+- Alarms: each dated alarm (Alarms › Add at this date) is a block of its own, titled with the name given to it; they all shared one block titled « Dated alarms ». Without a name, the alarm is called « Dated alarm · » and its date (instead of « Alarm »). Alarms already saved are recognised by their group, in the language it was written in (English or French); the other blocks (item, weather, vista, reminders, every-ET-day alarms) do not change.
+- For players: Alarms: each dated alarm now has its own block titled with its name, instead of one shared « Dated alarms » block.
+
 ## 0.1295.0
 - Plan global, X-294 : Infobulles d'objet : toute infobulle de Tensho pour une pièce d'équipement (pièce portée ou prévue de la page Équipement, Rangements, Objets, Marché, butins, PNJ vendeurs, récompenses, mode…) montre ses statistiques de base (HQ quand c'est connu, sinon selon « supposer HQ »), puis « Comparé à l'équipement porté » et « Valeurs de base, sans matérias ». Une seule partie les dessine (DrawItemGearStats), appelée par l'infobulle d'objet commune ; X-290 ne les donnait que dans la liste des pièces de la page Équipement, l'infobulle de la pièce portée n'en avait pas. Rien pour un objet qui n'est pas de l'équipement ou tant que le catalogue d'équipement n'est pas chargé.
 - Pour les joueurs : Infobulles d'objet : les pièces d'équipement montrent leurs statistiques et l'écart avec ce que vous portez sur toutes les pages, plus seulement dans la liste de l'Équipement.

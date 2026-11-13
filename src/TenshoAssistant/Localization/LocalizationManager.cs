@@ -57,6 +57,11 @@ internal sealed class LocalizationManager
     public string Get(string key)
         => ShowKeys ? key : selected.GetValueOrDefault(key) ?? english.GetValueOrDefault(key) ?? $"[{key}]";
 
+    /// <summary>X-295 (0.1296): the texts of this key in every loaded language and English, to recognise a stored text whatever the language it was written in.</summary>
+    public IReadOnlyList<string> Translations(string key)
+        => languages.Values.Select(map => map.GetValueOrDefault(key)).Append(english.GetValueOrDefault(key))
+            .OfType<string>().Where(text => text.Length > 0).Distinct(StringComparer.Ordinal).ToArray();
+
     /// <summary>Whether a text exists for this key in the chosen language or in English (for optional texts with a fallback).</summary>
     public bool Has(string key) => selected.ContainsKey(key) || english.ContainsKey(key);
 

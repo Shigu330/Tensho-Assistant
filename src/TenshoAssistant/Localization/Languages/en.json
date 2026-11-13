@@ -1716,6 +1716,7 @@
     "ManualLabel": "Alarm name",
     "AddDaily": "Add (every ET day)",
     "ManualDefault": "Alarm",
+    "DatedFallback": "Dated alarm · {0}",
     "GameTitle": "Game alarms (read only)",
     "GameHelp": "The alarms of the game's « Alarms » window, read only. The game offers no API for a plugin to create one: Tensho keeps its own list (with the game's alarm sound) and can add « every ET day » slots there through the /alarm command (« Send to the game » on a group, or the « Also create the alarms in the game » setting).",
     "OpenGame": "Open the game's alarms",

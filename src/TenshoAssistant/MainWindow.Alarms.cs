@@ -222,9 +222,19 @@ internal sealed partial class MainWindow
         _=>alarm.At.ToLocalTime().ToString("g"),
     };
 
-    // Alarm group (0.202): the item, or the weather / vista / name the alarm was created for, with its icon.
-    private static string AlarmGroupKey(TenshoAlarm alarm)=>alarm.ItemId!=0 ? $"item:{alarm.ItemId}":alarm.Group.Length>0 ? alarm.Group
-        :System.Text.RegularExpressions.Regex.Replace(alarm.Label,@" · \d\d:\d\d ET$","");
+    // Alarm group (0.202): the item, or the weather / vista / name the alarm was created for, with its icon. X-295 (0.1296): a dated alarm is
+    // a block of its own, titled with its name (AlarmGroups).
+    private (int Revision,IReadOnlyList<string> Texts) datedAlarmGroups=(-1,[]);
+    private IReadOnlyList<string> DatedAlarmGroups
+    {
+        get
+        {
+            if(datedAlarmGroups.Revision!=localization.Revision)datedAlarmGroups=(localization.Revision,localization.Translations("WorldClocks.Group"));
+            return datedAlarmGroups.Texts;
+        }
+    }
+    private string AlarmGroupKey(TenshoAlarm alarm)=>AlarmGroups.Key(alarm,DatedAlarmGroups);
+    private string DatedAlarmFallback(TenshoAlarm alarm)=>localization.Format("Alarms.DatedFallback",AlarmWhen(alarm));
     private void DrawAlarmGroupIcon(TenshoAlarm first,string title)
     {
         var size=new Vector2(32);
@@ -321,6 +331,7 @@ internal sealed partial class MainWindow
             {
                 var members=group.ToArray();var first=members[0];
                 var title=first.ItemId!=0 ? itemCatalog.State.Catalog?.Find(first.ItemId)?.Name ?? first.ItemId.ToString()
+                    :AlarmGroups.IsDated(first,DatedAlarmGroups) ? AlarmGroups.DatedTitle(first,DatedAlarmFallback)
                     :first.Group.Length>0 ? first.Group:group.Key;
                 ImGui.PushID($"{section.Key}/{group.Key}");
                 try

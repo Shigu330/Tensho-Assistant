@@ -1716,6 +1716,7 @@
     "ManualLabel": "Nom de l'alarme",
     "AddDaily": "Ajouter (chaque jour ET)",
     "ManualDefault": "Alarme",
+    "DatedFallback": "Alarme à date · {0}",
     "GameTitle": "Alarmes du jeu (lecture)",
     "GameHelp": "Les alarmes de la fenêtre « Alarmes » du jeu, en lecture. Le jeu n'offre pas d'API pour qu'un plugin en crée : Tensho garde sa propre liste (avec le son des alarmes du jeu) et peut y ajouter les créneaux « chaque jour ET » par la commande /alarm (« Envoyer au jeu » sur un groupe, ou réglage « Créer aussi les alarmes dans le jeu »).",
     "OpenGame": "Ouvrir les alarmes du jeu",

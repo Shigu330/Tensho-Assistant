@@ -80,9 +80,11 @@ internal sealed partial class MainWindow
         {
             if(ImGui.SmallButton(localization.Get("WorldClocks.AddOnce")) && at is { } when)
             {
-                AddAlarms([new TenshoAlarm{Label=alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),
-                    Group=localization.Get("WorldClocks.Group"),Source=AlarmSource.Other,Repeat=chosenRepeat,At=when,
-                    LeadMinutes=AlarmSchedule.ClampLead(chosenRepeat,DefaultAlarmLead)}]);
+                // X-295 (0.1296): the block of a dated alarm is titled with its name; without a name, « Dated alarm · » and its date.
+                var alarm=new TenshoAlarm{Group=localization.Get("WorldClocks.Group"),Source=AlarmSource.Other,Repeat=chosenRepeat,At=when,
+                    LeadMinutes=AlarmSchedule.ClampLead(chosenRepeat,DefaultAlarmLead)};
+                alarm.Label=alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():DatedAlarmFallback(alarm);
+                AddAlarms([alarm]);
                 alarmManualDate="";
             }
         }
