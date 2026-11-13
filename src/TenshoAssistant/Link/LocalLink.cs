@@ -28,6 +28,9 @@ namespace TenshoAssistant.Link;
 //    bags included, only when seen), so the application stays silent as the game does when the item is already gathered (X-62).
 //  - Protocol 3, optional part (0.1246, X-165): Tensho's state in the game (LinkState: the dashboard's overall state, the heap, the lines
 //    that are not fine), shown by the application's status bar and its dashboard; a state out of bounds is dropped, never the snapshot.
+//  - Protocol 3, optional part of the state (0.1271, X-264): the dashboard's measures (LinkMeasures: memory in use, slowest page, the
+//    frame's times when measured, session counters), one copy of the history's last point; the application keeps its own hour of them and
+//    draws the gauges and the curves. Measures out of bounds are dropped, the state kept; an application of before ignores them.
 
 /// <summary>What the plugin tells the application, read on the framework thread and copied (R07). Protocol 1: who and where. Protocol 2
 /// (0.1114): also the small live states and the saved files that changed. Protocol 3 (0.1119): those as categories only.</summary>
@@ -49,10 +52,33 @@ public static class LocalLinkProtocol
 
     /// <summary>X-165 (0.1246): the state to send, bounded: an unknown level is not sent; heap kept only when finite and between 0 and 1 TB;
     /// at most MaxStateLines lines, each cut at MaxStateLine.</summary>
-    public static LinkState? State(string? overall,double? heapMegabytes,IEnumerable<string> issues)
+    public static LinkState? State(string? overall,double? heapMegabytes,IEnumerable<string> issues,LinkMeasures? measures=null)
         => overall is null || !StateLevels.Contains(overall) ? null
             : new(overall,heapMegabytes is { } heap && double.IsFinite(heap) && heap is >= 0 and <= 1_048_576 ? Math.Round(heap,1) : null,
-                [.. issues.Where(line=>line is not null).Take(MaxStateLines).Select(line=>line.Length>MaxStateLine ? line[..MaxStateLine] : line)]);
+                [.. issues.Where(line=>line is not null).Take(MaxStateLines).Select(line=>line.Length>MaxStateLine ? line[..MaxStateLine] : line)],
+                measures is { } given && ValidMeasures(given) ? given : null);
+
+    /// <summary>X-264 (0.1271): the largest value a measure or a counter may carry on the link.</summary>
+    public const double MaxMeasure=1_048_576;
+    public const int MaxCounter=100_000_000;
+
+    /// <summary>X-264 (0.1271): the measures to send, bounded: a value that is not a finite number between 0 and MaxMeasure is sent as
+    /// unknown (null, never 0), a counter is kept between 0 and MaxCounter.</summary>
+    public static LinkMeasures Measures(double? memoryMb,double? pageMs,double? frameAvgMs,double? frameP95Ms,int slowFrames,int requests,int writesFailed,int panelsOff,int unavailable)
+    {
+        static double? Known(double? value)=>value is { } number && double.IsFinite(number) && number is >= 0 and <= MaxMeasure ? Math.Round(number,3) : null;
+        static int Count(int value)=>Math.Clamp(value,0,MaxCounter);
+        return new(Known(memoryMb),Known(pageMs),Known(frameAvgMs),Known(frameP95Ms),Count(slowFrames),Count(requests),Count(writesFailed),Count(panelsOff),Count(unavailable));
+    }
+
+    /// <summary>X-264 (0.1271): whether measures read from the pipe are within bounds (else the application drops them, the state is kept).</summary>
+    public static bool ValidMeasures(LinkMeasures measures)
+    {
+        static bool Known(double? value)=>value is null || double.IsFinite(value.Value) && value.Value is >= 0 and <= MaxMeasure;
+        static bool Count(int value)=>value is >= 0 and <= MaxCounter;
+        return Known(measures.MemoryMb) && Known(measures.PageMs) && Known(measures.FrameAvgMs) && Known(measures.FrameP95Ms)
+            && Count(measures.SlowFrames) && Count(measures.Requests) && Count(measures.WritesFailed) && Count(measures.PanelsOff) && Count(measures.Unavailable);
+    }
 
     /// <summary>X-165 (0.1246): whether a state read from the pipe is within bounds (else the application drops it, the snapshot is kept).</summary>
     public static bool ValidState(LinkState state)
@@ -133,6 +159,8 @@ public static class LocalLinkProtocol
             {error="held list refused";return false;}
         // X-165 (0.1246): a state out of bounds is left out, the rest of the snapshot kept (the lesson of N6: never cut the link for a part).
         if(read.State is { } state && !ValidState(state))read=read with {State=null};
+        // X-264 (0.1271): the same for the measures inside the state: out of bounds, they are left out and the state is kept.
+        if(read.State is { Measures: { } measures } kept && !ValidMeasures(measures))read=read with {State=kept with {Measures=null}};
         snapshot=read;return true;
     }
 
@@ -429,7 +457,12 @@ public sealed record LinkHeld(uint Item,long Count);
 /// <summary>X-165 (0.1246, slice 3): Tensho's state in the game for the desktop application: the dashboard's overall state (« Ok »,
 /// « Watch », « Problem »), the heap in MB (null: unknown, R08) and the lines that are not fine, in the plugin's language, bounded
 /// (LocalLinkProtocol.State).</summary>
-public sealed record LinkState(string Overall,double? HeapMegabytes,IReadOnlyList<string> Issues);
+public sealed record LinkState(string Overall,double? HeapMegabytes,IReadOnlyList<string> Issues,LinkMeasures? Measures=null);
+
+/// <summary>X-264 (0.1271): the dashboard's measures for the desktop application, the last point of the game's history: memory in use (MB),
+/// usual draw time of the slowest page (ms), the frame's average and the bound of its 95th percentile (ms; only measured in developer
+/// mode), and the session's counters (slow frames, requests, failed saves, panels off, readers unavailable). Unknown is null (R08).</summary>
+public sealed record LinkMeasures(double? MemoryMb,double? PageMs,double? FrameAvgMs,double? FrameP95Ms,int SlowFrames,int Requests,int WritesFailed,int PanelsOff,int Unavailable);
 
 /// <summary>
 /// X-163 (0.1155): the plugin's alerts to send, filled where they ring (framework thread), read by the feed once a second. The newest

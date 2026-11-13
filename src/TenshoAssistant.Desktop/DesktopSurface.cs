@@ -38,6 +38,10 @@ internal sealed class DesktopSurface
     /// <summary>X-165 (0.1246): Tensho's state in the game brought by the link (overall « Ok », « Watch » or « Problem », or null: none; heap in
     /// MB; the lines that are not fine), for the window's dashboard. Each frame.</summary>
     public required Action<string?,double?,string[]> GameState { get; init; }
+    /// <summary>X-264 (0.1271): the game's measures brought by the link (numbers: memory in use, slowest page, frame average, frame 95th
+    /// percentile bound; counters: slow frames, requests, failed saves, panels off, readers unavailable; both null: none), and the
+    /// application's clock in milliseconds, for the dashboard's gauges and its hour of curves. Each frame.</summary>
+    public required Action<double?[]?,int[]?,long> GameMeasures { get; init; }
     /// <summary>--zone (diagnostic): the weather page of a territory (territory, zone name).</summary>
     public required Action<uint,string> OpenWeather { get; init; }
 
@@ -47,7 +51,7 @@ internal sealed class DesktopSurface
         [nameof(Pages)]=Pages,[nameof(CurrentPage)]=CurrentPage,[nameof(SetPage)]=SetPage,[nameof(HidePages)]=HidePages,
         [nameof(DesktopMode)]=DesktopMode,[nameof(UseData)]=UseData,[nameof(CopyData)]=CopyData,[nameof(CopyDiscoveries)]=CopyDiscoveries,
         [nameof(DueAlarms)]=DueAlarms,[nameof(AlarmNotification)]=AlarmNotification,[nameof(LinkNotices)]=LinkNotices,
-        [nameof(AlarmHeld)]=AlarmHeld,[nameof(GameState)]=GameState,[nameof(OpenWeather)]=OpenWeather,
+        [nameof(AlarmHeld)]=AlarmHeld,[nameof(GameState)]=GameState,[nameof(GameMeasures)]=GameMeasures,[nameof(OpenWeather)]=OpenWeather,
     };
 
     /// <summary>
@@ -78,6 +82,7 @@ internal sealed class DesktopSurface
             LinkNotices=Take<Func<string[],bool,(string[],bool)>>(nameof(LinkNotices),(_,_)=>([],false)),
             AlarmHeld=Take<Action<uint[],long[]>>(nameof(AlarmHeld),(_,_)=>{}),
             GameState=Take<Action<string?,double?,string[]>>(nameof(GameState),(_,_,_)=>{}),
+            GameMeasures=Take<Action<double?[]?,int[]?,long>>(nameof(GameMeasures),(_,_,_)=>{}),
             OpenWeather=Take<Action<uint,string>>(nameof(OpenWeather),(_,_)=>{}),
         };
         missing=absent;

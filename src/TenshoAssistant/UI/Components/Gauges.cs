@@ -31,7 +31,10 @@ internal sealed partial class MainWindow
         void Fill(float from,float to,float at,float thick,Vector4 fill)
         {
             var packed=ImGui.GetColorU32(fill);
-            foreach(var (a,b,c,d) in GaugeMath.Band(centre,at,thick,from,to))draw.AddQuadFilled(a,b,c,d,packed);
+            // One stroked path per span: no seam between segments (a band of quads showed one at each joint).
+            if(GaugeMath.Arc(from,to) is not var (start,stop,segments))return;
+            draw.PathArcTo(centre,at,start,stop,segments);
+            draw.PathStroke(packed,ImDrawFlags.None,thick);
         }
         Fill(0,1,radius,thickness,border with{W=border.W*0.6f});
         Fill(0,GaugeMath.Fraction(amount,max),radius,thickness,colour);
@@ -46,7 +49,7 @@ internal sealed partial class MainWindow
             Fill(problem,1,at,rim,Error);
         }
         draw.AddText(origin,ImGui.GetColorU32(chosen ? Accent:Muted),title);
-        using(UiComponents.PushSectionFont())
+        using(UiComponents.TitleFont is { Available: true } large ? large.Push():UiComponents.PushSectionFont())
         {
             var text=ImGui.CalcTextSize(value);
             draw.AddText(new Vector2(centre.X-text.X*0.5f,centre.Y-text.Y*0.5f),ImGui.GetColorU32(amount is null ? Muted:colour),value);

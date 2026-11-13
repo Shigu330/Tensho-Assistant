@@ -76,6 +76,8 @@ internal sealed class StatusBar(Host host,DesktopVersionResult version)
         // X-165 (0.1246): Tensho's state in the game, to the window's dashboard (none when not linked or paused).
         var current=Link?.Invoke();
         host.GameState(current is { Paused: false } ? current.State : null);
+        // X-264 (0.1271): and its measures, at the application's clock (the window keeps a point every ten seconds).
+        host.GameMeasures(current is { Paused: false } ? current.State?.Measures : null,Environment.TickCount64);
         var categories=changes.Take(current);
         if(categories.Contains(TenshoAssistant.Link.LocalLinkProtocol.SettingsCategory))(reload??=new(host.ReadSettingsAgain)).Request();
         // X-119 step 2, part 2 (0.1131): a category the app reads is copied again off the frame (a burst of notices = one copy), then its

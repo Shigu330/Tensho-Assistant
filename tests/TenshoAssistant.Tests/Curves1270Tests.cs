@@ -21,12 +21,14 @@ internal static class Curves1270Tests
         {
             var page=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
             var gauges=page[page.IndexOf("private void DrawDashboardGauges(",StringComparison.Ordinal)..];
-            Check(gauges.Contains("if(dashboardCurve is { } chosen)") && gauges.Split("CurvePlot(").Length==2,"one curve at most, the chosen one");
-            Check(gauges.Contains("else ImGui.TextDisabled(localization.Get(\"Dashboard.CurveHint\"));"),"the way to the curves is said");
-            Check(gauges.Contains("if(history.Count<2)ImGui.TextDisabled(localization.Get(\"Dashboard.CurveEmpty\"));"),"no curve from a single point");
+            gauges=gauges[..gauges.IndexOf("// X-165 (0.1246, slice 3): the floating panel",StringComparison.Ordinal)];
+            Check(gauges.Contains("if(allCurves ? curve.Values.Any(value=>value is not null):curve.Name==dashboardCurve)CurvePlot(") && gauges.Split("CurvePlot(").Length==2,"in game one curve at most, the chosen one (0.1271: all of them in the application)");
+            Check(gauges.Contains("if(!allCurves && dashboardCurve is null)ImGui.TextDisabled(localization.Get(\"Dashboard.CurveHint\"));"),"the way to the curves is said");
+            Check(gauges.Contains("else if(history.Count<2)ImGui.TextDisabled(localization.Get(\"Dashboard.CurveEmpty\"));"),"no curve from a single point");
+            Check(gauges.Contains("void Pick(string name,bool clicked){if(clicked && !allCurves)dashboardCurve=dashboardCurve==name ? null:name;}"),"a click shows, a second click hides");
             foreach(var name in new[]{"Memory","Page","Frame","Requests"})
-                Check(gauges.Contains($"dashboardCurve=dashboardCurve==\"{name}\" ? null:\"{name}\";"),name+": a click shows, a second click hides");
-            Check(gauges.Contains("history.PerMinute(sample=>sample.Requests),rateTop"),"requests: the rate per minute, on the gauge's own scale");
+                Check(gauges.Contains($"Pick(\"{name}\",Gauge(\"{name}\",") && gauges.Contains($"Chosen(\"{name}\")"),name+": its gauge picks its curve");
+            Check(gauges.Contains("var rates=history.PerMinute(sample=>sample.Requests);") && gauges.Contains("(\"Requests\",localization.Get(\"Dashboard.GaugeRequests\"),rates,rateTop,"),"requests: the rate per minute, on the gauge's own scale");
             var component=Read("src/TenshoAssistant/UI/Components/Gauges.cs");
             var plot=component[component.IndexOf("private void CurvePlot(",StringComparison.Ordinal)..component.IndexOf("private static int GaugesPerLine()",StringComparison.Ordinal)];
             Check(plot.Contains("GaugeMath.Curve(values,min,max,top)") && plot.Contains("TipText(localization.Format(\"Dashboard.CurveSummary\""),"the pure layout, and the figures on hover");

@@ -209,6 +209,7 @@ internal static class Headless
         status.Link=null;
         failed+=FoldedNavigation(host,status,report);
         failed+=GardenViews(host,status,report);
+        failed+=DashboardView(host,status,report);
         failed+=ReadOnlyCheck(host,report);
         report.Write(failed==0);
         return failed==0 ? 0 : 1;
@@ -291,6 +292,69 @@ internal static class Headless
         }
         finally{host.SetSetting("GardenBeds",before);host.SetSetting("GardenDetailedView",detailedBefore ?? false);host.SetPage("Home");}
         return failed;
+    }
+
+    /// <summary>
+    /// X-264 (0.1271): the dashboard's gauges and curves drawn from a trial hour of measures (given as the link would give them, never
+    /// written), on the page that holds the dashboard: it must draw, and its cost by frame is said beside the same page without measures.
+    /// The number of failures.
+    /// </summary>
+    private static int DashboardView(Host host,StatusBar status,Report report)
+    {
+        var failed=0;
+        var size=new System.Numerics.Vector2(1280,820);
+        var linkBefore=status.Link;
+        try
+        {
+            host.SetPage("Diagnostics");
+            double Time(string what,out Exception? thrown,out int vertices)
+            {
+                thrown=null;vertices=0;var times=new List<double>();
+                for(var frame=0;frame<40;frame++)
+                {
+                    Beat($"dashboard {what}, frame {frame}",TimeSpan.FromSeconds(30));
+                    var start=System.Diagnostics.Stopwatch.GetTimestamp();
+                    thrown??=Ui.Frame(host,status,size,1/60f);
+                    if(frame>=10)times.Add(System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds);
+                    vertices=Math.Max(vertices,Dalamud.Bindings.ImGui.ImGui.GetDrawData().TotalVtxCount);
+                }
+                times.Sort();
+                return times[times.Count/2];
+            }
+            var without=Time("without measures",out var first,out var plain);
+            DashboardTrial(host,status);
+            var with=Time("with a trial hour",out var second,out var drawn);
+            foreach(var thrown in new[]{first,second})
+                if(thrown is not null){report.Fail($"dashboard view: {thrown.GetType().Name}: {Short(thrown.Message)}");failed++;}
+            if(drawn<=plain){report.Fail($"dashboard view: the trial hour drew nothing more ({drawn} vertices against {plain})");failed++;}
+            Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"  dashboard gauges and curves: {(failed==0 ? "drawn" : "FAILED")}, vtx {drawn} (page without measures {plain}), frame {with:0.00} ms (without {without:0.00} ms)"));
+        }
+        finally{status.Link=linkBefore;host.GameMeasures(null,Environment.TickCount64);host.GameState(null);host.SetPage("Home");}
+        return failed;
+    }
+
+    /// <summary>
+    /// X-264 (0.1271): a trial hour of the game's measures, given as the link gives them (the headless run, or a capture with
+    /// --dashboard-trial): 360 points ten seconds apart ending now, with a slow page now and then, a few points without the page's time
+    /// (the curve breaks there), requests in bursts, a panel off near the end; then a linked game whose state is « to look at ».
+    /// </summary>
+    // The window keeps 360 points ten seconds apart (the plugin's HealthHistory, not a type of the application).
+    private const int TrialPoints=360;
+    private const long TrialStepMs=10_000;
+    public static void DashboardTrial(Host host,StatusBar status)
+    {
+        var now=Environment.TickCount64;
+        static TenshoAssistant.Link.LinkMeasures At(int point)
+            =>TenshoAssistant.Link.LocalLinkProtocol.Measures(300+120*Math.Sin(point/40.0)+point*0.25,point is >=100 and <110 ? null : 0.6+0.3*Math.Sin(point/7.0)+(point%90==45 ? 5.5 : 0),
+                0.5+0.25*Math.Sin(point/11.0),1,point/120,point/3+(point>200 ? (point-200)*2 : 0),0,point>300 ? 1 : 0,0);
+        for(var point=0;point<TrialPoints;point++)
+            host.GameMeasures(At(point),now-(TrialPoints-1-point)*TrialStepMs);
+        var state=new TenshoAssistant.Link.LinkState("Watch",512,["Trial: a panel was turned off after an error."],At(TrialPoints-1));
+        var snapshot=new TenshoAssistant.Link.LinkSnapshot(TenshoAssistant.Link.LocalLinkProtocol.Version,"trial",true,false,0,"",1,State:state);
+        status.Link=()=>snapshot;
+        // The headless run draws without polling the status bar: the state is given here too (a window run gets it again each frame).
+        host.GameState(state);
     }
 
     /// <summary>

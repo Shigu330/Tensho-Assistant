@@ -27,7 +27,9 @@ internal sealed partial class MainWindow
 
     /// <summary>X-165 (0.1246): the snapshot as the local link sends it (LocalLinkFeed, framework thread), bounded by the protocol.</summary>
     internal Link.LinkState? DashboardLinkState()
-        => DashboardState is { } state ? Link.LocalLinkProtocol.State(state.Overall.ToString(),state.HeapMegabytes,state.Issues) : null;
+        => DashboardState is { } state ? Link.LocalLinkProtocol.State(state.Overall.ToString(),state.HeapMegabytes,state.Issues,Volatile.Read(ref dashboardMeasures)) : null;
+    // X-264 (0.1271): the history's last point as the link sends it (written on the draw thread at each point, read by the link's feed).
+    private Link.LinkMeasures? dashboardMeasures;
 
     // Once a second at most, on the draw thread (the page times belong to it): the dashboard and the snapshot the server bar reads.
     private void RefreshDashboard()
@@ -54,9 +56,9 @@ internal sealed partial class MainWindow
         var started=System.Diagnostics.Stopwatch.GetTimestamp();
         RefreshDashboard();
         if(dashboard is not { } read || dashboardInputs is not { } inputs)return;
-        var frame=SlowFrames.Steady.LastFrame;
-        dashboardHistory.Add(new HealthSample(now,read.Overall,inputs.ManagedBytes is { } managed ? managed/1048576.0:null,inputs.SlowestMedianMs,
-            frame?.Average,frame?.P95,SlowFrames.Reported,inputs.Requests.Values.Sum(),inputs.WritesFailed,inputs.PanelsOff?.Count ?? 0,inputs.Unavailable.Count));
+        var view=GameDashboardView(inputs);
+        dashboardHistory.Add(new HealthSample(now,read.Overall,view.MemoryMb,view.PageMs,view.FrameAvgMs,view.FrameP95Ms,SlowFrames.Reported,view.RequestsTotal,view.WritesFailed,view.PanelsOff,view.Unavailable));
+        Volatile.Write(ref dashboardMeasures,Link.LocalLinkProtocol.Measures(view.MemoryMb,view.PageMs,view.FrameAvgMs,view.FrameP95Ms,SlowFrames.Reported,view.RequestsTotal,view.WritesFailed,view.PanelsOff,view.Unavailable));
         dashboardSampleMs=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
         dashboardSampleMaxMs=Math.Max(dashboardSampleMaxMs,dashboardSampleMs);
     }
@@ -110,7 +112,7 @@ internal sealed partial class MainWindow
         RefreshDashboard();
         var (overall,lines)=dashboard!.Value;
         ImGui.TextColored(DashboardColour(overall),localization.Get("Dashboard.Overall"+overall));
-        DrawDashboardGauges(dashboardInputs!,dashboardHistory);
+        DrawDashboardGauges(GameDashboardView(dashboardInputs!),dashboardHistory,allCurves:false);
         foreach(var line in lines)
         {
             DrawStateMark(line.Level switch { HealthLevel.Problem=>false,HealthLevel.Watch=>null,_=>true });
@@ -121,59 +123,76 @@ internal sealed partial class MainWindow
 
     private System.Numerics.Vector4 DashboardColour(HealthLevel level)=>level switch { HealthLevel.Problem=>Error,HealthLevel.Watch=>Warning,_=>Success };
 
+    /// <summary>X-264 (0.1271): what the gauges show: the game's own reading, or in the desktop application the measures brought by the link.
+    /// SlowFrames null: not counted (out of developer mode).</summary>
+    private readonly record struct DashboardView(double? MemoryMb,double? PageMs,string? PageName,double? FrameAvgMs,double? FrameP95Ms,int RequestsTotal,int WritesFailed,int PanelsOff,int Unavailable,int? SlowFrames);
+
+    private DashboardView GameDashboardView(HealthInputs inputs)
+    {
+        var frame=SlowFrames.Steady.LastFrame;
+        return new(inputs.ManagedBytes is { } managed ? managed/1048576.0:null,inputs.SlowestMedianMs,inputs.SlowestPage,frame?.Average,frame?.P95,inputs.Requests.Values.Sum(),
+            inputs.WritesFailed+(inputs.SaveError is null ? 0:1),inputs.PanelsOff?.Count ?? 0,inputs.Unavailable.Count,DeveloperMode ? SlowFrames.Reported:null);
+    }
+
     /// <summary>
-    /// X-264 (0.1269): the dashboard as gauges (the state of the moment) and counters, from the reading the lines below come from. A gauge
-    /// with a rule of Tensho (HealthBoard) carries its zones and the colour of its level; one without a rule is drawn in the accent.
-    /// The frame's own times exist only in developer mode (they are only measured there): no gauge otherwise, never a zero.
+    /// X-264 (0.1269): the dashboard as gauges (the state of the moment) and counters. A gauge with a rule of Tensho (HealthBoard) carries
+    /// its zones and the colour of its level; one without a rule is drawn in the accent. The frame's own times exist only in developer mode
+    /// (they are only measured there): no gauge otherwise, never a zero. 0.1270: in game the curves stay behind a click (the gauge clicked
+    /// shows its last hour, a second click hides it). 0.1271: in the desktop application every curve is shown (<paramref name="allCurves"/>).
     /// </summary>
-    private void DrawDashboardGauges(HealthInputs inputs,HealthHistory history)
+    private void DrawDashboardGauges(DashboardView view,HealthHistory history,bool allCurves)
     {
         var started=DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp():0;
         var perLine=GaugesPerLine();var onLine=0;
         void Next(){if(onLine>0 && onLine<perLine)ImGui.SameLine();else onLine=0;onLine++;}
         string Number(double value,string format)=>value.ToString(format,Numbers);
-        var memory=inputs.ManagedBytes is { } managed ? managed/1048576.0:(double?)null;
-        var memoryTop=UI.GaugeMath.NiceMax(history.Series(sample=>sample.HeapMb).Max() ?? memory ?? 0,500);
+        string Mb(double value)=>localization.Format("Dashboard.UnitMb",Number(value,"N0"));
+        string Ms(double value)=>localization.Format("Dashboard.UnitMs",Number(value,"0.0#"));
+        void Pick(string name,bool clicked){if(clicked && !allCurves)dashboardCurve=dashboardCurve==name ? null:name;}
+        bool Chosen(string name)=>!allCurves && dashboardCurve==name;
+        var memoryTop=UI.GaugeMath.NiceMax(history.Series(sample=>sample.HeapMb).Max() ?? view.MemoryMb ?? 0,500);
         Next();
-        if(Gauge("Memory",localization.Get("Dashboard.GaugeMemory"),memory is { } mb ? localization.Format("Dashboard.UnitMb",Number(mb,"N0")):"—",memory,memoryTop,null,null,
-            localization.Format("Dashboard.GaugeMemoryTip",Number(memoryTop,"N0")),dashboardCurve=="Memory"))dashboardCurve=dashboardCurve=="Memory" ? null:"Memory";
+        Pick("Memory",Gauge("Memory",localization.Get("Dashboard.GaugeMemory"),view.MemoryMb is { } mb ? Mb(mb):"—",view.MemoryMb,memoryTop,null,null,
+            localization.Format("Dashboard.GaugeMemoryTip",Number(memoryTop,"N0")),Chosen("Memory")));
         Next();
-        if(Gauge("Page",localization.Get("Dashboard.GaugePage"),inputs.SlowestMedianMs is { } page ? localization.Format("Dashboard.UnitMs",Number(page,"0.0#")):"—",inputs.SlowestMedianMs,HealthHistoryScales.FrameMs,HealthBoard.SlowPageMs,null,
-            localization.Format("Dashboard.GaugePageTip",inputs.SlowestPage ?? "—"),dashboardCurve=="Page"))dashboardCurve=dashboardCurve=="Page" ? null:"Page";
-        if(SlowFrames.Steady.LastFrame is { } frame)
+        Pick("Page",Gauge("Page",localization.Get("Dashboard.GaugePage"),view.PageMs is { } page ? Ms(page):"—",view.PageMs,HealthHistoryScales.FrameMs,HealthBoard.SlowPageMs,null,
+            view.PageName is { } slowest ? localization.Format("Dashboard.GaugePageTip",slowest):localization.Get("Dashboard.GaugePageTipDesktop"),Chosen("Page")));
+        if(view.FrameAvgMs is { } frame)
         {
             Next();
-            if(Gauge("Frame",localization.Get("Dashboard.GaugeFrame"),localization.Format("Dashboard.UnitMs",Number(frame.Average,"0.0#")),frame.Average,HealthHistoryScales.FrameMs,null,null,
-                localization.Format("Dashboard.GaugeFrameTip",frame.P95 is { } bound ? "≤ "+Number(bound,"0.##"):"> 100",Number(frame.Max,"0.#"),frame.Count),dashboardCurve=="Frame"))dashboardCurve=dashboardCurve=="Frame" ? null:"Frame";
+            Pick("Frame",Gauge("Frame",localization.Get("Dashboard.GaugeFrame"),Ms(frame),frame,HealthHistoryScales.FrameMs,null,null,
+                localization.Format("Dashboard.GaugeFrameTip",view.FrameP95Ms is { } bound ? "≤ "+Number(bound,"0.##"):"> 100"),Chosen("Frame")));
         }
         var rate=history.LastPerMinute(sample=>sample.Requests);
-        var rateTop=UI.GaugeMath.NiceMax(history.PerMinute(sample=>sample.Requests).Max() ?? rate ?? 0,10);
+        var rates=history.PerMinute(sample=>sample.Requests);
+        var rateTop=UI.GaugeMath.NiceMax(rates.Max() ?? rate ?? 0,10);
         Next();
-        if(Gauge("Requests",localization.Get("Dashboard.GaugeRequests"),rate is { } perMinute ? Number(perMinute,"0.#"):"—",rate,rateTop,null,null,
-            localization.Format("Dashboard.GaugeRequestsTip",inputs.Requests.Values.Sum()),dashboardCurve=="Requests"))dashboardCurve=dashboardCurve=="Requests" ? null:"Requests";
-        var failed=inputs.WritesFailed+(inputs.SaveError is null ? 0:1);var panels=inputs.PanelsOff?.Count ?? 0;
-        Next();StatTile(localization.Get("Dashboard.TileWrites"),failed.ToString("N0",Numbers),failed>0 ? HealthLevel.Problem:HealthLevel.Ok,localization.Get("Dashboard.TileWritesTip"));
-        Next();StatTile(localization.Get("Dashboard.TilePanels"),panels.ToString("N0",Numbers),panels>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TilePanelsTip"));
-        Next();StatTile(localization.Get("Dashboard.TileReaders"),inputs.Unavailable.Count.ToString("N0",Numbers),inputs.Unavailable.Count>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TileReadersTip"));
-        // X-264 (0.1270): in game the curves stay behind a click: the gauge clicked shows its last hour under the gauges, a second click hides it.
-        if(dashboardCurve is { } chosen)
+        Pick("Requests",Gauge("Requests",localization.Get("Dashboard.GaugeRequests"),rate is { } perMinute ? Number(perMinute,"0.#"):"—",rate,rateTop,null,null,
+            localization.Format("Dashboard.GaugeRequestsTip",view.RequestsTotal),Chosen("Requests")));
+        // The counters on their own line, under the gauges.
+        onLine=0;
+        Next();StatTile(localization.Get("Dashboard.TileWrites"),view.WritesFailed.ToString("N0",Numbers),view.WritesFailed>0 ? HealthLevel.Problem:HealthLevel.Ok,localization.Get("Dashboard.TileWritesTip"));
+        Next();StatTile(localization.Get("Dashboard.TilePanels"),view.PanelsOff.ToString("N0",Numbers),view.PanelsOff>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TilePanelsTip"));
+        Next();StatTile(localization.Get("Dashboard.TileReaders"),view.Unavailable.ToString("N0",Numbers),view.Unavailable>0 ? HealthLevel.Watch:HealthLevel.Ok,localization.Get("Dashboard.TileReadersTip"));
+        if(view.SlowFrames is { } slow){Next();StatTile(localization.Get("Dashboard.TileSlow"),slow.ToString("N0",Numbers),HealthLevel.Ok,localization.Get("Dashboard.TileSlowTip"));}
+        // The curves of the last hour: all of them in the desktop application, the one of the gauge clicked in game.
+        var curves=new (string Name,string Title,double?[] Values,double Top,Func<double,string> Text)[]
         {
-            string Mb(double value)=>localization.Format("Dashboard.UnitMb",Number(value,"N0"));
-            string Ms(double value)=>localization.Format("Dashboard.UnitMs",Number(value,"0.0#"));
-            var (title,values,top,text)=chosen switch
-            {
-                "Memory"=>(localization.Get("Dashboard.GaugeMemory"),history.Series(sample=>sample.HeapMb),memoryTop,(Func<double,string>)Mb),
-                "Page"=>(localization.Get("Dashboard.GaugePage"),history.Series(sample=>sample.PageMs),HealthHistoryScales.FrameMs,Ms),
-                "Frame"=>(localization.Get("Dashboard.GaugeFrame"),history.Series(sample=>sample.FrameAvgMs),HealthHistoryScales.FrameMs,Ms),
-                _=>(localization.Get("Dashboard.GaugeRequests"),history.PerMinute(sample=>sample.Requests),rateTop,value=>Number(value,"0.#")),
-            };
-            if(history.Count<2)ImGui.TextDisabled(localization.Get("Dashboard.CurveEmpty"));
-            else CurvePlot(title,values,top,text,localization.Format("Dashboard.CurveAgo",Math.Max(1,(int)Math.Round(history.SpanMs/60_000.0))),localization.Get("Dashboard.CurveNow"),Accent);
+            ("Memory",localization.Get("Dashboard.GaugeMemory"),history.Series(sample=>sample.HeapMb),memoryTop,Mb),
+            ("Page",localization.Get("Dashboard.GaugePage"),history.Series(sample=>sample.PageMs),HealthHistoryScales.FrameMs,Ms),
+            ("Frame",localization.Get("Dashboard.GaugeFrame"),history.Series(sample=>sample.FrameAvgMs),HealthHistoryScales.FrameMs,Ms),
+            ("Requests",localization.Get("Dashboard.GaugeRequests"),rates,rateTop,value=>Number(value,"0.#")),
+        };
+        if(!allCurves && dashboardCurve is null)ImGui.TextDisabled(localization.Get("Dashboard.CurveHint"));
+        else if(history.Count<2)ImGui.TextDisabled(localization.Get("Dashboard.CurveEmpty"));
+        else
+        {
+            var left=localization.Format("Dashboard.CurveAgo",Math.Max(1,(int)Math.Round(history.SpanMs/60_000.0)));var right=localization.Get("Dashboard.CurveNow");
+            foreach(var curve in curves)
+                if(allCurves ? curve.Values.Any(value=>value is not null):curve.Name==dashboardCurve)CurvePlot(curve.Title,curve.Values,curve.Top,curve.Text,left,right,Accent);
         }
-        else ImGui.TextDisabled(localization.Get("Dashboard.CurveHint"));
-        if(DeveloperMode)
+        if(DeveloperMode && !inDesktopApp)
         {
-            Next();StatTile(localization.Get("Dashboard.TileSlow"),SlowFrames.Reported.ToString("N0",Numbers),HealthLevel.Ok,localization.Get("Dashboard.TileSlowTip"));
             ImGui.TextDisabled(localization.Format("Dashboard.HistoryCost",history.Count,Number(dashboardSampleMs,"0.00"),Number(dashboardSampleMaxMs,"0.00")));
             SlowFrames.Add(ImGui.GetFrameCount(),"dashboard gauges",System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
         }
@@ -220,5 +239,21 @@ internal sealed partial class MainWindow
         ImGui.TextColored(DashboardColour(level),localization.Get("Dashboard.DesktopGame")+" "+StateHeadline(overall,heap));
         if(issues.Length==0)ImGui.TextUnformatted(localization.Get("Dashboard.DesktopAllFine"));
         foreach(var issue in issues){DrawStateMark(level==HealthLevel.Problem ? false : null);ImGui.SameLine();ImGui.TextWrapped(issue);}
+        // X-264 (0.1271): the game's measures brought by the link: the same gauges, and every curve of the hour the application has seen.
+        if(desktopMeasures is not var (numbers,counters)){ImGui.TextDisabled(localization.Get("Dashboard.DesktopNoMeasures"));return;}
+        DrawDashboardGauges(new DashboardView(numbers[0],numbers[1],null,numbers[2],numbers[3],counters[1],counters[2],counters[3],counters[4],numbers[2] is null ? null:counters[0]),desktopHistory,allCurves:true);
+    }
+
+    // X-264 (0.1271): the game's measures the desktop application received by the link (DesktopSurface.GameMeasures, each frame; null: none):
+    // numbers = memory in use, slowest page, frame average, frame 95th percentile bound; counters = slow frames, requests, failed saves,
+    // panels off, readers unavailable. The application keeps its own hour: a point every ten seconds of its clock (« at »).
+    private (double?[] Numbers,int[] Counters)? desktopMeasures;
+    private readonly HealthHistory desktopHistory=new();
+    internal void DesktopGameMeasures(double?[]? numbers,int[]? counters,long at)
+    {
+        if(numbers is not { Length: >=4 } || counters is not { Length: >=5 }){desktopMeasures=null;return;}
+        desktopMeasures=(numbers,counters);
+        var level=desktopGameState is var (overall,_,_) && Enum.TryParse<HealthLevel>(overall,out var parsed) ? parsed:HealthLevel.Ok;
+        desktopHistory.Add(new HealthSample(at,level,numbers[0],numbers[1],numbers[2],numbers[3],counters[0],counters[1],counters[2],counters[3],counters[4]));
     }
 }

@@ -54,7 +54,7 @@ internal static class Gauges1269Tests
             Check(GaugeMath.NiceMax(3,10)==10 && GaugeMath.NiceMax(12,10)==20 && GaugeMath.NiceMax(21,10)==50 && GaugeMath.NiceMax(double.NaN,10)==10,"small scales, not a number");
             Check(Math.Abs(HealthHistoryScales.FrameMs-16.6667)<0.001 && HealthBoard.SlowPageMs==4,"the page gauge: a 60 fps frame, worth a look from 4 ms (the dashboard's own rule)");
         }),
-        ("Gauges 1269: the dial stays in its box and its band follows the value",() =>
+        ("Gauges 1269: the dial stays in its box and its arc follows the value",() =>
         {
             foreach(var width in new[]{75f,150f,300f})
             {
@@ -63,19 +63,15 @@ internal static class Gauges1269Tests
                 Check(size.X==width && centre.X==origin.X+width/2,"centred in its width");
                 var outer=radius+thickness/2;
                 Check(centre.X-outer>=origin.X && centre.X+outer<=origin.X+width && centre.Y-outer>=origin.Y+18,"the dial is inside the box, under the title");
-                var full=GaugeMath.Band(centre,radius,thickness,0,1);
-                Check(full.Count==48,"a full dial: 48 quads");
-                foreach(var quad in full)
-                    foreach(var point in new[]{quad.A,quad.B,quad.C,quad.D})
-                        Check(point.X>=origin.X-0.01f && point.X<=origin.X+width+0.01f && point.Y>=origin.Y+18-0.01f && point.Y<=origin.Y+size.Y+0.01f,$"width {width}: every point in the box");
-                Check(full[0].A.X<centre.X && full[0].A.Y>centre.Y && full[^1].D.X>centre.X && full[^1].D.Y>centre.Y,"from bottom left to bottom right");
-                Check(full[23].C.Y<centre.Y-radius*0.9f,"over the top in the middle");
+                // The dial's lowest points (its two ends, 45° under the horizontal) are inside the box too.
+                var low=centre.Y+MathF.Sin(GaugeMath.Start)*outer;
+                Check(low<=origin.Y+size.Y+0.01f && low>centre.Y,$"width {width}: the ends of the dial are inside the box, under the centre");
             }
-            var c=new Vector2(0,0);
-            Check(GaugeMath.Band(c,10,2,0,0).Count==0 && GaugeMath.Band(c,10,2,0.5f,0.5f).Count==0 && GaugeMath.Band(c,10,2,0.7f,0.2f).Count==0,"an empty span draws nothing");
-            var half=GaugeMath.Band(c,10,2,0,0.5f);
-            Check(half.Count==24 && Math.Abs(half[^1].C.X)<0.001f && half[^1].C.Y<0,"half: ends at the top");
-            for(var index=1;index<half.Count;index++)Check(Vector2.Distance(half[index-1].C,half[index].B)<0.001f && Vector2.Distance(half[index-1].D,half[index].A)<0.001f,"quads joined, no gap");
+            Check(GaugeMath.Arc(0,1) is (var from,var to,48) && from==GaugeMath.Start && Math.Abs(to-(GaugeMath.Start+GaugeMath.Sweep))<0.0001f,"the whole dial: from bottom left to bottom right, 48 segments");
+            Check(MathF.Cos(GaugeMath.Start)<0 && MathF.Sin(GaugeMath.Start)>0 && MathF.Cos(GaugeMath.Start+GaugeMath.Sweep)>0 && MathF.Sin(GaugeMath.Start+GaugeMath.Sweep)>0,"both ends under the centre, left then right");
+            Check(GaugeMath.Arc(0,0.5f) is (_,var top,24) && Math.Abs(top-MathF.PI*1.5f)<0.0001f,"half: ends at the top");
+            Check(GaugeMath.Arc(0,0) is null && GaugeMath.Arc(0.5f,0.5f) is null && GaugeMath.Arc(0.7f,0.2f) is null,"an empty span draws nothing");
+            Check(GaugeMath.Arc(-1,0.01f) is (_,_,2) && GaugeMath.Arc(0.9f,7) is (_,var end,_) && Math.Abs(end-(GaugeMath.Start+GaugeMath.Sweep))<0.0001f,"clamped to the dial; two segments at least");
         }),
         ("Gauges 1269: a curve breaks on an unknown value and never leaves its rectangle",() =>
         {
@@ -107,10 +103,10 @@ internal static class Gauges1269Tests
             Check(sample.Contains("dashboardSampleMs=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;"),"the cost of a point is timed");
             var draw=page[page.IndexOf("private void DrawDashboard()",StringComparison.Ordinal)..page.IndexOf("private System.Numerics.Vector4 DashboardColour",StringComparison.Ordinal)];
             Check(draw.IndexOf("UiComponents.Header(",StringComparison.Ordinal)<draw.IndexOf("DrawDashboardGauges(",StringComparison.Ordinal),"gauges only under the opened header");
-            Check(page.Split("DrawDashboardGauges(").Length==3,"drawn from one place");
+            Check(page.Split("DrawDashboardGauges(").Length==4,"drawn from one place in game (0.1271: and one in the desktop application)");
             var gauges=page[page.IndexOf("private void DrawDashboardGauges(",StringComparison.Ordinal)..];
             Check(gauges.Contains("HealthHistoryScales.FrameMs,HealthBoard.SlowPageMs,null,"),"the page gauge carries the dashboard's own rule");
-            Check(gauges.Contains("if(SlowFrames.Steady.LastFrame is { } frame)"),"the frame gauge only when the frame is measured");
+            Check(gauges.Contains("if(view.FrameAvgMs is { } frame)") && page.Contains("return new(inputs.ManagedBytes is { } managed ? managed/1048576.0:null,inputs.SlowestMedianMs,inputs.SlowestPage,frame?.Average,frame?.P95,"),"the frame gauge only when the frame is measured (0.1271: through the view)");
             var component=Read("src/TenshoAssistant/UI/Components/Gauges.cs");
             Check(component.Contains("TipText(tip);") && component.Contains("ImGui.InvisibleButton(\"##Gauge\"+id,size)"),"a gauge is reachable and has its help");
             Check(component.Contains("var colour=ruled ? LevelColour(GaugeMath.Zone(amount,watchAt,problemAt)):Accent;"),"a level colour only under a rule");

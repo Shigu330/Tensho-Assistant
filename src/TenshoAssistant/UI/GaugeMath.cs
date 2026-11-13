@@ -51,24 +51,14 @@ public static class GaugeMath
     }
 
     /// <summary>
-    /// The band of the dial between two fractions, as quads (inner then outer points, turning with the dial): each quad is
-    /// (inner start, outer start, outer end, inner end). Nothing for an empty span.
+    /// The arc of the dial between two fractions: its two angles and how many segments draw it (48 for the whole dial); null for an
+    /// empty span (nothing to draw).
     /// </summary>
-    public static IReadOnlyList<(Vector2 A,Vector2 B,Vector2 C,Vector2 D)> Band(Vector2 centre,float radius,float thickness,float from,float to)
+    public static (float From,float To,int Segments)? Arc(float from,float to)
     {
         from=Math.Clamp(from,0,1);to=Math.Clamp(to,0,1);
-        if(!(to>from))return [];
-        var steps=Math.Max(1,(int)MathF.Ceiling(48*(to-from)));
-        var inner=radius-thickness*0.5f;var outer=radius+thickness*0.5f;
-        var quads=new (Vector2,Vector2,Vector2,Vector2)[steps];
-        var angle=Angle(from);var before=new Vector2(MathF.Cos(angle),MathF.Sin(angle));
-        for(var step=1;step<=steps;step++)
-        {
-            angle=Angle(from+(to-from)*step/steps);var after=new Vector2(MathF.Cos(angle),MathF.Sin(angle));
-            quads[step-1]=(centre+before*inner,centre+before*outer,centre+after*outer,centre+after*inner);
-            before=after;
-        }
-        return quads;
+        if(!(to>from))return null;
+        return (Angle(from),Angle(to),Math.Max(2,(int)MathF.Ceiling(48*(to-from))));
     }
 
     /// <summary>

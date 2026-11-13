@@ -155,6 +155,10 @@ internal sealed class Host
     public void AlarmHeld(uint[] items,long[] counts)=>Surface.AlarmHeld(items,counts);
     /// <summary>X-165 (0.1246): Tensho's state in the game brought by the link (null: none), to MainWindow.DesktopGameState.</summary>
     public void GameState(TenshoAssistant.Link.LinkState? state)=>Surface.GameState(state?.Overall,state?.HeapMegabytes,state is null ? [] : [.. state.Issues]);
+    /// <summary>X-264 (0.1271): the game's measures brought by the link (null: none) at the application's clock, to MainWindow.DesktopGameMeasures.</summary>
+    public void GameMeasures(TenshoAssistant.Link.LinkMeasures? measures,long at)
+        =>Surface.GameMeasures(measures is null ? null : [measures.MemoryMb,measures.PageMs,measures.FrameAvgMs,measures.FrameP95Ms],
+            measures is null ? null : [measures.SlowFrames,measures.Requests,measures.WritesFailed,measures.PanelsOff,measures.Unavailable],at);
 
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
