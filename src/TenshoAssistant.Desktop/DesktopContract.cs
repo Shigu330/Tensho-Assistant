@@ -8,8 +8,9 @@ namespace TenshoAssistant.Desktop;
 /// member renamed or changed in the plugin compiles fine and, until now, turned a feature off in silence (most lookups are « ?. »). Every
 /// such member is listed here, with its exact parameters; the headless run of Verify resolves the whole list against the plugin it packs
 /// and fails when one is missing (so publish.sh and the release stop), and the interactive app writes the missing ones to its console.
-/// DesktopContract1157Tests keeps the list complete: every name the application reflects on must be listed. A typed interface in place of
-/// these names is the next step (the plugin's DLL is loaded at run time from a rewritten copy, so a shared type is not the same type yet).
+/// DesktopContract1157Tests keeps the list complete: every name the application reflects on must be listed. X-151 (0.1238): the
+/// application's working entries (pages, data, alarms, notices) are typed now (DesktopSurface, reached through MainWindow.DesktopSurfaceMap);
+/// the names left are the window's construction (settings, texts, lexicon) and the headless run's own checks.
 /// </summary>
 internal static class DesktopContract
 {
@@ -26,24 +27,12 @@ internal static class DesktopContract
         new("TenshoAssistant.Configuration",Kind.Type,"",false,null,"the saved settings"),
         new("TenshoAssistant.Configuration",Kind.Property,"LanguageCode",false,null,"the plugin's language"),
         new(Main,Kind.Type,"",false,null,"the plugin's window"),
-        new(Main+"+Page",Kind.Type,"",false,null,"the pages"),
-        new(Main,Kind.Field,"page",false,null,"the page shown"),
+        new(Main,Kind.Method,"DesktopSurfaceMap",false,[],"the typed contract (DesktopSurface): pages, data, alarms, notices"),
         new(Main,Kind.Property,"PageEntries",false,null,"the navigation"),
-        new(Main,Kind.Field,"pageEntries",false,null,"the navigation without the in-game pages"),
-        new(Main,Kind.Field,"pageGroups",false,null,"the navigation without the in-game pages"),
         new(Main,Kind.Property,"LexiconLoad",false,null,"the lexicon"),
         new(Main+"+PageEntry",Kind.Property,"Page",false,null,"the navigation"),
         new(Main+"+PageEntry",Kind.Property,"Label",false,null,"--step=entries (diagnostic)"),
         new(Main+"+PageEntry",Kind.Property,"Visible",false,null,"--step=entries (diagnostic)"),
-        new(Main+"+PageEntry",Kind.Field,"<Visible>k__BackingField",false,null,"the in-game pages hidden"),
-        new(Main+"+PageEntry",Kind.Method,"<Clone>$",false,[],"the in-game pages hidden"),
-        new(Main,Kind.Method,"UseDesktopData",false,["System.String","System.String","System.Action`2[System.Exception,System.String]"],"the saved data"),
-        new(Main,Kind.Method,"DesktopDueAlarms",false,["System.DateTimeOffset","System.Boolean"],"the alarms and the garden ring"),
-        new(Main,Kind.Method,"DesktopAlarmNotification",false,[],"the Windows notification"),
-        new(Main,Kind.Method,"DesktopLinkNotices",false,["System.String[]","System.Boolean"],"the game's other alerts ring"),
-        new(Main,Kind.Method,"DesktopAlarmHeld",false,["System.UInt32[]","System.Int64[]"],"an item already gathered stays silent"),
-        new(Main,Kind.Method,"DesktopMode",false,[],"the navigation follows the page choices of the desktop app"),
-        new(Main,Kind.Method,"OpenWeather",false,null,"--zone (diagnostic)"),
         new(Main,Kind.Field,"jitWarmup",false,null,"the headless timing"),
         new("TenshoAssistant.Diagnostics.JitWarmup",Kind.Method,"Wait",false,["System.TimeSpan"],"the headless timing"),
         new("TenshoAssistant.Diagnostics.JitWarmup",Kind.Property,"Prepared",false,null,"the headless timing"),
@@ -54,8 +43,6 @@ internal static class DesktopContract
         new("TenshoAssistant.Localization.LocalizationManager",Kind.Method,"Format",false,null,"the texts"),
         new("TenshoAssistant.Localization.LocalizationManager",Kind.Method,"Has",false,null,"the texts"),
         new("TenshoAssistant.Lexicon.LexiconLoader",Kind.Method,"Read",true,null,"the lexicon"),
-        new("TenshoAssistant.TenshoDataDatabase",Kind.Method,"CopyForDesktop",true,["System.String","System.String"],"the copy of the player's data file"),
-        new("TenshoAssistant.TenshoDataDatabase",Kind.Method,"CopyDiscoveriesForDesktop",true,["System.String","System.String"],"the copy of the discoveries"),
         new("TenshoAssistant.Caching.DataCache",Kind.Type,"",false,null,"the catalogue cache"),
         new("TenshoAssistant.Maps.MapCatalogService",Kind.Property,"State",false,null,"the headless check of the map catalogue"),
         new("TenshoAssistant.Maps.MapCatalogState",Kind.Property,"Catalog",false,null,"the headless check of the map catalogue"),

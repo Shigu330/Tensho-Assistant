@@ -61,7 +61,7 @@ internal static class DesktopData1131Tests
             Check(data.Contains("internal void UseDesktopData(string folder,string category,Action<Exception,string> warn)"),"the entry's signature");
             foreach(var category in LocalLinkProtocol.DesktopCategories)Check(data.Contains($"case \"{category}\":"),"built: "+category);
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
-            Check(host.Contains("GetMethod(\"UseDesktopData\",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string),typeof(string),typeof(Action<Exception,string>)])"),"the app calls that entry, by that signature");
+            Check(host.Contains("Surface.UseData(mirror,category,") && data.Contains("UseData=UseDesktopData,"),"the app calls that entry through the typed contract (X-151, 0.1238)");
             var program=Read("src/TenshoAssistant.Desktop/Program.cs");
             Check(program.IndexOf("status.ReadData();",StringComparison.Ordinal)>program.IndexOf("if(headless)return Headless.Run(",StringComparison.Ordinal),"never in a headless run (Verify does not copy the user's files)");
         }),

@@ -14,6 +14,34 @@ internal sealed partial class MainWindow
     private bool inDesktopApp;
     internal void DesktopMode()=>inDesktopApp=true;
 
+    // X-151 (0.1238): the typed contract with the desktop application (Desktop/DesktopSurface.cs, one source compiled into both): every entry
+    // is one of this window's members, typed here (« required »: a missing entry or other parameters break this build, not the application
+    // at run time). The application reaches this method by its name only (DesktopContract) and reads the entries back typed.
+    internal IReadOnlyDictionary<string,Delegate> DesktopSurfaceMap()=>new Desktop.DesktopSurface
+    {
+        Pages=()=>Enum.GetNames<Page>(),
+        CurrentPage=()=>page.ToString(),
+        SetPage=name=>page=Enum.Parse<Page>(name),
+        HidePages=DesktopHidePages,
+        DesktopMode=DesktopMode,
+        UseData=UseDesktopData,
+        CopyData=TenshoDataDatabase.CopyForDesktop,
+        CopyDiscoveries=TenshoDataDatabase.CopyDiscoveriesForDesktop,
+        DueAlarms=DesktopDueAlarms,
+        AlarmNotification=DesktopAlarmNotification,
+        LinkNotices=DesktopLinkNotices,
+        AlarmHeld=DesktopAlarmHeld,
+        OpenWeather=OpenWeather,
+    }.ToMap();
+
+    // X-151 (0.1238): the pages the application keeps in the game leave its navigation (their entry hidden, the groups rebuilt), before the
+    // first frame; the application gives the rule (DesktopPages), the window its own entries (no reflection on the record's members any more).
+    private void DesktopHidePages(Func<string,bool> hidden)
+    {
+        pageEntries=[.. PageEntries.Select(entry=>hidden(entry.Page.ToString()) ? entry with { Visible=()=>false } : entry)];
+        pageGroups=null;
+    }
+
     // X-180 (0.1168, night review N1): what the desktop application would save lands on its copy of the plugin's folder and settings, then is
     // overwritten from the game without a word. There every save of this window throws (DesktopReadOnly.Guard), the stores are read-only, the
     // controls that create or change something are greyed (DesktopEditBegin) and the status bar says why (DesktopPages.Editing).

@@ -48,7 +48,7 @@ internal static class DesktopNotice1154Tests
             var options=new AlarmSettings();
             Check(options.DesktopNotification && options.Copy().DesktopNotification,"on by default, kept by Copy");
             Check(Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("internal bool DesktopAlarmNotification()=>(configuration.AlarmOptions ?? new()).DesktopNotification;"),"the plugin's entry");
-            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"DesktopAlarmNotification\",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes)"),"called by that name");
+            Check(Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("AlarmNotification=DesktopAlarmNotification,") && Read("src/TenshoAssistant.Desktop/Host.cs").Contains("public bool AlarmNotification()=>Surface.AlarmNotification();"),"called through the typed contract (X-151, 0.1238)");
             var status=Read("src/TenshoAssistant.Desktop/StatusBar.cs");
             Check(status.Contains("if(Window!=IntPtr.Zero && host.AlarmNotification())notice.Show(Window,lines);"),"shown after the sound, with the window");
             var program=Read("src/TenshoAssistant.Desktop/Program.cs");

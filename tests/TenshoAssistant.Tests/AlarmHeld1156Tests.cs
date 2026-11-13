@@ -66,7 +66,7 @@ internal static class AlarmHeld1156Tests
             Check(Read("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs").Contains("loggedIn ? ReadHeld():null"),"sent with a character only");
             var data=Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(data.Contains("internal void DesktopAlarmHeld(uint[] items,long[] counts)") && data.Contains("item=>held.TryGetValue(item,out var count) ? count:null);"),"the bell uses the counts");
-            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"DesktopAlarmHeld\",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(uint[]),typeof(long[])])"),"called by that signature");
+            Check(Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("AlarmHeld=DesktopAlarmHeld,") && Read("src/TenshoAssistant.Desktop/Host.cs").Contains("public void AlarmHeld(uint[] items,long[] counts)=>Surface.AlarmHeld(items,counts);"),"called through the typed contract (X-151, 0.1238)");
             var status=Read("src/TenshoAssistant.Desktop/StatusBar.cs");
             Check(status.IndexOf("host.AlarmHeld(",StringComparison.Ordinal) is > 0 and var at && at<status.IndexOf("host.DueAlarms(now,front)",StringComparison.Ordinal),"counts given before the bell decides");
         }),

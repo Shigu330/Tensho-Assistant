@@ -96,7 +96,7 @@ internal static class LinkNotices1155Tests
                 "the Tensho alarms and the garden ring in the app by their own rule (AlarmBell, GardenBell): not sent twice");
             Check(Read("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs").Contains("notices.Snapshot(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())"),"in each snapshot");
             Check(Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("if(texts.Length==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);\n        return (texts,options.DesktopSound);"),"same options as the alarms");
-            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"DesktopLinkNotices\",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string[]),typeof(bool)])"),"called by that signature");
+            Check(Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("LinkNotices=DesktopLinkNotices,") && Read("src/TenshoAssistant.Desktop/Host.cs").Contains("=>Surface.LinkNotices(texts,gameInFront);"),"called through the typed contract (X-151, 0.1238)");
             Check(Read("src/TenshoAssistant.Desktop/StatusBar.cs").Contains("linkNotices.Take(linked,now.ToUnixTimeMilliseconds())"),"read once a second with the bell");
             var options=new AlarmSettings();
             Check(options.DesktopSound && options.DesktopOnlyGameBehind,"defaults");

@@ -1,6 +1,6 @@
 <Project Sdk="Dalamud.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1237.0</Version>
+    <Version>0.1238.0</Version>
     <AssemblyName>TenshoAssistant</AssemblyName>
     <RootNamespace>TenshoAssistant</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -27,7 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- X-126 (0.1113): the desktop app's release rules and install, one source shared with the app (src/TenshoAssistant.Desktop). -->
-    <Compile Include="..\TenshoAssistant.Desktop\DesktopUpdate.cs;..\TenshoAssistant.Desktop\DesktopVersionCheck.cs;..\TenshoAssistant.Desktop\DesktopInstall.cs;..\TenshoAssistant.Desktop\DesktopPages.cs" Link="Desktop\%(Filename)%(Extension)" />
+    <Compile Include="..\TenshoAssistant.Desktop\DesktopUpdate.cs;..\TenshoAssistant.Desktop\DesktopVersionCheck.cs;..\TenshoAssistant.Desktop\DesktopInstall.cs;..\TenshoAssistant.Desktop\DesktopPages.cs;..\TenshoAssistant.Desktop\DesktopSurface.cs" Link="Desktop\%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <!-- 0.248: languages live only inside the DLL (embedded); an optional Localization/Languages folder still overrides them. -->

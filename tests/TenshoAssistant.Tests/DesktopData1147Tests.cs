@@ -116,7 +116,7 @@ internal static class DesktopData1147Tests
             Check(bar.Contains("category==TenshoAssistant.Link.LocalLinkProtocol.DataCategory ? host.CopyData(data.Source,data.Mirror)") && bar.Contains(": DesktopMirror.Copy(data.Source,data.Mirror,category);")
                 && bar.Contains("Apply(category,Copy(data,category));") && bar.Contains("new(()=>Copy(data,category))"),"the app copies « data » by the backup, at start and on notice");
             var host=Read("src/TenshoAssistant.Desktop/Host.cs");
-            Check(host.Contains("GetMethod(\"CopyForDesktop\",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)])"),"called by its name and signature");
+            Check(host.Contains("Surface.CopyData(Path.Combine(source,\"TenshoData.db\"),Path.Combine(mirror,\"TenshoData.db\"))") && Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("CopyData=TenshoDataDatabase.CopyForDesktop,"),"called through the typed contract (X-151, 0.1238)");
             var window=Read("src/TenshoAssistant/MainWindow.DesktopData.cs");
             Check(window.Contains("case \"data\":") && window.Contains("if(Volatile.Read(ref desktopGilGeneration)==generation)Volatile.Write(ref desktopGil,state);")
                 && window.Contains("_=Task.Run(()=>"),"read off the frame, an older reading never replaces a newer one");

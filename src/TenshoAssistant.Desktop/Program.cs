@@ -125,6 +125,7 @@ internal static class Program
         Console.WriteLine($"PASS window: {host.Window.GetType().FullName} built with its real constructor ({watch.Elapsed.TotalSeconds:0.0} s); settings: {host.SettingsNote}; text {host.TextCode}, game data {host.GameLanguage}");
         // X-151 (0.1157): a member of the plugin the app reaches by name and does not find turns that part off: said, never silent.
         foreach(var missing in DesktopContract.Missing(host.Plugin))Console.WriteLine("Contract: the plugin lacks "+missing+"; that part is off");
+        foreach(var missing in host.SurfaceMissing)Console.WriteLine("Typed contract: the plugin does not give "+missing+"; that part is off");
         var status=new StatusBar(host,version);
         var cache=Path.Combine(Own,"cache");
         if(headless)return Headless.Run(host,status,cache,args);

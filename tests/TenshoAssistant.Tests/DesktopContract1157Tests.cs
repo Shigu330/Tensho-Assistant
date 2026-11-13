@@ -16,8 +16,8 @@ internal static class DesktopContract1157Tests
     private sealed class Window
     {
 #pragma warning disable CS0169, CS0414, IDE0051
-        private int page;
-        private bool DesktopDueAlarms(DateTimeOffset now,bool front)=>front;
+        private int jitWarmup;
+        private IReadOnlyDictionary<string,Delegate> DesktopSurfaceMap()=>new Dictionary<string,Delegate>();
         internal static void Copy(string a,string b){}
 #pragma warning restore CS0169, CS0414, IDE0051
     }
@@ -38,8 +38,8 @@ internal static class DesktopContract1157Tests
             }
             Check(found.Count>=20,"the scan finds the host's lookups: "+found.Count);
             var missing=found.Where(item=>!names.Contains(item[(item.IndexOf(": ",StringComparison.Ordinal)+2)..]) && !item.EndsWith(": Page",StringComparison.Ordinal)).ToArray();
-            // « Page » is both the nested enum (a type of the list) and the entry's property (a member of the list).
-            Check(names.Contains("Page") && types.Contains("TenshoAssistant.MainWindow+Page"),"Page listed");
+            // « Page » is the entry's property (a member of the list; the nested enum is not reached since 0.1238, X-151).
+            Check(names.Contains("Page"),"Page listed");
             Check(missing.Length==0,"not in DesktopContract.Members: "+string.Join(", ",missing));
         }),
         ("Desktop contract 1157: the resolver finds a missing type, a renamed member, other parameters, a static asked as instance",() =>
@@ -48,10 +48,10 @@ internal static class DesktopContract1157Tests
             Type? Of(string name)=>name=="TenshoAssistant.MainWindow" ? window : null;
             var all=DesktopContract.Missing(Of);
             Check(all.Any(item=>item.StartsWith("TenshoAssistant.Configuration (",StringComparison.Ordinal)),"a missing type is said");
-            Check(!all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.page ",StringComparison.Ordinal)),"a private field found");
-            Check(!all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.DesktopDueAlarms ",StringComparison.Ordinal)),"a private method with its parameters found");
-            Check(all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.DesktopLinkNotices ",StringComparison.Ordinal)),"a missing method is said");
-            var member=new DesktopContract.Member("X",DesktopContract.Kind.Method,"DesktopDueAlarms",false,["System.DateTimeOffset"],"test");
+            Check(!all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.jitWarmup ",StringComparison.Ordinal)),"a private field found");
+            Check(!all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.DesktopSurfaceMap ",StringComparison.Ordinal)),"a private method with its parameters found");
+            Check(all.Any(item=>item.StartsWith("TenshoAssistant.MainWindow.AddAlarms ",StringComparison.Ordinal)),"a missing method is said");
+            var member=new DesktopContract.Member("X",DesktopContract.Kind.Method,"DesktopSurfaceMap",false,["System.DateTimeOffset"],"test");
             Check(typeof(DesktopContract).GetMethod("Has",BindingFlags.NonPublic|BindingFlags.Static)!.Invoke(null,[window,member]) is false,"other parameters: missing");
             var asInstance=new DesktopContract.Member("X",DesktopContract.Kind.Method,"Copy",false,null,"test");
             Check(typeof(DesktopContract).GetMethod("Has",BindingFlags.NonPublic|BindingFlags.Static)!.Invoke(null,[window,asInstance]) is false,"a static method asked as an instance one: missing");

@@ -92,7 +92,7 @@ internal static class DesktopDiscoveries1152Tests
             var bar = Read("src/TenshoAssistant.Desktop/StatusBar.cs");
             Check(bar.Contains("category==TenshoAssistant.Link.LocalLinkProtocol.DiscoveriesCategory ? host.CopyDiscoveries(data.Source,data.Mirror)",StringComparison.Ordinal)
                 && bar.Contains("foreach(var category in DesktopMirror.Due(categories,DateTime.UtcNow,ref discoveriesNext,ref discoveriesWaiting))",StringComparison.Ordinal),"status bar");
-            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"CopyDiscoveriesForDesktop\",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)])",StringComparison.Ordinal),"the application calls the plugin's copy by its name");
+            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("Surface.CopyDiscoveries(Path.Combine(source,\"Discoveries\",\"Discoveries.db\"),Path.Combine(mirror,\"Discoveries\",\"Discoveries.db\"))",StringComparison.Ordinal) && Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("CopyDiscoveries=TenshoDataDatabase.CopyDiscoveriesForDesktop,"),"the application calls the plugin's copy through the typed contract (X-151, 0.1238)");
         }),
     ];
 }

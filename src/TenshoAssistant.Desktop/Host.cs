@@ -28,8 +28,10 @@ internal sealed class Host
     private readonly MethodInfo format,has;
     private readonly Dictionary<Type,object?> made=[];
     private readonly List<object> loaders=[];
-    private readonly Type pageType;
-    private readonly FieldInfo pageField;
+    /// <summary>X-151 (0.1238): the window's typed contract (DesktopSurface), read once after the window is built.</summary>
+    public readonly DesktopSurface Surface;
+    /// <summary>X-151: the entries the plugin did not give (another version): said at start, a failure of the headless run.</summary>
+    public readonly IReadOnlyList<string> SurfaceMissing;
     private readonly string? settingsPath;
     private readonly Type configurationType;
 
@@ -54,8 +56,6 @@ internal sealed class Host
         // Dalamud's scale is set by its interface manager; 1 here (no DPI scaling yet).
         ImGuiHeadless.GlobalScale(1f);
         var mainType=Plugin.GetType("TenshoAssistant.MainWindow",true)!;
-        pageType=mainType.GetNestedType("Page",BindingFlags.NonPublic)!;
-        pageField=mainType.GetField("page",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var localizationType=Plugin.GetType("TenshoAssistant.Localization.LocalizationManager",true)!;
         localization=Activator.CreateInstance(localizationType,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic,null,
             [(Action<Exception,string>)((e,m)=>Console.WriteLine($"  localization warning: {m}: {e.Message}")),pluginDirectory],null)!;
@@ -66,8 +66,12 @@ internal sealed class Host
         // The save action does nothing: the app reads the plugin's settings and never writes them.
         var args=ctor.GetParameters().Select(p=>p.ParameterType==typeof(Action) ? (Action)(()=>{}) : Make(p.ParameterType,0)).ToArray();
         Window=ctor.Invoke(args);
+        // X-151 (0.1238): the one name left for the window's own entries; everything after it is typed (DesktopSurface, shared source).
+        var map=mainType.GetMethod("DesktopSurfaceMap",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes)?.Invoke(Window,null) as IReadOnlyDictionary<string,Delegate>;
+        Surface=DesktopSurface.FromMap(map,out SurfaceMissing);
+        if(map is null)SurfaceMissing=["MainWindow.DesktopSurfaceMap (another version?)"];
         // X-119 step 4 (0.1158): the window knows it is drawn by the desktop application (its navigation follows the player's page choices).
-        mainType.GetMethod("DesktopMode",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes)?.Invoke(Window,null);
+        Surface.DesktopMode();
         // Data the plugin fills after building the window (Plugin.cs): the lexicon, read off the frame from the sheets.
         if(Plugin.GetType("TenshoAssistant.Lexicon.LexiconLoader")?.GetMethod("Read",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic) is { } read
            && mainType.GetProperty("LexiconLoad",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic) is { } lexicon)
@@ -106,87 +110,47 @@ internal sealed class Host
     }
 
     /// <summary>
-    /// X-119 step 2, part 2 and X-151 (0.1131): the plugin's stores of a category built on the application's copy of the plugin's folder,
-    /// by the plugin's own MainWindow.UseDesktopData (the one entry, called by its name; DesktopData1131Tests checks it exists). On the UI
-    /// thread, between frames. A note in English for the log.
+    /// X-119 step 2, part 2 and X-151 (0.1131, typed in 0.1238): the plugin's stores of a category built on the application's copy of the
+    /// plugin's folder, by the plugin's own MainWindow.UseDesktopData (DesktopSurface.UseData). On the UI thread, between frames. A note in
+    /// English for the log.
     /// </summary>
     public string UseData(string mirror,string category)
     {
-        var use=Window.GetType().GetMethod("UseDesktopData",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string),typeof(string),typeof(Action<Exception,string>)]);
-        if(use is null)return $"{category}: the plugin has no UseDesktopData (another version?)";
-        try{use.Invoke(Window,[mirror,category,(Action<Exception,string>)((error,message)=>Console.WriteLine($"  {category}: {message} ({error.GetType().Name})"))]);return $"{category}: read from the copy";}
-        catch(TargetInvocationException error){return $"{category}: not read ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})";}
+        try{Surface.UseData(mirror,category,(error,message)=>Console.WriteLine($"  {category}: {message} ({error.GetType().Name})"));return $"{category}: read from the copy";}
+        catch(Exception error){return $"{category}: not read ({error.GetType().Name}: {error.Message})";}
     }
 
     /// <summary>
-    /// X-119 with X-173 (0.1147): the player's data file (TenshoData.db) copied into the mirror by the plugin's own
-    /// TenshoDataDatabase.CopyForDesktop (SQLite's backup, the plugin's file read-only; called by its name, DesktopData1147Tests). Any thread.
+    /// X-119 with X-173 (0.1147, typed in 0.1238): the player's data file (TenshoData.db) copied into the mirror by the plugin's own
+    /// TenshoDataDatabase.CopyForDesktop (DesktopSurface.CopyData: SQLite's backup, the plugin's file read-only). Any thread.
     /// </summary>
     public (int Copied,IReadOnlyList<string> Problems) CopyData(string source,string mirror)
     {
-        copyData??=Plugin.GetType("TenshoAssistant.TenshoDataDatabase")?.GetMethod("CopyForDesktop",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)]);
-        if(copyData is null)return (0,["TenshoData.db: the plugin has no CopyForDesktop (another version?)"]);
-        try
-        {
-            if(copyData.Invoke(null,[Path.Combine(source,"TenshoData.db"),Path.Combine(mirror,"TenshoData.db")]) is System.Runtime.CompilerServices.ITuple { Length:2 } result)
-                return ((int)result[0]!,(IReadOnlyList<string>)result[1]!);
-            return (0,["TenshoData.db: no answer from CopyForDesktop"]);
-        }
-        catch(TargetInvocationException error){return (0,[$"TenshoData.db: not copied ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})"]);}
+        try{return Surface.CopyData(Path.Combine(source,"TenshoData.db"),Path.Combine(mirror,"TenshoData.db"));}
+        catch(Exception error){return (0,[$"TenshoData.db: not copied ({error.GetType().Name}: {error.Message})"]);}
     }
-    private MethodInfo? copyData;
 
     /// <summary>
-    /// X-119 (0.1152): the discoveries' database (Discoveries/Discoveries.db, that file only) copied into the mirror by the plugin's own
-    /// TenshoDataDatabase.CopyDiscoveriesForDesktop (SQLite's backup, the plugin's file read-only; called by its name). Any thread.
+    /// X-119 (0.1152, typed in 0.1238): the discoveries' database (Discoveries/Discoveries.db, that file only) copied into the mirror by the
+    /// plugin's own TenshoDataDatabase.CopyDiscoveriesForDesktop (DesktopSurface.CopyDiscoveries: SQLite's backup, read-only). Any thread.
     /// </summary>
     public (int Copied,IReadOnlyList<string> Problems) CopyDiscoveries(string source,string mirror)
     {
-        copyDiscoveries??=Plugin.GetType("TenshoAssistant.TenshoDataDatabase")?.GetMethod("CopyDiscoveriesForDesktop",BindingFlags.Static|BindingFlags.Public,[typeof(string),typeof(string)]);
-        if(copyDiscoveries is null)return (0,["Discoveries.db: the plugin has no CopyDiscoveriesForDesktop (another version?)"]);
-        try
-        {
-            if(copyDiscoveries.Invoke(null,[Path.Combine(source,"Discoveries","Discoveries.db"),Path.Combine(mirror,"Discoveries","Discoveries.db")]) is System.Runtime.CompilerServices.ITuple { Length:2 } result)
-                return ((int)result[0]!,(IReadOnlyList<string>)result[1]!);
-            return (0,["Discoveries.db: no answer from CopyDiscoveriesForDesktop"]);
-        }
-        catch(TargetInvocationException error){return (0,[$"Discoveries.db: not copied ({error.InnerException?.GetType().Name}: {error.InnerException?.Message})"]);}
+        try{return Surface.CopyDiscoveries(Path.Combine(source,"Discoveries","Discoveries.db"),Path.Combine(mirror,"Discoveries","Discoveries.db"));}
+        catch(Exception error){return (0,[$"Discoveries.db: not copied ({error.GetType().Name}: {error.Message})"]);}
     }
-    private MethodInfo? copyDiscoveries;
 
-    /// <summary>X-163 (0.1132): the alarms to ring now, from the plugin's MainWindow.DesktopDueAlarms (called by its name); none when it is missing.</summary>
-    public (string[] Lines,bool Sound) DueAlarms(DateTimeOffset now,bool gameInFront)
-    {
-        due??=Window.GetType().GetMethod("DesktopDueAlarms",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(DateTimeOffset),typeof(bool)]);
-        if(due?.Invoke(Window,[now,gameInFront]) is not System.Runtime.CompilerServices.ITuple { Length:2 } result)return ([],false);
-        return ((string[])result[0]!,(bool)result[1]!);
-    }
-    private MethodInfo? due;
+    /// <summary>X-163 (0.1132, typed in 0.1238): the alarms to ring now, from the plugin's MainWindow.DesktopDueAlarms; none when the plugin gives none.</summary>
+    public (string[] Lines,bool Sound) DueAlarms(DateTimeOffset now,bool gameInFront)=>Surface.DueAlarms(now,gameInFront);
 
-    /// <summary>X-163 (0.1154): whether the alarms rung also show a Windows notification, from MainWindow.DesktopAlarmNotification (by its name); false when it is missing.</summary>
-    public bool AlarmNotification()
-    {
-        notification??=Window.GetType().GetMethod("DesktopAlarmNotification",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes);
-        return notification?.Invoke(Window,null) is true;
-    }
-    private MethodInfo? notification;
+    /// <summary>X-163 (0.1154, typed in 0.1238): whether the alarms rung also show a Windows notification (MainWindow.DesktopAlarmNotification).</summary>
+    public bool AlarmNotification()=>Surface.AlarmNotification();
 
-    /// <summary>X-163 (0.1155): the plugin's alerts received by the link, as MainWindow.DesktopLinkNotices rings them (by its name); none when it is missing.</summary>
-    public (string[] Lines,bool Sound) LinkNotices(string[] texts,bool gameInFront)
-    {
-        notices??=Window.GetType().GetMethod("DesktopLinkNotices",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(string[]),typeof(bool)]);
-        if(notices?.Invoke(Window,[texts,gameInFront]) is not System.Runtime.CompilerServices.ITuple { Length:2 } result)return ([],false);
-        return ((string[])result[0]!,(bool)result[1]!);
-    }
-    private MethodInfo? notices;
+    /// <summary>X-163 (0.1155, typed in 0.1238): the plugin's alerts received by the link, as MainWindow.DesktopLinkNotices rings them.</summary>
+    public (string[] Lines,bool Sound) LinkNotices(string[] texts,bool gameInFront)=>Surface.LinkNotices(texts,gameInFront);
 
-    /// <summary>X-163 (0.1156): the held counts of the alarms' items brought by the link, to MainWindow.DesktopAlarmHeld (by its name); nothing when it is missing.</summary>
-    public void AlarmHeld(uint[] items,long[] counts)
-    {
-        held??=Window.GetType().GetMethod("DesktopAlarmHeld",BindingFlags.Instance|BindingFlags.NonPublic,[typeof(uint[]),typeof(long[])]);
-        held?.Invoke(Window,[items,counts]);
-    }
-    private MethodInfo? held;
+    /// <summary>X-163 (0.1156, typed in 0.1238): the held counts of the alarms' items brought by the link, to MainWindow.DesktopAlarmHeld.</summary>
+    public void AlarmHeld(uint[] items,long[] counts)=>Surface.AlarmHeld(items,counts);
 
     /// <summary>X-150: a new reading of the settings, off the frame (StatusBar groups the link's notices); null without a settings file read at start.</summary>
     public object? ReadSettingsAgain()=>settingsPath is null || !made.TryGetValue(configurationType,out var target) || target is null ? null : Parse(settingsPath);
@@ -218,35 +182,18 @@ internal sealed class Host
         }
     }
 
-    public IEnumerable<string> Pages=>Enum.GetNames(pageType);
-    public void SetPage(string name)=>pageField.SetValue(Window,Enum.Parse(pageType,name));
-    public string CurrentPage=>pageField.GetValue(Window)!.ToString()!;
+    public IEnumerable<string> Pages=>Surface.Pages();
+    public void SetPage(string name)=>Surface.SetPage(name);
+    public string CurrentPage=>Surface.CurrentPage();
     public object? Service(string fullName)=>made.FirstOrDefault(pair=>pair.Key.FullName==fullName).Value;
 
     /// <summary>A text of the plugin's language files, in the plugin's language (LocalizationManager.Format).</summary>
     public string Text(string key,params object[] args)=>(string)format.Invoke(localization,[key,args])!;
     public bool HasText(string key)=>(bool)has.Invoke(localization,[key])!;
 
-    /// <summary>The pages that stay in the game leave the navigation (their entry's Visible answers false), before the first frame.</summary>
-    public void HideInGamePages()
-    {
-        var mainType=Window.GetType();
-        var entries=(Array)mainType.GetProperty("PageEntries",BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(Window)!;
-        var copy=Array.CreateInstance(entries.GetType().GetElementType()!,entries.Length);
-        for(var i=0;i<entries.Length;i++)
-        {
-            var entry=entries.GetValue(i)!;
-            var page=entry.GetType().GetProperty("Page")!.GetValue(entry)!.ToString()!;
-            if(DesktopPages.Kind(page)==DesktopPageKind.InGame)
-            {
-                entry=entry.GetType().GetMethod("<Clone>$")!.Invoke(entry,null)!;
-                entry.GetType().GetField("<Visible>k__BackingField",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(entry,(Func<bool>)(()=>false));
-            }
-            copy.SetValue(entry,i);
-        }
-        mainType.GetField("pageEntries",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(Window,copy);
-        mainType.GetField("pageGroups",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(Window,null);
-    }
+    /// <summary>The pages that stay in the game leave the navigation (their entry's Visible answers false), before the first frame
+    /// (X-151, 0.1238: by the window itself, DesktopSurface.HidePages, no reflection on its record any more).</summary>
+    public void HideInGamePages()=>Surface.HidePages(page=>DesktopPages.Kind(page)==DesktopPageKind.InGame);
 
     /// <summary>One catalogue loader of the plugin, ticked as the game's framework would until it unsubscribes.</summary>
     public sealed class LoaderRun(string name,FrameworkProxy framework,System.Diagnostics.Stopwatch clock,Action dispose)

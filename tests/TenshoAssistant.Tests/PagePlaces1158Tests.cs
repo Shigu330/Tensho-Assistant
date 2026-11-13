@@ -39,8 +39,8 @@ internal static class PagePlaces1158Tests
             var advanced=Read("src/TenshoAssistant/MainWindow.Advanced.cs");
             Check(advanced.Contains("if(!Desktop.DesktopPages.Choosable(name))continue;") && advanced.Contains("ComboSetting(\"Advanced.PagePlace\",\"Advanced.PagePlaceTip\""),"one choice per page, by the shared component");
             Check(advanced.Contains("if(value==Desktop.PagePlace.Both)configuration.PagePlaces.Remove(name);"),"« both » removes the entry (no entry: both)");
-            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("GetMethod(\"DesktopMode\",BindingFlags.Instance|BindingFlags.NonPublic,Type.EmptyTypes)?.Invoke(Window,null);"),"the app's window knows it is the app");
-            Check(DesktopContract.Members.Any(member=>member.Name=="DesktopMode"),"in the contract");
+            Check(Read("src/TenshoAssistant.Desktop/Host.cs").Contains("Surface.DesktopMode();") && Read("src/TenshoAssistant/MainWindow.DesktopData.cs").Contains("DesktopMode=DesktopMode,"),"the app's window knows it is the app");
+            Check(DesktopContract.Members.Any(member=>member.Name=="DesktopSurfaceMap"),"in the contract (typed since 0.1238)");
             Check(Read("src/TenshoAssistant/TenshoAssistant.csproj").Contains("..\\TenshoAssistant.Desktop\\DesktopPages.cs"),"one list shared by the plugin and the app");
         }),
     ];

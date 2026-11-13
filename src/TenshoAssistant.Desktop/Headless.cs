@@ -17,7 +17,7 @@ internal static class Headless
     public static void OpenZone(Host host,uint territory)
     {
         var name=host.Data.Excel.GetSheet<TerritoryType>().TryGetRow(territory,out var row) ? row.PlaceName.ValueNullable?.Name.ExtractText() ?? "" : "";
-        host.Window.GetType().GetMethod("OpenWeather",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.Invoke(host.Window,[territory,name]);
+        host.Surface.OpenWeather(territory,name);
     }
 
     /// <summary>--step=A,B: calls these MainWindow methods one by one inside a frame, each on a worker thread with a 5 s limit (finds a blocking call).</summary>
@@ -76,6 +76,9 @@ internal static class Headless
         var broken=DesktopContract.Missing(host.Plugin);
         if(broken.Count>0){report.Fail("contract: the plugin lacks "+string.Join("; ",broken));return 1;}
         Console.WriteLine($"PASS contract: the {DesktopContract.Members.Length} members of the plugin the app reaches by name exist");
+        // X-151 (0.1238): every entry of the typed contract is given by the plugin, with its type (DesktopSurface).
+        if(host.SurfaceMissing.Count>0){report.Fail("typed contract: the plugin does not give "+string.Join("; ",host.SurfaceMissing));return 1;}
+        Console.WriteLine("PASS typed contract: every entry of DesktopSurface given by the plugin, with its type");
         var code=-1;
         var worker=new Thread(()=>{try{code=Body(host,status,cache,args,report);}catch(Exception error){report.Fail($"{error.GetType().Name}: {error.Message}");code=1;}}){IsBackground=true,Name="headless"};
         worker.Start();
