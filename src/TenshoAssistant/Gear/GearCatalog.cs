@@ -4,6 +4,21 @@ namespace TenshoAssistant.Gear;
 // worn pieces, materia kinds and caps (0.312–0.313), candidate filters, planned stats and the « TENSHO-GEAR1: » share code.
 // Game data only (docs/evidence/0.310-gear-sheets.md, docs/evidence/0.312-materia.md); rules tested in tests/TenshoAssistant.Tests.
 
+/// <summary>
+/// X-277 (0.1289): the jobs of a ClassJobCategory row, read by column (raw column = ClassJob row + 1, the sheet's own layout; bit = ClassJob
+/// row). The typed sheet names its columns by job abbreviation and calls the three added by patch 7.58 « Unknown0 » to « Unknown2 »:
+/// matched by name, the Beastmaster (ClassJob 43, BST) had no gear at all (docs/evidence/0.1289-beastmaster-classjobcategory.md).
+/// </summary>
+public static class GearJobMask
+{
+    public static ulong Of(IEnumerable<uint> jobs,Func<int,object?> column)
+    {
+        ulong mask=0;
+        foreach(var job in jobs)if(job<64 && column((int)job+1) is true)mask|=1UL<<(int)job;
+        return mask;
+    }
+}
+
 /// <summary>Character window slots, in the game's EquippedItems order (Waist and the soul crystal left out).</summary>
 public enum GearSlot { MainHand, OffHand, Head, Body, Hands, Legs, Feet, Ears, Neck, Wrists, RingRight, RingLeft }
 

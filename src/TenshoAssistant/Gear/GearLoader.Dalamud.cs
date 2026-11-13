@@ -53,12 +53,11 @@ public sealed unsafe class GearLoader : IDisposable
 
     private GearCatalog Build(CancellationToken token)
     {
-        // ClassJobCategory columns are named by the English job abbreviation; bit = ClassJob row.
-        var columns=typeof(ClassJobCategory).GetProperties().Where(property=>property.PropertyType==typeof(bool)).ToDictionary(property=>property.Name);
-        var jobs=data.GetExcelSheet<ClassJob>(ClientLanguage.English).Where(job=>job.RowId<64 && !job.Abbreviation.IsEmpty)
-            .Select(job=>(Bit:job.RowId,Column:columns.GetValueOrDefault(job.Abbreviation.ExtractText()))).Where(job=>job.Column is not null).ToArray();
+        // X-277 (0.1289): ClassJobCategory read raw, column = ClassJob row + 1 (GearJobMask); bit = ClassJob row. Matched by the typed
+        // sheet's column names, the jobs added by patch 7.58 (Beastmaster) were left out: their columns are named « Unknown… ».
+        var jobs=data.GetExcelSheet<ClassJob>(ClientLanguage.English).Where(job=>job.RowId<64 && !job.Abbreviation.IsEmpty).Select(job=>job.RowId).ToArray();
         var masks=new Dictionary<uint,ulong>();
-        var categories=data.GetExcelSheet<ClassJobCategory>();
+        var categories=data.Excel.GetSheet<Lumina.Excel.RawRow>(null,"ClassJobCategory");
         // 0.312: melding caps = ItemLevel column of the stat × BaseParam percentage of the slot / 1000 (docs/evidence/0.312-materia.md).
         var levels=data.GetExcelSheet<ItemLevel>();var baseParams=data.GetExcelSheet<BaseParam>();
         var levelColumns=new Dictionary<int,System.Reflection.PropertyInfo?>();
@@ -96,8 +95,7 @@ public sealed unsafe class GearLoader : IDisposable
             if(!masks.TryGetValue(categoryId,out var mask))
             {
                 mask=0;
-                if(categories.TryGetRow(categoryId,out var category))
-                    foreach(var (bit,column) in jobs)if(column!.GetValue(category) is true)mask|=1UL<<(int)bit;
+                if(categories.TryGetRow(categoryId,out var category))mask=GearJobMask.Of(jobs,index=>category.ReadColumn(index));
                 masks[categoryId]=mask;
             }
             if(mask==0)continue;
