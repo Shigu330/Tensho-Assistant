@@ -298,13 +298,22 @@ internal sealed class MapLiveReader : IDisposable
         for(var index=0;index<count;index++){var marker=agent->MapMarkers[index].MapMarker;game.Add((marker.IconId,marker.X,marker.Y,marker.IconFlags));}
         var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
         // 0.1321: the game's list decides on this map; the same set is kept while it does not change.
-        var listed=checks.Where(check=>check.Listed).Select(check=>(check.Icon,check.PixelX,check.PixelY)).ToHashSet();
-        if(gameListedMarkers is not { } before || before.MapId!=agent->CurrentMapId || !before.Listed.SetEquals(listed))gameListedMarkers=new(agent->CurrentMapId,listed);
+        // X-351 (0.1335): the maps built earlier in the session and the bits drawn while read locked are kept (MapMarkerUnlock.Remember).
+        var remembered=MapMarkerUnlock.Remember(gameListedMarkers,agent->CurrentMapId,checks);
+        gameListedMarkers=remembered;
+        var listed=remembered.Listed;
         var agree=checks.Count(check=>check.Listed==check.Unlocked);
+        // R06 probe: the sheet columns of each icon the bit's reading gets wrong, to find the game's own rule.
+        var wrong=rows.Where(row=>row.Icon!=0 && row.MapMarkerUnlockedBit!=0 && checks.Any(check=>check.Bit==row.MapMarkerUnlockedBit && check.Icon==row.Icon
+                && check.PixelX==row.X && check.PixelY==row.Y && check.Listed!=check.Unlocked))
+            .Select(row=>$"bit {row.MapMarkerUnlockedBit} row {row.RowId}.{row.SubrowId}: type {row.Type}, data type {row.DataType}, data key {row.DataKey.RowId}, unknown {row.Unknown0}").ToArray();
         var line=$"Map icon unlocks on map {agent->CurrentMapId} ({checks.Count} with an unlock bit, {game.Count} in the game's list, {listed.Count} drawn by the game): "
-            +$"the bit's reading agrees on {agree} of {checks.Count}; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe));
-        // The map follows the game's list here; a disagreement only matters on maps the game has not built (where the bit's reading decides).
-        markerUnlockCheckBox=Tuple.Create(true,line);
+            +$"the bit's reading agrees on {agree} of {checks.Count}; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe))
+            +(wrong.Length>0 ? "; reading wrong on: "+string.Join("; ",wrong):"")
+            +$"; remembered: {remembered.Remembered.Count} map(s), bits drawn while read locked: {(remembered.DrawnWhileLocked.Count>0 ? string.Join(",",remembered.DrawnWhileLocked.Order()):"none")}";
+        // X-351 (0.1335): a real verdict: the bit's reading against the game's own list (the map follows the game's list here; elsewhere the
+        // reading decides, with what the game was seen to draw).
+        markerUnlockCheckBox=Tuple.Create(MapMarkerUnlock.Agrees(checks),line);
         if(line==markerUnlockLine)return;
         markerUnlockLine=line;
         log.Information(line);

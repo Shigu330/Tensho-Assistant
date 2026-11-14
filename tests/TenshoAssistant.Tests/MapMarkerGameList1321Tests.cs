@@ -32,8 +32,8 @@ internal static class MapMarkerGameList1321Tests
         ("Map marker game list 1321: the reader builds the game's list, keeps it while unchanged, and the self-check reports the agreement",() =>
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Replace("\r\n","\n");
-            Check(reader.Contains("var listed=checks.Where(check=>check.Listed).Select(check=>(check.Icon,check.PixelX,check.PixelY)).ToHashSet();"),"listed icons");
-            Check(reader.Contains("!before.Listed.SetEquals(listed))gameListedMarkers=new(agent->CurrentMapId,listed);"),"same set kept");
+            // 0.1335 (X-351): the list is built, and kept while unchanged, by MapMarkerUnlock.Remember (tested in MapMarkerRemember1335Tests).
+            Check(reader.Contains("var remembered=MapMarkerUnlock.Remember(gameListedMarkers,agent->CurrentMapId,checks);") && reader.Contains("gameListedMarkers=remembered;"),"listed icons, same set kept");
             Check(reader.Contains("undiscovered,questPoints,unlockedMarkerBits,gameListedMarkers){ActiveLeve=ReadActiveLeve()});"),"published with the state");
             Check(reader.Contains("the bit's reading agrees on {agree} of {checks.Count}"),"the agreement said in the log");
         }),

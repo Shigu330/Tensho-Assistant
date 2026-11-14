@@ -19,11 +19,48 @@ public static class MapMarkerUnlock
     /// own list decides (an icon with a bit is drawn when the game lists it: same icon at the same pixel, GameList.Listed); on another
     /// map, the bit's reading (an error there only hides).
     /// </summary>
+    /// <remarks>
+    /// X-351 (0.1335, review of the block 0.1318 to 0.1329, I3): on a map the game has not built, the bit's reading alone hid what the game
+    /// draws (bit 83). There, an icon is also drawn when the game listed it on that map earlier in the session (<see cref="GameList.Remembered"/>)
+    /// or when its bit was seen drawn by the game while read locked (<see cref="GameList.DrawnWhileLocked"/>): what the game was seen to draw
+    /// is never hidden again. The rule that needs no memory waits for the probe in the game (R06; candidates in the log).
+    /// </remarks>
     public static bool Visible(ushort bit,uint icon,float pixelX,float pixelY,uint mapId,GameList? game,IReadOnlySet<ushort>? unlocked)
-        =>bit==0 || (game is { } built && built.MapId==mapId ? built.Listed.Contains((icon,pixelX,pixelY)):Visible(bit,unlocked));
+        =>bit==0 || (game is { } built && built.MapId==mapId ? built.Listed.Contains((icon,pixelX,pixelY))
+            :Visible(bit,unlocked) || game?.DrawnWhileLocked.Contains(bit)==true
+             || game?.Remembered.TryGetValue(mapId,out var seen)==true && seen.Contains((icon,pixelX,pixelY)));
 
-    /// <summary>0.1321: the icons with an unlock bit that the game lists on the map it has built (AgentMap.CurrentMapId), by icon and sheet pixel.</summary>
-    public sealed record GameList(uint MapId,IReadOnlySet<(uint Icon,float PixelX,float PixelY)> Listed);
+    /// <summary>
+    /// 0.1321: the icons with an unlock bit that the game lists on the map it has built (AgentMap.CurrentMapId), by icon and sheet pixel.
+    /// X-351 (0.1335): with what the game listed on the maps it built earlier in the session, and the bits it drew while their reading said locked.
+    /// </summary>
+    public sealed record GameList(uint MapId,IReadOnlySet<(uint Icon,float PixelX,float PixelY)> Listed)
+    {
+        public IReadOnlyDictionary<uint,IReadOnlySet<(uint Icon,float PixelX,float PixelY)>> Remembered{get;init;}=new Dictionary<uint,IReadOnlySet<(uint,float,float)>>();
+        public IReadOnlySet<ushort> DrawnWhileLocked{get;init;}=new HashSet<ushort>();
+    }
+
+    /// <summary>At most this many maps remembered (the game has about 500 maps with icons).</summary>
+    public const int MaximumRemembered=1024;
+
+    /// <summary>
+    /// X-351 (0.1335): the list after the game has built <paramref name="mapId"/> with these checks: its listed icons, the earlier maps kept,
+    /// the bits drawn while read locked added. The same object when nothing changed (the map's filter is kept by reference).
+    /// </summary>
+    public static GameList Remember(GameList? before,uint mapId,IReadOnlyList<Check> checks)
+    {
+        var listed=checks.Where(check=>check.Listed).Select(check=>(check.Icon,check.PixelX,check.PixelY)).ToHashSet();
+        var drawn=checks.Where(check=>check.Listed && !check.Unlocked).Select(check=>check.Bit).ToHashSet();
+        if(before is { } same && same.MapId==mapId && same.Listed.SetEquals(listed) && drawn.IsSubsetOf(same.DrawnWhileLocked))return same;
+        var remembered=new Dictionary<uint,IReadOnlySet<(uint,float,float)>>();
+        if(before is not null)foreach(var (map,icons) in before.Remembered)if(remembered.Count<MaximumRemembered-1)remembered[map]=icons;
+        remembered[mapId]=listed;
+        if(before is not null)drawn.UnionWith(before.DrawnWhileLocked);
+        return new(mapId,listed){Remembered=remembered,DrawnWhileLocked=drawn};
+    }
+
+    /// <summary>X-351 (0.1335): the self-check's verdict: the bit's reading agrees with the game on every icon (the review saw it always « Ok »).</summary>
+    public static bool Agrees(IReadOnlyList<Check> checks)=>checks.All(check=>check.Listed==check.Unlocked);
 
     /// <summary>
     /// Where the game's own map list (AgentMap.MapMarkers) puts a sheet marker: world position × 16 (Mor Dhona's aetheryte, sheet 108.3 at
