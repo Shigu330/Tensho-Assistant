@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1332.0
+- Tests : PlanCompact1092 vérifiait qu'un point ouvert garde sa ligne entière dans le plan global en prenant X-01 ; X-01 est fermé depuis le 14/11 (37 minutes de donjons sans saccade), le test prend désormais n'importe quel point ouvert.
+- Tests : PlanCompact1092Tests. Verify.ps1 (agent) : 2500/2500, 0 avertissement, 0 erreur ; DLL 0.1332.0.0. Rien à essayer en jeu.
+### English
+- Tests: PlanCompact1092 checked that an open point keeps its whole row in the global plan through X-01; X-01 is closed since 14/11 (37 minutes of duties without a stutter), the test now takes any open point.
+
 ## 0.1331.0
 - Plan global, X-343 : Prix du tableau du marché : un objet tout juste regardé au tableau du jeu, puis survolé avec Ctrl+Alt, montrait la ligne d'Universalis pour le monde au lieu du relevé du tableau. Cause : Dalamud envoie lui-même à Universalis ce que le joueur voit au tableau (réglage « Anonymously upload market board data », actif par défaut) ; l'envoi tombe quelques secondes après le relevé de Tensho et gagnait la règle « le plus récent l'emporte » (X-292, X-331), alors que c'est le même relevé. Un envoi d'Universalis ne compte comme plus récent que s'il arrive plus de 5 minutes après le relevé du tableau (SeenPrices.SameReading, la tolérance d'horloge déjà employée pour les ventes) ; la même borne vaut pour l'offre la moins chère du centre de données, la page du marché et la comparaison des servants. Un relevé d'un autre joueur, plus tard, remplace toujours celui du tableau. Nouveau test SameReading1331 (service réel : même relevé, Universalis sans envoi pour le monde, Universalis vraiment plus récent ; et les trois autres usages) ; preuve docs/evidence/x343-dalamud-upload.md.
 - Pour les joueurs : Un objet tout juste regardé au tableau du marché garde les prix vus au tableau quand vous l'actualisez avec Ctrl+Alt, au lieu de la copie d'Universalis du même relevé.

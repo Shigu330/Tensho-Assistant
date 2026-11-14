@@ -15,7 +15,8 @@ internal static class PlanCompact1092Tests
             Check(done.Count > 200,"done X and W rows are compact in both halves: " + done.Count);
             var heavy = done.Where(l => l.Length > 320).ToList();
             Check(heavy.Count == 0,"a done row stays short: " + string.Join(" / ",heavy.Select(l => l[..40])));
-            Check(rows.Any(l => l.StartsWith("| X-01 |") && l.Length > 320),"an open point (X-01) keeps its full text");
+            // 0.1332: X-01, the open point checked here, was closed on 14/11: any open point now.
+            Check(rows.Any(l => !done.Contains(l) && !l.Contains("| Done in ") && !l.Contains("| Fait en ") && l.Length > 320),"an open point keeps its full text");
             var size = new FileInfo(path).Length;
             // 0.1135 (relais 26): 160 KB → 200 KB: the open points added since 0.1118 (X-165 to X-176, about 18 KB in both languages) keep their full text
             // by design; done rows stay short (checked above).
