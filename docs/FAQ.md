@@ -26,7 +26,7 @@ Settings › General › Language. English and French are complete. German and J
 
 ## What goes on the Internet?
 
-Prices, loot, wiki pages and community data are asked of those community sites, with the item or page you are looking at. Each source can be turned off in Settings › Data and sources. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
+Prices, loot, wiki pages and community data are asked of the community sites that provide them, with the item or page you are looking at. Each source can be turned off in Settings › Data and sources. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
 
 ## Can I turn off the community data?
 
@@ -114,7 +114,7 @@ In the game, turn on Settings › Advanced › « Link with the desktop app » (
 
 ## Can Tensho install the desktop app for me?
 
-Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update of the desktop app », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
+Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (if left empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update of the desktop app », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
 
 Français :
 
@@ -144,7 +144,7 @@ Paramètres › Général › Langue. L'anglais et le français sont complets. L
 
 ## Qu'est-ce qui part sur Internet ?
 
-Les prix, le butin, les pages du wiki et les données communautaires sont demandés à ces sites, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Données et sources. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
+Les prix, le butin, les pages du wiki et les données communautaires sont demandés aux sites communautaires qui les fournissent, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Données et sources. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
 
 ## Puis-je couper les données communautaires ?
 
@@ -232,4 +232,4 @@ Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de b
 
 ## Tensho peut-il installer l'application de bureau pour moi ?
 
-Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique de l'application de bureau », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.
+Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (s'il est laissé vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique de l'application de bureau », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.

@@ -64,13 +64,13 @@ and the help text of each page (the « ? » beside its title):
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
 |  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
 |  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
-|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that teach the others. |
+|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that unlock the others. |
 |  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
 |  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
 | Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
 |  | **Relics** | Relic weapons and armour, the stages you hold and the Zodiac book in progress. |
 |  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
-|  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what their coffers give. |
+|  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
 |  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
 |  | **Triple Triad** | Your cards, decks, a simulator, NPCs with their availability and the cards you lack. With the observation on, advice during a match. |
@@ -162,7 +162,7 @@ Framework and tools:
 
 Community data used by the plugin (licence compatible with GPL-3.0, or service API):
 
-- [LuminaSupplemental](https://github.com/Critical-Impact/LuminaSupplemental) by Critical-Impact (GPL-3.0): duty loot and item sources, downloaded at runtime; airship unlock tree and possible loot, embedded with its notice (0.336)
+- [LuminaSupplemental](https://github.com/Critical-Impact/LuminaSupplemental) by Critical-Impact (GPL-3.0): duty loot and item sources, downloaded at runtime; airship unlock tree and possible loot, embedded with its notice
 - [GatherBuddy](https://github.com/Ottermandias/GatherBuddy) by Ottermandias (Apache-2.0): fishing bait, mooch, bite and window data, downloaded at runtime as data
 - [Teamcraft](https://github.com/ffxiv-teamcraft/ffxiv-teamcraft) (MIT): fishing bite times from its public reports
 - [FFXIVGachaSpreadsheet](https://github.com/Infiziert90/FFXIVGachaSpreadsheet) by Infi (MIT, crowd-sourced): Fashion Report data (downloaded at runtime) and submersible loot averages (embedded snapshot, `tools/submarine-loot.py`)
@@ -258,13 +258,13 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
 |  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
 |  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
-|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui apprennent les autres. |
+|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
 |  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
 |  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres et victimes, pour votre classe et votre grande compagnie. |
 | Contenus | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
 |  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre du zodiaque en cours. |
 |  | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
-|  | **Donjons sans fond** | Pour préparer dehors : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
+|  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
 |  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
 | Gold Saucer | **Revue de mode** | Le thème et les catégories de la semaine, ce que vous possédez pour chacune, et l'équipement signalé par la communauté. |
 |  | **Triple Triade** | Vos cartes, vos decks, un simulateur, les PNJ avec leur disponibilité et les cartes qui vous manquent. Avec l'observation activée, des conseils pendant un match. |
