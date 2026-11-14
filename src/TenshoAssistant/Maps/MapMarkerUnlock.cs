@@ -14,6 +14,8 @@ public static class MapMarkerUnlock
     public static bool Visible(ushort bit,IReadOnlySet<ushort>? unlocked)=>bit==0 || unlocked?.Contains(bit)==true;
 
     /// <summary>
+    /// 0.1340 (X-351): the bits are read from QuestManager.UnlockedMapMarkers (the game's own array for these icons), no longer from
+    /// UIState.IsUnlockLinkUnlocked (unlock links, another array): see MapLiveReader.ReadMarkerUnlocks.
     /// 0.1321 (X-322, dalamud.log of 11/14 11:39:48, Mor Dhona): the bit read by IsUnlockLinkUnlocked agreed with the game on 8 icons of 9;
     /// the icon of bit 83 (60467 at 1375, 653) is drawn by the game while that reading says locked. So on the map the game has built, its
     /// own list decides (an icon with a bit is drawn when the game lists it: same icon at the same pixel, GameList.Listed); on another
@@ -72,27 +74,24 @@ public static class MapMarkerUnlock
     public static bool Agrees(IReadOnlyList<Check> checks)=>checks.All(check=>check.Listed==check.Unlocked);
 
     /// <summary>
-    /// Where the game's own map list (AgentMap.MapMarkers) puts a sheet marker: world position × 16 (Mor Dhona's aetheryte, sheet 108.3 at
-    /// pixel 1064, 356, is listed at 640, −10688), the world position from the texture pixel as MapProjection.PixelFromWorld reverses it.
+    /// Where the game's own map list (AgentMap.MapMarkers) puts a sheet marker: (texture pixel − 1024) × 16. Mor Dhona's aetheryte (sheet 108.3
+    /// at pixel 1064, 356, size factor 100) is listed at 640, −10688; 0.1340 (X-351, dalamud.log of 11/14 16:05:29, map 14, Ul'dah, size factor
+    /// 200): 60441 at pixel 1209, 794 is listed at 2960, −3680, and the 50 other icons of the map the same way: the size factor is not applied
+    /// (the 0.1320 rule « world × 16 » held at factor 100 only).
     /// </summary>
-    public static (float X,float Y) GamePosition(float pixelX,float pixelY,int sizeFactor,int offsetX,int offsetY)
-    {
-        var scale=Math.Max(1,sizeFactor)/100f;
-        return (((pixelX-1024)/scale-offsetX)*16,((pixelY-1024)/scale-offsetY)*16);
-    }
+    public static (float X,float Y) GamePosition(float pixelX,float pixelY)=>((pixelX-1024)*16,(pixelY-1024)*16);
 
     /// <summary>
     /// 0.1338 (X-351): how many of a map's icons without an unlock bit (always drawn by the game) the game's list holds (same icon within two
     /// world units): the game's list belongs to the map that it holds best, the player's or the one its map window shows.
     /// </summary>
-    public static (int Found,int Total) Coverage(IEnumerable<(uint Icon,float PixelX,float PixelY)> plain,int sizeFactor,int offsetX,int offsetY,
-        IReadOnlyList<(uint Icon,int X,int Y,int Flags)> game)
+    public static (int Found,int Total) Coverage(IEnumerable<(uint Icon,float PixelX,float PixelY)> plain,IReadOnlyList<(uint Icon,int X,int Y,int Flags)> game)
     {
         int found=0,total=0;
         foreach(var (icon,pixelX,pixelY) in plain)
         {
             total++;
-            var (x,y)=GamePosition(pixelX,pixelY,sizeFactor,offsetX,offsetY);
+            var (x,y)=GamePosition(pixelX,pixelY);
             foreach(var marker in game)
                 if(marker.Icon==icon && Math.Abs(marker.X-x)<=32 && Math.Abs(marker.Y-y)<=32){found++;break;}
         }
@@ -106,14 +105,14 @@ public static class MapMarkerUnlock
     public sealed record Check(ushort Bit,uint Icon,float PixelX,float PixelY,bool Listed,int Flags,bool Unlocked);
 
     /// <summary>For the self-check in the game: each sheet icon with an unlock bit of the map the game has open, against the game's list and the unlocked bits.</summary>
-    public static IReadOnlyList<Check> Compare(IEnumerable<(ushort Bit,uint Icon,float PixelX,float PixelY)> sheet,int sizeFactor,int offsetX,int offsetY,
+    public static IReadOnlyList<Check> Compare(IEnumerable<(ushort Bit,uint Icon,float PixelX,float PixelY)> sheet,
         IReadOnlyList<(uint Icon,int X,int Y,int Flags)> game,IReadOnlySet<ushort> unlocked)
     {
         var result=new List<Check>();
         foreach(var (bit,icon,pixelX,pixelY) in sheet)
         {
             if(bit==0)continue;
-            var (x,y)=GamePosition(pixelX,pixelY,sizeFactor,offsetX,offsetY);
+            var (x,y)=GamePosition(pixelX,pixelY);
             var flags=-1;
             foreach(var marker in game)
                 if(marker.Icon==icon && Math.Abs(marker.X-x)<=32 && Math.Abs(marker.Y-y)<=32){flags=marker.Flags;break;}

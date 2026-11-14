@@ -16,12 +16,12 @@ internal static class MapMarkerShown1338Tests
     [
         ("Map marker shown 1338: the game's list is held by its own map's icons without a bit, not by another map's",() =>
         {
-            var own=MapMarkerUnlock.Coverage(MorDhonaPlain,100,0,0,MorDhonaList);
+            var own=MapMarkerUnlock.Coverage(MorDhonaPlain,MorDhonaList);
             Check(own==(2,2) && MapMarkerUnlock.Holds(own),"Mor Dhona's list holds Mor Dhona's plain icons: "+own);
-            var other=MapMarkerUnlock.Coverage([(60453,300,1700),(60412,900,900),(60441,1500,400)],100,0,0,MorDhonaList);
+            var other=MapMarkerUnlock.Coverage([(60453,300,1700),(60412,900,900),(60441,1500,400)],MorDhonaList);
             Check(other==(0,3) && !MapMarkerUnlock.Holds(other),"another map's icons are not in it: "+other);
             Check(MapMarkerUnlock.Holds((1,2)) && !MapMarkerUnlock.Holds((1,3)) && !MapMarkerUnlock.Holds((0,0)),"at least half, and one at least");
-            Check(MapMarkerUnlock.Coverage(MorDhonaPlain,100,0,0,[(60453,672,-10688,0)])==(1,2) && MapMarkerUnlock.Coverage(MorDhonaPlain,100,0,0,[(60453,673,-10688,0)])==(0,2),
+            Check(MapMarkerUnlock.Coverage(MorDhonaPlain,[(60453,672,-10688,0)])==(1,2) && MapMarkerUnlock.Coverage(MorDhonaPlain,[(60453,673,-10688,0)])==(0,2),
                 "within two world units (32) only");
         }),
         ("Map marker shown 1338: wiring: the player's map and the shown map are both tried, nothing learned from a list that holds neither",() =>

@@ -94,7 +94,7 @@ internal sealed class MapLiveReader : IDisposable
     }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     // X-322 (0.1320): the unlock bits of the map icons, the ones read unlocked (same set kept while unchanged), and the last check written.
-    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";private MapMarkerUnlock.GameList? gameListedMarkers;
+    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";private MapMarkerUnlock.GameList? gameListedMarkers;private IReadOnlySet<ushort>? unlockLinkBits;
     /// <summary>X-322 (0.1320): the last comparison of the game's own map list with the unlock bits (self-check); null before one.</summary>
     public (bool Agree,string Text)? MarkerUnlockCheck=>markerUnlockCheckBox is { } box ? (box.Item1,box.Item2):null;
     private volatile Tuple<bool,string>? markerUnlockCheckBox;
@@ -276,10 +276,21 @@ internal sealed class MapLiveReader : IDisposable
             .Where(bit=>bit!=0).Distinct().Order().ToArray());
         if(markerBitList.IsFaulted)throw markerBitList.Exception!.GetBaseException();
         if(!markerBitList.IsCompleted)return unlockedMarkerBits;
-        var ui=UIState.Instance();
-        if(ui==null || (nint)UIState.MemberFunctionPointers.IsUnlockLinkUnlocked==0)return null;
+        // 0.1340 (X-351, dalamud.log of 11/14 16:05: bits 68 and 118 of map 14 and 83 of Mor Dhona drawn by the game while
+        // UIState.IsUnlockLinkUnlocked said locked): the game's own array for these icons, QuestManager.UnlockedMapMarkers (a field, no game
+        // function called); a bit past its end is unknown (hidden). The former reading stays in the log for the comparison (R06).
+        var quests=FFXIVClientStructs.FFXIV.Client.Game.QuestManager.Instance();
+        if(quests==null)return null;
+        var bits=quests->UnlockedMapMarkers.Length*8;
         var set=new HashSet<ushort>();
-        foreach(var bit in markerBitList.Result)if(ui->IsUnlockLinkUnlocked(bit))set.Add(bit);
+        foreach(var bit in markerBitList.Result)if(bit<bits && quests->UnlockedMapMarkersBitArray[bit])set.Add(bit);
+        var ui=UIState.Instance();
+        if(ui!=null && (nint)UIState.MemberFunctionPointers.IsUnlockLinkUnlocked!=0)
+        {
+            var links=new HashSet<ushort>();
+            foreach(var bit in markerBitList.Result)if(ui->IsUnlockLinkUnlocked(bit))links.Add(bit);
+            unlockLinkBits=links;
+        }
         return unlockedMarkerBits is { } before && before.SetEquals(set) ? before:set;
     }
 
@@ -301,7 +312,7 @@ internal sealed class MapLiveReader : IDisposable
         {
             if(mapSheet.GetRowOrDefault(candidate) is not { } option || !markerSheet.TryGetRow(option.MapMarkerRange,out var optionRows))continue;
             var plain=optionRows.Where(row=>row.Icon!=0 && row.MapMarkerUnlockedBit==0).Select(row=>((uint)row.Icon,(float)row.X,(float)row.Y)).ToArray();
-            var held=MapMarkerUnlock.Coverage(plain,option.SizeFactor,option.OffsetX,option.OffsetY,game);
+            var held=MapMarkerUnlock.Coverage(plain,game);
             if(chosen is null || held.Found*Math.Max(1,coverage.Total)>coverage.Found*Math.Max(1,held.Total)){chosen=option;coverage=held;}
         }
         if(chosen is not { } map || !markerSheet.TryGetRow(map.MapMarkerRange,out var rows))return;
@@ -323,7 +334,7 @@ internal sealed class MapLiveReader : IDisposable
             }
             return;
         }
-        var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
+        var checks=MapMarkerUnlock.Compare(sheet,game,unlocked);
         // 0.1321: the game's list decides on this map; the same set is kept while it does not change.
         // X-351 (0.1335): the maps built earlier in the session and the bits drawn while read locked are kept (MapMarkerUnlock.Remember).
         var remembered=MapMarkerUnlock.Remember(gameListedMarkers,mapId,checks);
@@ -336,7 +347,9 @@ internal sealed class MapLiveReader : IDisposable
             .Select(row=>$"bit {row.MapMarkerUnlockedBit} row {row.RowId}.{row.SubrowId}: type {row.Type}, data type {row.DataType}, data key {row.DataKey.RowId}, unknown {row.Unknown0}").ToArray();
         var line=$"Map icon unlocks on map {mapId} (player on map {agent->CurrentMapId}, game's map showing {agent->SelectedMapId}; {coverage.Found} of {coverage.Total} icons without an unlock bit found in the game's list; "
             +$"{checks.Count} with an unlock bit, {game.Count} in the game's list, {listed.Count} drawn by the game): "
-            +$"the bit's reading agrees on {agree} of {checks.Count}; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe))
+            +$"the bit's reading agrees on {agree} of {checks.Count}"
+            +(unlockLinkBits is { } links ? $" (the unlock-link reading of before 0.1340 on {checks.Count(check=>check.Listed==links.Contains(check.Bit))})":"")
+            +"; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe))
             +(wrong.Length>0 ? "; reading wrong on: "+string.Join("; ",wrong):"")
             +$"; remembered: {remembered.Remembered.Count} map(s), bits drawn while read locked: {(remembered.DrawnWhileLocked.Count>0 ? string.Join(",",remembered.DrawnWhileLocked.Order()):"none")}";
         // X-351 (0.1335): a real verdict: the bit's reading against the game's own list (the map follows the game's list here; elsewhere the
