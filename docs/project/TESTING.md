@@ -1774,17 +1774,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
 
-- [ ] (0.1318) Eurêka et Bozja › Météo et nuit : chaque monstre « nuit » montre une prochaine fenêtre (« maintenant » ou dans moins de 70 min) ; les monstres à météo montrent la leur quand la météo vient dans les 28 h ; comparer une ligne avec la météo annoncée en jeu dans la zone
+- [x] (0.1318) Eurêka et Bozja › Météo et nuit : chaque monstre « nuit » montre une prochaine fenêtre (« maintenant » ou dans moins de 70 min) ; les monstres à météo montrent la leur quand la météo vient dans les 28 h ; comparer une ligne avec la météo annoncée en jeu dans la zone
 
-- [ ] (0.1319) Rangements › Gils, période 1 jour : finir une ALÉA (ligne « ALÉA (récompenses) »), vaincre quelques monstres qui donnent des gils (« Monstres vaincus »), achever une rubrique du carnet d'objectifs (« Carnet d'objectifs ») ; acheter, vendre à un PNJ, réparer chez un PNJ, se téléporter : chacun dans sa catégorie, aucun dans « Autre »
+- [x] (0.1319) Rangements › Gils, période 1 jour : finir une ALÉA (ligne « ALÉA (récompenses) »), vaincre quelques monstres qui donnent des gils (« Monstres vaincus »), achever une rubrique du carnet d'objectifs (« Carnet d'objectifs ») ; acheter, vendre à un PNJ, réparer chez un PNJ, se téléporter : chacun dans sa catégorie, aucun dans « Autre »
 
-- [ ] (0.1320) Mor Dhona, carte de Tensho : plus d'icône « Échangeur » seule en X 21.4 Y 5.5 (à l'ouest de la Maison des splendeurs) ; les autres icônes de marchands et d'échange que la carte du jeu montre sont toujours là ; ouvrir la carte du jeu puis regarder la ligne « map icon unlocks » de l'auto-contrôle
+- [x] (0.1320) Mor Dhona, carte de Tensho : plus d'icône « Échangeur » seule en X 21.4 Y 5.5 (à l'ouest de la Maison des splendeurs) ; les autres icônes de marchands et d'échange que la carte du jeu montre sont toujours là ; ouvrir la carte du jeu puis regarder la ligne « map icon unlocks » de l'auto-contrôle
 
-- [ ] (0.1321) Mor Dhona, après avoir ouvert la carte du jeu : la carte de Tensho montre exactement les icônes d'échange et de marchands que la carte du jeu montre (plus d'« Échangeur » seul en X 21.4 Y 5.5 ; l'icône vers X 28 Y 13.7 est là si le jeu la montre)
+- [x] (0.1321) Mor Dhona, après avoir ouvert la carte du jeu : la carte de Tensho montre exactement les icônes d'échange et de marchands que la carte du jeu montre (plus d'« Échangeur » seul en X 21.4 Y 5.5 ; l'icône vers X 28 Y 13.7 est là si le jeu la montre)
 
-- [ ] (0.1322) Objets › Organisation, sacs du personnage, avec la zone qui couvre les 140 cases : l'aperçu remplit le sac 1, puis le sac 3, puis le sac 2 ; « Appliquer » (ou le bouton Tensho de l'inventaire) : dans le jeu, la colonne de gauche (sacs 1 et 3) se remplit avant celle de droite
+- [x] (0.1322) Objets › Organisation, sacs du personnage, avec la zone qui couvre les 140 cases : l'aperçu remplit le sac 1, puis le sac 3, puis le sac 2 ; « Appliquer » (ou le bouton Tensho de l'inventaire) : dans le jeu, la colonne de gauche (sacs 1 et 3) se remplit avant celle de droite
 
-- [ ] (0.1323) Aide › Signaler un problème : préparer un bug de test (titre « essai ») et ouvrir le formulaire : le titre est « [Bug] essai », l'étiquette player-report est posée à l'envoi (puis fermer le ticket)
+- [x] (0.1323) Aide › Signaler un problème : préparer un bug de test (titre « essai ») et ouvrir le formulaire : le titre est « [Bug] essai », l'étiquette player-report est posée à l'envoi (puis fermer le ticket)
 
 - [x] (0.1324) Aide › Signaler un problème, GitHub connecté (Monde › Découvertes) : choisir « Par ma connexion GitHub », titre « essai X-340 », « Envoyer sur GitHub… » : l'aperçu montre le titre puis le texte avec le rapport entier ; « Envoyer maintenant » : « Envoyé : ticket n° N », « Ouvrir le ticket » montre le même texte, avec les étiquettes bug et player-report posées en moins d'une minute (puis fermer le ticket)
 
@@ -1796,9 +1796,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1327) Sociétés alliées : première ouverture de la page après un rechargement : « Lecture des données du jeu… » un instant, puis les sociétés et leurs genres ; dalamud.log sans ligne « slow frame » à cette ouverture
 
-- [ ] (0.1330) Après la prochaine release, installée depuis le dépôt (mode normal) : /xlplugins, onglet des plugins installés : Tensho Assistant montre son icône (plus le « ? » de Dalamud).
+- [x] (0.1330) Après la prochaine release, installée depuis le dépôt (mode normal) : /xlplugins, onglet des plugins installés : Tensho Assistant montre son icône (plus le « ? » de Dalamud).
 
-- [ ] (0.1331) Ouvrir un objet au tableau du marché du jeu, le refermer, puis le survoler avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (source : tableau du marché, heure du relevé), pas celle d'Universalis.
+- [x] (0.1331) Ouvrir un objet au tableau du marché du jeu, le refermer, puis le survoler avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (source : tableau du marché, heure du relevé), pas celle d'Universalis.
+
+- [ ] (0.1335) Ouvrir la carte du jeu à Mor Dhona, puis la carte de Tensho sur une autre zone, puis revenir à Mor Dhona sur la carte de Tensho sans rouvrir celle du jeu : l'icône à X 28.5 Y 14.1 (dessinée par le jeu) reste, l'icône « Échangeur » seule à X 21.4 Y 5.5 reste absente.
 
 **0.535 : interfaces** — à voir en jouant
 

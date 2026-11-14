@@ -282,7 +282,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x126-desktop-install.md](x126-desktop-install.md) | `src/TenshoAssistant/Plugin.Desktop.cs` | — |
 | [x158-highbridge-window.md](x158-highbridge-window.md) | `src/TenshoAssistant/Maps/VistaWindow.cs`, `tests/TenshoAssistant.Tests/VistaWindow1128Tests.cs` | — |
 | [x172-sqlite-trial.md](x172-sqlite-trial.md) | `src/TenshoAssistant/Discoveries/DiscoveryDatabase.cs`, `src/TenshoAssistant/Plugin.Discoveries.cs`, `src/TenshoAssistant/TenshoAssistant.csproj`, `tests/TenshoAssistant.Tests/DiscoveriesSqlite1136Tests.cs`, `tools/README.md`, `tools/SqliteTrialProbe/Program.cs` | — |
-| [x343-dalamud-upload.md](x343-dalamud-upload.md) | `src/TenshoAssistant/Market/SeenPrices.cs`, `tests/TenshoAssistant.Tests/SameReading1331Tests.cs` | `CHANGELOG.md` |
+| [x343-dalamud-upload.md](x343-dalamud-upload.md) | `src/TenshoAssistant/Market/SeenPrices.cs`, `tests/TenshoAssistant.Tests/SameReading1331Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [x344-plugin-icon.md](x344-plugin-icon.md) | `scripts/Verify.ps1`, `tests/TenshoAssistant.Tests/PluginIcon1330Tests.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
