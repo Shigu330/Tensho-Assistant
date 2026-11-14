@@ -9,6 +9,14 @@ namespace TenshoAssistant.Quests;
 
 internal sealed unsafe class QuestReader : IDisposable
 {
+    /// <summary>X-266 (0.1307): a quest under way or done, read now (the map's vendors placed by a quest's layer); nothing before the character is in.</summary>
+    public static bool SeenNow(IClientState client, IPlayerState player, IUnlockState unlocks, ExcelSheet<Quest> quests, uint id)
+    {
+        if (!client.IsLoggedIn || !player.IsLoaded) return false;
+        var manager = QuestManager.Instance();
+        return manager != null && manager->IsQuestAccepted(id) || quests.TryGetRow(id, out var row) && unlocks.IsQuestCompleted(row);
+    }
+
     private readonly object gate = new();
     private readonly QuestService service;
     private readonly IDataManager data;

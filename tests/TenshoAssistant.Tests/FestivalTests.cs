@@ -57,7 +57,8 @@ internal static class FestivalTests
             Check(!NpcShopLinks.Present(new NpcLocation(128,11,"",1,1,0,0,0,NpcShopLinks.Unplaced),new HashSet<uint>()),"0.829: a Level-only vendor not on the map");
             Check(NpcShopLinks.MorePresent((2,0),(1,27))==(1,27u) && NpcShopLinks.MorePresent((1,27),(0,0))==(0,0u) && NpcShopLinks.MorePresent((2,0),(2,0))==(2,0u),"0.823: the layer that keeps it most");
             var loader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs"));
-            Check(loader.Contains("list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};"),"0.823: Level positions too");
+            // 0.1307 (X-266): the Level position's condition comes from NpcShopLinks.LevelCondition (festival, or quest when only quest layers place it).
+            Check(loader.Contains("case NpcShopLinks.DuringFestival:list[index]=list[index] with {Condition=NpcShopLinks.DuringFestival,Festival=placed!.Value.Festival};"),"0.823: Level positions too");
         }),
         ("Conditional NPCs: on the map, always, or while its festival runs; never a quest's or the opening's",() =>
         {
@@ -65,7 +66,9 @@ internal static class FestivalTests
             Check(NpcShopLinks.Present(Spot(0),running) && NpcShopLinks.Present(Spot(1,114),running),"always, running festival");
             Check(!NpcShopLinks.Present(Spot(1,27),running) && !NpcShopLinks.Present(Spot(2),running),"other festival, quest");
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(map.Contains("same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running)") && map.Contains("|| mapVendorCache.Festivals!=festivalKey)"),"filtered, rebuilt");
+            // 0.1307 (X-266): with the quests seen; rebuilt too when one of the quests its vendors wait for changes.
+            Check(map.Contains("same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running,seen)") && map.Contains("|| mapVendorCache.Festivals!=festivalKey")
+                && map.Contains("|| mapVendorQuests.Quests.Length>0 && MapVendorQuestKey(mapVendorQuests.Quests)!=mapVendorQuests.Seen)"),"filtered, rebuilt");
         }),
     ];
 }

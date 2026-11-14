@@ -242,6 +242,8 @@ internal sealed class NpcVendorLoader : IDisposable
         // 0.823 (X-45, reopened: event NPCs still on the Aftcastle): every vendor's layers are read, not only the vendors without a position, so that a Level
         // position also gets its layer's condition (an NPC on an always-there layer stays; one only on festival, quest or opening layers does not).
         var conditions=new Dictionary<(uint Npc,uint Territory),(int Condition,uint Festival)>();
+        // X-266 (0.1307): the quest layers placing each vendor in a territory, to link a Level position to their quests.
+        var questLayers=new Dictionary<(uint Npc,uint Territory),HashSet<string>>();
         foreach(var territory in data.GetExcelSheet<TerritoryType>())
             foreach(var kind in LayoutKinds)
             {
@@ -259,6 +261,8 @@ internal sealed class NpcVendorLoader : IDisposable
                             var layerCondition=NpcShopLinks.LayerCondition(layer.Name,layer.FestivalID);
                             var key=(npc.ParentData.ParentData.BaseId,territory.RowId);
                             conditions[key]=conditions.TryGetValue(key,out var known) ? NpcShopLinks.MorePresent(known,layerCondition):layerCondition;
+                            if(layerCondition.Condition==NpcShopLinks.DuringQuest && NpcShopLinks.LayerQuestKey(layer.Name) is { } questKey)
+                                (questLayers.TryGetValue(key,out var keys) ? keys:questLayers[key]=new(StringComparer.OrdinalIgnoreCase)).Add(questKey);
                         }
                         if(!missing.Contains(npc.ParentData.ParentData.BaseId))continue;
                         var id=npc.ParentData.ParentData.BaseId;var position=instance.Transform.Translation;
@@ -276,15 +280,28 @@ internal sealed class NpcVendorLoader : IDisposable
         var placedAnywhere=conditions.Keys.Select(key=>key.Npc).ToHashSet();
         // 0.823 (X-45): a Level position takes the condition of the NPC's layers in that territory (none: always there). 0.828: a festival's only; a quest's or
         // the opening's layer often places a permanent NPC too (0.823 left out 13 of map 12's 14 vendors).
+        // 0.829 (X-45, user capture of the Aftcastle): a vendor no layer places anywhere exists only through its Level row: the game shows it for an event.
+        // X-266 (0.1307): one placed in that territory only by quest layers shows while one of their quests is under way or done (NpcShopLinks.LevelCondition).
+        List<(uint Id,string Script)>? scripts=null;var byQuest=0;var linked=0;
         foreach(var (npcId,list) in locations)
             for(var index=0;index<list.Count;index++)
             {
-                if(list[index].Condition==NpcShopLinks.Always && conditions.TryGetValue((npcId,list[index].TerritoryId),out var placed) && placed.Condition==NpcShopLinks.DuringFestival)
-                    list[index]=list[index] with {Condition=placed.Condition,Festival=placed.Festival};
-                // 0.829 (X-45, user capture of the Aftcastle): a vendor no layer places anywhere exists only through its Level row: the game shows it for an event.
-                else if(list[index].Condition==NpcShopLinks.Always && !placedAnywhere.Contains(npcId))
-                    list[index]=list[index] with {Condition=NpcShopLinks.Unplaced};
+                if(list[index].Condition!=NpcShopLinks.Always)continue;
+                var key=(npcId,list[index].TerritoryId);
+                (int Condition,uint Festival)? placed=conditions.TryGetValue(key,out var known) ? known:null;
+                switch(NpcShopLinks.LevelCondition(placed,placedAnywhere.Contains(npcId)))
+                {
+                    case NpcShopLinks.DuringFestival:list[index]=list[index] with {Condition=NpcShopLinks.DuringFestival,Festival=placed!.Value.Festival};break;
+                    case NpcShopLinks.Unplaced:list[index]=list[index] with {Condition=NpcShopLinks.Unplaced};break;
+                    case NpcShopLinks.DuringQuest:
+                        scripts??=data.GetExcelSheet<Quest>().Select(quest=>(quest.RowId,quest.Id.ExtractText())).Where(quest=>quest.Item2.Length>0).ToList();
+                        var quests=questLayers.TryGetValue(key,out var keys) ? keys.SelectMany(layerKey=>NpcShopLinks.QuestsOf(layerKey,scripts)).Distinct().Order().ToArray():[];
+                        list[index]=list[index] with {Condition=NpcShopLinks.DuringQuest,Quests=quests.Length>0 ? quests:null};
+                        byQuest++;if(quests.Length>0)linked++;
+                        break;
+                }
             }
+        log.Information("NPC vendors: {0} Level place(s) only on quest layers, {1} linked to their quests (X-266).",byQuest,linked);
         foreach(var place in NpcShopLinks.ObservedPlaces)
         {
             if(locations.ContainsKey(place.Npc) || !vendorShops.ContainsKey(place.Npc) || !data.GetExcelSheet<Map>().TryGetRow(place.Map,out var map))continue;

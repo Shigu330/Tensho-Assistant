@@ -258,6 +258,9 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.AirshipSectorName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AirshipExplorationPoint>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             mainWindow.SectorName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.SubmarineExploration>().GetRowOrDefault(id)?.Destination.ExtractText() ?? "";
             mainWindow.DutyName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+            // X-266 (0.1307): a vendor placed only by a quest's layer shows on the map while that quest is under way or done.
+            var questRows=new Lazy<Lumina.Excel.ExcelSheet<Lumina.Excel.Sheets.Quest>>(()=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>());
+            mainWindow.QuestSeen=id=>Quests.QuestReader.SeenNow(client,player,unlocks,questRows.Value,id);
             // X-263 (0.1305): a retainer venture's name (exploration) or class and level (targeted), from RetainerTask.
             mainWindow.VentureRowOf=id=>
             {
