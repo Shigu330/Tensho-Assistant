@@ -29,4 +29,18 @@ public static class ReferenceErrors
     /// each once.</summary>
     public static string[] Shown(IEnumerable<string> keys,bool loadingPicture=false)=>
         keys.Where(key=>IsError(key) || (!loadingPicture && IsWaiting(key))).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
+
+    /// <summary>X-284 M2: an error picture that shows no error.</summary>
+    public const string NoErrorShown="(no error state shown)";
+
+    /// <summary>What is wrong with a picture of <paramref name="setup"/>, from the keys its frame asked: a loading picture may wait; an error
+    /// picture (X-284 M2) must show an error and nothing else wrong (a wait), else it says « (no error state shown) »; any other picture
+    /// shows neither.</summary>
+    public static string[] ShownFor(IEnumerable<string> keys,string setup)
+    {
+        var asked=keys as IReadOnlyCollection<string> ?? keys.ToArray();
+        if(setup!="error")return Shown(asked,setup=="loading");
+        var waits=asked.Where(IsWaiting).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
+        return asked.Any(IsError) ? waits : [NoErrorShown,..waits];
+    }
 }

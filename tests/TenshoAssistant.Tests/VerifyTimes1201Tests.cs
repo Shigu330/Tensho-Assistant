@@ -54,7 +54,7 @@ internal static class VerifyTimes1201Tests
             var program = File.ReadAllText(Path.GetFullPath("tests/TenshoAssistant.Tests/Program.cs")).ReplaceLineEndings("\n");
             // X-267 (0.1275): the count comes from the parallel run (TestRunner.cs); same order, the count still last.
             var slowest = program.IndexOf("Console.WriteLine(SlowestTests.Line(run.Times, run.Whole));", StringComparison.Ordinal);
-            Check(slowest > 0 && slowest < program.IndexOf("Console.WriteLine($\"{run.Passed}/{run.Total} passed\");", StringComparison.Ordinal), "before the count, which stays the last line");
+            Check(slowest > 0 && slowest < program.IndexOf("Console.WriteLine(ParallelTests.CountLine(run));", StringComparison.Ordinal), "before the count, which stays the last line");
         }),
     ];
 }

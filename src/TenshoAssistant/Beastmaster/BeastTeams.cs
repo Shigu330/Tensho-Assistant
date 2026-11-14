@@ -123,6 +123,16 @@ public static class BeastTeams
     public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks)
         => (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key).Select(pair => $"{pair.Key}:{pair.Value}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
+    /// <summary>
+    /// X-284 M1 (review of block 0.1278, R07): the plans saved off the game's thread. The text is made here, from the plans as they are now
+    /// (the caller's thread keeps changing them); the file is written by <paramref name="writer"/>, one write after the other, so a file held
+    /// an instant by another program (AtomicFile tries again for up to about 750 ms) never makes the game wait while it draws.
+    /// </summary>
+    public static void SaveLater(BackgroundWriter writer, string file, SavedPlans plans)
+    {
+        var text = Write(plans);
+        writer.Enqueue("Beast team plans could not be saved.", () => AtomicFile.Write(file, text));
+    }
     public static SavedPlans? Read(string text)
     {
         try { return JsonSerializer.Deserialize<SavedPlans>(text) is { Plans: not null, Keys: not null } plans ? plans : null; }

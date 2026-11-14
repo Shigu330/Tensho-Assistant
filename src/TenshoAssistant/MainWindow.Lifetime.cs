@@ -15,6 +15,8 @@ internal sealed partial class MainWindow
         DisposeMapDiscovery();
         // X-43: the discoveries written once more when the plugin unloads; X-142 (0.1121): after a save that was running.
         FlushDiscoveries();
+        // X-284 M1: the beast team plans' last write (made off the game's thread).
+        FlushBeastPlans();
         mapFindCancel?.Cancel();mapFindCancel?.Dispose();mapFindCancel=null;
         fromStockCancel?.Cancel();fromStockCancel?.Dispose();fromStockCancel=null;
         craftSolve.Dispose();

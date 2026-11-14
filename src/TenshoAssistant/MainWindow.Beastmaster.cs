@@ -164,12 +164,23 @@ internal sealed partial class MainWindow
         }
         return beastPlans!;
     }
+    /// <summary>X-284 M1: the plans' writes, off the game's thread (BeastTeams.SaveLater); flushed when the window is disposed.</summary>
+    private BackgroundWriter? beastWriter;
     private void SaveBeastPlans()
     {
         // X-180 (0.1168): never in the desktop application (its copy is overwritten from the game; the plans stay in memory there).
         if (inDesktopApp) return;
-        try { if (beastPlans is not null && BeastTeamsFile?.Invoke() is { } file) AtomicFile.Write(file, BeastTeams.Write(beastPlans)); }
+        try
+        {
+            if (beastPlans is not null && BeastTeamsFile?.Invoke() is { } file)
+                BeastTeams.SaveLater(beastWriter ??= new BackgroundWriter((error, message) => { log.Warning(error, message); NoteWriteFailed(message); }), file, beastPlans);
+        }
         catch (Exception error) { log.Warning(error, "Beast team plans could not be saved."); }
+    }
+    /// <summary>X-284 M1: at unload, the plans' last write waited for (a few seconds at most), said when it did not end.</summary>
+    private void FlushBeastPlans()
+    {
+        if (beastWriter is { } writer && !writer.Flush(TimeSpan.FromSeconds(3))) log.Warning("The beast team plans were still being written 3 s after the unload began.");
     }
     internal BoardPlan? BeastPlanFor(Board board, BeastState state)
     {

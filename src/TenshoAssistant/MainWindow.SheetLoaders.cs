@@ -13,6 +13,17 @@ namespace TenshoAssistant;
 /// </summary>
 internal sealed partial class MainWindow
 {
+    /// <summary>
+    /// X-284 M2 (review of block 0.1278): the pages that read their sheets once, when they first open (allied societies, relic weapons),
+    /// forget what they read: their next draw reads again with the loaders given last. The desktop application's reference pictures of the
+    /// error state use it (sheets that cannot be read, as after a game update, R08), then give the real loaders back.
+    /// </summary>
+    internal void ForgetSheetPages()
+    {
+        alliedCatalog=null;alliedTried=false;alliedFailed=false;alliedRead=null;allied=null;
+        relicCatalog=null;relicCatalogTried=false;relicCatalogTask=null;relicReadFailed=false;relicRead=null;relicProgress=null;relicLines.Clear();
+    }
+
     internal void UseSheetLoaders(Dalamud.Plugin.Services.IDataManager data,Dalamud.Plugin.Services.IPluginLog log)
     {
         T? Read<T>(string what,Func<T?> read) where T:class

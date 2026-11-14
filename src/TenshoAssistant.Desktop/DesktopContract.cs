@@ -30,6 +30,7 @@ internal static class DesktopContract
         new(Main,Kind.Method,"DesktopSurfaceMap",false,[],"the typed contract (DesktopSurface): pages, data, alarms, notices"),
         new(Main,Kind.Property,"PageEntries",false,null,"the navigation"),
         new(Main,Kind.Method,"UseSheetLoaders",false,["Dalamud.Plugin.Services.IDataManager","Dalamud.Plugin.Services.IPluginLog"],"the page loaders that read only the sheets (X-285)"),
+        new(Main,Kind.Method,"ForgetSheetPages",false,[],"the error pictures: the pages read their sheets again (X-284 M2)"),
         new(Main,Kind.Method,"ConfigureGarden",false,["Dalamud.Plugin.Services.IDataManager"],"the garden's seed list and crossbreeds (X-178)"),
         new(Main+"+PageEntry",Kind.Property,"Page",false,null,"the navigation"),
         new(Main+"+PageEntry",Kind.Property,"Label",false,null,"--step=entries (diagnostic)"),

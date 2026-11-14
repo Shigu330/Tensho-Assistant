@@ -62,12 +62,15 @@ internal static class References
                         Console.WriteLine($"  {shot.Id}: the trial patch could not be given");
                 }
                 if(shot.Setup=="dashboard")Headless.DashboardTrial(host,status);
+                // X-284 M2: the page's sheets cannot be read for this picture (its error state), then are given back.
+                if(shot.Setup=="error" && !host.SheetsFail(true))Console.WriteLine($"  {shot.Id}: the sheets could not be made to fail");
                 if(shot.Page=="Weather")Headless.OpenZone(host,155);
                 thrown+=Take(host,status,window,shot,folder,compare,rows);
             }
             finally
             {
                 if(shot.Setup.StartsWith("garden-",StringComparison.Ordinal)){host.SetSetting("GardenBeds",beds);host.SetSetting("GardenDetailedView",detailed ?? false);}
+                if(shot.Setup=="error")host.SheetsFail(false);
                 if(shot.Setup=="dashboard"){status.Link=link;host.GameMeasures(null,Environment.TickCount64);host.GameState(null);}
             }
         }
@@ -111,7 +114,7 @@ internal static class References
             Thread.Sleep(frames<5 ? 0 : 15);
         }
         host.ListenKeys(null);
-        var shown=ReferenceErrors.Shown(asked,shot.Setup=="loading");
+        var shown=ReferenceErrors.ShownFor(asked,shot.Setup);
         host.SetSetting("ThemeMode",0);
         var width=(int)window.Size.X;var height=(int)window.Size.Y;
         var file=Path.Combine(folder,shot.Id+".png");

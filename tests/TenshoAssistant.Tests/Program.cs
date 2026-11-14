@@ -944,7 +944,7 @@ foreach (var note in run.Results.Select(result => result.Note).OfType<string>().
 Console.WriteLine(ParallelTests.Line(run, groups));
 // Measure 7 (0.1201): the slowest tests are said in one line, before the count (which stays the last line: the scripts read it there).
 Console.WriteLine(SlowestTests.Line(run.Times, run.Whole));
-Console.WriteLine($"{run.Passed}/{run.Total} passed");
+Console.WriteLine(ParallelTests.CountLine(run));
 return run.Failed == 0 ? 0 : 1;
 
 static void Check(bool condition, string message)

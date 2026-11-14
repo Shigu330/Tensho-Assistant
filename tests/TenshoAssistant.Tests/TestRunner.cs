@@ -127,6 +127,17 @@ internal static class ParallelTests
 
     private static string FirstLine(string text) => text.Split('\n')[0].TrimEnd('\r');
 
+    /// <summary>
+    /// The last line, read by the scripts (« N/M passed »). X-284 M4 (review of block 0.1278): a wrong quarantine entry fails the run while
+    /// every test passed; the line then says the run failed and no longer reads « N/N passed » (the scripts' pattern does not match it).
+    /// </summary>
+    public static string CountLine(TestRun run)
+    {
+        var faults = run.Notes.Count(note => note.StartsWith("FAIL ", StringComparison.Ordinal));
+        return faults == 0 ? $"{run.Passed}/{run.Total} passed"
+            : $"{run.Passed}/{run.Total} tests passed, but the run FAILED: {faults} quarantine entr{(faults == 1 ? "y" : "ies")} wrong (FAIL lines above)";
+    }
+
     /// <summary>One line on the run itself: threads, groups, the serial ones, and the longest group (the floor of a parallel run).</summary>
     public static string Line(TestRun run, IReadOnlyList<TestGroup> groups)
     {

@@ -80,6 +80,30 @@ internal sealed class Host
         mainType.GetMethod("UseSheetLoaders",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)?.Invoke(Window,[DataStub,LogProxy.Create()]);
     }
 
+    /// <summary>
+    /// X-284 M2 (review of block 0.1278: the reference pictures lacked the error state): the sheet loaders given a data manager whose every
+    /// read fails, as after a game update the plugin cannot read (R08), or the real one back; the pages that read their sheets once forget
+    /// what they read (MainWindow.ForgetSheetPages), so their next draw reads again. False when the plugin has no such method.
+    /// </summary>
+    public bool SheetsFail(bool fail)
+    {
+        var type=Window.GetType();
+        var use=type.GetMethod("UseSheetLoaders",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+        var forget=type.GetMethod("ForgetSheetPages",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+        if(use is null || forget is null)return false;
+        use.Invoke(Window,[fail ? FailingData.Create() : DataStub,LogProxy.Create()]);
+        forget.Invoke(Window,null);
+        return true;
+    }
+
+    /// <summary>X-284 M2: a data manager whose every member throws (the sheets unreadable), for the error pictures.</summary>
+    public class FailingData:DispatchProxy
+    {
+        public static Dalamud.Plugin.Services.IDataManager Create()=>DispatchProxy.Create<Dalamud.Plugin.Services.IDataManager,FailingData>();
+        protected override object? Invoke(MethodInfo? method,object?[]? args)=>
+            throw new InvalidDataException($"The game's sheets cannot be read (reference picture of the error state: {method?.Name}).");
+    }
+
     /// <summary>The plugin's saved settings read as Dalamud reads them (Newtonsoft, type names), or null (no file, or unreadable).</summary>
     private object? ReadSettings(string? path,Type configurationType,out string note)
     {
