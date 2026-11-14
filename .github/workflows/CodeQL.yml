@@ -37,11 +37,10 @@ jobs:
 
       # Dalamud.NET.Sdk stops the build when Dalamud is not installed (~/.xlcore/dalamud/Hooks/dev on Linux): the official
       # distribution is unpacked there for its reference assemblies only; nothing from it is run.
+      # X-148: checked against goatcorp's published version and the API level of global.json (scripts/Get-Dalamud.ps1).
       - name: Download Dalamud
-        run: |
-          mkdir -p "$HOME/.xlcore/dalamud/Hooks/dev"
-          curl -sSfL https://goatcorp.github.io/dalamud-distrib/latest.zip -o "$RUNNER_TEMP/dalamud.zip"
-          unzip -q "$RUNNER_TEMP/dalamud.zip" -d "$HOME/.xlcore/dalamud/Hooks/dev"
+        shell: pwsh
+        run: ./scripts/Get-Dalamud.ps1 -Destination "$HOME/.xlcore/dalamud/Hooks/dev"
 
       - name: Restore
         run: dotnet restore TenshoAssistant.sln

@@ -29,10 +29,9 @@ jobs:
       - name: Download Dalamud
         shell: pwsh
         run: |
+          # X-148: checked against goatcorp's published version and the API level of global.json (scripts/Get-Dalamud.ps1).
           $hooks = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
-          New-Item -ItemType Directory -Force -Path $hooks | Out-Null
-          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile dalamud.zip
-          Expand-Archive -Path dalamud.zip -DestinationPath $hooks -Force
+          ./scripts/Get-Dalamud.ps1 -Destination $hooks
           "DALAMUD_HOME=$hooks" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Verify (build, tests, languages, package)
@@ -61,9 +60,7 @@ jobs:
 
       - name: Download Dalamud
         run: |
-          New-Item -ItemType Directory -Force -Path /work/dalamud | Out-Null
-          Invoke-WebRequest -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile /tmp/dalamud.zip
-          Expand-Archive -Path /tmp/dalamud.zip -DestinationPath /work/dalamud -Force
+          ./scripts/Get-Dalamud.ps1 -Destination /work/dalamud
 
       - name: Restore from the lock file
         working-directory: src/TenshoAssistant
