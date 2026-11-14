@@ -94,6 +94,8 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-151 | Relais : un seul écrivain ou deux, réserve 21 % au-dessus du plancher (question de l'utilisateur du 14/11 vers 12 h 05) | Essai Opus moyen : un seul écrivain, le prochain bloc répétitif sur « Tensho · Relais Opus moyen », mesuré contre Opus élevé (R26.6) |  |
 | D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (R04 : requête sur clic, données du joueur), réponse de l'utilisateur du 14/11 vers 12 h 40 : « pour formulaire git c'est ok vu que ça envoie sur clic pas seul et la personne le fera que si elle a envie et en connaissance de cause » | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
 | D-154 | X-57 (quête de cuisinier à Limsa, carte) : l'utilisateur n'a plus la quête, la lecture en jeu est impossible (14/11 après-midi : « je l'ai plus, on met en suspens si je retombe sur le même souci ») | En suspens : passé en « plus tard », repris seulement si le même souci revient, avec une capture |  |
+| D-157 | Ordre des deux points d'avant l'annonce (14/11 vers 16 h 50 ; l'utilisateur : « outils avant fable ») | D'abord le dépôt GitHub propre et ses outils de maintien (inventaire présenté à l'utilisateur avant tout nettoyage), puis la révision complète des textes vus par les joueurs en Fable + ultracode |  |
+| D-158 | X-357, étiquette accessibility jamais posée ni citée (ajout du relais 61 au point 10 de l'inventaire) | La retirer avec in-game-test, probe et decision (recommandé ; l'utilisateur a choisi « recommandé » pour tout l'inventaire le 14/11 vers 17 h 20) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -204,6 +206,8 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-151 | Relais : un seul écrivain ou deux, réserve 21 % au-dessus du plancher (question de l'utilisateur du 14/11 vers 12 h 05) | Essai Opus moyen : un seul écrivain, le prochain bloc répétitif sur « Tensho · Relais Opus moyen », mesuré contre Opus élevé (R26.6) |  |
 | D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (R04 : requête sur clic, données du joueur), réponse de l'utilisateur du 14/11 vers 12 h 40 : « pour formulaire git c'est ok vu que ça envoie sur clic pas seul et la personne le fera que si elle a envie et en connaissance de cause » | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
 | D-154 | X-57 (quête de cuisinier à Limsa, carte) : l'utilisateur n'a plus la quête, la lecture en jeu est impossible (14/11 après-midi : « je l'ai plus, on met en suspens si je retombe sur le même souci ») | En suspens : passé en « plus tard », repris seulement si le même souci revient, avec une capture |  |
+| D-157 | Ordre des deux points d'avant l'annonce (14/11 vers 16 h 50 ; l'utilisateur : « outils avant fable ») | D'abord le dépôt GitHub propre et ses outils de maintien (inventaire présenté à l'utilisateur avant tout nettoyage), puis la révision complète des textes vus par les joueurs en Fable + ultracode |  |
+| D-158 | X-357, étiquette accessibility jamais posée ni citée (ajout du relais 61 au point 10 de l'inventaire) | La retirer avec in-game-test, probe et decision (recommandé ; l'utilisateur a choisi « recommandé » pour tout l'inventaire le 14/11 vers 17 h 20) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
