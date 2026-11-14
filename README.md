@@ -21,7 +21,7 @@ game up to date.
 Questions: [docs/FAQ.md](docs/FAQ.md) (the same as the plugin's Help page), or ask in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a). Building from source
 and development builds: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-These documents were produced for version <!-- docgen:version -->0.1354<!-- /docgen:version -->. What changed in each version is in
+These documents were produced for version <!-- docgen:version -->0.1355<!-- /docgen:version -->. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
 
@@ -215,7 +215,7 @@ le jeu à jour.
 Questions : [docs/FAQ.md](docs/FAQ.md) (les mêmes que la page Aide du plugin), ou posez la vôtre dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a).
 Compiler depuis les sources et versions de développement : [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Ces documents ont été produits pour la version <!-- docgen:version -->0.1354<!-- /docgen:version -->. Les changements de chaque version sont dans
+Ces documents ont été produits pour la version <!-- docgen:version -->0.1355<!-- /docgen:version -->. Les changements de chaque version sont dans
 [CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).
 
@@ -239,13 +239,13 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Pêche en mer** | Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée. |
 |  | **Félicité insulaire** | Les créations de vos fabriques avec leur valeur estimée, et les animaux de votre pâturage, à partir de ce que le jeu a chargé sur votre île. |
 |  | **Enchaînement de macros** | Enchaînez plusieurs macros du jeu, l'une après l'autre. La suite ne démarre que sur votre clic. |
-| Monde | **Carte** | La carte Tensho, avec votre position, drapeaux, favoris, panoramas, points de récolte et quêtes ; aussi les liens de carte du chat, les terrains en vente, un relevé de train de chasse et les conditions d'apparition des rangs S. |
+| Monde | **Carte** | La carte Tensho, avec votre position, drapeaux, favoris, lieux notoires, points de récolte et quêtes ; aussi les liens de carte du chat, les terrains en vente, un relevé de train de chasse et les conditions d'apparition des rangs S. |
 |  | **Météo** | Les prévisions météo d'une zone et ses prochaines fenêtres. |
 |  | **ALÉA** | Où se tient chaque ALÉA des zones ouvertes, avec son niveau, d'après les fichiers du jeu. |
 |  | **PNJ vendeurs** | Qui vend un objet, à quel prix et où. |
 |  | **Butin des contenus** | Ce que chaque contenu peut donner, et où vous en êtes. |
 |  | **Butin des monstres** | Quels monstres donnent l'objet choisi, et où les trouver. |
-|  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les panoramas vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'info-bulle des objets montrent ce que vous avez vu. |
+|  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'info-bulle des objets montrent ce que vous avez vu. |
 | Suivi | **Alarmes** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
 |  | **Rappels** | Les minuteurs et compteurs du jeu, avec des cases « fait » : tâches du jour et de la semaine, servants, expéditions, missions aléatoires, escouade, état du personnage, vos propres tâches. |
 |  | **Jardinage** | Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
@@ -258,7 +258,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
 |  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
 |  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
-|  | **Chocobo** | Votre chocobo de compagnie : ce qu'il porte, les bardes débloquées et les objets qui apprennent les autres. |
+|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui apprennent les autres. |
 |  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
 |  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres et victimes, pour votre classe et votre grande compagnie. |
 | Contenus | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |

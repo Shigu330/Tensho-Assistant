@@ -209,7 +209,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 | **FFXIV Console Games Wiki** : acquisition des objets, butin des monstres, guides des contenus, carnet d'exploration, sorts de mage bleu, pages du dresseur et du pâturage de l'île | `ffxiv.consolegameswiki.com` | « Wiki (consolegameswiki) » | `Community/WikiItemAcquisition.cs`, `Duties/WikiDutyGuide.cs`, `Maps/WikiVistas.cs`, `Monsters/BeastWikiIndex.cs`, `Monsters/BlueSpellWikiIndex.cs`, `Monsters/WikiMonsterSources.cs`, `Island/IslandAnimals.Dalamud.cs`, `Island/IslandAnimals.cs` |
 | **Teamcraft** : rapports publics : une requête GraphQL POST portant le numéro du lieu de pêche | `gubal.ffxivteamcraft.com` | « Teamcraft (temps de touche) » | `Community/FishBiteTimes.cs` |
 | **LuminaSupplemental** : fichiers de données de la communauté (CSV) hébergés sur GitHub | `raw.githubusercontent.com` | « LuminaSupplemental » | `Community/LuminaSupplemental.cs` |
-| **GatherBuddy** : données des poissons (appâts, remises à l'eau, fenêtres) hébergées sur GitHub | `raw.githubusercontent.com`, `api.github.com` | « GatherBuddy (pêche) » | `Community/GatherBuddyFish.cs` |
+| **GatherBuddy** : données des poissons (appâts, pêches au vif, fenêtres) hébergées sur GitHub | `raw.githubusercontent.com`, `api.github.com` | « GatherBuddy (pêche) » | `Community/GatherBuddyFish.cs` |
 | **Fashion Report (FFXIVGachaSpreadsheet)** : les données de la Revue de mode de la semaine, hébergées sur GitHub | `raw.githubusercontent.com` | « Revue de mode (FFXIVGachaSpreadsheet) » | `Fashion/FashionDataService.cs` |
 | **PaissaDB** : terrains libres, par numéro de monde, sur un clic ou avec sa surveillance facultative | `paissadb.zhu.codes` | « Terrains en vente (PaissaDB) » | `Community/PaissaDb.cs` |
 | **This repository** : galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code | `raw.githubusercontent.com` | — (sur un clic) | `MyTools/ToolGallery.cs`, `Help/CommunityHelp.cs` |
@@ -311,7 +311,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   font aucune requête réseau.
 - **Jeu** : la mémoire du jeu est lue sur le thread framework et copiée. Les actions qui atteignent le jeu partent d'un clic :
   téléportation, application d'un tri d'inventaire, chaînes de macros, écriture des macros d'artisanat dans les macros du jeu, ouverture
-  de la cabine d'essayage, équiper un ensemble d'équipement, porter un titre, envoyer l'appel du train de chasse dans le canal choisi par
+  de la cabine d'essayage, équiper une tenue, porter un titre, envoyer l'appel du train de chasse dans le canal choisi par
   le joueur, et les commandes `/alarm` des alarmes du jeu (quand le joueur ajoute une alarme avec le réglage « alarmes du jeu » actif,
   désactivé par défaut, ou appuie sur « Envoyer » ; les alarmes automatiques n'en créent jamais). Un réglage, désactivé par défaut, agit
   sans clic : porter le titre choisi pour un job au changement de job (DEC-035). Deux hooks : la fonction de macro du jeu (chaînes de

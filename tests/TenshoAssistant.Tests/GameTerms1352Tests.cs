@@ -47,7 +47,7 @@ internal static class GameTerms1352Tests
             None(fr,@"Fashion Report","Revue de mode (Addon#8819.0)");
             None(fr,@"(?i)carnets? de chasse","bestiaire (Addon#1880.0)");
             None(fr,@"(?i)monstres? de chasse","cible d'élite (Achievement#979.2)");
-            None(fr,@"(?i)recettes? expertes?","recette avancée (Addon#1452.0)");
+            None(fr,@"(?i)recettes? expertes?","recette avancée (Addon#1452.0)","ExtraCollections.MasterBook");
             None(fr,@"(?i)\bmétiers?\b","job (Addon#804.0)");
             None(fr,@"Grande Compagnie","Grande compagnie (Addon#791.0)");
             None(fr,@"Enclave de Doma","Quartier enclavé de Doma (PlaceName#2507.0)");

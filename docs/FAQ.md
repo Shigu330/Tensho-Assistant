@@ -14,7 +14,7 @@ The game only gives some data once its window has been opened, or once you are l
 
 ## Why must I open a game window?
 
-Tensho only reads what the game has on your computer. Retainers, the dresser, titles or achievements are only sent by the server when you open them.
+Tensho only reads what the game has on your computer. Retainers, the Glamour Dresser, titles or achievements are only sent by the server when you open them.
 
 ## What do the check mark, the cross and the question mark mean?
 

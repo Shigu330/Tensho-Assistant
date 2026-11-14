@@ -545,7 +545,7 @@ NETWORK = [
     ("LuminaSupplemental", ["raw.githubusercontent.com"], "CommunityLumina", ["Community/LuminaSupplemental.cs"],
      "community data files (CSV) hosted on GitHub", "fichiers de données de la communauté (CSV) hébergés sur GitHub"),
     ("GatherBuddy", ["raw.githubusercontent.com", "api.github.com"], "CommunityGatherBuddy", ["Community/GatherBuddyFish.cs"],
-     "fish data (baits, mooches, windows) hosted on GitHub", "données des poissons (appâts, remises à l'eau, fenêtres) hébergées sur GitHub"),
+     "fish data (baits, mooches, windows) hosted on GitHub", "données des poissons (appâts, pêches au vif, fenêtres) hébergées sur GitHub"),
     ("Fashion Report (FFXIVGachaSpreadsheet)", ["raw.githubusercontent.com"], "CommunityFashion", ["Fashion/FashionDataService.cs"],
      "the week's Fashion Report data hosted on GitHub", "les données de la Revue de mode de la semaine, hébergées sur GitHub"),
     ("PaissaDB", ["paissadb.zhu.codes"], "CommunityPaissa", ["Community/PaissaDb.cs"],
