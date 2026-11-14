@@ -64,6 +64,9 @@ public static class GarlandItemSourceParser
         try{fishing=FishingSourceParser.Parse(item);}catch(InvalidDataException){}
         return new(expectedId,sources.AsReadOnly(),fetchedAt,trades.AsReadOnly(),fishing,PatchOf(item));
     }
+    /// <summary>X-313 (0.1317): a patch number as the game writes it (« 7.4 », « 6.55 », « 1.0 »), the same in every language.</summary>
+    public static string PatchLabel(double patch)=>patch.ToString("0.0#",System.Globalization.CultureInfo.InvariantCulture);
+
     /// <summary>X-224: the patch that added the item, 1.0 to 20.0, rounded to the hundredth; null otherwise.</summary>
     public static double? PatchOf(JsonElement item)
         => item.TryGetProperty("patch",out var value) && value.ValueKind==JsonValueKind.Number && value.TryGetDouble(out var patch)

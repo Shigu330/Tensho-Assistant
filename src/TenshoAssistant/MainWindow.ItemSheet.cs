@@ -36,6 +36,13 @@ internal sealed partial class MainWindow
     // « Items » page has no other top tab.
     private void OpenItemSheet(string tab="Overview"){page=Page.Items;itemSheetFocus=tab;}
 
+    /// <summary>
+    /// X-224 (0.1227), X-313 (0.1317): « Added in patch 7.4 (Garland Tools) », the one way to write it (item sheet header, common item tooltip);
+    /// from what Garland already gave for the sources (Peek: never a request, also from the hover), nothing while Garland is off or unknown.
+    /// </summary>
+    private string? ItemPatchText(uint id)
+        =>itemSources?.Peek(id)?.List?.Patch is { } patch ? localization.Format("ItemSheet.Patch",Community.GarlandItemSourceParser.PatchLabel(patch)):null;
+
     private void DrawItemSheet()
     {
         if(itemId<=0)return;
@@ -59,7 +66,7 @@ internal sealed partial class MainWindow
             var stock=GetRecipeHoldings(id);
             facts.Add(stock.HasObservation ? localization.Format("ItemSheet.Stock",stock.Total.ToString("N0",Numbers)):localization.Get("ItemSheet.StockUnknown"));
             // X-224 (0.1227, K-40): the patch that added the item, when Garland Tools gave it (already read for the sources: no request here).
-            if(itemSources?.Peek(id)?.List?.Patch is { } patch)facts.Add(localization.Format("ItemSheet.Patch",patch.ToString("0.0#",System.Globalization.CultureInfo.InvariantCulture)));
+            if(ItemPatchText(id) is { } patchText)facts.Add(patchText);
             ImGui.TextDisabled(string.Join(" · ",facts));
             if(market.GetCached(market.State.WorldId,id) is { } quote && (quote.Nq.Minimum ?? quote.Hq.Minimum) is { } lowest)
             {
