@@ -1149,7 +1149,9 @@ public sealed partial class Plugin : IDalamudPlugin
             // 0.460 (DEC-027 follow-up, user request): plantings read from the chat.
             Reminders.GardenChatWatcher? gardenWatcher=null;
             registrations.Register(()=>gardenWatcher=new Reminders.GardenChatWatcher(chatGui,framework,data,client,log,()=>configuration.GardenDetect,
-                id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,mainWindow.GardenPlanted,
+                id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id)==true,
+                // X-382 (0.1360): a harvest is also the source of the items it gives (no « Item gain not attributed » for them).
+                (found,seed,place)=>{if(found.Kind==Reminders.GardenChatKind.Harvested)itemWatcher?.SourceSeen(Discoveries.GainSource.Garden,(uint)(found.Bed ?? 0));mainWindow.GardenPlanted(found,seed,place);},
                 target:()=>targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventObj } bedObject ? bedObject.BaseId:0u,
                 gui:gameGui,developer:()=>configuration.DeveloperMode),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();

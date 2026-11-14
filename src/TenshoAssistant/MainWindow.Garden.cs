@@ -292,7 +292,7 @@ internal sealed partial class MainWindow
             if(GardenJournal.CleanText(newBedPlace) is not { } place || GardenJournal.CleanText(newBedSeed) is not { } seed)newBedError=localization.Get("Garden.Invalid");
             else
             {
-                configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow,newBedSeedId)];
+                configuration.GardenBeds=[..beds,GardenJournal.Plant(place,seed,newBedGrow,newBedTend,DateTimeOffset.UtcNow,newBedSeedId,beds)];
                 newBedSeed="";newBedSeedId=0;newBedError=null;SaveReminders();
             }
         }

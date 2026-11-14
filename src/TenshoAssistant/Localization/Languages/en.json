@@ -6305,6 +6305,7 @@
     "ForecastNone": "No crossbreed: no compatible neighbour was there when it was planted.",
     "ForecastUnknownSeed": "Crossbreed not known: this seed is not in the crossbreed pairs.",
     "ForecastUnknownNeighbour": "Crossbreed not known: the seed of bed {0} ({1}) is not in the crossbreed pairs.",
+    "ForecastNotKept": "Crossbreed not known: this bed was noted before Tensho kept its neighbours at planting, and a neighbour is empty or was planted after it.",
     "ForecastSource": "Forecasts: the seed planted crosses with the first compatible neighbour already there (right, down, up, left), rule of the Console Games Wiki; pairs of nick75g/FFXIV-Crossbreed-Helper. Not checked in game; the chance of each result is not known.",
     "RipeNotice": "Garden: {0} is ripe — {1}.",
     "TendNotice": "Garden: tend {0} — {1}.",

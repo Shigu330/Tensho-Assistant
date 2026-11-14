@@ -35,8 +35,11 @@ public sealed class GardenChat
 
     /// <summary>#36 (0.978, docs/evidence/0.978-garden-harvest.md): EObjName 2003757, « emplacement », a garden bed: the target while harvesting.</summary>
     public const uint BedObject=2003757;
-    /// <summary>#36 (0.978): a harvest is the ordinary item gain line (chat type 62, no sender) while the target is a garden bed (the caller checks housing).</summary>
-    public static bool IsHarvest(int chatType,string sender,uint target)=>chatType==62 && sender.Length==0 && target==BedObject;
+    /// <summary>#36 (0.978): a harvest is the ordinary item gain line (chat type 62, no sender) while the target is a garden bed (the caller checks housing).
+    /// X-382 (0.1360, dalamud.log of 14/11 23:48: « Garden menu read … bed 6 », then « Vous obtenez 9 carottes de Krakka » 1.5 s later, the harvest
+    /// not seen): or a bed's menu read here just before (<paramref name="bedMenuJustSeen"/>, within <see cref="GardenMenuMemory.HarvestWindow"/>),
+    /// the target being no longer the bed when the gain line comes.</summary>
+    public static bool IsHarvest(int chatType,string sender,uint target,bool bedMenuJustSeen=false)=>chatType==62 && sender.Length==0 && (target==BedObject || bedMenuJustSeen);
 
     private static Regex? Pattern(IReadOnlyList<string?>? parts)
     {
@@ -121,9 +124,21 @@ public static class GardenHarvests
 public sealed class GardenMenuMemory
 {
     public static readonly TimeSpan Window=TimeSpan.FromSeconds(30);
+    /// <summary>X-382 (0.1360): a gain line within 10 s of a bed's menu, at the same place, is that bed's harvest (1.3 to 1.6 s in the log of 14/11).</summary>
+    public static readonly TimeSpan HarvestWindow=TimeSpan.FromSeconds(10);
     private readonly object gate=new();
     private (int Patch,int Bed,string? Place,DateTimeOffset At)? last;
     public void Seen(int patch,int bed,string? place,DateTimeOffset at){lock(gate)last=(patch,bed,place,at);}
+    /// <summary>X-382 (0.1360): the bed of the menu seen at this place within <paramref name="window"/>, without forgetting it.</summary>
+    public (int Patch,int Bed)? Peek(string? place,DateTimeOffset now,TimeSpan window)
+    {
+        lock(gate)
+        {
+            if(last is not { } seen || now<seen.At || now-seen.At>window || string.IsNullOrEmpty(place) || seen.Place!=place)return null;
+            return (seen.Patch,seen.Bed);
+        }
+    }
+
     public (int Patch,int Bed)? Take(string? place,DateTimeOffset now)
     {
         lock(gate)

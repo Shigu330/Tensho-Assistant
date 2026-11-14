@@ -2,8 +2,9 @@ namespace TenshoAssistant.Discoveries;
 
 /// <summary>0.1096: where a gain of items came from when it is none of the causes of <see cref="ItemGains.Attribute"/>.</summary>
 /// <remarks>0.1099 (dalamud.log of 11/11 15:41-15:54): Craft (a synthesis), Gathering (a gathering point, its collectables included) and Window (an item
-/// moved out of the saddlebag, a retainer, a chest, a shop or a trade: not a gain, never noted).</remarks>
-public enum GainSource { None, Venture, AirshipReturn, SubmarineReturn, Squadron, SquadronTraining, Craft, Gathering, Window }
+/// moved out of the saddlebag, a retainer, a chest, a shop or a trade: not a gain, never noted).
+/// X-382 (0.1360): Garden, a harvest the garden journal read (GardenChatWatcher).</remarks>
+public enum GainSource { None, Venture, AirshipReturn, SubmarineReturn, Squadron, SquadronTraining, Craft, Gathering, Window, Garden }
 
 /// <summary>
 /// 0.1096 (user report, 11/11 15 h: « Item gain not attributed » for retainer ventures, an airship and a submarine back, and squadron titles):

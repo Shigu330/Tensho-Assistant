@@ -34,14 +34,17 @@ internal sealed partial class MainWindow
             if(ids.Count>0)gardenForecastIndex=index;
         }
         var known=index.Known;
-        return GardenForecasts.For(planted.Select(entry=>(entry.Number,index.Ids.TryGetValue(entry.Bed.Seed,out var id) ? id:(uint?)null,entry.Bed.PlantedAt)).ToArray(),
+        // X-383 (0.1360): each bed with the neighbours kept at its planting (null for a bed noted before 0.1360).
+        uint? Id(uint seedId,string name)=>seedId>0 ? seedId:index.Ids.TryGetValue(name,out var id) ? id:null;
+        return GardenForecasts.For(planted.Select(entry=>new GardenForecastBed(entry.Number,index.Ids.TryGetValue(entry.Bed.Seed,out var id) ? id:(uint?)null,entry.Bed.PlantedAt,
+            entry.Bed.NeighboursAtPlanting?.Select(neighbour=>(neighbour.Bed,Id(neighbour.SeedId,neighbour.Seed),neighbour.Seed)).ToArray())).ToArray(),
             index.Pairs,seed=>known.Contains(seed));
     }
 
     private void DrawGardenForecast(GardenForecast forecast,IReadOnlyList<(int Number,GardenBed Bed)> planted)
     {
         string Name(uint id)=>gardenForecastIndex?.Names.TryGetValue(id,out var name)==true && name.Length>0 ? name:"#"+id;
-        string BedSeed(int? number)=>planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
+        string BedSeed(int? number)=>forecast.PartnerName ?? planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
         switch(forecast.Kind)
         {
             case GardenForecastKind.Crosses:
@@ -54,6 +57,7 @@ internal sealed partial class MainWindow
             case GardenForecastKind.NoPartner:ImGui.TextDisabled(localization.Get("Garden.ForecastNone"));break;
             case GardenForecastKind.UnknownSeed:ImGui.TextDisabled(localization.Get("Garden.ForecastUnknownSeed"));break;
             case GardenForecastKind.UnknownNeighbour:ImGui.TextDisabled(localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));break;
+            case GardenForecastKind.NotKept:ImGui.TextDisabled(localization.Get("Garden.ForecastNotKept"));break;
         }
     }
 

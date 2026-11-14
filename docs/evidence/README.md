@@ -50,6 +50,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.135.0-marker-evidence.log](0.135.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1351-chat-map-link-menu.md](0.1351-chat-map-link-menu.md) | `src/TenshoAssistant/Maps/ChatLinkHoverWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkMenu1351Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
+| [0.1360-garden-harvest-menu.md](0.1360-garden-harvest-menu.md) | — | `CHANGELOG.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -135,7 +136,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.451-raphael-study.md](0.451-raphael-study.md) | `src/TenshoAssistant/Craft/RaphaelActions.cs`, `src/TenshoAssistant/Craft/RaphaelCraftSolver.Dalamud.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.512-d17-build.md`, `docs/project/DECISIONS.md` |
 | [0.451-xivapi-v2.md](0.451-xivapi-v2.md) | — | `docs/project/PUBLISHING.md` |
 | [0.452-craft-buff-rows.md](0.452-craft-buff-rows.md) | `tests/TenshoAssistant.Tests/ResilienceTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
-| [0.456-garden-grid.md](0.456-garden-grid.md) | `src/TenshoAssistant/Credits/CreditCatalog.cs`, `src/TenshoAssistant/MainWindow.GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenForecasts.cs`, `tests/TenshoAssistant.Tests/GardenCrossesTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
+| [0.456-garden-grid.md](0.456-garden-grid.md) | `src/TenshoAssistant/Credits/CreditCatalog.cs`, `src/TenshoAssistant/MainWindow.GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenCrosses.cs`, `src/TenshoAssistant/Reminders/GardenForecasts.cs`, `src/TenshoAssistant/Reminders/GardenJournal.cs`, `tests/TenshoAssistant.Tests/Garden1360Tests.cs`, `tests/TenshoAssistant.Tests/GardenCrossesTests.cs` | `CHANGELOG.md`, `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.1360-garden-harvest-menu.md` |
 | [0.459-garden-detection.md](0.459-garden-detection.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.874-probe-coverage.md` |
 | [0.463-squadron-probe.log](0.463-squadron-probe.log) | — | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.478-collectable-truncated-name.md](0.478-collectable-truncated-name.md) | `src/TenshoAssistant/Gathering/Collectables.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
@@ -260,7 +261,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.961-ocean-missions.md](0.961-ocean-missions.md) | `src/TenshoAssistant/Gathering/OceanMissions.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [0.97.0-wolf-npc-probe.log](0.97.0-wolf-npc-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md` |
 | [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
-| [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
+| [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/evidence/0.1360-garden-harvest-menu.md` |
 | [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` | `docs/evidence/0.980-beast-teams.md` |
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md`, `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.980-beast-teams.md](0.980-beast-teams.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `src/TenshoAssistant/MainWindow.Beastmaster.cs` | — |
@@ -285,5 +286,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 273 files · fichiers ; 228 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 274 files · fichiers ; 228 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

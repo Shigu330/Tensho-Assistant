@@ -417,6 +417,13 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         catch(Exception){}
     }
 
+    /// <summary>X-382 (0.1360): a source seen elsewhere (a garden harvest), for the gains that come with it; any thread.</summary>
+    public void SourceSeen(GainSource source,uint detail)
+    {
+        if(source==GainSource.None)return;
+        lock(logGate)if(logSources.Count<32)logSources.Add((source,detail,null,Environment.TickCount64));
+    }
+
     private void SettleGains(long now)
     {
         (GainSource Source,uint Detail,string? Note,long At)[] seen;uint[] unlocks;

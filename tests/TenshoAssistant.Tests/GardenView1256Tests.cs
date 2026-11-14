@@ -86,7 +86,7 @@ internal static class GardenView1256Tests
             Check(old.Count==1 && old[0].SeedId==0 && old[0].Seed=="Old Seed" && old[0].GrowHours==24,"a bed saved before 0.1256: read whole, no item");
             var page=Read("src/TenshoAssistant/MainWindow.Garden.cs");
             Check(page.Contains("DateTimeOffset.UtcNow,known.Seed.SeedId);"),"the chat detection notes the seed's item");
-            Check(page.Contains("newBedSeedId=seed.SeedId;") && page.Contains("ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;") && page.Contains("DateTimeOffset.UtcNow,newBedSeedId)];"),"the picked seed's item is noted, and dropped when another name is typed");
+            Check(page.Contains("newBedSeedId=seed.SeedId;") && page.Contains("ref newBedSeed,GardenJournal.MaximumText))newBedSeedId=0;") && page.Contains("DateTimeOffset.UtcNow,newBedSeedId,beds)];"),"the picked seed's item is noted, and dropped when another name is typed");
         }),
     ];
 }

@@ -19,6 +19,17 @@ public sealed class GardenBed
     // Reminders already said (kept on disk, so a restart does not repeat them): the harvest, and the tending due time.
     public bool RipeSaid { get; set; }
     public DateTimeOffset? TendSaidFor { get; set; }
+    /// <summary>X-383 (0.1360): the beds next to this one that were planted when it was (the crossbreed is decided then): their number and seed.
+    /// Null: not kept (noted before 0.1360, or a place that is no patch's bed).</summary>
+    public List<GardenNeighbour>? NeighboursAtPlanting { get; set; }
+}
+
+/// <summary>X-383 (0.1360): a neighbour kept at a bed's planting: its bed number, its seed's item (0 = unknown, found by the name) and the name noted.</summary>
+public sealed class GardenNeighbour
+{
+    public int Bed { get; set; }
+    public uint SeedId { get; set; }
+    public string Seed { get; set; } = "";
 }
 
 public enum GardenState { Growing, ToTend, Ripe }
@@ -69,8 +80,25 @@ public static class GardenJournal
     public static GardenState State(GardenBed bed,DateTimeOffset now)
         =>now>=RipeAt(bed) ? GardenState.Ripe:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
 
-    public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0)
-        =>new(){Place=place,Seed=seed,SeedId=seedId,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours)};
+    /// <param name="among">X-383 (0.1360): the journal at that moment: the neighbours planted then are kept in the new bed (null: none kept).</param>
+    public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0,IEnumerable<GardenBed>? among=null)
+        =>new(){Place=place,Seed=seed,SeedId=seedId,PlantedAt=now,GrowHours=ClampGrow(growHours),TendHours=ClampTend(tendHours),NeighboursAtPlanting=among is null ? null:NeighboursOf(among,place,now)};
+
+    /// <summary>
+    /// X-383 (0.1360, user report of 14/11): the beds next to a patch's bed that are planted at <paramref name="now"/> (right, down, up, left;
+    /// the latest planted when a slot is noted twice), or null when the place is no patch's bed. The crossbreed is decided at planting
+    /// (docs/evidence/0.456-garden-grid.md): this is what its forecast reads later, whatever happens to the neighbours since.
+    /// </summary>
+    public static List<GardenNeighbour>? NeighboursOf(IEnumerable<GardenBed> beds,string place,DateTimeOffset now)
+    {
+        if(Slot(new GardenBed{Place=place}) is not { } slot)return null;
+        var neighbours=new List<GardenNeighbour>();
+        var around=beds.Select(bed=>(Bed:bed,Slot:Slot(bed))).Where(pair=>pair.Slot is { } seen && seen.Zone==slot.Zone && seen.Patch==slot.Patch && pair.Bed.PlantedAt<=now).ToArray();
+        foreach(var number in GardenForecasts.Neighbours(slot.Bed))
+            if(around.Where(pair=>pair.Slot!.Bed==number).OrderByDescending(pair=>pair.Bed.PlantedAt).Select(pair=>pair.Bed).FirstOrDefault() is { } bed)
+                neighbours.Add(new(){Bed=number,SeedId=bed.SeedId,Seed=bed.Seed});
+        return neighbours;
+    }
 
     /// <summary>
     /// 0.460: a planting seen in the chat: replaces the bed noted at the same place (it was dug up or harvested), or null when the journal is full.
@@ -81,7 +109,7 @@ public static class GardenJournal
         var slot=Slot(new GardenBed{Place=place});
         var kept=(beds ?? []).Where(bed=>bed.Place!=place && (slot is null || Slot(bed)!=slot)).ToList();
         if(kept.Count>=Capacity)return null;
-        kept.Add(Plant(place,seed,growHours,tendHours,now,seedId));
+        kept.Add(Plant(place,seed,growHours,tendHours,now,seedId,kept));
         return kept;
     }
 

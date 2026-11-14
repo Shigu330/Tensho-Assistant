@@ -164,17 +164,22 @@ internal sealed class GardenChatWatcher : IDisposable
             // #36 (0.1110): the capture of every housing chat line is gone, tending and harvesting being recognized (0.616, 0.978).
             // 0.997 (review): one harvest can print several gain lines (crop, seeds): the first one counts, the others within 5 s are the same harvest.
             // X-185 (0.1211, N23): the bed read in the menu is taken first: another bed than the last one harvested is a new harvest, even within 5 s.
-            if(target is not null && InHousing() && GardenChat.IsHarvest((int)message.LogKind,sender,target()))
+            // X-382 (0.1360): or the bed's menu read here just before, the target being no longer the bed when the gain line comes.
+            if(target is not null && (int)message.LogKind==62 && sender.Length==0 && InHousing())
             {
                 var at=DateTimeOffset.UtcNow;
-                var place=Place();
-                var slot=menuMemory.Take(place,at);
-                if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))
+                var place=Place();var aimed=target();
+                if(GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null))
                 {
-                    lastHarvest=at;lastHarvestSlot=slot;
-                    planted(new(GardenChatKind.Harvested,slot?.Patch,slot?.Bed),null,place);
+                    var slot=menuMemory.Take(place,at);
+                    if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))
+                    {
+                        lastHarvest=at;lastHarvestSlot=slot;
+                        if(developer?.Invoke()==true)log.Information("Garden harvest read: patch {0}, bed {1}, target {2}.",slot?.Patch ?? 0,slot?.Bed ?? 0,aimed);
+                        planted(new(GardenChatKind.Harvested,slot?.Patch,slot?.Bed),null,place);
+                    }
+                    return;
                 }
-                return;
             }
             if(Rules()?.Read(sender,text) is not { } found)return;
             if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted)

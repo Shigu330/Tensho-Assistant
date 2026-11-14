@@ -117,7 +117,7 @@ internal static class GardenJournalTests
             Check(GardenChat.IsHarvest(62,"",2003757),"harvest");
             Check(!GardenChat.IsHarvest(62,"",0) && !GardenChat.IsHarvest(57,"",2003757) && !GardenChat.IsHarvest(62,"Player",2003757),"not a harvest");
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs"));
-            Check(watcher.Contains("InHousing() && GardenChat.IsHarvest((int)message.LogKind,sender,target())"),"housing only");
+            Check(watcher.Contains("(int)message.LogKind==62 && sender.Length==0 && InHousing())") && watcher.Contains("var place=Place();var aimed=target();"),"housing only");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Garden.cs"));
             Check(page.Contains("\"Garden.HarvestedNotice\"") && page.Contains("kind==GardenChatKind.Harvested"),"journal");
         }),

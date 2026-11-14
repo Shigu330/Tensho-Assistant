@@ -10,7 +10,7 @@ internal static class GardenCapture1110Tests
         {
             var watcher=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs"));
             Check(!watcher.Contains("Garden chat capture",StringComparison.Ordinal) && !watcher.Contains("log.Information(\"Garden chat",StringComparison.Ordinal),"no capture line");
-            Check(watcher.Contains("GardenChat.IsHarvest((int)message.LogKind,sender,target())",StringComparison.Ordinal),"the harvest is still recognized");
+            Check(watcher.Contains("GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null)",StringComparison.Ordinal),"the harvest is still recognized");
         }),
     ];
 }

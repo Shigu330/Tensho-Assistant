@@ -180,7 +180,7 @@ internal sealed partial class MainWindow
     {
         var side=ImGui.GetFrameHeight();
         string Name(uint id)=>gardenForecastIndex?.Names.TryGetValue(id,out var name)==true && name.Length>0 ? name:"#"+id;
-        string BedSeed(int? number)=>planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
+        string BedSeed(int? number)=>forecast.PartnerName ?? planted.FirstOrDefault(entry=>entry.Number==number).Bed?.Seed ?? "?";
         switch(forecast.Kind)
         {
             case GardenForecastKind.Crosses:
@@ -216,6 +216,7 @@ internal sealed partial class MainWindow
                 break;
             case GardenForecastKind.NoPartner:DrawGardenCrossNote(FontAwesomeIcon.Ban,localization.Get("Garden.ForecastNone"));break;
             case GardenForecastKind.UnknownSeed:DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get("Garden.ForecastUnknownSeed"));break;
+            case GardenForecastKind.NotKept:DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Get("Garden.ForecastNotKept"));break;
             case GardenForecastKind.UnknownNeighbour:
                 DrawGardenCrossNote(FontAwesomeIcon.Question,localization.Format("Garden.ForecastUnknownNeighbour",forecast.Partner ?? 0,BedSeed(forecast.Partner)));
                 break;
