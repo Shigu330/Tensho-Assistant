@@ -697,19 +697,9 @@ public sealed partial class Plugin : IDalamudPlugin
             },()=>regenTick?.Dispose());
             mainWindow.RegenTick=()=>regenTick?.State;
             // g, R-01 (0.392): ocean fishing timetable from the game's loop (IKDRouteTable) and voyages (IKDRoute), built on first use.
-            var ocean=new Lazy<Gathering.OceanSchedule?>(()=>
-            {
-                try
-                {
-                    var routes=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRoute>().Where(row=>!row.Name.IsEmpty).ToDictionary(row=>row.RowId,row=>new Gathering.OceanRoute(row.RowId,row.Name.ExtractText(),
-                        row.Spot.Zip(row.Time).Where(pair=>pair.First.RowId!=0)
-                            .Select(pair=>new Gathering.OceanStop(pair.First.ValueNullable?.PlaceName.ValueNullable?.Name.ExtractText() ?? "",Gathering.OceanSchedule.TimeOf(pair.Second.RowId))).ToArray()));
-                    var loop=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRouteTable>().OrderBy(row=>row.RowId).Select(row=>(row.Route.RowId,row.Unknown0)).ToArray();
-                    return loop.Length>0 ? new Gathering.OceanSchedule(loop,routes):null;
-                }
-                catch(Exception error){log.Warning(error,"Ocean fishing timetable unavailable.");return null;}
-            });
-            mainWindow.OceanTimetable=()=>ocean.Value;
+            // X-285 (0.1300): the page loaders that read only the game's sheets, given by one method to the game and the desktop application.
+            mainWindow.UseSheetLoaders(data,log);
+            var ocean=new Lazy<Gathering.OceanSchedule?>(()=>mainWindow.OceanTimetable?.Invoke());
             // g, R-07 (0.418): the voyage in progress and the game's ocean fishing data (routes, places, fish of each spot, missions).
             var oceanVoyageData=new Lazy<Gathering.OceanVoyageData?>(()=>
             {
@@ -1023,22 +1013,12 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.WorkshopProjectsLoad=()=>FreeCompany.WorkshopProjectsLoader.Read(data);
             mainWindow.CompanyActionNames=LoadSheet("Status",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().Where(row=>row.IsFcBuff).ToDictionary(row=>row.RowId,row=>row.Name.ExtractText()),[]);
             // N-10 (0.671): the island's workshops, read on the player's click.
-            mainWindow.IslandCatalogLoad=()=>
-            {
-                try{return Island.IslandCatalogLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Island sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadIsland=catalog=>framework.RunOnFrameworkThread(()=>
             {
                 try{return Island.IslandReader.Read(catalog);}
                 catch(Exception error){log.Warning(error,"Island unreadable (game update?).");throw;}
             });
             // W-01 (0.675): the custom delivery clients, read when the page opens and on the player's click.
-            mainWindow.DeliveryClientsLoad=()=>
-            {
-                try{return Deliveries.DeliveryClientLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Custom delivery sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadDeliveries=clients=>framework.RunOnFrameworkThread(()=>
             {
                 try
@@ -1048,29 +1028,10 @@ public sealed partial class Plugin : IDalamudPlugin
                 }
                 catch(Exception error){log.Warning(error,"Custom deliveries unreadable (game update?).");throw;}
             });
-            // W-14b (0.721): every FATE's place, from the game's zone layouts, off the frame.
-            mainWindow.FatesLoad=()=>
-            {
-                try{return Fields.FieldCatalogLoader.ReadOpenZones(data,log);}
-                catch(Exception error){log.Warning(error,"FATE places unreadable (game update?).");return null;}
-            };
             mainWindow.CurrentTerritory=()=>client.TerritoryType;
             // 0.757 (X-12): the aetherytes of each territory, from the game's sheet, for the teleport price of a zone.
             mainWindow.TerritoryAetherytes=LoadSheet("Aetheryte",()=>data.GetExcelSheet<Lumina.Excel.Sheets.Aetheryte>().Where(row=>row.IsAetheryte && row.Territory.RowId!=0)
                 .GroupBy(row=>row.Territory.RowId).ToDictionary(group=>group.Key,group=>group.Select(row=>row.RowId).ToArray()),new Dictionary<uint,uint[]>());
-            // W-16 (0.719): the lexicon, from the sheets, off the frame.
-            mainWindow.LexiconLoad=()=>
-            {
-                try{return Lexicon.LexiconLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Lexicon sheets unreadable (game update?).");return null;}
-            };
-            // W-15 (0.718): the deep dungeons, from the sheets, off the frame.
-            mainWindow.DeepDungeonLoad=()=>
-            {
-                try{return DeepDungeons.DeepDungeonLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Deep dungeon sheets unreadable (game update?).");return null;}
-            };
-            // W-14 (0.717): Eureka and Bozja, from the game's files, off the frame.
             // X-92 (0.972): what is new in the game's sheets since the last load (log and self-check).
             var gameDataCheck=Diagnostics.GameDataWatch.Start(data,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GameDataSnapshot.json"),log,gameDataCancel.Token);
             mainWindow.GameDataCheck=()=>gameDataCheck;
@@ -1079,51 +1040,26 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>occultReader=new Fields.OccultCrescentReader(framework,log),()=>occultReader?.Dispose());
             mainWindow.OccultStateRead=()=>occultReader?.State;
             mainWindow.OccultOnIsland=()=>occultReader?.OnIsland==true;
-            mainWindow.FieldCatalogLoad=()=>
-            {
-                try{return Fields.FieldCatalogLoader.Read(data,log);}
-                catch(Exception error){log.Warning(error,"Eureka and Bozja sheets unreadable (game update?).");return null;}
-            };
             // W-11 (0.714): the Grand Companies, read when the page opens and on the player's click.
             mainWindow.GcFeminine=()=>framework.RunOnFrameworkThread(GrandCompanies.GcReader.Feminine);
-            mainWindow.GcCatalogLoad=feminine=>
-            {
-                try{return GrandCompanies.GcCatalogLoader.Read(data,feminine);}
-                catch(Exception error){log.Warning(error,"Grand Company sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadGc=rows=>framework.RunOnFrameworkThread(()=>
             {
                 try{return GrandCompanies.GcReader.Read(rows);}
                 catch(Exception error){log.Warning(error,"Grand Companies unreadable (game update?).");throw;}
             });
             // W-10 (0.713): the allied societies, read when the page opens and on the player's click.
-            mainWindow.AlliedCatalogLoad=()=>
-            {
-                try{return Societies.AlliedCatalogLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Allied society sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadAllied=catalog=>framework.RunOnFrameworkThread(()=>
             {
                 try{return Societies.AlliedReader.Read(catalog);}
                 catch(Exception error){log.Warning(error,"Allied societies unreadable (game update?).");throw;}
             });
             // W-03 (0.708): the Zodiac weapons, read when the page opens and on the player's click.
-            mainWindow.RelicCatalogLoad=()=>
-            {
-                try{return Relics.RelicCatalogLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Relic sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadRelics=()=>framework.RunOnFrameworkThread(()=>
             {
                 try{return Relics.RelicReader.Read();}
                 catch(Exception error){log.Warning(error,"Relic book unreadable (game update?).");throw;}
             });
             // W-02 (0.683): the stages of the Masked Carnivale, read when the page opens and on the player's click.
-            mainWindow.CarnivaleStagesLoad=()=>
-            {
-                try{return Carnivale.CarnivaleStageLoader.Read(data);}
-                catch(Exception error){log.Warning(error,"Masked Carnivale sheets unreadable (game update?).");return null;}
-            };
             mainWindow.ReadCarnivale=stages=>framework.RunOnFrameworkThread(()=>
             {
                 try{return Carnivale.CarnivaleReader.Read(stages);}

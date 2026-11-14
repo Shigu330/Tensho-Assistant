@@ -236,7 +236,7 @@ internal sealed partial class MainWindow
         if(relicReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Relics.Unavailable"));return;}
         switch(relicProgress?.Status)
         {
-            case null:return;
+            case null:ReadInGameNote();return;
             case RelicReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Relics.NotLoaded"));return;
             case RelicReadStatus.Unavailable:ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Relics.Unavailable"));return;
         }

@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("CustomDeliveries.ReadTip");
         if(deliveryReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CustomDeliveries.Unavailable"));return;}
-        if(deliverySnapshot is not { } current)return;
+        if(deliverySnapshot is not { } current){ReadInGameNote();return;}
         switch(current.Status)
         {
             case DeliveryReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("CustomDeliveries.NotLoaded"));return;

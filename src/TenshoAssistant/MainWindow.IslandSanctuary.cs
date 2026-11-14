@@ -50,7 +50,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("Island.ReadTip");
         if(islandReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Island.Unavailable"));return;}
-        if(island is not { } current)return;
+        if(island is not { } current){ReadInGameNote();return;}
         switch(current.Status)
         {
             case IslandReadStatus.NotOnIsland:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Island.NotOnIsland"));return;

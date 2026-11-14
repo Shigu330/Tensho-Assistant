@@ -16,7 +16,7 @@ internal sealed partial class MainWindow
         Heading(localization.Get("SpecialDeliveries.Title"),localization.Get("SpecialDeliveries.Subtitle"));
         var state=quests.State;
         if(state.Entries.Count==0 && Environment.TickCount64-specialDeliveryAsked>60000){specialDeliveryAsked=Environment.TickCount64;quests.RequestRefresh();}
-        if(state.Loading || state.Entries.Count==0){ImGui.TextDisabled(localization.Get("SpecialDeliveries.Loading"));return;}
+        if(state.Loading || state.Entries.Count==0){ImGui.TextDisabled(LoadingText("SpecialDeliveries.Loading"));return;}
         ImGui.Checkbox(localization.Get("SpecialDeliveries.OnlyLeft")+"###SpecialDeliveryLeft",ref specialDeliveryOnlyLeft);
         Tip("SpecialDeliveries.OnlyLeftTip");
         var tabs=new List<(string Key,string Label,Action Draw)>();

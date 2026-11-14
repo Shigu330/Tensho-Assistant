@@ -72,7 +72,7 @@ internal sealed partial class MainWindow
         }
         if (ImGui.Button(localization.Get("QuestsBrowser.Refresh"))) quests.RequestRefresh();
         ImGui.SameLine();
-        ImGui.TextDisabled(state.Loading ? localization.Get("QuestsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("QuestsBrowser.Offline"));
+        ImGui.TextDisabled(state.Loading ? LoadingText("QuestsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("QuestsBrowser.Offline"));
         if (state.Error is { } error) DrawDataError(error,"QuestsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Quests,state.ObservedAt,state.FromCache);
         DrawFollowedQuests();

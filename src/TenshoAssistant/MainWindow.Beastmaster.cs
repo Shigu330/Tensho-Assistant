@@ -25,7 +25,7 @@ internal sealed partial class MainWindow
         Heading(localization.Get("BeastUi.Title"), localization.Get("BeastUi.Help"));
         var state = Beasts?.State;
         if (state?.Error is not null) { ImGui.TextWrapped(localization.Get("BeastUi.Error")); return; }
-        if (state?.Catalog is not { } catalog) { ImGui.TextDisabled(localization.Get("BeastUi.Loading")); return; }
+        if (state?.Catalog is not { } catalog) { ImGui.TextDisabled(LoadingText("BeastUi.Loading")); return; }
         DetailTabs("BeastTabs",
         [
             ("Beasts", localization.Get("BeastUi.Beasts"), () => DrawBeastList(state, catalog)),
@@ -234,7 +234,7 @@ internal sealed partial class MainWindow
     internal void DrawBeastBoardPanel()
     {
         var state = Beasts?.State;
-        if (state?.Catalog is not { } catalog || catalog.Boards.Count == 0) { EmptyState("BeastUi.Loading"); return; }
+        if (state?.Catalog is not { } catalog || catalog.Boards.Count == 0) { EmptyState(inDesktopApp ? "Desktop.ReadInGame":"BeastUi.Loading"); return; }
         Board board;
         if (TenshoAssistant.Competitive.CompetitiveGate.Cut)
         {

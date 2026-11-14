@@ -8039,6 +8039,7 @@
     "LinkLiveBags": "sacs : {0} places libres sur {1}",
     "SettingsReloaded": "Réglages du plugin relus à {0} (enregistrés dans le jeu).",
     "SettingsReloadFailed": "Réglages du plugin enregistrés dans le jeu, pas encore relus : {0}",
+    "ReadInGame": "Lu dans le jeu : ouvrez cette page dans Tensho en jeu pour la remplir.",
     "InGameOnly": "« {0} » reste dans le jeu : ouvrez-la dans Tensho en jeu.",
     "Loading": "Lecture des données du jeu : {0} catalogues prêts sur {1}.",
     "LiveHome": "alarmes, état du personnage, minuteurs, escouade",

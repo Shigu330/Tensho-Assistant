@@ -360,7 +360,7 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Format(DiscoveriesWriteBlocked ? "DiscoveriesUi.BaseBlocked":"DiscoveriesUi.BaseSetAside",Path.GetFileName(setAside)));
             ImGui.PopStyleColor();
         }
-        if(DiscoveryStore is not { } store || DiscoveryFolder is not { } folder || !DiscoveriesLoaded){ImGui.TextDisabled(localization.Get("DiscoveriesUi.Loading"));return;}
+        if(DiscoveryStore is not { } store || DiscoveryFolder is not { } folder || !DiscoveriesLoaded){ImGui.TextDisabled(LoadingText("DiscoveriesUi.Loading"));return;}
         BoolSetting("DiscoveriesUi.Enabled","DiscoveriesUi.EnabledTip",()=>configuration.Discovery.Enabled,value=>configuration.Discovery.Enabled=value,c=>c.Discovery.Enabled);
         if(configuration.Discovery.Enabled)
         {

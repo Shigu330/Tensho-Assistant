@@ -74,10 +74,10 @@ internal sealed class Host
         Surface.DesktopMode();
         // X-178 (0.1258): the garden's seed list and crossbreeds, built by the window from the sheets as in the game.
         mainType.GetMethod("ConfigureGarden",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)?.Invoke(Window,[DataStub]);
-        // Data the plugin fills after building the window (Plugin.cs): the lexicon, read off the frame from the sheets.
-        if(Plugin.GetType("TenshoAssistant.Lexicon.LexiconLoader")?.GetMethod("Read",BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic) is { } read
-           && mainType.GetProperty("LexiconLoad",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic) is { } lexicon)
-            lexicon.SetValue(Window,Delegate.CreateDelegate(lexicon.PropertyType,DataStub,read));
+        // X-285 (0.1300): the page loaders that read only the sheets, given by the plugin's own method, as Plugin.cs does (the lexicon,
+        // the allied societies, the Grand Companies, the island, the deliveries, the carnivale, the relics, ocean fishing, FATEs, field
+        // content, deep dungeons). Before, only the lexicon was given here: the others drew an error or a load that never ended.
+        mainType.GetMethod("UseSheetLoaders",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)?.Invoke(Window,[DataStub,LogProxy.Create()]);
     }
 
     /// <summary>The plugin's saved settings read as Dalamud reads them (Newtonsoft, type names), or null (no file, or unreadable).</summary>
@@ -212,6 +212,10 @@ internal sealed class Host
 
     /// <summary>The pages that stay in the game leave the navigation (their entry's Visible answers false), before the first frame
     /// (X-151, 0.1238: by the window itself, DesktopSurface.HidePages, no reflection on its record any more).</summary>
+    /// <summary>X-285: the keys of the texts the page asks, given to <paramref name="listen"/> (null: stop listening).</summary>
+    public void ListenKeys(Action<string>? listen)=>localization.GetType().GetProperty("KeyRead",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic)!
+        .SetValue(localization,listen);
+
     public void HideInGamePages()=>Surface.HidePages(page=>DesktopPages.Kind(page)==DesktopPageKind.InGame);
 
     /// <summary>One catalogue loader of the plugin, ticked as the game's framework would until it unsubscribes.</summary>

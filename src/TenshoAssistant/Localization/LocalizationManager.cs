@@ -54,8 +54,15 @@ internal sealed class LocalizationManager
         Revision++;
     }
 
+    /// <summary>X-285 (0.1300): the desktop application's reference pictures listen to the keys a page asks while it is drawn, to find a
+    /// page that shows an error state (Desktop/ReferenceErrors.cs). Null in the game: one test of a field per text.</summary>
+    internal Action<string>? KeyRead { get; set; }
+
     public string Get(string key)
-        => ShowKeys ? key : selected.GetValueOrDefault(key) ?? english.GetValueOrDefault(key) ?? $"[{key}]";
+    {
+        KeyRead?.Invoke(key);
+        return ShowKeys ? key : selected.GetValueOrDefault(key) ?? english.GetValueOrDefault(key) ?? $"[{key}]";
+    }
 
     /// <summary>X-295 (0.1296): the texts of this key in every loaded language and English, to recognise a stored text whatever the language it was written in.</summary>
     public IReadOnlyList<string> Translations(string key)

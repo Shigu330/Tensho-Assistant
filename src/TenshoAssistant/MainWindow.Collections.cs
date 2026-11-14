@@ -54,7 +54,7 @@ internal sealed partial class MainWindow
         var state = collections.State;
         if (ImGui.Button(localization.Get("CollectionsBrowser.Refresh"))) collections.RequestRefresh();
         ImGui.SameLine();
-        ImGui.TextDisabled(state.Loading ? localization.Get("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
+        ImGui.TextDisabled(state.Loading ? LoadingText("CollectionsBrowser.Loading") : state.ObservedAt is { } date ? localization.Format("CollectionsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("CollectionsBrowser.Offline"));
         if (state.Error is { } error) DrawDataError(error,"CollectionsBrowser.Error");
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,state.ObservedAt,state.FromCache);
         if(!blueMagic)DrawCollectionRecent(state);

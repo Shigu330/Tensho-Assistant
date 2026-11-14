@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
         if (ImGui.SmallButton(localization.Get("TriadUi.Refresh"))) collections.RequestRefresh();
         DrawCacheStamp(TenshoAssistant.Caching.CacheArea.Collections,collections.State.ObservedAt,collections.State.FromCache);
         ImGui.SameLine();
-        ImGui.TextDisabled(state.Loading ? localization.Get("TriadUi.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("TriadUi.Offline"));
+        ImGui.TextDisabled(state.Loading ? LoadingText("TriadUi.Loading") : state.ObservedAt is { } date ? localization.Format("QuestsBrowser.Observed",date.ToLocalTime().ToString("g")) : localization.Get("TriadUi.Offline"));
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Collection");
         foreach (var issue in state.CategoryIssues ?? []) if (issue.Kind == Collections.CollectionKind.TripleTriad) ImGui.TextWrapped(issue.Reason);
         triadDeck ??= (configuration.TripleTriadDeck ?? []).ToList();

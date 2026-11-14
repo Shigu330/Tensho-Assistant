@@ -22,7 +22,9 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("GrandCompany.Title"),localization.Get("GrandCompany.Subtitle"));
         // The grades' names depend on the character: read that first, then the sheets, once.
+        // X-285 (0.1300): without the game (the desktop application) the character is not known: the sheets with the grades' usual names.
         if(!gcTried && GcFeminine is not null){gcTried=true;gcGender=GcFeminine();}
+        else if(!gcTried && GcCatalogLoad is not null){gcTried=true;gcCatalog=GcCatalogLoad(false);}
         if(gcGender is { IsCompleted:true } gender && gcCatalog is null)
         {
             var feminine=gender.IsCompletedSuccessfully && gender.Result==true;
@@ -43,7 +45,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("GrandCompany.ReadTip");
         if(gcFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("GrandCompany.Unavailable"));return;}
-        if(gcSnapshot is not { } current)return;
+        if(gcSnapshot is not { } current){ReadInGameNote();return;}
         switch(current.Status)
         {
             case GcReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("GrandCompany.NotLoaded"));return;

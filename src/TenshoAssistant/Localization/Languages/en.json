@@ -8039,6 +8039,7 @@
     "LinkLiveBags": "bags: {0} free of {1}",
     "SettingsReloaded": "Plugin settings read again at {0} (saved in the game).",
     "SettingsReloadFailed": "Plugin settings saved in the game, not read again yet: {0}",
+    "ReadInGame": "Read in the game: open this page in Tensho in the game to fill it.",
     "InGameOnly": "« {0} » stays in the game: open it in Tensho in the game.",
     "Loading": "Reading the game data: {0} of {1} catalogues ready.",
     "LiveHome": "alarms, character status, timers, squadron",

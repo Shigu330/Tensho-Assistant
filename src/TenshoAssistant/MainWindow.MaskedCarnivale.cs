@@ -37,7 +37,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("MaskedCarnivale.ReadTip");
         if(carnivaleReadFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("MaskedCarnivale.Unavailable"));return;}
-        if(carnivaleSnapshot is not { } current)return;
+        if(carnivaleSnapshot is not { } current){ReadInGameNote();return;}
         switch(current.Status)
         {
             case CarnivaleReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MaskedCarnivale.NotLoaded"));return;

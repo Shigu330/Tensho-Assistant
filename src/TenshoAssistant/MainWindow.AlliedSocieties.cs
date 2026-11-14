@@ -36,7 +36,7 @@ internal sealed partial class MainWindow
         finally{ImGui.EndDisabled();}
         Tip("Allied.ReadTip");
         if(alliedFailed){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Allied.Unavailable"));return;}
-        if(allied is not { } current)return;
+        if(allied is not { } current){ReadInGameNote();return;}
         switch(current.Status)
         {
             case AlliedReadStatus.NotLoaded:ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("Allied.NotLoaded"));return;

@@ -16,6 +16,8 @@ using TenshoAssistant.Desktop;
 internal static class References
 {
     public const int MaxFrames=150;
+    /// <summary>X-285: a page that still shows a waiting text is drawn on (its load ends between frames), this long at most.</summary>
+    public static readonly TimeSpan WaitLimit=TimeSpan.FromSeconds(20);
     private const int MinFrames=10;
     /// <summary>Three captures alike in a row: the page is still (its off-frame work, such as the garden's crossings, done).</summary>
     private const int StillCaptures=3;
@@ -77,33 +79,42 @@ internal static class References
     {
         if(!host.SetSetting("ThemeMode",shot.Theme))Console.WriteLine($"  {shot.Id}: the theme could not be set");
         window.Resize(shot.Width,shot.Height);
+        // X-285: the keys of the texts asked by the last frame drawn, the one pictured: an error key means the picture shows an error
+        // state, a waiting key (outside the loading pictures) a wait that never ends.
+        var asked=new HashSet<string>(StringComparer.Ordinal);
+        host.ListenKeys(key=>asked.Add(key));
         host.SetPage(shot.Page);
         byte[]? last=null;byte[]? picture=null;var frames=0;var still=false;var alike=0;Exception? error=null;
         // The garden's icons wait for their texture before giving way to the name (UI/IconWait): as the headless run, 70 frames.
         var least=shot.Setup.StartsWith("garden-",StringComparison.Ordinal) ? 70 : MinFrames;
         var display=new Vector2(shot.Width,shot.Height);
-        for(;frames<MaxFrames && !still;frames++)
+        var waited=System.Diagnostics.Stopwatch.StartNew();var waiting=false;
+        for(;(frames<MaxFrames || (waiting && waited.Elapsed<WaitLimit)) && !still;frames++)
         {
             window.Pump();
+            asked.Clear();
             error??=Ui.Frame(host,status,display,1/60f);
             window.Render(Dalamud.Bindings.ImGui.ImGui.GetDrawData(),new Vector4(0.08f,0.08f,0.1f,1));
             if(frames>=least-StillCaptures)
             {
                 picture=window.Capture();
                 alike=last is not null && last.AsSpan().SequenceEqual(picture) ? alike+1 : 0;
-                still=frames>=least-1 && alike>=StillCaptures-1;
+                waiting=shot.Setup!="loading" && asked.Any(ReferenceErrors.IsWaiting);
+                still=frames>=least-1 && alike>=StillCaptures-1 && !waiting;
                 last=picture;
             }
             window.Swap();
             // The pages' off-frame loads (icons, the lexicon, searches, the garden's crossings) finish between frames.
             Thread.Sleep(frames<5 ? 0 : 15);
         }
+        host.ListenKeys(null);
+        var shown=ReferenceErrors.Shown(asked,shot.Setup=="loading");
         host.SetSetting("ThemeMode",0);
         var width=(int)window.Size.X;var height=(int)window.Size.Y;
         var file=Path.Combine(folder,shot.Id+".png");
         Png.Write(file,width,height,picture!);
         var row=new Dictionary<string,object?>{["id"]=shot.Id,["page"]=shot.Page,["theme"]=shot.Theme,["width"]=width,["height"]=height,["setup"]=shot.Setup,
-            ["frames"]=frames,["still"]=still,["error"]=error is null ? null : $"{error.GetType().Name}: {Headless.Short(error.Message)}"};
+            ["frames"]=frames,["still"]=still,["error"]=error is null ? null : $"{error.GetType().Name}: {Headless.Short(error.Message)}",["error_keys"]=shown};
         var line=new StringBuilder($"  {shot.Id,-26} {width}x{height} {(still ? "still" : "moving")} after {frames,3} frames");
         if(compare is not null && File.Exists(Path.Combine(compare,shot.Id+".png")))
         {
@@ -116,6 +127,7 @@ internal static class References
         }
         else row["reference"]=false;
         if(error is not null)line.Append("  THROWS "+row["error"]);
+        if(shown.Length>0)line.Append("  SHOWS AN ERROR "+string.Join(", ",shown));
         Console.WriteLine(line.ToString());
         rows.Add(row);
         return error is null ? 0 : 1;
