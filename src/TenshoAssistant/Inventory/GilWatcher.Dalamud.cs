@@ -52,8 +52,8 @@ public sealed unsafe class GilWatcher : IDisposable
     private void OnLogMessage(Dalamud.Game.Chat.ILogMessage message)
     {
         if(disposed)return;
-        foreach(var (id,_) in GilJournal.Messages)
-            if(message.LogMessageId==id){lock(messagesGate)messages[id]=DateTimeOffset.UtcNow;return;}
+        // X-350 (0.1334, R03.2, DEC-038): nothing noted while Tensho is cut (PvP, ranked content, Triple Triad, Mahjong).
+        lock(messagesGate)GilJournal.NoteMessage(messages,message.LogMessageId,DateTimeOffset.UtcNow,TenshoAssistant.Competitive.CompetitiveGate.Cut);
     }
 
     private void OnUpdate(IFramework _)

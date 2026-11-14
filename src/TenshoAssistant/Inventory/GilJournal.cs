@@ -54,6 +54,18 @@ public static class GilJournal
     /// </summary>
     public static readonly IReadOnlyList<(uint LogMessage,GilCategory Category)> Messages=[(3780,GilCategory.ChallengeLog),(557,GilCategory.Defeat)];
 
+    /// <summary>
+    /// X-350 (0.1334, review of the block 0.1318 to 0.1329, R03.2 and DEC-038): a log message of <see cref="Messages"/> noted at
+    /// <paramref name="now"/>, never while Tensho is cut (<paramref name="cut"/>: PvP, ranked content, Triple Triad, Mahjong). Whether it was noted.
+    /// </summary>
+    public static bool NoteMessage(IDictionary<uint,DateTimeOffset> seen,uint messageId,DateTimeOffset now,bool cut)
+    {
+        if(cut)return false;
+        foreach(var (id,_) in Messages)
+            if(messageId==id){seen[id]=now;return true;}
+        return false;
+    }
+
     /// <summary>X-320: the gil follows its message within the second (read once a second here): a message counts 5 seconds, not 15.</summary>
     public static readonly TimeSpan MessageWindow=TimeSpan.FromSeconds(5);
 
