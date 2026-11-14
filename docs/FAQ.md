@@ -46,7 +46,7 @@ Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the fo
 
 ## Does Tensho play for me?
 
-No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and wearing the title you chose for a job when you change job (off by default).
+No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and the title you chose for a job is worn when you change job (off by default).
 
 ## M opens another map: how do I get the game's back?
 
@@ -94,7 +94,7 @@ Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. U
 
 ## The garden is shown as icons: how do I get the text back?
 
-Gardening › Garden › Garden journal › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark tells the tending (drop: later, « ! »: due, check: ripe).
+Gardening › Garden › Garden journal › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
 
 ## How do I install Tensho?
 
@@ -106,7 +106,7 @@ Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zi
 
 ## Does the desktop app update itself?
 
-Yes, with no step from you. At start (and on « Check for update ») it asks this repository's GitHub release of the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
+Yes, with no step from you. At start (and on « Check for update ») it looks up this repository's GitHub release matching the installed plugin's version, else the latest Stable release: HTTPS, no player data. It downloads TenshoAssistant.Desktop.zip, checks its SHA-256 against TenshoAssistant.Desktop.zip.sha256 of the same release, installs it beside (%LOCALAPPDATA%\TenshoAssistant\Desktop\versions) and keeps the version before. The running app is never overwritten nor restarted while you use it: the new version opens at the next start, or with « Restart now ». « Previous version » goes back; « Automatic update: on » turns it off. Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
 
 ## How do I link the desktop app to the game?
 

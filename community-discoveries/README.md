@@ -20,15 +20,15 @@ The maintainer merges the gists with `python tools/discoveries-merge.py sync` (G
 in `players/<issue>.json`, facts that do not hold refused, a player whose refusals pass 5 % flagged and left out, then the `v3/` set rebuilt from the
 player files with `rebuild` (each player counts as one import of a fact); then the result is committed.
 The files reach players with the next release (they are read from `main`).
-Since Tensho 0.1210 (X-183): one issue per GitHub account counts (the newest; an older one of the same author is left out); each field must have the
-plugin's type; a player counts for at most 1 000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
+Since Tensho 0.1210 (X-183): one issue per GitHub account counts (the newest; an older one by the same author is left out); each field must have the
+plugin's type; a player counts for at most 1,000 sightings of a fact in the common histograms (the shape of theirs kept); the exact place kept is the one
 of the earliest day; a player alone far outside the other players' levels on over 5 % of the facts they share is left out and checked by hand.
 **Withdrawing.** Close your « Discoveries » issue (or ask in it): the maintainer removes `players/<issue>.json` with
 `python tools/discoveries-merge.py withdraw <issue>`, and your facts leave the common files at the next release.
 
 **File format (version 2, since Tensho 0.916).** `{"Version":2,"Producer":…,"Written":…,"Facts":[…]}`. A fact is identified by `Kind`, `Subject`, `Detail`,
 `Territory`, `Map`, `CellX`, `CellZ`; it holds the exact first place (`X`, `Z`), the widest values seen (`LevelMin`, `LevelMax`), `Seen`, `Imported`,
-`First`, `Last`. Version 2 adds two optional fields, left out when empty: `Hq`, how many sightings were HQ (an item got), and `Values`, how many times
+`First`, `Last`. Version 2 adds two optional fields, left out when empty: `Hq`, how many sightings were HQ (an item obtained), and `Values`, how many times
 each value was seen (`{"value":count}`, at most 32 values; past 32, a new value is counted under the nearest value kept). In `v3/` both are
 the sums over the players. Version 1 files (without them) are still read.
 
@@ -39,7 +39,7 @@ the sums over the players. Version 1 files (without them) are still read.
 (optional ones left out when empty, nothing else). Since Tensho 0.1170 the plugin ignores a name it does not know when it reads `v3/` (a field
 added later needs no version 4), but refuses a line that holds `Own` or `Key` (a player's own part); the merge tool stays strict on the players' gists
 (any other name refuses the line). Readers check the size and the SHA-256 against the index before use and read the lines as a stream
-within bounds (32 MB compressed, 256 MB decompressed, 64 KB per line, 200 000 facts per kind); a bad line is refused and counted, a file whose refusals
+within bounds (32 MB compressed, 256 MB decompressed, 64 KB per line, 200,000 facts per kind); a bad line is refused and counted, a file whose refusals
 pass 5 % is refused. A player's gist holds the same set, `index.json` and each kind file in base64 (`kind-NN.jsonl.gz.b64`). The tool writes the same
 facts as the same bytes. Since Tensho 0.1349 the common facts are in `v3/` only: the version 2 common file `discoveries.json` is no longer written
 nor read (the plugin takes nothing without `v3/`); the merge tool still reads a player's older gist holding the single `tensho-discoveries.b64`.
@@ -51,7 +51,7 @@ nor read (the plugin takes nothing without `v3/`); the merge tool still reads a 
 `v3/` (depuis Tensho 0.1137) contient les découvertes partagées par les joueurs avec Monde › Découvertes › « Échange avec les
 autres joueurs (GitHub) » : ce que chaque joueur connecté a vu lui-même part dans un gist secret à son nom, avec un ticket « Discoveries: <login> » dans
 ce dépôt qui y renvoie. Tensho les télécharge lors d'un échange (automatique une fois par jour quand il est activé, ou « Échanger maintenant ») et les
-joint à la base comme importés : les fichiers de `v3/` dont l'empreinte a changé depuis le dernier échange (l'ancien fichier unique `discoveries.json` est retiré depuis Tensho 0.1349).
+joint à la base comme importées : les fichiers de `v3/` dont l'empreinte a changé depuis le dernier échange (l'ancien fichier unique `discoveries.json` est retiré depuis Tensho 0.1349).
 Une découverte ne contient que des lignes et des lieux du jeu : jamais le nom ni l'identifiant d'un joueur, ni rien sur les autres joueurs ; ce qui quitte
 le PC porte le jour de chaque observation, jamais son heure, et les fichiers de ce dossier ne gardent eux aussi que le jour (depuis Tensho 0.1012). Un
 poisson pris ou une touche est noté à l'endroit exact du personnage (la précision choisie par DEC-045, utile aux cartes des autres joueurs) : avec son

@@ -108,17 +108,17 @@ What the plugin does that matters for security (read against the code of the `De
   the player's own browser only on a click or a `/tensho wiki|lodestone` command; help videos and tool links ask for a confirmation
   that shows the address first. Tensho itself sends nothing.
 - **Local files**, in the plugin's Dalamud configuration folder: the configuration (through Dalamud); the disk cache (`DataCache-v1/`);
-  the saved storages (since 0.1149 in the player's data file `TenshoData.db`, saved per character in one transaction; the files of before,
+  the saved storages (since 0.1149 in the player's data file `TenshoData.db`, saved per character in one transaction; the earlier files,
   `InventoryBank/` with one file per character, are kept once in `before-sqlite-<date>/`, a former `InventoryBank.json` as `.migrated`); the gil journal
   (90 days and 20,000 entries per character at most; since 0.1139 in the player's data file `TenshoData.db`, one SQLite database at the
-  root of the folder, saved whole per character in one transaction; the files of before, `GilJournal/<id>.json`, are kept once in
-  `GilJournal/before-sqlite-<date>/`); the achievement progress seen per character (since 0.1140 in `TenshoData.db` too; the file of
-  before, `AchievementProgress.json`, is kept once in `before-sqlite-<date>/`); what Tensho last read for each of the player's characters
+  root of the folder, saved whole per character in one transaction; the earlier files, `GilJournal/<id>.json`, are kept once in
+  `GilJournal/before-sqlite-<date>/`); the achievement progress seen per character (since 0.1140 in `TenshoData.db` too; the earlier
+  file, `AchievementProgress.json`, is kept once in `before-sqlite-<date>/`); what Tensho last read for each of the player's characters
   (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
-  imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
+  imported ones, written row by row; the earlier files, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
   `community-v3.json` (the hash of each common file taken; a `community.sha256` left by a version before 0.1349 is no longer used), `github.lock` (one exchange at a time), the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); the voyage history (since 0.1148 in `TenshoData.db`;
-  the file of before, `VoyageHistory.json`, is kept once in `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, notebook exports
+  the earlier file, `VoyageHistory.json`, is kept once in `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, notebook exports
   (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
   only the GitHub exchange above sends anything. Translators can put language JSON files beside the DLL; they are validated when
@@ -238,7 +238,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 - **Échange des découvertes partagées (GitHub)** : Monde › Découvertes, sur « Échanger maintenant » ou avec le réglage « Échange
   automatique » (désactivé par défaut, une fois par jour au plus). Il télécharge les fichiers communs de ce dépôt
   (`raw.githubusercontent.com`) : depuis 0.1137 l'index de `community-discoveries/v3/` et seulement le fichier compressé de chaque genre qui a
-  changé, chacun vérifié contre l'empreinte et la taille que donne l'index et lu dans des bornes (DEC-052) ; l'ancien fichier unique
+  changé, chacun vérifié contre l'empreinte et la taille que donne l'index et lu dans des bornes (DEC-052) ;
   rien d'autre depuis 0.1349 (l'ancien fichier unique `discoveries.json` est retiré). Seulement après que le joueur a appuyé sur « Connecter GitHub » et approuvé sur github.com le code
   affiché (connexion par appareil de GitHub, aucun mot de passe dans le jeu), il envoie aussi ce que le joueur a vu lui-même, jamais ce
   qu'il a importé, dans un gist non répertorié à son nom (GitHub le dit secret ; qui a son lien peut le lire, et ce lien est dans le ticket public ; un fichier compressé par genre et leur index, 0.1137), avec un ticket dans ce dépôt titré de son identifiant GitHub (`api.github.com`) ; un
@@ -247,7 +247,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   donc avec le jour et le ticket elle peut dire où ce compte GitHub a pêché un jour donné ; seuls les champs relevés par le joueur
   lui-même partent, jamais des dates, niveaux ou lieux venus d'un import (0.1134) ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
   jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). Depuis 0.1161 la connexion passe par l'application GitHub
-  du dépôt (X-175) : elle ne demande que Issues (lecture et écriture), sur ce seul dépôt, et les Gists du compte (lecture et écriture),
+  du dépôt (X-175) : elle ne demande que les droits Issues (lecture et écriture), sur ce seul dépôt, et les Gists du compte (lecture et écriture),
   rien d'autre ; Tensho ne s'en sert que pour le seul gist du joueur, toujours créé secret, et le seul ticket. Avant 0.1161 c'était
   l'application OAuth du dépôt, avec les droits `gist` et `public_repo` (GitHub n'en donne pas de plus étroits) : un jeton de cette
   application OAuth est oublié et le joueur se reconnecte ; le jeton de l'application expire après 8 heures et se renouvelle avant un envoi par son jeton de renouvellement

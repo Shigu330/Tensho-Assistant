@@ -53,7 +53,7 @@ Development builds in game:
 2. Load the plugin, then open the window with `/tensho`.
 3. Check preferences, reloading and unloading.
 
-## Project organization
+## Project organisation
 
 ```text
 .
@@ -113,7 +113,7 @@ Development builds in game:
   indented under it and greyed while that one is off.
 - Shared helpers: tooltips through `Tip` / `TipText` (`UI/Components/Tooltip.cs`), « nothing here » and « loading » lines through
   `EmptyState` (`UI/Components/StatusLines.cs`), saved files through `AtomicFile.Write` (temporary file, then swapped in).
-- Style: follow the neighboring code (naming, comment density, compact C# style used by the project).
+- Style: follow the neighbouring code (naming, comment density, compact C# style used by the project).
 - Licences: the project is under **GPL v3**. Data or code under a compatible licence (MIT, Apache-2.0, BSD, CC0, CC-BY, GPL-3.0, and
   EUPL-1.2 through its compatibility clause, decision DEC-025) may be used with credit in the README « Credits » and on the Credits page
   (`src/TenshoAssistant/Credits/CreditCatalog.cs`) and, for embedded files, the licence notice kept in the file (example:
@@ -325,7 +325,7 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
 
 ## Règles du projet
 
-- **Ne jamais inventer une donnée du jeu.** Tout lien de données (feuille Excel, champ natif, format externe) doit être prouvé : par une
+- **Ne jamais inventer de donnée du jeu.** Tout lien de données (feuille Excel, champ natif, format externe) doit être prouvé : par une
   sonde en lecture seule (`tools/ShopCurrencyProbe`, `tools/ApiProbe`) ou une source citée ; la sortie est gardée dans `docs/evidence/`
   et citée dans le code.
 - Données du jeu d'abord ; données de la communauté seulement quand le jeu ne les a pas (voir `docs/project/DECISIONS.md`, DEC-011).
@@ -485,8 +485,8 @@ gardez ceci vrai :
 
 ## Résumé
 
-Compilez et testez avec `./scripts/Verify.ps1` (SDK .NET 10.0) depuis la racine du dépôt ; il doit rester vert, sans avertissement. Ne
-jamais inventer une donnée du jeu : prouvez les liens de données par une sonde en lecture seule (`tools/`) et gardez la sortie dans
+Compilez et testez avec `./scripts/Verify.ps1` (SDK .NET 10.0) depuis la racine du dépôt ; il doit rester vert, sans avertissement. N'inventez
+jamais de donnée du jeu : prouvez les liens de données par une sonde en lecture seule (`tools/`) et gardez la sortie dans
 `docs/evidence/`. Inconnu n'est pas zéro. La mémoire native est lue sur le thread framework et copiée ; les chaînes natives sont lues
 avec une borne. Les textes de l'interface sont dans `Localization/Languages/*.json` (l'anglais est la référence, le français complet) ;
 chaque réglage a une infobulle. Les références AGPL ou sans licence (Mappy, SortaKinda, xivgear.app) sont lues, jamais copiées ; ce

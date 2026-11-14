@@ -18,7 +18,7 @@ run by the agent (DEC-050); the latest release is on the GitHub releases page. V
 it (DEC-039).
 
 Answer received on the Dalamud Discord, 2026-11-05 (hOst1k, question asked by the author): no size limit if the plugin follows the rules;
-the bigger it is, the longer the first review; better not to aim too complex from the start, Simple Tweaks and « VanillaTweaks » (probably
+the bigger it is, the longer the first review; better not to aim for something too complex from the start, Simple Tweaks and « VanillaTweaks » (probably
 VanillaPlus) having grown over time. Exact role of this person in the team: not checked. At that date: 57,419 lines of C# in the plugin,
 123,519 lines tracked by git. The AI policy also applied then: an « Auto » submission too big for the author to account for may be closed
 (no longer followed since DEC-050).
