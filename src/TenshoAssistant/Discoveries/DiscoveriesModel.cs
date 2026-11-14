@@ -493,6 +493,9 @@ public sealed class DiscoveryStore
                 var source=ready[at];
                 if(facts.TryGetValue(source.Key,out var known))
                 {
+                    // X-330 (0.1325, review I1): the fact as it was before the import or the common file's join, so the save adds this change to the
+                    // row as saved now (AddMine: imports take the largest, sightings untouched) instead of replacing what the other client saved.
+                    Mine(known.Key);
                     // X-167 (0.1134, audit R03): your fact's own fields kept apart before the import widens them.
                     if(known.Seen>0)known.Own??=DiscoveryFact.OwnOf(known);
                     if(common)known.Imported=Math.Max(known.Imported,source.Imported);else known.Imported++;
@@ -509,7 +512,8 @@ public sealed class DiscoveryStore
                 if(shared.GetValueOrDefault(source.Kind)>=MaxFacts){LeftOut++;continue;}
                 var copy=source.Copy();copy.Seen=0;copy.Imported=common ? Math.Max(1,source.Imported):1;copy.Own=null;shared[source.Kind]=shared.GetValueOrDefault(source.Kind)+1;
                 (copy.ImportedHq,copy.ImportedValues)=ImportedPart(source);copy.Hq=0;copy.Values=null;
-                Put(copy);changedKeys.Add(copy.Key);added++;
+                // X-330: new here (base null): a row the other client saved meanwhile keeps its sightings, the import's parts joined to it.
+                Mine(copy.Key);Put(copy);changedKeys.Add(copy.Key);added++;
             }
             if(added+joined>before){Dirty=true;revision++;}
         }
@@ -613,9 +617,12 @@ public sealed class DiscoveryStore
             // stop before the shared files leaves the old copy there. Yours already holds it (its imports included): the old copy is left out, never added
             // to it, and the next save writes the shared file without it. 0.1136: only when yours holds an import already (it came from that copy); a fact you
             // saw while its shared kind was not read yet (shared kinds are read when asked) has none, and is joined to the shared copy as before.
-            if(sharedFile && fact.Seen==0 && facts.TryGetValue(fact.Key,out var mine) && mine.Seen>0 && mine.Imported>0){changedKeys.Add(mine.Key);Dirty=true;continue;}
-            // 0.855: facts meeting in one cell are joined, and the base is written again, smaller.
-            if(facts.TryGetValue(fact.Key,out var known)){Join(known,fact);changedKeys.Add(known.Key);continue;}
+            // X-330 (0.1325, review I1): rewritten from a base (the fact as it is), so the row keeps what the other client saved meanwhile.
+            if(sharedFile && fact.Seen==0 && facts.TryGetValue(fact.Key,out var mine) && mine.Seen>0 && mine.Imported>0){Mine(mine.Key);changedKeys.Add(mine.Key);Dirty=true;continue;}
+            // 0.855: facts meeting in one cell are joined, and the base is written again, smaller. X-330: a shared kind's copy joined to a fact
+            // already here (read later, LoadShared) is a change of this client: its base is the fact before the join. The base read at start
+            // (Load) stays a conversion, written whole: both clients make the same join, which added twice would count the sightings twice.
+            if(facts.TryGetValue(fact.Key,out var known)){if(sharedFile)Mine(known.Key);Join(known,fact);changedKeys.Add(known.Key);continue;}
             // X-93 (0.939): yours always; a shared fact while the shared part has room, else counted as left out.
             if(fact.Seen>0)Put(fact);
             else if(shared.GetValueOrDefault(fact.Kind)<MaxFacts){Put(fact);shared[fact.Kind]=shared.GetValueOrDefault(fact.Kind)+1;}
