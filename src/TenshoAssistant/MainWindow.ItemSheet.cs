@@ -38,10 +38,15 @@ internal sealed partial class MainWindow
 
     /// <summary>
     /// X-224 (0.1227), X-313 (0.1317): « Added in patch 7.4 (Garland Tools) », the one way to write it (item sheet header, common item tooltip);
-    /// from what Garland already gave for the sources (Peek: never a request, also from the hover), nothing while Garland is off or unknown.
+    /// nothing while Garland (or its « item sources » use) is off or the patch is unknown. X-363 (0.1350): with Peek only, the line showed
+    /// only for an item Garland had been asked about for its sources, i.e. without any source known from the game data; a vendor item
+    /// (49731, Garland: patch 7.4, docs/evidence/0.1227-garland-patch.md) never had it. <paramref name="ask"/>: Get, one request per item
+    /// through the shared cache (sheet header; tooltip once the mouse rested on the item, <see cref="patchDwell"/>).
     /// </summary>
-    private string? ItemPatchText(uint id)
-        =>itemSources?.Peek(id)?.List?.Patch is { } patch ? localization.Format("ItemSheet.Patch",Community.GarlandItemSourceParser.PatchLabel(patch)):null;
+    private string? ItemPatchText(uint id,bool ask)
+        =>(ask ? itemSources?.Get(id):itemSources?.Peek(id))?.List?.Patch is { } patch ? localization.Format("ItemSheet.Patch",Community.GarlandItemSourceParser.PatchLabel(patch)):null;
+    // X-363: the tooltip asks Garland for the item the mouse stopped on for 0.6 s, not for every row swept.
+    private readonly Community.HoverDwell patchDwell=new(600);
 
     private void DrawItemSheet()
     {
@@ -65,8 +70,8 @@ internal sealed partial class MainWindow
             RefreshRecipeHoldingsCache();
             var stock=GetRecipeHoldings(id);
             facts.Add(stock.HasObservation ? localization.Format("ItemSheet.Stock",stock.Total.ToString("N0",Numbers)):localization.Get("ItemSheet.StockUnknown"));
-            // X-224 (0.1227, K-40): the patch that added the item, when Garland Tools gave it (already read for the sources: no request here).
-            if(ItemPatchText(id) is { } patchText)facts.Add(patchText);
+            // X-224 (0.1227, K-40), X-363 (0.1350): the patch that added the item, asked of Garland Tools for the item shown.
+            if(ItemPatchText(id,ask:true) is { } patchText)facts.Add(patchText);
             ImGui.TextDisabled(string.Join(" · ",facts));
             if(market.GetCached(market.State.WorldId,id) is { } quote && (quote.Nq.Minimum ?? quote.Hq.Minimum) is { } lowest)
             {

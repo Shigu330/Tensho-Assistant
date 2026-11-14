@@ -24,7 +24,8 @@ internal static class GarlandPatch1227Tests
         ("Garland patch 1226: the item sheet shows it from what is already read, in both languages",() =>
         {
             var sheet = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ItemSheet.cs"));
-            Check(sheet.Contains("itemSources?.Peek(id)?.List?.Patch is { } patch",StringComparison.Ordinal),"read with Peek: no request from the header");
+            // X-363 (0.1350): Peek alone left the header empty for any item whose sources the game data knows; the header now asks (Get).
+            Check(sheet.Contains("(ask ? itemSources?.Get(id):itemSources?.Peek(id))?.List?.Patch is { } patch",StringComparison.Ordinal),"read with Get when asked (the header), Peek otherwise");
             foreach (var language in new[] { "en","fr" })
                 Check(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json")).Contains("\"Patch\": ",StringComparison.Ordinal),language + ": ItemSheet.Patch");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.1227-garland-patch.md")),"evidence");

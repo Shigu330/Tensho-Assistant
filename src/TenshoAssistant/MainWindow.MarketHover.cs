@@ -340,7 +340,8 @@ internal sealed partial class MainWindow
             ImGui.EndGroup();
             if(item is { ItemLevel:>1 })ImGui.TextDisabled(localization.Format("HoverUi.Levels",item.ItemLevel,item.EquipLevel));
             // X-313 (0.1317, user's remark of 14/11 on T-0.1227-1): the patch that added the item, as in the item sheet's header, when known.
-            if(ItemPatchText(id) is { } patchText)ImGui.TextDisabled(patchText);
+            // X-363 (0.1350): asked of Garland once the mouse rested on this item (patchDwell), read from what is known before.
+            if(ItemPatchText(id,ask:patchDwell.Settled(id,Environment.TickCount64)) is { } patchText)ImGui.TextDisabled(patchText);
             if(ShowIds)ImGui.TextDisabled($"ID {id}");
             DrawItemGearStats(id,glamourOnly,hq);
             DrawItemInfoBody(item,id);

@@ -59,11 +59,13 @@ internal static class ItemTooltipPatch1317Tests
             var hover = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MarketHover.cs"));
             var tooltip = hover[hover.IndexOf("private void DrawItemInfoTooltip(", StringComparison.Ordinal)..];
             tooltip = tooltip[..tooltip.IndexOf("DrawItemInfoBody(item,id);", StringComparison.Ordinal)];
-            Check(tooltip.Contains("if(ItemPatchText(id) is { } patchText)ImGui.TextDisabled(patchText);", StringComparison.Ordinal), "the tooltip shows it");
+            // X-363 (0.1350): the tooltip asks once the mouse rested on the item (ItemPatchAsk1350Tests).
+            Check(tooltip.Contains("if(ItemPatchText(id,ask:patchDwell.Settled(id,Environment.TickCount64)) is { } patchText)ImGui.TextDisabled(patchText);", StringComparison.Ordinal), "the tooltip shows it");
             var sheet = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ItemSheet.cs"));
-            Check(sheet.Contains("if(ItemPatchText(id) is { } patchText)facts.Add(patchText);", StringComparison.Ordinal), "the sheet uses the same helper");
+            Check(sheet.Contains("if(ItemPatchText(id,ask:true) is { } patchText)facts.Add(patchText);", StringComparison.Ordinal), "the sheet uses the same helper");
             Check(sheet.Split("\"ItemSheet.Patch\"").Length == 2 && !hover.Contains("\"ItemSheet.Patch\"", StringComparison.Ordinal), "the text is written in one place only");
-            Check(sheet.Contains("itemSources?.Peek(id)?.List?.Patch is { } patch ? localization.Format(\"ItemSheet.Patch\",Community.GarlandItemSourceParser.PatchLabel(patch)):null", StringComparison.Ordinal), "Peek only: never Get from the hover");
+            // X-363 (0.1350): Peek only hid the line for every item with a source known from the game data; Get when asked.
+            Check(sheet.Contains("(ask ? itemSources?.Get(id):itemSources?.Peek(id))?.List?.Patch is { } patch ? localization.Format(\"ItemSheet.Patch\",Community.GarlandItemSourceParser.PatchLabel(patch)):null", StringComparison.Ordinal), "Get when asked, Peek otherwise");
         }),
     ];
 }
