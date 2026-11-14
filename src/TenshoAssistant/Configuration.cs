@@ -91,6 +91,8 @@ public static class ConfigurationReset
         "CloseOnGameWindow",
         // 0.445 (domain 6, N-05): PaissaDB plot watch.
         "PlotWatch", "PlotWatchMinutes", "PlotWatchSize",
+        // X-265 (0.1306): the allied societies page shows one kind (0 all, 1 combat, 2 crafting, 4 gathering).
+        "AlliedKindFilter",
         // 0.446 (N-09): alert when an A or S hunt mark appears nearby.
         "HuntMarkAlert",
         // 0.447 (X-13): chat channel of the conductor's call.
@@ -747,6 +749,8 @@ public sealed partial class Configuration
     public bool PlotWatch { get; set; }
     public int PlotWatchMinutes { get; set; } = 30;
     public int PlotWatchSize { get; set; }
+    // X-265 (0.1306): the allied societies listed: 0 all, else one AlliedKind (combat 1, crafting 2, gathering 4); a society of two kinds under each.
+    public int AlliedKindFilter { get; set; }
     // 0.446 (N-09): a chat line (and the alarm sound if the alarms play one) when an A or S hunt mark appears nearby; off by default.
     public bool HuntMarkAlert { get; set; }
     // 0.447 (X-13): chat channel the conductor's call is sent to, on click only (one of HuntTrain.AnnounceChannels).

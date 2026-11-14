@@ -304,10 +304,22 @@ public sealed class TenshoDataFile
                 : Directory.EnumerateDirectories(System.IO.Path.GetDirectoryName(directory)!,"before-sqlite-*").SelectMany(aside=>Directory.EnumerateDirectories(aside,keptIn+"*"));
             foreach(var aside in places)
                 foreach(var kept in Directory.EnumerateFiles(aside,name+"*"+extension))
-                    if(new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file)))return false;
+                    if(SameBytes(kept,file,length))return false;
             return true;
         }
         catch(Exception error) when(error is FileNotFoundException or DirectoryNotFoundException){return false;}
+    }
+
+    /// <summary>
+    /// 0.1306 (found by publish.sh on 14/11: « Concurrent data 1169 », a second client loading during the voyage conversion): a copy set aside
+    /// that another client is still writing (or the file itself, held) cannot be compared: it proves nothing, so the next copy is looked at
+    /// and, none equal, the file counts as written again; its entries are then merged, never twice (only those not in the database).
+    /// </summary>
+    private static bool SameBytes(string kept,string file,long length)
+    {
+        try{return new FileInfo(kept).Length==length && File.ReadAllBytes(kept).AsSpan().SequenceEqual(File.ReadAllBytes(file));}
+        catch(IOException error) when(error is not (FileNotFoundException or DirectoryNotFoundException)){return false;}
+        catch(UnauthorizedAccessException){return false;}
     }
 
     /// <summary>

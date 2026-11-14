@@ -43,18 +43,28 @@ internal sealed partial class MainWindow
             case AlliedReadStatus.Unavailable:ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Allied.Unavailable"));return;
         }
         if(current.AllowancesLeft is { } left)ImGui.TextUnformatted(localization.Format("Allied.Allowances",left));
+        // X-265 (0.1306): one kind of society (combat, crafting, gathering: the game's names, ClassJobCategory), kept; the Namazu under both of theirs.
+        var kindsKnown=catalog.KindNames.Count>0 && catalog.Societies.Any(society=>society.Kind!=AlliedKind.None);
+        var chosen=kindsKnown ? (AlliedKind)configuration.AlliedKindFilter:AlliedKind.None;
+        if(kindsKnown)
+            ComboSetting("Allied.Kind","Allied.KindTip",()=>configuration.AlliedKindFilter,value=>configuration.AlliedKindFilter=value,
+                [(0,localization.Get("Allied.KindAll")),..AlliedKinds.Shown.Select(kind=>((int)kind,AlliedKindName(catalog,kind)))],0,200);
         RefreshRecipeHoldingsCache();
-        if(!ImGui.BeginTable("###AlliedTable",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
+        if(!ImGui.BeginTable("###AlliedTable",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try
         {
-            foreach(var column in new[]{"ColumnSociety","ColumnExpansion","ColumnPlace","ColumnRank","ColumnReputation","ColumnCurrency"})ImGui.TableSetupColumn(localization.Get("Allied."+column));
+            foreach(var column in new[]{"ColumnSociety","ColumnKind","ColumnExpansion","ColumnPlace","ColumnRank","ColumnReputation","ColumnCurrency"})ImGui.TableSetupColumn(localization.Get("Allied."+column));
             ImGui.TableHeadersRow();
             var items=itemCatalog.State.Catalog;var size=new Vector2(ImGui.GetTextLineHeight());
             foreach(var society in catalog.Societies)
             {
+                if(!AlliedKinds.Listed(society,chosen))continue;
                 var standing=current.Standings.GetValueOrDefault(society.Row);
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(society.Name);
+                ImGui.TableNextColumn();
+                if(AlliedKinds.Names(society.Kind,catalog.KindNames) is { Length:>0 } kindName)ImGui.TextUnformatted(Capitalized(kindName));
+                else ImGui.TextDisabled("—");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(society.Expansion);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(society.Place);
                 if(maps.State.Catalog?.Find(society.MapId) is { } map)PlaceMenu($"AlliedPlace{society.Row}",map,CoordinateOf(map,new Vector3(society.X,0,society.Z)),society.Name);
@@ -78,4 +88,8 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndTable();}
     }
+
+    // X-265 (0.1306): a kind's name as the game writes it (« artisans »), with a capital in the list.
+    private static string AlliedKindName(AlliedCatalog catalog,AlliedKind kind)=>Capitalized(catalog.KindNames.GetValueOrDefault(kind) ?? kind.ToString());
+    private static string Capitalized(string text)=>text.Length==0 ? text:char.ToUpper(text[0],System.Globalization.CultureInfo.InvariantCulture)+text[1..];
 }

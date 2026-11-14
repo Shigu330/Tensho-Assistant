@@ -33,6 +33,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `AlarmOptions.DutyPopAlert` | bool | false | Settings › Tracking | **Alert when a duty is ready** — A chat line and the alarm sound when the Duty Finder finds your party (same silence rules in duties). Also sent to Discord when its « Duty ready » category is on. Default: off. |
 | `AlarmOptions.GameCommandDelayMs` | int | 500 | Settings › Tracking | **Delay between two /alarm commands** — Wait between two alarms sent to the game. Raise it if the game ignores some when many are sent at once. Default: 500 ms. |
 | `AlarmServerBar` | bool | true | Settings › General · Settings › General | **Alarm icon in the server bar** — Shows a clock and the number of active Tensho alarms in the game's info bar (next to the server name); hover = next alarm; click = Alarms page. Hidden without an active alarm. Default: on. |
+| `AlliedKindFilter` | int | 0 | page Allied Societies | **Kind** — Shows only the societies of one kind, as their quests ask (the game's class categories). A society of two kinds shows under each. Default: all. |
 | `AutoBankCapture` | bool | true | Settings › Data · Settings › Data | **Save retainers, saddlebags and the company chest automatically when they are opened** — Off: an import button appears beside the game's storage windows. Default: on. |
 | `BagsServerBar` | bool | false | Settings › General | **Bags in the server bar** — Shows the free slots of your four bags in the game's server info bar; its tooltip gives the total, a click opens Storage. Refreshed every 2 seconds. Default: off. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Show as a list** — One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply. Default: off. |
@@ -325,7 +326,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 269 controls (261 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 270 controls (262 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -364,6 +365,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `AlarmOptions.DutyPopAlert` | bool | false | Paramètres › Suivi et notifications | **Alerte quand une mission est prête** — Une ligne dans la discussion et le son des alarmes quand l'outil de recherche de mission trouve votre groupe (mêmes règles de silence en mission). Envoyée aussi à Discord si la catégorie « Mission prête » y est cochée. Par défaut : désactivé. |
 | `AlarmOptions.GameCommandDelayMs` | int | 500 | Paramètres › Suivi et notifications | **Délai entre deux commandes /alarm** — Temps d'attente entre deux alarmes envoyées au jeu. Augmentez-le si le jeu en ignore quand beaucoup partent d'un coup. Par défaut : 500 ms. |
 | `AlarmServerBar` | bool | true | Paramètres › Général · Paramètres › Général | **Icône d'alarme dans la barre du serveur** — Affiche une horloge et le nombre d'alarmes Tensho actives dans la barre d'informations du jeu (à côté du nom du serveur) ; survol = prochaine alarme ; clic = page Alarmes. Masquée sans alarme active. Par défaut : activé. |
+| `AlliedKindFilter` | int | 0 | page Peuples alliés | **Genre** — Montre seulement les peuples d'un genre, selon ce que demandent leurs quêtes (catégories de classes du jeu). Un peuple de deux genres est montré sous chacun. Par défaut : tous. |
 | `AutoBankCapture` | bool | true | Paramètres › Données et sources · Paramètres › Données et sources | **Enregistrer automatiquement les servants, sacoches et le coffre de compagnie à leur ouverture** — Désactivé : un bouton d'import apparaît à côté des fenêtres de rangement du jeu. Par défaut : activé. |
 | `BagsServerBar` | bool | false | Paramètres › Général | **Sacs dans la barre serveur** — Montre les cases libres de vos quatre sacs dans la barre d'informations du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes. Par défaut : désactivé. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Afficher en liste** — Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués. Par défaut : désactivé. |
@@ -656,5 +658,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 269 cases (261 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 270 cases (262 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
