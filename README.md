@@ -185,7 +185,7 @@ Read to understand, never copied (facts only, original code):
 - Craftimizer (writing macros into the game, functional reference)
 - HimbeertoniRaidTool (MIT) and Glamourer (Apache-2.0) for the gear planner; xivgear.app (no published licence: read only)
 - Argus (licence not confirmed) for vessel builds; its airship breakpoint data comes from unlicensed sources and is not used
-- frozen_rabbit_tome (no licence): the Bountiful Yield II rule, taken as a fact with original code and shown as an estimate (a rule, no text copied)
+- frozen_rabbit_tome (no licence): the Bountiful Yield II / Bountiful Harvest II rule, taken as a fact with original code and shown as an estimate (a rule, no text copied)
 
 This project is an original plugin implementation, but it relies on these ecosystem components and references for its operation, testing, and validation.
 
@@ -227,7 +227,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 <!-- docgen:pages-fr -->
 | Groupe | Page | À quoi elle sert |
 |---|---|---|
-| — | **Accueil & outils** | Une vue d'ensemble : une tuile par outil principal avec son état, la prochaine alarme, les calculs en cours et les erreurs. |
+| — | **Accueil** | Une vue d'ensemble : une tuile par outil principal avec son état, la prochaine alarme, les calculs en cours et les erreurs. |
 |  | **Mes outils** | Construisez vos petites pages avec les blocs de Tensho, sans code, ou installez celles de la communauté. |
 | Objets | **Objets** | Trouvez un objet et voyez sa fiche : comment l'obtenir, vos stocks, l'artisanat, les usages, la récolte, le marché, votre note. |
 |  | **Rangements** | Où sont vos objets : personnage, servants, sacoches, arsenal, coiffeuse mirage, bahut personnel, coffre de compagnie ; aussi les cristaux, les devises avec ce qu'elles achètent, un journal des gils, un rapport de ce qui pourrait libérer de la place, et vos autres personnages. |
@@ -323,6 +323,7 @@ Règles : [Localization/README.md](src/TenshoAssistant/Localization/README.md). 
 - [CHANGELOG.md](CHANGELOG.md) : changements par version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) : le plan, ce qui est fait et validé en jeu
 - Tickets : [notre plan](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+label%3Aplan) (étiquette `plan`, épinglés) · [signalements des joueurs](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+label%3Aplayer-report) (étiquette `player-report`, ouverts)
+- [docs/project/ROADMAP.md](docs/project/ROADMAP.md) · [ARCHITECTURE.md](docs/project/ARCHITECTURE.md) · [TESTING.md](docs/project/TESTING.md) · [REFERENCES.md](docs/project/REFERENCES.md)
 - [Localization/README.md](src/TenshoAssistant/Localization/README.md) : contribution à la localisation
 - [SECURITY.md](SECURITY.md) : signaler une vulnérabilité
 
@@ -332,7 +333,7 @@ Ce plugin est développé avec un agent IA (Claude, niveau « Auto ») sous la d
 les changements en jeu. Chaque release est compilée et testée automatiquement (compilation, tests, application de bureau dessinée sans fenêtre), puis
 chargée une fois en jeu avec son auto-contrôle, ce que disent ses notes (« vérifié au lancement, pas encore essayé en détail ») ; les
 essais détaillés en jeu viennent après, groupés en campagnes, et [CHANGELOG.md](CHANGELOG.md) dit pour chaque version si elle a été
-validée en jeu. Un correctif urgent (patch du jeu, confidentialité) peut partir avant cette vérification au lancement, et ses notes le disent. Les liens de données sont prouvés par des sondes en lecture seule ([docs/evidence/](docs/evidence/)). L'icône du plugin a aussi été générée par l'agent IA.
+validée en jeu. Un correctif urgent (patch du jeu, confidentialité) peut partir avant cette vérification au lancement, et ses notes le disent. Les liens de données sont prouvés par des sondes en lecture seule ([docs/evidence/](docs/evidence/)). Les règles Dalamud que suit le projet : [CONTRIBUTING.md](CONTRIBUTING.md#publication-dalamud). L'icône du plugin (`src/TenshoAssistant/images/icon.png`) a aussi été générée par l'agent IA.
 
 ## Crédits
 
@@ -346,13 +347,13 @@ Les données du jeu d'abord : chaque liste est lue dans les feuilles et la mémo
 servent que lorsque le jeu ne les a pas, et sont toujours citées.
 
 - Final Fantasy XIV et ses données (feuilles lues par Dalamud / Lumina), Dalamud et FFXIVClientStructs ; SDK Dalamud.NET, SDK et
-  runtime .NET, PowerShell.
-- Données communautaires utilisées : LuminaSupplemental (Critical-Impact, GPL-3.0 : butin des contenus et sources d'objets, téléchargé ; arbre de déblocage et butin possible des dirigeables, embarqués avec leur avis) ;
+  runtime .NET, PowerShell ; Raphael.Net (Asriel, MIT) et raphael-rs (KonaeAkira, Apache-2.0) : solveur d'artisanat ; Microsoft.Data.Sqlite (.NET Foundation, MIT), SQLitePCLRaw (Eric Sink, Apache-2.0, bibliothèque native `e_sqlite3.dll`) et SQLite (domaine public) : base locale des découvertes.
+- Données communautaires utilisées : LuminaSupplemental (Critical-Impact, GPL-3.0 : butin des contenus et sources d'objets, téléchargé ; arbre de déblocage et butin possible des aéronefs, embarqués avec leur avis) ;
   GatherBuddy (Ottermandias, Apache-2.0 : données de pêche, téléchargées) ; Teamcraft (MIT : temps de touche) ; FFXIVGachaSpreadsheet
   (Infi, MIT : Revue de mode téléchargée, butin moyen des sous-marins embarqué) ; SubmarineTracker (Infi, MIT : seuils des secteurs
   embarqués, avis dans `src/TenshoAssistant/FreeCompany/Data/submarine-breakpoints.csv`, à l'origine la feuille communautaire
-  « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules de voyage comprises en lisant son code ; usure d'après la feuille
-  « Submersibles durability damage ») ; Raphael.Net (Asriel, MIT) et raphael-rs (KonaeAkira, Apache-2.0) : solveur d'artisanat ; Microsoft.Data.Sqlite (.NET Foundation, MIT), SQLitePCLRaw (Eric Sink, Apache-2.0, bibliothèque native `e_sqlite3.dll`) et SQLite (domaine public) : base locale des découvertes ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
+  « Submersible Loot Spreadsheet » d'Elena / saerielle ; formules d'expédition comprises en lisant son code ; usure d'après la feuille
+  « Submersibles durability damage ») ; FFXIV Gardening Tracker (Lotlab, GPL-3.0 : durées du jardinage, embarquées) et FFXIV Crossbreed Helper (nick75g, MIT : croisements, embarqués) ; table des modificateurs de niveau de Character Panel Refined (Kouzukii, MIT, avis complet dans `Character/StatFormulas.cs`) ;
   [Universalis](https://universalis.app/), [Garland Tools](https://www.garlandtools.org/), le [wiki FFXIV](https://ffxiv.consolegameswiki.com/),
   [PaissaDB](https://github.com/zhudotexe/FFXIV_PaissaDB) de zhudotexe (terrains en vente, lus sur clic ou par la surveillance facultative) ;
   ce dépôt sur GitHub (CC0-1.0 : découvertes partagées, sur « Échanger maintenant » ou par l'échange automatique facultatif, et galerie
@@ -360,7 +361,7 @@ servent que lorsque le jeu ne les a pas, et sont toujours citées.
   navigateur) ; Discord (webhook facultatif des alarmes).
 - Lus pour comprendre, jamais copiés : Mappy et SortaKinda (AGPL-3.0-or-later) et les autres références de `docs/project/ROADMAP.md` ;
   Craftimizer (écriture des macros) ; HimbeertoniRaidTool (MIT), Glamourer (Apache-2.0), xivgear.app (sans licence) pour l'équipement ;
-  Argus (licence non confirmée) pour les montages. Règle reprise comme fait, avec du code original : frozen_rabbit_tome (sans licence) pour la
-  Récolte abondante II, affichée comme estimation.
+  Argus (licence non confirmée) pour les montages. Règle reprise comme fait, avec du code original : frozen_rabbit_tome (sans licence) pour
+  l'Extraction abondante II et la Récolte abondante II, affichées comme estimation.
 
 Liens et détails : section anglaise ci-dessus.

@@ -1,5 +1,5 @@
 <!-- Thank you for contributing. Pull requests target the Devloppement branch (main only receives releases).
-Traduction française plus bas. -->
+You can fill in the template in English or in French; delete the half you do not use. Traduction française plus bas. -->
 
 ## What and why
 
