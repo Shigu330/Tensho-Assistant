@@ -2,6 +2,30 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1296.0
+- Plan global, X-295 : Alarmes : chaque alarme à date (Alarmes › Ajouter à cette date) est un bloc à elle, titré du nom qu'on lui a donné ; elles partageaient toutes un seul bloc titré « Alarmes à date ». Sans nom, l'alarme s'appelle « Alarme à date · » et sa date (au lieu de « Alarme »). Les alarmes déjà enregistrées sont reconnues par leur groupe, dans la langue où il a été écrit (anglais ou français) ; les autres blocs (objet, météo, repère, rappels, alarmes chaque jour ET) ne changent pas.
+- Pour les joueurs : Alarmes : chaque alarme à date a son propre bloc, titré de son nom, au lieu d'un bloc « Alarmes à date » commun.
+- Tests : AlarmDatedTitle1296Tests. Verify.ps1 (agent) : 2398/2398, 0 avertissement, 0 erreur ; DLL 0.1296.0.0. Non validé en jeu.
+### English
+- Alarms: each dated alarm (Alarms › Add at this date) is a block of its own, titled with the name given to it; they all shared one block titled « Dated alarms ». Without a name, the alarm is called « Dated alarm · » and its date (instead of « Alarm »). Alarms already saved are recognised by their group, in the language it was written in (English or French); the other blocks (item, weather, vista, reminders, every-ET-day alarms) do not change.
+- For players: Alarms: each dated alarm now has its own block titled with its name, instead of one shared « Dated alarms » block.
+
+## 0.1295.0
+- Plan global, X-294 : Infobulles d'objet : toute infobulle de Tensho pour une pièce d'équipement (pièce portée ou prévue de la page Équipement, Rangements, Objets, Marché, butins, PNJ vendeurs, récompenses, mode…) montre ses statistiques de base (HQ quand c'est connu, sinon selon « supposer HQ »), puis « Comparé à l'équipement porté » et « Valeurs de base, sans matérias ». Une seule partie les dessine (DrawItemGearStats), appelée par l'infobulle d'objet commune ; X-290 ne les donnait que dans la liste des pièces de la page Équipement, l'infobulle de la pièce portée n'en avait pas. Rien pour un objet qui n'est pas de l'équipement ou tant que le catalogue d'équipement n'est pas chargé.
+- Pour les joueurs : Infobulles d'objet : les pièces d'équipement montrent leurs statistiques et l'écart avec ce que vous portez sur toutes les pages, plus seulement dans la liste de l'Équipement.
+- Tests : GearTipEverywhere1295Tests. Verify.ps1 (agent) : 2393/2393, 0 avertissement, 0 erreur ; DLL 0.1295.0.0. Non validé en jeu.
+### English
+- Item tooltips: every Tensho tooltip of a gear piece (worn or planned piece of the Gear page, Storage, Items, Market, loot, NPC vendors, rewards, fashion…) shows its base stats (HQ when known, else as « assume HQ »), then « Compared with your worn gear » and « Base values, no materia ». One part draws them (DrawItemGearStats), called by the common item tooltip; X-290 gave them only in the Gear page's piece list, the worn piece's tooltip had none. Nothing for an item that is not gear or while the gear catalogue is not loaded.
+- For players: Item tooltips: gear pieces now show their stats and how they compare with what you wear in every page, not only in the Gear list.
+
+## 0.1294.0
+- Plan global, X-290 : Équipement, liste des pièces d'un emplacement : les écarts de statistiques écrits au bout de chaque ligne sortaient du cadre et étaient coupés (« +4 I », « -5 Détermination ») ; ils quittent la liste. L'infobulle d'une pièce de la liste donne désormais ses statistiques de base (HQ quand l'option « supposer HQ » est active) puis « Comparé à l'équipement porté », écarts verts et rouges deux par deux, « Valeurs de base, sans matérias », dessinés par les mêmes parties que le comparateur sous l'infobulle du jeu (DrawStatPairs, DrawHoverComparisons) ; les niveaux, le stock et l'obtention restent dessous. La ligne des niveaux passe à la ligne quand elle ne tient pas (jamais coupée). Le calcul des trois écarts pour chaque ligne disparaît : la comparaison se fait pour la seule pièce survolée.
+- Pour les joueurs : Équipement : la liste des pièces ne coupe plus les écarts de statistiques au bout des lignes ; survolez une pièce pour voir ses statistiques et l'écart avec ce que vous portez.
+- Tests : GearPickTip1294Tests. Verify.ps1 (agent) : 2389/2389, 0 avertissement, 0 erreur ; DLL 0.1294.0.0. Non validé en jeu.
+### English
+- Gear, list of the pieces of a slot: the stat differences written at the end of each line went past the frame and were cut (« +4 I », « -5 Determination »); they leave the list. A piece's tooltip in the list now gives its base stats (HQ when « assume HQ » is on), then « Compared with your worn gear », gains and losses in green and red two by two, « Base values, no materia », drawn by the same parts as the comparator under the game's tooltip (DrawStatPairs, DrawHoverComparisons); levels, stock and how to get it stay below. The levels line goes to the next line when it does not fit (never cut). The three differences worked out for every line are gone: the comparison is made for the hovered piece only.
+- For players: Gear: the piece list no longer cuts stat differences at the end of the lines; hover a piece to see its stats and how it compares with what you wear.
+
 ## 0.1293.0
 - Plan global, X-291 : Stockage › Banque : les gils d'un servant (et ceux du coffre de compagnie) s'affichent en montant exact, sur une ligne à eux (« Shirune · gils : 1 234 567 », séparateurs de milliers de la langue, icône de gil), dans l'onglet du servant et dans la vue Globale, quels que soient les filtres ; ils ne sont plus une case d'objet dans un « Sac 6 » ni une ligne de la vue en liste, de la recherche ou des catégories. Un porte-monnaie non lu reste inconnu (pas de ligne), jamais zéro. Les cristaux restent des objets (cases, comme dans le jeu).
 - Pour les joueurs : Banque : les gils de vos servants s'affichent en montant sur une ligne à eux, plus comme un objet dans un sac.

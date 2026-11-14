@@ -1387,7 +1387,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1148) Atelier de la compagnie › historique des voyages : après le rechargement, la même liste qu'avant ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; au prochain retour d'un sous-marin, le voyage s'ajoute
 
 
-- [ ] (0.1149) Stockage › Banque (tous les personnages, servants, sacoches, arsenal, coffre de compagnie) : après le rechargement, tout ce qui était enregistré est là ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; before-sqlite-<date>/InventoryBank/ existe à la racine du dossier du plugin ; une nouvelle lecture d'un servant s'enregistre
+- [x] (0.1149) Stockage › Banque (tous les personnages, servants, sacoches, arsenal, coffre de compagnie) : après le rechargement, tout ce qui était enregistré est là ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; before-sqlite-<date>/InventoryBank/ existe à la racine du dossier du plugin ; une nouvelle lecture d'un servant s'enregistre
 
 
 
@@ -1716,7 +1716,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1286) Atelier de compagnie : ouvrir le panneau des sous-marins puis celui des dirigeables (puis l'inverse) : Atelier › Vaisseaux liste les deux vaisseaux partis, la barre serveur et Alarmes donnent les deux retours ; dalamud.log dit « Workshop read without … » une fois par visite.
 
-- [ ] (0.1287) Survol d'un objet déjà vu au tableau du marché, puis Ctrl+Alt : « Consulté » passe à l'heure présente, les lignes du monde, du centre de données et de la région changent avec ; dalamud.log dit « Hover price refresh (Ctrl+Alt): item …, Success » ; Paramètres › Général, le tableau de bord compte universalis.app.
+- [x] (0.1287) Survol d'un objet déjà vu au tableau du marché, puis Ctrl+Alt : « Consulté » passe à l'heure présente, les lignes du monde, du centre de données et de la région changent avec ; dalamud.log dit « Hover price refresh (Ctrl+Alt): item …, Success » ; Paramètres › Général, le tableau de bord compte universalis.app.
 
 - [x] (0.1288) Alarmes › Alarmes à date : créer une alarme quotidienne, « Modifier » : le champ « Date et heure » montre la prochaine sonnerie ; changer l'heure et quitter le champ : la ligne de l'alarme dit la nouvelle heure, une seule alarme dans le groupe, toujours là après un rechargement.
 
@@ -1732,11 +1732,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1294) Page Équipement, clic sur un emplacement (Main secondaire, niveaux 40 à 45), fenêtre étroite puis large : aucun texte coupé au bout des lignes ; survol d'une pièce : « Statistiques de base », puis « Comparé à l'équipement porté » avec les écarts verts et rouges deux par deux et « Valeurs de base, sans matérias », puis niveau, stock et obtention.
 
-- [ ] (0.1295) Page Équipement : survol du nom de la pièce portée d'un emplacement (boucles d'oreilles) : « Statistiques de base » puis « Valeurs de base, sans matérias » ; survol d'une pièce de la liste : même infobulle avec « Comparé à l'équipement porté ».
+- [x] (0.1295) Page Équipement : survol du nom de la pièce portée d'un emplacement (boucles d'oreilles) : « Statistiques de base » puis « Valeurs de base, sans matérias » ; survol d'une pièce de la liste : même infobulle avec « Comparé à l'équipement porté ».
 
-- [ ] (0.1295) Rangements (Banque), Objets, Marché et un PNJ vendeur : survol d'une pièce d'équipement : statistiques de base et comparaison avec la pièce portée ; survol d'un objet qui n'est pas de l'équipement (cristal) : pas de bloc de statistiques.
+- [x] (0.1295) Rangements (Banque), Objets, Marché et un PNJ vendeur : survol d'une pièce d'équipement : statistiques de base et comparaison avec la pièce portée ; survol d'un objet qui n'est pas de l'équipement (cristal) : pas de bloc de statistiques.
 
-- [ ] (0.1296) Alarmes › Ajouter à cette date : deux alarmes nommées « A » et « B » : deux blocs titrés « A » et « B » (l'alarme « test » déjà enregistrée garde son nom comme titre) ; une troisième sans nom : bloc « Alarme à date · » et sa date.
+- [x] (0.1296) Alarmes › Ajouter à cette date : deux alarmes nommées « A » et « B » : deux blocs titrés « A » et « B » (l'alarme « test » déjà enregistrée garde son nom comme titre) ; une troisième sans nom : bloc « Alarme à date · » et sa date.
+
+- [ ] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
+
+- [ ] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
+
+- [ ] (0.1273) Application de bureau : les flèches des catégories de la navigation (OBJETS, PRODUCTION…) sont des triangles, plus des rectangles ; Jardinage : la goutte et la coche des parcelles se lisent ; tableau de bord : le « ? » des lignes à regarder se lit
+
+- [ ] (0.1300) Application de bureau : Pêche en mer, Aléas, Contenus de terrain, Donjons profonds, Lexique et Armes reliques montrent leur contenu ; Peuples alliés, Grandes Compagnies, Félicité insulaire, Livraisons particulières, Carnaval masqué n'affichent plus « … n'ont pas pu être lues » mais « Lu dans le jeu » sous leur bouton ; Collections, Quêtes, Triple Triade, Dresseur, Livraisons spéciales, Découvertes disent « Lu dans le jeu »
+
+- [ ] (0.1300) En jeu : les mêmes pages (Peuples alliés, Grandes Compagnies, Félicité insulaire, Livraisons particulières, Carnaval masqué, Armes reliques, Pêche en mer, Aléas, Contenus de terrain, Donjons profonds, Lexique) se remplissent comme avant
 
 **0.535 : interfaces** — à voir en jouant
 
