@@ -26,7 +26,7 @@ internal static class MapLockedQuests1107Tests
             var tab=lists.IndexOf("private void DrawLocalQuests(",StringComparison.Ordinal);
             var box=lists.IndexOf("if(SettingBox(\"MapView.ShowLockedQuests\",settings.ShowLockedQuests,value=>settings.ShowLockedQuests=value))SaveMapSettings();",StringComparison.Ordinal);
             Check(tab>0 && box>tab && box<lists.IndexOf("private void DrawLocalFates(",StringComparison.Ordinal),"in the Quests tab");
-            Check(lists.Contains("MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.OutOfSeason(festivals?.Quests,running))") && lists.Contains("cache.Locked!=locked"),"the list follows the box");
+            Check(lists.Contains("MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.OutOfSeason(festivals?.Quests,running),offered)") && lists.Contains("cache.Locked!=locked"),"the list follows the box");
             var view=Read("MainWindow.MapView.cs");
             Check(!view.Contains("contextSettings.ShowLockedQuests"),"not in the right-click menu");
             Check(view.Contains("changed|=SettingBox(\"MapView.ShowLockedQuests\",settings.ShowLockedQuests"),"still in the map settings");

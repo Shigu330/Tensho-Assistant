@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     private string mapLocalQuestCategory="",mapLocalGatheringType="";
     // 0.328: the lists of the shown tab, rebuilt only when what they are made of changes (the menu stays open for seconds; quests and
     // gathering sources are walked in full, MapCatalog.Equivalent walks every map).
-    private (object? Entries,object? Index,uint MapId,bool Complete,bool Locked,string Season,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,true,"",[]);
+    private (object? Entries,object? Index,uint MapId,bool Complete,bool Locked,string Season,string Offered,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,true,"","",[]);
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Groups) mapLocalGatheringCache=(0,null,null,[]);
     private (object? Catalog,uint MapId,IReadOnlySet<uint> Ids) mapLocalEquivalentCache=(null,0,new HashSet<uint>());
     private (object? Maps,object? Index,MapLocalKind Kind,MapLocalPosition[] Rows) mapLocalCollectibleCache=(null,null,default,[]);
@@ -87,10 +87,13 @@ internal sealed partial class MainWindow
         var festivals=locked ? null:Festivals?.Invoke();festivals?.Want();
         var running=festivals?.State?.Active.Select(festival=>festival.Id).Order().ToArray();
         var season=festivals?.Quests is null || running is null ? "?":string.Join(',',running);
+        // X-355 (0.1345): the quests the game offers on this map (its own list, as the map draws it), when it covers the map.
+        var offered=locked ? null:MapLocalLists.Offered(mapLive?.State?.Events?.Select(marker=>(marker.MapId,marker.ObjectiveId,marker.MarkerType)),map.MapId);
+        var offeredKey=offered is null ? "?":string.Join(',',offered.Order());
         var cache=mapLocalQuestCache;
-        if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete || cache.Locked!=locked || cache.Season!=season)
-            mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,locked,season,
-                MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.OutOfSeason(festivals?.Quests,running)));
+        if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete || cache.Locked!=locked || cache.Season!=season || cache.Offered!=offeredKey)
+            mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,locked,season,offeredKey,
+                MapLocalLists.Quests(state.Entries,index,map.MapId,mapLocalShowComplete,locked,MapLocalLists.OutOfSeason(festivals?.Quests,running),offered));
         var groups=mapLocalQuestCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         DrawSplitView("Quest",groups,ref mapLocalQuestCategory,item=>

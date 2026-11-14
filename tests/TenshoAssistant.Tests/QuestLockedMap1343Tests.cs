@@ -56,5 +56,18 @@ internal static class QuestLockedMap1343Tests
             Check(MapLocalLists.OutOfSeason(null,[100u]) is null && MapLocalLists.OutOfSeason(questsOf,null) is null,"festivals or their quests unknown: nothing taken for out of season");
             Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:false,outOfSeason:null)).SequenceEqual([0x10003u,0x10007u,0x10008u]),"unknown: as before");
         }),
+        ("Quest locked map 1345: where the game's list covers the map, a quest not started is available only when the game offers it",() =>
+        {
+            // 0.1345 (user report at the Gold Saucer: « Toutes les cartes en main » listed, absent from the map, « la carte a raison »).
+            var index=new MapLocalIndex([new MapLocalPosition(MapLocalKind.QuestIssuer,0x10003,3,10f,20f,0),new MapLocalPosition(MapLocalKind.QuestIssuer,0x10009,3,11f,21f,0),
+                new MapLocalPosition(MapLocalKind.QuestIssuer,0x10006,3,12f,22f,0)]);
+            var entries=new[]{Quest(0x10003,QuestProgress.Unconfirmed),Quest(0x10009,QuestProgress.Unconfirmed),Quest(0x10006,QuestProgress.Active)};
+            static uint[] Ids(IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> groups)=>groups.SelectMany(group=>group.Quests).Select(item=>item.Quest.Id).Order().ToArray();
+            var offered=MapLocalLists.Offered([(3u,0x0003u,(byte)3),(4u,0x0009u,(byte)3),(3u,0x0009u,(byte)1)],3);
+            Check(offered is not null && offered.SetEquals([0x10003u]),"the game offers 0x10003 on map 3 (another map's marker and a quest step are not offers)");
+            Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:false,offered:offered)).SequenceEqual([0x10003u,0x10006u]),"box off: the quest the game does not offer leaves the list; one under way stays");
+            Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:true,offered:offered)).SequenceEqual([0x10003u,0x10006u,0x10009u]),"box on: every quest");
+            Check(MapLocalLists.Offered([(4u,0x0009u,(byte)3)],3) is null && MapLocalLists.Offered(null,3) is null,"no offer of the game on this map: no restriction (not covered and none offered are not told apart)");
+        }),
     ];
 }

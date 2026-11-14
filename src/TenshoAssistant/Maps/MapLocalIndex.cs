@@ -125,20 +125,35 @@ public static class MapLocalLists
     /// <remarks>
     /// X-355 (0.1344, user question of 11/14: « tu as aussi pris en compte les quêtes event ? »): a quest of a seasonal event whose event is not
     /// running (<paramref name="outOfSeason"/>, <see cref="OutOfSeason"/>) is not available either: left out with the not-unlocked ones.
+    /// X-355 (0.1345, user report of 11/14 at the Gold Saucer: « Toutes les cartes en main » listed, absent from the map, « la carte a raison »):
+    /// a quest can ask more than its previous quests; where the game's own list of the quests it offers covers the map (<paramref name="offered"/>,
+    /// <see cref="Offered"/>), a quest not started is available only when the game offers it there.
     /// </remarks>
     public static IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Quests(IEnumerable<QuestEntry> entries,MapLocalIndex index,uint mapId,bool includeComplete,bool includeLocked=true,
-        IReadOnlySet<uint>? outOfSeason=null)
+        IReadOnlySet<uint>? outOfSeason=null,IReadOnlySet<uint>? offered=null)
     {
         ArgumentNullException.ThrowIfNull(entries);ArgumentNullException.ThrowIfNull(index);
         var all=entries as IReadOnlyCollection<QuestEntry> ?? entries.ToArray();
         var links=includeLocked ? null:new QuestLinks(all);
         return all.Where(entry=>includeComplete || entry.Progress!=QuestProgress.Complete)
-            .Where(entry=>links is null || entry.Progress!=QuestProgress.Unconfirmed || QuestList.Available(links,entry) && outOfSeason?.Contains(entry.Id)!=true)
+            .Where(entry=>links is null || entry.Progress!=QuestProgress.Unconfirmed
+                || QuestList.Available(links,entry) && outOfSeason?.Contains(entry.Id)!=true && offered?.Contains(entry.Id)!=false)
             .Select(entry=>index.Quest(entry.Id) is { } position && position.MapId==mapId ? new MapLocalQuest(entry,position):null).OfType<MapLocalQuest>()
             .GroupBy(item=>item.Quest.Category.Length>0 ? item.Quest.Category:"—")
             .OrderBy(group=>group.Key,StringComparer.CurrentCultureIgnoreCase)
             .Select(group=>(group.Key,(IReadOnlyList<MapLocalQuest>)group.OrderBy(item=>item.Quest.Level).ThenBy(item=>item.Quest.Name,StringComparer.CurrentCultureIgnoreCase).ToArray()))
             .ToArray();
+    }
+
+    /// <summary>
+    /// X-355 (0.1345): the quests the game offers on a map: its markers of quests not accepted yet (Map.UnacceptedQuestMarkers, marker type 3),
+    /// as quest rows. Null when the game's list holds none on this map (not covered, or nothing offered: not told apart, so no restriction, R06).
+    /// </summary>
+    public static IReadOnlySet<uint>? Offered(IEnumerable<(uint MapId,uint ObjectiveId,byte MarkerType)>? markers,uint mapId)
+    {
+        if(markers is null)return null;
+        var ids=markers.Where(marker=>marker.MapId==mapId && marker.MarkerType==3 && marker.ObjectiveId!=0).Select(marker=>MapQuestIcons.QuestId(marker.ObjectiveId)).ToHashSet();
+        return ids.Count>0 ? ids:null;
     }
 
     /// <summary>
