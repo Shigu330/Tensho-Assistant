@@ -9,7 +9,8 @@ namespace TenshoAssistant.Maps;
 // Orientation: where the game writes the label (MapMarker SubtextOrientation, Maps/MapLabels.cs).
 // X-138 (0.1166, user capture, Central Shroud): an aetheryte marker without a subtext (MapMarker 5.16, Bentbranch) has no Label, the game drawing the
 // place's name with another marker; Title is then the aetheryte's own name (Aetheryte sheet), for menus, tooltips and search, never drawn on the map.
-public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0,byte Orientation=0,string Title="")
+// X-322 (0.1320): UnlockBit: the sheet's MapMarkerUnlockedBit (0: always drawn by the game); see MapMarkerUnlock.
+public sealed record MapIconMarker(float X,float Y,uint Icon,string Label,uint LinkMapId=0,uint AetheryteId=0,byte Orientation=0,string Title="",ushort UnlockBit=0)
 {
     /// <summary>The name to show in menus and tooltips: the game's label, else the aetheryte's name.</summary>
     public string Shown=>MapLabels.MenuName(Label,Title);
@@ -100,7 +101,7 @@ internal sealed class MapMarkerSource
             {
                 var label=row.PlaceNameSubtext.RowId!=0 ? row.PlaceNameSubtext.Value.Name.ExtractText():"";
                 if(row.Icon!=0 || label.Length>0)markers.Add(new(row.X,row.Y,row.Icon,label,row.DataType==1 ? row.DataKey.RowId:NamedMap(row.Icon,row.DataType,row.PlaceNameSubtext.RowId,label,range),row.DataType==3 ? row.DataKey.RowId:0,row.SubtextOrientation,
-                    row.DataType==3 && label.Length==0 ? AetheryteName(row.DataKey.RowId):""));
+                    row.DataType==3 && label.Length==0 ? AetheryteName(row.DataKey.RowId):"",row.MapMarkerUnlockedBit));
             }
         return markers.AsReadOnly();
     }

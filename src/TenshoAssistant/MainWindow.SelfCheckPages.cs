@@ -32,6 +32,10 @@ internal sealed partial class MainWindow
                     (territory,id)=>weathers.Zone(territory)?.Shares.Any(share=>share.WeatherId==id)==true) is { Count:>0 } wrong
                     ? Diagnostics.SelfCheck.Suspect("Eureka notorious monsters",string.Join("; ",wrong))
                     :EurekaWindowsCheck(weathers))),
+            // X-322 (0.1320): the game's own map list against the unlock bits of the fixed icons (MapLiveReader.CheckMarkerUnlocks).
+            Page("map icon unlocks",()=>Task.FromResult(mapLive?.MarkerUnlockCheck is not { } unlockCheck
+                ? Diagnostics.SelfCheck.NotRead("map icon unlocks","no game map with unlock icons built yet")
+                :unlockCheck.Agree ? Diagnostics.SelfCheck.Ok("map icon unlocks",unlockCheck.Text):Diagnostics.SelfCheck.Suspect("map icon unlocks",unlockCheck.Text))),
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")
                 :Diagnostics.SelfCheck.Failed("FATEs","nothing read"))),

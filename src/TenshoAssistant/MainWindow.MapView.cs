@@ -1320,7 +1320,7 @@ internal sealed partial class MainWindow
             // 0.153: zoom^follow (setting « Zoom follow », MapView.ZoomFollow) so icons set for a close zoom stay readable when zoomed out.
             var zoomFactor=settings.ZoomFactor(mapZoom);
             var baseIcon=Math.Max(4,32*zoomFactor*MapViewSettings.ClampScale(settings.IconScale));
-            var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? mapMarkers?.For(map.MarkerRange) ?? []:[];
+            var markers=settings.ShowFixedIcons || settings.ShowPlaceNames ? VisibleFixed(mapMarkers?.For(map.MarkerRange) ?? []):[];
             if(mapMarkers?.Failed(map.MarkerRange)==true)
                 draw.AddText(origin+new Vector2(8,26),ImGui.GetColorU32(UI.FfxivTheme.TextMuted),localization.Get("MapView.MarkersUnavailable"));
             // 0.569 (P15): what no longer reads after a game update, instead of a map that just looks empty.
@@ -1923,6 +1923,17 @@ internal sealed partial class MainWindow
     {
         var index=MapVendorIcons.Nearest(candidates.Select(marker=>(marker.X,marker.Y,marker.Icon,marker.Label.Length>0)).ToArray(),pixel,preferred);
         return index<0 ? null:candidates[index];
+    }
+    // X-322 (0.1320): the fixed icons the game draws: one with an unlock bit only when the game has it unlocked (MapMarkerUnlock.Visible);
+    // the filtered list is kept while its inputs are the same objects (the vendor layout compares it by reference).
+    private (IReadOnlyList<MapIconMarker> From,IReadOnlySet<ushort>? Unlocked,IReadOnlyList<MapIconMarker> Shown)? fixedShown;
+    private IReadOnlyList<MapIconMarker> VisibleFixed(IReadOnlyList<MapIconMarker> all)
+    {
+        var unlocked=mapLive?.State?.UnlockedMarkerBits;
+        if(fixedShown is { } known && ReferenceEquals(known.From,all) && ReferenceEquals(known.Unlocked,unlocked))return known.Shown;
+        IReadOnlyList<MapIconMarker> shown=all.All(marker=>marker.UnlockBit==0) ? all:all.Where(marker=>MapMarkerUnlock.Visible(marker.UnlockBit,unlocked)).ToArray();
+        fixedShown=(all,unlocked,shown);
+        return shown;
     }
     // Gil shop = the shop icon; only special exchanges = the exchange icon.
     private uint VendorIconOf(Npcs.NpcVendor vendor)

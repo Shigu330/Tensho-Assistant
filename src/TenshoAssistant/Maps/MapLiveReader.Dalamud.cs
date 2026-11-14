@@ -36,9 +36,11 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     IReadOnlyDictionary<uint,MapFlightState>? Flights=null,IReadOnlyList<MapEventMarker>? Events=null,bool InCombat=false,bool InDuty=false,
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
     IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
-    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null)
+    IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null,
+    IReadOnlySet<ushort>? UnlockedMarkerBits=null)
 {
     /// <summary>X-87 (0.968): the leve under way (Map.ActiveLevequestMarker): its objective id and the game's icon of its marker; null when none.</summary>
+    // X-322 (0.1320): UnlockedMarkerBits: the map icons' unlock bits (MapMarker.MapMarkerUnlockedBit) read unlocked (UIState.IsUnlockLinkUnlocked); null: not read.
     public (uint Objective,uint Icon)? ActiveLeve { get; init; }
 }
 
@@ -90,6 +92,11 @@ internal sealed class MapLiveReader : IDisposable
         return MapDiscovery.Undiscovered(row.Flag,region=>region<size ? found[region]:null);
     }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
+    // X-322 (0.1320): the unlock bits of the map icons, the ones read unlocked (same set kept while unchanged), and the last check written.
+    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";
+    /// <summary>X-322 (0.1320): the last comparison of the game's own map list with the unlock bits (self-check); null before one.</summary>
+    public (bool Agree,string Text)? MarkerUnlockCheck=>markerUnlockCheckBox is { } box ? (box.Item1,box.Item2):null;
+    private volatile Tuple<bool,string>? markerUnlockCheckBox;
     private IReadOnlyList<MapPartyMarker> partyMarkers=[];private IReadOnlySet<uint>? unlockedCurrents;private IReadOnlySet<uint>? sightseen;
     private readonly uint[] allCurrents;private readonly uint[] adventureRows;private int loggedVistas=-1,loggedNative=-1;private int logUnlock=-1,logUnlockEx=-1;
     private IReadOnlyList<MapFateMarker> fates=[];
@@ -217,6 +224,7 @@ internal sealed class MapLiveReader : IDisposable
                 try{(unlockedCurrents,sightseen)=ReadCollected();Read("collected");}catch(Exception error){Failed("collected",error);}
                 try{var wanted=(uint)Volatile.Read(ref discoveryWanted);undiscovered=wanted==0 ? null:ReadUndiscovered(wanted);discoveryMap=wanted;Read("discovery");}
                 catch(Exception error){undiscovered=null;Failed("discovery",error);}
+                try{unlockedMarkerBits=ReadMarkerUnlocks();CheckMarkerUnlocks();Read("map icon unlocks");}catch(Exception error){unlockedMarkerBits=null;Failed("map icon unlocks",error);}
                 flightAt=now.AddSeconds(2);
             }
             if(now>=eventsAt)
@@ -239,7 +247,7 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints){ActiveLeve=ReadActiveLeve()});
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints,unlockedMarkerBits){ActiveLeve=ReadActiveLeve()});
             positionFailureLogged=false;
         }
         // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
@@ -259,6 +267,44 @@ internal sealed class MapLiveReader : IDisposable
     private string[] failedParts=[];
     /// <summary>The parts whose last read failed, for the map's line and Diagnostics.</summary>
     public IReadOnlyList<string> FailedParts=>Volatile.Read(ref failedParts);
+    // X-322 (0.1320): every unlock bit the MapMarker sheet uses (read once, off the frame), then each one's state from the game; the set
+    // read before is kept when nothing changed, so the map's filtered icons are not rebuilt.
+    private unsafe IReadOnlySet<ushort>? ReadMarkerUnlocks()
+    {
+        markerBitList??=Task.Run(()=>placeData.GetSubrowExcelSheet<MapMarker>().SelectMany(rows=>rows).Select(row=>row.MapMarkerUnlockedBit)
+            .Where(bit=>bit!=0).Distinct().Order().ToArray());
+        if(markerBitList.IsFaulted)throw markerBitList.Exception!.GetBaseException();
+        if(!markerBitList.IsCompleted)return unlockedMarkerBits;
+        var ui=UIState.Instance();
+        if(ui==null || (nint)UIState.MemberFunctionPointers.IsUnlockLinkUnlocked==0)return null;
+        var set=new HashSet<ushort>();
+        foreach(var bit in markerBitList.Result)if(ui->IsUnlockLinkUnlocked(bit))set.Add(bit);
+        return unlockedMarkerBits is { } before && before.SetEquals(set) ? before:set;
+    }
+
+    // X-322 (0.1320), R06: the map the game has built (AgentMap.MapMarkers: what the game itself draws) against the rule (MapMarkerUnlock.Visible):
+    // each sheet icon with an unlock bit, listed by the game or not, and its bit. Written to the log once per new result; the self-check reads it.
+    private unsafe void CheckMarkerUnlocks()
+    {
+        var agent=AgentMap.Instance();
+        if(agent==null || agent->MapMarkerCount==0 || agent->CurrentMapId==0 || unlockedMarkerBits is not { } unlocked)return;
+        if(placeData.GetExcelSheet<Lumina.Excel.Sheets.Map>().GetRowOrDefault(agent->CurrentMapId) is not { } map
+            || !placeData.GetSubrowExcelSheet<MapMarker>().TryGetRow(map.MapMarkerRange,out var rows))return;
+        var sheet=rows.Where(row=>row.Icon!=0).Select(row=>(row.MapMarkerUnlockedBit,(uint)row.Icon,(float)row.X,(float)row.Y)).ToArray();
+        if(sheet.All(row=>row.MapMarkerUnlockedBit==0))return;
+        var count=Math.Min((int)agent->MapMarkerCount,agent->MapMarkers.Length);
+        var game=new List<(uint Icon,int X,int Y,int Flags)>(count);
+        for(var index=0;index<count;index++){var marker=agent->MapMarkers[index].MapMarker;game.Add((marker.IconId,marker.X,marker.Y,marker.IconFlags));}
+        var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
+        var agree=checks.All(check=>check.Listed==check.Unlocked);
+        var line=$"Map icon unlocks on map {agent->CurrentMapId} ({checks.Count} with an unlock bit, {game.Count} in the game's list): "
+            +(agree ? "the game lists exactly the unlocked ones":"DISAGREE")+"; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe));
+        markerUnlockCheckBox=Tuple.Create(agree,line);
+        if(line==markerUnlockLine)return;
+        markerUnlockLine=line;
+        log.Information(line);
+    }
+
     private unsafe IReadOnlyDictionary<uint,MapFlightState> ReadFlights()
     {
         var player=PlayerState.Instance();var result=new Dictionary<uint,MapFlightState>();
