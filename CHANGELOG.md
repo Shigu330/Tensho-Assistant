@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1315.0
+- Découvertes partagées : le ticket n° 43 (« Discoveries: Shigu330 ») est fusionné dans la base commune (R12.2). Contrôle par tools/discoveries-merge.py sync --dry-run : 3007 faits, 0 refusé, 31 genres connus, 651 faits nouveaux ou changés, aucun disparu ; puis sync : 11 fichiers v3 écrits, discoveries.json à 3007 faits. Aucun code changé.
+- Pour les joueurs : Découvertes partagées : 651 faits nouveaux ou mis à jour, venus de la contribution d'un joueur.
+- Tests : CommunityDiscoveries882Tests. Verify.ps1 (agent) : 2448/2448, 0 avertissement, 0 erreur ; DLL 0.1315.0.0. Rien à essayer en jeu.
+### English
+- Shared discoveries: issue no. 43 (« Discoveries: Shigu330 ») is merged into the common base (R12.2). Check by tools/discoveries-merge.py sync --dry-run: 3007 facts, 0 refused, 31 known kinds, 651 facts new or changed, none gone; then sync: 11 v3 files written, discoveries.json at 3007 facts. No code changed.
+- For players: Shared discoveries: 651 new or updated facts from a player's contribution.
+
 ## 0.1314.0
 - Plan global, X-171 : Deux clients du jeu sur un même profil : la banque affichée suit ce que l'autre client enregistre (X-171, cache de la banque entre deux clients). Avec le fichier de données, chaque changement (capture, oubli, effacement d'un personnage) relit tous les personnages tels qu'ils sont enregistrés, dans la même prise du verrou du profil (PerCharacterBankStore.Apply) : la banque montrée par un client contient les personnages que l'autre a enregistrés depuis, et plus ceux qu'il a effacés. Avant, les autres personnages restaient tels que ce client les avait chargés jusqu'au rechargement suivant (rien n'était perdu sur le disque : seul l'affichage retardait). Sans fichier de données (fichiers par personnage d'avant 0.1149), rien ne change. Les deux cas de l'audit du 12/11 sur la banque étaient déjà traités et testés (chargement repris quand le verrou est tenu, X-170 en 0.1142 ; « inchangé » décidé contre le fichier, 0.1173). Test de comportement TwoClientsBank1314 (2) : deux magasins et deux services sur un vrai fichier de données ; sans la relecture, les deux échouent. Reste au plan : purge du cache partagé (données retéléchargeables).
 - Pour les joueurs : Deux clients du jeu sur un même profil : la banque de chacun montre les personnages enregistrés par l'autre.
