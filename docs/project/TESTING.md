@@ -1381,7 +1381,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1144) Collection › Magie bleue : la liste du grimoire se remplit comme avant ; « Lire les pages manquantes » avance page par page ; dalamud.log sans erreur
+- [x] (0.1144) Collection › Magie bleue : la liste du grimoire se remplit comme avant ; « Lire les pages manquantes » avance page par page ; dalamud.log sans erreur
 
 
 - [ ] (0.1148) Atelier de la compagnie › historique des voyages : après le rechargement, la même liste qu'avant ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; au prochain retour d'un sous-marin, le voyage s'ajoute
@@ -1403,7 +1403,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1158) Paramètres › Avancé › Application de bureau › « Pages dans le jeu et dans l'application de bureau » : mettre « Objets » sur « Application seulement » : la page quitte la navigation du jeu et reste dans celle de l'application ; « Marché » sur « Jeu seulement » : l'inverse ; Accueil, Paramètres, la carte, l'artisanat en direct et la Revue de mode ne sont pas proposés ; « ↺ » remet « Jeu et application »
 
-- [ ] (0.1159) Rappels › onglet « Alarmes (N) » : les alarmes posées avec une cloche des minuteurs et les alarmes automatiques (servants, voyages, escouade) y sont, avec leurs boutons ; « Rappels (N) » dans le menu ; l'outil Alarmes ne les liste plus et son chiffre ne les compte plus ; elles sonnent toujours
+- [x] (0.1159) Rappels › onglet « Alarmes (N) » : les alarmes posées avec une cloche des minuteurs et les alarmes automatiques (servants, voyages, escouade) y sont, avec leurs boutons ; « Rappels (N) » dans le menu ; l'outil Alarmes ne les liste plus et son chiffre ne les compte plus ; elles sonnent toujours
 
 - [ ] (0.1160) Jardinage › onglet « Alarmes (N) » : chaque lit noté au journal montre son prochain entretien et sa récolte avec l'heure ; « Jardinage (N) » dans le menu ; « Me le rappeler dans le chat » décoché : l'onglet le dit et le chiffre disparaît
 
@@ -1469,7 +1469,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1183) Après « Tout réinitialiser » (ou sur une installation neuve) : la première touche M ouvre la carte de Tensho et une ligne [Tensho] dans le chat dit comment retrouver celle du jeu ; la deuxième M ne la répète pas
 
-- [ ] (0.1183) Aide › FAQ : « M ouvre une autre carte : comment retrouver celle du jeu ? » ouvre les Paramètres ; « Tensho joue-t-il à ma place ? » cite la carte sur M et le titre selon le job
+- [x] (0.1183) Aide › FAQ : « M ouvre une autre carte : comment retrouver celle du jeu ? » ouvre les Paramètres ; « Tensho joue-t-il à ma place ? » cite la carte sur M et le titre selon le job
 
 - [ ] (0.1184) Mode développeur : après deux ou trois rechargements de Tensho, dalamud.log, lignes « Load created » et « Load 10 s later » : « heap … MB, Tensho load contexts N of M, previous instance … » ; si N grandit à chaque rechargement ou si l'instance d'avant reste « still alive », une fuite est vue (à rapporter)
 
@@ -1509,13 +1509,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1220) Barre serveur des monnaies et prochaine alarme : « 3h 05m » en anglais, « 3 h 05 » en français
 
-- [ ] (0.1221) Pied de page de la fenêtre Tensho : « Servants et chocobo : enregistrés à l'ouverture (datés) » ; avec l'enregistrement automatique des rangements coupé : « enregistrés sur demande (datés) »
+- [x] (0.1221) Pied de page de la fenêtre Tensho : « Servants et chocobo : enregistrés à l'ouverture (datés) » ; avec l'enregistrement automatique des rangements coupé : « enregistrés sur demande (datés) »
 
-- [ ] (0.1222) Barre latérale d'une configuration sans groupe replié encore : Progression, Contenus, Gold Saucer et Références repliés ; un clic sur un groupe garde les autres comme ils étaient
+- [x] (0.1222) Barre latérale d'une configuration sans groupe replié encore : Progression, Contenus, Gold Saucer et Références repliés ; un clic sur un groupe garde les autres comme ils étaient
 
-- [ ] (0.1222) Guide (Aide › Lancer le guide) : étape « Panneaux à côté des fenêtres du jeu » ; « Tout masquer » coupe les panneaux (fiche du personnage, outil de mission, synthèse, récolte, barre serveur…), « Tout afficher » les remet ; PaissaDB dans l'étape des sources
+- [x] (0.1222) Guide (Aide › Lancer le guide) : étape « Panneaux à côté des fenêtres du jeu » ; « Tout masquer » coupe les panneaux (fiche du personnage, outil de mission, synthèse, récolte, barre serveur…), « Tout afficher » les remet ; PaissaDB dans l'étape des sources
 
-- [ ] (0.1222) Guide sans intérêt coché : la visite ne montre que les pages pour tous (pas Triple Triade ni Artisanat)
+- [x] (0.1222) Guide sans intérêt coché : la visite ne montre que les pages pour tous (pas Triple Triade ni Artisanat)
 
 
 - [ ] (0.1222) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : guide : nouvelle étape « Panneaux à côté des fenêtres du jeu » (tout masquer ou afficher, puis chaque panneau) et visite réduite aux pages pour tous sans case cochée ; aide : quatre nouvelles questions de la FAQ ; liste des outils de l'accueil : aucun changement (pas de nouvelle page)
@@ -1526,17 +1526,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1226) Zone à instances (instance 2 par exemple) : la marque d'instance du jeu suit le nom de la zone ; hors instance : le nom seul
 
-- [ ] (0.1227) Fiche d'un objet récent (onglet des sources ouvert une fois) : « Ajouté au patch 7.x (Garland Tools) » dans l'en-tête ; Garland coupé dans Paramètres › Données et sources : la ligne n'apparaît pas
+- [x] (0.1227) Fiche d'un objet récent (onglet des sources ouvert une fois) : « Ajouté au patch 7.x (Garland Tools) » dans l'en-tête ; Garland coupé dans Paramètres › Données et sources : la ligne n'apparaît pas
 
-- [ ] (0.1228) Rangements › Personnages, 15 s après la connexion : colonne « Jobs » remplie pour le personnage connecté ; clic : niveaux des jobs et ensembles (numéro, nom, job, niveau d'objet) sous le tableau, mêmes valeurs que le jeu
+- [x] (0.1228) Rangements › Personnages, 15 s après la connexion : colonne « Jobs » remplie pour le personnage connecté ; clic : niveaux des jobs et ensembles (numéro, nom, job, niveau d'objet) sous le tableau, mêmes valeurs que le jeu
 
 - [ ] (0.1228) Changer de personnage puis revenir : les jobs et ensembles de l'autre personnage restent affichés ; monter un niveau : la valeur change dans les 5 minutes
 
 - [ ] (0.1228) « Effacer » sur un autre personnage : sa colonne « Jobs » devient « — »
 
-- [ ] (0.1229) Collections › Montures, survol de la baleine lunaire : « Porte 8 personnes », « Sa propre musique de monture » ; survol d'un gobbue : son action de monture, avec le nom du jeu ; survol d'une monture volante courante : « Musique de monture partagée avec 89 autres montures »
+- [x] (0.1229) Collections › Montures, survol de la baleine lunaire : « Porte 8 personnes », « Sa propre musique de monture » ; survol d'un gobbue : son action de monture, avec le nom du jeu ; survol d'une monture volante courante : « Musique de monture partagée avec 89 autres montures »
 
-- [ ] (0.1230) Fenêtre principale, champ « Chercher dans Tensho… » en haut de la navigation : taper « mine » : pages, objets, quêtes et lieux listés sous le champ ; clic sur un objet : sa page s'ouvre ; clic sur un lieu : la carte de Tensho s'ouvre sur ce lieu ; une lettre seule : rien n'est listé
+- [x] (0.1230) Fenêtre principale, champ « Chercher dans Tensho… » en haut de la navigation : taper « mine » : pages, objets, quêtes et lieux listés sous le champ ; clic sur un objet : sa page s'ouvre ; clic sur un lieu : la carte de Tensho s'ouvre sur ce lieu ; une lettre seule : rien n'est listé
 
 - [ ] (0.1230) Application de bureau : le même champ ; une page placée « en jeu seulement » n'est pas proposée
 
@@ -1560,15 +1560,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1240) Barre serveur : alarmes, rappels, monnaies, gils et entrées facultatives au même endroit qu'avant, info-bulles et clics comme avant ; désactiver puis réactiver le plugin : aucune erreur Tensho dans dalamud.log
 
-- [ ] (0.1241) Eurêka et Bozja › Météo et nuit : les quatre zones d'Eurêka, noms d'ALEA et de météo du jeu, une prochaine fenêtre par ligne ; en Eurêka, la fenêtre « maintenant » concorde avec la météo affichée par le jeu
+- [x] (0.1241) Eurêka et Bozja › Météo et nuit : les quatre zones d'Eurêka, noms d'ALEA et de météo du jeu, une prochaine fenêtre par ligne ; en Eurêka, la fenêtre « maintenant » concorde avec la météo affichée par le jeu
 
-- [ ] (0.1241) Bouton « Alarme » d'un monstre à météo (ex. Pagos, morbole de neige) : alarmes ajoutées dans Alarmes, qui ne sonnent que pendant la météo
+- [x] (0.1241) Bouton « Alarme » d'un monstre à météo (ex. Pagos, morbole de neige) : alarmes ajoutées dans Alarmes, qui ne sonnent que pendant la météo
 
-- [ ] (0.1241) Paramètres › Avancé › « Données du jeu et observées seulement » coché : l'onglet dit que ces conditions sont masquées
+- [x] (0.1241) Paramètres › Avancé › « Données du jeu et observées seulement » coché : l'onglet dit que ces conditions sont masquées
 
 - [ ] (0.1241) dalamud.log : ligne Selftest « Eureka notorious monsters » ok
 
-- [ ] (0.1242) Page Équipement : choisir une pièce, poser une matéria, changer de job prévu, cocher « supposer HQ » : statistiques, niveau d'objet moyen et valeurs dérivées changent aussitôt comme avant ; mode développeur : pas de ligne « slow frame » pour Gear
+- [x] (0.1242) Page Équipement : choisir une pièce, poser une matéria, changer de job prévu, cocher « supposer HQ » : statistiques, niveau d'objet moyen et valeurs dérivées changent aussitôt comme avant ; mode développeur : pas de ligne « slow frame » pour Gear
 
 - [ ] (0.1243) Planificateur des aéronefs, objectif « Butin : un objet » : choisir un objet (recherche), « Peut tomber à » nomme des secteurs, chaque trajet listé passe par l'un d'eux
 
@@ -1738,7 +1738,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1296) Alarmes › Ajouter à cette date : deux alarmes nommées « A » et « B » : deux blocs titrés « A » et « B » (l'alarme « test » déjà enregistrée garde son nom comme titre) ; une troisième sans nom : bloc « Alarme à date · » et sa date.
 
-- [ ] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
+- [x] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
 
 - [ ] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
 
@@ -1765,6 +1765,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1308) Donjon profond : en combat, l'affichage de Tensho suit les mêmes réglages que dans un donjon normal (caché en combat s'il l'est ailleurs)
 
 - [ ] (0.1308) JcJ (Wolves' Den ou Crystalline Conflict) : Tensho se coupe toujours avec sa ligne dans le chat
+
+- [ ] (0.1316) Eurêka et Bozja › Météo et nuit : la prochaine fenêtre d'un monstre notoire à plus d'une heure s'écrit « dans 2 h 05 » (pas « dans 125 min »)
+
+- [ ] (0.1316) Alarmes : une alarme unique avec 90 min d'avance sonne « Alarme : … — dans 1 h 30 (…) » dans le chat ; le bouton de répétition dit « Dans … » ; Gold Saucer : tirage du Méga Cactpot « (dans 2 j 3 h) »
+
+- [ ] (0.1316) Discord (si un salon est réglé) : le bouton d'essai envoie « … dans 5 min (…) » ; un message personnel avec [minutes] garde le nombre seul
+
+- [ ] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
 
 **0.535 : interfaces** — à voir en jouant
 
