@@ -1,6 +1,7 @@
 name: Tool proposal
 description: Propose a new tool or page for Tensho Assistant, that you would like to write or see written
-labels: ["tool-proposal"]
+title: "[Idea] "
+labels: ["tool-proposal", "player-report"]
 body:
   - type: markdown
     attributes:

@@ -38,7 +38,7 @@ internal static class HelpTests
         ("Report a problem: the form's address, with the field ids of the repository's forms",() =>
         {
             var link=ProblemReport.Link(new(ProblemKind.Bug,"Map & flag","Step 1","It works","Report text","0.504.0","fr"));
-            Check(!link.ReportLeftOut && link.Url.StartsWith(ProblemReport.Repository+"/issues/new?template=bug_report.yml&title=Map%20%26%20flag",StringComparison.Ordinal),"template and encoded title");
+            Check(!link.ReportLeftOut && link.Url.StartsWith(ProblemReport.Repository+"/issues/new?template=bug_report.yml&title=%5BBug%5D%20Map%20%26%20flag",StringComparison.Ordinal),"template and encoded title");
             foreach(var part in new[]{"&version=0.504.0","&client=fr","&steps=Step%201","&expected=It%20works","&report=Report%20text"})Check(link.Url.Contains(part,StringComparison.Ordinal),part);
             var form=Read(".github/ISSUE_TEMPLATE/bug_report.yml");
             foreach(var id in new[]{"version","client","steps","expected","report"})Check(form.Contains("id: "+id,StringComparison.Ordinal),"bug form: "+id);

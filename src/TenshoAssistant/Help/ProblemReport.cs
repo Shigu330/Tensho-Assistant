@@ -28,7 +28,8 @@ public sealed record ProblemSend(string Url, IReadOnlyList<(string Key, string V
 /// <summary>
 /// Report a problem (ONBOARD-001, lot 3, G5): the address of the project's GitHub form, filled in. The plugin sends nothing and holds no token: the
 /// player's browser opens, and the player reads and submits it. Form fields by id (.github/ISSUE_TEMPLATE); GitHub answers 414 on a too long address and
-/// gives no figure, so a safe length is kept. Labels cannot be set this way without write access to the repository: the report says where it comes from.
+/// gives no figure, so a safe length is kept. Labels come from the chosen form (template=…: bug, enhancement or translation, and player-report), which
+/// GitHub applies without write access; the title starts with the kind's prefix (0.1323, X-342: players' reports apart from the project's plan).
 /// 0.1125 (X-143 part 3, audit A08): the diagnosis is built from a closed list of fields; paths are masked whole, folders with spaces and network
 /// paths included; the Windows user and computer names are masked wherever they appear; the browser opens only after a preview of the exact text.
 /// </summary>
@@ -78,6 +79,18 @@ public static partial class ProblemReport
         return text.ToString();
     }
 
+    /// <summary>0.1323 (X-342): the title prefix of each kind, the same as the forms' « title: » in .github/ISSUE_TEMPLATE.</summary>
+    public static string Prefix(ProblemKind kind) => kind switch { ProblemKind.Idea => "[Idea]", ProblemKind.Translation => "[Translation]", _ => "[Bug]" };
+
+    /// <summary>The title with its prefix, once: a title the player already started with the prefix (any case) keeps it as typed.</summary>
+    public static string PrefixedTitle(ProblemKind kind, string title)
+    {
+        var prefix = Prefix(kind);
+        var text = (title ?? string.Empty).Trim();
+        if (text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return text;
+        return text.Length == 0 ? prefix : prefix + " " + text;
+    }
+
     public static string SearchAddress(string words)
         => $"{Repository}/issues?q={Uri.EscapeDataString("is:issue " + Clean(words).Trim())}";
 
@@ -98,7 +111,7 @@ public static partial class ProblemReport
             _ => ("bug_report.yml", [("version", draft.Version), ("client", draft.Client), ("steps", draft.What), ("expected", draft.Expected), ("report", draft.Report)]),
         };
         var cleaned = fields.Select(field => (Key: field.Item1, Value: Clean(field.Item2 ?? string.Empty, known))).Where(field => field.Value.Length > 0).ToArray();
-        var title = ("title", Clean(draft.Title ?? string.Empty, known).Trim());
+        var title = ("title", PrefixedTitle(draft.Kind, Clean(draft.Title ?? string.Empty, known)));
         (string Url, IReadOnlyList<(string, string)> Fields) Address(IEnumerable<(string Key, string Value)> pairs)
         {
             var list = new List<(string, string)> { title };

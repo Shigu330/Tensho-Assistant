@@ -1,6 +1,7 @@
 name: Feature request
 description: Suggest a tool or an improvement.
-labels: ["enhancement"]
+title: "[Idea] "
+labels: ["enhancement", "player-report"]
 body:
   - type: markdown
     attributes:

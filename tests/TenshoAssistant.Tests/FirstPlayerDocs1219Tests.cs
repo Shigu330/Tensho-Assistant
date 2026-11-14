@@ -41,7 +41,7 @@ internal static class FirstPlayerDocs1219Tests
         ("First player 1219: the GitHub forms speak to a player",() =>
         {
             var bug = Read(".github/ISSUE_TEMPLATE/bug_report.yml");
-            Check(bug.Contains("issues?q=is%3Aissue+is%3Aopen+-label%3Aroadmap+-label%3Adiscoveries",StringComparison.Ordinal),"the open problems leave out the work list and the discoveries");
+            Check(bug.Contains("issues?q=is%3Aissue+is%3Aopen+label%3Aplayer-report",StringComparison.Ordinal),"the open problems are the players' reports (0.1323, X-342: apart from the plan and the discoveries)");
             Check(!bug.Contains("0.323.0",StringComparison.Ordinal),"no stale version example");
             foreach (var form in new[] { "bug_report.yml","feature_request.yml","translation.yml","tool_proposal.yml" })
                 Check(Read(".github/ISSUE_TEMPLATE/" + form).Contains("Vous pouvez écrire en français",StringComparison.Ordinal),form + ": French is welcome");

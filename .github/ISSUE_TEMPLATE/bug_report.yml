@@ -1,11 +1,12 @@
 name: Bug report
 description: Something in Tensho Assistant does not work as expected.
-labels: ["bug"]
+title: "[Bug] "
+labels: ["bug", "player-report"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for the report. Please check the [open problems](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+-label%3Aroadmap+-label%3Adiscoveries) first.
+        Thank you for the report. Please check the [open problems](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+label%3Aplayer-report) first.
         Security problems go through the private report instead (see SECURITY.md), never a public issue.
         You can write in French. / Vous pouvez écrire en français.
   - type: input

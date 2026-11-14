@@ -126,6 +126,7 @@ Rules: [Localization/README.md](src/TenshoAssistant/Localization/README.md). In 
 - [CONTRIBUTING.md](CONTRIBUTING.md) — build, tests, project rules, Dalamud publishing rules
 - [CHANGELOG.md](CHANGELOG.md) — what changed in each version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) — the plan, what is done and what is validated in game
+- Issues: [our plan](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+label%3Aplan) (label `plan`, pinned) · [player reports](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+label%3Aplayer-report) (label `player-report`, open)
 - [docs/project/ROADMAP.md](docs/project/ROADMAP.md) · [ARCHITECTURE.md](docs/project/ARCHITECTURE.md) · [TESTING.md](docs/project/TESTING.md) · [REFERENCES.md](docs/project/REFERENCES.md)
 - [Localization/README.md](src/TenshoAssistant/Localization/README.md) — localization workflow
 - [SECURITY.md](SECURITY.md) — reporting a vulnerability
@@ -321,6 +322,7 @@ Règles : [Localization/README.md](src/TenshoAssistant/Localization/README.md). 
 - [CONTRIBUTING.md](CONTRIBUTING.md) : compiler, tester, règles du projet, publication Dalamud
 - [CHANGELOG.md](CHANGELOG.md) : changements par version
 - [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md) : le plan, ce qui est fait et validé en jeu
+- Tickets : [notre plan](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+label%3Aplan) (étiquette `plan`, épinglés) · [signalements des joueurs](https://github.com/Shigu330/Tensho-Assistant/issues?q=is%3Aissue+is%3Aopen+label%3Aplayer-report) (étiquette `player-report`, ouverts)
 - [Localization/README.md](src/TenshoAssistant/Localization/README.md) : contribution à la localisation
 - [SECURITY.md](SECURITY.md) : signaler une vulnérabilité
 

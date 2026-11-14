@@ -1,6 +1,7 @@
 name: Translation
 description: Fix or add a translation of Tensho's interface.
-labels: ["translation"]
+title: "[Translation] "
+labels: ["translation", "player-report"]
 body:
   - type: markdown
     attributes:
