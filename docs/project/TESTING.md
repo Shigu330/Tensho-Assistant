@@ -1784,6 +1784,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1322) Objets › Organisation, sacs du personnage, avec la zone qui couvre les 140 cases : l'aperçu remplit le sac 1, puis le sac 3, puis le sac 2 ; « Appliquer » (ou le bouton Tensho de l'inventaire) : dans le jeu, la colonne de gauche (sacs 1 et 3) se remplit avant celle de droite
 
+- [ ] (0.1323) Aide › Signaler un problème : préparer un bug de test (titre « essai ») et ouvrir le formulaire : le titre est « [Bug] essai », l'étiquette player-report est posée à l'envoi (puis fermer le ticket)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
