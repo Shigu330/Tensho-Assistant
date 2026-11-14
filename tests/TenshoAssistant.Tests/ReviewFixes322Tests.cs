@@ -5,6 +5,7 @@ using TenshoAssistant.Items;
 
 // 0.322 (queue step d, review 0.316 point 7): translated storage names, crystals on any client, and the tables that turn the services'
 // French sentences into translated keys kept in step with the sentences the code really emits.
+[SerialTests("LocalizationManager.SetLanguage sets TenshoCulture for the whole process")]
 internal static class ReviewFixes322Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }

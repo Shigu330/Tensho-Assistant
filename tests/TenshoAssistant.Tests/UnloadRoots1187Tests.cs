@@ -7,6 +7,7 @@ using TenshoAssistant.Gathering;
 // 0.1187 (X-01 C1.3, the root of the leak of unloaded instances; docs/evidence/0.1187-unload-roots.md): the static hooks given by the
 // plugin's constructor as closures kept the whole unloaded instance alive (a static lives as long as its load context, which stays alive in
 // the game process). They are emptied at unload; the log names, at the next loads, the parts of earlier instances that are still alive.
+[SerialTests("CompetitiveGate's static hooks and WeatherCatalog.StoryWeatherConfirmed are shared by the whole process")]
 internal static class UnloadRoots1187Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

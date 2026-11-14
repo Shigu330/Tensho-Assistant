@@ -43,6 +43,7 @@ internal sealed class Reader1199Shared
     [MethodImpl(MethodImplOptions.NoInlining)] private int Third(int value) => value - 3;
 }
 
+[SerialTests("CompetitiveGate's static compiler and hooks (ForgetInstance) are shared by the whole process")]
 internal static class ReaderStart1199Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

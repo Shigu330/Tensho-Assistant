@@ -17,6 +17,7 @@ internal sealed class Reader1200E { public int Calls; public void OnUpdate(int t
 internal sealed class Warm1200Early { public int One() => 1; public int Two() => 2; }
 internal sealed class Warm1200Rest { public int Three() => 3; }
 
+[SerialTests("CompetitiveGate's static compiler and hooks (ForgetInstance) are shared by the whole process")]
 internal static class CompileOrder1200Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

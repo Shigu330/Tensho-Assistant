@@ -2,6 +2,7 @@ using TenshoAssistant.Competitive;
 
 // 0.1193 (X-177 C4.4, analysis of the slow frames of 12/11): the time a subscription spends inside a function of the game it calls on the
 // player's request (the gear set reader's EquipGearset: 354 ms once) is not counted as the reader's own in the « Slow reader » line.
+[SerialTests("CompetitiveGate's static measure of the game's own time (MeasureStart, GameCallEnded) is shared by the whole process")]
 internal static class ReaderTime1193Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

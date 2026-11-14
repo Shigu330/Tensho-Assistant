@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using TenshoAssistant.Character;
 using TenshoAssistant.Localization;
 
+[SerialTests("LocalizationManager.SetLanguage and TenshoCulture.Use set the culture of the whole process")]
 internal static class LanguageFormats1220Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }

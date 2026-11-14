@@ -2,6 +2,7 @@ using TenshoAssistant.Character;
 
 // 0.380 (g, M-09): stat tiers — points to the next value and wasted points, solved exactly for the floor formulas and checked against
 // a step-by-step search; the GCD searched; nothing without modifiers.
+[SerialTests("formats with TenshoCulture.Current, then reads it again: a language set meanwhile would break the parse")]
 internal static class StatTiers380Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
