@@ -50,7 +50,23 @@ public sealed class DataCache : IDisposable
     private bool disposed;
     private string? error;
     public string? Error=>Volatile.Read(ref error);
-    public DataCache(string directory)=>root=Path.GetFullPath(directory);
+    public DataCache(string directory)
+    {
+        root=Path.GetFullPath(directory);
+        LockPath=Path.TrimEndingDirectorySeparator(root)+".lock";
+    }
+    /// <summary>
+    /// X-171 (0.1333, GPT audit of 11/12): the folder is shared by the clients of one profile; the queue and the disk lock above are one client's
+    /// only. Each write (temporary file, replace, trim), the patch reports and the purge (copy, then removal) also hold this lock of the profile
+    /// (FairFileLock), a file beside the folder, so the purge never removes it: the other client's write asked during a purge waits and stays
+    /// after it, never lost in a temporary file removed nor erased. Reads take no lock (a file removed meanwhile is a miss).
+    /// </summary>
+    public string LockPath{get;}
+    /// <summary>X-171: how long a write or a purge waits for the other client before it fails (nothing written, nothing removed).</summary>
+    internal int LockWaitMs=15_000;
+    private FileStream HoldProfile(CancellationToken token)=>FairFileLock.Hold(LockPath,LockWaitMs,failure=>new CacheLockBusyException(LockPath,failure),token);
+    /// <summary>X-171: the lock of the profile stayed held by another program past <see cref="LockWaitMs"/>.</summary>
+    public sealed class CacheLockBusyException(string path,Exception inner):IOException("The cache lock is held by another program: "+path,inner);
     /// <summary>X-142 part 2 (0.1122): what a purge did: files removed, files that could not be (in use), the copy taken before.</summary>
     public sealed record CacheClearResult(int Removed,int Failed,string? Backup);
     private string FileName(string family,string scope,string version)
@@ -76,7 +92,10 @@ public sealed class DataCache : IDisposable
             try
             {
                 if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return null;
-                var bytes=await File.ReadAllBytesAsync(path,linked.Token).ConfigureAwait(false);
+                byte[] bytes;
+                // X-171 (0.1333): removed meanwhile by the other client's purge or trim: a miss, not an error.
+                try{bytes=await File.ReadAllBytesAsync(path,linked.Token).ConfigureAwait(false);}
+                catch(Exception gone) when(gone is FileNotFoundException or DirectoryNotFoundException){return null;}
                 var envelope=JsonSerializer.Deserialize<Envelope>(bytes,JsonOptions);
                 if(envelope is not {Schema:1} || envelope.Family!=family || envelope.Scope!=scope || envelope.Version!=version)return null;
                 var value=envelope.Value.Deserialize<T>(JsonOptions);
@@ -111,11 +130,16 @@ public sealed class DataCache : IDisposable
                         var value=JsonSerializer.SerializeToElement(snapshot,JsonOptions);
                         var bytes=JsonSerializer.SerializeToUtf8Bytes(new Envelope(1,family,scope,version,recordedAt,value),JsonOptions);
                         if(bytes.Length>MaximumEntryBytes)throw new InvalidDataException("Cache snapshot exceeds size limit.");
-                        Directory.CreateDirectory(root);temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
-                        await File.WriteAllBytesAsync(temporary,bytes,token).ConfigureAwait(false);
-                        // X-267 (0.1275): tried again while a scanner holds the new file or the old one an instant (a lost write before).
-                        AtomicFile.OverwriteWhenFree(temporary,path);temporary=null;
-                        moved=Trim();Volatile.Write(ref error,null);
+                        // X-171 (0.1333): under the lock of the profile, so the other client's purge never removes the temporary file nor this write.
+                        using(HoldProfile(token))
+                        {
+                            Directory.CreateDirectory(root);temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
+                            await File.WriteAllBytesAsync(temporary,bytes,token).ConfigureAwait(false);
+                            // X-267 (0.1275): tried again while a scanner holds the new file or the old one an instant (a lost write before).
+                            AtomicFile.OverwriteWhenFree(temporary,path);temporary=null;
+                            moved=Trim();
+                        }
+                        Volatile.Write(ref error,null);
                     }
                     finally{io.Release();}
                     if(moved.Count>0)Report(moved);
@@ -207,8 +231,10 @@ public sealed class DataCache : IDisposable
                 Volatile.Write(ref patchReports,reports.ToArray());
                 try{PatchReported?.Invoke(report);}catch(Exception){}
             }
-            AtomicFile.Write(PatchReportsPath,JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions));
+            var bytes=JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions);
+            using(HoldProfile(lifetime.Token))AtomicFile.Write(PatchReportsPath,bytes);
         }
+        catch(OperationCanceledException){}
         catch(Exception failure) when(failure is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
         {Volatile.Write(ref error,"Patch comparison not saved: "+failure.Message);}
     }
@@ -266,11 +292,14 @@ public sealed class DataCache : IDisposable
                 await io.WaitAsync(lifetime.Token).ConfigureAwait(false);
                 try
                 {
+                    // X-171 (0.1333): the copy and the removal under the lock of the profile too: the other client neither writes nor trims meanwhile.
+                    using var held=HoldProfile(lifetime.Token);
                     var copy=backup?.Invoke();
                     int removed=0,failed=0;
+                    // A file the other client reads an instant (no lock for reads) is tried again a few times; one held throughout is counted.
                     if(Directory.Exists(root))
                         foreach(var file in Directory.GetFiles(root,"*",SearchOption.AllDirectories))
-                            try{File.Delete(file);removed++;}catch(IOException){failed++;}catch(UnauthorizedAccessException){failed++;}
+                            if(AtomicFile.DeleteWhenFree(file,4))removed++;else failed++;
                     return new CacheClearResult(removed,failed,copy);
                 }
                 finally{io.Release();}

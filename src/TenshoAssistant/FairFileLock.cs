@@ -21,9 +21,11 @@ public static class FairFileLock
     /// The lock held (dispose to release). No client waiting: tried at once. Otherwise this client takes its place in the line (its mark) and
     /// tries every <see cref="PollMs"/> ms once the clients before it are served; past half its wait, or without a mark of its own, it tries
     /// anyway (a mark never makes it refuse a free lock); past <paramref name="waitMs"/>, <paramref name="busy"/>'s exception.
+    /// X-171 (0.1333): <paramref name="cancel"/> ends the wait (OperationCanceledException), so a plugin that unloads never sleeps on a lock.
     /// </summary>
-    public static FileStream Hold(string path,int waitMs,Func<IOException,Exception> busy)
+    public static FileStream Hold(string path,int waitMs,Func<IOException,Exception> busy,CancellationToken cancel=default)
     {
+        cancel.ThrowIfCancellationRequested();
         var full=Path.GetFullPath(path);
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
         var start=Environment.TickCount64;
@@ -42,7 +44,8 @@ public static class FairFileLock
                     try{return new FileStream(full,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
                     catch(IOException error){throw busy(error);}
                 }
-                Thread.Sleep(PollMs);
+                if(!cancel.CanBeCanceled)Thread.Sleep(PollMs);
+                else if(cancel.WaitHandle.WaitOne(PollMs))cancel.ThrowIfCancellationRequested();
             }
         }
         finally{mark?.Dispose();}
