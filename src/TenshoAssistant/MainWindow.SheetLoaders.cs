@@ -20,7 +20,7 @@ internal sealed partial class MainWindow
     /// </summary>
     internal void ForgetSheetPages()
     {
-        alliedCatalog=null;alliedTried=false;alliedFailed=false;alliedRead=null;allied=null;
+        alliedCatalog=null;alliedTried=false;alliedFailed=false;alliedRead=null;allied=null;alliedLoad=null;
         relicCatalog=null;relicCatalogTried=false;relicCatalogTask=null;relicReadFailed=false;relicRead=null;relicProgress=null;relicLines.Clear();
     }
 

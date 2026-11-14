@@ -7175,6 +7175,7 @@
     "Left": "to do"
   },
   "Allied": {
+    "Loading": "Reading the game's data…",
     "Title": "Allied Societies",
     "Subtitle": "Your ranks, from what the game holds.",
     "Read": "Refresh",

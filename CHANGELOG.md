@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1327.0
+- Plan global, X-332 : Performance (relecture 0.1318, I3 et I4, R07) : deux lectures des feuilles du jeu sortent du dessin. Les noms des tâches de servant des découvertes (RetainerTask, RetainerTaskRandom et toute la feuille ClassJob, relues à chaque image pour chaque ligne) viennent d'une table construite une fois hors du dessin (BackgroundTable, nouvelle aide de Caching) ; avant qu'elle soit prête, une tâche montre son numéro. Le catalogue des sociétés alliées (avec le parcours de toute la feuille Quest de X-265) est lu dans une tâche à la première ouverture de la page, comme ceux des ALEA et du lexique, avec « Lecture des données du jeu… » entre-temps.
+- Pour les joueurs : Le tableau des découvertes avec des tâches de servant et la première ouverture des Sociétés alliées ne ralentissent plus les images du jeu.
+- Tests : SheetsOffFrame1327Tests. Verify.ps1 (agent) : 2489/2489, 0 avertissement, 0 erreur ; DLL 0.1327.0.0. Non validé en jeu.
+### English
+- Performance (review of 0.1318, I3 and I4, R07): two reads of the game's sheets leave the frame. The discoveries' venture names (RetainerTask, RetainerTaskRandom and the whole ClassJob sheet, read again at each frame for each row) come from a table built once off the frame (BackgroundTable, a new Caching helper); until it is ready a venture shows its number. The allied societies' catalogue (with X-265's walk of the whole Quest sheet) is read in a task at the page's first opening, like the FATEs' and the lexicon's, with « Reading the game's data… » meanwhile.
+- For players: The Discoveries table with ventures and the first opening of Allied Societies no longer slow the game's frames.
+
 ## 0.1326.0
 - Plan global, X-331 : Marché, prix vus au tableau du jeu (relecture 0.1318, I2) : une réponse d'Universalis sans envoi pour le monde (personne n'y a relevé cet objet, donc aucune date d'envoi) ne cache plus un vrai relevé du tableau du jeu. La règle « le relevé le plus récent gagne » (X-292) compare désormais le relevé du tableau à la date d'envoi d'Universalis seulement ; avant, l'heure de la requête (« maintenant ») comptait à sa place et gagnait toujours. Les autres mondes et la région d'Universalis restent affichés à côté.
 - Pour les joueurs : Un prix vu au tableau du marché du jeu n'est plus caché par une réponse vide d'Universalis pour votre monde.

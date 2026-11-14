@@ -49,7 +49,7 @@ internal static class VentureName1305Tests
             Check(page.Contains("localization.Format(\"DiscoveriesUi.FromVenture\",DiscoveryItemName(fact.Subject),DiscoveryVentureName(fact.Detail))",StringComparison.Ordinal)
                 && page.Contains("VentureNames.Describe(id,VentureRowOf?.Invoke(id))",StringComparison.Ordinal),"page");
             var plugin=Read("src/TenshoAssistant/Plugin.cs");
-            Check(plugin.Contains("mainWindow.VentureRowOf=",StringComparison.Ordinal) && plugin.Contains("RetainerTaskRandom>().GetRowOrDefault(task.Task.RowId)",StringComparison.Ordinal),"plugin");
+            Check(plugin.Contains("mainWindow.VentureRowOf=",StringComparison.Ordinal) && plugin.Contains("RetainerTaskRandom>();",StringComparison.Ordinal) && plugin.Contains("randoms.GetRowOrDefault(task.Task.RowId)",StringComparison.Ordinal),"plugin");
         }),
     ];
 }

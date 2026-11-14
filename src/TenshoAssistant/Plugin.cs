@@ -264,18 +264,22 @@ public sealed partial class Plugin : IDalamudPlugin
             var questRows=new Lazy<Lumina.Excel.ExcelSheet<Lumina.Excel.Sheets.Quest>>(()=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>());
             mainWindow.QuestSeen=id=>Quests.QuestReader.SeenNow(client,player,unlocks,questRows.Value,id);
             // X-263 (0.1305): a retainer venture's name (exploration) or class and level (targeted), from RetainerTask.
-            mainWindow.VentureRowOf=id=>
+            // X-332 (0.1327, review of 0.1318 I3, R07): every venture read once, off the frame (RetainerTask, RetainerTaskRandom and the ClassJob
+            // names, which were read again at each frame for each row); until the table is built a venture shows its number.
+            var ventures=new Caching.BackgroundTable<uint,Discoveries.VentureRow>(()=>
             {
-                try
+                var jobs=data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.Abbreviation.ExtractText(),row.Name.ExtractText())).ToArray();
+                var randoms=data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTaskRandom>();
+                var rows=new Dictionary<uint,Discoveries.VentureRow>();
+                foreach(var task in data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTask>())
                 {
-                    if(data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTask>().GetRowOrDefault(id) is not { } task)return null;
-                    var random=task.IsRandom ? data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTaskRandom>().GetRowOrDefault(task.Task.RowId)?.Name.ExtractText() ?? "":"";
-                    var job=task.IsRandom ? "":Discoveries.VentureNames.JobName(task.ClassJobCategory.ValueNullable?.Name.ExtractText() ?? "",
-                        data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.Abbreviation.ExtractText(),row.Name.ExtractText())));
-                    return new Discoveries.VentureRow(task.IsRandom,random,job,task.RetainerLevel);
+                    var random=task.IsRandom ? randoms.GetRowOrDefault(task.Task.RowId)?.Name.ExtractText() ?? "":"";
+                    var job=task.IsRandom ? "":Discoveries.VentureNames.JobName(task.ClassJobCategory.ValueNullable?.Name.ExtractText() ?? "",jobs);
+                    rows[task.RowId]=new Discoveries.VentureRow(task.IsRandom,random,job,task.RetainerLevel);
                 }
-                catch(Exception){return null;}
-            };
+                return rows;
+            },error=>log.Warning(error,"Venture sheets unreadable (game update?)."));
+            mainWindow.VentureRowOf=id=>ventures.TryGet(id,out var row) ? row:null;
             // X-74 (0.860): where the items got come from, and the fish caught (Discoveries/ItemDiscoveryWatcher).
             HashSet<uint>? fishItems=null;var territoryDuties=new Dictionary<uint,uint>();
             Discoveries.ItemDiscoveryWatcher? itemWatcher=null;

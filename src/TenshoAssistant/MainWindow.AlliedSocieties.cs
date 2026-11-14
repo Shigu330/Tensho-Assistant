@@ -13,17 +13,22 @@ internal sealed partial class MainWindow
     private AlliedCatalog? alliedCatalog;
     private bool alliedTried,alliedFailed;
     private Task<AlliedSnapshot>? alliedRead;
+    // X-332 (0.1327, review of 0.1318 I4, R07): the catalogue (with X-265's walk of the whole Quest sheet) read off the frame, like the FATEs' and lexicon's.
+    private Task<AlliedCatalog?>? alliedLoad;
     private AlliedSnapshot? allied;
 
     private void DrawAlliedSocieties()
     {
         Heading(localization.Get("Allied.Title"),localization.Get("Allied.Subtitle"));
-        if(!alliedTried)
+        if(!alliedTried && alliedLoad is null && AlliedCatalogLoad is { } load)alliedLoad=Task.Run(load);
+        if(alliedLoad is { IsCompleted:true } loaded)
         {
+            alliedLoad=null;
             alliedTried=true;
-            alliedCatalog=AlliedCatalogLoad?.Invoke();
+            alliedCatalog=loaded.IsCompletedSuccessfully ? loaded.Result:null;
             if(alliedCatalog is { Societies.Count:>0 } first && ReadAllied is not null)alliedRead=ReadAllied(first);
         }
+        if(alliedLoad is not null){ImGui.TextDisabled(localization.Get("Allied.Loading"));return;}
         if(alliedCatalog is not { Societies.Count:>0 } catalog){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Allied.SheetsUnavailable"));return;}
         if(alliedRead is { IsCompleted:true } read)
         {

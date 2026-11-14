@@ -7175,6 +7175,7 @@
     "Left": "à faire"
   },
   "Allied": {
+    "Loading": "Lecture des données du jeu…",
     "Title": "Peuples alliés",
     "Subtitle": "Vos rangs, à partir de ce que le jeu détient.",
     "Read": "Lire de nouveau",
