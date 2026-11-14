@@ -20,6 +20,8 @@ internal sealed partial class MainWindow
     internal Func<uint,string>? FateName { get; set; }
     /// <summary>X-74 (0.860): a duty's name (ContentFinderCondition).</summary>
     internal Func<uint,string>? DutyName { get; set; }
+    /// <summary>X-263 (0.1305): a retainer venture as the sheets know it (RetainerTask, RetainerTaskRandom, ClassJobCategory), null when unknown.</summary>
+    internal Func<uint,VentureRow?>? VentureRowOf { get; set; }
     /// <summary>X-73.8 (0.862): a submersible sector's name.</summary>
     internal Func<uint,string>? SectorName { get; set; }
     internal Func<uint,string>? AirshipSectorName { get; set; }
@@ -287,6 +289,12 @@ internal sealed partial class MainWindow
     private string DiscoveryItemName(uint id)=>id>=ItemGains.KeyItemStart ? KeyItemNameOf?.Invoke(id) is { Length:>0 } key ? key:$"#{id}"
         :itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}";
     private string DiscoveryDutyName(uint id)=>DutyName?.Invoke(id) is { Length:>0 } name ? name:$"#{id}";
+    // X-263 (0.1305): an exploration by its name, a targeted venture by its class and level, the number only when the sheets give nothing.
+    private string DiscoveryVentureName(uint id)
+    {
+        var (key,args)=VentureNames.Describe(id,VentureRowOf?.Invoke(id));
+        return localization.Format(key,args);
+    }
     private static DateTime DiscoveryDay(int day)=>new DateTime(2013,8,27).AddDays(day);
     // « HH:mm–HH:mm ET » of two Eorzea minutes of the day.
     private static string EtRange(int from,int to)=>$"{Gathering.GatheringTime.Clock(from)}–{Gathering.GatheringTime.Clock(to)} ET";
@@ -311,7 +319,7 @@ internal sealed partial class MainWindow
     private string DiscoveryFactName(DiscoveryFact fact)=>fact.Kind switch
     {
         DiscoveryKind.Desynthesis=>localization.Format("DiscoveriesUi.FromDesynthesis",DiscoveryItemName(fact.Subject),DiscoveryItemName(fact.Detail)),
-        DiscoveryKind.Venture=>localization.Format("DiscoveriesUi.FromVenture",DiscoveryItemName(fact.Subject),fact.Detail),
+        DiscoveryKind.Venture=>localization.Format("DiscoveriesUi.FromVenture",DiscoveryItemName(fact.Subject),DiscoveryVentureName(fact.Detail)),
         DiscoveryKind.DutyChest=>localization.Format("DiscoveriesUi.FromDutyChest",DiscoveryItemName(fact.Subject),DiscoveryDutyName(fact.Detail)),
         DiscoveryKind.FateReward=>localization.Format("DiscoveriesUi.FromFate",DiscoveryItemName(fact.Subject),DiscoveryFateName(fact.Detail)),
         DiscoveryKind.MonsterDrop=>localization.Format("DiscoveriesUi.FromMonster",DiscoveryItemName(fact.Subject),DiscoveryMonsterName(fact.Detail)),

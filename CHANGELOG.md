@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1305.0
+- Plan global, X-263 : Découvertes : une tâche de servant se nomme comme dans les feuilles du jeu plutôt que par son numéro (X-263, demande de l'utilisateur du 13/11, capture « Rondin de zelkova ← tâche n° 584 »). Exploration : le nom de RetainerTaskRandom (RetainerTask 584 → 30084 « Exploration en forêt XXI », sondé le 14/11) ; tâche ciblée : la classe (ClassJob dont l'abréviation est le nom de la ClassJobCategory, sinon le nom de la catégorie) et le niveau, « tâche de botaniste niv. 70 » ; le numéro seulement si la feuille ne donne rien. Classe pure Discoveries/VentureNames, MainWindow.VentureRowOf rempli par Plugin.cs. Test VentureName1305 (3).
+- Pour les joueurs : Découvertes : une tâche de servant montre son nom (exploration) ou sa classe et son niveau, au lieu d'un numéro.
+- Tests : VentureName1305Tests. Verify.ps1 (agent) : 2419/2419, 0 avertissement, 0 erreur ; DLL 0.1305.0.0. Non validé en jeu.
+### English
+- Discoveries: a retainer venture is named as in the game's sheets rather than by its number (X-263, user request of 11/13, picture « Zelkova log ← venture no. 584 »). Exploration: the RetainerTaskRandom name (RetainerTask 584 → 30084 « Woodland Exploration XXI », probed on 11/14); targeted venture: the class (the ClassJob whose abbreviation is the ClassJobCategory's name, otherwise the category's name) and the level, « botanist venture, level 70 »; the number only when the sheet gives nothing. Pure class Discoveries/VentureNames, MainWindow.VentureRowOf filled by Plugin.cs. Test VentureName1305 (3).
+- For players: Discoveries: a retainer venture now shows its name (an exploration) or its class and level, instead of a number.
+
 ## 0.1304.0
 - Plan global, X-286 : Tuiles de l'accueil (X-286, relecture du bloc 0.1278, M5, et image Home vue par la maître le 13/11) : un nom ou une ligne de tuile plus large que la tuile était coupé au milieu d'un mot par le bord de la tuile, sans « … » (« simulateur, carnet, r », « créneaux, météo, PR », « plan d'équipeme »). Le texte se raccourcit maintenant pour tenir et finit par « … », coupé après le dernier mot entier quand cela garde l'essentiel de la ligne (UI/TextFit, classe pure) ; le texte entier se lit dans l'infobulle de la tuile. À toutes les tailles de fenêtre (la place se mesure à chaque image). Images de l'accueil refaites.
 - Pour les joueurs : Accueil : un texte de tuile trop long finit par « … » et se lit en entier dans son infobulle.

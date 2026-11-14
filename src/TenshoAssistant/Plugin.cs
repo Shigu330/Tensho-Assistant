@@ -258,6 +258,19 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.AirshipSectorName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.AirshipExplorationPoint>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             mainWindow.SectorName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.SubmarineExploration>().GetRowOrDefault(id)?.Destination.ExtractText() ?? "";
             mainWindow.DutyName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
+            // X-263 (0.1305): a retainer venture's name (exploration) or class and level (targeted), from RetainerTask.
+            mainWindow.VentureRowOf=id=>
+            {
+                try
+                {
+                    if(data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTask>().GetRowOrDefault(id) is not { } task)return null;
+                    var random=task.IsRandom ? data.GetExcelSheet<Lumina.Excel.Sheets.RetainerTaskRandom>().GetRowOrDefault(task.Task.RowId)?.Name.ExtractText() ?? "":"";
+                    var job=task.IsRandom ? "":Discoveries.VentureNames.JobName(task.ClassJobCategory.ValueNullable?.Name.ExtractText() ?? "",
+                        data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.Abbreviation.ExtractText(),row.Name.ExtractText())));
+                    return new Discoveries.VentureRow(task.IsRandom,random,job,task.RetainerLevel);
+                }
+                catch(Exception){return null;}
+            };
             // X-74 (0.860): where the items got come from, and the fish caught (Discoveries/ItemDiscoveryWatcher).
             HashSet<uint>? fishItems=null;var territoryDuties=new Dictionary<uint,uint>();
             Discoveries.ItemDiscoveryWatcher? itemWatcher=null;
