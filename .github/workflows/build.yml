@@ -83,4 +83,5 @@ jobs:
           if ($found) { throw "Dalamud's own DLL in the output: $($found.Name -join ', ')" }
           $manifest = Get-Content -Raw /tmp/output/TenshoAssistant/TenshoAssistant.json | ConvertFrom-Json
           if ($manifest.InternalName -ne 'TenshoAssistant') { throw "internal name: $($manifest.InternalName)" }
+          if (-not $manifest.IconUrl) { throw 'no IconUrl in the packaged manifest: the installed plugin would show no icon' }
           "Built $($manifest.AssemblyVersion), API level $($manifest.DalamudApiLevel)"

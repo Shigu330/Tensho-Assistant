@@ -442,6 +442,8 @@ try {
     $download = "https://github.com/$repository/releases/download/$tag/latest.zip"
     $imagesUrl = "https://raw.githubusercontent.com/$repository/$releaseBranch/src/TenshoAssistant/images"
     $imageUrls = Get-ImageUrls $imagesUrl
+    # X-344: the icon of the installed plugin comes from the manifest inside latest.zip; repo.json must carry the same one.
+    if ($manifest.IconUrl -ne "$imagesUrl/icon.png") { Stop-Release "Stopped: the packaged manifest's IconUrl '$($manifest.IconUrl)' is not $imagesUrl/icon.png (the installed plugin would show no icon)." }
     $entry = [ordered]@{
         Author = $manifest.Author; Name = $manifest.Name; InternalName = $manifest.InternalName
         AssemblyVersion = $manifest.AssemblyVersion; TestingAssemblyVersion = $manifest.AssemblyVersion

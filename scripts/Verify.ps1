@@ -203,6 +203,14 @@ try {
     if ($taskManifest.InternalName -ne 'TenshoAssistant' -or $taskManifest.DalamudApiLevel -ne 15 -or $taskManifest.AssemblyVersion -ne "$taskProjectVersion.0" -or $taskManifest.AssemblyVersion -ne $taskAssemblyVersion) {
         throw 'Packaged manifest identity/API/version mismatch.'
     }
+    # X-344: Dalamud shows an installed plugin's icon from the IconUrl of the manifest inside latest.zip (copied to installedPlugins on
+    # install), never from repo.json nor from images/icon.png (read for a dev plugin only). A package without it shows Dalamud's « ? »
+    # (docs/evidence/x344-plugin-icon.md).
+    $taskIconUrl = 'https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/src/TenshoAssistant/images/icon.png'
+    if ($taskManifest.IconUrl -ne $taskIconUrl) { throw "Packaged manifest has no icon: IconUrl must be $taskIconUrl (src/TenshoAssistant/TenshoAssistant.json)." }
+    $taskIconFile = Join-Path $taskRoot 'src\TenshoAssistant\images\icon.png'
+    $taskIconBytes = if (Test-Path -LiteralPath $taskIconFile) { [IO.File]::ReadAllBytes($taskIconFile) } else { [byte[]]@() }
+    if ($taskIconBytes.Length -lt 8 -or $taskIconBytes[0] -ne 0x89 -or $taskIconBytes[1] -ne 0x50 -or $taskIconBytes[2] -ne 0x4E -or $taskIconBytes[3] -ne 0x47) { throw 'Plugin icon missing: src/TenshoAssistant/images/icon.png must be a PNG file (the IconUrl serves it from main).' }
     $taskZip = [IO.Compression.ZipFile]::OpenRead((Join-Path $taskOutput 'TenshoAssistant\latest.zip'))
     try {
         $taskEntries = @($taskZip.Entries.FullName)
