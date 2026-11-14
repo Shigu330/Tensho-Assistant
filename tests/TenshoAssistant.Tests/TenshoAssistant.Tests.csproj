@@ -74,6 +74,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/VistaWindow.cs" Link="Maps/VistaWindow.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/WikiVistas.cs" Link="Maps/WikiVistas.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/ChatMapLinks.cs" Link="Maps/ChatMapLinks.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/ChatLinkHover.cs" Link="Maps/ChatLinkHover.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/HuntTrain.cs" Link="Maps/HuntTrain.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/PlaceDirectory.cs" Link="Maps/PlaceDirectory.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />

@@ -101,7 +101,7 @@ public sealed partial class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface, ICommandManager commands, IPluginLog log,
         IGameInventory inventory, IPlayerState player, IClientState client, IFramework framework, IDataManager data, IGameGui gameGui,
-        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents)
+        ITextureProvider textures, IUnlockState unlocks, IGameInteropProvider interop,IObjectTable objects,IContextMenu contextMenus,IGameConfig gameConfig,ICondition condition,IFateTable fateTable,ITargetManager targets,IPartyList partyList,IChatGui chat,IDtrBar dtrBar,IKeyState keyState,IMarketBoard marketBoardEvents,IAddonLifecycle addonLifecycle)
     {
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
@@ -931,6 +931,11 @@ public sealed partial class Plugin : IDalamudPlugin
             Maps.ChatMapLinkWatcher? chatLinks=null;
             registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
             mainWindow.ChatLinkHistory=chatLinks?.History;
+            // X-365 (0.1351): the chat map link under the mouse, for the right-click Tensho menu (same map settings switch).
+            Maps.ChatLinkHoverWatcher? chatLinkHover=null;
+            registrations.Register(()=>chatLinkHover=new Maps.ChatLinkHoverWatcher(addonLifecycle,log,()=>configuration.MapView.ChatLinks,()=>mainWindow.DeveloperMode),
+                ()=>chatLinkHover?.Dispose());
+            mainWindow.ChatLinkHover=chatLinkHover?.Hover;
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
@@ -1645,6 +1650,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("CraftLive",mainWindow.DrawCraftLivePanel),
             ("InventorySort",mainWindow.DrawInventorySortButton),
             ("RegenTick",mainWindow.ObserveRegenTick),
+            ("ChatLinkMenu",mainWindow.DrawChatLinkMenu),
             ("AlarmBar",()=>alarmBar?.Invoke()?.DrawTooltip()),
             ("ReminderBar",()=>reminderBar?.Invoke()?.DrawTooltip()),
             ("CurrencyBar",()=>currencyBar?.Invoke()?.DrawTooltip()),

@@ -10,6 +10,31 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal ChatMapLinkHistory? ChatLinkHistory { get; set; }
+    // X-365 (0.1351): the chat map link under the mouse (ChatLinkHoverWatcher) and the right-click menu opened on it.
+    internal ChatLinkHover? ChatLinkHover { get; set; }
+    private (MapDefinition Map,Vector2 Coordinate,string Place)? chatLinkMenu;
+
+    /// <summary>
+    /// X-365 (0.1351, user's choice of 14/11): a right click on a chat map link opens the Tensho place menu at the mouse (« Tensho — place »,
+    /// the place entries of Tensho's menus: flag, nearest aetheryte with its cost, Tensho map, zone weather), as the game's item menu gets
+    /// « Tensho — item ». The game's left click (its flag) is untouched; nothing is sent to the game; nothing during a cut (Draw stops before).
+    /// </summary>
+    internal void DrawChatLinkMenu()
+    {
+        if(ChatLinkHover is not { } hover)return;
+        if(ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !ImGui.GetIO().WantCaptureMouse
+           && hover.RightClick(Environment.TickCount64,TenshoAssistant.Competitive.CompetitiveGate.Cut,configuration.MapView.ChatLinks) is { } link
+           && maps.State.Catalog?.Find(link.MapId) is { } linkMap && MapCatalog.CoordinatesValid(link.X,link.Y))
+        {
+            var coordinate=new Vector2(link.X,link.Y);
+            chatLinkMenu=(linkMap,coordinate,$"{(link.Place.Length>0 ? link.Place:linkMap.Zone)}  ({MapProjection.CoordinateText(coordinate)})");
+            ImGui.OpenPopup("###TenshoChatMapLinkMenu");
+        }
+        if(chatLinkMenu is not { } menu)return;
+        if(!ImGui.BeginPopup("###TenshoChatMapLinkMenu")){chatLinkMenu=null;return;}
+        try{MenuHeader(localization.Get("ChatLinks.MenuTitle"));PlaceEntries(menu.Map,menu.Coordinate,null,menu.Place);}
+        finally{ImGui.EndPopup();}
+    }
     // 0.384 (g, M-14): the deciphered treasure map held (TreasureMapReader), for the Tensho map and the Reminders page.
     internal Func<TreasureMapSpot?>? TreasureMap { get; set; }
     // Channels kept by the filter (null = every channel); session only.
