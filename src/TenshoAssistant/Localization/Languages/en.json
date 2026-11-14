@@ -3727,7 +3727,7 @@
     "ShowPlaceNamesHelp": "Shows the zone's place names, as on the game map.\nDefault: on.",
     "ShowFlagHelp": "Shows the map flag (yours or one from a link).\nDefault: on.",
     "ShowLockedQuests": "Quests not available yet",
-    "ShowLockedQuestsHelp": "Shows the quest markers the game draws locked (quests you cannot take yet). Greyed while « Quests and objectives » is off.\nDefault: on.",
+    "ShowLockedQuestsHelp": "Shows the quests not unlocked yet (their previous quests are not done). Off, they leave the map and this list; a quest you have unlocked stays, even when the game draws it in red because your level or your current job is not the one it asks. Greyed while « Quests and objectives » is off.\nDefault: on.",
     "LeveTarget": "{0} (level {1}): target of your leve",
     "ShowQuestsHelp": "Shows the quest, objective and event markers the game puts on its map.\nDefault: on.",
     "ShowQuestAreasHelp": "Draws the search area of quest objectives (coloured circle).\nDefault: on.",

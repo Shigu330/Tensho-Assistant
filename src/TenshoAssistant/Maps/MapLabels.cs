@@ -7,6 +7,23 @@ public static class MapQuestIcons
 {
     public static bool NamesItsVariant(bool locked,int variant)=>variant==1 || IsStep(locked,variant);
     public static bool IsStep(bool locked,int variant)=>locked && variant==5;
+
+    /// <summary>The quest row of a quest marker's objective (0x10000 + the low 16 bits, as the journal's targets).</summary>
+    public static uint QuestId(uint objectiveId)=>0x10000|(objectiveId&0xFFFF);
+
+    /// <summary>
+    /// X-355 (0.1343, user report of 11/14 at the Steps of Thal: « Quests not available yet » off hid unlock quests the player has
+    /// unlocked): the game draws a quest marker locked (red) for a quest not unlocked yet, but also for one only out of reach of the current
+    /// level or job. With the box off, a locked marker is hidden only when its quest is not unlocked: not started, and its previous quests not
+    /// done (QuestList.Available, the rule of the map's quest list). A quest under way or unlocked stays; a quest Tensho cannot find keeps the
+    /// game's word (locked: hidden).
+    /// </summary>
+    public static bool HiddenAsLocked(bool showLocked,bool iconLocked,uint objectiveId,TenshoAssistant.Quests.QuestLinks? links)
+    {
+        if(showLocked || !iconLocked)return false;
+        if(objectiveId==0 || links?.Find(QuestId(objectiveId)) is not { } quest)return true;
+        return quest.Progress==TenshoAssistant.Quests.QuestProgress.Unconfirmed && !TenshoAssistant.Quests.QuestList.Available(links,quest);
+    }
 }
 
 /// <summary>P17 (0.652): a leve's marker on the map: the icon read in game, or a tooltip naming a row of the Leve sheet (docs/evidence/0.652-leve-markers.md).</summary>

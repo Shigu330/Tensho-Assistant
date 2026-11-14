@@ -30,7 +30,8 @@ internal static class MapViewTests
         {
             Check(new TenshoAssistant.MapViewSettings().ShowLockedQuests,"on by default");
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
-            Check(map.Contains("if(settings.ShowLockedQuests || mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)!=true || !questIcon.Locked)"),"filter");
+            // 0.1343 (X-355): the filter goes through MapQuestIcons.HiddenAsLocked (tested in QuestLockedMap1343Tests).
+            Check(map.Contains("if(!MapQuestIcons.HiddenAsLocked(settings.ShowLockedQuests,mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)==true && questIcon.Locked,marker.ObjectiveId,questLinks))"),"filter");
             Check(System.Text.RegularExpressions.Regex.Matches(map,"SettingBox\\(\"MapView.ShowLockedQuests\"").Count==1,"the settings (X-128, 0.1107: the menu's box moved to the Quests tab)");
         }),
         // From HeightArrows844Tests: 0.844 (X-67, user request): up and down arrows on map icons above or below the player.

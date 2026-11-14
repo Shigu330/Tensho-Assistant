@@ -47,7 +47,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1320-map-marker-unlock.md](0.1320-map-marker-unlock.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerGameList1321Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerRemember1335Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerUnlock1320Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1342-map-marker-bits.md` |
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
-| [0.1342-map-marker-bits.md](0.1342-map-marker-bits.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs` | `CHANGELOG.md` |
+| [0.1342-map-marker-bits.md](0.1342-map-marker-bits.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerBits1342Tests.cs` | `CHANGELOG.md` |
 | [0.135.0-marker-evidence.log](0.135.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md` |

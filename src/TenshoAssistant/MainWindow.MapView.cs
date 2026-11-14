@@ -1432,8 +1432,10 @@ internal sealed partial class MainWindow
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
             foreach(var fate in fates.Where(fate=>fate.Icon!=0))Add(fate.Icon,2,MapProjection.PixelFromWorld(fate.Position,map),FateLabel(fate),worldRadius:settings.ShowFateAreas ? fate.Radius:0,height:fate.Position.Y);
             // X-86 (0.966): locked quest markers (the game's « not available yet » icons) left out when the player hides them.
+            // X-355 (0.1343): only those of quests not unlocked yet (previous quests not done); out of reach of the level or the job: kept.
+            var questLinks=settings.ShowLockedQuests ? null:MapQuestLinks();
             foreach(var marker in events)
-                if(settings.ShowLockedQuests || mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)!=true || !questIcon.Locked)
+                if(!MapQuestIcons.HiddenAsLocked(settings.ShowLockedQuests,mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)==true && questIcon.Locked,marker.ObjectiveId,questLinks))
                 Add(marker.Icon,3,MapProjection.PixelFromWorld(marker.Position,map),settings.QuestTooltips ? EventLabel(marker):null,
                 worldRadius:(marker.MarkerType==3 ? settings.ShowQuestAreas:marker.IsLeve ? settings.ShowLeveAreas:settings.ShowEventAreas) ? marker.Radius:0,height:marker.Position.Y);
             ExpireGameTarget();
@@ -1928,6 +1930,17 @@ internal sealed partial class MainWindow
     // the filtered list is kept while its inputs are the same objects (the vendor layout compares it by reference).
     // 0.1321: on the map the game has built, the game's own list decides (MapMarkerUnlock.GameList).
     private (IReadOnlyList<MapIconMarker> From,IReadOnlySet<ushort>? Unlocked,MapMarkerUnlock.GameList? Game,IReadOnlyList<MapIconMarker> Shown)? fixedShown;
+    // X-355 (0.1343): the quests' links for the map's locked markers, built again only when the quest list changes; null while it is empty.
+    private (IReadOnlyList<Quests.QuestEntry> Entries,Quests.QuestLinks Links)? mapQuestLinks;
+    private Quests.QuestLinks? MapQuestLinks()
+    {
+        var entries=quests.State.Entries;
+        if(entries.Count==0)return null;
+        if(mapQuestLinks is { } known && ReferenceEquals(known.Entries,entries))return known.Links;
+        var links=new Quests.QuestLinks(entries);
+        mapQuestLinks=(entries,links);
+        return links;
+    }
     private IReadOnlyList<MapIconMarker> VisibleFixed(uint mapId,IReadOnlyList<MapIconMarker> all)
     {
         var live=mapLive?.State;var unlocked=live?.UnlockedMarkerBits;var game=live?.GameListedMarkers;
