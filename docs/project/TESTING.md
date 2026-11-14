@@ -1812,6 +1812,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1344) Onglet Quêtes de la carte de Tensho au Gold Saucer, « Quêtes pas encore disponibles » décoché : seule la quête de l'événement en cours (« Avalanche de mots ») y figure parmi les quêtes d'événement, comme sur la carte.
 
+- [ ] (0.1345) Onglet Quêtes de la carte de Tensho au Gold Saucer, « Quêtes pas encore disponibles » décoché : « Toutes les cartes en main » n'y est plus (la carte du jeu ne la montre pas) ; les quêtes que la carte montre y sont.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
