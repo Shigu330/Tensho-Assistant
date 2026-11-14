@@ -262,6 +262,23 @@ public sealed class JitWarmup : IDisposable
     public static string PauseText(double milliseconds)=>
         milliseconds<1 ? "":string.Create(System.Globalization.CultureInfo.InvariantCulture,$" (runtime pauses {milliseconds:0} ms)");
 
+    /// <summary>
+    /// X-01 (0.1310): what else happened during a slow pass, for its line of the log: methods compiled by the other threads (the warm-up, the
+    /// readers' compiler) and their time, waits on a lock held by another thread, collections by generation, the readers' classes still
+    /// waiting. On 13-14/11 a reader took 187 to 309 ms about 24 s after each load (a different one each time, nothing compiled on the game's
+    /// thread, 19 to 36 ms of pauses): the rest of the time was spent waiting on something these figures name. Nothing when all are zero.
+    /// </summary>
+    public static string ContextText(double otherCompilingMs,long otherMethods,long contentions,int gen0,int gen1,int gen2,int waitingClasses)
+    {
+        var parts=new List<string>();
+        var culture=System.Globalization.CultureInfo.InvariantCulture;
+        if(otherMethods>0)parts.Add(string.Create(culture,$"other threads compiled {otherMethods} methods in {otherCompilingMs:0} ms"));
+        if(contentions>0)parts.Add(string.Create(culture,$"{contentions} lock waits"));
+        if(gen0+gen1+gen2>0)parts.Add(string.Create(culture,$"collections {gen0}/{gen1}/{gen2}"));
+        if(waitingClasses>0)parts.Add(string.Create(culture,$"{waitingClasses} reader classes waiting"));
+        return parts.Count==0 ? "":" ["+string.Join("; ",parts)+"]";
+    }
+
     internal static bool Compilable(MethodBase method)
     {
         if(method.IsAbstract || method.ContainsGenericParameters)return false;
