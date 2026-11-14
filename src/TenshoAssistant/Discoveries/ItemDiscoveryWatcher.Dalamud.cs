@@ -256,6 +256,7 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         catch{registrations.Dispose();throw;}
     }
 
+    private static void Step(string name)=>TenshoAssistant.Competitive.CompetitiveGate.Step(name);
     private void Update(IFramework unused)
     {
         if(disposed)return;
@@ -272,16 +273,18 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
         if(!wanted.Enabled || !wanted.ItemSources && !wanted.Fishing || !client.IsLoggedIn || objects.LocalPlayer is not { } me){before=null;return;}
         try
         {
-            var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);
-            CheckWeather(at,now,territory,duty);
-            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);ReadIntuition(now,at,territory,map,me);ReadSpectral(at,now,territory);}
+            // X-01 (0.1312): each step named (Step): a slow pass says which one cost (developer mode; nothing otherwise).
+            var at=DateTimeOffset.UtcNow;var territory=client.TerritoryType;var map=client.MapId;var duty=dutyOf(territory);Step("duty");
+            CheckWeather(at,now,territory,duty);Step("weather");
+            if(wanted.Fishing && me.ClassJob.RowId==18){ReadLine(now,me);ReadSpear(at,now,territory,map,me.Position);ReadIntuition(now,at,territory,map,me);ReadSpectral(at,now,territory);Step("fishing");}
             if(wanted.ItemSources)
             {
-                ReadSalvage(at);ReadPurify(at);ReadHandIn(at,now);ReadVenture(at);ReadLoot(at,territory,duty);
-                ReadFate(now);ReadTarget(now,at,territory,map);ReadDefeats(at,territory,map,me);ReadTreasureHunt(now);ReadLearned(at,now,territory,map);ReadSeasonal(at,now);ReadShopNpc(at,territory,map);ReadCasters(at,territory,map);
+                ReadSalvage(at);Step("salvage");ReadPurify(at);Step("purify");ReadHandIn(at,now);Step("hand-in");ReadVenture(at);Step("venture");ReadLoot(at,territory,duty);Step("loot");
+                ReadFate(now);Step("fate");ReadTarget(now,at,territory,map);ReadDefeats(at,territory,map,me);ReadTreasureHunt(now);Step("target, defeats, treasure hunt");
+                ReadLearned(at,now,territory,map);Step("learned");ReadSeasonal(at,now);Step("seasonal");ReadShopNpc(at,territory,map);Step("shop");ReadCasters(at,territory,map);Step("casters");
             }
-            SettleGains(now);
-            var (counts,hqCounts)=Counts();
+            SettleGains(now);Step("settle");
+            var (counts,hqCounts)=Counts();Step("counts");
             if(before is null || beforeHq is null){before=counts;beforeHq=hqCounts;return;}
             var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);before=counts;
             // X-76 E1 (0.916): a gain is an HQ sighting when HQ units of the item came in (the bags count HQ apart, slot.IsHq).

@@ -2,8 +2,8 @@ using TenshoAssistant.Diagnostics;
 
 // 0.1311 (X-01): a reader took 187 to 430 ms of one frame 15 to 25 s after each load made by Verify, a different one each time, nothing
 // compiled on the game's thread. The slow pass's line now says what the other threads did meanwhile (compiling, lock waits, collections,
-// readers' classes waiting): at 4:12 on 14/11 nothing was compiled anywhere while the readers' compiler had work, the whole game waiting
-// for the processor taken by Verify's tests and desktop pages. Verify.ps1 now runs below normal priority (the game keeps the processor).
+// readers' classes waiting). Verify.ps1 runs below normal priority (the game keeps the processor during a publication). 0.1312: the frame
+// itself follows the managed heap's size (developer reloads, D-144), not the processor.
 internal static class SlowContext1311Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }

@@ -33,9 +33,10 @@ if ($Plan -and ($Commit -or $Release -or $TestsOnly)) { throw '-Plan only says t
 if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
 if ($Major -and -not $Release) { throw '-Major goes with -Release only.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
-# X-01 (0.1310): the whole run below normal priority (the build, the tests alongside and the desktop pages inherit it): the game keeps the
-# processor. A load made by this run had a 190 to 310 ms frame 15 to 25 s after it, a different reader each time, while no other thread of
-# the game compiled anything (the whole game process waiting for the processor, 32 test threads and the desktop app at normal priority).
+# X-01 (0.1311): the whole run below normal priority (the build, the tests alongside and the desktop pages inherit it): the game keeps the
+# processor while a relay publishes during play. 0.1312: the 190 to 430 ms frame 15 to 25 s after a load made by this run is not the
+# processor's: it follows the size of the managed heap (none under 920 MB, then growing with it), filled by the earlier instances that a
+# developer reload leaves alive (D-144); a player's single load does not have it.
 try { (Get-Process -Id $PID).PriorityClass = [System.Diagnostics.ProcessPriorityClass]::BelowNormal } catch { }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $taskRoot = Split-Path -Parent $PSScriptRoot

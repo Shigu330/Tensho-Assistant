@@ -47,6 +47,31 @@ internal static partial class CompetitiveGate
     /// <summary>After that call (in a finally): its time is the game's, taken out of the subscription's measured time.</summary>
     internal static void GameCallEnded(long started)=>gameCallMs+=System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
+    // X-01 (0.1312): a reader names its steps (Step after each one); a slow pass says its costliest step, so the next slow reader says where
+    // its time went. Per thread: only the thread that started the steps counts them (elsewhere Step does nothing).
+    [ThreadStatic] private static long stepAt;
+    [ThreadStatic] private static string? costliestStep;
+    [ThreadStatic] private static double costliestStepMs;
+
+    /// <summary>The end of a reader's step named <paramref name="name"/> (the time since the last step, or since the pass began).</summary>
+    internal static void Step(string name)
+    {
+        if(stepAt==0)return;
+        var now=System.Diagnostics.Stopwatch.GetTimestamp();
+        var milliseconds=System.Diagnostics.Stopwatch.GetElapsedTime(stepAt,now).TotalMilliseconds;
+        if(milliseconds>costliestStepMs){costliestStepMs=milliseconds;costliestStep=name;}
+        stepAt=now;
+    }
+    /// <summary>A pass begins: its steps are counted on this thread.</summary>
+    internal static void StepsStart(){stepAt=System.Diagnostics.Stopwatch.GetTimestamp();costliestStep=null;costliestStepMs=0;}
+    /// <summary>The pass ends: its costliest named step for the log line (nothing when no step was named), and nothing counted any more.</summary>
+    internal static string StepsEnd()
+    {
+        var text=costliestStep is { } name ? string.Create(System.Globalization.CultureInfo.InvariantCulture,$" [costliest step {name} {costliestStepMs:0} ms]"):"";
+        stepAt=0;costliestStep=null;costliestStepMs=0;
+        return text;
+    }
+
     /// <summary>Starts the measure of one subscription: nothing of the game counted yet.</summary>
     internal static long MeasureStart(){gameCallMs=0;return System.Diagnostics.Stopwatch.GetTimestamp();}
 

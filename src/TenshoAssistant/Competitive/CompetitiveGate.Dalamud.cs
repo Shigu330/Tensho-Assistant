@@ -51,9 +51,11 @@ internal static partial class CompetitiveGate
         var allMethodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(false);
         var contentionsBefore=Monitor.LockContentionCount;
         var gen0Before=GC.CollectionCount(0);var gen1Before=GC.CollectionCount(1);var gen2Before=GC.CollectionCount(2);
+        StepsStart();
         var started=MeasureStart();
         handler(running);
         var spent=MeasureOwn(started);
+        var steps=StepsEnd();
         if(spent<=50)return;
         var name=$"{handler.Method.DeclaringType?.Name}.{handler.Method.Name}";
         if(slowNotes.Note(name,spent,Environment.TickCount64) is not { } worst)return;
@@ -63,7 +65,7 @@ internal static partial class CompetitiveGate
             System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore)+Diagnostics.JitWarmup.PauseText((GC.GetTotalPauseDuration()-pausedBefore).TotalMilliseconds)
             +Diagnostics.JitWarmup.ContextText((System.Runtime.JitInfo.GetCompilationTime(false)-allCompiledBefore-ownCompiling).TotalMilliseconds,
                 System.Runtime.JitInfo.GetCompiledMethodCount(false)-allMethodsBefore-ownMethods,Monitor.LockContentionCount-contentionsBefore,
-                GC.CollectionCount(0)-gen0Before,GC.CollectionCount(1)-gen1Before,GC.CollectionCount(2)-gen2Before,CompilerState?.Waiting ?? 0),spent,worst);
+                GC.CollectionCount(0)-gen0Before,GC.CollectionCount(1)-gen1Before,GC.CollectionCount(2)-gen2Before,CompilerState?.Waiting ?? 0)+steps,spent,worst);
     }
 
     /// <summary>
