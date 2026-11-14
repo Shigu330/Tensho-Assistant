@@ -837,7 +837,7 @@ public sealed partial class Plugin : IDalamudPlugin
             Inventory.GilWatcher? gilWatcher=null;
             var gilStore=new Inventory.GilJournalStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"GilJournal"),tenshoData);
             registrations.Register(()=>gilWatcher=new Inventory.GilWatcher(framework,player,gameGui,gilStore,log,
-                ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode),()=>gilWatcher?.Dispose());
+                ()=>mainWindow.GameWindowSource?.Invoke().Select(window=>window.Name).ToArray() ?? [],()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());
             mainWindow.GilJournalState=()=>gilWatcher?.State;
             // The server bar's entries (alarms, reminders, currencies, gil, X-217's optional entries), once the services they show exist:
             // the server bar family (X-153, 0.1240: Plugin.ServerBar.cs), in the order they were created before.

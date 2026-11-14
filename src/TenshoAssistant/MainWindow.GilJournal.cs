@@ -26,6 +26,10 @@ internal sealed partial class MainWindow
         GilCategory.Company=>Dalamud.Interface.FontAwesomeIcon.Users,
         GilCategory.Mail=>Dalamud.Interface.FontAwesomeIcon.Envelope,
         GilCategory.OceanFishing=>Dalamud.Interface.FontAwesomeIcon.Fish,
+        // X-320 (0.1319).
+        GilCategory.Fate=>Dalamud.Interface.FontAwesomeIcon.Flag,
+        GilCategory.Defeat=>Dalamud.Interface.FontAwesomeIcon.Crosshairs,
+        GilCategory.ChallengeLog=>Dalamud.Interface.FontAwesomeIcon.Book,
         _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
     };
     private void DrawGilJournal()

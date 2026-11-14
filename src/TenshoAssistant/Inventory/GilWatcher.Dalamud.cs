@@ -35,11 +35,25 @@ public sealed unsafe class GilWatcher : IDisposable
     private readonly Func<IReadOnlyList<string>>? windowsOpen;
     private readonly Func<bool> developerMode;
     private readonly Dictionary<string,DateTimeOffset> seenAny=[];
+    // X-320 (0.1319): when each log message of GilJournal.Messages was last seen (challenge log entry done, a defeat); the event may come off
+    // the framework thread, hence the lock.
+    private readonly Dictionary<uint,DateTimeOffset> messages=[];
+    private readonly object messagesGate=new();
+    private readonly IChatGui? chat;
     private long retainerDeposits;
-    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,GilJournalStore store,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null)
+    public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,GilJournalStore store,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null,IChatGui? chat=null)
     {
-        this.framework=framework;this.player=player;this.gui=gui;this.store=store;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);
-        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        this.framework=framework;this.player=player;this.gui=gui;this.store=store;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);this.chat=chat;
+        if(chat is not null)chat.LogMessage+=OnLogMessage;
+        try{TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);}
+        catch{if(chat is not null)chat.LogMessage-=OnLogMessage;throw;}
+    }
+
+    private void OnLogMessage(Dalamud.Game.Chat.ILogMessage message)
+    {
+        if(disposed)return;
+        foreach(var (id,_) in GilJournal.Messages)
+            if(message.LogMessageId==id){lock(messagesGate)messages[id]=DateTimeOffset.UtcNow;return;}
     }
 
     private void OnUpdate(IFramework _)
@@ -120,7 +134,9 @@ public sealed unsafe class GilWatcher : IDisposable
         if(last is { } before && before!=value)
         {
             var delta=value-before;
-            var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.ForDelta(GilJournal.Classify(seen,at),delta)};
+            Dictionary<uint,DateTimeOffset> heard;
+            lock(messagesGate)heard=new(messages);
+            var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.ForDelta(GilJournal.Classify(seen,at,heard),delta)};
             // 0.769 (X-19): a deposit to the retainers waits for their rise; a rise beyond the deposits is their market sales.
             if(source==GilSource.Character && category==GilCategory.Retainer && delta<0)retainerDeposits+=-delta;
             if(source==GilSource.Retainers && delta>0)
@@ -132,8 +148,9 @@ public sealed unsafe class GilWatcher : IDisposable
             }
             if(delta!=0)entries.Add(new GilEntry(at,delta,value,source,category));
             if(category==GilCategory.Other && developerMode())
-                log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}",value-before,
-                    string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)));
+                log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}; log messages: {2}",value-before,
+                    string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)),
+                    string.Join(", ",heard.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).Select(pair=>pair.Key)));
             if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,at);
             dirty=true;
         }
@@ -163,6 +180,7 @@ public sealed unsafe class GilWatcher : IDisposable
     {
         if(disposed)return;
         disposed=true;
+        if(chat is not null)chat.LogMessage-=OnLogMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);
         if(writer?.Flush(TimeSpan.FromSeconds(3))==false)log.Warning("Gil journal: the last write did not finish before the plugin closed.");
