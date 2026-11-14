@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1328.0
+- Plan global, X-334 : Tests (relecture 0.1318, I6, R28.14) : l'aller-retour « enregistrer puis relire » de la configuration passe désormais par le même sérialiseur que le plugin (Newtonsoft, TypeNameHandling.Objects, réglages de Plugin.cs), au lieu de la réflexion ou de System.Text.Json. Un fichier d'avant le renommage (GearExactOutsideCaps) garde le choix du joueur (coupé, allumé, ou par défaut), seul le nouveau nom est réécrit, et le choix tient après deux sauvegardes ; une alarme déplacée sur place est relue telle quelle (même alarme, nouvelle heure, rien de perdu). Le projet de tests référence Newtonsoft.Json 13.0.4, la version que Dalamud fournit.
+- Tests : ConfigRoundTrip1328Tests. Verify.ps1 (agent) : 2491/2491, 0 avertissement, 0 erreur ; DLL 0.1328.0.0. Rien à essayer en jeu.
+### English
+- Tests (review of 0.1318, I6, R28.14): the settings' « save then read back » now goes through the plugin's own serializer (Newtonsoft, TypeNameHandling.Objects, Plugin.cs's settings) instead of reflection or System.Text.Json. A file from before the rename (GearExactOutsideCaps) keeps the player's choice (off, on, or default), only the new name is written again, and the choice holds across two saves; an alarm moved in place is read back as it is (same alarm, new time, nothing lost). The test project references Newtonsoft.Json 13.0.4, the version Dalamud ships.
+
 ## 0.1327.0
 - Plan global, X-332 : Performance (relecture 0.1318, I3 et I4, R07) : deux lectures des feuilles du jeu sortent du dessin. Les noms des tâches de servant des découvertes (RetainerTask, RetainerTaskRandom et toute la feuille ClassJob, relues à chaque image pour chaque ligne) viennent d'une table construite une fois hors du dessin (BackgroundTable, nouvelle aide de Caching) ; avant qu'elle soit prête, une tâche montre son numéro. Le catalogue des sociétés alliées (avec le parcours de toute la feuille Quest de X-265) est lu dans une tâche à la première ouverture de la page, comme ceux des ALEA et du lexique, avec « Lecture des données du jeu… » entre-temps.
 - Pour les joueurs : Le tableau des découvertes avec des tâches de servant et la première ouverture des Sociétés alliées ne ralentissent plus les images du jeu.

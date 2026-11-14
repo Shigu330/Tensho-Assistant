@@ -225,5 +225,7 @@
     <!-- X-172 (0.1136): Discoveries/DiscoveryDatabase.cs, linked with Discoveries/*.cs, uses SQLite: the plugin's packages. -->
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.14" />
+    <!-- X-334 (0.1328): the plugin saves its settings with Newtonsoft (Dalamud's, 13.0.4): the round-trip tests use the same serializer. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 </Project>
