@@ -10,7 +10,7 @@
 - .NET SDK **10.0** (`global.json` accepts 10.0.100 and newer: the Dalamud repository builds with 10.0.101). Dalamud.NET.Sdk 15 is restored from NuGet during the build, but
   the Dalamud assemblies it compiles against come from your Dalamud install (`%AppData%\XIVLauncher\addon\Hooks\dev`), or from the folder
   named by the `DALAMUD_HOME` environment variable (for example an extracted Dalamud distribution).
-- PowerShell 7 recommended (`commit-release.bat` falls back to Windows PowerShell 5.1).
+- PowerShell 7 recommended (`scripts/commit-release.bat` falls back to Windows PowerShell 5.1).
 
 ## Build and test
 
@@ -64,7 +64,6 @@ Development builds in game:
 ├── tools/                    read-only data probes (game sheets, APIs) and data scripts
 ├── scripts/                  Verify.ps1 (build + tests + localization + package), Release.ps1 (git steps),
 │                             New-Tool.ps1 (skeleton of a new page), Update-ToolGallery.ps1 (gallery index)
-├── commit-release.bat        Verify -Commit then -Release (maintainer)
 ├── repo.json                 Dalamud custom repository entry (refreshed by each release)
 ├── .github/                  CodeQL and build workflows, Dependabot settings, issue and pull request templates
 ├── community-help/           help videos and guides listed in the plugin
@@ -88,7 +87,7 @@ Development builds in game:
   scripts (`tools/submarine-loot.py`, `tools/garden-data.py`; `tools/discoveries-merge.py`, the maintainer's merge of the shared
   discoveries into `community-discoveries/`, see its [README](community-discoveries/README.md)).
 - Scripts: `scripts/Verify.ps1` (checks), `scripts/Release.ps1` (git steps, called by `Verify.ps1`), `scripts/New-Tool.ps1` (skeleton
-  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `commit-release.bat` (root).
+  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `scripts/commit-release.bat`.
 - Documentation: see [docs/README.md](docs/README.md). History: [CHANGELOG.md](CHANGELOG.md).
 
 ## Project rules
@@ -187,7 +186,7 @@ Version numbers (`X.Y.Z`, decision DEC-024):
 | `.\scripts\Verify.ps1 -Commit` | On `Devloppement`: commits every change as `x.y.z` with the CHANGELOG entry as description, pushes `Devloppement`. |
 | `.\scripts\Verify.ps1 -Release` | From a clean, pushed `Devloppement` whose GitHub CI (`Build and test`) is green for that commit, with no other workflow failed: commits `repo.json` and tags it `Stable-x.y.z` (local steps); then pushes the tag, creates the GitHub release with `latest.zip` and the CHANGELOG notes, moves `main` (which carries `repo.json`) to the tagged commit last, as a fast-forward (no merge commit, no branch change), and pushes `Devloppement`. Stops (exit code 2) while the CI runs or has failed, and when one of the maintainer's working files (the 0.802 block of `.gitignore`) or a Discord webhook address would be published. Run again after a failure: when the tag exists but the GitHub release or `main` is missing, only the missing steps run. Stops (exit code 2) when the release is complete. |
 | add `-Hotfix "<reason>"` (with `-Release`) | Urgent fix (game patch, privacy) released before its in-game tests: the reason and « not validated in game », in English then French, head the release notes. |
-| `commit-release.bat` (double-click) | `-Commit` then `-Release`, stopping before the release if the commit step fails or stops; the release step then stops until the CI of the pushed commit is green: run it again once it is. `commit-release.bat dry` shows the commands only, `commit-release.bat commit` commits only. |
+| `scripts/commit-release.bat` (double-click) | `-Commit` then `-Release`, stopping before the release if the commit step fails or stops; the release step then stops until the CI of the pushed commit is green: run it again once it is. `commit-release.bat dry` shows the commands only, `commit-release.bat commit` commits only. |
 | add `-DryRun` | Prints the git/gh commands without running them (the CI and push checks only warn). |
 | add `-Force` | Runs every check again; otherwise checks are skipped when the same version and sources (all tracked files except `*.md`, `docs/`, `repo.json`) already passed (stamp in `artifacts/verify-stamp.json`). |
 
@@ -213,11 +212,11 @@ requires, among other things (restrictions and AI policy re-read on 2026-11-04):
   automated gameplay (crafting, dialogues, loot…), nothing that augments, alters or interferes with combat (combat-related plugins contact
   the approval team before submitting), no advantage in any competitive or PvP environment, no parsing, no bypassing the Mog Station, no
   collection of other players' account ids;
-- [AI policy](https://dalamud.dev/plugin-publishing/ai-policy): AI use must be **declared** in the pull request (written by a human);
+- [AI policy](https://dalamud.dev/plugin-publishing/ai-policy), for information only: this project no longer follows it, as it submits
+  nothing (DEC-050), and its AI use stays disclosed. For a submission, the policy says: AI use must be **declared** in the pull request (written by a human);
   a submission **entirely generated by AI without real human involvement is rejected**, and twice means a ban; undisclosed AI use in a
   clearly AI-written submission means a ban; Copilot and Auto submissions are reviewed at the maintainers' discretion and may be closed if
-  larger than the author can account for; the author must understand, test, and explain the code. This project no longer
-  follows the AI policy, as it submits nothing (DEC-050); its AI use stays disclosed.
+  larger than the author can account for; the author must understand, test, and explain the code.
 
 **Current project status:** the code is written with an AI agent (level "Auto") under the direction of its author, who tries the changes
 in game. Each release is built and tested automatically (compilation, tests, the desktop app drawn without a window), then loaded
@@ -263,7 +262,7 @@ except the AI policy (DEC-050); AI use stays disclosed (see « Dalamud publicati
   depuis NuGet pendant la compilation, mais les assemblys Dalamud contre lesquels il compile viennent de votre installation Dalamud
   (`%AppData%\XIVLauncher\addon\Hooks\dev`), ou du dossier nommé par la variable d'environnement `DALAMUD_HOME` (par exemple une
   distribution Dalamud extraite).
-- PowerShell 7 recommandé (`commit-release.bat` se replie sur Windows PowerShell 5.1).
+- PowerShell 7 recommandé (`scripts/commit-release.bat` se replie sur Windows PowerShell 5.1).
 
 ## Compiler et tester
 
@@ -321,7 +320,7 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
   `tools/ApiProbe`) et scripts de données (`tools/submarine-loot.py`, `tools/garden-data.py` ; `tools/discoveries-merge.py`, la fusion
   par le mainteneur des découvertes partagées dans `community-discoveries/`, voir son [README](community-discoveries/README.md)).
 - Scripts : `scripts/Verify.ps1` (contrôles), `scripts/Release.ps1` (étapes git, appelé par `Verify.ps1`), `scripts/New-Tool.ps1`
-  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `commit-release.bat` (racine).
+  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `scripts/commit-release.bat`.
 - Documentation : voir [docs/README.md](docs/README.md). Historique : [CHANGELOG.md](CHANGELOG.md).
 
 ## Règles du projet
@@ -427,7 +426,7 @@ Numéros de version (`X.Y.Z`, décision DEC-024) :
 | `.\scripts\Verify.ps1 -Commit` | Sur `Devloppement` : commite tous les changements sous `x.y.z` avec l'entrée du CHANGELOG comme description, pousse `Devloppement`. |
 | `.\scripts\Verify.ps1 -Release` | Depuis une `Devloppement` propre et poussée, dont la CI GitHub (`Build and test`) est verte pour ce commit, sans autre workflow en échec : commite `repo.json` et pose le tag `Stable-x.y.z` (étapes locales) ; puis pousse le tag, crée la release GitHub avec `latest.zip` et les notes du CHANGELOG, avance `main` (qui porte `repo.json`) jusqu'au commit du tag en dernier, en avance rapide (sans commit de fusion ni changement de branche), et pousse `Devloppement`. S'arrête (code de sortie 2) tant que la CI tourne ou a échoué, et quand un des fichiers de travail du mainteneur (le bloc 0.802 de `.gitignore`) ou une adresse de webhook Discord serait publié. À relancer après un échec : quand le tag existe mais que la release GitHub ou `main` manque, seules les étapes manquantes s'exécutent. S'arrête (code de sortie 2) quand la release est complète. |
 | ajouter `-Hotfix "<raison>"` (avec `-Release`) | Correctif urgent (patch du jeu, confidentialité) publié avant ses essais en jeu : la raison et « non validé en jeu », en anglais puis en français, en tête des notes de la release. |
-| `commit-release.bat` (double-clic) | `-Commit` puis `-Release`, en s'arrêtant avant la release si l'étape de commit échoue ou s'arrête ; l'étape de release s'arrête ensuite tant que la CI du commit poussé n'est pas verte : la relancer quand elle l'est. `commit-release.bat dry` montre seulement les commandes, `commit-release.bat commit` commite seulement. |
+| `scripts/commit-release.bat` (double-clic) | `-Commit` puis `-Release`, en s'arrêtant avant la release si l'étape de commit échoue ou s'arrête ; l'étape de release s'arrête ensuite tant que la CI du commit poussé n'est pas verte : la relancer quand elle l'est. `commit-release.bat dry` montre seulement les commandes, `commit-release.bat commit` commite seulement. |
 | ajouter `-DryRun` | Affiche les commandes git/gh sans les lancer (les contrôles de CI et de push avertissent seulement). |
 | ajouter `-Force` | Refait tous les contrôles ; sinon ils sont sautés quand la même version et les mêmes sources (tous les fichiers suivis sauf `*.md`, `docs/`, `repo.json`) ont déjà réussi (tampon dans `artifacts/verify-stamp.json`). |
 
@@ -455,12 +454,12 @@ demande entre autres (restrictions et politique IA relues le 2026-11-04) :
   aucun jeu automatisé (artisanat, dialogues, butin…), rien qui augmente, modifie ou gêne le combat (les plugins liés au combat
   contactent l'équipe d'approbation avant de soumettre), aucun avantage en environnement compétitif ou JcJ, aucun parsing, aucun
   contournement de la Mog Station, aucune collecte des identifiants de compte des autres joueurs ;
-- [politique IA](https://dalamud.dev/plugin-publishing/ai-policy) : l'usage de l'IA doit être **déclaré** dans la pull request (écrite
+- [politique IA](https://dalamud.dev/plugin-publishing/ai-policy), pour information seulement : ce projet ne la suit plus, puisqu'il ne
+  soumet rien (DEC-050), et son usage de l'IA reste déclaré. Pour une soumission, elle dit : l'usage de l'IA doit être **déclaré** dans la pull request (écrite
   par un humain) ; une soumission **entièrement générée par IA sans réelle implication humaine est refusée**, et deux fois mènent à un
   bannissement ; un usage non déclaré dans une soumission clairement écrite par IA mène à un bannissement ; les soumissions Copilot et
   Auto sont examinées à la discrétion des mainteneurs et peuvent être fermées si elles dépassent ce dont l'auteur peut répondre ; l'auteur
-  doit comprendre, tester et expliquer le code. Ce projet ne suit plus la politique IA, puisqu'il ne soumet rien (DEC-050) ;
-  son usage de l'IA reste déclaré.
+  doit comprendre, tester et expliquer le code.
 
 **État actuel du projet :** le code est écrit avec un agent IA (niveau « Auto ») sous la direction de son auteur, qui essaie les
 changements en jeu. Chaque release est compilée et testée automatiquement (compilation, tests, application de bureau dessinée sans fenêtre), puis

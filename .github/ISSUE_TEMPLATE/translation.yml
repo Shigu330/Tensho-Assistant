@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         The texts live in `src/TenshoAssistant/Localization/Languages/<code>.json`; how to add or check a language is explained in
-        [src/TenshoAssistant/Localization/README.md](https://github.com/Shigu330/Tensho-Assistant/blob/Devloppement/src/TenshoAssistant/Localization/README.md).
+        [src/TenshoAssistant/Localization/README.md](https://github.com/Shigu330/Tensho-Assistant/blob/main/src/TenshoAssistant/Localization/README.md).
         A pull request is welcome too; `.\scripts\Verify.ps1 -TestsOnly` checks the language files without the game.
         You can write in French. / Vous pouvez écrire en français.
   - type: input

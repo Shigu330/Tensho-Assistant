@@ -22,8 +22,6 @@ Working documents of [project/](project/), changed with almost every version and
 
 Consistency rule: the code is the reference. A document that contradicts the code is fixed; a fact that was not checked is marked as such,
 with its date. The current state, what is done and what is validated in game, is in [project/GLOBAL-PLAN.md](project/GLOBAL-PLAN.md).
-Some documents of `project/` still name old goal sheets (`goals/`) and agent files (`ai/`): they are kept out of the repository since
-0.802, so a link to them does not open on GitHub.
 
 ---
 
@@ -48,6 +46,4 @@ Documents de travail de [project/](project/), changés à presque chaque version
 <!-- /docgen:index-fr -->
 
 Règle de cohérence : le code fait foi. Un document qui contredit le code est corrigé ; un fait non vérifié est marqué comme tel, avec sa
-date. L'état courant, ce qui est fait et ce qui est validé en jeu, est dans [project/GLOBAL-PLAN.md](project/GLOBAL-PLAN.md). Des
-documents de `project/` nomment encore d'anciennes fiches d'objectifs (`goals/`) et des fichiers de l'agent (`ai/`) : ils sont gardés
-hors du dépôt depuis la 0.802, donc un lien vers eux ne s'ouvre pas sur GitHub.
+date. L'état courant, ce qui est fait et ce qui est validé en jeu, est dans [project/GLOBAL-PLAN.md](project/GLOBAL-PLAN.md).

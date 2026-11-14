@@ -20,7 +20,7 @@ REPLACEABLE. NEEDS_STUDY is a note of uncertainty, not a removal. No arbitrary p
 
 The « Work » column was written at 0.315 (2026-11-02) and completed until 0.512; what came later is in the [CHANGELOG](../../CHANGELOG.md)
 and the [global plan](GLOBAL-PLAN.md). « Validated » = report or screenshot of the user; the other versions named are to be validated in
-game. The goal sheets these rows named (`docs/goals/`) are agent files, outside the repository.
+game. The goal sheets these rows named were the author's working notes, outside the repository.
 
 | # | ID | Plugin | Author(s) | Description | State | Coverage | Work | Evidence | Group |
 |---|---|---|---|---|---|---|---|---|---|
@@ -49,7 +49,7 @@ application. The other capacities follow the same principle, without declaring t
 ## User requests R-01 to R-14
 
 This table is the only list of the requests R-01 to R-14 (their detailed wording was in USER-REQUESTS, removed in 0.1088; git history keeps it); a new request goes to the [global plan](GLOBAL-PLAN.md) as an X-NN point ([IDS](IDS.md)). « Validated » = report or screenshot of the user; otherwise, to validate in
-game. The plans R-06 and R-11 are agent files (`docs/goals/`), outside the repository.
+game. The plans R-06 and R-11 are the author's working notes, outside the repository.
 
 | No. | Subject | Done | Validated in game | Left |
 |---|---|---|---|---|
@@ -128,8 +128,8 @@ NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitu
 
 La colonne « Travail » a été écrite au 0.315 (2026-11-02) et complétée jusqu'au 0.512 ; la suite est dans le
 [CHANGELOG](../../CHANGELOG.md) et le [plan global](GLOBAL-PLAN.md). « Validé » = rapport ou capture de l'utilisateur ; les autres
-versions citées sont à valider en jeu. Les fiches d'objectifs que citaient ces lignes (`docs/goals/`) sont des fichiers de l'agent, hors
-du dépôt.
+versions citées sont à valider en jeu. Les fiches d'objectifs que citaient ces lignes étaient des notes de travail de l'auteur,
+hors du dépôt.
 
 | # | ID | Plugin | Auteur(s) | Description | State | Coverage | Travail | Preuves | Groupe |
 |---|---|---|---|---|---|---|---|---|---|
@@ -158,7 +158,7 @@ toute application native. Les autres capacités suivent le même principe, sans 
 ## Demandes utilisateur R-01 à R-14
 
 Ce tableau est la seule liste des demandes R-01 à R-14 (leur libellé détaillé était dans USER-REQUESTS, retiré en 0.1088 ; l'historique git le garde) ; une nouvelle demande va dans le [plan global](GLOBAL-PLAN.md) comme point X-NN ([IDS](IDS.md)). « Validé » = rapport ou capture de l'utilisateur ; sinon, à valider en jeu. Les
-plans R-06 et R-11 sont des fichiers de l'agent (`docs/goals/`), hors du dépôt.
+plans R-06 et R-11 sont des notes de travail de l'auteur, hors du dépôt.
 
 | N° | Sujet | Fait | Validé en jeu | Reste |
 |---|---|---|---|---|

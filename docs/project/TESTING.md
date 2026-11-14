@@ -42,8 +42,7 @@ repris dans la ligne « Tests » de chaque entrée du [CHANGELOG](../../CHANGELO
 
 1. Charger `C:\Plugins-ff14\src\TenshoAssistant\bin\x64\Release\TenshoAssistant.dll` dans les plugins de développement Dalamud ;
    vérifier la version affichée dans la fenêtre (`/tensho`).
-2. Suivre la liste ci-dessous, ou le protocole de la version dans [CHANGELOG.md](../../CHANGELOG.md) / le document d'objectif
-   (`docs/goals/<ID>.md`).
+2. Suivre la liste ci-dessous, ou le protocole de la version dans [CHANGELOG.md](../../CHANGELOG.md).
 3. Rapporter : version, ce qui a été observé, captures si possible, et `dalamud.log` / `dalamud.crashhandler.log` en cas d'erreur.
    Seul ce rapport permet d'écrire « validé en jeu » ; il se reporte en cochant la case de l'essai sur cette page.
 

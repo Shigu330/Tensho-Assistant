@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1347.0
+- Plan global, X-357 : Dépôt propre avant l'annonce (inventaire accepté par l'utilisateur) : CONTRIBUTING donne la politique IA de Dalamud pour information seulement (plus suivie, DEC-050) ; tête de GLOBAL-PLAN sans version ni soumission périmées ; ROADMAP, TESTING et docs/README ne nomment plus de chemins de travail hors du dépôt ; les formulaires d'issue renvoient à la version publiée (main). `commit-release.bat` passe dans `scripts/`.
+- Tests : FirstPlayerDocs1219Tests. Verify.ps1 (agent) : 2523/2523, 0 avertissement, 0 erreur ; DLL 0.1347.0.0. Rien à essayer en jeu.
+### English
+- Clean repository before the announcement (inventory accepted by the user): CONTRIBUTING gives the Dalamud AI policy for information only (no longer followed, DEC-050); GLOBAL-PLAN's head without an outdated version or submission; ROADMAP, TESTING and docs/README no longer name working paths outside the repository; the issue forms link the published version (main). `commit-release.bat` moves to `scripts/`.
+
 ## 0.1346.0
 - Plan global, X-358 : Carte, onglet Quêtes du menu du clic droit : la liste des quêtes que le jeu propose (0.1345) comptait aussi les étapes des quêtes déjà acceptées, de même type de marqueur. Seules les quêtes de la liste du jeu des quêtes pas encore acceptées comptent maintenant comme proposées (`MapOfferedQuests.Tag`, marque `Offered` des marqueurs) ; une carte où ne figurent que des quêtes acceptées ne restreint plus la liste. Test QuestOffered1346 (une quête acceptée et une proposée au même endroit).
 - Pour les joueurs : Carte, onglet Quêtes : les quêtes déjà acceptées ne changent plus la liste des quêtes proposées.

@@ -1,11 +1,11 @@
 @echo off
 rem Tensho Assistant: verify, commit and release in one go (double-click or run from a terminal).
-rem   commit-release.bat          commit then release
-rem   commit-release.bat dry      same, commands shown only (-DryRun)
-rem   commit-release.bat commit   commit only
+rem   scripts\commit-release.bat          commit then release
+rem   scripts\commit-release.bat dry      same, commands shown only (-DryRun)
+rem   scripts\commit-release.bat commit   commit only
 rem Exit code: 0 done, 1 error, 2 expected stop (already released, nothing new...).
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 set "MODE=%~1"
 set "DRY="
