@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Survey of 2026-11-02 (0.318), read-only. State at 2026-11-04: step g) is done; what remains is in [G-PROPOSALS](G-PROPOSALS.md) "Gaps left". Request: « ce qui manque à Tensho par rapport aux plugins existants » ("what Tensho lacks compared with existing plugins"), widened to
+Survey of 2026-11-02 (0.318), read-only. State at 2026-11-04: step g) is done; what remains is in [G-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md) "Gaps left". Request: « ce qui manque à Tensho par rapport aux plugins existants » ("what Tensho lacks compared with existing plugins"), widened to
 « pas que plugin de référence mais ceux du dépôt Dalamud (voir repo non officiel si ça respecte les règles Dalamud upload) » ("not only the reference plugins but those of the Dalamud repository (look at unofficial repos if they follow the Dalamud upload rules)"), with
 a decision phase for the user before the roadmap. The "Choice" column gives the user's decision (2026-11-02); the gaps kept
 are in the [ROADMAP](ROADMAP.md), step g) of the queue.
@@ -512,7 +512,7 @@ Note: Artisan, XIV-Shinies and Tomestone, classed "reference", in fact come from
 
 # Plan des manques par rapport aux plugins existants (point c)
 
-Relevé du 2026-11-02 (0.318), en lecture seule. État au 2026-11-04 : l'étape g) est faite ; ce qui reste est dans [G-PROPOSALS](G-PROPOSALS.md) « Écarts laissés ». Demande : « ce qui manque à Tensho par rapport aux plugins existants », élargie à
+Relevé du 2026-11-02 (0.318), en lecture seule. État au 2026-11-04 : l'étape g) est faite ; ce qui reste est dans [G-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md) « Écarts laissés ». Demande : « ce qui manque à Tensho par rapport aux plugins existants », élargie à
 « pas que plugin de référence mais ceux du dépôt Dalamud (voir repo non officiel si ça respecte les règles Dalamud upload) », avec
 une phase de décision de l'utilisateur avant la feuille de route. La colonne « Choix » donne la décision de l'utilisateur (2026-11-02) ;
 les manques retenus sont dans la [ROADMAP](ROADMAP.md), étape g) de la file.

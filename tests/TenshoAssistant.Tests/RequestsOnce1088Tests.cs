@@ -16,8 +16,7 @@ internal static class RequestsOnce1088Tests
             var project = Read("docs/project/PROJECT.md");
             Check(!project.Contains("| Request | Domain | Where in the code |") && !project.Contains("| Demande | Domaine | Où dans le code |"),"PROJECT no longer repeats an R table");
             foreach (var path in new[] { "docs/project/PROJECT.md","docs/project/ROADMAP.md","docs/project/DECISIONS.md","docs/project/GAPS.md",
-                                         "docs/project/ITEMS-PROPOSALS.md","docs/project/MAP-PROPOSALS.md","docs/project/TOOLS-PROPOSALS.md",
-                                         "docs/project/CRAFT-GATHER-PROPOSALS.md","tools/README.md","docs/README.md" })
+                                         "tools/README.md","docs/README.md" })
             {
                 var text = Read(path);
                 Check(!text.Contains("BACKLOG.md") && !text.Contains("USER-REQUESTS.md"),path + " no longer names a removed file");

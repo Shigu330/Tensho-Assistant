@@ -1,28 +1,21 @@
-// 0.1086 (audit A072, D-138): the work audits and plans left docs/evidence for docs/project/audits/, and no tracked file names their old path.
+// 0.1086 (audit A072, D-138): the work audits and plans left docs/evidence for docs/project/audits/.
+// 0.1348 (X-357, the user's sort of 14/11): docs/project/audits/ is gone; the two audits the code cites are evidence again (R06), the
+// others are removed (git history keeps them), and no tracked file names the old folder.
 internal static class AuditsFolder1086Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
-    private static readonly string[] Moved = ["x76-2bc-plan.md","x76-0-baseline.md","x76-9-comparison.md","x76-2-duplicates.md",
-        "0.857-community-map.md","0.949-network-rules.md","0.874-probe-coverage.md"];
-
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Audits: moved out of docs/evidence, old paths gone",() =>
+        ("Audits: the folder is gone, the two cited by the code are in docs/evidence",() =>
         {
-            foreach (var name in Moved)
-            {
-                Check(File.Exists(Path.GetFullPath("docs/project/audits/" + name)),"in docs/project/audits: " + name);
-                Check(!File.Exists(Path.GetFullPath("docs/evidence/" + name)),"out of docs/evidence: " + name);
-            }
-            foreach (var path in new[] { "CHANGELOG.md","docs/project/DECISIONS.md","docs/project/GLOBAL-PLAN.md",
-                                         "src/TenshoAssistant/Market/SeenPrices.cs","src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs" })
-            {
-                var text = File.ReadAllText(Path.GetFullPath(path));
-                foreach (var name in Moved)
-                    Check(!text.Contains("docs/evidence/" + name),path + " still names docs/evidence/" + name);
-            }
-            Check(File.ReadAllText(Path.GetFullPath("docs/README.md")).Contains("[audits/](project/audits/)"),"audits/ is in the documents' map");
+            Check(!Directory.Exists(Path.GetFullPath("docs/project/audits")),"docs/project/audits is gone");
+            foreach (var name in new[] { "0.857-community-map.md","0.874-probe-coverage.md" })
+                Check(File.Exists(Path.GetFullPath("docs/evidence/" + name)),"in docs/evidence: " + name);
+            foreach (var path in new[] { "src/TenshoAssistant/Market/SeenPrices.cs","src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs",
+                                         "src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs","docs/README.md","docs/project/DECISIONS.md" })
+                Check(!File.ReadAllText(Path.GetFullPath(path)).Replace("/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/audits/","").Contains("project/audits/"),path + " no longer names docs/project/audits/ (but by a permanent link)");
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Market/SeenPrices.cs")).Contains("docs/evidence/0.857-community-map.md"),"the code cites the evidence's new place");
         }),
     ];
 }

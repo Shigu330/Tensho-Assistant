@@ -233,7 +233,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
     Marché le dit au lieu d'interroger Universalis ;
   - la pause de 3 s entre deux requêtes ne relance plus une tâche à chaque image : la même tâche attend, en montrant le cache.
 - Demande : vérifier que les réglages de cache sont utilisés partout, et ajouter « jamais ». Revérification faite (détail dans
-  `docs/evidence/0.246-cache-audit.md`, section 0.281) : toutes les sources suivent leur zone de Réglages › Caches ; seul le cache
+  `https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md`, section 0.281) : toutes les sources suivent leur zone de Réglages › Caches ; seul le cache
   disque des annonces manquait (ajouté). Nouvelle durée **« Jamais (seulement sur demande) »** dans chaque zone : les données ne sont
   plus relues d'elles-mêmes, les boutons « Actualiser » restent disponibles.
 - Verify.ps1 (agent) : 561/561, 0 avertissement, 0 erreur ; DLL 0.281.0.0. Non validé en jeu.
@@ -658,13 +658,13 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 
 ## 0.246.0
 - R-10 (audit des caches) : relevé de toutes les sources réseau et données du jeu, de leurs durées et cadences dans
-  `docs/evidence/0.246-cache-audit.md`. Deux défauts corrigés :
+  `https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md`. Deux défauts corrigés :
   - LuminaSupplemental et GatherBuddy sont demandés à chaque image ; après un échec (hors ligne, GitHub indisponible), le
     téléchargement repartait aussitôt, en boucle. Désormais 5 min d'attente avant un nouvel essai.
   - Quand la copie en cache a expiré et que le réseau échoue, l'ancienne copie est utilisée au lieu de perdre la source.
 - Verify.ps1 (agent) : 557/557, 0 avertissement, 0 erreur ; DLL 0.246.0.0. Non validé en jeu.
 ### English
-- Cache audit (docs/evidence/0.246-cache-audit.md). LuminaSupplemental and GatherBuddy no longer retry every frame after a
+- Cache audit (https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md). LuminaSupplemental and GatherBuddy no longer retry every frame after a
   failed download (5 min wait), and fall back to their expired cached copy when the network fails.
 
 ## 0.245.0

@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1348.0
+- Plan global, X-357 : Tri des documents accepté par l'utilisateur : 22 documents de travail périmés retirés (propositions de l'audit du 2026-11-02 et leur tri, étude des outils de contenus, archives, audits du nettoyage X-76 et du réseau de la 0.948, 7 relevés ponctuels de docs/evidence) ; les audits 0.857 et 0.874, cités par le code, rejoignent docs/evidence/ ; chaque lien vers un document retiré devient un lien permanent vers sa dernière version (commit 024c426c), plan compris ; carte des documents mise à jour.
+- Tests : AuditsFolder1086Tests. Verify.ps1 (agent) : 2523/2523, 0 avertissement, 0 erreur ; DLL 0.1348.0.0. Rien à essayer en jeu.
+### English
+- Document sort accepted by the user: 22 outdated working documents removed (the proposals of the 2026-11-02 audit and their triage, the content tools study, archives, the X-76 cleanup and the 0.948 network audits, 7 one-off readings of docs/evidence); audits 0.857 and 0.874, cited by the code, join docs/evidence/; every link to a removed document becomes a permanent link to its last version (commit 024c426c), the plan included; map of the documents updated.
+
 ## 0.1347.0
 - Plan global, X-357 : Dépôt propre avant l'annonce (inventaire accepté par l'utilisateur) : CONTRIBUTING donne la politique IA de Dalamud pour information seulement (plus suivie, DEC-050) ; tête de GLOBAL-PLAN sans version ni soumission périmées ; ROADMAP, TESTING et docs/README ne nomment plus de chemins de travail hors du dépôt ; les formulaires d'issue renvoient à la version publiée (main). `commit-release.bat` passe dans `scripts/`.
 - Tests : FirstPlayerDocs1219Tests. Verify.ps1 (agent) : 2523/2523, 0 avertissement, 0 erreur ; DLL 0.1347.0.0. Rien à essayer en jeu.

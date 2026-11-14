@@ -32,7 +32,7 @@ public sealed unsafe class ReadingCapture : IDisposable
     private bool fishing,disposed,warned;
     // X-73.13 (0.869): the fishing line's state (cast, bite, how long, the player's animation at the bite), aetherial reduction results, items asked at a hand-in.
     private int fishState=-1;private long castAt=-100_000;private string purify="",npcTrade="";
-    // X-75.7 (0.881, docs/project/audits/0.874-probe-coverage.md): the windows whose numbers would replace community data (spearfishing size and speed, airship
+    // X-75.7 (0.881, docs/evidence/0.874-probe-coverage.md): the windows whose numbers would replace community data (spearfishing size and speed, airship
     // destinations and results, submarine results, overmeld rate, spiritbond extraction, letters' attachments), the Fashion Report preview and best score
     // (dyes, evaluations), and the island's wild animals. Numbers only: no text is written, so no name (a letter's sender) can reach the log.
     private static readonly string[] ProbedWindows=["SpearFishing","AirShipExploration","AirShipExplorationResult","SubmarineExplorationResult","MateriaAttachDialog",

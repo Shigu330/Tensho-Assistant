@@ -5,7 +5,7 @@ internal static class VersionStamps1084Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
     private static readonly string[] Living = ["docs/project/ARCHITECTURE.md","docs/project/ROADMAP.md","docs/project/PROJECT.md",
-        "docs/project/PUBLISHING.md","docs/project/REFERENCES.md","docs/project/G-PROPOSALS.md"];
+        "docs/project/PUBLISHING.md","docs/project/REFERENCES.md"];
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [

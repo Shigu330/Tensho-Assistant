@@ -1,20 +1,18 @@
-// 0.1058 (audit A062): the questions of CONTENT-TOOLS carry the answers of DEC-045 in both halves, and the one it did not answer is
-// said to be open.
+// 0.1058 (audit A062): the questions of CONTENT-TOOLS carried the answers of DEC-045 in both halves.
+// 0.1348 (X-357): CONTENT-TOOLS is removed (git history keeps it); DEC-045 keeps the answers and the study's last version is linked.
 internal static class ContentToolsAnswers1058Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Content tools: the answers of DEC-045 follow the questions in both halves",() =>
+        ("Content tools: the study removed, DEC-045 keeps the answers in both halves",() =>
         {
-            var text = File.ReadAllText(Path.GetFullPath("docs/project/CONTENT-TOOLS.md")).Replace("\r\n","\n");
-            var english = text.IndexOf("Answers ([DEC-045](DECISIONS.md), 2026-11-09, point 8)",StringComparison.Ordinal);
-            var french = text.IndexOf("Réponses ([DEC-045](DECISIONS.md), 2026-11-09, point 8)",StringComparison.Ordinal);
+            Check(!File.Exists(Path.GetFullPath("docs/project/CONTENT-TOOLS.md")),"CONTENT-TOOLS removed");
+            var text = File.ReadAllText(Path.GetFullPath("docs/project/DECISIONS.md")).Replace("\r\n","\n");
             var middle = text.IndexOf("\n---\n",StringComparison.Ordinal);
-            Check(english > 0 && english < middle,"English answers before the French half");
-            Check(french > middle,"French answers in the French half");
-            Check(text.Contains("Question 3 was not in that\nbatch and stays open") && text.Contains("question 3 n'était pas dans ce lot et reste ouverte"),"question 3 said to be open in both halves");
+            Check(text.IndexOf("DEC-045",StringComparison.Ordinal) is > 0 and var first && first < middle,"DEC-045 in the English half");
+            Check(text.LastIndexOf("DEC-045",StringComparison.Ordinal) > middle,"DEC-045 in the French half");
         }),
     ];
 }

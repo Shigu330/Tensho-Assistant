@@ -8,7 +8,7 @@ internal static class StepH1074Tests
     [
         ("Working documents: « étape h » is now phase 6",() =>
         {
-            foreach (var name in new[]{"TESTING.md","CRAFT-GATHER-PROPOSALS.md","G-PROPOSALS.md","MAP-PROPOSALS.md"})
+            foreach (var name in new[]{"TESTING.md"})
             {
                 var text = File.ReadAllText(Path.GetFullPath("docs/project/" + name));
                 Check(!text.Contains("étape h") && !text.Contains("step h"),$"{name} no longer names the old step h");

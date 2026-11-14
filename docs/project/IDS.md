@@ -20,10 +20,10 @@ the older documents cite them) and no new one is created.
 | `R-01` to `R-14` | [ROADMAP](ROADMAP.md), [PROJECT](PROJECT.md) | the user's first requests (R-14: resistance to game updates) |
 | `D-NN` | [ROADMAP](ROADMAP.md) | decisions postponed to the end; settled ones point to their DEC |
 | `A-`, `R-`, `I-`, `C-`, `M-`, `N-`, `X-` (01 to 15) | [GAPS](GAPS.md) | gaps by domain: A crafting, R gathering, I items, C collections, M map and character, N domains without a module, X cross-check additions |
-| `C0` to `C36` (with `K` and `G`) | [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) | crafting and gathering proposals |
-| `I0` to `I22` | [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md) | items, bank, sorting and market proposals |
-| `P0` to `P27` | [MAP-PROPOSALS](MAP-PROPOSALS.md) | map proposals |
-| `T0` to `T29` | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) | alarms, free company, quests, gear and mini-game proposals |
+| `C0` to `C36` (with `K` and `G`) | [CRAFT-GATHER-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CRAFT-GATHER-PROPOSALS.md) | crafting and gathering proposals |
+| `I0` to `I22` | [ITEMS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md) | items, bank, sorting and market proposals |
+| `P0` to `P27` | [MAP-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/MAP-PROPOSALS.md) | map proposals |
+| `T0` to `T29` | [TOOLS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/TOOLS-PROPOSALS.md) | alarms, free company, quests, gear and mini-game proposals |
 | `W-NN` | [GLOBAL-PLAN](GLOBAL-PLAN.md) | topics added on 2026-11-06 |
 | `H1` to `H10`, parsers `P1` to `P10`, `E1` to `E5` | [GLOBAL-PLAN](GLOBAL-PLAN.md) (full cleanup, X-76) | harmonisation steps, parsers, extra steps |
 | `D1` to `D5` | [DECISIONS](DECISIONS.md), DEC-038 | questions of the switch-off in PvP and ranked content (plan folded into DEC-038 in 0.1087) |
@@ -63,10 +63,10 @@ quels (le CHANGELOG et les anciens documents les citent) et aucun nouveau n'est 
 | `R-01` à `R-14` | [ROADMAP](ROADMAP.md), [PROJECT](PROJECT.md) | les premières demandes de l'utilisateur (R-14 : résistance aux mises à jour du jeu) |
 | `D-NN` | [ROADMAP](ROADMAP.md) | décisions reportées à la fin ; celles tranchées renvoient à leur DEC |
 | `A-`, `R-`, `I-`, `C-`, `M-`, `N-`, `X-` (01 à 15) | [GAPS](GAPS.md) | manques par domaine : A artisanat, R récolte, I objets, C collections, M carte et personnage, N domaines sans module, X ajouts du recoupement |
-| `C0` à `C36` (avec `K` et `G`) | [CRAFT-GATHER-PROPOSALS](CRAFT-GATHER-PROPOSALS.md) | propositions d'artisanat et de récolte |
-| `I0` à `I22` | [ITEMS-PROPOSALS](ITEMS-PROPOSALS.md) | propositions objets, banque, tri et marché |
-| `P0` à `P27` | [MAP-PROPOSALS](MAP-PROPOSALS.md) | propositions de la carte |
-| `T0` à `T29` | [TOOLS-PROPOSALS](TOOLS-PROPOSALS.md) | propositions alarmes, compagnie libre, quêtes, équipement et mini-jeux |
+| `C0` à `C36` (avec `K` et `G`) | [CRAFT-GATHER-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CRAFT-GATHER-PROPOSALS.md) | propositions d'artisanat et de récolte |
+| `I0` à `I22` | [ITEMS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md) | propositions objets, banque, tri et marché |
+| `P0` à `P27` | [MAP-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/MAP-PROPOSALS.md) | propositions de la carte |
+| `T0` à `T29` | [TOOLS-PROPOSALS](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/TOOLS-PROPOSALS.md) | propositions alarmes, compagnie libre, quêtes, équipement et mini-jeux |
 | `W-NN` | [GLOBAL-PLAN](GLOBAL-PLAN.md) | sujets ajoutés le 2026-11-06 |
 | `H1` à `H10`, parseurs `P1` à `P10`, `E1` à `E5` | [GLOBAL-PLAN](GLOBAL-PLAN.md) (nettoyage complet, X-76) | étapes d'harmonisation, parseurs, étapes ajoutées |
 | `D1` à `D5` | [DECISIONS](DECISIONS.md), DEC-038 | questions de la coupure en JcJ et en contenu classé (plan fondu dans DEC-038 en 0.1087) |

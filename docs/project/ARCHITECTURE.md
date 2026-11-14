@@ -185,7 +185,7 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
 - Durations per area (`CacheArea`, Settings › Data), defaults since 0.750 (X-02): Prices 1 day, Quests 1 h, Collections 7 days, Sources
   « Only when missing, or on Refresh », Fashion Report 7 days, Imported stock 1 day (only flags the age), Crafting computations 7 days,
   Titles and achievements 7 days; choices 5 min, 1 h, 24 h, 7 days or « Only when missing, or on Refresh ». Full record of the sources and
-  rates at the time of the audit: [docs/evidence/0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+  rates at the time of the audit: [https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
 
 ### Embedded resources and external sources
 
@@ -481,7 +481,7 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
 - Durées par domaine (`CacheArea`, Paramètres › Données), valeurs par défaut depuis la 0.750 (X-02) : Prix 1 j, Quêtes 1 h, Collections
   7 j, Sources « Seulement si absent, ou sur Actualiser », Revue de mode 7 j, Stock importé 1 j (signale seulement l'ancienneté), Calculs
   d'artisanat 7 j, Titres et succès 7 j ; choix 5 min, 1 h, 24 h, 7 j ou « Seulement si absent, ou sur Actualiser ». Relevé complet des
-  sources et cadences au moment de l'audit : [docs/evidence/0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+  sources et cadences au moment de l'audit : [https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
 
 ### Ressources embarquées et sources externes
 

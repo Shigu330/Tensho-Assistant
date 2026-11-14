@@ -204,7 +204,7 @@ References: ROADMAP (R-05), CHANGELOG.md 0.301
 ID: DEC-015
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.246, 0.270, 0.281)
 Problem: After a network failure, LuminaSupplemental and GatherBuddy restarted the download at every frame; an expired copy was lost offline; the market listings had no disk cache.
-Evidence: docs/evidence/0.246-cache-audit.md (read from the code on 2026-11-01, updated 0.281); docs/evidence/0.270-universalis-listings.md.
+Evidence: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md (read from the code on 2026-11-01, updated 0.281); docs/evidence/0.270-universalis-listings.md.
 Options: Fix case by case; one common rule for all sources.
 Decision: 5 min wait after a failure; the expired copy is used when the network fails; each source reads the duration of its cache zone (Settings › Data), with "Never (only on request)"; responses bounded in size and duration. Universalis: listings and history read from the Market page only, one request at a time, 3 s apart, 4 MB at most, last reading shown and dated on failure, no request for an item that cannot be sold.
 Reason: Never hit a source in a loop; keep dated data rather than nothing.
@@ -319,7 +319,7 @@ Options: For each point: the agent's recommended choice, or the noted alternativ
 Decision: (1) The provisional choices of G-PROPOSALS are confirmed as a block (their alternatives stay ideas). (2) X-04: a simple link to partake.gg (Events page), Tensho reads nothing from it. (3) X-13: the hunt train conductor's announcement can be sent to the chat (/sh, /y, /p, /fc, /ls1, /cwl1) on click, in addition to the copy (alternative chosen by the user, against the recommended default). (4) The "Monsters on hover" setting, without effect since the panel redesign, is removed with its code. (5) Stable release from 0.431 to 0.448 after this batch. (6) Line endings: normalisation done (nothing to change: the repository is already LF). (7) GitHub: main and Devloppement branches protected (no force push or deletion), Stable-* tags protected, Dependabot and the build with tests in CI enabled. (8) Inventory (defect 7 of audit 0.329): DEC-004 kept, the sort rule editor stays displayed during the re-read. (9) Tomestones: 80 % threshold like the other currencies. (10) Raphael (A-03, A-04): studied in session (licence, Plogon build, size) before any code. (11) N-06 and N-14: look for a community source, licence checked and submitted before coding. (12) N-08: gardening log with durations typed by the player.
 Reason: User's choice (2026-11-03).
 Consequences: 0.447 (points 2, 3, 4, 8), 0.448 (point 12); GitHub and CI outside the plugin; issue #24 updated; G-PROPOSALS and ROADMAP marked "DECIDED 2026-11-03". Sending to the chat (point 3) is the only Tensho function that writes into a channel visible to other players: click only, channel from a fixed list, text cleaned, 5 s apart, checked again before the game call.
-References: docs/project/G-PROPOSALS.md, docs/project/ROADMAP.md, tests/TenshoAssistant.Tests/Decisions447Tests.cs, GitHub issue #24
+References: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, docs/project/ROADMAP.md, tests/TenshoAssistant.Tests/Decisions447Tests.cs, GitHub issue #24
 
 ID: DEC-027
 Timestamp: 2026-11-03 Europe/Brussels (0.449)
@@ -328,7 +328,7 @@ Options: N-06 from the game alone with a probe, or wait for in-game tests; N-14 
 Decision: (1) N-06: coded from the game sheets (GcArmyExpedition, GcArmyMemberGrow, GcArmyTraining) and FFXIVClientStructs, with an in-game probe; the percentage stays "not validated in game" until the probe. (2) N-14: MIT pairs from nick75g/FFXIV-Crossbreed-Helper, linked to items by the English names of the Item sheet and shown in the game language ("correlation to French", user's choice); names not found are discarded and counted. (3) N-08: growth and care durations prefilled from Lotlab/FFXIV-Gardening-Tracker (GPL-3.0), always editable.
 Reason: User's choice (2026-11-03); the squadron success rule is in the game sheets; only these two sources have a compatible licence.
 Consequences: 0.449 (point 3), 0.450 (point 2), 0.451 (point 1); data embedded with their licence notice, credits added; no network request.
-References: docs/evidence/0.448-n06-n14-sources.md, docs/project/G-PROPOSALS.md
+References: docs/evidence/0.448-n06-n14-sources.md, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md
 
 ID: DEC-028
 Timestamp: 2026-11-03 Europe/Brussels (ultracode session, after Stable-0.451.0)
@@ -338,7 +338,7 @@ Options: Raphael optional or C# solver only; A-04 with the Tensho solver (exact,
 Decision: (1) A-03: Raphael.Net 5.0.0 added as an option, setting "Solver: Tensho / Raphael", Tensho by default; each Raphael macro replayed in CraftSimulation before being offered; calculation off the game thread, cancellable, one at a time; MIT and Apache-2.0 notices, credits. (2) A-04: suggestions during crafting with Tensho's C# solver, from the observed state (condition and effects included), display only.
 Reason: User's choice (2026-11-03, ultracode session).
 Consequences: Order of the session: R-14 and A-14 first, then I-05, I-15, N-10, A-03 / A-04; package checked (raphael_bindings.dll in latest.zip).
-References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, GitHub issue #28
+References: docs/evidence/0.451-raphael-study.md, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, GitHub issue #28
 
 ID: DEC-029
 Timestamp: 2026-11-04 Europe/Brussels (decision session during the in-game campaign)
@@ -388,7 +388,7 @@ Options: The agent's advice, or change it one by one.
 Decision: Frame of the game windows removed. Game advice in PvE only: Triple Triad against an NPC, never in a tournament or against a player. The rest, agent's advice: release after a game session on the latest version; retainer sales, Universalis on click; I-15 during an in-game session with the user; N-10 left aside, only if it is useful to the user.
 Reason: User decision.
 Consequences: Territories 579, 940 and 941 turn the advice off (docs/evidence/0.510-triad-competitive.md). "Advice during a match" point of PUBLISHING handled; the Dédale panel is still to be asked of the team before 1.0.0.
-References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31; release rule modified by DEC-050
+References: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31; release rule modified by DEC-050
 
 ID: DEC-034
 Timestamp: 2026-11-04 Europe/Brussels
@@ -473,7 +473,7 @@ References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLA
 ID: DEC-042
 Timestamp: 2026-11-08 Europe/Brussels
 Problem: The format of the discoveries file has no room for HQ, per-value counters or denominators (future loot rates); changing it after 1.0.0 would force migrating every player's files.
-Evidence: Plan X-76 2c (step E1, docs/project/audits/x76-2bc-plan.md); user answer: « Fais-le au plus vite » ("Do it as soon as possible").
+Evidence: Plan X-76 2c (step E1, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/audits/x76-2bc-plan.md); user answer: « Fais-le au plus vite » ("Do it as soon as possible").
 Options: Before 1.0.0; later.
 Decision: Format fixed right now: optional fields added, format version raised, reading of old files kept, merge tool updated.
 Reason: User decision.
@@ -488,7 +488,7 @@ Options: Game functions if they only calculate; keep the formula.
 Decision: The game functions are called only if they only calculate (no action, nothing sent to the server, no state changed), on the framework thread; otherwise the formula stays, checked against the game.
 Reason: User decision.
 Consequences: A probe first proves the nature of the function; proof in docs/evidence.
-References: X-75.6, docs/project/audits/0.874-probe-coverage.md
+References: X-75.6, docs/evidence/0.874-probe-coverage.md
 
 ID: DEC-044
 Timestamp: 2026-11-08 Europe/Brussels
@@ -508,7 +508,7 @@ Options: For each point, the recommended proposal or the other choice (G-PROPOSA
 Decision: 1 PvP cut: left as it is today (jobs started not cancelled, Discord mission alert kept). 2 position in the shared discoveries: exact everywhere, after explanation (useful for other players' maps; it may tell where you were fishing on a given day). 3 settings: the agent proposes a plan of tabs and sections, nothing changes before agreement. 4 provisional choices: already confirmed by DEC-026; alternatives reviewed. 5 retainer sales: Universalis comparison on click. 6 collection fish: seen in the fishing help; add the targeted collectability and the scrips to it. 7 agent files: in French (at the agent's choice, answers in French). 8 content tools: wiki mechanics and strategies (GFDL, on click, credited, Wiki switch), written notes and arena diagram in the Tensho window, out of combat, never over the game, no marker placed in the game; browser links for sites without a licence; deep dungeon bestiary with the wiki notes, outside the dungeon only.
 Reason: User decisions.
 Consequences: X-97 (fishing help), X-90 (wiki, notes, diagram, bestiary), settings plan to propose.
-References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, docs/project/CONTENT-TOOLS.md
+References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CONTENT-TOOLS.md
 
 ID: DEC-046
 Timestamp: 2026-11-09 Europe/Brussels
@@ -786,7 +786,7 @@ References: ROADMAP (R-05), CHANGELOG.md 0.301
 DEC-ID: DEC-015
 Timestamp: 2026-11-01 → 2026-11-02 Europe/Brussels (0.246, 0.270, 0.281)
 Problem: Après un échec réseau, LuminaSupplemental et GatherBuddy relançaient le téléchargement à chaque image ; une copie expirée était perdue hors ligne ; les annonces du marché n'avaient pas de cache disque.
-Evidence: docs/evidence/0.246-cache-audit.md (relevé dans le code le 2026-11-01, mise à jour 0.281) ; docs/evidence/0.270-universalis-listings.md.
+Evidence: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md (relevé dans le code le 2026-11-01, mise à jour 0.281) ; docs/evidence/0.270-universalis-listings.md.
 Options: Corriger au cas par cas ; règle commune à toutes les sources.
 Decision: 5 min d'attente après un échec ; la copie expirée sert quand le réseau échoue ; chaque source lit la durée de sa zone de cache (Paramètres › Données), avec « Jamais (seulement sur demande) » ; réponses bornées en taille et en durée. Universalis : annonces et historique lus depuis la page Marché seulement, une requête à la fois, 3 s d'écart, 4 Mo au plus, dernière lecture affichée et datée en cas d'échec, aucune requête pour un objet non vendable.
 Reason: Ne jamais solliciter une source en boucle ; garder une donnée datée plutôt que rien.
@@ -901,7 +901,7 @@ Options: Pour chaque point : le choix recommandé par l'agent, ou l'alternative 
 Decision: (1) Les choix provisoires de G-PROPOSALS sont confirmés en bloc (leurs alternatives restent des idées). (2) X-04 : un simple lien vers partake.gg (page Événements), Tensho n'en lit rien. (3) X-13 : l'annonce du conducteur du train de chasse peut être envoyée au chat (/sh, /y, /p, /fc, /ls1, /cwl1) sur clic, en plus de la copie (alternative choisie par l'utilisateur, contre le défaut recommandé). (4) Le réglage « Monstres au survol », sans effet depuis la refonte du panneau, est retiré avec son code. (5) Release Stable de 0.431 à 0.448 après ce lot. (6) Fins de ligne : normalisation faite (rien à changer : le dépôt est déjà en LF). (7) GitHub : branches main et Devloppement protégées (pas de push forcé ni de suppression), tags Stable-* protégés, Dependabot et la compilation avec tests en CI activés. (8) Inventaire (défaut 7 de l'audit 0.329) : DEC-004 gardée, l'éditeur de règles du tri reste affiché pendant la relecture. (9) Mémoquartz : seuil de 80 % comme les autres monnaies. (10) Raphael (A-03, A-04) : étudié en séance (licence, build Plogon, taille) avant tout code. (11) N-06 et N-14 : chercher une source communautaire, licence vérifiée et soumise avant de coder. (12) N-08 : journal de jardinage avec des durées tapées par le joueur.
 Reason: Choix de l'utilisateur (2026-11-03).
 Consequences: 0.447 (points 2, 3, 4, 8), 0.448 (point 12) ; GitHub et CI hors du plugin ; issue #24 mise à jour ; G-PROPOSALS et ROADMAP marqués « DÉCIDÉ 2026-11-03 ». L'envoi au chat (point 3) est la seule fonction de Tensho qui écrit dans un canal visible des autres joueurs : clic seulement, canal parmi une liste fixe, texte nettoyé, 5 s d'écart, vérifié de nouveau avant l'appel au jeu.
-References: docs/project/G-PROPOSALS.md, docs/project/ROADMAP.md, tests/TenshoAssistant.Tests/Decisions447Tests.cs, GitHub issue #24
+References: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, docs/project/ROADMAP.md, tests/TenshoAssistant.Tests/Decisions447Tests.cs, GitHub issue #24
 
 DEC-ID: DEC-027
 Timestamp: 2026-11-03 Europe/Brussels (0.449)
@@ -910,7 +910,7 @@ Options: N-06 depuis le jeu seul avec sonde, ou attendre les tests en jeu ; N-14
 Decision: (1) N-06 : codé depuis les feuilles du jeu (GcArmyExpedition, GcArmyMemberGrow, GcArmyTraining) et FFXIVClientStructs, avec une sonde en jeu ; le pourcentage reste « non validé en jeu » jusqu'à la sonde. (2) N-14 : paires MIT de nick75g/FFXIV-Crossbreed-Helper, reliées aux objets par les noms anglais de la feuille Item et affichées dans la langue du jeu (« corrélation vers le fr », choix de l'utilisateur) ; noms non trouvés écartés et comptés. (3) N-08 : durées de pousse et d'entretien pré-remplies depuis Lotlab/FFXIV-Gardening-Tracker (GPL-3.0), toujours modifiables.
 Reason: Choix de l'utilisateur (2026-11-03) ; la règle de réussite de l'escouade est dans les feuilles du jeu ; seules ces deux sources ont une licence compatible.
 Consequences: 0.449 (point 3), 0.450 (point 2), 0.451 (point 1) ; données embarquées avec leur avis de licence, crédits ajoutés ; aucune requête réseau.
-References: docs/evidence/0.448-n06-n14-sources.md, docs/project/G-PROPOSALS.md
+References: docs/evidence/0.448-n06-n14-sources.md, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md
 
 DEC-ID: DEC-028
 Timestamp: 2026-11-03 Europe/Brussels (séance ultracode, après Stable-0.451.0)
@@ -920,7 +920,7 @@ Options: Raphael en option ou solveur C# seul ; A-04 avec le solveur Tensho (exa
 Decision: (1) A-03 : Raphael.Net 5.0.0 ajouté en option, réglage « Solveur : Tensho / Raphael », Tensho par défaut ; chaque macro Raphael rejouée dans CraftSimulation avant d'être proposée ; calcul hors du thread du jeu, annulable, un seul à la fois ; avis MIT et Apache-2.0, crédits. (2) A-04 : suggestions pendant la synthèse avec le solveur C# de Tensho, depuis l'état observé (condition et effets compris), affichage seulement.
 Reason: Choix de l'utilisateur (2026-11-03, séance ultracode).
 Consequences: Ordre de la séance : R-14 et A-14 d'abord, puis I-05, I-15, N-10, A-03 / A-04 ; package vérifié (raphael_bindings.dll dans latest.zip).
-References: docs/evidence/0.451-raphael-study.md, docs/project/G-PROPOSALS.md, GitHub issue #28
+References: docs/evidence/0.451-raphael-study.md, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, GitHub issue #28
 
 DEC-ID: DEC-029
 Timestamp: 2026-11-04 Europe/Brussels (séance de décisions pendant la campagne en jeu)
@@ -970,7 +970,7 @@ Options: Les conseils de l'agent, ou les changer un par un.
 Decision: Cadre des fenêtres du jeu retiré. Conseils de jeu en JcE seulement : Triple Triade contre un PNJ, jamais en tournoi ni contre un joueur. Reste, conseils de l'agent : release après une session de jeu sur la dernière version ; ventes des servants, Universalis sur clic ; I-15 lors d'une séance en jeu avec l'utilisateur ; N-10 laissé de côté, seulement s'il sert à l'utilisateur.
 Reason: Décision de l'utilisateur.
 Consequences: Les territoires 579, 940 et 941 coupent les conseils (docs/evidence/0.510-triad-competitive.md). Point « Conseil en match » de PUBLISHING traité ; le panneau du Dédale reste à demander à l'équipe avant la 1.0.0.
-References: docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31 ; règle de release modifiée par DEC-050
+References: https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md, docs/project/PUBLISHING.md, issue #24, issue #31 ; règle de release modifiée par DEC-050
 
 DEC-ID: DEC-034
 Timestamp: 2026-11-04 Europe/Brussels
@@ -1055,7 +1055,7 @@ References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-039, docs/project/GLOBAL-PLA
 DEC-ID: DEC-042
 Timestamp: 2026-11-08 Europe/Brussels
 Problem: Le format du fichier des découvertes n'a pas de place pour le HQ, des compteurs par valeur ou des dénominateurs (taux de butin futurs) ; le changer après la 1.0.0 obligerait à migrer les fichiers de tous les joueurs.
-Evidence: Plan X-76 2c (étape E1, docs/project/audits/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
+Evidence: Plan X-76 2c (étape E1, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/audits/x76-2bc-plan.md) ; réponse de l'utilisateur : « Fais-le au plus vite ».
 Options: Avant la 1.0.0 ; plus tard.
 Decision: Format fixé tout de suite : champs facultatifs ajoutés, version du format montée, lecture des anciens fichiers gardée, outil de fusion mis à jour.
 Reason: Décision de l'utilisateur.
@@ -1070,7 +1070,7 @@ Options: Fonctions du jeu si elles ne font que calculer ; garder la formule.
 Decision: Les fonctions du jeu sont appelées seulement si elles ne font que calculer (aucune action, aucun envoi au serveur, aucun état modifié), sur le fil du framework ; sinon la formule reste, contrôlée contre le jeu.
 Reason: Décision de l'utilisateur.
 Consequences: Une sonde prouve d'abord la nature de la fonction ; preuve dans docs/evidence.
-References: X-75.6, docs/project/audits/0.874-probe-coverage.md
+References: X-75.6, docs/evidence/0.874-probe-coverage.md
 
 DEC-ID: DEC-044
 Timestamp: 2026-11-08 Europe/Brussels
@@ -1090,7 +1090,7 @@ Options: Pour chaque point, la proposition recommandée ou l'autre choix (G-PROP
 Decision: 1 coupure JcJ : laissée comme aujourd'hui (travaux lancés non annulés, alerte Discord de mission gardée). 2 position dans les découvertes partagées : exacte partout, après explication (utile aux cartes des autres joueurs ; elle peut dire où vous pêchiez tel jour). 3 réglages : l'agent propose un plan des onglets et sections, rien ne change avant accord. 4 choix provisoires : déjà confirmés par DEC-026 ; revue des alternatives. 5 ventes des servants : comparaison Universalis sur clic. 6 poissons de collection : vus dans l'aide à la pêche ; y ajouter la collectionnabilité visée et les assignats. 7 fichiers de l'agent : en français (au choix de l'agent, réponses en français). 8 outils de contenus : mécaniques et stratégies du wiki (GFDL, sur clic, créditées, interrupteur Wiki), notes écrites et schéma d'arène dans la fenêtre Tensho, hors combat, jamais par-dessus le jeu, aucun marqueur posé dans le jeu ; liens navigateur pour les sites sans licence ; bestiaire des donjons profonds avec les notes du wiki, hors du donjon seulement.
 Reason: Décisions de l'utilisateur.
 Consequences: X-97 (aide à la pêche), X-90 (wiki, notes, schéma, bestiaire), plan des réglages à proposer.
-References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, docs/project/CONTENT-TOOLS.md
+References: G-PROPOSALS, DEC-026, DEC-038, DEC-041, https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CONTENT-TOOLS.md
 
 DEC-ID: DEC-046
 Timestamp: 2026-11-09 Europe/Brussels

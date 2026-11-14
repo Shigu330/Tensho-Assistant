@@ -71,7 +71,7 @@ public static class SeenPrices
     /// <summary>
     /// X-73.1 (0.857, user request: prices seen on the other worlds of the data center, when one goes there, complete Universalis): the cheapest offer of the data
     /// center from Universalis' and from each visited world's lowest offer seen. Universalis' world gives way to what was seen there later; another world seen
-    /// counts while its offers are current (CurrentOffers). docs/project/audits/0.857-community-map.md (market report).
+    /// counts while its offers are current (CurrentOffers). docs/evidence/0.857-community-map.md (market report).
     /// </summary>
     public static MarketListing? Cheapest(MarketListing? universalis,IEnumerable<(uint World,decimal? Price,DateTimeOffset At)> seen,DateTimeOffset now)
     {

@@ -791,7 +791,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - Rien n'est vendu pour vous.
 - Les notes sont des données gardées (« Restaurer tous les réglages » ne les efface pas), bornées à 2 000 objets, et remplacées en
   entier à chaque changement (lues sans verrou sur le thread du jeu).
-- Idées et choix provisoires ajoutés à docs/project/G-PROPOSALS.md.
+- Idées et choix provisoires ajoutés à https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md.
 - Tests : ItemNotes347Tests (2 cas). Verify.ps1 (agent) : 672/672, 0 avertissement, 0 erreur ; DLL 0.347.0.0. Non validé en jeu.
 ### English
 - Queue step g, I-08: item notes and labels (« important », « to sell to an NPC ») in a new item sheet tab, shown in the item
@@ -810,7 +810,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - vous collez et confirmez vous-même : aucune mise en vente automatique ;
   - offres lues par l'événement Dalamud IMarketBoard.OfferingsReceived, rien n'est demandé au serveur.
   - Réglage Paramètres › Avancé, désactivé par défaut (il remplace le presse-papiers), avec infobulle et ↺.
-- Choix provisoires ajoutés à docs/project/G-PROPOSALS.md.
+- Choix provisoires ajoutés à https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md.
 - Tests : Market346Tests (2 cas). Verify.ps1 (agent) : 670/670, 0 avertissement, 0 erreur ; DLL 0.346.0.0. Non validé en jeu.
 ### English
 - Queue step g, I-06: NPC sale price (unit and hovered stack) in the item information. I-07: when you open an item's market offers,
@@ -837,7 +837,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - « Effacer » (deux clics) supprime tout ce qui le concerne.
 - Banque : un choix « Personnage » montre les rangements enregistrés d'un autre personnage (sans l'onglet direct).
 - Aperçu de tri : il ne propose plus que les servants et les sacoches (liste de ce qui se trie, et non plus de ce qui ne se trie pas).
-- Propositions et choix provisoires de l'étape g) réunis dans docs/project/G-PROPOSALS.md (demande de l'utilisateur : les revoir
+- Propositions et choix provisoires de l'étape g) réunis dans https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/G-PROPOSALS.md (demande de l'utilisateur : les revoir
   ensemble).
 - Tests : Characters345Tests (3 cas) ; un doublon d'inclusion de 0.344 retiré du projet de tests. Verify.ps1 (agent) : 668/668, 0 avertissement, 0 erreur ;
   DLL 0.345.0.0. Non validé en jeu.
@@ -1162,14 +1162,14 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   description des Collections corrigée.
 - Reporté : rappels « fait » et carte au trésor par personnage (format de sauvegarde à changer, prévu dans les propositions T1).
 - Reporté aussi : un anneau unique importé à côté du même anneau porté peut encore compter deux fois (relecture 0.331, faible).
-  30 propositions à choisir dans docs/project/TOOLS-PROPOSALS.md (recommandées : T0 à T4).
+  30 propositions à choisir dans https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/TOOLS-PROPOSALS.md (recommandées : T0 à T4).
 - Tests : Tools331Tests (3 cas) ; un test 0.326 adapté. Verify.ps1 (agent) : 637/637, 0 avertissement, 0 erreur ; DLL 0.331.0.0.
   Non validé en jeu.
 ### English
 - Queue step e: remaining tools audit (57 confirmed defects), fixed. Alarms: a queued /alarm command is no longer sent after its alarm
   is deleted; a game copy that disappeared can ring in Tensho again; weather alarms wait for the weather catalogue; Discord pauses are
   shown and cleared. Free company reads isolated (R-14). The Duty Finder panel has its own loot service. Gear plans are no longer
-  erased by an empty import. Restore-all resyncs developer mode. 30 improvement proposals in docs/project/TOOLS-PROPOSALS.md.
+  erased by an empty import. Restore-all resyncs developer mode. 30 improvement proposals in https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/TOOLS-PROPOSALS.md.
 
 ## 0.330.0
 - Étape e) de la file : artisanat et récolte. Audit en lecture seule : 28 défauts confirmés (environ 20 distincts), corrigés par 4 agents.
@@ -1183,7 +1183,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Relecture (3 relecteurs et un vérificateur) : 3 remarques confirmées, soit 2 défauts distincts, corrigés :
   - une copie faite sans enchaînement ne remplace plus le plan de séquences enregistré ;
   - un bonus d'Abondance inconnu (niveau 68 et plus) ne bloque plus le plan : il compte le minimum de la règle, +1, et le panneau le dit.
-- 37 propositions à choisir dans docs/project/CRAFT-GATHER-PROPOSALS.md. Tests : CraftGather330Tests (3 cas). Verify.ps1 (agent) :
+- 37 propositions à choisir dans https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/CRAFT-GATHER-PROPOSALS.md. Tests : CraftGather330Tests (3 cas). Verify.ps1 (agent) :
   634/634, 0 avertissement, 0 erreur ; DLL 0.330.0.0. Non validé en jeu.
 ### English
 - Queue step e: crafting and gathering audit, fixed. « Start the macro chain » only runs the pages written by the last successful copy;
@@ -1213,7 +1213,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Textes et documents : aide du survol (Garland et le wiki sont bien interrogés), menu contextuel, page Diagnostics, ARCHITECTURE et
   GAPS corrigés.
 - Reporté à la fin : inventaire vidé 250 ms à chaque mouvement (DEC-004, ROADMAP). 23 propositions à choisir dans
-  docs/project/ITEMS-PROPOSALS.md (recommandées : I0, I1, I3, puis I4 et I14).
+  https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md (recommandées : I0, I1, I3, puis I4 et I14).
 - Tests : Items329Tests (2 cas) ; un test du marché adapté (la pause n'est plus une erreur). Verify.ps1 (agent) : 631/631,
   0 avertissement, 0 erreur ; DLL 0.329.0.0. Non validé en jeu.
 ### English
@@ -1221,7 +1221,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   read no longer signs the character out of every stock feature; reads are isolated and a lasting notice says which storage is
   unreadable. Armoury, glamour dresser and armoire are recorded whatever the auto-save setting; a full dresser saves and reloads.
   Retainer crystals count as a lower bound. The 3 s Universalis pause no longer shows an error or wipes a price. History, craft book
-  cache, sort preview errors, bank texts and documents fixed. 23 improvement proposals listed in docs/project/ITEMS-PROPOSALS.md.
+  cache, sort preview errors, bank texts and documents fixed. 23 improvement proposals listed in https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/ITEMS-PROPOSALS.md.
 
 ## 0.328.0
 - Étape e) de la file, la carte d'abord. Audit de la carte en lecture seule (4 agents, puis un vérificateur) : 50 remarques, 45
@@ -1257,7 +1257,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Textes : « Niveau à côté des points de récolte » (le nom n'était pas écrit) ; aide des infobulles de quête ; boutique des crédits de
   compagnie traduite ; ARCHITECTURE et DECISIONS mis à jour.
 - Reporté à la fin : identifiant 60561 de l'icône du drapeau à prouver en jeu (ROADMAP). 28 propositions d'amélioration de la carte,
-  rien d'implémenté : à choisir dans docs/project/MAP-PROPOSALS.md (recommandées : P1, P2, P3, puis P4, P6, P8).
+  rien d'implémenté : à choisir dans https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/MAP-PROPOSALS.md (recommandées : P1, P2, P3, puis P4, P6, P8).
 - Tests : Map328Tests (4 cas). Verify.ps1 (agent) : 629/629, 0 avertissement, 0 erreur ; DLL 0.328.0.0. Non validé en jeu.
 ### English
 - Queue step e, the map first: a read-only map audit (28 distinct defects), fixed and reviewed. With « Replace the game map », M no
@@ -1265,7 +1265,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   stays. Native map reads are bounded and isolated per part (R-14); unreadable icons, textures, position and teleport costs are said.
   Zoom buttons keep the view centre; edge markers no longer trigger the icon under them and follow hidden layers; area hover follows
   the area switches; map errors no longer follow the mouse; per-icon reset; vendor labels and right-click lists cached. Bookmark,
-  vista alarm and map page fixes; texts corrected. 28 improvement proposals listed for the user in docs/project/MAP-PROPOSALS.md.
+  vista alarm and map page fixes; texts corrected. 28 improvement proposals listed for the user in https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/MAP-PROPOSALS.md.
 
 ## 0.327.0
 - Étape e) de la file, 1re version : réglages « sans question » de l'audit du point d), tous avec infobulle et ↺. Par défaut, rien ne
@@ -1399,7 +1399,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - restent 3 exceptions : la grille du Mini Cactpot et la fenêtre « Règles du score » (aide en tête) ;
   - deuxième cas : une infobulle ne doit jamais devenir le corps d'un « if » autour d'un contrôle (le défaut de 0.287).
 - Reporté à l'étape e) : mise en cache du plan et du coût de préparation (mesurés sous 0,5 ms par image en 0.292,
-  docs/evidence/0.292-draw-times.md), à mesurer en jeu avant de changer.
+  https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.292-draw-times.md), à mesurer en jeu avant de changer.
 - Reporté à la fin : la confirmation en deux clics ne couvre que « Tout supprimer » d'un groupe d'alarmes ; les autres
   suppressions ont une infobulle (choix recommandé appliqué).
 - Verify.ps1 (agent) : 604/604, 0 avertissement, 0 erreur, langues et paquet verts ; DLL 0.325.0.0. Non validé en jeu.

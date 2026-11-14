@@ -5,7 +5,7 @@ using TenshoAssistant.Market;
 namespace TenshoAssistant;
 
 // I-05 (issue #26): beside the game's retainer sale list, your prices against the other sellers. Read-only: the only write is to the clipboard, on a click.
-// Universalis is asked on the « Compare » click only: whether to ask when the list opens is a decision left to the player (docs/project/G-PROPOSALS.md).
+// Universalis is asked on the « Compare » click only: whether to ask when the list opens is a decision left to the player.
 internal sealed partial class MainWindow
 {
     internal Func<RetainerSalesState>? RetainerSalesSource { get; set; }

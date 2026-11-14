@@ -11,7 +11,7 @@ The second table lists the settings reset by « Restore every setting » (`Confi
 
 Do not write in the block by hand: `python -I -X utf8 tools/docgen.py write`. The inventory made by hand in 0.943 and 0.971 (real
 effect, what changes when it is turned off, where the code reads it, the nine defects fixed in 0.944) is kept, in French, in
-[archive/SETTINGS-INVENTAIRE-0.971.md](archive/SETTINGS-INVENTAIRE-0.971.md); its line numbers date from 0.943.
+[archive/SETTINGS-INVENTAIRE-0.971.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/SETTINGS-INVENTAIRE-0.971.md); its line numbers date from 0.943.
 
 <!-- docgen:settings -->
 | Setting | Type | Default | Where | Label and tooltip |
@@ -343,7 +343,7 @@ Le deuxième tableau liste les réglages remis par « Tout remettre par défaut 
 
 Ne pas écrire dans le bloc à la main : `python -I -X utf8 tools/docgen.py write`. L'inventaire fait à la main en 0.943 et 0.971 (effet
 réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corrigées en 0.944) est gardé dans
-[archive/SETTINGS-INVENTAIRE-0.971.md](archive/SETTINGS-INVENTAIRE-0.971.md) ; ses numéros de ligne datent de 0.943.
+[archive/SETTINGS-INVENTAIRE-0.971.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/SETTINGS-INVENTAIRE-0.971.md) ; ses numéros de ligne datent de 0.943.
 
 <!-- docgen:settings-fr -->
 | Réglage | Type | Défaut | Où | Libellé et info-bulle |

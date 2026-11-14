@@ -62,7 +62,7 @@ game. The plans R-06 and R-11 are the author's working notes, outside the reposi
 | R-07 | Free company | page and expeditions 0.307, best routes 0.309, builds 0.315; DEC-023 follow-up done: flagged sectors 0.334, market prices and tiers 0.335, airships 0.336–0.337; history 0.379 | no | to validate in game |
 | R-08 | Reminders | page 0.300, icon and tooltip in the server bar 0.300–0.302, expeditions 0.307, squadron 0.333; then step g (M-01 to M-05, N-01 to N-03) | no | Ehcatl Gliders left out (nothing readable, 0.334); to validate in game |
 | R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | to validate; no future dates (no reliable source) |
-| R-10 | Cache audit | 0.246 ([audit](../evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
+| R-10 | Cache audit | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
 | R-11 | Gear | step 1 (0.310), glamour (0.311), materia and caps (0.312–0.313), sources and ownership (0.314), vessel builds (0.315) | 0.310–0.314 | 0.315 and 0.340 to validate; step 4: chocobo barding DONE 0.340, Chocobo page 0.341 (squadron left out, recommended default, decision at the end) |
 | R-12 | Discord webhook for alarms | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
 | R-13 | Full « Credits » page in the plugin | 0.320 | no | to validate in game |
@@ -78,7 +78,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 ## To decide / to review
 
 <!-- gen:decisions:en -->
-Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
+Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
 | N° | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
@@ -171,7 +171,7 @@ plans R-06 et R-11 sont des notes de travail de l'auteur, hors du dépôt.
 | R-07 | Compagnie libre | page et expéditions 0.307, meilleurs trajets 0.309, montages 0.315 ; suite DEC-023 faite : secteurs signalés 0.334, prix du marché et paliers 0.335, dirigeables 0.336–0.337 ; historique 0.379 | non | à valider en jeu |
 | R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307, escouade 0.333 ; puis étape g (M-01 à M-05, N-01 à N-03) | non | Planeurs d'Ehcatl laissés (rien de lisible, 0.334) ; à valider en jeu |
 | R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | à valider ; pas de dates à venir (aucune source fiable) |
-| R-10 | Audit des caches | 0.246 ([audit](../evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
+| R-10 | Audit des caches | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
 | R-11 | Équipement | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 et 0.340 à valider ; étape 4 : barde de chocobo FAITE 0.340, page Chocobo 0.341 (escouade retirée, défaut recommandé, décision de la fin) |
 | R-12 | Webhook Discord pour les alarmes | 0.319 | non | à valider en jeu ; utilisé ensuite par C-10, I-02, M-01 |
 | R-13 | Page « Crédits » complète dans le plugin | 0.320 | non | à valider en jeu |
@@ -188,7 +188,7 @@ donnée prise sur des sites web).
 ## À décider / à revoir
 
 <!-- gen:decisions:fr -->
-Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
+Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|

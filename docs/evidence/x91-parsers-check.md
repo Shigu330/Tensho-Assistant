@@ -1,7 +1,7 @@
 # X-91 — last check of the parsers (2026-11-09, version 0.971)
 
 User request (« a faire » document): check one last time that every parser does what was planned. Method: every parser item of the plan
-(GLOBAL-PLAN rows X-73 to X-75.8, X-76 2c list in `docs/project/audits/x76-2bc-plan.md`) compared with the code and the versions that coded it.
+(GLOBAL-PLAN rows X-73 to X-75.8, X-76 2c list in `https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/audits/x76-2bc-plan.md`) compared with the code and the versions that coded it.
 
 | Planned | Status | Where |
 |---|---|---|
@@ -13,7 +13,7 @@ User request (« a faire » document): check one last time that every parser doe
 | X-75.7: spearfishing, airships, submarine results, overmeld rates, mail, Fashion Report preview, garden crosses, collectability, bountiful | coded (0.881 probes; 0.896 spearfishing; 0.899 overmeld rates match the sheets; 0.903 letters; 0.919 airship route; 0.934 submarine sectors) | see the GLOBAL-PLAN rows X-81 to X-84 |
 | X-75.7: open shop's id | not probed (structure unknown), left | X-75.7 row |
 | X-75.8: PaissaDB, hook-only data, Mog Station, future dates, worlds never visited | stay with the community sources (Dalamud rule or no game data) | X-75.8 row |
-| X-76 P1 to P9 | coded (0.911–0.936) | `docs/project/audits/x76-2bc-plan.md` « Done » |
+| X-76 P1 to P9 | coded (0.911–0.936) | `https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/audits/x76-2bc-plan.md` « Done » |
 | X-76 P9 retainers (ClassJob, Level, MarketExpire) | waits for an in-game reading | reminder table « Liste des servants » |
 | X-76 P10 duty-end rewards (DutyCompleted, ChestObjectId) | chest counts coded (0.935); rewards wait for an in-game reading | reminder table « Fin d'une mission » |
 | X-76 P6 swimbait (cast flag 32) | waits for an in-game reading | reminder table « Pêche avec un leurre nageur » |

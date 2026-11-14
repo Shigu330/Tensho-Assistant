@@ -7,7 +7,7 @@ namespace TenshoAssistant.Craft;
 public static class RaphaelActions
 {
     /// <summary>
-    /// 0.782 (X-25, the game froze on 2026-11-07 15:18:45): Raphael's native code divides by the base quality gain (quality_upper_bound_solver/state.rs:59,
+    /// 0.782 (X-25, the game froze on 2026-11-07 15:18:45, docs/evidence/0.782-raphael-freeze.md): Raphael's native code divides by the base quality gain (quality_upper_bound_solver/state.rs:59,
     /// « attempt to divide by zero ») and by the others; a panic there cannot be caught and stops the game. Any value it cannot take is refused here, before the
     /// call: zero gains (a recipe without quality, a stat read as 0), no durability or progress, or a number past what its 16-bit fields hold. Null: safe to call.
     /// </summary>

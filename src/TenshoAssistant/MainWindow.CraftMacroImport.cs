@@ -4,7 +4,7 @@ using TenshoAssistant.Craft;
 namespace TenshoAssistant;
 
 // A-08 (0.425): « Import a macro » in the simulator — pasted text only (macro lines « /ac … »), names matched to the job's actions in
-// the game's language; the sequence replaces the current one. Online rotation links are not read (see G-PROPOSALS).
+// the game's language; the sequence replaces the current one. Online rotation links are not read.
 internal sealed partial class MainWindow
 {
     private string craftImportText="";

@@ -32,7 +32,7 @@ duration); Universalis has its own limits (`MarketService` 1 MB / 12 s; `MarketB
 3 s apart); Teamcraft: 20 s timeout, response refused beyond one million characters (check made after reading). Shared disk
 cache `Caching/DataCache.cs`, durations in Settings › Data and sources (including "Never (on request only)", 0.281); 5 min
 wait after a failure and expired copy as a fallback (0.246). None of them contacts the game servers. Details:
-[0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+[0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
 
 ### Embedded in the DLL (community data under a compatible licence, DEC-021)
 
@@ -156,7 +156,7 @@ STATUS: validated in game (« c'est ok » ("it's ok"), 2026-10-31).
 | 0.283 | [0.283-quest-journal-sections.md](../evidence/0.283-quest-journal-sections.md) | `Quest.JournalGenre` → `JournalCategory` → `JournalSection` |
 | 0.285 | [0.285-quest-start-cities.md](../evidence/0.285-quest-start-cities.md) | "Close to Home" roots per starting city, `PreviousQuest` chains |
 | 0.286 | [0.286-quest-alternatives.md](../evidence/0.286-quest-alternatives.md) | `QuestLock` and `PreviousQuestJoin` (a single previous quest is enough) |
-| 0.292 | [0.292-draw-times.md](../evidence/0.292-draw-times.md) | draw times recorded in game by the user (medians under 0.5 ms) |
+| 0.292 | [0.292-draw-times.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.292-draw-times.md) | draw times recorded in game by the user (medians under 0.5 ms) |
 | 0.295 | [0.295-fcc-shops.md](../evidence/0.295-fcc-shops.md) | `FccShop`: item, cost in company credits, required rank |
 | 0.300 | [0.300-calendar-resets.md](../evidence/0.300-calendar-resets.md) | reset times of the game for the Calendar (user screenshot) |
 
@@ -1006,7 +1006,7 @@ bornées) ; Universalis a ses propres bornes (`MarketService` 1 Mo / 12 s ; `Mar
 3 s d'écart) ; Teamcraft : délai 20 s, réponse refusée au-delà d'un million de caractères (contrôle fait après la lecture). Cache
 disque commun `Caching/DataCache.cs`, durées dans Paramètres › Données (dont « Jamais (seulement sur demande) », 0.281) ; 5 min
 d'attente après un échec et copie expirée en secours (0.246). Aucune ne contacte les serveurs du jeu. Détail :
-[0.246-cache-audit.md](../evidence/0.246-cache-audit.md).
+[0.246-cache-audit.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md).
 
 ### Embarquées dans la DLL (données communautaires sous licence compatible, DEC-021)
 
@@ -1130,7 +1130,7 @@ STATUS: validé en jeu (« c'est ok », 2026-10-31).
 | 0.283 | [0.283-quest-journal-sections.md](../evidence/0.283-quest-journal-sections.md) | `Quest.JournalGenre` → `JournalCategory` → `JournalSection` |
 | 0.285 | [0.285-quest-start-cities.md](../evidence/0.285-quest-start-cities.md) | racines « Une visite s'impose » par cité de départ, chaînes `PreviousQuest` |
 | 0.286 | [0.286-quest-alternatives.md](../evidence/0.286-quest-alternatives.md) | `QuestLock` et `PreviousQuestJoin` (une seule quête précédente suffit) |
-| 0.292 | [0.292-draw-times.md](../evidence/0.292-draw-times.md) | temps d'affichage relevés en jeu par l'utilisateur (médianes sous 0,5 ms) |
+| 0.292 | [0.292-draw-times.md](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.292-draw-times.md) | temps d'affichage relevés en jeu par l'utilisateur (médianes sous 0,5 ms) |
 | 0.295 | [0.295-fcc-shops.md](../evidence/0.295-fcc-shops.md) | `FccShop` : objet, coût en crédits de compagnie, rang requis |
 | 0.300 | [0.300-calendar-resets.md](../evidence/0.300-calendar-resets.md) | heures de remise à zéro du Calendrier du jeu (capture utilisateur) |
 

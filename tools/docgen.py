@@ -56,7 +56,7 @@ NO_HAND_VERSION = ("README.md", "CONTRIBUTING.md", "SECURITY.md", "src/TenshoAss
                    "community-templates/README.md", "community-discoveries/README.md", ".github/pull_request_template.md",
                    # 0.1084 (audit A060): the living documents of docs/project carry a date, never a version stamp.
                    "docs/project/ARCHITECTURE.md", "docs/project/ROADMAP.md", "docs/project/PROJECT.md",
-                   "docs/project/PUBLISHING.md", "docs/project/REFERENCES.md", "docs/project/G-PROPOSALS.md")
+                   "docs/project/PUBLISHING.md", "docs/project/REFERENCES.md")
 
 # ---------------------------------------------------------------------------------------------------------------------------- index
 # One row per document or folder; paths are relative to docs/. (links, for whom en/fr, content en/fr).
@@ -115,20 +115,10 @@ PROJECT_WORKING = [
     ("TESTING-ROUTE", "the in-game tests not yet ticked, sorted by activity", "les essais en jeu non cochés, rangés par activité"),
     ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",
      "inventaire des réglages, produit depuis le code : défaut, où, libellé et info-bulle"),
-    ("CONTENT-TOOLS", "content tools study, X-90", "étude des outils de contenus, X-90"),
     ("DECISIONS", None, None),
     ("IDS", "registry of the identifier families (X-, DEC-, frozen ones, collisions)", "registre des familles d'identifiants (X-, DEC-, familles figées, collisions)"),
     ("GAPS", "gaps against other Dalamud plugins and choices made", "manques face aux autres plugins Dalamud et choix retenus"),
     ("REFERENCES", "verified APIs and sources", "API et sources vérifiées"),
-    ("PROPOSALS-TRIAGE", "sorting of the proposals", "tri des propositions"),
-    ("MAP-PROPOSALS", "map", "carte"),
-    ("ITEMS-PROPOSALS", "items, bank, sorting, market", "objets, banque, tri, marché"),
-    ("CRAFT-GATHER-PROPOSALS", "crafting, gathering", "artisanat, récolte"),
-    ("TOOLS-PROPOSALS", "alarms, free company, quests, gear, mini-games", "alarmes, compagnie libre, quêtes, équipement, mini-jeux"),
-    ("G-PROPOSALS", "proposals and provisional choices of step g", "propositions et choix provisoires de l'étape g"),
-    ("audits/", "audits and plans of the work (X-76 cleanup, network rules, probe coverage, community map)",
-     "audits et plans du travail (nettoyage X-76, règles réseau, couverture des sondes, carte communautaire)"),
-    ("archive/", "older sections moved out of the plan and the decisions", "anciennes sections sorties du plan et des décisions"),
 ]
 WORKING_INTRO = {
     "en": "Working documents of [project/](project/), changed with almost every version and written in French for now (their English "
