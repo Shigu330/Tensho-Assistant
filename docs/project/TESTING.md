@@ -1823,6 +1823,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1351) Carte › réglages › « Liens de carte du chat » coupé : le clic droit sur un lien de carte n'ouvre plus rien de Tensho.
 
+- [ ] (0.1352) Plugin en français : la barre latérale dit « ALÉA », « Eurêka et Bozja », « Donjons sans fond », « Armes antiques » ; Rappels : onglets « Missions aléatoires » et « Escouade » ; Rangements : onglet « Devises » ; Banque : « Coiffeuse mirage » et « Bahut personnel » ; Collections : onglet « Hauts faits » ; Compagnie libre : « Aéronefs » et « Secteurs d'aéronef » ; Équipement : « Tenues du jeu » ; aucun texte coupé ni débordant.
+
+- [ ] (0.1352) Plugin en anglais : Dresseur, infobulle d'une bête « Trick / Tempered Release », colonne « CON », « Boss of the Board », filtre « Classification » ; Récolte : « logs » ; Triple Triade : « Card List ».
+
+- [ ] (0.1353) Plugin en français : la barre latérale dit « Accueil » ; l'aide de première visite des Livraisons spéciales cite « Lire de nouveau », comme le bouton de la page ; aucun texte coupé.
+
+- [ ] (0.1354) Plugin en français : Découvertes, ligne « ALÉA vus » ; Dresseur, colonne des lieux « (1 lieu(x) vu(s)) » ; recherche d'un objet avec une apostrophe tapée au clavier (« d'Ehcatl » par exemple) : il est trouvé.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
