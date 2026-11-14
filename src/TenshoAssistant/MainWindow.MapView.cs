@@ -116,6 +116,8 @@ internal sealed partial class MainWindow
     internal bool MapViewVisible()
     {
         if(windowDisposed || maps.State.Catalog is null)return false;
+        // X-262 (0.1308): in an instance whose map the game draws itself (deep dungeons), Tensho's map is hidden and the game's stays.
+        if(InOwnMapInstance?.Invoke()==true)return false;
         var settings=configuration.MapView;var live=mapLive?.State;
         // Hidden, not closed: the window comes back when combat or the duty ends.
         return !(live is not null && (settings.HideInCombat && live.InCombat || settings.HideInDuty && live.InDuty));
@@ -2205,6 +2207,8 @@ internal sealed partial class MainWindow
     private (uint MapId,object? Catalog,IReadOnlyList<(Npcs.NpcVendor Vendor,Npcs.NpcLocation Spot)> Rows,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)> Shops,string Festivals) mapVendorCache=(0,null,[],new Dictionary<uint,(string,Npcs.NpcShopKind,int)>(),"");
     /// <summary>X-266 (0.1307): whether a quest is under way or done (read in the game); a vendor placed only by a quest's layer shows then.</summary>
     internal Func<uint,bool>? QuestSeen { get; set; }
+    /// <summary>X-262 (0.1308): whether the player is in an instance whose map the game draws itself (Competitive.CompetitiveGate.HasOwnMap).</summary>
+    internal Func<bool>? InOwnMapInstance { get; set; }
     // X-266 (0.1307): the quests the vendors of the cached map wait for, and which of them were seen when it was built: the map is built again when one changes.
     private (uint[] Quests,string Seen) mapVendorQuests=([],"");
     private string MapVendorQuestKey(uint[] quests)=>quests.Length==0 || QuestSeen is not { } seen ? "":string.Concat(quests.Select(quest=>seen(quest) ? '1':'0'));

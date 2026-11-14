@@ -15,6 +15,10 @@ internal static partial class CompetitiveGate
     private static readonly Dictionary<IFramework.OnUpdateDelegate,IFramework.OnUpdateDelegate> Wrappers=[];
     private static volatile bool cut;
     public static bool Cut=>cut;
+    /// <summary>X-262 (0.1308): the instances whose map the game draws itself (CompetitiveZones.OwnMapInstances), read once with the zones.</summary>
+    private static volatile IReadOnlySet<uint> ownMap=new HashSet<uint>();
+    public static bool HasOwnMap(uint territory)=>territory!=0 && ownMap.Contains(territory);
+    internal static void SetOwnMap(IReadOnlySet<uint> territories)=>ownMap=territories;
     // X-109 (0.981, DEC-047): in the Beastmaster labyrinth, the board window is open and the player is not in combat (docs/evidence/0.979-labyrinth-reading.md).
     private static volatile bool labyrinthBoard;
     public static bool LabyrinthBoard=>labyrinthBoard;
@@ -138,6 +142,15 @@ internal sealed class CompetitiveWatcher : IDisposable
             catch(Exception error){log.Warning(error,"Labyrinth boards unreadable from the sheets: the written list stays.");}
             zones=CompetitiveZones.Build(data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.IsPvpZone)),
                 data.GetExcelSheet<ContentFinderCondition>().Select(row=>(row.TerritoryType.RowId,row.PvP,row.ContentType.RowId)),labyrinth);
+            // X-262 (0.1308): where the game draws its own map (deep dungeons…): Tensho's map gives way there. A failed read leaves none known.
+            try
+            {
+                var own=CompetitiveZones.OwnMapInstances(data.GetExcelSheet<ContentFinderCondition>().Select(row=>row.TerritoryType.RowId),
+                    data.GetExcelSheet<TerritoryType>().Select(row=>(row.RowId,row.Map.RowId)),data.GetExcelSheet<Map>().Select(row=>row.TerritoryType.RowId));
+                CompetitiveGate.SetOwnMap(own);
+                log.Information("Instances with the game's own map: {0} (Tensho's map gives way there).",own.Count);
+            }
+            catch(Exception error){log.Warning(error,"Instances with their own map unreadable: Tensho's map stays everywhere.");}
         }
         // In doubt, stopped: after a game update that breaks these sheets Tensho stays cut rather than running in PvP.
         catch(Exception error){zones=null;log.Warning(error,"Competitive zones unavailable: Tensho stays stopped while logged in.");}

@@ -43,6 +43,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1289-beastmaster-classjobcategory.md](0.1289-beastmaster-classjobcategory.md) | `src/TenshoAssistant/Gear/GearCatalog.cs`, `tests/TenshoAssistant.Tests/BeastmasterGear1289Tests.cs` | `docs/changelog/CHANGELOG-0.1200-0.1299.md` |
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1306-allied-kinds.md](0.1306-allied-kinds.md) | `tools/README.md` | `CHANGELOG.md` |
+| [0.1308-own-map-instances.md](0.1308-own-map-instances.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs`, `tests/TenshoAssistant.Tests/DeepDungeonOpen1308Tests.cs` | `CHANGELOG.md`, `docs/project/ARCHITECTURE.md` |
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
 | [0.135.0-marker-evidence.log](0.135.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |
@@ -283,5 +284,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md`, `docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 271 files · fichiers ; 217 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 272 files · fichiers ; 218 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

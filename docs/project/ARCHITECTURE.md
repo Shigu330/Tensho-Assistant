@@ -262,10 +262,15 @@ game data: [0.600-competitive-inventory](../evidence/0.600-competitive-inventory
 
 | Level | Content | How it is known |
 |---|---|---|
-| Game flags | PvP, Lord of Verminion, deep dungeons (ranked on the Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` and its content type 21 (`CompetitiveZones.Build`): new maps are covered without an update; `IsPvP` alone is false at the Battlehall (579) and at Lord of Verminion |
+| Game flags | PvP, Lord of Verminion; deep dungeons (content type 21) were cut until 0.1308, no longer since (X-262, DEC-038 completed on 2026-11-13) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` (`CompetitiveZones.Build`): new maps are covered without an update; `IsPvP` alone is false at the Battlehall (579) and at Lord of Verminion |
 | Arena only | Triple Triad Battlehall (579), whose public hall has PvE matches | `GameMain.IsInPvPInstance` (0.612); the log writes `Competitive arena check` |
 | Listed in the code | Triple Triad tournaments (940, 941), Mahjong (831); the Crucible of the Unbroken (1339 to 1343) was listed until 0.1115, no longer cut since (X-137, DEC-038 completed on 2026-11-11) | `CompetitiveZones.Listed`; the labyrinth's territories stay known (`IsLabyrinth`) |
 | Outside a zone | Triple Triad against a player in a normal zone | only the Triple Triad part switches off (DEC-038, D5) |
+
+Instances with the game's own map (X-262, 0.1308): in a duty's territory that no map of the sheets covers (`CompetitiveZones.OwnMapInstances`:
+the deep dungeons, the Gold Saucer's games, the Diadem's trial, the Final Verse, one extreme trial;
+[0.1308-own-map-instances](../evidence/0.1308-own-map-instances.md)), Tensho is not cut but its map window is hidden and the game's map is
+left in place (`CompetitiveGate.HasOwnMap`, `MapViewVisible`); both come back on leaving.
 
 What « switched off » means, as coded (`CompetitiveGate`): Tensho stays loaded and one guard, on the framework thread, keeps only the
 reading of the zone. The framework subscriptions go through it (a test refuses one that would bypass it), the chat readers too (0.615),
@@ -558,10 +563,15 @@ dans les données du jeu : [0.600-competitive-inventory](../evidence/0.600-compe
 
 | Niveau | Contenu | Comment on le sait |
 |---|---|---|
-| Drapeaux du jeu | JcJ, Lord of Verminion, donjons profonds (classés sur le Lodestone) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` et son type de contenu 21 (`CompetitiveZones.Build`) : les nouvelles cartes sont couvertes sans mise à jour ; `IsPvP` seul est faux au Battlehall (579) et à Lord of Verminion |
+| Drapeaux du jeu | JcJ, Lord of Verminion ; les donjons profonds (type de contenu 21) étaient coupés jusqu'en 0.1308, plus depuis (X-262, DEC-038 complétée le 2026-11-13) | `IClientState.IsPvP` (`EnterPvP`, `LeavePvP`), `TerritoryType.IsPvpZone`, `ContentFinderCondition.PvP` (`CompetitiveZones.Build`) : les nouvelles cartes sont couvertes sans mise à jour ; `IsPvP` seul est faux au Battlehall (579) et à Lord of Verminion |
 | Arène seulement | Battlehall de Triple Triade (579), dont la salle publique a des matchs JcE | `GameMain.IsInPvPInstance` (0.612) ; le journal écrit `Competitive arena check` |
 | Listé dans le code | Tournois de Triple Triade (940, 941), Mahjong (831) ; le Dédale bestial (1339 à 1343) y était jusqu'en 0.1115, il n'est plus coupé depuis (X-137, DEC-038 complétée le 2026-11-11) | `CompetitiveZones.Listed` ; les territoires du Dédale restent connus (`IsLabyrinth`) |
 | Hors d'une zone | Triple Triade contre un joueur dans une zone normale | seule la partie Triple Triade se coupe (DEC-038, D5) |
+
+Instances à carte propre (X-262, 0.1308) : dans le territoire d'un contenu qu'aucune carte des feuilles ne couvre
+(`CompetitiveZones.OwnMapInstances` : les donjons profonds, les jeux du Gold Saucer, l'épreuve du Diadème, le Verset final, une épreuve
+extrême ; [0.1308-own-map-instances](../evidence/0.1308-own-map-instances.md)), Tensho n'est pas coupé mais sa fenêtre de carte est cachée
+et la carte du jeu laissée en place (`CompetitiveGate.HasOwnMap`, `MapViewVisible`) ; tout revient à la sortie.
 
 Ce que « coupé » veut dire, tel que codé (`CompetitiveGate`) : Tensho reste chargé et un seul gardien, sur le thread du framework, ne
 garde que la lecture de la zone. Les abonnements au framework passent par lui (un test refuse celui qui le contournerait), les lecteurs

@@ -2,10 +2,12 @@ namespace TenshoAssistant.Competitive;
 
 /// <summary>
 /// DEC-038: where the whole plugin stops. From the game's data where it says so: PvP zones, content flagged PvP (Triple Triad Battlehall, Lord of
-/// Verminion) and deep dungeons, ranked on the Lodestone. Listed by hand where nothing flags it: Triple Triad tournaments, Mahjong
+/// Verminion). Listed by hand where nothing flags it: Triple Triad tournaments, Mahjong
 /// (docs/evidence/0.600-competitive-inventory.md). No setting avoids it, and in doubt it stays stopped.
 /// X-137 (0.1115, user's choice of 2026-11-11, DEC-038 completed): the Beastmaster labyrinth is no longer cut (no ranking); its territories stay
 /// known (<see cref="IsLabyrinth"/>) for the board panel and the developer reading.
+/// X-262 (0.1308, user's choice of 2026-11-13 after the Palace of the Dead 1-10, DEC-038 completed): deep dungeons (content type 21) are no
+/// longer cut; Tensho works there as in a normal dungeon, but its map gives way to the game's (<see cref="OwnMapInstances"/>).
 /// </summary>
 public static class CompetitiveZones
 {
@@ -31,8 +33,21 @@ public static class CompetitiveZones
         // X-137 (0.1115): the labyrinth's boards are remembered (IsLabyrinth), not cut.
         LabyrinthFound=(labyrinth ?? []).Where(territory=>territory!=0).ToHashSet();
         foreach(var (territory,pvpZone) in territories)if(pvpZone)zones.Add(territory);
-        foreach(var (territory,pvp,type) in content)if(territory!=0 && (pvp || type==DeepDungeonContentType))zones.Add(territory);
+        // X-262 (0.1308): content flagged PvP only; deep dungeons (DeepDungeonContentType) are no longer cut.
+        foreach(var (territory,pvp,_) in content)if(territory!=0 && pvp)zones.Add(territory);
         return zones;
+    }
+
+    /// <summary>
+    /// X-262 (0.1308): the instances whose map the game draws itself: the territory of a duty (ContentFinderCondition) that no map of the sheets
+    /// covers (TerritoryType.Map 0 and no Map row naming it). Read on 2026-11-14 (docs/evidence/0.1308-own-map-instances.md): the 50 deep
+    /// dungeon duties, the Gold Saucer's games, the Diadem's trial, the Final Verse and one extreme trial. Tensho's map has nothing to show there.
+    /// </summary>
+    public static HashSet<uint> OwnMapInstances(IEnumerable<uint> dutyTerritories,IEnumerable<(uint Territory,uint Map)> territories,IEnumerable<uint> mappedTerritories)
+    {
+        var withMap=mappedTerritories.Where(territory=>territory!=0).ToHashSet();
+        foreach(var (territory,map) in territories)if(map!=0)withMap.Add(territory);
+        return dutyTerritories.Where(territory=>territory!=0 && !withMap.Contains(territory)).ToHashSet();
     }
 
     /// <summary>Zones null: the data could not be read, so stopped. Territory 0: a loading screen, the state stays. Logged out: nothing to protect.</summary>

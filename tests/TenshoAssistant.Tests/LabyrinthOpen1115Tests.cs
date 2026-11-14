@@ -13,7 +13,9 @@ internal static class LabyrinthOpen1115Tests
             var zones=CompetitiveZones.Build([(250,true)],[(561,false,CompetitiveZones.DeepDungeonContentType)],[1339u,1399u]);
             foreach(var board in new uint[]{1339,1340,1341,1342,1343,1399})
                 Check(!CompetitiveZones.IsCut(true,board,false,zones,false) && CompetitiveZones.IsLabyrinth(board),$"board {board}: not cut, still known");
-            foreach(var cut in new uint[]{250,561,940,941,831})Check(CompetitiveZones.IsCut(true,cut,false,zones,false),$"{cut} still cut");
+            // X-262 (0.1308): deep dungeons (561) are no longer cut either.
+            foreach(var cut in new uint[]{250,940,941,831})Check(CompetitiveZones.IsCut(true,cut,false,zones,false),$"{cut} still cut");
+            Check(!CompetitiveZones.IsCut(true,561,false,zones,false),"561 (deep dungeon) no longer cut");
             Check(CompetitiveZones.IsCut(true,1339,true,zones,false),"PvP (IsPvP) still cuts everywhere");
             CompetitiveZones.Build([],[]);
             var decisions=File.ReadAllText(Path.GetFullPath("docs/project/DECISIONS.md"));

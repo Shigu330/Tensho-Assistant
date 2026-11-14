@@ -56,9 +56,9 @@ That map is Tensho's: by default it replaces the game's on the M key, with the s
 
 Tensho adds small panels next to some game windows (character sheet, Duty Finder, retainer sales, synthesis, gathering, fishing, the Sort button, Triple Triad) and lines in the server bar. The guide's step « Panels next to the game's windows » turns them all off or on at once (Help › « Start the guide »); each one also has its switch in Settings, and the reset button (curved arrow) puts it back.
 
-## Why does Tensho stop in PvP or in a deep dungeon?
+## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
-In PvP zones, deep dungeons and other ranked content, the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this.
+In PvP zones and other ranked content (Triple Triad tournaments, Mahjong), the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this. In deep dungeons Tensho works as in any dungeon, but the game draws its own map there: Tensho's map hides and leaves the game's map until you leave.
 
 ## How do I update Tensho?
 
@@ -174,9 +174,9 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 
 Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
 
-## Pourquoi Tensho s'arrête-t-il en JcJ ou en donjon profond ?
+## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon profond ?
 
-Dans les zones JcJ, les donjons profonds et les autres contenus classés, tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela.
+Dans les zones JcJ et les autres contenus classés (tournois de Triple Triade, Mahjong), tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela. En donjon profond, Tensho marche comme dans tout donjon, mais le jeu y dessine sa propre carte : la carte de Tensho se cache et laisse celle du jeu jusqu'à votre sortie.
 
 ## Comment mettre Tensho à jour ?
 

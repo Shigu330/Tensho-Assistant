@@ -54,7 +54,8 @@ internal static class BackupNames1141Tests
         })),
         ("Competitive 1141: in the arena, a read that fails counts as « in the arena » (stopped); elsewhere the arena is never read",() =>
         {
-            var zones=CompetitiveZones.Build([(100,false),(250,true)],[(430,false,21)]);
+            // X-262 (0.1308): content type 21 (deep dungeons) is no longer cut: 430 is content flagged PvP here.
+            var zones=CompetitiveZones.Build([(100,false),(250,true)],[(430,true,21)]);
             var asked=0;
             bool Failing(){asked++;throw new InvalidOperationException("read lost after a game update");}
             Check(CompetitiveZones.IsCut(true,579,false,zones,false,Failing),"arena read failed: stopped (in doubt)");
