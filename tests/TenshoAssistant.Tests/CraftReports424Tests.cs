@@ -13,7 +13,7 @@ internal static class CraftReports424Tests
                 < plan.IndexOf("CraftPlan.Build(recipe",StringComparison.Ordinal),"cache refreshed before the plan reads it");
             Check(Read("MainWindow.CraftSimulation.cs").Contains("if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId); page=Page.Items;")
                 && Read("UI/Navigation/MainWindow.CategoryNavigation.cs").Contains("if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);page=Page.Items;"),"both buttons");
-            Check(Read("Localization/Languages/fr.json").Contains("\"Notebook\": \"Retour à l’objet\""),"named after what it does");
+            Check(Read("Localization/Languages/fr.json").Contains("\"Notebook\": \"Retour à l'objet\""),"named after what it does");
         }),
     ];
 }

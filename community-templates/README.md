@@ -24,7 +24,7 @@ the plugin reads this folder from the `main` branch, only when a player clicks.
 ## What is accepted
 
 - **Licence:** `CC0-1.0`, so anyone may use and change the tool.
-- **Format:** the tests check each file with the plugin's own rules. An unknown field or block, or a link that is not https, refuses it.
+- **Format:** the tests check each file with the plugin's own rules. An unknown field or block, or a link that is not https, gets it refused.
 - **Content:** useful for players, without advertising or anything unpleasant. No real-money trading, no automation or exploit
   instructions, nothing a player cannot normally see, and no personal information.
 - **Items:** by their game identifier, so names follow each player's language. Add `en` and `fr` texts if you can.

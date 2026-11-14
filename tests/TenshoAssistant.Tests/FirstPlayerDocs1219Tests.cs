@@ -21,7 +21,7 @@ internal static class FirstPlayerDocs1219Tests
         ("First player 1219: the README starts with the install, in both languages",() =>
         {
             var (en,fr) = Halves("README.md");
-            foreach (var (half,install,overview) in new[] { (en,"## Install\n","## Overview\n"),(fr,"## Installation\n","## Vue d’ensemble\n") })
+            foreach (var (half,install,overview) in new[] { (en,"## Install\n","## Overview\n"),(fr,"## Installation\n","## Vue d'ensemble\n") })
             {
                 var at = half.IndexOf(install,StringComparison.Ordinal);
                 Check(at > 0 && at < half.IndexOf(overview,StringComparison.Ordinal),"install before the page table: " + install.Trim());

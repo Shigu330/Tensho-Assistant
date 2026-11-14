@@ -128,7 +128,7 @@ Par le guide : Aide › « Lancer le guide » montre les pages principales en qu
 
 ## Une page est vide ou dit « non lu ».
 
-Le jeu ne donne certaines données qu'une fois sa fenêtre ouverte, ou une fois connecté. Le « ? » de la page dit ce qu'elle attend. Ouvrez une fois cette fenêtre : Tensho garde ce qu'il a lu.
+Le jeu ne donne certaines données qu'une fois sa fenêtre ouverte, ou une fois que vous êtes connecté. Le « ? » de la page dit ce qu'elle attend. Ouvrez une fois cette fenêtre : Tensho garde ce qu'il a lu.
 
 ## Pourquoi dois-je ouvrir une fenêtre du jeu ?
 

@@ -6,7 +6,7 @@
 2. Rename it with the language code, for example `es.json`.
 3. Update `_meta` and translate the values.
 4. Never rename translation keys.
-5. Run the localization validator from the repository root (requires the .NET SDK specified in `global.json`):
+5. Run the localisation validator from the repository root (requires the .NET SDK specified in `global.json`):
 
    ```powershell
    dotnet run --project tests/TenshoAssistant.Tests -c Release -- --validate-localization src/TenshoAssistant/Localization/Languages
@@ -39,7 +39,7 @@ The diagnostics still report the invalid editable file so it can be corrected. V
 `{1}` before `{0}`.
 
 Use descriptive keys such as `ToolDirectory.Crafting.Name`. Do not use numbered labels. Keep FFXIV item, action and location names in the
-official game catalog: these files translate the plugin interface, and game data is shown in the game's own language.
+official game catalogue: these files translate the plugin interface, and game data is shown in the game's own language.
 
 ---
 

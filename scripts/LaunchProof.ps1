@@ -47,6 +47,13 @@ function Get-LaunchProof([string]$Version, [string]$Zip, [string]$Path = (Get-La
     return $result
 }
 
+# 0.1354 (X-371, X-356 review): a French count agrees with its number: 0 and 1 take the singular, 2 and more the plural.
+function Format-FrenchCount($Count, [string]$One, [string]$Many) {
+    $n = [int]$Count
+    if ($n -ge 2) { return "$n $Many" }
+    return "$n $One"
+}
+
 # 0.1145 (X-170, end of X-144): the positive note of a release says only what the accepted proof holds (version, DLL, date, character
 # logged in, the self-check's counts), nothing it does not (the proof says nothing of the log). English line, then French line.
 function Format-LaunchNote($LaunchProof) {
@@ -54,7 +61,7 @@ function Format-LaunchNote($LaunchProof) {
     $when = $LaunchProof.At.ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
     $dll = $LaunchProof.Dll.Substring(0, 12)
     $counts = "$([int]$proof.Ok) ok, $([int]$proof.Seen) seen before, $([int]$proof.NotRead) not read, $([int]$proof.Suspect) suspect, $([int]$proof.Failed) failed"
-    $countsFr = "$([int]$proof.Ok) ok, $([int]$proof.Seen) vus avant, $([int]$proof.NotRead) non lus, $([int]$proof.Suspect) suspects, $([int]$proof.Failed) échec"
+    $countsFr = "$([int]$proof.Ok) ok, $(Format-FrenchCount $proof.Seen 'vu avant' 'vus avant'), $(Format-FrenchCount $proof.NotRead 'non lu' 'non lus'), $(Format-FrenchCount $proof.Suspect 'suspect' 'suspects'), $(Format-FrenchCount $proof.Failed 'échec' 'échecs')"
     return "**Checked at launch, not tried in detail yet**: on $when UTC, Tensho $($proof.Version) loaded in game with the very DLL of this release (SHA-256 $dll…), a character logged in; its self-check: $counts. The detailed in-game tests come later.`n" +
         "**Vérifié au lancement, pas encore essayé en détail** : le $when UTC, Tensho $($proof.Version) s'est chargé en jeu avec la DLL même de cette release (SHA-256 $dll…), personnage connecté ; son autotest : $countsFr. Les essais détaillés en jeu viendront ensuite."
 }

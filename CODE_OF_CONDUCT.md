@@ -69,5 +69,5 @@ des messages concernés. Ne répondez pas sur le même ton en public. Les signal
 ## Ce qui se passe ensuite
 
 Le mainteneur peut modifier, masquer ou supprimer des messages, fermer ou verrouiller une discussion, refuser une contribution, ou
-bloquer quelqu'un du dépôt, pour un temps ou pour de bon, selon ce qui s'est passé. Un premier problème vaut d'habitude un rappel de ce
+exclure quelqu'un du dépôt, pour un temps ou pour de bon, selon ce qui s'est passé. Un premier problème vaut d'habitude un rappel de ce
 code.

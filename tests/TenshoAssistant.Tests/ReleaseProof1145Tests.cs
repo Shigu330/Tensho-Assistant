@@ -101,7 +101,7 @@ internal static class ReleaseProof1145Tests
                 Check(lines[0].StartsWith("**Checked at launch, not tried in detail yet**: on "+when+" UTC, Tensho 0.1145.0 loaded",StringComparison.Ordinal),"English, dated from the proof: "+lines[0]);
                 Check(lines[0].Contains("SHA-256 "+hash[..12]+"…") && lines[0].Contains("36 ok, 4 seen before, 1 not read, 2 suspect, 0 failed"),"the proof's DLL and counts: "+lines[0]);
                 Check(lines[1].StartsWith("**Vérifié au lancement, pas encore essayé en détail** : le "+when+" UTC",StringComparison.Ordinal),"French second, accents read right (UTF-8 with BOM for Windows PowerShell 5.1): "+lines[1]);
-                Check(lines[1].Contains("36 ok, 4 vus avant, 1 non lus, 2 suspects, 0 échec"),"French counts: "+lines[1]);
+                Check(lines[1].Contains("36 ok, 4 vus avant, 1 non lu, 2 suspects, 0 échec"),"French counts: "+lines[1]);
                 foreach(var word in new[]{"the log","journal","error"})Check(!note.Contains(word,StringComparison.OrdinalIgnoreCase),"nothing the proof does not hold: "+word);
             }
             finally { Remove(folder); }
