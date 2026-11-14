@@ -39,6 +39,16 @@ internal static class MapMarkerRemember1335Tests
             Check(MapMarkerUnlock.Visible(1,60442,1045,393,25,other,Unlocked),"bit 1 read unlocked: drawn");
             Check(other.DrawnWhileLocked.Contains(83),"the learned bit survives a map change");
         }),
+        ("Map marker remember 1337: on a map built earlier, the game's list decides, except a bit unlocked since (probe of 11/14 15:41, map 13)",() =>
+        {
+            // Map 13: bit 2 (icon 60412 at 1062,813) read unlocked, not listed by the game; bit 231 neither.
+            var thirteen=MapMarkerUnlock.Remember(null,13,[new(2,60412,1062,813,false,-1,true),new(231,63919,813,732,false,-1,false)]);
+            var later=MapMarkerUnlock.Remember(thirteen,14,[]);
+            Check(!MapMarkerUnlock.Visible(2,60412,1062,813,13,later,new HashSet<ushort>{2}),"bit 2: the game did not draw it, read unlocked then and now: hidden");
+            Check(MapMarkerUnlock.Visible(2,60412,1062,813,13,null,new HashSet<ushort>{2}),"(without memory the bit's reading would show it)");
+            Check(MapMarkerUnlock.Visible(231,63919,813,732,13,later,new HashSet<ushort>{2,231}),"bit 231 unlocked since the map was built: drawn");
+            Check(!MapMarkerUnlock.Visible(231,63919,813,732,13,later,new HashSet<ushort>{2}),"bit 231 still locked: hidden");
+        }),
         ("Map marker remember 1335: the same object while nothing changes; the memory is bounded",() =>
         {
             var first=MapMarkerUnlock.Remember(null,25,MorDhona);

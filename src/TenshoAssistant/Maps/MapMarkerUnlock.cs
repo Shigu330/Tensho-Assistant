@@ -24,11 +24,20 @@ public static class MapMarkerUnlock
     /// draws (bit 83). There, an icon is also drawn when the game listed it on that map earlier in the session (<see cref="GameList.Remembered"/>)
     /// or when its bit was seen drawn by the game while read locked (<see cref="GameList.DrawnWhileLocked"/>): what the game was seen to draw
     /// is never hidden again. The rule that needs no memory waits for the probe in the game (R06; candidates in the log).
+    /// 0.1337 (probe of 11/14 15:41, map 13: bit 2, icon 60412 at 1062,813, read unlocked, not listed by the game): a map the game built earlier
+    /// keeps its list as the rule (what it did not draw stays hidden too), except a bit unlocked since (read locked then, unlocked now).
     /// </remarks>
     public static bool Visible(ushort bit,uint icon,float pixelX,float pixelY,uint mapId,GameList? game,IReadOnlySet<ushort>? unlocked)
-        =>bit==0 || (game is { } built && built.MapId==mapId ? built.Listed.Contains((icon,pixelX,pixelY))
-            :Visible(bit,unlocked) || game?.DrawnWhileLocked.Contains(bit)==true
-             || game?.Remembered.TryGetValue(mapId,out var seen)==true && seen.Contains((icon,pixelX,pixelY)));
+    {
+        if(bit==0)return true;
+        if(game is { } built && built.MapId==mapId)return built.Listed.Contains((icon,pixelX,pixelY));
+        if(game?.Remembered.TryGetValue(mapId,out var seen)==true)
+            return seen.Listed.Contains((icon,pixelX,pixelY)) || Visible(bit,unlocked) && !seen.UnlockedThen.Contains(bit);
+        return Visible(bit,unlocked) || game?.DrawnWhileLocked.Contains(bit)==true;
+    }
+
+    /// <summary>0.1337 (X-351): a map the game built earlier in the session: the icons it listed, and the bits read unlocked then.</summary>
+    public sealed record SeenMap(IReadOnlySet<(uint Icon,float PixelX,float PixelY)> Listed,IReadOnlySet<ushort> UnlockedThen);
 
     /// <summary>
     /// 0.1321: the icons with an unlock bit that the game lists on the map it has built (AgentMap.CurrentMapId), by icon and sheet pixel.
@@ -36,7 +45,7 @@ public static class MapMarkerUnlock
     /// </summary>
     public sealed record GameList(uint MapId,IReadOnlySet<(uint Icon,float PixelX,float PixelY)> Listed)
     {
-        public IReadOnlyDictionary<uint,IReadOnlySet<(uint Icon,float PixelX,float PixelY)>> Remembered{get;init;}=new Dictionary<uint,IReadOnlySet<(uint,float,float)>>();
+        public IReadOnlyDictionary<uint,SeenMap> Remembered{get;init;}=new Dictionary<uint,SeenMap>();
         public IReadOnlySet<ushort> DrawnWhileLocked{get;init;}=new HashSet<ushort>();
     }
 
@@ -52,9 +61,9 @@ public static class MapMarkerUnlock
         var listed=checks.Where(check=>check.Listed).Select(check=>(check.Icon,check.PixelX,check.PixelY)).ToHashSet();
         var drawn=checks.Where(check=>check.Listed && !check.Unlocked).Select(check=>check.Bit).ToHashSet();
         if(before is { } same && same.MapId==mapId && same.Listed.SetEquals(listed) && drawn.IsSubsetOf(same.DrawnWhileLocked))return same;
-        var remembered=new Dictionary<uint,IReadOnlySet<(uint,float,float)>>();
-        if(before is not null)foreach(var (map,icons) in before.Remembered)if(remembered.Count<MaximumRemembered-1)remembered[map]=icons;
-        remembered[mapId]=listed;
+        var remembered=new Dictionary<uint,SeenMap>();
+        if(before is not null)foreach(var (map,seen) in before.Remembered)if(remembered.Count<MaximumRemembered-1)remembered[map]=seen;
+        remembered[mapId]=new(listed,checks.Where(check=>check.Unlocked).Select(check=>check.Bit).ToHashSet());
         if(before is not null)drawn.UnionWith(before.DrawnWhileLocked);
         return new(mapId,listed){Remembered=remembered,DrawnWhileLocked=drawn};
     }
