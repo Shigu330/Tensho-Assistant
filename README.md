@@ -232,7 +232,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Objets | **Objets** | Trouvez un objet et voyez sa fiche : comment l'obtenir, vos stocks, l'artisanat, les usages, la récolte, le marché, votre note. |
 |  | **Rangements** | Où sont vos objets : personnage, servants, sacoches, arsenal, coiffeuse mirage, bahut personnel, coffre de compagnie ; aussi les cristaux, les devises avec ce qu'elles achètent, un journal des gils, un rapport de ce qui pourrait libérer de la place, et vos autres personnages. |
 |  | **Tri de l'inventaire** | Prévisualisez une règle de tri, puis appliquez-la à vos rangements. Rien ne bouge sans votre clic. |
-|  | **Marché** | Les prix de l'objet choisi, depuis Universalis : résumé, offres de votre monde, centre de données ou région, historique des ventes. |
+|  | **Marché** | Les prix de l'objet choisi, depuis Universalis : résumé, offres de votre monde, centre de traitement de données ou région, historique des ventes. |
 |  | **Souhaits** | Les objets que vous voulez obtenir, en une liste : leur état (obtenu, ou les exemplaires que vous avez), votre prix pour l'alerte de vente et, pour les objets qui se récoltent, où les récolter (job, zone, point, heures ou météo). |
 | Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes de fabrication (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
 |  | **Récolte** | Trouvez où et quand récolter ou pêcher une ressource, avec vos carnets, l'horloge d'Éorzéa et l'aide à la pêche. |
