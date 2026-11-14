@@ -1786,6 +1786,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1323) Aide › Signaler un problème : préparer un bug de test (titre « essai ») et ouvrir le formulaire : le titre est « [Bug] essai », l'étiquette player-report est posée à l'envoi (puis fermer le ticket)
 
+- [ ] (0.1324) Aide › Signaler un problème, GitHub connecté (Monde › Découvertes) : choisir « Par ma connexion GitHub », titre « essai X-340 », « Envoyer sur GitHub… » : l'aperçu montre le titre puis le texte avec le rapport entier ; « Envoyer maintenant » : « Envoyé : ticket n° N », « Ouvrir le ticket » montre le même texte, avec les étiquettes bug et player-report posées en moins d'une minute (puis fermer le ticket)
+
+- [ ] (0.1324) Aide › Signaler un problème, voie « Par mon navigateur » avec un long texte (plus de 6 000 caractères) : l'aperçu montre l'encadré « Trop long pour l'adresse… collez-le (Ctrl+V) » ; après l'ouverture, l'encadré « Votre rapport est copié » reste visible
+
+- [ ] (0.1326) Marché, un objet rare jamais envoyé à Universalis sur votre monde : ouvrir ses offres au tableau du jeu, puis survoler l'objet avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (marqué « vu au tableau »), avec les autres mondes d'Universalis
+
+- [ ] (0.1327) Monde › Découvertes, avec des tâches de servant notées : ouvrir le tableau et chercher « servant » : les noms des tâches s'affichent (un numéro au plus un instant) ; dalamud.log sans ligne « slow frame » pendant ce temps
+
+- [ ] (0.1327) Sociétés alliées : première ouverture de la page après un rechargement : « Lecture des données du jeu… » un instant, puis les sociétés et leurs genres ; dalamud.log sans ligne « slow frame » à cette ouverture
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
