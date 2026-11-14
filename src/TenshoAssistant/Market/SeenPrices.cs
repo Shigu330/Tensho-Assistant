@@ -58,6 +58,17 @@ public static class SeenPrices
     public static readonly TimeSpan KeptFor=TimeSpan.FromDays(90);
 
     /// <summary>
+    /// X-343 (0.1331, user report of 14/11: an item just seen at the game's board, then hovered with Ctrl+Alt, showed Universalis instead): Dalamud
+    /// itself uploads to Universalis what the player sees at the board (its setting « Anonymously upload market board data », on by default;
+    /// docs/evidence/x343-dalamud-upload.md), so Universalis' upload for that world falls a few seconds after the look and is the same reading.
+    /// An upload counts as a newer reading only when it comes later than this after the look; the same 5 minutes as the clock tolerance of the
+    /// sales (MergeSales). Another player's upload after that replaces the look.
+    /// </summary>
+    public static readonly TimeSpan SameReading=TimeSpan.FromMinutes(5);
+    /// <summary>X-343: Universalis' reading of a world is newer than the look at the board (not the same reading uploaded by Dalamud).</summary>
+    public static bool UniversalisNewer(DateTimeOffset? uploaded,DateTimeOffset seen)=>uploaded is { } at && at>seen+SameReading;
+
+    /// <summary>
     /// X-73.1 (0.857, user request: prices seen on the other worlds of the data center, when one goes there, complete Universalis): the cheapest offer of the data
     /// center from Universalis' and from each visited world's lowest offer seen. Universalis' world gives way to what was seen there later; another world seen
     /// counts while its offers are current (CurrentOffers). docs/project/audits/0.857-community-map.md (market report).
@@ -69,7 +80,7 @@ public static class SeenPrices
         if(universalis is { } listing)
         {
             var there=worlds.FirstOrDefault(entry=>entry.World==listing.WorldId);
-            if(there.World!=0 && there.At>(listing.UploadedAt ?? DateTimeOffset.MinValue)){if(there.Price is { } price)candidates.Add(new(price,listing.WorldId,there.At));}
+            if(there.World!=0 && !UniversalisNewer(listing.UploadedAt,there.At)){if(there.Price is { } price)candidates.Add(new(price,listing.WorldId,there.At));}
             else candidates.Add(listing);
         }
         foreach(var (world,price,at) in worlds)
@@ -94,7 +105,7 @@ public static class SeenPrices
             if(entry.Listings.Count>0 && now-entry.ListingsAt<=CurrentOffers)
             {
                 var latest=offers.Where(offer=>offer.World==world).Select(offer=>offer.ReviewedAt ?? DateTimeOffset.MinValue).DefaultIfEmpty(DateTimeOffset.MinValue).Max();
-                if(entry.ListingsAt>latest)
+                if(!UniversalisNewer(latest==DateTimeOffset.MinValue ? null:latest,entry.ListingsAt))
                 {
                     offers.RemoveAll(offer=>offer.World==world);
                     offers.AddRange(entry.Listings.Where(listing=>listing.Price>0 && listing.Quantity>0).Select(listing=>new MarketOffer((long)Math.Round(listing.Price),
@@ -126,7 +137,7 @@ public static class SeenPrices
     public static RetainerItemOffers? RetainerOffers(SeenMarketEntry? entry,string world,RetainerItemOffers? universalis,DateTimeOffset now)
     {
         if(entry is not { OwnKnown:true } || entry.Listings.Count==0 || now-entry.ListingsAt>CurrentOffers)return null;
-        if(universalis?.DataAt is { } uploaded && uploaded>=entry.ListingsAt)return null;
+        if(UniversalisNewer(universalis?.DataAt,entry.ListingsAt))return null;
         return new(entry.Listings.Where(listing=>!listing.Own && listing.Price>0 && listing.Quantity>0).Select(listing=>new MarketOffer((long)Math.Round(listing.Price),listing.Quantity,
             listing.Hq,world,"",(long)Math.Round(listing.Price*listing.Quantity*0.05m),entry.ListingsAt,true,false)).OrderBy(offer=>offer.UnitPrice).ToArray(),entry.ListingsAt);
     }
@@ -153,7 +164,8 @@ public static class SeenPrices
     {
         if(entry is null || entry.Listings.Count==0 && entry.Sales.Count==0)return null;
         if(universalis is null && waitForUniversalis)return null;
-        if(universalis?.UploadedAt is { } uploaded && uploaded>=entry.Seen)return null;
+        // X-343 (0.1331): an upload within SameReading of the look is that look, sent by Dalamud: the board seen keeps the line.
+        if(UniversalisNewer(universalis?.UploadedAt,entry.Seen))return null;
         return Quote(entry,universalis,now);
     }
 }

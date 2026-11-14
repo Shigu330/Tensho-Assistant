@@ -28,7 +28,8 @@ internal static class SeenPrices817Tests
             var old=new MarketQuote(33,5000,Now.AddHours(-1),Now.AddDays(-1),empty,empty,new MarketListing(95,34,Now));
             var seen=SeenPrices.Prefer(Entry(),old,Now);
             Check(seen is { Nq.Minimum:100 } && seen.NqCheapest?.WorldId==34,"seen, other worlds kept");
-            var fresh=old with {UploadedAt=Now};
+            // X-343 (0.1331): an upload within SeenPrices.SameReading of the look is that look; a newer reading comes later.
+            var fresh=old with {UploadedAt=Now.AddMinutes(10)};
             Check(SeenPrices.Prefer(Entry(),fresh,Now) is null,"Universalis newer: Universalis");
             Check(SeenPrices.Prefer(Entry(),null,Now) is not null,"no Universalis and its source off: seen alone");
             Check(SeenPrices.Prefer(Entry(),null,Now,true) is null,"0.821: no Universalis yet but its source on: wait for it, so it is asked and its other worlds come");
