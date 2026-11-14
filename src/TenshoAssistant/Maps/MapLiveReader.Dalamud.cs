@@ -37,10 +37,11 @@ public sealed record MapLiveState(uint TerritoryId,uint MapId,Vector3 Position,f
     IReadOnlyList<MapObjectMarker>? Objects=null,IReadOnlyList<MapFateMarker>? Fates=null,IReadOnlyList<MapPartyMarker>? Party=null,
     IReadOnlySet<uint>? UnlockedCurrents=null,IReadOnlySet<uint>? Sightseen=null,int SightseeingUnlock=-1,int SightseeingUnlockEx=-1,string Area="",string SubArea="",
     IReadOnlyList<MapMonster>? Monsters=null,uint DiscoveryMapId=0,IReadOnlyList<int>? Undiscovered=null,IReadOnlyList<MapQuestPoint>? QuestPoints=null,
-    IReadOnlySet<ushort>? UnlockedMarkerBits=null)
+    IReadOnlySet<ushort>? UnlockedMarkerBits=null,MapMarkerUnlock.GameList? GameListedMarkers=null)
 {
     /// <summary>X-87 (0.968): the leve under way (Map.ActiveLevequestMarker): its objective id and the game's icon of its marker; null when none.</summary>
     // X-322 (0.1320): UnlockedMarkerBits: the map icons' unlock bits (MapMarker.MapMarkerUnlockedBit) read unlocked (UIState.IsUnlockLinkUnlocked); null: not read.
+    // 0.1321: GameListedMarkers: on the map the game has built, the icons with a bit it lists (it decides there, MapMarkerUnlock.Visible).
     public (uint Objective,uint Icon)? ActiveLeve { get; init; }
 }
 
@@ -93,7 +94,7 @@ internal sealed class MapLiveReader : IDisposable
     }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     // X-322 (0.1320): the unlock bits of the map icons, the ones read unlocked (same set kept while unchanged), and the last check written.
-    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";
+    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";private MapMarkerUnlock.GameList? gameListedMarkers;
     /// <summary>X-322 (0.1320): the last comparison of the game's own map list with the unlock bits (self-check); null before one.</summary>
     public (bool Agree,string Text)? MarkerUnlockCheck=>markerUnlockCheckBox is { } box ? (box.Item1,box.Item2):null;
     private volatile Tuple<bool,string>? markerUnlockCheckBox;
@@ -247,7 +248,7 @@ internal sealed class MapLiveReader : IDisposable
             try{ReadPlace();Read("place");}catch(Exception error){areaName=subAreaName="";Failed("place",error);}
             var inCombat=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             var inDuty=condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty56];
-            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints,unlockedMarkerBits){ActiveLeve=ReadActiveLeve()});
+            Volatile.Write(ref state,new MapLiveState(client.TerritoryType,client.MapId,player.Position,player.Rotation,now,flagMap,flag,flights,events,inCombat,inDuty,nearby,fates,partyMarkers,unlockedCurrents,sightseen,logUnlock,logUnlockEx,areaName,subAreaName,monsters,discoveryMap,undiscovered,questPoints,unlockedMarkerBits,gameListedMarkers){ActiveLeve=ReadActiveLeve()});
             positionFailureLogged=false;
         }
         // X-76 H9 (0.922): logged once until a read succeeds again (it was logged every 5 s).
@@ -296,10 +297,14 @@ internal sealed class MapLiveReader : IDisposable
         var game=new List<(uint Icon,int X,int Y,int Flags)>(count);
         for(var index=0;index<count;index++){var marker=agent->MapMarkers[index].MapMarker;game.Add((marker.IconId,marker.X,marker.Y,marker.IconFlags));}
         var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
-        var agree=checks.All(check=>check.Listed==check.Unlocked);
-        var line=$"Map icon unlocks on map {agent->CurrentMapId} ({checks.Count} with an unlock bit, {game.Count} in the game's list): "
-            +(agree ? "the game lists exactly the unlocked ones":"DISAGREE")+"; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe));
-        markerUnlockCheckBox=Tuple.Create(agree,line);
+        // 0.1321: the game's list decides on this map; the same set is kept while it does not change.
+        var listed=checks.Where(check=>check.Listed).Select(check=>(check.Icon,check.PixelX,check.PixelY)).ToHashSet();
+        if(gameListedMarkers is not { } before || before.MapId!=agent->CurrentMapId || !before.Listed.SetEquals(listed))gameListedMarkers=new(agent->CurrentMapId,listed);
+        var agree=checks.Count(check=>check.Listed==check.Unlocked);
+        var line=$"Map icon unlocks on map {agent->CurrentMapId} ({checks.Count} with an unlock bit, {game.Count} in the game's list, {listed.Count} drawn by the game): "
+            +$"the bit's reading agrees on {agree} of {checks.Count}; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe));
+        // The map follows the game's list here; a disagreement only matters on maps the game has not built (where the bit's reading decides).
+        markerUnlockCheckBox=Tuple.Create(true,line);
         if(line==markerUnlockLine)return;
         markerUnlockLine=line;
         log.Information(line);

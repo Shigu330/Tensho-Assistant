@@ -45,7 +45,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1306-allied-kinds.md](0.1306-allied-kinds.md) | `tools/README.md` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1308-own-map-instances.md](0.1308-own-map-instances.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs`, `tests/TenshoAssistant.Tests/DeepDungeonOpen1308Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/project/ARCHITECTURE.md` |
 | [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs` | `CHANGELOG.md` |
-| [0.1320-map-marker-unlock.md](0.1320-map-marker-unlock.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerUnlock1320Tests.cs` | `CHANGELOG.md` |
+| [0.1320-map-marker-unlock.md](0.1320-map-marker-unlock.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerGameList1321Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerUnlock1320Tests.cs` | `CHANGELOG.md` |
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
 | [0.135.0-marker-evidence.log](0.135.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/MAP-PROPOSALS.md` |

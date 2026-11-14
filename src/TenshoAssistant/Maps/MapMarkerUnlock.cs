@@ -14,6 +14,18 @@ public static class MapMarkerUnlock
     public static bool Visible(ushort bit,IReadOnlySet<ushort>? unlocked)=>bit==0 || unlocked?.Contains(bit)==true;
 
     /// <summary>
+    /// 0.1321 (X-322, dalamud.log of 11/14 11:39:48, Mor Dhona): the bit read by IsUnlockLinkUnlocked agreed with the game on 8 icons of 9;
+    /// the icon of bit 83 (60467 at 1375, 653) is drawn by the game while that reading says locked. So on the map the game has built, its
+    /// own list decides (an icon with a bit is drawn when the game lists it: same icon at the same pixel, GameList.Listed); on another
+    /// map, the bit's reading (an error there only hides).
+    /// </summary>
+    public static bool Visible(ushort bit,uint icon,float pixelX,float pixelY,uint mapId,GameList? game,IReadOnlySet<ushort>? unlocked)
+        =>bit==0 || (game is { } built && built.MapId==mapId ? built.Listed.Contains((icon,pixelX,pixelY)):Visible(bit,unlocked));
+
+    /// <summary>0.1321: the icons with an unlock bit that the game lists on the map it has built (AgentMap.CurrentMapId), by icon and sheet pixel.</summary>
+    public sealed record GameList(uint MapId,IReadOnlySet<(uint Icon,float PixelX,float PixelY)> Listed);
+
+    /// <summary>
     /// Where the game's own map list (AgentMap.MapMarkers) puts a sheet marker: world position × 16 (Mor Dhona's aetheryte, sheet 108.3 at
     /// pixel 1064, 356, is listed at 640, −10688), the world position from the texture pixel as MapProjection.PixelFromWorld reverses it.
     /// </summary>

@@ -235,7 +235,7 @@ internal sealed partial class MainWindow
     {
         if(npcVendors?.State.Catalog is null){StateLine(UI.UiState.Waiting,localization.Get("MapLocal.VendorsLoading"));return;}
         var rows=MapVendors(map);
-        var vendorMarkers=VendorCandidates(VisibleFixed(mapMarkers?.For(map.MarkerRange) ?? []));
+        var vendorMarkers=VendorCandidates(VisibleFixed(map.MapId,mapMarkers?.For(map.MarkerRange) ?? []));
         if(rows.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
         ImGui.TextDisabled(localization.Format("MapLocal.VendorCount",rows.Count));
         foreach(var (vendor,spot) in rows.OrderBy(row=>row.Vendor.Name,StringComparer.CurrentCultureIgnoreCase))

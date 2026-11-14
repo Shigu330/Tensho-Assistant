@@ -43,9 +43,9 @@ internal static class MapMarkerUnlock1320Tests
             var source=Read("src/TenshoAssistant/Maps/MapMarkerSource.Dalamud.cs");
             Check(source.Contains("string Title=\"\",ushort UnlockBit=0)") && source.Contains("AetheryteName(row.DataKey.RowId):\"\",row.MapMarkerUnlockedBit));"),"UnlockBit from MapMarkerUnlockedBit");
             var view=Read("src/TenshoAssistant/MainWindow.MapView.cs");
-            Check(view.Contains("? VisibleFixed(mapMarkers?.For(map.MarkerRange) ?? []):[];") && view.Contains("MapMarkerUnlock.Visible(marker.UnlockBit,unlocked)"),"the map draws the visible icons");
-            Check(view.Contains("if(fixedShown is { } known && ReferenceEquals(known.From,all) && ReferenceEquals(known.Unlocked,unlocked))return known.Shown;"),"kept, not filtered in every frame");
-            Check(Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("VendorCandidates(VisibleFixed(mapMarkers?.For(map.MarkerRange) ?? []))"),"the vendor list too");
+            Check(view.Contains("? VisibleFixed(map.MapId,mapMarkers?.For(map.MarkerRange) ?? []):[];") && view.Contains("MapMarkerUnlock.Visible(marker.UnlockBit,marker.Icon,marker.X,marker.Y,mapId,game,unlocked)"),"the map draws the visible icons");
+            Check(view.Contains("ReferenceEquals(known.From,all) && ReferenceEquals(known.Unlocked,unlocked) && ReferenceEquals(known.Game,game))return known.Shown;"),"kept, not filtered in every frame");
+            Check(Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("VendorCandidates(VisibleFixed(map.MapId,mapMarkers?.For(map.MarkerRange) ?? []))"),"the vendor list too");
             var reader=Read("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs");
             Check(reader.Contains("if(ui==null || (nint)UIState.MemberFunctionPointers.IsUnlockLinkUnlocked==0)return null;") && reader.Contains("before.SetEquals(set) ? before:set"),"read guarded, same set kept");
             Check(reader.Contains("try{unlockedMarkerBits=ReadMarkerUnlocks();CheckMarkerUnlocks();Read(\"map icon unlocks\");}catch(Exception error){unlockedMarkerBits=null;Failed(\"map icon unlocks\",error);}"),"in the two-second reads, a failure hides");
