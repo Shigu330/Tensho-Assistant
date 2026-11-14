@@ -41,6 +41,10 @@ internal sealed partial class MainWindow
     }
     /// <summary>X-279 (0.1292): a time left in the common format (« 17 d 2 h », « 3 h 05 », « 45 min »), the one way to write it.</summary>
     private string TimeLeftText(TimeSpan left)=>GardenLeftText(TenshoAssistant.UI.TimeLeft.Split(left));
+    /// <summary>X-312 (0.1316): the same, rounded up to the minute (a countdown never says « 0 min » while time is left).</summary>
+    private string TimeLeftUp(TimeSpan left)=>TimeLeftText(TenshoAssistant.UI.TimeLeft.UpToMinute(left));
+    /// <summary>X-312 (0.1316): a number of minutes (a lead, a snooze, a game alarm's reminder) in the common format.</summary>
+    private string MinutesText(int minutes)=>TimeLeftText(TimeSpan.FromMinutes(Math.Max(0,minutes)));
 
     /// <summary>One cell of a patch in icons: the bed's number, then the seed (or the empty bed).</summary>
     private void DrawGardenGridIcons(int number,GardenBed? bed,IReadOnlyList<(int Number,GardenBed Bed)> planted,IReadOnlyList<GardenForecast>? forecasts,DateTimeOffset now,ref bool changed,ref GardenBed? removed)

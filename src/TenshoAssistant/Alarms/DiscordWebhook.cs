@@ -21,7 +21,7 @@ public sealed class DiscordSettings
     // 0.598 (T24): another channel for a category; without one, the address above. Secrets like it: stored here only, never logged nor reported.
     public Dictionary<AlarmSource,string>? CategoryUrls { get; set; }
     public string Username { get; set; } = "Tensho";
-    // Empty = the localized default message. Placeholders: [label], [minutes], [time], [character].
+    // Empty = the localized default message. Placeholders: [label], [minutes], [left] (X-312: the time left in hours and days), [time], [character].
     public string Template { get; set; } = "";
     public bool Gathering { get; set; } = true;
     public bool Fishing { get; set; } = true;
@@ -144,7 +144,7 @@ public static class DiscordWebhook
     /// The message text: the alarm's own message, else the template, else the default; placeholders replaced, [character] only when
     /// allowed (else removed), the role mention first when set, cut to Discord's 2000 characters.
     /// </summary>
-    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null)
+    public static string Format(DiscordSettings settings, string defaultTemplate, string? alarmMessage, string label, int minutes, DateTimeOffset localTime, string? character, string? zone = null, string? item = null, string? left = null)
     {
         ArgumentNullException.ThrowIfNull(settings);
         var template = !string.IsNullOrWhiteSpace(alarmMessage) ? alarmMessage! : !string.IsNullOrWhiteSpace(settings.Template) ? settings.Template : defaultTemplate;
@@ -152,6 +152,8 @@ public static class DiscordWebhook
         var text = template.Replace("[label]", label, StringComparison.Ordinal).Replace("[minutes]", Math.Max(0, minutes).ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
             .Replace("[time]", localTime.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal)
             .Replace("[character]", who, StringComparison.Ordinal)
+            // X-312 (0.1316): the time left in the common format (« 1 h 30 »); without it, the minutes and « min » as [minutes] gave them.
+            .Replace("[left]", left ?? Math.Max(0, minutes).ToString(System.Globalization.CultureInfo.InvariantCulture) + " min", StringComparison.Ordinal)
             // 0.564 (T18): Discord writes these two in each reader's own time zone; the Eorzea time and the names of the zone and the item.
             .Replace("[discordtime]", $"<t:{localTime.ToUnixTimeSeconds()}:t>", StringComparison.Ordinal)
             .Replace("[relative]", $"<t:{localTime.ToUnixTimeSeconds()}:R>", StringComparison.Ordinal)

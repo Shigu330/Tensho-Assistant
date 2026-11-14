@@ -60,8 +60,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn();ImGui.TextDisabled($"{source.Zone} · {localization.Format("GatheringPanel.Level",source.Level)}");
                     ImGui.TableNextColumn();
                     var left=(opening.Current ? opening.EndsAt:opening.StartsAt)-now;
-                    if(opening.Current)ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("GatheringBrowser.NowOpen",(int)left.TotalMinutes,left.Seconds.ToString("00")));
-                    else ImGui.TextUnformatted(localization.Format("GatheringBrowser.NowSoon",(int)left.TotalMinutes,left.Seconds.ToString("00")));
+                    if(opening.Current)ImGui.TextColored(UI.FfxivTheme.Success,localization.Format("GatheringBrowser.NowOpen",UI.Motion.Countdown(left)));
+                    else ImGui.TextUnformatted(localization.Format("GatheringBrowser.NowSoon",UI.Motion.Countdown(left)));
                     ImGui.TableNextColumn();DrawGatheringAlarmButton($"GatheringNowAlarm{source.ItemId}/{source.PointId}",source);
                 }
                 finally{ImGui.PopID();}

@@ -119,7 +119,7 @@ internal sealed partial class MainWindow
         {
             if(ImGui.SmallButton(localization.Get("Discord.Test")+"###DiscordTest") && discordNotifier is { } notifier)
                 notifier.Enqueue(new(settings.WebhookUrl,DiscordWebhook.Payload(settings,DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),
-                    localization.Get("Discord.TestMessage"),localization.Get("Discord.TestLabel"),5,DateTimeOffset.Now.AddMinutes(5),null))));
+                    localization.Get("Discord.TestMessage"),localization.Get("Discord.TestLabel"),5,DateTimeOffset.Now.AddMinutes(5),null,left:MinutesText(5)))));
         }
         finally{if(!ready)ImGui.EndDisabled();}
         Tip("Discord.TestTip");

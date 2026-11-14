@@ -274,7 +274,7 @@ internal sealed partial class MainWindow
         // memory; a bed the plugin already said is not said again), in the same words as the game's chat line.
         var garden=configuration.GardenAlerts ? (desktopGarden??=new()).Due(configuration.GardenBeds,now):[];
         if(due.Count+garden.Count==0 || options.DesktopOnlyGameBehind && gameInFront)return ([],false);
-        return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((item.Occurrence-now).TotalMinutes)))),
+        return ([.. due.Select(item=>localization.Format("Desktop.AlarmLine",item.Alarm.Label,item.Occurrence.ToLocalTime().ToString("t"),TimeLeftUp(item.Occurrence-now))),
             .. garden.Select(item=>localization.Format(item.State==Reminders.GardenState.Ripe ? "Garden.RipeNotice":"Garden.TendNotice",item.Bed.Seed,item.Bed.Place))],options.DesktopSound);
     }
 }

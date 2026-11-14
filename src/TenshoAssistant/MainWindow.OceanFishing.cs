@@ -53,8 +53,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     ImGui.TextUnformatted(departure.At.ToLocalTime().ToString("ddd HH:mm"));
                     ImGui.TableNextColumn();
-                    if(departure.At<=now)ImGui.TextColored(Success,localization.Format("OceanFishing.Boarding",(int)Math.Ceiling((departure.At+OceanSchedule.Boarding-now).TotalMinutes)));
-                    else{var left=departure.At-now;ImGui.TextUnformatted(localization.Format("OceanFishing.Countdown",(int)left.TotalHours,left.Minutes));}
+                    if(departure.At<=now)ImGui.TextColored(Success,localization.Format("OceanFishing.Boarding",TimeLeftUp(departure.At+OceanSchedule.Boarding-now)));
+                    else{var left=departure.At-now;ImGui.TextUnformatted(TimeLeftText(left));}
                     var index=(long)Math.Round((departure.At-OceanSchedule.LoopStart)/OceanSchedule.Step);
                     ImGui.TableNextColumn();DrawOceanRoute(departure.Aldenard,baseSchedule,index,OceanPort.Aldenard,states.Aldenard);
                     ImGui.TableNextColumn();DrawOceanRoute(departure.Othard,baseSchedule,index,OceanPort.Othard,states.Othard);

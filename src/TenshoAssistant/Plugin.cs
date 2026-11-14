@@ -380,7 +380,11 @@ public sealed partial class Plugin : IDalamudPlugin
                     if(parts.Length<3)return;
                     // R-12 (0.414): the game's map link to the alarm's gathering point, and « Open » (Tensho on the item), when known.
                     var message=new Dalamud.Game.Text.SeStringHandling.SeStringBuilder()
-                        .AddText("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),parts[^2],parts[^1]));
+                        .AddText("[Tensho] "+localization.Format("Alarms.Ring",string.Join('|',parts[..^2]),
+                            // X-312 (0.1316): the minutes left in the common format (« 1 h 30 », « 17 j 2 h »), not « 90 min ».
+                            int.TryParse(parts[^2],System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var ringMinutes)
+                                ? UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,ringMinutes)),(key,first,second)=>localization.Format(key,first,second)):parts[^2],
+                            parts[^1]));
                     if(mainWindow.AlarmPlace(alarm) is { } place)
                         message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
                     // 0.774 (X-03, user report and Dalamud's console in verbose): the game never handed the « Open in Tensho » link to Dalamud; it took it for an
@@ -403,7 +407,8 @@ public sealed partial class Plugin : IDalamudPlugin
                     // Framework thread: the character's name is read here, only when the player allowed it.
                     var settings=configuration.Discord;
                     var character=settings.IncludeCharacter ? objects.LocalPlayer?.Name.TextValue:null;
-                    var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character,mainWindow.AlarmZoneName(alarm.TerritoryId),mainWindow.AlarmItemName(alarm.ItemId));
+                    var content=Alarms.DiscordWebhook.Format(settings,localization.Get("Discord.DefaultTemplate"),alarm.DiscordMessage,alarm.Label,minutes,occurrence.ToLocalTime(),character,mainWindow.AlarmZoneName(alarm.TerritoryId),mainWindow.AlarmItemName(alarm.ItemId),
+                        UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,minutes)),(key,first,second)=>localization.Format(key,first,second)));
                     discord.Enqueue(new(Alarms.DiscordWebhook.UrlFor(settings,Alarms.DiscordWebhook.SourceOf(alarm)),Alarms.DiscordWebhook.Payload(settings,content)));
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);

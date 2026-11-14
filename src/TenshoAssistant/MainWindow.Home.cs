@@ -52,7 +52,7 @@ internal sealed partial class MainWindow
         // 0.599 (T10): the three next alarms are in « Today »; this line only while that one is hidden.
         if(configuration.HomeTodayHidden?.Contains("Alarms")==true && NextAlarm() is { } next)
         {
-            ImGui.TextColored(Success,localization.Format("Home.NextAlarm",next.Alarm.Label,next.At.ToLocalTime().ToString("t"),Math.Max(0,(int)(next.At-DateTimeOffset.UtcNow).TotalMinutes)));
+            ImGui.TextColored(Success,localization.Format("Home.NextAlarm",next.Alarm.Label,next.At.ToLocalTime().ToString("t"),TimeLeftText(next.At-DateTimeOffset.UtcNow)));
             if(ImGui.IsItemClicked())page=Page.Alarms;
         }
         var failed=new List<string>();

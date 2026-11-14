@@ -194,7 +194,7 @@ internal sealed partial class MainWindow
             else AlarmButtonSpace();
             ImGui.SameLine();
             ImGui.TextUnformatted(localization.Format("Weather.Occurrence",entry.StartsAt.ToLocalTime().ToString("g"),entry.EndsAt.ToLocalTime().ToString("t"),entry.EtHours,
-                Math.Max(0,(int)(entry.StartsAt-now).TotalMinutes)));
+                TimeLeftText(entry.StartsAt-now)));
         }
     }
 }

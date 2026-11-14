@@ -118,7 +118,7 @@ internal sealed partial class MainWindow
         bool clicked;
         try{clicked=ImGui.SmallButton(FontAwesomeIcon.Bell.ToIconString()+"##Alarm"+id);}
         finally{ImGui.PopFont();}
-        if(ImGui.IsItemHovered())WrappedTooltip(tooltip+"\n"+localization.Format("Alarms.LeadHint",AlarmSchedule.ClampLead(daily ? AlarmRepeat.EorzeaDaily:AlarmRepeat.Once,DefaultAlarmLead)));
+        if(ImGui.IsItemHovered())WrappedTooltip(tooltip+"\n"+localization.Format("Alarms.LeadHint",MinutesText(AlarmSchedule.ClampLead(daily ? AlarmRepeat.EorzeaDaily:AlarmRepeat.Once,DefaultAlarmLead))));
         if(clicked)AddAlarms(create());
     }
     // 0.331: a copy in the game keeps ringing there as it was sent; turning the alarm off or changing its lead here does not reach it.
@@ -209,7 +209,7 @@ internal sealed partial class MainWindow
         var starts=alarm.Weathers.Count>0 && vista.MinTime==0 && vista.MaxTime==0 ? new[]{0,480,960}:new[]{alarm.EtMinute};
         if(ImGui.Selectable(localization.Format(weatherNote is null ? "Alarms.VistaAdd":"Alarms.VistaAddWindow",vista.Name)+"##VistaAlarm"))
             AddAlarms(AlarmSchedule.ForWindows(alarm.Label,starts,alarm.LeadMinutes,territory,0,alarm.Weathers).Select(created=>{created.Group=alarm.Group;return created;}).ToArray());
-        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.LeadHint",alarm.LeadMinutes)+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
+        if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.LeadHint",MinutesText(alarm.LeadMinutes))+(weatherNote is null ? "":"\n"+localization.Get(weatherNote)));
     }
 
     private string AlarmWhen(TenshoAlarm alarm)=>alarm.Repeat switch
@@ -286,7 +286,7 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("Alarms.AddDaily")))
                 AddAlarms(AlarmSchedule.ForWindows(alarmManualLabel.Trim().Length>0 ? alarmManualLabel.Trim():localization.Get("Alarms.ManualDefault"),[alarmManualHour*60+alarmManualMinute],DefaultAlarmLead,0,0));
-            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead)));
+            if(ImGui.IsItemHovered())WrappedTooltip(localization.Format("Alarms.AddDailyTip",MinutesText(AlarmSchedule.ClampLead(AlarmRepeat.EorzeaDaily,DefaultAlarmLead))));
             // 0.386 (g, X-10): the same label at a real local date, once.
             DrawManualDateAlarm();
         }
@@ -453,7 +453,7 @@ internal sealed partial class MainWindow
                                         if(alarm.AutoKey.Length==0 && ImGui.SmallButton(localization.Get("Alarms.Edit")+"##AlarmEdit"))alarmEditing=alarmEditing==alarm.Id ? null:alarm.Id;
                                         if(alarm.AutoKey.Length==0){Tip("Alarms.EditTip");ImGui.SameLine();}
                                         var snooze=configuration.AlarmOptions?.SnoozeMinutes ?? 5;
-                                        if(ImGui.SmallButton(localization.Format("Alarms.Snooze",snooze)+"##AlarmSnooze"))added.Add(AlarmSchedule.Snooze(alarm,now,snooze));
+                                        if(ImGui.SmallButton(localization.Format("Alarms.Snooze",MinutesText(snooze))+"##AlarmSnooze"))added.Add(AlarmSchedule.Snooze(alarm,now,snooze));
                                         Tip("Alarms.SnoozeTip");
                                         ImGui.SameLine();
                                         if(DeleteButton("Alarms.Delete"))remove.Add(alarm);
@@ -512,7 +512,7 @@ internal sealed partial class MainWindow
             if(game.Count==0)ImGui.TextDisabled(localization.Get("Alarms.GameNone"));
             foreach(var alarm in game)
                 ImGui.TextUnformatted($"{alarm.Name} · {alarm.Hour:00}:{alarm.Minute:00} {localization.Get("Alarms.Clock"+Math.Clamp(alarm.ClockTime,0,2))}"
-                    +(alarm.Repeat ? " · "+localization.Get("Alarms.Repeat"):"")+(alarm.Reminder>0 ? " · "+localization.Format("Alarms.Reminder",alarm.Reminder):""));
+                    +(alarm.Repeat ? " · "+localization.Get("Alarms.Repeat"):"")+(alarm.Reminder>0 ? " · "+localization.Format("Alarms.Reminder",MinutesText(alarm.Reminder)):""));
             // Native fields needed before Tensho may write a game alarm (0.202): copy them for the developer.
             if(game.Count>0 && ImGui.SmallButton(localization.Get("Alarms.CopyRaw")))
                 ImGui.SetClipboardText(string.Join(Environment.NewLine,game.Select(alarm=>$"name={alarm.Name} index={alarm.Index} clock={alarm.ClockTime} {alarm.Hour:00}:{alarm.Minute:00} reminder={alarm.Reminder} sound={alarm.Sound} timestamp={alarm.Timestamp} flags={alarm.Flags} captured={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}")));

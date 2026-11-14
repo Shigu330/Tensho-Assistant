@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
                 if(forecast is not null)foreach(var open in EurekaNotoriousBoard.Windows(monster,forecast))if(open.End>now){next=open;break;}
                 if(next is not { } window)ImGui.TextDisabled(localization.Get("FieldContent.NotoriousNoWindow"));
                 else if(window.Start<=now)ImGui.TextColored(Success,localization.Format("FieldContent.NotoriousNow",window.End.ToLocalTime().ToString("t")));
-                else ImGui.TextUnformatted(localization.Format("FieldContent.NotoriousNext",window.Start.ToLocalTime().ToString("t"),Math.Max(0,(int)Math.Ceiling((window.Start-now).TotalMinutes))));
+                else ImGui.TextUnformatted(localization.Format("FieldContent.NotoriousNext",window.Start.ToLocalTime().ToString("t"),TimeLeftUp(window.Start-now)));
                 ImGui.TableNextColumn();
                 if(ImGui.SmallButton(localization.Get("FieldContent.NotoriousAlarm")+"##NmAlarm"+monster.Fate))
                     AddAlarms(AlarmSchedule.ForWindows(name,EurekaNotoriousBoard.AlarmMinutes(monster),DefaultAlarmLead,monster.Territory,0,monster.Weather is { } needed ? [needed]:null));

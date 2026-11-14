@@ -32,12 +32,12 @@ internal sealed partial class MainWindow
             try
             {
                 var length=window.EndsAt-window.StartsAt;
-                var text=localization.Format("FishWindows.Line",window.StartsAt.ToLocalTime().ToString("ddd HH:mm"),window.EndsAt.ToLocalTime().ToString("HH:mm"),(int)Math.Round(length.TotalMinutes));
+                var text=localization.Format("FishWindows.Line",window.StartsAt.ToLocalTime().ToString("ddd HH:mm"),window.EndsAt.ToLocalTime().ToString("HH:mm"),TimeLeftText(TenshoAssistant.UI.TimeLeft.NearestMinute(length)));
                 if(window.StartsAt<=now)ImGui.TextColored(Success,text+" · "+localization.Get("FishWindows.Open"));
                 else
                 {
                     var left=window.StartsAt-now;
-                    ImGui.TextUnformatted(text+" · "+localization.Format("FishWindows.In",(int)left.TotalHours,left.Minutes));
+                    ImGui.TextUnformatted(text+" · "+localization.Format("FishWindows.In",TimeLeftText(left)));
                     ImGui.SameLine();
                     AlarmButton("FishWindow",localization.Format("Alarms.PeriodTooltip",name,window.StartsAt.ToLocalTime().ToString("g")),
                         ()=>[new TenshoAlarm{Label=name,Repeat=AlarmRepeat.Once,At=window.StartsAt,LeadMinutes=AlarmSchedule.ClampLead(AlarmRepeat.Once,DefaultAlarmLead),

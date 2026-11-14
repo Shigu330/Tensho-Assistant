@@ -113,7 +113,7 @@ internal sealed partial class MainWindow
     private (string Text,Vector4 Colour) VistaStateLine(VistaWindowState state,VistaWindowState? next)
     {
         string Opens()=>next is null ? localization.Get("MapView.VistaSearching"):next.Opens is { } opens
-            ? localization.Format("MapView.VistaOpens",opens.ToLocalTime().ToString("g"),Math.Max(0,(int)Math.Ceiling((opens-DateTimeOffset.UtcNow).TotalMinutes)))
+            ? localization.Format("MapView.VistaOpens",opens.ToLocalTime().ToString("g"),TimeLeftUp(opens-DateTimeOffset.UtcNow))
             :localization.Format("MapView.VistaNoWindow",next.SearchedDays);
         return state.State switch
         {
