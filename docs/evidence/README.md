@@ -48,7 +48,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
 | [0.1342-map-marker-bits.md](0.1342-map-marker-bits.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerBits1342Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.135.0-marker-evidence.log](0.135.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
-| [0.1351-chat-map-link-menu.md](0.1351-chat-map-link-menu.md) | `src/TenshoAssistant/Maps/ChatLinkHoverWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkMenu1351Tests.cs` | `CHANGELOG.md` |
+| [0.1351-chat-map-link-menu.md](0.1351-chat-map-link-menu.md) | `src/TenshoAssistant/Maps/ChatLinkHoverWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkMenu1351Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

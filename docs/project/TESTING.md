@@ -1831,6 +1831,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1354) Plugin en français : Découvertes, ligne « ALÉA vus » ; Dresseur, colonne des lieux « (1 lieu(x) vu(s)) » ; recherche d'un objet avec une apostrophe tapée au clavier (« d'Ehcatl » par exemple) : il est trouvé.
 
+- [ ] (0.1355) Plugin en français : en-tête et page Météo, l'heure du jeu s'écrit « HE » ; Paramètres › Panneaux, réglage « Fenêtre « Modifier le jeu » » de Triple Triade ; Marché, colonne « Servant » et portée « Centre de traitement de données ».
+
+- [ ] (0.1356) Plugin en français : Carte, réglage « Lieux notoires » et alarme par clic droit sur un lieu notoire ; Objets, onglet « Synthèse liée » ; Compagnie libre, onglet « Appareils » ; Rappels, « Aventures imaginaires de Khloe ».
+
+- [ ] (0.1357) Plugin en français : Accueil, liste des outils, une fiche d'outil (Carte, Marché) commence sans « Disponible : » ; Paramètres, info-bulle du cache des quêtes cite « Actualiser les quêtes ».
+
+- [ ] (0.1358) Plugin en français : survol d'un objet (« Possédés : … », « déjà dans la collection ») ; Équipement, ligne des points perdus au plafond (« {0} points de … »).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
