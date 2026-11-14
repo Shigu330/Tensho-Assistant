@@ -46,7 +46,7 @@ internal static class MapMarkerUnlock1320Tests
             Check(view.Contains("ReferenceEquals(known.From,all) && ReferenceEquals(known.Unlocked,unlocked) && ReferenceEquals(known.Game,game))return known.Shown;"),"kept, not filtered in every frame");
             Check(Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("VendorCandidates(VisibleFixed(map.MapId,mapMarkers?.For(map.MarkerRange) ?? []))"),"the vendor list too");
             var reader=Read("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs");
-            Check(reader.Contains("if(quests==null)return null;") && reader.Contains("if(bit<bits && quests->UnlockedMapMarkersBitArray[bit])set.Add(bit);") && reader.Contains("before.SetEquals(set) ? before:set"),"read guarded (0.1340: QuestManager.UnlockedMapMarkers), same set kept");
+            Check(reader.Contains("if(quests==null)return null;") && reader.Contains("if(MapMarkerUnlock.IsSet(array,bit))set.Add(bit);") && reader.Contains("before.SetEquals(set) ? before:set"),"read guarded (0.1340: QuestManager.UnlockedMapMarkers; 0.1342: most significant bit first), same set kept");
             Check(reader.Contains("try{unlockedMarkerBits=ReadMarkerUnlocks();CheckMarkerUnlocks();Read(\"map icon unlocks\");}catch(Exception error){unlockedMarkerBits=null;Failed(\"map icon unlocks\",error);}"),"in the two-second reads, a failure hides");
             Check(Read("src/TenshoAssistant/MainWindow.SelfCheckPages.cs").Contains("Page(\"map icon unlocks\""),"self-check");
         }),

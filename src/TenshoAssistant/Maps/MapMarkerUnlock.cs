@@ -101,6 +101,14 @@ public static class MapMarkerUnlock
     /// <summary>0.1338 (X-351): the game's list is taken as this map's when it holds at least half of its icons without a bit (and one at least).</summary>
     public static bool Holds((int Found,int Total) coverage)=>coverage.Total>0 && coverage.Found*2>=coverage.Total;
 
+    /// <summary>
+    /// 0.1342 (X-351, dalamud.log of 11/14 16:15:27, docs/evidence/0.1342-map-marker-bits.md): a bit of QuestManager.UnlockedMapMarkers, the
+    /// most significant bit of each byte first (bit 0 = 0x80 of byte 0). Read through FFXIVClientStructs' BitArray (least significant first),
+    /// map 14 showed bits 69 and 98 unlocked while the game draws neither; read this way, the ten icons checked against the game's own list
+    /// (Mor Dhona and map 14) all agree. A bit past the array is unknown: not set (hidden, R06).
+    /// </summary>
+    public static bool IsSet(ReadOnlySpan<byte> array,ushort bit)=>bit/8<array.Length && (array[bit/8] & (0x80>>(bit%8)))!=0;
+
     /// <summary>One fixed icon with an unlock bit, compared with the game's own list: listed there (same icon within two world units), its flags (−1: not listed), and its bit read unlocked.</summary>
     public sealed record Check(ushort Bit,uint Icon,float PixelX,float PixelY,bool Listed,int Flags,bool Unlocked);
 

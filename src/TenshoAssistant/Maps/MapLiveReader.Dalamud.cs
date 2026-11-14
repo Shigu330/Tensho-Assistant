@@ -281,9 +281,10 @@ internal sealed class MapLiveReader : IDisposable
         // function called); a bit past its end is unknown (hidden). The former reading stays in the log for the comparison (R06).
         var quests=FFXIVClientStructs.FFXIV.Client.Game.QuestManager.Instance();
         if(quests==null)return null;
-        var bits=quests->UnlockedMapMarkers.Length*8;
+        // 0.1342: read most significant bit first (MapMarkerUnlock.IsSet), not through the BitArray (least significant first).
+        var array=quests->UnlockedMapMarkers;
         var set=new HashSet<ushort>();
-        foreach(var bit in markerBitList.Result)if(bit<bits && quests->UnlockedMapMarkersBitArray[bit])set.Add(bit);
+        foreach(var bit in markerBitList.Result)if(MapMarkerUnlock.IsSet(array,bit))set.Add(bit);
         var ui=UIState.Instance();
         if(ui!=null && (nint)UIState.MemberFunctionPointers.IsUnlockLinkUnlocked!=0)
         {
