@@ -17,7 +17,7 @@ internal static class AgentFilesDec1082Tests
             Check(fr.Contains("DEC-ID: DEC-051\n"),"DEC-051 in the French half");
             Check(en.Contains("amended by DEC-050 and DEC-051"),"DEC-010 consequences amended (English)");
             Check(fr.Contains("modifié par DEC-050 et DEC-051"),"DEC-010 consequences amended (French)");
-            Check(!System.Text.RegularExpressions.Regex.IsMatch(text,@"docs/ai/|scripts/agent/|CLAUDE\.md"),"no path to the agent's files (R22)");
+            Check(!AgentPaths1329Tests.Cites(text),"no path to the agent's files (R22)");
         }),
     ];
 }

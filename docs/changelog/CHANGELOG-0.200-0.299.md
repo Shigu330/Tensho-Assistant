@@ -948,7 +948,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 ## 0.221.0
 - Retour : « le git ne se fait pas en anglais ». Les messages de commit et les notes de release GitHub viennent désormais de la sous-section
   `### English` de l'entrée du CHANGELOG (le texte français au-dessus reste pour le suivi) ; `Release.ps1` s'arrête (en jaune) si elle
-  manque ou est vide. Sections anglaises ajoutées aux entrées 0.219.0 et 0.220.0. Règle ajoutée à CLAUDE.md et CONTRIBUTING.md.
+  manque ou est vide. Sections anglaises ajoutées aux entrées 0.219.0 et 0.220.0. Règle ajoutée à consignes de l'agent et CONTRIBUTING.md.
 - Verify.ps1 (agent) : 554/554, 0 avertissement, 0 erreur ; DLL 0.221.0.0. Aucun changement du plugin. Testé : -Commit -DryRun (section anglaise trouvée).
 ### English
 - Git commit messages and GitHub release notes now come from the `### English` section of each CHANGELOG entry; the release script
@@ -985,7 +985,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   du CHANGELOG, push) ; `Verify.ps1 -Release` (repo.json, main local remis sur origin/main, fusion Devloppement → main, push main, tag `Stable-x.y.z`,
   `gh release create` avec latest.zip et les notes, mise à jour de Devloppement) ; `-DryRun` affiche les commandes. Garde-fous : branche,
   entrée du CHANGELOG, arbre propre, tag existant, gh absent. Verify affiche aussi « VERSION x.y.z (DLL …) » et ne relance pas les contrôles si la même version et les mêmes sources (hors .md, docs/, repo.json) sont déjà passées au vert (`artifacts/verify-stamp.json`, `-Force` pour relancer) ; recherche de gh dans son dossier d'installation ; compatible Windows PowerShell 5.1. Documentation : CONTRIBUTING
-  « Versions and releases », README (URL du dépôt personnalisé), CLAUDE.md étape 5. Testé : syntaxe des deux scripts, garde-fou de branche
+  « Versions and releases », README (URL du dépôt personnalisé), consignes de l'agent étape 5. Testé : syntaxe des deux scripts, garde-fou de branche
   (-DryRun). Lancé par l'utilisateur le 2026-11-01 : -Commit puis -Release réussis (release GitHub Stable-0.219.0 avec latest.zip, main, repo.json en ligne) ; un second -Release de la même version est refusé (tag existant).
 - Revue de mode : un bouton Tensho (t-shirt) sur chaque ligne d'emplacement de la fenêtre du jeu (nœud 8 + n, position lue avec les
   catégories) ; clic = ouvre cet emplacement dans le panneau (pièces et teintures), nouveau clic = ferme. Petites fenêtres séparées pour

@@ -1,6 +1,6 @@
 using TenshoAssistant;
 
-// X-76 E3 (0.937): every docs/evidence path the code cites exists (CLAUDE.md rule 7), through renames and moves. E4: OnceSet keeps noting new events.
+// X-76 E3 (0.937): every docs/evidence path the code cites exists (the agent's instructions rule 7), through renames and moves. E4: OnceSet keeps noting new events.
 internal static class Evidence937Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }

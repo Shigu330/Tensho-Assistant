@@ -2,7 +2,7 @@ namespace TenshoAssistant;
 
 /// <summary>
 /// X-100 (0.999, DEC-048): every setting of the Settings page (its label key) and its tab, for the search. Generated from the code by scanning each
-/// tab's methods (scripts/agent/settings_index.py); a test makes the same scan and fails when this list is out of step.
+/// tab's methods (the agent's settings_index.py); a test makes the same scan and fails when this list is out of step.
 /// </summary>
 public static class SettingsIndex
 {

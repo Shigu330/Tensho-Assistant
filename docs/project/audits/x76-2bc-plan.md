@@ -237,7 +237,7 @@ Ranked X-76 plan: 10 harmonisation versions (2b), 10 parser items (2c) and 4 ext
 
 - **E1. Decide the discovery file schema before 1.0.** Add optional fields (HQ flag, counts per value, counts per visit) and raise `CurrentVersion` (`DiscoveriesModel.cs:76-83`), updating `tools/discoveries-merge.py`. This is cheaper now, while there is one shared player file, than migrating every player's file after 1.0. P6, P7 and P8 depend on it.
 - **E2. One "UI rules" test that cannot go backwards.** It forbids hand-written key tooltips, fixed text colours in `MainWindow*.cs`, and `try{save();` outside `SettingRow.cs`. Without it, H1 to H5 drift back with every new page.
-- **E3. One test for every docs/evidence path cited by the code.** 159 paths are cited, and only 3 tests check theirs today. It keeps CLAUDE.md rule 7 enforced through the renames of step 7.
+- **E3. One test for every docs/evidence path cited by the code.** 159 paths are cited, and only 3 tests check theirs today. It keeps the agent's instructions rule 7 enforced through the renames of step 7.
 - **E4. One "once per event" helper for watchers.** `lootSeen` stops silently at 256 entries (`ItemDiscoveryWatcher.Dalamud.cs:445`, confirmed). The 4096 cap on `voyagesNoted` was not checked.
 ## Done
 

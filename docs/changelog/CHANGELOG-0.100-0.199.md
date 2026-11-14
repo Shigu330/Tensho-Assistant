@@ -68,7 +68,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Sécurité (`MacroSlotPlan`, testé) : seulement entre le premier et le dernier emplacement réglés ; par défaut seulement dans les emplacements
   vides ou déjà nommés par Tensho (« Tensho 1/3 »…) ; toutes les pages ou aucune ; écrasement des autres macros seulement si l'option est cochée.
 - Paramètres › Modules › Export : macros individuelles ou partagées, premier emplacement (0–99), dernier emplacement (limite), nom des macros,
-  autorisation d'écraser. Liens du dépôt mis à jour vers Shigu330/Tensho-Assistant (manifeste, CLAUDE.md, publication D17).
+  autorisation d'écraser. Liens du dépôt mis à jour vers Shigu330/Tensho-Assistant (manifeste, consignes de l'agent, publication D17).
 - Test : 1 groupe `MacroSlotPlanTests`. Verify.ps1 (agent) : 548/548, 0 avertissement, 0 erreur ; DLL 0.191.0.0. VALIDATED_IN_GAME : « ça fonctionne » (utilisateur, 2026-10-31).
 
 ## 0.190.0
@@ -426,8 +426,8 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 
 ## 0.154.0
 - Nettoyage (CLEANUP-017, demande utilisateur) : `checkpoints/` sorti de git (dossier local) ; 28 preuves déplacées dans `docs/evidence/` et références mises à jour ; ce CHANGELOG généré depuis les notes de vérification.
-- Documentation rangée : `docs/ai/` (règles, état, objectif, prompt maître), `docs/project/` (périmètre, feuille de route, backlog, décisions, architecture, tests, références), `docs/goals/` (79 objectifs), index `docs/README.md` ; 78 liens relatifs corrigés.
-- Nouveaux/réécrits : CLAUDE.md (entrée IA, procédure par version), CONTRIBUTING.md (build, règles, publication Dalamud D17, politique IA), README (structure, carte Tensho, sources communautaires, déclaration d'usage de l'IA), STATUS et GOAL.
+- Documentation rangée : notes de l'agent (règles, état, objectif, prompt maître), `docs/project/` (périmètre, feuille de route, backlog, décisions, architecture, tests, références), `docs/goals/` (79 objectifs), index `docs/README.md` ; 78 liens relatifs corrigés.
+- Nouveaux/réécrits : consignes de l'agent (entrée IA, procédure par version), CONTRIBUTING.md (build, règles, publication Dalamud D17, politique IA), README (structure, carte Tensho, sources communautaires, déclaration d'usage de l'IA), STATUS et GOAL.
 - Paramètres : nouvel onglet « Carte » reprenant tous les réglages de la carte (même contenu que la roue dentée de la carte). Verify.ps1 (agent) : 532/532, 0 avertissement, 0 erreur. Non validé en jeu.
 - Relecture de `docs/project/` contre le code (documents seuls, DLL inchangée) : ARCHITECTURE, TESTING, REFERENCES, ROADMAP et BACKLOG ont une partie « état au 0.154.0 » relue contre le code (domaines, carte, sources d'objets, cache disque, services externes, protocole de test, backlog ouvert) et leur historique est marqué comme archive ; décisions DEC-010 (dépôt et documents) et DEC-011 (ordre des sources, outil ALEA) ; hors périmètre précisé dans PROJECT.
 

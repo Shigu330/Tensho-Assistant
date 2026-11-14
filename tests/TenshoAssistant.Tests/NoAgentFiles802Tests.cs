@@ -7,8 +7,8 @@ internal static class NoAgentFiles802Tests
         ("Agent files: ignored by git, not linked from the README or the documents' index",() =>
         {
             var ignore=File.ReadAllText(Path.GetFullPath(".gitignore"));
-            foreach(var entry in new[]{"CLAUDE.md",".claude/","docs/ai/","scripts/agent/"})Check(ignore.Contains(entry),"ignored: "+entry);
-            Check(!File.ReadAllText(Path.GetFullPath("README.md")).Contains("docs/ai/") && !File.ReadAllText(Path.GetFullPath("docs/README.md")).Contains("](ai/"),"not linked");
+            foreach(var entry in AgentPaths1329Tests.Ignored)Check(ignore.Contains(entry),"ignored: "+entry);
+            Check(!AgentPaths1329Tests.Cites(File.ReadAllText(Path.GetFullPath("README.md"))) && !File.ReadAllText(Path.GetFullPath("docs/README.md")).Contains("](ai/"),"not linked");
         }),
     ];
 }

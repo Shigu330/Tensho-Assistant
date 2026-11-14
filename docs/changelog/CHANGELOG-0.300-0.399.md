@@ -1490,7 +1490,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - tools/README.md : les 15 sondes en lecture seule et le script du butin des sous-marins ;
   - .editorconfig, aligné sur les fichiers actuels ;
   - .githooks/pre-push : lance Verify avant chaque push, désactivé tant que vous ne l'activez pas.
-- .gitignore : .claude/settings.local.json, Thumbs.db, desktop.ini, __pycache__/. Sauvegarde zip mal placée
+- .gitignore : réglages de l'agent, Thumbs.db, desktop.ini, __pycache__/. Sauvegarde zip mal placée
   (src/TenshoAssistant/checkpoints) déplacée dans checkpoints/.
 - CONTRIBUTING et README : DALAMUD_HOME, -TestsOnly, outils pour contributeurs ; la mention « restored during the build », ambiguë,
   est corrigée.
@@ -1670,7 +1670,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - les tests en jeu de tout le plugin se feront à la fin, guidés (étape h) ;
   - les décisions sont gardées pour la fin, avec un choix provisoire noté (ROADMAP « Décisions reportées à la fin ») ;
   - R-13, page « Crédits » complète, vient juste après ;
-  - R-14, résistance aux mises à jour de FF14 directement dans la logique du code : règle ajoutée à docs/ai/RULES.md pour tout
+  - R-14, résistance aux mises à jour de FF14 directement dans la logique du code : règle ajoutée à notes de l'agent pour tout
     nouveau code, passage complet sur l'existant vers la toute fin de la file (étape g2, avant les tests en jeu).
 - Tests : 11 nouveaux (adresses, message, mentions, catégories, nouvelles tentatives, pause demandée, file, « Effacer », worker qui
   survit, identifiants de rôle, sources des anciennes alarmes) ; TESTING.md : liste de contrôle en jeu du webhook.
@@ -1704,7 +1704,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - R-12, webhook Discord pour les alarmes, placé juste après c) (USER-REQUESTS, ROADMAP, STATUS) ;
   - amélioration du dépôt git et de GitHub, rattachée au point d) ;
   - règle de numérotation des versions (DEC-024) : X = grandes étapes (1.0.0 = première publication Dalamud), Y = nos versions,
-    Z = versions de la communauté ; écrite dans CLAUDE.md et CONTRIBUTING.md.
+    Z = versions de la communauté ; écrite dans consignes de l'agent et CONTRIBUTING.md.
 - Aucun changement de code. Verify.ps1 (agent) : 570/570, 0 avertissement, 0 erreur, langues et paquet verts ; DLL 0.318.0.0.
   Non validé en jeu.
 ### English
@@ -1764,7 +1764,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - fiche contributeur : fichiers source exacts par page (Monstres, Mage bleu, Équipement, Compagnie libre…), liste des dossiers
     complète, sources SubmarineTracker et FFXIVGachaSpreadsheet.
 - STATUS : la dernière release est Stable-0.242.0 (tag git vérifié) ; GOAL R-11 ; liste « à valider en jeu » renvoyée à la
-  feuille de route ; couverture de Character Panel et de Macro Chain mise à jour. CLAUDE.md : règle de sauvegarde zip avant toute
+  feuille de route ; couverture de Character Panel et de Macro Chain mise à jour. consignes de l'agent : règle de sauvegarde zip avant toute
   grosse modification (demande de l'utilisateur).
 - Verify.ps1 (agent) : 569/569, 0 avertissement, 0 erreur, langues et paquet verts ; DLL 0.316.0.0. Non validé en jeu.
 ### English

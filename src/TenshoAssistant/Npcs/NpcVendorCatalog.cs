@@ -46,7 +46,7 @@ public static class NpcShopLinks
         || spot.Condition==DuringQuest && seen is not null && spot.Quests is { Count:>0 } quests && quests.Any(seen);
 
     /// <summary>
-    /// X-266 (0.1307, user report of 13/11 at Mor Dhona, relais/diagnostic-pnj-absents-13-11.md): a Level position (« always ») takes the condition of the
+    /// X-266 (0.1307, user report of 13/11 at Mor Dhona, the agent's notes): a Level position (« always ») takes the condition of the
     /// vendor's layers in its territory: a festival's (0.828), or a quest's when every layer there is a quest's (Cristiana 1016290, only layer
     /// « QST_JobRel101 », quest 67748 not taken: not in the game); placed by no layer anywhere, unplaced (0.829); otherwise always.
     /// </summary>

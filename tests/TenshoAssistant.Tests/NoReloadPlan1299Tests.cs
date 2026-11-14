@@ -1,5 +1,5 @@
 // 0.1299 (X-283, review of the 0.1278 block, I4, R28.14): the « player busy » path is proved by a behaviour test, run by check.sh
-// (scripts/agent/noreload-test.sh, an agent file): publish.sh's own decision under a made-up PlayState, Verify.ps1 -Plan (the real
+// (the agent's noreload-test.sh, an agent file): publish.sh's own decision under a made-up PlayState, Verify.ps1 -Plan (the real
 // decision: output folder, stamp), a real build beside the game with the game's DLL unchanged, then the next free publish building where
 // the game loads. Here, the wiring that test leans on: -Plan stops before anything is built or written, and reads the same lines as the build.
 internal static class NoReloadPlan1299Tests

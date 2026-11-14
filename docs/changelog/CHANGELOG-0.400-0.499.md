@@ -610,7 +610,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Documentation relue (demande du 2026-11-03) : README (pages, commandes et fonctions jusqu'à 0.446, crédit PaissaDB), GOAL, STATUS
   (prochaine action, plan « Git », dernière release Stable-0.430.0), ROADMAP, PROJECT, USER-REQUESTS, PUBLISHING ; propositions déjà
   faites marquées : 36 lignes « État » dans MAP, ITEMS, CRAFT-GATHER et TOOLS-PROPOSALS, alternatives faites dans G-PROPOSALS.
-- Git confié à l'agent (accord du 2026-11-03) : CLAUDE.md, RULES et STATUS « Git » ; commit et push par `Verify.ps1 -Commit`, release
+- Git confié à l'agent (accord du 2026-11-03) : consignes de l'agent, RULES et STATUS « Git » ; commit et push par `Verify.ps1 -Commit`, release
   seulement sur ta demande. Release.ps1 : variable facultative `TENSHO_COMMIT_TRAILER`, ajoutée en fin de message de commit.
 - GitHub (demande du 2026-11-03) : milestone 2 renommée, milestones 3 (résistance aux mises à jour, travaux en séance) et 1.0.0
   (publication Dalamud), labels in-game-test, probe, decision, ultracode, état à 0.446 commenté sur #10–#17, issues #22–#31.
@@ -1155,7 +1155,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
   - le mode développeur traduit ses messages et ses libellés (recette, mission, donneur de quête) ;
   - le journal reste en anglais.
   - Gardés en français : noms des cristaux et des fêtes du client français (reconnus dans le texte du jeu), alias de commande « pêche ».
-- Pour la suite : règle écrite dans docs/ai/RULES.md, et test Languages406Tests qui refuse tout texte français écrit dans le code (hors
+- Pour la suite : règle écrite dans notes de l'agent, et test Languages406Tests qui refuse tout texte français écrit dans le code (hors
   fichiers de langue et exceptions listées) et vérifie que chaque clé a ses deux textes.
 - Sauvegarde avant changement : checkpoints/backup-20261103-105245-avant-messages-anglais-0406.zip. Preuve : docs/evidence/0.406-languages.md.
 - Tests : Languages406Tests (2 cas) ; les tests existants suivent les textes anglais. Verify.ps1 (agent) : 750/750, 0 avertissement,

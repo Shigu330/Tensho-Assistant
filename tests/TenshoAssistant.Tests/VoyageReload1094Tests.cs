@@ -52,7 +52,7 @@ internal static class VoyageReload1094Tests
             Check(PlayState.ShouldWrite("duty",true,null,Start.AddSeconds(2),Start),"change written");
             Check(!PlayState.ShouldWrite("duty",true,"duty",Start.AddSeconds(10),Start) && PlayState.ShouldWrite("duty",true,"duty",Start.AddSeconds(30),Start),"heartbeat while busy");
             var json=PlayState.ToJson("ocean voyage",Start);
-            Check(json.Contains("\"busy\":true") && json.Contains("\"reason\":\"ocean voyage\"") && json.Contains("\"updated\":\"2026-11-11T14:10:00"),"file shape read by scripts/agent/playstate.py: "+json);
+            Check(json.Contains("\"busy\":true") && json.Contains("\"reason\":\"ocean voyage\"") && json.Contains("\"updated\":\"2026-11-11T14:10:00"),"file shape read by the agent's playstate.py: "+json);
         }),
         ("Voyage reload 1094: wiring",() =>
         {

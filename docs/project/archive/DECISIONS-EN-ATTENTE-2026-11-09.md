@@ -88,7 +88,7 @@ Choix appliqué par défaut : la comparaison avec Universalis se lance seulement
 
 ## À décider avec l'utilisateur (relevé du 2026-11-04)
 
-Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, CLAUDE.md).
+Règle : une règle Dalamud en jeu demande un résumé et son accord (mémoire, consignes de l'agent).
 
 | Point | Règle | Conseil de l'agent | État |
 |---|---|---|---|
@@ -113,7 +113,7 @@ La liste complète de ce qui reste pour la 1.0.0 : [PUBLISHING](../PUBLISHING.md
 | 4 | Choix provisoires depuis la 0.345 (tableau en tête de ce fichier) | Les passer en un seul lot, cases à cocher, à la fin du nettoyage (étape 9) | — |
 | 5 | Ventes des servants (I-05) | Garder la comparaison Universalis sur clic | Demander une fois à l'ouverture, sur réglage |
 | 6 | Poissons de collection « pas pris en compte » (X-97) | Question : où l'avez-vous vu ? Les prises collectionnables sont bien comptées dans les sacs et les découvertes ; proposition : afficher dans l'aide à la pêche la collectionnabilité visée et les assignats d'un poisson collectionnable | — |
-| 7 | Langue des fichiers de l'agent (X-91, 2026-11-09) | CLAUDE.md, docs/ai/RULES.md et le skill de version mis à jour contre le code, mais gardés en français (exception de l'étape 4 : fichiers hors Git, consignes de l'utilisateur en français) | Les traduire en anglais avec les documents vivants, juste avant la 1.0.0 |
+| 7 | Langue des fichiers de l'agent (X-91, 2026-11-09) | consignes de l'agent, notes de l'agent et le skill de version mis à jour contre le code, mais gardés en français (exception de l'étape 4 : fichiers hors Git, consignes de l'utilisateur en français) | Les traduire en anglais avec les documents vivants, juste avant la 1.0.0 |
 | 8 | Outils de contenus (X-90), docs/project/CONTENT-TOOLS.md | Tableaux stratégiques en notes écrites par vous, masquées en combat, sans dessin sur l'écran du jeu ; bestiaire des donjons profonds hors du donjon, sans conseil ; suivi partagé des NM d'Eurêka laissé aux plugins existants | Conseils de la communauté hors du donjon ; autre format de tableaux |
 | 9 | Alerte « souhait en vente sous un prix » (X-101) : Tensho interrogerait Universalis en arrière-plan, sans clic, pour vos souhaits avec un prix (règle Dalamud : appel réseau automatique, à déclarer) | Réglage coupé par défaut ; au plus une fois toutes les 30 min, seulement les souhaits avec un prix, 20 objets par passage, ligne de discussion à la baisse sous le prix ; Universalis déjà dans la liste des hôtes | Seulement sur un bouton « Vérifier maintenant » (aucun appel automatique) |
 | 10 | Regroupement des outils et des réglages (X-100) | Voir la section « Proposition X-100 » ci-dessous | Garder la disposition actuelle |

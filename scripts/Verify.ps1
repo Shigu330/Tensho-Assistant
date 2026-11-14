@@ -15,7 +15,7 @@
     # validation, skips the plugin build and the package. Not enough for a release.
     [switch]$TestsOnly,
     # X-283 (0.1299): says what this run would decide (built beside the game or where it loads, skipped by the stamp or not, the
-    # build's arguments) as one JSON line, then stops: nothing built, nothing written. scripts/agent/noreload-test.sh (check.sh) runs it,
+    # build's arguments) as one JSON line, then stops: nothing built, nothing written. the agent's noreload-test.sh (check.sh) runs it,
     # with a made-up stamp (TENSHO_VERIFY_STAMP, read with -Plan only), to prove the « player busy » path on the real decision.
     [switch]$Plan,
     # X-268 (R19.3): the player is in a duty (or an ocean voyage, competitive content): the plugin is built into artifacts\noreload\, not

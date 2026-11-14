@@ -11,7 +11,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks><NoWarn>CA1416</NoWarn><TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>TenshoAssistant.Desktop</AssemblyName><RootNamespace>TenshoAssistant.Desktop</RootNamespace>
-    <!-- One version source (R33): the plugin's <Version>, read here; scripts/agent/new-version.py writes the plugin's csproj only. -->
+    <!-- One version source (R33): the plugin's <Version>, read here; the agent's new-version.py writes the plugin's csproj only. -->
     <TenshoPluginProject>$(MSBuildThisFileDirectory)..\TenshoAssistant\TenshoAssistant.csproj</TenshoPluginProject>
     <Version>$([System.Text.RegularExpressions.Regex]::Replace($([System.IO.File]::ReadAllText($(TenshoPluginProject))), '(?s)^.*?&lt;Version&gt;\s*([^&lt;\s]+)\s*&lt;/Version&gt;.*$', '$1'))</Version>
     <DalamudLibPath Condition="'$(DalamudLibPath)' == '' and '$(DALAMUD_HOME)' != ''">$(DALAMUD_HOME)\</DalamudLibPath>

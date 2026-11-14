@@ -25,7 +25,7 @@ internal static class Tooling323Tests
         ("Git ignores per-user and generated files; GitHub templates live in .github",()=>
         {
             var ignore = File.ReadAllLines(Path.Combine(Root,".gitignore")).Select(line => line.Trim()).ToHashSet();
-            // Agent files (CLAUDE.md, .claude/, docs/ai/, scripts/agent/): NoAgentFiles802Tests (audit #71).
+            // Agent files (the agent's instructions, the agent's settings, the agent's notes, the agent's scripts): NoAgentFiles802Tests (audit #71).
             foreach (var entry in new[] { "**/bin/","**/obj/","checkpoints/","artifacts/","Thumbs.db","desktop.ini","__pycache__/" })
                 Check(ignore.Contains(entry),".gitignore lists " + entry);
             foreach (var template in new[] { "ISSUE_TEMPLATE/bug_report.yml","ISSUE_TEMPLATE/feature_request.yml","ISSUE_TEMPLATE/translation.yml","ISSUE_TEMPLATE/config.yml","pull_request_template.md" })

@@ -4,7 +4,7 @@ namespace TenshoAssistant.Diagnostics;
 /// X-177 C6 (0.1204, dalamud.log of 13/11: « Submarine voyage check » 606 lines, « Reading eventMarkers » 655, « Map event marker » 357,
 /// the same text written again at each reload of the plugin): what a research probe wrote is remembered for the game process, across the
 /// plugin's reloads, so the same text is written whole once per game session; after that its caller writes a short line, which keeps the
-/// start the log reader looks for (scripts/agent/logread.py). The memory is a set of the texts' hashes (integers, a type of the runtime,
+/// start the log reader looks for (the agent's logread.py). The memory is a set of the texts' hashes (integers, a type of the runtime,
 /// never one of the plugin's: an unloaded instance keeps nothing alive through it), kept in the process's data slot; bounded.
 /// </summary>
 public static class SessionOnce

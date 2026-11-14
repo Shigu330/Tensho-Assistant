@@ -567,7 +567,7 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - Demande de l'utilisateur : remettre tous les .md et GitHub à l'étape actuelle, et relever ce qui manque pour la 1.0.0.
 - Compilation chez Dalamud : leur conteneur utilise le SDK 10.0.101 sous Linux, réseau coupé ; `global.json` exigeait 10.0.403, Tensho n'y aurait pas compilé. Il accepte maintenant 10.0.100 et plus, `Verify.ps1` prend le SDK 10.x local le plus récent, et un job CI compile avec leur image et leur commande ([relevé](../../docs/evidence/0.512-d17-build.md), DEC-034).
 - Manifeste : Description réécrite (lignes coupées à la main, fonctions et réseau à jour, les deux réglages qui agissent sans clic sont nommés). `manifest.toml` : changelog à jour. Brouillon de PR relu contre le code.
-- Documents : STATUS raccourci, son historique déplacé dans `docs/ai/STATUS-ARCHIVE.md` ; GOAL, PUBLISHING (liste de ce qui reste, en ordre), ROADMAP, BACKLOG, TESTING, SECURITY, CONTRIBUTING, README (crédits : Raphael.Net, jardinage), CLAUDE.md, RULES, DECISIONS remis à jour.
+- Documents : STATUS raccourci, son historique déplacé dans notes de l'agent ; GOAL, PUBLISHING (liste de ce qui reste, en ordre), ROADMAP, BACKLOG, TESTING, SECURITY, CONTRIBUTING, README (crédits : Raphael.Net, jardinage), consignes de l'agent, RULES, DECISIONS remis à jour.
 - Tests : aucun changement de logique. Verify.ps1 (agent) : 972/972, 0 avertissement, 0 erreur ; DLL 0.512.0.0. Non validé en jeu.
 ### English
 - Build: the Dalamud repository compiles with SDK 10.0.101 on Linux, and `global.json` demanded 10.0.403, so the plugin could not have built there. It now accepts 10.0.100 and newer, and a new CI job builds with their image and command.
