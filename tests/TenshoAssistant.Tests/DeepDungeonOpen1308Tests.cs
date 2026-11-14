@@ -37,7 +37,7 @@ internal static class DeepDungeonOpen1308Tests
             var architecture=Read("docs/project/ARCHITECTURE.md");
             Check(architecture.Contains("Instances with the game's own map (X-262, 0.1308)",StringComparison.Ordinal) && architecture.Contains("Instances à carte propre (X-262, 0.1308)",StringComparison.Ordinal),"ARCHITECTURE, both halves");
             Check(Read("src/TenshoAssistant/Localization/Languages/en.json").Contains("In deep dungeons Tensho works as in any dungeon",StringComparison.Ordinal)
-                && Read("src/TenshoAssistant/Localization/Languages/fr.json").Contains("En donjon profond, Tensho marche comme dans tout donjon",StringComparison.Ordinal),"FAQ, en and fr");
+                && Read("src/TenshoAssistant/Localization/Languages/fr.json").Contains("En donjon sans fond, Tensho marche comme dans tout donjon",StringComparison.Ordinal),"FAQ, en and fr");
         }),
     ];
 }

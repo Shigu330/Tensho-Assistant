@@ -15,7 +15,7 @@
         { "en": "Hunt bills", "fr": "Contrats de chasse" }
       ]
     },
-    { "type": "heading", "text": { "en": "Grand Company", "fr": "Grande Compagnie" } },
+    { "type": "heading", "text": { "en": "Grand Company", "fr": "Grande compagnie" } },
     { "type": "timer", "label": { "en": "Supply missions", "fr": "Missions de ravitaillement" }, "at": "supply" },
     { "type": "note", "text": { "en": "These missions renew at their own hour, not at the daily reset.", "fr": "Ces missions se renouvellent à leur propre heure, pas à la remise quotidienne." } }
   ]

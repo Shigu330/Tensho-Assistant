@@ -132,7 +132,7 @@ Le jeu ne donne certaines données qu'une fois sa fenêtre ouverte, ou une fois 
 
 ## Pourquoi dois-je ouvrir une fenêtre du jeu ?
 
-Tensho ne lit que ce que le jeu a sur votre ordinateur. Les servants, le coffre à apparence, les titres ou les succès ne sont envoyés par le serveur qu'à leur ouverture.
+Tensho ne lit que ce que le jeu a sur votre ordinateur. Les servants, la coiffeuse mirage, les titres ou les hauts faits ne sont envoyés par le serveur qu'à leur ouverture.
 
 ## Que veulent dire la coche, la croix et le point d'interrogation ?
 
@@ -156,7 +156,7 @@ Tensho suit les règles des plugins de Dalamud : il lit et montre, n'agit sur le
 
 ## Que garde Tensho sur mon PC ?
 
-Ce que le jeu lui a montré (rangements, collections, progression), vos réglages, notes, listes et alarmes, un journal des gils (90 jours), l'historique des voyages (180 jours) et la base des découvertes. Ces fichiers restent sur ce PC ; vos découvertes n'en sortent que par l'échange GitHub, après la connexion de GitHub (ou par un fichier que vous exportez et partagez vous-même), et les alarmes seulement par le webhook Discord, si vous en indiquez un.
+Ce que le jeu lui a montré (rangements, collections, progression), vos réglages, notes, listes et alarmes, un journal des gils (90 jours), l'historique des expéditions (180 jours) et la base des découvertes. Ces fichiers restent sur ce PC ; vos découvertes n'en sortent que par l'échange GitHub, après la connexion de GitHub (ou par un fichier que vous exportez et partagez vous-même), et les alarmes seulement par le webhook Discord, si vous en indiquez un.
 
 ## Où sont mes fichiers, et comment tout effacer (y compris ce que j'ai partagé) ?
 
@@ -174,9 +174,9 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 
 Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
 
-## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon profond ?
+## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
-Dans les zones JcJ et les autres contenus classés (tournois de Triple Triade, Mahjong), tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela. En donjon profond, Tensho marche comme dans tout donjon, mais le jeu y dessine sa propre carte : la carte de Tensho se cache et laisse celle du jeu jusqu'à votre sortie.
+Dans les zones JcJ et les autres contenus classés (tournois de Triple Triade, Mahjong), tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela. En donjon sans fond, Tensho marche comme dans tout donjon, mais le jeu y dessine sa propre carte : la carte de Tensho se cache et laisse celle du jeu jusqu'à votre sortie.
 
 ## Comment mettre Tensho à jour ?
 
