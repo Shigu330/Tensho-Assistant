@@ -111,15 +111,21 @@ internal sealed partial class MainWindow
                     var clicked=ImGui.Selectable("##Tile",false,ImGuiSelectableFlags.None,new Vector2(0,side));
                     var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();
                     var draw=ImGui.GetWindowDrawList();
+                    // X-286 (review M5): a name or line wider than the tile ends with « … » (before, the clip cut it in a word); the
+                    // whole text in the tile's tooltip.
+                    var left=min.X+side+ImGui.GetStyle().ItemSpacing.X;
+                    var room=MathF.Max(0,max.X-left-ImGui.GetStyle().ItemSpacing.X/2);
+                    static float Measure(string text)=>ImGui.CalcTextSize(text).X;
+                    var shownName=UI.TextFit.Fit(name,room,Measure);var shownLine=UI.TextFit.Fit(line,room,Measure);
+                    if(UI.TextFit.Shortened(name,shownName) || UI.TextFit.Shortened(line,shownLine))TipText(name+"\n"+line);
                     draw.PushClipRect(min,max,true);
                     try
                     {
                         draw.AddRect(min,min+new Vector2(side),ImGui.GetColorU32(ImGuiCol.Border),2);
                         DrawGlyphIn(icon,min,min+new Vector2(side),Text,ImGui.GetFontSize());
-                        var left=min.X+side+ImGui.GetStyle().ItemSpacing.X;
                         var top=min.Y+MathF.Max(0,(side-ImGui.GetTextLineHeightWithSpacing()*2)/2);
-                        draw.AddText(new Vector2(left,top),ImGui.GetColorU32(ImGuiCol.Text),name);
-                        draw.AddText(new Vector2(left,top+ImGui.GetTextLineHeightWithSpacing()),ImGui.GetColorU32(ImGuiCol.TextDisabled),line);
+                        draw.AddText(new Vector2(left,top),ImGui.GetColorU32(ImGuiCol.Text),shownName);
+                        draw.AddText(new Vector2(left,top+ImGui.GetTextLineHeightWithSpacing()),ImGui.GetColorU32(ImGuiCol.TextDisabled),shownLine);
                     }
                     finally{draw.PopClipRect();}
                     if(clicked)page=target;

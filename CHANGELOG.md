@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1304.0
+- Plan global, X-286 : Tuiles de l'accueil (X-286, relecture du bloc 0.1278, M5, et image Home vue par la maître le 13/11) : un nom ou une ligne de tuile plus large que la tuile était coupé au milieu d'un mot par le bord de la tuile, sans « … » (« simulateur, carnet, r », « créneaux, météo, PR », « plan d'équipeme »). Le texte se raccourcit maintenant pour tenir et finit par « … », coupé après le dernier mot entier quand cela garde l'essentiel de la ligne (UI/TextFit, classe pure) ; le texte entier se lit dans l'infobulle de la tuile. À toutes les tailles de fenêtre (la place se mesure à chaque image). Images de l'accueil refaites.
+- Pour les joueurs : Accueil : un texte de tuile trop long finit par « … » et se lit en entier dans son infobulle.
+- Tests : HomeTileText1304Tests. Verify.ps1 (agent) : 2416/2416, 0 avertissement, 0 erreur ; DLL 0.1304.0.0. Non validé en jeu.
+### English
+- Home tiles (X-286, review of block 0.1278, M5, and the Home picture seen by the master on 13/11): a tile's name or line wider than the tile was cut in the middle of a word by the tile's edge, with no « … » (« simulateur, carnet, r », « créneaux, météo, PR », « plan d'équipeme »). The text is now shortened to fit and ends with « … », cut after the last whole word when that keeps most of the line (UI/TextFit, a pure class); the whole text reads in the tile's tooltip. At every window size (the room is measured each frame). Home pictures taken again.
+- For players: Home: a tile text too long for its tile ends with « … » and reads in full in its tooltip.
+
 ## 0.1303.0
 - Plan global, X-293 : Noms des fêtes recopiés depuis LuminaSupplemental 7.0.1 (X-293, décision de l'utilisateur du 13/11) : la copie embarquée Events/Data/festival-names.csv reçoit les deux noms ajoutés par 7.0.1 (256 « Unmoored Isle », 257 « Keybound Brawler », au lieu de 257 « Unknown »). 7.0.1 les a ajoutés au fichier d'entrée du générateur (SpaghettiGenerator/ManualData/FestivalName.csv, commit ef4372e) ; le fichier publié Generated/FestivalName.csv ne les a pas encore : la copie suit maintenant le premier. Valeurs gardées telles que publiées ; source, commit, SHA-256 du fichier d'origine et avis GPL-3.0 gardés en tête (R05). Côté agent (hors version) : la veille réseau signale la release la plus récente de chaque source de tiers (LuminaSupplemental, GatherBuddy, Teamcraft, FFXIVGachaSpreadsheet, SubmarineTracker, et les sources des copies du jardin), compare chaque copie embarquée à son fichier d'origine et vérifie dans les CSV en ligne de LuminaSupplemental les colonnes que le plugin lit.
 - Pour les joueurs : Événements : deux noms d'événement de plus connus.
