@@ -128,18 +128,22 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
         lock(gate)
         {
             if(loadFailed)throw new InvalidOperationException("A failed bank load prevents overwriting saved data.");
+            // X-171 (0.1314): with the data file, every character as saved now is read back under the same lock: the bank shown by this client
+            // holds what the other client saved since (before, the other characters stayed as this client had loaded them until a reload).
+            BankEntry[]? everyone=null;
             var saved=Locked(()=>
             {
                 if(data?.Database() is { } opened)
                 {
                     using var open=opened.Open();
                     Convert(open);
-                    if(change.Erase!=0){EraseEverywhere(open,id);return Array.Empty<BankEntry>();}
+                    if(change.Erase!=0){EraseEverywhere(open,id);everyone=Rows(open,null);return Array.Empty<BankEntry>();}
                     using var transaction=open.BeginTransaction();
                     var rowsBefore=change.Erase!=0 ? []:Rows(open,transaction,id);
                     var rowsAfter=change.Erase!=0 ? []:change.On(rowsBefore);
                     InventoryBankService.ValidateEntries(rowsAfter);
                     if(change.Erase!=0 || !StillSaved(change,rowsBefore) && !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
+                    everyone=Rows(open,transaction);
                     transaction.Commit();
                     return rowsAfter;
                 }
@@ -157,7 +161,7 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 if(!StillSaved(change,before) && !before.SequenceEqual(after))Store(id).Save(after);
                 return after;
             });
-            var result=memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
+            var result=everyone ?? memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
             InventoryBankService.ValidateEntries(result);
             return result;
         }
