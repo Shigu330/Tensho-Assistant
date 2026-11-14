@@ -143,8 +143,12 @@ public static class InventorySortRules
             var categories=Categories(zone);
             var matches=remaining.Where(value=>Matches(value,zone,Describe(value.Stack.Item.Id.Value)))
                 .OrderBy(value=>categories.Count==0 ? 0:IndexOf(categories,Describe(value.Stack.Item.Id.Value).Category)).Take(zone.Count).ToArray();
+            // X-321 (0.1322, user report of 14/11 with captures: a zone over the four bags filled them 1, 2, 3, 4): a zone's own positions are
+            // filled in the same order as the rest (FillOrder: bags 1, 3, 2, 4; one bag, or another storage, position after position).
+            var zoneSlots=fill.Where(slot=>slot>=zone.Start && slot<zone.Start+zone.Count).ToArray();
+            if(zone.ReverseFill)Array.Reverse(zoneSlots);
             for(var index=0;index<matches.Length;index++)
-            {slots[zone.ReverseFill ? zone.Start+zone.Count-1-index:zone.Start+index]=matches[index];remaining.Remove(matches[index]);}
+            {slots[zoneSlots[index]]=matches[index];remaining.Remove(matches[index]);}
             if(zone.ShareUnused)
                 for(var slot=zone.Start;slot<zone.Start+zone.Count;slot++)if(slots[slot] is null)reserved[slot]=false;
         }
