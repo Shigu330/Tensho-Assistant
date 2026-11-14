@@ -1748,6 +1748,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1300) En jeu : les mêmes pages (Peuples alliés, Grandes Compagnies, Félicité insulaire, Livraisons particulières, Carnaval masqué, Armes reliques, Pêche en mer, Aléas, Contenus de terrain, Donjons profonds, Lexique) se remplissent comme avant
 
+- [ ] (0.1302) En jeu, Dédale bestial : après un plateau (ou une lecture des rangs dans la fenêtre d'équipe), l'équipe proposée reste la même après un rechargement du plugin (plans enregistrés hors du fil du jeu)
+
+- [ ] (0.1304) En jeu, Accueil : rétrécir la fenêtre ; les tuiles dont le texte ne tient pas finissent par « … » (jamais coupées au milieu d'un mot sans « … »), et l'infobulle de la tuile donne le texte entier
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
