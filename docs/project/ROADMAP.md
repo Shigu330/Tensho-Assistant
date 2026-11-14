@@ -93,6 +93,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-150 | X-312 : message Discord des alarmes au-delà de 60 min (« dans 1440 min ») | appliqué (0.1316) : nouveau repère [left] (« dans 1 h 30 ») pris par le message par défaut ; [minutes] garde le nombre pour les messages déjà écrits par les joueurs |  |
 | D-151 | Relais : un seul écrivain ou deux, réserve 21 % au-dessus du plancher (question de l'utilisateur du 14/11 vers 12 h 05) | Essai Opus moyen : un seul écrivain, le prochain bloc répétitif sur « Tensho · Relais Opus moyen », mesuré contre Opus élevé (R26.6) |  |
 | D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (R04 : requête sur clic, données du joueur), réponse de l'utilisateur du 14/11 vers 12 h 40 : « pour formulaire git c'est ok vu que ça envoie sur clic pas seul et la personne le fera que si elle a envie et en connaissance de cause » | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
+| D-154 | X-57 (quête de cuisinier à Limsa, carte) : l'utilisateur n'a plus la quête, la lecture en jeu est impossible (14/11 après-midi : « je l'ai plus, on met en suspens si je retombe sur le même souci ») | En suspens : passé en « plus tard », repris seulement si le même souci revient, avec une capture |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -202,6 +203,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-150 | X-312 : message Discord des alarmes au-delà de 60 min (« dans 1440 min ») | appliqué (0.1316) : nouveau repère [left] (« dans 1 h 30 ») pris par le message par défaut ; [minutes] garde le nombre pour les messages déjà écrits par les joueurs |  |
 | D-151 | Relais : un seul écrivain ou deux, réserve 21 % au-dessus du plancher (question de l'utilisateur du 14/11 vers 12 h 05) | Essai Opus moyen : un seul écrivain, le prochain bloc répétitif sur « Tensho · Relais Opus moyen », mesuré contre Opus élevé (R26.6) |  |
 | D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (R04 : requête sur clic, données du joueur), réponse de l'utilisateur du 14/11 vers 12 h 40 : « pour formulaire git c'est ok vu que ça envoie sur clic pas seul et la personne le fera que si elle a envie et en connaissance de cause » | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
+| D-154 | X-57 (quête de cuisinier à Limsa, carte) : l'utilisateur n'a plus la quête, la lecture en jeu est impossible (14/11 après-midi : « je l'ai plus, on met en suspens si je retombe sur le même souci ») | En suspens : passé en « plus tard », repris seulement si le même souci revient, avec une capture |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

@@ -316,7 +316,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.351 : I-04 journal des gils** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Acheter à un PNJ, vendre à un PNJ, réparer, se téléporter : Rangements › Gils montre chaque variation avec la bonne catégorie
+- [x] Acheter à un PNJ, vendre à un PNJ, réparer, se téléporter : Rangements › Gils montre chaque variation avec la bonne catégorie
   (Boutique PNJ, Réparation, Téléportation).
 - [x] Ouvrir la cloche des servants : le solde des servants apparaît ; ouvrir le coffre de compagnie : son solde apparaît.
 
@@ -968,7 +968,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.829) Limsa, la Dunette : plus de marchand fantôme ; ailleurs dans Limsa, les marchands permanents sont là.
+- [x] (0.829) Limsa, la Dunette : plus de marchand fantôme ; ailleurs dans Limsa, les marchands permanents sont là.
 
 
 - [ ] (0.831) Enchaîner deux points du même genre en dépensant des PR au premier : le second propose un plan.
@@ -1435,7 +1435,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1171) Monde › Découvertes, échange GitHub connecté : « Échanger » envoie toujours ; « Déconnecter » efface la connexion (plus de nom affiché) ; dalamud.log sans erreur GitHub
 
-- [ ] (0.1172) Objets › Organisation, sacs du personnage : l'aperçu remplit le sac 1, puis le sac 3, puis le 2, puis le 4 ; « Appliquer » range les sacs du jeu de la même façon ; une sacoche ou un servant se range comme avant
+- [x] (0.1172) Objets › Organisation, sacs du personnage : l'aperçu remplit le sac 1, puis le sac 3, puis le 2, puis le 4 ; « Appliquer » range les sacs du jeu de la même façon ; une sacoche ou un servant se range comme avant
 
 - [x] (0.1174) Mode développeur, en extérieur : vaincre un monstre qui laisse un objet, même sans le cibler : dalamud.log montre « Discovery: defeat of … read from the game's message » puis « Discovery: MonsterDrop item … » (plus de « Item gain not attributed » pour ce butin)
 
@@ -1766,7 +1766,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1308) JcJ (Wolves' Den ou Crystalline Conflict) : Tensho se coupe toujours avec sa ligne dans le chat
 
-- [ ] (0.1316) Eurêka et Bozja › Météo et nuit : la prochaine fenêtre d'un monstre notoire à plus d'une heure s'écrit « dans 2 h 05 » (pas « dans 125 min »)
+- [x] (0.1316) Eurêka et Bozja › Météo et nuit : la prochaine fenêtre d'un monstre notoire à plus d'une heure s'écrit « dans 2 h 05 » (pas « dans 125 min »)
 
 - [ ] (0.1316) Alarmes : une alarme unique avec 90 min d'avance sonne « Alarme : … — dans 1 h 30 (…) » dans le chat ; le bouton de répétition dit « Dans … » ; Gold Saucer : tirage du Méga Cactpot « (dans 2 j 3 h) »
 
@@ -1786,15 +1786,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1323) Aide › Signaler un problème : préparer un bug de test (titre « essai ») et ouvrir le formulaire : le titre est « [Bug] essai », l'étiquette player-report est posée à l'envoi (puis fermer le ticket)
 
-- [ ] (0.1324) Aide › Signaler un problème, GitHub connecté (Monde › Découvertes) : choisir « Par ma connexion GitHub », titre « essai X-340 », « Envoyer sur GitHub… » : l'aperçu montre le titre puis le texte avec le rapport entier ; « Envoyer maintenant » : « Envoyé : ticket n° N », « Ouvrir le ticket » montre le même texte, avec les étiquettes bug et player-report posées en moins d'une minute (puis fermer le ticket)
+- [x] (0.1324) Aide › Signaler un problème, GitHub connecté (Monde › Découvertes) : choisir « Par ma connexion GitHub », titre « essai X-340 », « Envoyer sur GitHub… » : l'aperçu montre le titre puis le texte avec le rapport entier ; « Envoyer maintenant » : « Envoyé : ticket n° N », « Ouvrir le ticket » montre le même texte, avec les étiquettes bug et player-report posées en moins d'une minute (puis fermer le ticket)
 
-- [ ] (0.1324) Aide › Signaler un problème, voie « Par mon navigateur » avec un long texte (plus de 6 000 caractères) : l'aperçu montre l'encadré « Trop long pour l'adresse… collez-le (Ctrl+V) » ; après l'ouverture, l'encadré « Votre rapport est copié » reste visible
+- [x] (0.1324) Aide › Signaler un problème, voie « Par mon navigateur » avec un long texte (plus de 6 000 caractères) : l'aperçu montre l'encadré « Trop long pour l'adresse… collez-le (Ctrl+V) » ; après l'ouverture, l'encadré « Votre rapport est copié » reste visible
 
-- [ ] (0.1326) Marché, un objet rare jamais envoyé à Universalis sur votre monde : ouvrir ses offres au tableau du jeu, puis survoler l'objet avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (marqué « vu au tableau »), avec les autres mondes d'Universalis
+- [x] (0.1326) Marché, un objet rare jamais envoyé à Universalis sur votre monde : ouvrir ses offres au tableau du jeu, puis survoler l'objet avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (marqué « vu au tableau »), avec les autres mondes d'Universalis
 
-- [ ] (0.1327) Monde › Découvertes, avec des tâches de servant notées : ouvrir le tableau et chercher « servant » : les noms des tâches s'affichent (un numéro au plus un instant) ; dalamud.log sans ligne « slow frame » pendant ce temps
+- [x] (0.1327) Monde › Découvertes, avec des tâches de servant notées : ouvrir le tableau et chercher « servant » : les noms des tâches s'affichent (un numéro au plus un instant) ; dalamud.log sans ligne « slow frame » pendant ce temps
 
-- [ ] (0.1327) Sociétés alliées : première ouverture de la page après un rechargement : « Lecture des données du jeu… » un instant, puis les sociétés et leurs genres ; dalamud.log sans ligne « slow frame » à cette ouverture
+- [x] (0.1327) Sociétés alliées : première ouverture de la page après un rechargement : « Lecture des données du jeu… » un instant, puis les sociétés et leurs genres ; dalamud.log sans ligne « slow frame » à cette ouverture
+
+- [ ] (0.1330) Après la prochaine release, installée depuis le dépôt (mode normal) : /xlplugins, onglet des plugins installés : Tensho Assistant montre son icône (plus le « ? » de Dalamud).
+
+- [ ] (0.1331) Ouvrir un objet au tableau du marché du jeu, le refermer, puis le survoler avec Ctrl+Alt : la ligne de votre monde garde le prix vu au tableau (source : tableau du marché, heure du relevé), pas celle d'Universalis.
 
 **0.535 : interfaces** — à voir en jouant
 
