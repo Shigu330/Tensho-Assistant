@@ -41,5 +41,20 @@ internal static class QuestLockedMap1343Tests
             Check(view.Contains("if(!MapQuestIcons.HiddenAsLocked(settings.ShowLockedQuests,mapMarkers?.QuestIcons.TryGetValue(marker.Icon,out var questIcon)==true && questIcon.Locked,marker.ObjectiveId,questLinks))"),"the map uses it");
             Check(view.Contains("if(mapQuestLinks is { } known && ReferenceEquals(known.Entries,entries))return known.Links;"),"links built again only when the list changes");
         }),
+        ("Quest locked map 1344: a seasonal event's quest outside its event is not available in the Quests tab; during it, it stays",() =>
+        {
+            // 0.1344 (user question: « tu as aussi pris en compte les quêtes event ? »). Festival 100 runs, festival 200 does not.
+            var index=new MapLocalIndex([new MapLocalPosition(MapLocalKind.QuestIssuer,0x10003,3,10f,20f,0),new MapLocalPosition(MapLocalKind.QuestIssuer,0x10007,3,11f,21f,0),
+                new MapLocalPosition(MapLocalKind.QuestIssuer,0x10008,3,12f,22f,0)]);
+            var entries=new[]{Quest(0x10003,QuestProgress.Unconfirmed),Quest(0x10007,QuestProgress.Unconfirmed),Quest(0x10008,QuestProgress.Unconfirmed)};
+            var questsOf=new Dictionary<uint,IReadOnlyList<uint>>{[100]=[0x10007],[200]=[0x10008]};
+            static uint[] Ids(IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> groups)=>groups.SelectMany(group=>group.Quests).Select(item=>item.Quest.Id).Order().ToArray();
+            var off=MapLocalLists.OutOfSeason(questsOf,[100u]);
+            Check(off is not null && off.SetEquals([0x10008u]),"festival 200 not running: its quest out of season");
+            Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:false,outOfSeason:off)).SequenceEqual([0x10003u,0x10007u]),"box off: the out-of-season event quest leaves the list, the running event's stays");
+            Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:true,outOfSeason:off)).SequenceEqual([0x10003u,0x10007u,0x10008u]),"box on: every quest");
+            Check(MapLocalLists.OutOfSeason(null,[100u]) is null && MapLocalLists.OutOfSeason(questsOf,null) is null,"festivals or their quests unknown: nothing taken for out of season");
+            Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:false,outOfSeason:null)).SequenceEqual([0x10003u,0x10007u,0x10008u]),"unknown: as before");
+        }),
     ];
 }

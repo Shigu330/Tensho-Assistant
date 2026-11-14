@@ -122,18 +122,34 @@ public static class MapLocalLists
 {
     /// <summary>Quests by journal category (sorted by name), each by level then name; completed ones only on request. X-128 (0.1107): without
     /// <paramref name="includeLocked"/>, the quests not available yet are left out (not started and not <see cref="QuestList.Available"/>).</summary>
-    public static IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Quests(IEnumerable<QuestEntry> entries,MapLocalIndex index,uint mapId,bool includeComplete,bool includeLocked=true)
+    /// <remarks>
+    /// X-355 (0.1344, user question of 11/14: « tu as aussi pris en compte les quêtes event ? »): a quest of a seasonal event whose event is not
+    /// running (<paramref name="outOfSeason"/>, <see cref="OutOfSeason"/>) is not available either: left out with the not-unlocked ones.
+    /// </remarks>
+    public static IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Quests(IEnumerable<QuestEntry> entries,MapLocalIndex index,uint mapId,bool includeComplete,bool includeLocked=true,
+        IReadOnlySet<uint>? outOfSeason=null)
     {
         ArgumentNullException.ThrowIfNull(entries);ArgumentNullException.ThrowIfNull(index);
         var all=entries as IReadOnlyCollection<QuestEntry> ?? entries.ToArray();
         var links=includeLocked ? null:new QuestLinks(all);
         return all.Where(entry=>includeComplete || entry.Progress!=QuestProgress.Complete)
-            .Where(entry=>links is null || entry.Progress!=QuestProgress.Unconfirmed || QuestList.Available(links,entry))
+            .Where(entry=>links is null || entry.Progress!=QuestProgress.Unconfirmed || QuestList.Available(links,entry) && outOfSeason?.Contains(entry.Id)!=true)
             .Select(entry=>index.Quest(entry.Id) is { } position && position.MapId==mapId ? new MapLocalQuest(entry,position):null).OfType<MapLocalQuest>()
             .GroupBy(item=>item.Quest.Category.Length>0 ? item.Quest.Category:"—")
             .OrderBy(group=>group.Key,StringComparer.CurrentCultureIgnoreCase)
             .Select(group=>(group.Key,(IReadOnlyList<MapLocalQuest>)group.OrderBy(item=>item.Quest.Level).ThenBy(item=>item.Quest.Name,StringComparer.CurrentCultureIgnoreCase).ToArray()))
             .ToArray();
+    }
+
+    /// <summary>
+    /// X-355 (0.1344): the quests of the seasonal events not running now (Quest.Festival, FestivalReader.Quests, against the festivals the game
+    /// says are running). Null while either is unknown: nothing is taken for out of season without the game's word (R06).
+    /// </summary>
+    public static IReadOnlySet<uint>? OutOfSeason(IReadOnlyDictionary<uint,IReadOnlyList<uint>>? questsOf,IEnumerable<uint>? running)
+    {
+        if(questsOf is null || running is null)return null;
+        var now=running.ToHashSet();
+        return questsOf.Where(pair=>!now.Contains(pair.Key)).SelectMany(pair=>pair.Value).ToHashSet();
     }
 
     /// <summary>

@@ -3727,7 +3727,7 @@
     "ShowPlaceNamesHelp": "Affiche les noms des lieux de la zone, comme sur la carte du jeu.\nPar défaut : activé.",
     "ShowFlagHelp": "Affiche le drapeau posé sur la carte (le vôtre ou celui d'un lien).\nPar défaut : activé.",
     "ShowLockedQuests": "Quêtes pas encore disponibles",
-    "ShowLockedQuestsHelp": "Montre les quêtes pas encore débloquées (leurs quêtes préalables ne sont pas faites). Coupé, elles quittent la carte et cette liste ; une quête que vous avez débloquée reste, même quand le jeu la dessine en rouge parce que votre niveau ou votre job actuel n'est pas celui qu'elle demande. Grisé tant que « Quêtes et objectifs » est coupé.\nPar défaut : activé.",
+    "ShowLockedQuestsHelp": "Montre les quêtes pas encore débloquées (leurs quêtes préalables ne sont pas faites). Coupé, elles quittent la carte et cette liste ; une quête que vous avez débloquée reste, même quand le jeu la dessine en rouge parce que votre niveau ou votre job actuel n'est pas celui qu'elle demande ; une quête d'événement saisonnier compte comme pas encore disponible hors de son événement. Grisé tant que « Quêtes et objectifs » est coupé.\nPar défaut : activé.",
     "LeveTarget": "{0} (niveau {1}) : cible de votre mandat",
     "ShowQuestsHelp": "Affiche les marqueurs des quêtes, objectifs et événements que le jeu montre sur sa carte.\nPar défaut : activé.",
     "ShowQuestAreasHelp": "Dessine la zone de recherche des objectifs de quête (cercle coloré).\nPar défaut : activé.",
