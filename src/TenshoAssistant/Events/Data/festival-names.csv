@@ -1,6 +1,6 @@
 # FestivalName (seasonal event names, English only), embedded by Tensho Assistant (DEC-023, point 7, 0.342). Values kept as published.
-# Source: LuminaSupplemental, src/LuminaSupplemental.Excel/Generated/FestivalName.csv, commit bd265c2b39868387937ae5b0c038593af997e0f9
-#   https://github.com/Critical-Impact/LuminaSupplemental — original file SHA-256 c6eb3780de6c209dd83514140d4fe30300200c7f089e9769b2350fda4bec8da6
+# Source: LuminaSupplemental, src/LuminaSupplemental.SpaghettiGenerator/ManualData/FestivalName.csv, commit ef4372ebdc78684dae430705e6c619b287661ded
+#   https://github.com/Critical-Impact/LuminaSupplemental — original file SHA-256 50113f38849ec74e576a8e814131f0046b43ac3b2d958bdbf0b9f7dff1fa6ef7
 # Licence: GNU General Public License v3.0 (GPL-3.0), Copyright (C) Critical-Impact and LuminaSupplemental contributors.
 # This file is distributed under the same licence as Tensho Assistant (GPL-3.0); full licence text: LICENSE at the root of the repository.
 # There is no warranty, to the extent permitted by law (GPL-3.0 sections 15 and 16).
@@ -132,7 +132,8 @@ FestivalId,Name
 174,Moonfire Faire (2026)
 175,The Rising (2026)
 176,All Saint's Wake (2026)
-257,Unknown
+256,Unmoored Isle
+257,Keybound Brawler
 258,Starlight Celebration (2026)
 259,Heavensturn (2027)
 260,Valentione's Day (2027)
