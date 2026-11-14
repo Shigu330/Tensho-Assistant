@@ -1000,7 +1000,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.852) Fenêtre d'une quête, clic droit sur une récompense : entrée Tensho ; survol : panneau ou ligne « Item hover without panel » au journal.
 
-- [ ] (0.853) Tillac de Limsa, clic droit sur la cible de quête : « Éthérite la plus proche », puis Limsa et l'éthernet jusqu'à la guilde.
+- [x] (0.853) Tillac de Limsa, clic droit sur la cible de quête : « Éthérite la plus proche », puis Limsa et l'éthernet jusqu'à la guilde.
 
 
 
@@ -1375,7 +1375,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1141) Salle de jeu de la Triple Triade (Gold Saucer, 579) : Tensho reste allumé dans la salle publique et se coupe dans un match de l'arène ; dalamud.log montre « Competitive arena check » sans avertissement
+- [x] (0.1141) Salle de jeu de la Triple Triade (Gold Saucer, 579) : Tensho reste allumé dans la salle publique et se coupe dans un match de l'arène ; dalamud.log montre « Competitive arena check » sans avertissement
 
 - [ ] (0.1142) Deux clients du jeu sur le même profil : lancer le second pendant que le premier enregistre la banque ; Stockage › Banque du second dit d'abord « attend », puis se charge seul en quelques secondes
 
@@ -1384,7 +1384,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] (0.1144) Collection › Magie bleue : la liste du grimoire se remplit comme avant ; « Lire les pages manquantes » avance page par page ; dalamud.log sans erreur
 
 
-- [ ] (0.1148) Atelier de la compagnie › historique des voyages : après le rechargement, la même liste qu'avant ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; au prochain retour d'un sous-marin, le voyage s'ajoute
+- [x] (0.1148) Atelier de la compagnie › historique des voyages : après le rechargement, la même liste qu'avant ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; au prochain retour d'un sous-marin, le voyage s'ajoute
 
 
 - [x] (0.1149) Stockage › Banque (tous les personnages, servants, sacoches, arsenal, coffre de compagnie) : après le rechargement, tout ce qui était enregistré est là ; dalamud.log dit le fichier d'avant déplacé vers TenshoData.db ; before-sqlite-<date>/InventoryBank/ existe à la racine du dossier du plugin ; une nouvelle lecture d'un servant s'enregistre
@@ -1401,11 +1401,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1158) Paramètres › Avancé › Application de bureau › « Pages dans le jeu et dans l'application de bureau » : mettre « Objets » sur « Application seulement » : la page quitte la navigation du jeu et reste dans celle de l'application ; « Marché » sur « Jeu seulement » : l'inverse ; Accueil, Paramètres, la carte, l'artisanat en direct et la Revue de mode ne sont pas proposés ; « ↺ » remet « Jeu et application »
+- [x] (0.1158) Paramètres › Avancé › Application de bureau › « Pages dans le jeu et dans l'application de bureau » : mettre « Objets » sur « Application seulement » : la page quitte la navigation du jeu et reste dans celle de l'application ; « Marché » sur « Jeu seulement » : l'inverse ; Accueil, Paramètres, la carte, l'artisanat en direct et la Revue de mode ne sont pas proposés ; « ↺ » remet « Jeu et application »
 
 - [x] (0.1159) Rappels › onglet « Alarmes (N) » : les alarmes posées avec une cloche des minuteurs et les alarmes automatiques (servants, voyages, escouade) y sont, avec leurs boutons ; « Rappels (N) » dans le menu ; l'outil Alarmes ne les liste plus et son chiffre ne les compte plus ; elles sonnent toujours
 
-- [ ] (0.1160) Jardinage › onglet « Alarmes (N) » : chaque lit noté au journal montre son prochain entretien et sa récolte avec l'heure ; « Jardinage (N) » dans le menu ; « Me le rappeler dans le chat » décoché : l'onglet le dit et le chiffre disparaît
+- [x] (0.1160) Jardinage › onglet « Alarmes (N) » : chaque lit noté au journal montre son prochain entretien et sa récolte avec l'heure ; « Jardinage (N) » dans le menu ; « Me le rappeler dans le chat » décoché : l'onglet le dit et le chiffre disparaît
 
 - [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
 
@@ -1415,21 +1415,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1164) Après quelques changements de réglage (fenêtre, alarmes) : dalamud.log n'a plus de ligne « Slow settings save » au-delà de 50 ms ni « Long UiBuilder(Tensho Assistant) » au moment d'un clic sur un réglage ; aucune ligne « saved on the game's thread, as before »
 
 
-- [ ] (0.1165) Jardin avec plusieurs emplacements notés : clic droit sur une plante (menu « Potager N, emplacement M »), Entretenir : dans Jardinage, seul cet emplacement passe à « entretenu » (heure d'entretien suivante repoussée), les autres et l'onglet Alarmes suivent ; en mode développeur, dalamud.log a « Garden menu read: window …, patch N, bed M. »
+- [x] (0.1165) Jardin avec plusieurs emplacements notés : clic droit sur une plante (menu « Potager N, emplacement M »), Entretenir : dans Jardinage, seul cet emplacement passe à « entretenu » (heure d'entretien suivante repoussée), les autres et l'onglet Alarmes suivent ; en mode développeur, dalamud.log a « Garden menu read: window …, patch N, bed M. »
 
 
 
-- [ ] (0.1166) Carte de Tensho sur la Forêt centrale : clic droit, onglet Éthérites : chaque éthérite a son nom (plus d'icône seule) ; survol de l'icône de l'éthérite de Bentbranch : son nom ; la recherche de la carte trouve « Bentbranch »
+- [x] (0.1166) Carte de Tensho sur la Forêt centrale : clic droit, onglet Éthérites : chaque éthérite a son nom (plus d'icône seule) ; survol de l'icône de l'éthérite de Bentbranch : son nom ; la recherche de la carte trouve « Bentbranch »
 
-- [ ] (0.1167) Point de récolte avec un objet « RARE » (une seule prise) : le prendre, puis l'objet suivant proposé : son plan dit « Plan établi sur ce qui reste à ce point (N PR, 5 essais) » et compte sur les essais restants, plus sur ceux de l'ouverture ; l'action suivante proposée correspond au plan
+- [x] (0.1167) Point de récolte avec un objet « RARE » (une seule prise) : le prendre, puis l'objet suivant proposé : son plan dit « Plan établi sur ce qui reste à ce point (N PR, 5 essais) » et compte sur les essais restants, plus sur ceux de l'ouverture ; l'action suivante proposée correspond au plan
 
-- [ ] (0.1168) Application de bureau, page Mes outils : boutons Créer, Importer, Galerie, Modifier, Retirer et cases de progression grisés ; barre d'état « Lecture seule : ce que vous créez ou changez ici n'est pas enregistré »
+- [x] (0.1168) Application de bureau, page Mes outils : boutons Créer, Importer, Galerie, Modifier, Retirer et cases de progression grisés ; barre d'état « Lecture seule : ce que vous créez ou changez ici n'est pas enregistré »
 
-- [ ] (0.1168) Application de bureau, page Alarmes : alarme manuelle grisée ; page Paramètres : changer un réglage le remet aussitôt et le bas de la fenêtre dit « Non enregistré : … faites ce changement dans le jeu »
+- [x] (0.1168) Application de bureau, page Alarmes : alarme manuelle grisée ; page Paramètres : changer un réglage le remet aussitôt et le bas de la fenêtre dit « Non enregistré : … faites ce changement dans le jeu »
 
 - [x] (0.1168) Dans le jeu : créer une alarme, un outil et un préréglage d'artisanat fonctionne comme avant (rien de grisé)
 
-- [ ] (0.1169) Atelier de la compagnie (sous-marins revenus) : l'historique des voyages garde les voyages d'avant après un rechargement du plugin, et les nouveaux s'ajoutent
+- [x] (0.1169) Atelier de la compagnie (sous-marins revenus) : l'historique des voyages garde les voyages d'avant après un rechargement du plugin, et les nouveaux s'ajoutent
 
 - [x] (0.1169) Hauts faits suivis : la progression lue reste après un rechargement ; dalamud.log sans erreur « Tensho data »
 
@@ -1437,31 +1437,31 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1172) Objets › Organisation, sacs du personnage : l'aperçu remplit le sac 1, puis le sac 3, puis le 2, puis le 4 ; « Appliquer » range les sacs du jeu de la même façon ; une sacoche ou un servant se range comme avant
 
-- [ ] (0.1174) Mode développeur, en extérieur : vaincre un monstre qui laisse un objet, même sans le cibler : dalamud.log montre « Discovery: defeat of … read from the game's message » puis « Discovery: MonsterDrop item … » (plus de « Item gain not attributed » pour ce butin)
+- [x] (0.1174) Mode développeur, en extérieur : vaincre un monstre qui laisse un objet, même sans le cibler : dalamud.log montre « Discovery: defeat of … read from the game's message » puis « Discovery: MonsterDrop item … » (plus de « Item gain not attributed » pour ce butin)
 
 - [ ] (0.1174) Mode développeur, chasse au trésor en extérieur (carte déchiffrée, sans portail) : le butin du coffre donne « Discovery: ItemFromItem item … » avec l'objet de la carte ; Découvertes › la carte au trésor montre ces objets
 
-- [ ] (0.1175) Mode développeur, sur un point de récolte où un objet porte « RARE » (terreau III, par exemple) : ouvrir le point, faire une récolte sur l'objet RARE puis une autre ; dalamud.log a des lignes « addons » Gathering: …, à garder pour le relevé (logread.py)
+- [x] (0.1175) Mode développeur, sur un point de récolte où un objet porte « RARE » (terreau III, par exemple) : ouvrir le point, faire une récolte sur l'objet RARE puis une autre ; dalamud.log a des lignes « addons » Gathering: …, à garder pour le relevé (logread.py)
 
-- [ ] (0.1176) Sur l'île de Lunule : Tensho › Eurêka et Bozja › onglet de l'île : le savoir (465 / 2800 par exemple) et les pièces comme dans le jeu ; le job de soutien porté en premier, en doré, avec le même niveau que la fenêtre des jobs de soutien du jeu ; « appris ensuite » donne l'action ou le trait du niveau suivant (info-bulle : sa description) ; l'expérience du job porté comme dans le jeu
+- [x] (0.1176) Sur l'île de Lunule : Tensho › Eurêka et Bozja › onglet de l'île : le savoir (465 / 2800 par exemple) et les pièces comme dans le jeu ; le job de soutien porté en premier, en doré, avec le même niveau que la fenêtre des jobs de soutien du jeu ; « appris ensuite » donne l'action ou le trait du niveau suivant (info-bulle : sa description) ; l'expérience du job porté comme dans le jeu
 
-- [ ] (0.1176) Hors de l'île, après y être passé pendant la séance : l'onglet garde le dernier relevé avec son heure ; sans passage : « Pas encore lus pendant cette séance »
+- [x] (0.1176) Hors de l'île, après y être passé pendant la séance : l'onglet garde le dernier relevé avec son heure ; sans passage : « Pas encore lus pendant cette séance »
 
 - [ ] (0.1176) Mode développeur, sur l'île : dalamud.log, ligne « fields » : « experience … needed … » à comparer avec l'expérience du jeu (pour savoir si elle compte depuis le début du niveau)
 
 - [ ] (0.1177) Barre d'usure et page Équipement › Usure et symbiose : une pièce peu portée affiche le même pourcentage que la fiche du personnage du jeu (1 % et non 0 %) ; l'info-bulle de la page donne la valeur exacte ; près de 100 %, comparer avec le jeu (99 % tant que l'extraction n'est pas possible)
 
-- [ ] (0.1178) Sur l'île de Lunule : le panneau apparaît (job de soutien porté en doré, niveau, barre d'expérience, « Ensuite : … », barre du savoir, pièces) et disparaît en quittant l'île ; ses nombres comme ceux du jeu ; il se déplace à la souris
+- [x] (0.1178) Sur l'île de Lunule : le panneau apparaît (job de soutien porté en doré, niveau, barre d'expérience, « Ensuite : … », barre du savoir, pièces) et disparaît en quittant l'île ; ses nombres comme ceux du jeu ; il se déplace à la souris
 
-- [ ] (0.1178) Eurêka et Bozja › onglet de l'île : décocher « Panneau sur l'île » le cache ; les boutons « Ce que permet d'acheter : pièce d'argent / d'or des douze cités » ouvrent Rangements › Que faire avec ? sur la bonne pièce
+- [x] (0.1178) Eurêka et Bozja › onglet de l'île : décocher « Panneau sur l'île » le cache ; les boutons « Ce que permet d'acheter : pièce d'argent / d'or des douze cités » ouvrent Rangements › Que faire avec ? sur la bonne pièce
 
-- [ ] (0.1178) Eurêka et Bozja › onglet de l'île : « Archives occultes lues : N / M » comme dans le jeu ; « Voir ce qui manque » ouvre Collections › Archives occultes, filtre non confirmées
+- [x] (0.1178) Eurêka et Bozja › onglet de l'île : « Archives occultes lues : N / M » comme dans le jeu ; « Voir ce qui manque » ouvre Collections › Archives occultes, filtre non confirmées
 
-- [ ] (0.1179) Sur l'île de Lunule, hors combat : à l'annonce du jeu « Nouvelle confrontation critique ! Début dans 1:07 », une ligne [Tensho] « Confrontation critique : … — inscriptions ouvertes, encore 1:07 — zone ( X , Y ) » ; le temps et le lieu comme sur la carte du jeu ; une seule fois
+- [x] (0.1179) Sur l'île de Lunule, hors combat : à l'annonce du jeu « Nouvelle confrontation critique ! Début dans 1:07 », une ligne [Tensho] « Confrontation critique : … — inscriptions ouvertes, encore 1:07 — zone ( X , Y ) » ; le temps et le lieu comme sur la carte du jeu ; une seule fois
 
-- [ ] (0.1179) Sur l'île : un ALÉA qui commence donne une ligne « ALÉA : nom (niveau N) — encore m:ss — zone ( X , Y ) », une seule fois ; l'application de bureau reçoit les mêmes lignes
+- [x] (0.1179) Sur l'île : un ALÉA qui commence donne une ligne « ALÉA : nom (niveau N) — encore m:ss — zone ( X , Y ) », une seule fois ; l'application de bureau reçoit les mêmes lignes
 
-- [ ] (0.1179) Sur l'île, en combat : aucune ligne ni panneau ; à la fin du combat, la confrontation encore ouverte est dite
+- [x] (0.1179) Sur l'île, en combat : aucune ligne ni panneau ; à la fin du combat, la confrontation encore ouverte est dite
 
 - [ ] (0.1179) Mode développeur, sur l'île : dalamud.log, lignes « Reading occultevents » à chaque nouvelle confrontation et changement d'étape (inscription, préparation, combat) : comparer « left » au compte à rebours du jeu
 
@@ -1473,39 +1473,39 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1184) Mode développeur : après deux ou trois rechargements de Tensho, dalamud.log, lignes « Load created » et « Load 10 s later » : « heap … MB, Tensho load contexts N of M, previous instance … » ; si N grandit à chaque rechargement ou si l'instance d'avant reste « still alive », une fuite est vue (à rapporter)
 
-- [ ] (0.1186) Après un rechargement de Tensho, carte ouverte : les vendeurs (et ceux des fêtes en cours) apparaissent sur la carte comme avant ; page Événements : les PNJ des fêtes se chargent toujours
+- [x] (0.1186) Après un rechargement de Tensho, carte ouverte : les vendeurs (et ceux des fêtes en cours) apparaissent sur la carte comme avant ; page Événements : les PNJ des fêtes se chargent toujours
 
 - [ ] (0.1187) Mode développeur : après trois rechargements de Tensho ou plus, dalamud.log, lignes « Earlier instance … » dix secondes après un chargement : pour les instances de deux chargements ou plus en arrière, « 0 of N parts alive » (le contexte peut rester « alive ») ; si des parties restent vivantes, rapporter leurs noms. Aucune ligne « framework subscriptions were still registered at unload »
 
 - [ ] (0.1188) Mode développeur : après un rechargement de Tensho, carte ouverte, dalamud.log : la première image de la carte (« Slow frame … map canvas ») n'a plus « canvas vendors » ni « icon list » en tête ; lignes « Earlier instance … » : parties collectées, état du déchargement, champs statiques
 
-- [ ] (0.1189) Hors mode développeur, en plein air avec des monstres autour : icônes et notes des monstres (listes, souhaits, journal de chasse) comme avant. Mode développeur : lignes « Nearby monsters » toujours écrites ; après trois rechargements, lignes « Earlier instance … hubs emptied, N of M parts alive » : rapporter les parties encore vivantes
+- [x] (0.1189) Hors mode développeur, en plein air avec des monstres autour : icônes et notes des monstres (listes, souhaits, journal de chasse) comme avant. Mode développeur : lignes « Nearby monsters » toujours écrites ; après trois rechargements, lignes « Earlier instance … hubs emptied, N of M parts alive » : rapporter les parties encore vivantes
 
-- [ ] (0.1190) Mode développeur : jouer quelques minutes (ville, plein air, carte ouverte), puis dalamud.log, lignes « Steady frames over 60 s » : rapporter les postes dont la moyenne dépasse 1 ms ou dont le 95e centile dépasse 5 ms
+- [x] (0.1190) Mode développeur : jouer quelques minutes (ville, plein air, carte ouverte), puis dalamud.log, lignes « Steady frames over 60 s » : rapporter les postes dont la moyenne dépasse 1 ms ou dont le 95e centile dépasse 5 ms
 
-- [ ] (0.1191) En plein air avec des monstres autour, juste après un rechargement de Tensho : icônes au-dessus des monstres et notes « journal de chasse » comme avant ; mode développeur : la première image des overlays (« Slow frame ») n'a plus « MonsterIcons » à 50 ms ou plus
+- [x] (0.1191) En plein air avec des monstres autour, juste après un rechargement de Tensho : icônes au-dessus des monstres et notes « journal de chasse » comme avant ; mode développeur : la première image des overlays (« Slow frame ») n'a plus « MonsterIcons » à 50 ms ou plus
 
 - [ ] (0.1192) Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance 0.1192… hubs emptied, N of M parts alive: … » : rapporter les chemins encore vivants (ils nomment ce qui retient l'ancienne instance)
 
 - [ ] (0.1193) Page Tenues du jeu : « Équiper » une tenue fonctionne comme avant ; mode développeur : plus de ligne « Slow reader: GameGearsetReader… » au moment où la tenue change
 
-- [ ] (0.1194) Carnet d'artisanat et simulateur : une rotation calculée par Raphael s'affiche comme avant, et un second calcul de la même recette revient vite (séquence gardée sur le disque). Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance … » de l'instance d'avant la dernière (sans « hubs emptied ») : quelques parties vivantes seulement, au lieu de 463 sur 471 ; rapporter le nombre
+- [x] (0.1194) Carnet d'artisanat et simulateur : une rotation calculée par Raphael s'affiche comme avant, et un second calcul de la même recette revient vite (séquence gardée sur le disque). Mode développeur : après trois rechargements de Tensho à partir de cette version, dalamud.log, ligne « Earlier instance … » de l'instance d'avant la dernière (sans « hubs emptied ») : quelques parties vivantes seulement, au lieu de 463 sur 471 ; rapporter le nombre
 
-- [ ] (0.1202) Panneau des collectables (point de récolte collectionnable) : le plan conseillé et ses étapes s'affichent comme avant, un peu plus vite ; Prudent, Équilibré et Tenter sa chance donnent les mêmes conseils qu'avant
+- [x] (0.1202) Panneau des collectables (point de récolte collectionnable) : le plan conseillé et ses étapes s'affichent comme avant, un peu plus vite ; Prudent, Équilibré et Tenter sa chance donnent les mêmes conseils qu'avant
 
 - [ ] (0.1204) Mode développeur : après deux rechargements du plugin, dalamud.log n'a plus qu'une ligne courte « Reading eventMarkers: the same as earlier in this game session » (et « Submarine voyage check …: the same 6 lines … ») au lieu du texte entier ; un nouveau texte (autre zone, autre carte) est écrit en entier
 
-- [ ] (0.1206) Carte : quelques secondes après le chargement (plus de 12 s), ouvrir une carte de région (Nocturne, Forêt…) pour la première fois : elle s'affiche sans à-coup ; noms des liens et éthérites présents comme avant
+- [x] (0.1206) Carte : quelques secondes après le chargement (plus de 12 s), ouvrir une carte de région (Nocturne, Forêt…) pour la première fois : elle s'affiche sans à-coup ; noms des liens et éthérites présents comme avant
 
 - [ ] (0.1206) Mode développeur : ouvrir Rangements puis Paramètres et changer d'onglet : si une image lente est notée dans dalamud.log, la ligne « Slow frame » nomme l'onglet (« storage … », « settings … »)
 
-- [ ] (0.1207) Application de bureau ouverte, jeu lancé : ouvrir puis fermer des pages qui lisent les gils ou les hauts faits sans rien changer : l'application ne recopie plus le fichier de données à chaque fois (pas de rechargement visible) ; un vrai changement (gils gagnés) arrive toujours
+- [x] (0.1207) Application de bureau ouverte, jeu lancé : ouvrir puis fermer des pages qui lisent les gils ou les hauts faits sans rien changer : l'application ne recopie plus le fichier de données à chaque fois (pas de rechargement visible) ; un vrai changement (gils gagnés) arrive toujours
 
 - [ ] (0.1211) Jardin : récolter deux emplacements à moins de 5 secondes d'écart (ouvrir le menu de chacun) : les deux sont retirés du journal comme récoltés
 
 - [ ] (0.1212) Rangements › Personnages : « Effacer » un personnage qui n'est pas connecté : il disparaît de la liste, son journal des gils et ses hauts faits ne s'affichent plus pour lui
 
-- [ ] (0.1220) Paramètres › Général › Langue : Deutsch et 日本語 marqués « (partiel) » ; Tensho en anglais : pourcentages sans espace (usure de l'équipement, statistiques du personnage) et nombres « 1,234 » ; en français : « 1 234 » et « 12,5 % »
+- [x] (0.1220) Paramètres › Général › Langue : Deutsch et 日本語 marqués « (partiel) » ; Tensho en anglais : pourcentages sans espace (usure de l'équipement, statistiques du personnage) et nombres « 1,234 » ; en français : « 1 234 » et « 12,5 % »
 
 - [ ] (0.1220) Barre serveur des monnaies et prochaine alarme : « 3h 05m » en anglais, « 3 h 05 » en français
 
@@ -1520,11 +1520,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1222) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : guide : nouvelle étape « Panneaux à côté des fenêtres du jeu » (tout masquer ou afficher, puis chaque panneau) et visite réduite aux pages pour tous sans case cochée ; aide : quatre nouvelles questions de la FAQ ; liste des outils de l'accueil : aucun changement (pas de nouvelle page)
 
-- [ ] (0.1223) Tensho en anglais : pages Compagnie libre (Submersible), Grandes compagnies (rank), infobulles « On: / Off: », orthographe britannique ; rien de cassé dans les infobulles et les boutons « Refresh »
+- [x] (0.1223) Tensho en anglais : pages Compagnie libre (Submersible), Grandes compagnies (rank), infobulles « On: / Off: », orthographe britannique ; rien de cassé dans les infobulles et les boutons « Refresh »
 
 - [x] (0.1226) Paramètres › Général : activer « Sacs », « État de l'équipement » et « Zone et instance » dans la barre serveur ; les trois entrées apparaissent, se mettent à jour (ramasser un objet, changer de zone), clic : Rangements, Équipement, carte
 
-- [ ] (0.1226) Zone à instances (instance 2 par exemple) : la marque d'instance du jeu suit le nom de la zone ; hors instance : le nom seul
+- [x] (0.1226) Zone à instances (instance 2 par exemple) : la marque d'instance du jeu suit le nom de la zone ; hors instance : le nom seul
 
 - [x] (0.1227) Fiche d'un objet récent (onglet des sources ouvert une fois) : « Ajouté au patch 7.x (Garland Tools) » dans l'en-tête ; Garland coupé dans Paramètres › Données et sources : la ligne n'apparaît pas
 
@@ -1538,23 +1538,23 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1230) Fenêtre principale, champ « Chercher dans Tensho… » en haut de la navigation : taper « mine » : pages, objets, quêtes et lieux listés sous le champ ; clic sur un objet : sa page s'ouvre ; clic sur un lieu : la carte de Tensho s'ouvre sur ce lieu ; une lettre seule : rien n'est listé
 
-- [ ] (0.1230) Application de bureau : le même champ ; une page placée « en jeu seulement » n'est pas proposée
+- [x] (0.1230) Application de bureau : le même champ ; une page placée « en jeu seulement » n'est pas proposée
 
-- [ ] (0.1231) Mode développeur, artisan ou récolteur : lire un manuel (militaire, commercial ou révisé) puis faire une synthèse ou une récolte : dalamud.log a une ligne « Reading statuses » avec 45 ou 46 et son param à chaque changement (noter le param avant et après quelques gains d'expérience)
+- [x] (0.1231) Mode développeur, artisan ou récolteur : lire un manuel (militaire, commercial ou révisé) puis faire une synthèse ou une récolte : dalamud.log a une ligne « Reading statuses » avec 45 ou 46 et son param à chaque changement (noter le param avant et après quelques gains d'expérience)
 
 - [ ] (0.1232) Dans une zone d'un rang S « vaincre 100 monstres » (Heavensward, Stormblood, Shadowbringers ou Endwalker) : vaincre un monstre de la liste : Cartes › Conditions des rangs S, ligne « Vos monstres vaincus » passe à 1 ; un monstre vaincu par un autre joueur ne compte pas ; « Effacer » remet ce rang à 0 sans toucher aux autres
 
-- [ ] (0.1233) Page Mini Cactpot : « Prochain JACTA » à la prochaine heure :00, :20 ou :40 de l'horloge du PC ; « Tirage du Méga Cactpot » le bon jour à l'heure du PC (Europe : samedi 20:00 en heure d'hiver française) ; cloche du tirage : une alarme hebdomadaire apparaît dans Alarmes
+- [x] (0.1233) Page Mini Cactpot : « Prochain JACTA » à la prochaine heure :00, :20 ou :40 de l'horloge du PC ; « Tirage du Méga Cactpot » le bon jour à l'heure du PC (Europe : samedi 20:00 en heure d'hiver française) ; cloche du tirage : une alarme hebdomadaire apparaît dans Alarmes
 
 - [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir le support des roues éthérées (une roue posée au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle la roue a été posée et le temps restant que montre le jeu
 
-- [ ] (0.1235) Page Chocobo, section « Chocobo de course » avant toute course : « Pas encore lu » ; ouvrir la fiche du chocobo de course dans le jeu (Gold Saucer, guichet des courses) : catégorie, cote, pedigree, caractéristiques et aptitudes identiques à la fenêtre du jeu
+- [x] (0.1235) Page Chocobo, section « Chocobo de course » avant toute course : « Pas encore lu » ; ouvrir la fiche du chocobo de course dans le jeu (Gold Saucer, guichet des courses) : catégorie, cote, pedigree, caractéristiques et aptitudes identiques à la fenêtre du jeu
 
-- [ ] (0.1236) Tensho en anglais : la navigation et les titres des pages disent « Allied Societies » et « Custom Deliveries »
+- [x] (0.1236) Tensho en anglais : la navigation et les titres des pages disent « Allied Societies » et « Custom Deliveries »
 
 - [ ] (0.1237) Événements (une fête en cours) et une boutique dont un objet demande une quête : la coche des quêtes faites est la même qu'avant ; mode développeur : pas de ligne « slow frame » pour Events au changement du journal
 
-- [ ] (0.1238) Application de bureau : elle s'ouvre, la navigation n'a pas les pages laissées au jeu, une page se choisit, une alarme due sonne avec sa notification Windows ; sa console ne dit ni « Contract » ni « Typed contract »
+- [x] (0.1238) Application de bureau : elle s'ouvre, la navigation n'a pas les pages laissées au jeu, une page se choisit, une alarme due sonne avec sa notification Windows ; sa console ne dit ni « Contract » ni « Typed contract »
 
 - [x] (0.1239) Chargement et déchargement du plugin (désactiver puis réactiver dans Dalamud) : aucune erreur Tensho dans dalamud.log ; la banque (Rangements) garde ses sacs et ses servants
 
@@ -1570,9 +1570,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1242) Page Équipement : choisir une pièce, poser une matéria, changer de job prévu, cocher « supposer HQ » : statistiques, niveau d'objet moyen et valeurs dérivées changent aussitôt comme avant ; mode développeur : pas de ligne « slow frame » pour Gear
 
-- [ ] (0.1243) Planificateur des aéronefs, objectif « Butin : un objet » : choisir un objet (recherche), « Peut tomber à » nomme des secteurs, chaque trajet listé passe par l'un d'eux
+- [x] (0.1243) Planificateur des aéronefs, objectif « Butin : un objet » : choisir un objet (recherche), « Peut tomber à » nomme des secteurs, chaque trajet listé passe par l'un d'eux
 
-- [ ] (0.1243) Objectif « Débloquer un secteur » : choisir un secteur, la ligne dit par quel secteur, le rang et l'ordre d'exploration ; chaque trajet passe par ce secteur
+- [x] (0.1243) Objectif « Débloquer un secteur » : choisir un secteur, la ligne dit par quel secteur, le rang et l'ordre d'exploration ; chaque trajet passe par ce secteur
 
 - [ ] (0.1244) Mode développeur, Diagnostics : la section « Tableau de bord » en tête, état général et neuf lignes ; les valeurs bougent une fois par seconde ; repliée, rien ne change
 
@@ -1582,11 +1582,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1246) Paramètres › Général : cocher « État de Tensho dans un panneau » : petit panneau « Tensho : ok · … Mo » déplaçable, bouton Détails qui ouvre les paramètres ; avec « Seulement en cas de souci », le panneau disparaît tant que tout va bien
 
-- [ ] (0.1246) Application de bureau reliée au jeu (Paramètres › Avancé) : la barre d'état dit « Tensho : ok · … Mo » après la zone ; Paramètres › Général de l'application montre « En jeu : … » dans le tableau de bord
+- [x] (0.1246) Application de bureau reliée au jeu (Paramètres › Avancé) : la barre d'état dit « Tensho : ok · … Mo » après la zone ; Paramètres › Général de l'application montre « En jeu : … » dans le tableau de bord
 
-- [ ] (0.1247) Paramètres › Général, état de Tensho activé : le tableau de bord dit « Démarré en … ms », « Panneaux : aucun coupé » ; après quelques prix du marché affichés, la ligne des requêtes compte universalis.app
+- [x] (0.1247) Paramètres › Général, état de Tensho activé : le tableau de bord dit « Démarré en … ms », « Panneaux : aucun coupé » ; après quelques prix du marché affichés, la ligne des requêtes compte universalis.app
 
-- [ ] (0.1248) Compagnie › Aéronefs, après avoir ouvert la liste des aéronefs à l'atelier : ouvrir « Vos aéronefs : meilleur trajet de chacun » : une ligne par aéronef avec son trajet ; changer l'objectif change les lignes ; « Choisir » remplit le planificateur ; aucun à-coup visible à l'ouverture
+- [x] (0.1248) Compagnie › Aéronefs, après avoir ouvert la liste des aéronefs à l'atelier : ouvrir « Vos aéronefs : meilleur trajet de chacun » : une ligne par aéronef avec son trajet ; changer l'objectif change les lignes ; « Choisir » remplit le planificateur ; aucun à-coup visible à l'ouverture
 
 - [ ] (0.1252) Fenêtre de Tensho rétrécie sous environ 620 px de large : la liste des pages disparaît, un bouton à trois barres en haut à gauche l'ouvre dans une fenêtre surgissante ; choisir une page la referme ; l'en-tête nomme la page
 
@@ -1773,6 +1773,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1316) Discord (si un salon est réglé) : le bouton d'essai envoie « … dans 5 min (…) » ; un message personnel avec [minutes] garde le nombre seul
 
 - [ ] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
+
+- [ ] (0.1318) Eurêka et Bozja › Météo et nuit : chaque monstre « nuit » montre une prochaine fenêtre (« maintenant » ou dans moins de 70 min) ; les monstres à météo montrent la leur quand la météo vient dans les 28 h ; comparer une ligne avec la météo annoncée en jeu dans la zone
+
+- [ ] (0.1319) Rangements › Gils, période 1 jour : finir une ALÉA (ligne « ALÉA (récompenses) »), vaincre quelques monstres qui donnent des gils (« Monstres vaincus »), achever une rubrique du carnet d'objectifs (« Carnet d'objectifs ») ; acheter, vendre à un PNJ, réparer chez un PNJ, se téléporter : chacun dans sa catégorie, aucun dans « Autre »
+
+- [ ] (0.1320) Mor Dhona, carte de Tensho : plus d'icône « Échangeur » seule en X 21.4 Y 5.5 (à l'ouest de la Maison des splendeurs) ; les autres icônes de marchands et d'échange que la carte du jeu montre sont toujours là ; ouvrir la carte du jeu puis regarder la ligne « map icon unlocks » de l'auto-contrôle
+
+- [ ] (0.1321) Mor Dhona, après avoir ouvert la carte du jeu : la carte de Tensho montre exactement les icônes d'échange et de marchands que la carte du jeu montre (plus d'« Échangeur » seul en X 21.4 Y 5.5 ; l'icône vers X 28 Y 13.7 est là si le jeu la montre)
+
+- [ ] (0.1322) Objets › Organisation, sacs du personnage, avec la zone qui couvre les 140 cases : l'aperçu remplit le sac 1, puis le sac 3, puis le sac 2 ; « Appliquer » (ou le bouton Tensho de l'inventaire) : dans le jeu, la colonne de gauche (sacs 1 et 3) se remplit avant celle de droite
 
 **0.535 : interfaces** — à voir en jouant
 
