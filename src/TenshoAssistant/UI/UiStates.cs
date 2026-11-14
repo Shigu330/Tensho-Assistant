@@ -12,6 +12,12 @@ public enum UiColour { Muted, Warning, Error }
 /// </summary>
 public static class UiStates
 {
+    /// <summary>
+    /// X-385 (0.1361, user report of 15/11: « Visual sort applied to the four bags… » twice on the inventory organisation page): the raw line
+    /// developer mode adds under a message, or null when it says the same as the line already shown (a known message, translated both times).
+    /// </summary>
+    public static string? DeveloperDetail(string shown,string detail)=>string.Equals(shown,detail,StringComparison.Ordinal) ? null:detail;
+
     public static string Key(UiState state)=>state switch
     {
         UiState.Waiting=>"Common.StateWaiting",

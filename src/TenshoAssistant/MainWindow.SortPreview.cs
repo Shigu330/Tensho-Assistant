@@ -152,9 +152,12 @@ internal sealed partial class MainWindow
             if((preview.Slots is { } all ? all[position]:position<preview.Stacks.Count ? preview.Stacks[position]:null) is { } shown && shown.Stack.DisplayIndex>=0 && shown.Stack.DisplayIndex!=position)movedStacks++;
         ImGui.TextDisabled(localization.Format("SortUi.Moved",movedStacks));
         var openSlotMenu=false;
-        for (var bag = 0; bag < scope.ContainerCount; bag++)
+        // X-384 (0.1361): the frames in the order the sort fills them (bags 1, 3, 2, 4), each with its own number and slots.
+        var shownBags=InventorySortRules.ShownContainers(scope);
+        for (var shown = 0; shown < shownBags.Length; shown++)
         {
-            if (bag % framesPerRow != 0) ImGui.SameLine();
+            var bag=shownBags[shown];
+            if (shown % framesPerRow != 0) ImGui.SameLine();
             var visible = ImGui.BeginChild($"SortPreviewBag{bag}", new Vector2(frameWidth,frameHeight), true,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
             try

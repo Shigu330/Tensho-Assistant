@@ -23,8 +23,10 @@ internal sealed partial class MainWindow
 
     private void DrawServiceMessage(string message,string fallbackKey)
     {
-        ImGui.TextWrapped(UiMessages.Get(localization,message,fallbackKey));
-        if(developerMode)ImGui.TextWrapped(RawMessage(message));
+        var shown=UiMessages.Get(localization,message,fallbackKey);
+        ImGui.TextWrapped(shown);
+        // X-385 (0.1361): developer mode adds the raw message only when it says something else (a known message was drawn twice).
+        if(developerMode && UiStates.DeveloperDetail(shown,RawMessage(message)) is { } detail)ImGui.TextWrapped(detail);
     }
 
     private void DrawSortMessage(string message)

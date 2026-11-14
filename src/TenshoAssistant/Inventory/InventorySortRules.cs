@@ -99,6 +99,14 @@ public static class InventorySortRules
         return new[]{0,2,1,3}.SelectMany(bag=>Enumerable.Range(bag*scope.SlotsPerContainer,scope.SlotsPerContainer)).ToArray();
     }
 
+    /// <summary>
+    /// X-384 (0.1361, user request of 15/11: the preview showed bags 1, 2, 3, 4 while the sort fills them 1, 3, 2, 4): the order the preview
+    /// draws the containers (0-based): the order of <see cref="FillOrder"/> (bags 1, 3, 2, 4 for the player's four bags), so the sorted stacks
+    /// read on from one frame to the next; the other storages in their order. Each frame keeps its own number and slot numbers.
+    /// </summary>
+    public static int[] ShownContainers(InventorySortScope scope)
+        =>FillOrder(scope).Select(slot=>slot/Math.Max(1,scope.SlotsPerContainer)).Distinct().Where(bag=>bag<scope.ContainerCount).ToArray();
+
     public static InventorySortResult Build(IEnumerable<InventoryContainerSnapshot> containers,InventorySortScope scope,InventorySortProfile profile,
         Func<uint,(string Name,uint Category)> describe)
     {
