@@ -557,11 +557,11 @@ NETWORK = [
     ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com"], "Discovery.AutoExchange",
      ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs"],
      "the common files of this repository; after « Connect GitHub » only, the player's own sightings to an unlisted gist and one issue that links it "
-     "(described below); on « Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › Report a problem only, the "
+     "(described below); on « Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › « Report a problem or help » only, the "
      "player's ticket, whose exact text is shown first",
      "les fichiers communs de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist non répertorié et un ticket qui y renvoie "
      "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique » ; et, seulement sur « Envoyer maintenant » "
-     "d'Aide › Signaler un problème, le ticket du joueur, dont le texte exact est montré d'abord"),
+     "d'Aide › « Signaler un problème ou aider », le ticket du joueur, dont le texte exact est montré d'abord"),
     ("Discord webhook", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled",
      ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],
      "HTTPS POST of alarms and alerts to the player's own webhook (described below)",
@@ -615,6 +615,17 @@ REQUEST = re.compile(r"\bHttpClient\b|\bBoundedHttp\b|\bHttpRequestMessage\b")
 HOST = re.compile(r'https?://([a-z0-9.-]+\.[a-z]{2,})|"([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|net|app|codes|gg|io|co|be|wiki|tv))"')
 
 
+# French names of the NETWORK rows (a proper name stays as it is).
+NETWORK_NAMES_FR = {
+    "Fashion Report (FFXIVGachaSpreadsheet)": "Revue de mode (FFXIVGachaSpreadsheet)",
+    "This repository": "Ce dépôt",
+    "Shared discoveries exchange": "Échange des découvertes partagées",
+    "Discord webhook": "Webhook Discord",
+    "Desktop app update": "Mise à jour de l'application de bureau",
+    "Desktop app install": "Installation de l'application de bureau",
+}
+
+
 def network_block(code):
     en = code == "en"
     texts = language(code)
@@ -627,7 +638,7 @@ def network_block(code):
         else:
             switch = "— (on a click)" if en else "— (sur un clic)"
         code_cell = ", ".join(f"`{file}`" for file in files)
-        rows.append(f"| **{name}**: {what_en if en else what_fr} | {', '.join(f'`{host}`' for host in hosts)} | {switch} | {code_cell} |"
+        rows.append(f"| **{name if en else NETWORK_NAMES_FR.get(name, name)}**: {what_en if en else what_fr} | {', '.join(f'`{host}`' for host in hosts)} | {switch} | {code_cell} |"
                     .replace("**:", "**:" if en else "** :"))
     return "\n".join(rows)
 
