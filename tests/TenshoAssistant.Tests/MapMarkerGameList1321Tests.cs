@@ -33,7 +33,7 @@ internal static class MapMarkerGameList1321Tests
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs")).Replace("\r\n","\n");
             // 0.1335 (X-351): the list is built, and kept while unchanged, by MapMarkerUnlock.Remember (tested in MapMarkerRemember1335Tests).
-            Check(reader.Contains("var remembered=MapMarkerUnlock.Remember(gameListedMarkers,agent->CurrentMapId,checks);") && reader.Contains("gameListedMarkers=remembered;"),"listed icons, same set kept");
+            Check(reader.Contains("var remembered=MapMarkerUnlock.Remember(gameListedMarkers,mapId,checks);") && reader.Contains("gameListedMarkers=remembered;"),"listed icons, same set kept");
             Check(reader.Contains("undiscovered,questPoints,unlockedMarkerBits,gameListedMarkers){ActiveLeve=ReadActiveLeve()});"),"published with the state");
             Check(reader.Contains("the bit's reading agrees on {agree} of {checks.Count}"),"the agreement said in the log");
         }),

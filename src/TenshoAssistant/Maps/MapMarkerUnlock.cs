@@ -81,6 +81,27 @@ public static class MapMarkerUnlock
         return (((pixelX-1024)/scale-offsetX)*16,((pixelY-1024)/scale-offsetY)*16);
     }
 
+    /// <summary>
+    /// 0.1338 (X-351): how many of a map's icons without an unlock bit (always drawn by the game) the game's list holds (same icon within two
+    /// world units): the game's list belongs to the map that it holds best, the player's or the one its map window shows.
+    /// </summary>
+    public static (int Found,int Total) Coverage(IEnumerable<(uint Icon,float PixelX,float PixelY)> plain,int sizeFactor,int offsetX,int offsetY,
+        IReadOnlyList<(uint Icon,int X,int Y,int Flags)> game)
+    {
+        int found=0,total=0;
+        foreach(var (icon,pixelX,pixelY) in plain)
+        {
+            total++;
+            var (x,y)=GamePosition(pixelX,pixelY,sizeFactor,offsetX,offsetY);
+            foreach(var marker in game)
+                if(marker.Icon==icon && Math.Abs(marker.X-x)<=32 && Math.Abs(marker.Y-y)<=32){found++;break;}
+        }
+        return (found,total);
+    }
+
+    /// <summary>0.1338 (X-351): the game's list is taken as this map's when it holds at least half of its icons without a bit (and one at least).</summary>
+    public static bool Holds((int Found,int Total) coverage)=>coverage.Total>0 && coverage.Found*2>=coverage.Total;
+
     /// <summary>One fixed icon with an unlock bit, compared with the game's own list: listed there (same icon within two world units), its flags (−1: not listed), and its bit read unlocked.</summary>
     public sealed record Check(ushort Bit,uint Icon,float PixelX,float PixelY,bool Listed,int Flags,bool Unlocked);
 

@@ -288,18 +288,37 @@ internal sealed class MapLiveReader : IDisposable
     private unsafe void CheckMarkerUnlocks()
     {
         var agent=AgentMap.Instance();
-        if(agent==null || agent->MapMarkerCount==0 || agent->CurrentMapId==0 || unlockedMarkerBits is not { } unlocked)return;
-        if(placeData.GetExcelSheet<Lumina.Excel.Sheets.Map>().GetRowOrDefault(agent->CurrentMapId) is not { } map
-            || !placeData.GetSubrowExcelSheet<MapMarker>().TryGetRow(map.MapMarkerRange,out var rows))return;
-        var sheet=rows.Where(row=>row.Icon!=0).Select(row=>(row.MapMarkerUnlockedBit,(uint)row.Icon,(float)row.X,(float)row.Y)).ToArray();
-        if(sheet.All(row=>row.MapMarkerUnlockedBit==0))return;
+        if(agent==null || agent->MapMarkerCount==0 || unlockedMarkerBits is not { } unlocked)return;
         var count=Math.Min((int)agent->MapMarkerCount,agent->MapMarkers.Length);
         var game=new List<(uint Icon,int X,int Y,int Flags)>(count);
         for(var index=0;index<count;index++){var marker=agent->MapMarkers[index].MapMarker;game.Add((marker.IconId,marker.X,marker.Y,marker.IconFlags));}
+        // 0.1338 (X-351, probe of 11/14 at 15:45: the game's map opened on Mor Dhona from Western Thanalan wrote nothing): the player's map
+        // (CurrentMapId) and the one the game's map window shows (SelectedMapId) both tried; the game's list is the one whose icons without an
+        // unlock bit (always drawn) it holds best (MapMarkerUnlock.Coverage); none held well enough: nothing learned (a wrong map would hide icons).
+        var mapSheet=placeData.GetExcelSheet<Lumina.Excel.Sheets.Map>();var markerSheet=placeData.GetSubrowExcelSheet<MapMarker>();
+        Lumina.Excel.Sheets.Map? chosen=null;(int Found,int Total) coverage=(0,0);
+        foreach(var candidate in new[]{agent->CurrentMapId,agent->SelectedMapId}.Where(id=>id!=0).Distinct())
+        {
+            if(mapSheet.GetRowOrDefault(candidate) is not { } option || !markerSheet.TryGetRow(option.MapMarkerRange,out var optionRows))continue;
+            var plain=optionRows.Where(row=>row.Icon!=0 && row.MapMarkerUnlockedBit==0).Select(row=>((uint)row.Icon,(float)row.X,(float)row.Y)).ToArray();
+            var held=MapMarkerUnlock.Coverage(plain,option.SizeFactor,option.OffsetX,option.OffsetY,game);
+            if(chosen is null || held.Found*Math.Max(1,coverage.Total)>coverage.Found*Math.Max(1,held.Total)){chosen=option;coverage=held;}
+        }
+        if(chosen is not { } map || !markerSheet.TryGetRow(map.MapMarkerRange,out var rows))return;
+        var sheet=rows.Where(row=>row.Icon!=0).Select(row=>(row.MapMarkerUnlockedBit,(uint)row.Icon,(float)row.X,(float)row.Y)).ToArray();
+        if(sheet.All(row=>row.MapMarkerUnlockedBit==0))return;
+        var mapId=map.RowId;
+        if(!MapMarkerUnlock.Holds(coverage))
+        {
+            var unsure=$"Map icon unlocks: the game's list ({game.Count} icons) matches neither the player's map {agent->CurrentMapId} nor the shown map {agent->SelectedMapId} "
+                +$"(best: map {mapId}, {coverage.Found} of {coverage.Total} icons without an unlock bit): nothing compared";
+            if(unsure!=markerUnlockLine){markerUnlockLine=unsure;log.Information(unsure);}
+            return;
+        }
         var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
         // 0.1321: the game's list decides on this map; the same set is kept while it does not change.
         // X-351 (0.1335): the maps built earlier in the session and the bits drawn while read locked are kept (MapMarkerUnlock.Remember).
-        var remembered=MapMarkerUnlock.Remember(gameListedMarkers,agent->CurrentMapId,checks);
+        var remembered=MapMarkerUnlock.Remember(gameListedMarkers,mapId,checks);
         gameListedMarkers=remembered;
         var listed=remembered.Listed;
         var agree=checks.Count(check=>check.Listed==check.Unlocked);
@@ -307,7 +326,8 @@ internal sealed class MapLiveReader : IDisposable
         var wrong=rows.Where(row=>row.Icon!=0 && row.MapMarkerUnlockedBit!=0 && checks.Any(check=>check.Bit==row.MapMarkerUnlockedBit && check.Icon==row.Icon
                 && check.PixelX==row.X && check.PixelY==row.Y && check.Listed!=check.Unlocked))
             .Select(row=>$"bit {row.MapMarkerUnlockedBit} row {row.RowId}.{row.SubrowId}: type {row.Type}, data type {row.DataType}, data key {row.DataKey.RowId}, unknown {row.Unknown0}").ToArray();
-        var line=$"Map icon unlocks on map {agent->CurrentMapId} ({checks.Count} with an unlock bit, {game.Count} in the game's list, {listed.Count} drawn by the game): "
+        var line=$"Map icon unlocks on map {mapId} (player on map {agent->CurrentMapId}, game's map showing {agent->SelectedMapId}; {coverage.Found} of {coverage.Total} icons without an unlock bit found in the game's list; "
+            +$"{checks.Count} with an unlock bit, {game.Count} in the game's list, {listed.Count} drawn by the game): "
             +$"the bit's reading agrees on {agree} of {checks.Count}; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe))
             +(wrong.Length>0 ? "; reading wrong on: "+string.Join("; ",wrong):"")
             +$"; remembered: {remembered.Remembered.Count} map(s), bits drawn while read locked: {(remembered.DrawnWhileLocked.Count>0 ? string.Join(",",remembered.DrawnWhileLocked.Order()):"none")}";
