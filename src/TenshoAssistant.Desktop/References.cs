@@ -23,6 +23,9 @@ internal static class References
     private const int StillCaptures=3;
     /// <summary>The version the plugin copy and the status bar show in the pictures.</summary>
     public static readonly Version Stamp=new(0,0,0,0);
+    /// <summary>X-282: the instant the plugin copy reads instead of the computer's clock (Rewrite.Plugin's clock, HostClock): the countdowns,
+    /// Eorzea's hour, the forecasts and the trial garden's dates are the same on every day.</summary>
+    public static readonly DateTimeOffset Clock=new(2026,11,11,10,0,0,TimeSpan.Zero);
 
     public static int Run(Host host,StatusBar status,string cache,Win32Gl window,string folder,string? compare)
     {

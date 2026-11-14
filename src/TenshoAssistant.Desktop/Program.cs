@@ -131,9 +131,10 @@ internal static class Program
         // Tensho this is replaced by a real seam in the plugin after the post-7.58 release (the fonts read from one property of the plugin's UI
         // components, set by Plugin.cs from UiBuilder and by this app from its atlas; a ratchet test forbids new direct uses). Until then the
         // plugin's source is not changed (frozen until Dalamud is ready for 7.58).
-        // X-271 (R37): the reference images draw a copy of their own whose version reads 0.0.0 (a picture must not change with the number).
+        // X-271 (R37): the reference images draw a copy of their own whose version reads 0.0.0 (a picture must not change with the number);
+        // X-282: and whose clock stands still at References.Clock (a picture must not change with the hour or the day).
         var copy=references is null ? Rewrite.Plugin(plugin,Path.Combine(Own,"plugin"),Hooks,AppVersion.ToString(),PluginSiblings)
-            : Rewrite.Plugin(plugin,Path.Combine(Own,"plugin-references"),Hooks,AppVersion.ToString(),PluginSiblings,stamp:References.Stamp);
+            : Rewrite.Plugin(plugin,Path.Combine(Own,"plugin-references"),Hooks,AppVersion.ToString(),PluginSiblings,stamp:References.Stamp,clock:References.Clock);
         PluginFolder=Path.GetDirectoryName(copy);
         Console.WriteLine($"PASS fonts: Dalamud font statics pointed at the desktop atlas in a copy of the plugin ({PluginFolder}): {string.Join(", ",Rewrite.Sites.Select(p=>$"{p.Key} {p.Value} sites"))}");
         var settings=args.Contains("--new-settings") || references is not null ? null : DesktopPaths.PluginConfig(AppData);

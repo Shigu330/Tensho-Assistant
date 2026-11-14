@@ -368,7 +368,8 @@ internal static class Headless
         if(bedType is null)return false;
         var items=host.Data.Excel.GetSheet<Item>().Where(row=>row.RowId>=7715 && row.Icon!=0 && !row.Name.IsEmpty).Take(6).ToArray();
         var beds=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(bedType))!;
-        var now=DateTimeOffset.UtcNow;
+        // X-282: the clock the plugin copy reads (the fixed one of the reference images, else the computer's).
+        var now=HostClock.UtcNow;
         // (patch, bed number, hours since planting, growing hours, tending hours, a seed the game knows). X-178 (0.1263): three patches at
         // the same place, as at a large house: the first with every state, the second and the third with a few beds.
         var trial=new (int Patch,int Number,double Planted,int Grow,int Tend,bool Known)[]{(1,1,1,48,0,true),(1,2,2,72,24,true),(1,3,30,72,24,true),(1,4,60,48,24,true),(1,5,10,120,48,true),(1,6,0.2,24,0,true),(1,8,5,24,0,false),
