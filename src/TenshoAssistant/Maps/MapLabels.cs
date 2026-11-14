@@ -69,6 +69,22 @@ public static class MapQuestEvents
 }
 
 /// <summary>
+/// X-358 (0.1346, review of 0.1345: the list of offered quests also counted the steps of quests already accepted, type 3 like the offers). The quests of
+/// the game's list of quests not accepted yet (Map.UnacceptedQuestMarkers) are marked offered on every marker of the merged list (a window marker at the
+/// same place keeps its row in the merge, so the mark goes by quest); a quest also in the list of accepted quests (Map.QuestMarkers) is never an offer.
+/// </summary>
+public static class MapOfferedQuests
+{
+    public static IReadOnlyList<T> Tag<T>(IReadOnlyList<T> markers,IReadOnlyList<T> unaccepted,IReadOnlyList<T> accepted,Func<T,(bool Quest,uint Key)> key,Func<T,T> offer)
+    {
+        var offered=unaccepted.Select(key).Where(item=>item.Quest).Select(item=>item.Key).ToHashSet();
+        offered.ExceptWith(accepted.Select(key).Where(item=>item.Quest).Select(item=>item.Key));
+        if(offered.Count==0)return markers;
+        return markers.Select(marker=>key(marker) is { Quest:true } item && offered.Contains(item.Key) ? offer(marker):marker).ToArray();
+    }
+}
+
+/// <summary>
 /// 0.793 (X-32, user request: what opening and closing the game map unblocked): the game's own leve markers (UIState Map) hold a leve's area while the map
 /// window's list is still empty (docs/evidence/0.793-game-leve-markers.md). They are added to what the map window gives, each once: the same map, icon and
 /// place within a yalm is the same marker.

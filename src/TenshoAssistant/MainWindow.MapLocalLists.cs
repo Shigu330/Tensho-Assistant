@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
         var running=festivals?.State?.Active.Select(festival=>festival.Id).Order().ToArray();
         var season=festivals?.Quests is null || running is null ? "?":string.Join(',',running);
         // X-355 (0.1345): the quests the game offers on this map (its own list, as the map draws it), when it covers the map.
-        var offered=locked ? null:MapLocalLists.Offered(mapLive?.State?.Events?.Select(marker=>(marker.MapId,marker.ObjectiveId,marker.MarkerType)),map.MapId);
+        var offered=locked ? null:MapLocalLists.Offered(mapLive?.State?.Events?.Select(marker=>(marker.MapId,marker.ObjectiveId,marker.Offered)),map.MapId);
         var offeredKey=offered is null ? "?":string.Join(',',offered.Order());
         var cache=mapLocalQuestCache;
         if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete || cache.Locked!=locked || cache.Season!=season || cache.Offered!=offeredKey)

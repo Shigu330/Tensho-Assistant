@@ -146,13 +146,14 @@ public static class MapLocalLists
     }
 
     /// <summary>
-    /// X-355 (0.1345): the quests the game offers on a map: its markers of quests not accepted yet (Map.UnacceptedQuestMarkers, marker type 3),
-    /// as quest rows. Null when the game's list holds none on this map (not covered, or nothing offered: not told apart, so no restriction, R06).
+    /// X-355 (0.1345): the quests the game offers on a map: its markers of quests not accepted yet (Map.UnacceptedQuestMarkers), as quest rows.
+    /// X-358 (0.1346): only the markers marked offered (<see cref="MapOfferedQuests.Tag"/>): the accepted quests' markers are type 3 as well.
+    /// Null when the game's list holds none on this map (not covered, or nothing offered: not told apart, so no restriction, R06).
     /// </summary>
-    public static IReadOnlySet<uint>? Offered(IEnumerable<(uint MapId,uint ObjectiveId,byte MarkerType)>? markers,uint mapId)
+    public static IReadOnlySet<uint>? Offered(IEnumerable<(uint MapId,uint ObjectiveId,bool Offered)>? markers,uint mapId)
     {
         if(markers is null)return null;
-        var ids=markers.Where(marker=>marker.MapId==mapId && marker.MarkerType==3 && marker.ObjectiveId!=0).Select(marker=>MapQuestIcons.QuestId(marker.ObjectiveId)).ToHashSet();
+        var ids=markers.Where(marker=>marker.MapId==mapId && marker.Offered && marker.ObjectiveId!=0).Select(marker=>MapQuestIcons.QuestId(marker.ObjectiveId)).ToHashSet();
         return ids.Count>0 ? ids:null;
     }
 

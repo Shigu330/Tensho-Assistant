@@ -63,11 +63,11 @@ internal static class QuestLockedMap1343Tests
                 new MapLocalPosition(MapLocalKind.QuestIssuer,0x10006,3,12f,22f,0)]);
             var entries=new[]{Quest(0x10003,QuestProgress.Unconfirmed),Quest(0x10009,QuestProgress.Unconfirmed),Quest(0x10006,QuestProgress.Active)};
             static uint[] Ids(IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> groups)=>groups.SelectMany(group=>group.Quests).Select(item=>item.Quest.Id).Order().ToArray();
-            var offered=MapLocalLists.Offered([(3u,0x0003u,(byte)3),(4u,0x0009u,(byte)3),(3u,0x0009u,(byte)1)],3);
+            var offered=MapLocalLists.Offered([(3u,0x0003u,true),(4u,0x0009u,true),(3u,0x0009u,false)],3);
             Check(offered is not null && offered.SetEquals([0x10003u]),"the game offers 0x10003 on map 3 (another map's marker and a quest step are not offers)");
             Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:false,offered:offered)).SequenceEqual([0x10003u,0x10006u]),"box off: the quest the game does not offer leaves the list; one under way stays");
             Check(Ids(MapLocalLists.Quests(entries,index,3,false,includeLocked:true,offered:offered)).SequenceEqual([0x10003u,0x10006u,0x10009u]),"box on: every quest");
-            Check(MapLocalLists.Offered([(4u,0x0009u,(byte)3)],3) is null && MapLocalLists.Offered(null,3) is null,"no offer of the game on this map: no restriction (not covered and none offered are not told apart)");
+            Check(MapLocalLists.Offered([(4u,0x0009u,true)],3) is null && MapLocalLists.Offered(null,3) is null,"no offer of the game on this map: no restriction (not covered and none offered are not told apart)");
         }),
     ];
 }

@@ -14,7 +14,8 @@ public sealed record MapFlightState(uint TerritoryId,int Total,int Unlocked,bool
 // Game event marker (quest objectives and similar) copied from AgentMap.EventMarkers: world position, optional area radius.
 // ObjectiveId: the game's objective (quest) id of the marker, used to focus a quest opened from the journal.
 // MarkerType/DataId (0.135, /xllog evidence): type 3 = quest with DataId = quest row − 65536 (71021 → data 24, 71151 → data 141).
-public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float Radius,string Tooltip,uint ObjectiveId=0,byte MarkerType=0,uint DataId=0,bool IsLeve=false);
+// X-358 (0.1346): Offered, a quest marker of the game's list of the quests not accepted yet (MapOfferedQuests.Tag).
+public sealed record MapEventMarker(uint MapId,uint Icon,Vector3 Position,float Radius,string Tooltip,uint ObjectiveId=0,byte MarkerType=0,uint DataId=0,bool IsLeve=false,bool Offered=false);
 
 // Nearby game objects shown on the map (coffers, gathering points); Level is the gathering level when known, else 0.
 // N-09 (0.441): HuntMark = a living hunt mark (NotoriousMonster by BNpcBase); Level holds its rank (1 B, 2 A, 3 S).
@@ -550,10 +551,14 @@ internal sealed class MapLiveReader : IDisposable
         var journalRequest=agent->CurrentOpenMapInfo.Type is FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.QuestLog or FFXIVClientStructs.FFXIV.Client.UI.Agent.MapType.GatheringLog;
         if(!MapEventHold.Holds(result.Count,journalRequest,agent->CurrentMapId,lastEventsMap)){lastEvents=result.AsReadOnly();lastEventsMap=agent->CurrentMapId;}
         // 0.848 (X-70): the game's quest list, current at each step, replaces the window's markers of the same quests.
-        var current=MapQuestEvents.Merge(lastEvents,ReadGameQuests(),marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
+        var accepted=ReadGameQuests();
+        var current=MapQuestEvents.Merge(lastEvents,accepted,marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
         // X-99 (0.977, user report with captures: after a teleport, the quests not accepted yet were missing from the Tensho map): the map window's
         // list holds only the map last shown in the game's own window (here the world map, 919), so the game's own list of those quests is added.
-        current=MapGameLeves.Merge(current,ReadGameUnaccepted(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z));
+        var unaccepted=ReadGameUnaccepted();
+        current=MapGameLeves.Merge(current,unaccepted,marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z));
+        // X-358 (0.1346, review of 0.1345): the accepted quests' markers are type 3 too; only the quests of the game's list of quests not accepted are offers.
+        current=MapOfferedQuests.Tag(current,unaccepted,accepted,marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF),marker=>marker with { Offered=true });
         return WithLeveAreas(MapGameLeves.Merge(current,ReadGameLeves(),marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z)));
     }
     /// <summary>0.848 (X-70): the markers of the quests the game renders, from its own Map (kept current with or without its map window); bounded.</summary>
