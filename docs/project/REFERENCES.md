@@ -1149,10 +1149,10 @@ LICENSE: Licences consignées dans REF-QUEST-REWARDS-003/REF-INVENTORY ; faits c
 VERIFIED_AT: 2026-10-29.
 STATUS: LOCAL_VERIFIED census ; identité UNKNOWN ; runtime UNKNOWN.
 SOURCE: [définition Quest](https://github.com/xivapi/SaintCoinach/blob/0b22b78f97951bb66bfa78fb561aa4c7bf7af7cd/SaintCoinach/Definitions/Quest.json), [renderer InventoryTools](https://github.com/Critical-Impact/InventoryTools/blob/70a9f410d9a8ab97bef6bcf795415ea2d7c75097/InventoryTools/Logic/ItemRenderers/ItemQuestSourceRenderer.cs).
-FILES_READ: Trois fichiers InventoryTools cités dans l’étude ; définitions de monnaie/GC, métadonnées GrandCompany/Item/Quest et recherche de bindings ; census natif détaillé.
+FILES_READ: Trois fichiers InventoryTools cités dans l'étude ; définitions de monnaie/GC, métadonnées GrandCompany/Item/Quest et recherche de bindings ; census natif détaillé.
 TECHNICAL_FACTS: CurrencyReward et GCTypeReward nuls dans quinze cas ; neuf prérequis GC explicites, six sans GC. Les monnaies directes connues ont Item.GrandCompany nul et catégorie Autre ; pas de relation unique de résolution démontrée.
-LOCAL_COMPATIBILITY: Probe étendu passant, production 0.68 inchangée ; quantités conservées et couverture partielle explicite, pas d’Item inventé.
-NOTES: Étude et limites (QUEST-CURRENCIES-005-STUDY). Inconnu local, aucun blocage global ; poursuivre l’audit de base.
+LOCAL_COMPATIBILITY: Probe étendu passant, production 0.68 inchangée ; quantités conservées et couverture partielle explicite, pas d'Item inventé.
+NOTES: Étude et limites (QUEST-CURRENCIES-005-STUDY). Inconnu local, aucun blocage global ; poursuivre l'audit de base.
 
 ## REF-QUEST-ITEM-SOURCES-004
 
@@ -1165,7 +1165,7 @@ VERIFIED_AT: 2026-10-29.
 STATUS: LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: projection et limites (QUEST-REWARDS-003), index/lifecycle (QUEST-ITEM-SOURCES-004).
 FILES_READ: QuestService/Reader, QuestRewards, usages/fiches et tests existants ; snapshots natifs via QuestRewardsProbe.
-TECHNICAL_FACTS: Item/quête groupés sans perdre les variantes, indices complets et couverture explicite ; worker managé, génération/snapshot/annulation empêchent une publication obsolète, erreurs d’index distinctes de progression.
+TECHNICAL_FACTS: Item/quête groupés sans perdre les variantes, indices complets et couverture explicite ; worker managé, génération/snapshot/annulation empêchent une publication obsolète, erreurs d'index distinctes de progression.
 LOCAL_COMPATIBILITY: 434 tests/package verts ; 3 496 Items/8 288 associations et chaque variante concordent avec la projection directe ; Potion 25 quêtes candidates ; hors personnage sans progression confirmée.
 NOTES: Pas de disponibilité, choix ou obtention déduits ; quinze monnaies non reliées et quatre quantités inconnues conservées. UI/callbacks en jeu non observés.
 
@@ -1202,7 +1202,7 @@ NOTES: Contrat et limites (COLL-003). Aucun chargement/callback/état de joueur 
 ## REF-COLL-002
 
 DOMAIN: Collections / Item et contexte communs.
-NAME: Catalogue et confirmations d’orchestrion.
+NAME: Catalogue et confirmations d'orchestrion.
 REPOSITORY: goatcorp/Dalamud ; Lumina/FFXIVClientStructs et fichiers du jeu installés.
 COMMIT_OR_VERSION: Source Dalamud 1e514694497ae448fca8e8a46f7b63642ad1e5ad relue ; métadonnées installées le 2026-10-29.
 LICENSE: AGPL v3 selon REF-DALAMUD historique pour le code étudié ; faits ciblés, aucune implémentation native copiée.
@@ -1212,7 +1212,7 @@ SOURCE: [UnlockState](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448f
 FILES_READ: UnlockState.cs getter Orchestrion et chemin Item ; métadonnées IUnlockState, Orchestrion/Uiparam/Category, Item/AdditionalData ; fichiers natifs via CollectionProbe.
 TECHNICAL_FACTS: Acquisition par Orchestrion.RowId, Item lié par AdditionalData typé Orchestrion ; 886 identités Item/morceau différentes, 12 catégories natives. Pas de drapeau orchestrion dédié exposé ; négatif non confirmé. UI/catégorie étrangères ne fournissent pas de métadonnées.
 LOCAL_COMPATIBILITY: 416 tests/package verts ; 886 projections/liens/icônes vérifiés hors jeu ; reader/service/contextes existants étendus, erreurs de catégorie isolées.
-NOTES: Contrat et limites (COLL-002). Aucun état de joueur ni interaction native validés ; types supplémentaires conservés à l’étude.
+NOTES: Contrat et limites (COLL-002). Aucun état de joueur ni interaction native validés ; types supplémentaires conservés à l'étude.
 
 ## REF-GATHER-FISH-FORECAST-010
 
@@ -1225,7 +1225,7 @@ VERIFIED_AT: 2026-10-29.
 STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: [consommateur horaire et période précédente](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Web/bell/gt.bell.js), [source 8753](https://www.garlandtools.org/db/doc/item/fr/3/8753.json), [source 4915](https://www.garlandtools.org/db/doc/item/fr/3/4915.json).
 FILES_READ: Références primaires déjà vérifiées en 0.62/0.63 ; WeatherForecast, GatheringTimeline, FishingConditions ; réponses/probes natifs ciblés.
-TECHNICAL_FACTS: Heure ET et période météo précédente distinctes ; critères absents non assimilés à sans restriction. Les segments compatibles n’établissent que les critères rapportés, avec couverture explicite ; inconnus et incompatibilité distincts.
+TECHNICAL_FACTS: Heure ET et période météo précédente distinctes ; critères absents non assimilés à sans restriction. Les segments compatibles n'établissent que les critères rapportés, avec couverture explicite ; inconnus et incompatibilité distincts.
 LOCAL_COMPATIBILITY: 412 tests/package verts ; oracle indépendant et probes réels avec fixtures datées pour météo/précédente 8753 et horaire seul 4915.
 NOTES: Contrat et limites (GATHER-FISH-FORECAST-010). Pas de capture/prérequis/météo forcée observés ; code natif 2 inchangé.
 
@@ -1242,7 +1242,7 @@ SOURCE: [Weather.cs](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20
 FILES_READ: Sources primaires déjà consultées en 0.62 ; Weather/French et English, TerritoryType/WeatherRate locaux ; WeatherCatalogLoader et projection commune/probes.
 TECHNICAL_FACTS: Noms anglais de la source ; 43 labels natifs globalement ambigus, dont Clear Skies IDs 1/91/209. Correspondance exacte unique seulement dans les taux positifs du territoire ; métadonnées manquantes ou ambiguïté locale conservées inconnues.
 LOCAL_COMPATIBILITY: 405 tests/package ; WeatherProbe 214 lignes et contrôles antérieurs passants ; consultation réelle 8753 reliée au territoire 137 et Weather 1/7/8, noms/icônes natifs.
-NOTES: Contrat et limites (GATHER-FISH-WEATHER-009). Pas d’intersection/disponibilité ni observation du ciel ; code natif 2 toujours inconnu.
+NOTES: Contrat et limites (GATHER-FISH-WEATHER-009). Pas d'intersection/disponibilité ni observation du ciel ; code natif 2 toujours inconnu.
 
 ## REF-GATHER-FISH-WINDOWS-008
 
@@ -1257,11 +1257,11 @@ SOURCE: [générateur](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c
 FILES_READ: FishingSpots.cs, Weather.cs, gt.bell.js, fish.js et lignes ciblées du TSV ; exemples API 7685,7686,7690,7705,4915,8753.
 TECHNICAL_FACTS: during en heures entières ET ; début inclus/fin exclue, minuit circulaire ; transition = météo de la période précédente, weather = alternatives courantes. Absents non déduits ; divergence source épinglée/API 7685 conservée inconnue.
 LOCAL_COMPATIBILITY: 401 tests/package verts, probes 4915 et 8753 liés aux lieux/appâts natifs, calcul horaire UTC partagé ; FashionProbe compilé.
-NOTES: Contrat et limites (GATHER-FISH-WINDOWS-008). Noms météo non encore reliés aux IDs locaux, pas d’intersection/disponibilité, code natif 2 inconnu.
+NOTES: Contrat et limites (GATHER-FISH-WINDOWS-008). Noms météo non encore reliés aux IDs locaux, pas d'intersection/disponibilité, code natif 2 inconnu.
 
 ## REF-GATHER-FISH-SOURCES-007
 
-DOMAIN: GatherBuddy / sources d’objet communes.
+DOMAIN: GatherBuddy / sources d'objet communes.
 NAME: Appâts et chaînes communautaires par lieu.
 REPOSITORY: ufx/GarlandTools ; FFXIV-CombatReborn/GatherBuddyReborn ; xivapi/SaintCoinach.
 COMMIT_OR_VERSION: GarlandTools 04cadd2e1e0de86c20aa9303faa082c7971f8d8b ; GatherBuddy a204f2f45cb98302dbe938921255c3a6d617c775 ; définition SaintCoinach consultée le 2026-10-29.
@@ -1270,8 +1270,8 @@ VERIFIED_AT: 2026-10-29.
 STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: [générateur de pêche](https://github.com/ufx/GarlandTools/blob/04cadd2e1e0de86c20aa9303faa082c7971f8d8b/Garland.Data/Modules/FishingSpots.cs), [document objet](https://www.garlandtools.org/db/doc/item/fr/3/4869.json).
 FILES_READ: FishingSpots.cs, gt.fishing.js, LICENSE ; FishingNoteInfo.json SaintCoinach ; réponse item 4869 et exemple 7902 ; Fish/CatchData de GatherBuddy déjà lus.
-TECHNICAL_FACTS: alternatives de chaînes ordonnées par lieu, appât initial puis intermédiaires. Le drapeau météo natif 2 n’est pas expliqué : tests >0 et ==1 divergent selon les producteurs ; Unknown conservé.
-LOCAL_COMPATIBILITY: 396 tests/package, sept groupes nouveaux ; consultation réelle 4869 avec 19 lieux natifs et deux IDs d’appâts résolus. Service/cache/transport d’objet existants partagés.
+TECHNICAL_FACTS: alternatives de chaînes ordonnées par lieu, appât initial puis intermédiaires. Le drapeau météo natif 2 n'est pas expliqué : tests >0 et ==1 divergent selon les producteurs ; Unknown conservé.
+LOCAL_COMPATIBILITY: 396 tests/package, sept groupes nouveaux ; consultation réelle 4869 avec 19 lieux natifs et deux IDs d'appâts résolus. Service/cache/transport d'objet existants partagés.
 NOTES: Contrat et limites (GATHER-FISH-SOURCES-007). Champs météo/horaires non interprétés, aucune disponibilité garantie ; rendu/interaction natifs non observés.
 
 ## REF-GATHER-FISH-006
@@ -1292,12 +1292,12 @@ NOTES: Contrat et limites (GATHER-FISH-006). Staticité distincte de prises/déb
 ## REF-SORT-TEMPLATES-007
 
 DOMAIN: SortaKinda / configuration commune / livraison.
-NAME: Modèles de règles sans identité d’observation.
+NAME: Modèles de règles sans identité d'observation.
 COMMIT_OR_VERSION: Tensho 0.59.0.0, configuration et modèles v1.
 VERIFIED_AT: 2026-10-29.
 STATUS: LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: implémentation managée originale, validation commune et contrôles de livraison locaux ; aucune API native ajoutée.
-TECHNICAL_FACTS: géométrie exacte, rebind au scope courant seulement, copie de listes et absence de données d’observation. Chargement en brouillon sans capture/application. ZIP contrôlé par SHA-256 contre DLL/manifeste canoniques.
+TECHNICAL_FACTS: géométrie exacte, rebind au scope courant seulement, copie de listes et absence de données d'observation. Chargement en brouillon sans capture/application. ZIP contrôlé par SHA-256 contre DLL/manifeste canoniques.
 LOCAL_COMPATIBILITY: 385 tests/package, six groupes de modèles et Newtonsoft trois modes passants ; sortie canonique 0.59.0.0.
 NOTES: Contrat et limites (SORT-TEMPLATES-007). Rendu/application/persistance natifs non observés ; 17 domaines PARTIAL.
 
@@ -1333,7 +1333,7 @@ COMMIT_OR_VERSION: Tensho 0.56.0.0 ; configuration v1 conservée.
 VERIFIED_AT: 2026-10-29.
 STATUS: LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: implémentation managée originale sur ItemCatalog, InventorySortPreview et permutation existants ; aucune nouvelle API native ou formule externe supposée.
-TECHNICAL_FACTS: catégories et noms issus des ItemDefinition natifs partagés ; trous représentés explicitement puis affectés à de vraies cases physiques vides, toutes les piles vérifiées. Règles et sauvegarde par scope distinctes de l’application.
+TECHNICAL_FACTS: catégories et noms issus des ItemDefinition natifs partagés ; trous représentés explicitement puis affectés à de vraies cases physiques vides, toutes les piles vérifiées. Règles et sauvegarde par scope distinctes de l'application.
 LOCAL_COMPATIBILITY: 369 tests/package, huit groupes supplémentaires dont 24 scènes multi-scopes ; Newtonsoft None/Auto/Objects passants avec listes imbriquées et v1 historique.
 NOTES: Contrat et limites (SORT-RULES-004). Affichage et application native non observés ; les 17 domaines restent PARTIAL.
 
@@ -1345,7 +1345,7 @@ COMMIT_OR_VERSION: plugin 0.55.0.0, bindings installés API 15 ; source externe 
 VERIFIED_AT: 2026-10-29.
 STATUS: LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: BankStorageScope, InventoryNativeReader et métadonnées ItemOrderModule/GetActiveRetainerSorter/ActiveRetainerId déjà inspectées ; compilation des accès directs.
-TECHNICAL_FACTS: 4 × 35 personnel, 2 × 35 par sacoche, 7 × 25 servant ; propriétaire natif du servant distinct du personnage. Fenêtre/chargement/identités revérifiés au framework, reçu de capture directe indépendant d’un cache importé.
+TECHNICAL_FACTS: 4 × 35 personnel, 2 × 35 par sacoche, 7 × 25 servant ; propriétaire natif du servant distinct du personnage. Fenêtre/chargement/identités revérifiés au framework, reçu de capture directe indépendant d'un cache importé.
 LOCAL_COMPATIBILITY: 361 tests/package, dont 144 scénarios des scopes et contrôles de cache/identité/fraîcheur/lifecycle ; zéro avertissement/erreur.
 NOTES: Contrat et limites (SORT-SCOPES-003). Détection de fenêtre, capture réelle, écriture et persistance non observées en jeu. Aucun code externe importé.
 
@@ -1355,27 +1355,27 @@ DOMAIN: SortaKinda / inventaire commun.
 NAME: Ordre visuel natif.
 REPOSITORY: MidoriKami/SortaKinda.
 COMMIT_OR_VERSION: 95a1bf9161f4bc595c21094eeaae9fda556f4b4b.
-LICENSE: AGPL v3 ou ultérieure, LICENSE lu ; faits d’API seulement, implémentation originale.
+LICENSE: AGPL v3 ou ultérieure, LICENSE lu ; faits d'API seulement, implémentation originale.
 VERIFIED_AT: 2026-10-29.
 STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: [SortingController](https://github.com/MidoriKami/SortaKinda/blob/95a1bf9161f4bc595c21094eeaae9fda556f4b4b/SortaKinda/Classes/SortingController.cs).
 FILES_READ: SortingController.cs, ItemOrderModuleSorterExtensions.cs, InventoryTypeExtensions.cs, ItemSlotInfo.cs, SortaKinda.cs, LICENSE ; métadonnées installées ItemOrderModule/Sorter/ItemEntry/PreviousOrder/SortFunction/StdVector.
-TECHNICAL_FACTS: ordre visuel par Page/Slot d’entrées ; permutation des valeurs entières, HasChanges après traitement. Le code de référence utilise des workers et hooks, qui ne sont pas repris.
+TECHNICAL_FACTS: ordre visuel par Page/Slot d'entrées ; permutation des valeurs entières, HasChanges après traitement. Le code de référence utilise des workers et hooks, qui ne sont pas repris.
 LOCAL_COMPATIBILITY: bridge original sur framework.Update, 140 cases personnelles, gardes owner/âge/couverture/permutation/ordre/pointeurs ; compilation et 355 tests/package passants.
 NOTES: application native, rendu et persistance non observés ; pas de revendication REPLACEABLE. Contrat et limites (SORT-NATIVE-002).
 
 ## REF-USE-CONTEXT-004
 
 DOMAIN: Item Use / contexte partagé.
-NAME: Menu contextuel d’inventaire Dalamud.
+NAME: Menu contextuel d'inventaire Dalamud.
 REPOSITORY: goatcorp/Dalamud.
 COMMIT_OR_VERSION: 1e514694497ae448fca8e8a46f7b63642ad1e5ad ; SDK local API 15.
-LICENSE: AGPL v3 ; faits d’API seulement, code original.
+LICENSE: AGPL v3 ; faits d'API seulement, code original.
 VERIFIED_AT: 2026-10-29.
 STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED ; runtime UNKNOWN.
 SOURCE: [MenuTargetInventory](https://github.com/goatcorp/Dalamud/blob/1e514694497ae448fca8e8a46f7b63642ad1e5ad/Dalamud/Game/Gui/ContextMenu/MenuTargetInventory.cs).
 FILES_READ: MenuTargetInventory.cs, GameInventoryItem.cs, MenuItem.cs, MenuOpenedArgs.cs, MenuArgs.cs, ContextMenu.cs ; métadonnées IContextMenu/IMenuOpenedArgs/IMenuItemClickedArgs installées.
-TECHNICAL_FACTS: TargetItem construit une copie GameInventoryItem du slot ciblé ; lire la cible au callback. OpenSubmenu est fourni à OnClicked ; la branche AddonContextSub n’émet pas un nouvel OnMenuOpened. Les closures de Tensho ne conservent que des valeurs managées normalisées.
+TECHNICAL_FACTS: TargetItem construit une copie GameInventoryItem du slot ciblé ; lire la cible au callback. OpenSubmenu est fourni à OnClicked ; la branche AddonContextSub n'émet pas un nouvel OnMenuOpened. Les closures de Tensho ne conservent que des valeurs managées normalisées.
 LOCAL_COMPATIBILITY: compilation 0.53 sans avertissement/erreur, 349 tests/package et Newtonsoft trois modes passants.
 NOTES: contrôles propriétaire/révision/âge et option indépendants ; absence de validation native observée. Contrat et protocole (USE-CONTEXT-004).
 
@@ -1415,7 +1415,7 @@ Voir aussi CACT-LIVE-002 : métadonnées locales AddonLotteryDaily et source FFX
 STATUS: CURRENT_VERIFIED / LOCAL_VERIFIED — 2026-10-29. Sources et limites dans CRAFT-CONDITIONS-004 et CRAFT-CONDITION-RANGE-005.
 SOURCE: Craftimizer commit 1d4a2c67ea47a25d68701e8e69c8744dbbd56d86, Gearsets et Simulator (StepCondition, facteurs qualité), lus depuis le dépôt primaire ; métadonnées et sqpack locaux.
 FACTS: description anglaise connue des outils × 1,75 ; 136 marqueurs dans 928 outils principaux, aucun ailleurs. Favorable/Mauvaise → Normale ; Excellente → Mauvaise ; à partir de Normale, enveloppe conservatrice Normale/Favorable/Excellente sans probabilité. Bornes par condition comparées à une énumération exhaustive sur petits scénarios.
-VALIDATION: 302/302 tests/package verts. L’observation de l’outil réellement équipé et le rendu en jeu restent non validés ; tests projection et Macro Chain différés.
+VALIDATION: 302/302 tests/package verts. L'observation de l'outil réellement équipé et le rendu en jeu restent non validés ; tests projection et Macro Chain différés.
 
 ## REF-CRAFT-LIVE-003
 

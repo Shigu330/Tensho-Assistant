@@ -259,7 +259,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   les interrupteurs de sources du joueur ; la page Marché (Universalis) est exclue. Hors mode développeur, rien ne se lance.
 - **Webhook Discord (R-12)** : désactivé par défaut. Quand le joueur l'active et saisit une adresse de webhook (seuls les hôtes de
   Discord sont acceptés : `discord.com`, `ptb.discord.com`, `canary.discord.com`, `discordapp.com` ; une adresse par catégorie peut être
-  saisie de la même façon), une alarme Tensho qui sonne, les alertes de plafond de monnaie et les alertes « mission prête » y sont
+  saisie de la même façon), une alarme Tensho qui sonne, les alertes de plafond des devises et les alertes « mission prête » y sont
   envoyées (HTTPS POST) : le message et l'heure locale, et le nom du personnage seulement si le joueur l'active ; les mentions sont
   limitées au rôle choisi par le joueur (`allowed_mentions`). Chaque alarme a sa propre case Discord, décochée pour une nouvelle alarme
   (une alarme ajoutée à un groupe prend le choix du groupe). L'adresse est un secret : gardée dans la configuration du plugin sur le PC
@@ -274,7 +274,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   genre de données enregistrées a changé, en catégories d'une liste fermée (`settings`, `bank`, `characters`, `gil-journal`,
   `craft-lists`, `my-tools`, `voyages`, `achievements`, `beast-teams`, `duties`, `discoveries`, `data`), jamais un nom de fichier, le contenu
   d'un fichier, le nom ou l'identifiant d'un personnage ; et, depuis 0.1155, les dernières alertes qui ont sonné en jeu en dehors des
-  alarmes Tensho (monnaies, mission prête, PR, usure de l'équipement, objets importants, marques de chasse : 4 au plus, 200 caractères
+  alarmes Tensho (devises, mission prête, PR, usure de l'équipement, objets importants, cibles d'élite : 4 au plus, 200 caractères
   chacune, telles que la ligne du chat les a dites, gardées 2 minutes), pour que l'application les fasse sonner aussi ; et, depuis 0.1156,
   combien le personnage possède de chaque objet des alarmes qui demandent une quantité (32 objets au plus, seulement ceux vus), pour que
   l'application se taise quand il est déjà récolté. L'application de bureau s'y connecte sous le même utilisateur seulement et
@@ -294,7 +294,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   transaction ; les fichiers d'avant, `InventoryBank/` avec un fichier par personnage, sont gardés une fois dans `before-sqlite-<date>/`,
   un ancien `InventoryBank.json` en `.migrated`) ; le journal des gils (90 jours et 20 000 entrées par personnage au plus ; depuis 0.1139 dans le fichier de données du joueur,
   `TenshoData.db`, une base SQLite à la racine du dossier, enregistré en entier par personnage en une transaction ; les fichiers d'avant,
-  `GilJournal/<id>.json`, sont gardés une fois dans `GilJournal/before-sqlite-<date>/`) ; la progression des succès vue, par personnage
+  `GilJournal/<id>.json`, sont gardés une fois dans `GilJournal/before-sqlite-<date>/`) ; la progression des hauts faits vue, par personnage
   (depuis 0.1140 dans `TenshoData.db` aussi ; le fichier d'avant, `AchievementProgress.json`, est gardé une fois dans `before-sqlite-<date>/`) ; ce que Tensho a
   lu en dernier pour chacun des personnages du joueur (`Characters/`) ; la base locale de découvertes (`Discoveries/` : depuis 0.1136
   une base SQLite, `Discoveries.db`, ce que le joueur a vu lui-même et ce qu'il a importé, écrite ligne par ligne ; les fichiers d'avant,

@@ -139,7 +139,7 @@ internal static class AchievementSqlite1140Tests
                 && !watcher.Contains("File.ReadAllText",StringComparison.Ordinal),"watcher");
             var security=File.ReadAllText(Path.GetFullPath("SECURITY.md")).Split("\n---",2);
             Check(security[0].Contains("achievement progress",StringComparison.Ordinal) && security[0].Contains("AchievementProgress.json",StringComparison.Ordinal)
-                && security[1].Contains("progression des succès",StringComparison.Ordinal),"SECURITY, both halves");
+                && security[1].Contains("progression des hauts faits",StringComparison.Ordinal),"SECURITY, both halves");
         }),
     ];
 }
