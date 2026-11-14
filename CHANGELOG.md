@@ -6,6 +6,14 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1326.0
+- Plan global, X-331 : Marché, prix vus au tableau du jeu (relecture 0.1318, I2) : une réponse d'Universalis sans envoi pour le monde (personne n'y a relevé cet objet, donc aucune date d'envoi) ne cache plus un vrai relevé du tableau du jeu. La règle « le relevé le plus récent gagne » (X-292) compare désormais le relevé du tableau à la date d'envoi d'Universalis seulement ; avant, l'heure de la requête (« maintenant ») comptait à sa place et gagnait toujours. Les autres mondes et la région d'Universalis restent affichés à côté.
+- Pour les joueurs : Un prix vu au tableau du marché du jeu n'est plus caché par une réponse vide d'Universalis pour votre monde.
+- Tests : EmptyUniversalis1326Tests. Verify.ps1 (agent) : 2485/2485, 0 avertissement, 0 erreur ; DLL 0.1326.0.0. Non validé en jeu.
+### English
+- Market, prices seen at the game's board (review of 0.1318, I2): a Universalis answer without an upload for the world (nobody uploaded that item there, so no upload date) no longer hides a real reading of the game's board. The rule « the newest reading wins » (X-292) now compares the board's reading with Universalis' upload date only; before, the request time (« now ») counted instead and always won. Universalis' other worlds and region stay shown beside it.
+- For players: A price you saw at the game's market board is no longer hidden by an empty Universalis answer for your world.
+
 ## 0.1325.0
 - Plan global, X-330 : Découvertes, deux clients du jeu sur un même profil (relecture 0.1318, I1) : un import de fichier et la jonction de la base commune notent désormais la fiche telle qu'elle était, comme une observation, et la sauvegarde ajoute ce changement à la ligne telle qu'elle est enregistrée (« additionner les deux », X-171) au lieu de remplacer la ligne entière. Avant, l'import ou la jonction d'un client effaçait les observations que l'autre avait enregistrées depuis, et une fiche vue par l'autre pouvait redevenir partagée. La copie d'un genre partagé lu plus tard et jointe à une fiche déjà là suit la même règle ; la lecture de la base au démarrage reste une conversion écrite telle quelle (les deux clients font la même, l'additionner compterait deux fois).
 - Pour les joueurs : Avec deux clients du jeu ouverts, importer des découvertes ou joindre celles des autres n'efface plus ce que l'autre client a enregistré.

@@ -141,7 +141,9 @@ public static class SeenPrices
         Quality(entry.Listings,entry.Sales,false,now),Quality(entry.Listings,entry.Sales,true,now),universalis?.NqCheapest,universalis?.HqCheapest,universalis?.NqRegion,universalis?.HqRegion,true);
 
     /// <summary>
-    /// The seen quote when it is newer than Universalis' data for that world (its upload, else its fetch); otherwise null.
+    /// The seen quote when it is newer than Universalis' data for that world (its upload); otherwise null. X-331 (0.1326, review of 0.1318 I2): an
+    /// answer without an upload for the world (none sent to Universalis, UploadedAt null) holds no reading of it: the board seen keeps the line (its
+    /// fetch time, « now », used to win over any look).
     /// X-292 (0.1291, user rule of 13/11: for each line, the newest reading wins, the board seen or Universalis, with its date and source): one
     /// rule, whether the price was asked again (Ctrl+Alt) or not.
     /// 0.821 (user report: the other worlds vanished): with no Universalis quote yet, nothing while Universalis is asked (« waitForUniversalis »), so that the request
@@ -151,7 +153,7 @@ public static class SeenPrices
     {
         if(entry is null || entry.Listings.Count==0 && entry.Sales.Count==0)return null;
         if(universalis is null && waitForUniversalis)return null;
-        if(universalis is not null && (universalis.UploadedAt ?? universalis.FetchedAt)>=entry.Seen)return null;
+        if(universalis?.UploadedAt is { } uploaded && uploaded>=entry.Seen)return null;
         return Quote(entry,universalis,now);
     }
 }
