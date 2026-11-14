@@ -322,12 +322,6 @@ public sealed class SeenPriceStore
     }
 
     // The lock file held for the read and the write (FileShare.None): the other client waits for it, 10 s at most, then the save fails and is kept.
-    private static FileStream HoldLock(string path)
-    {
-        for(var attempt=0;;attempt++)
-        {
-            try{return new FileStream(path,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
-            catch(IOException) when(attempt<100){Thread.Sleep(100);}
-        }
-    }
+    // X-310 (0.1309): the fair lock (FairFileLock): a client saving in a row lets the waiting client go first.
+    private static FileStream HoldLock(string path)=>FairFileLock.Hold(path,10_000,error=>error);
 }

@@ -321,26 +321,16 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
 
     /// <summary>
     /// X-141: work done while holding the profile's lock file (opened without sharing: the other client, or another store here, waits);
-    /// tried again every 50 ms up to lockWaitMs, then <see cref="BankLockBusyException"/> (nothing changed; X-170, 0.1142: its own type, so the
+    /// tried again every 50 ms up to lockWaitMs (fair since X-310: <see cref="FairFileLock"/>), then <see cref="BankLockBusyException"/> (nothing changed; X-170, 0.1142: its own type, so the
     /// service can tell « the other client holds the lock » from a file that cannot be read). X-173 (0.1149): the data file kept busy by another
     /// writer past SQLite's wait is the same case (nothing changed, tried again).
     /// </summary>
     private T Locked<T>(Func<T> work)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(LockPath)!);
-        var until=Environment.TickCount64+lockWaitMs;
-        while(true)
-        {
-            FileStream held;
-            try{held=new FileStream(LockPath,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
-            catch(IOException) when(Environment.TickCount64<until){Thread.Sleep(50);continue;}
-            catch(IOException error){throw new BankLockBusyException(LockPath,error);}
-            using(held)
-            {
-                try{return work();}
-                catch(SqliteException error) when(error.SqliteErrorCode is 5 or 6){throw new BankLockBusyException(LockPath,error);}
-            }
-        }
+        // X-310 (0.1309): the fair lock: a client saving in a row lets the waiting client go first (it could be refused past its wait before).
+        using var held=FairFileLock.Hold(LockPath,lockWaitMs,error=>new BankLockBusyException(LockPath,error));
+        try{return work();}
+        catch(SqliteException error) when(error.SqliteErrorCode is 5 or 6){throw new BankLockBusyException(LockPath,error);}
     }
 
     private FileInventoryBankStore Store(ulong id)
