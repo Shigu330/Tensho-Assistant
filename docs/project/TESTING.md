@@ -1815,6 +1815,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1346) Carte, clic droit, onglet Quêtes, « Quêtes pas encore disponibles » décoché, dans une zone où une quête est acceptée et où un donneur propose une autre quête (au même endroit si possible) : les quêtes que le jeu propose restent listées, et une zone où seules des quêtes acceptées figurent ne vide plus la liste des quêtes non commencées.
 
+- [ ] (0.1349) Monde › Découvertes › Échanger maintenant : l'échange finit « fait » et le fichier commun est dit récupéré ou à jour (lu dans community-discoveries/v3/ seulement).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
