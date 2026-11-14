@@ -1752,6 +1752,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1304) En jeu, Accueil : rétrécir la fenêtre ; les tuiles dont le texte ne tient pas finissent par « … » (jamais coupées au milieu d'un mot sans « … »), et l'infobulle de la tuile donne le texte entier
 
+- [ ] (0.1305) Découvertes : après une tâche de servant (exploration), la ligne « … ← tâche : » montre le nom de l'exploration (par exemple « Exploration en forêt XXI »), plus « n° 584 » ; une tâche ciblée montre « tâche de <classe> niv. <niveau> »
+
+- [ ] (0.1306) Peuples alliés : après « Actualiser », le choix « Genre » montre seulement les peuples de combat, d'artisanat ou de récolte ; les Namazu sont sous artisanat et sous récolte ; la colonne « Genre » le dit ; le choix reste après fermeture et réouverture de Tensho
+
+- [ ] (0.1307) Carte, Mor Dhona (X 21.4 Y 5.5) : sans la quête « Les cristaux d'Ardashir » (67748) prise, Cristiana (« Matériaux pour armes anima ») n'est plus sur la carte de Tensho ; les autres marchands de Mor Dhona (Kakalan…) restent
+
+- [ ] (0.1307) Carte : marchand d'une quête : une fois sa quête prise, il apparaît sur la carte de Tensho sans recharger (la carte se refait)
+
+- [ ] (0.1308) Palais des morts (entrée, Gridania de l'Est … ou par l'outil des missions) : Tensho reste actif (pas de ligne « Tensho est en pause » dans le chat, pages ouvertes) ; touche M : la carte du jeu s'affiche (celle du donjon), pas celle de Tensho ; la fenêtre de carte de Tensho, si elle était ouverte, est cachée et revient à la sortie
+
+- [ ] (0.1308) Donjon profond : en combat, l'affichage de Tensho suit les mêmes réglages que dans un donjon normal (caché en combat s'il l'est ailleurs)
+
+- [ ] (0.1308) JcJ (Wolves' Den ou Crystalline Conflict) : Tensho se coupe toujours avec sa ligne dans le chat
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
