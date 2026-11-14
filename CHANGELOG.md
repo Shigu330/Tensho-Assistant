@@ -6,6 +6,12 @@ Chaque version a été compilée et testée par `scripts/Verify.ps1` ; la valida
 Ce fichier garde la dernière release et les versions qui suivent ; les plus anciennes sont dans [docs/changelog/](docs/changelog/)
 (déplacées par `tools/changelog.py archive`, un fichier par centaine de versions).
 
+## 0.1339.0
+- Plan global, X-351 : Carte, icônes fixes à déblocage, sonde (R06) : au chargement de la 0.1338, la liste de la carte du jeu ne contenait qu'une icône sans bit sur 50 de la carte 14 (Ul'dah, facteur d'échelle 200) : la conversion des positions de la liste du jeu (monde × 16) n'a été prouvée qu'à Mor Dhona (facteur 100). Quand la liste du jeu ne correspond à aucune carte, le journal écrit désormais aussi, une fois par changement, les données brutes (facteur d'échelle, décalages, icônes de la feuille et de la liste du jeu, 80 au plus de chaque) pour trouver la règle de position.
+- Tests : MapMarkerShown1338Tests. Verify.ps1 (agent) : 2515/2515, 0 avertissement, 0 erreur ; DLL 0.1339.0.0. Rien à essayer en jeu.
+### English
+- Map, fixed icons with an unlock, probe (R06): when 0.1338 loaded, the game's map list held only one of the 50 icons without a bit of map 14 (Ul'dah, size factor 200): the position rule of the game's list (world × 16) was proven at Mor Dhona only (factor 100). When the game's list matches no map, the log now also writes, once per change, the raw data (size factor, offsets, icons of the sheet and of the game's list, 80 at most of each) to find the position rule.
+
 ## 0.1338.0
 - Plan global, X-351 : Carte, icônes fixes à déblocage, sonde en jeu du 14/11 vers 15 h 45 : la carte du jeu ouverte sur Mor Dhona et d'autres zones depuis Thanalan occidental n'a rien écrit dans le journal, parce que la comparaison lisait seulement la carte où se trouve le joueur (AgentMap.CurrentMapId). Elle essaie maintenant aussi la carte affichée par la fenêtre de carte du jeu (SelectedMapId), et la liste du jeu est donnée à la carte dont elle contient le mieux les icônes sans bit de déblocage (toujours dessinées) ; si elle n'en contient pas au moins la moitié, rien n'est comparé ni retenu : la liste d'une autre carte ne peut plus cacher les icônes de celle-ci. La ligne du journal dit la carte du joueur, la carte affichée et cette part. Nouveau test MapMarkerShown1338.
 - Tests : MapMarkerShown1338Tests. Verify.ps1 (agent) : 2515/2515, 0 avertissement, 0 erreur ; DLL 0.1338.0.0. Non validé en jeu.

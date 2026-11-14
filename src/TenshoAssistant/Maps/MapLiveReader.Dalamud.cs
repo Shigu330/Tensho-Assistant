@@ -312,7 +312,15 @@ internal sealed class MapLiveReader : IDisposable
         {
             var unsure=$"Map icon unlocks: the game's list ({game.Count} icons) matches neither the player's map {agent->CurrentMapId} nor the shown map {agent->SelectedMapId} "
                 +$"(best: map {mapId}, {coverage.Found} of {coverage.Total} icons without an unlock bit): nothing compared";
-            if(unsure!=markerUnlockLine){markerUnlockLine=unsure;log.Information(unsure);}
+            if(unsure!=markerUnlockLine)
+            {
+                markerUnlockLine=unsure;log.Information(unsure);
+                // 0.1339 (X-351, R06): the raw data to find the game's position rule on this map (size factor, offsets, both lists), once per change.
+                var raw=$"Map icon unlocks raw: map {mapId} size {map.SizeFactor} offset {map.OffsetX},{map.OffsetY}; sheet: "
+                    +string.Join(" ",rows.Where(row=>row.Icon!=0).Take(80).Select(row=>$"{row.Icon}@{row.X},{row.Y}"))
+                    +"; game: "+string.Join(" ",game.Take(80).Select(marker=>$"{marker.Icon}@{marker.X},{marker.Y}"));
+                log.Information(raw);
+            }
             return;
         }
         var checks=MapMarkerUnlock.Compare(sheet,map.SizeFactor,map.OffsetX,map.OffsetY,game,unlocked);
