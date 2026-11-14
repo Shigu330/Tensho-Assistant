@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Data.Sqlite;
 using TenshoAssistant;
 using TenshoAssistant.Inventory;
@@ -20,18 +21,27 @@ internal static class FairLock1309Tests
 
     private static string[] Marks(string root) => Directory.GetFiles(root,"*.wait-*");
 
-    // A client that takes the lock again as soon as it released it, for `seconds` (or until stopped); returns how many times it held it.
-    private static Task<int> Greedy(Func<IDisposable> hold,int holdMs,int seconds,CancellationToken stop) => Task.Run(() =>
+    // A client that takes the lock again as soon as it released it, for `seconds` (or until stopped); `held` counts the times it held it.
+    // Its own thread (not the pool's, which Verify keeps busy with the other tests): it starts at once.
+    private static Thread Greedy(Func<IDisposable> hold,int holdMs,int seconds,CancellationToken stop,StrongBox<int> held)
     {
-        var count = 0;
-        var until = Environment.TickCount64 + seconds * 1000L;
-        while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+        var thread = new Thread(() =>
         {
-            using (hold()) Thread.Sleep(holdMs);
-            count++;
-        }
-        return count;
-    });
+            var until = Environment.TickCount64 + seconds * 1000L;
+            while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
+            {
+                using (hold()) { Interlocked.Increment(ref held.Value); Thread.Sleep(holdMs); }
+            }
+        }) { IsBackground = true };
+        thread.Start();
+        return thread;
+    }
+    private static void Started(StrongBox<int> held)
+    {
+        var until = Environment.TickCount64 + 10_000;
+        while (Volatile.Read(ref held.Value) == 0 && Environment.TickCount64 < until) Thread.Sleep(5);
+        Check(Volatile.Read(ref held.Value) > 0,"the greedy client started");
+    }
 
     private static BankEntry Entry(ulong character,BankStorageKind kind,ulong storage = 0)
     {
@@ -47,16 +57,23 @@ internal static class FairLock1309Tests
         {
             var path = Path.Combine(root,"Profile.lock");
             using var stop = new CancellationTokenSource();
-            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,6,stop.Token);
-            Thread.Sleep(200);
+            var held = new StrongBox<int>();
+            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,6,stop.Token,held);
+            Started(held);
+            var first = Volatile.Read(ref held.Value);
+            var rounds = new List<string>();
             for (var round = 0; round < 5; round++)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
-                using (FairFileLock.Hold(path,2_000,error => new TimeoutException("starved: " + error.Message))) { }
+                var before = Volatile.Read(ref held.Value);
+                using (FairFileLock.Hold(path,2_000,error => new TimeoutException("starved: " + error.Message))) Thread.Sleep(5);
+                rounds.Add(watch.ElapsedMilliseconds + " ms, greedy +" + (Volatile.Read(ref held.Value) - before));
                 Check(watch.ElapsedMilliseconds < 1_500,"the waiting client got the lock in " + watch.ElapsedMilliseconds + " ms (round " + round + ")");
             }
             stop.Cancel();
-            Check(greedy.Wait(TimeSpan.FromSeconds(30)) && greedy.Result > 5,"the greedy client kept saving too: " + greedy.Result);
+            // Fair, not a hand-over: the greedy client got the lock again meanwhile (it is not starved in turn).
+            var during = Volatile.Read(ref held.Value) - first;
+            Check(greedy.Join(TimeSpan.FromSeconds(30)) && during >= 1,"the greedy client kept saving too: " + during + " times during the waiting client's turns (" + string.Join("; ",rounds) + ")");
             Check(Marks(root).Length == 0,"no waiting mark left: " + string.Join(", ",Marks(root)));
         })),
         ("Fair lock 1309: behaviour: two bank stores on one data file, one saving in a tight loop: the other's change goes through (lock wait 2 s)",() => InTemp(root =>
@@ -69,29 +86,28 @@ internal static class FairLock1309Tests
             var waiting = new PerCharacterBankStore(folder,legacy,2_000,Data());
             Check(busy.Load().Length == 0 && waiting.Load().Length == 0,"both loaded, empty");
             using var stop = new CancellationTokenSource();
-            var next = 0UL;
-            var greedy = Task.Run(() =>
+            var held = new StrongBox<int>();
+            var greedy = new Thread(() =>
             {
-                var count = 0;
                 var until = Environment.TickCount64 + 8_000;
                 while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
                 {
-                    busy.Apply(new BankChange(Put: Entry(7,BankStorageKind.Retainer,1000 + next++)),[]);
-                    count++;
+                    busy.Apply(new BankChange(Put: Entry(7,BankStorageKind.Retainer,1000 + (ulong)held.Value)),[]);
+                    Interlocked.Increment(ref held.Value);
                 }
-                return count;
-            });
-            Thread.Sleep(300);
+            }) { IsBackground = true };
+            greedy.Start();
+            Started(held);
             for (var i = 0UL; i < 5; i++)
             {
                 var saved = waiting.Apply(new BankChange(Put: Entry(8,BankStorageKind.Retainer,2000 + i)),[]);
                 Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)i + 1,"the waiting store's change " + i + " saved");
             }
             stop.Cancel();
-            Check(greedy.Wait(TimeSpan.FromSeconds(30)),"the greedy store stopped");
+            Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy store stopped");
             var all = new PerCharacterBankStore(folder,legacy,10_000,Data()).Load();
-            Check(all.Count(entry => entry.Key.CharacterId == 8) == 5 && all.Count(entry => entry.Key.CharacterId == 7) == greedy.Result,
-                "nothing lost on either side: " + all.Count(entry => entry.Key.CharacterId == 7) + " of " + greedy.Result);
+            Check(all.Count(entry => entry.Key.CharacterId == 8) == 5 && all.Count(entry => entry.Key.CharacterId == 7) == held.Value,
+                "nothing lost on either side: " + all.Count(entry => entry.Key.CharacterId == 7) + " of " + held.Value);
             Check(Marks(root).Length == 0,"no waiting mark left");
         })),
         ("Fair lock 1309: the lock held by another program: refused past the wait with the caller's exception, the mark removed; free again: taken at once",() => InTemp(root =>
@@ -113,17 +129,31 @@ internal static class FairLock1309Tests
         ("Fair lock 1309: another client's waiting mark lets it go first (half the wait at most, never a refusal); a stale mark is ignored",() => InTemp(root =>
         {
             var path = Path.Combine(root,"Profile.lock");
-            var mark = path + ".wait-" + Guid.NewGuid().ToString("N") + ".lock";
+            var mark = Path.Combine(root,FairFileLock.MarkName(path,DateTime.UtcNow,Guid.NewGuid()));
             File.WriteAllBytes(mark,[]);
-            Check(FairFileLock.OthersWaiting(path),"the mark seen");
+            Check(FairFileLock.Waiting(path,null).Count == 1,"the mark seen");
             var watch = System.Diagnostics.Stopwatch.StartNew();
             using (FairFileLock.Hold(path,600,error => error)) { }
             Check(watch.ElapsedMilliseconds >= 250,"it waited for the marked client first: " + watch.ElapsedMilliseconds + " ms");
             File.SetCreationTimeUtc(mark,DateTime.UtcNow - FairFileLock.StaleMark - TimeSpan.FromMinutes(1));
-            Check(!FairFileLock.OthersWaiting(path),"a stale mark is not a waiting client");
+            Check(FairFileLock.Waiting(path,null).Count == 0,"a stale mark is not a waiting client");
             var stale = System.Diagnostics.Stopwatch.StartNew();
             using (FairFileLock.Hold(path,10_000,error => error)) { }
             Check(stale.ElapsedMilliseconds < 1_000,"no wait for a stale mark: " + stale.ElapsedMilliseconds + " ms");
+        })),
+        ("Fair lock 1310: first come, first served: the marks sort in arrival order; a client waits only for the marks older than its own",() => InTemp(root =>
+        {
+            var path = Path.Combine(root,"Profile.lock");
+            var now = DateTime.UtcNow;
+            var first = FairFileLock.MarkName(path,now.AddMilliseconds(-5),Guid.NewGuid());
+            var second = FairFileLock.MarkName(path,now,Guid.NewGuid());
+            var third = FairFileLock.MarkName(path,now.AddTicks(1),Guid.NewGuid());
+            Check(string.CompareOrdinal(first,second) < 0 && string.CompareOrdinal(second,third) < 0,"names in arrival order");
+            Check(FairFileLock.MarkName(path,new DateTime(2026,1,1,0,0,0,DateTimeKind.Utc),Guid.Empty).Length == FairFileLock.MarkName(path,now,Guid.Empty).Length,"fixed width");
+            foreach (var name in new[] { third,first,second }) File.WriteAllBytes(Path.Combine(root,name),[]);
+            Check(FairFileLock.Waiting(path,null).SequenceEqual(new[] { first,second,third }),"all, oldest first");
+            Check(FairFileLock.Waiting(path,Path.Combine(root,second)).SequenceEqual(new[] { first }),"the second waits for the first only");
+            Check(FairFileLock.Waiting(path,Path.Combine(root,first)).Count == 0,"the first waits for none: its turn");
         })),
         ("Fair lock 1309: the bank store and the seen prices use the fair lock (one source); a mark ends in .lock, so the desktop link sends no change for it",() =>
         {
