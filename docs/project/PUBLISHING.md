@@ -14,7 +14,7 @@ Rules re-read on 2026-11-04: [submission](https://dalamud.dev/plugin-publishing/
 List checked against the code on 2026-11-09.
 
 The custom repository: `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, updated by `Verify.ps1 -Release`,
-run by the agent (DEC-050); the latest release is on the GitHub releases page. Version 1.0.0 marks the end of the global plan on this custom repository; the user decides
+run by the agent (DEC-050); the latest release is on the GitHub releases page. Version 1.0.0 marks the end of the global plan on this custom repository; the author decides
 it (DEC-039).
 
 Answer received on the Dalamud Discord, 2026-11-05 (hOst1k, question asked by the author): no size limit if the plugin follows the rules;
@@ -118,7 +118,7 @@ Liste relue contre le code le 2026-11-09.
 
 Le dépôt personnalisé : `https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json`, mis à jour par
 `Verify.ps1 -Release`, lancé par l'agent (DEC-050) ; la dernière release est sur la page des releases GitHub. La version 1.0.0 marque la fin du plan global sur ce dépôt
-personnalisé ; c'est l'utilisateur qui la décide (DEC-039).
+personnalisé ; c'est l'auteur qui la décide (DEC-039).
 
 Réponse reçue sur le Discord de Dalamud, 2026-11-05 (hOst1k, question posée par l'auteur) : pas de limite de taille si le plugin respecte
 les règles ; plus il est gros, plus le premier examen est long ; mieux vaut ne pas viser trop complexe dès le départ, Simple Tweaks et

@@ -1,8 +1,8 @@
-# TenshoAssistant
+# Tensho Assistant
 
 > *Traduction française plus bas.*
 
-TenshoAssistant is a Dalamud plugin for Final Fantasy XIV that brings everyday tools together in one window, opened with `/tensho`:
+Tensho Assistant is a Dalamud plugin for Final Fantasy XIV that brings everyday tools together in one window, opened with `/tensho`:
 items and storage, inventory sorting, market prices, crafting, gathering and fishing, a map that replaces the game map, weather, alarms
 and reminders, free company voyages, quests, collections, character stats, a gear planner, Gold Saucer helpers, macro chains,
 the island sanctuary, side content (Eureka and Bozja, deep dungeons, relics, Masked Carnivale), a local base of what you discover
@@ -42,7 +42,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Wishlist** | The items you want to get, in one list: their state (obtained, or the copies you hold), your price for a sale alert and, for the items that are gathered, where to gather them (job, zone, node, hours or weather). |
 | Production | **Crafting** | Simulate a recipe step by step, search a sequence, prepare the materials, and make a macro to copy or write into the game. Other tabs: crafting lists (with an on-screen panel of what they still need) and « What can I craft? » from your stocks. |
 |  | **Gathering** | Find where and when a resource can be gathered or fished, with your gathering and fishing logs, an Eorzean clock and the fishing help. |
-|  | **Ocean fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
+|  | **Ocean Fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
 |  | **Island Sanctuary** | Your workshops' crafts with their estimated value, and the animals of your pasture, from what the game has loaded on your island. |
 |  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts when you click. |
 | World | **Map** | The Tensho map, with your position, flags, favourites, vistas, gathering points and quests; also chat map links, plots for sale, a hunt train recorder and the S ranks' spawn conditions. |
@@ -58,7 +58,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Free Company** | Submersibles and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
 | Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
 |  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
-|  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wish list. |
+|  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wishlist. |
 |  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
 |  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
@@ -66,11 +66,11 @@ and the help text of each page (the « ? » beside its title):
 |  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
 |  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that teach the others. |
 |  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
-|  | **Hunting log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
+|  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
 | Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
 |  | **Relics** | Relic weapons and armour, the stages you hold and the Zodiac book in progress. |
 |  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
-|  | **Deep dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what their coffers give. |
+|  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what their coffers give. |
 |  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
 |  | **Triple Triad** | Your cards, decks, a simulator, NPCs with their availability and the cards you lack. With the observation on, advice during a match. |
@@ -84,7 +84,7 @@ and the help text of each page (the « ? » beside its title):
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
 `/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
-`recolte`, `recette`) open the item in Tensho (item sheet, Market, Gathering, Crafting); `/tensho wiki <item>` and
+`recolte`, `recette`) open the item in Tensho (item page, Market, Gathering, Crafting); `/tensho wiki <item>` and
 `/tensho lodestone <item>` open the item's page in the browser; `/tenshonext` is the end-of-page marker of macro chains. Dalamud's « open » and « settings » buttons open the window and its
 Settings page.
 
@@ -143,7 +143,7 @@ was also generated by the AI agent.
 
 ## Credits
 
-The complete list, with every licence and what each source is used for, is the plugin's **Credits** page (Preferences › Credits,
+The complete list, with every licence and what each source is used for, is the plugin's **Credits** page (References › Credits,
 `src/TenshoAssistant/Credits/CreditCatalog.cs`, kept in step with the code by tests); this section summarises it.
 
 FINAL FANTASY is a registered trademark of Square Enix Holdings Co., Ltd. FINAL FANTASY XIV © SQUARE ENIX CO., LTD. All rights reserved.
@@ -191,11 +191,11 @@ This project is an original plugin implementation, but it relies on these ecosys
 
 ---
 
-# TenshoAssistant
+# Tensho Assistant
 
 Version française / French version
 
-TenshoAssistant est un plugin Dalamud pour Final Fantasy XIV qui réunit dans une seule fenêtre, ouverte par `/tensho`, des outils du
+Tensho Assistant est un plugin Dalamud pour Final Fantasy XIV qui réunit dans une seule fenêtre, ouverte par `/tensho`, des outils du
 quotidien : objets et rangements, tri de l'inventaire, prix du marché, artisanat, récolte et pêche, une carte qui remplace celle du jeu,
 météo, alarmes et rappels, expéditions de la compagnie libre, quêtes, collections, statistiques du personnage, planificateur
 d'équipement, aides du Gold Saucer, enchaînement de macros, la Félicité insulaire, des contenus annexes (Eurêka et Bozja, donjons
@@ -234,7 +234,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Tri de l'inventaire** | Prévisualisez une règle de tri, puis appliquez-la à vos rangements. Rien ne bouge sans votre clic. |
 |  | **Marché** | Les prix de l'objet choisi, depuis Universalis : résumé, offres de votre monde, centre de traitement de données ou région, historique des ventes. |
 |  | **Souhaits** | Les objets que vous voulez obtenir, en une liste : leur état (obtenu, ou les exemplaires que vous avez), votre prix pour l'alerte de vente et, pour les objets qui se récoltent, où les récolter (job, zone, point, heures ou météo). |
-| Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes de fabrication (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
+| Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes d'artisanat (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
 |  | **Récolte** | Trouvez où et quand récolter ou pêcher une ressource, avec vos carnets, l'horloge d'Éorzéa et l'aide à la pêche. |
 |  | **Pêche en mer** | Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée. |
 |  | **Félicité insulaire** | Les créations de vos fabriques avec leur valeur estimée, et les animaux de votre pâturage, à partir de ce que le jeu a chargé sur votre île. |
@@ -245,7 +245,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **PNJ vendeurs** | Qui vend un objet, à quel prix et où. |
 |  | **Butin des contenus** | Ce que chaque contenu peut donner, et où vous en êtes. |
 |  | **Butin des monstres** | Quels monstres donnent l'objet choisi, et où les trouver. |
-|  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'info-bulle des objets montrent ce que vous avez vu. |
+|  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'infobulle des objets montrent ce que vous avez vu. |
 | Suivi | **Alarmes** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
 |  | **Rappels** | Les minuteurs et compteurs du jeu, avec des cases « fait » : tâches du jour et de la semaine, servants, expéditions, missions aléatoires, escouade, état du personnage, vos propres tâches. |
 |  | **Jardinage** | Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
@@ -269,7 +269,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Gold Saucer | **Revue de mode** | Le thème et les catégories de la semaine, ce que vous possédez pour chacune, et l'équipement signalé par la communauté. |
 |  | **Triple Triade** | Vos cartes, vos decks, un simulateur, les PNJ avec leur disponibilité et les cartes qui vous manquent. Avec l'observation activée, des conseils pendant un match. |
 |  | **Mini Cactpot** | La meilleure case à révéler et la meilleure ligne d'un ticket. Vous choisissez toujours vous-même. |
-| Références | **Lexique** | Trouver un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface. |
+| Références | **Lexique** | Trouvez un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface. |
 |  | **Aide** | Toute l'aide de Tensho : cherchez-y, lisez les questions fréquentes ou ouvrez une page. Le « ? » à côté du titre explique la page où vous êtes. |
 |  | **Crédits** | À qui Tensho doit ses données et ses bibliothèques, avec leurs licences. |
 | Préférences | **Paramètres** | Toutes les options de Tensho, groupées par domaine. Chacune a son infobulle, et le bouton de retour au défaut (flèche courbe), à côté d'une option changée, la remet par défaut. |
@@ -280,7 +280,7 @@ Commandes : `/tensho` ouvre la fenêtre ; `/tensho peche` (ou `pêche`, `fish`, 
 `/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
 `price`, `gather`, `recipe`) ouvrent l'objet dans Tensho (fiche objet, Marché, Récolte, Artisanat) ; `/tensho wiki <objet>` et `/tensho lodestone <objet>` ouvrent la page de
 l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'enchaînement de macros. Les boutons « ouvrir » et
-« réglages » de Dalamud ouvrent la fenêtre et sa page Paramètres.
+« paramètres » de Dalamud ouvrent la fenêtre et sa page Paramètres.
 
 ## Fonctions
 
@@ -295,7 +295,7 @@ donnée communautaire), le plugin le dit au lieu de deviner. Validation en jeu d
 Chaque release porte aussi `TenshoAssistant.Desktop.zip` : les mêmes pages dans une fenêtre Windows, jeu fermé (étape 1 de l'application de
 bureau ; le lien avec le jeu lancé viendra ensuite). Décompressez-le où vous voulez et lancez `TenshoAssistant.Desktop.exe`. Il lui faut
 XIVLauncher avec Dalamud et le jeu installés (elle lit l'ImGui de Dalamud et les données du jeu là où ils sont installés ; rien d'eux n'est
-livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos réglages Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
+livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos paramètres Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
 restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le
 jeu. L'application et le plugin portent le même numéro de version et sont publiés ensemble : l'application signale au démarrage une version
 différente du plugin installé.
@@ -337,7 +337,7 @@ validée en jeu. Un correctif urgent (patch du jeu, confidentialité) peut parti
 
 ## Crédits
 
-La liste complète, avec chaque licence et l'usage de chaque source, est la page **Crédits** du plugin (Préférences › Crédits,
+La liste complète, avec chaque licence et l'usage de chaque source, est la page **Crédits** du plugin (Références › Crédits,
 `src/TenshoAssistant/Credits/CreditCatalog.cs`, tenue à jour avec le code par des tests) ; cette section la résume.
 
 FINAL FANTASY est une marque déposée de Square Enix Holdings Co., Ltd. FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Tous droits réservés.

@@ -38,7 +38,7 @@ for a time or for good, depending on what happened. A first problem usually gets
 # Code de conduite
 
 Tensho Assistant est un petit projet communautaire. Ce code s'applique à toute personne qui y participe sur GitHub : tickets,
-Discussions, demandes de fusion, relectures et commentaires, et l'échange des découvertes partagées.
+Discussions, pull requests, relectures et commentaires, et l'échange des découvertes partagées.
 
 ## Ce que nous attendons
 

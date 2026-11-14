@@ -95,7 +95,7 @@ Development builds in game:
 - **Never invent game data.** Any data link (Excel sheet, native field, external format) must be proven: use a read-only probe
   (`tools/ShopCurrencyProbe`, `tools/ApiProbe`) or a cited source; the output must be kept in `docs/evidence/` and referenced in the code.
 - Game data first; community data only when the game does not have it (see `docs/project/DECISIONS.md`, DEC-011).
-- Unknown ≠ zero: display "unknown" instead of a guessed value; cite the source of community data (Garland Tools, FFXIV wiki, Universalis,
+- Unknown ≠ zero: display « unknown » instead of a guessed value; cite the source of community data (Garland Tools, FFXIV wiki, Universalis,
   GatherBuddy, Teamcraft, LuminaSupplemental, FFXIVGachaSpreadsheet, SubmarineTracker, and every other source on the Credits page).
 - Game memory: read on the framework thread and copied into managed data; nothing heavy in `Draw`; native string reads are bounded.
 - Network: requests are bounded in time and size and their results go through the disk cache (`Caching/DataCache.cs`). New community
@@ -164,7 +164,7 @@ gallery, see [community-templates/README.md](community-templates/README.md). Nei
 
 1. One branch per subject; keep each subject small and verifiable.
 2. `Verify.ps1` must be green; add new tests for the pure logic.
-3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was "validated in-game" or not), with a `### English`
+3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was « validated in game » or not), with a `### English`
    summary.
 4. Pull request towards `Devloppement`, describing the in-game test performed.
 
@@ -218,7 +218,7 @@ requires, among other things (restrictions and AI policy re-read on 2026-11-04):
   clearly AI-written submission means a ban; Copilot and Auto submissions are reviewed at the maintainers' discretion and may be closed if
   larger than the author can account for; the author must understand, test, and explain the code.
 
-**Current project status:** the code is written with an AI agent (level "Auto") under the direction of its author, who tries the changes
+**Current project status:** the code is written with an AI agent (level « Auto ») under the direction of its author, who tries the changes
 in game. Each release is built and tested automatically (compilation, tests, the desktop app drawn without a window), then loaded
 once in game with its self-check, which its notes say (« checked at launch, not tried in detail yet »); the detailed in-game tests
 come after, grouped in campaigns, and CHANGELOG.md says for each version whether it was validated in game. An urgent fix
@@ -437,8 +437,7 @@ logique est dans `scripts/Release.ps1`. Sujets des commits : `x.y.z` la premièr
 release, `x.y.z · docs` après elle (documentation seulement).
 
 Dépôt Dalamud personnalisé (installation sans la DLL de développement) :
-`https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` (Dalamud › Settings › Experimental › Custom Plugin
-Repositories), mis à jour par chaque `-Release`.
+`https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` (`/xlsettings` › Expérimental › Dépôts de plugins personnalisés), mis à jour par chaque `-Release`.
 
 ## Publication Dalamud
 

@@ -42,7 +42,7 @@ What the game has shown it (storages, collections, progress), your settings, not
 
 ## Where are my files, and how do I erase everything (and what I shared)?
 
-Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the folder %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, the discoveries, a cache). The desktop app adds %LOCALAPPDATA%\TenshoAssistant\ (its copy of the data, its cache and versions), which stays after you delete the app. To erase everything: remove Tensho in Dalamud, then delete that file and those folders. One character only: Storage › Characters › « Erase ». What you shared: « Disconnect » keeps your gist and your ticket on GitHub; delete the gist on github.com and close the ticket. Discoveries already merged into the shared base (CC0) stay in it: ask on GitHub to have yours withdrawn.
+Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the folder %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, the discoveries, a cache). The desktop app adds %LOCALAPPDATA%\TenshoAssistant\ (its copy of the data, its cache and versions), which stays after you delete the app. To erase everything: remove Tensho in Dalamud, then delete that file and those folders. One character only: Storage › Characters › « Erase ». What you shared: « Disconnect » keeps your gist and your issue on GitHub; delete the gist on github.com and close the issue. Discoveries already merged into the shared base (CC0) stay in it: ask on GitHub to have yours withdrawn.
 
 ## Does Tensho play for me?
 
@@ -74,11 +74,11 @@ Its author chose to publish it on its own repository. Dalamud's support does not
 
 ## Where can I ask a question?
 
-On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in a ticket (« Report a problem or help » on the Help page).
+On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in an issue (« Report a problem or help » on the Help page).
 
 ## Something is wrong.
 
-Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the ticket leaves in one click; otherwise the GitHub form opens in your browser, filled in.
+Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the issue leaves in one click; otherwise the GitHub form opens in your browser, filled in.
 
 ## How can I help translate Tensho?
 
@@ -172,7 +172,7 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 
 ## Comment retirer les panneaux autour des fenêtres du jeu ?
 
-Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
+Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre du serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
@@ -184,7 +184,7 @@ Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage d
 
 ## Comment repartir de zéro ?
 
-Paramètres › Avancé › « Tout remettre par défaut » remet chaque réglage à sa valeur par défaut. Vos données restent : alarmes, préréglages, decks, plans et ce que le jeu a montré. Son info-bulle liste tout ce qui est gardé.
+Paramètres › Avancé › « Tout remettre par défaut » remet chaque réglage à sa valeur par défaut. Vos données restent : alarmes, préréglages, decks, plans et ce que le jeu a montré. Son infobulle liste tout ce qui est gardé.
 
 ## Pourquoi Tensho n'est-il pas dans la liste officielle de Dalamud ?
 

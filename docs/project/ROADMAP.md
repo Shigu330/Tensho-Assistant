@@ -61,7 +61,7 @@ game. The plans R-06 and R-11 are the author's working notes, outside the reposi
 | R-06 | Interface overhaul | steps 1 (0.247–0.263), 2 (0.264), 4 (0.270–0.271); 3 mostly (item sheet 0.272, Storage 0.280); 5 in part (↺ 0.249–0.262, « Reset everything to default » 0.258, tooltips on every setting 0.287, map settings 0.288–0.289); 6: lightness (0.290–0.292) and the game's title font (0.293–0.294) | 0.265–0.271, 0.276–0.279, 0.287–0.294 | useful missing settings (step 5, point d); game frames and textures (step 6, removed in 0.510, DEC-033); `FilteredTable` removed from the plan (DEC-023) |
 | R-07 | Free company | page and expeditions 0.307, best routes 0.309, builds 0.315; DEC-023 follow-up done: flagged sectors 0.334, market prices and tiers 0.335, airships 0.336–0.337; history 0.379 | no | to validate in game |
 | R-08 | Reminders | page 0.300, icon and tooltip in the server bar 0.300–0.302, expeditions 0.307, squadron 0.333; then step g (M-01 to M-05, N-01 to N-03) | no | Ehcatl Nine left out (nothing readable, 0.334); to validate in game |
-| R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | to validate; no future dates (no reliable source) |
+| R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | no future dates (no reliable source) |
 | R-10 | Cache audit | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
 | R-11 | Gear | step 1 (0.310), glamour (0.311), materia and caps (0.312–0.313), sources and ownership (0.314), vessel builds (0.315) | 0.310–0.314 | 0.315 and 0.340 to validate; step 4: chocobo barding DONE 0.340, Chocobo page 0.341 (squadron left out, recommended default, decision at the end) |
 | R-12 | Discord webhook for alarms | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
@@ -102,8 +102,8 @@ Open points, produced by script from the agent's source of decisions. Choices al
 ## In-game tests
 
 The current list: the boxes of [TESTING.md](TESTING.md). The guided in-game campaign of the whole plugin is phase 6 of the
-[global plan](GLOBAL-PLAN.md). Records still asked for (data unknown, see « To decide »): marker type of an accepted leve; quest icon
-variants 71141 / 71151.
+[global plan](GLOBAL-PLAN.md). Records still asked for (data unknown): marker type of an accepted leve; quest icon
+variants 71141 / 71151 (see « To decide », D-88).
 
 ## Complementary domain
 
@@ -129,7 +129,7 @@ NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitu
 
 ## Matrice principale
 
-La colonne « Travail » a été écrite au 0.315 (2026-11-02) et complétée jusqu'au 0.512 ; la suite est dans le
+La colonne « Travail » a été écrite à la 0.315 (2026-11-02) et complétée jusqu'à la 0.512 ; la suite est dans le
 [CHANGELOG](../../CHANGELOG.md) et le [plan global](GLOBAL-PLAN.md). « Validé » = rapport ou capture de l'utilisateur ; les autres
 versions citées sont à valider en jeu. Les fiches d'objectifs que citaient ces lignes étaient des notes de travail de l'auteur,
 hors du dépôt.
@@ -150,7 +150,7 @@ hors du dépôt.
 | 12 | MAP-001 | Mappy | MidoriKami, harbingerftw | Carte en jeu polyvalente | ACTIVE | PARTIAL | Carte Tensho remplaçant la carte du jeu (M, quête du journal, éthérites) : icônes du jeu à taille/priorité par carte, quêtes et mandats, ALÉA, groupe, récolte/pêche à horaires, vents éthérés, exploration (météo du wiki), marchands, drapeau, téléportation au coût réel, listes par onglet. Validé en jeu : 0.100–0.156 (dont carte hôte hors écran, zones colorées, zoom, maisons des splendeurs de Rowena), variantes de carte (0.171–0.175), icônes de quêtes (0.211), réglages et cône de vision (0.287–0.289), repères au bord de la carte et « Retirer le drapeau » (0.297–0.299), menus et outils par-dessus la carte (0.303–0.306). À valider : R-01 (0.242–0.243), R-03 (0.244), R-04 (0.245), fond du zoom (0.308). Inconnus : type de marqueur des mandats, sens des variantes d'icônes de quête | [icônes d'événements](../evidence/0.211-event-icons.md) | C |
 | 13 | LOOT-001 | Monster Loot Hunter | Sylf | Sources de matériaux sur les monstres | ACTIVE | PARTIAL | Matériau/monstre/zone, fiches, cache/cadence/annulation et contexte testés ; LuminaSupplemental (MobDrop) en tête (0.190, validé), puis le wiki FFXIV et Garland pour les lieux ; données partielles | — | B |
 | 14 | MARKET-001 | Price Insight | Kouzukii | Prix du marché au survol d'un objet | ACTIVE | PARTIAL | Consultation manuelle et survol sur option NQ/HQ/monde, accroché à l'infobulle, stock et moins cher du centre de données validés en jeu (0.85–0.86) ; page Marché enrichie (R-06 étape 4 : annonces Universalis, filtres, coût pour N unités, historique, tri des colonnes) validée en jeu (0.270–0.271) ; repli sur le cache disque si Universalis échoue (0.281, à valider) | [annonces Universalis](../evidence/0.270-universalis-listings.md) | B |
-| 15 | QUEST-001 | QuestTracker | isaiahcat, keifufu | Progression et complétion des quêtes | ACTIVE | PARTIAL | Fiches/liens/niveaux/zones/carte, récompenses natives conditionnelles et index inverse Objet → quête hors du dessin ; progression observée jointe aux sources d'un objet (0.76, validé) ; types de quêtes des sections du journal, pourcentages, cités de départ et options non prises (0.283–0.286, validés). Monnaies/rangs non prouvés ; disponibilité à compléter | [sections du journal](../evidence/0.283-quest-journal-sections.md), [cités de départ](../evidence/0.285-quest-start-cities.md), [options](../evidence/0.286-quest-alternatives.md) | B |
+| 15 | QUEST-001 | QuestTracker | isaiahcat, keifufu | Progression et complétion des quêtes | ACTIVE | PARTIAL | Fiches/liens/niveaux/zones/carte, récompenses natives conditionnelles et index inverse Objet → quête hors du dessin ; progression observée jointe aux sources d'un objet (0.76, validé) ; types de quêtes des sections du journal, pourcentages, cités de départ et options non prises (0.283–0.286, validés). Devises/rangs non prouvés ; disponibilité à compléter | [sections du journal](../evidence/0.283-quest-journal-sections.md), [cités de départ](../evidence/0.285-quest-start-cities.md), [options](../evidence/0.286-quest-alternatives.md) | B |
 | 16 | SORT-001 | SortaKinda | MidoriKami | Personnalisation de l'inventaire, règles, aperçu et application | ACTIVE | PARTIAL | Profils et modèles réutilisables, critères multiples, zones protégées/filtrées, remplissage dans les deux sens et application visuelle après capture directe ; tri natif validé en jeu (2026-10-30). Arsenal lu comme rangement (0.235, à valider) mais pas trié : tri de l'arsenal et tri automatique laissés pour plus tard (I-14) | — | A |
 | 17 | TRIAD-001 | TriadBuddy | MgAl2O4 | Solveur de Triple Triade | ACTIVE | PARTIAL | Carnet/deck/solveur manuel testés ; TRIAD-003 terminé : conseil superposé en match (0.160), % par deck et génération de deck à la fenêtre de défi (0.161), decks Tensho (0.162) validés en jeu ; carnet (menus, valeurs, tri, score estimé, cartes Ex.) validé (0.265–0.269, 0.276–0.279). Règles natives non couvertes | [cartes Ex.](../evidence/0.278-triad-ex-cards.md) | C |
 
@@ -173,7 +173,7 @@ plans R-06 et R-11 sont des notes de travail de l'auteur, hors du dépôt.
 | R-06 | Refonte de l'interface | étapes 1 (0.247–0.263), 2 (0.264), 4 (0.270–0.271) ; 3 pour l'essentiel (fiche objet 0.272, Rangements 0.280) ; 5 en partie (↺ 0.249–0.262, « Tout remettre par défaut » 0.258, infobulles de tous les réglages 0.287, réglages de carte 0.288–0.289) ; 6 : légèreté (0.290–0.292) et police de titre du jeu (0.293–0.294) | 0.265–0.271, 0.276–0.279, 0.287–0.294 | réglages utiles manquants (étape 5, point d) ; cadres et textures du jeu (étape 6, retirés en 0.510, DEC-033) ; `FilteredTable` retiré du plan (DEC-023) |
 | R-07 | Compagnie libre | page et expéditions 0.307, meilleurs trajets 0.309, montages 0.315 ; suite DEC-023 faite : secteurs signalés 0.334, prix du marché et paliers 0.335, aéronefs 0.336–0.337 ; historique 0.379 | non | à valider en jeu |
 | R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307, escouade 0.333 ; puis étape g (M-01 à M-05, N-01 à N-03) | non | Planeurs d'Ehcatl laissés (rien de lisible, 0.334) ; à valider en jeu |
-| R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | à valider ; pas de dates à venir (aucune source fiable) |
+| R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | pas de dates à venir (aucune source fiable) |
 | R-10 | Audit des caches | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
 | R-11 | Équipement | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 et 0.340 à valider ; étape 4 : barde de chocobo FAITE 0.340, page Chocobo 0.341 (escouade retirée, défaut recommandé, décision de la fin) |
 | R-12 | Webhook Discord pour les alarmes | 0.319 | non | à valider en jeu ; utilisé ensuite par C-10, I-02, M-01 |
@@ -215,8 +215,8 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 ## Tests en jeu
 
 La liste à jour : les cases de [TESTING.md](TESTING.md). La campagne guidée en jeu de tout le plugin est la phase 6 du
-[plan global](GLOBAL-PLAN.md). Relevés encore demandés (données inconnues, voir « À décider ») : type de marqueur d'un mandat accepté ;
-variantes d'icônes de quête 71141 / 71151.
+[plan global](GLOBAL-PLAN.md). Relevés encore demandés (données inconnues) : type de marqueur d'un mandat accepté ;
+variantes d'icônes de quête 71141 / 71151 (voir « À décider », D-88).
 
 ## Domaine complémentaire
 

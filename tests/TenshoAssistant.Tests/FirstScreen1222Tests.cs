@@ -61,7 +61,7 @@ internal static class FirstScreen1222Tests
             var english = Read("src/TenshoAssistant/Localization/Languages/en.json");
             var french = Read("src/TenshoAssistant/Localization/Languages/fr.json");
             Check(english.Contains("%APPDATA%\\\\XIVLauncher\\\\pluginConfigs\\\\TenshoAssistant.json",StringComparison.Ordinal) && english.Contains("%LOCALAPPDATA%\\\\TenshoAssistant\\\\",StringComparison.Ordinal),"where the files are");
-            Check(english.Contains("Your gist and your ticket stay on GitHub",StringComparison.Ordinal) && french.Contains("Votre gist et votre ticket restent sur GitHub",StringComparison.Ordinal),"Disconnect says what stays");
+            Check(english.Contains("Your gist and your issue stay on GitHub",StringComparison.Ordinal) && french.Contains("Votre gist et votre ticket restent sur GitHub",StringComparison.Ordinal),"Disconnect says what stays");
             Check(english.Contains("kept in clear in the plugin's configuration file",StringComparison.Ordinal) && french.Contains("gardée en clair dans le fichier de configuration",StringComparison.Ordinal),"the webhook address is in clear");
             var readme = Read("README.md");
             Check(readme.Split("%LOCALAPPDATA%\\TenshoAssistant\\").Length == 3,"README: the desktop app's folder, in both halves");

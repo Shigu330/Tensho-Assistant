@@ -25,12 +25,12 @@ Current state (counted in the language files, version <!-- docgen:version -->0.1
 <!-- /docgen:languages-en -->
 
 The completion of each language is shown in
-Settings → Debug and in the contributor panel of Diagnostics (developer mode).
+Settings › Debug and in the contributor panel of Diagnostics (developer mode).
 
 Language files are discovered automatically; no enum or C# window changes are needed.
 The languages live only inside `TenshoAssistant.dll` (embedded resources, since 0.248); the package ships no language file. To test a
 translation, create a `Localization/Languages` folder next to the installed DLL and put the JSON file there: external values override
-bundled values. Use Settings → Advanced to enable Developer mode, then Settings → Debug → Reload translations to load edits from the
+bundled values. Use Settings › Advanced to enable Developer mode, then Settings › Debug › Reload translations to load edits from the
 installed plugin's `Localization/Languages` directory. The contributor panel of Diagnostics (developer mode) can show translation keys.
 Reloading is explicit; JSON is never parsed by the normal translation lookup during rendering.
 
@@ -69,12 +69,12 @@ L'anglais est la langue de référence. Les clés manquantes se replient sur l'a
 <!-- /docgen:languages-fr -->
 
 L'avancement de chaque langue est
-affiché dans Paramètres → Debug et dans le panneau contributeur de Diagnostics (mode développeur).
+affiché dans Paramètres › Débogage et dans le panneau contributeur de Diagnostics (mode développeur).
 
 Les fichiers de langue sont trouvés automatiquement ; aucun changement d'énumération ni de fenêtre C# n'est nécessaire.
 Les langues vivent seulement dans `TenshoAssistant.dll` (ressources embarquées, depuis la 0.248) ; le paquet ne livre aucun fichier de
 langue. Pour essayer une traduction, créez un dossier `Localization/Languages` à côté de la DLL installée et posez-y le fichier JSON : les
-valeurs externes remplacent les valeurs embarquées. Dans Paramètres → Avancé, activez le mode développeur, puis Paramètres → Debug →
+valeurs externes remplacent les valeurs embarquées. Dans Paramètres › Avancé, activez le mode développeur, puis Paramètres › Débogage ›
 Recharger les traductions pour charger les modifications du dossier `Localization/Languages` du plugin installé. Le panneau
 contributeur de Diagnostics (mode développeur) peut afficher les clés de traduction. Le rechargement est explicite ; le JSON n'est jamais lu par la recherche normale des traductions pendant
 le rendu.
