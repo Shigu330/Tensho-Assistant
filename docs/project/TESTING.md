@@ -1802,6 +1802,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1335) Ouvrir la carte du jeu à Mor Dhona, puis la carte de Tensho sur une autre zone, puis revenir à Mor Dhona sur la carte de Tensho sans rouvrir celle du jeu : l'icône à X 28.5 Y 14.1 (dessinée par le jeu) reste, l'icône « Échangeur » seule à X 21.4 Y 5.5 reste absente.
 
+- [ ] (0.1338) Depuis n'importe quelle zone, ouvrir la carte du jeu et afficher Mor Dhona, puis 4 ou 5 autres zones (quelques secondes chacune) : dalamud.log a une ligne « Map icon unlocks on map … » pour chaque carte qui a des icônes à déblocage (vérifié par l'agent).
+
+- [ ] (0.1340) Ouvrir la carte de Tensho à Ul'dah (Faubourg de Thal ou Quartier de Nald) puis à Mor Dhona : les icônes fixes présentes sur la carte du jeu y sont, l'icône « Échangeur » seule à Mor Dhona (X 21.4 Y 5.5) reste absente.
+
+- [ ] (0.1342) Ouvrir la carte de Tensho au Faubourg de Thal (Ul'dah) : un seul masque bleu (celui que montre la carte du jeu), pas trois.
+
+- [ ] (0.1343) Carte de Tensho au Faubourg de Thal (Ul'dah), « Quêtes pas encore disponibles » décoché : les 4 icônes rouges de quêtes de déblocage que montre la carte du jeu y sont aussi ; une quête dont les quêtes préalables ne sont pas faites reste cachée.
+
+- [ ] (0.1344) Onglet Quêtes de la carte de Tensho au Gold Saucer, « Quêtes pas encore disponibles » décoché : seule la quête de l'événement en cours (« Avalanche de mots ») y figure parmi les quêtes d'événement, comme sur la carte.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
