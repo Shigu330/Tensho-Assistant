@@ -85,7 +85,7 @@ internal static class ReportPrivacy1125Tests
         {
             var help=Read("src/TenshoAssistant/MainWindow.Help.cs");
             Check(help.Contains("Dalamud.Utility.Util.OpenLink(preview.Send.Url)") && !help.Contains("OpenLink(link.Url)"),"opens the previewed address");
-            Check(help.Contains("if (ProblemDraftNow(kind) != preview.Draft) problemPreview = null;"),"a changed draft drops the preview");
+            Check(help.Contains("if (ProblemDraftNow(kind) != preview.Draft || preview.Direct != direct) problemPreview = null;"),"a changed draft drops the preview");
             Check(help.Contains("if (preview.Send.Clipboard is { } clipboard) ImGui.SetClipboardText(clipboard);"),"the clipboard gets the previewed text");
             var advanced=Read("src/TenshoAssistant/MainWindow.Advanced.cs");
             Check(advanced.Contains("private string BugReport() => TenshoAssistant.Help.ProblemReport.Diagnostic(BugReportFields());"),"diagnosis from fields");

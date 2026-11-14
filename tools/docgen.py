@@ -567,9 +567,11 @@ NETWORK = [
     ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com"], "Discovery.AutoExchange",
      ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs"],
      "the common files of this repository; after « Connect GitHub » only, the player's own sightings to an unlisted gist and one issue that links it "
-     "(described below); on « Exchange now » or with « Automatic exchange »",
+     "(described below); on « Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › Report a problem only, the "
+     "player's ticket, whose exact text is shown first",
      "les fichiers communs de ce dépôt ; seulement après « Connecter GitHub », les observations du joueur vers un gist non répertorié et un ticket qui y renvoie "
-     "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique »"),
+     "(décrit plus bas) ; sur « Échanger maintenant » ou avec « Échange automatique » ; et, seulement sur « Envoyer maintenant » "
+     "d'Aide › Signaler un problème, le ticket du joueur, dont le texte exact est montré d'abord"),
     ("Discord webhook", ["discord.com", "discordapp.com", "ptb.discord.com", "canary.discord.com"], "Discord.Enabled",
      ["Alarms/DiscordNotifier.cs", "Alarms/DiscordWebhook.cs"],
      "HTTPS POST of alarms and alerts to the player's own webhook (described below)",

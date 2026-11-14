@@ -1,0 +1,26 @@
+# 0.1324 (X-340): a ticket sent from the game through a player's GitHub connection asks for its form's labels, but GitHub keeps labels only
+# from a sender with write access. This job sets them from the title's prefix (the same as the forms' « title: » in .github/ISSUE_TEMPLATE).
+# The title is never run: it is only compared in the « if » expressions, and the labels passed to gh are fixed words.
+name: "Player report labels"
+
+on:
+  issues:
+    types: [ opened ]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    name: Label
+    if: startsWith(github.event.issue.title, '[Bug]') || startsWith(github.event.issue.title, '[Idea]') || startsWith(github.event.issue.title, '[Translation]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Add the form's labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: ${{ startsWith(github.event.issue.title, '[Bug]') && 'bug,player-report' || startsWith(github.event.issue.title, '[Idea]') && 'enhancement,player-report' || 'translation,player-report' }}
+        run: gh issue edit "$NUMBER" --repo "$REPOSITORY" --add-label "$LABELS"

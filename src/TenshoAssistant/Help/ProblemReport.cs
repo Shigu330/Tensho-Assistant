@@ -26,8 +26,17 @@ public sealed record ProblemSend(string Url, IReadOnlyList<(string Key, string V
 }
 
 /// <summary>
-/// Report a problem (ONBOARD-001, lot 3, G5): the address of the project's GitHub form, filled in. The plugin sends nothing and holds no token: the
-/// player's browser opens, and the player reads and submits it. Form fields by id (.github/ISSUE_TEMPLATE); GitHub answers 414 on a too long address and
+/// 0.1324 (X-340, user's decision of 2026-11-14, R04): the issue sent directly through the player's GitHub connection (the discoveries' one), on
+/// the player's click only. The preview shown before the click is <see cref="Preview"/>, made of the very strings that leave (title and body).
+/// </summary>
+public sealed record ProblemIssue(string Title, string Body, IReadOnlyList<string> Labels)
+{
+    public string Preview() => Title + "\n\n" + Body;
+}
+
+/// <summary>
+/// Report a problem (ONBOARD-001, lot 3, G5): the address of the project's GitHub form, filled in: the player's browser opens, and the player reads
+/// and submits it. Since 0.1324 (X-340), a player connected to GitHub may send <see cref="Issue"/> directly instead, on a click under its preview. Form fields by id (.github/ISSUE_TEMPLATE); GitHub answers 414 on a too long address and
 /// gives no figure, so a safe length is kept. Labels come from the chosen form (template=…: bug, enhancement or translation, and player-report), which
 /// GitHub applies without write access; the title starts with the kind's prefix (0.1323, X-342: players' reports apart from the project's plan).
 /// 0.1125 (X-143 part 3, audit A08): the diagnosis is built from a closed list of fields; paths are masked whole, folders with spaces and network
@@ -101,9 +110,9 @@ public static partial class ProblemReport
     }
 
     /// <summary>The address, the fields as they are in it and the clipboard text, all cleaned the same way (one place: what is previewed is what leaves).</summary>
-    public static ProblemSend Prepare(ProblemDraft draft, IEnumerable<string>? names = null)
+    /// <summary>The form of each kind, its fields by id (cleaned, empty ones left out, in the form's order) and the title with its prefix.</summary>
+    private static (string Template, (string Key, string Value)[] Fields, string Title) Fields(ProblemDraft draft, string[] known)
     {
-        var known = (names ?? LocalNames.Value).ToArray();
         var (template, fields) = draft.Kind switch
         {
             ProblemKind.Idea => ("feature_request.yml", new (string, string)[] { ("need", draft.What), ("example", draft.Expected) }),
@@ -111,7 +120,66 @@ public static partial class ProblemReport
             _ => ("bug_report.yml", [("version", draft.Version), ("client", draft.Client), ("steps", draft.What), ("expected", draft.Expected), ("report", draft.Report)]),
         };
         var cleaned = fields.Select(field => (Key: field.Item1, Value: Clean(field.Item2 ?? string.Empty, known))).Where(field => field.Value.Length > 0).ToArray();
-        var title = ("title", PrefixedTitle(draft.Kind, Clean(draft.Title ?? string.Empty, known)));
+        return (template, cleaned, PrefixedTitle(draft.Kind, Clean(draft.Title ?? string.Empty, known)));
+    }
+
+    /// <summary>The labels of each kind's form (.github/ISSUE_TEMPLATE); GitHub keeps them only for a sender with write access, a workflow of the
+    /// repository (player-report-labels.yml) sets them from the title's prefix for everyone else.</summary>
+    public static IReadOnlyList<string> Labels(ProblemKind kind) => kind switch
+    {
+        ProblemKind.Idea => ["enhancement", "player-report"],
+        ProblemKind.Translation => ["translation", "player-report"],
+        _ => ["bug", "player-report"],
+    };
+
+    /// <summary>The headings of the form's fields, as GitHub writes them in an issue made from the form (« ### label »).</summary>
+    private static string Heading(string key) => key switch
+    {
+        "version" => "Tensho version",
+        "client" => "Game client language and Dalamud version",
+        "steps" => "Steps to reproduce",
+        "expected" => "Expected and actual result",
+        "report" => "Diagnostic report",
+        "need" => "What you need",
+        "example" => "Existing plugin or example (optional)",
+        "language" => "Language",
+        "texts" => "Texts",
+        _ => key,
+    };
+
+    /// <summary>
+    /// 0.1324 (X-340): the issue as it leaves through the GitHub connection: the same cleaned fields as the browser's form, each under its form
+    /// heading, the diagnostic report in a code block whose fence is longer than any run of backticks in it (the report cannot close it).
+    /// </summary>
+    public static ProblemIssue Issue(ProblemDraft draft, IEnumerable<string>? names = null)
+    {
+        var (_, fields, title) = Fields(draft, (names ?? LocalNames.Value).ToArray());
+        var body = new StringBuilder();
+        foreach (var (key, value) in fields)
+        {
+            body.Append("### ").Append(Heading(key)).Append("\n\n");
+            if (key == "report")
+            {
+                var fence = new string('`', Math.Max(3, LongestRun(value, '`') + 1));
+                body.Append(fence).Append("text\n").Append(value.TrimEnd('\n', '\r')).Append('\n').Append(fence).Append("\n\n");
+            }
+            else body.Append(value.Trim()).Append("\n\n");
+        }
+        body.Append("Sent from the in-game form of Tensho Assistant, on the player's click, through their GitHub connection.");
+        return new(title, body.ToString(), Labels(draft.Kind));
+    }
+
+    private static int LongestRun(string text, char mark)
+    {
+        int longest = 0, run = 0;
+        foreach (var letter in text) { run = letter == mark ? run + 1 : 0; longest = Math.Max(longest, run); }
+        return longest;
+    }
+
+    public static ProblemSend Prepare(ProblemDraft draft, IEnumerable<string>? names = null)
+    {
+        var (template, cleaned, prefixed) = Fields(draft, (names ?? LocalNames.Value).ToArray());
+        var title = ("title", prefixed);
         (string Url, IReadOnlyList<(string, string)> Fields) Address(IEnumerable<(string Key, string Value)> pairs)
         {
             var list = new List<(string, string)> { title };

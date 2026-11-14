@@ -69,11 +69,15 @@ public sealed class GitHubExchange : IDisposable
     /// <summary>X-175: the shortest wait between two polls of the device flow (GitHub asks 5 seconds; the behaviour tests wait less).</summary>
     internal TimeSpan PollFloor { get; init; }=TimeSpan.FromSeconds(5);
     private string? userCode,verifyAddress;private ExchangeMessage? message;
+    // X-340 (0.1324): the result of the last problem report sent directly, apart from the exchange's message (the Help page shows it).
+    private ExchangeMessage? reportMessage;
 
     public bool Busy{get{lock(gate)return busy;}}
     public string? UserCode{get{lock(gate)return userCode;}}
     public string? VerifyAddress{get{lock(gate)return verifyAddress;}}
     public ExchangeMessage? Message{get{lock(gate)return message;}}
+    /// <summary>X-340: the last report's result: « ReportSent » (issue number, address), or the cause of a failure; null while none or one is on its way.</summary>
+    public ExchangeMessage? ReportMessage{get{lock(gate)return reportMessage;}}
     public bool Connected{get{lock(gate)return token is not null;}}
     public string Login{get{lock(gate)return meta.Login;}}
     public DateTimeOffset? Exchanged{get{lock(gate)return meta.Exchanged;}}
@@ -108,9 +112,14 @@ public sealed class GitHubExchange : IDisposable
     /// <summary>The automatic exchange is due: none for <see cref="Every"/>, and no attempt for <see cref="Retry"/> (a failure is not retried every second).</summary>
     public bool Due(DateTimeOffset now){lock(gate)return !busy && now-tried>=Retry && (meta.Exchanged is not { } last || now-last>=Every);}
 
-    private bool Start(Func<Task<ExchangeMessage>> work)
+    private bool Start(Func<Task<ExchangeMessage>> work,bool report=false)
     {
-        lock(gate){if(busy)return false;busy=true;message=null;tried=DateTimeOffset.UtcNow;workGeneration=generation;}
+        lock(gate)
+        {
+            if(busy)return false;
+            busy=true;workGeneration=generation;
+            if(report)reportMessage=null;else{message=null;tried=DateTimeOffset.UtcNow;}
+        }
         _=Task.Run(async()=>
         {
             ExchangeMessage result;
@@ -119,13 +128,19 @@ public sealed class GitHubExchange : IDisposable
             catch(ExchangeRefused refused){if(refused.Forget)Disconnect();result=new(refused.Key);}
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){ForgetIfStill(null);result=new("ExchangeUnauthorized");}
             catch(Exception error){result=new("ExchangeFailed",error.GetType().Name);}
-            lock(gate){message=result;busy=false;userCode=null;}
+            lock(gate){if(report)reportMessage=result;else message=result;busy=false;userCode=null;}
         });
         return true;
     }
 
     public bool Connect()=>Start(ConnectAsync);
     public bool Exchange(DiscoveryStore store,bool upload)=>Start(()=>ExchangeAsync(store,upload));
+    /// <summary>
+    /// X-340 (0.1324, user's decision of 2026-11-14, R04): the player's problem report opened as an issue of the repository, through this connection,
+    /// on the player's click only (the Help page calls it from its « Send » button, under the preview of these very strings). False when not
+    /// connected or while another work runs. The token is never written in a message or the log.
+    /// </summary>
+    public bool Report(TenshoAssistant.Help.ProblemIssue issue)=>Connected && Start(()=>ReportAsync(issue),true);
 
     /// <summary>Forgets the token on this PC, and its refresh token (the authorization itself is revoked on github.com › Settings › Applications).</summary>
     public void Disconnect()
@@ -462,6 +477,27 @@ public sealed class GitHubExchange : IDisposable
     }
 
     private bool HasRefresh{get{lock(gate)return refresh is not null;}}
+
+    private async Task<ExchangeMessage> ReportAsync(TenshoAssistant.Help.ProblemIssue issue)
+    {
+        WriteSecrets();
+        await Fresh().ConfigureAwait(false);
+        var body=new JsonObject{["title"]=issue.Title,["body"]=issue.Body,["labels"]=new JsonArray([..issue.Labels.Select(label=>(JsonNode?)JsonValue.Create(label))])};
+        JsonNode? opened;
+        try
+        {
+            try{opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",body.DeepClone()).ConfigureAwait(false);}
+            catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
+            {await Fresh(force:true).ConfigureAwait(false);opened=await Api(HttpMethod.Post,$"https://api.github.com/repos/{Repository}/issues",body.DeepClone()).ConfigureAwait(false);}
+        }
+        catch(HttpRequestException error) when(signIn.App && error.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.NotFound)
+        {throw new ExchangeRefused("ReportAppMissing",false);}
+        var number=opened?["number"] is JsonValue value && value.TryGetValue<int>(out var given) ? given:0;
+        if(number<=0)throw new InvalidDataException("No issue number.");
+        var address=opened?["html_url"] is JsonValue link && link.TryGetValue<string>(out var text) && text.StartsWith($"https://github.com/{Repository}/issues/",StringComparison.Ordinal)
+            ? text:$"https://github.com/{Repository}/issues/{number}";
+        return new("ReportSent",number.ToString(System.Globalization.CultureInfo.InvariantCulture),address);
+    }
 
     private async Task<JsonObject> Form(string address,Dictionary<string,string> fields,CancellationToken? cancel=null)
     {

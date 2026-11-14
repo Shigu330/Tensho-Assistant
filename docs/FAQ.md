@@ -78,7 +78,7 @@ On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assi
 
 ## Something is wrong.
 
-Use « Report a problem or help » on the Help page: it fills in the GitHub form for you, in your browser.
+Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the ticket leaves in one click; otherwise the GitHub form opens in your browser, filled in.
 
 ## How can I help translate Tensho?
 
@@ -196,7 +196,7 @@ Sur le GitHub du projet, dans Discussions › Q&A (github.com/Shigu330/Tensho-As
 
 ## Quelque chose ne va pas.
 
-Utilisez « Signaler un problème ou aider » de la page Aide : cela remplit le formulaire GitHub pour vous, dans votre navigateur.
+Utilisez « Signaler un problème ou aider » de la page Aide, puis « Envoyer sur GitHub… » : le texte exact est montré d'abord. Si GitHub est connecté (Monde › Découvertes), le ticket part en un clic ; sinon le formulaire GitHub s'ouvre rempli dans votre navigateur.
 
 ## Comment aider à traduire Tensho ?
 

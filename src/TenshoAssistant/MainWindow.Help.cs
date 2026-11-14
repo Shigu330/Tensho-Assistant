@@ -197,16 +197,55 @@ internal sealed partial class MainWindow
         if (TenshoAssistant.UI.UiComponents.Header(localization.Get("Help.Contribute"))) DrawProblemForm();
     }
 
-    // 0.504 (lot 3, G5): a form in the game, then the GitHub form filled in, in the player's browser. The plugin sends nothing and holds no token.
+    // 0.504 (lot 3, G5): a form in the game, then the GitHub form filled in, in the player's browser.
+    // 0.1324 (X-340, user's decision of 2026-11-14, R04): with the discoveries' GitHub connection, the issue may instead be sent directly, on the
+    // player's click under the preview of its exact text; without it (or by choice), the browser's form as before.
     private bool problemRequested;
     private int problemKind;
     private string problemTitle = string.Empty, problemWhat = string.Empty, problemExpected = string.Empty, problemReport = string.Empty;
-    private bool problemLeftOut;
+    private bool problemLeftOut, problemDirect = true, problemSent, problemRefused;
     // 0.1125 (X-143 part 3, audit A08): the browser opens only from the preview, which shows the exact strings of the address and the clipboard;
-    // a change to the draft after the preview drops it (the player confirms what is sent, not an older text).
-    private (ProblemDraft Draft, ProblemSend Send)? problemPreview;
+    // a change to the draft after the preview drops it (the player confirms what is sent, not an older text). X-340: a change of the way to send
+    // drops it too (the preview is that of the way chosen: the issue's title and body, or the form's fields and clipboard).
+    private (ProblemDraft Draft, bool Direct, ProblemSend Send, ProblemIssue Issue)? problemPreview;
     private ProblemDraft ProblemDraftNow(ProblemKind kind)
         => new(kind, problemTitle, problemWhat, problemExpected, problemReport, BuildVersion, kind == ProblemKind.Translation ? localization.CurrentCode : $"Plugin language {localization.CurrentCode}");
+
+    /// <summary>X-340: the step to do in the browser, framed so it is seen: the report is in the clipboard, to paste into the form.</summary>
+    private void DrawPasteStep(string text, float width)
+    {
+        var start = ImGui.GetCursorScreenPos();
+        ImGui.Dummy(new Vector2(0, 2));
+        ImGui.Indent(8);
+        ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + width - 16);
+        ImGui.TextColored(Warning, text);
+        ImGui.PopTextWrapPos();
+        ImGui.Unindent(8);
+        var end = new Vector2(start.X + width, ImGui.GetItemRectMax().Y + 4);
+        ImGui.Dummy(new Vector2(0, 2));
+        ImGui.GetWindowDrawList().AddRect(start, end, ImGui.GetColorU32(Warning), 4, ImDrawFlags.None, 1.5f);
+    }
+
+    /// <summary>X-340: the direct report's result: on its way, sent (with a button to open the issue) or the cause of a failure.</summary>
+    private void DrawReportResult(Discoveries.GitHubExchange exchange)
+    {
+        if (exchange.ReportMessage is not { } said) { ImGui.TextDisabled(localization.Get("Help.ReportSending")); return; }
+        if (said.Key == "ReportSent" && said.Args.Length >= 2)
+        {
+            ImGui.TextColored(Success, localization.Format("Help.ReportSent", said.Args[0]));
+            ImGui.SameLine();
+            if (ImGui.SmallButton(localization.Get("Help.ReportOpen"))) Dalamud.Utility.Util.OpenLink(said.Args[1]);
+            Tip("Help.ReportOpenTip");
+            return;
+        }
+        var text = said.Key switch
+        {
+            "ReportAppMissing" => localization.Get("Help.ReportAppMissing"),
+            "ExchangeUnauthorized" or "ExchangeExpired" => localization.Get("DiscoveriesUi." + said.Key),
+            _ => localization.Format("Help.ReportFailed", said.Args.Length > 0 ? said.Args[0] : said.Key),
+        };
+        ImGui.TextColored(Error, text);
+    }
 
     private string ProblemReportText()
     {
@@ -248,41 +287,74 @@ internal sealed partial class MainWindow
         if (ImGui.SmallButton(localization.Get("Help.FormSearch")))
             Dalamud.Utility.Util.OpenLink(ProblemReport.SearchAddress(problemTitle));
         Tip("Help.FormSearchTip");
-        ImGui.SameLine();
+        var exchange = DiscoveryExchange;
+        var connected = exchange?.Connected == true;
+        if (connected)
+        {
+            if (ImGui.RadioButton(localization.Format("Help.RouteDirect", exchange!.Login), problemDirect)) problemDirect = true;
+            Tip("Help.RouteDirectTip");
+            ImGui.SameLine();
+            if (ImGui.RadioButton(localization.Get("Help.RouteBrowser"), !problemDirect)) problemDirect = false;
+            Tip("Help.RouteBrowserTip");
+        }
+        var direct = connected && problemDirect;
         ImGui.BeginDisabled(problemTitle.Trim().Length == 0);
         try
         {
-            if (ImGui.SmallButton(localization.Get("Help.FormOpen")))
+            if (ImGui.Button(localization.Get("Help.FormOpen")))
             {
                 var draft = ProblemDraftNow(kind);
-                problemPreview = (draft, ProblemReport.Prepare(draft));
-                problemLeftOut = false;
+                problemPreview = (draft, direct, ProblemReport.Prepare(draft), ProblemReport.Issue(draft));
+                problemLeftOut = problemSent = problemRefused = false;
             }
         }
         finally { ImGui.EndDisabled(); }
-        Tip("Help.FormOpenTip");
+        Tip(direct ? "Help.FormOpenDirectTip" : "Help.FormOpenTip");
+        if (!connected) ImGui.TextDisabled(localization.Get("Help.RouteConnectHint"));
         if (problemPreview is { } preview)
         {
-            if (ProblemDraftNow(kind) != preview.Draft) problemPreview = null;
+            if (ProblemDraftNow(kind) != preview.Draft || preview.Direct != direct) problemPreview = null;
             else
             {
                 ImGui.TextColored(Accent, localization.Get("Help.FormPreview"));
-                var shown = preview.Send.Preview();
-                ImGui.InputTextMultiline("##ProblemPreview", ref shown, Math.Max(shown.Length + 1, 16), new Vector2(size.X, 150), ImGuiInputTextFlags.ReadOnly); Tip("Help.FormPreviewTip");
-                if (ImGui.SmallButton(localization.Get("Help.FormSend")))
+                var shown = direct ? preview.Issue.Preview() : preview.Send.Preview();
+                ImGui.InputTextMultiline("##ProblemPreview", ref shown, Math.Max(shown.Length + 1, 16), new Vector2(size.X, 150), ImGuiInputTextFlags.ReadOnly);
+                Tip(direct ? "Help.FormPreviewDirectTip" : "Help.FormPreviewTip");
+                if (!direct && preview.Send.ReportLeftOut) DrawPasteStep(localization.Get("Help.FormPasteBefore"), size.X);
+                if (direct)
                 {
-                    problemLeftOut = preview.Send.ReportLeftOut;
-                    if (preview.Send.Clipboard is { } clipboard) ImGui.SetClipboardText(clipboard);
-                    Dalamud.Utility.Util.OpenLink(preview.Send.Url);
-                    problemPreview = null;
+                    ImGui.BeginDisabled(exchange!.Busy);
+                    try
+                    {
+                        if (ImGui.Button(localization.Get("Help.FormSendDirect")))
+                        {
+                            // The only place a report leaves by the connection: this click, with the issue whose text is shown just above.
+                            if (exchange.Report(preview.Issue)) { problemSent = true; problemPreview = null; }
+                            else problemRefused = true;
+                        }
+                    }
+                    finally { ImGui.EndDisabled(); }
+                    Tip("Help.FormSendDirectTip");
                 }
-                Tip("Help.FormSendTip");
+                else
+                {
+                    if (ImGui.Button(localization.Get("Help.FormSend")))
+                    {
+                        problemLeftOut = preview.Send.ReportLeftOut;
+                        if (preview.Send.Clipboard is { } clipboard) ImGui.SetClipboardText(clipboard);
+                        Dalamud.Utility.Util.OpenLink(preview.Send.Url);
+                        problemPreview = null;
+                    }
+                    Tip("Help.FormSendTip");
+                }
                 ImGui.SameLine();
                 if (ImGui.SmallButton(localization.Get("Help.FormCancel"))) problemPreview = null;
                 Tip("Help.FormCancelTip");
+                if (problemRefused || direct && exchange!.Busy) ImGui.TextDisabled(localization.Get("Help.ReportBusy"));
             }
         }
-        if (problemLeftOut) ImGui.TextColored(Accent, localization.Get("Help.FormLeftOut"));
+        if (problemLeftOut) DrawPasteStep(localization.Get("Help.FormLeftOut"), size.X);
+        if (problemSent && exchange is not null) DrawReportResult(exchange);
         if (ImGui.SmallButton(localization.Get("Help.FormSecurity"))) Dalamud.Utility.Util.OpenLink(ProblemReport.SecurityAddress);
         Tip("Help.FormSecurityTip");
     }
