@@ -110,7 +110,8 @@ internal sealed partial class MainWindow
                 if(DiscoveryDatabase is { } database)
                 {
                     var changed=store.ChangesToSave(out var stamp);
-                    try{database.Write(changed.Write,changed.Remove,changed.All);}
+                    // X-171 (0.1313): what this client saw is added to the rows as saved now (two clients on one profile: « add both »).
+                    try{database.Write(changed.Write,changed.Remove,changed.All,changed.Bases);}
                     catch(Exception){store.SaveFailed(changed);throw;}
                     store.MarkSaved(stamp);
                 }

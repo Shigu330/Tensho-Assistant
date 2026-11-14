@@ -190,6 +190,19 @@ public static class ValueCounts
         return result;
     }
 
+    /// <summary>X-171 (0.1313): per value, what <paramref name="now"/> counts over <paramref name="before"/> (never below 0); null when nothing.</summary>
+    public static Dictionary<int,int>? Over(Dictionary<int,int>? now,Dictionary<int,int>? before)
+    {
+        if(now is null)return null;
+        Dictionary<int,int>? result=null;
+        foreach(var (value,count) in now.OrderBy(pair=>pair.Key))
+        {
+            var more=count-(before?.GetValueOrDefault(value) ?? 0);
+            if(more>0)(result??=[])[value]=more;
+        }
+        return result;
+    }
+
     /// <summary>Per value, the largest count of the two (an imported file read again adds nothing).</summary>
     public static Dictionary<int,int>? Max(Dictionary<int,int>? first,Dictionary<int,int>? second)
     {
@@ -384,7 +397,7 @@ public sealed class DiscoveryStore
             if(facts.TryGetValue(fact.Key,out var known))
             {
                 // X-167 (0.1134, audit R03): your first sighting of an imported fact: its fields are the import's, yours kept apart (Own).
-                changedKeys.Add(known.Key);
+                Mine(known.Key);changedKeys.Add(known.Key);
                 if(known.Seen==0)known.Own=new(){First=at,Last=at,LevelMin=value,LevelMax=value,X=position.X,Z=position.Z};
                 else known.Own?.Saw(at,value,false);
                 known.LevelMin=Math.Min(known.LevelMin,value);known.LevelMax=Math.Max(known.LevelMax,value);known.Seen++;
@@ -395,7 +408,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             // X-93 (0.939): your own sighting is never refused.
-            Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
+            Mine(fact.Key);Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
             return true;
         }
     }
@@ -427,7 +440,7 @@ public sealed class DiscoveryStore
                 if(level>0){known.LevelMin=known.LevelMin==0 ? level:Math.Min(known.LevelMin,level);known.LevelMax=Math.Max(known.LevelMax,level);}
                 // X-167 (0.1134, audit R03): the gap is measured from your own last sighting, never from an imported date (a later imported date kept your
                 // sighting from being counted); your first sighting of an imported fact always counts, its fields kept apart (Own).
-                changedKeys.Add(known.Key);
+                Mine(known.Key);changedKeys.Add(known.Key);
                 var wasShared=known.Seen==0;
                 var ownLast=wasShared ? (DateTimeOffset?)null:known.Own?.Last ?? known.Last;
                 if(ownLast is null || at-ownLast.Value>=gap)
@@ -442,7 +455,7 @@ public sealed class DiscoveryStore
                 return false;
             }
             // X-93 (0.939): your own sighting is never refused.
-            Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
+            Mine(fact.Key);Put(fact);changedKeys.Add(fact.Key);Dirty=true;revision++;
             return true;
         }
     }
@@ -658,7 +671,7 @@ public sealed class DiscoveryStore
         return new DiscoveryFile{Written=at,Facts=copies};
     }
 
-    public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();changedKeys.Clear();changedAll=true;Dirty=true;revision++;}}
+    public void Clear(){lock(gate){facts.Clear();index.Clear();sharedWaiting.Clear();changedKeys.Clear();bases.Clear();changedAll=true;Dirty=true;revision++;}}
 
     /// <summary>X-172 (0.1136): a shared kind read from a file or the database at once (the conversion): a fact of yours already there keeps the rule of PutRange.</summary>
     public void LoadShared(DiscoveryFile file){var prepared=Prepare(file);lock(gate)Apply(prepared,false);}
@@ -666,8 +679,43 @@ public sealed class DiscoveryStore
     // X-172 (0.1136, the database written row by row): the keys changed since the last save taken; changedAll after a base cleared on purpose.
     private readonly HashSet<string> changedKeys=new(StringComparer.Ordinal);
     private bool changedAll;
-    /// <summary>X-172: what a save of the database writes (rows to put in, rows to take out, everything first when cleared).</summary>
-    public sealed record Changes(List<DiscoveryFact> Write,List<string> Remove,bool All);
+    /// <summary>X-172: what a save of the database writes (rows to put in, rows to take out, everything first when cleared). X-171 (0.1313): with,
+    /// for each fact this client saw since its last save, the fact as it was then (null: new in this client), so the write adds only what this
+    /// client saw to the row the other client may have changed meanwhile (<see cref="AddMine"/>).</summary>
+    public sealed record Changes(List<DiscoveryFact> Write,List<string> Remove,bool All,Dictionary<string,DiscoveryFact?>? Bases=null);
+
+    // X-171 (0.1313, user's rule of 11/13 « add both »): per fact seen by this client since its last save, the fact as it was before (null: new).
+    private readonly Dictionary<string,DiscoveryFact?> bases=new(StringComparer.Ordinal);
+    // Under the lock, before one of your sightings changes or puts a fact: what it was, the first time since the last save.
+    private void Mine(string key){if(!bases.ContainsKey(key))bases[key]=facts.TryGetValue(key,out var fact) ? fact.Copy():null;}
+
+    /// <summary>
+    /// X-171 (0.1313, user's rule of 11/13: « add both »): two game clients on one profile, the same fact seen by both. The row saved
+    /// (<paramref name="stored"/>, maybe written by the other client since) gets what this client saw since <paramref name="before"/> (its own
+    /// fact at its last save; null: new in this client): sightings, HQ sightings and values added; the imported parts the largest of the two
+    /// (an import read by both is not counted twice); levels and dates widened, the earliest place kept; your own part joined. Nothing is lost,
+    /// nothing counted twice (a save without a new sighting adds nothing).
+    /// </summary>
+    public static DiscoveryFact AddMine(DiscoveryFact stored,DiscoveryFact mine,DiscoveryFact? before)
+    {
+        var merged=stored.Copy();
+        var seen=Math.Max(0,mine.Seen-(before?.Seen ?? 0));
+        var hq=Math.Max(0,mine.Hq-(before?.Hq ?? 0));
+        var values=ValueCounts.Over(mine.Values,before?.Values);
+        if(mine.Seen>0 && (stored.Own is not null || mine.Own is not null || stored.Seen>0!=mine.Seen>0))
+            merged.Own=OwnPart.Join(DiscoveryFact.OwnOf(stored),DiscoveryFact.OwnOf(mine));
+        merged.Seen=(int)Math.Min(int.MaxValue,(long)stored.Seen+seen);
+        merged.Values=ValueCounts.Sum(merged.Values,values);
+        merged.Hq=ValueCounts.AtMostTotal((long)stored.Hq+hq,merged.Values);
+        merged.Imported=Math.Max(stored.Imported,mine.Imported);
+        merged.ImportedValues=ValueCounts.Max(stored.ImportedValues,mine.ImportedValues);
+        merged.ImportedHq=ValueCounts.AtMostTotal(Math.Max(stored.ImportedHq,mine.ImportedHq),merged.ImportedValues);
+        if(mine.LevelMin>0)merged.LevelMin=merged.LevelMin==0 ? mine.LevelMin:Math.Min(merged.LevelMin,mine.LevelMin);
+        merged.LevelMax=Math.Max(merged.LevelMax,mine.LevelMax);
+        if(mine.First<merged.First){merged.First=mine.First;merged.X=mine.X;merged.Z=mine.Z;}
+        if(mine.Last>merged.Last)merged.Last=mine.Last;
+        return merged;
+    }
     /// <summary>
     /// X-172 (0.1136): the facts changed since the last save taken, copied, and the change stamp they hold (MarkSaved after the write; SaveFailed when it
     /// fails, so they are taken again). A change of a shared kind not read yet (X-93) waits for the kind: its row may hold the shared copy, which the
@@ -680,15 +728,19 @@ public sealed class DiscoveryStore
             stamp=Interlocked.Read(ref changes);
             var all=changedAll;changedAll=false;
             var write=new List<DiscoveryFact>();var remove=new List<string>();var waiting=new List<string>();
+            // X-171 (0.1313): the facts as they were before this client's sightings go with the save (none after a clear: everything is replaced).
+            var before=new Dictionary<string,DiscoveryFact?>(StringComparer.Ordinal);
+            if(all)bases.Clear();
             foreach(var key in all ? facts.Keys.ToList():changedKeys.ToList())
             {
-                if(!facts.TryGetValue(key,out var fact)){remove.Add(key);continue;}
+                if(!facts.TryGetValue(key,out var fact)){remove.Add(key);bases.Remove(key);continue;}
                 if(!all && sharedWaiting.Contains(fact.Kind)){waiting.Add(key);Want(fact.Kind);continue;}
                 write.Add(fact.Copy());
+                if(bases.Remove(key,out var was))before[key]=was;
             }
             changedKeys.Clear();changedKeys.UnionWith(waiting);
             if(waiting.Count>0)Dirty=true;
-            return new(write,remove,all);
+            return new(write,remove,all,before);
         }
     }
     /// <summary>X-172: a save that failed: its changes are taken again by the next one.</summary>
@@ -699,6 +751,8 @@ public sealed class DiscoveryStore
             if(failed.All)changedAll=true;
             foreach(var fact in failed.Write)changedKeys.Add(fact.Key);
             changedKeys.UnionWith(failed.Remove);
+            // X-171 (0.1313): nothing of that save is in the file: the fact as it was before it is the one to add from (older than any noted since).
+            if(failed.Bases is { } before)foreach(var (key,was) in before)bases[key]=was;
         }
     }
 

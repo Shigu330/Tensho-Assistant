@@ -94,12 +94,16 @@ public sealed class DiscoveryDatabase
 
     /// <summary>
     /// One save: the rows of <paramref name="write"/> put in (or replaced), those of <paramref name="remove"/> taken out, everything else first when
-    /// <paramref name="all"/> (a base cleared on purpose), in one transaction: either the whole save is in the file or none of it.
+    /// <paramref name="all"/> (a base cleared on purpose), in one transaction: either the whole save is in the file or none of it. X-171 (0.1313,
+    /// « add both »): a fact given in <paramref name="before"/> (seen by this client since its last save) is added to the row as it is now, read in
+    /// the same transaction (the other client may have written it since): DiscoveryStore.AddMine. The transaction takes the write lock at once
+    /// (BEGIN IMMEDIATE), so two clients never read the same row and both write it.
     /// </summary>
-    public void Write(IReadOnlyCollection<DiscoveryFact> write,IReadOnlyCollection<string> remove,bool all)
+    public void Write(IReadOnlyCollection<DiscoveryFact> write,IReadOnlyCollection<string> remove,bool all,IReadOnlyDictionary<string,DiscoveryFact?>? before=null)
     {
         using var open=Open();
-        using var transaction=open.BeginTransaction();
+        using var transaction=open.BeginTransaction(deferred:false);
+        if(before is { Count:>0 } && !all)write=AddedToSaved(open,transaction,write,before);
         if(all)Run(open,"DELETE FROM facts;",transaction);
         if(remove.Count>0)
         {
@@ -110,6 +114,23 @@ public sealed class DiscoveryDatabase
         }
         if(write.Count>0)Upsert(open,transaction,write);
         transaction.Commit();
+    }
+    // X-171 (0.1313): each fact seen by this client since its last save, added to its row as saved now (a row that cannot be read is replaced as before).
+    private static List<DiscoveryFact> AddedToSaved(SqliteConnection open,SqliteTransaction transaction,IReadOnlyCollection<DiscoveryFact> write,IReadOnlyDictionary<string,DiscoveryFact?> before)
+    {
+        using var select=open.CreateCommand();select.Transaction=transaction;
+        select.CommandText="SELECT fact FROM facts WHERE key=$key;";
+        var key=select.Parameters.Add("$key",SqliteType.Text);
+        var result=new List<DiscoveryFact>(write.Count);
+        foreach(var fact in write)
+        {
+            if(!before.TryGetValue(fact.Key,out var was)){result.Add(fact);continue;}
+            key.Value=fact.Key;
+            DiscoveryFact? stored=null;
+            if(select.ExecuteScalar() is string text)try{stored=JsonSerializer.Deserialize<DiscoveryFact>(text,Options);}catch(JsonException){}
+            result.Add(stored is null ? fact:DiscoveryStore.AddMine(stored,fact,was));
+        }
+        return result;
     }
     private static void Upsert(SqliteConnection open,SqliteTransaction transaction,IEnumerable<DiscoveryFact> write)
     {
