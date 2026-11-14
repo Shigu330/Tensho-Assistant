@@ -649,7 +649,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.609) Fiche d'un objet qu'un autre personnage possède : la ligne donne ses quantités.
 
-- [ ] (0.610) D'abord hors JcJ : tout marche comme avant, barre de serveur et carte comprises. Puis, un à la fois : quai de Wolves' Den, Crystalline Conflict personnalisé, Battlehall, Mahjong, donjon profond, avec la carte et des panneaux ouverts : tout disparaît, une ligne de chat, tout revient à la sortie.
+- [x] (0.610) D'abord hors JcJ : tout marche comme avant, barre de serveur et carte comprises. Puis, un à la fois : quai de Wolves' Den, Crystalline Conflict personnalisé, Battlehall, Mahjong, donjon profond, avec la carte et des panneaux ouverts : tout disparaît, une ligne de chat, tout revient à la sortie.
 
 
 
@@ -1813,9 +1813,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1345) Onglet Quêtes de la carte de Tensho au Gold Saucer, « Quêtes pas encore disponibles » décoché : « Toutes les cartes en main » n'y est plus (la carte du jeu ne la montre pas) ; les quêtes que la carte montre y sont.
 
-- [ ] (0.1346) Carte, clic droit, onglet Quêtes, « Quêtes pas encore disponibles » décoché, dans une zone où une quête est acceptée et où un donneur propose une autre quête (au même endroit si possible) : les quêtes que le jeu propose restent listées, et une zone où seules des quêtes acceptées figurent ne vide plus la liste des quêtes non commencées.
+- [x] (0.1346) Carte, clic droit, onglet Quêtes, « Quêtes pas encore disponibles » décoché, dans une zone où une quête est acceptée et où un donneur propose une autre quête (au même endroit si possible) : les quêtes que le jeu propose restent listées, et une zone où seules des quêtes acceptées figurent ne vide plus la liste des quêtes non commencées.
 
-- [ ] (0.1349) Monde › Découvertes › Échanger maintenant : l'échange finit « fait » et le fichier commun est dit récupéré ou à jour (lu dans community-discoveries/v3/ seulement).
+- [x] (0.1349) Monde › Découvertes › Échanger maintenant : l'échange finit « fait » et le fichier commun est dit récupéré ou à jour (lu dans community-discoveries/v3/ seulement).
+
+- [ ] (0.1350) Objets : ouvrir la fiche de la Bague d'attaquant de grand champion (ou un autre objet récent vendu par un PNJ) : l'en-tête dit « Ajouté au patch 7.4 (Garland Tools) » après un instant ; survoler l'objet dans une liste de Tensho et garder la souris dessus : l'infobulle dit la même ligne ; Paramètres › Données et sources › Garland coupé : la ligne disparaît des deux.
+
+- [ ] (0.1351) Chat : un lien de carte (par exemple le vôtre, tapé <flag> dans Dire) ; clic gauche : le jeu pose son drapeau, comme avant ; clic droit sur le lien : le menu « Tensho — lieu » s'ouvre à la souris (nom du lieu et coordonnées, Drapeau, Éthérite la plus proche, Afficher sur la carte, Météo de la zone) ; « Éthérite la plus proche » ouvre la carte Tensho sur le point avec la question de téléportation et son coût ; clic droit sur un lien d'objet : toujours le menu du jeu avec « Tensho — objet », pas le menu de lieu ; mode développeur : dalamud.log dit « Chat link hovered (ChatLogPanel_n): map link, map N » au survol.
+
+- [ ] (0.1351) Carte › réglages › « Liens de carte du chat » coupé : le clic droit sur un lien de carte n'ouvre plus rien de Tensho.
 
 **0.535 : interfaces** — à voir en jouant
 
