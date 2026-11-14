@@ -56,6 +56,45 @@ public static class EurekaNotoriousBoard
         new(1418,Hydatos,null,EurekaConditionOn.Monster,true),
     ];
 
+    /// <summary>The periods the page reads: 72 of 8 Eorzea hours, about 28 real hours.</summary>
+    public const int ForecastPeriods=72;
+
+    /// <summary>
+    /// X-323 (0.1318, user report of 2026-11-14: every row « none in the next 28 hours », night monsters included): the zone's forecast
+    /// over <paramref name="count"/> periods from the one holding <paramref name="now"/>, asked of the weather catalogue 24 periods at a
+    /// time, the most it gives (WeatherCatalog.Forecast throws above 24: asking 72 at once threw, the page caught it and had no forecast).
+    /// </summary>
+    public static IReadOnlyList<(DateTimeOffset Start,DateTimeOffset End,int EtHour,uint? Weather)> Forecast(Gathering.WeatherCatalog catalog,uint territory,DateTimeOffset now,int count=ForecastPeriods)
+    {
+        ArgumentNullException.ThrowIfNull(catalog);
+        var periods=new List<(DateTimeOffset Start,DateTimeOffset End,int EtHour,uint? Weather)>(Math.Max(count,0));
+        while(periods.Count<count)
+            foreach(var period in catalog.Forecast(territory,periods.Count==0 ? now:periods[^1].End,Math.Min(24,count-periods.Count)))
+                periods.Add((period.StartsAt,period.EndsAt,period.EtHour,period.Weather?.Id));
+        return periods.AsReadOnly();
+    }
+
+    /// <summary>
+    /// X-323 (0.1318), for the self-check in the game: from the catalogue read, how many monsters have a window in the forecast, and each
+    /// monster needing the night alone whose next window does not open within one Eorzea day (70 real minutes), which cannot be
+    /// (« fate N: no night window »).
+    /// </summary>
+    public static (int WithWindow,IReadOnlyList<string> Wrong) ForecastCheck(Gathering.WeatherCatalog catalog,DateTimeOffset now)
+    {
+        var withWindow=0;var wrong=new List<string>();
+        foreach(var zone in All.GroupBy(monster=>monster.Territory))
+        {
+            var forecast=Forecast(catalog,zone.Key,now);
+            foreach(var monster in zone)
+            {
+                var next=Windows(monster,forecast).Where(window=>window.End>now).Select(window=>(EurekaWindow?)window).FirstOrDefault();
+                if(next is not null)withWindow++;
+                if(monster is { Night:true, Weather:null } && (next is not { } night || night.Start>now.AddSeconds(4200)))wrong.Add($"fate {monster.Fate}: no night window");
+            }
+        }
+        return (withWindow,wrong);
+    }
+
     /// <summary>
     /// The windows when the condition holds, in order, adjacent ones joined, from 8-hour weather periods (start, end, Eorzea hour of the
     /// start: 0, 8 or 16; weather row, null when unknown). A period whose weather is unknown is never a window when a weather is needed.

@@ -31,7 +31,7 @@ internal sealed partial class MainWindow
                 :Fields.EurekaNotoriousBoard.Mismatches((territory,fate)=>field.Zones.Any(zone=>zone.Territory==territory && zone.Events.Any(row=>row.Kind==Fields.FieldEventKind.Fate && row.Id==fate)),
                     (territory,id)=>weathers.Zone(territory)?.Shares.Any(share=>share.WeatherId==id)==true) is { Count:>0 } wrong
                     ? Diagnostics.SelfCheck.Suspect("Eureka notorious monsters",string.Join("; ",wrong))
-                    :Diagnostics.SelfCheck.Ok("Eureka notorious monsters",$"{Fields.EurekaNotoriousBoard.All.Count} monsters, their FATEs and weathers found in the game's files"))),
+                    :EurekaWindowsCheck(weathers))),
             Page("FATEs",()=>Task.FromResult(FatesLoad?.Invoke() is { Count:>0 } zones
                 ? Diagnostics.SelfCheck.Ok("FATEs",$"{zones.Count} zones, {zones.Sum(zone=>zone.Events.Count)} FATEs")
                 :Diagnostics.SelfCheck.Failed("FATEs","nothing read"))),
@@ -83,6 +83,15 @@ internal sealed partial class MainWindow
                 return read?.Status==CarnivaleReadStatus.Loaded ? Diagnostics.SelfCheck.Ok("masked carnivale",$"{stages.Count} stages, {read.Completed.Count(done=>done)} done"):Diagnostics.SelfCheck.NotRead("masked carnivale",read?.Status.ToString() ?? "no reader");
             }),
         ];
+    }
+
+    // X-323 (0.1318): the windows the page shows, computed from the catalogue read in the game (each night monster has one within 70 minutes).
+    private static SelfCheckLine EurekaWindowsCheck(Gathering.WeatherCatalog weathers)
+    {
+        var (withWindow,wrong)=Fields.EurekaNotoriousBoard.ForecastCheck(weathers,DateTimeOffset.UtcNow);
+        var count=Fields.EurekaNotoriousBoard.All.Count;
+        return wrong.Count>0 ? Diagnostics.SelfCheck.Suspect("Eureka notorious monsters",string.Join("; ",wrong))
+            :Diagnostics.SelfCheck.Ok("Eureka notorious monsters",$"{count} monsters, their FATEs and weathers found in the game's files; {withWindow} of {count} with a window in the next 28 hours");
     }
 
     private IEnumerable<(string Domain,Func<SelfCheckLine> Probe)> SelfCheckPageProbes()=>(selfCheckPages ?? []).Select(page=>(page.Domain,(Func<SelfCheckLine>)(()=>

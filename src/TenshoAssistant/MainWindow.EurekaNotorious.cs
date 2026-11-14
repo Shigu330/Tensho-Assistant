@@ -17,7 +17,7 @@ internal sealed partial class MainWindow
     {
         if(now-eurekaForecastAt>TimeSpan.FromMinutes(1)){eurekaForecast.Clear();eurekaForecastAt=now;}
         if(eurekaForecast.TryGetValue(territory,out var known))return known;
-        try{return eurekaForecast[territory]=[.. catalog.Forecast(territory,now,72).Select(period=>(period.StartsAt,period.EndsAt,period.EtHour,period.Weather?.Id))];}
+        try{return eurekaForecast[territory]=EurekaNotoriousBoard.Forecast(catalog,territory,now);}
         catch(ArgumentOutOfRangeException){return null;}
     }
 
