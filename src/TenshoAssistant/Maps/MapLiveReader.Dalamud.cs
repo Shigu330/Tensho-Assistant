@@ -94,7 +94,7 @@ internal sealed class MapLiveReader : IDisposable
     }
     private readonly ICondition condition;private readonly IFateTable fateTable;private readonly IPartyList party;
     // X-322 (0.1320): the unlock bits of the map icons, the ones read unlocked (same set kept while unchanged), and the last check written.
-    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";private MapMarkerUnlock.GameList? gameListedMarkers;private IReadOnlySet<ushort>? unlockLinkBits;
+    private Task<ushort[]>? markerBitList;private IReadOnlySet<ushort>? unlockedMarkerBits;private string markerUnlockLine="";private MapMarkerUnlock.GameList? gameListedMarkers;private IReadOnlySet<ushort>? unlockLinkBits;private string markerArrayHex="";
     /// <summary>X-322 (0.1320): the last comparison of the game's own map list with the unlock bits (self-check); null before one.</summary>
     public (bool Agree,string Text)? MarkerUnlockCheck=>markerUnlockCheckBox is { } box ? (box.Item1,box.Item2):null;
     private volatile Tuple<bool,string>? markerUnlockCheckBox;
@@ -290,6 +290,8 @@ internal sealed class MapLiveReader : IDisposable
             var links=new HashSet<ushort>();
             foreach(var bit in markerBitList.Result)if(ui->IsUnlockLinkUnlocked(bit))links.Add(bit);
             unlockLinkBits=links;
+            // 0.1341 (X-351, R06): the whole array in the log while a reading is wrong (bits 69 and 98 of map 14 read unlocked, not drawn).
+            markerArrayHex=Convert.ToHexString(quests->UnlockedMapMarkers);
         }
         return unlockedMarkerBits is { } before && before.SetEquals(set) ? before:set;
     }
@@ -350,7 +352,7 @@ internal sealed class MapLiveReader : IDisposable
             +$"the bit's reading agrees on {agree} of {checks.Count}"
             +(unlockLinkBits is { } links ? $" (the unlock-link reading of before 0.1340 on {checks.Count(check=>check.Listed==links.Contains(check.Bit))})":"")
             +"; "+string.Join("; ",checks.Select(MapMarkerUnlock.Describe))
-            +(wrong.Length>0 ? "; reading wrong on: "+string.Join("; ",wrong):"")
+            +(wrong.Length>0 ? "; reading wrong on: "+string.Join("; ",wrong)+"; map marker array: "+markerArrayHex:"")
             +$"; remembered: {remembered.Remembered.Count} map(s), bits drawn while read locked: {(remembered.DrawnWhileLocked.Count>0 ? string.Join(",",remembered.DrawnWhileLocked.Order()):"none")}";
         // X-351 (0.1335): a real verdict: the bit's reading against the game's own list (the map follows the game's list here; elsewhere the
         // reading decides, with what the game was seen to draw).
