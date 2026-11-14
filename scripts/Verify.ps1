@@ -14,6 +14,10 @@
     # 0.323: contributors without the game: builds the test project only (pure logic, no Dalamud), runs the tests and the language
     # validation, skips the plugin build and the package. Not enough for a release.
     [switch]$TestsOnly,
+    # X-283 (0.1299): says what this run would decide (built beside the game or where it loads, skipped by the stamp or not, the
+    # build's arguments) as one JSON line, then stops: nothing built, nothing written. scripts/agent/noreload-test.sh (check.sh) runs it,
+    # with a made-up stamp (TENSHO_VERIFY_STAMP, read with -Plan only), to prove the « player busy » path on the real decision.
+    [switch]$Plan,
     # X-268 (R19.3): the player is in a duty (or an ocean voyage, competitive content): the plugin is built into artifacts\noreload\, not
     # into the folder the game loads, so the game does not reload it now; the next run without it (the next free publish) loads it. Every
     # check runs the same on that build. A release is always built where the game loads it: refused with -Release.
@@ -25,6 +29,7 @@ $ErrorActionPreference = 'Stop'
 if ($env:TENSHO_NORELOAD -eq '1' -and -not $Release) { $NoReload = [switch]::Present }
 if ($NoReload -and $Release) { throw '-NoReload builds beside the game: a release is always built where the game loads it (R19.3); run it when the player is free.' }
 if ($TestsOnly -and ($Commit -or $Release)) { throw '-TestsOnly checks the logic only: it cannot be combined with -Commit or -Release.' }
+if ($Plan -and ($Commit -or $Release -or $TestsOnly)) { throw '-Plan only says the decision: it cannot be combined with -Commit, -Release or -TestsOnly.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and -not $Release) { throw '-Hotfix goes with -Release only.' }
 if ($Major -and -not $Release) { throw '-Major goes with -Release only.' }
 if ($PSBoundParameters.ContainsKey('Hotfix') -and $Hotfix.Trim().Length -lt 8) { throw "-Hotfix needs its reason in a few words, e.g. -Hotfix 'game patch 7.58'." }
@@ -75,6 +80,7 @@ function Get-TaskFingerprint([switch]$Documents, [switch]$CountPlaceholder) {
     finally { $hasher.Dispose() }
 }
 $taskStampFile = Join-Path $taskRoot 'artifacts\verify-stamp.json'
+if ($Plan -and $env:TENSHO_VERIFY_STAMP) { $taskStampFile = $env:TENSHO_VERIFY_STAMP }   # X-283: a made-up stamp, for the decision only
 $taskVersionNow = ([xml](Get-Content -Raw -LiteralPath (Join-Path $taskRoot 'src\TenshoAssistant\TenshoAssistant.csproj'))).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
 # -Release when the tag already exists: not stopped here (0.326). Release.ps1 stops if the release is complete (GitHub release and
 # main), and otherwise resumes the missing steps of a release stopped halfway.
@@ -126,6 +132,14 @@ if (-not $Force -and -not $Release -and (Test-Path -LiteralPath $taskStampFile) 
     # X-268: a build made beside the game (-NoReload) is never taken for the one the game loads: a run without -NoReload builds again.
     if ($taskStamp.NoReload -and -not $NoReload) { $taskSkip = $false }
 }
+# X-268, X-283: where this run builds the plugin; the build, the package checks and -Plan read these same two lines.
+$taskNoReloadOutput = Join-Path $taskRoot 'artifacts\noreload\'
+$taskOutput = if ($NoReload) { $taskNoReloadOutput.TrimEnd('\') } else { Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release' }
+if ($Plan) {
+    [ordered]@{ Version = $taskVersionNow; Fingerprint = $taskFingerprint; NoReload = [bool]$NoReload; Skip = [bool]$taskSkip; Output = $taskOutput
+        BuildArgs = $(if ($NoReload) { "-p:TenshoOutputPath=$taskNoReloadOutput" } else { '' }) } | ConvertTo-Json -Compress
+    exit 0
+}
 if ($taskSkip -and $taskStamp.Documents -ne $taskDocuments) {
     # 0.1203 (relay 37, publish.sh measured): publish.sh writes the test count into the new CHANGELOG entry right after the green run;
     # that alone ran every managed test again at -Commit (about 60 s a version). Only that count changed: nothing to run again.
@@ -154,7 +168,6 @@ else {
 $taskTests = $null
 Push-Location $taskRoot
 try {
-    $taskNoReloadOutput = Join-Path $taskRoot 'artifacts\noreload\'
     if ($NoReload) { & $DotNet build TenshoAssistant.sln -c Release --nologo "-p:TenshoOutputPath=$taskNoReloadOutput" }
     else { & $DotNet build TenshoAssistant.sln -c Release --nologo }
     if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
@@ -172,7 +185,6 @@ try {
     if ($LASTEXITCODE -ne 0) { $taskLanguages | ForEach-Object { Write-Host "$_" }; throw 'Localization validation failed.' }
     Write-Output 'PASS localization metadata, duplicate keys and format compatibility (partial translations allowed)'
     Add-TaskTime 'languages'
-    $taskOutput = if ($NoReload) { $taskNoReloadOutput.TrimEnd('\') } else { Join-Path $taskRoot 'src\TenshoAssistant\bin\x64\Release' }
     if ($NoReload) { Write-Output "NO RELOAD: the plugin was built into $taskOutput (the game keeps the DLL it loaded; the next free publish loads this version)." }
     $taskManifest = Get-Content -Raw -LiteralPath (Join-Path $taskOutput 'TenshoAssistant.json') | ConvertFrom-Json
     # The source manifest leaves InternalName/AssemblyVersion/DalamudApiLevel to DalamudPackager (Dalamud plugin metadata rules);
