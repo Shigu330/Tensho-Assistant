@@ -46,7 +46,8 @@ internal static class MergeTool1210Tests
         {
             var exchange=Read("src/TenshoAssistant/Discoveries/GitHubExchange.cs");
             var model=Read("src/TenshoAssistant/Discoveries/DiscoveriesModel.cs");
-            Check(exchange.Contains("var result=store.Merge(read.Facts,common:true);") && exchange.Contains("var result=store.Merge(file.Facts,common:true);added=result.Added;"),"v3 and v2 common files");
+            // X-357 (0.1349): the v2 common file is no longer read.
+            Check(exchange.Contains("var result=store.Merge(read.Facts,common:true);") && !exchange.Contains("store.Merge(file.Facts,common:true)"),"the v3 common files (the v2 one gone)");
             Check(model.Contains("public (int Added,int Joined,int Refused) Merge(IEnumerable<DiscoveryFact> imported,bool common=false)")
                 && model.Contains("if(common)known.Imported=Math.Max(known.Imported,source.Imported);else known.Imported++;")
                 && model.Contains("copy.Imported=common ? Math.Max(1,source.Imported):1;")

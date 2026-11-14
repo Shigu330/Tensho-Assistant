@@ -85,7 +85,6 @@ public sealed class GitHubExchange : IDisposable
     private string RefreshPath=>Path.Combine(folder,"github.refresh");
     private string MetaPath=>Path.Combine(folder,"github.json");
     private string LockPath=>Path.Combine(folder,"github.lock");
-    private string CommonMarker=>Path.Combine(folder,"community.sha256");
     /// <summary>X-174 (0.1137): the hash of each v3 kind file taken, by kind number ({"10":"HEX",…}), noted once a save holds its facts.</summary>
     private string CommonV3Marker=>Path.Combine(folder,"community-v3.json");
 
@@ -329,7 +328,9 @@ public sealed class GitHubExchange : IDisposable
     private async Task<ExchangeMessage> ExchangeAsync(DiscoveryStore store,bool upload)
     {
         (string Common,int Added,int Joined) taken;
-        try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store).ConfigureAwait(false);}
+        // X-357 (0.1349, DEC-052): the v3 set only; the v2 file is gone from the repository. Without a v3 index this version reads: nothing taken,
+        // « unreadable », the local base untouched.
+        try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? ("CommonUnreadable",0,0);}
         catch(Exception error) when(CommonUnreadable(error)){taken=("CommonUnreadable",0,0);}
         var (common,added,joined)=taken;
         var sent="";
@@ -362,7 +363,7 @@ public sealed class GitHubExchange : IDisposable
     /// <summary>
     /// X-174 (0.1137, DEC-052): the v3 set of the repository: its index, then only the kind files whose hash differs from the one noted for that kind, each
     /// downloaded within the size its index gives, checked (ExchangeV3.ReadKind) and merged; its hash is noted only once a save holds its facts (X-166:
-    /// WhenImportSaved, ImportWaiting against a double merge meanwhile). Null when there is no index this version reads: the v2 file is read instead.
+    /// WhenImportSaved, ImportWaiting against a double merge meanwhile). Null when there is no index this version reads (X-357: nothing else is read).
     /// </summary>
     private async Task<(string Common,int Added,int Joined)?> TakeCommonV3(DiscoveryStore store)
     {
@@ -399,29 +400,6 @@ public sealed class GitHubExchange : IDisposable
             var noted=CommonV3Marks();noted[kind]=hash;
             Directory.CreateDirectory(folder);AtomicFile.Write(CommonV3Marker,JsonSerializer.Serialize(noted));
         }
-    }
-
-    /// <summary>X-174 (0.1137): the v2 common file, read while the v3 set is missing (« v2 still read for a while »).</summary>
-    private async Task<(string Common,int Added,int Joined)> TakeCommonV2(DiscoveryStore store)
-    {
-        var added=0;var joined=0;string common;
-        try
-        {
-            var json=await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.Address),CommunityDiscoveries.MaxBytes,stop.Token).ConfigureAwait(false);
-            var hash=CommunityDiscoveries.Hash(json);
-            if(File.Exists(CommonMarker) && File.ReadAllText(CommonMarker).Trim()==hash || store.ImportWaiting("common:"+hash))common="CommonSame";
-            else if(CommunityDiscoveries.Parse(json) is { } file)
-            {
-                var result=store.Merge(file.Facts,common:true);added=result.Added;joined=result.Joined;
-                // X-166 (0.1133, audit R01): the hash is noted only once a save holds the merged facts; a stop before leaves the file to take again.
-                store.WhenImportSaved("common:"+hash,()=>{Directory.CreateDirectory(folder);AtomicFile.Write(CommonMarker,hash);});
-                common="CommonTaken";
-            }
-            else common="CommonUnreadable";
-        }
-        catch(HttpRequestException){common="CommonMissing";}
-        catch(Exception error) when(CommonUnreadable(error)){common="CommonUnreadable";}
-        return (common,added,joined);
     }
 
     private async Task Upload(IReadOnlyDictionary<string,string> contents)

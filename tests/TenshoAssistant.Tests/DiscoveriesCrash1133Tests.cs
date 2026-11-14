@@ -121,7 +121,8 @@ internal static class DiscoveriesCrash1133Tests
             var split=model[model.IndexOf("public static void WriteSplit(",StringComparison.Ordinal)..];
             Check(split.IndexOf("Write(mainPath,",StringComparison.Ordinal)<split.IndexOf("foreach(var (kind,facts) in byKind)",StringComparison.Ordinal),"your file first");
             var exchange=Read("Discoveries/GitHubExchange.cs");
-            Check(exchange.Contains("store.WhenImportSaved(\"common:\"+hash,") && !exchange.Contains("File.WriteAllText(CommonMarker,hash)"),"the hash noted after the save");
+            // X-357 (0.1349): the v2 file is gone; each v3 kind's hash is noted after the save.
+            Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && !exchange.Contains("File.WriteAllText(CommonMarker,hash)"),"the hash noted after the save");
             Check(model.Contains("store.WhenImportSaved(key,()=>File.Move(path,path+\".imported\",true));"),"the import file renamed after the save");
         }),
     ];

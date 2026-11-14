@@ -62,7 +62,7 @@ What the plugin does that matters for security (read against the code of the `De
 - **Shared discoveries exchange (GitHub)**: World › Discoveries, on « Exchange now » or with the « Automatic exchange » setting (off by
   default, once a day at most). It downloads the common files of this repository (`raw.githubusercontent.com`): since 0.1137 the index of
   `community-discoveries/v3/` and only the compressed file of each kind that changed, each checked against the hash and size the index gives
-  and read within bounds (DEC-052); the older single `discoveries.json` while that set is missing. Only after the player
+  and read within bounds (DEC-052); nothing else since 0.1349 (the older single `discoveries.json` is gone). Only after the player
   presses « Connect GitHub » and approves the code shown on github.com (GitHub's device sign-in, no password in the game), it also sends
   the player's own sightings, never imported ones, to an unlisted gist of theirs (GitHub calls it secret; anyone with its link can read it, and the link is in the public issue; one compressed file per kind and their index, 0.1137), with one issue in this repository titled with their GitHub
   login (`api.github.com`); a warning says so before connecting. A sighting holds game rows and places with the day only, never the
@@ -117,7 +117,7 @@ What the plugin does that matters for security (read against the code of the `De
   (`Characters/`); the local discoveries base (`Discoveries/`: since 0.1136 one SQLite database, `Discoveries.db`, the player's own sightings and the
   imported ones, written row by row; the files of before, `Discoveries.json` and `Shared/`, are kept once in `before-sqlite-<date>/`; the market prices seen at the market board in `MarketSeen.json`, with no seller name or id,
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
-  `community.sha256`, `community-v3.json` (the hash of each common file taken), `github.lock` (one exchange at a time), the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); the voyage history (since 0.1148 in `TenshoData.db`;
+  `community-v3.json` (the hash of each common file taken; a `community.sha256` left by a version before 0.1349 is no longer used), `github.lock` (one exchange at a time), the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); the voyage history (since 0.1148 in `TenshoData.db`;
   the file of before, `VoyageHistory.json`, is kept once in `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, notebook exports
   (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
@@ -239,7 +239,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   automatique » (désactivé par défaut, une fois par jour au plus). Il télécharge les fichiers communs de ce dépôt
   (`raw.githubusercontent.com`) : depuis 0.1137 l'index de `community-discoveries/v3/` et seulement le fichier compressé de chaque genre qui a
   changé, chacun vérifié contre l'empreinte et la taille que donne l'index et lu dans des bornes (DEC-052) ; l'ancien fichier unique
-  `discoveries.json` tant que cet ensemble manque. Seulement après que le joueur a appuyé sur « Connecter GitHub » et approuvé sur github.com le code
+  rien d'autre depuis 0.1349 (l'ancien fichier unique `discoveries.json` est retiré). Seulement après que le joueur a appuyé sur « Connecter GitHub » et approuvé sur github.com le code
   affiché (connexion par appareil de GitHub, aucun mot de passe dans le jeu), il envoie aussi ce que le joueur a vu lui-même, jamais ce
   qu'il a importé, dans un gist non répertorié à son nom (GitHub le dit secret ; qui a son lien peut le lire, et ce lien est dans le ticket public ; un fichier compressé par genre et leur index, 0.1137), avec un ticket dans ce dépôt titré de son identifiant GitHub (`api.github.com`) ; un
   avertissement le dit avant la connexion. Une observation contient des lignes et des lieux du jeu avec le jour seulement, jamais
@@ -300,7 +300,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   une base SQLite, `Discoveries.db`, ce que le joueur a vu lui-même et ce qu'il a importé, écrite ligne par ligne ; les fichiers d'avant,
   `Discoveries.json` et `Shared/`, sont gardés une fois dans `before-sqlite-<date>/` ; les prix vus au tableau des
   ventes dans `MarketSeen.json`, sans nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur, les
-  dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community.sha256`, `community-v3.json` (l'empreinte de chaque fichier commun pris), `github.lock` (un échange à la fois), le `github.token` chiffré et, avec l'application GitHub, le `github.refresh` chiffré) ;
+  dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community-v3.json` (l'empreinte de chaque fichier commun pris ; un `community.sha256` laissé par une version d'avant 0.1349 ne sert plus), `github.lock` (un échange à la fois), le `github.token` chiffré et, avec l'application GitHub, le `github.refresh` chiffré) ;
   `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; l'historique des voyages (depuis 0.1148 dans `TenshoData.db` ;
   le fichier d'avant, `VoyageHistory.json`, est gardé une fois dans `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
   `SelfCheckSeen.json` et `PageSweepLast.txt`. La base de découvertes ne garde que des lignes du jeu et des lieux, jamais le nom, la

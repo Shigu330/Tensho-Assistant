@@ -7,13 +7,13 @@ namespace TenshoAssistant.Discoveries;
 
 /// <summary>
 /// X-77 (0.882): sharing through Git what the parsers learned. 0.885 (user request: keep only the automatic exchange): only the GitHub exchange remains (GitHubExchange: the common
-/// file community-discoveries/discoveries.json of main joined as imported, your own sightings sent to your gist, on the opt-in automatic exchange or « Exchange now »);
-/// the zip-and-issue way and its buttons are gone. This class keeps the shared helpers: the file's address, hash, parsing, own sightings, gist encoding.
+/// set community-discoveries/v3/ of main joined as imported, your own sightings sent to your gist, on the opt-in automatic exchange or « Exchange now »);
+/// the zip-and-issue way and its buttons are gone. This class keeps the shared helpers: the set's address, hash, parsing, own sightings, gist encoding.
+/// X-357 (0.1349, DEC-052): the v2 common file discoveries.json is gone; Parse, Encode and Decode stay for the files of versions 1 and 2.
 /// </summary>
 public static class CommunityDiscoveries
 {
-    public const string Address="https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/community-discoveries/discoveries.json";
-    /// <summary>X-174 (0.1137, DEC-052): the folder of the v3 set (index.json and one kind-NN.jsonl.gz per kind, ExchangeV3), read first; the v2 file above while it is missing.</summary>
+    /// <summary>X-174 (0.1137, DEC-052): the folder of the v3 set (index.json and one kind-NN.jsonl.gz per kind, ExchangeV3), the only common file read since X-357 (0.1349).</summary>
     public const string AddressV3="https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/community-discoveries/v3/";
     public const int MaxBytes=32*1024*1024;
 
@@ -48,7 +48,7 @@ public static class CommunityDiscoveries
         return new(){Written=facts.Count==0 ? DateTimeOffset.UnixEpoch:facts.Max(fact=>fact.Last),Producer=all.Producer,Facts=facts};
     }
 
-    /// <summary>X-77.1 (0.883): the file as one line of text for a gist: JSON, gzip, base64. X-174 (0.1137): the gist is now a v3 set (ExchangeV3.GistFiles); kept for the v2 reads.</summary>
+    /// <summary>X-77.1 (0.883): the file as one line of text for a gist: JSON, gzip, base64. X-174 (0.1137): the gist is now a v3 set (ExchangeV3.GistFiles); kept for the files of versions 1 and 2.</summary>
     public static string Encode(DiscoveryFile file)
     {
         using var memory=new MemoryStream();

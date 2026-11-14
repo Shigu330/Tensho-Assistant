@@ -8,7 +8,7 @@ using TenshoAssistant.Discoveries;
 
 // 0.1137 (X-174, DEC-052, user choice of 12/11 « option 3 »): the exchange format v3 of the shared discoveries: index.json and one kind-NN.jsonl.gz per
 // kind, read as a stream and bounded, checked against the index's hash; the plugin downloads the kind files that changed and notes each hash only once a
-// save holds it (X-166); it uploads a v3 gist from Mine (X-167) and removes the old v2 file; the v2 file is still read while the v3 set is missing.
+// save holds it (X-166); it uploads a v3 gist from Mine (X-167) and removes the old v2 file. X-357 (0.1349): the v2 common file is no longer read.
 // Behaviour tests (R28): real gzip bytes, a fake GitHub answering the exchange, saves simulated with SnapshotToSave and MarkSaved.
 internal static class ExchangeV31137Tests
 {
@@ -172,7 +172,7 @@ internal static class ExchangeV31137Tests
             (bytes,entry)=KindFile(DiscoveryKind.Venture,2,[Header(DiscoveryKind.Venture,2),good[0]]);
             Check(Refused(()=>ExchangeV3.ReadKind(new MemoryStream(bytes),entry)),"fewer facts than the header says: refused");
         }),
-        ("Exchange v3 1137: the plugin downloads the kind files that changed and notes each hash only after the save; the v2 file is read while the v3 set is missing",() => InTemp(root =>
+        ("Exchange v3 1137: the plugin downloads the kind files that changed and notes each hash only after the save; without the v3 set nothing is taken and the base is untouched",() => InTemp(root =>
         {
             using var server=new Server();
             server.Serve(ExchangeV3.Build(Common(Fish(1),Fish(2),Venture(5))));
@@ -203,18 +203,24 @@ internal static class ExchangeV31137Tests
             Check(Run(refused,other,false).Args[2]=="CommonUnreadable" && other.Find(DiscoveryKind.FishCatch,7u,5).Count==0,"a file that does not match its hash: refused, nothing merged");
             Saved(other);
             Check(!File.Exists(Path.Combine(root,"b","community-v3.json")),"and its hash not noted");
-            // No v3 index (404), or one this version does not read: the v2 file, as before.
+            // X-357 (0.1349, R28.14): no v3 index (404), or one this version does not read: nothing taken, « unreadable », the local base untouched;
+            // the old v2 file, still served here, is never asked for.
             using var old=new Server();
-            old.Files[CommunityDiscoveries.Address]=Encoding.UTF8.GetBytes(JsonSerializer.Serialize(Common(Fish(9))));
+            const string V2="https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/community-discoveries/discoveries.json";
+            old.Files[V2]=Encoding.UTF8.GetBytes(JsonSerializer.Serialize(Common(Fish(9))));
             using var v2=new GitHubExchange(Path.Combine(root,"c"),old);var third=new DiscoveryStore();
-            Check(Run(v2,third,false).Args[2]=="CommonTaken" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==1,"the v2 file read while the v3 set is missing");
-            Check(old.Asked.First()==CommunityDiscoveries.AddressV3+ExchangeV3.IndexName,"the v3 index asked first");
-            Check(!File.Exists(Path.Combine(root,"c","community.sha256")),"the v2 hash waits for the save too");
+            third.Merge([Venture(4),Fish(8)],common:true);Saved(third);
+            var before=JsonSerializer.Serialize(third.Snapshot(At,false));
+            Check(Run(v2,third,false).Args[2]=="CommonUnreadable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set: nothing taken, said unreadable");
+            Check(old.Asked.SequenceEqual([CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]),"only the v3 index asked, never the v2 file");
             Saved(third);
-            Check(File.Exists(Path.Combine(root,"c","community.sha256")),"the v2 hash noted after the save");
+            Check(JsonSerializer.Serialize(third.Snapshot(At,false))==before && third.Find(DiscoveryKind.FishCatch,8u,5).Count==1 && third.Find(DiscoveryKind.Venture,4u,5).Count==1,
+                "the local base untouched: the facts it held are all there, nothing added");
+            Check(!File.Exists(Path.Combine(root,"c","community-v3.json")) && !File.Exists(Path.Combine(root,"c","community.sha256")),"no hash noted");
             old.Files[CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]=Encoding.UTF8.GetBytes("{\"Format\":\"tensho-discoveries\",\"Version\":4,\"Files\":[]}");
             using var newer=new GitHubExchange(Path.Combine(root,"d"),old);var fourth=new DiscoveryStore();
-            Check(Run(newer,fourth,false).Args[2]=="CommonTaken" && fourth.Find(DiscoveryKind.FishCatch,9u,5).Count==1,"an index of an unknown version: the v2 file read");
+            Check(Run(newer,fourth,false).Args[2]=="CommonUnreadable" && fourth.Find(DiscoveryKind.FishCatch,9u,5).Count==0 && !old.Asked.Contains(V2),
+                "an index of an unknown version: nothing taken, the v2 file not read");
         })),
         ("Exchange v3 1137: the upload is a v3 gist built from Mine (never Own nor imported counts), the old v2 file removed; the same facts send nothing",() => InTemp(root =>
         {
@@ -233,7 +239,7 @@ internal static class ExchangeV31137Tests
             store.SeeSource(DiscoveryKind.Venture,5,7,2,At);
             store.Merge([Venture(6)]);
             var message=Run(exchange,store,true);
-            Check(message.Args[2]=="CommonMissing" && message.Args[3]=="Sent","sent");
+            Check(message.Args[2]=="CommonUnreadable" && message.Args[3]=="Sent","sent (no common set served: unreadable, X-357)");
             var patch=server.Calls.Single();
             Check(patch.Method=="PATCH" && patch.Address=="https://api.github.com/gists/g1","the gist updated");
             var files=JsonNode.Parse(patch.Body)!["files"]!.AsObject();
@@ -258,7 +264,7 @@ internal static class ExchangeV31137Tests
             Check(!second.ContainsKey(GitHubExchange.GistFile),"the v2 file not asked for again once removed");
             Check(JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(Path.Combine(root,"github.json")))!.GistFiles.Count==3,"the gist's files remembered");
         })),
-        ("Exchange v3 1137: the v3 set the merge tool wrote in the repository reads in the plugin and holds the facts of discoveries.json",() =>
+        ("Exchange v3 1137: the v3 set the merge tool wrote in the repository reads in the plugin, each file whole; the v2 file is gone",() =>
         {
             var folder=Path.GetFullPath("community-discoveries/v3");
             var index=ExchangeV3.ParseIndex(File.ReadAllText(Path.Combine(folder,"index.json")));
@@ -271,13 +277,14 @@ internal static class ExchangeV31137Tests
                 Check(kind.Refused==0 && kind.Facts.Count==entry.Count && kind.Facts.All(fact=>fact.Seen==0 && fact.Imported>0),entry.Name+" reads whole");
                 foreach(var fact in kind.Facts)keys.Add(fact.Key);
             }
-            var common=CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json")))!;
-            Check(keys.Count==common.Facts.Count && common.Facts.All(fact=>keys.Contains(fact.Key)),$"the same facts as the v2 file ({keys.Count} and {common.Facts.Count})");
+            // X-357 (0.1349): the v2 discoveries.json is gone (it held the same 3007 facts, checked by the relay before its removal).
+            Check(keys.Count==index!.Files.Sum(entry=>entry.Count) && !File.Exists(Path.GetFullPath("community-discoveries/discoveries.json")),$"one fact per line, no double ({keys.Count}); the v2 file gone");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("v3=write_v3(common[\"Facts\"],V3_DIR,say)"),"the merge tool reads v3 gists and writes the v3 set");
+            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("return write_v3(common[\"Facts\"],V3_DIR,say)")
+                && !tool.Contains("COMMON=") && !tool.Contains("write_json(COMMON"),"the merge tool reads v3 gists and writes the v3 set only");
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
-            Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && exchange.Contains("await TakeCommonV3(store).ConfigureAwait(false) ?? await TakeCommonV2(store)"),
-                "the wiring: each kind's hash noted after the save, v3 first, v2 when it is missing");
+            Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && exchange.Contains("await TakeCommonV3(store).ConfigureAwait(false) ?? (\"CommonUnreadable\",0,0);")
+                && !exchange.Contains("TakeCommonV2") && !exchange.Contains("community.sha256"),"the wiring: each kind's hash noted after the save, v3 only");
         }),
     ];
 }

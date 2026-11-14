@@ -12,11 +12,13 @@ internal static class CommunityMerge1101Tests
     [
         ("Community discoveries: ticket #43 merged, known fields and kinds only",() =>
         {
-            using var common = JsonDocument.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json")));
-            var facts = common.RootElement.GetProperty("Facts");
-            Check(facts.GetArrayLength() >= 1967,"the common file holds the facts of ticket #43 (" + facts.GetArrayLength() + ")");
-            foreach (var fact in facts.EnumerateArray())
+            // X-357 (0.1349): the lines of the v3 set as published (the v2 discoveries.json is gone).
+            var lines = RepositoryCommon.FactLines();
+            Check(lines.Count >= 1967,"the common set holds the facts of ticket #43 (" + lines.Count + ")");
+            foreach (var (_, line) in lines)
             {
+                using var document = JsonDocument.Parse(line);
+                var fact = document.RootElement;
                 foreach (var member in fact.EnumerateObject())
                     Check(Fields.Contains(member.Name),"unknown field in a fact: " + member.Name);
                 var kind = fact.GetProperty("Kind").GetInt32();

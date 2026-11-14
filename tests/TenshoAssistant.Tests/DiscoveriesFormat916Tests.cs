@@ -114,7 +114,7 @@ internal static class DiscoveriesFormat916Tests
             Check(json.Contains("\"Hq\":1,\"Values\":{\"5\":2,\"7\":1}") && !json.Contains("Imported\":0,\"ImportedHq") && !json.Contains("ImportedValues"),"written: "+json);
             Check(json.Contains("\"Key\":\"5:5:7:0:0:0:0\""),"the Key as before");
         }),
-        ("Discoveries format: the merge tool reads versions 1 and 2, sums HQ and values with the same bound, writes version 2; the common file is version 2; the watcher passes HQ",() =>
+        ("Discoveries format: the merge tool reads versions 1 and 2, sums HQ and values with the same bound, writes version 2 player files; the common set reads; the watcher passes HQ",() =>
         {
             var tool=Source("tools/discoveries-merge.py");
             // X-174 (0.1137): version 3 (the v3 gists) is read too; the common file is still written as version 2 beside the v3 set.
@@ -123,7 +123,8 @@ internal static class DiscoveriesFormat916Tests
             Check(tool.Contains("min(values,key=lambda v:(abs(v-value),v))") && tool.Contains("known[\"Values\"]=histogram_sum(known.get(\"Values\"),f[\"Values\"])"),"sum, nearest value");
             Check(tool.Contains("0<=f[\"Hq\"]<=sum(f.get(\"Values\",{}).values())") && tool.Contains("f.pop(\"ImportedHq\",None);f.pop(\"ImportedValues\",None)"),"HQ checked, imported parts dropped");
             Check(tool.Contains("FLAG: refusals over 5 %"),"the 5 % flag kept");
-            Check(CommunityDiscoveries.Parse(Source("community-discoveries/discoveries.json")) is { Version:2, Facts.Count:>0 },"common file");
+            // X-357 (0.1349): the common facts are the v3 set (the v2 discoveries.json is gone); their fields are those of version 2.
+            Check(RepositoryCommon.Facts().Count>0,"common set");
             var readme=Source("community-discoveries/README.md");
             Check(readme.Contains("version 2, since Tensho 0.916") && readme.Contains("version 2, depuis Tensho 0.916"),"README in both languages");
             var watcher=Source("src/TenshoAssistant/Discoveries/ItemDiscoveryWatcher.Dalamud.cs");

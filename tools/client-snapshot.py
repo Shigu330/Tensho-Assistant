@@ -480,7 +480,8 @@ def patch(root, sqpack, lang, lang_ui):
 
 # ---------- X-116: facts against the client, places to recheck, content to discover ----------
 
-COMMUNITY = ROOT / "community-discoveries" / "discoveries.json"
+# X-357 (0.1349): the community base is the v3 set (index.json and kind-NN.jsonl.gz); the v2 discoveries.json is gone.
+COMMUNITY = ROOT / "community-discoveries" / "v3"
 LOCAL_FACTS = XIVL / "pluginConfigs" / "TenshoAssistant" / "Discoveries" / "Discoveries.json"
 # Kinds whose place the client also holds (DiscoveriesModel.cs): NpcPlace (19) → layout NPC of that ENpc; FateSeen (3) → the FATE's range;
 # FishCatch, FishBite, FishBiteBait, IntuitionStart (10, 23, 29, 30) → fishing spots of the map; SpearShadow (28) → spearfishing points.
@@ -497,12 +498,22 @@ ITEM_DETAIL = {4, 9, 10, 24, 29, 35}
 PLACED = {1, 2, 3, 8, 10, 19, 22, 23, 28, 29, 30}  # tools/discoveries-merge.py PLACED (DiscoveryStore.HasPlace)
 
 
+def merge_tool():
+    """tools/discoveries-merge.py as a module (its v3 reader)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("discoveries_merge", ROOT / "tools" / "discoveries-merge.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def read_facts(paths=None):
-    """[(source, fact)] of the community base and this PC's own facts (the defaults), or of the files given."""
+    """[(source, fact)] of the community base and this PC's own facts (the defaults), or of the files given. A folder is a v3 set, read by
+    tools/discoveries-merge.py (bounded, checked against its index)."""
     out = []
     for path in [Path(x) for x in paths] if paths else [COMMUNITY, LOCAL_FACTS]:
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data = merge_tool().from_v3_dir(str(path)) if path.is_dir() else json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
         name = "community" if path == COMMUNITY else "local" if path == LOCAL_FACTS else path.name
@@ -715,6 +726,11 @@ def selftest():
         check(counts.get(3) == {"ok": 1} and counts.get(10) == {"ok": 1, "far": 1, "none": 1} and 1 not in counts, f"FATE, fishing, monsters {counts}")
         found, n = discover(results, [("t", {"Kind": 4, "Subject": 3, "Detail": 0})])
         check(n == 0, "a new item named by a fact is not to discover")
+        # X-357 (0.1349): the community base read from the v3 set (the v2 discoveries.json is gone).
+        if (COMMUNITY / "index.json").is_file():
+            base = [s for s, _ in read_facts()]
+            check(COMMUNITY.is_dir() and base.count("community") > 0 and read_facts([str(COMMUNITY)])[0][0] == "community",
+                  f"community base read from the v3 set ({base.count('community')} facts)")
         found, n = discover(results, [])
         check(n == 1 and "Nouveau (3)" in found[0][1], "a new item with no source and no fact is to discover")
     print(f"client-snapshot selftest: {ok}/{total} ok")

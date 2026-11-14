@@ -80,12 +80,12 @@ internal static class Exchange1208Tests
                 var message = Run(exchange, store);
                 Check(message.Args[2] == "CommonTaken" && store.Find(DiscoveryKind.Venture, 5u, 5).Count == 1 && store.Find(DiscoveryKind.FishCatch, 1u, 5).Count == 0,
                     "the venture kind taken, the cut fish kind left for the next time: " + string.Join(", ", message.Args));
-                // The v2 file cut the same way (no v3 index): the exchange still ends done.
+                // X-357 (0.1349): the v3 index cut the same way (the v2 file is no longer read): the exchange still ends done.
                 using var old = new Server();
-                old.Files[CommunityDiscoveries.Address] = Encoding.UTF8.GetBytes(new string('x', 4096));
-                old.Broken.Add(CommunityDiscoveries.Address);
+                old.Files[CommunityDiscoveries.AddressV3 + ExchangeV3.IndexName] = Encoding.UTF8.GetBytes(new string('x', 4096));
+                old.Broken.Add(CommunityDiscoveries.AddressV3 + ExchangeV3.IndexName);
                 using var v2 = new GitHubExchange(Path.Combine(root, "b"), old);
-                Check(Run(v2, new DiscoveryStore()).Args[2] == "CommonUnreadable", "v2 cut: unreadable, done");
+                Check(Run(v2, new DiscoveryStore()).Args[2] == "CommonUnreadable", "index cut: unreadable, done");
             }
             finally { try { Directory.Delete(root, true); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
         }),

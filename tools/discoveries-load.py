@@ -2,7 +2,7 @@
 
 Invented but realistic shares (the kind mix of the shared ticket #43 and a real local base, game-bounded subjects, 50-yalm cells, value histograms,
 dates kept to the day) are written as gist contents in a temporary folder, one per player; then, as `sync` does without the network: clean() of
-each share and the player files written, rebuild() of discoveries.json, and rebuild() again with nothing new. Times, file sizes and the peak memory
+each share and the player files written, rebuild() of the v3 set (X-357: the v2 discoveries.json is gone), and rebuild() again with nothing new. Times, file sizes and the peak memory
 of the process (each run in its own process, so that peaks do not add up) are printed, median over the runs. Writes only to a temporary folder,
 removed at the end; the repository's community-discoveries/ is never touched. Not run by Verify (minutes at a million facts).
 
@@ -106,7 +106,7 @@ def measure(size,players,seed):
     folder=tempfile.mkdtemp(prefix="tensho-merge-load-")
     try:
         sightings,largest=generate(folder,size,players,seed)
-        merge=load_merge();merge.PLAYERS=os.path.join(folder,"players");merge.COMMON=os.path.join(folder,"discoveries.json");os.makedirs(merge.PLAYERS)
+        merge=load_merge();merge.PLAYERS=os.path.join(folder,"players");merge.V3_DIR=os.path.join(folder,"v3");os.makedirs(merge.PLAYERS)
         raw=os.path.join(folder,"raw");refused=0;kept=0;quiet=io.StringIO()
         start=time.perf_counter()
         for name in sorted(os.listdir(raw),key=lambda n:int(n.split(".")[0])):
@@ -121,11 +121,12 @@ def measure(size,players,seed):
         start=time.perf_counter()
         with contextlib.redirect_stdout(quiet):again=merge.rebuild()
         again_s=time.perf_counter()-start
-        common=json.load(open(merge.COMMON,encoding="utf-8"))["Facts"]
+        # X-357 (0.1349): the common facts are the v3 set only (the v2 discoveries.json is no longer written).
+        common=merge.from_v3_dir(merge.V3_DIR)["Facts"];common_bytes=sum(os.path.getsize(os.path.join(merge.V3_DIR,n)) for n in os.listdir(merge.V3_DIR))
         return {"sightings":sightings,"largest_share":largest,"refused":refused,"kept":kept,"common_facts":len(common),"changed":changed,"unchanged_second":not again,
                 "clean_s":clean_s,"rebuild_s":rebuild_s,"rebuild_unchanged_s":again_s,
-                "common_mb":os.path.getsize(merge.COMMON)/1048576,"players_mb":sum(os.path.getsize(os.path.join(merge.PLAYERS,n)) for n in os.listdir(merge.PLAYERS))/1048576,
-                "bytes_a_fact":os.path.getsize(merge.COMMON)/max(1,len(common)),"peak_mb":peak_mb()}
+                "common_mb":common_bytes/1048576,"players_mb":sum(os.path.getsize(os.path.join(merge.PLAYERS,n)) for n in os.listdir(merge.PLAYERS))/1048576,
+                "bytes_a_fact":common_bytes/max(1,len(common)),"peak_mb":peak_mb()}
     finally:shutil.rmtree(folder,ignore_errors=True)
 
 def main(argv):
@@ -145,7 +146,7 @@ def main(argv):
             out=subprocess.run([sys.executable,"-I","-X","utf8",os.path.abspath(__file__),"--one",str(size),str(players),"93"],capture_output=True,text=True,check=True)
             results.append(json.loads(out.stdout.strip().splitlines()[-1]));print(f"  size {size:,}: run {run+1}/{runs} done",file=sys.stderr)
         print(f"\nSIZE {size:,} distinct facts: {results[0]['sightings']:,} sightings in {players} shares (largest {results[0]['largest_share']:,}), "
-              f"{results[0]['common_facts']:,} facts in discoveries.json, {results[0]['refused']} refused")
+              f"{results[0]['common_facts']:,} facts in the v3 set, {results[0]['refused']} refused")
         rows={}
         for name in ("clean_s","rebuild_s","rebuild_unchanged_s","common_mb","players_mb","bytes_a_fact","peak_mb"):
             values=sorted(r[name] for r in results);rows[name]={"median":statistics.median(values),"min":values[0],"max":values[-1]}

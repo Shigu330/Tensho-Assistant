@@ -207,7 +207,7 @@ Known gaps to the rule « Draw reads neither pointer nor Excel sheet » (noted o
 | bite times | network (GraphQL, `FishBiteTimes`) | Teamcraft public reports (MIT) |
 | Fashion Report (`FashionReport.json`) | network (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
 | open housing plots | network (`BoundedHttp`) | PaissaDB |
-| common discoveries file (`community-discoveries/discoveries.json`) | network (raw.githubusercontent.com), on « Exchange now » or the opt-in daily exchange | Tensho's repository (players' readings) |
+| common discoveries set (`community-discoveries/v3/`) | network (raw.githubusercontent.com), on « Exchange now » or the opt-in daily exchange | Tensho's repository (players' readings) |
 | sign-in, gist and issue of the discoveries exchange | network (github.com, api.github.com), only after the player connects GitHub | GitHub |
 | alarm, currency and duty-pop posts | network (the player's own webhook, discord.com hosts only) | Discord |
 
@@ -503,7 +503,7 @@ actions du joueur (retrait du drapeau, téléportation, /alarm, macros, tri, imp
 | temps de touche | réseau (GraphQL, `FishBiteTimes`) | rapports publics de Teamcraft (MIT) |
 | Revue de mode (`FashionReport.json`) | réseau (GitHub, `BoundedHttp`) | FFXIVGachaSpreadsheet (MIT) |
 | terrains libres | réseau (`BoundedHttp`) | PaissaDB |
-| fichier commun des découvertes (`community-discoveries/discoveries.json`) | réseau (raw.githubusercontent.com), sur « Échanger maintenant » ou l'échange quotidien sur option | dépôt de Tensho (relevés des joueurs) |
+| ensemble commun des découvertes (`community-discoveries/v3/`) | réseau (raw.githubusercontent.com), sur « Échanger maintenant » ou l'échange quotidien sur option | dépôt de Tensho (relevés des joueurs) |
 | connexion, gist et ticket de l'échange des découvertes | réseau (github.com, api.github.com), seulement après que le joueur a connecté GitHub | GitHub |
 | messages des alarmes, des monnaies et de l'outil de mission | réseau (webhook du joueur, hôtes discord.com seulement) | Discord |
 

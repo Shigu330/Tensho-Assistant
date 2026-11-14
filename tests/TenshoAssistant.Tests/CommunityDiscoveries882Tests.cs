@@ -13,9 +13,10 @@ internal static class CommunityDiscoveries882Tests
             store.Merge([new DiscoveryFact{Kind=DiscoveryKind.Venture,Subject=6,Detail=7,LevelMin=1,LevelMax=1,Imported=1,First=at,Last=at}]);
             var mine=CommunityDiscoveries.Mine(store.Snapshot(at,false));
             Check(mine.Facts.Count==1 && mine.Facts[0].Subject==5 && mine.Facts[0].Imported==0,"own sightings only");
-            Check(CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json"))) is { Facts.Count:>0 } common
-                && common.Facts.All(fact=>fact.Seen==0 && fact.Imported>0 && DiscoveryStore.Valid(fact)),"common file");
-            Check(CommunityDiscoveries.Address.StartsWith("https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/",StringComparison.Ordinal),"read from main");
+            // X-357 (0.1349): the common facts are the v3 set (the v2 discoveries.json is gone).
+            Check(RepositoryCommon.Facts() is { Count:>0 } common && common.All(fact=>fact.Seen==0 && fact.Imported>0 && DiscoveryStore.Valid(fact)),"common set");
+            Check(CommunityDiscoveries.AddressV3.StartsWith("https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/",StringComparison.Ordinal)
+                && !File.Exists(Path.GetFullPath("community-discoveries/discoveries.json")),"read from main, the v2 file gone");
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Discoveries.cs"));
             Check(!page.Contains("DiscoveriesUi.TakeCommon") && !page.Contains("DiscoveriesUi.Share\"") && !File.Exists(Path.GetFullPath(".github/ISSUE_TEMPLATE/discoveries.yml")),"no other way");
         }),

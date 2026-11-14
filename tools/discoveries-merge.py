@@ -1,10 +1,10 @@
-"""X-77 (0.882), 0.886: builds community-discoveries/discoveries.json from what players shared (maintainer tool, run by hand).
+"""X-77 (0.882), 0.886: builds the common discoveries (community-discoveries/v3/) from what players shared (maintainer tool, run by hand).
 
 Usage:
   python tools/discoveries-merge.py sync [--dry-run]
       Reads every open « Discoveries » issue through the GitHub CLI, fetches the gist it points to, keeps the player's valid facts
       in community-discoveries/players/<issue>.json (replacing that player's previous file: an updated gist is never counted twice), then rebuilds
-      discoveries.json from all player files. --dry-run: report only, nothing written.
+      the common v3 set from all player files. --dry-run: report only, nothing written.
       X-168 (0.1146): GitHub drops the « discoveries » label of an issue opened by a player without rights on the repository, so issues are found
       by the label, or by their title « Discoveries: <login> », or by their content (« Shared from Tensho Assistant » with a gist link). Before
       anything is read, each one must hold one gist link only, the CC0-1.0 sharing ticked, a title naming its author (when it names one), and a gist
@@ -12,7 +12,7 @@ Usage:
       X-183 (0.1210): one issue per GitHub account: the newest one is read, an older one of the same author is reported and not read; a player
       file notes its author (« Login »); a player file whose issue is no longer an open share is reported with the withdraw command.
   python tools/discoveries-merge.py rebuild
-      Rebuilds discoveries.json and the v3 set community-discoveries/v3/ from community-discoveries/players/*.json.
+      Rebuilds the v3 set community-discoveries/v3/ from community-discoveries/players/*.json.
   python tools/discoveries-merge.py withdraw <issue> [--dry-run]
       X-183: removes players/<issue>.json (a player who closed their issue or asked to be taken out), then rebuilds.
   python tools/discoveries-merge.py check <file.json|file.zip|v3 folder|gist:ID>
@@ -37,13 +37,14 @@ optional fields: Hq (how many sightings were HQ) and Values (value seen -> count
 sums over the players (a new value past 32 is counted under the nearest value kept, the lower one on a tie). ImportedHq and ImportedValues (what the player
 imported, never shared by the plugin) are accepted and dropped.
 X-113 (0.1029): a ticket whose gist brings nothing new (same facts as its player file) is reported « nothing new »: its file is not written again,
-and it gets no « Merged into » comment; discoveries.json is written only when its facts change (not for a new date alone).
+and it gets no « Merged into » comment; the common set is written only when its facts change (not for a new date alone).
 X-174 (0.1137, DEC-052): exchange format v3. A set is index.json and one kind-NN.jsonl.gz per kind (gzip of UTF-8 lines: a header line, then one
 fact per line), each listed in the index with its fact count, compressed size and SHA-256; read bounded (compressed and decompressed size, line
 length, facts per kind) and checked against the index's hash first; a bad line is counted as refused. A player's gist is read in v3 (index.json and
 kind-NN.jsonl.gz.b64, base64 of the gzip bytes) or in v2 (the single tensho-discoveries.b64, still read for a while). The player files stay v2 JSON
-(players/<issue>.json); rebuild writes both the v2 discoveries.json (plugins before 0.1137) and the v3 set community-discoveries/v3/, the same facts
-giving the same bytes (gzip mtime 0, facts and fields in a fixed order, dated by their newest day).
+(players/<issue>.json); rebuild writes the v3 set community-discoveries/v3/, the same facts giving the same bytes (gzip mtime 0, facts and
+fields in a fixed order, dated by their newest day). X-357 (0.1349, DEC-052): the v2 common file discoveries.json (plugins before 0.1137) is no
+longer written: the plugin reads v3 only; rebuild compares to the v3 set (a file written only when its bytes change).
 X-183 (0.1210, night review of 12/11, N5, N12, N13, N16, N17): each field has the plugin's type and bounds (a gist can no longer get a whole kind refused
 by the plugin's reader); a share's facts are its sightings (Seen from 1 to 100 000, at least the values counted) and no date before 2026-11-01; each
 player counts for at most 1 000 sightings of a fact in the common histograms; the exact place is the earliest day's; a player alone far outside the
@@ -54,7 +55,7 @@ in time is reported unreadable and skipped, the batch goes on."""
 import base64,collections,gzip,hashlib,importlib.util,io,json,math,os,re,struct,subprocess,sys,tempfile,time,unicodedata,urllib.request,zipfile
 from datetime import datetime,timezone,timedelta
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-COMMON=os.path.join(ROOT,"community-discoveries","discoveries.json");PLAYERS=os.path.join(ROOT,"community-discoveries","players")
+PLAYERS=os.path.join(ROOT,"community-discoveries","players")
 V3_DIR=os.path.join(ROOT,"community-discoveries","v3")
 QUEST_ASKED_FIXED=datetime(2026,11,8,15,42,29,tzinfo=timezone.utc)
 QUEST_ASKED_FIXED_DAY=datetime(2026,11,9,tzinfo=timezone.utc)  # 0.1012: a date kept to the day only passes the fix if it is on a later day
@@ -373,14 +374,9 @@ def rebuild(say=print):
     common={"Version":VERSION,"Producer":"Tensho Assistant community","Written":datetime.now(timezone.utc).isoformat(),
             "Facts":sorted(merged.values(),key=sort_key)}
     players=len(counted)-len(left)
-    v3=write_v3(common["Facts"],V3_DIR,say)  # X-174: the v3 set, same facts
-    try:before=json.load(open(COMMON,encoding="utf-8"))
-    except (OSError,ValueError):before={}
-    # X-113: the same facts are not written again (the date alone changed in 0.1027).
-    if before.get("Version")==VERSION and before.get("Facts")==common["Facts"]:
-        say(f"discoveries.json: unchanged, {len(common['Facts'])} facts from {players} players");return v3
-    write_json(COMMON,common)
-    say(f"discoveries.json: {len(common['Facts'])} facts from {players} players");return True
+    # X-174, X-357 (0.1349): the v3 set only, compared byte for byte (X-113: the same facts are not written again, a date alone changes nothing).
+    say(f"common: {len(common['Facts'])} facts from {players} players")
+    return write_v3(common["Facts"],V3_DIR,say)
 
 def write_v3(facts,folder,say=print):
     """X-174: the v3 set of these facts in folder: a file written only when its bytes change, a kind file no longer in the set removed. True if changed."""
@@ -532,7 +528,8 @@ def recheck(changes,facts):
     return out
 
 def facts_of(local=False):
-    out=[("community",f) for f in json.load(open(COMMON,encoding="utf-8")).get("Facts",[])] if os.path.exists(COMMON) else []
+    # X-357 (0.1349): the common facts from the v3 set (the v2 discoveries.json is gone).
+    out=[("community",f) for f in from_v3_dir(V3_DIR).get("Facts",[])] if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)) else []
     if local:
         path=os.path.join(os.environ.get("APPDATA",""),"XIVLauncher","pluginConfigs","TenshoAssistant","Discoveries","Discoveries.json")
         try:out+=[("local",f) for f in json.load(open(path,encoding="utf-8")).get("Facts",[])]
@@ -675,18 +672,20 @@ def selftest():
           f"N5: a histogram capped, its shape and HQ share kept, the same when capped twice ({big})")
     check(not any(unicodedata.category(c) in ("Cc","Cf") for c in short("a\x1b[2Kb‮c\r\nd")) and short("a\x1b[2Kb")=="a?[2Kb","N17: control and format characters shown as ?")
     # X-183 (N5, N13, N16): rebuild on made-up player files.
-    global COMMON,V3_DIR
-    saved=(PLAYERS,COMMON,V3_DIR)
+    global V3_DIR
+    saved=(PLAYERS,V3_DIR)
     with tempfile.TemporaryDirectory() as tmp:
-        PLAYERS=os.path.join(tmp,"players");os.makedirs(PLAYERS);COMMON=os.path.join(tmp,"discoveries.json");V3_DIR=os.path.join(tmp,"v3")
+        PLAYERS=os.path.join(tmp,"players");os.makedirs(PLAYERS);V3_DIR=os.path.join(tmp,"v3")
         said=[];say=said.append
         def put(n,facts,author=None):write_json(os.path.join(PLAYERS,f"{n}.json"),{"Issue":n,**({"Login":author} if author else {}),"Facts":facts})
-        def common():return json.load(open(COMMON,encoding="utf-8"))["Facts"]
+        def common():return sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)
         first=[{**f(1,s,128,60.0,140.0,"2026-11-03T00:00:00+00:00"),"LevelMin":10,"LevelMax":12,"Values":{"10":2,"12":1}} for s in range(1,5)]
         put(43,first,"Ann");put(100,[{**g,"LevelMax":100000,"Values":{"999":100_000_000}} for g in first],"Bob")
         rebuild(say);held={key(g):g for g in common()}
         check(all(held[key(g)]["LevelMax"]==12 and held[key(g)]["Imported"]==1 and held[key(g)]["Values"]=={"10":2,"12":1} for g in first)
               and any(l.startswith("100.json: FLAG") for l in said),f"N5: a player far outside the others' levels is left out, their facts unchanged ({said})")
+        check(not os.path.exists(os.path.join(tmp,"discoveries.json")) and sorted(os.listdir(tmp))==["players","v3"],"X-357: rebuild writes the v3 set only, no v2 discoveries.json")
+        said.clear();check(rebuild(say) is False and "v3: 1 kind files, 4 facts, unchanged" in said,f"X-357: the same facts again: the v3 set unchanged, nothing written ({said})")
         for n in os.listdir(PLAYERS):os.remove(os.path.join(PLAYERS,n))
         put(43,[{**first[0],"X":61.0}],"Ann");put(100,[{**first[0],"X":62.0,"First":"2026-11-02T00:00:00+00:00"}],"Bob")
         rebuild(say);got=common()[0]
@@ -701,7 +700,7 @@ def selftest():
         except OSError:raised=True
         finally:os.replace=real
         check(raised and open(target,encoding="utf-8").read()=="old" and not [n for n in os.listdir(tmp) if n.endswith(".tmp")],"N16: a failed write leaves the old file whole and no temporary")
-    PLAYERS,COMMON,V3_DIR=saved
+    PLAYERS,V3_DIR=saved
     # X-146: a gist file read within its bound and its time, a slow trickle stopped.
     class Answer:
         def __init__(self,data,pause=0.0):self.data=data;self.pause=pause
@@ -716,9 +715,11 @@ def selftest():
     except TimeoutError:slow=True
     check(slow,"X-146: a byte at a time past the deadline: stopped")
     check(refused(lambda:fetch_gist_raw("https://example.com/x",10,opener=lambda u,timeout:Answer(b"abc"))),"X-146: another address: refused")
-    if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)) and os.path.isfile(COMMON):
-        held=json.load(open(COMMON,encoding="utf-8"))["Facts"]
-        check(sorted(from_v3_dir(V3_DIR)["Facts"],key=sort_key)==sorted(held,key=sort_key),"v3: the repository's set holds the facts of discoveries.json")
+    if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)):
+        # X-357 (0.1349): was « v3 holds the facts of discoveries.json »; the v2 file is gone: the repository's set reads whole and clean.
+        repo=from_v3_dir(V3_DIR);facts,report=clean(repo)
+        check(repo["Unreadable"]==0 and len(repo["Facts"])>0 and report["refused"]==0 and report["facts"]==len(repo["Facts"]),
+              f"v3: the repository's set reads whole, every fact valid ({report['facts']} facts, {report['refused']} refused)")
     print(f"discoveries-merge selftest: {ok}/{total} ok");return 0 if ok==total else 1
 
 # X-168: the player is told why a share was not taken (English then French).

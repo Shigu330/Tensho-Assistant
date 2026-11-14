@@ -10,8 +10,19 @@ internal static class DiscoveriesPrivacy1012Tests
     [
         ("Discoveries privacy 1012: every published fact has First and Last at 00:00 UTC",() =>
         {
-            var files=Directory.GetFiles(Path.GetFullPath("community-discoveries/players"),"*.json").Append(Path.GetFullPath("community-discoveries/discoveries.json")).ToList();
+            var files=Directory.GetFiles(Path.GetFullPath("community-discoveries/players"),"*.json").ToList();
             var facts=0;
+            // X-357 (0.1349): the common facts are the lines of the v3 set (the v2 discoveries.json is gone).
+            foreach(var (file,line) in RepositoryCommon.FactLines())
+            {
+                using var document=JsonDocument.Parse(line);
+                facts++;
+                foreach(var name in new[]{"First","Last"})
+                {
+                    var text=document.RootElement.GetProperty(name).GetString()!;
+                    Check(text.EndsWith("T00:00:00+00:00",StringComparison.Ordinal),$"v3/{file} {name} {text[..10]} keeps a time");
+                }
+            }
             foreach(var file in files)
             {
                 using var document=JsonDocument.Parse(File.ReadAllText(file));

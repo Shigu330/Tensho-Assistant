@@ -24,7 +24,8 @@ internal static class MergeToolTests
                     var key=string.Join(":",new[]{"Kind","Subject","Detail","Territory","Map","CellX","CellZ"}.Select(name=>fact.GetProperty(name).GetRawText()));
                     counts[key]=counts.GetValueOrDefault(key)+1;
                 }
-            var common=CommunityDiscoveries.Parse(File.ReadAllText(Path.GetFullPath("community-discoveries/discoveries.json")))!;
+            // X-357 (0.1349): the common facts read from the v3 set (the v2 discoveries.json is gone).
+            var common=new DiscoveryFile{Facts=RepositoryCommon.Facts()};
             Check(common.Facts.Count==counts.Count && common.Facts.All(fact=>counts[fact.Key.Replace(((int)fact.Kind).ToString()+":",((int)fact.Kind).ToString()+":")]==fact.Imported),"rebuilt");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
             Check(tool.Contains("def sync(dry)") && tool.Contains("FLAG: refusals over 5 %"),"sync with its check");

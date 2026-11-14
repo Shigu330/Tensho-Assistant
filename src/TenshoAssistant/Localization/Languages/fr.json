@@ -737,7 +737,6 @@
     "ExchangeExpired": "Votre connexion à GitHub a expiré et n'a pas pu être renouvelée : connectez-vous à nouveau.",
     "ExchangeSignInChanged": "Tensho se connecte maintenant à GitHub par son application GitHub, avec moins de droits : l'ancienne autorisation a été oubliée sur ce PC ; connectez-vous à nouveau. Vous pouvez retirer l'ancienne sur github.com › Settings › Applications.",
     "ExchangeFailed": "L'échange a échoué ({0}) ; voir le journal.",
-    "CommonMissing": "Le fichier commun n'est pas encore publié (ou GitHub n'a pas répondu).",
     "CommonSame": "Déjà à jour : le fichier commun n'a pas changé.",
     "ShareEmpty": "Rien de vu par vous à partager pour l'instant.",
     "SummaryBlueSpellCaster": "Monstres vus lançant un sort de mage bleu : {0} ({1} vus par vous, {2} importés seulement)",
