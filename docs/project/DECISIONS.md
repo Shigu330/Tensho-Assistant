@@ -59,6 +59,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-050 | 2026-11-09 | Topics entrusted to the agent on 2026-11-09: releases, Dalamud AI policy, EUPL-1.2 licence, icon. Some DECs and public documents still said the opposite: commits made by the desktop application (DEC-009, DEC-010), release after a game session (DEC-033), AI policy followed (DEC-010, DEC-039), EUPL "to be accepted by the user" (GAPS), icon "to keep or replace" (PUBLISHING, point 7). |
 | DEC-051 | 2026-11-11 | No decision recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said that the user makes the commits (GitHub Desktop) and that no zip is made any more. |
 | DEC-052 | 2026-11-12 | The shared discoveries are exchanged as one JSON file (DEC-042, version 2): the common file of the repository (`community-discoveries/discoveries.json`) and the single gist file of each player (`tensho-discoveries.b64`, base64 of gzip of JSON) are read whole, and a change to one kind makes every player download everything again; changing the format after the public announcement would force migrating every player's files. |
+| DEC-053 | 2026-11-15 | DEC-030 removed the customisable chat (« I will take Chat 2 if I need it »); the chat study of 2026-11-15 (X-388: an audit of Chat 2 and of what Tensho could add to it) asked how far a Tensho chat should go, and when. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -359,6 +360,7 @@ Decision: Customisable chat abandoned and removed: page, window, settings, texts
 Reason: User's choice, 2026-11-04.
 Consequences: 0.472. The old plan and the code stay in the git history (commit bf30b72, 0.471.0). The community templates (TEMPLATES-001) continue.
 References: docs/project/DECISIONS.md (DEC-029), the maintainer's notes (not in the repository)
+Reopened: in part by DEC-053 (2026-11-15): a Tensho chat window beside the game's.
 
 ID: DEC-031
 Timestamp: 2026-11-04 Europe/Brussels
@@ -580,6 +582,16 @@ Reason: User decision; a large common file is no longer read whole, a change to 
 Consequences: Replaces DEC-042 on the format (its version 2 fields stay, in the lines of v3). The v2 common file is written beside the v3 set for plugins before 0.1137 until version 2 is dropped. community-discoveries/README.md and SECURITY.md describe the v3 set. Completed in 0.1349 (X-357, user request of 2026-11-14 for a clean repository before the announcement, the laptop worker confirmed on v3): version 2 dropped from the common files: `community-discoveries/discoveries.json` removed; the plugin reads the v3 set only (without it, nothing is taken, the exchange says « unreadable » and the local base is untouched); the merge tool writes and compares the v3 set only. The player files stay version 2 JSON, and the tool still reads a player's older v2 gist.
 References: DEC-042, tools/discoveries-merge.py, src/TenshoAssistant/Discoveries/ExchangeV3.cs, src/TenshoAssistant/Discoveries/GitHubExchange.cs, community-discoveries/README.md, GLOBAL-PLAN X-174
 
+ID: DEC-053
+Timestamp: 2026-11-15 Europe/Brussels (0.1436)
+Problem: DEC-030 removed the customisable chat (« I will take Chat 2 if I need it »); the chat study of 2026-11-15 (X-388: an audit of Chat 2 and of what Tensho could add to it) asked how far a Tensho chat should go, and when.
+Evidence: User choice of 2026-11-15 on the study's question: « Fenêtre en plus » ("an extra window"). The read-only chat window delivered in 0.1434 (X-403, phase 1).
+Options: (a) A Tensho chat window in addition to the game's (reading, Tensho menus on every link, rules and alerts, conversations), then integration with Chat 2 through its IPC; typing and replacing the game's chat decided later, from use; a nice-to-have point, after the must-haves. (b) A full chat that replaces the game's (DEC-029).
+Decision: Option (a). Tensho shows its own chat window beside the game's chat, never hides the game's chat and has no typing: reading (tabs, colours, unread lines), Tensho menus on every link (item, place, player, quest), rules and alerts, conversations; then Tensho's menus inside Chat 2 through its IPC. Off by default; the lines are kept in memory only.
+Reason: User's choice, 2026-11-15.
+Consequences: Reopens DEC-030 in part: a Tensho chat window comes back beside the game's; the full replacement of DEC-029 stays cancelled. X-403 is done in phases, one family per version: phase 1 (reading window) in 0.1434, then the links and their menus, rules and alerts, conversations, and the Chat 2 integration. Typing and replacing the game's chat are decided later, from use. Red lines unchanged: no automatic sending; original code (Chat 2 is read to understand, never copied); the whole window off in player-versus-player and competitive content (DEC-038).
+References: DEC-029, DEC-030, DEC-038, GLOBAL-PLAN X-388 and X-403, src/TenshoAssistant/Chat/
+
 ---
 
 # Décisions durables
@@ -641,6 +653,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-050 | 2026-11-09 | Sujets confiés à l'agent le 2026-11-09 : releases, politique IA de Dalamud, licence EUPL-1.2, icône. Des DEC et des documents publics disaient encore le contraire : commits faits par l'application de bureau (DEC-009, DEC-010), release après une séance de jeu (DEC-033), politique IA suivie (DEC-010, DEC-039), EUPL « à accepter par l'utilisateur » (GAPS), icône « à garder ou remplacer » (PUBLISHING, point 7). |
 | DEC-051 | 2026-11-11 | Aucune décision ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore que l'utilisateur fait les commits (GitHub Desktop) et qu'aucun zip n'est plus fait. |
 | DEC-052 | 2026-11-12 | Les découvertes partagées s'échangent en un seul fichier JSON (DEC-042, version 2) : le fichier commun du dépôt (`community-discoveries/discoveries.json`) et le fichier unique du gist de chaque joueur (`tensho-discoveries.b64`, base64 d'un gzip de JSON) se lisent en entier, et un changement d'un seul genre fait tout retélécharger à chaque joueur ; changer le format après l'annonce publique obligerait à migrer les fichiers de tous les joueurs. |
+| DEC-053 | 2026-11-15 | DEC-030 a retiré le chat personnalisable (« je prendrai Chat 2 si j'en ai besoin ») ; l'étude du chat du 2026-11-15 (X-388 : audit de Chat 2 et de ce que Tensho pourrait y ajouter) demandait jusqu'où irait un chat de Tensho, et quand. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -941,6 +954,7 @@ Decision: Chat personnalisable abandonné et retiré : page, fenêtre, réglages
 Reason: Choix de l'utilisateur, 2026-11-04.
 Consequences: 0.472. L'ancien plan et le code restent dans l'historique git (commit bf30b72, 0.471.0). Les modèles communautaires (TEMPLATES-001) continuent.
 References: docs/project/DECISIONS.md (DEC-029), notes du mainteneur (hors du dépôt)
+Rouverte : en partie par DEC-053 (2026-11-15) : une fenêtre de chat Tensho à côté de celle du jeu.
 
 DEC-ID: DEC-031
 Timestamp: 2026-11-04 Europe/Brussels
@@ -1161,3 +1175,13 @@ Decision: Format d'échange v3 : un ensemble est `index.json` (format, version 3
 Reason: Décision de l'utilisateur ; un gros fichier commun n'est plus lu en entier, un changement d'un genre coûte un petit téléchargement, et un fichier abîmé ou trop gros est refusé avant d'être utilisé.
 Consequences: Remplace DEC-042 pour le format (ses champs de version 2 restent, dans les lignes de la v3). Le fichier commun v2 est écrit à côté de l'ensemble v3 pour les plugins d'avant 0.1137 jusqu'au retrait de la version 2. community-discoveries/README.md et SECURITY.md décrivent l'ensemble v3. Complétée en 0.1349 (X-357, demande de l'utilisateur du 2026-11-14 d'un dépôt propre avant l'annonce, le travailleur du portable confirmé en v3) : la version 2 retirée des fichiers communs : `community-discoveries/discoveries.json` supprimé ; le plugin ne lit plus que l'ensemble v3 (sans lui, rien n'est pris, l'échange dit « illisible » et la base locale n'est pas touchée) ; l'outil de fusion n'écrit et ne compare plus que l'ensemble v3. Les fichiers des joueurs restent en JSON de version 2, et l'outil lit encore l'ancien gist v2 d'un joueur.
 References: DEC-042, tools/discoveries-merge.py, src/TenshoAssistant/Discoveries/ExchangeV3.cs, src/TenshoAssistant/Discoveries/GitHubExchange.cs, community-discoveries/README.md, GLOBAL-PLAN X-174
+
+DEC-ID: DEC-053
+Timestamp: 2026-11-15 Europe/Brussels (0.1436)
+Problem: DEC-030 a retiré le chat personnalisable (« je prendrai Chat 2 si j'en ai besoin ») ; l'étude du chat du 2026-11-15 (X-388 : audit de Chat 2 et de ce que Tensho pourrait y ajouter) demandait jusqu'où irait un chat de Tensho, et quand.
+Evidence: Choix de l'utilisateur du 2026-11-15 sur la question de l'étude : « Fenêtre en plus ». La fenêtre de chat en lecture seule livrée en 0.1434 (X-403, phase 1).
+Options: (a) Une fenêtre de chat Tensho en plus de celle du jeu (lecture, menus Tensho sur tous les liens, règles et alertes, conversations), puis l'intégration à Chat 2 par son IPC ; la saisie et le remplacement du chat du jeu décidés plus tard, sur l'usage ; point souhaitable, après les indispensables. (b) Un chat complet qui remplace celui du jeu (DEC-029).
+Decision: Option (a). Tensho montre sa propre fenêtre de chat à côté de celle du jeu, ne cache jamais le chat du jeu et n'a pas de saisie : lecture (onglets, couleurs, lignes non lues), menus Tensho sur tous les liens (objet, lieu, joueur, quête), règles et alertes, conversations ; puis les menus de Tensho dans Chat 2 par son IPC. Désactivée par défaut ; les lignes sont gardées en mémoire seulement.
+Reason: Choix de l'utilisateur, 2026-11-15.
+Consequences: Rouvre DEC-030 en partie : une fenêtre de chat Tensho revient à côté de celle du jeu ; le remplacement complet de DEC-029 reste annulé. X-403 se fait par phases, une famille par version : phase 1 (fenêtre en lecture) en 0.1434, puis les liens et leurs menus, les règles et alertes, les conversations, et l'intégration à Chat 2. La saisie et le remplacement du chat du jeu se décident plus tard, sur l'usage. Lignes rouges inchangées : aucun envoi automatique ; code original (Chat 2 lu pour comprendre, jamais copié) ; toute la fenêtre coupée en joueur contre joueur et en contenu classé (DEC-038).
+References: DEC-029, DEC-030, DEC-038, GLOBAL-PLAN X-388 et X-403, src/TenshoAssistant/Chat/
