@@ -1945,6 +1945,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1442) Fenêtre de chat Tensho : clic droit sur le texte d'un message : menu « Copier ce message » et « Copier tous les messages de cet onglet » ; le texte collé ailleurs a l'heure, le canal, l'auteur et le message, un message par ligne
 
+- [ ] (0.1453) Fenêtre de chat de Tensho : une adresse web dans un message (https://… ou www.…, par exemple dite par vous en /dire) est soulignée ; au survol, l'adresse entière ; un clic ouvre un menu avec l'adresse : « Ouvrir dans le navigateur » ouvre la page dans le navigateur, « Copier l'adresse » la copie ; un point ou une virgule après l'adresse n'en fait pas partie.
+
+- [ ] (0.1454) Fenêtre de chat de Tensho : le bouton au bout des onglets (cadre) retire la barre de titre et le cadre, la fenêtre ne garde que les onglets et les messages ; le même bouton les remet ; le bouton du cadenas empêche de la déplacer et de la redimensionner, un second clic la libère ; « Opacité du fond » à 0 % rend le fond transparent ; après un rechargement, la fenêtre garde sa place, sa taille et ces deux réglages ; « /tensho chat » la masque et la réaffiche, aussi sans bordure.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
