@@ -93,6 +93,10 @@ public sealed class CollectionTracker(int maximumNotes=20)
     private readonly object gate=new();
     private readonly Dictionary<long,(DateTime At,long Depth,long Kind,long Reason,int EndedBefore)> open=[];
     private int notes;
+    private long backgroundCount=-1;
+    /// <summary>X-433 (0.1431): when the background collection running now began (none: null).</summary>
+    public DateTime? BackgroundSince { get{lock(gate)return backgroundSince;} }
+    private DateTime? backgroundSince;
     public int Ended { get; private set; }
     public int Generation2 { get; private set; }
     public int Background { get; private set; }
@@ -105,11 +109,13 @@ public sealed class CollectionTracker(int maximumNotes=20)
             switch(name)
             {
                 case "GCStart_V2":
+                    if(kind==1){backgroundSince=at;backgroundCount=number;}
                     open[number]=(at,depth ?? 0,kind ?? 0,reason ?? -1,Ended);
                     if(open.Count>OpenCap)open.Remove(open.Keys.Min());
                     return null;
                 case "GCEnd_V1":
                 {
+                    if(number==backgroundCount){backgroundSince=null;backgroundCount=-1;}
                     if(!open.Remove(number,out var started))return null;
                     Ended++;
                     if(started.Depth<2)return null;
@@ -156,6 +162,52 @@ public sealed class CollectionTracker(int maximumNotes=20)
     };
 }
 
+/// <summary>
+/// X-433 (0.1431): the runtime's allocation ticks (GCAllocationTick: one each time about 100 KB were allocated, with the kind of heap, the type
+/// and the thread): the large and pinned ones are counted by thread (the game's, the JIT warm-up's, others); one made while a background
+/// collection runs gives a note with its thread, type, size and time (at most <see cref="MaximumNotes"/>). Pure: fed by
+/// <see cref="RuntimeSuspensionListener"/>, or by the tests.
+/// </summary>
+public sealed class LargeAllocationTracker(int maximumNotes=30)
+{
+    public int MaximumNotes { get; } = maximumNotes;
+    private readonly object gate=new();
+    private int notes;
+    public int Large { get; private set; }
+    public int OnGameThread { get; private set; }
+    public int OnWarmupThread { get; private set; }
+    public int DuringBackground { get; private set; }
+
+    /// <param name="kind">The runtime's AllocationKind: 0 small objects, 1 large objects, 2 pinned objects.</param>
+    /// <param name="background">When the background collection running at that time began (none: null).</param>
+    public string? See(DateTime at,long kind,long bytes,string? type,long thread,long gameThread,long warmupThread,DateTime? background)
+    {
+        if(kind is not (1 or 2))return null;
+        lock(gate)
+        {
+            Large++;
+            var onGame=gameThread!=0 && thread==gameThread;
+            var onWarmup=warmupThread!=0 && thread==warmupThread;
+            if(onGame)OnGameThread++;
+            if(onWarmup)OnWarmupThread++;
+            if(background is not { } since)return null;
+            DuringBackground++;
+            if(notes>=MaximumNotes)return null;
+            notes++;
+            var who=onGame ? "the game's thread":onWarmup ? "the JIT warm-up's thread":"thread "+thread.ToString(CultureInfo.InvariantCulture);
+            return string.Create(CultureInfo.InvariantCulture,
+                $"{(kind==1 ? "Large":"Pinned")} object allocated on {who} at {at.ToLocalTime():HH:mm:ss.fff} during the background collection begun {since.ToLocalTime():HH:mm:ss.fff}: {type ?? "?"}, {bytes/1024.0:0} KB.");
+        }
+    }
+
+    public string Summary(TimeSpan watched)
+    {
+        lock(gate)
+            return string.Create(CultureInfo.InvariantCulture,
+                $"Large or pinned allocation ticks in the {watched.TotalSeconds:0} s after the load: {Large} ({OnGameThread} on the game's thread, {OnWarmupThread} on the JIT warm-up's), {DuringBackground} during a background collection.");
+    }
+}
+
 /// <summary>X-433 (0.1422): how long the listener watches after a load, and its end (false when the unload already ended it).</summary>
 public static class RuntimeSuspensionWatch
 {
@@ -183,6 +235,8 @@ public sealed class RuntimeSuspensionListener : EventListener
     private readonly TypeLoadTracker types=new();
     // X-433 (0.1430): the collections, with their kind (GC keyword, already enabled).
     private readonly CollectionTracker collections=new();
+    // X-433 (0.1431): the large allocations, by thread (GC keyword at the verbose level: the allocation ticks).
+    private readonly LargeAllocationTracker large=new();
     private volatile Action<string>? say;
     private int disposed;
 
@@ -190,12 +244,14 @@ public sealed class RuntimeSuspensionListener : EventListener
 
     public SuspensionTracker Tracker=>tracker;
     public CollectionTracker Collections=>collections;
+    public LargeAllocationTracker Large=>large;
     public TypeLoadTracker Types=>types;
     public bool IsDisposed=>Volatile.Read(ref disposed)!=0;
 
     protected override void OnEventSourceCreated(EventSource source)
     {
-        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Informational,(EventKeywords)(GcKeyword|TieredCompilationKeyword|TypeDiagnosticKeyword));
+        // X-433 (0.1431): the verbose level, for the GC keyword's allocation ticks (developer mode, two minutes).
+        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Verbose,(EventKeywords)(GcKeyword|TieredCompilationKeyword|TypeDiagnosticKeyword));
     }
 
     protected override void OnEventWritten(EventWrittenEventArgs written)
@@ -211,6 +267,14 @@ public sealed class RuntimeSuspensionListener : EventListener
             var name=written.PayloadNames?.IndexOf("TypeName") is int at && at>=0 && written.Payload is { } values && at<values.Count ? values[at] as string:null;
             if(Number(written,"TypeLoadStartID") is { } id
                 && types.Stop(id,written.TimeStamp.ToUniversalTime(),name,Interlocked.Read(ref ThreadClock.GameThread)) is { } typeNote)say?.Invoke(typeNote);
+            return;
+        }
+        if(written.EventName?.StartsWith("GCAllocationTick",StringComparison.Ordinal)==true)
+        {
+            var size=Number(written,"ObjectSize") is { } objectSize and >0 ? objectSize:Number(written,"AllocationAmount64") ?? Number(written,"AllocationAmount") ?? 0;
+            var typeName=written.PayloadNames?.IndexOf("TypeName") is int typeAt && typeAt>=0 && written.Payload is { } typeValues && typeAt<typeValues.Count ? typeValues[typeAt] as string:null;
+            if(large.See(written.TimeStamp.ToUniversalTime(),Number(written,"AllocationKind") ?? 0,size,typeName,written.OSThreadId,
+                Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread),collections.BackgroundSince) is { } largeNote)say?.Invoke(largeNote);
             return;
         }
         if(written.EventName is "GCStart_V2" or "GCEnd_V1")

@@ -11,6 +11,8 @@ public static class ThreadClock
 {
     /// <summary>The system id of the game's thread, as last seen by a reader's pass (0: not seen yet).</summary>
     public static long GameThread;
+    /// <summary>X-433 (0.1431): the system id of the JIT warm-up's thread, once it ran (0: not yet).</summary>
+    public static long WarmupThread;
 
     public static double? ProcessorMs()
     {

@@ -319,6 +319,7 @@ public sealed class JitWarmup : IDisposable
     {
         try
         {
+            Interlocked.Exchange(ref ThreadClock.WarmupThread,ThreadClock.SystemId());
             if(early is null){earlyDone=true;firstPartDone=true;}
             var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
             if(token.WaitHandle.WaitOne(early is null ? delay:first))return;

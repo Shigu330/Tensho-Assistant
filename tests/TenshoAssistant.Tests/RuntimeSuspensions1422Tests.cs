@@ -58,7 +58,7 @@ internal static class RuntimeSuspensions1422Tests
             Check(plugin.Contains("registrations.Register(()=>{},()=>suspensions.Dispose());", StringComparison.Ordinal), "released with the plugin's registrations");
             Check(plugin.Contains("Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length)", StringComparison.Ordinal) && RuntimeSuspensionWatch.Length == TimeSpan.FromMinutes(2), "two minutes");
             Check(RuntimeSuspensionListener.RuntimeSource == "Microsoft-Windows-DotNETRuntime" && RuntimeSuspensionListener.GcKeyword == 1 && RuntimeSuspensionListener.TieredCompilationKeyword == 0x400000000, "source and keywords");
-            Check(Read("src/TenshoAssistant/Diagnostics/RuntimeSuspensions.cs").Contains("EnableEvents(source,EventLevel.Informational,(EventKeywords)(GcKeyword|TieredCompilationKeyword|", StringComparison.Ordinal), "enabled at the informational level");
+            Check(Read("src/TenshoAssistant/Diagnostics/RuntimeSuspensions.cs").Contains("EnableEvents(source,EventLevel.Verbose,(EventKeywords)(GcKeyword|TieredCompilationKeyword|", StringComparison.Ordinal), "enabled (0.1431: at the verbose level, for the allocation ticks)");
         }),
     ];
 }
