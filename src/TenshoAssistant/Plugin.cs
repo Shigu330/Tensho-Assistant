@@ -1357,7 +1357,11 @@ public sealed partial class Plugin : IDalamudPlugin
                 registrations.Register(()=>{},()=>suspensions.Dispose());
                 _=Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length).ContinueWith(_=>
                 {
-                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))
+                    {
+                        log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Types.Summary());
+                    }
                 },TaskScheduler.Default);
             }
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>

@@ -99,25 +99,40 @@ public static class RuntimeSuspensionWatch
 public sealed class RuntimeSuspensionListener : EventListener
 {
     public const string RuntimeSource="Microsoft-Windows-DotNETRuntime";
-    public const long GcKeyword=0x1,TieredCompilationKeyword=0x400000000;
+    public const long GcKeyword=0x1,TieredCompilationKeyword=0x400000000,TypeDiagnosticKeyword=0x8000000000;
     // Field initialisers run before the base constructor, which may already enable the runtime's source.
     private readonly SuspensionTracker tracker=new();
+    // X-433 (0.1423): the type loads too (TypeDiagnostic keyword).
+    private readonly TypeLoadTracker types=new();
     private volatile Action<string>? say;
     private int disposed;
 
     public RuntimeSuspensionListener(Action<string> say)=>this.say=say;
 
     public SuspensionTracker Tracker=>tracker;
+    public TypeLoadTracker Types=>types;
     public bool IsDisposed=>Volatile.Read(ref disposed)!=0;
 
     protected override void OnEventSourceCreated(EventSource source)
     {
-        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Informational,(EventKeywords)(GcKeyword|TieredCompilationKeyword));
+        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Informational,(EventKeywords)(GcKeyword|TieredCompilationKeyword|TypeDiagnosticKeyword));
     }
 
     protected override void OnEventWritten(EventWrittenEventArgs written)
     {
         if(Volatile.Read(ref disposed)!=0)return;
+        if(written.EventName=="TypeLoadStart")
+        {
+            if(Number(written,"TypeLoadStartID") is { } id)types.Start(id,written.TimeStamp.ToUniversalTime(),written.OSThreadId);
+            return;
+        }
+        if(written.EventName=="TypeLoadStop")
+        {
+            var name=written.PayloadNames?.IndexOf("TypeName") is int at && at>=0 && written.Payload is { } values && at<values.Count ? values[at] as string:null;
+            if(Number(written,"TypeLoadStartID") is { } id
+                && types.Stop(id,written.TimeStamp.ToUniversalTime(),name,Interlocked.Read(ref ThreadClock.GameThread)) is { } typeNote)say?.Invoke(typeNote);
+            return;
+        }
         uint? reason=null;long? jitted=null;
         if(written.EventName=="GCSuspendEEBegin_V1")reason=Number(written,"Reason") is { } value ? (uint)value:null;
         else if(written.EventName=="TieredCompilationBackgroundJitStop")jitted=Number(written,"JittedMethodCount");
