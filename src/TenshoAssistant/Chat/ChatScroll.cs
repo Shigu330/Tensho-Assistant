@@ -30,14 +30,28 @@ public static class ChatScroll
     public const int WheelLines=1;
 
     /// <summary>X-447 A4 (0.1467): the scroll after the mouse wheel: whole lines (the top line kept whole), within 0 and the limit; the
-    /// limit itself when the wheel reaches it (the window then follows the bottom again).</summary>
-    public static float Wheel(float scroll,float wheel,float lineHeight,float scrollMax)
+    /// limit itself when the wheel reaches it (the window then follows the bottom again). X-482 M3 (0.1472): the wheel's values add up in
+    /// <paramref name="rest"/> and a line moves for each whole notch: a fine wheel or a touchpad sends small values every frame, and each one
+    /// moved a whole line (Ceiling or Floor of 0.1), far too fast.</summary>
+    public static float Wheel(float scroll,float wheel,float lineHeight,float scrollMax,ref float rest)
     {
-        if(wheel==0 || lineHeight<=0)return scroll;
-        var notches=wheel>0 ? (int)Math.Ceiling(wheel):(int)Math.Floor(wheel);
+        if(lineHeight<=0)return scroll;
+        rest+=wheel;
+        var notches=(int)Math.Truncate(rest);
+        if(notches==0)return scroll;
+        rest-=notches;
         var line=(float)Math.Round(scroll/lineHeight)-notches*WheelLines;
         return Math.Clamp(line*lineHeight,0f,Math.Max(0f,scrollMax));
     }
+
+    /// <summary>X-482 M2 (0.1472): the « back to the bottom » button's top left corner, in the lines' own coordinates (scroll included): at the
+    /// bottom right of the visible lines. Known before the lines are drawn, so that the links under it do not answer the mouse.</summary>
+    public static (float X,float Y) ButtonCorner(float contentRight,float scroll,float shown,float buttonWidth,float buttonHeight)
+        =>(Math.Max(0f,contentRight-buttonWidth-4f),scroll+shown-buttonHeight-4f);
+
+    /// <summary>X-482 M2 (0.1472): the point is on the button (its corner and size in the same coordinates).</summary>
+    public static bool OnButton(float x,float y,(float X,float Y) corner,float buttonWidth,float buttonHeight)
+        =>x>=corner.X && x<=corner.X+buttonWidth && y>=corner.Y && y<=corner.Y+buttonHeight;
 
     /// <summary>X-447 A4 (0.1467): the « back to the bottom » button shows while the last line is out of view.</summary>
     public static bool ShowsBottomButton(float scroll,float scrollMax)=>scrollMax>0 && scroll<scrollMax-1f;

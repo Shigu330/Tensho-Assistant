@@ -231,7 +231,8 @@ internal sealed partial class MainWindow
             if(view.Count==0){EmptyState("ChatWindow.Empty");view.MarkSeen();return;}
             ImGui.SetWindowFontScale(options.BoundedFontScale/100f);
             var width=ImGui.GetContentRegionAvail().X;
-            var key=ChatFormat.LayoutKey(options);
+            // X-482 M1 (0.1472): laid out again once the lists naming the links are loaded.
+            var key=ChatFormat.LayoutKey(options,ChatFormat.NamesKey(itemCatalog.State.Catalog is not null,quests.State.ById is not null,maps.State.Catalog is not null));
             var relaid=!view.LaidOutFor(width,key);
             if(relaid)view.Relayout(width,key);
             for(var budget=ChatLayoutsPerFrame;budget>0;budget--)
@@ -250,6 +251,10 @@ internal sealed partial class MainWindow
             // At the bottom on the frame before (its rows): follow the new lines, and nothing is unread in this tab any more.
             var atBottom=ChatScroll.AtBottom(scroll,view.RowsShown,height,view.HeightShown);
             var end=scroll+shown;
+            // X-482 M2 (0.1472): the « back to the bottom » button is placed before the lines: the links and lines under it do not answer the mouse.
+            var button=atBottom ? null:ChatBottomButton(view,scroll,shown);
+            var mouse=ImGui.GetMousePos()-ImGui.GetWindowPos()+new Vector2(0,scroll);
+            chatLinesBlocked=button is { } placed && ImGui.IsWindowHovered() && ChatScroll.OnButton(mouse.X,mouse.Y,placed.Corner,placed.Size.X,placed.Size.Y);
             for(var index=view.IndexAtRow((int)(scroll/height));index<view.Count;index++)
             {
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
@@ -260,10 +265,11 @@ internal sealed partial class MainWindow
             // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
             view.RowsShown=view.RowCount;view.HeightShown=shown;
             if(atBottom){ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();}
-            else DrawChatBottomButton(view,scroll,shown,height);
-            // X-447 A4 (0.1467): the mouse wheel moves whole lines, as the game's chat.
+            else if(button is { } bottom)DrawChatBottomButton(view,bottom,shown,height);
+            chatLinesBlocked=false;
+            // X-447 A4 (0.1467): the mouse wheel moves whole lines, as the game's chat. X-482 M3 (0.1472): a fine wheel adds up to whole notches.
             if(ImGui.IsWindowHovered() && ImGui.GetIO().MouseWheel is var wheel and not 0)
-                ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY()));
+                ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY(),ref chatWheelRest));
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);
@@ -321,16 +327,25 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>X-447 A4 (0.1467): while reading higher up, a button at the bottom right of the lines brings the window back down; it says how
-    /// many messages arrived meanwhile.</summary>
-    private void DrawChatBottomButton(ChatTabView view,float scroll,float shown,float height)
+    /// many messages arrived meanwhile. X-482 (0.1472): placed before the lines are drawn (M2); « 1 new » in the singular (M4).</summary>
+    private (string Label,(float X,float Y) Corner,Vector2 Size)? ChatBottomButton(ChatTabView view,float scroll,float shown)
     {
-        if(!ChatScroll.ShowsBottomButton(scroll,ImGui.GetScrollMaxY()))return;
-        var label=(view.Unread>0 ? localization.Format("ChatWindow.NewBelow",view.Unread):localization.Get("ChatWindow.ToBottom"))+"###ChatToBottom";
-        var size=ImGui.CalcTextSize(label.Split("###")[0])+ImGui.GetStyle().FramePadding*2;
-        ImGui.SetCursorPos(new Vector2(Math.Max(0,ImGui.GetWindowContentRegionMax().X-size.X-4),scroll+shown-size.Y-4));
-        if(ImGui.Button(label))ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));
+        if(!ChatScroll.ShowsBottomButton(scroll,ImGui.GetScrollMaxY()))return null;
+        var label=view.Unread switch{1=>localization.Get("ChatWindow.NewBelowOne"),>1=>localization.Format("ChatWindow.NewBelow",view.Unread),_=>localization.Get("ChatWindow.ToBottom")};
+        var size=ImGui.CalcTextSize(label)+ImGui.GetStyle().FramePadding*2;
+        return (label,ChatScroll.ButtonCorner(ImGui.GetWindowContentRegionMax().X,scroll,shown,size.X,size.Y),size);
+    }
+
+    private void DrawChatBottomButton(ChatTabView view,(string Label,(float X,float Y) Corner,Vector2 Size) button,float shown,float height)
+    {
+        ImGui.SetCursorPos(new Vector2(button.Corner.X,button.Corner.Y));
+        if(ImGui.Button(button.Label+"###ChatToBottom"))ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));
         Tip("ChatWindow.ToBottomTip");
     }
+
+    // X-482 (0.1472): M2, the mouse is on the « back to the bottom » button (the lines under it do not answer it); M3, the wheel's part of a notch.
+    private bool chatLinesBlocked;
+    private float chatWheelRest;
 
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
         =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X));
@@ -361,8 +376,8 @@ internal sealed partial class MainWindow
                 else
                 {
                     ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
-                    // 0.1442: a right click on a message's text: its menu (copy).
-                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
+                    // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
+                    if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
                 }
                 index++;
             }
@@ -395,6 +410,8 @@ internal sealed partial class MainWindow
         var min=ImGui.GetItemRectMin();
         var max=ImGui.GetItemRectMax();
         ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
+        // X-482 M2 (0.1472): under the « back to the bottom » button the link neither shows its tooltip nor opens (its menu already open stays).
+        if(chatLinesBlocked){if(link.Kind==ChatSegmentKind.ItemLink && ImGui.IsPopupOpen("##ChatItem"+id))ItemLinksMenu("##ChatItem"+id,itemCatalog.State.Catalog?.Find(link.ItemId));return;}
         if(link.Kind==ChatSegmentKind.WebLink)
         {
             if(ImGui.IsItemHovered()){ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);TipText(WebLinkTip(link.Url));}

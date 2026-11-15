@@ -6189,6 +6189,7 @@
     "LinkNoName": "[link]",
     "ToBottom": "Bottom",
     "NewBelow": "{0} new",
+    "NewBelowOne": "1 new",
     "ToBottomTip": "Back to the last message. While you read higher up, the new messages wait below and the window no longer follows them.",
     "Title": "Tensho chat window",
     "Show": "Show the Tensho chat window",

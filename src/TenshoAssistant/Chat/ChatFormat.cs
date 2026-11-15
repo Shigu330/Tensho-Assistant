@@ -34,9 +34,14 @@ public static class ChatFormat
     public static string Time(DateTimeOffset time,ChatSettings settings)
         =>time.ToLocalTime().ToString((settings.Clock24 ? "HH:mm":"h:mm")+(settings.ShowSeconds ? ":ss":"")+(settings.Clock24 ? "":" tt"),CultureInfo.InvariantCulture);
 
-    /// <summary>What changes how the lines are written: a change lays them out again.</summary>
-    public static string LayoutKey(ChatSettings settings)
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}";
+    /// <summary>What changes how the lines are written: a change lays them out again. X-482 M1 (0.1472): <paramref name="names"/> says which of the
+    /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
+    /// for good; it is laid out again once they are.</summary>
+    public static string LayoutKey(ChatSettings settings,string names="")
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}|{names}";
+
+    /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
+    public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
 
     /// <summary>A tab's name, with its unread count when it has one and shows it.</summary>
     public static string TabLabel(string? name,bool showUnread,int unread)
