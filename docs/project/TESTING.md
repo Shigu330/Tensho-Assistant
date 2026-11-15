@@ -1917,6 +1917,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1418) Journal des gils : finir un plateau du Dédale bestial qui donne des gils : le gain est « Dresseur (résultats des plateaux) ».
 
+- [ ] (0.1421) Rappels › État du personnage : le tableau des servants tient dans la fenêtre (colonne « Ville du marché » entière, Gils et Objets serrés sur leurs nombres) et les lignes d'aide se replient au bord.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
