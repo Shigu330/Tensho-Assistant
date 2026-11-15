@@ -1364,7 +1364,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 // subscription, which would wait for the readers' compiler), whatever ran meanwhile: a stop of every managed thread by a
                 // collection freezes the game only if its thread waits too.
                 var gaps=new Diagnostics.FrameGaps();
-                void Gap(){if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
+                void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
                 pluginInterface.UiBuilder.Draw+=Gap;
                 registrations.Register(()=>{},()=>pluginInterface.UiBuilder.Draw-=Gap);
                 _=Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length).ContinueWith(_=>

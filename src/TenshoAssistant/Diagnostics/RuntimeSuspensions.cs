@@ -85,9 +85,11 @@ public sealed class SuspensionTracker(double thresholdMs=20,int maximumNotes=30)
 /// collections ended meanwhile (at most <see cref="MaximumNotes"/>); the others are counted. Pure: fed by
 /// <see cref="RuntimeSuspensionListener"/>, or by the tests.
 /// </summary>
-public sealed class CollectionTracker(int maximumNotes=20)
+public sealed class CollectionTracker(int maximumNotes=20,double shortNoteMs=100)
 {
     public int MaximumNotes { get; } = maximumNotes;
+    /// <summary>X-433 (0.1435): a collection of generation 0 or 1 this long or longer gives a note too (one of 432 ms froze the game 513 ms).</summary>
+    public double ShortNoteMs { get; } = shortNoteMs;
     /// <summary>At most this many collections begun and not ended are kept (an end missed never grows the table).</summary>
     public const int OpenCap=64;
     private readonly object gate=new();
@@ -118,7 +120,14 @@ public sealed class CollectionTracker(int maximumNotes=20)
                     if(number==backgroundCount){backgroundSince=null;backgroundCount=-1;}
                     if(!open.Remove(number,out var started))return null;
                     Ended++;
-                    if(started.Depth<2)return null;
+                    if(started.Depth<2)
+                    {
+                        var short_=(at-started.At).TotalMilliseconds;
+                        if(short_<ShortNoteMs || notes>=MaximumNotes)return null;
+                        notes++;
+                        return string.Create(CultureInfo.InvariantCulture,
+                            $"{KindName(started.Kind)} collection of generation {started.Depth} ({ReasonName(started.Reason)}) from {started.At.ToLocalTime():HH:mm:ss.fff} to {at.ToLocalTime():HH:mm:ss.fff}: {short_:0} ms.");
+                    }
                     Generation2++;
                     if(started.Kind==1)Background++;
                     var milliseconds=(at-started.At).TotalMilliseconds;
