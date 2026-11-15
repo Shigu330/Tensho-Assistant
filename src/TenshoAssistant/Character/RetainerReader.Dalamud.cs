@@ -19,6 +19,8 @@ internal static unsafe class RetainerReader
         IReadOnlyList<FinderRetainer>? finder;
         try{finder=RetainerFinderReader.Read();}
         catch(Exception){finder=null;}
+        // X-431 M2 (0.1416): the open retainer's gil from its own purse, as GilWatcher reads it (the list's figure waits for the list to reopen).
+        var open=RetainerPurse.Open(manager);
         var found=new List<RetainerState>();
         for(var index=0;index<count;index++)
         {
@@ -26,7 +28,7 @@ internal static unsafe class RetainerReader
             if(retainer==null || retainer->RetainerId==0)continue;
             var id=retainer->RetainerId;
             var copy=finder?.FirstOrDefault(row=>row.RetainerId==id);
-            found.Add(RetainerStates.From(retainer->NameString,Name(jobName,retainer->ClassJob),retainer->Level,retainer->Gil,retainer->ItemCount,
+            found.Add(RetainerStates.From(retainer->NameString,Name(jobName,retainer->ClassJob),retainer->Level,RetainerPurse.Gil(id,retainer->Gil,open),retainer->ItemCount,
                 retainer->MarketItemCount,retainer->MarketExpire,retainer->VentureId,retainer->VentureComplete,Name(townName,(byte)retainer->Town),
                 copy is null ? null:RetainerFinderCompare.Stock(copy)));
         }
