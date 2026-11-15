@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1384.0
+- Plan global, X-412 : Cache des données : test de comportement à deux clients pour les rapports de patch (X-359 M1, R28.14). Le client A compare son catalogue pendant que le client B, sur le même dossier, fait et écrit son propre rapport (un autre catalogue) entre la comparaison de A et son écriture ; l'écriture de A, sous le verrou du profil, relit le fichier : le rapport de B reste, en mémoire comme sur le disque. Point d'essai DataCache.ReportsCompared (tests seulement). Test PatchReportsTwoClients1384Tests.
+- Tests : PatchReportsTwoClients1384Tests. Verify.ps1 (agent) : 2617/2617, 0 avertissement, 0 erreur ; DLL 0.1384.0.0. Rien à essayer en jeu.
+### English
+- Data cache: a two-client behaviour test of the patch reports (X-359 M1, R28.14). Client A compares its catalogue while client B, on the same folder, makes and writes its own report (another catalogue) between A's comparison and A's write; A's write, under the profile's lock, reads the file again: B's report stays, in memory and on disk. Test seam DataCache.ReportsCompared (tests only). Test PatchReportsTwoClients1384Tests.
+
 ## 0.1383.0
 - Plan global, X-406 : Outil de fusion des découvertes (tools/discoveries-merge.py) : rebuild borne chaque genre de l'ensemble commun à 200 000 faits, la limite du plugin (DiscoveryStore.MaxFacts) ; au-delà, les faits vus par le plus de joueurs sont gardés, puis les plus récents, et le nombre laissé de côté est dit ; v3_build refuse d'écrire un genre au-delà de la borne. Avant, un genre de plus de 200 000 faits faisait refuser l'index entier par le plugin (plus personne ne lisait l'ensemble commun). Aujourd'hui environ 1 500 faits : rien de cassé. Test DiscoveryBound1383Tests et cas de l'auto-test de l'outil.
 - Tests : DiscoveryBound1383Tests. Verify.ps1 (agent) : 2615/2615, 0 avertissement, 0 erreur ; DLL 0.1383.0.0. Rien à essayer en jeu.

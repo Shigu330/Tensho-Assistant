@@ -45,6 +45,8 @@ public sealed class DataCache : IDisposable
     public IReadOnlyList<PatchCatalogReport> PatchReports=>Volatile.Read(ref patchReports);
     /// <summary>X-117 (0.1046): called off the framework thread with each new report.</summary>
     public Action<PatchCatalogReport>? PatchReported{get;set;}
+    /// <summary>X-412 (0.1384, tests only): runs after the comparison, before the reports are read again and written under the profile's lock.</summary>
+    internal Action? ReportsCompared{get;set;}
     private string PreviousFolder=>Path.Combine(root,"previous");
     private string PatchReportsPath=>Path.Combine(PreviousFolder,"patch-reports.json");
     private bool disposed;
@@ -231,6 +233,7 @@ public sealed class DataCache : IDisposable
                 made.Add(PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow));
             }
             if(made.Count==0)return;
+            ReportsCompared?.Invoke();
             PatchCatalogReport[] reports;
             using(HoldProfile(lifetime.Token))
             {
