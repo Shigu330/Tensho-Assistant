@@ -110,6 +110,22 @@ public sealed class CompletionListsData
     }
 
     /// <summary>
+    /// X-417 (0.1390), X-422 M1 (0.1400): the saved readings applied to what the service publishes (the disk copy, or a reading published
+    /// before they arrived), with their dates for the page; the publication keeps its date and « from cache ». Nothing (false) while no
+    /// character, another character's readings or state, a loading state or an error is there.
+    /// </summary>
+    internal static bool PublishSaved(CollectionService service,ulong owner,ulong listsOwner,IReadOnlyDictionary<CollectionKind,CompletionList>? lists,
+        bool titlesComplete,bool achievementsComplete,DateTimeOffset now,TimeSpan keep)
+    {
+        var state=service.State;
+        if(owner==0 || listsOwner!=owner || state.CharacterId!=owner || state.Loading || state.Error is not null)return false;
+        var (applied,titlesAt,achievementsAt)=ApplySaved(state.Entries,lists,titlesComplete,achievementsComplete,now,keep);
+        service.SetReadings(titlesAt,achievementsAt);
+        service.Publish(owner,applied,state.CategoryIssues,state.ObservedAt,state.FromCache);
+        return true;
+    }
+
+    /// <summary>
     /// Pure: a fresh entry (the game has not sent its list this session) with the last reading: obtained stays obtained; not in the reading
     /// counts as not obtained while the reading is younger than the « Titles and achievements » cache duration; a fresh positive always wins.
     /// </summary>

@@ -52,8 +52,8 @@ internal static class SavedReadings1390Tests
             Check(restore > 0 && back > restore && reader.IndexOf("return;", restore, StringComparison.Ordinal) > back - 1, "the disk copy path applies the readings before it returns");
             Check(reader.Contains("completeTitles=false;completeAchievements=false;"), "the disk copy is no complete reading of this session");
             Check(reader.Contains("if(!scanning && restore is null)PublishSavedReadings(owner);"), "readings arriving later are applied to what is published");
-            Check(completion.Contains("CompletionListsData.ApplySaved(state.Entries,completionLists,completeTitles,completeAchievements,")
-                && completion.Contains("service.SetReadings(titlesAt,achievementsAt);"), "one step applies them and sets the dates");
+            Check(completion.Contains("CompletionListsData.PublishSaved(service,owner,listsOwner,completionLists,completeTitles,completeAchievements,"),
+                "one step applies them and sets the dates (X-422 M1: CompletionListsData.PublishSaved, run by SavedReadingsPath1400Tests)");
         }),
     ];
 }
