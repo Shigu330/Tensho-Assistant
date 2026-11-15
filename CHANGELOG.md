@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1443.0
+- X-153, onzième tranche : la famille du chat sort de Plugin.cs, après les familles du bureau (0.1225), de la persistance (0.1239), de la barre du serveur (0.1240), des panneaux (0.1249), des découvertes (0.1250), des voyages (0.1403), de la carte (0.1404), de la récolte (0.1412), de la pêche en mer (0.1417) et du chocobo (0.1419). Le lecteur de la fenêtre de chat de Tensho (X-403), les liens de carte du chat gardés pour la page Cartes et le lien de carte sous la souris (X-365) sont créés chacun par un seul chemin d'installation et libérés par un seul chemin de libération des inscriptions du plugin, dans Plugin.Chat.cs, dans l'ordre d'avant ; Plugin.cs appelle la famille une fois, à la même place. Aucun comportement ne change.
+- Tests : ChatFamily1443Tests. Verify.ps1 (agent) : 2768/2768, 0 avertissement, 0 erreur ; DLL 0.1443.0.0. Rien à essayer en jeu.
+### English
+- X-153, eleventh slice: the chat family out of Plugin.cs, after the desktop (0.1225), persistence (0.1239), server bar (0.1240), panels (0.1249), discoveries (0.1250), voyages (0.1403), map (0.1404), gathering (0.1412), ocean fishing (0.1417) and chocobo (0.1419) families. The Tensho chat window's reader (X-403), the chat's map links kept for the Maps page and the chat map link under the mouse (X-365) are each created by one install path and released by one release path of the plugin's registrations, in Plugin.Chat.cs, in the order of before; Plugin.cs calls the family once, at the same place. No behaviour changes.
+
 ## 0.1442.0
 - X-403 phase 2, deuxième partie (D-166, DEC-053) : liens de quête et copie. Un lien de quête d'un message est gardé comme les liens de carte et d'objet ; clic gauche : la quête s'ouvre dans la page Quêtes de Tensho. Un clic droit sur le texte d'un message ouvre un petit menu : copier ce message, ou tous les messages de l'onglet, tels que la fenêtre les écrit (heure, canal, auteur, texte). Les liens de joueur restent du texte (le menu du jeu reste celui du joueur ; Tensho ne garde rien sur les autres joueurs). Rien n'est envoyé au serveur du jeu.
 - Pour les joueurs : dans la fenêtre de chat de Tensho, les liens de quête ouvrent la quête dans la page Quêtes de Tensho, et un clic droit sur un message le copie, ou tous les messages de l'onglet.

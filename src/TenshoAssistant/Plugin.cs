@@ -768,18 +768,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.TreasureMap=()=>treasureMap?.Spot;
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
-            // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on.
-            Chat.ChatReader? chatReader=null;
-            registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());
-            // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
-            Maps.ChatMapLinkWatcher? chatLinks=null;
-            registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
-            mainWindow.ChatLinkHistory=chatLinks?.History;
-            // X-365 (0.1351): the chat map link under the mouse, for the right-click Tensho menu (same map settings switch).
-            Maps.ChatLinkHoverWatcher? chatLinkHover=null;
-            registrations.Register(()=>chatLinkHover=new Maps.ChatLinkHoverWatcher(addonLifecycle,log,()=>configuration.MapView.ChatLinks,()=>mainWindow.DeveloperMode),
-                ()=>chatLinkHover?.Dispose());
-            mainWindow.ChatLinkHover=chatLinkHover?.Hover;
+            // X-153 (0.1443): the chat family (the Tensho chat window's reader, the chat's map links, the link under the mouse) is wired in Plugin.Chat.cs.
+            RegisterChat(configuration,client,addonLifecycle);
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());

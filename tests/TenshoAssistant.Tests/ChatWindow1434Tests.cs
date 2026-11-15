@@ -170,7 +170,8 @@ internal static class ChatWindow1434Tests
             Check(Read("MainWindow.TrackerWindow.cs").Contains("new(this,ChatPanelDefinition),"),"a panel window: fails alone, its close button written back");
             Check(window.Contains("DrawChatWindowContents,CloseChatWindow,") && window.Contains("ChatMessages.Clear();"),"closing the window drops what it kept");
             var plugin=Read("Plugin.cs");
-            Check(plugin.Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
+            // 0.1443 (X-153): the chat family moved to Plugin.Chat.cs.
+            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
             Check(Read("MainWindow.Settings.cs").Contains("DrawChatWindowSettings();"),"its settings in Settings › Panels beside the game");
             Check(window.Contains("ImGui.SetScrollHereY(1);view.MarkSeen();") && window.Contains("view.IndexAtRow((int)(scroll/height))"),"only the rows in view are drawn; the bottom reached clears the count");
