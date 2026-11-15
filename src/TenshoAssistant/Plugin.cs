@@ -773,39 +773,8 @@ public sealed partial class Plugin : IDalamudPlugin
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
-            // g, X-02 (0.370): the music playing now (BGMSystem, memory only) and its roll (BGM file = OrchestrionPath file).
-            Collections.BgmReader? bgm=null;
-            registrations.Register(()=>bgm=new Collections.BgmReader(framework,client,log),()=>bgm?.Dispose());
-            Dictionary<uint,uint>? rollByBgm=null;
-            mainWindow.PlayingRoll=()=>
-            {
-                bgm?.Want();
-                if(bgm?.Playing is not { } playing)return null;
-                rollByBgm??=BuildRollByBgm();
-                return rollByBgm.TryGetValue(playing,out var roll) ? roll:null;
-            };
-            mainWindow.MusicRead=()=>bgm?.Playing is not null;
-            Dictionary<uint,uint> BuildRollByBgm()
-            {
-                var rolls=data.GetExcelSheet<Lumina.Excel.Sheets.OrchestrionPath>().Where(row=>row.RowId!=0 && !row.File.IsEmpty)
-                    .GroupBy(row=>row.File.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.First().RowId,StringComparer.OrdinalIgnoreCase);
-                return data.GetExcelSheet<Lumina.Excel.Sheets.BGM>().Where(row=>!row.File.IsEmpty)
-                    .Select(row=>(row.RowId,Roll:rolls.GetValueOrDefault(row.File.ExtractText()))).Where(pair=>pair.Roll!=0).ToDictionary(pair=>pair.RowId,pair=>pair.Roll);
-            }
-            // g, X-03 (0.369): wear a title (click), or the job's title on a job change when the player turned it on.
-            Collections.TitleChanger? titleChanger=null;
-            registrations.Register(()=>mainWindow.TitleChangerSource=titleChanger=new Collections.TitleChanger(framework,client,player,log,
-                ()=>configuration.JobTitlesEnabled,()=>configuration.JobTitles),()=>titleChanger?.Dispose());
-            // g, C-15 (0.368): achievement progress, read passively; asked from the server only on the player's click.
-            Collections.AchievementProgressWatcher? achievementProgress=null;
-            registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log,
-                new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"AchievementProgress.json"),tenshoData),id=>configuration.TrackedAchievements?.Contains(id)==true,mainWindow.AchievementCompleted),
-                ()=>achievementProgress?.Dispose());
-            // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
-            Collections.ExtraCollectionReader? extraCollections=null;
-            registrations.Register(()=>extraCollections=new Collections.ExtraCollectionReader(framework,client,player,unlocks,data,log),()=>extraCollections?.Dispose());
-            mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};
-            mainWindow.ExtraCollectionsUnavailable=()=>extraCollections?.Unavailable==true;
+            // X-153 (0.1444): the collections family (music, titles, achievement progress, extra collections) is wired in Plugin.Collections.cs.
+            RegisterCollections(pluginInterface,configuration,data,framework,client,player,unlocks,tenshoData);
             // g, C-12 (0.364): hunting log (MonsterNote, copied once) and the kills the game holds, read while the page shows them.
             // X-01 C2.2 (0.1191, analysis of 12/11: MonsterIcons took 55 to 133 ms on its first frame in the open air, 5 to 9 ms in town:
             // the first pass with monsters around copied the whole MonsterNote sheet, and the whole English BNpcName sheet for a Blue Mage or

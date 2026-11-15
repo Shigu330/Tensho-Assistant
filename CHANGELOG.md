@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1444.0
+- X-153, douzième tranche : la famille des collections sort de Plugin.cs, après celle du chat (0.1443). La musique jouée et son rouleau d'orchestrion (X-02), le changement de titre (X-03), la progression des hauts faits (C-15, demandée au serveur seulement sur le clic du joueur) et les collections annexes (C-04) sont créés chacun par un seul chemin d'installation et libérés par un seul chemin de libération des inscriptions du plugin, dans Plugin.Collections.cs, dans l'ordre d'avant ; Plugin.cs appelle la famille une fois, à la même place. Aucun comportement ne change.
+- Tests : CollectionsFamily1444Tests. Verify.ps1 (agent) : 2769/2769, 0 avertissement, 0 erreur ; DLL 0.1444.0.0. Rien à essayer en jeu.
+### English
+- X-153, twelfth slice: the collections family out of Plugin.cs, after the chat family (0.1443). The music playing and its orchestrion roll (X-02), the title changer (X-03), the achievement progress (C-15, asked from the server only on the player's click) and the extra collections (C-04) are each created by one install path and released by one release path of the plugin's registrations, in Plugin.Collections.cs, in the order of before; Plugin.cs calls the family once, at the same place. No behaviour changes.
+
 ## 0.1443.0
 - X-153, onzième tranche : la famille du chat sort de Plugin.cs, après les familles du bureau (0.1225), de la persistance (0.1239), de la barre du serveur (0.1240), des panneaux (0.1249), des découvertes (0.1250), des voyages (0.1403), de la carte (0.1404), de la récolte (0.1412), de la pêche en mer (0.1417) et du chocobo (0.1419). Le lecteur de la fenêtre de chat de Tensho (X-403), les liens de carte du chat gardés pour la page Cartes et le lien de carte sous la souris (X-365) sont créés chacun par un seul chemin d'installation et libérés par un seul chemin de libération des inscriptions du plugin, dans Plugin.Chat.cs, dans l'ordre d'avant ; Plugin.cs appelle la famille une fois, à la même place. Aucun comportement ne change.
 - Tests : ChatFamily1443Tests. Verify.ps1 (agent) : 2768/2768, 0 avertissement, 0 erreur ; DLL 0.1443.0.0. Rien à essayer en jeu.

@@ -19,7 +19,7 @@ internal static class ExtraCollections365Tests
             var page = Read("MainWindow.Collections.cs");
             Check(page.Contains("[CollectionKind.Hairstyle,CollectionKind.Ornament,CollectionKind.Glasses,CollectionKind.Barding,",StringComparison.Ordinal)
                 && page.Contains("(ExtraKinds.Contains(kind) ? extra ?? [] : state.Entries)",StringComparison.Ordinal),"tabs in order, rows from the extra reader");
-            Check(Read("Plugin.cs").Contains("()=>extraCollections?.Dispose()",StringComparison.Ordinal),"reader disposed");
+            Check(Read("Plugin.Collections.cs").Contains("()=>extraCollections?.Dispose()",StringComparison.Ordinal),"reader disposed");   // 0.1444 (X-153): Plugin.Collections.cs
         }),
     ];
 }
