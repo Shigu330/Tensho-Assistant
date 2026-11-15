@@ -28,6 +28,25 @@ public static class PlacedObjects
         return new((x+offsetX)*scale+1024f,(z+offsetY)*scale+1024f);
     }
 
+    /// <summary>A map of the placement's territory: its projection (Map.OffsetX/OffsetY, Map.SizeFactor) and the bell and chest markers on it.</summary>
+    public readonly record struct MapFrame(float OffsetX,float OffsetY,float SizeFactor,IReadOnlyList<(uint Icon,Vector2 At)> Marks);
+
+    /// <summary>
+    /// X-424 (0.1405): whether one of these maps (the other maps of the territory: another floor of the place) already has a marker of the
+    /// same icon at this world spot. Eulmore's bell (world 7.2/31.5) is marked by the game on map 555, not on the territory's main map 498:
+    /// it is not missing (probe: docs/evidence/0.1402-bells-and-chests.md, section 0.1405).
+    /// </summary>
+    public static bool MarkedOnAnyMap(IEnumerable<MapFrame> maps,uint icon,float x,float z)
+    {
+        foreach(var map in maps)
+        {
+            if(map.SizeFactor==0)continue;
+            var pixel=Pixel(x,z,map.OffsetX,map.OffsetY,map.SizeFactor);
+            if(map.Marks.Any(mark=>mark.Icon==icon && Vector2.Distance(mark.At,pixel)<=SameSpotPixels))return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Whether a layout placement is to be added: inside the map's texture (a housing ward's subdivision has its own map), and no mark of the
     /// same icon (the game's markers, and the placements already added) within <see cref="SameSpotPixels"/>.
