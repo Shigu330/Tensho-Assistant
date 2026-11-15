@@ -49,6 +49,10 @@ public static class RetainerStates
         return clean.Length>MaximumText ? clean[..MaximumText]:clean;
     }
 
+    /// <summary>X-196 (0.1411): when the automatic alarm of a retainer's sales rings: at their end, only while something is on sale (null otherwise).</summary>
+    public static DateTimeOffset? SaleAlarmAt(int marketItems,uint marketExpire)
+        =>marketItems>0 && marketExpire>0 ? DateTimeOffset.FromUnixTimeSeconds(marketExpire):null;
+
     /// <summary>X-196 (0.1410): a sale ends « soon » within a day (the table shows it in orange; ended ones in red).</summary>
     public static readonly TimeSpan SaleSoon=TimeSpan.FromDays(1);
 

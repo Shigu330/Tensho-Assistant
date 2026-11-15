@@ -7,6 +7,7 @@ namespace TenshoAssistant.Alarms;
 /// g, M-01 (0.371): every 30 seconds on the framework thread, while logged in and when « automatic alarms » is on (default): reads the
 /// retainer ventures (RetainerManager, known once the retainer list was opened at a summoning bell) and the saved vessel returns
 /// (Configuration.Voyages, kept by VoyageWatcher), and the squadron's mission and training (0.455), then syncs the automatic alarms (AutoAlarms) and saves when they changed.
+/// X-196 (0.1411): the end of each retainer's sales too (RetainerManager, MarketItemCount and MarketExpire), the reminder before they end.
 /// </summary>
 public sealed unsafe class AutoAlarmWatcher : IDisposable
 {
@@ -41,7 +42,11 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
                 for(var index=0u;index<retainers->GetRetainerCount();index++)
                 {
                     var retainer=retainers->GetRetainerBySortedIndex(index);
-                    if(retainer==null || retainer->RetainerId==0 || retainer->VentureId==0 || retainer->VentureComplete==0)continue;
+                    if(retainer==null || retainer->RetainerId==0)continue;
+                    if(TenshoAssistant.Character.RetainerStates.SaleAlarmAt(retainer->MarketItemCount,retainer->MarketExpire) is { } salesEnd)
+                        events.Add(new($"market:{retainer->RetainerId}",string.Format(text("AutoAlarms.Market"),retainer->NameString),text("AutoAlarms.MarketGroup"),
+                            salesEnd,AlarmSource.Reminder));
+                    if(retainer->VentureId==0 || retainer->VentureComplete==0)continue;
                     events.Add(new($"venture:{retainer->RetainerId}",string.Format(text("AutoAlarms.Venture"),retainer->NameString),text("AutoAlarms.VentureGroup"),
                         DateTimeOffset.FromUnixTimeSeconds(retainer->VentureComplete),AlarmSource.Reminder));
                 }
