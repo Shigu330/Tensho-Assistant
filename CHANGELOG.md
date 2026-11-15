@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1395.0
+- Plan global, X-307 : Sonde des sacs des servants gardés par le jeu, second passage : la première (0.1394) a trouvé les mêmes objets que la Banque, les objets HQ comme identifiant + 1 000 000 et les mêmes cristaux, mais pas les mêmes cases. La ligne « retainer finder » de l'auto-contrôle dit maintenant aussi si la copie du jeu est tassée depuis la case 0, si elle suit l'ordre des cases de la Banque sans les trous, et si elle suit l'ordre d'affichage de la fenêtre du servant. Preuve docs/evidence/0.1394-retainer-finder.md. Test RetainerFinder1394Tests (cas nouveau).
+- Tests : RetainerFinder1394Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1395.0.0. Rien à essayer en jeu.
+### English
+- Probe of the retainers' bags the game keeps, second pass: the first (0.1394) found the same items as the bank, HQ items as id + 1,000,000 and the same crystals, but not the same slots. The self-check line « retainer finder » now also says whether the game's copy is packed from slot 0, whether it follows the bank's slot order without the gaps, and whether it follows the retainer window's display order. Evidence docs/evidence/0.1394-retainer-finder.md. Test RetainerFinder1394Tests (new case).
+
 ## 0.1394.0
 - Plan global, X-307 : Sonde (R06) de la copie des sacs des servants que garde le jeu (ItemFinderModule.RetainerInventories : 175 cases, 14 pièces équipées, 18 cristaux par servant appelé au moins une fois ; IsRetainerCurrent), lue sur le fil du jeu à chaque chargement par l'auto-contrôle (ligne « retainer finder ») et comparée aux pages gardées par la Banque pour les mêmes servants : mêmes objets, mêmes cases (case i = page i / 25, case i % 25), objets HQ comme identifiant + 1 000 000 (à confirmer par la sonde), mêmes cristaux. Chiffres seulement dans le journal. Lecture native : copiée en données managées, indisponible (jamais devinée) si la structure a bougé. Comparaison pure RetainerFinderCompare ; test RetainerFinder1394Tests.
 - Tests : RetainerFinder1394Tests. Verify.ps1 (agent) : 2644/2644, 0 avertissement, 0 erreur ; DLL 0.1394.0.0. Rien à essayer en jeu.
