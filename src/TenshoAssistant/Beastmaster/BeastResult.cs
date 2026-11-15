@@ -7,7 +7,8 @@ public sealed record BoardResult(DateTimeOffset At, int Score, IReadOnlyList<Bea
 
 /// <summary>
 /// X-135 (0.1163, R06): the numbers of the game's result window XBMResult, as recorded on the 1st board on 2026-11-12 in developer mode
-/// (docs/evidence/0.1163-beast-result.md): index 2 the score, the sum of indexes 4, 6, 8 and 10; index 72 the team size; then five rows of
+/// (docs/evidence/0.1163-beast-result.md): index 2 the score, the sum of indexes 4, 6, 8, 10 and 12 (X-465, 0.1465: 12 was 0 on the first
+/// board and 312 on the board of 11/15, docs/evidence/0.1465-beast-result-index-12.md); index 72 the team size; then five rows of
 /// 16 slots for each team beast: 73 its icon (XBMPet column 4), 89 its experience before, 105 after, 121 its rank before, 137 after.
 /// The « before » values are those the game's bestiary showed for the same beasts before the board. Anything outside what was seen
 /// (score not the sum, unknown icon, rank going down or above the beast's last rank, experience over 100) is refused whole: after a game
@@ -19,27 +20,41 @@ public static class BeastResults
     /// <summary>Numbers read from the window (indexes 0 to 159).</summary>
     public const int ValueCount = 160;
     private const int Score = 2, TeamSize = 72, Icons = 73, ExpBefore = 89, ExpAfter = 105, RankBefore = 121, RankAfter = 137, MaxTeam = 10, MaxExp = 100;
-    private static readonly int[] ScoreParts = [4, 6, 8, 10];
+    private static readonly int[] ScoreParts = [4, 6, 8, 10, 12];
 
-    public static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at)
+    public static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at) => Parse(values, beasts, at, out _);
+
+    /// <summary>X-465 (0.1465): why the window is refused, for the log (numbers only); empty when it is read.</summary>
+    public static string Why(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts)
+    {
+        Parse(values, beasts, DateTimeOffset.UnixEpoch, out var why);
+        return why;
+    }
+
+    private static BoardResult? Parse(IReadOnlyDictionary<int, long> values, IReadOnlyList<Beast> beasts, DateTimeOffset at, out string why)
     {
         long Value(int index) => values.TryGetValue(index, out var value) ? value : -1;
         var score = Value(Score);
-        if (score < 0 || score > 1_000_000 || ScoreParts.Any(index => Value(index) < 0) || ScoreParts.Sum(Value) != score) return null;
+        why = "";
+        if (score < 0 || score > 1_000_000 || ScoreParts.Any(index => Value(index) < 0) || ScoreParts.Sum(Value) != score)
+        {
+            why = $"score {score} is not the sum of indexes {string.Join(", ", ScoreParts)} ({string.Join(" + ", ScoreParts.Select(Value))})";
+            return null;
+        }
         var size = Value(TeamSize);
-        if (size < 1 || size > MaxTeam) return null;
+        if (size < 1 || size > MaxTeam) { why = $"team size {size}"; return null; }
         var gains = new List<BeastGain>();
         for (var slot = 0; slot < size; slot++)
         {
             var icon = Value(Icons + slot);
             var matching = beasts.Where(beast => beast.Icon != 0 && beast.Icon == icon).ToArray();
-            if (matching.Length != 1) return null;
+            if (matching.Length != 1) { why = $"slot {slot}: icon {icon} matches {matching.Length} beasts"; return null; }
             var beast = matching[0];
             var top = Math.Max(1, beast.Ranks.Count);
             var (rankBefore, rankAfter, expBefore, expAfter) = (Value(RankBefore + slot), Value(RankAfter + slot), Value(ExpBefore + slot), Value(ExpAfter + slot));
-            if (rankBefore < 1 || rankAfter < rankBefore || rankAfter > top) return null;
-            if (expBefore < 0 || expBefore > MaxExp || expAfter < 0 || expAfter > MaxExp) return null;
-            if (gains.Any(gain => gain.Beast == beast.Id)) return null;
+            if (rankBefore < 1 || rankAfter < rankBefore || rankAfter > top) { why = $"slot {slot}: rank {rankBefore} to {rankAfter} (top {top})"; return null; }
+            if (expBefore < 0 || expBefore > MaxExp || expAfter < 0 || expAfter > MaxExp) { why = $"slot {slot}: experience {expBefore} to {expAfter}"; return null; }
+            if (gains.Any(gain => gain.Beast == beast.Id)) { why = $"slot {slot}: beast {beast.Id} twice"; return null; }
             gains.Add(new BeastGain(beast.Id, (int)rankBefore, (int)expBefore, (int)rankAfter, (int)expAfter));
         }
         return new BoardResult(at, (int)score, gains.AsReadOnly());

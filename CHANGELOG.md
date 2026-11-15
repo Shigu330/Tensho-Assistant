@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1465.0
+- Plan global, X-465 : Dédale bestial : la fenêtre de résultat d'un plateau est de nouveau lue (score, et pour chaque bête son rang et son expérience avant et après) ; Dresseur › Équipe montre le dernier plateau. Le plateau du 15/11 avait été refusé : son score, 7862, n'était plus la somme des index 4, 6, 8 et 10 (7550) : l'index 12 (312) en fait partie (il valait 0 au premier plateau). Une fenêtre qui ne colle pas reste refusée en entier, et le journal dit maintenant pourquoi, en nombres. Preuve : docs/evidence/0.1465-beast-result-index-12.md (valeurs de dalamud.log du 15/11, 21:56:34).
+- Pour les joueurs : dédale bestial : le résultat d'un plateau (score, rang et expérience de chaque bête) est de nouveau lu et montré dans Dresseur › Équipe.
+- Tests : BeastResult1465Tests. Verify.ps1 (agent) : 2841/2841, 0 avertissement, 0 erreur ; DLL 0.1465.0.0. Non validé en jeu.
+### English
+- Beast labyrinth: a board's result window is read again (score, and each beast's rank and experience before and after); Beastmaster › Team shows the last board. The board of 11/15 had been refused: its score, 7862, was no longer the sum of indexes 4, 6, 8 and 10 (7550): index 12 (312) is part of it (it was 0 on the first board). A window that does not fit is still refused whole, and the log now says why, in numbers. Evidence: docs/evidence/0.1465-beast-result-index-12.md (dalamud.log values of 11/15, 21:56:34).
+- For players: Beast labyrinth: the board's result (score, each beast's rank and experience) is read again and shown in Beastmaster › Team.
+
 ## 0.1464.0
 - Plan global, X-462 : Carte de Tensho : à Eulmore (Les Racines, Le Tronc, La Voûte), chaque couche ne montre plus que ses propres icônes. Deux causes : la carte prenait toutes les cartes du même cadre (même territoire, échelle et décalage), couches comprises ; et les PNJ, sonnettes et coffres posés par la disposition du jeu allaient tous sur la carte par défaut du territoire. Une carte du même cadre avec sa propre plage de marqueurs est maintenant une autre couche, laissée de côté, et un objet posé par la disposition prend la carte de la boîte « MapRange » du jeu qui le contient (aucune : il n'est montré sur aucune couche). Vaut pour les 62 territoires à plusieurs cartes d'un même cadre ; les versions d'une même terre (Auxesia, l'île sans nom) restent ensemble. Preuve : docs/evidence/0.1464-map-floors.md (les 117 PNJ de la feuille Level d'Eulmore tombent tous dans la boîte de leur carte) ; sonde PROBE_FLOORS.
 - Pour les joueurs : carte de Tensho : à Eulmore et dans les lieux dessinés sur plusieurs couches, chaque couche ne montre plus que ses propres icônes, comme le jeu.

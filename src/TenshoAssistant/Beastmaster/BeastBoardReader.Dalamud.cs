@@ -90,7 +90,8 @@ internal sealed class BeastBoardReader : IDisposable
         else if (!resultWarned)
         {
             resultWarned = true;
-            log.Warning("The Beastmaster board result window could not be read (unavailable, maybe after a game update): nothing kept.");
+            // X-465 (0.1465): why, in numbers (read again at each change of the window: one filled later is still read).
+            log.Warning("The Beastmaster board result window could not be read (unavailable, maybe after a game update): nothing kept ({0}).", BeastResults.Why(values, known));
         }
     }
 
