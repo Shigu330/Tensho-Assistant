@@ -31,8 +31,11 @@ public sealed class JitWarmup : IDisposable
     private bool Timed(MethodBase method,Func<bool> compile)
     {
         var at=System.Diagnostics.Stopwatch.GetTimestamp();
+        // X-433 (0.1426): and the warm-up thread's own processor time meanwhile (a long compilation that hardly used it was waiting).
+        var processorBefore=ThreadClock.ProcessorMs();
         var compiled=compile();
-        slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now);
+        var processor=processorBefore is { } before && ThreadClock.ProcessorMs() is { } after ? after-before:(double?)null;
+        slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now,processor);
         return compiled;
     }
     /// <summary>X-01 (0.1104): how many of <see cref="Prepared"/> were compiled first.</summary>

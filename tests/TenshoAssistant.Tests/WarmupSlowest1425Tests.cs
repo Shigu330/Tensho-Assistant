@@ -14,7 +14,7 @@ internal static class WarmupSlowest1425Tests
         {
             using var warmup = JitWarmup.Start(() => [typeof(SlowCompilations)], TimeSpan.Zero);
             Check(warmup.Wait(TimeSpan.FromSeconds(30)), "finished");
-            Check(warmup.Prepared > 0 && Regex.IsMatch(warmup.Slowest, @"^SlowCompilations\.\S+ \d+ ms \(ended \d\d:\d\d:\d\d\.\d{3}\)"), "timed: " + warmup.Slowest);
+            Check(warmup.Prepared > 0 && Regex.IsMatch(warmup.Slowest, @"^SlowCompilations\.\S+ \d+ ms \((on the processor \d+ ms, )?ended \d\d:\d\d:\d\d\.\d{3}\)"), "timed: " + warmup.Slowest);
         }),
         ("Warm-up slowest 1425: every compilation of the warm-up goes through the timer; the plugin says them with the compiler's lines", () =>
         {

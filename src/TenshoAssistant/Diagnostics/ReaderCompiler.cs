@@ -25,14 +25,15 @@ public sealed class SlowCompilations(int kept=5)
     public int Kept { get; } = kept;
     public static string Name(MethodBase method)=>$"{method.DeclaringType?.Name}.{method.Name}";
     private readonly object gate=new();
-    private readonly List<(string Name,double Milliseconds,DateTimeOffset Ended)> longest=[];
+    private readonly List<(string Name,double Milliseconds,DateTimeOffset Ended,double? Processor)> longest=[];
 
-    public void Note(string name,double milliseconds,DateTimeOffset ended)
+    /// <param name="processor">X-433 (0.1426): the compiling thread's own processor time meanwhile, when known (working or waiting).</param>
+    public void Note(string name,double milliseconds,DateTimeOffset ended,double? processor=null)
     {
         lock(gate)
         {
             if(longest.Count>=Kept && milliseconds<=longest[^1].Milliseconds)return;
-            longest.Add((name,milliseconds,ended));
+            longest.Add((name,milliseconds,ended,processor));
             longest.Sort((left,right)=>right.Milliseconds.CompareTo(left.Milliseconds));
             if(longest.Count>Kept)longest.RemoveAt(longest.Count-1);
         }
@@ -42,7 +43,7 @@ public sealed class SlowCompilations(int kept=5)
     {
         lock(gate)
             return string.Join(", ",longest.Select(slow=>string.Create(System.Globalization.CultureInfo.InvariantCulture,
-                $"{slow.Name} {slow.Milliseconds:0} ms (ended {slow.Ended.ToLocalTime():HH:mm:ss.fff})")));
+                $"{slow.Name} {slow.Milliseconds:0} ms ({(slow.Processor is { } processor ? string.Create(System.Globalization.CultureInfo.InvariantCulture,$"on the processor {processor:0} ms, "):"")}ended {slow.Ended.ToLocalTime():HH:mm:ss.fff})")));
     }
 }
 
