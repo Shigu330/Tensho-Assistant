@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1408.0
+- Plan global, X-425 : Règles de Dalamud (mineur M1 de la relecture 0.1404). La ligne de la règle 1 de PUBLISHING.md nommait « la téléportation vers un éthérite » sans nommer le fichier qui appelle la fonction du jeu (Maps/MapLiveReader.Dalamud.cs, Telepo->Teleport) ; il est ajouté dans les deux moitiés, et la liste des gestes de DalamudRulesActs1399Tests a maintenant sa ligne : un appel de téléportation ailleurs, ou une règle 1 qui ne nomme plus ce fichier, fait échouer le test. Avec 0.1406 (M2 écarté avec sa raison, M3), les trois mineurs de la relecture 0.1404 sont fermés.
+- Tests : DalamudRulesActs1399Tests. Verify.ps1 (agent) : 2672/2672, 0 avertissement, 0 erreur ; DLL 0.1408.0.0. Rien à essayer en jeu.
+### English
+- Dalamud rules (minor finding M1 of review 0.1404). Rule 1's row in PUBLISHING.md named « the teleport to an aetheryte » without the file that calls the game's function (Maps/MapLiveReader.Dalamud.cs, Telepo->Teleport); it is added in both halves, and the acts list of DalamudRulesActs1399Tests now has its row: a teleport call elsewhere, or a rule 1 that no longer names this file, fails the test. With 0.1406 (M2 set aside with its reason, M3), the three minor findings of review 0.1404 are closed.
+
 ## 0.1407.0
 - Plan global, X-427 : Jardin (fiabilité) : la CI de 0.1405 a échoué une fois (1 sur les 60 derniers passages) sur « Garden journal: a detected planting replaces the bed… » : une expression régulière du jardin a dépassé son délai de 50 ms pendant que les tests tournaient en parallèle (RegexMatchTimeoutException). Les expressions du jardin (place d'une plate-bande, ligne du chat de plantation, titre du menu de la plate-bande) ont maintenant un délai commun d'une seconde (GardenJournal.MatchTimeout ; leurs entrées sont bornées à 40, 200 et 80 caractères) ; une expiration se lit « rien lu » au lieu de sortir du dessin de la page ou de la lecture du chat. Test : GardenRegex1407Tests.
 - Tests : GardenRegex1407Tests. Verify.ps1 (agent) : 2672/2672, 0 avertissement, 0 erreur ; DLL 0.1407.0.0. Rien à essayer en jeu.

@@ -17,6 +17,8 @@ internal static class DalamudRulesActs1399Tests
         ("ItemOrderModuleSorterItemEntry", ["Inventory/InventoryVisualSortBridge.Dalamud.cs"], [1]),
         ("ProcessChatBoxEntry", ["Alarms/AlarmService.Dalamud.cs", "Maps/HuntAnnouncer.Dalamud.cs"], [1]),
         ("SendTitleIdUpdate", ["Collections/TitleChanger.Dalamud.cs"], [1]),
+        // X-425 M1 (0.1408): the teleport to an aetheryte, named by rule 1's text since 0.1399, its file now in its list too.
+        ("telepo->Teleport(", ["Maps/MapLiveReader.Dalamud.cs"], [1]),
     ];
 
     private static IEnumerable<(string Name, string Text)> Sources()
