@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1467.0
+- Fenêtre de chat de Tensho, option A4 cochée par l'utilisateur (X-447, défilement du jeu) : la molette fait défiler ligne par ligne, comme le chat du jeu ; quand on lit plus haut, un bouton en bas à droite ramène au dernier message et dit combien de messages sont arrivés entre-temps (« 12 nouveaux »). Revenu en bas, à la molette ou par le bouton, la fenêtre suit de nouveau les messages.
+- Pour les joueurs : fenêtre de chat de Tensho : la molette défile ligne par ligne, et quand vous lisez plus haut un bouton ramène au dernier message et compte les nouveaux.
+- Tests : ChatScroll1467Tests. Verify.ps1 (agent) : 2850/2850, 0 avertissement, 0 erreur ; DLL 0.1467.0.0. Non validé en jeu.
+### English
+- Tensho chat window, option A4 ticked by the user (X-447, the game's scrolling): the mouse wheel scrolls line by line, as the game's chat; while reading higher up, a button at the bottom right brings back the last message and says how many messages arrived meanwhile (« 12 new »). Back at the bottom, with the wheel or the button, the window follows the messages again.
+- For players: Tensho chat window: the mouse wheel scrolls line by line, and while you read higher up a button brings you back to the last message and counts the new ones.
+
 ## 0.1466.0
 - Plan global, X-464 : Relecture de 0.1455 à 0.1461, constats mineurs. M1 : un calcul de fond encore en cours au déchargement n'est pas arrêté de force : il finit seul (il peut lire les données du jeu jusque-là) et son résultat est jeté ; les commentaires le disent maintenant (ils promettaient l'arrêt, et la note de 0.1457 aussi) et le journal le signale. M2 : fenêtre de chat, les onglets Combat et Événement ne comptent plus de messages non lus (le compteur « Combat (N) » montait à chaque coup et changeait la largeur des onglets), neufs ou créés en 0.1458. M3 : l'onglet Général enregistré avant 0.1458 (tous les canaux sauf Combat) laisse les dialogues des PNJ à l'onglet Événement quand il existe. M4 : l'onglet Combat montre aussi les combats des autres joueurs et des ennemis non engagés (le type d'un message du jeu ne dit pas qui frappe) : gardé, et dit tel quel (la note de 0.1458 disait « comme dans le jeu ») ; les lignes de combat ont maintenant leur propre limite en mémoire et ne chassent plus les messages des autres onglets (raid d'alliance).
 - Pour les joueurs : fenêtre de chat de Tensho : les onglets Combat et Événement n'affichent plus de compteur de non-lus, les dialogues des PNJ ne sont plus en double dans Général, et les lignes de combat ne chassent plus les autres messages en raid d'alliance.

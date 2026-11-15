@@ -223,7 +223,8 @@ internal sealed partial class MainWindow
         // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
         var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
-        var visible=ImGui.BeginChild("###TenshoChatLines",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
+        var visible=ImGui.BeginChild("###TenshoChatLines",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
         try
         {
             if(!visible)return;
@@ -259,6 +260,10 @@ internal sealed partial class MainWindow
             // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
             view.RowsShown=view.RowCount;view.HeightShown=shown;
             if(atBottom){ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();}
+            else DrawChatBottomButton(view,scroll,shown,height);
+            // X-447 A4 (0.1467): the mouse wheel moves whole lines, as the game's chat.
+            if(ImGui.IsWindowHovered() && ImGui.GetIO().MouseWheel is var wheel and not 0)
+                ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY()));
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);
@@ -313,6 +318,18 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndChild();}
+    }
+
+    /// <summary>X-447 A4 (0.1467): while reading higher up, a button at the bottom right of the lines brings the window back down; it says how
+    /// many messages arrived meanwhile.</summary>
+    private void DrawChatBottomButton(ChatTabView view,float scroll,float shown,float height)
+    {
+        if(!ChatScroll.ShowsBottomButton(scroll,ImGui.GetScrollMaxY()))return;
+        var label=(view.Unread>0 ? localization.Format("ChatWindow.NewBelow",view.Unread):localization.Get("ChatWindow.ToBottom"))+"###ChatToBottom";
+        var size=ImGui.CalcTextSize(label.Split("###")[0])+ImGui.GetStyle().FramePadding*2;
+        ImGui.SetCursorPos(new Vector2(Math.Max(0,ImGui.GetWindowContentRegionMax().X-size.X-4),scroll+shown-size.Y-4));
+        if(ImGui.Button(label))ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));
+        Tip("ChatWindow.ToBottomTip");
     }
 
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)

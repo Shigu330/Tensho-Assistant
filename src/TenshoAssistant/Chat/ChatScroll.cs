@@ -25,4 +25,20 @@ public static class ChatScroll
     /// that height, not this frame's (a message just arrived, a window just resized): the window then follows the new message, and keeps the
     /// last line at the bottom after a resize.</summary>
     public static bool AtBottom(float scroll,int rowsBefore,float lineHeight,float visibleBefore)=>scroll>=Bottom(rowsBefore,lineHeight,visibleBefore)-1f;
+
+    /// <summary>X-447 A4 (0.1467): the lines one notch of the mouse wheel moves, as the game's chat.</summary>
+    public const int WheelLines=1;
+
+    /// <summary>X-447 A4 (0.1467): the scroll after the mouse wheel: whole lines (the top line kept whole), within 0 and the limit; the
+    /// limit itself when the wheel reaches it (the window then follows the bottom again).</summary>
+    public static float Wheel(float scroll,float wheel,float lineHeight,float scrollMax)
+    {
+        if(wheel==0 || lineHeight<=0)return scroll;
+        var notches=wheel>0 ? (int)Math.Ceiling(wheel):(int)Math.Floor(wheel);
+        var line=(float)Math.Round(scroll/lineHeight)-notches*WheelLines;
+        return Math.Clamp(line*lineHeight,0f,Math.Max(0f,scrollMax));
+    }
+
+    /// <summary>X-447 A4 (0.1467): the « back to the bottom » button shows while the last line is out of view.</summary>
+    public static bool ShowsBottomButton(float scroll,float scrollMax)=>scrollMax>0 && scroll<scrollMax-1f;
 }

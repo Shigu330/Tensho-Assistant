@@ -138,7 +138,7 @@ internal static class ChatScroll1462Tests
         {
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n", "\n");
             var declared = window.IndexOf("ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));", StringComparison.Ordinal);
-            var child = window.IndexOf("ImGui.BeginChild(\"###TenshoChatLines\",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar);", StringComparison.Ordinal);
+            var child = window.IndexOf("ImGui.BeginChild(\"###TenshoChatLines\",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);", StringComparison.Ordinal);   // 0.1467 (X-447 A4): the wheel read by the window
             Check(declared > 0 && child > declared, "declared just before the area, bar always kept");
             Check(window.Contains("var top=ImGui.GetCursorPosY();", StringComparison.Ordinal) && !window.Contains("var top=ImGui.GetCursorStartPos()", StringComparison.Ordinal),
                   "the lines placed from the top of the content (GetCursorStartPos takes the scroll off once more)");
