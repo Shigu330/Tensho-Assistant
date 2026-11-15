@@ -45,11 +45,17 @@ internal sealed partial class CollectionReader : IDisposable
     // 0.278: cards now carry « Extra » (Ex. series); older cached collections are read again instead of losing it.
     private const string CacheShape="|triad-ex-278";
     private Task<CachedValue<CollectionCacheData>?>? restore;
+    // X-274 (0.1387): the last complete title and achievement readings of the character, kept in TenshoData.db (read off the framework thread).
+    private readonly CompletionListsData? lists;
+    private Task<Dictionary<CollectionKind,CompletionList>>? listsLoad;
+    private Dictionary<CollectionKind,CompletionList> completionLists=[];
+    private ulong listsOwner;
 
     public CollectionReader(CollectionService service, IDataManager data, IFramework framework,
         IPlayerState player, IClientState client, IUnlockState unlocks, IPluginLog log,Func<TimeSpan>? cacheLifetime=null,DataCache? disk=null,
-        Func<TimeSpan>? completionLifetime=null)
+        Func<TimeSpan>? completionLifetime=null,CompletionListsData? lists=null)
     {
+        this.lists=lists;
         this.service = service; this.data = data; this.framework = framework;
         this.player = player; this.client = client; this.unlocks = unlocks; this.log = log;
         this.cacheLifetime=cacheLifetime ?? (()=>TimeSpan.FromDays(1));this.disk=disk;this.completionLifetime=completionLifetime ?? (()=>TimeSpan.FromDays(7));
@@ -91,6 +97,18 @@ internal sealed partial class CollectionReader : IDisposable
         if(!scanning && owner!=0 && CompletionLoadingChanged())service.RequestRefresh();
         try{service.SetListsLoaded(owner==0 ? null:unlocks.IsTitleListLoaded,owner==0 ? null:unlocks.IsAchievementListLoaded);}
         catch{service.SetListsLoaded(null,null);}
+        if(lists is not null && owner!=listsOwner)
+        {
+            // X-274: the saved readings of this character, read in the background; a load begun for another character is dropped.
+            listsOwner=owner;completionLists=[];service.SetReadings(null,null);
+            var who=owner;listsLoad=owner==0 ? null:Task.Run(()=>lists.Load(who));
+        }
+        if(listsLoad is { IsCompleted:true } listsDone)
+        {
+            listsLoad=null;
+            try{completionLists=listsDone.GetAwaiter().GetResult();}
+            catch(Exception error){log.Warning(error,"Saved title and achievement readings could not be read; the game's windows are needed again.");}
+        }
         var force=service.ConsumeRefresh();
         if (owner != character || force || (!scanning && restore is null && owner!=0 && now >= nextRefresh && !CacheAge.Fresh(service.State.ObservedAt,DateTimeOffset.UtcNow,cacheLifetime())))
         {
@@ -306,6 +324,7 @@ internal sealed partial class CollectionReader : IDisposable
             issues.AddRange(CompletionIssues());
             if(character!=0)ApplyCompletionMemory(character,entries,completionLifetime());
             service.Publish(character,entries,issues);
+            if(character!=0)KeepCompleteReadings(character,service.State.ObservedAt ?? DateTimeOffset.UtcNow);
             if(character!=0 && disk is not null && service.State.ObservedAt is { } date)
                 _=disk.WriteAsync("collections",character.ToString(),cacheVersion ??= GameCacheIdentity.For(data)+CacheShape,
                     new CollectionCacheData(character,service.State.Entries,service.State.CategoryIssues,titlesCheckedAt,achievementsCheckedAt),date);

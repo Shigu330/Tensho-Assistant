@@ -2181,6 +2181,8 @@
     "State": "État",
     "TitlesNotLoaded": "Le jeu n'a pas encore envoyé la liste des titres : ouvrez une fois la fenêtre Titres du jeu, l'état se mettra à jour.",
     "AchievementsNotLoaded": "Le jeu n'a pas encore envoyé la liste des hauts faits : ouvrez une fois la fenêtre Hauts faits du jeu, l'état se mettra à jour.",
+    "TitlesFromReading": "Relevé du {0} : le jeu n'a pas envoyé la liste des titres pendant cette session ; ouvrez une fois la fenêtre Titres du jeu pour le mettre à jour.",
+    "AchievementsFromReading": "Relevé du {0} : le jeu n'a pas envoyé la liste des hauts faits pendant cette session ; ouvrez une fois la fenêtre Hauts faits du jeu pour le mettre à jour.",
     "SearchTip": "Partie du nom ; majuscules ignorées.",
     "AcquiredTip": "Seulement ce que le jeu confirme comme obtenu (terminé pour les hauts faits).",
     "UnconfirmedTip": "Tout ce que le jeu ne confirme pas comme obtenu.",

@@ -88,8 +88,11 @@ internal sealed partial class MainWindow
         foreach(var issue in state.CategoryIssues ?? [])if(issue.Kind==kind)ImGui.TextWrapped(issue.Reason);
         ImGui.SetNextItemWidth(-1);
         // 0.144: titles and achievements are only known once the game sent their list (its window opened once this session).
-        if(kind==CollectionKind.Title && collections.TitleListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.TitlesNotLoaded"));
-        if(kind==CollectionKind.Achievement && collections.AchievementListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("CollectionsBrowser.AchievementsNotLoaded"));
+        // X-274 (0.1387): with a reading kept from an earlier session, the line says its date instead.
+        if(kind==CollectionKind.Title && collections.TitleListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,collections.TitlesReadAt is { } titlesRead
+            ? localization.Format("CollectionsBrowser.TitlesFromReading",titlesRead.ToLocalTime().ToString("g",Numbers)):localization.Get("CollectionsBrowser.TitlesNotLoaded"));
+        if(kind==CollectionKind.Achievement && collections.AchievementListLoaded==false)ImGui.TextColored(UI.FfxivTheme.Error,collections.AchievementsReadAt is { } achievementsRead
+            ? localization.Format("CollectionsBrowser.AchievementsFromReading",achievementsRead.ToLocalTime().ToString("g",Numbers)):localization.Get("CollectionsBrowser.AchievementsNotLoaded"));
         ImGui.InputTextWithHint("##CollectionSearch", localization.Get("CollectionsBrowser.Search"), ref collectionQuery, 128);
         Tip("CollectionsBrowser.SearchTip");
         var completion=kind is CollectionKind.Title or CollectionKind.Achievement;

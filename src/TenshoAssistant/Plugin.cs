@@ -1332,7 +1332,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(() => questReader = new QuestReader(quests, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Quests),dataCache),
                 () => questReader?.Dispose());
             CollectionReader? collectionReader = null;
-            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache,()=>configuration.Cache.Duration(CacheArea.Completion)),
+            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache,()=>configuration.Cache.Duration(CacheArea.Completion),
+                new CompletionListsData(tenshoData)),
                 () => collectionReader?.Dispose());
             TriadObservationReader? triadReader = null;
             MiniCactpotObservationReader? cactpotReader=null;

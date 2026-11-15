@@ -2181,6 +2181,8 @@
     "State": "State",
     "TitlesNotLoaded": "The game has not sent the title list yet: open the game's Titles window once and the state will update.",
     "AchievementsNotLoaded": "The game has not sent the achievement list yet: open the game's Achievements window once and the state will update.",
+    "TitlesFromReading": "Reading of {0}: the game has not sent the title list this session; open the game's Titles window once to update it.",
+    "AchievementsFromReading": "Reading of {0}: the game has not sent the achievement list this session; open the game's Achievements window once to update it.",
     "SearchTip": "Part of the name; case is ignored.",
     "AcquiredTip": "Only what the game confirms as obtained (completed for achievements).",
     "UnconfirmedTip": "Everything the game does not confirm as obtained.",

@@ -62,6 +62,8 @@ internal static class CharacterErase1212Tests
                     // 0.1228 (X-218): the job levels and gear sets are per character too.
                     TenshoDataDatabase.Run(open,$"INSERT INTO character_jobs(character,job,level,seen_at) VALUES({character},19,100,1);");
                     TenshoDataDatabase.Run(open,$"INSERT INTO character_gearsets(character,number,job,item_level,name,seen_at) VALUES({character},1,19,730,'{(character==5 ? Marker:"other")}',1);");
+                    // 0.1387 (X-274): the titles and achievements as last read are per character too.
+                    TenshoDataDatabase.Run(open,$"INSERT INTO completion_lists(character,kind,read_at,ids) VALUES({character},6,1,'1,2');");
                 }
             Check(Holds(database,Marker) || Holds(database+"-wal",Marker),"the marker is in the data file before the erase");
             var left=store.Apply(new BankChange(Erase:5),store.Load());
