@@ -50,6 +50,16 @@ internal sealed class GardenChatWatcher : IDisposable
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        // X-433 (0.1452): the rules' regular expressions built off the game's thread (their automaton tables: 3.8 MB in a frame at the first
+        // chat line after a load, 0.1451's measure); with the garden off they are built at the first line, as before.
+        if(enabled())rulesBuilding=Task.Run(BuildRules);
+    }
+
+    private Task<GardenChat>? rulesBuilding;
+    private GardenChat BuildRules()
+    {
+        var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
+        return new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
     }
 
     private GardenChat? Rules()
@@ -57,10 +67,11 @@ internal sealed class GardenChatWatcher : IDisposable
         if(rules is not null || rulesFailed)return rules;
         try
         {
-            var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
-            rules=new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
+            // X-433 (0.1452): the rules built in the background, waited for only if a line comes before they are done (no line is lost).
+            rules=rulesBuilding is { } building ? building.GetAwaiter().GetResult():BuildRules();
         }
         catch(Exception error){rulesFailed=true;log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update).");}
+        rulesBuilding=null;
         return rules;
     }
 

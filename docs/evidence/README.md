@@ -28,7 +28,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1178-occult-panel.md](0.1178-occult-panel.md) | `src/TenshoAssistant/Fields/FieldBoard.Dalamud.cs`, `tests/TenshoAssistant.Tests/OccultPanel1178Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.1179-occult-alerts.md](0.1179-occult-alerts.md) | `tests/TenshoAssistant.Tests/OccultAlerts1179Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md` |
 | [0.1186-load-measures.md](0.1186-load-measures.md) | `src/TenshoAssistant/Diagnostics/LoadMemory.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `docs/evidence/0.1187-unload-roots.md` |
-| [0.1187-unload-roots.md](0.1187-unload-roots.md) | `src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs`, `src/TenshoAssistant/Diagnostics/UnloadWatch.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/UnloadRoots1187Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md` |
+| [0.1187-unload-roots.md](0.1187-unload-roots.md) | `src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs`, `src/TenshoAssistant/Diagnostics/UnloadWatch.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/UnloadRoots1187Tests.cs` | `docs/changelog/CHANGELOG-0.1100-0.1199.md`, `docs/evidence/0.1452-load-allocations.md` |
 | [0.1227-garland-patch.md](0.1227-garland-patch.md) | `src/TenshoAssistant/Community/GarlandItemSources.cs`, `src/TenshoAssistant/MainWindow.ItemSheet.cs`, `tests/TenshoAssistant.Tests/GarlandPatch1227Tests.cs` | `docs/changelog/CHANGELOG-0.1200-0.1299.md`, `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1229-mount-sheet.md](0.1229-mount-sheet.md) | `src/TenshoAssistant/Collections/CollectionReader.Dalamud.cs`, `src/TenshoAssistant/Collections/CollectionService.cs`, `tests/TenshoAssistant.Tests/MountSheet1229Tests.cs` | `docs/changelog/CHANGELOG-0.1200-0.1299.md` |
 | [0.1231-grace-cap.md](0.1231-grace-cap.md) | `src/TenshoAssistant/Diagnostics/ReadingCapture.Dalamud.cs`, `tests/TenshoAssistant.Tests/GraceReading1231Tests.cs` | `docs/changelog/CHANGELOG-0.1200-0.1299.md`, `docs/project/GLOBAL-PLAN.md` |
@@ -69,6 +69,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `src/TenshoAssistant/Diagnostics/MachineMemory.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
+| [0.1452-load-allocations.md](0.1452-load-allocations.md) | `tests/TenshoAssistant.Tests/GardenRules1452Tests.cs` | `CHANGELOG.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -301,5 +302,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 289 files · fichiers ; 243 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 290 files · fichiers ; 244 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
