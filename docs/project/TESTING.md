@@ -1935,6 +1935,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1434) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : Guide : aucun (une fenêtre en plus, désactivée par défaut ; l'étape Panneaux du guide ne règle que les panneaux actifs par défaut). Aide : question de la FAQ « Qu'est-ce que la fenêtre de chat Tensho ? », qui ouvre Paramètres. Liste des outils de l'accueil : aucun (une fenêtre, pas une page ; ouverte depuis Paramètres › Panneaux à côté du jeu ou par /tensho chat).
 
+- [ ] (0.1441) Fenêtre de chat Tensho (Paramètres › Panneaux à côté du jeu, ou /tensho chat) : un lien de carte d'un message (par exemple un drapeau partagé en équipe ou en linkshell) apparaît souligné ; au survol, son lieu et ses coordonnées ; clic gauche : le drapeau du jeu est posé à cet endroit et la carte s'ouvre ; clic droit : menu « Tensho — lieu » (éthérite la plus proche avec son coût, carte Tensho, météo)
+
+- [ ] (0.1441) Fenêtre de chat Tensho : un lien d'objet d'un message (objet lié dans le chat, ou butin obtenu) apparaît souligné ; au survol, son nom ; clic gauche : la fiche de l'objet s'ouvre dans Tensho ; clic droit : menu d'objet de Tensho (pages, essayer, listes, copier le nom, sites)
+
+- [ ] (0.1441) Fenêtre de chat Tensho : un message avec un lien au milieu d'une phrase se lit d'un seul tenant (texte avant et après le lien à leur place, la petite flèche du jeu absente) ; rien n'est envoyé dans le chat par un clic
+
+- [ ] (0.1442) Fenêtre de chat Tensho : un lien de quête d'un message (quête liée dans le chat) apparaît souligné ; au survol, son nom ; clic gauche : la page Quêtes de Tensho s'ouvre sur cette quête
+
+- [ ] (0.1442) Fenêtre de chat Tensho : clic droit sur le texte d'un message : menu « Copier ce message » et « Copier tous les messages de cet onglet » ; le texte collé ailleurs a l'heure, le canal, l'auteur et le message, un message par ligne
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

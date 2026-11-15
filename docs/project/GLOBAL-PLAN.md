@@ -818,6 +818,10 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-436 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11), I1: finding in CHANGELOG.md:16 (French detail in the French half; plan.py… | Done in 0.1428 |
 | X-437 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11), minor M1, M2, M3: M1 in… | Done in 0.1428 |
 | X-438 | Bug seen by relay 81 (15/11, review 0.1427 P1): the manifest's description (TenshoAssistant.json, « Actions that reach the game ») says «… | Done in 0.1429 |
+| X-439 | Decision D-166 (Tensho chat window next to the game's, 11/15) written into docs/project/DECISIONS.md: a new DEC entry that partly reopens… | Done in 0.1436 |
+| X-440 | Review of block 0.1428 to 0.1435 (review 0.1435, 15/11), minor M1, M2, M3: M1 in tests/TenshoAssistant.Tests/CacheStream1432Tests.cs:1 ; M2… | Done in 0.1437 |
+| X-441 | Tool: release_notes.py cannot fix a « For players » line of an already published release (Stable-0.1427.0 still promises « Fewer short freezes », cause not proven, X-436); the guard refuses editing a release directly Done when: release_notes.py has a command (master session only) that removes or replaces one line of a release, in both halves (English and French), with a dry run showing before and after, and nothing else changes (title, assets, tag); its --selftest covers it; the 0.1427 line of Stable-0.1427.0 is removed by the master with that tool. | Indispensable, rank 1 (R13.3, tool defect found on 11/15) |
+| X-442 | Tool: guard.py refuses a command whose quoted argument only quotes the text of a forbidden command (plan.py add text on 11/15, a brief note… | Done in 0.1435.0 |
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -1707,6 +1711,10 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-436 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427, 15/11), I1 : X-433 : la section 0.1427.0 du CHANGELOG (en et fr) dit encore « cause… | Fait en 0.1428 |
 | X-437 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427, 15/11), mineurs M1, M2, M3 : M1 : X-434 : le test « lnum2, lnum3, lnum4 in that order… | Fait en 0.1428 |
 | X-438 | Bug vu par le relais 81 (15/11, relecture 0.1427 P1) : la description du manifeste (TenshoAssistant.json, « Actions that reach the game »)… | Fait en 0.1429 |
+| X-439 | Décision D-166 (fenêtre de chat Tensho en plus de celle du jeu, 15/11) écrite dans docs/project/DECISIONS.md : nouvelle entrée DEC qui… | Fait en 0.1436 |
+| X-440 | Relecture du bloc 0.1428 à 0.1435 (relecture 0.1435, 15/11), mineurs M1, M2, M3 : M1 : L'en-tête du test dit encore « 0.1432, X-433 (fix… | Fait en 0.1437 |
+| X-441 | Outil : release_notes.py ne peut pas corriger une ligne « Pour les joueurs » d'une release déjà publiée (Stable-0.1427.0 promet encore « Fewer short freezes », cause non prouvée, X-436) ; le garde-fou refuse l'édition directe d'une release Fait quand : release_notes.py a une commande (session maître seulement) qui retire ou remplace une ligne d'une release, dans ses deux moitiés (anglais et français), avec un essai à blanc qui montre l'avant et l'après, et rien d'autre ne change (titre, fichiers, tag) ; son --selftest le couvre ; la ligne 0.1427 de Stable-0.1427.0 est retirée par la maître avec cet outil. | Indispensable, rang 1 (R13.3, défaut d'outil constaté le 15/11) |
+| X-442 | Outil : guard.py refuse une commande dont un argument entre guillemets cite seulement le texte d'une commande interdite (texte de plan.py… | Fait en 0.1435.0 |
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment
