@@ -46,9 +46,9 @@ internal static class MapFloors1464Tests
             Check(MapFloors.MapOf(Boxes, 498, 0, 82, -10) == 555 && MapFloors.MapOf(Boxes, 498, 30, 85.5f, -60) == 555, "The Canopy");
             Check(MapFloors.MapOf(Boxes, 498, 25, 8, -58) == 498, "the smallest box wins where two hold the point");
         }),
-        ("Map floors 1464: a placement in no box is on no floor (never on one by chance); a territory without floors keeps its map", () =>
+        ("Map floors 1464: a placement in no box is on no other floor (0.1469, X-480: on the territory's map); a territory without floors keeps its map", () =>
         {
-            Check(MapFloors.MapOf(Boxes, 498, 0, 200, 0) == 0 && MapFloors.MapOf(Boxes, 498, 900, 0, 0) == 0, "outside every box: none");
+            Check(MapFloors.MapOf(Boxes, 498, 0, 200, 0) == 498 && MapFloors.MapOf(Boxes, 498, 900, 0, 0) == 498, "outside every box: the territory's map");
             Check(MapFloors.MapOf([], 12, 0, 200, 0) == 12, "no boxes: the territory's map");
             Check(MapFloors.MapOf([new MapFloorRange(12, 0, 0, 0, 10, 10, 10, 0)], 12, 500, 0, 0) == 12, "one map's boxes only: not floors, the territory's map");
         }),
@@ -60,9 +60,9 @@ internal static class MapFloors1464Tests
         ("Map floors 1464: the loaders of layout placements read the floors (vendors, Triple Triad players, bells and chests)", () =>
         {
             static string Read(string path) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + path)).Replace("\r\n", "\n");
-            Check(Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("var floorMap=Maps.MapFloors.MapOf(ranges,map.RowId,position.X,position.Y,position.Z);", StringComparison.Ordinal)
+            Check(Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("var floorMap=Maps.MapFloors.MapOf(floors.Of(bg,map),map.RowId,position.X,position.Y,position.Z);", StringComparison.Ordinal)
                   && Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("list.Add(new(territory.RowId,floorMap,zone,", StringComparison.Ordinal), "vendors");
-            Check(Read("MiniGames/TriadNpcLoader.Dalamud.cs").Contains("Maps.MapFloors.MapOf(Maps.MapFloorReader.Read(data, bg), map.RowId, position.X, position.Y, position.Z)", StringComparison.Ordinal), "Triple Triad");
+            Check(Read("MiniGames/TriadNpcLoader.Dalamud.cs").Contains("Maps.MapFloors.MapOf(floors.Of(bg, map), map.RowId, position.X, position.Y, position.Z)", StringComparison.Ordinal), "Triple Triad");
             Check(Read("Maps/MapLocalIndexLoader.Dalamud.cs").Contains("found.Add(new(MapLocalKind.PlacedObject,++added,floorMap,at.X,at.Z,0,icon));", StringComparison.Ordinal), "bells and chests");
         }),
     ];

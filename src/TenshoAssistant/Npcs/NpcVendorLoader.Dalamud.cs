@@ -64,7 +64,7 @@ internal sealed class NpcVendorLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-681;floors-1464");
+                    cacheVersion=NpcVendorCache.Version($"{dataVersion};schema={typeof(GilShop).Assembly.GetName().Version};fcc-295;req-352;service-681;floors-1469");
                 }
                 if(!cacheChecked && cache is not null)
                 {
@@ -245,7 +245,7 @@ internal sealed class NpcVendorLoader : IDisposable
         // X-266 (0.1307): the quest layers placing each vendor in a territory, to link a Level position to their quests.
         var questLayers=new Dictionary<(uint Npc,uint Territory),HashSet<string>>();
         // X-462 (0.1464): a territory drawn on floors (Eulmore): a layout's NPC takes its floor's map (MapFloors), read once per layout.
-        var floors=new Dictionary<string,IReadOnlyList<Maps.MapFloorRange>>();
+        var floors=new Maps.MapFloorReader.FloorCache(data);   // X-480 (0.1469): the territory's floors only, once per layout and map
         foreach(var territory in data.GetExcelSheet<TerritoryType>())
             foreach(var kind in LayoutKinds)
             {
@@ -269,9 +269,7 @@ internal sealed class NpcVendorLoader : IDisposable
                         if(!missing.Contains(npc.ParentData.ParentData.BaseId))continue;
                         var id=npc.ParentData.ParentData.BaseId;var position=instance.Transform.Translation;
                         var bg=territory.Bg.ExtractText();
-                        if(!floors.TryGetValue(bg,out var ranges))floors[bg]=ranges=Maps.MapFloorReader.Read(data,bg);
-                        var floorMap=Maps.MapFloors.MapOf(ranges,map.RowId,position.X,position.Y,position.Z);
-                        if(floorMap==0)continue;   // in no floor's box: on no floor
+                        var floorMap=Maps.MapFloors.MapOf(floors.Of(bg,map),map.RowId,position.X,position.Y,position.Z);   // X-480: in no box, the territory's map
                         var x=NpcShopLinks.MapCoordinate(position.X,map.OffsetX,map.SizeFactor);var y=NpcShopLinks.MapCoordinate(position.Z,map.OffsetY,map.SizeFactor);
                         if(!locations.TryGetValue(id,out var list))locations[id]=list=[];
                         // Several territories share one layout (e.g. instanced copies): keep one entry per map and spot.

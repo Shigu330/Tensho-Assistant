@@ -76,6 +76,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1464-map-floors.md](0.1464-map-floors.md) | `src/TenshoAssistant/Maps/MapFloorReader.Dalamud.cs`, `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1464Tests.cs` | `CHANGELOG.md` |
 | [0.1465-beast-result-index-12.md](0.1465-beast-result-index-12.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs` | `CHANGELOG.md` |
 | [0.1468-chat-link-pieces.md](0.1468-chat-link-pieces.md) | `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLinkPieces1468Tests.cs` | `CHANGELOG.md` |
+| [0.1469-map-floors-check.md](0.1469-map-floors-check.md) | `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1469Tests.cs`, `tools/ShopCurrencyProbe/Program.cs` | `CHANGELOG.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.159.0-triad-npc-probe.log](0.159.0-triad-npc-probe.log) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs`, `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs`, `tests/TenshoAssistant.Tests/TriadMatchSimulatorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -307,5 +308,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 295 files · fichiers ; 249 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 296 files · fichiers ; 250 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

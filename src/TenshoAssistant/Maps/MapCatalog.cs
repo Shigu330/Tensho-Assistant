@@ -130,7 +130,7 @@ public sealed class MapCatalog
     /// <remarks>X-462 (0.1464): not another floor of the same frame (Eulmore's three floors: MapFloors.OtherFloor).</remarks>
     public IReadOnlyList<uint> Equivalent(MapDefinition map) => Entries
         .Where(other => other.MapId == map.MapId || other.TerritoryId == map.TerritoryId && other.SizeFactor == map.SizeFactor
-            && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY && !MapFloors.OtherFloor(map, other))
+            && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY && !MapFloors.OtherFloor(map.MapId, map.MarkerRange, other.MapId, other.MarkerRange))
         .Select(other => other.MapId).ToArray();
     /// <summary>
     /// 0.679 (user report): the versions of one drawing of the land, such as the Island Sanctuary's as it develops (maps 772, 773, 774, 780): the game may place a marker on any of them.
