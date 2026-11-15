@@ -6215,6 +6215,8 @@
     "SectionTabs": "Onglets",
     "SectionColors": "Couleurs",
     "TabAll": "Général",
+    "TabBattle": "Combat",
+    "TabEvent": "Événement",
     "TabSocial": "Social",
     "TabName": "Nom",
     "TabNameTip": "Le nom de l'onglet (24 lettres au plus).",

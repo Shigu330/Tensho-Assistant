@@ -77,9 +77,13 @@ internal sealed partial class MainWindow
         if(chatSettingsPending && !ImGui.IsAnyItemActive()){chatSettingsPending=false;TrySave("Chat window tabs and colours");}
     }
 
+    /// <summary>X-445 (0.1458): the tabs, the game's three default ones (names of the game's Addon sheet) and Social, made or completed once.</summary>
+    private List<ChatTabSettings> ChatTabs(ChatSettings options)=>options.EnsureTabs(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabBattle"),
+        localization.Get("ChatWindow.TabEvent"),localization.Get("ChatWindow.TabSocial"));
+
     private void DrawChatTabSettings(ChatSettings options)
     {
-        var tabs=options.EnsureTabs(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabSocial"));
+        var tabs=ChatTabs(options);
         for(var index=0;index<tabs.Count;index++)
         {
             var tab=tabs[index];
@@ -175,7 +179,7 @@ internal sealed partial class MainWindow
     private void DrawChatWindowContents()
     {
         var options=ChatOptions;
-        var tabs=options.EnsureTabs(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabSocial"));
+        var tabs=ChatTabs(options);
         if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
         try
         {

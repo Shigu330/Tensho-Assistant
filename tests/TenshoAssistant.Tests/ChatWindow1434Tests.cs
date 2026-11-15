@@ -25,7 +25,7 @@ internal static class ChatWindow1434Tests
             Check(ChatChannels.From(14)==ChatChannel.Party && ChatChannels.From(32)==ChatChannel.Party && ChatChannels.From(15)==ChatChannel.Alliance && ChatChannels.From(24)==ChatChannel.FreeCompany,"groups");
             Check(ChatChannels.From(16)==ChatChannel.Ls1 && ChatChannels.From(23)==ChatChannel.Ls8 && ChatChannels.From(37)==ChatChannel.Cwls1 && ChatChannels.From(101)==ChatChannel.Cwls2 && ChatChannels.From(107)==ChatChannel.Cwls8,"linkshells");
             Check(ChatChannels.From(28)==ChatChannel.Emote && ChatChannels.From(29)==ChatChannel.Emote && ChatChannels.From(27)==ChatChannel.Novice && ChatChannels.From(56)==ChatChannel.Echo,"emotes, novice, echo");
-            Check(ChatChannels.From(57)==ChatChannel.System && ChatChannels.From(58)==ChatChannel.System && ChatChannels.From(73)==ChatChannel.System && ChatChannels.From(74)==ChatChannel.System,"58 is a battle system message, filed with the system messages; signs and /random too");
+            Check(ChatChannels.From(57)==ChatChannel.System && ChatChannels.From(58)==ChatChannel.Combat && ChatChannels.From(73)==ChatChannel.System && ChatChannels.From(74)==ChatChannel.System,"58 is a battle system message, in the game's Battle tab since 0.1458 (X-445); signs and /random with the system messages");
             Check(ChatChannels.From(60)==ChatChannel.Error && ChatChannels.From(61)==ChatChannel.Npc && ChatChannels.From(65)==ChatChannel.Loot && ChatChannels.From(66)==ChatChannel.Crafting && ChatChannels.From(67)==ChatChannel.Gathering,"errors, NPC, loot, synthesis, gathering");
             Check(ChatChannels.From(71)==ChatChannel.Retainer && ChatChannels.From(70)==ChatChannel.Announcement && ChatChannels.From(64)==ChatChannel.Progress,"retainers, announcements, progression");
             Check(ChatChannels.From(41)==ChatChannel.Combat && ChatChannels.From(49)==ChatChannel.Combat && ChatChannels.From(999)==ChatChannel.Other && ChatChannels.From(0)==ChatChannel.Other,"combat apart, others");
@@ -68,7 +68,7 @@ internal static class ChatWindow1434Tests
         ("Chat window 1434: unread counts per tab: a line in a tab not shown counts, showing the tab clears it, what you send never counts",() =>
         {
             var store=new ChatStore();var options=new ChatSettings();
-            var tabs=options.EnsureTabs("General","Social");
+            var tabs=options.EnsureTabs("General","Battle","Event","Social").Where(tab=>tab.Name is "General" or "Social").ToList();
             Say(store,10);Say(store,57);
             var general=store.ViewOf(tabs[0]);var social=store.ViewOf(tabs[1]);
             general.Refresh(store,tabs[0],2000);social.Refresh(store,tabs[1],2000);
@@ -142,9 +142,9 @@ internal static class ChatWindow1434Tests
             Check(!options.WindowOpen && !options.HideInCombat && options.ShowTimestamps && options.ShowChannel,"off by default: no message is copied");
             options.Opacity=500;options.FontScale=1;options.MaxLines=9;
             Check(options.BoundedOpacity==100 && options.BoundedFontScale==60 && options.BoundedMaxLines==ChatStore.MinimumLines,"bounds");
-            var tabs=options.EnsureTabs("All","Social");
-            Check(tabs.Count==2 && !tabs[0].Shows(ChatChannel.Combat) && tabs[0].Shows(ChatChannel.System) && tabs[1].Shows(ChatChannel.Party) && !tabs[1].Shows(ChatChannel.System),"tabs");
-            Check(ReferenceEquals(options.EnsureTabs("x","y"),tabs),"kept");
+            var tabs=options.EnsureTabs("All","Battle","Event","Social");
+            Check(tabs.Count==4 && !tabs[0].Shows(ChatChannel.Combat) && tabs[0].Shows(ChatChannel.System) && tabs[3].Shows(ChatChannel.Party) && !tabs[3].Shows(ChatChannel.System),"tabs");
+            Check(ReferenceEquals(options.EnsureTabs("x","y","z","w"),tabs),"kept");
             options.Colors=new(){[ChatChannel.Say]=0xFF123456};
             Check(options.ColorOf(ChatChannel.Say)==0x123456 && options.ColorOf(ChatChannel.Party)==ChatChannels.DefaultColor(ChatChannel.Party),"colours");
             var configuration=new Configuration();

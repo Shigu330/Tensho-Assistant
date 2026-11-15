@@ -30,21 +30,44 @@ public sealed class ChatSettings
     /// <summary>X-448 (0.1454): the window is neither moved nor resized.</summary>
     public bool Locked{get;set;}
     public List<ChatTabSettings>? Tabs{get;set;}
+    /// <summary>X-445 (0.1458): <see cref="CurrentTabs"/> once the tabs follow the game's default tabs (tabs saved before get Battle and Event
+    /// once).</summary>
+    public int TabsVersion{get;set;}
+    public const int CurrentTabs=1;
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);
     public int BoundedMaxLines=>ChatStore.Bounded(MaxLines);
     public uint ColorOf(ChatChannel channel)=>Colors?.TryGetValue(channel,out var color)==true ? color&0xFFFFFF:ChatChannels.DefaultColor(channel);
-    /// <summary>The tabs, made at first use: everything said and shown except combat lines, then only what people say to you or your groups.</summary>
-    public List<ChatTabSettings> EnsureTabs(string allName,string socialName)
+    /// <summary>The tabs, made at first use. X-445 (0.1458): the game's three default log tabs (General: everything but the combat lines and the
+    /// NPC dialogue; Battle: the combat lines; Event: the NPC dialogue), then Social (only what people say to you or your groups). Tabs saved
+    /// before get Battle and Event once, after the first tab, unless a tab already shows that channel alone; the others stay as they are.</summary>
+    public List<ChatTabSettings> EnsureTabs(string generalName,string battleName,string eventName,string socialName)
     {
-        if(Tabs is { Count:>0 })return Tabs;
+        if(Tabs is { Count:>0 })
+        {
+            if(TabsVersion<CurrentTabs)
+            {
+                var at=1;
+                foreach(var (name,channel) in new[]{(battleName,ChatChannel.Combat),(eventName,ChatChannel.Npc)})
+                {
+                    if(Tabs.Count>=MaximumTabs || Tabs.Any(tab=>tab.Channels is [var only] && only==channel))continue;
+                    Tabs.Insert(Math.Min(at,Tabs.Count),new(){Name=name,Channels=[channel]});
+                    at++;
+                }
+                TabsVersion=CurrentTabs;
+            }
+            return Tabs;
+        }
         Tabs=
         [
-            new(){Name=allName,Channels=ChatChannels.All.Where(channel=>channel!=ChatChannel.Combat).ToList()},
+            new(){Name=generalName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.General).ToList()},
+            new(){Name=battleName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Battle).ToList()},
+            new(){Name=eventName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Event).ToList()},
             new(){Name=socialName,Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()},
         ];
+        TabsVersion=CurrentTabs;
         return Tabs;
     }
 }

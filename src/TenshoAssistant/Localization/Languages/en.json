@@ -6215,6 +6215,8 @@
     "SectionTabs": "Tabs",
     "SectionColors": "Colours",
     "TabAll": "General",
+    "TabBattle": "Battle",
+    "TabEvent": "Event",
     "TabSocial": "Social",
     "TabName": "Name",
     "TabNameTip": "The tab's name (24 letters at most).",
