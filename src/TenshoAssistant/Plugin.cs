@@ -148,7 +148,22 @@ public sealed partial class Plugin : IDalamudPlugin
             TenshoAssistant.Competitive.CompetitiveGate.Compiler.Hold=()=>mainWindow is not { WarmupEarlyDone:true };
             // X-437 M2 (0.1428): the readers' compiler times its compilations for the log in developer mode only.
             TenshoAssistant.Competitive.CompetitiveGate.Compiler.Measure=static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true;
-            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
+            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>
+            {
+                log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
+                // X-433 (0.1440): while the runtime is listened to (developer mode, two minutes after a load), the methods the game's thread
+                // compiled during that pass, read a moment later (the runtime's events come in a little after).
+                if(Diagnostics.GameThreadJit.Current is { } jit)
+                {
+                    var to=DateTime.UtcNow;
+                    var from=to-TimeSpan.FromMilliseconds(spent+5);
+                    _=Task.Delay(TimeSpan.FromSeconds(2)).ContinueWith(_=>
+                    {
+                        var names=jit.Between(from,to);
+                        if(names.Count>0)log.Information("Slow reader: methods the game's thread compiled meanwhile ({0}): {1}.",names.Count,string.Join(", ",names.Take(40)));
+                    },TaskScheduler.Default);
+                }
+            };
             // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
             // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.
             var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
@@ -1381,6 +1396,7 @@ public sealed partial class Plugin : IDalamudPlugin
                         log.Information(suspensions.Types.Summary());
                         log.Information(suspensions.Collections.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Large.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Jit.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                     }
                 },TaskScheduler.Default);
             }

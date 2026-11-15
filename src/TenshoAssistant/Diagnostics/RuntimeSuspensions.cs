@@ -230,6 +230,59 @@ public static class RuntimeSuspensionWatch
 }
 
 /// <summary>
+/// X-433 (0.1440): the methods the game's thread compiles while the runtime is listened to (developer mode, two minutes after a load): how
+/// many, by area (the first two parts of the declaring type's namespace), and their names with the time each started, the first
+/// <see cref="Kept"/> of them, to name what a slow first pass of a reader compiled. Thread-safe; pure (fed by the listener or the tests).
+/// </summary>
+public sealed class GameThreadJit(int kept=4000)
+{
+    /// <summary>The tracker of the listener alive now (developer mode, two minutes after a load), for the slow passes' lines; null otherwise.</summary>
+    public static GameThreadJit? Current=>Volatile.Read(ref current);
+    private static GameThreadJit? current;
+    internal static void Begin(GameThreadJit jit)=>Volatile.Write(ref current,jit);
+    internal static void End(GameThreadJit jit)=>Interlocked.CompareExchange(ref current,null,jit);
+    public int Kept { get; } = kept;
+    private readonly object gate=new();
+    private readonly List<(DateTime At,string Name)> seen=[];
+    private readonly Dictionary<string,int> areas=new(StringComparer.Ordinal);
+    public int Count { get; private set; }
+
+    /// <summary>The area of a type's full name: its first two dotted parts, before any generic mark (« System.Linq », « TenshoAssistant.Inventory »).</summary>
+    public static string Area(string? typeName)
+    {
+        if(string.IsNullOrEmpty(typeName))return "?";
+        var end=typeName.IndexOfAny(['`','[','<','+']);
+        var plain=end>0 ? typeName[..end]:typeName;
+        var parts=plain.Split('.',StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length==0 ? "?":string.Join('.',parts.Take(Math.Min(2,Math.Max(1,parts.Length-1))));
+    }
+
+    public void See(DateTime at,string? typeName,string? methodName)
+    {
+        lock(gate)
+        {
+            Count++;
+            var area=Area(typeName);
+            areas[area]=areas.GetValueOrDefault(area)+1;
+            if(seen.Count<Kept)seen.Add((at,$"{typeName}.{methodName}"));
+        }
+    }
+
+    /// <summary>The names of the methods that started compiling between the two times (inclusive), in order.</summary>
+    public IReadOnlyList<string> Between(DateTime from,DateTime to)
+    {
+        lock(gate)return [..seen.Where(entry=>entry.At>=from && entry.At<=to).Select(entry=>entry.Name)];
+    }
+
+    public string Summary(TimeSpan watched,int top=12)
+    {
+        lock(gate)
+            return string.Create(CultureInfo.InvariantCulture,
+                $"Methods compiled on the game's thread in the {watched.TotalSeconds:0} s after the load: {Count}; by area: {(areas.Count==0 ? "none":string.Join(", ",areas.OrderByDescending(area=>area.Value).ThenBy(area=>area.Key,StringComparer.Ordinal).Take(top).Select(area=>string.Create(CultureInfo.InvariantCulture,$"{area.Key} {area.Value}"))))}.");
+    }
+}
+
+/// <summary>
 /// X-433 (0.1422): listens to the runtime's own events in this process (Microsoft-Windows-DotNETRuntime: the GC keyword for the suspensions,
 /// the tiered compilation keyword for its background work, informational level) and gives each long suspension to <paramref name="say"/>.
 /// Developer mode only, for a short watch after a load (Plugin): disposed at its end and at the unload.
@@ -237,7 +290,7 @@ public static class RuntimeSuspensionWatch
 public sealed class RuntimeSuspensionListener : EventListener
 {
     public const string RuntimeSource="Microsoft-Windows-DotNETRuntime";
-    public const long GcKeyword=0x1,TieredCompilationKeyword=0x400000000,TypeDiagnosticKeyword=0x8000000000;
+    public const long GcKeyword=0x1,TieredCompilationKeyword=0x400000000,TypeDiagnosticKeyword=0x8000000000,JitKeyword=0x10;
     // Field initialisers run before the base constructor, which may already enable the runtime's source.
     private readonly SuspensionTracker tracker=new();
     // X-433 (0.1423): the type loads too (TypeDiagnostic keyword).
@@ -246,10 +299,18 @@ public sealed class RuntimeSuspensionListener : EventListener
     private readonly CollectionTracker collections=new();
     // X-433 (0.1431): the large allocations, by thread (GC keyword at the verbose level: the allocation ticks).
     private readonly LargeAllocationTracker large=new();
+    // X-433 (0.1440): the methods compiled on the game's thread (JIT keyword, verbose: one event as each compilation starts).
+    private readonly GameThreadJit jit=new();
     private volatile Action<string>? say;
     private int disposed;
 
-    public RuntimeSuspensionListener(Action<string> say)=>this.say=say;
+    public RuntimeSuspensionListener(Action<string> say)
+    {
+        this.say=say;
+        GameThreadJit.Begin(jit);
+    }
+
+    public GameThreadJit Jit=>jit;
 
     public SuspensionTracker Tracker=>tracker;
     public CollectionTracker Collections=>collections;
@@ -260,12 +321,21 @@ public sealed class RuntimeSuspensionListener : EventListener
     protected override void OnEventSourceCreated(EventSource source)
     {
         // X-433 (0.1431): the verbose level, for the GC keyword's allocation ticks (developer mode, two minutes).
-        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Verbose,(EventKeywords)(GcKeyword|TieredCompilationKeyword|TypeDiagnosticKeyword));
+        // X-433 (0.1440): and the JIT keyword, to name what the game's thread compiles.
+        if(source.Name==RuntimeSource)EnableEvents(source,EventLevel.Verbose,(EventKeywords)(GcKeyword|TieredCompilationKeyword|TypeDiagnosticKeyword)|(EventKeywords)JitKeyword);
     }
 
     protected override void OnEventWritten(EventWrittenEventArgs written)
     {
         if(Volatile.Read(ref disposed)!=0)return;
+        // X-433 (0.1440): a method starts compiling; only the game's thread's are kept (its id is known once a reader ran).
+        if(written.EventName?.StartsWith("MethodJittingStarted",StringComparison.Ordinal)==true)
+        {
+            var game=Interlocked.Read(ref ThreadClock.GameThread);
+            if(game!=0 && written.OSThreadId==game)jit.See(written.TimeStamp.ToUniversalTime(),Text(written,"MethodNamespace"),Text(written,"MethodName"));
+            return;
+        }
+        if(written.EventName?.StartsWith("MethodLoad",StringComparison.Ordinal)==true)return;
         if(written.EventName=="TypeLoadStart")
         {
             if(Number(written,"TypeLoadStartID") is { } id)types.Start(id,written.TimeStamp.ToUniversalTime(),written.OSThreadId);
@@ -297,6 +367,12 @@ public sealed class RuntimeSuspensionListener : EventListener
         if(tracker.See(written.EventName,written.TimeStamp.ToUniversalTime(),reason,jitted) is { } note)say?.Invoke(note);
     }
 
+    private static string? Text(EventWrittenEventArgs written,string name)
+    {
+        var index=written.PayloadNames?.IndexOf(name) ?? -1;
+        return index>=0 && written.Payload is { } payload && index<payload.Count ? payload[index] as string:null;
+    }
+
     private static long? Number(EventWrittenEventArgs written,string name)
     {
         var index=written.PayloadNames?.IndexOf(name) ?? -1;
@@ -308,6 +384,8 @@ public sealed class RuntimeSuspensionListener : EventListener
     {
         if(Interlocked.Exchange(ref disposed,1)!=0)return;
         say=null;
+        // X-433 (0.1440): the slow passes' lines stop with the listener (nothing kept past the watch or the unload).
+        GameThreadJit.End(jit);
         base.Dispose();
     }
 }
