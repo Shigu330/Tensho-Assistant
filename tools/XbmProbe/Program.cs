@@ -7,6 +7,25 @@ using Lumina.Text.ReadOnly;
 if(args.Length<1)throw new ArgumentException("Supply the installed sqpack directory; then a language (French, English) and optionally sheet names.");
 var language=args.Length>1 ? Enum.Parse<Language>(args[1]):Language.French;
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=language,CacheFileResources=false});
+// X-481 (0.1470): « uld:NAME » lists the text nodes of the game window ui/uld/NAME.uld with a fixed text (Addon sheet row), in node order, with
+// their parent, place and size: the labels the window shows next to the numbers it is given (XBMResult: the parts of the score).
+if(args.Length>2 && args[2].StartsWith("uld:",StringComparison.Ordinal))
+{
+    var path=$"ui/uld/{args[2][4..]}.uld";
+    var uld=data.GetFile<Lumina.Data.Files.UldFile>(path) ?? throw new FileNotFoundException(path);
+    var addon=data.Excel.GetSheet<Lumina.Excel.Sheets.Addon>(language);
+    void Nodes(string where,IEnumerable<Lumina.Data.Parsing.Uld.UldRoot.NodeData> nodes)
+    {
+        foreach(var node in nodes)
+            if(node.Node is Lumina.Data.Parsing.Uld.NodeData.TextNode text)
+                Console.WriteLine($"TEXT {where} node {node.NodeId} parent {node.ParentId} at {node.X},{node.Y} size {node.W}x{node.H} visible {node.Visible} "
+                    +$"sheet {text.SheetType} text {text.TextId}"+(text.TextId!=0 && text.SheetType==Lumina.Data.Parsing.Uld.NodeData.SheetType.Addon && addon.GetRowOrDefault(text.TextId) is { } row
+                        ? $" '{row.Text.ExtractText().Replace("\n"," ")}'":""));
+    }
+    Nodes("window",uld.WidgetData.Nodes ?? []);
+    foreach(var component in uld.Components)Nodes($"component {component.Id} ({component.Type})",component.Nodes);
+    return;
+}
 string[] names=args.Length>2 ? args[2..]:["XBMPet","XBMPetParamGrow","XBMBattleDetail","XBMBattleDetailAction","XBMActionEffectType","XBMActionTarget","XBMContent","XBMContentBattle","XBMElement","XBMScoreBonus","XBMScoreRank","XBMItem","XBMItemType","XBMEntrance","XBMStageEventType"];
 string Cell(object? value)=>value switch
 {

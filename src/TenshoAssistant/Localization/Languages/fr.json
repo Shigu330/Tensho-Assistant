@@ -194,6 +194,7 @@
     "TeamPanelNote": "Tensho ne montre ceci qu'avant d'entrer et devant le plateau ; ce panneau se coupe quand un combat commence.",
     "ResultNone": "Aucun résultat de plateau lu pour l'instant : il se lit quand le jeu affiche le résultat d'un plateau.",
     "ResultTitle": "Dernier plateau ({0}) : score {1}",
+    "ResultTotal": "bonus {0} ({1} obtenu(s)) · total {2}",
     "ResultBeast": "{0} : rang {1} ({2}/100) → rang {3} ({4}/100)",
     "ResultRanks": "+{0} rang(s)",
     "KnownRank": "rang {0}",
