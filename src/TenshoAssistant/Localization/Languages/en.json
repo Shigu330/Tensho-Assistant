@@ -5992,7 +5992,7 @@
     "NotOwned": "missing"
   },
   "Leves": {
-    "AetheryteClient": "Nearest aetheryte to the client",
+    "AetheryteClient": "Nearest aetheryte to the leve's NPC",
     "AetheryteStart": "Nearest aetheryte to the leve",
     "TooltipAllowances": "Allowances: {0}",
     "Title": "Guildleves",

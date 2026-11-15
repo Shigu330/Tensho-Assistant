@@ -909,14 +909,20 @@ public sealed partial class Plugin : IDalamudPlugin
             IReadOnlySet<uint>? cabinetItems=null;
             // g, C-14 (0.363): guildleves (Leve sheet, copied once) and the character's progress, read while the page shows them.
             IReadOnlyList<Leves.LeveDefinition>? leveList=null;
-            IReadOnlyList<Leves.LeveDefinition> LeveList()=>leveList??=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>()
+            IReadOnlyList<Leves.LeveDefinition> LeveList()=>leveList??=LeveClientsNamed(data.GetExcelSheet<Lumina.Excel.Sheets.Leve>()
                 .Where(row=>!row.Name.IsEmpty && row.ClassJobLevel>0)
                 .Select(row=>new Leves.LeveDefinition(row.RowId,row.Name.ExtractText(),row.ClassJobLevel,row.LeveAssignmentType.RowId,
                     row.LeveAssignmentType.ValueNullable?.Name.ExtractText() ?? "",(uint)Math.Max(0,row.LeveAssignmentType.ValueNullable?.Icon ?? 0),
                     row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost,
                     row.LevelLevemete.ValueNullable is { Map.RowId:not 0 } client ? new(client.Map.RowId,client.X,client.Z):null,
                     row.LevelStart.ValueNullable is { Map.RowId:not 0 } start ? new(start.Map.RowId,start.X,start.Z):null))
-                .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray();
+                .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray());
+            // X-404 (0.1372): the sheet's « Client: » label taken off each name once (the page wrote « Client : Client : … »).
+            static IReadOnlyList<Leves.LeveDefinition> LeveClientsNamed(Leves.LeveDefinition[] leves)
+            {
+                var labels=Leves.LeveCatalog.ClientLabels(leves.Select(leve=>leve.Client));
+                return labels.Count==0 ? leves:leves.Select(leve=>leve with{Client=Leves.LeveCatalog.WithoutClientLabel(leve.Client,labels)}).ToArray();
+            }
             Leves.LeveProgressReader? leveReader=null;
             registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
             mainWindow.LeveDefinitions=LeveList;

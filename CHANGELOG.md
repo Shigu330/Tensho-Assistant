@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1372.0
+- Plan global, X-404 : Mandats : le nom du client ne répète plus « Client : ». La feuille LeveClient porte déjà ce libellé devant chaque nom (anglais « Client: », français « Client : », allemand « Auftraggeber: » ou « Auftraggeberin: », aucun en japonais ; preuve docs/evidence/0.1372-leve-client-label.md) : il est trouvé dans la feuille elle-même et retiré une fois, pour l'infobulle, la colonne et le filtre. L'entrée du menu « Éthérite la plus proche du client » visait en fait le PNJ de LevelLevemete (responsable des mandats, sergent de grande compagnie ou PNJ de livraison selon le mandat) : elle dit maintenant « Éthérite la plus proche du PNJ du mandat ».
+- Pour les joueurs : mandats : les noms des clients ne répètent plus « Client : », et l'entrée de carte dit qu'elle vise le PNJ du mandat.
+- Tests : LeveClient1372Tests. Verify.ps1 (agent) : 2579/2579, 0 avertissement, 0 erreur ; DLL 0.1372.0.0. Non validé en jeu.
+### English
+- Guildleves: the client's name no longer repeats « Client: ». The LeveClient sheet already writes that label before each name (English « Client: », French « Client : », German « Auftraggeber: » or « Auftraggeberin: », none in Japanese; evidence docs/evidence/0.1372-leve-client-label.md): it is found from the sheet itself and taken off once, for the tooltip, the column and the filter. The menu entry « Nearest aetheryte to the client » in fact pointed at the LevelLevemete NPC (a levemete, a Grand Company sergeant or a delivery NPC depending on the leve): it now says « Nearest aetheryte to the leve's NPC ».
+- For players: Guildleves: client names no longer repeat « Client: », and the map entry now says it points to the leve's NPC.
+
 ## 0.1371.0
 - Plan global, X-373 : Tests : le test « Settings saver 1164 : le déchargement écrit ce qui reste » ne dépend plus d'un délai réel. L'écriture en cours est retenue par une porte que le test ouvre lui-même, au lieu de 400 ms de vrai temps qu'une machine de la CI lente pouvait dépasser (échec « the wait ran out », CI de 0.1354.0). Même comportement vérifié : l'attente expire, rien n'est écrit tant que la porte est fermée, puis les réglages vivants finissent sur le disque, sans écriture simultanée.
 - Tests : SettingsSaver1164Tests. Verify.ps1 (agent) : 2576/2576, 0 avertissement, 0 erreur ; DLL 0.1371.0.0. Rien à essayer en jeu.

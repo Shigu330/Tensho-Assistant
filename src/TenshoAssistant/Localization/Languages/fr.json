@@ -5992,7 +5992,7 @@
     "NotOwned": "manquante"
   },
   "Leves": {
-    "AetheryteClient": "Éthérite la plus proche du client",
+    "AetheryteClient": "Éthérite la plus proche du PNJ du mandat",
     "AetheryteStart": "Éthérite la plus proche du mandat",
     "TooltipAllowances": "Autorisations : {0}",
     "Title": "Mandats",
