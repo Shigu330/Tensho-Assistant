@@ -358,6 +358,43 @@ internal static class Headless
     }
 
     /// <summary>
+    /// X-430 (0.1415): the trial retainers of the « Reminders-retainers » picture (ReferencePlan.RetainerTrial), written as the plugin writes a
+    /// character (Characters/&lt;id&gt;.json, schema 1) in a folder of their own, read by the plugin's own reader (UseData « characters »), and
+    /// the Status tab asked once. Waits for the reading (off the frame) at most ten seconds. False when the plugin's fields cannot be reached.
+    /// </summary>
+    public static bool RetainerTrial(Host host,string folder)
+    {
+        var now=HostClock.UtcNow;
+        var characters=Path.Combine(folder,"Characters");
+        Directory.CreateDirectory(characters);
+        foreach(var character in ReferencePlan.RetainerTrial.GroupBy(row=>(row.ContentId,row.Character)))
+        {
+            var retainers=character.Select(row=>new Dictionary<string,object?>
+            {
+                ["Name"]=row.Name,["Job"]=row.Job,["Level"]=row.Level,["Gil"]=row.Gil,["Items"]=row.Items,["MarketItems"]=row.MarketItems,
+                ["MarketEnds"]=row.MarketEndsIn is { } ends ? now.AddHours(ends):null,["Venture"]=row.Venture,
+                ["VentureDone"]=row.VentureDoneIn is { } done ? now.AddHours(done):null,["Town"]=row.Town,["Stacks"]=row.Stacks,["HqStacks"]=row.HqStacks,["Crystals"]=row.Crystals,
+            }).ToArray();
+            var file=new Dictionary<string,object?>{["Schema"]=1,["Status"]=new Dictionary<string,object?>{["ContentId"]=character.Key.ContentId,["Name"]=character.Key.Character,["SeenAt"]=now.AddHours(-2),["Retainers"]=retainers}};
+            File.WriteAllText(Path.Combine(characters,character.Key.ContentId+".json"),System.Text.Json.JsonSerializer.Serialize(file));
+        }
+        const System.Reflection.BindingFlags Private=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+        var read=host.Window.GetType().GetField("desktopCharacters",Private);
+        var focus=host.Window.GetType().GetField("reminderTabFocus",Private);
+        if(read is null || focus is null)return false;
+        read.SetValue(host.Window,null);
+        Console.WriteLine("  "+host.UseData(folder,"characters"));
+        var watch=System.Diagnostics.Stopwatch.StartNew();
+        while(read.GetValue(host.Window) is null && watch.Elapsed<TimeSpan.FromSeconds(10))Thread.Sleep(20);
+        focus.SetValue(host.Window,"Status");
+        return read.GetValue(host.Window) is System.Collections.IEnumerable list && list.GetEnumerator().MoveNext();
+    }
+
+    /// <summary>X-430 (0.1415): the trial retainers taken back (no character in the application, as before the picture).</summary>
+    public static void RetainerTrialEnd(Host host)
+        =>host.Window.GetType().GetField("desktopCharacters",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)?.SetValue(host.Window,null);
+
+    /// <summary>
     /// X-178 (0.1257): a trial patch given to the copy of the settings in memory (the headless run, or a capture with --garden-trial; never
     /// written: the application saves nothing): three patches at one place; in the first, seven beds: growing, tending later, tending due,
     /// ripe, two more, and a seed whose name matches no item (bed 7 stays empty); a few beds in the second and the third. False when the plugin's types cannot be reached.

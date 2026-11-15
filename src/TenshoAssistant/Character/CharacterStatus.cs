@@ -38,7 +38,7 @@ public static class RetainerStates
         (int Stacks,int HqStacks,int Crystals)? stock)=>new()
     {
         Name=Text(name),Job=Text(job),Level=Math.Max(0,level),Gil=Math.Max(0,gil),Items=Math.Max(0,items),MarketItems=Math.Max(0,marketItems),
-        MarketEnds=marketItems>0 && marketExpire>0 ? DateTimeOffset.FromUnixTimeSeconds(marketExpire):null,
+        MarketEnds=SalesEnd(marketItems,marketExpire),
         Venture=venture,VentureDone=venture!=0 && ventureComplete>0 ? DateTimeOffset.FromUnixTimeSeconds(ventureComplete):null,
         Town=Text(town),Stacks=stock?.Stacks,HqStacks=stock?.HqStacks,Crystals=stock?.Crystals,
     };
@@ -50,8 +50,23 @@ public static class RetainerStates
     }
 
     /// <summary>X-196 (0.1411): when the automatic alarm of a retainer's sales rings: at their end, only while something is on sale (null otherwise).</summary>
-    public static DateTimeOffset? SaleAlarmAt(int marketItems,uint marketExpire)
-        =>marketItems>0 && marketExpire>0 ? DateTimeOffset.FromUnixTimeSeconds(marketExpire):null;
+    public static DateTimeOffset? SaleAlarmAt(int marketItems,uint marketExpire)=>SalesEnd(marketItems,marketExpire);
+
+    /// <summary>X-429 (0.1415): no retainer's sale ends before the game began (A Realm Reborn, 27 August 2013): an earlier value is no time.</summary>
+    public static readonly DateTimeOffset GameStart=new(2013,8,27,0,0,0,TimeSpan.Zero);
+
+    /// <summary>
+    /// X-429 (0.1415, docs/evidence/0.1415-retainer-sales-end.md): the end of a retainer's sales, the one reading of it for the table and the
+    /// alarm. The game writes it in its own retainer list (Addon 2314: « Selling n items until date », the time given as lnum4 beside the town
+    /// lnum2 and the count lnum3, the three values of RetainerManager.Retainer: Town, MarketItemCount, MarketExpire). Null when nothing is on
+    /// sale (the game shows no time then: Addon 2317), when no time is given, or when the time is before <see cref="GameStart"/>.
+    /// </summary>
+    public static DateTimeOffset? SalesEnd(int marketItems,uint marketExpire)
+    {
+        if(marketItems<=0 || marketExpire==0)return null;
+        var end=DateTimeOffset.FromUnixTimeSeconds(marketExpire);
+        return end<GameStart ? null:end;
+    }
 
     /// <summary>X-196 (0.1410): a sale ends « soon » within a day (the table shows it in orange; ended ones in red).</summary>
     public static readonly TimeSpan SaleSoon=TimeSpan.FromDays(1);
