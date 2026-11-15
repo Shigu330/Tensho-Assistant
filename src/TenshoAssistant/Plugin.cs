@@ -326,20 +326,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.EnglishPlaceIds=name=>(englishPlaces??=data.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>(Dalamud.Game.ClientLanguage.English)
                 .Where(row=>!row.Name.IsEmpty).GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(group=>group.Key,group=>(IReadOnlyList<uint>)group.Select(row=>row.RowId).ToArray(),StringComparer.OrdinalIgnoreCase)).GetValueOrDefault(name.Trim()) ?? [];
-            Maps.MapLiveReader? mapLive=null;
-            registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,partyList,log),()=>mapLive?.Dispose());
-            var mapLocal=new Maps.MapLocalIndexService();
-            Maps.MapLocalIndexLoader? mapLocalLoader=null;
-            registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
-            var mapMarkers=new Maps.MapMarkerSource(data,log);
-            mainWindow.ConfigureMapView(mapLive!,mapMarkers,mapLocal);
-            // X-01 C5 (0.1206): the names of every map and the aetheryte rows built off the frame once the loading's own work is done, so the
-            // first region map only reads them (it took 1 311 ms on the game's thread); stopped with the plugin.
-            _=Task.Run(async()=>
-            {
-                try{await Task.Delay(MapMarkersWarmDelay,gameDataCancel.Token).ConfigureAwait(false);mapMarkers.Warm(gameDataCancel.Token);}
-                catch(OperationCanceledException){}
-            });
+            // X-153 (0.1404, seventh slice): the map family (Plugin.Maps.cs), at the same place as before.
+            RegisterMaps(framework,client,objects,data,condition,fateTable,partyList);
             var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandItemSources)};
             registrations.Register(()=>{},itemSources.Dispose);
             mainWindow.ConfigureItemSources(itemSources);

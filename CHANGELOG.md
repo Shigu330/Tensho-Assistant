@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1404.0
+- Plan global, X-153 : Code (sans changement visible), X-153 tranche 7 (revue GPT du 11/11, acceptée par l'utilisateur) : la famille de la carte sort de Plugin.cs dans Plugin.Maps.cs : le lecteur de la carte en direct, l'index des positions et son chargeur, les marqueurs de carte du jeu et leur préparation hors de l'image, la vue de carte configurée avec eux. Mêmes chemins d'installation et de libération, même ordre, même place dans le constructeur (bloc déplacé tel quel) ; le lecteur en direct devient un champ, que les lecteurs suivants (survol des objets, découvertes) interrogent comme avant. Test : MapsFamily1404Tests ; MapWarm1206Tests suit (raison donnée).
+- Tests : MapsFamily1404Tests. Verify.ps1 (agent) : 2662/2662, 0 avertissement, 0 erreur ; DLL 0.1404.0.0. Rien à essayer en jeu.
+### English
+- Code (no visible change), X-153 slice 7 (GPT review of 11/11, accepted by the user): the map family leaves Plugin.cs for Plugin.Maps.cs: the live map reader, the positions' index and its loader, the game's map markers and their warm-up off the frame, the map view configured with them. Same install and release paths, same order, same place in the constructor (block moved as it was); the live reader becomes a field, which the later readers (item hover, discoveries) ask as before. Test: MapsFamily1404Tests; MapWarm1206Tests follows (reason given).
+
 ## 0.1403.0
 - Plan global, X-153 : Code (sans changement visible), X-153 tranche 6 (revue GPT du 11/11, acceptée par l'utilisateur) : la famille des voyages de la compagnie sort de Plugin.cs dans Plugin.Voyages.cs : le guetteur des voyages (sous-marins et dirigeables, butin pour la base des découvertes) et son historique, la table des voyages des dirigeables tirée des fonctions du jeu, la sonde des fonctions des sous-marins (mode développeur), avec ce que la fenêtre principale en lit. Mêmes chemins d'installation et de libération, même ordre, même place dans le constructeur (bloc déplacé tel quel). Définition de « fait » du point écrite (R28.13) ; restent les autres lecteurs du jeu, domaine par domaine. Test : VoyagesFamily1403Tests.
 - Tests : VoyagesFamily1403Tests. Verify.ps1 (agent) : 2661/2661, 0 avertissement, 0 erreur ; DLL 0.1403.0.0. Rien à essayer en jeu.
