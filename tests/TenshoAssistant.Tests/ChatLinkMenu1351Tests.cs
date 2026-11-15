@@ -13,22 +13,22 @@ internal static class ChatLinkMenu1351Tests
         ("X-365: the map link under the mouse is the one a right click is about", () =>
         {
             var hover = new ChatLinkHover();
-            Check(hover.RightClick(1_000, cut: false, enabled: true) is null, "nothing hovered: no menu");
-            hover.Over(Link);
-            Check(hover.RightClick(1_010, cut: false, enabled: true) == Link, "hovered: the menu is about it");
+            Check(hover.RightClick(1_000, null, cut: false, enabled: true) is null, "nothing hovered: no menu");
+            hover.Over(Link, 1_000, null);
+            Check(hover.RightClick(1_010, null, cut: false, enabled: true) == Link, "hovered: the menu is about it");
             hover.Out(1_100);
-            Check(hover.RightClick(1_100 + ChatLinkHover.Grace, cut: false, enabled: true) == Link, "mouse out as the button goes down: still it");
-            Check(hover.RightClick(1_101 + ChatLinkHover.Grace, cut: false, enabled: true) is null, "mouse gone: no menu");
-            hover.Over(Link);hover.Over(null);
-            Check(hover.Current(2_000) is null, "another kind of link (item, player) under the mouse: no place menu");
+            Check(hover.RightClick(1_100 + ChatLinkHover.Grace, null, cut: false, enabled: true) == Link, "mouse out as the button goes down: still it");
+            Check(hover.RightClick(1_101 + ChatLinkHover.Grace, null, cut: false, enabled: true) is null, "mouse gone: no menu");
+            hover.Over(Link, 2_000, null);hover.Over(null, 2_000, null);
+            Check(hover.Current(2_000, null) is null, "another kind of link (item, player) under the mouse: no place menu");
         }),
         ("X-365: nothing during a cut or with the chat links off, and the hovered link is forgotten", () =>
         {
             var hover = new ChatLinkHover();
-            hover.Over(Link);
-            Check(hover.RightClick(1_000, cut: true, enabled: true) is null && hover.Current(1_000) is null, "cut: nothing, forgotten");
-            hover.Over(Link);
-            Check(hover.RightClick(1_000, cut: false, enabled: false) is null && hover.Current(1_000) is null, "chat links off: nothing, forgotten");
+            hover.Over(Link, 1_000, null);
+            Check(hover.RightClick(1_000, null, cut: true, enabled: true) is null && hover.Current(1_000, null) is null, "cut: nothing, forgotten");
+            hover.Over(Link, 1_000, null);
+            Check(hover.RightClick(1_000, null, cut: false, enabled: false) is null && hover.Current(1_000, null) is null, "chat links off: nothing, forgotten");
         }),
         ("X-365: the chat panels' link events through Dalamud's lifecycle, read only, nothing during a cut", () =>
         {
@@ -46,8 +46,9 @@ internal static class ChatLinkMenu1351Tests
         {
             var window = Read("src/TenshoAssistant/MainWindow.ChatMapLinks.cs");
             var menu = window[window.IndexOf("internal void DrawChatLinkMenu()", StringComparison.Ordinal)..];
-            Check(menu.Contains("ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !ImGui.GetIO().WantCaptureMouse"), "right click outside Tensho's windows");
-            Check(menu.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,configuration.MapView.ChatLinks"), "cut and setting");
+            Check(menu.Contains("if(pressed && NativeMouse.GameInFront() && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))"), "right click outside Tensho's windows");
+            Check(menu.Contains("var cut=TenshoAssistant.Competitive.CompetitiveGate.Cut;var enabled=configuration.MapView.ChatLinks;")
+                && menu.Contains("hover.RightClick(now,cursor,cut,enabled)"), "cut and setting");
             Check(menu.Contains("MenuHeader(localization.Get(\"ChatLinks.MenuTitle\"));PlaceEntries(menu.Map,menu.Coordinate,null,menu.Place);"), "the place entries of Tensho's menus");
             Check(!menu.Contains("ImGuiMouseButton.Left"), "the left click is the game's");
             var plugin = Read("src/TenshoAssistant/Plugin.cs");

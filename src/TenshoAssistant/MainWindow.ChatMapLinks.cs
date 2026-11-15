@@ -13,22 +13,39 @@ internal sealed partial class MainWindow
     // X-365 (0.1351): the chat map link under the mouse (ChatLinkHoverWatcher) and the right-click menu opened on it.
     internal ChatLinkHover? ChatLinkHover { get; set; }
     private (MapDefinition Map,Vector2 Coordinate,string Place)? chatLinkMenu;
+    // X-387 (0.1366): the right button as Windows saw it last frame (a press is its change to down).
+    private bool chatRightWasDown;
 
     /// <summary>
     /// X-365 (0.1351, user's choice of 14/11): a right click on a chat map link opens the Tensho place menu at the mouse (« Tensho — place »,
     /// the place entries of Tensho's menus: flag, nearest aetheryte with its cost, Tensho map, zone weather), as the game's item menu gets
     /// « Tensho — item ». The game's left click (its flag) is untouched; nothing is sent to the game; nothing during a cut (Draw stops before).
+    /// X-387 (0.1366, second try, R18): the right click is read from Windows (NativeMouse: button pressed this frame, the game in front, no
+    /// ImGui window under the mouse) instead of ImGui's own click state, and traced in developer mode (« Chat link right click: … »). The
+    /// left click's flag: the Tensho map, when it is open, goes to the clicked link's map, where it draws the game's flag.
     /// </summary>
     internal void DrawChatLinkMenu()
     {
         if(ChatLinkHover is not { } hover)return;
-        if(ImGui.IsMouseClicked(ImGuiMouseButton.Right) && !ImGui.GetIO().WantCaptureMouse
-           && hover.RightClick(Environment.TickCount64,TenshoAssistant.Competitive.CompetitiveGate.Cut,configuration.MapView.ChatLinks) is { } link
-           && maps.State.Catalog?.Find(link.MapId) is { } linkMap && MapCatalog.CoordinatesValid(link.X,link.Y))
+        var now=Environment.TickCount64;var cut=TenshoAssistant.Competitive.CompetitiveGate.Cut;var enabled=configuration.MapView.ChatLinks;
+        var down=NativeMouse.RightDown();var pressed=down && !chatRightWasDown;chatRightWasDown=down;
+        if(pressed && NativeMouse.GameInFront() && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
         {
-            var coordinate=new Vector2(link.X,link.Y);
-            chatLinkMenu=(linkMap,coordinate,$"{(link.Place.Length>0 ? link.Place:linkMap.Zone)}  ({MapProjection.CoordinateText(coordinate)})");
-            ImGui.OpenPopup("###TenshoChatMapLinkMenu");
+            var cursor=NativeMouse.Cursor();
+            if(developerMode && hover.Describe(now,cursor) is { } traced)log.Information("Chat link right click: {0}.",traced);
+            if(hover.RightClick(now,cursor,cut,enabled) is { } link && maps.State.Catalog?.Find(link.MapId) is { } linkMap && MapCatalog.CoordinatesValid(link.X,link.Y))
+            {
+                var coordinate=new Vector2(link.X,link.Y);
+                chatLinkMenu=(linkMap,coordinate,$"{(link.Place.Length>0 ? link.Place:linkMap.Zone)}  ({MapProjection.CoordinateText(coordinate)})");
+                ImGui.OpenPopup("###TenshoChatMapLinkMenu");
+            }
+        }
+        if(hover.TakeClick(now,cut,enabled) is { } clicked && MapViewVisible() && maps.State.Catalog?.Find(clicked.MapId) is { } clickedMap
+           && MapCatalog.CoordinatesValid(clicked.X,clicked.Y))
+        {
+            mapViewMapId=clickedMap.MapId;mapViewFollow=false;mapFitRequested=false;
+            mapCenterRequest=MapProjection.PixelFromCoordinate(new Vector2(clicked.X,clicked.Y),clickedMap);
+            if(developerMode)log.Information("Chat link click: the Tensho map shows map {0}.",clickedMap.MapId);
         }
         if(chatLinkMenu is not { } menu)return;
         if(!ImGui.BeginPopup("###TenshoChatMapLinkMenu")){chatLinkMenu=null;return;}

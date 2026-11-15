@@ -192,6 +192,8 @@ internal sealed class GardenChatWatcher : IDisposable
             }
             var seed=chosenSeed!=0 && DateTimeOffset.UtcNow-chosenAt<TimeSpan.FromSeconds(60) ? chosenSeed:(uint?)null;
             chosenSeed=0;
+            // X-395 M3 (0.1366): the menu noted for this planting is not a harvest of the next gain line.
+            menuMemory.Forget();
             planted(found,seed,Place());
         }
         catch(Exception error)

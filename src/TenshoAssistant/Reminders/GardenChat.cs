@@ -124,11 +124,14 @@ public static class GardenHarvests
 public sealed class GardenMenuMemory
 {
     public static readonly TimeSpan Window=TimeSpan.FromSeconds(30);
-    /// <summary>X-382 (0.1360): a gain line within 10 s of a bed's menu, at the same place, is that bed's harvest (1.3 to 1.6 s in the log of 14/11).</summary>
-    public static readonly TimeSpan HarvestWindow=TimeSpan.FromSeconds(10);
+    /// <summary>X-382 (0.1360): a gain line within this time of a bed's menu, at the same place, is that bed's harvest (1.3 to 1.6 s in the log of 14/11).
+    /// X-395 M3 (0.1366): 4 s instead of 10 s, so that a menu closed without anything done is soon forgotten.</summary>
+    public static readonly TimeSpan HarvestWindow=TimeSpan.FromSeconds(4);
     private readonly object gate=new();
     private (int Patch,int Bed,string? Place,DateTimeOffset At)? last;
     public void Seen(int patch,int bed,string? place,DateTimeOffset at){lock(gate)last=(patch,bed,place,at);}
+    /// <summary>X-395 M3 (0.1366): a planting closes the menu's story: its bed is not the next gain's harvest.</summary>
+    public void Forget(){lock(gate)last=null;}
     /// <summary>X-382 (0.1360): the bed of the menu seen at this place within <paramref name="window"/>, without forgetting it.</summary>
     public (int Patch,int Bed)? Peek(string? place,DateTimeOffset now,TimeSpan window)
     {
