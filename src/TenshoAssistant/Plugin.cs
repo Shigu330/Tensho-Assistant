@@ -1357,10 +1357,19 @@ public sealed partial class Plugin : IDalamudPlugin
             {
                 var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));
                 registrations.Register(()=>{},()=>suspensions.Dispose());
+                // X-433 (0.1433): the gaps between the game's frames meanwhile (the interface's Draw, once a frame; not a framework
+                // subscription, which would wait for the readers' compiler), whatever ran meanwhile: a stop of every managed thread by a
+                // collection freezes the game only if its thread waits too.
+                var gaps=new Diagnostics.FrameGaps();
+                void Gap(){if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
+                pluginInterface.UiBuilder.Draw+=Gap;
+                registrations.Register(()=>{},()=>pluginInterface.UiBuilder.Draw-=Gap);
                 _=Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length).ContinueWith(_=>
                 {
+                    pluginInterface.UiBuilder.Draw-=Gap;
                     if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))
                     {
+                        log.Information(gaps.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Types.Summary());
                         log.Information(suspensions.Collections.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
