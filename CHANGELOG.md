@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1374.0
+- Plan global, X-405 : Vocabulaire français (choix recommandés des décisions D-170 et D-171, appliqués en attendant la réponse de l'utilisateur) : « duty » se dit « mission » partout, le nom du client (Addon#2225.0, #3770.0, #11170.0, MainCommand#43.5) : la page devient « Butin des missions », le réglage de la carte « Masquer en mission » ; « contenu » ne garde que le groupe CONTENUS, le contenu classé et le contenu d'un sac ou du presse-papiers. Un PNJ qui vend est un « marchand » (Addon#3408.0, #7610.0, MainCommand#71.6) : la page et l'outil s'appellent partout « PNJ marchands » ; « vendeur » reste le joueur du tableau des ventes (Addon#6996.0). En anglais, « merchant directory » et « Shopkeepers » s'alignent sur « vendor ».
+- Pour les joueurs : textes français : les contenus s'appellent « missions » et les PNJ vendeurs « marchands » partout, comme dans le jeu.
+- Tests : Vocabulary1374Tests. Verify.ps1 (agent) : 2583/2583, 0 avertissement, 0 erreur ; DLL 0.1374.0.0. Non validé en jeu.
+### English
+- French vocabulary (recommended choices of decisions D-170 and D-171, applied while the user has not answered): « duty » is « mission » everywhere, the client's name (Addon#2225.0, #3770.0, #11170.0, MainCommand#43.5): the page becomes « Butin des missions », the map's setting « Masquer en mission »; « contenu » keeps only the CONTENUS group, ranked content and the contents of a bag or the clipboard. An NPC who sells is a « marchand » (Addon#3408.0, #7610.0, MainCommand#71.6): the page and the tool are « PNJ marchands » everywhere; « vendeur » stays the market-board player (Addon#6996.0). In English, « merchant directory » and « Shopkeepers » are aligned on « vendor ».
+- For players: French texts: duties are called « missions » and NPC vendors « marchands » everywhere, as in the game.
+
 ## 0.1373.0
 - Plan global, X-366 : Dédale bestial : dans le panneau d'équipe devant le plateau, les lignes longues passent à la ligne dans la largeur du panneau au lieu d'être coupées au bord (« Rangs pas encore lus… », noms des ennemis, équipe de chaque combat), les lignes des combats gardent leur retrait ; le compte des faiblesses s'accorde : « faiblesse touchée : 0 sur 1 ennemi », « 2 sur 3 ennemis » (anglais « 0 of 1 enemy »). La page Dédale (onglet Équipe) suit les mêmes retours à la ligne. Essai T0-13 du 14/11.
 - Pour les joueurs : dédale bestial : les lignes longues du panneau d'équipe passent à la ligne au lieu d'être coupées, et « 0 sur 1 ennemi » est au singulier.

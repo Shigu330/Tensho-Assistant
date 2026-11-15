@@ -242,8 +242,8 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Monde | **Carte** | La carte Tensho, avec votre position, drapeaux, favoris, lieux notoires, points de récolte et quêtes ; aussi les liens de carte du chat, les terrains en vente, un relevé de train de chasse et les conditions d'apparition des rangs S. |
 |  | **Météo** | Les prévisions météo d'une zone et ses prochaines fenêtres. |
 |  | **ALÉA** | Où se tient chaque ALÉA des zones ouvertes, avec son niveau, d'après les fichiers du jeu. |
-|  | **PNJ vendeurs** | Qui vend un objet, à quel prix et où. |
-|  | **Butin des contenus** | Ce que chaque contenu peut donner, et où vous en êtes. |
+|  | **PNJ marchands** | Qui vend un objet, à quel prix et où. |
+|  | **Butin des missions** | Ce que chaque mission peut donner, et où vous en êtes. |
 |  | **Butin des monstres** | Quels monstres donnent l'objet choisi, et où les trouver. |
 |  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'infobulle des objets montrent ce que vous avez vu. |
 | Suivi | **Alarmes** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
