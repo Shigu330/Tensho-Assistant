@@ -203,6 +203,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         $"Panels opened {panelGate.OpenedAfter} ms after the load ({(panelGate.ByBound ? "at the bound" : "their code compiled")}: {jitWarmup.Prepared} of {jitWarmup.FirstPartMethods} methods with what they call compiled by then, all ready {jitWarmup.FirstReadyAfter:F0} ms after the load, -1 = not yet); their first frame {frameMs:F0} ms.");
     /// <summary>X-177 C4.2 (0.1200): the interface's code (map, overlays) is compiled: the readers' classes may be compiled next.</summary>
     internal bool WarmupEarlyDone=>jitWarmup.EarlyDone;
+    /// <summary>X-433 (0.1425): the warm-up's longest compilations so far, for the readers' compiler's lines of the log.</summary>
+    internal string WarmupSlowest=>jitWarmup.Slowest;
 
     private readonly Diagnostics.JitWarmup jitWarmup;
 

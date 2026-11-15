@@ -25,6 +25,16 @@ public sealed class JitWarmup : IDisposable
     private volatile bool disposed;
 
     public int Prepared { get; private set; }
+    /// <summary>X-433 (0.1425): the warm-up's five longest compilations so far, with the clock time each ended (for the log).</summary>
+    public string Slowest=>slowest.Text();
+    private readonly SlowCompilations slowest=new();
+    private bool Timed(MethodBase method,Func<bool> compile)
+    {
+        var at=System.Diagnostics.Stopwatch.GetTimestamp();
+        var compiled=compile();
+        slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now);
+        return compiled;
+    }
     /// <summary>X-01 (0.1104): how many of <see cref="Prepared"/> were compiled first.</summary>
     public int EarlyPrepared { get; private set; }
     public int Skipped { get; private set; }
@@ -311,7 +321,7 @@ public sealed class JitWarmup : IDisposable
                 {
                     if(token.IsCancellationRequested)return;
                     compiled.Add(method);
-                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                    if(Timed(method,()=>CallGraph.Prepare(method)))Prepared++;else Skipped++;
                 }
                 FirstPrepared=Prepared;
                 FirstReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
@@ -329,7 +339,7 @@ public sealed class JitWarmup : IDisposable
                     if(WindowPartMethods>=WindowCap)break;
                     if(!compiled.Add(method))continue;
                     WindowPartMethods++;
-                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                    if(Timed(method,()=>CallGraph.Prepare(method)))Prepared++;else Skipped++;
                 }
                 WindowReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
             }
@@ -351,7 +361,7 @@ public sealed class JitWarmup : IDisposable
                     while(holdRest is not null && Held(holdRest) && System.Diagnostics.Stopwatch.GetElapsedTime(held)<RestHold)
                         if(token.WaitHandle.WaitOne(50))return;
                 }
-                try{RuntimeHelpers.PrepareMethod(method.MethodHandle);Prepared++;}
+                try{Timed(method,()=>{RuntimeHelpers.PrepareMethod(method.MethodHandle);return true;});Prepared++;}
                 catch(Exception){Skipped++;}
             }
             Elapsed=System.Diagnostics.Stopwatch.GetElapsedTime(started);

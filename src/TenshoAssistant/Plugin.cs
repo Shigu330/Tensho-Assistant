@@ -1380,6 +1380,9 @@ public sealed partial class Plugin : IDalamudPlugin
                     // X-433 (0.1424): the longest compilations, to compare with a hitch's time.
                     if(TenshoAssistant.Competitive.CompetitiveGate.CompilerSlowest is { Length:>0 } slowest)
                         log.Information("Readers' longest compilations: {0}.",slowest);
+                    // X-433 (0.1425): and the JIT warm-up's, the other thread that compiles while the readers start.
+                    if(mainWindow.WarmupSlowest is { Length:>0 } warmup)
+                        log.Information("JIT warm-up's longest compilations so far: {0}.",warmup);
                 }
                 SayReaders();
                 // 0.1200: the classes come after the interface's code: said again once they had the time to end.
