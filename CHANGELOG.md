@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1398.0
+- Plan global, X-420 : Banque, « Effacer ce personnage » : suite de 0.1391. Quand une ligne d'un autre personnage ne pouvait pas être lue du tout (écrite par un autre client ou une autre version : JSON abîmé, autre schéma, ligne trop grosse, clé qui ne correspond pas à l'entrée), l'effacement était fait mais la relecture levait une erreur : la Banque gardait le personnage effacé à l'écran et répondait « échec de l'enregistrement ». La relecture entière (lecture des lignes et contrôles) se replie maintenant sur les autres personnages tels que ce client les tient ; la réponse est « Personnage effacé ». Les lignes illisibles restent telles quelles (le chargement suivant échoue fermé dessus, comme avant). Test : BankEraseRows1398Tests (le service, trois sortes de lignes illisibles : ce qu'il montre et répond, deux effacements de suite, un autre personnage).
+- Pour les joueurs : banque : effacer un personnage ne signale plus un échec quand les données d'un autre personnage sont illisibles.
+- Tests : BankEraseRows1398Tests. Verify.ps1 (agent) : 2648/2648, 0 avertissement, 0 erreur ; DLL 0.1398.0.0. Rien à essayer en jeu.
+### English
+- Bank, « Erase this character »: follow-up of 0.1391. When a row of another character could not be read at all (written by another client or version: broken JSON, another schema, too big, key disagreeing with its entry), the erase was done but the read back threw: the bank kept the erased character on screen and answered « Bank save failed ». The whole read back (reading the rows and the checks) now falls back to the other characters as this client holds them; the answer is « Character erased ». The unreadable rows are left as they are (the next load fails closed on them, as before). Test: BankEraseRows1398Tests (the service, three kinds of unreadable rows: what it shows and answers, two erases in a row, another character).
+- For players: Bank: erasing a character no longer reports a failure when another character's saved data cannot be read.
+
 ## 0.1397.0
 - Plan global, X-307 : Preuve docs/evidence/0.1394-retainer-finder.md complétée par la seconde lecture (0.1395) : la copie que le jeu garde des sacs de chaque servant suit l'ordre d'affichage de la fenêtre du servant (2 servants sur 2), pas l'ordre des cases des pages ; mêmes objets, HQ à part (identifiant + 1 000 000) et mêmes cristaux que la Banque. Elle peut donc servir au tableau des servants (X-196) et de repli à la Banque quand l'ordre visuel manque (X-275).
 - Tests : RetainerFinder1394Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1397.0.0. Rien à essayer en jeu.
