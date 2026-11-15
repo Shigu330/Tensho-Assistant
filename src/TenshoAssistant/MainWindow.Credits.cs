@@ -65,8 +65,8 @@ internal sealed partial class MainWindow
     };
 
     private bool CreditMatches(Credit credit,string filter)=>
-        CreditName(credit).Contains(filter,StringComparison.OrdinalIgnoreCase) || credit.Author.Contains(filter,StringComparison.OrdinalIgnoreCase)
-        || CreditLicense(credit).Contains(filter,StringComparison.OrdinalIgnoreCase) || localization.Get("Credits.Items."+credit.Id).Contains(filter,StringComparison.OrdinalIgnoreCase);
+        SearchText.Contains(CreditName(credit),filter,StringComparison.OrdinalIgnoreCase) || SearchText.Contains(credit.Author,filter,StringComparison.OrdinalIgnoreCase)
+        || SearchText.Contains(CreditLicense(credit),filter,StringComparison.OrdinalIgnoreCase) || SearchText.Contains(localization.Get("Credits.Items."+credit.Id),filter,StringComparison.OrdinalIgnoreCase);
 
     private void DrawCreditRow(Credit credit)
     {

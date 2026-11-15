@@ -137,7 +137,7 @@ internal sealed partial class MainWindow
             $"{localization.Get("DutyUi.FightCoffers")} ({Count(1)})",$"{localization.Get("DutyUi.ZoneCoffers")} ({Count(2)})"};
         var groups=document.Entries.Where(entry=>dutyFinderFilter==0 || (int)entry.Kind==dutyFinderFilter-1)
             .Where(entry=>LootKindMatches(items?.Find(entry.ItemId)))
-            .Where(entry=>query.Length==0 || (items?.Find(entry.ItemId)?.Name ?? "").Contains(query,StringComparison.CurrentCultureIgnoreCase)
+            .Where(entry=>query.Length==0 || SearchText.Contains((items?.Find(entry.ItemId)?.Name ?? ""),query,StringComparison.CurrentCultureIgnoreCase)
                 || entry.ItemId.ToString(CultureInfo.InvariantCulture)==query)
             .GroupBy(entry=>(entry.Kind,entry.SourceIndex)).OrderBy(group=>group.Key.Kind).ThenBy(group=>group.Key.SourceIndex)
             .Select(group=>new DutyFinderGroup(group.First(),group.Select(entry=>entry.ItemId).Distinct().ToArray())).ToArray();

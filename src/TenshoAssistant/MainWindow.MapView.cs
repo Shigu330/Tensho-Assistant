@@ -1005,7 +1005,7 @@ internal sealed partial class MainWindow
             :icon==FlagIcon || targetIcons.Contains(icon) ? 6
             :mapMarkers?.SymbolName(icon) is { Length:>0 } ? 7:8;
         var rows=icons.Select(icon=>(Icon:icon,Name:IconRowName(icon)))
-            .Where(row=>mapIconFilter.Length==0 || row.Name.Contains(mapIconFilter,StringComparison.CurrentCultureIgnoreCase))
+            .Where(row=>mapIconFilter.Length==0 || SearchText.Contains(row.Name,mapIconFilter,StringComparison.CurrentCultureIgnoreCase))
             .GroupBy(row=>Category(row.Icon)).OrderBy(group=>group.Key);
         foreach(var category in rows)
         {
@@ -1410,6 +1410,11 @@ internal sealed partial class MainWindow
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
             }
+            // X-386 (0.1402): bells and company chests placed by the layouts where the game's map has none (company workshops): drawn as the
+            // game's markers (same icon, size table and filter, hover name from MapSymbol).
+            if(settings.ShowFixedIcons && mapLocal?.State.Index is { } placedIndex)
+                foreach(var placed in placedIndex.OnMap(MapLocalKind.PlacedObject,map.MapId))
+                    Add(placed.Data,0,MapProjection.PixelFromWorld(new Vector3(placed.X,0,placed.Z),map),null);
             foreach(var point in islandPoints)
             {
                 var islandItems=itemCatalog.State.Catalog;
@@ -2238,6 +2243,16 @@ internal sealed partial class MainWindow
     // X-266 (0.1307): the quests the vendors of the cached map wait for, and which of them were seen when it was built: the map is built again when one changes.
     private (uint[] Quests,string Seen) mapVendorQuests=([],"");
     private string MapVendorQuestKey(uint[] quests)=>quests.Length==0 || QuestSeen is not { } seen ? "":string.Concat(quests.Select(quest=>seen(quest) ? '1':'0'));
+    // X-336 M5 (0.1380): the game's quests are read again at most once a second (a quest taken or done shows its vendors within a second).
+    private long mapVendorQuestsCheckedAt=-100_000;
+    private bool MapVendorQuestsChanged()
+    {
+        if(mapVendorQuests.Quests.Length==0)return false;
+        var now=Environment.TickCount64;
+        if(now-mapVendorQuestsCheckedAt<1000)return false;
+        mapVendorQuestsCheckedAt=now;
+        return MapVendorQuestKey(mapVendorQuests.Quests)!=mapVendorQuests.Seen;
+    }
     // 0.679: worked out once per map, not on every frame.
     private (uint MapId,MapCatalog? Catalog,HashSet<uint> Maps) mapSameLand=(0,null,[]);
     private HashSet<uint> SameLandMaps(MapDefinition map)
@@ -2262,7 +2277,7 @@ internal sealed partial class MainWindow
         var running=festivalState?.Active.Select(festival=>festival.Id).ToHashSet() ?? (mapVendorCache.Festivals is { Length:>0 } kept ? kept.Split(',').Select(uint.Parse).ToHashSet():[]);
         var festivalKey=string.Join(',',running.Order());
         if(mapVendorCache.MapId!=map.MapId || !ReferenceEquals(mapVendorCache.Catalog,catalog) || mapVendorCache.Festivals!=festivalKey
-           || mapVendorQuests.Quests.Length>0 && MapVendorQuestKey(mapVendorQuests.Quests)!=mapVendorQuests.Seen)
+           || MapVendorQuestsChanged())
         {
             // X-01 (0.1103, first map frame after a load: « canvas vendors » 71 to 156 ms, once 2 729 ms): the shops and the vendors of the map come
             // from the catalogue's indexes, built off the frame, instead of grouping every sale and scanning every vendor here.

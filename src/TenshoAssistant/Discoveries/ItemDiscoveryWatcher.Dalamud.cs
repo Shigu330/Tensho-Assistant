@@ -286,9 +286,10 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
             SettleGains(now);Step("settle");
             var (counts,hqCounts)=Counts();Step("counts");
             if(before is null || beforeHq is null){before=counts;beforeHq=hqCounts;return;}
-            var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);before=counts;
+            // X-433 (0.1450): the tables replaced are filled again at the next read (Counts).
+            var gains=ItemGains.Gains(before,counts);var losses=ItemGains.Losses(before,counts);spareAll=before;before=counts;
             // X-76 E1 (0.916): a gain is an HQ sighting when HQ units of the item came in (the bags count HQ apart, slot.IsHq).
-            var hqGains=ItemGains.Gains(beforeHq,hqCounts);beforeHq=hqCounts;
+            var hqGains=ItemGains.Gains(beforeHq,hqCounts);spareHq=beforeHq;beforeHq=hqCounts;
             if(gains.Count==0 || gains.Count>16)return;
             var fishing=wanted.Fishing && condition[ConditionFlag.Fishing];
             var crafting=condition[ConditionFlag.Crafting] || condition[ConditionFlag.PreparingToCraft];var gathering=condition[ConditionFlag.Gathering];
@@ -369,9 +370,14 @@ public sealed unsafe class ItemDiscoveryWatcher : IDisposable
     private static int EorzeaMinute(DateTimeOffset at)=>Gathering.GatheringTime.MinuteOfDay(at);
 
     /// <summary>Per item, the units in the bags, HQ and NQ together; and apart, the HQ units (X-76 E1, 0.916).</summary>
+    // X-433 (0.1450): the two tables of the read before last, emptied and filled again (two new tables ten times a second before: 8.6 MB
+    // of dictionary entries on the game's thread in the two minutes after a load, 0.1449's measure); null: none to reuse.
+    private Dictionary<uint,long>? spareAll,spareHq;
     private (Dictionary<uint,long> All,Dictionary<uint,long> Hq) Counts()
     {
-        var counts=new Dictionary<uint,long>();var hq=new Dictionary<uint,long>();
+        var counts=spareAll ?? new Dictionary<uint,long>();var hq=spareHq ?? new Dictionary<uint,long>();
+        spareAll=null;spareHq=null;
+        counts.Clear();hq.Clear();
         foreach(var bag in Bags)
             foreach(var slot in inventory.GetInventoryItems(bag))
                 if(!slot.IsEmpty && slot.BaseItemId!=0 && slot.Quantity>0)

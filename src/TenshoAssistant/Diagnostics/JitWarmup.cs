@@ -8,8 +8,8 @@ namespace TenshoAssistant.Diagnostics;
 /// load of the plugin. The desktop application's headless run measured it: Reminders 40.3 ms on its first frame, 38.9 ms of it compiling
 /// 79 methods; Gathering 57.4 ms, 45.3 ms compiling (docs/evidence/0.1050-first-frame-jit.md). In the game the same first frames were
 /// 92 to 161 ms (page sweep of 11/11 02:14). This compiles the window's methods ahead, then those of every other type of the plugin
-/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread below
-/// normal priority, a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
+/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread (below
+/// normal priority; normal from 0.1427 to 0.1431, undone in 0.1432), a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
 /// the libraries' code (ImGui, Lumina) stay compiled on first use. Its own thread, cancelled and joined on dispose (R07); a method
 /// that cannot be prepared (generic, abstract, without a body) is skipped, never an error for the window.
 /// </summary>
@@ -25,6 +25,21 @@ public sealed class JitWarmup : IDisposable
     private volatile bool disposed;
 
     public int Prepared { get; private set; }
+    /// <summary>X-433 (0.1425): the warm-up's five longest compilations so far, with the clock time each ended (for the log).</summary>
+    public string Slowest=>slowest.Text();
+    private readonly SlowCompilations slowest=new();
+    private bool Timed(MethodBase method,Func<bool> compile)
+    {
+        // X-437 M2 (0.1428): timed only when asked (developer mode): two GetThreadTimes, the clock and a lock for each of some 26 000 methods.
+        if(measure?.Invoke()!=true)return compile();
+        var at=System.Diagnostics.Stopwatch.GetTimestamp();
+        // X-433 (0.1426): and the warm-up thread's own processor time meanwhile (a long compilation that hardly used it was waiting).
+        var processorBefore=ThreadClock.ProcessorMs();
+        var compiled=compile();
+        var processor=processorBefore is { } before && ThreadClock.ProcessorMs() is { } after ? after-before:(double?)null;
+        slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now,processor);
+        return compiled;
+    }
     /// <summary>X-01 (0.1104): how many of <see cref="Prepared"/> were compiled first.</summary>
     public int EarlyPrepared { get; private set; }
     public int Skipped { get; private set; }
@@ -62,6 +77,17 @@ public sealed class JitWarmup : IDisposable
     /// A test checks that each name is still declared in the sources.</summary>
     public static readonly IReadOnlyList<string> WindowMethods=["PreDraw","PostDraw","Draw","DrawMain","DrawNavigation","DrawNavigationPopup","DrawPageHelpButton",
         "DrawCategoryNavigation","DrawHelpBanner"];
+    // X-433 (0.1449): « <Name> » made once (a lambda or a local function carries its outer method's name in angle brackets); the filters
+    // built it for every method and name (82 MB of strings on the warm-up's thread in the two minutes after a load, 0.1448).
+    private static readonly string[] WindowBracketed=Bracketed(WindowMethods);
+    private static string[] Bracketed(IReadOnlyList<string> names)=>[..names.Select(name=>"<"+name+">")];
+    /// <summary>X-433 (0.1449): the name is one of <paramref name="names"/>, or holds one in angle brackets; walked by index, nothing allocated.</summary>
+    private static bool Named(string name,IReadOnlyList<string> names,string[] bracketed)
+    {
+        for(var index=0;index<bracketed.Length;index++)
+            if(name==names[index] || name.Contains(bracketed[index],StringComparison.Ordinal))return true;
+        return false;
+    }
     /// <summary>X-01 (0.1282): a method of the main window's frame or of its first page (see <see cref="WindowMethods"/>).</summary>
     public static bool WindowFirst(MethodBase method)
     {
@@ -69,16 +95,20 @@ public sealed class JitWarmup : IDisposable
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
             if(type.Name=="MainWindow"){inWindow=true;break;}
         if(!inWindow)return false;
-        var name=method.Name;
-        foreach(var window in WindowMethods)
-            if(name==window || name.Contains("<"+window+">",StringComparison.Ordinal))return true;
-        return false;
+        return Named(method.Name,WindowMethods,WindowBracketed);
     }
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
+    /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
+    private readonly Func<bool>? measure;
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure)
     {
         var token=cancellation.Token;
+        this.measure=measure;
+        // X-433: below normal, so its seconds of processor never compete with the game's threads. 0.1427 ran it at normal priority on a
+        // hypothesis (docs/evidence/0.1427-warmup-priority.md: the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and disproved
+        // in 0.1432 (docs/evidence/0.1432-background-collection-stall.md): its long compilations without processor time were stops of every
+        // managed thread during a background collection, the game's included; undone.
         thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
@@ -91,8 +121,10 @@ public sealed class JitWarmup : IDisposable
     /// at most: the runtime compiles one method at a time for the plugin, so what the game's thread needs sooner is compiled first.</param>
     /// <param name="firstPart">X-01 (0.1279): with <paramref name="early"/>, the methods compiled before the rest of the early part, together
     /// with what they call in the plugin (<see cref="CallGraph.Closure"/>); <see cref="FirstPartDone"/> tells when.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart);
+    /// <param name="measure">X-437 M2 (0.1428): while it says true, each compilation is timed for the log (<see cref="Slowest"/>); the plugin
+    /// gives the developer mode. None: never timed.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -116,17 +148,13 @@ public sealed class JitWarmup : IDisposable
     /// </summary>
     public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
         "DrawEdgeMarkers","DrawGlyph","DrawPlayerArrow","BeastPlacesOf","RefreshQuestIndex"];
+    private static readonly string[] MapPathBracketed=Bracketed(MapPathMethods);
     /// <summary>X-01 C3.3 (0.1188): the settings' methods the canvas calls for each icon (size and priority, per map).</summary>
     public static readonly IReadOnlyList<string> MapPathSettings=["SizeOf","PriorityOf","CleanSize"];
     /// <summary>X-01 C3.3 (0.1188): the namespace of the vendors' catalogue, read by the canvas for its vendor icons.</summary>
     public const string VendorNamespace="TenshoAssistant.Npcs";
 
-    private static bool OnMapPath(string name)
-    {
-        foreach(var path in MapPathMethods)
-            if(name==path || name.Contains("<"+path+">",StringComparison.Ordinal))return true;
-        return false;
-    }
+    private static bool OnMapPath(string name)=>Named(name,MapPathMethods,MapPathBracketed);
 
     /// <summary>
     /// X-01 C2.1 (0.1185, analysis of 12/11: the overlays' first frame came about 1.9 s after the warm-up started, before the « everything
@@ -138,6 +166,7 @@ public sealed class JitWarmup : IDisposable
         "DrawCactpotOverlay","DrawCraftLivePanel","DrawInventorySortButton","ObserveRegenTick","DrawChatLinkMenu","DrawTriadOverlay","DrawTriadRequestPanel","DrawTriadDeckReminder","DrawCharacterPanel",
         "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
         "ProcessGameLogRequest","ObserveHuntTrain","ObserveOccultAlerts","ObserveGarden","WatchWishlistSales","WatchPlots","DrawFishingPanel","RefreshNearbyMonsters"];
+    private static readonly string[] OverlayBracketed=Bracketed(OverlayMethods);
     /// <summary>Words of the main window's methods that belong to the free panels and bars drawn every frame (tracker, wear bar, alarm and reminder bars).</summary>
     public static readonly IReadOnlyList<string> OverlayWords=["Tracker","Panel","Bar","Overlay"];
 
@@ -152,10 +181,9 @@ public sealed class JitWarmup : IDisposable
             if(type.Name=="MainWindow"){inWindow=true;break;}
         if(!inWindow)return false;
         var name=method.Name;
-        foreach(var overlay in OverlayMethods)
-            if(name==overlay || name.Contains("<"+overlay+">",StringComparison.Ordinal))return true;
-        foreach(var word in OverlayWords)
-            if(name.Contains(word,StringComparison.Ordinal))return true;
+        if(Named(name,OverlayMethods,OverlayBracketed))return true;
+        for(var index=0;index<OverlayWords.Count;index++)
+            if(name.Contains(OverlayWords[index],StringComparison.Ordinal))return true;
         return false;
     }
 
@@ -166,8 +194,18 @@ public sealed class JitWarmup : IDisposable
     public const string MapNamespace="TenshoAssistant.Maps";
 
     /// <summary>X-01 (0.1104): the early methods first, then the others, each part in its former order.</summary>
-    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)
-        =>[..methods.Where(early),..methods.Where(method=>!early(method))];
+    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)=>EarlyFirst(methods,early,out _);
+
+    /// <summary>X-433 (0.1449): the same in one pass, <paramref name="early"/> asked once per method, and how many are early.</summary>
+    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early,out int earlyCount)
+    {
+        var first=new List<MethodBase>(methods.Count);
+        var rest=new List<MethodBase>();
+        for(var index=0;index<methods.Count;index++)(early(methods[index]) ? first:rest).Add(methods[index]);
+        earlyCount=first.Count;
+        first.AddRange(rest);
+        return first;
+    }
 
     /// <summary>The first type, then every type of its assembly (those that load: a type whose dependency is missing is left out).</summary>
     public static IReadOnlyList<Type> FirstThenAssembly(Type first)
@@ -223,7 +261,8 @@ public sealed class JitWarmup : IDisposable
     /// outside it at the first level, 50 at the next). 0: the class alone, as before.</param>
     /// <param name="known">X-177 (0.1281): methods already taken by an earlier class (shared by the caller, one thread): left out and not
     /// counted again; the ones taken here are added.</param>
-    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null,int callees=0,ISet<MethodBase>? known=null)
+    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null,int callees=0,ISet<MethodBase>? known=null,
+        Action<MethodBase,double>? timed=null)
     {
         IReadOnlyList<MethodBase> methods;
         try
@@ -233,6 +272,7 @@ public sealed class JitWarmup : IDisposable
             if(methods.Count>cap)methods=handler.DeclaringType is { } own ? Methods([own]):[];
             if(methods.Count>cap)return 0;
             if(callees>0 && methods.Count>0 && owner is not null)
+                // X-444 M2 (0.1446): the plugin's own callees only; 0.1439's game-API leaves removed (no gain measured, places taken in the cap).
                 methods=[..CallGraph.Closure(methods,owner.Assembly,methods.Count+callees,stop).Where(method=>known?.Contains(method)!=true)];
         }
         catch(Exception){return 0;}
@@ -243,9 +283,12 @@ public sealed class JitWarmup : IDisposable
             known?.Add(method);
             try
             {
+                // X-433 (0.1424): each compilation's time, for the longest ones (timed).
+                var at=System.Diagnostics.Stopwatch.GetTimestamp();
                 if(prepare is not null)prepare(method);
                 else if(!CallGraph.Prepare(method))continue;
                 prepared++;
+                timed?.Invoke(method,System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds);
             }
             catch(Exception){}
         }
@@ -291,6 +334,7 @@ public sealed class JitWarmup : IDisposable
     {
         try
         {
+            Interlocked.Exchange(ref ThreadClock.WarmupThread,ThreadClock.SystemId());
             if(early is null){earlyDone=true;firstPartDone=true;}
             var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
             if(token.WaitHandle.WaitOne(early is null ? delay:first))return;
@@ -307,7 +351,7 @@ public sealed class JitWarmup : IDisposable
                 {
                     if(token.IsCancellationRequested)return;
                     compiled.Add(method);
-                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                    if(Timed(method,()=>CallGraph.Prepare(method)))Prepared++;else Skipped++;
                 }
                 FirstPrepared=Prepared;
                 FirstReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
@@ -325,14 +369,16 @@ public sealed class JitWarmup : IDisposable
                     if(WindowPartMethods>=WindowCap)break;
                     if(!compiled.Add(method))continue;
                     WindowPartMethods++;
-                    if(CallGraph.Prepare(method))Prepared++;else Skipped++;
+                    if(Timed(method,()=>CallGraph.Prepare(method)))Prepared++;else Skipped++;
                 }
                 WindowReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
             }
             if(compiled.Count>0)methods=[..methods.Where(method=>!compiled.Contains(method))];
-            var earlyCount=early is null ? 0:methods.Count(early);
+            // X-433 (0.1449): the early filter asked once per method (it was three times: a count, then two passes).
+            var earlyCount=0;
+            var ordered=early is null ? methods:EarlyFirst(methods,early,out earlyCount);
             var index=0;
-            foreach(var method in early is null ? methods:EarlyFirst(methods,early))
+            foreach(var method in ordered)
             {
                 if(token.IsCancellationRequested)return;
                 // 0.1104: the early part done, the rest waits until the usual delay after loading.
@@ -347,7 +393,7 @@ public sealed class JitWarmup : IDisposable
                     while(holdRest is not null && Held(holdRest) && System.Diagnostics.Stopwatch.GetElapsedTime(held)<RestHold)
                         if(token.WaitHandle.WaitOne(50))return;
                 }
-                try{RuntimeHelpers.PrepareMethod(method.MethodHandle);Prepared++;}
+                try{Timed(method,()=>{RuntimeHelpers.PrepareMethod(method.MethodHandle);return true;});Prepared++;}
                 catch(Exception){Skipped++;}
             }
             Elapsed=System.Diagnostics.Stopwatch.GetElapsedTime(started);

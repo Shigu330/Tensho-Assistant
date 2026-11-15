@@ -137,13 +137,29 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 {
                     using var open=opened.Open();
                     Convert(open);
-                    if(change.Erase!=0){EraseEverywhere(open,id);everyone=Rows(open,null);return Array.Empty<BankEntry>();}
+                    if(change.Erase!=0)
+                    {
+                        // X-414 (0.1386): the erase is the player's command and only removes rows: done first, whatever the other characters
+                        // hold. X-418 (0.1391): the bank read back is shown only when it passes the checks (unchecked in 0.1380); otherwise the
+                        // other characters as this client holds them (checked when they were shown, without the erased one), never a failure:
+                        // the erase is done, and saying it failed kept the erased character on screen.
+                        // X-420 (0.1398): the read back as a whole: a row of another character that cannot be read (written by another client
+                        // or version: bad JSON, another schema, too big, key disagreeing with its entry) throws from Rows, not from the checks.
+                        EraseEverywhere(open,id);
+                        try{var readBack=Rows(open,null);InventoryBankService.ValidateEntries(readBack);everyone=readBack;}
+                        catch(Exception error) when(error is ArgumentException or InvalidDataException or SqliteException){everyone=null;}
+                        return Array.Empty<BankEntry>();
+                    }
                     using var transaction=open.BeginTransaction();
                     var rowsBefore=change.Erase!=0 ? []:Rows(open,transaction,id);
                     var rowsAfter=change.Erase!=0 ? []:change.On(rowsBefore);
                     InventoryBankService.ValidateEntries(rowsAfter);
                     if(change.Erase!=0 || !StillSaved(change,rowsBefore) && !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
                     everyone=Rows(open,transaction);
+                    // X-336 M12 (0.1380): checked before the commit: an invalid row makes the save fail as a whole, never after it was written.
+                    // X-414 (0.1386): a row of another character that fails the checks (written by another client or version) fails this
+                    // character's save too, nothing written: the same rows make Load fail closed (the bank unavailable, the files protected).
+                    InventoryBankService.ValidateEntries(everyone);
                     transaction.Commit();
                     return rowsAfter;
                 }
@@ -161,7 +177,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 if(!StillSaved(change,before) && !before.SequenceEqual(after))Store(id).Save(after);
                 return after;
             });
-            var result=everyone ?? memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
+            if(everyone is not null)return everyone;
+            var result=memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
             InventoryBankService.ValidateEntries(result);
             return result;
         }

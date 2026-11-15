@@ -54,12 +54,16 @@ public sealed class AchievementProgressData
                     {
                         var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
                         marked=converted is not null;
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value))
-                           && TenshoDataFile.StillThere(ReadOrSetAside) is { } found)
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
                         {
-                            Upsert(open,transaction,found.Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
-                            if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
-                            marked=true;
+                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
+                            if(TenshoDataFile.StillThere(ReadOrSetAside) is { } found)
+                            {
+                                Upsert(open,transaction,found.Select(pair=>(pair.Key,(IReadOnlyDictionary<uint,AchievementProgress>)pair.Value)).ToList());
+                                if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                                marked=true;
+                            }
+                            else marked=false;
                         }
                         DuringSave?.Invoke();
                         transaction.Commit();

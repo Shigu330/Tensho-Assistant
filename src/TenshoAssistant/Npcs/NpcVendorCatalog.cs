@@ -50,6 +50,10 @@ public static class NpcShopLinks
     /// vendor's layers in its territory: a festival's (0.828), or a quest's when every layer there is a quest's (Cristiana 1016290, only layer
     /// « QST_JobRel101 », quest 67748 not taken: not in the game); placed by no layer anywhere, unplaced (0.829); otherwise always.
     /// </summary>
+    /// <summary>X-336 M10 (0.1380): a place on quest layers is « during the quest » only when a quest is linked; linked to none, it stays shown
+    /// (Always, as before 0.1307), since no quest of the player's could ever show it.</summary>
+    public static int QuestLinked(int linkedQuests)=>linkedQuests>0 ? DuringQuest:Always;
+
     public static int LevelCondition((int Condition,uint Festival)? placed,bool placedAnywhere)=>placed switch
     {
         { Condition:DuringFestival }=>DuringFestival,

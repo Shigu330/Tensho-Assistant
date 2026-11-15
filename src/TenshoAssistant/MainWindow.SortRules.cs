@@ -148,8 +148,8 @@ internal sealed partial class MainWindow
                                             ImGui.Separator();
                                         }
                                         foreach(var value in catalog.Categories.Where(value=>!categories.Contains(value.Id)
-                                            && (filter.Length==0 || System.Globalization.CultureInfo.InvariantCulture.CompareInfo.IndexOf(value.Name,filter,
-                                                System.Globalization.CompareOptions.IgnoreCase|System.Globalization.CompareOptions.IgnoreNonSpace)>=0)))
+                                            && (filter.Length==0 || SearchText.Contains(value.Name,filter,
+                                                System.Globalization.CompareOptions.IgnoreCase|System.Globalization.CompareOptions.IgnoreNonSpace,System.Globalization.CultureInfo.InvariantCulture))))
                                         {
                                             shown++;
                                             if(ImGui.Selectable($"{value.Name}##{value.Id}")){categoryId=0;categoryIds=SortIds(categories.Append(value.Id));changed=true;}

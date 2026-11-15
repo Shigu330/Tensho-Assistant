@@ -190,6 +190,6 @@ internal sealed partial class MainWindow
         finally { ImGui.EndTable(); }
     }
 
-    private static bool SourceContains(string text, string query) => System.Globalization.CultureInfo.CurrentCulture.CompareInfo
-        .IndexOf(text, query.Trim(), System.Globalization.CompareOptions.IgnoreCase | System.Globalization.CompareOptions.IgnoreNonSpace) >= 0;
+    private static bool SourceContains(string text, string query) =>
+        SearchText.Contains(text, query.Trim(), System.Globalization.CompareOptions.IgnoreCase | System.Globalization.CompareOptions.IgnoreNonSpace);
 }

@@ -56,13 +56,17 @@ That map is Tensho's: by default it replaces the game's on the M key, with the s
 
 Tensho adds small panels next to some game windows (character sheet, Duty Finder, retainer sales, synthesis, gathering, fishing, the Sort button, Triple Triad) and lines in the server bar. The guide's step « Panels next to the game's windows » turns them all off or on at once (Help › « Start the guide »); each one also has its switch in Settings, and the reset button (curved arrow) puts it back.
 
+## What is the Tensho chat window?
+
+An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads: the game's chat stays where it is, never hidden, and nothing is sent from it. Messages stay in memory only, are never saved on disk, and are cleared when you turn the window off or log out. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+
 ## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
 In PvP zones and other ranked content (Triple Triad tournaments, Mahjong), the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this. In deep dungeons Tensho works as in any dungeon, but the game draws its own map there: Tensho's map hides and leaves the game's map until you leave.
 
 ## How do I update Tensho?
 
-Nothing to do: Dalamud updates it like any other plugin, when the game starts or from the plugin installer (/xlplugins › « Update »). What changed in each version is in CHANGELOG.md on GitHub. The desktop app updates itself.
+Nothing to do: Dalamud updates it like any other plugin, when the game starts or from the plugin installer (/xlplugins › « Update plugins »). What changed in each version is in CHANGELOG.md on GitHub. The desktop app updates itself.
 
 ## How do I start over?
 
@@ -148,7 +152,7 @@ Les prix, le butin, les pages du wiki et les données communautaires sont demand
 
 ## Puis-je couper les données communautaires ?
 
-Oui : Paramètres › Données et sources › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
+Oui : Paramètres › Données et sources › « Données du jeu et vos observations seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
 
 ## Tensho est-il sûr, et est-il permis ?
 
@@ -174,13 +178,17 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 
 Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre du serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
 
+## Qu'est-ce que la fenêtre de chat Tensho ?
+
+Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire : le chat du jeu reste à sa place, jamais caché, et rien n'est envoyé depuis elle. Les messages restent en mémoire seulement, ne sont jamais enregistrés sur le disque et sont effacés quand vous désactivez la fenêtre ou vous déconnectez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
+
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
 Dans les zones JcJ et les autres contenus classés (tournois de Triple Triade, Mahjong), tout le plugin cesse de lire le jeu et le dit. Il revient tout seul quand vous en sortez. Aucun réglage ne change cela. En donjon sans fond, Tensho marche comme dans tout donjon, mais le jeu y dessine sa propre carte : la carte de Tensho se cache et laisse celle du jeu jusqu'à votre sortie.
 
 ## Comment mettre Tensho à jour ?
 
-Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage du jeu ou depuis l'installateur de plugins (/xlplugins › « Mettre à jour »). Les changements de chaque version sont dans CHANGELOG.md sur GitHub. L'application de bureau se met à jour seule.
+Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage du jeu ou depuis l'installateur de plugins (/xlplugins › « Mettre à jour les plugins »). Les changements de chaque version sont dans CHANGELOG.md sur GitHub. L'application de bureau se met à jour seule.
 
 ## Comment repartir de zéro ?
 
@@ -212,11 +220,11 @@ Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de ce
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 
-Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque parcelle en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
+Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 
-Dans Dalamud › Settings › Experimental › Custom Plugin Repositories, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
+Dans Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
 
 ## Puis-je voir Tensho sans le jeu ?
 

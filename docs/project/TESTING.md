@@ -1545,7 +1545,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1233) Page Mini Cactpot : « Prochain JACTA » à la prochaine heure :00, :20 ou :40 de l'horloge du PC ; « Tirage du Méga Cactpot » le bon jour à l'heure du PC (Europe : samedi 20:00 en heure d'hiver française) ; cloche du tirage : une alarme hebdomadaire apparaît dans Alarmes
 
-- [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir le support des roues éthérées (une roue posée au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle la roue a été posée et le temps restant que montre le jeu
+- [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir la base de tours éthéréens (un tour posé au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle le tour a été posé et le temps restant que montre le jeu
 
 - [x] (0.1235) Page Chocobo, section « Chocobo de course » avant toute course : « Pas encore lu » ; ouvrir la fiche du chocobo de course dans le jeu (Gold Saucer, guichet des courses) : catégorie, cote, pedigree, caractéristiques et aptitudes identiques à la fenêtre du jeu
 
@@ -1771,7 +1771,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1316) Discord (si un salon est réglé) : le bouton d'essai envoie « … dans 5 min (…) » ; un message personnel avec [minutes] garde le nombre seul
 
-- [ ] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
+- [x] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
 
 - [x] (0.1318) Eurêka et Bozja › Météo et nuit : chaque monstre « nuit » montre une prochaine fenêtre (« maintenant » ou dans moins de 70 min) ; les monstres à météo montrent la leur quand la météo vient dans les 28 h ; comparer une ligne avec la météo annoncée en jeu dans la zone
 
@@ -1817,27 +1817,133 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1349) Monde › Découvertes › Échanger maintenant : l'échange finit « fait » et le fichier commun est dit récupéré ou à jour (lu dans community-discoveries/v3/ seulement).
 
-- [ ] (0.1350) Objets : ouvrir la fiche de la Bague d'attaquant de grand champion (ou un autre objet récent vendu par un PNJ) : l'en-tête dit « Ajouté au patch 7.4 (Garland Tools) » après un instant ; survoler l'objet dans une liste de Tensho et garder la souris dessus : l'infobulle dit la même ligne ; Paramètres › Données et sources › Garland coupé : la ligne disparaît des deux.
+- [x] (0.1350) Objets : ouvrir la fiche de la Bague d'attaquant de grand champion (ou un autre objet récent vendu par un PNJ) : l'en-tête dit « Ajouté au patch 7.4 (Garland Tools) » après un instant ; survoler l'objet dans une liste de Tensho et garder la souris dessus : l'infobulle dit la même ligne ; Paramètres › Données et sources › Garland coupé : la ligne disparaît des deux.
 
 - [ ] (0.1351) Chat : un lien de carte (par exemple le vôtre, tapé <flag> dans Dire) ; clic gauche : le jeu pose son drapeau, comme avant ; clic droit sur le lien : le menu « Tensho — lieu » s'ouvre à la souris (nom du lieu et coordonnées, Drapeau, Éthérite la plus proche, Afficher sur la carte, Météo de la zone) ; « Éthérite la plus proche » ouvre la carte Tensho sur le point avec la question de téléportation et son coût ; clic droit sur un lien d'objet : toujours le menu du jeu avec « Tensho — objet », pas le menu de lieu ; mode développeur : dalamud.log dit « Chat link hovered (ChatLogPanel_n): map link, map N » au survol.
 
 - [ ] (0.1351) Carte › réglages › « Liens de carte du chat » coupé : le clic droit sur un lien de carte n'ouvre plus rien de Tensho.
 
-- [ ] (0.1352) Plugin en français : la barre latérale dit « ALÉA », « Eurêka et Bozja », « Donjons sans fond », « Armes antiques » ; Rappels : onglets « Missions aléatoires » et « Escouade » ; Rangements : onglet « Devises » ; Banque : « Coiffeuse mirage » et « Bahut personnel » ; Collections : onglet « Hauts faits » ; Compagnie libre : « Aéronefs » et « Secteurs d'aéronef » ; Équipement : « Tenues du jeu » ; aucun texte coupé ni débordant.
+- [x] (0.1352) Plugin en français : la barre latérale dit « ALÉA », « Eurêka et Bozja », « Donjons sans fond », « Armes antiques » ; Rappels : onglets « Missions aléatoires » et « Escouade » ; Rangements : onglet « Devises » ; Banque : « Coiffeuse mirage » et « Bahut personnel » ; Collections : onglet « Hauts faits » ; Compagnie libre : « Aéronefs » et « Secteurs d'aéronef » ; Équipement : « Tenues du jeu » ; aucun texte coupé ni débordant.
 
 - [ ] (0.1352) Plugin en anglais : Dresseur, infobulle d'une bête « Trick / Tempered Release », colonne « CON », « Boss of the Board », filtre « Classification » ; Récolte : « logs » ; Triple Triade : « Card List ».
 
-- [ ] (0.1353) Plugin en français : la barre latérale dit « Accueil » ; l'aide de première visite des Livraisons spéciales cite « Lire de nouveau », comme le bouton de la page ; aucun texte coupé.
+- [x] (0.1353) Plugin en français : la barre latérale dit « Accueil » ; l'aide de première visite des Livraisons spéciales cite « Lire de nouveau », comme le bouton de la page ; aucun texte coupé.
 
 - [ ] (0.1354) Plugin en français : Découvertes, ligne « ALÉA vus » ; Dresseur, colonne des lieux « (1 lieu(x) vu(s)) » ; recherche d'un objet avec une apostrophe tapée au clavier (« d'Ehcatl » par exemple) : il est trouvé.
 
-- [ ] (0.1355) Plugin en français : en-tête et page Météo, l'heure du jeu s'écrit « HE » ; Paramètres › Panneaux, réglage « Fenêtre « Modifier le jeu » » de Triple Triade ; Marché, colonne « Servant » et portée « Centre de traitement de données ».
+- [x] (0.1355) Plugin en français : en-tête et page Météo, l'heure du jeu s'écrit « HE » ; Paramètres › Panneaux, réglage « Fenêtre « Modifier le jeu » » de Triple Triade ; Marché, colonne « Servant » et portée « Centre de traitement de données ».
 
-- [ ] (0.1356) Plugin en français : Carte, réglage « Lieux notoires » et alarme par clic droit sur un lieu notoire ; Objets, onglet « Synthèse liée » ; Compagnie libre, onglet « Appareils » ; Rappels, « Aventures imaginaires de Khloe ».
+- [x] (0.1356) Plugin en français : Carte, réglage « Lieux notoires » et alarme par clic droit sur un lieu notoire ; Objets, onglet « Synthèse liée » ; Compagnie libre, onglet « Appareils » ; Rappels, « Aventures imaginaires de Khloe ».
 
-- [ ] (0.1357) Plugin en français : Accueil, liste des outils, une fiche d'outil (Carte, Marché) commence sans « Disponible : » ; Paramètres, info-bulle du cache des quêtes cite « Actualiser les quêtes ».
+- [x] (0.1357) Plugin en français : Accueil, liste des outils, une fiche d'outil (Carte, Marché) commence sans « Disponible : » ; Paramètres, info-bulle du cache des quêtes cite « Actualiser les quêtes ».
 
-- [ ] (0.1358) Plugin en français : survol d'un objet (« Possédés : … », « déjà dans la collection ») ; Équipement, ligne des points perdus au plafond (« {0} points de … »).
+- [x] (0.1358) Plugin en français : survol d'un objet (« Possédés : … », « déjà dans la collection ») ; Équipement, ligne des points perdus au plafond (« {0} points de … »).
+
+- [ ] (0.1360) Jardin, potager avec un carreau mûr : ouvrir le menu du carreau et récolter (avec graines) : le carreau quitte le journal de Tensho, un message « récolté » dans le chat ; en mode développeur, dalamud.log dit « Garden harvest read: patch …, bed …, target … » et « Item gain attributed: … from Garden … ».
+
+- [ ] (0.1360) Jardin : planter une graine à côté d'une plante déjà là, puis retirer ou replanter cette voisine : la prévision de croisement de la première ne change pas.
+
+- [x] (0.1361) Organisation de l'inventaire, aperçu du tri des sacs : les cadres dans l'ordre Sac 1, Sac 3, Sac 2, Sac 4 (numéros de cases inchangés) ; appliquer le tri en mode développeur : « Tri visuel appliqué aux quatre sacs… » une seule fois sous « Rangement ».
+
+- [x] (0.1362) Plugin en anglais : menu des pages (Ocean Fishing, Hunting Log, Deep Dungeons) ; plugin en français : Paramètres, onglet « Débogage » en mode développeur ; Aide › Signaler un problème : textes « issue » en anglais.
+
+- [ ] (0.1363) Plugin en français et en anglais : infobulles de Paramètres › Avancé (tableau de bord, ventes des servants, lien avec l'application de bureau) et du simulateur d'artisanat (« Bénédiction de Byregot »), lisibles et justes.
+
+- [ ] (0.1364) Plugin en français : Découvertes, recherche par deux lettres (monstre, ALÉA, objet) ; page Donjons sans fond, sous-titre ; jardin vide : phrase sur l'entretien et la récolte lus dans le chat.
+
+- [ ] (0.1366) Chat : un lien de carte d'une autre zone (par exemple <flag> posé ailleurs, tapé dans Dire), la carte Tensho ouverte : clic gauche : le jeu pose son drapeau et la carte Tensho va sur la carte du lien, drapeau visible ; mode développeur : dalamud.log dit « Chat link clicked (ChatLogPanel_n): map link, map N, left button » puis « Chat link click: the Tensho map shows map N ».
+
+- [ ] (0.1366) Chat : clic droit sur un lien de carte : le menu « Tensho — lieu » s'ouvre à la souris ; mode développeur : dalamud.log dit « Chat link right click: map N, menu opened » ; puis survoler le lien, s'éloigner et tourner la caméra au clic droit dans le monde : aucun menu (ligne « not taken: cursor … px away »).
+
+- [ ] (0.1366) Jardin : ouvrir le menu d'un carreau, le fermer sans rien faire, puis acheter un objet ou recevoir un objet dans les secondes qui suivent : aucun carreau mûr retiré du journal ; planter un carreau : rien de récolté.
+
+- [ ] (0.1367) Objets (page Objets ou recherche rapide de l'accueil) : taper « d'Ehcatl » avec l'apostrophe du clavier : la poignée de plumes et la paire de gants d'Ehcatl sont trouvées ; Découvertes : une recherche ne montre que les objets dont une source a été notée (un objet jamais obtenu n'y est pas).
+
+- [ ] (0.1368) Plugin en français : page Listes d'artisanat (titre), onglet « Liste d'artisanat » du simulateur, panneau à l'écran et ligne « Liste d'artisanat : il en manque … » de l'aide à la récolte : un seul nom partout.
+
+- [ ] (0.1369) Plugin en français : page Bestiaire (colonne « Vaincus »), page Mandats (colonne et filtre « Client »), réglages de la carte Tensho (« Cibles d'élite proches », « Monstres de vos Chroniques du zodiaque »), page Rangs S (champ « Chercher une cible d'élite… »), Aide › questions « mettre à jour » et « installer » (« Mettre à jour les plugins », « Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés »).
+
+- [ ] (0.1370) Découvertes › Échange, jeu lancé, réseau coupé juste avant « Échanger maintenant » (ou pare-feu sur le jeu) : le message dit « GitHub injoignable ou fichier commun pas encore publié, réessayez plus tard », pas « Fichier commun illisible ».
+
+- [ ] (0.1372) Mandats, en français puis en anglais : infobulle d'un mandat « Client : <nom> » une seule fois ; colonne Client et filtre des clients sans « Client : » devant chaque nom ; clic droit : « Éthérite la plus proche du PNJ du mandat » pose le drapeau près du PNJ qui donne ou reçoit le mandat.
+
+- [ ] (0.1373) Dédale bestial, panneau d'équipe devant le plateau (français puis anglais) : aucune ligne coupée au bord (« Rangs pas encore lus… », noms des ennemis comme « Succube épéiste », « Grand feu follet… ») ; les lignes passent à la ligne, retrait gardé ; « faiblesse touchée : 0 sur 1 ennemi » au singulier, « 2 sur 3 ennemis » au pluriel.
+
+- [ ] (0.1374) En français : barre de navigation « Butin des missions » et « PNJ marchands » ; carte › réglage « Masquer en mission » ; infobulle d'un objet vendu : « (outil PNJ marchands) » ; panneau des servants au tableau des ventes : « Comparer aux autres vendeurs » inchangé.
+
+- [ ] (0.1375) Objets annotés, Collection, aide et carte : taper un nom avec une apostrophe courbe (d'Ehcatl tapé avec l'apostrophe courbe, Alt+0146) trouve le même résultat qu'avec l'apostrophe droite
+
+- [ ] (0.1376) Chat : survoler un long lien de carte par son début, puis clic droit sur ses coordonnées à l'autre bout : le menu de Tensho s'ouvre (mode développeur : « Chat link right click: map N, menu opened »)
+
+- [ ] (0.1376) Chat : survoler un lien de carte, puis clic droit loin au-dessus, dans le monde : aucun menu (ligne « not taken … beyond the link's … px »)
+
+- [ ] (0.1378) Jardin : ouvrir le menu d'un emplacement, le fermer sans rien faire, puis acheter un objet à un marchand dans les 4 s : aucune récolte notée (mode développeur : pas de « Garden harvest read »)
+
+- [ ] (0.1378) Jardin : récolter un emplacement mûr par son menu : la récolte est notée (« Garden harvest read: patch N, bed M »)
+
+- [ ] (0.1379) Rappels : un rappel à plus de 24 h dit « Dans N j H h » (et l'heure seule pour aujourd'hui) ; la barre du serveur dit aussi « N j H h » pour une alarme à plusieurs jours
+
+- [ ] (0.1380) Alarmes : une alarme quotidienne à l'heure réelle, juste après qu'elle a sonné (dans son avance), ouvrir « Modifier » et valider la date sans la changer : elle ne sonne pas une seconde fois
+
+- [ ] (0.1380) Équipement : ouvrir le choix d'une pièce, faire défiler une longue liste : les rangées gardent la même hauteur, le niveau reste sur la ligne
+
+- [ ] (0.1387) Collection › Titres et Hauts faits : ouvrir une fois la fenêtre Titres et la fenêtre Hauts faits du jeu, puis recharger Tensho (ou relancer le jeu) sans les rouvrir : les deux pages montrent le même compte d'obtenus qu'avant, et la ligne rouge dit « Relevé du <date> ».
+
+- [ ] (0.1388) Barre du serveur du jeu (Paramètres : entrées Sacs, État de l'équipement, Zone et instance cochées) : survoler chacune : l'infobulle est celle de Tensho (titre doré, même style que les alarmes), au-dessus ou en dessous selon le réglage « Au-dessus de l'entrée ».
+
+- [ ] (0.1389) Chat : survoler un lien de carte en entrant par son bout gauche, puis clic droit à deux largeurs de lien à gauche du lien (sans passer ailleurs) : le menu de Tensho ne s'ouvre pas ; le même clic sur le lien l'ouvre. À une seule largeur à gauche, le menu s'ouvre encore : c'est voulu (la boîte est symétrique autour du point d'entrée, une largeur de lien plus 8 px de chaque côté ; X-419 M3).
+
+- [ ] (0.1389) Barre du serveur du jeu, entrée des alarmes en anglais : le temps restant s'écrit « 2h 15 » (et non plus « 2h 15m »), « 6d 0h » au-delà d'un jour.
+
+- [ ] (0.1401) Barre du serveur (X-419 M2, 0.1393) : afficher une entrée de Tensho qui change souvent (objets dans les sacs, ou zone), survoler l'entrée et la garder survolée pendant qu'elle change (ramasser un objet, changer de zone) : l'infobulle reste celle de Tensho, elle ne repasse pas à celle du jeu le temps d'un rafraîchissement.
+
+- [ ] (0.1402) Carte de Tensho, dans l'atelier de compagnie (Brumée, Lavandière, Gobelet, Shirogane ou Empyrée) : la sonnette d'appel et le coffre de compagnie sont sur la carte avec les icônes du jeu ; le survol donne leur nom ; dans le tableau des icônes de la carte, la taille 0 de la sonnette les cache. Dans une ville (Limsa basse, Ul'dah Thal, Vieille Gridania), les sonnettes ne sont pas en double.
+
+- [ ] (0.1405) Carte de Tensho, à Eulmore : la sonnette d'appel n'apparaît qu'une fois, sur la carte où le jeu la marque (pas de deuxième sonnette sur l'autre carte d'Eulmore). Journal : « Map positions: 10 bell(s) and company chest(s) … longest step … ms ».
+
+- [ ] (0.1410) Rappels › Statut, après avoir ouvert la liste des servants à une sonnette d'appel (attendre 30 secondes) : le tableau « Vos servants » montre chaque servant avec sa classe et son niveau, ses gils, ses objets (au survol : piles, haute qualité, cristaux d'après la copie du jeu), ses ventes (orange si elles finissent dans la journée, rouge si finies), sa tâche et sa ville du marché ; le total des gils est juste. Avec un autre personnage, ses servants s'ajoutent après sa propre visite à la sonnette.
+
+- [ ] (0.1411) Alarmes : à la sonnette d'appel, liste des servants ouverte, un servant avec des objets en vente : une alarme automatique « Fin des ventes de <servant> » (groupe « Ventes des servants ») apparaît à l'heure de fin donnée par le jeu ; elle correspond à la fin indiquée dans le tableau Rappels › Statut. Si l'heure semble fausse (le jeu ne fait pas expirer les ventes), le noter.
+
+- [ ] (0.1415) Rappels › Statut, tableau des servants : la date de fin des ventes de chaque servant est le jour que la liste des servants du jeu écrit après « jusqu'au » (Addon 2314).
+
+- [ ] (0.1416) Sonnette : mettre en vente puis retirer tous les objets d'un servant, rouvrir la liste des servants : l'alarme « fin des ventes » de ce servant disparaît de Rappels › Alarmes.
+
+- [ ] (0.1416) Sonnette : déposer des gils chez un servant ouvert : sa ligne du tableau des servants (Rappels › Statut) suit tout de suite, comme le journal des gils.
+
+- [ ] (0.1418) Journal des gils (Rangements › Gils) : rendre une quête qui donne des gils : le gain est « Quêtes et mandats (récompenses) », pas « Autre ».
+
+- [ ] (0.1418) Journal des gils : livrer une commande spéciale : le gain est « Commandes spéciales ».
+
+- [ ] (0.1418) Journal des gils : finir un plateau du Dédale bestial qui donne des gils : le gain est « Dresseur (résultats des plateaux) ».
+
+- [ ] (0.1421) Rappels › État du personnage : le tableau des servants tient dans la fenêtre (colonne « Ville du marché » entière, Gils et Objets serrés sur leurs nombres) et les lignes d'aide se replient au bord.
+
+- [ ] (0.1434) Paramètres › Panneaux à côté du jeu › « Fenêtre de chat Tensho » : cocher « Afficher la fenêtre de chat Tensho ». La fenêtre s'ouvre à côté du chat du jeu, qui reste visible ; Dire, linkshell, système et emotes arrivent avec l'heure et leur couleur.
+
+- [ ] (0.1434) Onglets « Général » et « Social » : un message dit pendant que Général est affiché donne « Social (1) » ; afficher Social efface le compte. Un murmure envoyé ne compte pas.
+
+- [ ] (0.1434) Remonter dans les messages : la fenêtre ne suit plus ; revenir en bas : elle suit de nouveau. Redimensionner la fenêtre : les lignes se recoupent.
+
+- [ ] (0.1434) Réglages de la fenêtre : opacité, taille du texte, heure 12/24 h, secondes, nom court du canal ; ajouter, renommer ou retirer un onglet ; changer une couleur puis ↺.
+
+- [ ] (0.1434) La croix ferme la fenêtre et décoche le réglage ; /tensho chat l'affiche et la masque.
+
+- [ ] (0.1434) Se déconnecter puis se reconnecter : la fenêtre repart vide.
+
+- [ ] (0.1434) Entrer en JcJ : la fenêtre disparaît, et revient à la sortie ; masquer l'interface du jeu : elle se masque aussi.
+
+- [ ] (0.1434) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : Guide : aucun (une fenêtre en plus, désactivée par défaut ; l'étape Panneaux du guide ne règle que les panneaux actifs par défaut). Aide : question de la FAQ « Qu'est-ce que la fenêtre de chat Tensho ? », qui ouvre Paramètres. Liste des outils de l'accueil : aucun (une fenêtre, pas une page ; ouverte depuis Paramètres › Panneaux à côté du jeu ou par /tensho chat).
+
+- [ ] (0.1441) Fenêtre de chat Tensho (Paramètres › Panneaux à côté du jeu, ou /tensho chat) : un lien de carte d'un message (par exemple un drapeau partagé en équipe ou en linkshell) apparaît souligné ; au survol, son lieu et ses coordonnées ; clic gauche : le drapeau du jeu est posé à cet endroit et la carte s'ouvre ; clic droit : menu « Tensho — lieu » (éthérite la plus proche avec son coût, carte Tensho, météo)
+
+- [ ] (0.1441) Fenêtre de chat Tensho : un lien d'objet d'un message (objet lié dans le chat, ou butin obtenu) apparaît souligné ; au survol, son nom ; clic gauche : la fiche de l'objet s'ouvre dans Tensho ; clic droit : menu d'objet de Tensho (pages, essayer, listes, copier le nom, sites)
+
+- [ ] (0.1441) Fenêtre de chat Tensho : un message avec un lien au milieu d'une phrase se lit d'un seul tenant (texte avant et après le lien à leur place, la petite flèche du jeu absente) ; rien n'est envoyé dans le chat par un clic
+
+- [ ] (0.1442) Fenêtre de chat Tensho : un lien de quête d'un message (quête liée dans le chat) apparaît souligné ; au survol, son nom ; clic gauche : la page Quêtes de Tensho s'ouvre sur cette quête
+
+- [ ] (0.1442) Fenêtre de chat Tensho : clic droit sur le texte d'un message : menu « Copier ce message » et « Copier tous les messages de cet onglet » ; le texte collé ailleurs a l'heure, le canal, l'auteur et le message, un message par ligne
 
 **0.535 : interfaces** — à voir en jouant
 

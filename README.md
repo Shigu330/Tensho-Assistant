@@ -21,7 +21,7 @@ game up to date.
 Questions: [docs/FAQ.md](docs/FAQ.md) (the same as the plugin's Help page), or ask in [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a). Building from source
 and development builds: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-These documents were produced for version <!-- docgen:version -->0.1359<!-- /docgen:version -->. What changed in each version is in
+These documents were produced for version <!-- docgen:version -->0.1445<!-- /docgen:version -->. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md); what is validated in game, and what is not yet, is in [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md). Map of all
 documents: [docs/README.md](docs/README.md).
 
@@ -68,7 +68,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
 |  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
 | Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
-|  | **Relics** | Relic weapons and armour, the stages you hold and the Zodiac book in progress. |
+|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
 |  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
 |  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
 |  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
@@ -83,7 +83,7 @@ and the help text of each page (the « ? » beside its title):
 <!-- /docgen:pages-en -->
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
-`/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
+`/tensho chat` shows or hides the Tensho chat window (beside the game's chat, reading only); `/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
 `recolte`, `recette`) open the item in Tensho (item page, Market, Gathering, Crafting); `/tensho wiki <item>` and
 `/tensho lodestone <item>` open the item's page in the browser; `/tenshonext` is the end-of-page marker of macro chains. Dalamud's « open » and « settings » buttons open the window and its
 Settings page.
@@ -215,7 +215,7 @@ le jeu à jour.
 Questions : [docs/FAQ.md](docs/FAQ.md) (les mêmes que la page Aide du plugin), ou posez la vôtre dans [Discussions › Q&A](https://github.com/Shigu330/Tensho-Assistant/discussions/categories/q-a).
 Compiler depuis les sources et versions de développement : [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Ces documents ont été produits pour la version <!-- docgen:version -->0.1359<!-- /docgen:version -->. Les changements de chaque version sont dans
+Ces documents ont été produits pour la version <!-- docgen:version -->0.1445<!-- /docgen:version -->. Les changements de chaque version sont dans
 [CHANGELOG.md](CHANGELOG.md) ; ce qui est validé en jeu, et ce qui ne l'est pas encore, dans [docs/project/GLOBAL-PLAN.md](docs/project/GLOBAL-PLAN.md).
 Carte des documents : [docs/README.md](docs/README.md).
 
@@ -242,13 +242,13 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Monde | **Carte** | La carte Tensho, avec votre position, drapeaux, favoris, lieux notoires, points de récolte et quêtes ; aussi les liens de carte du chat, les terrains en vente, un relevé de train de chasse et les conditions d'apparition des rangs S. |
 |  | **Météo** | Les prévisions météo d'une zone et ses prochaines fenêtres. |
 |  | **ALÉA** | Où se tient chaque ALÉA des zones ouvertes, avec son niveau, d'après les fichiers du jeu. |
-|  | **PNJ vendeurs** | Qui vend un objet, à quel prix et où. |
-|  | **Butin des contenus** | Ce que chaque contenu peut donner, et où vous en êtes. |
+|  | **PNJ marchands** | Qui vend un objet, à quel prix et où. |
+|  | **Butin des missions** | Ce que chaque mission peut donner, et où vous en êtes. |
 |  | **Butin des monstres** | Quels monstres donnent l'objet choisi, et où les trouver. |
 |  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'infobulle des objets montrent ce que vous avez vu. |
 | Suivi | **Alarmes** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
 |  | **Rappels** | Les minuteurs et compteurs du jeu, avec des cases « fait » : tâches du jour et de la semaine, servants, expéditions, missions aléatoires, escouade, état du personnage, vos propres tâches. |
-|  | **Jardinage** | Vos parcelles et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
+|  | **Jardinage** | Vos emplacements de potager et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
 |  | **Compagnie libre** | Sous-marins et aéronefs : rang, trajet, retour, trouvailles, meilleurs trajets, montages et l'historique de vos expéditions ; aussi les matériaux des projets de l'atelier, avec un panneau à l'écran. |
 | Progression | **Quêtes** | Les quêtes du jeu avec votre progression, leurs récompenses et leurs enchaînements. |
 |  | **Événements** | Les événements saisonniers en cours, avec leurs quêtes, ce que vous avez fait et leurs boutiques. |
@@ -260,9 +260,9 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
 |  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
 |  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
-|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres et victimes, pour votre classe et votre grande compagnie. |
+|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
 | Contenus | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
-|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre du zodiaque en cours. |
+|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
 |  | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
 |  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
 |  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
@@ -277,7 +277,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 <!-- /docgen:pages-fr -->
 
 Commandes : `/tensho` ouvre la fenêtre ; `/tensho peche` (ou `pêche`, `fish`, `fishing`) ouvre ou ferme l'aide à la pêche ;
-`/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
+`/tensho chat` affiche ou masque la fenêtre de chat Tensho (à côté du chat du jeu, en lecture seule) ; `/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
 `price`, `gather`, `recipe`) ouvrent l'objet dans Tensho (fiche objet, Marché, Récolte, Artisanat) ; `/tensho wiki <objet>` et `/tensho lodestone <objet>` ouvrent la page de
 l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'enchaînement de macros. Les boutons « ouvrir » et
 « paramètres » de Dalamud ouvrent la fenêtre et sa page Paramètres.

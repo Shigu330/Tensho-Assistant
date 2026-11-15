@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
         if(workshopSearched!=workshopSearch)
         {
             workshopSearched=workshopSearch;
-            workshopShown=projects.Where(project=>workshopSearch.Length==0 || WorkshopName(project).Contains(workshopSearch,StringComparison.CurrentCultureIgnoreCase) || project.Type.Contains(workshopSearch,StringComparison.CurrentCultureIgnoreCase))
+            workshopShown=projects.Where(project=>workshopSearch.Length==0 || SearchText.Contains(WorkshopName(project),workshopSearch,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(project.Type,workshopSearch,StringComparison.CurrentCultureIgnoreCase))
                 .OrderBy(project=>project.Type,StringComparer.CurrentCulture).ThenBy(WorkshopName,StringComparer.CurrentCulture).ToArray();
         }
         if(ImGui.BeginChild("WorkshopList",new Vector2(0,170),true))

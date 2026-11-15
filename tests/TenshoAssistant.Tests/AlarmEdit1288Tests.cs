@@ -55,7 +55,7 @@ internal static class AlarmEdit1288Tests
         ("X-280: the edit field uses DateEditable and Move", () =>
         {
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Alarms.cs"));
-            Check(page.Contains("if(AlarmSchedule.DateEditable(alarm.Repeat))") && page.Contains("AlarmSchedule.Move(alarm,moved)"), "wiring");
+            Check(page.Contains("if(AlarmSchedule.DateEditable(alarm.Repeat))") && page.Contains("AlarmSchedule.Move(alarm,moved,now)"), "wiring");
         }),
     ];
 }

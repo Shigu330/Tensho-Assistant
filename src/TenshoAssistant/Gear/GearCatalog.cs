@@ -11,10 +11,11 @@ namespace TenshoAssistant.Gear;
 /// </summary>
 public static class GearJobMask
 {
-    public static ulong Of(IEnumerable<uint> jobs,Func<int,object?> column)
+    /// <param name="columns">X-336 M8 (0.1380, R08): the sheet's column count; a job beyond it (a shorter sheet after a patch) is not read.</param>
+    public static ulong Of(IEnumerable<uint> jobs,Func<int,object?> column,int columns=int.MaxValue)
     {
         ulong mask=0;
-        foreach(var job in jobs)if(job<64 && column((int)job+1) is true)mask|=1UL<<(int)job;
+        foreach(var job in jobs)if(job<64 && (int)job+1<columns && column((int)job+1) is true)mask|=1UL<<(int)job;
         return mask;
     }
 }
@@ -143,7 +144,7 @@ public static class GearRules
         var (min,max)=LevelWindow(level,filter);
         var anyone=AnyJobAndLevel(slot,filter);
         return catalog.Items.Where(item=>Fits(item,slot) && (anyone || item.WearableBy(job) && item.Level>=min && item.Level<=max) && item.ItemLevel>=filter.MinItemLevel
-                && (filter.Search.Length==0 || item.Name.Contains(filter.Search,StringComparison.OrdinalIgnoreCase)))
+                && (filter.Search.Length==0 || SearchText.Contains(item.Name,filter.Search,StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(item=>item.ItemLevel).ThenByDescending(item=>item.Level).ThenBy(item=>item.Name,StringComparer.CurrentCulture);
     }
 

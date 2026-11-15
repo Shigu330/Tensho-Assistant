@@ -10,7 +10,7 @@ public enum GilSource { Character, Retainers, Company }
 // 0.1102: OceanFishing: the gil of an ocean fishing voyage's missions (IKDMission, IKDFishingLog), added last too.
 // 0.1319 (X-320): Fate (the FATE's reward window), Defeat (the gil a defeated monster gives), ChallengeLog (an entry of the challenge log
 // done), added last too.
-public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail, OceanFishing, Fate, Defeat, ChallengeLog }
+public enum GilCategory { Other, NpcShop, Market, Repair, Teleport, Retainer, Company, Mail, OceanFishing, Fate, Defeat, ChallengeLog, Quest, CustomDeliveries, Beastmaster }
 
 /// <summary>One change of a gil balance: when, by how much, the balance after it, whose, and its category.</summary>
 public sealed record GilEntry(DateTimeOffset At,long Delta,long Balance,GilSource Source,GilCategory Category);
@@ -44,6 +44,10 @@ public static class GilJournal
         // 0.1319 (X-320, dalamud.log of 11/12 and 11/13): « Gil other: +84 … +90, windows seen in the last 15 s: FateReward », with the chat lines
         // « Vous obtenez 242 sceaux du Maelstrom. » and « Vous obtenez 84 gils. » at the same second: a FATE's reward.
         ("FateReward",GilCategory.Fate),
+        // X-18 (0.1418, docs/evidence/0.1418-gil-windows.md): the reward windows that pay gil, probed in the client (tools/UldProbe): the journal's
+        // reward window (quests and leves), the custom deliveries' window, and the Beastmaster trial's result (XBMResult, also seen in the log on
+        // 11/13: « Gil other: +2,000, windows seen in the last 15 s: XBMResult … », left « Other » in 0.1319).
+        ("JournalResult",GilCategory.Quest),("SatisfactionSupply",GilCategory.CustomDeliveries),("XBMResult",GilCategory.Beastmaster),
     ];
 
     /// <summary>
@@ -77,6 +81,8 @@ public static class GilJournal
     {
         GilCategory.Teleport when delta>0=>GilCategory.Other,
         GilCategory.Fate or GilCategory.Defeat or GilCategory.ChallengeLog when delta<0=>GilCategory.Other,
+        // X-18 (0.1418): rewards only; a spending while their window is open stays « Other ».
+        GilCategory.Quest or GilCategory.CustomDeliveries or GilCategory.Beastmaster when delta<0=>GilCategory.Other,
         _=>category,
     };
 

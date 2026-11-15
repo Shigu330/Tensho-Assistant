@@ -184,7 +184,8 @@ internal static class ResilienceTests
             Check(recipes.Contains("function not resolved") && recipes.Split("Volatile.Write(ref state,null);").Length>=3,"crafted recipes");
             Check(Code("Leves/LeveProgressReader.Dalamud.cs").Contains("pending=null;building=[];Unavailable=true;nextRead=now.AddSeconds(30);Volatile.Write(ref state,null);"),"leves");
             var hunting=Code("Hunting/HuntingLogReader.Dalamud.cs");
-            Check(hunting.Contains("!loaded->IsLoaded") && hunting.Contains("nextRead=now.AddSeconds(30);\n            Volatile.Write(ref state,null);".Replace("\n",Environment.NewLine)) || hunting.Contains("!loaded->IsLoaded") && hunting.Contains("nextRead=now.AddSeconds(30);\n            Volatile.Write(ref state,null);"),"hunting log");
+            // X-413 (0.1385): line ends normalised first instead of « A && CRLF || A && LF » (LineEndChecks1385Tests).
+            Check(hunting.Contains("!loaded->IsLoaded") && hunting.Replace("\r\n","\n").Contains("nextRead=now.AddSeconds(30);\n            Volatile.Write(ref state,null);"),"hunting log");
             Check(Code("Inventory/BankInventoryBridge.Dalamud.cs").Contains("Cabinet.MemberFunctionPointers.IsItemInCabinet != 0"),"armoire");
             Check(Code("Maps/MapLiveReader.Dalamud.cs").Contains("teleportFailed=true"),"a failed teleport no longer blanks the map");
         }),

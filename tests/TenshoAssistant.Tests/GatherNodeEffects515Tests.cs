@@ -74,7 +74,7 @@ internal static class GatherNodeEffects515Tests
             Check(panel.Contains("\"GatheringPanel.EffectOnAttempts\"") && panel.Contains("\"GatheringPanel.EffectMissing\"") && panel.Contains("\"GatheringPanel.EffectUnknown\"") && panel.Contains("DrawGatheringNodeEffects(frame,rating);"),"named, whichever item is chosen");
             Check(panel.Contains("\"GatheringPanel.ListNeedNodes\"") && panel.Contains("GatherListNeed(slot.ItemId)") && !panel.Contains("gatherNeeds"),"the list says what it needs");
             Check(Read("Gathering/GatheringObservationReader.Dalamud.cs").Contains("ObjectKind.GatheringPoint ? target.BaseId:0"),"the targeted node only");
-            var plugin=Read("Plugin.cs");
+            var plugin=Read("Plugin.Gathering.cs");   // X-153 (0.1412): the gathering family
             Check(plugin.Contains("mainWindow.ConfigureNodeEffects(") && plugin.Contains("catch(Exception error){log.Warning(error,\"Node effects unavailable"),"guarded, once per node");
         }),
     ];

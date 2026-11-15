@@ -148,7 +148,7 @@ internal sealed partial class MainWindow
         {
             ImGui.SetNextItemWidth(-1);ImGui.InputTextWithHint("##WeatherZoneQuery",localization.Get("Weather.ZoneSearch"),ref weatherZoneQuery,64);Tip("Weather.ZoneSearchTip");
             foreach(var map in (maps.State.Catalog?.Entries ?? []).Where(map=>map.TerritoryId!=0 && map.Zone.Length>0 && catalog.Zone(map.TerritoryId) is { RateId:not 0 })
-                .DistinctBy(map=>map.TerritoryId).Where(map=>weatherZoneQuery.Length==0 || map.Zone.Contains(weatherZoneQuery,StringComparison.CurrentCultureIgnoreCase)).Take(200))
+                .DistinctBy(map=>map.TerritoryId).Where(map=>weatherZoneQuery.Length==0 || SearchText.Contains(map.Zone,weatherZoneQuery,StringComparison.CurrentCultureIgnoreCase)).Take(200))
                 if(ImGui.Selectable($"{map.Zone}##Zone{map.TerritoryId}",map.TerritoryId==weatherTerritory))OpenWeather(map.TerritoryId,map.Zone);
         }
         finally{ImGui.EndCombo();}

@@ -220,7 +220,7 @@ internal sealed partial class MainWindow
                     case CounterBlock counter:DrawMyToolCounter(counter,index,tool,store,language);break;
                     case TimerBlock timer:
                         var left=ToolProgress.NextTime(timer,now)-now;
-                        ImGui.TextUnformatted(localization.Format("MyToolsUi.TimerLine",timer.Label.For(language),(int)left.TotalHours,left.Minutes.ToString("00")));
+                        ImGui.TextUnformatted(localization.Format("MyToolsUi.TimerLine",timer.Label.For(language),TimeLeftText(left)));
                         break;
                     case ItemListBlock items:DrawMyToolItems(items);break;
                     case LinkBlock link:DrawMyToolLink(link,index,language);break;

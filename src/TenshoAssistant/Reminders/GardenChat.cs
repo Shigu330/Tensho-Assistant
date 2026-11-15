@@ -38,13 +38,19 @@ public sealed class GardenChat
     /// <summary>#36 (0.978): a harvest is the ordinary item gain line (chat type 62, no sender) while the target is a garden bed (the caller checks housing).
     /// X-382 (0.1360, dalamud.log of 14/11 23:48: « Garden menu read … bed 6 », then « Vous obtenez 9 carottes de Krakka » 1.5 s later, the harvest
     /// not seen): or a bed's menu read here just before (<paramref name="bedMenuJustSeen"/>, within <see cref="GardenMenuMemory.HarvestWindow"/>),
-    /// the target being no longer the bed when the gain line comes.</summary>
-    public static bool IsHarvest(int chatType,string sender,uint target,bool bedMenuJustSeen=false)=>chatType==62 && sender.Length==0 && (target==BedObject || bedMenuJustSeen);
+    /// the target being no longer the bed when the gain line comes.
+    /// X-410 M1 (0.1378): with only the menu to go on, the gain line must name a garden item (<paramref name="gardenItem"/> true); a line naming
+    /// no item (null) keeps the menu rule; one naming only other items (false: a purchase, an item received after a menu closed) is no harvest.</summary>
+    public static bool IsHarvest(int chatType,string sender,uint target,bool bedMenuJustSeen=false,bool? gardenItem=null)=>
+        chatType==62 && sender.Length==0 && (target==BedObject || bedMenuJustSeen && gardenItem!=false);
+
+    /// <summary>X-410 M1 (0.1378): whether a gain line names a garden item: null when it names no item, else whether one of them is.</summary>
+    public static bool? GardenItem(IReadOnlyCollection<uint> items,Func<uint,bool> isGardenItem)=>items.Count==0 ? null:items.Any(isGardenItem);
 
     private static Regex? Pattern(IReadOnlyList<string?>? parts)
     {
         if(parts is null || !parts.Any(part=>part is { Length:>0 }))return null;
-        return new("^"+string.Concat(parts.Select(part=>part is null ? @"\D*(\d+)\D*?":Regex.Escape(part)))+"$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+        return new("^"+string.Concat(parts.Select(part=>part is null ? @"\D*(\d+)\D*?":Regex.Escape(part)))+"$",GardenJournal.Linear,GardenJournal.MatchTimeout);
     }
 
     /// <summary>The planting a line announces, or null. A line with a sender (a player) never counts.</summary>
@@ -78,14 +84,14 @@ public sealed class GardenMenuTitle
     public static GardenMenuTitle? From(string? macro)
     {
         if(string.IsNullOrWhiteSpace(macro))return null;
-        var tokens=Regex.Matches(macro,@"<[^>]*>",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+        var tokens=Regex.Matches(macro,@"<[^>]*>",GardenJournal.Linear,GardenJournal.MatchTimeout);
         var built=new System.Text.StringBuilder("^");
         var at=0;int patch=0,bed=0,group=0;
         foreach(Match token in tokens)
         {
             built.Append(Regex.Escape(macro[at..token.Index]));
             at=token.Index+token.Length;
-            var number=Regex.Match(token.Value,@"^<(num|ordinal)\(lnum([12])\)>$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+            var number=Regex.Match(token.Value,@"^<(num|ordinal)\(lnum([12])\)>$",GardenJournal.Linear,GardenJournal.MatchTimeout);
             if(!number.Success)return null;
             group++;
             if(number.Groups[2].Value=="1"){if(patch!=0)return null;patch=group;}else{if(bed!=0)return null;bed=group;}
@@ -93,7 +99,7 @@ public sealed class GardenMenuTitle
         }
         built.Append(Regex.Escape(macro[at..])).Append('$');
         if(patch==0 || bed==0)return null;
-        return new(new Regex(built.ToString(),RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50)),patch,bed);
+        return new(new Regex(built.ToString(),GardenJournal.Linear,GardenJournal.MatchTimeout),patch,bed);
     }
 
     /// <summary>The patch (1 to 3) and bed (1 to 8) a menu title names, or null.</summary>
@@ -124,11 +130,14 @@ public static class GardenHarvests
 public sealed class GardenMenuMemory
 {
     public static readonly TimeSpan Window=TimeSpan.FromSeconds(30);
-    /// <summary>X-382 (0.1360): a gain line within 10 s of a bed's menu, at the same place, is that bed's harvest (1.3 to 1.6 s in the log of 14/11).</summary>
-    public static readonly TimeSpan HarvestWindow=TimeSpan.FromSeconds(10);
+    /// <summary>X-382 (0.1360): a gain line within this time of a bed's menu, at the same place, is that bed's harvest (1.3 to 1.6 s in the log of 14/11).
+    /// X-395 M3 (0.1366): 4 s instead of 10 s, so that a menu closed without anything done is soon forgotten.</summary>
+    public static readonly TimeSpan HarvestWindow=TimeSpan.FromSeconds(4);
     private readonly object gate=new();
     private (int Patch,int Bed,string? Place,DateTimeOffset At)? last;
     public void Seen(int patch,int bed,string? place,DateTimeOffset at){lock(gate)last=(patch,bed,place,at);}
+    /// <summary>X-395 M3 (0.1366): a planting closes the menu's story: its bed is not the next gain's harvest.</summary>
+    public void Forget(){lock(gate)last=null;}
     /// <summary>X-382 (0.1360): the bed of the menu seen at this place within <paramref name="window"/>, without forgetting it.</summary>
     public (int Patch,int Bed)? Peek(string? place,DateTimeOffset now,TimeSpan window)
     {

@@ -43,18 +43,17 @@ internal sealed partial class MainWindow
             ("Tasks",localization.Get("Reminders.TabTasks"),()=>DrawPersonalTasks()),
             ("Roulettes",localization.Get("Reminders.TabRoulettes"),()=>DrawDailyRoulettes(timers)),
             ("Squadron",localization.Get("Reminders.TabSquadron"),()=>DrawSquadronPlanner()),
-            ("Status",localization.Get("Reminders.TabStatus"),()=>DrawCharacterStatuses()),
+            ("Status",localization.Get("Reminders.TabStatus"),()=>{DrawCharacterStatuses();DrawRetainerTable();}),
             // X-133 (0.1159): the reminders' alarms, apart from the Alarms tool.
             ("Alarms",localization.Format("Reminders.TabAlarms",ReminderAlarmCount),()=>DrawReminderAlarms()),
         ],ref reminderTabFocus);
     }
 
-    // « in H h mm (date) » of a coming time, on the Reminders page and the Free Company voyages.
+    // « in 6 d 0 h (date) » of a coming time, on the Reminders page and the Free Company voyages; X-333 (0.1379): days from 24 h on, and
+    // the hour alone when it is today.
     private string InText(DateTimeOffset at,DateTimeOffset now)
-    {
-        var left=at-now;
-        return localization.Format("Reminders.In",(int)left.TotalHours,left.Minutes,at.ToLocalTime().ToString("g"));
-    }
+        =>localization.Format("Reminders.In",TimeLeftText(at-now),
+            at.ToLocalTime().ToString(TenshoAssistant.UI.TimeLeft.SameDay(at,now,TimeZoneInfo.Local) ? "t":"g"));
     private void DrawReminderTimers(GameTimerSnapshot? timers,DateTimeOffset now)
     {
         if(!ImGui.BeginTable("Reminders",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;
@@ -180,7 +179,7 @@ internal sealed partial class MainWindow
         {
             string BenefitName(uint status)=>CompanyActionNames?.GetValueOrDefault(status) ?? $"#{status}";
             string BenefitText(CompanyBenefit benefit)=>benefit.Ends is { } ends && ends>now
-                ? localization.Format("Reminders.CompanyActionLeft",BenefitName(benefit.Status),(int)(ends-now).TotalHours,(ends-now).Minutes):BenefitName(benefit.Status);
+                ? localization.Format("Reminders.CompanyActionLeft",BenefitName(benefit.Status),TimeLeftText(ends-now)):BenefitName(benefit.Status);
             var state=benefits is null ? localization.Get("Reminders.CompanyActionsUnknown")
                 :benefits.Count==0 ? localization.Get("Reminders.CompanyActionsNone")
                 :string.Join(", ",benefits.Select(BenefitText));

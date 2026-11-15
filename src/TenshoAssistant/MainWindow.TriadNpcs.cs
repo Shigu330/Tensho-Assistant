@@ -139,7 +139,7 @@ internal sealed partial class MainWindow
             if(missingKey!=triadMissingKey)
             {
                 triadMissingKey=missingKey;
-                triadMissingRows=entries.Values.Where(entry=>!entry.ConfirmedUnlocked && (triadMissingQuery.Length==0 || entry.Name.Contains(triadMissingQuery,StringComparison.CurrentCultureIgnoreCase)))
+                triadMissingRows=entries.Values.Where(entry=>!entry.ConfirmedUnlocked && (triadMissingQuery.Length==0 || SearchText.Contains(entry.Name,triadMissingQuery,StringComparison.CurrentCultureIgnoreCase)))
                     .OrderBy(entry=>entry.Card?.Extra==true).ThenBy(entry=>entry.Number).ToArray();
             }
             var missing=triadMissingRows;

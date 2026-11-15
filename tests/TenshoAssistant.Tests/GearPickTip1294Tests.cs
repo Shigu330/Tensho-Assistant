@@ -13,12 +13,15 @@ internal static class GearPickTip1294Tests
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("X-290: the list writes no stat difference on its lines; only the level line, which goes to the next line when it does not fit", () =>
+        ("X-290: the list writes no stat difference on its lines; only the level line, on the piece's row (X-336 M7: one line per row)", () =>
         {
             var gear = Read("MainWindow.Gear.cs");
             var pick = gear[gear.IndexOf("private void DrawGearPick(", StringComparison.Ordinal)..gear.IndexOf("private readonly record struct GearPickKey", StringComparison.Ordinal)];
             Check(!pick.Contains("Gear.Param") && !pick.Contains("in differences"), "no difference text in the list");
-            Check(pick.Contains("SameLineOrNext(localization.Format(\"Gear.LevelLine\"") && pick.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "level line wraps; tooltip on hover");
+            // X-413 (0.1385): line ends normalised first, so that both parts are always checked (the 0.1380 « LF || CRLF && tooltip » skipped the tooltip).
+            var lines = pick.Replace("\r\n", "\n");
+            Check(lines.Contains("ImGui.SameLine();\n                        ImGui.TextDisabled(localization.Format(\"Gear.LevelLine\""), "the level line on the piece's row (one line per row, X-336 M7)");
+            Check(lines.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "the piece's tooltip on hover");
             Check(!gear.Contains("PickDifferences"), "the old three differences are gone");
         }),
         ("X-290: one way to draw stats: the comparator and the list's tooltip share DrawStatPairs and the comparison", () =>

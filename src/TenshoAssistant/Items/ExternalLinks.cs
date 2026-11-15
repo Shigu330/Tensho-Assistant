@@ -35,7 +35,7 @@ public static class ExternalLinks
         foreach(var item in items)
         {
             if(string.Equals(item.Name,wanted,StringComparison.CurrentCultureIgnoreCase))return item;
-            if(item.Name.Contains(wanted,StringComparison.CurrentCultureIgnoreCase) && (best is null || item.Name.Length<best.Name.Length))best=item;
+            if(SearchText.Contains(item.Name,wanted,StringComparison.CurrentCultureIgnoreCase) && (best is null || item.Name.Length<best.Name.Length))best=item;
         }
         return best;
     }

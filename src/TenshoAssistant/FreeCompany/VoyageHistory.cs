@@ -144,12 +144,16 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
                     {
                         var converted=TenshoDataDatabase.ConvertedAt(open,Family,transaction);
                         marked=converted is not null;
-                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value))
-                           && TenshoDataFile.StillThere(()=>VoyageHistory.Read(file)) is { } found)
+                        if(File.Exists(file) && (converted is null || TenshoDataFile.WrittenAgain(file,converted.Value)))
                         {
-                            Write(open,transaction,found,keep:true);
-                            if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
-                            marked=true;
+                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
+                            if(TenshoDataFile.StillThere(()=>VoyageHistory.Read(file)) is { } found)
+                            {
+                                Write(open,transaction,found,keep:true);
+                                if(converted is null)TenshoDataDatabase.MarkConverted(open,transaction,Family,now);
+                                marked=true;
+                            }
+                            else marked=false;
                         }
                         DuringSave?.Invoke();
                         transaction.Commit();

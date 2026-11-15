@@ -23,7 +23,10 @@ internal sealed partial class MainWindow
         else if(Volatile.Read(ref desktopCharacters) is { } copy)all=[.. copy.OrderBy(status=>status.Name)];
         else return;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.Title",all.Count)+"###CharacterStatuses",ImGuiTreeNodeFlags.DefaultOpen))return;
+        // X-435 M4 (0.1421): the help lines wrap at the page's edge (they were cut at 1280 px).
+        ImGui.PushTextWrapPos(0);
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
+        ImGui.PopTextWrapPos();
         if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
         var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source?.Current ?? 0;
         var lastWeekly=ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour);
@@ -95,6 +98,74 @@ internal sealed partial class MainWindow
             }
         }
         finally{ImGui.EndTable();}
+    }
+
+    // X-196 (0.1410): every retainer of every character, as last read at a summoning bell (0.1409); shown once one was read. In the desktop
+    // application, from its copy of the character files, like the characters' table.
+    private void DrawRetainerTable()
+    {
+        var source=CharacterStatusSource;
+        IReadOnlyList<CharacterStatus> all;
+        if(source is not null)all=source.All;
+        else if(Volatile.Read(ref desktopCharacters) is { } copy)all=[.. copy.OrderBy(status=>status.Name)];
+        else return;
+        var rows=RetainerStates.Table(all);
+        if(rows.Count==0)return;
+        if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.RetainersTitle",rows.Count)+"###RetainerTable",ImGuiTreeNodeFlags.DefaultOpen))return;
+        ImGui.PushTextWrapPos(0);
+        ImGui.TextDisabled(localization.Get("CharacterStatus.RetainersHelp"));
+        ImGui.PopTextWrapPos();
+        var now=DateTimeOffset.UtcNow;
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("RetainerTable",8,scrollHeight:Math.Min(320,(rows.Count+1)*ImGui.GetFrameHeightWithSpacing()+8)))return;
+        try
+        {
+            // X-435 M4 (0.1421): Gil and Items fit their numbers (they took a stretched share and left the market town cut at 1280 px).
+            foreach(var key in new[]{"Character","Name","Job","Gil","Items","Market","Venture","Town"})
+                ImGui.TableSetupColumn(localization.Get("CharacterStatus.RetainerColumn"+key),key is "Gil" or "Items" ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None);
+            ImGui.TableSetupScrollFreeze(2,1);
+            ImGui.TableHeadersRow();
+            var index=0;
+            foreach(var (character,retainer) in rows)
+            {
+                ImGui.PushID(index++);
+                try
+                {
+                    ImGui.TableNextRow();ImGui.TableNextColumn();
+                    ImGui.TextUnformatted(character.Name.Length>0 ? character.Name:localization.Get("CharacterStatus.Unnamed"));
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(retainer.Name);
+                    ImGui.TableNextColumn();
+                    if(retainer.Job.Length>0 || retainer.Level>0)ImGui.TextUnformatted(localization.Format("CharacterStatus.RetainerJob",retainer.Job,retainer.Level));
+                    else ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
+                    ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(retainer.Gil.ToString("N0",Numbers));
+                    ImGui.TableNextColumn();TenshoAssistant.UI.UiComponents.NumberCell(retainer.Items.ToString(Numbers));
+                    TipText(retainer.Stacks is { } stacks ? localization.Format("CharacterStatus.RetainerStock",stacks,retainer.HqStacks ?? 0,retainer.Crystals ?? 0)
+                        :localization.Get("CharacterStatus.RetainerStockUnknown"));
+                    ImGui.TableNextColumn();DrawRetainerSale(retainer,now);
+                    ImGui.TableNextColumn();
+                    if(retainer.Venture==0)ImGui.TextDisabled(localization.Get("CharacterStatus.RetainerNone"));
+                    else if(retainer.VentureDone is not { } done)ImGui.TextUnformatted(localization.Get("CharacterStatus.RetainerVentureRunning"));
+                    else if(done<=now)ImGui.TextColored(Success,localization.Get("CharacterStatus.OtherDone"));
+                    else ImGui.TextUnformatted(done.ToLocalTime().ToString("g"));
+                    ImGui.TableNextColumn();
+                    if(retainer.Town.Length>0)ImGui.TextUnformatted(retainer.Town);else ImGui.TextDisabled(localization.Get("CharacterStatus.Unknown"));
+                }
+                finally{ImGui.PopID();}
+            }
+        }
+        finally{ImGui.EndTable();}
+        ImGui.TextDisabled(localization.Format("CharacterStatus.RetainersGil",rows.Sum(row=>row.Retainer.Gil).ToString("N0",Numbers)));
+    }
+
+    private void DrawRetainerSale(RetainerState retainer,DateTimeOffset now)
+    {
+        var sale=RetainerStates.Sale(retainer,now);
+        if(sale==RetainerSale.None){ImGui.TextDisabled(localization.Get("CharacterStatus.RetainerNone"));return;}
+        var end=retainer.MarketEnds?.ToLocalTime().ToString("g");
+        var text=end is null ? localization.Format("CharacterStatus.RetainerMarketCount",retainer.MarketItems)
+            :localization.Format(sale==RetainerSale.Ended ? "CharacterStatus.RetainerMarketEnded":"CharacterStatus.RetainerMarket",retainer.MarketItems,end);
+        if(sale==RetainerSale.Ended)ImGui.TextColored(Error,text);
+        else if(sale==RetainerSale.EndingSoon)ImGui.TextColored(Warning,text);
+        else ImGui.TextUnformatted(text);
     }
 
     private void DrawCharacterOther(CharacterStatus status,DateTimeOffset now,DateTimeOffset lastDaily,DateTimeOffset lastWeekly)

@@ -76,6 +76,39 @@ agreement (instruction of 2026-11-04), except the AI policy, no longer followed 
 | AI-assisted translations reviewed by speakers | German and Japanese: 30 keys, not reviewed, declared; English and French complete | `src/TenshoAssistant/Localization/Languages/` |
 | Embedded data under a compatible licence, notice kept | done: SubmarineTracker and FFXIVGachaSpreadsheet (MIT, full text in the file), LuminaSupplemental airship and festival tables (GPL-3.0), Character Panel Refined (MIT, in the code), Lotlab FFXIV Gardening Tracker (GPL-3.0), nick75g crossbreeds (MIT); credits in the README and the Credits page | `FreeCompany/Data/`, `Events/Data/`, `Reminders/Data/`, `Character/StatFormulas.cs`, `Credits/CreditCatalog.cs` |
 
+## Dalamud rules, one by one
+
+Text of origin: dalamud.dev, plugin-publishing/restrictions, read on 2026-11-15 (22 rules; the guidance that follows them is not a rule).
+Tensho is published on its own repository (DEC-039) and keeps these rules all the same. One row per rule: how Tensho keeps it, and its proof
+(decision, file, test). `DalamudRules1392Tests` checks that every rule has its row and its proof in both halves, that the files named exist,
+and that the code keeps what the rows say: the functions that act on the game stay in the files named here, the ones said absent stay absent.
+A change that touches a rule changes its row in the same version.
+
+| # | Rule | How Tensho keeps it | Proof |
+|---|---|---|---|
+| 1 | No automatic request to the server; nothing the normal game could not send | What reaches the game starts from the player's click, as a normal game command or through the game's own function: game alarms (`/alarm`), the hunt announcement typed into the chat box, the teleport to an aetheryte, equipping a gearset, Try On, writing the crafting macros into the game's macro list, the macro chain (rule 12) and applying the sort to an open inventory. One exception, declared and off by default: the title by job | DEC-035; `src/TenshoAssistant/Collections/TitleChanger.Dalamud.cs`, `src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs`, `src/TenshoAssistant/Maps/HuntAnnouncer.Dalamud.cs`, `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`, `src/TenshoAssistant/Gear/GameGearsetReader.Dalamud.cs`, `src/TenshoAssistant/Items/TryOn.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs`, `src/TenshoAssistant/Inventory/InventoryVisualSortBridge.Dalamud.cs`; `DalamudRules1392Tests`, `DalamudRulesActs1399Tests` |
+| 2 | Combat not augmented, altered or interfered with | No combat domain: nothing during a fight, only preparation information in PvE. Exception decided by the user for the Beastmaster encounters, information only | DEC-009, DEC-032, DEC-046, DEC-047 |
+| 3 | No harm to Square Enix's revenue | Nothing is bought, unlocked or given: shop and Mog Station items are shown as information | `DalamudRules1392Tests` (no purchase function of the game called) |
+| 4 | No parsing, raid logging or DPS meter | None: no fight is logged or measured; ACT and IINACT are out of scope | DEC-009; `DalamudRules1392Tests` (no FFLogs) |
+| 5 | No account id of other players | Only the logged-in character's local id (`player.ContentId`) is a key; at the market board, each offer's retainer id is read only to recognise the player's own offers, never kept (only « one of mine » is) | `src/TenshoAssistant/Market/SeenPriceReader.Dalamud.cs` |
+| 6 | No hard dependency on a plugin that breaks the rules | No plugin dependency, no IPC with another plugin; one NuGet package (Raphael.Net, MIT) | `src/TenshoAssistant/TenshoAssistant.csproj`; `DalamudRules1392Tests` (no IPC subscriber) |
+| 7 | Not useful only for out-of-spec behaviour | Information first; a game action only on the player's click (each one named in rule 1) | [README](../../README.md); rules 1 and 12; `DalamudRulesActs1399Tests` |
+| 8 | No advantage in competitive or PvP content | The whole plugin stops in PvP and ranked content, with no setting, and restarts by itself | DEC-038; `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs`; `CompetitiveCut610Tests` |
+| 9 | No emote or expression looping | None: no emote is sent (the chat box is used only for the alarms and the hunt announcement) | `DalamudRules1392Tests` |
+| 10 | No cutscene skipping | None: no game window is answered or closed in the player's place | `DalamudRules1392Tests` (no window callback) |
+| 11 | No automatic skipping of dialogue boxes | None: no Talk or Yes/No window is read to answer it | `DalamudRules1392Tests` (no Talk, no SelectYesno) |
+| 12 | No automated crafting | Simulator, solver and suggested move, never executed; the rotation recorder only watches the player's own actions (the game's function called first, its result returned unchanged). Crafting macros are written into the game's macro list on the player's click, never run by that. The macro chain, started by the player's click, runs the player's macros one after the other through the game's own macro function, as the player wrote them (each read again and refused if changed; stopped at a locked macro, an interruption or in PvP) | `src/TenshoAssistant/Craft/CraftRecorder.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs`; `DalamudRules1392Tests`, `DalamudRulesActs1399Tests` |
+| 13 | No automatic loot rolls | None: no loot roll is sent | `DalamudRules1392Tests` (no roll function) |
+| 14 | No friend list login or logout alerts | None: the friend list is not read | `DalamudRules1392Tests` (no friend list) |
+| 15 | No markers for untelegraphed area attacks | None | DEC-009 |
+| 16 | No camera zoom beyond the game's bounds | None: the camera is not touched | `DalamudRules1392Tests` (no camera manager) |
+| 17 | No FFLogs integration | None | `DalamudRules1392Tests` (no FFLogs) |
+| 18 | No damage parser | None | DEC-009 |
+| 19 | No way around the Mog Station (Fantasia) | None | rule 3 |
+| 20 | No new combo plugin | None: no action is replaced or combined | rule 12; `DalamudRules1392Tests` (UseAction only watched by the recorder) |
+| 21 | No recolouring of area attacks | None | DEC-009 |
+| 22 | Nothing in PvP that gives an advantage | The whole plugin stops in PvP (rule 8) | DEC-038; `CompetitiveCut610Tests` |
+
 ## `manifest.toml` template (DalamudPluginsD17 repository, `testing/live/TenshoAssistant/manifest.toml`)
 
 ```toml
@@ -169,7 +202,7 @@ et l'accord de l'auteur (consigne du 2026-11-04), sauf la politique IA, plus sui
 | Éléments de combat seulement informatifs, ce que le joueur saurait déjà | parser : aucun (DEC-009). Page dresseur : données du jeu (DEC-032). Monstres proches : nom, lieu et niveau seulement, rien sur le combat (`Maps/MapLiveReader.Dalamud.cs`) | `MainWindow.Beastmaster.cs`, `MainWindow.NearbyMonsters.cs` |
 | Aucun avantage en contenu compétitif | le plugin entier s'arrête en JcJ et en contenu classé (DEC-038) ; conseil de Triple Triade contre les PNJ seulement, jamais en tournoi ni contre un joueur (DEC-033) | `Competitive/`, `MainWindow.TriadAdvice.cs` |
 | Identifiants de compte : seulement le sien | conforme : seul `player.ContentId` (personnage local) sert de clé ; les offres lues au tableau des ventes ne gardent ni nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur | lecteurs `*.Dalamud.cs`, `Market/SeenPriceReader.Dalamud.cs` |
-| Aucune donnée personnelle envoyée, HTTPS, nom d'hôte | conforme. Universalis, Garland Tools, wiki, Teamcraft (une requête GraphQL par lieu de pêche), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, galerie et vidéos de ce dépôt) ; les huit sources de données ont chacune leur interrupteur et « Données du jeu et observées seulement » les coupe d'un coup ; la galerie et les vidéos ne sont lues que sur un clic. Exceptions choisies par le joueur : webhook Discord désactivé par défaut, hôtes de Discord seulement, nom du personnage seulement sur option, adresse jamais journalisée ; échange des découvertes partagées par GitHub, sans aucun envoi avant la connexion du joueur à GitHub, ses propres observations avec le jour seulement, vers un gist secret et un ticket au nom de son identifiant GitHub, jeton chiffré sur le PC (DPAPI) | [SECURITY](../../SECURITY.md) |
+| Aucune donnée personnelle envoyée, HTTPS, nom d'hôte | conforme. Universalis, Garland Tools, wiki, Teamcraft (une requête GraphQL par lieu de pêche), PaissaDB, GitHub (LuminaSupplemental, GatherBuddy, FFXIVGachaSpreadsheet, galerie et vidéos de ce dépôt) ; les huit sources de données ont chacune leur interrupteur et « Données du jeu et vos observations seulement » les coupe d'un coup ; la galerie et les vidéos ne sont lues que sur un clic. Exceptions choisies par le joueur : webhook Discord désactivé par défaut, hôtes de Discord seulement, nom du personnage seulement sur option, adresse jamais journalisée ; échange des découvertes partagées par GitHub, sans aucun envoi avant la connexion du joueur à GitHub, ses propres observations avec le jour seulement, vers un gist secret et un ticket au nom de son identifiant GitHub, jeton chiffré sur le PC (DPAPI) | [SECURITY](../../SECURITY.md) |
 | Signaler un problème | le texte exact montré d'abord ; puis, sur le clic du joueur seulement, un ticket public envoyé par sa propre connexion GitHub (celle des découvertes, s'il est connecté), sinon le formulaire GitHub prérempli ouvert dans le navigateur et envoyé par le joueur (accord de l'auteur du 2026-11-14) | `Help/ProblemReport.cs`, `Discoveries/GitHubExchange.cs` |
 | Pas de télémétrie | conforme : aucune | — |
 | Lumina plutôt que XIVAPI | conforme : feuilles du jeu ; XIVAPI n'est pas appelé par le plugin | [preuve](../evidence/0.451-xivapi-v2.md) |
@@ -178,6 +211,39 @@ et l'accord de l'auteur (consigne du 2026-11-04), sauf la politique IA, plus sui
 | Déclaration d'IA dans la PR | à écrire par l'auteur si une soumission a lieu un jour | — (le brouillon de 0.971 est parti avec publish/d17 en 0.1090, historique git) |
 | Traductions assistées par IA relues par des locuteurs | allemand et japonais : 30 clés, non relues, déclarées ; anglais et français complets | `src/TenshoAssistant/Localization/Languages/` |
 | Données embarquées sous licence compatible, avis conservé | fait : SubmarineTracker et FFXIVGachaSpreadsheet (MIT, texte complet dans le fichier), tables des dirigeables et des fêtes de LuminaSupplemental (GPL-3.0), Character Panel Refined (MIT, dans le code), FFXIV Gardening Tracker de Lotlab (GPL-3.0), croisements de nick75g (MIT) ; crédits dans le README et la page Crédits | `FreeCompany/Data/`, `Events/Data/`, `Reminders/Data/`, `Character/StatFormulas.cs`, `Credits/CreditCatalog.cs` |
+
+## Règles de Dalamud, une par une
+
+Texte d'origine : dalamud.dev, plugin-publishing/restrictions, lu le 2026-11-15 (22 règles ; les conseils qui suivent ne sont pas des
+règles). Tensho est publié sur son propre dépôt (DEC-039) et garde ces règles quand même. Une ligne par règle : comment Tensho la respecte,
+et sa preuve (décision, fichier, test). `DalamudRules1392Tests` vérifie que chaque règle a sa ligne et sa preuve dans les deux moitiés, que
+les fichiers nommés existent, et que le code tient ce que disent les lignes : les fonctions qui agissent sur le jeu restent dans les fichiers
+nommés ici, celles dites absentes restent absentes. Un changement qui touche une règle change sa ligne dans la même version.
+
+| # | Règle | Comment Tensho la respecte | Preuve |
+|---|---|---|---|
+| 1 | Aucune requête automatique au serveur ; rien que le jeu normal ne pourrait envoyer | Ce qui part vers le jeu part d'un clic du joueur, comme une commande normale du jeu ou par la fonction du jeu lui-même : alarmes du jeu (`/alarm`), annonce de chasse tapée dans la boîte de discussion, téléportation vers un éthérite, équiper une tenue, cabine d'essayage, écriture des macros d'artisanat dans la liste des macros du jeu, chaîne de macros (règle 12) et application du tri à un inventaire ouvert. Une exception, déclarée et coupée par défaut : le titre selon le job | DEC-035 ; `src/TenshoAssistant/Collections/TitleChanger.Dalamud.cs`, `src/TenshoAssistant/Alarms/AlarmService.Dalamud.cs`, `src/TenshoAssistant/Maps/HuntAnnouncer.Dalamud.cs`, `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs`, `src/TenshoAssistant/Gear/GameGearsetReader.Dalamud.cs`, `src/TenshoAssistant/Items/TryOn.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs`, `src/TenshoAssistant/Inventory/InventoryVisualSortBridge.Dalamud.cs` ; `DalamudRules1392Tests`, `DalamudRulesActs1399Tests` |
+| 2 | Le combat n'est ni augmenté, ni modifié, ni gêné | Pas de domaine combat : rien pendant un combat, seulement des informations de préparation en JcE. Exception décidée par l'utilisateur pour les rencontres du Dédale bestial, en information seulement | DEC-009, DEC-032, DEC-046, DEC-047 |
+| 3 | Aucun tort aux revenus de Square Enix | Rien n'est acheté, débloqué ni donné : les objets des boutiques et de la Mog Station sont montrés en information | `DalamudRules1392Tests` (aucune fonction d'achat du jeu appelée) |
+| 4 | Pas d'analyse de combat, de journal de raid ni de compteur de dégâts | Aucun : aucun combat n'est enregistré ni mesuré ; ACT et IINACT hors périmètre | DEC-009 ; `DalamudRules1392Tests` (pas de FFLogs) |
+| 5 | Aucun identifiant de compte des autres joueurs | Seul l'identifiant local du personnage connecté (`player.ContentId`) sert de clé ; au marché, l'identifiant du servant de chaque offre est lu seulement pour reconnaître les offres du joueur, jamais gardé (seul « une des miennes » l'est) | `src/TenshoAssistant/Market/SeenPriceReader.Dalamud.cs` |
+| 6 | Aucune dépendance obligatoire à un plugin qui enfreint les règles | Aucune dépendance de plugin, aucun IPC avec un autre plugin ; un paquet NuGet (Raphael.Net, MIT) | `src/TenshoAssistant/TenshoAssistant.csproj` ; `DalamudRules1392Tests` (aucun abonné IPC) |
+| 7 | Pas utile seulement pour un usage hors des règles | L'information d'abord ; une action dans le jeu seulement sur le clic du joueur (chacune nommée à la règle 1) | [README](../../README.md) ; règles 1 et 12 ; `DalamudRulesActs1399Tests` |
+| 8 | Aucun avantage en contenu compétitif ou JcJ | Tout le plugin se coupe en JcJ et en contenu classé, sans réglage, et repart seul | DEC-038 ; `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` ; `CompetitiveCut610Tests` |
+| 9 | Pas d'emote ni d'expression en boucle | Aucune : aucune emote n'est envoyée (la boîte de discussion ne sert qu'aux alarmes et à l'annonce de chasse) | `DalamudRules1392Tests` |
+| 10 | Pas de cinématique passée | Aucune : aucune fenêtre du jeu n'est répondue ni fermée à la place du joueur | `DalamudRules1392Tests` (aucun rappel de fenêtre) |
+| 11 | Pas de dialogue passé automatiquement | Aucun : aucune fenêtre Talk ni Oui/Non n'est lue pour y répondre | `DalamudRules1392Tests` (ni Talk, ni SelectYesno) |
+| 12 | Pas d'artisanat automatisé | Simulateur, solveur et coup conseillé, jamais exécutés ; l'enregistreur de rotation ne fait que regarder les actions du joueur (la fonction du jeu appelée d'abord, son résultat rendu tel quel). Les macros d'artisanat sont écrites dans la liste des macros du jeu sur le clic du joueur, jamais lancées par là. La chaîne de macros, lancée par le clic du joueur, exécute ses macros l'une après l'autre par la fonction de macro du jeu, telles qu'il les a écrites (chacune relue et refusée si elle a changé ; arrêt sur une macro verrouillée, une interruption ou en JcJ) | `src/TenshoAssistant/Craft/CraftRecorder.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroWriter.Dalamud.cs`, `src/TenshoAssistant/Macros/MacroChainBridge.Dalamud.cs` ; `DalamudRules1392Tests`, `DalamudRulesActs1399Tests` |
+| 13 | Pas de jet de butin automatique | Aucun : aucun jet n'est envoyé | `DalamudRules1392Tests` (aucune fonction de jet) |
+| 14 | Pas d'alerte de connexion ou de déconnexion des amis | Aucune : la liste d'amis n'est pas lue | `DalamudRules1392Tests` (pas de liste d'amis) |
+| 15 | Pas de marqueur des attaques de zone non signalées | Aucun | DEC-009 |
+| 16 | Pas de zoom de caméra au-delà des bornes du jeu | Aucun : la caméra n'est pas touchée | `DalamudRules1392Tests` (pas de gestionnaire de caméra) |
+| 17 | Pas d'intégration FFLogs | Aucune | `DalamudRules1392Tests` (pas de FFLogs) |
+| 18 | Pas d'analyseur de dégâts | Aucun | DEC-009 |
+| 19 | Pas de contournement de la Mog Station (Fantasia) | Aucun | règle 3 |
+| 20 | Pas de nouveau plugin de combos | Aucun : aucune action n'est remplacée ni combinée | règle 12 ; `DalamudRules1392Tests` (UseAction seulement regardé par l'enregistreur) |
+| 21 | Pas de recoloration des attaques de zone | Aucune | DEC-009 |
+| 22 | Rien en JcJ qui donne un avantage | Tout le plugin se coupe en JcJ (règle 8) | DEC-038 ; `CompetitiveCut610Tests` |
 
 ## Modèle de `manifest.toml` (dépôt DalamudPluginsD17, `testing/live/TenshoAssistant/manifest.toml`)
 

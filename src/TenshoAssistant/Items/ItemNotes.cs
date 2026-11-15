@@ -24,7 +24,7 @@ public static class ItemNotes
         var words=(query ?? "").Split(' ',StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries);
         return notes.Where(pair=>pair.Value is not null && !pair.Value.Empty && (filter switch{AnnotatedFilter.Important=>pair.Value.Important,AnnotatedFilter.ToSell=>pair.Value.ToSell,_=>true}))
             .Select(pair=>new AnnotatedItem(pair.Key,name(pair.Key),pair.Value))
-            .Where(row=>words.All(word=>row.Name.Contains(word,StringComparison.CurrentCultureIgnoreCase) || row.Note.Text.Contains(word,StringComparison.CurrentCultureIgnoreCase)))
+            .Where(row=>words.All(word=>SearchText.Contains(row.Name,word) || SearchText.Contains(row.Note.Text,word)))
             .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase).ToArray();
     }
     public const int MaximumText=500,MaximumItems=2000;

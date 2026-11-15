@@ -16,7 +16,7 @@ internal static class Titles369Tests
             var configuration = Read("Configuration.cs");
             Check(TenshoAssistant.ConfigurationReset.Kept.Contains("JobTitles") && TenshoAssistant.ConfigurationReset.Reset.Contains("JobTitlesEnabled"),
                 "map kept, switch reset");
-            Check(Read("Plugin.cs").Contains("()=>titleChanger?.Dispose()",StringComparison.Ordinal),"released");
+            Check(Read("Plugin.Collections.cs").Contains("()=>titleChanger?.Dispose()",StringComparison.Ordinal),"released");   // 0.1444 (X-153): Plugin.Collections.cs
         }),
     ];
 }

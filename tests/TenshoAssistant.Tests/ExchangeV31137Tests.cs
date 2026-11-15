@@ -211,7 +211,7 @@ internal static class ExchangeV31137Tests
             using var v2=new GitHubExchange(Path.Combine(root,"c"),old);var third=new DiscoveryStore();
             third.Merge([Venture(4),Fish(8)],common:true);Saved(third);
             var before=JsonSerializer.Serialize(third.Snapshot(At,false));
-            Check(Run(v2,third,false).Args[2]=="CommonUnreadable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set: nothing taken, said unreadable");
+            Check(Run(v2,third,false).Args[2]=="CommonUnreachable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set (404): nothing taken, said unreachable or not published yet (X-367)");
             Check(old.Asked.SequenceEqual([CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]),"only the v3 index asked, never the v2 file");
             Saved(third);
             Check(JsonSerializer.Serialize(third.Snapshot(At,false))==before && third.Find(DiscoveryKind.FishCatch,8u,5).Count==1 && third.Find(DiscoveryKind.Venture,4u,5).Count==1,
@@ -239,7 +239,7 @@ internal static class ExchangeV31137Tests
             store.SeeSource(DiscoveryKind.Venture,5,7,2,At);
             store.Merge([Venture(6)]);
             var message=Run(exchange,store,true);
-            Check(message.Args[2]=="CommonUnreadable" && message.Args[3]=="Sent","sent (no common set served: unreadable, X-357)");
+            Check(message.Args[2]=="CommonUnreachable" && message.Args[3]=="Sent","sent (no common set served: unreachable or not published yet, X-357, X-367)");
             var patch=server.Calls.Single();
             Check(patch.Method=="PATCH" && patch.Address=="https://api.github.com/gists/g1","the gist updated");
             var files=JsonNode.Parse(patch.Body)!["files"]!.AsObject();
@@ -280,7 +280,7 @@ internal static class ExchangeV31137Tests
             // X-357 (0.1349): the v2 discoveries.json is gone (it held the same 3007 facts, checked by the relay before its removal).
             Check(keys.Count==index!.Files.Sum(entry=>entry.Count) && !File.Exists(Path.GetFullPath("community-discoveries/discoveries.json")),$"one fact per line, no double ({keys.Count}); the v2 file gone");
             var tool=File.ReadAllText(Path.GetFullPath("tools/discoveries-merge.py"));
-            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("return write_v3(common[\"Facts\"],V3_DIR,say)")
+            Check(tool.Contains("def v3_kind(") && tool.Contains("def from_gist_files(") && tool.Contains("return write_v3(bounded(common[\"Facts\"],say=say),V3_DIR,say)")
                 && !tool.Contains("COMMON=") && !tool.Contains("write_json(COMMON"),"the merge tool reads v3 gists and writes the v3 set only");
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
             Check(exchange.Contains("store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));") && exchange.Contains("await TakeCommonV3(store).ConfigureAwait(false) ?? (\"CommonUnreadable\",0,0);")

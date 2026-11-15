@@ -154,10 +154,26 @@ def v3_kind_bytes(kind,facts,producer):
     text="".join(v3_line(o)+"\n" for o in [header]+[{k:f[k] for k in ORDER if k in f} for f in facts])
     return gzip.compress(text.encode("utf-8"),compresslevel=9,mtime=0)
 
+def bounded(facts,limit=None,say=print):
+    """X-406: each kind kept to `limit` facts (MAX_FACTS: the plugin's DiscoveryStore.MaxFacts, the bound of an index entry). Over it, the
+    facts the most players saw are kept (Imported), then the most recent (Last), then the fixed order; the others are said, never written."""
+    limit=MAX_FACTS if limit is None else limit
+    counts=collections.Counter(f["Kind"] for f in facts)
+    over=sorted(k for k,n in counts.items() if n>limit)
+    if not over:return facts
+    kept=[f for f in facts if f["Kind"] not in over]
+    for kind in over:
+        mine=sorted((f for f in facts if f["Kind"]==kind),key=lambda f:(-f["Imported"],-when(f["Last"]).timestamp(),sort_key(f)))
+        kept.extend(mine[:limit])
+        say(f"kind {kind}: {counts[kind]} facts over the bound of {limit}: {counts[kind]-limit} left out (the least seen, then the oldest)")
+    return sorted(kept,key=sort_key)
+
 def v3_build(facts,producer):
-    """(index.json text, {name: gzip bytes}) of a v3 set."""
+    """(index.json text, {name: gzip bytes}) of a v3 set. X-406: a kind over MAX_FACTS is refused (its index entry would refuse the whole set)."""
     by=collections.defaultdict(list)
     for f in facts:by[f["Kind"]].append(f)
+    over={k:len(v) for k,v in by.items() if len(v)>MAX_FACTS}
+    if over:raise ValueError(f"kinds over the bound of {MAX_FACTS} facts: {over} (bounded() first)")
     files={};entries=[]
     for kind in sorted(by):
         data=v3_kind_bytes(kind,by[kind],producer);files[v3_name(kind)]=data
@@ -376,7 +392,7 @@ def rebuild(say=print):
     players=len(counted)-len(left)
     # X-174, X-357 (0.1349): the v3 set only, compared byte for byte (X-113: the same facts are not written again, a date alone changes nothing).
     say(f"common: {len(common['Facts'])} facts from {players} players")
-    return write_v3(common["Facts"],V3_DIR,say)
+    return write_v3(bounded(common["Facts"],say=say),V3_DIR,say)
 
 def write_v3(facts,folder,say=print):
     """X-174: the v3 set of these facts in folder: a file written only when its bytes change, a kind file no longer in the set removed. True if changed."""
@@ -715,6 +731,26 @@ def selftest():
     except TimeoutError:slow=True
     check(slow,"X-146: a byte at a time past the deadline: stopped")
     check(refused(lambda:fetch_gist_raw("https://example.com/x",10,opener=lambda u,timeout:Answer(b"abc"))),"X-146: another address: refused")
+    # X-406: a kind over the bound kept to it (most seen, then most recent), the index read back whole; unbounded, refused before writing.
+    global MAX_FACTS
+    bound=MAX_FACTS
+    try:
+        MAX_FACTS=3
+        g=lambda subject,imported,last:{**f(1,subject,128,60.0,140.0,last),"Imported":imported}
+        many=[g(1,1,"2026-11-01T00:00:00+00:00"),g(2,5,"2026-11-01T00:00:00+00:00"),g(3,1,"2026-11-05T00:00:00+00:00"),
+              g(4,2,"2026-11-02T00:00:00+00:00"),g(5,1,"2026-11-04T00:00:00+00:00"),f(3,9,128,0.0,0.0,"2026-11-01T00:00:00+00:00")]
+        said=[];kept=bounded(many,say=said.append)
+        check(sorted(k["Subject"] for k in kept if k["Kind"]==1)==[2,3,4] and any(k["Kind"]==3 for k in kept) and len(kept)==4
+              and said==["kind 1: 5 facts over the bound of 3: 2 left out (the least seen, then the oldest)"],f"X-406: bounded keeps {[(k['Kind'],k['Subject']) for k in kept]}, {said}")
+        check(bounded(many[:3],say=said.append) is not None and len(said)==1,"X-406: a kind under the bound: unchanged, nothing said")
+        index,files=v3_build(kept,"t")
+        check([e["Count"] for e in v3_index(index)]==[3,1],"X-406: the bounded set's index reads whole")
+        check(refused(lambda:v3_build(many,"t")),"X-406: a kind over the bound: v3_build refuses to write")
+        with tempfile.TemporaryDirectory(prefix="tensho-x406-") as tmp:
+            check(write_v3(bounded(many,say=lambda s:None),tmp,lambda s:None) and len(v3_index(open(os.path.join(tmp,V3_INDEX),encoding="utf-8").read()))==2,
+                  "X-406: the set written in a folder reads back")
+    finally:MAX_FACTS=bound
+    check(MAX_FACTS==200_000,"X-406: the bound is the plugin's DiscoveryStore.MaxFacts")
     if os.path.isfile(os.path.join(V3_DIR,V3_INDEX)):
         # X-357 (0.1349): was « v3 holds the facts of discoveries.json »; the v2 file is gone: the repository's set reads whole and clean.
         repo=from_v3_dir(V3_DIR);facts,report=clean(repo)

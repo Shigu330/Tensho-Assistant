@@ -203,3 +203,31 @@ million facts). The rest of the wait is the dictionary growing under the lock (o
 appear only far above today's base (1 772 facts, one slice). A sighting or change made while a copy runs either goes into that copy or marks
 the base to save again, so nothing is lost (test DiscoveriesSlices1040Tests). The 64 MB bound of `Discoveries.json` is unchanged: a valid file
 over it is set aside (0.1039), not read; reading it in parts is left to part (5).
+
+## X-406 bound per kind, measured again at a million facts (0.1393, X-419 M4)
+
+Since 0.1383 (X-406) `rebuild` keeps each kind of the v3 set within `MAX_FACTS` (200 000, the same bound as the plugin's store): the most seen
+first, then the most recent. The million-fact run was made again on 2026-11-15 (relays 75 and 76, the same figures), with the largest kind file
+now measured against the exchange's bounds:
+
+```
+python -I -X utf8 tools/discoveries-load.py --sizes 1000000 --players 100 --runs 1
+```
+
+| Measure (1 000 000 distinct facts, 100 players, one run) | Value | Bound |
+|---|---|---|
+| Sightings in the shares (largest share) | 2 398 606 (24 481) | 200 000 facts a share |
+| Facts in the v3 set, refused, players flagged | 496 923, 0, 0 | |
+| Facts of the largest kind (kept by the bound) | 200 000 | `MAX_FACTS` 200 000 |
+| Largest kind file, compressed | 6.8 MB | `MAX_COMPRESSED` 32 MB |
+| Largest kind file, once read (decompressed) | 54.7 MB | `MAX_DECOMPRESSED` 256 MB |
+| Whole v3 set (index and kind files) | 14.4 MB (30.5 bytes a fact) | |
+| `read` + `clean` of every share, player files written | 151 s | |
+| `rebuild` (v3 set written) / again with nothing new | 127 s / 127 s | |
+| Player files (`community-discoveries/players/`) | 587 MB | |
+| Peak memory of the process | 3 671 MB | |
+
+What it says: the bound holds at a million facts with room to spare (the largest kind file is a fifth of the compressed bound and a fifth of the
+read bound); `rebuild` takes about two minutes and 3.7 GB, fine for a tool run by hand on this PC. The player files (587 MB) stay the limit
+named in part (6) above (git), not the v3 set.
+

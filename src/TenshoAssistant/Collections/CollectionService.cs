@@ -54,6 +54,15 @@ public sealed class CollectionService
     private int titlesLoaded=-1,achievementsLoaded=-1;
     public bool? TitleListLoaded=>Volatile.Read(ref titlesLoaded) is var value && value<0 ? null:value==1;
     public bool? AchievementListLoaded=>Volatile.Read(ref achievementsLoaded) is var value && value<0 ? null:value==1;
+    // X-274 (0.1387): the date of the saved reading shown while the game has not sent the list this session (UTC ticks; 0 = none used).
+    private long titlesReadAt,achievementsReadAt;
+    public DateTimeOffset? TitlesReadAt=>Volatile.Read(ref titlesReadAt) is var ticks && ticks>0 ? new DateTimeOffset(ticks,TimeSpan.Zero):null;
+    public DateTimeOffset? AchievementsReadAt=>Volatile.Read(ref achievementsReadAt) is var ticks && ticks>0 ? new DateTimeOffset(ticks,TimeSpan.Zero):null;
+    internal void SetReadings(DateTimeOffset? titles,DateTimeOffset? achievements)
+    {
+        Volatile.Write(ref titlesReadAt,titles?.UtcTicks ?? 0);
+        Volatile.Write(ref achievementsReadAt,achievements?.UtcTicks ?? 0);
+    }
     internal void SetListsLoaded(bool? titles,bool? achievements)
     {
         Volatile.Write(ref titlesLoaded,titles is null ? -1:titles.Value ? 1:0);

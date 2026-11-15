@@ -16,6 +16,7 @@ internal sealed class PanelWindow : Window
     private bool broken;
     private Vector2? lastPosition;
     private Vector2 lastSize;
+    private bool borderPushed;
 
     public PanelWindow(MainWindow owner, PanelDefinition panel) : base(panel.Id, panel.Flags)
     {
@@ -26,6 +27,8 @@ internal sealed class PanelWindow : Window
         RespectCloseHotkey = false;
         DisableWindowSounds = true;
         ShowCloseButton = panel.Close is not null;
+        // X-403 (0.1434): a panel that is resized by hand (the chat window) starts at its size.
+        if (panel.Size is { } size) { Size = size; SizeCondition = ImGuiCond.FirstUseEver; }
     }
 
     public void Follow() => IsOpen = !broken && panel.Wanted();
@@ -42,11 +45,17 @@ internal sealed class PanelWindow : Window
     {
         if (panel.Title is { } title) WindowName = title() + panel.Id;
         UI.FfxivTheme.Push();
-        if (panel.Alpha is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);
+        // X-403 (0.1434): an opacity chosen in the settings is read at each draw.
+        if ((panel.Opacity?.Invoke() ?? panel.Alpha) is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);
+        // X-448 (0.1454): flags a setting adds at each draw (the chat window: borderless, locked), and no frame line when borderless.
+        if (panel.MoreFlags is { } more) Flags = panel.Flags | more();
+        borderPushed = panel.NoBorder?.Invoke() == true;
+        if (borderPushed) ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
     }
 
     public override void PostDraw()
     {
+        if (borderPushed) { ImGui.PopStyleVar(); borderPushed = false; }
         UI.FfxivTheme.Pop();
         if (!IsOpen) panel.Close?.Invoke();
     }
@@ -69,4 +78,5 @@ internal sealed class PanelWindow : Window
 }
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
-internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null);
+internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null,
+    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null);

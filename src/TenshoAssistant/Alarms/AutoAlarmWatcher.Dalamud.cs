@@ -7,6 +7,7 @@ namespace TenshoAssistant.Alarms;
 /// g, M-01 (0.371): every 30 seconds on the framework thread, while logged in and when « automatic alarms » is on (default): reads the
 /// retainer ventures (RetainerManager, known once the retainer list was opened at a summoning bell) and the saved vessel returns
 /// (Configuration.Voyages, kept by VoyageWatcher), and the squadron's mission and training (0.455), then syncs the automatic alarms (AutoAlarms) and saves when they changed.
+/// X-196 (0.1411): the end of each retainer's sales too (RetainerManager, MarketItemCount and MarketExpire), the reminder before they end.
 /// </summary>
 public sealed unsafe class AutoAlarmWatcher : IDisposable
 {
@@ -36,12 +37,20 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
         try
         {
             var events=new List<DueEvent>();
+            // X-431 M1 (0.1416): the retainers read with nothing on sale: their « sales end » alarm, if any, is taken back. X-435 M1 (0.1420):
+            // only those; a retainer still selling whose time is unusable (0, before the game began) keeps the alarm it had.
+            var gone=new List<string>();
             var retainers=RetainerManager.Instance();
             if(retainers!=null && retainers->IsReady)
                 for(var index=0u;index<retainers->GetRetainerCount();index++)
                 {
                     var retainer=retainers->GetRetainerBySortedIndex(index);
-                    if(retainer==null || retainer->RetainerId==0 || retainer->VentureId==0 || retainer->VentureComplete==0)continue;
+                    if(retainer==null || retainer->RetainerId==0)continue;
+                    if(TenshoAssistant.Character.RetainerStates.SaleAlarmAt(retainer->MarketItemCount,retainer->MarketExpire) is { } salesEnd)
+                        events.Add(new($"market:{retainer->RetainerId}",string.Format(text("AutoAlarms.Market"),retainer->NameString),text("AutoAlarms.MarketGroup"),
+                            salesEnd,AlarmSource.Reminder));
+                    else if(TenshoAssistant.Character.RetainerStates.NothingOnSale(retainer->MarketItemCount))gone.Add($"market:{retainer->RetainerId}");
+                    if(retainer->VentureId==0 || retainer->VentureComplete==0)continue;
                     events.Add(new($"venture:{retainer->RetainerId}",string.Format(text("AutoAlarms.Venture"),retainer->NameString),text("AutoAlarms.VentureGroup"),
                         DateTimeOffset.FromUnixTimeSeconds(retainer->VentureComplete),AlarmSource.Reminder));
                 }
@@ -60,7 +69,7 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
                     events.Add(new("squadron:training",text("AutoAlarms.SquadronTraining"),group,DateTimeOffset.FromUnixTimeSeconds(player->SquadronTrainingCompletionTimestamp),AlarmSource.Reminder));
             }
             configuration.Alarms??=[];
-            if(AutoAlarms.Sync(configuration.Alarms,events,now,options.LeadMinutes))save();
+            if(AutoAlarms.Sync(configuration.Alarms,events,now,options.LeadMinutes,gone))save();
             warned=false;
         }
         catch(Exception error)

@@ -57,7 +57,7 @@ internal static class VoyageReload1094Tests
         ("Voyage reload 1094: wiring",() =>
         {
             string Read(string file)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+file));
-            var plugin=Read("Plugin.cs");
+            var plugin=Read("Plugin.Ocean.cs");   // X-153 (0.1417): the ocean family's file
             Check(plugin.Contains("\"OceanVoyage.json\"") && plugin.Contains("new Diagnostics.PlayStateWriter(") && plugin.Contains("pluginInterface.IsDev || configuration.DeveloperMode"),"plugin wiring");
             var reader=Read("Gathering/OceanVoyageReader.Dalamud.cs");
             Check(reader.Contains("OceanVoyageRecord.Merge(record,") && reader.Contains("AtomicFile.Write(path,json)") && reader.Contains("OceanVoyageRecord.FromJson("),"reader keeps and reads the record");

@@ -17,6 +17,7 @@ internal sealed partial class MainWindow
     private string mapLocalQuestCategory="",mapLocalGatheringType="";
     // 0.328: the lists of the shown tab, rebuilt only when what they are made of changes (the menu stays open for seconds; quests and
     // gathering sources are walked in full, MapCatalog.Equivalent walks every map).
+    private (object? Events,object? Festivals,object? FestivalQuests,uint MapId,bool Locked,uint[]? Running,string? Season,IReadOnlySet<uint>? Offered,string OfferedKey) mapLocalQuestKeys;
     private (object? Entries,object? Index,uint MapId,bool Complete,bool Locked,string Season,string Offered,IReadOnlyList<(string Category,IReadOnlyList<MapLocalQuest> Quests)> Groups) mapLocalQuestCache=(null,null,0,false,true,"","",[]);
     private (uint MapId,object? Catalog,object? Index,IReadOnlyList<(string Type,IReadOnlyList<MapLocalGatheringPoint> Points)> Groups) mapLocalGatheringCache=(0,null,null,[]);
     private (object? Catalog,uint MapId,IReadOnlySet<uint> Ids) mapLocalEquivalentCache=(null,0,new HashSet<uint>());
@@ -85,11 +86,20 @@ internal sealed partial class MainWindow
         var locked=settings.ShowLockedQuests;
         // X-355 (0.1344): the seasonal events running now (unknown: « ? », nothing taken for out of season).
         var festivals=locked ? null:Festivals?.Invoke();festivals?.Want();
-        var running=festivals?.State?.Active.Select(festival=>festival.Id).Order().ToArray();
-        var season=festivals?.Quests is null || running is null ? "?":string.Join(',',running);
-        // X-355 (0.1345): the quests the game offers on this map (its own list, as the map draws it), when it covers the map.
-        var offered=locked ? null:MapLocalLists.Offered(mapLive?.State?.Events?.Select(marker=>(marker.MapId,marker.ObjectiveId,marker.Offered)),map.MapId);
-        var offeredKey=offered is null ? "?":string.Join(',',offered.Order());
+        // X-359 M4 (0.1382, R07): the running events and the offered quests, with their keys, made again only when their sources change
+        // (compared by reference, as the entries), not at every frame.
+        var events=locked ? null:mapLive?.State?.Events;
+        var keys=mapLocalQuestKeys;
+        if(!ReferenceEquals(keys.Events,events) || !ReferenceEquals(keys.Festivals,festivals?.State) || !ReferenceEquals(keys.FestivalQuests,festivals?.Quests)
+           || keys.MapId!=map.MapId || keys.Locked!=locked || keys.Season is null)
+        {
+            var activeIds=festivals?.State?.Active.Select(festival=>festival.Id).Order().ToArray();
+            // X-355 (0.1345): the quests the game offers on this map (its own list, as the map draws it), when it covers the map.
+            var offeredNow=locked ? null:MapLocalLists.Offered(events?.Select(marker=>(marker.MapId,marker.ObjectiveId,marker.Offered)),map.MapId);
+            keys=mapLocalQuestKeys=(events,festivals?.State,festivals?.Quests,map.MapId,locked,activeIds,
+                festivals?.Quests is null || activeIds is null ? "?":string.Join(',',activeIds),offeredNow,offeredNow is null ? "?":string.Join(',',offeredNow.Order()));
+        }
+        var running=keys.Running;var season=keys.Season!;var offered=keys.Offered;var offeredKey=keys.OfferedKey;
         var cache=mapLocalQuestCache;
         if(!ReferenceEquals(cache.Entries,state.Entries) || !ReferenceEquals(cache.Index,index) || cache.MapId!=map.MapId || cache.Complete!=mapLocalShowComplete || cache.Locked!=locked || cache.Season!=season || cache.Offered!=offeredKey)
             mapLocalQuestCache=(state.Entries,index,map.MapId,mapLocalShowComplete,locked,season,offeredKey,

@@ -205,7 +205,7 @@ internal sealed partial class MainWindow
         {
             if(fromStockView is { } before && (before.Job!=fromStockJob || before.Min!=fromStockMin || before.Max!=fromStockMax || before.Sort!=fromStockSort || before.Query!=fromStockQuery || !ReferenceEquals(before.Source,result)))fromStockPage=0;
             var names=itemCatalog.State.Catalog;
-            var filtered=CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax).Where(row=>fromStockQuery.Length==0 || names?.Find(row.Recipe.ResultItemId)?.Name.Contains(fromStockQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
+            var filtered=CraftFromStock.Filter(result.Rows,fromStockJob,fromStockMin,fromStockMax).Where(row=>fromStockQuery.Length==0 || SearchText.Contains(names?.Find(row.Recipe.ResultItemId)?.Name,fromStockQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
             var ranked=FromStockRanked(filtered);
             var (shownRows,shownPage,pages)=CraftFromStock.Paged(CraftFromStock.Lines(ranked),fromStockPage,FromStockPageSize);
             fromStockPage=shownPage;

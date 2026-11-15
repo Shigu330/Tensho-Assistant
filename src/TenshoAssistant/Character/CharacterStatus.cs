@@ -7,6 +7,94 @@ namespace TenshoAssistant.Character;
 public sealed record VentureState(string Retainer,DateTimeOffset? Done);
 
 /// <summary>
+/// X-196 (0.1409): one retainer of the character as last read at a summoning bell (RetainerManager, once the retainer list was opened): job
+/// (abbreviation in the client's language, as read), level, gil, items held (the game's count), items on the market and when their sales
+/// end, the venture and its end, the market town (Town sheet, as read); its stock in the game's item finder copy (X-307: stacks, HQ stacks,
+/// crystals; null when the copy has no entry for it). No retainer id is kept: the copy is joined at the reading only.
+/// </summary>
+public sealed record RetainerState
+{
+    public string Name { get; init; } = "";
+    public string Job { get; init; } = "";
+    public int Level { get; init; }
+    public long Gil { get; init; }
+    public int Items { get; init; }
+    public int MarketItems { get; init; }
+    public DateTimeOffset? MarketEnds { get; init; }
+    public uint Venture { get; init; }
+    public DateTimeOffset? VentureDone { get; init; }
+    public string Town { get; init; } = "";
+    public int? Stacks { get; init; }
+    public int? HqStacks { get; init; }
+    public int? Crystals { get; init; }
+}
+
+/// <summary>X-196 (0.1409): the game's values of a retainer as Tensho keeps them (a zero time is « none », texts bounded).</summary>
+public static class RetainerStates
+{
+    public const int MaximumText=40;
+
+    public static RetainerState From(string name,string job,int level,long gil,int items,int marketItems,uint marketExpire,uint venture,uint ventureComplete,string town,
+        (int Stacks,int HqStacks,int Crystals)? stock)=>new()
+    {
+        Name=Text(name),Job=Text(job),Level=Math.Max(0,level),Gil=Math.Max(0,gil),Items=Math.Max(0,items),MarketItems=Math.Max(0,marketItems),
+        MarketEnds=SalesEnd(marketItems,marketExpire),
+        Venture=venture,VentureDone=venture!=0 && ventureComplete>0 ? DateTimeOffset.FromUnixTimeSeconds(ventureComplete):null,
+        Town=Text(town),Stacks=stock?.Stacks,HqStacks=stock?.HqStacks,Crystals=stock?.Crystals,
+    };
+
+    public static string Text(string? text)
+    {
+        var clean=(text ?? "").Trim();
+        return clean.Length>MaximumText ? clean[..MaximumText]:clean;
+    }
+
+    /// <summary>X-435 M1 (0.1420): the retainer was read with nothing on sale (its « sales end » alarm is taken back); a retainer still selling
+    /// whose time is unusable is not « nothing on sale ».</summary>
+    public static bool NothingOnSale(int marketItems)=>marketItems<=0;
+
+    /// <summary>X-196 (0.1411): when the automatic alarm of a retainer's sales rings: at their end, only while something is on sale (null otherwise).</summary>
+    public static DateTimeOffset? SaleAlarmAt(int marketItems,uint marketExpire)=>SalesEnd(marketItems,marketExpire);
+
+    /// <summary>X-429 (0.1415): no retainer's sale ends before the game began (A Realm Reborn, 27 August 2013): an earlier value is no time.</summary>
+    public static readonly DateTimeOffset GameStart=new(2013,8,27,0,0,0,TimeSpan.Zero);
+
+    /// <summary>
+    /// X-429 (0.1415, docs/evidence/0.1415-retainer-sales-end.md): the end of a retainer's sales, the one reading of it for the table and the
+    /// alarm. The game writes it in its own retainer list (Addon 2314: « Selling n items until date », the time given as lnum4 beside the town
+    /// lnum2 and the count lnum3, the three values of RetainerManager.Retainer: Town, MarketItemCount, MarketExpire). X-434 (0.1420,
+    /// docs/evidence/0.1420-retainer-sales-end-code.md): read in the game's own code, the function that writes that line pushes the retainer's
+    /// bytes +0x30, +0x31 and the 32-bit value +0x34 (MarketExpire) as lnum2, lnum3 and lnum4: the game's « until » day is the day of this
+    /// very time (the game shows the day only; Tensho the same time to the minute). Null when nothing is on
+    /// sale (the game shows no time then: Addon 2317), when no time is given, or when the time is before <see cref="GameStart"/>.
+    /// </summary>
+    public static DateTimeOffset? SalesEnd(int marketItems,uint marketExpire)
+    {
+        if(marketItems<=0 || marketExpire==0)return null;
+        var end=DateTimeOffset.FromUnixTimeSeconds(marketExpire);
+        return end<GameStart ? null:end;
+    }
+
+    /// <summary>X-196 (0.1410): a sale ends « soon » within a day (the table shows it in orange; ended ones in red).</summary>
+    public static readonly TimeSpan SaleSoon=TimeSpan.FromDays(1);
+
+    /// <summary>X-196 (0.1410): where the retainer's sales stand at <paramref name="now"/>, as last read.</summary>
+    public static RetainerSale Sale(RetainerState retainer,DateTimeOffset now)
+    {
+        if(retainer.MarketItems<=0)return RetainerSale.None;
+        if(retainer.MarketEnds is not { } end)return RetainerSale.Selling;
+        return end<=now ? RetainerSale.Ended:end-now<=SaleSoon ? RetainerSale.EndingSoon:RetainerSale.Selling;
+    }
+
+    /// <summary>X-196 (0.1410): the table's rows: each character in the given order, its retainers in the game's order; characters never read left out.</summary>
+    public static IReadOnlyList<(CharacterStatus Character,RetainerState Retainer)> Table(IEnumerable<CharacterStatus> characters)
+        =>[.. characters.Where(status=>status.Retainers is { Length:>0 }).SelectMany(status=>status.Retainers!.Select(retainer=>(status,retainer)))];
+}
+
+/// <summary>X-196 (0.1410): a retainer's sales as last read: none on sale, selling, ending within <see cref="RetainerStates.SaleSoon"/>, ended.</summary>
+public enum RetainerSale { None, Selling, EndingSoon, Ended }
+
+/// <summary>
 /// g, M-04 (0.374): what Tensho last read for one of the player's characters (local character id, never an Account ID): retainer
 /// ventures, next treasure map, Wondrous Tails, hunt bills, daily roulettes, and the Reminders page's « done » boxes. A null value is
 /// unknown (never read), never zero.
@@ -35,6 +123,8 @@ public sealed record CharacterStatus
     public DateTimeOffset? TimersAt { get; init; }
     public DateTimeOffset? SquadronMissionDone { get; init; }
     public DateTimeOffset? SquadronTrainingDone { get; init; }
+    // X-196 (0.1409): every retainer as last read at a summoning bell (null: never read; a file from before 0.1409 reads null).
+    public RetainerState[]? Retainers { get; init; }
 }
 
 /// <summary>
@@ -69,6 +159,7 @@ public static class CharacterStatuses
             TimersAt=fresh.DeliveriesLeft is null && fresh.AlliedQuestsLeft is null ? old.TimersAt:fresh.TimersAt,
             SquadronMissionDone=fresh.SquadronMissionDone ?? old.SquadronMissionDone,
             SquadronTrainingDone=fresh.SquadronTrainingDone ?? old.SquadronTrainingDone,
+            Retainers=fresh.Retainers ?? old.Retainers,
         };
     }
 
@@ -76,10 +167,10 @@ public static class CharacterStatuses
     public static bool Changed(CharacterStatus? old,CharacterStatus fresh)
     {
         if(old is null)return true;
-        var a=old with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null};var b=fresh with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null};
-        return a!=b || !Same(old.Ventures,fresh.Ventures) || !Same(old.Done,fresh.Done);
+        var a=old with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null,Retainers=null};var b=fresh with{SeenAt=default,Ventures=null,Done=null,RoulettesAt=null,TimersAt=null,Retainers=null};
+        return a!=b || !Same(old.Ventures,fresh.Ventures) || !Same(old.Done,fresh.Done) || !Same(old.Retainers,fresh.Retainers);
     }
-    private static bool Same(VentureState[]? a,VentureState[]? b)=>a is null ? b is null:b is not null && a.SequenceEqual(b);
+    private static bool Same<T>(T[]? a,T[]? b)=>a is null ? b is null:b is not null && a.SequenceEqual(b);
     private static bool Same(Dictionary<string,DateTimeOffset>? a,Dictionary<string,DateTimeOffset>? b)
         =>a is null ? b is null:b is not null && a.Count==b.Count && a.All(pair=>b.TryGetValue(pair.Key,out var at) && at==pair.Value);
 
@@ -141,6 +232,10 @@ public static class CharacterStatuses
     {
         Name=status.Name.Length>80 ? status.Name[..80]:status.Name,
         Ventures=status.Ventures?.Take(MaximumVentures).ToArray(),
+        Retainers=status.Retainers?.Take(MaximumVentures).Select(retainer=>retainer with
+        {
+            Name=RetainerStates.Text(retainer.Name),Job=RetainerStates.Text(retainer.Job),Town=RetainerStates.Text(retainer.Town),
+        }).ToArray(),
         Done=status.Done is { Count:>MaximumDone } done ? done.Take(MaximumDone).ToDictionary():status.Done,
     };
 }

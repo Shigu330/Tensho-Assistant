@@ -102,7 +102,7 @@ internal sealed partial class MainWindow
                     3=>row.State is OutfitState.Stored,
                     _=>true,
                 })
-                .Where(row=>query.Length==0 || (items?.Find(row.Outfit.SetItemId)?.Name ?? "").Contains(query,StringComparison.CurrentCultureIgnoreCase))
+                .Where(row=>query.Length==0 || SearchText.Contains((items?.Find(row.Outfit.SetItemId)?.Name ?? ""),query,StringComparison.CurrentCultureIgnoreCase))
                 .OrderByDescending(row=>row.State==OutfitState.InDresser).ThenByDescending(row=>row.Owned*100/Math.Max(1,row.Outfit.Pieces.Count))
                 .ThenBy(row=>items?.Find(row.Outfit.SetItemId)?.Name ?? "",StringComparer.CurrentCultureIgnoreCase).ToArray();
         }

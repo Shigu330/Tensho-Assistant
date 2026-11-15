@@ -16,6 +16,8 @@ internal static class SettingsSaver1164Tests
     {
         public readonly ConcurrentQueue<(int Version, int Thread)> Writes = new();
         public int SlowMs;
+        /// <summary>X-373: when set, each write waits until the test opens it (no real delay to outlast on a slow machine).</summary>
+        public ManualResetEventSlim? Gate;
         public Func<Settings, bool>? Fail;
         public int Running;
         public int Overlaps;
@@ -25,6 +27,7 @@ internal static class SettingsSaver1164Tests
             try
             {
                 if (SlowMs > 0) Thread.Sleep(SlowMs);
+                if (Gate is not null && !Gate.Wait(TimeSpan.FromSeconds(30))) throw new TimeoutException("the test never opened the gate");
                 if (Fail?.Invoke(copy) == true) throw new IOException("disk full");
                 Writes.Enqueue((copy.Version, Environment.CurrentManagedThreadId));
             }
@@ -123,13 +126,20 @@ internal static class SettingsSaver1164Tests
             live.Version = 3; saver.Save();
             Check(disk.Last == 3 && disk.Writes.Last().Thread == Environment.CurrentManagedThreadId, "after unload, saved directly");
             var (slow, slowLive, slowDisk, _, _) = Make();
-            slowDisk.SlowMs = 400;
+            // X-373: the write under way is held by a gate (was 400 ms of real time, which a slow CI machine could outlast): the wait runs out for sure.
+            using var gate = new ManualResetEventSlim(false);
+            slowDisk.Gate = gate;
             slowLive.Version = 1; slow.Save();
             Until(() => slowDisk.Running == 1);
+            Check(slowDisk.Running == 1, "the first write is under way, held");
             slowLive.Version = 2;
             Check(!slow.Flush(TimeSpan.FromMilliseconds(20)), "the wait ran out");
+            Check(slowDisk.Writes.IsEmpty, "nothing written while the gate is shut");
+            // The disk answers while the unload is waiting (or just before it waits: the same end either way).
+            var opened = Task.Run(() => { Thread.Sleep(20); gate.Set(); });
             // 0.1207 (X-184 N22): the unload waits once more until the live settings are on disk (Plugin.cs: Settle).
-            Check(slow.Settle(TimeSpan.FromSeconds(10)) && slowDisk.Last == 2, "settled: on its return, the live settings are on disk: " + slowDisk.Last);
+            Check(slow.Settle(TimeSpan.FromSeconds(30)) && slowDisk.Last == 2, "settled: on its return, the live settings are on disk: " + slowDisk.Last);
+            opened.Wait();
             Until(() => slowDisk.Writes.Count == 2);
             Check(slowDisk.Writes.Select(write => write.Version).SequenceEqual(new[] { 1, 2 }) && slowDisk.Overlaps == 0,
                 "the live settings written anyway, after the write under way, never at the same time: " + string.Join(",", slowDisk.Writes.Select(write => write.Version)));

@@ -110,7 +110,9 @@ internal static class GilJournalTests
             var page=Read("MainWindow.GilJournal.cs");
             Check(page.Contains("totals.Where(total=>!GilJournal.IsTransfer(total.Category))"),"net");
             var watcher=Read("Inventory/GilWatcher.Dalamud.cs");
-            Check(watcher.Contains("InventoryType.RetainerGil") && watcher.Contains("GilJournal.SplitRetainerRise(delta,retainerDeposits)"),"live and split");
+            // X-431 M2 (0.1416): the open retainer's purse is read by RetainerPurse, shared with the retainers' table.
+            Check(Read("Inventory/RetainerPurse.Dalamud.cs").Contains("InventoryType.RetainerGil") && watcher.Contains("RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse)")
+                && watcher.Contains("GilJournal.SplitRetainerRise(delta,retainerDeposits)"),"live and split");
         }),
     ];
 }

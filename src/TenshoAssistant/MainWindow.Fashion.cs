@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
         {
             var query=fashionHintQuery.Trim();
             fashionHintMatches=fashionAllHints.Where(hint=>query.Length==0 || hint.Id.ToString(CultureInfo.InvariantCulture)==query
-                || CultureInfo.CurrentCulture.CompareInfo.IndexOf(hint.Name,query,CompareOptions.IgnoreCase|CompareOptions.IgnoreNonSpace)>=0).ToArray();
+                || SearchText.Contains(hint.Name,query,CompareOptions.IgnoreCase|CompareOptions.IgnoreNonSpace)).ToArray();
             fashionNativeView=catalog; fashionHintDataView=dataset; fashionHintQueryView=fashionHintQuery;
             fashionHintsNeedFilter=false;
         }

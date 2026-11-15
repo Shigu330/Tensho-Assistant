@@ -157,8 +157,7 @@ internal sealed partial class MainWindow
     }
 
     private bool MatchesToolFilter(string text) => string.IsNullOrWhiteSpace(toolQuery)
-        || CultureInfo.InvariantCulture.CompareInfo.IndexOf(text, toolQuery.Trim(),
-            CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0;
+        || SearchText.Contains(text, toolQuery.Trim(), CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace, CultureInfo.InvariantCulture);
 
     private void OpenToolDirectory(string reference)
     {

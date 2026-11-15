@@ -324,6 +324,13 @@ public sealed class GitHubExchange : IDisposable
     private bool CommonUnreadable(Exception error)
         =>error is HttpRequestException or IOException or InvalidDataException or DecoderFallbackException or System.Text.Json.JsonException
             || error is TaskCanceledException && !stop.IsCancellationRequested;
+    /// <summary>
+    /// X-367 M1 (relecture 0.1349, D-159): of those, the ones where the file could not be fetched, not a file that is damaged: GitHub not reached, a
+    /// refusal or a missing file (any HttpRequestException: no answer, 404 before the set is published, 403, 429, 5xx), a request past its delay
+    /// (TaskCanceledException outside a stop) and a body cut midway (IOException). « Unreachable or not published yet, try again later », never
+    /// « unreadable ». Bad gzip, a size or hash that does not match, text or JSON that cannot be read stay « unreadable ».
+    /// </summary>
+    internal static bool CommonUnreachable(Exception error)=>error is HttpRequestException or IOException or TaskCanceledException;
 
     private async Task<ExchangeMessage> ExchangeAsync(DiscoveryStore store,bool upload)
     {
@@ -331,7 +338,7 @@ public sealed class GitHubExchange : IDisposable
         // X-357 (0.1349, DEC-052): the v3 set only; the v2 file is gone from the repository. Without a v3 index this version reads: nothing taken,
         // « unreadable », the local base untouched.
         try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? ("CommonUnreadable",0,0);}
-        catch(Exception error) when(CommonUnreadable(error)){taken=("CommonUnreadable",0,0);}
+        catch(Exception error) when(CommonUnreadable(error)){taken=(CommonUnreachable(error) ? "CommonUnreachable":"CommonUnreadable",0,0);}
         var (common,added,joined)=taken;
         var sent="";
         if(upload && Connected)
@@ -369,9 +376,9 @@ public sealed class GitHubExchange : IDisposable
     {
         ExchangeV3Index? index;
         try{index=ExchangeV3.ParseIndex(await Community.BoundedHttp.ReadAsync(client,new Uri(CommunityDiscoveries.AddressV3+ExchangeV3.IndexName),ExchangeV3.MaxIndexBytes,stop.Token).ConfigureAwait(false));}
-        catch(Exception error) when(CommonUnreadable(error)){return null;}
+        catch(Exception error) when(CommonUnreadable(error)){return CommonUnreachable(error) ? ("CommonUnreachable",0,0):null;}
         if(index is null)return null;
-        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0;
+        var noted=CommonV3Marks();int added=0,joined=0,taken=0,unreadable=0,unreachable=0;
         foreach(var entry in index.Files)
         {
             var kind=(int)entry.Kind;var hash=entry.Sha256.ToUpperInvariant();var key=$"common-v3:{kind}:{hash}";
@@ -383,9 +390,9 @@ public sealed class GitHubExchange : IDisposable
                 var result=store.Merge(read.Facts,common:true);added+=result.Added;joined+=result.Joined;taken++;
                 store.WhenImportSaved(key,()=>NoteCommonV3(kind,hash));
             }
-            catch(Exception error) when(CommonUnreadable(error)){unreadable++;}
+            catch(Exception error) when(CommonUnreadable(error)){if(CommonUnreachable(error))unreachable++;else unreadable++;}
         }
-        return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":"CommonSame",added,joined);
+        return (taken>0 ? "CommonTaken":unreadable>0 ? "CommonUnreadable":unreachable>0 ? "CommonUnreachable":"CommonSame",added,joined);
     }
     private Dictionary<int,string> CommonV3Marks()
     {

@@ -15,8 +15,12 @@ $base = 'https://goatcorp.github.io/dalamud-distrib'
 $maximumBytes = 300MB
 
 $zip = $ZipPath
+$downloaded = $false
+# X-359 M5 (0.1382): a zip this script downloaded is removed at the end (a zip given with -ZipPath is left alone).
+try {
 if (-not $zip) {
     $zip = Join-Path ([System.IO.Path]::GetTempPath()) ('dalamud-' + [guid]::NewGuid().ToString('N') + '.zip')
+    $downloaded = $true
     Invoke-WebRequest -Uri "$base/latest.zip" -OutFile $zip -UseBasicParsing
 }
 if (-not $PublishedVersion) {
@@ -47,3 +51,7 @@ if ($version.Major -ne $apiLevel) {
     throw "Dalamud: latest.zip is Dalamud $version, the plugin is built for API level $apiLevel (Dalamud.NET.Sdk $sdk in global.json): update the SDK first"
 }
 "Dalamud $version (published $PublishedVersion, API level $apiLevel), latest.zip $size bytes, SHA-256 $hash"
+}
+finally {
+    if ($downloaded -and (Test-Path -LiteralPath $zip)) { Remove-Item -LiteralPath $zip -Force -ErrorAction SilentlyContinue }
+}

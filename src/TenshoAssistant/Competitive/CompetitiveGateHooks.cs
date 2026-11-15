@@ -30,6 +30,10 @@ internal static partial class CompetitiveGate
     internal static (int Classes,int Methods,double Compiling,double DoneAfter,int Waiting)? CompilerState{get{lock(CompilerGate)return compiler?.State;}}
     /// <summary>X-177 (0.1281): of the methods compiled for the readers, those called from their classes in other classes.</summary>
     internal static int CompilerCallees{get{lock(CompilerGate)return compiler?.Callees ?? 0;}}
+    /// <summary>X-433 (0.1438): how many readers the guard delay started before their class was compiled; 0 without a compiler.</summary>
+    internal static int CompilerGuardStarts{get{lock(CompilerGate)return compiler?.GuardStarts ?? 0;}}
+    /// <summary>X-433 (0.1424): the readers' compiler's longest compilations, with the clock time each ended; empty without a compiler.</summary>
+    internal static string CompilerSlowest{get{lock(CompilerGate)return compiler?.Slowest ?? "";}}
     /// <summary>X-177 C4.2 (0.1200): readers' classes still wait or are being compiled (the warm-up's rest waits for them); false without a compiler.</summary>
     internal static bool CompilerBusy{get{Diagnostics.ReaderCompiler? running;lock(CompilerGate)running=compiler;return running is { Idle:false };}}
 

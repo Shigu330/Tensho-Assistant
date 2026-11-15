@@ -176,7 +176,7 @@ internal sealed partial class MainWindow
         var shownRows=currencyValueRows.Where(row=>
         {
             var definition=items?.Find(row.ItemId);
-            if(currencyValueSearch.Length>0 && definition?.Name.Contains(currencyValueSearch,StringComparison.CurrentCultureIgnoreCase)!=true)return false;
+            if(currencyValueSearch.Length>0 && SearchText.Contains(definition?.Name,currencyValueSearch,StringComparison.CurrentCultureIgnoreCase)!=true)return false;
             return currencyValueFilter switch
             {
                 1=>currencyValueOwned.ContainsKey(row.ItemId),

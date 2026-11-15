@@ -12,9 +12,15 @@ internal static class AgentPaths1329Tests
 
     /// <summary>The entries .gitignore must hold (NoAgentFiles802).</summary>
     public static readonly string[] Ignored = ["CLAUDE" + ".md", "." + "claude/", "docs/" + "ai/", "scripts/" + "agent/"];
+    // X-353 M3 (0.1381): with a Windows separator too, any case, and the agent's file names cited alone (a relay's passage, the
+    // instructions, the plan's and tests' sources).
+    private const string Slash = "[/\\\\]";
     private static readonly Regex Paths = new(string.Join("|",
-        Regex.Escape("scripts/" + "agent"), Regex.Escape("docs/" + "ai/"), "(?<![A-Za-z])" + Regex.Escape("relais" + "/"), Regex.Escape("maitre" + "-inbox"),
-        Regex.Escape("side-session" + "-notes"), Regex.Escape("." + "claude/"), Regex.Escape("CLAUDE" + ".md")), RegexOptions.CultureInvariant);
+        "scripts" + Slash + "agent", "docs" + Slash + "ai" + Slash, "(?<![A-Za-z])relais" + Slash, Regex.Escape("maitre" + "-inbox"),
+        Regex.Escape("side-session" + "-notes"), Regex.Escape(".") + "claude" + Slash, Regex.Escape("CLAUDE" + ".md"),
+        "passage-[0-9]+" + Regex.Escape(".md"), "relais" + "-consigne", "relecteur" + "-consigne", "relance" + "-auto", Regex.Escape("maitre" + ".json"),
+        Regex.Escape("points" + "-fable.md"), Regex.Escape("essais" + ".jsonl"), Regex.Escape("regles" + ".jsonl"), Regex.Escape("idees" + ".jsonl")),
+        RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
     /// <summary>Whether a text names a path of the agent's files.</summary>
     public static bool Cites(string text) => Paths.IsMatch(text);
@@ -34,7 +40,8 @@ internal static class AgentPaths1329Tests
     [
         ("Agent paths 1329: the pattern finds each path of the agent's files, and not ordinary words", () =>
         {
-            foreach (var path in Ignored.Concat(["scripts/" + "agent/publish.sh", "docs/" + "ai/maitre" + "-inbox.jsonl", "(relais" + "/revue.md", " relais" + "/x.log"]))
+            foreach (var path in Ignored.Concat(["scripts/" + "agent/publish.sh", "docs/" + "ai/maitre" + "-inbox.jsonl", "(relais" + "/revue.md", " relais" + "/x.log",
+                "docs\\" + "ai\\plan.jsonl", "Scripts\\" + "Agent\\q.py", "(passage" + "-25.md)", "PASSAGE" + "-3.MD", "relais" + "-consigne.md", "essais" + ".jsonl"]))
                 Check(Cites("see " + path + " here"), "found: " + path);
             foreach (var text in new[] { "the agent's notes", "docs/project/GLOBAL-PLAN.md", "relais 32 (a relay)", "scripts/Verify.ps1", "prerelais/x" })
                 Check(!Cites(text), "not a path: " + text);

@@ -11,7 +11,7 @@ internal static class OrchestrionPlayer370Tests
             var reader = Read("Collections/BgmReader.Dalamud.cs");
             Check(reader.Contains("system->Scenes[index].PlayingBgmId",StringComparison.Ordinal) && !reader.Contains("SetBGM",StringComparison.Ordinal)
                 && !reader.Contains("ResetBGM",StringComparison.Ordinal),"read only, the music is never changed");
-            Check(Read("Plugin.cs").Contains("OrchestrionPath>()",StringComparison.Ordinal) && Read("Plugin.cs").Contains("()=>bgm?.Dispose()",StringComparison.Ordinal),"roll by path; released");
+            Check(Read("Plugin.Collections.cs").Contains("OrchestrionPath>()",StringComparison.Ordinal) && Read("Plugin.Collections.cs").Contains("()=>bgm?.Dispose()",StringComparison.Ordinal),"roll by path; released");   // 0.1444 (X-153): Plugin.Collections.cs
             Check(TenshoAssistant.ConfigurationReset.Kept.Contains("OrchestrionFavorites"),"favourites kept on reset");
         }),
     ];

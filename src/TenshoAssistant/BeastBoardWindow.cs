@@ -11,6 +11,8 @@ namespace TenshoAssistant;
 internal sealed class BeastBoardWindow : Window
 {
     private readonly MainWindow owner;
+    /// <summary>X-366 (0.1373): the panel's widest size, and the width its lines wrap at inside it (the window's padding on both sides taken off).</summary>
+    public const float MaxWidth = 460, WrapWidth = MaxWidth - 24;
     public Func<Beastmaster.BoardWindows> Windows { get; init; } = () => default;
     public BeastBoardWindow(MainWindow owner) : base("Tensho###TenshoBeastBoard", ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize)
     {
@@ -22,7 +24,7 @@ internal sealed class BeastBoardWindow : Window
         var at = Windows();
         var x = at.Party ? at.PartyX + at.PartyWidth + 8 : at.X + at.Width + 8;
         ImGui.SetNextWindowPos(new Vector2(x, at.Y), ImGuiCond.Always);
-        ImGui.SetNextWindowSizeConstraints(new Vector2(300, 0), new Vector2(460, Math.Max(300, at.Height)));
+        ImGui.SetNextWindowSizeConstraints(new Vector2(300, 0), new Vector2(MaxWidth, Math.Max(300, at.Height)));
     }
     public override void Draw() => owner.DrawBeastBoardPanel();
 }

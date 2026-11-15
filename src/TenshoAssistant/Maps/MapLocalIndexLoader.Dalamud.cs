@@ -17,6 +17,9 @@ internal sealed class MapLocalIndexLoader : IDisposable
     private readonly CancellationTokenSource cancellation=new();
     private readonly List<MapLocalPosition> rows=[];
     private IEnumerator<int>? copy;
+    // X-425 M3 (0.1406): the layouts' bells and chests, read on a worker; the framework steps wait for it.
+    private Task<PlacedRead>? placedRead;
+    private sealed record PlacedRead(List<MapLocalPosition> Rows,uint Added,int Read,TimeSpan Longest,string LongestPath);
     private Task<(MapLocalIndex? Index,Exception? Error,bool FromCache)>? build;
     private Task<Caching.CachedValue<MapLocalIndexCacheData>?>? cacheRead;
     private bool cacheChecked,stopped,disposed;
@@ -80,9 +83,11 @@ internal sealed class MapLocalIndexLoader : IDisposable
                     }
                 }
                 copy??=Copy().GetEnumerator();
+                if(placedRead is { IsCompleted:false })return;   // X-425 M3: the layouts are read on a worker; nothing to step meanwhile
                 var started=Stopwatch.GetTimestamp();var progress=0;var done=false;
                 while(Stopwatch.GetElapsedTime(started)<TimeSpan.FromMilliseconds(2))
                 {
+                    if(placedRead is { IsCompleted:false })break;
                     if(!copy.MoveNext()){done=true;break;}
                     progress=copy.Current;
                 }
@@ -175,9 +180,101 @@ internal sealed class MapLocalIndexLoader : IDisposable
             }
             yield return ++count;
         }
+        foreach(var step in CopyPlacedObjects(count)){count=step;yield return step;}
     }
 
-    private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);copy?.Dispose();copy=null;cacheRead=null;toPersist=null;rows.Clear();}
+    // X-386 (0.1402): bells and company chests placed by the layouts where the game's own map has no marker of the same icon (company
+    // workshops: docs/evidence/0.1402-bells-and-chests.md). Territories sharing a layout read once.
+    // X-425 M3 (0.1406): the 1 662 layout files are read on a worker (0.1405 measured 14.6 ms for the longest one on the game's thread);
+    // the framework waits for it (OnUpdate steps nothing meanwhile), then adds its rows.
+    private IEnumerable<int> CopyPlacedObjects(int count)
+    {
+        var token=cancellation.Token;
+        var reading=placedRead=Task.Run(()=>ReadPlacedObjects(token),token);
+        yield return ++count;
+        var placed=reading.GetAwaiter().GetResult();placedRead=null;
+        rows.AddRange(placed.Rows);
+        log.Information("Map positions: {0} bell(s) and company chest(s) from the layouts where no map of the place has a marker (X-386, X-424); {1} layout file(s) read on a worker (X-425), longest step {2:F1} ms ({3}).",
+            placed.Added,placed.Read,placed.Longest.TotalMilliseconds,placed.LongestPath);
+        yield return ++count;
+    }
+
+    // X-424 (0.1405): compared to the markers of every map of the territory (Eulmore's bell is marked on map 555, not on the main map 498).
+    // Runs on a worker: reads game data only and returns its own rows (the loader's list stays the framework's).
+    private PlacedRead ReadPlacedObjects(CancellationToken token)
+    {
+        var found=new List<MapLocalPosition>();
+        var markerSheet=data.GetSubrowExcelSheet<MapMarker>();
+        var layouts=new HashSet<string>(StringComparer.Ordinal);var marksByMap=new Dictionary<uint,List<(uint Icon,System.Numerics.Vector2 At)>>();var added=0u;
+        List<(uint Icon,System.Numerics.Vector2 At)> MarksOf(Map map)
+        {
+            if(marksByMap.TryGetValue(map.RowId,out var marks))return marks;
+            marks=[];
+            if(map.MapMarkerRange!=0 && markerSheet.TryGetRow(map.MapMarkerRange,out var markerRows))
+                foreach(var marker in markerRows)
+                    if((uint)marker.Icon is PlacedObjects.BellIcon or PlacedObjects.CompanyChestIcon)marks.Add(((uint)marker.Icon,new(marker.X,marker.Y)));
+            return marksByMap[map.RowId]=marks;
+        }
+        var mapsByTerritory=new Dictionary<uint,List<Map>>();
+        foreach(var each in data.GetExcelSheet<Map>())
+        {
+            if(each.TerritoryType.RowId==0 || each.SizeFactor==0)continue;
+            if(!mapsByTerritory.TryGetValue(each.TerritoryType.RowId,out var list))mapsByTerritory[each.TerritoryType.RowId]=list=[];
+            list.Add(each);
+        }
+        var longest=TimeSpan.Zero;var longestPath="";var read=0;
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
+        {
+            token.ThrowIfCancellationRequested();
+            if(territory.Map.RowId==0 || !territory.Map.IsValid)continue;
+            var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+            if(cut<0 || !layouts.Add(bg))continue;
+            var map=territory.Map.Value;
+            if(map.SizeFactor==0)continue;
+            var marks=MarksOf(map);
+            var others=mapsByTerritory.TryGetValue(territory.RowId,out var territoryMaps)
+                ? territoryMaps.Where(other=>other.RowId!=map.RowId).Select(other=>new PlacedObjects.MapFrame(other.OffsetX,other.OffsetY,other.SizeFactor,MarksOf(other))).ToArray()
+                : [];
+            foreach(var kind in PlacedObjects.LayoutKinds)
+            {
+                var started=Stopwatch.GetTimestamp();var path=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";
+                if(Layout(path) is { } file)
+                {
+                    read++;
+                    foreach(var layer in file.Layers)
+                    {
+                        if(layer.FestivalID!=0)continue;   // festival layers come and go (Sinus Ardorum's bells): left out
+                        foreach(var instance in layer.InstanceObjects)
+                        {
+                            if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.EventObject
+                               || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.EventInstanceObject placed)continue;
+                            var icon=PlacedObjects.IconOf(placed.ParentData.BaseId);var at=instance.Transform.Translation;
+                            var pixel=PlacedObjects.Pixel(at.X,at.Z,map.OffsetX,map.OffsetY,map.SizeFactor);
+                            if(!PlacedObjects.Missing(marks,icon,pixel) || PlacedObjects.MarkedOnAnyMap(others,icon,at.X,at.Z))continue;
+                            marks.Add((icon,pixel));
+                            found.Add(new(MapLocalKind.PlacedObject,++added,map.RowId,at.X,at.Z,0,icon));
+                        }
+                    }
+                }
+                var spent=Stopwatch.GetElapsedTime(started);
+                if(spent>longest){longest=spent;longestPath=path;}
+            }
+        }
+        return new(found,added,read,longest,longestPath);
+    }
+
+    // A missing, unexpected or unreadable layout only means no placed object there (the LGB header checked first, as the vendors' loader does).
+    private Lumina.Data.Files.LgbFile? Layout(string path)
+    {
+        try
+        {
+            if(!data.FileExists(path) || data.GetFile(path)?.Data is not { } bytes || !Npcs.NpcShopLinks.ValidLayout(bytes))return null;
+            return data.GetFile<Lumina.Data.Files.LgbFile>(path);
+        }
+        catch(Exception error){log.Debug(error,"Territory layout unreadable: {0}",path);return null;}
+    }
+
+    private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);copy?.Dispose();copy=null;placedRead=null;cacheRead=null;toPersist=null;rows.Clear();}
     public void Dispose()
     {
         lock(gate)

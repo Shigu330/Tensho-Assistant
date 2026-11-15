@@ -107,7 +107,7 @@ internal sealed partial class MainWindow
         Tip("GrandCompany.SearchTip");
         var items=itemCatalog.State.Catalog;
         var rank=gcMyRank && current.Ranks.Count>=gcShopCompany ? current.Ranks[gcShopCompany-1]:(int?)null;
-        var rows=GcBoard.Shop(catalog,gcShopCompany,rank).Where(row=>gcQuery.Length==0 || items?.Find(row.Item)?.Name.Contains(gcQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
+        var rows=GcBoard.Shop(catalog,gcShopCompany,rank).Where(row=>gcQuery.Length==0 || SearchText.Contains(items?.Find(row.Item)?.Name,gcQuery,StringComparison.CurrentCultureIgnoreCase)==true).ToArray();
         var held=current.Seals.Count>=gcShopCompany ? current.Seals[gcShopCompany-1]:0;
         ImGui.TextDisabled(localization.Format("GrandCompany.ShopCount",rows.Length,held.ToString("N0",Numbers)));
         if(rows.Length==0 || !ImGui.BeginTable("###GcShop",3,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.ScrollY,new Vector2(0,Math.Max(160,ImGui.GetContentRegionAvail().Y))))return;

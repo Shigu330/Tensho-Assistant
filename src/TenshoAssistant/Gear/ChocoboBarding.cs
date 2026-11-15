@@ -23,8 +23,8 @@ public static class ChocoboBarding
     {
         var text=search.Trim();
         return sets.Where(set=>!missingOnly || unlocked is not null && !unlocked.Contains(set.Id))
-            .Where(set=>text.Length==0 || set.Name.Contains(text,StringComparison.CurrentCultureIgnoreCase)
-                || set.ItemId!=0 && itemName(set.ItemId)?.Contains(text,StringComparison.CurrentCultureIgnoreCase)==true)
+            .Where(set=>text.Length==0 || SearchText.Contains(set.Name,text)
+                || set.ItemId!=0 && SearchText.Contains(itemName(set.ItemId),text))
             .OrderBy(set=>set.Order).ThenBy(set=>set.Id).ToArray();
     }
 

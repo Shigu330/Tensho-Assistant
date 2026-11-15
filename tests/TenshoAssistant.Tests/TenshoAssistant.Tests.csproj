@@ -9,6 +9,8 @@
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
+    <!-- X-403 (0.1434): the Tensho chat window's pure parts (channels, store, tab views, format, settings). -->
+    <Compile Include="../../src/TenshoAssistant/Chat/*.cs" Exclude="../../src/TenshoAssistant/Chat/*.Dalamud.cs" Link="Chat/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Carnivale/*.cs" Exclude="../../src/TenshoAssistant/Carnivale/*.Dalamud.cs" Link="Carnivale/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Societies/*.cs" Exclude="../../src/TenshoAssistant/Societies/*.Dalamud.cs" Link="Societies/%(Filename)%(Extension)" />
@@ -71,6 +73,7 @@
     <Compile Include="../../src/TenshoAssistant/Competitive/CompetitiveZones.cs" Link="Competitive/CompetitiveZones.cs" />
     <Compile Include="../../src/TenshoAssistant/Competitive/CompetitiveGateHooks.cs" Link="Competitive/CompetitiveGateHooks.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapLocalIndex.cs" Link="Maps/MapLocalIndex.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/PlacedObjects.cs" Link="Maps/PlacedObjects.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/VistaWindow.cs" Link="Maps/VistaWindow.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/WikiVistas.cs" Link="Maps/WikiVistas.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/ChatMapLinks.cs" Link="Maps/ChatMapLinks.cs" />
@@ -125,6 +128,7 @@
     <Compile Include="../../src/TenshoAssistant/Collections/CollectionRecent.cs" Link="Collections/CollectionRecent.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressStore.cs" Link="Collections/AchievementProgressStore.cs" />
     <Compile Include="../../src/TenshoAssistant/Collections/AchievementProgressData.cs" Link="Collections/AchievementProgressData.cs" />
+    <Compile Include="../../src/TenshoAssistant/Collections/CompletionListsData.cs" Link="Collections/CompletionListsData.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LeveCatalog.cs" Link="Leves/LeveCatalog.cs" />
     <Compile Include="../../src/TenshoAssistant/Leves/LevePrepare.cs" Link="Leves/LevePrepare.cs" />
     <Compile Include="../../src/TenshoAssistant/SettingsIndex.cs" Link="SettingsIndex.cs" />

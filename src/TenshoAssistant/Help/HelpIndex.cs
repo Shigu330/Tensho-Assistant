@@ -44,7 +44,7 @@ public static class HelpIndex
     {
         var words = query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (words.Length == 0) return Array.AsReadOnly(topics.ToArray());
-        static bool Holds(string text, string word) => text.Contains(word, StringComparison.CurrentCultureIgnoreCase);
+        static bool Holds(string text, string word) => SearchText.Contains(text, word);
         return Array.AsReadOnly(topics
             .Where(topic => words.All(word => Holds(topic.Title, word) || Holds(topic.Purpose, word) || Holds(topic.Start, word) || Holds(topic.Empty, word)))
             .OrderByDescending(topic => words.Count(word => Holds(topic.Title, word)))

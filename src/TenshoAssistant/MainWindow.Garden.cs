@@ -317,7 +317,7 @@ internal sealed partial class MainWindow
                     Tip("Garden.SeedSearchTip");
                     foreach(var (seed,name) in seeds)
                     {
-                        if(gardenSeedSearch.Length>0 && !name.Contains(gardenSeedSearch,StringComparison.CurrentCultureIgnoreCase))continue;
+                        if(gardenSeedSearch.Length>0 && !SearchText.Contains(name,gardenSeedSearch,StringComparison.CurrentCultureIgnoreCase))continue;
                         if(!ImGui.Selectable(name+"##GardenSeed"+seed.SeedId))continue;
                         newBedSeed=GardenSeeds.JournalName(name) ?? newBedSeed;
                         newBedSeedId=seed.SeedId;

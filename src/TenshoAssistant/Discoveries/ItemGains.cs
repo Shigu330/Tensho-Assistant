@@ -12,6 +12,22 @@ public static class ItemGains
     public static Dictionary<uint,long> Losses(IReadOnlyDictionary<uint,long> before,IReadOnlyDictionary<uint,long> after)=>
         before.Where(pair=>pair.Value>after.GetValueOrDefault(pair.Key)).ToDictionary(pair=>pair.Key,pair=>pair.Value-after.GetValueOrDefault(pair.Key));
 
+    /// <summary>X-433 (0.1450): the same for the watcher's own tables (read ten times a second on the game's thread): plain loops, no
+    /// closure nor boxed enumerator; a new table only for what changed.</summary>
+    public static Dictionary<uint,long> Gains(Dictionary<uint,long> before,Dictionary<uint,long> after)
+    {
+        var gains=new Dictionary<uint,long>();
+        foreach(var pair in after)
+        {
+            var had=before.TryGetValue(pair.Key,out var count) ? count:0;
+            if(pair.Value>had)gains[pair.Key]=pair.Value-had;
+        }
+        return gains;
+    }
+
+    /// <summary>X-433 (0.1450): see <see cref="Gains(Dictionary{uint,long},Dictionary{uint,long})"/>.</summary>
+    public static Dictionary<uint,long> Losses(Dictionary<uint,long> before,Dictionary<uint,long> after)=>Gains(after,before);
+
     /// <summary>X-73.12 (0.864): days since 2013-08-27 (the game's relaunch), the scale festivals' days are kept in.</summary>
     private static readonly DateTimeOffset DayZero=new(2013,8,27,0,0,0,TimeSpan.Zero);
     public static int DayNumber(DateTimeOffset at)=>(int)Math.Clamp((at-DayZero).TotalDays,0,100_000);

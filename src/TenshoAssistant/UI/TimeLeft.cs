@@ -39,6 +39,28 @@ public static class TimeLeft
         return format(key,first,second);
     }
 
+    /// <summary>
+    /// X-415 M4 (0.1389): the server bar's and the tracker's time left: the common text through the language's keys (Write, every language),
+    /// « < 1 min » below a minute.
+    /// </summary>
+    public static string Remaining(TimeSpan left,Func<string,string> text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return left>=TimeSpan.FromMinutes(1) ? Write(left,(key,first,second)=>string.Format(TenshoAssistant.Localization.TenshoCulture.Current,text(key),first,second)):"< 1 min";
+    }
+
+    /// <summary>
+    /// X-333 (0.1379): a countdown to the second (gathering windows, timed items of the list panels): « hh:mm:ss » below a day, the common
+    /// text from a day on (« 6 d 0 h »), never « 144:00:00 »; zero once passed.
+    /// </summary>
+    public static string Countdown(TimeSpan left,Func<string,int,int,string> format)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+        if(left<=TimeSpan.Zero)return "00:00:00";
+        if(left>=TimeSpan.FromDays(1))return Write(left,format);
+        return $"{(int)left.TotalHours:00}:{left.Minutes:00}:{left.Seconds:00}";
+    }
+
     /// <summary>True when <paramref name="at"/> falls on the same day as <paramref name="now"/> in that time zone: the hour alone is then enough.</summary>
     public static bool SameDay(DateTimeOffset at,DateTimeOffset now,TimeZoneInfo zone)=>TimeZoneInfo.ConvertTime(at,zone).Date==TimeZoneInfo.ConvertTime(now,zone).Date;
 }

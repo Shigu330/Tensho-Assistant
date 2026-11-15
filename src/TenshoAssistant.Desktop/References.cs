@@ -54,6 +54,8 @@ internal static class References
         foreach(var shot in plan.Where(shot=>shot.Setup!="loading"))
         {
             var beds=host.GetSetting("GardenBeds");var detailed=host.GetSetting("GardenDetailedView");var link=status.Link;
+            // X-430 (0.1415): the trial retainers' folder of the « Reminders-retainers » picture, removed after it.
+            var trial=shot.Setup=="retainers" ? Path.Combine(Path.GetTempPath(),"tensho-retainer-trial-"+Guid.NewGuid().ToString("N")) : null;
             try
             {
                 if(shot.Setup.StartsWith("garden-",StringComparison.Ordinal))
@@ -62,6 +64,7 @@ internal static class References
                         Console.WriteLine($"  {shot.Id}: the trial patch could not be given");
                 }
                 if(shot.Setup=="dashboard")Headless.DashboardTrial(host,status);
+                if(trial is not null && !Headless.RetainerTrial(host,trial))Console.WriteLine($"  {shot.Id}: the trial retainers could not be given");
                 // X-284 M2: the page's sheets cannot be read for this picture (its error state), then are given back.
                 if(shot.Setup=="error" && !host.SheetsFail(true))Console.WriteLine($"  {shot.Id}: the sheets could not be made to fail");
                 if(shot.Page=="Weather")Headless.OpenZone(host,155);
@@ -71,6 +74,7 @@ internal static class References
             {
                 if(shot.Setup.StartsWith("garden-",StringComparison.Ordinal)){host.SetSetting("GardenBeds",beds);host.SetSetting("GardenDetailedView",detailed ?? false);}
                 if(shot.Setup=="error")host.SheetsFail(false);
+                if(trial is not null){Headless.RetainerTrialEnd(host);try{Directory.Delete(trial,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
                 if(shot.Setup=="dashboard"){status.Link=link;host.GameMeasures(null,Environment.TickCount64);host.GameState(null);}
             }
         }

@@ -20,7 +20,7 @@ public static class LexiconBoard
     {
         var builder=new StringBuilder(text.Length);
         foreach(var character in text.Normalize(NormalizationForm.FormD))
-            if(CharUnicodeInfo.GetUnicodeCategory(character)!=UnicodeCategory.NonSpacingMark)builder.Append(char.ToLowerInvariant(character));
+            if(CharUnicodeInfo.GetUnicodeCategory(character)!=UnicodeCategory.NonSpacingMark)builder.Append(char.ToLowerInvariant(SearchText.Apostrophe(character)));
         return builder.ToString();
     }
 

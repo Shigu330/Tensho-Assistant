@@ -58,6 +58,9 @@ public sealed class TenshoDataDatabase
                 +"PRIMARY KEY(character,job)) WITHOUT ROWID;",transaction);
             Run(open,"CREATE TABLE IF NOT EXISTS character_gearsets(character INTEGER NOT NULL,number INTEGER NOT NULL,job INTEGER NOT NULL,item_level INTEGER NOT NULL,"
                 +"name TEXT NOT NULL,seen_at INTEGER NOT NULL,PRIMARY KEY(character,number)) WITHOUT ROWID;",transaction);
+            // 0.1387 (X-274): each character's titles and achievements as the game last sent them completely (ids obtained, comma-separated).
+            Run(open,"CREATE TABLE IF NOT EXISTS completion_lists(character INTEGER NOT NULL,kind INTEGER NOT NULL,read_at INTEGER NOT NULL,ids TEXT NOT NULL,"
+                +"PRIMARY KEY(character,kind)) WITHOUT ROWID;",transaction);
             if(version<Schema)Run(open,$"PRAGMA user_version={Schema};",transaction);
             transaction.Commit();
         }
@@ -108,7 +111,7 @@ public sealed class TenshoDataDatabase
 
     /// <summary>The SQLite library's version (for the log).</summary>
     /// <summary>X-185 (0.1211, N10): the tables that keep rows per character (« Erase this character » empties them all for one).</summary>
-    public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress","character_jobs","character_gearsets"];
+    public static readonly string[] CharacterTables=["bank_entries","gil_entries","achievement_progress","character_jobs","character_gearsets","completion_lists"];
 
     /// <summary>X-185 (0.1211, N10): one character's rows of every per-character table, in the caller's transaction.</summary>
     public static void EraseCharacter(SqliteConnection open,SqliteTransaction transaction,ulong character)

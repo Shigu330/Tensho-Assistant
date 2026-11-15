@@ -60,5 +60,5 @@ public static class FieldBoard
         return 0;
     }
 
-    public static bool Matches(string query,params string[] texts)=>query.Length==0 || texts.Any(text=>text.Contains(query,StringComparison.CurrentCultureIgnoreCase));
+    public static bool Matches(string query,params string[] texts)=>query.Length==0 || texts.Any(text=>SearchText.Contains(text,query,StringComparison.CurrentCultureIgnoreCase));
 }

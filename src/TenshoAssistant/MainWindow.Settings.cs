@@ -162,6 +162,8 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         ImGui.Spacing();ImGui.Separator();
         DrawModuleSettings();
+        // X-403 (0.1434, D-166): the Tensho chat window, beside the game's chat (MainWindow.ChatWindow.cs).
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.Title"),ImGuiTreeNodeFlags.DefaultOpen))DrawChatWindowSettings();
     }
 
     // X-100 (0.999, DEC-048): alarms, their game commands, and the server bar entries (also on their own pages).
@@ -183,7 +185,7 @@ internal sealed partial class MainWindow
         Tip("Settings.SearchTip");
         var query=settingsQuery.Trim();
         if(query.Length<2)return;
-        var hits=SettingsIndex.Entries.Where(entry=>localization.Get(entry.Key).Contains(query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
+        var hits=SettingsIndex.Entries.Where(entry=>SearchText.Contains(localization.Get(entry.Key),query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
         if(hits.Length==0){ImGui.TextDisabled(localization.Get("Settings.SearchNone"));return;}
         foreach(var (key,tab) in hits)
             if(ImGui.Selectable($"{localization.Get(key)}  ·  {localization.Get("SettingsSections."+tab)}##SettingHit{key}")){requestedSettingsTab=tab;settingsQuery="";}

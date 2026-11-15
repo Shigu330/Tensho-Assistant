@@ -39,7 +39,16 @@ public sealed record GardenSlot(string Zone,int Patch,int Bed);
 
 public static class GardenJournal
 {
-    private static readonly System.Text.RegularExpressions.Regex SlotText=new(@"^(.+) · \D*(\d+)\D+(\d+)$",System.Text.RegularExpressions.RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+    /// <summary>
+    /// X-428 (0.1414): the one way the garden's regular expressions run: .NET's linear engine (NonBacktracking), whose time grows with the
+    /// input's length only, never by going back over it. X-427 (0.1407) had raised a 50 ms timeout to a second after the CI of 0.1405 ran
+    /// out of time on a busy processor; a slow player's PC could still lose a planting that way. The same matches and groups as before
+    /// (checked on the game's rows), and no timeout any more: <see cref="MatchTimeout"/> is infinite, nothing can run out.
+    /// </summary>
+    public const System.Text.RegularExpressions.RegexOptions Linear=System.Text.RegularExpressions.RegexOptions.CultureInvariant|System.Text.RegularExpressions.RegexOptions.NonBacktracking;
+    /// <summary>X-428 (0.1414): infinite: the linear engine needs no timeout, so a busy processor never turns a reading into « nothing read ».</summary>
+    public static readonly TimeSpan MatchTimeout=System.Text.RegularExpressions.Regex.InfiniteMatchTimeout;
+    private static readonly System.Text.RegularExpressions.Regex SlotText=new(@"^(.+) · \D*(\d+)\D+(\d+)$",Linear,MatchTimeout);
 
     /// <summary>0.461: the slot of a bed noted as « zone · patch N, bed M » (the format of the chat detection, in every language), or null for a free text or a pot.</summary>
     public static GardenSlot? Slot(GardenBed bed)

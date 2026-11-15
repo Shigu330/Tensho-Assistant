@@ -40,7 +40,7 @@ internal sealed partial class MainWindow
                     ImGui.SetNextItemWidth(-1);
                     ImGui.InputTextWithHint("##ClockSearch",localization.Get("WorldClocks.Search"),ref clockSearch,64);
                     Tip("WorldClocks.SearchTip");
-                    foreach(var zone in TimeZoneInfo.GetSystemTimeZones().Where(zone=>clockSearch.Length==0 || zone.DisplayName.Contains(clockSearch,StringComparison.CurrentCultureIgnoreCase)).Take(80))
+                    foreach(var zone in TimeZoneInfo.GetSystemTimeZones().Where(zone=>clockSearch.Length==0 || SearchText.Contains(zone.DisplayName,clockSearch,StringComparison.CurrentCultureIgnoreCase)).Take(80))
                         if(ImGui.Selectable(zone.DisplayName+"##"+zone.Id))
                         {
                             var list=new List<string>(zones);

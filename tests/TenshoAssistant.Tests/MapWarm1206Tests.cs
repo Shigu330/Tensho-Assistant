@@ -38,9 +38,11 @@ internal static class MapWarm1206Tests
             Check(source.Contains("private readonly BuiltOnce<NamedMapIndex> namedMaps;") && source.Contains("public IReadOnlyList<AetheryteRow> Aetherytes=>aetheryteRows.Value;")
                 && source.Contains("private string AetheryteName(uint id)=>aetheryteNames.Value.GetValueOrDefault(id,\"\");") && !source.Contains("namedMapsLock") && !source.Contains("aetherytes=["), "built once");
             Check(source.Contains("public void Warm(CancellationToken token)") && source.Contains("_=namedMaps.Value;") && source.Contains("_=aetheryteNames.Value;"), "warm");
+            // X-153 (0.1404): the warm-up lives in the map family (Plugin.Maps.cs); the plugin still cancels it.
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
-            Check(plugin.Contains("try{await Task.Delay(MapMarkersWarmDelay,gameDataCancel.Token).ConfigureAwait(false);mapMarkers.Warm(gameDataCancel.Token);}")
-                && plugin.Contains("catch(OperationCanceledException){}") && plugin.Contains("gameDataCancel.Cancel();"), "off the frame, after the loading, stopped with the plugin");
+            var maps = Read("src/TenshoAssistant/Plugin.Maps.cs");
+            Check(maps.Contains("try{await Task.Delay(MapMarkersWarmDelay,gameDataCancel.Token).ConfigureAwait(false);mapMarkers.Warm(gameDataCancel.Token);}")
+                && maps.Contains("catch(OperationCanceledException){}") && plugin.Contains("gameDataCancel.Cancel();"), "off the frame, after the loading, stopped with the plugin");
             var storage = Read("src/TenshoAssistant/MainWindow.Storage.cs");
             foreach (var method in new[] { "DrawBankBrowser", "DrawCrystalsTab", "DrawCurrenciesTab", "DrawCurrencyValueTab", "DrawImportManager", "DrawCharactersTab", "DrawStorageReport", "DrawGilJournal" })
                 Check(storage.Contains(", " + method + "); } finally", StringComparison.Ordinal) && storage.Contains("{ try { MeasureMap(\"storage ", StringComparison.Ordinal), "timed: " + method);

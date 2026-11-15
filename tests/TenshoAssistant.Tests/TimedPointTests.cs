@@ -25,7 +25,7 @@ internal static class TimedPointTests
             var page=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ListPanels.cs"));
             Check(page.Contains("ImGui.TextColored(state.Open ? Success:UI.FfxivTheme.Error,state.Text);"),"colours");
             var french=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/fr.json"));
-            Check(french.Contains("\"TimedOpen\": \"{0}:{1:00}:{2:00}\"") && french.Contains("\"TimedClosedHint\""),"timer alone");
+            Check(french.Contains("\"TimedOpen\": \"{0}\"") && french.Contains("\"TimedClosedHint\""),"timer alone");
         }),
         ("0.588: the gathering page lists the timed points open now or soon, once per Eorzea minute",() =>
         {

@@ -45,7 +45,7 @@ internal static class NpcQuestLayer1307Tests
         {
             var loader=Read("src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs");
             Check(loader.Contains("if(layerCondition.Condition==NpcShopLinks.DuringQuest && NpcShopLinks.LayerQuestKey(layer.Name) is { } questKey)",StringComparison.Ordinal)
-                && loader.Contains("list[index]=list[index] with {Condition=NpcShopLinks.DuringQuest,Quests=quests.Length>0 ? quests:null};",StringComparison.Ordinal)
+                && loader.Contains("if(NpcShopLinks.QuestLinked(quests.Length)==NpcShopLinks.DuringQuest)list[index]=list[index] with {Condition=NpcShopLinks.DuringQuest,Quests=quests};",StringComparison.Ordinal)
                 && loader.Contains("Level place(s) only on quest layers",StringComparison.Ordinal),"loader");
             var map=Read("src/TenshoAssistant/MainWindow.MapView.cs");
             Check(map.Contains("Npcs.NpcShopLinks.Present(spot,running,seen)",StringComparison.Ordinal) && map.Contains("mapVendorQuests=(waited,MapVendorQuestKey(waited));",StringComparison.Ordinal),"map");

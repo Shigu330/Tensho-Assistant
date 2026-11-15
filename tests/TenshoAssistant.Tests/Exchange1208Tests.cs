@@ -85,14 +85,14 @@ internal static class Exchange1208Tests
                 old.Files[CommunityDiscoveries.AddressV3 + ExchangeV3.IndexName] = Encoding.UTF8.GetBytes(new string('x', 4096));
                 old.Broken.Add(CommunityDiscoveries.AddressV3 + ExchangeV3.IndexName);
                 using var v2 = new GitHubExchange(Path.Combine(root, "b"), old);
-                Check(Run(v2, new DiscoveryStore()).Args[2] == "CommonUnreadable", "index cut: unreadable, done");
+                Check(Run(v2, new DiscoveryStore()).Args[2] == "CommonUnreachable", "index cut: unreachable (try again later, X-367), done");
             }
             finally { try { Directory.Delete(root, true); } catch (IOException) { } catch (UnauthorizedAccessException) { } }
         }),
         ("Exchange 1208: wiring: one test for what a failed read of the common may throw; the player's facts are sent after it whatever it gave", () =>
         {
             var source = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs")).Replace("\r\n", "\n");
-            Check(source.Contains("|| error is TaskCanceledException && !stop.IsCancellationRequested;") && source.Contains("catch(Exception error) when(CommonUnreadable(error)){taken=(\"CommonUnreadable\",0,0);}"), "unreadable, not failed");
+            Check(source.Contains("|| error is TaskCanceledException && !stop.IsCancellationRequested;") && source.Contains("catch(Exception error) when(CommonUnreadable(error)){taken=(CommonUnreachable(error) ? \"CommonUnreachable\":\"CommonUnreadable\",0,0);}"), "unreadable or unreachable, not failed");
             var read = source.IndexOf("catch(Exception error) when(CommonUnreadable(error)){taken=", StringComparison.Ordinal);
             Check(read > 0 && read < source.IndexOf("if(upload && Connected)", read, StringComparison.Ordinal), "the upload comes after, whatever the read gave");
         }),

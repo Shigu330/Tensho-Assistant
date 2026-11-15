@@ -19,7 +19,9 @@ internal sealed partial class MainWindow
     }
     // Countdown of an opening: the time until it closes (open) or opens (closed), also used by the map tooltip of a timed point.
     private string WindowCountdown((bool Open,TimeSpan Left) state)
-        =>localization.Format(state.Open ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",Math.Max(0,(int)state.Left.TotalHours),state.Left.Minutes,state.Left.Seconds);
+        =>localization.Format(state.Open ? "LocalClock.CountdownClose":"LocalClock.CountdownOpen",CountdownText(state.Left));
+    // X-333 (0.1379): « hh:mm:ss » below a day, « 6 d 0 h » from a day on.
+    private string CountdownText(TimeSpan left)=>TenshoAssistant.UI.TimeLeft.Countdown(left,(key,first,second)=>localization.Format(key,first,second));
     // 0.330: text of a schedule for the UI and the copies: its windows (language-neutral) or the translated text of its kind.
     private string ScheduleText(GatheringSchedule schedule)=>schedule.TextKey is { } key ? localization.Get(key):schedule.Label;
     private void DrawGatheringTime(GatheringSchedule schedule)

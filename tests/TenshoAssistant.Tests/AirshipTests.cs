@@ -134,7 +134,7 @@ internal static class AirshipTests
             var page = Read("MainWindow.AirshipPlanner.cs");
             Check(page.Contains("Task.Run(()=>AirshipPlanner.Plan(",StringComparison.Ordinal) && page.Contains("AirshipPlanner.Unconfirmed",StringComparison.Ordinal),"searched on a worker, shown as not confirmed");
             Check(!page.Contains("HousingManager",StringComparison.Ordinal),"the page never calls the game");
-            Check(Read("Plugin.cs").Contains("new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());",StringComparison.Ordinal),"owned and disposed");
+            Check(Read("Plugin.Voyages.cs").Contains("new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());",StringComparison.Ordinal),"owned and disposed");
         }),
         ("Airship planner (0.337 review): a sector of unknown experience makes a lower bound, left out of the experience goals",() =>
         {

@@ -129,6 +129,18 @@ public static class LocalLinkProtocol
 
     public static string Serialize(LinkSnapshot snapshot)=>JsonSerializer.Serialize(snapshot,Options);
 
+    /// <summary>X-433 (0.1445): a snapshot with every part filled, serialized once: System.Text.Json makes its getters for the snapshot and
+    /// its parts on the calling thread (a background one), so the game's thread does not make them in a frame. The line, or null if it failed.</summary>
+    public static string? Prepare()
+    {
+        try
+        {
+            return Serialize(new LinkSnapshot(Version,"0.0.0",true,false,1,"zone",1,new LinkLive("job",1,1,1,1,1),[new LinkChange(DataCategory,1)],
+                [new LinkNotice(1,1,"notice")],[new LinkHeld(1,1)],new LinkState(StateLevels[0],1,["issue"],new LinkMeasures(1,1,1,1,1,1,1,1,1))));
+        }
+        catch(Exception){return null;}
+    }
+
     /// <summary>A line read from the pipe: the snapshot, or null and why it was refused (English, for the log).</summary>
     public static bool TryParse(string? line,out LinkSnapshot? snapshot,out string? error)
     {
@@ -206,6 +218,37 @@ public static class LocalLinkProtocol
             if(int.TryParse(middle,System.Globalization.NumberStyles.None,System.Globalization.CultureInfo.InvariantCulture,out var number) && number!=Version)return number;
         }
         return null;
+    }
+}
+
+/// <summary>
+/// X-444 M5 (0.1446): <see cref="LocalLinkProtocol.Prepare"/> run once on a background thread, so System.Text.Json makes its getters there
+/// and not in a frame of the game. LocalLinkFeed starts it when it is made while the link is on, else on the first update the link is on,
+/// and publishes nothing before it has run (0.1445 prepared at the feed's creation only: a link turned on during a session made its 18
+/// getters in a frame; docs/evidence/0.1445-link-json-getters.md).
+/// </summary>
+public sealed class LinkPreparation(Func<string?> prepare)
+{
+    private readonly object gate=new();
+    private Task? task;
+    public int Started { get; private set; }
+
+    /// <summary>Starts the preparation, once: later calls do nothing.</summary>
+    public void Start()
+    {
+        lock(gate)
+        {
+            if(task is not null)return;
+            Started++;
+            task=Task.Run(prepare);
+        }
+    }
+
+    /// <summary>Starts it if needed; true once it has run (whatever it gave).</summary>
+    public bool Ready()
+    {
+        Start();
+        lock(gate)return task!.IsCompleted;
     }
 }
 

@@ -24,6 +24,8 @@ internal sealed class GardenChatWatcher : IDisposable
     private readonly IPluginLog log;
     private readonly Func<bool> enabled;
     private readonly Func<uint,bool> isSeed;
+    // X-410 M1 (0.1378): a seed or a crop of the embedded garden data (null: not given, the menu rule alone).
+    private readonly Func<uint,bool>? isGardenItem;
     private readonly Action<GardenChatEvent,uint?,string?> planted;
     private GardenChat? rules;
     private bool rulesFailed,warned,disposed;
@@ -43,11 +45,21 @@ internal sealed class GardenChatWatcher : IDisposable
     private GardenMenuTitle? menuTitle;
     private bool menuTitleFailed;
     private string? menuSeen;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null)
-    {this.target=target;this.gui=gui;this.developer=developer;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null)
+    {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
+        // X-433 (0.1452): the rules' regular expressions built off the game's thread (their automaton tables: 3.8 MB in a frame at the first
+        // chat line after a load, 0.1451's measure); with the garden off they are built at the first line, as before.
+        if(enabled())rulesBuilding=Task.Run(BuildRules);
+    }
+
+    private Task<GardenChat>? rulesBuilding;
+    private GardenChat BuildRules()
+    {
+        var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
+        return new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
     }
 
     private GardenChat? Rules()
@@ -55,10 +67,11 @@ internal sealed class GardenChatWatcher : IDisposable
         if(rules is not null || rulesFailed)return rules;
         try
         {
-            var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
-            rules=new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
+            // X-433 (0.1452): the rules built in the background, waited for only if a line comes before they are done (no line is lost).
+            rules=rulesBuilding is { } building ? building.GetAwaiter().GetResult():BuildRules();
         }
         catch(Exception error){rulesFailed=true;log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update).");}
+        rulesBuilding=null;
         return rules;
     }
 
@@ -169,7 +182,9 @@ internal sealed class GardenChatWatcher : IDisposable
             {
                 var at=DateTimeOffset.UtcNow;
                 var place=Place();var aimed=target();
-                if(GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null))
+                var gardenItem=isGardenItem is null ? (bool?)null:GardenChat.GardenItem(message.Message.Payloads.OfType<Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload>()
+                    .Select(payload=>TenshoAssistant.Discoveries.ItemGains.BaseItem(payload.ItemId)).ToArray(),isGardenItem);
+                if(GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null,gardenItem))
                 {
                     var slot=menuMemory.Take(place,at);
                     if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))
@@ -192,6 +207,8 @@ internal sealed class GardenChatWatcher : IDisposable
             }
             var seed=chosenSeed!=0 && DateTimeOffset.UtcNow-chosenAt<TimeSpan.FromSeconds(60) ? chosenSeed:(uint?)null;
             chosenSeed=0;
+            // X-395 M3 (0.1366): the menu noted for this planting is not a harvest of the next gain line.
+            menuMemory.Forget();
             planted(found,seed,Place());
         }
         catch(Exception error)

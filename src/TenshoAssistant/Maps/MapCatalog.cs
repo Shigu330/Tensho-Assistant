@@ -146,8 +146,8 @@ public sealed class MapCatalog
         var tokens = query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (tokens.Length == 0) return Entries;
         return Array.AsReadOnly(Entries.Where(map => tokens.All(token =>
-            CultureInfo.CurrentCulture.CompareInfo.IndexOf($"{map.Region} {map.Zone} {map.Subzone} {map.MapId}", token,
-                CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0)).ToArray());
+            SearchText.Contains($"{map.Region} {map.Zone} {map.Subzone} {map.MapId}", token,
+                CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace))).ToArray());
     }
     // A generous input bound protects the native coordinate encoder; this is not a map availability check.
     public static bool CoordinatesValid(float x, float y) => float.IsFinite(x) && float.IsFinite(y)

@@ -30,13 +30,41 @@ internal sealed partial class CollectionReader
         var now=DateTimeOffset.UtcNow;
         if(completionOwner!=owner){completionMemory.Clear();completionOwner=owner;titlesCheckedAt=achievementsCheckedAt=null;}
         var keepTitles=titlesCheckedAt is { } t && now-t<=keep;var keepAchievements=achievementsCheckedAt is { } a && now-a<=keep;
+        // X-274 (0.1387): the last complete reading kept in TenshoData.db, for a list the game has not sent this session.
+        var savedTitles=!completeTitles && listsOwner==owner ? completionLists.GetValueOrDefault(CollectionKind.Title):null;
+        var savedAchievements=!completeAchievements && listsOwner==owner ? completionLists.GetValueOrDefault(CollectionKind.Achievement):null;
+        service.SetReadings(savedTitles?.ReadAt,savedAchievements?.ReadAt);
         for(var index=0;index<source.Count;index++)
         {
             var entry=source[index];
+            if(entry.Kind==CollectionKind.Title && savedTitles is not null)entry=source[index]=CompletionListsData.Apply(entry,savedTitles,now-savedTitles.ReadAt<=keep);
+            if(entry.Kind==CollectionKind.Achievement && savedAchievements is not null)entry=source[index]=CompletionListsData.Apply(entry,savedAchievements,now-savedAchievements.ReadAt<=keep);
             if(entry.Kind==CollectionKind.Title && !completeTitles)source[index]=CompletionMemory.Merge(entry,completionMemory.TryGetValue((entry.Kind,entry.Id),out var title) ? title:null,keepTitles);
             if(entry.Kind==CollectionKind.Achievement && !completeAchievements)source[index]=CompletionMemory.Merge(entry,completionMemory.TryGetValue((entry.Kind,entry.Id),out var achievement) ? achievement:null,keepAchievements);
         }
         RememberCompletion(owner,source,completeTitles ? now:null,completeAchievements ? now:null);
+    }
+    /// <summary>
+    /// X-417 (0.1390): the saved readings applied to what is published (disk copy, or a reading published before they arrived), with their
+    /// dates for the page; nothing while another character's state or a loading state is published.
+    /// </summary>
+    private void PublishSavedReadings(ulong owner)=>
+        CompletionListsData.PublishSaved(service,owner,listsOwner,completionLists,completeTitles,completeAchievements,DateTimeOffset.UtcNow,completionLifetime());
+    /// <summary>X-274 (0.1387): a complete reading (the game had sent the list) kept for the next sessions, written in the background.</summary>
+    private void KeepCompleteReadings(ulong owner,DateTimeOffset at)
+    {
+        if(lists is null || listsOwner!=owner)return;
+        foreach(var (kind,complete) in new[]{(CollectionKind.Title,completeTitles),(CollectionKind.Achievement,completeAchievements)})
+        {
+            if(!complete)continue;
+            var list=new CompletionList(owner,kind,at,[.. service.State.Entries.Where(entry=>entry.Kind==kind && entry.ConfirmedUnlocked).Select(entry=>entry.Id)]);
+            completionLists[kind]=list;
+            _=Task.Run(()=>
+            {
+                try{lists.Save(list);}
+                catch(Exception error){log.Warning(error,"The title or achievement reading could not be kept in the Tensho data file.");}
+            });
+        }
     }
     private bool? lastTitlesLoaded,lastAchievementsLoaded;
     private string? titlesIssue,achievementsIssue;

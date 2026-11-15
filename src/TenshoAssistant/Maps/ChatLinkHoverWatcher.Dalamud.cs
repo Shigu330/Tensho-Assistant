@@ -1,5 +1,7 @@
+using System.Numerics;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.NativeWrapper;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
@@ -18,6 +20,9 @@ public sealed unsafe class ChatLinkHoverWatcher : IDisposable
 {
     internal static readonly string[] Panels=["ChatLogPanel_0","ChatLogPanel_1","ChatLogPanel_2","ChatLogPanel_3"];
     internal const byte LinkMouseOver=76,LinkMouseOut=77;
+    // X-387 (0.1366): the link click (same numbering as Dalamud's AddonEventType, evidence 0.1351): a left click on a map link is kept for
+    // the Tensho map; with the right button down, the developer line says so (the menu itself is opened by the window, NativeMouse).
+    internal const byte LinkMouseClick=75;
     // A link payload is a few dozen bytes; the copy stops at the text's NUL or at this bound.
     private const int MaximumBytes=512;
     private readonly RegistrationScope registrations=new();
@@ -41,11 +46,12 @@ public sealed unsafe class ChatLinkHoverWatcher : IDisposable
         if(args is not AddonReceiveEventArgs received)return;
         var kind=(byte)received.AtkEventType;
         if(kind==LinkMouseOut){Hover.Out(Environment.TickCount64);return;}
+        if(kind==LinkMouseClick){Click(args.AddonName,received.AtkEventData);return;}
         if(kind!=LinkMouseOver)return;
         try
         {
             var link=Read(received.AtkEventData,out var linkType);
-            Hover.Over(link);
+            Hover.Over(link,Environment.TickCount64,NativeMouse.Cursor(),link is null ? default:Extent(received.AtkEventData,args.Addon));
             warned=false;
             // Developer mode: what the chat's link events say, once per change (the in-game test reads it, R15.2).
             var seen=link is null ? $"link type {linkType}, not a map link":$"map link, map {link.MapId}";
@@ -56,6 +62,31 @@ public sealed unsafe class ChatLinkHoverWatcher : IDisposable
             Hover.Clear();
             if(!warned){warned=true;log.Warning(error,"A chat link could not be read.");}
         }
+    }
+
+    private void Click(string addon,nint eventData)
+    {
+        try
+        {
+            if(Read(eventData,out _) is not { } link)return;
+            var right=NativeMouse.RightDown();
+            if(!right)Hover.Clicked(link,Environment.TickCount64);
+            // Developer mode: the line the in-game test reads at the click (X-387).
+            if(developer())log.Information("Chat link clicked ({0}): map link, map {1}, {2} button.",addon,link.MapId,right ? "right":"left");
+        }
+        catch(Exception error)
+        {
+            if(!warned){warned=true;log.Warning(error,"A chat link could not be read.");}
+        }
+    }
+
+    // X-409 (0.1376): the link's size on screen, from its bounds (LinkData MinX..MaxY, evidence 0.1351) and the chat panel's scale.
+    private static Vector2 Extent(nint eventData,AtkUnitBasePtr panel)
+    {
+        if(eventData==0)return default;
+        var data=((AtkEventData*)eventData)->LinkData;
+        if(data==null)return default;
+        return ChatLinkHover.Extent(data->MinX,data->MinY,data->MaxX,data->MaxY,panel.Address==0 ? 1f:panel.Scale);
     }
 
     private static HoveredMapLink? Read(nint eventData,out int linkType)

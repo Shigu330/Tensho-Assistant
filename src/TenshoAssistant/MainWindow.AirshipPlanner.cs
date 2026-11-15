@@ -169,7 +169,7 @@ internal sealed partial class MainWindow
                 var search=airshipTargetSearch.Trim();
                 var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
                     :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
-                foreach(var (id,name) in rows.Where(row=>search.Length==0 || row.Name.Contains(search,StringComparison.CurrentCultureIgnoreCase))
+                foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
                             .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
                     if(ImGui.Selectable($"{name}##AirshipTarget{id}",id==chosen)){if(loot)airshipLootItem=id;else airshipUnlockSector=id;}
             }
@@ -239,7 +239,8 @@ internal sealed partial class MainWindow
     }
 
     // « H h mm » of a voyage or survey time, on the airship and submarine pages.
-    private static string HoursMinutes(TimeSpan time)=>TenshoAssistant.Localization.TenshoCulture.Hours((int)time.TotalHours,time.Minutes);
+    // X-333 (0.1379): a voyage's length in the common format (days from 24 h on).
+    private string HoursMinutes(TimeSpan time)=>TimeLeftText(time);
 
     // Experience of a route; « ≥ » when a sector's experience is not known (0 in the game data).
     private static string AirshipExp(AirshipRoute route)=>(route.UnknownExp>0 ? "≥ ":"")+route.Exp.ToString("N0",Numbers);

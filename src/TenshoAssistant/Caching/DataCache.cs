@@ -16,6 +16,10 @@ public sealed record FashionCacheData(string Json,string? Metadata);
 public sealed class DataCache : IDisposable
 {
     private sealed record Envelope(int Schema,string Family,string Scope,string Version,DateTimeOffset RecordedAt,JsonElement Value);
+    /// <summary>X-433 (0.1432): the same envelope read with its value typed, from a stream: no copy of the whole file nor of the value.</summary>
+    private sealed record TypedEnvelope<T>(int Schema,string Family,string Scope,string Version,DateTimeOffset RecordedAt,T? Value);
+    /// <summary>X-433 (0.1432): the read buffer, under the size of a large object (85 000 bytes).</summary>
+    internal const int StreamBuffer=64*1024;
     private sealed record RewardData(byte Mode,uint Gil,QuestRewardItem[] Items,QuestUnresolvedReward[] Unresolved,bool Additional,string Version);
     private sealed class RewardConverter : JsonConverter<QuestRewardSnapshot>
     {
@@ -45,6 +49,8 @@ public sealed class DataCache : IDisposable
     public IReadOnlyList<PatchCatalogReport> PatchReports=>Volatile.Read(ref patchReports);
     /// <summary>X-117 (0.1046): called off the framework thread with each new report.</summary>
     public Action<PatchCatalogReport>? PatchReported{get;set;}
+    /// <summary>X-412 (0.1384, tests only): runs after the comparison, before the reports are read again and written under the profile's lock.</summary>
+    internal Action? ReportsCompared{get;set;}
     private string PreviousFolder=>Path.Combine(root,"previous");
     private string PatchReportsPath=>Path.Combine(PreviousFolder,"patch-reports.json");
     private bool disposed;
@@ -92,14 +98,18 @@ public sealed class DataCache : IDisposable
             try
             {
                 if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return null;
-                byte[] bytes;
+                // X-433 (0.1432, docs/evidence/0.1432-background-collection-stall.md): read as a stream into the typed envelope. The whole file
+                // read at once (10 MB for the items) and the JsonElement's copy of the value with its token table (twice about 16 MB), allocated
+                // in a burst while a background collection ran, came just before every managed thread stopped until its end (the game's: 394 ms).
+                FileStream stream;
                 // X-171 (0.1333): removed meanwhile by the other client's purge or trim: a miss, not an error.
-                try{bytes=await File.ReadAllBytesAsync(path,linked.Token).ConfigureAwait(false);}
+                try{stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read,StreamBuffer,FileOptions.Asynchronous|FileOptions.SequentialScan);}
                 catch(Exception gone) when(gone is FileNotFoundException or DirectoryNotFoundException){return null;}
-                var envelope=JsonSerializer.Deserialize<Envelope>(bytes,JsonOptions);
+                TypedEnvelope<T>? envelope;
+                await using(stream.ConfigureAwait(false))
+                    envelope=await JsonSerializer.DeserializeAsync<TypedEnvelope<T>>(stream,JsonOptions,linked.Token).ConfigureAwait(false);
                 if(envelope is not {Schema:1} || envelope.Family!=family || envelope.Scope!=scope || envelope.Version!=version)return null;
-                var value=envelope.Value.Deserialize<T>(JsonOptions);
-                return value is null ? null:new CachedValue<T>(value,envelope.RecordedAt);
+                return envelope.Value is { } value ? new CachedValue<T>(value,envelope.RecordedAt):null;
             }
             finally{io.Release();}
         }
@@ -217,22 +227,29 @@ public sealed class DataCache : IDisposable
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
     }
     // Off the io lock: both copies are read again (each at most MaximumEntryBytes) and compared once, when the patch is first seen.
+    // X-359 M1 (0.1382): the reports file is then read again and written under the profile's lock, in one go: a report another client
+    // wrote meanwhile is kept (before, the list read off the lock was written back over it).
     private void Report(List<PatchMove> moved)
     {
         try
         {
-            var reports=ReadReports().ToList();
+            var made=new List<PatchCatalogReport>();
             foreach(var move in moved)
             {
                 var before=ReadEnvelope(move.Previous);var after=ReadEnvelope(move.Current);
                 if(before is null || after is null)continue;
-                var report=PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow);
-                reports.RemoveAll(row=>row.Family==report.Family && row.Scope==report.Scope);reports.Add(report);
-                Volatile.Write(ref patchReports,reports.ToArray());
-                try{PatchReported?.Invoke(report);}catch(Exception){}
+                made.Add(PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow));
             }
-            var bytes=JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions);
-            using(HoldProfile(lifetime.Token))AtomicFile.Write(PatchReportsPath,bytes);
+            if(made.Count==0)return;
+            ReportsCompared?.Invoke();
+            PatchCatalogReport[] reports;
+            using(HoldProfile(lifetime.Token))
+            {
+                reports=WithReports(ReadReports(),made);
+                AtomicFile.Write(PatchReportsPath,JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions));
+            }
+            Volatile.Write(ref patchReports,reports);
+            foreach(var report in made)try{PatchReported?.Invoke(report);}catch(Exception){}
         }
         catch(OperationCanceledException){}
         catch(Exception failure) when(failure is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
@@ -243,6 +260,9 @@ public sealed class DataCache : IDisposable
         if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return null;
         return JsonSerializer.Deserialize<Envelope>(File.ReadAllBytes(path),JsonOptions) is {Schema:1} envelope ? envelope:null;
     }
+    /// <summary>X-359 M1 (0.1382): the saved reports with the new ones, each family and scope once (the new one replacing the saved one).</summary>
+    internal static PatchCatalogReport[] WithReports(IEnumerable<PatchCatalogReport> saved,IReadOnlyList<PatchCatalogReport> made)
+        =>saved.Where(row=>!made.Any(report=>report.Family==row.Family && report.Scope==row.Scope)).Concat(made).ToArray();
     private IReadOnlyList<PatchCatalogReport> ReadReports()
     {
         var path=PatchReportsPath;

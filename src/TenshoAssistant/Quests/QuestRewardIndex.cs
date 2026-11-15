@@ -26,8 +26,8 @@ public sealed class QuestRewardIndex
         if(string.IsNullOrWhiteSpace(query))return sources;
         var tokens=query.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries);
         return Array.AsReadOnly(sources.Where(source=>tokens.All(token=>
-            source.Name.Contains(token,StringComparison.OrdinalIgnoreCase)
-            || source.Category.Contains(token,StringComparison.OrdinalIgnoreCase)
+            SearchText.Contains(source.Name,token,StringComparison.OrdinalIgnoreCase)
+            || SearchText.Contains(source.Category,token,StringComparison.OrdinalIgnoreCase)
             || source.QuestId.ToString(System.Globalization.CultureInfo.InvariantCulture)==token)).ToArray());
     }
     public static QuestRewardIndex Build(IEnumerable<QuestEntry> quests,CancellationToken cancellation=default)

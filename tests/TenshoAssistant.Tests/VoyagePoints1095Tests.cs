@@ -28,7 +28,7 @@ internal static class VoyagePoints1095Tests
             Check(panel.Contains("OceanCacheTick();") && panel.Contains("OceanSpectralSeen(stop)") && !panel.Contains("seenStore.Find(Discoveries.DiscoveryKind.SpectralBefore,fish=>stopFish.Contains(fish),3);\n"),"per-fish data kept, not rebuilt every frame");
             Check(!System.Text.RegularExpressions.Regex.IsMatch(panel,@"DrawOceanFishTable[\s\S]*var row=FishRow\(fishId,spotId\)"),"no GatherBuddy row rebuilt per fish per frame");
             Check(panel.Contains("OceanPart(\"ocean fish table\""),"the table measured in developer mode");
-            var plugin=Read("Plugin.cs");
+            var plugin=Read("Plugin.Ocean.cs");   // X-153 (0.1417): the ocean family's file
             Check(plugin.Contains("mainWindow.OceanVoyageData=InBackground(oceanVoyageData);") && plugin.Contains("mainWindow.OceanTimetableNow=InBackground(ocean);"),"sheets read off the frame");
             var reader=Read("Gathering/OceanVoyageReader.Dalamud.cs");
             Check(reader.Contains("++resultWait>=60") && reader.Contains("Tensho counted {5} points, {6} fish"),"result logged once filled, with Tensho's count");

@@ -1,28 +1,28 @@
 {
  "Format": "tensho-discoveries",
  "Version": 3,
- "Written": "2026-11-14T00:00:00+00:00",
+ "Written": "2026-11-15T00:00:00+00:00",
  "Files": [
   {
    "Name": "kind-01.jsonl.gz",
    "Kind": 1,
-   "Count": 2183,
-   "Bytes": 42664,
-   "Sha256": "B12E9AF54953003FDD8F15F42947F9ECDB7C37B8C827781301ABBBCED6BD8B85"
+   "Count": 2210,
+   "Bytes": 43320,
+   "Sha256": "54547A700FEBD1E9C5A447EE33251E1D3894973A08A6A3FF3DA17C9CAB396454"
   },
   {
    "Name": "kind-02.jsonl.gz",
    "Kind": 2,
-   "Count": 14,
-   "Bytes": 683,
-   "Sha256": "183615C7236EFB5605ABDA76FB5FA7644EC1E32CCE1C55A10FE9A44E1F51BB13"
+   "Count": 17,
+   "Bytes": 753,
+   "Sha256": "D32DCCDDDB18B3A0C2F8317E60469B5B8596115723FFDB8F305A2353EE7488AE"
   },
   {
    "Name": "kind-03.jsonl.gz",
    "Kind": 3,
    "Count": 242,
-   "Bytes": 6219,
-   "Sha256": "1142EC8387C1F3933720A8B6A10C948E3BC5FAA5D5C06834CE54156B29751DB4"
+   "Bytes": 6223,
+   "Sha256": "F9A6D75657A78643D85B05E1F0FB571DE2F51D153FB2B1F1D9E513B3E183DC03"
   },
   {
    "Name": "kind-04.jsonl.gz",
@@ -105,8 +105,8 @@
    "Name": "kind-17.jsonl.gz",
    "Kind": 17,
    "Count": 13,
-   "Bytes": 391,
-   "Sha256": "696B7DC84FDB62A5DF1C2DAD32163EF3E2EA7341FE6D69F28C960836E1EF8980"
+   "Bytes": 394,
+   "Sha256": "9162CB4CC1C6A8D1D86367C63D40CC5F2EC40518FCF94194F7CAAFB7B631D7E9"
   },
   {
    "Name": "kind-18.jsonl.gz",

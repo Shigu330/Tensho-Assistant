@@ -19,6 +19,9 @@ public sealed record BoardPlan(uint Board, IReadOnlyList<BeastPick> Team, IReadO
 /// </summary>
 public static class BeastTeams
 {
+    /// <summary>X-366 (0.1373): the text of « weakness hit: n of m enemies », the noun agreed with m (« 0 of 1 enemy », « 0 sur 1 ennemi »).</summary>
+    public static string HitKey(int enemies) => enemies <= 1 ? "BeastUi.TeamHitOne" : "BeastUi.TeamHit";
+
     public const int PerBattle = 3;
 
     public static (bool Weak, double Attack, double Guard) Against(BeastStats beast, uint autoRow, BoardEnemy enemy)

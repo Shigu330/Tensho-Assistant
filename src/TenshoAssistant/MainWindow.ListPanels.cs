@@ -169,7 +169,7 @@ internal sealed partial class MainWindow
                 ImGui.SetNextItemWidth(-1);
                 ImGui.InputTextWithHint("###ListPanelCurrencySearch",localization.Get("ListPanels.CurrencySearch"),ref listPanelCurrencySearch,60);
                 Tip("ListPanels.CurrencySearchTip");
-                var shown=ready.Result.Concat(on.Where(id=>ready.Result.All(row=>row.Id!=id)).Select(id=>(Id:id,Name:itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}"))).Where(row=>listPanelCurrencySearch.Length==0 || row.Name.Contains(listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
+                var shown=ready.Result.Concat(on.Where(id=>ready.Result.All(row=>row.Id!=id)).Select(id=>(Id:id,Name:itemCatalog.State.Catalog?.Find(id)?.Name ?? $"#{id}"))).Where(row=>listPanelCurrencySearch.Length==0 || SearchText.Contains(row.Name,listPanelCurrencySearch,StringComparison.CurrentCultureIgnoreCase)).ToArray();
                 if(ImGui.SmallButton(localization.Get("ListPanels.CurrencyNone")))
                 {
                     on=[];write(on);SaveReminders();
@@ -424,7 +424,7 @@ internal sealed partial class MainWindow
             var (open,left)=next.At(now);
             if(best is null || open && !best.Value.Open || open==best.Value.Open && left<best.Value.Left)best=(open,left);
         }
-        (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",Math.Max(0,(int)found.Left.TotalHours),found.Left.Minutes,found.Left.Seconds)):null;
+        (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",CountdownText(found.Left))):null;
         listTimedStates.States[item]=state;
         return state;
     }

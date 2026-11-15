@@ -10,8 +10,10 @@ public sealed record DueEvent(string Key,string Label,string Group,DateTimeOffse
 /// </summary>
 public static class AutoAlarms
 {
-    /// <summary>Applies the readings to the alarm list; true when it changed (to be saved).</summary>
-    public static bool Sync(List<TenshoAlarm> alarms,IReadOnlyCollection<DueEvent> events,DateTimeOffset now,int lead)
+    /// <summary>Applies the readings to the alarm list; true when it changed (to be saved). X-431 M1 (0.1416): <paramref name="gone"/> are the
+    /// keys whose cause was read as gone in this pass (a retainer read with nothing left on sale): their automatic alarm still to come is removed.
+    /// A key not read in this pass is not in it: an alarm is never removed for want of a reading.</summary>
+    public static bool Sync(List<TenshoAlarm> alarms,IReadOnlyCollection<DueEvent> events,DateTimeOffset now,int lead,IReadOnlyCollection<string>? gone=null)
     {
         var changed=false;
         foreach(var due in events)
@@ -31,6 +33,8 @@ public static class AutoAlarms
                 changed=true;
             }
         }
+        if(gone is { Count:>0 })
+            changed|=alarms.RemoveAll(alarm=>alarm.AutoKey.Length>0 && alarm.At>now && gone.Contains(alarm.AutoKey) && !events.Any(due=>due.Key==alarm.AutoKey))>0;
         // An automatic alarm that rang more than an hour ago and was not read again is done.
         changed|=alarms.RemoveAll(alarm=>alarm.AutoKey.Length>0 && alarm.Repeat==AlarmRepeat.Once && alarm.At<now.AddHours(-1)
             && !events.Any(due=>due.Key==alarm.AutoKey && due.At>now))>0;

@@ -101,17 +101,10 @@ public sealed unsafe class GilWatcher : IDisposable
             {
                 long sum=0;
                 // 0.769 (X-19, user report: the retainers' total followed a deposit only after reopening): the open retainer's gil from its own container,
-                // which the game updates at once; the list keeps the others'.
-                var active=manager->GetActiveRetainer();
-                long? live=null;
-                if(active!=null && active->RetainerId!=0 && canOpen && inventory->GetInventoryContainer(InventoryType.RetainerGil) is var purse && purse!=null && purse->IsLoaded)
-                {
-                    long held=0;
-                    for(var slot=0;slot<purse->Size;slot++)if(purse->GetInventorySlot(slot) is var item && item!=null && item->ItemId==1)held+=item->Quantity;
-                    live=held;
-                }
+                // which the game updates at once; the list keeps the others'. X-431 M2 (0.1416): one reading, shared with the retainers' table (RetainerPurse).
+                var livePurse=RetainerPurse.Open(manager);
                 foreach(ref var retainer in manager->Retainers)
-                    if(retainer.RetainerId!=0)sum+=live is { } heldNow && active!=null && retainer.RetainerId==active->RetainerId ? heldNow:retainer.Gil;
+                    if(retainer.RetainerId!=0)sum+=RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse);
                 newRetainers=sum;
             }
             var changed=Record(ref gil,newGil,GilSource.Character,now) | Record(ref retainers,newRetainers,GilSource.Retainers,now)

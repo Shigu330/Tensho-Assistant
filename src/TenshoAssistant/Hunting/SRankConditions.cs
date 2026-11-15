@@ -90,5 +90,5 @@ public static class SRankConditions
     }
 
     public static bool Matches(SRankRow row,string query)
-        =>query.Length==0 || row.Name.Contains(query,StringComparison.OrdinalIgnoreCase) || row.Zone.Contains(query,StringComparison.OrdinalIgnoreCase) || row.Text.Contains(query,StringComparison.OrdinalIgnoreCase);
+        =>query.Length==0 || SearchText.Contains(row.Name,query,StringComparison.OrdinalIgnoreCase) || SearchText.Contains(row.Zone,query,StringComparison.OrdinalIgnoreCase) || SearchText.Contains(row.Text,query,StringComparison.OrdinalIgnoreCase);
 }

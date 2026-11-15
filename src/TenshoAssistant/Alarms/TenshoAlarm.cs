@@ -170,11 +170,13 @@ public static class AlarmSchedule
     /// <summary>
     /// X-280 (0.1288): moves the alarm itself to a new date and time (for a daily or weekly one: its next ringing, so its time of day and
     /// weekday); what it already rang is forgotten so that the new time rings. The same alarm (same id, nothing added); false when nothing changes.
-    /// </summary>
-    public static bool Move(TenshoAlarm alarm, DateTimeOffset at)
+    /// X-336 M1 (0.1380): with <paramref name="now"/>, a date equal to the one the field shows (<see cref="EditShown"/>, to the minute) changes
+    /// nothing: a daily alarm validated unchanged within its lead after it rang would have rung twice.</summary>
+    public static bool Move(TenshoAlarm alarm, DateTimeOffset at, DateTimeOffset? now = null)
     {
         ArgumentNullException.ThrowIfNull(alarm);
         if (!DateEditable(alarm.Repeat) || alarm.At == at) return false;
+        if (now is { } shownAt && EditShown(alarm, shownAt).ToUnixTimeSeconds() / 60 == at.ToUnixTimeSeconds() / 60) return false;
         alarm.At = at; alarm.LastOccurrence = default; alarm.LastRung = default; alarm.LastOnTime = default;
         return true;
     }

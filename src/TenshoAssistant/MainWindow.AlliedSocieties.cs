@@ -26,6 +26,8 @@ internal sealed partial class MainWindow
             alliedLoad=null;
             alliedTried=true;
             alliedCatalog=loaded.IsCompletedSuccessfully ? loaded.Result:null;
+            // X-353 M5 (0.1381, R08): the cause of a catalogue that could not be read goes to the log, as the other background reads.
+            if(!loaded.IsCompletedSuccessfully)log.Warning(loaded.Exception?.GetBaseException() ?? new OperationCanceledException(),"Allied societies: the catalogue could not be read (perhaps after a game update).");
             if(alliedCatalog is { Societies.Count:>0 } first && ReadAllied is not null)alliedRead=ReadAllied(first);
         }
         if(alliedLoad is not null){ImGui.TextDisabled(localization.Get("Allied.Loading"));return;}
@@ -95,6 +97,8 @@ internal sealed partial class MainWindow
     }
 
     // X-265 (0.1306): a kind's name as the game writes it (« artisans »), with a capital in the list.
-    private static string AlliedKindName(AlliedCatalog catalog,AlliedKind kind)=>Capitalized(catalog.KindNames.GetValueOrDefault(kind) ?? kind.ToString());
+    // X-336 M9 (0.1380, R09): without the game's name, Tensho's word in the plugin's language, never the enum's English name.
+    private string AlliedKindName(AlliedCatalog catalog,AlliedKind kind)=>Capitalized(catalog.KindNames.GetValueOrDefault(kind)
+        ?? localization.Get(kind switch{AlliedKind.Combat=>"Allied.KindCombat",AlliedKind.Crafting=>"Allied.KindCrafting",_=>"Allied.KindGathering"}));
     private static string Capitalized(string text)=>text.Length==0 ? text:char.ToUpper(text[0],System.Globalization.CultureInfo.InvariantCulture)+text[1..];
 }

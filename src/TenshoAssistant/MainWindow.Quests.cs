@@ -163,7 +163,7 @@ internal sealed partial class MainWindow
                 && (questSection.Length == 0 || entry.Section == questSection)
                 && (string.IsNullOrWhiteSpace(questCategory) || entry.Category == questCategory)
                 && (questFilter == 0 || entry.Progress == (questFilter == 1 ? QuestProgress.Active : questFilter == 2 ? QuestProgress.Complete : QuestProgress.Unconfirmed))
-                && (string.IsNullOrWhiteSpace(questQuery) || entry.Name.Contains(questQuery.Trim(), StringComparison.OrdinalIgnoreCase)
+                && (string.IsNullOrWhiteSpace(questQuery) || SearchText.Contains(entry.Name, questQuery.Trim(), StringComparison.OrdinalIgnoreCase)
                     || entry.Id.ToString(CultureInfo.InvariantCulture) == questQuery.Trim())), questSort.Column, questSort.Descending);
             questViewState = state; questViewQuery = questQuery;
             questViewCategory = questCategory; questViewFilter = questFilter;

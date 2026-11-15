@@ -101,6 +101,8 @@ public static class ConfigurationReset
         "GardenAlerts", "GardenDetect", "GardenDetailedView", "CraftLivePanel",
         // 0.403 (g, R-08): GP alert and its threshold.
         "GpAlert", "GpAlertThreshold",
+        // X-403 (0.1434, D-166): the Tensho chat window's settings (the messages themselves are never saved).
+        "Chat",
     };
 }
 
@@ -595,6 +597,10 @@ public sealed partial class Configuration
     private SourceUseSettings sourceUses=new();
     public SourceUseSettings SourceUses {get=>sourceUses;set=>sourceUses=value ?? new();}
     public int? CommunityBeforeGameOnly { get; set; }
+    // X-403 (0.1434, D-166): the Tensho chat window, beside the game's chat (off by default): display, tabs and colours. Settings only: the
+    // messages stay in memory (Chat/ChatStore.cs). « "Chat": null » in a hand-edited file becomes the defaults, as MapView.
+    private TenshoAssistant.Chat.ChatSettings chat=new();
+    public TenshoAssistant.Chat.ChatSettings Chat {get=>chat;set=>chat=value ?? new();}
     // 0.328 (map audit): « "MapView": null » in a hand-edited file becomes the defaults here, like Cache, so no draw path reads null.
     private MapViewSettings mapView=new();
     public MapViewSettings MapView {get=>mapView;set=>mapView=value ?? new();}

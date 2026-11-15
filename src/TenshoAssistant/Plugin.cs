@@ -92,6 +92,7 @@ public sealed partial class Plugin : IDalamudPlugin
     private Func<Inventory.GilDtrEntry?>? gilBar;
     // X-165 (0.1245): Tensho's state in the server bar (Plugin.ServerBar.cs).
     private Func<Alarms.StateDtrEntry?>? stateBar;
+    private Func<Alarms.InfoDtrEntries?>? infoBar;
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
@@ -105,6 +106,8 @@ public sealed partial class Plugin : IDalamudPlugin
     {
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
+        // X-433 (0.1447): what the process allocates and keeps while Tensho loads (developer mode, said two minutes after the load).
+        var allocatedBefore=GC.GetTotalAllocatedBytes();var managedBefore=GC.GetTotalMemory(false);
         this.log = log;
         // 0.1105 (R20, plan 4.20): the version loaded, read by the agent's launch check (the agent's logread.py launch).
         log.Information("Tensho Assistant {0} loaded; logged in: {1}, territory {2}.",typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",client.IsLoggedIn,client.TerritoryType);
@@ -145,7 +148,24 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
             // exists and its warm-up has compiled the interface's code (bounded by ReaderCompiler.MaxHold; dropped at unload).
             TenshoAssistant.Competitive.CompetitiveGate.Compiler.Hold=()=>mainWindow is not { WarmupEarlyDone:true };
-            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
+            // X-437 M2 (0.1428): the readers' compiler times its compilations for the log in developer mode only.
+            TenshoAssistant.Competitive.CompetitiveGate.Compiler.Measure=static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true;
+            TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>
+            {
+                log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
+                // X-433 (0.1440): while the runtime is listened to (developer mode, two minutes after a load), the methods the game's thread
+                // compiled during that pass, read a moment later (the runtime's events come in a little after).
+                if(Diagnostics.GameThreadJit.Current is { } jit)
+                {
+                    var to=DateTime.UtcNow;
+                    var from=to-TimeSpan.FromMilliseconds(spent+5);
+                    _=Task.Delay(TimeSpan.FromSeconds(2)).ContinueWith(_=>
+                    {
+                        var names=jit.Between(from,to);
+                        if(names.Count>0)log.Information("Slow reader: methods the game's thread compiled meanwhile ({0}): {1}.",names.Count,string.Join(", ",names.Take(40)));
+                    },TaskScheduler.Default);
+                }
+            };
             // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
             // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.
             var saveNotes=new Diagnostics.SlowNotes(TimeSpan.FromMinutes(5));
@@ -325,20 +345,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.EnglishPlaceIds=name=>(englishPlaces??=data.GetExcelSheet<Lumina.Excel.Sheets.PlaceName>(Dalamud.Game.ClientLanguage.English)
                 .Where(row=>!row.Name.IsEmpty).GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(group=>group.Key,group=>(IReadOnlyList<uint>)group.Select(row=>row.RowId).ToArray(),StringComparer.OrdinalIgnoreCase)).GetValueOrDefault(name.Trim()) ?? [];
-            Maps.MapLiveReader? mapLive=null;
-            registrations.Register(()=>mapLive=new Maps.MapLiveReader(framework,client,objects,data,condition,fateTable,partyList,log),()=>mapLive?.Dispose());
-            var mapLocal=new Maps.MapLocalIndexService();
-            Maps.MapLocalIndexLoader? mapLocalLoader=null;
-            registrations.Register(()=>mapLocalLoader=new Maps.MapLocalIndexLoader(mapLocal,data,framework,log,dataCache),()=>mapLocalLoader?.Dispose());
-            var mapMarkers=new Maps.MapMarkerSource(data,log);
-            mainWindow.ConfigureMapView(mapLive!,mapMarkers,mapLocal);
-            // X-01 C5 (0.1206): the names of every map and the aetheryte rows built off the frame once the loading's own work is done, so the
-            // first region map only reads them (it took 1 311 ms on the game's thread); stopped with the plugin.
-            _=Task.Run(async()=>
-            {
-                try{await Task.Delay(MapMarkersWarmDelay,gameDataCancel.Token).ConfigureAwait(false);mapMarkers.Warm(gameDataCancel.Token);}
-                catch(OperationCanceledException){}
-            });
+            // X-153 (0.1404, seventh slice): the map family (Plugin.Maps.cs), at the same place as before.
+            RegisterMaps(framework,client,objects,data,condition,fateTable,partyList);
             var itemSources=new Community.GarlandItemSourceService(garland){Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.GarlandItemSources)};
             registrations.Register(()=>{},itemSources.Dispose);
             mainWindow.ConfigureItemSources(itemSources);
@@ -417,99 +425,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 }),()=>alarms?.Dispose());
             mainWindow.ConfigureAlarms(alarms!);
             if(alarms is not null)alarms.Gathered=mainWindow.AlarmGathered;
-            var gatherBuddyFish=new Community.GatherBuddyFishService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityGatherBuddy};
-            registrations.Register(()=>{},gatherBuddyFish.Dispose);
-            mainWindow.ConfigureGatherBuddyFish(gatherBuddyFish);
-            var biteTimes=new Community.FishBiteTimeService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache){Enabled=()=>configuration.CommunityTeamcraftBites};
-            registrations.Register(()=>{},biteTimes.Dispose);
-            mainWindow.ConfigureBiteTimes(biteTimes);
-            // Fishing help (0.226): the FishingSpot of the player's territory nearest to the player. FishingSpot X/Z are map pixels
-            // (0–2048, probe PROBE_FISHSPOT: spot 35 X 668 Z 1120 at scale 200 = map 7.7, 12.2 as Garland): world = (pixel − 1024) / scale − offset.
-            // g, R-05 (0.402): fishing, spearfishing and gathering notebooks, read while the Gathering page shows them.
-            Gathering.NotebookReader? notebooks=null;
-            registrations.Register(()=>notebooks=new Gathering.NotebookReader(framework,client,data,log),()=>notebooks?.Dispose());
-            mainWindow.NotebookSource=notebooks;
-            mainWindow.NotebookExportFolder=()=>Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Exports");
-            // g, R-04 (0.398): the bait in hand for the fishing help.
-            Gathering.FishingBaitReader? baitReader=null;
-            registrations.Register(()=>baitReader=new Gathering.FishingBaitReader(framework,objects,log),()=>baitReader?.Dispose());
-            mainWindow.FishingBait=()=>baitReader?.Bait;
-            mainWindow.FishingIntuitionLeft=()=>baitReader?.IntuitionLeft;
-            mainWindow.FishingCastAt=()=>baitReader?.CastAt;
-            // 0.604 (C35): the player copied on the framework thread, again only when it changed; the two tables built off the frame on first use, nothing
-            // shown until they are ready, a failure logged once.
-            System.Runtime.CompilerServices.StrongBox<(uint Job,uint Territory,float X,float Z,bool Fishing)?> fishingNowCopy=new(null);
-            IFramework.OnUpdateDelegate copyFishingNow=_=>
-            {
-                var local=objects.LocalPlayer;
-                (uint Job,uint Territory,float X,float Z,bool Fishing)? seen=local is null ? null
-                    :(local.ClassJob.RowId,(uint)client.TerritoryType,local.Position.X,local.Position.Z,condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Fishing]);
-                if(seen!=Volatile.Read(ref fishingNowCopy).Value)Volatile.Write(ref fishingNowCopy,new(seen));
-            };
-            registrations.Register(()=>TenshoAssistant.Competitive.CompetitiveGate.Add(framework,copyFishingNow),()=>TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,copyFishingNow));
-            Task<Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>>? fishingSpotsTask=null;
-            mainWindow.ConfigureFishingHelp(()=>Volatile.Read(ref fishingNowCopy).Value,(territory,x,z)=>
-            {
-                fishingSpotsTask??=Task.Run(()=>
-                {
-                    var spots=new Dictionary<uint,List<(uint Id,string Name,float X,float Z,uint[] Fish)>>();
-                    try
-                    {
-                        foreach(var spot in data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>())
-                        {
-                            if(spot.TerritoryType.RowId==0 || !spot.TerritoryType.IsValid)continue;
-                            var map=spot.TerritoryType.Value.Map.Value;var scale=Math.Max(1,(int)map.SizeFactor)/100f;
-                            var fish=spot.Item.Where(item=>item.RowId!=0).Select(item=>item.RowId).ToArray();
-                            if(fish.Length==0)continue;
-                            if(!spots.TryGetValue(spot.TerritoryType.RowId,out var list))spots[spot.TerritoryType.RowId]=list=[];
-                            list.Add((spot.RowId,spot.PlaceName.IsValid ? spot.PlaceName.Value.Name.ExtractText():"",(spot.X-1024)/scale-map.OffsetX,(spot.Z-1024)/scale-map.OffsetY,fish));
-                        }
-                    }
-                    catch(Exception error){log.Warning(error,"Fishing spots unavailable (perhaps after a game update).");}
-                    return spots;
-                });
-                if(!fishingSpotsTask.IsCompletedSuccessfully)return null;
-                return fishingSpotsTask.Result.TryGetValue(territory,out var candidates) && candidates.Count>0
-                    ? candidates.OrderBy(spot=>(spot.X-x)*(spot.X-x)+(spot.Z-z)*(spot.Z-z)).First():null;
-            });
-            // Bountiful II base of a gathered item (0.224): ItemLevel.Gathering at its GatheringItemLevelConvertTable row, highest of its
-            // gathering rows; 0.604: built off the frame on first use (docs/evidence/0.224-bountiful-base.md).
-            Task<Dictionary<uint,int>>? bountifulBases=null;
-            mainWindow.ConfigureBountifulBase(item=>
-            {
-                bountifulBases??=Task.Run(()=>
-                {
-                    var bases=new Dictionary<uint,int>();
-                    try
-                    {
-                        var levels=data.GetExcelSheet<Lumina.Excel.Sheets.ItemLevel>();
-                        foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.GatheringItem>())
-                            if(row.Item.RowId!=0 && levels.TryGetRow(row.GatheringItemLevel.RowId,out var level) && level.Gathering>0)
-                                bases[row.Item.RowId]=Math.Max(bases.GetValueOrDefault(row.Item.RowId),(int)level.Gathering);
-                    }
-                    catch(Exception error){log.Warning(error,"Bountiful bases unavailable (perhaps after a game update).");}
-                    return bases;
-                });
-                return bountifulBases.IsCompletedSuccessfully && bountifulBases.Result.TryGetValue(item,out var value) ? value:null;
-            });
-            // 0.515: a node's effects, read once per node (docs/evidence/0.515-node-effects.md). R-14: an unreadable sheet means no effect line, not a broken panel.
-            var nodeEffects=new Dictionary<uint,IReadOnlyList<Gathering.GatherNodeEffect>>();
-            mainWindow.ConfigureNodeEffects(node=>
-            {
-                if(nodeEffects.TryGetValue(node,out var known))return known;
-                var found=new List<Gathering.GatherNodeEffect>();
-                try
-                {
-                    var bonuses=data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPointBonus>();
-                    if(data.GetExcelSheet<Lumina.Excel.Sheets.GatheringPoint>().TryGetRow(node,out var point))
-                        foreach(var link in point.GatheringPointBonus)
-                            if(link.RowId!=0 && bonuses.TryGetRow(link.RowId,out var bonus) && Gathering.GatherNodeEffects.From(bonus.Condition.RowId,bonus.ConditionValue,bonus.Condition.ValueNullable?.Text.ExtractText(),bonus.BonusType.RowId,bonus.BonusValue,bonus.BonusType.ValueNullable?.Text.ExtractText()) is { } effect)
-                                found.Add(effect);
-                }
-                catch(Exception error){log.Warning(error,"Node effects unavailable (perhaps after a game update).");}
-                nodeEffects[node]=found;
-                return found;
-            });
+            // X-153 (0.1412, eighth slice): the gathering and fishing family (Plugin.Gathering.cs), at the same place as before.
+            RegisterGathering(pluginInterface,configuration,data,framework,client,objects,condition);
             mainWindow.ConfigureJobNames(job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().TryGetRow(job,out var row) ? row.Name.ExtractText():null);
             var lumina=new Community.LuminaSupplementalService(()=>configuration.Cache.Duration(CacheArea.Sources),dataCache,
                 id=>data.GetExcelSheet<Lumina.Excel.Sheets.BNpcName>().TryGetRow(id,out var monster) ? monster.Singular.ExtractText():null,
@@ -638,35 +555,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 catch(Exception error){log.Warning("Duty ready alert failed ({Error}).",error.GetType().Name);}
             }
             registrations.Register(()=>client.CfPop+=OnDutyPop,()=>client.CfPop-=OnDutyPop);
-            FreeCompany.VoyageWatcher? voyages=null;
-            // g, M-10 (0.379): voyage loot history, 180 days; since 0.1148 (X-173) in TenshoData.db, the file of before (VoyageHistory.json)
-            // converted at its first load and kept aside.
-            var voyageHistory=new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"VoyageHistory.json"),(error,message)=>log.Warning(error,message),tenshoData);
-            registrations.Register(()=>voyages=new FreeCompany.VoyageWatcher(framework,data,configuration,()=>SaveTimed("voyages"),log){Observed=voyageHistory.Observe,
-                // X-73.8 (0.862): each submersible voyage's loot by sector and the sectors it unlocked, for the discoveries base.
-                AirshipLoot=(item,sector,count)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.AirshipDrop,item%1_000_000,sector,count,DateTimeOffset.UtcNow,hq:item>=1_000_000);},
-                SectorLoot=(item,sector,count,hq)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageDrop,item,sector,count,DateTimeOffset.UtcNow,hq:hq);},
-                SectorVisit=(sector,twice,surveillance)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageVisit,sector,twice ? 1u:0u,surveillance,DateTimeOffset.UtcNow);},
-                SectorUnlock=(unlocked,sector)=>{if(configuration.Discovery.Enabled && configuration.Discovery.ItemSources)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.VoyageUnlock,unlocked,sector,1,DateTimeOffset.UtcNow);}},()=>voyages?.Dispose());
-            mainWindow.VoyageHistorySource=voyageHistory;
-            mainWindow.SubmarineCatalog=()=>voyages?.Catalog;
-            mainWindow.VesselParts=()=>voyages?.PartCatalog;
-            mainWindow.SubmarineCatalogFailed=()=>voyages?.CatalogFailed==true;
-            mainWindow.VesselPartsFailed=()=>voyages?.PartCatalogFailed==true;
-            mainWindow.AirshipCatalog=()=>voyages?.AirshipCatalog;
-            mainWindow.AirshipCatalogFailed=()=>voyages?.AirshipCatalogFailed==true;
-            // 0.337 (DEC-023 3): airship leg times and distances from the game's own functions, on the framework thread, on request.
-            FreeCompany.AirshipVoyageTable? airshipTable=null;
-            registrations.Register(()=>airshipTable=new FreeCompany.AirshipVoyageTable(framework,client,log),()=>airshipTable?.Dispose());
-            mainWindow.AirshipTable=()=>airshipTable?.State;
-            // DEC-043 (0.1006): developer-mode probe of the game's submarine functions against the formula, once per session (log only).
-            FreeCompany.SubmarineVoyageProbe? submarineProbe=null;
-            registrations.Register(()=>submarineProbe=new FreeCompany.SubmarineVoyageProbe(framework,client,data,log,()=>configuration.DeveloperMode),()=>submarineProbe?.Dispose());
-            mainWindow.RequestAirshipTable=(speed,points)=>airshipTable?.Request(speed,points);
-            // X-201 (0.1248): the other speeds (one per registered airship) and their tables, for the fleet list.
-            mainWindow.RequestAirshipSpeeds=speeds=>airshipTable?.RequestAlso(speeds);
-            mainWindow.AirshipTableFor=speed=>airshipTable?.TableFor(speed);
-            mainWindow.VoyageReadUnavailable=()=>voyages?.ReadUnavailable==true;
+            // X-153 (0.1403, sixth slice): the company voyages family (Plugin.Voyages.cs), at the same place as before.
+            RegisterVoyages(pluginInterface,configuration,data,framework,client,tenshoData,()=>SaveTimed("voyages"));
             Gear.GearLoader? gear=null;
             registrations.Register(()=>gear=new Gear.GearLoader(framework,data,client,log),()=>gear?.Dispose());
             // g, M-12 (0.383): the game's gear sets and the job levels (ClassJob ExpArrayIndex), read while the Gear page shows them.
@@ -726,52 +616,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // g, R-01 (0.392): ocean fishing timetable from the game's loop (IKDRouteTable) and voyages (IKDRoute), built on first use.
             // X-285 (0.1300): the page loaders that read only the game's sheets, given by one method to the game and the desktop application.
             mainWindow.UseSheetLoaders(data,log);
-            var ocean=new Lazy<Gathering.OceanSchedule?>(()=>mainWindow.OceanTimetable?.Invoke());
-            // g, R-07 (0.418): the voyage in progress and the game's ocean fishing data (routes, places, fish of each spot, missions).
-            var oceanVoyageData=new Lazy<Gathering.OceanVoyageData?>(()=>
-            {
-                try
-                {
-                    var routes=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRoute>().Where(row=>!row.Name.IsEmpty)
-                        .ToDictionary(row=>row.RowId,row=>(row.Spot.Select(spot=>spot.RowId).Where(id=>id!=0).ToArray(),row.Time.Select(time=>time.RowId).ToArray()));
-                    var spots=data.GetExcelSheet<Lumina.Excel.Sheets.IKDSpot>().Where(row=>row.PlaceName.RowId!=0)
-                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanSpot(row.RowId,row.PlaceName.ValueNullable?.Name.ExtractText() ?? "",row.SpotMain.RowId,row.SpotSub.RowId));
-                    var fishingSpots=data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>();
-                    var spotFish=new Dictionary<uint,IReadOnlyList<uint>>();var territories=new HashSet<uint>();
-                    foreach(var id in spots.Values.SelectMany(spot=>new[]{spot.MainSpot,spot.SpectralSpot}).Where(id=>id!=0).Distinct())
-                        if(fishingSpots.GetRowOrDefault(id) is { } fishingSpot)
-                        {
-                            spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
-                            if(fishingSpot.TerritoryType.RowId!=0)territories.Add(fishingSpot.TerritoryType.RowId);
-                        }
-                    // X-85 V3 (0.961): each mission's criterion from the English texts (species words matched to the bonus rows), each fish's species.
-                    var words=Gathering.OceanMissionRules.SpeciesWords(data.GetExcelSheet<Lumina.Excel.Sheets.IKDContentBonus>(Dalamud.Game.ClientLanguage.English)
-                        .Select(row=>(row.RowId,row.Requirement.ExtractText())));
-                    var englishMissions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>(Dalamud.Game.ClientLanguage.English);
-                    var missions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>().Where(row=>!row.Unknown0.IsEmpty)
-                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1,
-                            englishMissions.GetRowOrDefault(row.RowId) is { } english ? Gathering.OceanMissionRules.Parse(english.Unknown0.ExtractText(),words):null));
-                    var fishBonuses=new Dictionary<uint,uint[]>();
-                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.IKDFishParam>())
-                        if(row.Fish.ValueNullable?.Item.RowId is { } item and not 0)
-                            fishBonuses[item]=row.IKDContentBonus.Select(bonus=>bonus.RowId).Where(id=>id!=0).ToArray();
-                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions){Territories=territories,FishBonuses=fishBonuses};
-                }
-                catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
-            });
-            // 0.1095 (user report: OceanVoyage 75 to 90 ms on the first frame after each reload): the sheets are read in the background; the panel
-            // and the schedule check wait for them (null until then) instead of reading them in the frame.
-            mainWindow.OceanVoyageData=InBackground(oceanVoyageData);
-            mainWindow.OceanTimetableNow=InBackground(ocean);
-            OceanVoyageReader? oceanVoyageReader=null;
-            // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, and the play state for the developer's scripts.
-            var voyageWriter=new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});
-            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log,
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"OceanVoyage.json"),voyageWriter){Developer=()=>configuration.DeveloperMode,
-                CatchPoints=(item,points)=>{if(configuration.Discovery.Enabled && configuration.Discovery.Fishing)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.FishPoints,item,0,Math.Min(points,100_000),DateTimeOffset.UtcNow,client.TerritoryType);}},()=>oceanVoyageReader?.Dispose());
-            Diagnostics.PlayStateWriter? playState=null;
-            registrations.Register(()=>playState=new Diagnostics.PlayStateWriter(framework,condition,pluginInterface.GetPluginConfigDirectory(),
-                ()=>pluginInterface.IsDev || configuration.DeveloperMode,()=>oceanVoyageReader?.Frame is not null,voyageWriter),()=>playState?.Dispose());
+            // X-153 (0.1417, ninth slice): the ocean fishing family (Plugin.Ocean.cs), at the same place as before.
+            RegisterOcean(pluginInterface,configuration,data,framework,client,condition);
             // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
             Inventory.InventoryWindowReader? inventoryWindow=null;
             registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());
@@ -799,20 +645,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
-            // 0.340 (R-11 step 4): the companion chocobo and its bardings, read on the framework thread while the page shows them.
-            Gear.ChocoboReader? chocobo=null;
-            registrations.Register(()=>chocobo=new Gear.ChocoboReader(framework,client,player,unlocks,data,log),()=>chocobo?.Dispose());
-            mainWindow.Chocobo=()=>{chocobo?.Want();return chocobo?.State;};
-            mainWindow.ChocoboUnavailable=()=>chocobo?.Unavailable==true;
-            // X-204 (0.1235): the racing chocobo, read only once the game loaded it (never asked of the server); ranks and abilities from the sheets.
-            MiniGames.RaceChocoboReader? raceChocobo=null;
-            registrations.Register(()=>raceChocobo=new MiniGames.RaceChocoboReader(framework,client,player,condition,log),()=>raceChocobo?.Dispose());
-            mainWindow.RaceChocobo=()=>{raceChocobo?.Want();return raceChocobo?.State;};
-            mainWindow.RaceChocoboUnavailable=()=>raceChocobo?.Unavailable==true;
-            mainWindow.RaceChocoboRanks=new Lazy<MiniGames.RaceChocoboRank[]>(()=>LoadSheet("ChocoboRaceRank",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ChocoboRaceRank>()
-                .Where(row=>row.Name.RowId!=0).Select(row=>new MiniGames.RaceChocoboRank(row.RowId,row.RatingMin,row.RatingMax,row.Name.ValueNullable?.Text.ExtractText() ?? "")).Where(rank=>rank.Name.Length>0).ToArray(),[]));
-            mainWindow.RaceChocoboAbility=id=>id==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.ChocoboRaceAbility>().GetRowOrDefault(id) is { } ability && !ability.Name.IsEmpty
-                ? new MiniGames.RaceChocoboAbility(id,ability.Name.ExtractText(),ability.Description.ExtractText()):null;
+            // X-153 (0.1419, tenth slice): the chocobo family (Plugin.Chocobo.cs), at the same place as before.
+            RegisterChocobo(data,framework,client,player,unlocks,condition);
             mainWindow.StainName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.342 (R-09): running festivals (GameMain), their quests (Quest.Festival) and English names (LuminaSupplemental, embedded).
             Events.FestivalReader? festivals=null;
@@ -829,7 +663,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 var wanted=text.Trim();
                 if(wanted.Length==0)return [];
                 keyItems??=data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().Where(row=>!row.Name.IsEmpty).Select(row=>(row.RowId,row.Name.ExtractText(),(uint)row.Icon)).ToArray();
-                return keyItems.Where(item=>item.Name.Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(30).ToArray();
+                return keyItems.Where(item=>SearchText.Contains(item.Name,wanted,StringComparison.CurrentCultureIgnoreCase)).Take(30).ToArray();
             };
             // 0.352 (g, I-11): names of the quests and achievements that unlock shop articles.
             mainWindow.QuestNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id)?.Name.ExtractText();
@@ -903,20 +737,29 @@ public sealed partial class Plugin : IDalamudPlugin
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
             registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>SaveTimed("character status"),
-                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters")),()=>characterStatus?.Dispose());
+                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
+                // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
+                job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",
+                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? ""),()=>characterStatus?.Dispose());
             mainWindow.CharacterStatusSource=characterStatus;
             // g, C-03 (0.357): items the armoire takes, for the storage report.
             IReadOnlySet<uint>? cabinetItems=null;
             // g, C-14 (0.363): guildleves (Leve sheet, copied once) and the character's progress, read while the page shows them.
             IReadOnlyList<Leves.LeveDefinition>? leveList=null;
-            IReadOnlyList<Leves.LeveDefinition> LeveList()=>leveList??=data.GetExcelSheet<Lumina.Excel.Sheets.Leve>()
+            IReadOnlyList<Leves.LeveDefinition> LeveList()=>leveList??=LeveClientsNamed(data.GetExcelSheet<Lumina.Excel.Sheets.Leve>()
                 .Where(row=>!row.Name.IsEmpty && row.ClassJobLevel>0)
                 .Select(row=>new Leves.LeveDefinition(row.RowId,row.Name.ExtractText(),row.ClassJobLevel,row.LeveAssignmentType.RowId,
                     row.LeveAssignmentType.ValueNullable?.Name.ExtractText() ?? "",(uint)Math.Max(0,row.LeveAssignmentType.ValueNullable?.Icon ?? 0),
                     row.LeveClient.ValueNullable?.Name.ExtractText() ?? "",row.PlaceNameStartZone.ValueNullable?.Name.ExtractText() ?? "",row.GilReward,row.AllowanceCost,
                     row.LevelLevemete.ValueNullable is { Map.RowId:not 0 } client ? new(client.Map.RowId,client.X,client.Z):null,
                     row.LevelStart.ValueNullable is { Map.RowId:not 0 } start ? new(start.Map.RowId,start.X,start.Z):null))
-                .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray();
+                .OrderBy(leve=>leve.Level).ThenBy(leve=>leve.Name,StringComparer.CurrentCulture).ToArray());
+            // X-404 (0.1372): the sheet's « Client: » label taken off each name once (the page wrote « Client : Client : … »).
+            static IReadOnlyList<Leves.LeveDefinition> LeveClientsNamed(Leves.LeveDefinition[] leves)
+            {
+                var labels=Leves.LeveCatalog.ClientLabels(leves.Select(leve=>leve.Client));
+                return labels.Count==0 ? leves:leves.Select(leve=>leve with{Client=Leves.LeveCatalog.WithoutClientLabel(leve.Client,labels)}).ToArray();
+            }
             Leves.LeveProgressReader? leveReader=null;
             registrations.Register(()=>leveReader=new Leves.LeveProgressReader(framework,client,player,unlocks,data,log,LeveList),()=>leveReader?.Dispose());
             mainWindow.LeveDefinitions=LeveList;
@@ -927,51 +770,13 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.TreasureMap=()=>treasureMap?.Spot;
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
-            // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
-            Maps.ChatMapLinkWatcher? chatLinks=null;
-            registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
-            mainWindow.ChatLinkHistory=chatLinks?.History;
-            // X-365 (0.1351): the chat map link under the mouse, for the right-click Tensho menu (same map settings switch).
-            Maps.ChatLinkHoverWatcher? chatLinkHover=null;
-            registrations.Register(()=>chatLinkHover=new Maps.ChatLinkHoverWatcher(addonLifecycle,log,()=>configuration.MapView.ChatLinks,()=>mainWindow.DeveloperMode),
-                ()=>chatLinkHover?.Dispose());
-            mainWindow.ChatLinkHover=chatLinkHover?.Hover;
+            // X-153 (0.1443): the chat family (the Tensho chat window's reader, the chat's map links, the link under the mouse) is wired in Plugin.Chat.cs.
+            RegisterChat(configuration,client,addonLifecycle);
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
-            // g, X-02 (0.370): the music playing now (BGMSystem, memory only) and its roll (BGM file = OrchestrionPath file).
-            Collections.BgmReader? bgm=null;
-            registrations.Register(()=>bgm=new Collections.BgmReader(framework,client,log),()=>bgm?.Dispose());
-            Dictionary<uint,uint>? rollByBgm=null;
-            mainWindow.PlayingRoll=()=>
-            {
-                bgm?.Want();
-                if(bgm?.Playing is not { } playing)return null;
-                rollByBgm??=BuildRollByBgm();
-                return rollByBgm.TryGetValue(playing,out var roll) ? roll:null;
-            };
-            mainWindow.MusicRead=()=>bgm?.Playing is not null;
-            Dictionary<uint,uint> BuildRollByBgm()
-            {
-                var rolls=data.GetExcelSheet<Lumina.Excel.Sheets.OrchestrionPath>().Where(row=>row.RowId!=0 && !row.File.IsEmpty)
-                    .GroupBy(row=>row.File.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>group.First().RowId,StringComparer.OrdinalIgnoreCase);
-                return data.GetExcelSheet<Lumina.Excel.Sheets.BGM>().Where(row=>!row.File.IsEmpty)
-                    .Select(row=>(row.RowId,Roll:rolls.GetValueOrDefault(row.File.ExtractText()))).Where(pair=>pair.Roll!=0).ToDictionary(pair=>pair.RowId,pair=>pair.Roll);
-            }
-            // g, X-03 (0.369): wear a title (click), or the job's title on a job change when the player turned it on.
-            Collections.TitleChanger? titleChanger=null;
-            registrations.Register(()=>mainWindow.TitleChangerSource=titleChanger=new Collections.TitleChanger(framework,client,player,log,
-                ()=>configuration.JobTitlesEnabled,()=>configuration.JobTitles),()=>titleChanger?.Dispose());
-            // g, C-15 (0.368): achievement progress, read passively; asked from the server only on the player's click.
-            Collections.AchievementProgressWatcher? achievementProgress=null;
-            registrations.Register(()=>mainWindow.AchievementProgressSource=achievementProgress=new Collections.AchievementProgressWatcher(framework,client,player,log,
-                new Collections.AchievementProgressData(Path.Combine(pluginInterface.GetPluginConfigDirectory(),"AchievementProgress.json"),tenshoData),id=>configuration.TrackedAchievements?.Contains(id)==true,mainWindow.AchievementCompleted),
-                ()=>achievementProgress?.Dispose());
-            // g, C-04 (0.365): hairstyles, accessories, glasses, bardings, portraits, master books, McGuffins, Occult Crescent lore.
-            Collections.ExtraCollectionReader? extraCollections=null;
-            registrations.Register(()=>extraCollections=new Collections.ExtraCollectionReader(framework,client,player,unlocks,data,log),()=>extraCollections?.Dispose());
-            mainWindow.ExtraCollections=()=>{extraCollections?.Want();return extraCollections?.State;};
-            mainWindow.ExtraCollectionsUnavailable=()=>extraCollections?.Unavailable==true;
+            // X-153 (0.1444): the collections family (music, titles, achievement progress, extra collections) is wired in Plugin.Collections.cs.
+            RegisterCollections(pluginInterface,configuration,data,framework,client,player,unlocks,tenshoData);
             // g, C-12 (0.364): hunting log (MonsterNote, copied once) and the kills the game holds, read while the page shows them.
             // X-01 C2.2 (0.1191, analysis of 12/11: MonsterIcons took 55 to 133 ms on its first frame in the open air, 5 to 9 ms in town:
             // the first pass with monsters around copied the whole MonsterNote sheet, and the whole English BNpcName sheet for a Blue Mage or
@@ -1079,6 +884,12 @@ public sealed partial class Plugin : IDalamudPlugin
                 try{return GrandCompanies.GcReader.Read(rows);}
                 catch(Exception error){log.Warning(error,"Grand Companies unreadable (game update?).");throw;}
             });
+            // X-307 (0.1394): the game's item finder copy of the retainers, read by the self-check on the framework thread.
+            mainWindow.RetainerFinder=()=>
+            {
+                try{return Inventory.RetainerFinderReader.Read();}
+                catch(Exception error){log.Warning(error,"Item finder copy of the retainers unreadable (game update?).");return null;}
+            };
             // W-10 (0.713): the allied societies, read when the page opens and on the player's click.
             mainWindow.ReadAllied=catalog=>framework.RunOnFrameworkThread(()=>
             {
@@ -1153,6 +964,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 // X-382 (0.1360): a harvest is also the source of the items it gives (no « Item gain not attributed » for them).
                 (found,seed,place)=>{if(found.Kind==Reminders.GardenChatKind.Harvested)itemWatcher?.SourceSeen(Discoveries.GainSource.Garden,(uint)(found.Bed ?? 0));mainWindow.GardenPlanted(found,seed,place);},
                 target:()=>targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventObj } bedObject ? bedObject.BaseId:0u,
+                // X-410 M1 (0.1378): a harvest seen through the bed's menu names a seed or a crop.
+                isGardenItem:id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id || row.Item1.HarvestId==id)==true,
                 gui:gameGui,developer:()=>configuration.DeveloperMode),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
@@ -1324,7 +1137,8 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(() => questReader = new QuestReader(quests, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Quests),dataCache),
                 () => questReader?.Dispose());
             CollectionReader? collectionReader = null;
-            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache,()=>configuration.Cache.Duration(CacheArea.Completion)),
+            registrations.Register(() => collectionReader = new CollectionReader(collections, data, framework, player, client, unlocks, log,()=>configuration.Cache.Duration(CacheArea.Collections),dataCache,()=>configuration.Cache.Duration(CacheArea.Completion),
+                new CompletionListsData(tenshoData)),
                 () => collectionReader?.Dispose());
             TriadObservationReader? triadReader = null;
             MiniCactpotObservationReader? cactpotReader=null;
@@ -1501,7 +1315,9 @@ public sealed partial class Plugin : IDalamudPlugin
             string Memory()
             {
                 var contexts=System.Runtime.Loader.AssemblyLoadContext.All.Select(context=>context.Name).ToArray();
-                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive);
+                // X-433 (0.1447): with the process's private memory and the machine's (a collection « induced for low memory »).
+                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive)
+                    +"; "+Diagnostics.MachineMemory.Text(Diagnostics.MachineMemory.Read(),Diagnostics.MachineMemory.ProcessPrivateBytes());
             }
             void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",
                 when,(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,(long)(GC.GetTotalPauseDuration()-pausesBefore).TotalMilliseconds,GC.CollectionCount(2)-gen2Before,framework.IsInFrameworkUpdateThread ? "framework":"other",Memory());
@@ -1516,6 +1332,41 @@ public sealed partial class Plugin : IDalamudPlugin
             developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
             mainWindow.LoadMilliseconds=(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds;
+            // X-433 (0.1422): developer mode, two minutes after the load: the runtime's suspensions of every thread with their reason (the
+            // collection pauses are not all of them), to name what the readers wait on about 25 s after a load.
+            if(configuration.DeveloperMode)
+            {
+                var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));
+                registrations.Register(()=>{},()=>suspensions.Dispose());
+                // X-433 (0.1433): the gaps between the game's frames meanwhile (the interface's Draw, once a frame; not a framework
+                // subscription, which would wait for the readers' compiler), whatever ran meanwhile: a stop of every managed thread by a
+                // collection freezes the game only if its thread waits too. X-440 (0.1437): Dalamud skips Draw while the plugin interface
+                // is hidden (cutscene, gpose, hidden by the player); HideUi ends the run, so that time is not read as a frame gap.
+                var gaps=new Diagnostics.FrameGaps();
+                // X-444 M4 (0.1446): a competitive cut ends the run too (the first frame after it is not a gap as long as the cut).
+                void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut){gaps.Cut();return;}if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
+                void GapHidden()=>gaps.Hidden();
+                pluginInterface.UiBuilder.Draw+=Gap;
+                pluginInterface.UiBuilder.HideUi+=GapHidden;
+                registrations.Register(()=>{},()=>{pluginInterface.UiBuilder.Draw-=Gap;pluginInterface.UiBuilder.HideUi-=GapHidden;});
+                _=Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length).ContinueWith(_=>
+                {
+                    pluginInterface.UiBuilder.Draw-=Gap;
+                    pluginInterface.UiBuilder.HideUi-=GapHidden;
+                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))
+                    {
+                        log.Information(gaps.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Types.Summary());
+                        log.Information(suspensions.Collections.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Large.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(suspensions.Jit.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        // X-433 (0.1447): what was allocated meanwhile, by type and thread, and by the whole process.
+                        log.Information(suspensions.Allocations.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(Diagnostics.MachineMemory.AllocatedText(GC.GetTotalAllocatedBytes()-allocatedBefore,managedBefore,GC.GetTotalMemory(false),Diagnostics.RuntimeSuspensionWatch.Length));
+                    }
+                },TaskScheduler.Default);
+            }
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
             {
                 SayLoad("10 s later");
@@ -1529,6 +1380,15 @@ public sealed partial class Plugin : IDalamudPlugin
                     // X-177 (0.1281): of those methods, the ones the readers' classes call in other classes (CallGraph).
                     if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is not null)
                         log.Information("Readers' callees: {0} methods called from their classes in other classes, compiled with them.",TenshoAssistant.Competitive.CompetitiveGate.CompilerCallees);
+                    // X-433 (0.1438): the readers the guard delay started before their class was compiled (each compiles in a frame).
+                    if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is not null)
+                        log.Information("Readers started by the guard delay before their class was compiled: {0}.",TenshoAssistant.Competitive.CompetitiveGate.CompilerGuardStarts);
+                    // X-433 (0.1424): the longest compilations, to compare with a hitch's time.
+                    if(TenshoAssistant.Competitive.CompetitiveGate.CompilerSlowest is { Length:>0 } slowest)
+                        log.Information("Readers' longest compilations: {0}.",slowest);
+                    // X-433 (0.1425): and the JIT warm-up's, the other thread that compiles while the readers start.
+                    if(mainWindow.WarmupSlowest is { Length:>0 } warmup)
+                        log.Information("JIT warm-up's longest compilations so far: {0}.",warmup);
                 }
                 SayReaders();
                 // 0.1200: the classes come after the interface's code: said again once they had the time to end.
@@ -1556,6 +1416,8 @@ public sealed partial class Plugin : IDalamudPlugin
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){chatForCut?.Print("[Tensho] "+localization.Get("Competitive.Off"));return;}
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
+        // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
+        if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         // 0.494: « /tensho selftest » writes the self-check to the log.
@@ -1658,6 +1520,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("CurrencyBar",()=>currencyBar?.Invoke()?.DrawTooltip()),
             ("GilBar",()=>gilBar?.Invoke()?.DrawTooltip()),
             ("StateBar",()=>{mainWindow.TickDashboard();stateBar?.Invoke()?.DrawTooltip();}),
+            ("InfoBar",()=>infoBar?.Invoke()?.DrawTooltip()),
             ("TriadOverlay",mainWindow.DrawTriadOverlay),
             ("TriadRequest",mainWindow.DrawTriadRequestPanel),
             ("TriadDeck",mainWindow.DrawTriadDeckReminder),

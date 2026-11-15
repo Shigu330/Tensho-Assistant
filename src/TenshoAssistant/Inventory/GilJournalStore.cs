@@ -61,8 +61,12 @@ public sealed class GilJournalStore
                             else marked=false;
                         }
                         // X-182 (0.1169, night review N3): written again after the conversion (an older version still running): merged.
-                        else if(TenshoDataFile.WrittenAgain(json,converted) && TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } again)
-                            WriteRows(open,character,Merge(ReadRows(opened,character),again),null);
+                        else if(TenshoDataFile.WrittenAgain(json,converted))
+                        {
+                            // X-336 M4 (0.1380): written again but held by another client: not merged, so not set aside either.
+                            if(TenshoDataFile.StillThere(()=>GilJournal.Read(json)) is { } again)WriteRows(open,character,Merge(ReadRows(opened,character),again),null);
+                            else marked=false;
+                        }
                     }
                     if(marked)data.SetAside(json,now,"gil journal");
                     return marked;

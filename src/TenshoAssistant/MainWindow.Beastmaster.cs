@@ -256,8 +256,12 @@ internal sealed partial class MainWindow
         }
         else board = DrawBeastBoardChoice(catalog);
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
-        DrawBeastPlan(plan, board, catalog, state.Obtained is null);
-        ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote"));
+        // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
+        var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
+        ImGui.PushTextWrapPos(wrapAt);
+        try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
+        finally { ImGui.PopTextWrapPos(); }
     }
 
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
@@ -271,7 +275,15 @@ internal sealed partial class MainWindow
         DrawBeastPlan(plan, board, catalog, state.Obtained is null);
     }
 
-    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown)
+    /// <summary>X-366 (0.1373): every line wraps at wrapAt (a position in the window; 0: its right edge), the fights' lines indented as a block.</summary>
+    internal void DrawBeastPlan(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown, float wrapAt = 0f)
+    {
+        ImGui.PushTextWrapPos(wrapAt);
+        try { DrawBeastPlanLines(plan, board, catalog, heldUnknown); }
+        finally { ImGui.PopTextWrapPos(); }
+    }
+
+    private void DrawBeastPlanLines(BoardPlan plan, Board board, BeastCatalog catalog, bool heldUnknown)
     {
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
@@ -289,9 +301,14 @@ internal sealed partial class MainWindow
             if (battle.Battle >= board.Battles.Count) continue;
             var fight = board.Battles[battle.Battle];
             ImGui.TextColored(Accent, fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", battle.Battle));
-            ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.TeamHit", battle.WeaknessesHit, battle.Enemies));
-            ImGui.TextDisabled("    " + string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
-            ImGui.TextUnformatted("    → " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Format(BeastTeams.HitKey(battle.Enemies), battle.WeaknessesHit, battle.Enemies));
+            ImGui.Indent();
+            try
+            {
+                ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
+                ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+            }
+            finally { ImGui.Unindent(); }
         }
     }
 
