@@ -54,6 +54,7 @@ internal sealed partial class MainWindow
             Own("character", SelfCheckCharacter),
             Own("inventory", SelfCheckInventory),
             Own("bank", SelfCheckBank),
+            Own("retainer finder", SelfCheckRetainerFinder),
             Own("quests", SelfCheckQuests),
             Own("collections", SelfCheckCollections),
             Own("extra collections", () => ExtraCollectionsUnavailable?.Invoke() == true ? Diagnostics.SelfCheck.Failed("extra collections", "read failed")
@@ -139,6 +140,19 @@ internal sealed partial class MainWindow
         var state = bank.State;
         if (state.Error is not null) return Diagnostics.SelfCheck.Failed("bank", state.Error);
         return state.Loading ? Diagnostics.SelfCheck.NotRead("bank", "loading") : Diagnostics.SelfCheck.Ok("bank", $"{state.Entries.Count} saved containers");
+    }
+
+    /// <summary>X-307 (0.1394): the game's item finder copy of the retainers against the bank (R06 probe; numbers only).</summary>
+    internal Func<IReadOnlyList<Inventory.FinderRetainer>?>? RetainerFinder { get; set; }
+    private SelfCheckLine SelfCheckRetainerFinder()
+    {
+        if (RetainerFinder is null) return Diagnostics.SelfCheck.NotRead("retainer finder", "no reader");
+        if (RetainerFinder() is not { } finder) return Diagnostics.SelfCheck.Failed("retainer finder", "item finder module unavailable");
+        var state = bank.State;
+        if (state.Loading) return Diagnostics.SelfCheck.NotRead("retainer finder", "bank loading");
+        var retainers = state.Entries.Where(entry => entry.Key.Kind == Inventory.BankStorageKind.Retainer).GroupBy(entry => entry.Key.StorageId).ToDictionary(group => group.Key, group => group.First());
+        var compared = finder.Select(row => Inventory.RetainerFinderCompare.Compare(row, retainers.GetValueOrDefault(row.RetainerId))).ToArray();
+        return Diagnostics.SelfCheck.Ok("retainer finder", Inventory.RetainerFinderCompare.Summary(finder, compared));
     }
 
     private SelfCheckLine SelfCheckQuests()

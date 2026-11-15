@@ -1086,6 +1086,12 @@ public sealed partial class Plugin : IDalamudPlugin
                 try{return GrandCompanies.GcReader.Read(rows);}
                 catch(Exception error){log.Warning(error,"Grand Companies unreadable (game update?).");throw;}
             });
+            // X-307 (0.1394): the game's item finder copy of the retainers, read by the self-check on the framework thread.
+            mainWindow.RetainerFinder=()=>
+            {
+                try{return Inventory.RetainerFinderReader.Read();}
+                catch(Exception error){log.Warning(error,"Item finder copy of the retainers unreadable (game update?).");return null;}
+            };
             // W-10 (0.713): the allied societies, read when the page opens and on the player's click.
             mainWindow.ReadAllied=catalog=>framework.RunOnFrameworkThread(()=>
             {
