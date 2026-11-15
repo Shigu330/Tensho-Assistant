@@ -1311,12 +1311,15 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-01 C1.1 (0.1184): the heap and the load contexts with each load line; the previous instance's context is held weakly in a
             // process-wide slot, read before this one replaces it (measurement only, no collection forced).
             var previousContext=AppDomain.CurrentDomain.GetData(Diagnostics.LoadMemory.PreviousSlot) as WeakReference;
+            // X-433 (0.1459): the load's rank in the game process (the frame gaps after a load grow with the heap the reloads leave).
+            var loadRank=Diagnostics.LoadMemory.NextRank(AppDomain.CurrentDomain.GetData(Diagnostics.LoadMemory.RankSlot));
+            AppDomain.CurrentDomain.SetData(Diagnostics.LoadMemory.RankSlot,loadRank);
             AppDomain.CurrentDomain.SetData(Diagnostics.LoadMemory.PreviousSlot,new WeakReference(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly)));
             string Memory()
             {
                 var contexts=System.Runtime.Loader.AssemblyLoadContext.All.Select(context=>context.Name).ToArray();
                 // X-433 (0.1447): with the process's private memory and the machine's (a collection « induced for low memory »).
-                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive)
+                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive,loadRank)
                     +"; "+Diagnostics.MachineMemory.Text(Diagnostics.MachineMemory.Read(),Diagnostics.MachineMemory.ProcessPrivateBytes());
             }
             void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",

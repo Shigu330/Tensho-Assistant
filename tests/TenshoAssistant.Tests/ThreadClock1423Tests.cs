@@ -18,13 +18,20 @@ internal static class ThreadClock1423Tests
             var before = ThreadClock.ProcessorMs();
             Thread.Sleep(150);
             var slept = ThreadClock.ProcessorMs();
+            // 0.1459: work until the thread's own clock has moved 40 ms, at most 5 s of wall time: a fixed 300 ms of wall time gave only 31 ms
+            // of processor time on a loaded machine (the game running, 32 test threads), and the test failed for that alone.
             var watch = Stopwatch.StartNew();
             var spin = 0L;
-            while (watch.ElapsedMilliseconds < 300) spin++;
-            var worked = ThreadClock.ProcessorMs();
+            var worked = slept;
+            while (watch.ElapsedMilliseconds < 5000 && (worked is null || slept is null || worked.Value - slept.Value < 40))
+            {
+                spin++;
+                if ((spin & 0xFFFF) == 0) worked = ThreadClock.ProcessorMs();
+            }
+            worked = ThreadClock.ProcessorMs();
             Check(before is not null && slept is not null && worked is not null, "known on Windows");
             Check(slept!.Value - before!.Value < 100, "a sleep of 150 ms costs almost nothing: " + (slept - before));
-            Check(worked!.Value - slept.Value >= 40, "300 ms of work counts (clock ticks of about 16 ms, the machine loaded): " + (worked - slept) + " " + spin);
+            Check(worked!.Value - slept.Value >= 40, "work counts (clock ticks of about 16 ms): " + (worked - slept) + " ms in " + watch.ElapsedMilliseconds + " ms, " + spin);
             Check(ThreadClock.ProcessorText(10, 42) == " (on the processor 32 ms)" && ThreadClock.ProcessorText(null, 42) == "" && ThreadClock.ProcessorText(50, 42) == "", "the slow line's part");
         }),
         ("Thread clock 1423: a long type load gives a note naming its thread and type; the game thread's time summed", () =>
