@@ -258,7 +258,8 @@ public sealed class JitWarmup : IDisposable
             if(methods.Count>cap)methods=handler.DeclaringType is { } own ? Methods([own]):[];
             if(methods.Count>cap)return 0;
             if(callees>0 && methods.Count>0 && owner is not null)
-                methods=[..CallGraph.Closure(methods,owner.Assembly,methods.Count+callees,stop).Where(method=>known?.Contains(method)!=true)];
+                // X-433 (0.1439): with what the class calls directly in the game's API (Dalamud, ClientStructs, Lumina), as leaves.
+                methods=[..CallGraph.Closure(methods,owner.Assembly,methods.Count+callees,stop,CallGraph.GameApi).Where(method=>known?.Contains(method)!=true)];
         }
         catch(Exception){return 0;}
         var prepared=0;
