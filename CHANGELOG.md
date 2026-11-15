@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1373.0
+- Plan global, X-366 : Dédale bestial : dans le panneau d'équipe devant le plateau, les lignes longues passent à la ligne dans la largeur du panneau au lieu d'être coupées au bord (« Rangs pas encore lus… », noms des ennemis, équipe de chaque combat), les lignes des combats gardent leur retrait ; le compte des faiblesses s'accorde : « faiblesse touchée : 0 sur 1 ennemi », « 2 sur 3 ennemis » (anglais « 0 of 1 enemy »). La page Dédale (onglet Équipe) suit les mêmes retours à la ligne. Essai T0-13 du 14/11.
+- Pour les joueurs : dédale bestial : les lignes longues du panneau d'équipe passent à la ligne au lieu d'être coupées, et « 0 sur 1 ennemi » est au singulier.
+- Tests : BeastPanel1373Tests. Verify.ps1 (agent) : 2581/2581, 0 avertissement, 0 erreur ; DLL 0.1373.0.0. Non validé en jeu.
+### English
+- Beastmaster labyrinth: in the team panel beside the board, long lines wrap inside the panel's width instead of being cut at its edge (« Ranks not read yet… », the enemies' names, each fight's team), the fights' lines keep their indent; the weakness count agrees: « weakness hit: 0 of 1 enemy », « 2 of 3 enemies » (French « 0 sur 1 ennemi »). The Beastmaster page (Team tab) wraps the same way. Test T0-13 of 14/11.
+- For players: Beastmaster labyrinth: the team panel's long lines now wrap instead of being cut, and « 0 of 1 enemy » is singular.
+
 ## 0.1372.0
 - Plan global, X-404 : Mandats : le nom du client ne répète plus « Client : ». La feuille LeveClient porte déjà ce libellé devant chaque nom (anglais « Client: », français « Client : », allemand « Auftraggeber: » ou « Auftraggeberin: », aucun en japonais ; preuve docs/evidence/0.1372-leve-client-label.md) : il est trouvé dans la feuille elle-même et retiré une fois, pour l'infobulle, la colonne et le filtre. L'entrée du menu « Éthérite la plus proche du client » visait en fait le PNJ de LevelLevemete (responsable des mandats, sergent de grande compagnie ou PNJ de livraison selon le mandat) : elle dit maintenant « Éthérite la plus proche du PNJ du mandat ».
 - Pour les joueurs : mandats : les noms des clients ne répètent plus « Client : », et l'entrée de carte dit qu'elle vise le PNJ du mandat.
