@@ -41,7 +41,8 @@ public static class ChatFormat
         =>(name is { Length:>0 } ? name:"-")+(showUnread && unread>0 ? $" ({unread})":"");
 
     /// <param name="shortName">The channel's short name; empty for none.</param>
-    public static IReadOnlyList<ChatRun> Runs(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName)
+    /// <param name="linkName">X-461 (0.1463): the name of what a link without visible text points to (an item, a quest, a place); null or empty: « … ».</param>
+    public static IReadOnlyList<ChatRun> Runs(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
     {
         var runs=new List<ChatRun>(5);
         if(settings.ShowTimestamps)runs.Add(new($"{Time(record.Time,settings)} ",ChatRole.Timestamp));
@@ -53,17 +54,25 @@ public static class ChatFormat
         else if(sender.Length>0 && (spoken || record.Channel is ChatChannel.Npc))
             runs.Add(new(record.Channel switch{ChatChannel.TellOut=>$">> {sender}: ",ChatChannel.TellIn=>$"{sender} >> ",_=>$"{sender}: "},ChatRole.Sender));
         foreach(var segment in record.Body)
+        {
+            // X-461 (0.1463): a link with no text of its own (ChatPieces keeps its place empty): the name of what it points to.
+            if(segment.Text.Length==0 && segment.Link is { } named)
+            {
+                runs.Add(new(Clean(linkName?.Invoke(named)) is { Length:>0 } name ? name:"…",ChatRole.Link,named));
+                continue;
+            }
             if(Clean(segment.Text) is { Length:>0 } text)runs.Add(segment.Link is { } link ? new(text,ChatRole.Link,link):new(text,ChatRole.Body));
+        }
         return runs;
     }
 
     /// <summary>X-403 phase 2 (0.1442): a message as one line of text, as the window writes it (time, channel, sender, text), for the clipboard.</summary>
-    public static string Plain(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName)
-        =>string.Concat(Runs(record,settings,shortName).Select(run=>run.Text)).TrimEnd();
+    public static string Plain(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
+        =>string.Concat(Runs(record,settings,shortName,linkName).Select(run=>run.Text)).TrimEnd();
 
     /// <summary>X-403 phase 2 (0.1442): messages one per line, for the clipboard.</summary>
-    public static string Plain(IEnumerable<ChatRecord> records,ChatSettings settings,Func<ChatChannel,string> shortName)
-        =>string.Join("\n",records.Select(record=>Plain(record,settings,shortName)));
+    public static string Plain(IEnumerable<ChatRecord> records,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
+        =>string.Join("\n",records.Select(record=>Plain(record,settings,shortName,linkName)));
 
     /// <summary>The lines of a message for a width. Breaks between words; a word wider than the line is cut. Runs of one role (and one link) are joined on a line, to draw as little as possible.</summary>
     public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure)

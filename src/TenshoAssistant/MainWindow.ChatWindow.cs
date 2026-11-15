@@ -303,9 +303,9 @@ internal sealed partial class MainWindow
                 {
                     try
                     {
-                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyLine")))ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort));
+                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyLine")))ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort,ChatLinkName));
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
-                            ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort));
+                            ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName));
                     }
                     finally{ImGui.EndPopup();}
                 }
@@ -316,7 +316,17 @@ internal sealed partial class MainWindow
     }
 
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
-        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort),view.Width,text=>ImGui.CalcTextSize(text).X));
+        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X));
+
+    /// <summary>X-461 (0.1463): the name of what a link without text of its own points to: an item (Tensho's item list), a quest, a place; else
+    /// a word for a link (never empty: the link keeps its place in the message).</summary>
+    private string ChatLinkName(ChatLink link)=>link.Kind switch
+    {
+        ChatSegmentKind.ItemLink=>itemCatalog.State.Catalog?.Find(link.ItemId)?.Name,
+        ChatSegmentKind.QuestLink=>quests.State.ById?.GetValueOrDefault(link.QuestId)?.Name,
+        ChatSegmentKind.MapLink=>link.Place.Length>0 ? link.Place:maps.State.Catalog?.Find(link.MapId)?.Zone,
+        _=>null,
+    } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
     private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options)
     {

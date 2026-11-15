@@ -171,7 +171,8 @@ internal static class ChatWindow1434Tests
             Check(window.Contains("DrawChatWindowContents,CloseChatWindow,") && window.Contains("ChatMessages.Clear();"),"closing the window drops what it kept");
             var plugin=Read("Plugin.cs");
             // 0.1443 (X-153): the chat family moved to Plugin.Chat.cs.
-            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
+            // 0.1463 (X-461): the reader also gets developer mode (the kinds of pieces of a message with a link).
+            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
             Check(Read("MainWindow.Settings.cs").Contains("DrawChatWindowSettings();"),"its settings in Settings › Panels beside the game");
             // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom (the lines' height declared, not measured).

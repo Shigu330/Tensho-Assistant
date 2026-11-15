@@ -15,7 +15,7 @@ public sealed partial class Plugin
     {
         // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on.
         Chat.ChatReader? chatReader=null;
-        registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());
+        registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode),()=>chatReader?.Dispose());
         // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
         Maps.ChatMapLinkWatcher? chatLinks=null;
         registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());

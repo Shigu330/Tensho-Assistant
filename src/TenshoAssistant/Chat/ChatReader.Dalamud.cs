@@ -15,11 +15,15 @@ internal sealed class ChatReader : IDisposable
 {
     private readonly RegistrationScope registrations=new();
     private readonly IPluginLog log;private readonly Func<ChatSettings> settings;private readonly ChatStore store;
+    private readonly Func<bool>? developer;
     private bool disposed,warned;
+    // X-461 (0.1463): developer mode: the kinds of pieces of a message with a link, a few per session (kinds and lengths only, never the words).
+    private int piecesSaid;
+    private const int PiecesSaidMax=20;
 
-    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store)
+    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null)
     {
-        this.log=log;this.settings=settings;this.store=store;
+        this.log=log;this.settings=settings;this.store=store;this.developer=developer;
         // One owner for both subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
@@ -51,6 +55,11 @@ internal sealed class ChatReader : IDisposable
                     case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;
                     case ITextProvider text:pieces.Add(new(text.Text));break;
                 }
+            if(piecesSaid<PiecesSaidMax && developer?.Invoke()==true && message.Message.Payloads.Any(payload=>payload is ItemPayload or QuestPayload or MapLinkPayload))
+            {
+                piecesSaid++;
+                log.Information("Chat window, pieces of a message with a link (kind {0}): {1}.",(int)message.LogKind,string.Join(", ",message.Message.Payloads.Select(PieceKind)));
+            }
             var body=ChatPieces.Segments(pieces);
             store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,message.Sender.TextValue,body,current.BoundedMaxLines);
             warned=false;
@@ -60,6 +69,18 @@ internal sealed class ChatReader : IDisposable
             if(!warned){warned=true;log.Warning(error,"A chat message could not be copied for the Tensho chat window.");}
         }
     }
+
+    /// <summary>X-461 (0.1463): a piece as the log names it: its kind, an item's row, a text's length; never its words.</summary>
+    private static string PieceKind(Payload payload)=>payload switch
+    {
+        ItemPayload item=>$"Item {item.ItemId}{(item.IsHQ ? " HQ":"")}",
+        QuestPayload=>"Quest",
+        MapLinkPayload=>"MapLink",
+        RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>"LinkEnd",
+        ITextProvider text=>$"{payload.GetType().Name} ({text.Text?.Length ?? 0} characters{(text.Text?.Any(letter=>letter is >= '\uE000' and <= '\uF8FF')==true ? ", game glyph":"")})",
+        RawPayload raw=>$"Raw ({raw.Data.Length} bytes)",
+        _=>payload.GetType().Name,
+    };
 
     private static ChatLink? MapLink(MapLinkPayload map)
     {

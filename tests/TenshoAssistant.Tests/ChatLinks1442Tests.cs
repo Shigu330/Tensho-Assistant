@@ -33,7 +33,7 @@ internal static class ChatLinks1442Tests
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}"),"quest: the Quests page");
             Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup(\"###TenshoChatLine\");}")
-                && window.Contains("ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort));"),"a message's menu: copy");
+                && window.Contains("ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort,ChatLinkName));"),"a message's menu: copy");   // 0.1463 (X-461): with the links' names
             foreach(var lang in new[]{"en","fr"})
             {
                 var text = Read("Localization/Languages/" + lang + ".json");
