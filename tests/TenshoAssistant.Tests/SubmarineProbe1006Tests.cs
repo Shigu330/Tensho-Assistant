@@ -13,7 +13,7 @@ internal static class SubmarineProbe1006Tests
             var check=probe.IndexOf("MemberFunctionPointers.GetSubmarineVoyageTime==0");var call=probe.IndexOf("HousingManager.GetSubmarineSurveyDuration(b");
             Check(check>0 && call>check && probe.Contains("MemberFunctionPointers.GetSubmarineSurveyDuration==0"),"pointers first");
             Check(probe.Contains("CompetitiveGate.Add(framework,OnUpdate)") && probe.Contains("CompetitiveGate.Remove(framework,OnUpdate)"),"gate and dispose");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Voyages.cs"));
             Check(plugin.Contains("new FreeCompany.SubmarineVoyageProbe(framework,client,data,log,()=>configuration.DeveloperMode),()=>submarineProbe?.Dispose()"),"wired");
         }),
     ];

@@ -117,9 +117,12 @@ internal static class VoyageSqlite1148Tests
             Check(window.Contains("new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null)")
                 && window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);"),
                 "the app reads its copy of the data file once converted, the JSON copy before, never converting it itself");
+            // X-153 (0.1403): the store is created in the voyages family (Plugin.Voyages.cs), called after the persistence family.
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var voyages=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Voyages.cs"));
             Check(plugin.IndexOf("var (tenshoData,bank,bankBridge)=RegisterPersistence(",StringComparison.Ordinal) is var made and >0
-                && made<plugin.IndexOf("new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"VoyageHistory.json\"),(error,message)=>log.Warning(error,message),tenshoData)",StringComparison.Ordinal),"the plugin's store on the data file");
+                && made<plugin.IndexOf("RegisterVoyages(pluginInterface,configuration,data,framework,client,tenshoData,",StringComparison.Ordinal)
+                && voyages.Contains("new FreeCompany.VoyageHistoryStore(Path.Combine(pluginInterface.GetPluginConfigDirectory(),\"VoyageHistory.json\"),(error,message)=>log.Warning(error,message),tenshoData)",StringComparison.Ordinal),"the plugin's store on the data file");
         })),
     ];
 }
