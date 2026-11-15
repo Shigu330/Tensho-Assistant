@@ -114,7 +114,7 @@ PROJECT_WORKING = [
     ("TESTING", "in-game test protocols", "protocoles d'essai en jeu"),
     ("TESTING-ROUTE", "the in-game tests not yet ticked, sorted by activity", "les essais en jeu non cochés, rangés par activité"),
     ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",
-     "inventaire des réglages, produit depuis le code : défaut, où, libellé et info-bulle"),
+     "inventaire des réglages, produit depuis le code : défaut, où, libellé et infobulle"),
     ("DECISIONS", None, None),
     ("IDS", "registry of the identifier families (X-, DEC-, frozen ones, collisions)", "registre des familles d'identifiants (X-, DEC-, familles figées, collisions)"),
     ("GAPS", "gaps against other Dalamud plugins and choices made", "manques face aux autres plugins Dalamud et choix retenus"),
@@ -481,7 +481,7 @@ SETTINGS_WORDS = {
            "written by a page or migration marks.",
            "| Setting | Type | Default |",
            "Counted: {rows} controls ({linked} linked to `Configuration`, {other} to another file), {hidden} settings without a control."),
-    "fr": ("| Réglage | Type | Défaut | Où | Libellé et info-bulle |",
+    "fr": ("| Réglage | Type | Défaut | Où | Libellé et infobulle |",
            "Réglages remis par « Tout remettre par défaut » sans case dans l'interface ({n}) : état de l'interface, choix "
            "écrits par une page ou marques de migration.",
            "| Réglage | Type | Défaut |",

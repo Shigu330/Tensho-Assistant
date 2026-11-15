@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1377.0
+- Plan global, X-399 : Vocabulaire (mineurs de la relecture de 0.1364) : M1, le réglage « Données du jeu et vos observations seulement » est cité sous ce nom dans la FAQ et la condition des cibles d'élite masquée ; M3, un emplacement de potager s'appelle « emplacement » comme dans le jeu (« Potager 1, emplacement 6 »), « parcelle » restant au logement ; « barre du serveur » partout (fr et en), « remise à zéro » pour les remises, « Niv. d'objet » ; M4, « infobulle » dans le document des réglages et son générateur. M2 écarté : déjà corrigé en 0.1369 (« cible d'élite »).
+- Pour les joueurs : textes : les emplacements du potager, la barre du serveur, les remises à zéro et le niveau d'objet n'ont plus qu'un nom chacun, et la FAQ cite le réglage « Données du jeu et vos observations seulement » sous son nom actuel.
+- Tests : Vocabulary1377Tests. Verify.ps1 (agent) : 2595/2595, 0 avertissement, 0 erreur ; DLL 0.1377.0.0. Rien à essayer en jeu.
+### English
+- Vocabulary (minors of the 0.1364 review): M1, the setting « Game data and what you observed only » is quoted under that name in the FAQ and the hidden elite mark conditions; M3, a garden bed is called « emplacement » in French as in the game, « parcelle » staying for housing; « server bar » everywhere (fr and en), « remise à zéro » for the resets, « Niv. d'objet »; M4, « infobulle » in the settings document and its generator. M2 set aside: already fixed in 0.1369 (« cible d'élite »).
+- For players: Texts: garden beds, the server bar, resets and item level now use one name each, and the FAQ quotes the « game data only » setting under its current name.
+
 ## 0.1376.0
 - Plan global, X-409 : Carte : le clic droit sur un lien de carte du chat ouvre le menu de Tensho où que l'on clique sur le lien, et plus seulement à moins de 48 px de l'endroit où la souris y est entrée. La taille du lien vient de ses bornes (LinkData MinX à MaxY, fois l'échelle du panneau du chat) ; seule la taille sert, pas la position, dont le repère n'est pas prouvé (preuve 0.1351, partie 0.1376). Sans bornes lisibles, la portée de 48 px reste. La ligne du mode développeur d'un clic refusé dit la portée.
 - Pour les joueurs : un clic droit n'importe où sur un lien de carte du chat ouvre désormais le menu de Tensho, et plus seulement près de l'endroit où la souris est entrée sur le lien.

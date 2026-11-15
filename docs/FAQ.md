@@ -148,7 +148,7 @@ Les prix, le butin, les pages du wiki et les données communautaires sont demand
 
 ## Puis-je couper les données communautaires ?
 
-Oui : Paramètres › Données et sources › « Données du jeu et observées seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
+Oui : Paramètres › Données et sources › « Données du jeu et vos observations seulement » coupe d'un coup toutes les sources communautaires (prix, butin, wiki…) ; chacune peut aussi s'y couper seule. L'échange des découvertes reste coupé tant que vous ne l'activez pas, et les guides de la communauté ne sont lus que sur votre clic.
 
 ## Tensho est-il sûr, et est-il permis ?
 
@@ -212,7 +212,7 @@ Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de ce
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 
-Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque parcelle en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
+Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 
