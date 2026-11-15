@@ -302,7 +302,7 @@ public sealed class RuntimeSuspensionListener : EventListener
     // X-433 (0.1440): the methods compiled on the game's thread (JIT keyword, verbose: one event as each compilation starts).
     private readonly GameThreadJit jit=new();
     // X-433 (0.1447): what is allocated, by type and by thread (the same allocation ticks).
-    private readonly AllocationTypes allocations=new();
+    private readonly AllocationTypes allocations=new(keptOther:16);
     private volatile Action<string>? say;
     private int disposed;
     // X-433 (0.1448): the thread the runtime's events are given on (its own allocations are the measure's cost).

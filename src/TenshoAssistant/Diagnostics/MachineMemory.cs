@@ -89,8 +89,10 @@ public static class MachineMemory
 /// measure, which a player does not have), the others. A sample: a type's amount is near what it allocated, not exact. Thread-safe; pure
 /// (fed by <see cref="RuntimeSuspensionListener"/>, or by the tests).
 /// </summary>
-public sealed class AllocationTypes(int kept=4,int maximumTypes=2000)
+public sealed class AllocationTypes(int kept=4,int maximumTypes=2000,int? keptOther=null)
 {
+    /// <summary>X-433 (0.1450): how many types the other threads list (most of the amount: 537 MB of 777 at 0.1449's load).</summary>
+    public int KeptOther { get; } = keptOther ?? kept;
     /// <summary>Where a tick was made.</summary>
     public enum Where { Game, Warmup, Compiler, Listener, Other }
     private static readonly string[] Names=["the game's thread","the JIT warm-up's thread","the readers' compiler's thread","the measure's own listener","other threads"];
@@ -138,7 +140,7 @@ public sealed class AllocationTypes(int kept=4,int maximumTypes=2000)
         lock(gate)
         {
             var parts=Enumerable.Range(0,Names.Length).Where(index=>amounts[index]>0).Select(index=>Names[index]+" "+Mb(amounts[index])+" ("
-                +string.Join(", ",byType[index].OrderByDescending(pair=>pair.Value).ThenBy(pair=>pair.Key,StringComparer.Ordinal).Take(Kept).Select(pair=>pair.Key+" "+Mb(pair.Value)))
+                +string.Join(", ",byType[index].OrderByDescending(pair=>pair.Value).ThenBy(pair=>pair.Key,StringComparer.Ordinal).Take(index==(int)Where.Other ? KeptOther:Kept).Select(pair=>pair.Key+" "+Mb(pair.Value)))
                 +(others[index]>0 ? ", other types "+Mb(others[index]):"")+")");
             return string.Create(CultureInfo.InvariantCulture,
                 $"Allocated in the {watched.TotalSeconds:0} s after the load (allocation ticks, about one per 100 KB): {Mb(total)} in {ticks} ticks{(ticks==0 ? "":"; "+string.Join("; ",parts))}.");
