@@ -77,6 +77,17 @@ public sealed class JitWarmup : IDisposable
     /// A test checks that each name is still declared in the sources.</summary>
     public static readonly IReadOnlyList<string> WindowMethods=["PreDraw","PostDraw","Draw","DrawMain","DrawNavigation","DrawNavigationPopup","DrawPageHelpButton",
         "DrawCategoryNavigation","DrawHelpBanner"];
+    // X-433 (0.1449): « <Name> » made once (a lambda or a local function carries its outer method's name in angle brackets); the filters
+    // built it for every method and name (82 MB of strings on the warm-up's thread in the two minutes after a load, 0.1448).
+    private static readonly string[] WindowBracketed=Bracketed(WindowMethods);
+    private static string[] Bracketed(IReadOnlyList<string> names)=>[..names.Select(name=>"<"+name+">")];
+    /// <summary>X-433 (0.1449): the name is one of <paramref name="names"/>, or holds one in angle brackets; walked by index, nothing allocated.</summary>
+    private static bool Named(string name,IReadOnlyList<string> names,string[] bracketed)
+    {
+        for(var index=0;index<bracketed.Length;index++)
+            if(name==names[index] || name.Contains(bracketed[index],StringComparison.Ordinal))return true;
+        return false;
+    }
     /// <summary>X-01 (0.1282): a method of the main window's frame or of its first page (see <see cref="WindowMethods"/>).</summary>
     public static bool WindowFirst(MethodBase method)
     {
@@ -84,10 +95,7 @@ public sealed class JitWarmup : IDisposable
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
             if(type.Name=="MainWindow"){inWindow=true;break;}
         if(!inWindow)return false;
-        var name=method.Name;
-        foreach(var window in WindowMethods)
-            if(name==window || name.Contains("<"+window+">",StringComparison.Ordinal))return true;
-        return false;
+        return Named(method.Name,WindowMethods,WindowBracketed);
     }
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
     /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
@@ -140,17 +148,13 @@ public sealed class JitWarmup : IDisposable
     /// </summary>
     public static readonly IReadOnlyList<string> MapPathMethods=["VendorLayout","VendorLabel","VendorIconOf","VendorCandidates","VendorMarker","EventLabel","FateLabel",
         "DrawEdgeMarkers","DrawGlyph","DrawPlayerArrow","BeastPlacesOf","RefreshQuestIndex"];
+    private static readonly string[] MapPathBracketed=Bracketed(MapPathMethods);
     /// <summary>X-01 C3.3 (0.1188): the settings' methods the canvas calls for each icon (size and priority, per map).</summary>
     public static readonly IReadOnlyList<string> MapPathSettings=["SizeOf","PriorityOf","CleanSize"];
     /// <summary>X-01 C3.3 (0.1188): the namespace of the vendors' catalogue, read by the canvas for its vendor icons.</summary>
     public const string VendorNamespace="TenshoAssistant.Npcs";
 
-    private static bool OnMapPath(string name)
-    {
-        foreach(var path in MapPathMethods)
-            if(name==path || name.Contains("<"+path+">",StringComparison.Ordinal))return true;
-        return false;
-    }
+    private static bool OnMapPath(string name)=>Named(name,MapPathMethods,MapPathBracketed);
 
     /// <summary>
     /// X-01 C2.1 (0.1185, analysis of 12/11: the overlays' first frame came about 1.9 s after the warm-up started, before the « everything
@@ -162,6 +166,7 @@ public sealed class JitWarmup : IDisposable
         "DrawCactpotOverlay","DrawCraftLivePanel","DrawInventorySortButton","ObserveRegenTick","DrawChatLinkMenu","DrawTriadOverlay","DrawTriadRequestPanel","DrawTriadDeckReminder","DrawCharacterPanel",
         "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
         "ProcessGameLogRequest","ObserveHuntTrain","ObserveOccultAlerts","ObserveGarden","WatchWishlistSales","WatchPlots","DrawFishingPanel","RefreshNearbyMonsters"];
+    private static readonly string[] OverlayBracketed=Bracketed(OverlayMethods);
     /// <summary>Words of the main window's methods that belong to the free panels and bars drawn every frame (tracker, wear bar, alarm and reminder bars).</summary>
     public static readonly IReadOnlyList<string> OverlayWords=["Tracker","Panel","Bar","Overlay"];
 
@@ -176,10 +181,9 @@ public sealed class JitWarmup : IDisposable
             if(type.Name=="MainWindow"){inWindow=true;break;}
         if(!inWindow)return false;
         var name=method.Name;
-        foreach(var overlay in OverlayMethods)
-            if(name==overlay || name.Contains("<"+overlay+">",StringComparison.Ordinal))return true;
-        foreach(var word in OverlayWords)
-            if(name.Contains(word,StringComparison.Ordinal))return true;
+        if(Named(name,OverlayMethods,OverlayBracketed))return true;
+        for(var index=0;index<OverlayWords.Count;index++)
+            if(name.Contains(OverlayWords[index],StringComparison.Ordinal))return true;
         return false;
     }
 
@@ -190,8 +194,18 @@ public sealed class JitWarmup : IDisposable
     public const string MapNamespace="TenshoAssistant.Maps";
 
     /// <summary>X-01 (0.1104): the early methods first, then the others, each part in its former order.</summary>
-    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)
-        =>[..methods.Where(early),..methods.Where(method=>!early(method))];
+    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early)=>EarlyFirst(methods,early,out _);
+
+    /// <summary>X-433 (0.1449): the same in one pass, <paramref name="early"/> asked once per method, and how many are early.</summary>
+    public static IReadOnlyList<MethodBase> EarlyFirst(IReadOnlyList<MethodBase> methods,Func<MethodBase,bool> early,out int earlyCount)
+    {
+        var first=new List<MethodBase>(methods.Count);
+        var rest=new List<MethodBase>();
+        for(var index=0;index<methods.Count;index++)(early(methods[index]) ? first:rest).Add(methods[index]);
+        earlyCount=first.Count;
+        first.AddRange(rest);
+        return first;
+    }
 
     /// <summary>The first type, then every type of its assembly (those that load: a type whose dependency is missing is left out).</summary>
     public static IReadOnlyList<Type> FirstThenAssembly(Type first)
@@ -360,9 +374,11 @@ public sealed class JitWarmup : IDisposable
                 WindowReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
             }
             if(compiled.Count>0)methods=[..methods.Where(method=>!compiled.Contains(method))];
-            var earlyCount=early is null ? 0:methods.Count(early);
+            // X-433 (0.1449): the early filter asked once per method (it was three times: a count, then two passes).
+            var earlyCount=0;
+            var ordered=early is null ? methods:EarlyFirst(methods,early,out earlyCount);
             var index=0;
-            foreach(var method in early is null ? methods:EarlyFirst(methods,early))
+            foreach(var method in ordered)
             {
                 if(token.IsCancellationRequested)return;
                 // 0.1104: the early part done, the rest waits until the usual delay after loading.
