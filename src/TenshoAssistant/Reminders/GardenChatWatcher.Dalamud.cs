@@ -27,8 +27,10 @@ internal sealed class GardenChatWatcher : IDisposable
     // X-410 M1 (0.1378): a seed or a crop of the embedded garden data (null: not given, the menu rule alone).
     private readonly Func<uint,bool>? isGardenItem;
     private readonly Action<GardenChatEvent,uint?,string?> planted;
-    private GardenChat? rules;
-    private bool rulesFailed,warned,disposed;
+    // X-453 M4 (0.1457): the rules, built once in the background (BackgroundBuild: a line that comes first waits, a failure said once,
+    // stopped by Dispose).
+    private readonly TenshoAssistant.Caching.BackgroundBuild<GardenChat> rulesBuild;
+    private bool warned,disposed;
     private uint chosenSeed;
     private DateTimeOffset chosenAt,nextPoll;
 
@@ -48,32 +50,22 @@ internal sealed class GardenChatWatcher : IDisposable
     public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null)
     {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
+        rulesBuild=new(BuildRules,error=>log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update)."));
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
         // X-433 (0.1452): the rules' regular expressions built off the game's thread (their automaton tables: 3.8 MB in a frame at the first
         // chat line after a load, 0.1451's measure); with the garden off they are built at the first line, as before.
-        if(enabled())rulesBuilding=Task.Run(BuildRules);
+        if(enabled())rulesBuild.Start();
     }
 
-    private Task<GardenChat>? rulesBuilding;
     private GardenChat BuildRules()
     {
         var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
         return new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
     }
 
-    private GardenChat? Rules()
-    {
-        if(rules is not null || rulesFailed)return rules;
-        try
-        {
-            // X-433 (0.1452): the rules built in the background, waited for only if a line comes before they are done (no line is lost).
-            rules=rulesBuilding is { } building ? building.GetAwaiter().GetResult():BuildRules();
-        }
-        catch(Exception error){rulesFailed=true;log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update).");}
-        rulesBuilding=null;
-        return rules;
-    }
+    // X-433 (0.1452): the rules built in the background, waited for only if a line comes before they are done (no line is lost).
+    private GardenChat? Rules()=>rulesBuild.Get();
 
     private static IEnumerable<string?> Texts(Lumina.Excel.ExcelSheet<Lumina.Excel.Sheets.LogMessage> sheet,uint[] rows)
         =>rows.Select(row=>Parts(sheet.GetRowOrDefault(row)?.Text) is { } parts ? string.Concat(parts):null).ToArray();
@@ -223,5 +215,7 @@ internal sealed class GardenChatWatcher : IDisposable
         disposed=true;
         chat.ChatMessageUnhandled-=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
+        // X-453 M4 (0.1457): a build still running is waited for (2 s at most) and dropped: nothing of Tensho reads the game's data after this.
+        rulesBuild.Stop(TimeSpan.FromSeconds(2));
     }
 }
