@@ -19,7 +19,10 @@ public static class ChatPieces
             if(piece.Start is { } start){open=start;continue;}
             if(piece.End){open=null;continue;}
             if(piece.Text is not { Length:>0 } text)continue;
-            body.Add(open is null ? new ChatSegment(text):new ChatSegment(text,open.Kind,open));
+            if(open is not null){body.Add(new ChatSegment(text,open.Kind,open));continue;}
+            // X-403 phase 2 (0.1453): web addresses in the plain text (outside a game link), each its own segment.
+            foreach(var (part,url) in ChatWeb.Split(text))
+                body.Add(url is null ? new ChatSegment(part):new ChatSegment(part,ChatSegmentKind.WebLink,new ChatLink(ChatSegmentKind.WebLink,Url:url)));
         }
         return body;
     }

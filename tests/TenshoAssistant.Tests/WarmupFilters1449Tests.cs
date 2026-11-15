@@ -51,7 +51,9 @@ internal static class WarmupFilters1449Tests
                 }
             var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
             Check(hits > 0, "some are early");
-            Check(allocated < 4096, "allocated for 12,000 answers: " + allocated + " bytes (each built strings before 0.1449)");
+            // 0.1453: 64 KB, not 4: a collection during the loop (tests in parallel) lets the runtime drop its weakly held reflection caches,
+            // refilled on the next call (8,920 bytes once in Verify). Before 0.1449 these 12,000 answers built megabytes of strings.
+            Check(allocated < 65536, "allocated for 12,000 answers: " + allocated + " bytes (each built strings before 0.1449)");
         }),
         ("Warm-up filters 1449: the early filter is asked once per method; the order is kept and the early ones counted", () =>
         {

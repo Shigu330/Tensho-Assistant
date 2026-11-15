@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1453.0
+- X-403, phase 2, fin : les adresses web. Le jeu les envoie comme du texte (aucun lien du jeu) : la fenêtre de chat de Tensho les trouve dans le texte d'un message (http://, https://, www.), les souligne, montre l'adresse entière au survol, et un clic ouvre un petit menu avec l'adresse : « Ouvrir dans le navigateur » ou « Copier l'adresse » ; rien ne s'ouvre au premier clic. Seulement http et https, avec un hôte ; la ponctuation finale et une parenthèse fermante non ouverte dans l'adresse sont laissées hors du lien. Le texte d'un lien du jeu (lieu, objet, quête) n'est pas relu.
+- Pour les joueurs : la fenêtre de chat de Tensho souligne les adresses web écrites dans les messages : un clic propose de les ouvrir dans le navigateur ou de les copier.
+- Tests : ChatWeb1453Tests. Verify.ps1 (agent) : 2796/2796, 0 avertissement, 0 erreur ; DLL 0.1453.0.0. Non validé en jeu.
+### English
+- X-403, phase 2, end: web addresses. The game sends them as plain text (no game link): Tensho's chat window finds them in a message's text (http://, https://, www.), underlines them, shows the whole address on hover, and a click opens a small menu with the address: « Open in the browser » or « Copy the address »; nothing opens at the first click. Only http and https, with a host; trailing punctuation and a closing bracket not opened in the address are left out of the link. A game link's text (place, item, quest) is not read again.
+- For players: Tensho's chat window underlines the web addresses written in messages: a click offers to open them in the browser or to copy them.
+
 ## 0.1452.0
 - X-433 : mesure de 0.1451 à son chargement (20 h 00) : les lectures des pages de l'auto-contrôle (mode développeur seulement) allouent 198 Mo (lexique 154, ALÉA 33) ; avec l'écoute de la mesure (74 Mo), elles n'existent pas chez un joueur : il reste environ 470 Mo pour un joueur dans les deux minutes qui suivent un chargement (741 Mo en tout, 856 à 0.1447). Le fil du jeu montrait 3,8 Mo de tables d'automate d'une expression régulière : les règles du chat du jardin, construites avec le moteur linéaire de .NET au premier message après un chargement, sur le fil du jeu. Elles sont maintenant construites en fond quand le suivi est créé (jardin activé), et attendues seulement si un message arrive avant (aucun n'est perdu). Les mesures de 0.1447 à 0.1452 sont gardées dans docs/evidence/0.1452-load-allocations.md, avec les pistes restantes (caches JSON lus au chargement, lexique).
 - Tests : GardenRules1452Tests. Verify.ps1 (agent) : 2792/2792, 0 avertissement, 0 erreur ; DLL 0.1452.0.0. Rien à essayer en jeu.

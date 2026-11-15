@@ -228,6 +228,23 @@ internal sealed partial class MainWindow
                 }
                 else chatWindowPlace=null;
             }
+            // X-403 phase 2 (0.1453): the menu of a web address, opened by a click on it: the address whole, then open it or copy it.
+            if(chatWindowWeb is { } address)
+            {
+                if(ImGui.BeginPopup("###TenshoChatWeb"))
+                {
+                    try
+                    {
+                        ImGui.TextColored(Warning,localization.Get("ChatWindow.WebWarning"));
+                        ImGui.TextUnformatted(address);
+                        ImGui.Separator();
+                        if(ImGui.Selectable(localization.Get("ChatWindow.OpenWeb")))Dalamud.Utility.Util.OpenLink(address);
+                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyWeb")))ImGui.SetClipboardText(address);
+                    }
+                    finally{ImGui.EndPopup();}
+                }
+                else chatWindowWeb=null;
+            }
             // X-403 phase 2 (0.1442): the menu of a message, opened by a right click on its text: copy it, or every message of this tab.
             if(chatWindowLine is { } said)
             {
@@ -279,12 +296,15 @@ internal sealed partial class MainWindow
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
     // 0.1442: the message whose menu a right click opened.
     private ChatRecord? chatWindowLine;
+    // 0.1453: the web address whose menu a click opened.
+    private string? chatWindowWeb;
 
     /// <summary>
     /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
     /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
     /// opens Tensho's item menu. 0.1442: quest link: left click opens the quest on the Quests page. A target Tensho does not know (data not
-    /// loaded, an item it does not list) is only said on hover.
+    /// loaded, an item it does not list) is only said on hover. 0.1453: web address: the whole address on hover; a click opens its menu (open in
+    /// the browser, copy), never the browser at once.
     /// </summary>
     private void DrawChatLink(ChatRun run,ChatLink link,string id)
     {
@@ -292,6 +312,13 @@ internal sealed partial class MainWindow
         var min=ImGui.GetItemRectMin();
         var max=ImGui.GetItemRectMax();
         ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
+        if(link.Kind==ChatSegmentKind.WebLink)
+        {
+            if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            TipText(localization.Format("ChatWindow.WebLinkTip",link.Url));
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowWeb=link.Url;ImGui.OpenPopup("###TenshoChatWeb");}
+            return;
+        }
         if(link.Kind==ChatSegmentKind.MapLink)
         {
             if(maps.State.Catalog?.Find(link.MapId) is not { } map || !Maps.MapCatalog.CoordinatesValid(link.X,link.Y)){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
