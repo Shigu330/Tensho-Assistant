@@ -8,7 +8,7 @@ internal static class PlayerReport1323Tests
         ("Player reports: each form has the player-report label and its kind's title prefix", () =>
         {
             foreach (var (file, prefix, label) in new[] { ("bug_report.yml", "[Bug] ", "bug"), ("feature_request.yml", "[Idea] ", "enhancement"),
-                ("tool_proposal.yml", "[Idea] ", "tool-proposal"), ("translation.yml", "[Translation] ", "translation") })
+                ("tool_proposal.yml", "[Tool] ", "tool-proposal"), ("translation.yml", "[Translation] ", "translation") })
             {
                 var form = Read(".github/ISSUE_TEMPLATE/" + file).Replace("\r\n", "\n");
                 Check(form.Contains($"\ntitle: \"{prefix}\"\n", StringComparison.Ordinal), file + ": title prefix");

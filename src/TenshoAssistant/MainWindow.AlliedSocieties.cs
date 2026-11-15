@@ -26,6 +26,8 @@ internal sealed partial class MainWindow
             alliedLoad=null;
             alliedTried=true;
             alliedCatalog=loaded.IsCompletedSuccessfully ? loaded.Result:null;
+            // X-353 M5 (0.1381, R08): the cause of a catalogue that could not be read goes to the log, as the other background reads.
+            if(!loaded.IsCompletedSuccessfully)log.Warning(loaded.Exception?.GetBaseException() ?? new OperationCanceledException(),"Allied societies: the catalogue could not be read (perhaps after a game update).");
             if(alliedCatalog is { Societies.Count:>0 } first && ReadAllied is not null)alliedRead=ReadAllied(first);
         }
         if(alliedLoad is not null){ImGui.TextDisabled(localization.Get("Allied.Loading"));return;}
