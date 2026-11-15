@@ -12,7 +12,7 @@ internal static class WarmupSlowest1425Tests
     [
         ("Warm-up slowest 1425: a real warm-up of a small type times its compilations", () =>
         {
-            using var warmup = JitWarmup.Start(() => [typeof(SlowCompilations)], TimeSpan.Zero);
+            using var warmup = JitWarmup.Start(() => [typeof(SlowCompilations)], TimeSpan.Zero, measure: static () => true);
             Check(warmup.Wait(TimeSpan.FromSeconds(30)), "finished");
             Check(warmup.Prepared > 0 && Regex.IsMatch(warmup.Slowest, @"^SlowCompilations\.\S+ \d+ ms \((on the processor \d+ ms, )?ended \d\d:\d\d:\d\d\.\d{3}\)"), "timed: " + warmup.Slowest);
         }),

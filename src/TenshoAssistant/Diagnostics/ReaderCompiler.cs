@@ -63,6 +63,10 @@ public sealed class ReaderCompiler : IDisposable
     /// worker. Given by the plugin, dropped at the stop: it is the one thing here that can hold an instance.</summary>
     public Func<bool>? Hold{get=>hold;set=>hold=value;}
     private volatile Func<bool>? hold;
+    /// <summary>X-437 M2 (0.1428): while this says true, each compilation is timed for the log (<see cref="Slowest"/>); asked on the worker,
+    /// once per class. None: never timed. The plugin gives the developer mode.</summary>
+    public Func<bool>? Measure{get=>measure;set=>measure=value;}
+    private volatile Func<bool>? measure;
 
     /// <summary>What a subscription asks before each call: whether its reader may run yet.</summary>
     public sealed class Ticket
@@ -196,8 +200,9 @@ public sealed class ReaderCompiler : IDisposable
             {
                 own=JitWarmup.Methods([JitWarmup.Owner(next.Handler)!]).Count;
                 // X-177 (0.1281): with what the class calls in other classes, nearest first (CalleeCap), each method once for all the readers.
-                compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known,
-                    (method,milliseconds)=>slowest.Note(SlowCompilations.Name(method),milliseconds,DateTimeOffset.Now));
+                // X-437 M2 (0.1428): timed for the log only when asked (developer mode).
+                var timed=measure?.Invoke()==true ? (Action<MethodBase,double>)((method,milliseconds)=>slowest.Note(SlowCompilations.Name(method),milliseconds,DateTimeOffset.Now)):null;
+                compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known,timed);
             }
             catch(Exception){}
             // Whatever happened to the compiling, the reader is never left waiting.

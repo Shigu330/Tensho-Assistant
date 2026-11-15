@@ -38,7 +38,7 @@ internal static class SlowCompilations1424Tests
         ("Slow compilations 1424: wired: the readers' compiler times its warm-up, the plugin says the longest with the compiler's lines", () =>
         {
             var compiler = Read("src/TenshoAssistant/Diagnostics/ReaderCompiler.cs");
-            Check(compiler.Contains("(method,milliseconds)=>slowest.Note(SlowCompilations.Name(method),milliseconds,DateTimeOffset.Now));", StringComparison.Ordinal), "the compiler notes them");
+            Check(compiler.Contains("(method,milliseconds)=>slowest.Note(SlowCompilations.Name(method),milliseconds,DateTimeOffset.Now)):null;", StringComparison.Ordinal), "the compiler notes them (0.1428, X-437 M2: when asked)");
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
             Check(plugin.IndexOf("log.Information(\"Readers' longest compilations: {0}.\",slowest);", StringComparison.Ordinal) > plugin.IndexOf("void SayReaders()", StringComparison.Ordinal), "said with the compiler's lines");
         }),

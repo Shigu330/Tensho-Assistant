@@ -1,0 +1,508 @@
+# AddonTextProbe, client 7.58 (game 2026.11.03.0000.0000), 2026-11-15: raw output kept for docs/evidence/0.1420-retainer-sales-end-code.md (X-434; X-437 M1).
+# 1) AddonTextProbe --struct=FFXIVClientStructs.FFXIV.Client.Game.RetainerManager+Retainer 2314,2315,967,2317 --before=260 : its STRUCT block, unchanged.
+# 2) AddonTextProbe 2315 --before=480 --after=10 : its TEXT line and its first hit (the retainer list function, from its start at rva 0xE3728C), unchanged; the second hit (rva 0x1A8F52C, another window) is cut.
+STRUCT FFXIVClientStructs.FFXIV.Client.Game.RetainerManager+Retainer
+  0x00 UInt64 RetainerId
+  0x08 FixedSizeArray32`1 _name
+  0x28 Boolean Available
+  0x29 Byte ClassJob
+  0x2A Byte Level
+  0x2B Byte ItemCount
+  0x2C UInt32 Gil
+  0x30 RetainerTown Town
+  0x31 Byte MarketItemCount
+  0x34 UInt32 MarketExpire
+  0x38 UInt16 VentureId
+  0x3C UInt32 VentureComplete
+TEXT 9951418 instructions, base 0x140000000
+=== row 2315 at 0x140E377E5 (rva 0xE377E5)
+  00E37120 push r14
+  00E37122 sub rsp,20h
+  00E37126 mov eax,[rel 142AADCF0h]
+  00E3712C movzx r13d,dl
+  00E37130 movzx r8d,word [rel 142AADD00h]
+  00E37138 test eax,eax
+  00E3713A movzx ebx,byte [rcx+125D8h]
+  00E37141 cmovne r8w,ax
+  00E37146 movzx ecx,r8w
+  00E3714A call 0000000140E26530h
+  00E3714F mov ecx,eax
+  00E37151 call 000000014083D2C0h
+  00E37156 test rax,rax
+  00E37159 je short 0000000140E3717Ah
+  00E3715B test bl,bl
+  00E3715D jns short 0000000140E3716Ah
+  00E3715F mov ecx,ebx
+  00E37161 btr ecx,7
+  00E37165 cmp ecx,2
+  00E37168 jb short 0000000140E3716Fh
+  00E3716A cmp bl,3Ch
+  00E3716D jae short 0000000140E3717Ah
+  00E3716F lea rcx,[rbx+rbx*4]
+  00E37173 movzx esi,byte [rax+rcx*4+10h]
+  00E37178 jmp short 0000000140E3717Dh
+  00E3717A mov sil,0FFh
+  00E3717D mov [rsp+50h],r15
+  00E37182 mov eax,50h
+  00E37187 lea r14d,[rax-14h]
+  00E3718B test r13b,r13b
+  00E3718E je short 0000000140E37196h
+  00E37190 lea r15d,[rax-4Eh]
+  00E37194 jmp short 0000000140E371BEh
+  00E37196 cmp sil,1
+  00E3719A jne short 0000000140E371A1h
+  00E3719C mov ecx,r14d
+  00E3719F jmp short 0000000140E371ADh
+  00E371A1 cmp sil,2
+  00E371A5 mov ecx,28h
+  00E371AA cmove ecx,eax
+  00E371AD add ecx,27h
+  00E371B0 mov eax,0CCCCCCCDh
+  00E371B5 mul ecx
+  00E371B7 shr edx,5
+  00E371BA movzx r15d,dx
+  00E371BE xor eax,eax
+  00E371C0 mov ebp,eax
+  00E371C2 mov r12d,eax
+  00E371C5 movzx ebx,ax
+  00E371C8 add ebp,28h
+  00E371CB movzx eax,bx
+  00E371CE lea rcx,[rel 140000000h]
+  00E371D5 test r13b,r13b
+  00E371D8 je short 0000000140E371E3h
+  00E371DA mov edi,[rcx+rax*4+21D27A8h]
+  00E371E1 jmp short 0000000140E371EAh
+  00E371E3 mov edi,[rcx+rax*4+21D27A0h]
+  00E371EA mov edx,edi
+  00E371EC lea rcx,[rel 142AD8590h]
+  00E371F3 call 000000014086CE50h
+  00E371F8 test rax,rax
+  00E371FB je short 0000000140E37214h
+  00E371FD cmp byte [rax+18h],0
+  00E37201 je short 0000000140E37272h
+  00E37203 mov edx,edi
+  00E37205 lea rcx,[rel 142AD8590h]
+  00E3720C call 0000000140874810h
+  00E37211 add r12d,eax
+  00E37214 inc bx
+  00E37217 cmp bx,r15w
+  00E3721B jb short 0000000140E371C8h
+  00E3721D cmp sil,1
+  00E37221 je short 0000000140E37236h
+  00E37223 cmp sil,2
+  00E37227 mov r14d,28h
+  00E3722D mov eax,50h
+  00E37232 cmove r14d,eax
+  00E37236 mov edx,0
+  00E3723B mov ecx,ebp
+  00E3723D sub ecx,r14d
+  00E37240 mov eax,r12d
+  00E37243 cmp ebp,r14d
+  00E37246 cmovb ecx,edx
+  00E37249 sub eax,ecx
+  00E3724B cmp r12d,ecx
+  00E3724E cmovb eax,edx
+  00E37251 test eax,eax
+  00E37253 setne al
+  00E37256 mov r15,[rsp+50h]
+  00E3725B mov rbx,[rsp+58h]
+  00E37260 mov rbp,[rsp+60h]
+  00E37265 add rsp,20h
+  00E37269 pop r14
+  00E3726B pop r13
+  00E3726D pop r12
+  00E3726F pop rdi
+  00E37270 pop rsi
+  00E37271 ret
+  00E37272 mov al,1
+  00E37274 jmp short 0000000140E37256h
+  00E37276 int3
+  00E37277 int3
+  00E37278 int3
+  00E37279 int3
+  00E3727A int3
+  00E3727B int3
+  00E3727C int3
+  00E3727D int3
+  00E3727E int3
+  00E3727F int3
+  00E37280 test rdx,rdx
+  00E37283 je near 0000000140E37A87h
+  00E37289 mov r11,rsp
+  00E3728C push rbp
+  00E3728D push rbx
+  00E3728E push rdi
+  00E3728F lea rbp,[r11-108h]
+  00E37296 sub rsp,1F0h
+  00E3729D mov rax,[rel 1428E8C98h]
+  00E372A4 xor rax,rsp
+  00E372A7 mov [rbp+0D0h],rax
+  00E372AE mov r8d,[rcx+12B80h]
+  00E372B5 mov rdi,rdx
+  00E372B8 mov [rbp-80h],rdx
+  00E372BC mov rbx,rcx
+  00E372BF mov [rsp+78h],rcx
+  00E372C4 test r8d,r8d
+  00E372C7 je near 0000000140E37A4Fh
+  00E372CD sub r8d,1
+  00E372D1 je near 0000000140E37A6Eh
+  00E372D7 mov [r11+10h],rsi
+  00E372DB xor edi,edi
+  00E372DD mov [r11+18h],r12
+  00E372E1 mov [r11+20h],r13
+  00E372E5 mov [r11-20h],r14
+  00E372E9 cmp r8d,1
+  00E372ED jne short 0000000140E372F5h
+  00E372EF mov [rcx+12B80h],edi
+  00E372F5 mov rcx,[rel 14290BE90h]
+  00E372FC call 00000001400D2910h
+  00E37301 mov r12d,12h
+  00E37307 mov [rsp+70h],rax
+  00E3730C mov [rbp-78h],r12
+  00E37310 lea rcx,[rbp-50h]
+  00E37314 mov edx,r12d
+  00E37317 mov r8,rax
+  00E3731A nop word [rax+rax]
+  00E37320 mov [rcx],edi
+  00E37322 mov [rcx+8],edi
+  00E37325 lea rcx,[rcx+10h]
+  00E37329 sub rdx,1
+  00E3732D jne short 0000000140E37320h
+  00E3732F mov rax,[rax]
+  00E37332 mov rcx,r8
+  00E37335 call qword [rax+30h]
+  00E37338 mov rcx,rax
+  00E3733B mov edx,394h
+  00E37340 call 00000001409A5AE0h
+  00E37345 mov edx,8
+  00E3734A lea rcx,[rbp-30h]
+  00E3734E mov rbx,rax
+  00E37351 call 00000001406373B0h
+  00E37356 movzx r12d,byte [rel 142ADEB29h]
+  00E3735E mov r13d,edi
+  00E37361 and r12b,1
+  00E37365 mov [rbp-28h],rbx
+  00E37369 xor r14b,r14b
+  00E3736C mov [rsp+1E0h],r15
+  00E37374 mov [rsp+40h],r14b
+  00E37379 nop dword [rax]
+  00E37380 mov edx,r13d
+  00E37383 lea rcx,[rel 142AFBDC0h]
+  00E3738A call 0000000141110250h
+  00E3738F mov rsi,rax
+  00E37392 test rax,rax
+  00E37395 je near 0000000140E3795Bh
+  00E3739B cmp qword [rax],0
+  00E3739F je near 0000000140E3795Bh
+  00E373A5 mov r14d,[rax+3Ch]
+  00E373A9 mov r15d,edi
+  00E373AC call 00000001400E08C0h
+  00E373B1 cmp r14d,eax
+  00E373B4 jbe short 0000000140E373CEh
+  00E373B6 call 00000001400E08C0h
+  00E373BB mov ecx,r14d
+  00E373BE sub ecx,eax
+  00E373C0 mov eax,88888889h
+  00E373C5 mul ecx
+  00E373C7 mov r15d,edx
+  00E373CA shr r15d,5
+  00E373CE xor edx,edx
+  00E373D0 mov [rsp+58h],rdi
+  00E373D5 xorps xmm0,xmm0
+  00E373D8 mov [rsp+60h],rdi
+  00E373DD mov r8d,2C4h
+  00E373E3 mov [rsp+68h],rdi
+  00E373E8 movdqu [rsp+48h],xmm0
+  00E373EE lea ecx,[rdx+10h]
+  00E373F1 call 0000000140094F00h
+  00E373F6 lea rcx,[rsp+48h]
+  00E373FB mov byte [rbp-60h],2
+  00E373FF mov [rax+8],rdi
+  00E37403 mov [rsp+48h],rax
+  00E37408 mov [rax],rcx
+  00E3740B lea rax,[rsi+8]
+  00E3740F mov rcx,[rsp+68h]
+  00E37414 mov rdx,[rsp+58h]
+  00E37419 mov [rbp-70h],rax
+  00E3741D lea rax,[rbp-70h]
+  00E37421 mov [rbp-68h],rax
+  00E37425 lea rax,[rcx+1]
+  00E37429 cmp rdx,rax
+  00E3742C ja short 0000000140E37447h
+  00E3742E mov edx,1
+  00E37433 lea rcx,[rsp+48h]
+  00E37438 call 00000001401E7AA0h
+  00E3743D mov rcx,[rsp+68h]
+  00E37442 mov rdx,[rsp+58h]
+  00E37447 mov rax,[rsp+60h]
+  00E3744C dec rdx
+  00E3744F and rax,rdx
+  00E37452 add rcx,rax
+  00E37455 mov [rsp+60h],rax
+  00E3745A and rcx,rdx
+  00E3745D mov rdx,[rsp+50h]
+  00E37462 lea rbx,[rcx*8]
+  00E3746A cmp qword [rbx+rdx],0
+  00E3746F jne short 0000000140E3748Fh
+  00E37471 xor edx,edx
+  00E37473 mov r8d,2C4h
+  00E37479 lea ecx,[rdx+18h]
+  00E3747C call 0000000140094F00h
+  00E37481 mov rcx,[rsp+50h]
+  00E37486 mov [rbx+rcx],rax
+  00E3748A mov rdx,[rsp+50h]
+  00E3748F mov rdx,[rbx+rdx]
+  00E37493 xor eax,eax
+  00E37495 mov [rdx],rax
+  00E37498 mov [rdx+8],rdi
+  00E3749C mov byte [rdx+10h],0FFh
+  00E374A0 movsx rax,byte [rbp-60h]
+  00E374A5 cmp al,0FFh
+  00E374A7 je short 0000000140E374F6h
+  00E374A9 lea rcx,[rbp-70h]
+  00E374AD cmp rdx,rcx
+  00E374B0 je short 0000000140E374F6h
+  00E374B2 test rax,rax
+  00E374B5 jne short 0000000140E374C5h
+  00E374B7 mov rax,[rbp-68h]
+  00E374BB mov ecx,[rax]
+  00E374BD mov [rdx],ecx
+  00E374BF mov byte [rdx+10h],0
+  00E374C3 jmp short 0000000140E374F2h
+  00E374C5 cmp rax,1
+  00E374C9 jne short 0000000140E374DEh
+  00E374CB mov rax,[rbp-68h]
+  00E374CF mov rcx,[rax]
+  00E374D2 inc dword [rcx+68h]
+  00E374D5 mov [rdx],rcx
+  00E374D8 mov byte [rdx+10h],1
+  00E374DC jmp short 0000000140E374F2h
+  00E374DE cmp rax,2
+  00E374E2 jne short 0000000140E374F6h
+  00E374E4 mov rax,[rbp-68h]
+  00E374E8 mov rcx,[rax]
+  00E374EB mov [rdx],rcx
+  00E374EE mov byte [rdx+10h],2
+  00E374F2 mov [rdx+8],rdx
+  00E374F6 inc qword [rsp+68h]
+  00E374FB mov rbx,[rbp-68h]
+  00E374FF test rbx,rbx
+  00E37502 je short 0000000140E3752Bh
+  00E37504 cmp byte [rbp-60h],1
+  00E37508 jne short 0000000140E3752Bh
+  00E3750A mov rbx,[rbx]
+  00E3750D dec dword [rbx+68h]
+  00E37510 cmp dword [rbx+68h],0
+  00E37514 jg short 0000000140E3752Bh
+  00E37516 mov rcx,rbx
+  00E37519 call 0000000140089310h
+  00E3751E mov edx,70h
+  00E37523 mov rcx,rbx
+  00E37526 call 0000000141DA05D8h
+  00E3752B movzx eax,byte [rsi+30h]
+  00E3752F xor ecx,ecx
+  00E37531 mov rdx,[rsp+58h]
+  00E37536 mov [rbp-70h],rcx
+  00E3753A mov [rbp-70h],eax
+  00E3753D lea rax,[rbp-70h]
+  00E37541 mov [rbp-68h],rax
+  00E37545 mov rax,[rsp+68h]
+  00E3754A inc rax
+  00E3754D mov [rbp-60h],cl
+  00E37550 cmp rdx,rax
+  00E37553 ja short 0000000140E37567h
+  00E37555 lea edx,[rcx+1]
+  00E37558 lea rcx,[rsp+48h]
+  00E3755D call 00000001401E7AA0h
+  00E37562 mov rdx,[rsp+58h]
+  00E37567 mov rcx,[rsp+60h]
+  00E3756C dec rdx
+  00E3756F and rcx,rdx
+  00E37572 mov [rsp+60h],rcx
+  00E37577 add rcx,[rsp+68h]
+  00E3757C and rcx,rdx
+  00E3757F mov rdx,[rsp+50h]
+  00E37584 lea rbx,[rcx*8]
+  00E3758C cmp qword [rbx+rdx],0
+  00E37591 jne short 0000000140E375B1h
+  00E37593 xor edx,edx
+  00E37595 mov r8d,2C4h
+  00E3759B lea ecx,[rdx+18h]
+  00E3759E call 0000000140094F00h
+  00E375A3 mov rcx,[rsp+50h]
+  00E375A8 mov [rbx+rcx],rax
+  00E375AC mov rdx,[rsp+50h]
+  00E375B1 mov rdx,[rbx+rdx]
+  00E375B5 xor eax,eax
+  00E375B7 mov [rdx],rax
+  00E375BA mov [rdx+8],rdi
+  00E375BE mov byte [rdx+10h],0FFh
+  00E375C2 movsx rax,byte [rbp-60h]
+  00E375C7 cmp al,0FFh
+  00E375C9 je short 0000000140E37618h
+  00E375CB lea rcx,[rbp-70h]
+  00E375CF cmp rdx,rcx
+  00E375D2 je short 0000000140E37618h
+  00E375D4 test rax,rax
+  00E375D7 jne short 0000000140E375E7h
+  00E375D9 mov rax,[rbp-68h]
+  00E375DD mov ecx,[rax]
+  00E375DF mov [rdx],ecx
+  00E375E1 mov byte [rdx+10h],0
+  00E375E5 jmp short 0000000140E37614h
+  00E375E7 cmp rax,1
+  00E375EB jne short 0000000140E37600h
+  00E375ED mov rax,[rbp-68h]
+  00E375F1 mov rcx,[rax]
+  00E375F4 inc dword [rcx+68h]
+  00E375F7 mov [rdx],rcx
+  00E375FA mov byte [rdx+10h],1
+  00E375FE jmp short 0000000140E37614h
+  00E37600 cmp rax,2
+  00E37604 jne short 0000000140E37618h
+  00E37606 mov rax,[rbp-68h]
+  00E3760A mov rcx,[rax]
+  00E3760D mov [rdx],rcx
+  00E37610 mov byte [rdx+10h],2
+  00E37614 mov [rdx+8],rdx
+  00E37618 inc qword [rsp+68h]
+  00E3761D mov rbx,[rbp-68h]
+  00E37621 test rbx,rbx
+  00E37624 je short 0000000140E3764Dh
+  00E37626 cmp byte [rbp-60h],1
+  00E3762A jne short 0000000140E3764Dh
+  00E3762C mov rbx,[rbx]
+  00E3762F dec dword [rbx+68h]
+  00E37632 cmp dword [rbx+68h],0
+  00E37636 jg short 0000000140E3764Dh
+  00E37638 mov rcx,rbx
+  00E3763B call 0000000140089310h
+  00E37640 mov edx,70h
+  00E37645 mov rcx,rbx
+  00E37648 call 0000000141DA05D8h
+  00E3764D movzx eax,byte [rsi+31h]
+  00E37651 lea rdx,[rbp-70h]
+  00E37655 xor ecx,ecx
+  00E37657 mov [rbp-70h],rcx
+  00E3765B mov [rbp-70h],eax
+  00E3765E lea rax,[rbp-70h]
+  00E37662 mov [rbp-60h],cl
+  00E37665 lea rcx,[rsp+48h]
+  00E3766A mov [rbp-68h],rax
+  00E3766E call 00000001401EAFC0h
+  00E37673 mov rbx,[rbp-68h]
+  00E37677 test rbx,rbx
+  00E3767A je short 0000000140E376A3h
+  00E3767C cmp byte [rbp-60h],1
+  00E37680 jne short 0000000140E376A3h
+  00E37682 mov rbx,[rbx]
+  00E37685 dec dword [rbx+68h]
+  00E37688 cmp dword [rbx+68h],0
+  00E3768C jg short 0000000140E376A3h
+  00E3768E mov rcx,rbx
+  00E37691 call 0000000140089310h
+  00E37696 mov edx,70h
+  00E3769B mov rcx,rbx
+  00E3769E call 0000000141DA05D8h
+  00E376A3 mov eax,[rsi+34h]
+  00E376A6 lea rdx,[rbp-70h]
+  00E376AA xor ecx,ecx
+  00E376AC mov [rbp-70h],rcx
+  00E376B0 mov [rbp-70h],eax
+  00E376B3 lea rax,[rbp-70h]
+  00E376B7 mov [rbp-60h],cl
+  00E376BA lea rcx,[rsp+48h]
+  00E376BF mov [rbp-68h],rax
+  00E376C3 call 00000001401EAFC0h
+  00E376C8 mov rbx,[rbp-68h]
+  00E376CC test rbx,rbx
+  00E376CF je short 0000000140E376F8h
+  00E376D1 cmp byte [rbp-60h],1
+  00E376D5 jne short 0000000140E376F8h
+  00E376D7 mov rbx,[rbx]
+  00E376DA dec dword [rbx+68h]
+  00E376DD cmp dword [rbx+68h],0
+  00E376E1 jg short 0000000140E376F8h
+  00E376E3 mov rcx,rbx
+  00E376E6 call 0000000140089310h
+  00E376EB mov edx,70h
+  00E376F0 mov rcx,rbx
+  00E376F3 call 0000000141DA05D8h
+  00E376F8 mov eax,88888889h
+  00E376FD mov byte [rbp-60h],0
+  00E37701 mul r15d
+  00E37704 xor eax,eax
+  00E37706 lea rcx,[rsp+48h]
+  00E3770B mov edi,edx
+  00E3770D mov [rbp-70h],rax
+  00E37711 lea rax,[rbp-70h]
+  00E37715 shr edi,5
+  00E37718 lea rdx,[rbp-70h]
+  00E3771C mov [rbp-70h],edi
+  00E3771F mov [rbp-68h],rax
+  00E37723 call 00000001401EAFC0h
+  00E37728 mov rbx,[rbp-68h]
+  00E3772C test rbx,rbx
+  00E3772F je short 0000000140E37758h
+  00E37731 cmp byte [rbp-60h],1
+  00E37735 jne short 0000000140E37758h
+  00E37737 mov rbx,[rbx]
+  00E3773A dec dword [rbx+68h]
+  00E3773D cmp dword [rbx+68h],0
+  00E37741 jg short 0000000140E37758h
+  00E37743 mov rcx,rbx
+  00E37746 call 0000000140089310h
+  00E3774B mov edx,70h
+  00E37750 mov rcx,rbx
+  00E37753 call 0000000141DA05D8h
+  00E37758 imul eax,edi,3Ch
+  00E3775B lea rdx,[rbp-70h]
+  00E3775F lea rcx,[rsp+48h]
+  00E37764 mov byte [rbp-60h],0
+  00E37768 sub r15d,eax
+  00E3776B xor eax,eax
+  00E3776D mov [rbp-70h],rax
+  00E37771 lea rax,[rbp-70h]
+  00E37775 mov [rbp-68h],rax
+  00E37779 mov [rbp-70h],r15d
+  00E3777D call 00000001401EAFC0h
+  00E37782 mov rbx,[rbp-68h]
+  00E37786 test rbx,rbx
+  00E37789 je short 0000000140E377B2h
+  00E3778B cmp byte [rbp-60h],1
+  00E3778F jne short 0000000140E377B2h
+  00E37791 mov rbx,[rbx]
+  00E37794 dec dword [rbx+68h]
+  00E37797 cmp dword [rbx+68h],0
+  00E3779B jg short 0000000140E377B2h
+  00E3779D mov rcx,rbx
+  00E377A0 call 0000000140089310h
+  00E377A5 mov edx,70h
+  00E377AA mov rcx,rbx
+  00E377AD call 0000000141DA05D8h
+  00E377B2 cmp byte [rsi+28h],0
+  00E377B6 jne short 0000000140E377BFh
+  00E377B8 mov ebx,906h
+  00E377BD jmp short 0000000140E3783Ah
+  00E377BF cmp byte [rsi+31h],0
+  00E377C3 jbe short 0000000140E37804h
+  00E377C5 test r14d,r14d
+  00E377C8 je short 0000000140E377F8h
+  00E377CA call 00000001400E08C0h
+  00E377CF cmp r14d,eax
+  00E377D2 ja short 0000000140E377DBh
+  00E377D4 mov ebx,90Ch
+  00E377D9 jmp short 0000000140E3783Ah
+  00E377DB call 00000001400E08C0h
+  00E377E0 cmp r14d,eax
+  00E377E3 jbe short 0000000140E377ECh
+> 00E377E5 mov ebx,90Bh
+  00E377EA jmp short 0000000140E3783Ah
+  00E377EC test r12b,r12b
+  00E377EF jne short 0000000140E37835h
+  00E377F1 mov ebx,3C7h
+  00E377F6 jmp short 0000000140E3783Ah
+  00E377F8 test r12b,r12b
+  00E377FB je short 0000000140E377F1h
+  00E377FD mov ebx,90Ah
+  00E37802 jmp short 0000000140E3783Ah

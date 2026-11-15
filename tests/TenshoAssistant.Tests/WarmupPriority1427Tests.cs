@@ -1,5 +1,6 @@
-// 0.1427, X-433 (fix, docs/evidence/0.1427-warmup-priority.md): the JIT warm-up runs at normal priority. Below normal, it was preempted in the
-// middle of a compilation (771 ms, 31 ms of it on its processor) while the game's thread and the collector waited for it.
+// 0.1427, X-433 (change kept, cause not proven: docs/evidence/0.1427-warmup-priority.md): the JIT warm-up runs at normal priority, to remove
+// one possible cause of the hitches (the thread preempted in the middle of a compilation the game's thread waits on). 0.1428 (X-436): this
+// header said « fix ».
 using TenshoAssistant.Diagnostics;
 
 internal static class WarmupPriority1427Tests

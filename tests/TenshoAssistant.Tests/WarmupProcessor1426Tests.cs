@@ -22,7 +22,7 @@ internal static class WarmupProcessor1426Tests
         }),
         ("Warmup processor 1426: a real warm-up says its compilations' processor time on Windows", () =>
         {
-            using var warmup = JitWarmup.Start(() => [typeof(SlowCompilations)], TimeSpan.Zero);
+            using var warmup = JitWarmup.Start(() => [typeof(SlowCompilations)], TimeSpan.Zero, measure: static () => true);
             Check(warmup.Wait(TimeSpan.FromSeconds(30)), "finished");
             if (OperatingSystem.IsWindows()) Check(warmup.Slowest.Contains(" ms (on the processor ", StringComparison.Ordinal), "the processor time: " + warmup.Slowest);
             Check(Read("src/TenshoAssistant/Diagnostics/JitWarmup.cs").Contains("var processorBefore=ThreadClock.ProcessorMs();\n        var compiled=compile();", StringComparison.Ordinal), "measured around the compilation");

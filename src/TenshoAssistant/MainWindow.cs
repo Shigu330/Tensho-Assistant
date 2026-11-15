@@ -191,6 +191,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             firstPart: Diagnostics.JitWarmup.OverlayFirst,
             // X-01 (0.1282): then the window's frame and its first page, with what they call.
             windowPart: method => Diagnostics.JitWarmup.WindowFirst(method) || firstPage is { } shown && method.MethodHandle == shown,
+            // X-437 M2 (0.1428): its compilations timed for the log in developer mode only.
+            measure: static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true,
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }

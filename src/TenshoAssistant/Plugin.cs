@@ -146,6 +146,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-177 C4.2 (0.1200): one thread compiles at a time, in the order of the need: the readers' classes wait until the window
             // exists and its warm-up has compiled the interface's code (bounded by ReaderCompiler.MaxHold; dropped at unload).
             TenshoAssistant.Competitive.CompetitiveGate.Compiler.Hold=()=>mainWindow is not { WarmupEarlyDone:true };
+            // X-437 M2 (0.1428): the readers' compiler times its compilations for the log in developer mode only.
+            TenshoAssistant.Competitive.CompetitiveGate.Compiler.Measure=static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true;
             TenshoAssistant.Competitive.CompetitiveGate.SlowSubscription=(name,spent,worst)=>log.Information("Slow reader: {0} took {1:0} ms in one frame (worst {2:0} ms; named at most every 5 minutes).",name,spent,worst);
             // X-177 (0.1162): a save of the settings made on the framework thread is timed; over 50 ms it is named in the log with what saved
             // (AutoAlarmWatcher took 648 ms in one frame on 12/11 at 11:15, its work being a save of the whole settings), at most every 5 minutes.

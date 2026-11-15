@@ -8,8 +8,8 @@ namespace TenshoAssistant.Diagnostics;
 /// load of the plugin. The desktop application's headless run measured it: Reminders 40.3 ms on its first frame, 38.9 ms of it compiling
 /// 79 methods; Gathering 57.4 ms, 45.3 ms compiling (docs/evidence/0.1050-first-frame-jit.md). In the game the same first frames were
 /// 92 to 161 ms (page sweep of 11/11 02:14). This compiles the window's methods ahead, then those of every other type of the plugin
-/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread below
-/// normal priority, a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
+/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread (normal
+/// priority since 0.1427, below normal before), a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
 /// the libraries' code (ImGui, Lumina) stay compiled on first use. Its own thread, cancelled and joined on dispose (R07); a method
 /// that cannot be prepared (generic, abstract, without a body) is skipped, never an error for the window.
 /// </summary>
@@ -30,6 +30,8 @@ public sealed class JitWarmup : IDisposable
     private readonly SlowCompilations slowest=new();
     private bool Timed(MethodBase method,Func<bool> compile)
     {
+        // X-437 M2 (0.1428): timed only when asked (developer mode): two GetThreadTimes, the clock and a lock for each of some 26 000 methods.
+        if(measure?.Invoke()!=true)return compile();
         var at=System.Diagnostics.Stopwatch.GetTimestamp();
         // X-433 (0.1426): and the warm-up thread's own processor time meanwhile (a long compilation that hardly used it was waiting).
         var processorBefore=ThreadClock.ProcessorMs();
@@ -88,12 +90,17 @@ public sealed class JitWarmup : IDisposable
         return false;
     }
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
+    /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
+    private readonly Func<bool>? measure;
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure)
     {
         var token=cancellation.Token;
-        // X-433 (0.1427, docs/evidence/0.1427-warmup-priority.md): normal priority. Below normal, the thread was preempted in the middle of a
-        // compilation (771 ms, 31 ms of it on its processor) while the game's thread and the collector waited for it (364 ms and 723 ms).
+        this.measure=measure;
+        // X-433 (0.1427): normal priority, like the readers' compiler (below normal before), to remove one possible cause of the hitches about
+        // 20 s after a load (the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and
+        // neither gain nor harm measured (docs/evidence/0.1427-warmup-priority.md: a 704 ms compilation with no processor time happened during
+        // a 702 ms collection, a compilation's time including the collector's pauses).
         thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.Normal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
@@ -106,8 +113,10 @@ public sealed class JitWarmup : IDisposable
     /// at most: the runtime compiles one method at a time for the plugin, so what the game's thread needs sooner is compiled first.</param>
     /// <param name="firstPart">X-01 (0.1279): with <paramref name="early"/>, the methods compiled before the rest of the early part, together
     /// with what they call in the plugin (<see cref="CallGraph.Closure"/>); <see cref="FirstPartDone"/> tells when.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart);
+    /// <param name="measure">X-437 M2 (0.1428): while it says true, each compilation is timed for the log (<see cref="Slowest"/>); the plugin
+    /// gives the developer mode. None: never timed.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
