@@ -10,9 +10,9 @@ internal static class GardenRegex1407Tests
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("Garden regex 1407: one shared timeout of a second, no 50 ms one left", () =>
+        ("Garden regex 1407: one shared timeout, no 50 ms one left (X-428, 0.1414: infinite, on the linear engine)", () =>
         {
-            Check(GardenJournal.MatchTimeout == TimeSpan.FromSeconds(1), "one second");
+            Check(GardenJournal.MatchTimeout == System.Text.RegularExpressions.Regex.InfiniteMatchTimeout, "infinite since X-428");
             foreach (var file in new[] { "Reminders/GardenJournal.cs", "Reminders/GardenChat.cs" })
             {
                 var text = Read(file);
@@ -20,14 +20,14 @@ internal static class GardenRegex1407Tests
             }
             Check(System.Text.RegularExpressions.Regex.Matches(Read("Reminders/GardenChat.cs"), "GardenJournal\\.MatchTimeout").Count == 4, "the four expressions of the chat and the menu use it");
         }),
-        ("Garden regex 1407: a timeout is « nothing read » in the journal, the chat line and the menu title", () =>
+        ("Garden regex 1407: no timeout can happen in the journal, the chat line and the menu title (X-428, 0.1414: linear engine, no catch left)", () =>
         {
             var journal = Read("Reminders/GardenJournal.cs");
-            Check(journal.Contains("try{match=SlotText.Match(bed.Place);}\n        catch(System.Text.RegularExpressions.RegexMatchTimeoutException){return null;}", StringComparison.Ordinal), "the bed's slot");
+            Check(journal.Contains("new(@\"^(.+) · \\D*(\\d+)\\D+(\\d+)$\",Linear,MatchTimeout)", StringComparison.Ordinal), "the bed's slot");
             var chat = Read("Reminders/GardenChat.cs");
-            Check(chat.Contains("try{return ReadLine(text);}\n        catch(RegexMatchTimeoutException){return null;}", StringComparison.Ordinal), "the chat line");
-            Check(chat.Contains("try{return Build(macro);}\n        catch(RegexMatchTimeoutException){return null;}", StringComparison.Ordinal), "the menu title's pattern");
-            Check(chat.Contains("try{match=pattern.Match(text.Trim());}\n        catch(RegexMatchTimeoutException){return null;}", StringComparison.Ordinal), "the menu title");
+            Check(System.Text.RegularExpressions.Regex.Matches(chat, "GardenJournal\\.Linear,GardenJournal\\.MatchTimeout").Count == 4, "the chat line and the menu title");
+            foreach (var text in new[] { journal, chat })
+                Check(!text.Contains("RegexMatchTimeoutException", StringComparison.Ordinal), "no timeout to catch");
         }),
         ("Garden regex 1407: behaviour: the slots read as before, and the worst accepted place takes far less than the timeout", () =>
         {

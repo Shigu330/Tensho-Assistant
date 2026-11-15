@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1414.0
+- Plan global, X-428 : Jardin : les expressions régulières du journal (emplacement noté, ligne du chat qui annonce une plantation, titre du menu d'un emplacement) passent au moteur linéaire de .NET (NonBacktracking), sans délai d'expiration : leur temps ne dépend plus que de la longueur du texte, jamais d'un retour en arrière. Une machine chargée (la CI de 0.1405) avait dépassé le délai ; chez un joueur au PC chargé, la plantation n'aurait pas été lue. Mêmes résultats qu'avant, comparés sur les lignes du jeu ; plus aucune expiration possible, les quatre rattrapages de 0.1407 retirés. Test : GardenLinear1414Tests ; GardenRegex1407Tests suit.
+- Pour les joueurs : jardin : une plantation annoncée dans le chat est lue même quand le PC est très occupé.
+- Tests : GardenLinear1414Tests. Verify.ps1 (agent) : 2688/2688, 0 avertissement, 0 erreur ; DLL 0.1414.0.0. Rien à essayer en jeu.
+### English
+- Garden: the journal's regular expressions (noted place, the chat line announcing a planting, a bed's menu title) move to .NET's linear engine (NonBacktracking), with no timeout: their time now depends only on the text's length, never on backtracking. A busy machine (the CI of 0.1405) had run past the timeout; on a player's busy PC, the planting would not have been read. Same results as before, compared on the game's lines; no timeout can happen any more, the four catches of 0.1407 removed. Test: GardenLinear1414Tests; GardenRegex1407Tests follows.
+- For players: Garden: a planting announced in the chat is read even when the PC is busy.
+
 ## 0.1413.0
 - Plan global, X-432 : Outil des documents produits : l'index des preuves (docs/evidence/README.md) et l'index des documents lisent désormais les fichiers que le prochain commit contiendra (suivis, et nouveaux non ignorés). Une archive du CHANGELOG créée par la même passe de documents (nouvelle centaine) restait hors de l'index des preuves : la release de 0.1412 s'était arrêtée sur « Documents not produced for this version ». Test : DocsFresh1413Tests.
 - Tests : DocsFresh1413Tests. Verify.ps1 (agent) : 2685/2685, 0 avertissement, 0 erreur ; DLL 0.1413.0.0. Rien à essayer en jeu.

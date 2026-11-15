@@ -40,19 +40,20 @@ public sealed record GardenSlot(string Zone,int Patch,int Bed);
 public static class GardenJournal
 {
     /// <summary>
-    /// X-427 (0.1407): the one timeout of the garden's regular expressions. Their inputs are bounded (a place of 40 characters, a chat line of
-    /// 200, a menu title of 80), so a second only guards against a pathological pattern; 50 ms ran out on a busy processor (the CI of 0.1405,
-    /// tests in parallel). A timeout reads as « nothing read ».
+    /// X-428 (0.1414): the one way the garden's regular expressions run: .NET's linear engine (NonBacktracking), whose time grows with the
+    /// input's length only, never by going back over it. X-427 (0.1407) had raised a 50 ms timeout to a second after the CI of 0.1405 ran
+    /// out of time on a busy processor; a slow player's PC could still lose a planting that way. The same matches and groups as before
+    /// (checked on the game's rows), and no timeout any more: <see cref="MatchTimeout"/> is infinite, nothing can run out.
     /// </summary>
-    public static readonly TimeSpan MatchTimeout=TimeSpan.FromSeconds(1);
-    private static readonly System.Text.RegularExpressions.Regex SlotText=new(@"^(.+) · \D*(\d+)\D+(\d+)$",System.Text.RegularExpressions.RegexOptions.CultureInvariant,MatchTimeout);
+    public const System.Text.RegularExpressions.RegexOptions Linear=System.Text.RegularExpressions.RegexOptions.CultureInvariant|System.Text.RegularExpressions.RegexOptions.NonBacktracking;
+    /// <summary>X-428 (0.1414): infinite: the linear engine needs no timeout, so a busy processor never turns a reading into « nothing read ».</summary>
+    public static readonly TimeSpan MatchTimeout=System.Text.RegularExpressions.Regex.InfiniteMatchTimeout;
+    private static readonly System.Text.RegularExpressions.Regex SlotText=new(@"^(.+) · \D*(\d+)\D+(\d+)$",Linear,MatchTimeout);
 
     /// <summary>0.461: the slot of a bed noted as « zone · patch N, bed M » (the format of the chat detection, in every language), or null for a free text or a pot.</summary>
     public static GardenSlot? Slot(GardenBed bed)
     {
-        System.Text.RegularExpressions.Match match;
-        try{match=SlotText.Match(bed.Place);}
-        catch(System.Text.RegularExpressions.RegexMatchTimeoutException){return null;}
+        var match=SlotText.Match(bed.Place);
         if(!match.Success || !int.TryParse(match.Groups[2].Value,out var patch) || !int.TryParse(match.Groups[3].Value,out var number) || patch is <1 or >3 || number is <1 or >8)return null;
         return new(match.Groups[1].Value,patch,number);
     }
