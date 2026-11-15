@@ -54,9 +54,12 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
             .OrderBy(pair=>pair.At).Take(10).Select(pair=>(pair.Label,pair.At!.Value,pair.Weather)).ToArray();
         // 0.302 (user request): time left before the next alarm, not its clock time.
         var time=upcoming.Count==0 ? "":" · "+Remaining(upcoming[0].At-now,text);
+        var before=shownText;
         shownText=SeIconChar.Clock.ToIconString()+" "+enabled.Length+time;
         entry.Text=new SeStringBuilder().AddText(shownText).Build();
         bounds=FindTextNode(gui,shownText);
+        // X-419 M2 (0.1393): the game draws a new text on a later frame: until then the node still holds the text shown before.
+        if(bounds is null && before.Length>0 && before!=shownText)bounds=FindTextNode(gui,before);
         // Own tooltip when the entry was found on screen; else the game's.
         if(configuration.AlarmBarTooltip && bounds is not null)entry.Tooltip=null;
         else entry.Tooltip=upcoming.Count==0 ? text("Alarms.BarNone")

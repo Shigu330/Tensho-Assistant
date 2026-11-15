@@ -71,6 +71,8 @@ public sealed class InfoDtrEntries : IDisposable
         if(line is not { } shownLine){entry.Shown=false;shown[index]=null;lines[index]=null;return;}
         entry.Shown=true;
         var bounds=AlarmDtrEntry.FindTextNode(gui,shownLine.Label);
+        // X-419 M2 (0.1393): the game draws a new label on a later frame: until then the node still holds the label shown before.
+        if(bounds is null && lines[index] is { } before && before.Label!=shownLine.Label)bounds=AlarmDtrEntry.FindTextNode(gui,before.Label);
         lines[index]=new(shownLine.Label,shownLine.Tip,bounds);
         // X-276: Tensho's tooltip once the entry is found on screen (the game's stays until then, or when Tensho's is turned off).
         var own=configuration.AlarmBarTooltip && bounds is not null;

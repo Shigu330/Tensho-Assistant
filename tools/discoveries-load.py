@@ -10,7 +10,7 @@ Usage:
   python -I -X utf8 tools/discoveries-load.py [--sizes 100000,1000000] [--players 100] [--runs 3] [--json out.json]
   python -I -X utf8 tools/discoveries-load.py --selftest     a 2 000-fact run, checks the merge kept every distinct fact (a few seconds)
 """
-import contextlib,importlib.util,io,json,math,os,random,shutil,statistics,subprocess,sys,tempfile,time
+import contextlib,gzip,importlib.util,io,json,math,os,random,shutil,statistics,subprocess,sys,tempfile,time
 from datetime import datetime,timedelta,timezone
 
 HERE=os.path.dirname(os.path.abspath(__file__))
@@ -137,10 +137,19 @@ def measure(size,players,seed):
         # X-357 (0.1349): the common facts are the v3 set only (the v2 discoveries.json is no longer written).
         common=merge.from_v3_dir(merge.V3_DIR)["Facts"];common_bytes=sum(os.path.getsize(os.path.join(merge.V3_DIR,n)) for n in os.listdir(merge.V3_DIR))
         flagged=sum(1 for line in quiet.getvalue().splitlines() if "FLAG" in line)
+        # X-419 M4: the largest kind file of the set against the exchange's bounds (MAX_FACTS facts, MAX_COMPRESSED bytes, MAX_DECOMPRESSED once read).
+        index=json.load(open(os.path.join(merge.V3_DIR,merge.V3_INDEX),encoding="utf-8"));kinds=[]
+        for name in os.listdir(merge.V3_DIR):
+            if name.endswith(".jsonl.gz"):
+                data=open(os.path.join(merge.V3_DIR,name),"rb").read();kinds.append((len(data),len(gzip.decompress(data))))
+        counts=[entry.get("Count",0) for entry in (index.get("Kinds") or index.get("Files") or []) if isinstance(entry,dict)]
         return {"sightings":sightings,"largest_share":largest,"refused":refused,"kept":kept,"common_facts":len(common),"flagged":flagged,"changed":changed,"unchanged_second":not again,
                 "clean_s":clean_s,"rebuild_s":rebuild_s,"rebuild_unchanged_s":again_s,
                 "common_mb":common_bytes/1048576,"players_mb":sum(os.path.getsize(os.path.join(merge.PLAYERS,n)) for n in os.listdir(merge.PLAYERS))/1048576,
-                "bytes_a_fact":common_bytes/max(1,len(common)),"peak_mb":peak_mb()}
+                "bytes_a_fact":common_bytes/max(1,len(common)),"peak_mb":peak_mb(),
+                "largest_kind_facts":max(counts,default=0),"max_facts":merge.MAX_FACTS,
+                "largest_kind_mb":max((c for c,_ in kinds),default=0)/1048576,"max_compressed_mb":merge.MAX_COMPRESSED/1048576,
+                "largest_kind_read_mb":max((d for _,d in kinds),default=0)/1048576,"max_decompressed_mb":merge.MAX_DECOMPRESSED/1048576}
     finally:shutil.rmtree(folder,ignore_errors=True)
 
 def main(argv):
@@ -162,7 +171,7 @@ def main(argv):
         print(f"\nSIZE {size:,} distinct facts: {results[0]['sightings']:,} sightings in {players} shares (largest {results[0]['largest_share']:,}), "
               f"{results[0]['common_facts']:,} facts in the v3 set, {results[0]['refused']} refused, {results[0]['flagged']} players flagged")
         rows={}
-        for name in ("clean_s","rebuild_s","rebuild_unchanged_s","common_mb","players_mb","bytes_a_fact","peak_mb"):
+        for name in ("clean_s","rebuild_s","rebuild_unchanged_s","common_mb","players_mb","bytes_a_fact","peak_mb","largest_kind_facts","largest_kind_mb","largest_kind_read_mb"):
             values=sorted(r[name] for r in results);rows[name]={"median":statistics.median(values),"min":values[0],"max":values[-1]}
             print(f"  {name:<22} {statistics.median(values):>12.2f}   [{values[0]:.2f} - {values[-1]:.2f}]")
         report[str(size)]={"facts":results[0],"metrics":rows}

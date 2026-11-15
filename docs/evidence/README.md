@@ -287,7 +287,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x344-plugin-icon.md](x344-plugin-icon.md) | `scripts/Verify.ps1`, `tests/TenshoAssistant.Tests/PluginIcon1330Tests.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
-| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
+| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `CHANGELOG.md`, `docs/evidence/x172-sqlite-trial.md` |
 
 Counted · compté : 277 files · fichiers ; 231 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
