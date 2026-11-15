@@ -69,10 +69,13 @@ internal static class ChatLinks1463Tests
             Check(window.Contains("ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName)", StringComparison.Ordinal)
                   && window.Contains("private string ChatLinkName(ChatLink link)=>link.Kind switch", StringComparison.Ordinal), "the window's names");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs")).Replace("\r\n", "\n");
-            Check(reader.Contains("piecesSaid<PiecesSaidMax && developer?.Invoke()==true", StringComparison.Ordinal)
-                  && reader.Contains("ITextProvider text=>$\"{payload.GetType().Name} ({text.Text?.Length ?? 0} characters", StringComparison.Ordinal)
-                  && !reader.Contains("PieceKind(Payload payload)=>payload switch\n    {\n        ITextProvider text=>text.Text", StringComparison.Ordinal),
-                  "kinds and lengths only");
+            // 0.1468 (X-479): the line is written by ChatPayloads.Describe (pure; ChatLinkPieces1468Tests reads it back), two per kind of message.
+            Check(reader.Contains("developer?.Invoke()==true && ChatPayloads.HasLink(payloads)", StringComparison.Ordinal)
+                  && reader.Contains("if(piecesSaid.Take(kind))", StringComparison.Ordinal)
+                  && reader.Contains("ChatPayloads.Describe(payloads)", StringComparison.Ordinal), "kinds and lengths only");
+            var describe = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatPayloads.cs")).Replace("\r\n", "\n");
+            Check(describe.Contains("ChatPayloadKind.Text=>$\"{payload.Name} ({payload.Text?.Length ?? 0} characters", StringComparison.Ordinal)
+                  && !describe.Contains("=>payload.Text,", StringComparison.Ordinal), "never the words");
         }),
     ];
 }

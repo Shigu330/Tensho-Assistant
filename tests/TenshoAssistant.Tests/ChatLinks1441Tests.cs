@@ -48,8 +48,9 @@ internal static class ChatLinks1441Tests
         ("Chat links 1441: the reader keeps the links; the window draws them with Tensho's menus; texts in both languages",() =>
         {
             var reader = Read("Chat/ChatReader.Dalamud.cs");
-            Check(reader.Contains("case MapLinkPayload map:pieces.Add(new(null,MapLink(map)));break;") && reader.Contains("case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;")
-                && reader.Contains("case ItemPayload item:pieces.Add(new(null,new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)));break;"),"map, item and end read");
+            // 0.1468 (X-479): each payload told apart by the reader (ChatPayload), the pieces made by ChatPayloads (ChatLinkPieces1468Tests).
+            Check(reader.Contains("MapLinkPayload map=>new(ChatPayloadKind.Map,\"MapLink\",Link:MapLink(map)),") && reader.Contains("RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,\"LinkEnd\"),")
+                && reader.Contains("ItemPayload item=>new(ChatPayloadKind.Item,\"Item\",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),"),"map, item and end read");
             Check(reader.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;"),"still not read during a cut");
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("if(run.Link is { } link)DrawChatLink(run,link,$\"{record.Id}_{line}_{index}\");"),"links drawn as links");

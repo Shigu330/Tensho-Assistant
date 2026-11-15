@@ -29,7 +29,8 @@ internal static class ChatLinks1442Tests
         }),
         ("Chat links 1442: the reader keeps quest links; the window opens them on the Quests page and has a message menu; both languages",() =>
         {
-            Check(Read("Chat/ChatReader.Dalamud.cs").Contains("case QuestPayload quest:pieces.Add(new(null,new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)));break;"),"quest read");
+            // 0.1468 (X-479): told apart by the reader (ChatPayload), made into a piece by ChatPayloads.
+            Check(Read("Chat/ChatReader.Dalamud.cs").Contains("QuestPayload quest=>new(ChatPayloadKind.Quest,\"Quest\",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),"),"quest read");
             var window = Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}"),"quest: the Quests page");
             Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup(\"###TenshoChatLine\");}")

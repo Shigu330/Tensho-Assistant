@@ -18,8 +18,11 @@ internal sealed class ChatReader : IDisposable
     private readonly Func<bool>? developer;
     private bool disposed,warned;
     // X-461 (0.1463): developer mode: the kinds of pieces of a message with a link, a few per session (kinds and lengths only, never the words).
-    private int piecesSaid;
-    private const int PiecesSaidMax=20;
+    // X-479 (0.1468): a few per kind of message (loot lines took all twenty on 11/15 before any message of a player); and a link shown without
+    // text of its own (the window writes its target's name) is said apart, with what the game sent for it.
+    private readonly ChatPieceLog piecesSaid=new();
+    private int bareSaid;
+    private const int BareSaidMax=10;
 
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null)
     {
@@ -43,24 +46,20 @@ internal sealed class ChatReader : IDisposable
             // Turned off (also by « restore every setting »): what was kept goes at the next message.
             if(!current.WindowOpen){if(store.Count>0)store.Clear();return;}
             // X-403 phase 2 (0.1441): the links too (a place or an item), with the text that shows them; a link whose target cannot be
-            // read stays plain text.
-            var pieces=new List<ChatPiece>();
-            foreach(var payload in message.Message.Payloads)
-                switch(payload)
-                {
-                    case MapLinkPayload map:pieces.Add(new(null,MapLink(map)));break;
-                    case ItemPayload item:pieces.Add(new(null,new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)));break;
-                    // 0.1442: a quest link.
-                    case QuestPayload quest:pieces.Add(new(null,new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)));break;
-                    case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;
-                    case ITextProvider text:pieces.Add(new(text.Text));break;
-                }
-            if(piecesSaid<PiecesSaidMax && developer?.Invoke()==true && message.Message.Payloads.Any(payload=>payload is ItemPayload or QuestPayload or MapLinkPayload))
+            // read stays plain text. X-479 (0.1468): each payload told apart here (ChatPayload, pure), the rest in ChatPayloads.
+            var payloads=message.Message.Payloads.Select(Payload).ToList();
+            var body=ChatPayloads.Segments(payloads);
+            if(developer?.Invoke()==true && ChatPayloads.HasLink(payloads))
             {
-                piecesSaid++;
-                log.Information("Chat window, pieces of a message with a link (kind {0}): {1}.",(int)message.LogKind,string.Join(", ",message.Message.Payloads.Select(PieceKind)));
+                var kind=(int)message.LogKind;
+                if(piecesSaid.Take(kind))
+                    log.Information("Chat window, pieces of a message with a link (kind {0}): {1}.",kind,ChatPayloads.Describe(payloads));
+                if(bareSaid<BareSaidMax && ChatPayloads.Bare(body)>0)
+                {
+                    bareSaid++;
+                    log.Information("Chat window, a link without text of its own (kind {0}), its target's name written instead: {1}.",kind,ChatPayloads.Describe(payloads));
+                }
             }
-            var body=ChatPieces.Segments(pieces);
             store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,message.Sender.TextValue,body,current.BoundedMaxLines);
             warned=false;
         }
@@ -70,16 +69,18 @@ internal sealed class ChatReader : IDisposable
         }
     }
 
-    /// <summary>X-461 (0.1463): a piece as the log names it: its kind, an item's row, a text's length; never its words.</summary>
-    private static string PieceKind(Payload payload)=>payload switch
+    /// <summary>X-479 (0.1468): one of the game's payloads as the reader tells it apart (ChatPayload: pure, replayed by the tests on recorded messages).</summary>
+    private static ChatPayload Payload(Payload payload)=>payload switch
     {
-        ItemPayload item=>$"Item {item.ItemId}{(item.IsHQ ? " HQ":"")}",
-        QuestPayload=>"Quest",
-        MapLinkPayload=>"MapLink",
-        RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>"LinkEnd",
-        ITextProvider text=>$"{payload.GetType().Name} ({text.Text?.Length ?? 0} characters{(text.Text?.Any(letter=>letter is >= '\uE000' and <= '\uF8FF')==true ? ", game glyph":"")})",
-        RawPayload raw=>$"Raw ({raw.Data.Length} bytes)",
-        _=>payload.GetType().Name,
+        MapLinkPayload map=>new(ChatPayloadKind.Map,"MapLink",Link:MapLink(map)),
+        ItemPayload item=>new(ChatPayloadKind.Item,"Item",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),
+        // 0.1442: a quest link.
+        QuestPayload quest=>new(ChatPayloadKind.Quest,"Quest",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),
+        RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,"LinkEnd"),
+        ITextProvider text=>new(ChatPayloadKind.Text,payload.GetType().Name,Text:text.Text),
+        IconPayload icon=>new(ChatPayloadKind.Icon,payload.GetType().Name,Icon:(uint)icon.Icon),
+        RawPayload raw=>new(ChatPayloadKind.Raw,"Raw",Size:raw.Data.Length),
+        _=>new(ChatPayloadKind.Other,payload.GetType().Name),
     };
 
     private static ChatLink? MapLink(MapLinkPayload map)
