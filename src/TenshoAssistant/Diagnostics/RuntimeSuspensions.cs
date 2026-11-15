@@ -79,6 +79,83 @@ public sealed class SuspensionTracker(double thresholdMs=20,int maximumNotes=30)
     };
 }
 
+/// <summary>
+/// X-433 (0.1430): the runtime's collections, from its own events (GCStart_V2 with its generation, kind and reason, then GCEnd_V1 with the
+/// same count): each collection of generation 2 gives one note with its kind (background, blocking), when it began and ended and how many other
+/// collections ended meanwhile (at most <see cref="MaximumNotes"/>); the others are counted. Pure: fed by
+/// <see cref="RuntimeSuspensionListener"/>, or by the tests.
+/// </summary>
+public sealed class CollectionTracker(int maximumNotes=20)
+{
+    public int MaximumNotes { get; } = maximumNotes;
+    /// <summary>At most this many collections begun and not ended are kept (an end missed never grows the table).</summary>
+    public const int OpenCap=64;
+    private readonly object gate=new();
+    private readonly Dictionary<long,(DateTime At,long Depth,long Kind,long Reason,int EndedBefore)> open=[];
+    private int notes;
+    public int Ended { get; private set; }
+    public int Generation2 { get; private set; }
+    public int Background { get; private set; }
+    /// <summary>One event of the runtime; a note when it ends a collection of generation 2, else null.</summary>
+    public string? See(string? name,DateTime at,long? count,long? depth=null,long? kind=null,long? reason=null)
+    {
+        if(count is not { } number)return null;
+        lock(gate)
+        {
+            switch(name)
+            {
+                case "GCStart_V2":
+                    open[number]=(at,depth ?? 0,kind ?? 0,reason ?? -1,Ended);
+                    if(open.Count>OpenCap)open.Remove(open.Keys.Min());
+                    return null;
+                case "GCEnd_V1":
+                {
+                    if(!open.Remove(number,out var started))return null;
+                    Ended++;
+                    if(started.Depth<2)return null;
+                    Generation2++;
+                    if(started.Kind==1)Background++;
+                    var milliseconds=(at-started.At).TotalMilliseconds;
+                    if(milliseconds<0 || notes>=MaximumNotes)return null;
+                    notes++;
+                    var others=Ended-started.EndedBefore-1;
+                    return string.Create(CultureInfo.InvariantCulture,
+                        $"{KindName(started.Kind)} collection of generation 2 ({ReasonName(started.Reason)}) from {started.At.ToLocalTime():HH:mm:ss.fff} to {at.ToLocalTime():HH:mm:ss.fff}: {milliseconds:0} ms, {others} other collections ended meanwhile.");
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+    public string Summary(TimeSpan watched)
+    {
+        lock(gate)
+            return string.Create(CultureInfo.InvariantCulture,
+                $"Collections in the {watched.TotalSeconds:0} s after the load: {Ended}, {Generation2} of generation 2 ({Background} in the background).");
+    }
+    /// <summary>The runtime's kinds of collection (GCStart_V2 Type).</summary>
+    public static string KindName(long kind)=>kind switch { 0=>"Blocking", 1=>"Background", 2=>"Foreground", _=>"Kind "+kind.ToString(CultureInfo.InvariantCulture) };
+    /// <summary>The runtime's reasons for a collection (GCStart_V2 Reason).</summary>
+    public static string ReasonName(long reason)=>reason switch
+    {
+        0=>"small allocations",
+        1=>"induced",
+        2=>"low memory",
+        3=>"empty",
+        4=>"large allocations",
+        5=>"out of space for small objects",
+        6=>"out of space for large objects",
+        7=>"induced, not forced",
+        8=>"internal",
+        9=>"induced for low memory",
+        10=>"induced compacting",
+        11=>"low memory on the host",
+        12=>"provisional mode",
+        13=>"low memory on the host, blocking",
+        _=>"reason "+reason.ToString(CultureInfo.InvariantCulture),
+    };
+}
+
 /// <summary>X-433 (0.1422): how long the listener watches after a load, and its end (false when the unload already ended it).</summary>
 public static class RuntimeSuspensionWatch
 {
@@ -104,12 +181,15 @@ public sealed class RuntimeSuspensionListener : EventListener
     private readonly SuspensionTracker tracker=new();
     // X-433 (0.1423): the type loads too (TypeDiagnostic keyword).
     private readonly TypeLoadTracker types=new();
+    // X-433 (0.1430): the collections, with their kind (GC keyword, already enabled).
+    private readonly CollectionTracker collections=new();
     private volatile Action<string>? say;
     private int disposed;
 
     public RuntimeSuspensionListener(Action<string> say)=>this.say=say;
 
     public SuspensionTracker Tracker=>tracker;
+    public CollectionTracker Collections=>collections;
     public TypeLoadTracker Types=>types;
     public bool IsDisposed=>Volatile.Read(ref disposed)!=0;
 
@@ -131,6 +211,11 @@ public sealed class RuntimeSuspensionListener : EventListener
             var name=written.PayloadNames?.IndexOf("TypeName") is int at && at>=0 && written.Payload is { } values && at<values.Count ? values[at] as string:null;
             if(Number(written,"TypeLoadStartID") is { } id
                 && types.Stop(id,written.TimeStamp.ToUniversalTime(),name,Interlocked.Read(ref ThreadClock.GameThread)) is { } typeNote)say?.Invoke(typeNote);
+            return;
+        }
+        if(written.EventName is "GCStart_V2" or "GCEnd_V1")
+        {
+            if(collections.See(written.EventName,written.TimeStamp.ToUniversalTime(),Number(written,"Count"),Number(written,"Depth"),Number(written,"Type"),Number(written,"Reason")) is { } collectionNote)say?.Invoke(collectionNote);
             return;
         }
         uint? reason=null;long? jitted=null;

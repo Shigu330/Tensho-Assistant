@@ -1363,6 +1363,7 @@ public sealed partial class Plugin : IDalamudPlugin
                     {
                         log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Types.Summary());
+                        log.Information(suspensions.Collections.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                     }
                 },TaskScheduler.Default);
             }
