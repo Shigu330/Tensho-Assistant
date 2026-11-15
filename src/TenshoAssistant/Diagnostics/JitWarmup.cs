@@ -223,7 +223,8 @@ public sealed class JitWarmup : IDisposable
     /// outside it at the first level, 50 at the next). 0: the class alone, as before.</param>
     /// <param name="known">X-177 (0.1281): methods already taken by an earlier class (shared by the caller, one thread): left out and not
     /// counted again; the ones taken here are added.</param>
-    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null,int callees=0,ISet<MethodBase>? known=null)
+    public static int PrepareOwner(MethodBase handler,int cap=OwnerCap,Func<bool>? stop=null,Action<MethodBase>? prepare=null,int callees=0,ISet<MethodBase>? known=null,
+        Action<MethodBase,double>? timed=null)
     {
         IReadOnlyList<MethodBase> methods;
         try
@@ -243,9 +244,12 @@ public sealed class JitWarmup : IDisposable
             known?.Add(method);
             try
             {
+                // X-433 (0.1424): each compilation's time, for the longest ones (timed).
+                var at=System.Diagnostics.Stopwatch.GetTimestamp();
                 if(prepare is not null)prepare(method);
                 else if(!CallGraph.Prepare(method))continue;
                 prepared++;
+                timed?.Invoke(method,System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds);
             }
             catch(Exception){}
         }

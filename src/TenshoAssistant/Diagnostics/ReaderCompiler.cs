@@ -19,6 +19,33 @@ namespace TenshoAssistant.Diagnostics;
 /// need: the interface's code first (the warm-up's early part), then the readers' classes, then the rest. <see cref="Hold"/> is that
 /// order: the classes wait while it says so, <see cref="MaxHold"/> at most.
 /// </summary>
+/// <summary>X-433 (0.1424): the <see cref="Kept"/> longest compilations seen, each with the clock time it ended (thread-safe).</summary>
+public sealed class SlowCompilations(int kept=5)
+{
+    public int Kept { get; } = kept;
+    public static string Name(MethodBase method)=>$"{method.DeclaringType?.Name}.{method.Name}";
+    private readonly object gate=new();
+    private readonly List<(string Name,double Milliseconds,DateTimeOffset Ended)> longest=[];
+
+    public void Note(string name,double milliseconds,DateTimeOffset ended)
+    {
+        lock(gate)
+        {
+            if(longest.Count>=Kept && milliseconds<=longest[^1].Milliseconds)return;
+            longest.Add((name,milliseconds,ended));
+            longest.Sort((left,right)=>right.Milliseconds.CompareTo(left.Milliseconds));
+            if(longest.Count>Kept)longest.RemoveAt(longest.Count-1);
+        }
+    }
+
+    public string Text()
+    {
+        lock(gate)
+            return string.Join(", ",longest.Select(slow=>string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"{slow.Name} {slow.Milliseconds:0} ms (ended {slow.Ended.ToLocalTime():HH:mm:ss.fff})")));
+    }
+}
+
 public sealed class ReaderCompiler : IDisposable
 {
     /// <summary>X-177 (0.1281): at most this many methods a reader's class calls elsewhere, compiled with it (measured on 13/11: the four slow
@@ -73,6 +100,10 @@ public sealed class ReaderCompiler : IDisposable
     private volatile bool stopped;
     private int classes,methods;
     private double compiling,doneAfter;
+    // X-433 (0.1424): the longest compilations, with the clock time each ended.
+    private readonly SlowCompilations slowest=new();
+    /// <summary>X-433 (0.1424): the five longest compilations so far, for the log (empty before any).</summary>
+    public string Slowest=>slowest.Text();
 
     /// <param name="now">The clock of the guard delay, in milliseconds (the tests' own; the machine's by default).</param>
     /// <param name="prepare">What compiles one method (the tests' own; the runtime's by default).</param>
@@ -164,7 +195,8 @@ public sealed class ReaderCompiler : IDisposable
             {
                 own=JitWarmup.Methods([JitWarmup.Owner(next.Handler)!]).Count;
                 // X-177 (0.1281): with what the class calls in other classes, nearest first (CalleeCap), each method once for all the readers.
-                compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known);
+                compiled=JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known,
+                    (method,milliseconds)=>slowest.Note(SlowCompilations.Name(method),milliseconds,DateTimeOffset.Now));
             }
             catch(Exception){}
             // Whatever happened to the compiling, the reader is never left waiting.

@@ -105,7 +105,7 @@ internal static class ReaderCallees1281Tests
             var gate = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs"));
             Check(gate.Contains("Diagnostics.JitWarmup.PauseText((GC.GetTotalPauseDuration()-pausedBefore).TotalMilliseconds)", StringComparison.Ordinal), "the slow reader line says it");
             var compiler = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/ReaderCompiler.cs"));
-            Check(compiler.Contains("JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known)", StringComparison.Ordinal), "the readers' classes with their callees");
+            Check(compiler.Contains("JitWarmup.PrepareOwner(next.Handler,JitWarmup.OwnerCap,()=>stopped,prepare,CalleeCap,known,", StringComparison.Ordinal), "the readers' classes with their callees");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("Readers' callees: {0} methods called from their classes in other classes", StringComparison.Ordinal), "the readers' line counts them");
         }),
     ];
