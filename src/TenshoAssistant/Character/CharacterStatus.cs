@@ -48,7 +48,25 @@ public static class RetainerStates
         var clean=(text ?? "").Trim();
         return clean.Length>MaximumText ? clean[..MaximumText]:clean;
     }
+
+    /// <summary>X-196 (0.1410): a sale ends « soon » within a day (the table shows it in orange; ended ones in red).</summary>
+    public static readonly TimeSpan SaleSoon=TimeSpan.FromDays(1);
+
+    /// <summary>X-196 (0.1410): where the retainer's sales stand at <paramref name="now"/>, as last read.</summary>
+    public static RetainerSale Sale(RetainerState retainer,DateTimeOffset now)
+    {
+        if(retainer.MarketItems<=0)return RetainerSale.None;
+        if(retainer.MarketEnds is not { } end)return RetainerSale.Selling;
+        return end<=now ? RetainerSale.Ended:end-now<=SaleSoon ? RetainerSale.EndingSoon:RetainerSale.Selling;
+    }
+
+    /// <summary>X-196 (0.1410): the table's rows: each character in the given order, its retainers in the game's order; characters never read left out.</summary>
+    public static IReadOnlyList<(CharacterStatus Character,RetainerState Retainer)> Table(IEnumerable<CharacterStatus> characters)
+        =>[.. characters.Where(status=>status.Retainers is { Length:>0 }).SelectMany(status=>status.Retainers!.Select(retainer=>(status,retainer)))];
 }
+
+/// <summary>X-196 (0.1410): a retainer's sales as last read: none on sale, selling, ending within <see cref="RetainerStates.SaleSoon"/>, ended.</summary>
+public enum RetainerSale { None, Selling, EndingSoon, Ended }
 
 /// <summary>
 /// g, M-04 (0.374): what Tensho last read for one of the player's characters (local character id, never an Account ID): retainer
