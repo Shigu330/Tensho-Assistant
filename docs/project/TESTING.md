@@ -1919,6 +1919,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1421) Rappels › État du personnage : le tableau des servants tient dans la fenêtre (colonne « Ville du marché » entière, Gils et Objets serrés sur leurs nombres) et les lignes d'aide se replient au bord.
 
+- [ ] (0.1434) Paramètres › Panneaux à côté du jeu › « Fenêtre de chat Tensho » : cocher « Afficher la fenêtre de chat Tensho ». La fenêtre s'ouvre à côté du chat du jeu, qui reste visible ; Dire, linkshell, système et emotes arrivent avec l'heure et leur couleur.
+
+- [ ] (0.1434) Onglets « Général » et « Social » : un message dit pendant que Général est affiché donne « Social (1) » ; afficher Social efface le compte. Un murmure envoyé ne compte pas.
+
+- [ ] (0.1434) Remonter dans les messages : la fenêtre ne suit plus ; revenir en bas : elle suit de nouveau. Redimensionner la fenêtre : les lignes se recoupent.
+
+- [ ] (0.1434) Réglages de la fenêtre : opacité, taille du texte, heure 12/24 h, secondes, nom court du canal ; ajouter, renommer ou retirer un onglet ; changer une couleur puis ↺.
+
+- [ ] (0.1434) La croix ferme la fenêtre et décoche le réglage ; /tensho chat l'affiche et la masque.
+
+- [ ] (0.1434) Se déconnecter puis se reconnecter : la fenêtre repart vide.
+
+- [ ] (0.1434) Entrer en JcJ : la fenêtre disparaît, et revient à la sortie ; masquer l'interface du jeu : elle se masque aussi.
+
+- [ ] (0.1434) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : Guide : aucun (une fenêtre en plus, désactivée par défaut ; l'étape Panneaux du guide ne règle que les panneaux actifs par défaut). Aide : question de la FAQ « Qu'est-ce que la fenêtre de chat Tensho ? », qui ouvre Paramètres. Liste des outils de l'accueil : aucun (une fenêtre, pas une page ; ouverte depuis Paramètres › Panneaux à côté du jeu ou par /tensho chat).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
