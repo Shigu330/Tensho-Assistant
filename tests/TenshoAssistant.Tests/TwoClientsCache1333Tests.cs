@@ -76,7 +76,7 @@ internal static class TwoClientsCache1333Tests
         ("Two clients 1333: wiring (writes, patch reports and purge under the lock of the profile; a vanished file is a miss)",() =>
         {
             var code=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Caching/DataCache.cs")).Replace("\r\n","\n");
-            Check(code.Contains("using(HoldProfile(token))") && code.Contains("using(HoldProfile(lifetime.Token))AtomicFile.Write(PatchReportsPath,bytes);")
+            Check(code.Contains("using(HoldProfile(token))") && code.Contains("using(HoldProfile(lifetime.Token))\n            {\n                reports=WithReports(ReadReports(),made);\n                AtomicFile.Write(PatchReportsPath,")
                 && code.Contains("using var held=HoldProfile(lifetime.Token);"),"the three writers hold the lock");
             Check(code.Contains("catch(Exception gone) when(gone is FileNotFoundException or DirectoryNotFoundException){return null;}"),"a file removed by the other client is a miss");
         }),

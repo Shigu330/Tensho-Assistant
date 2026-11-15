@@ -123,9 +123,9 @@ public static class MapLocalLists
     /// <summary>Quests by journal category (sorted by name), each by level then name; completed ones only on request. X-128 (0.1107): without
     /// <paramref name="includeLocked"/>, the quests not available yet are left out (not started and not <see cref="QuestList.Available"/>).</summary>
     /// <remarks>
-    /// X-355 (0.1344, user question of 11/14: « tu as aussi pris en compte les quêtes event ? »): a quest of a seasonal event whose event is not
+    /// X-355 (0.1344, user question of 11/14: did the list take the event quests into account): a quest of a seasonal event whose event is not
     /// running (<paramref name="outOfSeason"/>, <see cref="OutOfSeason"/>) is not available either: left out with the not-unlocked ones.
-    /// X-355 (0.1345, user report of 11/14 at the Gold Saucer: « Toutes les cartes en main » listed, absent from the map, « la carte a raison »):
+    /// X-355 (0.1345, user report of 11/14 at the Gold Saucer: a Triple Triad quest listed, absent from the map, and « the map is right »):
     /// a quest can ask more than its previous quests; where the game's own list of the quests it offers covers the map (<paramref name="offered"/>,
     /// <see cref="Offered"/>), a quest not started is available only when the game offers it there.
     /// </remarks>

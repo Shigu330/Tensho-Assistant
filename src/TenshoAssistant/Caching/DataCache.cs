@@ -217,22 +217,28 @@ public sealed class DataCache : IDisposable
         catch(Exception error) when(error is IOException or UnauthorizedAccessException){return false;}
     }
     // Off the io lock: both copies are read again (each at most MaximumEntryBytes) and compared once, when the patch is first seen.
+    // X-359 M1 (0.1382): the reports file is then read again and written under the profile's lock, in one go: a report another client
+    // wrote meanwhile is kept (before, the list read off the lock was written back over it).
     private void Report(List<PatchMove> moved)
     {
         try
         {
-            var reports=ReadReports().ToList();
+            var made=new List<PatchCatalogReport>();
             foreach(var move in moved)
             {
                 var before=ReadEnvelope(move.Previous);var after=ReadEnvelope(move.Current);
                 if(before is null || after is null)continue;
-                var report=PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow);
-                reports.RemoveAll(row=>row.Family==report.Family && row.Scope==report.Scope);reports.Add(report);
-                Volatile.Write(ref patchReports,reports.ToArray());
-                try{PatchReported?.Invoke(report);}catch(Exception){}
+                made.Add(PatchCatalogDiff.Compare(move.Family,move.Scope,before.Version,before.Value,after.Version,after.Value,DateTimeOffset.UtcNow));
             }
-            var bytes=JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions);
-            using(HoldProfile(lifetime.Token))AtomicFile.Write(PatchReportsPath,bytes);
+            if(made.Count==0)return;
+            PatchCatalogReport[] reports;
+            using(HoldProfile(lifetime.Token))
+            {
+                reports=WithReports(ReadReports(),made);
+                AtomicFile.Write(PatchReportsPath,JsonSerializer.SerializeToUtf8Bytes(reports,JsonOptions));
+            }
+            Volatile.Write(ref patchReports,reports);
+            foreach(var report in made)try{PatchReported?.Invoke(report);}catch(Exception){}
         }
         catch(OperationCanceledException){}
         catch(Exception failure) when(failure is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
@@ -243,6 +249,9 @@ public sealed class DataCache : IDisposable
         if(!File.Exists(path) || new FileInfo(path).Length is <=0 or >MaximumEntryBytes)return null;
         return JsonSerializer.Deserialize<Envelope>(File.ReadAllBytes(path),JsonOptions) is {Schema:1} envelope ? envelope:null;
     }
+    /// <summary>X-359 M1 (0.1382): the saved reports with the new ones, each family and scope once (the new one replacing the saved one).</summary>
+    internal static PatchCatalogReport[] WithReports(IEnumerable<PatchCatalogReport> saved,IReadOnlyList<PatchCatalogReport> made)
+        =>saved.Where(row=>!made.Any(report=>report.Family==row.Family && report.Scope==row.Scope)).Concat(made).ToArray();
     private IReadOnlyList<PatchCatalogReport> ReadReports()
     {
         var path=PatchReportsPath;
