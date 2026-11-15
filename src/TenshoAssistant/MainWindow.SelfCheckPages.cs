@@ -12,13 +12,25 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     private IReadOnlyList<(string Domain,Task<SelfCheckLine> Read)>? selfCheckPages;
+    // X-433 (0.1451): what each page's read allocated on its thread, said once they are all read (developer mode's cost, not a player's).
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string,long> selfCheckAllocated=new(StringComparer.Ordinal);
     /// <summary>X-92 (0.972): the game data check of this load (null result: failed or cancelled).</summary>
     internal Func<Task<GameDataReport?>>? GameDataCheck { get; set; }
 
     private void StartSelfCheckPages()
     {
         if(selfCheckPages is not null)return;
-        static (string,Task<SelfCheckLine>) Page(string domain,Func<Task<SelfCheckLine>> read)=>(domain,Task.Run(read));
+        (string,Task<SelfCheckLine>) Page(string domain,Func<Task<SelfCheckLine>> page)
+        {
+            // X-433 (0.1451): measured on the thread that reads, until the read's first wait.
+            Task<SelfCheckLine> read()
+            {
+                var before=GC.GetAllocatedBytesForCurrentThread();
+                try{return page();}
+                finally{selfCheckAllocated[domain]=GC.GetAllocatedBytesForCurrentThread()-before;}
+            }
+            return (domain,Task.Run(read));
+        }
         selfCheckPages=
         [
             Page("Eureka and Bozja",()=>Task.FromResult(FieldCatalogLoad?.Invoke() is { } field && field.Zones.Sum(zone=>zone.Events.Count)>0
@@ -87,6 +99,7 @@ internal sealed partial class MainWindow
                 return read?.Status==CarnivaleReadStatus.Loaded ? Diagnostics.SelfCheck.Ok("masked carnivale",$"{stages.Count} stages, {read.Completed.Count(done=>done)} done"):Diagnostics.SelfCheck.NotRead("masked carnivale",read?.Status.ToString() ?? "no reader");
             }),
         ];
+        _=Task.WhenAll(selfCheckPages.Select(page=>page.Read)).ContinueWith(_=>log.Information(Diagnostics.SelfCheck.PagesAllocated(selfCheckAllocated)),TaskScheduler.Default);
     }
 
     // X-323 (0.1318): the windows the page shows, computed from the catalogue read in the game (each night monster has one within 70 minutes).

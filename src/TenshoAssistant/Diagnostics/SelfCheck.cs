@@ -67,6 +67,17 @@ public static partial class SelfCheck
         return line.Length <= MaximumError ? line : line[..MaximumError] + "…";
     }
 
+    /// <summary>X-433 (0.1451): what the self-check's page reads allocated on their threads, the largest first (developer mode only).</summary>
+    public static string PagesAllocated(IEnumerable<KeyValuePair<string, long>> pages)
+    {
+        var read = pages.Where(page => page.Value > 0).OrderByDescending(page => page.Value).ThenBy(page => page.Key, StringComparer.Ordinal).ToArray();
+        static string Mb(long bytes) => bytes >= 10 * 1_048_576
+            ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{bytes / 1_048_576.0:0} MB")
+            : string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{bytes / 1_048_576.0:0.0} MB");
+        return $"Self-check pages' reads allocated (developer mode, on their threads, until their first wait): {Mb(read.Sum(page => page.Value))}"
+            + (read.Length == 0 ? "." : "; " + string.Join(", ", read.Select(page => page.Key + " " + Mb(page.Value))) + ".");
+    }
+
     public static string Summary(string reason, IReadOnlyCollection<SelfCheckLine> lines)
     {
         int Count(SelfCheckStatus status) => lines.Count(line => line.Status == status);
