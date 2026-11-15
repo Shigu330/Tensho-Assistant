@@ -215,7 +215,9 @@ internal sealed class GardenChatWatcher : IDisposable
         disposed=true;
         chat.ChatMessageUnhandled-=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
-        // X-453 M4 (0.1457): a build still running is waited for (2 s at most) and dropped: nothing of Tensho reads the game's data after this.
-        rulesBuild.Stop(TimeSpan.FromSeconds(2));
+        // X-453 M4 (0.1457): a build still running is waited for (2 s at most) and its result dropped. X-464 M1 (0.1466): one still running
+        // after the wait ends by itself (it may read the game's data until then): said in the log.
+        var ended=rulesBuild.Stop(TimeSpan.FromSeconds(2));
+        if(!ended)log.Information("Unload: the garden rules' build was still running after 2 s; it ends by itself and its result is dropped.");
     }
 }

@@ -33,7 +33,8 @@ public sealed class ChatSettings
     /// <summary>X-445 (0.1458): <see cref="CurrentTabs"/> once the tabs follow the game's default tabs (tabs saved before get Battle and Event
     /// once).</summary>
     public int TabsVersion{get;set;}
-    public const int CurrentTabs=1;
+    /// <summary>X-464 (0.1466): 2, the Battle and Event tabs count no unread line; the General tab saved before 0.1458 leaves the NPC dialogue to Event.</summary>
+    public const int CurrentTabs=2;
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
@@ -47,24 +48,37 @@ public sealed class ChatSettings
     {
         if(Tabs is { Count:>0 })
         {
-            if(TabsVersion<CurrentTabs)
+            if(TabsVersion<1)
             {
                 var at=1;
                 foreach(var (name,channel) in new[]{(battleName,ChatChannel.Combat),(eventName,ChatChannel.Npc)})
                 {
                     if(Tabs.Count>=MaximumTabs || Tabs.Any(tab=>tab.Channels is [var only] && only==channel))continue;
-                    Tabs.Insert(Math.Min(at,Tabs.Count),new(){Name=name,Channels=[channel]});
+                    Tabs.Insert(Math.Min(at,Tabs.Count),new(){Name=name,Channels=[channel],ShowUnread=false});
                     at++;
                 }
-                TabsVersion=CurrentTabs;
             }
+            if(TabsVersion<2)
+            {
+                // X-464 M2 (0.1466): the Battle and Event tabs made in 0.1458 (one channel) count no unread line, as the game counts none.
+                foreach(var tab in Tabs)
+                    if(tab.Channels is [var only] && only is ChatChannel.Combat or ChatChannel.Npc)tab.ShowUnread=false;
+                // X-464 M3 (0.1466): the General tab saved before 0.1458 (every channel but Combat, exactly) leaves the NPC dialogue to Event.
+                if(Tabs.Any(tab=>tab.Channels is [ChatChannel.Npc]))
+                {
+                    var oldGeneral=ChatChannels.All.Where(channel=>channel!=ChatChannel.Combat).ToHashSet();
+                    foreach(var tab in Tabs)
+                        if(tab.Channels is { Count:>1 } channels && channels.ToHashSet().SetEquals(oldGeneral))channels.Remove(ChatChannel.Npc);
+                }
+            }
+            TabsVersion=CurrentTabs;
             return Tabs;
         }
         Tabs=
         [
             new(){Name=generalName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.General).ToList()},
-            new(){Name=battleName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Battle).ToList()},
-            new(){Name=eventName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Event).ToList()},
+            new(){Name=battleName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Battle).ToList(),ShowUnread=false},
+            new(){Name=eventName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Event).ToList(),ShowUnread=false},
             new(){Name=socialName,Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()},
         ];
         TabsVersion=CurrentTabs;
