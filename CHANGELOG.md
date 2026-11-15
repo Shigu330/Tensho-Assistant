@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1371.0
+- Plan global, X-373 : Tests : le test « Settings saver 1164 : le déchargement écrit ce qui reste » ne dépend plus d'un délai réel. L'écriture en cours est retenue par une porte que le test ouvre lui-même, au lieu de 400 ms de vrai temps qu'une machine de la CI lente pouvait dépasser (échec « the wait ran out », CI de 0.1354.0). Même comportement vérifié : l'attente expire, rien n'est écrit tant que la porte est fermée, puis les réglages vivants finissent sur le disque, sans écriture simultanée.
+- Tests : SettingsSaver1164Tests. Verify.ps1 (agent) : 2576/2576, 0 avertissement, 0 erreur ; DLL 0.1371.0.0. Rien à essayer en jeu.
+### English
+- Tests: the test « Settings saver 1164: unload writes what is left » no longer depends on a real delay. The write under way is held by a gate the test opens itself, instead of 400 ms of real time that a slow CI machine could outlast (failure « the wait ran out », CI of 0.1354.0). Same behaviour checked: the wait runs out, nothing is written while the gate is shut, then the live settings end on disk, never two writes at once.
+
 ## 0.1370.0
 - Plan global, X-367 : Échange des découvertes : quand GitHub ne répond pas, refuse la demande, dépasse son délai ou n'a pas encore publié le fichier commun, la page dit « GitHub injoignable ou fichier commun pas encore publié, réessayez plus tard » au lieu de « Fichier commun illisible » (relecture du bloc 0.1346 à 0.1349, M1 ; décision D-159). Un fichier vraiment abîmé (JSON illisible, empreinte fausse) reste « illisible ». Hors version : l'outil de propreté de l'agent refuse un mode ou une option mal tapés (M2) et l'échec de son auto-test, comme celui du garde-fou, arrête la publication (M3) ; le générateur de la mesure de charge de l'outil de fusion suit les règles de X-183 et son auto-test passe (X-362).
 - Pour les joueurs : échange des découvertes : quand GitHub est injoignable, la page dit de réessayer plus tard au lieu de dire le fichier commun illisible.
