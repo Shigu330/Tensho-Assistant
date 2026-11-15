@@ -68,7 +68,7 @@ internal static class FestivalTests
             var map=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.MapView.cs"));
             // 0.1307 (X-266): with the quests seen; rebuilt too when one of the quests its vendors wait for changes.
             Check(map.Contains("same.Contains(spot.MapId) && Npcs.NpcShopLinks.Present(spot,running,seen)") && map.Contains("|| mapVendorCache.Festivals!=festivalKey")
-                && map.Contains("|| mapVendorQuests.Quests.Length>0 && MapVendorQuestKey(mapVendorQuests.Quests)!=mapVendorQuests.Seen)"),"filtered, rebuilt");
+                && map.Contains("|| MapVendorQuestsChanged())") && map.Contains("return MapVendorQuestKey(mapVendorQuests.Quests)!=mapVendorQuests.Seen;"),"filtered, rebuilt");
         }),
     ];
 }

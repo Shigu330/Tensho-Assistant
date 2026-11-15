@@ -56,7 +56,7 @@ internal sealed partial class MainWindow
             Tip("Alarms.EditDateTip");
             if(WorldClocks.ParseLocal(alarmEditDate,now) is { } moved)
             {
-                if(ImGui.IsItemDeactivatedAfterEdit() && AlarmSchedule.Move(alarm,moved)){changed=true;NoteGameCopy([alarm]);}
+                if(ImGui.IsItemDeactivatedAfterEdit() && AlarmSchedule.Move(alarm,moved,now)){changed=true;NoteGameCopy([alarm]);}
             }
             else ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Alarms.EditDateBad"));
         }

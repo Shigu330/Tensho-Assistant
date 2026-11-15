@@ -38,7 +38,7 @@ internal static class BeastmasterGear1289Tests
         ("X-277: the gear loader reads the category raw, by column", () =>
         {
             var loader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gear/GearLoader.Dalamud.cs"));
-            Check(loader.Contains("GetSheet<Lumina.Excel.RawRow>(null,\"ClassJobCategory\")") && loader.Contains("GearJobMask.Of(jobs,index=>category.ReadColumn(index))")
+            Check(loader.Contains("GetSheet<Lumina.Excel.RawRow>(null,\"ClassJobCategory\")") && loader.Contains("GearJobMask.Of(jobs,index=>category.ReadColumn(index),categories.Columns.Count)")
                 && !loader.Contains("typeof(ClassJobCategory).GetProperties()"), "raw read, no name matching");
         }),
     ];

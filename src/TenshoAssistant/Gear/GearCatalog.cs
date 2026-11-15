@@ -11,10 +11,11 @@ namespace TenshoAssistant.Gear;
 /// </summary>
 public static class GearJobMask
 {
-    public static ulong Of(IEnumerable<uint> jobs,Func<int,object?> column)
+    /// <param name="columns">X-336 M8 (0.1380, R08): the sheet's column count; a job beyond it (a shorter sheet after a patch) is not read.</param>
+    public static ulong Of(IEnumerable<uint> jobs,Func<int,object?> column,int columns=int.MaxValue)
     {
         ulong mask=0;
-        foreach(var job in jobs)if(job<64 && column((int)job+1) is true)mask|=1UL<<(int)job;
+        foreach(var job in jobs)if(job<64 && (int)job+1<columns && column((int)job+1) is true)mask|=1UL<<(int)job;
         return mask;
     }
 }

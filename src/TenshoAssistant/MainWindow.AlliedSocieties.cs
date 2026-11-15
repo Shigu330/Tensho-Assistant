@@ -95,6 +95,8 @@ internal sealed partial class MainWindow
     }
 
     // X-265 (0.1306): a kind's name as the game writes it (« artisans »), with a capital in the list.
-    private static string AlliedKindName(AlliedCatalog catalog,AlliedKind kind)=>Capitalized(catalog.KindNames.GetValueOrDefault(kind) ?? kind.ToString());
+    // X-336 M9 (0.1380, R09): without the game's name, Tensho's word in the plugin's language, never the enum's English name.
+    private string AlliedKindName(AlliedCatalog catalog,AlliedKind kind)=>Capitalized(catalog.KindNames.GetValueOrDefault(kind)
+        ?? localization.Get(kind switch{AlliedKind.Combat=>"Allied.KindCombat",AlliedKind.Crafting=>"Allied.KindCrafting",_=>"Allied.KindGathering"}));
     private static string Capitalized(string text)=>text.Length==0 ? text:char.ToUpper(text[0],System.Globalization.CultureInfo.InvariantCulture)+text[1..];
 }

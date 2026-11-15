@@ -144,6 +144,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     InventoryBankService.ValidateEntries(rowsAfter);
                     if(change.Erase!=0 || !StillSaved(change,rowsBefore) && !rowsBefore.SequenceEqual(rowsAfter))WriteRows(open,transaction,id,rowsAfter);
                     everyone=Rows(open,transaction);
+                    // X-336 M12 (0.1380): checked before the commit: an invalid row makes the save fail as a whole, never after it was written.
+                    InventoryBankService.ValidateEntries(everyone);
                     transaction.Commit();
                     return rowsAfter;
                 }
@@ -161,7 +163,8 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                 if(!StillSaved(change,before) && !before.SequenceEqual(after))Store(id).Save(after);
                 return after;
             });
-            var result=everyone ?? memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
+            if(everyone is not null)return everyone;
+            var result=memory.Where(entry=>entry.Key.CharacterId!=id).Concat(saved).ToArray();
             InventoryBankService.ValidateEntries(result);
             return result;
         }

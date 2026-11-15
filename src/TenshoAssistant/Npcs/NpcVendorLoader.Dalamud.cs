@@ -296,7 +296,7 @@ internal sealed class NpcVendorLoader : IDisposable
                     case NpcShopLinks.DuringQuest:
                         scripts??=data.GetExcelSheet<Quest>().Select(quest=>(quest.RowId,quest.Id.ExtractText())).Where(quest=>quest.Item2.Length>0).ToList();
                         var quests=questLayers.TryGetValue(key,out var keys) ? keys.SelectMany(layerKey=>NpcShopLinks.QuestsOf(layerKey,scripts)).Distinct().Order().ToArray():[];
-                        list[index]=list[index] with {Condition=NpcShopLinks.DuringQuest,Quests=quests.Length>0 ? quests:null};
+                        if(NpcShopLinks.QuestLinked(quests.Length)==NpcShopLinks.DuringQuest)list[index]=list[index] with {Condition=NpcShopLinks.DuringQuest,Quests=quests};
                         byQuest++;if(quests.Length>0)linked++;
                         break;
                 }

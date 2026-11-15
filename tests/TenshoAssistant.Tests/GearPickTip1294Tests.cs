@@ -18,7 +18,7 @@ internal static class GearPickTip1294Tests
             var gear = Read("MainWindow.Gear.cs");
             var pick = gear[gear.IndexOf("private void DrawGearPick(", StringComparison.Ordinal)..gear.IndexOf("private readonly record struct GearPickKey", StringComparison.Ordinal)];
             Check(!pick.Contains("Gear.Param") && !pick.Contains("in differences"), "no difference text in the list");
-            Check(pick.Contains("SameLineOrNext(localization.Format(\"Gear.LevelLine\"") && pick.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "level line wraps; tooltip on hover");
+            Check(pick.Contains("ImGui.SameLine();\n                        ImGui.TextDisabled(localization.Format(\"Gear.LevelLine\"") || pick.Contains("ImGui.SameLine();\r\n                        ImGui.TextDisabled(localization.Format(\"Gear.LevelLine\"") && pick.Contains("DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly)"), "level line wraps; tooltip on hover");
             Check(!gear.Contains("PickDifferences"), "the old three differences are gone");
         }),
         ("X-290: one way to draw stats: the comparator and the list's tooltip share DrawStatPairs and the comparison", () =>

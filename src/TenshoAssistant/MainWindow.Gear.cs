@@ -346,9 +346,10 @@ internal sealed partial class MainWindow
                         // were cut (« +4 I », « -5 Détermination »): they are in the piece's tooltip, with its stats, as the hover comparator shows them.
                         if(ImGui.IsItemHovered())DrawItemInfoTooltip(candidate.Id,glamourOnly:glamourOnly);
                         ItemLinksMenu($"GearPickMenu{candidate.Id}",definition);
-                        SameLineOrNext(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
+                        // X-336 M7 (0.1380): one line per row inside the clipper (rows of one height, or the scrolling goes wrong).
+                        ImGui.SameLine();
                         ImGui.TextDisabled(localization.Format("Gear.LevelLine",candidate.Level,candidate.ItemLevel));
-                        if(glamourOnly){SameLineOrNext(localization.Get("Gear.GlamourOnly"));ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));}
+                        if(glamourOnly){ImGui.SameLine();ImGui.TextColored(UI.FfxivTheme.Gold,localization.Get("Gear.GlamourOnly"));}
                     }
                 }
                 finally{clipper.End();clipper.Destroy();}

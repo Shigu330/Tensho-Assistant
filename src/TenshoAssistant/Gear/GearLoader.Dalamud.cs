@@ -95,7 +95,7 @@ public sealed unsafe class GearLoader : IDisposable
             if(!masks.TryGetValue(categoryId,out var mask))
             {
                 mask=0;
-                if(categories.TryGetRow(categoryId,out var category))mask=GearJobMask.Of(jobs,index=>category.ReadColumn(index));
+                if(categories.TryGetRow(categoryId,out var category))mask=GearJobMask.Of(jobs,index=>category.ReadColumn(index),categories.Columns.Count);
                 masks[categoryId]=mask;
             }
             if(mask==0)continue;

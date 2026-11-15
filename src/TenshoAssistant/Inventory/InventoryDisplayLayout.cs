@@ -4,12 +4,6 @@ namespace TenshoAssistant.Inventory;
 public static class InventoryDisplayLayout
 {
     /// <summary>
-    /// Containers without a bag layout, shown in slot order: armoury chest, glamour dresser, armoire (0.237) and, 0.463 (in-game campaign), the company chest (20000 to 22001: pages, gil,
-    /// crystals), for which the game keeps no display order.
-    /// </summary>
-    public static bool HasNoBagLayout(int container)=>container is >= 3200 and < 4000 or >= 20000 and <= 22001 or >= 25000;
-
-    /// <summary>
     /// X-275 (0.1285): the containers the game orders visually (bags 0–3, saddlebags, retainer pages 10000–10006). Every other container
     /// of a storage (a retainer's gil 12000 and crystals 12001 since 0.767, currencies, crystals) is shown in slot order: mixed in the
     /// visual order, its stacks without a position made the retainer's whole tab fail.
