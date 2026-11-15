@@ -9,7 +9,7 @@ internal static class ReadmeShort1091Tests
         ("README: short, one Features section per language, credits kept",() =>
         {
             var text = File.ReadAllText(Path.GetFullPath("README.md")).Replace("\r\n","\n");
-            var half = text.IndexOf("\n---\n\n# TenshoAssistant\n",StringComparison.Ordinal);
+            var half = text.IndexOf("\n---\n\n# Tensho Assistant\n",StringComparison.Ordinal);
             Check(half > 0,"one bilingual README (A079)");
             var en = text[..half];
             var fr = text[half..];

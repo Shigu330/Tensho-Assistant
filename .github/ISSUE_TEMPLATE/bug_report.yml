@@ -13,7 +13,7 @@ body:
     id: version
     attributes:
       label: Tensho version
-      description: First line of the diagnostic report (Settings › Advanced › Help and reporting › Copy the diagnostic report), e.g. « Tensho Assistant 0.1200.0 » (yours may differ).
+      description: First line of the diagnostic report (Settings › Advanced › Help and reporting › Copy the diagnostic report), e.g. « Tensho: 0.1200.0 · en · page Home » (yours may differ).
     validations:
       required: true
   - type: input

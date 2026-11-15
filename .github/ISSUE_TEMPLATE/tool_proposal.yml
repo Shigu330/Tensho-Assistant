@@ -42,7 +42,7 @@ body:
     attributes:
       label: Who would write it?
       options:
-        - I would like to write it (see "Adding a tool" in CONTRIBUTING.md)
+        - I would like to write it (see « Adding a tool » in CONTRIBUTING.md)
         - I am only suggesting it
     validations:
       required: true

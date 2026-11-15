@@ -11,7 +11,7 @@ the official repository, DEC-039).
 The step queue a) to h) (2026-11-02 to 2026-11-04) and the foundation notes (2026-10-27 to 2026-10-28) were history; they were removed from
 this file on 2026-11-08 and stay readable in git (this file in commit `2da535d`, 0.865.0).
 
-Origin: the master prompt, §4 (maintainer's notes, outside the repository; a historical source since 2026-11-09, the user's
+Origin: the maintainer's initial notes (outside the repository; a historical source since 2026-11-09, the user's
 decisions and [DECISIONS](DECISIONS.md) prevail). Every row is kept. State
 describes the work; Coverage describes the capacity actually validated. TODO/READY/ACTIVE/BLOCKED/DONE; NOT_STARTED/PARTIAL/FUNCTIONAL/
 REPLACEABLE. NEEDS_STUDY is a note of uncertainty, not a removal. No arbitrary percentage.
@@ -61,7 +61,7 @@ game. The plans R-06 and R-11 are the author's working notes, outside the reposi
 | R-06 | Interface overhaul | steps 1 (0.247–0.263), 2 (0.264), 4 (0.270–0.271); 3 mostly (item sheet 0.272, Storage 0.280); 5 in part (↺ 0.249–0.262, « Reset everything to default » 0.258, tooltips on every setting 0.287, map settings 0.288–0.289); 6: lightness (0.290–0.292) and the game's title font (0.293–0.294) | 0.265–0.271, 0.276–0.279, 0.287–0.294 | useful missing settings (step 5, point d); game frames and textures (step 6, removed in 0.510, DEC-033); `FilteredTable` removed from the plan (DEC-023) |
 | R-07 | Free company | page and expeditions 0.307, best routes 0.309, builds 0.315; DEC-023 follow-up done: flagged sectors 0.334, market prices and tiers 0.335, airships 0.336–0.337; history 0.379 | no | to validate in game |
 | R-08 | Reminders | page 0.300, icon and tooltip in the server bar 0.300–0.302, expeditions 0.307, squadron 0.333; then step g (M-01 to M-05, N-01 to N-03) | no | Ehcatl Nine left out (nothing readable, 0.334); to validate in game |
-| R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | to validate; no future dates (no reliable source) |
+| R-09 | Seasonal events | Events page (0.342): running, quests, shops, names | 0.342 | no future dates (no reliable source) |
 | R-10 | Cache audit | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), second check in 0.281 (« Never » duration) | — | — |
 | R-11 | Gear | step 1 (0.310), glamour (0.311), materia and caps (0.312–0.313), sources and ownership (0.314), vessel builds (0.315) | 0.310–0.314 | 0.315 and 0.340 to validate; step 4: chocobo barding DONE 0.340, Chocobo page 0.341 (squadron left out, recommended default, decision at the end) |
 | R-12 | Discord webhook for alarms | 0.319 | no | to validate in game; used later by C-10, I-02, M-01 |
@@ -89,25 +89,25 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
-| D-148 | X-01 (relay 47): on each load, also wait for the invisible watchers of the same loop as the panels (regrowth, hunt train, garden, sales, plots, discoveries…), 3 s at most, besides the panels and free bars decided on 13/11 | a) yes, the whole loop waits (recommended: their first run also cost 2 to 16 ms each; they read a game state, nothing is lost in 1 to 3 s) |  |
+| D-148 | X-01: on each load, also wait for the invisible watchers of the same loop as the panels (regrowth, hunt train, garden, sales, plots, discoveries…), 3 s at most, besides the panels and free bars decided on 13/11 | a) yes, the whole loop waits (recommended: their first run also cost 2 to 16 ms each; they read a game state, nothing is lost in 1 to 3 s) |  |
 | D-150 | X-312: Discord message of alarms beyond 60 min (« in 1440 min ») | applied (0.1316): new placeholder [left] (« in 1 h 30 ») used by the default message; [minutes] keeps the number for the messages players already wrote |  |
-| D-151 | Relays: one writer or two, reserve 21 % above the floor (the user's question of 14/11 around 12:05) | Medium-effort Opus trial: one writer, the next repetitive block on a medium-effort Opus relay, measured against high-effort Opus (R26.6) |  |
-| D-152 | Report a bug: direct sending through Tensho's GitHub connection (R04: request on a click, player data), the user's answer of 14/11 around 12:40: the form is fine since it sends on a click, not by itself, and only when the person chooses to, knowingly | Direct sending on a click, with the text shown and read first, by the connected GitHub account; without a connection: the browser form as today |  |
+| D-152 | Report a bug: direct sending through Tensho's GitHub connection (request on a click, player data) | Direct sending on a click, with the text shown and read first, by the connected GitHub account; without a connection: the browser form as today |  |
 | D-154 | X-57 (cook quest in Limsa, map): the user no longer has the quest, reading it in game is impossible (14/11 afternoon: on hold unless the same problem comes back) | On hold: moved to « later », taken up again only if the same problem comes back, with a screenshot |  |
-| D-157 | Order of the two points before the announcement (14/11 around 16:50; the user: « tools before Fable ») | First the clean GitHub repository and its upkeep tools (inventory shown to the user before any cleanup), then the full review of the texts players see with Fable and ultracode |  |
-| D-158 | X-357, accessibility label never set nor cited (added by relay 61 to point 10 of the inventory) | Remove it with in-game-test, probe and decision (recommended; the user chose « recommended » for the whole inventory on 14/11 around 17:20) |  |
+| D-157 | Order of the two points before the announcement (14/11 around 16:50; the user: « tools before Fable ») | First the clean GitHub repository and its upkeep tools (inventory shown to the user before any cleanup), then the full review of the texts players see |  |
+| D-158 | X-357, accessibility label never set nor cited | Remove it with in-game-test, probe and decision (recommended; the user chose « recommended » for the whole inventory on 14/11 around 17:20) |  |
 | D-163 | X-374: the 5 vocabulary questions of the X-356 report (deck, Eorzea time, data center, vistas, craft): the client's official name where it does not get in the way, applied in 0.1355 and 0.1356 | Applied: heure éorzéenne and HE (Addon#1129.0, Addon#1132.0), Centre de traitement de données (Addon#10890.0), vents éthérés, carnet d'artisanat, Triple Triade, valeur de collection, état Normal/Bon; « deck » kept (the client says « jeu », which would be confused with « the game ») but the game's windows named by their labels (« Modifier le jeu », « Jeux » tab); in 0.1356 (X-375): « lieu notoire » for vistas (LogMessage#1272.5, instead of panorama and repère), « synthèse » or « artisanat » instead of « craft » (Addon#210.0, Addon#1400.0) |  |
+| D-164 | Annonce publique de Tensho : où la poster ? | Un post Reddit (rappel de l'utilisateur du 15/11 : « on avait parlé d'un post reddit pour pas ennuyer dalamud ») : pas de message sur le Discord de Dalamud pour Tensho ; texte préparé par l'agent, posté par l'utilisateur (Reddit et forums : PLAN-SYSTEME) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
 
 The current list: the boxes of [TESTING.md](TESTING.md). The guided in-game campaign of the whole plugin is phase 6 of the
-[global plan](GLOBAL-PLAN.md). Records still asked for (data unknown, see « To decide »): marker type of an accepted leve; quest icon
-variants 71141 / 71151.
+[global plan](GLOBAL-PLAN.md). Records still asked for (data unknown): marker type of an accepted leve; quest icon
+variants 71141 / 71151 (see « To decide », D-88).
 
 ## Complementary domain
 
-Combat/ACT/IINACT: removed from the project (user decision 2026-10-31).
+Combat/ACT/IINACT: removed from the project (user decision 2026-10-31), except help in the Crucible of the Unbroken and preparation information in PvE ([DECISIONS](DECISIONS.md), DEC-032, DEC-041, DEC-046, DEC-047).
 
 ---
 
@@ -122,14 +122,14 @@ décisions prises en route. Les 17 lignes restent PARTIAL : aucune validation en
 La file d'étapes a) à h) (2026-11-02 au 2026-11-04) et les notes de fondation (2026-10-27 au 2026-10-28) étaient de l'historique ; elles
 ont été retirées de ce fichier le 2026-11-08 et restent lisibles dans git (ce fichier au commit `2da535d`, 0.865.0).
 
-Origine : le prompt maître, §4 (notes du mainteneur, hors du dépôt ; source historique depuis le 2026-11-09, les décisions de
+Origine : les notes initiales du mainteneur (hors du dépôt ; source historique depuis le 2026-11-09, les décisions de
 l'utilisateur et [DECISIONS](DECISIONS.md) priment). Toutes les lignes sont
 conservées. State décrit le travail ; Coverage décrit la capacité réellement validée. TODO/READY/ACTIVE/BLOCKED/DONE ;
 NOT_STARTED/PARTIAL/FUNCTIONAL/REPLACEABLE. NEEDS_STUDY est une note d'incertitude, pas une suppression. Aucun pourcentage arbitraire.
 
 ## Matrice principale
 
-La colonne « Travail » a été écrite au 0.315 (2026-11-02) et complétée jusqu'au 0.512 ; la suite est dans le
+La colonne « Travail » a été écrite à la 0.315 (2026-11-02) et complétée jusqu'à la 0.512 ; la suite est dans le
 [CHANGELOG](../../CHANGELOG.md) et le [plan global](GLOBAL-PLAN.md). « Validé » = rapport ou capture de l'utilisateur ; les autres
 versions citées sont à valider en jeu. Les fiches d'objectifs que citaient ces lignes étaient des notes de travail de l'auteur,
 hors du dépôt.
@@ -150,11 +150,11 @@ hors du dépôt.
 | 12 | MAP-001 | Mappy | MidoriKami, harbingerftw | Carte en jeu polyvalente | ACTIVE | PARTIAL | Carte Tensho remplaçant la carte du jeu (M, quête du journal, éthérites) : icônes du jeu à taille/priorité par carte, quêtes et mandats, ALÉA, groupe, récolte/pêche à horaires, vents éthérés, exploration (météo du wiki), marchands, drapeau, téléportation au coût réel, listes par onglet. Validé en jeu : 0.100–0.156 (dont carte hôte hors écran, zones colorées, zoom, maisons des splendeurs de Rowena), variantes de carte (0.171–0.175), icônes de quêtes (0.211), réglages et cône de vision (0.287–0.289), repères au bord de la carte et « Retirer le drapeau » (0.297–0.299), menus et outils par-dessus la carte (0.303–0.306). À valider : R-01 (0.242–0.243), R-03 (0.244), R-04 (0.245), fond du zoom (0.308). Inconnus : type de marqueur des mandats, sens des variantes d'icônes de quête | [icônes d'événements](../evidence/0.211-event-icons.md) | C |
 | 13 | LOOT-001 | Monster Loot Hunter | Sylf | Sources de matériaux sur les monstres | ACTIVE | PARTIAL | Matériau/monstre/zone, fiches, cache/cadence/annulation et contexte testés ; LuminaSupplemental (MobDrop) en tête (0.190, validé), puis le wiki FFXIV et Garland pour les lieux ; données partielles | — | B |
 | 14 | MARKET-001 | Price Insight | Kouzukii | Prix du marché au survol d'un objet | ACTIVE | PARTIAL | Consultation manuelle et survol sur option NQ/HQ/monde, accroché à l'infobulle, stock et moins cher du centre de données validés en jeu (0.85–0.86) ; page Marché enrichie (R-06 étape 4 : annonces Universalis, filtres, coût pour N unités, historique, tri des colonnes) validée en jeu (0.270–0.271) ; repli sur le cache disque si Universalis échoue (0.281, à valider) | [annonces Universalis](../evidence/0.270-universalis-listings.md) | B |
-| 15 | QUEST-001 | QuestTracker | isaiahcat, keifufu | Progression et complétion des quêtes | ACTIVE | PARTIAL | Fiches/liens/niveaux/zones/carte, récompenses natives conditionnelles et index inverse Objet → quête hors du dessin ; progression observée jointe aux sources d'un objet (0.76, validé) ; types de quêtes des sections du journal, pourcentages, cités de départ et options non prises (0.283–0.286, validés). Monnaies/rangs non prouvés ; disponibilité à compléter | [sections du journal](../evidence/0.283-quest-journal-sections.md), [cités de départ](../evidence/0.285-quest-start-cities.md), [options](../evidence/0.286-quest-alternatives.md) | B |
+| 15 | QUEST-001 | QuestTracker | isaiahcat, keifufu | Progression et complétion des quêtes | ACTIVE | PARTIAL | Fiches/liens/niveaux/zones/carte, récompenses natives conditionnelles et index inverse Objet → quête hors du dessin ; progression observée jointe aux sources d'un objet (0.76, validé) ; types de quêtes des sections du journal, pourcentages, cités de départ et options non prises (0.283–0.286, validés). Devises/rangs non prouvés ; disponibilité à compléter | [sections du journal](../evidence/0.283-quest-journal-sections.md), [cités de départ](../evidence/0.285-quest-start-cities.md), [options](../evidence/0.286-quest-alternatives.md) | B |
 | 16 | SORT-001 | SortaKinda | MidoriKami | Personnalisation de l'inventaire, règles, aperçu et application | ACTIVE | PARTIAL | Profils et modèles réutilisables, critères multiples, zones protégées/filtrées, remplissage dans les deux sens et application visuelle après capture directe ; tri natif validé en jeu (2026-10-30). Arsenal lu comme rangement (0.235, à valider) mais pas trié : tri de l'arsenal et tri automatique laissés pour plus tard (I-14) | — | A |
 | 17 | TRIAD-001 | TriadBuddy | MgAl2O4 | Solveur de Triple Triade | ACTIVE | PARTIAL | Carnet/deck/solveur manuel testés ; TRIAD-003 terminé : conseil superposé en match (0.160), % par deck et génération de deck à la fenêtre de défi (0.161), decks Tensho (0.162) validés en jeu ; carnet (menus, valeurs, tri, score estimé, cartes Ex.) validé (0.265–0.269, 0.276–0.279). Règles natives non couvertes | [cartes Ex.](../evidence/0.278-triad-ex-cards.md) | C |
 
-Les ID métier désignent la capacité globale, découpée en petits objectifs au moment de l'activation. CRAFT-001 commence par le
+Les ID de domaine désignent la capacité globale, découpée en petits objectifs au moment de l'activation. CRAFT-001 commence par le
 catalogue, puis simulation, macros et suggestions ; GATHER-001 par les lieux, puis horaires/météo/pêche ; SORT-001 par l'aperçu avant
 toute application native. Les autres capacités suivent le même principe, sans déclarer le plugin couvert dès la première tranche.
 
@@ -172,8 +172,8 @@ plans R-06 et R-11 sont des notes de travail de l'auteur, hors du dépôt.
 | R-05 | Ordre des fenêtres | clos sans code (2026-11-01, [preuve](../evidence/0.246-r05-window-order.md)) | — | — |
 | R-06 | Refonte de l'interface | étapes 1 (0.247–0.263), 2 (0.264), 4 (0.270–0.271) ; 3 pour l'essentiel (fiche objet 0.272, Rangements 0.280) ; 5 en partie (↺ 0.249–0.262, « Tout remettre par défaut » 0.258, infobulles de tous les réglages 0.287, réglages de carte 0.288–0.289) ; 6 : légèreté (0.290–0.292) et police de titre du jeu (0.293–0.294) | 0.265–0.271, 0.276–0.279, 0.287–0.294 | réglages utiles manquants (étape 5, point d) ; cadres et textures du jeu (étape 6, retirés en 0.510, DEC-033) ; `FilteredTable` retiré du plan (DEC-023) |
 | R-07 | Compagnie libre | page et expéditions 0.307, meilleurs trajets 0.309, montages 0.315 ; suite DEC-023 faite : secteurs signalés 0.334, prix du marché et paliers 0.335, aéronefs 0.336–0.337 ; historique 0.379 | non | à valider en jeu |
-| R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307, escouade 0.333 ; puis étape g (M-01 à M-05, N-01 à N-03) | non | Planeurs d'Ehcatl laissés (rien de lisible, 0.334) ; à valider en jeu |
-| R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | à valider ; pas de dates à venir (aucune source fiable) |
+| R-08 | Rappels | page 0.300, icône et infobulle dans la barre du serveur 0.300–0.302, expéditions 0.307, escouade 0.333 ; puis étape g (M-01 à M-05, N-01 à N-03) | non | Planeurs d'Ehcatl laissés de côté (rien de lisible, 0.334) ; à valider en jeu |
+| R-09 | Événements saisonniers | page Événements (0.342) : en cours, quêtes, boutiques, noms | 0.342 | pas de dates à venir (aucune source fiable) |
 | R-10 | Audit des caches | 0.246 ([audit](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/evidence/0.246-cache-audit.md)), revérifié 0.281 (durée « Jamais ») | — | — |
 | R-11 | Équipement | étape 1 (0.310), mirage (0.311), matérias et plafonds (0.312–0.313), sources et possession (0.314), montages de vaisseaux (0.315) | 0.310–0.314 | 0.315 et 0.340 à valider ; étape 4 : barde de chocobo FAITE 0.340, page Chocobo 0.341 (escouade retirée, défaut recommandé, décision de la fin) |
 | R-12 | Webhook Discord pour les alarmes | 0.319 | non | à valider en jeu ; utilisé ensuite par C-10, I-02, M-01 |
@@ -202,22 +202,22 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Bonus estimé d'Extraction/Récolte abondante (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
-| D-148 | X-01 (relais 47) : à chaque chargement, attendre aussi pour les observateurs invisibles de la même boucle que les panneaux (repousse, train de chasse, jardin, ventes, terrains, découvertes…), 3 s au plus, en plus des panneaux et barres libres décidés le 13/11 | a) oui, toute la boucle attend (recommandé : leur première exécution coûtait aussi 2 à 16 ms chacun ; ils lisent un état du jeu, rien ne se perd en 1 à 3 s) |  |
+| D-148 | X-01 : à chaque chargement, attendre aussi pour les observateurs invisibles de la même boucle que les panneaux (repousse, train de chasse, jardin, ventes, terrains, découvertes…), 3 s au plus, en plus des panneaux et barres libres décidés le 13/11 | a) oui, toute la boucle attend (recommandé : leur première exécution coûtait aussi 2 à 16 ms chacun ; ils lisent un état du jeu, rien ne se perd en 1 à 3 s) |  |
 | D-150 | X-312 : message Discord des alarmes au-delà de 60 min (« dans 1440 min ») | appliqué (0.1316) : nouveau repère [left] (« dans 1 h 30 ») pris par le message par défaut ; [minutes] garde le nombre pour les messages déjà écrits par les joueurs |  |
-| D-151 | Relais : un seul écrivain ou deux, réserve 21 % au-dessus du plancher (question de l'utilisateur du 14/11 vers 12 h 05) | Essai Opus moyen : un seul écrivain, le prochain bloc répétitif sur « Tensho · Relais Opus moyen », mesuré contre Opus élevé (R26.6) |  |
-| D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (R04 : requête sur clic, données du joueur), réponse de l'utilisateur du 14/11 vers 12 h 40 : « pour formulaire git c'est ok vu que ça envoie sur clic pas seul et la personne le fera que si elle a envie et en connaissance de cause » | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
+| D-152 | Signaler un bug : envoi direct par la connexion GitHub de Tensho (requête sur clic, données du joueur) | Envoi direct sur clic, avec le texte relu et montré avant, par le compte GitHub connecté ; sans connexion : le formulaire du navigateur comme aujourd'hui |  |
 | D-154 | X-57 (quête de cuisinier à Limsa, carte) : l'utilisateur n'a plus la quête, la lecture en jeu est impossible (14/11 après-midi : « je l'ai plus, on met en suspens si je retombe sur le même souci ») | En suspens : passé en « plus tard », repris seulement si le même souci revient, avec une capture |  |
-| D-157 | Ordre des deux points d'avant l'annonce (14/11 vers 16 h 50 ; l'utilisateur : « outils avant fable ») | D'abord le dépôt GitHub propre et ses outils de maintien (inventaire présenté à l'utilisateur avant tout nettoyage), puis la révision complète des textes vus par les joueurs en Fable + ultracode |  |
-| D-158 | X-357, étiquette accessibility jamais posée ni citée (ajout du relais 61 au point 10 de l'inventaire) | La retirer avec in-game-test, probe et decision (recommandé ; l'utilisateur a choisi « recommandé » pour tout l'inventaire le 14/11 vers 17 h 20) |  |
+| D-157 | Ordre des deux points d'avant l'annonce (14/11 vers 16 h 50 ; l'utilisateur : « outils avant fable ») | D'abord le dépôt GitHub propre et ses outils de maintien (inventaire présenté à l'utilisateur avant tout nettoyage), puis la révision complète des textes vus par les joueurs |  |
+| D-158 | X-357, étiquette accessibility jamais posée ni citée | La retirer avec in-game-test, probe et decision (recommandé ; l'utilisateur a choisi « recommandé » pour tout l'inventaire le 14/11 vers 17 h 20) |  |
 | D-163 | X-374 : les 5 questions de vocabulaire du rapport X-356 (deck, heure éorzéenne, centre de données, panoramas, craft) : le nom officiel du client là où il ne gêne pas, appliqué en 0.1355 et 0.1356 | Appliqué : heure éorzéenne et HE (Addon#1129.0, Addon#1132.0), Centre de traitement de données (Addon#10890.0), vents éthérés, carnet d'artisanat, Triple Triade, valeur de collection, état Normal/Bon ; « deck » gardé (le client dit « jeu », qui se confondrait avec « le jeu ») mais les fenêtres du jeu citées par leur nom (« Modifier le jeu », onglet « Jeux ») ; en 0.1356 (X-375) : « lieu notoire » pour les vistas (LogMessage#1272.5, au lieu de panorama et repère), « synthèse » ou « artisanat » au lieu de « craft » (Addon#210.0, Addon#1400.0) |  |
+| D-164 | Annonce publique de Tensho : où la poster ? | Un post Reddit (rappel de l'utilisateur du 15/11 : « on avait parlé d'un post reddit pour pas ennuyer dalamud ») : pas de message sur le Discord de Dalamud pour Tensho ; texte préparé par l'agent, posté par l'utilisateur (Reddit et forums : PLAN-SYSTEME) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
 
 La liste à jour : les cases de [TESTING.md](TESTING.md). La campagne guidée en jeu de tout le plugin est la phase 6 du
-[plan global](GLOBAL-PLAN.md). Relevés encore demandés (données inconnues, voir « À décider ») : type de marqueur d'un mandat accepté ;
-variantes d'icônes de quête 71141 / 71151.
+[plan global](GLOBAL-PLAN.md). Relevés encore demandés (données inconnues) : type de marqueur d'un mandat accepté ;
+variantes d'icônes de quête 71141 / 71151 (voir « À décider », D-88).
 
 ## Domaine complémentaire
 
-Combat/ACT/IINACT : retiré du projet (décision de l'utilisateur, 2026-10-31).
+Combat/ACT/IINACT : retiré du projet (décision de l'utilisateur, 2026-10-31), sauf l'aide du Dédale bestial et les informations de préparation en JcE ([DECISIONS](DECISIONS.md), DEC-032, DEC-041, DEC-046, DEC-047).

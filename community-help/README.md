@@ -73,13 +73,13 @@ Ajoutez une ligne à `guides` dans `index.json`, lancez `.\scripts\Verify.ps1 -T
 | `title` | 120 caractères au plus |
 | `author` | Facultatif, 60 caractères au plus |
 | `address` | https, sur un hôte accepté : YouTube (`www.youtube.com`, `youtube.com`, `youtu.be`), ou un fichier de ce dépôt sur `github.com` pour un guide écrit |
-| `forVersion` | Facultatif : la version du plugin qu'elle montre |
+| `forVersion` | Facultatif : la version du plugin montrée |
 
 Une ligne qui enfreint une règle fait échouer les tests, et le plugin refuse alors tout le fichier : vérifiez-la avant de la proposer.
 
 ## Ce qui est accepté
 
-- Elle montre Tensho tel qu'il fonctionne, sans automatisation ni outil interdit à l'image.
+- La vidéo ou le guide montre Tensho tel qu'il fonctionne, sans automatisation ni outil interdit à l'image.
 - Vous en avez les droits, ou son auteur est d'accord.
 - Aucun détail de personnage ou de compte de quelqu'un d'autre.
 - Un guide est retiré à la demande de son auteur, ou quand il ne correspond plus au plugin.

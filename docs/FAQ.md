@@ -26,7 +26,7 @@ Settings › General › Language. English and French are complete. German and J
 
 ## What goes on the Internet?
 
-Prices, loot, wiki pages and community data are asked of those community sites, with the item or page you are looking at. Each source can be turned off in Settings › Data and sources. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
+Prices, loot, wiki pages and community data are asked of the community sites that provide them, with the item or page you are looking at. Each source can be turned off in Settings › Data and sources. The list and the licences are in Credits. Prices you open at the market board are kept and, for your world, used in place of Universalis' when they are newer.
 
 ## Can I turn off the community data?
 
@@ -42,7 +42,7 @@ What the game has shown it (storages, collections, progress), your settings, not
 
 ## Where are my files, and how do I erase everything (and what I shared)?
 
-Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the folder %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, the discoveries, a cache). The desktop app adds %LOCALAPPDATA%\TenshoAssistant\ (its copy of the data, its cache and versions), which stays after you delete the app. To erase everything: remove Tensho in Dalamud, then delete that file and those folders. One character only: Storage › Characters › « Erase ». What you shared: « Disconnect » keeps your gist and your ticket on GitHub; delete the gist on github.com and close the ticket. Discoveries already merged into the shared base (CC0) stay in it: ask on GitHub to have yours withdrawn.
+Settings: %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant.json. Data: the folder %APPDATA%\XIVLauncher\pluginConfigs\TenshoAssistant\ (TenshoData.db, the discoveries, a cache). The desktop app adds %LOCALAPPDATA%\TenshoAssistant\ (its copy of the data, its cache and versions), which stays after you delete the app. To erase everything: remove Tensho in Dalamud, then delete that file and those folders. One character only: Storage › Characters › « Erase ». What you shared: « Disconnect » keeps your gist and your issue on GitHub; delete the gist on github.com and close the issue. Discoveries already merged into the shared base (CC0) stay in it: ask on GitHub to have yours withdrawn.
 
 ## Does Tensho play for me?
 
@@ -74,11 +74,11 @@ Its author chose to publish it on its own repository. Dalamud's support does not
 
 ## Where can I ask a question?
 
-On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in a ticket (« Report a problem or help » on the Help page).
+On the project's GitHub, in Discussions › Q&A (github.com/Shigu330/Tensho-Assistant/discussions). A question that comes back joins this list. A problem or an idea goes in an issue (« Report a problem or help » on the Help page).
 
 ## Something is wrong.
 
-Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the ticket leaves in one click; otherwise the GitHub form opens in your browser, filled in.
+Use « Report a problem or help » on the Help page, then « Send on GitHub… »: the exact text is shown first. With GitHub connected (World › Discoveries), the issue leaves in one click; otherwise the GitHub form opens in your browser, filled in.
 
 ## How can I help translate Tensho?
 
@@ -114,7 +114,7 @@ In the game, turn on Settings › Advanced › « Link with the desktop app » (
 
 ## Can Tensho install the desktop app for me?
 
-Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update of the desktop app », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
+Yes, if you want it (it is optional): Settings › Advanced › Desktop application › « Install the desktop app ». Tensho downloads TenshoAssistant.Desktop.zip from this repository's GitHub release of its own version (else the latest Stable release), checks its SHA-256 against the one published in the same release and unpacks it in the install folder (if left empty: %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Nothing is sent but the version asked, and the app is never started without your click on « Open the desktop app ». After that the app updates itself (« Automatic update of the desktop app », in the same section). Limit: the app is not code-signed, so the SHA-256 protects against a damaged download, not against a stolen GitHub account.
 
 Français :
 
@@ -144,7 +144,7 @@ Paramètres › Général › Langue. L'anglais et le français sont complets. L
 
 ## Qu'est-ce qui part sur Internet ?
 
-Les prix, le butin, les pages du wiki et les données communautaires sont demandés à ces sites, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Données et sources. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
+Les prix, le butin, les pages du wiki et les données communautaires sont demandés aux sites communautaires qui les fournissent, avec l'objet ou la page que vous consultez. Chaque source se coupe dans Paramètres › Données et sources. La liste et les licences sont dans Crédits. Les prix que vous ouvrez au tableau des ventes sont gardés et, pour votre monde, remplacent ceux d'Universalis quand ils sont plus récents.
 
 ## Puis-je couper les données communautaires ?
 
@@ -172,7 +172,7 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 
 ## Comment retirer les panneaux autour des fenêtres du jeu ?
 
-Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
+Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre du serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
@@ -184,7 +184,7 @@ Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage d
 
 ## Comment repartir de zéro ?
 
-Paramètres › Avancé › « Tout remettre par défaut » remet chaque réglage à sa valeur par défaut. Vos données restent : alarmes, préréglages, decks, plans et ce que le jeu a montré. Son info-bulle liste tout ce qui est gardé.
+Paramètres › Avancé › « Tout remettre par défaut » remet chaque réglage à sa valeur par défaut. Vos données restent : alarmes, préréglages, decks, plans et ce que le jeu a montré. Son infobulle liste tout ce qui est gardé.
 
 ## Pourquoi Tensho n'est-il pas dans la liste officielle de Dalamud ?
 
@@ -232,4 +232,4 @@ Dans le jeu, activez Paramètres › Avancé › « Lien avec l'application de b
 
 ## Tensho peut-il installer l'application de bureau pour moi ?
 
-Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique de l'application de bureau », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.
+Oui, si vous le voulez (c'est facultatif) : Paramètres › Avancé › Application de bureau › « Installer l'application de bureau ». Tensho télécharge TenshoAssistant.Desktop.zip depuis la release GitHub de ce dépôt qui a sa propre version (sinon la dernière Stable), vérifie son SHA-256 avec celui publié dans la même release et le dépaquette dans le dossier d'installation (s'il est laissé vide : %LOCALAPPDATA%\TenshoAssistant\Desktop\versions). Rien n'est envoyé sauf la version demandée, et l'application n'est jamais lancée sans votre clic sur « Ouvrir l'application de bureau ». Ensuite l'application se met à jour seule (« Mise à jour automatique de l'application de bureau », dans la même section). Limite : l'application n'est pas signée, donc le SHA-256 protège d'un téléchargement abîmé, pas d'un compte GitHub volé.

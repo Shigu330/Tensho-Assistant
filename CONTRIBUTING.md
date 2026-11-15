@@ -29,7 +29,7 @@ maintainer's tooling and falls back to the PATH when they are absent.
 
 Other help for contributors: the read-only probes that prove game facts are described in [tools/README.md](tools/README.md); issue and
 pull request templates are in `.github/`; an optional pre-push hook runs `Verify.ps1` before every push
-(`git config core.hooksPath .githooks`); editor defaults are in `.editorconfig`; the CI workflows (build, CodeQL, Dependabot) are in
+(`git config core.hooksPath .githooks`); editor defaults are in `.editorconfig`; the GitHub workflows (build, CodeQL, player report labels) and the Dependabot settings are in
 `.github/`.
 
 The script, run from the repository root, builds `TenshoAssistant.sln` in Release, runs the managed tests (`tests/TenshoAssistant.Tests`),
@@ -79,7 +79,7 @@ Development builds in game:
 - Code: `src/TenshoAssistant/` (one folder per domain; files ending in `*.Dalamud.cs` touch the game, files ending in `*.Lumina.cs` copy
   game sheets, and the others are pure C# and testable). Pages are `MainWindow.<Page>.cs` partial files, listed in `MainWindow.Pages.cs`;
   shared UI templates are in `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`, `EntityMenus`, `DataIndexes`, `Tooltip`,
-  `StatusLines`, `ToolButton`). Embedded data
+  `StatusLines`, `ToolButton`, `DeleteButton`, `Gauges`). Embedded data
   files are in `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` and `Localization/Languages/`. The code map is in
   [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests: `tests/TenshoAssistant.Tests/` (no-framework test program using `Check(condition, "message")`).
@@ -87,7 +87,7 @@ Development builds in game:
   scripts (`tools/submarine-loot.py`, `tools/garden-data.py`; `tools/discoveries-merge.py`, the maintainer's merge of the shared
   discoveries into `community-discoveries/`, see its [README](community-discoveries/README.md)).
 - Scripts: `scripts/Verify.ps1` (checks), `scripts/Release.ps1` (git steps, called by `Verify.ps1`), `scripts/New-Tool.ps1` (skeleton
-  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `scripts/commit-release.bat`.
+  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `scripts/Get-Dalamud.ps1` (checked Dalamud download for the CI), `scripts/LaunchProof.ps1` (launch proof read by the release), `scripts/commit-release.bat`.
 - Documentation: see [docs/README.md](docs/README.md). History: [CHANGELOG.md](CHANGELOG.md).
 
 ## Project rules
@@ -95,7 +95,7 @@ Development builds in game:
 - **Never invent game data.** Any data link (Excel sheet, native field, external format) must be proven: use a read-only probe
   (`tools/ShopCurrencyProbe`, `tools/ApiProbe`) or a cited source; the output must be kept in `docs/evidence/` and referenced in the code.
 - Game data first; community data only when the game does not have it (see `docs/project/DECISIONS.md`, DEC-011).
-- Unknown ≠ zero: display "unknown" instead of a guessed value; cite the source of community data (Garland Tools, FFXIV wiki, Universalis,
+- Unknown ≠ zero: display « unknown » instead of a guessed value; cite the source of community data (Garland Tools, FFXIV wiki, Universalis,
   GatherBuddy, Teamcraft, LuminaSupplemental, FFXIVGachaSpreadsheet, SubmarineTracker, and every other source on the Credits page).
 - Game memory: read on the framework thread and copied into managed data; nothing heavy in `Draw`; native string reads are bounded.
 - Network: requests are bounded in time and size and their results go through the disk cache (`Caching/DataCache.cs`). New community
@@ -164,7 +164,7 @@ gallery, see [community-templates/README.md](community-templates/README.md). Nei
 
 1. One branch per subject; keep each subject small and verifiable.
 2. `Verify.ps1` must be green; add new tests for the pure logic.
-3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was "validated in-game" or not), with a `### English`
+3. Add an entry in [CHANGELOG.md](CHANGELOG.md) (what, why, evidence, and whether it was « validated in game » or not), with a `### English`
    summary.
 4. Pull request towards `Devloppement`, describing the in-game test performed.
 
@@ -218,7 +218,7 @@ requires, among other things (restrictions and AI policy re-read on 2026-11-04):
   clearly AI-written submission means a ban; Copilot and Auto submissions are reviewed at the maintainers' discretion and may be closed if
   larger than the author can account for; the author must understand, test, and explain the code.
 
-**Current project status:** the code is written with an AI agent (level "Auto") under the direction of its author, who tries the changes
+**Current project status:** the code is written with an AI agent (level « Auto ») under the direction of its author, who tries the changes
 in game. Each release is built and tested automatically (compilation, tests, the desktop app drawn without a window), then loaded
 once in game with its self-check, which its notes say (« checked at launch, not tried in detail yet »); the detailed in-game tests
 come after, grouped in campaigns, and CHANGELOG.md says for each version whether it was validated in game. An urgent fix
@@ -282,7 +282,7 @@ du mainteneur et se replie sur le PATH quand ils sont absents.
 Autres aides pour les contributeurs : les sondes en lecture seule qui prouvent les faits du jeu sont décrites dans
 [tools/README.md](tools/README.md) ; les modèles de tickets et de pull requests sont dans `.github/` ; un hook pre-push facultatif lance
 `Verify.ps1` avant chaque push (`git config core.hooksPath .githooks`) ; les réglages de l'éditeur sont dans `.editorconfig` ; les
-workflows de CI (compilation, CodeQL, Dependabot) sont dans `.github/`.
+workflows GitHub (compilation, CodeQL, étiquettes des rapports de joueurs) et les réglages de Dependabot sont dans `.github/`.
 
 Le script, lancé depuis la racine du dépôt, compile `TenshoAssistant.sln` en Release, lance les tests managés
 (`tests/TenshoAssistant.Tests`), valide les fichiers de langue et contrôle le paquet (identité du manifeste, niveau d'API 15, version,
@@ -313,14 +313,14 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
 - Code : `src/TenshoAssistant/` (un dossier par domaine ; les fichiers en `*.Dalamud.cs` touchent au jeu, ceux en `*.Lumina.cs` copient
   des feuilles du jeu, et les autres sont du C# pur, testable). Les pages sont des fichiers partiels `MainWindow.<Page>.cs`, listés dans
   `MainWindow.Pages.cs` ; les modèles d'interface communs sont dans `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`,
-  `EntityMenus`, `DataIndexes`, `Tooltip`, `StatusLines`, `ToolButton`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
+  `EntityMenus`, `DataIndexes`, `Tooltip`, `StatusLines`, `ToolButton`, `DeleteButton`, `Gauges`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
   `Localization/Languages/`. La carte du code est dans [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests : `tests/TenshoAssistant.Tests/` (programme de test sans framework, avec `Check(condition, "message")`).
 - Sondes : `tools/` (programmes console en lecture seule sur les fichiers ou les API du jeu, par exemple `tools/ShopCurrencyProbe`,
   `tools/ApiProbe`) et scripts de données (`tools/submarine-loot.py`, `tools/garden-data.py` ; `tools/discoveries-merge.py`, la fusion
   par le mainteneur des découvertes partagées dans `community-discoveries/`, voir son [README](community-discoveries/README.md)).
 - Scripts : `scripts/Verify.ps1` (contrôles), `scripts/Release.ps1` (étapes git, appelé par `Verify.ps1`), `scripts/New-Tool.ps1`
-  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `scripts/commit-release.bat`.
+  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `scripts/Get-Dalamud.ps1` (téléchargement vérifié de Dalamud pour la CI), `scripts/LaunchProof.ps1` (preuve de lancement lue par la release), `scripts/commit-release.bat`.
 - Documentation : voir [docs/README.md](docs/README.md). Historique : [CHANGELOG.md](CHANGELOG.md).
 
 ## Règles du projet
@@ -337,7 +337,7 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
 - Réseau : les requêtes sont bornées en temps et en taille et leurs résultats passent par le cache disque (`Caching/DataCache.cs`). Les
   nouvelles sources de la communauté utilisent `Community/BoundedHttp.cs` ; les clients Universalis (`Market/MarketService.cs`,
   `Market/MarketBoardService.cs`) ont leur propre `HttpClient` avec un délai et une limite de taille de réponse, et le client Teamcraft
-  (`Community/FishBiteTimes.cs`) passe aussi par `BoundedHttp.SendAsync` (POST, lu dans 1 Mio). Les requêtes partent d'une action du
+  (`Community/FishBiteTimes.cs`) passe aussi par `BoundedHttp.SendAsync` (POST, réponse lue dans la limite de 1 Mio). Les requêtes partent d'une action du
   joueur ou d'une page qui a besoin des données, jamais en boucle après un échec. Chaque source a son interrupteur dans
   Paramètres › Données et sources, et « Données du jeu et observées seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
   (`Discoveries/GitHubExchange.cs`) n'envoie quelque chose qu'après la connexion du joueur à GitHub.
@@ -437,8 +437,7 @@ logique est dans `scripts/Release.ps1`. Sujets des commits : `x.y.z` la premièr
 release, `x.y.z · docs` après elle (documentation seulement).
 
 Dépôt Dalamud personnalisé (installation sans la DLL de développement) :
-`https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` (Dalamud › Settings › Experimental › Custom Plugin
-Repositories), mis à jour par chaque `-Release`.
+`https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json` (`/xlsettings` › Expérimental › Dépôts de plugins personnalisés), mis à jour par chaque `-Release`.
 
 ## Publication Dalamud
 
@@ -456,7 +455,7 @@ demande entre autres (restrictions et politique IA relues le 2026-11-04) :
   contournement de la Mog Station, aucune collecte des identifiants de compte des autres joueurs ;
 - [politique IA](https://dalamud.dev/plugin-publishing/ai-policy), pour information seulement : ce projet ne la suit plus, puisqu'il ne
   soumet rien (DEC-050), et son usage de l'IA reste déclaré. Pour une soumission, elle dit : l'usage de l'IA doit être **déclaré** dans la pull request (écrite
-  par un humain) ; une soumission **entièrement générée par IA sans réelle implication humaine est refusée**, et deux fois mènent à un
+  par un humain) ; une soumission **entièrement générée par IA sans réelle implication humaine est refusée**, et une deuxième fois mène à un
   bannissement ; un usage non déclaré dans une soumission clairement écrite par IA mène à un bannissement ; les soumissions Copilot et
   Auto sont examinées à la discrétion des mainteneurs et peuvent être fermées si elles dépassent ce dont l'auteur peut répondre ; l'auteur
   doit comprendre, tester et expliquer le code.

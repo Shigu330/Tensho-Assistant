@@ -38,14 +38,14 @@ for a time or for good, depending on what happened. A first problem usually gets
 # Code de conduite
 
 Tensho Assistant est un petit projet communautaire. Ce code s'applique à toute personne qui y participe sur GitHub : tickets,
-Discussions, demandes de fusion, relectures et commentaires, et l'échange des découvertes partagées.
+Discussions, pull requests, relectures et commentaires, et l'échange des découvertes partagées.
 
 ## Ce que nous attendons
 
 - Soyez aimable et patient : joueurs, traducteurs et contributeurs viennent de partout et parlent des langues différentes ; l'anglais et
   le français sont tous deux bienvenus.
-- Restez dans le sujet : une question, un rapport ou un changement de Tensho Assistant. Dites ce que vous avez vu, pas qui vous pensez
-  qu'est quelqu'un.
+- Restez dans le sujet : une question, un rapport ou un changement de Tensho Assistant. Dites ce que vous avez vu, pas ce que vous pensez
+  de la personne.
 - Respectez les autres joueurs : ne publiez jamais le nom d'un autre joueur, son personnage, son monde, son chat ni aucune donnée
   personnelle, ni en texte ni sur une capture.
 - Respectez les règles que suit ce projet : celles des plugins Dalamud et les conditions d'utilisation du jeu (voir `SECURITY.md` et
