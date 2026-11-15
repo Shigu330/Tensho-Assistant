@@ -1,7 +1,8 @@
-// 0.1432, X-433 (fix, docs/evidence/0.1432-background-collection-stall.md): every managed thread stopped during a background collection right
-// after a burst of large allocations by Tensho's cache reads (a 10 MB cache file read at once, its JsonElement's two copies of about 16 MB)
-// and a catalogue grown by doubling. The cache is read as a stream into a typed envelope: a 4 MB entry is read back the same without any
-// byte[] of 1 MB or more (the runtime's allocation ticks); the item catalogue is built sized once and sorted in place, in the same order.
+// 0.1432, X-433 (burst reduced, docs/evidence/0.1432-background-collection-stall.md): every managed thread stopped during a background
+// collection right after a burst of large allocations by Tensho's cache reads (a 10 MB cache file read at once, its JsonElement's two copies
+// of about 16 MB) and a catalogue grown by doubling. The burst is not the only cause of the stop (0.1433: the stop came back without it;
+// X-433 stays open). The cache is read as a stream into a typed envelope: a 4 MB entry is read back the same without any byte[] of 1 MB or
+// more (the runtime's allocation ticks); the item catalogue is built sized once and sorted in place, in the same order.
 using System.Diagnostics.Tracing;
 using System.Reflection;
 using TenshoAssistant.Caching;

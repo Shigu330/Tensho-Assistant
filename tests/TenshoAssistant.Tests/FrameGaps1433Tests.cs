@@ -30,8 +30,8 @@ internal static class FrameGaps1433Tests
             var start = plugin.IndexOf("var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));", StringComparison.Ordinal);
             var subscribe = plugin.IndexOf("pluginInterface.UiBuilder.Draw+=Gap;", StringComparison.Ordinal);
             Check(start > 0 && subscribe > start && plugin.IndexOf("if(configuration.DeveloperMode)", start - 200, StringComparison.Ordinal) > 0, "with the other measures, developer mode");
-            Check(plugin.Contains("registrations.Register(()=>{},()=>pluginInterface.UiBuilder.Draw-=Gap);", StringComparison.Ordinal), "let go at the unload");
-            var end = plugin.IndexOf("pluginInterface.UiBuilder.Draw-=Gap;\n                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))", StringComparison.Ordinal);
+            Check(plugin.Contains("registrations.Register(()=>{},()=>{pluginInterface.UiBuilder.Draw-=Gap;pluginInterface.UiBuilder.HideUi-=GapHidden;});", StringComparison.Ordinal), "let go at the unload (0.1437: HideUi too)");
+            var end = plugin.IndexOf("pluginInterface.UiBuilder.Draw-=Gap;\n                    pluginInterface.UiBuilder.HideUi-=GapHidden;\n                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))", StringComparison.Ordinal);
             Check(end > subscribe && plugin.IndexOf("log.Information(gaps.Summary(Diagnostics.RuntimeSuspensionWatch.Length));", end, StringComparison.Ordinal) > end, "let go at the watch's end, then the summary");
         }),
     ];

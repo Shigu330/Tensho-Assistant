@@ -64,7 +64,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1420-retainer-sales-end-probe.log](0.1420-retainer-sales-end-probe.log) | `tests/TenshoAssistant.Tests/Review1428Tests.cs` | `CHANGELOG.md`, `docs/evidence/0.1420-retainer-sales-end-code.md` |
 | [0.1427-warmup-priority.md](0.1427-warmup-priority.md) | `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/Review1428Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `CHANGELOG.md` |
 | [0.1432-background-collection-stall.md](0.1432-background-collection-stall.md) | `src/TenshoAssistant/Caching/DataCache.cs`, `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/CacheStream1432Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `CHANGELOG.md`, `docs/evidence/0.1427-warmup-priority.md`, `docs/project/GLOBAL-PLAN.md` |
-| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs` | `CHANGELOG.md` |
+| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `CHANGELOG.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
