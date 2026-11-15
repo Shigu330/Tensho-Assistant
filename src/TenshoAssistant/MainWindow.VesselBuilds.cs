@@ -261,7 +261,7 @@ internal sealed partial class MainWindow
         var breakpoint=VesselBuilds.RouteBreakpoint(catalog.Breakpoints,buildRoute);
         var time=TimeSpan.FromSeconds(SecondsOf(Math.Max(1,planned.Stats.Speed)));
         ImGui.TextColored(distance>planned.Stats.Range ? Error:Success,localization.Format("VesselBuilds.Distance",distance,planned.Stats.Range));
-        ImGui.SameLine();ImGui.TextUnformatted(localization.Format("VesselBuilds.Duration",(int)time.TotalHours,time.Minutes));
+        ImGui.SameLine();ImGui.TextUnformatted(localization.Format("VesselBuilds.Duration",TimeLeftText(time)));
         if(breakpoint is null)ImGui.TextDisabled(localization.Get("VesselBuilds.BreakpointsUnknown"));
         else
         {

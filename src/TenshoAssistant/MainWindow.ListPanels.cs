@@ -424,7 +424,7 @@ internal sealed partial class MainWindow
             var (open,left)=next.At(now);
             if(best is null || open && !best.Value.Open || open==best.Value.Open && left<best.Value.Left)best=(open,left);
         }
-        (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",Math.Max(0,(int)found.Left.TotalHours),found.Left.Minutes,found.Left.Seconds)):null;
+        (bool,string)? state=best is { } found ? (found.Open,localization.Format(found.Open ? "ListPanels.TimedOpen":"ListPanels.TimedClosed",CountdownText(found.Left))):null;
         listTimedStates.States[item]=state;
         return state;
     }

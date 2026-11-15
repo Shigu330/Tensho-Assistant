@@ -239,7 +239,8 @@ internal sealed partial class MainWindow
     }
 
     // « H h mm » of a voyage or survey time, on the airship and submarine pages.
-    private static string HoursMinutes(TimeSpan time)=>TenshoAssistant.Localization.TenshoCulture.Hours((int)time.TotalHours,time.Minutes);
+    // X-333 (0.1379): a voyage's length in the common format (days from 24 h on).
+    private string HoursMinutes(TimeSpan time)=>TimeLeftText(time);
 
     // Experience of a route; « ≥ » when a sector's experience is not known (0 in the game data).
     private static string AirshipExp(AirshipRoute route)=>(route.UnknownExp>0 ? "≥ ":"")+route.Exp.ToString("N0",Numbers);

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1379.0
+- Plan global, X-333 : Durées : au-delà de 24 h, tout temps restant ou toute durée se dit en jours (« dans 6 j 0 h », jamais « 144 h 00 ») : rappels (« Dans … » et actions de compagnie), minuteurs de Mes outils, revue de la Fashion Week, durées des vaisseaux et des secteurs, comptes à rebours des récoltes et des objets à horaire des panneaux de liste (hh:mm:ss sous un jour), barre du serveur. Un moment à venir aujourd'hui montre l'heure seule. TimeLeft.Countdown et TenshoCulture.Days ; cliquet étendu à TotalHours.
+- Pour les joueurs : les délais de plus d'un jour s'écrivent désormais en jours et en heures (« dans 6 j 0 h ») au lieu d'un grand nombre d'heures, et un moment plus tard dans la journée montre l'heure seule.
+- Tests : DurationDays1379Tests. Verify.ps1 (agent) : 2602/2602, 0 avertissement, 0 erreur ; DLL 0.1379.0.0. Non validé en jeu.
+### English
+- Durations: beyond 24 h every time left or length is written in days (« in 6d 0h », never « 144:00 »): reminders (« In … » and company actions), My tools timers, the Fashion Report's next review, vessel and sector lengths, gathering and list panel countdowns (hh:mm:ss below a day), the server bar. A coming time of today shows its hour alone. TimeLeft.Countdown and TenshoCulture.Days; the ratchet now also covers TotalHours.
+- For players: Times more than a day away are now written in days and hours (« in 6d 0h ») instead of a large number of hours, and a time later today shows its hour alone.
+
 ## 0.1378.0
 - Plan global, X-410 : Jardin et vocabulaire (mineurs de la relecture de 0.1374) : M1, un menu d'emplacement fermé sans rien faire puis un gain d'objet dans les 4 s (un achat, un objet reçu) ne compte plus comme la récolte de cet emplacement : quand seul le menu fait le lien (la cible n'est plus l'emplacement), la ligne de gain doit nommer une graine ou une récolte des données du jardin ; une ligne sans objet garde la règle de 0.1366. M2 écarté : le panneau d'équipe du Dédale n'est dessiné qu'en jeu (fenêtre du plateau), l'application de bureau ne peut pas le dessiner, d'où l'absence d'image ; l'essai T-0.1373-1 demande les lignes longues. M3 : filtres d'avancement de la page Butin des missions au féminin (Toutes, Non terminées, Débloquées, non terminées, Terminées, « terminées sur … lues »), « l'outil de mission » en minuscules partout.
 - Pour les joueurs : jardin : un objet acheté ou reçu juste après avoir fermé le menu d'un emplacement n'est plus pris pour la récolte de cet emplacement.
