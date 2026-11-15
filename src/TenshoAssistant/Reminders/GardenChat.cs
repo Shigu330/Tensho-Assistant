@@ -50,13 +50,19 @@ public sealed class GardenChat
     private static Regex? Pattern(IReadOnlyList<string?>? parts)
     {
         if(parts is null || !parts.Any(part=>part is { Length:>0 }))return null;
-        return new("^"+string.Concat(parts.Select(part=>part is null ? @"\D*(\d+)\D*?":Regex.Escape(part)))+"$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+        return new("^"+string.Concat(parts.Select(part=>part is null ? @"\D*(\d+)\D*?":Regex.Escape(part)))+"$",RegexOptions.CultureInvariant,GardenJournal.MatchTimeout);
     }
 
     /// <summary>The planting a line announces, or null. A line with a sender (a player) never counts.</summary>
     public GardenChatEvent? Read(string sender,string text)
     {
         if(sender.Length>0 || text.Length is 0 or >200)return null;
+        try{return ReadLine(text);}
+        catch(RegexMatchTimeoutException){return null;}   // X-427: nothing read
+    }
+
+    private GardenChatEvent? ReadLine(string text)
+    {
         var bare=Bare(text);
         if(tended.Contains(bare))return new(GardenChatKind.Tended,null,null);
         if(uprooted.Contains(bare))return new(GardenChatKind.Uprooted,null,null);
@@ -84,14 +90,20 @@ public sealed class GardenMenuTitle
     public static GardenMenuTitle? From(string? macro)
     {
         if(string.IsNullOrWhiteSpace(macro))return null;
-        var tokens=Regex.Matches(macro,@"<[^>]*>",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+        try{return Build(macro);}
+        catch(RegexMatchTimeoutException){return null;}   // X-427: nothing read
+    }
+
+    private static GardenMenuTitle? Build(string macro)
+    {
+        var tokens=Regex.Matches(macro,@"<[^>]*>",RegexOptions.CultureInvariant,GardenJournal.MatchTimeout);
         var built=new System.Text.StringBuilder("^");
         var at=0;int patch=0,bed=0,group=0;
         foreach(Match token in tokens)
         {
             built.Append(Regex.Escape(macro[at..token.Index]));
             at=token.Index+token.Length;
-            var number=Regex.Match(token.Value,@"^<(num|ordinal)\(lnum([12])\)>$",RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50));
+            var number=Regex.Match(token.Value,@"^<(num|ordinal)\(lnum([12])\)>$",RegexOptions.CultureInvariant,GardenJournal.MatchTimeout);
             if(!number.Success)return null;
             group++;
             if(number.Groups[2].Value=="1"){if(patch!=0)return null;patch=group;}else{if(bed!=0)return null;bed=group;}
@@ -99,14 +111,16 @@ public sealed class GardenMenuTitle
         }
         built.Append(Regex.Escape(macro[at..])).Append('$');
         if(patch==0 || bed==0)return null;
-        return new(new Regex(built.ToString(),RegexOptions.CultureInvariant,TimeSpan.FromMilliseconds(50)),patch,bed);
+        return new(new Regex(built.ToString(),RegexOptions.CultureInvariant,GardenJournal.MatchTimeout),patch,bed);
     }
 
     /// <summary>The patch (1 to 3) and bed (1 to 8) a menu title names, or null.</summary>
     public (int Patch,int Bed)? Read(string? text)
     {
         if(text is null || text.Length is 0 or >80)return null;
-        var match=pattern.Match(text.Trim());
+        Match match;
+        try{match=pattern.Match(text.Trim());}
+        catch(RegexMatchTimeoutException){return null;}   // X-427: nothing read
         if(!match.Success || !int.TryParse(match.Groups[patchGroup].Value,out var patch) || !int.TryParse(match.Groups[bedGroup].Value,out var bed))return null;
         return patch is >= 1 and <= 3 && bed is >= 1 and <= 8 ? (patch,bed):null;
     }
