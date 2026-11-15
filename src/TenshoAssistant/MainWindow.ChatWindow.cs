@@ -223,7 +223,8 @@ internal sealed partial class MainWindow
             ImGui.SetWindowFontScale(options.BoundedFontScale/100f);
             var width=ImGui.GetContentRegionAvail().X;
             var key=ChatFormat.LayoutKey(options);
-            if(!view.LaidOutFor(width,key))view.Relayout(width,key);
+            var relaid=!view.LaidOutFor(width,key);
+            if(relaid)view.Relayout(width,key);
             for(var budget=ChatLayoutsPerFrame;budget>0;budget--)
             {
                 var next=view.NextToLayOut();
@@ -246,6 +247,9 @@ internal sealed partial class MainWindow
             ImGui.SetCursorPosY(top+view.RowCount*height);
             ImGui.Dummy(new Vector2(1,1));
             if(atBottom){ImGui.SetScrollHereY(1);view.MarkSeen();}
+            // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
+            if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
+                log.Information(jumps);
             // X-403 phase 2 (0.1441): the place menu of a map link, opened by a right click on it (the same entries as Tensho's other place menus).
             if(chatWindowPlace is { } place)
             {
@@ -331,6 +335,8 @@ internal sealed partial class MainWindow
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
     // 0.1442: the message whose menu a right click opened.
     private ChatRecord? chatWindowLine;
+    // 0.1460 (X-457): the scrolling of the tab shown, frame by frame, in developer mode.
+    private readonly ChatScrollWatch chatScrollWatch=new();
     // 0.1453: the web address whose menu a click opened.
     private string? chatWindowWeb;
     // 0.1456 (X-451): its site, read when the menu shows a new address.
