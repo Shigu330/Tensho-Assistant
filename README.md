@@ -97,8 +97,8 @@ organised: [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 
 ## Desktop app (game closed)
 
-Each release also carries `TenshoAssistant.Desktop.zip`: the same pages in a Windows window, with the game closed (step 1 of the desktop
-application; the link to a running game comes later). Unzip it anywhere and start `TenshoAssistant.Desktop.exe`. It needs XIVLauncher with
+Each release also carries `TenshoAssistant.Desktop.zip`: the same pages in a Windows window, with the game closed (an optional link to a
+running game, off by default: Settings › Advanced › « Link with the desktop app »; the other live parts and the actions come later). Unzip it anywhere and start `TenshoAssistant.Desktop.exe`. It needs XIVLauncher with
 Dalamud and the game installed (it reads Dalamud's ImGui and the game data where they are installed; nothing of them is shipped); it carries
 its own .NET runtime, nothing else to install. It reads your saved Tensho settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are
 off, as its status bar says; the map, live synthesis and the Fashion Report stay in the game. The app and the plugin carry the same version
@@ -292,8 +292,8 @@ donnée communautaire), le plugin le dit au lieu de deviner. Validation en jeu d
 
 ## Application de bureau (jeu fermé)
 
-Chaque release porte aussi `TenshoAssistant.Desktop.zip` : les mêmes pages dans une fenêtre Windows, jeu fermé (étape 1 de l'application de
-bureau ; le lien avec le jeu lancé viendra ensuite). Décompressez-le où vous voulez et lancez `TenshoAssistant.Desktop.exe`. Il lui faut
+Chaque release porte aussi `TenshoAssistant.Desktop.zip` : les mêmes pages dans une fenêtre Windows, jeu fermé (lien facultatif avec le
+jeu lancé, désactivé par défaut : Paramètres › Avancé › « Lien avec l'application de bureau » ; les autres parties en direct et les actions viendront ensuite). Décompressez-le où vous voulez et lancez `TenshoAssistant.Desktop.exe`. Il lui faut
 XIVLauncher avec Dalamud et le jeu installés (elle lit l'ImGui de Dalamud et les données du jeu là où ils sont installés ; rien d'eux n'est
 livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos paramètres Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
 restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le

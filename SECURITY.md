@@ -7,8 +7,8 @@ Thank you for helping keep Tensho Assistant secure.
 ## Supported versions
 
 Only the latest published release (the version in `repo.json`, tag `Stable-x.y.z`) receives security fixes; a fix ships as a new
-version. Builds of the `Devloppement` branch and local builds are not supported. The scope below describes the `Devloppement` branch at
-the version named in its first line, which may be newer than the latest release.
+version. Builds of the `Devloppement` branch and local builds are not supported. The scope below describes the `Devloppement` branch on
+the date named in its first line, which may be newer than the latest release.
 
 ## Reporting a vulnerability
 
@@ -44,7 +44,7 @@ What the plugin does that matters for security (read against the code of the `De
 | **Desktop app install**: plugin, on « Install » or « Update » in Settings › Advanced › Desktop application only: this repository's release of the plugin's version (else the latest Stable one), then TenshoAssistant.Desktop.zip and its SHA-256 from that release, unpacked beside; GET only, no player data; the app is never started without a click | `api.github.com`, `github.com` | — (on a click) | `Link/DesktopInstaller.cs`, `TenshoAssistant.Desktop/DesktopInstall.cs`, `TenshoAssistant.Desktop/DesktopUpdate.cs` |
 <!-- /docgen:network-en -->
 
-  The desktop application (`src/TenshoAssistant.Desktop`, X-121) updates itself from this repository's releases (row « Desktop app
+  The desktop application (`src/TenshoAssistant.Desktop`) updates itself from this repository's releases (row « Desktop app
   update »): it installs a new `TenshoAssistant.Desktop.zip` beside the running one (`%LOCALAPPDATA%\TenshoAssistant\Desktop\versions`)
   only when the release is a published `Stable-x.y.z` of this repository, the file comes from this repository's download address, and its
   SHA-256 is the one in `TenshoAssistant.Desktop.zip.sha256` of the same release; the copy before it stays for going back. **Limit:** the
@@ -69,7 +69,7 @@ What the plugin does that matters for security (read against the code of the `De
   time, and never a player's name or id; a fish caught or a bite holds the character's exact place (DEC-045), so with the day and the
   issue it can tell where that GitHub account fished on a given day; only fields the player read themself are sent, never dates, levels or
   places that came from an import (0.1134); the files this repository publishes from them keep the day only too, and are under
-  CC0-1.0, which the warning and the player's issue state (0.1012). Since 0.1161 the sign-in is the repository's GitHub App (X-175): it asks
+  CC0-1.0, which the warning and the player's issue state (0.1012). Since 0.1161 the sign-in is the repository's GitHub App: it asks
   only Issues (read and write), on this repository alone, and the account's Gists (read and write), nothing else; Tensho uses them only for the
   player's one gist, always created secret, and the one issue. Before 0.1161 it was the repository's OAuth app, with the scopes `gist` and
   `public_repo` (GitHub gives no narrower ones): a token of that OAuth app is forgotten and the player connects again. The GitHub App's token expires after 8 hours and is renewed before an
@@ -79,7 +79,7 @@ What the plugin does that matters for security (read against the code of the `De
 - **Developer mode page sweep (DEC-040)**: in developer mode only, after the self-check, Tensho draws every page once, at most once every
   two hours. A page may then make the requests it makes when the player opens it, within the player's source switches; the Market page
   (Universalis) is left out. Outside developer mode, nothing runs.
-- **Discord webhook (R-12)**: off by default. When the player turns it on and enters a webhook address (only Discord's own hosts are
+- **Discord webhook**: off by default. When the player turns it on and enters a webhook address (only Discord's own hosts are
   accepted: `discord.com`, `ptb.discord.com`, `canary.discord.com`, `discordapp.com`; one address per category may be set the same way), a
   ringing Tensho alarm, the currency cap alerts and the « duty ready » alerts are posted there (HTTPS POST): the message and local time,
   and the character's name only when the player enables it; mentions are limited to the role the player sets (`allowed_mentions`). Each
@@ -87,7 +87,7 @@ What the plugin does that matters for security (read against the code of the `De
   in the plugin configuration on the player's PC, masked in the settings, never written to the logs nor to the support report (which only
   says whether it is valid) (`src/TenshoAssistant/Alarms/DiscordNotifier.cs`, `DiscordWebhook.cs`). Clearing it or turning sending off
   drops the queued messages.
-- **Local link with the desktop application (X-119)**: off by default. While Settings › Advanced « Link with the desktop app » is on,
+- **Local link with the desktop application**: off by default. While Settings › Advanced « Link with the desktop app » is on,
   the plugin offers a local named pipe, out only, open to the current Windows user and denied to network logons (no network port);
   once a second it writes exactly this, and reads nothing back: the plugin's version; whether a character is logged in; whether Tensho
   is paused (PvP, ranked content); the zone's number and name; the job's abbreviation and level, the gathering points and their maximum,
@@ -182,7 +182,7 @@ Merci d'aider à garder Tensho Assistant sûr.
 
 Seule la dernière release publiée (la version de `repo.json`, tag `Stable-x.y.z`) reçoit les corrections de sécurité ; une correction
 sort dans une nouvelle version. Les compilations de la branche `Devloppement` et les compilations locales ne sont pas prises en charge.
-Le périmètre ci-dessous décrit la branche `Devloppement` à la version nommée dans sa première ligne, qui peut être plus récente que la
+Le périmètre ci-dessous décrit la branche `Devloppement` à la date nommée dans sa première ligne, qui peut être plus récente que la
 dernière release.
 
 ## Signaler une vulnérabilité
@@ -219,7 +219,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 | **Installation de l'application de bureau** : plugin, seulement sur « Installer » ou « Mettre à jour » dans Paramètres › Avancé › Application de bureau : la release de ce dépôt qui a la version du plugin (sinon la dernière Stable), puis TenshoAssistant.Desktop.zip et son SHA-256 de cette release, dépaquetés à côté ; GET seulement, aucune donnée du joueur ; l'application n'est jamais lancée sans un clic | `api.github.com`, `github.com` | — (sur un clic) | `Link/DesktopInstaller.cs`, `TenshoAssistant.Desktop/DesktopInstall.cs`, `TenshoAssistant.Desktop/DesktopUpdate.cs` |
 <!-- /docgen:network-fr -->
 
-  L'application de bureau (`src/TenshoAssistant.Desktop`, X-121) se met à jour depuis les releases de ce dépôt (ligne « Mise à jour de
+  L'application de bureau (`src/TenshoAssistant.Desktop`) se met à jour depuis les releases de ce dépôt (ligne « Mise à jour de
   l'application de bureau ») : elle installe un nouveau `TenshoAssistant.Desktop.zip` à côté de celle qui tourne (`%LOCALAPPDATA%\TenshoAssistant\Desktop\versions`)
   seulement si la release est une `Stable-x.y.z` publiée de ce dépôt, si le fichier vient de l'adresse de téléchargement de ce dépôt et
   si son SHA-256 est celui de `TenshoAssistant.Desktop.zip.sha256` de la même release ; la copie d'avant reste pour revenir en arrière.
@@ -247,7 +247,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   donc, avec le jour et le ticket, on peut savoir où ce compte GitHub a pêché un jour donné ; seuls les champs relevés par le joueur
   lui-même partent, jamais des dates, niveaux ou lieux venus d'un import (0.1134) ; les fichiers que ce dépôt en publie ne gardent eux aussi que le
   jour, sous CC0-1.0, ce que l'avertissement et le ticket du joueur disent (0.1012). Depuis 0.1161 la connexion passe par l'application GitHub
-  du dépôt (X-175) : elle ne demande que les droits Issues (lecture et écriture), sur ce seul dépôt, et les Gists du compte (lecture et écriture),
+  du dépôt : elle ne demande que les droits Issues (lecture et écriture), sur ce seul dépôt, et les Gists du compte (lecture et écriture),
   rien d'autre ; Tensho ne s'en sert que pour le seul gist du joueur, toujours créé secret, et le seul ticket. Avant 0.1161 c'était
   l'application OAuth du dépôt, avec les droits `gist` et `public_repo` (GitHub n'en donne pas de plus étroits) : un jeton de cette
   application OAuth est oublié et le joueur se reconnecte ; le jeton de l'application GitHub expire après 8 heures et se renouvelle avant un envoi par son jeton de renouvellement
@@ -257,7 +257,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
 - **Passage des pages en mode développeur (DEC-040)** : en mode développeur seulement, après l'auto-contrôle, Tensho dessine une fois
   chaque page, au plus une fois toutes les deux heures. Une page peut alors faire les requêtes qu'elle fait quand le joueur l'ouvre, dans
   les interrupteurs de sources du joueur ; la page Marché (Universalis) est exclue. Hors mode développeur, rien ne se lance.
-- **Webhook Discord (R-12)** : désactivé par défaut. Quand le joueur l'active et saisit une adresse de webhook (seuls les hôtes de
+- **Webhook Discord** : désactivé par défaut. Quand le joueur l'active et saisit une adresse de webhook (seuls les hôtes de
   Discord sont acceptés : `discord.com`, `ptb.discord.com`, `canary.discord.com`, `discordapp.com` ; une adresse par catégorie peut être
   saisie de la même façon), une alarme Tensho qui sonne, les alertes de plafond des devises et les alertes « mission prête » y sont
   envoyées (HTTPS POST) : le message et l'heure locale, et le nom du personnage seulement si le joueur l'active ; les mentions sont
@@ -266,7 +266,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   du joueur, masquée dans les réglages, jamais écrite dans les journaux ni dans le rapport d'assistance (qui dit seulement si elle est
   valide) (`src/TenshoAssistant/Alarms/DiscordNotifier.cs`, `DiscordWebhook.cs`). L'effacer ou couper l'envoi vide les messages en
   attente.
-- **Lien local avec l'application de bureau (X-119)** : désactivé par défaut. Tant que Paramètres › Avancé « Lien avec l'application de
+- **Lien local avec l'application de bureau** : désactivé par défaut. Tant que Paramètres › Avancé « Lien avec l'application de
   bureau » est activé, le plugin ouvre un canal nommé local, en sortie seulement, ouvert à l'utilisateur Windows courant et refusé aux
   connexions réseau (aucun port réseau) ; une fois par seconde il écrit exactement ceci, et ne lit rien en retour : la version du
   plugin ; si un personnage est connecté ; si Tensho est en pause (JcJ, contenu classé) ; le numéro et le nom de la zone ; l'abréviation

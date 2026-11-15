@@ -18,7 +18,7 @@ You can fill in the template in English or in French; delete the half you do not
 
 ## AI use
 
-<!-- Dalamud's plugin policy asks to declare AI use. Say whether and how an AI tool was used for this change. -->
+<!-- This project discloses its AI use. Say whether and how an AI tool was used for this change. -->
 
 ---
 
@@ -42,4 +42,4 @@ Merci de contribuer. Les pull requests visent la branche Devloppement (main ne r
 
 ## Usage de l'IA
 
-<!-- La politique des plugins Dalamud demande de déclarer l'usage de l'IA. Dites si et comment un outil d'IA a servi pour ce changement. -->
+<!-- Ce projet déclare son usage de l'IA. Dites si et comment un outil d'IA a servi pour ce changement. -->

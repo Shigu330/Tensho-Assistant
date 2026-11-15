@@ -79,7 +79,7 @@ Development builds in game:
 - Code: `src/TenshoAssistant/` (one folder per domain; files ending in `*.Dalamud.cs` touch the game, files ending in `*.Lumina.cs` copy
   game sheets, and the others are pure C# and testable). Pages are `MainWindow.<Page>.cs` partial files, listed in `MainWindow.Pages.cs`;
   shared UI templates are in `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`, `EntityMenus`, `DataIndexes`, `Tooltip`,
-  `StatusLines`, `ToolButton`). Embedded data
+  `StatusLines`, `ToolButton`, `DeleteButton`, `Gauges`). Embedded data
   files are in `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` and `Localization/Languages/`. The code map is in
   [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests: `tests/TenshoAssistant.Tests/` (no-framework test program using `Check(condition, "message")`).
@@ -87,7 +87,7 @@ Development builds in game:
   scripts (`tools/submarine-loot.py`, `tools/garden-data.py`; `tools/discoveries-merge.py`, the maintainer's merge of the shared
   discoveries into `community-discoveries/`, see its [README](community-discoveries/README.md)).
 - Scripts: `scripts/Verify.ps1` (checks), `scripts/Release.ps1` (git steps, called by `Verify.ps1`), `scripts/New-Tool.ps1` (skeleton
-  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `scripts/commit-release.bat`.
+  of a new page), `scripts/Update-ToolGallery.ps1` (community tool gallery), `scripts/Get-Dalamud.ps1` (checked Dalamud download for the CI), `scripts/LaunchProof.ps1` (launch proof read by the release), `scripts/commit-release.bat`.
 - Documentation: see [docs/README.md](docs/README.md). History: [CHANGELOG.md](CHANGELOG.md).
 
 ## Project rules
@@ -313,14 +313,14 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
 - Code : `src/TenshoAssistant/` (un dossier par domaine ; les fichiers en `*.Dalamud.cs` touchent au jeu, ceux en `*.Lumina.cs` copient
   des feuilles du jeu, et les autres sont du C# pur, testable). Les pages sont des fichiers partiels `MainWindow.<Page>.cs`, listés dans
   `MainWindow.Pages.cs` ; les modèles d'interface communs sont dans `UI/Components/` (`ItemCell`, `DetailPage`, `SettingRow`,
-  `EntityMenus`, `DataIndexes`, `Tooltip`, `StatusLines`, `ToolButton`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
+  `EntityMenus`, `DataIndexes`, `Tooltip`, `StatusLines`, `ToolButton`, `DeleteButton`, `Gauges`). Les fichiers de données embarqués sont dans `FreeCompany/Data/`, `Reminders/Data/`, `Events/Data/` et
   `Localization/Languages/`. La carte du code est dans [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 - Tests : `tests/TenshoAssistant.Tests/` (programme de test sans framework, avec `Check(condition, "message")`).
 - Sondes : `tools/` (programmes console en lecture seule sur les fichiers ou les API du jeu, par exemple `tools/ShopCurrencyProbe`,
   `tools/ApiProbe`) et scripts de données (`tools/submarine-loot.py`, `tools/garden-data.py` ; `tools/discoveries-merge.py`, la fusion
   par le mainteneur des découvertes partagées dans `community-discoveries/`, voir son [README](community-discoveries/README.md)).
 - Scripts : `scripts/Verify.ps1` (contrôles), `scripts/Release.ps1` (étapes git, appelé par `Verify.ps1`), `scripts/New-Tool.ps1`
-  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `scripts/commit-release.bat`.
+  (squelette d'une nouvelle page), `scripts/Update-ToolGallery.ps1` (galerie d'outils de la communauté), `scripts/Get-Dalamud.ps1` (téléchargement vérifié de Dalamud pour la CI), `scripts/LaunchProof.ps1` (preuve de lancement lue par la release), `scripts/commit-release.bat`.
 - Documentation : voir [docs/README.md](docs/README.md). Historique : [CHANGELOG.md](CHANGELOG.md).
 
 ## Règles du projet
