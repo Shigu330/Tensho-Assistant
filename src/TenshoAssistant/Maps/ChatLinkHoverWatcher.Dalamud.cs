@@ -1,5 +1,7 @@
+using System.Numerics;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.NativeWrapper;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
@@ -49,7 +51,7 @@ public sealed unsafe class ChatLinkHoverWatcher : IDisposable
         try
         {
             var link=Read(received.AtkEventData,out var linkType);
-            Hover.Over(link,Environment.TickCount64,NativeMouse.Cursor());
+            Hover.Over(link,Environment.TickCount64,NativeMouse.Cursor(),link is null ? default:Extent(received.AtkEventData,args.Addon));
             warned=false;
             // Developer mode: what the chat's link events say, once per change (the in-game test reads it, R15.2).
             var seen=link is null ? $"link type {linkType}, not a map link":$"map link, map {link.MapId}";
@@ -76,6 +78,15 @@ public sealed unsafe class ChatLinkHoverWatcher : IDisposable
         {
             if(!warned){warned=true;log.Warning(error,"A chat link could not be read.");}
         }
+    }
+
+    // X-409 (0.1376): the link's size on screen, from its bounds (LinkData MinX..MaxY, evidence 0.1351) and the chat panel's scale.
+    private static Vector2 Extent(nint eventData,AtkUnitBasePtr panel)
+    {
+        if(eventData==0)return default;
+        var data=((AtkEventData*)eventData)->LinkData;
+        if(data==null)return default;
+        return ChatLinkHover.Extent(data->MinX,data->MinY,data->MaxX,data->MaxY,panel.Address==0 ? 1f:panel.Scale);
     }
 
     private static HoveredMapLink? Read(nint eventData,out int linkType)

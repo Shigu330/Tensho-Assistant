@@ -12,15 +12,26 @@ public sealed record HoveredMapLink(uint TerritoryId,uint MapId,float X,float Y,
 /// X-395 M4 (0.1366): a link whose « mouse out » never came is not kept for ever: it holds <see cref="MaxAge"/> ms after its last « over »
 /// and only while the cursor stays within <see cref="Reach"/> pixels of where it was then (a right click in the world later, to turn the
 /// camera, is not about it). X-387 (0.1366): the link clicked with the left button is kept <see cref="ClickLife"/> ms for the Tensho map.
+/// X-409 (0.1376): the game sends « over » as the mouse enters a link, which is much wider than <see cref="Reach"/>; the link's size on
+/// screen (<see cref="Extent"/>) widens the reach to the link's width and height around that point (plus <see cref="Margin"/>), since
+/// the point lies in the link. Without a readable size, the 48 px reach stays.
 /// </summary>
 public sealed class ChatLinkHover
 {
     public const long Grace=400,MaxAge=60_000,ClickLife=3_000;
-    public const float Reach=48f;
+    public const float Reach=48f,Margin=8f,MaxExtent=1600f;
     private readonly object gate=new();
-    private HoveredMapLink? link;private long outAt=long.MaxValue,overAt;private Vector2? overCursor;
+    private HoveredMapLink? link;private long outAt=long.MaxValue,overAt;private Vector2? overCursor;private Vector2 overExtent;
     private (HoveredMapLink Link,long At)? clicked;
-    public void Over(HoveredMapLink? hovered,long now,Vector2? cursor){lock(gate){link=hovered;outAt=long.MaxValue;overAt=now;overCursor=cursor;}}
+    public void Over(HoveredMapLink? hovered,long now,Vector2? cursor,Vector2 extent=default){lock(gate){link=hovered;outAt=long.MaxValue;overAt=now;overCursor=cursor;overExtent=extent;}}
+    /// <summary>X-409: the link's size on screen from the game's link bounds (LinkData MinX..MaxY) and the panel's scale; zero when the
+    /// bounds are empty, reversed or beyond <see cref="MaxExtent"/> (then the plain reach applies). A scale that is not a number is 1.</summary>
+    public static Vector2 Extent(int minX,int minY,int maxX,int maxY,float scale)
+    {
+        if(!(scale>0f && scale<=8f))scale=1f;
+        var width=(maxX-(long)minX)*scale;var height=(maxY-(long)minY)*scale;
+        return width<=0 || height<=0 || width>MaxExtent || height>MaxExtent ? Vector2.Zero:new Vector2(width,height);
+    }
     public void Out(long now){lock(gate){if(link is not null && outAt==long.MaxValue)outAt=now;}}
     public void Clear(){lock(gate){link=null;outAt=long.MaxValue;overCursor=null;clicked=null;}}
     public HoveredMapLink? Current(long now,Vector2? cursor){lock(gate){return Why(now,cursor) is null ? link:null;}}
@@ -44,7 +55,16 @@ public sealed class ChatLinkHover
         if(link is null)return "no link";
         if(outAt!=long.MaxValue && now-outAt>Grace)return $"mouse out {now-outAt} ms before";
         if(now-overAt>MaxAge)return $"hovered {now-overAt} ms before";
-        if(overCursor is { } then && cursor is { } here && Vector2.Distance(then,here)>Reach)return $"cursor {Vector2.Distance(then,here):0} px away";
+        if(overCursor is { } then && cursor is { } here)
+        {
+            if(overExtent==Vector2.Zero){if(Vector2.Distance(then,here)>Reach)return $"cursor {Vector2.Distance(then,here):0} px away";}
+            else
+            {
+                var allowX=MathF.Max(Reach,overExtent.X+Margin);var allowY=MathF.Max(Reach,overExtent.Y+Margin);
+                if(MathF.Abs(here.X-then.X)>allowX || MathF.Abs(here.Y-then.Y)>allowY)
+                    return $"cursor {Vector2.Distance(then,here):0} px away, beyond the link's {allowX:0} x {allowY:0} px";
+            }
+        }
         return null;
     }
     /// <summary>X-387: the map link clicked with the left button (the game places its flag), for the Tensho map.</summary>

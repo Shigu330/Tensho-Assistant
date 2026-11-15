@@ -45,7 +45,7 @@ internal static class ChatLinkGarden1366Tests
             var watcher = Read("src/TenshoAssistant/Maps/ChatLinkHoverWatcher.Dalamud.cs");
             Check(watcher.Contains("LinkMouseClick=75") && watcher.Contains("if(kind==LinkMouseClick){Click(args.AddonName,received.AtkEventData);return;}"), "the link click event");
             Check(watcher.Contains("log.Information(\"Chat link clicked ({0}): map link, map {1}, {2} button.\""), "a line at the click");
-            Check(watcher.Contains("Hover.Over(link,Environment.TickCount64,NativeMouse.Cursor());"), "the cursor kept with the hover");
+            Check(watcher.Contains("Hover.Over(link,Environment.TickCount64,NativeMouse.Cursor(),link is null ? default:Extent(received.AtkEventData,args.Addon));"), "the cursor kept with the hover");
             var window = Read("src/TenshoAssistant/MainWindow.ChatMapLinks.cs");
             Check(window.Contains("var down=NativeMouse.RightDown();var pressed=down && !chatRightWasDown;chatRightWasDown=down;"), "the press from Windows");
             Check(window.Contains("log.Information(\"Chat link right click: {0}.\",traced)"), "a line at the right click");

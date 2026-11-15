@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1376.0
+- Plan global, X-409 : Carte : le clic droit sur un lien de carte du chat ouvre le menu de Tensho où que l'on clique sur le lien, et plus seulement à moins de 48 px de l'endroit où la souris y est entrée. La taille du lien vient de ses bornes (LinkData MinX à MaxY, fois l'échelle du panneau du chat) ; seule la taille sert, pas la position, dont le repère n'est pas prouvé (preuve 0.1351, partie 0.1376). Sans bornes lisibles, la portée de 48 px reste. La ligne du mode développeur d'un clic refusé dit la portée.
+- Pour les joueurs : un clic droit n'importe où sur un lien de carte du chat ouvre désormais le menu de Tensho, et plus seulement près de l'endroit où la souris est entrée sur le lien.
+- Tests : ChatLinkReach1376Tests. Verify.ps1 (agent) : 2591/2591, 0 avertissement, 0 erreur ; DLL 0.1376.0.0. Non validé en jeu.
+### English
+- Map: a right click on a chat map link opens Tensho's menu wherever the link is clicked, no longer only within 48 px of where the mouse entered it. The link's size comes from its bounds (LinkData MinX to MaxY, times the chat panel's scale); only the size is used, not the position, whose frame is not proven (evidence 0.1351, part 0.1376). Without readable bounds the 48 px reach stays. The developer line of a refused click gives the reach.
+- For players: Right-clicking anywhere on a chat map link now opens Tensho's menu, not only near where the mouse entered the link.
+
 ## 0.1375.0
 - Plan global, X-408 : Recherches : les recherches tapées qui comparaient encore sans le traitement commun des apostrophes (X-389) y passent toutes : objets annotés, objets de collection, sources de quête, bardes de chocobo, tenues (indices et objets), aide, suites d'artisanat enregistrées, collections, quêtes, sources de récolte, catégories des règles de rangement, liste des outils et zones de la carte. SearchText reçoit une forme avec options de comparaison (accents ignorés) et culture. Le garde-fou voit désormais toute aiguille (mot, jeton, texte…) et tout CompareInfo.IndexOf ; les comparaisons qui ne sont pas une recherche tapée sont listées avec leur raison.
 - Pour les joueurs : une recherche tapée avec une apostrophe courbe ou autre trouve désormais les mêmes résultats dans toutes les listes (objets annotés, objets de collection, bardes, tenues, aide, suites d'artisanat, collections, quêtes, zones de la carte).
