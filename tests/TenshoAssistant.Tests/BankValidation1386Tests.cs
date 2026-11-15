@@ -72,9 +72,10 @@ internal static class BankValidation1386Tests
             shownA = a.Apply(new BankChange(Put: Entry(1, BankStorageKind.Saddlebag)), shownA);
             shownA = a.Apply(new BankChange(Put: Entry(3, BankStorageKind.Saddlebag)), shownA);
             Crowd(store());
-            var failed = Fails(() => a.Apply(new BankChange(Erase: 1), shownA));
-            Check(failed is ArgumentException && failed.Message.Contains("Too many bank entries", StringComparison.Ordinal),
-                "the bank read back after the erase is checked (0.1380 returned it unchecked): " + (failed?.Message ?? "no error"));
+            // X-418 (0.1391): the bank read back fails the checks: not shown, and no failure: the other characters as this client holds them.
+            var shown = a.Apply(new BankChange(Erase: 1), shownA);
+            Check(shown.Length == 1 && shown[0].Key.CharacterId == 3,
+                "the bank read back after the erase is checked (0.1380 returned it unchecked): not shown, this client's other characters instead: " + shown.Length);
             var after = Saved(database);
             Check(after.All(row => row.Character != 1) && after.Count == 4097, "the erase of character 1 is done, the others kept: " + after.Count);
         })),

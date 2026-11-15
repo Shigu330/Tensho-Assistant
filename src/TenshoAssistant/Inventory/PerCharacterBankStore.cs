@@ -140,10 +140,13 @@ public sealed class PerCharacterBankStore : IInventoryBankStore
                     if(change.Erase!=0)
                     {
                         // X-414 (0.1386): the erase is the player's command and only removes rows: done first, whatever the other characters
-                        // hold; the bank read back is then checked as in the other branch (unchecked in 0.1380): an invalid row fails the
-                        // change after the erase, which stays done.
-                        EraseEverywhere(open,id);everyone=Rows(open,null);
-                        InventoryBankService.ValidateEntries(everyone);
+                        // hold. X-418 (0.1391): the bank read back is shown only when it passes the checks (unchecked in 0.1380); otherwise the
+                        // other characters as this client holds them (checked when they were shown, without the erased one), never a failure:
+                        // the erase is done, and saying it failed kept the erased character on screen.
+                        EraseEverywhere(open,id);
+                        var readBack=Rows(open,null);
+                        try{InventoryBankService.ValidateEntries(readBack);everyone=readBack;}
+                        catch(ArgumentException){everyone=null;}
                         return Array.Empty<BankEntry>();
                     }
                     using var transaction=open.BeginTransaction();
