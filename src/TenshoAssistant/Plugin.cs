@@ -1349,6 +1349,17 @@ public sealed partial class Plugin : IDalamudPlugin
             developerAtUnload=()=>configuration.DeveloperMode;
             SayLoad("created");
             mainWindow.LoadMilliseconds=(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds;
+            // X-433 (0.1422): developer mode, two minutes after the load: the runtime's suspensions of every thread with their reason (the
+            // collection pauses are not all of them), to name what the readers wait on about 25 s after a load.
+            if(configuration.DeveloperMode)
+            {
+                var suspensions=new Diagnostics.RuntimeSuspensionListener(note=>log.Information(note));
+                registrations.Register(()=>{},()=>suspensions.Dispose());
+                _=Task.Delay(Diagnostics.RuntimeSuspensionWatch.Length).ContinueWith(_=>
+                {
+                    if(Diagnostics.RuntimeSuspensionWatch.End(suspensions))log.Information(suspensions.Tracker.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                },TaskScheduler.Default);
+            }
             _=Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_=>
             {
                 SayLoad("10 s later");
