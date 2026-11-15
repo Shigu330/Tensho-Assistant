@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1397.0
+- Plan global, X-307 : Preuve docs/evidence/0.1394-retainer-finder.md complétée par la seconde lecture (0.1395) : la copie que le jeu garde des sacs de chaque servant suit l'ordre d'affichage de la fenêtre du servant (2 servants sur 2), pas l'ordre des cases des pages ; mêmes objets, HQ à part (identifiant + 1 000 000) et mêmes cristaux que la Banque. Elle peut donc servir au tableau des servants (X-196) et de repli à la Banque quand l'ordre visuel manque (X-275).
+- Tests : RetainerFinder1394Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1397.0.0. Rien à essayer en jeu.
+### English
+- Evidence docs/evidence/0.1394-retainer-finder.md completed with the second reading (0.1395): the copy the game keeps of each retainer's bags follows the retainer window's display order (2 retainers of 2), not the pages' slot order; same items, HQ apart (id + 1,000,000) and the same crystals as the bank. It can therefore serve the retainers' table (X-196) and the bank's fallback when the visual order is missing (X-275).
+
 ## 0.1396.0
 - Test instable corrigé à la cause (R36.2) : « Settings 1120 : une notification pendant une lecture en demande une de plus » attendait 200 ms et tenait la lecture pour commencée ; Grouped attend son délai (100 ms) avant de lire et rattache à cette lecture les demandes faites pendant l'attente : sous charge (tous les tests en parallèle), l'attente pouvait dépasser les 200 ms et une lecture manquait (« got 2 »). Le test attend maintenant que le travail ait commencé (un signal posé dedans) au lieu d'un temps fixe.
 - Tests : SettingsRead1120Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1396.0.0. Rien à essayer en jeu.
