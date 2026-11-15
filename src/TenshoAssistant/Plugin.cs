@@ -865,7 +865,10 @@ public sealed partial class Plugin : IDalamudPlugin
             // g, M-04 (0.374): one status file per character (Characters/<local character id>.json): ventures, counters, « done » boxes.
             Character.CharacterStatusWatcher? characterStatus=null;
             registrations.Register(()=>characterStatus=new Character.CharacterStatusWatcher(framework,player,log,configuration,()=>SaveTimed("character status"),
-                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters")),()=>characterStatus?.Dispose());
+                ()=>dailyRoulettes,Path.Combine(pluginInterface.GetPluginConfigDirectory(),"Characters"),
+                // X-196 (0.1409): the retainers' job and market town, named from the sheets (ClassJob abbreviation; Town, whose rows are RetainerTown's values).
+                job=>data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().GetRowOrDefault(job)?.Abbreviation.ExtractText() ?? "",
+                town=>data.GetExcelSheet<Lumina.Excel.Sheets.Town>().GetRowOrDefault(town)?.Name.ExtractText() ?? ""),()=>characterStatus?.Dispose());
             mainWindow.CharacterStatusSource=characterStatus;
             // g, C-03 (0.357): items the armoire takes, for the storage report.
             IReadOnlySet<uint>? cabinetItems=null;

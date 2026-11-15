@@ -30,6 +30,13 @@ public static class RetainerFinderCompare
         =>[.. retainer.Items.Select((slot,position)=>(slot,position)).Where(pair=>pair.slot.Id!=0 && pair.slot.Count>0)
             .Select(pair=>(Decode(pair.slot.Id),(long)pair.slot.Count,pair.position))];
 
+    /// <summary>X-196 (0.1409): a retainer's stock in the game's copy: its stacks, the HQ ones, and its crystals (the 18 counts added).</summary>
+    public static (int Stacks,int HqStacks,int Crystals) Stock(FinderRetainer retainer)
+    {
+        var stacks=Stacks(retainer);
+        return (stacks.Count,stacks.Count(stack=>stack.Item.IsHighQuality),retainer.Crystals.Sum(count=>(int)count));
+    }
+
     public static InventoryItem Decode(uint id)=>id>=HighQualityOffset ? new(new(id-HighQualityOffset),true):new(new(id),false);
 
     /// <summary>The bank's stacks of the retainer's pages as (item, quantity, position: page * 25 + slot; -1 when the slot is unknown).</summary>

@@ -17,6 +17,8 @@ public sealed class CharacterStatusWatcher : IDisposable
     private readonly Configuration configuration;
     private readonly Action saveConfiguration;
     private readonly Func<IReadOnlyList<RouletteRow>?> roulettes;
+    // X-196 (0.1409): the job's abbreviation and the market town's name, in the client's language (null in the tests: texts left empty).
+    private readonly Func<byte,string>? jobName,townName;
     private readonly string folder;
     private readonly object gate=new();
     private readonly Dictionary<ulong,CharacterStatus> statuses=[];
@@ -26,10 +28,10 @@ public sealed class CharacterStatusWatcher : IDisposable
     private bool disposed,warned;
 
     public CharacterStatusWatcher(IFramework framework,IPlayerState player,IPluginLog log,Configuration configuration,Action saveConfiguration,
-        Func<IReadOnlyList<RouletteRow>?> roulettes,string folder)
+        Func<IReadOnlyList<RouletteRow>?> roulettes,string folder,Func<byte,string>? jobName=null,Func<byte,string>? townName=null)
     {
         this.framework=framework;this.player=player;this.log=log;this.configuration=configuration;this.saveConfiguration=saveConfiguration;
-        this.roulettes=roulettes;this.folder=folder;
+        this.roulettes=roulettes;this.folder=folder;this.jobName=jobName;this.townName=townName;
         foreach(var status in CharacterStatuses.ReadAll(folder,(path,error)=>
                 {
                     if(ulong.TryParse(Path.GetFileNameWithoutExtension(path),out var id))unreadable.Add(id);
@@ -107,6 +109,7 @@ public sealed class CharacterStatusWatcher : IDisposable
                 DeliveriesLeft=timers.DeliveriesLeft,AlliedQuestsLeft=(int?)timers.AlliedQuestsLeft,
                 TimersAt=timers.DeliveriesLeft is null && timers.AlliedQuestsLeft is null ? null:now,
                 SquadronMissionDone=timers.SquadronMission?.Done,SquadronTrainingDone=timers.SquadronTraining?.Done,
+                Retainers=ReadRetainers(),
             };
             lock(gate)
             {
@@ -145,6 +148,13 @@ public sealed class CharacterStatusWatcher : IDisposable
     {
         try{CharacterStatuses.Write(folder,statuses[id]);return true;}
         catch(Exception error){log.Warning(error,"A character file could not be saved.");return false;}
+    }
+
+    // X-196 (0.1409): guarded on its own: a failure leaves the retainers as last read, the rest of the status goes on.
+    private RetainerState[]? ReadRetainers()
+    {
+        try{return RetainerReader.Read(jobName,townName);}
+        catch(Exception error){log.Debug(error,"The retainers could not be read.");return null;}
     }
 
     // « Name (World) » of the logged-in character, as the Bank names its storages (0.345).
