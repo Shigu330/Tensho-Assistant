@@ -339,7 +339,7 @@ Arborescence du dépôt : le bloc de la partie anglaise ci-dessus.
   `Market/MarketBoardService.cs`) ont leur propre `HttpClient` avec un délai et une limite de taille de réponse, et le client Teamcraft
   (`Community/FishBiteTimes.cs`) passe aussi par `BoundedHttp.SendAsync` (POST, réponse lue dans la limite de 1 Mio). Les requêtes partent d'une action du
   joueur ou d'une page qui a besoin des données, jamais en boucle après un échec. Chaque source a son interrupteur dans
-  Paramètres › Données et sources, et « Données du jeu et observées seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
+  Paramètres › Données et sources, et « Données du jeu et vos observations seulement » les coupe toutes d'un coup. L'échange des découvertes partagées
   (`Discoveries/GitHubExchange.cs`) n'envoie quelque chose qu'après la connexion du joueur à GitHub.
 - Chaque abonnement, tâche ou fenêtre a un propriétaire et un nettoyage (arrêt et désabonnement propres du plugin).
 - Interface : le texte va dans `src/TenshoAssistant/Localization/Languages/*.json` (l'anglais est la référence, le français doit être

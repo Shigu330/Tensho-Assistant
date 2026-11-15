@@ -980,7 +980,7 @@ Predators, Snag. Credit in README and in the fishing help. Garland remains the f
 Ordre (DEC-011) : données du jeu d'abord (Lumina / sqpack, structures FFXIVClientStructs), puis sources communautaires. Une source
 communautaire absente ou désactivée donne « inconnu », jamais une valeur devinée. Interrupteurs : Paramètres › Avancé › Sources
 communautaires, un par source (LuminaSupplemental, Garland, wiki, GatherBuddy, Teamcraft, Revue de mode, PaissaDB, Universalis),
-et « Données du jeu et observées seulement » coupe les huit d'un coup (relu contre le code le 2026-11-11).
+et « Données du jeu et vos observations seulement » coupe les huit d'un coup (relu contre le code le 2026-11-11).
 
 ### Lues à l'exécution (réseau)
 

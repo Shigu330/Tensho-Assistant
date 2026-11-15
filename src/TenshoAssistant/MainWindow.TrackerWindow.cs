@@ -41,7 +41,7 @@ internal sealed partial class MainWindow
                 if(ImGui.Selectable(row.Label,false,ImGuiSelectableFlags.None,new Vector2(220,0))){OpenAlarmItem(row.ItemId);IsOpen=true;}
                 ImGui.SameLine();
                 var left=row.At-now;
-                ImGui.TextColored(left<=TimeSpan.FromMinutes(5) ? Accent:Muted,AlarmDtrEntry.Remaining(left)+(row.Weather ? " *":""));
+                ImGui.TextColored(left<=TimeSpan.FromMinutes(5) ? Accent:Muted,AlarmDtrEntry.Remaining(left,localization.Get)+(row.Weather ? " *":""));
                 if(row.Weather)Tip("Alarms.WeatherCondition");
                 if(configuration.Alarms?.FirstOrDefault(alarm=>alarm.Id==row.Id) is { } alarm && AlarmPlace(alarm) is { } place
                    && maps.State.Catalog?.Find(place.MapId) is { } map)

@@ -31,10 +31,6 @@ internal static class TenshoCulture
     /// <summary>The colon after a label: « : » in English, « : » after a no-break space in French.</summary>
     public static string Colon => IsFrench ? " :" : ":";
 
-    /// <summary>X-333 (0.1379): days and hours, as Common.LeftDays: « 6d 0h » in English, « 6 j 0 h » in French.</summary>
-    public static string Days(int days, int hours)
-        => IsFrench ? $"{days} j {hours} h" : $"{days}d {hours}h";
-
     /// <summary>Hours and minutes: « 3h 05m » in English, « 3 h 05 » in French.</summary>
     public static string Hours(int hours, int minutes)
         => IsFrench ? $"{hours} h {minutes:00}" : $"{hours}h {minutes:00}m";

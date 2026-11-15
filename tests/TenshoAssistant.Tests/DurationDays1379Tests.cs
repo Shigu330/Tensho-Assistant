@@ -29,11 +29,13 @@ internal static class DurationDays1379Tests
         }),
         ("Duration days 1379: the server bar says days from a day on", () =>
         {
-            var days = TenshoAssistant.Localization.TenshoCulture.Days(6, 0);
-            Check(days is "6d 0h" or "6 j 0 h", "days: " + days);
-            var bar = Read("src/TenshoAssistant/Alarms/AlarmDtrEntry.Dalamud.cs");
-            Check(bar.Contains("=>left.Days>=1 ? TenshoAssistant.Localization.TenshoCulture.Days(left.Days,left.Hours)", StringComparison.Ordinal)
-                && bar.Contains("TenshoCulture.Hours(left.Hours,left.Minutes)", StringComparison.Ordinal), "server bar: days first, then hours below a day");
+            // X-415 M4 (0.1389): through the common text (TimeLeft.Write), no longer TenshoCulture.Days: the same days first, every language.
+            string Text(string key) => key switch { "Common.LeftDays" => "{0}d {1}h", "Common.LeftHours" => "{0}h {1:00}", _ => "{0} min" };
+            var days = TimeLeft.Remaining(TimeSpan.FromDays(6) + TimeSpan.FromMinutes(5), Text);
+            Check(days == "6d 0h", "days: " + days);
+            Check(TimeLeft.Remaining(new TimeSpan(2, 15, 30), Text) == "2h 15" && TimeLeft.Remaining(TimeSpan.FromMinutes(45.5), Text) == "45 min"
+                && TimeLeft.Remaining(TimeSpan.FromSeconds(20), Text) == "< 1 min", "hours below a day, minutes below an hour, then « < 1 min »");
+            Check(Read("src/TenshoAssistant/Alarms/AlarmDtrEntry.Dalamud.cs").Contains("public static string Remaining(TimeSpan left,Func<string,string> text)=>UI.TimeLeft.Remaining(left,text);", StringComparison.Ordinal), "the server bar uses it");
         }),
         ("Duration days 1379: no hour placeholder left in the texts of a time left", () =>
         {

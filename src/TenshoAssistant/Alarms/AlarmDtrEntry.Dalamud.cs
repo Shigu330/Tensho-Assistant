@@ -53,7 +53,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
         upcoming=enabled.Select(alarm=>(Label:alarm.Label,At:AlarmSchedule.Next(alarm,now),Weather:alarm.Weathers.Count+alarm.PreviousWeathers.Count>0)).Where(pair=>pair.At is not null)
             .OrderBy(pair=>pair.At).Take(10).Select(pair=>(pair.Label,pair.At!.Value,pair.Weather)).ToArray();
         // 0.302 (user request): time left before the next alarm, not its clock time.
-        var time=upcoming.Count==0 ? "":" · "+Remaining(upcoming[0].At-now);
+        var time=upcoming.Count==0 ? "":" · "+Remaining(upcoming[0].At-now,text);
         shownText=SeIconChar.Clock.ToIconString()+" "+enabled.Length+time;
         entry.Text=new SeStringBuilder().AddText(shownText).Build();
         bounds=FindTextNode(gui,shownText);
@@ -64,10 +64,12 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
                 +(upcoming[0].Weather ? " · "+text("Alarms.WeatherCondition"):"");
     }
 
-    /// <summary>« 6 j 0 h » from a day on (X-333), « 2 h 15 » from one hour on, « 45 min » below, « < 1 min » at the end.</summary>
-    public static string Remaining(TimeSpan left)
-        =>left.Days>=1 ? TenshoAssistant.Localization.TenshoCulture.Days(left.Days,left.Hours)
-        :left.TotalHours>=1 ? TenshoAssistant.Localization.TenshoCulture.Hours(left.Hours,left.Minutes):left.TotalMinutes>=1 ? $"{(int)left.TotalMinutes} min":"< 1 min";
+    /// <summary>
+    /// The common text of a time left (X-415 M4, 0.1389, R10: TimeLeft.Write with Common.LeftDays, LeftHours and LeftMinutes, each language its
+    /// own form; before, a second way written in English and French only): « 6 j 0 h » from a day on, « 2 h 15 » from one hour on, « 45 min »
+    /// below, « < 1 min » at the end.
+    /// </summary>
+    public static string Remaining(TimeSpan left,Func<string,string> text)=>UI.TimeLeft.Remaining(left,text);
 
     // The entry's text node in the server info bar addon: Dalamud adds it under the addon's root; matched by its text.
     internal static (Vector2 Min,Vector2 Max)? FindTextNode(IGameGui gui,string wanted)
@@ -102,7 +104,7 @@ public sealed unsafe class AlarmDtrEntry : IDisposable
             if(upcoming.Count==0){ImGui.TextUnformatted(text("Alarms.BarNone"));return;}
             ImGui.TextColored(UI.FfxivTheme.Gold,text("Alarms.BarTitle"));
             foreach(var (label,at,conditioned) in upcoming.Take(Math.Clamp(configuration.AlarmBarTooltipCount,1,10)))
-                ImGui.TextUnformatted($"{Remaining(at-DateTimeOffset.UtcNow)}  ({at.ToLocalTime().ToString("t",System.Globalization.CultureInfo.CurrentCulture)})  {label}"
+                ImGui.TextUnformatted($"{Remaining(at-DateTimeOffset.UtcNow,text)}  ({at.ToLocalTime().ToString("t",System.Globalization.CultureInfo.CurrentCulture)})  {label}"
                     +(conditioned ? " · "+text("Alarms.WeatherCondition"):""));
             ImGui.TextDisabled(text("Alarms.BarClick"));
         }
