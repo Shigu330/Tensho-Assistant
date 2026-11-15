@@ -1397,6 +1397,9 @@ public sealed partial class Plugin : IDalamudPlugin
                     // X-177 (0.1281): of those methods, the ones the readers' classes call in other classes (CallGraph).
                     if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is not null)
                         log.Information("Readers' callees: {0} methods called from their classes in other classes, compiled with them.",TenshoAssistant.Competitive.CompetitiveGate.CompilerCallees);
+                    // X-433 (0.1438): the readers the guard delay started before their class was compiled (each compiles in a frame).
+                    if(TenshoAssistant.Competitive.CompetitiveGate.CompilerState is not null)
+                        log.Information("Readers started by the guard delay before their class was compiled: {0}.",TenshoAssistant.Competitive.CompetitiveGate.CompilerGuardStarts);
                     // X-433 (0.1424): the longest compilations, to compare with a hitch's time.
                     if(TenshoAssistant.Competitive.CompetitiveGate.CompilerSlowest is { Length:>0 } slowest)
                         log.Information("Readers' longest compilations: {0}.",slowest);
