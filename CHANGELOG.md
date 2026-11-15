@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1461.0
+- Essais en jeu : toutes les lectures de l'étape 0 sont faites (les deux dernières, champs et gains d'objets, relevées le 15/11) ; la case de l'étape 0 du parcours des essais se coche, et le test qui en vérifiait le début accepte la case cochée.
+- Tests : Readings1071Tests. Verify.ps1 (agent) : 2814/2814, 0 avertissement, 0 erreur ; DLL 0.1461.0.0. Rien à essayer en jeu.
+### English
+- In-game tests: every reading of step 0 is done (the last two, fields and item gains, read on 11/15); the test route's step 0 box gets ticked, and the test that checked its start accepts the ticked box.
+
 ## 0.1460.0
 - Plan global, X-457 : Plan global, X-457 (mesure d'abord) : la fenêtre de chat de Tensho, collée en bas, sautait entre deux positions 5 à 20 fois par seconde (vu par l'utilisateur le 15/11 vers 20 h 50) ; la cause n'est pas prouvée sans le jeu (barre de défilement qui va et vient, mise en page refaite, hauteur du contenu qui change pendant la mise en page). En mode développeur, la fenêtre écrit maintenant une ligne dans le journal quand, en une seconde, elle refait la mise en page de ses lignes deux fois ou plus, ou que ses rangées, la limite du défilement ou « collée en bas » changent quatre fois ou plus : largeurs, rangées, défilement et limite, image par image. X-457 reste ouvert.
 - Tests : ChatScrollWatch1460Tests. Verify.ps1 (agent) : 2814/2814, 0 avertissement, 0 erreur ; DLL 0.1460.0.0. Non validé en jeu.
