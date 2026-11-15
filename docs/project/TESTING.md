@@ -1899,6 +1899,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1402) Carte de Tensho, dans l'atelier de compagnie (Brumée, Lavandière, Gobelet, Shirogane ou Empyrée) : la sonnette d'appel et le coffre de compagnie sont sur la carte avec les icônes du jeu ; le survol donne leur nom ; dans le tableau des icônes de la carte, la taille 0 de la sonnette les cache. Dans une ville (Limsa basse, Ul'dah Thal, Vieille Gridania), les sonnettes ne sont pas en double.
 
+- [ ] (0.1405) Carte de Tensho, à Eulmore : la sonnette d'appel n'apparaît qu'une fois, sur la carte où le jeu la marque (pas de deuxième sonnette sur l'autre carte d'Eulmore). Journal : « Map positions: 10 bell(s) and company chest(s) … longest step … ms ».
+
+- [ ] (0.1410) Rappels › Statut, après avoir ouvert la liste des servants à une sonnette d'appel (attendre 30 secondes) : le tableau « Vos servants » montre chaque servant avec sa classe et son niveau, ses gils, ses objets (au survol : piles, haute qualité, cristaux d'après la copie du jeu), ses ventes (orange si elles finissent dans la journée, rouge si finies), sa tâche et sa ville du marché ; le total des gils est juste. Avec un autre personnage, ses servants s'ajoutent après sa propre visite à la sonnette.
+
+- [ ] (0.1411) Alarmes : à la sonnette d'appel, liste des servants ouverte, un servant avec des objets en vente : une alarme automatique « Fin des ventes de <servant> » (groupe « Ventes des servants ») apparaît à l'heure de fin donnée par le jeu ; elle correspond à la fin indiquée dans le tableau Rappels › Statut. Si l'heure semble fausse (le jeu ne fait pas expirer les ventes), le noter.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
