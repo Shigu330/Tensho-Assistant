@@ -63,8 +63,11 @@ public sealed class ItemCatalog
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(metadata);
-        var items = new Dictionary<uint, ItemDefinition>();
-        var names = new List<(ItemDefinition Item, string SearchName)>();
+        // X-433 (0.1432): sized once when the source knows its count (a list from the cache): growing by doubling allocated each large array
+        // three or four times (Entry[] 197 to 1768 KB) while a background collection ran.
+        var known = source.TryGetNonEnumeratedCount(out var count) ? count : 0;
+        var items = new Dictionary<uint, ItemDefinition>(known);
+        var names = new List<(ItemDefinition Item, string SearchName)>(known);
         foreach (var item in source)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -73,8 +76,14 @@ public sealed class ItemCatalog
             names.Add((item, Normalize(item.Name)));
         }
         cancellationToken.ThrowIfCancellationRequested();
-        var sorted = names.OrderBy(entry => entry.SearchName, StringComparer.Ordinal)
-            .ThenBy(entry => entry.Item.Id).ToArray();
+        // X-433 (0.1432): sorted in place, in the order OrderBy(SearchName, ordinal).ThenBy(Id) gave (ids are unique: the order is total, the
+        // sort's instability changes nothing), without its copies of the keys and of the list.
+        names.Sort(static (left, right) =>
+        {
+            var byName = string.CompareOrdinal(left.SearchName, right.SearchName);
+            return byName != 0 ? byName : left.Item.Id.CompareTo(right.Item.Id);
+        });
+        var sorted = names.ToArray();
         cancellationToken.ThrowIfCancellationRequested();
         return new ItemCatalog(metadata, items, sorted);
     }

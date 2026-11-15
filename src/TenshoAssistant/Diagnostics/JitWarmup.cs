@@ -8,8 +8,8 @@ namespace TenshoAssistant.Diagnostics;
 /// load of the plugin. The desktop application's headless run measured it: Reminders 40.3 ms on its first frame, 38.9 ms of it compiling
 /// 79 methods; Gathering 57.4 ms, 45.3 ms compiling (docs/evidence/0.1050-first-frame-jit.md). In the game the same first frames were
 /// 92 to 161 ms (page sweep of 11/11 02:14). This compiles the window's methods ahead, then those of every other type of the plugin
-/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread (normal
-/// priority since 0.1427, below normal before), a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
+/// (Configuration, alarms, timers, catalogues: what the pages still compiled once the window was done), on one background thread (below
+/// normal priority; normal from 0.1427 to 0.1431, undone in 0.1432), a few seconds after loading, so that the frame finds them compiled. Generic code made for given type arguments and
 /// the libraries' code (ImGui, Lumina) stay compiled on first use. Its own thread, cancelled and joined on dispose (R07); a method
 /// that cannot be prepared (generic, abstract, without a body) is skipped, never an error for the window.
 /// </summary>
@@ -97,11 +97,11 @@ public sealed class JitWarmup : IDisposable
     {
         var token=cancellation.Token;
         this.measure=measure;
-        // X-433 (0.1427): normal priority, like the readers' compiler (below normal before), to remove one possible cause of the hitches about
-        // 20 s after a load (the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and
-        // neither gain nor harm measured (docs/evidence/0.1427-warmup-priority.md: a 704 ms compilation with no processor time happened during
-        // a 702 ms collection, a compilation's time including the collector's pauses).
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.Normal,Name="Tensho JIT warm-up"};
+        // X-433: below normal, so its seconds of processor never compete with the game's threads. 0.1427 ran it at normal priority on a
+        // hypothesis (docs/evidence/0.1427-warmup-priority.md: the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and disproved
+        // in 0.1432 (docs/evidence/0.1432-background-collection-stall.md): its long compilations without processor time were stops of every
+        // managed thread during a background collection, the game's included; undone.
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
