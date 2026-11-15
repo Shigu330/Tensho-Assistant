@@ -89,6 +89,8 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-170 | Vocabulary (X-381, question 1): French for « duty », « mission » or « contenu »? | « mission(s) » everywhere, the client's official name (D-161); page « Butin des missions »; « contenu » kept for the « CONTENUS » group and ranked content |  |
+| D-171 | Vocabulary (X-381, question 2): an NPC who sells, « marchand » or « vendeur »? | « marchand(s) » for every selling NPC, page « PNJ marchands »; « vendeur » stays the market-board player; one name for the tool |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -194,6 +196,8 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
 | D-89 | Bonus estimé d'Extraction/Récolte abondante (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
 | D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+| D-170 | Vocabulaire (X-381, question 1) : « duty » en français, « mission » ou « contenu » ? | « mission(s) » partout, nom officiel du client (Addon#2225.0, #3770.0, #11170.0 ; D-161) : page « Butin des missions », « contenu » gardé pour le groupe « CONTENUS » et « contenu classé » ; à aligner aussi « Masquer en instance » |  |
+| D-171 | Vocabulaire (X-381, question 2) : un PNJ qui vend, « marchand » ou « vendeur » ? | « marchand(s) » pour tout PNJ qui vend, page « PNJ marchands » (Addon#3408.0, #7610.0, MainCommand#71.6) ; « vendeur » reste le joueur du tableau des ventes (Addon#6996.0) ; un seul nom pour l'outil |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

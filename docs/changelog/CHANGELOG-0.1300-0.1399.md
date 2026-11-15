@@ -2,6 +2,14 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1368.0
+- Plan global, X-397 : Relecture du bloc 0.1362 à 0.1364, constat I1 : les listes d'artisanat portaient encore deux noms en français (« Liste(s) de fabrication » dans le titre de la page, l'onglet du simulateur, le panneau et les lignes de l'aide à la récolte, à côté de « liste d'artisanat » dans leurs infobulles). Un seul nom maintenant, « liste d'artisanat », titres compris ; l'infobulle d'ajout cite le vrai titre de la page. Test CraftListName1368Tests (insensible à la casse, titre cité égal au titre de la page).
+- Pour les joueurs : les listes d'artisanat ont un seul nom partout en français.
+- Tests : CraftListName1368Tests. Verify.ps1 (agent) : 2570/2570, 0 avertissement, 0 erreur ; DLL 0.1368.0.0. Non validé en jeu.
+### English
+- Review of block 0.1362 to 0.1364, finding I1: the craft lists still had two French names (« Liste(s) de fabrication » in the page title, the simulator tab, the panel and the gathering help lines, beside « liste d'artisanat » in their tooltips). One name now, « liste d'artisanat », titles included; the add tooltip quotes the page's real title. Test CraftListName1368Tests (case-insensitive, quoted title equal to the page title).
+- For players: French: craft lists have a single name everywhere.
+
 ## 0.1367.0
 - Plan global, X-389 : Recherches et apostrophes (essai T-0.1354-1) : sonde des feuilles du jeu (objets, lieux, PNJ, monstres, quêtes, ALÉA, missions, montures, mascottes, mandats, statuts, actions, hauts faits, titres, objets clés ; français et anglais) : les noms n'utilisent que l'apostrophe droite, comme les textes de Tensho (D-162). Toutes les recherches de Tensho (51 endroits : objets, découvertes, banque, artisanat, carte, missions, triade, jardin, météo, paramètres…, plus la liste des objets, la recherche rapide et le lexique) traitent maintenant toutes les formes d'apostrophe tapées (courbe, apostrophe-lettre, accent aigu, accent grave, prime, pleine chasse) comme l'apostrophe droite. L'essai du 15/11 était fait dans les Découvertes, qui ne cherchent que parmi les faits notés. Preuve docs/evidence/0.1367-search-apostrophes.md ; test SearchApostrophe1367Tests (noms réels Item#8090 et #8568, et aucun endroit de recherche sans l'aide commune).
 - Pour les joueurs : les recherches acceptent toutes les formes d'apostrophe tapées.

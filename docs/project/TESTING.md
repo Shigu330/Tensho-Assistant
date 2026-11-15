@@ -1863,6 +1863,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1369) Plugin en français : page Bestiaire (colonne « Vaincus »), page Mandats (colonne et filtre « Client »), réglages de la carte Tensho (« Cibles d'élite proches », « Monstres de vos Chroniques du zodiaque »), page Rangs S (champ « Chercher une cible d'élite… »), Aide › questions « mettre à jour » et « installer » (« Mettre à jour les plugins », « Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés »).
 
+- [ ] (0.1370) Découvertes › Échange, jeu lancé, réseau coupé juste avant « Échanger maintenant » (ou pare-feu sur le jeu) : le message dit « GitHub injoignable ou fichier commun pas encore publié, réessayez plus tard », pas « Fichier commun illisible ».
+
+- [ ] (0.1372) Mandats, en français puis en anglais : infobulle d'un mandat « Client : <nom> » une seule fois ; colonne Client et filtre des clients sans « Client : » devant chaque nom ; clic droit : « Éthérite la plus proche du PNJ du mandat » pose le drapeau près du PNJ qui donne ou reçoit le mandat.
+
+- [ ] (0.1373) Dédale bestial, panneau d'équipe devant le plateau (français puis anglais) : aucune ligne coupée au bord (« Rangs pas encore lus… », noms des ennemis comme « Succube épéiste », « Grand feu follet… ») ; les lignes passent à la ligne, retrait gardé ; « faiblesse touchée : 0 sur 1 ennemi » au singulier, « 2 sur 3 ennemis » au pluriel.
+
+- [ ] (0.1374) En français : barre de navigation « Butin des missions » et « PNJ marchands » ; carte › réglage « Masquer en mission » ; infobulle d'un objet vendu : « (outil PNJ marchands) » ; panneau des servants au tableau des ventes : « Comparer aux autres vendeurs » inchangé.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
