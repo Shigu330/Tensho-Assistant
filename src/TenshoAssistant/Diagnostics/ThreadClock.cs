@@ -13,6 +13,8 @@ public static class ThreadClock
     public static long GameThread;
     /// <summary>X-433 (0.1431): the system id of the JIT warm-up's thread, once it ran (0: not yet).</summary>
     public static long WarmupThread;
+    /// <summary>X-433 (0.1448): the system id of the readers' compiler's thread, once it ran (0: not yet).</summary>
+    public static long CompilerThread;
 
     public static double? ProcessorMs()
     {

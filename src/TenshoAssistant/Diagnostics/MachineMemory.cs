@@ -84,51 +84,64 @@ public static class MachineMemory
 
 /// <summary>
 /// X-433 (0.1447): what is allocated in the two minutes after a load, from the runtime's allocation ticks (one about every 100 KB, with the
-/// amount allocated since the last one and the type of the object that crossed the mark): the amount by type (the largest <see cref="Kept"/>)
-/// and by thread (the game's, the JIT warm-up's, the others). A sample: a type's amount is near what it allocated, not exact. Thread-safe;
-/// pure (fed by <see cref="RuntimeSuspensionListener"/>, or by the tests).
+/// amount allocated since the last one and the type of the object that crossed the mark). X-433 (0.1448): by thread, each with its own
+/// largest types (<see cref="Kept"/>): the game's, the JIT warm-up's, the readers' compiler's, the event listener's own (the cost of this
+/// measure, which a player does not have), the others. A sample: a type's amount is near what it allocated, not exact. Thread-safe; pure
+/// (fed by <see cref="RuntimeSuspensionListener"/>, or by the tests).
 /// </summary>
-public sealed class AllocationTypes(int kept=10,int maximumTypes=4000)
+public sealed class AllocationTypes(int kept=4,int maximumTypes=2000)
 {
+    /// <summary>Where a tick was made.</summary>
+    public enum Where { Game, Warmup, Compiler, Listener, Other }
+    private static readonly string[] Names=["the game's thread","the JIT warm-up's thread","the readers' compiler's thread","the measure's own listener","other threads"];
     public int Kept { get; } = kept;
+    /// <summary>At most this many types kept by thread; the rest counted as « other types ».</summary>
     public int MaximumTypes { get; } = maximumTypes;
     private readonly object gate=new();
-    private readonly Dictionary<string,long> byType=new(StringComparer.Ordinal);
-    private long other;
+    private readonly Dictionary<string,long>[] byType=[new(StringComparer.Ordinal),new(StringComparer.Ordinal),new(StringComparer.Ordinal),new(StringComparer.Ordinal),new(StringComparer.Ordinal)];
+    private readonly long[] amounts=new long[5],others=new long[5];
+    private long ticks,total;
     public long Ticks { get{lock(gate)return ticks;} }
     public long Total { get{lock(gate)return total;} }
-    public long OnGameThread { get{lock(gate)return onGame;} }
-    public long OnWarmupThread { get{lock(gate)return onWarmup;} }
-    private long ticks,total,onGame,onWarmup;
+    public long On(Where where){lock(gate)return amounts[(int)where];}
+    public long OnGameThread=>On(Where.Game);
+    public long OnWarmupThread=>On(Where.Warmup);
+
+    /// <summary>The thread a tick was made on, from the system ids known (0: not known yet, never matched).</summary>
+    public static Where Of(long thread,long gameThread,long warmupThread,long compilerThread,long listenerThread)=>
+        thread==0 ? Where.Other : thread==gameThread ? Where.Game : thread==warmupThread ? Where.Warmup
+            : thread==compilerThread ? Where.Compiler : thread==listenerThread ? Where.Listener : Where.Other;
 
     /// <summary>One allocation tick: the amount since the last one, the type named, the thread (system ids; 0: not known yet).</summary>
-    public void See(string? type,long bytes,long thread,long gameThread,long warmupThread)
+    public void See(string? type,long bytes,long thread,long gameThread,long warmupThread,long compilerThread=0,long listenerThread=0)
     {
         if(bytes<=0)return;
+        var where=(int)Of(thread,gameThread,warmupThread,compilerThread,listenerThread);
         lock(gate)
         {
-            ticks++;total+=bytes;
-            if(gameThread!=0 && thread==gameThread)onGame+=bytes;
-            if(warmupThread!=0 && thread==warmupThread)onWarmup+=bytes;
+            ticks++;total+=bytes;amounts[where]+=bytes;
             var name=string.IsNullOrEmpty(type) ? "?":type;
-            if(byType.TryGetValue(name,out var sum))byType[name]=sum+bytes;
-            else if(byType.Count<MaximumTypes)byType[name]=bytes;
-            else other+=bytes;
+            var table=byType[where];
+            if(table.TryGetValue(name,out var sum))table[name]=sum+bytes;
+            else if(table.Count<MaximumTypes)table[name]=bytes;
+            else others[where]+=bytes;
         }
     }
 
     private static string Mb(long bytes)=>bytes>=10*1_048_576
-        ? string.Create(CultureInfo.InvariantCulture,$"{bytes/1_048_576} MB")
+        ? string.Create(CultureInfo.InvariantCulture,$"{bytes/1_048_576.0:0} MB")
         : string.Create(CultureInfo.InvariantCulture,$"{bytes/1_048_576.0:0.0} MB");
 
-    /// <summary>The line said when the watch ends.</summary>
+    /// <summary>The line said when the watch ends: the total, then each thread with an amount, its largest types first.</summary>
     public string Summary(TimeSpan watched)
     {
         lock(gate)
         {
-            var top=byType.OrderByDescending(pair=>pair.Value).ThenBy(pair=>pair.Key,StringComparer.Ordinal).Take(Kept).Select(pair=>pair.Key+" "+Mb(pair.Value));
+            var parts=Enumerable.Range(0,Names.Length).Where(index=>amounts[index]>0).Select(index=>Names[index]+" "+Mb(amounts[index])+" ("
+                +string.Join(", ",byType[index].OrderByDescending(pair=>pair.Value).ThenBy(pair=>pair.Key,StringComparer.Ordinal).Take(Kept).Select(pair=>pair.Key+" "+Mb(pair.Value)))
+                +(others[index]>0 ? ", other types "+Mb(others[index]):"")+")");
             return string.Create(CultureInfo.InvariantCulture,
-                $"Allocated in the {watched.TotalSeconds:0} s after the load (allocation ticks, about one per 100 KB): {Mb(total)} in {ticks} ticks, {Mb(onGame)} on the game's thread, {Mb(onWarmup)} on the JIT warm-up's; by type: {(byType.Count==0 ? "none":string.Join(", ",top))}{(other>0 ? "; other types "+Mb(other):"")}.");
+                $"Allocated in the {watched.TotalSeconds:0} s after the load (allocation ticks, about one per 100 KB): {Mb(total)} in {ticks} ticks{(ticks==0 ? "":"; "+string.Join("; ",parts))}.");
         }
     }
 }

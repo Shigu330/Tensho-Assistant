@@ -305,6 +305,8 @@ public sealed class RuntimeSuspensionListener : EventListener
     private readonly AllocationTypes allocations=new();
     private volatile Action<string>? say;
     private int disposed;
+    // X-433 (0.1448): the thread the runtime's events are given on (its own allocations are the measure's cost).
+    private long listenerThread;
 
     public RuntimeSuspensionListener(Action<string> say)
     {
@@ -331,6 +333,7 @@ public sealed class RuntimeSuspensionListener : EventListener
     protected override void OnEventWritten(EventWrittenEventArgs written)
     {
         if(Volatile.Read(ref disposed)!=0)return;
+        if(Interlocked.Read(ref listenerThread)==0)Interlocked.Exchange(ref listenerThread,ThreadClock.SystemId());
         // X-433 (0.1440): a method starts compiling; only the game's thread's are kept (its id is known once a reader ran).
         if(written.EventName?.StartsWith("MethodJittingStarted",StringComparison.Ordinal)==true)
         {
@@ -357,7 +360,7 @@ public sealed class RuntimeSuspensionListener : EventListener
             var typeName=written.PayloadNames?.IndexOf("TypeName") is int typeAt && typeAt>=0 && written.Payload is { } typeValues && typeAt<typeValues.Count ? typeValues[typeAt] as string:null;
             // X-433 (0.1447): every tick, weighed by the amount allocated since the last one.
             allocations.See(typeName,Number(written,"AllocationAmount64") ?? Number(written,"AllocationAmount") ?? 0,written.OSThreadId,
-                Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread));
+                Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread),Interlocked.Read(ref ThreadClock.CompilerThread),Interlocked.Read(ref listenerThread));
             if(large.See(written.TimeStamp.ToUniversalTime(),Number(written,"AllocationKind") ?? 0,size,typeName,written.OSThreadId,
                 Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread),collections.BackgroundSince) is { } largeNote)say?.Invoke(largeNote);
             return;

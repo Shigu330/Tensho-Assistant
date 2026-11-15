@@ -38,10 +38,10 @@ internal static class MemoryMeasure1447Tests
             types.See(null,0,5,7,9);                  // no amount: not a tick
             Check(types.Ticks == 5 && types.Total == 750 * 1024 + 20 * Mb,"ticks and total: " + types.Ticks + ", " + types.Total);
             Check(types.OnGameThread == 100 * 1024 && types.OnWarmupThread == 300 * 1024,"by thread");
+            // 0.1448: by thread, each with its largest types (MemoryMeasure1448Tests).
             var summary = types.Summary(TimeSpan.FromMinutes(2));
-            Check(summary.Contains("by type: System.Byte[] 0.4 MB, System.String 0.3 MB; other types 20 MB.",StringComparison.Ordinal),summary);
-            Check(summary.StartsWith("Allocated in the 120 s after the load (allocation ticks, about one per 100 KB): 20 MB in 5 ticks, 0.1 MB on the game's thread, 0.3 MB on the JIT warm-up's;",StringComparison.Ordinal),summary);
-            Check(new AllocationTypes().Summary(TimeSpan.FromMinutes(2)).Contains("by type: none.",StringComparison.Ordinal),"nothing seen");
+            Check(summary == "Allocated in the 120 s after the load (allocation ticks, about one per 100 KB): 21 MB in 5 ticks; the game's thread 0.1 MB (System.Byte[] 0.1 MB); the JIT warm-up's thread 0.3 MB (System.String 0.3 MB); other threads 20 MB (Tensho.Late 20 MB, System.Byte[] 0.3 MB).",summary);
+            Check(new AllocationTypes().Summary(TimeSpan.FromMinutes(2)).EndsWith(": 0.0 MB in 0 ticks.",StringComparison.Ordinal),"nothing seen");
         }),
         ("Memory measure 1447: the listener weighs every tick, a collection of generation 2 says the memory, the plugin says both",() =>
         {
