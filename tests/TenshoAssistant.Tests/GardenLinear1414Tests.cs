@@ -7,6 +7,9 @@ using TenshoAssistant.Reminders;
 // hostile inputs read in a time bounded by their length, the same answers as before, and no RegexMatchTimeoutException is possible.
 internal static class GardenLinear1414Tests
 {
+    // X-435 M3 (0.1421): not a speed measure (the classes run in parallel, R36.2; the CI is loaded): only a guard against a runaway engine,
+    // whose backtracking on these inputs would take far longer. The linear engine itself is checked by the first case.
+    private static readonly TimeSpan Runaway = TimeSpan.FromSeconds(30);
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static string Read(string path) => File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/" + path)).Replace("\r\n", "\n");
     private static readonly DateTimeOffset Now = new(2026, 11, 15, 14, 0, 0, TimeSpan.Zero);
@@ -35,7 +38,7 @@ internal static class GardenLinear1414Tests
             var good = string.Concat(Enumerable.Repeat("x · ", 3000)) + "patch 3, bed 8";
             var slot = GardenJournal.Slot(new GardenBed { Place = good });
             Check(slot is { Patch: 3, Bed: 8 } && slot.Zone.Length == good.Length - " · patch 3, bed 8".Length, "the last separator still splits the zone: " + slot?.Zone.Length);
-            Check(watch.Elapsed < TimeSpan.FromSeconds(2), "two long places in " + watch.Elapsed.TotalMilliseconds + " ms");
+            Check(watch.Elapsed < Runaway, "two long places in " + watch.Elapsed.TotalMilliseconds + " ms");
             Check(GardenJournal.Slot(GardenJournal.Plant("Mist 5 · patch 2, bed 7", "Seed", 24, 0, Now)) is { Zone: "Mist 5", Patch: 2, Bed: 7 }, "a usual place");
         }),
         ("Garden linear 1414: the chat line and the menu title read as before, and their longest accepted inputs stay fast", () =>
@@ -54,7 +57,7 @@ internal static class GardenLinear1414Tests
                 Check(chat.Read("", worst) is null, "no planting in a line of many numbers");
                 Check(title!.Read(new string('1', 79)) is null, "no title in 79 digits");
             }
-            Check(watch.Elapsed < TimeSpan.FromSeconds(2), "1000 worst reads in " + watch.Elapsed.TotalMilliseconds + " ms");
+            Check(watch.Elapsed < Runaway, "1000 worst reads in " + watch.Elapsed.TotalMilliseconds + " ms");
         }),
     ];
 }

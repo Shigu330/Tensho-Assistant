@@ -23,7 +23,10 @@ internal sealed partial class MainWindow
         else if(Volatile.Read(ref desktopCharacters) is { } copy)all=[.. copy.OrderBy(status=>status.Name)];
         else return;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.Title",all.Count)+"###CharacterStatuses",ImGuiTreeNodeFlags.DefaultOpen))return;
+        // X-435 M4 (0.1421): the help lines wrap at the page's edge (they were cut at 1280 px).
+        ImGui.PushTextWrapPos(0);
         ImGui.TextDisabled(localization.Get("CharacterStatus.Help"));
+        ImGui.PopTextWrapPos();
         if(all.Count==0){ImGui.TextDisabled(localization.Get("CharacterStatus.Empty"));return;}
         var now=DateTimeOffset.UtcNow;var lastDaily=ResetSchedule.PreviousDaily(now,ResetSchedule.DailyHour);var current=source?.Current ?? 0;
         var lastWeekly=ResetSchedule.PreviousWeekly(now,ResetSchedule.WeeklyDay,ResetSchedule.WeeklyHour);
@@ -109,12 +112,16 @@ internal sealed partial class MainWindow
         var rows=RetainerStates.Table(all);
         if(rows.Count==0)return;
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Format("CharacterStatus.RetainersTitle",rows.Count)+"###RetainerTable",ImGuiTreeNodeFlags.DefaultOpen))return;
+        ImGui.PushTextWrapPos(0);
         ImGui.TextDisabled(localization.Get("CharacterStatus.RetainersHelp"));
+        ImGui.PopTextWrapPos();
         var now=DateTimeOffset.UtcNow;
         if(!TenshoAssistant.UI.UiComponents.BeginDataTable("RetainerTable",8,scrollHeight:Math.Min(320,(rows.Count+1)*ImGui.GetFrameHeightWithSpacing()+8)))return;
         try
         {
-            foreach(var key in new[]{"Character","Name","Job","Gil","Items","Market","Venture","Town"})ImGui.TableSetupColumn(localization.Get("CharacterStatus.RetainerColumn"+key));
+            // X-435 M4 (0.1421): Gil and Items fit their numbers (they took a stretched share and left the market town cut at 1280 px).
+            foreach(var key in new[]{"Character","Name","Job","Gil","Items","Market","Venture","Town"})
+                ImGui.TableSetupColumn(localization.Get("CharacterStatus.RetainerColumn"+key),key is "Gil" or "Items" ? ImGuiTableColumnFlags.WidthFixed:ImGuiTableColumnFlags.None);
             ImGui.TableSetupScrollFreeze(2,1);
             ImGui.TableHeadersRow();
             var index=0;

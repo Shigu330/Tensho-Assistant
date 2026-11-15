@@ -21,10 +21,15 @@ internal static class GilCategories1418Tests
                 Check(GilJournal.ForDelta(read, 2000) == category && GilJournal.ForDelta(read, -500) == GilCategory.Other, window + ": gains only");
                 Check(GilJournal.Classify(seen, Now.AddSeconds(20)) == GilCategory.Other, window + ": 15 seconds at most");
             }
-            var both = new Dictionary<string, DateTimeOffset> { ["XBMResult"] = Now.AddSeconds(-10), ["NowLoading"] = Now.AddSeconds(-2) };
-            Check(GilJournal.ForDelta(GilJournal.Classify(both, Now), 2000) == GilCategory.Other, "the 11/13 case: a loading screen after the result is newer: a teleport gain stays « Other »");
-            var after = new Dictionary<string, DateTimeOffset> { ["NowLoading"] = Now.AddSeconds(-10), ["XBMResult"] = Now.AddSeconds(-2) };
-            Check(GilJournal.Classify(after, Now) == GilCategory.Beastmaster, "the result newest: Beastmaster");
+            // X-435 M2 (0.1421): an invented order (not a reading): a loading screen newer than the result; the gain stays « Other ».
+            var loadingNewer = new Dictionary<string, DateTimeOffset> { ["XBMResult"] = Now.AddSeconds(-10), ["NowLoading"] = Now.AddSeconds(-2) };
+            Check(GilJournal.ForDelta(GilJournal.Classify(loadingNewer, Now), 2000) == GilCategory.Other, "a loading screen newer than the result: a teleport gain stays « Other »");
+            // The 11/13 case (docs/evidence/0.1319-gil-other.md): the log lists the windows newest first (GilWatcher, OrderByDescending):
+            // « XBMResult, NeedGreed, NowLoading, XBMContentsMainHUD »: the result was the newest: Beastmaster.
+            var logged = new[] { "XBMResult", "NeedGreed", "NowLoading", "XBMContentsMainHUD" };
+            var november13 = logged.Select((window, rank) => (window, rank)).ToDictionary(pair => pair.window, pair => Now.AddSeconds(-2 - 3 * pair.rank));
+            Check(GilJournal.Classify(november13, Now) == GilCategory.Beastmaster, "the 11/13 case, in the logged order: Beastmaster");
+            Check(Read("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs").Contains(".OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)", StringComparison.Ordinal), "the log lists the newest window first");
         }),
         ("Gil categories 1418: the values written before keep their number; every category has an icon and an English and French text", () =>
         {
