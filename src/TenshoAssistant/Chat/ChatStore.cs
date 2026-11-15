@@ -1,7 +1,9 @@
 namespace TenshoAssistant.Chat;
 
-public enum ChatSegmentKind { Text }
-public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text);
+public enum ChatSegmentKind { Text,MapLink,ItemLink }
+/// <summary>X-403 phase 2 (0.1441): what a link of a message points to: a place (territory, map, coordinate, place name) or an item (id, high quality).</summary>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false);
+public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
 public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body);
 

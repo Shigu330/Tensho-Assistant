@@ -218,6 +218,16 @@ internal sealed partial class MainWindow
             ImGui.SetCursorPosY(top+view.RowCount*height);
             ImGui.Dummy(new Vector2(1,1));
             if(atBottom){ImGui.SetScrollHereY(1);view.MarkSeen();}
+            // X-403 phase 2 (0.1441): the place menu of a map link, opened by a right click on it (the same entries as Tensho's other place menus).
+            if(chatWindowPlace is { } place)
+            {
+                if(ImGui.BeginPopup("###TenshoChatWindowPlace"))
+                {
+                    try{MenuHeader(localization.Get("ChatLinks.MenuTitle"));PlaceEntries(place.Map,place.Coordinate,null,place.Place);}
+                    finally{ImGui.EndPopup();}
+                }
+                else chatWindowPlace=null;
+            }
         }
         finally{ImGui.EndChild();}
     }
@@ -232,13 +242,53 @@ internal sealed partial class MainWindow
         {
             ImGui.SetCursorPosY(y+line*height);
             var first=true;
+            var index=0;
             foreach(var run in lines[line])
             {
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
-                ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                if(run.Link is { } link)DrawChatLink(run,link,$"{record.Id}_{line}_{index}");
+                else ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                index++;
             }
             if(first)ImGui.TextUnformatted(" ");
         }
+    }
+
+    // X-403 phase 2 (0.1441): the place menu a right click on a map link opened (drawn by DrawChatLines).
+    private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
+
+    /// <summary>
+    /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
+    /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
+    /// opens Tensho's item menu. A target Tensho does not know (data not loaded, an item it does not list) is only said on hover.
+    /// </summary>
+    private void DrawChatLink(ChatRun run,ChatLink link,string id)
+    {
+        ImGui.TextColored(Accent,run.Text);
+        var min=ImGui.GetItemRectMin();
+        var max=ImGui.GetItemRectMax();
+        ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
+        if(link.Kind==ChatSegmentKind.MapLink)
+        {
+            if(maps.State.Catalog?.Find(link.MapId) is not { } map || !Maps.MapCatalog.CoordinatesValid(link.X,link.Y)){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
+            var coordinate=new Vector2(link.X,link.Y);
+            var place=$"{(link.Place.Length>0 ? link.Place:map.Zone)}  ({Maps.MapProjection.CoordinateText(coordinate)})";
+            if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            TipText(localization.Format("ChatWindow.MapLinkTip",place));
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Left))OpenMapPointFromPage(map,link.X,link.Y);
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,place);ImGui.OpenPopup("###TenshoChatWindowPlace");}
+            return;
+        }
+        if(itemCatalog.State.Catalog?.Find(link.ItemId) is not { } item){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
+        if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        TipText(localization.Format("ChatWindow.ItemLinkTip",item.Name));
+        if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+        {
+            SelectItem(item.Id);
+            if(RelevantRoutes(item.Id) is { Count:>0 } routes)OpenRoute(routes[0],item.Id);
+            IsOpen=true;
+        }
+        ItemLinksMenu("##ChatItem"+id,item);
     }
 }

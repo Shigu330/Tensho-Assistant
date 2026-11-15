@@ -1,5 +1,6 @@
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Plugin.Services;
 
 namespace TenshoAssistant.Chat;
@@ -37,9 +38,18 @@ internal sealed class ChatReader : IDisposable
             var current=settings();
             // Turned off (also by « restore every setting »): what was kept goes at the next message.
             if(!current.WindowOpen){if(store.Count>0)store.Clear();return;}
-            var body=new List<ChatSegment>();
+            // X-403 phase 2 (0.1441): the links too (a place or an item), with the text that shows them; a link whose target cannot be
+            // read stays plain text.
+            var pieces=new List<ChatPiece>();
             foreach(var payload in message.Message.Payloads)
-                if(payload is ITextProvider text && text.Text is { Length:>0 } value)body.Add(new(value));
+                switch(payload)
+                {
+                    case MapLinkPayload map:pieces.Add(new(null,MapLink(map)));break;
+                    case ItemPayload item:pieces.Add(new(null,new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)));break;
+                    case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;
+                    case ITextProvider text:pieces.Add(new(text.Text));break;
+                }
+            var body=ChatPieces.Segments(pieces);
             store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,message.Sender.TextValue,body,current.BoundedMaxLines);
             warned=false;
         }
@@ -47,6 +57,12 @@ internal sealed class ChatReader : IDisposable
         {
             if(!warned){warned=true;log.Warning(error,"A chat message could not be copied for the Tensho chat window.");}
         }
+    }
+
+    private static ChatLink? MapLink(MapLinkPayload map)
+    {
+        try{return new ChatLink(ChatSegmentKind.MapLink,map.TerritoryType.RowId,map.Map.RowId,map.XCoord,map.YCoord,map.PlaceName ?? "");}
+        catch(Exception){return null;}
     }
 
     private void OnLogout(int type,int code)=>store.Clear();
