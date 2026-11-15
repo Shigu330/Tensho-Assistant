@@ -92,7 +92,9 @@ public sealed class JitWarmup : IDisposable
     private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart)
     {
         var token=cancellation.Token;
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        // X-433 (0.1427, docs/evidence/0.1427-warmup-priority.md): normal priority. Below normal, the thread was preempted in the middle of a
+        // compilation (771 ms, 31 ms of it on its processor) while the game's thread and the collector waited for it (364 ms and 723 ms).
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.Normal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
