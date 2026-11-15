@@ -129,6 +129,18 @@ public static class LocalLinkProtocol
 
     public static string Serialize(LinkSnapshot snapshot)=>JsonSerializer.Serialize(snapshot,Options);
 
+    /// <summary>X-433 (0.1445): a snapshot with every part filled, serialized once: System.Text.Json makes its getters for the snapshot and
+    /// its parts on the calling thread (a background one), so the game's thread does not make them in a frame. The line, or null if it failed.</summary>
+    public static string? Prepare()
+    {
+        try
+        {
+            return Serialize(new LinkSnapshot(Version,"0.0.0",true,false,1,"zone",1,new LinkLive("job",1,1,1,1,1),[new LinkChange(DataCategory,1)],
+                [new LinkNotice(1,1,"notice")],[new LinkHeld(1,1)],new LinkState(StateLevels[0],1,["issue"],new LinkMeasures(1,1,1,1,1,1,1,1,1))));
+        }
+        catch(Exception){return null;}
+    }
+
     /// <summary>A line read from the pipe: the snapshot, or null and why it was refused (English, for the log).</summary>
     public static bool TryParse(string? line,out LinkSnapshot? snapshot,out string? error)
     {

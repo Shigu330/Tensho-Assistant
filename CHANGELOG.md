@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1445.0
+- X-433 : premier cas nommé par la mesure de 0.1440. Le premier passage de LocalLinkFeed (lien avec l'application de bureau) compilait 23 méthodes dans une image du jeu (58 à 68 ms à chaque chargement), dont 17 accesseurs que System.Text.Json fabrique à l'exécution pour l'instantané du lien et ses parties : la première sérialisation les fabrique sur le fil qui sérialise. Le flux sérialise maintenant un instantané complet (toutes les parties remplies) sur un fil de fond à sa création, quand le lien est activé : les accesseurs y sont fabriqués et le fil du jeu les trouve prêts. Mesure à lire au chargement suivant (ligne « Slow reader » de LocalLinkFeed).
+- Tests : LinkPrepare1445Tests. Verify.ps1 (agent) : 2771/2771, 0 avertissement, 0 erreur ; DLL 0.1445.0.0. Rien à essayer en jeu.
+### English
+- X-433: first case named by 0.1440's measure. LocalLinkFeed's first pass (the link with the desktop application) compiled 23 methods in a frame of the game (58 to 68 ms at each load), 17 of them getters System.Text.Json makes at run time for the link's snapshot and its parts: the first serialization makes them on the thread that serializes. The feed now serializes one full snapshot (every part filled) on a background thread when it is made, while the link is on: the getters are made there and the game's thread finds them ready. Measure to read at the next load (LocalLinkFeed's « Slow reader » line).
+
 ## 0.1444.0
 - X-153, douzième tranche : la famille des collections sort de Plugin.cs, après celle du chat (0.1443). La musique jouée et son rouleau d'orchestrion (X-02), le changement de titre (X-03), la progression des hauts faits (C-15, demandée au serveur seulement sur le clic du joueur) et les collections annexes (C-04) sont créés chacun par un seul chemin d'installation et libérés par un seul chemin de libération des inscriptions du plugin, dans Plugin.Collections.cs, dans l'ordre d'avant ; Plugin.cs appelle la famille une fois, à la même place. Aucun comportement ne change.
 - Tests : CollectionsFamily1444Tests. Verify.ps1 (agent) : 2769/2769, 0 avertissement, 0 erreur ; DLL 0.1444.0.0. Rien à essayer en jeu.

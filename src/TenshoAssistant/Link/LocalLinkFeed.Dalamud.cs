@@ -46,6 +46,8 @@ internal sealed class LocalLinkFeed:IDisposable
         this.inventory=inventory;this.objects=objects;this.settingsFile=settingsFile;this.folder=folder;
         CompetitiveGate.Add(framework,OnUpdate);
         CompetitiveGate.Changed+=OnCut;
+        // X-433 (0.1445): the snapshot's serialization prepared off the game's thread, while the link is on (0.1440: 17 getters made in a frame).
+        if(configuration.DesktopLink)_=Task.Run(LocalLinkProtocol.Prepare);
     }
 
     /// <summary>The link's state for the settings page (Off while the setting is off) and why, if it failed.</summary>
