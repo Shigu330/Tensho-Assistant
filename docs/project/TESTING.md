@@ -1545,7 +1545,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1233) Page Mini Cactpot : « Prochain JACTA » à la prochaine heure :00, :20 ou :40 de l'horloge du PC ; « Tirage du Méga Cactpot » le bon jour à l'heure du PC (Europe : samedi 20:00 en heure d'hiver française) ; cloche du tirage : une alarme hebdomadaire apparaît dans Alarmes
 
-- [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir le support des roues éthérées (une roue posée au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle la roue a été posée et le temps restant que montre le jeu
+- [ ] (0.1234) Mode développeur, maison de la compagnie : ouvrir la base de tours éthéréens (un tour posé au moins) : dalamud.log a « Game windows » avec le nom de la fenêtre et une ligne « Reading addons: …Wheel…: » avec ses nombres ; noter l'heure à laquelle le tour a été posé et le temps restant que montre le jeu
 
 - [x] (0.1235) Page Chocobo, section « Chocobo de course » avant toute course : « Pas encore lu » ; ouvrir la fiche du chocobo de course dans le jeu (Gold Saucer, guichet des courses) : catégorie, cote, pedigree, caractéristiques et aptitudes identiques à la fenêtre du jeu
 
@@ -1904,6 +1904,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1410) Rappels › Statut, après avoir ouvert la liste des servants à une sonnette d'appel (attendre 30 secondes) : le tableau « Vos servants » montre chaque servant avec sa classe et son niveau, ses gils, ses objets (au survol : piles, haute qualité, cristaux d'après la copie du jeu), ses ventes (orange si elles finissent dans la journée, rouge si finies), sa tâche et sa ville du marché ; le total des gils est juste. Avec un autre personnage, ses servants s'ajoutent après sa propre visite à la sonnette.
 
 - [ ] (0.1411) Alarmes : à la sonnette d'appel, liste des servants ouverte, un servant avec des objets en vente : une alarme automatique « Fin des ventes de <servant> » (groupe « Ventes des servants ») apparaît à l'heure de fin donnée par le jeu ; elle correspond à la fin indiquée dans le tableau Rappels › Statut. Si l'heure semble fausse (le jeu ne fait pas expirer les ventes), le noter.
+
+- [ ] (0.1415) Rappels › Statut, tableau des servants : la date de fin des ventes de chaque servant est le jour que la liste des servants du jeu écrit après « jusqu'au » (Addon 2314).
+
+- [ ] (0.1416) Sonnette : mettre en vente puis retirer tous les objets d'un servant, rouvrir la liste des servants : l'alarme « fin des ventes » de ce servant disparaît de Rappels › Alarmes.
+
+- [ ] (0.1416) Sonnette : déposer des gils chez un servant ouvert : sa ligne du tableau des servants (Rappels › Statut) suit tout de suite, comme le journal des gils.
+
+- [ ] (0.1418) Journal des gils (Rangements › Gils) : rendre une quête qui donne des gils : le gain est « Quêtes et mandats (récompenses) », pas « Autre ».
+
+- [ ] (0.1418) Journal des gils : livrer une commande spéciale : le gain est « Commandes spéciales ».
+
+- [ ] (0.1418) Journal des gils : finir un plateau du Dédale bestial qui donne des gils : le gain est « Dresseur (résultats des plateaux) ».
 
 **0.535 : interfaces** — à voir en jouant
 
