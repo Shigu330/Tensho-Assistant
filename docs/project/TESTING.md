@@ -1887,6 +1887,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1380) Équipement : ouvrir le choix d'une pièce, faire défiler une longue liste : les rangées gardent la même hauteur, le niveau reste sur la ligne
 
+- [ ] (0.1387) Collection › Titres et Hauts faits : ouvrir une fois la fenêtre Titres et la fenêtre Hauts faits du jeu, puis recharger Tensho (ou relancer le jeu) sans les rouvrir : les deux pages montrent le même compte d'obtenus qu'avant, et la ligne rouge dit « Relevé du <date> ».
+
+- [ ] (0.1388) Barre du serveur du jeu (Paramètres : entrées Sacs, État de l'équipement, Zone et instance cochées) : survoler chacune : l'infobulle est celle de Tensho (titre doré, même style que les alarmes), au-dessus ou en dessous selon le réglage « Au-dessus de l'entrée ».
+
+- [ ] (0.1389) Chat : survoler un lien de carte en entrant par son bout gauche, puis clic droit une largeur de lien à gauche du lien (sans passer ailleurs) : le menu de Tensho ne s'ouvre pas ; le même clic sur le lien l'ouvre (X-415 M3).
+
+- [ ] (0.1389) Barre du serveur du jeu, entrée des alarmes en anglais : le temps restant s'écrit « 2h 15 » (et non plus « 2h 15m »), « 6d 0h » au-delà d'un jour.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
