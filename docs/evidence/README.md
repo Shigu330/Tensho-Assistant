@@ -55,7 +55,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1369-second-look-terms.md](0.1369-second-look-terms.md) | `tests/TenshoAssistant.Tests/SecondLook1369Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1372-leve-client-label.md](0.1372-leve-client-label.md) | `src/TenshoAssistant/Leves/LeveCatalog.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs`, `src/TenshoAssistant/Maps/PlacedObjects.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md`, `docs/evidence/0.1402-bells-and-chests.md` |
-| [0.1394-retainer-finder.md](0.1394-retainer-finder.md) | `src/TenshoAssistant/Inventory/RetainerFinderCompare.cs`, `tests/TenshoAssistant.Tests/RetainerFinderBound1401Tests.cs` | `CHANGELOG.md` |
+| [0.1394-retainer-finder.md](0.1394-retainer-finder.md) | `src/TenshoAssistant/Inventory/RetainerFinderCompare.cs`, `tests/TenshoAssistant.Tests/RetainerFinderBound1401Tests.cs` | `CHANGELOG.md`, `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1402-bells-and-chests.md](0.1402-bells-and-chests.md) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs`, `src/TenshoAssistant/Maps/PlacedObjects.cs`, `tests/TenshoAssistant.Tests/PlacedObjects1402Tests.cs`, `tools/README.md` | `CHANGELOG.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -289,7 +289,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x344-plugin-icon.md](x344-plugin-icon.md) | `scripts/Verify.ps1`, `tests/TenshoAssistant.Tests/PluginIcon1330Tests.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
-| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `CHANGELOG.md`, `docs/evidence/x172-sqlite-trial.md` |
+| [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
 Counted · compté : 279 files · fichiers ; 233 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

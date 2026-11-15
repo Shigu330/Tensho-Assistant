@@ -92,6 +92,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | D-170 | Vocabulary (X-381, question 1): French for « duty », « mission » or « contenu »? | « mission(s) » everywhere, the client's official name (D-161); page « Butin des missions »; « contenu » kept for the « CONTENUS » group and ranked content |  |
 | D-171 | Vocabulary (X-381, question 2): an NPC who sells, « marchand » or « vendeur »? | « marchand(s) » for every selling NPC, page « PNJ marchands »; « vendeur » stays the market-board player; one name for the tool |  |
 | D-172 | Common discoveries set: which facts to keep past 200,000 facts of one kind (X-406) | The facts seen by the most players, then the most recent (applied in 0.1383) |  |
+| D-173 | Dalamud rule 12 (no automated crafting), R04: the macro chain, started by a click, runs your macros one after the other (crafting macros included) through the game's own macro function. Keep it as it is (like the Macro Chain plugin of the official repository)? | Keep it as it is, declared in PUBLISHING (rules 1 and 12, 0.1399) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -200,6 +201,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | D-170 | Vocabulaire (X-381, question 1) : « duty » en français, « mission » ou « contenu » ? | « mission(s) » partout, nom officiel du client (Addon#2225.0, #3770.0, #11170.0 ; D-161) : page « Butin des missions », « contenu » gardé pour le groupe « CONTENUS » et « contenu classé » ; à aligner aussi « Masquer en instance » |  |
 | D-171 | Vocabulaire (X-381, question 2) : un PNJ qui vend, « marchand » ou « vendeur » ? | « marchand(s) » pour tout PNJ qui vend, page « PNJ marchands » (Addon#3408.0, #7610.0, MainCommand#71.6) ; « vendeur » reste le joueur du tableau des ventes (Addon#6996.0) ; un seul nom pour l'outil |  |
 | D-172 | Ensemble commun des découvertes : quels faits garder au-delà de 200 000 faits d'un genre (X-406) | Les faits vus par le plus de joueurs, puis les plus récents (appliqué en 0.1383) |  |
+| D-173 | Règle 12 de Dalamud (pas d'artisanat automatisé), R04 : la chaîne de macros, lancée par un clic, exécute vos macros l'une après l'autre (macros d'artisanat comprises) par la fonction de macro du jeu. Garder telle quelle (comme le plugin Macro Chain du dépôt officiel) ? | Garder telle quelle, déclarée dans PUBLISHING (règles 1 et 12, 0.1399) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

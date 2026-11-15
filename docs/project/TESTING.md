@@ -1891,9 +1891,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1388) Barre du serveur du jeu (Paramètres : entrées Sacs, État de l'équipement, Zone et instance cochées) : survoler chacune : l'infobulle est celle de Tensho (titre doré, même style que les alarmes), au-dessus ou en dessous selon le réglage « Au-dessus de l'entrée ».
 
-- [ ] (0.1389) Chat : survoler un lien de carte en entrant par son bout gauche, puis clic droit une largeur de lien à gauche du lien (sans passer ailleurs) : le menu de Tensho ne s'ouvre pas ; le même clic sur le lien l'ouvre (X-415 M3).
+- [ ] (0.1389) Chat : survoler un lien de carte en entrant par son bout gauche, puis clic droit à deux largeurs de lien à gauche du lien (sans passer ailleurs) : le menu de Tensho ne s'ouvre pas ; le même clic sur le lien l'ouvre. À une seule largeur à gauche, le menu s'ouvre encore : c'est voulu (la boîte est symétrique autour du point d'entrée, une largeur de lien plus 8 px de chaque côté ; X-419 M3).
 
 - [ ] (0.1389) Barre du serveur du jeu, entrée des alarmes en anglais : le temps restant s'écrit « 2h 15 » (et non plus « 2h 15m »), « 6d 0h » au-delà d'un jour.
+
+- [ ] (0.1401) Barre du serveur (X-419 M2, 0.1393) : afficher une entrée de Tensho qui change souvent (objets dans les sacs, ou zone), survoler l'entrée et la garder survolée pendant qu'elle change (ramasser un objet, changer de zone) : l'infobulle reste celle de Tensho, elle ne repasse pas à celle du jeu le temps d'un rafraîchissement.
+
+- [ ] (0.1402) Carte de Tensho, dans l'atelier de compagnie (Brumée, Lavandière, Gobelet, Shirogane ou Empyrée) : la sonnette d'appel et le coffre de compagnie sont sur la carte avec les icônes du jeu ; le survol donne leur nom ; dans le tableau des icônes de la carte, la taille 0 de la sonnette les cache. Dans une ville (Limsa basse, Ul'dah Thal, Vieille Gridania), les sonnettes ne sont pas en double.
 
 **0.535 : interfaces** — à voir en jouant
 
