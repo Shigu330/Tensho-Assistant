@@ -1871,6 +1871,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1374) En français : barre de navigation « Butin des missions » et « PNJ marchands » ; carte › réglage « Masquer en mission » ; infobulle d'un objet vendu : « (outil PNJ marchands) » ; panneau des servants au tableau des ventes : « Comparer aux autres vendeurs » inchangé.
 
+- [ ] (0.1375) Objets annotés, Collection, aide et carte : taper un nom avec une apostrophe courbe (d'Ehcatl tapé avec l'apostrophe courbe, Alt+0146) trouve le même résultat qu'avec l'apostrophe droite
+
+- [ ] (0.1376) Chat : survoler un long lien de carte par son début, puis clic droit sur ses coordonnées à l'autre bout : le menu de Tensho s'ouvre (mode développeur : « Chat link right click: map N, menu opened »)
+
+- [ ] (0.1376) Chat : survoler un lien de carte, puis clic droit loin au-dessus, dans le monde : aucun menu (ligne « not taken … beyond the link's … px »)
+
+- [ ] (0.1378) Jardin : ouvrir le menu d'un emplacement, le fermer sans rien faire, puis acheter un objet à un marchand dans les 4 s : aucune récolte notée (mode développeur : pas de « Garden harvest read »)
+
+- [ ] (0.1378) Jardin : récolter un emplacement mûr par son menu : la récolte est notée (« Garden harvest read: patch N, bed M »)
+
+- [ ] (0.1379) Rappels : un rappel à plus de 24 h dit « Dans N j H h » (et l'heure seule pour aujourd'hui) ; la barre du serveur dit aussi « N j H h » pour une alarme à plusieurs jours
+
+- [ ] (0.1380) Alarmes : une alarme quotidienne à l'heure réelle, juste après qu'elle a sonné (dans son avance), ouvrir « Modifier » et valider la date sans la changer : elle ne sonne pas une seconde fois
+
+- [ ] (0.1380) Équipement : ouvrir le choix d'une pièce, faire défiler une longue liste : les rangées gardent la même hauteur, le niveau reste sur la ligne
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
