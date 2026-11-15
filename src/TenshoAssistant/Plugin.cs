@@ -626,20 +626,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.GearCatalog=()=>gear?.Catalog;
             mainWindow.GearCatalogFailed=()=>gear?.CatalogFailed==true;
             mainWindow.EquippedGear=()=>gear?.Equipped ?? [];
-            // 0.340 (R-11 step 4): the companion chocobo and its bardings, read on the framework thread while the page shows them.
-            Gear.ChocoboReader? chocobo=null;
-            registrations.Register(()=>chocobo=new Gear.ChocoboReader(framework,client,player,unlocks,data,log),()=>chocobo?.Dispose());
-            mainWindow.Chocobo=()=>{chocobo?.Want();return chocobo?.State;};
-            mainWindow.ChocoboUnavailable=()=>chocobo?.Unavailable==true;
-            // X-204 (0.1235): the racing chocobo, read only once the game loaded it (never asked of the server); ranks and abilities from the sheets.
-            MiniGames.RaceChocoboReader? raceChocobo=null;
-            registrations.Register(()=>raceChocobo=new MiniGames.RaceChocoboReader(framework,client,player,condition,log),()=>raceChocobo?.Dispose());
-            mainWindow.RaceChocobo=()=>{raceChocobo?.Want();return raceChocobo?.State;};
-            mainWindow.RaceChocoboUnavailable=()=>raceChocobo?.Unavailable==true;
-            mainWindow.RaceChocoboRanks=new Lazy<MiniGames.RaceChocoboRank[]>(()=>LoadSheet("ChocoboRaceRank",()=>data.GetExcelSheet<Lumina.Excel.Sheets.ChocoboRaceRank>()
-                .Where(row=>row.Name.RowId!=0).Select(row=>new MiniGames.RaceChocoboRank(row.RowId,row.RatingMin,row.RatingMax,row.Name.ValueNullable?.Text.ExtractText() ?? "")).Where(rank=>rank.Name.Length>0).ToArray(),[]));
-            mainWindow.RaceChocoboAbility=id=>id==0 ? null:data.GetExcelSheet<Lumina.Excel.Sheets.ChocoboRaceAbility>().GetRowOrDefault(id) is { } ability && !ability.Name.IsEmpty
-                ? new MiniGames.RaceChocoboAbility(id,ability.Name.ExtractText(),ability.Description.ExtractText()):null;
+            // X-153 (0.1419, tenth slice): the chocobo family (Plugin.Chocobo.cs), at the same place as before.
+            RegisterChocobo(data,framework,client,player,unlocks,condition);
             mainWindow.StainName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Stain>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.342 (R-09): running festivals (GameMain), their quests (Quest.Festival) and English names (LuminaSupplemental, embedded).
             Events.FestivalReader? festivals=null;

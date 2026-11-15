@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1419.0
+- Plan global, X-153 : Refonte de Plugin.cs, dixième tranche (revue GPT du 11/11, acceptée par l'utilisateur) : la famille des chocobos sort de Plugin.cs vers Plugin.Chocobo.cs : le lecteur du chocobo compagnon (et de ses bardes) et le lecteur du chocobo de course, avec ses rangs et ses capacités tirés des feuilles. Le bloc est déplacé tel quel : un seul chemin d'installation et un seul de libération par service, dans l'ordre d'avant, à la même place. Aucune page changée. Test : ChocoboFamily1419Tests ; Barding340Tests lit le nouveau fichier.
+- Tests : ChocoboFamily1419Tests. Verify.ps1 (agent) : 2698/2698, 0 avertissement, 0 erreur ; DLL 0.1419.0.0. Rien à essayer en jeu.
+### English
+- Plugin.cs overhaul, tenth slice (GPT review of 11/11, accepted by the user): the chocobo family leaves Plugin.cs for Plugin.Chocobo.cs: the companion chocobo's reader (and its bardings) and the racing chocobo's reader, with its ranks and abilities from the sheets. The block moved as it was: one install path and one release path per service, in the order of before, at the same place. No page changed. Test: ChocoboFamily1419Tests; Barding340Tests reads the new file.
+
 ## 0.1418.0
 - Plan global, X-18 : Journal des gils : moins de gains « Autre ». Trois catégories nouvelles, chacune tirée d'une fenêtre du jeu sondée dans le client (UldProbe) : « Quêtes et mandats (récompenses) » (JournalResult, la fenêtre des récompenses du journal), « Commandes spéciales » (SatisfactionSupply) et « Dresseur (résultats des plateaux) » (XBMResult, déjà vue au journal le 13/11 avec un gain de 2 000 resté « Autre »). Gains seulement ; une dépense à côté reste « Autre » ; les entrées déjà écrites gardent leur catégorie. Icône et textes pour chacune. Preuve : docs/evidence/0.1418-gil-windows.md. Test : GilCategories1418Tests.
 - Pour les joueurs : journal des gils : les récompenses de quêtes et de mandats, les commandes spéciales et les résultats des plateaux du dresseur ont désormais leur catégorie au lieu de « Autre ».
