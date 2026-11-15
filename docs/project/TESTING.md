@@ -1861,6 +1861,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1368) Plugin en français : page Listes d'artisanat (titre), onglet « Liste d'artisanat » du simulateur, panneau à l'écran et ligne « Liste d'artisanat : il en manque … » de l'aide à la récolte : un seul nom partout.
 
+- [ ] (0.1369) Plugin en français : page Bestiaire (colonne « Vaincus »), page Mandats (colonne et filtre « Client »), réglages de la carte Tensho (« Cibles d'élite proches », « Monstres de vos Chroniques du zodiaque »), page Rangs S (champ « Chercher une cible d'élite… »), Aide › questions « mettre à jour » et « installer » (« Mettre à jour les plugins », « Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés »).
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

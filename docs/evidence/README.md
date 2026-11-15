@@ -51,7 +51,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1351-chat-map-link-menu.md](0.1351-chat-map-link-menu.md) | `src/TenshoAssistant/Maps/ChatLinkHoverWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkMenu1351Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1360-garden-harvest-menu.md](0.1360-garden-harvest-menu.md) | — | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
-| [0.1367-search-apostrophes.md](0.1367-search-apostrophes.md) | `src/TenshoAssistant/Help/SearchText.cs`, `tests/TenshoAssistant.Tests/SearchApostrophe1367Tests.cs` | `CHANGELOG.md` |
+| [0.1367-search-apostrophes.md](0.1367-search-apostrophes.md) | `src/TenshoAssistant/Help/SearchText.cs`, `tests/TenshoAssistant.Tests/SearchApostrophe1367Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1369-second-look-terms.md](0.1369-second-look-terms.md) | `tests/TenshoAssistant.Tests/SecondLook1369Tests.cs` | `CHANGELOG.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
