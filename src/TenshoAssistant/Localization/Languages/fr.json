@@ -6173,6 +6173,9 @@
     "VesselGroup": "Vaisseaux de la compagnie"
   },
   "ChatWindow": {
+    "QuestLinkTip": "{0}\nClic gauche : l'ouvre dans la page Quêtes de Tensho.",
+    "CopyLine": "Copier ce message",
+    "CopyTab": "Copier tous les messages de cet onglet",
     "MapLinkTip": "{0}\nClic gauche : pose le drapeau à cet endroit et ouvre la carte. Clic droit : menu de lieu de Tensho (éthérite la plus proche avec son coût, carte Tensho, météo).",
     "ItemLinkTip": "{0}\nClic gauche : l'ouvre dans Tensho. Clic droit : menu d'objet de Tensho.",
     "LinkUnknownTip": "Tensho ne sait pas ce que vise ce lien (ses données ne sont pas encore chargées, ou Tensho ne le liste pas).",

@@ -6173,6 +6173,9 @@
     "VesselGroup": "Company vessels"
   },
   "ChatWindow": {
+    "QuestLinkTip": "{0}\nLeft click: open it on Tensho's Quests page.",
+    "CopyLine": "Copy this message",
+    "CopyTab": "Copy every message of this tab",
     "MapLinkTip": "{0}\nLeft click: place the flag there and open the map. Right click: Tensho's place menu (nearest aetheryte with its cost, Tensho map, weather).",
     "ItemLinkTip": "{0}\nLeft click: open it in Tensho. Right click: Tensho's item menu.",
     "LinkUnknownTip": "Tensho does not know what this link points to (its data is not loaded yet, or Tensho does not list it).",

@@ -228,6 +228,21 @@ internal sealed partial class MainWindow
                 }
                 else chatWindowPlace=null;
             }
+            // X-403 phase 2 (0.1442): the menu of a message, opened by a right click on its text: copy it, or every message of this tab.
+            if(chatWindowLine is { } said)
+            {
+                if(ImGui.BeginPopup("###TenshoChatLine"))
+                {
+                    try
+                    {
+                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyLine")))ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort));
+                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
+                            ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort));
+                    }
+                    finally{ImGui.EndPopup();}
+                }
+                else chatWindowLine=null;
+            }
         }
         finally{ImGui.EndChild();}
     }
@@ -248,7 +263,12 @@ internal sealed partial class MainWindow
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
                 if(run.Link is { } link)DrawChatLink(run,link,$"{record.Id}_{line}_{index}");
-                else ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                else
+                {
+                    ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                    // 0.1442: a right click on a message's text: its menu (copy).
+                    if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
+                }
                 index++;
             }
             if(first)ImGui.TextUnformatted(" ");
@@ -257,11 +277,14 @@ internal sealed partial class MainWindow
 
     // X-403 phase 2 (0.1441): the place menu a right click on a map link opened (drawn by DrawChatLines).
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
+    // 0.1442: the message whose menu a right click opened.
+    private ChatRecord? chatWindowLine;
 
     /// <summary>
     /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
     /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
-    /// opens Tensho's item menu. A target Tensho does not know (data not loaded, an item it does not list) is only said on hover.
+    /// opens Tensho's item menu. 0.1442: quest link: left click opens the quest on the Quests page. A target Tensho does not know (data not
+    /// loaded, an item it does not list) is only said on hover.
     /// </summary>
     private void DrawChatLink(ChatRun run,ChatLink link,string id)
     {
@@ -278,6 +301,15 @@ internal sealed partial class MainWindow
             TipText(localization.Format("ChatWindow.MapLinkTip",place));
             if(ImGui.IsItemClicked(ImGuiMouseButton.Left))OpenMapPointFromPage(map,link.X,link.Y);
             if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,place);ImGui.OpenPopup("###TenshoChatWindowPlace");}
+            return;
+        }
+        if(link.Kind==ChatSegmentKind.QuestLink)
+        {
+            // 0.1442: a quest link: left click opens it on Tensho's Quests page.
+            if(quests.State.ById?.GetValueOrDefault(link.QuestId) is not { } quest){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
+            if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            TipText(localization.Format("ChatWindow.QuestLinkTip",quest.Name));
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
             return;
         }
         if(itemCatalog.State.Catalog?.Find(link.ItemId) is not { } item){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}

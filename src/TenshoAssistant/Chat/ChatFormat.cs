@@ -57,6 +57,14 @@ public static class ChatFormat
         return runs;
     }
 
+    /// <summary>X-403 phase 2 (0.1442): a message as one line of text, as the window writes it (time, channel, sender, text), for the clipboard.</summary>
+    public static string Plain(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName)
+        =>string.Concat(Runs(record,settings,shortName).Select(run=>run.Text)).TrimEnd();
+
+    /// <summary>X-403 phase 2 (0.1442): messages one per line, for the clipboard.</summary>
+    public static string Plain(IEnumerable<ChatRecord> records,ChatSettings settings,Func<ChatChannel,string> shortName)
+        =>string.Join("\n",records.Select(record=>Plain(record,settings,shortName)));
+
     /// <summary>The lines of a message for a width. Breaks between words; a word wider than the line is cut. Runs of one role (and one link) are joined on a line, to draw as little as possible.</summary>
     public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure)
     {

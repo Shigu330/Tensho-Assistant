@@ -46,6 +46,8 @@ internal sealed class ChatReader : IDisposable
                 {
                     case MapLinkPayload map:pieces.Add(new(null,MapLink(map)));break;
                     case ItemPayload item:pieces.Add(new(null,new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)));break;
+                    // 0.1442: a quest link.
+                    case QuestPayload quest:pieces.Add(new(null,new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)));break;
                     case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;
                     case ITextProvider text:pieces.Add(new(text.Text));break;
                 }
