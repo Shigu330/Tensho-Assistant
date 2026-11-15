@@ -90,7 +90,8 @@ internal static class ChatLinkPieces1468Tests
             {
                 var payloads = Payloads(line);
                 var runs = Laid(kind, payloads);
-                var all = string.Concat(payloads.Where(payload => payload.Kind == ChatPayloadKind.Text).Select(payload => ChatFormat.Clean(payload.Text)));
+                // 0.1471 (X-472): the icons of the game's font are kept too, written readably (the world icon « @ » in kind 44)
+                var all = ChatFormat.Clean(ChatPayloads.Text(payloads));
                 Check(string.Concat(runs.Select(run => run.Text)) == all, $"{time}: nothing lost: « {string.Concat(runs.Select(run => run.Text))} »");
                 foreach (var (link, name) in Named(payloads))
                 {
@@ -143,10 +144,11 @@ internal static class ChatLinkPieces1468Tests
             var full = new ChatPieceLog(perKind: 50, total: 3);
             Check(full.Take(1) && full.Take(2) && full.Take(3) && !full.Take(4), "thirty at most per session");
         }),
-        ("Chat link pieces 1468: an icon, a raw payload or another payload is never a piece; the reader tells each payload apart (wiring)", () =>
+        ("Chat link pieces 1468: a raw payload or another payload is never a piece (0.1471, X-472: an icon is, written readably); the reader tells each payload apart (wiring)", () =>
         {
-            Check(!ChatPayloads.Pieces([new(ChatPayloadKind.Icon, "IconPayload", Icon: 88), new(ChatPayloadKind.Raw, "Raw", Size: 4), new(ChatPayloadKind.Other, "PlayerPayload"),
+            Check(!ChatPayloads.Pieces([new(ChatPayloadKind.Raw, "Raw", Size: 4), new(ChatPayloadKind.Other, "PlayerPayload"),
                 new(ChatPayloadKind.Map, "MapLink")]).Any(), "no piece (a map link that could not be read has no start)");
+            Check(ChatPayloads.Pieces([new(ChatPayloadKind.Icon, "IconPayload", Icon: 88)]).Single() == new ChatPiece("@"), "the world icon: « @ »");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs"));
             Check(reader.Contains("ChatPayloads.Segments(payloads)", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Describe(payloads)", StringComparison.Ordinal)
                   && reader.Contains("piecesSaid.Take(kind)", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Bare(body)>0", StringComparison.Ordinal)

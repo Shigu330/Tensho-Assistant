@@ -60,7 +60,9 @@ internal sealed class ChatReader : IDisposable
                     log.Information("Chat window, a link without text of its own (kind {0}), its target's name written instead: {1}.",kind,ChatPayloads.Describe(payloads));
                 }
             }
-            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,message.Sender.TextValue,body,current.BoundedMaxLines);
+            // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
+            var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
+            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines);
             warned=false;
         }
         catch(Exception error)

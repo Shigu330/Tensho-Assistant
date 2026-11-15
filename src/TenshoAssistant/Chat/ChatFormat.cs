@@ -10,14 +10,16 @@ public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=n
 /// <summary>X-403 phase 1 (D-166; back from 0.471): how one message reads, and its lines for a given width. Pure: the width of a text is given by the caller.</summary>
 public static class ChatFormat
 {
-    /// <summary>The text without control characters and the game's own glyphs (private use area U+E000 to U+F8FF), which the plugin's font does not draw.</summary>
+    /// <summary>The text without control characters; X-472 (0.1471): each glyph of the game's font (private use area U+E000 to U+F8FF) written
+    /// with its readable equivalent (ChatGlyphs: boxed letters as letters, the world icon « @ »…), the link glyph alone left out.</summary>
     public static string Clean(string? text)
     {
         if(string.IsNullOrEmpty(text))return "";
         var clean=new StringBuilder(text.Length);
         foreach(var letter in text)
             if(letter=='\n')clean.Append(letter);
-            else if(!char.IsControl(letter) && letter is not (>='' and <=''))clean.Append(letter);
+            else if(ChatGlyphs.IsGlyph(letter))clean.Append(ChatGlyphs.Readable(letter));
+            else if(!char.IsControl(letter))clean.Append(letter);
         return clean.ToString();
     }
 

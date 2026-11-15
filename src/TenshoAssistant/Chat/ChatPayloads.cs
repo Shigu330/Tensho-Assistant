@@ -25,8 +25,15 @@ public static class ChatPayloads
                 case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map when payload.Link is { } link:yield return new(null,link);break;
                 case ChatPayloadKind.LinkEnd:yield return new(null,End:true);break;
                 case ChatPayloadKind.Text:yield return new(payload.Text);break;
+                // X-472 (0.1471): an icon of the game's font keeps its place, written readably (the world icon « @ »).
+                case ChatPayloadKind.Icon:yield return new(ChatGlyphs.Icon(payload.Icon));break;
             }
     }
+
+    /// <summary>X-472 (0.1471): the plain text of payloads (a sender's name): the texts, and each icon of the game's font written readably
+    /// (« Name@World »); before, the sender's TextValue left the world icon out (« NameWorld »).</summary>
+    public static string Text(IEnumerable<ChatPayload> payloads)
+        =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.Icon(payload.Icon),_=>""}));
 
     /// <summary>The segments the store keeps for these payloads (ChatPieces.Segments of their pieces).</summary>
     public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));

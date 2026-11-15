@@ -113,8 +113,8 @@ internal static class ChatWindow1434Tests
             Check(Line(Record(10,"Ann","hello"))=="[S] Ann: hello","say");
             Check(Line(Record(13,"Ann","hi"))=="[X] Ann >> hi" && Line(Record(12,"Ann","hi"))=="[X] >> Ann: hi","tells");
             Check(Line(Record(57,"","Message"))=="Message" && Line(Record(29,"Ann","Ann waves."))=="Ann waves." && Line(Record(28,"Ann","waves"))=="Ann waves","system and emotes");
-            Check(Line(Record(10,"AnnShiva","a\u0002bc"))=="[S] AnnShiva: abc","game glyphs and control characters removed");
-            Check(ChatFormat.Clean("a\nb")=="a\nb" && ChatFormat.Clean(null)=="","line breaks kept");
+            Check(Line(Record(10,"AnnShiva","a\u0002bc"))=="[S] Ann@Shiva: abc«","control characters removed; the game's glyphs written readably (0.1471, X-472: the world glyph « @ », the auto-translate mark « « »)");
+            Check(ChatFormat.Clean("a\nb")=="a\nb··" && ChatFormat.Clean(null)=="","line breaks kept; an unknown glyph of the game marked « · » (0.1471)");
             options.ShowChannel=false;Check(Line(Record(10,"Ann","x"))=="Ann: x","no channel");
             options.ShowTimestamps=true;options.Clock24=true;options.ShowSeconds=true;
             var runs=ChatFormat.Runs(Record(10,"Ann","x"),options,_=>"");

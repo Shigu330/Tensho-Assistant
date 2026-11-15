@@ -75,7 +75,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1464-map-floors.md](0.1464-map-floors.md) | `src/TenshoAssistant/Maps/MapFloorReader.Dalamud.cs`, `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1464Tests.cs` | `CHANGELOG.md` |
 | [0.1465-beast-result-index-12.md](0.1465-beast-result-index-12.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs` | `CHANGELOG.md`, `docs/evidence/0.1470-beast-result-window.md` |
-| [0.1468-chat-link-pieces.md](0.1468-chat-link-pieces.md) | `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLinkPieces1468Tests.cs` | `CHANGELOG.md` |
+| [0.1468-chat-link-pieces.md](0.1468-chat-link-pieces.md) | `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatGlyphs1471Tests.cs`, `tests/TenshoAssistant.Tests/ChatLinkPieces1468Tests.cs` | `CHANGELOG.md` |
 | [0.1469-map-floors-check.md](0.1469-map-floors-check.md) | `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1469Tests.cs`, `tools/ShopCurrencyProbe/Program.cs` | `CHANGELOG.md` |
 | [0.1470-beast-result-window.md](0.1470-beast-result-window.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs`, `tests/TenshoAssistant.Tests/BeastResult1470Tests.cs` | `CHANGELOG.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
