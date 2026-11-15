@@ -1771,7 +1771,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1316) Discord (si un salon est réglé) : le bouton d'essai envoie « … dans 5 min (…) » ; un message personnel avec [minutes] garde le nombre seul
 
-- [ ] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
+- [x] (0.1317) Objets : ouvrir la fiche d'un objet récent (le patch s'affiche dans l'en-tête), puis survoler cet objet dans une liste de Tensho : l'infobulle dit « Ajouté au patch 7.x (Garland Tools) » ; Paramètres › Données et sources › Garland coupé : la ligne disparaît
 
 - [x] (0.1318) Eurêka et Bozja › Météo et nuit : chaque monstre « nuit » montre une prochaine fenêtre (« maintenant » ou dans moins de 70 min) ; les monstres à météo montrent la leur quand la météo vient dans les 28 h ; comparer une ligne avec la météo annoncée en jeu dans la zone
 
@@ -1817,27 +1817,39 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1349) Monde › Découvertes › Échanger maintenant : l'échange finit « fait » et le fichier commun est dit récupéré ou à jour (lu dans community-discoveries/v3/ seulement).
 
-- [ ] (0.1350) Objets : ouvrir la fiche de la Bague d'attaquant de grand champion (ou un autre objet récent vendu par un PNJ) : l'en-tête dit « Ajouté au patch 7.4 (Garland Tools) » après un instant ; survoler l'objet dans une liste de Tensho et garder la souris dessus : l'infobulle dit la même ligne ; Paramètres › Données et sources › Garland coupé : la ligne disparaît des deux.
+- [x] (0.1350) Objets : ouvrir la fiche de la Bague d'attaquant de grand champion (ou un autre objet récent vendu par un PNJ) : l'en-tête dit « Ajouté au patch 7.4 (Garland Tools) » après un instant ; survoler l'objet dans une liste de Tensho et garder la souris dessus : l'infobulle dit la même ligne ; Paramètres › Données et sources › Garland coupé : la ligne disparaît des deux.
 
 - [ ] (0.1351) Chat : un lien de carte (par exemple le vôtre, tapé <flag> dans Dire) ; clic gauche : le jeu pose son drapeau, comme avant ; clic droit sur le lien : le menu « Tensho — lieu » s'ouvre à la souris (nom du lieu et coordonnées, Drapeau, Éthérite la plus proche, Afficher sur la carte, Météo de la zone) ; « Éthérite la plus proche » ouvre la carte Tensho sur le point avec la question de téléportation et son coût ; clic droit sur un lien d'objet : toujours le menu du jeu avec « Tensho — objet », pas le menu de lieu ; mode développeur : dalamud.log dit « Chat link hovered (ChatLogPanel_n): map link, map N » au survol.
 
 - [ ] (0.1351) Carte › réglages › « Liens de carte du chat » coupé : le clic droit sur un lien de carte n'ouvre plus rien de Tensho.
 
-- [ ] (0.1352) Plugin en français : la barre latérale dit « ALÉA », « Eurêka et Bozja », « Donjons sans fond », « Armes antiques » ; Rappels : onglets « Missions aléatoires » et « Escouade » ; Rangements : onglet « Devises » ; Banque : « Coiffeuse mirage » et « Bahut personnel » ; Collections : onglet « Hauts faits » ; Compagnie libre : « Aéronefs » et « Secteurs d'aéronef » ; Équipement : « Tenues du jeu » ; aucun texte coupé ni débordant.
+- [x] (0.1352) Plugin en français : la barre latérale dit « ALÉA », « Eurêka et Bozja », « Donjons sans fond », « Armes antiques » ; Rappels : onglets « Missions aléatoires » et « Escouade » ; Rangements : onglet « Devises » ; Banque : « Coiffeuse mirage » et « Bahut personnel » ; Collections : onglet « Hauts faits » ; Compagnie libre : « Aéronefs » et « Secteurs d'aéronef » ; Équipement : « Tenues du jeu » ; aucun texte coupé ni débordant.
 
 - [ ] (0.1352) Plugin en anglais : Dresseur, infobulle d'une bête « Trick / Tempered Release », colonne « CON », « Boss of the Board », filtre « Classification » ; Récolte : « logs » ; Triple Triade : « Card List ».
 
-- [ ] (0.1353) Plugin en français : la barre latérale dit « Accueil » ; l'aide de première visite des Livraisons spéciales cite « Lire de nouveau », comme le bouton de la page ; aucun texte coupé.
+- [x] (0.1353) Plugin en français : la barre latérale dit « Accueil » ; l'aide de première visite des Livraisons spéciales cite « Lire de nouveau », comme le bouton de la page ; aucun texte coupé.
 
 - [ ] (0.1354) Plugin en français : Découvertes, ligne « ALÉA vus » ; Dresseur, colonne des lieux « (1 lieu(x) vu(s)) » ; recherche d'un objet avec une apostrophe tapée au clavier (« d'Ehcatl » par exemple) : il est trouvé.
 
-- [ ] (0.1355) Plugin en français : en-tête et page Météo, l'heure du jeu s'écrit « HE » ; Paramètres › Panneaux, réglage « Fenêtre « Modifier le jeu » » de Triple Triade ; Marché, colonne « Servant » et portée « Centre de traitement de données ».
+- [x] (0.1355) Plugin en français : en-tête et page Météo, l'heure du jeu s'écrit « HE » ; Paramètres › Panneaux, réglage « Fenêtre « Modifier le jeu » » de Triple Triade ; Marché, colonne « Servant » et portée « Centre de traitement de données ».
 
-- [ ] (0.1356) Plugin en français : Carte, réglage « Lieux notoires » et alarme par clic droit sur un lieu notoire ; Objets, onglet « Synthèse liée » ; Compagnie libre, onglet « Appareils » ; Rappels, « Aventures imaginaires de Khloe ».
+- [x] (0.1356) Plugin en français : Carte, réglage « Lieux notoires » et alarme par clic droit sur un lieu notoire ; Objets, onglet « Synthèse liée » ; Compagnie libre, onglet « Appareils » ; Rappels, « Aventures imaginaires de Khloe ».
 
-- [ ] (0.1357) Plugin en français : Accueil, liste des outils, une fiche d'outil (Carte, Marché) commence sans « Disponible : » ; Paramètres, info-bulle du cache des quêtes cite « Actualiser les quêtes ».
+- [x] (0.1357) Plugin en français : Accueil, liste des outils, une fiche d'outil (Carte, Marché) commence sans « Disponible : » ; Paramètres, info-bulle du cache des quêtes cite « Actualiser les quêtes ».
 
-- [ ] (0.1358) Plugin en français : survol d'un objet (« Possédés : … », « déjà dans la collection ») ; Équipement, ligne des points perdus au plafond (« {0} points de … »).
+- [x] (0.1358) Plugin en français : survol d'un objet (« Possédés : … », « déjà dans la collection ») ; Équipement, ligne des points perdus au plafond (« {0} points de … »).
+
+- [ ] (0.1360) Jardin, potager avec un carreau mûr : ouvrir le menu du carreau et récolter (avec graines) : le carreau quitte le journal de Tensho, un message « récolté » dans le chat ; en mode développeur, dalamud.log dit « Garden harvest read: patch …, bed …, target … » et « Item gain attributed: … from Garden … ».
+
+- [ ] (0.1360) Jardin : planter une graine à côté d'une plante déjà là, puis retirer ou replanter cette voisine : la prévision de croisement de la première ne change pas.
+
+- [x] (0.1361) Organisation de l'inventaire, aperçu du tri des sacs : les cadres dans l'ordre Sac 1, Sac 3, Sac 2, Sac 4 (numéros de cases inchangés) ; appliquer le tri en mode développeur : « Tri visuel appliqué aux quatre sacs… » une seule fois sous « Rangement ».
+
+- [x] (0.1362) Plugin en anglais : menu des pages (Ocean Fishing, Hunting Log, Deep Dungeons) ; plugin en français : Paramètres, onglet « Débogage » en mode développeur ; Aide › Signaler un problème : textes « issue » en anglais.
+
+- [ ] (0.1363) Plugin en français et en anglais : infobulles de Paramètres › Avancé (tableau de bord, ventes des servants, lien avec l'application de bureau) et du simulateur d'artisanat (« Bénédiction de Byregot »), lisibles et justes.
+
+- [ ] (0.1364) Plugin en français : Découvertes, recherche par deux lettres (monstre, ALÉA, objet) ; page Donjons sans fond, sous-titre ; jardin vide : phrase sur l'entretien et la récolte lus dans le chat.
 
 **0.535 : interfaces** — à voir en jouant
 
