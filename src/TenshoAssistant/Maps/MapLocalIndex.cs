@@ -90,7 +90,8 @@ public static class MapLocalIndexCache
     // 3: fishing spots carry their area (0.894, FishingSpotRadiusFactor).
     // 4: bells and company chests from the layouts where the game's map has no marker (X-386, 0.1402).
     // 5: only where no map of the territory has that marker (X-424, 0.1405: Eulmore's bell is on map 555).
-    private const int CopyRules=5;
+    // 6: same rows, the layouts read on a worker (X-425 M3, 0.1406): rebuilt once so the log line measures the new path.
+    private const int CopyRules=6;
     /// <summary>
     /// X-78 (0.894, docs/evidence/0.894-fishing-spot-area.md): FishingSpot.Radius in map texture pixels (as FishingSpot.X/Z), measured on the fishing log's own map
     /// of La Mer de Rubis (user capture): spots of radius 1000 drew circles of about 155 texture pixels, the 2000 one about 310. Approximate (±5 %).

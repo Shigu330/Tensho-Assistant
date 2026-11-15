@@ -44,7 +44,8 @@ internal static class PlacedObjects1405Tests
             Check(loader.Contains("territoryMaps.Where(other=>other.RowId!=map.RowId)", StringComparison.Ordinal)
                 && loader.Contains("foreach(var each in data.GetExcelSheet<Map>())", StringComparison.Ordinal), "the other maps come from Map.TerritoryType");
             Check(loader.Contains("longest step {2:F1} ms ({3})", StringComparison.Ordinal), "the longest layout step is logged (X-425 M3)");
-            Check(Read("Maps/MapLocalIndex.cs").Contains("private const int CopyRules=5;", StringComparison.Ordinal), "the positions' cache is rebuilt once");
+            var rules = System.Text.RegularExpressions.Regex.Match(Read("Maps/MapLocalIndex.cs"), @"private const int CopyRules=(\d+);");
+            Check(rules.Success && int.Parse(rules.Groups[1].Value) >= 5, "the positions' cache is rebuilt once (copy rules 5 or later)");
         }),
     ];
 }
