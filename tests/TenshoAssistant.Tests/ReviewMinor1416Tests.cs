@@ -30,7 +30,7 @@ internal static class ReviewMinor1416Tests
             // A key both gone and read (never happens): the reading wins.
             Check(!AutoAlarms.Sync(alarms, [Market(1, 40), Venture(1, 1)], Now.AddMinutes(4), 5, ["market:1"]) && alarms.Any(alarm => alarm.AutoKey == "market:1"), "a reading is never taken back");
             var watcher = Read("Alarms/AutoAlarmWatcher.Dalamud.cs");
-            Check(watcher.Contains("else gone.Add($\"market:{retainer->RetainerId}\");", StringComparison.Ordinal) && watcher.Contains("AutoAlarms.Sync(configuration.Alarms,events,now,options.LeadMinutes,gone)", StringComparison.Ordinal),
+            Check(watcher.Contains("else if(TenshoAssistant.Character.RetainerStates.NothingOnSale(retainer->MarketItemCount))gone.Add($\"market:{retainer->RetainerId}\");", StringComparison.Ordinal) && watcher.Contains("AutoAlarms.Sync(configuration.Alarms,events,now,options.LeadMinutes,gone)", StringComparison.Ordinal),
                 "the watcher names the retainers read with nothing on sale");
             Check(watcher.IndexOf("var gone=new List<string>();", StringComparison.Ordinal) < watcher.IndexOf("if(retainers!=null && retainers->IsReady)", StringComparison.Ordinal),
                 "gone only from retainers read in this pass (the list ready)");

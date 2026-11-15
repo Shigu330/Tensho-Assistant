@@ -37,7 +37,8 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
         try
         {
             var events=new List<DueEvent>();
-            // X-431 M1 (0.1416): the retainers read with nothing on sale: their « sales end » alarm, if any, is taken back.
+            // X-431 M1 (0.1416): the retainers read with nothing on sale: their « sales end » alarm, if any, is taken back. X-435 M1 (0.1420):
+            // only those; a retainer still selling whose time is unusable (0, before the game began) keeps the alarm it had.
             var gone=new List<string>();
             var retainers=RetainerManager.Instance();
             if(retainers!=null && retainers->IsReady)
@@ -48,7 +49,7 @@ public sealed unsafe class AutoAlarmWatcher : IDisposable
                     if(TenshoAssistant.Character.RetainerStates.SaleAlarmAt(retainer->MarketItemCount,retainer->MarketExpire) is { } salesEnd)
                         events.Add(new($"market:{retainer->RetainerId}",string.Format(text("AutoAlarms.Market"),retainer->NameString),text("AutoAlarms.MarketGroup"),
                             salesEnd,AlarmSource.Reminder));
-                    else gone.Add($"market:{retainer->RetainerId}");
+                    else if(TenshoAssistant.Character.RetainerStates.NothingOnSale(retainer->MarketItemCount))gone.Add($"market:{retainer->RetainerId}");
                     if(retainer->VentureId==0 || retainer->VentureComplete==0)continue;
                     events.Add(new($"venture:{retainer->RetainerId}",string.Format(text("AutoAlarms.Venture"),retainer->NameString),text("AutoAlarms.VentureGroup"),
                         DateTimeOffset.FromUnixTimeSeconds(retainer->VentureComplete),AlarmSource.Reminder));

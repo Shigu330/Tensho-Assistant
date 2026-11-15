@@ -49,6 +49,10 @@ public static class RetainerStates
         return clean.Length>MaximumText ? clean[..MaximumText]:clean;
     }
 
+    /// <summary>X-435 M1 (0.1420): the retainer was read with nothing on sale (its « sales end » alarm is taken back); a retainer still selling
+    /// whose time is unusable is not « nothing on sale ».</summary>
+    public static bool NothingOnSale(int marketItems)=>marketItems<=0;
+
     /// <summary>X-196 (0.1411): when the automatic alarm of a retainer's sales rings: at their end, only while something is on sale (null otherwise).</summary>
     public static DateTimeOffset? SaleAlarmAt(int marketItems,uint marketExpire)=>SalesEnd(marketItems,marketExpire);
 
@@ -58,7 +62,10 @@ public static class RetainerStates
     /// <summary>
     /// X-429 (0.1415, docs/evidence/0.1415-retainer-sales-end.md): the end of a retainer's sales, the one reading of it for the table and the
     /// alarm. The game writes it in its own retainer list (Addon 2314: « Selling n items until date », the time given as lnum4 beside the town
-    /// lnum2 and the count lnum3, the three values of RetainerManager.Retainer: Town, MarketItemCount, MarketExpire). Null when nothing is on
+    /// lnum2 and the count lnum3, the three values of RetainerManager.Retainer: Town, MarketItemCount, MarketExpire). X-434 (0.1420,
+    /// docs/evidence/0.1420-retainer-sales-end-code.md): read in the game's own code, the function that writes that line pushes the retainer's
+    /// bytes +0x30, +0x31 and the 32-bit value +0x34 (MarketExpire) as lnum2, lnum3 and lnum4: the game's « until » day is the day of this
+    /// very time (the game shows the day only; Tensho the same time to the minute). Null when nothing is on
     /// sale (the game shows no time then: Addon 2317), when no time is given, or when the time is before <see cref="GameStart"/>.
     /// </summary>
     public static DateTimeOffset? SalesEnd(int marketItems,uint marketExpire)
