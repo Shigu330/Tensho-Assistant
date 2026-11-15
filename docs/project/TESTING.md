@@ -1851,6 +1851,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1364) Plugin en français : Découvertes, recherche par deux lettres (monstre, ALÉA, objet) ; page Donjons sans fond, sous-titre ; jardin vide : phrase sur l'entretien et la récolte lus dans le chat.
 
+- [ ] (0.1366) Chat : un lien de carte d'une autre zone (par exemple <flag> posé ailleurs, tapé dans Dire), la carte Tensho ouverte : clic gauche : le jeu pose son drapeau et la carte Tensho va sur la carte du lien, drapeau visible ; mode développeur : dalamud.log dit « Chat link clicked (ChatLogPanel_n): map link, map N, left button » puis « Chat link click: the Tensho map shows map N ».
+
+- [ ] (0.1366) Chat : clic droit sur un lien de carte : le menu « Tensho — lieu » s'ouvre à la souris ; mode développeur : dalamud.log dit « Chat link right click: map N, menu opened » ; puis survoler le lien, s'éloigner et tourner la caméra au clic droit dans le monde : aucun menu (ligne « not taken: cursor … px away »).
+
+- [ ] (0.1366) Jardin : ouvrir le menu d'un carreau, le fermer sans rien faire, puis acheter un objet ou recevoir un objet dans les secondes qui suivent : aucun carreau mûr retiré du journal ; planter un carreau : rien de récolté.
+
+- [ ] (0.1367) Objets (page Objets ou recherche rapide de l'accueil) : taper « d'Ehcatl » avec l'apostrophe du clavier : la poignée de plumes et la paire de gants d'Ehcatl sont trouvées ; Découvertes : une recherche ne montre que les objets dont une source a été notée (un objet jamais obtenu n'y est pas).
+
+- [ ] (0.1368) Plugin en français : page Listes d'artisanat (titre), onglet « Liste d'artisanat » du simulateur, panneau à l'écran et ligne « Liste d'artisanat : il en manque … » de l'aide à la récolte : un seul nom partout.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [ ] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
