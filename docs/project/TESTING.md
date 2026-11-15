@@ -1949,7 +1949,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1454) Fenêtre de chat de Tensho : le bouton au bout des onglets (cadre) retire la barre de titre et le cadre, la fenêtre ne garde que les onglets et les messages ; le même bouton les remet ; le bouton du cadenas empêche de la déplacer et de la redimensionner, un second clic la libère ; « Opacité du fond » à 0 % rend le fond transparent ; après un rechargement, la fenêtre garde sa place, sa taille et ces deux réglages ; « /tensho chat » la masque et la réaffiche, aussi sans bordure.
 
-- [ ] (0.1456) Fenêtre de chat de Tensho : quelqu'un écrit (ou vous écrivez en Dire) « https://www.mogstation.com@example.org » : le texte n'est pas souligné, aucun menu ; une adresse normale (par exemple https://na.finalfantasyxiv.com) : l'info-bulle et le menu disent « Site : na.finalfantasyxiv.com » avant « Ouvrir dans le navigateur ».
+- [x] (0.1456) Fenêtre de chat de Tensho : quelqu'un écrit (ou vous écrivez en Dire) « https://www.mogstation.com@example.org » : le texte n'est pas souligné, aucun menu ; une adresse normale (par exemple https://na.finalfantasyxiv.com) : l'info-bulle et le menu disent « Site : na.finalfantasyxiv.com » avant « Ouvrir dans le navigateur ».
 
 - [ ] (0.1458) Fenêtre de chat de Tensho : les onglets sont Général, Combat, Événement et Social, comme les trois premiers onglets du chat du jeu ; en combat, vos dégâts et « Vous avez vaincu … » sont dans Combat et pas dans Général ; un dialogue de PNJ (une quête) est dans Événement ; vos onglets d'avant sont gardés, Combat et Événement ajoutés une seule fois (pas après un rechargement) ; comparer avec les onglets du chat du jeu.
 
@@ -1968,6 +1968,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1466) Fenêtre de chat de Tensho : pendant un combat, l'onglet Combat n'affiche plus de compteur « (N) » et la barre d'onglets ne bouge plus ; un dialogue de PNJ n'est plus que dans l'onglet Événement (plus dans Général) ; en raid d'alliance, les messages de Général restent tous là après le combat.
 
 - [ ] (0.1467) Fenêtre de chat de Tensho : la molette fait défiler une ligne par cran ; remonter plus haut : le bouton « En bas » apparaît en bas à droite ; pendant que des messages arrivent, il devient « N nouveaux » ; un clic ramène au dernier message, et la fenêtre suit de nouveau les messages.
+
+- [ ] (0.1468) Mode développeur, fenêtre de chat Tensho ouverte : dire « test <item> test » (un objet lié) dans /dire : le lien s'affiche entre les deux « test », souligné ; dans dalamud.log, une ligne « Chat window, pieces of a message with a link (kind 10) » dit ce que le jeu a envoyé (et, si le lien s'affiche sans son nom, une ligne « a link without text of its own »).
+
+- [ ] (0.1469) Carte de Tensho, villes à étages : à Eulmore, chaque couche (Les Racines, Le Tronc, La Voûte) ne montre que ses marchands et sonnettes ; à Ul'dah (Faubourg de Thal, Faubourg de Nald) et à Limsa Lominsa (Le Tillac), un marchand de l'étage du haut s'affiche sur la carte de cet étage, à sa place ; aucun marchand connu ne manque.
+
+- [ ] (0.1470) Dédale bestial : finir un plateau ; Tensho › Dresseur › Équipe, résultat du dernier plateau : « score S · bonus B (n obtenu(s)) · total T » avec les mêmes nombres que la fenêtre de résultat du jeu (Score, Bonus, Total). En mode développeur, une capture de la fenêtre de résultat du jeu (lignes du score avec leurs points) sur la page des essais : elle dira quelle part du score est laquelle.
+
+- [ ] (0.1471) Fenêtre de chat Tensho : un message en lettres encadrées du jeu (annonce d'un joueur, « THE … ») se lit en lettres simples ; un joueur d'un autre monde s'affiche « Nom@Monde » comme dans le jeu ; un objet HQ lié a « HQ » après son nom ; la copie du message (clic droit) garde le même texte.
+
+- [ ] (0.1472) Fenêtre de chat Tensho : en lisant plus haut, cliquer « En bas » sur un lien n'ouvre pas le lien (seulement le retour en bas) ; un pavé tactile fait défiler doucement, une ligne par cran de molette ; avec un seul nouveau message le bouton dit « 1 nouveau ».
 
 **0.535 : interfaces** — à voir en jouant
 

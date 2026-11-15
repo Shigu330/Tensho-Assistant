@@ -73,8 +73,8 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1458-chat-default-tabs.md](0.1458-chat-default-tabs.md) | `src/TenshoAssistant/Chat/ChatChannels.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/project/DECISIONS.md` |
 | [0.1459-gaps-by-heap.md](0.1459-gaps-by-heap.md) | `tests/TenshoAssistant.Tests/LoadRank1459Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
-| [0.1464-map-floors.md](0.1464-map-floors.md) | `src/TenshoAssistant/Maps/MapFloorReader.Dalamud.cs`, `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1464Tests.cs` | `CHANGELOG.md` |
-| [0.1465-beast-result-index-12.md](0.1465-beast-result-index-12.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs` | `CHANGELOG.md`, `docs/evidence/0.1470-beast-result-window.md` |
+| [0.1464-map-floors.md](0.1464-map-floors.md) | `src/TenshoAssistant/Maps/MapFloorReader.Dalamud.cs`, `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1464Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
+| [0.1465-beast-result-index-12.md](0.1465-beast-result-index-12.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1470-beast-result-window.md` |
 | [0.1468-chat-link-pieces.md](0.1468-chat-link-pieces.md) | `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatGlyphs1471Tests.cs`, `tests/TenshoAssistant.Tests/ChatLinkPieces1468Tests.cs` | `CHANGELOG.md` |
 | [0.1469-map-floors-check.md](0.1469-map-floors-check.md) | `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1469Tests.cs`, `tools/ShopCurrencyProbe/Program.cs` | `CHANGELOG.md` |
 | [0.1470-beast-result-window.md](0.1470-beast-result-window.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs`, `tests/TenshoAssistant.Tests/BeastResult1470Tests.cs` | `CHANGELOG.md` |
@@ -306,7 +306,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x343-dalamud-upload.md](x343-dalamud-upload.md) | `src/TenshoAssistant/Market/SeenPrices.cs`, `tests/TenshoAssistant.Tests/SameReading1331Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [x344-plugin-icon.md](x344-plugin-icon.md) | `scripts/Verify.ps1`, `tests/TenshoAssistant.Tests/PluginIcon1330Tests.cs` | — |
 | [x85-ocean-sightings-2026-11-08.log](x85-ocean-sightings-2026-11-08.log) | `src/TenshoAssistant/Gathering/OceanFishing.cs` | — |
-| [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
+| [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
 Counted · compté : 297 files · fichiers ; 251 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.

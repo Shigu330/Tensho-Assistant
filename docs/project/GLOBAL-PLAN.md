@@ -41,7 +41,7 @@ Total before 1.0.0 (phases 1 to 6): 101 points, a count produced by a script fro
 |---|---|---|
 | Garden | Add Cornflowers to the seed list | Done in 0.540 |
 | Items | Item blocks without a price | Done in 0.541 |
-| Squadron | Alarm button for a mission in progress already present: bell on the row in… | Done |
+| Squadron | Alarm button for a mission in progress already present… | Done |
 <!-- /gen:plan:phase-1-en -->
 
 If one of them finally needs an in-game survey, it moves to phase 5.
@@ -61,38 +61,38 @@ If one of them finally needs an in-game survey, it moves to phase 5.
 | P20 | « Layers » button to show or hide everything in one click |  | Done in 0.547 |
 | I0 | Count worn pieces in the stocks and in « owned » |  | Done in 0.549 |
 | I5 | Preparation cost at the data centre price (option of A-06) |  | Done in 0.574 |
-| I8 | X-07, early part: open the item on Universalis, Garland Tools, Teamcraft or the… |  | Done in 0.561 |
+| I8 | X-07, early part: open the item on Universalis, Garland… |  | Done in 0.561 |
 | I9 | Copy the item name and item link into chat (local) |  | Done in 0.561 |
 | I15 | Share a sorting template as text (copy / paste) |  | Done in 0.566 |
 | I16 | Commands « /tensho objet » and « /tensho prix » |  | Done in 0.555 |
-| I18 | I-07, early part: copy « lowest price − 1 » from the Market page |  | Done in 0.567 |
+| I18 | I-07, early part: copy « lowest price − 1 » from the Market… |  | Done in 0.567 |
 | I19 | English item name in the item sheet and tooltip |  | Done in 0.562 |
 | I20 | Sorting preview: moved slots flagged |  | Done in 0.565 |
-| ~~I22~~ done in 0.669 without an in-game measurement | Calculations done every frame (deferred to e): preparation cost and market… |  | Done in 0.669 |
-| C0 | A-01, early part: choose the target quality in the log panel already present |  | Done |
+| ~~I22~~ done in 0.669 without an in-game measurement | Calculations done every frame (deferred to e): preparation… |  | Done in 0.669 |
+| C0 | A-01, early part: choose the target quality in the log… |  | Done |
 | C2 | Try one's saved sequences on all recipes |  | Done in 0.552 |
-| C3 | Simulate another job without wearing it: last attributes read per job and… |  | Done in 0.554 |
-| C4 | Attribute thresholds of a sequence: minimum Craftsmanship, Control and CP |  | Done in 0.553 |
+| C3 | Simulate another job without wearing it: last attributes… |  | Done in 0.554 |
+| C4 | Attribute thresholds of a sequence: minimum Craftsmanship… |  | Done in 0.553 |
 | C9 | R-02, early part: « possible now? » in the fishing help |  | Done in 0.568 |
 | ~~C12~~ done in 0.669 | Initial quality computed from the chosen HQ ingredients |  | Done in 0.669 |
-| C14 | A-12, early part: full recipe sheet (master book, quick synthesis, HQ… |  | Done in 0.600 |
-| C15 | More direct simulator: recipe choice in the page, result recomputed on its own… |  | Done in 0.572 |
-| C17 | Macro export options: separate waits (X-12), sound, final echo, icon |  | Done in 0.573 |
-| C19 | Where are my materials: detail per storage in the preparation and the chain |  | Done in 0.559 |
-| C24 | Remaining preparation need in the gathering and fishing helps |  | Done in 0.560 |
+| C14 | A-12, early part: full recipe sheet (master book, quick… |  | Done in 0.600 |
+| C15 | More direct simulator: recipe choice in the page, result… |  | Done in 0.572 |
+| C17 | Macro export options: separate waits (X-12), sound, final… |  | Done in 0.573 |
+| C19 | Where are my materials: detail per storage in the… |  | Done in 0.559 |
+| C24 | Remaining preparation need in the gathering and fishing… |  | Done in 0.560 |
 | C31 | Weather of several zones in one table (favourite zones) |  | Done in 0.563 |
-| C32 | Commands « /tensho recolte » and « /tensho recette » (follow-up of I16) |  | Done in 0.555 |
+| C32 | Commands « /tensho recolte » and « /tensho recette »… |  | Done in 0.555 |
 | C35 | Fishing help: game readings and first tables out of Draw |  | Done in 0.604 |
-| C36 | R-14, crafting and gathering part: an unreadable help says so instead of… |  | Done in 0.601 |
+| C36 | R-14, crafting and gathering part: an unreadable help says… |  | Done in 0.601 |
 | T3 | Quests: Level and Zone columns, level sort and filter |  | Done in 0.550 |
-| T4 | Monsters: flag on the monster's position, not at the map centre |  | Done in 0.551 |
+| T4 | Monsters: flag on the monster's position, not at the map… |  | Done in 0.551 |
 | T16 | Retainer tasks: one row per retainer, with alarm |  | Done in 0.570 |
 | T17 | Reminders ticked by themselves when the game says so |  | Done in 0.558 |
-| T18 | Discord: time read in each member's time zone, and [zone], [item], [and] tags |  | Done in 0.564 |
+| T18 | Discord: time read in each member's time zone, and [zone]… |  | Done in 0.564 |
 | T19 | Alarms: edit the name and time, and « Remind me in 5 min » |  | Done in 0.557 |
 | T20 | Alarms: also ring at the exact time |  | Done in 0.556 |
-| T23 | Free Company: ships grouped by company, old reading erasable, value of the last… |  | Done in 0.603 |
-| T28 | Collections: « Recently obtained » and source menu for emotes |  | Done in 0.602 |
+| T23 | Free Company: ships grouped by company, old reading… |  | Done in 0.603 |
+| T28 | Collections: « Recently obtained » and source menu for… |  | Done in 0.602 |
 | T29 | Mini Cactpot: payout table proven and visible |  | Done in 0.571 |
 <!-- /gen:plan:phase-2-en -->
 
@@ -103,23 +103,23 @@ C12 moves to phase 5: its calculation rule must be compared with the initial qua
 <!-- gen:plan:phase-3-en -->
 | No. | Proposal | Size | Detail |
 |---|---|---|---|
-| P10 | Search on the map (places, aetherytes, NPCs, quests, resources) |  | Done in 0.597 |
+| P10 | Search on the map (places, aetherytes, NPCs, quests… |  | Done in 0.597 |
 | P12 | Names written next to the icons, like the game map |  | Done in 0.596 |
-| I1 | Flag and erase the reading of a dismissed retainer or an old storage |  | Done in 0.576 |
-| I3 | NPC vendor prices in the preparation cost and on the Market page |  | Done in 0.575 |
+| I1 | Flag and erase the reading of a dismissed retainer or an… |  | Done in 0.576 |
+| I3 | NPC vendor prices in the preparation cost and on the Market… |  | Done in 0.575 |
 | I11 | Sortable list view of the Bank |  | Done in 0.594 |
 | I21 | Job and gear set filter in the sorting rules |  | Done in 0.595 |
-| C5 | Follow one's sequence during the synthesis: next action and gap with the plan |  | Done in 0.589 |
+| C5 | Follow one's sequence during the synthesis: next action and… |  | Done in 0.589 |
 | C7 | R-13, early part: timed points open now or soon |  | Done in 0.588 |
-| C16 | Sequence library: search, rename, duplicate, copy and paste as text (A-08, text… |  | Done in 0.590 |
-| C18 | Crafting chain: buttons per step, identical steps grouped, « done » boxes |  | Done in 0.591 |
+| C16 | Sequence library: search, rename, duplicate, copy and paste… |  | Done in 0.590 |
+| C18 | Crafting chain: buttons per step, identical steps grouped… |  | Done in 0.591 |
 | C21 | « What can I craft? » with my stocks |  | Done in 0.592 |
-| T0 | Real-time alarms: by hand, every day, every week or at every reset (X-10, early… |  | Done in 0.577 |
+| T0 | Real-time alarms: by hand, every day, every week or at… |  | Done in 0.577 |
 | T10 | Home: « Today » block and tiles of one's choice |  | Done in 0.599 |
 | T11 | « Available now » quests and quests of the current zone |  | Done in 0.582 |
-| T12 | Path to a quest: remaining prerequisites, count and next one to do |  | Done in 0.583 |
+| T12 | Path to a quest: remaining prerequisites, count and next… |  | Done in 0.583 |
 | T14 | Gear: prepare the plan of a job other than the one worn |  | Done in 0.580 |
-| T15 | Fashion Report: outfit of the chosen week, tried on in one click, with where to… |  | Done in 0.581 |
+| T15 | Fashion Report: outfit of the chosen week, tried on in one… |  | Done in 0.581 |
 | T24 | Discord: one channel per category (several webhooks) |  | Done in 0.598 |
 | T25 | Gear: several named plans per job |  | Done in 0.593 |
 <!-- /gen:plan:phase-3-en -->
@@ -150,8 +150,8 @@ A piece of data is not proven: the survey comes before the code. Order: by activ
 <!-- gen:plan:phase-5-corrections-en -->
 | Where | What to survey | Issue |
 |---|---|---|
-| Garden | One upkeep and one harvest, to recognise their messages; then remove the… | Done in 0.1110 |
-| Gathering | GP regeneration during a gathering read on 2026-11-06: no increase within the… | Done |
+| Garden | One upkeep and one harvest, to recognise their messages… | Done in 0.1110 |
+| Gathering | GP regeneration during a gathering read on 2026-11-06: no… | Done |
 <!-- /gen:plan:phase-5-corrections-en -->
 
 ### Gathering and fishing
@@ -160,11 +160,11 @@ A piece of data is not proven: the survey comes before the code. Order: by activ
 | No. | Proposal | Size | Detail |
 |---|---|---|---|
 | C33 | A single in-game reading session for crafting and gathering, before coding | S-M |  |
-| ~~C27~~ done in 0.647 | Node class (normal, ephemeral, legendary…) and required folklore tome |  | Done in 0.647 |
+| ~~C27~~ done in 0.647 | Node class (normal, ephemeral, legendary…) and required… |  | Done in 0.647 |
 | ~~C28~~ done in 0.663 | Intuition duration and countdown |  | Done in 0.663 |
 | ~~C29~~ done in 0.649 | R-15, early part: spearfishing fish in the Gathering page |  | Done in 0.649 |
 | C30 | Local record of your catches and personal bite times | M |  |
-| ~~C10~~ done in 0.1011 | Bite timer restarted on its own at every cast (fishing help and Ocean Fishing)… |  | Done in 0.1011 |
+| ~~C10~~ done in 0.1011 | Bite timer restarted on its own at every cast (fishing help… |  | Done in 0.1011 |
 <!-- /gen:plan:phase-5-recolte-et-peche-en -->
 
 ### Crafting
@@ -172,9 +172,9 @@ A piece of data is not proven: the survey comes before the code. Order: by activ
 <!-- gen:plan:phase-5-artisanat-en -->
 | No. | Proposal | Size | Detail |
 |---|---|---|---|
-| ~~C6~~ done in 0.666 for the simulation | Level-adjusted recipes, forced-quality recipes and Cosmic Exploration |  | Done in 0.666 |
+| ~~C6~~ done in 0.666 for the simulation | Level-adjusted recipes, forced-quality recipes and Cosmic… |  | Done in 0.666 |
 | ~~C13~~ done in 0.668 | HQ chance of a final quality |  | Done in 0.668 |
-| ~~C22~~ done in 0.664 | Free Company workshop projects: materials per part and per phase |  | Done in 0.664 |
+| ~~C22~~ done in 0.664 | Free Company workshop projects: materials per part and per… |  | Done in 0.664 |
 <!-- /gen:plan:phase-5-artisanat-en -->
 
 ### Map
@@ -348,22 +348,22 @@ Chosen by the user from the list of sections of a French website. No data from t
 | Point | Topic | State |
 |---|---|---|
 | W-01 | Custom Deliveries page: clients, rank, points, week | Done in 0.675 |
-| W-02 | Masked Carnivale: stages done and remaining, no combat advice | Done in 0.683 |
+| W-02 | Masked Carnivale: stages done and remaining, no combat… | Done in 0.683 |
 | W-03 | Relic weapons: progress per expansion | Done |
 | W-04 | Island Sanctuary animals | Done in 0.685 |
-| W-05 | On-screen panels: workshop project materials and preparation list, adjustable | Done in 0.691 |
-| W-06 | « What can I craft? »: sort by most profitable in gil, scrips or other | Done in 0.707 |
+| W-05 | On-screen panels: workshop project materials and… | Done in 0.691 |
+| W-06 | « What can I craft? »: sort by most profitable in gil… | Done in 0.707 |
 | W-07 | « What can I craft? »: count sub-recipes | Done in 0.696 |
 | W-08 | Levequests: right click to the nearest aetheryte | Done in 0.698 |
-| W-09 | Tracking list by origin (gathering, NPC, monster, other), workshop and crafting | Done in 0.699 |
+| W-09 | Tracking list by origin (gathering, NPC, monster, other)… | Done in 0.699 |
 | W-10 | Allied Societies: rank and quests of each society | Done in 0.713 |
 | W-11 | Grand Company: rank, seals and missions on one page | Done in 0.714 |
-| W-12 | Special deliveries: Crystarium, Sharlayan Academy, « Bazar aux Mille Perles » | Done in 0.715 |
-| W-13 | Next relics: Anima, Eureka, Resistance, Manderville, phantoms, and their armour | Done |
-| W-14 | Eureka and Bozja: FATEs, skirmishes, Critical Engagements, front reports, Lost… | Done in 0.717 |
-| W-15 | Deep Dungeon: Palace of the Dead, Heaven-on-High, Eureka Orthos, Pilgrim's… | Done in 0.718 |
+| W-12 | Special deliveries: Crystarium, Sharlayan Academy, « Bazar… | Done in 0.715 |
+| W-13 | Next relics: Anima, Eureka, Resistance, Manderville… | Done |
+| W-14 | Eureka and Bozja: FATEs, skirmishes, Critical Engagements… | Done in 0.717 |
+| W-15 | Deep Dungeon: Palace of the Dead, Heaven-on-High, Eureka… | Done in 0.718 |
 | W-16 | Lexicon of game words, French and English, from its sheets | Done in 0.719 |
-| W-14b | FATEs of all open zones, location and level, from the zone files | Done in 0.721 |
+| W-14b | FATEs of all open zones, location and level, from the zone… | Done in 0.721 |
 <!-- /gen:plan:w-en -->
 
 ## Requests of 2026-11-07, while playing
@@ -373,237 +373,237 @@ Noted in the order the user made them; to be done after the current task, one ve
 <!-- gen:plan:x-en -->
 | Point | Request | State |
 |---|---|---|
-| X-01 | Sluggishness: find what blocks a Tensho frame (120 to 230 ms every few minutes… | Done in 0.1329.0 |
-| X-02 | Data kept longer, re-read only if absent; settings that complete « Cache &… | Done in 0.750.0 |
+| X-01 | Sluggishness: find what blocks a Tensho frame (120 to 230… | Done in 0.1329.0 |
+| X-02 | Data kept longer, re-read only if absent; settings that… | Done in 0.750.0 |
 | X-03 | « Open in Tensho » link of an alarm: opens nothing | Done in 0.837.0 |
-| X-04 | At a gathering point, highlight the items that the tracking lists (crafting and… | Done in 0.751 |
-| X-05 | Crafting and workshop tracking lists gathered by gathering zone | Done in 0.752 |
-| X-06 | « Gather automatically » ticked in the game window: the plan keeps only the… | Done in 0.753 |
-| X-07 | « What can I craft? »: an item craftable by two jobs counted once | Done in 0.739 |
-| X-08 | Tooltip of a timed point (map): « closed now » without saying when it opens… | Done in 0.754 |
-| X-09 | Crafting and workshop tracking lists: a button that adds the alarms of all… | Done in 0.755 |
-| X-10 | Gathering help: first select an item that the tracking lists need | Done in 0.756 |
+| X-04 | At a gathering point, highlight the items that the tracking… | Done in 0.751 |
+| X-05 | Crafting and workshop tracking lists gathered by gathering… | Done in 0.752 |
+| X-06 | « Gather automatically » ticked in the game window: the… | Done in 0.753 |
+| X-07 | « What can I craft? »: an item craftable by two jobs… | Done in 0.739 |
+| X-08 | Tooltip of a timed point (map): « closed now » without… | Done in 0.754 |
+| X-09 | Crafting and workshop tracking lists: a button that adds… | Done in 0.755 |
+| X-10 | Gathering help: first select an item that the tracking… | Done in 0.756 |
 | X-11 | Tracking lists: be able to collapse each gathering zone | Done in 0.757 |
-| X-12 | Tracking lists by zone: the zone where one is first, then the others sorted… | Done in 0.757 |
-| X-13 | Tracking lists: items of timed points (alarms) in their own collapsible group… | Done in 0.758 |
-| X-14 | « Timed points » group of the tracking lists: say for each item whether its… | Done in 0.761 |
-| X-15 | Right-click menu of an item: « Go there » directly (gathering point, nearest… | Done in 0.762 |
-| X-16 | GP plan: at equal yield, prefer actions that last the whole gathering, for… | Done in 0.763 |
-| X-17 | Reduced tracking panel: the help loses « Your lists still need » and the frame… | Done in 0.764 |
-| X-18 | Gil log: icons (gil, categories) and less « Other »: find other categories from… | Done in 0.1418 |
-| X-19 | Gil log: a deposit with a retainer counted as spending; the retainers' total… | Done in 0.769 |
-| X-20 | Items deposited with a retainer, in the saddlebags or in the Free Company… | Done in 0.770 |
-| X-21 | « Add the alarms » offered 19 alarms, including items that looked already… | Done in 0.772 |
-| X-22 | Monster loot, wiki lines « Monster · level · Zone (x,y) »: no right click to… | Done in 0.777 |
+| X-12 | Tracking lists by zone: the zone where one is first, then… | Done in 0.757 |
+| X-13 | Tracking lists: items of timed points (alarms) in their own… | Done in 0.758 |
+| X-14 | « Timed points » group of the tracking lists: say for each… | Done in 0.761 |
+| X-15 | Right-click menu of an item: « Go there » directly… | Done in 0.762 |
+| X-16 | GP plan: at equal yield, prefer actions that last the whole… | Done in 0.763 |
+| X-17 | Reduced tracking panel: the help loses « Your lists still… | Done in 0.764 |
+| X-18 | Gil log: icons (gil, categories) and less « Other »: find… | Done in 0.1418 |
+| X-19 | Gil log: a deposit with a retainer counted as spending; the… | Done in 0.769 |
+| X-20 | Items deposited with a retainer, in the saddlebags or in… | Done in 0.770 |
+| X-21 | « Add the alarms » offered 19 alarms, including items that… | Done in 0.772 |
+| X-22 | Monster loot, wiki lines « Monster · level · Zone (x,y) »… | Done in 0.777 |
 | X-23 | Alarms: sending to Discord disabled by default | Done in 0.778 |
-| X-24 | After a plugin load, monster items spend a while under « Other »: the monster… | Done in 0.779 |
-| X-25 | **Game freeze, 15:18:45**: the Raphael solver (native) panics on a division by… | Done in 0.782 |
-| X-26 | « Compare next moves » on an impossible high-quality recipe: « mismatched… | Done in 0.784 |
-| X-27 | Tracking lists must be able to show only finished items (the items to craft… | Done in 0.785 |
-| X-28 | Free Company workshop: take into account what is already delivered to the… | Done in 0.787 |
-| X-29 | Crafting log: as Carpenter on a Blacksmith recipe (Mythril Ingot), Tensho does… | Done in 0.788 |
-| X-30 | See the remaining crafting steps (intermediate items to craft) for the workshop… | Done in 0.789 |
-| X-31 | « Remaining crafts »: each step must be expandable down to the final step; a… | Done in 0.790 |
-| X-32 | Map: find a solution to the blockage worked around by opening then closing the… | Done in 0.793 |
-| X-33 | Storage, « What to do with it? »: set prices like « What can I craft » and take… | Done in 0.794 |
-| X-34 | Nearby monsters (game object table), information only: Dalamud rule to… | Done in 0.795 |
-| X-35 | Nearby monsters: those that drop an item requested by the tracking lists («… | Done in 0.795 |
+| X-24 | After a plugin load, monster items spend a while under «… | Done in 0.779 |
+| X-25 | **Game freeze, 15:18:45**: the Raphael solver (native)… | Done in 0.782 |
+| X-26 | « Compare next moves » on an impossible high-quality… | Done in 0.784 |
+| X-27 | Tracking lists must be able to show only finished items… | Done in 0.785 |
+| X-28 | Free Company workshop: take into account what is already… | Done in 0.787 |
+| X-29 | Crafting log: as Carpenter on a Blacksmith recipe (Mythril… | Done in 0.788 |
+| X-30 | See the remaining crafting steps (intermediate items to… | Done in 0.789 |
+| X-31 | « Remaining crafts »: each step must be expandable down to… | Done in 0.790 |
+| X-32 | Map: find a solution to the blockage worked around by… | Done in 0.793 |
+| X-33 | Storage, « What to do with it? »: set prices like « What… | Done in 0.794 |
+| X-34 | Nearby monsters (game object table), information only… | Done in 0.795 |
+| X-35 | Nearby monsters: those that drop an item requested by the… | Done in 0.795 |
 | X-36 | Nearby monsters: those missing from the hunting log | Done in 0.796 |
-| X-37 | Nearby monsters: targets of accepted levequests and current FATEs | Done in 0.797 |
-| X-38 | Blue Mage: nearby monsters that teach a spell not yet learned, Blue Mage icon… | Done in 0.798 |
-| X-39 | Beastmaster: nearby monsters from the beastmaster's bestiary, same display and… | Done in 0.804 |
-| X-40 | Nearby monsters: other uses to propose, and consistent settings in the right… | Done in 0.1002 |
-| X-41 | Nearby monsters: those that drop a missing collection item (mount, minion… | Done in 0.800 |
+| X-37 | Nearby monsters: targets of accepted levequests and current… | Done in 0.797 |
+| X-38 | Blue Mage: nearby monsters that teach a spell not yet… | Done in 0.798 |
+| X-39 | Beastmaster: nearby monsters from the beastmaster's… | Done in 0.804 |
+| X-40 | Nearby monsters: other uses to propose, and consistent… | Done in 0.1002 |
+| X-41 | Nearby monsters: those that drop a missing collection item… | Done in 0.800 |
 | X-42 | Before phase 7: take the user's settings and make them the default values | Dropped on 2026-11-07 at the user's request (« garde valeur par défaut cohérente » ("keep consistent default values")): the default values stay those of the code, nothing was published |
 | X-43 | Local discovery database: record what is within range (monsters and their locations, loot, learned blue spells, beastmaster captures, gathering points, fishing…) to complete the tools; debug options but active outside debugging; import (merge with ours) and export, to stop depending on community data as one plays | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). Frame accepted on 2026-11-07 (« Oui, ce cadre » ("Yes, this frame")): local file, provenance per entry, no other player, nothing sent, no combat help, cut off in PvP, import … [details](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md#x-43) |
-| X-44 | Crafting log: no Tensho right-click menu, neither on a recipe of the list nor… | Done in 0.808 |
-| X-45 | Map: event vendors are shown although they are not there in game (Limsa, the… | Done in 0.810 |
-| X-46 | Map: the zoom does not always stay the one that was set; to do just before… | Done in 0.850 |
-| X-47 | Quest rewards (quest window): neither a Tensho panel under the item tooltip… | Done in 0.852 |
-| X-48 | Map: right click on a quest target (« Target indicated by the game (log) »)… | Done in 0.853 |
-| X-49 | Map: the quest target does not disappear after the quest is completed (Ishgard… | Done in 0.813 |
-| X-50 | Map: map-edge icons must pass above everything (hidden under the name banner… | Done in 0.814 |
-| X-51 | Collectables panel: highlight on the hotbars the skills that the plan asks for… | Done in 0.815 |
-| X-52 | Discovery database: prices seen on the sales board replace Universalis (more… | Done in 0.817 |
-| X-53 | Nearby monsters: the woolly yak and the loaghtan (yak milk, loaghtan meat from… | Done in 0.828.0 |
-| X-54 | When opening a storage other than the inventory (retainer, chocobo saddlebag… | Done in 0.820 |
-| X-55 | Crafting and workshop tracking lists: specify when the item is not on oneself… | Done in 0.822 |
-| X-56 | Crafting and workshop tracking lists: in place of « teleport 219 gil », the… | Done in 0.824 |
+| X-44 | Crafting log: no Tensho right-click menu, neither on a… | Done in 0.808 |
+| X-45 | Map: event vendors are shown although they are not there in… | Done in 0.810 |
+| X-46 | Map: the zoom does not always stay the one that was set; to… | Done in 0.850 |
+| X-47 | Quest rewards (quest window): neither a Tensho panel under… | Done in 0.852 |
+| X-48 | Map: right click on a quest target (« Target indicated by… | Done in 0.853 |
+| X-49 | Map: the quest target does not disappear after the quest is… | Done in 0.813 |
+| X-50 | Map: map-edge icons must pass above everything (hidden… | Done in 0.814 |
+| X-51 | Collectables panel: highlight on the hotbars the skills… | Done in 0.815 |
+| X-52 | Discovery database: prices seen on the sales board replace… | Done in 0.817 |
+| X-53 | Nearby monsters: the woolly yak and the loaghtan (yak milk… | Done in 0.828.0 |
+| X-54 | When opening a storage other than the inventory (retainer… | Done in 0.820 |
+| X-55 | Crafting and workshop tracking lists: specify when the item… | Done in 0.822 |
+| X-56 | Crafting and workshop tracking lists: in place of «… | Done in 0.824 |
 | X-57 | Map, culinarian quest in Limsa: the target (at the right place) and the quest icon are not at the same place, the displayed quest falls outside the zone, and it does not appear on the Upper Decks map (captures of 2026-11-07, the game map shows the link to the Upper Decks) | Must before the announcement (sorting of 11/13, accepted by the user). Waiting for an in-game reading (relay 53, 11/14): probed, « Une faim en queue de poisson » (2606) has step 1 at the Bismarck (X 10.2 Y 8.2) and step 2 at the Seven Sages (X 11.6 Y 8.0): the icon seen on 11/08 was the previous step's, a stale map-window list, which 0.848 (X-70) replaces with the game's quest list; never seen again in game since. Trial: a class quest with steps in Limsa, Tensho's map and the game's side by side at each step, and the Upper Decks map when the objective is there; the « Reading questMarkers » log line (developer mode) if the gap comes back. [details](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md#x-57) |
-| X-58 | Tensho right-click menu on an item: add its recipe to an already created… | Done in 0.826 |
-| X-59 | Tracking lists, timed points: remove « open » / « closed », keep the timer… | Done in 0.827 |
-| X-60 | Tracking lists, right click on an item: « Place the flag » absent when on the… | Done in 0.830 |
-| X-61 | Gathering help: no plan offered, « item read after a GP spend on this point »… | Done in 0.831 |
-| X-62 | Alarms added from a tracking list: they still ring when the resource is already… | Done in 0.832 |
-| X-63 | « Go there » to a zone without an aetheryte (Dravanian Hinterlands): teleport… | Done in 0.833 |
-| X-64 | Tracking lists, right click: neither « Go there » nor « Place the flag » for… | Done in 0.834 |
-| X-65 | Crafting tracking list (Candied Chestnuts): birch syrup, a held intermediate… | Done in 0.838 |
-| X-66 | Storage frame (X-54): at the retainer, it frames the cooking wine instead of… | Done in 0.839 |
-| X-67 | Tensho map: flag that a target is higher or lower, like the game map (up or… | Done in 0.842 |
-| X-68 | Tensho map: the culinarian quest zone (Mor Dhona) « ne se fait pas zoomer… | Done in 0.846.0 |
-| X-69 | Tensho map: « la map ne se rafraîchit pas assez » ("the map does not refresh… | Done in 0.847 |
-| X-70 | Tensho map: the zone of a quest's new step is missing until the game map has… | Done in 0.848 |
-| X-71 | Tensho map: take over the game map's higher / lower icons (views at Mor Dhona)… | Done in 0.849 |
-| X-72 | Discovery database (parsers): check that it is effective, the user has already… | Done in 0.856 |
-| X-73 | 0.1003 (re-check of 2026-11-09: user's database and community sources): airship… | Done in 0.887.0 |
-| X-73.1 | Market: prices seen on each visited world of the data centre, preferred to… | Done in 0.857 |
-| X-73.2 | Market: sales histories merged from one opening to the next (sale speed… | Done in 0.858 |
-| X-73.3 | Fishing: flags from the game's log (« no time or weather condition ») instead… | Done in 0.859 |
-| X-73.4 | Fashion Report: theme and categories read from the game (FashionCheckManager)… | Done in 0.861 |
-| X-73.5 | Desynthesis and reduction: items obtained from which item (AgentSalvage… | Done in 0.860 |
+| X-58 | Tensho right-click menu on an item: add its recipe to an… | Done in 0.826 |
+| X-59 | Tracking lists, timed points: remove « open » / « closed »… | Done in 0.827 |
+| X-60 | Tracking lists, right click on an item: « Place the flag »… | Done in 0.830 |
+| X-61 | Gathering help: no plan offered, « item read after a GP… | Done in 0.831 |
+| X-62 | Alarms added from a tracking list: they still ring when the… | Done in 0.832 |
+| X-63 | « Go there » to a zone without an aetheryte (Dravanian… | Done in 0.833 |
+| X-64 | Tracking lists, right click: neither « Go there » nor «… | Done in 0.834 |
+| X-65 | Crafting tracking list (Candied Chestnuts): birch syrup, a… | Done in 0.838 |
+| X-66 | Storage frame (X-54): at the retainer, it frames the… | Done in 0.839 |
+| X-67 | Tensho map: flag that a target is higher or lower, like the… | Done in 0.842 |
+| X-68 | Tensho map: the culinarian quest zone (Mor Dhona) « ne se… | Done in 0.846.0 |
+| X-69 | Tensho map: « la map ne se rafraîchit pas assez » ("the map… | Done in 0.847 |
+| X-70 | Tensho map: the zone of a quest's new step is missing until… | Done in 0.848 |
+| X-71 | Tensho map: take over the game map's higher / lower icons… | Done in 0.849 |
+| X-72 | Discovery database (parsers): check that it is effective… | Done in 0.856 |
+| X-73 | 0.1003 (re-check of 2026-11-09: user's database and… | Done in 0.887.0 |
+| X-73.1 | Market: prices seen on each visited world of the data… | Done in 0.857 |
+| X-73.2 | Market: sales histories merged from one opening to the next… | Done in 0.858 |
+| X-73.3 | Fishing: flags from the game's log (« no time or weather… | Done in 0.859 |
+| X-73.4 | Fashion Report: theme and categories read from the game… | Done in 0.861 |
+| X-73.5 | Desynthesis and reduction: items obtained from which item… | Done in 0.860 |
 | X-73.6 | Retainer ventures: rewards seen (AgentRetainerTask) | Done in 0.860 |
 | X-73.7 | Duty chests: items seen per duty (Loot.Items) | Done in 0.860 |
 | X-73.8 | Voyages: loot per sector (already read in the workshop) | Done in 0.862 |
-| X-73.9 | Blue Mage and Beastmaster: spell learned and beast tamed, with the monster | Done in 0.863 |
-| X-73.10 | Fishing: catches (bait, mooch, place), bite time, conditions seen; in-game… | Done in 0.971 |
-| X-73.11 | Monster loot: items received after the death of one's target (the riskiest… | Done in 0.860 |
-| X-73.12 | The rest according to the map: item chests, FATE rewards, vistas, island… | Done in 0.864 |
-| X-73.13 | Request of 2026-11-08 (« oui tous en faisant tests en jeu nécessaires » ("yes… | Done in 0.869 |
-| X-73.14 | Offers seen marked « mine / not mine » (retainer number compared to yours, no… | Done in 0.870 |
-| X-73.15 | Data center → region table from the game's sheets (WorldDCGroupType) instead of… | Done in 0.871 |
-| X-73.16 | Location of vendors missing from the sheets: noted when their shop opens… | Done in 0.872 |
+| X-73.9 | Blue Mage and Beastmaster: spell learned and beast tamed… | Done in 0.863 |
+| X-73.10 | Fishing: catches (bait, mooch, place), bite time… | Done in 0.971 |
+| X-73.11 | Monster loot: items received after the death of one's… | Done in 0.860 |
+| X-73.12 | The rest according to the map: item chests, FATE rewards… | Done in 0.864 |
+| X-73.13 | Request of 2026-11-08 (« oui tous en faisant tests en jeu… | Done in 0.869 |
+| X-73.14 | Offers seen marked « mine / not mine » (retainer number… | Done in 0.870 |
+| X-73.15 | Data center → region table from the game's sheets… | Done in 0.871 |
+| X-73.16 | Location of vendors missing from the sheets: noted when… | Done in 0.872 |
 | X-73.17 | Loot from the chests of Deep Dungeons, Eureka and Bozja | Done in 0.873 |
-| X-73.18 | After the X-73.13 readings: bite time and type, mooch, Intuition and predators… | Done in 0.887 |
-| X-74 | Night instruction (2026-11-08, the user is asleep): add as many coherent… | Done |
-| X-75 | Request of 2026-11-08: a test for each probe; recheck that no probe is missing… | Done |
-| X-75.1 | A test for each probe: list of the parts of the capture frozen by a test, text… | Done in 0.874 |
-| X-75.2 | « Seen in game » first everywhere the learned data already exists: Monsters… | Done in 0.875 |
-| X-75.3 | Fishing: mooch catch noted with the mooched fish (not the bait), lure, previous… | Done in 0.877 |
-| X-75.4 | Blue Mage: monsters seen casting a spell (cast bar), spell levels drawn from… | Done in 0.878 |
-| X-75.5 | Other pages: festivals « seen from … to … », locations of FATEs seen on the… | Done in 0.879 |
-| X-75.6 | Game calculations instead of community formulas: submersible voyage durations… | Done in 0.880 |
-| X-75.7 | New developer-mode probes, then parsers after the readings: island animals… | Done in 0.881 |
+| X-73.18 | After the X-73.13 readings: bite time and type, mooch… | Done in 0.887 |
+| X-74 | Night instruction (2026-11-08, the user is asleep): add as… | Done |
+| X-75 | Request of 2026-11-08: a test for each probe; recheck that… | Done |
+| X-75.1 | A test for each probe: list of the parts of the capture… | Done in 0.874 |
+| X-75.2 | « Seen in game » first everywhere the learned data already… | Done in 0.875 |
+| X-75.3 | Fishing: mooch catch noted with the mooched fish (not the… | Done in 0.877 |
+| X-75.4 | Blue Mage: monsters seen casting a spell (cast bar), spell… | Done in 0.878 |
+| X-75.5 | Other pages: festivals « seen from … to … », locations of… | Done in 0.879 |
+| X-75.6 | Game calculations instead of community formulas… | Done in 0.880 |
+| X-75.7 | New developer-mode probes, then parsers after the readings… | Done in 0.881 |
 | X-75.8 | Outside the parser: PaissaDB (reading the sign requires a hook: Dalamud rule, user's agreement first), hookset used (hook), Mog Station shop, future dates, worlds never visited: these stay with community sources | Noted |
-| X-77 | Request of 2026-11-08: if possible, a system that goes through Git to send the… | Done in 0.882 |
-| X-77.1 | User feedback (2026-11-08): « le système actuel pour import export avec git est… | Done in 0.883 |
-| X-78 | Request of 2026-11-08 (capture of the Tensho map, The Ruby Sea): keep the… | Done in 0.890 |
-| X-79 | Request of 2026-11-08 (spearfishing trial): the spearfishing panel's list must… | Done in 0.891 |
-| X-80 | Request of 2026-11-08 (capture of the map filter): « Gathering points » split… | Done in 0.895 |
+| X-77 | Request of 2026-11-08: if possible, a system that goes… | Done in 0.882 |
+| X-77.1 | User feedback (2026-11-08): « le système actuel pour import… | Done in 0.883 |
+| X-78 | Request of 2026-11-08 (capture of the Tensho map, The Ruby… | Done in 0.890 |
+| X-79 | Request of 2026-11-08 (spearfishing trial): the… | Done in 0.891 |
+| X-80 | Request of 2026-11-08 (capture of the map filter): «… | Done in 0.895 |
 | X-81 | In-game trial of forced melding (X-75.7) | Done in 0.899 |
-| X-82 | In-game trial of the Fashion Report (X-75.7) and user feedback: right-click… | Done in 0.900 |
-| X-83 | User feedback (2026-11-08, on the island next to a monster: no icon on the map)… | Done in 0.901 |
-| X-84 | In-game trial of mail (X-75.7): a letter with an item and 1 gil | Done in 0.903 |
-| X-85 | User's « to do » document (2026-11-08), Ocean Fishing (priorities given by the… | Done in 0.964.0 |
-| X-86 | 0.966: « quests not yet available » checkbox (right click and settings). 0.967… | Done in 0.966 |
-| X-87 | 0.968: zone of an accepted leve removed when that leve is in progress (and… | Done in 0.968 |
-| X-88 | 0.969: 256 categories per zone, adding a whole group of categories (game… | Done in 0.969 |
-| X-89 | 0.970: quest expansion (game data) in their tooltip and sheet; item expansion… | Done in 0.970 |
-| X-90 | 0.996: Deep Dungeon bestiary through the same wiki reading (page of each floor… | Done in 0.996 |
-| X-91 | 0.971: parsers rechecked (`docs/evidence/x91-parsers-check.md`): only one… | Done in 0.971 |
-| X-92 | 0.1001: inventory of the lists frozen in the code: only that of the Labyrinth… | Done in 0.1001 |
-| X-93 | Request of 2026-11-08: « prévisions pour une masse de données conséquente… | Done in 0.1040.0 |
-| X-94 | 0.960: cause found and fixed (a fishing spot's number was looked up in the… | Done in 0.960 |
-| X-95 | 0.950: first cause found and fixed (map vendor list rebuilt twice at each zone… | Done in 0.950 |
-| X-96 | 0.959: cause found and fixed (zones with individual weather — story not… | Done in 0.959 |
-| X-97 | 0.982: user's answer (DEC-045): seen in the fishing aid; under each collectable… | Done in 0.982 |
-| X-98 | V2 points and V6 scrip reading (0.964): points of each catch read from the… | Done |
-| X-99 | Review of 2026-11-09 (DEC-045), report: after a teleport, markers of quests not… | Done in 0.977 |
-| X-100 | 0.999 (DEC-048): Settings in seven tabs (General, Panels beside the game, Map… | Done in 0.999 |
-| X-101 | Idea kept (DEC-045, from C-09): alert when an item on the wish list is for sale… | Done in 0.1000 |
-| X-102 | Idea kept (DEC-045, from C-15): progress of tracked achievements kept on disk… | Done in 0.987 |
-| X-103 | Idea kept (DEC-045, from C-14): « Prepare » button that sends the items of… | Done in 0.988 |
-| X-104 | Idea kept (DEC-045, from C-05): missing pieces of an outfit added to a list in… | Done in 0.989 |
-| X-105 | Idea kept (DEC-045, from I-12): filter by job in the item list (item cache… | Done in 0.991 |
-| X-106 | Idea kept (DEC-045, from C-01): « done » state of duties kept per character… | Done in 0.990 |
-| X-107 | Idea kept (DEC-045, from I-04): gil earned or spent today in the server bar | Done in 0.986 |
+| X-82 | In-game trial of the Fashion Report (X-75.7) and user… | Done in 0.900 |
+| X-83 | User feedback (2026-11-08, on the island next to a monster… | Done in 0.901 |
+| X-84 | In-game trial of mail (X-75.7): a letter with an item and 1… | Done in 0.903 |
+| X-85 | User's « to do » document (2026-11-08), Ocean Fishing… | Done in 0.964.0 |
+| X-86 | 0.966: « quests not yet available » checkbox (right click… | Done in 0.966 |
+| X-87 | 0.968: zone of an accepted leve removed when that leve is… | Done in 0.968 |
+| X-88 | 0.969: 256 categories per zone, adding a whole group of… | Done in 0.969 |
+| X-89 | 0.970: quest expansion (game data) in their tooltip and… | Done in 0.970 |
+| X-90 | 0.996: Deep Dungeon bestiary through the same wiki reading… | Done in 0.996 |
+| X-91 | 0.971: parsers rechecked… | Done in 0.971 |
+| X-92 | 0.1001: inventory of the lists frozen in the code: only… | Done in 0.1001 |
+| X-93 | Request of 2026-11-08: « prévisions pour une masse de… | Done in 0.1040.0 |
+| X-94 | 0.960: cause found and fixed (a fishing spot's number was… | Done in 0.960 |
+| X-95 | 0.950: first cause found and fixed (map vendor list rebuilt… | Done in 0.950 |
+| X-96 | 0.959: cause found and fixed (zones with individual weather… | Done in 0.959 |
+| X-97 | 0.982: user's answer (DEC-045): seen in the fishing aid… | Done in 0.982 |
+| X-98 | V2 points and V6 scrip reading (0.964): points of each… | Done |
+| X-99 | Review of 2026-11-09 (DEC-045), report: after a teleport… | Done in 0.977 |
+| X-100 | 0.999 (DEC-048): Settings in seven tabs (General, Panels… | Done in 0.999 |
+| X-101 | Idea kept (DEC-045, from C-09): alert when an item on the… | Done in 0.1000 |
+| X-102 | Idea kept (DEC-045, from C-15): progress of tracked… | Done in 0.987 |
+| X-103 | Idea kept (DEC-045, from C-14): « Prepare » button that… | Done in 0.988 |
+| X-104 | Idea kept (DEC-045, from C-05): missing pieces of an outfit… | Done in 0.989 |
+| X-105 | Idea kept (DEC-045, from I-12): filter by job in the item… | Done in 0.991 |
+| X-106 | Idea kept (DEC-045, from C-01): « done » state of duties… | Done in 0.990 |
+| X-107 | Idea kept (DEC-045, from I-04): gil earned or spent today… | Done in 0.986 |
 | X-108 | Request of 2026-11-09: gardening parser to fill the gaps by discovery, crossbreeding included. Plan: 1) in-game reading of a harvest that yields seeds (chat lines, items); 2) new kinds of discoveries: sprout observed (planting → maturity: real hours per seed), tending observed (interval), harvest (seed planted → items and quantities), crossbreeding (seed obtained ≠ seed planted, with the seeds of neighboring slots noted in the log); 3) community sharing (merge tool updated); 4) the log and the crossbreeding grid completed by these readings, the community source (nick75g) kept as fallback and marked; missing seeds (Cornflowers) from the sheets | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). In-game reading first (reminders table); after X-97 |
-| X-109 | 0.981: panel beside the game's board (before entering, and in the Labyrinth… | Done in 0.981 |
-| X-110 | 0.984: Beastmaster page, location column: « (n places seen) » with the… | Done in 0.984 |
-| X-111 | 0.983: the shared component has existed since 0.704 (PlaceMenu: right click… | Done in 0.983 |
-| X-112 | Finding from the test audit of 2026-11-09 (no. 0), noted in 0.1019: the… | Done in 0.1041 |
-| X-76 | Request of 2026-11-08: full code cleanup (« ne plus avoir de chose qui serait… | Done |
-| X-113 | Shared discoveries: when a ticket brings no new fact (gist unchanged)… | Done in 0.1029 |
-| X-114 | Request of 2026-11-10: Tensho's map only (not the game's map: its compass… | Done in 0.1049 |
-| X-115 | Request of 2026-11-10: client map database tool, without Dalamud (Lumina alone… | Done in 0.1028 |
-| X-116 | Request of 2026-11-10, follow-up of X-115 (B and C): full database per version… | Done in 0.1029 |
-| X-117 | Request of 2026-11-10, follow-up of X-115 (D): in the plugin, at the first load… | Done in 0.1048 |
-| X-118 | Request of 2026-11-10, plan 4 chosen by the user (desktop application linked to… | Done in 0.1030 |
+| X-109 | 0.981: panel beside the game's board (before entering, and… | Done in 0.981 |
+| X-110 | 0.984: Beastmaster page, location column: « (n places seen)… | Done in 0.984 |
+| X-111 | 0.983: the shared component has existed since 0.704… | Done in 0.983 |
+| X-112 | Finding from the test audit of 2026-11-09 (no. 0), noted in… | Done in 0.1041 |
+| X-76 | Request of 2026-11-08: full code cleanup (« ne plus avoir… | Done |
+| X-113 | Shared discoveries: when a ticket brings no new fact (gist… | Done in 0.1029 |
+| X-114 | Request of 2026-11-10: Tensho's map only (not the game's… | Done in 0.1049 |
+| X-115 | Request of 2026-11-10: client map database tool, without… | Done in 0.1028 |
+| X-116 | Request of 2026-11-10, follow-up of X-115 (B and C): full… | Done in 0.1029 |
+| X-117 | Request of 2026-11-10, follow-up of X-115 (D): in the… | Done in 0.1048 |
+| X-118 | Request of 2026-11-10, plan 4 chosen by the user (desktop… | Done in 0.1030 |
 | X-119 | Follow-up of X-118 (plan 4), steps 1 to 4: 1) application with the game closed, data pages (items, recipes, weather, lexicon, discoveries, collections from the saved files); 2) local link with the plugin (named pipe, current user only, no network port, off by default; state read on the framework thread, copied, sent off the thread, R07) and live pages; 3) actions on a click only, carried out by the plugin like the in-game button (flag, teleport request, alarms, lists); 4) a setting per page: in the game, in the application or both; the map, the panels attached to game windows, the gathering helper, live crafting and the Fashion Report stay in the game. Application distributed separately (GitHub release), never launched nor contained by the plugin; sync (request of 2026-11-10): the application and the plugin carry the same number, are built, tested (every page drawn outside the game in Verify) and published together; each release carries the application, Verify -Release refuses without it; the application checks its compatibility with the installed plugin | Wanted before the announcement, rank 2 (sorting of 11/13). Goal: Tensho on a second screen (accepted on 11/11). Done: step 1 (0.1031), link (0.1081), protocol 2 (0.1114), categories (0.1119), mirror copy per category and stores on it (0.1131, first slice with X-151). Left: other categories (characters, gil journal, achievements, duties, discoveries), rest of X-151 (host still by reflection), step 3 (actions, two-way channel), step 4 (setting per page), font entry point; the app's stores are read-only in effect until step 3; user's choice of 11/12 for step 3: the app may create or change Tensho's data (alarms, lists, tools, settings) only while the link with the game is active; each action of the app is passed to the plugin, which applies and saves it itself (the app never writes itself); nothing is sent to the game; game closed: read only (X-180) |
-| X-120 | Request of 2026-11-10, revised the same day by the user: plan 2 only of the six… | Done in 0.1032 |
-| X-121 | Request of 2026-11-10: automatic update of the desktop application from GitHub… | Done in 0.1033 |
-| X-122 | The user's decisions of 2026-11-10 (decision session) to code in the plugin… | Done in 0.1045 |
-| X-123 | The user's decision D-100 (2026-11-10): code of conduct (CODE_OF_CONDUCT.md… | Done in 0.1033 |
-| X-124 | The user's approval of 2026-11-10 ("I give you the approval for everything")… | Done in 0.1035 |
-| X-125 | The user's approval of 2026-11-10 ("yes"): PluginUiTest tried on 4 or 5 popular… | Done in 0.1036 |
-| X-126 | The user's request of 2026-11-11: install the desktop application from Tensho… | Done in 0.1113 |
-| X-127 | Request of 2026-11-11: the wishlist as a tool of its own, with its entry in… | Done in 0.1106 |
-| X-128 | Request of 2026-11-11 (screenshot): Tensho map, the « Quests not available yet… | Done in 0.1107 |
-| X-129 | Request of 2026-11-11 (screenshot, Glowing apple seeds): gathering help, a… | Done in 0.1108 |
-| X-130 | Request of 2026-11-11: garden, crossbreed forecasts from the planted garden… | Done in 0.1109 |
-| X-132 | Request of 2026-11-11: garden alarms (ripe, tending, from the Gardening tool's… | Done in 0.1160 |
-| X-133 | Request of 2026-11-11: reminder alarms in an « Alarms » tab of the Reminders… | Done in 0.1159 |
+| X-120 | Request of 2026-11-10, revised the same day by the user… | Done in 0.1032 |
+| X-121 | Request of 2026-11-10: automatic update of the desktop… | Done in 0.1033 |
+| X-122 | The user's decisions of 2026-11-10 (decision session) to… | Done in 0.1045 |
+| X-123 | The user's decision D-100 (2026-11-10): code of conduct… | Done in 0.1033 |
+| X-124 | The user's approval of 2026-11-10 ("I give you the approval… | Done in 0.1035 |
+| X-125 | The user's approval of 2026-11-10 ("yes"): PluginUiTest… | Done in 0.1036 |
+| X-126 | The user's request of 2026-11-11: install the desktop… | Done in 0.1113 |
+| X-127 | Request of 2026-11-11: the wishlist as a tool of its own… | Done in 0.1106 |
+| X-128 | Request of 2026-11-11 (screenshot): Tensho map, the «… | Done in 0.1107 |
+| X-129 | Request of 2026-11-11 (screenshot, Glowing apple seeds)… | Done in 0.1108 |
+| X-130 | Request of 2026-11-11: garden, crossbreed forecasts from… | Done in 0.1109 |
+| X-132 | Request of 2026-11-11: garden alarms (ripe, tending, from… | Done in 0.1160 |
+| X-133 | Request of 2026-11-11: reminder alarms in an « Alarms » tab… | Done in 0.1159 |
 | X-134 | Request of 2026-11-11 (grade 3 Thanalan topsoil): gathering help GP plan, items gatherable once per node (one catch counted, the next attempts on the most useful item) and items whose yield cannot be raised (no GP spend proposed for the yield); game data first, else your readings | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). Partly in 0.1167 and 0.1175 (developer-mode log of the Gathering window's numbers, up to 200, never its texts). Left: the user's reading on a point with a « RARE » item (trial of 0.1175), then no GP proposed for its quantity |
 | X-135 | Request of 2026-11-11 (Beast labyrinth board 1): read the board result (XBMResult: score, path, targets, bonuses; each beast's experience and rank gains; loot XBMContentsBooty, XBMContentsTreasure) and use the beasts' ranks in the Beastmaster page and the help | Wanted before the announcement, rank 7 (sorting of 11/13). Board result done in 0.1163 (score, each beast's rank and experience, XBMResult window, ranks used by the Beastmaster page); left: the loot (XBMContentsBooty, XBMContentsTreasure, recorded on 11/12 in the agent's notes) |
-| X-136 | Request of 2026-11-11: more coherent Beast labyrinth help: team chosen from the enemy's weaknesses and stats, one advice per fight of the board if possible, beasts to level for later boards proposed, beast combos highlighted before the fight, and in combat the Instinct II combo skills highlighted for the summoned beast (option, off by default) | Wanted before the announcement, rank 8 (sorting of 11/13). To do; relay 31: the rest needs data not established (Instinct II combos; meaning of XBMContent columns 3 and 4; « rank 1 to 5 » of board 1 while the beasts there are rank 6): record or source to find first (R06, nothing guessed) |
-| X-137 | User's choice of 2026-11-11 (« oui mais en pvp et classement »): Tensho is no… | Done in 0.1115 |
-| X-138 | Request of 2026-11-11 (screenshot, Central Shroud): Tensho map, right-click… | Done in 0.1166 |
-| X-140 | Audit A01 and A03 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1117 |
-| X-141 | Audit A02 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1118 |
-| X-142 | Audit A04, A05, A09 (GPT audit of 11/11, checked in the code by the master… | Done in 0.1122 |
-| X-143 | Audit A06, A07, A08 (GPT audit of 11/11, checked in the code by the master… | Done in 0.1125 |
-| X-144 | Audit A13 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1126 |
+| X-136 | Request of 2026-11-11: more coherent Beast labyrinth help: team chosen from the enemy's weaknesses and stats, one advice per fight of the board if possible, beasts to level for later boards proposed, beast combos highlighted before the fight, and in combat the Instinct II combo skills highlighted for the summoned beast (option, off by default) | Wanted before the announcement, rank 8 (sorting of 11/13). To do; relay 31: the rest needs data not established (Instinct II combos; meaning of XBMContent columns 3 and 4; « rank 1 to 5 » of board 1 while the beasts there are rank 6): record or source to find first (R06, nothing guessed); user reminder of 11/16 around 0:25 am: the game's help can tell a lot: look first in the game's help (the « ? » button of the board layout and team formation, enemy sheets, vulnerability tooltips, the client's help and guide sheets) for the meaning of the missing data (Instinct II combos, XBMContent columns, first board ranks) before any reading, sources cited (R06) |
+| X-137 | User's choice of 2026-11-11 (« oui mais en pvp et… | Done in 0.1115 |
+| X-138 | Request of 2026-11-11 (screenshot, Central Shroud): Tensho… | Done in 0.1166 |
+| X-140 | Audit A01 and A03 (GPT audit of 11/11, checked in the code… | Done in 0.1117 |
+| X-141 | Audit A02 (GPT audit of 11/11, checked in the code by the… | Done in 0.1118 |
+| X-142 | Audit A04, A05, A09 (GPT audit of 11/11, checked in the… | Done in 0.1122 |
+| X-143 | Audit A06, A07, A08 (GPT audit of 11/11, checked in the… | Done in 0.1125 |
+| X-144 | Audit A13 (GPT audit of 11/11, checked in the code by the… | Done in 0.1126 |
 | X-145 | Audit A11 (GPT audit of 11/11, checked in the code by the master, order accepted by the user): GitHub discoveries exchange: sharing state (gist, issue, hash) tied to the signed-in account, cleared on account change; token deletion failure shown; review the public_repo permission (least privilege) | Replaced by X-175 on 12/11 (GitHub App with least permissions, sharing state tied to the player's account) |
-| X-146 | Audit A10 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1214 |
-| X-147 | Audit A14 (GPT audit of 11/11, checked in the code by the master, order… | Done in 0.1217 |
+| X-146 | Audit A10 (GPT audit of 11/11, checked in the code by the… | Done in 0.1214 |
+| X-147 | Audit A14 (GPT audit of 11/11, checked in the code by the… | Done in 0.1217 |
 | X-148 | Partly done in 0.1215: workflow actions pinned by hash (A16); A15 done in 0.1120 (X-150). Dalamud's latest.zip is not pinned (decision of 11/13) but checked in the CI in 0.1336 (scripts/Get-Dalamud.ps1: version published by goatcorp, API level of global.json, hash written to the log). Left, low priority: CodeQL on the desktop app (net10.0-windows, references PluginUiTest.Host: a Windows job, to try while following the CI) | Wanted before the announcement, rank 21 (sorting of 11/13). User's decision of 11/13 around 11:10: Dalamud's latest.zip is not pinned (Dalamud publishes no hash: a kept hash would break the CI at each update). Left: CodeQL of the desktop application (a Windows job), to try while following the CI. Before the announcement, low priority. |
 | X-139 | Request of 2026-11-11: PluginUiTest (repository Shigu330/PluginUiTest) shows how windows render: a PNG of each drawn window beside the report, and optionally a preview window on screen; new version of the tool | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do, last priority |
-| X-149 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1119 |
-| X-150 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1120 |
-| X-151 | GPT review of 11/11, checked in the code by the master, accepted by the user… | Done in 0.1238 |
+| X-149 | GPT review of 11/11, checked in the code by the master… | Done in 0.1119 |
+| X-150 | GPT review of 11/11, checked in the code by the master… | Done in 0.1120 |
+| X-151 | GPT review of 11/11, checked in the code by the master… | Done in 0.1238 |
 | X-152 | GPT review of 11/11, checked in the code by the master, accepted by the user: state messages made consistent across pages (« waiting », « source off », « old data », « failed »), in French and English, fallback of partial languages checked | Merged into X-154 on 12/11 (visual plan accepted by the user) |
 | X-153 | GPT review of 11/11, checked in the code by the master, accepted by the user: wiring and release of Plugin.cs's services extracted by family (desktop or persistence first), measured by the paths that set up or release the same service and errors at close Done when: every service family of Plugin.cs (desktop, persistence, server bar, panels, discoveries, then the game readers domain by domain) has its file Plugin.<Family>.cs, with one install path and one release path per service, in the order of before, and its family test counting those paths; no page image changed; Plugin.cs no longer installs a game reader itself. One slice per version. | Wanted before the announcement, rank 1 (sorting of 11/13). Slice 1 done in 0.1225 (desktop family, Plugin.Desktop.cs, DesktopFamily1225Tests); slice 2 done in 0.1239 (persistence: TenshoData, bank and its bridge, Plugin.Persistence.cs, PersistenceFamily1239Tests); slice 3 done in 0.1240 (server bar, Plugin.ServerBar.cs, ServerBarFamily1240Tests); slice 4 done in 0.1249 (panels, Plugin.Panels.cs, PanelFamily1249Tests); slice 5 done in 0.1250 (discoveries: store, GitHub exchange, loading with the prices seen, Plugin.Discoveries.cs, DiscoveriesFamily1250Tests); left: game readers (about 35, interleaved with their services all through the constructor: to cut by domain, gathering, crafting, company, collections…, one slice per domain, same measure; the discoveries' item watcher with them); low priority (before X-139) |
-| X-154 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1255 |
-| X-155 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1261 |
-| X-156 | GPT visual plan of 12/11, checked by the master, place accepted by the user… | Done in 0.1267 |
-| X-157 | GPT visual plan of 12/11, checked by the master, place accepted by the user: «… | Done in 0.1272 |
-| X-158 | User's request of 12/11 (screenshots, The Viaduct 020, Brewers' Beacon 008, The… | Done in 0.1128 |
-| X-159 | User's request of 12/11 (treasure hunt of 12/11 around 0:35, no portal; reading… | Done in 0.1174 |
-| X-160 | User's request of 12/11: Tensho map, FATEs have the favourites' icon: use the… | Done in 0.1268 |
-| X-161 | User's request of 12/11: Tensho map only: sightseeing icons a little smaller by… | Done in 0.1262 |
-| X-162 | User's request of 12/11 (screenshot): server info bar, the gil tooltip (and… | Done in 0.1129 |
-| X-163 | User's request of 12/11: alarms (reminders, gardening and others included) also… | Done in 0.1156 |
-| X-164 | User's request of 12/11 (screenshot of the map toolbar): the icons are not… | Done in 0.1130 |
-| X-176 | User's request of 12/11: discoveries merge worker on the user's laptop, a… | Done in 0.1345.0 |
-| X-165 | User's request of 12/11: Tensho dashboard. Full in developer mode: memory and… | Done in 0.1247 |
-| X-166 | R01 (GPT audit of 12/11, checked by the master, accepted by the user): an… | Done in 0.1133 |
-| X-167 | R03 (GPT audit of 12/11, checked by the master, accepted by the user): sending… | Done in 0.1134 |
-| X-168 | R04 (GPT audit of 12/11, checked by the master, accepted by the user): GitHub… | Done in 0.1146 |
-| X-169 | R05 and R06 (GPT audit of 12/11, checked by the master, accepted by the user)… | Done in 0.1141 |
-| X-170 | Additions from the GPT audit of 12/11, checked by the master, accepted by the… | Done in 0.1145 |
+| X-154 | GPT visual plan of 12/11, checked by the master, place… | Done in 0.1255 |
+| X-155 | GPT visual plan of 12/11, checked by the master, place… | Done in 0.1261 |
+| X-156 | GPT visual plan of 12/11, checked by the master, place… | Done in 0.1267 |
+| X-157 | GPT visual plan of 12/11, checked by the master, place… | Done in 0.1272 |
+| X-158 | User's request of 12/11 (screenshots, The Viaduct 020… | Done in 0.1128 |
+| X-159 | User's request of 12/11 (treasure hunt of 12/11 around… | Done in 0.1174 |
+| X-160 | User's request of 12/11: Tensho map, FATEs have the… | Done in 0.1268 |
+| X-161 | User's request of 12/11: Tensho map only: sightseeing icons… | Done in 0.1262 |
+| X-162 | User's request of 12/11 (screenshot): server info bar, the… | Done in 0.1129 |
+| X-163 | User's request of 12/11: alarms (reminders, gardening and… | Done in 0.1156 |
+| X-164 | User's request of 12/11 (screenshot of the map toolbar)… | Done in 0.1130 |
+| X-176 | User's request of 12/11: discoveries merge worker on the… | Done in 0.1345.0 |
+| X-165 | User's request of 12/11: Tensho dashboard. Full in… | Done in 0.1247 |
+| X-166 | R01 (GPT audit of 12/11, checked by the master, accepted by… | Done in 0.1133 |
+| X-167 | R03 (GPT audit of 12/11, checked by the master, accepted by… | Done in 0.1134 |
+| X-168 | R04 (GPT audit of 12/11, checked by the master, accepted by… | Done in 0.1146 |
+| X-169 | R05 and R06 (GPT audit of 12/11, checked by the master… | Done in 0.1141 |
+| X-170 | Additions from the GPT audit of 12/11, checked by the… | Done in 0.1145 |
 | X-171 | Part 1 | Done in 0.1333 |
-| X-172 | User's choice of 12/11: SQLite trial against the current storage for the… | Done in 0.1149.0 |
-| X-173 | User's choice of 12/11: other data families into SQLite, one at a time with a… | Done in 0.1149 |
-| X-174 | User's choice of 12/11 (option 3 kept): v3 discoveries exchange format: JSON… | Done in 0.1137.0 |
-| X-175 | User's choice of 12/11 (option B kept): GitHub exchange on the players' side… | Done in 0.1161 |
-| X-177 | Master's finding of 2026-11-12 (today's dalamud.log): Dalamud hitch warnings (>… | Done in 0.1281.0 |
-| X-178 | User request of 2026-11-12 (screenshot of Garden › Journal, Shirogane 2-17… | Done in 0.1259 |
-| X-179 | User's finding of 2026-11-12 (« manual tending does not update the alarms, I… | Done in 0.1165 |
-| X-180 | Review N1 (high): night review of 11/12 (the agent's notes, master's folder; 31… | Done in 0.1168 |
-| X-181 | Review N2, N7, N8, N29, N30: night review of 11/12 (the agent's notes, master's… | Done in 0.1171 |
-| X-182 | Review N3, N4, N9, N11, N26, N27, N28: night review of 11/12 (the agent's… | Done in 0.1173 |
-| X-183 | Review N5, N12, N13, N14, N16, N17: night review of 11/12 (the agent's notes… | Done in 0.1210 |
-| X-184 | Review N6, N21, N15, N20, N22: night review of 11/12 (the agent's notes… | Done in 0.1209 |
-| X-185 | Review N10, N18, N19, N23, N24, N25: night review of 11/12 (the agent's notes… | Done in 0.1213 |
-| X-186 | User's choice of 2026-11-12 (« Yes, ignore them », finding N31 of the night… | Done in 0.1170 |
-| X-187 | User request of 2026-11-12: Tensho's visual sort of the bags… | Done in 0.1172 |
-| X-188 | User request of 2026-11-12 (on the Crescent Isle, « all of them »: the four… | Done in 0.1178 |
-| X-189 | User request of 2026-11-12 (on the Crescent Isle, « all of them »: the four… | Done in 0.1179 |
+| X-172 | User's choice of 12/11: SQLite trial against the current… | Done in 0.1149.0 |
+| X-173 | User's choice of 12/11: other data families into SQLite… | Done in 0.1149 |
+| X-174 | User's choice of 12/11 (option 3 kept): v3 discoveries… | Done in 0.1137.0 |
+| X-175 | User's choice of 12/11 (option B kept): GitHub exchange on… | Done in 0.1161 |
+| X-177 | Master's finding of 2026-11-12 (today's dalamud.log)… | Done in 0.1281.0 |
+| X-178 | User request of 2026-11-12 (screenshot of Garden › Journal… | Done in 0.1259 |
+| X-179 | User's finding of 2026-11-12 (« manual tending does not… | Done in 0.1165 |
+| X-180 | Review N1 (high): night review of 11/12 (the agent's notes… | Done in 0.1168 |
+| X-181 | Review N2, N7, N8, N29, N30: night review of 11/12 (the… | Done in 0.1171 |
+| X-182 | Review N3, N4, N9, N11, N26, N27, N28: night review of… | Done in 0.1173 |
+| X-183 | Review N5, N12, N13, N14, N16, N17: night review of 11/12… | Done in 0.1210 |
+| X-184 | Review N6, N21, N15, N20, N22: night review of 11/12 (the… | Done in 0.1209 |
+| X-185 | Review N10, N18, N19, N23, N24, N25: night review of 11/12… | Done in 0.1213 |
+| X-186 | User's choice of 2026-11-12 (« Yes, ignore them », finding… | Done in 0.1170 |
+| X-187 | User request of 2026-11-12: Tensho's visual sort of the… | Done in 0.1172 |
+| X-188 | User request of 2026-11-12 (on the Crescent Isle, « all of… | Done in 0.1178 |
+| X-189 | User request of 2026-11-12 (on the Crescent Isle, « all of… | Done in 0.1179 |
 | X-190 | User request of 2026-11-12 (on the Crescent Isle, « all of them »: the four helpers offered; follows point LUNULE; record the agent's notes; Occult Crescent Helper and Phantom Job Switcher under AGPL: read only, never copied; R03: show and advise, never play in the player's place): progress of occult knowledge (level, 465/2800 to the next) and of silver and gold pieces (what they can buy, from the island vendor's sheets); progress of the occult lore in Collections (CollectionKind.OccultLore already exists: add the count and what is missing); tests. Priority: with X-188 | Wanted before the announcement, rank 4 (sorting of 11/13). Mostly in 0.1178: one button per island coin → Storage › What to do with it?; « Occult records read: N / M » and « See what is missing »; coins in the island panel. Left: the knowledge level (no field of the game's state: KnowledgeLevelSync is 0 at 465/2800; MKDGrowData does not hold 2800; evidence 0.1178-occult-panel.md): one more in-game reading (level shown by the game against knowledge) will say where to take it from; user reading of 11/15 around 8:54 pm on the island (screenshot of the game windows and « Reading fields »): the game shows knowledge level 3, 465/2800, and a « 3 » flag beside it; Tensho reads 465/2800 but sync 0: level 3 is still in no field read; Phantom Paladin level 2, 240/2400: Tensho reads level 2 and 240, but « needed 0 » instead of 2400 (NeededJobExperience empty or misplaced); silver 270 and gold 12 right |
-| X-191 | User's finding of 2026-11-12 (« Condition 81 % Spiritbond 0 % », on the… | Done in 0.1177 |
+| X-191 | User's finding of 2026-11-12 (« Condition 81 % Spiritbond 0… | Done in 0.1177 |
 | X-192 | User request of 2026-11-12 (plugin comparison, K-01, accepted on 11/12): Grand Company expert delivery: on the expert tab, for each item: seals, part of a gearset, goes to the armoire, market value and a "worth more in gil" warning, seals left before the rank cap; a "seals" line in the panel under the tooltip; outside the window, a bag list marked "estimated" until the eligibility rule is recorded; nothing is handed in for the player | Wanted before the announcement, rank 9 (sorting of 11/13). To do: probe of the expert tab (AddonGrandCompanySupplyList), new reader; GCSupplyDutyReward, GrandCompanyRank; eligibility rule declared unknown until recorded |
 | X-193 | User request of 2026-11-12 (plugin comparison, K-02, accepted on 11/12): venture planner: for each retainer (job, level, stats when known), the possible targeted ventures, quantity at each tier, market value on click, gain per venture compared with quick exploration (loot seen in Discoveries); the player chooses in the game User's term: « retainer tasks » (French « tâches des servants »). | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: RetainerTask, RetainerTaskNormal, RetainerTaskParameter, RetainerTaskRandom sheets; retainer stats read while the retainer is open; in-game record of the tier thresholds |
 | X-194 | User choice already made (GAPS M-13), found again on 2026-11-12 by the plugin comparison (K-03): Faux Hollows solver (Idyllshire weekly mini-game): most useful tile highlighted on the 6×6 board, like the Mini Cactpot; weekly reminder in Reminders and the character status | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: AddonWeeklyPuzzle (board), PlayerState (FauxHollowsState, FauxHollowsTimestamp); patterns enumerated by Tensho or a cited source; "unknown" when a pattern is missing; in-game record of the board |
 | X-195 | User request of 2026-11-12 (plugin comparison, K-04, accepted on 11/12): fishing: a sound (and an optional line) on a bite, different for !, !! and !!!, a setting per strength; read from memory as in 0.887, no network packets; the player hooks himself | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: FishingHookStrength (292 to 294) already read; alarm sounds; check "!!!" in game (C30 session) |
-| X-196 | User request of 2026-11-12 (plugin comparison, K-05, accepted on 11/12): table… | Done in 0.1411 |
+| X-196 | User request of 2026-11-12 (plugin comparison, K-05… | Done in 0.1411 |
 | X-197 | User request of 2026-11-12 (plugin comparison, K-06, accepted on 11/12): panel under the tooltip: a "desynthesis" line (job, item level, your level, above or below) and a "coffer" line (all obtained or n missing), each one can be turned off The user says (11/12): « we already have desynthesis and card packs »: check by Grep what the panel already shows and add only what is missing (compared level, other coffers). | Wanted before the announcement, rank 11 (sorting of 11/13). To do: Item.LevelItem, Item.ClassJobRepair, PlayerState.GetDesynthesisLevel; ItemSupplement (LuminaSupplemental) crossed with the collections; computed once per item |
 | X-198 | User request of 2026-11-12 (plugin comparison, K-07, accepted on 11/12): personal tasks with a condition, ticked when Tensho observes it: own N × item (all storages), currency ≥ N, duty completed, mount/outfit/card obtained; "unknown" until the data has been read | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: PersonalTasks + ItemHoldings, Currencies, DutyProgressReader, collection state; FATEs excluded |
 | X-199 | User request of 2026-11-12 (plugin comparison, K-08, accepted on 11/12): Plots: lottery phase (entries or results) and its end, read from PaissaDB; an "I entered" button that sets an alarm when the results open; check the coverage of the European worlds (the code says NA only) The user plays on Chaos (Europe): check that PaissaDB covers Chaos and fix « NA servers only » in Community/PaissaDb.cs. | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: show LottoPhase and PhaseUntil (already read); Tensho alarm; check Chaos and Light in PaissaDB; N-04 stays for the in-game reading |
 | X-200 | User request of 2026-11-12 (plugin comparison, K-09, accepted on 11/12): submersibles: unlock path to a chosen sector, as for airships | Wanted before the announcement, rank 16 (sorting of 11/13). To do: SubmarineExploration + LuminaSupplemental SubmarineUnlock (GPL-3.0, credited); same model as AirshipSectors.UnlockPath |
 | X-202 | User request of 2026-11-12 (plugin comparison, K-11, accepted on 11/12): Cosmic Exploration information page: missions per job and planet (rank, type), bronze/silver/gold thresholds, rewards, next windows of the timed and weather missions, progress read from the game; no red alert promised | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: WKSMission*, WKSCosmoTool* sheets; WKSManager to probe; time and weather conditions to record in game |
 | X-203 | User request of 2026-11-12 (plugin comparison, K-12, accepted on 11/12): Ishgard Restoration (items per level, tiers, rewards) and the Diadem (items to gather per level, points, session count) | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: HWDCrafterSupply*, HWDGathererInspection* sheets; no instance weather forecast |
-| X-201 | User request of 2026-11-12 (« add an automatic route calculator for airships… | Done in 0.1248 |
-| X-204 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1235 |
-| X-205 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1241 |
+| X-201 | User request of 2026-11-12 (« add an automatic route… | Done in 0.1248 |
+| X-204 | User request of 2026-11-12 (plugin comparison, the agent's… | Done in 0.1235 |
+| X-205 | User request of 2026-11-12 (plugin comparison, the agent's… | Done in 0.1241 |
 | X-206 | User request of 2026-11-12 (plugin comparison, K-13, accepted on 11/12): session log: items obtained today or this session with their source (unattributed shown as such), filter, export; duration of each completed duty, shown after the end, history First check by Grep what already exists (user request of 11/12). | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: view over ItemGains and GainSources; IDutyState for the duration; TenshoData.db; with X-159; user's choice of 11/12: duration history kept across sessions |
 | X-207 | User request of 2026-11-12 (plugin comparison, K-14, accepted on 11/12): estimated value of stocks per storage and per character, a "sleeping and sells" list (sold price × sales per day, NPC price beside), NPC vs market line under the tooltip; advice only, on click First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 12 (sorting of 11/13). To do: bank + batched MarketService + MarketQuote; NpcVendorCatalog.GilPrice; old prices flagged |
 | X-208 | User request of 2026-11-12 (plugin comparison, K-16, accepted on 11/12): "My listings": retainer sale lists kept, since when, price, "sold since the last visit" (listing gone + retainer gil rise); Universalis on click only (D-82); optional CSV First check by Grep what already exists (user request of 11/12). | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: SellListEntries kept per retainer; cross-check with GilJournal.SplitRetainerRise; after X-171 |
@@ -615,14 +615,14 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-214 | User request of 2026-11-12 (plugin comparison, K-24, accepted on 11/12): an "Open in the duty finder" button on any mention of a duty, without queuing; Wondrous Tails duties still to do in the duty finder panel; "Go there" only where the game gives a position (D-12) First check by Grep what already exists (user request of 11/12). | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: AgentContentsFinder.OpenRegularDuty; WeeklyBingoOrderData; disabled inside a duty |
 | X-215 | User request of 2026-11-12 (plugin comparison, K-25, accepted on 11/12): Custom deliveries: items each client asks for this week, bonus, reward at the target tier, link to the recipe or gathering; read at the client window then kept for the week; "unknown" otherwise First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 17 (sorting of 11/13). To do: record of the client window; SatisfactionSupply, SatisfactionNpc; SupplySeed calculation only on decision (X-75.6, DEC-043) |
 | X-216 | User request of 2026-11-12 (plugin comparison, K-26, accepted on 11/12): glamour: "same model" on any item sheet (extends SameLook) with ✓/✗ and location; piece-by-piece "Glamour" collection (dresser, armoire, inventories, retainers) First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 14 (sorting of 11/13). To do: Item.ModelMain/ModelSub/EquipSlotCategory, MirageManager; Collections view |
-| X-217 | User request of 2026-11-12 (plugin comparison, K-30, accepted on 11/12)… | Done in 0.1226 |
-| X-218 | User request of 2026-11-12 (plugin comparison, K-32, accepted on 11/12): job… | Done in 0.1228 |
-| X-219 | User request of 2026-11-12 (plugin comparison, K-34, accepted on 11/12): richer… | Done in 0.1229 |
-| X-220 | User request of 2026-11-12 (plugin comparison, K-36, accepted on 11/12): one… | Done in 0.1230 |
+| X-217 | User request of 2026-11-12 (plugin comparison, K-30… | Done in 0.1226 |
+| X-218 | User request of 2026-11-12 (plugin comparison, K-32… | Done in 0.1228 |
+| X-219 | User request of 2026-11-12 (plugin comparison, K-34… | Done in 0.1229 |
+| X-220 | User request of 2026-11-12 (plugin comparison, K-36… | Done in 0.1230 |
 | X-221 | User request of 2026-11-12 (plugin comparison, K-37, accepted on 11/12): Grace remaining XP, "unknown" if the start was not seen  First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 5 (sorting of 11/13). Part 1 done in 0.1231 (probe: cap only in the manuals' description, evidence 0.1231-grace-cap.md; statuses 45 and 46 read in developer mode); left: read the status param in game, then show it; user reading of 11/15 around 8:35 pm (manual used, one craft, dalamud.log « Reading statuses »): status 45, param 70 before and after the craft, 64,774 s left (18 h): the param does not count the points left (likely the manual's tier, 70 = commercial manual, cap 1,750,000); left: count the experience earned since the bonus started, « unknown » if Tensho did not see it; user's screenshot (same evening): Commercial Engineering Manual, « +150% up to level 69, then +75% », bonus cap 1,750,000 points, 18 h: param 70 is the level where the bonus drops to +75%; the rate thus depends on the worn job's level |
-| X-222 | User request of 2026-11-12 (plugin comparison, K-38, accepted on 11/12): S rank… | Done in 0.1232 |
-| X-223 | User request of 2026-11-12 (plugin comparison, K-39, accepted on 11/12): next… | Done in 0.1233 |
-| X-224 | User request of 2026-11-12 (plugin comparison, K-40, accepted on 11/12)… | Done in 0.1227 |
+| X-222 | User request of 2026-11-12 (plugin comparison, K-38… | Done in 0.1232 |
+| X-223 | User request of 2026-11-12 (plugin comparison, K-39… | Done in 0.1233 |
+| X-224 | User request of 2026-11-12 (plugin comparison, K-40… | Done in 0.1227 |
 | X-225 | User request of 2026-11-12 (plugin comparison, K-46, accepted on 11/12): reminder when the items placed on the free company house furniture (« Aetherial Wheel ») are charged. User's correction of 11/14 about 3:55 pm: in the French game they are « tours éthérées », not « roues éthérées » (the agent's translation); the French name comes from the game's sheets (French Item and EventItem, XbmProbe, R09), never translated from English; also fix test T-0.1234-1's text. First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 6 (sorting of 11/13). Part 1 done in 0.1234 (probe: 20, 45, 70 h by grade, evidence 0.1234-aetherial-wheels.md; « Wheel » window read in developer mode); the game's French names (French Item sheet, 15/11, relay 79): « base de tours éthéréens » (the stand, item 8838), « tour éthéréen » (items 8860 on); test T-0.1234-1's text corrected; left: read the stand's window in the game, then the reminder |
 | X-226 | User request of 2026-11-12 (plugin comparison, K-15, accepted on 11/12; user's R04 agreement on 11/12, pros and cons given): out-of-combat preparation reminder: food over or nearly over, chocobo companion absent or nearly over; chat and sound like wear (D-38), nothing in combat or in a duty; combat food only if the user agrees (R04) First check by Grep what already exists (user request of 11/12). | Wanted before the announcement, rank 19 (sorting of 11/13). To do: status 48 (RemainingTime), Buddy.CompanionInfo.TimeLeft, ICondition; adjustable thresholds |
 | X-227 | User request of 2026-11-12 (plugin comparison, K-17, accepted on 11/12; user's R04 agreement on 11/12, pros and cons given; new host api.xivgear.app accepted): import of an xivgear link into the gear planner (pieces and materia), missing pieces and materia framed in the storages (X-54) and flagged under the tooltip; request on click only First check by Grep what already exists (user request of 11/12). | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do: bounded xivgear client (BoundedHttp), "game data only" switch, credits, SECURITY; Etro second if still served |
@@ -647,53 +647,53 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-246 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined before, reopened) First check by Grep what already exists (user request of 11/12).: highlight in the island sanctuary workshop agenda; C23 and DEC-033 reopened (drawing on the game's interface) | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do |
 | X-247 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined before, reopened) First check by Grep what already exists (user request of 11/12).: Windows notification « duty found »; D-49 b reopened (with X-163 and K-22) | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do |
 | X-248 | User's choice of 2026-11-12 (plugin comparison, section 5: idea declined before, reopened) First check by Grep what already exists (user request of 11/12).: import on click of third-party site links (e.g. for macros); D-15 b reopened (with K-17) | After the announcement, before 1.0 (sorting of 11/13, accepted by the user). To do |
-| X-250 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1180 |
-| X-251 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1181 |
-| X-252 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1182 |
-| X-253 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1183 |
-| X-254 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1219 |
-| X-255 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1219.0 |
-| X-256 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1222 |
-| X-257 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1222.0 |
-| X-258 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1220 |
-| X-259 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1221 |
-| X-260 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1223 |
-| X-261 | First-player review of 11/12 (the agent's notes), before the public… | Done in 0.1220.0 |
-| X-262 | User's choice of 11/13 around 13:20 (after the Palace of the Dead 1-10): deep… | Done in 0.1308 |
-| X-263 | User request of 11/13 around 12:40 (screenshot « Seen in game: Zelkova log ←… | Done in 0.1305 |
-| X-264 | User request of 11/13 around 13:35 (reference screenshot of a Grafana-like… | Done in 0.1271 |
-| X-265 | User request of 11/13 around 15:05 (« sort allied societies by kind: combat… | Done in 0.1306 |
-| X-266 | User report of 11/13 around 15:30 (Mor Dhona, screenshot; diagnosis the agent's… | Done in 0.1307 |
-| X-267 | Tooling 1 (method plan site 3, R36): every test at each version but in parallel… | Done in 0.1275 |
-| X-268 | Tooling 1 (R20.3, R19.3, R23, R28.12): a relay's last version made ready to… | Done in 0.1276 |
-| X-269 | Tooling 1 (R28.10, R28.9, R26): return script without a model (git and CI check… | Done in 0.1277 |
-| X-270 | Tooling 1 (audit of 11/13): accurate start: start message without a stale line… | Done in 0.1277 |
-| X-271 | Tooling 2 (site 4, R37): reference images of the pages drawn outside the game… | Done in 0.1278 |
-| X-272 | Tooling 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7): trials by batch… | Done in 0.1278 |
-| X-273 | Tooling (master's finding, 13/11 about 8:55 pm): retour.py --apply marks the… | Done in 0.1298 |
-| X-274 | User's request, 13/11 about 9:10 pm (test T-0.1140-1, « it must keep it, same… | Done in 0.1387 |
-| X-275 | Bug seen in testing on 13/11 about 9:05 pm (T-0.1149-1, screenshots): Storage ›… | Done in 0.1285 |
-| X-276 | User's remark, 13/11 about 9:25 pm (test T-0.1240-1, « Gear condition »… | Done in 0.1388 |
-| X-277 | Bug seen in testing by the user on 13/11 about 9:35 pm (screenshots, Equipment… | Done in 0.1289 |
-| X-278 | Bug seen in testing by the user on 13/11 about 9:45 pm (T-0.1247-1… | Done in 0.1287 |
-| X-279 | Bug seen in testing by the user on 13/11 about 9:55 pm (screenshot, Alarms ›… | Done in 0.1292 |
-| X-280 | Bug seen in testing by the user on 13/11 about 9:55 pm (« editing an alarm does… | Done in 0.1288 |
-| X-281 | Review of block 0.1278 (I1, important): parallel tests with no [SerialTests]… | Done in 0.1298 |
-| X-282 | Review of block 0.1278 (I2, important): reference image tolerances far above… | Done in 0.1301 |
-| X-283 | Review of block 0.1278 (I4, important): X-268 (DLL not reloaded while the… | Done in 0.1299 |
-| X-284 | Review of block 0.1278 (minor): M1 AtomicFile.Write retries up to about 750 ms… | Done in 0.1302 |
-| X-285 | Seen by the user in the gallery on 13/11 about 10 pm (AlliedSocieties… | Done in 0.1300 |
-| X-286 | Review of block 0.1278 (M5) and Home image seen by the master on 13/11: on the… | Done in 0.1304 |
-| X-287 | Tooling (master's finding, 13/11 about 10:20 pm, review I3): q.py rouvrir… | Done in 0.1298 |
-| X-288 | Bug seen by the user on 13/11 about 10:50 pm (screenshots): an airship… | Done in 0.1286 |
-| X-289 | User's decision, 13/11 about 11 pm (« level caps 50-60-70-80-90-100 must show… | Done in 0.1290.0 |
-| X-290 | User's request, 13/11 about 11:30 pm (screenshots, Equipment page, piece search… | Done in 0.1294 |
-| X-291 | User's request, 13/11 about 11:45 pm (screenshots, Storage › Bank, retainers… | Done in 0.1293 |
-| X-292 | Follow-up of X-278 (test T-0.1287-1 failed, 13/11 about 11:45 pm, screenshot)… | Done in 0.1291 |
-| X-293 | User's decision, 13/11 about midnight (« Yes, to the plan », after the… | Done in 0.1303 |
-| X-294 | User's request, 14/11 about 0:20 am (screenshots: worn piece tooltip « Royal… | Done in 0.1295 |
-| X-295 | User's request, 14/11 about 0:25 am (screenshot, Alarms › Dated alarms, alarm… | Done in 0.1296 |
-| X-296 | Tooling (master's finding, 14/11 about 0:25 am): no command removes a faulty… | Done in 0.1298 |
+| X-250 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1180 |
+| X-251 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1181 |
+| X-252 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1182 |
+| X-253 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1183 |
+| X-254 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1219 |
+| X-255 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1219.0 |
+| X-256 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1222 |
+| X-257 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1222.0 |
+| X-258 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1220 |
+| X-259 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1221 |
+| X-260 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1223 |
+| X-261 | First-player review of 11/12 (the agent's notes), before… | Done in 0.1220.0 |
+| X-262 | User's choice of 11/13 around 13:20 (after the Palace of… | Done in 0.1308 |
+| X-263 | User request of 11/13 around 12:40 (screenshot « Seen in… | Done in 0.1305 |
+| X-264 | User request of 11/13 around 13:35 (reference screenshot of… | Done in 0.1271 |
+| X-265 | User request of 11/13 around 15:05 (« sort allied societies… | Done in 0.1306 |
+| X-266 | User report of 11/13 around 15:30 (Mor Dhona, screenshot… | Done in 0.1307 |
+| X-267 | Tooling 1 (method plan site 3, R36): every test at each… | Done in 0.1275 |
+| X-268 | Tooling 1 (R20.3, R19.3, R23, R28.12): a relay's last… | Done in 0.1276 |
+| X-269 | Tooling 1 (R28.10, R28.9, R26): return script without a… | Done in 0.1277 |
+| X-270 | Tooling 1 (audit of 11/13): accurate start: start message… | Done in 0.1277 |
+| X-271 | Tooling 2 (site 4, R37): reference images of the pages… | Done in 0.1278 |
+| X-272 | Tooling 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7)… | Done in 0.1278 |
+| X-273 | Tooling (master's finding, 13/11 about 8:55 pm): retour.py… | Done in 0.1298 |
+| X-274 | User's request, 13/11 about 9:10 pm (test T-0.1140-1, « it… | Done in 0.1387 |
+| X-275 | Bug seen in testing on 13/11 about 9:05 pm (T-0.1149-1… | Done in 0.1285 |
+| X-276 | User's remark, 13/11 about 9:25 pm (test T-0.1240-1, « Gear… | Done in 0.1388 |
+| X-277 | Bug seen in testing by the user on 13/11 about 9:35 pm… | Done in 0.1289 |
+| X-278 | Bug seen in testing by the user on 13/11 about 9:45 pm… | Done in 0.1287 |
+| X-279 | Bug seen in testing by the user on 13/11 about 9:55 pm… | Done in 0.1292 |
+| X-280 | Bug seen in testing by the user on 13/11 about 9:55 pm («… | Done in 0.1288 |
+| X-281 | Review of block 0.1278 (I1, important): parallel tests with… | Done in 0.1298 |
+| X-282 | Review of block 0.1278 (I2, important): reference image… | Done in 0.1301 |
+| X-283 | Review of block 0.1278 (I4, important): X-268 (DLL not… | Done in 0.1299 |
+| X-284 | Review of block 0.1278 (minor): M1 AtomicFile.Write retries… | Done in 0.1302 |
+| X-285 | Seen by the user in the gallery on 13/11 about 10 pm… | Done in 0.1300 |
+| X-286 | Review of block 0.1278 (M5) and Home image seen by the… | Done in 0.1304 |
+| X-287 | Tooling (master's finding, 13/11 about 10:20 pm, review… | Done in 0.1298 |
+| X-288 | Bug seen by the user on 13/11 about 10:50 pm (screenshots)… | Done in 0.1286 |
+| X-289 | User's decision, 13/11 about 11 pm (« level caps… | Done in 0.1290.0 |
+| X-290 | User's request, 13/11 about 11:30 pm (screenshots… | Done in 0.1294 |
+| X-291 | User's request, 13/11 about 11:45 pm (screenshots, Storage… | Done in 0.1293 |
+| X-292 | Follow-up of X-278 (test T-0.1287-1 failed, 13/11 about… | Done in 0.1291 |
+| X-293 | User's decision, 13/11 about midnight (« Yes, to the plan… | Done in 0.1303 |
+| X-294 | User's request, 14/11 about 0:20 am (screenshots: worn… | Done in 0.1295 |
+| X-295 | User's request, 14/11 about 0:25 am (screenshot, Alarms ›… | Done in 0.1296 |
+| X-296 | Tooling (master's finding, 14/11 about 0:25 am): no command… | Done in 0.1298 |
 | X-297 | User's decision, 14/11 about 1 am (idea box sorting, I-002, comparison with four plugins): Equipment page: filter the piece search by the piece's source (crafting, market, NPC, duty, exchange). Done when: the filter narrows the list by each piece's known source; source test. Idea source: Allagan Tools, EquipmentSuggest (GPL-3.0), read never copied (R05). | Later, user's decision |
 | X-298 | User's decision, 14/11 about 1 am (idea box sorting, I-003, comparison with four plugins): Occult Crescent: Forked Tower opening windows in the Crescent panel, next to the critical engagements (X-189). Done when: the panel gives the next opening, probed in the sheets (R06). Idea source: XIV Shinies, Occult/ (MIT), read never copied (R05). | Later, user's decision |
 | X-299 | User's decision, 14/11 about 1 am (idea box sorting, I-004, comparison with four plugins): Beastmaster crucible: read the offer windows (treasure, loot, shop) and the bag to advise a choice; show only, never choose (R03.2, R03.3). Done when: the advice shows next to the offer window, no action sent to the game; advice test. Idea source: XIV Shinies, Beastmaster/Crucible/ (MIT), read never copied (R05). | Later, user's decision |
@@ -701,156 +701,156 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-301 | User's decision, 14/11 about 1 am (idea box sorting, I-006, comparison with four plugins): Per duty: completion time, loot obtained and personal record, kept per character (TenshoData.db). Done when: a finished duty adds its line, the record updates; behaviour test (write, read back). Idea source: LootView (GPL-3.0), read never copied (R05). | Later, user's decision |
 | X-302 | User's decision, 14/11 about 1 am (idea box sorting, I-007, comparison with four plugins): Commendations received: line or banner with the new total after a duty, out of combat (R03.1). Done when: after a duty the total changes and shows out of combat. Idea source: LootView (GPL-3.0), read never copied (R05). | Later, user's decision |
 | X-303 | User's decision, 14/11 about 1 am (idea box sorting, I-008, comparison with four plugins): Game's loot roll window: attached panel marking collection items « already owned / new » and warning of a once-a-week item; player's data only, no roll sent nor others' read (R03.1, R03.3, R04). Done when: the panel follows the game window without replacing it; marks test. Idea source: LootView (GPL-3.0), read never copied (R05). | Later, user's decision |
-| X-304 | User's decision, 14/11 about 1 am (idea box sorting, I-009, comparison with… | Done in 0.1392 |
+| X-304 | User's decision, 14/11 about 1 am (idea box sorting, I-009… | Done in 0.1392 |
 | X-305 | User's decision, 14/11 about 1 am (idea box sorting, I-010, comparison with four plugins): IPC: provide a few data to other plugins (owned quantity of an item) and register in Wotsit (search Tensho's pages); Dalamud rule to present to the user first (R04). Done when: R04 agreement noted, IPC documented, Wotsit finds the pages. Idea source: Allagan Tools, IPC/ (GPL-3.0), read never copied (R05). | Later, user's decision |
 | X-306 | User's decision, 14/11 about 1 am (idea box sorting, I-011, comparison with four plugins): Item movement history: also keep losses and moves (sold, used, given to a retainer), besides the Discoveries' gains. Done when: the page shows dated gains and losses; behaviour test (movement noted once, no duplicate). Idea source: Allagan Tools, History filter (GPL-3.0), read never copied (R05). | Later, user's decision |
-| X-307 | User's decision, 14/11 about 1 am (comparison with four plugins, section 2)… | Done in 0.1409.0 |
-| X-308 | User's decision, 14/11 about 2:45 am (« Yes, tools first », idea I-012)… | Done in 0.1301.0 |
+| X-307 | User's decision, 14/11 about 1 am (comparison with four… | Done in 0.1409.0 |
+| X-308 | User's decision, 14/11 about 2:45 am (« Yes, tools first »… | Done in 0.1301.0 |
 | X-309 | Relay 52: the pinned copy of PluginUiTest.Host (tools/PluginUiTest) diverges from upstream Shigu330/PluginUiTest (v0.2.0, 43d27f4): Rewrite.Plugin got stamp (X-271) and clock/HostClock (X-282) here, while its README says the files are the same as v0.1.0 and never changed here first. Port stamp and clock upstream (PluginUiTest repository, R21.3), then copy the library back and write the version and commit in the README. Done when: .cs files the same as upstream (empty diff), README up to date. | Relay 52 bug (debt) |
-| X-310 | Master's finding, 14/11 about 3:40 am (CI of a9df76e « 0.1308.0 · suite », run… | Done in 0.1309 |
-| X-311 | Tooling (master's finding, 14/11 about 3:45 am): plan.py add takes the id… | Done in 0.1335.0 |
-| X-312 | Master's finding, 14/11 morning (test T-0.1241-2, Eureka and Bozja › Weather… | Done in 0.1316 |
-| X-313 | User's remark, 14/11 morning (test T-0.1227-1): « Added in patch 7.x (Garland… | Done in 0.1317 |
-| X-320 | Bug seen by the user on the route of 14/11 about 11 am (test T-0.351-1, and… | Done in 0.1319 |
-| X-321 | Bug seen by the user on the route of 14/11 about 11 am (test T-0.1172-1): Items… | Done in 0.1322 |
-| X-322 | Bug seen by the user on the route of 14/11 about 11 am (test T-0.829-1): the… | Done in 0.1320 |
-| X-323 | Bug seen by the user on 14/11 about 11:30 am (screenshot, Eureka and Bozja ›… | Done in 0.1318 |
-| X-324 | Tooling (master's finding, 14/11 about 11:40 am): plan.py add marked X-322 « | Done in 0.1318 |
-| X-325 | Tooling (user's question, 14/11 about noon: « is it normal that we never use… | Done in 0.1331 |
-| X-330 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I1: X-171 « add… | Done in 0.1325 |
-| X-331 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I2: X-292: the… | Done in 0.1326 |
-| X-332 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I3 et I4: R07… | Done in 0.1327 |
-| X-333 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I5: X-279 and… | Done in 0.1379 |
-| X-334 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I6: R28.14 and… | Done in 0.1328 |
-| X-335 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), I7: R22: new lines… | Done in 0.1329 |
-| X-336 | Review of block 0.1279 to 0.1317 (the agent's notes, 14/11), M1 à M15: Minor… | Done in 0.1380 |
-| X-340 | User's remark, 14/11 about 12:30 pm (bug report test, screenshot) and decision… | Done in 0.1324 |
-| X-341 | User's decision, 14/11 about 1:10 pm (« The worker », after the duplicate PR… | Done in 0.1323 |
-| X-342 | User's decision, 14/11 about 1:30 pm (« ok for everything »: our issues apart… | Done in 0.1323 |
-| X-343 | User's remark, 14/11 about 2:45 pm (after test T-0.1326-1): an item he has just… | Done in 0.1331 |
-| X-344 | Bug seen by the user on 14/11 about 3:10 pm (screenshot, Dalamud plugin list… | Done in 0.1330 |
-| X-350 | Review of block 0.1318 to 0.1329 (14/11), I1: R03.2 and DEC-038: X-320's new… | Done in 0.1334 |
-| X-351 | Review of block 0.1318 to 0.1329 (14/11), I3: X-322: on a map the game did not… | Done in 0.1342.0 |
+| X-310 | Master's finding, 14/11 about 3:40 am (CI of a9df76e «… | Done in 0.1309 |
+| X-311 | Tooling (master's finding, 14/11 about 3:45 am): plan.py… | Done in 0.1335.0 |
+| X-312 | Master's finding, 14/11 morning (test T-0.1241-2, Eureka… | Done in 0.1316 |
+| X-313 | User's remark, 14/11 morning (test T-0.1227-1): « Added in… | Done in 0.1317 |
+| X-320 | Bug seen by the user on the route of 14/11 about 11 am… | Done in 0.1319 |
+| X-321 | Bug seen by the user on the route of 14/11 about 11 am… | Done in 0.1322 |
+| X-322 | Bug seen by the user on the route of 14/11 about 11 am… | Done in 0.1320 |
+| X-323 | Bug seen by the user on 14/11 about 11:30 am (screenshot… | Done in 0.1318 |
+| X-324 | Tooling (master's finding, 14/11 about 11:40 am): plan.py… | Done in 0.1318 |
+| X-325 | Tooling (user's question, 14/11 about noon: « is it normal… | Done in 0.1331 |
+| X-330 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1325 |
+| X-331 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1326 |
+| X-332 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1327 |
+| X-333 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1379 |
+| X-334 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1328 |
+| X-335 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1329 |
+| X-336 | Review of block 0.1279 to 0.1317 (the agent's notes… | Done in 0.1380 |
+| X-340 | User's remark, 14/11 about 12:30 pm (bug report test… | Done in 0.1324 |
+| X-341 | User's decision, 14/11 about 1:10 pm (« The worker », after… | Done in 0.1323 |
+| X-342 | User's decision, 14/11 about 1:30 pm (« ok for everything… | Done in 0.1323 |
+| X-343 | User's remark, 14/11 about 2:45 pm (after test T-0.1326-1)… | Done in 0.1331 |
+| X-344 | Bug seen by the user on 14/11 about 3:10 pm (screenshot… | Done in 0.1330 |
+| X-350 | Review of block 0.1318 to 0.1329 (14/11), I1: R03.2 and… | Done in 0.1334 |
+| X-351 | Review of block 0.1318 to 0.1329 (14/11), I3: X-322: on a… | Done in 0.1342.0 |
 | X-352 | Review of block 0.1318 to 0.1329 (14/11), I2: Rest of X-01 (closed on the user's agreement on 14/11 after 37 min of dungeons with no hitch in normal mode): first openings still slow in developer mode: NativeMapReplacer 976 ms once, SortPreview page 137 ms at first opening, panels at load 56 to 86 ms (target 50 ms). Done when: those first openings under 50 ms or done out of drawing, measured; no « Slow reader » line over 150 ms between +5 and +60 s after a load. | Wished, review bug (R27.2) |
-| X-353 | Review of block 0.1318 to 0.1329 (14/11), M1 à M5: Minor: M1 X-340 has no… | Done in 0.1381 |
-| X-354 | Tooling (relay 59, 14/11): a publish.sh --last stopped by a failing test puts… | Done in 0.1349.0 |
-| X-355 | User request of 11/14 about 4:20 pm (game map and Tensho map captures at the… | Done in 0.1343 |
-| X-356 | User's request, 14/11 about 4:10 pm (« plan a full review with Fable +… | Done in 0.1369.0 |
-| X-357 | User's request, 14/11 about 4:15 pm (« before the announcement, but nothing… | Done in 0.1349 |
-| X-358 | Review of block 0.1330 to 0.1345 (14/11), I1: X-355 (0.1345)… | Done in 0.1346 |
-| X-359 | Review of block 0.1330 to 0.1345 (14/11), minor: M1 X-171 patch reports read… | Done in 0.1382 |
-| X-360 | User's request, 14/11 about 5:40 pm (« it must be done before fable »)… | Done in 0.1351.0 |
-| X-361 | Bug of X-360 seen by the master on 14/11 about 5:55 pm: retour.py --apply… | Done in 0.1349 |
-| X-362 | Bug seen in relay 62 (14/11 about 6:30 pm): tools/discoveries-load.py… | Done in 0.1370.0 |
-| X-363 | Bug (test T-0.1317-1, 14/11 evening): the « Added in patch 7.x (Garland Tools)… | Done in 0.1350 |
-| X-364 | Tool (batch of 14/11 evening): q.py lot prints only the action (« do ») of T0… | Done in 0.1364.0 |
-| X-365 | User's request (batch of 14/11 evening, screenshot): left-clicking a chat map… | Done in 0.1351 |
-| X-366 | Display bug (test T0-13, 14/11 evening, screenshot): Labyrinth panel in front… | Done in 0.1373 |
-| X-367 | Review of block 0.1346 to 0.1349 (14/11), minor M1, M2, M3: M1 in… | Done in 0.1370 |
-| X-368 | Tool (14/11 evening): plan.py fait refuses to replace an existing definition of… | Done in 0.1364.0 |
-| X-369 | X-356, fixes (user's choice A, D-160), family 1: game terms: the 58 « terme-jeu… | Done in 0.1352 |
-| X-370 | X-356, fixes (D-160), family 2: the 30 English/French meaning gaps of the… | Done in 0.1353 |
-| X-371 | X-356, fixes (D-160), family 3: English (13), French spelling (8) and… | Done in 0.1354 |
-| X-372 | X-356, rest of the reading (D-160): the 28 remaining packets (L03 to L25, D02… | Done in 0.1354.0 |
-| X-373 | Flaky test (CI of 0.1354.0, 14/11 evening, run 43639320577): « Settings saver… | Done in 0.1371 |
-| X-374 | X-356, fixes (D-160), family 4a: game terms, packets L03 to L14 (133 kept «… | Done in 0.1355 |
-| X-375 | X-356, fixes (D-160), family 4b: game terms, packets L15 to L25 and D02 to D06… | Done in 0.1356 |
-| X-376 | X-356, fixes (D-160), family 5: meaning gaps between English and French (74… | Done in 0.1357 |
-| X-377 | X-356, fixes (D-160), family 6: English (35), French spelling (40), French… | Done in 0.1358 |
-| X-378 | X-356, fixes (D-160), family 7: vocabulary inconsistencies (114 « coherence »… | Done in 0.1362 |
-| X-379 | X-356, fixes (D-160), family 8: clarity (82 « clarte » findings of relay 67 and… | Done in 0.1363 |
-| X-380 | X-356, fixes (D-160), family 9: outdated texts (29 « perime » findings of relay… | Done in 0.1364 |
-| X-381 | X-356, Fable second look (D-160): the findings the glossary does not settle… | Done in 0.1369 |
-| X-382 | Bug (user report, 14/11 about 11:50 pm, screenshot): garden, Shirogane 2-17… | Done in 0.1360 |
-| X-383 | Bug (user report, 14/11 about 11:55 pm, two screenshots): garden, Shirogane… | Done in 0.1360.0 |
-| X-384 | User's request (15/11, screenshot): the inventory sort preview (SortUi, « Bag… | Done in 0.1361 |
-| X-385 | Display bug (user report, 15/11, screenshot): Inventory organisation page… | Done in 0.1361.0 |
-| X-386 | User's request of 15/11: show summoning bells (retainers) and the company chest… | Done in 0.1402 |
-| X-387 | Bug, X-365 not working in game (user report, 15/11 about 0:25 am, test… | Done in 0.1366 |
-| X-388 | Study asked by the user on 15/11 (with the chat map link bug): audit of Chat 2… | Done in 0.1368.0 |
-| X-389 | Bug (test T-0.1354-1, 15/11 about 0:45 am): searching an item with a keyboard… | Done in 0.1367 |
+| X-353 | Review of block 0.1318 to 0.1329 (14/11), M1 à M5: Minor… | Done in 0.1381 |
+| X-354 | Tooling (relay 59, 14/11): a publish.sh --last stopped by a… | Done in 0.1349.0 |
+| X-355 | User request of 11/14 about 4:20 pm (game map and Tensho… | Done in 0.1343 |
+| X-356 | User's request, 14/11 about 4:10 pm (« plan a full review… | Done in 0.1369.0 |
+| X-357 | User's request, 14/11 about 4:15 pm (« before the… | Done in 0.1349 |
+| X-358 | Review of block 0.1330 to 0.1345 (14/11), I1: X-355… | Done in 0.1346 |
+| X-359 | Review of block 0.1330 to 0.1345 (14/11), minor: M1 X-171… | Done in 0.1382 |
+| X-360 | User's request, 14/11 about 5:40 pm (« it must be done… | Done in 0.1351.0 |
+| X-361 | Bug of X-360 seen by the master on 14/11 about 5:55 pm… | Done in 0.1349 |
+| X-362 | Bug seen in relay 62 (14/11 about 6:30 pm)… | Done in 0.1370.0 |
+| X-363 | Bug (test T-0.1317-1, 14/11 evening): the « Added in patch… | Done in 0.1350 |
+| X-364 | Tool (batch of 14/11 evening): q.py lot prints only the… | Done in 0.1364.0 |
+| X-365 | User's request (batch of 14/11 evening, screenshot)… | Done in 0.1351 |
+| X-366 | Display bug (test T0-13, 14/11 evening, screenshot)… | Done in 0.1373 |
+| X-367 | Review of block 0.1346 to 0.1349 (14/11), minor M1, M2, M3… | Done in 0.1370 |
+| X-368 | Tool (14/11 evening): plan.py fait refuses to replace an… | Done in 0.1364.0 |
+| X-369 | X-356, fixes (user's choice A, D-160), family 1: game… | Done in 0.1352 |
+| X-370 | X-356, fixes (D-160), family 2: the 30 English/French… | Done in 0.1353 |
+| X-371 | X-356, fixes (D-160), family 3: English (13), French… | Done in 0.1354 |
+| X-372 | X-356, rest of the reading (D-160): the 28 remaining… | Done in 0.1354.0 |
+| X-373 | Flaky test (CI of 0.1354.0, 14/11 evening, run… | Done in 0.1371 |
+| X-374 | X-356, fixes (D-160), family 4a: game terms, packets L03 to… | Done in 0.1355 |
+| X-375 | X-356, fixes (D-160), family 4b: game terms, packets L15 to… | Done in 0.1356 |
+| X-376 | X-356, fixes (D-160), family 5: meaning gaps between… | Done in 0.1357 |
+| X-377 | X-356, fixes (D-160), family 6: English (35), French… | Done in 0.1358 |
+| X-378 | X-356, fixes (D-160), family 7: vocabulary inconsistencies… | Done in 0.1362 |
+| X-379 | X-356, fixes (D-160), family 8: clarity (82 « clarte »… | Done in 0.1363 |
+| X-380 | X-356, fixes (D-160), family 9: outdated texts (29 « perime… | Done in 0.1364 |
+| X-381 | X-356, Fable second look (D-160): the findings the glossary… | Done in 0.1369 |
+| X-382 | Bug (user report, 14/11 about 11:50 pm, screenshot)… | Done in 0.1360 |
+| X-383 | Bug (user report, 14/11 about 11:55 pm, two screenshots)… | Done in 0.1360.0 |
+| X-384 | User's request (15/11, screenshot): the inventory sort… | Done in 0.1361 |
+| X-385 | Display bug (user report, 15/11, screenshot): Inventory… | Done in 0.1361.0 |
+| X-386 | User's request of 15/11: show summoning bells (retainers)… | Done in 0.1402 |
+| X-387 | Bug, X-365 not working in game (user report, 15/11 about… | Done in 0.1366 |
+| X-388 | Study asked by the user on 15/11 (with the chat map link… | Done in 0.1368.0 |
+| X-389 | Bug (test T-0.1354-1, 15/11 about 0:45 am): searching an… | Done in 0.1367 |
 | X-390 | Public announcement (user's decision of 15/11: a Reddit post, not the Dalamud Discord): post text prepared by the agent when plan.py annonce says yes: short presentation, what it does, cleaned screenshots (R25), custom repository and install link, honest limits, AI agent disclosure, not affiliated with Dalamud, where to report problems; English post with a French translation for the user; subreddit chosen with the user and its rules read (third-party tools). Done when: text in the user's files (pour-moi) read by the user; the user posts it. | Announcement |
-| X-391 | Tool (user's finding, 15/11: « the reviewer is late too, isn't it? »): lance.py… | Done in 0.1364.0 |
-| X-392 | Tool (user's finding, 15/11: « you didn't remind me to do some »): after relays… | Done in 0.1364.0 |
-| X-393 | Tool (15/11): plan.py import-relecture read « 0 findings » from review 0.1361… | Done in 0.1364.0 |
+| X-391 | Tool (user's finding, 15/11: « the reviewer is late too… | Done in 0.1364.0 |
+| X-392 | Tool (user's finding, 15/11: « you didn't remind me to do… | Done in 0.1364.0 |
+| X-393 | Tool (15/11): plan.py import-relecture read « 0 findings »… | Done in 0.1364.0 |
 | X-394 | Review 0.1350 to 0.1361, important finding 1: X-384 and X-385 done without the expected image (R37): the SortPreview reference only shows « Connect a character… ». Done when: an image of the preview with a sample inventory shows bags 1, 3, 2, 4 and the message once, declared and approved (R37). | Bug |
-| X-395 | Review 0.1350 to 0.1361, minors 3 and 4: (3) garden: a bed menu opened then… | Done in 0.1366.0 |
-| X-396 | Tool (R37 changed on 15/11, J139): while the desktop app is frozen (D-149)… | Done in 0.1364.0 |
-| X-397 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11), I1: finding in… | Done in 0.1368 |
-| X-398 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11), I2: finding in… | Done in 0.1365 |
-| X-399 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11), minor M1, M2, M3, M4… | Done in 0.1377 |
-| X-400 | Tool (15/11, relay 70, 0.1367): publish.sh runs Verify without marking the… | Done in 0.1368.0 |
-| X-401 | Tool (15/11, relay 70): plan.py gen publishes in GLOBAL-PLAN cells that quote… | Done in 0.1368.0 |
-| X-402 | Tool (15/11, relay 70): txn.py restore stops on « Errno 22 Invalid argument »… | Done in 0.1368.0 |
+| X-395 | Review 0.1350 to 0.1361, minors 3 and 4: (3) garden: a bed… | Done in 0.1366.0 |
+| X-396 | Tool (R37 changed on 15/11, J139): while the desktop app is… | Done in 0.1364.0 |
+| X-397 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11)… | Done in 0.1368 |
+| X-398 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11)… | Done in 0.1365 |
+| X-399 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11)… | Done in 0.1377 |
+| X-400 | Tool (15/11, relay 70, 0.1367): publish.sh runs Verify… | Done in 0.1368.0 |
+| X-401 | Tool (15/11, relay 70): plan.py gen publishes in… | Done in 0.1368.0 |
+| X-402 | Tool (15/11, relay 70): txn.py restore stops on « Errno 22… | Done in 0.1368.0 |
 | X-403 | Tensho chat, extra window (D-166, user's choice of 15/11 from the study, phases 1 to 4 and Chat 2 integration): a Tensho window next to the game chat, no typing, game chat not hidden: reading, Tensho menus on every link, rules and alerts, conversations; then Tensho menus in Chat 2 through its IPC; cut in PvP and ranked content (R03.2). Split into one-family points per version (study, 8.2). Done when: each phase with its tests and in-game tests; typing still to decide. | Request |
-| X-404 | Levequests page: the client's name comes from the LeveClient sheet, which… | Done in 0.1372 |
-| X-405 | Vocabulary, recommended choices applied pending the user's answer (R14; D-170… | Done in 0.1374 |
-| X-406 | Bug seen in relay 73 (15/11, X-362 load measure at a million facts)… | Done in 0.1383 |
-| X-407 | Bug seen in relay 73 (15/11): the agent's idea box tool, called with « add… | Done in 0.1383.0 |
-| X-408 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11), I1: finding in… | Done in 0.1375 |
-| X-409 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11), I2: finding in… | Done in 0.1376 |
-| X-410 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11), minor M1, M2, M3: M1… | Done in 0.1378 |
-| X-411 | Tool defect (relay 74, 11/15): publish.sh and new-version.py accept a test… | Done in 0.1383.0 |
-| X-412 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11), I1: finding in… | Done in 0.1384 |
-| X-413 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11), I2: finding in… | Done in 0.1385 |
-| X-414 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11), I3: finding in… | Done in 0.1386 |
-| X-415 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11), minor M1, M2, M3, M4… | Done in 0.1389 |
-| X-416 | Tool defect (15/11, relay 74 return): retour.py composes the announcement from… | Done in 0.1383.0 |
-| X-417 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11), I1: finding in… | Done in 0.1390 |
-| X-418 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11), I2: finding in… | Done in 0.1391 |
-| X-419 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11), minor M1, M2, M3, M4… | Done in 0.1393 |
-| X-420 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11), I1: finding in… | Done in 0.1398 |
-| X-421 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11), I2: finding in… | Done in 0.1399 |
-| X-422 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11), minor M1, M2, M3, M4… | Done in 0.1401.0 |
-| X-423 | Tool defect (15/11 about 8 am): consigne.py relecteur (X-393) asks for « N… | Done in 0.1397.0 |
-| X-424 | Review of block 0.1398 to 0.1404 (review 0.1404, 15/11), I1: finding in… | Done in 0.1405 |
-| X-425 | Review of block 0.1398 to 0.1404 (review 0.1404, 15/11), minor M1, M2, M3: M1… | Done in 0.1408 |
-| X-426 | Bug seen by relay 78 (15/11, 08:57): a 625 ms hitch while 0.1405 loaded, in an… | Done in 0.1415 |
-| X-427 | Bug seen by relay 78 (15/11): the CI of 0.1405 failed on « Garden journal: a… | Done in 0.1407 |
-| X-428 | Bug (CI of 0.1405.0, 15/11): a garden journal test failed on… | Done in 0.1414 |
-| X-429 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11), I1: finding in… | Done in 0.1415 |
-| X-430 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11), I2: finding in… | Done in 0.1415 |
-| X-431 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11), minor M1, M2, M3: M1… | Done in 0.1416 |
-| X-432 | Tool defect (15/11, relay 78 return): after publish.sh --last… | Done in 0.1413 |
+| X-404 | Levequests page: the client's name comes from the… | Done in 0.1372 |
+| X-405 | Vocabulary, recommended choices applied pending the user's… | Done in 0.1374 |
+| X-406 | Bug seen in relay 73 (15/11, X-362 load measure at a… | Done in 0.1383 |
+| X-407 | Bug seen in relay 73 (15/11): the agent's idea box tool… | Done in 0.1383.0 |
+| X-408 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11)… | Done in 0.1375 |
+| X-409 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11)… | Done in 0.1376 |
+| X-410 | Review of block 0.1365 to 0.1374 (review 0.1374, 15/11)… | Done in 0.1378 |
+| X-411 | Tool defect (relay 74, 11/15): publish.sh and… | Done in 0.1383.0 |
+| X-412 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11)… | Done in 0.1384 |
+| X-413 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11)… | Done in 0.1385 |
+| X-414 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11)… | Done in 0.1386 |
+| X-415 | Review of block 0.1375 to 0.1382 (review 0.1382, 15/11)… | Done in 0.1389 |
+| X-416 | Tool defect (15/11, relay 74 return): retour.py composes… | Done in 0.1383.0 |
+| X-417 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11)… | Done in 0.1390 |
+| X-418 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11)… | Done in 0.1391 |
+| X-419 | Review of block 0.1383 to 0.1389 (review 0.1389, 15/11)… | Done in 0.1393 |
+| X-420 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11)… | Done in 0.1398 |
+| X-421 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11)… | Done in 0.1399 |
+| X-422 | Review of block 0.1390 to 0.1397 (review 0.1397, 15/11)… | Done in 0.1401.0 |
+| X-423 | Tool defect (15/11 about 8 am): consigne.py relecteur… | Done in 0.1397.0 |
+| X-424 | Review of block 0.1398 to 0.1404 (review 0.1404, 15/11)… | Done in 0.1405 |
+| X-425 | Review of block 0.1398 to 0.1404 (review 0.1404, 15/11)… | Done in 0.1408 |
+| X-426 | Bug seen by relay 78 (15/11, 08:57): a 625 ms hitch while… | Done in 0.1415 |
+| X-427 | Bug seen by relay 78 (15/11): the CI of 0.1405 failed on «… | Done in 0.1407 |
+| X-428 | Bug (CI of 0.1405.0, 15/11): a garden journal test failed… | Done in 0.1414 |
+| X-429 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11)… | Done in 0.1415 |
+| X-430 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11)… | Done in 0.1415 |
+| X-431 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11)… | Done in 0.1416 |
+| X-432 | Tool defect (15/11, relay 78 return): after publish.sh… | Done in 0.1413 |
 | X-433 | Bug seen by relay 79: a reader hitch of 127 to 515 ms about 20 s after a load. Relays 80 to 83 (0.1422 to 0.1452, evidence docs/evidence/0.1452-load-allocations.md): every thread stopped at the end of a background collection; changes: streamed caches (0.1432), the readers' guard (0.1438), the local link prepared (0.1445), a warm-up without strings (0.1449), the bags' tables (0.1450), the garden's rules in the background (0.1452). Freezes « induced for low memory »: 2 loads of 12 (0.1443, 0.1445); cause not proven: the machine's memory was measured only at the loads of 0.1447 and 0.1448 (load 86 to 88 % during a publication), not at the two freezes, and the game held 8.3 GB private after 132 reloads (another possible cause); none since 0.1446. Left: the JSON caches read at a load (about 55 MB), the readers' first passes. Done when: the frame gaps over 150 ms between 10 and 30 s after a load explained and reduced, or set aside with their reason, over several loads. | Wished: hitch; reading T-0.1459-1 of 11/15 around 10:37 pm (game restarted, fresh heap; cut at 10:39 pm by the 0.1463 publication, second load kept): loads of rank 1 and 2, managed heap 301 and 361 MB: 0 hitch over 100 ms, 0 gap over 150 ms between 10 and 30 s after the load (gaps.py); one 252 ms gap at 22:38:10, before login finished; like the 29 loads under 500 MB measured before: the freezes follow the heap grown by developer-mode reloads, not the version; a player who does not reload Tensho should not see them (to confirm on a normal play session) |
-| X-434 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11), I1: finding in… | Done in 0.1420 |
-| X-435 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11), minor M1, M2, M3, M4… | Done in 0.1421 |
-| X-436 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11), I1: finding in… | Done in 0.1428 |
-| X-437 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11), minor M1, M2, M3: M1… | Done in 0.1428 |
-| X-438 | Bug seen by relay 81 (15/11, review 0.1427 P1): the manifest's description… | Done in 0.1429 |
-| X-439 | Decision D-166 (Tensho chat window next to the game's, 11/15) written into… | Done in 0.1436 |
-| X-440 | Review of block 0.1428 to 0.1435 (review 0.1435, 15/11), minor M1, M2, M3: M1… | Done in 0.1437 |
-| X-441 | Tool: release_notes.py cannot fix a « For players » line of an already… | Done in 0.1461.0 |
-| X-442 | Tool: guard.py refuses a command whose quoted argument only quotes the text of… | Done in 0.1435.0 |
-| X-443 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11), I1: finding in… | Done in 0.1446 |
-| X-444 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11), minor M1, M2, M3, M4… | Done in 0.1446.0 |
-| X-445 | User request of 11/15 around 8:10 pm, made precise around 8:25 pm (Tensho chat… | Done in 0.1458 |
-| X-446 | Tool: state.py child set ID "text" without the field (etat, version or… | Done in 0.1455.0 |
+| X-434 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11)… | Done in 0.1420 |
+| X-435 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11)… | Done in 0.1421 |
+| X-436 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11)… | Done in 0.1428 |
+| X-437 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11)… | Done in 0.1428 |
+| X-438 | Bug seen by relay 81 (15/11, review 0.1427 P1): the… | Done in 0.1429 |
+| X-439 | Decision D-166 (Tensho chat window next to the game's… | Done in 0.1436 |
+| X-440 | Review of block 0.1428 to 0.1435 (review 0.1435, 15/11)… | Done in 0.1437 |
+| X-441 | Tool: release_notes.py cannot fix a « For players » line of… | Done in 0.1461.0 |
+| X-442 | Tool: guard.py refuses a command whose quoted argument only… | Done in 0.1435.0 |
+| X-443 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11)… | Done in 0.1446 |
+| X-444 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11)… | Done in 0.1446.0 |
+| X-445 | User request of 11/15 around 8:10 pm, made precise around… | Done in 0.1458 |
+| X-446 | Tool: state.py child set ID "text" without the field (etat… | Done in 0.1455.0 |
 | X-447 | User request of 11/15 around 8:15 pm (after testing the Tensho chat window): a chat interface a bit more like FFXIV's but with the options of WoW and its chat addons; Tensho chat window looking like the game's chat (tabs, font, background and transparency, channel colours, scrolling) with options drawn from WoW and its chat addons (Prat, Chatter, WIM, ElvUI chat…), no automatic sending nor action in the player's place (R03.3), cut in PvP Done when: first a list of the options of WoW and its addons (base: the WoW survey of the CHAT-001 plan of 0.471, found in the git history, and the chat study), each with what it does, its feasibility in Dalamud, the rule it touches and its number of versions, shown to the user as boxes to tick; then the ticked options done by phases within X-403, each phase with its in-game test and a picture of the window compared with the game's chat. | Wanted, with X-403 (user request, 11/15); user's choice of 11/15 around 8:40 pm (relay 83's list): yes to A2, A3, A4, B1, B2, B4, B5, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16; no to A1 (font), B3 (chosen timestamp), B6 (folded repeats); message history kept on disk: yes, off by default and only with the player's consent ; extra settings (relay 84's list, section D), user's choice of 11/15 around 9:20 pm: yes to D1 to D8 |
 | X-448 | User request of 11/15 around 8:20 pm (Tensho chat window): also plan a borderless mode and more settings Done when: the Tensho chat window has a borderless mode (no title bar nor frame, background adjustable down to transparent, position and size kept, lockable; a visible way back to the normal mode and /tensho chat still working); the further settings join the list of options to tick of the chat interface point (FFXIV look, WoW options); in-game test and picture of the borderless window. | Wanted, with X-403 (user request, 11/15) |
 | X-449 | User request of 11/15 around 8:20 pm: redo the settings to make them easier, with more categories per tab; answers: all Tensho settings, categories as a list on the left Done when: in the Settings window, each tab (General, Panels beside the game, Map, Tracking and notifications, Data and sources, Advanced, Debug) shows a list of categories on the left and the chosen category's settings on the right, like the game's System Configuration; every setting belongs to a category (none left over, test); the settings search leads to the right category; the chosen category is kept; a new DEC decision completes DEC-048; SETTINGS.md and the settings index follow; pictures of every tab declared and compared (R37). | Wanted (user request, 11/15) |
-| X-450 | User request of 11/15 around 8:30 pm: a private page of the in-game tests (only… | Done in 0.1455.0 |
-| X-451 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), I1: finding in… | Done in 0.1456 |
-| X-452 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), I2: finding in… | Done in 0.1456.0 |
-| X-453 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), minor M1, M2, M3, M4… | Done in 0.1457 |
-| X-454 | Red CI (Build and test of « 0.1454.0 · suite », run 43752719862, 11/15): the… | Done in 0.1455 |
+| X-450 | User request of 11/15 around 8:30 pm: a private page of the… | Done in 0.1455.0 |
+| X-451 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11)… | Done in 0.1456 |
+| X-452 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11)… | Done in 0.1456.0 |
+| X-453 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11)… | Done in 0.1457 |
+| X-454 | Red CI (Build and test of « 0.1454.0 · suite », run… | Done in 0.1455 |
 | X-455 | User request of 11/15 around 8:45 pm (Tensho chat window): do not forget the options of an ordinary chat, copy and paste and others Done when: a list of an ordinary chat's options, compared with what is done (copy of one message or a tab in 0.1442), is shown to the user as boxes to tick with feasibility and number of versions: selecting text with the mouse over one or several messages and copying the selection, Ctrl+C and Ctrl+A, copying a name, a link or an address, pasting into the input box (depends on typing, still to decide), clearing a tab, text size, jump to the bottom, right-click on a player's name (the game's menu, nothing sent by itself, R03.3); the ticked options are done with X-447, each with its in-game test. | Wanted, with X-447 (user request, 11/15) ; user's choice of 11/15 around 9:20 pm (relay 84's list, section E): yes to E1, E2, E3, E4, E5, E7; E6 (paste into the input) yes but not a priority and to be explained again before coding: last |
-| X-456 | Tool: STATUS's « 0) Reprise » line piles up leftovers at each version… | Done in 0.1461.0 |
+| X-456 | Tool: STATUS's « 0) Reprise » line piles up leftovers at… | Done in 0.1461.0 |
 | X-457 | Bug seen by the user on 11/15 around 8:50 pm (0.1454, two screenshots): the Tensho chat window, stuck to the bottom, jumps between two scroll positions 5 to 20 times a second (one view with empty space under the last line, one scrolled up a few lines); a two-line message is in view; leads: DrawChatLines follows the bottom from the previous frame's ScrollMaxY then SetScrollHereY(1) after the Dummy, while the content height changes from frame to frame as lines get laid out progressively (a multi-line message counted as one line until laid out); second reading (8:50 pm, two screenshots): one can scroll far below the last message, the window then shows only an empty background with the scrollbar at the bottom: the content height is larger than the lines shown Done when: the window stuck to the bottom no longer moves when nothing arrives, with one- and multi-line messages, with and without frame (0.1454), after a resize; the scroll area ends at the last line (no empty space below); a behaviour test reproduces the back-and-forth (content height changing during layout) and proves it fixed; also check why every line looks doubled on the screenshot (two monsters defeated, or a message copied twice: compare with the game chat, test if it is a bug); in-game test. | Indispensable, rank 3 (visible bug, 11/15); measure of 0.1461 (11/15 10:05 pm, Combat tab, user: scrolling feels odd and the chat still jumps, four screenshots): « Chat window jumps » every second: width 704 and 45 rows fixed, layout redone 0 times, but the scroll limit alternates frame to frame between 310 and 400 px (or 330 and 400), at the bottom every frame: the visible height of the message area changes by 70 to 90 px every other frame (lead: the window's size or place toggling, e.g. the panels stepping aside before a game window, « Panel Chat steps aside », or the frame and tab bar), not the content; 10:15 pm, user: a fight done, no information (Combat tab, two screenshots: at the bottom of the tab, two lines of 10:00 pm then empty space); the game did send the combat lines (dalamud.log « Reading messages: kind 41: … 348 damage » at 22:00:49): check they are in the window and hidden by the jump (rows drawn outside the visible area), else a second copying bug to fix; test: combat lines added while the window is at the bottom all stay visible |
-| X-458 | User request of 11/15 around 9 pm: on the private test page (X-450), a full… | Done in 0.1461.0 |
+| X-458 | User request of 11/15 around 9 pm: on the private test page… | Done in 0.1461.0 |
 | X-459 | User request of 11/15 around 9:05 pm: on the private test page (X-450), also allow sending screenshots for a test Done when: each test of the page accepts one or more screenshots (button, drag and drop, paste an image with Ctrl+V), uploaded to the page's files (« assets » capability, private page: only the user and the agent see them); the answer keeps each screenshot's id; the page shows thumbnails and lets one be removed; the page tool's import fetches the new screenshots (read by the master) and keeps them beside the answer, cited in the test's note or the X-auto point; screenshots stay out of the repository (R25: they may show the character's name); size and image types bounded; test of uploading a screenshot and the agent reading it. | Indispensable, rank 2 (tool asked by the user, with X-450) |
 | X-460 | Bug seen by the user on 11/15 around 9 pm (test T-0.1130-1, test page, screenshot): Tensho map, tool column: the two « 100% » boxes (the zoom percentage and the « 100% » button below) are slightly off to the right in their frame Done when: both boxes' text is centred in its frame, at 100% and 150% zoom, overlay map and small window, in French and English; picture of the tool column declared and compared (R37); in-game test. | Wanted (minor display bug, 11/15) |
-| X-461 | Bug seen by the user on 11/15 around 9:20 pm (test T-0.1441-3, test page)… | Done in 0.1463 |
+| X-461 | Bug seen by the user on 11/15 around 9:20 pm (test… | Done in 0.1463 |
 | X-462 | Bug seen by the user on 11/15 around 9:30 pm (three screenshots, game map left, Tensho map right): in Eulmore, a three-layer city (The Canopy... Les Racines, Le Tronc, La Voûte, one map each), the Tensho map shows on each layer icons (vendors, vendor bags, NPCs…) that belong to the other layers; the game only shows the open layer's Done when: every icon of the Tensho map (vendors, NPCs, quests, bells and chests X-386, aetherytes, discoveries) is sorted by map (the layer's Map row) and not by zone, for every zone with several maps (list drawn from the game's TerritoryType and Map sheets, probed and cited, R06); a test takes Eulmore's three maps and proves an icon of one layer does not appear on another; an icon whose map is unknown is not shown on a random layer; pictures of the three layers compared with the game map; in-game test in each layer. | Indispensable, rank 3 (visible map bug, 11/15) |
-| X-463 | Tool: retour.py refuses the release while a relay commit has red CI, even when… | Done in 0.1461.0 |
-| X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
-| X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
+| X-463 | Tool: retour.py refuses the release while a relay commit… | Done in 0.1461.0 |
+| X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11)… | Done in 0.1466 |
+| X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15… | Done in 0.1465 |
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should stop counting after 100 and show 100+ Done when: a tab's unread count shows as is up to 100, then « 100+ » beyond (the real count goes on underneath, without changing the tabs' width at each message); test of ChatFormat.TabLabel for 99, 100, 101 and 5000; in-game test. | Wanted, rank 1 (user request, with X-447) |
 | X-467 | User decision of 11/15 around 10:25 pm (no text bar in the chat, then « Yes, after the bugs »): the Tensho chat window gets an input bar (phase 5 of the chat study), after the chat bugs and the ticked options (X-447, X-455); Dalamud rule in play (what a plugin sends to the game): user's agreement given, text is sent only on an Enter typed by the player, never by itself (R03.3, R04) Done when: an input bar under the messages sends to the game, on Enter only, what the player typed, in the chosen channel (Say, Party, FC, LS, CWLS, /tell with world, / commands), with typed-line history, name and channel completion, shortcuts and keyboard focus without stealing the game's keys; pasting into the bar (E6 of X-455); cut in PvP and cut content (CompetitiveGate); DEC-053 completed (typing decided); tests of what goes out (nothing without Enter, right channel, text as is); a batch of in-game tests of its own (channels, LS, CWLS, cross-world /tell, auto-translate). | Wanted, after X-447 and X-455 (user decision, 11/15) |
 | X-468 | User decision of 11/15 around 10:30 pm (D-172, shared discoveries beyond 200,000 facts of a kind): find a way to keep them all, and a fact seen and checked several times by several people counts more Done when: a study first (real size per kind today and in a year at the measured pace, GitHub and v3 exchange format limits, plugin load time) proposes how to keep all facts (split by kind and zone, or slice files downloaded on demand) with a weight per fact: the number of distinct players who saw it; the tools and pages using them prefer a fact seen by several, show « seen by N players » or « seen once »; shown to the user with pros, cons and cost before coding; DEC-042/v3 completed; no fact holds player data (R12.2). | Wanted (user decision, 11/15) |
 | X-469 | User decision of 11/15 around 10:30 pm (D-174, retainer table X-196): « items for sale » also shows each retainer's list of items for sale Done when: a retainer's sale list (name, quantity, price, HQ) is read when its sale list is opened in the game (checked native read, « unavailable » if it does not fit, R08), kept per character and dated; the retainer table shows it under the retainer's row; a retainer never opened says « not read yet »; tests of the reading and storage; groundwork for « My listings » (X-208); in-game test. | Wanted (user decision, 11/15, with X-208) |
-| X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm: publish.sh says at each version how many versions wait for a review (X-391, threshold 8), as it already says the in-game test cap (R34) Done when: publish.sh and retour.py show « review: N/8 versions without review since x.y.z » at each version, with a warning at 7 and 8; same count as lance.py; self-test. | Indispensable, rank 4 (tool, idea chosen by the user) |
-| X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same guard as plan.py (X-401, no agent file path in the public plan) for the other sources of the public documents produced by document generation (decisions and their public blocks, CHANGELOG, TESTING, FAQ) Done when: every tool writing a public document's source refuses an agent file path with plan.py's message; check-docs also checks the produced documents; self-test of each tool. | Indispensable, rank 4 (tool, idea chosen by the user) |
+| X-470 | Tool, idea I-015 put on the plan by the user on 11/15… | Done in 0.1467.0 |
+| X-471 | Tool, idea I-014 put on the plan by the user on 11/15… | Done in 0.1467.0 |
 | X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho chat window side by side): the Tensho chat window loses the game's symbols: « Lysara Nocte [world icon] Alpha : THE UNDERGROOVE // November 22… » becomes « Lysara NocteAlpha:   // November 22… »; the icon between name and world and « THE UNDERGROOVE » written in the game's boxed letters (private-use characters of the game font, SeIconChar) are gone Done when: the game's special characters (boxed letters and digits, world and party icons, arrows, game-font symbols, IconPayload) show in the Tensho chat window as in the game (game font or icons served by Dalamud) or else as a readable equivalent (plain letters, world name written), never dropped; copying a message keeps readable text; ChatPieces test on a real message with those characters; in-game test. | Indispensable, rank 3 (visible bug, 11/15) |
 | X-473 | User request of 11/15 around 10:50 pm (Tensho chat window): tooltips for players, skills, items and statuses Done when: hovering a player's name shows their world, and job and level only if in the party or nearby (what the game already shows; nothing kept, R04); hovering an action, item or status name in a message (combat lines included) shows its icon and description from the game sheets (Action, Item, Status), like the game tooltip; display only, nothing counted or analysed in combat (R03.1); a name not surely recognised gets no tooltip (never a wrong one); tests of the name recognition; in-game test. | Wanted, rank 1 (user request, with X-447) |
 | X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the « Learn more here » of Dalamud's message (« Developer Mode is enabled ») is no longer a link (in the game it opens Dalamud's experimental settings) Done when: a Dalamud or plugin link (DalamudLinkPayload) shows underlined and, on click, does what it does in the game chat if Dalamud allows it (probe first: calling the link's handler from Tensho); otherwise it stays plain text with a tooltip « open this link from the game chat »; test; in-game test. | Wanted, rank 1 (chat window bug, 11/15) |
@@ -858,6 +858,17 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-476 | User request of 11/15 around 10:50 pm (two screenshots side by side, Tensho chat window and the game chat): more like the game chat, same layout, same kind of transparency, adding tabs and settings in the chat interface, a chat settings icon (only the chat settings, mirrored in the global settings) Done when: the Tensho chat window takes the game chat's layout (tabs at the bottom like the game, or by choice; time in brackets [22:47] like the game; same margins) and its transparency (very light background, readable text with outline, X-447 A2 and A3); at the end of the tabs a « + » adding a tab and a gear opening a small panel with only the chat settings (tabs, channels, colours, frame, lock, size, history), the same as in Tensho's Settings: a change on one side shows on the other (one settings source, test); picture of the window compared with a screenshot of the game chat; in-game test. | Wanted, rank 1 (user request, with X-447) |
 | X-477 | Display bug seen by the user on 11/15 around 10:55 pm (screenshot): Tensho chat window, the two icons at the end of the tabs (frame and lock, 0.1454) are badly framed in their button (shifted up, cut or squeezed against the edge) Done when: both icons are centred in buttons as tall as the tabs, with and without frame, at every text size, in French and English (the icons go through the common icon-button component, R10); picture declared and compared (R37); in-game test. | Wanted, rank 1 (display bug, 11/15) |
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for each tab's name (General, Combat…), to tell them apart at a glance Done when: each tab has a colour setting for its name (default: the current colour), in the chat settings panel and in Tensho's Settings (same source); the name stays readable on the active and inactive tab, in light and dark theme (contrast checked); reset to default; test; in-game test. | Wanted, rank 1 (user request, with X-447) |
+| X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in src/TenshoAssistant/Chat/ChatPieces.cs :17 (French detail in the French half; plan.py translate). Done when: the finding no longer holds, with a test that proves it. | Must-have: review bug (R27.2) |
+| X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11)… | Done in 0.1469 |
+| X-481 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I3: finding in src/TenshoAssistant/Beastmaster/BeastResult.cs :23 (French detail in the French half; plan.py translate). Done when: the finding no longer holds, with a test that proves it. | Must-have: review bug (R27.2) |
+| X-482 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11)… | Done in 0.1472 |
+| X-483 | Tool (defect seen by the user on 11/15 around 11:40 pm on the test page dashboard): seven old « readings » (D-83 to D-90, of 11/02) sit among the decisions to take while they are in-game checks with no choice Done when: the readings of the decisions list become tests of the page (D-85, D-87, D-88, D-89, D-90: one test each, with what to do, where and what to look at, no agent path) then are closed as decisions (note « became test … »); D-83 and D-84 are closed as covered by their versions' tests; the test tool can add a test with no plan point (same form as q.py releve); the dashboard counts only real decisions (open a/b choices), readings going to the tests; self-tests. | Indispensable, rank 1 (R13.3, tool defect found on 11/15) |
+| X-484 | User request of 11/15 around 11:45 pm (twelve screenshots of the game's « Log filters »: Chat, Battle by subject and type, Announcements): more filters if possible, beyond the game's Done when: each tab of the Tensho chat window filters at least as finely as the game: Chat (all channels, LS and CWLS 1 to 8 apart, standard and custom emotes), Battle by subject (you, party, alliance, other players, engaged enemies, other enemies, friendly NPCs, each one's companions and pets) and by type (damage dealt and taken, missed and evaded attacks, actions, items, heals, beneficial and detrimental effects, effects ending), Announcements (system messages, own and others' battle system messages, gathering, errors, echo, novice network, FC, PvP, markets, NPC dialogue and announcements, loot, progress, dice, own and others' synthesis and gathering, others' fishing, recruitment, signs, orchestrion, letters, alert, glamour); a battle line's subject and target read from the message's full type (probe first, R06: what Dalamud 15 gives); beyond the game: filters by word (keep or hide, case-sensitive or not), by player name (hide or highlight), hide others' mounts and teleports, and X-447's filters (alerts, repeats); presets « like the game », all on, all off; channels recognised or not cited in an evidence file; tests; in-game test. | Wanted, rank 1 (user request, with X-447) |
+| X-485 | User request of 11/15 around 11:55 pm (screenshot: the Tensho chat window drawn over Tensho's main window and the game windows): the chat stays in front of the game's and Tensho's interfaces; it must go behind or hide (chat setting) Done when: the Tensho chat window goes behind Tensho's other windows (never brought to the front by itself, NoBringToFrontOnFocus or draw order); before the game windows, which a Dalamud-drawn window cannot go under, a chat setting by choice: hide, turn transparent or step aside when a game or Tensho window covers it (same mechanism as the panels stepping aside), and come back by itself; clicks go to the window on top; tests; in-game test (Tensho main window, inventory, game map over the chat). | Wanted, rank 1 (user request, with X-447 D8) |
+| X-486 | User request of 11/16 around 0:20 am (four screenshots in the Beastmaster labyrinth: board layout step 1, team formation, the board's Knight and Bishop sheets, the Tensho panel showing the whole board at once): once on the team formation, an interface for each fight instead of everything at once, with the fight help Done when: before the team formation, the labyrinth panel first shows the current fight (step and encounter read from the game window, R08): its enemies with weakness, vulnerabilities, strength, intelligence, resistance and vitality stars, and their actions (target, damage type, area, interrupt, effect, from the game sheets, R06), then the three beasts advised for this fight with the reason; the rest of the board folded under « whole board »; the panel follows the step as it changes; still cut as soon as a fight starts (DEC-047, R03.2); linked to X-136; tests on a real board's data; in-game test. | Wanted, rank 1 (user request, with X-136) |
+| X-487 | Tool, user request of 11/16 around 0:30 am (the game's help covers the whole game; rule R06 completed the same evening): an index of the game's help and guide texts, searched before any in-game reading; the user adds (11/16 around 0:35 am) that the help is mostly in the official online guide, the Lodestone Play Guide Done when: the Lodestone play guide is the first online source: its pages are read by the agent when a point needs them (page link cited in the evidence, nothing copied into the plugin, no automatic reading by the plugin) and their list by topic is kept in the index; a read-only probe of the client sheets (window help, guides, tutorials, tips, descriptions of content and systems; the list of sheets probed and cited) writes an index in French and English, searchable by word (agent tool and command documented in tools/README.md), with each text's sheet, row and game version; redone after a patch; the version skill says to look it up before coding an unknown reading or asking for one; self-test on known texts (labyrinth, Grace, aetherial wheels). | Indispensable, rank 2 (tool asked by the user) |
+| X-488 | User request of 11/16 around 0:40 am: the test page dashboard (X-458) has « not enough stats »: quota used per day and per hour, versions per relay and per relay type, and more, plus what the agent finds useful Done when: a « Statistics » tab with charts and tables, measured figures only (R16), each with source and date: quota (5 h, week, Fable) per hour and per day, with the R26 floor and the reset; per relay: model and effort, duration, versions, points done, tests added, week and 5-hour quota used, quota per version, context at the end, stops and why; comparison by relay type (Opus high, very high, medium, Fable: quota per version and per point, rework, R26.5); versions and releases per day; plan progress over time (open and done points by class, added and closed per day); tests (passed, failed, could not, per day; versions never seen; delay from a version to its test); bugs found by the user, the reviewer and the agent, and their fix delay; review findings per block; CI (red runs, reruns, flaky tests); automated tests (count per version); user requests per day and delay to « done »; the agent's extra suggestions; sources read by the page tool, quota history kept at each reading; readable on a phone; self-test on made data. | Indispensable, rank 2 (tool asked by the user, with X-458) |
+| X-489 | Tool (defect found by relay 86 on 11/16 around 00:35): the produced GLOBAL-PLAN went over its 300 KB budget (308,805 bytes; 155 open points: 153 KB, 502 done points: 104 KB) and publish.sh --last stopped; the relay cut done points' titles from 80 to 60 characters (291,446 bytes, under 20 KB of room: the warning stays). Done when: a lasting answer chosen (for instance done points on a separate produced page, or open points' long definitions summed up in the table with the detail elsewhere), GLOBAL-PLAN under its budget with at least 20 KB of room, self-test and budget test. | Indispensable, rank 1 (R13.3, tool defect found on 11/16) |
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -970,7 +981,7 @@ Total avant la 1.0.0 (phases 1 à 6) : 101 points, compte produit par script dep
 |---|---|---|
 | Jardin | Ajouter les Bleuets à la liste de graines | Fait en 0.540 |
 | Objets | Blocs d'objets sans prix | Fait en 0.541 |
-| Escouade | Bouton d'alarme pour une mission en cours déjà présent : cloche de la ligne… | Fait |
+| Escouade | Bouton d'alarme pour une mission en cours déjà présent… | Fait |
 <!-- /gen:plan:phase-1 -->
 
 Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
@@ -982,46 +993,46 @@ Si l'une d'elles demande finalement un relevé en jeu, elle passe en phase 5.
 |---|---|---|---|
 | P1 | Zoom à l'ouverture, réglable et gardé entre les sessions |  | Fait en 0.542 |
 | P2 | Taille des étiquettes réglée à part de celle des icônes |  | Fait en 0.543 |
-| P3 | Éthérite la plus proche du drapeau ou d'un point, avec son coût |  | Fait en 0.544 |
+| P3 | Éthérite la plus proche du drapeau ou d'un point, avec son… |  | Fait en 0.544 |
 | P5 | Molette : zoom depuis toute la fenêtre et pas réglable |  | Fait en 0.545 |
 | P9 | ALEA : bonus d'expérience et couleur selon le temps restant |  | Fait en 0.548 |
-| P15 | État des lectures du jeu affiché sur la carte (R-14, partie carte) |  | Fait en 0.569 |
+| P15 | État des lectures du jeu affiché sur la carte (R-14, partie… |  | Fait en 0.569 |
 | P16 | Option : clic gauche sur la carte pour poser le drapeau |  | Fait en 0.546 |
 | P20 | Bouton « Couches » pour tout afficher ou masquer en un clic |  | Fait en 0.547 |
-| I0 | Compter les pièces portées dans les stocks et dans « possédé » |  | Fait en 0.549 |
-| I5 | Coût de préparation au prix du centre de données (option de A-06) |  | Fait en 0.574 |
-| I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis, Garland Tools… |  | Fait en 0.561 |
-| I9 | Copier le nom de l'objet et lien d'objet dans le chat (local) |  | Fait en 0.561 |
+| I0 | Compter les pièces portées dans les stocks et dans «… |  | Fait en 0.549 |
+| I5 | Coût de préparation au prix du centre de données (option de… |  | Fait en 0.574 |
+| I8 | X-07, partie anticipée : ouvrir l'objet sur Universalis… |  | Fait en 0.561 |
+| I9 | Copier le nom de l'objet et lien d'objet dans le chat… |  | Fait en 0.561 |
 | I15 | Partager un modèle de tri en texte (copier / coller) |  | Fait en 0.566 |
 | I16 | Commandes « /tensho objet » et « /tensho prix » |  | Fait en 0.555 |
-| I18 | I-07, partie anticipée : copier « prix le plus bas − 1 » depuis la page Marché |  | Fait en 0.567 |
+| I18 | I-07, partie anticipée : copier « prix le plus bas − 1 »… |  | Fait en 0.567 |
 | I19 | Nom anglais de l'objet dans la fiche et l'infobulle |  | Fait en 0.562 |
 | I20 | Aperçu du tri : cases déplacées signalées |  | Fait en 0.565 |
-| ~~I22~~ fait en 0.669 sans mesure en jeu | Calculs faits à chaque image (reportés à e) : coût de préparation et historique… |  | Fait en 0.669 |
-| C0 | A-01, partie anticipée : choisir la qualité visée dans le panneau du carnet… |  | Fait |
+| ~~I22~~ fait en 0.669 sans mesure en jeu | Calculs faits à chaque image (reportés à e) : coût de… |  | Fait en 0.669 |
+| C0 | A-01, partie anticipée : choisir la qualité visée dans le… |  | Fait |
 | C2 | Essayer ses séquences sauvegardées sur toutes les recettes |  | Fait en 0.552 |
-| C3 | Simuler un autre métier sans le porter : derniers attributs relevés par métier… |  | Fait en 0.554 |
-| C4 | Seuils d'attributs d'une séquence : Habileté, Contrôle et PS minimum |  | Fait en 0.553 |
-| C9 | R-02, partie anticipée : « possible maintenant ? » dans l'aide à la pêche |  | Fait en 0.568 |
-| ~~C12~~ fait en 0.669 | Qualité initiale calculée à partir des ingrédients HQ choisis |  | Fait en 0.669 |
-| C14 | A-12, partie anticipée : fiche de recette complète (livre de maître, synthèse… |  | Fait en 0.600 |
-| C15 | Simulateur plus direct : choix de la recette dans la page, résultat recalculé… |  | Fait en 0.572 |
-| C17 | Options d'export des macros : attentes séparées (X-12), son, écho final, icône |  | Fait en 0.573 |
-| C19 | Où sont mes matériaux : détail par rangement dans la préparation et la chaîne |  | Fait en 0.559 |
-| C24 | Besoin restant de la préparation dans les aides de récolte et de pêche |  | Fait en 0.560 |
+| C3 | Simuler un autre métier sans le porter : derniers attributs… |  | Fait en 0.554 |
+| C4 | Seuils d'attributs d'une séquence : Habileté, Contrôle et… |  | Fait en 0.553 |
+| C9 | R-02, partie anticipée : « possible maintenant ? » dans… |  | Fait en 0.568 |
+| ~~C12~~ fait en 0.669 | Qualité initiale calculée à partir des ingrédients HQ… |  | Fait en 0.669 |
+| C14 | A-12, partie anticipée : fiche de recette complète (livre… |  | Fait en 0.600 |
+| C15 | Simulateur plus direct : choix de la recette dans la page… |  | Fait en 0.572 |
+| C17 | Options d'export des macros : attentes séparées (X-12)… |  | Fait en 0.573 |
+| C19 | Où sont mes matériaux : détail par rangement dans la… |  | Fait en 0.559 |
+| C24 | Besoin restant de la préparation dans les aides de récolte… |  | Fait en 0.560 |
 | C31 | Météo de plusieurs zones en un tableau (zones favorites) |  | Fait en 0.563 |
-| C32 | Commandes « /tensho recolte » et « /tensho recette » (suite de I16) |  | Fait en 0.555 |
-| C35 | Aide à la pêche : lectures du jeu et premières tables hors de Draw |  | Fait en 0.604 |
-| C36 | R-14, partie artisanat et récolte : une aide illisible le dit au lieu de… |  | Fait en 0.601 |
+| C32 | Commandes « /tensho recolte » et « /tensho recette » (suite… |  | Fait en 0.555 |
+| C35 | Aide à la pêche : lectures du jeu et premières tables hors… |  | Fait en 0.604 |
+| C36 | R-14, partie artisanat et récolte : une aide illisible le… |  | Fait en 0.601 |
 | T3 | Quêtes : colonnes Niveau et Zone, tri et filtre de niveau |  | Fait en 0.550 |
-| T4 | Monstres : drapeau sur la position du monstre, pas au centre de la carte |  | Fait en 0.551 |
+| T4 | Monstres : drapeau sur la position du monstre, pas au… |  | Fait en 0.551 |
 | T16 | Tâches de servants : une ligne par servant, avec alarme |  | Fait en 0.570 |
 | T17 | Rappels cochés d'eux-mêmes quand le jeu le dit |  | Fait en 0.558 |
-| T18 | Discord : heure lue dans le fuseau de chaque membre, et balises [zone]… |  | Fait en 0.564 |
-| T19 | Alarmes : modifier le nom et l'heure, et « Me rappeler dans 5 min » |  | Fait en 0.557 |
+| T18 | Discord : heure lue dans le fuseau de chaque membre, et… |  | Fait en 0.564 |
+| T19 | Alarmes : modifier le nom et l'heure, et « Me rappeler dans… |  | Fait en 0.557 |
 | T20 | Alarmes : sonner aussi à l'heure exacte |  | Fait en 0.556 |
-| T23 | Compagnie libre : vaisseaux groupés par compagnie, ancien relevé effaçable… |  | Fait en 0.603 |
-| T28 | Collections : « Obtenus récemment » et menu des sources pour les emotes |  | Fait en 0.602 |
+| T23 | Compagnie libre : vaisseaux groupés par compagnie, ancien… |  | Fait en 0.603 |
+| T28 | Collections : « Obtenus récemment » et menu des sources… |  | Fait en 0.602 |
 | T29 | Mini Cactpot : table des gains prouvée et visible |  | Fait en 0.571 |
 <!-- /gen:plan:phase-2 -->
 
@@ -1032,23 +1043,23 @@ C12 passe en phase 5 : sa règle de calcul doit être comparée à la qualité i
 <!-- gen:plan:phase-3 -->
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| P10 | Recherche sur la carte (lieux, éthérites, PNJ, quêtes, ressources) |  | Fait en 0.597 |
+| P10 | Recherche sur la carte (lieux, éthérites, PNJ, quêtes… |  | Fait en 0.597 |
 | P12 | Noms écrits à côté des icônes, comme la carte du jeu |  | Fait en 0.596 |
-| I1 | Signaler et effacer le relevé d'un servant renvoyé ou d'un ancien rangement |  | Fait en 0.576 |
-| I3 | Prix des marchands PNJ dans le coût de préparation et sur la page Marché |  | Fait en 0.575 |
+| I1 | Signaler et effacer le relevé d'un servant renvoyé ou d'un… |  | Fait en 0.576 |
+| I3 | Prix des marchands PNJ dans le coût de préparation et sur… |  | Fait en 0.575 |
 | I11 | Vue en liste triable de la Banque |  | Fait en 0.594 |
 | I21 | Filtre de job et de set d'équipement dans les règles de tri |  | Fait en 0.595 |
-| C5 | Suivre sa séquence pendant la synthèse : action suivante et écart avec le plan |  | Fait en 0.589 |
-| C7 | R-13, partie anticipée : points à horaire ouverts maintenant ou bientôt |  | Fait en 0.588 |
-| C16 | Bibliothèque des séquences : recherche, renommer, dupliquer, copier et coller… |  | Fait en 0.590 |
-| C18 | Chaîne de fabrication : boutons par étape, étapes identiques regroupées, cases… |  | Fait en 0.591 |
+| C5 | Suivre sa séquence pendant la synthèse : action suivante et… |  | Fait en 0.589 |
+| C7 | R-13, partie anticipée : points à horaire ouverts… |  | Fait en 0.588 |
+| C16 | Bibliothèque des séquences : recherche, renommer… |  | Fait en 0.590 |
+| C18 | Chaîne de fabrication : boutons par étape, étapes… |  | Fait en 0.591 |
 | C21 | « Que puis-je fabriquer ? » avec mes stocks |  | Fait en 0.592 |
-| T0 | Alarmes en heure réelle : à la main, chaque jour, chaque semaine ou à chaque… |  | Fait en 0.577 |
+| T0 | Alarmes en heure réelle : à la main, chaque jour, chaque… |  | Fait en 0.577 |
 | T10 | Accueil : bloc « Aujourd'hui » et tuiles au choix |  | Fait en 0.599 |
-| T11 | Quêtes « disponibles maintenant » et quêtes de la zone actuelle |  | Fait en 0.582 |
-| T12 | Chemin vers une quête : prérequis restants, nombre et prochaine à faire |  | Fait en 0.583 |
+| T11 | Quêtes « disponibles maintenant » et quêtes de la zone… |  | Fait en 0.582 |
+| T12 | Chemin vers une quête : prérequis restants, nombre et… |  | Fait en 0.583 |
 | T14 | Équipement : préparer le plan d'un autre job que celui porté |  | Fait en 0.580 |
-| T15 | Revue de mode : tenue de la semaine choisie, essayée en un clic, avec l'endroit… |  | Fait en 0.581 |
+| T15 | Revue de mode : tenue de la semaine choisie, essayée en un… |  | Fait en 0.581 |
 | T24 | Discord : un salon par catégorie (plusieurs webhooks) |  | Fait en 0.598 |
 | T25 | Équipement : plusieurs plans nommés par job |  | Fait en 0.593 |
 <!-- /gen:plan:phase-3 -->
@@ -1079,8 +1090,8 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 <!-- gen:plan:phase-5-corrections -->
 | Où | Ce qu'il faut relever | Issue |
 |---|---|---|
-| Jardin | Un entretien et une récolte, pour reconnaître leurs messages ; puis retirer les… | Fait en 0.1110 |
-| Récolte | La régénération de PR pendant une récolte relevée le 2026-11-06 : aucune hausse… | Fait |
+| Jardin | Un entretien et une récolte, pour reconnaître leurs… | Fait en 0.1110 |
+| Récolte | La régénération de PR pendant une récolte relevée le… | Fait |
 <!-- /gen:plan:phase-5-corrections -->
 
 ### Récolte et pêche
@@ -1089,11 +1100,11 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
 | C33 | Une seule séance de relevés en jeu pour l'artisanat et la récolte, avant de coder | S-M |  |
-| ~~C27~~ fait en 0.647 | Classe du point (normal, éphémère, légendaire…) et livre de folklore requis |  | Fait en 0.647 |
+| ~~C27~~ fait en 0.647 | Classe du point (normal, éphémère, légendaire…) et livre de… |  | Fait en 0.647 |
 | ~~C28~~ fait en 0.663 | Durée de l'intuition et compte à rebours |  | Fait en 0.663 |
-| ~~C29~~ fait en 0.649 | R-15, partie anticipée : poissons au harpon dans la page Récolte |  | Fait en 0.649 |
+| ~~C29~~ fait en 0.649 | R-15, partie anticipée : poissons au harpon dans la page… |  | Fait en 0.649 |
 | C30 | Relevé local de vos prises et temps de touche personnels | M |  |
-| ~~C10~~ fait en 0.1011 | Chrono de touche relancé tout seul à chaque lancer (aide à la pêche et pêche en… |  | Fait en 0.1011 |
+| ~~C10~~ fait en 0.1011 | Chrono de touche relancé tout seul à chaque lancer (aide à… |  | Fait en 0.1011 |
 <!-- /gen:plan:phase-5-recolte-et-peche -->
 
 ### Artisanat
@@ -1101,9 +1112,9 @@ Une donnée n'est pas prouvée : le relevé précède le code. Ordre : par activ
 <!-- gen:plan:phase-5-artisanat -->
 | N° | Proposition | Taille | Précision |
 |---|---|---|---|
-| ~~C6~~ fait en 0.666 pour la simulation | Recettes à niveau ajusté, à qualité imposée et Exploration cosmique |  | Fait en 0.666 |
+| ~~C6~~ fait en 0.666 pour la simulation | Recettes à niveau ajusté, à qualité imposée et Exploration… |  | Fait en 0.666 |
 | ~~C13~~ fait en 0.668 | Chance HQ d'une qualité finale |  | Fait en 0.668 |
-| ~~C22~~ fait en 0.664 | Projets de l'atelier de compagnie libre : matériaux par pièce et par phase |  | Fait en 0.664 |
+| ~~C22~~ fait en 0.664 | Projets de l'atelier de compagnie libre : matériaux par… |  | Fait en 0.664 |
 <!-- /gen:plan:phase-5-artisanat -->
 
 ### Carte
@@ -1277,22 +1288,22 @@ Choisis par l'utilisateur à partir de la liste de rubriques d'un site français
 | Point | Sujet | État |
 |---|---|---|
 | W-01 | Page Commandes spéciales : clients, rang, points, semaine | Fait en 0.675 |
-| W-02 | Grande Mascarade : épreuves faites et restantes, sans conseil de combat | Fait en 0.683 |
+| W-02 | Grande Mascarade : épreuves faites et restantes, sans… | Fait en 0.683 |
 | W-03 | Armes reliques : progression par extension | Fait |
 | W-04 | Animaux de la Félicité insulaire | Fait en 0.685 |
-| W-05 | Panneaux à l'écran : matériaux du projet d'atelier et liste de préparation… | Fait en 0.691 |
-| W-06 | « Que puis-je fabriquer ? » : trier par le plus rentable en gils, assignats ou… | Fait en 0.707 |
+| W-05 | Panneaux à l'écran : matériaux du projet d'atelier et liste… | Fait en 0.691 |
+| W-06 | « Que puis-je fabriquer ? » : trier par le plus rentable en… | Fait en 0.707 |
 | W-07 | « Que puis-je fabriquer ? » : compter les sous-recettes | Fait en 0.696 |
 | W-08 | Mandats : clic droit vers l'éthérite la plus proche | Fait en 0.698 |
-| W-09 | Liste de suivi par provenance (récolte, PNJ, monstre, autre), atelier et… | Fait en 0.699 |
+| W-09 | Liste de suivi par provenance (récolte, PNJ, monstre… | Fait en 0.699 |
 | W-10 | Peuples alliés : rang et quêtes de chaque peuple | Fait en 0.713 |
 | W-11 | Grande compagnie : rang, sceaux et missions sur une page | Fait en 0.714 |
-| W-12 | Livraisons spéciales : Cristarium, Académie de Sharlayan, Bazar aux Mille Perles | Fait en 0.715 |
-| W-13 | Reliques suivantes : Anima, Eurêka, Résistance, Manderville, fantômes, et leurs… | Fait |
-| W-14 | Eureka et Bozja : ALEA, escarmouches, affrontements cruciaux, rapports du… | Fait en 0.717 |
-| W-15 | Donjons profonds : Palais des morts, Pilier des cieux, Eureka Orthos… | Fait en 0.718 |
-| W-16 | Lexique des mots du jeu, français et anglais, à partir de ses feuilles | Fait en 0.719 |
-| W-14b | ALEA de toutes les zones ouvertes, lieu et niveau, d'après les fichiers de zone | Fait en 0.721 |
+| W-12 | Livraisons spéciales : Cristarium, Académie de Sharlayan… | Fait en 0.715 |
+| W-13 | Reliques suivantes : Anima, Eurêka, Résistance… | Fait |
+| W-14 | Eureka et Bozja : ALEA, escarmouches, affrontements… | Fait en 0.717 |
+| W-15 | Donjons profonds : Palais des morts, Pilier des cieux… | Fait en 0.718 |
+| W-16 | Lexique des mots du jeu, français et anglais, à partir de… | Fait en 0.719 |
+| W-14b | ALEA de toutes les zones ouvertes, lieu et niveau, d'après… | Fait en 0.721 |
 <!-- /gen:plan:w -->
 
 ## Demandes du 2026-11-07, en jouant
@@ -1302,170 +1313,170 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 <!-- gen:plan:x -->
 | Point | Demande | État |
 |---|---|---|
-| X-01 | Lourdeur : trouver ce qui bloque une image de Tensho (120 à 230 ms toutes les… | Fait en 0.1329.0 |
-| X-02 | Données gardées plus longtemps, relues seulement si absentes ; réglages qui… | Fait en 0.750.0 |
+| X-01 | Lourdeur : trouver ce qui bloque une image de Tensho (120 à… | Fait en 0.1329.0 |
+| X-02 | Données gardées plus longtemps, relues seulement si… | Fait en 0.750.0 |
 | X-03 | Lien « Ouvrir dans Tensho » d'une alarme : n'ouvre rien | Fait en 0.837.0 |
-| X-04 | Au point de récolte, mettre en évidence les objets dont les listes de suivi… | Fait en 0.751 |
-| X-05 | Listes de suivi d'artisanat et d'atelier rassemblées par zone de récolte | Fait en 0.752 |
-| X-06 | « Récolter automatiquement » coché dans la fenêtre du jeu : le plan ne garde… | Fait en 0.753 |
-| X-07 | « Que puis-je fabriquer ? » : un objet faisable par deux métiers compté une fois | Fait en 0.739 |
-| X-08 | Infobulle d'un point à horaire (carte) : « fermé maintenant » sans dire dans… | Fait en 0.754 |
-| X-09 | Listes de suivi d'artisanat et d'atelier : un bouton qui ajoute les alarmes de… | Fait en 0.755 |
-| X-10 | Aide à la récolte : se placer d'abord sur un objet dont les listes de suivi ont… | Fait en 0.756 |
+| X-04 | Au point de récolte, mettre en évidence les objets dont les… | Fait en 0.751 |
+| X-05 | Listes de suivi d'artisanat et d'atelier rassemblées par… | Fait en 0.752 |
+| X-06 | « Récolter automatiquement » coché dans la fenêtre du jeu… | Fait en 0.753 |
+| X-07 | « Que puis-je fabriquer ? » : un objet faisable par deux… | Fait en 0.739 |
+| X-08 | Infobulle d'un point à horaire (carte) : « fermé maintenant… | Fait en 0.754 |
+| X-09 | Listes de suivi d'artisanat et d'atelier : un bouton qui… | Fait en 0.755 |
+| X-10 | Aide à la récolte : se placer d'abord sur un objet dont les… | Fait en 0.756 |
 | X-11 | Listes de suivi : pouvoir replier chaque zone de récolte | Fait en 0.757 |
-| X-12 | Listes de suivi par zone : la zone où l'on se trouve en premier, puis les… | Fait en 0.757 |
-| X-13 | Listes de suivi : les objets des points à horaire (alarmes) dans leur propre… | Fait en 0.758 |
-| X-14 | Groupe « Points à horaire » des listes de suivi : dire pour chaque objet si son… | Fait en 0.761 |
-| X-15 | Menu du clic droit d'un objet : « Y aller » directement (point de récolte… | Fait en 0.762 |
-| X-16 | Plan de PR : à rendement égal, préférer les actions qui durent toute la… | Fait en 0.763 |
-| X-17 | Panneau de suivi réduit : l'aide perd « Vos listes en demandent encore » et le… | Fait en 0.764 |
-| X-18 | Journal des gils : icônes (gils, catégories) et moins de « Autre » : trouver… | Fait en 0.1418 |
-| X-19 | Journal des gils : un dépôt chez un servant compté comme dépense ; le total des… | Fait en 0.769 |
-| X-20 | Objets déposés chez un servant, dans les sacoches ou au coffre de compagnie… | Fait en 0.770 |
-| X-21 | « Ajouter les alarmes » proposait 19 alarmes, dont des objets déjà complets en… | Fait en 0.772 |
-| X-22 | Butin des monstres, lignes du wiki « Monstre · niveau · Zone (x,y) » : pas de… | Fait en 0.777 |
+| X-12 | Listes de suivi par zone : la zone où l'on se trouve en… | Fait en 0.757 |
+| X-13 | Listes de suivi : les objets des points à horaire (alarmes)… | Fait en 0.758 |
+| X-14 | Groupe « Points à horaire » des listes de suivi : dire pour… | Fait en 0.761 |
+| X-15 | Menu du clic droit d'un objet : « Y aller » directement… | Fait en 0.762 |
+| X-16 | Plan de PR : à rendement égal, préférer les actions qui… | Fait en 0.763 |
+| X-17 | Panneau de suivi réduit : l'aide perd « Vos listes en… | Fait en 0.764 |
+| X-18 | Journal des gils : icônes (gils, catégories) et moins de «… | Fait en 0.1418 |
+| X-19 | Journal des gils : un dépôt chez un servant compté comme… | Fait en 0.769 |
+| X-20 | Objets déposés chez un servant, dans les sacoches ou au… | Fait en 0.770 |
+| X-21 | « Ajouter les alarmes » proposait 19 alarmes, dont des… | Fait en 0.772 |
+| X-22 | Butin des monstres, lignes du wiki « Monstre · niveau ·… | Fait en 0.777 |
 | X-23 | Alarmes : l'envoi sur Discord désactivé par défaut | Fait en 0.778 |
-| X-24 | Après un chargement du plugin, les objets de monstres passent un moment en «… | Fait en 0.779 |
-| X-25 | **Gel du jeu, 15:18:45** : le solveur Raphael (natif) panique sur une division… | Fait en 0.782 |
-| X-26 | « Comparer les prochains coups » sur une recette en haute qualité impossible… | Fait en 0.784 |
-| X-27 | Les listes de suivi doivent pouvoir n'afficher que les objets finis (les objets… | Fait en 0.785 |
-| X-28 | Atelier de compagnie : tenir compte de ce qui est déjà livré au projet ; «… | Fait en 0.787 |
-| X-29 | Carnet de synthèse : en Menuisier sur une recette de Métallurgie (Lingot de… | Fait en 0.788 |
-| X-30 | Voir les étapes de fabrication qui restent (objets intermédiaires à fabriquer)… | Fait en 0.789 |
-| X-31 | « Fabrications restantes » : chaque étape doit pouvoir se déplier jusqu'à… | Fait en 0.790 |
-| X-32 | Carte : trouver une solution au blocage contourné en ouvrant puis fermant la… | Fait en 0.793 |
-| X-33 | Rangements, « Que faire avec ? » : régler les prix comme « Que puis-je… | Fait en 0.794 |
-| X-34 | Monstres proches (table des objets du jeu), information seulement : règle… | Fait en 0.795 |
-| X-35 | Monstres proches : ceux qui lâchent un objet demandé par les listes de suivi… | Fait en 0.795 |
+| X-24 | Après un chargement du plugin, les objets de monstres… | Fait en 0.779 |
+| X-25 | **Gel du jeu, 15:18:45** : le solveur Raphael (natif)… | Fait en 0.782 |
+| X-26 | « Comparer les prochains coups » sur une recette en haute… | Fait en 0.784 |
+| X-27 | Les listes de suivi doivent pouvoir n'afficher que les… | Fait en 0.785 |
+| X-28 | Atelier de compagnie : tenir compte de ce qui est déjà… | Fait en 0.787 |
+| X-29 | Carnet de synthèse : en Menuisier sur une recette de… | Fait en 0.788 |
+| X-30 | Voir les étapes de fabrication qui restent (objets… | Fait en 0.789 |
+| X-31 | « Fabrications restantes » : chaque étape doit pouvoir se… | Fait en 0.790 |
+| X-32 | Carte : trouver une solution au blocage contourné en… | Fait en 0.793 |
+| X-33 | Rangements, « Que faire avec ? » : régler les prix comme «… | Fait en 0.794 |
+| X-34 | Monstres proches (table des objets du jeu), information… | Fait en 0.795 |
+| X-35 | Monstres proches : ceux qui lâchent un objet demandé par… | Fait en 0.795 |
 | X-36 | Monstres proches : ceux qui manquent au carnet de chasse | Fait en 0.796 |
-| X-37 | Monstres proches : cibles des mandats acceptés et des ALÉA en cours | Fait en 0.797 |
-| X-38 | Mage bleu : monstres proches qui apprennent une compétence pas encore apprise… | Fait en 0.798 |
-| X-39 | Dresseur : monstres proches du bestiaire du dresseur, même affichage et mêmes… | Fait en 0.804 |
-| X-40 | Monstres proches : autres usages à proposer, et des réglages cohérents à… | Fait en 0.1002 |
-| X-41 | Monstres proches : ceux qui lâchent un objet de collection qui manque (monture… | Fait en 0.800 |
+| X-37 | Monstres proches : cibles des mandats acceptés et des ALÉA… | Fait en 0.797 |
+| X-38 | Mage bleu : monstres proches qui apprennent une compétence… | Fait en 0.798 |
+| X-39 | Dresseur : monstres proches du bestiaire du dresseur, même… | Fait en 0.804 |
+| X-40 | Monstres proches : autres usages à proposer, et des… | Fait en 0.1002 |
+| X-41 | Monstres proches : ceux qui lâchent un objet de collection… | Fait en 0.800 |
 | X-42 | Avant la phase 7 : prendre les réglages de l'utilisateur et en faire les valeurs par défaut | Abandonné le 2026-11-07 à la demande de l'utilisateur (« garde valeur par défaut cohérente ») : les valeurs par défaut restent celles du code, rien n'a été publié |
 | X-43 | Base locale de découvertes : relever ce qui est à portée (monstres et leurs lieux, butin, sorts bleus appris, captures du dresseur, points de récolte, pêche…) pour compléter les outils ; options de débogage mais actif hors débogage ; import (fusion avec la nôtre) et export, pour ne plus dépendre des données communautaires à force de jouer | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). Cadre accepté le 2026-11-07 (« Oui, ce cadre ») : fichier local, provenance par entrée, aucun autre joueur, rien d'envoyé, pas d'aide au combat, coupé en JcJ, import … [détail](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md#x-43) |
-| X-44 | Carnet d'artisanat : pas de menu Tensho au clic droit, ni sur une recette de la… | Fait en 0.808 |
-| X-45 | Carte : des marchands d'événement sont affichés alors qu'ils ne sont pas là en… | Fait en 0.810 |
-| X-46 | Carte : le zoom ne reste pas toujours celui qu'on a réglé ; à faire juste avant… | Fait en 0.850 |
-| X-47 | Récompenses de quête (fenêtre de la quête) : ni panneau Tensho sous… | Fait en 0.852 |
-| X-48 | Carte : le clic droit sur la cible d'une quête (« Cible indiquée par le jeu… | Fait en 0.853 |
-| X-49 | Carte : la cible de quête ne disparaît pas après validation de la quête… | Fait en 0.813 |
-| X-50 | Carte : les icônes de bord de carte doivent passer au-dessus de tout (cachées… | Fait en 0.814 |
-| X-51 | Panneau des collectionnables : surligner sur les barres de raccourcis les… | Fait en 0.815 |
-| X-52 | Base de découvertes : les prix vus au tableau des ventes remplacent Universalis… | Fait en 0.817 |
-| X-53 | Monstres proches : le yak laineux et le loaghtan (lait de yak, viande de… | Fait en 0.828.0 |
-| X-54 | À l'ouverture d'un autre rangement que l'inventaire (servant, sacoche du… | Fait en 0.820 |
-| X-55 | Listes de suivi d'artisanat et d'atelier : préciser quand l'objet n'est pas sur… | Fait en 0.822 |
-| X-56 | Listes de suivi d'artisanat et d'atelier : à la place de « téléportation 219… | Fait en 0.824 |
+| X-44 | Carnet d'artisanat : pas de menu Tensho au clic droit, ni… | Fait en 0.808 |
+| X-45 | Carte : des marchands d'événement sont affichés alors… | Fait en 0.810 |
+| X-46 | Carte : le zoom ne reste pas toujours celui qu'on a réglé… | Fait en 0.850 |
+| X-47 | Récompenses de quête (fenêtre de la quête) : ni panneau… | Fait en 0.852 |
+| X-48 | Carte : le clic droit sur la cible d'une quête (« Cible… | Fait en 0.853 |
+| X-49 | Carte : la cible de quête ne disparaît pas après validation… | Fait en 0.813 |
+| X-50 | Carte : les icônes de bord de carte doivent passer… | Fait en 0.814 |
+| X-51 | Panneau des collectionnables : surligner sur les barres de… | Fait en 0.815 |
+| X-52 | Base de découvertes : les prix vus au tableau des ventes… | Fait en 0.817 |
+| X-53 | Monstres proches : le yak laineux et le loaghtan (lait de… | Fait en 0.828.0 |
+| X-54 | À l'ouverture d'un autre rangement que l'inventaire… | Fait en 0.820 |
+| X-55 | Listes de suivi d'artisanat et d'atelier : préciser quand… | Fait en 0.822 |
+| X-56 | Listes de suivi d'artisanat et d'atelier : à la place de «… | Fait en 0.824 |
 | X-57 | Carte, quête de cuisinier à Limsa : la cible (au bon endroit) et l'icône de quête ne sont pas au même endroit, la quête affichée tombe hors de la zone, et elle n'apparaît pas sur la carte du Tillac (captures du 2026-11-07, la carte du jeu montre le lien vers le Tillac) | Indispensable avant l'annonce (tri du 13/11, accepté par l'utilisateur). En attente d'une lecture en jeu (relais 53, 14/11) : sondé, « Une faim en queue de poisson » (2606) a l'étape 1 au Bismarck (X 10,2 Y 8,2) et l'étape 2 aux Sept Sauges (X 11,6 Y 8,0) : l'icône vue le 08/11 était celle de l'étape d'avant, liste de la fenêtre périmée, que 0.848 (X-70) remplace par la liste de quêtes du jeu ; jamais revu en jeu depuis. Essai : une quête de classe à étapes dans Limsa, carte de Tensho et carte du jeu côte à côte à chaque étape, et la carte du Tillac quand l'objectif y est ; ligne « Reading questMarkers » du journal (mode développeur) si l'écart revient. [détail](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/GLOBAL-PLAN-X-2026-11-09.md#x-57) |
-| X-58 | Menu Tensho du clic droit sur un objet : ajouter sa recette à une liste… | Fait en 0.826 |
-| X-59 | Listes de suivi, points à horaire : retirer « ouvert » / « fermé », garder le… | Fait en 0.827 |
-| X-60 | Listes de suivi, clic droit sur un objet : « Placer le drapeau » absent quand… | Fait en 0.830 |
-| X-61 | Aide à la récolte : pas de plan proposé, « objet lu après une dépense de PR sur… | Fait en 0.831 |
-| X-62 | Alarmes ajoutées depuis une liste de suivi : elles sonnent encore quand la… | Fait en 0.832 |
-| X-63 | « Y aller » vers une zone sans éthérite (Arrière-pays dravanien) : téléporter à… | Fait en 0.833 |
-| X-64 | Listes de suivi, clic droit : ni « Y aller » ni « Placer le drapeau » pour… | Fait en 0.834 |
-| X-65 | Liste de suivi d'artisanat (Marrons glacés) : le sirop de bouleau, ingrédient… | Fait en 0.838 |
-| X-66 | Encadré des rangements (X-54) : chez le servant, il encadre le vin de cuisine… | Fait en 0.839 |
-| X-67 | Carte de Tensho : signaler qu'une cible est plus haut ou plus bas, comme la… | Fait en 0.842 |
-| X-68 | Carte de Tensho : la zone de la quête de cuisinier (Mor Dhona) « ne se fait pas… | Fait en 0.846.0 |
-| X-69 | Carte de Tensho : « la map ne se rafraîchit pas assez » : la quête est passée à… | Fait en 0.847 |
-| X-70 | Carte de Tensho : la zone de la nouvelle étape d'une quête manque tant que la… | Fait en 0.848 |
-| X-71 | Carte de Tensho : reprendre les icônes plus haut / plus bas de la carte du jeu… | Fait en 0.849 |
-| X-72 | Base de découvertes (parseurs) : vérifier qu'elle est efficace, l'utilisateur a… | Fait en 0.856 |
-| X-73 | 0.1003 (revérification du 2026-11-09 : base de l'utilisateur et sources… | Fait en 0.887.0 |
-| X-73.1 | Marché : prix vus sur chaque monde visité du centre de données, préférés à… | Fait en 0.857 |
-| X-73.2 | Marché : historiques de ventes fusionnés d'une ouverture à l'autre (vitesse de… | Fait en 0.858 |
-| X-73.3 | Pêche : drapeaux du carnet du jeu (« sans condition d'heure ni de météo ») à la… | Fait en 0.859 |
-| X-73.4 | Revue de mode : thème et catégories lus dans le jeu (FashionCheckManager) au… | Fait en 0.861 |
-| X-73.5 | Désynthèse et réduction : objets obtenus de quel objet (AgentSalvage… | Fait en 0.860 |
+| X-58 | Menu Tensho du clic droit sur un objet : ajouter sa recette… | Fait en 0.826 |
+| X-59 | Listes de suivi, points à horaire : retirer « ouvert » / «… | Fait en 0.827 |
+| X-60 | Listes de suivi, clic droit sur un objet : « Placer le… | Fait en 0.830 |
+| X-61 | Aide à la récolte : pas de plan proposé, « objet lu après… | Fait en 0.831 |
+| X-62 | Alarmes ajoutées depuis une liste de suivi : elles sonnent… | Fait en 0.832 |
+| X-63 | « Y aller » vers une zone sans éthérite (Arrière-pays… | Fait en 0.833 |
+| X-64 | Listes de suivi, clic droit : ni « Y aller » ni « Placer le… | Fait en 0.834 |
+| X-65 | Liste de suivi d'artisanat (Marrons glacés) : le sirop de… | Fait en 0.838 |
+| X-66 | Encadré des rangements (X-54) : chez le servant, il encadre… | Fait en 0.839 |
+| X-67 | Carte de Tensho : signaler qu'une cible est plus haut ou… | Fait en 0.842 |
+| X-68 | Carte de Tensho : la zone de la quête de cuisinier (Mor… | Fait en 0.846.0 |
+| X-69 | Carte de Tensho : « la map ne se rafraîchit pas assez »… | Fait en 0.847 |
+| X-70 | Carte de Tensho : la zone de la nouvelle étape d'une quête… | Fait en 0.848 |
+| X-71 | Carte de Tensho : reprendre les icônes plus haut / plus bas… | Fait en 0.849 |
+| X-72 | Base de découvertes (parseurs) : vérifier qu'elle est… | Fait en 0.856 |
+| X-73 | 0.1003 (revérification du 2026-11-09 : base de… | Fait en 0.887.0 |
+| X-73.1 | Marché : prix vus sur chaque monde visité du centre de… | Fait en 0.857 |
+| X-73.2 | Marché : historiques de ventes fusionnés d'une ouverture à… | Fait en 0.858 |
+| X-73.3 | Pêche : drapeaux du carnet du jeu (« sans condition d'heure… | Fait en 0.859 |
+| X-73.4 | Revue de mode : thème et catégories lus dans le jeu… | Fait en 0.861 |
+| X-73.5 | Désynthèse et réduction : objets obtenus de quel objet… | Fait en 0.860 |
 | X-73.6 | Tâches des servants : récompenses vues (AgentRetainerTask) | Fait en 0.860 |
 | X-73.7 | Coffres des missions : objets vus par mission (Loot.Items) | Fait en 0.860 |
 | X-73.8 | Voyages : butin par secteur (déjà lu dans l'atelier) | Fait en 0.862 |
-| X-73.9 | Mage bleu et dresseur : sort appris et bête apprivoisée, avec le monstre | Fait en 0.863 |
-| X-73.10 | Pêche : prises (appât, mooch, lieu), temps de touche, conditions vues ; sondes… | Fait en 0.971 |
-| X-73.11 | Butin des monstres : objets reçus après la mort de sa cible (le plus risqué… | Fait en 0.860 |
-| X-73.12 | Le reste selon la carte : coffres d'objets, ALÉA récompenses, panoramas… | Fait en 0.864 |
-| X-73.13 | Demande du 2026-11-08 (« oui tous en faisant tests en jeu nécessaires »)… | Fait en 0.869 |
-| X-73.14 | Offres vues marquées « à moi / pas à moi » (numéro de servant comparé aux… | Fait en 0.870 |
-| X-73.15 | Table centre de données → région depuis les feuilles du jeu (WorldDCGroupType)… | Fait en 0.871 |
-| X-73.16 | Lieu des marchands absents des feuilles : noté à l'ouverture de leur boutique… | Fait en 0.872 |
-| X-73.17 | Butin des coffres des donjons sans fond, d'Eurêka et de Bozja | Fait en 0.873 |
-| X-73.18 | Après les relevés de X-73.13 : temps et type de touche, mooch, Intuition et… | Fait en 0.887 |
-| X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter le plus de parseurs… | Fait |
-| X-75 | Demande du 2026-11-08 : un test pour chaque sonde ; revérifier qu'aucune sonde… | Fait |
-| X-75.1 | Un test pour chaque sonde : liste des parties de la capture figée par un test… | Fait en 0.874 |
-| X-75.2 | « Vu en jeu » d'abord partout où la donnée apprise existe déjà : page Monstres… | Fait en 0.875 |
-| X-75.3 | Pêche : prise au mooch notée avec le poisson moochés (et non l'appât), leurre… | Fait en 0.877 |
-| X-75.4 | Mage bleu : monstres vus lançant un sort (barre d'incantation), niveaux des… | Fait en 0.878 |
-| X-75.5 | Autres pages : fêtes « vues du … au … », lieux des ALÉA vus sur la page des… | Fait en 0.879 |
-| X-75.6 | Calculs du jeu à la place des formules communautaires : durées des voyages de… | Fait en 0.880 |
-| X-75.7 | Nouvelles sondes en mode développeur, puis parseurs après les relevés : animaux… | Fait en 0.881 |
+| X-73.9 | Mage bleu et dresseur : sort appris et bête apprivoisée… | Fait en 0.863 |
+| X-73.10 | Pêche : prises (appât, mooch, lieu), temps de touche… | Fait en 0.971 |
+| X-73.11 | Butin des monstres : objets reçus après la mort de sa cible… | Fait en 0.860 |
+| X-73.12 | Le reste selon la carte : coffres d'objets, ALÉA… | Fait en 0.864 |
+| X-73.13 | Demande du 2026-11-08 (« oui tous en faisant tests en jeu… | Fait en 0.869 |
+| X-73.14 | Offres vues marquées « à moi / pas à moi » (numéro de… | Fait en 0.870 |
+| X-73.15 | Table centre de données → région depuis les feuilles du jeu… | Fait en 0.871 |
+| X-73.16 | Lieu des marchands absents des feuilles : noté à… | Fait en 0.872 |
+| X-73.17 | Butin des coffres des donjons sans fond, d'Eurêka et de… | Fait en 0.873 |
+| X-73.18 | Après les relevés de X-73.13 : temps et type de touche… | Fait en 0.887 |
+| X-74 | Consigne de nuit (2026-11-08, l'utilisateur dort) : ajouter… | Fait |
+| X-75 | Demande du 2026-11-08 : un test pour chaque sonde… | Fait |
+| X-75.1 | Un test pour chaque sonde : liste des parties de la capture… | Fait en 0.874 |
+| X-75.2 | « Vu en jeu » d'abord partout où la donnée apprise existe… | Fait en 0.875 |
+| X-75.3 | Pêche : prise au mooch notée avec le poisson moochés (et… | Fait en 0.877 |
+| X-75.4 | Mage bleu : monstres vus lançant un sort (barre… | Fait en 0.878 |
+| X-75.5 | Autres pages : fêtes « vues du … au … », lieux des ALÉA vus… | Fait en 0.879 |
+| X-75.6 | Calculs du jeu à la place des formules communautaires… | Fait en 0.880 |
+| X-75.7 | Nouvelles sondes en mode développeur, puis parseurs après… | Fait en 0.881 |
 | X-75.8 | Hors parseur : PaissaDB (lire la pancarte demande un crochet : règle Dalamud, accord de l'utilisateur d'abord), ferrage utilisé (crochet), boutique Mog Station, dates futures, mondes jamais visités : restent aux sources communautaires | Noté |
-| X-77 | Demande du 2026-11-08 : si possible, un système qui passe par Git pour envoyer… | Fait en 0.882 |
-| X-77.1 | Retour de l'utilisateur (2026-11-08) : « le système actuel pour import export… | Fait en 0.883 |
-| X-78 | Demande du 2026-11-08 (capture de la carte de Tensho, La Mer de Rubis) : garder… | Fait en 0.890 |
-| X-79 | Demande du 2026-11-08 (essai du harpon) : la liste du panneau de harpon doit… | Fait en 0.891 |
-| X-80 | Demande du 2026-11-08 (capture du filtre de la carte) : « Points de récolte »… | Fait en 0.895 |
+| X-77 | Demande du 2026-11-08 : si possible, un système qui passe… | Fait en 0.882 |
+| X-77.1 | Retour de l'utilisateur (2026-11-08) : « le système actuel… | Fait en 0.883 |
+| X-78 | Demande du 2026-11-08 (capture de la carte de Tensho, La… | Fait en 0.890 |
+| X-79 | Demande du 2026-11-08 (essai du harpon) : la liste du… | Fait en 0.891 |
+| X-80 | Demande du 2026-11-08 (capture du filtre de la carte) : «… | Fait en 0.895 |
 | X-81 | Essai en jeu du sertissage forcé (X-75.7) | Fait en 0.899 |
-| X-82 | Essai en jeu de la revue de mode (X-75.7) et retour de l'utilisateur : menu du… | Fait en 0.900 |
-| X-83 | Retour de l'utilisateur (2026-11-08, sur l'île à côté d'un monstre : aucune… | Fait en 0.901 |
-| X-84 | Essai en jeu du courrier (X-75.7) : une lettre avec un objet et 1 gil | Fait en 0.903 |
-| X-85 | Document « a faire » de l'utilisateur (2026-11-08), pêche en mer (priorités… | Fait en 0.964.0 |
-| X-86 | 0.966 : case « quêtes pas encore disponibles » (clic droit et réglages). 0.967… | Fait en 0.966 |
-| X-87 | 0.968 : zone d'un mandat acceptée retirée quand ce mandat est en cours (et… | Fait en 0.968 |
-| X-88 | 0.969 : 256 catégories par zone, ajout d'un groupe entier de catégories… | Fait en 0.969 |
-| X-89 | 0.970 : extension des quêtes (donnée du jeu) dans leur info-bulle et leur fiche… | Fait en 0.970 |
-| X-90 | 0.996 : bestiaire des donjons profonds par la même lecture du wiki (page de… | Fait en 0.996 |
-| X-91 | 0.971 : parseurs revérifiés (`docs/evidence/x91-parsers-check.md`) : un seul… | Fait en 0.971 |
-| X-92 | 0.1001 : inventaire des listes figées dans le code : seule celle des… | Fait en 0.1001 |
-| X-93 | Demande du 2026-11-08 : « prévisions pour une masse de données conséquente… | Fait en 0.1040.0 |
-| X-94 | 0.960 : cause trouvée et corrigée (le numéro d'un lieu de pêche était cherché… | Fait en 0.960 |
-| X-95 | 0.950 : première cause trouvée et corrigée (liste des vendeurs de la carte… | Fait en 0.950 |
-| X-96 | 0.959 : cause trouvée et corrigée (zones à météo individuelle — histoire non… | Fait en 0.959 |
-| X-97 | 0.982 : réponse de l'utilisateur (DEC-045) : vu dans l'aide à la pêche ; sous… | Fait en 0.982 |
-| X-98 | V2 points et V6 relevé des assignats (0.964) : points de chaque prise lus dans… | Fait |
-| X-99 | Revue du 2026-11-09 (DEC-045), signalement : après une téléportation, les… | Fait en 0.977 |
-| X-100 | 0.999 (DEC-048) : Paramètres en sept onglets (Général, Panneaux à côté du jeu… | Fait en 0.999 |
-| X-101 | Idée retenue (DEC-045, de C-09) : alerte quand un objet de la liste de souhaits… | Fait en 0.1000 |
-| X-102 | Idée retenue (DEC-045, de C-15) : progression des succès suivis gardée sur… | Fait en 0.987 |
-| X-103 | Idée retenue (DEC-045, de C-14) : bouton « Préparer » qui envoie les objets des… | Fait en 0.988 |
-| X-104 | Idée retenue (DEC-045, de C-05) : pièces manquantes d'une tenue ajoutées d'un… | Fait en 0.989 |
-| X-105 | Idée retenue (DEC-045, de I-12) : filtre par job dans la liste des objets… | Fait en 0.991 |
-| X-106 | Idée retenue (DEC-045, de C-01) : état « fait » des contenus gardé par… | Fait en 0.990 |
-| X-107 | Idée retenue (DEC-045, de I-04) : gils gagnés ou dépensés aujourd'hui dans la… | Fait en 0.986 |
+| X-82 | Essai en jeu de la revue de mode (X-75.7) et retour de… | Fait en 0.900 |
+| X-83 | Retour de l'utilisateur (2026-11-08, sur l'île à côté d'un… | Fait en 0.901 |
+| X-84 | Essai en jeu du courrier (X-75.7) : une lettre avec un… | Fait en 0.903 |
+| X-85 | Document « a faire » de l'utilisateur (2026-11-08), pêche… | Fait en 0.964.0 |
+| X-86 | 0.966 : case « quêtes pas encore disponibles » (clic droit… | Fait en 0.966 |
+| X-87 | 0.968 : zone d'un mandat acceptée retirée quand ce mandat… | Fait en 0.968 |
+| X-88 | 0.969 : 256 catégories par zone, ajout d'un groupe entier… | Fait en 0.969 |
+| X-89 | 0.970 : extension des quêtes (donnée du jeu) dans leur… | Fait en 0.970 |
+| X-90 | 0.996 : bestiaire des donjons profonds par la même lecture… | Fait en 0.996 |
+| X-91 | 0.971 : parseurs revérifiés… | Fait en 0.971 |
+| X-92 | 0.1001 : inventaire des listes figées dans le code : seule… | Fait en 0.1001 |
+| X-93 | Demande du 2026-11-08 : « prévisions pour une masse de… | Fait en 0.1040.0 |
+| X-94 | 0.960 : cause trouvée et corrigée (le numéro d'un lieu de… | Fait en 0.960 |
+| X-95 | 0.950 : première cause trouvée et corrigée (liste des… | Fait en 0.950 |
+| X-96 | 0.959 : cause trouvée et corrigée (zones à météo… | Fait en 0.959 |
+| X-97 | 0.982 : réponse de l'utilisateur (DEC-045) : vu dans l'aide… | Fait en 0.982 |
+| X-98 | V2 points et V6 relevé des assignats (0.964) : points de… | Fait |
+| X-99 | Revue du 2026-11-09 (DEC-045), signalement : après une… | Fait en 0.977 |
+| X-100 | 0.999 (DEC-048) : Paramètres en sept onglets (Général… | Fait en 0.999 |
+| X-101 | Idée retenue (DEC-045, de C-09) : alerte quand un objet de… | Fait en 0.1000 |
+| X-102 | Idée retenue (DEC-045, de C-15) : progression des succès… | Fait en 0.987 |
+| X-103 | Idée retenue (DEC-045, de C-14) : bouton « Préparer » qui… | Fait en 0.988 |
+| X-104 | Idée retenue (DEC-045, de C-05) : pièces manquantes d'une… | Fait en 0.989 |
+| X-105 | Idée retenue (DEC-045, de I-12) : filtre par job dans la… | Fait en 0.991 |
+| X-106 | Idée retenue (DEC-045, de C-01) : état « fait » des… | Fait en 0.990 |
+| X-107 | Idée retenue (DEC-045, de I-04) : gils gagnés ou dépensés… | Fait en 0.986 |
 | X-108 | Demande du 2026-11-09 : parseur du jardinage pour combler les trous par découverte, croisements inclus. Plan : 1) relevé en jeu d'une récolte qui donne des graines (lignes du chat, objets) ; 2) nouvelles sortes de découvertes : pousse observée (plantation → maturité : heures réelles par graine), entretien observé (intervalle), récolte (graine plantée → objets et quantités), croisement (graine obtenue ≠ graine plantée, avec les graines des emplacements voisins notées au journal) ; 3) partage communautaire (outil de fusion à jour) ; 4) le journal et la grille des croisements complétés par ces relevés, la source communautaire (nick75g) gardée en repli et marquée ; graines manquantes (Bleuets) depuis les feuilles | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). Relevé en jeu d'abord (table des rappels) ; après X-97 |
-| X-109 | 0.981 : panneau à côté du plateau du jeu (avant l'entrée, et dans le Dédale… | Fait en 0.981 |
-| X-110 | 0.984 : page Dresseur, colonne du lieu : « (n lieux vus) » avec le menu des… | Fait en 0.984 |
-| X-111 | 0.983 : le composant commun existe depuis la 0.704 (PlaceMenu : clic droit… | Fait en 0.983 |
-| X-112 | Constat de l'audit des tests du 2026-11-09 (n° 0), noté en 0.1019 : les flèches… | Fait en 0.1041 |
-| X-76 | Demande du 2026-11-08 : nettoyage complet du code (« ne plus avoir de chose qui… | Fait |
-| X-113 | Découvertes partagées : quand un ticket n'apporte aucun fait nouveau (gist… | Fait en 0.1029 |
-| X-114 | Demande du 2026-11-10 : carte de Tensho seulement (pas la carte du jeu : sa… | Fait en 0.1049 |
-| X-115 | Demande du 2026-11-10 : outil de base cartographique du client, sans Dalamud… | Fait en 0.1028 |
-| X-116 | Demande du 2026-11-10, suite de X-115 (B et C) : base complète par version… | Fait en 0.1029 |
-| X-117 | Demande du 2026-11-10, suite de X-115 (D) : dans le plugin, au premier… | Fait en 0.1048 |
-| X-118 | Demande du 2026-11-10, plan 4 choisi par l'utilisateur (application de bureau… | Fait en 0.1030 |
+| X-109 | 0.981 : panneau à côté du plateau du jeu (avant l'entrée… | Fait en 0.981 |
+| X-110 | 0.984 : page Dresseur, colonne du lieu : « (n lieux vus) »… | Fait en 0.984 |
+| X-111 | 0.983 : le composant commun existe depuis la 0.704… | Fait en 0.983 |
+| X-112 | Constat de l'audit des tests du 2026-11-09 (n° 0), noté en… | Fait en 0.1041 |
+| X-76 | Demande du 2026-11-08 : nettoyage complet du code (« ne… | Fait |
+| X-113 | Découvertes partagées : quand un ticket n'apporte aucun… | Fait en 0.1029 |
+| X-114 | Demande du 2026-11-10 : carte de Tensho seulement (pas la… | Fait en 0.1049 |
+| X-115 | Demande du 2026-11-10 : outil de base cartographique du… | Fait en 0.1028 |
+| X-116 | Demande du 2026-11-10, suite de X-115 (B et C) : base… | Fait en 0.1029 |
+| X-117 | Demande du 2026-11-10, suite de X-115 (D) : dans le plugin… | Fait en 0.1048 |
+| X-118 | Demande du 2026-11-10, plan 4 choisi par l'utilisateur… | Fait en 0.1030 |
 | X-119 | Suite de X-118 (plan 4), étapes 1 à 4 : 1) application jeu fermé, pages de données (objets, recettes, météo, lexique, découvertes, collections depuis les fichiers enregistrés) ; 2) lien local avec le plugin (canal nommé, utilisateur courant seulement, aucun port réseau, désactivé par défaut ; état lu sur le thread du framework, copié, envoyé hors du thread, R07) et pages en direct ; 3) actions sur clic seulement, exécutées par le plugin comme le bouton en jeu (drapeau, demande de téléportation, alarmes, listes) ; 4) réglage par page : dans le jeu, dans l'application ou les deux ; la carte, les panneaux attachés aux fenêtres du jeu, l'aide de récolte, l'artisanat en direct et la Revue de mode restent en jeu. Application distribuée à part (release GitHub), jamais lancée ni contenue par le plugin ; synchro (demande du 2026-11-10, R33) : l'application et le plugin portent le même numéro, se construisent, se testent (toutes les pages dessinées hors du jeu dans Verify) et se publient ensemble ; chaque release porte l'application, Verify -Release refuse sans elle ; l'application vérifie sa compatibilité avec le plugin installé | Souhaitable avant l'annonce, rang 2 (tri du 13/11). Objectif : Tensho sur un 2e écran (accepté le 11/11). Fait : étape 1 (0.1031), lien (0.1081), protocole 2 (0.1114), catégories (0.1119), copie miroir par catégorie et magasins dessus (0.1131, première tranche avec X-151). Reste : autres catégories (personnages, journal des gils, succès, missions, découvertes), reste de X-151 (hôte encore par réflexion), étape 3 (actions, canal à deux sens), étape 4 (réglage par page), point d'entrée des polices ; les magasins de l'application sont en lecture seule de fait jusqu'à l'étape 3 ; choix de l'utilisateur du 12/11 pour l'étape 3 : l'application peut créer ou changer les données de Tensho (alarmes, listes, outils, réglages) seulement quand le lien avec le jeu est actif ; chaque action de l'application est transmise au plugin, qui l'applique et l'enregistre lui-même (l'application n'écrit jamais elle-même) ; rien n'est envoyé au jeu ; jeu fermé : lecture seule (X-180) |
-| X-120 | Demande du 2026-11-10, revue le même jour par l'utilisateur : plan 2 seulement… | Fait en 0.1032 |
-| X-121 | Demande du 2026-11-10 : mise à jour automatique de l'application de bureau… | Fait en 0.1033 |
-| X-122 | Décisions de l'utilisateur du 2026-11-10 (séance des décisions) à coder dans le… | Fait en 0.1045 |
-| X-123 | Décision D-100 de l'utilisateur (2026-11-10) : code de conduite… | Fait en 0.1033 |
-| X-124 | Accord de l'utilisateur du 2026-11-10 (« je te donne l'accord pour tout ») pour… | Fait en 0.1035 |
-| X-125 | Accord de l'utilisateur du 2026-11-10 (« oui ») : PluginUiTest essayé sur 4 ou… | Fait en 0.1036 |
-| X-126 | Demande de l'utilisateur du 2026-11-11 : installer l'application de bureau… | Fait en 0.1113 |
-| X-127 | Demande du 2026-11-11 : liste de souhaits en outil à part, avec son entrée dans… | Fait en 0.1106 |
-| X-128 | Demande du 2026-11-11 (capture) : carte de Tensho, la case « Quêtes pas encore… | Fait en 0.1107 |
-| X-129 | Demande du 2026-11-11 (capture, Graines de pommier luisant) : aide à la… | Fait en 0.1108 |
-| X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à partir du jardin… | Fait en 0.1109 |
-| X-132 | Demande du 2026-11-11 : alarmes du jardin (maturité, entretien, d'après le… | Fait en 0.1160 |
-| X-133 | Demande du 2026-11-11 : alarmes de rappel dans un onglet « Alarmes » de l'outil… | Fait en 0.1159 |
+| X-120 | Demande du 2026-11-10, revue le même jour par l'utilisateur… | Fait en 0.1032 |
+| X-121 | Demande du 2026-11-10 : mise à jour automatique de… | Fait en 0.1033 |
+| X-122 | Décisions de l'utilisateur du 2026-11-10 (séance des… | Fait en 0.1045 |
+| X-123 | Décision D-100 de l'utilisateur (2026-11-10) : code de… | Fait en 0.1033 |
+| X-124 | Accord de l'utilisateur du 2026-11-10 (« je te donne… | Fait en 0.1035 |
+| X-125 | Accord de l'utilisateur du 2026-11-10 (« oui »)… | Fait en 0.1036 |
+| X-126 | Demande de l'utilisateur du 2026-11-11 : installer… | Fait en 0.1113 |
+| X-127 | Demande du 2026-11-11 : liste de souhaits en outil à part… | Fait en 0.1106 |
+| X-128 | Demande du 2026-11-11 (capture) : carte de Tensho, la case… | Fait en 0.1107 |
+| X-129 | Demande du 2026-11-11 (capture, Graines de pommier luisant)… | Fait en 0.1108 |
+| X-130 | Demande du 2026-11-11 : jardin, prévisions de croisement à… | Fait en 0.1109 |
+| X-132 | Demande du 2026-11-11 : alarmes du jardin (maturité… | Fait en 0.1160 |
+| X-133 | Demande du 2026-11-11 : alarmes de rappel dans un onglet «… | Fait en 0.1159 |
 | X-134 | Demande du 2026-11-11 (terreau thanalan 3) : plan de PR de l'aide à la récolte, objets récoltables une seule fois par point (une prise comptée, essais suivants sur l'objet le plus utile) et objets dont la quantité ne peut pas être augmentée (aucune dépense de PR proposée pour la quantité) ; d'abord les données du jeu, sinon vos relevés | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). En partie en 0.1167 et 0.1175 (journal en mode développeur des nombres de la fenêtre Gathering, jusqu'à 200, jamais ses textes). Reste : relevé de l'utilisateur sur un point avec un objet « RARE » (essai de 0.1175), puis aucune PR proposée pour sa quantité |
 | X-135 | Demande du 2026-11-11 (plateau 1 du Dédale bestial) : lire le résultat du plateau (XBMResult : score, chemin, cibles, bonus ; expérience et gains de rang de chaque bête ; butin XBMContentsBooty, XBMContentsTreasure) et reprendre les rangs des bêtes dans la page Dresseur et l'aide | Souhaitable avant l'annonce, rang 7 (tri du 13/11). Résultat du plateau fait en 0.1163 (score, rang et expérience de chaque bête, fenêtre XBMResult, rangs repris par le Dresseur) ; reste : le butin (XBMContentsBooty, XBMContentsTreasure, relevés le 12/11 dans notes de l'agent) |
-| X-136 | Demande du 2026-11-11 : aide du Dédale bestial plus cohérente : équipe choisie selon les faiblesses et statistiques de l'ennemi, un conseil par combat du plateau si possible, bêtes à faire monter pour les plateaux suivants proposées, combos des bêtes mis en évidence avant le combat, et en combat surlignage des compétences de combo Instinct II selon la bête invoquée (option, coupée par défaut) | Souhaitable avant l'annonce, rang 8 (tri du 13/11). À faire ; relais 31 : la suite demande des données non établies (combos d'Instinct II ; sens des colonnes 3 et 4 de XBMContent ; « rang 1 à 5 » du 1er plateau alors que les bêtes y sont au rang 6) : relevé ou source à trouver d'abord (R06, rien de deviné) |
-| X-137 | Choix de l'utilisateur du 2026-11-11 (« oui mais en pvp et classement »)… | Fait en 0.1115 |
-| X-138 | Demande du 2026-11-11 (capture, Forêt centrale) : carte de Tensho, menu du clic… | Fait en 0.1166 |
+| X-136 | Demande du 2026-11-11 : aide du Dédale bestial plus cohérente : équipe choisie selon les faiblesses et statistiques de l'ennemi, un conseil par combat du plateau si possible, bêtes à faire monter pour les plateaux suivants proposées, combos des bêtes mis en évidence avant le combat, et en combat surlignage des compétences de combo Instinct II selon la bête invoquée (option, coupée par défaut) | Souhaitable avant l'annonce, rang 8 (tri du 13/11). À faire ; relais 31 : la suite demande des données non établies (combos d'Instinct II ; sens des colonnes 3 et 4 de XBMContent ; « rang 1 à 5 » du 1er plateau alors que les bêtes y sont au rang 6) : relevé ou source à trouver d'abord (R06, rien de deviné) ; rappel de l'utilisateur du 16/11 vers 0 h 25 : « les aides du jeu peuvent t'aider pour pas mal de choses » : chercher d'abord dans les aides du jeu (bouton « ? » de la Disposition du plateau et de la Formation de l'équipe, fiches d'ennemis, info-bulles des vulnérabilités, feuilles d'aide et de guide du client) le sens des données manquantes (combos d'Instinct II, colonnes de XBMContent, rangs du 1er plateau) avant tout relevé, sources citées (R06) |
+| X-137 | Choix de l'utilisateur du 2026-11-11 (« oui mais en pvp et… | Fait en 0.1115 |
+| X-138 | Demande du 2026-11-11 (capture, Forêt centrale) : carte de… | Fait en 0.1166 |
 | X-140 | Audit A01 et A03 (audit GPT du 11/11… | Fait en 0.1117 |
 | X-141 | Audit A02 (audit GPT du 11/11… | Fait en 0.1118 |
 | X-142 | Audit A04, A05, A09 (audit GPT du 11/11… | Fait en 0.1122 |
@@ -1476,63 +1487,63 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-147 | Audit A14 (audit GPT du 11/11… | Fait en 0.1217 |
 | X-148 | Fait en partie en 0.1215 : actions des workflows épinglées par empreinte (A16) ; A15 fait en 0.1120 (X-150). latest.zip de Dalamud non épinglé (décision du 13/11) mais vérifié dans la CI en 0.1336 (scripts/Get-Dalamud.ps1 : version publiée par goatcorp, niveau d'API de global.json, empreinte écrite au journal). Reste, priorité basse : CodeQL sur l'application de bureau (net10.0-windows, référence PluginUiTest.Host : un job Windows, à essayer en suivant la CI) | Souhaitable avant l'annonce, rang 21 (tri du 13/11). Décision de l'utilisateur du 13/11 vers 11 h 10 : latest.zip de Dalamud non épinglé (Dalamud ne publie pas d'empreinte : une empreinte gardée casserait la CI à chaque mise à jour). Reste : CodeQL de l'application de bureau (job Windows), à essayer en suivant la CI. Avant l'annonce, priorité basse. |
 | X-139 | Demande du 2026-11-11 : PluginUiTest (dépôt Shigu330/PluginUiTest) montre le rendu des fenêtres : image PNG de chaque fenêtre dessinée à côté du rapport, et en option une fenêtre d'aperçu à l'écran ; nouvelle version de l'outil | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire, dernière priorité |
-| X-149 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1119 |
-| X-150 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1120 |
-| X-151 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le… | Fait en 0.1238 |
+| X-149 | revue GPT du 11/11… | Fait en 0.1119 |
+| X-150 | revue GPT du 11/11… | Fait en 0.1120 |
+| X-151 | revue GPT du 11/11… | Fait en 0.1238 |
 | X-152 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le code par la maître, acceptée par l'utilisateur (« Oui, ajoute tout ») : messages d'état harmonisés dans toutes les pages (« en attente », « source désactivée », « donnée ancienne », « échec »), en français et en anglais, repli des langues partielles vérifié | Fondu dans X-154 le 12/11 (plan visuel accepté par l'utilisateur) |
 | X-153 | revue GPT du 11/11 (C:\Plugins-ff14-plan-2026-11-11-2dddccb), vérifiée dans le code par la maître, acceptée par l'utilisateur (« Oui, ajoute tout ») : branchement et libération des services de Plugin.cs extraits par famille (bureau ou persistance d'abord), mesuré par les chemins qui installent ou libèrent un même service et les erreurs à la fermeture Fait quand : chaque famille de services de Plugin.cs (bureau, persistance, barre du serveur, panneaux, découvertes, puis les lecteurs du jeu domaine par domaine) a son fichier Plugin.<Famille>.cs, avec un seul chemin d'installation et un seul de libération par service, dans l'ordre d'avant, et son test de famille qui compte ces chemins ; aucune image de page changée ; Plugin.cs n'installe plus de lecteur du jeu lui-même. Une tranche par version. | Souhaitable avant l'annonce, rang 1 (tri du 13/11). Tranche 1 faite en 0.1225 (famille bureau, Plugin.Desktop.cs, DesktopFamily1225Tests) ; tranche 2 faite en 0.1239 (persistance : TenshoData, banque et son pont, Plugin.Persistence.cs, PersistenceFamily1239Tests) ; tranche 3 faite en 0.1240 (barre serveur, Plugin.ServerBar.cs, ServerBarFamily1240Tests) ; tranche 4 faite en 0.1249 (panneaux, Plugin.Panels.cs, PanelFamily1249Tests) ; tranche 5 faite en 0.1250 (découvertes : magasin, échange GitHub, chargement avec les prix vus, Plugin.Discoveries.cs, DiscoveriesFamily1250Tests) ; reste : lecteurs du jeu (≈ 35, entremêlés avec leurs services dans tout le constructeur : à découper par domaine, récolte, artisanat, compagnie, collections…, une tranche par domaine, même mesure ; le guetteur d'objets des découvertes avec eux) ; priorité basse (avant X-139) |
-| X-154 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1255 |
-| X-155 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1261 |
-| X-156 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1267 |
-| X-157 | plan visuel GPT du 12/11 (C:\Plugins-ff14-plan-visuel-2026-11-12-3b1d717)… | Fait en 0.1272 |
-| X-158 | Demande de l'utilisateur du 12/11 (captures, Le Viaduc 020, Phare des Brasseurs… | Fait en 0.1128 |
-| X-159 | Demande de l'utilisateur du 12/11 (chasse au trésor du 12/11 vers 0 h 35, sans… | Fait en 0.1174 |
-| X-160 | Demande de l'utilisateur du 12/11 : carte de Tensho, les ALÉA ont l'icône des… | Fait en 0.1268 |
-| X-161 | Demande de l'utilisateur du 12/11 : carte de Tensho seulement : icônes… | Fait en 0.1262 |
-| X-162 | Demande de l'utilisateur du 12/11 (capture) : barre d'infos serveur… | Fait en 0.1129 |
-| X-163 | Demande de l'utilisateur du 12/11 : les alarmes (rappels, jardinage et autres… | Fait en 0.1156 |
-| X-164 | Demande de l'utilisateur du 12/11 (capture de la barre d'outils de la carte)… | Fait en 0.1130 |
-| X-176 | Demande de l'utilisateur du 12/11 (« une secondaire de plus, que pour le… | Fait en 0.1345.0 |
-| X-165 | Demande de l'utilisateur du 12/11 (« ta recommandation semble bien ») : tableau… | Fait en 0.1247 |
-| X-166 | R01 (audit GPT du 12/11 (C:\Plugins-ff14-audit-2026-11-12-42a2db0), vérifié par… | Fait en 0.1133 |
-| X-167 | R03 (audit GPT du 12/11 (C:\Plugins-ff14-audit-2026-11-12-42a2db0), vérifié par… | Fait en 0.1134 |
-| X-168 | R04 (audit GPT du 12/11 (C:\Plugins-ff14-audit-2026-11-12-42a2db0), vérifié par… | Fait en 0.1146 |
-| X-169 | R05 et R06 (audit GPT du 12/11 (C:\Plugins-ff14-audit-2026-11-12-42a2db0)… | Fait en 0.1141 |
-| X-170 | Compléments de l'audit GPT du 12/11 (C:\Plugins-ff14-audit-2026-11-12-42a2db0)… | Fait en 0.1145 |
+| X-154 | plan visuel GPT du 12/11… | Fait en 0.1255 |
+| X-155 | plan visuel GPT du 12/11… | Fait en 0.1261 |
+| X-156 | plan visuel GPT du 12/11… | Fait en 0.1267 |
+| X-157 | plan visuel GPT du 12/11… | Fait en 0.1272 |
+| X-158 | Demande de l'utilisateur du 12/11 (captures, Le Viaduc 020… | Fait en 0.1128 |
+| X-159 | Demande de l'utilisateur du 12/11 (chasse au trésor du… | Fait en 0.1174 |
+| X-160 | Demande de l'utilisateur du 12/11 : carte de Tensho, les… | Fait en 0.1268 |
+| X-161 | Demande de l'utilisateur du 12/11 : carte de Tensho… | Fait en 0.1262 |
+| X-162 | Demande de l'utilisateur du 12/11 (capture) : barre d'infos… | Fait en 0.1129 |
+| X-163 | Demande de l'utilisateur du 12/11 : les alarmes (rappels… | Fait en 0.1156 |
+| X-164 | Demande de l'utilisateur du 12/11 (capture de la barre… | Fait en 0.1130 |
+| X-176 | Demande de l'utilisateur du 12/11 (« une secondaire de… | Fait en 0.1345.0 |
+| X-165 | Demande de l'utilisateur du 12/11 (« ta recommandation… | Fait en 0.1247 |
+| X-166 | R01 (audit GPT du 12/11… | Fait en 0.1133 |
+| X-167 | R03 (audit GPT du 12/11… | Fait en 0.1134 |
+| X-168 | R04 (audit GPT du 12/11… | Fait en 0.1146 |
+| X-169 | R05 et R06 (audit GPT du 12/11… | Fait en 0.1141 |
+| X-170 | Compléments de l'audit GPT du 12/11… | Fait en 0.1145 |
 | X-171 | Partie 1 | Fait en 0.1333 |
-| X-172 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; « je suis le seul a… | Fait en 0.1149.0 |
-| X-173 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; « je suis le seul a… | Fait en 0.1149 |
-| X-174 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; « je suis le seul a… | Fait en 0.1137.0 |
-| X-175 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; « je suis le seul a… | Fait en 0.1161 |
-| X-177 | Constat de la maître du 2026-11-12 (dalamud.log du jour) : saccades signalées… | Fait en 0.1281.0 |
-| X-178 | Demande de l'utilisateur du 2026-11-12 (capture de Jardinage › Journal… | Fait en 0.1259 |
-| X-179 | Constat de l'utilisateur du 2026-11-12 (« entretien manuel ne met pas à jour… | Fait en 0.1165 |
-| X-180 | Revue N1 (haute) : revue de la nuit du 12/11 (notes de l'agent, dossier de la… | Fait en 0.1168 |
-| X-181 | Revue N2, N7, N8, N29, N30 : revue de la nuit du 12/11 (notes de l'agent… | Fait en 0.1171 |
-| X-182 | Revue N3, N4, N9, N11, N26, N27, N28 : revue de la nuit du 12/11 (notes de… | Fait en 0.1173 |
-| X-183 | Revue N5, N12, N13, N14, N16, N17 : revue de la nuit du 12/11 (notes de… | Fait en 0.1210 |
-| X-184 | Revue N6, N21, N15, N20, N22 : revue de la nuit du 12/11 (notes de l'agent… | Fait en 0.1209 |
-| X-185 | Revue N10, N18, N19, N23, N24, N25 : revue de la nuit du 12/11 (notes de… | Fait en 0.1213 |
-| X-186 | Choix de l'utilisateur du 2026-11-12 (« Oui, ignore-les », constat N31 de la… | Fait en 0.1170 |
-| X-187 | Demande de l'utilisateur du 2026-11-12 : tri visuel des sacs par Tensho… | Fait en 0.1172 |
-| X-188 | Demande de l'utilisateur du 2026-11-12 (sur l'île de Lunule, « le tous » : les… | Fait en 0.1178 |
-| X-189 | Demande de l'utilisateur du 2026-11-12 (sur l'île de Lunule, « le tous » : les… | Fait en 0.1179 |
+| X-172 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; «… | Fait en 0.1149.0 |
+| X-173 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; «… | Fait en 0.1149 |
+| X-174 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; «… | Fait en 0.1137.0 |
+| X-175 | Choix de l'utilisateur du 12/11 (« Oui, retiens tout » ; «… | Fait en 0.1161 |
+| X-177 | Constat de la maître du 2026-11-12 (dalamud.log du jour)… | Fait en 0.1281.0 |
+| X-178 | Demande de l'utilisateur du 2026-11-12 (capture de… | Fait en 0.1259 |
+| X-179 | Constat de l'utilisateur du 2026-11-12 (« entretien manuel… | Fait en 0.1165 |
+| X-180 | Revue N1 (haute) : revue de la nuit du 12/11 (notes de… | Fait en 0.1168 |
+| X-181 | Revue N2, N7, N8, N29, N30 : revue de la nuit du 12/11… | Fait en 0.1171 |
+| X-182 | Revue N3, N4, N9, N11, N26, N27, N28 : revue de la nuit du… | Fait en 0.1173 |
+| X-183 | Revue N5, N12, N13, N14, N16, N17 : revue de la nuit du… | Fait en 0.1210 |
+| X-184 | Revue N6, N21, N15, N20, N22 : revue de la nuit du 12/11… | Fait en 0.1209 |
+| X-185 | Revue N10, N18, N19, N23, N24, N25 : revue de la nuit du… | Fait en 0.1213 |
+| X-186 | Choix de l'utilisateur du 2026-11-12 (« Oui, ignore-les »… | Fait en 0.1170 |
+| X-187 | Demande de l'utilisateur du 2026-11-12 : tri visuel des… | Fait en 0.1172 |
+| X-188 | Demande de l'utilisateur du 2026-11-12 (sur l'île de… | Fait en 0.1178 |
+| X-189 | Demande de l'utilisateur du 2026-11-12 (sur l'île de… | Fait en 0.1179 |
 | X-190 | Demande de l'utilisateur du 2026-11-12 (sur l'île de Lunule, « le tous » : les quatre aides proposées ; suite du point LUNULE ; relevé notes de l'agent ; Occult Crescent Helper et Phantom Job Switcher sous AGPL : lecture seule, jamais copiés ; R03 : montrer et conseiller, jamais jouer à la place du joueur) : progression du savoir occulte (niveau, 465/2800 jusqu'au suivant) et des pièces d'argent et d'or (ce qu'on peut acheter avec, d'après les feuilles du marchand de l'île) ; progression des archives occultes dans les Collections (CollectionKind.OccultLore existe déjà : ajouter le compte et ce qui manque) ; tests. Priorité : avec X-188 | Souhaitable avant l'annonce, rang 4 (tri du 13/11). En grande partie en 0.1178 : bouton par pièce de l'île → Rangements › Que faire avec ? ; « Archives occultes lues : N / M » et « Voir ce qui manque » ; pièces dans le panneau de l'île. Reste : le niveau de savoir (aucun champ de l'état du jeu : KnowledgeLevelSync vaut 0 à 465/2800 ; MKDGrowData ne contient pas 2800 ; preuve 0.1178-occult-panel.md) : un relevé en jeu de plus (niveau affiché par le jeu contre le savoir) dira d'où le tirer ; relevé de l'utilisateur du 15/11 vers 20 h 54 sur l'île (capture des fenêtres du jeu et « Reading fields ») : le jeu affiche niveau de savoir 3, 465/2800, et un drapeau « 3 » à côté ; Tensho lit 465/2800 mais sync 0 : le niveau 3 n'est toujours dans aucun champ lu ; Paladin fantôme niveau 2, 240/2400 : Tensho lit niveau 2 et 240, mais « needed 0 » au lieu de 2400 (NeededJobExperience vide ou mal placé) ; argent 270 et or 12 justes |
-| X-191 | Constat de l'utilisateur du 2026-11-12 (« État 81 % Symbiose 0 % », sur l'île… | Fait en 0.1177 |
+| X-191 | Constat de l'utilisateur du 2026-11-12 (« État 81 %… | Fait en 0.1177 |
 | X-192 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-01, accepté le 12/11) : livraisons expertes de la Grande Compagnie : à l'onglet expert, pour chaque objet : sceaux, pièce d'un set, va à l'armoire, valeur au marché et mise en garde « vaut plus en gils », sceaux restants avant le plafond du grade ; ligne « sceaux » dans le panneau sous l'infobulle ; hors fenêtre, liste des sacs « estimée » tant que la règle d'admission n'est pas relevée ; rien n'est rendu à la place du joueur | Souhaitable avant l'annonce, rang 9 (tri du 13/11). À faire : sonde de l'onglet expert (AddonGrandCompanySupplyList), nouveau lecteur ; GCSupplyDutyReward, GrandCompanyRank ; règle d'admission déclarée inconnue tant que non relevée |
 | X-193 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-02, accepté le 12/11) : planificateur de ventures : pour chaque servant (métier, niveau, statistiques si connues), les ventures ciblées possibles, quantité à chaque palier, valeur au marché au clic, gain par venture comparé à l'exploration rapide (butin vu dans les Découvertes) ; le joueur choisit dans le jeu Terme de l'utilisateur : « tâches des servants » (pas « ventures »). | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : feuilles RetainerTask, RetainerTaskNormal, RetainerTaskParameter, RetainerTaskRandom ; statistiques du servant lues servant ouvert ; relevé en jeu des seuils de palier |
 | X-194 | Choix de l'utilisateur déjà fait (GAPS M-13), retrouvé le 2026-11-12 par la comparaison aux plugins (K-03) : solveur Faux Hollows (mini-jeu hebdomadaire d'Idyllshire) : case la plus utile surlignée sur le plateau 6×6, comme le Mini Cactpot ; rappel hebdomadaire dans Rappels et l'état des personnages | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : AddonWeeklyPuzzle (plateau), PlayerState (FauxHollowsState, FauxHollowsTimestamp) ; motifs énumérés par Tensho ou source citée ; « inconnu » si un motif manque ; relevé en jeu du plateau |
 | X-195 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-04, accepté le 12/11) : pêche : son (et ligne facultative) à la touche, différent pour !, !! et !!!, réglage par force ; lu en mémoire comme en 0.887, sans paquet réseau ; le joueur ferre lui-même | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : FishingHookStrength (292 à 294) déjà lu ; sons des alarmes ; vérifier « !!! » en jeu (séance C30) |
-| X-196 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-05, accepté… | Fait en 0.1411 |
+| X-196 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1411 |
 | X-197 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-06, accepté le 12/11) : panneau sous l'infobulle : ligne « désynthèse » (métier, niveau de l'objet, votre niveau, au-dessus ou en dessous) et ligne « coffret » (tout obtenu ou il manque n), chacune coupable L'utilisateur précise (12/11) : « on a déjà désynthèse et les paquets de cartes » : vérifier par Grep ce que le panneau montre déjà et n'ajouter que ce qui manque (niveau comparé, autres coffrets). | Souhaitable avant l'annonce, rang 11 (tri du 13/11). À faire : Item.LevelItem, Item.ClassJobRepair, PlayerState.GetDesynthesisLevel ; ItemSupplement (LuminaSupplemental) croisé avec les collections ; calcul une fois par objet |
 | X-198 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-07, accepté le 12/11) : tâches personnelles avec condition, cochées quand Tensho l'observe : avoir N × objet (tous rangements), monnaie ≥ N, mission terminée, monture/tenue/carte obtenue ; « inconnu » tant que la donnée n'a pas été lue | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : PersonalTasks + ItemHoldings, Currencies, DutyProgressReader, état des collections ; ALÉA exclues |
 | X-199 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-08, accepté le 12/11) : Parcelles : phase de la loterie (inscriptions ou résultats) et sa fin, lues dans PaissaDB ; bouton « J'ai participé » qui pose une alarme à l'ouverture des résultats ; vérifier la couverture des mondes européens (le code dit NA seulement) L'utilisateur joue sur Chaos (Europe) : vérifier que PaissaDB couvre Chaos et corriger « serveurs NA seulement » dans Community/PaissaDb.cs. | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : afficher LottoPhase et PhaseUntil (déjà lus) ; alarme Tensho ; vérifier Chaos et Light dans PaissaDB ; N-04 reste pour la lecture dans le jeu |
 | X-200 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-09, accepté le 12/11) : sous-marins : chemin de déblocage d'un secteur visé, comme pour les aéronefs | Souhaitable avant l'annonce, rang 16 (tri du 13/11). À faire : SubmarineExploration + LuminaSupplemental SubmarineUnlock (GPL-3.0, crédité) ; même modèle qu'AirshipSectors.UnlockPath |
 | X-202 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-11, accepté le 12/11) : Exploration cosmique, page d'information : missions par métier et planète (rang, type), seuils bronze/argent/or, récompenses, prochaines fenêtres des missions horaires et météo, progression lue ; aucune alerte rouge promise | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : feuilles WKSMission*, WKSCosmoTool* ; WKSManager à sonder ; conditions d'heure et de météo à relever en jeu |
 | X-203 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-12, accepté le 12/11) : Restauration d'Ishgard (objets par niveau, paliers, récompenses) et Diadème (objets à récolter par niveau, points, compte de la session) | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : feuilles HWDCrafterSupply*, HWDGathererInspection* ; aucune prévision de météo d'instance |
-| X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un calculateur de trajet auto… | Fait en 0.1248 |
-| X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1235 |
-| X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1241 |
+| X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un… | Fait en 0.1248 |
+| X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1235 |
+| X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1241 |
 | X-206 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-13, accepté le 12/11) : journal de session : objets obtenus aujourd'hui ou cette session avec leur source (non attribué dit tel quel), filtre, export ; durée de chaque mission terminée, montrée après la fin, historique Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : vue sur ItemGains et GainSources ; IDutyState pour la durée ; TenshoData.db ; avec X-159 ; choix de l'utilisateur du 12/11 : historique des durées gardé d'une séance à l'autre |
 | X-207 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-14, accepté le 12/11) : valeur estimée des stocks par rangement et par personnage, liste « dort et se vend » (prix vendu × ventes par jour, prix PNJ à côté), ligne PNJ face au marché sous l'infobulle ; conseil seulement, au clic Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 12 (tri du 13/11). À faire : banque + MarketService par lots + MarketQuote ; NpcVendorCatalog.GilPrice ; prix anciens signalés |
 | X-208 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-16, accepté le 12/11) : « Mes annonces » : listes de vente des servants gardées, depuis quand, prix, « vendu depuis la dernière visite » (annonce disparue + hausse des gils) ; Universalis au clic seulement (D-82) ; CSV facultatif Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : SellListEntries gardées par servant ; croisement avec GilJournal.SplitRetainerRise ; après X-171 |
@@ -1544,14 +1555,14 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-214 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-24, accepté le 12/11) : bouton « Ouvrir dans l'outil de mission » sur toute mention d'un contenu, sans inscription ; contenus du Livre d'or à faire dans le panneau de l'outil de mission ; « Y aller » seulement où le jeu donne une position (D-12) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : AgentContentsFinder.OpenRegularDuty ; WeeklyBingoOrderData ; désactivé pendant un contenu |
 | X-215 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-25, accepté le 12/11) : Livraisons : objets demandés cette semaine par chaque client, bonus, récompense au palier visé, lien recette ou récolte ; lus à la fenêtre du client puis gardés pour la semaine ; « inconnu » sinon Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 17 (tri du 13/11). À faire : relevé de la fenêtre du client ; SatisfactionSupply, SatisfactionNpc ; calcul par SupplySeed seulement sur décision (X-75.6, DEC-043) |
 | X-216 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-26, accepté le 12/11) : mirage : « même modèle » sur toute fiche d'objet (étend SameLook) avec ✓/✗ et emplacement ; collection « Mirage » pièce par pièce (coffre, armoire, inventaires, servants) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 14 (tri du 13/11). À faire : Item.ModelMain/ModelSub/EquipSlotCategory, MirageManager ; vue Collections |
-| X-217 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-30, accepté… | Fait en 0.1226 |
-| X-218 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-32, accepté… | Fait en 0.1228 |
-| X-219 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-34, accepté… | Fait en 0.1229 |
-| X-220 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-36, accepté… | Fait en 0.1230 |
+| X-217 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1226 |
+| X-218 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1228 |
+| X-219 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1229 |
+| X-220 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1230 |
 | X-221 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-37, accepté le 12/11) : expérience restante de la Grâce, « inconnu » si le début n'a pas été vu  Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 5 (tri du 13/11). Partie 1 faite en 0.1231 (sonde : plafond seulement dans la description des manuels, preuve 0.1231-grace-cap.md ; relevé des statuts 45 et 46 en mode développeur) ; reste : lire en jeu le param du statut, puis afficher ; relevé de l'utilisateur du 15/11 vers 20 h 35 (manuel utilisé, un craft, dalamud.log « Reading statuses ») : statut 45, param 70 avant et après le craft, 64 774 s restantes (18 h) : le param ne compte pas les points restants (sans doute le palier du manuel, 70 = manuel commercial, plafond 1 750 000) ; reste : compter l'expérience gagnée depuis le début du bonus, « inconnu » si Tensho ne l'a pas vu ; capture de l'utilisateur (même soir) : Manuel commercial d'ingénieur, « +150 % jusqu'au niveau 69, puis +75 % », bonus maximum 1 750 000 points, 18 h : le param 70 est le niveau où le bonus passe à +75 % ; le taux dépend donc du niveau du métier porté |
-| X-222 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-38, accepté… | Fait en 0.1232 |
-| X-223 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-39, accepté… | Fait en 0.1233 |
-| X-224 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-40, accepté… | Fait en 0.1227 |
+| X-222 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1232 |
+| X-223 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1233 |
+| X-224 | Demande de l'utilisateur du 2026-11-12 (comparaison aux… | Fait en 0.1227 |
 | X-225 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-46, accepté le 12/11) : rappel de fin de charge des objets posés sur le meuble de la maison de compagnie (« Aetherial Wheel » en anglais). Correction de l'utilisateur du 14/11 vers 15 h 55 : en jeu ce sont des « tours éthérées », pas des « roues éthérées » (traduction de l'agent) ; le nom français se prend dans les feuilles du jeu (Item et EventItem français, XbmProbe, R09), jamais traduit de l'anglais ; corriger aussi le texte de l'essai T-0.1234-1. Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 6 (tri du 13/11). Partie 1 faite en 0.1234 (sonde : 20, 45, 70 h par grade, preuve 0.1234-aetherial-wheels.md ; fenêtre « Wheel » lue en mode développeur) ; noms du jeu (Item français, 15/11, relais 79) : « base de tours éthéréens » (le support, objet 8838), « tour éthéréen » (objets 8860 et suivants) ; texte de l'essai T-0.1234-1 corrigé ; reste : lire en jeu la fenêtre du support, puis le rappel |
 | X-226 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-15, accepté le 12/11; accord R04 de l'utilisateur le 12/11, pour et contre donnés) : rappel de préparation hors combat : repas fini ou presque, compagnon chocobo absent ou presque ; chat et son comme l'usure (D-38), rien en combat ni dans une mission ; repas de combat seulement si l'utilisateur l'accepte (R04) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Souhaitable avant l'annonce, rang 19 (tri du 13/11). À faire : statut 48 (RemainingTime), Buddy.CompanionInfo.TimeLeft, ICondition ; seuils réglables |
 | X-227 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-17, accepté le 12/11; accord R04 de l'utilisateur le 12/11, pour et contre donnés ; nouvel hôte api.xivgear.app accepté) : import d'un lien xivgear dans le planificateur d'équipement (pièces et matérias), pièces et matérias manquantes encadrées dans les rangements (X-54) et signalées sous l'infobulle ; requête sur clic seulement Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire : client xivgear borné (BoundedHttp), interrupteur « données du jeu seulement », crédits, SECURITY ; Etro en second si encore servi |
@@ -1576,53 +1587,53 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-246 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée écartée autrefois, rouverte) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). : surlignage dans l'agenda de l'atelier de l'île sanctuaire ; C23 et DEC-033 rouvertes (dessin sur l'interface du jeu) | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire |
 | X-247 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée écartée autrefois, rouverte) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). : notification Windows « mission trouvée » ; D-49 b rouverte (avec X-163 et K-22) | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire |
 | X-248 | Choix de l'utilisateur du 2026-11-12 (comparaison aux plugins, section 5 : idée écartée autrefois, rouverte) Vérifier d'abord par Grep ce qui existe déjà (demande de l'utilisateur du 12/11). : import au clic de liens de sites tiers (par exemple pour les macros) ; D-15 b rouverte (avec K-17) | Après l'annonce, avant la 1.0 (tri du 13/11, accepté par l'utilisateur). À faire |
-| X-250 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1180 |
-| X-251 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1181 |
-| X-252 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1182 |
-| X-253 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1183 |
-| X-254 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1219 |
-| X-255 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1219.0 |
-| X-256 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1222 |
-| X-257 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1222.0 |
-| X-258 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1220 |
-| X-259 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1221 |
-| X-260 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1223 |
-| X-261 | Revue « premier joueur » du 12/11 (notes de l'agent), avant l'annonce publique… | Fait en 0.1220.0 |
-| X-262 | Choix de l'utilisateur du 13/11 vers 13 h 20 (après le Palais des morts 1-10, «… | Fait en 0.1308 |
-| X-263 | Demande de l'utilisateur du 13/11 vers 12 h 40 (capture « Vu en jeu : Rondin de… | Fait en 0.1305 |
-| X-264 | Demande de l'utilisateur du 13/11 vers 13 h 35 (capture de référence d'un… | Fait en 0.1271 |
-| X-265 | Demande de l'utilisateur du 13/11 vers 15 h 05 (« prevoir un tri des peuples… | Fait en 0.1306 |
-| X-266 | Signalement de l'utilisateur du 13/11 vers 15 h 30 (Mor Dhona, capture… | Fait en 0.1307 |
-| X-267 | Outillage 1 (PLAN-METHODE chantier 3, R36) : tous les tests à chaque version… | Fait en 0.1275 |
-| X-268 | Outillage 1 (R20.3, R19.3, R23, R28.12) : la dernière version d'un relais… | Fait en 0.1276 |
-| X-269 | Outillage 1 (R28.10, R28.9, R26) : script de retour sans modèle (contrôle git… | Fait en 0.1277 |
-| X-270 | Outillage 1 (audit du 13/11) : démarrage juste : message de démarrage sans… | Fait en 0.1277 |
-| X-271 | Outillage 2 (chantier 4, R37) : images de référence des pages dessinées hors du… | Fait en 0.1278 |
-| X-272 | Outillage 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5, R28.7) : essais par lots… | Fait en 0.1278 |
-| X-273 | Outillage (constat de la maître du 13/11 vers 20 h 55) : retour.py --apply… | Fait en 0.1298 |
-| X-274 | Demande de l'utilisateur du 13/11 vers 21 h 10 (essai T-0.1140-1, « elle doit… | Fait en 0.1387 |
-| X-275 | Bug vu en essai le 13/11 vers 21 h 05 (T-0.1149-1, captures) : Stockage ›… | Fait en 0.1285 |
-| X-276 | Remarque de l'utilisateur du 13/11 vers 21 h 25 (essai T-0.1240-1, capture «… | Fait en 0.1388 |
-| X-277 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 35 (captures, page… | Fait en 0.1289 |
-| X-278 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 45 (T-0.1247-1, captures)… | Fait en 0.1287 |
-| X-279 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 55 (capture, page Alarmes… | Fait en 0.1292 |
-| X-280 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 55 (« modifier de alarme… | Fait en 0.1288 |
-| X-281 | Relecture du bloc 0.1278 (I1, important) : tests en parallèle sans aucune… | Fait en 0.1298 |
-| X-282 | Relecture du bloc 0.1278 (I2, important) : tolérances des images de référence… | Fait en 0.1301 |
-| X-283 | Relecture du bloc 0.1278 (I4, important) : X-268 (DLL non rechargée pendant que… | Fait en 0.1299 |
-| X-284 | Relecture du bloc 0.1278 (mineurs) : M1 AtomicFile.Write réessaie jusqu'à… | Fait en 0.1302 |
-| X-285 | Vu par l'utilisateur dans la galerie le 13/11 vers 22 h (capture… | Fait en 0.1300 |
-| X-286 | Relecture du bloc 0.1278 (M5) et image Home vue par la maître le 13/11 : sur… | Fait en 0.1304 |
-| X-287 | Outillage (constat de la maître du 13/11 vers 22 h 20, relecture I3) : q.py… | Fait en 0.1298 |
-| X-288 | Bug vu par l'utilisateur le 13/11 vers 22 h 50 (captures) : un dirigeable… | Fait en 0.1286 |
-| X-289 | Décision de l'utilisateur du 13/11 vers 23 h (« les paliers de niveau… | Fait en 0.1290.0 |
-| X-290 | Demande de l'utilisateur du 13/11 vers 23 h 30 (captures, page Équipement… | Fait en 0.1294 |
-| X-291 | Demande de l'utilisateur du 13/11 vers 23 h 45 (captures, Stockage › Banque… | Fait en 0.1293 |
-| X-292 | Suite de X-278 (essai T-0.1287-1 pas ok, 13/11 vers 23 h 45, capture) : prix au… | Fait en 0.1291 |
-| X-293 | Décision de l'utilisateur du 13/11 vers 0 h (« Oui, au plan », après la release… | Fait en 0.1303 |
-| X-294 | Demande de l'utilisateur du 14/11 vers 0 h 20 (captures : infobulle de la pièce… | Fait en 0.1295 |
-| X-295 | Demande de l'utilisateur du 14/11 vers 0 h 25 (capture, Alarmes › Alarmes à… | Fait en 0.1296 |
-| X-296 | Outillage (constat de la maître du 14/11 vers 0 h 25) : aucune commande ne… | Fait en 0.1298 |
+| X-250 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1180 |
+| X-251 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1181 |
+| X-252 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1182 |
+| X-253 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1183 |
+| X-254 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1219 |
+| X-255 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1219.0 |
+| X-256 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1222 |
+| X-257 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1222.0 |
+| X-258 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1220 |
+| X-259 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1221 |
+| X-260 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1223 |
+| X-261 | Revue « premier joueur » du 12/11 (notes de l'agent), avant… | Fait en 0.1220.0 |
+| X-262 | Choix de l'utilisateur du 13/11 vers 13 h 20 (après le… | Fait en 0.1308 |
+| X-263 | Demande de l'utilisateur du 13/11 vers 12 h 40 (capture «… | Fait en 0.1305 |
+| X-264 | Demande de l'utilisateur du 13/11 vers 13 h 35 (capture de… | Fait en 0.1271 |
+| X-265 | Demande de l'utilisateur du 13/11 vers 15 h 05 (« prevoir… | Fait en 0.1306 |
+| X-266 | Signalement de l'utilisateur du 13/11 vers 15 h 30 (Mor… | Fait en 0.1307 |
+| X-267 | Outillage 1 (PLAN-METHODE chantier 3, R36) : tous les tests… | Fait en 0.1275 |
+| X-268 | Outillage 1 (R20.3, R19.3, R23, R28.12) : la dernière… | Fait en 0.1276 |
+| X-269 | Outillage 1 (R28.10, R28.9, R26) : script de retour sans… | Fait en 0.1277 |
+| X-270 | Outillage 1 (audit du 13/11) : démarrage juste : message de… | Fait en 0.1277 |
+| X-271 | Outillage 2 (chantier 4, R37) : images de référence des… | Fait en 0.1278 |
+| X-272 | Outillage 2 (R34, R13.2, R02.2, R27.2, R28.16, R28.5… | Fait en 0.1278 |
+| X-273 | Outillage (constat de la maître du 13/11 vers 20 h 55)… | Fait en 0.1298 |
+| X-274 | Demande de l'utilisateur du 13/11 vers 21 h 10 (essai… | Fait en 0.1387 |
+| X-275 | Bug vu en essai le 13/11 vers 21 h 05 (T-0.1149-1… | Fait en 0.1285 |
+| X-276 | Remarque de l'utilisateur du 13/11 vers 21 h 25 (essai… | Fait en 0.1388 |
+| X-277 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 35… | Fait en 0.1289 |
+| X-278 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 45… | Fait en 0.1287 |
+| X-279 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 55… | Fait en 0.1292 |
+| X-280 | Bug vu en essai par l'utilisateur le 13/11 vers 21 h 55 («… | Fait en 0.1288 |
+| X-281 | Relecture du bloc 0.1278 (I1, important) : tests en… | Fait en 0.1298 |
+| X-282 | Relecture du bloc 0.1278 (I2, important) : tolérances des… | Fait en 0.1301 |
+| X-283 | Relecture du bloc 0.1278 (I4, important) : X-268 (DLL non… | Fait en 0.1299 |
+| X-284 | Relecture du bloc 0.1278 (mineurs) : M1 AtomicFile.Write… | Fait en 0.1302 |
+| X-285 | Vu par l'utilisateur dans la galerie le 13/11 vers 22 h… | Fait en 0.1300 |
+| X-286 | Relecture du bloc 0.1278 (M5) et image Home vue par la… | Fait en 0.1304 |
+| X-287 | Outillage (constat de la maître du 13/11 vers 22 h 20… | Fait en 0.1298 |
+| X-288 | Bug vu par l'utilisateur le 13/11 vers 22 h 50 (captures)… | Fait en 0.1286 |
+| X-289 | Décision de l'utilisateur du 13/11 vers 23 h (« les paliers… | Fait en 0.1290.0 |
+| X-290 | Demande de l'utilisateur du 13/11 vers 23 h 30 (captures… | Fait en 0.1294 |
+| X-291 | Demande de l'utilisateur du 13/11 vers 23 h 45 (captures… | Fait en 0.1293 |
+| X-292 | Suite de X-278 (essai T-0.1287-1 pas ok, 13/11 vers 23 h… | Fait en 0.1291 |
+| X-293 | Décision de l'utilisateur du 13/11 vers 0 h (« Oui, au plan… | Fait en 0.1303 |
+| X-294 | Demande de l'utilisateur du 14/11 vers 0 h 20 (captures… | Fait en 0.1295 |
+| X-295 | Demande de l'utilisateur du 14/11 vers 0 h 25 (capture… | Fait en 0.1296 |
+| X-296 | Outillage (constat de la maître du 14/11 vers 0 h 25)… | Fait en 0.1298 |
 | X-297 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-002, comparaison avec quatre plugins, notes de l'agent) : Page Équipement : filtre de la recherche d'une pièce par sa source (artisanat, marché, PNJ, mission, échange). Fait quand : le filtre réduit la liste selon la source connue de chaque pièce ; test sur les sources. Source d'idée : Allagan Tools, EquipmentSuggest (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
 | X-298 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-003, comparaison avec quatre plugins, notes de l'agent) : Croissant occulte : fenêtres d'ouverture de la Tour fourchue dans le panneau du Croissant, à côté des ALÉA critiques (X-189). Fait quand : le panneau donne la prochaine ouverture, sondée dans les feuilles (R06). Source d'idée : XIV Shinies, Occult/ (MIT), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
 | X-299 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-004, comparaison avec quatre plugins, notes de l'agent) : Dédale bestial : lire les fenêtres d'offres (trésor, butin, boutique) et le sac pour conseiller un choix ; montrer seulement, jamais choisir (R03.2, R03.3). Fait quand : le conseil s'affiche à côté de la fenêtre d'offre, aucune action envoyée au jeu ; test du conseil. Source d'idée : XIV Shinies, Beastmaster/Crucible/ (MIT), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
@@ -1630,156 +1641,156 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-301 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-006, comparaison avec quatre plugins, notes de l'agent) : Par mission : temps de complétion, butin obtenu et record personnel, gardés par personnage (TenshoData.db). Fait quand : une mission finie ajoute sa ligne, le record se met à jour ; test de comportement (écriture, relecture). Source d'idée : LootView (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
 | X-302 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-007, comparaison avec quatre plugins, notes de l'agent) : Recommandations reçues : ligne ou bannière avec le nouveau total après une mission, hors combat (R03.1). Fait quand : après une mission, le total change et s'affiche hors combat. Source d'idée : LootView (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
 | X-303 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-008, comparaison avec quatre plugins, notes de l'agent) : Fenêtre des jets de butin du jeu : panneau attaché qui marque « déjà obtenu / nouveau » les objets de collection et avertit d'un objet limité à un par semaine ; données du joueur seulement, aucun jet envoyé ni lu chez les autres (R03.1, R03.3, R04). Fait quand : le panneau suit la fenêtre du jeu sans la remplacer ; test des marques. Source d'idée : LootView (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
-| X-304 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-009… | Fait en 0.1392 |
+| X-304 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la… | Fait en 0.1392 |
 | X-305 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-010, comparaison avec quatre plugins, notes de l'agent) : IPC : fournir quelques données à d'autres plugins (quantité possédée d'un objet) et s'inscrire dans Wotsit (recherche des pages de Tensho) ; règle de Dalamud à présenter à l'utilisateur avant (R04). Fait quand : accord R04 noté, IPC documenté, Wotsit trouve les pages. Source d'idée : Allagan Tools, IPC/ (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
 | X-306 | Décision de l'utilisateur du 14/11 vers 1 h (tri de la boîte à idées, I-011, comparaison avec quatre plugins, notes de l'agent) : Historique des mouvements d'objets : garder aussi les pertes et les déplacements (vendu, utilisé, passé à un servant), en plus des gains des Découvertes. Fait quand : la page montre gains et pertes datés ; test de comportement (mouvement noté une fois, sans doublon). Source d'idée : Allagan Tools, History filter (GPL-3.0), lue jamais copiée (R05). | Plus tard, décision de l'utilisateur |
-| X-307 | Décision de l'utilisateur du 14/11 vers 1 h (comparaison avec quatre plugins… | Fait en 0.1409.0 |
-| X-308 | Décision de l'utilisateur du 14/11 vers 2 h 45 (« Oui, outils d'abord », idée… | Fait en 0.1301.0 |
+| X-307 | Décision de l'utilisateur du 14/11 vers 1 h (comparaison… | Fait en 0.1409.0 |
+| X-308 | Décision de l'utilisateur du 14/11 vers 2 h 45 (« Oui… | Fait en 0.1301.0 |
 | X-309 | Relais 52 : la copie figée de PluginUiTest.Host (tools/PluginUiTest) diverge de l'amont Shigu330/PluginUiTest (v0.2.0, 43d27f4) : Rewrite.Plugin y a reçu stamp (X-271) et clock/HostClock (X-282), alors que son README dit les fichiers identiques à v0.1.0 et jamais changés ici d'abord. Porter stamp et clock en amont (dépôt PluginUiTest, R21.3), puis recopier la bibliothèque et écrire la version et le commit dans le README. Fait quand : fichiers .cs identiques à l'amont (diff vide), README à jour. | Bug du relais 52 (dette) |
-| X-310 | Constat de la maître du 14/11 vers 3 h 40 (CI de a9df76e « 0.1308.0 · suite »… | Fait en 0.1309 |
-| X-311 | Outillage (constat de la maître du 14/11 vers 3 h 45) : plan.py add prend… | Fait en 0.1335.0 |
-| X-312 | Constat de la maître du 14/11 au matin (essai T-0.1241-2, page Eurêka et Bozja… | Fait en 0.1316 |
-| X-313 | Remarque de l'utilisateur du 14/11 au matin (essai T-0.1227-1) : « Ajouté au… | Fait en 0.1317 |
-| X-320 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h (essai T-0.351-1, et… | Fait en 0.1319 |
-| X-321 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h (essai T-0.1172-1)… | Fait en 0.1322 |
-| X-322 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h (essai T-0.829-1) : le… | Fait en 0.1320 |
-| X-323 | Bug vu par l'utilisateur le 14/11 vers 11 h 30 (capture, Eurêka et Bozja ›… | Fait en 0.1318 |
-| X-324 | Outillage (constat de la maître du 14/11 vers 11 h 40) : plan.py add a marqué… | Fait en 0.1318 |
-| X-325 | Outillage (question de l'utilisateur du 14/11 vers 12 h : « c'est normal qu'on… | Fait en 0.1331 |
-| X-330 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I1 : X-171 «… | Fait en 0.1325 |
-| X-331 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I2 : X-292 : la… | Fait en 0.1326 |
-| X-332 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I3 et I4 : R07… | Fait en 0.1327 |
-| X-333 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I5 : X-279 et… | Fait en 0.1379 |
-| X-334 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I6 : R28.14 et… | Fait en 0.1328 |
-| X-335 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), I7 : R22 : des… | Fait en 0.1329 |
-| X-336 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent, 14/11), M1 à M15 : Mineurs… | Fait en 0.1380 |
-| X-340 | Remarque de l'utilisateur du 14/11 vers 12 h 30 (essai d'envoi d'un bug… | Fait en 0.1324 |
-| X-341 | Décision de l'utilisateur du 14/11 vers 13 h 10 (« Le travailleur », après la… | Fait en 0.1323 |
-| X-342 | Décision de l'utilisateur du 14/11 vers 13 h 30 (« ok pour tout » : nos tickets… | Fait en 0.1323 |
-| X-343 | Remarque de l'utilisateur du 14/11 vers 14 h 45 (après l'essai T-0.1326-1) : un… | Fait en 0.1331 |
-| X-344 | Bug vu par l'utilisateur le 14/11 vers 15 h 10 (capture, liste des plugins de… | Fait en 0.1330 |
-| X-350 | Relecture du bloc 0.1318 à 0.1329 (14/11), I1 : R03.2 et DEC-038 : le nouvel… | Fait en 0.1334 |
-| X-351 | Relecture du bloc 0.1318 à 0.1329 (14/11), I3 : X-322 : sur une carte que le… | Fait en 0.1342.0 |
+| X-310 | Constat de la maître du 14/11 vers 3 h 40 (CI de a9df76e «… | Fait en 0.1309 |
+| X-311 | Outillage (constat de la maître du 14/11 vers 3 h 45)… | Fait en 0.1335.0 |
+| X-312 | Constat de la maître du 14/11 au matin (essai T-0.1241-2… | Fait en 0.1316 |
+| X-313 | Remarque de l'utilisateur du 14/11 au matin (essai… | Fait en 0.1317 |
+| X-320 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h… | Fait en 0.1319 |
+| X-321 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h… | Fait en 0.1322 |
+| X-322 | Bug vu par l'utilisateur au parcours du 14/11 vers 11 h… | Fait en 0.1320 |
+| X-323 | Bug vu par l'utilisateur le 14/11 vers 11 h 30 (capture… | Fait en 0.1318 |
+| X-324 | Outillage (constat de la maître du 14/11 vers 11 h 40)… | Fait en 0.1318 |
+| X-325 | Outillage (question de l'utilisateur du 14/11 vers 12 h : «… | Fait en 0.1331 |
+| X-330 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1325 |
+| X-331 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1326 |
+| X-332 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1327 |
+| X-333 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1379 |
+| X-334 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1328 |
+| X-335 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1329 |
+| X-336 | Relecture du bloc 0.1279 à 0.1317 (notes de l'agent… | Fait en 0.1380 |
+| X-340 | Remarque de l'utilisateur du 14/11 vers 12 h 30 (essai… | Fait en 0.1324 |
+| X-341 | Décision de l'utilisateur du 14/11 vers 13 h 10 (« Le… | Fait en 0.1323 |
+| X-342 | Décision de l'utilisateur du 14/11 vers 13 h 30 (« ok pour… | Fait en 0.1323 |
+| X-343 | Remarque de l'utilisateur du 14/11 vers 14 h 45 (après… | Fait en 0.1331 |
+| X-344 | Bug vu par l'utilisateur le 14/11 vers 15 h 10 (capture… | Fait en 0.1330 |
+| X-350 | Relecture du bloc 0.1318 à 0.1329 (14/11), I1 : R03.2 et… | Fait en 0.1334 |
+| X-351 | Relecture du bloc 0.1318 à 0.1329 (14/11), I3 : X-322 : sur… | Fait en 0.1342.0 |
 | X-352 | Relecture du bloc 0.1318 à 0.1329 (14/11), I2 : Reste de X-01 (fermé sur l'accord de l'utilisateur le 14/11 après 37 min de donjons sans saccade en mode normal) : premières ouvertures encore lentes relevées en mode développeur : NativeMapReplacer 976 ms une fois, page SortPreview 137 ms à la première ouverture, panneaux au chargement 56 à 86 ms (cible 50 ms). Fait quand : ces premières ouvertures sous 50 ms ou faites hors du dessin, mesurées ; aucune ligne « Slow reader » de plus de 150 ms entre +5 et +60 s après un chargement. | Souhaitable, bug de la relecture (R27.2) |
-| X-353 | Relecture du bloc 0.1318 à 0.1329 (14/11), M1 à M5 : Mineurs : M1 X-340 sans… | Fait en 0.1381 |
-| X-354 | Outillage (relais 59, 14/11) : un publish.sh --last arrêté par un test échoué… | Fait en 0.1349.0 |
-| X-355 | Demande de l'utilisateur du 14/11 vers 16 h 20 (captures carte du jeu et carte… | Fait en 0.1343 |
-| X-356 | Demande de l'utilisateur du 14/11 vers 16 h 10 (« prévois une révision complète… | Fait en 0.1369.0 |
-| X-357 | Demande de l'utilisateur du 14/11 vers 16 h 15 (« avant l'annonce mais il faut… | Fait en 0.1349 |
-| X-358 | Relecture du bloc 0.1330 à 0.1345 (relecture 0.1345, 14/11), I1 : X-355… | Fait en 0.1346 |
-| X-359 | Relecture du bloc 0.1330 à 0.1345 (14/11), mineurs : M1 X-171 rapports de patch… | Fait en 0.1382 |
-| X-360 | Demande de l'utilisateur du 14/11 vers 17 h 40 (« il faut le faire avant fable… | Fait en 0.1351.0 |
-| X-361 | Bug de X-360 vu par la maître le 14/11 vers 17 h 55 : retour.py --apply… | Fait en 0.1349 |
-| X-362 | Bug vu au relais 62 (14/11 vers 18 h 30) : tools/discoveries-load.py --selftest… | Fait en 0.1370.0 |
-| X-363 | Bug (essai T-0.1317-1, 14/11 soir) : la ligne « Ajouté au patch 7.x (Garland… | Fait en 0.1350 |
-| X-364 | Outil (lot du 14/11 soir) : q.py lot n'écrit que le geste (« do ») des essais… | Fait en 0.1364.0 |
-| X-365 | Demande de l'utilisateur (lot du 14/11 soir, capture) : le clic gauche sur un… | Fait en 0.1351 |
-| X-366 | Bug d'affichage (essai T0-13, 14/11 soir, capture) : panneau du Dédale devant… | Fait en 0.1373 |
-| X-367 | Relecture du bloc 0.1346 à 0.1349 (14/11), mineurs M1, M2, M3 : M1 : Depuis… | Fait en 0.1370 |
-| X-368 | Outil (14/11 soir) : plan.py fait refuse de remplacer une définition de « fait… | Fait en 0.1364.0 |
-| X-369 | X-356, corrections (choix A de l'utilisateur, D-160), famille 1 : termes du jeu… | Fait en 0.1352 |
-| X-370 | X-356, corrections (D-160), famille 2 : les 30 écarts de sens entre l'anglais… | Fait en 0.1353 |
-| X-371 | X-356, corrections (D-160), famille 3 : anglais (13), orthographe (8) et… | Fait en 0.1354 |
-| X-372 | X-356, suite de la lecture (D-160) : les 28 paquets restants (L03 à L25, D02 à… | Fait en 0.1354.0 |
-| X-373 | Test instable (CI de 0.1354.0, 14/11 soir, run 43639320577) : « Settings saver… | Fait en 0.1371 |
-| X-374 | X-356, corrections (D-160), famille 4a : termes du jeu, paquets L03 à L14 (133… | Fait en 0.1355 |
-| X-375 | X-356, corrections (D-160), famille 4b : termes du jeu, paquets L15 à L25 et… | Fait en 0.1356 |
-| X-376 | X-356, corrections (D-160), famille 5 : écarts de sens entre l'anglais et le… | Fait en 0.1357 |
-| X-377 | X-356, corrections (D-160), famille 6 : anglais (35), orthographe du français… | Fait en 0.1358 |
-| X-378 | X-356, corrections (D-160), famille 7 : incohérences de vocabulaire (114… | Fait en 0.1362 |
-| X-379 | X-356, corrections (D-160), famille 8 : clarté (82 constats « clarte » du… | Fait en 0.1363 |
-| X-380 | X-356, corrections (D-160), famille 9 : textes périmés (29 constats « perime »… | Fait en 0.1364 |
-| X-381 | X-356, second regard Fable (D-160) : les constats non tranchés par le… | Fait en 0.1369 |
-| X-382 | Bug (rapport de l'utilisateur du 14/11 vers 23 h 50, capture) : jardin… | Fait en 0.1360 |
-| X-383 | Bug (rapport de l'utilisateur du 14/11 vers 23 h 55, deux captures) : jardin… | Fait en 0.1360.0 |
-| X-384 | Demande de l'utilisateur (15/11, capture) : l'aperçu du tri d'inventaire… | Fait en 0.1361 |
-| X-385 | Bug d'affichage (rapport de l'utilisateur du 15/11, capture) : page… | Fait en 0.1361.0 |
-| X-386 | Demande de l'utilisateur du 15/11 : afficher sur la carte Tensho les sonnettes… | Fait en 0.1402 |
-| X-387 | Bug, X-365 pas réussi en jeu (rapport de l'utilisateur du 15/11 vers 0 h 25… | Fait en 0.1366 |
-| X-388 | Étude demandée par l'utilisateur le 15/11 (avec le bug des liens de carte du… | Fait en 0.1368.0 |
-| X-389 | Bug (essai T-0.1354-1, 15/11 vers 0 h 45) : la recherche d'un objet avec une… | Fait en 0.1367 |
+| X-353 | Relecture du bloc 0.1318 à 0.1329 (14/11), M1 à M5… | Fait en 0.1381 |
+| X-354 | Outillage (relais 59, 14/11) : un publish.sh --last arrêté… | Fait en 0.1349.0 |
+| X-355 | Demande de l'utilisateur du 14/11 vers 16 h 20 (captures… | Fait en 0.1343 |
+| X-356 | Demande de l'utilisateur du 14/11 vers 16 h 10 (« prévois… | Fait en 0.1369.0 |
+| X-357 | Demande de l'utilisateur du 14/11 vers 16 h 15 (« avant… | Fait en 0.1349 |
+| X-358 | Relecture du bloc 0.1330 à 0.1345 (relecture 0.1345… | Fait en 0.1346 |
+| X-359 | Relecture du bloc 0.1330 à 0.1345 (14/11), mineurs : M1… | Fait en 0.1382 |
+| X-360 | Demande de l'utilisateur du 14/11 vers 17 h 40 (« il faut… | Fait en 0.1351.0 |
+| X-361 | Bug de X-360 vu par la maître le 14/11 vers 17 h 55… | Fait en 0.1349 |
+| X-362 | Bug vu au relais 62 (14/11 vers 18 h 30)… | Fait en 0.1370.0 |
+| X-363 | Bug (essai T-0.1317-1, 14/11 soir) : la ligne « Ajouté au… | Fait en 0.1350 |
+| X-364 | Outil (lot du 14/11 soir) : q.py lot n'écrit que le geste… | Fait en 0.1364.0 |
+| X-365 | Demande de l'utilisateur (lot du 14/11 soir, capture) : le… | Fait en 0.1351 |
+| X-366 | Bug d'affichage (essai T0-13, 14/11 soir, capture)… | Fait en 0.1373 |
+| X-367 | Relecture du bloc 0.1346 à 0.1349 (14/11), mineurs M1, M2… | Fait en 0.1370 |
+| X-368 | Outil (14/11 soir) : plan.py fait refuse de remplacer une… | Fait en 0.1364.0 |
+| X-369 | X-356, corrections (choix A de l'utilisateur, D-160)… | Fait en 0.1352 |
+| X-370 | X-356, corrections (D-160), famille 2 : les 30 écarts de… | Fait en 0.1353 |
+| X-371 | X-356, corrections (D-160), famille 3 : anglais (13)… | Fait en 0.1354 |
+| X-372 | X-356, suite de la lecture (D-160) : les 28 paquets… | Fait en 0.1354.0 |
+| X-373 | Test instable (CI de 0.1354.0, 14/11 soir, run 43639320577)… | Fait en 0.1371 |
+| X-374 | X-356, corrections (D-160), famille 4a : termes du jeu… | Fait en 0.1355 |
+| X-375 | X-356, corrections (D-160), famille 4b : termes du jeu… | Fait en 0.1356 |
+| X-376 | X-356, corrections (D-160), famille 5 : écarts de sens… | Fait en 0.1357 |
+| X-377 | X-356, corrections (D-160), famille 6 : anglais (35)… | Fait en 0.1358 |
+| X-378 | X-356, corrections (D-160), famille 7 : incohérences de… | Fait en 0.1362 |
+| X-379 | X-356, corrections (D-160), famille 8 : clarté (82 constats… | Fait en 0.1363 |
+| X-380 | X-356, corrections (D-160), famille 9 : textes périmés (29… | Fait en 0.1364 |
+| X-381 | X-356, second regard Fable (D-160) : les constats non… | Fait en 0.1369 |
+| X-382 | Bug (rapport de l'utilisateur du 14/11 vers 23 h 50… | Fait en 0.1360 |
+| X-383 | Bug (rapport de l'utilisateur du 14/11 vers 23 h 55, deux… | Fait en 0.1360.0 |
+| X-384 | Demande de l'utilisateur (15/11, capture) : l'aperçu du tri… | Fait en 0.1361 |
+| X-385 | Bug d'affichage (rapport de l'utilisateur du 15/11… | Fait en 0.1361.0 |
+| X-386 | Demande de l'utilisateur du 15/11 : afficher sur la carte… | Fait en 0.1402 |
+| X-387 | Bug, X-365 pas réussi en jeu (rapport de l'utilisateur du… | Fait en 0.1366 |
+| X-388 | Étude demandée par l'utilisateur le 15/11 (avec le bug des… | Fait en 0.1368.0 |
+| X-389 | Bug (essai T-0.1354-1, 15/11 vers 0 h 45) : la recherche… | Fait en 0.1367 |
 | X-390 | Annonce publique (décision de l'utilisateur du 15/11 : un post Reddit, pas le Discord de Dalamud) : texte du post préparé par l'agent quand plan.py annonce dit oui : présentation courte de Tensho, ce qu'il fait, captures nettoyées (R25), lien du dépôt personnalisé et de l'installation, limites honnêtes, mention de l'agent IA (comme la déclaration du manifeste), pas affilié à Dalamud, où signaler un problème ; anglais (le post) avec une traduction française pour l'utilisateur ; subreddit choisi avec l'utilisateur et ses règles relues (outils tiers). Fait quand : texte dans les fichiers de l'utilisateur (pour-moi) relu par l'utilisateur ; il le poste lui-même. | Annonce |
-| X-391 | Outil (constat de l'utilisateur du 15/11 : « relecteur est en retard aussi non… | Fait en 0.1364.0 |
-| X-392 | Outil (constat de l'utilisateur du 15/11 : « tu ne m'as pas rappelé d'en faire… | Fait en 0.1364.0 |
-| X-393 | Outil (15/11) : plan.py import-relecture a lu « 0 constat » dans le rapport… | Fait en 0.1364.0 |
+| X-391 | Outil (constat de l'utilisateur du 15/11 : « relecteur est… | Fait en 0.1364.0 |
+| X-392 | Outil (constat de l'utilisateur du 15/11 : « tu ne m'as pas… | Fait en 0.1364.0 |
+| X-393 | Outil (15/11) : plan.py import-relecture a lu « 0 constat »… | Fait en 0.1364.0 |
 | X-394 | Relecture 0.1350 à 0.1361 (relecture 0.1361, 15/11), constat important 1 : X-384 et X-385 faits sans l'image attendue (R37) : l'image de référence SortPreview ne montre que « Connectez un personnage… » (pas de sacs ni de ligne d'état) ; seuls les tests SortPreview1361Tests prouvent l'ordre. Fait quand : une image de l'aperçu avec un inventaire d'exemple montre l'ordre Sac 1, 3, 2, 4 et le message une seule fois, déclarée et approuvée (R37). | Bug |
 | X-395 | Relecture 0.1350 à 0.1361, mineurs 3 et 4 : (3) jardin… | Fait en 0.1366.0 |
-| X-396 | Outil (R37 changée le 15/11, J139) : tant que l'application est gelée (D-149)… | Fait en 0.1364.0 |
-| X-397 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364, 15/11), I1 : X-378 n'a pas… | Fait en 0.1368 |
-| X-398 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364, 15/11), I2 : La version… | Fait en 0.1365 |
-| X-399 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364, 15/11), mineurs M1, M2… | Fait en 0.1377 |
-| X-400 | Outil (15/11, relais 70, 0.1367) : publish.sh lance Verify sans marquer les… | Fait en 0.1368.0 |
-| X-401 | Outil (15/11, relais 70) : plan.py gen publie dans GLOBAL-PLAN des cellules qui… | Fait en 0.1368.0 |
-| X-402 | Outil (15/11, relais 70) : txn.py restore s'arrête sur « Errno 22 Invalid… | Fait en 0.1368.0 |
+| X-396 | Outil (R37 changée le 15/11, J139) : tant que l'application… | Fait en 0.1364.0 |
+| X-397 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364… | Fait en 0.1368 |
+| X-398 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364… | Fait en 0.1365 |
+| X-399 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364… | Fait en 0.1377 |
+| X-400 | Outil (15/11, relais 70, 0.1367) : publish.sh lance Verify… | Fait en 0.1368.0 |
+| X-401 | Outil (15/11, relais 70) : plan.py gen publie dans… | Fait en 0.1368.0 |
+| X-402 | Outil (15/11, relais 70) : txn.py restore s'arrête sur «… | Fait en 0.1368.0 |
 | X-403 | Chat de Tensho, fenêtre en plus (D-166, choix de l'utilisateur du 15/11 d'après l'étude du chat (X-388), phases 1 à 4 et intégration Chat 2) : une fenêtre Tensho à côté du chat du jeu, sans saisie et sans cacher le chat du jeu : lecture (onglets, couleurs, non-lus), menus Tensho sur tous les liens (objet, lieu, joueur, quête), règles et alertes, conversations ; puis les menus Tensho dans Chat 2 par son IPC ; coupure en JcJ et contenu classé (R03.2). À découper en points d'une famille par version (étude, section 8.2). Fait quand : chaque phase avec ses tests et essais en jeu ; la saisie reste à décider. | Demande |
-| X-404 | Page Mandats : le nom du client vient de la feuille LeveClient, qui contient… | Fait en 0.1372 |
-| X-405 | Vocabulaire, choix recommandés appliqués en attendant la réponse de… | Fait en 0.1374 |
-| X-406 | Bug vu au relais 73 (15/11, mesure de charge de X-362 à un million de faits)… | Fait en 0.1383 |
-| X-407 | Bug vu au relais 73 (15/11) : l'outil de la boîte à idées de l'agent, appelé… | Fait en 0.1383.0 |
-| X-408 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374, 15/11), I1 : X-389 n'a pas… | Fait en 0.1375 |
-| X-409 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374, 15/11), I2 : X-395 M4 et… | Fait en 0.1376 |
-| X-410 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374, 15/11), mineurs M1, M2, M3… | Fait en 0.1378 |
-| X-411 | Défaut d'outil (relais 74, 15/11) : publish.sh et new-version.py acceptent un… | Fait en 0.1383.0 |
-| X-412 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382, 15/11), I1 : X-359 M1… | Fait en 0.1384 |
-| X-413 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382, 15/11), I2 : Test existant… | Fait en 0.1385 |
-| X-414 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382, 15/11), I3 : X-336 M12… | Fait en 0.1386 |
-| X-415 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382, 15/11), mineurs M1, M2… | Fait en 0.1389 |
-| X-416 | Défaut d'outil (15/11, retour du relais 74) : retour.py compose l'annonce de… | Fait en 0.1383.0 |
-| X-417 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389, 15/11), I1 : X-274 : dans… | Fait en 0.1390 |
-| X-418 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389, 15/11), I2 : X-414… | Fait en 0.1391 |
-| X-419 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389, 15/11), mineurs M1, M2… | Fait en 0.1393 |
-| X-420 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397, 15/11), I1 : X-418 ne… | Fait en 0.1398 |
-| X-421 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397, 15/11), I2 : X-304 : la… | Fait en 0.1399 |
-| X-422 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397, 15/11), mineurs M1, M2… | Fait en 0.1401.0 |
-| X-423 | Défaut d'outil (15/11 vers 8 h, constat de la maître) : consigne.py relecteur… | Fait en 0.1397.0 |
-| X-424 | Relecture du bloc 0.1398 à 0.1404 (relecture 0.1404, 15/11), I1 : X-386 ajoute… | Fait en 0.1405 |
-| X-425 | Relecture du bloc 0.1398 à 0.1404 (relecture 0.1404, 15/11), mineurs M1, M2, M3… | Fait en 0.1408 |
-| X-426 | Bug vu par le relais 78 (15/11, 08 h 57) : à-coup de 625 ms au chargement de… | Fait en 0.1415 |
-| X-427 | Bug vu par le relais 78 (15/11) : la CI de 0.1405 a échoué sur « Garden… | Fait en 0.1407 |
-| X-428 | Bug (CI de 0.1405.0, 15/11, run 43692342607) : « Garden journal: a detected… | Fait en 0.1414 |
-| X-429 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412, 15/11), I1 : X-196… | Fait en 0.1415 |
-| X-430 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412, 15/11), I2 : X-196 marqué | Fait en 0.1415 |
-| X-431 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412, 15/11), mineurs M1, M2, M3… | Fait en 0.1416 |
-| X-432 | Défaut d'outil (15/11, retour du relais 78) : après publish.sh --last (commit «… | Fait en 0.1413 |
+| X-404 | Page Mandats : le nom du client vient de la feuille… | Fait en 0.1372 |
+| X-405 | Vocabulaire, choix recommandés appliqués en attendant la… | Fait en 0.1374 |
+| X-406 | Bug vu au relais 73 (15/11, mesure de charge de X-362 à un… | Fait en 0.1383 |
+| X-407 | Bug vu au relais 73 (15/11) : l'outil de la boîte à idées… | Fait en 0.1383.0 |
+| X-408 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374… | Fait en 0.1375 |
+| X-409 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374… | Fait en 0.1376 |
+| X-410 | Relecture du bloc 0.1365 à 0.1374 (relecture 0.1374… | Fait en 0.1378 |
+| X-411 | Défaut d'outil (relais 74, 15/11) : publish.sh et… | Fait en 0.1383.0 |
+| X-412 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382… | Fait en 0.1384 |
+| X-413 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382… | Fait en 0.1385 |
+| X-414 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382… | Fait en 0.1386 |
+| X-415 | Relecture du bloc 0.1375 à 0.1382 (relecture 0.1382… | Fait en 0.1389 |
+| X-416 | Défaut d'outil (15/11, retour du relais 74) : retour.py… | Fait en 0.1383.0 |
+| X-417 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389… | Fait en 0.1390 |
+| X-418 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389… | Fait en 0.1391 |
+| X-419 | Relecture du bloc 0.1383 à 0.1389 (relecture 0.1389… | Fait en 0.1393 |
+| X-420 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397… | Fait en 0.1398 |
+| X-421 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397… | Fait en 0.1399 |
+| X-422 | Relecture du bloc 0.1390 à 0.1397 (relecture 0.1397… | Fait en 0.1401.0 |
+| X-423 | Défaut d'outil (15/11 vers 8 h, constat de la maître)… | Fait en 0.1397.0 |
+| X-424 | Relecture du bloc 0.1398 à 0.1404 (relecture 0.1404… | Fait en 0.1405 |
+| X-425 | Relecture du bloc 0.1398 à 0.1404 (relecture 0.1404… | Fait en 0.1408 |
+| X-426 | Bug vu par le relais 78 (15/11, 08 h 57) : à-coup de 625 ms… | Fait en 0.1415 |
+| X-427 | Bug vu par le relais 78 (15/11) : la CI de 0.1405 a échoué… | Fait en 0.1407 |
+| X-428 | Bug (CI de 0.1405.0, 15/11, run 43692342607) : « Garden… | Fait en 0.1414 |
+| X-429 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412… | Fait en 0.1415 |
+| X-430 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412… | Fait en 0.1415 |
+| X-431 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412… | Fait en 0.1416 |
+| X-432 | Défaut d'outil (15/11, retour du relais 78) : après… | Fait en 0.1413 |
 | X-433 | Bug vu par le relais 79 (15/11) : à-coup d'un lecteur de 127 à 515 ms environ 20 s après un chargement. Relais 80 à 83 (0.1422 à 0.1452, preuve docs/evidence/0.1452-load-allocations.md) : arrêts de tous les fils à la fin d'une collecte de fond ; changements : caches en flux (0.1432), garde des lecteurs (0.1438), lien local préparé (0.1445), échauffement sans chaînes (0.1449), tables des sacs (0.1450), règles du jardin en fond (0.1452). Gels « induced for low memory » : 2 chargements sur 12 (0.1443, 0.1445) ; cause pas prouvée : la mémoire de la machine n'a été mesurée qu'aux chargements de 0.1447 et 0.1448 (charge de 86 à 88 % pendant une publication), pas aux deux gels, et le jeu tenait 8,3 Go privés après 132 rechargements (autre cause possible) ; aucun depuis 0.1446. Reste : caches JSON lus au chargement (environ 55 Mo), premiers passages des lecteurs. Fait quand : les trous d'images de plus de 150 ms entre 10 et 30 s après un chargement expliqués et réduits, ou écartés avec leur raison, sur plusieurs chargements. | Souhaitable : à-coup ; relevé T-0.1459-1 du 15/11 vers 22 h 37 (jeu relancé, mémoire neuve ; coupé à 22 h 39 par la publication de 0.1463, deuxième chargement gardé) : chargements de rang 1 et 2, tas géré 301 et 361 Mo : 0 à-coup de plus de 100 ms, 0 trou de plus de 150 ms entre 10 et 30 s après le chargement (gaps.py) ; un seul trou de 252 ms à 22:38:10, avant la fin de la connexion ; comme les 29 chargements sous 500 Mo mesurés avant : les gels suivent le tas grossi par les rechargements répétés du mode développeur, pas la version ; un joueur qui ne recharge pas Tensho ne devrait pas les voir (à confirmer sur une séance de jeu normale) |
-| X-434 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419, 15/11), I1 : X-429 : la… | Fait en 0.1420 |
-| X-435 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419, 15/11), mineurs M1, M2… | Fait en 0.1421 |
-| X-436 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427, 15/11), I1 : X-433 : la… | Fait en 0.1428 |
-| X-437 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427, 15/11), mineurs M1, M2, M3… | Fait en 0.1428 |
-| X-438 | Bug vu par le relais 81 (15/11, relecture 0.1427 P1) : la description du… | Fait en 0.1429 |
-| X-439 | Décision D-166 (fenêtre de chat Tensho en plus de celle du jeu, 15/11) écrite… | Fait en 0.1436 |
-| X-440 | Relecture du bloc 0.1428 à 0.1435 (relecture 0.1435, 15/11), mineurs M1, M2, M3… | Fait en 0.1437 |
-| X-441 | Outil : release_notes.py ne peut pas corriger une ligne « Pour les joueurs »… | Fait en 0.1461.0 |
-| X-442 | Outil : guard.py refuse une commande dont un argument entre guillemets cite… | Fait en 0.1435.0 |
-| X-443 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445, 15/11), I1 : La ligne «… | Fait en 0.1446 |
-| X-444 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445, 15/11), mineurs M1, M2… | Fait en 0.1446.0 |
-| X-445 | Demande de l'utilisateur du 15/11 vers 20 h 10, précisée vers 20 h 25 (essai de… | Fait en 0.1458 |
-| X-446 | Outil : state.py child set ID "texte" sans le champ (etat, version ou… | Fait en 0.1455.0 |
+| X-434 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419… | Fait en 0.1420 |
+| X-435 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419… | Fait en 0.1421 |
+| X-436 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427… | Fait en 0.1428 |
+| X-437 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427… | Fait en 0.1428 |
+| X-438 | Bug vu par le relais 81 (15/11, relecture 0.1427 P1) : la… | Fait en 0.1429 |
+| X-439 | Décision D-166 (fenêtre de chat Tensho en plus de celle du… | Fait en 0.1436 |
+| X-440 | Relecture du bloc 0.1428 à 0.1435 (relecture 0.1435… | Fait en 0.1437 |
+| X-441 | Outil : release_notes.py ne peut pas corriger une ligne «… | Fait en 0.1461.0 |
+| X-442 | Outil : guard.py refuse une commande dont un argument entre… | Fait en 0.1435.0 |
+| X-443 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445… | Fait en 0.1446 |
+| X-444 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445… | Fait en 0.1446.0 |
+| X-445 | Demande de l'utilisateur du 15/11 vers 20 h 10, précisée… | Fait en 0.1458 |
+| X-446 | Outil : state.py child set ID "texte" sans le champ (etat… | Fait en 0.1455.0 |
 | X-447 | Demande de l'utilisateur du 15/11 vers 20 h 15 (après l'essai de la fenêtre de chat Tensho) : « une interface pour le chat un peu plus comme ff14 mais avec les options de wow et ses addons chat » ; fenêtre de chat Tensho à l'aspect du chat du jeu (onglets, police, fond et transparence, couleurs des canaux, défilement) et options inspirées de WoW et de ses addons de chat (Prat, Chatter, WIM, chat d'ElvUI…), sans envoi automatique ni action à la place du joueur (R03.3), coupée en JcJ Fait quand : d'abord une liste des options de WoW et de ses addons (base : le relevé WoW du plan CHAT-001 de la 0.471, retrouvé dans l'historique git, et l'étude du chat), chacune avec ce qu'elle fait, sa faisabilité dans Dalamud, la règle qui la touche et le nombre de versions, présentée à l'utilisateur en cases à cocher ; puis les options cochées faites par phases dans X-403, chaque phase avec son essai en jeu et une image de la fenêtre comparée au chat du jeu. | Souhaitable, avec X-403 (demande de l'utilisateur, 15/11) ; choix de l'utilisateur du 15/11 vers 20 h 40 (liste du relais 83) : oui à A2, A3, A4, B1, B2, B4, B5, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16 ; non à A1 (police), B3 (horodatage choisi), B6 (doublons repliés) ; historique des messages gardé sur disque : oui, coupé par défaut et seulement avec l'accord du joueur (« ok pour messages garde sur disque … mais pas par defaut et avec accord de l'user ») ; réglages en plus (liste du relais 84, section D), choix de l'utilisateur du 15/11 vers 21 h 20 : oui à D1 à D8 |
 | X-448 | Demande de l'utilisateur du 15/11 vers 20 h 20 (fenêtre de chat Tensho) : « prevoir aussi un mode sans bordure et plus de reglages » Fait quand : la fenêtre de chat Tensho a un mode sans bordure (ni barre de titre ni cadre, fond réglable jusqu'à transparent, position et taille gardées, verrouillable ; un moyen visible de revenir au mode normal et /tensho chat toujours actif) ; les réglages en plus entrent dans la liste d'options à cocher du point de l'interface du chat (aspect de FFXIV, options de WoW) ; essai en jeu et image de la fenêtre sans bordure. | Souhaitable, avec X-403 (demande de l'utilisateur, 15/11) |
 | X-449 | Demande de l'utilisateur du 15/11 vers 20 h 20 : « il faut aussi refaire les reglages pour avoir plus facile (avec plus de categorie par onglet) » ; réponses : tous les réglages de Tensho, catégories en liste à gauche Fait quand : dans la fenêtre Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé, Débogage) montre une liste de catégories à gauche et les réglages de la catégorie choisie à droite, comme la Configuration système du jeu ; chaque réglage est rangé dans une catégorie (aucun orphelin, test) ; la recherche parmi les réglages mène à la bonne catégorie ; la catégorie choisie est gardée ; une nouvelle décision DEC complète DEC-048 ; SETTINGS.md et l'index des réglages suivent ; images de chaque onglet déclarées et comparées (R37). | Souhaitable (demande de l'utilisateur, 15/11) |
-| X-450 | Demande de l'utilisateur du 15/11 vers 20 h 30 : une page privée des essais en… | Fait en 0.1455.0 |
-| X-451 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), I1 : X-403… | Fait en 0.1456 |
-| X-452 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), I2 : X-448 est… | Fait en 0.1456.0 |
-| X-453 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), mineurs M1, M2… | Fait en 0.1457 |
-| X-454 | CI rouge (Build and test du commit « 0.1454.0 · suite », run 43752719862… | Fait en 0.1455 |
+| X-450 | Demande de l'utilisateur du 15/11 vers 20 h 30 : une page… | Fait en 0.1455.0 |
+| X-451 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454… | Fait en 0.1456 |
+| X-452 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454… | Fait en 0.1456.0 |
+| X-453 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454… | Fait en 0.1457 |
+| X-454 | CI rouge (Build and test du commit « 0.1454.0 · suite »… | Fait en 0.1455 |
 | X-455 | Demande de l'utilisateur du 15/11 vers 20 h 45 (fenêtre de chat Tensho) : « oublie pas de prevoir les options d'un chat normal copier coller et autre » Fait quand : une liste des options d'un chat ordinaire, comparée à ce qui est fait (copie d'un message ou d'un onglet en 0.1442), est présentée à l'utilisateur en cases à cocher avec la faisabilité et le nombre de versions : sélection du texte à la souris sur un ou plusieurs messages et copie de la sélection, Ctrl+C et Ctrl+A, copier un nom, un lien ou une adresse, coller dans la boîte de saisie (dépend de la saisie, encore à décider), effacer un onglet, taille du texte, aller en bas, clic droit sur un nom de joueur (menu du jeu, rien envoyé seul, R03.3) ; les options cochées sont faites avec X-447, chacune avec son essai en jeu. | Souhaitable, avec X-447 (demande de l'utilisateur, 15/11) ; choix de l'utilisateur du 15/11 vers 21 h 20 (liste du relais 84, section E) : oui à E1, E2, E3, E4, E5, E7 ; E6 (coller dans la saisie) oui mais « non prioritaire et a revoir exactement ce que c'est » : en dernier, à réexpliquer avant de coder |
-| X-456 | Outil : la ligne « 0) Reprise » de STATUS accumule des restes à chaque version… | Fait en 0.1461.0 |
+| X-456 | Outil : la ligne « 0) Reprise » de STATUS accumule des… | Fait en 0.1461.0 |
 | X-457 | Bug vu par l'utilisateur le 15/11 vers 20 h 50 (0.1454, deux captures) : la fenêtre de chat Tensho, collée en bas, saute entre deux positions de défilement 5 à 20 fois par seconde (une vue avec du vide sous la dernière ligne, une vue remontée de quelques lignes) ; un message de deux lignes (« La roselette appelle à l'aide! / 3 ennemis se joignent au combat. ») est dans la vue ; pistes : DrawChatLines suit le bas d'après ScrollMaxY de l'image d'avant puis SetScrollHereY(1) après le Dummy, alors que la hauteur du contenu change d'une image à l'autre quand des lignes sont mises en page au fil de l'eau (un message de plusieurs lignes compté une ligne tant qu'il n'est pas mis en page) ; deuxième relevé (20 h 50, deux captures) : on peut descendre bien plus bas que le dernier message, la fenêtre n'est plus qu'un fond vide avec la barre de défilement en bas : la hauteur du contenu est plus grande que les lignes affichées Fait quand : la fenêtre collée en bas ne bouge plus quand rien n'arrive, avec des messages d'une et de plusieurs lignes, avec et sans cadre (0.1454), après un redimensionnement ; la zone de défilement s'arrête à la dernière ligne (aucun vide en dessous) ; un test de comportement reproduit le va-et-vient (hauteur du contenu qui change pendant la mise en page) et le prouve corrigé ; vérifier aussi pourquoi chaque ligne paraît en double sur la capture (deux monstres vaincus, ou un message copié deux fois : comparer au chat du jeu, test si c'est un bug) ; essai en jeu. | Indispensable, rang 3 (bug visible, 15/11) ; mesure de 0.1461 (15/11 22 h 05, onglet Combat, l'utilisateur : « le defilement rend bizzard et j'ai encore une saut de chat », quatre captures) : « Chat window jumps » chaque seconde : largeur 704 et 45 rangées fixes, mise en page refaite 0 fois, mais la limite du défilement alterne d'une image à l'autre entre 310 et 400 px (ou 330 et 400), collée en bas à chaque image : c'est la hauteur visible de la zone des messages qui change de 70 à 90 px une image sur deux (piste : la taille ou la place de la fenêtre qui bascule, par exemple le pas de côté des panneaux devant une fenêtre du jeu, « Panel Chat steps aside », ou le cadre et la barre d'onglets), pas le contenu ; 22 h 15, l'utilisateur : « j'ai fait un combat y a pas d'infos » (onglet Combat, deux captures : en bas de l'onglet, deux lignes de 22 h 00 puis du vide) ; le jeu a bien envoyé les lignes de combat (dalamud.log « Reading messages: kind 41: Critique! Le chigoe subit 348 points de dégâts » à 22:00:49) : vérifier qu'elles sont dans la fenêtre et cachées par le saut (rangées dessinées hors de la zone visible), sinon un second bug de copie à corriger ; test : des lignes de combat ajoutées pendant que la fenêtre est collée en bas restent toutes visibles |
-| X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page privée des essais… | Fait en 0.1461.0 |
+| X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page… | Fait en 0.1461.0 |
 | X-459 | Demande de l'utilisateur du 15/11 vers 21 h 05 : sur la page privée des essais (X-450), « ajoute aussi la possibilité de te mettre des screen pour essai » Fait quand : chaque essai de la page accepte une ou plusieurs captures (bouton et glisser-déposer, coller une image avec Ctrl+V), envoyées dans les fichiers de la page (capacité « assets », page privée : seuls l'utilisateur et l'agent les voient) ; la réponse garde l'identifiant de chaque capture ; la page montre les vignettes et permet d'en retirer une ; l'import de l'outil de la page récupère les captures nouvelles (lecture par la maître) et les met à côté de la réponse, citées dans la note de l'essai ou du point X-auto ; les captures restent hors du dépôt (R25 : elles peuvent montrer le nom du personnage) ; taille et types d'image bornés ; essai du chargement d'une capture et de sa lecture par l'agent. | Indispensable, rang 2 (outil demandé par l'utilisateur, avec X-450) |
 | X-460 | Bug vu par l'utilisateur le 15/11 vers 21 h (essai T-0.1130-1, page des essais, capture) : carte de Tensho, colonne d'outils : les deux cases « 100% » (le pourcentage du zoom et le bouton « 100% » dessous) sont légèrement décalées à droite dans leur cadre Fait quand : le texte des deux cases est centré dans son cadre, à 100 % et à 150 % de zoom, carte superposée et en petite fenêtre, en français et en anglais ; image de la colonne d'outils déclarée et comparée (R37) ; essai en jeu. | Souhaitable (bug d'affichage mineur, 15/11) |
-| X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai T-0.1441-3, page des… | Fait en 0.1463 |
+| X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai… | Fait en 0.1463 |
 | X-462 | Bug vu par l'utilisateur le 15/11 vers 21 h 30 (trois captures, carte du jeu à gauche, carte de Tensho à droite) : à Eulmore, ville à trois couches (Les Racines, Le Tronc, La Voûte, une carte chacune), la carte de Tensho montre sur chaque couche des icônes (marchands, sacs de vendeurs, PNJ…) qui appartiennent aux autres couches ; le jeu n'en montre que celles de la couche ouverte Fait quand : chaque icône de la carte de Tensho (marchands, PNJ, quêtes, sonnettes et coffres X-386, éthérites, découvertes) est rangée par carte (la ligne Map de la couche) et non par zone, ce qui vaut pour toutes les zones à plusieurs cartes (liste tirée des feuilles TerritoryType et Map du jeu, sondée et citée, R06) ; un test prend les trois cartes d'Eulmore et prouve qu'une icône d'une couche n'apparaît pas sur une autre ; une icône dont la carte n'est pas connue n'est pas montrée sur une couche au hasard ; images des trois couches comparées à la carte du jeu ; essai en jeu dans chaque couche. | Indispensable, rang 3 (bug visible de la carte, 15/11) |
-| X-463 | Outil : retour.py refuse la release tant qu'un commit du relais a sa CI rouge… | Fait en 0.1461.0 |
-| X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
-| X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
+| X-463 | Outil : retour.py refuse la release tant qu'un commit du… | Fait en 0.1461.0 |
+| X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461… | Fait en 0.1466 |
+| X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21… | Fait en 0.1465 |
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il faudrait que le chat arrête de compter après 100 et marque 100+ » Fait quand : le compte des messages non lus d'un onglet s'affiche tel quel jusqu'à 100, puis « 100+ » au-delà (le compte réel continue en dessous, sans changer la largeur des onglets à chaque message) ; test de ChatFormat.TabLabel pour 99, 100, 101 et 5000 ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447) |
 | X-467 | Décision de l'utilisateur du 15/11 vers 22 h 25 (« on a pas de barre de texte avec le chat », puis « Oui, après les bugs ») : la fenêtre de chat Tensho reçoit une barre de saisie (phase 5 de l'étude du chat), après les bugs du chat et les options cochées (X-447, X-455) ; règle de Dalamud en jeu (ce qu'un plugin envoie au jeu) : accord de l'utilisateur donné, le texte n'est envoyé que sur Entrée tapée par le joueur, jamais seul (R03.3, R04) Fait quand : une barre de saisie sous les messages envoie au jeu, sur Entrée seulement, ce que le joueur a tapé, dans le canal choisi (Dire, Équipe, Compagnie, LS, CWLS, /tell avec le monde, commandes /), avec historique des lignes tapées, autocomplétion des noms et des canaux, raccourcis et prise du clavier sans voler les touches du jeu ; coller dans la barre (E6 de X-455) ; coupée en JcJ et dans les contenus coupés (CompetitiveGate) ; DEC-053 complétée (saisie décidée) ; tests de ce qui part (rien sans Entrée, canal juste, texte tel quel) ; un lot d'essais en jeu à elle seule (canaux, LS, CWLS, /tell entre mondes, autotraduction). | Souhaitable, après X-447 et X-455 (décision de l'utilisateur, 15/11) |
 | X-468 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-172, découvertes partagées au-delà de 200 000 faits d'un genre) : « trouve la solution pour pouvoir avoir tous, mais si existe et vérifié plusieurs fois par plusieurs personnes ça devient un fait qui est plus pris en compte » Fait quand : une étude d'abord (taille réelle par genre aujourd'hui et dans un an au rythme mesuré, limites de GitHub et du format d'échange v3, temps de chargement du plugin) propose comment garder tous les faits (découpage par genre et par zone, ou fichiers par tranche, téléchargés à la demande) avec un poids par fait : le nombre de joueurs distincts qui l'ont vu ; les outils et la page qui s'en servent préfèrent un fait vu par plusieurs, montrent « vu par N joueurs » ou « vu une fois » ; présentée à l'utilisateur avec pour, contre et coût avant de coder ; DEC-042/v3 complétée ; aucun fait ne porte de donnée de joueur (R12.2). | Souhaitable (décision de l'utilisateur, 15/11) |
 | X-469 | Décision de l'utilisateur du 15/11 vers 22 h 30 (D-174, tableau des servants X-196) : « objets en vente » montre aussi la liste des objets en vente de chaque servant Fait quand : la liste des objets en vente d'un servant (nom, quantité, prix, HQ) est lue à l'ouverture de sa liste de vente dans le jeu (lecture native vérifiée, « indisponible » si elle ne colle pas, R08), gardée par personnage et datée (« relevé le … ») ; le tableau des servants la montre sous la ligne du servant ; un servant jamais ouvert dit « pas encore relevé » ; tests de la lecture et du rangement ; base pour « Mes annonces » (X-208) ; essai en jeu. | Souhaitable (décision de l'utilisateur, 15/11, avec X-208) |
-| X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : publish.sh dit à chaque version le compte des versions sans relecture (X-391, seuil 8), comme il dit déjà le plafond des essais en jeu (R34) Fait quand : publish.sh et retour.py affichent « relecture : N/8 versions sans relecture depuis celle de x.y.z » à chaque version, avec un avertissement à 7 et 8 ; même calcul que lance.py ; auto-test. | Indispensable, rang 4 (outil, idée choisie par l'utilisateur) |
-| X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la même garde que plan.py (X-401, aucun chemin des fichiers de l'agent dans le plan public) pour les autres sources des documents publics produits par la génération des documents (décisions et leurs blocs publics, CHANGELOG, TESTING, FAQ) Fait quand : chaque outil qui écrit une source d'un document public refuse un chemin des fichiers de l'agent avec le même message que plan.py ; check-docs le vérifie aussi sur les documents produits ; auto-test de chaque outil. | Indispensable, rang 4 (outil, idée choisie par l'utilisateur) |
+| X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11… | Fait en 0.1467.0 |
+| X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11… | Fait en 0.1467.0 |
 | X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre de chat Tensho côte à côte) : la fenêtre de chat Tensho perd les symboles du jeu : « Lysara Nocte [icône de monde] Alpha : THE UNDERGROOVE // November 22… » devient « Lysara NocteAlpha:   // November 22… » ; l'icône entre le nom et le monde et le texte « THE UNDERGROOVE » écrit en lettres encadrées du jeu (caractères privés de la police du jeu, SeIconChar) ont disparu Fait quand : les caractères spéciaux du jeu (lettres et chiffres encadrés, icônes de monde et de groupe, flèches, symboles de la police du jeu, IconPayload) s'affichent dans la fenêtre de chat Tensho comme dans le jeu (police ou icônes du jeu servies par Dalamud) ou, à défaut, par un équivalent lisible (« THE UNDERGROOVE » en lettres simples, nom du monde écrit), jamais supprimés ; la copie d'un message garde un texte lisible ; test de ChatPieces sur un message réel avec ces caractères ; essai en jeu. | Indispensable, rang 3 (bug visible, 15/11) |
 | X-473 | Demande de l'utilisateur du 15/11 vers 22 h 50 (fenêtre de chat Tensho) : info-bulles des joueurs, des compétences, des objets et des statuts Fait quand : au survol d'un nom de joueur, son monde, et sa classe et son niveau seulement s'il est dans le groupe ou à portée (ce que le jeu montre déjà ; rien n'est gardé, R04) ; au survol d'un nom d'action, d'un objet ou d'un statut dans un message (ligne de combat comprise), son icône et sa description tirées des feuilles du jeu (Action, Item, Status), comme l'info-bulle du jeu ; affichage seulement, rien n'est compté ni analysé dans le combat (R03.1) ; un nom qui ne se reconnaît pas sûrement n'a pas d'info-bulle (jamais une fausse) ; tests de la reconnaissance des noms ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447) |
 | X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat Tensho, le « Learn more here » du message de Dalamud (« Developer Mode is enabled ») n'est plus un lien (dans le jeu, il ouvre les réglages expérimentaux de Dalamud) Fait quand : un lien de Dalamud ou d'un plugin (DalamudLinkPayload) s'affiche souligné et, au clic, fait la même chose que dans le chat du jeu si Dalamud le permet (sonde d'abord : appeler le gestionnaire du lien depuis Tensho) ; sinon il reste du texte simple avec une info-bulle « ouvrez ce lien depuis le chat du jeu » ; test ; essai en jeu. | Souhaitable, rang 1 (bug de la fenêtre de chat, 15/11) |
@@ -1787,6 +1798,17 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-476 | Demande de l'utilisateur du 15/11 vers 22 h 50 (deux captures côte à côte, fenêtre de chat Tensho et chat du jeu) : « faire plus comme le chat du jeu, même disposition, même genre de transparence, ajout d'onglet et réglages dans l'interface du chat, icône réglages du chat (avec uniquement les réglages du chat, qui doivent se répercuter sur les réglages globaux) » Fait quand : la fenêtre de chat Tensho reprend la disposition du chat du jeu (onglets en bas comme le jeu, ou au choix ; heure entre crochets [22:47] comme le jeu ; mêmes marges), sa transparence (fond très léger, texte lisible avec contour, X-447 A2 et A3) ; au bout des onglets un « + » qui ajoute un onglet et une roue dentée qui ouvre un petit panneau avec seulement les réglages du chat (onglets, canaux, couleurs, cadre, verrou, taille, historique), les mêmes que dans les Paramètres de Tensho : un changement d'un côté se voit de l'autre (une seule source de réglages, test) ; image de la fenêtre comparée à une capture du chat du jeu ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447) |
 | X-477 | Bug d'affichage vu par l'utilisateur le 15/11 vers 22 h 55 (capture) : fenêtre de chat Tensho, les deux icônes au bout des onglets (cadre et cadenas, 0.1454) sont mal cadrées dans leur bouton (décalées vers le haut, coupées ou serrées contre le bord) Fait quand : les deux icônes sont centrées dans des boutons de la même hauteur que les onglets, avec et sans cadre, à toutes les tailles de texte, en français et en anglais (les icônes passent par le composant commun des boutons à icône, R10) ; image déclarée et comparée (R37) ; essai en jeu. | Souhaitable, rang 1 (bug d'affichage, 15/11) |
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une couleur choisie pour le nom de chaque onglet (Général, Combat…), pour les reconnaître d'un coup d'œil Fait quand : chaque onglet a un réglage de couleur de son nom (par défaut la couleur actuelle), dans le panneau des réglages du chat et dans les Paramètres de Tensho (même source) ; le nom reste lisible sur l'onglet actif et inactif, en thème clair et sombre (contraste vérifié) ; remise à la couleur par défaut ; test ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447) |
+| X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la cause du lien disparu n'est pas établie, et la définition de « fait » (test « tel que le jeu l'envoie », charges utiles réelles) n'est pas remplie. Le correctif suppose qu'un lien arrive sans texte visible ; rien ne le prouve (aucune trace du jeu dans docs/evidence) et le relais a justement ajouté une ligne du mode développeur pour voir ce que le jeu envoie. Les morceaux du test sont inventés, pas relevés. Fait quand : le constat ne tient plus, avec un test qui le prouve. | Indispensable : bug de la relecture (R27.2) |
+| X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467… | Fait en 0.1469 |
+| X-481 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I3 : X-465 : la définition de « fait » demande le score, le chemin, les cibles, les bonus et l'expérience de chaque bête lus comme la fenêtre du jeu ; seuls le score et les bêtes sont lus. Les parts du score (4, 6, 8, 10, 12) ne servent qu'au contrôle de la somme ; leur sens n'est pas établi et rien ne les garde ni ne les montre. Fait quand : le constat ne tient plus, avec un test qui le prouve. | Indispensable : bug de la relecture (R27.2) |
+| X-482 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467… | Fait en 0.1472 |
+| X-483 | Outil (défaut vu par l'utilisateur le 15/11 vers 23 h 40 sur le tableau de bord de la page des essais) : sept anciens « relevés » (D-83 à D-90, du 02/11) sont rangés parmi les décisions à prendre alors que ce sont des vérifications en jeu sans choix Fait quand : les relevés de la liste des décisions deviennent des essais de la page (D-85, D-87, D-88, D-89, D-90 : un essai chacun, avec quoi faire, où et quoi regarder, sans chemin de l'agent) puis sont fermés comme décisions (note « devenu l'essai … ») ; D-83 et D-84 sont fermés comme couverts par les essais de leurs versions ; l'outil des essais sait ajouter un essai sans point du plan (même forme que q.py releve) ; le tableau de bord ne compte plus que les vraies décisions (choix a/b ouverts), les relevés allant dans les essais ; auto-tests. | Indispensable, rang 1 (R13.3, défaut d'outil constaté le 15/11) |
+| X-484 | Demande de l'utilisateur du 15/11 vers 23 h 45 (douze captures des « Filtres du log » du jeu : Discussion, Combat par sujet et par genre, Annonces) : « prévoir aussi plus de filtres si c'est possible, en plus du jeu » Fait quand : chaque onglet de la fenêtre de chat Tensho se filtre au moins aussi finement que le jeu : Discussion (tous les canaux, LS et CWLS 1 à 8 séparés, emotes standard et personnalisées), Combat par sujet (vous, équipe, alliance, autres joueurs, ennemis combattus, autres ennemis, PNJ amicaux, compagnons et familiers de chacun) et par genre (dégâts infligés et subis, attaques manquées et esquivées, actions, objets, soins, effets bénéfiques et néfastes, fin des effets), Annonces (messages système, système de combat personnels et des autres, récolte, erreurs, écho, réseau des novices, compagnie, JcJ, marchés, dialogues et annonces des PNJ, butin, progression, dés, synthèse et récolte personnelles et des autres, pêche des autres, recrutement, signes, orchestrion, correspondance, alerte, mirage) ; le sujet et la cible d'une ligne de combat lus dans le type complet du message (sonde d'abord, R06 : ce que Dalamud 15 donne) ; en plus du jeu : filtres par mot (garder ou cacher, avec ou sans majuscules), par nom de joueur (cacher ou mettre en avant), cacher les montures et téléportations des autres, et les filtres de X-447 (alertes, doublons) ; préréglages « comme le jeu », tout activer, tout désactiver ; les canaux reconnus ou non cités dans une preuve ; tests ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447) |
+| X-485 | Demande de l'utilisateur du 15/11 vers 23 h 55 (capture : la fenêtre de chat Tensho dessinée par-dessus la fenêtre principale de Tensho et les fenêtres du jeu) : « le chat reste devant les interfaces du jeu et de Tensho ; il doit être tout derrière ou se cacher (réglage pour le chat) » Fait quand : la fenêtre de chat Tensho passe derrière les autres fenêtres de Tensho (jamais prise au premier plan seule, ImGuiWindowFlags.NoBringToFrontOnFocus ou ordre d'affichage) ; face aux fenêtres du jeu, qu'une fenêtre dessinée par Dalamud ne peut pas passer dessous, un réglage du chat au choix : se cacher, devenir transparente ou s'écarter quand une fenêtre du jeu ou de Tensho la recouvre (même mécanisme que le pas de côté des panneaux, « Panel Chat steps aside »), et revenir seule ; les clics vont à la fenêtre du dessus ; tests ; essai en jeu (fenêtre principale de Tensho, inventaire, carte du jeu par-dessus le chat). | Souhaitable, rang 1 (demande de l'utilisateur, avec X-447 D8) |
+| X-486 | Demande de l'utilisateur du 16/11 vers 0 h 20 (quatre captures au Dédale bestial : « Disposition du plateau » étape 1, « Formation de l'équipe », fiches du Chevalier et de l'Évêque du plateau, panneau Tensho qui montre tout le plateau d'un coup) : « une fois sur la formation d'équipe, on n'a pas d'interface propre à chaque combat, pour ne pas avoir tout d'un coup, avec les aides de combat » Fait quand : devant la formation de l'équipe, le panneau du Dédale montre d'abord le combat en cours (étape et affrontement lus dans la fenêtre du jeu, R08) : ses ennemis avec faiblesse, vulnérabilités, étoiles de force, intelligence, résistances et vitalité, et leurs actions (cible, type de dégâts, aire, interruption, effet, tirées des feuilles du jeu, R06), puis les trois bêtes conseillées pour ce combat avec la raison (faiblesse touchée, vulnérabilité) ; le reste du plateau replié sous « tout le plateau » ; le panneau suit l'étape quand elle change ; toujours coupé dès qu'un combat commence (DEC-047, R03.2) ; lié à X-136 (conseils par combat) ; tests sur les données d'un plateau réel ; essai en jeu. | Souhaitable, rang 1 (demande de l'utilisateur, avec X-136) |
+| X-487 | Outil, demande de l'utilisateur du 16/11 vers 0 h 30 (« les aides du jeu couvrent tout le jeu », règle R06 complétée le même soir) : un index des textes d'aide et de guide du jeu, à chercher avant tout relevé en jeu ; l'utilisateur ajoute (16/11 vers 0 h 35) que l'aide est surtout dans le guide officiel en ligne, le Play Guide du Lodestone (fr.finalfantasyxiv.com/lodestone/playguide) Fait quand : le guide de jeu du Lodestone est la première source en ligne : ses pages sont lues par l'agent quand un point en a besoin (lien de la page cité dans la preuve, rien copié dans le plugin, aucune lecture automatique par le plugin) et leur liste par sujet est tenue dans l'index ; une sonde en lecture seule des feuilles du client (aides des fenêtres, guides, tutoriels, astuces, descriptions des contenus et des systèmes ; liste des feuilles relevée et citée) écrit un index en français et en anglais, cherchable par mot (outil de l'agent et commande documentée dans tools/README.md), avec pour chaque texte sa feuille, sa ligne et sa version du jeu ; refait après un patch ; le skill des versions dit de le consulter avant de coder une lecture inconnue ou de demander un relevé ; auto-test sur des textes connus (Dédale, Grâce, roues éthérées). | Indispensable, rang 2 (outil demandé par l'utilisateur) |
+| X-488 | Demande de l'utilisateur du 16/11 vers 0 h 40 : le tableau de bord de la page des essais (X-458) n'a « pas assez de stats » : quota utilisé par jour et par heure, versions par relais et par type de relais, « et j'en passe », et ce que l'agent jugera utile Fait quand : un onglet « Statistiques » avec courbes et tableaux, chiffres mesurés seulement (R16), chacun avec sa source et sa date : quota (5 h, semaine, Fable) par heure et par jour, avec le plancher R26 et la remise à zéro ; par relais : modèle et effort, durée, versions, points faits, tests ajoutés, quota de la semaine et de la fenêtre de 5 h consommé, quota par version, contexte à la fin, arrêts et pourquoi ; comparaison par type de relais (Opus élevé, très élevé, moyen, Fable : quota par version et par point, retouches, R26.5) ; versions et releases par jour ; avancement du plan dans le temps (points ouverts et faits par classe, ajoutés et fermés par jour) ; essais (validés, en échec, pas pu, par jour ; versions jamais vues ; temps entre une version et son essai) ; bugs trouvés par l'utilisateur, par le relecteur et par l'agent, et leur délai de correction ; constats de relecture par bloc (bloquants, importants, mineurs) ; CI (rouges, relances, tests instables) ; tests automatiques (nombre par version) ; demandes de l'utilisateur par jour et délai jusqu'à « fait » ; suggestions de l'agent en plus ; les sources (state.json, passages, plan, essais, lancements, journaux) lues par l'outil de la page, l'historique du quota gardé à chaque relevé ; lisible au téléphone ; auto-test sur des données faites. | Indispensable, rang 2 (outil demandé par l'utilisateur, avec X-458) |
+| X-489 | Outil (défaut constaté par le relais 86 le 16/11 vers 00 h 35) : GLOBAL-PLAN produit dépassait son budget de 300 Ko (308 805 octets ; 155 points ouverts : 153 Ko, 502 points faits : 104 Ko) et publish.sh --last s'arrêtait ; le relais a ramené les titres des points faits de 80 à 60 caractères (291 446 octets, moins de 20 Ko de marge : l'avertissement reste). Fait quand : une solution durable choisie (par exemple les points faits dans une page à part produite, ou les définitions longues des points ouverts résumées dans le tableau avec le détail ailleurs), GLOBAL-PLAN sous son budget avec au moins 20 Ko de marge, auto-test et test du budget. | Indispensable, rang 1 (R13.3, défaut d'outil constaté le 16/11) |
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment
