@@ -43,7 +43,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1306-allied-kinds.md](0.1306-allied-kinds.md) | `tools/README.md` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1308-own-map-instances.md](0.1308-own-map-instances.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs`, `tests/TenshoAssistant.Tests/DeepDungeonOpen1308Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/project/ARCHITECTURE.md` |
-| [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
+| [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1418-gil-windows.md` |
 | [0.1320-map-marker-unlock.md](0.1320-map-marker-unlock.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerGameList1321Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerRemember1335Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerUnlock1320Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1342-map-marker-bits.md` |
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
 | [0.1342-map-marker-bits.md](0.1342-map-marker-bits.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerBits1342Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
@@ -59,6 +59,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1402-bells-and-chests.md](0.1402-bells-and-chests.md) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs`, `src/TenshoAssistant/Maps/PlacedObjects.cs`, `tests/TenshoAssistant.Tests/PlacedObjects1402Tests.cs`, `tests/TenshoAssistant.Tests/PlacedObjects1405Tests.cs`, `tools/README.md` | `CHANGELOG.md`, `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1415-retainer-sales-end.md](0.1415-retainer-sales-end.md) | `src/TenshoAssistant/Character/CharacterStatus.cs`, `tests/TenshoAssistant.Tests/RetainerSalesEnd1415Tests.cs` | `CHANGELOG.md` |
+| [0.1418-gil-windows.md](0.1418-gil-windows.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilCategories1418Tests.cs` | `CHANGELOG.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
@@ -292,5 +293,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 280 files · fichiers ; 234 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 281 files · fichiers ; 235 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

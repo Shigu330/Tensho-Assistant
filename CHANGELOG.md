@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1418.0
+- Plan global, X-18 : Journal des gils : moins de gains « Autre ». Trois catégories nouvelles, chacune tirée d'une fenêtre du jeu sondée dans le client (UldProbe) : « Quêtes et mandats (récompenses) » (JournalResult, la fenêtre des récompenses du journal), « Commandes spéciales » (SatisfactionSupply) et « Dresseur (résultats des plateaux) » (XBMResult, déjà vue au journal le 13/11 avec un gain de 2 000 resté « Autre »). Gains seulement ; une dépense à côté reste « Autre » ; les entrées déjà écrites gardent leur catégorie. Icône et textes pour chacune. Preuve : docs/evidence/0.1418-gil-windows.md. Test : GilCategories1418Tests.
+- Pour les joueurs : journal des gils : les récompenses de quêtes et de mandats, les commandes spéciales et les résultats des plateaux du dresseur ont désormais leur catégorie au lieu de « Autre ».
+- Tests : GilCategories1418Tests. Verify.ps1 (agent) : 2697/2697, 0 avertissement, 0 erreur ; DLL 0.1418.0.0. Non validé en jeu.
+### English
+- Gil journal: fewer gains « Other ». Three new categories, each from a game window probed in the client (UldProbe): « Quests and leves (rewards) » (JournalResult, the journal's reward window), « Custom Deliveries » (SatisfactionSupply) and « Beastmaster (trial results) » (XBMResult, already seen in the log on 11/13 with a 2,000 gain left « Other »). Gains only; a spending next to them stays « Other »; entries already written keep their category. An icon and texts for each. Evidence: docs/evidence/0.1418-gil-windows.md. Test: GilCategories1418Tests.
+- For players: Gil journal: quest and leve rewards, Custom Deliveries and Beastmaster trial results now have their own category instead of « Other ».
+
 ## 0.1417.0
 - Plan global, X-153 : Refonte de Plugin.cs, neuvième tranche (revue GPT du 11/11, acceptée par l'utilisateur) : la famille de la pêche en mer sort de Plugin.cs vers Plugin.Ocean.cs : les données des voyages (routes, lieux, poissons de chaque coin, missions, bonus) et l'horaire, lus hors de l'image ; le lecteur du voyage et son relevé gardé à côté des réglages ; l'état de jeu pour les scripts du développeur, qui lit ce voyage. Le bloc est déplacé tel quel : un seul chemin d'installation et un seul de libération par service, dans l'ordre d'avant, à la même place. Aucune page changée. Test : OceanFamily1417Tests ; VoyagePoints1095Tests, OceanVoyageTests et VoyageReload1094Tests lisent le nouveau fichier.
 - Tests : OceanFamily1417Tests. Verify.ps1 (agent) : 2695/2695, 0 avertissement, 0 erreur ; DLL 0.1417.0.0. Rien à essayer en jeu.

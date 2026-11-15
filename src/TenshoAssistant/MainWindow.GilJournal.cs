@@ -30,6 +30,10 @@ internal sealed partial class MainWindow
         GilCategory.Fate=>Dalamud.Interface.FontAwesomeIcon.Flag,
         GilCategory.Defeat=>Dalamud.Interface.FontAwesomeIcon.Crosshairs,
         GilCategory.ChallengeLog=>Dalamud.Interface.FontAwesomeIcon.Book,
+        // X-18 (0.1418).
+        GilCategory.Quest=>Dalamud.Interface.FontAwesomeIcon.Scroll,
+        GilCategory.CustomDeliveries=>Dalamud.Interface.FontAwesomeIcon.Truck,
+        GilCategory.Beastmaster=>Dalamud.Interface.FontAwesomeIcon.Paw,
         _=>Dalamud.Interface.FontAwesomeIcon.QuestionCircle,
     };
     private void DrawGilJournal()
