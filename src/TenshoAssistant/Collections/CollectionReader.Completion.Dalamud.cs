@@ -44,6 +44,18 @@ internal sealed partial class CollectionReader
         }
         RememberCompletion(owner,source,completeTitles ? now:null,completeAchievements ? now:null);
     }
+    /// <summary>
+    /// X-417 (0.1390): the saved readings applied to what is published (disk copy, or a reading published before they arrived), with their
+    /// dates for the page; nothing while another character's state or a loading state is published.
+    /// </summary>
+    private void PublishSavedReadings(ulong owner)
+    {
+        var state=service.State;
+        if(owner==0 || listsOwner!=owner || state.CharacterId!=owner || state.Loading || state.Error is not null)return;
+        var (applied,titlesAt,achievementsAt)=CompletionListsData.ApplySaved(state.Entries,completionLists,completeTitles,completeAchievements,DateTimeOffset.UtcNow,completionLifetime());
+        service.SetReadings(titlesAt,achievementsAt);
+        service.Publish(owner,applied,state.CategoryIssues,state.ObservedAt,state.FromCache);
+    }
     /// <summary>X-274 (0.1387): a complete reading (the game had sent the list) kept for the next sessions, written in the background.</summary>
     private void KeepCompleteReadings(ulong owner,DateTimeOffset at)
     {

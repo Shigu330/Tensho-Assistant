@@ -88,6 +88,28 @@ public sealed class CompletionListsData
     }
 
     /// <summary>
+    /// X-417 (0.1390): pure: the saved readings applied to a whole list of entries, for each kind the game has not sent completely in this
+    /// reading (<paramref name="titlesComplete"/>, <paramref name="achievementsComplete"/>), with the date of each reading used (null when
+    /// none is used: the page then says the game's window is needed). Applied to the copy restored from the disk (the usual path after a
+    /// restart within the cache duration) and when the readings arrive after a publication; applying it twice gives the same entries.
+    /// </summary>
+    public static (CollectionEntry[] Entries,DateTimeOffset? TitlesReadAt,DateTimeOffset? AchievementsReadAt) ApplySaved(IReadOnlyList<CollectionEntry> entries,
+        IReadOnlyDictionary<CollectionKind,CompletionList>? lists,bool titlesComplete,bool achievementsComplete,DateTimeOffset now,TimeSpan keep)
+    {
+        var titles=titlesComplete ? null:lists?.GetValueOrDefault(CollectionKind.Title);
+        var achievements=achievementsComplete ? null:lists?.GetValueOrDefault(CollectionKind.Achievement);
+        var applied=new CollectionEntry[entries.Count];
+        for(var index=0;index<entries.Count;index++)
+        {
+            var entry=entries[index];
+            if(entry.Kind==CollectionKind.Title && titles is not null)entry=Apply(entry,titles,now-titles.ReadAt<=keep);
+            if(entry.Kind==CollectionKind.Achievement && achievements is not null)entry=Apply(entry,achievements,now-achievements.ReadAt<=keep);
+            applied[index]=entry;
+        }
+        return (applied,titles?.ReadAt,achievements?.ReadAt);
+    }
+
+    /// <summary>
     /// Pure: a fresh entry (the game has not sent its list this session) with the last reading: obtained stays obtained; not in the reading
     /// counts as not obtained while the reading is younger than the « Titles and achievements » cache duration; a fresh positive always wins.
     /// </summary>

@@ -108,6 +108,8 @@ internal sealed partial class CollectionReader : IDisposable
             listsLoad=null;
             try{completionLists=listsDone.GetAwaiter().GetResult();}
             catch(Exception error){log.Warning(error,"Saved title and achievement readings could not be read; the game's windows are needed again.");}
+            // X-417 (0.1390): readings that arrive after a publication (disk copy or reading) are applied to it now, not at the next reading.
+            if(!scanning && restore is null)PublishSavedReadings(owner);
         }
         var force=service.ConsumeRefresh();
         if (owner != character || force || (!scanning && restore is null && owner!=0 && now >= nextRefresh && !CacheAge.Fresh(service.State.ObservedAt,DateTimeOffset.UtcNow,cacheLifetime())))
@@ -139,7 +141,10 @@ internal sealed partial class CollectionReader : IDisposable
                 {
                     service.Publish(owner,saved.Value.Entries,saved.Value.Issues,saved.RecordedAt,true);
                     lastTitlesLoaded=unlocks.IsTitleListLoaded;lastAchievementsLoaded=unlocks.IsAchievementListLoaded;
-                    scanning=false;nextRefresh=0;return;
+                    // X-417 (0.1390): the disk copy is no complete reading of this session: the saved readings (TenshoData.db) apply to it
+                    // and the page names their date; before, this path returned without them.
+                    completeTitles=false;completeAchievements=false;
+                    scanning=false;nextRefresh=0;PublishSavedReadings(owner);return;
                 }
                 catch(Exception error){log.Warning(error,"Cached collections rejected; reading game data.");}
             }
