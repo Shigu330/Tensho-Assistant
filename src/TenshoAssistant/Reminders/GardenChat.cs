@@ -38,8 +38,14 @@ public sealed class GardenChat
     /// <summary>#36 (0.978): a harvest is the ordinary item gain line (chat type 62, no sender) while the target is a garden bed (the caller checks housing).
     /// X-382 (0.1360, dalamud.log of 14/11 23:48: « Garden menu read … bed 6 », then « Vous obtenez 9 carottes de Krakka » 1.5 s later, the harvest
     /// not seen): or a bed's menu read here just before (<paramref name="bedMenuJustSeen"/>, within <see cref="GardenMenuMemory.HarvestWindow"/>),
-    /// the target being no longer the bed when the gain line comes.</summary>
-    public static bool IsHarvest(int chatType,string sender,uint target,bool bedMenuJustSeen=false)=>chatType==62 && sender.Length==0 && (target==BedObject || bedMenuJustSeen);
+    /// the target being no longer the bed when the gain line comes.
+    /// X-410 M1 (0.1378): with only the menu to go on, the gain line must name a garden item (<paramref name="gardenItem"/> true); a line naming
+    /// no item (null) keeps the menu rule; one naming only other items (false: a purchase, an item received after a menu closed) is no harvest.</summary>
+    public static bool IsHarvest(int chatType,string sender,uint target,bool bedMenuJustSeen=false,bool? gardenItem=null)=>
+        chatType==62 && sender.Length==0 && (target==BedObject || bedMenuJustSeen && gardenItem!=false);
+
+    /// <summary>X-410 M1 (0.1378): whether a gain line names a garden item: null when it names no item, else whether one of them is.</summary>
+    public static bool? GardenItem(IReadOnlyCollection<uint> items,Func<uint,bool> isGardenItem)=>items.Count==0 ? null:items.Any(isGardenItem);
 
     private static Regex? Pattern(IReadOnlyList<string?>? parts)
     {

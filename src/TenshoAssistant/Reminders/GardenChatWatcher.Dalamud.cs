@@ -24,6 +24,8 @@ internal sealed class GardenChatWatcher : IDisposable
     private readonly IPluginLog log;
     private readonly Func<bool> enabled;
     private readonly Func<uint,bool> isSeed;
+    // X-410 M1 (0.1378): a seed or a crop of the embedded garden data (null: not given, the menu rule alone).
+    private readonly Func<uint,bool>? isGardenItem;
     private readonly Action<GardenChatEvent,uint?,string?> planted;
     private GardenChat? rules;
     private bool rulesFailed,warned,disposed;
@@ -43,8 +45,8 @@ internal sealed class GardenChatWatcher : IDisposable
     private GardenMenuTitle? menuTitle;
     private bool menuTitleFailed;
     private string? menuSeen;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null)
-    {this.target=target;this.gui=gui;this.developer=developer;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null)
+    {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         chat.ChatMessageUnhandled+=OnMessage;
         TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnUpdate);
@@ -169,7 +171,9 @@ internal sealed class GardenChatWatcher : IDisposable
             {
                 var at=DateTimeOffset.UtcNow;
                 var place=Place();var aimed=target();
-                if(GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null))
+                var gardenItem=isGardenItem is null ? (bool?)null:GardenChat.GardenItem(message.Message.Payloads.OfType<Dalamud.Game.Text.SeStringHandling.Payloads.ItemPayload>()
+                    .Select(payload=>TenshoAssistant.Discoveries.ItemGains.BaseItem(payload.ItemId)).ToArray(),isGardenItem);
+                if(GardenChat.IsHarvest((int)message.LogKind,sender,aimed,menuMemory.Peek(place,at,GardenMenuMemory.HarvestWindow) is not null,gardenItem))
                 {
                     var slot=menuMemory.Take(place,at);
                     if(GardenHarvests.IsNew(at,lastHarvest,slot,lastHarvestSlot))
