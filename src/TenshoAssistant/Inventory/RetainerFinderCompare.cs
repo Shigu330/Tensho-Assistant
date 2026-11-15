@@ -20,6 +20,9 @@ public sealed record FinderComparison(ulong RetainerId,bool Current,bool InBank,
 public static class RetainerFinderCompare
 {
     public const uint HighQualityOffset=1_000_000;
+    /// <summary>X-422 M4 (0.1401): the most entries of the game's map walked (kept or skipped): a game has at most 10 retainers a character,
+    /// anything far beyond is a moved structure (R08: unavailable, never an endless walk on the game's thread).</summary>
+    public const int MaximumEntries=64;
     public const int Slots=175,PageSize=25,Equipped=14,Crystals=18;
 
     /// <summary>The finder's stacks as (item, quantity, position), the HQ encoding decoded, empty slots left out.</summary>

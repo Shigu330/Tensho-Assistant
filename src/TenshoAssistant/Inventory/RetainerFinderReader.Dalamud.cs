@@ -13,8 +13,11 @@ internal static unsafe class RetainerFinderReader
         var module=ItemFinderModule.Instance();
         if(module==null)return null;
         var found=new List<FinderRetainer>();
+        var turns=0;
         foreach(var pair in module->RetainerInventories)
         {
+            // X-422 M4 (0.1401): every turn counts, the entries skipped too (an endless run of empty entries is a moved structure as well).
+            if(++turns>RetainerFinderCompare.MaximumEntries)return null;
             var (id,pointer)=pair;
             if(id==0 || pointer.Value==null)continue;
             var inventory=pointer.Value;
@@ -24,7 +27,6 @@ internal static unsafe class RetainerFinderReader
             var items=new (uint,ushort)[ids.Length];
             for(var slot=0;slot<ids.Length;slot++)items[slot]=(ids[slot],counts[slot]);
             found.Add(new(id,module->IsRetainerCurrent(id),items,inventory->EquippedItemIds.ToArray(),inventory->CrystalQuantities.ToArray()));
-            if(found.Count>64)return null; // a game has at most 10 retainers a character: anything far beyond is a moved structure.
         }
         return found.AsReadOnly();
     }
