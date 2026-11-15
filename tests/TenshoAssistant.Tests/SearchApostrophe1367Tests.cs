@@ -38,18 +38,8 @@ internal static class SearchApostrophe1367Tests
         }),
         ("Search apostrophe 1367: no search site compares a typed search without the shared helper", () =>
         {
-            var plain = new Regex(@"\.(Contains|IndexOf)\(\s*[A-Za-z_][A-Za-z0-9_.]*\s*,\s*StringComparison\.(Ordinal|CurrentCulture|InvariantCulture)IgnoreCase\s*\)");
-            var named = new Regex(@"(?i)search|query|filter|wanted|term");
-            var left = new List<string>();
-            foreach (var file in Directory.EnumerateFiles(Path.GetFullPath("src/TenshoAssistant"), "*.cs", SearchOption.AllDirectories))
-            {
-                if (file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar) || file.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar)) continue;
-                foreach (Match match in plain.Matches(File.ReadAllText(file)))
-                {
-                    var needle = Regex.Match(match.Value, @"\(\s*([A-Za-z0-9_.]+)").Groups[1].Value.Split('.').Last();
-                    if (named.IsMatch(needle)) left.Add(Path.GetFileName(file) + ": " + match.Value);
-                }
-            }
+            // X-408 (0.1375): the 0.1367 scan saw only needles named search, query, filter, wanted or term; the stricter scan sees any.
+            var left = SearchSites1375Tests.Left();
             Check(left.Count == 0, "search sites without SearchText: " + string.Join("; ", left.Take(5)));
         }),
     ];

@@ -125,6 +125,6 @@ public sealed class FashionDataset
         return Array.AsReadOnly(ForHint(hintId).Select(match=>new FashionCandidate(match,items?.Find(match.ItemId)))
             .Where(candidate=>(slot==EquipmentSlots.None || candidate.Item is { } item && (item.Equipment&slot)!=0)
                 && (query.Length==0 || candidate.Match.ItemId.ToString(CultureInfo.InvariantCulture)==query
-                    || CultureInfo.CurrentCulture.CompareInfo.IndexOf(candidate.Item?.Name ?? "",query,CompareOptions.IgnoreCase|CompareOptions.IgnoreNonSpace)>=0)).ToArray());
+                    || SearchText.Contains(candidate.Item?.Name ?? "",query,CompareOptions.IgnoreCase|CompareOptions.IgnoreNonSpace))).ToArray());
     }
 }

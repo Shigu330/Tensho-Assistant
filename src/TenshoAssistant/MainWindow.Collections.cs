@@ -150,7 +150,7 @@ internal sealed partial class MainWindow
                 _=>entry.Acquisition==CollectionAcquisition.NotAcquired,
             };
             collectionViewMatches = collectionViewEntries.Where(entry => StateMatches(entry) && CollectionSourceMatches(entry,sourceFilter)
-                && (string.IsNullOrWhiteSpace(collectionQuery) || entry.Name.Contains(collectionQuery.Trim(), StringComparison.OrdinalIgnoreCase))).ToArray();
+                && (string.IsNullOrWhiteSpace(collectionQuery) || SearchText.Contains(entry.Name, collectionQuery.Trim(), StringComparison.OrdinalIgnoreCase))).ToArray();
         }
         var entries = collectionViewEntries;
         ImGui.TextColored(Accent,localization.Format(kind==CollectionKind.Achievement ? "CollectionSummary.Completed":"CollectionSummary.Acquired",collectionViewAcquired,entries.Length));

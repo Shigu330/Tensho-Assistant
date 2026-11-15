@@ -57,7 +57,7 @@ public static class CraftPresets
         {
             if(source[index] is not { } row){if(words.Length==0)unreadable.Add(index);continue;}
             var text=$"{row.Name} {item(row)} {job(row)}";
-            if(words.All(word=>text.Contains(word,StringComparison.OrdinalIgnoreCase)))rows.Add(index);
+            if(words.All(word=>SearchText.Contains(text,word,StringComparison.OrdinalIgnoreCase)))rows.Add(index);
         }
         string Name(int index)=>source[index].Name ?? "";
         IEnumerable<int> sorted=sort switch

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace TenshoAssistant;
 
 /// <summary>
@@ -22,4 +24,8 @@ public static class SearchText
     /// <summary>Whether <paramref name="text"/> holds <paramref name="search"/>, apostrophes folded on both sides; null text holds nothing.</summary>
     public static bool Contains(string? text,string search,StringComparison comparison=StringComparison.CurrentCultureIgnoreCase)
         =>text is not null && Fold(text).Contains(Fold(search),comparison);
+
+    /// <summary>X-408 (0.1375): the same with compare options (accents ignored, IgnoreNonSpace), in the given culture (current by default).</summary>
+    public static bool Contains(string? text,string search,CompareOptions options,CultureInfo? culture=null)
+        =>text is not null && (culture ?? CultureInfo.CurrentCulture).CompareInfo.IndexOf(Fold(text),Fold(search),options)>=0;
 }

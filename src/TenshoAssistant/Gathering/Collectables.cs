@@ -103,8 +103,8 @@ public static class Collectables
     public static CollectableRule[] Filter(IEnumerable<CollectableRule> rules,string? query)
     {
         var words=(query ?? "").Split(' ',StringSplitOptions.RemoveEmptyEntries);
-        return rules.Where(rule=>words.All(word=>rule.Name.Contains(word,StringComparison.CurrentCultureIgnoreCase)
-            || rule.Group.Contains(word,StringComparison.CurrentCultureIgnoreCase))).ToArray();
+        return rules.Where(rule=>words.All(word=>SearchText.Contains(rule.Name,word)
+            || SearchText.Contains(rule.Group,word))).ToArray();
     }
 
     public static CollectableTier Tier(CollectableRule rule,int collectability)
