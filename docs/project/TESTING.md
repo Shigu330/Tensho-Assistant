@@ -1408,7 +1408,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
 
-- [ ] (0.1163) Dédale bestial, à la fin d'un plateau : Dresseur › Équipe montre « Dernier plateau (date) : score N » avec le même score que la fenêtre du jeu, et pour chaque bête « rang avant (exp/100) → rang après (exp/100) » comme le jeu ; dalamud.log a la ligne « Beastmaster board result read: score N, 10 beasts »
+- [ ] (0.1163) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
 
 
 - [ ] (0.1164) Après quelques changements de réglage (fenêtre, alarmes) : dalamud.log n'a plus de ligne « Slow settings save » au-delà de 50 ms ni « Long UiBuilder(Tensho Assistant) » au moment d'un clic sur un réglage ; aucune ligne « saved on the game's thread, as before »
@@ -1953,9 +1953,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1458) Fenêtre de chat de Tensho : les onglets sont Général, Combat, Événement et Social, comme les trois premiers onglets du chat du jeu ; en combat, vos dégâts et « Vous avez vaincu … » sont dans Combat et pas dans Général ; un dialogue de PNJ (une quête) est dans Événement ; vos onglets d'avant sont gardés, Combat et Événement ajoutés une seule fois (pas après un rechargement) ; comparer avec les onglets du chat du jeu.
 
-- [ ] (0.1459) Mode développeur, relevé pour X-433 : fermer le jeu et le relancer, se connecter, puis ne plus recharger Tensho pendant deux minutes (pas de version publiée pendant ce temps) ; jouer normalement ; dire « C'est fait » sur la page des essais : je compare dans le journal les à-coups de ce premier chargement (tas frais, « load 1 in this game process ») à ceux des chargements répétés.
+- [x] (0.1459) Mode développeur, relevé pour X-433 : fermer le jeu et le relancer, se connecter, puis ne plus recharger Tensho pendant deux minutes (pas de version publiée pendant ce temps) ; jouer normalement ; dire « C'est fait » sur la page des essais : je compare dans le journal les à-coups de ce premier chargement (tas frais, « load 1 in this game process ») à ceux des chargements répétés.
 
 - [ ] (0.1460) Mode développeur, fenêtre de chat de Tensho collée en bas, quand elle se remet à sauter (un message de deux lignes visible, ou en tirant le bord de la fenêtre) : dire l'heure ; le journal a une ligne « Chat window jumps » qui dit comment (mises en page, rangées, défilement).
+
+- [ ] (0.1462) Fenêtre de chat de Tensho collée en bas (onglet Combat, puis Général) : elle ne bouge plus quand rien n'arrive, avec des messages d'une et de plusieurs lignes, avec et sans cadre, puis après l'avoir agrandie et rétrécie ; on ne peut plus descendre sous la dernière ligne. En mode développeur, plus de ligne « Chat window jumps » dans dalamud.log. Les lignes en double de la capture du 15/11 : comparer au chat du jeu (deux messages du jeu, ou un message copié deux fois).
+
+- [ ] (0.1463) Fenêtre de chat de Tensho, mode développeur : dire « test <item> test » (un objet lié) puis lier une quête et un lieu au milieu d'une phrase : chaque lien s'affiche à sa place, souligné, entre les deux « test » ; un clic l'ouvre dans Tensho ; la copie du message (clic droit) l'a aussi. Dans dalamud.log, la ligne « Chat window, pieces of a message with a link » dit ce que le jeu a envoyé (sortes et longueurs seulement).
+
+- [ ] (0.1464) Carte de Tensho à Eulmore : ouvrir Les Racines, Le Tronc et La Voûte l'une après l'autre, à côté de la carte du jeu : chaque couche ne montre que ses marchands, PNJ, sonnettes et sacs de vendeurs, comme le jeu (aucune icône d'une autre couche). Puis un donjon à étages (par exemple le Phare de Sirius) : chaque étage garde ses icônes.
+
+- [ ] (0.1465) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
+
+- [ ] (0.1466) Fenêtre de chat de Tensho : pendant un combat, l'onglet Combat n'affiche plus de compteur « (N) » et la barre d'onglets ne bouge plus ; un dialogue de PNJ n'est plus que dans l'onglet Événement (plus dans Général) ; en raid d'alliance, les messages de Général restent tous là après le combat.
+
+- [ ] (0.1467) Fenêtre de chat de Tensho : la molette fait défiler une ligne par cran ; remonter plus haut : le bouton « En bas » apparaît en bas à droite ; pendant que des messages arrivent, il devient « N nouveaux » ; un clic ramène au dernier message, et la fenêtre suit de nouveau les messages.
 
 **0.535 : interfaces** — à voir en jouant
 
