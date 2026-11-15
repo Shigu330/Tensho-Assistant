@@ -155,9 +155,12 @@ def index_block(code):
 
 
 def git_files(pattern):
-    out = subprocess.run(["git", "ls-files", pattern], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+    # X-432: the files the next commit will hold: tracked, and new ones not ignored (the CHANGELOG archive of a new hundred, written by
+    # docs.py gen just before, was left out of the evidence index; the release then stopped on « Documents not produced »).
+    out = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", "--", pattern], cwd=ROOT,
+                         capture_output=True, text=True, encoding="utf-8")
     # A tracked file deleted in the working tree (not yet committed) is no longer a document to index (0.1052).
-    return [line for line in out.stdout.splitlines() if line and (ROOT / line).exists()]
+    return list(dict.fromkeys(line for line in out.stdout.splitlines() if line and (ROOT / line).exists()))
 
 
 def index_problems():

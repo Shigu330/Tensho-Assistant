@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1413.0
+- Plan global, X-432 : Outil des documents produits : l'index des preuves (docs/evidence/README.md) et l'index des documents lisent désormais les fichiers que le prochain commit contiendra (suivis, et nouveaux non ignorés). Une archive du CHANGELOG créée par la même passe de documents (nouvelle centaine) restait hors de l'index des preuves : la release de 0.1412 s'était arrêtée sur « Documents not produced for this version ». Test : DocsFresh1413Tests.
+- Tests : DocsFresh1413Tests. Verify.ps1 (agent) : 2685/2685, 0 avertissement, 0 erreur ; DLL 0.1413.0.0. Rien à essayer en jeu.
+### English
+- Produced documents tool: the evidence index (docs/evidence/README.md) and the document index now read the files the next commit will hold (tracked ones, and new ones not ignored). A CHANGELOG archive created by the same document pass (a new hundred) was left out of the evidence index: the 0.1412 release had stopped on « Documents not produced for this version ». Test: DocsFresh1413Tests.
+
 ## 0.1412.0
 - Plan global, X-153 : Refonte de Plugin.cs, huitième tranche (revue GPT du 11/11, acceptée par l'utilisateur) : la famille de la récolte et de la pêche sort de Plugin.cs vers Plugin.Gathering.cs : les deux services communautaires des poissons (GatherBuddy, temps de touche), le lecteur des carnets, le lecteur de l'appât, la copie de la pêche du joueur sur le thread du jeu, les coins de pêche, les bases de Récolte abondante et les effets des points de récolte. Le bloc est déplacé tel quel : un seul chemin d'installation et un seul de libération par service, dans l'ordre d'avant, à la même place. Aucune page changée. Test : GatheringFamily1412Tests.
 - Tests : GatheringFamily1412Tests. Verify.ps1 (agent) : 2683/2683, 0 avertissement, 0 erreur ; DLL 0.1412.0.0. Rien à essayer en jeu.
