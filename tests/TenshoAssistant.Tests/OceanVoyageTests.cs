@@ -82,7 +82,7 @@ internal static class OceanVoyageTests
                 && fishing.Contains("now.Job==18 && !atSea"),"usual help off at sea");
             var panel=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.OceanVoyagePanel.cs"));
             Check(panel.Contains("RecordOceanSighting(timetable,Math.Max(0,slot),frame.RouteId);") && panel.Contains("Ocean schedule sighting: slot {0}, loop row {1}"),"sighting recorded and logged");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Ocean.cs"));   // X-153 (0.1417): the ocean family's file
             Check(plugin.Contains("territories.Add(fishingSpot.TerritoryType.RowId)") && plugin.Contains("{Territories=territories,"),"territories from the game data");
             Check(TenshoAssistant.ConfigurationReset.Kept.Contains("OceanSightings"),"saved data kept");
         }),

@@ -597,52 +597,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // g, R-01 (0.392): ocean fishing timetable from the game's loop (IKDRouteTable) and voyages (IKDRoute), built on first use.
             // X-285 (0.1300): the page loaders that read only the game's sheets, given by one method to the game and the desktop application.
             mainWindow.UseSheetLoaders(data,log);
-            var ocean=new Lazy<Gathering.OceanSchedule?>(()=>mainWindow.OceanTimetable?.Invoke());
-            // g, R-07 (0.418): the voyage in progress and the game's ocean fishing data (routes, places, fish of each spot, missions).
-            var oceanVoyageData=new Lazy<Gathering.OceanVoyageData?>(()=>
-            {
-                try
-                {
-                    var routes=data.GetExcelSheet<Lumina.Excel.Sheets.IKDRoute>().Where(row=>!row.Name.IsEmpty)
-                        .ToDictionary(row=>row.RowId,row=>(row.Spot.Select(spot=>spot.RowId).Where(id=>id!=0).ToArray(),row.Time.Select(time=>time.RowId).ToArray()));
-                    var spots=data.GetExcelSheet<Lumina.Excel.Sheets.IKDSpot>().Where(row=>row.PlaceName.RowId!=0)
-                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanSpot(row.RowId,row.PlaceName.ValueNullable?.Name.ExtractText() ?? "",row.SpotMain.RowId,row.SpotSub.RowId));
-                    var fishingSpots=data.GetExcelSheet<Lumina.Excel.Sheets.FishingSpot>();
-                    var spotFish=new Dictionary<uint,IReadOnlyList<uint>>();var territories=new HashSet<uint>();
-                    foreach(var id in spots.Values.SelectMany(spot=>new[]{spot.MainSpot,spot.SpectralSpot}).Where(id=>id!=0).Distinct())
-                        if(fishingSpots.GetRowOrDefault(id) is { } fishingSpot)
-                        {
-                            spotFish[id]=fishingSpot.Item.Select(item=>item.RowId).Where(item=>item!=0).ToArray();
-                            if(fishingSpot.TerritoryType.RowId!=0)territories.Add(fishingSpot.TerritoryType.RowId);
-                        }
-                    // X-85 V3 (0.961): each mission's criterion from the English texts (species words matched to the bonus rows), each fish's species.
-                    var words=Gathering.OceanMissionRules.SpeciesWords(data.GetExcelSheet<Lumina.Excel.Sheets.IKDContentBonus>(Dalamud.Game.ClientLanguage.English)
-                        .Select(row=>(row.RowId,row.Requirement.ExtractText())));
-                    var englishMissions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>(Dalamud.Game.ClientLanguage.English);
-                    var missions=data.GetExcelSheet<Lumina.Excel.Sheets.IKDPlayerMissionCondition>().Where(row=>!row.Unknown0.IsEmpty)
-                        .ToDictionary(row=>row.RowId,row=>new Gathering.OceanMission(row.Unknown0.ExtractText(),row.Unknown1,
-                            englishMissions.GetRowOrDefault(row.RowId) is { } english ? Gathering.OceanMissionRules.Parse(english.Unknown0.ExtractText(),words):null));
-                    var fishBonuses=new Dictionary<uint,uint[]>();
-                    foreach(var row in data.GetExcelSheet<Lumina.Excel.Sheets.IKDFishParam>())
-                        if(row.Fish.ValueNullable?.Item.RowId is { } item and not 0)
-                            fishBonuses[item]=row.IKDContentBonus.Select(bonus=>bonus.RowId).Where(id=>id!=0).ToArray();
-                    return new Gathering.OceanVoyageData(routes,spots,spotFish,missions){Territories=territories,FishBonuses=fishBonuses};
-                }
-                catch(Exception error){log.Warning(error,"Ocean fishing voyage data unavailable.");return null;}
-            });
-            // 0.1095 (user report: OceanVoyage 75 to 90 ms on the first frame after each reload): the sheets are read in the background; the panel
-            // and the schedule check wait for them (null until then) instead of reading them in the frame.
-            mainWindow.OceanVoyageData=InBackground(oceanVoyageData);
-            mainWindow.OceanTimetableNow=InBackground(ocean);
-            OceanVoyageReader? oceanVoyageReader=null;
-            // 0.1094 (user report: seven reloads during one voyage): the voyage kept beside the settings, and the play state for the developer's scripts.
-            var voyageWriter=new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});
-            registrations.Register(()=>mainWindow.OceanVoyage=oceanVoyageReader=new OceanVoyageReader(framework,client,log,
-                Path.Combine(pluginInterface.GetPluginConfigDirectory(),"OceanVoyage.json"),voyageWriter){Developer=()=>configuration.DeveloperMode,
-                CatchPoints=(item,points)=>{if(configuration.Discovery.Enabled && configuration.Discovery.Fishing)mainWindow.DiscoveryStore?.SeeSource(Discoveries.DiscoveryKind.FishPoints,item,0,Math.Min(points,100_000),DateTimeOffset.UtcNow,client.TerritoryType);}},()=>oceanVoyageReader?.Dispose());
-            Diagnostics.PlayStateWriter? playState=null;
-            registrations.Register(()=>playState=new Diagnostics.PlayStateWriter(framework,condition,pluginInterface.GetPluginConfigDirectory(),
-                ()=>pluginInterface.IsDev || configuration.DeveloperMode,()=>oceanVoyageReader?.Frame is not null,voyageWriter),()=>playState?.Dispose());
+            // X-153 (0.1417, ninth slice): the ocean fishing family (Plugin.Ocean.cs), at the same place as before.
+            RegisterOcean(pluginInterface,configuration,data,framework,client,condition);
             // 0.388 (user request): position of the game's inventory window, for the sort button drawn above it.
             Inventory.InventoryWindowReader? inventoryWindow=null;
             registrations.Register(()=>inventoryWindow=new Inventory.InventoryWindowReader(framework,gameGui,()=>configuration.InventorySortButton,log),()=>inventoryWindow?.Dispose());

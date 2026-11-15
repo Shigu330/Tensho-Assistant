@@ -47,7 +47,9 @@ internal static class Dashboard1247Tests
             Check(Read("src/TenshoAssistant/MainWindow.TrackerWindow.cs").Contains("internal void PanelFailed(string name,Exception error){log.Error(error,") && Read("src/TenshoAssistant/MainWindow.TrackerWindow.cs").Contains("NotePanelOff(name);}"),"panel windows and attached panels");
             var plugin=Read("src/TenshoAssistant/Plugin.cs");
             Check(plugin.Contains("(perhaps after a game update).\",name);mainWindow.NotePanelOff(name);}"),"the plugin's overlays");
-            Check(plugin.Split("new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});").Length-1==2,"both background writers");
+            // X-153 (0.1417): the voyage record's writer moved with the ocean family (Plugin.Ocean.cs): both writers counted across the plugin's files.
+            var wiring=plugin+Read("src/TenshoAssistant/Plugin.Ocean.cs");
+            Check(wiring.Split("new BackgroundWriter((error,message)=>{log.Warning(error,message);mainWindow.NoteWriteFailed(message);});").Length-1==2,"both background writers");
             Check(plugin.Contains("SayLoad(\"created\");\n            mainWindow.LoadMilliseconds="),"the load's time");
             var dashboard=Read("src/TenshoAssistant/MainWindow.Dashboard.cs");
             Check(dashboard.Contains("internal void NoteWriteFailed(string message){Interlocked.Increment(ref writesFailed);Volatile.Write(ref lastWriteFailure,message);}"),"a writer's thread: counted atomically");
