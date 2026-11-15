@@ -67,8 +67,10 @@ internal static class SettingsRead1120Tests
         }),
         ("Settings 1120: a burst of notices is one reading off the frame; a notice during a reading asks one more; a failed reading keeps the last valid settings",() =>
         {
-            var reads=0;var fail=false;var gate=new ManualResetEventSlim(true);
-            var grouped=new Grouped<int>(()=>{gate.Wait(5000);var n=Interlocked.Increment(ref reads);if(fail)throw new IOException("being written");return n;},100);
+            // Relay 76: « started » is set as the work begins (after Grouped's delay): the requests that must ask one more are made after it,
+            // never after a fixed sleep (under load the delay could outlast it and the requests joined the reading).
+            var reads=0;var fail=false;var gate=new ManualResetEventSlim(true);var started=new ManualResetEventSlim(false);
+            var grouped=new Grouped<int>(()=>{started.Set();gate.Wait(5000);var n=Interlocked.Increment(ref reads);if(fail)throw new IOException("being written");return n;},100);
             var thread=Environment.CurrentManagedThreadId;
             for(var i=0;i<20;i++)grouped.Request();
             Check(SpinWait.SpinUntil(()=>!grouped.Busy,5000) && reads==1,"twenty notices: one reading, got "+reads);
@@ -76,9 +78,8 @@ internal static class SettingsRead1120Tests
             void Poll(){if(grouped.Take() is { } result && result.Error is null)applied=result.Value;}
             Poll();
             Check(applied==1 && grouped.Take() is null,"taken once and applied");
-            gate.Reset();grouped.Request();
-            Check(SpinWait.SpinUntil(()=>Volatile.Read(ref reads)==1 && grouped.Busy,1000),"a reading started");
-            Thread.Sleep(200);
+            gate.Reset();started.Reset();grouped.Request();
+            Check(started.Wait(5000) && Volatile.Read(ref reads)==1 && grouped.Busy,"a reading started");
             grouped.Request();grouped.Request();
             gate.Set();
             Check(SpinWait.SpinUntil(()=>!grouped.Busy,5000) && reads==3,"notices during a reading: one more, got "+reads);

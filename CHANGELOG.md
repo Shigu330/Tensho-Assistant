@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1396.0
+- Test instable corrigé à la cause (R36.2) : « Settings 1120 : une notification pendant une lecture en demande une de plus » attendait 200 ms et tenait la lecture pour commencée ; Grouped attend son délai (100 ms) avant de lire et rattache à cette lecture les demandes faites pendant l'attente : sous charge (tous les tests en parallèle), l'attente pouvait dépasser les 200 ms et une lecture manquait (« got 2 »). Le test attend maintenant que le travail ait commencé (un signal posé dedans) au lieu d'un temps fixe.
+- Tests : SettingsRead1120Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1396.0.0. Rien à essayer en jeu.
+### English
+- Unstable test fixed at the cause (R36.2): « Settings 1120: a notice during a reading asks one more » slept 200 ms and took the reading as begun; Grouped waits its delay (100 ms) before reading and joins the requests made during that wait to this reading: under load (every test in parallel) the wait could outlast the 200 ms and one reading was missing (« got 2 »). The test now waits for the work to have started (a signal set inside it) instead of a fixed time.
+
 ## 0.1395.0
 - Plan global, X-307 : Sonde des sacs des servants gardés par le jeu, second passage : la première (0.1394) a trouvé les mêmes objets que la Banque, les objets HQ comme identifiant + 1 000 000 et les mêmes cristaux, mais pas les mêmes cases. La ligne « retainer finder » de l'auto-contrôle dit maintenant aussi si la copie du jeu est tassée depuis la case 0, si elle suit l'ordre des cases de la Banque sans les trous, et si elle suit l'ordre d'affichage de la fenêtre du servant. Preuve docs/evidence/0.1394-retainer-finder.md. Test RetainerFinder1394Tests (cas nouveau).
 - Tests : RetainerFinder1394Tests. Verify.ps1 (agent) : 2645/2645, 0 avertissement, 0 erreur ; DLL 0.1395.0.0. Rien à essayer en jeu.
