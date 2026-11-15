@@ -62,7 +62,7 @@ In PvP zones and other ranked content (Triple Triad tournaments, Mahjong), the w
 
 ## How do I update Tensho?
 
-Nothing to do: Dalamud updates it like any other plugin, when the game starts or from the plugin installer (/xlplugins › « Update »). What changed in each version is in CHANGELOG.md on GitHub. The desktop app updates itself.
+Nothing to do: Dalamud updates it like any other plugin, when the game starts or from the plugin installer (/xlplugins › « Update plugins »). What changed in each version is in CHANGELOG.md on GitHub. The desktop app updates itself.
 
 ## How do I start over?
 
@@ -180,7 +180,7 @@ Dans les zones JcJ et les autres contenus classés (tournois de Triple Triade, M
 
 ## Comment mettre Tensho à jour ?
 
-Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage du jeu ou depuis l'installateur de plugins (/xlplugins › « Mettre à jour »). Les changements de chaque version sont dans CHANGELOG.md sur GitHub. L'application de bureau se met à jour seule.
+Rien à faire : Dalamud le met à jour comme les autres plugins, au démarrage du jeu ou depuis l'installateur de plugins (/xlplugins › « Mettre à jour les plugins »). Les changements de chaque version sont dans CHANGELOG.md sur GitHub. L'application de bureau se met à jour seule.
 
 ## Comment repartir de zéro ?
 
@@ -216,7 +216,7 @@ Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet ch
 
 ## Comment installer Tensho ?
 
-Dans Dalamud › Settings › Experimental › Custom Plugin Repositories, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
+Dans Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés, ajoutez https://raw.githubusercontent.com/Shigu330/Tensho-Assistant/main/repo.json et enregistrez, puis installez « Tensho Assistant » depuis l'installateur de plugins. /tensho ouvre la fenêtre.
 
 ## Puis-je voir Tensho sans le jeu ?
 

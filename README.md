@@ -68,7 +68,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
 |  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
 | Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
-|  | **Relics** | Relic weapons and armour, the stages you hold and the Zodiac book in progress. |
+|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
 |  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
 |  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
 |  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
@@ -260,9 +260,9 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
 |  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
 |  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
-|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres et victimes, pour votre classe et votre grande compagnie. |
+|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
 | Contenus | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
-|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre du zodiaque en cours. |
+|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
 |  | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
 |  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
 |  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |

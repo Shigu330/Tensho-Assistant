@@ -52,6 +52,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.136.0-marker-evidence.log](0.136.0-marker-evidence.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1360-garden-harvest-menu.md](0.1360-garden-harvest-menu.md) | — | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1367-search-apostrophes.md](0.1367-search-apostrophes.md) | `src/TenshoAssistant/Help/SearchText.cs`, `tests/TenshoAssistant.Tests/SearchApostrophe1367Tests.cs` | `CHANGELOG.md` |
+| [0.1369-second-look-terms.md](0.1369-second-look-terms.md) | `tests/TenshoAssistant.Tests/SecondLook1369Tests.cs` | `CHANGELOG.md` |
 | [0.139.0-symbols-probe.log](0.139.0-symbols-probe.log) | `src/TenshoAssistant/MainWindow.MapView.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/changelog/CHANGELOG-0.200-0.299.md` |
 | [0.141.0-itemaction-probe.log](0.141.0-itemaction-probe.log) | `src/TenshoAssistant/Items/ItemCatalog.cs`, `src/TenshoAssistant/Items/ItemUnlockCopy.Lumina.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -287,5 +288,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 275 files · fichiers ; 229 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 276 files · fichiers ; 230 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
