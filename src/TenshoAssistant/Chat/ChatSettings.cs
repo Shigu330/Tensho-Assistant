@@ -25,9 +25,14 @@ public sealed class ChatSettings
     public int Opacity{get;set;}=85;
     public int FontScale{get;set;}=100;
     public int MaxLines{get;set;}=2000;
+    /// <summary>X-448 (0.1454): no title bar nor frame; the buttons at the end of the tab bar stay.</summary>
+    public bool Borderless{get;set;}
+    /// <summary>X-448 (0.1454): the window is neither moved nor resized.</summary>
+    public bool Locked{get;set;}
     public List<ChatTabSettings>? Tabs{get;set;}
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
-    public int BoundedOpacity=>Math.Clamp(Opacity,10,100);
+    /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
+    public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);
     public int BoundedMaxLines=>ChatStore.Bounded(MaxLines);
     public uint ColorOf(ChatChannel channel)=>Colors?.TryGetValue(channel,out var color)==true ? color&0xFFFFFF:ChatChannels.DefaultColor(channel);

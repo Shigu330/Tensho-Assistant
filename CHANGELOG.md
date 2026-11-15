@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1454.0
+- Plan global, X-448 : Plan global, X-448 (demande de l'utilisateur du 15/11 vers 20 h 20, fenêtre de chat Tensho : « prévoir aussi un mode sans bordure et plus de réglages ») : la fenêtre de chat de Tensho a un mode sans bordure (ni barre de titre ni cadre) et un verrou (ni déplacée ni redimensionnée) ; son fond descend jusqu'à transparent (0 %, au lieu de 10 %) ; sa position et sa taille restent gardées comme avant. Deux boutons au bout de ses onglets, toujours visibles (aussi sans bordure), mettent ou retirent le cadre et le verrou ; les réglages ont les deux, et « /tensho chat » affiche ou masque toujours la fenêtre. Les autres réglages demandés entrent dans la liste d'options à cocher de X-447.
+- Pour les joueurs : la fenêtre de chat de Tensho peut se passer de son cadre (seulement les onglets et les messages) et être verrouillée à sa place, avec un fond tout à fait transparent si voulu ; deux boutons au bout de ses onglets règlent les deux.
+- Tests : ChatFrame1454Tests. Verify.ps1 (agent) : 2799/2799, 0 avertissement, 0 erreur ; DLL 0.1454.0.0. Non validé en jeu.
+### English
+- Global plan, X-448 (the user's request of 11/15 around 8:20 pm, Tensho chat window: « also plan a borderless mode and more settings »): Tensho's chat window has a borderless mode (no title bar nor frame) and a lock (neither moved nor resized); its background goes down to transparent (0 %, instead of 10 %); its position and size stay kept as before. Two buttons at the end of its tabs, always visible (also borderless), put the frame and the lock on or off; the settings have both, and « /tensho chat » still shows or hides the window. The other settings asked go into X-447's list of options to tick.
+- For players: Tensho's chat window can go without its frame (only the tabs and the messages) and be locked in place, with a fully transparent background if wanted; two buttons at the end of its tabs switch both.
+
 ## 0.1453.0
 - X-403, phase 2, fin : les adresses web. Le jeu les envoie comme du texte (aucun lien du jeu) : la fenêtre de chat de Tensho les trouve dans le texte d'un message (http://, https://, www.), les souligne, montre l'adresse entière au survol, et un clic ouvre un petit menu avec l'adresse : « Ouvrir dans le navigateur » ou « Copier l'adresse » ; rien ne s'ouvre au premier clic. Seulement http et https, avec un hôte ; la ponctuation finale et une parenthèse fermante non ouverte dans l'adresse sont laissées hors du lien. Le texte d'un lien du jeu (lieu, objet, quête) n'est pas relu.
 - Pour les joueurs : la fenêtre de chat de Tensho souligne les adresses web écrites dans les messages : un clic propose de les ouvrir dans le navigateur ou de les copier.

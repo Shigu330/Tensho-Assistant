@@ -37,11 +37,13 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `AutoBankCapture` | bool | true | Settings › Data · Settings › Data | **Save retainers, saddlebags and the company chest automatically when they are opened** — Off: an import button appears beside the game's storage windows. Default: on. |
 | `BagsServerBar` | bool | false | Settings › General | **Bags in the server bar** — Shows the free slots of your four bags in the server bar; its tooltip gives the total, a click opens Storage. Refreshed every 2 seconds. Default: off. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Show as a list** — One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply. Default: off. |
+| `Chat.Borderless` | bool | false | Settings › Panels | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.FontScale` | int | 100 | Settings › Panels | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
 | `Chat.HideInCombat` | bool | false | Settings › Panels | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
+| `Chat.Locked` | bool | false | Settings › Panels | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MaxLines` | int | 2000 | Settings › Panels | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
-| `Chat.Opacity` | int | 85 | Settings › Panels | **Background opacity** — Opacity of the window's background, from 10% to 100%. Default: 85%. |
+| `Chat.Opacity` | int | 85 | Settings › Panels | **Background opacity** — Opacity of the window's background, from 0% (transparent) to 100%. Default: 85%. |
 | `Chat.ShowChannel` | bool | true | Settings › Panels | **Show the channel** — Writes the channel's short name in front of what people say, such as [1] for linkshell 1. Default: on. |
 | `Chat.ShowSeconds` | bool | false | Settings › Panels | **Show the seconds** — Adds the seconds to the time. Greyed while the time is not shown. Default: off. |
 | `Chat.ShowTimestamps` | bool | true | Settings › Panels | **Show the time** — Writes the time of each message in front of it. Default: on. |
@@ -335,7 +337,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 279 controls (271 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 281 controls (273 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -378,11 +380,13 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `AutoBankCapture` | bool | true | Paramètres › Données et sources · Paramètres › Données et sources | **Enregistrer automatiquement les servants, sacoches et le coffre de compagnie à leur ouverture** — Désactivé : un bouton d'import apparaît à côté des fenêtres de rangement du jeu. Par défaut : activé. |
 | `BagsServerBar` | bool | false | Paramètres › Général | **Sacs dans la barre du serveur** — Montre les cases libres de vos quatre sacs dans la barre du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes. Par défaut : désactivé. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Afficher en liste** — Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués. Par défaut : désactivé. |
+| `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
 | `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
+| `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
-| `Chat.Opacity` | int | 85 | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 10 % à 100 %. Par défaut : 85 %. |
+| `Chat.Opacity` | int | 85 | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 0 % (transparent) à 100 %. Par défaut : 85 %. |
 | `Chat.ShowChannel` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher le canal** — Écrit le nom court du canal devant ce que disent les gens, comme [1] pour la linkshell 1. Par défaut : activé. |
 | `Chat.ShowSeconds` | bool | false | Paramètres › Panneaux à côté du jeu | **Afficher les secondes** — Ajoute les secondes à l'heure. Grisé tant que l'heure n'est pas affichée. Par défaut : désactivé. |
 | `Chat.ShowTimestamps` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher l'heure** — Écrit l'heure de chaque message devant lui. Par défaut : activé. |
@@ -676,5 +680,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 279 cases (271 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 281 cases (273 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

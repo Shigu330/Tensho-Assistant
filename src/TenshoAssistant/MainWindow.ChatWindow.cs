@@ -19,7 +19,11 @@ internal sealed partial class MainWindow
     private PanelDefinition ChatPanelDefinition=>new("Chat","###TenshoChat",new Vector2(40,420),
         ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar,
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
-        Opacity:()=>ChatOptions.BoundedOpacity/100f,Size:new Vector2(560,320));
+        Opacity:()=>ChatOptions.BoundedOpacity/100f,Size:new Vector2(560,320),MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless);
+
+    /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.</summary>
+    private ImGuiWindowFlags ChatFrameFlags()=>(ChatOptions.Borderless ? ImGuiWindowFlags.NoTitleBar:ImGuiWindowFlags.None)
+        |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None);
 
     private bool ChatWindowVisible()
         =>!windowDisposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && !gameGui.GameUiHidden && !(ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
@@ -61,7 +65,10 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
         BoolSetting("ChatWindow.Channel","ChatWindow.ChannelTip",()=>configuration.Chat.ShowChannel,value=>configuration.Chat.ShowChannel=value,c=>c.Chat.ShowChannel);
-        SliderSetting("ChatWindow.Opacity","ChatWindow.OpacityTip",()=>configuration.Chat.BoundedOpacity,value=>configuration.Chat.Opacity=value,10,100,defaults.Opacity,"%d %%");
+        SliderSetting("ChatWindow.Opacity","ChatWindow.OpacityTip",()=>configuration.Chat.BoundedOpacity,value=>configuration.Chat.Opacity=value,0,100,defaults.Opacity,"%d %%");
+        // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
+        BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);
+        BoolSetting("ChatWindow.Locked","ChatWindow.LockedTip",()=>configuration.Chat.Locked,value=>configuration.Chat.Locked=value,c=>c.Chat.Locked);
         SliderSetting("ChatWindow.FontScale","ChatWindow.FontScaleTip",()=>configuration.Chat.BoundedFontScale,value=>configuration.Chat.FontScale=value,60,200,defaults.FontScale,"%d %%");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
@@ -181,8 +188,25 @@ internal sealed partial class MainWindow
                 try{DrawChatLines(view,options);}
                 finally{ImGui.EndTabItem();}
             }
+            DrawChatFrameButtons(options);
         }
         finally{ImGui.EndTabBar();}
+    }
+
+    /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
+    private void DrawChatFrameButtons(ChatSettings options)
+    {
+        bool frame,lockButton;
+        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+        try{frame=ImGui.TabItemButton(Dalamud.Interface.FontAwesomeExtensions.ToIconString(options.Borderless ? Dalamud.Interface.FontAwesomeIcon.BorderAll:Dalamud.Interface.FontAwesomeIcon.BorderNone)+"###ChatFrame",ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);}
+        finally{ImGui.PopFont();}
+        Tip(options.Borderless ? "ChatWindow.FrameOnTip":"ChatWindow.FrameOffTip");
+        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
+        try{lockButton=ImGui.TabItemButton(Dalamud.Interface.FontAwesomeExtensions.ToIconString(options.Locked ? Dalamud.Interface.FontAwesomeIcon.Lock:Dalamud.Interface.FontAwesomeIcon.LockOpen)+"###ChatLock",ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);}
+        finally{ImGui.PopFont();}
+        Tip(options.Locked ? "ChatWindow.UnlockTip":"ChatWindow.LockTip");
+        if(frame){options.Borderless=!options.Borderless;TrySave("Chat window");}
+        if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
     }
 
     private void DrawChatLines(ChatTabView view,ChatSettings options)
