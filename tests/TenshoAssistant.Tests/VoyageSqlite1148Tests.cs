@@ -112,9 +112,10 @@ internal static class VoyageSqlite1148Tests
             Check(copy.Copied==1,"copied: "+string.Join("; ",copy.Problems));
             var app=new VoyageHistoryStore(Path.Combine(mirror,"VoyageHistory.json"),(_,_)=>{},Data(Path.Combine(mirror,TenshoDataDatabase.FileName)));
             Check(!app.Unavailable && Same(app.Records,VoyageHistory.Prune(saved,DateTimeOffset.UtcNow)),"the application shows the same voyages");
-            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.DesktopData.cs"));
+            // X-413 (0.1385): line ends normalised first; « A && CRLF || LF » never checked A on an LF tree.
+            var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.DesktopData.cs")).Replace("\r\n","\n");
             Check(window.Contains("new FreeCompany.VoyageHistoryStore(json,warn,!File.Exists(json) && File.Exists(file) ? new TenshoDataFile(file,warn):null)")
-                && window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);".Replace("\n",Environment.NewLine)) || window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);"),
+                && window.Contains("UseDesktopPlayerData(folder,warn);\n                UseDesktopVoyages(folder,warn);"),
                 "the app reads its copy of the data file once converted, the JSON copy before, never converting it itself");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
             Check(plugin.IndexOf("var (tenshoData,bank,bankBridge)=RegisterPersistence(",StringComparison.Ordinal) is var made and >0

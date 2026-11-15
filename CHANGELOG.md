@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1385.0
+- Plan global, X-413 : Tests : GearPickTip1294Tests, affaibli en 0.1380 (« variante LF || variante CRLF && infobulle » : sur un arbre en LF, comme le dépôt et la CI, l'infobulle n'était plus vérifiée), normalise les fins de ligne puis exige la ligne de niveau sur la rangée de la pièce (une ligne par rangée, X-336 M7) et l'infobulle ; nom et message suivent le changement M7. Même forme trouvée dans VoyageSqlite1148Tests (« A && CRLF || LF » : A jamais vérifié), corrigée de même ; ResilienceTests (journal de chasse, forme juste mais à deux variantes) normalisé aussi. Nouveau test à cliquet LineEndChecks1385Tests : aucune condition de Check ne mêle && et || au premier niveau à côté d'une variante de fin de ligne.
+- Tests : LineEndChecks1385Tests, GearPickTip1294Tests, VoyageSqlite1148Tests, ResilienceTests. Verify.ps1 (agent) : 2619/2619, 0 avertissement, 0 erreur ; DLL 0.1385.0.0. Rien à essayer en jeu.
+### English
+- Tests: GearPickTip1294Tests, weakened in 0.1380 (« LF variant || CRLF variant && tooltip »: on an LF tree, as the repository and the CI, the tooltip was no longer checked), normalises the line ends and then requires the level line on the piece's row (one line per row, X-336 M7) and the tooltip; its name and message follow the M7 change. The same shape found in VoyageSqlite1148Tests (« A && CRLF || LF »: A never checked), fixed the same way; ResilienceTests (hunting log, a right shape but with two variants) normalised too. New ratchet LineEndChecks1385Tests: no Check condition mixes && and || at its top level next to a line-end variant.
+
 ## 0.1384.0
 - Plan global, X-412 : Cache des données : test de comportement à deux clients pour les rapports de patch (X-359 M1, R28.14). Le client A compare son catalogue pendant que le client B, sur le même dossier, fait et écrit son propre rapport (un autre catalogue) entre la comparaison de A et son écriture ; l'écriture de A, sous le verrou du profil, relit le fichier : le rapport de B reste, en mémoire comme sur le disque. Point d'essai DataCache.ReportsCompared (tests seulement). Test PatchReportsTwoClients1384Tests.
 - Tests : PatchReportsTwoClients1384Tests. Verify.ps1 (agent) : 2617/2617, 0 avertissement, 0 erreur ; DLL 0.1384.0.0. Rien à essayer en jeu.
