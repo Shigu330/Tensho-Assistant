@@ -213,9 +213,17 @@ internal sealed partial class MainWindow
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
     }
 
+    // X-457 (0.1462): the height of a row in the lines' area (font size chosen in the settings), kept from the frame before: the lines' height is
+    // declared before the area opens.
+    private float chatLineHeight;
+
     private void DrawChatLines(ChatTabView view,ChatSettings options)
     {
-        var visible=ImGui.BeginChild("###TenshoChatLines",Vector2.Zero,false,ImGuiWindowFlags.NoNav);
+        // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the
+        // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
+        var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
+        ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
+        var visible=ImGui.BeginChild("###TenshoChatLines",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar);
         try
         {
             if(!visible)return;
@@ -232,11 +240,15 @@ internal sealed partial class MainWindow
                 LayOutChatLine(view,next,options);
             }
             var height=ImGui.GetTextLineHeightWithSpacing();
-            var top=ImGui.GetCursorStartPos().Y;
+            chatLineHeight=height;
+            // X-457 (0.1462): the top of the content, as SetCursorPosY counts it (GetCursorStartPos takes the scroll off, and SetCursorPosY
+            // takes it off again: every line was drawn the scroll too high, the cause of the jumps and of the empty window).
+            var top=ImGui.GetCursorPosY();
             var scroll=ImGui.GetScrollY();
-            // At the bottom on the frame before: follow the new lines, and nothing is unread in this tab any more.
-            var atBottom=scroll>=ImGui.GetScrollMaxY()-1;
-            var end=scroll+ImGui.GetWindowHeight();
+            var shown=ImGui.GetWindowHeight();
+            // At the bottom on the frame before (its rows): follow the new lines, and nothing is unread in this tab any more.
+            var atBottom=ChatScroll.AtBottom(scroll,view.RowsShown,height,view.HeightShown);
+            var end=scroll+shown;
             for(var index=view.IndexAtRow((int)(scroll/height));index<view.Count;index++)
             {
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
@@ -244,9 +256,9 @@ internal sealed partial class MainWindow
                 if(row*height>end)break;
                 DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options);
             }
-            ImGui.SetCursorPosY(top+view.RowCount*height);
-            ImGui.Dummy(new Vector2(1,1));
-            if(atBottom){ImGui.SetScrollHereY(1);view.MarkSeen();}
+            // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
+            view.RowsShown=view.RowCount;view.HeightShown=shown;
+            if(atBottom){ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();}
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);

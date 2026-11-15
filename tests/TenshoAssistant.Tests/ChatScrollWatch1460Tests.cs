@@ -35,7 +35,8 @@ internal static class ChatScrollWatch1460Tests
         ("Chat scroll watch 1460: watched in developer mode only, after the lines are drawn", () =>
         {
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n", "\n");
-            var follow = window.IndexOf("if(atBottom){ImGui.SetScrollHereY(1);view.MarkSeen();}", StringComparison.Ordinal);
+            // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom, no longer by SetScrollHereY.
+            var follow = window.IndexOf("if(atBottom){ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();}", StringComparison.Ordinal);
             Check(follow > 0 && window.IndexOf("if(developerMode && chatScrollWatch.Frame(", follow, StringComparison.Ordinal) > follow, "after the bottom is followed, developer mode only");
             Check(window.Contains("var relaid=!view.LaidOutFor(width,key);", StringComparison.Ordinal), "a layout redone is known");
         }),

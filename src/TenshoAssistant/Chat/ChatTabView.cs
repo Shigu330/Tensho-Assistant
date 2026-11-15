@@ -18,6 +18,10 @@ public sealed class ChatTabView
     public int Unread{get;private set;}
     public int Count=>records.Count;
     public float Width{get;private set;}=-1;
+    /// <summary>X-457 (0.1462): the rows and the visible height of the window at the end of the frame before (« at the bottom » is read
+    /// against them).</summary>
+    public int RowsShown{get;set;}
+    public float HeightShown{get;set;}
     public string LayoutKey{get;private set;}="";
 
     /// <summary>Takes the store's new lines this tab shows, oldest dropped past the cap; true when the tab changed.</summary>
