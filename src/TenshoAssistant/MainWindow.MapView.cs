@@ -1410,6 +1410,11 @@ internal sealed partial class MainWindow
                 if(vendorLayout.Merged.TryGetValue(marker,out var vendors)){label=vendors.Label;vendorFlag=vendors.Flag;}
                 Add(marker.Icon,0,new Vector2(marker.X,marker.Y),label,marker,flag:vendorFlag);
             }
+            // X-386 (0.1402): bells and company chests placed by the layouts where the game's map has none (company workshops): drawn as the
+            // game's markers (same icon, size table and filter, hover name from MapSymbol).
+            if(settings.ShowFixedIcons && mapLocal?.State.Index is { } placedIndex)
+                foreach(var placed in placedIndex.OnMap(MapLocalKind.PlacedObject,map.MapId))
+                    Add(placed.Data,0,MapProjection.PixelFromWorld(new Vector3(placed.X,0,placed.Z),map),null);
             foreach(var point in islandPoints)
             {
                 var islandItems=itemCatalog.State.Catalog;

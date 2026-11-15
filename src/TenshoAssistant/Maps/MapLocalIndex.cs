@@ -5,7 +5,8 @@ using TenshoAssistant.Quests;
 
 namespace TenshoAssistant.Maps;
 
-public enum MapLocalKind { QuestIssuer, GatheringPoint, FishingSpot, Sightseeing, AetherCurrent }
+// X-386 (0.1402): PlacedObject = a bell or company chest from the layouts, Data = its map icon (Maps/PlacedObjects.cs), listed per map.
+public enum MapLocalKind { QuestIssuer, GatheringPoint, FishingSpot, Sightseeing, AetherCurrent, PlacedObject }
 
 /// <summary>
 /// World X/Z position of a quest giver (Quest.IssuerLocation → Level) or a gathering point (ExportedGatheringPoint, keyed by
@@ -45,7 +46,7 @@ public sealed class MapLocalIndex
         {
             if(row is null || row.Id==0 || !float.IsFinite(row.X) || !float.IsFinite(row.Z) || !float.IsFinite(row.Radius))continue;
             // First row wins: a later duplicate never moves a known position.
-            if(row.Kind is MapLocalKind.Sightseeing or MapLocalKind.AetherCurrent)
+            if(row.Kind is MapLocalKind.Sightseeing or MapLocalKind.AetherCurrent or MapLocalKind.PlacedObject)
             {
                 // Listed per map; one position per entry.
                 if(row.MapId==0 || row.Name is null || !seen.Add((row.Kind,row.Id)))continue;
@@ -61,7 +62,7 @@ public sealed class MapLocalIndex
     public MapLocalPosition? Quest(uint questId)=>quests.GetValueOrDefault(questId);
     public MapLocalPosition? Gathering(uint baseId)=>gathering.GetValueOrDefault(baseId);
     public MapLocalPosition? Fishing(uint spotId)=>fishing.GetValueOrDefault(spotId);
-    /// <summary>Sightseeing vistas or aether currents placed on a map.</summary>
+    /// <summary>Sightseeing vistas, aether currents or placed objects (X-386) on a map.</summary>
     public IReadOnlyList<MapLocalPosition> OnMap(MapLocalKind kind,uint mapId)=>onMap.GetValueOrDefault((kind,mapId)) ?? [];
     /// <summary>Every vista or aether current of the index, all maps.</summary>
     public IEnumerable<MapLocalPosition> All(MapLocalKind kind)=>onMap.Where(pair=>pair.Key.Item1==kind).SelectMany(pair=>pair.Value);
@@ -87,7 +88,8 @@ public static class MapLocalIndexCache
     // Bump when the Lumina → MapLocalPosition copy rules change without a change of record shape.
     // 2: quest giver rows carry the quest kind's map icon in Data (0.151).
     // 3: fishing spots carry their area (0.894, FishingSpotRadiusFactor).
-    private const int CopyRules=3;
+    // 4: bells and company chests from the layouts where the game's map has no marker (X-386, 0.1402).
+    private const int CopyRules=4;
     /// <summary>
     /// X-78 (0.894, docs/evidence/0.894-fishing-spot-area.md): FishingSpot.Radius in map texture pixels (as FishingSpot.X/Z), measured on the fishing log's own map
     /// of La Mer de Rubis (user capture): spots of radius 1000 drew circles of about 155 texture pixels, the 2000 one about 310. Approximate (±5 %).

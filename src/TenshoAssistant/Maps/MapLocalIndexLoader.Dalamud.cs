@@ -175,6 +175,62 @@ internal sealed class MapLocalIndexLoader : IDisposable
             }
             yield return ++count;
         }
+        foreach(var step in CopyPlacedObjects(count)){count=step;yield return step;}
+    }
+
+    // X-386 (0.1402): bells and company chests placed by the layouts where the game's own map has no marker of the same icon (company
+    // workshops: docs/evidence/0.1402-bells-and-chests.md). One layout file per step; territories sharing a layout read once.
+    private IEnumerable<int> CopyPlacedObjects(int count)
+    {
+        var markerSheet=data.GetSubrowExcelSheet<MapMarker>();
+        var layouts=new HashSet<string>(StringComparer.Ordinal);var marksByMap=new Dictionary<uint,List<(uint Icon,System.Numerics.Vector2 At)>>();var added=0u;
+        foreach(var territory in data.GetExcelSheet<TerritoryType>())
+        {
+            if(territory.Map.RowId==0 || !territory.Map.IsValid)continue;
+            var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+            if(cut<0 || !layouts.Add(bg))continue;
+            var map=territory.Map.Value;
+            if(map.SizeFactor==0)continue;
+            if(!marksByMap.TryGetValue(map.RowId,out var marks))
+            {
+                marks=[];
+                if(map.MapMarkerRange!=0 && markerSheet.TryGetRow(map.MapMarkerRange,out var markerRows))
+                    foreach(var marker in markerRows)
+                        if((uint)marker.Icon is PlacedObjects.BellIcon or PlacedObjects.CompanyChestIcon)marks.Add(((uint)marker.Icon,new(marker.X,marker.Y)));
+                marksByMap[map.RowId]=marks;
+            }
+            foreach(var kind in PlacedObjects.LayoutKinds)
+            {
+                if(Layout($"bg/{bg[..(cut+1)]}level/{kind}.lgb") is { } file)
+                    foreach(var layer in file.Layers)
+                    {
+                        if(layer.FestivalID!=0)continue;   // festival layers come and go (Sinus Ardorum's bells): left out
+                        foreach(var instance in layer.InstanceObjects)
+                        {
+                            if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.EventObject
+                               || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.EventInstanceObject placed)continue;
+                            var icon=PlacedObjects.IconOf(placed.ParentData.BaseId);var at=instance.Transform.Translation;
+                            var pixel=PlacedObjects.Pixel(at.X,at.Z,map.OffsetX,map.OffsetY,map.SizeFactor);
+                            if(!PlacedObjects.Missing(marks,icon,pixel))continue;
+                            marks.Add((icon,pixel));
+                            rows.Add(new(MapLocalKind.PlacedObject,++added,map.RowId,at.X,at.Z,0,icon));
+                        }
+                    }
+                yield return ++count;
+            }
+        }
+        log.Information("Map positions: {0} bell(s) and company chest(s) from the layouts where the game's map has no marker (X-386).",added);
+    }
+
+    // A missing, unexpected or unreadable layout only means no placed object there (the LGB header checked first, as the vendors' loader does).
+    private Lumina.Data.Files.LgbFile? Layout(string path)
+    {
+        try
+        {
+            if(!data.FileExists(path) || data.GetFile(path)?.Data is not { } bytes || !Npcs.NpcShopLinks.ValidLayout(bytes))return null;
+            return data.GetFile<Lumina.Data.Files.LgbFile>(path);
+        }
+        catch(Exception error){log.Debug(error,"Territory layout unreadable: {0}",path);return null;}
     }
 
     private void Stop(){stopped=true;TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);copy?.Dispose();copy=null;cacheRead=null;toPersist=null;rows.Clear();}
