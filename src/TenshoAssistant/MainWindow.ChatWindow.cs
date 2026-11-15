@@ -259,7 +259,14 @@ internal sealed partial class MainWindow
                 {
                     try
                     {
+                        // X-451 (0.1456): the site it leads to, read once per address opened; a host in other alphabets is said with how it reads.
+                        if(chatWindowWebSite?.Url!=address)chatWindowWebSite=ChatWeb.Site(address);
                         ImGui.TextColored(Warning,localization.Get("ChatWindow.WebWarning"));
+                        if(chatWindowWebSite is { } site)
+                        {
+                            ImGui.TextUnformatted(localization.Format("ChatWindow.WebSite",site.Host));
+                            if(site.Foreign)ImGui.TextColored(Error,localization.Format("ChatWindow.WebForeign",site.Reads ?? site.Host));
+                        }
                         ImGui.TextUnformatted(address);
                         ImGui.Separator();
                         if(ImGui.Selectable(localization.Get("ChatWindow.OpenWeb")))Dalamud.Utility.Util.OpenLink(address);
@@ -322,13 +329,16 @@ internal sealed partial class MainWindow
     private ChatRecord? chatWindowLine;
     // 0.1453: the web address whose menu a click opened.
     private string? chatWindowWeb;
+    // 0.1456 (X-451): its site, read when the menu shows a new address.
+    private WebSite? chatWindowWebSite;
 
     /// <summary>
     /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
     /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
     /// opens Tensho's item menu. 0.1442: quest link: left click opens the quest on the Quests page. A target Tensho does not know (data not
     /// loaded, an item it does not list) is only said on hover. 0.1453: web address: the whole address on hover; a click opens its menu (open in
-    /// the browser, copy), never the browser at once.
+    /// the browser, copy), never the browser at once. 0.1456 (X-451): the tooltip and the menu say the site it leads to (its host as the browser
+    /// reaches it) and warn when that name holds letters of other alphabets; the tooltip is made only under the mouse (X-453 M3).
     /// </summary>
     private void DrawChatLink(ChatRun run,ChatLink link,string id)
     {
@@ -338,8 +348,7 @@ internal sealed partial class MainWindow
         ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
         if(link.Kind==ChatSegmentKind.WebLink)
         {
-            if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(localization.Format("ChatWindow.WebLinkTip",link.Url));
+            if(ImGui.IsItemHovered()){ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);TipText(WebLinkTip(link.Url));}
             if(ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowWeb=link.Url;ImGui.OpenPopup("###TenshoChatWeb");}
             return;
         }
@@ -373,5 +382,14 @@ internal sealed partial class MainWindow
             IsOpen=true;
         }
         ItemLinksMenu("##ChatItem"+id,item);
+    }
+
+    /// <summary>X-451 (0.1456): the tooltip of a web address: the address, the site it leads to, a warning when the site's name holds letters
+    /// of other alphabets, then what a click does. Made only while the mouse is on it.</summary>
+    private string WebLinkTip(string url)
+    {
+        var site=ChatWeb.Site(url);
+        var tip=localization.Format("ChatWindow.WebLinkTip",url,site?.Host ?? url);
+        return site is { Foreign:true } ? tip+"\n"+localization.Format("ChatWindow.WebForeign",site.Reads ?? site.Host):tip;
     }
 }
