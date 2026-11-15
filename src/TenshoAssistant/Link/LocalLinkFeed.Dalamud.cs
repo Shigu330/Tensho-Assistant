@@ -37,6 +37,9 @@ internal sealed class LocalLinkFeed:IDisposable
     private long next=-100_000;
     private long sequence;
     private bool disposed;
+    // X-433 (0.1445), X-444 M5 (0.1446): the snapshot's serialization prepared off the game's thread (0.1440: 18 getters made in a frame;
+    // docs/evidence/0.1445-link-json-getters.md), at the creation while the link is on, else when it is turned on.
+    private readonly LinkPreparation prepared=new(LocalLinkProtocol.Prepare);
 
     public LocalLinkFeed(IFramework framework,IClientState client,IPlayerState player,IGameInventory inventory,IObjectTable objects,string settingsFile,string folder,
         Configuration configuration,Func<uint,string?> zoneName,string version,IPluginLog log,LinkNoticeLog notices)
@@ -46,8 +49,7 @@ internal sealed class LocalLinkFeed:IDisposable
         this.inventory=inventory;this.objects=objects;this.settingsFile=settingsFile;this.folder=folder;
         CompetitiveGate.Add(framework,OnUpdate);
         CompetitiveGate.Changed+=OnCut;
-        // X-433 (0.1445): the snapshot's serialization prepared off the game's thread, while the link is on (0.1440: 17 getters made in a frame).
-        if(configuration.DesktopLink)_=Task.Run(LocalLinkProtocol.Prepare);
+        if(configuration.DesktopLink)prepared.Start();
     }
 
     /// <summary>The link's state for the settings page (Off while the setting is off) and why, if it failed.</summary>
@@ -60,6 +62,7 @@ internal sealed class LocalLinkFeed:IDisposable
         if(now-next<1000)return;
         next=now;
         if(!configuration.DesktopLink){Stop();return;}
+        if(!prepared.Ready())return;   // X-444 M5 (0.1446): nothing serialized on this thread before the getters are made
         if(server is null){server=new LocalLinkServer(LocalLinkProtocol.PipeName(),message=>log.Information(message));Watch();}
         var loggedIn=client.IsLoggedIn && player.IsLoaded;
         var territory=loggedIn ? (uint)client.TerritoryType : 0;

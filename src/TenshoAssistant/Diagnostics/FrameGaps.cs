@@ -22,6 +22,7 @@ public sealed class FrameGaps(double noteMs=150,int kept=5,int maximumNotes=20)
     public int Frames { get; private set; }
     public int Long { get; private set; }
     public int HiddenPeriods { get; private set; }
+    public int CutPeriods { get; private set; }
 
     /// <summary>The plugin interface is hidden (no Draw until it shows again): the next frame starts a new run, without a gap.</summary>
     public void Hidden()
@@ -29,6 +30,17 @@ public sealed class FrameGaps(double noteMs=150,int kept=5,int maximumNotes=20)
         lock(gate)
         {
             if(last>=0)HiddenPeriods++;
+            last=-1;
+        }
+    }
+
+    /// <summary>X-444 M4 (0.1446): a competitive cut (Tensho does nothing meanwhile, DEC-038): the run ends as with <see cref="Hidden"/>, so the
+    /// first frame after the cut is not a gap as long as the cut; one period counted however many frames say it.</summary>
+    public void Cut()
+    {
+        lock(gate)
+        {
+            if(last>=0)CutPeriods++;
             last=-1;
         }
     }
@@ -62,6 +74,6 @@ public sealed class FrameGaps(double noteMs=150,int kept=5,int maximumNotes=20)
     {
         lock(gate)
             return string.Create(CultureInfo.InvariantCulture,
-                $"Game frames in the {watched.TotalSeconds:0} s after the load: {Frames}, {Long} gaps of {NoteMs:0} ms or more; the longest: {(longest.Count==0 ? "none":string.Join(", ",longest.Select(gap=>string.Create(CultureInfo.InvariantCulture,$"{gap.Milliseconds:0} ms (ended {gap.Ended.ToLocalTime():HH:mm:ss.fff})"))))}{(HiddenPeriods==0 ? "":string.Create(CultureInfo.InvariantCulture,$"; {HiddenPeriods} period(s) with the plugin interface hidden, not counted"))}.");
+                $"Game frames in the {watched.TotalSeconds:0} s after the load: {Frames}, {Long} gaps of {NoteMs:0} ms or more; the longest: {(longest.Count==0 ? "none":string.Join(", ",longest.Select(gap=>string.Create(CultureInfo.InvariantCulture,$"{gap.Milliseconds:0} ms (ended {gap.Ended.ToLocalTime():HH:mm:ss.fff})"))))}{(HiddenPeriods==0 ? "":string.Create(CultureInfo.InvariantCulture,$"; {HiddenPeriods} period(s) with the plugin interface hidden, not counted"))}{(CutPeriods==0 ? "":string.Create(CultureInfo.InvariantCulture,$"; {CutPeriods} competitive cut(s), not counted"))}.");
     }
 }

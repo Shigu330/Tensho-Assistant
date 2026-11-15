@@ -93,8 +93,7 @@ public static class CallGraph
     /// The roots, then what they call, breadth first, each once, at most <paramref name="cap"/> methods: see the class. <paramref name="home"/>
     /// is the plugin's assembly. Every method returned can be given to <see cref="Prepare"/>; the roots are kept even when they are not.
     /// </summary>
-    /// <param name="leaf">X-433 (0.1439): a callee outside the plugin also taken (compiled, its own calls not followed); none by default.</param>
-    public static IReadOnlyList<MethodBase> Closure(IEnumerable<MethodBase> roots,Assembly home,int cap,Func<bool>? stop=null,Func<MethodBase,bool>? leaf=null)
+    public static IReadOnlyList<MethodBase> Closure(IEnumerable<MethodBase> roots,Assembly home,int cap,Func<bool>? stop=null)
     {
         var order=new List<MethodBase>();
         var seen=new HashSet<MethodBase>();
@@ -110,7 +109,7 @@ public static class CallGraph
             // A type's static constructor runs on its first use without being named in the IL (the lambdas' cache class has one).
             if(TypeInitializer(method) is { } initializer && Wanted(initializer,home) && seen.Add(initializer))queue.Enqueue(initializer);
             foreach(var callee in Callees(method))
-                if((Wanted(callee,home) || leaf?.Invoke(callee)==true) && seen.Add(callee))queue.Enqueue(callee);
+                if(Wanted(callee,home) && seen.Add(callee))queue.Enqueue(callee);
         }
         return order;
     }
@@ -136,23 +135,6 @@ public static class CallGraph
         {
             if(method.DeclaringType is { IsInterface:true } || !JitWarmup.Compilable(method))return false;
             return method.Module.Assembly==home || ClosedOver(method,home);
-        }
-        catch(Exception){return false;}
-    }
-
-    /// <summary>X-433 (0.1439): the assemblies of the game's API, compiled at the first call of each method (not ahead of time, unlike the
-    /// runtime's own): what a reader calls there directly is compiled with its class.</summary>
-    public static readonly IReadOnlySet<string> GameApiAssemblies=new HashSet<string>(StringComparer.Ordinal)
-        {"Dalamud","FFXIVClientStructs","InteropGenerator.Runtime","Lumina","Lumina.Excel"};
-
-    /// <summary>X-433 (0.1439): a method of the game's API with a body to compile (not an interface's, not abstract, no open generic
-    /// parameter, not native): a leaf of a reader's calls.</summary>
-    public static bool GameApi(MethodBase method)
-    {
-        try
-        {
-            if(method.DeclaringType is { IsInterface:true } || !JitWarmup.Compilable(method))return false;
-            return method.Module.Assembly.GetName().Name is { } name && GameApiAssemblies.Contains(name);
         }
         catch(Exception){return false;}
     }

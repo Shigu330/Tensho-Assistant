@@ -65,6 +65,9 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1427-warmup-priority.md](0.1427-warmup-priority.md) | `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/Review1428Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1432-background-collection-stall.md](0.1432-background-collection-stall.md) | `src/TenshoAssistant/Caching/DataCache.cs`, `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/CacheStream1432Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1427-warmup-priority.md`, `docs/project/GLOBAL-PLAN.md` |
 | [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
+| [0.1438-reader-guard.md](0.1438-reader-guard.md) | `src/TenshoAssistant/Diagnostics/ReaderCompiler.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
+| [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
+| [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
@@ -298,5 +301,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 286 files · fichiers ; 240 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 289 files · fichiers ; 243 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

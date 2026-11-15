@@ -1339,7 +1339,8 @@ public sealed partial class Plugin : IDalamudPlugin
                 // collection freezes the game only if its thread waits too. X-440 (0.1437): Dalamud skips Draw while the plugin interface
                 // is hidden (cutscene, gpose, hidden by the player); HideUi ends the run, so that time is not read as a frame gap.
                 var gaps=new Diagnostics.FrameGaps();
-                void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
+                // X-444 M4 (0.1446): a competitive cut ends the run too (the first frame after it is not a gap as long as the cut).
+                void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut){gaps.Cut();return;}if(gaps.Frame(System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,DateTimeOffset.Now) is { } gapNote)log.Information(gapNote);}
                 void GapHidden()=>gaps.Hidden();
                 pluginInterface.UiBuilder.Draw+=Gap;
                 pluginInterface.UiBuilder.HideUi+=GapHidden;

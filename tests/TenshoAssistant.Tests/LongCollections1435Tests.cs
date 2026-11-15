@@ -25,7 +25,8 @@ internal static class LongCollections1435Tests
         }),
         ("Long collections 1435: the frame-gap measure stops during a competitive cut", () =>
         {
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;if(gaps.Frame(", StringComparison.Ordinal), "the cut first");
+            // 0.1446 (X-444 M4): the cut also ends the run of frames (Review1446Tests).
+            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("void Gap(){if(TenshoAssistant.Competitive.CompetitiveGate.Cut){gaps.Cut();return;}if(gaps.Frame(", StringComparison.Ordinal), "the cut first");
         }),
     ];
 }

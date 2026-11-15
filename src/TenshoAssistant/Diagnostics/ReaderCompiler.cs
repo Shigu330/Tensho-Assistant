@@ -57,7 +57,8 @@ public sealed class ReaderCompiler : IDisposable
 
     /// <summary>How long a reader waits for its class with no progress of the compiler: past it, the reader starts anyway. X-433 (0.1438):
     /// counted from the later of the reader's subscription and the last class the compiler finished, so a compiler that keeps going is
-    /// waited for (at a load of 15/11 the guard let six readers go at once while their classes still waited: a frame of 994 ms).</summary>
+    /// waited for (at a load of 15/11 the guard let six readers go at once while their classes still waited: a frame of 994 ms; log lines in
+    /// docs/evidence/0.1438-reader-guard.md).</summary>
     public static readonly TimeSpan Guard=TimeSpan.FromSeconds(20);
     /// <summary>X-433 (0.1438): how long a reader waits at most, whatever the compiler does.</summary>
     public static readonly TimeSpan MaxWait=TimeSpan.FromSeconds(60);

@@ -1,6 +1,6 @@
 using TenshoAssistant.Link;
 
-// 0.1445 (X-433): LocalLinkFeed's first pass made 17 JSON getters in a frame of the game (0.1440's names). The feed serializes one full
+// 0.1445 (X-433): LocalLinkFeed's first pass made 18 JSON getters in a frame of the game (0.1440's names; 17 before 0.1446, X-444 M1). The feed serializes one full
 // snapshot off the game's thread when it is made, while the desktop link is on. The prepared line is a valid snapshot (every part read back).
 internal static class LinkPrepare1445Tests
 {
@@ -19,7 +19,8 @@ internal static class LinkPrepare1445Tests
         ("Link prepare 1445: the feed prepares it off the game's thread, only while the link is on",() =>
         {
             var feed = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs")).Replace("\r\n","\n");
-            Check(feed.Contains("if(configuration.DesktopLink)_=Task.Run(LocalLinkProtocol.Prepare);",StringComparison.Ordinal),"in the constructor, on a background thread");
+            // 0.1446 (X-444 M5): through LinkPreparation (a background thread), also when the link is turned on later (Review1446Tests).
+            Check(feed.Contains("if(configuration.DesktopLink)prepared.Start();",StringComparison.Ordinal) && feed.Contains("private readonly LinkPreparation prepared=new(LocalLinkProtocol.Prepare);",StringComparison.Ordinal),"in the constructor, on a background thread");
         }),
     ];
 }

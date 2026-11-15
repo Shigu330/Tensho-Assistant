@@ -221,6 +221,37 @@ public static class LocalLinkProtocol
     }
 }
 
+/// <summary>
+/// X-444 M5 (0.1446): <see cref="LocalLinkProtocol.Prepare"/> run once on a background thread, so System.Text.Json makes its getters there
+/// and not in a frame of the game. LocalLinkFeed starts it when it is made while the link is on, else on the first update the link is on,
+/// and publishes nothing before it has run (0.1445 prepared at the feed's creation only: a link turned on during a session made its 18
+/// getters in a frame; docs/evidence/0.1445-link-json-getters.md).
+/// </summary>
+public sealed class LinkPreparation(Func<string?> prepare)
+{
+    private readonly object gate=new();
+    private Task? task;
+    public int Started { get; private set; }
+
+    /// <summary>Starts the preparation, once: later calls do nothing.</summary>
+    public void Start()
+    {
+        lock(gate)
+        {
+            if(task is not null)return;
+            Started++;
+            task=Task.Run(prepare);
+        }
+    }
+
+    /// <summary>Starts it if needed; true once it has run (whatever it gave).</summary>
+    public bool Ready()
+    {
+        Start();
+        lock(gate)return task!.IsCompleted;
+    }
+}
+
 /// <summary>Where the plugin's end of the link stands.</summary>
 public enum LocalLinkState { Off, Waiting, Linked, Busy, Unavailable }
 
