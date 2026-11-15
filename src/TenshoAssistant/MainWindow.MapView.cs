@@ -1005,7 +1005,7 @@ internal sealed partial class MainWindow
             :icon==FlagIcon || targetIcons.Contains(icon) ? 6
             :mapMarkers?.SymbolName(icon) is { Length:>0 } ? 7:8;
         var rows=icons.Select(icon=>(Icon:icon,Name:IconRowName(icon)))
-            .Where(row=>mapIconFilter.Length==0 || row.Name.Contains(mapIconFilter,StringComparison.CurrentCultureIgnoreCase))
+            .Where(row=>mapIconFilter.Length==0 || SearchText.Contains(row.Name,mapIconFilter,StringComparison.CurrentCultureIgnoreCase))
             .GroupBy(row=>Category(row.Icon)).OrderBy(group=>group.Key);
         foreach(var category in rows)
         {

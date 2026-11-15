@@ -92,7 +92,7 @@ internal sealed partial class MainWindow
         {
             var query = dutyQuery.Trim();
             dutyMatches = catalog.Entries.Where(duty => (dutyCategory.Length == 0 || duty.Category == dutyCategory)
-                && (query.Length == 0 || duty.Name.Contains(query,StringComparison.CurrentCultureIgnoreCase)
+                && (query.Length == 0 || SearchText.Contains(duty.Name,query,StringComparison.CurrentCultureIgnoreCase)
                     || duty.DutyId.ToString(CultureInfo.InvariantCulture) == query)
                 && DutyProgress.Matches(progressFilter,progress?.Of(duty.InstanceId))).ToArray();
             dutyProgressCount = progress is null ? default : DutyProgress.Count(catalog.Entries.Where(duty => dutyCategory.Length == 0 || duty.Category == dutyCategory),progress);
@@ -315,7 +315,7 @@ internal sealed partial class MainWindow
             dutyItemMatches = document.Entries.Where(entry => dutySourceFilter == 0 || (int)entry.Kind == dutySourceFilter-1)
                 .GroupBy(entry => entry.ItemId).Select(group => (Id:group.Key,Name:items?.Find(group.Key)?.Name ?? localization.Format("BankUi.Item",group.Key),Sources:group.ToArray()))
                 .Where(item => LootKindMatches(items?.Find(item.Id)))
-                .Where(item => query.Length == 0 || item.Name.Contains(query,StringComparison.CurrentCultureIgnoreCase)
+                .Where(item => query.Length == 0 || SearchText.Contains(item.Name,query,StringComparison.CurrentCultureIgnoreCase)
                     || item.Id.ToString(CultureInfo.InvariantCulture) == query)
                 .OrderBy(item => item.Name,StringComparer.CurrentCultureIgnoreCase).ThenBy(item => item.Id).ToArray();
             dutyViewDocument = document; dutyViewItems = items; dutyViewItemQuery = dutyItemQuery; dutyViewSourceFilter = dutySourceFilter;

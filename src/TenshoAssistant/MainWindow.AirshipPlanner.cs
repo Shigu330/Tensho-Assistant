@@ -169,7 +169,7 @@ internal sealed partial class MainWindow
                 var search=airshipTargetSearch.Trim();
                 var rows=loot ? AirshipSectors.LootItems(catalog).Select(id=>(Id:id,Name:ItemName(id)))
                     :unlockable.Select(sector=>(sector.Id,Name:$"{sector.ShortName} · {sector.Name}"));
-                foreach(var (id,name) in rows.Where(row=>search.Length==0 || row.Name.Contains(search,StringComparison.CurrentCultureIgnoreCase))
+                foreach(var (id,name) in rows.Where(row=>search.Length==0 || SearchText.Contains(row.Name,search,StringComparison.CurrentCultureIgnoreCase))
                             .OrderBy(row=>row.Name,StringComparer.CurrentCultureIgnoreCase))
                     if(ImGui.Selectable($"{name}##AirshipTarget{id}",id==chosen)){if(loot)airshipLootItem=id;else airshipUnlockSector=id;}
             }

@@ -185,7 +185,7 @@ internal sealed partial class MainWindow
             triadMatches = triadCards.Where(entry => entry.Card!.Extra == triadExSeries && (triadStars == 0 || entry.Card!.Stars == triadStars)
                 && (triadType is null || entry.Card!.TypeId == triadType)
                 && (triadAcquisition == 0 || (triadAcquisition == 1 ? entry.ConfirmedUnlocked : !entry.ConfirmedUnlocked))
-                && (query.Length == 0 || entry.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                && (query.Length == 0 || SearchText.Contains(entry.Name,query,StringComparison.OrdinalIgnoreCase)
                     || entry.Card!.Number.ToString() == query || entry.Card!.Label.Equals(query, StringComparison.OrdinalIgnoreCase))).ToArray();
             // Sort key, then the card number so equal keys stay in notebook order.
             var sortBy = (MiniGames.TriadCardSort)Math.Clamp(triadSort, 0, Enum.GetValues<MiniGames.TriadCardSort>().Length - 1);

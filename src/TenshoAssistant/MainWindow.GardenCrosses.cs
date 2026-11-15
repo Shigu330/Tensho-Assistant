@@ -93,7 +93,7 @@ internal sealed partial class MainWindow
                 foreach(var seed in seeds.OrderBy(Name,StringComparer.CurrentCultureIgnoreCase))
                 {
                     var name=Name(seed);
-                    if(gardenCrossSearch.Length>0 && !name.Contains(gardenCrossSearch,StringComparison.CurrentCultureIgnoreCase))continue;
+                    if(gardenCrossSearch.Length>0 && !SearchText.Contains(name,gardenCrossSearch,StringComparison.CurrentCultureIgnoreCase))continue;
                     if(ImGui.Selectable(name+"##GardenCross"+seed,seed==gardenCrossSeed))gardenCrossSeed=seed;
                 }
             }

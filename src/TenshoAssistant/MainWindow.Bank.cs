@@ -454,8 +454,8 @@ internal sealed partial class MainWindow
         };
         var query = bankQuery.Trim();
         return categoryMatch && qualityMatch && (string.IsNullOrWhiteSpace(query)
-            || (item?.Name?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
-            || row.ItemId.ToString().Contains(query, StringComparison.OrdinalIgnoreCase));
+            || (SearchText.Contains(item?.Name,query,StringComparison.OrdinalIgnoreCase))
+            || SearchText.Contains(row.ItemId.ToString(),query,StringComparison.OrdinalIgnoreCase));
     }
 
     // 0.329: select false for the sort preview, whose own click only opens its zone menu (it must not replace the selected item).

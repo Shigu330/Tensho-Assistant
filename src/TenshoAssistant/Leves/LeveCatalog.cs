@@ -22,7 +22,7 @@ public static class LeveCatalog
         if(type!=0 && leve.TypeId!=type)return false;
         if(client.Length>0 && leve.Client!=client)return false;
         if(leve.Level<minLevel || maxLevel>0 && leve.Level>maxLevel)return false;
-        if(query.Length>0 && !leve.Name.Contains(query,StringComparison.CurrentCultureIgnoreCase))return false;
+        if(query.Length>0 && !SearchText.Contains(leve.Name,query,StringComparison.CurrentCultureIgnoreCase))return false;
         bool? completed=progress?.Completed is { } done ? done.Contains(leve.Id):null;
         return state switch
         {

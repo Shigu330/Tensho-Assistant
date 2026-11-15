@@ -183,7 +183,7 @@ public static class InventorySortRules
         var terms=QueryTerms(zone.Query);var items=zone.ItemIds ?? [];
         if(terms.Count==0 && items.Count==0)return true;
         var text=id.ToString();
-        return items.Contains(id) || terms.Any(term=>name.Contains(term,StringComparison.OrdinalIgnoreCase) || text.Contains(term,StringComparison.Ordinal));
+        return items.Contains(id) || terms.Any(term=>SearchText.Contains(name,term,StringComparison.OrdinalIgnoreCase) || text.Contains(term,StringComparison.Ordinal));
     }
     private static bool Matches(InventoryPreviewStack value,InventorySortZone zone,InventorySortMetadata label)
     {

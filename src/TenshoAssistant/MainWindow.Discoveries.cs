@@ -497,12 +497,12 @@ internal sealed partial class MainWindow
             discoverySearched=discoverySearch;discoveryShownRevision=store.Revision;
             var wanted=discoverySearch.Trim();
             // 0.856 (X-72 C): the hunt marks and the FATEs seen too, by their names.
-            discoveryRows=[..store.Find(DiscoveryKind.MonsterPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),200),
-                ..store.Find(DiscoveryKind.HuntMarkPlace,id=>DiscoveryMonsterName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
-                ..store.Find(DiscoveryKind.FateSeen,id=>DiscoveryFateName(id).Contains(wanted,StringComparison.CurrentCultureIgnoreCase),100),
+            discoveryRows=[..store.Find(DiscoveryKind.MonsterPlace,id=>SearchText.Contains(DiscoveryMonsterName(id),wanted,StringComparison.CurrentCultureIgnoreCase),200),
+                ..store.Find(DiscoveryKind.HuntMarkPlace,id=>SearchText.Contains(DiscoveryMonsterName(id),wanted,StringComparison.CurrentCultureIgnoreCase),100),
+                ..store.Find(DiscoveryKind.FateSeen,id=>SearchText.Contains(DiscoveryFateName(id),wanted,StringComparison.CurrentCultureIgnoreCase),100),
                 // X-74 (0.860): the items got and their sources, by the item's or the source's name.
                 // 0.911 (X-76): and every other kind (OtherSeenKinds).
-                ..ItemSourceKinds.Concat(OtherSeenKinds).SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>DiscoveryFactName(fact).Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
+                ..ItemSourceKinds.Concat(OtherSeenKinds).SelectMany(kind=>store.Find(kind,_=>true,20_000)).Where(fact=>SearchText.Contains(DiscoveryFactName(fact),wanted,StringComparison.CurrentCultureIgnoreCase)).Take(200)];
         }
         if(discoveryRows.Count==0){ImGui.TextDisabled(localization.Get("DiscoveriesUi.NoneFound"));return;}
         if(!ImGui.BeginTable("Discoveries",6,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH))return;

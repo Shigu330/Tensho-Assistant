@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
 
     private void DrawDeepDungeonThings(uint dungeon,string kind,IReadOnlyList<DeepDungeonThing> things)
     {
-        var rows=things.Where(row=>deepDungeonQuery.Length==0 || row.Name.Contains(deepDungeonQuery,StringComparison.CurrentCultureIgnoreCase) || row.Tooltip.Contains(deepDungeonQuery,StringComparison.CurrentCultureIgnoreCase)).ToArray();
+        var rows=things.Where(row=>deepDungeonQuery.Length==0 || SearchText.Contains(row.Name,deepDungeonQuery,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(row.Tooltip,deepDungeonQuery,StringComparison.CurrentCultureIgnoreCase)).ToArray();
         ImGui.TextColored(Accent,localization.Format("DeepDungeon."+kind,rows.Length));
         if(rows.Length==0 || !ImGui.BeginTable($"###DeepDungeon{kind}{dungeon}",2,ImGuiTableFlags.RowBg|ImGuiTableFlags.BordersInnerV|ImGuiTableFlags.Resizable))return;
         try

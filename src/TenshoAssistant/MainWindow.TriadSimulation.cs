@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
                     var target = triadAddHand == 0 ? triadBlueHand : triadRedHand;
                     var query = triadSimulationQuery.Trim();
                     foreach (var entry in triadCards.Where(entry => query.Length == 0
-                        || entry.Name.Contains(query, StringComparison.OrdinalIgnoreCase) || entry.Card!.Number.ToString() == query || entry.Card!.Label.Equals(query, StringComparison.OrdinalIgnoreCase)))
+                        || SearchText.Contains(entry.Name,query,StringComparison.OrdinalIgnoreCase) || entry.Card!.Number.ToString() == query || entry.Card!.Label.Equals(query, StringComparison.OrdinalIgnoreCase)))
                     {
                         ImGui.BeginDisabled(target.Count >= 5 || target.Contains(entry.Id));
                         try

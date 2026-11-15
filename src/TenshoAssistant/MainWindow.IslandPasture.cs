@@ -113,8 +113,8 @@ internal sealed partial class MainWindow
             foreach(var animal in islandAnimals)
             {
                 index++;
-                if(islandAnimalSearch.Length>0 && !animal.Name.Contains(islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase)
-                   && !animal.Common.Contains(islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase) && !animal.Bonus.Contains(islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase))continue;
+                if(islandAnimalSearch.Length>0 && !SearchText.Contains(animal.Name,islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase)
+                   && !SearchText.Contains(animal.Common,islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase) && !SearchText.Contains(animal.Bonus,islandAnimalSearch,StringComparison.CurrentCultureIgnoreCase))continue;
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(animal.Name);
                 ImGui.TableNextColumn();

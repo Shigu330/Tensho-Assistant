@@ -183,7 +183,7 @@ internal sealed partial class MainWindow
         Tip("Settings.SearchTip");
         var query=settingsQuery.Trim();
         if(query.Length<2)return;
-        var hits=SettingsIndex.Entries.Where(entry=>localization.Get(entry.Key).Contains(query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
+        var hits=SettingsIndex.Entries.Where(entry=>SearchText.Contains(localization.Get(entry.Key),query,StringComparison.CurrentCultureIgnoreCase)).Take(15).ToArray();
         if(hits.Length==0){ImGui.TextDisabled(localization.Get("Settings.SearchNone"));return;}
         foreach(var (key,tab) in hits)
             if(ImGui.Selectable($"{localization.Get(key)}  ·  {localization.Get("SettingsSections."+tab)}##SettingHit{key}")){requestedSettingsTab=tab;settingsQuery="";}

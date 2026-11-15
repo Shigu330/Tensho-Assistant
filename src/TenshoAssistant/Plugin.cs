@@ -829,7 +829,7 @@ public sealed partial class Plugin : IDalamudPlugin
                 var wanted=text.Trim();
                 if(wanted.Length==0)return [];
                 keyItems??=data.GetExcelSheet<Lumina.Excel.Sheets.EventItem>().Where(row=>!row.Name.IsEmpty).Select(row=>(row.RowId,row.Name.ExtractText(),(uint)row.Icon)).ToArray();
-                return keyItems.Where(item=>item.Name.Contains(wanted,StringComparison.CurrentCultureIgnoreCase)).Take(30).ToArray();
+                return keyItems.Where(item=>SearchText.Contains(item.Name,wanted,StringComparison.CurrentCultureIgnoreCase)).Take(30).ToArray();
             };
             // 0.352 (g, I-11): names of the quests and achievements that unlock shop articles.
             mainWindow.QuestNameOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Quest>().GetRowOrDefault(id)?.Name.ExtractText();

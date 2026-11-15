@@ -507,7 +507,7 @@ internal sealed partial class MainWindow
             craftBookMatches = recipes.Where(recipe => (string.IsNullOrWhiteSpace(craftBookFilter) || recipe.CraftType == craftBookFilter)
                     && (!neverOnly || recipeLog!.WasCrafted(recipe.RecipeId) == false)
                     && (string.IsNullOrWhiteSpace(query)
-                        || (items?.Find(recipe.ResultItemId)?.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)))
+                        || (SearchText.Contains(items?.Find(recipe.ResultItemId)?.Name,query,StringComparison.OrdinalIgnoreCase))))
                 .OrderBy(recipe => recipe.CraftTypeId).ThenBy(recipe => recipe.Level).ThenBy(recipe => recipe.RecipeId).ToArray();
             craftBookMatchesKey = matchesKey;
         }

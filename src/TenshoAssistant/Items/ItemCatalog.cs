@@ -140,7 +140,7 @@ public sealed class ItemCatalog
         foreach (var character in value.Normalize(NormalizationForm.FormD))
         {
             if (CharUnicodeInfo.GetUnicodeCategory(character) == UnicodeCategory.NonSpacingMark) continue;
-            text.Append(char.IsWhiteSpace(character) ? ' ' : char.ToUpperInvariant(character));
+            text.Append(char.IsWhiteSpace(character) ? ' ' : char.ToUpperInvariant(SearchText.Apostrophe(character)));
         }
         return text.ToString();
     }

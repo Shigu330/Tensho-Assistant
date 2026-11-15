@@ -88,7 +88,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     public IReadOnlyList<Beast> View(string query, string? family, bool onlyObtained, IReadOnlySet<uint>? obtained, int rank, BeastSort sort, bool descending)
     {
         IEnumerable<Beast> rows = Beasts;
-        if (query.Length > 0) rows = rows.Where(beast => beast.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.CatchPlace.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Assault.Contains(query, StringComparison.CurrentCultureIgnoreCase) || beast.Volley.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+        if (query.Length > 0) rows = rows.Where(beast => SearchText.Contains(beast.Name,query,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(beast.CatchPlace,query,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(beast.Assault,query,StringComparison.CurrentCultureIgnoreCase) || SearchText.Contains(beast.Volley,query,StringComparison.CurrentCultureIgnoreCase));
         if (family is not null) rows = rows.Where(beast => beast.Family == family);
         if (onlyObtained && obtained is not null) rows = rows.Where(beast => obtained.Contains(beast.Id));
         int Stat(Beast beast, Func<BeastStats, int> read) => beast.At(rank) is { } stats ? read(stats) : -1;

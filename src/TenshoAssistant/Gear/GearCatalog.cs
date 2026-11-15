@@ -143,7 +143,7 @@ public static class GearRules
         var (min,max)=LevelWindow(level,filter);
         var anyone=AnyJobAndLevel(slot,filter);
         return catalog.Items.Where(item=>Fits(item,slot) && (anyone || item.WearableBy(job) && item.Level>=min && item.Level<=max) && item.ItemLevel>=filter.MinItemLevel
-                && (filter.Search.Length==0 || item.Name.Contains(filter.Search,StringComparison.OrdinalIgnoreCase)))
+                && (filter.Search.Length==0 || SearchText.Contains(item.Name,filter.Search,StringComparison.OrdinalIgnoreCase)))
             .OrderByDescending(item=>item.ItemLevel).ThenByDescending(item=>item.Level).ThenBy(item=>item.Name,StringComparer.CurrentCulture);
     }
 

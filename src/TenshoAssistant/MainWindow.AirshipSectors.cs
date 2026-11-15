@@ -38,8 +38,8 @@ internal sealed partial class MainWindow
         {
             var filter=airshipFilter.Trim();
             airshipView=catalog.Sectors.Where(sector=>airshipRank==0 || sector.RankReq<=airshipRank)
-                .Where(sector=>filter.Length==0 || sector.Name.Contains(filter,StringComparison.CurrentCultureIgnoreCase)
-                    || catalog.Drops.GetValueOrDefault(sector.Id)?.Any(id=>items?.Find(id)?.Name.Contains(filter,StringComparison.CurrentCultureIgnoreCase)==true)==true)
+                .Where(sector=>filter.Length==0 || SearchText.Contains(sector.Name,filter,StringComparison.CurrentCultureIgnoreCase)
+                    || catalog.Drops.GetValueOrDefault(sector.Id)?.Any(id=>SearchText.Contains(items?.Find(id)?.Name,filter,StringComparison.CurrentCultureIgnoreCase)==true)==true)
                 .ToArray();
             airshipViewKey=key;
         }
