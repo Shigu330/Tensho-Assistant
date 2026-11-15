@@ -729,6 +729,7 @@
     "ExchangeDone": "Échange fait : {0} nouvelles, {1} jointes. {2} {3}",
     "CommonTaken": "Fichier commun récupéré.",
     "CommonUnreadable": "Fichier commun illisible.",
+    "CommonUnreachable": "GitHub injoignable ou fichier commun pas encore publié, réessayez plus tard.",
     "Sent": "Vos découvertes ont été envoyées.",
     "SentSame": "Rien de nouveau à envoyer.",
     "ExchangeStopped": "Échange arrêté.",

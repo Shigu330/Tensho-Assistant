@@ -729,6 +729,7 @@
     "ExchangeDone": "Exchange done: {0} new, {1} joined. {2} {3}",
     "CommonTaken": "Common file taken.",
     "CommonUnreadable": "Common file unreadable.",
+    "CommonUnreachable": "GitHub could not be reached or the common file is not published yet; try again later.",
     "Sent": "Your discoveries were sent.",
     "SentSame": "Nothing new to send.",
     "ExchangeStopped": "Exchange stopped.",

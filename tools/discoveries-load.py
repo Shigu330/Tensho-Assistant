@@ -48,7 +48,7 @@ def peak_mb():
 
 def day(at):return at.strftime("%Y-%m-%dT00:00:00+00:00")
 
-def one_fact(spec,rng,today):
+def one_fact(spec,rng,today,merge):
     kind,_,subjects,details,lowest,highest=spec
     draw=rng.random();subject=int(draw*draw*subjects)+1
     detail=subject*3%30000+1+rng.randrange(details) if kind==1 else rng.randrange(details)+(0 if details==1 else 1)
@@ -58,16 +58,28 @@ def one_fact(spec,rng,today):
         cx=(subject*131+mapid*17)%1600-800;cz=(subject*197+mapid*29)%1600-800;spread=160 if kind in (1,2,3) else 40
         x=round(max(-1000,min(1000,cx+rng.gauss(0,spread))),3);z=round(max(-1000,min(1000,cz+rng.gauss(0,spread))),3)
     elif kind in ZONED:territory=(subject*7919+rng.randrange(2))%MAPS+101
-    return {"Kind":kind,"Subject":subject,"Detail":detail,"Territory":territory,"Map":mapid,"CellX":math.floor(x/50),"CellZ":math.floor(z/50),"X":x,"Z":z}
+    # X-362: the cell computed as the merge tool checks it (single precision, merge.cell_of), never a cell it refuses.
+    cellx,cellz=merge.cell_of(x,z)
+    return {"Kind":kind,"Subject":subject,"Detail":detail,"Territory":territory,"Map":mapid,"CellX":cellx,"CellZ":cellz,"X":x,"Z":z}
 
-def sighting(fact,spec,rng,today):
-    """One player's copy of a fact, as their gist holds it (Seen >= 1, dates to the day, values counted)."""
+def level_centre(spec,rng):
+    """X-362: the level around which every player of a fact sees it, and how far each player's values stray from it. The spread is kept to a third of
+    the centre plus 10, so that no player is ever alone « far outside » the others (discoveries-merge.py far(): more than twice their widest plus 10),
+    which rebuild() would leave out as a FLAG."""
+    _,_,_,_,lowest,highest=spec
+    if highest<=0:return 0,0
+    centre=lowest+rng.randrange(highest-lowest+1)
+    return centre,max(0,min((highest-lowest)//20+1,(centre+10)//3))
+
+def sighting(fact,spec,rng,today,level,merge):
+    """One player's copy of a fact, as their gist holds it (Seen >= 1, dates to the day, values counted). X-362: it follows the rules of X-183 that
+    clean(player=True) and rebuild() apply: no date before merge.FIRST_DAY (the plugin noted nothing earlier), values around the fact's common level."""
     _,_,_,_,lowest,highest=spec
     roll=rng.random();seen=1 if roll<0.64 else 2 if roll<0.82 else 3 if roll<0.90 else 4+rng.randrange(37)
-    last=today-timedelta(days=rng.randrange(2));first=last-timedelta(days=rng.randrange(21))
+    last=max(merge.FIRST_DAY,today-timedelta(days=rng.randrange(2)));first=max(merge.FIRST_DAY,last-timedelta(days=rng.randrange(21)))
     f=dict(fact,Seen=seen,Imported=0,First=day(first),Last=day(last),LevelMin=0,LevelMax=0)
     if highest>0:
-        centre=lowest+rng.randrange(highest-lowest+1);width=(highest-lowest)//20+1;values={}
+        centre,width=level;values={}
         for _ in range(seen):
             v=max(lowest,min(highest,centre+(rng.randrange(-width,width+1) if highest>lowest else 0)))
             k=v if v in values or len(values)<32 else min(values,key=lambda w:(abs(w-v),w));values[k]=values.get(k,0)+1
@@ -76,7 +88,7 @@ def sighting(fact,spec,rng,today):
     return f
 def kind_hq(kind):return kind in (10,8,6,4)
 
-def generate(folder,size,players,seed):
+def generate(folder,size,players,seed,merge):
     """size distinct facts spread over players gist files (70 % of facts held by one player, 20 % by 2-3, 10 % by 4-20)."""
     rng=random.Random(seed);today=datetime.now(timezone.utc).replace(hour=0,minute=0,second=0,microsecond=0)
     total=sum(k[1] for k in KINDS);keys=set();shares=[[] for _ in range(players)];full=set();made=0
@@ -87,12 +99,12 @@ def generate(folder,size,players,seed):
             pick-=spec[1]
         if spec[0] in full:continue
         for _ in range(20):
-            fact=one_fact(spec,rng,today);key=f"{fact['Kind']}:{fact['Subject']}:{fact['Detail']}:{fact['Territory']}:{fact['Map']}:{fact['CellX']}:{fact['CellZ']}"
+            fact=one_fact(spec,rng,today,merge);key=f"{fact['Kind']}:{fact['Subject']}:{fact['Detail']}:{fact['Territory']}:{fact['Map']}:{fact['CellX']}:{fact['CellZ']}"
             if key not in keys:keys.add(key);break
         else:
             full.add(spec[0]);continue
-        share=rng.random();holders=1 if share<0.7 else 2+rng.randrange(2) if share<0.9 else 4+rng.randrange(17)
-        for player in rng.sample(range(players),min(holders,players)):shares[player].append(sighting(fact,spec,rng,today))
+        share=rng.random();holders=1 if share<0.7 else 2+rng.randrange(2) if share<0.9 else 4+rng.randrange(17);level=level_centre(spec,rng)
+        for player in rng.sample(range(players),min(holders,players)):shares[player].append(sighting(fact,spec,rng,today,level,merge))
         made+=1
     raw=os.path.join(folder,"raw");os.makedirs(raw)
     written=datetime.now(timezone.utc).isoformat()
@@ -105,13 +117,14 @@ def measure(size,players,seed):
     """One run, in this process: generate, then sync's clean + player files, rebuild, rebuild again. Prints one JSON line."""
     folder=tempfile.mkdtemp(prefix="tensho-merge-load-")
     try:
-        sightings,largest=generate(folder,size,players,seed)
-        merge=load_merge();merge.PLAYERS=os.path.join(folder,"players");merge.V3_DIR=os.path.join(folder,"v3");os.makedirs(merge.PLAYERS)
+        merge=load_merge();sightings,largest=generate(folder,size,players,seed,merge)
+        merge.PLAYERS=os.path.join(folder,"players");merge.V3_DIR=os.path.join(folder,"v3");os.makedirs(merge.PLAYERS)
         raw=os.path.join(folder,"raw");refused=0;kept=0;quiet=io.StringIO()
         start=time.perf_counter()
         for name in sorted(os.listdir(raw),key=lambda n:int(n.split(".")[0])):
             # sync(): clean() of the gist's content, then the player file written (news() and the network left out).
-            data=merge.read(os.path.join(raw,name));facts,report=merge.clean(data);refused+=report["refused"];kept+=len(facts)
+            # X-362: player=True, as sync() reads a player's share (X-183: each fact a sighting of theirs, histogram capped).
+            data=merge.read(os.path.join(raw,name));facts,report=merge.clean(data,player=True);refused+=report["refused"];kept+=len(facts)
             with open(os.path.join(merge.PLAYERS,name),"w",encoding="utf-8",newline="\n") as out:
                 json.dump({"Issue":int(name.split(".")[0]),"Facts":facts},out,ensure_ascii=False,separators=(",",":"))
         clean_s=time.perf_counter()-start
@@ -123,7 +136,8 @@ def measure(size,players,seed):
         again_s=time.perf_counter()-start
         # X-357 (0.1349): the common facts are the v3 set only (the v2 discoveries.json is no longer written).
         common=merge.from_v3_dir(merge.V3_DIR)["Facts"];common_bytes=sum(os.path.getsize(os.path.join(merge.V3_DIR,n)) for n in os.listdir(merge.V3_DIR))
-        return {"sightings":sightings,"largest_share":largest,"refused":refused,"kept":kept,"common_facts":len(common),"changed":changed,"unchanged_second":not again,
+        flagged=sum(1 for line in quiet.getvalue().splitlines() if "FLAG" in line)
+        return {"sightings":sightings,"largest_share":largest,"refused":refused,"kept":kept,"common_facts":len(common),"flagged":flagged,"changed":changed,"unchanged_second":not again,
                 "clean_s":clean_s,"rebuild_s":rebuild_s,"rebuild_unchanged_s":again_s,
                 "common_mb":common_bytes/1048576,"players_mb":sum(os.path.getsize(os.path.join(merge.PLAYERS,n)) for n in os.listdir(merge.PLAYERS))/1048576,
                 "bytes_a_fact":common_bytes/max(1,len(common)),"peak_mb":peak_mb()}
@@ -134,8 +148,8 @@ def main(argv):
         at=argv.index("--one");print(json.dumps(measure(int(argv[at+1]),int(argv[at+2]),int(argv[at+3]))));return 0
     if "--selftest" in argv:
         result=measure(2000,10,1)
-        ok=result["common_facts"]==2000 and result["refused"]==0 and result["changed"] and result["unchanged_second"]
-        print(("OK" if ok else "FAIL")+f" discoveries-load selftest: {result['common_facts']} facts merged from {result['sightings']} sightings, {result['refused']} refused");return 0 if ok else 1
+        ok=result["common_facts"]==2000 and result["refused"]==0 and result["flagged"]==0 and result["changed"] and result["unchanged_second"]
+        print(("OK" if ok else "FAIL")+f" discoveries-load selftest: {result['common_facts']} facts merged from {result['sightings']} sightings, {result['refused']} refused, {result['flagged']} players flagged");return 0 if ok else 1
     option=lambda name,default:argv[argv.index(name)+1] if name in argv else default
     sizes=[int(s) for s in option("--sizes","100000,1000000").split(",")];players=int(option("--players","100"));runs=int(option("--runs","3"))
     report={}
@@ -146,7 +160,7 @@ def main(argv):
             out=subprocess.run([sys.executable,"-I","-X","utf8",os.path.abspath(__file__),"--one",str(size),str(players),"93"],capture_output=True,text=True,check=True)
             results.append(json.loads(out.stdout.strip().splitlines()[-1]));print(f"  size {size:,}: run {run+1}/{runs} done",file=sys.stderr)
         print(f"\nSIZE {size:,} distinct facts: {results[0]['sightings']:,} sightings in {players} shares (largest {results[0]['largest_share']:,}), "
-              f"{results[0]['common_facts']:,} facts in the v3 set, {results[0]['refused']} refused")
+              f"{results[0]['common_facts']:,} facts in the v3 set, {results[0]['refused']} refused, {results[0]['flagged']} players flagged")
         rows={}
         for name in ("clean_s","rebuild_s","rebuild_unchanged_s","common_mb","players_mb","bytes_a_fact","peak_mb"):
             values=sorted(r[name] for r in results);rows[name]={"median":statistics.median(values),"min":values[0],"max":values[-1]}

@@ -211,7 +211,7 @@ internal static class ExchangeV31137Tests
             using var v2=new GitHubExchange(Path.Combine(root,"c"),old);var third=new DiscoveryStore();
             third.Merge([Venture(4),Fish(8)],common:true);Saved(third);
             var before=JsonSerializer.Serialize(third.Snapshot(At,false));
-            Check(Run(v2,third,false).Args[2]=="CommonUnreadable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set: nothing taken, said unreadable");
+            Check(Run(v2,third,false).Args[2]=="CommonUnreachable" && third.Find(DiscoveryKind.FishCatch,9u,5).Count==0,"no v3 set (404): nothing taken, said unreachable or not published yet (X-367)");
             Check(old.Asked.SequenceEqual([CommunityDiscoveries.AddressV3+ExchangeV3.IndexName]),"only the v3 index asked, never the v2 file");
             Saved(third);
             Check(JsonSerializer.Serialize(third.Snapshot(At,false))==before && third.Find(DiscoveryKind.FishCatch,8u,5).Count==1 && third.Find(DiscoveryKind.Venture,4u,5).Count==1,
@@ -239,7 +239,7 @@ internal static class ExchangeV31137Tests
             store.SeeSource(DiscoveryKind.Venture,5,7,2,At);
             store.Merge([Venture(6)]);
             var message=Run(exchange,store,true);
-            Check(message.Args[2]=="CommonUnreadable" && message.Args[3]=="Sent","sent (no common set served: unreadable, X-357)");
+            Check(message.Args[2]=="CommonUnreachable" && message.Args[3]=="Sent","sent (no common set served: unreachable or not published yet, X-357, X-367)");
             var patch=server.Calls.Single();
             Check(patch.Method=="PATCH" && patch.Address=="https://api.github.com/gists/g1","the gist updated");
             var files=JsonNode.Parse(patch.Body)!["files"]!.AsObject();
