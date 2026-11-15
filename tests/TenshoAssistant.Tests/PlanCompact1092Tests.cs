@@ -17,7 +17,9 @@ internal static class PlanCompact1092Tests
             Check(heavy.Count == 0,"a done row stays short: " + string.Join(" / ",heavy.Select(l => l[..40])));
             // 0.1332: X-01, the open point checked here, was closed on 14/11: any open point now.
             Check(rows.Any(l => !done.Contains(l) && !l.Contains("| Done in ") && !l.Contains("| Fait en ") && l.Length > 320),"an open point keeps its full text");
-            var size = new FileInfo(path).Length;
+            // 0.1455 (X-454): counted on the text read with LF line ends: FileInfo.Length said 299,900 bytes on an LF checkout and 301,699 on
+            // the CI's Windows checkout (CRLF), so the budget passed locally and failed in the CI.
+            var size = System.Text.Encoding.UTF8.GetByteCount(text);
             // 0.1135 (relais 26): 160 KB → 200 KB: the open points added since 0.1118 (X-165 to X-176, about 18 KB in both languages) keep their full text
             // by design; done rows stay short (checked above).
             // 0.1172 (relais 32): 200 KB → 250 KB: the open points of the night review and the user's requests of 12/11 (X-177 to X-190, about 30 KB
