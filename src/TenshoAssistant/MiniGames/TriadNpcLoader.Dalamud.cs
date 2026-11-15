@@ -93,7 +93,9 @@ internal sealed class TriadNpcLoader : IDisposable
                         || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject npc
                         || !missing.Remove(npc.ParentData.ParentData.BaseId)) continue;
                     var position = instance.Transform.Translation;
-                    places[npc.ParentData.ParentData.BaseId] = (map.RowId, map.PlaceName.ValueNullable?.Name.ExtractText() ?? "",
+                    // X-462 (0.1464): a territory drawn on floors: the floor's map (0: on no floor).
+                    var floorMap = Maps.MapFloors.MapOf(Maps.MapFloorReader.Read(data, bg), map.RowId, position.X, position.Y, position.Z);
+                    places[npc.ParentData.ParentData.BaseId] = (floorMap, map.PlaceName.ValueNullable?.Name.ExtractText() ?? "",
                         Npcs.NpcShopLinks.MapCoordinate(position.X, map.OffsetX, map.SizeFactor), Npcs.NpcShopLinks.MapCoordinate(position.Z, map.OffsetY, map.SizeFactor));
                 }
             }

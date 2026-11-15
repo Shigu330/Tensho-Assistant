@@ -127,9 +127,10 @@ public sealed class MapCatalog
     /// pixel. Auxesia (territory 1319) has 22 such variants, c1w4/01–22, that change with cosmic exploration progress, while NPC positions
     /// are recorded on the territory's default map (docs/evidence/0.175.0-auxesia-maps-probe.log).
     /// </summary>
+    /// <remarks>X-462 (0.1464): not another floor of the same frame (Eulmore's three floors: MapFloors.OtherFloor).</remarks>
     public IReadOnlyList<uint> Equivalent(MapDefinition map) => Entries
         .Where(other => other.MapId == map.MapId || other.TerritoryId == map.TerritoryId && other.SizeFactor == map.SizeFactor
-            && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY)
+            && other.OffsetX == map.OffsetX && other.OffsetY == map.OffsetY && !MapFloors.OtherFloor(map, other))
         .Select(other => other.MapId).ToArray();
     /// <summary>
     /// 0.679 (user report): the versions of one drawing of the land, such as the Island Sanctuary's as it develops (maps 772, 773, 774, 780): the game may place a marker on any of them.
