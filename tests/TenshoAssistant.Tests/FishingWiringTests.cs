@@ -65,7 +65,7 @@ internal static class FishingWiringTests
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/FishingBaitReader.Dalamud.cs"));
             Check(HasCode(reader,"if(disposed)return; ReadLine();"),"every frame, before the half-second throttle");
             Check(reader.Contains("if(state==lineState)return;") && reader.Contains("if(state==1)Volatile.Write(ref castAt"),"CastingOut only, on change");
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Gathering.cs"));   // X-153 (0.1412): the gathering family
             Check(plugin.Contains("mainWindow.FishingCastAt=()=>baitReader?.CastAt;"),"wired");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.FishingPanel.cs")).Contains("fishingSince=FromCast(fishingSince,FishingCastAt?.Invoke());"),"fishing help");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.OceanVoyagePanel.cs")).Contains("oceanFishingSince=FromCast(oceanFishingSince,FishingCastAt?.Invoke());"),"ocean fishing");
@@ -83,7 +83,7 @@ internal static class FishingWiringTests
         // From FishingHelp604Tests: 0.604 (C35): the fishing help reads nothing in the frame.
         ("Fishing help: the player copied on the framework thread, the tables off the frame",() =>
         {
-            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
+            var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.Gathering.cs"));   // X-153 (0.1412): the gathering family
             Check(plugin.Contains("TenshoAssistant.Competitive.CompetitiveGate.Add(framework,copyFishingNow)") && plugin.Contains("TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,copyFishingNow)"),"copied, with its clean-up");
             Check(plugin.Contains("mainWindow.ConfigureFishingHelp(()=>Volatile.Read(ref fishingNowCopy).Value,"),"the frame reads the copy");
             Check(plugin.Contains("fishingSpotsTask??=Task.Run(") && plugin.Contains("bountifulBases??=Task.Run("),"both tables on a worker");

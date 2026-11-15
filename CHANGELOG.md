@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1412.0
+- Plan global, X-153 : Refonte de Plugin.cs, huitième tranche (revue GPT du 11/11, acceptée par l'utilisateur) : la famille de la récolte et de la pêche sort de Plugin.cs vers Plugin.Gathering.cs : les deux services communautaires des poissons (GatherBuddy, temps de touche), le lecteur des carnets, le lecteur de l'appât, la copie de la pêche du joueur sur le thread du jeu, les coins de pêche, les bases de Récolte abondante et les effets des points de récolte. Le bloc est déplacé tel quel : un seul chemin d'installation et un seul de libération par service, dans l'ordre d'avant, à la même place. Aucune page changée. Test : GatheringFamily1412Tests.
+- Tests : GatheringFamily1412Tests. Verify.ps1 (agent) : 2683/2683, 0 avertissement, 0 erreur ; DLL 0.1412.0.0. Rien à essayer en jeu.
+### English
+- Plugin.cs overhaul, eighth slice (GPT review of 11/11, accepted by the user): the gathering and fishing family leaves Plugin.cs for Plugin.Gathering.cs: the two community fish services (GatherBuddy, bite times), the notebooks' reader, the bait reader, the player's fishing copy on the game's thread, the fishing spots, the Bountiful bases and the gathering points' effects. The block moved as it was: one install path and one release path per service, in the order of before, at the same place. No page changed. Test: GatheringFamily1412Tests.
+
 ## 0.1411.0
 - Plan global, X-196 : Tableau des servants, tranche 3 : le rappel avant la fin des ventes. Les alarmes automatiques (réglage « Alarmes automatiques », activé par défaut), qui sonnaient déjà à la fin de chaque tâche de servant, sonnent aussi à la fin des ventes de chaque servant (RetainerManager : objets en vente et fin des ventes, connus après avoir ouvert la liste des servants), avec la même avance et la même disparition une heure après avoir sonné ; un servant sans tâche a quand même son alarme de vente. Le texte du réglage le dit. Avec 0.1409 (lecture, copie des sacs du jeu X-307) et 0.1410 (tableau), le point est fait, sauf l'essai en jeu. Test : RetainerSales1411Tests.
 - Pour les joueurs : alarmes automatiques : une alarme quand les ventes d'un servant finissent, comme pour sa tâche.
