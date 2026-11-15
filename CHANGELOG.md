@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1388.0
+- Plan global, X-276 : Barre du serveur du jeu : les entrées facultatives Sacs, État de l'équipement et Zone et instance ouvrent maintenant l'infobulle de Tensho, comme les alarmes, rappels, devises, gils et l'état de Tensho, au-dessus ou en dessous de l'entrée selon le réglage ; l'infobulle du jeu reste vide dès que la place de l'entrée à l'écran est connue (même chemin : AlarmDtrEntry.FindTextNode, TooltipScope.UnderBox). Test à cliquet ServerBarTooltips1388Tests : aucune entrée ne pose l'infobulle du jeu quand celle de Tensho est active, chacune dessine la sienne.
+- Pour les joueurs : barre du serveur : les entrées Sacs, État de l'équipement et Zone montrent maintenant l'infobulle de Tensho comme les autres entrées, au-dessus ou en dessous selon le réglage.
+- Tests : ServerBarTooltips1388Tests. Verify.ps1 (agent) : 2628/2628, 0 avertissement, 0 erreur ; DLL 0.1388.0.0. Non validé en jeu.
+### English
+- Game's server bar: the optional entries Bags, Gear condition and Zone and instance now open Tensho's tooltip, as the alarms, reminders, currencies, gil and Tensho's state, above or below the entry as set; the game's tooltip stays empty once the entry's place on screen is known (same path: AlarmDtrEntry.FindTextNode, TooltipScope.UnderBox). Ratchet ServerBarTooltips1388Tests: no entry sets the game's tooltip while Tensho's is on, each draws its own.
+- For players: Server bar: the bags, gear condition and zone entries now show Tensho's tooltip like the other entries, above or below as set.
+
 ## 0.1387.0
 - Plan global, X-274 : Collection › Titres et Hauts faits : chaque relevé complet des listes de titres et de hauts faits (le jeu les avait envoyées) est gardé par personnage dans TenshoData.db (nouvelle table completion_lists, avec la date du relevé) ; à la session suivante, tant que le jeu n'a pas renvoyé la liste, le lecteur l'applique : obtenu reste obtenu, non obtenu pendant la durée de cache « Titres et hauts faits », et la ligne rouge dit « Relevé du … ». Avant, la mémoire vivait dans le cache des collections, dont la clé porte la version de Tensho (chaque nouvelle version la perdait), et en mémoire. Table effacée avec le personnage. Format de stockage ajouté avant l'annonce (R02.3). Test CompletionLists1387Tests ; CharacterErase1212Tests remplit aussi la nouvelle table (raison donnée).
 - Pour les joueurs : collection : les hauts faits terminés et les titres obtenus sont gardés d'une session à l'autre (« Relevé du … ») au lieu d'attendre la réouverture des fenêtres du jeu.

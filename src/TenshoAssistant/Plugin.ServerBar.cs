@@ -39,9 +39,10 @@ public sealed partial class Plugin
         gilBar=()=>gil;
         // X-217 (0.1226): bags, gear condition, zone and instance in the server bar (each off by default).
         Alarms.InfoDtrEntries? info=null;
-        registrations.Register(()=>info=new Alarms.InfoDtrEntries(dtrBar,framework,client,inventory,configuration,equipped,
+        registrations.Register(()=>info=new Alarms.InfoDtrEntries(dtrBar,framework,gameGui,client,inventory,configuration,equipped,
                 id=>mainWindow.TerritoryName?.Invoke(id),localization.Get,localization.Format,mainWindow.OpenGilJournal,mainWindow.OpenGear,mainWindow.OpenMap),
             ()=>{info?.Dispose();info=null;});
+        infoBar=()=>info;
         // X-165 (0.1245): Tensho's state (off by default), from the snapshot the main window publishes; a click opens the settings, where the dashboard is.
         Alarms.StateDtrEntry? state=null;
         registrations.Register(()=>state=new Alarms.StateDtrEntry(dtrBar,framework,gameGui,configuration,()=>mainWindow.DashboardState,localization.Get,localization.Format,mainWindow.OpenSettings),
