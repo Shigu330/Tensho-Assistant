@@ -67,7 +67,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1438-reader-guard.md](0.1438-reader-guard.md) | `src/TenshoAssistant/Diagnostics/ReaderCompiler.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
-| [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
+| [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `src/TenshoAssistant/Diagnostics/MachineMemory.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |

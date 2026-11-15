@@ -301,6 +301,8 @@ public sealed class RuntimeSuspensionListener : EventListener
     private readonly LargeAllocationTracker large=new();
     // X-433 (0.1440): the methods compiled on the game's thread (JIT keyword, verbose: one event as each compilation starts).
     private readonly GameThreadJit jit=new();
+    // X-433 (0.1447): what is allocated, by type and by thread (the same allocation ticks).
+    private readonly AllocationTypes allocations=new();
     private volatile Action<string>? say;
     private int disposed;
 
@@ -311,6 +313,7 @@ public sealed class RuntimeSuspensionListener : EventListener
     }
 
     public GameThreadJit Jit=>jit;
+    public AllocationTypes Allocations=>allocations;
 
     public SuspensionTracker Tracker=>tracker;
     public CollectionTracker Collections=>collections;
@@ -352,19 +355,32 @@ public sealed class RuntimeSuspensionListener : EventListener
         {
             var size=Number(written,"ObjectSize") is { } objectSize and >0 ? objectSize:Number(written,"AllocationAmount64") ?? Number(written,"AllocationAmount") ?? 0;
             var typeName=written.PayloadNames?.IndexOf("TypeName") is int typeAt && typeAt>=0 && written.Payload is { } typeValues && typeAt<typeValues.Count ? typeValues[typeAt] as string:null;
+            // X-433 (0.1447): every tick, weighed by the amount allocated since the last one.
+            allocations.See(typeName,Number(written,"AllocationAmount64") ?? Number(written,"AllocationAmount") ?? 0,written.OSThreadId,
+                Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread));
             if(large.See(written.TimeStamp.ToUniversalTime(),Number(written,"AllocationKind") ?? 0,size,typeName,written.OSThreadId,
                 Interlocked.Read(ref ThreadClock.GameThread),Interlocked.Read(ref ThreadClock.WarmupThread),collections.BackgroundSince) is { } largeNote)say?.Invoke(largeNote);
             return;
         }
         if(written.EventName is "GCStart_V2" or "GCEnd_V1")
         {
-            if(collections.See(written.EventName,written.TimeStamp.ToUniversalTime(),Number(written,"Count"),Number(written,"Depth"),Number(written,"Type"),Number(written,"Reason")) is { } collectionNote)say?.Invoke(collectionNote);
+            if(collections.See(written.EventName,written.TimeStamp.ToUniversalTime(),Number(written,"Count"),Number(written,"Depth"),Number(written,"Type"),Number(written,"Reason")) is { } collectionNote)
+                say?.Invoke(collectionNote.Contains(" collection of generation 2 ",StringComparison.Ordinal) ? WithMemory(collectionNote):collectionNote);
             return;
         }
         uint? reason=null;long? jitted=null;
         if(written.EventName=="GCSuspendEEBegin_V1")reason=Number(written,"Reason") is { } value ? (uint)value:null;
         else if(written.EventName=="TieredCompilationBackgroundJitStop")jitted=Number(written,"JittedMethodCount");
         if(tracker.See(written.EventName,written.TimeStamp.ToUniversalTime(),reason,jitted) is { } note)say?.Invoke(note);
+    }
+
+    /// <summary>X-433 (0.1447): a collection of generation 2, with the machine's memory now and the load the collector saw at its last full
+    /// blocking collection (a collection « induced for low memory » answers the system saying its memory is low).</summary>
+    private static string WithMemory(string note)
+    {
+        var info=GC.GetGCMemoryInfo(GCKind.FullBlocking);
+        return note.TrimEnd('.')+"; "+MachineMemory.Text(MachineMemory.Read(),MachineMemory.ProcessPrivateBytes())
+            +MachineMemory.CollectorText(info.MemoryLoadBytes,info.HighMemoryLoadThresholdBytes,info.TotalAvailableMemoryBytes)+".";
     }
 
     private static string? Text(EventWrittenEventArgs written,string name)

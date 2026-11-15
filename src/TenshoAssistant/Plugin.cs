@@ -106,6 +106,8 @@ public sealed partial class Plugin : IDalamudPlugin
     {
         // 0.525 (user report: lag when the plugin loads): what the load costs, said in the log, to tell the plugin's own work from the runtime's pauses.
         var loadStarted=System.Diagnostics.Stopwatch.GetTimestamp();var pausesBefore=GC.GetTotalPauseDuration();var gen2Before=GC.CollectionCount(2);
+        // X-433 (0.1447): what the process allocates and keeps while Tensho loads (developer mode, said two minutes after the load).
+        var allocatedBefore=GC.GetTotalAllocatedBytes();var managedBefore=GC.GetTotalMemory(false);
         this.log = log;
         // 0.1105 (R20, plan 4.20): the version loaded, read by the agent's launch check (the agent's logread.py launch).
         log.Information("Tensho Assistant {0} loaded; logged in: {1}, territory {2}.",typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",client.IsLoggedIn,client.TerritoryType);
@@ -1313,7 +1315,9 @@ public sealed partial class Plugin : IDalamudPlugin
             string Memory()
             {
                 var contexts=System.Runtime.Loader.AssemblyLoadContext.All.Select(context=>context.Name).ToArray();
-                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive);
+                // X-433 (0.1447): with the process's private memory and the machine's (a collection « induced for low memory »).
+                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive)
+                    +"; "+Diagnostics.MachineMemory.Text(Diagnostics.MachineMemory.Read(),Diagnostics.MachineMemory.ProcessPrivateBytes());
             }
             void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",
                 when,(long)System.Diagnostics.Stopwatch.GetElapsedTime(loadStarted).TotalMilliseconds,(long)(GC.GetTotalPauseDuration()-pausesBefore).TotalMilliseconds,GC.CollectionCount(2)-gen2Before,framework.IsInFrameworkUpdateThread ? "framework":"other",Memory());
@@ -1357,6 +1361,9 @@ public sealed partial class Plugin : IDalamudPlugin
                         log.Information(suspensions.Collections.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Large.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
                         log.Information(suspensions.Jit.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        // X-433 (0.1447): what was allocated meanwhile, by type and thread, and by the whole process.
+                        log.Information(suspensions.Allocations.Summary(Diagnostics.RuntimeSuspensionWatch.Length));
+                        log.Information(Diagnostics.MachineMemory.AllocatedText(GC.GetTotalAllocatedBytes()-allocatedBefore,managedBefore,GC.GetTotalMemory(false),Diagnostics.RuntimeSuspensionWatch.Length));
                     }
                 },TaskScheduler.Default);
             }
