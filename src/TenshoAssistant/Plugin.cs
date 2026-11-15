@@ -753,6 +753,9 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.TreasureMap=()=>treasureMap?.Spot;
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
+            // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on.
+            Chat.ChatReader? chatReader=null;
+            registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());
             // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
             Maps.ChatMapLinkWatcher? chatLinks=null;
             registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());
@@ -1423,6 +1426,8 @@ public sealed partial class Plugin : IDalamudPlugin
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){chatForCut?.Print("[Tensho] "+localization.Get("Competitive.Off"));return;}
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
+        // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
+        if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
         // 0.349 (g, X-07): « /tensho wiki <item> » and « /tensho lodestone <item> » open the item's page in the browser.
         var parts = arguments.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         // 0.494: « /tensho selftest » writes the self-check to the log.

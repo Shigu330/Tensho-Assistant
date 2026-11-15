@@ -30,10 +30,12 @@ internal static class Pages470Tests
             foreach(var part in new[]{"enum Page","New tools: scripts/New-Tool.ps1","Navigation","Program.cs","TenshoAssistant.Tests.csproj","DryRun","^[A-Z][A-Za-z0-9]{2,39}$"})Check(script.Contains(part),part);
             Check(Read("CONTRIBUTING.md").Contains("scripts/New-Tool.ps1"),"described for contributors");
         }),
-        ("The custom chat was removed by the user's decision (DEC-030): no page, setting, text or file is left; the other features that read chat lines stay",() =>
+        // X-403 (0.1434): the user brought the read-only chat window back (D-166 of 15/11, after DEC-030), as a panel window with its settings in
+        // Settings › Panels beside the game (ChatWindow1434Tests); the Chat page of 0.471, its file and its texts stay removed.
+        ("The custom chat page of 0.471 stays removed (DEC-030; its read-only window came back as a panel by D-166): no page, page file or old text is left; the other features that read chat lines stay",() =>
         {
-            Check(!Directory.Exists(Path.GetFullPath("src/TenshoAssistant/Chat")) && !File.Exists(Path.GetFullPath("src/TenshoAssistant/MainWindow.Chat.cs")),"files");
-            Check(!Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("Page.Chat") && !Read("src/TenshoAssistant/Configuration.cs").Contains("ChatSettings") && !Read("src/TenshoAssistant/Plugin.cs").Contains("ChatReader"),"wiring");
+            Check(!File.Exists(Path.GetFullPath("src/TenshoAssistant/MainWindow.Chat.cs")),"files");
+            Check(!Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("Page.Chat") && !Read("src/TenshoAssistant/MainWindow.cs").Contains("Chat }"),"wiring");
             foreach(var language in new[]{"en","fr"})Check(!Read($"src/TenshoAssistant/Localization/Languages/{language}.json").Contains("\"ChatUi\""),language);
             Check(File.Exists(Path.GetFullPath("src/TenshoAssistant/Maps/ChatMapLinkWatcher.Dalamud.cs")) && File.Exists(Path.GetFullPath("src/TenshoAssistant/Reminders/GardenChatWatcher.Dalamud.cs")),"map links and garden detection stay");
         }),

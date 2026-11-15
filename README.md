@@ -83,7 +83,7 @@ and the help text of each page (the « ? » beside its title):
 <!-- /docgen:pages-en -->
 
 Chat commands: `/tensho` opens the window; `/tensho fish` (also `fishing`, `peche`, `pêche`) opens or closes the fishing help;
-`/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
+`/tensho chat` shows or hides the Tensho chat window (beside the game's chat, reading only); `/tensho todo <task>` adds a free task to Reminders; `/tensho item <item>`, `price`, `gather` and `recipe` (also `objet`, `prix`,
 `recolte`, `recette`) open the item in Tensho (item page, Market, Gathering, Crafting); `/tensho wiki <item>` and
 `/tensho lodestone <item>` open the item's page in the browser; `/tenshonext` is the end-of-page marker of macro chains. Dalamud's « open » and « settings » buttons open the window and its
 Settings page.
@@ -277,7 +277,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 <!-- /docgen:pages-fr -->
 
 Commandes : `/tensho` ouvre la fenêtre ; `/tensho peche` (ou `pêche`, `fish`, `fishing`) ouvre ou ferme l'aide à la pêche ;
-`/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
+`/tensho chat` affiche ou masque la fenêtre de chat Tensho (à côté du chat du jeu, en lecture seule) ; `/tensho todo <tâche>` ajoute une tâche libre aux Rappels ; `/tensho objet <objet>`, `prix`, `recolte` et `recette` (ou `item`,
 `price`, `gather`, `recipe`) ouvrent l'objet dans Tensho (fiche objet, Marché, Récolte, Artisanat) ; `/tensho wiki <objet>` et `/tensho lodestone <objet>` ouvrent la page de
 l'objet dans le navigateur ; `/tenshonext` est le marqueur de fin de page de l'enchaînement de macros. Les boutons « ouvrir » et
 « paramètres » de Dalamud ouvrent la fenêtre et sa page Paramètres.

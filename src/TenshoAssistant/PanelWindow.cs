@@ -26,6 +26,8 @@ internal sealed class PanelWindow : Window
         RespectCloseHotkey = false;
         DisableWindowSounds = true;
         ShowCloseButton = panel.Close is not null;
+        // X-403 (0.1434): a panel that is resized by hand (the chat window) starts at its size.
+        if (panel.Size is { } size) { Size = size; SizeCondition = ImGuiCond.FirstUseEver; }
     }
 
     public void Follow() => IsOpen = !broken && panel.Wanted();
@@ -42,7 +44,8 @@ internal sealed class PanelWindow : Window
     {
         if (panel.Title is { } title) WindowName = title() + panel.Id;
         UI.FfxivTheme.Push();
-        if (panel.Alpha is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);
+        // X-403 (0.1434): an opacity chosen in the settings is read at each draw.
+        if ((panel.Opacity?.Invoke() ?? panel.Alpha) is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);
     }
 
     public override void PostDraw()
@@ -69,4 +72,4 @@ internal sealed class PanelWindow : Window
 }
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
-internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null);
+internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null);

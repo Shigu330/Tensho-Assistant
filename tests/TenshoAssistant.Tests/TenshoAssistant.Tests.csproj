@@ -9,6 +9,8 @@
   <ItemGroup>
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
+    <!-- X-403 (0.1434): the Tensho chat window's pure parts (channels, store, tab views, format, settings). -->
+    <Compile Include="../../src/TenshoAssistant/Chat/*.cs" Exclude="../../src/TenshoAssistant/Chat/*.Dalamud.cs" Link="Chat/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Localization/*.cs" Link="Localization/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Carnivale/*.cs" Exclude="../../src/TenshoAssistant/Carnivale/*.Dalamud.cs" Link="Carnivale/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Societies/*.cs" Exclude="../../src/TenshoAssistant/Societies/*.Dalamud.cs" Link="Societies/%(Filename)%(Extension)" />

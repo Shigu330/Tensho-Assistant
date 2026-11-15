@@ -29,6 +29,8 @@ public static class Faq
         // X-253 (0.1183): M opens Tensho's map by default.
         new("Map", "Settings"),
         new("Panels", "Settings"),
+        // X-403 (0.1434, D-166): the Tensho chat window, beside the game's chat.
+        new("ChatWindow", "Settings"),
         new("Pause"),
         new("Update"),
         new("Reset", "Settings"),

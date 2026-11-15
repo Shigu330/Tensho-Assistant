@@ -37,6 +37,15 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `AutoBankCapture` | bool | true | Settings › Data · Settings › Data | **Save retainers, saddlebags and the company chest automatically when they are opened** — Off: an import button appears beside the game's storage windows. Default: on. |
 | `BagsServerBar` | bool | false | Settings › General | **Bags in the server bar** — Shows the free slots of your four bags in the server bar; its tooltip gives the total, a click opens Storage. Refreshed every 2 seconds. Default: off. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Show as a list** — One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply. Default: off. |
+| `Chat.Clock24` | bool | true | Settings › Panels | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
+| `Chat.FontScale` | int | 100 | Settings › Panels | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
+| `Chat.HideInCombat` | bool | false | Settings › Panels | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
+| `Chat.MaxLines` | int | 2000 | Settings › Panels | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
+| `Chat.Opacity` | int | 85 | Settings › Panels | **Background opacity** — Opacity of the window's background, from 10% to 100%. Default: 85%. |
+| `Chat.ShowChannel` | bool | true | Settings › Panels | **Show the channel** — Writes the channel's short name in front of what people say, such as [1] for linkshell 1. Default: on. |
+| `Chat.ShowSeconds` | bool | false | Settings › Panels | **Show the seconds** — Adds the seconds to the time. Greyed while the time is not shown. Default: off. |
+| `Chat.ShowTimestamps` | bool | true | Settings › Panels | **Show the time** — Writes the time of each message in front of it. Default: on. |
+| `Chat.WindowOpen` | bool | false | Settings › Panels | **Show the Tensho chat window** — An extra window beside the game's chat that only reads it: tabs by channel, colours, time, unread counts. The game's chat stays as it is and nothing is sent. Messages stay in memory only (never saved), are cleared when you turn the window off or log out, and are not read in PvP or ranked play (Triple Triad tournaments, Mahjong). « /tensho chat » shows or hides it too. Default: off. |
 | `CloseOnGameWindow` | bool | true | Settings › General | **Close Tensho when it opens a game window** — After « Open in the crafting log », « … gathering log » or « Game map », the Tensho window closes to show the game's. A game window already open is opened on the entry, not closed. Default: on. |
 | `CollectableUseFocus` | bool | true | Settings › Panels | **Collectable plan: use Collector's Focus** — The plan may spend GP on Collector's Focus when that earns more on average. Default: on. |
 | `CollectableUsePriming` | bool | true | Settings › Panels | **Collectable plan: Priming Touch** — The plan may spend GP on Priming Touch when doubling the chance of a free Meticulous earns more. From level 95. Default: on. |
@@ -326,7 +335,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 270 controls (262 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 279 controls (271 linked to `Configuration`, 8 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -369,6 +378,15 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `AutoBankCapture` | bool | true | Paramètres › Données et sources · Paramètres › Données et sources | **Enregistrer automatiquement les servants, sacoches et le coffre de compagnie à leur ouverture** — Désactivé : un bouton d'import apparaît à côté des fenêtres de rangement du jeu. Par défaut : activé. |
 | `BagsServerBar` | bool | false | Paramètres › Général | **Sacs dans la barre du serveur** — Montre les cases libres de vos quatre sacs dans la barre du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes. Par défaut : désactivé. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Afficher en liste** — Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués. Par défaut : désactivé. |
+| `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
+| `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
+| `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
+| `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
+| `Chat.Opacity` | int | 85 | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 10 % à 100 %. Par défaut : 85 %. |
+| `Chat.ShowChannel` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher le canal** — Écrit le nom court du canal devant ce que disent les gens, comme [1] pour la linkshell 1. Par défaut : activé. |
+| `Chat.ShowSeconds` | bool | false | Paramètres › Panneaux à côté du jeu | **Afficher les secondes** — Ajoute les secondes à l'heure. Grisé tant que l'heure n'est pas affichée. Par défaut : désactivé. |
+| `Chat.ShowTimestamps` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher l'heure** — Écrit l'heure de chaque message devant lui. Par défaut : activé. |
+| `Chat.WindowOpen` | bool | false | Paramètres › Panneaux à côté du jeu | **Afficher la fenêtre de chat Tensho** — Une fenêtre en plus, à côté du chat du jeu, qui ne fait que le lire : onglets par canal, couleurs, heure, messages non lus. Le chat du jeu reste tel quel et rien n'est envoyé. Les messages restent en mémoire seulement (jamais enregistrés), sont effacés quand vous désactivez la fenêtre ou vous déconnectez, et ne sont pas lus en JcJ ni dans les parties classées (tournois de Triple Triade, Mahjong). « /tensho chat » l'affiche ou la masque aussi. Par défaut : désactivé. |
 | `CloseOnGameWindow` | bool | true | Paramètres › Général | **Fermer Tensho quand il ouvre une fenêtre du jeu** — Après « Ouvrir dans le carnet d'artisanat », « … de récolte » ou « Carte du jeu », la fenêtre de Tensho se ferme pour laisser voir celle du jeu. Une fenêtre du jeu déjà ouverte est ouverte sur l'entrée, pas refermée. Par défaut : activé. |
 | `CollectableUseFocus` | bool | true | Paramètres › Panneaux à côté du jeu | **Plan de collection : utiliser Œil du collectionneur** — Le plan peut dépenser des PR en Œil du collectionneur si cela rapporte plus en moyenne. Par défaut : activé. |
 | `CollectableUsePriming` | bool | true | Paramètres › Panneaux à côté du jeu | **Plan de collection : Toucher d'amorçage** — Le plan peut dépenser des PR pour Toucher d'amorçage quand doubler les chances d'une Sélection méthodique gratuite rapporte plus. À partir du niveau 95. Par défaut : activé. |
@@ -658,5 +676,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 270 cases (262 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 279 cases (271 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

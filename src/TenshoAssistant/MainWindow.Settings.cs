@@ -162,6 +162,8 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
         ImGui.Spacing();ImGui.Separator();
         DrawModuleSettings();
+        // X-403 (0.1434, D-166): the Tensho chat window, beside the game's chat (MainWindow.ChatWindow.cs).
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.Title"),ImGuiTreeNodeFlags.DefaultOpen))DrawChatWindowSettings();
     }
 
     // X-100 (0.999, DEC-048): alarms, their game commands, and the server bar entries (also on their own pages).

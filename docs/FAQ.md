@@ -56,6 +56,10 @@ That map is Tensho's: by default it replaces the game's on the M key, with the s
 
 Tensho adds small panels next to some game windows (character sheet, Duty Finder, retainer sales, synthesis, gathering, fishing, the Sort button, Triple Triad) and lines in the server bar. The guide's step « Panels next to the game's windows » turns them all off or on at once (Help › « Start the guide »); each one also has its switch in Settings, and the reset button (curved arrow) puts it back.
 
+## What is the Tensho chat window?
+
+An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads: the game's chat stays where it is, never hidden, and nothing is sent from it. Messages stay in memory only, are never saved on disk, and are cleared when you turn the window off or log out. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+
 ## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
 In PvP zones and other ranked content (Triple Triad tournaments, Mahjong), the whole plugin stops reading the game and says so. It comes back on its own when you leave. No setting changes this. In deep dungeons Tensho works as in any dungeon, but the game draws its own map there: Tensho's map hides and leaves the game's map until you leave.
@@ -173,6 +177,10 @@ Cette carte est celle de Tensho : par défaut, elle remplace celle du jeu sur la
 ## Comment retirer les panneaux autour des fenêtres du jeu ?
 
 Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche du personnage, outil de mission, ventes des servants, synthèse, récolte, pêche, bouton Trier, Triple Triade) et des lignes dans la barre du serveur. L'étape « Panneaux à côté des fenêtres du jeu » du guide les coupe ou les remet tous d'un coup (Aide › « Lancer le guide ») ; chacun a aussi son interrupteur dans Paramètres, et le bouton de retour au défaut (flèche courbe) le remet.
+
+## Qu'est-ce que la fenêtre de chat Tensho ?
+
+Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire : le chat du jeu reste à sa place, jamais caché, et rien n'est envoyé depuis elle. Les messages restent en mémoire seulement, ne sont jamais enregistrés sur le disque et sont effacés quand vous désactivez la fenêtre ou vous déconnectez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 
