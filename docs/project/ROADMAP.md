@@ -80,15 +80,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| No. | Point | Choice applied, or record awaited | Where |
-|---|---|---|---|
-| D-83 | Getting started, help, videos, issues: the 8 slices coded (0.502 to 0.506), DEC-031 | In-game validation; a release for the video list | ONBOARD-001 |
-| D-84 | Community templates: Finished on the code side in 0.476 | In-game validation; gallery visible after a release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
-| D-85 | « Cost ≤ capacity » rule below rank 50: Rule of the community tools. Consistent with 11 published airship builds; not checked in game below rank 50. | In-game record on a vessel below rank 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
-| D-87 | Flag icon 60561: The flag icon id is not proven in docs/evidence (placing the flag is validated in game). | In-game record: flag placed, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` read on the framework (probe), log in docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`); CHANGELOG 0.102 (« assumed »); map audit 0.328 |
-| D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
-| D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+Nothing open.
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -185,15 +177,7 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| N° | Point | Choix appliqué, ou relevé attendu | Où |
-|---|---|---|---|
-| D-83 | Prise en main, aide, vidéos, tickets : les 8 lots codés (0.502 à 0.506), DEC-031 | Validation en jeu ; une release pour la liste de vidéos | ONBOARD-001 |
-| D-84 | Modèles de la communauté : Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
-| D-85 | Règle « coût ≤ capacité » sous le rang 50 : Règle des outils de la communauté. Cohérente avec 11 montages d'aéronefs publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
-| D-87 | Icône du drapeau 60561 : L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
-| D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Bonus estimé d'Extraction/Récolte abondante (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
-| D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
+Aucune en attente.
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
