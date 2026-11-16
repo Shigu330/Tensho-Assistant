@@ -45,7 +45,7 @@ internal static class ChatLook1481Tests
             var bar = body.IndexOf("DrawChatTabBar(tabs,options);", StringComparison.Ordinal);
             var over = body.IndexOf("if(!options.TabsAtBottom)DrawChatShownTab(tabs,options,0);", StringComparison.Ordinal);
             Check(under > 0 && bar > under && over > bar, "lines, bar, lines");
-            Check(window.Contains("BeginChild(\"###TenshoChatLines\",new Vector2(0,linesHeight)", StringComparison.Ordinal), "the bar's room kept under the lines");
+            Check(window.Contains("BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight)", StringComparison.Ordinal), "the bar's room kept under the lines");   // 0.1484 (X-501): one area per tab
             Check(window.Contains("if(options.TextOutline)ChatOutline(run.Text);\n                    ImGui.TextColored(", StringComparison.Ordinal)
                   && window.Contains("if(ChatOptions.TextOutline)ChatOutline(run.Text);\n        ImGui.TextColored(Accent,run.Text);", StringComparison.Ordinal), "outline under the text and the links");
             Check(window.Contains("Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y)", StringComparison.Ordinal), "narrow margins");

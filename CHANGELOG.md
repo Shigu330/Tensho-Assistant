@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1484.0
+- Plan global, X-501 : Relecture de 0.1482 (X-501) : chaque onglet de la fenêtre de chat garde de nouveau sa propre position de défilement. Depuis 0.1481 les lignes sont dessinées hors de l'onglet, dans une seule zone pour tous : un onglet ouvert reprenait le défilement du précédent, avec le bouton « retour en bas », et ses lignes n'étaient pas marquées lues. La zone des lignes porte maintenant le numéro de son onglet (ChatFormat.LinesId).
+- Pour les joueurs : chaque onglet du chat garde de nouveau sa propre position ; ouvrir un autre onglet ne le montre plus remonté.
+- Tests : ChatTabScroll1484Tests. Verify.ps1 (agent) : 2906/2906, 0 avertissement, 0 erreur ; DLL 0.1484.0.0. Non validé en jeu.
+### English
+- Review of 0.1482 (X-501): each tab of the chat window keeps its own scroll position again. Since 0.1481 the lines were drawn outside the tab, in one area for all tabs: a tab opened at the scroll of the one before, with the « back to the bottom » button, and its lines were not marked read. The lines' area is now named after its tab (ChatFormat.LinesId).
+- For players: Each chat tab keeps its own scroll position again; opening another tab no longer starts it scrolled up.
+
 ## 0.1483.0
 - Plan global, X-500 : Relecture de 0.1482 (X-500) : la carte du jeu que Tensho remplace par la sienne n'est plus vue à l'écran par le lecteur des fenêtres du jeu. Le remplacement déplace seulement son nœud racine hors de l'écran (les X et Y de la fenêtre ne changent pas) ; le lecteur saute maintenant une fenêtre dont le nœud racine est hors de l'écran (GameWindows.HostedOffScreen, même valeur GameWindows.OffScreen que le remplacement). La fenêtre de chat ne se cache plus ni ne pâlit quand la carte du jeu est ouverte mais remplacée.
 - Pour les joueurs : la fenêtre de chat ne se cache plus quand la carte du jeu s'ouvre alors que celle de Tensho la remplace.

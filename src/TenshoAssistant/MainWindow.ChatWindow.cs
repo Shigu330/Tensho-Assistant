@@ -406,7 +406,8 @@ internal sealed partial class MainWindow
     private void DrawChatShownTab(List<ChatTabSettings> tabs,ChatSettings options,float height)
     {
         if(tabs.Count==0)return;
-        DrawChatLines(ChatMessages.ViewOf(tabs[Math.Clamp(chatTabShown,0,tabs.Count-1)]),options,height);
+        var shown=Math.Clamp(chatTabShown,0,tabs.Count-1);
+        DrawChatLines(ChatMessages.ViewOf(tabs[shown]),options,height,shown);
     }
 
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
@@ -462,14 +463,15 @@ internal sealed partial class MainWindow
     private float chatLineHeight;
 
     /// <param name="linesHeight">X-476 (0.1481): the lines' height; 0, all that is left; below 0, all but that much (the tab bar under them).</param>
-    private void DrawChatLines(ChatTabView view,ChatSettings options,float linesHeight)
+    /// <param name="tab">X-501: the tab's place, which names its lines' area (its own scroll).</param>
+    private void DrawChatLines(ChatTabView view,ChatSettings options,float linesHeight,int tab)
     {
         // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the
         // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
         var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
         // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
-        var visible=ImGui.BeginChild("###TenshoChatLines",new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
+        var visible=ImGui.BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
         try
         {
             if(!visible)return;

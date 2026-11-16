@@ -43,6 +43,10 @@ public static class ChatFormat
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
 
+    /// <summary>X-501 (review of 0.1482): the lines' area of one tab. Drawn outside the tab item since 0.1481 (no tab ID pushed), it is named
+    /// after its tab: each tab keeps its own scroll, as when it was drawn inside its tab item.</summary>
+    public static string LinesId(int tab)=>"###TenshoChatLines"+tab.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
     /// <summary>A tab's name, with its unread count when it has one and shows it.</summary>
     public static string TabLabel(string? name,bool showUnread,int unread)
         =>(name is { Length:>0 } ? name:"-")+(showUnread && unread>0 ? $" ({UnreadText(unread)})":"");
