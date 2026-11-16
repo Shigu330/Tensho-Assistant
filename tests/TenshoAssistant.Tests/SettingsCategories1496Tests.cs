@@ -25,7 +25,7 @@ internal static class SettingsCategories1496Tests
             foreach(var tab in tabs)Check(categories.Count(category=>category.Tab==tab)>=2,$"{tab}: fewer than two categories");
             var page=Read("src/TenshoAssistant/MainWindow.Settings.cs");
             Check(page.Contains("DrawSettingsCategories(key)") && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("CategoryPane(\"SettingsCategory\"+tab,categories,ref chosen)")
-                  && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("settingsCategoryChosen[tab]=chosen!"),"each tab draws its categories and keeps the chosen one");
+                  && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("ChooseSettingsCategory(tab,chosen!)"),"each tab draws its categories and keeps the chosen one");
         }),
         ("Settings categories 1496: every category has its label in English and French",() =>
         {
@@ -34,7 +34,7 @@ internal static class SettingsCategories1496Tests
             {
                 var labels=Labels(language);
                 Check(ids.All(id=>labels.GetValueOrDefault(id) is { Length:>0 }),$"{language}: a category without label: {string.Join(",",ids.Where(id=>!labels.ContainsKey(id)))}");
-                Check(labels.Keys.All(key=>ids.Contains(key) || key=="MapNone"),$"{language}: a label of no category: {string.Join(",",labels.Keys.Where(key=>!ids.Contains(key)))}");
+                Check(labels.Keys.All(key=>ids.Contains(key)),$"{language}: a label of no category: {string.Join(",",labels.Keys.Where(key=>!ids.Contains(key)))}");
             }
         }),
         ("Settings categories 1496: every setting is in one category of its tab (none left out, none lost), the search index says which",() =>

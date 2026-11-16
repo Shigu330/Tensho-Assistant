@@ -140,7 +140,7 @@ internal sealed partial class MainWindow
 
     private void ReachSetting(string labelKey)
     {
-        var (scroll,strength)=settingFocus.Reached(labelKey,ImGui.GetFrameCount(),ImGui.GetTime());
+        var (scroll,strength)=settingFocus.Reached(labelKey,ImGui.GetFrameCount(),ImGui.GetTime(),ImGui.GetItemRectMin().X);
         if(strength<=0)return;
         if(scroll)ImGui.SetScrollHereY(0.35f);
         var edge=new Vector2(3);

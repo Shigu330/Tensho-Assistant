@@ -15,6 +15,8 @@ public static class ConfigurationReset
         "Voyages", "OceanSightings", "WeatherStoryZones", "GearPlans", "SRankKills", "DutyNotes", "GearPlanSets", "CollectionMemories", "LastCraftStats", "FashionOutfit", "WeatherFavorites", "GearMateria", "SubmarineUnlocked", "VesselPlans",
         // 0.321: interface state, not a setting (which navigation groups are folded).
         "NavigationCollapsed",
+        // X-521 M2 (D-180): interface state, not a setting (the category chosen in each tab of the Settings page).
+        "SettingsCategories",
         // 0.503 (ONBOARD-001): the pages whose first-visit help was read.
         "HelpSeen",
         // 0.505 (ONBOARD-001): where the guide stands: a reset of the settings does not start it again.
@@ -395,6 +397,8 @@ public sealed partial class Configuration
     public List<uint> FollowedQuests { get; set; } = [];
     // 0.264: sidebar categories folded by the user (category keys).
     public HashSet<string>? NavigationCollapsed { get; set; }
+    // X-521 M2 (D-180): the category chosen in each tab of the Settings page (tab key → category id), kept as the last page is.
+    public Dictionary<string,string> SettingsCategories { get; set; } = [];
     public HashSet<string>? HelpSeen { get; set; }
     public bool GuideDone { get; set; }
     public bool GuideOffered { get; set; }

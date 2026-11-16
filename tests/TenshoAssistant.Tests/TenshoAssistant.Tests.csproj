@@ -151,6 +151,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/FontSettings.cs" Link="UI/FontSettings.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SettingSave.cs" Link="UI/SettingSave.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SettingFocus.cs" Link="UI/SettingFocus.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/SettingsCategoryChoice.cs" Link="UI/SettingsCategoryChoice.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/DesktopReadOnly.cs" Link="UI/DesktopReadOnly.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/BarTooltipPlace.cs" Link="UI/BarTooltipPlace.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/DeleteConfirm.cs" Link="UI/DeleteConfirm.cs" />

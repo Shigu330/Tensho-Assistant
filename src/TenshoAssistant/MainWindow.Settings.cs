@@ -15,8 +15,15 @@ internal sealed partial class MainWindow
         Heading(localization.Get("Settings.Title"),localization.Get("Settings.Description"));
         DrawSettingsSearch();
         settingFocus.Tick();
-        // X-507: while the setting a search chose is looked for, the headers and tree nodes around it are not folded.
-        TenshoAssistant.UI.UiComponents.OpenSections=settingFocus.Opening;
+        // X-507: while the setting a search chose is looked for, the headers and tree nodes around it are not folded; X-521 M1: given back
+        // in a finally, so that no other window's sections are opened when drawing a tab throws.
+        TenshoAssistant.UI.UiComponents.Focus=settingFocus;
+        try{DrawSettingsTabs();}
+        finally{TenshoAssistant.UI.UiComponents.Focus=null;}
+    }
+
+    private void DrawSettingsTabs()
+    {
         if(ImGui.BeginTabBar("SettingsSections"))
         {
             try
@@ -33,7 +40,6 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndTabBar();}
         }
-        TenshoAssistant.UI.UiComponents.OpenSections=false;
     }
 
     // X-76 H4 (0.914): the macro copy settings as saved before the edit not written yet; they come back when saving it fails.

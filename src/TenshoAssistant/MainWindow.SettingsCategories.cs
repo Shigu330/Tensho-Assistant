@@ -53,16 +53,21 @@ internal sealed partial class MainWindow
         new("Debug","DebugLanguages",DrawDebugLanguageSettings),
     ];
 
-    // The category chosen in each tab, kept while the plugin is loaded; the search and the tools' « Settings » links set it.
-    private readonly Dictionary<string,string> settingsCategoryChosen=[];
-
+    // The category chosen in each tab; the search and the tools' « Settings » links set it. X-521 M2 (D-180, recommended choice applied while
+    // the user's answer is awaited): kept in the configuration, as the last page is, so it survives a reload of the plugin and a restart.
     private void DrawSettingsCategories(string tab)
     {
         var categories=SettingsCategories.Where(category=>category.Tab==tab)
             .Select(category=>(category.Id,localization.Get("SettingsCategories."+category.Id),category.Draw)).ToArray();
-        var chosen=settingsCategoryChosen.GetValueOrDefault(tab);
+        var chosen=configuration.SettingsCategories.GetValueOrDefault(tab);
         CategoryPane("SettingsCategory"+tab,categories,ref chosen);
-        settingsCategoryChosen[tab]=chosen!;
+        ChooseSettingsCategory(tab,chosen!);
+    }
+
+    private void ChooseSettingsCategory(string tab,string category)
+    {
+        if(!UI.SettingsCategoryChoice.Set(configuration.SettingsCategories,tab,category) || inDesktopApp)return;
+        TrySave("Settings category chosen");
     }
 
     /// <summary>
@@ -72,7 +77,7 @@ internal sealed partial class MainWindow
     private void OpenSettingsCategory(string tab,string category,string? settingKey=null)
     {
         requestedSettingsTab=tab;
-        settingsCategoryChosen[tab]=category;
+        ChooseSettingsCategory(tab,category);
         if(settingKey is not null)settingFocus.Request(settingKey);
     }
 }

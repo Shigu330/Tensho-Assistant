@@ -24,7 +24,7 @@ internal sealed partial class MainWindow
         {
             try
             {
-                ImGui.TextColored(Accent,current.Label);
+                TenshoAssistant.UI.UiComponents.SubTitle(current.Label);
                 ImGui.Separator();
                 current.Draw();
             }

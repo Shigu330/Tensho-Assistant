@@ -67,13 +67,13 @@ internal static class SettingFocus1497Tests
             Check(Regex.Matches(row,@"ReachSetting\(labelKey\);").Count>=8,"the two sliders too");
             Check(Read("src/TenshoAssistant/MainWindow.MapView.cs").Contains("ReachSetting(key);",StringComparison.Ordinal),"the map's boxes (SettingBox)");
             var ui=Read("src/TenshoAssistant/UI/UiComponents.cs");
-            Check(ui.Contains("if (OpenSections) ImGui.SetNextItemOpen(true);",StringComparison.Ordinal) && Regex.Matches(ui,@"if \(OpenSections\) ImGui\.SetNextItemOpen\(true\);").Count==2,"headers and tree nodes open");
+            Check(Regex.Matches(ui,@"Unfold\(label, (true|false), ").Count==2 && ui.Contains("ImGui.SetNextItemOpen(true);",StringComparison.Ordinal),"headers and tree nodes open (X-521 M1: through Unfold)");
             // No fold on a setting's way escapes it: a method a category reaches that holds a setting does not call ImGui's own tree node or header.
             var raw=SettingsTabs999Tests.Walk().Where(step=>step.Body.Contains("ImGui.TreeNode(",StringComparison.Ordinal) || step.Body.Contains("ImGui.CollapsingHeader(",StringComparison.Ordinal))
                 .Select(step=>step.Method).Distinct().ToArray();
             Check(raw.Length==0,"a fold on a setting's way does not open for the search: "+string.Join(",",raw));
             var page=Read("src/TenshoAssistant/MainWindow.Settings.cs");
-            Check(page.Contains("settingFocus.Tick();",StringComparison.Ordinal) && page.Contains("OpenSections=settingFocus.Opening;",StringComparison.Ordinal) && page.Contains("OpenSections=false;",StringComparison.Ordinal),"the page ticks, opens the folds, and closes them again");
+            Check(page.Contains("settingFocus.Tick();",StringComparison.Ordinal) && page.Contains("UiComponents.Focus=settingFocus;",StringComparison.Ordinal) && page.Contains("finally{TenshoAssistant.UI.UiComponents.Focus=null;}",StringComparison.Ordinal),"the page ticks, opens the folds, and closes them again");
             Check(page.Contains("OpenSettingsCategory(tab,category,key);",StringComparison.Ordinal) && Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs").Contains("settingFocus.Request(settingKey);",StringComparison.Ordinal),"a search result asks for its setting");
         }),
         ("Setting focus 1497: every setting of the search index is drawn by a row component and lies in a category, so choosing it can reach it",() =>

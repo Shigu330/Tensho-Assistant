@@ -950,7 +950,7 @@ internal sealed partial class MainWindow
         var settings=configuration.MapView;
         var catalog=maps.State.Catalog;
         var map=catalog?.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId) ?? (mapLive?.State is { MapId:>0 } live ? catalog?.Find(live.MapId):null);
-        if(map is null){ImGui.TextDisabled(localization.Get("SettingsCategories.MapNone"));return;}
+        if(map is null){ImGui.TextDisabled(localization.Get("MapView.IconsNoMap"));return;}
         FinishMapSettings(DrawIconSizes(map,settings));
     }
 
