@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (537 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (542 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -542,6 +542,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-430 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11), I2: finding in… | Done in 0.1415 |
 | X-431 | Review of block 0.1405 to 0.1412 (review 0.1412, 15/11), minor M1, M2, M3: M1… | Done in 0.1416 |
 | X-432 | Tool defect (15/11, relay 78 return): after publish.sh --last… | Done in 0.1413 |
+| X-433 | Bug seen by relay 79: a reader hitch of 127 to 515 ms about 20 s after a load.… | Done in 0.1450.0 |
 | X-434 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11), I1: finding in… | Done in 0.1420 |
 | X-435 | Review of block 0.1413 to 0.1419 (review 0.1419, 15/11), minor M1, M2, M3, M4… | Done in 0.1421 |
 | X-436 | Review of block 0.1420 to 0.1427 (review 0.1427, 15/11), I1: finding in… | Done in 0.1428 |
@@ -585,6 +586,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-489 | Tool (defect found by relay 86 on 11/16 around 00:35): the produced GLOBAL-PLAN… | Done in 0.1473.0 |
 | X-490 | User request of 11/16 around 0:50 am: he will mostly use the private page… | Done in 0.1474.0 |
 | X-491 | Review of block 0.1468 to 0.1472 (review 0.1472, 16/11), I1: finding in… | Done in 0.1473 |
+| X-492 | Review of block 0.1468 to 0.1472 (review 0.1472, 16/11), minor M1, M2, M3, M4… | Done in 0.1499 |
 | X-493 | Review of block 0.1473 to 0.1474 (review 0.1474, 16/11), I1: finding in… | Done in 0.1475 |
 | X-494 | Review of block 0.1473 to 0.1474 (review 0.1474, 16/11), minor M1, M2, M3, M4… | Done in 0.1475.0 |
 | X-495 | Review of block 0.1475 to 0.1477 (review 0.1477, 16/11), I1: finding in… | Done in 0.1478 |
@@ -605,12 +607,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-514 | Review  (review 0.1492, 16/11), I1: finding in… | Done in 0.1493 |
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
 | X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
+| X-519 | Review  (review 0.1497, 16/11), I1: finding in… | Done in 0.1498 |
+| X-521 | Review  (review 0.1497, 16/11), minor M1, M2, M3, M4, M5, M6, M7: M1 in… | Done in 0.1498.0 |
+| X-522 | Tool (defect seen by the master on 11/16 around 1:55 pm): plan.py… | Done in 0.1498.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (537 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (542 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1150,6 +1155,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-430 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412, 15/11), I2 : X-196 marqué | Fait en 0.1415 |
 | X-431 | Relecture du bloc 0.1405 à 0.1412 (relecture 0.1412, 15/11), mineurs M1, M2, M3… | Fait en 0.1416 |
 | X-432 | Défaut d'outil (15/11, retour du relais 78) : après publish.sh --last (commit «… | Fait en 0.1413 |
+| X-433 | Bug vu par le relais 79 (15/11) : à-coup d'un lecteur de 127 à 515 ms environ… | Fait en 0.1450.0 |
 | X-434 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419, 15/11), I1 : X-429 : la… | Fait en 0.1420 |
 | X-435 | Relecture du bloc 0.1413 à 0.1419 (relecture 0.1419, 15/11), mineurs M1, M2… | Fait en 0.1421 |
 | X-436 | Relecture du bloc 0.1420 à 0.1427 (relecture 0.1427, 15/11), I1 : X-433 : la… | Fait en 0.1428 |
@@ -1193,6 +1199,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-489 | Outil (défaut constaté par le relais 86 le 16/11 vers 00 h 35) : GLOBAL-PLAN… | Fait en 0.1473.0 |
 | X-490 | Demande de l'utilisateur du 16/11 vers 0 h 50 : il utilisera surtout la page… | Fait en 0.1474.0 |
 | X-491 | Relecture du bloc 0.1468 à 0.1472 (relecture 0.1472, 16/11), I1 : Le nom et le… | Fait en 0.1473 |
+| X-492 | Relecture du bloc 0.1468 à 0.1472 (relecture 0.1472, 16/11), mineurs M1, M2… | Fait en 0.1499 |
 | X-493 | Relecture du bloc 0.1473 à 0.1474 (relecture 0.1474, 16/11), I1 : La… | Fait en 0.1475 |
 | X-494 | Relecture du bloc 0.1473 à 0.1474 (relecture 0.1474, 16/11), mineurs M1, M2… | Fait en 0.1475.0 |
 | X-495 | Relecture du bloc 0.1475 à 0.1477 (relecture 0.1477, 16/11), I1 : X-478 : la… | Fait en 0.1478 |
@@ -1213,3 +1220,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-514 | Relecture  (relecture 0.1492, 16/11), I1 : X-475 garde sur disque les liens de… | Fait en 0.1493 |
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
 | X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |
+| X-519 | Relecture  (relecture 0.1497, 16/11), I1 : Onze textes montrés aux joueurs… | Fait en 0.1498 |
+| X-521 | Relecture  (relecture 0.1497, 16/11), mineurs M1, M2, M3, M4, M5, M6, M7 : M1… | Fait en 0.1498.0 |
+| X-522 | Outil (défaut vu par la maître le 16/11 vers 13 h 55) : plan.py… | Fait en 0.1498.0 |

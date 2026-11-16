@@ -69,7 +69,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `src/TenshoAssistant/Diagnostics/MachineMemory.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
-| [0.1452-load-allocations.md](0.1452-load-allocations.md) | `tests/TenshoAssistant.Tests/GardenRules1452Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/project/GLOBAL-PLAN.md` |
+| [0.1452-load-allocations.md](0.1452-load-allocations.md) | `tests/TenshoAssistant.Tests/GardenRules1452Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1458-chat-default-tabs.md](0.1458-chat-default-tabs.md) | `src/TenshoAssistant/Chat/ChatChannels.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/project/DECISIONS.md` |
 | [0.1459-gaps-by-heap.md](0.1459-gaps-by-heap.md) | `tests/TenshoAssistant.Tests/LoadRank1459Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |

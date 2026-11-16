@@ -2065,6 +2065,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
 
+- [ ] (0.1498) Paramètres, recherche : taper « filtres du jeu » et choisir « Utiliser les filtres du jeu » : seule la section de l'onglet du chat qui le contient s'ouvre ; les listes de canaux et de filtres des autres onglets restent repliées.
+
+- [ ] (0.1498) Paramètres : choisir une catégorie dans un onglet (par exemple Carte › Icônes), recharger le plugin (ou relancer le jeu) puis rouvrir les Paramètres : la même catégorie est choisie.
+
+- [ ] (0.1498) Paramètres › Panneaux à côté du jeu › Macros d'artisanat : la plage de macros et « Écraser » s'y trouvent bien, comme le disent les bulles d'aide du bouton « Copier dans les macros du jeu ».
+
+- [ ] (0.1499) Fenêtre de chat, avec un pavé tactile ou une molette fine : faire défiler un peu vers le haut puis donner un cran de souris vers le bas : les lignes descendent tout de suite d'une ligne.
+
+- [ ] (0.1499) Fenêtre de chat, onglet du réseau des novices : le nom d'un mentor ou d'un nouvel aventurier s'écrit sans « · » devant.
+
+- [ ] (0.1500) Carte de Tensho, colonne d'outils : le texte des deux cases « 100% » (le pourcentage et le bouton dessous) est centré dans son cadre, à 100 % puis à 150 % de zoom, carte superposée puis en petite fenêtre, en français puis en anglais.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
