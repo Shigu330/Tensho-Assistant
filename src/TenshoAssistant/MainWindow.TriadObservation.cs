@@ -14,7 +14,7 @@ internal sealed partial class MainWindow
     {
         ImGui.TextColored(Accent,localization.Get("TriadObserved.Title"));
         var state = triadObservation.State;
-        DrawToolSettingsLink("TriadObservation");
+        DrawToolSettingsLink("TriadObservation","Games");
         ImGui.TextWrapped(localization.Get("TriadObserved.Help"));
         var status = state.Status switch
         {

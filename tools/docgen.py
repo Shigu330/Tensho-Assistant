@@ -439,16 +439,21 @@ def settings_tabs():
     return dict(re.findall(r'\("([\w.]+)","(\w+)"\)', read_source(SETTINGS_INDEX)))
 
 
+def settings_categories():
+    """X-449: the category of each setting (SettingsIndex.Categories), by label key."""
+    return dict(re.findall(r'\["([\w.]+)"\]="(\w+)"', read_source(SETTINGS_INDEX)))
+
+
 def settings_rows():
     """[(path or label key, kind, default, places, en text, fr text, has path)] sorted by path."""
-    classes, tabs = declarations(), settings_tabs()
+    classes, tabs, categories = declarations(), settings_tabs(), settings_categories()
     en, fr = language("en"), language("fr")
     rows = {}
     for path, label, tip, file in controls():
         key = path or f"({label})"
         tab = tabs.get(label)
         page = file[len("MainWindow."):-3] if file.startswith("MainWindow.") else file
-        place = (tab, page, file)
+        place = (tab, page, file, categories.get(label))
         row = rows.setdefault(key, {"path": path, "places": [], "label": label, "tip": tip, "settings": False})
         if place not in row["places"]:
             row["places"].append(place)
@@ -458,11 +463,12 @@ def settings_rows():
 
     def where(lang, code):
         def one(place):
-            tab, page, file = place
+            tab, page, file, category = place
             if tab:
-                return (f"Settings › {tab}" if code == "en" else
+                return (f"Settings › {tab} › {category}" if code == "en" else
                         f"{(text_of(lang, 'PageHelp.SettingsTitle') or 'Paramètres').strip()} › "
-                        f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()}")
+                        f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()} › "
+                        f"{(text_of(lang, 'SettingsCategories.' + category) or category).strip()}")
             title = text_of(lang, f"PageHelp.{page}Title")
             return f"page {title.strip()}" if title else f"`{file}`"
         return one

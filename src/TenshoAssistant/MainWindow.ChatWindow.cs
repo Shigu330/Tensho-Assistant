@@ -97,9 +97,62 @@ internal sealed partial class MainWindow
     private string ChatChannelShort(ChatChannel channel)=>localization.Get("ChatChannelsShort."+channel);
     private static Vector4 ChatColor(uint rgb){var (red,green,blue)=ChatChannels.Unpack(rgb);return new(red,green,blue,1);}
 
+    // The whole settings of the chat window, for the window's own settings panel; the Settings page shows the same parts one category each.
     private void DrawChatWindowSettings()
     {
-        var options=ChatOptions;var defaults=DefaultConfiguration.Chat;
+        var options=ChatOptions;
+        DrawChatLookSettings();
+        DrawChatHistorySettings(DefaultConfiguration.Chat);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
+        if(developerMode)DrawChatKinds();
+        SaveChatSettingsWhenReleased();
+    }
+
+    // X-449: the Settings page's categories of the chat window; each one writes the tabs and colours once no control is held any more.
+    private void DrawChatLookCategory()
+    {
+        DrawChatLookSettings();
+        SaveChatSettingsWhenReleased();
+    }
+
+    private void DrawChatHistoryCategory()
+    {
+        DrawChatHistorySettings(DefaultConfiguration.Chat);
+        SaveChatSettingsWhenReleased();
+    }
+
+    private void DrawChatTabsCategory()
+    {
+        var options=ChatOptions;
+        DrawChatTabSettings(options);
+        if(developerMode)DrawChatKinds();
+        SaveChatSettingsWhenReleased();
+    }
+
+    private void DrawChatColoursCategory()
+    {
+        var options=ChatOptions;
+        DrawChatColorSettings(options);
+        SaveChatSettingsWhenReleased();
+    }
+
+    private void DrawChatPlayersCategory()
+    {
+        var options=ChatOptions;
+        DrawChatPlayers(options);
+        SaveChatSettingsWhenReleased();
+    }
+
+    private void SaveChatSettingsWhenReleased()
+    {
+        if(chatSettingsPending && !ImGui.IsAnyItemActive()){chatSettingsPending=false;TrySave("Chat window tabs and colours");}
+    }
+
+    private void DrawChatLookSettings()
+    {
+        var defaults=DefaultConfiguration.Chat;
         BoolSetting("ChatWindow.Show","ChatWindow.ShowTip",()=>configuration.Chat.WindowOpen,value=>{configuration.Chat.WindowOpen=value;if(!value)ChatMessages.Clear();},c=>c.Chat.WindowOpen);
         BoolSetting("ChatWindow.HideInCombat","ChatWindow.HideInCombatTip",()=>configuration.Chat.HideInCombat,value=>configuration.Chat.HideInCombat=value,c=>c.Chat.HideInCombat);
         BoolSetting("ChatWindow.Timestamps","ChatWindow.TimestampsTip",()=>configuration.Chat.ShowTimestamps,value=>configuration.Chat.ShowTimestamps=value,c=>c.Chat.ShowTimestamps);
@@ -132,13 +185,6 @@ internal sealed partial class MainWindow
             ChatCovered.Hide,220);
         SliderSetting("ChatWindow.FontScale","ChatWindow.FontScaleTip",()=>configuration.Chat.BoundedFontScale,value=>configuration.Chat.FontScale=value,60,200,defaults.FontScale,"%d %%");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
-        // X-475: the chat history on this PC, off by default, turned on only after the player's yes.
-        DrawChatHistorySettings(defaults);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
-        if(developerMode)DrawChatKinds();
-        if(chatSettingsPending && !ImGui.IsAnyItemActive()){chatSettingsPending=false;TrySave("Chat window tabs and colours");}
     }
 
     /// <summary>X-475 (the user's remark of 15/11, asked again on 16/11; X-447 B10): « Keep the chat history on this PC », off by default. Ticking it

@@ -376,7 +376,7 @@ internal sealed partial class MainWindow
         if(!ReferenceEquals(macroExportSimulation,result)) { craftMacroExport=null; craftMacroError=null; macroExportSimulation=result; }
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CraftMacro.Title")+"###CraftMacroExport")) return;
         ImGui.TextWrapped(localization.Get("CraftMacro.Help"));
-        DrawToolSettingsLink("CraftMacroExport");
+        DrawToolSettingsLink("CraftMacroExport","CraftMacros");
         ImGui.TextDisabled(localization.Format("CraftMacro.Options",craftMacroExtraWait,localization.Get(craftMacroEcho ? "CraftMacro.Yes":"CraftMacro.No")));
         // A-10 (0.422): Macro Chain loaded and pages chained: they end with its /nextmacro.
         if(configuration.MacroCopy?.Chain==true && MacroChainLoaded?.Invoke()==true)ImGui.TextDisabled(localization.Get("CraftMacro.MacroChain"));

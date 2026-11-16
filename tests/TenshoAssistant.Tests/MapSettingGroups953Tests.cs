@@ -11,10 +11,12 @@ internal static class MapSettingGroups953Tests
     private static string MapSettings()
     {
         var text=Read("MainWindow.MapView.cs");
-        var start=text.IndexOf("private void DrawMapSettingsBody(",StringComparison.Ordinal);
+        // X-449: the body is now one method per category, from « Game map » to the window's, before the icons list.
+        var start=text.IndexOf("private void DrawMapGameSettings(",StringComparison.Ordinal);
         Check(start>=0,"settings body found");
-        var end=text.IndexOf("\n    private ",start+10,StringComparison.Ordinal);
-        return text[start..(end<0 ? text.Length:end)];
+        var end=text.IndexOf("private void DrawMapIconSettings(",start,StringComparison.Ordinal);
+        Check(end>start,"settings body ends before the icons list");
+        return text[start..end];
     }
 
     private static string Text(string language,string section,string key)

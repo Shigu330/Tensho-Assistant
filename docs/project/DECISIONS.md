@@ -60,6 +60,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-051 | 2026-11-11 | No decision recorded that the agent's working files left the repository in 0.802, nor that the agent makes the commits; DEC-010 still said that the user makes the commits (GitHub Desktop) and that no zip is made any more. |
 | DEC-052 | 2026-11-12 | The shared discoveries are exchanged as one JSON file (DEC-042, version 2): the common file of the repository (`community-discoveries/discoveries.json`) and the single gist file of each player (`tensho-discoveries.b64`, base64 of gzip of JSON) are read whole, and a change to one kind makes every player download everything again; changing the format after the public announcement would force migrating every player's files. |
 | DEC-053 | 2026-11-15 | DEC-030 removed the customisable chat (« I will take Chat 2 if I need it »); the chat study of 2026-11-15 (X-388: an audit of Chat 2 and of what Tensho could add to it) asked how far a Tensho chat should go, and when. |
+| DEC-054 | 2026-11-16 | DEC-048 grouped the settings in seven tabs with a search; the tabs had grown long (General held the window, the header, the fonts, the language, the theme, the item tooltips and the market in one scroll; Panels held every tool's aids and the chat), so a setting was hard to find. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -541,6 +542,7 @@ Decision: X-101: setting off by default; when enabled: at most one check every 3
 Reason: User decisions (recommended choices).
 Consequences: X-100 and X-101 to code.
 References: G-PROPOSALS (9, 10, "Proposal X-100"), DEC-039
+Completed: in part by DEC-054 (2026-11-16): the categories of each tab.
 
 ID: DEC-049
 Timestamp: 2026-11-10 Europe/Brussels
@@ -591,6 +593,16 @@ Decision: Option (a). Tensho shows its own chat window beside the game's chat, n
 Reason: User's choice, 2026-11-15.
 Consequences: Reopens DEC-030 in part: a Tensho chat window comes back beside the game's; the full replacement of DEC-029 stays cancelled. X-403 is done in phases, one family per version: phase 1 (reading window) in 0.1434, then the links and their menus, rules and alerts, conversations, and the Chat 2 integration. Typing and replacing the game's chat are decided later, from use. Red lines unchanged: no automatic sending; original code (Chat 2 is read to understand, never copied); the whole window off in player-versus-player and competitive content (DEC-038). X-445 (0.1458, the user's decision of 2026-11-15): Dalamud's combat rule is about what changes combat (an action in the player's place, help that goes too far), not about the combat chat: the combat lines are shown as the game shows them, in their own tab, never read nor counted. The default tabs follow the game's three (General, Battle, Event: LogFilter and Addon sheets, docs/evidence/0.1458-chat-default-tabs.md), plus Social; tabs saved before get Battle and Event once.
 References: DEC-029, DEC-030, DEC-038, GLOBAL-PLAN X-388 and X-403, src/TenshoAssistant/Chat/
+
+ID: DEC-054
+Timestamp: 2026-11-16 Europe/Brussels (0.1496)
+Problem: DEC-048 grouped the settings in seven tabs with a search; the tabs had grown long (General held the window, the header, the fonts, the language, the theme, the item tooltips and the market in one scroll; Panels held every tool's aids and the chat), so a setting was hard to find.
+Evidence: User request of 2026-11-15 around 8:20 pm: « il faut aussi refaire les reglages pour avoir plus facile (avec plus de categorie par onglet) »; his answers: every setting of Tensho, categories as a list on the left.
+Options: (a) Each tab shows a list of categories on the left and the settings of the chosen category on the right, like the game's system configuration; every setting in exactly one category; the search leads to the setting's category. (b) Keep one long page per tab with collapsing headers. (c) More tabs.
+Decision: Option (a). The seven tabs of DEC-048 stay; each lists its categories (General: window opening, header and home, language and theme, fonts, item tooltips, items and market; and so on for the others). The chosen category of each tab is kept while the plugin is loaded; the search and the tools' « Settings » links open the category of the setting; the map's cog opens the Map tab. No setting is added, removed or given another default.
+Reason: User's request and choices.
+Consequences: Coded in 0.1496 (X-449). The search index lists the category of every setting (a test makes the same scan and fails when a setting is in no category); SETTINGS.md says « Settings › tab › category ». Choosing a search result still opens the category, not the setting itself (X-507 follows: scroll to the setting and highlight it).
+References: DEC-048, GLOBAL-PLAN X-449 and X-507, src/TenshoAssistant/MainWindow.SettingsCategories.cs
 
 ---
 
@@ -654,6 +666,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-051 | 2026-11-11 | Aucune décision ne notait que les fichiers de travail de l'agent ont quitté le dépôt en 0.802, ni que l'agent fait les commits ; DEC-010 disait encore que l'utilisateur fait les commits (GitHub Desktop) et qu'aucun zip n'est plus fait. |
 | DEC-052 | 2026-11-12 | Les découvertes partagées s'échangent en un seul fichier JSON (DEC-042, version 2) : le fichier commun du dépôt (`community-discoveries/discoveries.json`) et le fichier unique du gist de chaque joueur (`tensho-discoveries.b64`, base64 d'un gzip de JSON) se lisent en entier, et un changement d'un seul genre fait tout retélécharger à chaque joueur ; changer le format après l'annonce publique obligerait à migrer les fichiers de tous les joueurs. |
 | DEC-053 | 2026-11-15 | DEC-030 a retiré le chat personnalisable (« je prendrai Chat 2 si j'en ai besoin ») ; l'étude du chat du 2026-11-15 (X-388 : audit de Chat 2 et de ce que Tensho pourrait y ajouter) demandait jusqu'où irait un chat de Tensho, et quand. |
+| DEC-054 | 2026-11-16 | DEC-048 a regroupé les réglages en sept onglets avec une recherche ; les onglets étaient devenus longs (Général tenait la fenêtre, l'en-tête, les polices, la langue, le thème, les infobulles des objets et le marché dans un seul défilement ; Panneaux tenait les aides de chaque outil et le chat), donc un réglage était difficile à trouver. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -1135,6 +1148,7 @@ Decision: X-101 : réglage coupé par défaut ; activé : au plus une vérificat
 Reason: Décisions de l'utilisateur (choix recommandés).
 Consequences: X-100 et X-101 à coder.
 References: G-PROPOSALS (9, 10, « Proposition X-100 »), DEC-039
+Complétée : en partie par DEC-054 (2026-11-16) : les catégories de chaque onglet.
 
 DEC-ID: DEC-049
 Timestamp: 2026-11-10 Europe/Brussels
@@ -1185,3 +1199,13 @@ Decision: Option (a). Tensho montre sa propre fenêtre de chat à côté de cell
 Reason: Choix de l'utilisateur, 2026-11-15.
 Consequences: Rouvre DEC-030 en partie : une fenêtre de chat Tensho revient à côté de celle du jeu ; le remplacement complet de DEC-029 reste annulé. X-403 se fait par phases, une famille par version : phase 1 (fenêtre en lecture) en 0.1434, puis les liens et leurs menus, les règles et alertes, les conversations, et l'intégration à Chat 2. La saisie et le remplacement du chat du jeu se décident plus tard, sur l'usage. Lignes rouges inchangées : aucun envoi automatique ; code original (Chat 2 lu pour comprendre, jamais copié) ; toute la fenêtre coupée en joueur contre joueur et en contenu classé (DEC-038). X-445 (0.1458, décision de l'utilisateur du 2026-11-15) : la règle de combat de Dalamud vise ce qui modifie le combat (une action à la place du joueur, une aide trop poussée), pas le chat de combat : les lignes de combat sont montrées comme le jeu les montre, dans leur propre onglet, jamais lues ni comptées. Les onglets par défaut suivent les trois du jeu (Général, Combat, Événement : feuilles LogFilter et Addon, docs/evidence/0.1458-chat-default-tabs.md), plus Social ; des onglets enregistrés avant reçoivent Combat et Événement une fois.
 References: DEC-029, DEC-030, DEC-038, GLOBAL-PLAN X-388 et X-403, src/TenshoAssistant/Chat/
+
+DEC-ID: DEC-054
+Timestamp: 2026-11-16 Europe/Brussels (0.1496)
+Problem: DEC-048 a regroupé les réglages en sept onglets avec une recherche ; les onglets étaient devenus longs (Général tenait la fenêtre, l'en-tête, les polices, la langue, le thème, les infobulles des objets et le marché dans un seul défilement ; Panneaux tenait les aides de chaque outil et le chat), donc un réglage était difficile à trouver.
+Evidence: Demande de l'utilisateur du 2026-11-15 vers 20 h 20 : « il faut aussi refaire les reglages pour avoir plus facile (avec plus de categorie par onglet) » ; ses réponses : tous les réglages de Tensho, catégories en liste à gauche.
+Options: (a) Chaque onglet montre une liste de catégories à gauche et les réglages de la catégorie choisie à droite, comme la configuration système du jeu ; chaque réglage dans une seule catégorie ; la recherche mène à la catégorie du réglage. (b) Garder une longue page par onglet avec des en-têtes repliables. (c) Plus d'onglets.
+Decision: Option (a). Les sept onglets de DEC-048 restent ; chacun liste ses catégories (Général : ouverture de la fenêtre, en-tête et accueil, langue et thème, polices, infobulles des objets, objets et marché ; et de même pour les autres). La catégorie choisie de chaque onglet est gardée tant que le plugin est chargé ; la recherche et les liens « Paramètres » des outils ouvrent la catégorie du réglage ; la roue de la carte ouvre l'onglet Carte. Aucun réglage n'est ajouté, retiré ni changé de valeur par défaut.
+Reason: Demande et choix de l'utilisateur.
+Consequences: Codé en 0.1496 (X-449). L'index de la recherche donne la catégorie de chaque réglage (un test fait le même relevé et échoue si un réglage est dans aucune catégorie) ; SETTINGS.md dit « Paramètres › onglet › catégorie ». Choisir un résultat de la recherche ouvre toujours la catégorie, pas le réglage lui-même (X-507 suit : défiler jusqu'au réglage et le mettre en évidence).
+References: DEC-048, GLOBAL-PLAN X-449 et X-507, src/TenshoAssistant/MainWindow.SettingsCategories.cs

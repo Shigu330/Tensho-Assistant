@@ -179,7 +179,7 @@ internal static class ChatWindow1434Tests
             var family=Read("Plugin.Chat.cs");
             Check(family.Contains("chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);") && family.Contains("},()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
-            Check(Read("MainWindow.Settings.cs").Contains("DrawChatWindowSettings();"),"its settings in Settings › Panels beside the game");
+            Check(Read("MainWindow.SettingsCategories.cs").Contains("new(\"Panels\",\"ChatWindow\",DrawChatLookCategory)"),"its settings in Settings › Panels beside the game (X-449: its categories)");
             // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom (the lines' height declared, not measured).
             Check(window.Contains("ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();") && window.Contains("view.IndexAtRow((int)(scroll/height))"),"only the rows in view are drawn; the bottom reached clears the count");
         }),

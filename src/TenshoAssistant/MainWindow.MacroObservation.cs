@@ -12,7 +12,7 @@ internal sealed partial class MainWindow
     {
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Get("MacroObserverUi.Title"))) return;
         var state = macroObservations.State;
-        DrawToolSettingsLink("MacroObservation");
+        DrawToolSettingsLink("MacroObservation","Macros");
         ImGui.TextDisabled(state.Enabled ? localization.Get("MacroObserverUi.Enabled"):localization.Get("MacroObserverUi.Disabled"));
         ImGui.TextWrapped(localization.Get("MacroObserverUi.Help"));
         if (state.Error is { } error) DrawDataError(error,"ServiceErrors.Observation");

@@ -5,7 +5,12 @@ internal static class SettingsTabs999Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
 
-    private static Dictionary<string,string> Scan()
+    // X-449: the roots of the scan are the methods of the categories (MainWindow.SettingsCategories.cs), each setting with its tab and category.
+    internal static IReadOnlyList<(string Tab,string Id,string Method)> CategoryList()
+        => Regex.Matches(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.SettingsCategories.cs")),@"new\(""(\w+)"",""(\w+)"",(\w+)\)")
+            .Select(match=>(match.Groups[1].Value,match.Groups[2].Value,match.Groups[3].Value)).ToArray();
+
+    internal static Dictionary<string,(string Tab,string Category)> Scan()
     {
         var bodies=new Dictionary<string,string>();
         foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs"))
@@ -18,16 +23,15 @@ internal static class SettingsTabs999Tests
                 bodies[m.Groups[1].Value]=bodies.GetValueOrDefault(m.Groups[1].Value,"")+body;
             }
         }
-        var seen=new Dictionary<string,string>();
-        foreach(var (tab,names) in new[]{("General",new[]{"DrawGeneralSettings","DrawInterfaceSettings"}),("Panels",["DrawPanelSettings"]),("Map",["DrawMapSettingsBody"]),
-            ("Tracking",["DrawTrackingSettings"]),("Data",["DrawDataSettings"]),("Advanced",["DrawAdvancedSettings"])})
+        var seen=new Dictionary<string,(string Tab,string Category)>();
+        foreach(var (tab,category,method) in CategoryList())
         {
-            var todo=new List<string>(names);var visited=new HashSet<string>();
+            var todo=new List<string>{method};var visited=new HashSet<string>();
             while(todo.Count>0)
             {
                 var name=todo[0];todo.RemoveAt(0);
                 if(!visited.Add(name) || !bodies.TryGetValue(name,out var body))continue;
-                foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,tab);
+                foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,(tab,category));
                 todo.AddRange(Regex.Matches(body,@"\b(Draw\w+)\(").Select(call=>call.Groups[1].Value));
             }
         }
@@ -46,7 +50,7 @@ internal static class SettingsTabs999Tests
         {
             var scanned=Scan();
             var index=TenshoAssistant.SettingsIndex.Entries.ToDictionary(entry=>entry.Key,entry=>entry.Tab);
-            Check(scanned.Count>100 && scanned.Count==index.Count && scanned.All(pair=>index.GetValueOrDefault(pair.Key)==pair.Value),
+            Check(scanned.Count>100 && scanned.Count==index.Count && scanned.All(pair=>index.GetValueOrDefault(pair.Key)==pair.Value.Tab),
                 $"index out of step: {scanned.Count} scanned, {index.Count} listed; missing {string.Join(",",scanned.Keys.Except(index.Keys).Take(5))}; extra {string.Join(",",index.Keys.Except(scanned.Keys).Take(5))}");
             var en=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/en.json"));
             Check(index.Keys.All(key=>en.Contains($"\"{key.Split('.')[^1]}\"")),"labels");

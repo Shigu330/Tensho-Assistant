@@ -13,7 +13,9 @@ internal static class MapZoom542Tests
             var view=Read("MainWindow.MapView.cs");
             Check(view.Contains("page=Page.Settings;requestedSettingsTab=\"Map\";IsOpen=true;BringToFront();"),"to Settings");
             Check(!view.Contains("BeginPopup(\"MapViewSettings\")"),"no popup any more");
-            Check(Read("MainWindow.Settings.cs").Contains("DrawMapSettingsBody(shown);"),"the same body in Settings");
+            // X-449: the Map tab lists the categories of the map's settings, one method each, where the one body was.
+            var categories=Read("MainWindow.SettingsCategories.cs");
+            Check(categories.Contains("new(\"Map\",\"MapGame\",DrawMapGameSettings)") && categories.Contains("new(\"Map\",\"MapWindow\",DrawMapWindowSettings)"),"the same body in Settings");
         }),
         ("Map (0.586): a zone's flight comes from its own link to a set, so that the old zones have their wing",() =>
         {

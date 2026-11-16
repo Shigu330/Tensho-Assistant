@@ -84,7 +84,7 @@ internal sealed partial class MainWindow
         {
             // 0.469 (user request, in-game campaign): the panel in sections (recipe, your state, target, result), figures in a table, explanations in the tooltips of « (?) ».
             if(context.Recipe is { } selected){DrawCraftLogTitle(selected);DrawRecipeFacts(selected);}
-            DrawToolSettingsLink("CraftLog");
+            DrawToolSettingsLink("CraftLog","Crafting");
             if(context.Recipe is { } forSimulator)
             {
                 ImGui.SameLine();

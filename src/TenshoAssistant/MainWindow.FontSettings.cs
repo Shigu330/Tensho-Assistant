@@ -12,7 +12,6 @@ internal sealed partial class MainWindow
 
     private void DrawFontSettings()
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("FontSettings.Header")+"###FontSettings"))return;
         ImGui.TextDisabled(localization.Get("FontSettings.Help"));
         FontRow("Title",()=>Fonts.Title,value=>Fonts.Title=value,()=>Fonts.TitleSize,value=>Fonts.TitleSize=value,FontDefaults.Title,FontDefaults.TitleSize,false);
         FontRow("Section",()=>Fonts.Section,value=>Fonts.Section=value,()=>Fonts.SectionSize,value=>Fonts.SectionSize=value,FontDefaults.Section,FontDefaults.SectionSize,false);

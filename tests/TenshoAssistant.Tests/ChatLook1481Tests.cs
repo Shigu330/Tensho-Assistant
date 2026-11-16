@@ -9,6 +9,13 @@ internal static class ChatLook1481Tests
 
     private static string Read(string path) => File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n", "\n");
 
+    // X-449: the whole panel of the chat window (the gear's panel) is made of the same parts the Settings page shows one category each.
+    private static string CompositeSettings(string window)
+    {
+        var start = window.IndexOf("private void DrawChatWindowSettings()", StringComparison.Ordinal);
+        return window[start..window.IndexOf("private void DrawChatLookCategory()", start, StringComparison.Ordinal)];
+    }
+
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
         ("Chat look 1481: defaults (tabs under the lines, outline on, background at 15 %); time in brackets as the game", () =>
@@ -28,7 +35,12 @@ internal static class ChatLook1481Tests
             var popup = window[window.IndexOf("private void DrawChatSettingsPopup()", StringComparison.Ordinal)..];
             popup = popup[..popup.IndexOf("finally{ImGui.EndPopup();}", StringComparison.Ordinal)];
             Check(popup.Contains("DrawChatWindowSettings();", StringComparison.Ordinal), "the gear's panel");
-            Check(Read("src/TenshoAssistant/MainWindow.Settings.cs").Contains("DrawChatWindowSettings();", StringComparison.Ordinal), "the Settings page");
+            // X-449: the Settings page shows the same parts one category each (the look first), through the same methods.
+            var categories = Read("src/TenshoAssistant/MainWindow.SettingsCategories.cs");
+            var categoryLook = window[window.IndexOf("private void DrawChatLookCategory()", StringComparison.Ordinal)..];
+            categoryLook = categoryLook[..categoryLook.IndexOf("private void DrawChatHistoryCategory()", StringComparison.Ordinal)];
+            Check(categories.Contains("DrawChatLookCategory", StringComparison.Ordinal) && categoryLook.Contains("DrawChatLookSettings();", StringComparison.Ordinal)
+                  && popup.Contains("DrawChatWindowSettings();", StringComparison.Ordinal) && CompositeSettings(window).Contains("DrawChatLookSettings();", StringComparison.Ordinal), "the Settings page");
             var settings = window[window.IndexOf("private void DrawChatWindowSettings()", StringComparison.Ordinal)..window.IndexOf("private List<ChatTabSettings> ChatTabs(", StringComparison.Ordinal)];
             foreach (var key in new[] { "ChatWindow.Opacity", "ChatWindow.Borderless", "ChatWindow.Locked", "ChatWindow.FontScale", "ChatWindow.MaxLines", "ChatWindow.TabsAtBottom", "ChatWindow.TextOutline", "ChatWindow.SectionTabs", "ChatWindow.SectionColors" })
                 Check(settings.Contains("\"" + key + "\"", StringComparison.Ordinal), "in the chat's settings: " + key);
