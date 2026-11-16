@@ -47,7 +47,7 @@ internal static class SettingGroups952Tests
             const string english="BoolSetting(\"ModuleSettings.ShowEnglishItemName\"";
             Check(Count(settings,english)==1,"English name drawn once");
             Check(settings.IndexOf(english,StringComparison.Ordinal)>settings.IndexOf("BoolSetting(\"Settings.ContextMenu\"",StringComparison.Ordinal)
-                && settings.IndexOf(english,StringComparison.Ordinal)<settings.IndexOf("private void DrawModuleSettings()",StringComparison.Ordinal),"English name in Settings › Interface, after the item menu");
+                && settings.IndexOf(english,StringComparison.Ordinal)<settings.IndexOf("private void DrawObservationNote()",StringComparison.Ordinal),"English name in Settings › General, after the item menu");
             Check(Depth(settings,"ImGui.BeginDisabled(!configuration.CraftLogHelperEnabled);","BoolSetting(\"ModuleSettings.CraftLogAutoSolve\"")==1,"the crafting log parts are still greyed");
         }),
         ("Setting groups 952: craft search limits under Raphael, echo options under the echo, simulation above Export",() =>
@@ -63,7 +63,7 @@ internal static class SettingGroups952Tests
             Greyed(settings,"ImGui.BeginDisabled(!configuration.CraftSearch.Echo);","IntSetting(\"ModuleSettings.EchoSound\"","echo sound");
             Greyed(settings,"ImGui.BeginDisabled(!configuration.CraftSearch.Echo);","BoolSetting(\"ModuleSettings.EchoLastOnly\"","echo last only");
             Check(settings.IndexOf("BoolSetting(\"ModuleSettings.AutoSimulate\"",StringComparison.Ordinal) is var simulate && simulate>0
-                && simulate<settings.IndexOf("ImGui.TextColored(Accent,localization.Get(\"ModuleSettings.Export\"));",StringComparison.Ordinal),"automatic simulation above the Export heading");
+                && simulate<settings.IndexOf("private void DrawCraftMacroSettings()",StringComparison.Ordinal),"automatic simulation above the Export part (X-449: its own category)");
         }),
         ("Setting groups 952: prices refresh under prices on hover, server bar tooltip under the bar entries",() =>
         {

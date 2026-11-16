@@ -82,18 +82,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
-| D-83 | Getting started, help, videos, issues: the 8 slices coded (0.502 to 0.506), DEC-031 | In-game validation; a release for the video list | ONBOARD-001 |
-| D-84 | Community templates: Finished on the code side in 0.476 | In-game validation; gallery visible after a release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
-| D-85 | « Cost ≤ capacity » rule below rank 50: Rule of the community tools. Consistent with 11 published airship builds; not checked in game below rank 50. | In-game record on a vessel below rank 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
-| D-87 | Flag icon 60561: The flag icon id is not proven in docs/evidence (placing the flag is validated in game). | In-game record: flag placed, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` read on the framework (probe), log in docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`); CHANGELOG 0.102 (« assumed »); map audit 0.328 |
-| D-88 | Quest icons 71141 / 71151: The meaning of the variants is not in the game data: the settings show « variant n ». | In-game record, otherwise keep « variant n ». | BACKLOG (removed in 0.1088, git history) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Estimated Bountiful bonus (0.224): Unofficial community rule, shown « estimated » and editable. | To compare in game with the real bonus. | BACKLOG, « Revue des points ouverts » (removed in 0.1088, git history) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
-| D-90 | Materia: piece on several slots: A piece covering several slots takes the body's percentage. | In-game record (cap shown against the game). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
-| D-170 | Vocabulary (X-381, question 1): French for « duty », « mission » or « contenu »? | « mission(s) » everywhere, the client's official name (D-161); page « Butin des missions »; « contenu » kept for the « CONTENUS » group and ranked content |  |
-| D-171 | Vocabulary (X-381, question 2): an NPC who sells, « marchand » or « vendeur »? | « marchand(s) » for every selling NPC, page « PNJ marchands »; « vendeur » stays the market-board player; one name for the tool |  |
-| D-172 | Common discoveries set: which facts to keep past 200,000 facts of one kind (X-406) | The facts seen by the most players, then the most recent (applied in 0.1383) |  |
-| D-173 | Dalamud rule 12 (no automated crafting), R04: the macro chain, started by a click, runs your macros one after the other (crafting macros included) through the game's own macro function. Keep it as it is (like the Macro Chain plugin of the official repository)? | Keep it as it is, declared in PUBLISHING (rules 1 and 12, 0.1399) |  |
-| D-174 | X-196 (retainer table): « items on sale » reads as the count of items on sale and the sales' end, like the game's retainer list; the items themselves stay in the game's sale window | The count and the end (applied) |  |
+| D-180 | X-449 (review 0.1497, M2): is the category chosen in each Settings tab kept after a plugin reload or a game restart? | yes, kept in the configuration, like the last page opened |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -192,18 +181,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
-| D-83 | Prise en main, aide, vidéos, tickets : les 8 lots codés (0.502 à 0.506), DEC-031 | Validation en jeu ; une release pour la liste de vidéos | ONBOARD-001 |
-| D-84 | Modèles de la communauté : Terminés côté code en 0.476 | Validation en jeu ; galerie visible après une release | TEMPLATES-001, [DEC-029](DECISIONS.md) |
-| D-85 | Règle « coût ≤ capacité » sous le rang 50 : Règle des outils de la communauté. Cohérente avec 11 montages d'aéronefs publiés ; non vérifiée en jeu sous le rang 50. | Relevé en jeu sur un vaisseau de rang inférieur à 50. | [0.315-vessel-builds](../evidence/0.315-vessel-builds.md), « Coût ≤ capacité » |
-| D-87 | Icône du drapeau 60561 : L'identifiant de l'icône du drapeau n'est pas prouvé dans docs/evidence (la pose du drapeau, elle, est validée en jeu). | Relevé en jeu : drapeau posé, `AgentMap.FlagMapMarkers[0].MapMarker.IconId` lu sur le framework (sonde), journal dans docs/evidence. | `MainWindow.MapView.cs` (`FlagIcon`) ; CHANGELOG 0.102 (« supposée ») ; audit de la carte 0.328 |
-| D-88 | Icônes de quête 71141 / 71151 : Le sens des variantes n'est pas dans les données du jeu : les réglages affichent « variante n ». | Relevé en jeu, sinon garder « variante n ». | BACKLOG (retiré en 0.1088, historique git) ; [0.211-event-icons](../evidence/0.211-event-icons.md) |
-| D-89 | Bonus estimé d'Extraction/Récolte abondante (0.224) : Règle de la communauté non officielle, affichée « estimé » et modifiable. | À comparer en jeu avec le bonus réel. | BACKLOG, « Revue des points ouverts » (retiré en 0.1088, historique git) ; [0.224-bountiful-base](../evidence/0.224-bountiful-base.md) |
-| D-90 | Matérias : pièce sur plusieurs emplacements : Une pièce qui couvre plusieurs emplacements prend le pourcentage du torse. | Relevé en jeu (plafond affiché contre le jeu). | [0.312-materia](../evidence/0.312-materia.md), « Non vérifié en jeu » |
-| D-170 | Vocabulaire (X-381, question 1) : « duty » en français, « mission » ou « contenu » ? | « mission(s) » partout, nom officiel du client (Addon#2225.0, #3770.0, #11170.0 ; D-161) : page « Butin des missions », « contenu » gardé pour le groupe « CONTENUS » et « contenu classé » ; à aligner aussi « Masquer en instance » |  |
-| D-171 | Vocabulaire (X-381, question 2) : un PNJ qui vend, « marchand » ou « vendeur » ? | « marchand(s) » pour tout PNJ qui vend, page « PNJ marchands » (Addon#3408.0, #7610.0, MainCommand#71.6) ; « vendeur » reste le joueur du tableau des ventes (Addon#6996.0) ; un seul nom pour l'outil |  |
-| D-172 | Ensemble commun des découvertes : quels faits garder au-delà de 200 000 faits d'un genre (X-406) | Les faits vus par le plus de joueurs, puis les plus récents (appliqué en 0.1383) |  |
-| D-173 | Règle 12 de Dalamud (pas d'artisanat automatisé), R04 : la chaîne de macros, lancée par un clic, exécute vos macros l'une après l'autre (macros d'artisanat comprises) par la fonction de macro du jeu. Garder telle quelle (comme le plugin Macro Chain du dépôt officiel) ? | Garder telle quelle, déclarée dans PUBLISHING (règles 1 et 12, 0.1399) |  |
-| D-174 | X-196 (tableau des servants) : « objets en vente » se lit comme le nombre d'objets en vente et la fin des ventes, comme la liste des servants du jeu ; le détail des objets reste dans la fenêtre de vente du jeu | Le nombre et la fin (appliqué) |  |
+| D-180 | X-449 (relecture 0.1497, M2) : la catégorie choisie dans chaque onglet des Paramètres est-elle retenue après un rechargement du plugin ou un redémarrage du jeu ? | oui, gardée dans la configuration, comme la dernière page ouverte |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

@@ -12,7 +12,7 @@ internal static class ReaderSteps1312Tests
         {
             CompetitiveGate.StepsStart();
             CompetitiveGate.Step("quick");
-            Thread.Sleep(40);
+            Thread.Sleep(200);   // 0.1478: 40 ms lost once to a pause before « quick » (44 ms) under the parallel tests
             CompetitiveGate.Step("slow");
             CompetitiveGate.Step("quick again");
             var text = CompetitiveGate.StepsEnd();

@@ -10,7 +10,8 @@ internal static class Readings1071Tests
         {
             var route = File.ReadAllText(Path.GetFullPath("docs/project/TESTING-ROUTE.md")).Replace("\r\n","\n");
             var line = route.Split('\n').First(l => l.Contains("Relevés en attente, au fil du jeu"));
-            Check(line.StartsWith("- [ ] Relevés en attente"),"the step 0 box keeps its start (q.py anchors on it)");
+            // 0.1461: ticked once every reading of step 0 is ok (15/11): the anchor is the same either way.
+            Check(line.StartsWith("- [ ] Relevés en attente") || line.StartsWith("- [x] Relevés en attente"),"the step 0 box keeps its start (q.py anchors on it)");
             Check(route.Contains("(GLOBAL-PLAN.md#rappels-de-relevés-en-jeu-par-moment)"),"the route links to the reminders table");
             Check(!route.Contains("coffres des cartes au trésor ; retour d'aéronef"),"the route no longer lists the readings");
             var plan = File.ReadAllText(Path.GetFullPath("docs/project/GLOBAL-PLAN.md")).Replace("\r\n","\n");

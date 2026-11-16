@@ -11,11 +11,19 @@ public static class LoadMemory
     /// <summary>Process-wide slot (AppDomain data) for a weak reference to the context of the instance loaded last: it never keeps it alive.</summary>
     public const string PreviousSlot="TenshoAssistant.X01.PreviousLoadContext";
 
+    /// <summary>X-433 (0.1459): process-wide slot (AppDomain data, an int: a runtime type only) counting Tensho's loads in this game process.</summary>
+    public const string RankSlot="TenshoAssistant.X433.LoadRank";
+
+    /// <summary>X-433 (0.1459): this load's rank in the game process, from the slot's value (1 when none or unreadable).</summary>
+    public static int NextRank(object? stored)=>stored is int rank && rank>0 && rank<int.MaxValue ? rank+1:1;
+
     /// <summary>The load contexts whose name holds the plugin's name, out of all the names given.</summary>
     public static int Named(IEnumerable<string?> names,string plugin)=>names.Count(name=>name is not null && name.Contains(plugin,StringComparison.OrdinalIgnoreCase));
 
     /// <summary>The words added to a load line: heap and total memory in megabytes, Tensho's contexts out of all, the previous one alive or not (null: none known).</summary>
-    public static string Describe(long heapBytes,long totalBytes,int tenshoContexts,int allContexts,bool? previousAlive)=>
+    /// X-433 (0.1459): <paramref name="rank"/> (above 0): « load N in this game process », to tell the reloads' heap from the version.
+    public static string Describe(long heapBytes,long totalBytes,int tenshoContexts,int allContexts,bool? previousAlive,int rank=0)=>
         $"heap {heapBytes/1_048_576} MB, managed {totalBytes/1_048_576} MB, Tensho load contexts {tenshoContexts} of {allContexts}"+
-        (previousAlive is { } alive ? $", previous instance {(alive ? "still alive" : "collected")}":", no previous instance known");
+        (previousAlive is { } alive ? $", previous instance {(alive ? "still alive" : "collected")}":", no previous instance known")+
+        (rank>0 ? $", load {rank} in this game process":"");
 }

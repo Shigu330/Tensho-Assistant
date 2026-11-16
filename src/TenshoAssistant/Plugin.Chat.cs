@@ -11,11 +11,20 @@ namespace TenshoAssistant;
 public sealed partial class Plugin
 {
     /// <summary>The chat family: what Tensho reads of the game's chat, and what the main window reads from it.</summary>
-    private void RegisterChat(Configuration configuration,IClientState client,IAddonLifecycle addonLifecycle)
+    private void RegisterChat(Configuration configuration,IClientState client,IAddonLifecycle addonLifecycle,IFramework framework,IPlayerState player,string pluginFolder)
     {
-        // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on.
+        // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on. X-475: with the chat
+        // history the player turned on (off by default), kept on this PC too, per character; the reader owns it and releases it.
         Chat.ChatReader? chatReader=null;
-        registrations.Register(()=>chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());
+        registrations.Register(()=>
+        {
+            var history=new Chat.ChatHistoryKeeper(framework,client,player,log,()=>configuration.Chat,mainWindow.ChatMessages,pluginFolder);
+            try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);}
+            catch{history.Dispose();throw;}
+            mainWindow.ChatHistoryFolder=history.Folder;
+            mainWindow.EraseChatHistory=history.Erase;
+            mainWindow.ChatHistoryBytes=()=>history.Bytes;
+        },()=>chatReader?.Dispose());
         // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
         Maps.ChatMapLinkWatcher? chatLinks=null;
         registrations.Register(()=>chatLinks=new Maps.ChatMapLinkWatcher(chatGui,client,log,()=>configuration.MapView.ChatLinks),()=>chatLinks?.Dispose());

@@ -13,7 +13,6 @@ internal sealed partial class MainWindow
     private static readonly string[] CacheChoiceKeys=["FiveMinutes","OneHour","OneDay","SevenDays","Never"];
     private void DrawCacheSettings()
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("CacheUi.Title"),ImGuiTreeNodeFlags.DefaultOpen))return;
         ImGui.TextWrapped(localization.Get("CacheUi.Help"));
         foreach(var (area,label) in new[]{(CacheArea.Prices,localization.Get("CacheUi.Prices")),(CacheArea.Quests,localization.Get("CacheUi.Quests")),
             (CacheArea.Collections,localization.Get("CacheUi.Collections")),(CacheArea.Completion,localization.Get("CacheUi.Completion")),(CacheArea.Sources,localization.Get("CacheUi.Sources")),

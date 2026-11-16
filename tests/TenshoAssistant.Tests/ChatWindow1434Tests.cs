@@ -25,7 +25,7 @@ internal static class ChatWindow1434Tests
             Check(ChatChannels.From(14)==ChatChannel.Party && ChatChannels.From(32)==ChatChannel.Party && ChatChannels.From(15)==ChatChannel.Alliance && ChatChannels.From(24)==ChatChannel.FreeCompany,"groups");
             Check(ChatChannels.From(16)==ChatChannel.Ls1 && ChatChannels.From(23)==ChatChannel.Ls8 && ChatChannels.From(37)==ChatChannel.Cwls1 && ChatChannels.From(101)==ChatChannel.Cwls2 && ChatChannels.From(107)==ChatChannel.Cwls8,"linkshells");
             Check(ChatChannels.From(28)==ChatChannel.Emote && ChatChannels.From(29)==ChatChannel.Emote && ChatChannels.From(27)==ChatChannel.Novice && ChatChannels.From(56)==ChatChannel.Echo,"emotes, novice, echo");
-            Check(ChatChannels.From(57)==ChatChannel.System && ChatChannels.From(58)==ChatChannel.System && ChatChannels.From(73)==ChatChannel.System && ChatChannels.From(74)==ChatChannel.System,"58 is a battle system message, filed with the system messages; signs and /random too");
+            Check(ChatChannels.From(57)==ChatChannel.System && ChatChannels.From(58)==ChatChannel.Combat && ChatChannels.From(73)==ChatChannel.System && ChatChannels.From(74)==ChatChannel.System,"58 is a battle system message, in the game's Battle tab since 0.1458 (X-445); signs and /random with the system messages");
             Check(ChatChannels.From(60)==ChatChannel.Error && ChatChannels.From(61)==ChatChannel.Npc && ChatChannels.From(65)==ChatChannel.Loot && ChatChannels.From(66)==ChatChannel.Crafting && ChatChannels.From(67)==ChatChannel.Gathering,"errors, NPC, loot, synthesis, gathering");
             Check(ChatChannels.From(71)==ChatChannel.Retainer && ChatChannels.From(70)==ChatChannel.Announcement && ChatChannels.From(64)==ChatChannel.Progress,"retainers, announcements, progression");
             Check(ChatChannels.From(41)==ChatChannel.Combat && ChatChannels.From(49)==ChatChannel.Combat && ChatChannels.From(999)==ChatChannel.Other && ChatChannels.From(0)==ChatChannel.Other,"combat apart, others");
@@ -68,7 +68,7 @@ internal static class ChatWindow1434Tests
         ("Chat window 1434: unread counts per tab: a line in a tab not shown counts, showing the tab clears it, what you send never counts",() =>
         {
             var store=new ChatStore();var options=new ChatSettings();
-            var tabs=options.EnsureTabs("General","Social");
+            var tabs=options.EnsureTabs("General","Battle","Event","Social").Where(tab=>tab.Name is "General" or "Social").ToList();
             Say(store,10);Say(store,57);
             var general=store.ViewOf(tabs[0]);var social=store.ViewOf(tabs[1]);
             general.Refresh(store,tabs[0],2000);social.Refresh(store,tabs[1],2000);
@@ -113,15 +113,15 @@ internal static class ChatWindow1434Tests
             Check(Line(Record(10,"Ann","hello"))=="[S] Ann: hello","say");
             Check(Line(Record(13,"Ann","hi"))=="[X] Ann >> hi" && Line(Record(12,"Ann","hi"))=="[X] >> Ann: hi","tells");
             Check(Line(Record(57,"","Message"))=="Message" && Line(Record(29,"Ann","Ann waves."))=="Ann waves." && Line(Record(28,"Ann","waves"))=="Ann waves","system and emotes");
-            Check(Line(Record(10,"AnnShiva","a\u0002bc"))=="[S] AnnShiva: abc","game glyphs and control characters removed");
-            Check(ChatFormat.Clean("a\nb")=="a\nb" && ChatFormat.Clean(null)=="","line breaks kept");
+            Check(Line(Record(10,"AnnShiva","a\u0002bc"))=="[S] Ann@Shiva: abc«","control characters removed; the game's glyphs written readably (0.1471, X-472: the world glyph « @ », the auto-translate mark « « »)");
+            Check(ChatFormat.Clean("a\nb")=="a\nb··" && ChatFormat.Clean(null)=="","line breaks kept; an unknown glyph of the game marked « · » (0.1471)");
             options.ShowChannel=false;Check(Line(Record(10,"Ann","x"))=="Ann: x","no channel");
             options.ShowTimestamps=true;options.Clock24=true;options.ShowSeconds=true;
             var runs=ChatFormat.Runs(Record(10,"Ann","x"),options,_=>"");
-            Check(runs[0].Role==ChatRole.Timestamp && runs[0].Text.Length==9 && runs[0].Text[2]==':' && runs[0].Text[5]==':',"timestamp: "+runs[0].Text);
+            Check(runs[0].Role==ChatRole.Timestamp && runs[0].Text.Length==11 && runs[0].Text[0]=='[' && runs[0].Text[3]==':' && runs[0].Text[6]==':' && runs[0].Text[9]==']',"timestamp: "+runs[0].Text);
             options.Clock24=false;options.ShowSeconds=false;
             var twelve=ChatFormat.Runs(Record(10,"Ann","x"),options,_=>"")[0].Text;
-            Check(twelve.EndsWith("AM ") || twelve.EndsWith("PM "),"12-hour clock: "+twelve);
+            Check(twelve.EndsWith("AM] ") || twelve.EndsWith("PM] "),"12-hour clock: "+twelve);
             Check(ChatFormat.LayoutKey(options)!=ChatFormat.LayoutKey(new ChatSettings()),"a change of format lays the lines out again");
             Check(ChatFormat.When(Noon.ToUnixTimeSeconds()-30,Noon)==Noon.AddSeconds(-30) && ChatFormat.When(0,Noon)==Noon && ChatFormat.When(1,Noon)==Noon && ChatFormat.When(long.MaxValue,Noon)==Noon,"the game's time stamp when it is plausible, else now");
         }),
@@ -142,9 +142,9 @@ internal static class ChatWindow1434Tests
             Check(!options.WindowOpen && !options.HideInCombat && options.ShowTimestamps && options.ShowChannel,"off by default: no message is copied");
             options.Opacity=500;options.FontScale=1;options.MaxLines=9;
             Check(options.BoundedOpacity==100 && options.BoundedFontScale==60 && options.BoundedMaxLines==ChatStore.MinimumLines,"bounds");
-            var tabs=options.EnsureTabs("All","Social");
-            Check(tabs.Count==2 && !tabs[0].Shows(ChatChannel.Combat) && tabs[0].Shows(ChatChannel.System) && tabs[1].Shows(ChatChannel.Party) && !tabs[1].Shows(ChatChannel.System),"tabs");
-            Check(ReferenceEquals(options.EnsureTabs("x","y"),tabs),"kept");
+            var tabs=options.EnsureTabs("All","Battle","Event","Social");
+            Check(tabs.Count==4 && !tabs[0].Shows(ChatChannel.Combat) && tabs[0].Shows(ChatChannel.System) && tabs[3].Shows(ChatChannel.Party) && !tabs[3].Shows(ChatChannel.System),"tabs");
+            Check(ReferenceEquals(options.EnsureTabs("x","y","z","w"),tabs),"kept");
             options.Colors=new(){[ChatChannel.Say]=0xFF123456};
             Check(options.ColorOf(ChatChannel.Say)==0x123456 && options.ColorOf(ChatChannel.Party)==ChatChannels.DefaultColor(ChatChannel.Party),"colours");
             var configuration=new Configuration();
@@ -164,17 +164,24 @@ internal static class ChatWindow1434Tests
             foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant/Chat"),"*.cs").Select(path=>"Chat/"+Path.GetFileName(path)).Append("MainWindow.ChatWindow.cs"))
             {
                 var code=Read(file);
-                foreach(var gone in new[]{"ProcessChatBox","SendMessage","chatGui.Print","AtomicFile","File.Write","BackgroundWriter","StreamWriter",".Update+=",".Update +="})
+                // 0.1492 (X-475, the user's choice of 15/11: kept on disk, off by default, with the player's consent): the chat history is the one
+                // part that writes, on this PC only, through the competitive gate (ChatHistory1492Tests); it sends nothing either.
+                var history=file is "Chat/ChatHistory.cs" or "Chat/ChatHistory.Dalamud.cs";
+                foreach(var gone in history ? new[]{"ProcessChatBox","SendMessage","chatGui.Print",".Update+=",".Update +="}:new[]{"ProcessChatBox","SendMessage","chatGui.Print","AtomicFile","File.Write","BackgroundWriter","StreamWriter",".Update+=",".Update +="})
                     Check(!code.Contains(gone,StringComparison.Ordinal),$"{file}: {gone} (it only reads, keeps nothing on disk, and has no framework subscription)");
             }
             Check(Read("MainWindow.TrackerWindow.cs").Contains("new(this,ChatPanelDefinition),"),"a panel window: fails alone, its close button written back");
             Check(window.Contains("DrawChatWindowContents,CloseChatWindow,") && window.Contains("ChatMessages.Clear();"),"closing the window drops what it kept");
             var plugin=Read("Plugin.cs");
             // 0.1443 (X-153): the chat family moved to Plugin.Chat.cs.
-            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
+            // 0.1463 (X-461): the reader also gets developer mode (the kinds of pieces of a message with a link).
+            // 0.1492 (X-475): the reader gets the chat history too, made in the same registration and released with the reader.
+            var family=Read("Plugin.Chat.cs");
+            Check(family.Contains("chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);") && family.Contains("},()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
-            Check(Read("MainWindow.Settings.cs").Contains("DrawChatWindowSettings();"),"its settings in Settings › Panels beside the game");
-            Check(window.Contains("ImGui.SetScrollHereY(1);view.MarkSeen();") && window.Contains("view.IndexAtRow((int)(scroll/height))"),"only the rows in view are drawn; the bottom reached clears the count");
+            Check(Read("MainWindow.SettingsCategories.cs").Contains("new(\"Panels\",\"ChatWindow\",DrawChatLookCategory)"),"its settings in Settings › Panels beside the game (X-449: its categories)");
+            // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom (the lines' height declared, not measured).
+            Check(window.Contains("ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();") && window.Contains("view.IndexAtRow((int)(scroll/height))"),"only the rows in view are drawn; the bottom reached clears the count");
         }),
     ];
 }

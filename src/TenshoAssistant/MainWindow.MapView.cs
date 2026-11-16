@@ -496,7 +496,9 @@ internal sealed partial class MainWindow
         const int buttons=9;
         var perColumn=slider>0 ? buttons:Math.Clamp((int)((room-label-style.WindowPadding.Y*2)/step),1,buttons);
         var columns=(buttons+perColumn-1)/perColumn;
-        var width=Math.Max(34,ImGui.CalcTextSize("100%").X+style.FramePadding.X+style.WindowPadding.X)+(columns-1)*30;
+        // X-460: the column holds the « 100% » boxes with a padding on each side (UI.CenteredText).
+        var hundred=UI.CenteredText.ButtonWidth(ImGui.CalcTextSize("100%").X,style.FramePadding.X,26);
+        var width=Math.Max(34,Math.Max(hundred,ImGui.CalcTextSize("100%").X+style.FramePadding.X+style.WindowPadding.X))+(columns-1)*30;
         var height=!overlay ? 0:slider>0 ? buttons*step+slider+label+2*style.ItemSpacing.Y+style.WindowPadding.Y*2
             :Math.Min(perColumn,buttons)*step+label+style.WindowPadding.Y*2;
         if(!ImGui.BeginChild("MapTools",new Vector2(width,height),false,ImGuiWindowFlags.NoScrollbar|(overlay ? ImGuiWindowFlags.NoBackground:ImGuiWindowFlags.None))){ImGui.EndChild();return width;}
@@ -543,9 +545,12 @@ internal sealed partial class MainWindow
             var lastColumn=slider>0 ? 0:(buttons-1)/perColumn;
             if(slider<=0)ImGui.SetCursorPosY(top+((buttons-1)%perColumn+1)*step);
             var columnX=left+lastColumn*30;
-            var fieldWidth=Math.Max(26,ImGui.CalcTextSize("100%").X+style.FramePadding.X);
+            // X-460: both boxes as wide as « 100% » with a padding on each side, their text in the middle (the field's text is left-aligned
+            // by ImGui: its left padding is widened to centre it).
+            var fieldWidth=hundred;
             ImGui.SetCursorPosX(Math.Max(0,columnX));
             if(overlay)ImGui.PushStyleColor(ImGuiCol.Text,MapOverlayText);
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding,new Vector2(UI.CenteredText.Padding(fieldWidth,ImGui.CalcTextSize(text).X,1),style.FramePadding.Y));
             try
             {
                 ImGui.SetNextItemWidth(fieldWidth);
@@ -553,10 +558,10 @@ internal sealed partial class MainWindow
                 if(ImGui.InputText("##MapZoomTyped",ref typed,8,ImGuiInputTextFlags.CharsDecimal|ImGuiInputTextFlags.AutoSelectAll|ImGuiInputTextFlags.EnterReturnsTrue)
                    && MapProjection.ZoomFromPercent(typed) is { } typedZoom)ZoomTo(typedZoom);
             }
-            finally{if(overlay)ImGui.PopStyleColor();}
+            finally{ImGui.PopStyleVar();if(overlay)ImGui.PopStyleColor();}
             Tip("MapView.ZoomLevel");
             ImGui.SetCursorPosX(Math.Max(0,columnX));
-            if(TextToolButton("100%","MapView.Zoom100"))ZoomTo(1);
+            if(TextToolButton("100%","MapView.Zoom100",width:fieldWidth))ZoomTo(1);
         }
         finally{ImGui.EndChild();}
         return width;
@@ -621,313 +626,346 @@ internal sealed partial class MainWindow
     }
     // Mappy-like display settings, saved at each change; every layer can be turned off.
     // Settings › Map, opened by the map's cog since 0.587.
-    private void DrawMapSettingsBody(MapDefinition? map)
+    // X-449: the game map: icons, flag, coordinates, bookmarks
+    private void DrawMapGameSettings()
     {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value,MapDefaults.ShowFixedIcons);
+        changed|=SettingBox("MapView.HideUndiscovered",settings.HideUndiscovered,value=>settings.HideUndiscovered=value,MapDefaults.HideUndiscovered);
+        changed|=SettingBox("MapView.TeleportOnClick",settings.TeleportOnClick,value=>settings.TeleportOnClick=value,MapDefaults.TeleportOnClick);
+        changed|=SettingBox("MapView.ChatLinks",settings.ChatLinks,value=>settings.ChatLinks=value,MapDefaults.ChatLinks);
+        changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value,MapDefaults.ShowPlaceNames);
+        // X-76 step 3 (0.953): icon names are the names of the game map icons (item.Fixed is set only by the fixed-icon loops):
+        // greyed while those icons are off.
+        ImGui.BeginDisabled(!settings.ShowFixedIcons);
+        try{changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value,MapDefaults.ShowIconNames);}
+        finally{ImGui.EndDisabled();}
+        // X-76 step 3 (0.953): the name size, zoom follow and minimum zoom are read only for place names and icon names: indented
+        // under them, greyed while neither is drawn.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowPlaceNames && !(settings.ShowIconNames && settings.ShowFixedIcons));
+        try
         {
-            var settings=configuration.MapView;var changed=false;
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionGame"),ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                changed|=SettingBox("MapView.ShowFixedIcons",settings.ShowFixedIcons,value=>settings.ShowFixedIcons=value,MapDefaults.ShowFixedIcons);
-                changed|=SettingBox("MapView.HideUndiscovered",settings.HideUndiscovered,value=>settings.HideUndiscovered=value,MapDefaults.HideUndiscovered);
-                changed|=SettingBox("MapView.TeleportOnClick",settings.TeleportOnClick,value=>settings.TeleportOnClick=value,MapDefaults.TeleportOnClick);
-                changed|=SettingBox("MapView.ChatLinks",settings.ChatLinks,value=>settings.ChatLinks=value,MapDefaults.ChatLinks);
-                changed|=SettingBox("MapView.ShowPlaceNames",settings.ShowPlaceNames,value=>settings.ShowPlaceNames=value,MapDefaults.ShowPlaceNames);
-                // X-76 step 3 (0.953): icon names are the names of the game map icons (item.Fixed is set only by the fixed-icon loops):
-                // greyed while those icons are off.
-                ImGui.BeginDisabled(!settings.ShowFixedIcons);
-                try{changed|=SettingBox("MapView.ShowIconNames",settings.ShowIconNames,value=>settings.ShowIconNames=value,MapDefaults.ShowIconNames);}
-                finally{ImGui.EndDisabled();}
-                // X-76 step 3 (0.953): the name size, zoom follow and minimum zoom are read only for place names and icon names: indented
-                // under them, greyed while neither is drawn.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowPlaceNames && !(settings.ShowIconNames && settings.ShowFixedIcons));
-                try
-                {
-                    var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
-                    Tip("SettingTips.PlaceNameScale");
-                    if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
-                    var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
-                    Tip("MapView.NameZoomFollowHelp");
-                    if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
-                    var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
-                    Tip("MapView.NameMinZoomHelp");
-                    if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
-                }
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
-                changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
-                changed|=SettingBox("MapView.ShowPlayerCoordinates",settings.ShowPlayerCoordinates,value=>settings.ShowPlayerCoordinates=value,MapDefaults.ShowPlayerCoordinates);
-                changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
-            }
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionQuests"),ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value,MapDefaults.ShowQuests);
-                // X-76 step 3 (0.953): read only for the quest markers, drawn only with « Quests and objectives »: indented and greyed under it.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowQuests);
-                try
-                {
-                    changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);
-                    changed|=SettingBox("MapView.ShowLockedQuests",settings.ShowLockedQuests,value=>settings.ShowLockedQuests=value,MapDefaults.ShowLockedQuests);
-                }
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value,MapDefaults.ShowFates);
-                changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value,MapDefaults.ShowSightseeing);
-                changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value,MapDefaults.ShowAetherCurrents);
-                // X-76 step 3 (0.953): read only inside the vista and aether current loops: indented under them, greyed while both are off.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowSightseeing && !settings.ShowAetherCurrents);
-                try{changed|=SettingBox("MapView.HideCollected",settings.HideCollected,value=>settings.HideCollected=value,MapDefaults.HideCollected);}
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-            }
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionNearby"),ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
-                changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
-                changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
-                changed|=GathererBoxes(settings,true);
-                // X-76 step 3 (0.953): the level labels are drawn only for gathering points (item.Point), and their zoom and size only with the
-                // labels: moved here from the end of this section, each indented and greyed under its switch.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowGathering);
-                try
-                {
-                    changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
-                    ImGui.Indent();
-                    ImGui.BeginDisabled(!settings.GatheringLabels);
-                    try
-                    {
-                        var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
-                        if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
-                        Tip("MapView.GatheringLabelMinZoomHelp");
-                        if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
-                        var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
-                        if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
-                        Tip("MapView.GatheringLabelScaleHelp");
-                        if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
-                    }
-                    finally{ImGui.EndDisabled();ImGui.Unindent();}
-                }
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
-                changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
-                // X-40 (0.1002): every crafting list, not only the one in a panel; greyed while the list layer is off.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowListMonsters && !configuration.ListPanelsNearbyMonsters);
-                try{changed|=SettingBox("MapView.ListMonstersAllLists",settings.ListMonstersAllLists,value=>settings.ListMonstersAllLists=value,MapDefaults.ListMonstersAllLists);}
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
-                changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
-                changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
-                // X-76 step 3 (0.953): « even when not Blue Mage » is read only with its switch (MainWindow.NearbyMonsters.cs): right under it,
-                // indented and greyed while it is off.
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowBlueMageMonsters);
-                try{changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);}
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value,MapDefaults.ShowCollectionMonsters);
-                changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value,MapDefaults.ShowBeastMonsters);
-                // X-76 step 3 (0.953): same for « even when not Beastmaster ».
-                ImGui.Indent();
-                ImGui.BeginDisabled(!settings.ShowBeastMonsters);
-                try{changed|=SettingBox("MapView.BeastMonstersAlways",settings.BeastMonstersAlways,value=>settings.BeastMonstersAlways=value,MapDefaults.BeastMonstersAlways);}
-                finally{ImGui.EndDisabled();ImGui.Unindent();}
-                // X-40 (0.1002, DEC-049): relic book targets and wish drops.
-                changed|=SettingBox("MapView.ShowRelicMonsters",settings.ShowRelicMonsters,value=>settings.ShowRelicMonsters=value,MapDefaults.ShowRelicMonsters);
-                changed|=SettingBox("MapView.ShowWishMonsters",settings.ShowWishMonsters,value=>settings.ShowWishMonsters=value,MapDefaults.ShowWishMonsters);
-                // 0.799 (X-38): icons above the monsters' heads, in the game's view.
-                changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
-                if(settings.MonsterIconsAbove)
-                {
-                    ImGui.Indent();
-                    // X-76 step 3 (0.953): an overhead icon shows only what was noted, and each kind is noted only while its switch above is on
-                    // (MainWindow.NearbyMonsters.cs; the list drops also with the list panels' « nearby monsters »): each row greyed while it is off.
-                    ImGui.BeginDisabled(!settings.ShowBlueMageMonsters);
-                    try{changed|=SettingBox("MapView.AboveBlueSpell",settings.AboveBlueSpell,value=>settings.AboveBlueSpell=value,MapDefaults.AboveBlueSpell);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowListMonsters && !configuration.ListPanelsNearbyMonsters);
-                    try{changed|=SettingBox("MapView.AboveList",settings.AboveList,value=>settings.AboveList=value,MapDefaults.AboveList);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowHuntLogMonsters);
-                    try{changed|=SettingBox("MapView.AboveHuntLog",settings.AboveHuntLog,value=>settings.AboveHuntLog=value,MapDefaults.AboveHuntLog);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowFateMonsters);
-                    try{changed|=SettingBox("MapView.AboveFate",settings.AboveFate,value=>settings.AboveFate=value,MapDefaults.AboveFate);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowCollectionMonsters);
-                    try{changed|=SettingBox("MapView.AboveCollection",settings.AboveCollection,value=>settings.AboveCollection=value,MapDefaults.AboveCollection);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowBeastMonsters);
-                    try{changed|=SettingBox("MapView.AboveBeast",settings.AboveBeast,value=>settings.AboveBeast=value,MapDefaults.AboveBeast);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowRelicMonsters);
-                    try{changed|=SettingBox("MapView.AboveRelic",settings.AboveRelic,value=>settings.AboveRelic=value,MapDefaults.AboveRelic);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowWishMonsters);
-                    try{changed|=SettingBox("MapView.AboveWish",settings.AboveWish,value=>settings.AboveWish=value,MapDefaults.AboveWish);}
-                    finally{ImGui.EndDisabled();}
-                    changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
-                    var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
-                    Tip("MapView.MonsterIconSizeTip");
-                    var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.MonsterIconDistance"),ref iconDistance,5,150,"%.0f")){settings.MonsterIconDistance=iconDistance;changed=true;}
-                    Tip("MapView.MonsterIconDistanceTip");
-                    ImGui.Unindent();
-                }
-                // 0.844 (X-67): the arrows above or below, and their threshold.
-                changed|=SettingBox("MapView.HeightArrows",settings.HeightArrows,value=>settings.HeightArrows=value,MapDefaults.HeightArrows);
-                if(settings.HeightArrows)
-                {
-                    var heightYalms=Math.Clamp(settings.HeightArrowYalms,2,50);ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.HeightArrowYalms"),ref heightYalms,2,50,"%.0f")){settings.HeightArrowYalms=heightYalms;changed=true;}
-                    Tip("MapView.HeightArrowYalmsTip");
-                    if(DefaultButton("HeightArrowYalms",settings.HeightArrowYalms!=MapDefaults.HeightArrowYalms)){settings.HeightArrowYalms=MapDefaults.HeightArrowYalms;changed=true;}
-                }
-            }
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionPlayer")))
-            {
-                changed|=SettingBox("MapView.ShowPlayer",settings.ShowPlayer,value=>settings.ShowPlayer=value,MapDefaults.ShowPlayer);
-                changed|=SettingBox("MapView.ShowParty",settings.ShowParty,value=>settings.ShowParty=value,MapDefaults.ShowParty);
-                changed|=SettingBox("MapView.ShowViewCone",settings.ShowViewCone,value=>settings.ShowViewCone=value,MapDefaults.ShowViewCone);
-                changed|=SettingBox("MapView.ShowEdgeMarkers",settings.ShowEdgeMarkers,value=>settings.ShowEdgeMarkers=value,MapDefaults.ShowEdgeMarkers);
-                ImGui.BeginDisabled(!settings.ShowEdgeMarkers);
-                try
-                {
-                    ImGui.Indent();
-                    // X-76 step 3 (0.953): DrawEdgeMarkers brings back only what the map draws: each kind also greyed while its map layer is off
-                    // (character, flag, party; quests, leves and events come from « Quests and objectives », FATEs and gathering points from
-                    // their layers). The flag's coordinates go with the flag's marker. The journal target has no layer of its own.
-                    ImGui.BeginDisabled(!settings.ShowPlayer);
-                    try{changed|=SettingBox("MapView.EdgePlayerOn",settings.EdgePlayer,value=>settings.EdgePlayer=value,MapDefaults.EdgePlayer);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowFlag);
-                    try
-                    {
-                        changed|=SettingBox("MapView.EdgeFlagOn",settings.EdgeFlag,value=>settings.EdgeFlag=value,MapDefaults.EdgeFlag);
-                        ImGui.Indent();
-                        ImGui.BeginDisabled(!settings.EdgeFlag);
-                        try{changed|=SettingBox("MapView.EdgeFlagCoordinatesOn",settings.EdgeFlagCoordinates,value=>settings.EdgeFlagCoordinates=value,MapDefaults.EdgeFlagCoordinates);}
-                        finally{ImGui.EndDisabled();ImGui.Unindent();}
-                    }
-                    finally{ImGui.EndDisabled();}
-                    changed|=SettingBox("MapView.EdgeTargetOn",settings.EdgeTarget,value=>settings.EdgeTarget=value,MapDefaults.EdgeTarget);
-                    ImGui.BeginDisabled(!settings.ShowQuests);
-                    try
-                    {
-                        changed|=SettingBox("MapView.EdgeQuestsOn",settings.EdgeQuests,value=>settings.EdgeQuests=value,MapDefaults.EdgeQuests);
-                        changed|=SettingBox("MapView.EdgeLevesOn",settings.EdgeLeves,value=>settings.EdgeLeves=value,MapDefaults.EdgeLeves);
-                        changed|=SettingBox("MapView.EdgeEventsOn",settings.EdgeEvents,value=>settings.EdgeEvents=value,MapDefaults.EdgeEvents);
-                    }
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowFates);
-                    try{changed|=SettingBox("MapView.EdgeFatesOn",settings.EdgeFates,value=>settings.EdgeFates=value,MapDefaults.EdgeFates);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowGathering);
-                    try{changed|=SettingBox("MapView.EdgeGatheringOn",settings.EdgeGathering,value=>settings.EdgeGathering=value,MapDefaults.EdgeGathering);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.BeginDisabled(!settings.ShowParty);
-                    try{changed|=SettingBox("MapView.EdgePartyOn",settings.EdgeParty,value=>settings.EdgeParty=value,MapDefaults.EdgeParty);}
-                    finally{ImGui.EndDisabled();}
-                    ImGui.Unindent();
-                }
-                finally{ImGui.EndDisabled();}
-                // 0.288 (user request): marker size, cone length and cone opacity, each with its tooltip and « ↺ ».
-                var marker=MapViewSettings.ClampMarker(settings.PlayerIconScale)*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.PlayerIconScale"),ref marker,50,300,"%.0f %%")){settings.PlayerIconScale=marker/100;changed=true;}
-                Tip("SettingTips.PlayerIconScale");
-                if(DefaultButton("PlayerIconScale",settings.PlayerIconScale!=MapDefaults.PlayerIconScale)){settings.PlayerIconScale=MapDefaults.PlayerIconScale;changed=true;}
-                ImGui.BeginDisabled(!settings.ShowViewCone);
-                try
-                {
-                    var cone=MapViewSettings.ClampMarker(settings.ViewConeScale)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.ViewConeScale"),ref cone,50,300,"%.0f %%")){settings.ViewConeScale=cone/100;changed=true;}
-                    Tip("SettingTips.ViewConeScale");
-                    if(DefaultButton("ViewConeScale",settings.ViewConeScale!=MapDefaults.ViewConeScale)){settings.ViewConeScale=MapDefaults.ViewConeScale;changed=true;}
-                    var coneOpacity=MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.ViewConeOpacity"),ref coneOpacity,0,100,"%.0f %%")){settings.ViewConeOpacity=coneOpacity/100;changed=true;}
-                    Tip("SettingTips.ViewConeOpacity");
-                    if(DefaultButton("ViewConeOpacity",settings.ViewConeOpacity!=MapDefaults.ViewConeOpacity)){settings.ViewConeOpacity=MapDefaults.ViewConeOpacity;changed=true;}
-                    var coneColour=settings.ViewConeColor ?? new Vector3(UI.FfxivTheme.Gold.X,UI.FfxivTheme.Gold.Y,UI.FfxivTheme.Gold.Z);
-                    if(ImGui.ColorEdit3(localization.Get("MapView.ViewConeColor")+"##ViewConeColor",ref coneColour,ImGuiColorEditFlags.NoInputs)){settings.ViewConeColor=coneColour;changed=true;}
-                    Tip("SettingTips.ViewConeColor");
-                    if(DefaultButton("ViewConeColor",settings.ViewConeColor is not null)){settings.ViewConeColor=null;changed=true;}
-                }
-                finally{ImGui.EndDisabled();}
-            }
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.Display")))
-            {
-                changed|=SettingBox("MapView.OverlayControls",settings.OverlayControls,value=>settings.OverlayControls=value,MapDefaults.OverlayControls);
-                ImGui.BeginDisabled(!settings.OverlayControls);
-                try{ImGui.Indent();changed|=SettingBox("MapView.OverlayZoneName",settings.OverlayZoneName,value=>settings.OverlayZoneName=value,MapDefaults.OverlayZoneName);ImGui.Unindent();}
-                finally{ImGui.EndDisabled();}
-                var scale=MapViewSettings.ClampScale(settings.IconScale)*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
-                Tip("SettingTips.IconScale");
-                if(DefaultButton("IconScale",settings.IconScale!=MapDefaults.IconScale)){settings.IconScale=MapDefaults.IconScale;changed=true;}
-                // 0.542 (P1).
-                ImGui.SetNextItemWidth(160);
-                if(ImGui.BeginCombo(localization.Get("MapView.OpenZoom")+"###MapOpenZoom",localization.Get("MapView.OpenZoom"+settings.OpenZoom)))
-                {
-                    foreach(var mode in Enum.GetValues<MapOpenZoom>())
-                        if(ImGui.Selectable(localization.Get("MapView.OpenZoom"+mode),settings.OpenZoom==mode)){settings.OpenZoom=mode;changed=true;}
-                    ImGui.EndCombo();
-                }
-                Tip("MapView.OpenZoomHelp");
-                if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
-                if(settings.OpenZoom==MapOpenZoom.Fixed)
-                {
-                    var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
-                    if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
-                    Tip("MapView.OpenZoomValueHelp");
-                    if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
-                }
-                var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
-                Tip("MapView.FocusZoomHelp");
-                if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
-                var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
-                Tip("MapView.WheelStepHelp");
-                if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
-                changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
-                var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
-                Tip("MapView.ZoomFollowHelp");
-                if(DefaultButton("ZoomFollow",settings.ZoomFollow!=MapDefaults.ZoomFollow)){settings.ZoomFollow=MapDefaults.ZoomFollow;changed=true;}
-                var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
-                if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
-                Tip("SettingTips.Opacity");
-                if(DefaultButton("Opacity",settings.Opacity!=MapDefaults.Opacity)){settings.Opacity=MapDefaults.Opacity;changed=true;}
-            }
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionAreas")))
-            {
-                changed|=AreaSetting("MapView.AreaQuests",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,settings.QuestAreaColor,value=>settings.QuestAreaColor=value,MapDefaults.ShowQuestAreas,MapDefaults.QuestAreaColor);
-                changed|=AreaSetting("MapView.AreaLeves",settings.ShowLeveAreas,value=>settings.ShowLeveAreas=value,settings.LeveAreaColor,value=>settings.LeveAreaColor=value,MapDefaults.ShowLeveAreas,MapDefaults.LeveAreaColor);
-                changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
-                changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
-                changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
-            }
-            if(map is not null && TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.SectionIcons")))changed|=DrawIconSizes(map,settings);
-            if(TenshoAssistant.UI.UiComponents.Header(localization.Get("MapView.Window")))
-            {
-                changed|=SettingBox("MapView.ReplaceGameMap",settings.ReplaceGameMap,value=>settings.ReplaceGameMap=value,MapDefaults.ReplaceGameMap);
-                changed|=SettingBox("MapView.Locked",settings.Locked,value=>settings.Locked=value,MapDefaults.Locked);
-                changed|=SettingBox("MapView.HideTitleBar",settings.HideTitleBar,value=>settings.HideTitleBar=value,MapDefaults.HideTitleBar);
-                changed|=SettingBox("MapView.HideBehindGame",settings.HideBehindGame,value=>settings.HideBehindGame=value,MapDefaults.HideBehindGame);
-                changed|=SettingBox("MapView.HideInCombat",settings.HideInCombat,value=>settings.HideInCombat=value,MapDefaults.HideInCombat);
-                changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
-            }
-            ImGui.TextDisabled(localization.Get("MapView.SettingsHelp"));
-            // 0.328 (map audit #41): a failed save is said (Common.SaveError), like the other settings. X-76 H4 (0.914): every change
-            // applies at once (the map follows a slider while it is dragged), but the file is written only once no control is held any
-            // more: on release of a slider or a colour picker, when a typed number is left, at once for a box or a « ↺ ».
-            mapSettingsPending|=changed;
-            if(mapSettingsPending && !ImGui.IsAnyItemActive())SaveMapSettings();
+            var names=Math.Clamp(float.IsFinite(settings.PlaceNameScale) ? settings.PlaceNameScale:1,0.5f,1.5f)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.PlaceNameScale"),ref names,50,150,"%.0f %%")){settings.PlaceNameScale=names/100;changed=true;}
+            Tip("SettingTips.PlaceNameScale");
+            if(DefaultButton("PlaceNameScale",settings.PlaceNameScale!=MapDefaults.PlaceNameScale)){settings.PlaceNameScale=MapDefaults.PlaceNameScale;changed=true;}
+            var nameFollow=MapViewSettings.ClampFollow(settings.NameZoomFollow ?? settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.NameZoomFollow"),ref nameFollow,0,100,"%.0f %%")){settings.NameZoomFollow=nameFollow/100;changed=true;}
+            Tip("MapView.NameZoomFollowHelp");
+            if(DefaultButton("NameZoomFollow",settings.NameZoomFollow is not null)){settings.NameZoomFollow=null;changed=true;}
+            var nameMinimum=Math.Clamp(settings.NameMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.NameMinZoom"),ref nameMinimum,0,200,"%.0f %%")){settings.NameMinZoom=nameMinimum/100;changed=true;}
+            Tip("MapView.NameMinZoomHelp");
+            if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
         }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
+        changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
+        changed|=SettingBox("MapView.ShowPlayerCoordinates",settings.ShowPlayerCoordinates,value=>settings.ShowPlayerCoordinates=value,MapDefaults.ShowPlayerCoordinates);
+        changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
+        FinishMapSettings(changed);
+    }
+
+    // X-449: quests, leves, sightseeing and aether currents
+    private void DrawMapQuestSettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.ShowQuests",settings.ShowQuests,value=>settings.ShowQuests=value,MapDefaults.ShowQuests);
+        // X-76 step 3 (0.953): read only for the quest markers, drawn only with « Quests and objectives »: indented and greyed under it.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowQuests);
+        try
+        {
+            changed|=SettingBox("MapView.QuestTooltips",settings.QuestTooltips,value=>settings.QuestTooltips=value,MapDefaults.QuestTooltips);
+            changed|=SettingBox("MapView.ShowLockedQuests",settings.ShowLockedQuests,value=>settings.ShowLockedQuests=value,MapDefaults.ShowLockedQuests);
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        changed|=SettingBox("MapView.ShowFates",settings.ShowFates,value=>settings.ShowFates=value,MapDefaults.ShowFates);
+        changed|=SettingBox("MapView.ShowSightseeing",settings.ShowSightseeing,value=>settings.ShowSightseeing=value,MapDefaults.ShowSightseeing);
+        changed|=SettingBox("MapView.ShowAetherCurrents",settings.ShowAetherCurrents,value=>settings.ShowAetherCurrents=value,MapDefaults.ShowAetherCurrents);
+        // X-76 step 3 (0.953): read only inside the vista and aether current loops: indented under them, greyed while both are off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowSightseeing && !settings.ShowAetherCurrents);
+        try{changed|=SettingBox("MapView.HideCollected",settings.HideCollected,value=>settings.HideCollected=value,MapDefaults.HideCollected);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        FinishMapSettings(changed);
+    }
+
+    // X-449: what is near the character
+    private void DrawMapNearbySettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.ShowTreasure",settings.ShowTreasure,value=>settings.ShowTreasure=value,MapDefaults.ShowTreasure);
+        changed|=SettingBox("MapView.ShowVendors",settings.ShowVendors,value=>settings.ShowVendors=value,MapDefaults.ShowVendors);
+        changed|=SettingBox("MapView.ShowGathering",settings.ShowGathering,value=>settings.ShowGathering=value,MapDefaults.ShowGathering);
+        changed|=GathererBoxes(settings,true);
+        // X-76 step 3 (0.953): the level labels are drawn only for gathering points (item.Point), and their zoom and size only with the
+        // labels: moved here from the end of this section, each indented and greyed under its switch.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowGathering);
+        try
+        {
+            changed|=SettingBox("MapView.GatheringLabels",settings.GatheringLabels,value=>settings.GatheringLabels=value,MapDefaults.GatheringLabels);
+            ImGui.Indent();
+            ImGui.BeginDisabled(!settings.GatheringLabels);
+            try
+            {
+                var labelMinimum=Math.Clamp(settings.GatheringLabelMinZoom,0,4)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelMinZoom"),ref labelMinimum,0,200,"%.0f %%")){settings.GatheringLabelMinZoom=labelMinimum/100;changed=true;}
+                Tip("MapView.GatheringLabelMinZoomHelp");
+                if(DefaultButton("GatheringLabelMinZoom",settings.GatheringLabelMinZoom!=MapDefaults.GatheringLabelMinZoom)){settings.GatheringLabelMinZoom=MapDefaults.GatheringLabelMinZoom;changed=true;}
+                var labelScale=Math.Clamp(settings.GatheringLabelScale,0.5f,2f)*100;ImGui.SetNextItemWidth(160);
+                if(ImGui.SliderFloat(localization.Get("MapView.GatheringLabelScale"),ref labelScale,50,200,"%.0f %%")){settings.GatheringLabelScale=labelScale/100;changed=true;}
+                Tip("MapView.GatheringLabelScaleHelp");
+                if(DefaultButton("GatheringLabelScale",settings.GatheringLabelScale!=MapDefaults.GatheringLabelScale)){settings.GatheringLabelScale=MapDefaults.GatheringLabelScale;changed=true;}
+            }
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        changed|=SettingBox("MapView.ShowHuntMarks",settings.ShowHuntMarks,value=>settings.ShowHuntMarks=value,MapDefaults.ShowHuntMarks);
+        changed|=SettingBox("MapView.ShowListMonsters",settings.ShowListMonsters,value=>settings.ShowListMonsters=value,MapDefaults.ShowListMonsters);
+        // X-40 (0.1002): every crafting list, not only the one in a panel; greyed while the list layer is off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowListMonsters && !configuration.ListPanelsNearbyMonsters);
+        try{changed|=SettingBox("MapView.ListMonstersAllLists",settings.ListMonstersAllLists,value=>settings.ListMonstersAllLists=value,MapDefaults.ListMonstersAllLists);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        changed|=SettingBox("MapView.ShowHuntLogMonsters",settings.ShowHuntLogMonsters,value=>settings.ShowHuntLogMonsters=value,MapDefaults.ShowHuntLogMonsters);
+        changed|=SettingBox("MapView.ShowFateMonsters",settings.ShowFateMonsters,value=>settings.ShowFateMonsters=value,MapDefaults.ShowFateMonsters);
+        changed|=SettingBox("MapView.ShowBlueMageMonsters",settings.ShowBlueMageMonsters,value=>settings.ShowBlueMageMonsters=value,MapDefaults.ShowBlueMageMonsters);
+        // X-76 step 3 (0.953): « even when not Blue Mage » is read only with its switch (MainWindow.NearbyMonsters.cs): right under it,
+        // indented and greyed while it is off.
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowBlueMageMonsters);
+        try{changed|=SettingBox("MapView.BlueMageMonstersAlways",settings.BlueMageMonstersAlways,value=>settings.BlueMageMonstersAlways=value,MapDefaults.BlueMageMonstersAlways);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        changed|=SettingBox("MapView.ShowCollectionMonsters",settings.ShowCollectionMonsters,value=>settings.ShowCollectionMonsters=value,MapDefaults.ShowCollectionMonsters);
+        changed|=SettingBox("MapView.ShowBeastMonsters",settings.ShowBeastMonsters,value=>settings.ShowBeastMonsters=value,MapDefaults.ShowBeastMonsters);
+        // X-76 step 3 (0.953): same for « even when not Beastmaster ».
+        ImGui.Indent();
+        ImGui.BeginDisabled(!settings.ShowBeastMonsters);
+        try{changed|=SettingBox("MapView.BeastMonstersAlways",settings.BeastMonstersAlways,value=>settings.BeastMonstersAlways=value,MapDefaults.BeastMonstersAlways);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // X-40 (0.1002, DEC-049): relic book targets and wish drops.
+        changed|=SettingBox("MapView.ShowRelicMonsters",settings.ShowRelicMonsters,value=>settings.ShowRelicMonsters=value,MapDefaults.ShowRelicMonsters);
+        changed|=SettingBox("MapView.ShowWishMonsters",settings.ShowWishMonsters,value=>settings.ShowWishMonsters=value,MapDefaults.ShowWishMonsters);
+        // 0.799 (X-38): icons above the monsters' heads, in the game's view.
+        changed|=SettingBox("MapView.MonsterIconsAbove",settings.MonsterIconsAbove,value=>settings.MonsterIconsAbove=value,MapDefaults.MonsterIconsAbove);
+        if(settings.MonsterIconsAbove)
+        {
+            ImGui.Indent();
+            // X-76 step 3 (0.953): an overhead icon shows only what was noted, and each kind is noted only while its switch above is on
+            // (MainWindow.NearbyMonsters.cs; the list drops also with the list panels' « nearby monsters »): each row greyed while it is off.
+            ImGui.BeginDisabled(!settings.ShowBlueMageMonsters);
+            try{changed|=SettingBox("MapView.AboveBlueSpell",settings.AboveBlueSpell,value=>settings.AboveBlueSpell=value,MapDefaults.AboveBlueSpell);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowListMonsters && !configuration.ListPanelsNearbyMonsters);
+            try{changed|=SettingBox("MapView.AboveList",settings.AboveList,value=>settings.AboveList=value,MapDefaults.AboveList);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowHuntLogMonsters);
+            try{changed|=SettingBox("MapView.AboveHuntLog",settings.AboveHuntLog,value=>settings.AboveHuntLog=value,MapDefaults.AboveHuntLog);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowFateMonsters);
+            try{changed|=SettingBox("MapView.AboveFate",settings.AboveFate,value=>settings.AboveFate=value,MapDefaults.AboveFate);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowCollectionMonsters);
+            try{changed|=SettingBox("MapView.AboveCollection",settings.AboveCollection,value=>settings.AboveCollection=value,MapDefaults.AboveCollection);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowBeastMonsters);
+            try{changed|=SettingBox("MapView.AboveBeast",settings.AboveBeast,value=>settings.AboveBeast=value,MapDefaults.AboveBeast);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowRelicMonsters);
+            try{changed|=SettingBox("MapView.AboveRelic",settings.AboveRelic,value=>settings.AboveRelic=value,MapDefaults.AboveRelic);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowWishMonsters);
+            try{changed|=SettingBox("MapView.AboveWish",settings.AboveWish,value=>settings.AboveWish=value,MapDefaults.AboveWish);}
+            finally{ImGui.EndDisabled();}
+            changed|=SettingBox("MapView.MonsterIconsHideInCombat",settings.MonsterIconsHideInCombat,value=>settings.MonsterIconsHideInCombat=value,MapDefaults.MonsterIconsHideInCombat);
+            var iconSize=Math.Clamp(settings.MonsterIconSize,16,96);ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderInt(localization.Get("MapView.MonsterIconSize"),ref iconSize,16,96)){settings.MonsterIconSize=iconSize;changed=true;}
+            Tip("MapView.MonsterIconSizeTip");
+            var iconDistance=Math.Clamp(settings.MonsterIconDistance,5,150);ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.MonsterIconDistance"),ref iconDistance,5,150,"%.0f")){settings.MonsterIconDistance=iconDistance;changed=true;}
+            Tip("MapView.MonsterIconDistanceTip");
+            ImGui.Unindent();
+        }
+        // 0.844 (X-67): the arrows above or below, and their threshold.
+        changed|=SettingBox("MapView.HeightArrows",settings.HeightArrows,value=>settings.HeightArrows=value,MapDefaults.HeightArrows);
+        if(settings.HeightArrows)
+        {
+            var heightYalms=Math.Clamp(settings.HeightArrowYalms,2,50);ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.HeightArrowYalms"),ref heightYalms,2,50,"%.0f")){settings.HeightArrowYalms=heightYalms;changed=true;}
+            Tip("MapView.HeightArrowYalmsTip");
+            if(DefaultButton("HeightArrowYalms",settings.HeightArrowYalms!=MapDefaults.HeightArrowYalms)){settings.HeightArrowYalms=MapDefaults.HeightArrowYalms;changed=true;}
+        }
+        FinishMapSettings(changed);
+    }
+
+    // X-449: the character, the party and the view cone
+    private void DrawMapPlayerSettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.ShowPlayer",settings.ShowPlayer,value=>settings.ShowPlayer=value,MapDefaults.ShowPlayer);
+        changed|=SettingBox("MapView.ShowParty",settings.ShowParty,value=>settings.ShowParty=value,MapDefaults.ShowParty);
+        changed|=SettingBox("MapView.ShowViewCone",settings.ShowViewCone,value=>settings.ShowViewCone=value,MapDefaults.ShowViewCone);
+        changed|=SettingBox("MapView.ShowEdgeMarkers",settings.ShowEdgeMarkers,value=>settings.ShowEdgeMarkers=value,MapDefaults.ShowEdgeMarkers);
+        ImGui.BeginDisabled(!settings.ShowEdgeMarkers);
+        try
+        {
+            ImGui.Indent();
+            // X-76 step 3 (0.953): DrawEdgeMarkers brings back only what the map draws: each kind also greyed while its map layer is off
+            // (character, flag, party; quests, leves and events come from « Quests and objectives », FATEs and gathering points from
+            // their layers). The flag's coordinates go with the flag's marker. The journal target has no layer of its own.
+            ImGui.BeginDisabled(!settings.ShowPlayer);
+            try{changed|=SettingBox("MapView.EdgePlayerOn",settings.EdgePlayer,value=>settings.EdgePlayer=value,MapDefaults.EdgePlayer);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowFlag);
+            try
+            {
+                changed|=SettingBox("MapView.EdgeFlagOn",settings.EdgeFlag,value=>settings.EdgeFlag=value,MapDefaults.EdgeFlag);
+                ImGui.Indent();
+                ImGui.BeginDisabled(!settings.EdgeFlag);
+                try{changed|=SettingBox("MapView.EdgeFlagCoordinatesOn",settings.EdgeFlagCoordinates,value=>settings.EdgeFlagCoordinates=value,MapDefaults.EdgeFlagCoordinates);}
+                finally{ImGui.EndDisabled();ImGui.Unindent();}
+            }
+            finally{ImGui.EndDisabled();}
+            changed|=SettingBox("MapView.EdgeTargetOn",settings.EdgeTarget,value=>settings.EdgeTarget=value,MapDefaults.EdgeTarget);
+            ImGui.BeginDisabled(!settings.ShowQuests);
+            try
+            {
+                changed|=SettingBox("MapView.EdgeQuestsOn",settings.EdgeQuests,value=>settings.EdgeQuests=value,MapDefaults.EdgeQuests);
+                changed|=SettingBox("MapView.EdgeLevesOn",settings.EdgeLeves,value=>settings.EdgeLeves=value,MapDefaults.EdgeLeves);
+                changed|=SettingBox("MapView.EdgeEventsOn",settings.EdgeEvents,value=>settings.EdgeEvents=value,MapDefaults.EdgeEvents);
+            }
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowFates);
+            try{changed|=SettingBox("MapView.EdgeFatesOn",settings.EdgeFates,value=>settings.EdgeFates=value,MapDefaults.EdgeFates);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowGathering);
+            try{changed|=SettingBox("MapView.EdgeGatheringOn",settings.EdgeGathering,value=>settings.EdgeGathering=value,MapDefaults.EdgeGathering);}
+            finally{ImGui.EndDisabled();}
+            ImGui.BeginDisabled(!settings.ShowParty);
+            try{changed|=SettingBox("MapView.EdgePartyOn",settings.EdgeParty,value=>settings.EdgeParty=value,MapDefaults.EdgeParty);}
+            finally{ImGui.EndDisabled();}
+            ImGui.Unindent();
+        }
+        finally{ImGui.EndDisabled();}
+        // 0.288 (user request): marker size, cone length and cone opacity, each with its tooltip and « ↺ ».
+        var marker=MapViewSettings.ClampMarker(settings.PlayerIconScale)*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.PlayerIconScale"),ref marker,50,300,"%.0f %%")){settings.PlayerIconScale=marker/100;changed=true;}
+        Tip("SettingTips.PlayerIconScale");
+        if(DefaultButton("PlayerIconScale",settings.PlayerIconScale!=MapDefaults.PlayerIconScale)){settings.PlayerIconScale=MapDefaults.PlayerIconScale;changed=true;}
+        ImGui.BeginDisabled(!settings.ShowViewCone);
+        try
+        {
+            var cone=MapViewSettings.ClampMarker(settings.ViewConeScale)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.ViewConeScale"),ref cone,50,300,"%.0f %%")){settings.ViewConeScale=cone/100;changed=true;}
+            Tip("SettingTips.ViewConeScale");
+            if(DefaultButton("ViewConeScale",settings.ViewConeScale!=MapDefaults.ViewConeScale)){settings.ViewConeScale=MapDefaults.ViewConeScale;changed=true;}
+            var coneOpacity=MapViewSettings.ClampConeOpacity(settings.ViewConeOpacity)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.ViewConeOpacity"),ref coneOpacity,0,100,"%.0f %%")){settings.ViewConeOpacity=coneOpacity/100;changed=true;}
+            Tip("SettingTips.ViewConeOpacity");
+            if(DefaultButton("ViewConeOpacity",settings.ViewConeOpacity!=MapDefaults.ViewConeOpacity)){settings.ViewConeOpacity=MapDefaults.ViewConeOpacity;changed=true;}
+            var coneColour=settings.ViewConeColor ?? new Vector3(UI.FfxivTheme.Gold.X,UI.FfxivTheme.Gold.Y,UI.FfxivTheme.Gold.Z);
+            if(ImGui.ColorEdit3(localization.Get("MapView.ViewConeColor")+"##ViewConeColor",ref coneColour,ImGuiColorEditFlags.NoInputs)){settings.ViewConeColor=coneColour;changed=true;}
+            Tip("SettingTips.ViewConeColor");
+            if(DefaultButton("ViewConeColor",settings.ViewConeColor is not null)){settings.ViewConeColor=null;changed=true;}
+        }
+        finally{ImGui.EndDisabled();}
+        FinishMapSettings(changed);
+    }
+
+    // X-449: zoom, scale and opacity
+    private void DrawMapAppearanceSettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.OverlayControls",settings.OverlayControls,value=>settings.OverlayControls=value,MapDefaults.OverlayControls);
+        ImGui.BeginDisabled(!settings.OverlayControls);
+        try{ImGui.Indent();changed|=SettingBox("MapView.OverlayZoneName",settings.OverlayZoneName,value=>settings.OverlayZoneName=value,MapDefaults.OverlayZoneName);ImGui.Unindent();}
+        finally{ImGui.EndDisabled();}
+        var scale=MapViewSettings.ClampScale(settings.IconScale)*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.IconScale"),ref scale,50,200,"%.0f %%")){settings.IconScale=scale/100;changed=true;}
+        Tip("SettingTips.IconScale");
+        if(DefaultButton("IconScale",settings.IconScale!=MapDefaults.IconScale)){settings.IconScale=MapDefaults.IconScale;changed=true;}
+        // 0.542 (P1).
+        ImGui.SetNextItemWidth(160);
+        if(ImGui.BeginCombo(localization.Get("MapView.OpenZoom")+"###MapOpenZoom",localization.Get("MapView.OpenZoom"+settings.OpenZoom)))
+        {
+            foreach(var mode in Enum.GetValues<MapOpenZoom>())
+                if(ImGui.Selectable(localization.Get("MapView.OpenZoom"+mode),settings.OpenZoom==mode)){settings.OpenZoom=mode;changed=true;}
+            ImGui.EndCombo();
+        }
+        Tip("MapView.OpenZoomHelp");
+        if(DefaultButton("OpenZoom",settings.OpenZoom!=MapDefaults.OpenZoom)){settings.OpenZoom=MapDefaults.OpenZoom;changed=true;}
+        if(settings.OpenZoom==MapOpenZoom.Fixed)
+        {
+            var opening=MapProjection.ClampZoom(settings.OpenZoomValue)*100;ImGui.SetNextItemWidth(160);
+            if(ImGui.SliderFloat(localization.Get("MapView.OpenZoomValue"),ref opening,15,400,"%.0f %%")){settings.OpenZoomValue=opening/100;changed=true;}
+            Tip("MapView.OpenZoomValueHelp");
+            if(DefaultButton("OpenZoomValue",settings.OpenZoomValue!=MapDefaults.OpenZoomValue)){settings.OpenZoomValue=MapDefaults.OpenZoomValue;changed=true;}
+        }
+        var focus=MapFocusZoom*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.FocusZoom"),ref focus,15,400,"%.0f %%")){settings.FocusZoom=focus/100;changed=true;}
+        Tip("MapView.FocusZoomHelp");
+        if(DefaultButton("FocusZoom",settings.FocusZoom!=MapDefaults.FocusZoom)){settings.FocusZoom=MapDefaults.FocusZoom;changed=true;}
+        var wheel=(Math.Clamp(float.IsFinite(settings.WheelStep) ? settings.WheelStep:1.15f,1.02f,1.5f)-1)*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.WheelStep"),ref wheel,2,50,"%.0f %%")){settings.WheelStep=1+wheel/100;changed=true;}
+        Tip("MapView.WheelStepHelp");
+        if(DefaultButton("WheelStep",settings.WheelStep!=MapDefaults.WheelStep)){settings.WheelStep=MapDefaults.WheelStep;changed=true;}
+        changed|=SettingBox("MapView.WheelInvert",settings.WheelInvert,value=>settings.WheelInvert=value,MapDefaults.WheelInvert);
+        var follow=MapViewSettings.ClampFollow(settings.ZoomFollow)*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.ZoomFollow"),ref follow,0,100,"%.0f %%")){settings.ZoomFollow=follow/100;changed=true;}
+        Tip("MapView.ZoomFollowHelp");
+        if(DefaultButton("ZoomFollow",settings.ZoomFollow!=MapDefaults.ZoomFollow)){settings.ZoomFollow=MapDefaults.ZoomFollow;changed=true;}
+        var opacity=MapViewSettings.ClampOpacity(settings.Opacity)*100;ImGui.SetNextItemWidth(160);
+        if(ImGui.SliderFloat(localization.Get("MapView.Opacity"),ref opacity,20,100,"%.0f %%")){settings.Opacity=opacity/100;changed=true;}
+        Tip("SettingTips.Opacity");
+        if(DefaultButton("Opacity",settings.Opacity!=MapDefaults.Opacity)){settings.Opacity=MapDefaults.Opacity;changed=true;}
+        FinishMapSettings(changed);
+    }
+
+    // X-449: the coloured areas
+    private void DrawMapAreaSettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=AreaSetting("MapView.AreaQuests",settings.ShowQuestAreas,value=>settings.ShowQuestAreas=value,settings.QuestAreaColor,value=>settings.QuestAreaColor=value,MapDefaults.ShowQuestAreas,MapDefaults.QuestAreaColor);
+        changed|=AreaSetting("MapView.AreaLeves",settings.ShowLeveAreas,value=>settings.ShowLeveAreas=value,settings.LeveAreaColor,value=>settings.LeveAreaColor=value,MapDefaults.ShowLeveAreas,MapDefaults.LeveAreaColor);
+        changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
+        changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
+        changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
+        FinishMapSettings(changed);
+    }
+
+    // X-449: the map window
+    private void DrawMapWindowSettings()
+    {
+        var settings=configuration.MapView;var changed=false;
+        changed|=SettingBox("MapView.ReplaceGameMap",settings.ReplaceGameMap,value=>settings.ReplaceGameMap=value,MapDefaults.ReplaceGameMap);
+        changed|=SettingBox("MapView.Locked",settings.Locked,value=>settings.Locked=value,MapDefaults.Locked);
+        changed|=SettingBox("MapView.HideTitleBar",settings.HideTitleBar,value=>settings.HideTitleBar=value,MapDefaults.HideTitleBar);
+        changed|=SettingBox("MapView.HideBehindGame",settings.HideBehindGame,value=>settings.HideBehindGame=value,MapDefaults.HideBehindGame);
+        changed|=SettingBox("MapView.HideInCombat",settings.HideInCombat,value=>settings.HideInCombat=value,MapDefaults.HideInCombat);
+        changed|=SettingBox("MapView.HideInDuty",settings.HideInDuty,value=>settings.HideInDuty=value,MapDefaults.HideInDuty);
+        FinishMapSettings(changed);
+    }
+
+    // X-449: the icons of the map shown (the one in the Tensho map, else the player's map); no map, no list.
+    private void DrawMapIconSettings()
+    {
+        var settings=configuration.MapView;
+        var catalog=maps.State.Catalog;
+        var map=catalog?.Find(mapViewMapId) ?? mapMarkers?.Overview(mapViewMapId) ?? (mapLive?.State is { MapId:>0 } live ? catalog?.Find(live.MapId):null);
+        if(map is null){ImGui.TextDisabled(localization.Get("MapView.IconsNoMap"));return;}
+        FinishMapSettings(DrawIconSizes(map,settings));
+    }
+
+    // 0.328 (map audit #41): a failed save is said (Common.SaveError), like the other settings. X-76 H4 (0.914): every change
+    // applies at once (the map follows a slider while it is dragged), but the file is written only once no control is held any
+    // more: on release of a slider or a colour picker, when a typed number is left, at once for a box or a « ↺ ».
+    private void FinishMapSettings(bool changed)
+    {
+        mapSettingsPending|=changed;
+        if(mapSettingsPending && !ImGui.IsAnyItemActive())SaveMapSettings();
     }
     // X-76 H4 (0.914): map settings changed in memory and not written yet (a slider, colour or number still held). Any save writes the
     // whole configuration, so a change left pending when the page closes mid-drag is also written by the next save of anything.
@@ -1143,6 +1181,7 @@ internal sealed partial class MainWindow
     {
         var changed=ImGui.Checkbox(localization.Get(key)+"###"+key,ref value);
         if(changed)apply(value);
+        ReachSetting(key);
         // 0.328 (map audit #39): also when greyed (edge kinds, zone name), whose help says what they depend on.
         if(localization.Has(key+"Help"))Tip(key+"Help");
         if(fallback is { } byDefault && DefaultButton(key,value!=byDefault)){apply(byDefault);changed=true;}

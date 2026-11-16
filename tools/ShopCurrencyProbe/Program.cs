@@ -7,6 +7,153 @@ if(args.Length is <1 or >2)throw new ArgumentException("Supply installed sqpack 
 using var data=new GameData(args[0],new LuminaOptions{DefaultExcelLanguage=Language.French,CacheFileResources=false});
 // PROBE_SRANK (X-76 P5, 0.931): the notorious monsters of every territory (TerritoryType.NotoriousMonsterTerritory -> NotoriousMonster: BNpcName,
 // Rank), to check Tensho's S rank table (Hunting/SRankConditions.cs) against the game; read-only.
+// X-462 (0.1464): territories drawn on several maps of the same frame (same territory, scale and offset) but with their own marker range: the
+// floors of a city (Eulmore: The Root, The Trunk, The Canopy). PROBE_FLOORS=all lists them; PROBE_FLOORS=<territory> also prints each map, the
+// map ranges of the territory's layouts (LayerEntryType.MapRange: the map the game opens in a box of the world) and the Level vendors per map.
+if(Environment.GetEnvironmentVariable("PROBE_FLOORS") is { Length:>0 } floorsWanted)
+{
+    var mapRows=data.Excel.GetSheet<Map>().Where(map=>map.TerritoryType.RowId!=0).ToList();
+    var floorGroups=mapRows.GroupBy(map=>(map.TerritoryType.RowId,map.SizeFactor,map.OffsetX,map.OffsetY))
+        .Where(group=>group.Select(map=>map.MapMarkerRange).Distinct().Count()>1).ToList();
+    Console.WriteLine($"FLOORS territories={floorGroups.Select(group=>group.Key.Item1).Distinct().Count()} frames={floorGroups.Count}");
+    foreach(var group in floorGroups.OrderBy(group=>group.Key.Item1))
+        Console.WriteLine($"FLOORS territory {group.Key.Item1} '{group.First().TerritoryType.Value.PlaceName.Value.Name.ExtractText()}' maps "
+            +string.Join(", ",group.Select(map=>$"{map.RowId} '{map.Id.ExtractText()}' sub='{map.PlaceNameSub.Value.Name.ExtractText()}' markers={map.MapMarkerRange} index={map.MapIndex}")));
+    // X-480 (0.1469, review of 0.1467 I2): PROBE_FLOORS=check: every territory whose planmap.lgb boxes name two maps or more (where the plugin's
+    // MapFloors.MapOf applies): the frame of each box's map against the territory's map, and each Level placement (its own map known) against the
+    // map MapOf gives it (same, another, none). Read-only; the result goes to docs/evidence/0.1469-map-floors-check.md.
+    if(floorsWanted=="check")
+    {
+        var mapSheet=data.Excel.GetSheet<Map>();
+        var levelsByTerritory=data.Excel.GetSheet<Level>().Where(level=>level.Map.RowId!=0).GroupBy(level=>level.Territory.RowId).ToDictionary(group=>group.Key,group=>group.ToList());
+        var seenBg=new HashSet<string>();
+        int layered=0,differentFrame=0;
+        var totals=new Dictionary<string,int>();
+        foreach(var territory in data.Excel.GetSheet<TerritoryType>())
+        {
+            if(territory.Map.RowId==0 || !territory.Map.IsValid)continue;
+            var bg=territory.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+            if(cut<0)continue;
+            var planmap=$"bg/{bg[..(cut+1)]}level/planmap.lgb";
+            if(!data.FileExists(planmap) || data.GetFile<Lumina.Data.Files.LgbFile>(planmap) is not { } planFile)continue;
+            var ranges=new List<(uint Map,System.Numerics.Vector3 At,System.Numerics.Vector3 Half,float Turn)>();
+            foreach(var layer in planFile.Layers)foreach(var instance in layer.InstanceObjects)
+                if(instance.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.MapRange && instance.Object is Lumina.Data.Parsing.Layer.LayerCommon.MapRangeInstanceObject box && box.Map!=0)
+                    ranges.Add((box.Map,new(instance.Transform.Translation.X,instance.Transform.Translation.Y,instance.Transform.Translation.Z),
+                        new(instance.Transform.Scale.X,instance.Transform.Scale.Y,instance.Transform.Scale.Z),instance.Transform.Rotation.Y));
+            var boxMaps=ranges.Select(range=>range.Map).Distinct().ToList();
+            if(boxMaps.Count<2)continue;
+            layered++;
+            var home=territory.Map.Value;
+            uint At(float x,float y,float z)
+            {
+                uint best=0;var volume=float.MaxValue;
+                foreach(var (boxMap,at,half,turn) in ranges)
+                {
+                    var dx=x-at.X;var dz=z-at.Z;var cos=MathF.Cos(-turn);var sin=MathF.Sin(-turn);
+                    var lx=dx*cos-dz*sin;var lz=dx*sin+dz*cos;
+                    if(MathF.Abs(lx)<=half.X && MathF.Abs(y-at.Y)<=half.Y && MathF.Abs(lz)<=half.Z && half.X*half.Y*half.Z<volume){best=boxMap;volume=half.X*half.Y*half.Z;}
+                }
+                return best;
+            }
+            var frames=string.Join("; ",boxMaps.Select(id=>
+            {
+                var row=mapSheet.GetRowOrDefault(id);
+                if(row is not { } m)return $"{id} missing";
+                var same=m.SizeFactor==home.SizeFactor && m.OffsetX==home.OffsetX && m.OffsetY==home.OffsetY;
+                if(!same)differentFrame++;
+                return $"{id} '{m.Id.ExtractText()}' t{m.TerritoryType.RowId} size {m.SizeFactor} offset {m.OffsetX},{m.OffsetY} markers {m.MapMarkerRange} {(same ? "same frame":"OTHER FRAME")}";
+            }));
+            // The plugin's rule since 0.1469 (MapFloors.Floors, then MapOf), on the same boxes.
+            TenshoAssistant.Maps.MapFloorFrame? FrameOf(uint id)=>mapSheet.GetRowOrDefault(id) is { } m
+                ? new TenshoAssistant.Maps.MapFloorFrame(m.RowId,m.TerritoryType.RowId,m.SizeFactor,m.OffsetX,m.OffsetY,m.MapMarkerRange):null;
+            var floors=TenshoAssistant.Maps.MapFloors.Floors([.. ranges.Select(range=>new TenshoAssistant.Maps.MapFloorRange(range.Map,range.At.X,range.At.Y,range.At.Z,
+                range.Half.X,range.Half.Y,range.Half.Z,range.Turn))],FrameOf(home.RowId)!.Value,FrameOf);
+            var keeps=TenshoAssistant.Maps.MapFloors.Layered(floors);
+            if(keeps)totals["floors.territories"]=totals.GetValueOrDefault("floors.territories")+1;
+            Console.WriteLine($"LAYERED territory {territory.RowId} '{territory.PlaceName.ValueNullable?.Name.ExtractText()}' bg '{bg}' map {home.RowId} size {home.SizeFactor} offset {home.OffsetX},{home.OffsetY} markers {home.MapMarkerRange}{(seenBg.Add(bg) ? "":" (layout shared)")}; boxes {ranges.Count}: {frames}");
+            Console.WriteLine($"  FLOORS 0.1469: {(keeps ? $"floors {string.Join(", ",floors.Select(range=>range.MapId).Distinct())}":"none (the territory's map for every placement)")}");
+            foreach(var group in (levelsByTerritory.GetValueOrDefault(territory.RowId) ?? []).GroupBy(level=>level.Type==8 ? "npc":"other"))
+            {
+                int same=0,other=0,none=0,homeNone=0,offMaps=0,nowSame=0,nowHome=0,nowWrong=0,nowFloor=0;
+                foreach(var level in group)
+                {
+                    var got=At(level.X,level.Y,level.Z);
+                    if(!boxMaps.Contains(level.Map.RowId) && level.Map.RowId!=home.RowId)offMaps++;
+                    if(got==level.Map.RowId)same++;
+                    else if(got==0){none++;if(level.Map.RowId==home.RowId)homeNone++;}
+                    else other++;
+                    var now=TenshoAssistant.Maps.MapFloors.MapOf(floors,home.RowId,level.X,level.Y,level.Z);
+                    // variant: a point held by boxes of two floors stays on the territory's map
+                    var holding=floors.Where(range=>TenshoAssistant.Maps.MapFloors.Contains(range,level.X,level.Y,level.Z)).Select(range=>range.MapId).Distinct().ToList();
+                    var alt=TenshoAssistant.Maps.MapFloors.Layered(floors) && holding.Count==1 ? holding[0]:home.RowId;
+                    totals[$"alt.{group.Key}.{(alt==level.Map.RowId ? "same":alt==home.RowId ? "home":"wrong")}"]=totals.GetValueOrDefault($"alt.{group.Key}.{(alt==level.Map.RowId ? "same":alt==home.RowId ? "home":"wrong")}")+1;
+                    if(holding.Count>1)totals[$"ambiguous.type{level.Type}"]=totals.GetValueOrDefault($"ambiguous.type{level.Type}")+1;
+                    if(now==level.Map.RowId){nowSame++;if(now!=home.RowId)nowFloor++;}
+                    else if(now==home.RowId)nowHome++;
+                    else
+                    {
+                        nowWrong++;totals[$"wrong.type{level.Type}"]=totals.GetValueOrDefault($"wrong.type{level.Type}")+1;
+                        if(level.Type is 8 or 45)Console.WriteLine($"  WRONG level {level.RowId} type {level.Type} object {level.Object.RowId} at {level.X:0.0},{level.Y:0.0},{level.Z:0.0}: its map {level.Map.RowId}, 0.1469 {now}");
+                    }
+                    if(now!=home.RowId && now==level.Map.RowId)totals[$"floor.type{level.Type}"]=totals.GetValueOrDefault($"floor.type{level.Type}")+1;
+                }
+                foreach(var (key,value) in new[]{("same",same),("other",other),("none",none),("homeNone",homeNone),("offMaps",offMaps),("all",group.Count()),
+                                                 ("now.same",nowSame),("now.floor",nowFloor),("now.home",nowHome),("now.wrong",nowWrong)})
+                    totals[$"{group.Key}.{key}"]=totals.GetValueOrDefault($"{group.Key}.{key}")+value;
+                Console.WriteLine($"  LEVEL {group.Key}: {group.Count()} placements: MapOf of 0.1464 gives their own map {same}, another map {other}, none {none} (of which on the territory's map {homeNone}); their map neither the territory's nor a box's {offMaps}");
+                Console.WriteLine($"  LEVEL {group.Key} 0.1469: their own map {nowSame} (on a floor other than the territory's map {nowFloor}), the territory's map instead of theirs {nowHome}, another map {nowWrong}");
+            }
+        }
+        Console.WriteLine($"CHECK layered territories {layered}, box maps of another frame {differentFrame}; totals: {string.Join(", ",totals.OrderBy(pair=>pair.Key).Select(pair=>$"{pair.Key} {pair.Value}"))}");
+        return;
+    }
+    if(uint.TryParse(floorsWanted,out var floorTerritory))
+    {
+        var territoryRow=data.Excel.GetSheet<TerritoryType>().GetRow(floorTerritory);
+        Console.WriteLine($"TERRITORY {floorTerritory} default map {territoryRow.Map.RowId} bg '{territoryRow.Bg.ExtractText()}'");
+        var bg=territoryRow.Bg.ExtractText();var cut=bg.IndexOf("/level/",StringComparison.Ordinal);
+        foreach(var kind in new[]{"bg","planmap","planevent","planner","planlive"})
+        {
+            var layoutPath=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";
+            if(!data.FileExists(layoutPath))continue;
+            var file=data.GetFile<Lumina.Data.Files.LgbFile>(layoutPath);if(file is null)continue;
+            foreach(var layer in file.Layers)foreach(var instance in layer.InstanceObjects)
+            {
+                if(instance.AssetType!=Lumina.Data.Parsing.Layer.LayerEntryType.MapRange)continue;
+                var range=(Lumina.Data.Parsing.Layer.LayerCommon.MapRangeInstanceObject)instance.Object;
+                var t=instance.Transform.Translation;var s=instance.Transform.Scale;
+                Console.WriteLine($"MAPRANGE [{kind}] instance {instance.InstanceId} map {range.Map} place {range.PlaceNameBlock}/{range.PlaceNameSpot} at {t.X:0.0},{t.Y:0.0},{t.Z:0.0} scale {s.X:0.0},{s.Y:0.0},{s.Z:0.0} rotation {instance.Transform.Rotation.Y:0.00} layer '{layer.Name}'");
+            }
+        }
+        // The boxes with a map, as the plugin reads them (half extents, turned about Y): does each Level NPC fall in its own map's box?
+        var boxes=new List<(uint Map,System.Numerics.Vector3 At,System.Numerics.Vector3 Half,float Turn)>();
+        foreach(var kind in new[]{"planmap"})
+        {
+            var layoutPath=$"bg/{bg[..(cut+1)]}level/{kind}.lgb";
+            if(!data.FileExists(layoutPath) || data.GetFile<Lumina.Data.Files.LgbFile>(layoutPath) is not { } boxFile)continue;
+            foreach(var layer in boxFile.Layers)foreach(var instance in layer.InstanceObjects)
+                if(instance.AssetType==Lumina.Data.Parsing.Layer.LayerEntryType.MapRange && instance.Object is Lumina.Data.Parsing.Layer.LayerCommon.MapRangeInstanceObject box && box.Map!=0)
+                    boxes.Add((box.Map,new(instance.Transform.Translation.X,instance.Transform.Translation.Y,instance.Transform.Translation.Z),
+                        new(instance.Transform.Scale.X,instance.Transform.Scale.Y,instance.Transform.Scale.Z),instance.Transform.Rotation.Y));
+        }
+        uint BoxAt(float x,float y,float z)
+        {
+            uint best=0;var volume=float.MaxValue;
+            foreach(var (boxMap,at,half,turn) in boxes)
+            {
+                var dx=x-at.X;var dz=z-at.Z;var cos=MathF.Cos(-turn);var sin=MathF.Sin(-turn);
+                var lx=dx*cos-dz*sin;var lz=dx*sin+dz*cos;
+                if(MathF.Abs(lx)<=half.X && MathF.Abs(y-at.Y)<=half.Y && MathF.Abs(lz)<=half.Z && half.X*half.Y*half.Z<volume){best=boxMap;volume=half.X*half.Y*half.Z;}
+            }
+            return best;
+        }
+        foreach(var group in data.Excel.GetSheet<Level>().Where(level=>level.Territory.RowId==floorTerritory && level.Type==8).GroupBy(level=>level.Map.RowId))
+            Console.WriteLine($"LEVELNPC map {group.Key}: {group.Count()} placements, heights {group.Min(level=>level.Y):0.0} to {group.Max(level=>level.Y):0.0}, "
+                +$"in the box of their map {group.Count(level=>BoxAt(level.X,level.Y,level.Z)==group.Key)}, in another box {group.Count(level=>BoxAt(level.X,level.Y,level.Z) is not 0 && BoxAt(level.X,level.Y,level.Z)!=group.Key)}, in none {group.Count(level=>BoxAt(level.X,level.Y,level.Z)==0)}");
+    }
+    return;
+}
 if(Environment.GetEnvironmentVariable("PROBE_SRANK") is { Length:>0 })
 {
     var names=data.Excel.GetSheet<BNpcName>(Language.English);

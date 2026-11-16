@@ -17,7 +17,32 @@ internal static class UiComponents
     /// <summary>A collapsing section header in the game's title font (every section header goes through here).</summary>
     public static bool Header(string label, ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.None)
     {
+        Unfold(label, true, flags.HasFlag(ImGuiTreeNodeFlags.DefaultOpen));
         using (PushSectionFont()) return ImGui.CollapsingHeader(label, flags);
+    }
+
+    /// <summary>X-507: a tree node that opens, like the headers, while the Settings page looks for the setting a search chose.</summary>
+    public static bool TreeNode(string label)
+    {
+        Unfold(label, false, false);
+        return ImGui.TreeNode(label);
+    }
+
+    /// <summary>
+    /// X-507: set by the Settings page while it is drawn (null elsewhere): while it looks for the setting a search chose, the headers and tree
+    /// nodes open so that the setting is drawn; X-521 M1: once it is found, those not around it that were folded before fold back.
+    /// </summary>
+    public static SettingFocus? Focus { get; set; }
+
+    private static void Unfold(string label, bool header, bool openByDefault)
+    {
+        var focus = Focus;
+        if (focus is null) return;
+        var id = ImGui.GetID(label);
+        if (focus.FoldBack(id)) { ImGui.SetNextItemOpen(false); return; }
+        if (!focus.Opening) return;
+        var openNow = ImGui.GetStateStorage().GetInt(id, openByDefault ? 1 : 0) != 0;
+        if (focus.Open(id, openNow, header, ImGui.GetCursorScreenPos().X, ImGui.GetFrameCount())) ImGui.SetNextItemOpen(true);
     }
 
     private static float Scale=>Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;

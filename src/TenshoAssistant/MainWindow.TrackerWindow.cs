@@ -61,10 +61,10 @@ internal sealed partial class MainWindow
     internal Func<IReadOnlyList<UI.GameWindow>>? GameWindowSource { get; set; }
     internal IReadOnlyList<UI.GameWindow> GameWindowList=>GameWindowSource?.Invoke() ?? [];
     internal bool HidePanelsBehindGame=>configuration.HidePanelsBehindGame;
-    private bool BehindGame(Vector2 at,Vector2 size)
+    private bool BehindGame(Vector2 at,Vector2 size,bool chat=false)
     {
         var screen=ImGui.GetMainViewport().Size;
-        return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y);
+        return UI.GameWindows.Covers(GameWindowList,at.X,at.Y,size.X,size.Y,screen.X,screen.Y,chat:chat);
     }
     internal bool BarBehindGame(Vector2 at,Vector2 size,string? name=null)
     {
@@ -73,7 +73,7 @@ internal sealed partial class MainWindow
         if(name is not null && panelsBehind.GetValueOrDefault(name)!=behind && developerMode)
         {
             panelsBehind[name]=behind;
-            log.Information("Panel {0} {1}: at {2}, size {3}; windows: {4}.",name,behind ? "steps aside":"comes back",at,size,string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
+            log.Information("Panel {0} {1}: at {2}, size {3}; windows: {4}.",name,behind ? "steps aside":"comes back",at,size,string.Join(", ",GameWindowList.Where(window=>!UI.GameWindows.ChatOnlyWindow(window.Name) && UI.GameWindows.Touch(at.X,at.Y,size.X,size.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
         }
         return behind;
     }

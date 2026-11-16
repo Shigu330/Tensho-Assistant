@@ -247,6 +247,30 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>{},dutyGuides.Dispose);
             mainWindow.DutyGuides=dutyGuides;
             mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
+            // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
+            // the same one a click in the game's chat calls), run on the game's thread on the player's click. X-496 M1 (0.1478): its message
+            // is the link's own string (from the link to its end), as Dalamud passes it (docs/evidence/0.1478-dalamud-link-handler.md); a
+            // failure is said on the link's tooltip, not only in the log.
+            mainWindow.DalamudLinkKnown=(plugin,command)=>chatGui.RegisteredLinkHandlers.ContainsKey((plugin,command));
+            // X-484 (0.1482): the game's log filters, in the client's language (docs/evidence/0.1482-chat-log-filters.md).
+            mainWindow.ChatFilterSource=()=>data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()
+                .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText())).ToList();
+            mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
+            {
+                if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
+                _=framework.RunOnFrameworkThread(()=>
+                {
+                    // X-498 M2 (0.1480): re-reading the link's string is Tensho's part: a failure there is logged as Tensho's, and the handler
+                    // gets the link's text instead; only an error of the handler itself is said to be the plugin's.
+                    var message=new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text));
+                    if(data is { Length:>0 })
+                        try{message=Dalamud.Game.Text.SeStringHandling.SeString.Parse(data);}
+                        catch(Exception error){log.Warning(error,"Tensho could not re-read a link of the chat window ({0}): its text is passed instead.",plugin);}
+                    try{handler(command,message);}
+                    catch(Exception error){mainWindow.DalamudLinkFailed=plugin;log.Warning(error,"A link of the chat window could not be opened by its plugin ({0}).",plugin);}
+                });
+                return true;
+            };
             // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
             // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
             // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English
@@ -397,8 +421,9 @@ public sealed partial class Plugin : IDalamudPlugin
                             int.TryParse(parts[^2],System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var ringMinutes)
                                 ? UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,ringMinutes)),(key,first,second)=>localization.Format(key,first,second)):parts[^2],
                             parts[^1]));
-                    if(mainWindow.AlarmPlace(alarm) is { } place)
-                        message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
+                    // X-509 (review of 0.1490): the whole place link (arrow, place and coordinates, end), not AddMapLink's bare start.
+                    if(mainWindow.AlarmPlace(alarm) is { } place && Alarms.AlarmPlaceLink.Build(place.TerritoryId,place.MapId,place.X,place.Y,log) is { } placeLink)
+                        message.AddText(" ").Append(placeLink);
                     // 0.774 (X-03, user report and Dalamud's console in verbose): the game never handed the « Open in Tensho » link to Dalamud; it took it for an
                     // item tooltip. The ring now carries the game's own item link: hovering shows the item, a right click opens its menu, where Tensho's entry is.
                     if(alarm.ItemId is > 0 and < uint.MaxValue)
@@ -489,6 +514,9 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
+            // X-467 (0.1502): where the game's chat puts its typing box and its message panels, in developer mode (read-only).
+            Chat.ChatLogLayoutProbe? chatLayoutProbe=null;
+            registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose());
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),
@@ -771,7 +799,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
             // X-153 (0.1443): the chat family (the Tensho chat window's reader, the chat's map links, the link under the mouse) is wired in Plugin.Chat.cs.
-            RegisterChat(configuration,client,addonLifecycle);
+            RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory());
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
@@ -1311,12 +1339,15 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-01 C1.1 (0.1184): the heap and the load contexts with each load line; the previous instance's context is held weakly in a
             // process-wide slot, read before this one replaces it (measurement only, no collection forced).
             var previousContext=AppDomain.CurrentDomain.GetData(Diagnostics.LoadMemory.PreviousSlot) as WeakReference;
+            // X-433 (0.1459): the load's rank in the game process (the frame gaps after a load grow with the heap the reloads leave).
+            var loadRank=Diagnostics.LoadMemory.NextRank(AppDomain.CurrentDomain.GetData(Diagnostics.LoadMemory.RankSlot));
+            AppDomain.CurrentDomain.SetData(Diagnostics.LoadMemory.RankSlot,loadRank);
             AppDomain.CurrentDomain.SetData(Diagnostics.LoadMemory.PreviousSlot,new WeakReference(System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(Plugin).Assembly)));
             string Memory()
             {
                 var contexts=System.Runtime.Loader.AssemblyLoadContext.All.Select(context=>context.Name).ToArray();
                 // X-433 (0.1447): with the process's private memory and the machine's (a collection « induced for low memory »).
-                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive)
+                return Diagnostics.LoadMemory.Describe(GC.GetGCMemoryInfo().HeapSizeBytes,GC.GetTotalMemory(false),Diagnostics.LoadMemory.Named(contexts,"TenshoAssistant"),contexts.Length,previousContext?.IsAlive,loadRank)
                     +"; "+Diagnostics.MachineMemory.Text(Diagnostics.MachineMemory.Read(),Diagnostics.MachineMemory.ProcessPrivateBytes());
             }
             void SayLoad(string when)=>log.Information("Load {When}: {Milliseconds} ms since the start, runtime pauses {Pauses} ms, {Collections} full collections, on thread {Thread}; {Memory}.",

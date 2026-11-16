@@ -48,7 +48,7 @@ internal static class SettingRows915Tests
         return found;
     }
 
-    private static readonly Regex Helper=new(@"(?<![\w.])(BoolSetting|IntSetting|SliderSetting|ComboSetting|DiscordText|SettingBox|AreaSetting)(?:<[^>()]*>)?\(");
+    private static readonly Regex Helper=new(@"(?<![\w.])(BoolSetting|IntSetting|SliderSetting|ComboSetting|DiscordText|SettingBox|AreaSetting|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(");
     private static readonly Regex Declaration=new(@"(private|static|bool|void)\s+$");
 
     /// <summary>Every call of a setting helper in the main window: the helper, its tooltip key, its arguments and where it is.</summary>

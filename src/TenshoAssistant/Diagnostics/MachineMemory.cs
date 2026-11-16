@@ -28,13 +28,15 @@ public static class MachineMemory
         catch(Exception){return null;}
     }
 
-    /// <summary>This process's private memory in bytes; -1 when it could not be read.</summary>
+    /// <summary>This process's private memory in bytes (its commit charge); -1 off Windows or when it could not be read. X-453 M2 (0.1457):
+    /// K32GetProcessMemoryInfo on this process alone; Process.PrivateMemorySize64 listed every process of the machine at each load.</summary>
     public static long ProcessPrivateBytes()
     {
+        if(!OperatingSystem.IsWindows())return -1;
         try
         {
-            using var self=System.Diagnostics.Process.GetCurrentProcess();
-            return self.PrivateMemorySize64;
+            var counters=new Native.ProcessCounters{Size=(uint)Marshal.SizeOf<Native.ProcessCounters>()};
+            return Native.GetProcessMemoryInfo(Native.GetCurrentProcess(),ref counters,counters.Size) ? (long)Math.Min((ulong)counters.PrivateUsage,long.MaxValue):-1;
         }
         catch(Exception){return -1;}
     }
@@ -79,6 +81,31 @@ public static class MachineMemory
         [DllImport("kernel32.dll",SetLastError=true)]
         [return:MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GlobalMemoryStatusEx(ref MemoryStatus buffer);
+
+        /// <summary>PROCESS_MEMORY_COUNTERS_EX (psapi.h).</summary>
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct ProcessCounters
+        {
+            internal uint Size;
+            internal uint PageFaultCount;
+            internal nuint PeakWorkingSetSize;
+            internal nuint WorkingSetSize;
+            internal nuint QuotaPeakPagedPoolUsage;
+            internal nuint QuotaPagedPoolUsage;
+            internal nuint QuotaPeakNonPagedPoolUsage;
+            internal nuint QuotaNonPagedPoolUsage;
+            internal nuint PagefileUsage;
+            internal nuint PeakPagefileUsage;
+            internal nuint PrivateUsage;
+        }
+
+        /// <summary>A pseudo-handle of this process: nothing to close.</summary>
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr GetCurrentProcess();
+
+        [DllImport("kernel32.dll",EntryPoint="K32GetProcessMemoryInfo",SetLastError=true)]
+        [return:MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetProcessMemoryInfo(IntPtr process,ref ProcessCounters counters,uint size);
     }
 }
 

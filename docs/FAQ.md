@@ -22,7 +22,7 @@ A check mark: the game confirms it; a cross: it says no; a question mark: it has
 
 ## How do I change the language?
 
-Settings › General › Language. English and French are complete. German and Japanese are partial (marked « (partial) » in the menu): only a few titles are translated and the rest shows in English, so Tensho starts in English with a German or Japanese game client; you can still pick them. Game data (item, place and quest names) stays in the game client's language.
+Settings › General › Language and theme › « Language ». English and French are complete. German and Japanese are partial (marked « (partial) » in the menu): only a few titles are translated and the rest shows in English, so Tensho starts in English with a German or Japanese game client; you can still pick them. Game data (item, place and quest names) stays in the game client's language.
 
 ## What goes on the Internet?
 
@@ -58,7 +58,11 @@ Tensho adds small panels next to some game windows (character sheet, Duty Finder
 
 ## What is the Tensho chat window?
 
-An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads: the game's chat stays where it is, never hidden, and nothing is sent from it. Messages stay in memory only, are never saved on disk, and are cleared when you turn the window off or log out. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads: the game's chat stays where it is, never hidden, and nothing is sent from it. Messages stay in memory and are cleared when you turn the window off or log out; only if you turn on « Keep the chat history on this PC » in its settings (off by default, asked first) are they also kept on this PC, per character, within the bounds you set, never sent anywhere, until you erase them. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+
+## Does Tensho keep my chat messages?
+
+Not by default. Only if you tick « Keep the chat history on this PC » in the Tensho chat window's settings, and say yes to the question that follows, are the messages of its tabs kept on this PC: one file per character in Tensho's folder (ChatHistory), the last messages and days you set (2,000 messages and 30 days by default; each can also be set to « No limit » to keep everything, and the place it takes on this PC is shown in the same settings), other players' names and words included, so that they show again after Tensho reloads or the game restarts. Tensho never sends them anywhere and does not read the chat in PvP or ranked play. « Erase the history », in the same settings, deletes every file; unticking the setting keeps nothing more.
 
 ## Why does Tensho stop in PvP, and why does its map give way in a deep dungeon?
 
@@ -144,7 +148,7 @@ Une coche : le jeu le confirme ; une croix : il dit non ; un point d'interrogati
 
 ## Comment changer la langue ?
 
-Paramètres › Général › Langue. L'anglais et le français sont complets. L'allemand et le japonais sont partiels (marqués « (partiel) » dans le menu) : seuls quelques titres sont traduits et le reste s'affiche en anglais, donc Tensho démarre en anglais avec un client du jeu allemand ou japonais ; vous pouvez quand même les choisir. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
+Paramètres › Général › Langue et thème › « Langue ». L'anglais et le français sont complets. L'allemand et le japonais sont partiels (marqués « (partiel) » dans le menu) : seuls quelques titres sont traduits et le reste s'affiche en anglais, donc Tensho démarre en anglais avec un client du jeu allemand ou japonais ; vous pouvez quand même les choisir. Les données du jeu (noms d'objets, de lieux et de quêtes) restent dans la langue du client du jeu.
 
 ## Qu'est-ce qui part sur Internet ?
 
@@ -180,7 +184,11 @@ Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche 
 
 ## Qu'est-ce que la fenêtre de chat Tensho ?
 
-Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire : le chat du jeu reste à sa place, jamais caché, et rien n'est envoyé depuis elle. Les messages restent en mémoire seulement, ne sont jamais enregistrés sur le disque et sont effacés quand vous désactivez la fenêtre ou vous déconnectez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
+Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire : le chat du jeu reste à sa place, jamais caché, et rien n'est envoyé depuis elle. Les messages restent en mémoire et sont effacés quand vous désactivez la fenêtre ou vous déconnectez ; c'est seulement si vous activez « Garder l'historique du chat sur ce PC » dans ses réglages (désactivé par défaut, avec votre accord demandé d'abord) qu'ils sont aussi gardés sur ce PC, par personnage, dans les limites que vous fixez, jamais envoyés, jusqu'à ce que vous les effaciez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
+
+## Tensho garde-t-il mes messages du chat ?
+
+Pas par défaut. C'est seulement si vous cochez « Garder l'historique du chat sur ce PC » dans les réglages de la fenêtre de chat Tensho, et répondez oui à la question qui suit, que les messages de ses onglets sont gardés sur ce PC : un fichier par personnage dans le dossier de Tensho (ChatHistory), les derniers messages et jours que vous fixez (2 000 messages et 30 jours par défaut ; chacun peut aussi être réglé sur « Sans limite » pour tout garder, et la place prise sur ce PC s'affiche dans les mêmes réglages), noms et mots des autres joueurs compris, pour les réafficher après un rechargement de Tensho ou une relance du jeu. Tensho ne les envoie jamais nulle part et ne lit pas le chat en JcJ ni dans les parties classées. « Effacer l'historique », dans les mêmes réglages, supprime tous les fichiers ; décocher le réglage ne garde plus rien.
 
 ## Pourquoi Tensho s'arrête-t-il en JcJ, et pourquoi sa carte s'efface-t-elle en donjon sans fond ?
 

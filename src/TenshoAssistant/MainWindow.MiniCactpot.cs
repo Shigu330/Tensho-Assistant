@@ -100,7 +100,7 @@ internal sealed partial class MainWindow
         if(windowDisposed)return;
         DrawGoldSaucerTimes();
         var observation=cactpotObservation.State;var enabled=observation.Enabled;
-        DrawToolSettingsLink("MiniCactpot");
+        DrawToolSettingsLink("MiniCactpot","Games");
         ImGui.TextDisabled(enabled ? localization.Get("CactpotUi.Observed"):localization.Get("CactpotUi.Manual"));
         SyncCactpot(observation);
         cactpotSolve.ValidateContext(enabled ? cactpotObservedOwner:0,cactpotGeneration);

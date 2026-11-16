@@ -9,17 +9,26 @@ namespace TenshoAssistant.Chat;
 /// X-403 phase 1 (D-166; back from 0.471): copies the messages the game shows (IChatGui.ChatMessageUnhandled: after the other plugins, so what they hide
 /// stays hidden) into the store, while the Tensho chat window is on: the sender's text, the message's text pieces, its kind and its time, as plain
 /// managed data, then returns. Never changes a message and sends nothing. Not read during a competitive cut. Cleared at logout and at unload; nothing
-/// goes to disk.
+/// goes to disk, except to the chat history when the player turned it on (X-475, ChatHistoryKeeper: on this PC only).
 /// </summary>
 internal sealed class ChatReader : IDisposable
 {
     private readonly RegistrationScope registrations=new();
     private readonly IPluginLog log;private readonly Func<ChatSettings> settings;private readonly ChatStore store;
+    private readonly Func<bool>? developer;
+    // X-475: the chat history on disk (null: none, as outside the game).
+    private readonly ChatHistoryKeeper? history;
     private bool disposed,warned;
+    // X-461 (0.1463): developer mode: the kinds of pieces of a message with a link, a few per session (kinds and lengths only, never the words).
+    // X-479 (0.1468): a few per kind of message (loot lines took all twenty on 11/15 before any message of a player); and a link shown without
+    // text of its own (the window writes its target's name) is said apart, with what the game sent for it.
+    private readonly ChatPieceLog piecesSaid=new();
+    private int bareSaid;
+    private const int BareSaidMax=10;
 
-    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store)
+    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null)
     {
-        this.log=log;this.settings=settings;this.store=store;
+        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;
         // One owner for both subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
@@ -39,20 +48,34 @@ internal sealed class ChatReader : IDisposable
             // Turned off (also by « restore every setting »): what was kept goes at the next message.
             if(!current.WindowOpen){if(store.Count>0)store.Clear();return;}
             // X-403 phase 2 (0.1441): the links too (a place or an item), with the text that shows them; a link whose target cannot be
-            // read stays plain text.
-            var pieces=new List<ChatPiece>();
-            foreach(var payload in message.Message.Payloads)
-                switch(payload)
+            // read stays plain text. X-479 (0.1468): each payload told apart here (ChatPayload, pure), the rest in ChatPayloads.
+            var payloads=message.Message.Payloads.Select(Payload).ToList();
+            // X-496 M1 (0.1478): a link of Dalamud or of a plugin keeps its own string (from the link to its end), the one Dalamud passes
+            // to its handler (docs/evidence/0.1478-dalamud-link-handler.md).
+            for(var index=0;index<payloads.Count;index++)
+                if(payloads[index] is { Kind:ChatPayloadKind.Dalamud,Link:{ } link })
                 {
-                    case MapLinkPayload map:pieces.Add(new(null,MapLink(map)));break;
-                    case ItemPayload item:pieces.Add(new(null,new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)));break;
-                    // 0.1442: a quest link.
-                    case QuestPayload quest:pieces.Add(new(null,new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)));break;
-                    case RawPayload raw when raw.Equals(RawPayload.LinkTerminator):pieces.Add(new(null,End:true));break;
-                    case ITextProvider text:pieces.Add(new(text.Text));break;
+                    var last=ChatPayloads.LinkLast(payloads,index);
+                    payloads[index]=payloads[index] with{Link=link with{Data=new SeString(message.Message.Payloads.Skip(index).Take(last-index+1).ToList()).Encode()}};
                 }
-            var body=ChatPieces.Segments(pieces);
-            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,message.Sender.TextValue,body,current.BoundedMaxLines);
+            var body=ChatPayloads.Segments(payloads);
+            if(developer?.Invoke()==true && ChatPayloads.HasLink(payloads))
+            {
+                var kind=(int)message.LogKind;
+                if(piecesSaid.Take(kind))
+                    log.Information("Chat window, pieces of a message with a link (kind {0}): {1}.",kind,ChatPayloads.Describe(payloads));
+                if(bareSaid<BareSaidMax && ChatPayloads.Bare(body)>0)
+                {
+                    bareSaid++;
+                    log.Information("Chat window, a link without text of its own (kind {0}), its target's name written instead: {1}.",kind,ChatPayloads.Describe(payloads));
+                }
+            }
+            // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
+            var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
+            // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
+            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
+            // X-475: kept on disk too when the player turned the history on.
+            history?.Keep(record);
             warned=false;
         }
         catch(Exception error)
@@ -60,6 +83,22 @@ internal sealed class ChatReader : IDisposable
             if(!warned){warned=true;log.Warning(error,"A chat message could not be copied for the Tensho chat window.");}
         }
     }
+
+    /// <summary>X-479 (0.1468): one of the game's payloads as the reader tells it apart (ChatPayload: pure, replayed by the tests on recorded messages).</summary>
+    internal static ChatPayload Payload(Payload payload)=>payload switch
+    {
+        MapLinkPayload map=>new(ChatPayloadKind.Map,"MapLink",Link:MapLink(map)),
+        ItemPayload item=>new(ChatPayloadKind.Item,"Item",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),
+        // 0.1442: a quest link.
+        QuestPayload quest=>new(ChatPayloadKind.Quest,"Quest",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),
+        // X-474 (0.1477): a link of Dalamud or of a plugin (« Learn more here » of « Developer Mode is enabled »): its plugin and command.
+        DalamudLinkPayload dalamud=>new(ChatPayloadKind.Dalamud,"DalamudLink",Link:new ChatLink(ChatSegmentKind.DalamudLink,Plugin:dalamud.Plugin ?? "",CommandId:dalamud.CommandId)),
+        RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,"LinkEnd"),
+        ITextProvider text=>new(ChatPayloadKind.Text,payload.GetType().Name,Text:text.Text),
+        IconPayload icon=>new(ChatPayloadKind.Icon,payload.GetType().Name,Icon:(uint)icon.Icon),
+        RawPayload raw=>new(ChatPayloadKind.Raw,"Raw",Size:raw.Data.Length),
+        _=>new(ChatPayloadKind.Other,payload.GetType().Name),
+    };
 
     private static ChatLink? MapLink(MapLinkPayload map)
     {
@@ -75,5 +114,7 @@ internal sealed class ChatReader : IDisposable
         disposed=true;
         registrations.Dispose();
         store.Clear();
+        // X-475: the history's queue (lines already made) written when it is on, then released.
+        history?.Dispose();
     }
 }

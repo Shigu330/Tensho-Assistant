@@ -45,6 +45,8 @@ internal sealed unsafe class GameWindowsReader : IDisposable
                         if(unit==null || !unit->IsVisible || unit->RootNode==null)continue;
                         var name=unit->NameString;
                         if(name.Length==0 || GameWindows.Ignored(name))continue;
+                        // X-500: the game map Tensho hosts off screen (root node moved, X and Y unchanged) is not on screen.
+                        if(GameWindows.HostedOffScreen(unit->RootNode->X,unit->RootNode->Y))continue;
                         found.Add(new(name,unit->X,unit->Y,unit->RootNode->Width*unit->Scale,unit->RootNode->Height*unit->Scale,layer*1000+999-index));
                     }
                 }

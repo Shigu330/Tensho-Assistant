@@ -1,19 +1,26 @@
 namespace TenshoAssistant.Chat;
 
-public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink }
+/// <remarks>X-474 (0.1477): DalamudLink, a link of Dalamud or of a plugin (its plugin and command).</remarks>
+public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink }
 /// <summary>X-403 phase 2 (0.1441): what a link of a message points to: a place (territory, map, coordinate, place name) or an item (id, high
 /// quality); 0.1442: or a quest (its row in the game's Quest sheet).</summary>
 /// <param name="Url">X-403 phase 2 (0.1453): a web address's absolute form (ChatWeb.Address), for a WebLink.</param>
-public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="");
+/// <param name="Plugin">X-474 (0.1477): a DalamudLink's plugin (« Dalamud » for Dalamud's own), with <paramref name="CommandId"/> its command.</param>
+/// <param name="Data">X-496 M1 (0.1478): a DalamudLink's own string, encoded: its payloads from the link to its end (the link terminator
+/// included), as Dalamud passes it to the link's handler; null when not read (the handler then gets the link's text).</param>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
-public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body);
+/// <param name="Source">X-484 (0.1482): who does it, Dalamud's XivChatRelationKind (0 none), and <paramref name="Target"/> to whom: the
+/// game's log filters tell the combat lines apart by them.</param>
+public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body,byte Source=0,byte Target=0);
 
 /// <summary>
 /// X-403 phase 1 (D-166; back from 0.471): the messages of this session, in memory only (other players' names and words are in them: never written
-/// anywhere), the oldest dropped past the bounded cap. Written from the game's chat event, read by the window, under one lock. It also holds each tab's
+/// anywhere; X-475: except, when the player turns it on with their consent, the chat history on this PC, ChatHistory), the oldest dropped past the bounded cap. Written from the game's chat event, read by the window, under one lock. It also holds each tab's
 /// view, so one clear (logout, unload, window turned off) drops every copy at once, the tabs' laid-out lines included. Counts the chat kinds seen, for
-/// developer mode (counts only, no text).
+/// developer mode (counts only, no text). X-464 M4 (0.1466): the combat lines have their own limit (the same number): an alliance raid's lines no
+/// longer push the spoken lines out; the numbers of the lines kept may then have gaps (<see cref="After"/> searches them).
 /// </summary>
 public sealed class ChatStore
 {
@@ -24,23 +31,35 @@ public sealed class ChatStore
     private readonly Dictionary<ChatTabSettings,ChatTabView> views=[];
     private long nextId=1;
     private long clears;
+    private int combat;
     public long Clears{get{lock(gate)return clears;}}
     public long LastId{get{lock(gate)return nextId-1;}}
     public int Count{get{lock(gate)return records.Count;}}
 
     public static int Bounded(int cap)=>Math.Clamp(cap,MinimumLines,MaximumLines);
 
-    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap)
+    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap,byte source=0,byte target=0)
     {
         lock(gate)
         {
-            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body);
+            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body,source,target);
             records.Add(record);
-            var excess=records.Count-Bounded(cap);
-            if(excess>0)records.RemoveRange(0,excess);
+            if(record.Channel==ChatChannel.Combat)combat++;
+            var limit=Bounded(cap);
+            while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
+            while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
             kinds[kind]=kinds.GetValueOrDefault(kind)+1;
             return record;
         }
+    }
+
+    // The oldest line of the combat lines (combat true) or of the others.
+    private void RemoveOldest(ChatChannel channel,bool same)
+    {
+        var index=records.FindIndex(record=>record.Channel==channel==same);
+        if(index<0)return;
+        if(records[index].Channel==ChatChannel.Combat)combat--;
+        records.RemoveAt(index);
     }
 
     /// <summary>The lines kept whose number is above <paramref name="id"/>, oldest first; nothing allocated when there is none.</summary>
@@ -49,8 +68,9 @@ public sealed class ChatStore
         lock(gate)
         {
             if(records.Count==0 || id>=nextId-1)return [];
-            var skip=(int)Math.Clamp(id-records[0].Id+1,0,records.Count);
-            return records.GetRange(skip,records.Count-skip);
+            int low=0,high=records.Count;
+            while(low<high){var middle=(low+high)/2;if(records[middle].Id<=id)low=middle+1;else high=middle;}
+            return low>=records.Count ? []:records.GetRange(low,records.Count-low);
         }
     }
 
@@ -67,9 +87,57 @@ public sealed class ChatStore
     /// <summary>A tab whose channels changed, or that was removed: its view is built again from the lines kept, as read.</summary>
     public void Restart(ChatTabSettings tab){lock(gate)views.Remove(tab);}
 
+    /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
+    /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
+    /// number given, and each tab's view is made again from them (taken as read). Returns how many were put back.
+    /// X-515 M4: a message's time is to the second; those of the same second as the oldest line kept (a fight or a loot at the reload) are put
+    /// back too, except the ones this session holds already (same time, kind, sender and text, counted: two equal lines stay two).</summary>
+    public int Restore(IReadOnlyList<ChatRecord> older,int cap)
+    {
+        lock(gate)
+        {
+            var first=records.Count>0 ? records[0].Time:DateTimeOffset.MaxValue;
+            var held=new Dictionary<string,int>(StringComparer.Ordinal);
+            foreach(var record in records)
+            {
+                if(record.Time!=first)continue;
+                var key=Same(record);held[key]=held.GetValueOrDefault(key)+1;
+            }
+            var back=older.Where(record=>record.Time<first || record.Time==first && !Held(held,record)).ToList();
+            if(back.Count==0)return 0;
+            var all=new List<ChatRecord>(back.Count+records.Count);
+            all.AddRange(back);all.AddRange(records);
+            records.Clear();combat=0;
+            foreach(var record in all)
+            {
+                var numbered=record with{Id=nextId++,Channel=ChatChannels.From(record.Kind)};
+                records.Add(numbered);
+                if(numbered.Channel==ChatChannel.Combat)combat++;
+            }
+            var limit=Bounded(cap);
+            while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
+            while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
+            views.Clear();
+            return back.Count;
+        }
+    }
+
+    // X-515 M4: what tells a message read back from one of this session (the link pieces by their text: a link read back may be text now).
+    private static string Same(ChatRecord record)
+        =>string.Join('\u001f',record.Kind,record.Sender,record.Source,record.Target,string.Concat(record.Body.Select(segment=>segment.Text)));
+
+    // One of this session's lines of that second matches: counted off (so a second equal line read back is still put back).
+    private static bool Held(Dictionary<string,int> held,ChatRecord record)
+    {
+        var key=Same(record);
+        if(held.GetValueOrDefault(key)<=0)return false;
+        held[key]--;
+        return true;
+    }
+
     public void Clear()
     {
-        lock(gate){records.Clear();views.Clear();clears++;}
+        lock(gate){records.Clear();views.Clear();clears++;combat=0;}
     }
 
     public IReadOnlyList<KeyValuePair<int,int>> KindCounts(){lock(gate)return kinds.OrderBy(row=>row.Key).ToArray();}

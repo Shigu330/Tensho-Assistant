@@ -74,7 +74,7 @@ internal sealed partial class MainWindow
         }
         ImGui.TextDisabled(localization.Get("CraftSearch.TargetHelp"));
         ImGui.TextWrapped(localization.Get("CraftSearch.Priority"));
-        DrawToolSettingsLink("CraftSearch");
+        DrawToolSettingsLink("CraftSearch","Crafting");
         // A-03 (0.465, DEC-028): which solver; also in Settings › Modules › Crafting.
         ImGui.TextUnformatted(localization.Get("CraftSearch.Solver"));
         ImGui.SameLine();

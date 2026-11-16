@@ -49,6 +49,10 @@ internal static class FfxivTheme
         ImGui.PushStyleColor(ImGuiCol.Tab, c.Panel);
         ImGui.PushStyleColor(ImGuiCol.TabActive, c.Selected);
         ImGui.PushStyleColor(ImGuiCol.TabHovered, c.Hovered);
+        // X-495 (0.1478): the tabs of a window without the focus (the chat window as soon as the player clicks in the game) in the theme's
+        // colours too: before, Dalamud's dark ones, also in the light theme.
+        ImGui.PushStyleColor(ImGuiCol.TabUnfocused, c.Panel);
+        ImGui.PushStyleColor(ImGuiCol.TabUnfocusedActive, c.Selected);
         ImGui.PushStyleColor(ImGuiCol.Separator, c.Border);
         ImGui.PushStyleColor(ImGuiCol.Text, c.Text);
         ImGui.PushStyleColor(ImGuiCol.PopupBg, c.Panel);
@@ -80,7 +84,7 @@ internal static class FfxivTheme
     {
         if(pushed.Count>0 && pushed.Pop()){PopIdentity();return;}
         ImGui.PopStyleVar(6);
-        ImGui.PopStyleColor(33);
+        ImGui.PopStyleColor(35);
     }
 
     // X-157 (0.1272): Tensho's identity over Dalamud's style: the accent on the check mark, the slider and the focus frame; nothing else.

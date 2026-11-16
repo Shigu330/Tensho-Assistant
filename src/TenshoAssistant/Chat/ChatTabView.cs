@@ -7,6 +7,10 @@ namespace TenshoAssistant.Chat;
 /// </summary>
 public sealed class ChatTabView
 {
+    private static int lastSerial;
+    /// <summary>X-504 M2 (review of 0.1486): the view's own number, given once (a view per tab, ChatStore.ViewOf): it names the tab's lines'
+    /// area, so the tab keeps its scroll when a tab before it is removed (named by its place, it took the scroll of the tab before).</summary>
+    public int Serial{get;}=Interlocked.Increment(ref lastSerial);
     private readonly List<ChatRecord> records=[];
     private readonly List<IReadOnlyList<IReadOnlyList<ChatRun>>?> lines=[];
     private readonly List<int> rowStarts=[];
@@ -18,16 +22,24 @@ public sealed class ChatTabView
     public int Unread{get;private set;}
     public int Count=>records.Count;
     public float Width{get;private set;}=-1;
+    /// <summary>X-457 (0.1462): the rows and the visible height of the window at the end of the frame before (« at the bottom » is read
+    /// against them).</summary>
+    public int RowsShown{get;set;}
+    public float HeightShown{get;set;}
     public string LayoutKey{get;private set;}="";
 
     /// <summary>Takes the store's new lines this tab shows, oldest dropped past the cap; true when the tab changed.</summary>
-    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap)
+    /// <param name="table">X-484 (0.1482): the game's log filters (null: not read; the tab's channels decide), with <paramref name="settings"/>
+    /// for the players hidden.</param>
+    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap,ChatFilterTable? table=null,ChatSettings? settings=null)
     {
         var changed=false;
+        ChatTabFilter? filter=null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
-            if(!tab.Shows(record.Channel))continue;
+            filter??=new(tab,table,settings);
+            if(!filter.Shows(record))continue;
             records.Add(record);lines.Add(null);
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;

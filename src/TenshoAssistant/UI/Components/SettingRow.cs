@@ -1,3 +1,4 @@
+using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 
@@ -18,9 +19,44 @@ internal sealed partial class MainWindow
     {
         var value=read();
         if(ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value))SaveSetting(labelKey,read,write,value);
+        ReachSetting(labelKey);
         Tip(tipKey);
         var fallback=defaultOf(DefaultConfiguration);
         if(DefaultButton(labelKey,read()!=fallback,OnOff(fallback)))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    /// <summary>X-503 M2 (review of 0.1482): a text setting (the chat's players, a tab's words): label, tooltip with its default, the value
+    /// written at each change (the caller saves). Found by the settings' search and by SETTINGS.md, as the other helpers.</summary>
+    private bool TextSetting(string labelKey,string tipKey,Func<string?> read,Action<string> write,int maximum,float width)
+    {
+        var value=read() ?? "";
+        ImGui.SetNextItemWidth(width);
+        var changed=ImGui.InputText(localization.Get(labelKey)+"###"+labelKey,ref value,maximum);
+        if(changed)write(value);
+        ReachSetting(labelKey);
+        Tip(tipKey);
+        return changed;
+    }
+
+    /// <summary>X-503 M2: an on/off setting of something that is not a field of Configuration (a chat tab): no « ↺ », its default is the
+    /// tab's own; the tooltip still names it.</summary>
+    private bool CheckSetting(string labelKey,string tipKey,Func<bool> read,Action<bool> write)
+    {
+        var value=read();
+        var changed=ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value);
+        if(changed)write(value);
+        ReachSetting(labelKey);
+        Tip(tipKey);
+        return changed;
+    }
+
+    /// <summary>X-503 M2: a button that changes a setting (a tab's way of choosing its messages), with its tooltip naming the default.</summary>
+    private bool SettingButton(string labelKey,string tipKey)
+    {
+        var clicked=ImGui.SmallButton(localization.Get(labelKey)+"###"+labelKey);
+        ReachSetting(labelKey);
+        Tip(tipKey);
+        return clicked;
     }
 
     /// <summary>The name of an on/off default, for the « ↺ » tooltip.</summary>
@@ -50,6 +86,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndCombo();}
         }
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,!comparer.Equals(read(),fallback),defaultName))SaveSetting(labelKey,read,write,fallback);
     }
@@ -65,6 +102,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.InputInt(localization.Get(labelKey)+"###"+labelKey,ref value,0))write(Math.Clamp(value,min,max));
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
     }
@@ -79,6 +117,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.SliderInt(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
     }
@@ -90,8 +129,22 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.SliderFloat(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    // X-507: the setting a search result chose; every setting row tells ReachSetting it was drawn, which scrolls it into view and
+    // highlights it for a moment (the Settings page opens the tab, the category and the folded sections around it first).
+    private readonly UI.SettingFocus settingFocus=new();
+
+    private void ReachSetting(string labelKey)
+    {
+        var (scroll,strength)=settingFocus.Reached(labelKey,ImGui.GetFrameCount(),ImGui.GetTime(),ImGui.GetItemRectMin().X);
+        if(strength<=0)return;
+        if(scroll)ImGui.SetScrollHereY(0.35f);
+        var edge=new Vector2(3);
+        ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-edge,ImGui.GetItemRectMax()+edge,ImGui.GetColorU32(Accent with { W=strength }),3,ImDrawFlags.None,2);
     }
 
     // X-76 H3/H4 (0.914): how to put back the value a number field or slider had when its edit began (one control is active at a

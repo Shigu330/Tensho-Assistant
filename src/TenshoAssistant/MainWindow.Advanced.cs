@@ -20,7 +20,6 @@ internal sealed partial class MainWindow
     // Header and home options (Settings › General).
     private void DrawHeaderSettings()
     {
-        ImGui.TextColored(Accent,localization.Get("Advanced.HeaderTitle"));
         BoolSetting("Advanced.HeaderClock","Advanced.HeaderClockTip",()=>configuration.ShowHeaderClock,value=>configuration.ShowHeaderClock=value,c=>c.ShowHeaderClock);
         BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
         BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
@@ -75,13 +74,15 @@ internal sealed partial class MainWindow
     /// <summary>X-119 step 2 (0.1081): the local link's state and why it failed, set by Plugin.cs (null in the desktop application).</summary>
     internal Func<(TenshoAssistant.Link.LocalLinkState State,string? Problem)>? DesktopLinkStatus { get; set; }
 
-    private void DrawAdvancedSettings()
+    private void DrawRestoreSettings()
     {
         ImGui.TextWrapped(localization.Get("Advanced.Help"));
         ImGui.Separator();
         DrawResetAllSettings();
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.DeveloperTitle"));
+    }
+
+    private void DrawDeveloperModeSettings()
+    {
         var developer=developerMode;
         if(ImGui.Checkbox(localization.Get("Developer.Enable")+"###DeveloperMode",ref developer))
         {
@@ -100,11 +101,12 @@ internal sealed partial class MainWindow
         try{BoolSetting("Advanced.ShowIds","Advanced.ShowIdsTip",()=>configuration.ShowIds,value=>configuration.ShowIds=value,c=>c.ShowIds);}
         finally{ImGui.EndDisabled();}
         if(developerMode && ImGui.SmallButton(localization.Get("Navigation.Diagnostics")))page=Page.Diagnostics;
+    }
 
-        // X-119 step 2 (0.1081): the local link with the desktop application, off by default; its state under the box (the desktop app,
-        // which draws this page too, has no link status: the line is left out there).
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.DesktopTitle"));
+    // X-119 step 2 (0.1081): the local link with the desktop application, off by default; its state under the box (the desktop app,
+    // which draws this page too, has no link status: the line is left out there).
+    private void DrawDesktopSettings()
+    {
         BoolSetting("Advanced.DesktopLink","Advanced.DesktopLinkTip",()=>configuration.DesktopLink,value=>configuration.DesktopLink=value,c=>c.DesktopLink);
         if(DesktopLinkStatus?.Invoke() is var (linkState,linkProblem))
             ImGui.TextColored(linkState is TenshoAssistant.Link.LocalLinkState.Busy or TenshoAssistant.Link.LocalLinkState.Unavailable ? Warning : Muted,
@@ -113,9 +115,10 @@ internal sealed partial class MainWindow
         DrawDesktopInstall();
         // X-119 step 4 (0.1158): where each page is listed: in the game and the app, or one of them.
         DrawPagePlaces();
+    }
 
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.SupportTitle"));
+    private void DrawSupportSettings()
+    {
         CopyButton(localization.Get("Advanced.CopyReport"),()=>BugReport());
         Tip("Advanced.CopyReportTip");
         ImGui.SameLine();
@@ -126,7 +129,7 @@ internal sealed partial class MainWindow
     // X-119 step 4 (0.1158): one choice per page of the navigation (Home, Settings and the pages that stay in the game are not offered).
     private void DrawPagePlaces()
     {
-        if(!ImGui.TreeNode(localization.Get("Advanced.PagePlacesTitle")+"###PagePlaces"))return;
+        if(!TenshoAssistant.UI.UiComponents.TreeNode(localization.Get("Advanced.PagePlacesTitle")+"###PagePlaces"))return;
         try
         {
             ImGui.TextDisabled(localization.Get("Advanced.PagePlacesHelp"));
@@ -191,8 +194,6 @@ internal sealed partial class MainWindow
     // X-100 (0.999, DEC-048): the community sources, now in « Data and sources ».
     private void DrawSourceSettings()
     {
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.SourcesTitle"));
         ImGui.TextDisabled(localization.Get("Advanced.SourcesHelp"));
         DrawGameDataOnly();
         if(configuration.GameDataOnly)ImGui.BeginDisabled();
@@ -235,8 +236,6 @@ internal sealed partial class MainWindow
     // X-100 (0.999, DEC-048): the game command delay and « remove all alarms », now in « Tracking and notifications ».
     private void DrawAlarmCommandSettings()
     {
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Advanced.AlarmsTitle"));
         configuration.AlarmOptions??=new();
         // 0.331 (audit): saved once, when the slider is released (it saved the whole configuration on every frame of a drag); 0.260: « ↺ »
         // back to the default delay (read from a fresh Configuration). X-76 H4 (0.914): SliderSetting.

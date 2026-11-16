@@ -19,7 +19,7 @@ internal static class MapToolbar1130Tests
         {
             var view=Read("MainWindow.MapView.cs");
             var typed=view.IndexOf("ImGui.InputText(\"##MapZoomTyped\",ref typed,8,ImGuiInputTextFlags.CharsDecimal|ImGuiInputTextFlags.AutoSelectAll|ImGuiInputTextFlags.EnterReturnsTrue)",StringComparison.Ordinal);
-            var hundred=view.IndexOf("if(TextToolButton(\"100%\",\"MapView.Zoom100\"))ZoomTo(1);",StringComparison.Ordinal);
+            var hundred=view.IndexOf("if(TextToolButton(\"100%\",\"MapView.Zoom100\",width:fieldWidth))ZoomTo(1);",StringComparison.Ordinal);
             Check(typed>0 && hundred>typed,"the percentage is typed, « 100% » under it");
             Check(view.Contains("&& MapProjection.ZoomFromPercent(typed) is { } typedZoom)ZoomTo(typedZoom);"),"Enter applies it");
             var button=Read("UI/Components/ToolButton.cs");

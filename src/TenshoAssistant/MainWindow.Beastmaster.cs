@@ -229,7 +229,9 @@ internal sealed partial class MainWindow
     private void DrawBeastResult(BeastCatalog catalog)
     {
         if (LoadBeastPlans().Result is not { } result) { ImGui.TextDisabled(localization.Get("BeastUi.ResultNone")); return; }
-        if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
+        // X-481 (0.1470): the window's bonus and total, when they were read.
+        var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
+        if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
         foreach (var gain in result.Beasts)
         {
             var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);

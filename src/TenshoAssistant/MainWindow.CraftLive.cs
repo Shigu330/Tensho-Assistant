@@ -39,7 +39,7 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("CraftLiveUi.Title"),localization.Get("CraftLiveUi.Description"));
         var state=craftLive.State;
-        DrawToolSettingsLink("CraftLive");
+        DrawToolSettingsLink("CraftLive","Crafting");
         DrawCraftLiveSettings();
         ImGui.TextWrapped(localization.Get("CraftLiveUi.Help"));
         ImGui.TextUnformatted(state.Status switch {CraftLiveStatusKind.Disabled=>localization.Get("CraftLiveUi.Disabled"),CraftLiveStatusKind.Waiting=>localization.Get("CraftLiveUi.Waiting"),CraftLiveStatusKind.Offline=>localization.Get("CraftLiveUi.Offline"),CraftLiveStatusKind.AddonAbsent=>localization.Get("CraftLiveUi.Absent"),CraftLiveStatusKind.NotReady=>localization.Get("CraftLiveUi.NotReady"),CraftLiveStatusKind.Error=>localization.Get("CraftLiveUi.Error"),_=>localization.Get("CraftLiveUi.Partial")});

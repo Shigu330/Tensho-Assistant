@@ -72,6 +72,7 @@ internal sealed class TriadNpcLoader : IDisposable
         // NPCs absent from the Level sheet (Gold Saucer players among others) are placed by the territory layouts, read as the NPC vendor
         // loader does (planevent/planner, LGB header checked first: docs/evidence/0.98.0-lgb-probe.log).
         var missing = wanted.Where(id => !places.ContainsKey(id)).ToHashSet();
+        var floors = new Maps.MapFloorReader.FloorCache(data);   // X-480 (0.1469, X-482 M5): read once per layout and map, as the vendors' loader does
         if (missing.Count > 0)
             foreach (var territory in data.GetExcelSheet<TerritoryType>())
             foreach (var kind in new[] { "planevent", "planner" })
@@ -93,7 +94,9 @@ internal sealed class TriadNpcLoader : IDisposable
                         || instance.Object is not Lumina.Data.Parsing.Layer.LayerCommon.ENPCInstanceObject npc
                         || !missing.Remove(npc.ParentData.ParentData.BaseId)) continue;
                     var position = instance.Transform.Translation;
-                    places[npc.ParentData.ParentData.BaseId] = (map.RowId, map.PlaceName.ValueNullable?.Name.ExtractText() ?? "",
+                    // X-462 (0.1464): a territory drawn on floors: the floor's map. X-480 (0.1469): the territory's floors only; in no box, its map.
+                    var floorMap = Maps.MapFloors.MapOf(floors.Of(bg, map), map.RowId, position.X, position.Y, position.Z);
+                    places[npc.ParentData.ParentData.BaseId] = (floorMap, map.PlaceName.ValueNullable?.Name.ExtractText() ?? "",
                         Npcs.NpcShopLinks.MapCoordinate(position.X, map.OffsetX, map.SizeFactor), Npcs.NpcShopLinks.MapCoordinate(position.Z, map.OffsetY, map.SizeFactor));
                 }
             }

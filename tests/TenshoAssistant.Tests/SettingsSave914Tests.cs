@@ -112,7 +112,7 @@ internal static class SettingsSave914Tests
             Check(!Source("MainWindow.GearWear.cs").Contains("SaveGearWear",StringComparison.Ordinal),"no save per drag frame in gear wear");
             var row=Source("UI/Components/SettingRow.cs");
             Check(Regex.Matches(row,@"private void SliderSetting\(").Count==2 && Regex.Matches(row,@"SaveWhenEditEnds\(labelKey,write,before\);").Count==3,"int and decimal sliders, and the whole-number field, save on release");
-            var map=Between(Source("MainWindow.MapView.cs"),"private void DrawMapSettingsBody(","private void SaveMapSettings()");
+            var map=Between(Source("MainWindow.MapView.cs"),"private void DrawMapGameSettings(","private void SaveMapSettings()");
             Check(map.Contains("mapSettingsPending|=changed;",StringComparison.Ordinal) && map.Contains("if(mapSettingsPending && !ImGui.IsAnyItemActive())SaveMapSettings();",StringComparison.Ordinal)
                 && !map.Contains("TrySave(",StringComparison.Ordinal),"map settings: live while held, written once nothing is held");
             var settings=Source("MainWindow.Settings.cs");
@@ -133,7 +133,7 @@ internal static class SettingsSave914Tests
             Check(Source("MainWindow.cs").Contains("if(DrawSaveError())return;",StringComparison.Ordinal),"in the footer");
             Check(Between(Source("UI/Components/SettingRow.cs"),"private bool DrawSaveError()","\n    }").Contains("ImGui.TextColored(Error,failed);",StringComparison.Ordinal),"theme error colour");
             Check(!Source("MainWindow.Settings.cs").Contains("saveError",StringComparison.Ordinal),"not on the Settings page any more");
-            Check(Between(Source("MainWindow.MapView.cs"),"private void DrawMapLayers()","private void DrawMapSettingsBody(").Contains("if(saveError is { } failed)ImGui.TextColored(Error,failed);",StringComparison.Ordinal),"map window popup");
+            Check(Between(Source("MainWindow.MapView.cs"),"private void DrawMapLayers()","private void DrawMapGameSettings(").Contains("if(saveError is { } failed)ImGui.TextColored(Error,failed);",StringComparison.Ordinal),"map window popup");
         }),
     ];
 }

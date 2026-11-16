@@ -57,6 +57,25 @@ internal sealed partial class MainWindow
         ImGui.GetWindowDrawList().AddText(font,size,new Vector2(MathF.Round(at.X),MathF.Round(at.Y)),colour,label);
     }
 
+    /// <summary>
+    /// X-477 (0.1476, user report of 15/11: the chat window's frame and lock icons sat high in their buttons, cut or pressed against the
+    /// edge): a button at the end of a tab bar with an icon. Its label is blank, in the text font, so the button has the tabs' height and an
+    /// icon's width; the glyph is then drawn at the centre of the button by its own ink box, as the other icon buttons.
+    /// </summary>
+    private bool GlyphTabButton(string id,FontAwesomeIcon icon,ImGuiTabItemFlags flags)
+    {
+        float glyphWidth;
+        ImGui.PushFont(UiBuilder.IconFont);
+        try{glyphWidth=ImGui.CalcTextSize(icon.ToIconString()).X;}
+        finally{ImGui.PopFont();}
+        var space=Math.Max(1f,ImGui.CalcTextSize(" ").X);
+        var clicked=ImGui.TabItemButton(new string(' ',Math.Max(2,(int)MathF.Ceiling(glyphWidth/space)))+id,flags);
+        ImGui.PushFont(UiBuilder.IconFont);
+        try{DrawGlyphAt(icon,ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),ImGui.GetColorU32(ImGuiCol.Text),ImGui.GetFontSize());}
+        finally{ImGui.PopFont();}
+        return clicked;
+    }
+
     private bool ToolButton(FontAwesomeIcon icon,string tooltipKey,bool enabled,bool active=false)
     {
         bool clicked;
@@ -91,11 +110,13 @@ internal sealed partial class MainWindow
         return clicked && enabled;
     }
 
-    private bool TextToolButton(string text,string tooltipKey,bool enabled=true)
+    private bool TextToolButton(string text,string tooltipKey,bool enabled=true,float width=0)
     {
         ImGui.BeginDisabled(!enabled);
         bool clicked;
-        try{clicked=ImGui.Button($"{text}##{tooltipKey}",new Vector2(Math.Max(ImGui.GetFrameHeight(),ImGui.CalcTextSize(text).X+ImGui.GetStyle().FramePadding.X),ImGui.GetFrameHeight()));}
+        // X-460: a padding on each side of the text (one only put the label off centre, to the right); a wider box given by the caller.
+        var size=Math.Max(width,UI.CenteredText.ButtonWidth(ImGui.CalcTextSize(text).X,ImGui.GetStyle().FramePadding.X,ImGui.GetFrameHeight()));
+        try{clicked=ImGui.Button($"{text}##{tooltipKey}",new Vector2(size,ImGui.GetFrameHeight()));}
         finally{ImGui.EndDisabled();}
         Tip(tooltipKey);
         return clicked && enabled;

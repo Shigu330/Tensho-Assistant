@@ -13,7 +13,7 @@ internal sealed partial class MainWindow
     {
         if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("GatheringObservation.Title")+"###GatheringObservation"))return;
         var state=gatheringObservation.State;var enabled=state.Enabled;
-        DrawToolSettingsLink("GatheringObservation");
+        DrawToolSettingsLink("GatheringObservation","Gathering");
         if(!enabled)ImGui.TextDisabled(localization.Get("GatheringObservation.Disabled"));
         if(!enabled)return;
         var now=DateTimeOffset.UtcNow;

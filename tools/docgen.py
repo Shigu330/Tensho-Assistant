@@ -111,6 +111,7 @@ PROJECT_CORE = [
 ]
 PROJECT_WORKING = [
     ("GLOBAL-PLAN", "global plan and current state", "plan global et état actuel"),
+    ("GLOBAL-PLAN-DONE", "the done points of the global plan, with their version", "les points faits du plan global, avec leur version"),
     ("TESTING", "in-game test protocols", "protocoles d'essai en jeu"),
     ("TESTING-ROUTE", "the in-game tests not yet ticked, sorted by activity", "les essais en jeu non cochés, rangés par activité"),
     ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",
@@ -309,7 +310,7 @@ def version_problems(release):
 SOURCE = ROOT / "src/TenshoAssistant"
 CONFIGURATION = SOURCE / "Configuration.cs"
 SETTINGS_INDEX = SOURCE / "SettingsIndex.cs"
-CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
+CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
 SETTING_BOX = re.compile(r'\bSettingBox\(\s*"([\w.]+)"\s*,\s*([\w.]+)\s*,')
 PROPERTY = re.compile(r"public\s+(?:required\s+)?([\w.<>?,\[\] ]+?)\s+(\w+)\s*\{\s*get\s*(;\s*(?:set|init);\s*\}(?:\s*=\s*([^;\n]+);)?|=>[^{}]*\})")
 # A property with get=>/set=> accessors reads a backing field (« ref field » or « =>field »), whose initializer is the default.
@@ -358,7 +359,7 @@ def call_body(text, start):
 # Local names of a part of Configuration in the files that draw its controls: (file, name) → property of Configuration.
 ALIASES = {("MainWindow.MapView.cs", "settings"): "MapView", ("MainWindow.MapView.cs", "contextSettings"): "MapView",
            ("MainWindow.Settings.cs", "search"): "CraftSearch", ("MainWindow.FashionWeek.cs", "options"): "FashionOptions",
-           ("MainWindow.GearWear.cs", "WearSettings"): "GearWear"}
+           ("MainWindow.GearWear.cs", "WearSettings"): "GearWear", ("MainWindow.ChatWindow.cs", "options"): "Chat"}
 
 
 def setting_path(expression, file):
@@ -438,16 +439,21 @@ def settings_tabs():
     return dict(re.findall(r'\("([\w.]+)","(\w+)"\)', read_source(SETTINGS_INDEX)))
 
 
+def settings_categories():
+    """X-449: the category of each setting (SettingsIndex.Categories), by label key."""
+    return dict(re.findall(r'\["([\w.]+)"\]="(\w+)"', read_source(SETTINGS_INDEX)))
+
+
 def settings_rows():
     """[(path or label key, kind, default, places, en text, fr text, has path)] sorted by path."""
-    classes, tabs = declarations(), settings_tabs()
+    classes, tabs, categories = declarations(), settings_tabs(), settings_categories()
     en, fr = language("en"), language("fr")
     rows = {}
     for path, label, tip, file in controls():
         key = path or f"({label})"
         tab = tabs.get(label)
         page = file[len("MainWindow."):-3] if file.startswith("MainWindow.") else file
-        place = (tab, page, file)
+        place = (tab, page, file, categories.get(label))
         row = rows.setdefault(key, {"path": path, "places": [], "label": label, "tip": tip, "settings": False})
         if place not in row["places"]:
             row["places"].append(place)
@@ -457,11 +463,12 @@ def settings_rows():
 
     def where(lang, code):
         def one(place):
-            tab, page, file = place
+            tab, page, file, category = place
             if tab:
-                return (f"Settings › {tab}" if code == "en" else
+                return (f"Settings › {tab} › {category}" if code == "en" else
                         f"{(text_of(lang, 'PageHelp.SettingsTitle') or 'Paramètres').strip()} › "
-                        f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()}")
+                        f"{(text_of(lang, 'SettingsSections.' + tab) or tab).strip()} › "
+                        f"{(text_of(lang, 'SettingsCategories.' + category) or category).strip()}")
             title = text_of(lang, f"PageHelp.{page}Title")
             return f"page {title.strip()}" if title else f"`{file}`"
         return one

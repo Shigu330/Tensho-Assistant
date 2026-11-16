@@ -59,7 +59,7 @@ internal sealed class MapLocalIndexLoader : IDisposable
                 {
                     dataVersion=string.Join(";",data.GameData.Repositories.Values.OrderBy(r=>r.Name).Select(r=>$"{r.Name}={r.Version}"));
                     cacheScope=data.Language.ToString();
-                    cacheVersion=MapLocalIndexCache.Version($"{dataVersion};schema={typeof(Level).Assembly.GetName().Version}");
+                    cacheVersion=MapLocalIndexCache.Version($"{dataVersion};schema={typeof(Level).Assembly.GetName().Version};floors-1469");
                 }
                 if(!cacheChecked && cache is not null)
                 {
@@ -232,6 +232,9 @@ internal sealed class MapLocalIndexLoader : IDisposable
             var map=territory.Map.Value;
             if(map.SizeFactor==0)continue;
             var marks=MarksOf(map);
+            // X-462 (0.1464): a territory drawn on floors (Eulmore): a bell or chest takes its floor's map (MapFloors). X-480 (0.1469): the boxes of
+            // the territory's floors only; in none, the territory's map (never left out).
+            var floorRanges=Maps.MapFloorReader.Floors(data,bg,map);
             var others=mapsByTerritory.TryGetValue(territory.RowId,out var territoryMaps)
                 ? territoryMaps.Where(other=>other.RowId!=map.RowId).Select(other=>new PlacedObjects.MapFrame(other.OffsetX,other.OffsetY,other.SizeFactor,MarksOf(other))).ToArray()
                 : [];
@@ -251,8 +254,9 @@ internal sealed class MapLocalIndexLoader : IDisposable
                             var icon=PlacedObjects.IconOf(placed.ParentData.BaseId);var at=instance.Transform.Translation;
                             var pixel=PlacedObjects.Pixel(at.X,at.Z,map.OffsetX,map.OffsetY,map.SizeFactor);
                             if(!PlacedObjects.Missing(marks,icon,pixel) || PlacedObjects.MarkedOnAnyMap(others,icon,at.X,at.Z))continue;
+                            var floorMap=Maps.MapFloors.MapOf(floorRanges,map.RowId,at.X,at.Y,at.Z);
                             marks.Add((icon,pixel));
-                            found.Add(new(MapLocalKind.PlacedObject,++added,map.RowId,at.X,at.Z,0,icon));
+                            found.Add(new(MapLocalKind.PlacedObject,++added,floorMap,at.X,at.Z,0,icon));
                         }
                     }
                 }
