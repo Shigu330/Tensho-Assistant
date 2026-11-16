@@ -177,7 +177,7 @@ internal sealed class NativeMapReplacer : IDisposable
                 else
                 {
                     // Off screen every frame (the game moves it back when it animates); a new request (journal, link) is relayed.
-                    if(unit->RootNode!=null)unit->RootNode->SetPositionFloat(-9000,-9000);
+                    if(unit->RootNode!=null)unit->RootNode->SetPositionFloat(UI.GameWindows.OffScreen,UI.GameWindows.OffScreen);
                     var (request,signature)=ReadRequest(false);
                     if(signature!=lastRequest){lastRequest=signature;if(request.Pointed){lastPointed=signature;lastPointedRequest=request;open(request);}}
                 }

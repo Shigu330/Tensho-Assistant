@@ -17,6 +17,10 @@ public static class GameWindows
     // ignoring it, as before (the Tensho map shows exactly when the game map opens). Hosted off screen it touches nothing.
     private static readonly string[] ChatOnly=["AreaMap"];
     public static bool ChatOnlyWindow(string name)=>ChatOnly.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
+    // X-500 (review of 0.1482): Tensho hosts the game map off screen by moving its root node only (NativeMapReplacer): the window stays
+    // visible and its own X and Y do not change. The reader looks at the root node: a window whose node is out there is not on screen.
+    public const float OffScreen=-9000f;
+    public static bool HostedOffScreen(float nodeX,float nodeY)=>nodeX<=OffScreen/2 || nodeY<=OffScreen/2;
 
     /// <param name="anchors">The game window the interface belongs to, by the start of its name: it and its parts never cover it, and only what is in front of it counts. None: whatever touches it.</param>
     /// <param name="chat">The chat window: the windows only it counts (the game's map) count too.</param>

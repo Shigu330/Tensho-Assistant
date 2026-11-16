@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1483.0
+- Plan global, X-500 : Relecture de 0.1482 (X-500) : la carte du jeu que Tensho remplace par la sienne n'est plus vue à l'écran par le lecteur des fenêtres du jeu. Le remplacement déplace seulement son nœud racine hors de l'écran (les X et Y de la fenêtre ne changent pas) ; le lecteur saute maintenant une fenêtre dont le nœud racine est hors de l'écran (GameWindows.HostedOffScreen, même valeur GameWindows.OffScreen que le remplacement). La fenêtre de chat ne se cache plus ni ne pâlit quand la carte du jeu est ouverte mais remplacée.
+- Pour les joueurs : la fenêtre de chat ne se cache plus quand la carte du jeu s'ouvre alors que celle de Tensho la remplace.
+- Tests : ChatReview1483Tests. Verify.ps1 (agent) : 2905/2905, 0 avertissement, 0 erreur ; DLL 0.1483.0.0. Non validé en jeu.
+### English
+- Review of 0.1482 (X-500): the game map that Tensho replaces with its own is no longer seen on screen by the game windows' reader. The replacement moves only its root node off screen (the window's X and Y do not change); the reader now skips a window whose root node is off screen (GameWindows.HostedOffScreen, the same GameWindows.OffScreen value as the replacement). The chat window no longer hides or fades when the game map is open but replaced.
+- For players: The chat window no longer hides when the game map opens while Tensho's map replaces it.
+
 ## 0.1482.0
 - Plan global, X-484 : Fenêtre de chat de Tensho : chaque onglet peut se régler avec les filtres de la fenêtre de discussion du jeu (feuille LogFilter, noms dans la langue du client) : Discussion (canaux, LS et LSIM 1 à 8, emotes standard et personnalisées), Annonces, et les lignes de combat par sujet (vous, équipiers, alliance, autres joueurs, ennemis combattus ou non, PNJ alliés, compagnons de chacun) et par genre (dégâts, attaques manquées, actions, objets, soins, effets, fin des effets), lus du sujet et de la cible que Dalamud donne pour chaque message. Préréglages « comme Général, Combat, Événement du jeu », tout, rien ; « autres messages » pour les types que le jeu ne liste pas. En plus du jeu : mots à garder ou à cacher (majuscules au choix) par onglet, joueurs cachés ou mis en avant. Reste à faire : montures et téléportations des autres (relevé en jeu d'abord), alertes de X-447.
 - Pour les joueurs : fenêtre de chat : chaque onglet peut utiliser les filtres du jeu (combat selon qui fait quoi à qui), plus des mots et des joueurs à cacher ou à mettre en avant.
