@@ -16,17 +16,39 @@ internal sealed partial class MainWindow
     private bool chatSettingsPending;
     private const int ChatLayoutsPerFrame=100;
 
+    // X-485 (0.1479): never brought to the front (NoBringToFrontOnFocus) and put at the back when it appears: Tensho's other windows stay in
+    // front of it. Its own setting decides what a game window over it does (StepsAside false: not the panels' setting).
     private PanelDefinition ChatPanelDefinition=>new("Chat","###TenshoChat",new Vector2(40,420),
-        ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar,
+        ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar|ImGuiWindowFlags.NoBringToFrontOnFocus,
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
-        Opacity:()=>ChatOptions.BoundedOpacity/100f,Size:new Vector2(560,320),MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless);
+        StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
+        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless);
 
-    /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.</summary>
+    /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.
+    /// X-485 (0.1479): faded under a game window, the clicks go through to the game.</summary>
     private ImGuiWindowFlags ChatFrameFlags()=>(ChatOptions.Borderless ? ImGuiWindowFlags.NoTitleBar:ImGuiWindowFlags.None)
-        |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None);
+        |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
+        |(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);
+
+    // X-485 (0.1479): where the window was last drawn, whether a game window covers it there, and the frame it was last drawn in.
+    private Vector2? chatAt;
+    private Vector2 chatSize;
+    private bool chatCovered;
+    private int chatLastFrame=-10;
+
+    private bool ChatWindowShown()
+        =>!windowDisposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && !gameGui.GameUiHidden && !(ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
 
     private bool ChatWindowVisible()
-        =>!windowDisposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && !gameGui.GameUiHidden && !(ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
+    {
+        if(!ChatWindowShown())return false;
+        var at=chatAt ?? Vector2.Zero;
+        var covered=ChatCover.Bounded(ChatOptions.WhenCovered)!=ChatCovered.Stay && chatAt is not null && BehindGame(at,chatSize);
+        if(covered!=chatCovered && developerMode)
+            log.Information("Chat window {0} ({1}): at {2}, size {3}.",covered ? "covered by a game window":"uncovered",ChatCover.Bounded(ChatOptions.WhenCovered),at,chatSize);
+        chatCovered=covered;
+        return !ChatCover.Hidden(ChatOptions.WhenCovered,covered);
+    }
 
     private void CloseChatWindow()
     {
@@ -69,6 +91,10 @@ internal sealed partial class MainWindow
         // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
         BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);
         BoolSetting("ChatWindow.Locked","ChatWindow.LockedTip",()=>configuration.Chat.Locked,value=>configuration.Chat.Locked=value,c=>c.Chat.Locked);
+        // X-485 (0.1479): what the window does under a window of the game.
+        ComboSetting("ChatWindow.WhenCovered","ChatWindow.WhenCoveredTip",()=>ChatCover.Bounded(configuration.Chat.WhenCovered),value=>configuration.Chat.WhenCovered=value,
+            [(ChatCovered.Hide,localization.Get("ChatWindow.CoveredHide")),(ChatCovered.Fade,localization.Get("ChatWindow.CoveredFade")),(ChatCovered.Stay,localization.Get("ChatWindow.CoveredStay"))],
+            ChatCovered.Hide,220);
         SliderSetting("ChatWindow.FontScale","ChatWindow.FontScaleTip",()=>configuration.Chat.BoundedFontScale,value=>configuration.Chat.FontScale=value,60,200,defaults.FontScale,"%d %%");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
@@ -188,6 +214,19 @@ internal sealed partial class MainWindow
     }
 
     private void DrawChatWindowContents()
+    {
+        // X-485 (0.1479): put at the back of the windows when it appears (it is never brought to the front afterwards).
+        var frameNow=ImGui.GetFrameCount();
+        if(frameNow!=chatLastFrame+1)ImGuiP.BringWindowToDisplayBack(ImGuiP.GetCurrentWindow());
+        chatLastFrame=frameNow;
+        chatAt=ImGui.GetWindowPos();chatSize=ImGui.GetWindowSize();
+        var faded=ChatCover.Faded(ChatOptions.WhenCovered,chatCovered);
+        if(faded)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,ChatCover.FadedAlpha);
+        try{DrawChatWindowBody();}
+        finally{if(faded)ImGui.PopStyleVar();}
+    }
+
+    private void DrawChatWindowBody()
     {
         var options=ChatOptions;
         var tabs=ChatTabs(options);

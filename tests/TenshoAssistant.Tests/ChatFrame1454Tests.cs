@@ -16,7 +16,7 @@ internal static class ChatFrame1454Tests
             options.Opacity = 0; Check(options.BoundedOpacity == 0, "transparent");
             options.Opacity = -5; Check(options.BoundedOpacity == 0, "bounded");
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
-            Check(window.Contains("private ImGuiWindowFlags ChatFrameFlags()=>(ChatOptions.Borderless ? ImGuiWindowFlags.NoTitleBar:ImGuiWindowFlags.None)\n        |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None);", StringComparison.Ordinal), "borderless: no title bar; locked: neither moved nor resized");
+            Check(window.Contains("private ImGuiWindowFlags ChatFrameFlags()=>(ChatOptions.Borderless ? ImGuiWindowFlags.NoTitleBar:ImGuiWindowFlags.None)\n        |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)\n", StringComparison.Ordinal), "borderless: no title bar; locked: neither moved nor resized");
         }),
         ("Chat frame 1454: the panel reads the flags and the frame line at each draw, and puts the style back", () =>
         {

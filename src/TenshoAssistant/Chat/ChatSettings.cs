@@ -31,6 +31,9 @@ public sealed class ChatSettings
     public bool Borderless{get;set;}
     /// <summary>X-448 (0.1454): the window is neither moved nor resized.</summary>
     public bool Locked{get;set;}
+    /// <summary>X-485 (0.1479): what the window does while a window of the game covers it: it hides (the default, as the panels), it fades
+    /// (no background, text faint, clicks go through), or it stays.</summary>
+    public ChatCovered WhenCovered{get;set;}=ChatCovered.Hide;
     public List<ChatTabSettings>? Tabs{get;set;}
     /// <summary>X-445 (0.1458): <see cref="CurrentTabs"/> once the tabs follow the game's default tabs (tabs saved before get Battle and Event
     /// once).</summary>

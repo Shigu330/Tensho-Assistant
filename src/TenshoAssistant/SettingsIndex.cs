@@ -155,6 +155,7 @@ public static class SettingsIndex
         ("ChatWindow.Seconds","Panels"),
         ("ChatWindow.Show","Panels"),
         ("ChatWindow.Timestamps","Panels"),
+        ("ChatWindow.WhenCovered","Panels"),
         ("CollectablePanel.UseFocus","Panels"),
         ("CollectablePanel.UsePriming","Panels"),
         ("CollectablePanel.UseRestore","Panels"),
