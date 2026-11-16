@@ -1977,7 +1977,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1471) Fenêtre de chat Tensho : un message en lettres encadrées du jeu (annonce d'un joueur, « THE … ») se lit en lettres simples ; un joueur d'un autre monde s'affiche « Nom@Monde » comme dans le jeu ; un objet HQ lié a « HQ » après son nom ; la copie du message (clic droit) garde le même texte.
 
-- [ ] (0.1472) Fenêtre de chat Tensho : en lisant plus haut, cliquer « En bas » sur un lien n'ouvre pas le lien (seulement le retour en bas) ; un pavé tactile fait défiler doucement, une ligne par cran de molette ; avec un seul nouveau message le bouton dit « 1 nouveau ».
+- [x] (0.1472) Fenêtre de chat Tensho : en lisant plus haut, cliquer « En bas » sur un lien n'ouvre pas le lien (seulement le retour en bas) ; un pavé tactile fait défiler doucement, une ligne par cran de molette ; avec un seul nouveau message le bouton dit « 1 nouveau ».
 
 - [x] (0.1476) Fenêtre de chat de Tensho : laisser un onglet non lu dépasser 100 messages (par exemple Combat pendant un combat, en regardant Général) : son nom montre « (100+) » et sa largeur ne bouge plus ; le lire jusqu'en bas remet le compte à zéro.
 
@@ -1985,13 +1985,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1476) Paramètres › Fenêtre de chat › Onglets : donner une couleur au nom de deux onglets (une claire, une foncée) : les noms prennent leur couleur, restent lisibles sur l'onglet actif et inactif, en thème sombre puis clair ; « ↺ » rend la couleur normale ; la couleur reste après un rechargement.
 
-- [ ] (0.1477) Fenêtre de chat de Tensho, mode développeur : au chargement de Dalamud, le message « Developer Mode is enabled » montre « Learn more here » souligné ; un clic gauche dessus ouvre la même fenêtre de Dalamud que le même clic dans le chat du jeu ; l'info-bulle nomme Dalamud.
+- [x] (0.1477) Fenêtre de chat de Tensho, mode développeur : au chargement de Dalamud, le message « Developer Mode is enabled » montre « Learn more here » souligné ; un clic gauche dessus ouvre la même fenêtre de Dalamud que le même clic dans le chat du jeu ; l'info-bulle nomme Dalamud.
 
-- [ ] (0.1478) Fenêtre de chat de Tensho, thème clair puis sombre : un onglet avec une couleur de nom foncée (puis claire) ; cliquer dans le jeu (la fenêtre perd le focus), survoler l'onglet : le nom reste lisible sur l'onglet actif et inactif ; les onglets sans focus ont les couleurs du thème.
+- [x] (0.1478) Fenêtre de chat de Tensho, thème clair puis sombre : un onglet avec une couleur de nom foncée (puis claire) ; cliquer dans le jeu (la fenêtre perd le focus), survoler l'onglet : le nom reste lisible sur l'onglet actif et inactif ; les onglets sans focus ont les couleurs du thème.
 
 - [ ] (0.1478) Fenêtre de chat de Tensho, mode développeur : clic gauche sur « Learn more here » du message « Developer Mode is enabled » : la fenêtre de Dalamud s'ouvre comme depuis le chat du jeu ; clic droit dessus : le menu du message (copier).
 
-- [ ] (0.1479) Fenêtre de chat de Tensho ouverte, puis la fenêtre principale de Tensho par-dessus : la fenêtre principale reste devant, même après un clic dans le chat.
+- [x] (0.1479) Fenêtre de chat de Tensho ouverte, puis la fenêtre principale de Tensho par-dessus : la fenêtre principale reste devant, même après un clic dans le chat.
 
 - [x] (0.1479) Réglage « Sous une fenêtre du jeu » : « Se cacher » : ouvrir l'inventaire puis la carte du jeu par-dessus le chat : il disparaît, puis revient seul à leur fermeture. « S'effacer » : le chat devient pâle sans fond et un clic dessus va à la fenêtre du jeu. « Rester » : rien ne change.
 
@@ -2001,19 +2001,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1481) Au bout des onglets du chat de Tensho : « + » ajoute un onglet ; la roue dentée ouvre les réglages du chat ; changer l'opacité ou un canal là, puis ouvrir la page Paramètres de Tensho : le même changement y est.
 
-- [ ] (0.1482) Fenêtre de chat de Tensho, réglages d'un onglet : « Utiliser les filtres du jeu » : les groupes Discussion, Annonces et Combat (par sujet) apparaissent avec les noms du jeu ; « Comme Combat du jeu » sur un onglet, puis un combat : seules vos lignes et celles de l'équipe y sont, comme dans l'onglet Combat du jeu ; décocher « Dégâts infligés par vous » les retire.
+- [x] (0.1482) Fenêtre de chat de Tensho, réglages d'un onglet : « Utiliser les filtres du jeu » : les groupes Discussion, Annonces et Combat (par sujet) apparaissent avec les noms du jeu ; « Comme Combat du jeu » sur un onglet, puis un combat : seules vos lignes et celles de l'équipe y sont, comme dans l'onglet Combat du jeu ; décocher « Dégâts infligés par vous » les retire.
 
-- [ ] (0.1482) Fenêtre de chat de Tensho : « Cacher avec » un mot, « Seulement avec » un autre ; « Joueurs cachés » avec le nom d'un joueur qui parle : ses messages disparaissent de Tensho (pas du jeu) ; « Joueurs mis en avant » : son nom ressort.
+- [x] (0.1482) Fenêtre de chat de Tensho : « Cacher avec » un mot, « Seulement avec » un autre ; « Joueurs cachés » avec le nom d'un joueur qui parle : ses messages disparaissent de Tensho (pas du jeu) ; « Joueurs mis en avant » : son nom ressort.
 
-- [ ] (0.1483) Remplacement de la carte du jeu actif, fenêtre de chat de Tensho ouverte en bas à gauche : ouvrir la carte (touche de la carte). La carte de Tensho s'ouvre ; la fenêtre de chat reste visible et ne pâlit pas. Puis réglage du remplacement coupé : la carte du jeu s'ouvre au-dessus du chat, et le chat se cache (ou pâlit).
+- [x] (0.1483) Remplacement de la carte du jeu actif, fenêtre de chat de Tensho ouverte en bas à gauche : ouvrir la carte (touche de la carte). La carte de Tensho s'ouvre ; la fenêtre de chat reste visible et ne pâlit pas. Puis réglage du remplacement coupé : la carte du jeu s'ouvre au-dessus du chat, et le chat se cache (ou pâlit).
 
-- [ ] (0.1484) Fenêtre de chat de Tensho avec deux onglets qui reçoivent des messages : remonter dans l'onglet A, puis ouvrir l'onglet B. B s'ouvre en bas (sans le bouton « retour en bas ») et ses messages sont marqués lus ; revenir à A : il est toujours remonté à l'endroit laissé.
+- [x] (0.1484) Fenêtre de chat de Tensho avec deux onglets qui reçoivent des messages : remonter dans l'onglet A, puis ouvrir l'onglet B. B s'ouvre en bas (sans le bouton « retour en bas ») et ses messages sont marqués lus ; revenir à A : il est toujours remonté à l'endroit laissé.
 
 - [x] (0.1485) Fenêtre de chat de Tensho en mode « S'effacer » derrière une fenêtre du jeu, contour du texte actif : ouvrir une fenêtre du jeu par-dessus le chat. Tout le chat pâlit, texte et contour noir compris (plus de lettres noires bien nettes sur un chat pâle).
 
 - [x] (0.1486) Fenêtre de chat de Tensho : ouvrir la roue dentée, puis un clic droit sur une ligne. Le panneau des réglages et le menu ont des marges normales (pas serrées contre le bord) ; la fenêtre de chat garde ses marges étroites.
 
-- [ ] (0.1486) Paramètres › rechercher « joueurs » puis « mots » : les réglages de la fenêtre de chat (joueurs cachés, mis en avant, mots gardés ou cachés) sont trouvés.
+- [x] (0.1486) Paramètres › rechercher « joueurs » puis « mots » : les réglages de la fenêtre de chat (joueurs cachés, mis en avant, mots gardés ou cachés) sont trouvés.
 
 - [ ] (0.1487) Fenêtre de chat de Tensho, à la sonnerie d'une alarme de récolte avec un lieu (ou une alarme d'essai) : le message montre une flèche puis le nom de l'objet, comme le chat du jeu, sans le nom de la zone collé devant ; un clic sur la flèche ouvre la carte au lieu de l'alarme.
 
@@ -2024,6 +2024,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1489) Fenêtre de chat de Tensho en mode « S'effacer » sous une fenêtre du jeu : le contour sombre des lettres pâlit autant que le texte (pas de halo noir autour de lettres pâles).
 
 - [ ] (0.1489) Fenêtre de chat de Tensho : défiler l'onglet Combat vers le haut, retirer l'onglet Général (roue dentée › Onglets › Retirer) : l'onglet Combat garde sa position de défilement.
+
+- [ ] (0.1490) Fenêtre de chat de Tensho : le décor du jeu se voit à travers le fond, sur toute la fenêtre (messages et onglets) ; Opacité à 0 % : fond invisible, texte lisible par son contour ; à 100 % : fond plein.
 
 **0.535 : interfaces** — à voir en jouant
 
