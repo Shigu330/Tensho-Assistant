@@ -1176,6 +1176,7 @@ internal sealed partial class MainWindow
     {
         var changed=ImGui.Checkbox(localization.Get(key)+"###"+key,ref value);
         if(changed)apply(value);
+        ReachSetting(key);
         // 0.328 (map audit #39): also when greyed (edge kinds, zone name), whose help says what they depend on.
         if(localization.Has(key+"Help"))Tip(key+"Help");
         if(fallback is { } byDefault && DefaultButton(key,value!=byDefault)){apply(byDefault);changed=true;}

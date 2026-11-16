@@ -10,7 +10,8 @@ internal static class SettingsTabs999Tests
         => Regex.Matches(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.SettingsCategories.cs")),@"new\(""(\w+)"",""(\w+)"",(\w+)\)")
             .Select(match=>(match.Groups[1].Value,match.Groups[2].Value,match.Groups[3].Value)).ToArray();
 
-    internal static Dictionary<string,(string Tab,string Category)> Scan()
+    // X-507: every method a category reaches (its own, then the Draw methods it calls), with the category it was reached from.
+    internal static IEnumerable<(string Tab,string Category,string Method,string Body)> Walk()
     {
         var bodies=new Dictionary<string,string>();
         foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs"))
@@ -23,7 +24,6 @@ internal static class SettingsTabs999Tests
                 bodies[m.Groups[1].Value]=bodies.GetValueOrDefault(m.Groups[1].Value,"")+body;
             }
         }
-        var seen=new Dictionary<string,(string Tab,string Category)>();
         foreach(var (tab,category,method) in CategoryList())
         {
             var todo=new List<string>{method};var visited=new HashSet<string>();
@@ -31,10 +31,17 @@ internal static class SettingsTabs999Tests
             {
                 var name=todo[0];todo.RemoveAt(0);
                 if(!visited.Add(name) || !bodies.TryGetValue(name,out var body))continue;
-                foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,(tab,category));
+                yield return (tab,category,name,body);
                 todo.AddRange(Regex.Matches(body,@"\b(Draw\w+)\(").Select(call=>call.Groups[1].Value));
             }
         }
+    }
+
+    internal static Dictionary<string,(string Tab,string Category)> Scan()
+    {
+        var seen=new Dictionary<string,(string Tab,string Category)>();
+        foreach(var (tab,category,_,body) in Walk())
+            foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,(tab,category));
         return seen;
     }
 

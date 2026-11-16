@@ -1,3 +1,4 @@
+using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 
@@ -18,6 +19,7 @@ internal sealed partial class MainWindow
     {
         var value=read();
         if(ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value))SaveSetting(labelKey,read,write,value);
+        ReachSetting(labelKey);
         Tip(tipKey);
         var fallback=defaultOf(DefaultConfiguration);
         if(DefaultButton(labelKey,read()!=fallback,OnOff(fallback)))SaveSetting(labelKey,read,write,fallback);
@@ -31,6 +33,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         var changed=ImGui.InputText(localization.Get(labelKey)+"###"+labelKey,ref value,maximum);
         if(changed)write(value);
+        ReachSetting(labelKey);
         Tip(tipKey);
         return changed;
     }
@@ -42,6 +45,7 @@ internal sealed partial class MainWindow
         var value=read();
         var changed=ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value);
         if(changed)write(value);
+        ReachSetting(labelKey);
         Tip(tipKey);
         return changed;
     }
@@ -50,6 +54,7 @@ internal sealed partial class MainWindow
     private bool SettingButton(string labelKey,string tipKey)
     {
         var clicked=ImGui.SmallButton(localization.Get(labelKey)+"###"+labelKey);
+        ReachSetting(labelKey);
         Tip(tipKey);
         return clicked;
     }
@@ -81,6 +86,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndCombo();}
         }
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,!comparer.Equals(read(),fallback),defaultName))SaveSetting(labelKey,read,write,fallback);
     }
@@ -96,6 +102,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.InputInt(localization.Get(labelKey)+"###"+labelKey,ref value,0))write(Math.Clamp(value,min,max));
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
     }
@@ -110,6 +117,7 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.SliderInt(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
     }
@@ -121,8 +129,22 @@ internal sealed partial class MainWindow
         ImGui.SetNextItemWidth(width);
         if(ImGui.SliderFloat(localization.Get(labelKey)+"###"+labelKey,ref value,min,max,format))write(value);
         SaveWhenEditEnds(labelKey,write,before);
+        ReachSetting(labelKey);
         Tip(tipKey);
         if(DefaultButton(labelKey,read()!=fallback))SaveSetting(labelKey,read,write,fallback);
+    }
+
+    // X-507: the setting a search result chose; every setting row tells ReachSetting it was drawn, which scrolls it into view and
+    // highlights it for a moment (the Settings page opens the tab, the category and the folded sections around it first).
+    private readonly UI.SettingFocus settingFocus=new();
+
+    private void ReachSetting(string labelKey)
+    {
+        var (scroll,strength)=settingFocus.Reached(labelKey,ImGui.GetFrameCount(),ImGui.GetTime());
+        if(strength<=0)return;
+        if(scroll)ImGui.SetScrollHereY(0.35f);
+        var edge=new Vector2(3);
+        ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin()-edge,ImGui.GetItemRectMax()+edge,ImGui.GetColorU32(Accent with { W=strength }),3,ImDrawFlags.None,2);
     }
 
     // X-76 H3/H4 (0.914): how to put back the value a number field or slider had when its edit began (one control is active at a

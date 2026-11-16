@@ -14,6 +14,9 @@ internal sealed partial class MainWindow
     {
         Heading(localization.Get("Settings.Title"),localization.Get("Settings.Description"));
         DrawSettingsSearch();
+        settingFocus.Tick();
+        // X-507: while the setting a search chose is looked for, the headers and tree nodes around it are not folded.
+        TenshoAssistant.UI.UiComponents.OpenSections=settingFocus.Opening;
         if(ImGui.BeginTabBar("SettingsSections"))
         {
             try
@@ -30,6 +33,7 @@ internal sealed partial class MainWindow
             }
             finally{ImGui.EndTabBar();}
         }
+        TenshoAssistant.UI.UiComponents.OpenSections=false;
     }
 
     // X-76 H4 (0.914): the macro copy settings as saved before the edit not written yet; they come back when saving it fails.
@@ -179,7 +183,7 @@ internal sealed partial class MainWindow
         foreach(var (key,tab) in hits)
         {
             var category=SettingsIndex.Categories[key];
-            if(ImGui.Selectable($"{localization.Get(key)}  ·  {localization.Get("SettingsSections."+tab)} › {localization.Get("SettingsCategories."+category)}##SettingHit{key}")){OpenSettingsCategory(tab,category);settingsQuery="";}
+            if(ImGui.Selectable($"{localization.Get(key)}  ·  {localization.Get("SettingsSections."+tab)} › {localization.Get("SettingsCategories."+category)}##SettingHit{key}")){OpenSettingsCategory(tab,category,key);settingsQuery="";}
         }
         ImGui.Separator();
     }

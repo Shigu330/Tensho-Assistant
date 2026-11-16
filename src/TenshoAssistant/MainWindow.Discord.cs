@@ -26,7 +26,7 @@ internal sealed partial class MainWindow
         (AlarmSource.Voyage,"Discord.Voyages"),(AlarmSource.Other,"Discord.Other"),(AlarmSource.Currency,"Discord.Currencies"),(AlarmSource.DutyPop,"Discord.DutyPop")];
     private void DrawDiscordCategoryChannels()
     {
-        if(!ImGui.TreeNode(localization.Get("Discord.Channels")+"###DiscordChannels"))return;
+        if(!TenshoAssistant.UI.UiComponents.TreeNode(localization.Get("Discord.Channels")+"###DiscordChannels"))return;
         try
         {
             ImGui.TextWrapped(localization.Get("Discord.ChannelsHelp"));

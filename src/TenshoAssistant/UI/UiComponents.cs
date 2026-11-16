@@ -17,8 +17,19 @@ internal static class UiComponents
     /// <summary>A collapsing section header in the game's title font (every section header goes through here).</summary>
     public static bool Header(string label, ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags.None)
     {
+        if (OpenSections) ImGui.SetNextItemOpen(true);
         using (PushSectionFont()) return ImGui.CollapsingHeader(label, flags);
     }
+
+    /// <summary>X-507: a tree node that opens, like the headers, while the Settings page looks for the setting a search chose.</summary>
+    public static bool TreeNode(string label)
+    {
+        if (OpenSections) ImGui.SetNextItemOpen(true);
+        return ImGui.TreeNode(label);
+    }
+
+    /// <summary>X-507: set by the Settings page while it looks for the setting a search chose, so the section holding it is not folded.</summary>
+    public static bool OpenSections { get; set; }
 
     private static float Scale=>Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale;
 

@@ -129,7 +129,7 @@ internal sealed partial class MainWindow
     // X-119 step 4 (0.1158): one choice per page of the navigation (Home, Settings and the pages that stay in the game are not offered).
     private void DrawPagePlaces()
     {
-        if(!ImGui.TreeNode(localization.Get("Advanced.PagePlacesTitle")+"###PagePlaces"))return;
+        if(!TenshoAssistant.UI.UiComponents.TreeNode(localization.Get("Advanced.PagePlacesTitle")+"###PagePlaces"))return;
         try
         {
             ImGui.TextDisabled(localization.Get("Advanced.PagePlacesHelp"));

@@ -65,10 +65,14 @@ internal sealed partial class MainWindow
         settingsCategoryChosen[tab]=chosen!;
     }
 
-    /// <summary>Opens a setting's place: its tab and its category (the category of a setting is in <see cref="SettingsIndex.Categories"/>).</summary>
-    private void OpenSettingsCategory(string tab,string category)
+    /// <summary>
+    /// Opens a setting's place: its tab and its category (the category of a setting is in <see cref="SettingsIndex.Categories"/>); with the
+    /// label key of a setting found by the search (X-507), the page then opens the sections around it, scrolls it into view and highlights it.
+    /// </summary>
+    private void OpenSettingsCategory(string tab,string category,string? settingKey=null)
     {
         requestedSettingsTab=tab;
         settingsCategoryChosen[tab]=category;
+        if(settingKey is not null)settingFocus.Request(settingKey);
     }
 }

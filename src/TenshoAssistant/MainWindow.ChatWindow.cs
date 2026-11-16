@@ -324,7 +324,7 @@ internal sealed partial class MainWindow
                     if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"))){ChatMessages.Restart(tab);tabs.RemoveAt(index);chatSettingsPending=true;return;}
                     Tip("ChatWindow.TabRemoveTip");
                 }
-                if(ImGui.TreeNode(localization.Format("ChatWindow.TabChannels",tab.Channels?.Count ?? 0)+"###ChatTabChannels"))
+                if(TenshoAssistant.UI.UiComponents.TreeNode(localization.Format("ChatWindow.TabChannels",tab.Channels?.Count ?? 0)+"###ChatTabChannels"))
                 {
                     try{DrawChatTabFilters(tab);}
                     finally{ImGui.TreePop();}
@@ -376,7 +376,7 @@ internal sealed partial class MainWindow
         DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Discussion),localization.Get("ChatWindow.FilterDiscussion"),"Discussion");
         DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Announcements),localization.Get("ChatWindow.FilterAnnouncements"),"Announcements");
         var combat=table.Rows.Where(row=>ChatFilterTable.IsCombat(row.Category)).ToList();
-        if(combat.Count>0 && ImGui.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterCombat"),combat,filters)+"###ChatFilterCombat"))
+        if(combat.Count>0 && TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterCombat"),combat,filters)+"###ChatFilterCombat"))
         {
             try
             {
@@ -400,7 +400,7 @@ internal sealed partial class MainWindow
     private void DrawChatFilterGroup(ChatTabSettings tab,List<uint> filters,IEnumerable<ChatFilterRow> rows,string name,string id)
     {
         var list=rows.ToList();
-        if(list.Count==0 || !ImGui.TreeNode(ChatFilterLabel(name,list,filters)+"###ChatFilter"+id))return;
+        if(list.Count==0 || !TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(name,list,filters)+"###ChatFilter"+id))return;
         try
         {
             // The whole group on or off at once, then each filter of the game.

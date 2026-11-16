@@ -53,7 +53,7 @@ internal static class SettingsCategories1496Tests
         ("Settings categories 1496: a search result opens its tab and its category; the tools' « Settings » links name an existing category of the Panels tab",() =>
         {
             var source=Read("src/TenshoAssistant/MainWindow.Settings.cs");
-            Check(source.Contains("OpenSettingsCategory(tab,category)") && source.Contains("SettingsIndex.Categories[key]"),"the search opens the category of the setting found");
+            Check(source.Contains("OpenSettingsCategory(tab,category,key)") && source.Contains("SettingsIndex.Categories[key]"),"the search opens the category of the setting found");
             var panels=SettingsTabs999Tests.CategoryList().Where(category=>category.Tab=="Panels").Select(category=>category.Id).ToHashSet();
             var linked=Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant"),"MainWindow*.cs").SelectMany(file=>Regex.Matches(File.ReadAllText(file),@"DrawToolSettingsLink\(""\w+"",""(\w+)""\)").Select(match=>match.Groups[1].Value)).ToArray();
             Check(linked.Length>=8 && linked.All(panels.Contains),"a tool link names a category that does not exist: "+string.Join(",",linked.Where(id=>!panels.Contains(id))));
