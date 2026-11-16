@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1490.0
+- Plan global, X-505 : Fenêtre de chat (X-505, capture de l'utilisateur du 16/11 vers 10 h : fond toujours opaque, même avec l'opacité à 0 %). La zone des lignes recevait du thème un fond de panneau opaque, dessiné par-dessus le fond de la fenêtre : le réglage d'opacité ne se voyait pas. La zone n'a plus de fond propre : seul le fond de la fenêtre, avec son opacité (15 % par défaut), se voit.
+- Pour les joueurs : le fond de la fenêtre de chat de Tensho suit maintenant son réglage d'opacité : par défaut il est presque invisible, comme le chat du jeu.
+- Tests : ChatBackground1490Tests. Verify.ps1 (agent) : 2924/2924, 0 avertissement, 0 erreur ; DLL 0.1490.0.0. Non validé en jeu.
+### English
+- Chat window (X-505, the user's capture of 11/16 around 10 am: background still opaque, even with the opacity at 0 %). The lines' area got an opaque panel background from the theme, drawn over the window's background: the opacity setting did not show. The area no longer has a background of its own: only the window's, with its opacity (15 % by default), shows.
+- For players: The Tensho chat window's background now follows its opacity setting: by default it is nearly invisible, as the game's chat.
+
 ## 0.1489.0
 - Plan global, X-504 : Relecture de 0.1486 (X-504, M1 et M2). M1 : le contour du texte est dessiné en quatre copies qui se superposent ; en mode « S'effacer », chaque copie est maintenant pâlie pour que les quatre ensemble soient pâlies comme le texte (le halo n'est plus plus sombre que le texte, 69 % avant là où les quatre se recouvraient). M2 : la zone des lignes porte le numéro propre à la vue de l'onglet, plus sa place : après « Retirer » un onglet, les suivants gardent leur propre défilement.
 - Pour les joueurs : dans la fenêtre de chat de Tensho, le contour des lettres pâlit autant que le texte quand la fenêtre s'efface, et retirer un onglet ne change plus le défilement des autres.

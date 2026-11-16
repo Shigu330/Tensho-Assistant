@@ -92,7 +92,7 @@ internal static class ChatLook1488Tests
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
             var thin = window.IndexOf("ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize,ChatLook.ScrollbarThin);", StringComparison.Ordinal);
             var area = window.IndexOf("try{visible=ImGui.BeginChild(ChatFormat.LinesId(tab)", StringComparison.Ordinal);
-            Check(thin > 0 && area > thin && window.Contains("finally{if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}", StringComparison.Ordinal), "the bar's size and colours around the area's start");
+            Check(thin > 0 && area > thin && window.Contains("if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}", StringComparison.Ordinal), "the bar's size and colours around the area's start");
             Check(window.Contains("ImGui.PushStyleVar(ImGuiStyleVar.TabRounding,ChatLook.TabRounding);", StringComparison.Ordinal)
                   && window.Contains("ChatLook.TabLabel(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),index==chatTabShown,options.GameTabs)", StringComparison.Ordinal), "the game's tabs");
             Check(window.Contains("if(!game)\n        {\n            var min=ImGui.GetItemRectMin();", StringComparison.Ordinal), "underlined only without the game's look");

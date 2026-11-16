@@ -491,8 +491,11 @@ internal sealed partial class MainWindow
             ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabActive,text with{W=ChatLook.ScrollbarGrab.Held});
         }
         bool visible;
+        // X-505 (0.1490, the user's capture of 11/16 09:58: background still opaque, with the opacity at 0 %): the lines' area has no background
+        // of its own (the theme gives children its opaque panel colour, drawn over the window's): only the window's, with its opacity, shows.
+        ImGui.PushStyleColor(ImGuiCol.ChildBg,Vector4.Zero);
         try{visible=ImGui.BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);}
-        finally{if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}
+        finally{ImGui.PopStyleColor();if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}
         try
         {
             if(!visible)return;
