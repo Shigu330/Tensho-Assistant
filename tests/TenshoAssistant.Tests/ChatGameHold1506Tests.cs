@@ -45,9 +45,11 @@ internal static class ChatGameHold1506Tests
             Check(window.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true",StringComparison.Ordinal),"the four states passed");
             Check(window.Contains("internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;",StringComparison.Ordinal),"followed only while hidden");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));
-            Check(hider.Contains("if(!ChatLogShown())now=ChatHideWant.Hold;",StringComparison.Ordinal),"the game's chat not shown: held");
-            Check(hider.Contains("place=now==ChatHideWant.Hide ? Read(boxes) : null;",StringComparison.Ordinal),"a place only while hidden");
-            Check(hider.IndexOf("now=ChatHideWant.Release;",StringComparison.Ordinal)<hider.IndexOf("if(!ChatLogShown())",StringComparison.Ordinal),"a competitive cut never gives back over a hidden chat");
+            Check(hider.Contains("ChatHideWants.InFrame(wanted(),chatLogShown:ChatLogShown(),competitiveCut:TenshoAssistant.Competitive.CompetitiveGate.Cut)",StringComparison.Ordinal)
+                && ChatHideWants.InFrame(ChatHideWant.Hide,false,false)==ChatHideWant.Hold,"the game's chat not shown: held");
+            Check(hider.Contains("place=ChatHideWants.ReadsPlace(now) ? Read(boxes) : null;",StringComparison.Ordinal) && window.Contains("var follow=ChatHidesGameMessages() ? ChatGamePlace?.Invoke():null;",StringComparison.Ordinal),
+                "a place read while the chat is shown (0.1509, X-534 M1), used by the window only while hidden");
+            Check(ChatHideWants.InFrame(ChatHideWant.Hide,true,false)==ChatHideWant.Hold,"a competitive cut never gives back over a hidden chat");
         }),
     ];
 }

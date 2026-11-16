@@ -52,7 +52,8 @@ internal static class ChatGameHide1504Tests
             var settings=new ChatSettings();
             Check(!settings.HideGameMessages && !settings.BothChats,"off by default");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));
-            Check(hider.Contains("CompetitiveGate.AddAlways(framework,OnUpdate)",StringComparison.Ordinal) && hider.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=ChatHideWant.Release;",StringComparison.Ordinal),"runs in a cut too, to give back");
+            Check(hider.Contains("CompetitiveGate.AddAlways(framework,OnUpdate)",StringComparison.Ordinal) && hider.Contains("ChatHideWants.InFrame(wanted(),chatLogShown:ChatLogShown(),competitiveCut:TenshoAssistant.Competitive.CompetitiveGate.Cut)",StringComparison.Ordinal)
+                && ChatHideWants.InFrame(ChatHideWant.Hide,true,true)==ChatHideWant.Release,"runs in a cut too, to give back");
             Check(hider.Contains("unit->IsVisible=false",StringComparison.Ordinal) && hider.Contains("unit->IsVisible=true",StringComparison.Ordinal),"panels hidden and shown");
             var chatLogLines=hider.Split('\n').Where(line=>line.Contains("IsVisible=",StringComparison.Ordinal));
             Check(chatLogLines.All(line=>line.Contains("Panel(index)",StringComparison.Ordinal)),"only the panels are written, never ChatLog");

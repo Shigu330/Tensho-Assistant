@@ -13,7 +13,9 @@ public enum ChatHideWant { Release, Hold, Hide }
 public static class ChatHideWants
 {
     /// <param name="wanted">The option on, « both chats » off, Tensho's chat window open, working and not unloading.</param>
-    /// <param name="competitive">Player-versus-player or competitive content (DEC-038): always given back, the whole of Tensho is cut.</param>
+    /// <param name="competitive">Player-versus-player or competitive content (DEC-038): given back, even with the game's interface hidden. X-534 M2
+    /// (0.1509): in the frame, a game chat window that is not shown holds first (InFrame): never shown again over a hidden chat, given back as
+    /// soon as it shows again.</param>
     /// <param name="gameUiHidden">The game hides its interface (cutscene, GPose, interface hidden): the messages stay as they are.</param>
     /// <param name="combatHidden">« Hide in combat » on and in combat: Tensho's window goes, the game's messages come back as the chat of the fight.</param>
     public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden)=>Of(wanted,competitive,gameUiHidden,combatHidden,false);
@@ -25,6 +27,19 @@ public static class ChatHideWants
             : gameUiHidden ? ChatHideWant.Hold
             : combatHidden || coveredHidden ? ChatHideWant.Release
             : ChatHideWant.Hide;
+
+    /// <summary>X-534 M2 (0.1509, review of 0.1507): the choice the hider applies in a frame, the one place where it is written. A competitive
+    /// cut gives back (DEC-038), whatever Tensho wished; but while the game's chat window itself is not shown (cutscene, opening scene of a
+    /// PvP match, interface hidden), nothing is touched (Hold, X-527): the panels Tensho hid come back as soon as ChatLog shows again.</summary>
+    public static ChatHideWant InFrame(ChatHideWant wished,bool competitiveCut,bool chatLogShown)
+        =>!chatLogShown ? ChatHideWant.Hold
+            : competitiveCut ? ChatHideWant.Release
+            : wished;
+
+    /// <summary>X-534 M1 (0.1509): the box of the game's messages is read in every frame the game's chat is shown, also while they are given
+    /// back (a game window over Tensho's, combat): when Tensho's window takes their place again, the box is there in that very frame, and the
+    /// window is never drawn for a frame at the player's own place (a blink, and a place another game window could cover).</summary>
+    public static bool ReadsPlace(ChatHideWant now)=>now!=ChatHideWant.Hold;
 }
 
 /// <summary>

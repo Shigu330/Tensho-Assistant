@@ -35,8 +35,8 @@ internal sealed unsafe class GameChatHider : IDisposable
         TenshoAssistant.Competitive.CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
-    /// <summary>Where Tensho's chat window goes while the game's messages are hidden (screen pixels); null when they are not hidden or the
-    /// box could not be read.</summary>
+    /// <summary>Where Tensho's chat window goes while the game's messages are hidden (screen pixels); read while the game's chat is shown
+    /// (X-534 M1, 0.1509: also while they are given back; the window uses it only while they are hidden); null otherwise or unread.</summary>
     public ChatFollowPlace? Place=>place;
 
     /// <summary>X-533 (0.1508): the game's channel menu is open while the game's messages are hidden (Tensho's window steps aside).</summary>
@@ -98,11 +98,9 @@ internal sealed unsafe class GameChatHider : IDisposable
         if(failed || disposed || !framework.IsInFrameworkUpdateThread || framework.IsFrameworkUnloading)return;
         try
         {
-            // Given back during a competitive cut, whatever the option says.
-            var now=wanted();
-            if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=ChatHideWant.Release;
-            // X-527 (0.1506): the game's chat not shown (interface hidden by the game, cutscene, HUD): nothing touched, nothing shown again.
-            if(!ChatLogShown())now=ChatHideWant.Hold;
+            // Given back during a competitive cut, whatever the option says; X-527 (0.1506): the game's chat not shown (interface hidden by
+            // the game, cutscene, HUD): nothing touched, nothing shown again. X-534 M2 (0.1509): one rule, ChatHideWants.InFrame.
+            var now=ChatHideWants.InFrame(wanted(),chatLogShown:ChatLogShown(),competitiveCut:TenshoAssistant.Competitive.CompetitiveGate.Cut);
             var states=new List<ChatPanelState>(4);
             var boxes=new List<ChatLogPanelBox>(4);
             // X-528 M2 (0.1507): only the panels under Tensho's window (panel 0 and the docked tabs at its place) are hidden.
@@ -121,7 +119,8 @@ internal sealed unsafe class GameChatHider : IDisposable
             if(!said && toHide.Count>0){said=true;log.Information("Game chat: its message panels hidden ({0}); the typing box stays the game's.",string.Join(", ",toHide));}
             if(toShow.Count>0)log.Information("Game chat: its message panels shown again ({0}).",string.Join(", ",toShow));
             StepTabs(now);
-            place=now==ChatHideWant.Hide ? Read(boxes) : null;
+            // X-534 M1 (0.1509): read also while given back, for Tensho's window to take the place again in the same frame.
+            place=ChatHideWants.ReadsPlace(now) ? Read(boxes) : null;
             menuOpen=now==ChatHideWant.Hide && MenuOpen();
         }
         catch(Exception error)
