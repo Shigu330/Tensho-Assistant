@@ -1995,6 +1995,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1479) Réglage « Sous une fenêtre du jeu » : « Se cacher » : ouvrir l'inventaire puis la carte du jeu par-dessus le chat : il disparaît, puis revient seul à leur fermeture. « S'effacer » : le chat devient pâle sans fond et un clic dessus va à la fenêtre du jeu. « Rester » : rien ne change.
 
+- [ ] (0.1480) Fenêtre de chat de Tensho, réglage « Sous une fenêtre du jeu » sur « Se cacher », remplacement de la carte du jeu coupé : ouvrir la carte du jeu par-dessus le chat : il disparaît, puis revient à sa fermeture. Sur « S'effacer » : toute la fenêtre pâlit, barre de titre et cadre compris (cadre affiché).
+
+- [ ] (0.1481) Fenêtre de chat de Tensho à côté du chat du jeu : heure entre crochets [22:47], lettres avec un contour sombre, fond léger, marges serrées ; réglage « Onglets sous les messages » : les onglets passent dessous, la dernière ligne reste visible.
+
+- [ ] (0.1481) Au bout des onglets du chat de Tensho : « + » ajoute un onglet ; la roue dentée ouvre les réglages du chat ; changer l'opacité ou un canal là, puis ouvrir la page Paramètres de Tensho : le même changement y est.
+
+- [ ] (0.1482) Fenêtre de chat de Tensho, réglages d'un onglet : « Utiliser les filtres du jeu » : les groupes Discussion, Annonces et Combat (par sujet) apparaissent avec les noms du jeu ; « Comme Combat du jeu » sur un onglet, puis un combat : seules vos lignes et celles de l'équipe y sont, comme dans l'onglet Combat du jeu ; décocher « Dégâts infligés par vous » les retire.
+
+- [ ] (0.1482) Fenêtre de chat de Tensho : « Cacher avec » un mot, « Seulement avec » un autre ; « Joueurs cachés » avec le nom d'un joueur qui parle : ses messages disparaissent de Tensho (pas du jeu) ; « Joueurs mis en avant » : son nom ressort.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
