@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (522 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (527 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -561,6 +561,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-453 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), minor M1, M2, M3, M4… | Done in 0.1457 |
 | X-454 | Red CI (Build and test of « 0.1454.0 · suite », run 43752719862, 11/15): the… | Done in 0.1455 |
 | X-456 | Tool: STATUS's « 0) Reprise » line piles up leftovers at each version… | Done in 0.1461.0 |
+| X-457 | Bug seen by the user on 11/15 around 8:50 pm (0.1454, two screenshots): the… | Done in 0.1462.0 |
 | X-458 | User request of 11/15 around 9 pm: on the private test page (X-450), a full… | Done in 0.1461.0 |
 | X-461 | Bug seen by the user on 11/15 around 9:20 pm (test T-0.1441-3, test page)… | Done in 0.1463 |
 | X-463 | Tool: retour.py refuses the release while a relay commit has red CI, even when… | Done in 0.1461.0 |
@@ -571,6 +572,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
 | X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the «… | Done in 0.1477 |
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
+| X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in… | Done in 0.1487.0 |
 | X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I2: finding in… | Done in 0.1469 |
 | X-482 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), minor M1, M2, M3, M4… | Done in 0.1472 |
 | X-483 | Tool (defect seen by the user on 11/15 around 11:40 pm on the test page… | Done in 0.1473.0 |
@@ -590,12 +592,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-500 | Review  (review 0.1482, 16/11), I1: finding in… | Done in 0.1483 |
 | X-501 | Review  (review 0.1482, 16/11), I2: finding in… | Done in 0.1484 |
 | X-502 | Review  (review 0.1482, 16/11), I3: finding in… | Done in 0.1485 |
+| X-503 | Review  (review 0.1482, 16/11), minor M1, M2, M3: M1 in… | Done in 0.1486.0 |
+| X-504 | Review  (review 0.1486, 16/11), minor M1, M2: M1 in… | Done in 0.1489 |
+| X-506 | Bug seen on 11/16 around 9:30 am (user screenshot next to the game chat, and… | Done in 0.1487 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (522 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (527 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1154,6 +1159,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-453 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), mineurs M1, M2… | Fait en 0.1457 |
 | X-454 | CI rouge (Build and test du commit « 0.1454.0 · suite », run 43752719862… | Fait en 0.1455 |
 | X-456 | Outil : la ligne « 0) Reprise » de STATUS accumule des restes à chaque version… | Fait en 0.1461.0 |
+| X-457 | Bug vu par l'utilisateur le 15/11 vers 20 h 50 (0.1454, deux captures) : la… | Fait en 0.1462.0 |
 | X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page privée des essais… | Fait en 0.1461.0 |
 | X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai T-0.1441-3, page des… | Fait en 0.1463 |
 | X-463 | Outil : retour.py refuse la release tant qu'un commit du relais a sa CI rouge… | Fait en 0.1461.0 |
@@ -1164,6 +1170,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
 | X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat… | Fait en 0.1477 |
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
+| X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la… | Fait en 0.1487.0 |
 | X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I2 : X-462 : MapOf… | Fait en 0.1469 |
 | X-482 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), mineurs M1, M2… | Fait en 0.1472 |
 | X-483 | Outil (défaut vu par l'utilisateur le 15/11 vers 23 h 40 sur le tableau de bord… | Fait en 0.1473.0 |
@@ -1183,3 +1190,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-500 | Relecture  (relecture 0.1482, 16/11), I1 : X-497 : la carte du jeu « hébergée… | Fait en 0.1483 |
 | X-501 | Relecture  (relecture 0.1482, 16/11), I2 : X-476 : les lignes sont maintenant… | Fait en 0.1484 |
 | X-502 | Relecture  (relecture 0.1482, 16/11), I3 : Le contour du texte (X-476) défait… | Fait en 0.1485 |
+| X-503 | Relecture  (relecture 0.1482, 16/11), mineurs M1, M2, M3 : M1 : Les marges… | Fait en 0.1486.0 |
+| X-504 | Relecture  (relecture 0.1486, 16/11), mineurs M1, M2 : M1 : X-502 : le contour… | Fait en 0.1489 |
+| X-506 | Bug vu le 16/11 vers 9 h 30 (capture de l'utilisateur côte à côte avec le chat… | Fait en 0.1487 |
