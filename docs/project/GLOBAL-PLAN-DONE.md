@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (545 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (549 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -613,12 +613,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-523 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), I1: finding in… | Done in 0.1501 |
 | X-524 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), minor M1, M2: M1 in… | Done in 0.1501.0 |
 | X-525 | Review of block 0.1501 to 0.1502 (review 0.1502, 16/11), minor M1, M2, M3: M1… | Done in 0.1503 |
+| X-526 | Tool (defect seen by the master on 11/16 around 4:30 pm, fix asked by the… | Done in 0.1505 |
+| X-527 | Review  (review 0.1504, 16/11), I1: finding in… | Done in 0.1506 |
+| X-528 | Review  (review 0.1504, 16/11), minor M1, M2, M3, M4: M1 in… | Done in 0.1507 |
+| X-531 | Tool (defect seen by the master on 16/11 around 23:00): page_essais.py import… | Done in 0.1505 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (545 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (549 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1229,3 +1233,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-523 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), I1 : X-492 M4 : la… | Fait en 0.1501 |
 | X-524 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), mineurs M1, M2… | Fait en 0.1501.0 |
 | X-525 | Relecture du bloc 0.1501 à 0.1502 (relecture 0.1502, 16/11), mineurs M1, M2, M3… | Fait en 0.1503 |
+| X-526 | Outil (défaut vu par la maître le 16/11 vers 16 h 30, correction demandée par… | Fait en 0.1505 |
+| X-527 | Relecture  (relecture 0.1504, 16/11), I1 : Le code rend les messages du jeu… | Fait en 0.1506 |
+| X-528 | Relecture  (relecture 0.1504, 16/11), mineurs M1, M2, M3, M4 : M1 : Une fenêtre… | Fait en 0.1507 |
+| X-531 | Outil (défaut vu par la maître le 16/11 vers 23 h) : page_essais.py import… | Fait en 0.1505 |

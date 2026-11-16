@@ -2053,25 +2053,25 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1494) Fenêtre de chat, historique coché avec « Sans limite » : recharger Tensho : les messages reviennent vite et en entier dans la fenêtre (jusqu'à son nombre de lignes), sans saccade du jeu au chargement.
 
-- [ ] (0.1496) Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage si le mode développeur est coché) : une liste de catégories à gauche, les réglages de la catégorie cliquée à droite ; changer d'onglet puis revenir (ou fermer et rouvrir la page) garde la catégorie choisie ; la fenêtre du jeu reste lisible à sa plus petite taille.
+- [x] (0.1496) Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage si le mode développeur est coché) : une liste de catégories à gauche, les réglages de la catégorie cliquée à droite ; changer d'onglet puis revenir (ou fermer et rouvrir la page) garde la catégorie choisie ; la fenêtre du jeu reste lisible à sa plus petite taille.
 
-- [ ] (0.1496) Paramètres, recherche : taper « police » puis « carte » : chaque résultat indique l'onglet et la catégorie (Onglet › Catégorie) ; choisir un résultat ouvre cet onglet et cette catégorie.
+- [x] (0.1496) Paramètres, recherche : taper « police » puis « carte » : chaque résultat indique l'onglet et la catégorie (Onglet › Catégorie) ; choisir un résultat ouvre cet onglet et cette catégorie.
 
-- [ ] (0.1496) Un outil avec son bouton « Paramètres » (aide du journal d'artisanat, observation de la récolte, mini-jeux) : le bouton ouvre Paramètres > Panneaux à côté du jeu, sur la catégorie de l'outil ; la roue de la carte ouvre l'onglet Carte.
+- [x] (0.1496) Un outil avec son bouton « Paramètres » (aide du journal d'artisanat, observation de la récolte, mini-jeux) : le bouton ouvre Paramètres > Panneaux à côté du jeu, sur la catégorie de l'outil ; la roue de la carte ouvre l'onglet Carte.
 
-- [ ] (0.1497) Paramètres, recherche : taper « liste des pages » et choisir « Liste des pages · Général › Langue et thème » : l'onglet Général et la catégorie Langue et thème s'ouvrent, la ligne trouvée est encadrée un instant et visible sans défiler de plus.
+- [x] (0.1497) Paramètres, recherche : taper « liste des pages » et choisir « Liste des pages · Général › Langue et thème » : l'onglet Général et la catégorie Langue et thème s'ouvrent, la ligne trouvée est encadrée un instant et visible sans défiler de plus.
 
-- [ ] (0.1497) Paramètres, recherche : choisir un réglage tout en bas d'une longue catégorie (par exemple taper « servants » et choisir « Panneau à côté de la liste de ventes des servants », dans Données et sources › Sources communautaires) : le volet défile jusqu'à lui et le cadre s'estompe en deux secondes.
+- [x] (0.1497) Paramètres, recherche : choisir un réglage tout en bas d'une longue catégorie (par exemple taper « servants » et choisir « Panneau à côté de la liste de ventes des servants », dans Données et sources › Sources communautaires) : le volet défile jusqu'à lui et le cadre s'estompe en deux secondes.
 
-- [ ] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
+- [x] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
 
-- [ ] (0.1498) Paramètres, recherche : taper « filtres du jeu » et choisir « Utiliser les filtres du jeu » : seule la section de l'onglet du chat qui le contient s'ouvre ; les listes de canaux et de filtres des autres onglets restent repliées.
+- [x] (0.1498) Paramètres, recherche : taper « filtres du jeu » et choisir « Utiliser les filtres du jeu » : seule la section de l'onglet du chat qui le contient s'ouvre ; les listes de canaux et de filtres des autres onglets restent repliées.
 
-- [ ] (0.1498) Paramètres : choisir une catégorie dans un onglet (par exemple Carte › Icônes), recharger le plugin (ou relancer le jeu) puis rouvrir les Paramètres : la même catégorie est choisie.
+- [x] (0.1498) Paramètres : choisir une catégorie dans un onglet (par exemple Carte › Icônes), recharger le plugin (ou relancer le jeu) puis rouvrir les Paramètres : la même catégorie est choisie.
 
-- [ ] (0.1498) Paramètres › Panneaux à côté du jeu › Macros d'artisanat : la plage de macros et « Écraser » s'y trouvent bien, comme le disent les bulles d'aide du bouton « Copier dans les macros du jeu ».
+- [x] (0.1498) Paramètres › Panneaux à côté du jeu › Macros d'artisanat : la plage de macros et « Écraser » s'y trouvent bien, comme le disent les bulles d'aide du bouton « Copier dans les macros du jeu ».
 
-- [ ] (0.1499) Fenêtre de chat, avec un pavé tactile ou une molette fine : faire défiler un peu vers le haut puis donner un cran de souris vers le bas : les lignes descendent tout de suite d'une ligne.
+- [x] (0.1499) Fenêtre de chat, avec un pavé tactile ou une molette fine : faire défiler un peu vers le haut puis donner un cran de souris vers le bas : les lignes descendent tout de suite d'une ligne.
 
 - [ ] (0.1499) Fenêtre de chat, onglet du réseau des novices : le nom d'un mentor ou d'un nouvel aventurier s'écrit sans « · » devant.
 
@@ -2090,6 +2090,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1504) Option cochée, bouton aux deux fenêtres au bout des onglets Tensho : les deux chats sont affichés, la fenêtre Tensho à sa place ; le bouton de réduction la ramène à ses onglets et la rouvre ; recliquer le bouton aux deux fenêtres : les messages du jeu sont de nouveau cachés
 
 - [ ] (0.1504) Option cochée, passer en JcJ (ou en contenu classé) : les messages du jeu reviennent pendant la coupure de Tensho et sont recachés à la sortie
+
+- [ ] (0.1506) Option « Cacher les messages du chat du jeu » cochée : voir une scène cinématique, puis entrer en GPose et en sortir : les messages du jeu ne réapparaissent jamais pendant la scène ni en GPose ; après, la fenêtre Tensho revient à leur place et ils restent cachés.
+
+- [ ] (0.1506) Option cochée et « Masquer en combat » coché : entrer en combat : la fenêtre Tensho part et les messages du jeu reviennent ; hors combat, ils se cachent de nouveau et la fenêtre Tensho reprend leur place.
+
+- [ ] (0.1507) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire, carte) : la fenêtre Tensho part et les messages du jeu reviennent sous la fenêtre du jeu ; la fermer : la fenêtre Tensho revient à leur place et ils se cachent.
+
+- [ ] (0.1507) Option cochée, un onglet du chat du jeu détaché ailleurs sur l'écran : cet onglet détaché reste affiché ; seuls les messages sous la fenêtre Tensho sont cachés.
+
+- [ ] (0.1507) Option décochée, réduire la fenêtre Tensho à ses onglets, puis cocher l'option dans les Paramètres : la fenêtre prend la place des messages du jeu en entier ; entrer en combat avec « Masquer en combat » puis en sortir : elle revient entière, pas réduite.
 
 **0.535 : interfaces** — à voir en jouant
 
