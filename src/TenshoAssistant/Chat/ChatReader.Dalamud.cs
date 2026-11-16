@@ -24,6 +24,8 @@ internal sealed class ChatReader : IDisposable
     // text of its own (the window writes its target's name) is said apart, with what the game sent for it.
     private readonly ChatPieceLog piecesSaid=new();
     private int bareSaid;
+    // X-525 M3 (0.1503): developer mode: the icon codes met in senders' names, once per code, at most twenty per session (codes only).
+    private readonly ChatPieceLog senderIconsSaid=new(1,20);
     private const int BareSaidMax=10;
 
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null)
@@ -72,6 +74,10 @@ internal sealed class ChatReader : IDisposable
             }
             // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
             var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
+            if(developer?.Invoke()==true && message.Sender.Payloads.Select(Payload).ToList() is var senderPayloads)
+                foreach(var icon in senderPayloads.Where(payload=>payload.Kind==ChatPayloadKind.Icon).Select(payload=>payload.Icon).Distinct())
+                    if(senderIconsSaid.Take((int)icon))
+                        log.Information("Chat window, icons in a sender's name (kind {0}): {1}.",(int)message.LogKind,string.Join(", ",ChatPayloads.SenderIcons(senderPayloads)));
             // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
             var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
             // X-475: kept on disk too when the player turned the history on.

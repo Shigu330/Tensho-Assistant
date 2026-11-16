@@ -37,6 +37,11 @@ public static class ChatPayloads
     public static string Text(IEnumerable<ChatPayload> payloads)
         =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.SenderIcon(payload.Icon),_=>""}));
 
+    /// <summary>X-525 M3 (0.1503): the icon codes in a sender's name, in order (codes only, never a letter of the name), with what the
+    /// window does with each: « 88 kept », « 128 left out » (ChatGlyphs.IsSenderDecoration). Empty when the name has no icon.</summary>
+    public static IReadOnlyList<string> SenderIcons(IEnumerable<ChatPayload> payloads)
+        =>payloads.Where(payload=>payload.Kind==ChatPayloadKind.Icon).Select(payload=>$"{payload.Icon} {(ChatGlyphs.IsSenderDecoration(payload.Icon) ? "left out" : "kept")}").ToList();
+
     /// <summary>The segments the store keeps for these payloads (ChatPieces.Segments of their pieces).</summary>
     public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));
 

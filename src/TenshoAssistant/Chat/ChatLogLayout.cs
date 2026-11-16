@@ -26,7 +26,9 @@ public readonly record struct ChatLogPanelBox(int Index,bool Visible,ChatLogBox 
 /// <param name="Channel">The channel menu before the typing box (ChannelSelectDropDown); null when it could not be read.</param>
 /// <param name="Background">The window's background (BackgroundNode); null when it could not be read.</param>
 /// <param name="Tabs">The first tab (ChatTabs[0]); null when it could not be read.</param>
-/// <param name="InputFocused">Whether the game's focus is on the typing box (the player is typing).</param>
+/// <param name="InputFocused">Whether ChatLog's focus node is the typing box. X-525 M1 (0.1503): not a sign of typing: the reading of 0.1502
+/// found it true while the player was not typing (ChatLog's focus node is the typing box even when it is closed; docs/evidence/0.1502-game-chat-input.md,
+/// section 3), so the log line writes « focus node », never « focused » nor « typing ».</param>
 public sealed record ChatLogLayout(bool Visible,float Scale,ChatLogBox Window,ChatLogBox? Input,ChatLogBox? Channel,ChatLogBox? Background,ChatLogBox? Tabs,bool InputFocused,IReadOnlyList<ChatLogPanelBox> Panels)
 {
     /// <summary>The log line: boxes, flags, and where each part lies (inside ChatLog, above or below the input). No text.</summary>
@@ -36,7 +38,7 @@ public sealed record ChatLogLayout(bool Visible,float Scale,ChatLogBox Window,Ch
         var inputBelowPanels=Input is { } input && Panels.Where(panel=>panel.Visible).All(panel=>panel.Box.Y+panel.Box.Height<=input.Y+1);
         var panels=string.Join("; ",Panels.Select(panel=>$"panel{panel.Index} {(panel.Visible ? "shown" : "hidden")} {panel.Box}{(panel.Box.Inside(Window) ? " inside" : " outside")}"));
         return string.Create(CultureInfo.InvariantCulture,
-            $"window {(Visible ? "shown" : "hidden")} {Window} scale {Scale:0.00}; input {Box(Input)}{(Input is { } i && i.Inside(Window) ? " inside" : "")}{(InputFocused ? " focused" : "")}; "
+            $"window {(Visible ? "shown" : "hidden")} {Window} scale {Scale:0.00}; input {Box(Input)}{(Input is { } i && i.Inside(Window) ? " inside" : "")}{(InputFocused ? " focus node" : "")}; "
             +$"channel {Box(Channel)}; tabs {Box(Tabs)}; background {Box(Background)}; input below the shown panels {inputBelowPanels}; {panels}");
     }
 }

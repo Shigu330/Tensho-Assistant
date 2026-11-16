@@ -19,7 +19,7 @@ internal static class ChatLogLayout1502Tests
             Check(line.Contains("input below the shown panels True",StringComparison.Ordinal),"the input under the shown panel");
             Check(line.Contains("panel0 shown 20,726 600x240 inside",StringComparison.Ordinal) && line.Contains("panel1 hidden 700,100 300x200 outside",StringComparison.Ordinal),"each panel");
             var unread=new ChatLogLayout(false,1.5f,window,null,null,null,null,true,[]).Line();
-            Check(unread.Contains("input unread focused",StringComparison.Ordinal) && unread.Contains("window hidden",StringComparison.Ordinal),unread);
+            Check(unread.Contains("input unread focus node",StringComparison.Ordinal) && !unread.Contains("focused",StringComparison.Ordinal) && unread.Contains("window hidden",StringComparison.Ordinal),unread);
         }),
         ("Chat log layout 1502: the probe reads only, in developer mode, and logs no text",() =>
         {
