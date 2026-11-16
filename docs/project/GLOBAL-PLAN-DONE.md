@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (508 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (513 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -566,8 +566,11 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-463 | Tool: retour.py refuses the release while a relay commit has red CI, even when… | Done in 0.1461.0 |
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
+| X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
+| X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the «… | Done in 0.1477 |
+| X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
 | X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I2: finding in… | Done in 0.1469 |
 | X-482 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), minor M1, M2, M3, M4… | Done in 0.1472 |
 | X-483 | Tool (defect seen by the user on 11/15 around 11:40 pm on the test page… | Done in 0.1473.0 |
@@ -576,12 +579,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-489 | Tool (defect found by relay 86 on 11/16 around 00:35): the produced GLOBAL-PLAN… | Done in 0.1473.0 |
 | X-490 | User request of 11/16 around 0:50 am: he will mostly use the private page… | Done in 0.1474.0 |
 | X-491 | Review of block 0.1468 to 0.1472 (review 0.1472, 16/11), I1: finding in… | Done in 0.1473 |
+| X-493 | Review of block 0.1473 to 0.1474 (review 0.1474, 16/11), I1: finding in… | Done in 0.1475 |
+| X-494 | Review of block 0.1473 to 0.1474 (review 0.1474, 16/11), minor M1, M2, M3, M4… | Done in 0.1475.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (508 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (513 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1145,8 +1150,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-463 | Outil : retour.py refuse la release tant qu'un commit du relais a sa CI rouge… | Fait en 0.1461.0 |
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
+| X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
+| X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat… | Fait en 0.1477 |
+| X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
 | X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I2 : X-462 : MapOf… | Fait en 0.1469 |
 | X-482 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), mineurs M1, M2… | Fait en 0.1472 |
 | X-483 | Outil (défaut vu par l'utilisateur le 15/11 vers 23 h 40 sur le tableau de bord… | Fait en 0.1473.0 |
@@ -1155,3 +1163,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-489 | Outil (défaut constaté par le relais 86 le 16/11 vers 00 h 35) : GLOBAL-PLAN… | Fait en 0.1473.0 |
 | X-490 | Demande de l'utilisateur du 16/11 vers 0 h 50 : il utilisera surtout la page… | Fait en 0.1474.0 |
 | X-491 | Relecture du bloc 0.1468 à 0.1472 (relecture 0.1472, 16/11), I1 : Le nom et le… | Fait en 0.1473 |
+| X-493 | Relecture du bloc 0.1473 à 0.1474 (relecture 0.1474, 16/11), I1 : La… | Fait en 0.1475 |
+| X-494 | Relecture du bloc 0.1473 à 0.1474 (relecture 0.1474, 16/11), mineurs M1, M2… | Fait en 0.1475.0 |

@@ -1979,6 +1979,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1472) Fenêtre de chat Tensho : en lisant plus haut, cliquer « En bas » sur un lien n'ouvre pas le lien (seulement le retour en bas) ; un pavé tactile fait défiler doucement, une ligne par cran de molette ; avec un seul nouveau message le bouton dit « 1 nouveau ».
 
+- [ ] (0.1476) Fenêtre de chat de Tensho : laisser un onglet non lu dépasser 100 messages (par exemple Combat pendant un combat, en regardant Général) : son nom montre « (100+) » et sa largeur ne bouge plus ; le lire jusqu'en bas remet le compte à zéro.
+
+- [ ] (0.1476) Fenêtre de chat de Tensho : les deux icônes au bout des onglets (cadre et cadenas) sont centrées dans leur bouton, de la même hauteur que les onglets, avec et sans cadre, à 60 % et 200 % de taille du texte (réglage du chat), en français puis en anglais.
+
+- [ ] (0.1476) Paramètres › Fenêtre de chat › Onglets : donner une couleur au nom de deux onglets (une claire, une foncée) : les noms prennent leur couleur, restent lisibles sur l'onglet actif et inactif, en thème sombre puis clair ; « ↺ » rend la couleur normale ; la couleur reste après un rechargement.
+
+- [ ] (0.1477) Fenêtre de chat de Tensho, mode développeur : au chargement de Dalamud, le message « Developer Mode is enabled » montre « Learn more here » souligné ; un clic gauche dessus ouvre la même fenêtre de Dalamud que le même clic dans le chat du jeu ; l'info-bulle nomme Dalamud.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
