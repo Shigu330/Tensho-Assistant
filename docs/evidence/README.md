@@ -78,7 +78,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1468-chat-link-pieces.md](0.1468-chat-link-pieces.md) | `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatGlyphs1471Tests.cs`, `tests/TenshoAssistant.Tests/ChatLinkPieces1468Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1469-map-floors-check.md](0.1469-map-floors-check.md) | `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1469Tests.cs`, `tools/ShopCurrencyProbe/Program.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1470-beast-result-window.md](0.1470-beast-result-window.md) | `src/TenshoAssistant/Beastmaster/BeastResult.cs`, `tests/TenshoAssistant.Tests/BeastResult1470Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
-| [0.1474-help-texts.md](0.1474-help-texts.md) | `tests/TenshoAssistant.Tests/HelpTexts1474Tests.cs`, `tools/HelpTextProbe/Program.cs`, `tools/README.md` | `CHANGELOG.md` |
+| [0.1474-help-texts.md](0.1474-help-texts.md) | `tests/TenshoAssistant.Tests/HelpTexts1474Tests.cs`, `tools/HelpTextProbe/Program.cs`, `tools/README.md` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1478-dalamud-link-handler.md](0.1478-dalamud-link-handler.md) | `src/TenshoAssistant/Chat/ChatReader.Dalamud.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/ChatReview1478Tests.cs` | `CHANGELOG.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

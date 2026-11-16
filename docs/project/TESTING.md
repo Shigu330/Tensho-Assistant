@@ -1987,6 +1987,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1477) Fenêtre de chat de Tensho, mode développeur : au chargement de Dalamud, le message « Developer Mode is enabled » montre « Learn more here » souligné ; un clic gauche dessus ouvre la même fenêtre de Dalamud que le même clic dans le chat du jeu ; l'info-bulle nomme Dalamud.
 
+- [ ] (0.1478) Fenêtre de chat de Tensho, thème clair puis sombre : un onglet avec une couleur de nom foncée (puis claire) ; cliquer dans le jeu (la fenêtre perd le focus), survoler l'onglet : le nom reste lisible sur l'onglet actif et inactif ; les onglets sans focus ont les couleurs du thème.
+
+- [ ] (0.1478) Fenêtre de chat de Tensho, mode développeur : clic gauche sur « Learn more here » du message « Developer Mode is enabled » : la fenêtre de Dalamud s'ouvre comme depuis le chat du jeu ; clic droit dessus : le menu du message (copier).
+
+- [ ] (0.1479) Fenêtre de chat de Tensho ouverte, puis la fenêtre principale de Tensho par-dessus : la fenêtre principale reste devant, même après un clic dans le chat.
+
+- [ ] (0.1479) Réglage « Sous une fenêtre du jeu » : « Se cacher » : ouvrir l'inventaire puis la carte du jeu par-dessus le chat : il disparaît, puis revient seul à leur fermeture. « S'effacer » : le chat devient pâle sans fond et un clic dessus va à la fenêtre du jeu. « Rester » : rien ne change.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
