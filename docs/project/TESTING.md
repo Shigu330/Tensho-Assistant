@@ -2079,6 +2079,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1501) Fenêtre de chat, onglet du réseau des novices : un message qui contient une icône de classe ou du réseau des novices dans son texte la montre « · » ; le nom de l'expéditeur reste sans « · » devant.
 
+- [ ] (0.1503) En mode développeur, après quelques messages de joueurs avec une icône devant leur nom (mentor, débutant, classe, jeu de rôle) : dalamud.log a des lignes « Chat window, icons in a sender's name » avec des codes seulement ; la fenêtre de chat Tensho montre leur nom sans « · » devant pour un mentor ou une classe.
+
+- [ ] (0.1504) Chat Tensho ouvert, cocher « Cacher les messages du chat du jeu » : les messages du chat du jeu disparaissent, sa zone de saisie, son menu des canaux et ses onglets restent ; la fenêtre Tensho est juste au-dessus de la saisie du jeu, sans la couvrir ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho
+
+- [ ] (0.1504) Option cochée : changer d'onglet du jeu, recevoir des messages, changer de zone, voir une scène cinématique : les messages du jeu restent cachés ; redimensionner ou déplacer le chat du jeu (son bouton de taille, le mode HUD) : la fenêtre Tensho suit
+
+- [ ] (0.1504) Décocher l'option, puis la recocher et fermer la fenêtre Tensho, puis la recocher et décharger Tensho : à chaque fois les messages du jeu reviennent tout de suite, la fenêtre Tensho retourne à sa place d'avant
+
+- [ ] (0.1504) Option cochée, bouton aux deux fenêtres au bout des onglets Tensho : les deux chats sont affichés, la fenêtre Tensho à sa place ; le bouton de réduction la ramène à ses onglets et la rouvre ; recliquer le bouton aux deux fenêtres : les messages du jeu sont de nouveau cachés
+
+- [ ] (0.1504) Option cochée, passer en JcJ (ou en contenu classé) : les messages du jeu reviennent pendant la coupure de Tensho et sont recachés à la sortie
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
