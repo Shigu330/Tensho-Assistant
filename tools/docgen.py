@@ -111,6 +111,7 @@ PROJECT_CORE = [
 ]
 PROJECT_WORKING = [
     ("GLOBAL-PLAN", "global plan and current state", "plan global et état actuel"),
+    ("GLOBAL-PLAN-DONE", "the done points of the global plan, with their version", "les points faits du plan global, avec leur version"),
     ("TESTING", "in-game test protocols", "protocoles d'essai en jeu"),
     ("TESTING-ROUTE", "the in-game tests not yet ticked, sorted by activity", "les essais en jeu non cochés, rangés par activité"),
     ("SETTINGS", "inventory of the settings, produced from the code: default, where, label and tooltip",

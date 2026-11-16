@@ -1,7 +1,7 @@
 using TenshoAssistant.Chat;
 
 // 0.1471 (X-472, user's capture of 11/15): the Tensho chat window left out the game's own glyphs and icons: « Name [world icon] World :
-// THE UNDERGROOVE // … » (a shout, its words in the game's boxed letters) became « NameWorld:   // … ». The message here has the same shape,
+// THE EXAMPLE // … » (a shout, its words in the game's boxed letters) became « NameWorld:   // … ». The message here has the same shape,
 // with invented words (never a player's name in the repository): the sender as the game sends a player from another world (PlayerPayload, the
 // name, LinkEnd, the world icon, the world: the shape recorded on 11/15 in kind 44, docs/evidence/0.1468-chat-link-pieces.md), the text in
 // SeIconChar's boxed letters (codes of Dalamud 15). Every glyph has a readable equivalent; only the link glyph is left out.
