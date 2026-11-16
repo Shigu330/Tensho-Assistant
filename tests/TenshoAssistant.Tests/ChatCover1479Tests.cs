@@ -29,9 +29,8 @@ internal static class ChatCover1479Tests
             Check(window.Contains("StepsAside:()=>false,", StringComparison.Ordinal), "the panels' setting does not apply");
             Check(window.Contains("(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None)", StringComparison.Ordinal), "clicks go through when faded");
             Check(window.Contains("return !ChatCover.Hidden(ChatOptions.WhenCovered,covered);", StringComparison.Ordinal)
-                  && window.Contains("chatAt is not null && BehindGame(at,chatSize)", StringComparison.Ordinal), "hidden while a game window covers where it was");
-            Check(window.Contains("if(faded)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,ChatCover.FadedAlpha);", StringComparison.Ordinal)
-                  && window.Contains("finally{if(faded)ImGui.PopStyleVar();}", StringComparison.Ordinal), "faint text, popped");
+                  && window.Contains("chatAt is not null && BehindGame(at,chatSize,chat:true)", StringComparison.Ordinal), "hidden while a game window covers where it was");
+            Check(window.Contains("Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null", StringComparison.Ordinal), "faint, whole window (X-498 M1)");
             Check(window.Contains("ComboSetting(\"ChatWindow.WhenCovered\",\"ChatWindow.WhenCoveredTip\"", StringComparison.Ordinal), "the setting");
         }),
     ];

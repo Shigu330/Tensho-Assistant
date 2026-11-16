@@ -22,7 +22,7 @@ internal sealed partial class MainWindow
         ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar|ImGuiWindowFlags.NoBringToFrontOnFocus,
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
         StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
-        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless);
+        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null);
 
     /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.
     /// X-485 (0.1479): faded under a game window, the clicks go through to the game.</summary>
@@ -43,9 +43,10 @@ internal sealed partial class MainWindow
     {
         if(!ChatWindowShown())return false;
         var at=chatAt ?? Vector2.Zero;
-        var covered=ChatCover.Bounded(ChatOptions.WhenCovered)!=ChatCovered.Stay && chatAt is not null && BehindGame(at,chatSize);
+        var covered=ChatCover.Bounded(ChatOptions.WhenCovered)!=ChatCovered.Stay && chatAt is not null && BehindGame(at,chatSize,chat:true);
         if(covered!=chatCovered && developerMode)
-            log.Information("Chat window {0} ({1}): at {2}, size {3}.",covered ? "covered by a game window":"uncovered",ChatCover.Bounded(ChatOptions.WhenCovered),at,chatSize);
+            log.Information("Chat window {0} ({1}): at {2}, size {3}; windows: {4}.",covered ? "covered by a game window":"uncovered",ChatCover.Bounded(ChatOptions.WhenCovered),at,chatSize,
+                string.Join(", ",GameWindowList.Where(window=>UI.GameWindows.Touch(at.X,at.Y,chatSize.X,chatSize.Y,window.X,window.Y,window.Width,window.Height)).Select(window=>window.Name)));
         chatCovered=covered;
         return !ChatCover.Hidden(ChatOptions.WhenCovered,covered);
     }
@@ -220,10 +221,8 @@ internal sealed partial class MainWindow
         if(frameNow!=chatLastFrame+1)ImGuiP.BringWindowToDisplayBack(ImGuiP.GetCurrentWindow());
         chatLastFrame=frameNow;
         chatAt=ImGui.GetWindowPos();chatSize=ImGui.GetWindowSize();
-        var faded=ChatCover.Faded(ChatOptions.WhenCovered,chatCovered);
-        if(faded)ImGui.PushStyleVar(ImGuiStyleVar.Alpha,ChatCover.FadedAlpha);
-        try{DrawChatWindowBody();}
-        finally{if(faded)ImGui.PopStyleVar();}
+        // X-498 M1 (0.1480): faded, the whole window is (the alpha pushed before Begin by PanelWindow, Fade), its frame and title bar too.
+        DrawChatWindowBody();
     }
 
     private void DrawChatWindowBody()

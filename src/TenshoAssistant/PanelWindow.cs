@@ -17,6 +17,7 @@ internal sealed class PanelWindow : Window
     private Vector2? lastPosition;
     private Vector2 lastSize;
     private bool borderPushed;
+    private bool fadePushed;
 
     public PanelWindow(MainWindow owner, PanelDefinition panel) : base(panel.Id, panel.Flags)
     {
@@ -51,10 +52,16 @@ internal sealed class PanelWindow : Window
         if (panel.MoreFlags is { } more) Flags = panel.Flags | more();
         borderPushed = panel.NoBorder?.Invoke() == true;
         if (borderPushed) ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
+        // X-498 M1 (0.1480): a faded panel (the chat window under a game window) is faded whole: pushed before Begin, its title bar, frame
+        // and resize grip are drawn faded too, not only its content.
+        var fade = panel.Fade?.Invoke();
+        fadePushed = fade is not null;
+        if (fade is { } alphaFaded) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alphaFaded);
     }
 
     public override void PostDraw()
     {
+        if (fadePushed) { ImGui.PopStyleVar(); fadePushed = false; }
         if (borderPushed) { ImGui.PopStyleVar(); borderPushed = false; }
         UI.FfxivTheme.Pop();
         if (!IsOpen) panel.Close?.Invoke();
@@ -79,4 +86,4 @@ internal sealed class PanelWindow : Window
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
 internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null,
-    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null);
+    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null);

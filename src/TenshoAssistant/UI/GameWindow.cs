@@ -10,11 +10,17 @@ public static class GameWindows
     // 0.679 (user report, log of 2026-11-06): MJIPadGuide is up in every mode of the Island Sanctuary with nothing to see, and made the map leave.
     // 0.692 (user report, log of 2026-11-06: « Panel WorkshopPanel steps aside ... windows: JobHudRRP0, JobHudRRP1 »): the job gauges are HUD, always up: a panel over them could never be seen, nor moved away.
     // MJIHud, the island's management board, is the same kind of thing.
-    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","AreaMap","MJIPadGuide","MJIHud","JobHud"];
+    private static readonly string[] NotWindows=["_","NamePlate","CastBar","ChatLog","ScenarioTree","CursorAddon","MJIPadGuide","MJIHud","JobHud"];
     public static bool Ignored(string name)=>NotWindows.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
+    // X-497 (0.1480, review of 0.1479): the game's map, ignored since 0.537 (Tensho hosts it off screen when it replaces it), now read: on screen
+    // it covers the chat window (« the game map over the chat: it leaves »). Only the chat counts it: the map, the panels and the bars keep
+    // ignoring it, as before (the Tensho map shows exactly when the game map opens). Hosted off screen it touches nothing.
+    private static readonly string[] ChatOnly=["AreaMap"];
+    public static bool ChatOnlyWindow(string name)=>ChatOnly.Any(start=>name.StartsWith(start,StringComparison.Ordinal));
 
     /// <param name="anchors">The game window the interface belongs to, by the start of its name: it and its parts never cover it, and only what is in front of it counts. None: whatever touches it.</param>
-    public static bool Covers(IReadOnlyList<GameWindow> windows,float x,float y,float width,float height,float screenWidth,float screenHeight,IReadOnlyList<string>? anchors=null)
+    /// <param name="chat">The chat window: the windows only it counts (the game's map) count too.</param>
+    public static bool Covers(IReadOnlyList<GameWindow> windows,float x,float y,float width,float height,float screenWidth,float screenHeight,IReadOnlyList<string>? anchors=null,bool chat=false)
     {
         int? home=null;
         if(anchors is {Count:>0})
@@ -23,6 +29,7 @@ public static class GameWindows
         foreach(var window in windows)
         {
             if(window.Width<=0 || window.Height<=0 || window.Width>=screenWidth*0.9f && window.Height>=screenHeight*0.9f)continue;
+            if(!chat && ChatOnlyWindow(window.Name))continue;
             if(anchors?.Any(anchor=>window.Name.StartsWith(anchor,StringComparison.Ordinal))==true)continue;
             if(home is { } rank && window.Rank<=rank)continue;
             if(Touch(x,y,width,height,window.X,window.Y,window.Width,window.Height))return true;

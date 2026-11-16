@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1480.0
+- Plan global, X-497 : Relecture de 0.1479 (X-497, X-498). La carte du jeu, à l'écran, compte comme une fenêtre du jeu pour la fenêtre de chat de Tensho : elle la cache (ou la pâlit, selon le réglage « Sous une fenêtre du jeu ») ; elle était ignorée par son nom depuis 0.537. Les panneaux, les barres et la carte de Tensho continuent de l'ignorer ; hébergée hors écran par Tensho, elle ne touche rien. En mode « S'effacer », toute la fenêtre de chat pâlit (barre de titre, cadre et poignée compris), pas seulement son contenu. Lien d'un plugin dans le chat de Tensho : si Tensho n'arrive pas à relire le lien, l'erreur est notée comme celle de Tensho et le plugin reçoit le texte du lien ; seule une erreur du plugin lui-même s'affiche dans l'info-bulle.
+- Pour les joueurs : fenêtre de chat : la carte du jeu par-dessus la cache aussi ; pâlie, toute la fenêtre pâlit.
+- Tests : ChatReview1480Tests. Verify.ps1 (agent) : 2896/2896, 0 avertissement, 0 erreur ; DLL 0.1480.0.0. Non validé en jeu.
+### English
+- Review of 0.1479 (X-497, X-498). The game's map, on screen, counts as a game window for Tensho's chat window: it hides it (or fades it, as the « Under a game window » setting says); it was ignored by name since 0.537. Tensho's panels, bars and map keep ignoring it; hosted off screen by Tensho, it touches nothing. In « fade » mode the whole chat window fades (title bar, frame and grip included), not only its content. A plugin's link in Tensho's chat: when Tensho cannot re-read the link, the error is logged as Tensho's and the plugin gets the link's text; only an error of the plugin itself shows on the tooltip.
+- For players: Chat window: the game's map over it now hides it too; faded, the whole window fades.
+
 ## 0.1479.0
 - Plan global, X-485 : Fenêtre de chat de Tensho : elle passe derrière les autres fenêtres de Tensho (jamais ramenée devant par un clic, mise au fond quand elle apparaît). Nouveau réglage « Sous une fenêtre du jeu » (une fenêtre dessinée par Dalamud ne peut pas passer sous celles du jeu) : se cacher (par défaut ; elle revient seule quand la fenêtre du jeu se ferme), s'effacer (sans fond, texte pâle, les clics vont au jeu) ou rester. Ce réglage remplace pour le chat celui des panneaux qui s'écartent devant les fenêtres du jeu.
 - Pour les joueurs : fenêtre de chat : reste derrière les fenêtres de Tensho ; nouveau réglage pour ce qu'elle fait sous une fenêtre du jeu (se cacher, s'effacer ou rester).

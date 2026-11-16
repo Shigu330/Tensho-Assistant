@@ -69,7 +69,7 @@ internal static class ChatReview1478Tests
             Check(reader.Contains("var last=ChatPayloads.LinkLast(payloads,index);", StringComparison.Ordinal)
                   && reader.Contains("Data=new SeString(message.Message.Payloads.Skip(index).Take(last-index+1).ToList()).Encode()", StringComparison.Ordinal), "reader keeps it");
             var plugin = Read("src/TenshoAssistant/Plugin.cs");
-            Check(plugin.Contains("var message=data is { Length:>0 } ? Dalamud.Game.Text.SeStringHandling.SeString.Parse(data)", StringComparison.Ordinal)
+            Check(plugin.Contains("try{message=Dalamud.Game.Text.SeStringHandling.SeString.Parse(data);}", StringComparison.Ordinal)
                   && plugin.Contains("handler(command,message);", StringComparison.Ordinal), "the handler gets it");
             Check(plugin.Contains("catch(Exception error){mainWindow.DalamudLinkFailed=plugin;", StringComparison.Ordinal), "a failure is said to the player");
             Check(File.Exists(Path.GetFullPath("docs/evidence/0.1478-dalamud-link-handler.md")), "evidence (R06)");

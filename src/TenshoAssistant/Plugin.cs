@@ -257,12 +257,13 @@ public sealed partial class Plugin : IDalamudPlugin
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
                 _=framework.RunOnFrameworkThread(()=>
                 {
-                    try
-                    {
-                        var message=data is { Length:>0 } ? Dalamud.Game.Text.SeStringHandling.SeString.Parse(data)
-                            :new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text));
-                        handler(command,message);
-                    }
+                    // X-498 M2 (0.1480): re-reading the link's string is Tensho's part: a failure there is logged as Tensho's, and the handler
+                    // gets the link's text instead; only an error of the handler itself is said to be the plugin's.
+                    var message=new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text));
+                    if(data is { Length:>0 })
+                        try{message=Dalamud.Game.Text.SeStringHandling.SeString.Parse(data);}
+                        catch(Exception error){log.Warning(error,"Tensho could not re-read a link of the chat window ({0}): its text is passed instead.",plugin);}
+                    try{handler(command,message);}
                     catch(Exception error){mainWindow.DalamudLinkFailed=plugin;log.Warning(error,"A link of the chat window could not be opened by its plugin ({0}).",plugin);}
                 });
                 return true;
