@@ -1,7 +1,8 @@
 namespace TenshoAssistant.Chat;
 
 /// <summary>X-479 (0.1468): the kinds of a message's payloads as the reader tells them apart.</summary>
-public enum ChatPayloadKind { Text,Item,Quest,Map,LinkEnd,Icon,Raw,Other }
+/// <remarks>X-474 (0.1477): Dalamud, a link of Dalamud or of a plugin (DalamudLinkPayload).</remarks>
+public enum ChatPayloadKind { Text,Item,Quest,Map,LinkEnd,Icon,Raw,Other,Dalamud }
 
 /// <summary>
 /// X-479 (0.1468): one payload of a message, without Dalamud's types: what ChatReader.Dalamud makes of each of the game's payloads (an item,
@@ -22,7 +23,7 @@ public static class ChatPayloads
         foreach(var payload in payloads)
             switch(payload.Kind)
             {
-                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map when payload.Link is { } link:yield return new(null,link);break;
+                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud when payload.Link is { } link:yield return new(null,link);break;
                 case ChatPayloadKind.LinkEnd:yield return new(null,End:true);break;
                 case ChatPayloadKind.Text:yield return new(payload.Text);break;
                 // X-472 (0.1471): an icon of the game's font keeps its place, written readably (the world icon « @ »).
@@ -39,7 +40,7 @@ public static class ChatPayloads
     public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));
 
     /// <summary>Whether a message holds a link of the game (item, quest or map).</summary>
-    public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map);
+    public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud);
 
     /// <summary>The links of a body that show no text of their own (ChatPieces kept their place empty; the window writes the name of their target).</summary>
     public static int Bare(IReadOnlyList<ChatSegment> body)=>body.Count(segment=>segment.Text.Length==0 && segment.Link is not null);
@@ -52,6 +53,7 @@ public static class ChatPayloads
         ChatPayloadKind.Item=>$"Item {payload.Link?.ItemId ?? 0}{(payload.Link?.Hq==true ? " HQ":"")}",
         ChatPayloadKind.Quest=>"Quest",
         ChatPayloadKind.Map=>"MapLink",
+        ChatPayloadKind.Dalamud=>"DalamudLink",
         ChatPayloadKind.LinkEnd=>"LinkEnd",
         ChatPayloadKind.Text=>$"{payload.Name} ({payload.Text?.Length ?? 0} characters{(Glyph(payload.Text) ? ", game glyph":"")})",
         ChatPayloadKind.Raw=>$"Raw ({payload.Size} bytes)",

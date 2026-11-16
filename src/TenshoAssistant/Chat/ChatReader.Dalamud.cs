@@ -78,6 +78,8 @@ internal sealed class ChatReader : IDisposable
         ItemPayload item=>new(ChatPayloadKind.Item,"Item",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),
         // 0.1442: a quest link.
         QuestPayload quest=>new(ChatPayloadKind.Quest,"Quest",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),
+        // X-474 (0.1477): a link of Dalamud or of a plugin (« Learn more here » of « Developer Mode is enabled »): its plugin and command.
+        DalamudLinkPayload dalamud=>new(ChatPayloadKind.Dalamud,"DalamudLink",Link:new ChatLink(ChatSegmentKind.DalamudLink,Plugin:dalamud.Plugin ?? "",CommandId:dalamud.CommandId)),
         RawPayload raw when raw.Equals(RawPayload.LinkTerminator)=>new(ChatPayloadKind.LinkEnd,"LinkEnd"),
         ITextProvider text=>new(ChatPayloadKind.Text,payload.GetType().Name,Text:text.Text),
         IconPayload icon=>new(ChatPayloadKind.Icon,payload.GetType().Name,Icon:(uint)icon.Icon),

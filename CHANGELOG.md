@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1477.0
+- Plan global, X-474 : Fenêtre de chat de Tensho : un lien de Dalamud ou d'un plugin (par exemple « Learn more here » du message « Developer Mode is enabled ») est de nouveau un lien, souligné ; un clic gauche lance le gestionnaire que Dalamud garde pour ce lien, comme un clic dans le chat du jeu (sur le fil du jeu ; le message transmis est le texte du lien). Si plus aucun plugin ne répond à ce lien, il reste du texte simple avec une info-bulle : l'ouvrir depuis le chat du jeu.
+- Pour les joueurs : fenêtre de chat : les liens de Dalamud et des plugins (comme « Learn more here ») s'ouvrent comme dans le chat du jeu.
+- Tests : ChatDalamudLink1477Tests. Verify.ps1 (agent) : 2885/2885, 0 avertissement, 0 erreur ; DLL 0.1477.0.0. Non validé en jeu.
+### English
+- Tensho's chat window: a link of Dalamud or of a plugin (for instance « Learn more here » of the « Developer Mode is enabled » message) is a link again, underlined; a left click runs the handler Dalamud keeps for that link, as a click in the game's chat does (on the game's thread; the message passed is the link's text). When no plugin answers that link any more, it stays plain text with a tooltip: open it from the game's chat.
+- For players: Chat window: links of Dalamud and plugins (such as « Learn more here ») open as they do in the game's chat.
+
 ## 0.1476.0
 - Plan global, X-466 : Fenêtre de chat de Tensho, onglets. X-466 (demande de l'utilisateur du 15/11) : le compte des messages non lus s'écrit tel quel jusqu'à 100, puis « 100+ » (le compte continue en dessous ; la largeur de l'onglet ne change plus à chaque message). X-477 (bug vu le 15/11) : les icônes du cadre et du cadenas au bout des onglets sont centrées dans des boutons de la hauteur des onglets, par le composant commun des boutons à icône (libellé blanc dans la police du texte, icône dessinée au centre de son encre). X-478 (demande du 15/11) : chaque onglet a une couleur de nom, réglée sous son nom dans Paramètres › Fenêtre de chat › Onglets (« ↺ » rend la couleur du texte du thème) ; une couleur trop proche du fond de l'onglet, actif ou non, est rapprochée de la couleur du texte jusqu'à un contraste de 3:1.
 - Pour les joueurs : fenêtre de chat : au-delà de 100 messages non lus, un onglet affiche « 100+ » ; les icônes du cadre et du cadenas sont centrées ; chaque onglet peut avoir la couleur de nom de votre choix.

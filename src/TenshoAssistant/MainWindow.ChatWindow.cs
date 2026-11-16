@@ -392,10 +392,11 @@ internal sealed partial class MainWindow
             {
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
-                if(run.Link is { } link)DrawChatLink(run,link,$"{record.Id}_{line}_{index}");
+                if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}");
                 else
                 {
                     ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                    if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
                 }
@@ -404,6 +405,15 @@ internal sealed partial class MainWindow
             if(first)ImGui.TextUnformatted(" ");
         }
     }
+
+    /// <summary>X-474 (0.1477): whether Dalamud keeps a handler for a link of Dalamud or of a plugin (set by the plugin; null outside the game).</summary>
+    internal Func<string,uint,bool>? DalamudLinkKnown{get;set;}
+    /// <summary>X-474 (0.1477): runs that handler as a click in the game's chat does (plugin, command, the link's text); false when there is none.</summary>
+    internal Func<string,uint,string,bool>? OpenDalamudLink{get;set;}
+
+    /// <summary>X-474 (0.1477): a link drawn as a link: all of them, except a link of Dalamud or of a plugin that Dalamud has no handler for
+    /// (a plugin unloaded since): plain text, its tooltip says to open it from the game's chat.</summary>
+    private bool ChatLinkActive(ChatLink link)=>link.Kind!=ChatSegmentKind.DalamudLink || DalamudLinkKnown?.Invoke(link.Plugin,link.CommandId)==true;
 
     // X-403 phase 2 (0.1441): the place menu a right click on a map link opened (drawn by DrawChatLines).
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
@@ -432,6 +442,15 @@ internal sealed partial class MainWindow
         ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
         // X-482 M2 (0.1472): under the « back to the bottom » button the link neither shows its tooltip nor opens (its menu already open stays).
         if(chatLinesBlocked){if(link.Kind==ChatSegmentKind.ItemLink && ImGui.IsPopupOpen("##ChatItem"+id))ItemLinksMenu("##ChatItem"+id,itemCatalog.State.Catalog?.Find(link.ItemId));return;}
+        // X-474 (0.1477): a link of Dalamud or of a plugin: a click does what it does in the game's chat (its plugin's handler).
+        if(link.Kind==ChatSegmentKind.DalamudLink)
+        {
+            if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+            TipText(localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Left) && OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,run.Text)!=true)
+                log.Information("Chat window: no handler any more for a link of {0} (command {1}).",link.Plugin,link.CommandId);
+            return;
+        }
         if(link.Kind==ChatSegmentKind.WebLink)
         {
             if(ImGui.IsItemHovered()){ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);TipText(WebLinkTip(link.Url));}

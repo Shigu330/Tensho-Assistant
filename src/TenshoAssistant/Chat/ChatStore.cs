@@ -1,10 +1,12 @@
 namespace TenshoAssistant.Chat;
 
-public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink }
+/// <remarks>X-474 (0.1477): DalamudLink, a link of Dalamud or of a plugin (its plugin and command).</remarks>
+public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLink }
 /// <summary>X-403 phase 2 (0.1441): what a link of a message points to: a place (territory, map, coordinate, place name) or an item (id, high
 /// quality); 0.1442: or a quest (its row in the game's Quest sheet).</summary>
 /// <param name="Url">X-403 phase 2 (0.1453): a web address's absolute form (ChatWeb.Address), for a WebLink.</param>
-public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="");
+/// <param name="Plugin">X-474 (0.1477): a DalamudLink's plugin (« Dalamud » for Dalamud's own), with <paramref name="CommandId"/> its command.</param>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
 public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body);

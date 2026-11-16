@@ -247,6 +247,19 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>{},dutyGuides.Dispose);
             mainWindow.DutyGuides=dutyGuides;
             mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
+            // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
+            // the same one a click in the game's chat calls), run on the game's thread on the player's click; its message is the link's text.
+            mainWindow.DalamudLinkKnown=(plugin,command)=>chatGui.RegisteredLinkHandlers.ContainsKey((plugin,command));
+            mainWindow.OpenDalamudLink=(plugin,command,text)=>
+            {
+                if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
+                _=framework.RunOnFrameworkThread(()=>
+                {
+                    try{handler(command,new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text)));}
+                    catch(Exception error){log.Warning(error,"A link of the chat window could not be opened by its plugin ({0}).",plugin);}
+                });
+                return true;
+            };
             // g, C-13 (0.367): monsters that teach a blue magic spell, from the wiki's spell page (English action name), on click only.
             // 0.387 (user report « never gives the monster »): the AozAction → Action link resolved in the client's language, so the wiki
             // was asked for the French page (« Mauvaise_haleine »: missing) and said « no monster ». The name now comes from the English
