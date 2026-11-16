@@ -54,8 +54,7 @@ string Cell(object? value)=>value is ReadOnlySeString text ? text.ExtractText().
 
 IEnumerable<(string Row,int Column,string Text)> Texts(string name,Language language)
 {
-    RawExcelSheet? plain=null;
-    try{ if(data.Excel.GetRawSheet(name,language) is RawExcelSheet sheet && sheet is not RawSubrowExcelSheet)plain=sheet; }catch(Exception){ yield break; }
+    // An unreadable sheet throws here or while its rows are read: the callers (sheets, find, index) catch it and name the sheet.
     var raw=data.Excel.GetRawSheet(name,language);
     var columns=raw.Columns.Select((column,index)=>(column,index)).Where(c=>c.column.Type==ExcelColumnDataType.String).Select(c=>c.index).ToArray();
     if(columns.Length==0)yield break;

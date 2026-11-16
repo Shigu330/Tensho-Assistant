@@ -12,6 +12,8 @@ internal static class PrivateNames1473Tests
 {
     public const string Variable = "TENSHO_PRIVATE_NAMES";
     private const string Phrase = "texte:";
+    /// <summary>The line written when the list is not given (the CI, or Verify.ps1 run without the maintainer's scripts).</summary>
+    public const string NotDone = "NOTE private names: list absent (" + Variable + " unset): check not done";
     private const string NotLetter = @"(?<![^\W\d_])";
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
 
@@ -119,7 +121,8 @@ internal static class PrivateNames1473Tests
         ("Private names 1473: no tracked file names a private name (the list given by TENSHO_PRIVATE_NAMES)", () =>
         {
             var list = Environment.GetEnvironmentVariable(Variable);
-            if (string.IsNullOrWhiteSpace(list)) return;   // the CI: no list
+            // X-494 M3 (review of 0.1474): without the list the check is not done; the run says so in its output instead of passing in silence.
+            if (string.IsNullOrWhiteSpace(list)) { Console.WriteLine(NotDone); return; }
             Check(File.Exists(list), "the private names' list given by " + Variable + " exists");
             var entries = Entries(File.ReadAllText(list));
             Check(entries.Length > 0, "the private names' list holds names");
