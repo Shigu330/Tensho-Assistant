@@ -640,7 +640,9 @@ internal sealed partial class MainWindow
         var at=ImGui.GetCursorScreenPos();
         var draw=ImGui.GetWindowDrawList();
         var font=ImGui.GetFont();var size=ImGui.GetFontSize();
-        foreach(var (x,y) in ChatLook.OutlineShifts)draw.AddText(font,size,at+new Vector2(x,y),ChatLook.OutlineColor,text);
+        // X-502 (review of 0.1482): faded with the window, as the text itself (TextColored takes the style's alpha, a draw list does not).
+        var colour=ChatLook.Outline(ImGui.GetStyle().Alpha);
+        foreach(var (x,y) in ChatLook.OutlineShifts)draw.AddText(font,size,at+new Vector2(x,y),colour,text);
     }
 
     /// <summary>X-474 (0.1477): whether Dalamud keeps a handler for a link of Dalamud or of a plugin (set by the plugin; null outside the game).</summary>

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1485.0
+- Plan global, X-502 : Relecture de 0.1482 (X-502) : le contour du texte de la fenêtre de chat pâlit avec elle. En mode « S'effacer », le texte pâlissait mais son contour noir restait à environ 85 % d'opacité (les couleurs d'une liste de dessin ne prennent pas l'alpha de la fenêtre) ; le contour prend maintenant cet alpha (ChatLook.Outline).
+- Pour les joueurs : quand la fenêtre de chat pâlit derrière une fenêtre du jeu, le contour sombre de son texte pâlit aussi.
+- Tests : ChatOutline1485Tests. Verify.ps1 (agent) : 2907/2907, 0 avertissement, 0 erreur ; DLL 0.1485.0.0. Non validé en jeu.
+### English
+- Review of 0.1482 (X-502): the outline of the chat window's text fades with it. In « Fade » mode the text faded but its black outline stayed about 85 % opaque (a draw list's colours do not take the window's alpha); the outline now takes that alpha (ChatLook.Outline).
+- For players: When the chat window fades behind a game window, the dark outline of its text now fades too.
+
 ## 0.1484.0
 - Plan global, X-501 : Relecture de 0.1482 (X-501) : chaque onglet de la fenêtre de chat garde de nouveau sa propre position de défilement. Depuis 0.1481 les lignes sont dessinées hors de l'onglet, dans une seule zone pour tous : un onglet ouvert reprenait le défilement du précédent, avec le bouton « retour en bas », et ses lignes n'étaient pas marquées lues. La zone des lignes porte maintenant le numéro de son onglet (ChatFormat.LinesId).
 - Pour les joueurs : chaque onglet du chat garde de nouveau sa propre position ; ouvrir un autre onglet ne le montre plus remonté.
