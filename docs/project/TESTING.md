@@ -1408,7 +1408,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
 
-- [ ] (0.1163) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
+- [x] (0.1163) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
 
 
 - [ ] (0.1164) Après quelques changements de réglage (fenêtre, alarmes) : dalamud.log n'a plus de ligne « Slow settings save » au-delà de 50 ms ni « Long UiBuilder(Tensho Assistant) » au moment d'un clic sur un réglage ; aucune ligne « saved on the game's thread, as before »
@@ -1973,15 +1973,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1469) Carte de Tensho, villes à étages : à Eulmore, chaque couche (Les Racines, Le Tronc, La Voûte) ne montre que ses marchands et sonnettes ; à Ul'dah (Faubourg de Thal, Faubourg de Nald) et à Limsa Lominsa (Le Tillac), un marchand de l'étage du haut s'affiche sur la carte de cet étage, à sa place ; aucun marchand connu ne manque.
 
-- [ ] (0.1470) Dédale bestial : finir un plateau ; Tensho › Dresseur › Équipe, résultat du dernier plateau : « score S · bonus B (n obtenu(s)) · total T » avec les mêmes nombres que la fenêtre de résultat du jeu (Score, Bonus, Total). En mode développeur, une capture de la fenêtre de résultat du jeu (lignes du score avec leurs points) sur la page des essais : elle dira quelle part du score est laquelle.
+- [x] (0.1470) Dédale bestial : finir un plateau ; Tensho › Dresseur › Équipe, résultat du dernier plateau : « score S · bonus B (n obtenu(s)) · total T » avec les mêmes nombres que la fenêtre de résultat du jeu (Score, Bonus, Total). En mode développeur, une capture de la fenêtre de résultat du jeu (lignes du score avec leurs points) sur la page des essais : elle dira quelle part du score est laquelle.
 
-- [ ] (0.1471) Fenêtre de chat Tensho : un message en lettres encadrées du jeu (annonce d'un joueur, « THE … ») se lit en lettres simples ; un joueur d'un autre monde s'affiche « Nom@Monde » comme dans le jeu ; un objet HQ lié a « HQ » après son nom ; la copie du message (clic droit) garde le même texte.
+- [x] (0.1471) Fenêtre de chat Tensho : un message en lettres encadrées du jeu (annonce d'un joueur, « THE … ») se lit en lettres simples ; un joueur d'un autre monde s'affiche « Nom@Monde » comme dans le jeu ; un objet HQ lié a « HQ » après son nom ; la copie du message (clic droit) garde le même texte.
 
 - [x] (0.1472) Fenêtre de chat Tensho : en lisant plus haut, cliquer « En bas » sur un lien n'ouvre pas le lien (seulement le retour en bas) ; un pavé tactile fait défiler doucement, une ligne par cran de molette ; avec un seul nouveau message le bouton dit « 1 nouveau ».
 
 - [x] (0.1476) Fenêtre de chat de Tensho : laisser un onglet non lu dépasser 100 messages (par exemple Combat pendant un combat, en regardant Général) : son nom montre « (100+) » et sa largeur ne bouge plus ; le lire jusqu'en bas remet le compte à zéro.
 
-- [ ] (0.1476) Fenêtre de chat de Tensho : les deux icônes au bout des onglets (cadre et cadenas) sont centrées dans leur bouton, de la même hauteur que les onglets, avec et sans cadre, à 60 % et 200 % de taille du texte (réglage du chat), en français puis en anglais.
+- [x] (0.1476) Fenêtre de chat de Tensho : les deux icônes au bout des onglets (cadre et cadenas) sont centrées dans leur bouton, de la même hauteur que les onglets, avec et sans cadre, à 60 % et 200 % de taille du texte (réglage du chat), en français puis en anglais.
 
 - [x] (0.1476) Paramètres › Fenêtre de chat › Onglets : donner une couleur au nom de deux onglets (une claire, une foncée) : les noms prennent leur couleur, restent lisibles sur l'onglet actif et inactif, en thème sombre puis clair ; « ↺ » rend la couleur normale ; la couleur reste après un rechargement.
 
@@ -2026,6 +2026,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1489) Fenêtre de chat de Tensho : défiler l'onglet Combat vers le haut, retirer l'onglet Général (roue dentée › Onglets › Retirer) : l'onglet Combat garde sa position de défilement.
 
 - [ ] (0.1490) Fenêtre de chat de Tensho : le décor du jeu se voit à travers le fond, sur toute la fenêtre (messages et onglets) ; Opacité à 0 % : fond invisible, texte lisible par son contour ; à 100 % : fond plein.
+
+- [ ] (0.1491) Alarme de Tensho sur un objet récoltable au lieu connu : quand elle sonne, le chat du jeu montre la flèche, le nom du lieu et ses coordonnées (« Zone ( x , y ) »), puis la flèche et le nom de l'objet ; un clic sur le lieu place le drapeau et ouvre la carte.
+
+- [ ] (0.1491) Fenêtre de chat de Tensho, même alarme : le lieu avec sa flèche orange et ses coordonnées, puis l'objet avec sa propre flèche orange ; une adresse web dite dans le chat est soulignée (couleur d'accent), comme un lien nommé par Tensho.
+
+- [ ] (0.1492) Fenêtre de chat de Tensho › roue dentée : cocher « Garder l'historique du chat sur ce PC » ouvre une question (ce qui est gardé, le dossier, 2 000 messages et 7 jours, comment l'effacer) ; « Annuler » laisse la case décochée ; « Garder l'historique » la coche.
+
+- [ ] (0.1492) Historique activé : dire quelques messages, puis recharger Tensho ou relancer le jeu : les messages d'avant reviennent dans les onglets, avant ceux de la session, sans doublon (dalamud.log : « Chat history: N messages read back »).
+
+- [ ] (0.1492) Historique activé, deux personnages : se connecter sur un autre personnage : ses onglets ne montrent pas les messages du premier ; revenir au premier : les siens reviennent.
+
+- [ ] (0.1492) « Effacer l'historique » : une question demande confirmation ; « Effacer » vide la fenêtre et affiche « Historique effacé. » ; après un rechargement de Tensho, rien d'avant ne revient.
+
+- [ ] (0.1492) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : Aide : nouvelle question de la FAQ « Tensho garde-t-il mes messages du chat ? » (et la réponse sur la fenêtre de chat mise à jour) ; guide et liste des outils de l'accueil : aucun changement (un réglage d'une fenêtre existante, désactivé par défaut, expliqué par sa propre question d'accord).
 
 **0.535 : interfaces** — à voir en jouant
 
