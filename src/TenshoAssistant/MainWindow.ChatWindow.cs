@@ -60,7 +60,9 @@ internal sealed partial class MainWindow
     /// while the game hides its interface (cutscene, GPose, interface hidden: Hold); given back only when really no longer wanted.</summary>
     internal ChatHideWant ChatGameMessagesWant()
         =>ChatHideWants.Of(!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats,
-            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
+            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true,
+            // X-528 M1 (0.1507): Tensho's window hidden under a game window: the game's messages come back, drawn under that window.
+            ChatCover.Hidden(ChatOptions.WhenCovered,chatCovered));
 
     /// <summary>X-467 (0.1504): the game's messages hidden now, Tensho's window in their place.</summary>
     internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;
@@ -70,6 +72,9 @@ internal sealed partial class MainWindow
     private PanelPlace? ChatPlace()
     {
         var follow=ChatHidesGameMessages() ? ChatGamePlace?.Invoke():null;
+        // X-528 M4 (0.1507): « reduced » belongs to the window at its own place; it is cleared when the window takes the game's messages' place,
+        // so it never comes back reduced after a pause of the following (combat, cutscene, covered) the player did not ask for.
+        if(follow is not null)chatReduced=false;
         chatFollowing=follow is not null;
         if(follow is { Box:var box })return new PanelPlace(new Vector2(box.X,box.Y),new Vector2(box.Width,box.Height));
         if(!chatReduced)return null;

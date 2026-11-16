@@ -62,11 +62,15 @@ internal sealed unsafe class GameChatHider : IDisposable
             if(!ChatLogShown())now=ChatHideWant.Hold;
             var states=new List<ChatPanelState>(4);
             var boxes=new List<ChatLogPanelBox>(4);
+            // X-528 M2 (0.1507): only the panels under Tensho's window (panel 0 and the docked tabs at its place) are hidden.
+            var main=Panel(0);
+            ChatLogBox? mainBox=main!=null ? Window(main):null;
             for(var index=0;index<4;index++)
             {
                 var unit=Panel(index);
-                states.Add(new(index,unit!=null,unit!=null && unit->IsVisible));
-                if(unit!=null)boxes.Add(new(index,unit->IsVisible,Window(unit)));
+                var box=unit!=null ? Window(unit):default;
+                states.Add(new(index,unit!=null,unit!=null && unit->IsVisible,unit!=null && ChatFollow.Under(index,box,mainBox)));
+                if(unit!=null)boxes.Add(new(index,unit->IsVisible,box));
             }
             var (toHide,toShow)=hide.Step(now,states);
             foreach(var index in toHide){var unit=Panel(index);if(unit!=null)unit->IsVisible=false;}

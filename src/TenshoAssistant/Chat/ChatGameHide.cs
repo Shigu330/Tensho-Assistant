@@ -1,7 +1,8 @@
 namespace TenshoAssistant.Chat;
 
-/// <summary>X-467 (0.1504): one of the game's message panels (ChatLogPanel_0 to _3) as the hider reads it in a frame: ready, shown.</summary>
-public readonly record struct ChatPanelState(int Index,bool Ready,bool Visible);
+/// <summary>X-467 (0.1504): one of the game's message panels (ChatLogPanel_0 to _3) as the hider reads it in a frame: ready, shown.
+/// X-528 M2 (0.1507): Under, the panel lies under Tensho's window (panel 0, or a docked tab at its place): only those are hidden.</summary>
+public readonly record struct ChatPanelState(int Index,bool Ready,bool Visible,bool Under=true);
 
 /// <summary>X-527 (0.1506, review of 0.1504, I1): what the hider does with the game's messages in a frame. Hide: hidden (Tensho's window in
 /// their place). Hold: left exactly as they are, neither hidden more nor given back (the game hides its own interface: cutscene, GPose,
@@ -15,10 +16,14 @@ public static class ChatHideWants
     /// <param name="competitive">Player-versus-player or competitive content (DEC-038): always given back, the whole of Tensho is cut.</param>
     /// <param name="gameUiHidden">The game hides its interface (cutscene, GPose, interface hidden): the messages stay as they are.</param>
     /// <param name="combatHidden">« Hide in combat » on and in combat: Tensho's window goes, the game's messages come back as the chat of the fight.</param>
-    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden)
+    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden)=>Of(wanted,competitive,gameUiHidden,combatHidden,false);
+
+    /// <param name="coveredHidden">X-528 M1 (0.1507): a game window covers Tensho's chat window and « Under a game window » hides it: the game's
+    /// messages come back, drawn by the game under its own window, so the part it does not cover stays readable.</param>
+    public static ChatHideWant Of(bool wanted,bool competitive,bool gameUiHidden,bool combatHidden,bool coveredHidden)
         =>!wanted || competitive ? ChatHideWant.Release
             : gameUiHidden ? ChatHideWant.Hold
-            : combatHidden ? ChatHideWant.Release
+            : combatHidden || coveredHidden ? ChatHideWant.Release
             : ChatHideWant.Hide;
 }
 
@@ -48,7 +53,7 @@ public sealed class ChatGameHide
         if(want==ChatHideWant.Hide)
         {
             foreach(var panel in panels)
-                if(panel.Ready && panel.Visible){hide.Add(panel.Index);hidden.Add(panel.Index);}
+                if(panel.Ready && panel.Visible && panel.Under){hide.Add(panel.Index);hidden.Add(panel.Index);}
             return (hide,show);
         }
         if(hidden.Count==0)return (hide,show);
@@ -76,6 +81,18 @@ public sealed class ChatGameHide
 public static class ChatFollow
 {
     public const float MinimumSide=40;
+
+    /// <summary>X-528 M2 (0.1507): whether a message panel lies under Tensho's window: panel 0 always; another one when at least half of
+    /// its box lies over panel 0's (the game keeps the docked tabs' panels at panel 0's place, docs/evidence/0.1502-game-chat-input.md); a tab
+    /// detached elsewhere on the screen is not, and stays shown.</summary>
+    public static bool Under(int index,ChatLogBox panel,ChatLogBox? main)
+    {
+        if(index==0)return true;
+        if(main is not { } box || panel.Width<=0 || panel.Height<=0)return false;
+        var width=Math.Min(panel.X+panel.Width,box.X+box.Width)-Math.Max(panel.X,box.X);
+        var height=Math.Min(panel.Y+panel.Height,box.Y+box.Height)-Math.Max(panel.Y,box.Y);
+        return width>0 && height>0 && width*height*2>=panel.Width*panel.Height;
+    }
 
     public static ChatLogBox? Box(IReadOnlyList<ChatLogPanelBox> panels,ChatLogBox window,ChatLogBox? input)
     {
