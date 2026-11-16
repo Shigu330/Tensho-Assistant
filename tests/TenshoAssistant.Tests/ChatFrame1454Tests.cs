@@ -34,7 +34,7 @@ internal static class ChatFrame1454Tests
             var tabs = window.IndexOf("if(!ImGui.BeginTabBar(\"###TenshoChatTabs\"", StringComparison.Ordinal);
             var buttons = window.IndexOf("DrawChatFrameButtons(options);", tabs, StringComparison.Ordinal);
             Check(tabs > 0 && buttons > tabs && buttons < window.IndexOf("finally{ImGui.EndTabBar();}", tabs, StringComparison.Ordinal), "inside the tab bar, so also borderless");
-            Check(window.Split("ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip").Length == 3, "two buttons at the end");
+            Check(window.Split("ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip").Length == 5, "four buttons at the end (X-476: « + » and the gear)");
             Check(window.Contains("Tip(options.Borderless ? \"ChatWindow.FrameOnTip\":\"ChatWindow.FrameOffTip\");", StringComparison.Ordinal) && window.Contains("Tip(options.Locked ? \"ChatWindow.UnlockTip\":\"ChatWindow.LockTip\");", StringComparison.Ordinal), "their tips");
             Check(window.Contains("BoolSetting(\"ChatWindow.Borderless\"", StringComparison.Ordinal) && window.Contains("BoolSetting(\"ChatWindow.Locked\"", StringComparison.Ordinal), "the settings");
             Check(window.Contains("value=>configuration.Chat.Opacity=value,0,100,defaults.Opacity", StringComparison.Ordinal), "the slider from 0");

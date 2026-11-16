@@ -22,7 +22,8 @@ internal sealed partial class MainWindow
         ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar|ImGuiWindowFlags.NoBringToFrontOnFocus,
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
         StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
-        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null);
+        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,
+        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y));
 
     /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.
     /// X-485 (0.1479): faded under a game window, the clicks go through to the game.</summary>
@@ -92,6 +93,9 @@ internal sealed partial class MainWindow
         // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
         BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);
         BoolSetting("ChatWindow.Locked","ChatWindow.LockedTip",()=>configuration.Chat.Locked,value=>configuration.Chat.Locked=value,c=>c.Chat.Locked);
+        // X-476 (0.1481): the tabs under the lines, and the letters' outline.
+        BoolSetting("ChatWindow.TabsAtBottom","ChatWindow.TabsAtBottomTip",()=>configuration.Chat.TabsAtBottom,value=>configuration.Chat.TabsAtBottom=value,c=>c.Chat.TabsAtBottom);
+        BoolSetting("ChatWindow.TextOutline","ChatWindow.TextOutlineTip",()=>configuration.Chat.TextOutline,value=>configuration.Chat.TextOutline=value,c=>c.Chat.TextOutline);
         // X-485 (0.1479): what the window does under a window of the game.
         ComboSetting("ChatWindow.WhenCovered","ChatWindow.WhenCoveredTip",()=>ChatCover.Bounded(configuration.Chat.WhenCovered),value=>configuration.Chat.WhenCovered=value,
             [(ChatCovered.Hide,localization.Get("ChatWindow.CoveredHide")),(ChatCovered.Fade,localization.Get("ChatWindow.CoveredFade")),(ChatCovered.Stay,localization.Get("ChatWindow.CoveredStay"))],
@@ -153,14 +157,14 @@ internal sealed partial class MainWindow
         }
         if(tabs.Count<ChatSettings.MaximumTabs)
         {
-            if(ImGui.SmallButton(localization.Get("ChatWindow.TabAdd")))
-            {
-                tabs.Add(new(){Name=localization.Format("ChatWindow.TabNew",tabs.Count+1),Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()});
-                chatSettingsPending=true;
-            }
+            if(ImGui.SmallButton(localization.Get("ChatWindow.TabAdd"))){AddChatTab(tabs);chatSettingsPending=true;}
             Tip("ChatWindow.TabAddTip");
         }
     }
+
+    /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
+    private void AddChatTab(List<ChatTabSettings> tabs)
+        =>tabs.Add(new(){Name=localization.Format("ChatWindow.TabNew",tabs.Count+1),Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()});
 
     private void DrawChatTabChannels(ChatTabSettings tab)
     {
@@ -225,10 +229,23 @@ internal sealed partial class MainWindow
         DrawChatWindowBody();
     }
 
+    // X-476 (0.1481): the tab chosen in the tab bar (its lines are drawn outside the bar, over or under it).
+    private int chatTabShown;
+
+    /// <summary>X-476 (0.1481): the tab bar over the lines (as before) or under them (setting); the bar's items are empty, the chosen tab's lines
+    /// are drawn after the bar, or before it with the bar's height kept free at the bottom.</summary>
     private void DrawChatWindowBody()
     {
         var options=ChatOptions;
         var tabs=ChatTabs(options);
+        foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines);
+        if(options.TabsAtBottom)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
+        DrawChatTabBar(tabs,options);
+        if(!options.TabsAtBottom)DrawChatShownTab(tabs,options,0);
+    }
+
+    private void DrawChatTabBar(List<ChatTabSettings> tabs,ChatSettings options)
+    {
         if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
         try
         {
@@ -236,23 +253,40 @@ internal sealed partial class MainWindow
             {
                 var tab=tabs[index];
                 var view=ChatMessages.ViewOf(tab);
-                view.Refresh(ChatMessages,tab,options.BoundedMaxLines);
                 bool open;
                 var coloured=PushChatTabColor(tab);
                 try{open=ImGui.BeginTabItem(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread)+"###ChatTab"+index);}
                 finally{if(coloured)ImGui.PopStyleColor();}
                 if(!open)continue;
-                try{DrawChatLines(view,options);}
-                finally{ImGui.EndTabItem();}
+                chatTabShown=index;
+                ImGui.EndTabItem();
             }
             DrawChatFrameButtons(options);
         }
         finally{ImGui.EndTabBar();}
     }
 
+    private void DrawChatShownTab(List<ChatTabSettings> tabs,ChatSettings options,float height)
+    {
+        if(tabs.Count==0)return;
+        DrawChatLines(ChatMessages.ViewOf(tabs[Math.Clamp(chatTabShown,0,tabs.Count-1)]),options,height);
+    }
+
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
     private void DrawChatFrameButtons(ChatSettings options)
     {
+        // X-476 (0.1481): « + » adds a tab (as the settings' button), the gear opens the chat's own settings: the same ones as on the Settings
+        // page, drawn by the same method from the same configuration (a change on one side shows on the other).
+        var tabs=ChatTabs(options);
+        if(tabs.Count<ChatSettings.MaximumTabs)
+        {
+            if(GlyphTabButton("###ChatAddTab",Dalamud.Interface.FontAwesomeIcon.Plus,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip)){AddChatTab(tabs);TrySave("Chat window tabs");}
+            Tip("ChatWindow.AddTabTip");
+        }
+        var settingsButton=GlyphTabButton("###ChatSettingsButton",Dalamud.Interface.FontAwesomeIcon.Cog,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
+        Tip("ChatWindow.SettingsTip");
+        if(settingsButton)ImGui.OpenPopup("###TenshoChatSettings");
+        DrawChatSettingsPopup();
         // X-477 (0.1476): the icons are drawn centred in tab-high buttons (GlyphTabButton), no longer as the label of a button in the icon font.
         var frame=GlyphTabButton("###ChatFrame",options.Borderless ? Dalamud.Interface.FontAwesomeIcon.BorderAll:Dalamud.Interface.FontAwesomeIcon.BorderNone,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip(options.Borderless ? "ChatWindow.FrameOnTip":"ChatWindow.FrameOffTip");
@@ -260,6 +294,19 @@ internal sealed partial class MainWindow
         Tip(options.Locked ? "ChatWindow.UnlockTip":"ChatWindow.LockTip");
         if(frame){options.Borderless=!options.Borderless;TrySave("Chat window");}
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
+    }
+
+    /// <summary>X-476 (0.1481): the chat's own settings, in a panel opened by the gear at the end of the tabs.</summary>
+    private void DrawChatSettingsPopup()
+    {
+        if(!ImGui.BeginPopup("###TenshoChatSettings"))return;
+        try
+        {
+            MenuHeader(localization.Get("ChatWindow.SettingsTitle"));
+            if(ImGui.BeginChild("###TenshoChatSettingsScroll",new Vector2(520,420)))DrawChatWindowSettings();
+            ImGui.EndChild();
+        }
+        finally{ImGui.EndPopup();}
     }
 
     /// <summary>X-478: pushes the colour of a tab's name when it has one (readable on the inactive and the active tab); true when pushed.
@@ -277,14 +324,15 @@ internal sealed partial class MainWindow
     // declared before the area opens.
     private float chatLineHeight;
 
-    private void DrawChatLines(ChatTabView view,ChatSettings options)
+    /// <param name="linesHeight">X-476 (0.1481): the lines' height; 0, all that is left; below 0, all but that much (the tab bar under them).</param>
+    private void DrawChatLines(ChatTabView view,ChatSettings options,float linesHeight)
     {
         // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the
         // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
         var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
         // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
-        var visible=ImGui.BeginChild("###TenshoChatLines",Vector2.Zero,false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
+        var visible=ImGui.BeginChild("###TenshoChatLines",new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
         try
         {
             if(!visible)return;
@@ -435,6 +483,7 @@ internal sealed partial class MainWindow
                 if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}",record);
                 else
                 {
+                    if(options.TextOutline)ChatOutline(run.Text);
                     ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
@@ -444,6 +493,15 @@ internal sealed partial class MainWindow
             }
             if(first)ImGui.TextUnformatted(" ");
         }
+    }
+
+    /// <summary>X-476 (0.1481, X-447 A3): the dark outline of the text about to be drawn at the cursor, as the game's chat.</summary>
+    private static void ChatOutline(string text)
+    {
+        var at=ImGui.GetCursorScreenPos();
+        var draw=ImGui.GetWindowDrawList();
+        var font=ImGui.GetFont();var size=ImGui.GetFontSize();
+        foreach(var (x,y) in ChatLook.OutlineShifts)draw.AddText(font,size,at+new Vector2(x,y),ChatLook.OutlineColor,text);
     }
 
     /// <summary>X-474 (0.1477): whether Dalamud keeps a handler for a link of Dalamud or of a plugin (set by the plugin; null outside the game).</summary>
@@ -479,6 +537,7 @@ internal sealed partial class MainWindow
     /// </summary>
     private void DrawChatLink(ChatRun run,ChatLink link,string id,ChatRecord record)
     {
+        if(ChatOptions.TextOutline)ChatOutline(run.Text);
         ImGui.TextColored(Accent,run.Text);
         var min=ImGui.GetItemRectMin();
         var max=ImGui.GetItemRectMax();

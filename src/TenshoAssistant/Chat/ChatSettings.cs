@@ -24,7 +24,8 @@ public sealed class ChatSettings
     public bool Clock24{get;set;}=true;
     public bool ShowSeconds{get;set;}
     public bool ShowChannel{get;set;}=true;
-    public int Opacity{get;set;}=85;
+    /// <summary>X-476 (0.1481): a light background, as the game's chat (was 85); the text keeps its outline.</summary>
+    public int Opacity{get;set;}=40;
     public int FontScale{get;set;}=100;
     public int MaxLines{get;set;}=2000;
     /// <summary>X-448 (0.1454): no title bar nor frame; the buttons at the end of the tab bar stay.</summary>
@@ -34,6 +35,10 @@ public sealed class ChatSettings
     /// <summary>X-485 (0.1479): what the window does while a window of the game covers it: it hides (the default, as the panels), it fades
     /// (no background, text faint, clicks go through), or it stays.</summary>
     public ChatCovered WhenCovered{get;set;}=ChatCovered.Hide;
+    /// <summary>X-476 (0.1481): the tabs under the messages instead of over them.</summary>
+    public bool TabsAtBottom{get;set;}
+    /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
+    public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}
     /// <summary>X-445 (0.1458): <see cref="CurrentTabs"/> once the tabs follow the game's default tabs (tabs saved before get Battle and Event
     /// once).</summary>

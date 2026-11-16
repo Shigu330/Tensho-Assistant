@@ -154,6 +154,8 @@ public static class SettingsIndex
         ("ChatWindow.Opacity","Panels"),
         ("ChatWindow.Seconds","Panels"),
         ("ChatWindow.Show","Panels"),
+        ("ChatWindow.TabsAtBottom","Panels"),
+        ("ChatWindow.TextOutline","Panels"),
         ("ChatWindow.Timestamps","Panels"),
         ("ChatWindow.WhenCovered","Panels"),
         ("CollectablePanel.UseFocus","Panels"),

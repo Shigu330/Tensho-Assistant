@@ -18,6 +18,7 @@ internal sealed class PanelWindow : Window
     private Vector2 lastSize;
     private bool borderPushed;
     private bool fadePushed;
+    private bool paddingPushed;
 
     public PanelWindow(MainWindow owner, PanelDefinition panel) : base(panel.Id, panel.Flags)
     {
@@ -57,10 +58,14 @@ internal sealed class PanelWindow : Window
         var fade = panel.Fade?.Invoke();
         fadePushed = fade is not null;
         if (fade is { } alphaFaded) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alphaFaded);
+        // X-476 (0.1481): margins of its own (the chat window: narrow, as the game's chat).
+        paddingPushed = panel.Padding is not null;
+        if (panel.Padding is { } padding) ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);
     }
 
     public override void PostDraw()
     {
+        if (paddingPushed) { ImGui.PopStyleVar(); paddingPushed = false; }
         if (fadePushed) { ImGui.PopStyleVar(); fadePushed = false; }
         if (borderPushed) { ImGui.PopStyleVar(); borderPushed = false; }
         UI.FfxivTheme.Pop();
@@ -86,4 +91,4 @@ internal sealed class PanelWindow : Window
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
 internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null,
-    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null);
+    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null, Vector2? Padding = null);

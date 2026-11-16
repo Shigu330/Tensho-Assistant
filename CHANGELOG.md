@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1481.0
+- Plan global, X-476 : Fenêtre de chat de Tensho plus proche du chat du jeu : heure entre crochets ([22:47]), contour sombre des lettres (réglage, activé par défaut), fond plus léger par défaut (40 %), marges serrées ; onglets au-dessus ou sous les messages (réglage) ; au bout des onglets, un « + » qui ajoute un onglet et une roue dentée qui ouvre les réglages du chat, les mêmes que dans la page Paramètres (un changement d'un côté se voit de l'autre).
+- Pour les joueurs : fenêtre de chat : plus proche du chat du jeu (heure entre crochets, texte avec contour, fond plus léger, onglets dessus ou dessous) ; « + » ajoute un onglet et une roue dentée ouvre les réglages du chat.
+- Tests : ChatLook1481Tests. Verify.ps1 (agent) : 2899/2899, 0 avertissement, 0 erreur ; DLL 0.1481.0.0. Non validé en jeu.
+### English
+- Tensho's chat window closer to the game's chat: time in brackets ([22:47]), dark outline around the letters (setting, on by default), lighter background by default (40%), narrow margins; tabs over or under the messages (setting); at the end of the tabs, a « + » that adds a tab and a gear that opens the chat's settings, the same as on the Settings page (a change on one side shows on the other).
+- For players: Chat window: closer to the game's chat (time in brackets, outlined text, lighter background, tabs over or under); « + » adds a tab and a gear opens the chat's settings.
+
 ## 0.1480.0
 - Plan global, X-497 : Relecture de 0.1479 (X-497, X-498). La carte du jeu, à l'écran, compte comme une fenêtre du jeu pour la fenêtre de chat de Tensho : elle la cache (ou la pâlit, selon le réglage « Sous une fenêtre du jeu ») ; elle était ignorée par son nom depuis 0.537. Les panneaux, les barres et la carte de Tensho continuent de l'ignorer ; hébergée hors écran par Tensho, elle ne touche rien. En mode « S'effacer », toute la fenêtre de chat pâlit (barre de titre, cadre et poignée compris), pas seulement son contenu. Lien d'un plugin dans le chat de Tensho : si Tensho n'arrive pas à relire le lien, l'erreur est notée comme celle de Tensho et le plugin reçoit le texte du lien ; seule une erreur du plugin lui-même s'affiche dans l'info-bulle.
 - Pour les joueurs : fenêtre de chat : la carte du jeu par-dessus la cache aussi ; pâlie, toute la fenêtre pâlit.

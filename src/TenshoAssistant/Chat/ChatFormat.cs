@@ -59,7 +59,8 @@ public static class ChatFormat
     public static IReadOnlyList<ChatRun> Runs(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
     {
         var runs=new List<ChatRun>(5);
-        if(settings.ShowTimestamps)runs.Add(new($"{Time(record.Time,settings)} ",ChatRole.Timestamp));
+        // X-476 (0.1481): in brackets, as the game's chat ([22:47]).
+        if(settings.ShowTimestamps)runs.Add(new($"[{Time(record.Time,settings)}] ",ChatRole.Timestamp));
         var spoken=ChatChannels.Spoken(record.Channel);
         if(settings.ShowChannel && spoken && shortName(record.Channel) is { Length:>0 } channel)runs.Add(new($"[{channel}] ",ChatRole.Channel));
         var sender=Clean(record.Sender).Trim();

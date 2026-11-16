@@ -118,10 +118,10 @@ internal static class ChatWindow1434Tests
             options.ShowChannel=false;Check(Line(Record(10,"Ann","x"))=="Ann: x","no channel");
             options.ShowTimestamps=true;options.Clock24=true;options.ShowSeconds=true;
             var runs=ChatFormat.Runs(Record(10,"Ann","x"),options,_=>"");
-            Check(runs[0].Role==ChatRole.Timestamp && runs[0].Text.Length==9 && runs[0].Text[2]==':' && runs[0].Text[5]==':',"timestamp: "+runs[0].Text);
+            Check(runs[0].Role==ChatRole.Timestamp && runs[0].Text.Length==11 && runs[0].Text[0]=='[' && runs[0].Text[3]==':' && runs[0].Text[6]==':' && runs[0].Text[9]==']',"timestamp: "+runs[0].Text);
             options.Clock24=false;options.ShowSeconds=false;
             var twelve=ChatFormat.Runs(Record(10,"Ann","x"),options,_=>"")[0].Text;
-            Check(twelve.EndsWith("AM ") || twelve.EndsWith("PM "),"12-hour clock: "+twelve);
+            Check(twelve.EndsWith("AM] ") || twelve.EndsWith("PM] "),"12-hour clock: "+twelve);
             Check(ChatFormat.LayoutKey(options)!=ChatFormat.LayoutKey(new ChatSettings()),"a change of format lays the lines out again");
             Check(ChatFormat.When(Noon.ToUnixTimeSeconds()-30,Noon)==Noon.AddSeconds(-30) && ChatFormat.When(0,Noon)==Noon && ChatFormat.When(1,Noon)==Noon && ChatFormat.When(long.MaxValue,Noon)==Noon,"the game's time stamp when it is plausible, else now");
         }),
