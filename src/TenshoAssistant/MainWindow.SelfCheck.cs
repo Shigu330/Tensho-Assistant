@@ -48,6 +48,7 @@ internal sealed partial class MainWindow
             ("maps", () => { var state = maps.State; return Diagnostics.SelfCheck.Catalog("maps", state.Catalog?.Entries.Count, state.Copied, state.Total, state.Error); }),
             ("duties", () => { var state = duties.State; return Diagnostics.SelfCheck.Catalog("duties", state.Catalog?.Entries.Count, state.Copied, state.Total, state.Error); }),
             ("vendors", SelfCheckVendors),
+            ("alarm place link", SelfCheckAlarmPlaceLink),
             ("gear data", () => Diagnostics.SelfCheck.Built("gear data", GearCatalog?.Invoke() is not null, GearCatalogFailed?.Invoke() == true)),
             ("submarine data", () => Diagnostics.SelfCheck.Built("submarine data", SubmarineCatalog?.Invoke() is not null, SubmarineCatalogFailed?.Invoke() == true)),
             ("airship data", () => Diagnostics.SelfCheck.Built("airship data", AirshipCatalog?.Invoke() is not null, AirshipCatalogFailed?.Invoke() == true)),
@@ -107,6 +108,17 @@ internal sealed partial class MainWindow
         if (!configuration.CraftLogHelperEnabled) return Diagnostics.SelfCheck.NotRead("crafting log", "help off");
         if (craftLog.Error is { } error) return Diagnostics.SelfCheck.Failed("crafting log", error);
         return craftLog.Observation is { } seen && seen.Fresh(DateTimeOffset.UtcNow) ? Diagnostics.SelfCheck.Ok("crafting log", $"recipe {seen.RecipeId}") : Diagnostics.SelfCheck.NotRead("crafting log", "not open");
+    }
+
+    /// <summary>X-509 (review of 0.1490): the place link Tensho's alarms send to the game's chat, made as the ring makes it (with Dalamud, on the
+    /// game's thread), read as the chat window reads it: a place's name and coordinates, then the link's end. Counts only.</summary>
+    private SelfCheckLine SelfCheckAlarmPlaceLink()
+    {
+        if (maps.State.Catalog?.Entries.FirstOrDefault(map => map.TerritoryId > 0 && map.MapId > 0) is not { } map) return Diagnostics.SelfCheck.NotRead("alarm place link", "maps loading");
+        if (TenshoAssistant.Alarms.AlarmPlaceLink.Build(map.TerritoryId, map.MapId, 10f, 10f) is not { } link) return Diagnostics.SelfCheck.Failed("alarm place link", "Dalamud could not make it");
+        var payloads = link.Payloads.Select(TenshoAssistant.Chat.ChatReader.Payload).ToList();
+        return TenshoAssistant.Chat.ChatPayloads.PlaceLinkFault(payloads) is { } fault ? Diagnostics.SelfCheck.Failed("alarm place link", fault)
+            : Diagnostics.SelfCheck.Ok("alarm place link", $"{payloads.Count} pieces: place and coordinates, closed");
     }
 
     private SelfCheckLine SelfCheckVendors()

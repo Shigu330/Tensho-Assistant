@@ -421,8 +421,9 @@ public sealed partial class Plugin : IDalamudPlugin
                             int.TryParse(parts[^2],System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var ringMinutes)
                                 ? UI.TimeLeft.Write(TimeSpan.FromMinutes(Math.Max(0,ringMinutes)),(key,first,second)=>localization.Format(key,first,second)):parts[^2],
                             parts[^1]));
-                    if(mainWindow.AlarmPlace(alarm) is { } place)
-                        message.AddText(" ").AddMapLink(place.TerritoryId,place.MapId,place.X,place.Y,0.05f);
+                    // X-509 (review of 0.1490): the whole place link (arrow, place and coordinates, end), not AddMapLink's bare start.
+                    if(mainWindow.AlarmPlace(alarm) is { } place && Alarms.AlarmPlaceLink.Build(place.TerritoryId,place.MapId,place.X,place.Y,log) is { } placeLink)
+                        message.AddText(" ").Append(placeLink);
                     // 0.774 (X-03, user report and Dalamud's console in verbose): the game never handed the « Open in Tensho » link to Dalamud; it took it for an
                     // item tooltip. The ring now carries the game's own item link: hovering shows the item, a right click opens its menu, where Tensho's entry is.
                     if(alarm.ItemId is > 0 and < uint.MaxValue)

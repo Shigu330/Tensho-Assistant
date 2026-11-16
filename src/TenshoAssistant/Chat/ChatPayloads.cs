@@ -48,6 +48,34 @@ public static class ChatPayloads
         return payloads.Count-1;
     }
 
+    /// <summary>X-509 (review of 0.1490): what the link that starts at <paramref name="start"/> shows: its texts up to its end, as the window
+    /// writes them (the link glyph left out), and whether its end (the game's link terminator) comes before another link starts or the message
+    /// ends. The self-check reads with it the place link Tensho's alarms send: a place and its coordinates, closed.</summary>
+    public static (string Shown,bool Closed) LinkShows(IReadOnlyList<ChatPayload> payloads,int start)
+    {
+        var shown=new System.Text.StringBuilder();
+        for(var index=start+1;index<payloads.Count;index++)
+        {
+            var payload=payloads[index];
+            if(payload.Kind==ChatPayloadKind.LinkEnd)return (shown.ToString().Trim(),true);
+            if(payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud)break;
+            if(payload.Kind==ChatPayloadKind.Text)shown.Append(ChatFormat.Clean(payload.Text));
+        }
+        return (shown.ToString().Trim(),false);
+    }
+
+    /// <summary>X-509: the self-check's verdict on a place link Tensho sends (the alarms' ring): its start, then a place's name and coordinates
+    /// (more than one letter, with a digit), then its end. Null when it is whole; else what is missing, in the log's words.</summary>
+    public static string? PlaceLinkFault(IReadOnlyList<ChatPayload> payloads)
+    {
+        var start=-1;
+        for(var index=0;index<payloads.Count && start<0;index++)if(payloads[index].Kind==ChatPayloadKind.Map)start=index;
+        if(start<0)return "no place link";
+        var (shown,closed)=LinkShows(payloads,start);
+        if(shown.Length<=1 || !shown.Any(char.IsDigit))return $"the place link shows {shown.Length} characters, no place and coordinates";
+        return closed ? null:"the place link has no end";
+    }
+
     /// <summary>Whether a message holds a link of the game (item, quest or map).</summary>
     public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud);
 

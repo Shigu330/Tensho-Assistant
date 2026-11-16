@@ -81,7 +81,7 @@ internal sealed class ChatReader : IDisposable
     }
 
     /// <summary>X-479 (0.1468): one of the game's payloads as the reader tells it apart (ChatPayload: pure, replayed by the tests on recorded messages).</summary>
-    private static ChatPayload Payload(Payload payload)=>payload switch
+    internal static ChatPayload Payload(Payload payload)=>payload switch
     {
         MapLinkPayload map=>new(ChatPayloadKind.Map,"MapLink",Link:MapLink(map)),
         ItemPayload item=>new(ChatPayloadKind.Item,"Item",Link:new ChatLink(ChatSegmentKind.ItemLink,ItemId:item.ItemId,Hq:item.IsHQ)),

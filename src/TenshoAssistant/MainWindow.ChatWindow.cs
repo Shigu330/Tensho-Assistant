@@ -709,12 +709,13 @@ internal sealed partial class MainWindow
     {
         if(ChatOptions.TextOutline)ChatOutline(run.Text);
         // X-505 (0.1488): with the game's look, the game's orange arrow then the text in the message's colour, not underlined; else underlined
-        // in the accent colour, as before.
-        var game=ChatOptions.GameLinks;
-        var colour=!game ? Accent:run.Role==ChatRole.LinkMark ? new Vector4(ChatLook.LinkMark.R,ChatLook.LinkMark.G,ChatLook.LinkMark.B,ChatLook.LinkMark.A)
+        // in the accent colour, as before. X-510 (review of 0.1490): with the game's look, a link without the game's arrow (a web address, a link
+        // named by Tensho, a link of Dalamud without arrow) is underlined in the accent colour too (ChatRun.Underlined): told apart from the text.
+        var underline=!ChatOptions.GameLinks || run.Underlined;
+        var colour=underline ? Accent:run.Role==ChatRole.LinkMark ? new Vector4(ChatLook.LinkMark.R,ChatLook.LinkMark.G,ChatLook.LinkMark.B,ChatLook.LinkMark.A)
             :ChatColor(ChatOptions.ColorOf(record.Channel));
         ImGui.TextColored(colour,run.Text);
-        if(!game)
+        if(underline)
         {
             var min=ImGui.GetItemRectMin();
             var max=ImGui.GetItemRectMax();

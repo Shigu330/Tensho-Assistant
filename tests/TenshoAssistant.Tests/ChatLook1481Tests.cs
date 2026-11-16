@@ -11,7 +11,7 @@ internal static class ChatLook1481Tests
 
     public static IEnumerable<(string Name, Action Run)> Cases =>
     [
-        ("Chat look 1481: defaults (tabs over, outline on, light background); time in brackets as the game", () =>
+        ("Chat look 1481: defaults (tabs under the lines, outline on, background at 15 %); time in brackets as the game", () =>
         {
             var settings = new ChatSettings();
             Check(settings.TabsAtBottom && settings.TextOutline && settings.BoundedOpacity == 15, "defaults (0.1488, X-505: the tabs under the lines, the background at 15 %)");

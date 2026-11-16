@@ -6,7 +6,10 @@ namespace TenshoAssistant.Chat;
 /// <remarks>X-505 (0.1488): LinkMark, the game's arrow before a link (part of the link: a click on it opens it).</remarks>
 public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark }
 /// <param name="Link">X-403 phase 2 (0.1441): what the run's text links to (role Link); null otherwise.</param>
-public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=null);
+/// <param name="Underlined">X-510 (review of 0.1490): with the game's look, a link that has no arrow of the game (a web address found by Tensho,
+/// a link named by Tensho, a link of Dalamud without arrow): drawn underlined in the accent colour, as every link before 0.1488, so that it is
+/// told apart from the text. Without the game's look every link is drawn so already.</param>
+public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=null,bool Underlined=false);
 
 /// <summary>X-403 phase 1 (D-166; back from 0.471): how one message reads, and its lines for a given width. Pure: the width of a text is given by the caller.</summary>
 public static class ChatFormat
@@ -70,6 +73,13 @@ public static class ChatFormat
         if(settings.ShowTimestamps)runs.Add(new($"[{Time(record.Time,settings)}] ",ChatRole.Timestamp));
         var spoken=ChatChannels.Spoken(record.Channel);
         if(settings.ShowChannel && spoken && shortName(record.Channel) is { Length:>0 } channel)runs.Add(new($"[{channel}] ",ChatRole.Channel));
+        // X-510 (review of 0.1490): with the game's look, the links that have the game's arrow (its glyph, or the arrow written for it); the
+        // others get the underline (ChatRun.Underlined). Made once per layout, not per frame.
+        HashSet<ChatLink>? arrowed=null;
+        if(settings.GameLinks)
+            foreach(var segment in record.Body)
+                if(segment.Link is { } link && ChatLook.Marked(segment.Text))(arrowed??=[]).Add(link);
+        bool Underlined(ChatLink target)=>settings.GameLinks && arrowed?.Contains(target)!=true;
         var sender=Clean(record.Sender).Trim();
         // A custom emote (kind 28) has its author apart from its text; a standard emote (29) already names them.
         if(record.Kind==28 && sender.Length>0)runs.Add(new($"{sender} ",ChatRole.Sender));
@@ -80,7 +90,7 @@ public static class ChatFormat
             // X-461 (0.1463): a link with no text of its own (ChatPieces keeps its place empty): the name of what it points to.
             if(segment.Text.Length==0 && segment.Link is { } named)
             {
-                runs.Add(new(Clean(linkName?.Invoke(named)) is { Length:>0 } name ? name:"…",ChatRole.Link,named));
+                runs.Add(new(Clean(linkName?.Invoke(named)) is { Length:>0 } name ? name:"…",ChatRole.Link,named,Underlined(named)));
                 continue;
             }
             // X-505 (0.1488): with the game's look, a link's glyph (where the game draws its arrow) becomes the arrow, apart, then its text.
@@ -90,7 +100,7 @@ public static class ChatFormat
                 if(Clean(ChatLook.Unmarked(segment.Text)) is { Length:>0 } rest)runs.Add(new(rest,ChatRole.Link,marked));
                 continue;
             }
-            if(Clean(segment.Text) is { Length:>0 } text)runs.Add(segment.Link is { } link ? new(text,ChatRole.Link,link):new(text,ChatRole.Body));
+            if(Clean(segment.Text) is { Length:>0 } text)runs.Add(segment.Link is { } link ? new(text,ChatRole.Link,link,Underlined(link)):new(text,ChatRole.Body));
         }
         return runs;
     }
@@ -113,10 +123,10 @@ public static class ChatFormat
         var full=width;
         // The narrower lines after the first keep at least half the width.
         void Flush(){lines.Add(line);line=[];used=0;width=indent>0 && full>0 ? Math.Max(full/2,full-indent):full;}
-        void Add(string text,ChatRole role,ChatLink? link,float size)
+        void Add(string text,ChatRun run,float size)
         {
-            if(line.Count>0 && line[^1].Role==role && Equals(line[^1].Link,link))line[^1]=new(line[^1].Text+text,role,link);
-            else line.Add(new(text,role,link));
+            if(line.Count>0 && line[^1].Role==run.Role && Equals(line[^1].Link,run.Link) && line[^1].Underlined==run.Underlined)line[^1]=line[^1] with{Text=line[^1].Text+text};
+            else line.Add(run with{Text=text});
             used+=size;
         }
         foreach(var run in runs)
@@ -125,15 +135,15 @@ public static class ChatFormat
                 if(newLine){Flush();continue;}
                 var size=measure(token);
                 if(used>0 && used+measure(token.TrimEnd())>width)Flush();
-                if(size<=width || width<=0){Add(token,run.Role,run.Link,size);continue;}
+                if(size<=width || width<=0){Add(token,run,size);continue;}
                 // A word wider than the line: as many letters as fit, then the next line.
                 var part=new StringBuilder();
                 foreach(var letter in token)
                 {
-                    if(part.Length>0 && used+measure(part.ToString()+letter)>width){Add(part.ToString(),run.Role,run.Link,measure(part.ToString()));part.Clear();Flush();}
+                    if(part.Length>0 && used+measure(part.ToString()+letter)>width){Add(part.ToString(),run,measure(part.ToString()));part.Clear();Flush();}
                     part.Append(letter);
                 }
-                if(part.Length>0)Add(part.ToString(),run.Role,run.Link,measure(part.ToString()));
+                if(part.Length>0)Add(part.ToString(),run,measure(part.ToString()));
             }
         if(line.Count>0 || lines.Count==0)lines.Add(line);
         return lines;

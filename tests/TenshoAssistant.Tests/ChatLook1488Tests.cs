@@ -95,7 +95,8 @@ internal static class ChatLook1488Tests
             Check(thin > 0 && area > thin && window.Contains("if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}", StringComparison.Ordinal), "the bar's size and colours around the area's start");
             Check(window.Contains("ImGui.PushStyleVar(ImGuiStyleVar.TabRounding,ChatLook.TabRounding);", StringComparison.Ordinal)
                   && window.Contains("ChatLook.TabLabel(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),index==chatTabShown,options.GameTabs)", StringComparison.Ordinal), "the game's tabs");
-            Check(window.Contains("if(!game)\n        {\n            var min=ImGui.GetItemRectMin();", StringComparison.Ordinal), "underlined only without the game's look");
+            // 0.1491 (X-510, review of 0.1490): with the game's look, a link without the game's arrow is underlined too (ChatReview1491Tests).
+            Check(window.Contains("if(underline)\n        {\n            var min=ImGui.GetItemRectMin();", StringComparison.Ordinal), "underlined without the game's look, or a link without the game's arrow");
             Check(window.Contains("ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));", StringComparison.Ordinal)
                   && window.Contains("if(line>0 && indent>0)ImGui.SetCursorPosX(left+indent);", StringComparison.Ordinal), "laid out and drawn with the same indent");
             foreach (var key in new[] { "HourLeadingZero", "ThinScrollbar", "GameLinks", "GameTabs", "WrapIndent" })
