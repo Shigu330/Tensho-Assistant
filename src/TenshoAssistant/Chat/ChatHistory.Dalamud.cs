@@ -36,6 +36,9 @@ internal sealed class ChatHistoryKeeper : IDisposable
     /// <summary>The folder of the history files (said to the player when asked to turn it on).</summary>
     public string Folder=>writer.Folder;
 
+    /// <summary>X-513: the place the open character's history takes on disk, in bytes (-1: none open).</summary>
+    public long Bytes=>writer.Bytes;
+
     /// <summary>A new message the reader copied (game's thread): kept when the history of its character is open.</summary>
     public void Keep(ChatRecord record)
     {

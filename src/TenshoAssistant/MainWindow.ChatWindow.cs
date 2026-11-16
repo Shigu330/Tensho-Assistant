@@ -15,6 +15,8 @@ internal sealed partial class MainWindow
     internal string? ChatHistoryFolder{get;set;}
     /// <summary>X-475: « Erase the history » (every character's file, and what is queued); its answer says whether every file went.</summary>
     internal Action<Action<bool>?>? EraseChatHistory{get;set;}
+    /// <summary>X-513: the place the open character's history takes on disk, in bytes (-1: none open); null outside the game.</summary>
+    internal Func<long>? ChatHistoryBytes{get;set;}
     // X-475: the player asked to turn the history on (the question opens next); the last « Erase »: 1 every file went, 2 one is still there.
     private bool chatHistoryAsk;
     private volatile int chatHistoryErased;
@@ -159,10 +161,25 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(!configuration.Chat.KeepHistory || !here);
         try
         {
-            IntSetting("ChatWindow.HistoryMessages","ChatWindow.HistoryMessagesTip",()=>configuration.Chat.BoundedHistoryMessages,value=>configuration.Chat.HistoryMessages=value,ChatHistory.MinimumMessages,ChatHistory.MaximumMessages,defaults.HistoryMessages);
-            IntSetting("ChatWindow.HistoryDays","ChatWindow.HistoryDaysTip",()=>configuration.Chat.BoundedHistoryDays,value=>configuration.Chat.HistoryDays=value,ChatHistory.MinimumDays,ChatHistory.MaximumDays,defaults.HistoryDays);
+            // X-513 (the user's request of 16/11, choice (a)): « No limit » beside each bound, apart; its number greyed while it is ticked.
+            ImGui.BeginDisabled(configuration.Chat.HistoryMessagesUnlimited);
+            try{IntSetting("ChatWindow.HistoryMessages","ChatWindow.HistoryMessagesTip",()=>ChatHistory.BoundedMessages(configuration.Chat.HistoryMessages),value=>configuration.Chat.HistoryMessages=value,ChatHistory.MinimumMessages,ChatHistory.MaximumMessages,defaults.HistoryMessages);}
+            finally{ImGui.EndDisabled();}
+            ImGui.SameLine();
+            BoolSetting("ChatWindow.HistoryMessagesUnlimited","ChatWindow.HistoryMessagesUnlimitedTip",()=>configuration.Chat.HistoryMessagesUnlimited,value=>configuration.Chat.HistoryMessagesUnlimited=value,c=>c.Chat.HistoryMessagesUnlimited);
+            ImGui.BeginDisabled(configuration.Chat.HistoryDaysUnlimited);
+            try{IntSetting("ChatWindow.HistoryDays","ChatWindow.HistoryDaysTip",()=>ChatHistory.BoundedDays(configuration.Chat.HistoryDays),value=>configuration.Chat.HistoryDays=value,ChatHistory.MinimumDays,ChatHistory.MaximumDays,defaults.HistoryDays);}
+            finally{ImGui.EndDisabled();}
+            ImGui.SameLine();
+            BoolSetting("ChatWindow.HistoryDaysUnlimited","ChatWindow.HistoryDaysUnlimitedTip",()=>configuration.Chat.HistoryDaysUnlimited,value=>configuration.Chat.HistoryDaysUnlimited=value,c=>c.Chat.HistoryDaysUnlimited);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // X-513: the place the character's history takes on disk, measured off the game's thread (none while no history is open).
+        if(here && ChatHistoryBytes?.Invoke() is >=0 and var size)
+        {
+            var (amount,unit)=ChatHistory.Size(size);
+            ImGui.TextColored(Muted,localization.Format("ChatWindow.HistorySize",localization.Format("ChatWindow.HistorySize"+unit,amount)));
+        }
         ImGui.BeginDisabled(EraseChatHistory is null);
         try
         {
@@ -188,7 +205,10 @@ internal sealed partial class MainWindow
         try
         {
             ImGui.PushTextWrapPos(ImGui.GetFontSize()*34);
-            ImGui.TextUnformatted(localization.Format("ChatWindow.HistoryConsentText",ChatHistoryFolder ?? "-",ChatOptions.BoundedHistoryMessages,ChatOptions.BoundedHistoryDays));
+            // X-513: « No limit » said in words, a number as the language writes it.
+            ImGui.TextUnformatted(localization.Format("ChatWindow.HistoryConsentText",ChatHistoryFolder ?? "-",
+                ChatOptions.HistoryMessagesUnlimited ? localization.Get("ChatWindow.HistoryNoLimit"):localization.Format("ChatWindow.HistoryNumber",ChatOptions.BoundedHistoryMessages),
+                ChatOptions.HistoryDaysUnlimited ? localization.Get("ChatWindow.HistoryNoLimit"):localization.Format("ChatWindow.HistoryNumber",ChatOptions.BoundedHistoryDays)));
             ImGui.PopTextWrapPos();
             if(ImGui.Button(localization.Get("ChatWindow.HistoryConsentYes")+"###ChatHistoryYes")){configuration.Chat.KeepHistory=true;TrySave("Chat history");ImGui.CloseCurrentPopup();}
             ImGui.SameLine();

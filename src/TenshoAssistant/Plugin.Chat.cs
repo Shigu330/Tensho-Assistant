@@ -23,6 +23,7 @@ public sealed partial class Plugin
             catch{history.Dispose();throw;}
             mainWindow.ChatHistoryFolder=history.Folder;
             mainWindow.EraseChatHistory=history.Erase;
+            mainWindow.ChatHistoryBytes=()=>history.Bytes;
         },()=>chatReader?.Dispose());
         // g, M-03 (0.373): map links of the chat, kept for the Maps page this session (map settings switch, on by default).
         Maps.ChatMapLinkWatcher? chatLinks=null;

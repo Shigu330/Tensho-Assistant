@@ -79,11 +79,17 @@ public sealed class ChatSettings
     /// <summary>X-475: the chat history kept on this PC (ChatHistory), per character, so that the window shows it again after a reload or a
     /// restart. Off by default; the window turns it on only after the player said yes to what is kept, where, how long and how to erase it.</summary>
     public bool KeepHistory{get;set;}
-    /// <summary>X-475: the history's bounds: the last messages kept (combat lines and the others each) and the days.</summary>
+    /// <summary>X-475: the history's bounds: the last messages kept (combat lines and the others each) and the days. X-513: 30 days by
+    /// default (7 before; a saved value is kept as it is).</summary>
     public int HistoryMessages{get;set;}=ChatHistory.DefaultMessages;
     public int HistoryDays{get;set;}=ChatHistory.DefaultDays;
-    public int BoundedHistoryMessages=>ChatHistory.BoundedMessages(HistoryMessages);
-    public int BoundedHistoryDays=>ChatHistory.BoundedDays(HistoryDays);
+    /// <summary>X-513 (the user's request of 16/11, choice (a)): « No limit » for the messages and for the days, each apart (off by
+    /// default); the number beside it is kept for when the box is unticked.</summary>
+    public bool HistoryMessagesUnlimited{get;set;}
+    public bool HistoryDaysUnlimited{get;set;}
+    /// <summary>The bounds as the history uses them: <see cref="ChatHistory.NoLimit"/> when « No limit » is ticked.</summary>
+    public int BoundedHistoryMessages=>HistoryMessagesUnlimited ? ChatHistory.NoLimit:ChatHistory.BoundedMessages(HistoryMessages);
+    public int BoundedHistoryDays=>HistoryDaysUnlimited ? ChatHistory.NoLimit:ChatHistory.BoundedDays(HistoryDays);
     /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
     public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}

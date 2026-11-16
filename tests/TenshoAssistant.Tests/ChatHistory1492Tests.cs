@@ -295,11 +295,14 @@ internal static class ChatHistory1492Tests
         ("Chat history 1492: off by default; ticking it asks first (what, where, how long, how to erase); only « Keep the history » turns it on", () =>
         {
             var settings = new ChatSettings();
-            Check(!settings.KeepHistory && settings.BoundedHistoryMessages == 2000 && settings.BoundedHistoryDays == 7, "off, 2,000 messages, 7 days");
+            // 0.1494 (X-513, the user's request of 16/11): 30 days by default (ChatHistory1494Tests).
+            Check(!settings.KeepHistory && settings.BoundedHistoryMessages == 2000 && settings.BoundedHistoryDays == 30, "off, 2,000 messages, 30 days");
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
             Check(window.Contains("value=>{if(value)chatHistoryAsk=true;else configuration.Chat.KeepHistory=false;}", StringComparison.Ordinal), "ticking only asks");
             Check(window.Contains("if(chatHistoryAsk){chatHistoryAsk=false;ImGui.OpenPopup(\"###ChatHistoryConsent\");}", StringComparison.Ordinal)
-                  && window.Contains("localization.Format(\"ChatWindow.HistoryConsentText\",ChatHistoryFolder ?? \"-\",ChatOptions.BoundedHistoryMessages,ChatOptions.BoundedHistoryDays)", StringComparison.Ordinal), "the question says the folder and the bounds");
+                  && window.Contains("localization.Format(\"ChatWindow.HistoryConsentText\",ChatHistoryFolder ?? \"-\",", StringComparison.Ordinal)
+                  && window.Contains("localization.Format(\"ChatWindow.HistoryNumber\",ChatOptions.BoundedHistoryMessages)", StringComparison.Ordinal)
+                  && window.Contains("localization.Format(\"ChatWindow.HistoryNumber\",ChatOptions.BoundedHistoryDays)", StringComparison.Ordinal), "the question says the folder and the bounds (0.1494, X-513: « no limit » in words)");
             Check(window.Split("configuration.Chat.KeepHistory=true;").Length == 2 && window.Contains("\"###ChatHistoryYes\")){configuration.Chat.KeepHistory=true;", StringComparison.Ordinal), "only its « yes » turns it on");
             Check(window.Contains("ImGui.OpenPopup(\"###ChatHistoryEraseAsk\")", StringComparison.Ordinal) && window.Contains("EraseChatHistory?.Invoke(", StringComparison.Ordinal), "« Erase » asks first");
             foreach (var language in new[] { "en", "fr" })

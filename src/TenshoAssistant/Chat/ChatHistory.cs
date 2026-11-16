@@ -21,6 +21,9 @@ namespace TenshoAssistant.Chat;
 /// <para>A line that cannot be read (a write cut short) is skipped, the others kept. A file of another format, version or character is never
 /// read nor written over. The file is trimmed to the bounds (messages and days) when it is read and when it has grown past twice the
 /// messages. Pure (tests); the game's side is ChatHistory.Dalamud.cs.</para>
+/// <para>X-513 (the user's request of 16/11, choice (a)): each bound may be « No limit » (<see cref="NoLimit"/>): nothing is removed for it.
+/// The window's messages are read from the file's end only (a big history is read back at once); a trim goes through the whole file line by
+/// line (<see cref="Trim"/>), never held whole, so nothing is lost past what is read back.</para>
 /// </summary>
 public static class ChatHistory
 {
@@ -28,14 +31,27 @@ public static class ChatHistory
     public const string FormatName="tensho-chat-history";
     public const int FormatVersion=1;
     public const int MinimumMessages=100,MaximumMessages=10000,DefaultMessages=2000;
-    public const int MinimumDays=1,MaximumDays=90,DefaultDays=7;
-    /// <summary>The most of a file read at once: past it, only its end (a file grows between two trims).</summary>
+    /// <summary>X-513 (the user's request of 16/11, choice (a)): 30 days by default (7 before; a saved setting keeps its value).</summary>
+    public const int MinimumDays=1,MaximumDays=90,DefaultDays=30;
+    /// <summary>X-513: « No limit » for the messages or the days (the player's box): nothing is removed for that bound. The window still shows
+    /// its own number of lines; what is read back for it is the last <see cref="MaximumMessages"/> of each kind.</summary>
+    public const int NoLimit=int.MaxValue;
+    /// <summary>The most of a file's end read back for the window at once (X-513: a big history is never read whole at load; the trim goes
+    /// through the whole file line by line, so nothing past this is lost).</summary>
     public const long MaximumReadBytes=64L*1024*1024;
     // A hand-edited line is bounded too.
     private const int MaximumText=4096,MaximumPieces=256,MaximumSender=256;
 
     public static int BoundedMessages(int messages)=>Math.Clamp(messages,MinimumMessages,MaximumMessages);
     public static int BoundedDays(int days)=>Math.Clamp(days,MinimumDays,MaximumDays);
+    // X-513: a bound as the history uses it: NoLimit kept, any other number bounded.
+    private static int Limit(int messages)=>messages==NoLimit ? NoLimit:BoundedMessages(messages);
+    private static DateTimeOffset Oldest(DateTimeOffset now,int days)=>days==NoLimit ? DateTimeOffset.MinValue:now-TimeSpan.FromDays(BoundedDays(days));
+
+    /// <summary>X-513: the place a history file takes, as shown to the player: the amount and its unit (KB under 1 MB, MB under 1 GB, GB).</summary>
+    public static (double Amount,string Unit) Size(long bytes)
+        =>bytes<1024*1024 ? (bytes<=0 ? 0:Math.Max(1,Math.Ceiling(bytes/1024.0)),"KB")
+            : bytes<1024L*1024*1024 ? (bytes/1048576.0,"MB"):(bytes/1073741824.0,"GB");
     public static string FileName(ulong character)=>character.ToString(CultureInfo.InvariantCulture)+".jsonl";
     public static string PathOf(string folder,ulong character)=>Path.Combine(folder,FileName(character));
 
@@ -159,52 +175,195 @@ public static class ChatHistory
         catch(JsonException){return null;}
     }
 
-    /// <summary>Reads a character's file: the messages within the bounds (<see cref="Bound"/>), numbered from 1. No file: nothing, ours.</summary>
-    public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)
+    /// <summary>Reads a character's file back for the window: the messages within the bounds, numbered from 1, in their order: none older
+    /// than <paramref name="days"/> days, and the last <paramref name="messages"/> of the combat lines and the last of the others (as the
+    /// window keeps them: a raid's lines never push a conversation out). X-513: read from the file's end only (at most
+    /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
+    /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
+    /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.</summary>
+    public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)=>Read(path,character,now,messages,days,MaximumReadBytes);
+
+    /// <summary><see cref="Read(string,ulong,DateTimeOffset,int,int)"/> with the most of the end read (a test makes it small).</summary>
+    public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days,long budget)
     {
         if(!File.Exists(path))return new([],0,0,true,false);
         using var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete);
-        string? first;
-        using(var head=new StreamReader(stream,Utf8,false,4096,leaveOpen:true))first=head.ReadLine();
+        var first=FirstLine(stream,out var body);
         var ours=IsOurs(first,character);
         if(ours==false)return new([],0,0,false,false);
-        var cut=stream.Length>MaximumReadBytes;
-        stream.Seek(cut ? stream.Length-MaximumReadBytes:0,SeekOrigin.Begin);
-        var all=new List<ChatRecord>();
-        int lines=0,bad=0;
-        using(var reader=new StreamReader(stream,Utf8,false,65536,leaveOpen:true))
+        var limit=Limit(messages);
+        var shown=Math.Min(limit,MaximumMessages);
+        var oldest=Oldest(now,days);
+        var newest=new List<ChatRecord>();
+        int lines=0,bad=0,combat=0,others=0;
+        bool over=false,old=false,full=false;
+        var walk=new BackwardLines(stream,body,budget);
+        while(walk.Next() is { } line)
         {
-            // From the start, the header (or a header cut short) is not a message; from within the file, the line cut by the seek is not one.
-            reader.ReadLine();
-            while(reader.ReadLine() is { } line)
-            {
-                if(line.Length==0)continue;
-                lines++;
-                if(Decode(line,all.Count+1) is { } record)all.Add(record);else bad++;
-            }
+            if(line.Length==0)continue;
+            lines++;
+            if(Decode(line,0) is not { } record){bad++;continue;}
+            if(record.Time<oldest){old=true;continue;}
+            ref var count=ref record.Channel==ChatChannel.Combat ? ref combat:ref others;
+            if(count>=shown){over=true;continue;}
+            count++;
+            newest.Add(record);
+            if(combat>=shown && others>=shown){full=true;break;}
         }
-        var kept=Bound(all,now,messages,days);
-        return new(kept,lines,bad,true,cut || bad>0 || kept.Count<all.Count || ours is null);
+        // Lines left before the point reached (both kinds full, or past the budget): past the bound when it is a number; with « No limit » on
+        // the messages, kept, unless the days remove the oldest one (the file is in time order: its first message says).
+        var before=walk.Cut;
+        if(full)
+        {
+            string? more;
+            do more=walk.Next();while(more is { Length:0 });
+            before|=more is not null;
+        }
+        if(before)
+        {
+            if(limit!=NoLimit)over=true;
+            else if(!old && oldest!=DateTimeOffset.MinValue && FirstMessageTime(stream,body) is { } time && time<oldest)old=true;
+        }
+        newest.Reverse();
+        var kept=new List<ChatRecord>(newest.Count);
+        foreach(var record in newest)kept.Add(record with{Id=kept.Count+1});
+        return new(kept,lines,bad,true,bad>0 || ours is null || old || over && limit!=NoLimit);
     }
 
-    /// <summary>The messages within the bounds, in their order, numbered from 1: none older than <paramref name="days"/> days, and the last
-    /// <paramref name="messages"/> of the combat lines and the last <paramref name="messages"/> of the others (as the window keeps them: a
-    /// raid's lines never push a conversation out).</summary>
-    public static IReadOnlyList<ChatRecord> Bound(IReadOnlyList<ChatRecord> records,DateTimeOffset now,int messages,int days)
+    // The first line of a file (at most 64 KB; a header never is that long) and where the next one begins.
+    private static string? FirstLine(FileStream stream,out long next)
     {
-        var limit=BoundedMessages(messages);
-        var oldest=now-TimeSpan.FromDays(BoundedDays(days));
-        var recent=records.Where(record=>record.Time>=oldest).ToList();
-        int combat=recent.Count(record=>record.Channel==ChatChannel.Combat),others=recent.Count-combat;
-        int dropCombat=Math.Max(0,combat-limit),dropOthers=Math.Max(0,others-limit);
-        var kept=new List<ChatRecord>(recent.Count-dropCombat-dropOthers);
-        foreach(var record in recent)
+        stream.Seek(0,SeekOrigin.Begin);
+        var buffer=new byte[(int)Math.Min(stream.Length,64*1024)];
+        var read=0;
+        while(read<buffer.Length && stream.Read(buffer,read,buffer.Length-read) is var got and >0)read+=got;
+        var end=Array.IndexOf(buffer,(byte)'\n',0,read);
+        next=end<0 ? stream.Length:end+1;
+        return read==0 ? null:Utf8.GetString(buffer,0,end<0 ? read:end).TrimEnd('\r');
+    }
+
+    // X-513: the time of the file's first message (the line after the first line), or null when it cannot be read.
+    private static DateTimeOffset? FirstMessageTime(FileStream stream,long body)
+    {
+        if(body>=stream.Length)return null;
+        stream.Seek(body,SeekOrigin.Begin);
+        using var reader=new StreamReader(stream,Utf8,false,4096,leaveOpen:true);
+        return reader.ReadLine() is { } line && Decode(line,0) is { } record ? record.Time:null;
+    }
+
+    /// <summary>X-513: a file's lines from its end back to <c>start</c> (the line after the first), newest first, in blocks; at most
+    /// <c>budget</c> bytes. <see cref="Cut"/>: the budget stopped it before the first line's end (lines are left before).</summary>
+    private sealed class BackwardLines(FileStream stream,long start,long budget)
+    {
+        private readonly byte[] block=new byte[64*1024];
+        private readonly long floor=Math.Max(start,stream.Length-budget);
+        private long position=stream.Length;
+        private int index=-1,end;
+        private List<byte> carry=[];
+        private bool done;
+
+        /// <summary>The budget is reached before the first line's end: lines are left before what can be given.</summary>
+        public bool Cut=>floor>start;
+
+        public string? Next()
         {
-            if(record.Channel==ChatChannel.Combat){if(dropCombat>0){dropCombat--;continue;}}
-            else if(dropOthers>0){dropOthers--;continue;}
-            kept.Add(record with{Id=kept.Count+1});
+            while(true)
+            {
+                for(;index>=0;index--)
+                {
+                    if(block[index]!=(byte)'\n')continue;
+                    var line=Text(index+1,end);
+                    end=index;index--;
+                    return line;
+                }
+                if(index==-1 && end>=0 && position<stream.Length)
+                {
+                    // The block's start belongs to the line that goes on in the block before.
+                    var rest=new List<byte>(end+carry.Count);
+                    for(var at=0;at<end;at++)rest.Add(block[at]);
+                    rest.AddRange(carry);carry=rest;end=-1;
+                }
+                if(position<=floor)
+                {
+                    if(done)return null;
+                    done=true;
+                    // At the first line's end, what is carried is a whole line; past the budget, a line cut by it (not given).
+                    if(floor>start || carry.Count==0)return null;
+                    var last=Utf8.GetString(carry.ToArray()).TrimEnd('\r');
+                    carry.Clear();
+                    return last;
+                }
+                var size=(int)Math.Min(block.Length,position-floor);
+                position-=size;
+                stream.Seek(position,SeekOrigin.Begin);
+                stream.ReadExactly(block,0,size);
+                index=size-1;end=size;
+            }
         }
-        return kept;
+
+        private string Text(int from,int to)
+        {
+            string line;
+            if(carry.Count==0)line=Utf8.GetString(block,from,to-from);
+            else
+            {
+                var bytes=new byte[to-from+carry.Count];
+                Array.Copy(block,from,bytes,0,to-from);
+                carry.CopyTo(bytes,to-from);
+                carry.Clear();
+                line=Utf8.GetString(bytes);
+            }
+            return line.TrimEnd('\r');
+        }
+    }
+
+    /// <summary>X-513: writes a character's file again within its bounds, line by line (a file of any size is never held whole): the lines
+    /// older than the days, the oldest past the messages of their kind (none with <see cref="NoLimit"/>) and the lines that cannot be read
+    /// are left out, the first line made again; through a temporary file (a failure leaves the old file whole). Not this character's
+    /// history: left as it is.</summary>
+    public static void Trim(string path,ulong character,DateTimeOffset now,int messages,int days)
+    {
+        if(!File.Exists(path) || IsOurs(FirstLineOf(path),character)==false)return;
+        var limit=Limit(messages);
+        var oldest=Oldest(now,days);
+        int combat=0,others=0;
+        foreach(var record in Records(path,character))
+            if(record is { } kept && kept.Time>=oldest){if(kept.Channel==ChatChannel.Combat)combat++;else others++;}
+        int dropCombat=limit==NoLimit ? 0:Math.Max(0,combat-limit),dropOthers=limit==NoLimit ? 0:Math.Max(0,others-limit);
+        var temporary=path+"."+Guid.NewGuid().ToString("N")+".tmp";
+        try
+        {
+            using(var output=new StreamWriter(new FileStream(temporary,FileMode.CreateNew,FileAccess.Write,FileShare.None),Utf8,65536))
+            {
+                output.Write(Header(character));output.Write('\n');
+                foreach(var record in Records(path,character))
+                {
+                    if(record is null || record.Time<oldest)continue;
+                    if(record.Channel==ChatChannel.Combat){if(dropCombat>0){dropCombat--;continue;}}
+                    else if(dropOthers>0){dropOthers--;continue;}
+                    output.Write(Encode(record));output.Write('\n');
+                }
+            }
+            AtomicFile.OverwriteWhenFree(temporary,path);
+        }
+        finally{AtomicFile.DeleteWhenFree(temporary);}
+    }
+
+    private static string? FirstLineOf(string path)
+    {
+        using var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete);
+        return FirstLine(stream,out _);
+    }
+
+    // X-513: a file's messages from its first, one line at a time (null for a line that cannot be read); none when it is another history.
+    private static IEnumerable<ChatRecord?> Records(string path,ulong character)
+    {
+        using var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite|FileShare.Delete);
+        if(IsOurs(FirstLine(stream,out var body),character)==false)yield break;
+        stream.Seek(body,SeekOrigin.Begin);
+        using var reader=new StreamReader(stream,Utf8,false,65536,leaveOpen:true);
+        while(reader.ReadLine() is { } line)
+            if(line.Length>0)yield return Decode(line,0);
     }
 
     /// <summary>Writes the file again with these messages only, through a temporary file (a failure leaves the old file whole).</summary>
@@ -310,6 +469,26 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
     public int Pending{get{lock(gate)return pending.Count;}}
     /// <summary>Writes that failed since the start.</summary>
     public int Failures=>Volatile.Read(ref failures);
+    private long bytes=-1;
+    /// <summary>X-513: the place the open character's file takes on disk, measured off the game's thread after each read, write, trim and
+    /// erase (-1: no history open).</summary>
+    public long Bytes=>Interlocked.Read(ref bytes);
+
+    // X-513: measured where `run` runs, for the open character only.
+    private void Measure(ulong who)
+    {
+        if(who==0 || who!=Character)return;
+        var path=ChatHistory.PathOf(folder,who);
+        long size;
+        try{size=File.Exists(path) ? new FileInfo(path).Length:0;}
+        catch(Exception error) when(error is IOException or UnauthorizedAccessException){return;}
+        lock(gate)if(who==character)Interlocked.Exchange(ref bytes,size);
+    }
+
+    // X-513: the bounds trimmed on disk at most every twice the messages kept (or the most read back, with « No limit »); never when both
+    // bounds are « No limit » (nothing is ever removed then).
+    private static int TrimEvery(int messages,int days)
+        =>messages==ChatHistory.NoLimit && days==ChatHistory.NoLimit ? int.MaxValue:2*(messages==ChatHistory.NoLimit ? ChatHistory.MaximumMessages:ChatHistory.BoundedMessages(messages));
 
     /// <summary>Opens a character's history: its file read back within the bounds (trimmed on disk when needed), handed to <paramref name="loaded"/>
     /// where <c>run</c> runs (an empty list when it cannot be read).</summary>
@@ -333,9 +512,10 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
             if(stale){loaded(new([],0,0,true,false));return;}
             if(!read.Ours)warn(new InvalidDataException("another format or character"),"The chat history file of this character is not one this version reads; it is left as it is and nothing is added to it.");
             else if(read.Trim)
-                try{ChatHistory.Rewrite(path,who,read.Records);}
+                try{ChatHistory.Trim(path,who,now,messages,days);}
                 catch(Exception error) when(error is IOException or UnauthorizedAccessException){Failed(error,"The chat history could not be trimmed; it is kept as it was.");}
             appended=0;
+            Measure(who);
             loaded(read);
         });
     }
@@ -421,10 +601,11 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
                 }
                 failing=false;
                 appended+=lines.Count;
+                Measure(who);
                 start=end;
             }
             var open=Character;
-            if(open!=0 && appended>2*ChatHistory.BoundedMessages(messages))
+            if(open!=0 && appended>TrimEvery(messages,days))
             {
                 appended=0;
                 lock(gate)if(at!=generation)return;
@@ -432,9 +613,10 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
                 try
                 {
                     var read=ChatHistory.Read(path,open,now,messages,days);
-                    if(read.Ours && read.Trim)ChatHistory.Rewrite(path,open,read.Records);
+                    if(read.Ours && read.Trim)ChatHistory.Trim(path,open,now,messages,days);
                 }
                 catch(Exception error) when(error is IOException or UnauthorizedAccessException){Failed(error,"The chat history could not be trimmed; it is kept as it was.");}
+                Measure(open);
             }
         });
     }
@@ -443,13 +625,13 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
     public void Close(DateTimeOffset now,int messages,int days)
     {
         Flush(now,messages,days);
-        lock(gate){character=0;ready=null;}
+        lock(gate){character=0;ready=null;Interlocked.Exchange(ref bytes,-1);}
     }
 
     /// <summary>The history turned off: nothing more is written, what was queued is dropped (the files stay until « Erase »).</summary>
     public void Drop()
     {
-        lock(gate){pending.Clear();generation++;character=0;ready=null;}
+        lock(gate){pending.Clear();generation++;character=0;ready=null;Interlocked.Exchange(ref bytes,-1);}
     }
 
     /// <summary>« Erase the history »: what is queued is dropped and every character's file deleted; <paramref name="done"/> says whether
@@ -461,6 +643,7 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
         {
             var all=ChatHistory.Erase(folder);
             appended=0;
+            Measure(Character);
             done?.Invoke(all);
         });
     }

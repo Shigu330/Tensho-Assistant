@@ -51,8 +51,10 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.HiddenPlayers` | string? | null | Settings › Panels | **Hidden players** — No tab shows what these players write (names with commas between them, the world not needed). Only in Tensho's window: the game's chat is unchanged. Default: none. |
 | `Chat.HideInCombat` | bool | false | Settings › Panels | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
 | `Chat.HighlightedPlayers` | string? | null | Settings › Panels | **Players put forward** — The name of these players stands out in the window (names with commas between them, the world not needed). Default: none. |
-| `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Settings › Panels | **Days kept** — Messages older than this are removed, from 1 to 90 days. Default: 7. |
+| `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Settings › Panels | **Days kept** — Messages older than this are removed, from 1 to 90 days. Default: 30. |
+| `Chat.HistoryDaysUnlimited` | bool | false | Settings › Panels | **No limit** — Keeps the messages of every day, however old; the number beside it is kept for when this is unticked. The place on disk keeps growing. Default: off. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Settings › Panels | **Messages kept** — The last messages kept per character, from 100 to 10,000 (the combat lines and the others each); the oldest go first. Default: 2,000. |
+| `Chat.HistoryMessagesUnlimited` | bool | false | Settings › Panels | **No limit** — Keeps every message, however many; the number beside it is kept for when this is unticked. The window still shows its own number of lines; the place on disk keeps growing. Default: off. |
 | `Chat.HourLeadingZero` | bool | false | Settings › Panels | **Hour with a leading zero** — Writes the hour with two digits ([09:21]); otherwise as the game's chat writes it ([9:21]). Default: off. |
 | `Chat.Locked` | bool | false | Settings › Panels | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MaxLines` | int | 2000 | Settings › Panels | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
@@ -355,7 +357,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 299 controls (285 linked to `Configuration`, 14 to another file), 34 settings without a control.
+Counted: 301 controls (287 linked to `Configuration`, 14 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -412,8 +414,10 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.HiddenPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs cachés** — Aucun onglet ne montre ce qu'écrivent ces joueurs (noms séparés par des virgules, le monde n'est pas nécessaire). Seulement dans la fenêtre de Tensho : le chat du jeu ne change pas. Par défaut : aucun. |
 | `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
 | `Chat.HighlightedPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs mis en avant** — Le nom de ces joueurs ressort dans la fenêtre (noms séparés par des virgules, le monde n'est pas nécessaire). Par défaut : aucun. |
-| `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Paramètres › Panneaux à côté du jeu | **Jours gardés** — Les messages plus anciens sont retirés, de 1 à 90 jours. Par défaut : 7. |
+| `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Paramètres › Panneaux à côté du jeu | **Jours gardés** — Les messages plus anciens sont retirés, de 1 à 90 jours. Par défaut : 30. |
+| `Chat.HistoryDaysUnlimited` | bool | false | Paramètres › Panneaux à côté du jeu | **Sans limite** — Garde les messages de tous les jours, aussi anciens soient-ils ; le nombre à côté est gardé pour quand la case est décochée. La place sur le disque continue de grandir. Par défaut : désactivé. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Paramètres › Panneaux à côté du jeu | **Messages gardés** — Les derniers messages gardés par personnage, de 100 à 10 000 (les lignes de combat et les autres, chacune) ; les plus anciens partent d'abord. Par défaut : 2 000. |
+| `Chat.HistoryMessagesUnlimited` | bool | false | Paramètres › Panneaux à côté du jeu | **Sans limite** — Garde tous les messages, quel que soit leur nombre ; le nombre à côté est gardé pour quand la case est décochée. La fenêtre montre toujours son propre nombre de lignes ; la place sur le disque continue de grandir. Par défaut : désactivé. |
 | `Chat.HourLeadingZero` | bool | false | Paramètres › Panneaux à côté du jeu | **Heure avec un zéro devant** — Écrit l'heure sur deux chiffres ([09:21]) ; sinon comme le chat du jeu l'écrit ([9:21]). Par défaut : désactivé. |
 | `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
@@ -716,5 +720,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 299 cases (285 reliées à `Configuration`, 14 à un autre fichier), 34 réglages sans case.
+Compté : 301 cases (287 reliées à `Configuration`, 14 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
