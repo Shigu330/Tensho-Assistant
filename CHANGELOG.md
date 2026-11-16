@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1487.0
+- Plan global, X-506 : Liens de la fenêtre de chat (X-506, X-479). X-506 : un lien dont la seule partie visible est la flèche du jeu (le lien de lieu des messages d'alarme de Tensho) s'affiche comme une flèche, sans nom : le nom de la zone n'est plus collé au nom de l'objet lié qui suit (« Thanalan occidentalTerreau thanalanais III ») ; le nom de la cible n'est écrit que pour un lien qui sinon ne montrerait rien. X-479 : la charge utile d'un message dit par le joueur (« test <objet> test », 16/11) porte le nom de l'objet comme texte du lien ; relevés du 16/11 gardés dans docs/evidence/0.1487-chat-link-said.md et rejoués par les tests.
+- Pour les joueurs : dans la fenêtre de chat de Tensho, les messages d'alarme montrent le lien de lieu comme une flèche, comme le chat du jeu, sans le nom de la zone collé au nom de l'objet.
+- Tests : ChatLinks1487Tests. Verify.ps1 (agent) : 2913/2913, 0 avertissement, 0 erreur ; DLL 0.1487.0.0. Non validé en jeu.
+### English
+- Chat window links (X-506, X-479). X-506: a link whose only visible piece is the game's arrow (the place link of Tensho's alarm messages) shows as an arrow, with no name: the zone's name is no longer glued to the next linked item's name; the target's name is written only for a link that would otherwise show nothing. X-479: the payload of a message said by the player (« test <item> test », 11/16) carries the item's name as the link's text; the records of 11/16 are kept in docs/evidence/0.1487-chat-link-said.md and replayed by the tests.
+- For players: In the Tensho chat window, alarm messages show the place link as an arrow like the game's chat, without the zone's name glued to the item's name.
+
 ## 0.1486.0
 - Plan global, X-503 : Relecture de 0.1482 (X-503, M1 et M2). M1 : les marges étroites de la fenêtre de chat restent les siennes : le panneau de la roue dentée, les menus du clic droit et les info-bulles qu'elle ouvre reprennent les marges habituelles (rendues au contenu après Begin, PanelWindow). M2 : les réglages de X-484 (joueurs cachés et mis en avant, mots gardés ou cachés, majuscules, autres messages, filtres du jeu) passent par des composants communs (TextSetting, CheckSetting, SettingButton) : la recherche des réglages et SETTINGS.md les trouvent ; leurs info-bulles disent leur valeur par défaut. M3 (noms d'autres joueurs écrits dans la configuration) attend l'accord de l'utilisateur (R04).
 - Pour les joueurs : les menus et le panneau de réglages de la fenêtre de chat retrouvent des marges normales, et ses réglages de joueurs et de mots se trouvent par la recherche des réglages.

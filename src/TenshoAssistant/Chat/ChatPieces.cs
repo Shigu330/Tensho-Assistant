@@ -8,7 +8,10 @@ public readonly record struct ChatPiece(string? Text,ChatLink? Start=null,bool E
 /// are that link's (its visible text: a place and coordinate, an item's name); a link left open runs to the end of the message; a new start
 /// replaces an open one; an end without a start changes nothing; empty texts are left out. X-461 (0.1463): a link that ends with no visible text
 /// (only the game's link glyph, or nothing) keeps its place as an empty segment of that link, which the window writes with the name of what it
-/// points to (ChatFormat.Runs): it no longer vanishes from the message. Pure.
+/// points to (ChatFormat.Runs): it no longer vanishes from the message. X-506 (0.1487, user's capture and game log of 11/16): a link whose
+/// only visible piece is the game's link glyph (the place link of Tensho's alarms, followed by an item link) shows that glyph as an arrow
+/// (ChatGlyphs.LinkArrow), as the game does, and no name: the zone's name was written glued to the item's (« Thanalan occidentalTerreau… »).
+/// The name of the target is written only for a link that would otherwise show nothing at all. Pure.
 /// </summary>
 public static class ChatPieces
 {
@@ -17,10 +20,15 @@ public static class ChatPieces
         var body=new List<ChatSegment>();
         ChatLink? open=null;
         var shown=false;
+        var mark=-1;   // X-506: the segment of the open link holding the game's link glyph
         void Close()
         {
-            if(open is not null && !shown)body.Add(new ChatSegment("",open.Kind,open));
-            open=null;shown=false;
+            if(open is not null && !shown)
+            {
+                if(mark>=0)body[mark]=body[mark] with{Text=body[mark].Text.Replace(ChatGlyphs.LinkMarker.ToString(),ChatGlyphs.LinkArrow,StringComparison.Ordinal)};
+                else body.Add(new ChatSegment("",open.Kind,open));
+            }
+            open=null;shown=false;mark=-1;
         }
         foreach(var piece in pieces)
         {
@@ -29,6 +37,7 @@ public static class ChatPieces
             if(piece.Text is not { Length:>0 } text)continue;
             if(open is not null)
             {
+                if(mark<0 && text.Contains(ChatGlyphs.LinkMarker,StringComparison.Ordinal))mark=body.Count;
                 body.Add(new ChatSegment(text,open.Kind,open));
                 if(ChatFormat.Clean(text).Trim().Length>0)shown=true;
                 continue;

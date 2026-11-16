@@ -32,11 +32,11 @@ internal static class ChatLinks1463Tests
             var link = runs.Single(run => run.Role == ChatRole.Link);
             Check(link.Text == "Hi-Potion" && link.Link == Potion, "underlined and clickable: " + link);
         }),
-        ("Chat links 1463: « test, link, test » with the link glyph only: the item's name written in its place", () =>
+        ("Chat links 1463: « test, link, test » with the link glyph only: the game's arrow in its place (0.1487, X-506: no name added)", () =>
         {
             var runs = Laid([new("test "), new(null, Potion), new("\uE0BB"), new(null, End: true), new(" test")], Names);
-            Check(string.Concat(runs.Select(run => run.Text)) == "Ann: test Hi-Potion test", "the whole message: " + string.Concat(runs.Select(run => run.Text)));
-            Check(runs.Single(run => run.Role == ChatRole.Link).Link == Potion, "the link kept");
+            Check(string.Concat(runs.Select(run => run.Text)) == "Ann: test \u2192 test", "the whole message: " + string.Concat(runs.Select(run => run.Text)));
+            Check(runs.Single(run => run.Role == ChatRole.Link) is { Text: "\u2192" } link && link.Link == Potion, "the link kept, as an arrow");
         }),
         ("Chat links 1463: a link with nothing between its start and its end, or left open at the end, keeps its place", () =>
         {

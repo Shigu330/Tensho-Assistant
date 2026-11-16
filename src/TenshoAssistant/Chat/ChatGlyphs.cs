@@ -13,6 +13,9 @@ public static class ChatGlyphs
 {
     /// <summary>SeIconChar.LinkMarker: the game's link glyph, before a link's text.</summary>
     public const char LinkMarker = '';
+    /// <summary>X-506 (0.1487): what the window writes for the game's link glyph when a link has nothing else to show (a place link of
+    /// Tensho's alarms: the game shows its arrow only). An arrow of the window's font, as the game's.</summary>
+    public const string LinkArrow = "\u2192";
     /// <summary>BitmapFontIcon.CrossWorld: the world icon between a player's name and their world.</summary>
     public const uint CrossWorld = 88;
 

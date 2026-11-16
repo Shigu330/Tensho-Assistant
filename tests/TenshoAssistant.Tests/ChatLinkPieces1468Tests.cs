@@ -120,15 +120,15 @@ internal static class ChatLinkPieces1468Tests
             Check(runs.Single(run => run.Role == ChatRole.Link) is { Link.ItemId: 5711 } shown && shown.Text == name, "underlined, clickable");
             Check(ChatPayloads.Bare(ChatPayloads.Segments(said)) == 0, "a link with its name is not « without text of its own »");
         }),
-        ("Chat link pieces 1468: the map link of 23:39 (one-character texts only): with spaces, its place is kept and named, and the developer line says it", () =>
+        ("Chat link pieces 1468: the map link of 23:39 (one-character texts only): with spaces, its place is kept as the game's arrow (0.1487, X-506: no name)", () =>
         {
             var (_, kind, line) = Lines()[^1];
             var payloads = Payloads(line, ' ');
             var body = ChatPayloads.Segments(payloads);
-            Check(ChatPayloads.Bare(body) == 1, "one link without text of its own: " + ChatPayloads.Bare(body));
+            Check(ChatPayloads.Bare(body) == 0, "its glyph is shown: not « without text of its own »: " + ChatPayloads.Bare(body));
             var runs = Laid(kind, payloads, width: 2000);
-            Check(runs.Any(run => run.Role == ChatRole.Link && run.Text.EndsWith("Eulmore", StringComparison.Ordinal) && run.Link?.Kind == ChatSegmentKind.MapLink),
-                "the place named: " + string.Join("|", runs));
+            Check(runs.Any(run => run.Role == ChatRole.Link && run.Text.Contains('\u2192', StringComparison.Ordinal) && run.Link?.Kind == ChatSegmentKind.MapLink)
+                  && !runs.Any(run => run.Text.Contains("Eulmore", StringComparison.Ordinal)), "the arrow, no place name: " + string.Join("|", runs));
             Check(runs.Single(run => run.Link?.Kind == ChatSegmentKind.ItemLink).Text == new string('e', 23), "the item after it keeps its name");
         }),
         ("Chat link pieces 1468: the developer line keeps room for a message said by a player after many loot lines (two per kind, thirty per session)", () =>
