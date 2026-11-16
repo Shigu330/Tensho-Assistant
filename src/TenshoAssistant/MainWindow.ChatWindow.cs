@@ -144,9 +144,19 @@ internal sealed partial class MainWindow
     /// character), how long (the bounds below) and how to erase it; only « Keep the history » turns it on. « Erase the history » asks too.</summary>
     private void DrawChatHistorySettings(ChatSettings defaults)
     {
-        BoolSetting("ChatWindow.KeepHistory","ChatWindow.KeepHistoryTip",()=>configuration.Chat.KeepHistory,value=>{if(value)chatHistoryAsk=true;else configuration.Chat.KeepHistory=false;},c=>c.Chat.KeepHistory);
+        // X-515 M2: outside the game (the desktop app) nothing keeps nor erases the history: its settings are shown greyed, with why, and the
+        // question (which names the folder) never opens there.
+        var here=ChatHistoryFolder is not null && EraseChatHistory is not null;
+        ImGui.BeginDisabled(!here);
+        try{BoolSetting("ChatWindow.KeepHistory","ChatWindow.KeepHistoryTip",()=>configuration.Chat.KeepHistory,value=>{if(value)chatHistoryAsk=true;else configuration.Chat.KeepHistory=false;},c=>c.Chat.KeepHistory);}
+        finally{ImGui.EndDisabled();}
+        if(!here)
+        {
+            chatHistoryAsk=false;
+            ImGui.TextColored(Muted,localization.Get("ChatWindow.HistoryGameOnly"));
+        }
         ImGui.Indent();
-        ImGui.BeginDisabled(!configuration.Chat.KeepHistory);
+        ImGui.BeginDisabled(!configuration.Chat.KeepHistory || !here);
         try
         {
             IntSetting("ChatWindow.HistoryMessages","ChatWindow.HistoryMessagesTip",()=>configuration.Chat.BoundedHistoryMessages,value=>configuration.Chat.HistoryMessages=value,ChatHistory.MinimumMessages,ChatHistory.MaximumMessages,defaults.HistoryMessages);

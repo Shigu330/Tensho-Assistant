@@ -12,8 +12,12 @@ namespace TenshoAssistant.Chat;
 /// number&gt;.jsonl</c> in the plugin's folder, UTF-8, one JSON object per line. The first line says what the file is:
 /// <c>{"format":"tensho-chat-history","version":1,"character":N}</c>. Each next line is one message: <c>time</c> (milliseconds since 1970,
 /// UTC), <c>kind</c> (the game's chat kind), <c>sender</c>, <c>source</c> and <c>target</c> (who does it and to whom, 0 none), <c>body</c>
-/// (its pieces: <c>text</c>, and <c>link</c> for a link: <c>type</c> MapLink, ItemLink, QuestLink, WebLink or DalamudLink, then territory, map,
-/// x, y, place, item, hq, quest, url, plugin, command, data in base64). A value that is empty or zero is left out.</para>
+/// (its pieces: <c>text</c>, and <c>link</c> for a link: <c>type</c> MapLink, ItemLink, QuestLink or WebLink, then territory, map, x, y, place,
+/// item, hq, quest, url). A value that is empty or zero is left out.</para>
+/// <para>X-514 (review of 0.1492, I1): a link of Dalamud or of a plugin is kept as its text only, never as a link. Its command number is the
+/// plugin's for that session only: after a reload or a restart the same (plugin, number) may be another action of that plugin, which a click
+/// on an old link would run (the game's chat keeps nothing from one session to the next either). A line written by 0.1492 with such a link
+/// (type DalamudLink, plugin, command, data) is read back as its text.</para>
 /// <para>A line that cannot be read (a write cut short) is skipped, the others kept. A file of another format, version or character is never
 /// read nor written over. The file is trimmed to the bounds (messages and days) when it is read and when it has grown past twice the
 /// messages. Pure (tests); the game's side is ChatHistory.Dalamud.cs.</para>
@@ -90,7 +94,8 @@ public static class ChatHistory
     public static string Encode(ChatRecord record)=>JsonSerializer.Serialize(new MessageLine
     {
         Time=record.Time.ToUnixTimeMilliseconds(),Kind=record.Kind,Sender=Empty(record.Sender),Source=record.Source,Target=record.Target,
-        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { } link ? Link(link):null}).ToList(),
+        // X-514: a link of Dalamud or of a plugin is kept as its text (its command is valid in this session only).
+        Body=record.Body.Select(segment=>new PieceLine{Text=Empty(segment.Text),Link=segment.Link is { Kind:not ChatSegmentKind.DalamudLink } link ? Link(link):null}).ToList(),
     },Json);
 
     private static string? Empty(string? text)=>string.IsNullOrEmpty(text) ? null:text;
@@ -127,9 +132,10 @@ public static class ChatHistory
 
     private static string Cut(string? text,int maximum)=>text is null ? "":text.Length<=maximum ? text:text[..maximum];
 
-    // A link of a type this version does not know stays plain text.
+    // A link of a type this version does not know stays plain text; X-514: so does a link of Dalamud or of a plugin (0.1492 wrote them),
+    // so that a click never runs a command number of an older session.
     private static ChatLink? Link(LinkLine link)
-        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind!=ChatSegmentKind.Text && Enum.IsDefined(kind)
+        =>Enum.TryParse<ChatSegmentKind>(link.Type,false,out var kind) && kind is not (ChatSegmentKind.Text or ChatSegmentKind.DalamudLink) && Enum.IsDefined(kind)
             ? new ChatLink(kind,link.Territory,link.Map,link.X,link.Y,Cut(link.Place,MaximumSender),link.Item,link.Hq,link.Quest,Cut(link.Url,MaximumText),
                 Cut(link.Plugin,MaximumSender),link.Command,link.Data is { Length:>0 and <=MaximumText } data ? data:null)
             : null;
@@ -211,12 +217,14 @@ public static class ChatHistory
 
     /// <summary>Adds lines at the end of a character's file (made with its first line when there is none). A line cut short by an earlier
     /// failed write is closed first, so it stays alone (skipped when read) and never spoils the next one. A file that is not this
-    /// character's history throws InvalidDataException and is not touched.</summary>
-    public static void Append(string path,ulong character,IReadOnlyList<string> lines)
+    /// character's history throws InvalidDataException and is not touched. Returns the file's length before (0: made by this write), for
+    /// <see cref="Undo"/>.</summary>
+    public static long Append(string path,ulong character,IReadOnlyList<string> lines)
     {
-        if(lines.Count==0)return;
+        if(lines.Count==0)return File.Exists(path) ? new FileInfo(path).Length:0;
         if(Path.GetDirectoryName(path) is { Length:>0 } folder)Directory.CreateDirectory(folder);
         using var stream=new FileStream(path,FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.Read);
+        var before=stream.Length;
         var text=new StringBuilder();
         if(stream.Length==0)text.Append(Header(character)).Append('\n');
         else
@@ -231,7 +239,29 @@ public static class ChatHistory
         stream.Seek(0,SeekOrigin.End);
         stream.Write(Utf8.GetBytes(text.ToString()));
         stream.Flush();
+        return before;
     }
+
+    /// <summary>X-515 M3: takes back a write that the player's « off » or « Erase » overtook: the file cut back to its length before
+    /// (<paramref name="before"/>), or deleted when that write made it.</summary>
+    public static void Undo(string path,long before)
+    {
+        if(!File.Exists(path))return;
+        if(before<=0){AtomicFile.DeleteWhenFree(path);return;}
+        using var stream=new FileStream(path,FileMode.Open,FileAccess.ReadWrite,FileShare.Read);
+        if(stream.Length>before)stream.SetLength(before);
+    }
+
+    // X-515 M5: a history file is named by the character's number; a message that names it (an IO error's message holds the whole path)
+    // reaches dalamud.log, which players join to their bug reports (R04, R25: a player's data). The number is replaced there.
+    private static readonly System.Text.RegularExpressions.Regex FileNumber=new(@"\d+(?=\.jsonl)",System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+    /// <summary>X-515 M5: a text with every history file's character number replaced by « &lt;character&gt; ».</summary>
+    public static string Scrub(string? text)=>string.IsNullOrEmpty(text) ? "":FileNumber.Replace(text,"<character>");
+
+    /// <summary>X-515 M5: the line written to the log for a failure of the history: the message, the error's kind and its scrubbed message
+    /// (never the error itself, whose message and stack name the file).</summary>
+    public static string Report(Exception error,string message)=>$"{message} ({error.GetType().Name}: {Scrub(error.Message)})";
 
     /// <summary>Deletes every history file of the folder (every character), and the folder when it is left empty. False when a file is still
     /// there (held by another program).</summary>
@@ -253,19 +283,25 @@ public static class ChatHistory
 /// once, queued), and flushes the queue once a second. A write that fails loses nothing: its lines go back to the head of the queue
 /// (bounded) and are written at the next flush, and the failure is said once until a write succeeds. A file that is not this character's
 /// history is never written to. Turning the history off (<see cref="Drop"/>) or erasing it (<see cref="Erase"/>) voids what was queued
-/// before, even work already handed to <c>run</c>.
+/// before: work handed to <c>run</c> and not begun does nothing; work under way stops before the next file, and the write it was doing
+/// when the player's « off » or « Erase » came is taken back (X-515 M3: the file cut back to its length before), so nothing it was asked
+/// to keep is left once off. The messages read back wait in <see cref="Take"/> for the game's thread; « off », « Erase » and a change of
+/// character drop them (X-515 M1: an erase is never undone by a read that ended just before it).
 /// </summary>
-public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Action<Exception,string> warn)
+/// <param name="append">The write of a file's lines (<see cref="ChatHistory.Append"/>; a test puts its own in, to act while it writes).</param>
+public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Action<Exception,string> warn,Func<string,ulong,IReadOnlyList<string>,long>? append=null)
 {
     /// <summary>The most lines waiting (a disk that keeps failing): past it, the oldest go.</summary>
     public const int MaximumPending=2*ChatHistory.MaximumMessages;
     private readonly object gate=new();
     private readonly List<(ulong Character,string Line)> pending=[];
+    private readonly Func<string,ulong,IReadOnlyList<string>,long> write=append ?? ChatHistory.Append;
     private ulong character;
     private int generation;
     private int appended;
     private bool failing;
     private int failures;
+    private ChatHistory.Loaded? ready;
 
     public string Folder=>folder;
     /// <summary>The character whose history is open (0: none).</summary>
@@ -304,6 +340,21 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
         });
     }
 
+    /// <summary>X-515 M1: opens a character's history; the messages read back wait for <see cref="Take"/>, kept only while nothing voided
+    /// them (« off », « Erase », another character opened, the history closed).</summary>
+    public void Open(ulong who,DateTimeOffset now,int messages,int days)
+    {
+        int at;
+        lock(gate){ready=null;at=generation;}
+        Open(who,now,messages,days,read=>{lock(gate)if(at==generation && character==who)ready=read;});
+    }
+
+    /// <summary>X-515 M1: the messages read back, once (game's thread); null when none wait.</summary>
+    public ChatHistory.Loaded? Take()
+    {
+        lock(gate){var read=ready;ready=null;return read;}
+    }
+
     /// <summary>A new message of the open character, queued (game's thread).</summary>
     public void Keep(ChatRecord record)
     {
@@ -327,14 +378,28 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
         }
         run("The chat history could not be written.",()=>
         {
-            lock(gate)if(at!=generation)return;
             for(var start=0;start<batch.Count;)
             {
+                // X-515 M3: « off » or « Erase » since this work began: nothing more is written.
+                lock(gate)if(at!=generation)return;
                 var who=batch[start].Character;
                 var end=start;
                 while(end<batch.Count && batch[end].Character==who)end++;
                 var lines=batch.GetRange(start,end-start).Select(entry=>entry.Line).ToList();
-                try{ChatHistory.Append(ChatHistory.PathOf(folder,who),who,lines);}
+                var path=ChatHistory.PathOf(folder,who);
+                try
+                {
+                    var before=write(path,who,lines);
+                    bool overtaken;
+                    lock(gate)overtaken=at!=generation;
+                    if(overtaken)
+                    {
+                        // X-515 M3: the player's « off » or « Erase » came while these lines were written: taken back.
+                        try{ChatHistory.Undo(path,before);}
+                        catch(Exception error) when(error is IOException or UnauthorizedAccessException){Failed(error,"The chat history's last lines could not be taken back after it was turned off.");}
+                        return;
+                    }
+                }
                 catch(InvalidDataException error)
                 {
                     // Not this character's history: never written to; these lines are not kept.
@@ -362,6 +427,7 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
             if(open!=0 && appended>2*ChatHistory.BoundedMessages(messages))
             {
                 appended=0;
+                lock(gate)if(at!=generation)return;
                 var path=ChatHistory.PathOf(folder,open);
                 try
                 {
@@ -377,20 +443,20 @@ public sealed class ChatHistoryWriter(string folder,Action<string,Action> run,Ac
     public void Close(DateTimeOffset now,int messages,int days)
     {
         Flush(now,messages,days);
-        lock(gate)character=0;
+        lock(gate){character=0;ready=null;}
     }
 
     /// <summary>The history turned off: nothing more is written, what was queued is dropped (the files stay until « Erase »).</summary>
     public void Drop()
     {
-        lock(gate){pending.Clear();generation++;character=0;}
+        lock(gate){pending.Clear();generation++;character=0;ready=null;}
     }
 
     /// <summary>« Erase the history »: what is queued is dropped and every character's file deleted; <paramref name="done"/> says whether
     /// every file went. The history stays open: the next messages are kept again.</summary>
     public void Erase(Action<bool>? done=null)
     {
-        lock(gate){pending.Clear();generation++;}
+        lock(gate){pending.Clear();generation++;ready=null;}
         run("The chat history could not be erased.",()=>
         {
             var all=ChatHistory.Erase(folder);

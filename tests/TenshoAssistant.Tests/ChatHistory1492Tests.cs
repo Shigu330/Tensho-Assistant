@@ -75,6 +75,8 @@ internal static class ChatHistory1492Tests
             for (var index = 0; index < body.Count; index++)
             {
                 var (was, got) = (body[index], back.Body[index]);
+                // 0.1493 (X-514, review of 0.1492 I1): a link of Dalamud or of a plugin is kept as its text only (ChatHistory1493Tests).
+                if (was.Kind == ChatSegmentKind.DalamudLink) was = new ChatSegment(was.Text);
                 Check(was.Text == got.Text && was.Kind == got.Kind, $"piece {index}: « {got.Text} » {got.Kind}");
                 Check(was.Link is null ? got.Link is null : got.Link is { } link && link with { Data = null } == was.Link with { Data = null }
                       && (was.Link.Data ?? []).SequenceEqual(link.Data ?? []), $"piece {index}: its link {got.Link}");
@@ -272,7 +274,9 @@ internal static class ChatHistory1492Tests
         {
             var store = new ChatStore();
             var tab = new ChatTabSettings { Name = "General", Channels = [ChatChannel.Say] };
-            store.Add(Now.AddMinutes(-5), 10, "Ann", [new("this session")], 2000);
+            // 0.1493 (X-515 M4): the session's line as the history writes it (same sender, who and to whom): a line of the same second is told
+            // apart by them now (ChatHistory1493Tests).
+            store.Add(Now.AddMinutes(-5), 10, "Ann Example", [new("this session")], 2000, 1, 2);
             var view = store.ViewOf(tab);
             view.Refresh(store, tab, 2000);
             var older = new List<ChatRecord> { Said("yesterday", 24 * 60), Said("an hour ago", 60), Said("this session", 5) };

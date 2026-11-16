@@ -6303,6 +6303,7 @@
     "HistoryEraseTip": "Deletes the chat history of every character kept on this PC and clears the window's lines. Asks first; it cannot be undone.",
     "HistoryErased": "History erased.",
     "HistoryEraseLeft": "A history file is in use and could not be deleted; try again in a moment.",
+    "HistoryGameOnly": "The chat history is kept and erased in the game only: turn it on from the settings of Tensho's chat window in the game.",
     "HistoryConsentTitle": "Keep the chat history?",
     "HistoryConsentText": "Tensho will keep the messages of the chat window on this PC, so that they show again after Tensho reloads or the game restarts.\n\n- What: every message of the tabs, yours and other players' (their names and words), and the game's lines, with their time, channel and links.\n- Where: one file per character, in Tensho's folder on this PC:\n{0}\n- How long: the last {1} messages and {2} days at most (settings below); older ones are removed.\n- Never sent anywhere by Tensho; not read in PvP or ranked play.\n- To erase it: « Erase the history », in these settings. Unticking the setting keeps nothing more; what was kept stays until you erase it.",
     "HistoryConsentYes": "Keep the history",

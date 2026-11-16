@@ -89,13 +89,21 @@ public sealed class ChatStore
 
     /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
     /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
-    /// number given, and each tab's view is made again from them (taken as read). Returns how many were put back.</summary>
+    /// number given, and each tab's view is made again from them (taken as read). Returns how many were put back.
+    /// X-515 M4: a message's time is to the second; those of the same second as the oldest line kept (a fight or a loot at the reload) are put
+    /// back too, except the ones this session holds already (same time, kind, sender and text, counted: two equal lines stay two).</summary>
     public int Restore(IReadOnlyList<ChatRecord> older,int cap)
     {
         lock(gate)
         {
             var first=records.Count>0 ? records[0].Time:DateTimeOffset.MaxValue;
-            var back=older.Where(record=>record.Time<first).ToList();
+            var held=new Dictionary<string,int>(StringComparer.Ordinal);
+            foreach(var record in records)
+            {
+                if(record.Time!=first)continue;
+                var key=Same(record);held[key]=held.GetValueOrDefault(key)+1;
+            }
+            var back=older.Where(record=>record.Time<first || record.Time==first && !Held(held,record)).ToList();
             if(back.Count==0)return 0;
             var all=new List<ChatRecord>(back.Count+records.Count);
             all.AddRange(back);all.AddRange(records);
@@ -112,6 +120,19 @@ public sealed class ChatStore
             views.Clear();
             return back.Count;
         }
+    }
+
+    // X-515 M4: what tells a message read back from one of this session (the link pieces by their text: a link read back may be text now).
+    private static string Same(ChatRecord record)
+        =>string.Join('\u001f',record.Kind,record.Sender,record.Source,record.Target,string.Concat(record.Body.Select(segment=>segment.Text)));
+
+    // One of this session's lines of that second matches: counted off (so a second equal line read back is still put back).
+    private static bool Held(Dictionary<string,int> held,ChatRecord record)
+    {
+        var key=Same(record);
+        if(held.GetValueOrDefault(key)<=0)return false;
+        held[key]--;
+        return true;
     }
 
     public void Clear()

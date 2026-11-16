@@ -6303,6 +6303,7 @@
     "HistoryEraseTip": "Supprime l'historique du chat de tous les personnages gardé sur ce PC et vide les lignes de la fenêtre. Demande d'abord ; ne peut pas être annulé.",
     "HistoryErased": "Historique effacé.",
     "HistoryEraseLeft": "Un fichier de l'historique est utilisé et n'a pas pu être supprimé ; réessayez dans un instant.",
+    "HistoryGameOnly": "L'historique du chat se garde et s'efface dans le jeu seulement : activez-le depuis les réglages de la fenêtre de chat de Tensho, en jeu.",
     "HistoryConsentTitle": "Garder l'historique du chat ?",
     "HistoryConsentText": "Tensho gardera les messages de la fenêtre de chat sur ce PC, pour les réafficher après un rechargement de Tensho ou une relance du jeu.\n\n- Quoi : chaque message des onglets, les vôtres et ceux des autres joueurs (leurs noms et leurs mots), et les lignes du jeu, avec leur heure, leur canal et leurs liens.\n- Où : un fichier par personnage, dans le dossier de Tensho sur ce PC :\n{0}\n- Combien de temps : les {1} derniers messages et {2} jours au plus (réglages ci-dessous) ; les plus anciens sont retirés.\n- Jamais envoyé nulle part par Tensho ; pas lu en JcJ ni dans les parties classées.\n- Pour l'effacer : « Effacer l'historique », dans ces réglages. Décocher le réglage ne garde plus rien ; ce qui a été gardé reste jusqu'à ce que vous l'effaciez.",
     "HistoryConsentYes": "Garder l'historique",
