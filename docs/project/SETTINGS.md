@@ -44,11 +44,13 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `BagsServerBar` | bool | false | Settings › General › Header | **Bags in the server bar** — Shows the free slots of your four bags in the server bar; its tooltip gives the total, a click opens Storage. Refreshed every 2 seconds. Default: off. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Show as a list** — One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply. Default: off. |
 | `Chat.Borderless` | bool | false | Settings › Panels › ChatWindow | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
+| `Chat.BothChats` | bool | false | Settings › Panels › ChatWindow | **Show both chats** — Shows the game's messages again and puts this window back where it was, to compare both chats; the button with two windows at the end of the tabs switches too. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels › ChatWindow | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.FontScale` | int | 100 | Settings › Panels › ChatWindow | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
 | `Chat.GameLinks` | bool | true | Settings › Panels › ChatWindow | **Links as in the game** — Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour. Default: on. |
 | `Chat.GameTabs` | bool | true | Settings › Panels › ChatWindow | **Tabs as in the game** — Rounded grey tabs, the one shown marked by a dot, as the game's chat. Default: on. |
 | `Chat.HiddenPlayers` | string? | null | Settings › Panels › ChatPlayers | **Hidden players** — No tab shows what these players write (names with commas between them, the world not needed). Only in Tensho's window: the game's chat is unchanged. Default: none. |
+| `Chat.HideGameMessages` | bool | false | Settings › Panels › ChatWindow | **Hide the game chat's messages** — Hides the messages of the game's chat and puts this window in their place, right above the game's own typing box: you keep typing in the game's chat (channels, auto-translate, links, history), Tensho sends nothing. The game's typing box, channel menu and tabs are never hidden. The messages come back as soon as you untick this, close this window, choose both chats, enter PvP or competitive content, or unload Tensho. Default: off. |
 | `Chat.HideInCombat` | bool | false | Settings › Panels › ChatWindow | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
 | `Chat.HighlightedPlayers` | string? | null | Settings › Panels › ChatPlayers | **Players put forward** — The name of these players stands out in the window (names with commas between them, the world not needed). Default: none. |
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Settings › Panels › ChatHistory | **Days kept** — Messages older than this are removed, from 1 to 90 days. Default: 30. |
@@ -357,7 +359,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 301 controls (287 linked to `Configuration`, 14 to another file), 34 settings without a control.
+Counted: 303 controls (289 linked to `Configuration`, 14 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -407,11 +409,13 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `BagsServerBar` | bool | false | Paramètres › Général › En-tête et accueil | **Sacs dans la barre du serveur** — Montre les cases libres de vos quatre sacs dans la barre du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes. Par défaut : désactivé. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Afficher en liste** — Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués. Par défaut : désactivé. |
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
+| `Chat.BothChats` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les deux chats** — Affiche de nouveau les messages du jeu et remet cette fenêtre à sa place, pour comparer les deux chats ; le bouton aux deux fenêtres au bout des onglets bascule aussi. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
 | `Chat.GameLinks` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Liens comme dans le jeu** — Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent. Par défaut : activé. |
 | `Chat.GameTabs` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Onglets comme dans le jeu** — Des onglets gris arrondis, celui qui est affiché marqué d'un point, comme dans le chat du jeu. Par défaut : activé. |
 | `Chat.HiddenPlayers` | string? | null | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Joueurs cachés** — Aucun onglet ne montre ce qu'écrivent ces joueurs (noms séparés par des virgules, le monde n'est pas nécessaire). Seulement dans la fenêtre de Tensho : le chat du jeu ne change pas. Par défaut : aucun. |
+| `Chat.HideGameMessages` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Cacher les messages du chat du jeu** — Cache les messages du chat du jeu et met cette fenêtre à leur place, juste au-dessus de la zone de saisie du jeu : vous tapez toujours dans le chat du jeu (canaux, traduction automatique, liens, historique), Tensho n'envoie rien. La zone de saisie du jeu, son menu des canaux et ses onglets ne sont jamais cachés. Les messages reviennent dès que vous décochez cette case, fermez cette fenêtre, choisissez les deux chats, passez en JcJ ou dans une partie classée, ou déchargez Tensho. Par défaut : désactivé. |
 | `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
 | `Chat.HighlightedPlayers` | string? | null | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Joueurs mis en avant** — Le nom de ces joueurs ressort dans la fenêtre (noms séparés par des virgules, le monde n'est pas nécessaire). Par défaut : aucun. |
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Paramètres › Panneaux à côté du jeu › Historique du chat | **Jours gardés** — Les messages plus anciens sont retirés, de 1 à 90 jours. Par défaut : 30. |
@@ -720,5 +724,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 301 cases (287 reliées à `Configuration`, 14 à un autre fichier), 34 réglages sans case.
+Compté : 303 cases (289 reliées à `Configuration`, 14 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

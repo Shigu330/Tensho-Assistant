@@ -517,6 +517,9 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-467 (0.1502): where the game's chat puts its typing box and its message panels, in developer mode (read-only).
             Chat.ChatLogLayoutProbe? chatLayoutProbe=null;
             registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose());
+            // X-467 (0.1504, D-181): the game chat's messages hidden while the option asks it, given back otherwise and on unload.
+            Chat.GameChatHider? chatHider=null;
+            registrations.Register(()=>{chatHider=new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatHidesGameMessages);mainWindow.ChatGamePlace=()=>chatHider?.Place;},()=>{mainWindow.ChatGamePlace=null;chatHider?.Dispose();});
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),

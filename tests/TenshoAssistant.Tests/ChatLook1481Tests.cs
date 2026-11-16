@@ -53,9 +53,9 @@ internal static class ChatLook1481Tests
             Check(buttons.Contains("GlyphTabButton(\"###ChatAddTab\",Dalamud.Interface.FontAwesomeIcon.Plus", StringComparison.Ordinal) && buttons.Contains("AddChatTab(tabs);", StringComparison.Ordinal), "« + » adds a tab");
             Check(buttons.Contains("ImGui.OpenPopup(\"###TenshoChatSettings\");", StringComparison.Ordinal) && buttons.Contains("DrawChatSettingsPopup();", StringComparison.Ordinal), "the gear opens the panel, in the same ID scope");
             var body = window[window.IndexOf("private void DrawChatWindowBody()", StringComparison.Ordinal)..window.IndexOf("private void DrawChatTabBar(", StringComparison.Ordinal)];
-            var under = body.IndexOf("if(options.TabsAtBottom)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());", StringComparison.Ordinal);
+            var under = body.IndexOf("if(options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());", StringComparison.Ordinal);
             var bar = body.IndexOf("DrawChatTabBar(tabs,options);", StringComparison.Ordinal);
-            var over = body.IndexOf("if(!options.TabsAtBottom)DrawChatShownTab(tabs,options,0);", StringComparison.Ordinal);
+            var over = body.IndexOf("if(!options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,0);", StringComparison.Ordinal);
             Check(under > 0 && bar > under && over > bar, "lines, bar, lines");
             Check(window.Contains("BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight)", StringComparison.Ordinal), "the bar's room kept under the lines");   // 0.1484 (X-501): one area per tab
             Check(window.Contains("if(options.TextOutline)ChatOutline(run.Text);\n                    ImGui.TextColored(", StringComparison.Ordinal)

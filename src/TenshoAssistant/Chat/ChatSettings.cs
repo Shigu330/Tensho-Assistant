@@ -30,6 +30,12 @@ public sealed class ChatSettings
     public const int MaximumTabs=12,MaximumTabName=24;
     public bool WindowOpen{get;set;}
     public bool HideInCombat{get;set;}
+    /// <summary>X-467 (0.1504, D-181 of 16/11, DEC-053 completed): the game chat's messages (its four panels) hidden and this window in their
+    /// place, above the game's own typing box (never hidden). Off by default; given back as soon as it is no longer wanted (GameChatHider).</summary>
+    public bool HideGameMessages{get;set;}
+    /// <summary>X-467 (0.1504): with <see cref="HideGameMessages"/>, both chats shown for a while, to compare (nothing hidden, this window at
+    /// its own place).</summary>
+    public bool BothChats{get;set;}
     public bool ShowTimestamps{get;set;}=true;
     public bool Clock24{get;set;}=true;
     public bool ShowSeconds{get;set;}
