@@ -98,6 +98,17 @@ internal sealed partial class MainWindow
                 var unread=tab.ShowUnread;
                 if(ImGui.Checkbox(localization.Get("ChatWindow.TabUnread")+"###ChatTabUnread",ref unread)){tab.ShowUnread=unread;chatSettingsPending=true;}
                 Tip("ChatWindow.TabUnreadTip");
+                // X-478 (the user's request of 15/11): the colour of the tab's name; « ↺ » brings back the theme's text colour.
+                ImGui.SameLine();
+                var named=tab.NameColor is { } chosen ? ChatColor(chosen):ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
+                var nameRgb=new Vector3(named.X,named.Y,named.Z);
+                if(ImGui.ColorEdit3(localization.Get("ChatWindow.TabColor")+"###ChatTabColor",ref nameRgb,ImGuiColorEditFlags.NoInputs))
+                {
+                    tab.NameColor=ChatChannels.Pack(nameRgb.X,nameRgb.Y,nameRgb.Z);
+                    chatSettingsPending=true;
+                }
+                Tip("ChatWindow.TabColorTip");
+                if(DefaultButton("ChatTabColor",tab.NameColor is not null)){tab.NameColor=null;chatSettingsPending=true;}
                 if(tabs.Count>1)
                 {
                     ImGui.SameLine();
@@ -188,7 +199,11 @@ internal sealed partial class MainWindow
                 var tab=tabs[index];
                 var view=ChatMessages.ViewOf(tab);
                 view.Refresh(ChatMessages,tab,options.BoundedMaxLines);
-                if(!ImGui.BeginTabItem(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread)+"###ChatTab"+index))continue;
+                bool open;
+                var coloured=PushChatTabColor(tab);
+                try{open=ImGui.BeginTabItem(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread)+"###ChatTab"+index);}
+                finally{if(coloured)ImGui.PopStyleColor();}
+                if(!open)continue;
                 try{DrawChatLines(view,options);}
                 finally{ImGui.EndTabItem();}
             }
@@ -200,17 +215,22 @@ internal sealed partial class MainWindow
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
     private void DrawChatFrameButtons(ChatSettings options)
     {
-        bool frame,lockButton;
-        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
-        try{frame=ImGui.TabItemButton(Dalamud.Interface.FontAwesomeExtensions.ToIconString(options.Borderless ? Dalamud.Interface.FontAwesomeIcon.BorderAll:Dalamud.Interface.FontAwesomeIcon.BorderNone)+"###ChatFrame",ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);}
-        finally{ImGui.PopFont();}
+        // X-477 (0.1476): the icons are drawn centred in tab-high buttons (GlyphTabButton), no longer as the label of a button in the icon font.
+        var frame=GlyphTabButton("###ChatFrame",options.Borderless ? Dalamud.Interface.FontAwesomeIcon.BorderAll:Dalamud.Interface.FontAwesomeIcon.BorderNone,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip(options.Borderless ? "ChatWindow.FrameOnTip":"ChatWindow.FrameOffTip");
-        ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);
-        try{lockButton=ImGui.TabItemButton(Dalamud.Interface.FontAwesomeExtensions.ToIconString(options.Locked ? Dalamud.Interface.FontAwesomeIcon.Lock:Dalamud.Interface.FontAwesomeIcon.LockOpen)+"###ChatLock",ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);}
-        finally{ImGui.PopFont();}
+        var lockButton=GlyphTabButton("###ChatLock",options.Locked ? Dalamud.Interface.FontAwesomeIcon.Lock:Dalamud.Interface.FontAwesomeIcon.LockOpen,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip(options.Locked ? "ChatWindow.UnlockTip":"ChatWindow.LockTip");
         if(frame){options.Borderless=!options.Borderless;TrySave("Chat window");}
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
+    }
+
+    /// <summary>X-478: pushes the colour of a tab's name when it has one (readable on the inactive and the active tab); true when pushed.</summary>
+    private static bool PushChatTabColor(ChatTabSettings tab)
+    {
+        if(tab.NameColor is not { } chosen)return false;
+        static Vector4 Style(ImGuiCol colour)=>ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(colour));
+        ImGui.PushStyleColor(ImGuiCol.Text,ChatTabColors.Readable(ChatColor(chosen),Style(ImGuiCol.Text),Style(ImGuiCol.Tab),Style(ImGuiCol.TabActive)));
+        return true;
     }
 
     // X-457 (0.1462): the height of a row in the lines' area (font size chosen in the settings), kept from the frame before: the lines' height is

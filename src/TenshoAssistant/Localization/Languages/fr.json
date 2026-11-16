@@ -6228,6 +6228,8 @@
     "TabNameTip": "Le nom de l'onglet (24 lettres au plus).",
     "TabUnread": "Messages non lus",
     "TabUnreadTip": "Affiche dans le nom de l'onglet combien de nouveaux messages vous n'avez pas encore vus ; afficher l'onglet jusqu'à sa dernière ligne remet le compte à zéro.",
+    "TabColor": "Couleur du nom",
+    "TabColorTip": "La couleur du nom de cet onglet, pour reconnaître les onglets d'un coup d'œil ; une couleur trop proche du fond de l'onglet est éclaircie ou foncée pour que le nom reste lisible.\nPar défaut : la couleur du texte du thème.",
     "TabRemove": "Retirer",
     "TabRemoveTip": "Retire cet onglet ; ses messages restent dans les autres onglets.",
     "TabChannels": "Canaux ({0})",

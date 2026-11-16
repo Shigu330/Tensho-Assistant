@@ -45,7 +45,14 @@ public static class ChatFormat
 
     /// <summary>A tab's name, with its unread count when it has one and shows it.</summary>
     public static string TabLabel(string? name,bool showUnread,int unread)
-        =>(name is { Length:>0 } ? name:"-")+(showUnread && unread>0 ? $" ({unread})":"");
+        =>(name is { Length:>0 } ? name:"-")+(showUnread && unread>0 ? $" ({UnreadText(unread)})":"");
+
+    /// <summary>X-466 (the user's request of 15/11): the most unread messages a tab writes as a number; past it, « 100+ » (the count itself
+    /// goes on underneath, and the tab's width no longer changes with each message).</summary>
+    public const int UnreadShown=100;
+
+    /// <summary>X-466: the unread count as the tab writes it: the number up to <see cref="UnreadShown"/>, then « 100+ ».</summary>
+    public static string UnreadText(int unread)=>unread>UnreadShown ? $"{UnreadShown}+":unread.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     /// <param name="shortName">The channel's short name; empty for none.</param>
     /// <param name="linkName">X-461 (0.1463): the name of what a link without visible text points to (an item, a quest, a place); null or empty: « … ».</param>

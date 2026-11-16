@@ -6,6 +6,8 @@ public sealed class ChatTabSettings
     public string Name{get;set;}="";
     public List<ChatChannel> Channels{get;set;}=[];
     public bool ShowUnread{get;set;}=true;
+    /// <summary>X-478 (the user's request of 15/11): the colour of the tab's name (0xRRGGBB); null: the theme's text colour.</summary>
+    public uint? NameColor{get;set;}
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
 }
 

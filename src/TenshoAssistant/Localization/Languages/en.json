@@ -6228,6 +6228,8 @@
     "TabNameTip": "The tab's name (24 letters at most).",
     "TabUnread": "Unread count",
     "TabUnreadTip": "Shows in the tab's name how many new messages you have not seen yet; showing the tab down to its last line clears it.",
+    "TabColor": "Name colour",
+    "TabColorTip": "The colour of this tab's name, to tell the tabs apart at a glance; a colour too close to the tab's background is made lighter or darker so the name stays legible.\nDefault: the theme's text colour.",
     "TabRemove": "Remove",
     "TabRemoveTip": "Removes this tab; its messages stay in the other tabs.",
     "TabChannels": "Channels ({0})",
