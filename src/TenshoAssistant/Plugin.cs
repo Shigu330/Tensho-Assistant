@@ -248,15 +248,22 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.DutyGuides=dutyGuides;
             mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
             // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
-            // the same one a click in the game's chat calls), run on the game's thread on the player's click; its message is the link's text.
+            // the same one a click in the game's chat calls), run on the game's thread on the player's click. X-496 M1 (0.1478): its message
+            // is the link's own string (from the link to its end), as Dalamud passes it (docs/evidence/0.1478-dalamud-link-handler.md); a
+            // failure is said on the link's tooltip, not only in the log.
             mainWindow.DalamudLinkKnown=(plugin,command)=>chatGui.RegisteredLinkHandlers.ContainsKey((plugin,command));
-            mainWindow.OpenDalamudLink=(plugin,command,text)=>
+            mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
             {
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
                 _=framework.RunOnFrameworkThread(()=>
                 {
-                    try{handler(command,new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text)));}
-                    catch(Exception error){log.Warning(error,"A link of the chat window could not be opened by its plugin ({0}).",plugin);}
+                    try
+                    {
+                        var message=data is { Length:>0 } ? Dalamud.Game.Text.SeStringHandling.SeString.Parse(data)
+                            :new Dalamud.Game.Text.SeStringHandling.SeString(new Dalamud.Game.Text.SeStringHandling.Payloads.TextPayload(text));
+                        handler(command,message);
+                    }
+                    catch(Exception error){mainWindow.DalamudLinkFailed=plugin;log.Warning(error,"A link of the chat window could not be opened by its plugin ({0}).",plugin);}
                 });
                 return true;
             };

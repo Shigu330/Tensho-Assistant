@@ -6,7 +6,9 @@ public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLin
 /// quality); 0.1442: or a quest (its row in the game's Quest sheet).</summary>
 /// <param name="Url">X-403 phase 2 (0.1453): a web address's absolute form (ChatWeb.Address), for a WebLink.</param>
 /// <param name="Plugin">X-474 (0.1477): a DalamudLink's plugin (« Dalamud » for Dalamud's own), with <paramref name="CommandId"/> its command.</param>
-public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0);
+/// <param name="Data">X-496 M1 (0.1478): a DalamudLink's own string, encoded: its payloads from the link to its end (the link terminator
+/// included), as Dalamud passes it to the link's handler; null when not read (the handler then gets the link's text).</param>
+public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
 public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body);

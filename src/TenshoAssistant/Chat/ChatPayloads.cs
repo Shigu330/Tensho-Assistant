@@ -39,6 +39,15 @@ public static class ChatPayloads
     /// <summary>The segments the store keeps for these payloads (ChatPieces.Segments of their pieces).</summary>
     public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));
 
+    /// <summary>X-496 M1 (0.1478): the last payload of the link that starts at <paramref name="start"/>: its end (the link terminator, kept as
+    /// Dalamud keeps it), or the message's last payload when the link is not closed. The payloads Dalamud passes to a link's handler.</summary>
+    public static int LinkLast(IReadOnlyList<ChatPayload> payloads,int start)
+    {
+        for(var index=start+1;index<payloads.Count;index++)
+            if(payloads[index].Kind==ChatPayloadKind.LinkEnd)return index;
+        return payloads.Count-1;
+    }
+
     /// <summary>Whether a message holds a link of the game (item, quest or map).</summary>
     public static bool HasLink(IEnumerable<ChatPayload> payloads)=>payloads.Any(payload=>payload.Kind is ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud);
 

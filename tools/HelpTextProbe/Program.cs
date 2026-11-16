@@ -54,7 +54,7 @@ string Cell(object? value)=>value is ReadOnlySeString text ? text.ExtractText().
 
 IEnumerable<(string Row,int Column,string Text)> Texts(string name,Language language)
 {
-    // An unreadable sheet throws here or while its rows are read: the callers (sheets, find, index) catch it and name the sheet.
+    // An unreadable sheet throws here or while its rows are read: the callers (sheets, find, index) catch it and name the sheet (find at the end).
     var raw=data.Excel.GetRawSheet(name,language);
     var columns=raw.Columns.Select((column,index)=>(column,index)).Where(c=>c.column.Type==ExcelColumnDataType.String).Select(c=>c.index).ToArray();
     if(columns.Length==0)yield break;
@@ -102,6 +102,8 @@ if(args[0]=="find")
     var language=Enum.Parse<Language>(args[2]);
     var wanted=Fold(string.Join(" ",args[3..]));
     Console.WriteLine($"GAME {version} FIND « {string.Join(" ",args[3..])} » ({language})");
+    // X-496 M4 (0.1478): a sheet that could not be read is named at the end: « nothing found » never stands for « not searched » (R06).
+    var unread=new List<string>();
     foreach(var name in data.Excel.SheetNames.OrderBy(n=>n,StringComparer.Ordinal))
     {
         var found=0;
@@ -111,9 +113,10 @@ if(args[0]=="find")
                 if(Fold(text).Contains(wanted) && found++<2)
                     Console.WriteLine($"{name} row {row} column {column}: {(text.Length>160 ? text[..160]+"…":text)}");
         }
-        catch(Exception){}
+        catch(Exception error){unread.Add($"{name} ({error.GetType().Name})");}
         if(found>2)Console.WriteLine($"{name}: {found} texts in all");
     }
+    if(unread.Count>0)Console.WriteLine($"NOT SEARCHED {unread.Count} sheet(s) unreadable in {language}: {string.Join(", ",unread)}");
     return;
 }
 

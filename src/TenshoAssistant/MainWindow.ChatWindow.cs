@@ -224,12 +224,14 @@ internal sealed partial class MainWindow
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
     }
 
-    /// <summary>X-478: pushes the colour of a tab's name when it has one (readable on the inactive and the active tab); true when pushed.</summary>
+    /// <summary>X-478: pushes the colour of a tab's name when it has one (readable on the inactive and the active tab); true when pushed.
+    /// X-495 (0.1478): also on the hovered tab and on the tabs of the window without the focus.</summary>
     private static bool PushChatTabColor(ChatTabSettings tab)
     {
         if(tab.NameColor is not { } chosen)return false;
         static Vector4 Style(ImGuiCol colour)=>ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(colour));
-        ImGui.PushStyleColor(ImGuiCol.Text,ChatTabColors.Readable(ChatColor(chosen),Style(ImGuiCol.Text),Style(ImGuiCol.Tab),Style(ImGuiCol.TabActive)));
+        ImGui.PushStyleColor(ImGuiCol.Text,ChatTabColors.Readable(ChatColor(chosen),Style(ImGuiCol.Text),Style(ImGuiCol.Tab),Style(ImGuiCol.TabActive),
+            Style(ImGuiCol.TabHovered),Style(ImGuiCol.TabUnfocused),Style(ImGuiCol.TabUnfocusedActive)));
         return true;
     }
 
@@ -392,7 +394,7 @@ internal sealed partial class MainWindow
             {
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
-                if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}");
+                if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}",record);
                 else
                 {
                     ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
@@ -408,8 +410,11 @@ internal sealed partial class MainWindow
 
     /// <summary>X-474 (0.1477): whether Dalamud keeps a handler for a link of Dalamud or of a plugin (set by the plugin; null outside the game).</summary>
     internal Func<string,uint,bool>? DalamudLinkKnown{get;set;}
-    /// <summary>X-474 (0.1477): runs that handler as a click in the game's chat does (plugin, command, the link's text); false when there is none.</summary>
-    internal Func<string,uint,string,bool>? OpenDalamudLink{get;set;}
+    /// <summary>X-474 (0.1477): runs that handler as a click in the game's chat does (plugin, command, the link's own string, the link's text);
+    /// false when there is none.</summary>
+    internal Func<string,uint,byte[]?,string,bool>? OpenDalamudLink{get;set;}
+    /// <summary>X-496 M1 (0.1478): the plugin whose handler failed on the last click (set on the game's thread), said on that plugin's links' tooltip.</summary>
+    internal volatile string? DalamudLinkFailed;
 
     /// <summary>X-474 (0.1477): a link drawn as a link: all of them, except a link of Dalamud or of a plugin that Dalamud has no handler for
     /// (a plugin unloaded since): plain text, its tooltip says to open it from the game's chat.</summary>
@@ -434,7 +439,7 @@ internal sealed partial class MainWindow
     /// the browser, copy), never the browser at once. 0.1456 (X-451): the tooltip and the menu say the site it leads to (its host as the browser
     /// reaches it) and warn when that name holds letters of other alphabets; the tooltip is made only under the mouse (X-453 M3).
     /// </summary>
-    private void DrawChatLink(ChatRun run,ChatLink link,string id)
+    private void DrawChatLink(ChatRun run,ChatLink link,string id,ChatRecord record)
     {
         ImGui.TextColored(Accent,run.Text);
         var min=ImGui.GetItemRectMin();
@@ -446,9 +451,15 @@ internal sealed partial class MainWindow
         if(link.Kind==ChatSegmentKind.DalamudLink)
         {
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Left) && OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,run.Text)!=true)
-                log.Information("Chat window: no handler any more for a link of {0} (command {1}).",link.Plugin,link.CommandId);
+            TipText(DalamudLinkFailed==link.Plugin ? localization.Format("ChatWindow.DalamudLinkFailedTip",link.Plugin):localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+            {
+                DalamudLinkFailed=null;
+                if(OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,link.Data,run.Text)!=true)
+                    log.Information("Chat window: no handler any more for a link of {0} (command {1}).",link.Plugin,link.CommandId);
+            }
+            // X-496 M2 (0.1478): a right click opens the message's menu (copy), as on its text (before 0.1477 the link was plain text).
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
             return;
         }
         if(link.Kind==ChatSegmentKind.WebLink)

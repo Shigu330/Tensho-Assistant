@@ -27,7 +27,7 @@ internal static class ChatTabs1476Tests
             foreach (var (theme, palette) in ThemePalettes.All)
                 foreach (var colour in chosen)
                 {
-                    var shown = ChatTabColors.Readable(colour, palette.Text, palette.Panel, palette.Selected);
+                    var shown = ChatTabColors.Readable(colour, palette.Text, palette.Panel, palette.Selected);   // the two focused backgrounds (X-495: ChatReview1478Tests for the five)
                     var legible = ThemePalettes.Contrast(shown, palette.Panel) >= ChatTabColors.MinimumContrast
                                   && ThemePalettes.Contrast(shown, palette.Selected) >= ChatTabColors.MinimumContrast;
                     Check(legible || shown == palette.Text, $"{theme} {colour}: {shown}");

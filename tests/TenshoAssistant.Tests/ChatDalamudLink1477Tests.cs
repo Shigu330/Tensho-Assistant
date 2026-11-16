@@ -42,7 +42,7 @@ internal static class ChatDalamudLink1477Tests
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
             Check(window.Contains("if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(", StringComparison.Ordinal)
                   && window.Contains("TipText(localization.Get(\"ChatWindow.DalamudLinkGameTip\"));", StringComparison.Ordinal), "plain text with a tooltip without a handler");
-            Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Left) && OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,run.Text)!=true)", StringComparison.Ordinal), "a left click opens it");
+            Check(window.Contains("if(OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,link.Data,run.Text)!=true)", StringComparison.Ordinal), "a left click opens it (X-496 M1: with the link's own string)");
         }),
     ];
 }

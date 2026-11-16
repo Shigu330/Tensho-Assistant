@@ -48,6 +48,14 @@ internal sealed class ChatReader : IDisposable
             // X-403 phase 2 (0.1441): the links too (a place or an item), with the text that shows them; a link whose target cannot be
             // read stays plain text. X-479 (0.1468): each payload told apart here (ChatPayload, pure), the rest in ChatPayloads.
             var payloads=message.Message.Payloads.Select(Payload).ToList();
+            // X-496 M1 (0.1478): a link of Dalamud or of a plugin keeps its own string (from the link to its end), the one Dalamud passes
+            // to its handler (docs/evidence/0.1478-dalamud-link-handler.md).
+            for(var index=0;index<payloads.Count;index++)
+                if(payloads[index] is { Kind:ChatPayloadKind.Dalamud,Link:{ } link })
+                {
+                    var last=ChatPayloads.LinkLast(payloads,index);
+                    payloads[index]=payloads[index] with{Link=link with{Data=new SeString(message.Message.Payloads.Skip(index).Take(last-index+1).ToList()).Encode()}};
+                }
             var body=ChatPayloads.Segments(payloads);
             if(developer?.Invoke()==true && ChatPayloads.HasLink(payloads))
             {
