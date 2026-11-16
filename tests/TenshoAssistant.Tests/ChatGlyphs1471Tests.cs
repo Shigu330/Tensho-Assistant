@@ -45,7 +45,7 @@ internal static class ChatGlyphs1471Tests
             for (var letter = ''; letter <= ''; letter++)
                 Check(letter == ChatGlyphs.LinkMarker ? ChatGlyphs.Readable(letter) == "" : ChatGlyphs.Readable(letter).Trim().Length > 0, $"U+{(int)letter:X4}");
             Check(ChatFormat.Clean("") == "·" && ChatFormat.Clean("a\u0007b") == "ab" && ChatFormat.Clean("a\nb") == "a\nb", "the rest of the private area; control characters still out");
-            Check(ChatGlyphs.Icon(ChatGlyphs.CrossWorld) == "@" && ChatGlyphs.Icon(54) == "«" && ChatGlyphs.Icon(77) == "·", "icons of the game's font");
+            Check(ChatGlyphs.Icon(ChatGlyphs.CrossWorld) == "@" && ChatGlyphs.Icon(54) == "«" && ChatGlyphs.Icon(1) == "·", "icons of the game's font (X-492 M4: 77 is now left out of a name)");
         }),
         ("Chat glyphs 1471: the recorded message of a player from another world (kind 44, 11/15) shows the world icon between the name and the text", () =>
         {

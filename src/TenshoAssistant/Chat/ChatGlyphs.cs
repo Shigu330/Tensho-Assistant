@@ -19,6 +19,8 @@ public static class ChatGlyphs
     public const string LinkArrow = "\u2192";
     /// <summary>BitmapFontIcon.CrossWorld: the world icon between a player's name and their world.</summary>
     public const uint CrossWorld = 88;
+    /// <summary>X-492 M4: BitmapFontIcon codes of the sender's decorations (Dalamud 15, tools/ApiProbe, 16/11).</summary>
+    public const uint NewAdventurer = 77, MentorPvP = 81, Returner = 95, MentorProblem = 127, Pictomancer = 171;
 
     /// <summary>Whether a letter is a glyph of the game's font (private use area).</summary>
     public static bool IsGlyph(char letter)=>letter is >= '' and <= '';
@@ -61,10 +63,14 @@ public static class ChatGlyphs
     private static readonly string[] Roman=["I","II","III","IV","V","VI"];
     private static readonly string[] Clocks=["LT","ST","ET"];
 
-    /// <summary>The readable text of an icon of the game's font (IconPayload, BitmapFontIcon): the world icon « @ », the auto-translate marks, arrows; « · » for the others.</summary>
+    /// <summary>The readable text of an icon of the game's font (IconPayload, BitmapFontIcon): the world icon « @ », the auto-translate marks, arrows; « · » for the others.
+    /// X-492 M4 (review of 0.1472): the icons the game puts before a sender's name are left out, so the name reads as it is (« ·Name » before):
+    /// the novice network's status (NewAdventurer 77, Mentor 78, MentorPvE 79, MentorCrafting 80, MentorPvP 81, Returner 95, MentorProblem 127)
+    /// and the jobs and classes (Gladiator 128 to Pictomancer 171). The name and the channel say who speaks; the icon adds no word to copy.</summary>
     public static string Icon(uint icon)=>icon switch
     {
         CrossWorld=>"@",
+        >= NewAdventurer and <= MentorPvP or Returner or >= MentorProblem and <= Pictomancer=>"",
         54=>"«",    // AutoTranslateBegin
         55=>"»",    // AutoTranslateEnd
         105=>"^",   // ArrowUp

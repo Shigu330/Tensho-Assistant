@@ -32,10 +32,12 @@ public static class ChatScroll
     /// <summary>X-447 A4 (0.1467): the scroll after the mouse wheel: whole lines (the top line kept whole), within 0 and the limit; the
     /// limit itself when the wheel reaches it (the window then follows the bottom again). X-482 M3 (0.1472): the wheel's values add up in
     /// <paramref name="rest"/> and a line moves for each whole notch: a fine wheel or a touchpad sends small values every frame, and each one
-    /// moved a whole line (Ceiling or Floor of 0.1), far too fast.</summary>
+    /// moved a whole line (Ceiling or Floor of 0.1), far too fast. X-492 M1: the rest is dropped when the wheel turns the other way, so a
+    /// notch down after small values up (a touchpad) moves its whole line; the window also drops it when the tab changes.</summary>
     public static float Wheel(float scroll,float wheel,float lineHeight,float scrollMax,ref float rest)
     {
         if(lineHeight<=0)return scroll;
+        if(rest*wheel<0)rest=0;
         rest+=wheel;
         var notches=(int)Math.Truncate(rest);
         if(notches==0)return scroll;

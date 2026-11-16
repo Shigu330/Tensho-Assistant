@@ -695,6 +695,8 @@ internal sealed partial class MainWindow
             else if(button is { } bottom)DrawChatBottomButton(view,bottom,shown,height);
             chatLinesBlocked=false;
             // X-447 A4 (0.1467): the mouse wheel moves whole lines, as the game's chat. X-482 M3 (0.1472): a fine wheel adds up to whole notches.
+            // X-492 M1: the rest of a fine wheel belongs to one tab: another tab starts from nothing.
+            if(!ReferenceEquals(view,chatWheelView)){chatWheelView=view;chatWheelRest=0;}
             if(ImGui.IsWindowHovered() && ImGui.GetIO().MouseWheel is var wheel and not 0)
                 ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY(),ref chatWheelRest));
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
@@ -773,6 +775,7 @@ internal sealed partial class MainWindow
     // X-482 (0.1472): M2, the mouse is on the « back to the bottom » button (the lines under it do not answer it); M3, the wheel's part of a notch.
     private bool chatLinesBlocked;
     private float chatWheelRest;
+    private object? chatWheelView;
 
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
         =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X,

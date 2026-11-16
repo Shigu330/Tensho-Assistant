@@ -15,8 +15,9 @@ public readonly record struct MapFloorFrame(uint MapId,uint TerritoryId,int Size
 /// layout splits it into floors: the boxes kept are those whose map is the territory's map or another floor of its frame (Floors). planmap.lgb
 /// names two maps or more in 316 territories (probe PROBE_FLOORS=check, docs/evidence/0.1469-map-floors-check.md), mostly not floors: the maps
 /// of another territory sharing the layout (instanced copies), a dungeon's areas drawn at their own offset (another frame: coordinates computed
-/// on the territory's map would be wrong there), versions of one land. A placement in no kept box, or in boxes of two floors, stays on the
-/// territory's map (0.1464 dropped one in no box). Pure.
+/// on the territory's map would be wrong there), versions of one land. A placement in no kept box stays on the territory's map (0.1464 dropped
+/// one in no box); in boxes of two floors, the smallest box wins (<see cref="At"/>; X-492 M2: this line said it stayed on the territory's map,
+/// the code and the test of 0.1464 « the smallest box wins » never did). Pure.
 /// </summary>
 public static class MapFloors
 {
