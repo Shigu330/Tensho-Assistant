@@ -2101,6 +2101,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1507) Option décochée, réduire la fenêtre Tensho à ses onglets, puis cocher l'option dans les Paramètres : la fenêtre prend la place des messages du jeu en entier ; entrer en combat avec « Masquer en combat » puis en sortir : elle revient entière, pas réduite.
 
+- [ ] (0.1508) Reprend T-0.1504-1. Chat Tensho ouvert, « Cacher les messages du chat du jeu » cochée : les messages et la barre d'onglets du chat du jeu sont cachés ; la fenêtre Tensho occupe leur place, juste au-dessus de la ligne de saisie du jeu, sans couvrir le nom du canal (« Dire ») ni la saisie ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho.
+
+- [ ] (0.1508) Option cochée : cliquer sur le nom du canal (« Dire ») à gauche de la saisie du jeu : le menu des canaux s'ouvre, la fenêtre Tensho s'efface, le menu est entièrement lisible et cliquable ; choisir un canal : le menu se ferme, la fenêtre Tensho revient. Mode développeur : dalamud.log dit « Game chat: channel menu open (drop-down owner …, list …) » puis « closed ».
+
+- [ ] (0.1508) Option cochée puis décochée (ou fermer la fenêtre Tensho, ou « les deux chats ») : la barre d'onglets du chat du jeu revient telle qu'avant, onglets cliquables ; recharger Tensho option cochée : elle revient aussi.
+
+- [ ] (0.1508) Si vos onglets du chat du jeu sont en haut (réglage du jeu) : option cochée, la fenêtre Tensho couvre aussi la ligne des onglets du haut, jusqu'à la saisie.
+
+- [ ] (0.1510) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir puis fermer une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire) : à la fermeture, la fenêtre Tensho revient directement à la place des messages du jeu, sans apparaître un instant ailleurs ; pareil à la fin d'un combat avec « Masquer en combat ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

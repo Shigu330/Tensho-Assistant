@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (549 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (551 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -617,12 +617,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-527 | Review  (review 0.1504, 16/11), I1: finding in… | Done in 0.1506 |
 | X-528 | Review  (review 0.1504, 16/11), minor M1, M2, M3, M4: M1 in… | Done in 0.1507 |
 | X-531 | Tool (defect seen by the master on 16/11 around 23:00): page_essais.py import… | Done in 0.1505 |
+| X-532 | Tool (defect seen by the user on 16/11 around 23:00): after a clear (R28.8) the… | Done in 0.1508 |
+| X-534 | Review of block 0.1505 to 0.1507 (review 0.1507, 16/11), minor M1, M2: M1 in… | Done in 0.1510 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (549 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (551 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1237,3 +1239,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-527 | Relecture  (relecture 0.1504, 16/11), I1 : Le code rend les messages du jeu… | Fait en 0.1506 |
 | X-528 | Relecture  (relecture 0.1504, 16/11), mineurs M1, M2, M3, M4 : M1 : Une fenêtre… | Fait en 0.1507 |
 | X-531 | Outil (défaut vu par la maître le 16/11 vers 23 h) : page_essais.py import… | Fait en 0.1505 |
+| X-532 | Outil (défaut vu par l'utilisateur le 16/11 vers 23 h : « quand tu es vidé tu… | Fait en 0.1508 |
+| X-534 | Relecture du bloc 0.1505 à 0.1507 (relecture 0.1507, 16/11), mineurs M1, M2… | Fait en 0.1510 |
