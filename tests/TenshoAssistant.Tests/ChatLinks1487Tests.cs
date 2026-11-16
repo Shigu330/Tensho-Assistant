@@ -12,7 +12,7 @@ internal static class ChatLinks1487Tests
     private const string Evidence = "docs/evidence/0.1487-chat-link-said.md";
     private static readonly Regex Recorded = new(@"^(\d\d:\d\d:\d\d) kind (\d+): (.+)$");
     private static readonly Regex Token = new(@"(?<name>\w+) \((?<len>\d+) characters(?<glyph>, game glyph)?\)|Raw \((?<size>\d+) bytes\)|Item (?<id>\d+)|(?<other>\w+)");
-    private static readonly ChatSettings Bare = new() { ShowTimestamps = false, ShowChannel = false };
+    private static readonly ChatSettings Bare = new() { ShowTimestamps = false, ShowChannel = false, GameLinks = false };   // 0.1488 (X-505): links as before 0.1488 (ChatLook1488Tests: as in the game)
     private static readonly DateTimeOffset Morning = new(2026, 11, 16, 8, 0, 0, TimeSpan.Zero);
     private static readonly ChatLink Place = new(ChatSegmentKind.MapLink, 140, 20, 26.1f, 24.4f);
 

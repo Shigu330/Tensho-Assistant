@@ -14,7 +14,7 @@ internal static class ChatLook1481Tests
         ("Chat look 1481: defaults (tabs over, outline on, light background); time in brackets as the game", () =>
         {
             var settings = new ChatSettings();
-            Check(!settings.TabsAtBottom && settings.TextOutline && settings.BoundedOpacity == 40, "defaults");
+            Check(settings.TabsAtBottom && settings.TextOutline && settings.BoundedOpacity == 15, "defaults (0.1488, X-505: the tabs under the lines, the background at 15 %)");
             var record = new ChatRecord(1, DateTimeOffset.FromUnixTimeSeconds(1_700_000_000), 10, ChatChannel.Say, "Alice", []);
             var runs = ChatFormat.Runs(record, new ChatSettings { ShowTimestamps = true, Clock24 = true }, _ => "", _ => "");
             var time = runs.First(run => run.Role == ChatRole.Timestamp).Text;
@@ -47,7 +47,8 @@ internal static class ChatLook1481Tests
             Check(under > 0 && bar > under && over > bar, "lines, bar, lines");
             Check(window.Contains("BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight)", StringComparison.Ordinal), "the bar's room kept under the lines");   // 0.1484 (X-501): one area per tab
             Check(window.Contains("if(options.TextOutline)ChatOutline(run.Text);\n                    ImGui.TextColored(", StringComparison.Ordinal)
-                  && window.Contains("if(ChatOptions.TextOutline)ChatOutline(run.Text);\n        ImGui.TextColored(Accent,run.Text);", StringComparison.Ordinal), "outline under the text and the links");
+                  && window.Contains("if(ChatOptions.TextOutline)ChatOutline(run.Text);\n        // X-505", StringComparison.Ordinal)
+                  && window.Contains("ImGui.TextColored(colour,run.Text);", StringComparison.Ordinal), "outline under the text and the links (0.1488, X-505: the link's colour chosen between)");
             Check(window.Contains("Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y)", StringComparison.Ordinal), "narrow margins");
             var panel = Read("src/TenshoAssistant/PanelWindow.cs");
             Check(panel.Contains("if (panel.Padding is { } padding)", StringComparison.Ordinal) && panel.Contains("ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);", StringComparison.Ordinal)   // 0.1486 (X-503 M1): the usual margins kept first

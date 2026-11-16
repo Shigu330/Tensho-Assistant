@@ -18,7 +18,7 @@ internal static class ChatLinks1463Tests
     private static List<ChatRun> Laid(IReadOnlyList<ChatPiece> pieces, Func<ChatLink, string?>? names = null)
     {
         var record = new ChatRecord(1, Noon, 10, ChatChannel.Say, "Ann", ChatPieces.Segments(pieces));
-        var runs = ChatFormat.Runs(record, new ChatSettings { ShowTimestamps = false, ShowChannel = false }, _ => "", names);
+        var runs = ChatFormat.Runs(record, new ChatSettings { ShowTimestamps = false, ShowChannel = false, GameLinks = false }, _ => "", names);
         return [.. ChatFormat.Wrap(runs, 600, Measure).SelectMany(line => line)];
     }
 
@@ -61,7 +61,7 @@ internal static class ChatLinks1463Tests
         ("Chat links 1463: the copy of a message has the link's name too", () =>
         {
             var record = new ChatRecord(1, Noon, 10, ChatChannel.Say, "Ann", ChatPieces.Segments([new("test "), new(null, Potion), new(null, End: true), new(" test")]));
-            Check(ChatFormat.Plain(record, new ChatSettings { ShowTimestamps = false, ShowChannel = false }, _ => "", Names) == "Ann: test Hi-Potion test", "copied whole");
+            Check(ChatFormat.Plain(record, new ChatSettings { ShowTimestamps = false, ShowChannel = false, GameLinks = false }, _ => "", Names) == "Ann: test Hi-Potion test", "copied whole");
         }),
         ("Chat links 1463: the window names a link without text, and developer mode says the kinds of pieces, never the words", () =>
         {

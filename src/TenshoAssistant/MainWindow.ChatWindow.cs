@@ -100,6 +100,8 @@ internal sealed partial class MainWindow
         {
             BoolSetting("ChatWindow.Clock24","ChatWindow.Clock24Tip",()=>configuration.Chat.Clock24,value=>configuration.Chat.Clock24=value,c=>c.Chat.Clock24);
             BoolSetting("ChatWindow.Seconds","ChatWindow.SecondsTip",()=>configuration.Chat.ShowSeconds,value=>configuration.Chat.ShowSeconds=value,c=>c.Chat.ShowSeconds);
+            // X-505 (0.1488): the hour as the game writes it ([9:21]), or with a leading zero.
+            BoolSetting("ChatWindow.HourLeadingZero","ChatWindow.HourLeadingZeroTip",()=>configuration.Chat.HourLeadingZero,value=>configuration.Chat.HourLeadingZero=value,c=>c.Chat.HourLeadingZero);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
         BoolSetting("ChatWindow.Channel","ChatWindow.ChannelTip",()=>configuration.Chat.ShowChannel,value=>configuration.Chat.ShowChannel=value,c=>c.Chat.ShowChannel);
@@ -110,6 +112,11 @@ internal sealed partial class MainWindow
         // X-476 (0.1481): the tabs under the lines, and the letters' outline.
         BoolSetting("ChatWindow.TabsAtBottom","ChatWindow.TabsAtBottomTip",()=>configuration.Chat.TabsAtBottom,value=>configuration.Chat.TabsAtBottom=value,c=>c.Chat.TabsAtBottom);
         BoolSetting("ChatWindow.TextOutline","ChatWindow.TextOutlineTip",()=>configuration.Chat.TextOutline,value=>configuration.Chat.TextOutline=value,c=>c.Chat.TextOutline);
+        // X-505 (0.1488): the rest of the game's look, each its own setting.
+        BoolSetting("ChatWindow.ThinScrollbar","ChatWindow.ThinScrollbarTip",()=>configuration.Chat.ThinScrollbar,value=>configuration.Chat.ThinScrollbar=value,c=>c.Chat.ThinScrollbar);
+        BoolSetting("ChatWindow.GameLinks","ChatWindow.GameLinksTip",()=>configuration.Chat.GameLinks,value=>configuration.Chat.GameLinks=value,c=>c.Chat.GameLinks);
+        BoolSetting("ChatWindow.GameTabs","ChatWindow.GameTabsTip",()=>configuration.Chat.GameTabs,value=>configuration.Chat.GameTabs=value,c=>c.Chat.GameTabs);
+        BoolSetting("ChatWindow.WrapIndent","ChatWindow.WrapIndentTip",()=>configuration.Chat.WrapIndent,value=>configuration.Chat.WrapIndent=value,c=>c.Chat.WrapIndent);
         // X-485 (0.1479): what the window does under a window of the game.
         ComboSetting("ChatWindow.WhenCovered","ChatWindow.WhenCoveredTip",()=>ChatCover.Bounded(configuration.Chat.WhenCovered),value=>configuration.Chat.WhenCovered=value,
             [(ChatCovered.Hide,localization.Get("ChatWindow.CoveredHide")),(ChatCovered.Fade,localization.Get("ChatWindow.CoveredFade")),(ChatCovered.Stay,localization.Get("ChatWindow.CoveredStay"))],
@@ -366,6 +373,22 @@ internal sealed partial class MainWindow
 
     private void DrawChatTabBar(List<ChatTabSettings> tabs,ChatSettings options)
     {
+        // X-505 (0.1488): the game's tabs: rounded, grey, the one shown marked by a dot.
+        var game=options.GameTabs;
+        if(game)
+        {
+            static Vector4 Colour((float R,float G,float B,float A) c)=>new(c.R,c.G,c.B,c.A);
+            ImGui.PushStyleVar(ImGuiStyleVar.TabRounding,ChatLook.TabRounding);
+            ImGui.PushStyleColor(ImGuiCol.Tab,Colour(ChatLook.Tab));
+            ImGui.PushStyleColor(ImGuiCol.TabHovered,Colour(ChatLook.TabHovered));
+            ImGui.PushStyleColor(ImGuiCol.TabActive,Colour(ChatLook.TabShown));
+        }
+        try{DrawChatTabItems(tabs,options);}
+        finally{if(game){ImGui.PopStyleColor(3);ImGui.PopStyleVar();}}
+    }
+
+    private void DrawChatTabItems(List<ChatTabSettings> tabs,ChatSettings options)
+    {
         if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
         try
         {
@@ -375,7 +398,7 @@ internal sealed partial class MainWindow
                 var view=ChatMessages.ViewOf(tab);
                 bool open;
                 var coloured=PushChatTabColor(tab);
-                try{open=ImGui.BeginTabItem(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread)+"###ChatTab"+index);}
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
                 finally{if(coloured)ImGui.PopStyleColor();}
                 if(!open)continue;
                 chatTabShown=index;
@@ -454,7 +477,20 @@ internal sealed partial class MainWindow
         var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
         // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
-        var visible=ImGui.BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);
+        // X-505 (0.1488): a thin, discreet scroll bar, as the game's (its size and colours are taken when the area begins).
+        var thin=options.ThinScrollbar;
+        if(thin)
+        {
+            var text=ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
+            ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize,ChatLook.ScrollbarThin);
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarBg,Vector4.Zero);
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrab,text with{W=ChatLook.ScrollbarGrab.Idle});
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabHovered,text with{W=ChatLook.ScrollbarGrab.Hovered});
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabActive,text with{W=ChatLook.ScrollbarGrab.Held});
+        }
+        bool visible;
+        try{visible=ImGui.BeginChild(ChatFormat.LinesId(tab),new Vector2(0,linesHeight),false,ImGuiWindowFlags.NoNav|ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);}
+        finally{if(thin){ImGui.PopStyleColor(4);ImGui.PopStyleVar();}}
         try
         {
             if(!visible)return;
@@ -578,7 +614,8 @@ internal sealed partial class MainWindow
     private float chatWheelRest;
 
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
-        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X));
+        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X,
+            ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));
 
     /// <summary>X-461 (0.1463): the name of what a link without text of its own points to: an item (Tensho's item list), a quest, a place; else
     /// a word for a link (never empty: the link keeps its place in the message).</summary>
@@ -593,9 +630,13 @@ internal sealed partial class MainWindow
     private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options)
     {
         var color=ChatColor(options.ColorOf(record.Channel));
+        // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
+        var left=ImGui.GetCursorPosX();
+        var indent=ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent);
         for(var line=0;line<lines.Count;line++)
         {
             ImGui.SetCursorPosY(y+line*height);
+            if(line>0 && indent>0)ImGui.SetCursorPosX(left+indent);
             var first=true;
             var index=0;
             foreach(var run in lines[line])
@@ -662,10 +703,18 @@ internal sealed partial class MainWindow
     private void DrawChatLink(ChatRun run,ChatLink link,string id,ChatRecord record)
     {
         if(ChatOptions.TextOutline)ChatOutline(run.Text);
-        ImGui.TextColored(Accent,run.Text);
-        var min=ImGui.GetItemRectMin();
-        var max=ImGui.GetItemRectMax();
-        ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
+        // X-505 (0.1488): with the game's look, the game's orange arrow then the text in the message's colour, not underlined; else underlined
+        // in the accent colour, as before.
+        var game=ChatOptions.GameLinks;
+        var colour=!game ? Accent:run.Role==ChatRole.LinkMark ? new Vector4(ChatLook.LinkMark.R,ChatLook.LinkMark.G,ChatLook.LinkMark.B,ChatLook.LinkMark.A)
+            :ChatColor(ChatOptions.ColorOf(record.Channel));
+        ImGui.TextColored(colour,run.Text);
+        if(!game)
+        {
+            var min=ImGui.GetItemRectMin();
+            var max=ImGui.GetItemRectMax();
+            ImGui.GetWindowDrawList().AddLine(new Vector2(min.X,max.Y-1),new Vector2(max.X,max.Y-1),ImGui.GetColorU32(Accent));
+        }
         // X-482 M2 (0.1472): under the « back to the bottom » button the link neither shows its tooltip nor opens (its menu already open stays).
         if(chatLinesBlocked){if(link.Kind==ChatSegmentKind.ItemLink && ImGui.IsPopupOpen("##ChatItem"+id))ItemLinksMenu("##ChatItem"+id,itemCatalog.State.Catalog?.Find(link.ItemId));return;}
         // X-474 (0.1477): a link of Dalamud or of a plugin: a click does what it does in the game's chat (its plugin's handler).

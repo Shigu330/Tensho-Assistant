@@ -33,8 +33,10 @@ public sealed class ChatSettings
     public bool Clock24{get;set;}=true;
     public bool ShowSeconds{get;set;}
     public bool ShowChannel{get;set;}=true;
-    /// <summary>X-476 (0.1481): a light background, as the game's chat (was 85); the text keeps its outline.</summary>
-    public int Opacity{get;set;}=40;
+    /// <summary>X-476 (0.1481): a light background, as the game's chat (was 85); the text keeps its outline. X-505 (0.1488, the user's
+    /// captures of 11/16): lighter still, nearly invisible as the game's (was 40).</summary>
+    public int Opacity{get;set;}=DefaultOpacity;
+    public const int DefaultOpacity=15;
     public int FontScale{get;set;}=100;
     public int MaxLines{get;set;}=2000;
     /// <summary>X-448 (0.1454): no title bar nor frame; the buttons at the end of the tab bar stay.</summary>
@@ -47,8 +49,32 @@ public sealed class ChatSettings
     /// <summary>X-484 (0.1482, beyond the game): players whose messages no tab shows, and players whose name stands out (commas between names).</summary>
     public string? HiddenPlayers{get;set;}
     public string? HighlightedPlayers{get;set;}
-    /// <summary>X-476 (0.1481): the tabs under the messages instead of over them.</summary>
-    public bool TabsAtBottom{get;set;}
+    /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
+    /// default, as the game's chat.</summary>
+    public bool TabsAtBottom{get;set;}=true;
+    /// <summary>X-505 (0.1488): a thin, discreet scroll bar, as the game's chat (a line), instead of the theme's wide one.</summary>
+    public bool ThinScrollbar{get;set;}=true;
+    /// <summary>X-505 (0.1488): the hour written with a leading zero ([09:21]); off, as the game writes it ([9:21]).</summary>
+    public bool HourLeadingZero{get;set;}
+    /// <summary>X-505 (0.1488): links drawn as the game's: its orange arrow before them, their text in the message's colour, not underlined.</summary>
+    public bool GameLinks{get;set;}=true;
+    /// <summary>X-505 (0.1488): rounded tabs, the one shown marked by a dot, as the game's chat.</summary>
+    public bool GameTabs{get;set;}=true;
+    /// <summary>X-505 (0.1488): the lines a message wraps onto indented, as the game's chat.</summary>
+    public bool WrapIndent{get;set;}=true;
+    /// <summary>X-505 (0.1488): <see cref="CurrentLook"/> once the look follows the game's (a configuration saved before gets the new defaults once).</summary>
+    public int LookVersion{get;set;}
+    public const int CurrentLook=1;
+    /// <summary>X-505 (0.1488): a configuration saved before gets the game's look once: the tabs under the lines (the user's answer to X-476), the
+    /// background lighter when it was still the old default (40 %); a background chosen by the player is kept. True when something changed.</summary>
+    public bool UpgradeLook()
+    {
+        if(LookVersion>=CurrentLook)return false;
+        if(Opacity==40)Opacity=DefaultOpacity;
+        TabsAtBottom=true;
+        LookVersion=CurrentLook;
+        return true;
+    }
     /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
     public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}
@@ -68,6 +94,7 @@ public sealed class ChatSettings
     /// before get Battle and Event once, after the first tab, unless a tab already shows that channel alone; the others stay as they are.</summary>
     public List<ChatTabSettings> EnsureTabs(string generalName,string battleName,string eventName,string socialName)
     {
+        UpgradeLook();
         if(Tabs is { Count:>0 })
         {
             if(TabsVersion<1)

@@ -14,7 +14,7 @@ internal static class ChatLinkPieces1468Tests
     private const string Evidence = "docs/evidence/0.1468-chat-link-pieces.md";
     private static readonly Regex Recorded = new(@"^(\d\d:\d\d:\d\d) kind (\d+): (.+)$");
     private static readonly Regex Token = new(@"(?<name>\w+) \((?<len>\d+) characters(?<glyph>, game glyph)?\)|Raw \((?<size>\d+) bytes\)|Item (?<id>\d+)(?<hq> HQ)?|(?<other>\w+)");
-    private static readonly ChatSettings Bare = new() { ShowTimestamps = false, ShowChannel = false };
+    private static readonly ChatSettings Bare = new() { ShowTimestamps = false, ShowChannel = false, GameLinks = false };   // 0.1488 (X-505): links as before 0.1488 (ChatLook1488Tests: as in the game)
     private static readonly DateTimeOffset Noon = new(2026, 11, 15, 22, 0, 0, TimeSpan.Zero);
 
     private static List<(string Time, int Kind, string Line)> Lines()

@@ -3,7 +3,8 @@ using System.Text;
 
 namespace TenshoAssistant.Chat;
 
-public enum ChatRole { Timestamp,Channel,Sender,Body,Link }
+/// <remarks>X-505 (0.1488): LinkMark, the game's arrow before a link (part of the link: a click on it opens it).</remarks>
+public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark }
 /// <param name="Link">X-403 phase 2 (0.1441): what the run's text links to (role Link); null otherwise.</param>
 public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=null);
 
@@ -32,13 +33,14 @@ public static class ChatFormat
     }
 
     public static string Time(DateTimeOffset time,ChatSettings settings)
-        =>time.ToLocalTime().ToString((settings.Clock24 ? "HH:mm":"h:mm")+(settings.ShowSeconds ? ":ss":"")+(settings.Clock24 ? "":" tt"),CultureInfo.InvariantCulture);
+        // X-505 (0.1488): the game writes the hour without a leading zero ([9:21]); with one on request.
+        =>time.ToLocalTime().ToString((settings.Clock24 ? (settings.HourLeadingZero ? "HH:mm":"H:mm"):"h:mm")+(settings.ShowSeconds ? ":ss":"")+(settings.Clock24 ? "":" tt"),CultureInfo.InvariantCulture);
 
     /// <summary>What changes how the lines are written: a change lays them out again. X-482 M1 (0.1472): <paramref name="names"/> says which of the
     /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
     /// for good; it is laid out again once they are.</summary>
     public static string LayoutKey(ChatSettings settings,string names="")
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}|{names}";
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}|{names}";
 
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
@@ -80,6 +82,13 @@ public static class ChatFormat
                 runs.Add(new(Clean(linkName?.Invoke(named)) is { Length:>0 } name ? name:"…",ChatRole.Link,named));
                 continue;
             }
+            // X-505 (0.1488): with the game's look, a link's glyph (where the game draws its arrow) becomes the arrow, apart, then its text.
+            if(settings.GameLinks && segment.Link is { } marked && ChatLook.Marked(segment.Text))
+            {
+                runs.Add(new(ChatGlyphs.LinkArrow,ChatRole.LinkMark,marked));
+                if(Clean(ChatLook.Unmarked(segment.Text)) is { Length:>0 } rest)runs.Add(new(rest,ChatRole.Link,marked));
+                continue;
+            }
             if(Clean(segment.Text) is { Length:>0 } text)runs.Add(segment.Link is { } link ? new(text,ChatRole.Link,link):new(text,ChatRole.Body));
         }
         return runs;
@@ -94,12 +103,15 @@ public static class ChatFormat
         =>string.Join("\n",records.Select(record=>Plain(record,settings,shortName,linkName)));
 
     /// <summary>The lines of a message for a width. Breaks between words; a word wider than the line is cut. Runs of one role (and one link) are joined on a line, to draw as little as possible.</summary>
-    public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure)
+    /// <param name="indent">X-505 (0.1488): how far the lines after the first are indented (they are that much narrower), as the game's chat.</param>
+    public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure,float indent=0)
     {
         var lines=new List<IReadOnlyList<ChatRun>>();
         var line=new List<ChatRun>();
         var used=0f;
-        void Flush(){lines.Add(line);line=[];used=0;}
+        var full=width;
+        // The narrower lines after the first keep at least half the width.
+        void Flush(){lines.Add(line);line=[];used=0;width=indent>0 && full>0 ? Math.Max(full/2,full-indent):full;}
         void Add(string text,ChatRole role,ChatLink? link,float size)
         {
             if(line.Count>0 && line[^1].Role==role && Equals(line[^1].Link,link))line[^1]=new(line[^1].Text+text,role,link);

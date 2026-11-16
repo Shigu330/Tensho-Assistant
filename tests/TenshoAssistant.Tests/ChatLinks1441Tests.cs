@@ -32,7 +32,7 @@ internal static class ChatLinks1441Tests
         ("Chat links 1441: link runs keep their link, are not joined with plain text nor with another link, and keep it when cut",() =>
         {
             var record = new ChatRecord(1,Noon,10,ChatChannel.Say,"Ann",[new("see "),new("\uE0BBLimsa",ChatSegmentKind.MapLink,Limsa),new(" and "),new("Hi-Potion",ChatSegmentKind.ItemLink,Potion)]);
-            var settings = new ChatSettings { ShowTimestamps = false,ShowChannel = false };
+            var settings = new ChatSettings { ShowTimestamps = false,ShowChannel = false, GameLinks = false };
             var runs = ChatFormat.Runs(record,settings,_ => "");
             var link = runs.Single(run => run.Link == Limsa);
             Check(link.Role == ChatRole.Link && link.Text == "Limsa","the game's glyph cleaned, role Link");

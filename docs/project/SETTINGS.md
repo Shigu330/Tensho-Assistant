@@ -45,19 +45,24 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.Borderless` | bool | false | Settings › Panels | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.FontScale` | int | 100 | Settings › Panels | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
+| `Chat.GameLinks` | bool | true | Settings › Panels | **Links as in the game** — Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour. Default: on. |
+| `Chat.GameTabs` | bool | true | Settings › Panels | **Tabs as in the game** — Rounded grey tabs, the one shown marked by a dot, as the game's chat. Default: on. |
 | `Chat.HiddenPlayers` | string? | null | Settings › Panels | **Hidden players** — No tab shows what these players write (names with commas between them, the world not needed). Only in Tensho's window: the game's chat is unchanged. Default: none. |
 | `Chat.HideInCombat` | bool | false | Settings › Panels | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
 | `Chat.HighlightedPlayers` | string? | null | Settings › Panels | **Players put forward** — The name of these players stands out in the window (names with commas between them, the world not needed). Default: none. |
+| `Chat.HourLeadingZero` | bool | false | Settings › Panels | **Hour with a leading zero** — Writes the hour with two digits ([09:21]); otherwise as the game's chat writes it ([9:21]). Default: off. |
 | `Chat.Locked` | bool | false | Settings › Panels | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MaxLines` | int | 2000 | Settings › Panels | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
-| `Chat.Opacity` | int | 40 | Settings › Panels | **Background opacity** — Opacity of the window's background, from 0% (transparent) to 100%. Default: 40%. |
+| `Chat.Opacity` | int | DefaultOpacity | Settings › Panels | **Background opacity** — Opacity of the window's background, from 0% (transparent) to 100%. Default: 15%. |
 | `Chat.ShowChannel` | bool | true | Settings › Panels | **Show the channel** — Writes the channel's short name in front of what people say, such as [1] for linkshell 1. Default: on. |
 | `Chat.ShowSeconds` | bool | false | Settings › Panels | **Show the seconds** — Adds the seconds to the time. Greyed while the time is not shown. Default: off. |
 | `Chat.ShowTimestamps` | bool | true | Settings › Panels | **Show the time** — Writes the time of each message in front of it. Default: on. |
-| `Chat.TabsAtBottom` | bool | false | Settings › Panels | **Tabs under the messages** — Puts the tabs under the messages instead of over them. Default: off. |
+| `Chat.TabsAtBottom` | bool | true | Settings › Panels | **Tabs under the messages** — Puts the tabs under the messages, as the game's chat, instead of over them. Default: on. |
 | `Chat.TextOutline` | bool | true | Settings › Panels | **Outline the text** — A dark outline around the letters, as in the game's chat: the text stays readable on a light or transparent background. Default: on. |
+| `Chat.ThinScrollbar` | bool | true | Settings › Panels | **Thin scroll bar** — A thin, discreet scroll bar, as the game's chat, instead of the theme's wide one. Default: on. |
 | `Chat.WhenCovered` | ChatCovered | ChatCovered.Hide | Settings › Panels | **Under a game window** — What the chat window does while a window of the game covers it (Tensho's windows always stay in front of it). Hide: it comes back by itself once the game window closes. Fade: no background and faint text, the clicks go to the game. Stay: as it is. Default: hide. |
 | `Chat.WindowOpen` | bool | false | Settings › Panels | **Show the Tensho chat window** — An extra window beside the game's chat that only reads it: tabs by channel, colours, time, unread counts. The game's chat stays as it is and nothing is sent. Messages stay in memory only (never saved), are cleared when you turn the window off or log out, and are not read in PvP or ranked play (Triple Triad tournaments, Mahjong). « /tensho chat » shows or hides it too. Default: off. |
+| `Chat.WrapIndent` | bool | true | Settings › Panels | **Indent wrapped lines** — The lines a long message continues on are indented, as in the game's chat. Default: on. |
 | `CloseOnGameWindow` | bool | true | Settings › General | **Close Tensho when it opens a game window** — After « Open in the crafting log », « … gathering log » or « Game map », the Tensho window closes to show the game's. A game window already open is opened on the entry, not closed. Default: on. |
 | `CollectableUseFocus` | bool | true | Settings › Panels | **Collectable plan: use Collector's Focus** — The plan may spend GP on Collector's Focus when that earns more on average. Default: on. |
 | `CollectableUsePriming` | bool | true | Settings › Panels | **Collectable plan: Priming Touch** — The plan may spend GP on Priming Touch when doubling the chance of a free Meticulous earns more. From level 95. Default: on. |
@@ -347,7 +352,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 291 controls (278 linked to `Configuration`, 13 to another file), 34 settings without a control.
+Counted: 296 controls (283 linked to `Configuration`, 13 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -398,19 +403,24 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
+| `Chat.GameLinks` | bool | true | Paramètres › Panneaux à côté du jeu | **Liens comme dans le jeu** — Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent. Par défaut : activé. |
+| `Chat.GameTabs` | bool | true | Paramètres › Panneaux à côté du jeu | **Onglets comme dans le jeu** — Des onglets gris arrondis, celui qui est affiché marqué d'un point, comme dans le chat du jeu. Par défaut : activé. |
 | `Chat.HiddenPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs cachés** — Aucun onglet ne montre ce qu'écrivent ces joueurs (noms séparés par des virgules, le monde n'est pas nécessaire). Seulement dans la fenêtre de Tensho : le chat du jeu ne change pas. Par défaut : aucun. |
 | `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
 | `Chat.HighlightedPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs mis en avant** — Le nom de ces joueurs ressort dans la fenêtre (noms séparés par des virgules, le monde n'est pas nécessaire). Par défaut : aucun. |
+| `Chat.HourLeadingZero` | bool | false | Paramètres › Panneaux à côté du jeu | **Heure avec un zéro devant** — Écrit l'heure sur deux chiffres ([09:21]) ; sinon comme le chat du jeu l'écrit ([9:21]). Par défaut : désactivé. |
 | `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
-| `Chat.Opacity` | int | 40 | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 0 % (transparent) à 100 %. Par défaut : 40 %. |
+| `Chat.Opacity` | int | DefaultOpacity | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 0 % (transparent) à 100 %. Par défaut : 15 %. |
 | `Chat.ShowChannel` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher le canal** — Écrit le nom court du canal devant ce que disent les gens, comme [1] pour la linkshell 1. Par défaut : activé. |
 | `Chat.ShowSeconds` | bool | false | Paramètres › Panneaux à côté du jeu | **Afficher les secondes** — Ajoute les secondes à l'heure. Grisé tant que l'heure n'est pas affichée. Par défaut : désactivé. |
 | `Chat.ShowTimestamps` | bool | true | Paramètres › Panneaux à côté du jeu | **Afficher l'heure** — Écrit l'heure de chaque message devant lui. Par défaut : activé. |
-| `Chat.TabsAtBottom` | bool | false | Paramètres › Panneaux à côté du jeu | **Onglets sous les messages** — Place les onglets sous les messages au lieu de les mettre au-dessus. Par défaut : désactivé. |
+| `Chat.TabsAtBottom` | bool | true | Paramètres › Panneaux à côté du jeu | **Onglets sous les messages** — Place les onglets sous les messages, comme dans le chat du jeu, au lieu de les mettre au-dessus. Par défaut : activé. |
 | `Chat.TextOutline` | bool | true | Paramètres › Panneaux à côté du jeu | **Contour du texte** — Un contour sombre autour des lettres, comme dans le chat du jeu : le texte reste lisible sur un fond clair ou transparent. Par défaut : activé. |
+| `Chat.ThinScrollbar` | bool | true | Paramètres › Panneaux à côté du jeu | **Barre de défilement fine** — Une barre de défilement fine et discrète, comme dans le chat du jeu, au lieu de la barre large du thème. Par défaut : activé. |
 | `Chat.WhenCovered` | ChatCovered | ChatCovered.Hide | Paramètres › Panneaux à côté du jeu | **Sous une fenêtre du jeu** — Ce que fait la fenêtre de chat quand une fenêtre du jeu la recouvre (les fenêtres de Tensho restent toujours devant elle). Se cacher : elle revient seule quand la fenêtre du jeu se ferme. S'effacer : sans fond et le texte pâle, les clics vont au jeu. Rester : telle quelle. Par défaut : se cacher. |
 | `Chat.WindowOpen` | bool | false | Paramètres › Panneaux à côté du jeu | **Afficher la fenêtre de chat Tensho** — Une fenêtre en plus, à côté du chat du jeu, qui ne fait que le lire : onglets par canal, couleurs, heure, messages non lus. Le chat du jeu reste tel quel et rien n'est envoyé. Les messages restent en mémoire seulement (jamais enregistrés), sont effacés quand vous désactivez la fenêtre ou vous déconnectez, et ne sont pas lus en JcJ ni dans les parties classées (tournois de Triple Triade, Mahjong). « /tensho chat » l'affiche ou la masque aussi. Par défaut : désactivé. |
+| `Chat.WrapIndent` | bool | true | Paramètres › Panneaux à côté du jeu | **Retrait des lignes repliées** — Les lignes sur lesquelles continue un long message sont en retrait, comme dans le chat du jeu. Par défaut : activé. |
 | `CloseOnGameWindow` | bool | true | Paramètres › Général | **Fermer Tensho quand il ouvre une fenêtre du jeu** — Après « Ouvrir dans le carnet d'artisanat », « … de récolte » ou « Carte du jeu », la fenêtre de Tensho se ferme pour laisser voir celle du jeu. Une fenêtre du jeu déjà ouverte est ouverte sur l'entrée, pas refermée. Par défaut : activé. |
 | `CollectableUseFocus` | bool | true | Paramètres › Panneaux à côté du jeu | **Plan de collection : utiliser Œil du collectionneur** — Le plan peut dépenser des PR en Œil du collectionneur si cela rapporte plus en moyenne. Par défaut : activé. |
 | `CollectableUsePriming` | bool | true | Paramètres › Panneaux à côté du jeu | **Plan de collection : Toucher d'amorçage** — Le plan peut dépenser des PR pour Toucher d'amorçage quand doubler les chances d'une Sélection méthodique gratuite rapporte plus. À partir du niveau 95. Par défaut : activé. |
@@ -700,5 +710,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 291 cases (278 reliées à `Configuration`, 13 à un autre fichier), 34 réglages sans case.
+Compté : 296 cases (283 reliées à `Configuration`, 13 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
