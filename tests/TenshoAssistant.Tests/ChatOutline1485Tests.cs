@@ -13,7 +13,7 @@ internal static class ChatOutline1485Tests
         {
             Check(ChatLook.Outline(1f) == ChatLook.OutlineColor, "not faded: as before");
             var faded = ChatLook.Outline(0.3f);
-            Check(faded >> 24 == (uint)MathF.Round(0xD9 * 0.3f), "faded to 30 %: the outline at 30 % of its own opacity");
+            Check(faded >> 24 < (uint)MathF.Round(0xD9 * 0.3f), "faded to 30 %: each copy paler than 30 % of its own opacity (0.1489, X-504 M1: the four copies together at 30 %)");
             Check((faded & 0x00FFFFFF) == (ChatLook.OutlineColor & 0x00FFFFFF), "still black");
             Check(ChatLook.Outline(0f) >> 24 == 0, "gone with the window");
             Check(ChatLook.Outline(2f) == ChatLook.OutlineColor && ChatLook.Outline(-1f) >> 24 == 0 && ChatLook.Outline(float.NaN) == ChatLook.OutlineColor, "bounded");

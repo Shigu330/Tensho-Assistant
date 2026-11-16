@@ -7,6 +7,10 @@ namespace TenshoAssistant.Chat;
 /// </summary>
 public sealed class ChatTabView
 {
+    private static int lastSerial;
+    /// <summary>X-504 M2 (review of 0.1486): the view's own number, given once (a view per tab, ChatStore.ViewOf): it names the tab's lines'
+    /// area, so the tab keeps its scroll when a tab before it is removed (named by its place, it took the scroll of the tab before).</summary>
+    public int Serial{get;}=Interlocked.Increment(ref lastSerial);
     private readonly List<ChatRecord> records=[];
     private readonly List<IReadOnlyList<IReadOnlyList<ChatRun>>?> lines=[];
     private readonly List<int> rowStarts=[];

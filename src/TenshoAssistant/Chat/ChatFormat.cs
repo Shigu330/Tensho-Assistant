@@ -46,7 +46,8 @@ public static class ChatFormat
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
 
     /// <summary>X-501 (review of 0.1482): the lines' area of one tab. Drawn outside the tab item since 0.1481 (no tab ID pushed), it is named
-    /// after its tab: each tab keeps its own scroll, as when it was drawn inside its tab item.</summary>
+    /// after its tab: each tab keeps its own scroll, as when it was drawn inside its tab item. X-504 M2 (review of 0.1486): the number is the
+    /// tab's view's own (ChatTabView.Serial), not its place: removing a tab no longer gives the next one the removed tab's scroll.</summary>
     public static string LinesId(int tab)=>"###TenshoChatLines"+tab.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>A tab's name, with its unread count when it has one and shows it.</summary>

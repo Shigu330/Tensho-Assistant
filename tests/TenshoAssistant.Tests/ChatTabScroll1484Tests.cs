@@ -18,7 +18,7 @@ internal static class ChatTabScroll1484Tests
             Check(ids.All(id => id.StartsWith("###", StringComparison.Ordinal)), "an ID only, nothing written");
             Check(ChatFormat.LinesId(1) != ChatFormat.LinesId(11) && ChatFormat.LinesId(11) == "###TenshoChatLines11", "no culture in the number");
             var window = Read("src/TenshoAssistant/MainWindow.ChatWindow.cs");
-            Check(window.Contains("DrawChatLines(ChatMessages.ViewOf(tabs[shown]),options,height,shown);", StringComparison.Ordinal), "the tab shown names its area");
+            Check(window.Contains("DrawChatLines(view,options,height,view.Serial);", StringComparison.Ordinal), "the tab shown names its area (0.1489, X-504 M2: by its view's own number)");
             Check(window.Contains("ImGui.BeginChild(ChatFormat.LinesId(tab),", StringComparison.Ordinal) && !window.Contains("BeginChild(\"###TenshoChatLines\"", StringComparison.Ordinal),
                   "never one area for all tabs again");
         }),

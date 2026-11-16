@@ -413,7 +413,9 @@ internal sealed partial class MainWindow
     {
         if(tabs.Count==0)return;
         var shown=Math.Clamp(chatTabShown,0,tabs.Count-1);
-        DrawChatLines(ChatMessages.ViewOf(tabs[shown]),options,height,shown);
+        // X-504 M2 (review of 0.1486): the area named after the tab's view (its own number), not the tab's place.
+        var view=ChatMessages.ViewOf(tabs[shown]);
+        DrawChatLines(view,options,height,view.Serial);
     }
 
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
@@ -469,7 +471,7 @@ internal sealed partial class MainWindow
     private float chatLineHeight;
 
     /// <param name="linesHeight">X-476 (0.1481): the lines' height; 0, all that is left; below 0, all but that much (the tab bar under them).</param>
-    /// <param name="tab">X-501: the tab's place, which names its lines' area (its own scroll).</param>
+    /// <param name="tab">X-501: the number that names the tab's lines' area (its own scroll); X-504 M2: its view's own (ChatTabView.Serial).</param>
     private void DrawChatLines(ChatTabView view,ChatSettings options,float linesHeight,int tab)
     {
         // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the

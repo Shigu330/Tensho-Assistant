@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1489.0
+- Plan global, X-504 : Relecture de 0.1486 (X-504, M1 et M2). M1 : le contour du texte est dessiné en quatre copies qui se superposent ; en mode « S'effacer », chaque copie est maintenant pâlie pour que les quatre ensemble soient pâlies comme le texte (le halo n'est plus plus sombre que le texte, 69 % avant là où les quatre se recouvraient). M2 : la zone des lignes porte le numéro propre à la vue de l'onglet, plus sa place : après « Retirer » un onglet, les suivants gardent leur propre défilement.
+- Pour les joueurs : dans la fenêtre de chat de Tensho, le contour des lettres pâlit autant que le texte quand la fenêtre s'efface, et retirer un onglet ne change plus le défilement des autres.
+- Tests : ChatReview1489Tests. Verify.ps1 (agent) : 2922/2922, 0 avertissement, 0 erreur ; DLL 0.1489.0.0. Non validé en jeu.
+### English
+- Review of 0.1486 (X-504, M1 and M2). M1: the text's outline is drawn in four overlapping copies; in « Fade » mode each copy is now faded so that the four together fade as the text does (the halo is no longer darker than the text, 69 % before where the four overlapped). M2: the lines' area carries the tab's view's own number, no longer its place: after « Remove » a tab, the next tabs keep their own scroll.
+- For players: In the Tensho chat window, the letters' outline fades as much as the text when the window fades, and removing a tab no longer moves the other tabs' scroll.
+
 ## 0.1488.0
 - Plan global, X-505 : Fenêtre de chat à l'aspect du chat du jeu (X-505, captures de l'utilisateur du 16/11). Chaque écart est un réglage, la valeur du jeu par défaut : onglets sous les messages ; fond presque invisible (15 %, contre 40 %) ; barre de défilement fine et discrète ; heure sans zéro devant ([9:21]), avec un zéro sur demande ; liens dessinés comme dans le jeu (flèche orange devant, texte dans la couleur du message, sans soulignement) ; onglets gris arrondis, celui qui est affiché marqué d'un point ; lignes repliées en retrait. Une configuration enregistrée avant reçoit une fois les onglets en bas et le fond léger (un fond choisi par le joueur est gardé).
 - Pour les joueurs : la fenêtre de chat de Tensho ressemble au chat du jeu : onglets en bas, fond presque invisible, barre de défilement fine, heure écrite [9:21], liens avec la flèche orange du jeu, onglets arrondis et lignes repliées en retrait ; chaque point se remet comme avant dans ses réglages.
