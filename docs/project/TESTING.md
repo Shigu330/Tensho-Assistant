@@ -2025,7 +2025,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1489) Fenêtre de chat de Tensho : défiler l'onglet Combat vers le haut, retirer l'onglet Général (roue dentée › Onglets › Retirer) : l'onglet Combat garde sa position de défilement.
 
-- [ ] (0.1490) Fenêtre de chat de Tensho : le décor du jeu se voit à travers le fond, sur toute la fenêtre (messages et onglets) ; Opacité à 0 % : fond invisible, texte lisible par son contour ; à 100 % : fond plein.
+- [x] (0.1490) Fenêtre de chat de Tensho : le décor du jeu se voit à travers le fond, sur toute la fenêtre (messages et onglets) ; Opacité à 0 % : fond invisible, texte lisible par son contour ; à 100 % : fond plein.
 
 - [ ] (0.1491) Alarme de Tensho sur un objet récoltable au lieu connu : quand elle sonne, le chat du jeu montre la flèche, le nom du lieu et ses coordonnées (« Zone ( x , y ) »), puis la flèche et le nom de l'objet ; un clic sur le lieu place le drapeau et ouvre la carte.
 
@@ -2040,6 +2040,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1492) « Effacer l'historique » : une question demande confirmation ; « Effacer » vide la fenêtre et affiche « Historique effacé. » ; après un rechargement de Tensho, rien d'avant ne revient.
 
 - [ ] (0.1492) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : Aide : nouvelle question de la FAQ « Tensho garde-t-il mes messages du chat ? » (et la réponse sur la fenêtre de chat mise à jour) ; guide et liste des outils de l'accueil : aucun changement (un réglage d'une fenêtre existante, désactivé par défaut, expliqué par sa propre question d'accord).
+
+- [ ] (0.1493) Fenêtre de chat, historique coché : faire sonner une alarme de Tensho (son message dans le chat porte un lien), puis recharger Tensho : relu depuis l'historique, ce lien est du texte simple (ni souligné ni cliquable) ; les liens de lieu et d'objet relus restent cliquables.
+
+- [ ] (0.1493) Fenêtre de chat, historique coché : recharger Tensho, puis tout de suite (dans la seconde) Effacer l'historique et confirmer : la fenêtre reste vide, les anciens messages ne reviennent pas ; les nouveaux messages arrivent.
+
+- [ ] (0.1493) Application de bureau, réglages de la fenêtre de chat : la case de l'historique, ses nombres et Effacer l'historique sont grisés, avec la phrase qui dit que l'historique se garde et s'efface dans le jeu seulement.
+
+- [ ] (0.1494) Fenêtre de chat, réglages de l'historique : cocher « Sans limite » à côté de « Messages gardés » puis à côté de « Jours gardés » : chaque nombre se grise ; les décocher : le nombre d'avant revient. Une configuration déjà réglée garde ses jours (7 restent 7 ; une nouvelle a 30 par défaut).
+
+- [ ] (0.1494) Fenêtre de chat, historique coché : sous les réglages, la place sur le disque pour ce personnage (en Ko ou Mo) ; elle grandit quand des messages arrivent, revient à 0 Ko après « Effacer l'historique ».
+
+- [ ] (0.1494) Fenêtre de chat, historique coché avec « Sans limite » : recharger Tensho : les messages reviennent vite et en entier dans la fenêtre (jusqu'à son nombre de lignes), sans saccade du jeu au chargement.
 
 **0.535 : interfaces** — à voir en jouant
 

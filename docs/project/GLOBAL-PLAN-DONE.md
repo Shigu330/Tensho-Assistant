@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (530 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (535 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -570,7 +570,9 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-466 | User request of 11/15 around 10:15 pm (Tensho chat window): the chat should… | Done in 0.1476 |
 | X-470 | Tool, idea I-015 put on the plan by the user on 11/15 around 10:35 pm… | Done in 0.1467.0 |
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
+| X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho… | Done in 0.1471.0 |
 | X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the «… | Done in 0.1477 |
+| X-477 | Display bug seen by the user on 11/15 around 10:55 pm (screenshot): Tensho chat… | Done in 0.1476.0 |
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
 | X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in… | Done in 0.1487.0 |
 | X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I2: finding in… | Done in 0.1469 |
@@ -598,12 +600,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-509 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I1: finding in… | Done in 0.1491 |
 | X-510 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I2: finding in… | Done in 0.1491.0 |
 | X-511 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), minor M1, M2, M3: M1… | Done in 0.1491.0 |
+| X-512 | Tool (defect seen by the user on 11/16 around 10:55 am): on the test page, a… | Done in 0.1492.0 |
+| X-514 | Review  (review 0.1492, 16/11), I1: finding in… | Done in 0.1493 |
+| X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (530 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (535 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1171,7 +1176,9 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-466 | Demande de l'utilisateur du 15/11 vers 22 h 15 (fenêtre de chat Tensho) : « il… | Fait en 0.1476 |
 | X-470 | Outil, idée I-015 mise au plan par l'utilisateur le 15/11 vers 22 h 35… | Fait en 0.1467.0 |
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
+| X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre… | Fait en 0.1471.0 |
 | X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat… | Fait en 0.1477 |
+| X-477 | Bug d'affichage vu par l'utilisateur le 15/11 vers 22 h 55 (capture) : fenêtre… | Fait en 0.1476.0 |
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
 | X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la… | Fait en 0.1487.0 |
 | X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I2 : X-462 : MapOf… | Fait en 0.1469 |
@@ -1199,3 +1206,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-509 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I1 : X-506 : la… | Fait en 0.1491 |
 | X-510 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I2 : X-505… | Fait en 0.1491.0 |
 | X-511 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), mineurs M1, M2, M3… | Fait en 0.1491.0 |
+| X-512 | Outil (défaut vu par l'utilisateur le 16/11 vers 10 h 55) : sur la page des… | Fait en 0.1492.0 |
+| X-514 | Relecture  (relecture 0.1492, 16/11), I1 : X-475 garde sur disque les liens de… | Fait en 0.1493 |
+| X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
