@@ -152,9 +152,10 @@ internal sealed unsafe class GameChatHider : IDisposable
         if(toShow.Count>0)log.Information("Game chat: its tab bar shown again ({0}).",string.Join(", ",toShow));
     }
 
-    /// <summary>X-533 (0.1508): whether the channel menu (ChatLog's ChannelSelectDropDown) is open: the window's open drop-down
-    /// (CurrentDropDownOwnerNode) or the menu's list shown. Both signals are written to the log on each change in developer mode, for the
-    /// in-game trial to tell which one the game sets (docs/evidence/0.1508-game-chat-channel-menu.md).</summary>
+    /// <summary>X-533 (0.1508): whether the channel menu (ChatLog's ChannelSelectDropDown) is open: the menu's list shown, with all its
+    /// parents. 0.1509: ChatLog's CurrentDropDownOwnerNode is no sign of it: dalamud.log of 2026-11-16 23:53:48, right after the load,
+    /// « drop-down owner set, list hidden » and no change after, so with it Tensho's window stayed away with the menu closed
+    /// (docs/evidence/0.1508-game-chat-channel-menu.md, section 6). Both are still written to the log on each change in developer mode.</summary>
     private bool MenuOpen()
     {
         var chat=Chat();
@@ -164,7 +165,7 @@ internal sealed unsafe class GameChatHider : IDisposable
         var list=drop==null ? null : (AtkComponentBase*)drop->List;
         var node=list==null || list->OwnerNode==null ? null : &list->OwnerNode->AtkResNode;
         var shown=node!=null && Shown(node);
-        var open=owner || shown;
+        var open=shown;
         if(DeveloperMode())
         {
             var said=$"{(open ? "open" : "closed")} (drop-down owner {(owner ? "set" : "none")}, list {(shown ? "shown" : "hidden")} {Node(node,chat->AtkUnitBase.Scale)?.ToString() ?? "unread"})";

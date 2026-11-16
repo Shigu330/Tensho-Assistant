@@ -53,7 +53,7 @@ internal static class ChatGameTabs1508Tests
             Check(hider.Contains("StepTabs(now);",StringComparison.Ordinal) && hider.Contains("var (toHide,toShow)=tabs.Step(now,states);",StringComparison.Ordinal),"the tabs follow the panels' choice (held, released in a competitive cut)");
             Check(hider.Contains("node->ToggleVisibility(false)",StringComparison.Ordinal) && hider.Contains("var slots=tabs.GiveBack();",StringComparison.Ordinal),"hidden, and given back on failure and unload");
             Check(hider.Contains("hide.Hidden.Count==0 && tabs.Hidden.Count==0",StringComparison.Ordinal),"unload gives the tabs back even with no panel hidden");
-            Check(hider.Contains("menuOpen=now==ChatHideWant.Hide && MenuOpen();",StringComparison.Ordinal) && hider.Contains("CurrentDropDownOwnerNode!=null",StringComparison.Ordinal),"the menu read only while hidden");
+            Check(hider.Contains("menuOpen=now==ChatHideWant.Hide && MenuOpen();",StringComparison.Ordinal) && hider.Contains("var open=shown;",StringComparison.Ordinal) && !hider.Contains("owner || shown",StringComparison.Ordinal),"the menu read only while hidden, from its list alone (0.1509: the drop-down owner stays set with the menu closed)");
             Check(hider.Contains("ChatFollow.Box(boxes,window,typing,name)",StringComparison.Ordinal),"the channel's name read for the place");
             Check(!hider.Contains("TextInput->",StringComparison.Ordinal) && !hider.Contains("ChannelSelectDropDown->SelectItem",StringComparison.Ordinal),"the typing box and the menu are never written");
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
