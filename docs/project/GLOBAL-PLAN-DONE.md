@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (535 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (537 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -555,6 +555,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-444 | Review of block 0.1436 to 0.1445 (review 0.1445, 15/11), minor M1, M2, M3, M4… | Done in 0.1446.0 |
 | X-445 | User request of 11/15 around 8:10 pm, made precise around 8:25 pm (Tensho chat… | Done in 0.1458 |
 | X-446 | Tool: state.py child set ID "text" without the field (etat, version or… | Done in 0.1455.0 |
+| X-449 | User request of 11/15 around 8:20 pm: redo the settings to make them easier… | Done in 0.1496 |
 | X-450 | User request of 11/15 around 8:30 pm: a private page of the in-game tests (only… | Done in 0.1455.0 |
 | X-451 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), I1: finding in… | Done in 0.1456 |
 | X-452 | Review of block 0.1446 to 0.1454 (review 0.1454, 15/11), I2: finding in… | Done in 0.1456.0 |
@@ -603,12 +604,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-512 | Tool (defect seen by the user on 11/16 around 10:55 am): on the test page, a… | Done in 0.1492.0 |
 | X-514 | Review  (review 0.1492, 16/11), I1: finding in… | Done in 0.1493 |
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
+| X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (535 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (537 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1161,6 +1163,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-444 | Relecture du bloc 0.1436 à 0.1445 (relecture 0.1445, 15/11), mineurs M1, M2… | Fait en 0.1446.0 |
 | X-445 | Demande de l'utilisateur du 15/11 vers 20 h 10, précisée vers 20 h 25 (essai de… | Fait en 0.1458 |
 | X-446 | Outil : state.py child set ID "texte" sans le champ (etat, version ou… | Fait en 0.1455.0 |
+| X-449 | Demande de l'utilisateur du 15/11 vers 20 h 20 : « il faut aussi refaire les… | Fait en 0.1496 |
 | X-450 | Demande de l'utilisateur du 15/11 vers 20 h 30 : une page privée des essais en… | Fait en 0.1455.0 |
 | X-451 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), I1 : X-403… | Fait en 0.1456 |
 | X-452 | Relecture du bloc 0.1446 à 0.1454 (relecture 0.1454, 15/11), I2 : X-448 est… | Fait en 0.1456.0 |
@@ -1209,3 +1212,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-512 | Outil (défaut vu par l'utilisateur le 16/11 vers 10 h 55) : sur la page des… | Fait en 0.1492.0 |
 | X-514 | Relecture  (relecture 0.1492, 16/11), I1 : X-475 garde sur disque les liens de… | Fait en 0.1493 |
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
+| X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |

@@ -2029,9 +2029,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1491) Alarme de Tensho sur un objet récoltable au lieu connu : quand elle sonne, le chat du jeu montre la flèche, le nom du lieu et ses coordonnées (« Zone ( x , y ) »), puis la flèche et le nom de l'objet ; un clic sur le lieu place le drapeau et ouvre la carte.
 
-- [ ] (0.1491) Fenêtre de chat de Tensho, même alarme : le lieu avec sa flèche orange et ses coordonnées, puis l'objet avec sa propre flèche orange ; une adresse web dite dans le chat est soulignée (couleur d'accent), comme un lien nommé par Tensho.
+- [x] (0.1491) Fenêtre de chat de Tensho, même alarme : le lieu avec sa flèche orange et ses coordonnées, puis l'objet avec sa propre flèche orange ; une adresse web dite dans le chat est soulignée (couleur d'accent), comme un lien nommé par Tensho.
 
-- [ ] (0.1492) Fenêtre de chat de Tensho › roue dentée : cocher « Garder l'historique du chat sur ce PC » ouvre une question (ce qui est gardé, le dossier, 2 000 messages et 7 jours, comment l'effacer) ; « Annuler » laisse la case décochée ; « Garder l'historique » la coche.
+- [x] (0.1492) Fenêtre de chat de Tensho › roue dentée : cocher « Garder l'historique du chat sur ce PC » ouvre une question (ce qui est gardé, le dossier, 2 000 messages et 7 jours, comment l'effacer) ; « Annuler » laisse la case décochée ; « Garder l'historique » la coche.
 
 - [ ] (0.1492) Historique activé : dire quelques messages, puis recharger Tensho ou relancer le jeu : les messages d'avant reviennent dans les onglets, avant ceux de la session, sans doublon (dalamud.log : « Chat history: N messages read back »).
 
@@ -2052,6 +2052,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1494) Fenêtre de chat, historique coché : sous les réglages, la place sur le disque pour ce personnage (en Ko ou Mo) ; elle grandit quand des messages arrivent, revient à 0 Ko après « Effacer l'historique ».
 
 - [ ] (0.1494) Fenêtre de chat, historique coché avec « Sans limite » : recharger Tensho : les messages reviennent vite et en entier dans la fenêtre (jusqu'à son nombre de lignes), sans saccade du jeu au chargement.
+
+- [ ] (0.1496) Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage si le mode développeur est coché) : une liste de catégories à gauche, les réglages de la catégorie cliquée à droite ; changer d'onglet puis revenir (ou fermer et rouvrir la page) garde la catégorie choisie ; la fenêtre du jeu reste lisible à sa plus petite taille.
+
+- [ ] (0.1496) Paramètres, recherche : taper « police » puis « carte » : chaque résultat indique l'onglet et la catégorie (Onglet › Catégorie) ; choisir un résultat ouvre cet onglet et cette catégorie.
+
+- [ ] (0.1496) Un outil avec son bouton « Paramètres » (aide du journal d'artisanat, observation de la récolte, mini-jeux) : le bouton ouvre Paramètres > Panneaux à côté du jeu, sur la catégorie de l'outil ; la roue de la carte ouvre l'onglet Carte.
+
+- [ ] (0.1497) Paramètres, recherche : taper « liste des pages » et choisir « Liste des pages · Général › Langue et thème » : l'onglet Général et la catégorie Langue et thème s'ouvrent, la ligne trouvée est encadrée un instant et visible sans défiler de plus.
+
+- [ ] (0.1497) Paramètres, recherche : choisir un réglage tout en bas d'une longue catégorie (par exemple taper « servants » et choisir « Panneau à côté de la liste de ventes des servants », dans Données et sources › Sources communautaires) : le volet défile jusqu'à lui et le cadre s'estompe en deux secondes.
+
+- [ ] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
 
 **0.535 : interfaces** — à voir en jouant
 
