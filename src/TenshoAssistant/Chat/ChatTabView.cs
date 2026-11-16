@@ -25,13 +25,17 @@ public sealed class ChatTabView
     public string LayoutKey{get;private set;}="";
 
     /// <summary>Takes the store's new lines this tab shows, oldest dropped past the cap; true when the tab changed.</summary>
-    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap)
+    /// <param name="table">X-484 (0.1482): the game's log filters (null: not read; the tab's channels decide), with <paramref name="settings"/>
+    /// for the players hidden.</param>
+    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap,ChatFilterTable? table=null,ChatSettings? settings=null)
     {
         var changed=false;
+        ChatTabFilter? filter=null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
-            if(!tab.Shows(record.Channel))continue;
+            filter??=new(tab,table,settings);
+            if(!filter.Shows(record))continue;
             records.Add(record);lines.Add(null);
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;

@@ -70,7 +70,8 @@ internal sealed class ChatReader : IDisposable
             }
             // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
             var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
-            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines);
+            // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
+            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
             warned=false;
         }
         catch(Exception error)

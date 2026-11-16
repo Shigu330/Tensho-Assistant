@@ -11,7 +11,9 @@ public enum ChatSegmentKind { Text,MapLink,ItemLink,QuestLink,WebLink,DalamudLin
 public sealed record ChatLink(ChatSegmentKind Kind,uint TerritoryId=0,uint MapId=0,float X=0,float Y=0,string Place="",uint ItemId=0,bool Hq=false,uint QuestId=0,string Url="",string Plugin="",uint CommandId=0,byte[]? Data=null);
 public sealed record ChatSegment(string Text,ChatSegmentKind Kind=ChatSegmentKind.Text,ChatLink? Link=null);
 /// <summary>A copy of one chat message, in plain managed data; nothing of the game's memory is kept.</summary>
-public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body);
+/// <param name="Source">X-484 (0.1482): who does it, Dalamud's XivChatRelationKind (0 none), and <paramref name="Target"/> to whom: the
+/// game's log filters tell the combat lines apart by them.</param>
+public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel Channel,string Sender,IReadOnlyList<ChatSegment> Body,byte Source=0,byte Target=0);
 
 /// <summary>
 /// X-403 phase 1 (D-166; back from 0.471): the messages of this session, in memory only (other players' names and words are in them: never written
@@ -36,11 +38,11 @@ public sealed class ChatStore
 
     public static int Bounded(int cap)=>Math.Clamp(cap,MinimumLines,MaximumLines);
 
-    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap)
+    public ChatRecord Add(DateTimeOffset time,int kind,string sender,IReadOnlyList<ChatSegment> body,int cap,byte source=0,byte target=0)
     {
         lock(gate)
         {
-            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body);
+            var record=new ChatRecord(nextId++,time,kind,ChatChannels.From(kind),sender,body,source,target);
             records.Add(record);
             if(record.Channel==ChatChannel.Combat)combat++;
             var limit=Bounded(cap);

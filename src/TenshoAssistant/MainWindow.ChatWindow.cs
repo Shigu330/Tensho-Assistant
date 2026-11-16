@@ -11,6 +11,20 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal ChatStore ChatMessages{get;}=new();
+    /// <summary>X-484 (0.1482): the game's log filters (LogFilter sheet, client language), set by the plugin; read once, on first use.</summary>
+    internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource{get;set;}
+    private ChatFilterTable? chatFilterTable;
+    private bool chatFilterTried;
+    private ChatFilterTable? ChatFilterTableNow()
+    {
+        if(chatFilterTried || ChatFilterSource is not { } source)return chatFilterTable;
+        chatFilterTried=true;
+        try{chatFilterTable=new(source());}
+        catch(Exception error){log.Warning(error,"The game's log filters could not be read: the chat tabs use their channels.");}
+        return chatFilterTable;
+    }
+    // X-484 (0.1482): the players whose name stands out, read once per frame.
+    private IReadOnlyList<string> chatHighlighted=[];
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
@@ -104,6 +118,7 @@ internal sealed partial class MainWindow
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
         if(developerMode)DrawChatKinds();
         if(chatSettingsPending && !ImGui.IsAnyItemActive()){chatSettingsPending=false;TrySave("Chat window tabs and colours");}
     }
@@ -148,7 +163,7 @@ internal sealed partial class MainWindow
                 }
                 if(ImGui.TreeNode(localization.Format("ChatWindow.TabChannels",tab.Channels?.Count ?? 0)+"###ChatTabChannels"))
                 {
-                    try{DrawChatTabChannels(tab);}
+                    try{DrawChatTabFilters(tab);}
                     finally{ImGui.TreePop();}
                 }
             }
@@ -160,6 +175,126 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("ChatWindow.TabAdd"))){AddChatTab(tabs);chatSettingsPending=true;}
             Tip("ChatWindow.TabAddTip");
         }
+    }
+
+    private void ChatTabChanged(ChatTabSettings tab){ChatMessages.Restart(tab);chatSettingsPending=true;}
+
+    /// <summary>X-484 (0.1482): what a tab shows. By channels (as before), with a button to the game's own filters; or by the game's log filters
+    /// (LogFilter sheet, names in the client's language): Discussion, Announcements and the combat lines by subject, each filter a kind with
+    /// who does it and to whom; presets as the game's tabs, all, none. Then, beyond the game, words to keep or hide.</summary>
+    private void DrawChatTabFilters(ChatTabSettings tab)
+    {
+        var table=ChatFilterTableNow();
+        if(tab.Filters is null || table is not { Rows.Count:>0 })
+        {
+            if(tab.Filters is not null)EmptyState("ChatWindow.FiltersUnavailable");
+            DrawChatTabChannels(tab);
+            if(tab.Filters is null && table is { Rows.Count:>0 })
+            {
+                if(ImGui.SmallButton(localization.Get("ChatWindow.FiltersUse"))){tab.Filters=table.FromChannels(tab.Channels ?? []).ToList();tab.Unlisted=true;ChatTabChanged(tab);}
+                Tip("ChatWindow.FiltersUseTip");
+            }
+            DrawChatTabWords(tab);
+            return;
+        }
+        var filters=tab.Filters;
+        foreach(var (key,ids) in new (string,Func<IEnumerable<uint>>)[]
+        {
+            ("ChatWindow.PresetGeneral",()=>table.Preset(ChatFilterTable.GeneralTab)),("ChatWindow.PresetBattle",()=>table.Preset(ChatFilterTable.BattleTab)),
+            ("ChatWindow.PresetEvent",()=>table.Preset(ChatFilterTable.EventTab)),("ChatWindow.PresetAll",()=>table.AllIds),("ChatWindow.PresetNone",()=>[]),
+        })
+        {
+            if(ImGui.SmallButton(localization.Get(key))){tab.Filters=ids().ToList();ChatTabChanged(tab);return;}
+            Tip(key+"Tip");
+            ImGui.SameLine();
+        }
+        if(ImGui.SmallButton(localization.Get("ChatWindow.FiltersChannels"))){tab.Filters=null;ChatTabChanged(tab);return;}
+        Tip("ChatWindow.FiltersChannelsTip");
+        var unlisted=tab.Unlisted;
+        if(ImGui.Checkbox(localization.Get("ChatWindow.Unlisted")+"###ChatUnlisted",ref unlisted)){tab.Unlisted=unlisted;ChatTabChanged(tab);}
+        Tip("ChatWindow.UnlistedTip");
+        DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Discussion),localization.Get("ChatWindow.FilterDiscussion"),"Discussion");
+        DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Announcements),localization.Get("ChatWindow.FilterAnnouncements"),"Announcements");
+        var combat=table.Rows.Where(row=>ChatFilterTable.IsCombat(row.Category)).ToList();
+        if(combat.Count>0 && ImGui.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterCombat"),combat,filters)+"###ChatFilterCombat"))
+        {
+            try
+            {
+                foreach(var subject in combat.GroupBy(row=>row.Category))
+                    DrawChatFilterGroup(tab,filters,subject,localization.Get("ChatWindow.FilterSubject"+subject.Key),"Subject"+subject.Key);
+            }
+            finally{ImGui.TreePop();}
+        }
+        // Other groups the game may add one day: under their number, never lost.
+        foreach(var other in table.Rows.Where(row=>row.Category is not ChatFilterTable.Discussion and not ChatFilterTable.Announcements && !ChatFilterTable.IsCombat(row.Category)).GroupBy(row=>row.Category))
+            DrawChatFilterGroup(tab,filters,other,localization.Format("ChatWindow.FilterGroup",other.Key),"Group"+other.Key);
+        DrawChatTabWords(tab);
+    }
+
+    private static string ChatFilterLabel(string name,IEnumerable<ChatFilterRow> rows,List<uint> filters)
+    {
+        var list=rows as IReadOnlyCollection<ChatFilterRow> ?? rows.ToList();
+        return $"{name} ({list.Count(row=>filters.Contains(row.Id))}/{list.Count})";
+    }
+
+    private void DrawChatFilterGroup(ChatTabSettings tab,List<uint> filters,IEnumerable<ChatFilterRow> rows,string name,string id)
+    {
+        var list=rows.ToList();
+        if(list.Count==0 || !ImGui.TreeNode(ChatFilterLabel(name,list,filters)+"###ChatFilter"+id))return;
+        try
+        {
+            // The whole group on or off at once, then each filter of the game.
+            if(ImGui.SmallButton(localization.Get("ChatWindow.GroupAll"))){foreach(var row in list)if(!filters.Contains(row.Id))filters.Add(row.Id);ChatTabChanged(tab);}
+            Tip("ChatWindow.GroupAllTip");
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("ChatWindow.GroupNone"))){filters.RemoveAll(chosen=>list.Any(row=>row.Id==chosen));ChatTabChanged(tab);}
+            Tip("ChatWindow.GroupNoneTip");
+            foreach(var row in list)
+            {
+                var shown=filters.Contains(row.Id);
+                if(ImGui.Checkbox(row.Name+"###ChatFilterRow"+row.Id,ref shown))
+                {
+                    if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
+                    ChatTabChanged(tab);
+                }
+                Tip("ChatWindow.FilterTip");
+            }
+        }
+        finally{ImGui.TreePop();}
+    }
+
+    /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
+    private void DrawChatTabWords(ChatTabSettings tab)
+    {
+        var keep=tab.KeepWords ?? "";
+        ImGui.SetNextItemWidth(260);
+        if(ImGui.InputText(localization.Get("ChatWindow.KeepWords")+"###ChatKeepWords",ref keep,300)){tab.KeepWords=keep;ChatTabChanged(tab);}
+        Tip("ChatWindow.KeepWordsTip");
+        var hide=tab.HideWords ?? "";
+        ImGui.SetNextItemWidth(260);
+        if(ImGui.InputText(localization.Get("ChatWindow.HideWords")+"###ChatHideWords",ref hide,300)){tab.HideWords=hide;ChatTabChanged(tab);}
+        Tip("ChatWindow.HideWordsTip");
+        var matchCase=tab.WordsMatchCase;
+        if(ImGui.Checkbox(localization.Get("ChatWindow.WordsMatchCase")+"###ChatWordsCase",ref matchCase)){tab.WordsMatchCase=matchCase;ChatTabChanged(tab);}
+        Tip("ChatWindow.WordsMatchCaseTip");
+    }
+
+    /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
+    private void DrawChatPlayers(ChatSettings options)
+    {
+        var hidden=options.HiddenPlayers ?? "";
+        ImGui.SetNextItemWidth(300);
+        if(ImGui.InputText(localization.Get("ChatWindow.HiddenPlayers")+"###ChatHiddenPlayers",ref hidden,600))
+        {
+            options.HiddenPlayers=hidden;
+            foreach(var tab in ChatTabs(options))ChatMessages.Restart(tab);
+            chatSettingsPending=true;
+        }
+        Tip("ChatWindow.HiddenPlayersTip");
+        var highlighted=options.HighlightedPlayers ?? "";
+        ImGui.SetNextItemWidth(300);
+        if(ImGui.InputText(localization.Get("ChatWindow.HighlightedPlayers")+"###ChatHighlightedPlayers",ref highlighted,600)){options.HighlightedPlayers=highlighted;chatSettingsPending=true;}
+        Tip("ChatWindow.HighlightedPlayersTip");
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
@@ -238,7 +373,9 @@ internal sealed partial class MainWindow
     {
         var options=ChatOptions;
         var tabs=ChatTabs(options);
-        foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines);
+        var table=ChatFilterTableNow();
+        foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
         if(options.TabsAtBottom)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
         DrawChatTabBar(tabs,options);
         if(!options.TabsAtBottom)DrawChatShownTab(tabs,options,0);
@@ -484,7 +621,7 @@ internal sealed partial class MainWindow
                 else
                 {
                     if(options.TextOutline)ChatOutline(run.Text);
-                    ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:color,run.Text);
+                    ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:run.Role==ChatRole.Sender && ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:color,run.Text);
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}

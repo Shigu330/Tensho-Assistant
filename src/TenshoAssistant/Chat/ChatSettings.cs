@@ -8,6 +8,15 @@ public sealed class ChatTabSettings
     public bool ShowUnread{get;set;}=true;
     /// <summary>X-478 (the user's request of 15/11): the colour of the tab's name (0xRRGGBB); null: the theme's text colour.</summary>
     public uint? NameColor{get;set;}
+    /// <summary>X-484 (0.1482): the game's log filters this tab shows (rows of the LogFilter sheet); null: its channels decide, as before.</summary>
+    public List<uint>? Filters{get;set;}
+    /// <summary>X-484 (0.1482): with the game's filters, also the messages none of them covers (kinds the game does not list).</summary>
+    public bool Unlisted{get;set;}=true;
+    /// <summary>X-484 (0.1482, beyond the game): only messages with one of these words (commas between them), and never those with one of
+    /// <see cref="HideWords"/>; <see cref="WordsMatchCase"/>: capitals count.</summary>
+    public string? KeepWords{get;set;}
+    public string? HideWords{get;set;}
+    public bool WordsMatchCase{get;set;}
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
 }
 
@@ -35,6 +44,9 @@ public sealed class ChatSettings
     /// <summary>X-485 (0.1479): what the window does while a window of the game covers it: it hides (the default, as the panels), it fades
     /// (no background, text faint, clicks go through), or it stays.</summary>
     public ChatCovered WhenCovered{get;set;}=ChatCovered.Hide;
+    /// <summary>X-484 (0.1482, beyond the game): players whose messages no tab shows, and players whose name stands out (commas between names).</summary>
+    public string? HiddenPlayers{get;set;}
+    public string? HighlightedPlayers{get;set;}
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them.</summary>
     public bool TabsAtBottom{get;set;}
     /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
