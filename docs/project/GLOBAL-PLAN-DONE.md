@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (518 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (522 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -586,12 +586,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-496 | Review of block 0.1475 to 0.1477 (review 0.1477, 16/11), minor M1, M2, M3, M4… | Done in 0.1478 |
 | X-497 | Review  (review 0.1479, 16/11), I1: finding in… | Done in 0.1480 |
 | X-498 | Review  (review 0.1479, 16/11), minor M1, M2: M1 in… | Done in 0.1480.0 |
+| X-499 | Tool (relay 90, 11/16): publish.sh takes new-version.py's first output line as… | Done in 0.1482.0 |
+| X-500 | Review  (review 0.1482, 16/11), I1: finding in… | Done in 0.1483 |
+| X-501 | Review  (review 0.1482, 16/11), I2: finding in… | Done in 0.1484 |
+| X-502 | Review  (review 0.1482, 16/11), I3: finding in… | Done in 0.1485 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (518 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (522 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1175,3 +1179,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-496 | Relecture du bloc 0.1475 à 0.1477 (relecture 0.1477, 16/11), mineurs M1, M2… | Fait en 0.1478 |
 | X-497 | Relecture  (relecture 0.1479, 16/11), I1 : X-485 : la carte du jeu ne cache… | Fait en 0.1480 |
 | X-498 | Relecture  (relecture 0.1479, 16/11), mineurs M1, M2 : M1 : X-485, mode «… | Fait en 0.1480.0 |
+| X-499 | Outil (relais 90, 16/11) : publish.sh prend la première ligne de new-version.py… | Fait en 0.1482.0 |
+| X-500 | Relecture  (relecture 0.1482, 16/11), I1 : X-497 : la carte du jeu « hébergée… | Fait en 0.1483 |
+| X-501 | Relecture  (relecture 0.1482, 16/11), I2 : X-476 : les lignes sont maintenant… | Fait en 0.1484 |
+| X-502 | Relecture  (relecture 0.1482, 16/11), I3 : Le contour du texte (X-476) défait… | Fait en 0.1485 |

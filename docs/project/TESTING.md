@@ -2005,6 +2005,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1482) Fenêtre de chat de Tensho : « Cacher avec » un mot, « Seulement avec » un autre ; « Joueurs cachés » avec le nom d'un joueur qui parle : ses messages disparaissent de Tensho (pas du jeu) ; « Joueurs mis en avant » : son nom ressort.
 
+- [ ] (0.1483) Remplacement de la carte du jeu actif, fenêtre de chat de Tensho ouverte en bas à gauche : ouvrir la carte (touche de la carte). La carte de Tensho s'ouvre ; la fenêtre de chat reste visible et ne pâlit pas. Puis réglage du remplacement coupé : la carte du jeu s'ouvre au-dessus du chat, et le chat se cache (ou pâlit).
+
+- [ ] (0.1484) Fenêtre de chat de Tensho avec deux onglets qui reçoivent des messages : remonter dans l'onglet A, puis ouvrir l'onglet B. B s'ouvre en bas (sans le bouton « retour en bas ») et ses messages sont marqués lus ; revenir à A : il est toujours remonté à l'endroit laissé.
+
+- [ ] (0.1485) Fenêtre de chat de Tensho en mode « S'effacer » derrière une fenêtre du jeu, contour du texte actif : ouvrir une fenêtre du jeu par-dessus le chat. Tout le chat pâlit, texte et contour noir compris (plus de lettres noires bien nettes sur un chat pâle).
+
+- [ ] (0.1486) Fenêtre de chat de Tensho : ouvrir la roue dentée, puis un clic droit sur une ligne. Le panneau des réglages et le menu ont des marges normales (pas serrées contre le bord) ; la fenêtre de chat garde ses marges étroites.
+
+- [ ] (0.1486) Paramètres › rechercher « joueurs » puis « mots » : les réglages de la fenêtre de chat (joueurs cachés, mis en avant, mots gardés ou cachés) sont trouvés.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
