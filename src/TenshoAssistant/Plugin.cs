@@ -796,7 +796,7 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-159 (0.1174): the map a treasure hunt's chest is put down to (its item, TreasureHuntRank.ItemName).
             if(itemWatcher is not null)itemWatcher.TreasureMapItem=()=>treasureMap?.Spot is { } held && data.GetExcelSheet<Lumina.Excel.Sheets.TreasureHuntRank>().GetRowOrDefault(held.Rank) is { } rank ? rank.ItemName.RowId:0u;
             // X-153 (0.1443): the chat family (the Tensho chat window's reader, the chat's map links, the link under the mouse) is wired in Plugin.Chat.cs.
-            RegisterChat(configuration,client,addonLifecycle);
+            RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory());
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());

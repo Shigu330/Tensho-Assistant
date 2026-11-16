@@ -22,7 +22,8 @@ public sealed class ChatTabSettings
 
 /// <summary>
 /// X-403 phase 1 (D-166; back from 0.471): the Tensho chat window's settings, read through bounded values so a hand-edited configuration stays in range.
-/// Off by default: while the window is off, no message is copied. Settings only: the messages themselves are never saved.
+/// Off by default: while the window is off, no message is copied. Settings only: the messages themselves are never saved here (X-475: the chat
+/// history, off by default, keeps them in its own files, ChatHistory).
 /// </summary>
 public sealed class ChatSettings
 {
@@ -75,6 +76,14 @@ public sealed class ChatSettings
         LookVersion=CurrentLook;
         return true;
     }
+    /// <summary>X-475: the chat history kept on this PC (ChatHistory), per character, so that the window shows it again after a reload or a
+    /// restart. Off by default; the window turns it on only after the player said yes to what is kept, where, how long and how to erase it.</summary>
+    public bool KeepHistory{get;set;}
+    /// <summary>X-475: the history's bounds: the last messages kept (combat lines and the others each) and the days.</summary>
+    public int HistoryMessages{get;set;}=ChatHistory.DefaultMessages;
+    public int HistoryDays{get;set;}=ChatHistory.DefaultDays;
+    public int BoundedHistoryMessages=>ChatHistory.BoundedMessages(HistoryMessages);
+    public int BoundedHistoryDays=>ChatHistory.BoundedDays(HistoryDays);
     /// <summary>X-476 (0.1481, X-447 A3): a dark outline around the letters, readable on a light background, as the game's chat.</summary>
     public bool TextOutline{get;set;}=true;
     public List<ChatTabSettings>? Tabs{get;set;}

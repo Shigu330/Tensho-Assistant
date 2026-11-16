@@ -11,6 +11,13 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal ChatStore ChatMessages{get;}=new();
+    /// <summary>X-475: the folder of the chat history files (said when the player is asked to turn it on); null outside the game.</summary>
+    internal string? ChatHistoryFolder{get;set;}
+    /// <summary>X-475: « Erase the history » (every character's file, and what is queued); its answer says whether every file went.</summary>
+    internal Action<Action<bool>?>? EraseChatHistory{get;set;}
+    // X-475: the player asked to turn the history on (the question opens next); the last « Erase »: 1 every file went, 2 one is still there.
+    private bool chatHistoryAsk;
+    private volatile int chatHistoryErased;
     /// <summary>X-484 (0.1482): the game's log filters (LogFilter sheet, client language), set by the plugin; read once, on first use.</summary>
     internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource{get;set;}
     private ChatFilterTable? chatFilterTable;
@@ -123,11 +130,84 @@ internal sealed partial class MainWindow
             ChatCovered.Hide,220);
         SliderSetting("ChatWindow.FontScale","ChatWindow.FontScaleTip",()=>configuration.Chat.BoundedFontScale,value=>configuration.Chat.FontScale=value,60,200,defaults.FontScale,"%d %%");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
+        // X-475: the chat history on this PC, off by default, turned on only after the player's yes.
+        DrawChatHistorySettings(defaults);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
         if(developerMode)DrawChatKinds();
         if(chatSettingsPending && !ImGui.IsAnyItemActive()){chatSettingsPending=false;TrySave("Chat window tabs and colours");}
+    }
+
+    /// <summary>X-475 (the user's remark of 15/11, asked again on 16/11; X-447 B10): « Keep the chat history on this PC », off by default. Ticking it
+    /// asks first, in plain words: what is kept (the tabs' messages, other players' names and words included), where (the folder, one file per
+    /// character), how long (the bounds below) and how to erase it; only « Keep the history » turns it on. « Erase the history » asks too.</summary>
+    private void DrawChatHistorySettings(ChatSettings defaults)
+    {
+        BoolSetting("ChatWindow.KeepHistory","ChatWindow.KeepHistoryTip",()=>configuration.Chat.KeepHistory,value=>{if(value)chatHistoryAsk=true;else configuration.Chat.KeepHistory=false;},c=>c.Chat.KeepHistory);
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.Chat.KeepHistory);
+        try
+        {
+            IntSetting("ChatWindow.HistoryMessages","ChatWindow.HistoryMessagesTip",()=>configuration.Chat.BoundedHistoryMessages,value=>configuration.Chat.HistoryMessages=value,ChatHistory.MinimumMessages,ChatHistory.MaximumMessages,defaults.HistoryMessages);
+            IntSetting("ChatWindow.HistoryDays","ChatWindow.HistoryDaysTip",()=>configuration.Chat.BoundedHistoryDays,value=>configuration.Chat.HistoryDays=value,ChatHistory.MinimumDays,ChatHistory.MaximumDays,defaults.HistoryDays);
+        }
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
+        ImGui.BeginDisabled(EraseChatHistory is null);
+        try
+        {
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryErase")+"###ChatHistoryErase"))ImGui.OpenPopup("###ChatHistoryEraseAsk");
+            Tip("ChatWindow.HistoryEraseTip");
+        }
+        finally{ImGui.EndDisabled();}
+        if(chatHistoryErased is 1 or 2)
+        {
+            ImGui.SameLine();
+            ImGui.TextColored(chatHistoryErased==1 ? Success:Warning,localization.Get(chatHistoryErased==1 ? "ChatWindow.HistoryErased":"ChatWindow.HistoryEraseLeft"));
+        }
+        if(chatHistoryAsk){chatHistoryAsk=false;ImGui.OpenPopup("###ChatHistoryConsent");}
+        DrawChatHistoryConsent();
+        DrawChatHistoryEraseAsk();
+    }
+
+    /// <summary>X-475: the question before the history is turned on; « Keep the history » turns it on, anything else leaves it off.</summary>
+    private void DrawChatHistoryConsent()
+    {
+        var open=true;
+        if(!ImGui.BeginPopupModal(localization.Get("ChatWindow.HistoryConsentTitle")+"###ChatHistoryConsent",ref open,ImGuiWindowFlags.AlwaysAutoResize))return;
+        try
+        {
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*34);
+            ImGui.TextUnformatted(localization.Format("ChatWindow.HistoryConsentText",ChatHistoryFolder ?? "-",ChatOptions.BoundedHistoryMessages,ChatOptions.BoundedHistoryDays));
+            ImGui.PopTextWrapPos();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryConsentYes")+"###ChatHistoryYes")){configuration.Chat.KeepHistory=true;TrySave("Chat history");ImGui.CloseCurrentPopup();}
+            ImGui.SameLine();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryCancel")+"###ChatHistoryNo"))ImGui.CloseCurrentPopup();
+        }
+        finally{ImGui.EndPopup();}
+    }
+
+    /// <summary>X-475: the question before « Erase the history »: every character's file, and the window's lines.</summary>
+    private void DrawChatHistoryEraseAsk()
+    {
+        var open=true;
+        if(!ImGui.BeginPopupModal(localization.Get("ChatWindow.HistoryEraseTitle")+"###ChatHistoryEraseAsk",ref open,ImGuiWindowFlags.AlwaysAutoResize))return;
+        try
+        {
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*30);
+            ImGui.TextUnformatted(localization.Get("ChatWindow.HistoryEraseText"));
+            ImGui.PopTextWrapPos();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryEraseYes")+"###ChatHistoryEraseYes"))
+            {
+                chatHistoryErased=0;
+                EraseChatHistory?.Invoke(all=>chatHistoryErased=all ? 1:2);
+                ChatMessages.Clear();
+                ImGui.CloseCurrentPopup();
+            }
+            ImGui.SameLine();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryCancel")+"###ChatHistoryEraseNo"))ImGui.CloseCurrentPopup();
+        }
+        finally{ImGui.EndPopup();}
     }
 
     /// <summary>X-445 (0.1458): the tabs, the game's three default ones (names of the game's Addon sheet) and Social, made or completed once.</summary>

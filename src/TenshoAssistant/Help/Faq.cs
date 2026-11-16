@@ -31,6 +31,8 @@ public static class Faq
         new("Panels", "Settings"),
         // X-403 (0.1434, D-166): the Tensho chat window, beside the game's chat.
         new("ChatWindow", "Settings"),
+        // X-475: the chat history kept on this PC, off by default (what, where, how long, how to erase it).
+        new("ChatHistory", "Settings"),
         new("Pause"),
         new("Update"),
         new("Reset", "Settings"),

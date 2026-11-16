@@ -17,7 +17,7 @@ public sealed record ChatRecord(long Id,DateTimeOffset Time,int Kind,ChatChannel
 
 /// <summary>
 /// X-403 phase 1 (D-166; back from 0.471): the messages of this session, in memory only (other players' names and words are in them: never written
-/// anywhere), the oldest dropped past the bounded cap. Written from the game's chat event, read by the window, under one lock. It also holds each tab's
+/// anywhere; X-475: except, when the player turns it on with their consent, the chat history on this PC, ChatHistory), the oldest dropped past the bounded cap. Written from the game's chat event, read by the window, under one lock. It also holds each tab's
 /// view, so one clear (logout, unload, window turned off) drops every copy at once, the tabs' laid-out lines included. Counts the chat kinds seen, for
 /// developer mode (counts only, no text). X-464 M4 (0.1466): the combat lines have their own limit (the same number): an alliance raid's lines no
 /// longer push the spoken lines out; the numbers of the lines kept may then have gaps (<see cref="After"/> searches them).
@@ -86,6 +86,33 @@ public sealed class ChatStore
 
     /// <summary>A tab whose channels changed, or that was removed: its view is built again from the lines kept, as read.</summary>
     public void Restart(ChatTabSettings tab){lock(gate)views.Remove(tab);}
+
+    /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
+    /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
+    /// number given, and each tab's view is made again from them (taken as read). Returns how many were put back.</summary>
+    public int Restore(IReadOnlyList<ChatRecord> older,int cap)
+    {
+        lock(gate)
+        {
+            var first=records.Count>0 ? records[0].Time:DateTimeOffset.MaxValue;
+            var back=older.Where(record=>record.Time<first).ToList();
+            if(back.Count==0)return 0;
+            var all=new List<ChatRecord>(back.Count+records.Count);
+            all.AddRange(back);all.AddRange(records);
+            records.Clear();combat=0;
+            foreach(var record in all)
+            {
+                var numbered=record with{Id=nextId++,Channel=ChatChannels.From(record.Kind)};
+                records.Add(numbered);
+                if(numbered.Channel==ChatChannel.Combat)combat++;
+            }
+            var limit=Bounded(cap);
+            while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
+            while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
+            views.Clear();
+            return back.Count;
+        }
+    }
 
     public void Clear()
     {

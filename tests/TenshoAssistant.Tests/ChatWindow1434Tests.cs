@@ -164,7 +164,10 @@ internal static class ChatWindow1434Tests
             foreach(var file in Directory.GetFiles(Path.GetFullPath("src/TenshoAssistant/Chat"),"*.cs").Select(path=>"Chat/"+Path.GetFileName(path)).Append("MainWindow.ChatWindow.cs"))
             {
                 var code=Read(file);
-                foreach(var gone in new[]{"ProcessChatBox","SendMessage","chatGui.Print","AtomicFile","File.Write","BackgroundWriter","StreamWriter",".Update+=",".Update +="})
+                // 0.1492 (X-475, the user's choice of 15/11: kept on disk, off by default, with the player's consent): the chat history is the one
+                // part that writes, on this PC only, through the competitive gate (ChatHistory1492Tests); it sends nothing either.
+                var history=file is "Chat/ChatHistory.cs" or "Chat/ChatHistory.Dalamud.cs";
+                foreach(var gone in history ? new[]{"ProcessChatBox","SendMessage","chatGui.Print",".Update+=",".Update +="}:new[]{"ProcessChatBox","SendMessage","chatGui.Print","AtomicFile","File.Write","BackgroundWriter","StreamWriter",".Update+=",".Update +="})
                     Check(!code.Contains(gone,StringComparison.Ordinal),$"{file}: {gone} (it only reads, keeps nothing on disk, and has no framework subscription)");
             }
             Check(Read("MainWindow.TrackerWindow.cs").Contains("new(this,ChatPanelDefinition),"),"a panel window: fails alone, its close button written back");
@@ -172,7 +175,9 @@ internal static class ChatWindow1434Tests
             var plugin=Read("Plugin.cs");
             // 0.1443 (X-153): the chat family moved to Plugin.Chat.cs.
             // 0.1463 (X-461): the reader also gets developer mode (the kinds of pieces of a message with a link).
-            Check(Read("Plugin.Chat.cs").Contains("new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode),()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
+            // 0.1492 (X-475): the reader gets the chat history too, made in the same registration and released with the reader.
+            var family=Read("Plugin.Chat.cs");
+            Check(family.Contains("chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);") && family.Contains("},()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
             Check(Read("MainWindow.Settings.cs").Contains("DrawChatWindowSettings();"),"its settings in Settings › Panels beside the game");
             // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom (the lines' height declared, not measured).

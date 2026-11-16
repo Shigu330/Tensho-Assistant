@@ -119,7 +119,10 @@ What the plugin does that matters for security (read against the code of the `De
   only whether an offer is one of the player's retainers', the `Import/` and `Export/` folders, and for the GitHub exchange `github.json`,
   `community-v3.json` (the hash of each common file taken; a `community.sha256` left by a version before 0.1349 is no longer used), `github.lock` (one exchange at a time), the encrypted `github.token` and, with the GitHub App, the encrypted `github.refresh`); `GameDataSnapshot.json` (the shape of 37 game sheets, to list what a game update adds); the voyage history (since 0.1148 in `TenshoData.db`;
   the earlier file, `VoyageHistory.json`, is kept once in `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, notebook exports
-  (`Exports/`); in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
+  (`Exports/`); the chat history, only when the player turns it on in the chat window's settings (off by default, after a question that says what
+  is kept, where, how long and how to erase it): `ChatHistory/<the character's local number>.jsonl`, one file per character, the last messages within
+  the bounds the player sets (2,000 messages and 7 days by default), other players' names and words included, never sent; « Erase the history »
+  deletes every file; in developer mode, `SelfCheckSeen.json` and `PageSweepLast.txt`. The discoveries base keeps game rows and places only,
   never another player's name, position or id; import merges the files the player puts in `Import/`, export writes a file to `Export/`;
   only the GitHub exchange above sends anything. Translators can put language JSON files beside the DLL; they are validated when
   reloaded.
@@ -302,7 +305,7 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   ventes dans `MarketSeen.json`, sans nom ni identifiant de vendeur, seulement si une offre est celle d'un servant du joueur, les
   dossiers `Import/` et `Export/`, et pour l'échange GitHub `github.json`, `community-v3.json` (l'empreinte de chaque fichier commun pris ; un `community.sha256` laissé par une version d'avant 0.1349 ne sert plus), `github.lock` (un échange à la fois), le `github.token` chiffré et, avec l'application GitHub, le `github.refresh` chiffré) ;
   `GameDataSnapshot.json` (la forme de 37 feuilles du jeu, pour lister ce qu'une mise à jour ajoute) ; l'historique des voyages (depuis 0.1148 dans `TenshoData.db` ;
-  le fichier d'avant, `VoyageHistory.json`, est gardé une fois dans `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; en mode développeur,
+  le fichier d'avant, `VoyageHistory.json`, est gardé une fois dans `before-sqlite-<date>/`), `MyTools.json`, `CraftLists.json`, les exports des carnets (`Exports/`) ; l'historique du chat, seulement quand le joueur l'active dans les réglages de la fenêtre de chat (désactivé par défaut, après une question qui dit ce qui est gardé, où, combien de temps et comment l'effacer) : `ChatHistory/<numéro local du personnage>.jsonl`, un fichier par personnage, les derniers messages dans les limites que le joueur fixe (2 000 messages et 7 jours par défaut), noms et mots des autres joueurs compris, jamais envoyé ; « Effacer l'historique » supprime tous les fichiers ; en mode développeur,
   `SelfCheckSeen.json` et `PageSweepLast.txt`. La base de découvertes ne garde que des lignes du jeu et des lieux, jamais le nom, la
   position ou l'identifiant d'un autre joueur ; l'import fusionne les fichiers que le joueur place dans `Import/`, l'export écrit un
   fichier dans `Export/` ; seul l'échange GitHub ci-dessus envoie quelque chose. Les traducteurs peuvent poser des fichiers de langue JSON à côté de la DLL ; ils sont validés au rechargement.

@@ -9,13 +9,15 @@ namespace TenshoAssistant.Chat;
 /// X-403 phase 1 (D-166; back from 0.471): copies the messages the game shows (IChatGui.ChatMessageUnhandled: after the other plugins, so what they hide
 /// stays hidden) into the store, while the Tensho chat window is on: the sender's text, the message's text pieces, its kind and its time, as plain
 /// managed data, then returns. Never changes a message and sends nothing. Not read during a competitive cut. Cleared at logout and at unload; nothing
-/// goes to disk.
+/// goes to disk, except to the chat history when the player turned it on (X-475, ChatHistoryKeeper: on this PC only).
 /// </summary>
 internal sealed class ChatReader : IDisposable
 {
     private readonly RegistrationScope registrations=new();
     private readonly IPluginLog log;private readonly Func<ChatSettings> settings;private readonly ChatStore store;
     private readonly Func<bool>? developer;
+    // X-475: the chat history on disk (null: none, as outside the game).
+    private readonly ChatHistoryKeeper? history;
     private bool disposed,warned;
     // X-461 (0.1463): developer mode: the kinds of pieces of a message with a link, a few per session (kinds and lengths only, never the words).
     // X-479 (0.1468): a few per kind of message (loot lines took all twenty on 11/15 before any message of a player); and a link shown without
@@ -24,9 +26,9 @@ internal sealed class ChatReader : IDisposable
     private int bareSaid;
     private const int BareSaidMax=10;
 
-    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null)
+    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null)
     {
-        this.log=log;this.settings=settings;this.store=store;this.developer=developer;
+        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;
         // One owner for both subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
@@ -71,7 +73,9 @@ internal sealed class ChatReader : IDisposable
             // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
             var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
             // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
-            store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
+            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
+            // X-475: kept on disk too when the player turned the history on.
+            history?.Keep(record);
             warned=false;
         }
         catch(Exception error)
@@ -110,5 +114,7 @@ internal sealed class ChatReader : IDisposable
         disposed=true;
         registrations.Dispose();
         store.Clear();
+        // X-475: the history's queue (lines already made) written when it is on, then released.
+        history?.Dispose();
     }
 }
