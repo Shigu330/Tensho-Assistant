@@ -45,8 +45,8 @@ internal static class Review1472Minor1499Tests
         }),
         ("Review 1472 minor 1499 M4: the novice network's and the jobs' icons before a name are left out; others still « · »",() =>
         {
-            foreach(var icon in new uint[]{77,78,79,80,81,95,127,128,150,171})Check(ChatGlyphs.Icon(icon)=="",$"icon {icon} left out");
-            foreach(var icon in new uint[]{1,76,82,94,96,126,172})Check(ChatGlyphs.Icon(icon)=="·",$"icon {icon} still written");
+            foreach(var icon in new uint[]{77,78,79,80,81,95,108,128,150,171})Check(ChatGlyphs.SenderIcon(icon)=="",$"icon {icon} left out of a name");
+            foreach(var icon in new uint[]{1,76,82,94,96,126,127,168,169,172})Check(ChatGlyphs.SenderIcon(icon)=="·",$"icon {icon} still written");
             Check(ChatGlyphs.Icon(ChatGlyphs.CrossWorld)=="@","world icon kept");
         }),
     ];

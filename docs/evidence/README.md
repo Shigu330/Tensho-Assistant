@@ -83,6 +83,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1482-chat-log-filters.md](0.1482-chat-log-filters.md) | `src/TenshoAssistant/Chat/ChatFilters.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/ChatFilters1482Tests.cs` | — |
 | [0.1487-chat-link-said.md](0.1487-chat-link-said.md) | `tests/TenshoAssistant.Tests/ChatLinks1487Tests.cs`, `tests/TenshoAssistant.Tests/ChatReview1491Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1491-alarm-place-link.md` |
 | [0.1491-alarm-place-link.md](0.1491-alarm-place-link.md) | `src/TenshoAssistant/Alarms/AlarmPlaceLink.Dalamud.cs`, `src/TenshoAssistant/Chat/ChatGlyphs.cs`, `src/TenshoAssistant/Chat/ChatPieces.cs`, `tests/TenshoAssistant.Tests/AlarmLinks414Tests.cs`, `tests/TenshoAssistant.Tests/ChatReview1491Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1487-chat-link-said.md` |
+| [0.1501-bitmapfonticon-codes.md](0.1501-bitmapfonticon-codes.md) | `src/TenshoAssistant/Chat/ChatGlyphs.cs`, `tests/TenshoAssistant.Tests/ChatIcons1501Tests.cs` | `CHANGELOG.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.159.0-triad-npc-probe.log](0.159.0-triad-npc-probe.log) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs`, `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs`, `tests/TenshoAssistant.Tests/TriadMatchSimulatorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -314,5 +315,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 302 files · fichiers ; 256 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 303 files · fichiers ; 257 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

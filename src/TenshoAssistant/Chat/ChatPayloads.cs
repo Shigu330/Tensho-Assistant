@@ -32,9 +32,10 @@ public static class ChatPayloads
     }
 
     /// <summary>X-472 (0.1471): the plain text of payloads (a sender's name): the texts, and each icon of the game's font written readably
-    /// (« Name@World »); before, the sender's TextValue left the world icon out (« NameWorld »).</summary>
+    /// (« Name@World »); before, the sender's TextValue left the world icon out (« NameWorld »). X-524 M2 (0.1501): the decorations before
+    /// the name (novice network, class and job) are left out here only (ChatGlyphs.SenderIcon); a message's text keeps them as « · » (Pieces).</summary>
     public static string Text(IEnumerable<ChatPayload> payloads)
-        =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.Icon(payload.Icon),_=>""}));
+        =>string.Concat(payloads.Select(payload=>payload.Kind switch{ChatPayloadKind.Text=>payload.Text ?? "",ChatPayloadKind.Icon=>ChatGlyphs.SenderIcon(payload.Icon),_=>""}));
 
     /// <summary>The segments the store keeps for these payloads (ChatPieces.Segments of their pieces).</summary>
     public static IReadOnlyList<ChatSegment> Segments(IEnumerable<ChatPayload> payloads)=>ChatPieces.Segments(Pieces(payloads));
