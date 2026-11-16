@@ -52,7 +52,7 @@ internal static class ChatGameHide1504Tests
             var settings=new ChatSettings();
             Check(!settings.HideGameMessages && !settings.BothChats,"off by default");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));
-            Check(hider.Contains("CompetitiveGate.AddAlways(framework,OnUpdate)",StringComparison.Ordinal) && hider.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=false;",StringComparison.Ordinal),"runs in a cut too, to give back");
+            Check(hider.Contains("CompetitiveGate.AddAlways(framework,OnUpdate)",StringComparison.Ordinal) && hider.Contains("if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=ChatHideWant.Release;",StringComparison.Ordinal),"runs in a cut too, to give back");
             Check(hider.Contains("unit->IsVisible=false",StringComparison.Ordinal) && hider.Contains("unit->IsVisible=true",StringComparison.Ordinal),"panels hidden and shown");
             var chatLogLines=hider.Split('\n').Where(line=>line.Contains("IsVisible=",StringComparison.Ordinal));
             Check(chatLogLines.All(line=>line.Contains("Panel(index)",StringComparison.Ordinal)),"only the panels are written, never ChatLog");
@@ -60,11 +60,11 @@ internal static class ChatGameHide1504Tests
                 Check(!hider.Contains(forbidden,StringComparison.Ordinal),$"the hider does not use {forbidden}");
             Check(hider.Contains("RunOnFrameworkThread(Release)",StringComparison.Ordinal),"given back on unload");
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(window.Contains("!inDesktopApp && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats && ChatWindowShown()",StringComparison.Ordinal),"wanted only with the window open, shown and working");
+            Check(window.Contains("ChatHideWants.Of(!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats,",StringComparison.Ordinal),"wanted only with the window open and working (X-527: shown or not is ChatHideWants' choice)");
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Dashboard.cs"));
             Check(tracker.Contains("if(name==\"Chat\")chatWindowFailed=true;",StringComparison.Ordinal),"a failed chat window gives the messages back");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatHidesGameMessages)",StringComparison.Ordinal) && plugin.Contains("chatHider?.Dispose()",StringComparison.Ordinal),"registered and disposed");
+            Check(plugin.Contains("new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatGameMessagesWant)",StringComparison.Ordinal) && plugin.Contains("chatHider?.Dispose()",StringComparison.Ordinal),"registered and disposed");
         }),
     ];
 }

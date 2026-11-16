@@ -56,9 +56,14 @@ internal sealed partial class MainWindow
     private volatile bool chatWindowFailed;
 
     /// <summary>X-467 (0.1504, D-181, DEC-053 completed): whether the game chat's messages are to be hidden now (read by GameChatHider on the
-    /// game's thread): the option on and « both chats » off, Tensho's chat window open, shown and working. Out of it they are given back.</summary>
-    internal bool ChatHidesGameMessages()
-        =>!inDesktopApp && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats && ChatWindowShown();
+    /// game's thread): the option on and « both chats » off, Tensho's chat window open, shown and working. X-527 (0.1506): left as they are
+    /// while the game hides its interface (cutscene, GPose, interface hidden: Hold); given back only when really no longer wanted.</summary>
+    internal ChatHideWant ChatGameMessagesWant()
+        =>ChatHideWants.Of(!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats,
+            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
+
+    /// <summary>X-467 (0.1504): the game's messages hidden now, Tensho's window in their place.</summary>
+    internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;
 
     /// <summary>X-467 (0.1504): the window's place given from outside: over the game's messages while they are hidden; reduced to its tabs
     /// when asked (its place kept); null otherwise (the window where the player put it).</summary>

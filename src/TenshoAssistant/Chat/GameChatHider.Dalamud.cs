@@ -7,8 +7,9 @@ namespace TenshoAssistant.Chat;
 /// <summary>
 /// X-467 (0.1504, D-181 of 16/11, DEC-053 completed): « Hide the game chat's messages ». Each frame, on the game's thread: while
 /// <c>wanted</c> says so, the game's message panels (ChatLogPanel_0 to _3) are made invisible; the window ChatLog (the game's typing box, its
-/// channel menu and tabs) is never touched. Out of it (the option off, Tensho's chat window not shown, « both chats », competitive content)
-/// the panels Tensho hid are shown again (ChatGameHide), and on unload too. It also reads the box Tensho's chat window takes in that mode
+/// channel menu and tabs) is never touched. Out of it (the option off, Tensho's chat window closed, « both chats », competitive content)
+/// the panels Tensho hid are shown again (ChatGameHide), and on unload too. X-527 (0.1506): while the game hides its own interface (cutscene,
+/// GPose, interface hidden) or its chat (ChatLog not shown), they are left as they are (Hold), never shown again over it. It also reads the box Tensho's chat window takes in that mode
 /// (ChatFollow: the panel's box down to the typing box). Tensho sends nothing to the game: the typing stays the game's own. A reading that
 /// fails stops the hider and gives the panels back (R08).
 /// </summary>
@@ -17,12 +18,12 @@ internal sealed unsafe class GameChatHider : IDisposable
     private readonly IFramework framework;
     private readonly IGameGui gui;
     private readonly IPluginLog log;
-    private readonly Func<bool> wanted;
+    private readonly Func<ChatHideWant> wanted;
     private readonly ChatGameHide hide=new();
     private volatile ChatFollowPlace? place;
     private bool failed,disposed,said;
 
-    public GameChatHider(IFramework framework,IGameGui gui,IPluginLog log,Func<bool> wanted)
+    public GameChatHider(IFramework framework,IGameGui gui,IPluginLog log,Func<ChatHideWant> wanted)
     {
         this.framework=framework;this.gui=gui;this.log=log;this.wanted=wanted;
         // Always called, also during a competitive cut: the panels are given back there (wanted is false in a cut).
@@ -56,7 +57,9 @@ internal sealed unsafe class GameChatHider : IDisposable
         {
             // Given back during a competitive cut, whatever the option says.
             var now=wanted();
-            if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=false;
+            if(TenshoAssistant.Competitive.CompetitiveGate.Cut)now=ChatHideWant.Release;
+            // X-527 (0.1506): the game's chat not shown (interface hidden by the game, cutscene, HUD): nothing touched, nothing shown again.
+            if(!ChatLogShown())now=ChatHideWant.Hold;
             var states=new List<ChatPanelState>(4);
             var boxes=new List<ChatLogPanelBox>(4);
             for(var index=0;index<4;index++)
@@ -70,7 +73,7 @@ internal sealed unsafe class GameChatHider : IDisposable
             foreach(var index in toShow){var unit=Panel(index);if(unit!=null)unit->IsVisible=true;}
             if(!said && toHide.Count>0){said=true;log.Information("Game chat: its message panels hidden ({0}); the typing box stays the game's.",string.Join(", ",toHide));}
             if(toShow.Count>0)log.Information("Game chat: its message panels shown again ({0}).",string.Join(", ",toShow));
-            place=now ? Read(boxes) : null;
+            place=now==ChatHideWant.Hide ? Read(boxes) : null;
         }
         catch(Exception error)
         {
@@ -79,6 +82,13 @@ internal sealed unsafe class GameChatHider : IDisposable
             log.Warning(error,"Hiding the game chat's messages stopped; they are shown again.");
             Release();
         }
+    }
+
+    /// <summary>X-527 (0.1506): the game's chat window (typing box) ready and shown.</summary>
+    private bool ChatLogShown()
+    {
+        var handle=gui.GetAddonByName("ChatLog");
+        return !handle.IsNull && handle.IsReady && ((AtkUnitBase*)handle.Address)->IsVisible;
     }
 
     private ChatFollowPlace? Read(List<ChatLogPanelBox> boxes)

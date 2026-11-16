@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1506.0
+- Plan global, X-527 : Relecture de 0.1504, I1 (X-527) : pendant une scène cinématique, en GPose ou l'interface du jeu cachée, les messages du chat du jeu cachés par l'option restent tels quels : Tensho ne les rend plus et ne force plus leurs panneaux visibles par-dessus la cinématique (avant, ils pouvaient réapparaître). Ils reviennent seulement quand ils ne sont vraiment plus voulus : option décochée, fenêtre de chat fermée, deux chats, JcJ ou contenu classé, et en combat avec « Masquer en combat » (la fenêtre Tensho part, les messages du jeu sont le chat du combat). Rien n'est touché tant que le chat du jeu lui-même n'est pas affiché. ChatHideWant (Hide, Hold, Release) et ChatHideWants.Of, purs ; GameChatHider tient (Hold) sans rien toucher.
+- Pour les joueurs : les messages cachés du chat du jeu ne réapparaissent plus pendant une scène cinématique ni en GPose.
+- Tests : ChatGameHold1506Tests. Verify.ps1 (agent) : 2996/2996, 0 avertissement, 0 erreur ; DLL 0.1506.0.0. Non validé en jeu.
+### English
+- Review of 0.1504, I1 (X-527): during a cutscene, in GPose or with the game's interface hidden, the game chat's messages hidden by the option stay as they are: Tensho no longer gives them back nor forces their panels visible over the cutscene (before, they could come back). They come back only when really no longer wanted: option unticked, chat window closed, both chats, PvP or competitive content, and in combat with « Hide in combat » (Tensho's window goes, the game's messages are the chat of the fight). Nothing is touched while the game's chat itself is not shown. ChatHideWant (Hide, Hold, Release) and ChatHideWants.Of, pure; GameChatHider holds without touching anything.
+- For players: The game chat's hidden messages no longer come back over a cutscene or in GPose.
+
 ## 0.1505.0
 - Plan global, X-526 : Outil (X-526) : la dernière release prise par le script de release est le dernier tag Stable-x.y.z qui a une release publiée sur GitHub (gh release list, brouillons exclus), plus le dernier tag seul : la release 0.1502 a échoué à l'envoi après la pose de son tag, et les notes de la release suivante auraient oublié 0.1501 et 0.1502. Fonction Get-LastPublishedRelease (scripts/LaunchProof.ps1), lue par les deux chemins de Release.ps1 (release nouvelle et reprise) ; GitHub illisible : la release s'arrête au lieu de deviner. Un tag sans release est signalé (gardé, rien supprimé). retour.py (fichier de l'agent) prend la même base et signale ces tags.
 - Tests : ReleaseBase1505Tests. Verify.ps1 (agent) : 2993/2993, 0 avertissement, 0 erreur ; DLL 0.1505.0.0. Rien à essayer en jeu.
