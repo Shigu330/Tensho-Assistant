@@ -50,7 +50,7 @@ internal static class ChatLook1481Tests
                   && window.Contains("if(ChatOptions.TextOutline)ChatOutline(run.Text);\n        ImGui.TextColored(Accent,run.Text);", StringComparison.Ordinal), "outline under the text and the links");
             Check(window.Contains("Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y)", StringComparison.Ordinal), "narrow margins");
             var panel = Read("src/TenshoAssistant/PanelWindow.cs");
-            Check(panel.Contains("if (panel.Padding is { } padding) ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);", StringComparison.Ordinal)
+            Check(panel.Contains("if (panel.Padding is { } padding)", StringComparison.Ordinal) && panel.Contains("ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);", StringComparison.Ordinal)   // 0.1486 (X-503 M1): the usual margins kept first
                   && panel.Contains("if (paddingPushed) { ImGui.PopStyleVar(); paddingPushed = false; }", StringComparison.Ordinal), "pushed before Begin, popped");
         }),
     ];

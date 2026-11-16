@@ -191,8 +191,7 @@ internal sealed partial class MainWindow
             DrawChatTabChannels(tab);
             if(tab.Filters is null && table is { Rows.Count:>0 })
             {
-                if(ImGui.SmallButton(localization.Get("ChatWindow.FiltersUse"))){tab.Filters=table.FromChannels(tab.Channels ?? []).ToList();tab.Unlisted=true;ChatTabChanged(tab);}
-                Tip("ChatWindow.FiltersUseTip");
+                if(SettingButton("ChatWindow.FiltersUse","ChatWindow.FiltersUseTip")){tab.Filters=table.FromChannels(tab.Channels ?? []).ToList();tab.Unlisted=true;ChatTabChanged(tab);}
             }
             DrawChatTabWords(tab);
             return;
@@ -210,9 +209,7 @@ internal sealed partial class MainWindow
         }
         if(ImGui.SmallButton(localization.Get("ChatWindow.FiltersChannels"))){tab.Filters=null;ChatTabChanged(tab);return;}
         Tip("ChatWindow.FiltersChannelsTip");
-        var unlisted=tab.Unlisted;
-        if(ImGui.Checkbox(localization.Get("ChatWindow.Unlisted")+"###ChatUnlisted",ref unlisted)){tab.Unlisted=unlisted;ChatTabChanged(tab);}
-        Tip("ChatWindow.UnlistedTip");
+        CheckSetting("ChatWindow.Unlisted","ChatWindow.UnlistedTip",()=>tab.Unlisted,value=>{tab.Unlisted=value;ChatTabChanged(tab);});
         DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Discussion),localization.Get("ChatWindow.FilterDiscussion"),"Discussion");
         DrawChatFilterGroup(tab,filters,table.Rows.Where(row=>row.Category==ChatFilterTable.Announcements),localization.Get("ChatWindow.FilterAnnouncements"),"Announcements");
         var combat=table.Rows.Where(row=>ChatFilterTable.IsCombat(row.Category)).ToList();
@@ -266,35 +263,21 @@ internal sealed partial class MainWindow
     /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
     private void DrawChatTabWords(ChatTabSettings tab)
     {
-        var keep=tab.KeepWords ?? "";
-        ImGui.SetNextItemWidth(260);
-        if(ImGui.InputText(localization.Get("ChatWindow.KeepWords")+"###ChatKeepWords",ref keep,300)){tab.KeepWords=keep;ChatTabChanged(tab);}
-        Tip("ChatWindow.KeepWordsTip");
-        var hide=tab.HideWords ?? "";
-        ImGui.SetNextItemWidth(260);
-        if(ImGui.InputText(localization.Get("ChatWindow.HideWords")+"###ChatHideWords",ref hide,300)){tab.HideWords=hide;ChatTabChanged(tab);}
-        Tip("ChatWindow.HideWordsTip");
-        var matchCase=tab.WordsMatchCase;
-        if(ImGui.Checkbox(localization.Get("ChatWindow.WordsMatchCase")+"###ChatWordsCase",ref matchCase)){tab.WordsMatchCase=matchCase;ChatTabChanged(tab);}
-        Tip("ChatWindow.WordsMatchCaseTip");
+        TextSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300,260);
+        TextSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,260);
+        CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
     }
 
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
     private void DrawChatPlayers(ChatSettings options)
     {
-        var hidden=options.HiddenPlayers ?? "";
-        ImGui.SetNextItemWidth(300);
-        if(ImGui.InputText(localization.Get("ChatWindow.HiddenPlayers")+"###ChatHiddenPlayers",ref hidden,600))
+        TextSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>
         {
-            options.HiddenPlayers=hidden;
+            options.HiddenPlayers=value;
             foreach(var tab in ChatTabs(options))ChatMessages.Restart(tab);
             chatSettingsPending=true;
-        }
-        Tip("ChatWindow.HiddenPlayersTip");
-        var highlighted=options.HighlightedPlayers ?? "";
-        ImGui.SetNextItemWidth(300);
-        if(ImGui.InputText(localization.Get("ChatWindow.HighlightedPlayers")+"###ChatHighlightedPlayers",ref highlighted,600)){options.HighlightedPlayers=highlighted;chatSettingsPending=true;}
-        Tip("ChatWindow.HighlightedPlayersTip");
+        },600,300);
+        TextSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600,300);
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>

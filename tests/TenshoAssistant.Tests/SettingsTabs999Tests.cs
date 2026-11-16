@@ -27,7 +27,7 @@ internal static class SettingsTabs999Tests
             {
                 var name=todo[0];todo.RemoveAt(0);
                 if(!visited.Add(name) || !bodies.TryGetValue(name,out var body))continue;
-                foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,tab);
+                foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,tab);
                 todo.AddRange(Regex.Matches(body,@"\b(Draw\w+)\(").Select(call=>call.Groups[1].Value));
             }
         }

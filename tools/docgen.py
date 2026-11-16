@@ -310,7 +310,7 @@ def version_problems(release):
 SOURCE = ROOT / "src/TenshoAssistant"
 CONFIGURATION = SOURCE / "Configuration.cs"
 SETTINGS_INDEX = SOURCE / "SettingsIndex.cs"
-CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
+CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
 SETTING_BOX = re.compile(r'\bSettingBox\(\s*"([\w.]+)"\s*,\s*([\w.]+)\s*,')
 PROPERTY = re.compile(r"public\s+(?:required\s+)?([\w.<>?,\[\] ]+?)\s+(\w+)\s*\{\s*get\s*(;\s*(?:set|init);\s*\}(?:\s*=\s*([^;\n]+);)?|=>[^{}]*\})")
 # A property with get=>/set=> accessors reads a backing field (« ref field » or « =>field »), whose initializer is the default.
@@ -359,7 +359,7 @@ def call_body(text, start):
 # Local names of a part of Configuration in the files that draw its controls: (file, name) → property of Configuration.
 ALIASES = {("MainWindow.MapView.cs", "settings"): "MapView", ("MainWindow.MapView.cs", "contextSettings"): "MapView",
            ("MainWindow.Settings.cs", "search"): "CraftSearch", ("MainWindow.FashionWeek.cs", "options"): "FashionOptions",
-           ("MainWindow.GearWear.cs", "WearSettings"): "GearWear"}
+           ("MainWindow.GearWear.cs", "WearSettings"): "GearWear", ("MainWindow.ChatWindow.cs", "options"): "Chat"}
 
 
 def setting_path(expression, file):

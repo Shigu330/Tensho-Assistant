@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1486.0
+- Plan global, X-503 : Relecture de 0.1482 (X-503, M1 et M2). M1 : les marges étroites de la fenêtre de chat restent les siennes : le panneau de la roue dentée, les menus du clic droit et les info-bulles qu'elle ouvre reprennent les marges habituelles (rendues au contenu après Begin, PanelWindow). M2 : les réglages de X-484 (joueurs cachés et mis en avant, mots gardés ou cachés, majuscules, autres messages, filtres du jeu) passent par des composants communs (TextSetting, CheckSetting, SettingButton) : la recherche des réglages et SETTINGS.md les trouvent ; leurs info-bulles disent leur valeur par défaut. M3 (noms d'autres joueurs écrits dans la configuration) attend l'accord de l'utilisateur (R04).
+- Pour les joueurs : les menus et le panneau de réglages de la fenêtre de chat retrouvent des marges normales, et ses réglages de joueurs et de mots se trouvent par la recherche des réglages.
+- Tests : ChatReview1486Tests. Verify.ps1 (agent) : 2909/2909, 0 avertissement, 0 erreur ; DLL 0.1486.0.0. Non validé en jeu.
+### English
+- Review of 0.1482 (X-503, M1 and M2). M1: the chat window's narrow margins stay its own: the gear's panel, the right-click menus and the tooltips it opens get the usual margins back (given back to the contents after Begin, PanelWindow). M2: the settings of X-484 (hidden and highlighted players, words kept or hidden, capitals, other messages, the game's filters) go through shared helpers (TextSetting, CheckSetting, SettingButton): the settings' search and SETTINGS.md find them; their tooltips name their default. M3 (other players' names written in the configuration) waits for the user's agreement (R04).
+- For players: The chat window's menus and settings panel have normal margins again, and its player and word settings can be found by the settings' search.
+
 ## 0.1485.0
 - Plan global, X-502 : Relecture de 0.1482 (X-502) : le contour du texte de la fenêtre de chat pâlit avec elle. En mode « S'effacer », le texte pâlissait mais son contour noir restait à environ 85 % d'opacité (les couleurs d'une liste de dessin ne prennent pas l'alpha de la fenêtre) ; le contour prend maintenant cet alpha (ChatLook.Outline).
 - Pour les joueurs : quand la fenêtre de chat pâlit derrière une fenêtre du jeu, le contour sombre de son texte pâlit aussi.

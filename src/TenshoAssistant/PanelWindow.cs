@@ -19,6 +19,8 @@ internal sealed class PanelWindow : Window
     private bool borderPushed;
     private bool fadePushed;
     private bool paddingPushed;
+    // X-503 M1 (review of 0.1482): the margins before this panel's own, given back to what it opens (popups, menus, tooltips).
+    private Vector2 outerPadding;
 
     public PanelWindow(MainWindow owner, PanelDefinition panel) : base(panel.Id, panel.Flags)
     {
@@ -60,7 +62,11 @@ internal sealed class PanelWindow : Window
         if (fade is { } alphaFaded) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alphaFaded);
         // X-476 (0.1481): margins of its own (the chat window: narrow, as the game's chat).
         paddingPushed = panel.Padding is not null;
-        if (panel.Padding is { } padding) ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);
+        if (panel.Padding is { } padding)
+        {
+            outerPadding = ImGui.GetStyle().WindowPadding;
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);
+        }
     }
 
     public override void PostDraw()
@@ -77,8 +83,13 @@ internal sealed class PanelWindow : Window
         lastPosition = ImGui.GetWindowPos();
         lastSize = ImGui.GetWindowSize();
         var started = owner.DeveloperMode ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        // X-503 M1 (review of 0.1482): the window took its margins at Begin; its contents get the usual ones back, so that the gear's panel,
+        // the right-click menus and the tooltips it opens are not narrow too (a child without border has no margins of its own anyway).
+        var inner = paddingPushed;
+        if (inner) ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, outerPadding);
         try { panel.Contents(); }
         catch (Exception error) { TurnOff(error); }
+        finally { if (inner) ImGui.PopStyleVar(); }
         if (started != 0) owner.RecordOverlayDraw(panel.Name, System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
     }
 

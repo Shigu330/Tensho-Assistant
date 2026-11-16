@@ -23,6 +23,37 @@ internal sealed partial class MainWindow
         if(DefaultButton(labelKey,read()!=fallback,OnOff(fallback)))SaveSetting(labelKey,read,write,fallback);
     }
 
+    /// <summary>X-503 M2 (review of 0.1482): a text setting (the chat's players, a tab's words): label, tooltip with its default, the value
+    /// written at each change (the caller saves). Found by the settings' search and by SETTINGS.md, as the other helpers.</summary>
+    private bool TextSetting(string labelKey,string tipKey,Func<string?> read,Action<string> write,int maximum,float width)
+    {
+        var value=read() ?? "";
+        ImGui.SetNextItemWidth(width);
+        var changed=ImGui.InputText(localization.Get(labelKey)+"###"+labelKey,ref value,maximum);
+        if(changed)write(value);
+        Tip(tipKey);
+        return changed;
+    }
+
+    /// <summary>X-503 M2: an on/off setting of something that is not a field of Configuration (a chat tab): no « ↺ », its default is the
+    /// tab's own; the tooltip still names it.</summary>
+    private bool CheckSetting(string labelKey,string tipKey,Func<bool> read,Action<bool> write)
+    {
+        var value=read();
+        var changed=ImGui.Checkbox(localization.Get(labelKey)+"###"+labelKey,ref value);
+        if(changed)write(value);
+        Tip(tipKey);
+        return changed;
+    }
+
+    /// <summary>X-503 M2: a button that changes a setting (a tab's way of choosing its messages), with its tooltip naming the default.</summary>
+    private bool SettingButton(string labelKey,string tipKey)
+    {
+        var clicked=ImGui.SmallButton(localization.Get(labelKey)+"###"+labelKey);
+        Tip(tipKey);
+        return clicked;
+    }
+
     /// <summary>The name of an on/off default, for the « ↺ » tooltip.</summary>
     private string OnOff(bool value)=>localization.Get(value ? "Settings.On":"Settings.Off");
 

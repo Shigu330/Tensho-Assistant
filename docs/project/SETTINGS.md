@@ -19,6 +19,11 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(Advanced.DesktopAutoUpdate)` | — | — | Settings › Advanced | **Automatic update of the desktop app** — The desktop app updates itself at its start to the installed plugin's version (from the same GitHub release, SHA-256 checked); kept in the app's own file, as its « Automatic update » button. Default: on. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Game data and what you observed only** — Turns off the eight community sources below at once (no download, their lines leave the tooltips); your own choices for each are kept and come back when you turn it off. Your discoveries and the shared ones stay. Default: off. |
 | `(Advanced.PagePlace)` | — | — | Settings › Advanced | **Listed in** — Where this page is listed in the navigation: in the game and in the desktop app, in the game only, or in the desktop app only. A page left out of a navigation still opens from a link, a command or another page. Default: game and app. |
+| `(ChatWindow.FiltersUse)` | — | — | Settings › Panels | **Use the game's filters** — Shows this tab with the filters of the game's log window, finer than channels (combat lines by who does what to whom). They start from the channels chosen here. Default: by channels. |
+| `(ChatWindow.HideWords)` | — | — | Settings › Panels | **Hide with** — Hides the messages that hold one of these words (commas between words). Default: empty. |
+| `(ChatWindow.KeepWords)` | — | — | Settings › Panels | **Only with** — Only the messages that hold one of these words (commas between words); empty: all. Default: empty. |
+| `(ChatWindow.Unlisted)` | — | — | Settings › Panels | **Other messages** — Also the messages none of the game's filters covers (kinds the game's log window does not list). Default: on. |
+| `(ChatWindow.WordsMatchCase)` | — | — | Settings › Panels | **Capitals count** — The words above match only with the same capitals. Default: off. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Size** — Size in pixels (10 to 40). Default: 24 for titles, 19 for sections, 17 for text. |
 | `(MapView.ShowLockedQuests)` | — | — | Settings › Map | **Quests not available yet** — Shows the quests not unlocked yet (their previous quests are not done). Off, they leave the map and this list; a quest you have unlocked stays, even when the game draws it in red because your level or your current job is not the one it asks; a seasonal event's quest counts as not available outside its event. Greyed while « Quests and objectives » is off. Default: on. |
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
@@ -40,7 +45,9 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.Borderless` | bool | false | Settings › Panels | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.FontScale` | int | 100 | Settings › Panels | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
+| `Chat.HiddenPlayers` | string? | null | Settings › Panels | **Hidden players** — No tab shows what these players write (names with commas between them, the world not needed). Only in Tensho's window: the game's chat is unchanged. Default: none. |
 | `Chat.HideInCombat` | bool | false | Settings › Panels | **Hide in combat** — Hides the window during combat; messages are still copied. Default: off. |
+| `Chat.HighlightedPlayers` | string? | null | Settings › Panels | **Players put forward** — The name of these players stands out in the window (names with commas between them, the world not needed). Default: none. |
 | `Chat.Locked` | bool | false | Settings › Panels | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MaxLines` | int | 2000 | Settings › Panels | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
 | `Chat.Opacity` | int | 40 | Settings › Panels | **Background opacity** — Opacity of the window's background, from 0% (transparent) to 100%. Default: 40%. |
@@ -340,7 +347,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 284 controls (276 linked to `Configuration`, 8 to another file), 34 settings without a control.
+Counted: 291 controls (278 linked to `Configuration`, 13 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -365,6 +372,11 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(Advanced.DesktopAutoUpdate)` | — | — | Paramètres › Avancé | **Mise à jour automatique de l'application de bureau** — L'application de bureau se met à jour à son démarrage vers la version du plugin installé (depuis la même release GitHub, SHA-256 vérifié) ; réglage gardé dans le fichier de l'application, comme son bouton « Mise à jour automatique ». Par défaut : activé. |
 | `(Advanced.GameDataOnly)` | — | — | `MainWindow.GameDataOnly.cs` | **Données du jeu et vos observations seulement** — Coupe d'un coup les huit sources communautaires ci-dessous (aucun téléchargement, leurs lignes quittent les infobulles) ; vos choix pour chacune sont gardés et reviennent quand vous décochez. Vos découvertes et celles partagées restent. Par défaut : désactivé. |
 | `(Advanced.PagePlace)` | — | — | Paramètres › Avancé | **Listée dans** — Où cette page est listée dans la navigation : dans le jeu et dans l'application de bureau, dans le jeu seulement, ou dans l'application seulement. Une page absente d'une navigation s'ouvre toujours depuis un lien, une commande ou une autre page. Par défaut : jeu et application. |
+| `(ChatWindow.FiltersUse)` | — | — | Paramètres › Panneaux à côté du jeu | **Utiliser les filtres du jeu** — Cet onglet se règle avec les filtres de la fenêtre de discussion du jeu, plus fins que les canaux (lignes de combat selon qui fait quoi à qui). Ils partent des canaux choisis ici. Par défaut : par canaux. |
+| `(ChatWindow.HideWords)` | — | — | Paramètres › Panneaux à côté du jeu | **Cacher avec** — Cache les messages qui contiennent l'un de ces mots (virgules entre les mots). Par défaut : vide. |
+| `(ChatWindow.KeepWords)` | — | — | Paramètres › Panneaux à côté du jeu | **Seulement avec** — Seulement les messages qui contiennent l'un de ces mots (virgules entre les mots) ; vide : tous. Par défaut : vide. |
+| `(ChatWindow.Unlisted)` | — | — | Paramètres › Panneaux à côté du jeu | **Autres messages** — Aussi les messages qu'aucun filtre du jeu ne couvre (types que la fenêtre de discussion du jeu ne liste pas). Par défaut : activé. |
+| `(ChatWindow.WordsMatchCase)` | — | — | Paramètres › Panneaux à côté du jeu | **Respecter les majuscules** — Les mots ci-dessus ne comptent qu'avec les mêmes majuscules. Par défaut : désactivé. |
 | `(FontSettings.Size)` | — | — | `MainWindow.FontSettings.cs` | **Taille** — Taille en pixels (10 à 40). Par défaut : 24 pour les titres, 19 pour les sections, 17 pour le texte. |
 | `(MapView.ShowLockedQuests)` | — | — | Paramètres › Carte | **Quêtes pas encore disponibles** — Montre les quêtes pas encore débloquées (leurs quêtes préalables ne sont pas faites). Réglage désactivé, elles quittent la carte et cette liste ; une quête que vous avez débloquée reste, même quand le jeu la dessine en rouge parce que votre niveau ou votre job actuel n'est pas celui qu'elle demande ; une quête d'événement saisonnier compte comme pas encore disponible hors de son événement. Grisé tant que « Quêtes et objectifs » est désactivé. Par défaut : activé. |
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
@@ -386,7 +398,9 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
+| `Chat.HiddenPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs cachés** — Aucun onglet ne montre ce qu'écrivent ces joueurs (noms séparés par des virgules, le monde n'est pas nécessaire). Seulement dans la fenêtre de Tensho : le chat du jeu ne change pas. Par défaut : aucun. |
 | `Chat.HideInCombat` | bool | false | Paramètres › Panneaux à côté du jeu | **Masquer en combat** — Masque la fenêtre pendant un combat ; les messages sont toujours copiés. Par défaut : désactivé. |
+| `Chat.HighlightedPlayers` | string? | null | Paramètres › Panneaux à côté du jeu | **Joueurs mis en avant** — Le nom de ces joueurs ressort dans la fenêtre (noms séparés par des virgules, le monde n'est pas nécessaire). Par défaut : aucun. |
 | `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
 | `Chat.Opacity` | int | 40 | Paramètres › Panneaux à côté du jeu | **Opacité du fond** — Opacité du fond de la fenêtre, de 0 % (transparent) à 100 %. Par défaut : 40 %. |
@@ -686,5 +700,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 284 cases (276 reliées à `Configuration`, 8 à un autre fichier), 34 réglages sans case.
+Compté : 291 cases (278 reliées à `Configuration`, 13 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
