@@ -2077,6 +2077,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1500) Carte de Tensho, colonne d'outils : le texte des deux cases « 100% » (le pourcentage et le bouton dessous) est centré dans son cadre, à 100 % puis à 150 % de zoom, carte superposée puis en petite fenêtre, en français puis en anglais.
 
+- [ ] (0.1501) Fenêtre de chat, onglet du réseau des novices : un message qui contient une icône de classe ou du réseau des novices dans son texte la montre « · » ; le nom de l'expéditeur reste sans « · » devant.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
