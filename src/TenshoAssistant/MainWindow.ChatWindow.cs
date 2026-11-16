@@ -50,6 +50,8 @@ internal sealed partial class MainWindow
 
     /// <summary>X-467 (0.1504): the box the game's messages leave free while they are hidden (GameChatHider.Place, set by the plugin).</summary>
     internal Func<ChatFollowPlace?>? ChatGamePlace{get;set;}
+    /// <summary>X-533 (0.1508): the game's channel menu open while its messages are hidden (GameChatHider.ChannelMenuOpen, set by the plugin).</summary>
+    internal Func<bool>? ChatGameChannelMenu{get;set;}
     // X-467 (0.1504): the window drawn over the game's messages this frame; reduced to its tabs (« both chats »), for this session.
     private bool chatFollowing,chatReduced;
     // X-467 (0.1504): the window failed (PanelWindow turned it off): the game's messages are never left hidden behind it.
@@ -102,6 +104,8 @@ internal sealed partial class MainWindow
     private bool ChatWindowVisible()
     {
         if(!ChatWindowShown())return false;
+        // X-533 (0.1508): over the game's messages, the window steps aside while the game's channel menu is open (the menu opens upward over it).
+        if(ChatFollow.StepsAside(ChatHidesGameMessages(),ChatGameChannelMenu?.Invoke()==true))return false;
         var at=chatAt ?? Vector2.Zero;
         var covered=ChatCover.Bounded(ChatOptions.WhenCovered)!=ChatCovered.Stay && chatAt is not null && BehindGame(at,chatSize,chat:true);
         if(covered!=chatCovered && developerMode)

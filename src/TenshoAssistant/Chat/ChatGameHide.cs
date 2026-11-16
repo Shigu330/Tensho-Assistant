@@ -94,13 +94,39 @@ public static class ChatFollow
         return width>0 && height>0 && width*height*2>=panel.Width*panel.Height;
     }
 
-    public static ChatLogBox? Box(IReadOnlyList<ChatLogPanelBox> panels,ChatLogBox window,ChatLogBox? input)
+    public static ChatLogBox? Box(IReadOnlyList<ChatLogPanelBox> panels,ChatLogBox window,ChatLogBox? input)=>Box(panels,window,input,null);
+
+    /// <summary>X-533 (0.1508, the user's request of 16/11): the frame of the game's messages and tabs, Tensho's window taking exactly their
+    /// place. Top: ChatLog's own top when the game draws its tabs there, above the panel (within the panel's upper half); else the panel's.
+    /// Bottom: the highest plausible top of the typing row, the typing box or the current channel's name (« Say » above the typing line, cut
+    /// by Tensho's window on the capture of 16/11 23 h 10), each one used only inside ChatLog and in the panel's lower half.</summary>
+    public static ChatLogBox? Box(IReadOnlyList<ChatLogPanelBox> panels,ChatLogBox window,ChatLogBox? input,ChatLogBox? channelName)
     {
         if(panels.Count==0)return null;
         var panel=panels.FirstOrDefault(each=>each.Index==0,panels[0]).Box;
         if(panel.Width<MinimumSide || panel.Height<MinimumSide)return null;
+        var top=window.Y<panel.Y && panel.Y-window.Y<panel.Height/2 ? window.Y:panel.Y;
         var bottom=panel.Y+panel.Height;
-        if(input is { } typing && typing.Inside(window) && typing.Y>panel.Y+panel.Height/2 && typing.Y<bottom)bottom=typing.Y;
-        return new ChatLogBox(panel.X,panel.Y,panel.Width,bottom-panel.Y);
+        foreach(var row in new[]{input,channelName})
+            if(row is { } typing && typing.Inside(window) && typing.Y>panel.Y+panel.Height/2 && typing.Y<bottom)bottom=typing.Y;
+        return new ChatLogBox(panel.X,top,panel.Width,bottom-top);
     }
+
+    /// <summary>X-533 (0.1508): the game's channel menu opens upward from the typing box, over the place of the messages, where Tensho's window
+    /// is: a window drawn by Dalamud is always over the game's, so the menu would be behind it. While Tensho's window takes the messages' place
+    /// and that menu is open, the window is not drawn (the game's messages stay hidden: nothing blinks); back when the menu closes.</summary>
+    public static bool StepsAside(bool following,bool channelMenuOpen)=>following && channelMenuOpen;
+}
+
+/// <summary>X-533 (0.1508, the user's choice of 16/11 around 23 h 20): the parts of the game chat's tab bar Tensho hides with the messages (nodes of
+/// ChatLog, FFXIVClientStructs' AddonChatLog): its five tabs (ChatTabs), the « add a tab » button, the bar's two end images and the settings
+/// button. Its typing box and channel menu are never hidden. Each part is a slot of a ChatGameHide (the same rules: only what Tensho hid is
+/// given back).</summary>
+public static class ChatTabBar
+{
+    public const int Tabs=5,AddTab=5,BarStart=6,BarEnd=7,Settings=8,Count=9;
+
+    /// <summary>A slot is read only when its node exists; a tab only below the game's tab count (the other tab nodes are the game's own,
+    /// hidden by it).</summary>
+    public static bool Ready(int slot,int tabCount,bool node)=>node && (slot>=Tabs || slot<tabCount);
 }
