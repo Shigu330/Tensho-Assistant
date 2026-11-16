@@ -110,11 +110,13 @@ internal sealed partial class MainWindow
         return clicked && enabled;
     }
 
-    private bool TextToolButton(string text,string tooltipKey,bool enabled=true)
+    private bool TextToolButton(string text,string tooltipKey,bool enabled=true,float width=0)
     {
         ImGui.BeginDisabled(!enabled);
         bool clicked;
-        try{clicked=ImGui.Button($"{text}##{tooltipKey}",new Vector2(Math.Max(ImGui.GetFrameHeight(),ImGui.CalcTextSize(text).X+ImGui.GetStyle().FramePadding.X),ImGui.GetFrameHeight()));}
+        // X-460: a padding on each side of the text (one only put the label off centre, to the right); a wider box given by the caller.
+        var size=Math.Max(width,UI.CenteredText.ButtonWidth(ImGui.CalcTextSize(text).X,ImGui.GetStyle().FramePadding.X,ImGui.GetFrameHeight()));
+        try{clicked=ImGui.Button($"{text}##{tooltipKey}",new Vector2(size,ImGui.GetFrameHeight()));}
         finally{ImGui.EndDisabled();}
         Tip(tooltipKey);
         return clicked && enabled;

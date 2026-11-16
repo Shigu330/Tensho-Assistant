@@ -496,7 +496,9 @@ internal sealed partial class MainWindow
         const int buttons=9;
         var perColumn=slider>0 ? buttons:Math.Clamp((int)((room-label-style.WindowPadding.Y*2)/step),1,buttons);
         var columns=(buttons+perColumn-1)/perColumn;
-        var width=Math.Max(34,ImGui.CalcTextSize("100%").X+style.FramePadding.X+style.WindowPadding.X)+(columns-1)*30;
+        // X-460: the column holds the « 100% » boxes with a padding on each side (UI.CenteredText).
+        var hundred=UI.CenteredText.ButtonWidth(ImGui.CalcTextSize("100%").X,style.FramePadding.X,26);
+        var width=Math.Max(34,Math.Max(hundred,ImGui.CalcTextSize("100%").X+style.FramePadding.X+style.WindowPadding.X))+(columns-1)*30;
         var height=!overlay ? 0:slider>0 ? buttons*step+slider+label+2*style.ItemSpacing.Y+style.WindowPadding.Y*2
             :Math.Min(perColumn,buttons)*step+label+style.WindowPadding.Y*2;
         if(!ImGui.BeginChild("MapTools",new Vector2(width,height),false,ImGuiWindowFlags.NoScrollbar|(overlay ? ImGuiWindowFlags.NoBackground:ImGuiWindowFlags.None))){ImGui.EndChild();return width;}
@@ -543,9 +545,12 @@ internal sealed partial class MainWindow
             var lastColumn=slider>0 ? 0:(buttons-1)/perColumn;
             if(slider<=0)ImGui.SetCursorPosY(top+((buttons-1)%perColumn+1)*step);
             var columnX=left+lastColumn*30;
-            var fieldWidth=Math.Max(26,ImGui.CalcTextSize("100%").X+style.FramePadding.X);
+            // X-460: both boxes as wide as « 100% » with a padding on each side, their text in the middle (the field's text is left-aligned
+            // by ImGui: its left padding is widened to centre it).
+            var fieldWidth=hundred;
             ImGui.SetCursorPosX(Math.Max(0,columnX));
             if(overlay)ImGui.PushStyleColor(ImGuiCol.Text,MapOverlayText);
+            ImGui.PushStyleVar(ImGuiStyleVar.FramePadding,new Vector2(UI.CenteredText.Padding(fieldWidth,ImGui.CalcTextSize(text).X,1),style.FramePadding.Y));
             try
             {
                 ImGui.SetNextItemWidth(fieldWidth);
@@ -553,10 +558,10 @@ internal sealed partial class MainWindow
                 if(ImGui.InputText("##MapZoomTyped",ref typed,8,ImGuiInputTextFlags.CharsDecimal|ImGuiInputTextFlags.AutoSelectAll|ImGuiInputTextFlags.EnterReturnsTrue)
                    && MapProjection.ZoomFromPercent(typed) is { } typedZoom)ZoomTo(typedZoom);
             }
-            finally{if(overlay)ImGui.PopStyleColor();}
+            finally{ImGui.PopStyleVar();if(overlay)ImGui.PopStyleColor();}
             Tip("MapView.ZoomLevel");
             ImGui.SetCursorPosX(Math.Max(0,columnX));
-            if(TextToolButton("100%","MapView.Zoom100"))ZoomTo(1);
+            if(TextToolButton("100%","MapView.Zoom100",width:fieldWidth))ZoomTo(1);
         }
         finally{ImGui.EndChild();}
         return width;
