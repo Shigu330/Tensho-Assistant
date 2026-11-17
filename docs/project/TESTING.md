@@ -20,7 +20,7 @@ livré à côté de la DLL depuis 0.248 ; aucune assembly de l'hôte redistribu�
   `artifacts/verify-stamp.json`) ; `-Force` les relance.
 - Exécutable seul, après un build : `dotnet run --project tests/TenshoAssistant.Tests -c Release --no-build`, **depuis la racine du
   dépôt**, avec le SDK que choisit Verify.ps1 (le plus récent `%USERPROFILE%\.codex\dotnet-10.*\dotnet.exe` s'il existe, sinon
-  `C:\ia-code\.tools\dotnet10\dotnet.exe`, sinon `dotnet`). Le test des infobulles de réglages lit `src/TenshoAssistant` et ses langues ; ceux de la compagnie libre lisent
+  `dotnet`). Le test des infobulles de réglages lit `src/TenshoAssistant` et ses langues ; ceux de la compagnie libre lisent
   `src/TenshoAssistant/FreeCompany/Data/`.
 - Dernier passage : ligne « Tests » de la dernière entrée du [CHANGELOG](../../CHANGELOG.md). En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
 

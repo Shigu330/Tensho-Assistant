@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1539.0
+- X-570 (audit du 17/11, partie A, points 6 et 9), partie suivie : Verify.ps1 ne cherche plus le SDK .NET dans l'ancien dossier C:\ia-code (le plus récent ~/.codex/dotnet-10.*, sinon dotnet) ; TESTING le dit. tools/client-snapshot.py prend le SDK par la même règle (plus de version écrite en dur, TENSHO_DOTNET accepté). .github/codeql/codeql-config.yml retiré : aucun workflow ne le lisait. Test ToolPaths1539Tests.
+- Tests : ToolPaths1539Tests. Verify.ps1 (agent) : 3079/3079, 0 avertissement, 0 erreur ; DLL 0.1539.0.0. Rien à essayer en jeu.
+### English
+- X-570 (audit of 17/11, part A, items 6 and 9), tracked part: Verify.ps1 no longer looks for the .NET SDK in the old C:\ia-code folder (the newest ~/.codex/dotnet-10.*, else dotnet); TESTING says so. tools/client-snapshot.py picks the SDK by the same rule (no hard-coded version, TENSHO_DOTNET accepted). .github/codeql/codeql-config.yml removed: no workflow read it. Test ToolPaths1539Tests.
+
 ## 0.1538.0
 - Plan global, X-567 : X-567 (audit du 17/11, partie B) : quatre textes vus par les joueurs disent ce que fait le code. FAQ de la fenêtre de chat : le chat du jeu n'est plus « jamais caché » ; l'option « Cacher les messages du chat du jeu » (désactivée par défaut, depuis 0.1504) y est nommée. FAQ et README (application de bureau) : les alarmes sonnent depuis l'application (ligne de la barre d'état, son et notification Windows, par défaut quand le jeu n'est pas au premier plan), au lieu de « restent vides ». SECURITY : historique du chat « 2 000 messages et 30 jours par défaut » (7 avant, le code dit 30). FAQ du Jardin : chemin Suivi › Jardinage › onglet Jardin › « Vue détaillée ». Test FaqTruth1538Tests : chaque texte lié au code (libellé de l'option, ChatHistory.DefaultDays et DefaultMessages, groupe et onglet de la page Jardin).
 - Pour les joueurs : la FAQ, le README et la page SECURITY disent maintenant ce que fait le plugin : l'option de la fenêtre de chat peut cacher le chat du jeu, l'application de bureau sonne les alarmes, l'historique du chat garde 30 jours par défaut, et la vue détaillée du jardin se trouve dans Suivi › Jardinage.

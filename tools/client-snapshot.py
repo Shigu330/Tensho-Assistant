@@ -150,11 +150,16 @@ def import_cache(folder, root, label=None, quiet=False):
     return added
 
 
+def newest_local_sdk(home=None):
+    """The newest ~/.codex/dotnet-10.*/dotnet.exe (versions compared as numbers), or None."""
+    found = [p for p in (Path(home or Path.home()) / ".codex").glob("dotnet-10.*/dotnet.exe") if p.is_file()]
+    key = lambda p: tuple(int(x) for x in re.findall(r"\d+", p.parent.name.replace("dotnet-", "")))
+    return str(max(found, key=key)) if found else None
+
+
 def build_tool():
-    dotnet = os.environ.get("DOTNET") or "dotnet"
-    local = Path.home() / ".codex" / "dotnet-10.0.403" / "dotnet.exe"
-    if not os.environ.get("DOTNET") and local.exists():
-        dotnet = str(local)
+    # The same rule as Verify.ps1: DOTNET (or TENSHO_DOTNET) when set, else the newest ~/.codex/dotnet-10.*, else « dotnet » on the PATH.
+    dotnet = os.environ.get("DOTNET") or os.environ.get("TENSHO_DOTNET") or newest_local_sdk() or "dotnet"
     r = subprocess.run([dotnet, "build", str(TOOL), "-c", "Release", "-nologo", "-v", "q"], capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
     if r.returncode != 0:
