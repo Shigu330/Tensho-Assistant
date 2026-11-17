@@ -70,8 +70,19 @@ public static class BeastTeams
             var score = Score(team);
             if (best is null || score.CompareTo(bestScore) > 0) { best = team; bestScore = score; }
         }
-        return (best ?? [], bestScore.Item1);
+        return (CallOrder(best ?? [], scores), bestScore.Item1);
     }
+
+    /// <summary>
+    /// X-575 part 4 (0.1544, the user's request of 17/11 around 23:25: « the best beasts for the fights, knowing they come out one at a time:
+    /// weakness first, then the rest, stats and others »): the three in calling order, the best first: the enemies whose weakness it hits, then
+    /// its attack against their resistances, then its defence (DescriptionString 1751: Force and Intelligence the damage dealt, the resistances
+    /// the damage taken, Vitalité the HP). The rank counts only through the attributes it gives. The enemies' vulnerabilities to effects are
+    /// not used: their meaning is not established (docs/evidence/0.1523-beast-weakness.md).
+    /// </summary>
+    private static int[] CallOrder(int[] picks, (bool Weak, double Attack, double Guard)[][] scores)
+        => picks.OrderByDescending(member => scores[member].Count(value => value.Weak)).ThenByDescending(member => scores[member].Sum(value => value.Attack))
+            .ThenByDescending(member => scores[member].Sum(value => value.Guard)).ThenBy(member => member).ToArray();
 
     private static IEnumerable<int[]> Combinations(int count, int size)
     {
@@ -142,8 +153,9 @@ public static class BeastTeams
         return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown, left);
     }
 
-    /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.</summary>
-    public const int PlanVersion = 2;
+    /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
+    /// 3 (0.1544): each fight's three in calling order.</summary>
+    public const int PlanVersion = 3;
 
     /// <summary>
     /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made

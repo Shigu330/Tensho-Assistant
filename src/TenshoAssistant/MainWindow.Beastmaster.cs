@@ -291,7 +291,7 @@ internal sealed partial class MainWindow
             ImGui.Indent();
             try
             {
-                ImGui.TextUnformatted("→ " + Names(fight.Trio));
+                DrawBeastCallOrder(battle, fight.Trio, catalog);
                 if (fight.Lost.Count > 0) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", Names(fight.Lost), fight.Instead.Count > 0 ? Names(fight.Instead) : "—"));
             }
             finally { ImGui.Unindent(); }
@@ -460,14 +460,12 @@ internal sealed partial class MainWindow
         ImGui.Indent();
         try
         {
-            foreach (var id in trio)
+            for (var place = 0; place < trio.Count; place++)
             {
+                var id = trio[place];
                 var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
                 if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); }
-                var hits = BeastTeams.Hits(fight, beast);
-                var name = beast?.Name ?? $"#{id}";
-                if (hits.Count > 0) ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonHits", name, beast!.AutoAttack, string.Join(", ", hits)));
-                else ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonNone", name));
+                ImGui.TextUnformatted(BeastCallText(fight, place, id, catalog));
                 DrawBeastCombo(id);
             }
             if (fromTeam is { Lost.Count: > 0 } lost)
@@ -475,6 +473,25 @@ internal sealed partial class MainWindow
                     lost.Instead.Count > 0 ? string.Join(", ", lost.Instead.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")) : "—"));
         }
         finally { ImGui.Unindent(); }
+    }
+
+    /// <summary>X-575 part 4 (0.1544): a beast called for a fight: its place in the calling order, its name and why (the enemies whose weakness it
+    /// hits, else its attack and defence). One text for the plan, the team taken and the fight shown.</summary>
+    private string BeastCallText(BoardBattle fight, int place, uint id, BeastCatalog catalog)
+    {
+        var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
+        var hits = BeastTeams.Hits(fight, beast);
+        var name = beast?.Name ?? $"#{id}";
+        return hits.Count > 0 ? localization.Format("BeastUi.FightReasonHits", place + 1, name, beast!.AutoAttack, string.Join(", ", hits))
+            : localization.Format("BeastUi.FightReasonNone", place + 1, name);
+    }
+
+    /// <summary>X-575 part 4 (0.1544): the three of a fight in calling order, the best first (BeastTeams.Best orders them).</summary>
+    private void DrawBeastCallOrder(BoardBattle fight, IReadOnlyList<uint> trio, BeastCatalog catalog)
+    {
+        if (trio.Count == 0) return;
+        ImGui.TextDisabled(localization.Get("BeastUi.CallOrder"));
+        for (var place = 0; place < trio.Count; place++) ImGui.TextUnformatted(BeastCallText(fight, place, trio[place], catalog));
     }
 
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
@@ -535,7 +552,7 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
-                ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+                DrawBeastCallOrder(fight, battle.Team.Select(pick => pick.Beast).ToArray(), catalog);
                 // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it. X-562 M3: worked out once per
                 // plan and beasts held, not at each frame (R07).
                 foreach (var miss in BeastMissed(plan, battle, fight, catalog))

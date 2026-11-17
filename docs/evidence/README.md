@@ -90,7 +90,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1517-chat-channel-help.md](0.1517-chat-channel-help.md) | `src/TenshoAssistant/Chat/ChatHelp.cs`, `tests/TenshoAssistant.Tests/ChatHelp1517Tests.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [0.1518-chat-filter-genres.md](0.1518-chat-filter-genres.md) | `tests/TenshoAssistant.Tests/ChatGenres1518Tests.cs` | — |
 | [0.1522-beast-board-read.md](0.1522-beast-board-read.md) | `src/TenshoAssistant/Beastmaster/BeastTeams.cs` | — |
-| [0.1523-beast-weakness.md](0.1523-beast-weakness.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | `docs/evidence/0.1529-beast-fight-shown.md`, `docs/evidence/0.1543-beast-plan.md` |
+| [0.1523-beast-weakness.md](0.1523-beast-weakness.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs` | `docs/evidence/0.1529-beast-fight-shown.md`, `docs/evidence/0.1543-beast-plan.md` |
 | [0.1529-beast-fight-shown.md](0.1529-beast-fight-shown.md) | `src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs` | — |
 | [0.1530-beast-instinct.md](0.1530-beast-instinct.md) | `src/TenshoAssistant/Beastmaster/BeastInstinct.cs` | — |
 | [0.1543-beast-plan.md](0.1543-beast-plan.md) | `tests/TenshoAssistant.Tests/BeastPlan1543Tests.cs` | `CHANGELOG.md` |
