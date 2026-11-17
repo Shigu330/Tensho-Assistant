@@ -92,6 +92,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1522-beast-board-read.md](0.1522-beast-board-read.md) | `src/TenshoAssistant/Beastmaster/BeastTeams.cs` | — |
 | [0.1523-beast-weakness.md](0.1523-beast-weakness.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | `docs/evidence/0.1529-beast-fight-shown.md` |
 | [0.1529-beast-fight-shown.md](0.1529-beast-fight-shown.md) | `src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs` | — |
+| [0.1530-beast-instinct.md](0.1530-beast-instinct.md) | `src/TenshoAssistant/Beastmaster/BeastInstinct.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.159.0-triad-npc-probe.log](0.159.0-triad-npc-probe.log) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs`, `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs`, `tests/TenshoAssistant.Tests/TriadMatchSimulatorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.160.0-triad-match-capture.log](0.160.0-triad-match-capture.log) | `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -322,5 +323,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 310 files · fichiers ; 264 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 311 files · fichiers ; 265 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

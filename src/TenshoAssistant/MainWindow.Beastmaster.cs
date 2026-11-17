@@ -376,6 +376,28 @@ internal sealed partial class MainWindow
         DrawBeastBoardWhole(board, plan, team, catalog, state, wrapAt);
     }
 
+    /// <summary>X-136 (0.1530): an action's name in the game's language (empty: not known, the desktop application).</summary>
+    internal Func<uint, string>? BeastActionName { get; set; }
+
+    /// <summary>
+    /// X-136 (0.1530): a beast's Trick affinity and its two intentional combos (« combo instinctif II »): the beastmaster's skill before the
+    /// Trick, or after it, with the kind (BeastInstinct, from the game's help). Shown before the fight only; nothing is sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastCombo(uint beast)
+    {
+        var combos = BeastInstinct.Combos(beast);
+        if (combos.Count < 2) return;
+        string Skill(BeastInstinct.Combo combo) => BeastActionName?.Invoke(combo.Skill) is { Length: > 0 } name ? name : localization.Get("BeastUi.Affinity" + combo.SkillAffinity);
+        var trick = BeastActionName?.Invoke(BeastInstinct.Trick(beast)) ?? "";
+        ImGui.Indent();
+        try
+        {
+            ImGui.TextDisabled(localization.Format("BeastUi.ComboLine", localization.Get("BeastUi.Affinity" + BeastInstinct.Of(beast)), trick.Length > 0 ? trick : "—",
+                Skill(combos[0]), localization.Get("BeastUi.Combo" + combos[0].Kind), Skill(combos[1]), localization.Get("BeastUi.Combo" + combos[1].Kind)));
+        }
+        finally { ImGui.Unindent(); }
+    }
+
     /// <summary>X-486 (0.1529): the fights the game's board window shows (null: not read).</summary>
     internal Func<IReadOnlySet<uint>?>? BeastFightsShown { get; set; }
 
@@ -435,6 +457,7 @@ internal sealed partial class MainWindow
                 var name = beast?.Name ?? $"#{id}";
                 if (hits.Count > 0) ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonHits", name, beast!.AutoAttack, string.Join(", ", hits)));
                 else ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonNone", name));
+                DrawBeastCombo(id);
             }
             if (fromTeam is { Lost.Count: > 0 } lost)
                 ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", string.Join(", ", lost.Lost.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")),

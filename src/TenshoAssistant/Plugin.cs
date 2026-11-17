@@ -521,6 +521,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
             // X-486 (0.1529): the fights the game's board window shows.
             mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
+            // X-136 (0.1530): the names of the beasts' Tricks and of the beastmaster's skills, from the game's Action sheet.
+            mainWindow.BeastActionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
