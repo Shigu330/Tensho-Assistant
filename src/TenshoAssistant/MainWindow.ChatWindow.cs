@@ -479,16 +479,11 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("ChatWindow.GroupNone"))){filters.RemoveAll(chosen=>list.Any(row=>row.Id==chosen));ChatTabChanged(tab);}
             Tip("ChatWindow.GroupNoneTip");
-            foreach(var row in list)
+            DrawChatCheckGrid("###ChatFilterRows"+id,list,row=>row.Name,row=>"ChatFilterRow"+row.Id,row=>filters.Contains(row.Id),(row,shown)=>
             {
-                var shown=filters.Contains(row.Id);
-                if(ImGui.Checkbox(row.Name+"###ChatFilterRow"+row.Id,ref shown))
-                {
-                    if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
-                    ChatTabChanged(tab);
-                }
-                TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));
-            }
+                if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
+                ChatTabChanged(tab);
+            },row=>{TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));});
         }
         finally{ImGui.TreePop();}
     }
@@ -497,20 +492,17 @@ internal sealed partial class MainWindow
     /// them are, its label counting them.</summary>
     private void DrawChatFilterGenres(ChatTabSettings tab,List<uint> filters,ChatFilterTable table)
     {
-        foreach(var (genre,rows) in table.Genres())
+        DrawChatCheckGrid("###ChatFilterGenres",table.Genres(),genre=>
         {
-            var key=ChatFilterTable.GenreKey(genre);
-            var name=localization.Has(key) ? localization.Get(key):rows[0].Name;
-            var on=rows.Count(row=>filters.Contains(row.Id));
-            var all=on==rows.Count;
-            if(ImGui.Checkbox(ChatFilterLabel(name,rows,filters)+"###ChatFilterGenre"+key,ref all))
-            {
-                filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
-                if(all)filters.AddRange(rows.Select(row=>row.Id));
-                ChatTabChanged(tab);
-            }
-            TipText(()=>ChatGenreTip(on,rows.Count));
-        }
+            var key=ChatFilterTable.GenreKey(genre.Genre);
+            return ChatFilterLabel(localization.Has(key) ? localization.Get(key):genre.Rows[0].Name,genre.Rows,filters);
+        },genre=>"ChatFilterGenre"+ChatFilterTable.GenreKey(genre.Genre),genre=>genre.Rows.All(row=>filters.Contains(row.Id)),(genre,all)=>
+        {
+            var rows=genre.Rows;
+            filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
+            if(all)filters.AddRange(rows.Select(row=>row.Id));
+            ChatTabChanged(tab);
+        },genre=>{TipText(()=>ChatGenreTip(genre.Rows.Count(row=>filters.Contains(row.Id)),genre.Rows.Count));});
     }
 
     private string ChatGenreTip(int on,int count)=>localization.Format("ChatWindow.GenreTip",on,count);
@@ -544,19 +536,40 @@ internal sealed partial class MainWindow
     private void DrawChatTabChannels(ChatTabSettings tab)
     {
         tab.Channels??=[];
-        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("###ChatTabChannelTable",3))return;
+        DrawChatCheckGrid("###ChatTabChannelTable",ChatChannels.All,ChatChannelName,channel=>"ChatChannel"+channel,tab.Shows,(channel,shown)=>
+        {
+            if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
+            ChatMessages.Restart(tab);chatSettingsPending=true;
+        },channel=>{TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));});
+    }
+
+    /// <summary>
+    /// X-560 (0.1528, the user's report of 17/11: « chat settings still not framed », the third column under the window's right edge and the
+    /// names cut): a grid of boxes with as many columns as the width left holds (the scroll bar outside it, ImGui's content region), each as
+    /// wide as the widest name, so no name is cut; a name wider than the window itself is written beside its box, wrapped.
+    /// </summary>
+    private void DrawChatCheckGrid<T>(string id,IReadOnlyList<T> items,Func<T,string> name,Func<T,string> key,Func<T,bool> get,Action<T,bool> set,Action<T> drawTip)
+    {
+        if(items.Count==0)return;
+        var style=ImGui.GetStyle();
+        var box=ImGui.GetFrameHeight()+style.ItemInnerSpacing.X;
+        var widest=0f;
+        foreach(var item in items)widest=Math.Max(widest,ImGui.CalcTextSize(name(item)).X);
+        var columns=ChatFormat.GridColumns(ImGui.GetContentRegionAvail().X,box+widest+style.CellPadding.X*2+style.ItemSpacing.X,items.Count);
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable(id,columns))return;
         try
         {
-            foreach(var channel in ChatChannels.All)
+            foreach(var item in items)
             {
                 ImGui.TableNextColumn();
-                var shown=tab.Shows(channel);
-                if(ImGui.Checkbox(ChatChannelName(channel)+"###ChatChannel"+channel,ref shown))
-                {
-                    if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
-                    ChatMessages.Restart(tab);chatSettingsPending=true;
-                }
-                TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));
+                var label=name(item);
+                var fits=box+ImGui.CalcTextSize(label).X<=ImGui.GetContentRegionAvail().X;
+                var shown=get(item);
+                if(ImGui.Checkbox((fits ? label:"")+"###"+key(item),ref shown))set(item,shown);
+                drawTip(item);
+                if(fits)continue;
+                ImGui.SameLine();ImGui.TextWrapped(label);
+                drawTip(item);
             }
         }
         finally{ImGui.EndTable();}

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1528.0
+- Plan global, X-559 : Fenêtre de chat : les lignes de combat n'entrent plus dans le nombre de messages non lus d'un onglet (ni sur l'étiquette de l'onglet, ni dans « nouveaux messages plus bas ») ; un onglet qui ne montre que le combat reste à zéro, comme le dit DEC-053 (« jamais lues ni comptées »). Réglages du chat : les grilles de cases (canaux, filtres du jeu, genres de lignes de combat) prennent autant de colonnes que la largeur en tient, chacune aussi large que le nom le plus long ; aucun nom n'est coupé ni ne passe sous le bord droit ou sous la barre de défilement, et un nom plus large que la fenêtre elle-même est écrit à côté de sa case, avec retour à la ligne.
+- Pour les joueurs : fenêtre de chat : les lignes de combat ne comptent plus dans les non lus d'un onglet, et les cases des réglages du chat tiennent dans la fenêtre à toute largeur, noms en entier.
+- Tests : ChatCombatUnread1528Tests. Verify.ps1 (agent) : 3049/3049, 0 avertissement, 0 erreur ; DLL 0.1528.0.0. Non validé en jeu.
+### English
+- Chat window: combat lines no longer enter a tab's unread count (neither on the tab's label nor in « new messages below »); a tab showing only combat stays at zero, as DEC-053 says (« never read nor counted »). Chat settings: the grids of boxes (channels, the game's filters, kinds of combat line) take as many columns as the width holds, each as wide as the longest name; no name is cut nor goes under the right edge or the scroll bar, and a name wider than the window itself is written beside its box, wrapped.
+- For players: Chat window: combat lines no longer add to a tab's unread count, and the chat settings' boxes now fit the window at any width, names in full.
+
 ## 0.1527.0
 - Plan global, X-561 : Dédale bestial, rangs des bêtes : un rang lu dans la fenêtre « Formation de l'équipe » ne fait plus jamais baisser un rang connu plus haut (les rangs ne baissent pas dans le jeu). Avant, quand le plateau n'était pas encore connu, la fenêtre (qui montre le rang ramené à la limite du plateau, « 5 » pour une bête de rang 7) faisait redescendre le rang gardé sur le disque, et il ne remontait qu'avec un résultat de plateau. Le plateau lu dans la fenêtre est aussi pris avant les rangs (il venait du tour d'avant). Le panneau dit « lu dans la fenêtre du jeu ; son numéro reste à confirmer en jeu » quand le plateau ne vient que du numéro de la fenêtre, pas encore relevé en jeu.
 - Pour les joueurs : dédale bestial : le rang d'une bête gardé par Tensho n'est plus baissé par la fenêtre d'équipe, qui montre les rangs ramenés à la limite du plateau.
