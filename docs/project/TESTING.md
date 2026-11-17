@@ -2183,6 +2183,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1544) Dédale bestial, 1er plateau : sous chaque combat, « Ordre d'appel, la meilleure d'abord » liste trois bêtes numérotées ; la première touche la faiblesse du plus d'ennemis (au gardien une bête Feu, au combat 5 une bête Eau), chacune dit sa raison
 
+- [ ] (0.1545) Lauda, avant d'entrer au Dédale bestial : la fenêtre du 1er et du 2e plateau dit « Rang de bête recommandé : X à Y » ; Tensho lit 3 à 5 et 8 à 10 : dire si les nombres du jeu sont les mêmes
+
+- [ ] (0.1545) Dédale bestial, 2e plateau, une bête de rang 7 ou moins dans l'équipe : le panneau dit « rang bas pour ce plateau » à côté d'elle ; une bête de rang 8 ou plus ne le dit pas
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
