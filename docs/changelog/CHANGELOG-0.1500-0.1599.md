@@ -2,6 +2,20 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1538.0
+- Plan global, X-567 : X-567 (audit du 17/11, partie B) : quatre textes vus par les joueurs disent ce que fait le code. FAQ de la fenêtre de chat : le chat du jeu n'est plus « jamais caché » ; l'option « Cacher les messages du chat du jeu » (désactivée par défaut, depuis 0.1504) y est nommée. FAQ et README (application de bureau) : les alarmes sonnent depuis l'application (ligne de la barre d'état, son et notification Windows, par défaut quand le jeu n'est pas au premier plan), au lieu de « restent vides ». SECURITY : historique du chat « 2 000 messages et 30 jours par défaut » (7 avant, le code dit 30). FAQ du Jardin : chemin Suivi › Jardinage › onglet Jardin › « Vue détaillée ». Test FaqTruth1538Tests : chaque texte lié au code (libellé de l'option, ChatHistory.DefaultDays et DefaultMessages, groupe et onglet de la page Jardin).
+- Pour les joueurs : la FAQ, le README et la page SECURITY disent maintenant ce que fait le plugin : l'option de la fenêtre de chat peut cacher le chat du jeu, l'application de bureau sonne les alarmes, l'historique du chat garde 30 jours par défaut, et la vue détaillée du jardin se trouve dans Suivi › Jardinage.
+- Tests : FaqTruth1538Tests. Verify.ps1 (agent) : 3077/3077, 0 avertissement, 0 erreur ; DLL 0.1538.0.0. Rien à essayer en jeu.
+### English
+- X-567 (audit of 17/11, part B): four texts players read now say what the code does. Chat window FAQ: the game chat is no longer « never hidden »; the « Hide the game chat's messages » option (off by default, since 0.1504) is named. FAQ and README (desktop app): alarms ring from the app (status bar line, Windows sound and notification, by default while the game is not in front) instead of « stay empty ». SECURITY: chat history « 2,000 messages and 30 days by default » (7 before; the code says 30). Garden FAQ: path Tracking › Garden › Garden tab › « Detailed view ». Test FaqTruth1538Tests: each text tied to the code (the option's label, ChatHistory.DefaultDays and DefaultMessages, the Garden page's group and tab).
+- For players: The FAQ, README and SECURITY page now match the plugin: the game chat can be hidden by the chat window's option, the desktop app rings alarms, the chat history keeps 30 days by default, and the garden's detailed view is found under Tracking › Garden.
+
+## 0.1537.0
+- Plan global, X-520 : Images de référence de l'application de bureau : les deux images des réglages des onglets du chat montrent désormais les canaux du premier onglet dépliés, avec leur grille de cases (elle était repliée sous « Canaux » dans les images de la version précédente). Le contrôle des images ne prend plus le nom du canal « Erreurs » du chat pour un état d'erreur de la page.
+- Tests : ChatSettingsPicture1537Tests. Verify.ps1 (agent) : 3073/3073, 0 avertissement, 0 erreur ; DLL 0.1537.0.0. Rien à essayer en jeu.
+### English
+- Reference pictures of the desktop application: the two pictures of the chat's tab settings now show the first tab's channels unfolded, with their grid of boxes (it was folded under « Channels » in the previous version's pictures). The pictures' check no longer takes the chat's « Error » channel name for an error state of the page.
+
 ## 0.1536.0
 - Plan global, X-520 : Images de référence de l'application de bureau : chaque onglet de la page Paramètres a désormais la sienne (Panneaux, Carte, Suivi, Données, Avancé et, en mode développeur, Débogage, chacun dans sa première catégorie ; Général l'avait déjà), ainsi que les réglages des onglets du chat (grilles des canaux, des filtres du jeu et des genres de combat), en largeur normale et étroite. L'application ouvre l'onglet et la catégorie par une nouvelle entrée de son contrat typé avec le plugin (OpenSettings).
 - Tests : SettingsPictures1536Tests. Verify.ps1 (agent) : 3071/3071, 0 avertissement, 0 erreur ; DLL 0.1536.0.0. Rien à essayer en jeu.

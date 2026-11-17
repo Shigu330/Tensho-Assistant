@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (574 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (577 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -642,12 +642,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-566 | Audit of 17/11 (master's report, part A, items 1 to 3): three places of the… | Done in 0.1538.0 |
 | X-567 | Audit of 17/11 (master's report, part B): four errors players see: FAQ « the… | Done in 0.1538 |
 | X-570 | Audit of 17/11 (master's report, part A, items 4 to 10): cleanup and robustness… | Done in 0.1539 |
+| X-571 | Flaky test « Fair lock 1309 » (two bank stores on one file, 2 s lock wait)… | Done in 0.1541 |
+| X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
+| X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (574 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (577 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1287,3 +1290,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-566 | Audit du 17/11 (rapport de la maître, partie A, points 1 à 3) : trois endroits… | Fait en 0.1538.0 |
 | X-567 | Audit du 17/11 (rapport de la maître, partie B) : quatre erreurs que voient les… | Fait en 0.1538 |
 | X-570 | Audit du 17/11 (rapport de la maître, partie A, points 4 à 10) : nettoyage et… | Fait en 0.1539 |
+| X-571 | Test fragile « Fair lock 1309 » (deux magasins de banque sur un fichier… | Fait en 0.1541 |
+| X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
+| X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
