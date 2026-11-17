@@ -21,13 +21,17 @@ public sealed record Beast(uint Id, string Name, uint Icon, string Family, strin
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
-public sealed record BoardAction(string Name, string Shape, string Target);
+/// <summary>X-486 (0.1529): Damage = the action's type of damage (Action.AttackType, its element when magical: the XBMElement rows of
+/// <see cref="Beast.AutoRow"/>), empty for an unaspected one or none.</summary>
+public sealed record BoardAction(string Name, string Shape, string Target, string Damage = "");
 /// <summary>
 /// X-109 (0.980, docs/evidence/0.980-beast-teams.md): Stars = XBMBattleDetail columns 1 to 5, the stars of the game's board window, in the order
 /// Strength, Intelligence, Physical resistance, Magical resistance, Vitality (the user's capture: Chevalier du plateau 2, 1, 2, 2, 3); WeaknessRow = its XBMElement row.
 /// </summary>
 public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOnlyList<BoardAction> Actions, BeastStats? Stars = null, uint WeaknessRow = 0);
-public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies);
+/// <summary>X-486 (0.1529): Detail = its XBMBattleDetail row (XBMContentBattle column 0), the number the game's board window gives its fights
+/// (AgentXBMStageDetailList, StageDetailEntry.BattleDetailId); 0 not known.</summary>
+public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies, uint Detail = 0);
 public sealed record BoardBonus(string Name, string Condition, int Points);
 /// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.</summary>
 public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0);
@@ -68,7 +72,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
-        var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), "")));
+        var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), ""), Auto(row.UInt(0))));
         var enemies = sheets["XBMBattleDetail"].Where(row => row.UInt(0) != 0).GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub).Select(row =>
             new BoardEnemy(Capitalize(enemyName(row.UInt(0))), row.UInt(10), Element(row.UInt(8)),
                 Array.AsReadOnly(new[] { row.UInt(6), row.UInt(7) }.Where(id => id != 0 && actions.ContainsKey(id)).Select(id => actions[id]).ToArray()),
@@ -79,7 +83,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         {
             var (name, level, itemLevel) = content(row.UInt(0));
             // The guardian's battle comes first in the sheet (« Gardien du plateau : combattre 3 monstres », board 1, battle 6: three enemies).
-            var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []))).ToArray();
+            var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []), battle.UInt(0))).ToArray();
             var scored = bonuses.Where(bonus => FirstBonusColumn + (int)bonus.Row < row.Cells.Length).Select(bonus => new BoardBonus(bonus.Text(1), bonus.Text(2), row.Int(FirstBonusColumn + (int)bonus.Row)))
                 .Where(bonus => bonus.Points > 0 && bonus.Name.Length > 0).ToArray();
             return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0));

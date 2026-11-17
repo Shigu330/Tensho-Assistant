@@ -268,15 +268,14 @@ internal sealed partial class MainWindow
     {
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
-        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
-        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        var fights = BeastTeamFightsFor(board, plan, team, catalog);
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamRead", team.Count));
         foreach (var member in team)
         {
             if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
             else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
         }
-        foreach (var fight in beastTeamFights.Value.Fights)
+        foreach (var fight in fights)
         {
             var battle = board.Battles[fight.Battle];
             ImGui.TextColored(Accent, battle.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", fight.Battle));
@@ -289,6 +288,15 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.Unindent(); }
         }
+    }
+
+    /// <summary>X-550 (0.1526): each fight's three among the team taken, worked out again only when the board, the plan or the team (HP included)
+    /// changes (X-486: shared by the fight shown and the whole board).</summary>
+    private IReadOnlyList<BeastTeams.TeamFight> BeastTeamFightsFor(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember> team, BeastCatalog catalog)
+    {
+        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
+        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        return beastTeamFights.Value.Fights;
     }
 
     /// <summary>X-481 (0.1525): the result's lines as the game's window shows them: the score's parts (a label, the value when it has one, the
@@ -349,8 +357,33 @@ internal sealed partial class MainWindow
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
         var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        var team = BeastTeamRead?.Invoke();
+        // X-486 (0.1529, the user's request of 16/11): the fights the game's board window shows come first, one block each; the whole board
+        // (the team taken, the advised plan) folded under « whole board ». The panel follows the window: it is read four times a second.
+        var now = BeastTeams.FightsShown(board, BeastFightsShown?.Invoke());
+        if (now.Count > 0)
+        {
+            var taken = team is { Count: > 0 } ? BeastTeamFightsFor(board, plan, team, catalog) : null;
+            ImGui.PushTextWrapPos(wrapAt);
+            try { foreach (var index in now) DrawBeastFightNow(board, index, plan, taken, catalog); }
+            finally { ImGui.PopTextWrapPos(); }
+            ImGui.Separator();
+            if (!TenshoAssistant.UI.UiComponents.TreeNode(localization.Get("BeastUi.WholeBoard") + "###BeastWholeBoard")) return;
+            try { DrawBeastBoardWhole(board, plan, team, catalog, state, wrapAt); }
+            finally { ImGui.TreePop(); }
+            return;
+        }
+        DrawBeastBoardWhole(board, plan, team, catalog, state, wrapAt);
+    }
+
+    /// <summary>X-486 (0.1529): the fights the game's board window shows (null: not read).</summary>
+    internal Func<IReadOnlySet<uint>?>? BeastFightsShown { get; set; }
+
+    /// <summary>X-486 (0.1529): the whole board as the panel showed it before: the team taken first (X-550), then the advised plan.</summary>
+    private void DrawBeastBoardWhole(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember>? team, BeastCatalog catalog, BeastState state, float wrapAt)
+    {
         // X-550 (0.1526): the team the player took (the game's team window) comes first: its three per fight, then the advised plan.
-        if (BeastTeamRead?.Invoke() is { Count: > 0 } team)
+        if (team is { Count: > 0 })
         {
             ImGui.PushTextWrapPos(wrapAt);
             try { DrawBeastTeamRead(board, plan, team, catalog); }
@@ -361,6 +394,53 @@ internal sealed partial class MainWindow
         ImGui.PushTextWrapPos(wrapAt);
         try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
         finally { ImGui.PopTextWrapPos(); }
+    }
+
+    /// <summary>
+    /// X-486 (0.1529): one fight the game's board window shows: its enemies (icon, weakness, the game's stars) and their actions (damage, shape,
+    /// target, from the sheets), then the three beasts for it, from the team taken when it is read (X-550), else the advised plan, each with why
+    /// (the enemies whose weakness it hits). Nothing is chosen nor sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastFightNow(Board board, int index, BoardPlan plan, IReadOnlyList<BeastTeams.TeamFight>? taken, BeastCatalog catalog)
+    {
+        if (index >= board.Battles.Count) return;
+        var fight = board.Battles[index];
+        ImGui.TextColored(Accent, (fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", index)) + " · " + localization.Get("BeastUi.FightNow"));
+        foreach (var enemy in fight.Enemies)
+        {
+            DrawSmallGameIcon(enemy.Icon); ImGui.SameLine();
+            ImGui.TextUnformatted(enemy.Name);
+            if (enemy.Weakness.Length > 0) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.Weakness", enemy.Weakness)); }
+            ImGui.Indent();
+            try
+            {
+                if (enemy.Stars is { } stars) ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality));
+                foreach (var action in enemy.Actions)
+                    ImGui.TextDisabled(string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
+            }
+            finally { ImGui.Unindent(); }
+        }
+        var fromTeam = taken?.FirstOrDefault(row => row.Battle == index);
+        var trio = fromTeam?.Trio ?? plan.Battles.FirstOrDefault(battle => battle.Battle == index)?.Team.Select(pick => pick.Beast).ToArray() ?? [];
+        if (trio.Count == 0) return;
+        ImGui.TextColored(Accent, localization.Get(fromTeam is not null ? "BeastUi.FightBeastsTeam" : "BeastUi.FightBeasts"));
+        ImGui.Indent();
+        try
+        {
+            foreach (var id in trio)
+            {
+                var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
+                if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); }
+                var hits = BeastTeams.Hits(fight, beast);
+                var name = beast?.Name ?? $"#{id}";
+                if (hits.Count > 0) ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonHits", name, beast!.AutoAttack, string.Join(", ", hits)));
+                else ImGui.TextUnformatted(localization.Format("BeastUi.FightReasonNone", name));
+            }
+            if (fromTeam is { Lost.Count: > 0 } lost)
+                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", string.Join(", ", lost.Lost.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")),
+                    lost.Instead.Count > 0 ? string.Join(", ", lost.Instead.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")) : "—"));
+        }
+        finally { ImGui.Unindent(); }
     }
 
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
@@ -471,7 +551,7 @@ internal sealed partial class MainWindow
                     // X-109 (0.980): the game's stars of the enemy (same order as its board window).
                     if (enemy.Stars is { } stars) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality)); }
                     foreach (var action in enemy.Actions)
-                        ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Shape, action.Target }.Where(part => part.Length > 0)));
+                        ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
                 }
             }
         }

@@ -519,6 +519,8 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastBoardContent=()=>boardReader?.State.Content ?? 0;
             // X-550 (0.1526): the team the game's team window shows.
             mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
+            // X-486 (0.1529): the fights the game's board window shows.
+            mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());

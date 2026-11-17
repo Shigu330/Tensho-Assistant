@@ -7,8 +7,9 @@ namespace TenshoAssistant.Beastmaster;
 /// <summary>Where the game's board and team windows are (screen pixels), when they are open.</summary>
 /// <param name="Content">X-549 (0.1522): the board the game's board or team window is about (their agent's ContentId; 0: not read).</param>
 /// <param name="Team">X-550 (0.1526): the team the game's team window shows (empty: closed or not read).</param>
+/// <param name="Shown">X-486 (0.1529): the fights the game's board window lists (their XBMBattleDetail rows; null: not read).</param>
 public readonly record struct BoardWindows(bool Board, float X, float Y, float Width, float Height, bool Party, float PartyX, float PartyWidth, uint Content = 0,
-    IReadOnlyList<BeastTeams.TeamMember>? Team = null);
+    IReadOnlyList<BeastTeams.TeamMember>? Team = null, IReadOnlySet<uint>? Shown = null);
 
 /// <summary>
 /// X-109 (0.981, DEC-047): reads, four times a second, whether the game's board window (XBMStageDetailList) and team window (XBMPetParty) are open and where,
@@ -28,6 +29,7 @@ internal sealed class BeastBoardReader : IDisposable
     private bool resultWarned;
     private string? resultSeen;
     private uint contentSaid;
+    private string? stageSaid;
     private BoardWindows state;
     public BoardWindows State => state;
 
@@ -52,6 +54,7 @@ internal sealed class BeastBoardReader : IDisposable
             if (boardUnit == null || boardUnit->RootNode == null) { state = default; return; }
             var hasParty = partyUnit != null && partyUnit->RootNode != null;
             var content = Content(hasParty);
+            var shown = Shown();
             IReadOnlyList<BeastTeams.TeamMember>? team = null;
             Dictionary<uint, int>? ranks = null;
             if (hasParty && beasts() is { Count: > 0 } known)
@@ -63,7 +66,7 @@ internal sealed class BeastBoardReader : IDisposable
                 team = BeastTeams.ParseTeam(texts, known);
             }
             state = new(true, boardUnit->X, boardUnit->Y, boardUnit->RootNode->Width * boardUnit->Scale, boardUnit->RootNode->Height * boardUnit->Scale,
-                hasParty, hasParty ? partyUnit->X : 0, hasParty ? partyUnit->RootNode->Width * partyUnit->Scale : 0, content, team);
+                hasParty, hasParty ? partyUnit->X : 0, hasParty ? partyUnit->RootNode->Width * partyUnit->Scale : 0, content, team, shown);
             // X-561 (review of 0.1526): the ranks are merged after the state holds this turn's board, so their limit is that board's.
             if (ranks is { Count: > 0 }) ranksRead(ranks);
             warned = false;
@@ -93,6 +96,37 @@ internal sealed class BeastBoardReader : IDisposable
             log.Information("Beastmaster board read in the game's windows: content {0} (board window {1}, team window {2}).", content, fromStage, party ? fromTeam.ToString() : "closed");
         }
         return content;
+    }
+
+    /// <summary>
+    /// X-486 (0.1529): the fights the game's board window lists: the BattleDetailId of AgentXBMStageDetailList's entries (fields only, no call;
+    /// ClientStructs: 1000 entries, EntrySelection 100 bytes). Said in the log when it changes, with the selection and the stage to scroll to,
+    /// so a reading in game tells what they are (docs/evidence/0.1529-beast-fight-shown.md). Null when the agent is not there.
+    /// </summary>
+    private unsafe IReadOnlySet<uint>? Shown()
+    {
+        var stage = AgentXBMStageDetailList.Instance();
+        if (stage == null) return null;
+        var details = new HashSet<uint>();
+        var entries = stage->Entries;
+        var count = 0;
+        for (var index = 0; index < entries.Length; index++)
+        {
+            var detail = entries[index].BattleDetailId;
+            if (entries[index].EntryType != 0 || detail != 0) count++;
+            if (detail != 0) details.Add(detail);
+        }
+        var selection = stage->EntrySelection;
+        var selected = new List<int>();
+        for (var index = 0; index < selection.Length; index++) if (selection[index] != 0) selected.Add(index);
+        var said = $"{count}|{string.Join(",", details.Order())}|{string.Join(",", selected)}|{stage->ScrollToStageId}|{stage->Mode}";
+        if (said != stageSaid)
+        {
+            stageSaid = said;
+            log.Information("Beastmaster board window entries: {0} entries, fights {1}; selection {2}; stage to scroll to {3}, mode {4}.",
+                count, string.Join(",", details.Order()), selected.Count == 0 ? "none" : string.Join(",", selected), stage->ScrollToStageId, stage->Mode);
+        }
+        return details;
     }
 
     /// <summary>X-135 (0.1163): the result window's numbers (Int and UInt only, never a text), parsed once per change; refused whole when they do not fit.</summary>

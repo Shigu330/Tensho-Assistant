@@ -172,6 +172,24 @@ public static class BeastTeams
         return fights;
     }
 
+    /// <summary>
+    /// X-486 (0.1529, the user's request of 16/11): the board's fights the game's board window shows (their XBMBattleDetail rows, read in
+    /// AgentXBMStageDetailList's entries), in the board's order. None when nothing is read, or when the window shows every fight of the board
+    /// (then no fight is its own: the whole board is shown as before).
+    /// </summary>
+    public static IReadOnlyList<int> FightsShown(Board board, IReadOnlyCollection<uint>? shown)
+    {
+        if (shown is not { Count: > 0 } || board.Battles.Count == 0) return [];
+        var set = shown as IReadOnlySet<uint> ?? shown.ToHashSet();
+        var found = Enumerable.Range(0, board.Battles.Count).Where(index => board.Battles[index].Detail != 0 && set.Contains(board.Battles[index].Detail)).ToArray();
+        return found.Length == board.Battles.Count ? [] : found;
+    }
+
+    /// <summary>X-486 (0.1529): why a beast is called for a fight: the names of the enemies whose weakness its automatic attack hits (empty: none,
+    /// chosen for its attack and defence).</summary>
+    public static IReadOnlyList<string> Hits(BoardBattle fight, Beast? beast)
+        => beast is null || beast.AutoRow == 0 ? [] : fight.Enemies.Where(enemy => enemy.WeaknessRow == beast.AutoRow).Select(enemy => enemy.Name).Distinct().ToArray();
+
     /// <summary>X-553 (0.1523): a weakness of a fight's enemies that none of its three beasts hits: the team's other beasts that would hit it, and
     /// the beasts held outside the team that would (all beasts when the beasts held are not read).</summary>
     public sealed record WeaknessMissed(uint Weakness, string Name, IReadOnlyList<uint> InTeam, IReadOnlyList<uint> Held);
