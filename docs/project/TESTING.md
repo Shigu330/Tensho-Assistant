@@ -2177,6 +2177,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1535) Après un rechargement en mode développeur : dalamud.log a la ligne « JIT warm-up: … Early phase (map, overlays, chat; …) ready N ms after the load » (logread.py)
 
+- [ ] (0.1543) Dédale bestial, 1er plateau, équipe vide (Formation de l'équipe à 0/10) : le panneau propose 10 bêtes qui couvrent Foudre, Feu, Eau, Vent, Glace, Contondant, Perforant et Tranchant ; chaque combat dit « faiblesse touchée » pour tous ses ennemis, sans ligne orange
+
+- [ ] (0.1543) Dédale bestial, 1er plateau, avec l'équipe choisie de la capture du 17/11 : au gardien Écureuil est appelé (3 sur 3), au combat 4 Piège-volant ou Uragnite compté (2 sur 2), au combat 5 Salamandre appelée ; pas de ligne orange pour une faiblesse qu'une bête de l'équipe touche
+
+- [ ] (0.1544) Dédale bestial, 1er plateau : sous chaque combat, « Ordre d'appel, la meilleure d'abord » liste trois bêtes numérotées ; la première touche la faiblesse du plus d'ennemis (au gardien une bête Feu, au combat 5 une bête Eau), chacune dit sa raison
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
