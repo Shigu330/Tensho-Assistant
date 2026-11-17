@@ -47,8 +47,8 @@ internal static class BeastBoardRead1522Tests
             Check(ranks[1] == 7 && !floors.Contains(1), "a rank known higher stays");
             Check(ranks[2] == 5 && floors.Contains(2), "a rank read at the limit is at least that");
             Check(ranks[7] == 3 && !floors.Contains(7) && ranks[8] == 4, "a rank read below the limit is the beast's own");
-            var (again, floorsAgain) = BeastTeams.MergeRanks(ranks, floors, new Dictionary<uint, int> { [2] = 4 }, 10);
-            Check(again[2] == 4 && !floorsAgain.Contains(2), "read below the limit later: exact, no longer a floor");
+            var (again, floorsAgain) = BeastTeams.MergeRanks(ranks, floors, new Dictionary<uint, int> { [2] = 6 }, 10);
+            Check(again[2] == 6 && !floorsAgain.Contains(2), "read below the limit later: exact, no longer a floor");
             var (unknownLimit, noFloor) = BeastTeams.MergeRanks(null, null, read, 0);
             Check(unknownLimit[1] == 5 && noFloor.Count == 0, "board not known: taken as read");
             Check(BeastTeams.Key(null, ranks, floors) != BeastTeams.Key(null, ranks, null), "the floors are part of the plan's key");

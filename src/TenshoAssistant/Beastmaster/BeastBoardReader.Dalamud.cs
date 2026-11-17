@@ -53,17 +53,19 @@ internal sealed class BeastBoardReader : IDisposable
             var hasParty = partyUnit != null && partyUnit->RootNode != null;
             var content = Content(hasParty);
             IReadOnlyList<BeastTeams.TeamMember>? team = null;
+            Dictionary<uint, int>? ranks = null;
             if (hasParty && beasts() is { Count: > 0 } known)
             {
                 var texts = new List<string>();
                 BeastWindowProbe.Texts(&partyUnit->UldManager, 0, texts);
-                var ranks = BeastTeams.ParseRanks(texts, known);
-                if (ranks.Count > 0) ranksRead(ranks);
+                ranks = BeastTeams.ParseRanks(texts, known);
                 // X-550 (0.1526): the team taken, with each beast's HP, read each time the window is open (after each fight).
                 team = BeastTeams.ParseTeam(texts, known);
             }
             state = new(true, boardUnit->X, boardUnit->Y, boardUnit->RootNode->Width * boardUnit->Scale, boardUnit->RootNode->Height * boardUnit->Scale,
                 hasParty, hasParty ? partyUnit->X : 0, hasParty ? partyUnit->RootNode->Width * partyUnit->Scale : 0, content, team);
+            // X-561 (review of 0.1526): the ranks are merged after the state holds this turn's board, so their limit is that board's.
+            if (ranks is { Count: > 0 }) ranksRead(ranks);
             warned = false;
         }
         catch (Exception error)

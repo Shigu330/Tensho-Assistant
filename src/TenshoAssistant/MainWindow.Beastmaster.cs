@@ -336,7 +336,8 @@ internal sealed partial class MainWindow
         {
             board = read;
             ImGui.TextColored(Accent, board.Name);
-            ImGui.SameLine(); ImGui.TextDisabled(localization.Get("BeastUi.BoardRead"));
+            // X-562 M6 (review of 0.1526): the windows' number (AgentXBM…ContentId) is not yet confirmed in game (R06): said so until then.
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Get(source == BoardSource.Window ? "BeastUi.BoardReadWindow" : "BeastUi.BoardRead"));
         }
         else if (TenshoAssistant.Competitive.CompetitiveZones.IsLabyrinth(CurrentTerritory?.Invoke() ?? 0)) { EmptyState("BeastUi.TeamBoardUnknown"); return; }
         else

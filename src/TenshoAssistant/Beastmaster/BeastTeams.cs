@@ -214,7 +214,9 @@ public static class BeastTeams
     /// X-549 (0.1522): ranks read in the game's team window merged with those known. The window shows a beast's rank brought down to the board's
     /// limit (the user's beasts at rank 7 showed « 5 » on the 1st board, limit 5; their result window said 7): a rank read at the limit is a floor,
     /// never put over a higher rank known, and kept as « at least » (floors); a rank read below the limit is the beast's own. limit 0: not known,
-    /// every rank read is taken as it is.
+    /// a rank read is taken as it is.
+    /// X-561 (review of 0.1526, I1): a beast's rank never goes down in the game, so a rank read never lowers a rank known higher, whatever the
+    /// limit (limit 0 when the board is not known, or a window's limit lower than the beast's rank): the known rank and its « at least » stay.
     /// </summary>
     public static (Dictionary<uint, int> Ranks, HashSet<uint> Floors) MergeRanks(IReadOnlyDictionary<uint, int>? known, IReadOnlySet<uint>? floors, IReadOnlyDictionary<uint, int> read, int limit)
     {
@@ -222,11 +224,14 @@ public static class BeastTeams
         var atLeast = new HashSet<uint>(floors ?? new HashSet<uint>());
         foreach (var (beast, rank) in read)
         {
+            var had = ranks.TryGetValue(beast, out var before);
+            if (had && before > rank) continue;
             if (limit > 0 && rank >= limit)
             {
-                if (ranks.TryGetValue(beast, out var before) && before >= rank) continue;
+                if (had && before >= rank) continue;
                 ranks[beast] = rank; atLeast.Add(beast);
             }
+            else if (limit == 0 && had && before == rank) continue;
             else { ranks[beast] = rank; atLeast.Remove(beast); }
         }
         return (ranks, atLeast);

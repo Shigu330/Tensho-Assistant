@@ -193,6 +193,7 @@
     "Stars": "★ Str {0} · Int {1} · Phys. res. {2} · Mag. res. {3} · Con {4}",
     "TeamBoardUnknown": "This Crucible's board is not known.",
     "BoardRead": "(read in the game)",
+    "BoardReadWindow": "(read in the game's window; its number is still to be confirmed in game)",
     "BoardChosen": "Board chosen here: the game's board layout is not open, so Tensho cannot read which board you chose.",
     "TeamPanelNote": "Tensho shows this beside the game's board layout, before entering and in the Crucible; the Crucible of the Unbroken is not cut, fights included.",
     "MissInTeam": "{0}: not hit by these three; in the team, {1} would hit it.",
