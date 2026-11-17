@@ -6226,6 +6226,7 @@
     "VesselGroup": "Vaisseaux de la compagnie"
   },
   "ChatWindow": {
+    "Loading": "Chargement…",
     "QuestLinkTip": "{0}\nClic gauche : l'ouvre dans la page Quêtes de Tensho.",
     "CopyLine": "Copier ce message",
     "CopyTab": "Copier tous les messages de cet onglet",

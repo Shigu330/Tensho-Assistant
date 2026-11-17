@@ -6226,6 +6226,7 @@
     "VesselGroup": "Company vessels"
   },
   "ChatWindow": {
+    "Loading": "Loading…",
     "QuestLinkTip": "{0}\nLeft click: open it on Tensho's Quests page.",
     "CopyLine": "Copy this message",
     "CopyTab": "Copy every message of this tab",

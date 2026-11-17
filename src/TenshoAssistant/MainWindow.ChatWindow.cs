@@ -624,6 +624,9 @@ internal sealed partial class MainWindow
     /// are drawn after the bar, or before it with the bar's height kept free at the bottom.</summary>
     private void DrawChatWindowBody()
     {
+        // X-558 (0.1533): after a load, the chat's code is compiled in the warm-up's early phase; the window waits for it (a second or two)
+        // instead of compiling it in one frame (« Chat 62 ms » on the reload of 17/11 13:05).
+        if(!WarmupEarlyDone){EmptyState("ChatWindow.Loading");return;}
         var options=ChatOptions;
         var tabs=ChatTabs(options);
         var table=ChatFilterTableNow();

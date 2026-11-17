@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1533.0
+- Plan global, X-558 : Fenêtre de chat, suite : après un rechargement, le code du chat est compilé d'avance avec celui de la carte et des panneaux, et la fenêtre de chat affiche « Chargement… » une ou deux secondes au lieu de le compiler pendant une image (mesure du 17/11 13 h 05 après 0.1532 : 62 ms pour la première image du chat, dont 5 ms de lecture des lignes et moins de 1 ms de mise en page).
+- Pour les joueurs : fenêtre de chat : plus d'à-coup à sa première image après un rechargement ; elle affiche « Chargement… » un instant à la place.
+- Tests : ChatWarmup1533Tests. Verify.ps1 (agent) : 3063/3063, 0 avertissement, 0 erreur ; DLL 0.1533.0.0. Non validé en jeu.
+### English
+- Chat window, continued: after a reload, the chat's code is compiled ahead with the map's and the panels', and the chat window shows « Loading… » for a second or two instead of compiling it during one frame (measured on 17/11 13:05 after 0.1532: 62 ms for the chat's first frame, 5 ms of it reading the lines and under 1 ms laying them out).
+- For players: Chat window: no more stall on its first frame after a reload; it shows « Loading… » for a moment instead.
+
 ## 0.1532.0
 - Plan global, X-558 : Fenêtre de chat : au chargement (ouverture, rechargement avec un long historique) et après un changement de largeur, les lignes les plus récentes sont mises en page d'abord, dans un budget de temps de 3 ms par image (100 lignes au plus) ; seules les 300 plus récentes sont préparées d'avance ; les plus anciennes ne le sont que quand vous remontez, par paquets de 40 juste au-dessus de ce que vous lisez, sans que la vue saute. Rien n'est perdu ni réordonné. En mode développeur, la ligne « Slow frame » distingue « Chat refresh » et « Chat layout ».
 - Pour les joueurs : fenêtre de chat : l'ouverture et le rechargement avec un long historique ne font plus d'à-coup ; les anciennes lignes se préparent quand vous remontez.

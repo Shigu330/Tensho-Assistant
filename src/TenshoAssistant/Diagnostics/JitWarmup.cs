@@ -187,8 +187,25 @@ public sealed class JitWarmup : IDisposable
         return false;
     }
 
-    /// <summary>X-01 C2.1 (0.1185): what the early phase compiles: the map's methods and the overlays'.</summary>
-    public static bool EarlyMethod(MethodBase method)=>MapFirst(method) || OverlayFirst(method);
+    /// <summary>X-01 C2.1 (0.1185): what the early phase compiles: the map's methods and the overlays'. X-558 (0.1533): the chat window's too.</summary>
+    public static bool EarlyMethod(MethodBase method)=>MapFirst(method) || OverlayFirst(method) || ChatFirst(method);
+
+    /// <summary>X-01 C2.1 (0.1185): the namespace of the chat window's types (its lines, layout, filters, history).</summary>
+    public const string ChatNamespace="TenshoAssistant.Chat";
+
+    /// <summary>
+    /// X-558 (0.1533, dalamud.log of 17/11 13:05:40: « Chat 62 ms » on the reload's first frame, its lines' refresh 5 ms and layout under
+    /// 1 ms: the rest was compiling): the chat's types and the window's chat methods (their name holds « Chat », lambdas included), compiled in
+    /// the early phase; the chat window waits for it (MainWindow.WarmupEarlyDone).
+    /// </summary>
+    public static bool ChatFirst(MethodBase method)
+    {
+        if(method.DeclaringType is not { } declaring)return false;
+        if(declaring.Namespace==ChatNamespace)return true;
+        for(var type=declaring;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow")return method.Name.Contains("Chat",StringComparison.Ordinal);
+        return false;
+    }
 
     /// <summary>X-01 (0.1111): the namespace of the map's types (catalogues, projection, layers, live readers).</summary>
     public const string MapNamespace="TenshoAssistant.Maps";
