@@ -31,6 +31,22 @@ public sealed class ChatFilterTable
 
     public static bool IsCombat(byte category)=>category is >=FirstCombat and <=LastCombat;
 
+    /// <summary>X-484 (0.1518, the user's request of 17/11: the combat filters by kind of line): a combat filter's kind of line, as the game's
+    /// log window files it under each subject: the message kind (41 damage, 42 failed attacks, 43 actions, 44 items, 45 healing, 46 beneficial
+    /// effects, 47 detrimental effects, 48 and 49 their end) and its side: done by the subject (« Subject » in the game, the target anyone) or
+    /// done to the subject (« Object », the caster anyone). Null for a filter outside the combat lines.</summary>
+    public static (int Kind,bool ToSubject)? Genre(ChatFilterRow row)
+        =>IsCombat(row.Category) ? (row.Kind,row.Caster==Anyone && row.Target!=Anyone):null;
+
+    /// <summary>X-484 (0.1518): the combat filters grouped by kind of line across every subject (« damage dealt »: by you, by your party
+    /// members… by others' pets), in the game's order (the side done by the subject first, then the side done to it, each by kind).</summary>
+    public IReadOnlyList<((int Kind,bool ToSubject) Genre,IReadOnlyList<ChatFilterRow> Rows)> Genres()
+        =>Rows.Where(row=>IsCombat(row.Category)).GroupBy(row=>Genre(row)!.Value).OrderBy(group=>group.Key.ToSubject).ThenBy(group=>group.Min(row=>row.Order))
+            .ThenBy(group=>group.Key.Kind).Select(group=>(group.Key,(IReadOnlyList<ChatFilterRow>)group.ToList())).ToList();
+
+    /// <summary>X-484 (0.1518): the localisation key of a kind of line (« ChatWindow.Genre41By », « ChatWindow.Genre41On »).</summary>
+    public static string GenreKey((int Kind,bool ToSubject) genre)=>$"ChatWindow.Genre{genre.Kind}{(genre.ToSubject ? "On":"By")}";
+
     /// <summary>The game's default filters of one of its tabs (General, Battle, Event).</summary>
     public IEnumerable<uint> Preset(byte gameTab)=>Rows.Where(row=>(row.Preset&gameTab)!=0).Select(row=>row.Id);
     public IEnumerable<uint> AllIds=>Rows.Select(row=>row.Id);

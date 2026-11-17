@@ -435,8 +435,21 @@ internal sealed partial class MainWindow
         {
             try
             {
-                foreach(var subject in combat.GroupBy(row=>row.Category))
-                    DrawChatFilterGroup(tab,filters,subject,localization.Get("ChatWindow.FilterSubject"+subject.Key),"Subject"+subject.Key);
+                // X-484 (0.1518): the game's two ways in: each subject with its kinds of line, and each kind of line for every subject.
+                if(TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterBySubject"),combat,filters)+"###ChatFilterBySubject"))
+                {
+                    try
+                    {
+                        foreach(var subject in combat.GroupBy(row=>row.Category))
+                            DrawChatFilterGroup(tab,filters,subject,localization.Get("ChatWindow.FilterSubject"+subject.Key),"Subject"+subject.Key);
+                    }
+                    finally{ImGui.TreePop();}
+                }
+                if(TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterByGenre"),combat,filters)+"###ChatFilterByGenre"))
+                {
+                    try{DrawChatFilterGenres(tab,filters,table);}
+                    finally{ImGui.TreePop();}
+                }
             }
             finally{ImGui.TreePop();}
         }
@@ -477,6 +490,28 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.TreePop();}
     }
+
+    /// <summary>X-484 (0.1518): one box per kind of combat line (damage dealt, damage taken…), for every subject at once; ticked when all of
+    /// them are, its label counting them.</summary>
+    private void DrawChatFilterGenres(ChatTabSettings tab,List<uint> filters,ChatFilterTable table)
+    {
+        foreach(var (genre,rows) in table.Genres())
+        {
+            var key=ChatFilterTable.GenreKey(genre);
+            var name=localization.Has(key) ? localization.Get(key):rows[0].Name;
+            var on=rows.Count(row=>filters.Contains(row.Id));
+            var all=on==rows.Count;
+            if(ImGui.Checkbox(ChatFilterLabel(name,rows,filters)+"###ChatFilterGenre"+key,ref all))
+            {
+                filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
+                if(all)filters.AddRange(rows.Select(row=>row.Id));
+                ChatTabChanged(tab);
+            }
+            TipText(()=>ChatGenreTip(on,rows.Count));
+        }
+    }
+
+    private string ChatGenreTip(int on,int count)=>localization.Format("ChatWindow.GenreTip",on,count);
 
     /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
     private void DrawChatTabWords(ChatTabSettings tab)
