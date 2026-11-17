@@ -21,6 +21,12 @@ public static class CompetitiveZones
     /// </summary>
     public static IReadOnlySet<uint> LabyrinthFound { get; private set; } = new HashSet<uint>();
     public static bool IsLabyrinth(uint territory)=>Labyrinth.Contains(territory) || LabyrinthFound.Contains(territory);
+    /// <summary>X-552 (0.1524, dalamud.log of 17/11: « Labyrinth reading » written every 1.5 s, 188 lines in one session): the windows the
+    /// labyrinth's developer reading names: the labyrinth's own (« XBM… », its HUD « JobHudXBM… » included) and the loading screens that tell a
+    /// board from its arena (NowLoading, FadeMiddle, docs/evidence/0.979-labyrinth-reading.md); a tooltip, a cast bar or a target window coming and
+    /// going no longer makes the line change. Sorted, each once.</summary>
+    public static IReadOnlyList<string> LabyrinthWindows(IEnumerable<string> names)
+        =>names.Where(name=>name.Contains("XBM",StringComparison.Ordinal) || name is "NowLoading" or "FadeMiddle").Distinct().Order(StringComparer.Ordinal).ToList();
     /// <summary>
     /// 0.612 (user report, in game): territory 579 is also a public hall with PvE matches, so neither the place nor a match proves anything: stopped only in
     /// the arena's own instance. What marks it is measured in game (the watcher logs it): docs/project/ARCHITECTURE.md, « Competitive switch-off ».

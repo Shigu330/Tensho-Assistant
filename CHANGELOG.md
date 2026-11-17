@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1524.0
+- Plan global, X-552 : Mode développeur, lecture du Dédale bestial : la ligne « Labyrinth reading » n'est plus réécrite toutes les 1,5 s. Elle était déjà écrite seulement quand elle change, mais elle nommait toutes les fenêtres visibles, et une infobulle ou une barre d'incantation qui apparaît et disparaît la changeait (188 lignes dans la séance du 17/11). Elle ne nomme plus que les fenêtres du Dédale (« XBM… », barre « JobHudXBM… » comprise) et les écrans de chargement qui séparent le plateau de l'arène.
+- Tests : LabyrinthLine1524Tests. Verify.ps1 (agent) : 3037/3037, 0 avertissement, 0 erreur ; DLL 0.1524.0.0. Rien à essayer en jeu.
+### English
+- Developer mode, Beast Labyrinth reading: the « Labyrinth reading » line is no longer written again every 1.5 s. It was already written only when it changed, but it named every visible window, and a tooltip or a cast bar coming and going changed it (188 lines in the session of 17/11). It now names only the labyrinth's windows (« XBM… », the « JobHudXBM… » bar included) and the loading screens that tell the board from the arena.
+
 ## 0.1523.0
 - Plan global, X-553 : Dédale bestial, panneau d'équipe : les bêtes magiques touchent enfin les faiblesses élémentaires. L'attaque automatique d'une bête magique prend son élément (Action.Aspect, chaque valeur appariée au bestiaire du jeu : Feu, Glace, Vent, Terre, Foudre, Eau ; Neutre sans élément) ; avant, toute bête magique valait 0 et ne touchait jamais Foudre, Glace ou Eau. Sur le 1er plateau réel, l'équipe de l'utilisateur touche 2, 0, 1, 2, 2 et 1 ennemis au lieu de 2, 0, 1, 0, 0, 1. Chaque faiblesse qu'aucune des trois bêtes ne touche est dite, avec les autres bêtes de l'équipe puis celles que vous avez qui la toucheraient (« Foudre : aucune bête de l'équipe ne la touche ; la toucheraient : … »). Le texte du panneau ne dit plus qu'il se coupe en combat (R03.2 : le Dédale n'est pas coupé, combats compris) ; la note sur la faiblesse dit qu'elle est celle de la fenêtre du plateau. Preuve 0.1523.
 - Pour les joueurs : dédale bestial : les bêtes magiques comptent enfin pour les faiblesses élémentaires, et le panneau dit quelle faiblesse aucune bête de votre équipe ne touche et quelles bêtes la toucheraient.

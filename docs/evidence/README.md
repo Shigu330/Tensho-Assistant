@@ -297,7 +297,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.97.0-wolf-npc-probe.log](0.97.0-wolf-npc-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md` |
 | [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/evidence/0.1360-garden-harvest-menu.md` |
-| [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs` | `docs/evidence/0.980-beast-teams.md` |
+| [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs`, `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/evidence/0.980-beast-teams.md` |
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md`, `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.980-beast-teams.md](0.980-beast-teams.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `src/TenshoAssistant/MainWindow.Beastmaster.cs` | — |
 | [0.99.0-consigneur-probe.log](0.99.0-consigneur-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | — |
