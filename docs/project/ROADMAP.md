@@ -80,9 +80,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| No. | Point | Choice applied, or record awaited | Where |
-|---|---|---|---|
-| D-180 | X-449 (review 0.1497, M2): is the category chosen in each Settings tab kept after a plugin reload or a game restart? | yes, kept in the configuration, like the last page opened |  |
+Nothing open.
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -179,9 +177,7 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| N° | Point | Choix appliqué, ou relevé attendu | Où |
-|---|---|---|---|
-| D-180 | X-449 (relecture 0.1497, M2) : la catégorie choisie dans chaque onglet des Paramètres est-elle retenue après un rechargement du plugin ou un redémarrage du jeu ? | oui, gardée dans la configuration, comme la dernière page ouverte |  |
+Aucune en attente.
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

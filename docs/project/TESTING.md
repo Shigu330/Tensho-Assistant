@@ -73,7 +73,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Rangements et Banque (0.235–0.240, 0.280)**
 
-- [ ] 0.235–0.237 — Capture automatique active (Paramètres › Données), attendre au plus 2 min : Rangements › Banque montre « Arsenal ».
+- [x] 0.235–0.237 — Capture automatique active (Paramètres › Données), attendre au plus 2 min : Rangements › Banque montre « Arsenal ».
   Ouvrir une fois le coffre à apparence et l'armoire (auberge) : leurs sections apparaissent (avant : « Ouvrez une fois… »). Les trois
   s'affichent en pages de 35 cases, sans « ordre visuel indisponible ».
 - [x] 0.240 — Tenue complète rangée au coffre : ses pièces comptent comme possédées (stocks, « possédé » de la Revue de mode).
@@ -104,23 +104,23 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] 0.247–0.250 — Dans plusieurs listes (butin des monstres, coût de préparation, sources de pêche et de récolte, usages,
   orchestrion, hauts faits, résultats de recherche, monnaie d'un marchand) : icône et nom d'un objet donnent la même infobulle complète,
   une seule à la fois ; clic = objet en contexte ; clic droit = outils. Mode dev : ID de l'objet dans l'infobulle.
-- [ ] 0.251 — Clic droit sur un objet : sources en sous-menus par type avec leur nombre (Hauts faits, Contenus, À partir d'autres
+- [x] 0.251 — Clic droit sur un objet : sources en sous-menus par type avec leur nombre (Hauts faits, Contenus, À partir d'autres
   objets, Échanges, PNJ vendeurs, Quêtes) ; Fabrication et Récolte sur une ligne ; aucune ligne en double.
 - [x] 0.255 — Récompenses de quête et Revue de mode : le nom de l'objet a l'infobulle complète et le clic droit.
 - [x] 0.256 — Inventaire du jeu, clic droit sur un objet › Tensho : sous les outils, les mêmes sous-menus de sources que dans Tensho ;
   « ↳ Drapeau sur la carte » sous un PNJ placé.
-- [ ] 0.257 — Survol d'un objet de l'inventaire du jeu : le panneau Tensho sous l'infobulle montre aussi « Comment l'obtenir ».
+- [x] 0.257 — Survol d'un objet de l'inventaire du jeu : le panneau Tensho sous l'infobulle montre aussi « Comment l'obtenir ».
 - [x] 0.263 — Clic droit sur une quête (liste, quêtes liées, onglet Quêtes de la carte), un PNJ (PNJ vendeurs, onglets Vendeurs /
   Triple Triad de la carte, PNJ de Triple Triade) et un monstre (monstres d'un objet) : mêmes entrées partout (ouvrir l'outil ; pour
   chaque position : drapeau, « Voir sur la carte Tensho », météo de la zone).
-- [ ] 0.272 — Objets : choisir un objet = fiche complète (icône, stock total, dernier prix connu et sa date ; onglets Aperçu, Stocks,
+- [x] 0.272 — Objets : choisir un objet = fiche complète (icône, stock total, dernier prix connu et sa date ; onglets Aperçu, Stocks,
   Craft lié, Usages, Récolte, Marché).
 - [ ] 0.273 — Liens : objet d'une alarme, « Comment l'obtenir (fiche) », monnaie d'un échange → fiche sur Aperçu ; « Prix du marché » →
   Marché › Résumé ; « Ouvrir l'outil Triple Triade » depuis un PNJ → « PNJ et cartes » ; bouton « Deck » des réglages → « Mon deck ».
 
 **Paramètres, caches et langues (0.246, 0.248, 0.258, 0.260–0.261, 0.264, 0.281)**
 
-- [ ] 0.258 — Paramètres › Avancé › « Tout remettre par défaut » (confirmation) : réglages remis ; gardés : langue, alarmes,
+- [x] 0.258 — Paramètres › Avancé › « Tout remettre par défaut » (confirmation) : réglages remis ; gardés : langue, alarmes,
   préréglages d'artisanat, decks, quêtes suivies, favoris de carte, plan de macros, profils et modèles de tri, relevés, et depuis 0.315
   vaisseaux lus et plans d'équipement / de matérias ; la Banque n'est pas touchée.
 - [ ] 0.246 (facultatif) — Hors ligne : `dalamud.log` ne montre pas de téléchargement LuminaSupplemental / GatherBuddy relancé à
@@ -150,12 +150,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **Relevés en jeu demandés (preuves, pas des réglages)**
 
 - [x] Mandat accepté, carte ouverte : relever le type de marqueur d'un mandat (repères au bord « Mandats et autres événements », 0.298).
-- [ ] Icônes de quête 71141 / 71151 : seulement avec un relevé en jeu (STATUS, points décidés avant D17).
 
 **Encore listés « à valider » dans STATUS avant 0.232**
 
-- [ ] 0.224 — Mineur / botaniste, objet récolté en contexte : outil PR, « Estimé : +N » à côté du bonus, bouton « Utiliser ».
-- [ ] 0.225 — Panneau « Aide à la récolte · Mineur / Botaniste » à droite de la fenêtre de récolte du jeu, un métier à la fois.
+- [x] 0.224 — Mineur / botaniste, objet récolté en contexte : outil PR, « Estimé : +N » à côté du bonus, bouton « Utiliser ».
+- [x] 0.225 — Panneau « Aide à la récolte · Mineur / Botaniste » à droite de la fenêtre de récolte du jeu, un métier à la fois.
 - [ ] 0.226–0.228 — Aide à la pêche : poissons du lieu, appâts, créneau, météo ; GatherBuddy d'abord, Garland en secours ; bouton
   « Ouvrir l'aide à la pêche » et `/tensho peche` (détection « pêche en cours » déjà vue en jeu, capture 2026-11-01). Pêche en mer non
   couverte.
@@ -171,23 +170,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Page Crédits (R-13, 0.320)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Filtre (« MIT », « Garland »…) ; « Copier le lien » et « Copier la licence » remplissent le presse-papiers ; colonne Usage
+- [x] Filtre (« MIT », « Garland »…) ; « Copier le lien » et « Copier la licence » remplissent le presse-papiers ; colonne Usage
   renvoyée à la ligne, sans texte coupé à une largeur de fenêtre réduite.
 
 **Point d) — 0.321** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
+- [x] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
   valeurs restent ; le bouton ↺ remet chacune ; la case « Aide du carnet » s'enregistre au clic et montre son infobulle au survol.
 - [x] Paramètres › Avancé › « Revue de mode (FFXIVGachaSpreadsheet) » décoché : la page Revue de mode dit « source désactivée » quand
   aucune copie n'est gardée, sans téléchargement.
-- [ ] Marché hors ligne (réseau coupé) : le bouton de portée « Région » reste grisé, avec son infobulle ; pas de ralentissement.
 
 **Point d) — 0.324 : interrupteurs de sources** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 
 **Point d) — 0.325 : infobulles, confirmations** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survol des filtres, recherches, tris et champs de saisie des pages (Banque, Collections, Butin, Quêtes, Récolte, Objets,
+- [x] Survol des filtres, recherches, tris et champs de saisie des pages (Banque, Collections, Butin, Quêtes, Récolte, Objets,
   Artisanat, Marché, Cartes, Rangement, Triple Triad, Revue de mode, Équipement, Météo…) : chacun montre une infobulle, en
   français et en anglais, sans texte coupé.
 - [ ] Panneau du Duty Finder : la recherche accepte l'identifiant exact d'un objet ; ↻ a son infobulle ; la liste d'origine du
@@ -202,7 +200,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **Étape e) — 0.327 : réglages** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Paramètres › Interface : nombre de résultats à 50 → la recherche d'objets en liste 50 et l'avis dit 50 ; ↺ remet 30.
-- [ ] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
+- [x] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
 - [ ] Survol : décocher chaque partie (collection, stock, usages, comment l'obtenir) → elle disparaît du panneau sous l'infobulle du jeu
   seulement ; « masquer en mission » coché → pas de panneau dans un donjon.
 - [x] Triple Triad (observation activée) : chacun des trois interrupteurs coupe son aide (cadre du match, défi d'un PNJ, éditeur de decks).
@@ -224,7 +222,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] Coffre à apparence très rempli : l'import s'enregistre et se recharge après un rechargement du plugin.
 - [ ] Fiche d'un objet ouverte directement (onglet Aperçu) : le stock de l'en-tête est juste ; pour un cristal, les servants montrent « ≥ ».
-- [ ] Survoler vite plusieurs objets avec prix au survol : pas de « prix indisponibles » pendant la pause de 3 s.
+- [x] Survoler vite plusieurs objets avec prix au survol : pas de « prix indisponibles » pendant la pause de 3 s.
 - [ ] Historique des objets : « Retour » revient à l'objet précédent ; le fil d'Ariane reste court.
 
 **Étape e) — 0.332 : cadre du jeu** — retiré en 0.510 (DEC-033), plus rien à tester
@@ -261,7 +259,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape f) — 0.340 : barde de chocobo** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] « n bardes débloquées sur m » comparé au carnet de bardes du jeu ; « Seulement celles qui manquent » ; recherche par nom d'objet.
+- [x] « n bardes débloquées sur m » comparé au carnet de bardes du jeu ; « Seulement celles qui manquent » ; recherche par nom d'objet.
 
 **Étape f) — 0.342 : événements saisonniers** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -269,7 +267,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.343 : I-01 infobulle de prix complète** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survol d'un objet vendable : sous chaque prix, « Dernière vente · moyenne · ventes par jour » ; les mêmes que la page de l'objet
+- [x] Survol d'un objet vendable : sous chaque prix, « Dernière vente · moyenne · ventes par jour » ; les mêmes que la page de l'objet
   sur universalis.app pour votre monde.
 - [x] Survol d'une pile de l'inventaire : « Pile de N : ~X » (N = la quantité de la case) ; pas de ligne pour un objet hors de vos sacs.
 - [ ] Ctrl+Alt pendant le survol : la date « Récupéré à » change ; maintenu, une seule demande ; Paramètres › Avancé, l'éteindre.
@@ -300,7 +298,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.348 : I-10 rapport de rangement** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Mettre un même objet en deux piles incomplètes dans les sacs : Rangements › Rapport le liste, avec « 1 case libérable ».
+- [x] Mettre un même objet en deux piles incomplètes dans les sacs : Rangements › Rapport le liste, avec « 1 case libérable ».
 
 **Étape g) — 0.349 : X-07 liens wiki et Lodestone** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -362,7 +360,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] Clic droit sur une monture dans un butin (Butin des contenus) › « Ajouter à mes souhaits » ; Collections › Souhaits la montre
   avec « Pas encore obtenu » ; clic droit sur la ligne donne ses sources ; « Retirer » l'enlève.
-- [ ] Un objet ordinaire ajouté montre « Possédé ×N » ou « Pas possédé » ; la liste reste après un redémarrage et après
+- [x] Un objet ordinaire ajouté montre « Possédé ×N » ou « Pas possédé » ; la liste reste après un redémarrage et après
   « Réinitialiser les réglages ».
 
 **Étape g) — 0.361 : C-11 carnet d'exploration** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -376,7 +374,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.363 : C-14 mandats** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Progression › Mandats : les allocations restantes et le nombre de mandats acceptés sont ceux du jeu ; un mandat déjà fait dit
+- [x] Progression › Mandats : les allocations restantes et le nombre de mandats acceptés sont ceux du jeu ; un mandat déjà fait dit
   « Terminé » ; filtres type, mandateur, niveau min/max et état.
 
 **Étape g) — 0.364 : C-12 carnet de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -400,13 +398,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.368 : C-15 progression des succès** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Ouvrir un succès en cours dans la fenêtre des succès du jeu : dans Tensho, sa fenêtre montre « Progression : x / y ».
+- [x] Ouvrir un succès en cours dans la fenêtre des succès du jeu : dans Tensho, sa fenêtre montre « Progression : x / y ».
 
 **Étape g) — 0.369 : X-03 titres** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Collections › Titres › un titre obtenu › « Porter ce titre » : le titre change au-dessus du personnage ; « Aucun titre » le retire ;
   « Titre au hasard » en met un autre.
-- [ ] « Titre de <job> » puis « Changer de titre avec le job » coché : changer de job porte le titre choisi ; décoché : rien ne change.
+- [x] « Titre de <job> » puis « Changer de titre avec le job » coché : changer de job porte le titre choisi ; décoché : rien ne change.
 
 **Étape g) — 0.370 : X-02 musique en cours, rouleaux favoris** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -449,7 +447,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.377 : M-07 comparaison au survol** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survoler une pièce d'équipement dans l'inventaire et au marché : sous l'infobulle, « Comparé à l'équipement porté » donne le
+- [x] Survoler une pièce d'équipement dans l'inventaire et au marché : sous l'infobulle, « Comparé à l'équipement porté » donne le
   niveau d'objet et les statistiques en plus (vert) et en moins (rouge) par rapport à la pièce portée ; une bague : deux lignes.
 
 **Étape g) — 0.378 : M-08 favoris sur la carte** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -476,13 +474,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Étape g) — 0.382 : M-11 autres compteurs** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Ouvrir le carnet d'objectifs du jeu : la ligne « Carnet d'objectifs » des Rappels donne le bon nombre de défis faits (indice des
+- [x] Ouvrir le carnet d'objectifs du jeu : la ligne « Carnet d'objectifs » des Rappels donne le bon nombre de défis faits (indice des
   lignes à confirmer).
 - [ ] Passer à l'Enclave de Doman, faire un don : la ligne « Enclave de Doman » montre le don et le plafond de la semaine.
 
 **Étape g) — 0.383 : M-12 ensembles d'équipement** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Équipement › « Ensembles d'équipement du jeu » : tous vos ensembles, avec numéro, nom, job et niveau d'objet du jeu.
+- [x] Équipement › « Ensembles d'équipement du jeu » : tous vos ensembles, avec numéro, nom, job et niveau d'objet du jeu.
 
 **Étape g) — 0.384 : M-14 carte au trésor** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -517,7 +515,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.537 : s'effacer devant les fenêtres du jeu** — à voir en jouant
 
-- [ ] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
+- [x] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
 - [x] (rapport de l'utilisateur, 2026-11-05, « fenêtre ok ») Carte, réglage « S'effacer devant les fenêtres du jeu » coché : une fenêtre la touche : elle se cache sans se fermer.
 **0.538 et suivantes : un essai par ligne, marqué de sa version** — à voir en jouant
 
@@ -531,7 +529,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.542) Carte, réglage « Zoom à l'ouverture » : régler un zoom, relancer le jeu : le dernier zoom revient. Tester aussi « Fixe » et « Carte entière », puis le zoom sur une quête.
 
-- [ ] (0.543) Carte : les quatre réglages des noms et des étiquettes de récolte changent bien l'affichage ; aux valeurs par défaut, rien ne change.
+- [x] (0.543) Carte : les quatre réglages des noms et des étiquettes de récolte changent bien l'affichage ; aux valeurs par défaut, rien ne change.
 
 - [x] (0.544) Carte : clic droit sur un point, puis sur le drapeau : « Éthérite la plus proche » donne le nom et le coût, et demande confirmation.
 
@@ -559,13 +557,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.556) Alarmes, réglage activé : l'alarme sonne avec son avance puis à l'heure ; une seule fois chacune, en chat comme en son.
 
-- [ ] (0.557) Alarmes : modifier un nom et une date ; « Dans 5 min » ajoute une alarme qui sonne ; une date passée ou mal écrite est refusée.
+- [x] (0.557) Alarmes : modifier un nom et une date ; « Dans 5 min » ajoute une alarme qui sonne ; une date passée ou mal écrite est refusée.
 
 - [ ] (0.558) Rappels : finir les quêtes de tribu ou les commandes spéciales : la case se coche seule, et le compteur de la barre suit. Vérifier qu'une connexion ne coche rien à tort.
 
 - [ ] (0.559) Préparation et chaîne : le survol d'un matériau donne le détail par rangement, avec la date pour un servant.
 
-- [ ] (0.560) Calculer une chaîne, puis récolter un de ses matériaux : « Encore N pour… » apparaît et baisse.
+- [x] (0.560) Calculer une chaîne, puis récolter un de ses matériaux : « Encore N pour… » apparaît et baisse.
 
 - [ ] (0.561) Menu d'un objet : copier le nom ; le lien s'affiche dans le chat, seulement pour vous ; les trois pages s'ouvrent sur le bon objet.
 
@@ -574,14 +572,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] (0.563) Météo : ajouter deux zones au tableau, comparer aux prévisions du jeu, retirer une zone ; le tableau reste après une relance.
 
 
-- [ ] (0.565) Aperçu du tri : les cases encadrées sont bien celles qui bougent ; le nombre correspond après application.
+- [x] (0.565) Aperçu du tri : les cases encadrées sont bien celles qui bougent ; le nombre correspond après application.
 
 
 
 - [ ] (0.568) Aide à la pêche : comparer « créneau », « météo » et « météo d'avant » à l'heure et à la météo du jeu, sur un poisson à conditions.
 
 
-- [ ] (0.570) Rappels : déplier les tâches de servants après la cloche ; les heures correspondent, et les deux cloches créent leur alarme.
+- [x] (0.570) Rappels : déplier les tâches de servants après la cloche ; les heures correspondent, et les deux cloches créent leur alarme.
 
 - [ ] (0.571) Mini Cactpot : comparer la table affichée au ticket du jeu, somme par somme.
 
@@ -593,7 +591,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.576) Rangements : effacer le relevé d'un servant (deux clics) : ses objets quittent les stocks, et rouvrir le servant le relit.
 
-- [ ] (0.577) Alarmes : créer une alarme chaque jour et une à la remise à zéro : l'heure annoncée est juste, et elle revient après avoir sonné.
+- [x] (0.577) Alarmes : créer une alarme chaque jour et une à la remise à zéro : l'heure annoncée est juste, et elle revient après avoir sonné.
 
 
 - [ ] (0.579) Équipement : cocher « Tous les jobs (mirage) » sur la page : la liste des pièces s'élargit, et la case des filtres suit.
@@ -612,15 +610,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (rapport de l'utilisateur, 2026-11-05, « re ok ») (0.587) Carte : la roue dentée ouvre Paramètres, onglet Carte, au premier plan ; la fenêtre surgissante a disparu ; un réglage changé s'applique à la carte.
 
-- [ ] (0.588) Récolte, section « Ouverts maintenant ou bientôt » : comparer les heures à un point ouvert dans le jeu ; la cloche crée l'alarme.
+- [x] (0.588) Récolte, section « Ouverts maintenant ou bientôt » : comparer les heures à un point ouvert dans le jeu ; la cloche crée l'alarme.
 
 - [ ] (0.589) Lancer une synthèse sur une recette avec une séquence enregistrée : l'action suivante avance à chaque coup, « Conforme au plan » tant que les chiffres sont égaux, avertissement après un état Bonne ou une autre action.
 
 - [ ] (0.590) Page des séquences : chercher un mot, changer l'ordre, renommer, dupliquer, copier en texte puis coller dans « Importer une macro » du simulateur.
 
-- [ ] (0.591) Préparation d'un objet à sous-recettes : calculer la chaîne, vérifier une ligne par recette et l'ordre, ouvrir le carnet et le simulateur depuis une ligne, cocher une étape.
+- [x] (0.591) Préparation d'un objet à sous-recettes : calculer la chaîne, vérifier une ligne par recette et l'ordre, ouvrir le carnet et le simulateur depuis une ligne, cocher une étape.
 
-- [ ] (0.592) Artisanat, onglet « Que puis-je fabriquer ? » : lancer la recherche, comparer quelques lignes à vos sacs, filtrer par métier et niveau.
+- [x] (0.592) Artisanat, onglet « Que puis-je fabriquer ? » : lancer la recherche, comparer quelques lignes à vos sacs, filtrer par métier et niveau.
 
 
 - [x] (0.594) Banque : cocher « Afficher en liste », trier chaque colonne, filtrer, changer d'onglet, cliquer un objet.
@@ -715,7 +713,6 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.649) Page Récolte : chercher un poisson au harpon, son lieu s'affiche. Comparer avec le carnet du jeu. Ses alarmes et sa carte fonctionnent comme les autres.
 
-- [ ] (0.650) Mode développeur : récolter sans action pendant quelques tics, le journal écrit « Reading gp ». Les relevés suivants sont donnés un par un.
 
 - [x] (0.651) Rappels, ligne Bienfaits de compagnie : les noms s'affichent sans rien ouvrir. Ouvrir l'onglet Bienfaits : le temps restant apparaît, comme dans le jeu. Poser la cloche : l'alarme est à l'heure de fin.
 
@@ -739,7 +736,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.661) Incanter une téléportation et fermer la carte avec sa touche : elle reste fermée. Carte ouverte, se téléporter sans y toucher : elle se rouvre à l'arrivée. Dézoomer une ville au maximum : seuls les noms de liens restent, comme le jeu.
 
-- [ ] (0.662) Carte Tensho ouverte, se téléporter plusieurs fois de suite : plus de plantage. Le coût au survol d'une éthérite s'affiche quelques secondes après l'arrivée.
+- [x] (0.662) Carte Tensho ouverte, se téléporter plusieurs fois de suite : plus de plantage. Le coût au survol d'une éthérite s'affiche quelques secondes après l'arrivée.
 
 - [ ] (0.663) Pêche : un poisson à proies affiche sa durée d'intuition. Attraper ses proies : le temps restant s'affiche, et sa valeur de départ correspond à la durée annoncée.
 
@@ -752,7 +749,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.668) Faire une synthèse et s'arrêter à plusieurs niveaux de qualité : le pourcentage HQ du jeu correspond à celui du simulateur pour la même qualité.
 
-- [ ] (0.669) Simulateur : choisir des ingrédients HQ, la qualité initiale doit égaler celle du carnet du jeu avec les mêmes ingrédients. Coût de préparation et historique du marché : mêmes valeurs qu'avant, filtres et tri réagissent à l'instant.
+- [x] (0.669) Simulateur : choisir des ingrédients HQ, la qualité initiale doit égaler celle du carnet du jeu avec les mêmes ingrédients. Coût de préparation et historique du marché : mêmes valeurs qu'avant, filtres et tri réagissent à l'instant.
 
 - [ ] (0.670) Cartes › Conditions des rangs S : les noms sont lisibles dans la langue du jeu (aucun « # »), les marques de la zone viennent en premier, la recherche filtre. À l'occasion, comparer une condition à ce qui se passe en jeu.
 
@@ -809,7 +806,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.713) Progression › Peuples alliés : comparer rangs et réputation à la fenêtre de réputation du jeu ; si chaque ligne montre le rang du voisin, le dire.
+- [x] (0.713) Progression › Peuples alliés : comparer rangs et réputation à la fenêtre de réputation du jeu ; si chaque ligne montre le rang du voisin, le dire.
 
 - [ ] (0.714) Progression › Grandes compagnies : comparer grade, sceaux et prix de la promotion au jeu ; vérifier le genre du nom de grade ; comparer quelques articles à la boutique du jeu.
 
@@ -837,10 +834,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] (0.729) À un point de récolte : une ligne doit séparer « Ensuite » du plan.
 
 
-- [ ] (0.731) À un point de récolte, suivez le plan jusqu'au bout : avec 50 PR ou plus et des essais restants, « Ensuite » doit proposer une action avec les PR restants.
+- [x] (0.731) À un point de récolte, suivez le plan jusqu'au bout : avec 50 PR ou plus et des essais restants, « Ensuite » doit proposer une action avec les PR restants.
 
 
-- [ ] (0.733) À un point de récolte : un cadre doré doit clignoter sur la case de l'action « Ensuite » ; Sagesse du fermier seulement après une récolte.
+- [x] (0.733) À un point de récolte : un cadre doré doit clignoter sur la case de l'action « Ensuite » ; Sagesse du fermier seulement après une récolte.
 
 - [x] (0.734) À un point de récolte : le cadre doit se poser sur Récolte abondante, même placée en version I sur la barre.
 
@@ -853,11 +850,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.744) Récoltez quelques objets de la liste : plus de clignotement ; je vérifie qu'aucun « List zero » ne revient.
+- [x] (0.744) Récoltez quelques objets de la liste : plus de clignotement ; je vérifie qu'aucun « List zero » ne revient.
 
 
 
-- [ ] (0.747) À un point de récolte : le plan apparaît après « Calcul du plan… », sans à-coup ; je relis « Slow frame ».
+- [x] (0.747) À un point de récolte : le plan apparaît après « Calcul du plan… », sans à-coup ; je relis « Slow frame ».
 
 
 
@@ -866,7 +863,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.752) Liste de l'atelier : sous Récolte, une ligne par zone avec ses objets.
 
-- [ ] (0.753) Point de récolte : cochez « Récolter automatiquement » ; le plan change et le dit.
+- [x] (0.753) Point de récolte : cochez « Récolter automatiquement » ; le plan change et le dit.
 
 - [x] (0.754) Carte : survolez un point à horaire fermé ; une ligne doit dire dans combien de temps il ouvre.
 
@@ -876,7 +873,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [x] (0.757) Liste de l'atelier : repliez une zone ; changez de zone, elle doit passer en tête ; les prix de téléportation s'affichent.
 
 
-- [ ] (0.759) Cliquez « Ouvrir dans Tensho » sur une alarme, même affichée avant un rechargement : la fiche de l'objet doit s'ouvrir.
+- [x] (0.759) Cliquez « Ouvrir dans Tensho » sur une alarme, même affichée avant un rechargement : la fiche de l'objet doit s'ouvrir.
 
 
 
@@ -905,16 +902,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
 
-- [ ] (0.782) Rouvrez le carnet d'artisan sur la recette 5623 en cuisinier : plus de gel.
+- [ ] (0.782) Où : en jeu, le carnet d'artisanat, et le panneau « Tensho · Carnet d'artisanat » à côté ; réglage : Paramètres › Panneaux à côté du jeu › Aide à l'artisanat › « Utiliser le solveur Raphael ». Faire : 1) cochez « Utiliser le solveur Raphael » ; 2) portez Cuisinier ; 3) ouvrez le carnet d'artisanat, passez sur Menuisier (ou cherchez « Madrier de ginseng ») ; 4) sélectionnez « Madrier de ginseng » (niveau 91). Regarder : le jeu ne gèle pas ; le panneau Tensho affiche une « Macro proposée » ou « Aucune séquence terminée compatible. ».
 
-- [ ] (0.783) Carnet d'artisan, Kit de réparation d'appareil : « Raphael non utilisé ».
+- [x] (0.783) Carnet d'artisan, Kit de réparation d'appareil : « Raphael non utilisé ».
 
 
 
 
 - [ ] (0.787) Ouvrez la livraison à l'établi : le panneau d'atelier ne garde que le reste à livrer, la page dit « Livré : phase 2/3 en cours ».
 
-- [ ] (0.788) Carnet en Menuisier sur le Lingot de mithril (Métallurgie) : « Mauvais métier » en orange et le bouton pour porter Forgeron.
+- [x] (0.788) Carnet en Menuisier sur le Lingot de mithril (Métallurgie) : « Mauvais métier » en orange et le bouton pour porter Forgeron.
 
 
 
@@ -937,7 +934,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.807) Promenez-vous parmi des monstres, puis Monde › Découvertes : cherchez un nom, ses lieux s'affichent ; Exporter, puis déposez le fichier dans Import et Importer.
 
-- [ ] (0.808) Carnet d'artisanat : clic droit sur une recette puis sur un matériau : entrée « Tensho ».
+- [x] (0.808) Carnet d'artisanat : clic droit sur une recette puis sur un matériau : entrée « Tensho ».
 
 - [ ] (0.809) Vainquez quelques monstres et ramassez leur butin (en mage bleu : un sort ; en dresseur : une capture) ; je relis « Reading messages ».
 
@@ -949,7 +946,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.814) Une cible hors de la vue, en haut à gauche : son icône de bord passe au-dessus du bandeau des noms.
 
 
-- [ ] (0.816) Récolte d'un collectionnable avec seuils : le bouton de l'action du plan encadré dans la fenêtre du jeu.
+- [x] (0.816) Récolte d'un collectionnable avec seuils : le bouton de l'action du plan encadré dans la fenêtre du jeu.
 
 - [x] (0.817) Ouvrez un objet au tableau des ventes, puis regardez son prix dans Tensho (survol, Que faire avec ?) : celui que vous venez de voir.
 
@@ -1030,7 +1027,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.875) Désynthétiser un objet, puis sa fiche › Usages : « Vu donner » ; vaincre un monstre et ramasser un objet, puis Monde › Monstres sur cet objet : « Vu le laisser ».
 
-- [ ] (0.876) Après un coffre de mission ouvert : la fiche de la mission montre « Coffre (vu par vous) » ; clic droit sur l'objet : la mission proposée.
+- [x] (0.876) Après un coffre de mission ouvert : la fiche de la mission montre « Coffre (vu par vous) » ; clic droit sur l'objet : la mission proposée.
 
 
 - [ ] (0.878) Combattre un monstre qui lance un sort de mage bleu (barre d'incantation) : Monde › Découvertes « vu lançant » ; Collections › Magie bleue, fenêtre du sort : « Vu par vous ».
@@ -1072,10 +1069,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
+- [x] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
 
 
-- [ ] (0.913) Survoler un bouton grisé (galerie d'outils pendant un chargement, carte d'un point sans carte) : l'info-bulle s'affiche ; les info-bulles longues ont toutes la même largeur.
+- [x] (0.913) Survoler un bouton grisé (galerie d'outils pendant un chargement, carte d'un point sans carte) : l'info-bulle s'affiche ; les info-bulles longues ont toutes la même largeur.
 
 - [x] (0.914) Glisser un curseur de la carte ou de l'équipement : l'effet suit en direct ; les réglages sont bien gardés après un rechargement.
 
@@ -1088,7 +1085,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.919) Atelier de la compagnie, après avoir consulté les résultats de l'aéronef : onglet des navires, « Dernier voyage : Mer de nuages - secteur 1 › … ».
 
-- [ ] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
+- [x] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
 
 - [x] (0.921) Parcourir quelques pages avec des icônes (contenus, actions, cartes de Triple Triade, carte du monde, vues panoramiques) : les icônes sont là et à la même taille.
 
@@ -1100,7 +1097,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.927) Survoler un objet qui apprend une emote ou une coiffure, déjà apprise puis non apprise : ligne « Apprend quelque chose : … » verte ou rouge.
 
 
-- [ ] (0.929) Carte d'une zone de Stormblood ou plus récente : survol d'une vue panoramique, « Carnet Stormblood n° 0xx » ; la liste des vues de la carte a ses numéros.
+- [x] (0.929) Carte d'une zone de Stormblood ou plus récente : survol d'une vue panoramique, « Carnet Stormblood n° 0xx » ; la liste des vues de la carte a ses numéros.
 
 
 
@@ -1117,7 +1114,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.944) Paramètres : info-bulles relues ; carte › réglages : une seule case « zones de quête » (section Zones) ; craft › attente des bonus : le bouton par défaut revient à la valeur des actions.
+- [x] (0.944) Paramètres : info-bulles relues ; carte › réglages : une seule case « zones de quête » (section Zones) ; craft › attente des bonus : le bouton par défaut revient à la valeur des actions.
 
 
 
@@ -1146,7 +1143,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.970) Quêtes : survoler une quête, ligne « Extension : … ». Survoler un objet récolté (ex. un minerai de Heavensward) : ligne « Extension (d'après ses lieux de récolte) : Heavensward ».
+- [x] (0.970) Quêtes : survoler une quête, ligne « Extension : … ». Survoler un objet récolté (ex. un minerai de Heavensward) : ligne « Extension (d'après ses lieux de récolte) : Heavensward ».
 
 
 
@@ -1229,7 +1226,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1042) Paramètres › Alarmes, « Créer aussi les alarmes dans le jeu » cochée : la case « Envoyer aussi sur Discord » apparaît dessous, décochée ; une alarme copiée dans le jeu ne part plus sur Discord ; case cochée (webhook activé), elle y part à l'heure, sans sonner deux fois dans le jeu.
 
-- [ ] (0.1043) Alarmes : « Supprimer » sur une alarme : le bouton devient « Cliquer encore pour supprimer » en rouge, l'alarme reste ; un second clic dans les 5 secondes la supprime ; après 5 secondes, le bouton revient et un clic ne fait que l'armer de nouveau.
+- [x] (0.1043) Alarmes : « Supprimer » sur une alarme : le bouton devient « Cliquer encore pour supprimer » en rouge, l'alarme reste ; un second clic dans les 5 secondes la supprime ; après 5 secondes, le bouton revient et un clic ne fait que l'armer de nouveau.
 
 
 
@@ -1277,7 +1274,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1046) Après le prochain patch du jeu, au premier chargement de Tensho : dalamud.log contient une ligne « Patch changes: catalog-… : ancienne -> nouvelle version, N added, N removed, N changed » par catalogue refait (objets, recettes, récolte, positions, marchands) ; au chargement suivant, les mêmes lignes en « Patch changes (kept) ». Le dossier DataCache-v1\previous du plugin contient une copie par catalogue et patch-reports.json.
+- [ ] (0.1046) Où : n'importe où, le jour du prochain patch du jeu. Faire : 1) après le patch, lancez le jeu avec Tensho et connectez un personnage ; 2) attendez une minute que Tensho finisse de charger ; 3) cliquez « C'est fait » sur cette page. Regarder : rien à l'écran : l'agent lit lui-même le journal de Dalamud (les lignes du rapport des changements de catalogue : objets, recettes, récolte, positions, marchands).
 
 
 
@@ -1312,7 +1309,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1106) Barre latérale, OBJETS › Souhaits : la page s'ouvre (plus d'onglet Souhaits dans Collections) ; clic droit sur un objet › « Ajouter à mes souhaits » : la ligne « ajouté à vos souhaits » en bas de la fenêtre, son bouton ouvre la liste
 
-- [ ] (0.1106) Souhaits avec un objet récolté sur un point limité (ex. un objet de légende) : sous son nom, « Récolte : métier · zone · point · heures » ; « Ajouter les alarmes (N) » les pose, un deuxième clic n'en ajoute pas
+- [x] (0.1106) Souhaits avec un objet récolté sur un point limité (ex. un objet de légende) : sous son nom, « Récolte : métier · zone · point · heures » ; « Ajouter les alarmes (N) » les pose, un deuxième clic n'en ajoute pas
 
 
 - [x] (0.1107) Carte de Tensho, clic droit › onglet Quêtes : la case « Quêtes pas encore disponibles » y est (plus au-dessus des onglets) ; décochée, les quêtes pas encore disponibles quittent la liste et leurs icônes la carte
@@ -1346,11 +1343,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1125) Aide › Signaler un problème : remplir un bug avec un chemin « C:\Users\Nom Prénom\x » dans le titre, « Préparer le formulaire GitHub » : l'aperçu montre <path>, rien ne s'ouvre ; changer un champ ferme l'aperçu ; « Ouvrir dans mon navigateur » ouvre le formulaire avec exactement le texte de l'aperçu (ne pas l'envoyer)
 
 
-- [ ] (0.1128) Carte › Carnet d'exploration : un panorama dont la fenêtre est ouverte dit « possible maintenant, jusqu'à HH:MM » et le jeu l'accepte ; un panorama hors de son heure n'est pas dans « Possibles maintenant » ; son infobulle dit ce qui manque et la prochaine fenêtre (Le Viaduc 020 : 05:00–07:59 ET, Ciel dégagé ou Beau temps)
+- [x] (0.1128) Carte › Carnet d'exploration : un panorama dont la fenêtre est ouverte dit « possible maintenant, jusqu'à HH:MM » et le jeu l'accepte ; un panorama hors de son heure n'est pas dans « Possibles maintenant » ; son infobulle dit ce qui manque et la prochaine fenêtre (Le Viaduc 020 : 05:00–07:59 ET, Ciel dégagé ou Beau temps)
 
 - [ ] (0.1128) Infobulle d'un panorama à météo rare (La Cité invisible 019, Nuages) : une prochaine fenêtre est donnée, ou « Aucune fenêtre dans les 30 prochains jours », jamais rien
 
-- [ ] (0.1129) Barre d'infos du serveur avec les alarmes, les rappels, les monnaies et les gils : chaque infobulle s'ouvre juste sous son entrée, sans sortir de l'écran ; avec « Au-dessus de l'entrée » coché et la barre en haut de l'écran, elles restent en dessous (pas de place au-dessus)
+- [x] (0.1129) Barre d'infos du serveur avec les alarmes, les rappels, les monnaies et les gils : chaque infobulle s'ouvre juste sous son entrée, sans sortir de l'écran ; avec « Au-dessus de l'entrée » coché et la barre en haut de l'écran, elles restent en dessous (pas de place au-dessus)
 
 - [x] (0.1130) Carte de Tensho : les icônes de la colonne d'outils sont centrées dans leurs boutons ; cliquer le pourcentage, taper 150 puis Entrée : zoom à 150 % ; « 100% » sous le pourcentage remet 100 % ; la colonne reste lisible sur la carte (superposée) et dans une petite fenêtre
 
@@ -1408,10 +1405,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1161) Découvertes › échange GitHub : un joueur déjà connecté voit « Tensho se connecte maintenant à GitHub par son application GitHub… » et se reconnecte ; la page d'autorisation de GitHub nomme l'application de Tensho et ne demande que les tickets du dépôt et les gists ; un envoi crée le gist secret et le ticket « Discoveries: <login> »
 
-- [x] (0.1163) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
+- [x] (0.1163) Où : Gold Saucer, le Dédale bestial ; dans Tensho : CONTENUS › Dresseur › onglet « Équipe ». Faire : 1) finissez un plateau du Dédale bestial ; 2) laissez la fenêtre de résultat du jeu ouverte quelques secondes (Tensho la lit à ce moment) ; 3) ouvrez /tensho › Dresseur › Équipe ; 4) cliquez la ligne « Dernier plateau… » pour la déplier. Regarder : « Dernier plateau (date) : score… · bonus… · total… » avec les mêmes chiffres que la fenêtre du jeu ; dépliée, une ligne par bête « Nom : rang A (x/100) → rang B (y/100) », et « +N rang(s) » en vert si elle monte.
 
 
-- [ ] (0.1164) Après quelques changements de réglage (fenêtre, alarmes) : dalamud.log n'a plus de ligne « Slow settings save » au-delà de 50 ms ni « Long UiBuilder(Tensho Assistant) » au moment d'un clic sur un réglage ; aucune ligne « saved on the game's thread, as before »
+- [x] (0.1164) Où : Tensho › Paramètres. Faire : 1) cochez puis décochez deux ou trois cases (par exemple dans l'onglet Carte) ; 2) déplacez une fenêtre de Tensho ; 3) cliquez « C'est fait ». Regarder : le jeu ne fige pas au clic ; l'agent vérifie dans le journal de Dalamud qu'aucun enregistrement des réglages n'a été lent.
 
 
 - [x] (0.1165) Jardin avec plusieurs emplacements notés : clic droit sur une plante (menu « Potager N, emplacement M »), Entretenir : dans Jardinage, seul cet emplacement passe à « entretenu » (heure d'entretien suivante repoussée), les autres et l'onglet Alarmes suivent ; en mode développeur, dalamud.log a « Garden menu read: window …, patch N, bed M. »
@@ -1438,7 +1435,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1174) Mode développeur, en extérieur : vaincre un monstre qui laisse un objet, même sans le cibler : dalamud.log montre « Discovery: defeat of … read from the game's message » puis « Discovery: MonsterDrop item … » (plus de « Item gain not attributed » pour ce butin)
 
-- [ ] (0.1174) Mode développeur, chasse au trésor en extérieur (carte déchiffrée, sans portail) : le butin du coffre donne « Discovery: ItemFromItem item … » avec l'objet de la carte ; Découvertes › la carte au trésor montre ces objets
+- [ ] (0.1174) Où : une zone extérieure, avec une carte au trésor déchiffrée qui n'ouvre pas de portail ; dans Tensho : MONDE › Découvertes. Faire : 1) creusez à l'endroit de la carte, battez les monstres, ouvrez le coffre ; 2) ouvrez /tensho › Découvertes ; 3) dans le champ « Monstre, ALÉA, objet… », tapez le nom de votre carte. Regarder : une ligne « <objet reçu> ← <nom de la carte> ouvert » pour chaque objet du coffre, et le compte « Objets ouverts » qui augmente.
 
 - [x] (0.1175) Mode développeur, sur un point de récolte où un objet porte « RARE » (terreau III, par exemple) : ouvrir le point, faire une récolte sur l'objet RARE puis une autre ; dalamud.log a des lignes « addons » Gathering: …, à garder pour le relevé (logread.py)
 
@@ -1492,11 +1489,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1202) Panneau des collectables (point de récolte collectionnable) : le plan conseillé et ses étapes s'affichent comme avant, un peu plus vite ; Prudent, Équilibré et Tenter sa chance donnent les mêmes conseils qu'avant
 
-- [ ] (0.1204) Mode développeur : après deux rechargements du plugin, dalamud.log n'a plus qu'une ligne courte « Reading eventMarkers: the same as earlier in this game session » (et « Submarine voyage check …: the same 6 lines … ») au lieu du texte entier ; un nouveau texte (autre zone, autre carte) est écrit en entier
 
 - [x] (0.1206) Carte : quelques secondes après le chargement (plus de 12 s), ouvrir une carte de région (Nocturne, Forêt…) pour la première fois : elle s'affiche sans à-coup ; noms des liens et éthérites présents comme avant
 
-- [ ] (0.1206) Mode développeur : ouvrir Rangements puis Paramètres et changer d'onglet : si une image lente est notée dans dalamud.log, la ligne « Slow frame » nomme l'onglet (« storage … », « settings … »)
+- [x] (0.1206) Mode développeur : ouvrir Rangements puis Paramètres et changer d'onglet : si une image lente est notée dans dalamud.log, la ligne « Slow frame » nomme l'onglet (« storage … », « settings … »)
 
 - [x] (0.1207) Application de bureau ouverte, jeu lancé : ouvrir puis fermer des pages qui lisent les gils ou les hauts faits sans rien changer : l'application ne recopie plus le fichier de données à chaque fois (pas de rechargement visible) ; un vrai changement (gils gagnés) arrive toujours
 
@@ -1506,7 +1502,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1220) Paramètres › Général › Langue : Deutsch et 日本語 marqués « (partiel) » ; Tensho en anglais : pourcentages sans espace (usure de l'équipement, statistiques du personnage) et nombres « 1,234 » ; en français : « 1 234 » et « 12,5 % »
 
-- [ ] (0.1220) Barre serveur des monnaies et prochaine alarme : « 3h 05m » en anglais, « 3 h 05 » en français
+- [x] (0.1220) Barre serveur des monnaies et prochaine alarme : « 3h 05m » en anglais, « 3 h 05 » en français
 
 - [x] (0.1221) Pied de page de la fenêtre Tensho : « Servants et chocobo : enregistrés à l'ouverture (datés) » ; avec l'enregistrement automatique des rangements coupé : « enregistrés sur demande (datés) »
 
@@ -1591,7 +1587,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1252) Paramètres › Général › « Liste des pages » : « Toujours visible » garde la colonne dans une fenêtre étroite, « Toujours repliée » la replie dans une fenêtre large ; ↺ revient à « Automatique »
 
-- [ ] (0.1252) Page choisie dans la liste : fond de sélection et barre dorée sur le bord gauche, texte de la couleur normale ; sous-pages de Récolte, Artisanat, Collections : barre sous le bouton choisi ; à vérifier aussi en thème clair
+- [x] (0.1252) Page choisie dans la liste : fond de sélection et barre dorée sur le bord gauche, texte de la couleur normale ; sous-pages de Récolte, Artisanat, Collections : barre sous le bouton choisi ; à vérifier aussi en thème clair
 
 - [ ] (0.1252) Échelle de Dalamud à 150 % : la colonne des pages s'élargit avec le texte (plus de noms coupés)
 
@@ -1628,9 +1624,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1259) Parcelle sans voisine compatible : glyphe barré avec la phrase en infobulle ; graine hors des paires : point d'interrogation
 
-- [ ] (0.1259) Bouton à icône (double coche) à côté du titre du potager : toutes les parcelles à entretenir passent en « entretenu » ; son infobulle l'explique ; vérifier que la double coche se lit
+- [x] (0.1259) Bouton à icône (double coche) à côté du titre du potager : toutes les parcelles à entretenir passent en « entretenu » ; son infobulle l'explique ; vérifier que la double coche se lit
 
-- [ ] (0.1260) Météo d'une zone : bandeau de trois blocs (Maintenant, Ensuite, Après) au-dessus du tableau, avec icône, nom, heures ET ; « Ensuite » et « Après » ont un compte à rebours qui avance à la seconde et l'heure du PC ; la cloche crée la même alarme que celle du tableau
+- [x] (0.1260) Météo d'une zone : bandeau de trois blocs (Maintenant, Ensuite, Après) au-dessus du tableau, avec icône, nom, heures ET ; « Ensuite » et « Après » ont un compte à rebours qui avance à la seconde et l'heure du PC ; la cloche crée la même alarme que celle du tableau
 
 - [ ] (0.1260) Rester sur la page au changement de période (toutes les 23 min 20 s) : le bloc courant change, avec un fondu très bref de son fond ; avec « mouvement réduit » coché dans les réglages de Dalamud : aucun fondu
 
@@ -1646,9 +1642,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1262) Carte de Tensho dans une zone avec des monstres suivis (liste, journal de chasse ou ALÉA) : leurs marques sont moitié moins grandes qu'avant ; les repères d'exploration (jumelles) un peu plus petits
 
-- [ ] (0.1262) Carte › tailles des icônes : ligne « Monstres proches » à 50 % et « Repères d'exploration » à 80 % ; changer une taille la garde après rechargement ; 0 masque les marques ; ↺ revient à la valeur par défaut
+- [x] (0.1262) Carte › tailles des icônes : ligne « Monstres proches » à 50 % et « Repères d'exploration » à 80 % ; changer une taille la garde après rechargement ; 0 masque les marques ; ↺ revient à la valeur par défaut
 
-- [ ] (0.1262) Si vous aviez déjà réglé la taille des repères d'exploration : elle n'a pas changé
+- [x] (0.1262) Si vous aviez déjà réglé la taille des repères d'exploration : elle n'a pas changé
 
 - [ ] (0.1263) Grande maison avec deux ou trois potagers plantés : Jardinage montre une grille par potager, titrée « lieu · potager 1 », « potager 2 », « potager 3 », chacune avec ses parcelles
 
@@ -1660,17 +1656,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1264) Survol d'un objet avec un prix ancien : « Donnée ancienne » se lit dans l'infobulle sans la déformer
 
-- [ ] (0.1265) Pendant une synthèse, page de la lecture en direct : ligne « Mesuré » (œil) avec l'heure ; fenêtre du jeu fermée depuis plus de deux secondes : « Donnée ancienne »
+- [ ] (0.1265) Où : Tensho › PRODUCTION › Artisanat, petit bouton « Synthèse en cours » en haut de la page. Faire : 1) lancez une synthèse dans le jeu ; 2) ouvrez /tensho › Artisanat › « Synthèse en cours » ; 3) jouez une action ; 4) finissez ou quittez la synthèse. Regarder : pendant la synthèse, un œil, « Mesuré » et « Observation à HH:MM:SS (heure PC) · récente », l'heure qui avance à chaque action ; après la fin : « Aucune fenêtre de synthèse ouverte. ».
 
-- [ ] (0.1265) Tableau des prochaines actions pendant une synthèse : ligne « Estimation » (calculatrice) au-dessus du tableau
+- [ ] (0.1265) Où : la fenêtre Tensho « Comparer les prochains coups · expérimental », collée à la fenêtre de synthèse du jeu (réglage : Paramètres › Panneaux à côté du jeu › Aide à l'artisanat, case « Fenêtre « Comparer les prochains coups » à côté de la synthèse »). Faire : 1) cochez ce réglage ; 2) lancez une synthèse ; 3) regardez la fenêtre Tensho à côté. Regarder : juste au-dessus du tableau (colonnes « Action », « Progression après »…), une calculatrice, « Estimation » et la phrase « Le tri porte sur un gain immédiat ; il ne choisit pas un plan de synthèse viable. ».
 
-- [ ] (0.1265) Simulation avec Travail rapide ou Ouvrage hâtif dans la séquence : ligne « Estimation » avec la phrase sur les actions laissées au hasard
+- [ ] (0.1265) Où : Tensho › PRODUCTION › Artisanat, onglet « Simulation ». Faire : 1) dans « Chercher une recette… », tapez un objet et cliquez-le ; 2) dans « Ajouter une action », cliquez « Travail rapide » ou « Ouvrage hâtif » ; 3) lisez sous le résultat ; 4) retirez ces actions. Regarder : une calculatrice, « Estimation » et la phrase « Actions aléatoires dans la séquence (Travail rapide 50 %, Ouvrage hâtif 60 %) : leur réussite est supposée. » ; la ligne disparaît quand ces actions sont retirées.
 
 - [x] (0.1265) « Que puis-je fabriquer ? » après avoir déplacé des objets : « Donnée ancienne » à côté du bouton de recherche
 
-- [ ] (0.1266) Outil PR avec un objet de récolte choisi, en mineur ou botaniste : petite calculatrice après « Estimé : +N » ; au survol « Estimation · calculé par Tensho… »
+- [x] (0.1266) Outil PR avec un objet de récolte choisi, en mineur ou botaniste : petite calculatrice après « Estimé : +N » ; au survol « Estimation · calculé par Tensho… »
 
-- [ ] (0.1266) Panneau de récolte devant un point : calculatrice après la ligne du rendement attendu du plan
+- [x] (0.1266) Panneau de récolte devant un point : calculatrice après la ligne du rendement attendu du plan
 
 - [ ] (0.1266) Observation du point (fenêtre de récolte ouverte) : ligne « Mesuré » avec le résumé ; fenêtre fermée : « En attente »
 
@@ -1686,7 +1682,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1268) Avec « ALÉA » coché dans les icônes au-dessus des têtes : mêmes marques au-dessus des ennemis et des alliés
 
-- [ ] (0.1269) Paramètres › Avancé, « état de Tensho » coché (ou page Diagnostic en mode développeur) : sous « Tableau de bord », une rangée de jauges (mémoire, page la plus lente, requêtes par minute) et des compteurs ; chaque jauge a sa valeur écrite et une aide au survol
+- [x] (0.1269) Paramètres › Avancé, « état de Tensho » coché (ou page Diagnostic en mode développeur) : sous « Tableau de bord », une rangée de jauges (mémoire, page la plus lente, requêtes par minute) et des compteurs ; chaque jauge a sa valeur écrite et une aide au survol
 
 - [ ] (0.1269) Fenêtre rétrécie : les jauges passent à la ligne sans se chevaucher ; thème clair : cadran et chiffres lisibles
 
@@ -1739,7 +1735,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1222) Accueil à la première visite : une seule description (le bandeau dit par où commencer) ; Aide : FAQ commençant par « Par où commencer ? »
 
-- [ ] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
+- [x] (0.1254) Titre de chaque page : plus de trait juste sous la description, un espace à la place ; rien ne se chevauche (à voir sur Accueil, Récolte, Marché, Paramètres)
 
 - [ ] (0.1273) Application de bureau : les flèches des catégories de la navigation (OBJETS, PRODUCTION…) sont des triangles, plus des rectangles ; Jardinage : la goutte et la coche des parcelles se lisent ; tableau de bord : le « ? » des lignes à regarder se lit
 
@@ -1753,11 +1749,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1305) Découvertes : après une tâche de servant (exploration), la ligne « … ← tâche : » montre le nom de l'exploration (par exemple « Exploration en forêt XXI »), plus « n° 584 » ; une tâche ciblée montre « tâche de <classe> niv. <niveau> »
 
-- [ ] (0.1306) Peuples alliés : après « Actualiser », le choix « Genre » montre seulement les peuples de combat, d'artisanat ou de récolte ; les Namazu sont sous artisanat et sous récolte ; la colonne « Genre » le dit ; le choix reste après fermeture et réouverture de Tensho
+- [x] (0.1306) Peuples alliés : après « Actualiser », le choix « Genre » montre seulement les peuples de combat, d'artisanat ou de récolte ; les Namazu sont sous artisanat et sous récolte ; la colonne « Genre » le dit ; le choix reste après fermeture et réouverture de Tensho
 
 - [x] (0.1307) Carte, Mor Dhona (X 21.4 Y 5.5) : sans la quête « Les cristaux d'Ardashir » (67748) prise, Cristiana (« Matériaux pour armes anima ») n'est plus sur la carte de Tensho ; les autres marchands de Mor Dhona (Kakalan…) restent
 
-- [ ] (0.1307) Carte : marchand d'une quête : une fois sa quête prise, il apparaît sur la carte de Tensho sans recharger (la carte se refait)
+- [x] (0.1307) Carte : marchand d'une quête : une fois sa quête prise, il apparaît sur la carte de Tensho sans recharger (la carte se refait)
 
 - [ ] (0.1308) Palais des morts (entrée, Gridania de l'Est … ou par l'outil des missions) : Tensho reste actif (pas de ligne « Tensho est en pause » dans le chat, pages ouvertes) ; touche M : la carte du jeu s'affiche (celle du donjon), pas celle de Tensho ; la fenêtre de carte de Tensho, si elle était ouverte, est cachée et revient à la sortie
 
@@ -1857,9 +1853,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1366) Jardin : ouvrir le menu d'un carreau, le fermer sans rien faire, puis acheter un objet ou recevoir un objet dans les secondes qui suivent : aucun carreau mûr retiré du journal ; planter un carreau : rien de récolté.
 
-- [ ] (0.1367) Objets (page Objets ou recherche rapide de l'accueil) : taper « d'Ehcatl » avec l'apostrophe du clavier : la poignée de plumes et la paire de gants d'Ehcatl sont trouvées ; Découvertes : une recherche ne montre que les objets dont une source a été notée (un objet jamais obtenu n'y est pas).
+- [x] (0.1367) Objets (page Objets ou recherche rapide de l'accueil) : taper « d'Ehcatl » avec l'apostrophe du clavier : la poignée de plumes et la paire de gants d'Ehcatl sont trouvées ; Découvertes : une recherche ne montre que les objets dont une source a été notée (un objet jamais obtenu n'y est pas).
 
-- [ ] (0.1368) Plugin en français : page Listes d'artisanat (titre), onglet « Liste d'artisanat » du simulateur, panneau à l'écran et ligne « Liste d'artisanat : il en manque … » de l'aide à la récolte : un seul nom partout.
+- [x] (0.1368) Plugin en français : page Listes d'artisanat (titre), onglet « Liste d'artisanat » du simulateur, panneau à l'écran et ligne « Liste d'artisanat : il en manque … » de l'aide à la récolte : un seul nom partout.
 
 - [ ] (0.1369) Plugin en français : page Bestiaire (colonne « Vaincus »), page Mandats (colonne et filtre « Client »), réglages de la carte Tensho (« Cibles d'élite proches », « Monstres de vos Chroniques du zodiaque »), page Rangs S (champ « Chercher une cible d'élite… »), Aide › questions « mettre à jour » et « installer » (« Mettre à jour les plugins », « Dalamud › Paramètres › Expérimental › Dépôts de plugins personnalisés »).
 
@@ -1869,9 +1865,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1373) Dédale bestial, panneau d'équipe devant le plateau (français puis anglais) : aucune ligne coupée au bord (« Rangs pas encore lus… », noms des ennemis comme « Succube épéiste », « Grand feu follet… ») ; les lignes passent à la ligne, retrait gardé ; « faiblesse touchée : 0 sur 1 ennemi » au singulier, « 2 sur 3 ennemis » au pluriel.
 
-- [ ] (0.1374) En français : barre de navigation « Butin des missions » et « PNJ marchands » ; carte › réglage « Masquer en mission » ; infobulle d'un objet vendu : « (outil PNJ marchands) » ; panneau des servants au tableau des ventes : « Comparer aux autres vendeurs » inchangé.
+- [x] (0.1374) En français : barre de navigation « Butin des missions » et « PNJ marchands » ; carte › réglage « Masquer en mission » ; infobulle d'un objet vendu : « (outil PNJ marchands) » ; panneau des servants au tableau des ventes : « Comparer aux autres vendeurs » inchangé.
 
-- [ ] (0.1375) Objets annotés, Collection, aide et carte : taper un nom avec une apostrophe courbe (d'Ehcatl tapé avec l'apostrophe courbe, Alt+0146) trouve le même résultat qu'avec l'apostrophe droite
+- [x] (0.1375) Objets annotés, Collection, aide et carte : taper un nom avec une apostrophe courbe (d'Ehcatl tapé avec l'apostrophe courbe, Alt+0146) trouve le même résultat qu'avec l'apostrophe droite
 
 - [ ] (0.1376) Chat : survoler un long lien de carte par son début, puis clic droit sur ses coordonnées à l'autre bout : le menu de Tensho s'ouvre (mode développeur : « Chat link right click: map N, menu opened »)
 
@@ -1881,15 +1877,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1378) Jardin : récolter un emplacement mûr par son menu : la récolte est notée (« Garden harvest read: patch N, bed M »)
 
-- [ ] (0.1379) Rappels : un rappel à plus de 24 h dit « Dans N j H h » (et l'heure seule pour aujourd'hui) ; la barre du serveur dit aussi « N j H h » pour une alarme à plusieurs jours
+- [x] (0.1379) Rappels : un rappel à plus de 24 h dit « Dans N j H h » (et l'heure seule pour aujourd'hui) ; la barre du serveur dit aussi « N j H h » pour une alarme à plusieurs jours
 
 - [ ] (0.1380) Alarmes : une alarme quotidienne à l'heure réelle, juste après qu'elle a sonné (dans son avance), ouvrir « Modifier » et valider la date sans la changer : elle ne sonne pas une seconde fois
 
-- [ ] (0.1380) Équipement : ouvrir le choix d'une pièce, faire défiler une longue liste : les rangées gardent la même hauteur, le niveau reste sur la ligne
+- [x] (0.1380) Équipement : ouvrir le choix d'une pièce, faire défiler une longue liste : les rangées gardent la même hauteur, le niveau reste sur la ligne
 
-- [ ] (0.1387) Collection › Titres et Hauts faits : ouvrir une fois la fenêtre Titres et la fenêtre Hauts faits du jeu, puis recharger Tensho (ou relancer le jeu) sans les rouvrir : les deux pages montrent le même compte d'obtenus qu'avant, et la ligne rouge dit « Relevé du <date> ».
+- [x] (0.1387) Collection › Titres et Hauts faits : ouvrir une fois la fenêtre Titres et la fenêtre Hauts faits du jeu, puis recharger Tensho (ou relancer le jeu) sans les rouvrir : les deux pages montrent le même compte d'obtenus qu'avant, et la ligne rouge dit « Relevé du <date> ».
 
-- [ ] (0.1388) Barre du serveur du jeu (Paramètres : entrées Sacs, État de l'équipement, Zone et instance cochées) : survoler chacune : l'infobulle est celle de Tensho (titre doré, même style que les alarmes), au-dessus ou en dessous selon le réglage « Au-dessus de l'entrée ».
+- [x] (0.1388) Barre du serveur du jeu (Paramètres : entrées Sacs, État de l'équipement, Zone et instance cochées) : survoler chacune : l'infobulle est celle de Tensho (titre doré, même style que les alarmes), au-dessus ou en dessous selon le réglage « Au-dessus de l'entrée ».
 
 - [ ] (0.1389) Chat : survoler un lien de carte en entrant par son bout gauche, puis clic droit à deux largeurs de lien à gauche du lien (sans passer ailleurs) : le menu de Tensho ne s'ouvre pas ; le même clic sur le lien l'ouvre. À une seule largeur à gauche, le menu s'ouvre encore : c'est voulu (la boîte est symétrique autour du point d'entrée, une largeur de lien plus 8 px de chaque côté ; X-419 M3).
 
@@ -1897,13 +1893,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1401) Barre du serveur (X-419 M2, 0.1393) : afficher une entrée de Tensho qui change souvent (objets dans les sacs, ou zone), survoler l'entrée et la garder survolée pendant qu'elle change (ramasser un objet, changer de zone) : l'infobulle reste celle de Tensho, elle ne repasse pas à celle du jeu le temps d'un rafraîchissement.
 
-- [ ] (0.1402) Carte de Tensho, dans l'atelier de compagnie (Brumée, Lavandière, Gobelet, Shirogane ou Empyrée) : la sonnette d'appel et le coffre de compagnie sont sur la carte avec les icônes du jeu ; le survol donne leur nom ; dans le tableau des icônes de la carte, la taille 0 de la sonnette les cache. Dans une ville (Limsa basse, Ul'dah Thal, Vieille Gridania), les sonnettes ne sont pas en double.
+- [x] (0.1402) Carte de Tensho, dans l'atelier de compagnie (Brumée, Lavandière, Gobelet, Shirogane ou Empyrée) : la sonnette d'appel et le coffre de compagnie sont sur la carte avec les icônes du jeu ; le survol donne leur nom ; dans le tableau des icônes de la carte, la taille 0 de la sonnette les cache. Dans une ville (Limsa basse, Ul'dah Thal, Vieille Gridania), les sonnettes ne sont pas en double.
 
-- [ ] (0.1405) Carte de Tensho, à Eulmore : la sonnette d'appel n'apparaît qu'une fois, sur la carte où le jeu la marque (pas de deuxième sonnette sur l'autre carte d'Eulmore). Journal : « Map positions: 10 bell(s) and company chest(s) … longest step … ms ».
+- [x] (0.1405) Carte de Tensho, à Eulmore : la sonnette d'appel n'apparaît qu'une fois, sur la carte où le jeu la marque (pas de deuxième sonnette sur l'autre carte d'Eulmore). Journal : « Map positions: 10 bell(s) and company chest(s) … longest step … ms ».
 
 - [x] (0.1410) Rappels › Statut, après avoir ouvert la liste des servants à une sonnette d'appel (attendre 30 secondes) : le tableau « Vos servants » montre chaque servant avec sa classe et son niveau, ses gils, ses objets (au survol : piles, haute qualité, cristaux d'après la copie du jeu), ses ventes (orange si elles finissent dans la journée, rouge si finies), sa tâche et sa ville du marché ; le total des gils est juste. Avec un autre personnage, ses servants s'ajoutent après sa propre visite à la sonnette.
 
-- [ ] (0.1411) Alarmes : à la sonnette d'appel, liste des servants ouverte, un servant avec des objets en vente : une alarme automatique « Fin des ventes de <servant> » (groupe « Ventes des servants ») apparaît à l'heure de fin donnée par le jeu ; elle correspond à la fin indiquée dans le tableau Rappels › Statut. Si l'heure semble fausse (le jeu ne fait pas expirer les ventes), le noter.
+- [x] (0.1411) Alarmes : à la sonnette d'appel, liste des servants ouverte, un servant avec des objets en vente : une alarme automatique « Fin des ventes de <servant> » (groupe « Ventes des servants ») apparaît à l'heure de fin donnée par le jeu ; elle correspond à la fin indiquée dans le tableau Rappels › Statut. Si l'heure semble fausse (le jeu ne fait pas expirer les ventes), le noter.
 
 - [x] (0.1415) Rappels › Statut, tableau des servants : la date de fin des ventes de chaque servant est le jour que la liste des servants du jeu écrit après « jusqu'au » (Addon 2314).
 
@@ -1961,7 +1957,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1463) Fenêtre de chat de Tensho, mode développeur : dire « test <item> test » (un objet lié) puis lier une quête et un lieu au milieu d'une phrase : chaque lien s'affiche à sa place, souligné, entre les deux « test » ; un clic l'ouvre dans Tensho ; la copie du message (clic droit) l'a aussi. Dans dalamud.log, la ligne « Chat window, pieces of a message with a link » dit ce que le jeu a envoyé (sortes et longueurs seulement).
 
-- [ ] (0.1464) Carte de Tensho à Eulmore : ouvrir Les Racines, Le Tronc et La Voûte l'une après l'autre, à côté de la carte du jeu : chaque couche ne montre que ses marchands, PNJ, sonnettes et sacs de vendeurs, comme le jeu (aucune icône d'une autre couche). Puis un donjon à étages (par exemple le Phare de Sirius) : chaque étage garde ses icônes.
+- [x] (0.1464) Carte de Tensho à Eulmore : ouvrir Les Racines, Le Tronc et La Voûte l'une après l'autre, à côté de la carte du jeu : chaque couche ne montre que ses marchands, PNJ, sonnettes et sacs de vendeurs, comme le jeu (aucune icône d'une autre couche). Puis un donjon à étages (par exemple le Phare de Sirius) : chaque étage garde ses icônes.
 
 - [ ] (0.1465) Dédale bestial : finir un plateau. Pendant que la fenêtre de résultat du jeu est ouverte, ouvrir Tensho › Dresseur › Équipe : « Dernier plateau » montre le même score que le jeu, et chaque bête son rang et son expérience avant → après, comme le jeu.
 
@@ -2019,7 +2015,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1488) Fenêtre de chat de Tensho à côté du chat du jeu : onglets en bas, gris et arrondis, l'onglet affiché marqué d'un point ; fond presque invisible, texte lisible par son contour ; barre de défilement fine ; heure écrite [9:21] ; un objet lié montre une flèche orange puis son nom, sans soulignement ; un long message continue en retrait sur la ligne suivante. Chaque point se remet comme avant par son réglage (roue dentée).
 
-- [ ] (0.1488) Clic sur la flèche orange d'un objet lié puis sur son nom : les deux ouvrent l'objet (clic droit : son menu).
+- [x] (0.1488) Clic sur la flèche orange d'un objet lié puis sur son nom : les deux ouvrent l'objet (clic droit : son menu).
 
 - [ ] (0.1489) Fenêtre de chat de Tensho en mode « S'effacer » sous une fenêtre du jeu : le contour sombre des lettres pâlit autant que le texte (pas de halo noir autour de lettres pâles).
 
@@ -2053,31 +2049,101 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1494) Fenêtre de chat, historique coché avec « Sans limite » : recharger Tensho : les messages reviennent vite et en entier dans la fenêtre (jusqu'à son nombre de lignes), sans saccade du jeu au chargement.
 
-- [ ] (0.1496) Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage si le mode développeur est coché) : une liste de catégories à gauche, les réglages de la catégorie cliquée à droite ; changer d'onglet puis revenir (ou fermer et rouvrir la page) garde la catégorie choisie ; la fenêtre du jeu reste lisible à sa plus petite taille.
+- [x] (0.1496) Paramètres, chaque onglet (Général, Panneaux à côté du jeu, Carte, Suivi et notifications, Données et sources, Avancé ; Débogage si le mode développeur est coché) : une liste de catégories à gauche, les réglages de la catégorie cliquée à droite ; changer d'onglet puis revenir (ou fermer et rouvrir la page) garde la catégorie choisie ; la fenêtre du jeu reste lisible à sa plus petite taille.
 
-- [ ] (0.1496) Paramètres, recherche : taper « police » puis « carte » : chaque résultat indique l'onglet et la catégorie (Onglet › Catégorie) ; choisir un résultat ouvre cet onglet et cette catégorie.
+- [x] (0.1496) Paramètres, recherche : taper « police » puis « carte » : chaque résultat indique l'onglet et la catégorie (Onglet › Catégorie) ; choisir un résultat ouvre cet onglet et cette catégorie.
 
-- [ ] (0.1496) Un outil avec son bouton « Paramètres » (aide du journal d'artisanat, observation de la récolte, mini-jeux) : le bouton ouvre Paramètres > Panneaux à côté du jeu, sur la catégorie de l'outil ; la roue de la carte ouvre l'onglet Carte.
+- [x] (0.1496) Un outil avec son bouton « Paramètres » (aide du journal d'artisanat, observation de la récolte, mini-jeux) : le bouton ouvre Paramètres > Panneaux à côté du jeu, sur la catégorie de l'outil ; la roue de la carte ouvre l'onglet Carte.
 
-- [ ] (0.1497) Paramètres, recherche : taper « liste des pages » et choisir « Liste des pages · Général › Langue et thème » : l'onglet Général et la catégorie Langue et thème s'ouvrent, la ligne trouvée est encadrée un instant et visible sans défiler de plus.
+- [x] (0.1497) Paramètres, recherche : taper « liste des pages » et choisir « Liste des pages · Général › Langue et thème » : l'onglet Général et la catégorie Langue et thème s'ouvrent, la ligne trouvée est encadrée un instant et visible sans défiler de plus.
 
-- [ ] (0.1497) Paramètres, recherche : choisir un réglage tout en bas d'une longue catégorie (par exemple taper « servants » et choisir « Panneau à côté de la liste de ventes des servants », dans Données et sources › Sources communautaires) : le volet défile jusqu'à lui et le cadre s'estompe en deux secondes.
+- [x] (0.1497) Paramètres, recherche : choisir un réglage tout en bas d'une longue catégorie (par exemple taper « servants » et choisir « Panneau à côté de la liste de ventes des servants », dans Données et sources › Sources communautaires) : le volet défile jusqu'à lui et le cadre s'estompe en deux secondes.
 
-- [ ] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
+- [x] (0.1497) Paramètres, recherche : choisir un réglage de filtres d'un onglet du chat (taper « filtres du jeu » : « Utiliser les filtres du jeu », dans Panneaux à côté du jeu › Onglets du chat) ou la place d'une page de l'application de bureau : la section repliée autour s'ouvre, le volet défile et le réglage est encadré.
 
-- [ ] (0.1498) Paramètres, recherche : taper « filtres du jeu » et choisir « Utiliser les filtres du jeu » : seule la section de l'onglet du chat qui le contient s'ouvre ; les listes de canaux et de filtres des autres onglets restent repliées.
+- [x] (0.1498) Paramètres, recherche : taper « filtres du jeu » et choisir « Utiliser les filtres du jeu » : seule la section de l'onglet du chat qui le contient s'ouvre ; les listes de canaux et de filtres des autres onglets restent repliées.
 
-- [ ] (0.1498) Paramètres : choisir une catégorie dans un onglet (par exemple Carte › Icônes), recharger le plugin (ou relancer le jeu) puis rouvrir les Paramètres : la même catégorie est choisie.
+- [x] (0.1498) Paramètres : choisir une catégorie dans un onglet (par exemple Carte › Icônes), recharger le plugin (ou relancer le jeu) puis rouvrir les Paramètres : la même catégorie est choisie.
 
-- [ ] (0.1498) Paramètres › Panneaux à côté du jeu › Macros d'artisanat : la plage de macros et « Écraser » s'y trouvent bien, comme le disent les bulles d'aide du bouton « Copier dans les macros du jeu ».
+- [x] (0.1498) Paramètres › Panneaux à côté du jeu › Macros d'artisanat : la plage de macros et « Écraser » s'y trouvent bien, comme le disent les bulles d'aide du bouton « Copier dans les macros du jeu ».
 
-- [ ] (0.1499) Fenêtre de chat, avec un pavé tactile ou une molette fine : faire défiler un peu vers le haut puis donner un cran de souris vers le bas : les lignes descendent tout de suite d'une ligne.
+- [x] (0.1499) Fenêtre de chat, avec un pavé tactile ou une molette fine : faire défiler un peu vers le haut puis donner un cran de souris vers le bas : les lignes descendent tout de suite d'une ligne.
 
 - [ ] (0.1499) Fenêtre de chat, onglet du réseau des novices : le nom d'un mentor ou d'un nouvel aventurier s'écrit sans « · » devant.
 
-- [ ] (0.1500) Carte de Tensho, colonne d'outils : le texte des deux cases « 100% » (le pourcentage et le bouton dessous) est centré dans son cadre, à 100 % puis à 150 % de zoom, carte superposée puis en petite fenêtre, en français puis en anglais.
+- [x] (0.1500) Carte de Tensho, colonne d'outils : le texte des deux cases « 100% » (le pourcentage et le bouton dessous) est centré dans son cadre, à 100 % puis à 150 % de zoom, carte superposée puis en petite fenêtre, en français puis en anglais.
 
 - [ ] (0.1501) Fenêtre de chat, onglet du réseau des novices : un message qui contient une icône de classe ou du réseau des novices dans son texte la montre « · » ; le nom de l'expéditeur reste sans « · » devant.
+
+- [ ] (0.1503) En mode développeur, après quelques messages de joueurs avec une icône devant leur nom (mentor, débutant, classe, jeu de rôle) : dalamud.log a des lignes « Chat window, icons in a sender's name » avec des codes seulement ; la fenêtre de chat Tensho montre leur nom sans « · » devant pour un mentor ou une classe.
+
+- [x] (0.1504) Chat Tensho ouvert, cocher « Cacher les messages du chat du jeu » : les messages du chat du jeu disparaissent, sa zone de saisie, son menu des canaux et ses onglets restent ; la fenêtre Tensho est juste au-dessus de la saisie du jeu, sans la couvrir ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho
+
+- [ ] (0.1504) Option cochée : changer d'onglet du jeu, recevoir des messages, changer de zone, voir une scène cinématique : les messages du jeu restent cachés ; redimensionner ou déplacer le chat du jeu (son bouton de taille, le mode HUD) : la fenêtre Tensho suit
+
+- [ ] (0.1504) Décocher l'option, puis la recocher et fermer la fenêtre Tensho, puis la recocher et décharger Tensho : à chaque fois les messages du jeu reviennent tout de suite, la fenêtre Tensho retourne à sa place d'avant
+
+- [ ] (0.1504) Option cochée, bouton aux deux fenêtres au bout des onglets Tensho : les deux chats sont affichés, la fenêtre Tensho à sa place ; le bouton de réduction la ramène à ses onglets et la rouvre ; recliquer le bouton aux deux fenêtres : les messages du jeu sont de nouveau cachés
+
+- [ ] (0.1504) Option cochée, passer en JcJ (ou en contenu classé) : les messages du jeu reviennent pendant la coupure de Tensho et sont recachés à la sortie
+
+- [ ] (0.1506) Option « Cacher les messages du chat du jeu » cochée : voir une scène cinématique, puis entrer en GPose et en sortir : les messages du jeu ne réapparaissent jamais pendant la scène ni en GPose ; après, la fenêtre Tensho revient à leur place et ils restent cachés.
+
+- [ ] (0.1506) Option cochée et « Masquer en combat » coché : entrer en combat : la fenêtre Tensho part et les messages du jeu reviennent ; hors combat, ils se cachent de nouveau et la fenêtre Tensho reprend leur place.
+
+- [x] (0.1507) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire, carte) : la fenêtre Tensho part et les messages du jeu reviennent sous la fenêtre du jeu ; la fermer : la fenêtre Tensho revient à leur place et ils se cachent.
+
+- [ ] (0.1507) Option cochée, un onglet du chat du jeu détaché ailleurs sur l'écran : cet onglet détaché reste affiché ; seuls les messages sous la fenêtre Tensho sont cachés.
+
+- [ ] (0.1507) Option décochée, réduire la fenêtre Tensho à ses onglets, puis cocher l'option dans les Paramètres : la fenêtre prend la place des messages du jeu en entier ; entrer en combat avec « Masquer en combat » puis en sortir : elle revient entière, pas réduite.
+
+- [ ] (0.1508) Reprend T-0.1504-1. Chat Tensho ouvert, « Cacher les messages du chat du jeu » cochée : les messages et la barre d'onglets du chat du jeu sont cachés ; la fenêtre Tensho occupe leur place, juste au-dessus de la ligne de saisie du jeu, sans couvrir le nom du canal (« Dire ») ni la saisie ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho.
+
+- [ ] (0.1508) Option cochée : cliquer sur le nom du canal (« Dire ») à gauche de la saisie du jeu : le menu des canaux s'ouvre, la fenêtre Tensho s'efface, le menu est entièrement lisible et cliquable ; choisir un canal : le menu se ferme, la fenêtre Tensho revient. Mode développeur : dalamud.log dit « Game chat: channel menu open (drop-down owner …, list …) » puis « closed ».
+
+- [ ] (0.1508) Option cochée puis décochée (ou fermer la fenêtre Tensho, ou « les deux chats ») : la barre d'onglets du chat du jeu revient telle qu'avant, onglets cliquables ; recharger Tensho option cochée : elle revient aussi.
+
+- [ ] (0.1508) Si vos onglets du chat du jeu sont en haut (réglage du jeu) : option cochée, la fenêtre Tensho couvre aussi la ligne des onglets du haut, jusqu'à la saisie.
+
+- [ ] (0.1510) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir puis fermer une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire) : à la fermeture, la fenêtre Tensho revient directement à la place des messages du jeu, sans apparaître un instant ailleurs ; pareil à la fin d'un combat avec « Masquer en combat ».
+
+- [ ] (0.1511) Écran titre puis sélection du personnage, avec Tensho chargé et des fenêtres de Tensho laissées ouvertes à la dernière session (par exemple la fenêtre de chat Tensho) : aucune fenêtre ni panneau de Tensho n'apparaît ; après la connexion du personnage, les mêmes fenêtres reviennent ; Échap › Retour à l'écran titre : elles disparaissent, puis reviennent à la connexion suivante.
+
+- [x] (0.1512) Option « Cacher les messages du chat du jeu » décochée (son défaut), mode développeur : en ouvrant et fermant des fenêtres du jeu et en déplaçant le chat du jeu, le journal de Dalamud n'écrit plus de ligne « Game chat: Tensho's place » ; option cochée : la fenêtre de chat Tensho se pose toujours sur les messages du jeu et y revient après une fenêtre du jeu posée dessus ou un combat.
+
+- [ ] (0.1517) Réglages du chat (roue de la fenêtre de chat Tensho), onglet d'un chat, liste des canaux : survolez cinq cases de canaux différents (par exemple Dire, Crier, Linkshell inter-Monde [3], Réseau des novices, Écho) : chaque infobulle commence par le nom entier du canal, puis explique ce canal (sa commande du jeu, qui le voit), et elles sont toutes différentes
+
+- [ ] (0.1517) Même onglet, « Utiliser les filtres du jeu » coché : ouvrez le groupe Discussion et survolez deux filtres (par exemple Dire et Emotes personnalisées) : l'infobulle donne le nom du filtre, l'exemple de ligne du jeu et les onglets du jeu qui le montrent par défaut
+
+- [ ] (0.1518) Réglages du chat (roue de la fenêtre de chat Tensho), un onglet avec « Utiliser les filtres du jeu » : ouvrez Combat puis « Par genre de ligne » ; décochez « Dégâts subis » : son compte passe à 0/11 ; ouvrez « Par sujet (qui agit) » puis « Vous » : « Dégâts subis par vous » est décoché aussi ; recochez « Dégâts subis » : les onze reviennent
+
+- [ ] (0.1518) Même onglet, en combat contre un monstre : avec « Dégâts infligés » coché et « Dégâts subis » décoché, l'onglet montre vos coups mais plus les coups que vous recevez
+
+- [ ] (0.1519) Réglages du chat, un onglet qui montre Hurler ou Crier : cochez « Replier les messages répétés » ; dans une cité où quelqu'un répète la même annonce, la fenêtre de chat Tensho ne la montre qu'une fois, avec « ×2 », « ×3 »… à sa fin ; survolez « ×3 » : l'infobulle dit combien de fois il est venu
+
+- [ ] (0.1519) Réglages du chat, Joueurs : écrivez le nom d'un joueur qui parle près de vous dans « Joueurs mis en avant » : chacun de ses messages est posé sur une bande colorée, son nom dans la couleur d'avertissement, et le texte reste lisible
+
+- [ ] (0.1520) Réglages du chat, Joueurs : écrivez « raid, vente » dans « Mots d'alerte » ; quand un message de Hurler ou Crier contient l'un de ces mots, il est posé sur une bande colorée ; si son onglet n'est pas celui affiché, le nom de l'onglet porte « ! » devant, qui disparaît quand vous ouvrez l'onglet et descendez en bas
+
+- [ ] (0.1521) Réglages du chat, Joueurs : mettez un mot dans « Mots d'alerte », puis écrivez-le vous-même en /dire ou /équipe : votre message n'est pas posé sur la bande et l'onglet ne porte pas « ! » ; le même mot écrit par un autre joueur alerte toujours
+
+- [ ] (0.1521) Avec un mot d'alerte qui apparaît dans vos lignes de combat (par exemple le nom d'un ennemi) : l'onglet qui montre le combat ne porte jamais « ! » et ces lignes ne sont pas surlignées
+
+- [ ] (0.1522) Au Dédale bestial, 1er plateau, devant « Formation de l'équipe » : le panneau Tensho montre le nom du 1er plateau suivi de « (lu dans le jeu) », « Les 10 à emmener », et ne dit plus « Rangs pas encore lus » pour des bêtes dont le jeu montre le rang
+
+- [ ] (0.1522) Avant d'entrer, sur un autre plateau (2e ou plus), ouvrez sa disposition : le panneau Tensho prend ce plateau seul (nom et « (lu dans le jeu) ») ; s'il garde la liste, notez-le (le journal dit « Beastmaster board read in the game's windows: content … »)
+
+- [ ] (0.1522) Page Dresseur, onglet Équipe, après un plateau : sous « Dernier plateau », plus de « Rangs pas encore lus » contradictoire avec les rangs montrés
+
+- [ ] (0.1523) Au Dédale bestial, 1er plateau, devant la disposition du plateau : le panneau Tensho appelle Piège-volant (Glace) au combat 4 (Sarcopte, Glace) ; sous le combat 2 (Archidémon, Foudre) une ligne dit qu'aucune bête de l'équipe ne touche Foudre et nomme celles qui la toucheraient
+
+- [ ] (0.1523) Page Dresseur, onglet Bêtes : la colonne de l'attaque automatique montre l'élément des bêtes magiques (Feu, Glace…) comme le bestiaire du jeu, « Magique » seulement pour une attaque neutre
+
+- [ ] (0.1525) Après un plateau du Dédale bestial, page Dresseur, onglet Équipe, « Dernier plateau » ouvert : les lignes (chemin parcouru, affrontements, cibles d'élite, gardien du plateau, PV restants, score, bonus, total) ont les mêmes nombres que la fenêtre de résultat du jeu
+
+- [ ] (0.1526) Au Dédale bestial, emmenez une équipe différente de celle que conseille Tensho : devant « Formation de l'équipe », le panneau montre d'abord « Votre équipe (lue dans le jeu) » avec les trois bêtes de chaque combat prises parmi les vôtres, et « Sans X (conseillée) : Y à la place » quand une bête conseillée manque
+
+- [ ] (0.1526) Après un combat où une bête est tombée ou a perdu beaucoup de PV, rouvrez « Formation de l'équipe » : le panneau dit « … est à terre : pas appelée » ou « … : PV bas (a/b) » et ne l'appelle plus si elle est à terre
 
 **0.535 : interfaces** — à voir en jouant
 
@@ -2097,11 +2163,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.529 : trois crans de risque des collectionnables** — à voir en jouant
 
-- [ ] Panneau Collectionnable (0.530) : trois icônes, main, balance, dé ; le nom au survol ; le cran choisi coloré, sa description dessous ; même choix dans Paramètres › Modules › Récolte.
+- [x] Panneau Collectionnable (0.530) : trois icônes, main, balance, dé ; le nom au survol ; le cran choisi coloré, sa description dessous ; même choix dans Paramètres › Modules › Récolte.
 
 **0.527 : Toucher d'amorçage dans le plan des collectionnables** — à voir en jouant
 
-- [ ] Botaniste ou mineur niveau 95 et plus : commencer vers 623 PR, lancer Inspection soi-même (il reste 423 PR) : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %. Depuis 727 PR, le plan passe par Inspection puis Sélection méthodique, sans Toucher : c'est prévu (capture du 2026-11-05).
+- [x] Botaniste ou mineur niveau 95 et plus : commencer vers 623 PR, lancer Inspection soi-même (il reste 423 PR) : le panneau propose Toucher d'amorçage ; une fois lancé, il ne le repropose plus et compte 48 %. Depuis 727 PR, le plan passe par Inspection puis Sélection méthodique, sans Toucher : c'est prévu (capture du 2026-11-05).
 - [x] (rapport de l'utilisateur, 2026-11-05) Toucher reste actif si une autre action passe avant la Sélection méthodique ; il ne retombe qu'après elle. Récolte non essayée.
 
 **0.526 : légendes locales dans les Collections** — à voir en jouant
@@ -2127,11 +2193,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.520 : tentative gratuite dans le plan des collectionnables** — à voir en jouant
 
-- [ ] Niveau 90 et plus, PR pour Sagesse du fermier ou Raison solide : la moyenne dépasse le pire cas, et la ligne « 50 % de chances d'une tentative gratuite » apparaît.
+- [x] Niveau 90 et plus, PR pour Sagesse du fermier ou Raison solide : la moyenne dépasse le pire cas, et la ligne « 50 % de chances d'une tentative gratuite » apparaît.
 
 **0.519 : éclats, cristaux et agrégats** — à voir en jouant
 
-- [ ] Éclat, cristal ou agrégat : le panneau propose Bénédiction de la nature et Bénédiction des Douze (0.521), sans « ≈ N objets ».
+- [x] Éclat, cristal ou agrégat : le panneau propose Bénédiction de la nature et Bénédiction des Douze (0.521), sans « ≈ N objets ».
 
 **0.518 : carte, tomes et niveau d'un point** — à voir en jouant
 
@@ -2153,7 +2219,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **0.514 : panneaux libres en fenêtres Dalamud (#38)** — à voir en jouant
 
 - [x] Fenêtre de suivi (réglage) : s'affiche à sa place habituelle, liste les alarmes, le nom ouvre l'objet, « Carte » ouvre le point ; la croix la ferme et décoche le réglage ; recocher la rouvre.
-- [ ] Barre de PR en mineur : se remplit, le repère du tic avance ; disparaît à PR pleins et sur un autre job ; PR mesurés même barre coupée.
+- [x] Barre de PR en mineur : se remplit, le repère du tic avance ; disparaît à PR pleins et sur un autre job ; PR mesurés même barre coupée.
 - [x] Guide et carte : la croix les ferme du premier coup.
 
 **0.510 : conseils de Triple Triade en JcE seulement** — à voir en jouant
@@ -2162,7 +2228,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.509 : coup conseillé pendant une synthèse (A-04)** — à voir en jouant
 
-- [ ] Dans « Comparer les prochains coups », pendant une synthèse : « Conseillé : … » change à chaque coup et suit l'état (sur Bon, un coup de cet état devrait souvent sortir, sans que ce soit une règle). Rien n'est joué. Réglage dans Paramètres › Modules › Artisanat. Pas de saccade.
+- [x] Dans « Comparer les prochains coups », pendant une synthèse : « Conseillé : … » change à chaque coup et suit l'état (sur Bon, un coup de cet état devrait souvent sortir, sans que ce soit une règle). Rien n'est joué. Réglage dans Paramètres › Modules › Artisanat. Pas de saccade.
 
 **0.508 : ventes des servants (I-05)** — à voir en jouant, à la sonnette
 
@@ -2174,7 +2240,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
 
-- [ ] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
+- [x] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
 
 **0.504 : signaler un problème (ONBOARD-001, lot 3)** — à voir en jouant
 
@@ -2198,7 +2264,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.498 : Tensho replié, puis demandé** — à voir en jouant
 
-- [ ] Replier la fenêtre Tensho par sa barre de titre, puis ouvrir quelque chose qui la demande (clic droit sur un objet › outil, `/tensho`, alarme) : elle se déplie sur la bonne page. Elle se replie encore normalement ensuite.
+- [x] Replier la fenêtre Tensho par sa barre de titre, puis ouvrir quelque chose qui la demande (clic droit sur un objet › outil, `/tensho`, alarme) : elle se déplie sur la bonne page. Elle se replie encore normalement ensuite.
 
 **0.497 : état de la synthèse dans « Comparer les prochains coups »** — à voir en jouant
 
@@ -2207,16 +2273,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] `/tensho selftest` et le bouton de Diagnostics relancent une passe ; Diagnostics montre les lignes.
 - [ ] 0.496 : fenêtre ouverte puis refermée, sans lancer de passe : la passe suivante donne OK_SEEN avec l'heure. Ça reste après un rechargement.
-- [ ] 0.495 : carnet d'artisanat ouvert, la ligne « crafting log » donne une recette ; synthèse en cours, « synthesis » passe en OK ; point de récolte ouvert, « gathering node » aussi.
 
 **0.493 : disponibilité des PNJ de Triple Triade** — à voir en jouant
 
-- [ ] Triple Triade › PNJ et cartes : colonne « Disponible ». Un PNJ marqué « Quête requise » refuse bien le défi ou n'est pas là en jeu, et un PNJ marqué « Oui » accepte. Le survol donne les quêtes, avec ✓ pour celles faites. À signaler surtout : un PNJ à deux quêtes dont une seule est faite (lecture « toutes » déduite, voir docs/evidence/0.493-triad-npc-requirements.md).
+- [x] Triple Triade › PNJ et cartes : colonne « Disponible ». Un PNJ marqué « Quête requise » refuse bien le défi ou n'est pas là en jeu, et un PNJ marqué « Oui » accepte. Le survol donne les quêtes, avec ✓ pour celles faites. À signaler surtout : un PNJ à deux quêtes dont une seule est faite (lecture « toutes » déduite, voir docs/evidence/0.493-triad-npc-requirements.md).
 
 **0.491 : R-14, valeurs inconnues** — à voir en jouant
 
-- [ ] Défi Triple Triade et match : règles et conseils comme avant, jamais « les règles n'ont pas pu être lues ». Le journal donne la ligne `Triad request rule values` (preuve à verser dans docs/evidence, défis à 1, 2 et 4 règles si possible).
-- [ ] Coffre à apparence ouvert avec une tenue complète : ses pièces comptent toujours comme possédées. Avec une tenue partielle : seules les pièces rangées comptent. Le journal donne `Dresser outfit … slots held` (preuve à verser dans docs/evidence).
+- [x] Défi Triple Triade et match : règles et conseils comme avant, jamais « les règles n'ont pas pu être lues ». Le journal donne la ligne `Triad request rule values` (preuve à verser dans docs/evidence, défis à 1, 2 et 4 règles si possible).
+- [x] Coffre à apparence ouvert avec une tenue complète : ses pièces comptent toujours comme possédées. Avec une tenue partielle : seules les pièces rangées comptent. Le journal donne `Dresser outfit … slots held` (preuve à verser dans docs/evidence).
 
 **0.490 : onglet Favoris de la carte** — pendant la campagne de tests en jeu (phase 6)
 
@@ -2319,12 +2384,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.469 : demande du jour de la Grande Compagnie, icônes du carnet** — pendant la campagne de tests en jeu (phase 6)
 
-- [ ] Ouvrir le calendrier du jeu puis les missions de ravitaillement : la bulle d'un objet demandé dit « demandée aujourd'hui ». Un autre objet possible dit « absente des demandes du jour que vous avez ouvertes ». Le journal Dalamud donne une ligne `Grand Company supply window`.
-- [ ] Carnet : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité verte si la cible est atteinte ; explications dans la bulle de « (?) ».
+- [x] Ouvrir le calendrier du jeu puis les missions de ravitaillement : la bulle d'un objet demandé dit « demandée aujourd'hui ». Un autre objet possible dit « absente des demandes du jour que vous avez ouvertes ». Le journal Dalamud donne une ligne `Grand Company supply window`.
+- [x] Carnet : panneau en sections (recette, votre état, cible, calcul, macro), chiffres en tableau, barre de qualité verte si la cible est atteinte ; explications dans la bulle de « (?) ».
 
 **0.468 : carnet (cible, état, meilleure séquence) et cache de Raphael** — pendant la campagne de tests en jeu (phase 6)
 
-- [ ] Raphael choisi, carnet : une recette calculée puis re-sélectionnée revient tout de suite, le tampon dit « Cache disque ». Après un changement d'option de macro ou une nouvelle version de la DLL : « Solveur : Raphael (séquence déjà calculée…) ».
+- [x] Raphael choisi, carnet : une recette calculée puis re-sélectionnée revient tout de suite, le tampon dit « Cache disque ». Après un changement d'option de macro ou une nouvelle version de la DLL : « Solveur : Raphael (séquence déjà calculée…) ».
 
 **0.467 : Raphael dans le carnet** — pendant la campagne de tests en jeu (phase 6)
 
@@ -2338,12 +2403,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **0.464 : retours du lot 5** — pendant la campagne de tests en jeu (phase 6)
 
 - [ ] Simulateur, métier porté : attributs copiés d'office, ligne « Détecté » juste (repas, remède, Manipulation, spécialiste) ; valeurs en vert ou rouge selon la recette ; « Conserver la séquence » après la palette.
-- [ ] Onglet « Liste de fabrication » : icônes, infobulle complète au survol, manquants en rouge.
-- [ ] Pendant une synthèse : la fenêtre de projection s'ouvre à côté de celle du jeu, se ferme avec elle, et ses chiffres correspondent au résultat de l'action jouée.
+- [x] Onglet « Liste de fabrication » : icônes, infobulle complète au survol, manquants en rouge.
+- [x] Pendant une synthèse : la fenêtre de projection s'ouvre à côté de celle du jeu, se ferme avec elle, et ses chiffres correspondent au résultat de l'action jouée.
 
 **0.462 : retours du lot 3** — pendant la campagne de tests en jeu (phase 6)
 
-- [ ] Clic droit sur un objet › Tensho : plus de « Tous les outils avec cet objet » ; le reste du menu est là.
+- [x] Clic droit sur un objet › Tensho : plus de « Tous les outils avec cet objet » ; le reste du menu est là.
 - [x] Ouvrir le coffre de compagnie, puis tous ses onglets : Banque › Coffre de compagnie liste les objets, plus de message « ordre visuel » (0.463) ; les quantités sont justes.
 
 **0.461 : grille du journal** — pendant la campagne de tests en jeu (phase 6)
@@ -2389,7 +2454,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] Rappels à l'écran titre ou de sélection : pas de zéros ni de rôle ; une fois connecté, les compteurs apparaissent.
 - [x] Prix de sous-cotation : après une sonnette, le prix est copié ; sans aucune sonnette depuis le lancement du jeu, rien n'est copié.
 - [x] Revue de mode : les catégories s'affichent comme avant.
-- [ ] Téléportation : coûts affichés ; mandats, collections supplémentaires et chocobo lus une fois connecté.
+- [x] Téléportation : coûts affichés ; mandats, collections supplémentaires et chocobo lus une fois connecté.
 
 **0.452 : R-14 et hooks (A-14)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
@@ -2445,7 +2510,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.443 : N-02 tâches du Livre d'or** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Rappels › Livre d'or : la liste « À faire » correspond aux cases du journal ; une tâche finie passe en « à réclamer » (vert), puis
+- [x] Rappels › Livre d'or : la liste « À faire » correspond aux cases du journal ; une tâche finie passe en « à réclamer » (vert), puis
   disparaît une fois la vignette posée.
 
 **0.442 : N-15 train de chasse** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2466,7 +2531,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.438 : actions interdites, équiper depuis le carnet** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Interdire Œil de l'expert et Manipulation : ni la recherche, ni l'assistant du carnet, ni la synthèse en cours ne les proposent ;
+- [x] Interdire Œil de l'expert et Manipulation : ni la recherche, ni l'assistant du carnet, ni la synthèse en cours ne les proposent ;
   grisées dans le simulateur. Carnet ouvert avec le mauvais métier : « Équiper (métier) » change d'ensemble et le calcul démarre.
 
 **0.437 : N-11 coordonnées collées** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2476,7 +2541,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.436 : A-14 enregistreur de rotation** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] « Enregistrer », fabriquer à la main (avec un buff, une action de qualité, une de progression), « Arrêter » : la liste est
+- [x] « Enregistrer », fabriquer à la main (avec un buff, une action de qualité, une de progression), « Arrêter » : la liste est
   exacte et dans l'ordre ; « Utiliser comme séquence » ; le jeu se comporte comme d'habitude pendant l'enregistrement (aucune action
   bloquée) ; après « Arrêter », rien n'est plus noté.
 
@@ -2492,7 +2557,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.433 : A-05 listes de fabrication** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Créer une liste, y ajouter deux recettes depuis Préparation, changer une quantité, retirer un objet ; les ingrédients totaux et
+- [x] Créer une liste, y ajouter deux recettes depuis Préparation, changer une quantité, retirer un objet ; les ingrédients totaux et
   « à compléter » sont justes ; la liste est toujours là après un rechargement du plugin ; lien Teamcraft de la liste.
 
 **0.432 : A-15 collectionnables des sacs** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2516,7 +2581,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.426 : fermer Tensho en ouvrant une fenêtre du jeu** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] « Ouvrir dans le carnet d'artisanat » : Tensho se ferme, le carnet s'ouvre sur la recette ; recommencer avec le carnet déjà
+- [x] « Ouvrir dans le carnet d'artisanat » : Tensho se ferme, le carnet s'ouvre sur la recette ; recommencer avec le carnet déjà
   ouvert : il reste ouvert et passe à la recette. Même chose pour le carnet de récolte et la carte du jeu. Réglage décoché : Tensho
   reste ouvert. « Y aller » : Tensho reste ouvert (question de téléportation).
 
@@ -2540,7 +2605,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.421 : A-11 recettes jamais fabriquées** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Fiche d'un objet › Craft lié : une recette déjà faite montre « ✓ déjà fabriquée », une jamais faite « jamais fabriquée » (comparer
+- [x] Fiche d'un objet › Craft lié : une recette déjà faite montre « ✓ déjà fabriquée », une jamais faite « jamais fabriquée » (comparer
   au carnet du jeu) ; livre des recettes, case « Jamais fabriquées seulement ».
 
 **0.420 : A-02 repas et remède** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2626,7 +2691,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.401 : panoramas** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survol d'un panorama sur la carte Tensho : plus d'erreur du wiki, la météo demandée est donnée ; le clic droit n'a plus d'onglet
+- [x] Survol d'un panorama sur la carte Tensho : plus d'erreur du wiki, la météo demandée est donnée ; le clic droit n'a plus d'onglet
   « Exploration », le « Carnet d'exploration » reste.
 
 **0.400 : onglets du clic droit de la carte** — pendant la campagne de tests en jeu de la fin (phase 6)
@@ -2662,7 +2727,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.394 : polices** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Réglages › Interface › Polices : changer la famille et la taille des titres, des sections et du texte : la fenêtre Tensho change
+- [x] Réglages › Interface › Polices : changer la famille et la taille des titres, des sections et du texte : la fenêtre Tensho change
   tout de suite ; ↺ remet la valeur par défaut ; « Restaurer tous les réglages » remet les trois.
 
 **0.393 : Bestiaire et grande compagnie** — pendant la campagne de tests en jeu de la fin (phase 6)

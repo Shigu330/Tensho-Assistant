@@ -30,7 +30,7 @@ internal static class ChatReview1472Tests
             Check(ChatScroll.OnButton(450, 580, corner, 80, 24) && !ChatScroll.OnButton(400, 580, corner, 80, 24) && !ChatScroll.OnButton(450, 560, corner, 80, 24), "on it, beside it, above it");
             var window = Window();
             var placed = window.IndexOf("var button=atBottom ? null:ChatBottomButton(view,scroll,shown);", StringComparison.Ordinal);
-            var lines = window.IndexOf("DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options);", StringComparison.Ordinal);
+            var lines = window.IndexOf("DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options,view.RepeatsAt(index));", StringComparison.Ordinal);
             Check(placed > 0 && placed < lines, "placed before the lines are drawn");
             Check(window.Contains("if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right))", StringComparison.Ordinal)
                   && window.Contains("if(chatLinesBlocked){if(link.Kind==ChatSegmentKind.ItemLink", StringComparison.Ordinal), "a line's menu and a link: not under the button");

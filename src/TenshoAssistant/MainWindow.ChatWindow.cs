@@ -34,6 +34,8 @@ internal sealed partial class MainWindow
     }
     // X-484 (0.1482): the players whose name stands out, read once per frame.
     private IReadOnlyList<string> chatHighlighted=[];
+    // X-484 (0.1520): the alert words, read once per frame.
+    private IReadOnlyList<string> chatAlertWords=[];
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
@@ -46,12 +48,55 @@ internal sealed partial class MainWindow
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
         StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
         MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,
-        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y));
+        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace);
+
+    /// <summary>X-467 (0.1504): the box the game's messages leave free while they are hidden (GameChatHider.Place, set by the plugin).</summary>
+    internal Func<ChatFollowPlace?>? ChatGamePlace{get;set;}
+    /// <summary>X-533 (0.1508): the game's channel menu open while its messages are hidden (GameChatHider.ChannelMenuOpen, set by the plugin).</summary>
+    internal Func<bool>? ChatGameChannelMenu{get;set;}
+    // X-467 (0.1504): the window drawn over the game's messages this frame; reduced to its tabs (« both chats »), for this session.
+    private bool chatFollowing,chatReduced;
+    // X-467 (0.1504): the window failed (PanelWindow turned it off): the game's messages are never left hidden behind it.
+    private volatile bool chatWindowFailed;
+
+    /// <summary>X-467 (0.1504, D-181, DEC-053 completed): whether the game chat's messages are to be hidden now (read by GameChatHider on the
+    /// game's thread): the option on and « both chats » off, Tensho's chat window open, shown and working. X-527 (0.1506): left as they are
+    /// while the game hides its interface (cutscene, GPose, interface hidden: Hold); given back only when really no longer wanted.</summary>
+    internal ChatHideWant ChatGameMessagesWant()
+        =>ChatHideWants.Of(ChatGameMessagesOption(),
+            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true,
+            // X-528 M1 (0.1507): Tensho's window hidden under a game window: the game's messages come back, drawn under that window.
+            ChatCover.Hidden(ChatOptions.WhenCovered,chatCovered));
+
+    /// <summary>X-540 M1: the option wanted: on, « both chats » off, Tensho's chat window open, shown and working (the first state of
+    /// ChatGameMessagesWant; the hider reads the game chat's place only then).</summary>
+    internal bool ChatGameMessagesOption()
+        =>!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;
+
+    /// <summary>X-467 (0.1504): the game's messages hidden now, Tensho's window in their place.</summary>
+    internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;
+
+    /// <summary>X-467 (0.1504): the window's place given from outside: over the game's messages while they are hidden; reduced to its tabs
+    /// when asked (its place kept); null otherwise (the window where the player put it).</summary>
+    private PanelPlace? ChatPlace()
+    {
+        var follow=ChatHidesGameMessages() ? ChatGamePlace?.Invoke():null;
+        // X-528 M4 (0.1507): « reduced » belongs to the window at its own place; it is cleared when the window takes the game's messages' place,
+        // so it never comes back reduced after a pause of the following (combat, cutscene, covered) the player did not ask for.
+        if(follow is not null)chatReduced=false;
+        chatFollowing=follow is not null;
+        if(follow is { Box:var box })return new PanelPlace(new Vector2(box.X,box.Y),new Vector2(box.Width,box.Height));
+        if(!chatReduced)return null;
+        var width=chatSize.X>0 ? chatSize.X:560;
+        return new PanelPlace(null,new Vector2(width,ImGui.GetFrameHeightWithSpacing()+ChatLook.Padding.Y*2+(ChatOptions.Borderless ? 0:ImGui.GetFrameHeight())));
+    }
 
     /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.
     /// X-485 (0.1479): faded under a game window, the clicks go through to the game.</summary>
     private ImGuiWindowFlags ChatFrameFlags()=>(ChatOptions.Borderless ? ImGuiWindowFlags.NoTitleBar:ImGuiWindowFlags.None)
         |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
+        // X-467 (0.1504): over the game's messages, the game's chat decides its place and size (its own resize button, the HUD layout).
+        |(chatFollowing ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
         |(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);
 
     // X-485 (0.1479): where the window was last drawn, whether a game window covers it there, and the frame it was last drawn in.
@@ -66,6 +111,8 @@ internal sealed partial class MainWindow
     private bool ChatWindowVisible()
     {
         if(!ChatWindowShown())return false;
+        // X-533 (0.1508): over the game's messages, the window steps aside while the game's channel menu is open (the menu opens upward over it).
+        if(ChatFollow.StepsAside(ChatHidesGameMessages(),ChatGameChannelMenu?.Invoke()==true))return false;
         var at=chatAt ?? Vector2.Zero;
         var covered=ChatCover.Bounded(ChatOptions.WhenCovered)!=ChatCovered.Stay && chatAt is not null && BehindGame(at,chatSize,chat:true);
         if(covered!=chatCovered && developerMode)
@@ -94,6 +141,10 @@ internal sealed partial class MainWindow
     }
 
     private string ChatChannelName(ChatChannel channel)=>localization.Get("ChatChannels."+channel);
+
+    /// <summary>X-545 (0.1517): a tooltip of the chat settings from its lines (keys and arguments, Chat/ChatHelp.cs), one line each.</summary>
+    private string ChatHelpText(IEnumerable<(string Key,object[] Args)> lines)
+        =>string.Join("\n",lines.Select(line=>line.Args.Length==0 ? localization.Get(line.Key):localization.Format(line.Key,line.Args)));
     private string ChatChannelShort(ChatChannel channel)=>localization.Get("ChatChannelsShort."+channel);
     private static Vector4 ChatColor(uint rgb){var (red,green,blue)=ChatChannels.Unpack(rgb);return new(red,green,blue,1);}
 
@@ -155,6 +206,12 @@ internal sealed partial class MainWindow
         var defaults=DefaultConfiguration.Chat;
         BoolSetting("ChatWindow.Show","ChatWindow.ShowTip",()=>configuration.Chat.WindowOpen,value=>{configuration.Chat.WindowOpen=value;if(!value)ChatMessages.Clear();},c=>c.Chat.WindowOpen);
         BoolSetting("ChatWindow.HideInCombat","ChatWindow.HideInCombatTip",()=>configuration.Chat.HideInCombat,value=>configuration.Chat.HideInCombat=value,c=>c.Chat.HideInCombat);
+        // X-467 (0.1504, D-181): the game chat's messages hidden, this window in their place above the game's typing box; both chats to compare.
+        BoolSetting("ChatWindow.HideGameMessages","ChatWindow.HideGameMessagesTip",()=>configuration.Chat.HideGameMessages,value=>configuration.Chat.HideGameMessages=value,c=>c.Chat.HideGameMessages);
+        ImGui.Indent();
+        ImGui.BeginDisabled(!configuration.Chat.HideGameMessages);
+        try{BoolSetting("ChatWindow.BothChats","ChatWindow.BothChatsTip",()=>configuration.Chat.BothChats,value=>configuration.Chat.BothChats=value,c=>c.Chat.BothChats);}
+        finally{ImGui.EndDisabled();ImGui.Unindent();}
         BoolSetting("ChatWindow.Timestamps","ChatWindow.TimestampsTip",()=>configuration.Chat.ShowTimestamps,value=>configuration.Chat.ShowTimestamps=value,c=>c.Chat.ShowTimestamps);
         ImGui.Indent();
         ImGui.BeginDisabled(!configuration.Chat.ShowTimestamps);
@@ -380,8 +437,21 @@ internal sealed partial class MainWindow
         {
             try
             {
-                foreach(var subject in combat.GroupBy(row=>row.Category))
-                    DrawChatFilterGroup(tab,filters,subject,localization.Get("ChatWindow.FilterSubject"+subject.Key),"Subject"+subject.Key);
+                // X-484 (0.1518): the game's two ways in: each subject with its kinds of line, and each kind of line for every subject.
+                if(TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterBySubject"),combat,filters)+"###ChatFilterBySubject"))
+                {
+                    try
+                    {
+                        foreach(var subject in combat.GroupBy(row=>row.Category))
+                            DrawChatFilterGroup(tab,filters,subject,localization.Get("ChatWindow.FilterSubject"+subject.Key),"Subject"+subject.Key);
+                    }
+                    finally{ImGui.TreePop();}
+                }
+                if(TenshoAssistant.UI.UiComponents.TreeNode(ChatFilterLabel(localization.Get("ChatWindow.FilterByGenre"),combat,filters)+"###ChatFilterByGenre"))
+                {
+                    try{DrawChatFilterGenres(tab,filters,table);}
+                    finally{ImGui.TreePop();}
+                }
             }
             finally{ImGui.TreePop();}
         }
@@ -417,11 +487,33 @@ internal sealed partial class MainWindow
                     if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
                     ChatTabChanged(tab);
                 }
-                Tip("ChatWindow.FilterTip");
+                TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));
             }
         }
         finally{ImGui.TreePop();}
     }
+
+    /// <summary>X-484 (0.1518): one box per kind of combat line (damage dealt, damage taken…), for every subject at once; ticked when all of
+    /// them are, its label counting them.</summary>
+    private void DrawChatFilterGenres(ChatTabSettings tab,List<uint> filters,ChatFilterTable table)
+    {
+        foreach(var (genre,rows) in table.Genres())
+        {
+            var key=ChatFilterTable.GenreKey(genre);
+            var name=localization.Has(key) ? localization.Get(key):rows[0].Name;
+            var on=rows.Count(row=>filters.Contains(row.Id));
+            var all=on==rows.Count;
+            if(ImGui.Checkbox(ChatFilterLabel(name,rows,filters)+"###ChatFilterGenre"+key,ref all))
+            {
+                filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
+                if(all)filters.AddRange(rows.Select(row=>row.Id));
+                ChatTabChanged(tab);
+            }
+            TipText(()=>ChatGenreTip(on,rows.Count));
+        }
+    }
+
+    private string ChatGenreTip(int on,int count)=>localization.Format("ChatWindow.GenreTip",on,count);
 
     /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
     private void DrawChatTabWords(ChatTabSettings tab)
@@ -429,6 +521,7 @@ internal sealed partial class MainWindow
         TextSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300,260);
         TextSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,260);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
+        CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
     }
 
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
@@ -441,6 +534,7 @@ internal sealed partial class MainWindow
             chatSettingsPending=true;
         },600,300);
         TextSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600,300);
+        TextSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600,300);
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
@@ -462,7 +556,7 @@ internal sealed partial class MainWindow
                     if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
                     ChatMessages.Restart(tab);chatSettingsPending=true;
                 }
-                Tip("ChatWindow.ChannelBoxTip");
+                TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));
             }
         }
         finally{ImGui.EndTable();}
@@ -522,9 +616,12 @@ internal sealed partial class MainWindow
         var table=ChatFilterTableNow();
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
-        if(options.TabsAtBottom)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
+        chatAlertWords=ChatTextFilter.Words(options.AlertWords);
+        // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
+        var reduced=chatReduced && !chatFollowing;
+        if(options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
         DrawChatTabBar(tabs,options);
-        if(!options.TabsAtBottom)DrawChatShownTab(tabs,options,0);
+        if(!options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,0);
     }
 
     private void DrawChatTabBar(List<ChatTabSettings> tabs,ChatSettings options)
@@ -554,7 +651,7 @@ internal sealed partial class MainWindow
                 var view=ChatMessages.ViewOf(tab);
                 bool open;
                 var coloured=PushChatTabColor(tab);
-                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
                 finally{if(coloured)ImGui.PopStyleColor();}
                 if(!open)continue;
                 chatTabShown=index;
@@ -594,6 +691,21 @@ internal sealed partial class MainWindow
         Tip(options.Borderless ? "ChatWindow.FrameOnTip":"ChatWindow.FrameOffTip");
         var lockButton=GlyphTabButton("###ChatLock",options.Locked ? Dalamud.Interface.FontAwesomeIcon.Lock:Dalamud.Interface.FontAwesomeIcon.LockOpen,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip(options.Locked ? "ChatWindow.UnlockTip":"ChatWindow.LockTip");
+        // X-467 (0.1504, D-181): with the game's messages hidden by the option, both chats on or off; out of it, this window reduced or not.
+        var both=false;
+        if(options.HideGameMessages)
+        {
+            both=GlyphTabButton("###ChatBoth",options.BothChats ? Dalamud.Interface.FontAwesomeIcon.WindowRestore:Dalamud.Interface.FontAwesomeIcon.Clone,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
+            Tip(options.BothChats ? "ChatWindow.BothChatsOffTip":"ChatWindow.BothChatsOnTip");
+        }
+        var reduce=false;
+        if(!chatFollowing)
+        {
+            reduce=GlyphTabButton("###ChatReduce",chatReduced ? Dalamud.Interface.FontAwesomeIcon.WindowMaximize:Dalamud.Interface.FontAwesomeIcon.WindowMinimize,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
+            Tip(chatReduced ? "ChatWindow.ExpandTip":"ChatWindow.ReduceTip");
+        }
+        if(both){options.BothChats=!options.BothChats;if(!options.BothChats)chatReduced=false;TrySave("Chat window");}
+        if(reduce)chatReduced=!chatReduced;
         if(frame){options.Borderless=!options.Borderless;TrySave("Chat window");}
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
     }
@@ -687,7 +799,7 @@ internal sealed partial class MainWindow
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
                 var row=view.RowOf(index);
                 if(row*height>end)break;
-                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options);
+                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options,view.RepeatsAt(index));
             }
             // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
             view.RowsShown=view.RowCount;view.HeightShown=shown;
@@ -791,11 +903,21 @@ internal sealed partial class MainWindow
         _=>null,
     } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
-    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options)
+    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options,int repeats=0)
     {
         var color=ChatColor(options.ColorOf(record.Channel));
         // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
         var left=ImGui.GetCursorPosX();
+        // X-484 (0.1519, the user's request of 17/11: the player put forward more visible): a band in the warning colour behind the whole message.
+        // X-484 (0.1520): a message holding an alert word on a band in the accent colour (a player put forward keeps the warning colour).
+        var put=ChatTextFilter.IsPlayer(record.Sender,chatHighlighted);
+        if(put || ChatAlert.Holds(record,chatAlertWords))
+        {
+            ImGui.SetCursorPosY(y);
+            var top=ImGui.GetCursorScreenPos();
+            ImGui.GetWindowDrawList().AddRectFilled(top-new Vector2(2,0),top+new Vector2(ImGui.GetContentRegionAvail().X+2,Math.Max(1,lines.Count)*height),
+                ImGui.GetColorU32((put ? Warning:Accent) with {W=ChatLook.HighlightBandAlpha}),3f);
+        }
         var indent=ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent);
         for(var line=0;line<lines.Count;line++)
         {
@@ -819,8 +941,17 @@ internal sealed partial class MainWindow
                 index++;
             }
             if(first)ImGui.TextUnformatted(" ");
+            // X-484 (0.1519): the repeats folded into this message, after its last line.
+            if(line==lines.Count-1 && repeats>0)
+            {
+                ImGui.SameLine(0,0);
+                ImGui.TextColored(Muted,localization.Format("ChatWindow.Repeats",repeats+1));
+                TipText(()=>ChatRepeatsTip(repeats+1));
+            }
         }
     }
+
+    private string ChatRepeatsTip(int times)=>localization.Format("ChatWindow.RepeatsTip",times);
 
     /// <summary>X-476 (0.1481, X-447 A3): the dark outline of the text about to be drawn at the cursor, as the game's chat.</summary>
     private static void ChatOutline(string text)

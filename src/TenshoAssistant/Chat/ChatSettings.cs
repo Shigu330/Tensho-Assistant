@@ -17,6 +17,9 @@ public sealed class ChatTabSettings
     public string? KeepWords{get;set;}
     public string? HideWords{get;set;}
     public bool WordsMatchCase{get;set;}
+    /// <summary>X-484 (0.1519, beyond the game; the « duplicates » of the chat study, X-447): a message repeated right after itself (same channel,
+    /// same sender, same text, within <see cref="ChatRepeat.Window"/>) is not shown again: the first one counts the repeats (« ×3 »).</summary>
+    public bool FoldRepeats{get;set;}
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
 }
 
@@ -30,6 +33,12 @@ public sealed class ChatSettings
     public const int MaximumTabs=12,MaximumTabName=24;
     public bool WindowOpen{get;set;}
     public bool HideInCombat{get;set;}
+    /// <summary>X-467 (0.1504, D-181 of 16/11, DEC-053 completed): the game chat's messages (its four panels) hidden and this window in their
+    /// place, above the game's own typing box (never hidden). Off by default; given back as soon as it is no longer wanted (GameChatHider).</summary>
+    public bool HideGameMessages{get;set;}
+    /// <summary>X-467 (0.1504): with <see cref="HideGameMessages"/>, both chats shown for a while, to compare (nothing hidden, this window at
+    /// its own place).</summary>
+    public bool BothChats{get;set;}
     public bool ShowTimestamps{get;set;}=true;
     public bool Clock24{get;set;}=true;
     public bool ShowSeconds{get;set;}
@@ -50,6 +59,9 @@ public sealed class ChatSettings
     /// <summary>X-484 (0.1482, beyond the game): players whose messages no tab shows, and players whose name stands out (commas between names).</summary>
     public string? HiddenPlayers{get;set;}
     public string? HighlightedPlayers{get;set;}
+    /// <summary>X-484 (0.1520, beyond the game; the « alerts » of the chat study, X-447): words that make a message stand out (commas between
+    /// them, capitals ignored): its line on a band, and its tab marked « ! » until it is seen.</summary>
+    public string? AlertWords{get;set;}
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
     /// default, as the game's chat.</summary>
     public bool TabsAtBottom{get;set;}=true;

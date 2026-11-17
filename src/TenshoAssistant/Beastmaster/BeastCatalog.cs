@@ -13,7 +13,9 @@ public sealed record XbmRow(uint Row, ushort Sub, object?[] Cells)
 }
 public sealed record BeastStats(int Strength, int Intelligence, int PhysicalResistance, int MagicalResistance, int Vitality);
 /// <summary>AutoAttack: the element's name for a physical one; empty for a magical one. Ranks[0] = rank 1.</summary>
-/// <summary>X-109 (0.980): AutoRow = the XBMElement row of the automatic attack (9 slashing, 8 piercing, 7 blunt; 0 magical).</summary>
+/// <summary>X-109 (0.980): AutoRow = the XBMElement row of the automatic attack (9 slashing, 8 piercing, 7 blunt). X-553 (0.1523): a magical one
+/// has its element's row (1 fire, 2 wind, 3 earth, 4 lightning, 5 ice, 6 water; <see cref="BeastCatalog.ElementOfAspect"/>); 0 only for an
+/// unaspected one (« Neutre » in the game's beast book). AutoAttack is that row's name, empty for an unaspected one.</summary>
 public sealed record Beast(uint Id, string Name, uint Icon, string Family, string AutoAttack, string Assault, string Volley, IReadOnlyList<BeastStats> Ranks, string CatchPlace = "", uint AutoRow = 0)
 {
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
@@ -42,7 +44,8 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     private const int FirstBonusColumn = 4;
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
-        Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null)
+        Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
+        Func<uint, int>? aspect = null)
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -52,7 +55,9 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         var elements = sheets["XBMElement"].ToDictionary(row => row.Row, row => row.Text(0));
         string Element(uint row) => elements.GetValueOrDefault(row, "");
         // Action.AttackType 1, 2, 3 = slashing, piercing, blunt; their XBMElement rows are 9, 8, 7 (Cu sith: 45187, « piercing » on the game's sheet).
-        uint AutoRow(uint action) => attackType(action) switch { 1 => 9u, 2 => 8u, 3 => 7u, _ => 0u };
+        // X-553 (0.1523): Action.AttackType 5 is magical: its element (Action.Aspect) gives the row; before, every magical beast was 0 and never hit
+        // an elemental weakness (Foudre, Glace…), so the panel's trios hit none (docs/evidence/0.1523-beast-weakness.md).
+        uint AutoRow(uint action) => attackType(action) switch { 1 => 9u, 2 => 8u, 3 => 7u, 5 => ElementOfAspect(aspect?.Invoke(action) ?? 0), _ => 0u };
         string Auto(uint action) => AutoRow(action) is var element and not 0 ? Element(element) : "";
         var grow = sheets["XBMPetParamGrow"].GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub)
             .Select(row => new BeastStats(row.Int(0), row.Int(1), row.Int(2), row.Int(3), row.Int(4))).ToArray());
@@ -81,6 +86,13 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         }).ToArray();
         return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
     }
+
+    /// <summary>
+    /// X-553 (0.1523): the XBMElement row of a magical attack's element (Action.Aspect): 1 fire → 1, 2 ice → 5, 3 wind → 2, 4 earth → 3,
+    /// 5 lightning → 4, 6 water → 6; 7 (unaspected) and anything else → 0. Each value matched against the game's beast book (« Feu », « Glace »,
+    /// « Foudre »… beside « Attaque auto. », read on 17/11) through a beast found by its attributes alone (docs/evidence/0.1523-beast-weakness.md).
+    /// </summary>
+    public static uint ElementOfAspect(int aspect) => aspect switch { 1 => 1u, 2 => 5u, 3 => 2u, 4 => 3u, 5 => 4u, 6 => 6u, _ => 0u };
 
     private static string Capitalize(string name) => name.Length == 0 ? name : char.ToUpperInvariant(name[0]) + name[1..];
 

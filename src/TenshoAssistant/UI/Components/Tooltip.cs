@@ -22,9 +22,12 @@ internal sealed partial class MainWindow
     }
 
     // Tooltip of the last drawn item from a ready text (also when disabled).
-    private static void TipText(string text)
+    private static void TipText(string text)=>TipText(()=>text);
+
+    // X-545 (0.1517): the same from a text built only when the item is hovered (a tooltip made of several lines, per row of a long list).
+    private static void TipText(Func<string> text)
     {
-        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(text);
+        if(ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))WrappedTooltip(text());
     }
 
     // A muted « info » icon on the line, its help text on hover.

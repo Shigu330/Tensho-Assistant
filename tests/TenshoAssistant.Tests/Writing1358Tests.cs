@@ -3,10 +3,16 @@ using System.Text.RegularExpressions;
 
 // 0.1358 (X-377, X-356 review, D-160): English, French spelling and typography, {0} markers. A ratchet on the forms the review fixed:
 // counts written « (s) » when the number can be 1, British spelling, « frames a second », « the earlier files » in SECURITY,
-// lower case after « Pour les joueurs : » in the CHANGELOG (new-version.py writes it so).
+// lower case after « Pour les joueurs : » in the CHANGELOG (the version tool writes it so); X-543 M4 (0.1515): a name keeps its capital
+// (« Tensho n'affiche plus… »); X-547 M2 (0.1516): the version tool uses the same list and the same rule (a name then a word boundary,
+// so « Tensho-Assistant » too), and its self-test fails when the two lists differ.
 internal static class Writing1358Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
+
+    // X-543 M4 (0.1515): names that keep their capital after « Pour les joueurs : ».
+    private static readonly string[] Names=["Tensho","Dalamud","Discord","GitHub","Raphael","Lodestone","Universalis","Eorzéa","Eorzea","Windows","Steam",
+        "Square","Final","Eulmore","Teamcraft","Garland","Allagan","Mogstation","Excel","Ishgard","Limsa","Gridania","Ul'dah"];
 
     private static Dictionary<string,string> Flat(string code)
     {
@@ -55,7 +61,7 @@ internal static class Writing1358Tests
             Check(!Regex.IsMatch(Read("SECURITY.md"),@"the files? of\s+before"),"SECURITY: « the earlier file(s) »");
             Check(!Read("CONTRIBUTING.md").Contains("organization") && !Read("CONTRIBUTING.md").Contains("neighboring"),"CONTRIBUTING: British spelling");
             Check(Read("community-discoveries/README.md").Contains("200,000 facts per kind"),"community-discoveries/README: English thousands separator");
-            var capital=Regex.Matches(Read("CHANGELOG.md"),@"^- Pour les joueurs : [A-ZÉ][a-zé]",RegexOptions.Multiline).Count;
+            var capital=Regex.Matches(Read("CHANGELOG.md"),@"^- Pour les joueurs : (?!(?:"+string.Join("|",Names)+@")\b)[A-ZÉ][a-zé]",RegexOptions.Multiline).Count;
             Check(capital==0,$"CHANGELOG: {capital} « Pour les joueurs : » line(s) with a capital after the colon");
         }),
     ];

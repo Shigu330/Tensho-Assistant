@@ -185,7 +185,8 @@ internal sealed partial class MainWindow
     internal BoardPlan? BeastPlanFor(Board board, BeastState state)
     {
         LoadBeastPlans();
-        var key = BeastTeams.Key(state.Obtained, BeastRanks);
+        var floors = LoadBeastPlans().Floors;
+        var key = BeastTeams.Key(state.Obtained, BeastRanks, floors);
         if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
         {
             beastPlanTask = null;
@@ -200,29 +201,46 @@ internal sealed partial class MainWindow
         {
             var held = state.Obtained; var ranks = BeastRanks;
             beastPlanFor = (board.Id, key);
-            beastPlanTask = Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, held, ranks));
+            beastPlanTask = Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, held, ranks, floors));
         }
         return beastPlans.Plans.GetValueOrDefault(board.Id);
     }
     /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
     internal IReadOnlyDictionary<uint, int>? BeastRanks => LoadBeastPlans().Ranks;
-    /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change.</summary>
+    /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change. X-549 (0.1522): a rank
+    /// read at the limit of the board the game is on is only a floor (BeastTeams.MergeRanks).</summary>
     internal void BeastRanksRead(Dictionary<uint, int> ranks)
     {
         var plans = LoadBeastPlans();
-        var known = plans.Ranks ?? [];
-        if (ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)) return;
-        var merged = new Dictionary<uint, int>(known);
-        foreach (var (beast, rank) in ranks) merged[beast] = rank;
-        beastPlans = plans with { Ranks = merged };
+        var limit = Beasts?.State.Catalog is { } catalog && CurrentBeastBoard(catalog).Board is { } board ? board.RankLimit : 0;
+        var (merged, floors) = BeastTeams.MergeRanks(plans.Ranks, plans.Floors, ranks, limit);
+        if (plans.Ranks is { } known && known.Count == merged.Count && merged.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)
+            && (plans.Floors ?? []).SetEquals(floors)) return;
+        beastPlans = plans with { Ranks = merged, Floors = floors };
         SaveBeastPlans();
+    }
+    /// <summary>X-549 (0.1522): the board the game's board or team window is about (0: not read).</summary>
+    internal Func<uint>? BeastBoardContent { get; set; }
+    /// <summary>X-549 (0.1522): the board the game is on: the labyrinth's territory, else the game's board or team window (BeastTeams.Current).</summary>
+    private (Board? Board, BoardSource Source) CurrentBeastBoard(BeastCatalog catalog)
+        => BeastTeams.Current(catalog.Boards, BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0, BeastBoardContent?.Invoke() ?? 0);
+    private uint beastBoardFollowed;
+    /// <summary>X-549: the page's list follows the board the game is on, once each time that board changes (it stays free to choose another).</summary>
+    private void FollowBeastBoard(BeastCatalog catalog)
+    {
+        var read = CurrentBeastBoard(catalog).Board?.Id ?? 0;
+        if (read == beastBoardFollowed) return;
+        beastBoardFollowed = read;
+        for (var index = 0; index < catalog.Boards.Count; index++) if (catalog.Boards[index].Id == read) beastBoard = index;
     }
     /// <summary>X-135 (0.1163): the board's result read in the game's result window: kept as the last result, its « after » ranks over those known.</summary>
     internal void BeastResultRead(BoardResult result)
     {
         var plans = LoadBeastPlans();
         if (BeastResults.Same(plans.Result, result)) return;
-        beastPlans = plans with { Result = result, Ranks = BeastResults.Merge(plans.Ranks, result) };
+        // X-549 (0.1522): the result's ranks are the beasts' own (not brought down to the board's limit): no longer floors.
+        var floors = plans.Floors is { } before ? before.Where(beast => result.Beasts.All(gain => gain.Beast != beast)).ToHashSet() : null;
+        beastPlans = plans with { Result = result, Ranks = BeastResults.Merge(plans.Ranks, result), Floors = floors };
         SaveBeastPlans();
     }
     /// <summary>X-135 (0.1163): the last board's result: score, then each beast's rank and experience before and after.</summary>
@@ -232,6 +250,7 @@ internal sealed partial class MainWindow
         // X-481 (0.1470): the window's bonus and total, when they were read.
         var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
+        DrawBeastResultLines(result);
         foreach (var gain in result.Beasts)
         {
             var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);
@@ -240,6 +259,67 @@ internal sealed partial class MainWindow
             if (gain.RankAfter > gain.RankBefore) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.ResultRanks", gain.RankAfter - gain.RankBefore)); }
         }
     }
+    /// <summary>X-550 (0.1526): the team the game's team window shows (null: not read).</summary>
+    internal Func<IReadOnlyList<BeastTeams.TeamMember>?>? BeastTeamRead { get; set; }
+    private (string Key, IReadOnlyList<BeastTeams.TeamFight> Fights)? beastTeamFights;
+    /// <summary>X-550 (0.1526): the team taken in the game: beasts down or low on HP, then each fight's three among them, with the advised beasts
+    /// missing and those taking their place. Worked out again only when the board, the plan or the team (HP included) changes.</summary>
+    private void DrawBeastTeamRead(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember> team, BeastCatalog catalog)
+    {
+        Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+        string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
+        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
+        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        ImGui.TextColored(Accent, localization.Format("BeastUi.TeamRead", team.Count));
+        foreach (var member in team)
+        {
+            if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
+            else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
+        }
+        foreach (var fight in beastTeamFights.Value.Fights)
+        {
+            var battle = board.Battles[fight.Battle];
+            ImGui.TextColored(Accent, battle.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", fight.Battle));
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Format(BeastTeams.HitKey(fight.Enemies), fight.Hit, fight.Enemies));
+            ImGui.Indent();
+            try
+            {
+                ImGui.TextUnformatted("→ " + Names(fight.Trio));
+                if (fight.Lost.Count > 0) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", Names(fight.Lost), fight.Instead.Count > 0 ? Names(fight.Instead) : "—"));
+            }
+            finally { ImGui.Unindent(); }
+        }
+    }
+
+    /// <summary>X-481 (0.1525): the result's lines as the game's window shows them: the score's parts (a label, the value when it has one, the
+    /// points), the score, each bonus's points, the bonus and the total. Labels from the game's own words (docs/evidence/0.1470-beast-result-window.md).</summary>
+    private void DrawBeastResultLines(BoardResult result)
+    {
+        if (result.Parts is not { } parts) return;
+        if (!TenshoAssistant.UI.UiComponents.BeginDataTable("BeastResultLines", 3)) return;
+        try
+        {
+            void Line(string key, string value, int points, bool strong = false)
+            {
+                ImGui.TableNextRow(); ImGui.TableNextColumn();
+                if (strong) ImGui.TextColored(Accent, localization.Get(key)); else ImGui.TextUnformatted(localization.Get(key));
+                ImGui.TableNextColumn(); ImGui.TextDisabled(value);
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(points.ToString("N0", System.Globalization.CultureInfo.CurrentCulture));
+            }
+            Line("BeastUi.ResultPath", "", parts.Path);
+            Line("BeastUi.ResultEnemies", "", parts.Enemies);
+            Line("BeastUi.ResultElite", "", parts.Elite);
+            Line("BeastUi.ResultBoss", "", parts.Boss);
+            Line("BeastUi.ResultHp", parts.HpLeft?.ToString(System.Globalization.CultureInfo.CurrentCulture) ?? "", parts.HpPoints);
+            Line("BeastUi.ResultScore", "", result.Score, true);
+            if (result.BonusPoints is { } points)
+                for (var index = 0; index < points.Count; index++) Line("BeastUi.ResultBonusOne", (index + 1).ToString(System.Globalization.CultureInfo.CurrentCulture), points[index]);
+            if (result.Bonus is { } bonus) Line("BeastUi.ResultBonusLine", "", bonus, true);
+            if (result.Total is { } total) Line("BeastUi.ResultTotalLine", "", total, true);
+        }
+        finally { ImGui.EndTable(); }
+    }
+
     /// <summary>X-109 (0.981): the board of a labyrinth territory (its ContentFinderCondition); null outside.</summary>
     internal Func<uint, uint>? BeastBoardOfTerritory { get; set; }
 
@@ -248,18 +328,35 @@ internal sealed partial class MainWindow
     {
         var state = Beasts?.State;
         if (state?.Catalog is not { } catalog || catalog.Boards.Count == 0) { EmptyState(inDesktopApp ? "Desktop.ReadInGame":"BeastUi.Loading"); return; }
+        // X-549 (0.1522): the board the game is on (the labyrinth's territory, else its board or team window), the list only when it tells
+        // nothing. Before, the territory was read only during a cut, and the labyrinth is no longer cut (X-137): the list was always used.
         Board board;
-        if (TenshoAssistant.Competitive.CompetitiveGate.Cut)
+        var (read, source) = CurrentBeastBoard(catalog);
+        if (read is not null)
         {
-            var id = BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0;
-            if (catalog.Boards.FirstOrDefault(row => row.Id == id) is not { } here) { EmptyState("BeastUi.TeamBoardUnknown"); return; }
-            board = here;
+            board = read;
             ImGui.TextColored(Accent, board.Name);
+            // X-562 M6 (review of 0.1526): the windows' number (AgentXBM…ContentId) is not yet confirmed in game (R06): said so until then.
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Get(source == BoardSource.Window ? "BeastUi.BoardReadWindow" : "BeastUi.BoardRead"));
         }
-        else board = DrawBeastBoardChoice(catalog);
+        else if (TenshoAssistant.Competitive.CompetitiveZones.IsLabyrinth(CurrentTerritory?.Invoke() ?? 0)) { EmptyState("BeastUi.TeamBoardUnknown"); return; }
+        else
+        {
+            FollowBeastBoard(catalog);
+            board = DrawBeastBoardChoice(catalog);
+            ImGui.TextDisabled(localization.Get("BeastUi.BoardChosen"));
+        }
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
         var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        // X-550 (0.1526): the team the player took (the game's team window) comes first: its three per fight, then the advised plan.
+        if (BeastTeamRead?.Invoke() is { Count: > 0 } team)
+        {
+            ImGui.PushTextWrapPos(wrapAt);
+            try { DrawBeastTeamRead(board, plan, team, catalog); }
+            finally { ImGui.PopTextWrapPos(); }
+            ImGui.Separator();
+        }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
         ImGui.PushTextWrapPos(wrapAt);
         try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
@@ -269,6 +366,7 @@ internal sealed partial class MainWindow
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
     {
         if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
+        FollowBeastBoard(catalog);
         var board = DrawBeastBoardChoice(catalog);
         BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
         ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
@@ -289,7 +387,8 @@ internal sealed partial class MainWindow
     {
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
-        if (plan.RanksAssumed) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", board.RankLimit));
+        // X-549 (0.1522): said only for the team's beasts whose rank is not known (the others' do not change the plan).
+        if (plan.RanksUnknown > 0) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", plan.RanksUnknown, board.RankLimit));
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
         foreach (var pick in plan.Team)
         {
@@ -309,6 +408,14 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
                 ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it.
+                foreach (var miss in BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, Beasts?.State.Obtained))
+                {
+                    string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
+                    ImGui.TextColored(Warning, miss.InTeam.Count > 0 ? localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam))
+                        : miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
+                        : localization.Format("BeastUi.MissNoneHeld", miss.Name));
+                }
             }
             finally { ImGui.Unindent(); }
         }

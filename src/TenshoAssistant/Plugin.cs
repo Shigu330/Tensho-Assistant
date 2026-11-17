@@ -96,6 +96,8 @@ public sealed partial class Plugin : IDalamudPlugin
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
+    // X-539: a character logged in and loaded (UI.CharacterGate); Draw and /tensho wait for it.
+    private readonly Func<bool> characterReady;
     private Diagnostics.SelfCheckRunner? selfCheck;
     // R-12 (0.414): items whose « Open » chat link handler is registered (command id = item id), all removed on unload.
     private readonly Dictionary<uint,Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload> alarmLinks=[];
@@ -112,6 +114,8 @@ public sealed partial class Plugin : IDalamudPlugin
         // 0.1105 (R20, plan 4.20): the version loaded, read by the agent's launch check (the agent's logread.py launch).
         log.Information("Tensho Assistant {0} loaded; logged in: {1}, territory {2}.",typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",client.IsLoggedIn,client.TerritoryType);
         chatGui = chat;
+        // X-539 (17/11): nothing drawn before a character is logged in (title screen, character selection), open state kept.
+        characterReady=()=>UI.CharacterGate.Draws(client.IsLoggedIn,player.IsLoaded);
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
         dutyLoot = new DutyLootService(garland);
         monsterLoot = new MonsterLootService(garland);
@@ -254,7 +258,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.DalamudLinkKnown=(plugin,command)=>chatGui.RegisteredLinkHandlers.ContainsKey((plugin,command));
             // X-484 (0.1482): the game's log filters, in the client's language (docs/evidence/0.1482-chat-log-filters.md).
             mainWindow.ChatFilterSource=()=>data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()
-                .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText())).ToList();
+                .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText(),row.Example.ExtractText())).ToList();
             mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
             {
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;
@@ -511,12 +515,19 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead),()=>boardReader?.Dispose());
             registrations.Register(()=>{boardWindow=new BeastBoardWindow(mainWindow){Windows=()=>boardReader?.State ?? default};boardWindows.AddWindow(boardWindow);},()=>{if(boardWindow is not null)boardWindows.RemoveWindow(boardWindow);});
             showBoardPanel=()=>configuration.ShowBeastBoardPanel;
+            // X-549 (0.1522): the board the game's board or team window is about, for the panel and the page.
+            mainWindow.BeastBoardContent=()=>boardReader?.State.Content ?? 0;
+            // X-550 (0.1526): the team the game's team window shows.
+            mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
             // X-467 (0.1502): where the game's chat puts its typing box and its message panels, in developer mode (read-only).
             Chat.ChatLogLayoutProbe? chatLayoutProbe=null;
             registrations.Register(()=>chatLayoutProbe=new Chat.ChatLogLayoutProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>chatLayoutProbe?.Dispose());
+            // X-467 (0.1504, D-181): the game chat's messages hidden while the option asks it, given back otherwise and on unload.
+            Chat.GameChatHider? chatHider=null;
+            registrations.Register(()=>{chatHider=new Chat.GameChatHider(framework,gameGui,log,mainWindow.ChatGameMessagesWant){DeveloperMode=()=>configuration.DeveloperMode,OptionWanted=mainWindow.ChatGameMessagesOption};mainWindow.ChatGamePlace=()=>chatHider?.Place;mainWindow.ChatGameChannelMenu=()=>chatHider?.ChannelMenuOpen==true;},()=>{mainWindow.ChatGamePlace=null;mainWindow.ChatGameChannelMenu=null;chatHider?.Dispose();});
             // 0.494 (user request): the self-check, on its own in developer mode, on request otherwise.
             registrations.Register(()=>selfCheck=new Diagnostics.SelfCheckRunner(framework,client,player,log,()=>configuration.DeveloperMode,mainWindow.SelfCheckReady,mainWindow.PrepareSelfCheck,mainWindow.SelfCheckProbes,mainWindow.SelfCheckWindows,
                 Path.Combine(pluginInterface.GetPluginConfigDirectory(),"SelfCheckSeen.json"),string.Join(";",data.GameData.Repositories.Values.OrderBy(repository=>repository.Name).Select(repository=>$"{repository.Name}:{repository.Version}")),
@@ -1446,6 +1457,7 @@ public sealed partial class Plugin : IDalamudPlugin
     private void OnCommand(string command, string arguments)
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){chatForCut?.Print("[Tensho] "+localization.Get("Competitive.Off"));return;}
+        if(!characterReady()){chatGui.Print("[Tensho] "+localization.Get("Plugin.NeedsCharacter"));return;}
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
         if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
@@ -1501,6 +1513,8 @@ public sealed partial class Plugin : IDalamudPlugin
     private void Draw()
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}
+        // X-539: title screen and character selection: no window nor overlay; their open state is left as it is.
+        if(!characterReady())return;
         // 0.745: in developer mode, a slow frame is written to the log with its costliest parts.
         if(!mainWindow.DeveloperMode){DrawFrame();return;}
         var started=System.Diagnostics.Stopwatch.GetTimestamp();var paused=GC.GetTotalPauseDuration();

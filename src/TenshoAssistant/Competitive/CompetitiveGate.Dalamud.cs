@@ -241,7 +241,7 @@ internal sealed class CompetitiveWatcher : IDisposable
             }
         }
         var seen=$"territory {client.TerritoryType}, in combat {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat]}, bound by duty {condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty]}, "
-            +$"cut {CompetitiveGate.Cut}, windows: {string.Join(", ",names.Distinct().Order(StringComparer.Ordinal))}";
+            +$"cut {CompetitiveGate.Cut}, windows: {string.Join(", ",CompetitiveZones.LabyrinthWindows(names))}";
         if(seen==labyrinthSeen)return;
         labyrinthSeen=seen;
         log.Information("Labyrinth reading: {0}",seen);

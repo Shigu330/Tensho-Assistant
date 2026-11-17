@@ -248,6 +248,18 @@ try {
         $foundFr = @(($entriesFr[$number] -split "`n") | Where-Object { $_ -match '^- Pour les joueurs : (.+)$' } | ForEach-Object { $Matches[1].Trim() })
         if ($foundFr.Count) { $playerLinesFr[$number] = $foundFr[0] }
     }
+    # X-526 (0.1505): the last release is the last tag with a release published on GitHub (Get-LastPublishedRelease, LaunchProof.ps1),
+    # never a Stable-* tag alone: a release that failed after its tag was made would drop its versions from the next notes.
+    function Get-LastReleased {
+        $previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+        try { $listed = @(& $gh release list --repo $repository --limit 1000 --json 'tagName,isDraft' 2>$null); $code = $LASTEXITCODE }
+        finally { $ErrorActionPreference = $previous; $global:LASTEXITCODE = 0 }
+        $tags = @(Invoke-Git @('tag', '--list', 'Stable-*') | Where-Object { $_ })
+        $found = Get-LastPublishedRelease $(if ($code -eq 0) { $listed -join "`n" } else { '' }) $version $tags
+        if (-not $found.Ok) { Stop-Release "Stopped: $($found.Reason); the release notes need the last published release." }
+        Write-Host "Release notes base: $($found.Reason)."
+        return @($found.Version | Where-Object { $_ })
+    }
     function Get-PlayerNotesSince([string]$Since) {
         $from = if ($Since) { [version]$Since } else { [version]'0.0.0' }
         $covered = @($entries.Keys | Where-Object { [version]$_ -gt $from -and [version]$_ -le [version]$version } | Sort-Object { [version]$_ } -Descending)
@@ -381,7 +393,7 @@ try {
     if ($resume) {
         Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
         $commit = (Invoke-Git @('rev-list', '-n', '1', $tag)).Trim()
-        $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+        $lastReleased = @(Get-LastReleased | Where-Object { $_ -match '^\d+\.\d+\.\d+$' })
         $notes = Get-PlayerNotesSince $(if ($lastReleased.Count -gt 0) { $lastReleased[0] } else { '' })
         $notes = Add-HotfixNote $notes
         [IO.File]::WriteAllText($notesFile, $notes, [Text.UTF8Encoding]::new($false))
@@ -425,9 +437,9 @@ try {
     Assert-PackagesFromCommit ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
     Write-ReleaseProof ((Invoke-Git @('rev-parse', 'HEAD')).Trim())
 
-    # Release notes: every version since the last published release (highest Stable-x.y.z tag here or on GitHub).
+    # Release notes: every version since the last published release (X-526: the highest Stable-x.y.z with a release published on GitHub).
     Invoke-Git @('fetch', 'origin', '--tags') | Out-Null
-    $lastReleased = @(Invoke-Git @('tag', '--list', 'Stable-*') | ForEach-Object { $_ -replace '^Stable-', '' } | Where-Object { $_ -match '^\d+\.\d+\.\d+$' -and [version]$_ -lt [version]$version } | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+    $lastReleased = @(Get-LastReleased | Where-Object { $_ -match '^\d+\.\d+\.\d+$' })
     $notes = Get-PlayerNotesSince $(if ($lastReleased.Count -gt 0) { $lastReleased[0] } else { '' })
     if ($lastReleased.Count -gt 0) { Write-Output "Release notes cover the versions after $($lastReleased[0]) (their « For players: » lines)." }
     # 0.1020: a new major number (1.0.0 first) is released only on the maintainer's word (-Major).

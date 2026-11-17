@@ -25,7 +25,9 @@ public static class ChatGlyphs
 
     /// <summary>X-523 (0.1501): whether an icon is one the game puts before a sender's name: the novice network's status (NewAdventurer 77,
     /// Mentor 78, MentorPvE 79, MentorCrafting 80, MentorPvP 81, Returner 95, MentorProblem 108) and the classes and jobs (Gladiator 128 to
-    /// Sage 167, Viper 170, Pictomancer 171).</summary>
+    /// Sage 167, Viper 170, Pictomancer 171). X-525 M3 (0.1503): chosen from the names of Dalamud's BitmapFontIcon, not yet from what the
+    /// game really puts before a sender's name (R06): in developer mode the reader writes the icon codes it meets in senders' names
+    /// (ChatPayloads.SenderIcons, codes only), so a real payload can prove or correct the set; until then 127 (RolePlaying) stays « · ».</summary>
     public static bool IsSenderDecoration(uint icon)=>icon is >= NewAdventurer and <= MentorPvP or Returner or MentorProblem or >= Gladiator and <= Sage or Viper or Pictomancer;
 
     /// <summary>Whether a letter is a glyph of the game's font (private use area).</summary>

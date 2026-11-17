@@ -98,7 +98,12 @@ internal sealed partial class MainWindow
     // X-165 (0.1247, slice 4): measures Tensho took without showing them. The panels and overlays turned off after an error (draw thread:
     // PanelWindow, AttachedPanels, the plugin's overlays), the saves in the background that failed (a writer's thread), the load's time.
     private readonly SortedSet<string> panelsOff=new(StringComparer.Ordinal);
-    internal void NotePanelOff(string name)=>panelsOff.Add(name);
+    internal void NotePanelOff(string name)
+    {
+        panelsOff.Add(name);
+        // X-467 (0.1504): the game chat's messages are never left hidden behind a chat window that no longer draws.
+        if(name=="Chat")chatWindowFailed=true;
+    }
     private int writesFailed;
     private string? lastWriteFailure;
     /// <summary>X-165 (0.1247): a save in the background failed (any thread): counted, its message kept for the dashboard.</summary>

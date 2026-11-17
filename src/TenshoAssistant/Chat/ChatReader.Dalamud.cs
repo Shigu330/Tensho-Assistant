@@ -16,6 +16,8 @@ internal sealed class ChatReader : IDisposable
     private readonly RegistrationScope registrations=new();
     private readonly IPluginLog log;private readonly Func<ChatSettings> settings;private readonly ChatStore store;
     private readonly Func<bool>? developer;
+    // X-554 (review of 0.1520): your character's name, to mark what you say yourself (the game gives no subject for it).
+    private readonly Func<string?>? ownName;
     // X-475: the chat history on disk (null: none, as outside the game).
     private readonly ChatHistoryKeeper? history;
     private bool disposed,warned;
@@ -24,11 +26,13 @@ internal sealed class ChatReader : IDisposable
     // text of its own (the window writes its target's name) is said apart, with what the game sent for it.
     private readonly ChatPieceLog piecesSaid=new();
     private int bareSaid;
+    // X-525 M3 (0.1503): developer mode: the icon codes met in senders' names, once per code, at most twenty per session (codes only).
+    private readonly ChatPieceLog senderIconsSaid=new(1,20);
     private const int BareSaidMax=10;
 
-    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null)
+    public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null,Func<string?>? ownName=null)
     {
-        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;
+        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;this.ownName=ownName;
         // One owner for both subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
@@ -72,8 +76,14 @@ internal sealed class ChatReader : IDisposable
             }
             // X-472 (0.1471): the sender with its world icon written « @ » (TextValue left it out: « NameWorld »).
             var sender=ChatPayloads.Text(message.Sender.Payloads.Select(Payload));
+            if(developer?.Invoke()==true && message.Sender.Payloads.Select(Payload).ToList() is var senderPayloads)
+                foreach(var icon in senderPayloads.Where(payload=>payload.Kind==ChatPayloadKind.Icon).Select(payload=>payload.Icon).Distinct())
+                    if(senderIconsSaid.Take((int)icon))
+                        log.Information("Chat window, icons in a sender's name (kind {0}): {1}.",(int)message.LogKind,string.Join(", ",ChatPayloads.SenderIcons(senderPayloads)));
             // X-484 (0.1482): who does it and to whom (Dalamud 15: IChatMessage.SourceKind and TargetKind), for the game's log filters.
-            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,(byte)message.SourceKind,(byte)message.TargetKind);
+            // X-554 (0.1521): what you say yourself marked as yours (ChatAlert.Source): it never alerts nor counts as unread.
+            var source=ChatAlert.Source(ChatChannels.From((int)message.LogKind),(byte)message.SourceKind,sender,ownName?.Invoke());
+            var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,source,(byte)message.TargetKind);
             // X-475: kept on disk too when the player turned the history on.
             history?.Keep(record);
             warned=false;

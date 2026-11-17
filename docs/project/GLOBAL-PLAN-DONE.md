@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (544 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (566 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -461,7 +461,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-340 | User's remark, 14/11 about 12:30 pm (bug report test, screenshot) and decision… | Done in 0.1324 |
 | X-341 | User's decision, 14/11 about 1:10 pm (« The worker », after the duplicate PR… | Done in 0.1323 |
 | X-342 | User's decision, 14/11 about 1:30 pm (« ok for everything »: our issues apart… | Done in 0.1323 |
-| X-343 | User's remark, 14/11 about 2:45 pm (after test T-0.1326-1): an item he has just… | Done in 0.1331 |
+| X-343 | User's remark, 14/11 about 2:45 pm (after test T-0.1326-1): an item the user… | Done in 0.1331 |
 | X-344 | Bug seen by the user on 14/11 about 3:10 pm (screenshot, Dalamud plugin list… | Done in 0.1330 |
 | X-350 | Review of block 0.1318 to 0.1329 (14/11), I1: R03.2 and DEC-038: X-320's new… | Done in 0.1334 |
 | X-351 | Review of block 0.1318 to 0.1329 (14/11), I3: X-322: on a map the game did not… | Done in 0.1342.0 |
@@ -566,6 +566,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-457 | Bug seen by the user on 11/15 around 8:50 pm (0.1454, two screenshots): the… | Done in 0.1462.0 |
 | X-458 | User request of 11/15 around 9 pm: on the private test page (X-450), a full… | Done in 0.1461.0 |
 | X-461 | Bug seen by the user on 11/15 around 9:20 pm (test T-0.1441-3, test page)… | Done in 0.1463 |
+| X-462 | Bug seen by the user on 11/15 around 9:30 pm (three screenshots, game map left… | Done in 0.1464 |
 | X-463 | Tool: retour.py refuses the release while a relay commit has red CI, even when… | Done in 0.1461.0 |
 | X-464 | Review of block 0.1455 to 0.1461 (review 0.1461, 15/11), minor M1, M2, M3, M4… | Done in 0.1466 |
 | X-465 | Bug seen in the Beastmaster labyrinth by the user on 11/15 around 9:56 pm… | Done in 0.1465 |
@@ -578,13 +579,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
 | X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in… | Done in 0.1487.0 |
 | X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I2: finding in… | Done in 0.1469 |
+| X-481 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I3: finding in… | Done in 0.1525 |
 | X-482 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), minor M1, M2, M3, M4… | Done in 0.1472 |
 | X-483 | Tool (defect seen by the user on 11/15 around 11:40 pm on the test page… | Done in 0.1473.0 |
 | X-485 | User request of 11/15 around 11:55 pm (screenshot: the Tensho chat window drawn… | Done in 0.1479 |
 | X-487 | Tool, user request of 11/16 around 0:30 am (the game's help covers the whole… | Done in 0.1474 |
 | X-488 | User request of 11/16 around 0:40 am: the test page dashboard (X-458) has « not… | Done in 0.1474.0 |
 | X-489 | Tool (defect found by relay 86 on 11/16 around 00:35): the produced GLOBAL-PLAN… | Done in 0.1473.0 |
-| X-490 | User request of 11/16 around 0:50 am: he will mostly use the private page… | Done in 0.1474.0 |
+| X-490 | User request of 11/16 around 0:50 am: the user will mostly use the private page… | Done in 0.1474.0 |
 | X-491 | Review of block 0.1468 to 0.1472 (review 0.1472, 16/11), I1: finding in… | Done in 0.1473 |
 | X-492 | Review of block 0.1468 to 0.1472 (review 0.1472, 16/11), minor M1, M2, M3, M4… | Done in 0.1499 |
 | X-493 | Review of block 0.1473 to 0.1474 (review 0.1474, 16/11), I1: finding in… | Done in 0.1475 |
@@ -612,12 +614,32 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-522 | Tool (defect seen by the master on 11/16 around 1:55 pm): plan.py… | Done in 0.1498.0 |
 | X-523 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), I1: finding in… | Done in 0.1501 |
 | X-524 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), minor M1, M2: M1 in… | Done in 0.1501.0 |
+| X-525 | Review of block 0.1501 to 0.1502 (review 0.1502, 16/11), minor M1, M2, M3: M1… | Done in 0.1503 |
+| X-526 | Tool (defect seen by the master on 11/16 around 4:30 pm, fix asked by the… | Done in 0.1505 |
+| X-527 | Review  (review 0.1504, 16/11), I1: finding in… | Done in 0.1506 |
+| X-528 | Review  (review 0.1504, 16/11), minor M1, M2, M3, M4: M1 in… | Done in 0.1507 |
+| X-531 | Tool (defect seen by the master on 16/11 around 23:00): page_essais.py import… | Done in 0.1505 |
+| X-532 | Tool (defect seen by the user on 16/11 around 23:00): after a clear (R28.8) the… | Done in 0.1508 |
+| X-533 | User's request (16/11 around 23:15, two screenshots in the master's notes)… | Done in 0.1509 |
+| X-534 | Review of block 0.1505 to 0.1507 (review 0.1507, 16/11), minor M1, M2: M1 in… | Done in 0.1510 |
+| X-536 | Tool (R13.3), test page of 17/11 around midnight: 29 tests commented « I don't… | Done in 0.1511 |
+| X-537 | Tool (R13.3), idea box defect (idees.py, called by page_essais.py import on… | Done in 0.1511 |
+| X-538 | Tool (R13.3), relay statistics skewed, seen on 17/11 around 0:40 comparing… | Done in 0.1511 |
+| X-540 | Review of block 0.1508 to 0.1510 (review 0.1510, 17/11), minor M1, M2, M3: M1… | Done in 0.1512 |
+| X-542 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), I1: finding in agent… | Done in 0.1514 |
+| X-543 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), minor M1, M2, M3, M4… | Done in 0.1514 |
+| X-544 | Tool: the state.py quota verdict (and the start hook) says « BELOW: one relay a… | Done in 0.1514 |
+| X-546 | Review  (review 0.1515, 17/11), I1: finding in q.py (agent file) :299 (French… | Done in 0.1516.0 |
+| X-547 | Review  (review 0.1515, 17/11), minor M1, M2, M3, M4: M1 in q.py (agent file)… | Done in 0.1516.0 |
+| X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
+| X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
+| X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (544 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (566 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1181,6 +1203,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-457 | Bug vu par l'utilisateur le 15/11 vers 20 h 50 (0.1454, deux captures) : la… | Fait en 0.1462.0 |
 | X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page privée des essais… | Fait en 0.1461.0 |
 | X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai T-0.1441-3, page des… | Fait en 0.1463 |
+| X-462 | Bug vu par l'utilisateur le 15/11 vers 21 h 30 (trois captures, carte du jeu à… | Fait en 0.1464 |
 | X-463 | Outil : retour.py refuse la release tant qu'un commit du relais a sa CI rouge… | Fait en 0.1461.0 |
 | X-464 | Relecture du bloc 0.1455 à 0.1461 (relecture 0.1461, 15/11), mineurs M1, M2… | Fait en 0.1466 |
 | X-465 | Bug vu au Dédale bestial par l'utilisateur le 15/11 vers 21 h 56 (mode… | Fait en 0.1465 |
@@ -1193,6 +1216,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
 | X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la… | Fait en 0.1487.0 |
 | X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I2 : X-462 : MapOf… | Fait en 0.1469 |
+| X-481 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I3 : X-465 : la… | Fait en 0.1525 |
 | X-482 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), mineurs M1, M2… | Fait en 0.1472 |
 | X-483 | Outil (défaut vu par l'utilisateur le 15/11 vers 23 h 40 sur le tableau de bord… | Fait en 0.1473.0 |
 | X-485 | Demande de l'utilisateur du 15/11 vers 23 h 55 (capture : la fenêtre de chat… | Fait en 0.1479 |
@@ -1227,3 +1251,23 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-522 | Outil (défaut vu par la maître le 16/11 vers 13 h 55) : plan.py… | Fait en 0.1498.0 |
 | X-523 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), I1 : X-492 M4 : la… | Fait en 0.1501 |
 | X-524 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), mineurs M1, M2… | Fait en 0.1501.0 |
+| X-525 | Relecture du bloc 0.1501 à 0.1502 (relecture 0.1502, 16/11), mineurs M1, M2, M3… | Fait en 0.1503 |
+| X-526 | Outil (défaut vu par la maître le 16/11 vers 16 h 30, correction demandée par… | Fait en 0.1505 |
+| X-527 | Relecture  (relecture 0.1504, 16/11), I1 : Le code rend les messages du jeu… | Fait en 0.1506 |
+| X-528 | Relecture  (relecture 0.1504, 16/11), mineurs M1, M2, M3, M4 : M1 : Une fenêtre… | Fait en 0.1507 |
+| X-531 | Outil (défaut vu par la maître le 16/11 vers 23 h) : page_essais.py import… | Fait en 0.1505 |
+| X-532 | Outil (défaut vu par l'utilisateur le 16/11 vers 23 h : « quand tu es vidé tu… | Fait en 0.1508 |
+| X-533 | Demande de l'utilisateur (16/11 vers 23 h 15, deux captures dans les notes de… | Fait en 0.1509 |
+| X-534 | Relecture du bloc 0.1505 à 0.1507 (relecture 0.1507, 16/11), mineurs M1, M2… | Fait en 0.1510 |
+| X-536 | Outil (R13.3), page des essais du 17/11 vers 0 h : 29 essais commentés « je… | Fait en 0.1511 |
+| X-537 | Outil (R13.3), défaut de la boîte à idées (idees.py, appelé par page_essais.py… | Fait en 0.1511 |
+| X-538 | Outil (R13.3), statistiques des relais faussées, vu le 17/11 vers 0 h 40 en… | Fait en 0.1511 |
+| X-540 | Relecture du bloc 0.1508 à 0.1510 (relecture 0.1510, 17/11), mineurs M1, M2, M3… | Fait en 0.1512 |
+| X-542 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), I1 : X-536… | Fait en 0.1514 |
+| X-543 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), mineurs M1, M2… | Fait en 0.1514 |
+| X-544 | Outil : le verdict de state.py quota (et le relevé du hook de démarrage) dit «… | Fait en 0.1514 |
+| X-546 | Relecture  (relecture 0.1515, 17/11), I1 : X-542 : NOT_UNDERSTOOD laisse passer… | Fait en 0.1516.0 |
+| X-547 | Relecture  (relecture 0.1515, 17/11), mineurs M1, M2, M3, M4 : M1 : X-542 : des… | Fait en 0.1516.0 |
+| X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
+| X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
+| X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |

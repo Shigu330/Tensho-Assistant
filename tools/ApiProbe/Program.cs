@@ -55,6 +55,8 @@ foreach (var name in args)
         if (member is MethodInfo method && method.IsSpecialName) continue;
         Console.WriteLine($"  {member}");
         if (member is FieldInfo field && field.IsLiteral) Console.WriteLine($"    = {field.GetRawConstantValue()}");
+        // 0.1504 (X-467): whether a property can be written (a native flag set through a property, not a method).
+        if (member is PropertyInfo property) Console.WriteLine($"    {(property.CanRead ? "get" : "")}{(property.CanWrite ? " set" : "")}");
     }
     // 0.356: internal fields too (fixed-size arrays behind Span properties show their length in the type name), with their offset.
     foreach (var field in type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))

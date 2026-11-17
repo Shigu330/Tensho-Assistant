@@ -127,3 +127,36 @@ function Test-ResumeAssets([string]$ViewJson, [hashtable]$Files) {
     $result.Reason = if ($upload.Count) { "missing on the release: $($upload -join ', ')" } else { 'every package attached, same sizes' }
     return $result
 }
+
+# X-526 (0.1505): the last release is the highest Stable-x.y.z below $Version that has a release published on GitHub (the JSON of
+# `gh release list --json tagName,isDraft --limit 1000`, drafts left out), never a tag alone: release 0.1502 failed after its tag was
+# made, and the notes of the next release must cover its versions. $Tags: the Stable-* tags known here; those below $Version and above
+# the last release without a published release come back in Unreleased, oldest first (reported, never deleted).
+# Returns @{ Ok = $true/$false; Reason = '...'; Version = 'x.y.z' or '' (none yet); Unreleased = @('x.y.z', ...) }.
+function Get-LastPublishedRelease([string]$ListJson, [string]$Version, [string[]]$Tags = @()) {
+    $result = @{ Ok = $false; Reason = ''; Version = ''; Unreleased = @() }
+    $text = "$ListJson".Trim()
+    $list = $null
+    if ($text.StartsWith('[')) { try { $list = ConvertFrom-Json $text -ErrorAction Stop } catch { $list = $null } }
+    if (-not $text.StartsWith('[') -or ($null -eq $list -and $text -ne '[]')) { $result.Reason = 'the GitHub releases cannot be read (gh release list)'; return $result }
+    $top = [version]$Version
+    $published = @()
+    foreach ($item in $list) {
+        if ($item -and $item.isDraft -ne $true -and "$($item.tagName)" -match '^Stable-(\d+\.\d+\.\d+)$' -and [version]$Matches[1] -lt $top) { $published += $Matches[1] }
+    }
+    $last = @($published | Sort-Object { [version]$_ } -Descending | Select-Object -First 1)
+    if ($last.Count) { $result.Version = $last[0] }
+    $floor = if ($result.Version) { [version]$result.Version } else { [version]'0.0.0' }
+    $alone = @()
+    foreach ($tag in $Tags) {
+        if ("$tag" -match '^Stable-(\d+\.\d+\.\d+)$') {
+            $number = $Matches[1]
+            if ([version]$number -lt $top -and [version]$number -gt $floor -and $published -notcontains $number) { $alone += $number }
+        }
+    }
+    $result.Unreleased = @($alone | Sort-Object { [version]$_ })
+    $result.Ok = $true
+    $result.Reason = if ($result.Version) { "last published release $($result.Version)" } else { 'no release published yet' }
+    if ($result.Unreleased.Count) { $result.Reason += "; tag(s) without a published release, kept: $($result.Unreleased -join ', ') (their versions go with this release)" }
+    return $result
+}

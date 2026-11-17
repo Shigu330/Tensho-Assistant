@@ -4,7 +4,8 @@ namespace TenshoAssistant.Chat;
 /// a message kind, who does it (Caster) and to whom (Target), as masks of Dalamud's XivChatRelationKind (bit 1 &lt;&lt; kind; 65535: anyone),
 /// its group (1 Discussion, 2 Announcements, 4 to 14 the combat lines by subject), its place and the game's default tabs (1 General, 2 Battle,
 /// 4 Event). docs/evidence/0.1482-chat-log-filters.md.</summary>
-public sealed record ChatFilterRow(uint Id,int Kind,ushort Caster,ushort Target,byte Category,byte Order,byte Preset,string Name);
+/// <remarks>X-545 (0.1517): <paramref name="Example"/> is the sheet's example line, in the client's language, shown in the filter's tooltip.</remarks>
+public sealed record ChatFilterRow(uint Id,int Kind,ushort Caster,ushort Target,byte Category,byte Order,byte Preset,string Name,string Example="");
 
 /// <summary>X-484 (0.1482): the game's log filters, as the game files them; pure (tests). A message is shown by a tab when one of the filters it
 /// chose matches it (kind, subject, target), as in the game's log window; a message no filter matches (a kind the game does not list) is shown
@@ -29,6 +30,22 @@ public sealed class ChatFilterTable
     private static bool Covers(ushort mask,byte relation)=>mask==Anyone || relation<16 && (mask&(1<<relation))!=0;
 
     public static bool IsCombat(byte category)=>category is >=FirstCombat and <=LastCombat;
+
+    /// <summary>X-484 (0.1518, the user's request of 17/11: the combat filters by kind of line): a combat filter's kind of line, as the game's
+    /// log window files it under each subject: the message kind (41 damage, 42 failed attacks, 43 actions, 44 items, 45 healing, 46 beneficial
+    /// effects, 47 detrimental effects, 48 and 49 their end) and its side: done by the subject (« Subject » in the game, the target anyone) or
+    /// done to the subject (« Object », the caster anyone). Null for a filter outside the combat lines.</summary>
+    public static (int Kind,bool ToSubject)? Genre(ChatFilterRow row)
+        =>IsCombat(row.Category) ? (row.Kind,row.Caster==Anyone && row.Target!=Anyone):null;
+
+    /// <summary>X-484 (0.1518): the combat filters grouped by kind of line across every subject (« damage dealt »: by you, by your party
+    /// members… by others' pets), in the game's order (the side done by the subject first, then the side done to it, each by kind).</summary>
+    public IReadOnlyList<((int Kind,bool ToSubject) Genre,IReadOnlyList<ChatFilterRow> Rows)> Genres()
+        =>Rows.Where(row=>IsCombat(row.Category)).GroupBy(row=>Genre(row)!.Value).OrderBy(group=>group.Key.ToSubject).ThenBy(group=>group.Min(row=>row.Order))
+            .ThenBy(group=>group.Key.Kind).Select(group=>(group.Key,(IReadOnlyList<ChatFilterRow>)group.ToList())).ToList();
+
+    /// <summary>X-484 (0.1518): the localisation key of a kind of line (« ChatWindow.Genre41By », « ChatWindow.Genre41On »).</summary>
+    public static string GenreKey((int Kind,bool ToSubject) genre)=>$"ChatWindow.Genre{genre.Kind}{(genre.ToSubject ? "On":"By")}";
 
     /// <summary>The game's default filters of one of its tabs (General, Battle, Event).</summary>
     public IEnumerable<uint> Preset(byte gameTab)=>Rows.Where(row=>(row.Preset&gameTab)!=0).Select(row=>row.Id);
@@ -65,6 +82,56 @@ public static class ChatTextFilter
     }
 
     public static string Text(ChatRecord record)=>record.Sender+" "+string.Concat(record.Body.Select(segment=>segment.Text));
+}
+
+/// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>
+public static class ChatAlert
+{
+    /// <summary>A message (its text, not its sender's name) holds one of the words, capitals ignored. X-554 and X-555 (review of 0.1520):
+    /// what you send yourself never alerts, on any channel (<see cref="Sent"/>), and the combat lines are never read for it (DEC-053: shown as
+    /// the game shows them, never read nor counted).</summary>
+    public static bool Holds(ChatRecord record,IReadOnlyList<string> words)
+    {
+        if(words.Count==0 || record.Channel==ChatChannel.Combat || Sent(record))return false;
+        var text=string.Concat(record.Body.Select(segment=>segment.Text));
+        return words.Any(word=>SearchText.Contains(text,word,StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>Dalamud's XivChatRelationKind.LocalPlayer: the message's subject is you.</summary>
+    public const byte You=1;
+
+    /// <summary>X-554: you sent this message: a tell you send, or a message whose subject is you (<see cref="Source"/>).</summary>
+    public static bool Sent(ChatRecord record)=>record.Channel==ChatChannel.TellOut || record.Source==You;
+
+    /// <summary>X-554 (review of 0.1520): the subject kept for a message. The game gives none (0) for what is said (the chat history of
+    /// 17/11: say, shout and party lines all with 0), so a message spoken (or an emote) whose sender is your own character's name, without
+    /// a world (the game writes none for you), is marked as yours.</summary>
+    public static byte Source(ChatChannel channel,byte source,string sender,string? ownName)
+        =>source==0 && channel<=ChatChannel.Emote && IsOwnName(sender,ownName) ? You:source;
+
+    /// <summary>The sender is your character: its name, once the game's glyphs (party number, icons) are left out, capitals ignored; a
+    /// sender with a world (« Name@World ») is someone of another world.</summary>
+    public static bool IsOwnName(string sender,string? ownName)
+    {
+        if(string.IsNullOrWhiteSpace(ownName) || sender.Contains('@'))return false;
+        var name=new string(sender.Where(letter=>!ChatGlyphs.IsGlyph(letter)).ToArray()).Trim();
+        return string.Equals(name,ownName.Trim(),StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The tab's label with « ! » in front while an alert in it is not seen.</summary>
+    public static string Mark(string label,int alerts)=>alerts>0 ? "! "+label:label;
+}
+
+/// <summary>X-484 (0.1519, beyond the game): a message that repeats the one shown just before it in a tab: same kind, channel, sender and text,
+/// at most <see cref="Window"/> after the last time it came. Pure (tests).</summary>
+public static class ChatRepeat
+{
+    public static readonly TimeSpan Window=TimeSpan.FromSeconds(60);
+
+    public static bool Repeats(ChatRecord shown,DateTimeOffset lastSeen,ChatRecord next)
+        =>next.Kind==shown.Kind && next.Channel==shown.Channel && string.Equals(next.Sender,shown.Sender,StringComparison.Ordinal)
+          && next.Time>=lastSeen && next.Time-lastSeen<=Window
+          && string.Equals(ChatTextFilter.Text(next),ChatTextFilter.Text(shown),StringComparison.Ordinal);
 }
 
 /// <summary>X-484 (0.1482): what one tab shows, made once per refresh: by its channels, or by the game's filters it chose (when the game's

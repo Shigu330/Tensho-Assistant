@@ -14,12 +14,17 @@ public sealed class ChatTabView
     private readonly List<ChatRecord> records=[];
     private readonly List<IReadOnlyList<IReadOnlyList<ChatRun>>?> lines=[];
     private readonly List<int> rowStarts=[];
+    // X-484 (0.1519): how many times each message came again right after itself (tabs folding repeats), and when the last one came.
+    private readonly List<int> repeats=[];
+    private DateTimeOffset lastSeen;
     private int rows;
     private bool rowsDirty;
     private long lastId;
     private bool started;
     private int layoutCursor=-1;
     public int Unread{get;private set;}
+    /// <summary>X-484 (0.1520): the messages holding an alert word not seen yet (cleared with <see cref="Unread"/>).</summary>
+    public int Alerts{get;private set;}
     public int Count=>records.Count;
     public float Width{get;private set;}=-1;
     /// <summary>X-457 (0.1462): the rows and the visible height of the window at the end of the frame before (« at the bottom » is read
@@ -35,31 +40,40 @@ public sealed class ChatTabView
     {
         var changed=false;
         ChatTabFilter? filter=null;
+        IReadOnlyList<string>? alerts=null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
             filter??=new(tab,table,settings);
             if(!filter.Shows(record))continue;
-            records.Add(record);lines.Add(null);
+            if(tab.FoldRepeats && records.Count>0 && ChatRepeat.Repeats(records[^1],lastSeen,record))
+            {
+                repeats[^1]++;lastSeen=record.Time;changed=true;
+                continue;
+            }
+            records.Add(record);lines.Add(null);repeats.Add(0);lastSeen=record.Time;
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;
-            if(started && ChatChannels.CountsAsUnread(record.Channel))Unread++;
+            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
+            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
             changed=true;
         }
         started=true;
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
         {
-            records.RemoveRange(0,excess);lines.RemoveRange(0,excess);rowStarts.RemoveRange(0,excess);
+            records.RemoveRange(0,excess);lines.RemoveRange(0,excess);rowStarts.RemoveRange(0,excess);repeats.RemoveRange(0,excess);
             rowsDirty=true;layoutCursor=Math.Max(-1,layoutCursor-excess);
         }
         return changed;
     }
 
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
-    public void MarkSeen()=>Unread=0;
+    public void MarkSeen(){Unread=0;Alerts=0;}
 
     public ChatRecord RecordAt(int index)=>records[index];
+    /// <summary>X-484 (0.1519): how many times the message at this place came again right after itself (0: never, or the tab does not fold).</summary>
+    public int RepeatsAt(int index)=>repeats[index];
     public IReadOnlyList<IReadOnlyList<ChatRun>>? LinesAt(int index)=>lines[index];
 
     public bool LaidOutFor(float width,string key)=>Math.Abs(width-Width)<=0.5f && key==LayoutKey;
