@@ -101,6 +101,22 @@ public sealed class ChatTabView
         return layoutCursor;
     }
 
+    /// <summary>X-558 (0.1532): the newest message not laid out yet among the <paramref name="eager"/> newest, or -1: the older ones are laid out
+    /// only when shown or near the view (<see cref="OlderToLayOut"/>), never ahead.</summary>
+    public int NextToLayOut(int eager)
+    {
+        var next=NextToLayOut();
+        return next>=0 && next>=lines.Count-Math.Max(0,eager) ? next:-1;
+    }
+
+    /// <summary>X-558 (0.1532): the nearest message above <paramref name="first"/> (the first one in view), within <paramref name="packet"/>
+    /// messages, not laid out yet; -1 when they all are.</summary>
+    public int OlderToLayOut(int first,int packet)
+    {
+        for(var index=Math.Min(first,lines.Count)-1;index>=0 && index>=first-packet;index--)if(lines[index] is null)return index;
+        return -1;
+    }
+
     /// <summary>Rows of the whole tab: a message not laid out yet counts one.</summary>
     public int RowCount{get{Rows();return rows;}}
     public int RowOf(int index){Rows();return rowStarts[index];}

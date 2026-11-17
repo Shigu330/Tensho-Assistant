@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1532.0
+- Plan global, X-558 : Fenêtre de chat : au chargement (ouverture, rechargement avec un long historique) et après un changement de largeur, les lignes les plus récentes sont mises en page d'abord, dans un budget de temps de 3 ms par image (100 lignes au plus) ; seules les 300 plus récentes sont préparées d'avance ; les plus anciennes ne le sont que quand vous remontez, par paquets de 40 juste au-dessus de ce que vous lisez, sans que la vue saute. Rien n'est perdu ni réordonné. En mode développeur, la ligne « Slow frame » distingue « Chat refresh » et « Chat layout ».
+- Pour les joueurs : fenêtre de chat : l'ouverture et le rechargement avec un long historique ne font plus d'à-coup ; les anciennes lignes se préparent quand vous remontez.
+- Tests : ChatLoading1532Tests. Verify.ps1 (agent) : 3061/3061, 0 avertissement, 0 erreur ; DLL 0.1532.0.0. Non validé en jeu.
+### English
+- Chat window: on loading (opening, a reload with a long history) and after a change of width, the newest lines are laid out first, within a time budget of 3 ms per frame (100 lines at most); only the 300 newest are prepared ahead; the older ones only when you scroll back, by packets of 40 just above what you read, without the view jumping. Nothing is lost nor reordered. In developer mode, the « Slow frame » line tells « Chat refresh » and « Chat layout » apart.
+- For players: Chat window: opening and reloading with a long history no longer stalls the game; older lines are prepared as you scroll back.
+
 ## 0.1531.0
 - Plan global, X-562 : Dédale bestial, constats mineurs de la relecture : une équipe conseillée gardée avant 0.1522 redit combien de ses bêtes ont un rang supposé ; les faiblesses non touchées de chaque combat ne sont plus recalculées à chaque image (gardées tant que l'équipe et les bêtes possédées ne changent pas) ; le mot anglais d'une attaque magique sans élément est celui du jeu, « Magical » (Addon 13101, « Magique » en français) ; les nombres 47 à 62 de la fenêtre de résultat du plateau sont écrits dans le journal, pour relever en jeu s'ils nomment les bonus.
 - Tests : BeastMinor1531Tests. Verify.ps1 (agent) : 3058/3058, 0 avertissement, 0 erreur ; DLL 0.1531.0.0. Non validé en jeu.

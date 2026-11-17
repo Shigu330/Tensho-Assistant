@@ -627,7 +627,10 @@ internal sealed partial class MainWindow
         var options=ChatOptions;
         var tabs=ChatTabs(options);
         var table=ChatFilterTableNow();
+        // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
+        var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
         chatAlertWords=ChatTextFilter.Words(options.AlertWords);
         // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
@@ -787,13 +790,30 @@ internal sealed partial class MainWindow
             var key=ChatFormat.LayoutKey(options,ChatFormat.NamesKey(itemCatalog.State.Catalog is not null,quests.State.ById is not null,maps.State.Catalog is not null));
             var relaid=!view.LaidOutFor(width,key);
             if(relaid)view.Relayout(width,key);
-            for(var budget=ChatLayoutsPerFrame;budget>0;budget--)
-            {
-                var next=view.NextToLayOut();
-                if(next<0)break;
-                LayOutChatLine(view,next,options);
-            }
             var height=ImGui.GetTextLineHeightWithSpacing();
+            // X-558 (0.1532): laid out within a time budget, the newest first, only the newest ahead (ChatLoading); scrolled back, a packet of
+            // older lines above the view, the scroll moved by the rows they add so the view does not jump.
+            var layoutStarted=System.Diagnostics.Stopwatch.GetTimestamp();
+            var laid=0;
+            while(ChatLoading.More(laid,System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds))
+            {
+                var next=view.NextToLayOut(ChatLoading.Eager);
+                if(next<0)break;
+                LayOutChatLine(view,next,options);laid++;
+            }
+            if(!relaid && !ChatScroll.AtBottom(ImGui.GetScrollY(),view.RowsShown,height,view.HeightShown))
+            {
+                var first=view.IndexAtRow((int)(ImGui.GetScrollY()/height));
+                var firstRow=view.RowOf(first);
+                while(ChatLoading.More(laid,System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds))
+                {
+                    var older=view.OlderToLayOut(first,ChatLoading.Packet);
+                    if(older<0)break;
+                    LayOutChatLine(view,older,options);laid++;
+                }
+                if(view.RowOf(first)-firstRow is var added and not 0)ImGui.SetScrollY(ChatLoading.Kept(ImGui.GetScrollY(),added,height));
+            }
+            if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat layout",System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds);
             chatLineHeight=height;
             // X-457 (0.1462): the top of the content, as SetCursorPosY counts it (GetCursorStartPos takes the scroll off, and SetCursorPosY
             // takes it off again: every line was drawn the scroll too high, the cause of the jumps and of the empty window).
