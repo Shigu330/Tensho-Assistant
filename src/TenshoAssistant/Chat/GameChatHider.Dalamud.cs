@@ -45,6 +45,9 @@ internal sealed unsafe class GameChatHider : IDisposable
     /// <summary>X-533 (0.1508): developer mode, for the log lines of the channel menu and of Tensho's place (none when unset).</summary>
     public Func<bool> DeveloperMode{get;init;}=()=>false;
 
+    /// <summary>X-540 M1: the option wanted (MainWindow.ChatGameMessagesOption); the place is read only then (none when unset).</summary>
+    public Func<bool> OptionWanted{get;init;}=()=>false;
+
     private static ChatLogBox Window(AtkUnitBase* unit)
     {
         ushort width=0,height=0;
@@ -120,7 +123,10 @@ internal sealed unsafe class GameChatHider : IDisposable
             if(toShow.Count>0)log.Information("Game chat: its message panels shown again ({0}).",string.Join(", ",toShow));
             StepTabs(now);
             // X-534 M1 (0.1509): read also while given back, for Tensho's window to take the place again in the same frame.
-            place=ChatHideWants.ReadsPlace(now) ? Read(boxes) : null;
+            // X-540 M1: only while the option is wanted, outside a competitive cut (ChatHideWants.OptionReadsPlace).
+            place=null;
+            if(ChatHideWants.OptionReadsPlace(OptionWanted(),TenshoAssistant.Competitive.CompetitiveGate.Cut))
+                place=ChatHideWants.ReadsPlace(now) ? Read(boxes) : null;
             menuOpen=now==ChatHideWant.Hide && MenuOpen();
         }
         catch(Exception error)

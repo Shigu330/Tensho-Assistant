@@ -61,10 +61,15 @@ internal sealed partial class MainWindow
     /// game's thread): the option on and « both chats » off, Tensho's chat window open, shown and working. X-527 (0.1506): left as they are
     /// while the game hides its interface (cutscene, GPose, interface hidden: Hold); given back only when really no longer wanted.</summary>
     internal ChatHideWant ChatGameMessagesWant()
-        =>ChatHideWants.Of(!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats,
+        =>ChatHideWants.Of(ChatGameMessagesOption(),
             TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true,
             // X-528 M1 (0.1507): Tensho's window hidden under a game window: the game's messages come back, drawn under that window.
             ChatCover.Hidden(ChatOptions.WhenCovered,chatCovered));
+
+    /// <summary>X-540 M1: the option wanted: on, « both chats » off, Tensho's chat window open, shown and working (the first state of
+    /// ChatGameMessagesWant; the hider reads the game chat's place only then).</summary>
+    internal bool ChatGameMessagesOption()
+        =>!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;
 
     /// <summary>X-467 (0.1504): the game's messages hidden now, Tensho's window in their place.</summary>
     internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;

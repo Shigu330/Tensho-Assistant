@@ -40,6 +40,12 @@ public static class ChatHideWants
     /// back (a game window over Tensho's, combat): when Tensho's window takes their place again, the box is there in that very frame, and the
     /// window is never drawn for a frame at the player's own place (a blink, and a place another game window could cover).</summary>
     public static bool ReadsPlace(ChatHideWant now)=>now!=ChatHideWant.Hold;
+
+    /// <summary>X-540 M1 (review of 0.1510): the place is read only while the option is wanted (« Hide the game chat's messages » on, Tensho's
+    /// chat window open and working) and outside a competitive cut (DEC-038: all of Tensho stops): with the option off, its default, nothing
+    /// is read, nothing is logged, and a reading error never stops the hider of a player who does not use it. While it is wanted but the
+    /// messages are given back (a game window over Tensho's, combat), the place is still read (X-534 M1).</summary>
+    public static bool OptionReadsPlace(bool optionWanted,bool competitiveCut)=>optionWanted && !competitiveCut;
 }
 
 /// <summary>
