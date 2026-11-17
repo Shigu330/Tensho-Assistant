@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (551 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (557 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -618,13 +618,19 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-528 | Review  (review 0.1504, 16/11), minor M1, M2, M3, M4: M1 in… | Done in 0.1507 |
 | X-531 | Tool (defect seen by the master on 16/11 around 23:00): page_essais.py import… | Done in 0.1505 |
 | X-532 | Tool (defect seen by the user on 16/11 around 23:00): after a clear (R28.8) the… | Done in 0.1508 |
+| X-533 | User's request (16/11 around 23:15, two screenshots in the master's notes)… | Done in 0.1509 |
 | X-534 | Review of block 0.1505 to 0.1507 (review 0.1507, 16/11), minor M1, M2: M1 in… | Done in 0.1510 |
+| X-535 | In-game test T-0.546-1 (test page, 17/11 vers 0 h 04): problem reported by the… | Done in 0.1513 |
+| X-536 | Tool (R13.3), test page of 17/11 around midnight: 29 tests commented « I don't… | Done in 0.1511 |
+| X-537 | Tool (R13.3), idea box defect (idees.py, called by page_essais.py import on… | Done in 0.1511 |
+| X-538 | Tool (R13.3), relay statistics skewed, seen on 17/11 around 0:40 comparing… | Done in 0.1511 |
+| X-540 | Review of block 0.1508 to 0.1510 (review 0.1510, 17/11), minor M1, M2, M3: M1… | Done in 0.1512 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (551 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (557 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1240,4 +1246,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-528 | Relecture  (relecture 0.1504, 16/11), mineurs M1, M2, M3, M4 : M1 : Une fenêtre… | Fait en 0.1507 |
 | X-531 | Outil (défaut vu par la maître le 16/11 vers 23 h) : page_essais.py import… | Fait en 0.1505 |
 | X-532 | Outil (défaut vu par l'utilisateur le 16/11 vers 23 h : « quand tu es vidé tu… | Fait en 0.1508 |
+| X-533 | Demande de l'utilisateur (16/11 vers 23 h 15, deux captures dans les notes de… | Fait en 0.1509 |
 | X-534 | Relecture du bloc 0.1505 à 0.1507 (relecture 0.1507, 16/11), mineurs M1, M2… | Fait en 0.1510 |
+| X-535 | Essai T-0.546-1 en jeu (page des essais, 17/11 vers 0 h 04) : problème signalé… | Fait en 0.1513 |
+| X-536 | Outil (R13.3), page des essais du 17/11 vers 0 h : 29 essais commentés « je… | Fait en 0.1511 |
+| X-537 | Outil (R13.3), défaut de la boîte à idées (idees.py, appelé par page_essais.py… | Fait en 0.1511 |
+| X-538 | Outil (R13.3), statistiques des relais faussées, vu le 17/11 vers 0 h 40 en… | Fait en 0.1511 |
+| X-540 | Relecture du bloc 0.1508 à 0.1510 (relecture 0.1510, 17/11), mineurs M1, M2, M3… | Fait en 0.1512 |
