@@ -2145,6 +2145,34 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1526) Après un combat où une bête est tombée ou a perdu beaucoup de PV, rouvrez « Formation de l'équipe » : le panneau dit « … est à terre : pas appelée » ou « … : PV bas (a/b) » et ne l'appelle plus si elle est à terre
 
+- [ ] (0.1527) Au Dédale bestial, avec une bête de rang supérieur à la limite du 1er plateau (rang 7 par exemple) : ouvrez « Formation de l'équipe » du 1er plateau ; la page Dresseur garde le rang 7 de cette bête (pas 5), même en rouvrant la fenêtre plusieurs fois
+
+- [ ] (0.1527) Devant « Formation de l'équipe », hors du Dédale : le nom du plateau dans le panneau Tensho est suivi de « (lu dans la fenêtre du jeu ; son numéro reste à confirmer en jeu) » ; dans dalamud.log, la ligne « Beastmaster board read in the game's windows: content N » donne le numéro à relever
+
+- [ ] (0.1528) Fenêtre de chat Tensho : un onglet qui ne montre que le combat (par exemple « Combat ») ne porte jamais de nombre de non lus pendant un combat, et « nouveaux messages plus bas » ne compte pas les lignes de combat
+
+- [ ] (0.1528) Réglages du chat › Onglets › canaux : réduisez la fenêtre petit à petit ; les cases passent de trois colonnes à deux puis à une, aucun nom n'est coupé (« Linkshell inter-Monde [3] », « Messages d'erreur système », « Objets vendus aux marchés » en entier) et rien ne passe sous la barre de défilement ; même chose pour les filtres du jeu et les genres de lignes de combat
+
+- [ ] (0.1529) Au Dédale bestial, devant « Formation de l'équipe » d'une étape : le panneau Tensho montre d'abord le ou les combats de l'étape (« Combat N · montré dans la disposition du plateau du jeu ») avec leurs ennemis, leurs actions et les trois bêtes avec la raison ; « Tout le plateau » est replié en dessous
+
+- [ ] (0.1529) Passez à l'étape suivante du plateau : le bloc du combat en tête change avec l'étape ; dans dalamud.log, la ligne « Beastmaster board window entries: … fights … » change aussi (à relever : une étape ou tout le plateau)
+
+- [ ] (0.1529) Si la disposition du plateau liste tous les combats à la fois, le panneau reste comme avant (tout le plateau), sans bloc de combat en tête
+
+- [ ] (0.1530) Au Dédale bestial, devant « Formation de l'équipe » : sous chaque bête conseillée du combat en tête, une ligne « Technique de type féroce (Griffure) ; combo instinctif II : Hache rafale puis la technique (Assaut vital), ou la technique puis Hache mistral (Assaut létal) » pour le cu sith ; faites le combo en combat et vérifiez que le jeu l'annonce
+
+- [ ] (0.1530) En mode développeur, au Dédale bestial, appelez une bête : dalamud.log a une ligne de la sonde pour la fenêtre « XBMActivePet » (à relever : le nom de la bête appelée y est-il ?)
+
+- [ ] (0.1531) Au Dédale bestial, après un plateau : dans dalamud.log, la ligne « Beastmaster board result, numbers 47 to 62 » donne des nombres à comparer aux bonus que montre la fenêtre de résultat (lignes de XBMScoreBonus ?)
+
+- [ ] (0.1532) Rechargez Tensho avec un long historique de chat (fenêtre de chat ouverte) : pas d'à-coup ; dans dalamud.log (mode développeur), plus de « Slow frame » où « Chat » dépasse quelques ms, et « Chat layout » reste vers 3 ms
+
+- [ ] (0.1532) Remontez loin dans l'historique avec la molette : les anciennes lignes apparaissent sans que la vue saute, dans l'ordre
+
+- [ ] (0.1533) Rechargez Tensho avec la fenêtre de chat ouverte : « Chargement… » une ou deux secondes, puis les lignes ; dans dalamud.log (mode développeur), plus de « Slow frame » où « Chat » dépasse 16 ms juste après le rechargement
+
+- [ ] (0.1534) Au Dédale bestial, devant « Formation de l'équipe » : le panneau Tensho n'est pas plus large que la fenêtre du jeu à côté, l'équipe conseillée est un tableau (icône et nom, rang, attaque) comme dans le jeu, aucun texte coupé
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

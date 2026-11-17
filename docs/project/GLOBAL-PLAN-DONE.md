@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (566 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (569 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -634,12 +634,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
 | X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
+| X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
+| X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
+| X-562 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), minor M1, M2, M3, M4… | Done in 0.1531 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (566 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (569 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1271,3 +1274,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
 | X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
+| X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
+| X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
+| X-562 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), mineurs M1, M2… | Fait en 0.1531 |
