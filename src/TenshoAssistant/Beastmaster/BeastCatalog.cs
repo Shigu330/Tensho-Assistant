@@ -33,8 +33,11 @@ public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOn
 /// (AgentXBMStageDetailList, StageDetailEntry.BattleDetailId); 0 not known.</summary>
 public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies, uint Detail = 0);
 public sealed record BoardBonus(string Name, string Condition, int Points);
-/// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.</summary>
-public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0);
+/// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.
+/// X-575 part 5 (0.1545): RankRecommended = XBMContent column 2 (3, 8, 13, 18, 23), read as the first number of the board window's « Rang de bête
+/// recommandé : X à Y » (Addon 17912, two numbers given by the game's code; Y is RankLimit, column 3); to confirm in game
+/// (docs/evidence/0.1543-beast-plan.md). 0: not known.</summary>
+public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0, int RankRecommended = 0);
 public enum BeastSort { Name, Family, Auto, Strength, Intelligence, PhysicalResistance, MagicalResistance, Vitality }
 
 public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Board> Boards)
@@ -86,7 +89,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
             var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []), battle.UInt(0))).ToArray();
             var scored = bonuses.Where(bonus => FirstBonusColumn + (int)bonus.Row < row.Cells.Length).Select(bonus => new BoardBonus(bonus.Text(1), bonus.Text(2), row.Int(FirstBonusColumn + (int)bonus.Row)))
                 .Where(bonus => bonus.Points > 0 && bonus.Name.Length > 0).ToArray();
-            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0));
+            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0), row.Int(2));
         }).ToArray();
         return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
     }

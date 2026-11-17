@@ -282,6 +282,9 @@ internal sealed partial class MainWindow
         {
             if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
             else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
+            // X-575 part 5 (0.1545): the rank the team window shows, below the board's recommended range.
+            if (BeastTeams.RankLow(board, member.Rank))
+                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadRankLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Rank, board.RankRecommended, board.RankLimit));
         }
         foreach (var fight in fights)
         {
@@ -533,6 +536,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
                     DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(beast.Name);
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
+                    // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
+                    if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format("BeastUi.RankLow", board.RankRecommended, board.RankLimit)); }
                     ImGui.TableNextColumn(); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                 }
             }

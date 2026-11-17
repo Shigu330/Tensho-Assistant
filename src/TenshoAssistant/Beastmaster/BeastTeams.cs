@@ -153,6 +153,13 @@ public static class BeastTeams
         return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown, left);
     }
 
+    /// <summary>
+    /// X-575 part 5 (0.1545, the user's request of 17/11 around 23:30: « the rank is not a criterion, but one can say the rank is low for the
+    /// board »): a rank read below the board's recommended range (« Rang de bête recommandé : X à Y », X = <see cref="Board.RankRecommended"/>).
+    /// Only a warning: the choice never uses it. A rank not read (assumed) or a range not known is never said low.
+    /// </summary>
+    public static bool RankLow(Board board, int rank, bool known = true) => known && board.RankRecommended > 0 && rank > 0 && rank < board.RankRecommended;
+
     /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
     /// 3 (0.1544): each fight's three in calling order.</summary>
     public const int PlanVersion = 3;
