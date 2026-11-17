@@ -34,9 +34,10 @@ public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOn
 public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies, uint Detail = 0);
 public sealed record BoardBonus(string Name, string Condition, int Points);
 /// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.
-/// X-575 part 5 (0.1545): RankRecommended = XBMContent column 2 (3, 8, 13, 18, 23), read as the first number of the board window's « Rang de bête
-/// recommandé : X à Y » (Addon 17912, two numbers given by the game's code; Y is RankLimit, column 3); to confirm in game
-/// (docs/evidence/0.1543-beast-plan.md). 0: not known.</summary>
+/// X-576 (0.1546): RankRecommended = the first number of the board window's « Rang de bête recommandé : X à Y » (Addon 17912, two numbers
+/// given by the game's code; Y is RankLimit, XBMContent column 3): the previous board's RankLimit plus one (<see cref="BeastCatalog.RankFloor"/>;
+/// the user's captures: « 1 à 5 » on the 1st board, « 6 à 10 » on the 2nd; column 2, 3 and 8, is not it: docs/evidence/0.1546-beast-rank-range.md).
+/// 0: not known.</summary>
 public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0, int RankRecommended = 0);
 public enum BeastSort { Name, Family, Auto, Strength, Intelligence, PhysicalResistance, MagicalResistance, Vitality }
 
@@ -49,6 +50,13 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         ["XBMElement"] = 1, ["XBMScoreBonus"] = 3, ["XBMActionEffectType"] = 1, ["XBMActionTarget"] = 1,
     };
     private const int FirstBonusColumn = 4;
+
+    /// <summary>
+    /// X-576 (0.1546, the user's capture of 18/11 around 00:05: « Rang de bête recommandé : 6 à 10 » before the 2nd board; « 1 à 5 » on the
+    /// 1st): the range's first number is the highest synchronisation rank (XBMContent column 3) below this board's, plus one; 1 for the
+    /// lowest board; 0 when the board's own rank is not known. No column of XBMContent holds it (docs/evidence/0.1546-beast-rank-range.md).
+    /// </summary>
+    public static int RankFloor(IEnumerable<int> limits, int limit) => limit <= 0 ? 0 : limits.Where(other => other > 0 && other < limit).DefaultIfEmpty(0).Max() + 1;
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
@@ -89,8 +97,11 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
             var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []), battle.UInt(0))).ToArray();
             var scored = bonuses.Where(bonus => FirstBonusColumn + (int)bonus.Row < row.Cells.Length).Select(bonus => new BoardBonus(bonus.Text(1), bonus.Text(2), row.Int(FirstBonusColumn + (int)bonus.Row)))
                 .Where(bonus => bonus.Points > 0 && bonus.Name.Length > 0).ToArray();
-            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0), row.Int(2));
+            return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0));
         }).ToArray();
+        // X-576 (0.1546): each board's recommended range starts after the previous board's synchronisation rank (not column 2).
+        var limits = boards.Select(board => board.RankLimit).ToArray();
+        boards = boards.Select(board => board with { RankRecommended = RankFloor(limits, board.RankLimit) }).ToArray();
         return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
     }
 

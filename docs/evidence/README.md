@@ -93,7 +93,8 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1523-beast-weakness.md](0.1523-beast-weakness.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `src/TenshoAssistant/Beastmaster/BeastTeams.cs` | `docs/evidence/0.1529-beast-fight-shown.md`, `docs/evidence/0.1543-beast-plan.md` |
 | [0.1529-beast-fight-shown.md](0.1529-beast-fight-shown.md) | `src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs` | — |
 | [0.1530-beast-instinct.md](0.1530-beast-instinct.md) | `src/TenshoAssistant/Beastmaster/BeastInstinct.cs` | — |
-| [0.1543-beast-plan.md](0.1543-beast-plan.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastPlan1543Tests.cs`, `tests/TenshoAssistant.Tests/BeastRankLow1545Tests.cs` | `CHANGELOG.md` |
+| [0.1543-beast-plan.md](0.1543-beast-plan.md) | `tests/TenshoAssistant.Tests/BeastPlan1543Tests.cs` | `CHANGELOG.md`, `docs/evidence/0.1546-beast-rank-range.md` |
+| [0.1546-beast-rank-range.md](0.1546-beast-rank-range.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastRankFloor1546Tests.cs`, `tests/TenshoAssistant.Tests/BeastRankLow1545Tests.cs` | `CHANGELOG.md`, `docs/evidence/0.1543-beast-plan.md` |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.159.0-triad-npc-probe.log](0.159.0-triad-npc-probe.log) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs`, `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs`, `tests/TenshoAssistant.Tests/TriadMatchSimulatorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.160.0-triad-match-capture.log](0.160.0-triad-match-capture.log) | `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -182,8 +183,8 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.488-gp-regen-traits.md](0.488-gp-regen-traits.md) | `src/TenshoAssistant/Gathering/RegenTick.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.650-gp-while-gathering.md` |
 | [0.493-triad-npc-requirements.md](0.493-triad-npc-requirements.md) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/project/TESTING.md` |
 | [0.494-selfcheck-first-pass.log](0.494-selfcheck-first-pass.log) | — | `docs/changelog/CHANGELOG-0.400-0.499.md` |
-| [0.498-xbm-sheets.md](0.498-xbm-sheets.md) | — | `docs/evidence/0.500-xbm-columns.md` |
-| [0.500-xbm-columns.md](0.500-xbm-columns.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastCatalogTests.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/evidence/0.1529-beast-fight-shown.md`, `docs/evidence/0.688-beast-places.md`, `docs/project/DECISIONS.md` |
+| [0.498-xbm-sheets.md](0.498-xbm-sheets.md) | — | `docs/evidence/0.1546-beast-rank-range.md`, `docs/evidence/0.500-xbm-columns.md` |
+| [0.500-xbm-columns.md](0.500-xbm-columns.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs`, `tests/TenshoAssistant.Tests/BeastCatalogTests.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/evidence/0.1529-beast-fight-shown.md`, `docs/evidence/0.1546-beast-rank-range.md`, `docs/evidence/0.688-beast-places.md`, `docs/project/DECISIONS.md` |
 | [0.508-retainer-sales.md](0.508-retainer-sales.md) | `src/TenshoAssistant/Market/RetainerSalesReader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.510-triad-competitive.md](0.510-triad-competitive.md) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md` |
 | [0.512-d17-build.md](0.512-d17-build.md) | `.github/workflows/build.yml` | `CONTRIBUTING.md`, `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md`, `docs/project/PUBLISHING.md`, `docs/project/TESTING.md` |
@@ -324,5 +325,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 312 files · fichiers ; 266 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 313 files · fichiers ; 267 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
