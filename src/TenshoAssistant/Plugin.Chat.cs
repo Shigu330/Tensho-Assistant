@@ -19,7 +19,7 @@ public sealed partial class Plugin
         registrations.Register(()=>
         {
             var history=new Chat.ChatHistoryKeeper(framework,client,player,log,()=>configuration.Chat,mainWindow.ChatMessages,pluginFolder);
-            try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);}
+            try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history,()=>player.CharacterName);}
             catch{history.Dispose();throw;}
             mainWindow.ChatHistoryFolder=history.Folder;
             mainWindow.EraseChatHistory=history.Erase;

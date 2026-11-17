@@ -176,8 +176,9 @@ internal static class ChatWindow1434Tests
             // 0.1443 (X-153): the chat family moved to Plugin.Chat.cs.
             // 0.1463 (X-461): the reader also gets developer mode (the kinds of pieces of a message with a link).
             // 0.1492 (X-475): the reader gets the chat history too, made in the same registration and released with the reader.
+            // 0.1521 (X-554): and your character's name, to mark what you say yourself.
             var family=Read("Plugin.Chat.cs");
-            Check(family.Contains("chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history);") && family.Contains("},()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
+            Check(family.Contains("chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history,()=>player.CharacterName);") && family.Contains("},()=>chatReader?.Dispose());"),"the reader owned by the plugin's registrations");
             Check(plugin.Contains("is \"chat\") { mainWindow?.ToggleChatWindow(); return; }"),"« /tensho chat »");
             Check(Read("MainWindow.SettingsCategories.cs").Contains("new(\"Panels\",\"ChatWindow\",DrawChatLookCategory)"),"its settings in Settings › Panels beside the game (X-449: its categories)");
             // 0.1462 (X-457): the bottom followed by ChatScroll.Bottom (the lines' height declared, not measured).

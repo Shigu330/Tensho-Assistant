@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1521.0
+- Plan global, X-554 : Fenêtre de chat, mots d'alerte (relecture de 0.1520) : ce que vous écrivez vous-même (dire, crier, hurler, équipe, compagnie libre, linkshells, emotes), et pas seulement vos murmures, n'alerte plus et ne compte plus comme non lu : le jeu ne donne pas de sujet à ces lignes (historique du chat du 17/11 : 0 pour dire, crier, équipe), le lecteur les marque comme vôtres quand l'auteur est le nom de votre personnage, sans monde (numéro d'équipe et icônes du jeu ignorés). Les lignes de combat ne sont plus lues pour les mots d'alerte (DEC-053 : montrées comme le jeu les montre, jamais lues ni comptées) : ni bande, ni « ! » sur l'onglet Combat (X-555). Infobulle des mots d'alerte complétée.
+- Pour les joueurs : les mots d'alerte du chat ne réagissent plus à ce que vous écrivez vous-même ni aux lignes de combat.
+- Tests : ChatAlertsOwn1521Tests. Verify.ps1 (agent) : 3027/3027, 0 avertissement, 0 erreur ; DLL 0.1521.0.0. Non validé en jeu.
+### English
+- Chat window, alert words (review of 0.1520): what you write yourself (say, shout, yell, party, free company, linkshells, emotes), not only your tells, no longer alerts nor counts as unread: the game gives these lines no subject (chat history of 17/11: 0 for say, shout, party), so the reader marks them as yours when the sender is your character's name, without a world (the game's party number and icons ignored). The combat lines are no longer read for alert words (DEC-053: shown as the game shows them, never read nor counted): no band, no « ! » on the Combat tab (X-555). Alert words tooltip completed.
+- For players: Chat alert words no longer fire on what you write yourself nor on combat lines.
+
 ## 0.1520.0
 - Plan global, X-484 : Fenêtre de chat, en plus du jeu : « Mots d'alerte » (réglages du chat, Joueurs) : un message qui contient l'un de ces mots (séparés par des virgules, majuscules ignorées) est posé sur une bande dans la couleur d'accent, et son onglet porte « ! » devant son nom jusqu'à ce que vous le voyiez. Le nom de l'auteur ne compte pas, vos propres messages n'alertent jamais ; pas de son.
 - Pour les joueurs : le chat peut guetter des mots d'alerte : un message qui en contient un ressort sur une bande et son onglet porte « ! » jusqu'à ce que vous le voyiez.

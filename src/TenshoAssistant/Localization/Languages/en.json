@@ -6333,7 +6333,7 @@
     "HighlightedPlayers": "Players put forward",
     "HighlightedPlayersTip": "What these players write stands out in the window: their name in the warning colour and their whole message on a coloured band (names with commas between them, the world not needed).\nDefault: none.",
     "AlertWords": "Alert words",
-    "AlertWordsTip": "A message holding one of these words (commas between them, capitals ignored) sits on a band in the accent colour, and its tab shows « ! » in front of its name until you see it. Your own messages never alert. Only in Tensho's window, no sound.\nDefault: none.",
+    "AlertWordsTip": "A message holding one of these words (commas between them, capitals ignored) sits on a band in the accent colour, and its tab shows « ! » in front of its name until you see it. Your own messages and the combat lines never alert. Only in Tensho's window, no sound.\nDefault: none.",
     "WhenCovered": "Under a game window",
     "WhenCoveredTip": "What the chat window does while a window of the game covers it (Tensho's windows always stay in front of it). Hide: it comes back by itself once the game window closes. Fade: no background and faint text, the clicks go to the game. Stay: as it is.\nDefault: hide.",
     "CoveredHide": "Hide",

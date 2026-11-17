@@ -87,12 +87,35 @@ public static class ChatTextFilter
 /// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>
 public static class ChatAlert
 {
-    /// <summary>A message (its text, not its sender's name) holds one of the words, capitals ignored; what you send yourself never alerts.</summary>
+    /// <summary>A message (its text, not its sender's name) holds one of the words, capitals ignored. X-554 and X-555 (review of 0.1520):
+    /// what you send yourself never alerts, on any channel (<see cref="Sent"/>), and the combat lines are never read for it (DEC-053: shown as
+    /// the game shows them, never read nor counted).</summary>
     public static bool Holds(ChatRecord record,IReadOnlyList<string> words)
     {
-        if(words.Count==0 || !ChatChannels.CountsAsUnread(record.Channel))return false;
+        if(words.Count==0 || record.Channel==ChatChannel.Combat || Sent(record))return false;
         var text=string.Concat(record.Body.Select(segment=>segment.Text));
         return words.Any(word=>SearchText.Contains(text,word,StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>Dalamud's XivChatRelationKind.LocalPlayer: the message's subject is you.</summary>
+    public const byte You=1;
+
+    /// <summary>X-554: you sent this message: a tell you send, or a message whose subject is you (<see cref="Source"/>).</summary>
+    public static bool Sent(ChatRecord record)=>record.Channel==ChatChannel.TellOut || record.Source==You;
+
+    /// <summary>X-554 (review of 0.1520): the subject kept for a message. The game gives none (0) for what is said (the chat history of
+    /// 17/11: say, shout and party lines all with 0), so a message spoken (or an emote) whose sender is your own character's name, without
+    /// a world (the game writes none for you), is marked as yours.</summary>
+    public static byte Source(ChatChannel channel,byte source,string sender,string? ownName)
+        =>source==0 && channel<=ChatChannel.Emote && IsOwnName(sender,ownName) ? You:source;
+
+    /// <summary>The sender is your character: its name, once the game's glyphs (party number, icons) are left out, capitals ignored; a
+    /// sender with a world (« Name@World ») is someone of another world.</summary>
+    public static bool IsOwnName(string sender,string? ownName)
+    {
+        if(string.IsNullOrWhiteSpace(ownName) || sender.Contains('@'))return false;
+        var name=new string(sender.Where(letter=>!ChatGlyphs.IsGlyph(letter)).ToArray()).Trim();
+        return string.Equals(name,ownName.Trim(),StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>The tab's label with « ! » in front while an alert in it is not seen.</summary>

@@ -54,7 +54,7 @@ public sealed class ChatTabView
             records.Add(record);lines.Add(null);repeats.Add(0);lastSeen=record.Time;
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;
-            if(started && ChatChannels.CountsAsUnread(record.Channel))Unread++;
+            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
             if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
             changed=true;
         }
