@@ -255,7 +255,7 @@
     "PhysicalResistance": "Phys. res.",
     "MagicalResistance": "Mag. res.",
     "Vitality": "CON",
-    "Magical": "Magic",
+    "Magical": "Magical",
     "Tooltip": "No. {0}\nTrick: {1}\nTempered Release: {2}",
     "NoBoard": "No board read.",
     "BoardTip": "The board whose enemies and bonuses are shown.",

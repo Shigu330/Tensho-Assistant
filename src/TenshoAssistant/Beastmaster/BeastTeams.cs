@@ -172,6 +172,10 @@ public static class BeastTeams
         return fights;
     }
 
+    /// <summary>X-562 M2 (review of 0.1526): how many beasts of the team have their rank assumed; a plan kept before 0.1522 has no count (0)
+    /// although its beasts say it: they are counted then.</summary>
+    public static int RanksUnknownOf(BoardPlan plan) => plan.RanksUnknown > 0 ? plan.RanksUnknown : plan.Team.Count(pick => !pick.RankKnown);
+
     /// <summary>
     /// X-486 (0.1529, the user's request of 16/11): the board's fights the game's board window shows (their XBMBattleDetail rows, read in
     /// AgentXBMStageDetailList's entries), in the board's order. None when nothing is read, or when the window shows every fight of the board

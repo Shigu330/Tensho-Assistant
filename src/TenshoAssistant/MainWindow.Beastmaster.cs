@@ -491,7 +491,8 @@ internal sealed partial class MainWindow
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
         // X-549 (0.1522): said only for the team's beasts whose rank is not known (the others' do not change the plan).
-        if (plan.RanksUnknown > 0) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", plan.RanksUnknown, board.RankLimit));
+        // X-562 M2: a plan kept before 0.1522 counts its beasts whose rank is assumed.
+        if (BeastTeams.RanksUnknownOf(plan) is > 0 and var unknown) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", unknown, board.RankLimit));
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
         foreach (var pick in plan.Team)
         {
@@ -511,8 +512,9 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
                 ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
-                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it.
-                foreach (var miss in BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, Beasts?.State.Obtained))
+                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it. X-562 M3: worked out once per
+                // plan and beasts held, not at each frame (R07).
+                foreach (var miss in BeastMissed(plan, battle, fight, catalog))
                 {
                     string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
                     ImGui.TextColored(Warning, miss.InTeam.Count > 0 ? localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam))
@@ -522,6 +524,18 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.Unindent(); }
         }
+    }
+
+    private (BoardPlan Plan, IReadOnlySet<uint>? Held, Dictionary<int, IReadOnlyList<BeastTeams.WeaknessMissed>> Fights)? beastMissed;
+    /// <summary>X-562 M3 (review of 0.1526): BeastTeams.Missed of a fight, kept until the plan or the beasts held change.</summary>
+    private IReadOnlyList<BeastTeams.WeaknessMissed> BeastMissed(BoardPlan plan, BattlePlan battle, BoardBattle fight, BeastCatalog catalog)
+    {
+        var held = Beasts?.State.Obtained;
+        if (beastMissed is not { } kept || !ReferenceEquals(kept.Plan, plan) || !ReferenceEquals(kept.Held, held)) beastMissed = kept = (plan, held, []);
+        if (kept.Fights.TryGetValue(battle.Battle, out var known)) return known;
+        var missed = BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, held);
+        kept.Fights[battle.Battle] = missed;
+        return missed;
     }
 
     /// <summary>

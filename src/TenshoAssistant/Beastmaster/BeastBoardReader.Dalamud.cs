@@ -150,6 +150,9 @@ internal sealed class BeastBoardReader : IDisposable
         if (BeastResults.Parse(values, known, now) is { } result)
         {
             log.Information("Beastmaster board result read: score {0}, {1} beasts, {2} ranks gained.", result.Score, result.Beasts.Count, result.Beasts.Sum(gain => gain.RankAfter - gain.RankBefore));
+            // X-562 M4 (review of 0.1526): the window names its bonuses, Tensho numbers them; its numbers from 47 on are not studied: said
+            // here (numbers only) to see in game whether they are the bonuses' XBMScoreBonus rows.
+            log.Information("Beastmaster board result, numbers 47 to 62: {0}.", string.Join(",", Enumerable.Range(47, 16).Select(index => values.TryGetValue(index, out var number) ? number.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-")));
             resultRead(result);
         }
         else if (!resultWarned)

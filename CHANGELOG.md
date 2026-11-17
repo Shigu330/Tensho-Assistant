@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1531.0
+- Plan global, X-562 : Dédale bestial, constats mineurs de la relecture : une équipe conseillée gardée avant 0.1522 redit combien de ses bêtes ont un rang supposé ; les faiblesses non touchées de chaque combat ne sont plus recalculées à chaque image (gardées tant que l'équipe et les bêtes possédées ne changent pas) ; le mot anglais d'une attaque magique sans élément est celui du jeu, « Magical » (Addon 13101, « Magique » en français) ; les nombres 47 à 62 de la fenêtre de résultat du plateau sont écrits dans le journal, pour relever en jeu s'ils nomment les bonus.
+- Tests : BeastMinor1531Tests. Verify.ps1 (agent) : 3058/3058, 0 avertissement, 0 erreur ; DLL 0.1531.0.0. Non validé en jeu.
+### English
+- Beast Labyrinth, minor review findings: an advised team kept before 0.1522 says again how many of its beasts have an assumed rank; the weaknesses not hit in each fight are no longer worked out at each frame (kept while the team and the beasts held do not change); the English word for a magical attack with no element is the game's, « Magical » (Addon 13101, « Magique » in French); the board result window's numbers 47 to 62 are written in the log, to read in game whether they name the bonuses.
+
 ## 0.1530.0
 - Plan global, X-136 : Dédale bestial, panneau d'équipe : pour chaque bête conseillée du combat montré, le type de sa technique instinctive (aérien, féroce, robuste, arcanique) et les deux combos instinctifs II à faire avec elle : la technique du dresseur à lancer avant la technique de la bête, ou après, avec le combo obtenu (Assaut vital ou Assaut létal). Tiré du jeu lui-même : la Table des types et le tutoriel du dresseur (le cu sith, féroce : Hache rafale avant, ou Hache mistral après), le type de chacune des cinquante techniques des bêtes et des quatre techniques instinctives du dresseur. Le surlignage en combat reste à faire.
 - Pour les joueurs : dédale bestial : le panneau dit maintenant, pour chaque bête conseillée, quelle technique du dresseur lancer avant ou après sa technique pour réussir un combo instinctif II.

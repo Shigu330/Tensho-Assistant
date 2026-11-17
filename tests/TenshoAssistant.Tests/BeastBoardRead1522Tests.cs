@@ -74,7 +74,7 @@ internal static class BeastBoardRead1522Tests
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
             Check(page.Contains("var (read, source) = CurrentBeastBoard(catalog);") && !page.Contains("if (TenshoAssistant.Competitive.CompetitiveGate.Cut)"), "the panel reads the board, not only during a cut");
             Check(page.Contains("FollowBeastBoard(catalog);\n        var board = DrawBeastBoardChoice(catalog);".Replace("\n", Environment.NewLine)) || page.Contains("FollowBeastBoard(catalog);\r\n        var board = DrawBeastBoardChoice(catalog);") || page.Contains("FollowBeastBoard(catalog);\n        var board = DrawBeastBoardChoice(catalog);"), "the page's list follows it");
-            Check(page.Contains("BeastTeams.MergeRanks(plans.Ranks, plans.Floors, ranks, limit)") && page.Contains("plan.RanksUnknown, board.RankLimit"), "ranks merged as floors; the team's unknown ranks said");
+            Check(page.Contains("BeastTeams.MergeRanks(plans.Ranks, plans.Floors, ranks, limit)") && page.Contains("\"BeastUi.TeamRanksAssumed\", unknown, board.RankLimit"), "ranks merged as floors; the team's unknown ranks said");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("AgentXBMStageDetailList.Instance()") && reader.Contains("stage->ContentId") && reader.Contains("team->ContentId"), "the reader reads the agents' board");
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
