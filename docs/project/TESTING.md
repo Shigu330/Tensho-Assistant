@@ -2173,6 +2173,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1534) Au Dédale bestial, devant « Formation de l'équipe » : le panneau Tensho n'est pas plus large que la fenêtre du jeu à côté, l'équipe conseillée est un tableau (icône et nom, rang, attaque) comme dans le jeu, aucun texte coupé
 
+- [ ] (0.1535) Fenêtre de chat avec un long historique : remonter à la molette, puis en tirant la barre ; la vue ne saute pas quand des lignes plus anciennes arrivent au-dessus (elles arrivent par paquets)
+
+- [ ] (0.1535) Après un rechargement en mode développeur : dalamud.log a la ligne « JIT warm-up: … Early phase (map, overlays, chat; …) ready N ms after the load » (logread.py)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

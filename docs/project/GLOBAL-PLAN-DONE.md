@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (569 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (571 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -610,6 +610,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
 | X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
 | X-519 | Review  (review 0.1497, 16/11), I1: finding in… | Done in 0.1498 |
+| X-520 | Review  (review 0.1497, 16/11), I2: finding in journal.jsonl (agent file)… | Done in 0.1536 |
 | X-521 | Review  (review 0.1497, 16/11), minor M1, M2, M3, M4, M5, M6, M7: M1 in… | Done in 0.1498.0 |
 | X-522 | Tool (defect seen by the master on 11/16 around 1:55 pm): plan.py… | Done in 0.1498.0 |
 | X-523 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), I1: finding in… | Done in 0.1501 |
@@ -637,12 +638,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
 | X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
 | X-562 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), minor M1, M2, M3, M4… | Done in 0.1531 |
+| X-563 | Review of block 0.1527 to 0.1534 (review 0.1534, 17/11), minor M1, M2, M3: M1… | Done in 0.1535 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (569 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (571 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1250,6 +1252,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
 | X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |
 | X-519 | Relecture  (relecture 0.1497, 16/11), I1 : Onze textes montrés aux joueurs… | Fait en 0.1498 |
+| X-520 | Relecture  (relecture 0.1497, 16/11), I2 : La définition de « fait » de X-449… | Fait en 0.1536 |
 | X-521 | Relecture  (relecture 0.1497, 16/11), mineurs M1, M2, M3, M4, M5, M6, M7 : M1… | Fait en 0.1498.0 |
 | X-522 | Outil (défaut vu par la maître le 16/11 vers 13 h 55) : plan.py… | Fait en 0.1498.0 |
 | X-523 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), I1 : X-492 M4 : la… | Fait en 0.1501 |
@@ -1277,3 +1280,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
 | X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
 | X-562 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), mineurs M1, M2… | Fait en 0.1531 |
+| X-563 | Relecture du bloc 0.1527 à 0.1534 (relecture 0.1534, 17/11), mineurs M1, M2, M3… | Fait en 0.1535 |
