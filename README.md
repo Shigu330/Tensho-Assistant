@@ -100,8 +100,9 @@ organised: [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md).
 Each release also carries `TenshoAssistant.Desktop.zip`: the same pages in a Windows window, with the game closed (an optional link to a
 running game, off by default: Settings › Advanced › « Link with the desktop app »; the other live parts and the actions come later). Unzip it anywhere and start `TenshoAssistant.Desktop.exe`. It needs XIVLauncher with
 Dalamud and the game installed (it reads Dalamud's ImGui and the game data where they are installed; nothing of them is shipped); it carries
-its own .NET runtime, nothing else to install. It reads your saved Tensho settings without changing them. Live parts (bags, timers, alarms) stay empty and actions are
-off, as its status bar says; the map, live synthesis and the Fashion Report stay in the game. The app and the plugin carry the same version
+its own .NET runtime, nothing else to install. It reads your saved Tensho settings without changing them. Alarms still ring from the app (a line in its status bar,
+Windows' sound and a notification; by default only while the game is not the window in front); the other live parts (bags, timers) stay empty and
+actions are off, as its status bar says; the map, live synthesis and the Fashion Report stay in the game. The app and the plugin carry the same version
 and are released together: the app says at start when the installed plugin's version differs.
 It updates itself: at start it asks GitHub for the release of the installed plugin's version (else the latest one), checks the
 zip's SHA-256 published in that release, installs it beside and keeps the version before (« Previous version »); it never restarts while
@@ -295,8 +296,9 @@ donnée communautaire), le plugin le dit au lieu de deviner. Validation en jeu d
 Chaque release porte aussi `TenshoAssistant.Desktop.zip` : les mêmes pages dans une fenêtre Windows, jeu fermé (lien facultatif avec le
 jeu lancé, désactivé par défaut : Paramètres › Avancé › « Lien avec l'application de bureau » ; les autres parties en direct et les actions viendront ensuite). Décompressez-le où vous voulez et lancez `TenshoAssistant.Desktop.exe`. Il lui faut
 XIVLauncher avec Dalamud et le jeu installés (elle lit l'ImGui de Dalamud et les données du jeu là où ils sont installés ; rien d'eux n'est
-livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos paramètres Tensho enregistrés sans les changer. Les parties en direct (sacs, minuteurs, alarmes)
-restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le
+livré) ; elle porte son propre runtime .NET, rien d'autre à installer. Elle lit vos paramètres Tensho enregistrés sans les changer. Les alarmes sonnent quand même depuis
+l'application (une ligne dans sa barre d'état, le son de Windows et une notification ; par défaut seulement quand le jeu n'est pas la fenêtre au
+premier plan) ; les autres parties en direct (sacs, minuteurs) restent vides et les actions sont coupées, comme le dit sa barre d'état ; la carte, la synthèse en direct et la Revue de mode restent dans le
 jeu. L'application et le plugin portent le même numéro de version et sont publiés ensemble : l'application signale au démarrage une version
 différente du plugin installé.
 Elle se met à jour seule : au démarrage, elle demande à GitHub la release de la version du plugin installé (sinon la dernière),

@@ -58,7 +58,7 @@ Tensho adds small panels next to some game windows (character sheet, Duty Finder
 
 ## What is the Tensho chat window?
 
-An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads: the game's chat stays where it is, never hidden, and nothing is sent from it. Messages stay in memory and are cleared when you turn the window off or log out; only if you turn on « Keep the chat history on this PC » in its settings (off by default, asked first) are they also kept on this PC, per character, within the bounds you set, never sent anywhere, until you erase them. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
+An extra window, off by default, that shows the game's chat beside it: tabs by channel, colours, time and unread counts. It only reads, and nothing is sent from it. The game's chat stays where it is, unless you turn on « Hide the game chat's messages » in its settings (off by default): this window then takes the place of the game chat's messages, and you keep typing in the game's own typing box. Messages stay in memory and are cleared when you turn the window off or log out; only if you turn on « Keep the chat history on this PC » in its settings (off by default, asked first) are they also kept on this PC, per character, within the bounds you set, never sent anywhere, until you erase them. Like the rest of Tensho it stops in PvP and ranked play (Triple Triad tournaments, Mahjong). Turn it on in Settings › Panels beside the game › « Show the Tensho chat window », or type « /tensho chat ».
 
 ## Does Tensho keep my chat messages?
 
@@ -102,7 +102,7 @@ Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. U
 
 ## The garden is shown as icons: how do I get the text back?
 
-Gardening › Garden › Garden journal › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
+Tracking › Garden › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
 
 ## How do I install Tensho?
 
@@ -110,7 +110,7 @@ In Dalamud › Settings › Experimental › Custom Plugin Repositories, add htt
 
 ## Can I see Tensho without the game?
 
-Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them: what you create or change in the app (tools, alarms, garden, craft presets, settings) is not saved, its controls are greyed and the status bar says so; make changes in the game. Live parts (bags, timers, alarms) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
+Yes, on Windows: the desktop app (TenshoAssistant.Desktop.zip, next to latest.zip in each GitHub release) shows the same pages with the game closed. It needs XIVLauncher with Dalamud and the game installed (it carries its own .NET runtime); it reads your saved settings without changing them: what you create or change in the app (tools, alarms, garden, craft presets, settings) is not saved, its controls are greyed and the status bar says so; make changes in the game. Alarms still ring from the app (a line in its status bar, Windows' sound and a Windows notification; by default only while the game is not the window in front); the other live parts (bags, timers) stay empty and actions are off; the map, live synthesis and the Fashion Report stay in the game. Take the app and the plugin from the same release: the app says so when the versions differ.
 
 ## Does the desktop app update itself?
 
@@ -184,7 +184,7 @@ Tensho ajoute de petits panneaux à côté de certaines fenêtres du jeu (fiche 
 
 ## Qu'est-ce que la fenêtre de chat Tensho ?
 
-Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire : le chat du jeu reste à sa place, jamais caché, et rien n'est envoyé depuis elle. Les messages restent en mémoire et sont effacés quand vous désactivez la fenêtre ou vous déconnectez ; c'est seulement si vous activez « Garder l'historique du chat sur ce PC » dans ses réglages (désactivé par défaut, avec votre accord demandé d'abord) qu'ils sont aussi gardés sur ce PC, par personnage, dans les limites que vous fixez, jamais envoyés, jusqu'à ce que vous les effaciez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
+Une fenêtre en plus, désactivée par défaut, qui affiche le chat du jeu à côté de lui : onglets par canal, couleurs, heure et messages non lus. Elle ne fait que lire, et rien n'est envoyé depuis elle. Le chat du jeu reste à sa place, sauf si vous activez « Cacher les messages du chat du jeu » dans ses réglages (désactivé par défaut) : cette fenêtre prend alors la place des messages du chat du jeu, et vous tapez toujours dans la zone de saisie du jeu. Les messages restent en mémoire et sont effacés quand vous désactivez la fenêtre ou vous déconnectez ; c'est seulement si vous activez « Garder l'historique du chat sur ce PC » dans ses réglages (désactivé par défaut, avec votre accord demandé d'abord) qu'ils sont aussi gardés sur ce PC, par personnage, dans les limites que vous fixez, jamais envoyés, jusqu'à ce que vous les effaciez. Comme le reste de Tensho, elle s'arrête en JcJ et dans les parties classées (tournois de Triple Triade, Mahjong). Activez-la dans Paramètres › Panneaux à côté du jeu › « Afficher la fenêtre de chat Tensho », ou tapez « /tensho chat ».
 
 ## Tensho garde-t-il mes messages du chat ?
 
@@ -228,7 +228,7 @@ Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de ce
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 
-Jardinage › Jardin › Journal de jardinage › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
+Suivi › Jardinage › onglet Jardin › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 
@@ -236,7 +236,7 @@ Dans Dalamud › Paramètres › Expérimental › Dépôts de plugins personnal
 
 ## Puis-je voir Tensho sans le jeu ?
 
-Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer : ce que vous créez ou changez dans l'application (outils, alarmes, potager, préréglages d'artisanat, réglages) n'est pas enregistré, ses contrôles sont grisés et la barre d'état le dit ; faites les changements dans le jeu. Les parties en direct (sacs, minuteurs, alarmes) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
+Oui, sous Windows : l'application de bureau (TenshoAssistant.Desktop.zip, à côté de latest.zip dans chaque release GitHub) montre les mêmes pages, jeu fermé. Il lui faut XIVLauncher avec Dalamud et le jeu installés (elle porte son propre runtime .NET) ; elle lit vos réglages enregistrés sans les changer : ce que vous créez ou changez dans l'application (outils, alarmes, potager, préréglages d'artisanat, réglages) n'est pas enregistré, ses contrôles sont grisés et la barre d'état le dit ; faites les changements dans le jeu. Les alarmes sonnent quand même depuis l'application (une ligne dans sa barre d'état, le son de Windows et une notification Windows ; par défaut seulement quand le jeu n'est pas la fenêtre au premier plan) ; les autres parties en direct (sacs, minuteurs) restent vides et les actions sont coupées ; la carte, la synthèse en direct et la Revue de mode restent dans le jeu. Prenez l'application et le plugin dans la même release : l'application le signale quand les versions diffèrent.
 
 ## L'application de bureau se met-elle à jour seule ?
 
