@@ -111,6 +111,67 @@ public static class BeastTeams
         return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown);
     }
 
+    /// <summary>X-550 (0.1526): a beast of the team chosen in the game's team window: its rank shown there, and its HP (-1 and 0: not read).</summary>
+    public sealed record TeamMember(uint Beast, int Rank, int Hp, int MaxHp)
+    {
+        /// <summary>Down: its HP read at 0.</summary>
+        public bool Down => MaxHp > 0 && Hp <= 0;
+        /// <summary>Low: alive with less than <see cref="LowPercent"/> % of its HP.</summary>
+        public bool Low => MaxHp > 0 && Hp > 0 && Hp * 100 < MaxHp * LowPercent;
+    }
+    public const int LowPercent = 30;
+
+    /// <summary>
+    /// X-550 (0.1526, the user's request of 17/11: « no team computed from the beasts I chose if I do not want to listen to it »; « the 3 to call
+    /// for the current team »; « see the beast's HP and whether it is dead », read at the end of each fight): the team the game's team window
+    /// shows (XBMPetParty, opened again after each fight): each beast's name, then its rank; its HP « a/b » two texts before the name
+    /// (« 608/608 ; PV ; Cu sith ; 5 », the window of 17/11 10:09). Each beast once, in the window's order; nothing else is guessed.
+    /// </summary>
+    public static IReadOnlyList<TeamMember> ParseTeam(IReadOnlyList<string> texts, IReadOnlyList<Beast> beasts)
+    {
+        var team = new List<TeamMember>();
+        for (var index = 0; index + 1 < texts.Count; index++)
+        {
+            var beast = beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, texts[index], StringComparison.CurrentCultureIgnoreCase));
+            if (beast is null || team.Any(member => member.Beast == beast.Id) || !int.TryParse(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
+            var (hp, max) = (-1, 0);
+            if (index >= 2 && texts[index - 2].Split('/') is [var left, var right] && int.TryParse(left, out var now) && int.TryParse(right, out var top) && top > 0 && now >= 0 && now <= top)
+                (hp, max) = (now, top);
+            team.Add(new TeamMember(beast.Id, rank, hp, max));
+        }
+        return team;
+    }
+
+    /// <summary>X-550 (0.1526): one fight's three beasts taken among the team read (beasts down left out), with the weaknesses they hit, and
+    /// against the advised plan: the advised beasts missing (not taken, or down) and those that take their place.</summary>
+    public sealed record TeamFight(int Battle, IReadOnlyList<uint> Trio, int Hit, int Enemies, IReadOnlyList<uint> Lost, IReadOnlyList<uint> Instead);
+
+    /// <summary>
+    /// X-550 (0.1526): the three of each fight among the beasts the player took (the team window), by the same rules as the plan (weaknesses
+    /// first, then attack, then defence; ranks at most the board's limit); the advised plan's beasts that are not there (or down) are said with
+    /// the beasts that replace them. Nothing is chosen nor sent to the game (R03.3).
+    /// </summary>
+    public static IReadOnlyList<TeamFight> FromTeam(Board board, BoardPlan? advised, IReadOnlyList<TeamMember> team, IReadOnlyList<Beast> beasts)
+    {
+        var limit = Math.Max(1, board.RankLimit);
+        var byId = beasts.GroupBy(beast => beast.Id).ToDictionary(group => group.Key, group => group.First());
+        var alive = team.Where(member => !member.Down && byId.ContainsKey(member.Beast) && byId[member.Beast].Ranks.Count > 0).ToArray();
+        var input = alive.Select(member => (byId[member.Beast].At(Math.Min(member.Rank, limit))!, byId[member.Beast].AutoRow)).ToArray();
+        var fights = new List<TeamFight>();
+        for (var index = 0; index < board.Battles.Count; index++)
+        {
+            var enemies = board.Battles[index].Enemies;
+            if (enemies.Count == 0) continue;
+            var (picks, hit) = Best(input, enemies);
+            var trio = picks.Select(pick => alive[pick].Beast).ToArray();
+            var wanted = advised?.Battles.FirstOrDefault(battle => battle.Battle == index)?.Team.Select(pick => pick.Beast).ToArray() ?? [];
+            var lost = wanted.Where(beast => alive.All(member => member.Beast != beast)).ToArray();
+            var instead = lost.Length > 0 ? trio.Where(beast => !wanted.Contains(beast)).ToArray() : [];
+            fights.Add(new TeamFight(index, trio, hit, enemies.Count, lost, instead));
+        }
+        return fights;
+    }
+
     /// <summary>X-553 (0.1523): a weakness of a fight's enemies that none of its three beasts hits: the team's other beasts that would hit it, and
     /// the beasts held outside the team that would (all beasts when the beasts held are not read).</summary>
     public sealed record WeaknessMissed(uint Weakness, string Name, IReadOnlyList<uint> InTeam, IReadOnlyList<uint> Held);

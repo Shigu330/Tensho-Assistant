@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1526.0
+- Plan global, X-550 : Dédale bestial, panneau d'équipe : les trois bêtes de chaque combat sont prises parmi l'équipe que vous avez vraiment choisie, lue dans la fenêtre « Formation de l'équipe » du jeu (nom, rang et PV de chaque bête, relus à chaque réouverture, donc après chaque combat). Cette partie vient en premier, avant l'équipe conseillée : une bête à terre (0 PV) n'est pas appelée et c'est dit, une bête sous 30 % de ses PV est signalée, et quand une bête conseillée pour un combat manque (pas emmenée ou à terre), le panneau dit laquelle et quelle bête prend sa place. Mêmes règles que l'équipe conseillée (faiblesses d'abord) ; rien n'est choisi ni envoyé au jeu à votre place.
+- Pour les joueurs : dédale bestial : le panneau d'équipe conseille maintenant depuis l'équipe que vous avez vraiment prise, dit quelles bêtes sont à terre ou à PV bas, et quelle bête remplace une bête conseillée laissée de côté.
+- Tests : BeastTeamRead1526Tests. Verify.ps1 (agent) : 3043/3043, 0 avertissement, 0 erreur ; DLL 0.1526.0.0. Non validé en jeu.
+### English
+- Beast Labyrinth, team panel: the three beasts of each fight are taken among the team you actually chose, read in the game's team window (each beast's name, rank and HP, read again each time it opens, so after each fight). This part comes first, before the advised team: a beast down (0 HP) is not called and this is said, a beast under 30 % of its HP is flagged, and when a beast advised for a fight is missing (not taken or down), the panel says which one and which beast takes its place. Same rules as the advised team (weaknesses first); nothing is chosen nor sent to the game for you.
+- For players: Beast Labyrinth: the team panel now advises from the team you actually took, says which beasts are down or low on HP, and which beast replaces an advised one you left behind.
+
 ## 0.1525.0
 - Plan global, X-481 : Dresseur, résultat du dernier plateau : ses lignes sont gardées et montrées comme la fenêtre du jeu : chemin parcouru, affrontements, cibles d'élite, gardien du plateau, PV restants (valeur et points), score, chaque bonus, bonus et total. Le sens de chaque index de la fenêtre XBMResult vient du relevé de l'utilisateur du 17/11 (fenêtre du jeu comparée à la ligne du mode développeur), porté dans la preuve 0.1470 ; les libellés sont les mots du jeu (Addon 17876 à 17882, DescriptionString 1730). Un résultat gardé avant cette version se relit sans ses lignes, rien n'est inventé.
 - Pour les joueurs : page Dresseur : le résultat du dernier plateau montre les mêmes lignes que la fenêtre de résultat du jeu (chemin, affrontements, cibles d'élite, gardien, PV restants, bonus, total).

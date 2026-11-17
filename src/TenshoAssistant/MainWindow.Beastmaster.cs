@@ -259,6 +259,38 @@ internal sealed partial class MainWindow
             if (gain.RankAfter > gain.RankBefore) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.ResultRanks", gain.RankAfter - gain.RankBefore)); }
         }
     }
+    /// <summary>X-550 (0.1526): the team the game's team window shows (null: not read).</summary>
+    internal Func<IReadOnlyList<BeastTeams.TeamMember>?>? BeastTeamRead { get; set; }
+    private (string Key, IReadOnlyList<BeastTeams.TeamFight> Fights)? beastTeamFights;
+    /// <summary>X-550 (0.1526): the team taken in the game: beasts down or low on HP, then each fight's three among them, with the advised beasts
+    /// missing and those taking their place. Worked out again only when the board, the plan or the team (HP included) changes.</summary>
+    private void DrawBeastTeamRead(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember> team, BeastCatalog catalog)
+    {
+        Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
+        string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
+        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
+        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        ImGui.TextColored(Accent, localization.Format("BeastUi.TeamRead", team.Count));
+        foreach (var member in team)
+        {
+            if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
+            else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
+        }
+        foreach (var fight in beastTeamFights.Value.Fights)
+        {
+            var battle = board.Battles[fight.Battle];
+            ImGui.TextColored(Accent, battle.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", fight.Battle));
+            ImGui.SameLine(); ImGui.TextDisabled(localization.Format(BeastTeams.HitKey(fight.Enemies), fight.Hit, fight.Enemies));
+            ImGui.Indent();
+            try
+            {
+                ImGui.TextUnformatted("→ " + Names(fight.Trio));
+                if (fight.Lost.Count > 0) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", Names(fight.Lost), fight.Instead.Count > 0 ? Names(fight.Instead) : "—"));
+            }
+            finally { ImGui.Unindent(); }
+        }
+    }
+
     /// <summary>X-481 (0.1525): the result's lines as the game's window shows them: the score's parts (a label, the value when it has one, the
     /// points), the score, each bonus's points, the bonus and the total. Labels from the game's own words (docs/evidence/0.1470-beast-result-window.md).</summary>
     private void DrawBeastResultLines(BoardResult result)
@@ -316,6 +348,14 @@ internal sealed partial class MainWindow
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
         var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        // X-550 (0.1526): the team the player took (the game's team window) comes first: its three per fight, then the advised plan.
+        if (BeastTeamRead?.Invoke() is { Count: > 0 } team)
+        {
+            ImGui.PushTextWrapPos(wrapAt);
+            try { DrawBeastTeamRead(board, plan, team, catalog); }
+            finally { ImGui.PopTextWrapPos(); }
+            ImGui.Separator();
+        }
         DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);
         ImGui.PushTextWrapPos(wrapAt);
         try { ImGui.TextDisabled(localization.Get("BeastUi.TeamPanelNote")); }
