@@ -660,7 +660,7 @@ internal sealed partial class MainWindow
             if(DefaultButton("NameMinZoom",settings.NameMinZoom!=MapDefaults.NameMinZoom)){settings.NameMinZoom=MapDefaults.NameMinZoom;changed=true;}
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
-        changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnClick,value=>settings.FlagOnClick=value,MapDefaults.FlagOnClick);
+        changed|=SettingBox("MapView.FlagOnClick",settings.FlagOnLeftClick,value=>settings.FlagOnLeftClick=value,MapDefaults.FlagOnLeftClick);
         changed|=SettingBox("MapView.ShowFlag",settings.ShowFlag,value=>settings.ShowFlag=value,MapDefaults.ShowFlag);
         changed|=SettingBox("MapView.ShowPlayerCoordinates",settings.ShowPlayerCoordinates,value=>settings.ShowPlayerCoordinates=value,MapDefaults.ShowPlayerCoordinates);
         changed|=SettingBox("MapView.ShowBookmarks",settings.ShowBookmarks,value=>settings.ShowBookmarks=value,MapDefaults.ShowBookmarks);
@@ -1826,7 +1826,8 @@ internal sealed partial class MainWindow
                     if(hit.Fixed is { LinkMapId:not 0 } door)linkUnderMouse=door.LinkMapId;
             // Region and world maps: a click (not a drag) on a linked icon opens that map, like the game.
             if(linkUnderMouse is { } link && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)NavigateMap(link);
-            if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null && tooltipPoint is null && sightseeingTip is null && map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)
+            // X-535: the rule in Maps.MapClickFlag (an empty spot of a zone map, a click, not a drag).
+            if(Maps.MapClickFlag.Places(settings.FlagOnLeftClick,hovered,top is not null,linkUnderMouse is not null,hoveredBookmark is not null,tooltipPoint is not null,sightseeingTip is not null,map.TerritoryId,ImGui.IsMouseReleased(ImGuiMouseButton.Left),mapDragged))
             {var spotClicked=MapProjection.CoordinateFromPixel((io.MousePos-origin-mapPan)/mapZoom,map);FlagFromMap(map,spotClicked.X,spotClicked.Y);}
         }
         finally{MapMark("canvas edges and tooltips");draw.PopClipRect();}

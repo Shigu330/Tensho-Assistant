@@ -3872,7 +3872,7 @@
     "LayersNone": "Tout masquer",
     "LayersNoneTip": "Masque toutes les couches de cette liste : seule la carte reste.",
     "FlagOnClick": "Clic gauche pour poser le drapeau",
-    "FlagOnClickHelp": "Un clic gauche bref sur un endroit vide d'une carte de zone pose le drapeau. Un glisser déplace toujours la carte.\nPar défaut : désactivé.",
+    "FlagOnClickHelp": "Un clic gauche bref sur un endroit vide d'une carte de zone pose le drapeau. Un glisser déplace toujours la carte.\nPar défaut : activé.",
     "WheelStep": "Pas de la molette",
     "WheelStepHelp": "De combien un cran de molette change le zoom. La molette marche sur toute la fenêtre de la carte.\nPar défaut : 15 %.",
     "WheelInvert": "Inverser la molette",
