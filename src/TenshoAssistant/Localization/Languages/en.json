@@ -14,7 +14,8 @@
     "ToolFilterHint": "Filter by category, tool or reference plugin…",
     "NoToolMatch": "No tool matches this filter.",
     "CommandHelp": "Open Tensho Assistant. /tensho fish (or peche): show or hide the fishing help. « chat »: show or hide the Tensho chat window. « wiki <item> » / « lodestone <item> » open the item's page. « todo <task> » adds a task to Reminders. « item <item> », « price », « gather », « recipe » open it in Tensho.",
-    "ToolFilterTip": "Part of a category, tool or reference plugin name; accents and case ignored."
+    "ToolFilterTip": "Part of a category, tool or reference plugin name; accents and case ignored.",
+    "NeedsCharacter": "Tensho needs a character: log in with a character first."
   },
   "MyToolsEditor": {
     "Theme": "Proposed theme",

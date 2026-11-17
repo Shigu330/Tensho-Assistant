@@ -96,6 +96,8 @@ public sealed partial class Plugin : IDalamudPlugin
     private Market.UndercutWatcher? undercut;
     // 0.349 (g, X-07): the chat, for the « /tensho wiki | lodestone » answers.
     private readonly IChatGui chatGui;
+    // X-539: a character logged in and loaded (UI.CharacterGate); Draw and /tensho wait for it.
+    private readonly Func<bool> characterReady;
     private Diagnostics.SelfCheckRunner? selfCheck;
     // R-12 (0.414): items whose « Open » chat link handler is registered (command id = item id), all removed on unload.
     private readonly Dictionary<uint,Dalamud.Game.Text.SeStringHandling.Payloads.DalamudLinkPayload> alarmLinks=[];
@@ -112,6 +114,8 @@ public sealed partial class Plugin : IDalamudPlugin
         // 0.1105 (R20, plan 4.20): the version loaded, read by the agent's launch check (the agent's logread.py launch).
         log.Information("Tensho Assistant {0} loaded; logged in: {1}, territory {2}.",typeof(Plugin).Assembly.GetName().Version?.ToString(3) ?? "?",client.IsLoggedIn,client.TerritoryType);
         chatGui = chat;
+        // X-539 (17/11): nothing drawn before a character is logged in (title screen, character selection), open state kept.
+        characterReady=()=>UI.CharacterGate.Draws(client.IsLoggedIn,player.IsLoaded);
         localization = new LocalizationManager((error, message) => log.Warning(error, message), pluginInterface.AssemblyLocation.DirectoryName);
         dutyLoot = new DutyLootService(garland);
         monsterLoot = new MonsterLootService(garland);
@@ -1449,6 +1453,7 @@ public sealed partial class Plugin : IDalamudPlugin
     private void OnCommand(string command, string arguments)
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){chatForCut?.Print("[Tensho] "+localization.Get("Competitive.Off"));return;}
+        if(!characterReady()){chatGui.Print("[Tensho] "+localization.Get("Plugin.NeedsCharacter"));return;}
         if (arguments.Trim().ToLowerInvariant() is "peche" or "pêche" or "fish" or "fishing") { mainWindow?.ToggleFishingPanel(); return; }
         // X-403 (0.1434, D-166): « /tensho chat » shows or hides the Tensho chat window.
         if (arguments.Trim().ToLowerInvariant() is "chat") { mainWindow?.ToggleChatWindow(); return; }
@@ -1504,6 +1509,8 @@ public sealed partial class Plugin : IDalamudPlugin
     private void Draw()
     {
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){DrawBeastBoard(TenshoAssistant.Competitive.CompetitiveGate.LabyrinthBoard);return;}
+        // X-539: title screen and character selection: no window nor overlay; their open state is left as it is.
+        if(!characterReady())return;
         // 0.745: in developer mode, a slow frame is written to the log with its costliest parts.
         if(!mainWindow.DeveloperMode){DrawFrame();return;}
         var started=System.Diagnostics.Stopwatch.GetTimestamp();var paused=GC.GetTotalPauseDuration();

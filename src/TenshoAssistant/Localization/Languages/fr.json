@@ -14,7 +14,8 @@
     "ToolFilterHint": "Filtrer par domaine, outil ou plugin de référence…",
     "NoToolMatch": "Aucun outil ne correspond à ce filtre.",
     "CommandHelp": "Ouvrir Tensho Assistant. /tensho peche (ou fish) : afficher ou masquer l'aide à la pêche. « chat » : afficher ou masquer la fenêtre de chat Tensho. « wiki <objet> » / « lodestone <objet> » ouvrent la page de l'objet. « todo <tâche> » ajoute une tâche aux Rappels. « objet <objet> », « prix », « recolte », « recette » l'ouvrent dans Tensho.",
-    "ToolFilterTip": "Partie du nom d'un domaine, d'un outil ou d'un plugin de référence ; accents et majuscules ignorés."
+    "ToolFilterTip": "Partie du nom d'un domaine, d'un outil ou d'un plugin de référence ; accents et majuscules ignorés.",
+    "NeedsCharacter": "Tensho a besoin d'un personnage : connectez-vous d'abord avec un personnage."
   },
   "MyToolsEditor": {
     "Theme": "Thème proposé",
