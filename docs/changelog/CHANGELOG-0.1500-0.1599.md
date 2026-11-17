@@ -2,6 +2,28 @@
 
 Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la dernière release, déplacées par `tools/changelog.py archive`. Même format (français, puis `### English` depuis 0.219.0) ; liens relatifs à la racine réécrits depuis ce dossier.
 
+## 0.1536.0
+- Plan global, X-520 : Images de référence de l'application de bureau : chaque onglet de la page Paramètres a désormais la sienne (Panneaux, Carte, Suivi, Données, Avancé et, en mode développeur, Débogage, chacun dans sa première catégorie ; Général l'avait déjà), ainsi que les réglages des onglets du chat (grilles des canaux, des filtres du jeu et des genres de combat), en largeur normale et étroite. L'application ouvre l'onglet et la catégorie par une nouvelle entrée de son contrat typé avec le plugin (OpenSettings).
+- Tests : SettingsPictures1536Tests. Verify.ps1 (agent) : 3071/3071, 0 avertissement, 0 erreur ; DLL 0.1536.0.0. Rien à essayer en jeu.
+### English
+- Reference pictures of the desktop application: every tab of the Settings page now has its own (Panels, Map, Tracking, Data, Advanced and, in developer mode, Debug, each in its first category; General had one already), as do the chat's tab settings (the grids of channels, of the game's filters and of combat kinds), at the usual width and narrow. The application opens the tab and the category through a new entry of its typed contract with the plugin (OpenSettings).
+
+## 0.1535.0
+- Plan global, X-563 : Relecture du bloc 0.1527 à 0.1534, constats mineurs. Fenêtre de chat : quand on remonte un long historique et qu'un paquet de lignes plus anciennes est mis en page au-dessus de la vue, les lignes restent à leur place dès cette image-là (le défilement corrigé ne prend effet qu'à l'image suivante : les lignes de cette image sont dessinées au défilement de la suivante) ; avant, la vue sautait d'une image à chaque paquet. Préchauffage du code : la fin de sa phase précoce (carte, panneaux, chat), qu'attendent la compilation des lecteurs et la fenêtre de chat, est mesurée et écrite au journal. Dédale bestial : le combat tiré de la disposition du plateau du jeu est dit « lecture à confirmer en jeu », comme le numéro du plateau lu dans la même fenêtre.
+- Pour les joueurs : fenêtre de chat : remonter un long historique ne fait plus sauter la vue quand des lignes plus anciennes arrivent au-dessus. Dédale bestial : le combat lu dans le plateau du jeu dit qu'il reste à confirmer.
+- Tests : Review1534Minor1535Tests. Verify.ps1 (agent) : 3068/3068, 0 avertissement, 0 erreur ; DLL 0.1535.0.0. Non validé en jeu.
+### English
+- Review of block 0.1527 to 0.1534, minor findings. Chat window: when scrolling back through a long history and a packet of older lines is laid out above the view, the lines stay in place from that frame on (the corrected scroll takes effect at the next frame only: that frame's lines are drawn at the next one's scroll); before, the view jumped for a frame at each packet. Code warm-up: the end of its early phase (map, panels, chat), which the readers' compilation and the chat window wait for, is measured and written in the log. Beast Labyrinth: the fight taken from the game's board window is said to be « reading still to be confirmed in game », like the board's number read in the same window.
+- For players: Chat window: scrolling back through a long history no longer jumps when older lines load above. Beast Labyrinth: the fight read from the game's board says it is still to be confirmed.
+
+## 0.1534.0
+- Plan global, X-551 : Dédale bestial, panneau d'équipe : il n'est jamais plus large que la fenêtre du jeu à côté de laquelle il se pose (formation de l'équipe, sinon disposition du plateau ; 460 pixels au plus, 300 au moins) ni plus haut que la disposition du plateau, et ses lignes vont à la ligne dans cette largeur. L'équipe conseillée est un tableau comme « Formation de l'équipe » du jeu : une ligne par bête (icône et nom, rang, attaque automatique), séparée du reste par un trait. Les mêmes lignes sur la page Dresseur › Équipe.
+- Pour les joueurs : dédale bestial : le panneau d'équipe reste dans la largeur de la fenêtre du jeu à côté et liste l'équipe en lignes comme la formation de l'équipe du jeu.
+- Tests : BeastPanelSize1534Tests. Verify.ps1 (agent) : 3065/3065, 0 avertissement, 0 erreur ; DLL 0.1534.0.0. Non validé en jeu.
+### English
+- Beast Labyrinth, team panel: it is never wider than the game's window it stands beside (the team formation, else the board layout; 460 pixels at most, 300 at least) nor taller than the board layout, and its lines wrap inside that width. The advised team is a table like the game's team formation: one row per beast (icon and name, rank, automatic attack), set apart from the rest by a line. The same rows on the Beastmaster › Team page.
+- For players: Beast Labyrinth: the team panel now stays within the width of the game's window beside it and lists the team in rows like the game's team formation.
+
 ## 0.1533.0
 - Plan global, X-558 : Fenêtre de chat, suite : après un rechargement, le code du chat est compilé d'avance avec celui de la carte et des panneaux, et la fenêtre de chat affiche « Chargement… » une ou deux secondes au lieu de le compiler pendant une image (mesure du 17/11 13 h 05 après 0.1532 : 62 ms pour la première image du chat, dont 5 ms de lecture des lignes et moins de 1 ms de mise en page).
 - Pour les joueurs : fenêtre de chat : plus d'à-coup à sa première image après un rechargement ; elle affiche « Chargement… » un instant à la place.
