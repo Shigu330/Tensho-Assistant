@@ -139,6 +139,10 @@ internal sealed partial class MainWindow
     }
 
     private string ChatChannelName(ChatChannel channel)=>localization.Get("ChatChannels."+channel);
+
+    /// <summary>X-545 (0.1517): a tooltip of the chat settings from its lines (keys and arguments, Chat/ChatHelp.cs), one line each.</summary>
+    private string ChatHelpText(IEnumerable<(string Key,object[] Args)> lines)
+        =>string.Join("\n",lines.Select(line=>line.Args.Length==0 ? localization.Get(line.Key):localization.Format(line.Key,line.Args)));
     private string ChatChannelShort(ChatChannel channel)=>localization.Get("ChatChannelsShort."+channel);
     private static Vector4 ChatColor(uint rgb){var (red,green,blue)=ChatChannels.Unpack(rgb);return new(red,green,blue,1);}
 
@@ -468,7 +472,7 @@ internal sealed partial class MainWindow
                     if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
                     ChatTabChanged(tab);
                 }
-                Tip("ChatWindow.FilterTip");
+                TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));
             }
         }
         finally{ImGui.TreePop();}
@@ -513,7 +517,7 @@ internal sealed partial class MainWindow
                     if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
                     ChatMessages.Restart(tab);chatSettingsPending=true;
                 }
-                Tip("ChatWindow.ChannelBoxTip");
+                TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));
             }
         }
         finally{ImGui.EndTable();}

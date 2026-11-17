@@ -64,13 +64,13 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1420-retainer-sales-end-probe.log](0.1420-retainer-sales-end-probe.log) | `tests/TenshoAssistant.Tests/Review1428Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1420-retainer-sales-end-code.md` |
 | [0.1427-warmup-priority.md](0.1427-warmup-priority.md) | `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/Review1428Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1432-background-collection-stall.md](0.1432-background-collection-stall.md) | `src/TenshoAssistant/Caching/DataCache.cs`, `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/CacheStream1432Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1427-warmup-priority.md` |
-| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
+| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1517-chat-channel-help.md` |
 | [0.1438-reader-guard.md](0.1438-reader-guard.md) | `src/TenshoAssistant/Diagnostics/ReaderCompiler.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `src/TenshoAssistant/Diagnostics/MachineMemory.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
 | [0.145.0-cache-before.log](0.145.0-cache-before.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1452-load-allocations.md](0.1452-load-allocations.md) | `tests/TenshoAssistant.Tests/GardenRules1452Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
-| [0.1458-chat-default-tabs.md](0.1458-chat-default-tabs.md) | `src/TenshoAssistant/Chat/ChatChannels.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/project/DECISIONS.md` |
+| [0.1458-chat-default-tabs.md](0.1458-chat-default-tabs.md) | `src/TenshoAssistant/Chat/ChatChannels.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1517-chat-channel-help.md`, `docs/project/DECISIONS.md` |
 | [0.1459-gaps-by-heap.md](0.1459-gaps-by-heap.md) | `tests/TenshoAssistant.Tests/LoadRank1459Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.146.0-achievement-probe.log](0.146.0-achievement-probe.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1464-map-floors.md](0.1464-map-floors.md) | `src/TenshoAssistant/Maps/MapFloorReader.Dalamud.cs`, `src/TenshoAssistant/Maps/MapFloors.cs`, `tests/TenshoAssistant.Tests/MapFloors1464Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
@@ -87,6 +87,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1502-game-chat-input.md](0.1502-game-chat-input.md) | `src/TenshoAssistant/Chat/ChatGameHide.cs`, `src/TenshoAssistant/Chat/ChatLogLayout.cs`, `src/TenshoAssistant/Chat/ChatLogLayoutProbe.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatReview1503Tests.cs` | `docs/changelog/CHANGELOG-0.1500-0.1599.md`, `docs/evidence/0.1508-game-chat-channel-menu.md`, `docs/project/DECISIONS.md` |
 | [0.1508-game-chat-channel-menu.md](0.1508-game-chat-channel-menu.md) | `src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs` | `docs/changelog/CHANGELOG-0.1500-0.1599.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
+| [0.1517-chat-channel-help.md](0.1517-chat-channel-help.md) | `src/TenshoAssistant/Chat/ChatHelp.cs`, `tests/TenshoAssistant.Tests/ChatHelp1517Tests.cs` | — |
 | [0.155.0-vendor-markers-probe.log](0.155.0-vendor-markers-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs`, `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.159.0-triad-npc-probe.log](0.159.0-triad-npc-probe.log) | `src/TenshoAssistant/MiniGames/TriadMatchAdvisor.cs`, `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs`, `tests/TenshoAssistant.Tests/TriadMatchSimulatorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.160.0-triad-match-capture.log](0.160.0-triad-match-capture.log) | `src/TenshoAssistant/MiniGames/TriadObservation.cs`, `src/TenshoAssistant/MiniGames/TriadObservationReader.Dalamud.cs`, `tests/TenshoAssistant.Tests/TriadMatchAdvisorTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -317,5 +318,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 305 files · fichiers ; 259 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 306 files · fichiers ; 260 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

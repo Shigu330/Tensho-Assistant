@@ -258,7 +258,7 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.DalamudLinkKnown=(plugin,command)=>chatGui.RegisteredLinkHandlers.ContainsKey((plugin,command));
             // X-484 (0.1482): the game's log filters, in the client's language (docs/evidence/0.1482-chat-log-filters.md).
             mainWindow.ChatFilterSource=()=>data.GetExcelSheet<Lumina.Excel.Sheets.LogFilter>()
-                .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText())).ToList();
+                .Select(row=>new Chat.ChatFilterRow(row.RowId,row.LogKind,row.Caster,row.Target,row.Category,row.DisplayOrder,row.Preset,row.Name.ExtractText(),row.Example.ExtractText())).ToList();
             mainWindow.OpenDalamudLink=(plugin,command,data,text)=>
             {
                 if(!chatGui.RegisteredLinkHandlers.TryGetValue((plugin,command),out var handler))return false;

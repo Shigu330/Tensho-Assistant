@@ -4,7 +4,8 @@ namespace TenshoAssistant.Chat;
 /// a message kind, who does it (Caster) and to whom (Target), as masks of Dalamud's XivChatRelationKind (bit 1 &lt;&lt; kind; 65535: anyone),
 /// its group (1 Discussion, 2 Announcements, 4 to 14 the combat lines by subject), its place and the game's default tabs (1 General, 2 Battle,
 /// 4 Event). docs/evidence/0.1482-chat-log-filters.md.</summary>
-public sealed record ChatFilterRow(uint Id,int Kind,ushort Caster,ushort Target,byte Category,byte Order,byte Preset,string Name);
+/// <remarks>X-545 (0.1517): <paramref name="Example"/> is the sheet's example line, in the client's language, shown in the filter's tooltip.</remarks>
+public sealed record ChatFilterRow(uint Id,int Kind,ushort Caster,ushort Target,byte Category,byte Order,byte Preset,string Name,string Example="");
 
 /// <summary>X-484 (0.1482): the game's log filters, as the game files them; pure (tests). A message is shown by a tab when one of the filters it
 /// chose matches it (kind, subject, target), as in the game's log window; a message no filter matches (a kind the game does not list) is shown

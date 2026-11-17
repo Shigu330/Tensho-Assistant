@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1517.0
+- Plan global, X-545 : Réglages du chat : chaque case de canal a sa propre infobulle au lieu d'une phrase commune. Elle donne le nom entier du canal (celui de la case peut être coupé, « Linkshell inter-Monde [3] »), ce qu'il porte, qui le voit et comment on y parle dans le jeu (par exemple /dire : un périmètre réduit ; /crier : un large périmètre ; /hurler : toute la zone ; /linkshellim3 ou /lsim3 : la linkshell inter-Monde numéro 3 ; /écho : vous seul), d'après la description des commandes et des filtres dans les textes du jeu. Chaque filtre du jeu (« Utiliser les filtres du jeu ») montre aussi son nom, l'exemple de ligne que donne le jeu et les onglets du jeu qui l'affichent par défaut.
+- Pour les joueurs : les réglages du chat expliquent chaque canal dans sa propre infobulle : nom entier, qui le voit et la commande du jeu pour y parler ; chaque filtre du jeu montre l'exemple de ligne du jeu.
+- Tests : ChatHelp1517Tests. Verify.ps1 (agent) : 3013/3013, 0 avertissement, 0 erreur ; DLL 0.1517.0.0. Non validé en jeu.
+### English
+- Chat settings: each channel box has its own tooltip instead of one shared sentence. It gives the channel's full name (the box's label may be cut, « Cross-world Linkshell [3] »), what it carries, who sees it and how one speaks in it in the game (for example /say: a small radius; /yell: a large radius; /shout: the whole area; /cwlinkshell3 or /cwl3: the cross-world linkshell of slot 3; /echo: only you), from the descriptions of the commands and filters in the game's texts. Each game filter (« Use the game's filters ») also shows its name, the example line the game gives and the game's tabs that show it by default.
+- For players: The chat settings explain each channel in its own tooltip: full name, who sees it and the game's command to speak in it; each game filter shows the game's example line.
+
 ## 0.1516.0
 - Plan global, X-547 : Relecture de 0.1515, constats mineurs : le commentaire du test d'écriture du journal des versions ne nomme plus un outil interne et dit que la liste des noms qui gardent leur majuscule est contrôlée des deux côtés (la même règle : un nom suivi d'une fin de mot, « Tensho-Assistant » compris). Preuve de 0.1470 (fenêtre de résultat du Dédale bestial) : la section « encore ouvert » donne l'index 11 sur les trois plateaux (361, 780, 912), sans plus contredire le troisième plateau.
 - Tests : Writing1358Tests. Verify.ps1 (agent) : 3009/3009, 0 avertissement, 0 erreur ; DLL 0.1516.0.0. Rien à essayer en jeu.
