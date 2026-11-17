@@ -804,6 +804,8 @@ internal sealed partial class MainWindow
                 if(next<0)break;
                 LayOutChatLine(view,next,options);laid++;
             }
+            // X-563 M1: how far the scroll moves at the next frame because of the rows added above (0 when none).
+            var shift=0f;
             if(!relaid && !ChatScroll.AtBottom(ImGui.GetScrollY(),view.RowsShown,height,view.HeightShown))
             {
                 var first=view.IndexAtRow((int)(ImGui.GetScrollY()/height));
@@ -814,7 +816,7 @@ internal sealed partial class MainWindow
                     if(older<0)break;
                     LayOutChatLine(view,older,options);laid++;
                 }
-                if(view.RowOf(first)-firstRow is var added and not 0)ImGui.SetScrollY(ChatLoading.Kept(ImGui.GetScrollY(),added,height));
+                if(view.RowOf(first)-firstRow is var added and not 0){ImGui.SetScrollY(ChatLoading.Kept(ImGui.GetScrollY(),added,height));shift=ChatLoading.Shift(ImGui.GetScrollY(),added,height);}
             }
             if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat layout",System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds);
             chatLineHeight=height;
@@ -823,14 +825,19 @@ internal sealed partial class MainWindow
             var top=ImGui.GetCursorPosY();
             var scroll=ImGui.GetScrollY();
             var shown=ImGui.GetWindowHeight();
+            // X-563 M1 (review of 0.1534): the scroll the lines are drawn at: ImGui's still has the frame before's (SetScrollY takes effect at
+            // the next frame), so in the frame a packet was laid out above, the lines are drawn as the next frame will draw them (no jump of a
+            // frame); the « back to the bottom » button, the mouse and « at the bottom » keep ImGui's scroll.
+            var drawn=scroll+shift;
+            top-=shift;
             // At the bottom on the frame before (its rows): follow the new lines, and nothing is unread in this tab any more.
             var atBottom=ChatScroll.AtBottom(scroll,view.RowsShown,height,view.HeightShown);
-            var end=scroll+shown;
+            var end=drawn+shown;
             // X-482 M2 (0.1472): the « back to the bottom » button is placed before the lines: the links and lines under it do not answer the mouse.
             var button=atBottom ? null:ChatBottomButton(view,scroll,shown);
             var mouse=ImGui.GetMousePos()-ImGui.GetWindowPos()+new Vector2(0,scroll);
             chatLinesBlocked=button is { } placed && ImGui.IsWindowHovered() && ChatScroll.OnButton(mouse.X,mouse.Y,placed.Corner,placed.Size.X,placed.Size.Y);
-            for(var index=view.IndexAtRow((int)(scroll/height));index<view.Count;index++)
+            for(var index=view.IndexAtRow((int)(drawn/height));index<view.Count;index++)
             {
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
                 var row=view.RowOf(index);
@@ -846,7 +853,7 @@ internal sealed partial class MainWindow
             // X-492 M1: the rest of a fine wheel belongs to one tab: another tab starts from nothing.
             if(!ReferenceEquals(view,chatWheelView)){chatWheelView=view;chatWheelRest=0;}
             if(ImGui.IsWindowHovered() && ImGui.GetIO().MouseWheel is var wheel and not 0)
-                ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY(),ref chatWheelRest));
+                ImGui.SetScrollY(ChatScroll.Wheel(drawn,wheel,height,ImGui.GetScrollMaxY()+shift,ref chatWheelRest));
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);

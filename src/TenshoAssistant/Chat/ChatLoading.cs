@@ -17,4 +17,11 @@ public static class ChatLoading
 
     /// <summary>The scroll that keeps the same message at the top of the view when the rows above it changed by <paramref name="added"/>.</summary>
     public static float Kept(float scroll,int added,float lineHeight)=>Math.Max(0,scroll+added*lineHeight);
+
+    /// <summary>
+    /// X-563 M1 (review of 0.1534): ImGui.SetScrollY takes effect at the next frame only; in the frame a packet was laid out, the lines are
+    /// drawn this much lower in the content (at the scroll <see cref="Kept"/> gives, minus the one ImGui still has), so the same message stays
+    /// at the same place on the screen in that frame too.
+    /// </summary>
+    public static float Shift(float scroll,int added,float lineHeight)=>Kept(scroll,added,lineHeight)-scroll;
 }

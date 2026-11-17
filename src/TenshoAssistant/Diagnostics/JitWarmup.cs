@@ -49,6 +49,9 @@ public sealed class JitWarmup : IDisposable
     /// interface's code (the readers' classes) may go on.</summary>
     public bool EarlyDone=>earlyDone;
     private volatile bool earlyDone;
+    /// <summary>X-563 M2 (review of 0.1534): when the early phase was compiled (ms after the warm-up was made; -1 before, or without an
+    /// early phase): the readers' classes and the chat window wait for it (MainWindow.WarmupEarlyDone).</summary>
+    public double EarlyReadyAfter{get;private set;}=-1;
     /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
     public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
@@ -402,6 +405,7 @@ public sealed class JitWarmup : IDisposable
                 if(index++==earlyCount && early is not null)
                 {
                     EarlyPrepared=Prepared;
+                    EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                     earlyDone=true;
                     var left=delay-first-System.Diagnostics.Stopwatch.GetElapsedTime(started);
                     if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
@@ -413,6 +417,8 @@ public sealed class JitWarmup : IDisposable
                 try{Timed(method,()=>{RuntimeHelpers.PrepareMethod(method.MethodHandle);return true;});Prepared++;}
                 catch(Exception){Skipped++;}
             }
+            // X-563 M2: every method was early: the phase ends with the warm-up.
+            if(early is not null && EarlyReadyAfter<0){EarlyPrepared=Prepared;EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;}
             Elapsed=System.Diagnostics.Stopwatch.GetElapsedTime(started);
             Completed=true;
             if(!token.IsCancellationRequested)finished?.Invoke(this);
