@@ -344,6 +344,13 @@ public static class BeastTeams
     /// X-561 (review of 0.1526, I1): a beast's rank never goes down in the game, so a rank read never lowers a rank known higher, whatever the
     /// limit (limit 0 when the board is not known, or a window's limit lower than the beast's rank): the known rank and its « at least » stay.
     /// </summary>
+    /// <summary>
+    /// X-580 (0.1549, the user's request of 18/11: « in the order of the bestiary's numbers, to make selecting easier »): the beasts to bring
+    /// in the order of the game's bestiary: its number is the beast's XBMPet row (« N°1 » Cu sith, row 1; « N°3 » Mouton, row 3;
+    /// docs/evidence/0.1548-beast-book.md). Each fight's three keep their calling order.
+    /// </summary>
+    public static IReadOnlyList<BeastPick> BookOrder(IEnumerable<BeastPick> team) => team.OrderBy(pick => pick.Beast).ToArray();
+
     /// <summary>X-578 (0.1548): the limit to give <see cref="MergeRanks"/> for a rank read in the bestiary: the beast's own, never a floor.</summary>
     public const int Exact = int.MaxValue;
 

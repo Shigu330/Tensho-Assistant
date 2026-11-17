@@ -188,6 +188,7 @@
     "TeamTen": "Les {0} à emmener :",
     "TeamBeast": "{0} (rang {1}, {2})",
     "TeamRank": "rang {0}",
+    "BookNumber": "N° {0} {1}",
     "RankLow": "rang bas pour ce plateau (recommandé : {0} à {1})",
     "TeamFight": "Combat {0}",
     "TeamHit": "faiblesse touchée : {0} sur {1} ennemis",

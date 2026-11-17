@@ -535,15 +535,16 @@ internal sealed partial class MainWindow
         if (BeastTeams.RanksUnknownOf(plan) is > 0 and var unknown) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", unknown, board.RankLimit));
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
         // X-551 (0.1534): one row per beast as the game's « Formation de l'équipe »: icon and name, rank, automatic attack.
+        // X-580 (0.1549): in the order of the game's bestiary, its number before the name, to find each beast in the game's window.
         if (TenshoAssistant.UI.UiComponents.BeginDataTable("###BeastTeamRows", 3))
         {
             try
             {
-                foreach (var pick in plan.Team)
+                foreach (var pick in BeastTeams.BookOrder(plan.Team))
                 {
                     if (Of(pick.Beast) is not { } beast) continue;
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(beast.Name);
+                    DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(localization.Format("BeastUi.BookNumber", beast.Id, beast.Name));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
                     // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
                     if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format("BeastUi.RankLow", board.RankRecommended, board.RankLimit)); }
