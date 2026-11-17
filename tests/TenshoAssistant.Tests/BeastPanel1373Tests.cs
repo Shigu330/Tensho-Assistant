@@ -22,14 +22,15 @@ internal static class BeastPanel1373Tests
         {
             var page = Read("src/TenshoAssistant/MainWindow.Beastmaster.cs");
             var panel = page[page.IndexOf("internal void DrawBeastBoardPanel()", StringComparison.Ordinal)..page.IndexOf("private void DrawBeastTeam(", StringComparison.Ordinal)];
-            Check(panel.Contains("var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;") && panel.Contains("DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);")
+            Check(panel.Contains("var wrapAt = ImGui.GetCursorPosX() + BeastPanelWrap;") && panel.Contains("DrawBeastPlan(plan, board, catalog, state.Obtained is null, wrapAt);")
                 && panel.Contains("ImGui.PushTextWrapPos(wrapAt);"), "the panel wraps at its width, its note too");
             var plan = page[page.IndexOf("internal void DrawBeastPlan(", StringComparison.Ordinal)..page.IndexOf("private (int Wiki, object? Seen, int Revision)? beastPlacesFor;", StringComparison.Ordinal)];
             Check(plan.Contains("ImGui.PushTextWrapPos(wrapAt);") && plan.Contains("finally { ImGui.PopTextWrapPos(); }"), "the plan's lines wrap, the wrap always popped");
             Check(!plan.Contains("\"    \"") && !plan.Contains("\"    → \"") && plan.Contains("ImGui.Indent();") && plan.Contains("finally { ImGui.Unindent(); }"), "indented as a block, so that a wrapped line keeps its indent");
             Check(plan.Contains("localization.Format(BeastTeams.HitKey(battle.Enemies), battle.WeaknessesHit, battle.Enemies)"), "the agreed text");
             var window = Read("src/TenshoAssistant/BeastBoardWindow.cs");
-            Check(window.Contains("public const float MaxWidth = 460, WrapWidth = MaxWidth - 24;") && window.Contains("new Vector2(MaxWidth, Math.Max(300, at.Height))"), "one width for the window and its wrap");
+            Check(window.Contains("public const float MaxWidth = 460, WrapWidth = MaxWidth - 24;") && window.Contains("owner.BeastPanelWrap = Beastmaster.BeastPanelSize.Wrap(width);")
+                && window.Contains("new Vector2(width, Math.Max(300, at.Height))"), "one width for the window and its wrap (X-551: the game's window beside it)");
         }),
     ];
 }

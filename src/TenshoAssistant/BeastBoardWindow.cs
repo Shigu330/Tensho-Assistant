@@ -24,7 +24,10 @@ internal sealed class BeastBoardWindow : Window
         var at = Windows();
         var x = at.Party ? at.PartyX + at.PartyWidth + 8 : at.X + at.Width + 8;
         ImGui.SetNextWindowPos(new Vector2(x, at.Y), ImGuiCond.Always);
-        ImGui.SetNextWindowSizeConstraints(new Vector2(300, 0), new Vector2(MaxWidth, Math.Max(300, at.Height)));
+        // X-551 (0.1534): never wider than the game's window it stands beside (nor taller than the board window); its lines wrap inside it.
+        var width = Beastmaster.BeastPanelSize.Width(at.Party ? at.PartyWidth : at.Width);
+        owner.BeastPanelWrap = Beastmaster.BeastPanelSize.Wrap(width);
+        ImGui.SetNextWindowSizeConstraints(new Vector2(Beastmaster.BeastPanelSize.Least, 0), new Vector2(width, Math.Max(300, at.Height)));
     }
     public override void Draw() => owner.DrawBeastBoardPanel();
 }

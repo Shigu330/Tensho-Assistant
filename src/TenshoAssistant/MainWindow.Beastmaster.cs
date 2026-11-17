@@ -356,7 +356,7 @@ internal sealed partial class MainWindow
         }
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
-        var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        var wrapAt = ImGui.GetCursorPosX() + BeastPanelWrap;
         var team = BeastTeamRead?.Invoke();
         // X-486 (0.1529, the user's request of 16/11): the fights the game's board window shows come first, one block each; the whole board
         // (the team taken, the advised plan) folded under « whole board ». The panel follows the window: it is read four times a second.
@@ -397,6 +397,9 @@ internal sealed partial class MainWindow
         }
         finally { ImGui.Unindent(); }
     }
+
+    /// <summary>X-551 (0.1534): the width the panel's lines wrap at (BeastBoardWindow sets it from the game's window beside it).</summary>
+    internal float BeastPanelWrap { get; set; } = BeastBoardWindow.WrapWidth;
 
     /// <summary>X-486 (0.1529): the fights the game's board window shows (null: not read).</summary>
     internal Func<IReadOnlySet<uint>?>? BeastFightsShown { get; set; }
@@ -494,13 +497,23 @@ internal sealed partial class MainWindow
         // X-562 M2: a plan kept before 0.1522 counts its beasts whose rank is assumed.
         if (BeastTeams.RanksUnknownOf(plan) is > 0 and var unknown) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", unknown, board.RankLimit));
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
-        foreach (var pick in plan.Team)
+        // X-551 (0.1534): one row per beast as the game's « Formation de l'équipe »: icon and name, rank, automatic attack.
+        if (TenshoAssistant.UI.UiComponents.BeginDataTable("###BeastTeamRows", 3))
         {
-            if (Of(pick.Beast) is not { } beast) continue;
-            DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
-            ImGui.TextUnformatted(localization.Format("BeastUi.TeamBeast", beast.Name, pick.Rank, beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical")));
+            try
+            {
+                foreach (var pick in plan.Team)
+                {
+                    if (Of(pick.Beast) is not { } beast) continue;
+                    ImGui.TableNextRow(); ImGui.TableNextColumn();
+                    DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(beast.Name);
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
+                    ImGui.TableNextColumn(); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                }
+            }
+            finally { ImGui.EndTable(); }
         }
-        ImGui.Spacing();
+        ImGui.Separator();
         foreach (var battle in plan.Battles)
         {
             if (battle.Battle >= board.Battles.Count) continue;

@@ -187,6 +187,7 @@
     "TeamRanksAssumed": "Rank not read yet for {0} of the team's beasts: rank {1} (the board's limit) is assumed for them. Ranks are read in the game's team window and in the board's result.",
     "TeamTen": "The {0} to bring:",
     "TeamBeast": "{0} (rank {1}, {2})",
+    "TeamRank": "rank {0}",
     "TeamFight": "Fight {0}",
     "TeamHit": "weakness hit: {0} of {1} enemies",
     "TeamHitOne": "weakness hit: {0} of {1} enemy",

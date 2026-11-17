@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1534.0
+- Plan global, X-551 : Dédale bestial, panneau d'équipe : il n'est jamais plus large que la fenêtre du jeu à côté de laquelle il se pose (formation de l'équipe, sinon disposition du plateau ; 460 pixels au plus, 300 au moins) ni plus haut que la disposition du plateau, et ses lignes vont à la ligne dans cette largeur. L'équipe conseillée est un tableau comme « Formation de l'équipe » du jeu : une ligne par bête (icône et nom, rang, attaque automatique), séparée du reste par un trait. Les mêmes lignes sur la page Dresseur › Équipe.
+- Pour les joueurs : dédale bestial : le panneau d'équipe reste dans la largeur de la fenêtre du jeu à côté et liste l'équipe en lignes comme la formation de l'équipe du jeu.
+- Tests : BeastPanelSize1534Tests. Verify.ps1 (agent) : 3065/3065, 0 avertissement, 0 erreur ; DLL 0.1534.0.0. Non validé en jeu.
+### English
+- Beast Labyrinth, team panel: it is never wider than the game's window it stands beside (the team formation, else the board layout; 460 pixels at most, 300 at least) nor taller than the board layout, and its lines wrap inside that width. The advised team is a table like the game's team formation: one row per beast (icon and name, rank, automatic attack), set apart from the rest by a line. The same rows on the Beastmaster › Team page.
+- For players: Beast Labyrinth: the team panel now stays within the width of the game's window beside it and lists the team in rows like the game's team formation.
+
 ## 0.1533.0
 - Plan global, X-558 : Fenêtre de chat, suite : après un rechargement, le code du chat est compilé d'avance avec celui de la carte et des panneaux, et la fenêtre de chat affiche « Chargement… » une ou deux secondes au lieu de le compiler pendant une image (mesure du 17/11 13 h 05 après 0.1532 : 62 ms pour la première image du chat, dont 5 ms de lecture des lignes et moins de 1 ms de mise en page).
 - Pour les joueurs : fenêtre de chat : plus d'à-coup à sa première image après un rechargement ; elle affiche « Chargement… » un instant à la place.

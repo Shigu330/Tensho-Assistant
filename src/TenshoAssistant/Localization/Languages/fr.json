@@ -187,6 +187,7 @@
     "TeamRanksAssumed": "Rang pas encore lu pour {0} bête(s) de l'équipe : le rang {1} (la limite du plateau) est supposé pour elles. Les rangs se lisent dans la fenêtre d'équipe du jeu et dans le résultat du plateau.",
     "TeamTen": "Les {0} à emmener :",
     "TeamBeast": "{0} (rang {1}, {2})",
+    "TeamRank": "rang {0}",
     "TeamFight": "Combat {0}",
     "TeamHit": "faiblesse touchée : {0} sur {1} ennemis",
     "TeamHitOne": "faiblesse touchée : {0} sur {1} ennemi",
