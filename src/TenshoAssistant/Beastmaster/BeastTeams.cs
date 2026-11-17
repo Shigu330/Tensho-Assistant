@@ -9,7 +9,12 @@ public sealed record BattlePlan(int Battle, IReadOnlyList<BeastPick> Team, int W
 /// <summary>The 10 beasts to bring for a board, and the 3 of each fight among them.</summary>
 /// <param name="RanksAssumed">X-549 (0.1522): a beast of the team (not of every beast held) has its rank assumed, or the beasts held are not read.</param>
 /// <param name="RanksUnknown">X-549: how many beasts of the team have their rank assumed (the board's limit).</param>
-public sealed record BoardPlan(uint Board, IReadOnlyList<BeastPick> Team, IReadOnlyList<BattlePlan> Battles, bool RanksAssumed, int RanksUnknown = 0);
+/// <param name="Left">X-575 (0.1543): the weaknesses of the board that no fight's three hit, and why (null: a plan kept before 0.1543).</param>
+public sealed record BoardPlan(uint Board, IReadOnlyList<BeastPick> Team, IReadOnlyList<BattlePlan> Battles, bool RanksAssumed, int RanksUnknown = 0, IReadOnlyList<WeaknessLeft>? Left = null);
+/// <summary>X-575 (0.1543): why a weakness of the board is left out: no beast held hits it, or the team's places all went to weaknesses of more enemies.</summary>
+public enum LeftReason { NoneHeld, NoRoom }
+/// <summary>X-575 (0.1543): a weakness of the board (its XBMElement row and name) that the plan leaves out, with the reason.</summary>
+public sealed record WeaknessLeft(uint Weakness, string Name, LeftReason Reason);
 /// <summary>X-549 (0.1522): where the board the panel shows comes from: the labyrinth's territory, the game's board or team window, or the
 /// list of the page (chosen by hand, when the game tells nothing).</summary>
 public enum BoardSource { Labyrinth, Window, Chosen }
@@ -21,6 +26,9 @@ public enum BoardSource { Labyrinth, Window, Chosen }
 /// 2) attack: for each enemy, the better of Strength over its Physical resistance stars and Intelligence over its Magical resistance stars;
 /// 3) defence: Physical resistance weighted by the enemy's Strength stars, Magical resistance by its Intelligence stars, plus Vitality.
 /// The 10: each fight's best 3 among every beast held, then the beasts chosen in the most fights, then the best attack. Nothing is guessed about a fight's outcome.
+/// X-575 (0.1543, the user's report of 17/11: « with an empty team it should take every weakness but does not »): the 10 first take, one by
+/// one, the beast held that adds the most enemies hit by their weakness over the whole board (each fight's three at most); only then the
+/// rule above fills the places left.
 /// </summary>
 public static class BeastTeams
 {
@@ -95,20 +103,66 @@ public static class BeastTeams
         }).ToArray();
         var fights = board.Battles.Select((battle, index) => (Index: index, battle.Enemies)).Where(fight => fight.Enemies.Count > 0).ToArray();
         IReadOnlyList<(BeastStats, uint)> Input(IEnumerable<int> members) => members.Select(member => (pool[member].Stats, pool[member].Beast.AutoRow)).ToArray();
-        // The 10: the beasts each fight would call from everything held, most fights first, then the best total attack.
         var size = Math.Max(1, Math.Min(board.TeamSize > 0 ? board.TeamSize : 10, pool.Length));
+        double Attack(int member) => fights.Sum(fight => fight.Enemies.Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
+        // X-575 (0.1543): the weaknesses first, over the whole board: each pick is the beast that adds the most enemies hit (a fight's three at
+        // most), then the one strongest against the enemies it hits, then the best total attack.
+        var weak = fights.Select(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0).GroupBy(enemy => enemy.WeaknessRow).ToDictionary(group => group.Key, group => group.Count())).ToArray();
+        var team = new List<int>();
+        var rows = new HashSet<uint>();
+        int Covered(HashSet<uint> present) => weak.Sum(fight => fight.Where(pair => present.Contains(pair.Key)).Select(pair => pair.Value).OrderDescending().Take(PerBattle).Sum());
+        double Strength(int member) => fights.Sum(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0 && enemy.WeaknessRow == pool[member].Beast.AutoRow)
+            .Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
+        while (team.Count < size)
+        {
+            var now = Covered(rows);
+            var next = Enumerable.Range(0, pool.Length).Where(member => !team.Contains(member) && pool[member].Beast.AutoRow != 0 && !rows.Contains(pool[member].Beast.AutoRow))
+                .Select(member => (Member: member, Gain: Covered([.. rows, pool[member].Beast.AutoRow]) - now)).Where(pick => pick.Gain > 0)
+                .OrderByDescending(pick => pick.Gain).ThenByDescending(pick => Strength(pick.Member)).ThenByDescending(pick => Attack(pick.Member)).ThenBy(pick => pool[pick.Member].Beast.Id).FirstOrDefault();
+            if (next.Gain <= 0) break;
+            team.Add(next.Member); rows.Add(pool[next.Member].Beast.AutoRow);
+        }
+        // The places left: the beasts each fight would call from everything held, most fights first, then the best total attack.
         var chosenIn = new int[pool.Length];
         foreach (var fight in fights)
             foreach (var member in Best(Input(Enumerable.Range(0, pool.Length)), fight.Enemies).Picks) chosenIn[member]++;
-        double Attack(int member) => fights.Sum(fight => fight.Enemies.Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
-        var team = Enumerable.Range(0, pool.Length).OrderByDescending(member => chosenIn[member]).ThenByDescending(Attack).ThenBy(member => pool[member].Beast.Id).Take(size).ToArray();
+        team.AddRange(Enumerable.Range(0, pool.Length).Where(member => !team.Contains(member)).OrderByDescending(member => chosenIn[member]).ThenByDescending(Attack)
+            .ThenBy(member => pool[member].Beast.Id).Take(size - team.Count));
         var battles = fights.Select(fight =>
         {
             var (picks, hit) = Best(Input(team), fight.Enemies);
             return new BattlePlan(fight.Index, picks.Select(pick => pool[team[pick]].Pick).ToArray(), hit, fight.Enemies.Count);
         }).ToArray();
+        // X-575: a weakness no fight's three hits is said with its reason: no beast held hits it, or the places went to weaknesses of more enemies.
+        var hitRows = team.Select(member => pool[member].Beast.AutoRow).ToHashSet();
+        var heldRows = pool.Select(member => member.Beast.AutoRow).ToHashSet();
+        var left = fights.SelectMany(fight => fight.Enemies).Where(enemy => enemy.WeaknessRow != 0 && !hitRows.Contains(enemy.WeaknessRow)).GroupBy(enemy => enemy.WeaknessRow)
+            .Select(group => new WeaknessLeft(group.Key, group.First().Weakness, heldRows.Contains(group.Key) ? LeftReason.NoRoom : LeftReason.NoneHeld)).OrderBy(row => row.Weakness).ToArray();
         var unknown = team.Count(member => !pool[member].Pick.RankKnown);
-        return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown);
+        return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown, left);
+    }
+
+    /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.</summary>
+    public const int PlanVersion = 2;
+
+    /// <summary>
+    /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made
+    /// before 0.1523 (magical beasts hit nothing then) and its key held only the beasts held and their ranks, so it was never made again.
+    /// The mark of the rules and of the game's data the plan comes from (each beast's attack and attributes, each enemy's weakness and stars,
+    /// each board's size and limit), part of the key: another version of the rules or of the game's sheets makes the plans again.
+    /// </summary>
+    public static string Mark(BeastCatalog catalog)
+    {
+        var hash = 2166136261u;
+        void Add(long value) { unchecked { hash = (hash ^ (uint)value) * 16777619u; hash = (hash ^ (uint)(value >> 32)) * 16777619u; } }
+        void Stats(BeastStats? stats) { if (stats is null) { Add(-1); return; } Add(stats.Strength); Add(stats.Intelligence); Add(stats.PhysicalResistance); Add(stats.MagicalResistance); Add(stats.Vitality); }
+        foreach (var beast in catalog.Beasts) { Add(beast.Id); Add(beast.AutoRow); Add(beast.Ranks.Count); foreach (var rank in beast.Ranks) Stats(rank); }
+        foreach (var board in catalog.Boards)
+        {
+            Add(board.Id); Add(board.TeamSize); Add(board.RankLimit); Add(board.Battles.Count);
+            foreach (var battle in board.Battles) { Add(battle.Enemies.Count); foreach (var enemy in battle.Enemies) { Add(enemy.WeaknessRow); Stats(enemy.Stars); } }
+        }
+        return $"v{PlanVersion}:{hash:x8}";
     }
 
     /// <summary>X-550 (0.1526): a beast of the team chosen in the game's team window: its rank shown there, and its HP (-1 and 0: not read).</summary>
@@ -279,8 +333,9 @@ public static class BeastTeams
         }
         return found;
     }
-    public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null)
-        => (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
+    /// <summary>X-575 (0.1543): mark = <see cref="Mark"/> of the catalog (empty: none), so a plan made by other rules or other data is made again.</summary>
+    public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null, string mark = "")
+        => (mark.Length > 0 ? mark + "|" : "") + (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
             .Select(pair => $"{pair.Key}:{pair.Value}{(floors?.Contains(pair.Key) == true ? "+" : "")}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
     /// <summary>

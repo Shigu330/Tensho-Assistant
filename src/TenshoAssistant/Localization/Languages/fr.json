@@ -213,6 +213,8 @@
     "MissInTeam": "{0} : pas touchée par ces trois ; dans l'équipe, {1} la toucherait.",
     "MissNone": "{0} : aucune bête de l'équipe ne la touche ; la toucheraient : {1}.",
     "MissNoneHeld": "{0} : aucune de vos bêtes ne la touche.",
+    "LeftNoneHeld": "{0} : laissée de côté, aucune de vos bêtes ne la touche.",
+    "LeftNoRoom": "{0} : laissée de côté, les {1} places sont allées aux faiblesses de plus d'ennemis.",
     "TeamRead": "Votre équipe (lue dans le jeu) : {0} bêtes. Les trois de chaque combat sont prises parmi elles :",
     "TeamReadDown": "{0} est à terre : pas appelée.",
     "TeamReadLow": "{0} : PV bas ({1}/{2}).",

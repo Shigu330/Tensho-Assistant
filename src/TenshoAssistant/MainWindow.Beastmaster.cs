@@ -186,7 +186,8 @@ internal sealed partial class MainWindow
     {
         LoadBeastPlans();
         var floors = LoadBeastPlans().Floors;
-        var key = BeastTeams.Key(state.Obtained, BeastRanks, floors);
+        // X-575 (0.1543): the key holds the mark of the rules and of the game's data: a plan kept from older rules is made again.
+        var key = BeastTeams.Key(state.Obtained, BeastRanks, floors, state.Catalog is { } marked ? BeastMarkOf(marked) : "");
         if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
         {
             beastPlanTask = null;
@@ -204,6 +205,13 @@ internal sealed partial class MainWindow
             beastPlanTask = Task.Run(() => BeastTeams.Plan(board, catalog.Beasts, held, ranks, floors));
         }
         return beastPlans.Plans.GetValueOrDefault(board.Id);
+    }
+    private (BeastCatalog Catalog, string Mark)? beastMark;
+    /// <summary>X-575 (0.1543): BeastTeams.Mark of the catalog, worked out once per catalog (R07).</summary>
+    private string BeastMarkOf(BeastCatalog catalog)
+    {
+        if (beastMark is not { } kept || !ReferenceEquals(kept.Catalog, catalog)) beastMark = kept = (catalog, BeastTeams.Mark(catalog));
+        return kept.Mark;
     }
     /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
     internal IReadOnlyDictionary<uint, int>? BeastRanks => LoadBeastPlans().Ranks;
@@ -513,6 +521,9 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndTable(); }
         }
+        // X-575 (0.1543): a weakness of the board no fight's three hits, and why: no beast held hits it, or the places went to weaknesses of more enemies.
+        foreach (var left in plan.Left ?? [])
+            ImGui.TextColored(Warning, localization.Format(left.Reason == LeftReason.NoneHeld ? "BeastUi.LeftNoneHeld" : "BeastUi.LeftNoRoom", left.Name, plan.Team.Count));
         ImGui.Separator();
         foreach (var battle in plan.Battles)
         {
@@ -530,8 +541,10 @@ internal sealed partial class MainWindow
                 foreach (var miss in BeastMissed(plan, battle, fight, catalog))
                 {
                     string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
-                    ImGui.TextColored(Warning, miss.InTeam.Count > 0 ? localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam))
-                        : miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
+                    // X-575 (0.1543): orange only when no beast brought hits the weakness; one of the team that could (its three places went
+                    // to weaknesses of more enemies) is said in grey.
+                    if (miss.InTeam.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam)));
+                    else ImGui.TextColored(Warning, miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
                         : localization.Format("BeastUi.MissNoneHeld", miss.Name));
                 }
             }

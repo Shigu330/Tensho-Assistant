@@ -213,6 +213,8 @@
     "MissInTeam": "{0}: not hit by these three; in the team, {1} would hit it.",
     "MissNone": "{0}: no beast of the team hits it; would hit it: {1}.",
     "MissNoneHeld": "{0}: none of your beasts hits it.",
+    "LeftNoneHeld": "{0}: left out of the plan, none of your beasts hits it.",
+    "LeftNoRoom": "{0}: left out of the plan, the {1} places went to weaknesses of more enemies.",
     "TeamRead": "Your team (read in the game): {0} beasts. The three of each fight are taken among them:",
     "TeamReadDown": "{0} is down: not called.",
     "TeamReadLow": "{0}: low HP ({1}/{2}).",
