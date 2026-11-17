@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (563 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (566 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -579,6 +579,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
 | X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in… | Done in 0.1487.0 |
 | X-480 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I2: finding in… | Done in 0.1469 |
+| X-481 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I3: finding in… | Done in 0.1525 |
 | X-482 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), minor M1, M2, M3, M4… | Done in 0.1472 |
 | X-483 | Tool (defect seen by the user on 11/15 around 11:40 pm on the test page… | Done in 0.1473.0 |
 | X-485 | User request of 11/15 around 11:55 pm (screenshot: the Tensho chat window drawn… | Done in 0.1479 |
@@ -631,12 +632,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-546 | Review  (review 0.1515, 17/11), I1: finding in q.py (agent file) :299 (French… | Done in 0.1516.0 |
 | X-547 | Review  (review 0.1515, 17/11), minor M1, M2, M3, M4: M1 in q.py (agent file)… | Done in 0.1516.0 |
 | X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
+| X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
+| X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (563 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (566 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1213,6 +1216,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
 | X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la… | Fait en 0.1487.0 |
 | X-480 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I2 : X-462 : MapOf… | Fait en 0.1469 |
+| X-481 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I3 : X-465 : la… | Fait en 0.1525 |
 | X-482 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), mineurs M1, M2… | Fait en 0.1472 |
 | X-483 | Outil (défaut vu par l'utilisateur le 15/11 vers 23 h 40 sur le tableau de bord… | Fait en 0.1473.0 |
 | X-485 | Demande de l'utilisateur du 15/11 vers 23 h 55 (capture : la fenêtre de chat… | Fait en 0.1479 |
@@ -1265,3 +1269,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-546 | Relecture  (relecture 0.1515, 17/11), I1 : X-542 : NOT_UNDERSTOOD laisse passer… | Fait en 0.1516.0 |
 | X-547 | Relecture  (relecture 0.1515, 17/11), mineurs M1, M2, M3, M4 : M1 : X-542 : des… | Fait en 0.1516.0 |
 | X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
+| X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
+| X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |

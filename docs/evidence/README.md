@@ -87,7 +87,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1502-game-chat-input.md](0.1502-game-chat-input.md) | `src/TenshoAssistant/Chat/ChatGameHide.cs`, `src/TenshoAssistant/Chat/ChatLogLayout.cs`, `src/TenshoAssistant/Chat/ChatLogLayoutProbe.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatReview1503Tests.cs` | `docs/changelog/CHANGELOG-0.1500-0.1599.md`, `docs/evidence/0.1508-game-chat-channel-menu.md`, `docs/project/DECISIONS.md` |
 | [0.1508-game-chat-channel-menu.md](0.1508-game-chat-channel-menu.md) | `src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs` | `docs/changelog/CHANGELOG-0.1500-0.1599.md` |
 | [0.151.0-questicon-probe.log](0.151.0-questicon-probe.log) | `src/TenshoAssistant/Maps/MapLocalIndexLoader.Dalamud.cs` | — |
-| [0.1517-chat-channel-help.md](0.1517-chat-channel-help.md) | `src/TenshoAssistant/Chat/ChatHelp.cs`, `tests/TenshoAssistant.Tests/ChatHelp1517Tests.cs` | — |
+| [0.1517-chat-channel-help.md](0.1517-chat-channel-help.md) | `src/TenshoAssistant/Chat/ChatHelp.cs`, `tests/TenshoAssistant.Tests/ChatHelp1517Tests.cs` | `docs/project/GLOBAL-PLAN.md` |
 | [0.1518-chat-filter-genres.md](0.1518-chat-filter-genres.md) | `tests/TenshoAssistant.Tests/ChatGenres1518Tests.cs` | — |
 | [0.1522-beast-board-read.md](0.1522-beast-board-read.md) | `src/TenshoAssistant/Beastmaster/BeastTeams.cs` | — |
 | [0.1523-beast-weakness.md](0.1523-beast-weakness.md) | `src/TenshoAssistant/Beastmaster/BeastCatalog.cs` | — |

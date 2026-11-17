@@ -2125,6 +2125,26 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1520) Réglages du chat, Joueurs : écrivez « raid, vente » dans « Mots d'alerte » ; quand un message de Hurler ou Crier contient l'un de ces mots, il est posé sur une bande colorée ; si son onglet n'est pas celui affiché, le nom de l'onglet porte « ! » devant, qui disparaît quand vous ouvrez l'onglet et descendez en bas
 
+- [ ] (0.1521) Réglages du chat, Joueurs : mettez un mot dans « Mots d'alerte », puis écrivez-le vous-même en /dire ou /équipe : votre message n'est pas posé sur la bande et l'onglet ne porte pas « ! » ; le même mot écrit par un autre joueur alerte toujours
+
+- [ ] (0.1521) Avec un mot d'alerte qui apparaît dans vos lignes de combat (par exemple le nom d'un ennemi) : l'onglet qui montre le combat ne porte jamais « ! » et ces lignes ne sont pas surlignées
+
+- [ ] (0.1522) Au Dédale bestial, 1er plateau, devant « Formation de l'équipe » : le panneau Tensho montre le nom du 1er plateau suivi de « (lu dans le jeu) », « Les 10 à emmener », et ne dit plus « Rangs pas encore lus » pour des bêtes dont le jeu montre le rang
+
+- [ ] (0.1522) Avant d'entrer, sur un autre plateau (2e ou plus), ouvrez sa disposition : le panneau Tensho prend ce plateau seul (nom et « (lu dans le jeu) ») ; s'il garde la liste, notez-le (le journal dit « Beastmaster board read in the game's windows: content … »)
+
+- [ ] (0.1522) Page Dresseur, onglet Équipe, après un plateau : sous « Dernier plateau », plus de « Rangs pas encore lus » contradictoire avec les rangs montrés
+
+- [ ] (0.1523) Au Dédale bestial, 1er plateau, devant la disposition du plateau : le panneau Tensho appelle Piège-volant (Glace) au combat 4 (Sarcopte, Glace) ; sous le combat 2 (Archidémon, Foudre) une ligne dit qu'aucune bête de l'équipe ne touche Foudre et nomme celles qui la toucheraient
+
+- [ ] (0.1523) Page Dresseur, onglet Bêtes : la colonne de l'attaque automatique montre l'élément des bêtes magiques (Feu, Glace…) comme le bestiaire du jeu, « Magique » seulement pour une attaque neutre
+
+- [ ] (0.1525) Après un plateau du Dédale bestial, page Dresseur, onglet Équipe, « Dernier plateau » ouvert : les lignes (chemin parcouru, affrontements, cibles d'élite, gardien du plateau, PV restants, score, bonus, total) ont les mêmes nombres que la fenêtre de résultat du jeu
+
+- [ ] (0.1526) Au Dédale bestial, emmenez une équipe différente de celle que conseille Tensho : devant « Formation de l'équipe », le panneau montre d'abord « Votre équipe (lue dans le jeu) » avec les trois bêtes de chaque combat prises parmi les vôtres, et « Sans X (conseillée) : Y à la place » quand une bête conseillée manque
+
+- [ ] (0.1526) Après un combat où une bête est tombée ou a perdu beaucoup de PV, rouvrez « Formation de l'équipe » : le panneau dit « … est à terre : pas appelée » ou « … : PV bas (a/b) » et ne l'appelle plus si elle est à terre
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
