@@ -170,12 +170,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Page Crédits (R-13, 0.320)** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Filtre (« MIT », « Garland »…) ; « Copier le lien » et « Copier la licence » remplissent le presse-papiers ; colonne Usage
+- [x] Filtre (« MIT », « Garland »…) ; « Copier le lien » et « Copier la licence » remplissent le presse-papiers ; colonne Usage
   renvoyée à la ligne, sans texte coupé à une largeur de fenêtre réduite.
 
 **Point d) — 0.321** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
+- [x] Paramètres › Modules › Artisanat : changer « Étapes », « Largeur », « Budget », « Attente » et « Écho », recharger le plugin : les
   valeurs restent ; le bouton ↺ remet chacune ; la case « Aide du carnet » s'enregistre au clic et montre son infobulle au survol.
 - [x] Paramètres › Avancé › « Revue de mode (FFXIVGachaSpreadsheet) » décoché : la page Revue de mode dit « source désactivée » quand
   aucune copie n'est gardée, sans téléchargement.
@@ -185,7 +185,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **Point d) — 0.325 : infobulles, confirmations** — pendant la campagne de tests en jeu de la fin (phase 6)
 
-- [ ] Survol des filtres, recherches, tris et champs de saisie des pages (Banque, Collections, Butin, Quêtes, Récolte, Objets,
+- [x] Survol des filtres, recherches, tris et champs de saisie des pages (Banque, Collections, Butin, Quêtes, Récolte, Objets,
   Artisanat, Marché, Cartes, Rangement, Triple Triad, Revue de mode, Équipement, Météo…) : chacun montre une infobulle, en
   français et en anglais, sans texte coupé.
 - [ ] Panneau du Duty Finder : la recherche accepte l'identifiant exact d'un objet ; ↻ a son infobulle ; la liste d'origine du
@@ -200,7 +200,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 **Étape e) — 0.327 : réglages** — pendant la campagne de tests en jeu de la fin (phase 6)
 
 - [x] Paramètres › Interface : nombre de résultats à 50 → la recherche d'objets en liste 50 et l'avis dit 50 ; ↺ remet 30.
-- [ ] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
+- [x] Paramètres › Général : « dernière page » coché, aller sur Carte, fermer, recharger le plugin → s'ouvre sur Carte ; décoché → Accueil.
 - [ ] Survol : décocher chaque partie (collection, stock, usages, comment l'obtenir) → elle disparaît du panneau sous l'infobulle du jeu
   seulement ; « masquer en mission » coché → pas de panneau dans un donjon.
 - [x] Triple Triad (observation activée) : chacun des trois interrupteurs coupe son aide (cadre du match, défi d'un PNJ, éditeur de decks).
@@ -515,7 +515,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.537 : s'effacer devant les fenêtres du jeu** — à voir en jouant
 
-- [ ] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
+- [x] Barre de PR, usure, suivi, tâches : une fenêtre du jeu les touche : elles se cachent. Le chat, les plaques de noms et le HUD ne les cachent pas.
 - [x] (rapport de l'utilisateur, 2026-11-05, « fenêtre ok ») Carte, réglage « S'effacer devant les fenêtres du jeu » coché : une fenêtre la touche : elle se cache sans se fermer.
 **0.538 et suivantes : un essai par ligne, marqué de sa version** — à voir en jouant
 
@@ -1069,10 +1069,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
+- [x] (0.911) Monde › Découvertes : les faits de pêche portent un libellé de pêche ; les ALÉA à (0,0) ont disparu.
 
 
-- [ ] (0.913) Survoler un bouton grisé (galerie d'outils pendant un chargement, carte d'un point sans carte) : l'info-bulle s'affiche ; les info-bulles longues ont toutes la même largeur.
+- [x] (0.913) Survoler un bouton grisé (galerie d'outils pendant un chargement, carte d'un point sans carte) : l'info-bulle s'affiche ; les info-bulles longues ont toutes la même largeur.
 
 - [x] (0.914) Glisser un curseur de la carte ou de l'équipement : l'effet suit en direct ; les réglages sont bien gardés après un rechargement.
 
@@ -1085,7 +1085,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.919) Atelier de la compagnie, après avoir consulté les résultats de l'aéronef : onglet des navires, « Dernier voyage : Mer de nuages - secteur 1 › … ».
 
-- [ ] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
+- [x] (0.920) Pages avec une erreur de source (source coupée ou hors ligne) : ligne rouge ; pages vides : ligne grise ; un bouton Copier : « Copié » à côté pendant deux secondes.
 
 - [x] (0.921) Parcourir quelques pages avec des icônes (contenus, actions, cartes de Triple Triade, carte du monde, vues panoramiques) : les icônes sont là et à la même taille.
 
@@ -1114,7 +1114,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.944) Paramètres : info-bulles relues ; carte › réglages : une seule case « zones de quête » (section Zones) ; craft › attente des bonus : le bouton par défaut revient à la valeur des actions.
+- [x] (0.944) Paramètres : info-bulles relues ; carte › réglages : une seule case « zones de quête » (section Zones) ; craft › attente des bonus : le bouton par défaut revient à la valeur des actions.
 
 
 
@@ -2109,7 +2109,21 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1511) Écran titre puis sélection du personnage, avec Tensho chargé et des fenêtres de Tensho laissées ouvertes à la dernière session (par exemple la fenêtre de chat Tensho) : aucune fenêtre ni panneau de Tensho n'apparaît ; après la connexion du personnage, les mêmes fenêtres reviennent ; Échap › Retour à l'écran titre : elles disparaissent, puis reviennent à la connexion suivante.
 
-- [ ] (0.1512) Option « Cacher les messages du chat du jeu » décochée (son défaut), mode développeur : en ouvrant et fermant des fenêtres du jeu et en déplaçant le chat du jeu, le journal de Dalamud n'écrit plus de ligne « Game chat: Tensho's place » ; option cochée : la fenêtre de chat Tensho se pose toujours sur les messages du jeu et y revient après une fenêtre du jeu posée dessus ou un combat.
+- [x] (0.1512) Option « Cacher les messages du chat du jeu » décochée (son défaut), mode développeur : en ouvrant et fermant des fenêtres du jeu et en déplaçant le chat du jeu, le journal de Dalamud n'écrit plus de ligne « Game chat: Tensho's place » ; option cochée : la fenêtre de chat Tensho se pose toujours sur les messages du jeu et y revient après une fenêtre du jeu posée dessus ou un combat.
+
+- [ ] (0.1517) Réglages du chat (roue de la fenêtre de chat Tensho), onglet d'un chat, liste des canaux : survolez cinq cases de canaux différents (par exemple Dire, Crier, Linkshell inter-Monde [3], Réseau des novices, Écho) : chaque infobulle commence par le nom entier du canal, puis explique ce canal (sa commande du jeu, qui le voit), et elles sont toutes différentes
+
+- [ ] (0.1517) Même onglet, « Utiliser les filtres du jeu » coché : ouvrez le groupe Discussion et survolez deux filtres (par exemple Dire et Emotes personnalisées) : l'infobulle donne le nom du filtre, l'exemple de ligne du jeu et les onglets du jeu qui le montrent par défaut
+
+- [ ] (0.1518) Réglages du chat (roue de la fenêtre de chat Tensho), un onglet avec « Utiliser les filtres du jeu » : ouvrez Combat puis « Par genre de ligne » ; décochez « Dégâts subis » : son compte passe à 0/11 ; ouvrez « Par sujet (qui agit) » puis « Vous » : « Dégâts subis par vous » est décoché aussi ; recochez « Dégâts subis » : les onze reviennent
+
+- [ ] (0.1518) Même onglet, en combat contre un monstre : avec « Dégâts infligés » coché et « Dégâts subis » décoché, l'onglet montre vos coups mais plus les coups que vous recevez
+
+- [ ] (0.1519) Réglages du chat, un onglet qui montre Hurler ou Crier : cochez « Replier les messages répétés » ; dans une cité où quelqu'un répète la même annonce, la fenêtre de chat Tensho ne la montre qu'une fois, avec « ×2 », « ×3 »… à sa fin ; survolez « ×3 » : l'infobulle dit combien de fois il est venu
+
+- [ ] (0.1519) Réglages du chat, Joueurs : écrivez le nom d'un joueur qui parle près de vous dans « Joueurs mis en avant » : chacun de ses messages est posé sur une bande colorée, son nom dans la couleur d'avertissement, et le texte reste lisible
+
+- [ ] (0.1520) Réglages du chat, Joueurs : écrivez « raid, vente » dans « Mots d'alerte » ; quand un message de Hurler ou Crier contient l'un de ces mots, il est posé sur une bande colorée ; si son onglet n'est pas celui affiché, le nom de l'onglet porte « ! » devant, qui disparaît quand vous ouvrez l'onglet et descendez en bas
 
 **0.535 : interfaces** — à voir en jouant
 
@@ -2206,7 +2220,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 **0.505 : guide des premiers pas (ONBOARD-001, lots 4 à 6)** — à voir en jouant
 
-- [ ] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
+- [x] Sur l'accueil, joueur existant : une proposition unique, « Non merci » la retire pour de bon. Vraie première installation : il s'ouvre seul à la première ouverture de Tensho (à tester avec une configuration vide ou par un testeur).
 
 **0.504 : signaler un problème (ONBOARD-001, lot 3)** — à voir en jouant
 

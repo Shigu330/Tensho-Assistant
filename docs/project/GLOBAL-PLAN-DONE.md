@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (560 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (563 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -628,12 +628,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-542 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), I1: finding in agent… | Done in 0.1514 |
 | X-543 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), minor M1, M2, M3, M4… | Done in 0.1514 |
 | X-544 | Tool: the state.py quota verdict (and the start hook) says « BELOW: one relay a… | Done in 0.1514 |
+| X-546 | Review  (review 0.1515, 17/11), I1: finding in q.py (agent file) :299 (French… | Done in 0.1516.0 |
+| X-547 | Review  (review 0.1515, 17/11), minor M1, M2, M3, M4: M1 in q.py (agent file)… | Done in 0.1516.0 |
+| X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (560 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (563 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1259,3 +1262,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-542 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), I1 : X-536… | Fait en 0.1514 |
 | X-543 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), mineurs M1, M2… | Fait en 0.1514 |
 | X-544 | Outil : le verdict de state.py quota (et le relevé du hook de démarrage) dit «… | Fait en 0.1514 |
+| X-546 | Relecture  (relecture 0.1515, 17/11), I1 : X-542 : NOT_UNDERSTOOD laisse passer… | Fait en 0.1516.0 |
+| X-547 | Relecture  (relecture 0.1515, 17/11), mineurs M1, M2, M3, M4 : M1 : X-542 : des… | Fait en 0.1516.0 |
+| X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
