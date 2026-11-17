@@ -44,7 +44,11 @@ internal sealed partial class MainWindow
         developerMode=developer;
         page=Page.Settings;
         if(category.Length>0)OpenSettingsCategory(tab,category);else requestedSettingsTab=tab;
+        // X-520 (0.1537): the chat's tabs pictured with the first tab's channels unfolded (X-560's grid).
+        desktopChatChannelsOpen=category=="ChatTabs";
     }
+    /// <summary>X-520 (0.1537): the first chat tab's channels are unfolded at the next draw (the desktop application's pictures only).</summary>
+    private bool desktopChatChannelsOpen;
 
     // X-151 (0.1238): the pages the application keeps in the game leave its navigation (their entry hidden, the groups rebuilt), before the
     // first frame; the application gives the rule (DesktopPages), the window its own entries (no reflection on the record's members any more).

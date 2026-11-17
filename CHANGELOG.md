@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1537.0
+- Plan global, X-520 : Images de référence de l'application de bureau : les deux images des réglages des onglets du chat montrent désormais les canaux du premier onglet dépliés, avec leur grille de cases (elle était repliée sous « Canaux » dans les images de la version précédente). Le contrôle des images ne prend plus le nom du canal « Erreurs » du chat pour un état d'erreur de la page.
+- Tests : ChatSettingsPicture1537Tests. Verify.ps1 (agent) : 3073/3073, 0 avertissement, 0 erreur ; DLL 0.1537.0.0. Rien à essayer en jeu.
+### English
+- Reference pictures of the desktop application: the two pictures of the chat's tab settings now show the first tab's channels unfolded, with their grid of boxes (it was folded under « Channels » in the previous version's pictures). The pictures' check no longer takes the chat's « Error » channel name for an error state of the page.
+
 ## 0.1536.0
 - Plan global, X-520 : Images de référence de l'application de bureau : chaque onglet de la page Paramètres a désormais la sienne (Panneaux, Carte, Suivi, Données, Avancé et, en mode développeur, Débogage, chacun dans sa première catégorie ; Général l'avait déjà), ainsi que les réglages des onglets du chat (grilles des canaux, des filtres du jeu et des genres de combat), en largeur normale et étroite. L'application ouvre l'onglet et la catégorie par une nouvelle entrée de son contrat typé avec le plugin (OpenSettings).
 - Tests : SettingsPictures1536Tests. Verify.ps1 (agent) : 3071/3071, 0 avertissement, 0 erreur ; DLL 0.1536.0.0. Rien à essayer en jeu.

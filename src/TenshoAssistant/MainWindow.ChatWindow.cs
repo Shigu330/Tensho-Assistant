@@ -381,6 +381,8 @@ internal sealed partial class MainWindow
                     if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"))){ChatMessages.Restart(tab);tabs.RemoveAt(index);chatSettingsPending=true;return;}
                     Tip("ChatWindow.TabRemoveTip");
                 }
+                // X-520 (0.1537): the desktop application's picture of the chat's tabs shows the first tab's channels (X-560's grid).
+                if(index==0 && desktopChatChannelsOpen){ImGui.SetNextItemOpen(true);desktopChatChannelsOpen=false;}
                 if(TenshoAssistant.UI.UiComponents.TreeNode(localization.Format("ChatWindow.TabChannels",tab.Channels?.Count ?? 0)+"###ChatTabChannels"))
                 {
                     try{DrawChatTabFilters(tab);}
