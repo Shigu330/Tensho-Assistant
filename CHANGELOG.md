@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1525.0
+- Plan global, X-481 : Dresseur, résultat du dernier plateau : ses lignes sont gardées et montrées comme la fenêtre du jeu : chemin parcouru, affrontements, cibles d'élite, gardien du plateau, PV restants (valeur et points), score, chaque bonus, bonus et total. Le sens de chaque index de la fenêtre XBMResult vient du relevé de l'utilisateur du 17/11 (fenêtre du jeu comparée à la ligne du mode développeur), porté dans la preuve 0.1470 ; les libellés sont les mots du jeu (Addon 17876 à 17882, DescriptionString 1730). Un résultat gardé avant cette version se relit sans ses lignes, rien n'est inventé.
+- Pour les joueurs : page Dresseur : le résultat du dernier plateau montre les mêmes lignes que la fenêtre de résultat du jeu (chemin, affrontements, cibles d'élite, gardien, PV restants, bonus, total).
+- Tests : BeastResultLines1525Tests. Verify.ps1 (agent) : 3040/3040, 0 avertissement, 0 erreur ; DLL 0.1525.0.0. Non validé en jeu.
+### English
+- Beastmaster, last board's result: its lines are kept and shown as the game's window shows them: moves made, enemies, elite enemies, boss, remaining HP (value and points), performance, each bonus, bonus boost and total score. What each index of the XBMResult window means comes from the user's reading of 17/11 (the game's window compared with the developer-mode line), put in evidence 0.1470; the labels are the game's words (Addon 17876 to 17882, DescriptionString 1730). A result kept before this version is read back without its lines; nothing is invented.
+- For players: Beastmaster page: the last board's result shows the same lines as the game's result window (moves, enemies, elite, boss, HP left, bonuses, total).
+
 ## 0.1524.0
 - Plan global, X-552 : Mode développeur, lecture du Dédale bestial : la ligne « Labyrinth reading » n'est plus réécrite toutes les 1,5 s. Elle était déjà écrite seulement quand elle change, mais elle nommait toutes les fenêtres visibles, et une infobulle ou une barre d'incantation qui apparaît et disparaît la changeait (188 lignes dans la séance du 17/11). Elle ne nomme plus que les fenêtres du Dédale (« XBM… », barre « JobHudXBM… » comprise) et les écrans de chargement qui séparent le plateau de l'arène.
 - Tests : LabyrinthLine1524Tests. Verify.ps1 (agent) : 3037/3037, 0 avertissement, 0 erreur ; DLL 0.1524.0.0. Rien à essayer en jeu.

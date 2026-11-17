@@ -6,7 +6,14 @@ public sealed record BeastGain(uint Beast, int RankBefore, int ExpBefore, int Ra
 /// <param name="Bonus">X-481 (0.1470): the window's « Bonus »: the points of the bonuses obtained; null when not read (unknown, never 0 by default).</param>
 /// <param name="Bonuses">X-481: how many bonuses were obtained; null when not read.</param>
 /// <param name="Total">X-481: the window's « Total »: the score and the bonus; null when not read.</param>
-public sealed record BoardResult(DateTimeOffset At, int Score, IReadOnlyList<BeastGain> Beasts, int? Bonus = null, int? Bonuses = null, int? Total = null);
+/// <param name="Parts">X-481 (0.1525): the score's lines as the window shows them; null in a result kept before 0.1525.</param>
+/// <param name="BonusPoints">X-481 (0.1525): each bonus's points, in the window's order; null when the bonus is not read.</param>
+public sealed record BoardResult(DateTimeOffset At, int Score, IReadOnlyList<BeastGain> Beasts, int? Bonus = null, int? Bonuses = null, int? Total = null,
+    BoardParts? Parts = null, IReadOnlyList<int>? BonusPoints = null);
+/// <summary>X-481 (0.1525, the user's reading R-X-481 of 17/11: the game's window beside the developer line of the same board): the score's lines,
+/// index 4 « Chemin parcouru » (moves made), 6 the enemies (« affrontement »), 8 the elite enemies (« cible d'élite »), 10 the boss (« gardien du
+/// plateau »), 12 « PV restants » (remaining HP) with its value at 11. docs/evidence/0.1470-beast-result-window.md.</summary>
+public sealed record BoardParts(int Path, int Enemies, int Elite, int Boss, int HpPoints, int? HpLeft);
 
 /// <summary>
 /// X-135 (0.1163, R06): the numbers of the game's result window XBMResult, as recorded on the 1st board on 2026-11-12 in developer mode
@@ -25,7 +32,7 @@ public static class BeastResults
     public const string Window = "XBMResult";
     /// <summary>Numbers read from the window (indexes 0 to 159).</summary>
     public const int ValueCount = 160;
-    private const int Score = 2, TeamSize = 72, Icons = 73, ExpBefore = 89, ExpAfter = 105, RankBefore = 121, RankAfter = 137, MaxTeam = 10, MaxExp = 100;
+    private const int Score = 2, HpLeft = 11, TeamSize = 72, Icons = 73, ExpBefore = 89, ExpAfter = 105, RankBefore = 121, RankAfter = 137, MaxTeam = 10, MaxExp = 100;
     private static readonly int[] ScoreParts = [4, 6, 8, 10, 12];
     // X-481 (0.1470): the bonuses' sum, their number, the first one's points (one slot each, at most 16 before index 47), the total.
     private const int BonusSum = 13, BonusCount = 14, BonusList = 31, BonusSlots = 16, Total = 68;
@@ -66,7 +73,12 @@ public static class BeastResults
             gains.Add(new BeastGain(beast.Id, (int)rankBefore, (int)expBefore, (int)rankAfter, (int)expAfter));
         }
         var (bonus, bonuses, total) = Bonuses(Value, score);
-        return new BoardResult(at, (int)score, gains.AsReadOnly(), bonus, bonuses, total);
+        // X-481 (0.1525): the parts were checked above (their sum is the score); the remaining HP's value kept when it is a plain number.
+        var hpLeft = Value(HpLeft);
+        var parts = new BoardParts((int)Value(ScoreParts[0]), (int)Value(ScoreParts[1]), (int)Value(ScoreParts[2]), (int)Value(ScoreParts[3]), (int)Value(ScoreParts[4]),
+            hpLeft is >= 0 and <= 1_000_000 ? (int)hpLeft : null);
+        IReadOnlyList<int>? points = bonuses is { } count ? Enumerable.Range(BonusList, count).Select(index => (int)Value(index)).ToArray() : null;
+        return new BoardResult(at, (int)score, gains.AsReadOnly(), bonus, bonuses, total, parts, points);
     }
 
     /// <summary>X-481 (0.1470): the window's bonus (sum, number) and total when they add up (each bonus above 0, their sum at 13, the total the score

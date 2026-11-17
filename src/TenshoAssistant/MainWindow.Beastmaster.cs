@@ -250,6 +250,7 @@ internal sealed partial class MainWindow
         // X-481 (0.1470): the window's bonus and total, when they were read.
         var totals = result.Total is { } total ? " · " + localization.Format("BeastUi.ResultTotal", result.Bonus ?? 0, result.Bonuses ?? 0, total) : "";
         if (!TenshoAssistant.UI.UiComponents.Header(localization.Format("BeastUi.ResultTitle", result.At.ToLocalTime().ToString("g"), result.Score) + totals + "###BeastResult", ImGuiTreeNodeFlags.None)) return;
+        DrawBeastResultLines(result);
         foreach (var gain in result.Beasts)
         {
             var beast = catalog.Beasts.FirstOrDefault(row => row.Id == gain.Beast);
@@ -258,6 +259,35 @@ internal sealed partial class MainWindow
             if (gain.RankAfter > gain.RankBefore) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.ResultRanks", gain.RankAfter - gain.RankBefore)); }
         }
     }
+    /// <summary>X-481 (0.1525): the result's lines as the game's window shows them: the score's parts (a label, the value when it has one, the
+    /// points), the score, each bonus's points, the bonus and the total. Labels from the game's own words (docs/evidence/0.1470-beast-result-window.md).</summary>
+    private void DrawBeastResultLines(BoardResult result)
+    {
+        if (result.Parts is not { } parts) return;
+        if (!TenshoAssistant.UI.UiComponents.BeginDataTable("BeastResultLines", 3)) return;
+        try
+        {
+            void Line(string key, string value, int points, bool strong = false)
+            {
+                ImGui.TableNextRow(); ImGui.TableNextColumn();
+                if (strong) ImGui.TextColored(Accent, localization.Get(key)); else ImGui.TextUnformatted(localization.Get(key));
+                ImGui.TableNextColumn(); ImGui.TextDisabled(value);
+                ImGui.TableNextColumn(); ImGui.TextUnformatted(points.ToString("N0", System.Globalization.CultureInfo.CurrentCulture));
+            }
+            Line("BeastUi.ResultPath", "", parts.Path);
+            Line("BeastUi.ResultEnemies", "", parts.Enemies);
+            Line("BeastUi.ResultElite", "", parts.Elite);
+            Line("BeastUi.ResultBoss", "", parts.Boss);
+            Line("BeastUi.ResultHp", parts.HpLeft?.ToString(System.Globalization.CultureInfo.CurrentCulture) ?? "", parts.HpPoints);
+            Line("BeastUi.ResultScore", "", result.Score, true);
+            if (result.BonusPoints is { } points)
+                for (var index = 0; index < points.Count; index++) Line("BeastUi.ResultBonusOne", (index + 1).ToString(System.Globalization.CultureInfo.CurrentCulture), points[index]);
+            if (result.Bonus is { } bonus) Line("BeastUi.ResultBonusLine", "", bonus, true);
+            if (result.Total is { } total) Line("BeastUi.ResultTotalLine", "", total, true);
+        }
+        finally { ImGui.EndTable(); }
+    }
+
     /// <summary>X-109 (0.981): the board of a labyrinth territory (its ContentFinderCondition); null outside.</summary>
     internal Func<uint, uint>? BeastBoardOfTerritory { get; set; }
 
