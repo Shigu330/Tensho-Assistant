@@ -84,6 +84,21 @@ public static class ChatTextFilter
     public static string Text(ChatRecord record)=>record.Sender+" "+string.Concat(record.Body.Select(segment=>segment.Text));
 }
 
+/// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>
+public static class ChatAlert
+{
+    /// <summary>A message (its text, not its sender's name) holds one of the words, capitals ignored; what you send yourself never alerts.</summary>
+    public static bool Holds(ChatRecord record,IReadOnlyList<string> words)
+    {
+        if(words.Count==0 || !ChatChannels.CountsAsUnread(record.Channel))return false;
+        var text=string.Concat(record.Body.Select(segment=>segment.Text));
+        return words.Any(word=>SearchText.Contains(text,word,StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>The tab's label with « ! » in front while an alert in it is not seen.</summary>
+    public static string Mark(string label,int alerts)=>alerts>0 ? "! "+label:label;
+}
+
 /// <summary>X-484 (0.1519, beyond the game): a message that repeats the one shown just before it in a tab: same kind, channel, sender and text,
 /// at most <see cref="Window"/> after the last time it came. Pure (tests).</summary>
 public static class ChatRepeat

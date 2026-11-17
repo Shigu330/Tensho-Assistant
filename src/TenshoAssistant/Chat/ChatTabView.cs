@@ -23,6 +23,8 @@ public sealed class ChatTabView
     private bool started;
     private int layoutCursor=-1;
     public int Unread{get;private set;}
+    /// <summary>X-484 (0.1520): the messages holding an alert word not seen yet (cleared with <see cref="Unread"/>).</summary>
+    public int Alerts{get;private set;}
     public int Count=>records.Count;
     public float Width{get;private set;}=-1;
     /// <summary>X-457 (0.1462): the rows and the visible height of the window at the end of the frame before (« at the bottom » is read
@@ -38,6 +40,7 @@ public sealed class ChatTabView
     {
         var changed=false;
         ChatTabFilter? filter=null;
+        IReadOnlyList<string>? alerts=null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
@@ -52,6 +55,7 @@ public sealed class ChatTabView
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;
             if(started && ChatChannels.CountsAsUnread(record.Channel))Unread++;
+            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
             changed=true;
         }
         started=true;
@@ -65,7 +69,7 @@ public sealed class ChatTabView
     }
 
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
-    public void MarkSeen()=>Unread=0;
+    public void MarkSeen(){Unread=0;Alerts=0;}
 
     public ChatRecord RecordAt(int index)=>records[index];
     /// <summary>X-484 (0.1519): how many times the message at this place came again right after itself (0: never, or the tab does not fold).</summary>

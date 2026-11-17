@@ -34,6 +34,8 @@ internal sealed partial class MainWindow
     }
     // X-484 (0.1482): the players whose name stands out, read once per frame.
     private IReadOnlyList<string> chatHighlighted=[];
+    // X-484 (0.1520): the alert words, read once per frame.
+    private IReadOnlyList<string> chatAlertWords=[];
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
@@ -532,6 +534,7 @@ internal sealed partial class MainWindow
             chatSettingsPending=true;
         },600,300);
         TextSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600,300);
+        TextSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600,300);
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
@@ -613,6 +616,7 @@ internal sealed partial class MainWindow
         var table=ChatFilterTableNow();
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
+        chatAlertWords=ChatTextFilter.Words(options.AlertWords);
         // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
         var reduced=chatReduced && !chatFollowing;
         if(options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
@@ -647,7 +651,7 @@ internal sealed partial class MainWindow
                 var view=ChatMessages.ViewOf(tab);
                 bool open;
                 var coloured=PushChatTabColor(tab);
-                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
                 finally{if(coloured)ImGui.PopStyleColor();}
                 if(!open)continue;
                 chatTabShown=index;
@@ -905,12 +909,14 @@ internal sealed partial class MainWindow
         // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
         var left=ImGui.GetCursorPosX();
         // X-484 (0.1519, the user's request of 17/11: the player put forward more visible): a band in the warning colour behind the whole message.
-        if(ChatTextFilter.IsPlayer(record.Sender,chatHighlighted))
+        // X-484 (0.1520): a message holding an alert word on a band in the accent colour (a player put forward keeps the warning colour).
+        var put=ChatTextFilter.IsPlayer(record.Sender,chatHighlighted);
+        if(put || ChatAlert.Holds(record,chatAlertWords))
         {
             ImGui.SetCursorPosY(y);
             var top=ImGui.GetCursorScreenPos();
             ImGui.GetWindowDrawList().AddRectFilled(top-new Vector2(2,0),top+new Vector2(ImGui.GetContentRegionAvail().X+2,Math.Max(1,lines.Count)*height),
-                ImGui.GetColorU32(Warning with {W=ChatLook.HighlightBandAlpha}),3f);
+                ImGui.GetColorU32((put ? Warning:Accent) with {W=ChatLook.HighlightBandAlpha}),3f);
         }
         var indent=ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent);
         for(var line=0;line<lines.Count;line++)

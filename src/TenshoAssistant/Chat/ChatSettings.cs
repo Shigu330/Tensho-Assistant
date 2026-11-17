@@ -59,6 +59,9 @@ public sealed class ChatSettings
     /// <summary>X-484 (0.1482, beyond the game): players whose messages no tab shows, and players whose name stands out (commas between names).</summary>
     public string? HiddenPlayers{get;set;}
     public string? HighlightedPlayers{get;set;}
+    /// <summary>X-484 (0.1520, beyond the game; the « alerts » of the chat study, X-447): words that make a message stand out (commas between
+    /// them, capitals ignored): its line on a band, and its tab marked « ! » until it is seen.</summary>
+    public string? AlertWords{get;set;}
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
     /// default, as the game's chat.</summary>
     public bool TabsAtBottom{get;set;}=true;

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1520.0
+- Plan global, X-484 : Fenêtre de chat, en plus du jeu : « Mots d'alerte » (réglages du chat, Joueurs) : un message qui contient l'un de ces mots (séparés par des virgules, majuscules ignorées) est posé sur une bande dans la couleur d'accent, et son onglet porte « ! » devant son nom jusqu'à ce que vous le voyiez. Le nom de l'auteur ne compte pas, vos propres messages n'alertent jamais ; pas de son.
+- Pour les joueurs : le chat peut guetter des mots d'alerte : un message qui en contient un ressort sur une bande et son onglet porte « ! » jusqu'à ce que vous le voyiez.
+- Tests : ChatAlerts1520Tests. Verify.ps1 (agent) : 3024/3024, 0 avertissement, 0 erreur ; DLL 0.1520.0.0. Non validé en jeu.
+### English
+- Chat window, beyond the game: « Alert words » (chat settings, Players): a message holding one of these words (commas between them, capitals ignored) sits on a band in the accent colour, and its tab shows « ! » in front of its name until you see it. The sender's name does not count, your own messages never alert; no sound.
+- For players: The chat can watch for alert words: a message holding one stands out on a band and its tab is marked « ! » until you see it.
+
 ## 0.1519.0
 - Plan global, X-484 : Fenêtre de chat, en plus du jeu : chaque onglet peut « Replier les messages répétés » (réglage de l'onglet, non par défaut) : un message qui revient juste après lui-même (même canal, même auteur, même texte, à moins d'une minute du précédent) n'est plus montré de nouveau, le premier porte « ×3 » à sa fin, avec une infobulle. Les joueurs mis en avant ressortent davantage : en plus de leur nom dans la couleur d'avertissement, tout leur message est posé sur une bande de cette couleur.
 - Pour les joueurs : un onglet du chat peut replier un message répété juste après lui-même (« ×3 »), et les joueurs mis en avant ressortent sur une bande colorée.
