@@ -46,12 +46,11 @@ internal static class MapZoom542Tests
             foreach(var layer in new[]{"ShowQuests","ShowFates","ShowGathering","ShowVendors","ShowSightseeing","ShowAetherCurrents","ShowParty","ShowBookmarks","ShowHuntMarks","ShowTreasure","ShowFixedIcons","ShowPlaceNames"})
                 Check(view[view.IndexOf("private void DrawMapLayers()")..view.IndexOf("// Mappy-like display settings")].Contains($"SettingBox(\"MapView.{layer}\""),layer);
         }),
-        ("Map (0.546): the flag on a left click is a setting, on an empty spot, not after a drag",() =>
+        ("Map (0.546): the flag on a left click is a setting, off by default, on an empty spot, not after a drag",() =>
         {
-            // X-535 (0.1513): on by default (as on the game's map); the rule moved to Maps.MapClickFlag (MapClickFlag1513Tests).
-            Check(new TenshoAssistant.MapViewSettings().FlagOnLeftClick,"on by default (X-535)");
+            Check(!new TenshoAssistant.MapViewSettings().FlagOnClick,"off by default");
             var view=Read("MainWindow.MapView.cs");
-            Check(view.Contains("if(Maps.MapClickFlag.Places(settings.FlagOnLeftClick,hovered,top is not null,linkUnderMouse is not null,hoveredBookmark is not null,tooltipPoint is not null,sightseeingTip is not null,map.TerritoryId,ImGui.IsMouseReleased(ImGuiMouseButton.Left),mapDragged))"),"empty spot, zone map, no drag");
+            Check(view.Contains("if(settings.FlagOnClick && hovered && top is null && linkUnderMouse is null && hoveredBookmark is null") && view.Contains("map.TerritoryId!=0 && ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !mapDragged)"),"empty spot, zone map, no drag");
         }),
         ("Map (0.545): the wheel keeps its old step until set, can be inverted, and a bad value does no harm",() =>
         {

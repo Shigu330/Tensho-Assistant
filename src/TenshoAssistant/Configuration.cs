@@ -251,9 +251,8 @@ public sealed class MapViewSettings
     // 0.378 (g, M-08): the player's bookmarks drawn on the Tensho map (a click places the flag).
     public bool ShowBookmarks { get; set; } = true;
     public float PlaceNameScale { get; set; } = 1f;
-    // 0.546 (P16, user request: on a setting): a short left click on an empty spot places the flag. X-535 (17/11, test T-0.546-1: « a click
-    // on the map places no flag »): on by default, as on the game's map; renamed (was FlagOnClick, off) so a value saved off is not read back.
-    public bool FlagOnLeftClick { get; set; } = true;
+    // 0.546 (P16, user request: on a setting): a short left click on an empty spot places the flag; off by default.
+    public bool FlagOnClick { get; set; }
     // 0.545 (P5): the wheel's step and direction; 1.15 is what the map always did.
     public float WheelStep { get; set; } = 1.15f;
     public bool WheelInvert { get; set; }
