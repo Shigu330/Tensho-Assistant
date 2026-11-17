@@ -227,6 +227,13 @@ internal sealed partial class MainWindow
         beastPlans = plans with { Ranks = merged, Floors = floors };
         SaveBeastPlans();
     }
+    /// <summary>X-578 (0.1548): a page of the game's bestiary read: the beast's own rank, saved when something changes (BeastTeams.WithBook).</summary>
+    internal void BeastBookRead(BeastTeams.BookRead read)
+    {
+        if (BeastTeams.WithBook(LoadBeastPlans(), read) is not { } plans) return;
+        beastPlans = plans;
+        SaveBeastPlans();
+    }
     /// <summary>X-549 (0.1522): the board the game's board or team window is about (0: not read).</summary>
     internal Func<uint>? BeastBoardContent { get; set; }
     /// <summary>X-549 (0.1522): the board the game is on: the labyrinth's territory, else the game's board or team window (BeastTeams.Current).</summary>

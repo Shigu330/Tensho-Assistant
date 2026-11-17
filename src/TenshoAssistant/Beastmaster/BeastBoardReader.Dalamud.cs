@@ -15,6 +15,7 @@ public readonly record struct BoardWindows(bool Board, float X, float Y, float W
 /// X-109 (0.981, DEC-047): reads, four times a second, whether the game's board window (XBMStageDetailList) and team window (XBMPetParty) are open and where,
 /// and the ranks the team window shows. Read only. Out of a cut as usual; in the labyrinth only while its board is open (CompetitiveGate.AddBoard).
 /// X-135 (0.1163): also the board's result window (XBMResult): its numbers only, read again only when they change (BeastResults).
+/// X-578 (0.1548): also the bestiary's beast page (XBMMonsterBookDetail): each beast's own rank, read again only when the page changes.
 /// </summary>
 internal sealed class BeastBoardReader : IDisposable
 {
@@ -24,6 +25,9 @@ internal sealed class BeastBoardReader : IDisposable
     private readonly Func<IReadOnlyList<Beast>?> beasts;
     private readonly Action<Dictionary<uint, int>> ranksRead;
     private readonly Action<BoardResult>? resultRead;
+    private readonly Action<BeastTeams.BookRead>? bookRead;
+    private string? bookSeen;
+    private bool bookWarned;
     private DateTimeOffset next;
     private bool warned;
     private bool resultWarned;
@@ -33,9 +37,10 @@ internal sealed class BeastBoardReader : IDisposable
     private BoardWindows state;
     public BoardWindows State => state;
 
-    public BeastBoardReader(IFramework framework, IGameGui gui, IPluginLog log, Func<IReadOnlyList<Beast>?> beasts, Action<Dictionary<uint, int>> ranksRead, Action<BoardResult>? resultRead = null)
+    public BeastBoardReader(IFramework framework, IGameGui gui, IPluginLog log, Func<IReadOnlyList<Beast>?> beasts, Action<Dictionary<uint, int>> ranksRead, Action<BoardResult>? resultRead = null,
+        Action<BeastTeams.BookRead>? bookRead = null)
     {
-        this.framework = framework; this.gui = gui; this.log = log; this.beasts = beasts; this.ranksRead = ranksRead; this.resultRead = resultRead;
+        this.framework = framework; this.gui = gui; this.log = log; this.beasts = beasts; this.ranksRead = ranksRead; this.resultRead = resultRead; this.bookRead = bookRead;
         TenshoAssistant.Competitive.CompetitiveGate.AddBoard(framework, OnUpdate);
     }
 
@@ -47,6 +52,7 @@ internal sealed class BeastBoardReader : IDisposable
         try
         {
             ReadResult(now);
+            ReadBook();
             var board = gui.GetAddonByName("XBMStageDetailList");
             var party = gui.GetAddonByName("XBMPetParty");
             var boardUnit = board.IsNull || !board.IsVisible ? null : (AtkUnitBase*)board.Address;
@@ -160,6 +166,35 @@ internal sealed class BeastBoardReader : IDisposable
             resultWarned = true;
             // X-465 (0.1465): why, in numbers (read again at each change of the window: one filled later is still read).
             log.Warning("The Beastmaster board result window could not be read (unavailable, maybe after a game update): nothing kept ({0}).", BeastResults.Why(values, known));
+        }
+    }
+
+    /// <summary>
+    /// X-578 (0.1548, the user's request of 18/11: « in the labyrinth, its bestiary shows the ranks of every beast one holds »): the bestiary's
+    /// beast page (XBMMonsterBookDetail, open in and out of the labyrinth): its texts (read only), parsed when they change (BeastTeams.ParseBook);
+    /// a page of a held beast that does not fit is said once in the log, nothing kept.
+    /// </summary>
+    private unsafe void ReadBook()
+    {
+        if (bookRead is null) return;
+        var addon = gui.GetAddonByName("XBMMonsterBookDetail");
+        if (addon.IsNull || !addon.IsVisible) { bookSeen = null; return; }
+        var unit = (AtkUnitBase*)addon.Address;
+        if (unit->RootNode == null || beasts() is not { Count: > 0 } known) return;
+        var texts = new List<string>();
+        BeastWindowProbe.Texts(&unit->UldManager, 0, texts);
+        var seen = string.Join("\u001f", texts);
+        if (seen == bookSeen) return;
+        bookSeen = seen;
+        if (BeastTeams.ParseBook(texts, known) is { } read)
+        {
+            log.Information("Beastmaster bestiary read: beast {0}, rank {1} (synchronised {2}).", read.Beast, read.Rank, read.Synced);
+            bookRead(read);
+        }
+        else if (!bookWarned && texts.Any(text => text.Length > 2 && text[0] == '(' && text[^1] == ')'))
+        {
+            bookWarned = true;
+            log.Warning("The Beastmaster bestiary's beast page could not be read (unavailable, maybe after a game update): nothing kept.");
         }
     }
 

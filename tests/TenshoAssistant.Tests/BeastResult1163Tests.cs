@@ -75,7 +75,7 @@ internal static class BeastResult1163Tests
             var reader = Read("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs");
             Check(reader.Contains("ReadResult(now);") && reader.Contains("gui.GetAddonByName(BeastResults.Window)") && reader.Contains("value.Type == AtkValueType.Int") && !reader.Contains("AtkValueType.String"), "numbers only");
             Check(reader.Contains("if (seen == resultSeen) return;"), "parsed once per change");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.BeastRanksRead,mainWindow.BeastResultRead)"), "the reader hands the result to the page");
+            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.BeastRanksRead,mainWindow.BeastResultRead"), "the reader hands the result to the page");
             var page = Read("src/TenshoAssistant/MainWindow.Beastmaster.cs");
             Check(page.Contains("DrawBeastResult(catalog);") && page.Contains("BeastResults.Merge(plans.Ranks, result)") && page.Contains("\"BeastUi.KnownRank\""), "the page shows it and uses the ranks");
             // 0.1522 (X-549): the ranks read are merged as floors (BeastTeams.MergeRanks), still from the plans loaded first.

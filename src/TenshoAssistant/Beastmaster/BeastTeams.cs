@@ -344,6 +344,9 @@ public static class BeastTeams
     /// X-561 (review of 0.1526, I1): a beast's rank never goes down in the game, so a rank read never lowers a rank known higher, whatever the
     /// limit (limit 0 when the board is not known, or a window's limit lower than the beast's rank): the known rank and its « at least » stay.
     /// </summary>
+    /// <summary>X-578 (0.1548): the limit to give <see cref="MergeRanks"/> for a rank read in the bestiary: the beast's own, never a floor.</summary>
+    public const int Exact = int.MaxValue;
+
     public static (Dictionary<uint, int> Ranks, HashSet<uint> Floors) MergeRanks(IReadOnlyDictionary<uint, int>? known, IReadOnlySet<uint>? floors, IReadOnlyDictionary<uint, int> read, int limit)
     {
         var ranks = new Dictionary<uint, int>(known ?? new Dictionary<uint, int>());
@@ -366,7 +369,53 @@ public static class BeastTeams
     /// <summary>The plans kept on disk (X-109: « cache disque »), one per board, with what they were computed from.</summary>
     /// <summary>X-135 (0.1163): Result = the last board's result read in the game's result window (null before the first one; older files have none).</summary>
     /// <summary>X-549 (0.1522): Floors = the beasts whose rank is only known to be at least the one kept (read at a board's limit).</summary>
-    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys, Dictionary<uint, int>? Ranks = null, BoardResult? Result = null, HashSet<uint>? Floors = null);
+    /// <summary>X-578 (0.1548): Book = each beast's page last read in the game's bestiary (null: none read, or a file of before).</summary>
+    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys, Dictionary<uint, int>? Ranks = null, BoardResult? Result = null, HashSet<uint>? Floors = null,
+        Dictionary<uint, BookRead>? Book = null);
+
+    /// <summary>
+    /// X-578 (0.1548): a beast's page of the game's bestiary (XBMMonsterBookDetail): its rank (« Rang 5 (8) »: 8 the beast's own rank, 5 the
+    /// rank it is synchronised at on the board), the attributes and HP the page shows (those of the synchronised rank) and its experience.
+    /// </summary>
+    public sealed record BookRead(uint Beast, int Rank, int Synced, BeastStats Stats, int Hp, int Exp);
+
+    /// <summary>
+    /// X-578 (0.1548, docs/evidence/0.1548-beast-book.md): the texts of the bestiary's beast page, in the order of the window's nodes: each
+    /// value before its label (« 0/3; Satiété; 83; Rés. magique; 95; Intelligence; 125; Vitalité; 88; Rés. physique; 154; Force; 608/608; PV;
+    /// 78/100; Exp; (8); 5; Rang »), then the beast's name. Read by place from the only « (n) » text (the beast's own rank, the synchronised
+    /// one after it), so the client's language does not matter; the beast by its name (the catalog's names come from the client's sheets).
+    /// A beast not held shows no numbers (« Exp; Rang »): none. Anything out of shape (after a game update): none, never a wrong rank (R08).
+    /// </summary>
+    public static BookRead? ParseBook(IReadOnlyList<string> texts, IReadOnlyList<Beast> beasts)
+    {
+        var named = texts.Select(text => beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, text, StringComparison.CurrentCultureIgnoreCase)))
+            .Where(row => row is not null).Distinct().ToArray();
+        var at = Enumerable.Range(0, texts.Count).Where(index => Own(texts[index]) > 0).ToArray();
+        if (named is not [{ } beast] || at is not [var own] || own < 16 || own + 1 >= texts.Count) return null;
+        static int Own(string text) => text.Length > 2 && text[0] == '(' && text[^1] == ')' && int.TryParse(text[1..^1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : 0;
+        static int Whole(string text) => int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : -1;
+        static int Part(string text) => text.Split('/') is [var now, var most] && Whole(now) >= 0 && Whole(most) > 0 ? Whole(now) : -1;
+        var rank = Own(texts[own]);
+        var synced = Whole(texts[own + 1]);
+        int[] stats = [Whole(texts[own - 6]), Whole(texts[own - 12]), Whole(texts[own - 8]), Whole(texts[own - 14]), Whole(texts[own - 10])];
+        var (exp, hp, satiety) = (Part(texts[own - 2]), Part(texts[own - 4]), Part(texts[own - 16]));
+        if (rank > Math.Max(1, beast.Ranks.Count) || synced < 1 || synced > rank || stats.Any(value => value < 0) || exp < 0 || hp < 0 || satiety < 0) return null;
+        return new BookRead(beast.Id, rank, synced, new BeastStats(stats[0], stats[1], stats[2], stats[3], stats[4]), hp, exp);
+    }
+
+    /// <summary>
+    /// X-578 (0.1548): a page of the bestiary read: its rank is the beast's own (not a floor: <see cref="Exact"/>), merged so that a rank
+    /// known higher never goes down (X-561); the page kept, unless one of a higher rank is kept. Null when nothing changes (no write).
+    /// </summary>
+    public static SavedPlans? WithBook(SavedPlans plans, BookRead read)
+    {
+        var (ranks, floors) = MergeRanks(plans.Ranks, plans.Floors, new Dictionary<uint, int> { [read.Beast] = read.Rank }, Exact);
+        var book = new Dictionary<uint, BookRead>(plans.Book ?? []);
+        if (!book.TryGetValue(read.Beast, out var before) || before.Rank <= read.Rank) book[read.Beast] = read;
+        var same = plans.Ranks is { } known && known.Count == ranks.Count && ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)
+            && (plans.Floors ?? []).SetEquals(floors) && plans.Book is { } kept && kept.Count == book.Count && book.All(pair => kept.TryGetValue(pair.Key, out var page) && page == pair.Value);
+        return same ? null : plans with { Ranks = ranks, Floors = floors, Book = book };
+    }
 
     /// <summary>
     /// X-109 (0.981): the ranks shown in the game's team window (XBMPetParty: each beast's attributes, then its name, then its rank; docs/evidence/0.980-beast-teams.md).

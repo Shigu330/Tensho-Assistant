@@ -184,7 +184,7 @@
     "TeamRules": "Prepared out of combat, before entering. The game gives no formula for the fights, so Tensho follows plain rules, in this order: 1) hit the weakness of as many enemies as possible (automatic attack of their weak type), in each fight the strongest monster's first (the sum of its stars), even against several weaker monsters; 2) attack: the better of Strength against their Physical resistance stars and Intelligence against their Magical resistance stars; 3) defence: resistances weighted by their Strength and Intelligence stars, plus Constitution. The team: first the beasts that add the most enemies hit by their weakness over the whole board, then each fight's best 3 among your beasts. In each fight the 3 are in calling order, the best first, by the same rules; the rank counts only through the attributes it gives.",
     "TeamComputing": "Working out the team…",
     "TeamHeldUnknown": "Your beasts are not read yet: every beast of the game is counted.",
-    "TeamRanksAssumed": "Rank not read yet for {0} of the team's beasts: rank {1} (the board's limit) is assumed for them. Ranks are read in the game's team window and in the board's result.",
+    "TeamRanksAssumed": "Rank not read yet for {0} of the team's beasts: rank {1} (the board's limit) is assumed for them. Ranks are read in the game's bestiary (each beast's page), its team window and the board's result.",
     "TeamTen": "The {0} to bring:",
     "TeamBeast": "{0} (rank {1}, {2})",
     "TeamRank": "rank {0}",
