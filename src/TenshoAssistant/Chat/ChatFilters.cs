@@ -84,6 +84,18 @@ public static class ChatTextFilter
     public static string Text(ChatRecord record)=>record.Sender+" "+string.Concat(record.Body.Select(segment=>segment.Text));
 }
 
+/// <summary>X-484 (0.1519, beyond the game): a message that repeats the one shown just before it in a tab: same kind, channel, sender and text,
+/// at most <see cref="Window"/> after the last time it came. Pure (tests).</summary>
+public static class ChatRepeat
+{
+    public static readonly TimeSpan Window=TimeSpan.FromSeconds(60);
+
+    public static bool Repeats(ChatRecord shown,DateTimeOffset lastSeen,ChatRecord next)
+        =>next.Kind==shown.Kind && next.Channel==shown.Channel && string.Equals(next.Sender,shown.Sender,StringComparison.Ordinal)
+          && next.Time>=lastSeen && next.Time-lastSeen<=Window
+          && string.Equals(ChatTextFilter.Text(next),ChatTextFilter.Text(shown),StringComparison.Ordinal);
+}
+
 /// <summary>X-484 (0.1482): what one tab shows, made once per refresh: by its channels, or by the game's filters it chose (when the game's
 /// filters are read), then the players hidden and its words.</summary>
 public sealed class ChatTabFilter

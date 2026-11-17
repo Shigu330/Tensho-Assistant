@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1519.0
+- Plan global, X-484 : Fenêtre de chat, en plus du jeu : chaque onglet peut « Replier les messages répétés » (réglage de l'onglet, non par défaut) : un message qui revient juste après lui-même (même canal, même auteur, même texte, à moins d'une minute du précédent) n'est plus montré de nouveau, le premier porte « ×3 » à sa fin, avec une infobulle. Les joueurs mis en avant ressortent davantage : en plus de leur nom dans la couleur d'avertissement, tout leur message est posé sur une bande de cette couleur.
+- Pour les joueurs : un onglet du chat peut replier un message répété juste après lui-même (« ×3 »), et les joueurs mis en avant ressortent sur une bande colorée.
+- Tests : ChatRepeats1519Tests. Verify.ps1 (agent) : 3021/3021, 0 avertissement, 0 erreur ; DLL 0.1519.0.0. Non validé en jeu.
+### English
+- Chat window, beyond the game: each tab can « Fold repeated messages » (a tab setting, off by default): a message that comes again right after itself (same channel, same sender, same text, within a minute of the one before) is no longer shown again, the first one carries « ×3 » at its end, with a tooltip. The players put forward stand out more: besides their name in the warning colour, their whole message sits on a band of that colour.
+- For players: A chat tab can fold a message repeated right after itself (« ×3 »), and the players you put forward stand out on a coloured band.
+
 ## 0.1518.0
 - Plan global, X-484 : Fenêtre de chat, filtres du jeu : la partie Combat se parcourt de deux façons, comme la fenêtre de filtres du jeu. « Par sujet (qui agit) » garde un groupe par sujet (vous, équipiers, alliance, autres joueurs, ennemis combattus, autres ennemis, PNJ amicaux et les compagnons de chacun). Nouveau, « Par genre de ligne » : une case par genre (dégâts infligés, dégâts subis, attaques manquées, attaques esquivées, actions utilisées et reçues, objets utilisés et reçus, soins lancés et reçus, effets bénéfiques lancés et reçus, effets néfastes lancés et subis, fin des effets bénéfiques, fin des effets néfastes) qui coche ou décoche ce genre pour tous les sujets à la fois ; son nom compte les filtres cochés. Seize genres sur onze sujets, d'après la feuille des filtres du jeu.
 - Pour les joueurs : les filtres de combat du chat se cochent aussi par genre de ligne (dégâts subis, soins reçus…) pour tout le monde à la fois, en plus de sujet par sujet.

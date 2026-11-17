@@ -17,6 +17,9 @@ public sealed class ChatTabSettings
     public string? KeepWords{get;set;}
     public string? HideWords{get;set;}
     public bool WordsMatchCase{get;set;}
+    /// <summary>X-484 (0.1519, beyond the game; the « duplicates » of the chat study, X-447): a message repeated right after itself (same channel,
+    /// same sender, same text, within <see cref="ChatRepeat.Window"/>) is not shown again: the first one counts the repeats (« ×3 »).</summary>
+    public bool FoldRepeats{get;set;}
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
 }
 

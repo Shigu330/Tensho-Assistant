@@ -519,6 +519,7 @@ internal sealed partial class MainWindow
         TextSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300,260);
         TextSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,260);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
+        CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
     }
 
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
@@ -794,7 +795,7 @@ internal sealed partial class MainWindow
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
                 var row=view.RowOf(index);
                 if(row*height>end)break;
-                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options);
+                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options,view.RepeatsAt(index));
             }
             // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
             view.RowsShown=view.RowCount;view.HeightShown=shown;
@@ -898,11 +899,19 @@ internal sealed partial class MainWindow
         _=>null,
     } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
-    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options)
+    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options,int repeats=0)
     {
         var color=ChatColor(options.ColorOf(record.Channel));
         // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
         var left=ImGui.GetCursorPosX();
+        // X-484 (0.1519, the user's request of 17/11: the player put forward more visible): a band in the warning colour behind the whole message.
+        if(ChatTextFilter.IsPlayer(record.Sender,chatHighlighted))
+        {
+            ImGui.SetCursorPosY(y);
+            var top=ImGui.GetCursorScreenPos();
+            ImGui.GetWindowDrawList().AddRectFilled(top-new Vector2(2,0),top+new Vector2(ImGui.GetContentRegionAvail().X+2,Math.Max(1,lines.Count)*height),
+                ImGui.GetColorU32(Warning with {W=ChatLook.HighlightBandAlpha}),3f);
+        }
         var indent=ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent);
         for(var line=0;line<lines.Count;line++)
         {
@@ -926,8 +935,17 @@ internal sealed partial class MainWindow
                 index++;
             }
             if(first)ImGui.TextUnformatted(" ");
+            // X-484 (0.1519): the repeats folded into this message, after its last line.
+            if(line==lines.Count-1 && repeats>0)
+            {
+                ImGui.SameLine(0,0);
+                ImGui.TextColored(Muted,localization.Format("ChatWindow.Repeats",repeats+1));
+                TipText(()=>ChatRepeatsTip(repeats+1));
+            }
         }
     }
+
+    private string ChatRepeatsTip(int times)=>localization.Format("ChatWindow.RepeatsTip",times);
 
     /// <summary>X-476 (0.1481, X-447 A3): the dark outline of the text about to be drawn at the cursor, as the game's chat.</summary>
     private static void ChatOutline(string text)
