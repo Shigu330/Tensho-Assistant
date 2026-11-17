@@ -111,6 +111,31 @@ public static class BeastTeams
         return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown);
     }
 
+    /// <summary>X-553 (0.1523): a weakness of a fight's enemies that none of its three beasts hits: the team's other beasts that would hit it, and
+    /// the beasts held outside the team that would (all beasts when the beasts held are not read).</summary>
+    public sealed record WeaknessMissed(uint Weakness, string Name, IReadOnlyList<uint> InTeam, IReadOnlyList<uint> Held);
+
+    /// <summary>
+    /// X-553 (0.1523, the user's report of 17/11: « the help does not seem to make good teams for weakness first »): each weakness of the fight's
+    /// enemies that the three chosen do not hit, with who would: the team's other beasts first, then the beasts held outside the team. The game's
+    /// weakness and a beast's automatic attack use the same rows (XBMElement): the board window's « Faiblesse » and the beast book's « Attaque auto. ».
+    /// </summary>
+    public static IReadOnlyList<WeaknessMissed> Missed(BoardBattle fight, IReadOnlyList<BeastPick> trio, IReadOnlyList<BeastPick> team, IReadOnlyList<Beast> beasts, IReadOnlySet<uint>? held)
+    {
+        var byId = beasts.GroupBy(beast => beast.Id).ToDictionary(group => group.Key, group => group.First());
+        uint AutoOf(uint id) => byId.TryGetValue(id, out var beast) ? beast.AutoRow : 0;
+        var hit = trio.Select(pick => AutoOf(pick.Beast)).Where(row => row != 0).ToHashSet();
+        var inTeam = team.Select(pick => pick.Beast).ToHashSet();
+        var missed = new List<WeaknessMissed>();
+        foreach (var enemy in fight.Enemies.Where(enemy => enemy.WeaknessRow != 0 && !hit.Contains(enemy.WeaknessRow)).GroupBy(enemy => enemy.WeaknessRow).Select(group => group.First()))
+        {
+            var others = team.Where(pick => trio.All(chosen => chosen.Beast != pick.Beast) && AutoOf(pick.Beast) == enemy.WeaknessRow).Select(pick => pick.Beast).ToArray();
+            var outside = beasts.Where(beast => !inTeam.Contains(beast.Id) && (held is null || held.Contains(beast.Id)) && beast.AutoRow == enemy.WeaknessRow).Select(beast => beast.Id).ToArray();
+            missed.Add(new(enemy.WeaknessRow, enemy.Weakness, others, outside));
+        }
+        return missed;
+    }
+
     /// <summary>
     /// X-549 (0.1522, the user's report of 17/11: the panel showed a board chosen by hand while the game showed the 1st): the board the game is
     /// on. In the labyrinth, its territory's board (one territory per board: ContentFinderCondition 1088 to 1092, territories 1339 to 1343,

@@ -78,7 +78,9 @@ internal sealed class BeastCatalogLoader : IDisposable
                 1 => data.GetExcelSheet<PlaceName>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
                 2 => data.GetExcelSheet<ContentFinderCondition>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
                 _ => "",
-            });
+            },
+            // X-553 (0.1523): a magical automatic attack's element.
+            aspect: id => actions.TryGetRow(id, out var action) ? action.Aspect : 0);
     }
 
     private unsafe void OnUpdate(IFramework _)

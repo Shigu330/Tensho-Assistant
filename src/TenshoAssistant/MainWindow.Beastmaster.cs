@@ -337,6 +337,14 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
                 ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
+                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it.
+                foreach (var miss in BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, Beasts?.State.Obtained))
+                {
+                    string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
+                    ImGui.TextColored(Warning, miss.InTeam.Count > 0 ? localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam))
+                        : miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
+                        : localization.Format("BeastUi.MissNoneHeld", miss.Name));
+                }
             }
             finally { ImGui.Unindent(); }
         }
