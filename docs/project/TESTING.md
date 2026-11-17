@@ -902,7 +902,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.781) À la prochaine alarme : clic droit sur la ligne de l'objet ; je relis « Context menu opened ».
 
-- [ ] (0.782) Rouvrez le carnet d'artisan sur la recette 5623 en cuisinier : plus de gel.
+- [ ] (0.782) Où : en jeu, le carnet d'artisanat, et le panneau « Tensho · Carnet d'artisanat » à côté ; réglage : Paramètres › Panneaux à côté du jeu › Aide à l'artisanat › « Utiliser le solveur Raphael ». Faire : 1) cochez « Utiliser le solveur Raphael » ; 2) portez Cuisinier ; 3) ouvrez le carnet d'artisanat, passez sur Menuisier (ou cherchez « Madrier de ginseng ») ; 4) sélectionnez « Madrier de ginseng » (niveau 91). Regarder : le jeu ne gèle pas ; le panneau Tensho affiche une « Macro proposée » ou « Aucune séquence terminée compatible. ».
 
 - [x] (0.783) Carnet d'artisan, Kit de réparation d'appareil : « Raphael non utilisé ».
 

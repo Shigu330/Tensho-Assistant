@@ -252,7 +252,7 @@ Avec un métier d'artisan, à l'établi.
 - [ ] **0.699** Panneau : matières de base par provenance (TESTING l. 790)
 - [ ] **0.715** Livraisons spéciales : quêtes faites (TESTING l. 813)
 - [x] **0.725** Tri par marché : ventes par jour (TESTING l. 828)
-- [ ] **0.782** Carnet recette 5623 cuisinier sans gel (TESTING l. 905)
+- [ ] **0.782** Carnet d'artisanat : pas de gel sur la recette « Madrier de ginseng » (5623) (TESTING l. 905)
 - [x] **0.783** Kit de réparation : Raphael non utilisé (TESTING l. 907)
 - [x] **0.788** Carnet en Menuisier sur Lingot de mithril : « Mauvais métier » (TESTING l. 914)
 - [x] **0.808** Carnet d'artisanat : clic droit recette et matériau, entrée Tensho (TESTING l. 937)
