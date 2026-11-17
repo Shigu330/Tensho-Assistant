@@ -21,11 +21,12 @@ internal sealed class ActionBarLocator : IDisposable
     private int frames;
     private bool failed;
     private volatile IReadOnlyList<ActionBarRect> rects=[];
-    private uint wanted,readFor;
+    private uint wanted,readFor,other;
     private long wantedAt;
 
     /// <summary>Asked at each frame by the drawing while an action is to be found; a request older than half a second is dropped.</summary>
-    public void Want(uint action){Volatile.Write(ref wanted,action);Volatile.Write(ref wantedAt,System.Diagnostics.Stopwatch.GetTimestamp());}
+    /// <remarks>X-136 (0.1550): a second action found with the first (the beastmaster's two skills of a combo); 0: none.</remarks>
+    public void Want(uint action,uint second=0){Volatile.Write(ref other,second);Volatile.Write(ref wanted,action);Volatile.Write(ref wantedAt,System.Diagnostics.Stopwatch.GetTimestamp());}
     public IReadOnlyList<ActionBarRect> Rects=>rects;
     /// <summary>The action the rectangles are for; 0 until the bars have been read for one.</summary>
     public uint ReadFor=>Volatile.Read(ref readFor);
@@ -50,6 +51,7 @@ internal sealed class ActionBarLocator : IDisposable
         if(wanted==0){if(Volatile.Read(ref readFor)!=0){Volatile.Write(ref readFor,0u);rects=[];}return;}
         if(failed || ++frames<FramesBetweenReads)return;
         frames=0;
+        var other=Volatile.Read(ref this.other);
         try
         {
             var found=new List<ActionBarRect>();
@@ -67,13 +69,14 @@ internal sealed class ActionBarLocator : IDisposable
                 {
                     if(slots[index].Icon==null)continue;
                     // 0.734 (user report): the game turns some actions into their next rank on the bar (Bountiful Harvest shows as II): the slot keeps the first one, so what it shows counts.
-                    var matched=slots[index].ActionId==(int)wanted;
+                    var matched=slots[index].ActionId==(int)wanted || other!=0 && slots[index].ActionId==(int)other;
                     if(module!=null && addon->RaptureHotbarId<module->Hotbars.Length)
                     {
                         ref var saved=ref module->Hotbars[addon->RaptureHotbarId].Slots[index];
                         // An item or a macro can carry the same number: only an action counts.
                         if(saved.ApparentSlotType!=RaptureHotbarModule.HotbarSlotType.Action)continue;
                         matched|=saved.ApparentActionId==wanted || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==wanted;
+                        if(other!=0)matched|=saved.ApparentActionId==other || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==other;
                     }
                     if(!matched)continue;
                     var node=&slots[index].Icon->AtkResNode;

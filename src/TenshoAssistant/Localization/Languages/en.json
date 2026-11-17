@@ -240,6 +240,8 @@
     "ResultRanks": "+{0} rank(s)",
     "KnownRank": "rank {0}",
     "BoardPanel": "Team panel beside the board",
+    "ComboHighlight": "Highlight the beast's combos",
+    "ComboHighlightTip": "In the Crucible, fights included: highlights on your hotbars the beastmaster's two skills that make an intentional combo with the beast called (the one before its Trick and the one after). Tensho only shows: nothing is sent to the game.\nDefault: off.",
     "BoardPanelTip": "Shows the team panel beside the game's board window: before entering, and in the Crucible only in front of the board, never during a fight.\nDefault: on.",
     "PlacesSeen": "({0} place(s) seen)",
     "PlacesSeenTip": "Where this beast was captured, or its monster seen, in game (yours or shared discoveries; the monster from the wiki's bestiary when known). Right click: flag and nearest aetheryte for each place.",

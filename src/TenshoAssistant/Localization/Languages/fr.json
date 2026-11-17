@@ -240,6 +240,8 @@
     "ResultRanks": "+{0} rang(s)",
     "KnownRank": "rang {0}",
     "BoardPanel": "Panneau d'équipe à côté du plateau",
+    "ComboHighlight": "Surligner les combos de la bête",
+    "ComboHighlightTip": "Dans le Dédale bestial, combat compris : surligne sur vos barres d'actions les deux techniques du dresseur qui font un combo instinctif II avec la bête appelée (celle d'avant sa technique et celle d'après). Tensho montre seulement : rien n'est envoyé au jeu.\nPar défaut : désactivé.",
     "BoardPanelTip": "Montre le panneau d'équipe à côté de la fenêtre du plateau du jeu : avant d'entrer, et dans le Dédale seulement devant le plateau, jamais pendant un combat.\nPar défaut : activé.",
     "PlacesSeen": "({0} lieu(x) vu(s))",
     "PlacesSeenTip": "Où cette bête a été capturée, ou son monstre vu, en jeu (vos découvertes ou partagées ; le monstre d'après le bestiaire du wiki quand il est connu). Clic droit : drapeau et éthérite la plus proche pour chaque lieu.",

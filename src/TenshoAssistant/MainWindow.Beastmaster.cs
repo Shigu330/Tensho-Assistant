@@ -416,6 +416,26 @@ internal sealed partial class MainWindow
         finally { ImGui.Unindent(); }
     }
 
+    /// <summary>X-136 (0.1550): the hotbars read for the combo highlight (its own locator, apart from the gathering panel's).</summary>
+    internal Gathering.ActionBarLocator? BeastBarLocator { get; set; }
+    /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (0: none).</summary>
+    internal Func<uint>? BeastActive { get; set; }
+
+    /// <summary>
+    /// X-136 (0.1550, the user's request of 11/11; R03.2: the labyrinth is not cut, combat included): with the option on and in the labyrinth
+    /// only, the beastmaster's two skills that make an intentional combo with the beast called (BeastInstinct.Combos: the one before its
+    /// Trick and the one after) are highlighted on the hotbars, as the gathering panel's next action. Shows only: nothing is sent to the
+    /// game (R03.3).
+    /// </summary>
+    internal void DrawBeastComboHighlight()
+    {
+        if (!configuration.HighlightBeastCombos || BeastBarLocator is not { } located) return;
+        if ((BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0) == 0) return;
+        if (BeastActive?.Invoke() is not (> 0 and var beast) || BeastInstinct.Combos(beast) is not [var before, var after]) return;
+        located.Want(before.Skill, after.Skill);
+        if (located.ReadFor == before.Skill) DrawGatheringBarHighlight(located);
+    }
+
     /// <summary>X-551 (0.1534): the width the panel's lines wrap at (BeastBoardWindow sets it from the game's window beside it).</summary>
     internal float BeastPanelWrap { get; set; } = BeastBoardWindow.WrapWidth;
 
@@ -512,6 +532,7 @@ internal sealed partial class MainWindow
         FollowBeastBoard(catalog);
         var board = DrawBeastBoardChoice(catalog);
         BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
+        BoolSetting("BeastUi.ComboHighlight", "BeastUi.ComboHighlightTip", () => configuration.HighlightBeastCombos, value => configuration.HighlightBeastCombos = value, c => c.HighlightBeastCombos);
         ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
         DrawBeastResult(catalog);
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }

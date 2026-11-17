@@ -47,6 +47,20 @@ public static class BeastInstinct
     public static IntentionalCombo Kind(Affinity first, Affinity second)
         => first == Affinity.None || second != Next(first) ? IntentionalCombo.None : first is Affinity.Volant or Affinity.Durant ? IntentionalCombo.Sunstrider : IntentionalCombo.Moonstalker;
 
+    /// <summary>
+    /// X-136 (0.1550): the beast the game's « Cornes d'appel » window (XBMActivePet) details: its value 19 is that beast's Trick (44933 +
+    /// 2 × its XBMPet row: 44965 for the Mante, row 16, in the probe's lines of 17/11 23:41) and its value 4 its name; both must agree,
+    /// else none (R08). docs/evidence/0.1550-beast-combo-highlight.md.
+    /// </summary>
+    public static uint FromWindow(uint trick, string name, IReadOnlyList<Beast> beasts)
+    {
+        if (trick <= FirstTrick || (trick - FirstTrick) % 2 != 0) return 0;
+        var row = (trick - FirstTrick) / 2;
+        if (row > Tricks.Length) return 0;
+        var beast = beasts.FirstOrDefault(candidate => candidate.Id == row);
+        return beast is not null && name.Length > 0 && string.Equals(beast.Name, name, StringComparison.CurrentCultureIgnoreCase) ? row : 0;
+    }
+
     /// <summary>One way to complete an intentional combo with a beast: the beastmaster's skill, before the Trick or after it.</summary>
     public sealed record Combo(uint Skill, Affinity SkillAffinity, bool AfterTrick, IntentionalCombo Kind);
 

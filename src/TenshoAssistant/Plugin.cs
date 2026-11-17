@@ -521,6 +521,10 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
             // X-486 (0.1529): the fights the game's board window shows.
             mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
+            // X-136 (0.1550): the beast called and the hotbars for the combo highlight (off by default).
+            mainWindow.BeastActive=()=>boardReader?.ActiveBeast ?? 0;
+            Gathering.ActionBarLocator? beastBarLocator=null;
+            registrations.Register(()=>mainWindow.BeastBarLocator=beastBarLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BeastBarLocator=null;beastBarLocator?.Dispose();});
             // X-136 (0.1530): the names of the beasts' Tricks and of the beastmaster's skills, from the game's Action sheet.
             mainWindow.BeastActionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
@@ -1577,6 +1581,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("DutyFinder",mainWindow.DrawDutyFinderPanel),
             ("FashionCheck",mainWindow.DrawFashionCheckPanel),
             ("Gathering",mainWindow.DrawGatheringPanel),
+            ("BeastCombo",mainWindow.DrawBeastComboHighlight),
             ("Collectable",mainWindow.DrawCollectablePanel),
             ("RetainerSales",mainWindow.DrawRetainerSalesPanel),
             ("Spearfishing",mainWindow.DrawSpearfishingPanel),

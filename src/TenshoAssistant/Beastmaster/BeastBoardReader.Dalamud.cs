@@ -27,6 +27,10 @@ internal sealed class BeastBoardReader : IDisposable
     private readonly Action<BoardResult>? resultRead;
     private readonly Action<BeastTeams.BookRead>? bookRead;
     private string? bookSeen;
+    private volatile uint activeBeast;
+    private string? activeSaid;
+    /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (its XBMPet row; 0: closed or not read).</summary>
+    public uint ActiveBeast => activeBeast;
     private bool bookWarned;
     private DateTimeOffset next;
     private bool warned;
@@ -53,6 +57,7 @@ internal sealed class BeastBoardReader : IDisposable
         {
             ReadResult(now);
             ReadBook();
+            ReadActive();
             var board = gui.GetAddonByName("XBMStageDetailList");
             var party = gui.GetAddonByName("XBMPetParty");
             var boardUnit = board.IsNull || !board.IsVisible ? null : (AtkUnitBase*)board.Address;
@@ -196,6 +201,26 @@ internal sealed class BeastBoardReader : IDisposable
             bookWarned = true;
             log.Warning("The Beastmaster bestiary's beast page could not be read (unavailable, maybe after a game update): nothing kept.");
         }
+    }
+
+    /// <summary>
+    /// X-136 (0.1550): the beast the game's « Cornes d'appel » window (XBMActivePet) details: its values 4 (name) and 19 (Trick), read only
+    /// (BeastInstinct.FromWindow); said in the log when it changes, with value 2, so a reading in game tells whether it is the beast out.
+    /// </summary>
+    private unsafe void ReadActive()
+    {
+        var addon = gui.GetAddonByName("XBMActivePet");
+        var unit = addon.IsNull || !addon.IsVisible ? null : (AtkUnitBase*)addon.Address;
+        if (unit == null || unit->AtkValues == null || unit->AtkValuesCount <= 19 || beasts() is not { Count: > 0 } known) { activeBeast = 0; return; }
+        var name = TenshoAssistant.UI.AtkValueRead.IsText(unit->AtkValues[4].Type) ? unit->AtkValues[4].String.ToString() ?? "" : "";
+        var value = unit->AtkValues[19];
+        var trick = value.Type == AtkValueType.UInt ? value.UInt : value.Type == AtkValueType.Int && value.Int > 0 ? (uint)value.Int : 0u;
+        var out2 = unit->AtkValues[2].Type == AtkValueType.Bool ? (unit->AtkValues[2].Byte != 0).ToString() : "-";
+        activeBeast = BeastInstinct.FromWindow(trick, name, known);
+        var said = $"{activeBeast}|{trick}|{out2}";
+        if (said == activeSaid) return;
+        activeSaid = said;
+        log.Information("Beastmaster battlehorns window: beast {0} (Trick {1}, value 2 {2}).", activeBeast, trick, out2);
     }
 
     public void Dispose() => TenshoAssistant.Competitive.CompetitiveGate.Remove(framework, OnUpdate);

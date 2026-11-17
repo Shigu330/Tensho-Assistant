@@ -167,7 +167,7 @@ public sealed class JitWarmup : IDisposable
     /// </summary>
     public static readonly IReadOnlyList<string> OverlayMethods=["DrawCraftLogHelper","DrawMonsterOverheadIcons","CollectDiscoveries","DrawStorageHighlight","DrawItemHover",
         "DrawCactpotOverlay","DrawCraftLivePanel","DrawInventorySortButton","ObserveRegenTick","DrawChatLinkMenu","DrawTriadOverlay","DrawTriadRequestPanel","DrawTriadDeckReminder","DrawCharacterPanel",
-        "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
+        "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawBeastComboHighlight","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
         "ProcessGameLogRequest","ObserveHuntTrain","ObserveOccultAlerts","ObserveGarden","WatchWishlistSales","WatchPlots","DrawFishingPanel","RefreshNearbyMonsters"];
     private static readonly string[] OverlayBracketed=Bracketed(OverlayMethods);
     /// <summary>Words of the main window's methods that belong to the free panels and bars drawn every frame (tracker, wear bar, alarm and reminder bars).</summary>
