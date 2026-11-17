@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1540.0
+- Plan global, X-573 : X-573 M2 (relecture 0.1539) : quand toutes les méthodes du préchauffage sont précoces (ou qu'il n'y en a aucune), la fin de la phase précoce était mesurée (EarlyReadyAfter) mais EarlyDone ne passait à vrai que dans le finally, après la ligne du journal qui la dit prête : les deux sont posés ensemble. Constat corrigé en partie : EarlyDone ne restait pas faux pour toujours (le finally le posait), seulement jusqu'à la fin du rappel. Test de comportement WarmupEarly1540Tests (toutes précoces, aucune, une partie : état lu au moment de la ligne du journal). M1 de X-573 et X-572 faits hors version (fichiers de l'agent : verrou de la file, rejeu au plus une fois).
+- Tests : WarmupEarly1540Tests. Verify.ps1 (agent) : 3082/3082, 0 avertissement, 0 erreur ; DLL 0.1540.0.0. Rien à essayer en jeu.
+### English
+- X-573 M2 (review 0.1539): when every warm-up method is early (or there is none), the early phase's end was measured (EarlyReadyAfter) but EarlyDone only became true in the finally, after the log line that says it ready: both are set together. Finding partly corrected: EarlyDone did not stay false for ever (the finally set it), only until the callback ended. Behaviour test WarmupEarly1540Tests (all early, none, part: state read when the log line is written). X-573 M1 and X-572 done outside a version (agent files: queue lock, replay at most once).
+
 ## 0.1539.0
 - X-570 (audit du 17/11, partie A, points 6 et 9), partie suivie : Verify.ps1 ne cherche plus le SDK .NET dans l'ancien dossier C:\ia-code (le plus récent ~/.codex/dotnet-10.*, sinon dotnet) ; TESTING le dit. tools/client-snapshot.py prend le SDK par la même règle (plus de version écrite en dur, TENSHO_DOTNET accepté). .github/codeql/codeql-config.yml retiré : aucun workflow ne le lisait. Test ToolPaths1539Tests.
 - Tests : ToolPaths1539Tests. Verify.ps1 (agent) : 3079/3079, 0 avertissement, 0 erreur ; DLL 0.1539.0.0. Rien à essayer en jeu.

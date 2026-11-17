@@ -418,7 +418,8 @@ public sealed class JitWarmup : IDisposable
                 catch(Exception){Skipped++;}
             }
             // X-563 M2: every method was early: the phase ends with the warm-up.
-            if(early is not null && EarlyReadyAfter<0){EarlyPrepared=Prepared;EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;}
+            // X-573 M2 (0.1540): told done at the same moment (it was only in the finally, after the log line that says it ready).
+            if(early is not null && EarlyReadyAfter<0){EarlyPrepared=Prepared;EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;earlyDone=true;}
             Elapsed=System.Diagnostics.Stopwatch.GetElapsedTime(started);
             Completed=true;
             if(!token.IsCancellationRequested)finished?.Invoke(this);
