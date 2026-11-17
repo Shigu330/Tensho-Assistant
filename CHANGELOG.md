@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1536.0
+- Plan global, X-520 : Images de référence de l'application de bureau : chaque onglet de la page Paramètres a désormais la sienne (Panneaux, Carte, Suivi, Données, Avancé et, en mode développeur, Débogage, chacun dans sa première catégorie ; Général l'avait déjà), ainsi que les réglages des onglets du chat (grilles des canaux, des filtres du jeu et des genres de combat), en largeur normale et étroite. L'application ouvre l'onglet et la catégorie par une nouvelle entrée de son contrat typé avec le plugin (OpenSettings).
+- Tests : SettingsPictures1536Tests. Verify.ps1 (agent) : 3071/3071, 0 avertissement, 0 erreur ; DLL 0.1536.0.0. Rien à essayer en jeu.
+### English
+- Reference pictures of the desktop application: every tab of the Settings page now has its own (Panels, Map, Tracking, Data, Advanced and, in developer mode, Debug, each in its first category; General had one already), as do the chat's tab settings (the grids of channels, of the game's filters and of combat kinds), at the usual width and narrow. The application opens the tab and the category through a new entry of its typed contract with the plugin (OpenSettings).
+
 ## 0.1535.0
 - Plan global, X-563 : Relecture du bloc 0.1527 à 0.1534, constats mineurs. Fenêtre de chat : quand on remonte un long historique et qu'un paquet de lignes plus anciennes est mis en page au-dessus de la vue, les lignes restent à leur place dès cette image-là (le défilement corrigé ne prend effet qu'à l'image suivante : les lignes de cette image sont dessinées au défilement de la suivante) ; avant, la vue sautait d'une image à chaque paquet. Préchauffage du code : la fin de sa phase précoce (carte, panneaux, chat), qu'attendent la compilation des lecteurs et la fenêtre de chat, est mesurée et écrite au journal. Dédale bestial : le combat tiré de la disposition du plateau du jeu est dit « lecture à confirmer en jeu », comme le numéro du plateau lu dans la même fenêtre.
 - Pour les joueurs : fenêtre de chat : remonter un long historique ne fait plus sauter la vue quand des lignes plus anciennes arrivent au-dessus. Dédale bestial : le combat lu dans le plateau du jeu dit qu'il reste à confirmer.

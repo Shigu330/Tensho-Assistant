@@ -29,6 +29,7 @@ internal static class DesktopSurface1238Tests
         GameState=(overall,heap,issues)=>calls.Add($"state {overall} {heap} {issues.Length}"),
         GameMeasures=(numbers,counters,at)=>calls.Add($"measures {numbers?.Length} {counters?.Length} {at}"),
         OpenWeather=(territory,zone)=>calls.Add($"weather {territory} {zone}"),
+        OpenSettings=(tab,category,developer)=>calls.Add($"settings {tab} {category} {developer}"),
     };
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
@@ -37,7 +38,7 @@ internal static class DesktopSurface1238Tests
         {
             var calls=new List<string>();
             var map=Recording(calls).ToMap();
-            Check(Entries.Length==15 && map.Count==Entries.Length && Entries.All(entry=>map.ContainsKey(entry.Name)),"every entry is in the map: "+string.Join(",",map.Keys));
+            Check(Entries.Length==16 && map.Count==Entries.Length && Entries.All(entry=>map.ContainsKey(entry.Name)),"every entry is in the map: "+string.Join(",",map.Keys));
             var surface=DesktopSurface.FromMap(map,out var missing);
             Check(missing.Count==0,"nothing missing: "+string.Join("; ",missing));
             Check(surface.Pages().SequenceEqual(["Home","Weather"]) && surface.CurrentPage()=="Home","pages");

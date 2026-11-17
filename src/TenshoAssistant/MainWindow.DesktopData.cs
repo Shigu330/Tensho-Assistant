@@ -34,7 +34,17 @@ internal sealed partial class MainWindow
         GameState=DesktopGameState,
         GameMeasures=DesktopGameMeasures,
         OpenWeather=OpenWeather,
+        OpenSettings=DesktopOpenSettings,
     }.ToMap();
+
+    // X-520 (0.1536): the desktop application's pictures of each Settings tab: the page at that tab and category (« » keeps the one chosen),
+    // the window's developer mode as asked (the Debug tab is drawn only in it). Nothing is saved there (ChooseSettingsCategory).
+    private void DesktopOpenSettings(string tab,string category,bool developer)
+    {
+        developerMode=developer;
+        page=Page.Settings;
+        if(category.Length>0)OpenSettingsCategory(tab,category);else requestedSettingsTab=tab;
+    }
 
     // X-151 (0.1238): the pages the application keeps in the game leave its navigation (their entry hidden, the groups rebuilt), before the
     // first frame; the application gives the rule (DesktopPages), the window its own entries (no reflection on the record's members any more).

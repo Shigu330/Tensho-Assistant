@@ -68,12 +68,15 @@ internal static class References
                 // X-284 M2: the page's sheets cannot be read for this picture (its error state), then are given back.
                 if(shot.Setup=="error" && !host.SheetsFail(true))Console.WriteLine($"  {shot.Id}: the sheets could not be made to fail");
                 if(shot.Page=="Weather")Headless.OpenZone(host,155);
+                // X-520 (0.1536): a tab and a category of the Settings page (the Debug tab in developer mode).
+                if(ReferencePlan.SettingsSetup(shot.Setup) is { } settings)host.Surface.OpenSettings(settings.Tab,settings.Category,settings.Developer);
                 thrown+=Take(host,status,window,shot,folder,compare,rows);
             }
             finally
             {
                 if(shot.Setup.StartsWith("garden-",StringComparison.Ordinal)){host.SetSetting("GardenBeds",beds);host.SetSetting("GardenDetailedView",detailed ?? false);}
                 if(shot.Setup=="error")host.SheetsFail(false);
+                if(ReferencePlan.SettingsSetup(shot.Setup) is not null)host.Surface.OpenSettings("General","",false);
                 if(trial is not null){Headless.RetainerTrialEnd(host);try{Directory.Delete(trial,true);}catch(IOException){}catch(UnauthorizedAccessException){}}
                 if(shot.Setup=="dashboard"){status.Link=link;host.GameMeasures(null,Environment.TickCount64);host.GameState(null);}
             }
