@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (578 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (579 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -646,12 +646,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
 | X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
 | X-575 | Bug seen by the user in the Beastmaster labyrinth on 17/11 around 23:00 (two… | Done in 0.1545 |
+| X-576 | User reading of 18/11 around 00:05 (capture of the window before entering the… | Done in 0.1546 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (578 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (579 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1295,3 +1296,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
 | X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
 | X-575 | Bug vu par l'utilisateur au Dédale bestial le 17/11 vers 23 h (deux captures du… | Fait en 0.1545 |
+| X-576 | Relevé de l'utilisateur du 18/11 vers 0 h 05 (capture de la fenêtre d'avant… | Fait en 0.1546 |

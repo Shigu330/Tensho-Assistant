@@ -2187,6 +2187,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1545) Dédale bestial, 2e plateau, une bête de rang 7 ou moins dans l'équipe : le panneau dit « rang bas pour ce plateau » à côté d'elle ; une bête de rang 8 ou plus ne le dit pas
 
+- [ ] (0.1546) Dédale bestial, 2e plateau, une bête de rang 5 ou moins dans l'équipe : le panneau dit « rang bas pour ce plateau » (6 à 10) à côté d'elle ; une bête de rang 6 à 10 ne le dit plus
+
+- [ ] (0.1546) si vous atteignez le 3e plateau du Dédale bestial : la fenêtre d'avant l'entrée dit « Rang de bête recommandé : 11 à 15 », comme Tensho
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
