@@ -37,6 +37,32 @@ public static class BeastTeams
 
     public const int PerBattle = 3;
 
+    /// <summary>
+    /// X-579 (0.1547): an enemy's strength, the sum of its five stars of the board window (XBMBattleDetail columns 1 to 5); 0 when not read.
+    /// The sheets mark no enemy as summoned nor as the fight's leader (docs/evidence/0.1547-beast-strongest.md): the stars decide.
+    /// </summary>
+    public static int Power(BoardEnemy enemy) => enemy.Stars is { } stars ? stars.Strength + stars.Intelligence + stars.PhysicalResistance + stars.MagicalResistance + stars.Vitality : 0;
+
+    /// <summary>X-579 (0.1547): the fight's strongest enemy (the first in the sheet's order on a tie), or null when its enemies are all as strong.</summary>
+    public static BoardEnemy? Strongest(BoardBattle fight) => fight.Enemies.Select(Power).Distinct().Count() > 1 ? fight.Enemies.OrderByDescending(Power).First() : null;
+
+    /// <summary>
+    /// X-579 (0.1547, the user's request of 18/11: « the weaknesses must be of the strongest monster first »): the weight of each enemy of a
+    /// fight, so that hitting a stronger enemy's weakness always counts more than hitting any number of weaker ones (the enemies of a same
+    /// strength count the same; all as strong: 1 each, the count of before).
+    /// </summary>
+    public static long[] Weights(IReadOnlyList<BoardEnemy> enemies)
+    {
+        var levels = enemies.Select(Power).Distinct().OrderDescending().ToArray();
+        var radix = enemies.Count + 1L;
+        return enemies.Select(enemy =>
+        {
+            long weight = 1;
+            for (var level = Array.IndexOf(levels, Power(enemy)) + 1; level < levels.Length; level++) weight *= radix;
+            return weight;
+        }).ToArray();
+    }
+
     public static (bool Weak, double Attack, double Guard) Against(BeastStats beast, uint autoRow, BoardEnemy enemy)
     {
         var stars = enemy.Stars ?? new BeastStats(1, 1, 1, 1, 1);
@@ -53,24 +79,27 @@ public static class BeastTeams
         if (count == 0 || enemies.Count == 0) return ([], 0);
         size = Math.Min(size, count);
         var scores = beasts.Select(beast => enemies.Select(enemy => Against(beast.Stats, beast.AutoRow, enemy)).ToArray()).ToArray();
-        (int Covered, int Hits, double Attack, double Guard) Score(int[] team)
+        // X-579 (0.1547): the enemies hit count by their weight (the strongest first), then the beasts' hits, attack and defence.
+        var weights = Weights(enemies);
+        (long Covered, int Hits, double Attack, double Guard) Score(int[] team)
         {
-            var covered = 0; var hits = 0; double attack = 0, guard = 0;
+            long covered = 0; var hits = 0; double attack = 0, guard = 0;
             for (var enemy = 0; enemy < enemies.Count; enemy++)
             {
                 var any = false;
                 foreach (var member in team) { var value = scores[member][enemy]; if (value.Weak) { hits++; any = true; } attack += value.Attack; guard += value.Guard; }
-                if (any) covered++;
+                if (any) covered += weights[enemy];
             }
             return (covered, hits, attack, guard);
         }
-        int[]? best = null; (int, int, double, double) bestScore = default;
+        int[]? best = null; (long, int, double, double) bestScore = default;
         foreach (var team in Combinations(count, size))
         {
             var score = Score(team);
             if (best is null || score.CompareTo(bestScore) > 0) { best = team; bestScore = score; }
         }
-        return (CallOrder(best ?? [], scores), bestScore.Item1);
+        var chosen = best ?? [];
+        return (CallOrder(chosen, scores, weights), Enumerable.Range(0, enemies.Count).Count(enemy => chosen.Any(member => scores[member][enemy].Weak)));
     }
 
     /// <summary>
@@ -78,10 +107,11 @@ public static class BeastTeams
     /// weakness first, then the rest, stats and others »): the three in calling order, the best first: the enemies whose weakness it hits, then
     /// its attack against their resistances, then its defence (DescriptionString 1751: Force and Intelligence the damage dealt, the resistances
     /// the damage taken, Vitalité the HP). The rank counts only through the attributes it gives. The enemies' vulnerabilities to effects are
-    /// not used: their meaning is not established (docs/evidence/0.1523-beast-weakness.md).
+    /// not used: their meaning is not established (docs/evidence/0.1523-beast-weakness.md). X-579 (0.1547): the enemies hit count by their
+    /// weight (<see cref="Weights"/>): the beast that hits the strongest enemy's weakness is called first.
     /// </summary>
-    private static int[] CallOrder(int[] picks, (bool Weak, double Attack, double Guard)[][] scores)
-        => picks.OrderByDescending(member => scores[member].Count(value => value.Weak)).ThenByDescending(member => scores[member].Sum(value => value.Attack))
+    private static int[] CallOrder(int[] picks, (bool Weak, double Attack, double Guard)[][] scores, long[] weights)
+        => picks.OrderByDescending(member => scores[member].Select((value, enemy) => value.Weak ? weights[enemy] : 0L).Sum()).ThenByDescending(member => scores[member].Sum(value => value.Attack))
             .ThenByDescending(member => scores[member].Sum(value => value.Guard)).ThenBy(member => member).ToArray();
 
     private static IEnumerable<int[]> Combinations(int count, int size)
@@ -161,8 +191,8 @@ public static class BeastTeams
     public static bool RankLow(Board board, int rank, bool known = true) => known && board.RankRecommended > 0 && rank > 0 && rank < board.RankRecommended;
 
     /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
-    /// 3 (0.1544): each fight's three in calling order.</summary>
-    public const int PlanVersion = 3;
+    /// 3 (0.1544): each fight's three in calling order. 4 (0.1547, X-579): the strongest enemy's weakness first.</summary>
+    public const int PlanVersion = 4;
 
     /// <summary>
     /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made
@@ -264,8 +294,9 @@ public static class BeastTeams
 
     /// <summary>X-486 (0.1529): why a beast is called for a fight: the names of the enemies whose weakness its automatic attack hits (empty: none,
     /// chosen for its attack and defence).</summary>
+    /// <remarks>X-579 (0.1547): the strongest enemy first.</remarks>
     public static IReadOnlyList<string> Hits(BoardBattle fight, Beast? beast)
-        => beast is null || beast.AutoRow == 0 ? [] : fight.Enemies.Where(enemy => enemy.WeaknessRow == beast.AutoRow).Select(enemy => enemy.Name).Distinct().ToArray();
+        => beast is null || beast.AutoRow == 0 ? [] : fight.Enemies.Where(enemy => enemy.WeaknessRow == beast.AutoRow).OrderByDescending(Power).Select(enemy => enemy.Name).Distinct().ToArray();
 
     /// <summary>X-553 (0.1523): a weakness of a fight's enemies that none of its three beasts hits: the team's other beasts that would hit it, and
     /// the beasts held outside the team that would (all beasts when the beasts held are not read).</summary>

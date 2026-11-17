@@ -479,13 +479,15 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>X-575 part 4 (0.1544): a beast called for a fight: its place in the calling order, its name and why (the enemies whose weakness it
-    /// hits, else its attack and defence). One text for the plan, the team taken and the fight shown.</summary>
+    /// hits, else its attack and defence). One text for the plan, the team taken and the fight shown. X-579 (0.1547): the strongest enemy
+    /// it aims at is named first and said the strongest.</summary>
     private string BeastCallText(BoardBattle fight, int place, uint id, BeastCatalog catalog)
     {
         var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
-        var hits = BeastTeams.Hits(fight, beast);
+        var strongest = BeastTeams.Strongest(fight)?.Name;
+        var hits = BeastTeams.Hits(fight, beast).Select(name => name == strongest ? localization.Format("BeastUi.Strongest", name) : name).ToArray();
         var name = beast?.Name ?? $"#{id}";
-        return hits.Count > 0 ? localization.Format("BeastUi.FightReasonHits", place + 1, name, beast!.AutoAttack, string.Join(", ", hits))
+        return hits.Length > 0 ? localization.Format("BeastUi.FightReasonHits", place + 1, name, beast!.AutoAttack, string.Join(", ", hits))
             : localization.Format("BeastUi.FightReasonNone", place + 1, name);
     }
 
