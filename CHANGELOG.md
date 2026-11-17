@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1516.0
+- Plan global, X-547 : Relecture de 0.1515, constats mineurs : le commentaire du test d'écriture du journal des versions ne nomme plus un outil interne et dit que la liste des noms qui gardent leur majuscule est contrôlée des deux côtés (la même règle : un nom suivi d'une fin de mot, « Tensho-Assistant » compris). Preuve de 0.1470 (fenêtre de résultat du Dédale bestial) : la section « encore ouvert » donne l'index 11 sur les trois plateaux (361, 780, 912), sans plus contredire le troisième plateau.
+- Tests : Writing1358Tests. Verify.ps1 (agent) : 3009/3009, 0 avertissement, 0 erreur ; DLL 0.1516.0.0. Rien à essayer en jeu.
+### English
+- Review of 0.1515, minor findings: the comment of the changelog's writing test no longer names an internal tool and says that the list of names keeping their capital is checked on both sides (the same rule: a name followed by a word end, « Tensho-Assistant » included). Evidence of 0.1470 (the beast labyrinth's result window): the « still open » section gives index 11 on the three boards (361, 780, 912), no longer contradicting the third board.
+
 ## 0.1515.0
 - Journal des versions : dans la ligne « Pour les joueurs » de 0.1511, le nom du plugin reprend sa majuscule (« Tensho n'affiche plus ses fenêtres… »). L'outil qui écrit cette ligne mettait en minuscule tout premier mot après les deux-points, un nom propre compris ; il garde maintenant la majuscule d'une liste de noms (Tensho, Dalamud, Discord…), et le test d'écriture du journal accepte la même liste (relecture de 0.1514, M4). Preuve de 0.1470 (fenêtre de résultat du Dédale bestial) : un troisième plateau, du 16/11, confirme la somme des parts du score, le bonus et le total ; le sens de chaque part reste à établir par un relevé avec capture.
 - Tests : Writing1358Tests. Verify.ps1 (agent) : 3009/3009, 0 avertissement, 0 erreur ; DLL 0.1515.0.0. Rien à essayer en jeu.

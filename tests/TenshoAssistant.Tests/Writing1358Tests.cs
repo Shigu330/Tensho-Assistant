@@ -3,8 +3,9 @@ using System.Text.RegularExpressions;
 
 // 0.1358 (X-377, X-356 review, D-160): English, French spelling and typography, {0} markers. A ratchet on the forms the review fixed:
 // counts written « (s) » when the number can be 1, British spelling, « frames a second », « the earlier files » in SECURITY,
-// lower case after « Pour les joueurs : » in the CHANGELOG (new-version.py writes it so); X-543 M4 (0.1515): a name keeps its capital
-// (« Tensho n'affiche plus… »), the same list as new-version.py's (scripts of the maintainer, PROPER_NAMES).
+// lower case after « Pour les joueurs : » in the CHANGELOG (the version tool writes it so); X-543 M4 (0.1515): a name keeps its capital
+// (« Tensho n'affiche plus… »); X-547 M2 (0.1516): the version tool uses the same list and the same rule (a name then a word boundary,
+// so « Tensho-Assistant » too), and its self-test fails when the two lists differ.
 internal static class Writing1358Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
