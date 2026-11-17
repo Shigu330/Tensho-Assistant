@@ -78,7 +78,8 @@ internal static class BeastResult1163Tests
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("mainWindow.BeastRanksRead,mainWindow.BeastResultRead)"), "the reader hands the result to the page");
             var page = Read("src/TenshoAssistant/MainWindow.Beastmaster.cs");
             Check(page.Contains("DrawBeastResult(catalog);") && page.Contains("BeastResults.Merge(plans.Ranks, result)") && page.Contains("\"BeastUi.KnownRank\""), "the page shows it and uses the ranks");
-            Check(page.Contains("var plans = LoadBeastPlans();\n        var known = plans.Ranks"), "ranks read before the page was opened are no longer lost");
+            // 0.1522 (X-549): the ranks read are merged as floors (BeastTeams.MergeRanks), still from the plans loaded first.
+            Check(page.Contains("var plans = LoadBeastPlans();\n        var limit = ") && page.Contains("BeastTeams.MergeRanks(plans.Ranks, plans.Floors, ranks, limit)"), "ranks read before the page was opened are no longer lost");
             foreach (var language in new[] { "en", "fr" })
             {
                 var text = Read($"src/TenshoAssistant/Localization/Languages/{language}.json");
