@@ -12,9 +12,20 @@ public static class ReferenceErrors
     /// « Squadron.ReadFailed », « Common.StateFailed ». Tooltips and settings that only name an error (« …ErrorTip ») are not states.</summary>
     public static bool IsError(string key)
     {
+        if(Names(key))return false;
         var last=key[(key.LastIndexOf('.')+1)..];
         return last.EndsWith("Unavailable",StringComparison.Ordinal) || last.EndsWith("Error",StringComparison.Ordinal)
             || last.EndsWith("Failed",StringComparison.Ordinal) || last=="StateFailed";
+    }
+
+    /// <summary>X-520 (0.1537): sections whose keys are names of things, never states: the chat's channels (« ChatChannels.Error » is the
+    /// channel of the game's error messages, shown in the chat's tab settings).</summary>
+    public static readonly IReadOnlyList<string> NameSections=["ChatChannels."];
+    private static bool Names(string key)
+    {
+        for(var index=0;index<NameSections.Count;index++)
+            if(key.StartsWith(NameSections[index],StringComparison.Ordinal))return true;
+        return false;
     }
 
     /// <summary>The last part of a key that names a wait (« DeepDungeon.Loading », « Common.StateWaiting »): in a still picture taken after

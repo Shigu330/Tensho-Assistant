@@ -46,9 +46,7 @@ if (-not $DotNet) {
         Sort-Object { [version]($_.Name -replace '^dotnet-', '') } -Descending |
         ForEach-Object { Join-Path $_.FullName 'dotnet.exe' } |
         Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-    $taskLegacySdk = 'C:\ia-code\.tools\dotnet10\dotnet.exe'
-    $DotNet = if ($taskLocalSdk) { $taskLocalSdk }
-        elseif (Test-Path -LiteralPath $taskLegacySdk) { $taskLegacySdk } else { 'dotnet' }
+    $DotNet = if ($taskLocalSdk) { $taskLocalSdk } else { 'dotnet' }
 }
 # Stamp of the last green run (0.219): version + SHA-256 of every git-tracked or new file except *.md, docs/ and repo.json. When nothing
 # changed since that run (e.g. -Commit after a plain run; never -Release since 0.1020) and the DLL is still there, the build/tests/package checks are not run again.

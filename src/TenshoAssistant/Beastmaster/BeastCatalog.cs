@@ -21,16 +21,24 @@ public sealed record Beast(uint Id, string Name, uint Icon, string Family, strin
     /// <summary>Attributes at this rank; a rank outside the table is the nearest known one. Null when the table is empty.</summary>
     public BeastStats? At(int rank) => Ranks.Count == 0 ? null : Ranks[Math.Clamp(rank - 1, 0, Ranks.Count - 1)];
 }
-public sealed record BoardAction(string Name, string Shape, string Target);
+/// <summary>X-486 (0.1529): Damage = the action's type of damage (Action.AttackType, its element when magical: the XBMElement rows of
+/// <see cref="Beast.AutoRow"/>), empty for an unaspected one or none.</summary>
+public sealed record BoardAction(string Name, string Shape, string Target, string Damage = "");
 /// <summary>
 /// X-109 (0.980, docs/evidence/0.980-beast-teams.md): Stars = XBMBattleDetail columns 1 to 5, the stars of the game's board window, in the order
 /// Strength, Intelligence, Physical resistance, Magical resistance, Vitality (the user's capture: Chevalier du plateau 2, 1, 2, 2, 3); WeaknessRow = its XBMElement row.
 /// </summary>
 public sealed record BoardEnemy(string Name, uint Icon, string Weakness, IReadOnlyList<BoardAction> Actions, BeastStats? Stars = null, uint WeaknessRow = 0);
-public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies);
+/// <summary>X-486 (0.1529): Detail = its XBMBattleDetail row (XBMContentBattle column 0), the number the game's board window gives its fights
+/// (AgentXBMStageDetailList, StageDetailEntry.BattleDetailId); 0 not known.</summary>
+public sealed record BoardBattle(bool Guardian, IReadOnlyList<BoardEnemy> Enemies, uint Detail = 0);
 public sealed record BoardBonus(string Name, string Condition, int Points);
-/// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.</summary>
-public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0);
+/// <summary>X-109 (0.981): Content = its ContentFinderCondition row (XBMContent column 0), which gives the labyrinth's territory.
+/// X-576 (0.1546): RankRecommended = the first number of the board window's « Rang de bête recommandé : X à Y » (Addon 17912, two numbers
+/// given by the game's code; Y is RankLimit, XBMContent column 3): the previous board's RankLimit plus one (<see cref="BeastCatalog.RankFloor"/>;
+/// the user's captures: « 1 à 5 » on the 1st board, « 6 à 10 » on the 2nd; column 2, 3 and 8, is not it: docs/evidence/0.1546-beast-rank-range.md).
+/// 0: not known.</summary>
+public sealed record Board(uint Id, string Name, int Level, int ItemLevel, int TeamSize, int RankLimit, IReadOnlyList<BoardBattle> Battles, IReadOnlyList<BoardBonus> Bonuses, uint Content = 0, int RankRecommended = 0);
 public enum BeastSort { Name, Family, Auto, Strength, Intelligence, PhysicalResistance, MagicalResistance, Vitality }
 
 public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Board> Boards)
@@ -42,6 +50,13 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         ["XBMElement"] = 1, ["XBMScoreBonus"] = 3, ["XBMActionEffectType"] = 1, ["XBMActionTarget"] = 1,
     };
     private const int FirstBonusColumn = 4;
+
+    /// <summary>
+    /// X-576 (0.1546, the user's capture of 18/11 around 00:05: « Rang de bête recommandé : 6 à 10 » before the 2nd board; « 1 à 5 » on the
+    /// 1st): the range's first number is the highest synchronisation rank (XBMContent column 3) below this board's, plus one; 1 for the
+    /// lowest board; 0 when the board's own rank is not known. No column of XBMContent holds it (docs/evidence/0.1546-beast-rank-range.md).
+    /// </summary>
+    public static int RankFloor(IEnumerable<int> limits, int limit) => limit <= 0 ? 0 : limits.Where(other => other > 0 && other < limit).DefaultIfEmpty(0).Max() + 1;
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
@@ -68,7 +83,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
         var shapes = sheets["XBMActionEffectType"].ToDictionary(row => row.Row, row => row.Text(0));
         var targets = sheets["XBMActionTarget"].ToDictionary(row => row.Row, row => row.Text(0));
-        var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), "")));
+        var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), ""), Auto(row.UInt(0))));
         var enemies = sheets["XBMBattleDetail"].Where(row => row.UInt(0) != 0).GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub).Select(row =>
             new BoardEnemy(Capitalize(enemyName(row.UInt(0))), row.UInt(10), Element(row.UInt(8)),
                 Array.AsReadOnly(new[] { row.UInt(6), row.UInt(7) }.Where(id => id != 0 && actions.ContainsKey(id)).Select(id => actions[id]).ToArray()),
@@ -79,11 +94,14 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         {
             var (name, level, itemLevel) = content(row.UInt(0));
             // The guardian's battle comes first in the sheet (« Gardien du plateau : combattre 3 monstres », board 1, battle 6: three enemies).
-            var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []))).ToArray();
+            var fights = (battles.GetValueOrDefault(row.Row) ?? []).Select(battle => new BoardBattle(battle.Sub == 0, Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []), battle.UInt(0))).ToArray();
             var scored = bonuses.Where(bonus => FirstBonusColumn + (int)bonus.Row < row.Cells.Length).Select(bonus => new BoardBonus(bonus.Text(1), bonus.Text(2), row.Int(FirstBonusColumn + (int)bonus.Row)))
                 .Where(bonus => bonus.Points > 0 && bonus.Name.Length > 0).ToArray();
             return new Board(row.Row, name, level, itemLevel, row.Int(1), row.Int(3), Array.AsReadOnly(fights), Array.AsReadOnly(scored), row.UInt(0));
         }).ToArray();
+        // X-576 (0.1546): each board's recommended range starts after the previous board's synchronisation rank (not column 2).
+        var limits = boards.Select(board => board.RankLimit).ToArray();
+        boards = boards.Select(board => board with { RankRecommended = RankFloor(limits, board.RankLimit) }).ToArray();
         return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
     }
 

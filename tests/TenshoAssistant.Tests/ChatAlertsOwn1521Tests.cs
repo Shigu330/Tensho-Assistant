@@ -45,7 +45,7 @@ internal static class ChatAlertsOwn1521Tests
             store.Add(Start.AddSeconds(2), 10, "Cloud Strife", [new ChatSegment("raid now")], 100);
             view.Refresh(store, tab, 100, null, settings);
             Check(view.Alerts == 1, $"only the other player's line alerts: {view.Alerts}");
-            Check(view.Unread == 2, $"your own line is not unread (the combat line and the other player's are): {view.Unread}");
+            Check(view.Unread == 1, $"your own line and the combat line are not unread (X-559, DEC-053), the other player's is: {view.Unread}");
         }),
         ("Chat alerts own 1521: the reader marks your lines with your character's name; the tooltip says it", () =>
         {

@@ -42,8 +42,9 @@ public static class ChatChannels
     };
     /// <summary>A person speaks on this channel, so its sender is written in front of the message.</summary>
     public static bool Spoken(ChatChannel channel)=>channel is <=ChatChannel.Novice;
-    /// <summary>A new line of this channel counts as unread in a tab; what you send yourself does not.</summary>
-    public static bool CountsAsUnread(ChatChannel channel)=>channel is not ChatChannel.TellOut;
+    /// <summary>A new line of this channel counts as unread in a tab; what you send yourself does not. X-559 (0.1528, DEC-053): nor a combat
+    /// line, never counted (a tab showing only combat stays at zero).</summary>
+    public static bool CountsAsUnread(ChatChannel channel)=>channel is not ChatChannel.TellOut and not ChatChannel.Combat;
     /// <summary>Tensho's own default colours (0xRRGGBB), changed in the settings; they are not read from the game.</summary>
     public static uint DefaultColor(ChatChannel channel)=>channel switch
     {

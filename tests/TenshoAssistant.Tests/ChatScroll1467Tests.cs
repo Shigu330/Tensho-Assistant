@@ -30,7 +30,7 @@ internal static class ChatScroll1467Tests
         {
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n", "\n");
             Check(window.Contains("ImGuiWindowFlags.AlwaysVerticalScrollbar|ImGuiWindowFlags.NoScrollWithMouse);", StringComparison.Ordinal)
-                  && window.Contains("ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY(),ref chatWheelRest));", StringComparison.Ordinal), "the wheel");
+                  && window.Contains("ImGui.SetScrollY(ChatScroll.Wheel(drawn,wheel,height,ImGui.GetScrollMaxY()+shift,ref chatWheelRest));", StringComparison.Ordinal), "the wheel");
             Check(window.Contains("else if(button is { } bottom)DrawChatBottomButton(view,bottom,shown,height);", StringComparison.Ordinal)
                   && window.Contains("localization.Format(\"ChatWindow.NewBelow\",view.Unread)", StringComparison.Ordinal)
                   && window.Contains("Tip(\"ChatWindow.ToBottomTip\");", StringComparison.Ordinal), "the button");

@@ -49,6 +49,9 @@ public sealed class JitWarmup : IDisposable
     /// interface's code (the readers' classes) may go on.</summary>
     public bool EarlyDone=>earlyDone;
     private volatile bool earlyDone;
+    /// <summary>X-563 M2 (review of 0.1534): when the early phase was compiled (ms after the warm-up was made; -1 before, or without an
+    /// early phase): the readers' classes and the chat window wait for it (MainWindow.WarmupEarlyDone).</summary>
+    public double EarlyReadyAfter{get;private set;}=-1;
     /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
     public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
@@ -164,7 +167,7 @@ public sealed class JitWarmup : IDisposable
     /// </summary>
     public static readonly IReadOnlyList<string> OverlayMethods=["DrawCraftLogHelper","DrawMonsterOverheadIcons","CollectDiscoveries","DrawStorageHighlight","DrawItemHover",
         "DrawCactpotOverlay","DrawCraftLivePanel","DrawInventorySortButton","ObserveRegenTick","DrawChatLinkMenu","DrawTriadOverlay","DrawTriadRequestPanel","DrawTriadDeckReminder","DrawCharacterPanel",
-        "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
+        "DrawDutyFinderPanel","DrawFashionCheckPanel","DrawGatheringPanel","DrawBeastComboHighlight","DrawCollectablePanel","DrawRetainerSalesPanel","DrawSpearfishingPanel","DrawOceanVoyagePanel",
         "ProcessGameLogRequest","ObserveHuntTrain","ObserveOccultAlerts","ObserveGarden","WatchWishlistSales","WatchPlots","DrawFishingPanel","RefreshNearbyMonsters"];
     private static readonly string[] OverlayBracketed=Bracketed(OverlayMethods);
     /// <summary>Words of the main window's methods that belong to the free panels and bars drawn every frame (tracker, wear bar, alarm and reminder bars).</summary>
@@ -187,8 +190,25 @@ public sealed class JitWarmup : IDisposable
         return false;
     }
 
-    /// <summary>X-01 C2.1 (0.1185): what the early phase compiles: the map's methods and the overlays'.</summary>
-    public static bool EarlyMethod(MethodBase method)=>MapFirst(method) || OverlayFirst(method);
+    /// <summary>X-01 C2.1 (0.1185): what the early phase compiles: the map's methods and the overlays'. X-558 (0.1533): the chat window's too.</summary>
+    public static bool EarlyMethod(MethodBase method)=>MapFirst(method) || OverlayFirst(method) || ChatFirst(method);
+
+    /// <summary>X-01 C2.1 (0.1185): the namespace of the chat window's types (its lines, layout, filters, history).</summary>
+    public const string ChatNamespace="TenshoAssistant.Chat";
+
+    /// <summary>
+    /// X-558 (0.1533, dalamud.log of 17/11 13:05:40: « Chat 62 ms » on the reload's first frame, its lines' refresh 5 ms and layout under
+    /// 1 ms: the rest was compiling): the chat's types and the window's chat methods (their name holds « Chat », lambdas included), compiled in
+    /// the early phase; the chat window waits for it (MainWindow.WarmupEarlyDone).
+    /// </summary>
+    public static bool ChatFirst(MethodBase method)
+    {
+        if(method.DeclaringType is not { } declaring)return false;
+        if(declaring.Namespace==ChatNamespace)return true;
+        for(var type=declaring;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow")return method.Name.Contains("Chat",StringComparison.Ordinal);
+        return false;
+    }
 
     /// <summary>X-01 (0.1111): the namespace of the map's types (catalogues, projection, layers, live readers).</summary>
     public const string MapNamespace="TenshoAssistant.Maps";
@@ -385,6 +405,7 @@ public sealed class JitWarmup : IDisposable
                 if(index++==earlyCount && early is not null)
                 {
                     EarlyPrepared=Prepared;
+                    EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                     earlyDone=true;
                     var left=delay-first-System.Diagnostics.Stopwatch.GetElapsedTime(started);
                     if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
@@ -396,6 +417,9 @@ public sealed class JitWarmup : IDisposable
                 try{Timed(method,()=>{RuntimeHelpers.PrepareMethod(method.MethodHandle);return true;});Prepared++;}
                 catch(Exception){Skipped++;}
             }
+            // X-563 M2: every method was early: the phase ends with the warm-up.
+            // X-573 M2 (0.1540): told done at the same moment (it was only in the finally, after the log line that says it ready).
+            if(early is not null && EarlyReadyAfter<0){EarlyPrepared=Prepared;EarlyReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;earlyDone=true;}
             Elapsed=System.Diagnostics.Stopwatch.GetElapsedTime(started);
             Completed=true;
             if(!token.IsCancellationRequested)finished?.Invoke(this);

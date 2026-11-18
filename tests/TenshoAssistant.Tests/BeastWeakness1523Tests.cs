@@ -79,7 +79,7 @@ internal static class BeastWeakness1523Tests
         ("Beast weakness 1523: the panel says it and no longer says it turns off in a fight", () =>
         {
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
-            Check(page.Contains("BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, Beasts?.State.Obtained)") && page.Contains("\"BeastUi.MissNone\""), "the missed weaknesses drawn");
+            Check(page.Contains("BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, held)") && page.Contains("\"BeastUi.MissNone\""), "the missed weaknesses drawn");
             var en = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/en.json"));
             var fr = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Localization/Languages/fr.json"));
             Check(!fr.Contains("ce panneau se coupe quand un combat commence") && fr.Contains("le Dédale bestial n'est pas coupé, combats compris") && en.Contains("the Crucible of the Unbroken is not cut, fights included"), "R03.2: not cut, fights included");

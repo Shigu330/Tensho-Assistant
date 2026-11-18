@@ -9,7 +9,12 @@ public sealed record BattlePlan(int Battle, IReadOnlyList<BeastPick> Team, int W
 /// <summary>The 10 beasts to bring for a board, and the 3 of each fight among them.</summary>
 /// <param name="RanksAssumed">X-549 (0.1522): a beast of the team (not of every beast held) has its rank assumed, or the beasts held are not read.</param>
 /// <param name="RanksUnknown">X-549: how many beasts of the team have their rank assumed (the board's limit).</param>
-public sealed record BoardPlan(uint Board, IReadOnlyList<BeastPick> Team, IReadOnlyList<BattlePlan> Battles, bool RanksAssumed, int RanksUnknown = 0);
+/// <param name="Left">X-575 (0.1543): the weaknesses of the board that no fight's three hit, and why (null: a plan kept before 0.1543).</param>
+public sealed record BoardPlan(uint Board, IReadOnlyList<BeastPick> Team, IReadOnlyList<BattlePlan> Battles, bool RanksAssumed, int RanksUnknown = 0, IReadOnlyList<WeaknessLeft>? Left = null);
+/// <summary>X-575 (0.1543): why a weakness of the board is left out: no beast held hits it, or the team's places all went to weaknesses of more enemies.</summary>
+public enum LeftReason { NoneHeld, NoRoom }
+/// <summary>X-575 (0.1543): a weakness of the board (its XBMElement row and name) that the plan leaves out, with the reason.</summary>
+public sealed record WeaknessLeft(uint Weakness, string Name, LeftReason Reason);
 /// <summary>X-549 (0.1522): where the board the panel shows comes from: the labyrinth's territory, the game's board or team window, or the
 /// list of the page (chosen by hand, when the game tells nothing).</summary>
 public enum BoardSource { Labyrinth, Window, Chosen }
@@ -21,6 +26,9 @@ public enum BoardSource { Labyrinth, Window, Chosen }
 /// 2) attack: for each enemy, the better of Strength over its Physical resistance stars and Intelligence over its Magical resistance stars;
 /// 3) defence: Physical resistance weighted by the enemy's Strength stars, Magical resistance by its Intelligence stars, plus Vitality.
 /// The 10: each fight's best 3 among every beast held, then the beasts chosen in the most fights, then the best attack. Nothing is guessed about a fight's outcome.
+/// X-575 (0.1543, the user's report of 17/11: « with an empty team it should take every weakness but does not »): the 10 first take, one by
+/// one, the beast held that adds the most enemies hit by their weakness over the whole board (each fight's three at most); only then the
+/// rule above fills the places left.
 /// </summary>
 public static class BeastTeams
 {
@@ -28,6 +36,32 @@ public static class BeastTeams
     public static string HitKey(int enemies) => enemies <= 1 ? "BeastUi.TeamHitOne" : "BeastUi.TeamHit";
 
     public const int PerBattle = 3;
+
+    /// <summary>
+    /// X-579 (0.1547): an enemy's strength, the sum of its five stars of the board window (XBMBattleDetail columns 1 to 5); 0 when not read.
+    /// The sheets mark no enemy as summoned nor as the fight's leader (docs/evidence/0.1547-beast-strongest.md): the stars decide.
+    /// </summary>
+    public static int Power(BoardEnemy enemy) => enemy.Stars is { } stars ? stars.Strength + stars.Intelligence + stars.PhysicalResistance + stars.MagicalResistance + stars.Vitality : 0;
+
+    /// <summary>X-579 (0.1547): the fight's strongest enemy (the first in the sheet's order on a tie), or null when its enemies are all as strong.</summary>
+    public static BoardEnemy? Strongest(BoardBattle fight) => fight.Enemies.Select(Power).Distinct().Count() > 1 ? fight.Enemies.OrderByDescending(Power).First() : null;
+
+    /// <summary>
+    /// X-579 (0.1547, the user's request of 18/11: « the weaknesses must be of the strongest monster first »): the weight of each enemy of a
+    /// fight, so that hitting a stronger enemy's weakness always counts more than hitting any number of weaker ones (the enemies of a same
+    /// strength count the same; all as strong: 1 each, the count of before).
+    /// </summary>
+    public static long[] Weights(IReadOnlyList<BoardEnemy> enemies)
+    {
+        var levels = enemies.Select(Power).Distinct().OrderDescending().ToArray();
+        var radix = enemies.Count + 1L;
+        return enemies.Select(enemy =>
+        {
+            long weight = 1;
+            for (var level = Array.IndexOf(levels, Power(enemy)) + 1; level < levels.Length; level++) weight *= radix;
+            return weight;
+        }).ToArray();
+    }
 
     public static (bool Weak, double Attack, double Guard) Against(BeastStats beast, uint autoRow, BoardEnemy enemy)
     {
@@ -45,25 +79,40 @@ public static class BeastTeams
         if (count == 0 || enemies.Count == 0) return ([], 0);
         size = Math.Min(size, count);
         var scores = beasts.Select(beast => enemies.Select(enemy => Against(beast.Stats, beast.AutoRow, enemy)).ToArray()).ToArray();
-        (int Covered, int Hits, double Attack, double Guard) Score(int[] team)
+        // X-579 (0.1547): the enemies hit count by their weight (the strongest first), then the beasts' hits, attack and defence.
+        var weights = Weights(enemies);
+        (long Covered, int Hits, double Attack, double Guard) Score(int[] team)
         {
-            var covered = 0; var hits = 0; double attack = 0, guard = 0;
+            long covered = 0; var hits = 0; double attack = 0, guard = 0;
             for (var enemy = 0; enemy < enemies.Count; enemy++)
             {
                 var any = false;
                 foreach (var member in team) { var value = scores[member][enemy]; if (value.Weak) { hits++; any = true; } attack += value.Attack; guard += value.Guard; }
-                if (any) covered++;
+                if (any) covered += weights[enemy];
             }
             return (covered, hits, attack, guard);
         }
-        int[]? best = null; (int, int, double, double) bestScore = default;
+        int[]? best = null; (long, int, double, double) bestScore = default;
         foreach (var team in Combinations(count, size))
         {
             var score = Score(team);
             if (best is null || score.CompareTo(bestScore) > 0) { best = team; bestScore = score; }
         }
-        return (best ?? [], bestScore.Item1);
+        var chosen = best ?? [];
+        return (CallOrder(chosen, scores, weights), Enumerable.Range(0, enemies.Count).Count(enemy => chosen.Any(member => scores[member][enemy].Weak)));
     }
+
+    /// <summary>
+    /// X-575 part 4 (0.1544, the user's request of 17/11 around 23:25: « the best beasts for the fights, knowing they come out one at a time:
+    /// weakness first, then the rest, stats and others »): the three in calling order, the best first: the enemies whose weakness it hits, then
+    /// its attack against their resistances, then its defence (DescriptionString 1751: Force and Intelligence the damage dealt, the resistances
+    /// the damage taken, Vitalité the HP). The rank counts only through the attributes it gives. The enemies' vulnerabilities to effects are
+    /// not used: their meaning is not established (docs/evidence/0.1523-beast-weakness.md). X-579 (0.1547): the enemies hit count by their
+    /// weight (<see cref="Weights"/>): the beast that hits the strongest enemy's weakness is called first.
+    /// </summary>
+    private static int[] CallOrder(int[] picks, (bool Weak, double Attack, double Guard)[][] scores, long[] weights)
+        => picks.OrderByDescending(member => scores[member].Select((value, enemy) => value.Weak ? weights[enemy] : 0L).Sum()).ThenByDescending(member => scores[member].Sum(value => value.Attack))
+            .ThenByDescending(member => scores[member].Sum(value => value.Guard)).ThenBy(member => member).ToArray();
 
     private static IEnumerable<int[]> Combinations(int count, int size)
     {
@@ -95,20 +144,74 @@ public static class BeastTeams
         }).ToArray();
         var fights = board.Battles.Select((battle, index) => (Index: index, battle.Enemies)).Where(fight => fight.Enemies.Count > 0).ToArray();
         IReadOnlyList<(BeastStats, uint)> Input(IEnumerable<int> members) => members.Select(member => (pool[member].Stats, pool[member].Beast.AutoRow)).ToArray();
-        // The 10: the beasts each fight would call from everything held, most fights first, then the best total attack.
         var size = Math.Max(1, Math.Min(board.TeamSize > 0 ? board.TeamSize : 10, pool.Length));
+        double Attack(int member) => fights.Sum(fight => fight.Enemies.Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
+        // X-575 (0.1543): the weaknesses first, over the whole board: each pick is the beast that adds the most enemies hit (a fight's three at
+        // most), then the one strongest against the enemies it hits, then the best total attack.
+        var weak = fights.Select(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0).GroupBy(enemy => enemy.WeaknessRow).ToDictionary(group => group.Key, group => group.Count())).ToArray();
+        var team = new List<int>();
+        var rows = new HashSet<uint>();
+        int Covered(HashSet<uint> present) => weak.Sum(fight => fight.Where(pair => present.Contains(pair.Key)).Select(pair => pair.Value).OrderDescending().Take(PerBattle).Sum());
+        double Strength(int member) => fights.Sum(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0 && enemy.WeaknessRow == pool[member].Beast.AutoRow)
+            .Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
+        while (team.Count < size)
+        {
+            var now = Covered(rows);
+            var next = Enumerable.Range(0, pool.Length).Where(member => !team.Contains(member) && pool[member].Beast.AutoRow != 0 && !rows.Contains(pool[member].Beast.AutoRow))
+                .Select(member => (Member: member, Gain: Covered([.. rows, pool[member].Beast.AutoRow]) - now)).Where(pick => pick.Gain > 0)
+                .OrderByDescending(pick => pick.Gain).ThenByDescending(pick => Strength(pick.Member)).ThenByDescending(pick => Attack(pick.Member)).ThenBy(pick => pool[pick.Member].Beast.Id).FirstOrDefault();
+            if (next.Gain <= 0) break;
+            team.Add(next.Member); rows.Add(pool[next.Member].Beast.AutoRow);
+        }
+        // The places left: the beasts each fight would call from everything held, most fights first, then the best total attack.
         var chosenIn = new int[pool.Length];
         foreach (var fight in fights)
             foreach (var member in Best(Input(Enumerable.Range(0, pool.Length)), fight.Enemies).Picks) chosenIn[member]++;
-        double Attack(int member) => fights.Sum(fight => fight.Enemies.Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
-        var team = Enumerable.Range(0, pool.Length).OrderByDescending(member => chosenIn[member]).ThenByDescending(Attack).ThenBy(member => pool[member].Beast.Id).Take(size).ToArray();
+        team.AddRange(Enumerable.Range(0, pool.Length).Where(member => !team.Contains(member)).OrderByDescending(member => chosenIn[member]).ThenByDescending(Attack)
+            .ThenBy(member => pool[member].Beast.Id).Take(size - team.Count));
         var battles = fights.Select(fight =>
         {
             var (picks, hit) = Best(Input(team), fight.Enemies);
             return new BattlePlan(fight.Index, picks.Select(pick => pool[team[pick]].Pick).ToArray(), hit, fight.Enemies.Count);
         }).ToArray();
+        // X-575: a weakness no fight's three hits is said with its reason: no beast held hits it, or the places went to weaknesses of more enemies.
+        var hitRows = team.Select(member => pool[member].Beast.AutoRow).ToHashSet();
+        var heldRows = pool.Select(member => member.Beast.AutoRow).ToHashSet();
+        var left = fights.SelectMany(fight => fight.Enemies).Where(enemy => enemy.WeaknessRow != 0 && !hitRows.Contains(enemy.WeaknessRow)).GroupBy(enemy => enemy.WeaknessRow)
+            .Select(group => new WeaknessLeft(group.Key, group.First().Weakness, heldRows.Contains(group.Key) ? LeftReason.NoRoom : LeftReason.NoneHeld)).OrderBy(row => row.Weakness).ToArray();
         var unknown = team.Count(member => !pool[member].Pick.RankKnown);
-        return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown);
+        return new BoardPlan(board.Id, team.Select(member => pool[member].Pick).ToArray(), battles, held is null || unknown > 0, unknown, left);
+    }
+
+    /// <summary>
+    /// X-575 part 5 (0.1545, the user's request of 17/11 around 23:30: « the rank is not a criterion, but one can say the rank is low for the
+    /// board »): a rank read below the board's recommended range (« Rang de bête recommandé : X à Y », X = <see cref="Board.RankRecommended"/>).
+    /// Only a warning: the choice never uses it. A rank not read (assumed) or a range not known is never said low.
+    /// </summary>
+    public static bool RankLow(Board board, int rank, bool known = true) => known && board.RankRecommended > 0 && rank > 0 && rank < board.RankRecommended;
+
+    /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
+    /// 3 (0.1544): each fight's three in calling order. 4 (0.1547, X-579): the strongest enemy's weakness first.</summary>
+    public const int PlanVersion = 4;
+
+    /// <summary>
+    /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made
+    /// before 0.1523 (magical beasts hit nothing then) and its key held only the beasts held and their ranks, so it was never made again.
+    /// The mark of the rules and of the game's data the plan comes from (each beast's attack and attributes, each enemy's weakness and stars,
+    /// each board's size and limit), part of the key: another version of the rules or of the game's sheets makes the plans again.
+    /// </summary>
+    public static string Mark(BeastCatalog catalog)
+    {
+        var hash = 2166136261u;
+        void Add(long value) { unchecked { hash = (hash ^ (uint)value) * 16777619u; hash = (hash ^ (uint)(value >> 32)) * 16777619u; } }
+        void Stats(BeastStats? stats) { if (stats is null) { Add(-1); return; } Add(stats.Strength); Add(stats.Intelligence); Add(stats.PhysicalResistance); Add(stats.MagicalResistance); Add(stats.Vitality); }
+        foreach (var beast in catalog.Beasts) { Add(beast.Id); Add(beast.AutoRow); Add(beast.Ranks.Count); foreach (var rank in beast.Ranks) Stats(rank); }
+        foreach (var board in catalog.Boards)
+        {
+            Add(board.Id); Add(board.TeamSize); Add(board.RankLimit); Add(board.Battles.Count);
+            foreach (var battle in board.Battles) { Add(battle.Enemies.Count); foreach (var enemy in battle.Enemies) { Add(enemy.WeaknessRow); Stats(enemy.Stars); } }
+        }
+        return $"v{PlanVersion}:{hash:x8}";
     }
 
     /// <summary>X-550 (0.1526): a beast of the team chosen in the game's team window: its rank shown there, and its HP (-1 and 0: not read).</summary>
@@ -172,6 +275,29 @@ public static class BeastTeams
         return fights;
     }
 
+    /// <summary>X-562 M2 (review of 0.1526): how many beasts of the team have their rank assumed; a plan kept before 0.1522 has no count (0)
+    /// although its beasts say it: they are counted then.</summary>
+    public static int RanksUnknownOf(BoardPlan plan) => plan.RanksUnknown > 0 ? plan.RanksUnknown : plan.Team.Count(pick => !pick.RankKnown);
+
+    /// <summary>
+    /// X-486 (0.1529, the user's request of 16/11): the board's fights the game's board window shows (their XBMBattleDetail rows, read in
+    /// AgentXBMStageDetailList's entries), in the board's order. None when nothing is read, or when the window shows every fight of the board
+    /// (then no fight is its own: the whole board is shown as before).
+    /// </summary>
+    public static IReadOnlyList<int> FightsShown(Board board, IReadOnlyCollection<uint>? shown)
+    {
+        if (shown is not { Count: > 0 } || board.Battles.Count == 0) return [];
+        var set = shown as IReadOnlySet<uint> ?? shown.ToHashSet();
+        var found = Enumerable.Range(0, board.Battles.Count).Where(index => board.Battles[index].Detail != 0 && set.Contains(board.Battles[index].Detail)).ToArray();
+        return found.Length == board.Battles.Count ? [] : found;
+    }
+
+    /// <summary>X-486 (0.1529): why a beast is called for a fight: the names of the enemies whose weakness its automatic attack hits (empty: none,
+    /// chosen for its attack and defence).</summary>
+    /// <remarks>X-579 (0.1547): the strongest enemy first.</remarks>
+    public static IReadOnlyList<string> Hits(BoardBattle fight, Beast? beast)
+        => beast is null || beast.AutoRow == 0 ? [] : fight.Enemies.Where(enemy => enemy.WeaknessRow == beast.AutoRow).OrderByDescending(Power).Select(enemy => enemy.Name).Distinct().ToArray();
+
     /// <summary>X-553 (0.1523): a weakness of a fight's enemies that none of its three beasts hits: the team's other beasts that would hit it, and
     /// the beasts held outside the team that would (all beasts when the beasts held are not read).</summary>
     public sealed record WeaknessMissed(uint Weakness, string Name, IReadOnlyList<uint> InTeam, IReadOnlyList<uint> Held);
@@ -218,6 +344,16 @@ public static class BeastTeams
     /// X-561 (review of 0.1526, I1): a beast's rank never goes down in the game, so a rank read never lowers a rank known higher, whatever the
     /// limit (limit 0 when the board is not known, or a window's limit lower than the beast's rank): the known rank and its « at least » stay.
     /// </summary>
+    /// <summary>
+    /// X-580 (0.1549, the user's request of 18/11: « in the order of the bestiary's numbers, to make selecting easier »): the beasts to bring
+    /// in the order of the game's bestiary: its number is the beast's XBMPet row (« N°1 » Cu sith, row 1; « N°3 » Mouton, row 3;
+    /// docs/evidence/0.1548-beast-book.md). Each fight's three keep their calling order.
+    /// </summary>
+    public static IReadOnlyList<BeastPick> BookOrder(IEnumerable<BeastPick> team) => team.OrderBy(pick => pick.Beast).ToArray();
+
+    /// <summary>X-578 (0.1548): the limit to give <see cref="MergeRanks"/> for a rank read in the bestiary: the beast's own, never a floor.</summary>
+    public const int Exact = int.MaxValue;
+
     public static (Dictionary<uint, int> Ranks, HashSet<uint> Floors) MergeRanks(IReadOnlyDictionary<uint, int>? known, IReadOnlySet<uint>? floors, IReadOnlyDictionary<uint, int> read, int limit)
     {
         var ranks = new Dictionary<uint, int>(known ?? new Dictionary<uint, int>());
@@ -240,7 +376,53 @@ public static class BeastTeams
     /// <summary>The plans kept on disk (X-109: « cache disque »), one per board, with what they were computed from.</summary>
     /// <summary>X-135 (0.1163): Result = the last board's result read in the game's result window (null before the first one; older files have none).</summary>
     /// <summary>X-549 (0.1522): Floors = the beasts whose rank is only known to be at least the one kept (read at a board's limit).</summary>
-    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys, Dictionary<uint, int>? Ranks = null, BoardResult? Result = null, HashSet<uint>? Floors = null);
+    /// <summary>X-578 (0.1548): Book = each beast's page last read in the game's bestiary (null: none read, or a file of before).</summary>
+    public sealed record SavedPlans(Dictionary<uint, BoardPlan> Plans, Dictionary<uint, string> Keys, Dictionary<uint, int>? Ranks = null, BoardResult? Result = null, HashSet<uint>? Floors = null,
+        Dictionary<uint, BookRead>? Book = null);
+
+    /// <summary>
+    /// X-578 (0.1548): a beast's page of the game's bestiary (XBMMonsterBookDetail): its rank (« Rang 5 (8) »: 8 the beast's own rank, 5 the
+    /// rank it is synchronised at on the board), the attributes and HP the page shows (those of the synchronised rank) and its experience.
+    /// </summary>
+    public sealed record BookRead(uint Beast, int Rank, int Synced, BeastStats Stats, int Hp, int Exp);
+
+    /// <summary>
+    /// X-578 (0.1548, docs/evidence/0.1548-beast-book.md): the texts of the bestiary's beast page, in the order of the window's nodes: each
+    /// value before its label (« 0/3; Satiété; 83; Rés. magique; 95; Intelligence; 125; Vitalité; 88; Rés. physique; 154; Force; 608/608; PV;
+    /// 78/100; Exp; (8); 5; Rang »), then the beast's name. Read by place from the only « (n) » text (the beast's own rank, the synchronised
+    /// one after it), so the client's language does not matter; the beast by its name (the catalog's names come from the client's sheets).
+    /// A beast not held shows no numbers (« Exp; Rang »): none. Anything out of shape (after a game update): none, never a wrong rank (R08).
+    /// </summary>
+    public static BookRead? ParseBook(IReadOnlyList<string> texts, IReadOnlyList<Beast> beasts)
+    {
+        var named = texts.Select(text => beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, text, StringComparison.CurrentCultureIgnoreCase)))
+            .Where(row => row is not null).Distinct().ToArray();
+        var at = Enumerable.Range(0, texts.Count).Where(index => Own(texts[index]) > 0).ToArray();
+        if (named is not [{ } beast] || at is not [var own] || own < 16 || own + 1 >= texts.Count) return null;
+        static int Own(string text) => text.Length > 2 && text[0] == '(' && text[^1] == ')' && int.TryParse(text[1..^1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : 0;
+        static int Whole(string text) => int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : -1;
+        static int Part(string text) => text.Split('/') is [var now, var most] && Whole(now) >= 0 && Whole(most) > 0 ? Whole(now) : -1;
+        var rank = Own(texts[own]);
+        var synced = Whole(texts[own + 1]);
+        int[] stats = [Whole(texts[own - 6]), Whole(texts[own - 12]), Whole(texts[own - 8]), Whole(texts[own - 14]), Whole(texts[own - 10])];
+        var (exp, hp, satiety) = (Part(texts[own - 2]), Part(texts[own - 4]), Part(texts[own - 16]));
+        if (rank > Math.Max(1, beast.Ranks.Count) || synced < 1 || synced > rank || stats.Any(value => value < 0) || exp < 0 || hp < 0 || satiety < 0) return null;
+        return new BookRead(beast.Id, rank, synced, new BeastStats(stats[0], stats[1], stats[2], stats[3], stats[4]), hp, exp);
+    }
+
+    /// <summary>
+    /// X-578 (0.1548): a page of the bestiary read: its rank is the beast's own (not a floor: <see cref="Exact"/>), merged so that a rank
+    /// known higher never goes down (X-561); the page kept, unless one of a higher rank is kept. Null when nothing changes (no write).
+    /// </summary>
+    public static SavedPlans? WithBook(SavedPlans plans, BookRead read)
+    {
+        var (ranks, floors) = MergeRanks(plans.Ranks, plans.Floors, new Dictionary<uint, int> { [read.Beast] = read.Rank }, Exact);
+        var book = new Dictionary<uint, BookRead>(plans.Book ?? []);
+        if (!book.TryGetValue(read.Beast, out var before) || before.Rank <= read.Rank) book[read.Beast] = read;
+        var same = plans.Ranks is { } known && known.Count == ranks.Count && ranks.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)
+            && (plans.Floors ?? []).SetEquals(floors) && plans.Book is { } kept && kept.Count == book.Count && book.All(pair => kept.TryGetValue(pair.Key, out var page) && page == pair.Value);
+        return same ? null : plans with { Ranks = ranks, Floors = floors, Book = book };
+    }
 
     /// <summary>
     /// X-109 (0.981): the ranks shown in the game's team window (XBMPetParty: each beast's attributes, then its name, then its rank; docs/evidence/0.980-beast-teams.md).
@@ -257,8 +439,9 @@ public static class BeastTeams
         }
         return found;
     }
-    public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null)
-        => (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
+    /// <summary>X-575 (0.1543): mark = <see cref="Mark"/> of the catalog (empty: none), so a plan made by other rules or other data is made again.</summary>
+    public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null, string mark = "")
+        => (mark.Length > 0 ? mark + "|" : "") + (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
             .Select(pair => $"{pair.Key}:{pair.Value}{(floors?.Contains(pair.Key) == true ? "+" : "")}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
     /// <summary>

@@ -52,7 +52,7 @@ internal static class BeastTeamRead1526Tests
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("team = BeastTeams.ParseTeam(texts, known);"), "read with the ranks");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
-            Check(page.Contains("if (BeastTeamRead?.Invoke() is { Count: > 0 } team)") && page.Contains("BeastTeams.FromTeam(board, plan, team, catalog.Beasts)"), "drawn before the advised plan");
+            Check(page.Contains("var team = BeastTeamRead?.Invoke();") && page.Contains("if (team is { Count: > 0 })") && page.Contains("BeastTeams.FromTeam(board, plan, team, catalog.Beasts)"), "drawn before the advised plan");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs")).Contains("mainWindow.BeastTeamRead=()=>boardReader?.State.Team;"), "wired");
         }),
     ];

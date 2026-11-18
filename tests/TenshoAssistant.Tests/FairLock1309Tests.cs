@@ -76,20 +76,22 @@ internal static class FairLock1309Tests
             Check(greedy.Join(TimeSpan.FromSeconds(30)) && during >= 1,"the greedy client kept saving too: " + during + " times during the waiting client's turns (" + string.Join("; ",rounds) + ")");
             Check(Marks(root).Length == 0,"no waiting mark left: " + string.Join(", ",Marks(root)));
         })),
-        ("Fair lock 1309: behaviour: two bank stores on one data file, one saving in a tight loop: the other's change goes through (lock wait 2 s)",() => InTemp(root =>
+        // X-571 (0.1541): the waiting store waits 10 s, the store's default (it was 2 s: one save of the busy store, slowed by the disk inside SQLite,
+        // took up to 4.3 s on 17/11 and the test failed once under load); the busy store saves until stopped, so an unfair lock still fails here.
+        ("Fair lock 1309: behaviour: two bank stores on one data file, one saving in a tight loop past the other's wait: the other's change goes through (lock wait 10 s, the store's default)",() => InTemp(root =>
         {
             var folder = Path.Combine(root,"InventoryBank");
             var legacy = Path.Combine(root,"InventoryBank.json");
             var database = Path.Combine(root,TenshoDataDatabase.FileName);
             TenshoDataFile Data() => new(database,(error,message) => { });
             var busy = new PerCharacterBankStore(folder,legacy,10_000,Data());
-            var waiting = new PerCharacterBankStore(folder,legacy,2_000,Data());
+            var waiting = new PerCharacterBankStore(folder,legacy,10_000,Data());
             Check(busy.Load().Length == 0 && waiting.Load().Length == 0,"both loaded, empty");
             using var stop = new CancellationTokenSource();
             var held = new StrongBox<int>();
             var greedy = new Thread(() =>
             {
-                var until = Environment.TickCount64 + 8_000;
+                var until = Environment.TickCount64 + 120_000;   // past the waiting store's five waits of 10 s: stopped by the test
                 while (Environment.TickCount64 < until && !stop.IsCancellationRequested)
                 {
                     busy.Apply(new BankChange(Put: Entry(7,BankStorageKind.Retainer,1000 + (ulong)held.Value)),[]);
@@ -100,9 +102,11 @@ internal static class FairLock1309Tests
             Started(held);
             for (var i = 0UL; i < 5; i++)
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 var saved = waiting.Apply(new BankChange(Put: Entry(8,BankStorageKind.Retainer,2000 + i)),[]);
-                Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)i + 1,"the waiting store's change " + i + " saved");
+                Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)i + 1,"the waiting store's change " + i + " saved (" + watch.ElapsedMilliseconds + " ms)");
             }
+            Check(greedy.IsAlive,"the busy store was still saving after the waiting store's changes");
             stop.Cancel();
             Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy store stopped");
             var all = new PerCharacterBankStore(folder,legacy,10_000,Data()).Load();

@@ -53,7 +53,7 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
-        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
+        "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "HighlightBeastCombos", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "StateServerBar", "StateServerBarOnlyProblems", "StatePanel", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
         "AlarmBarTooltipCount", "RouteUnlockedOnly", "GearLevelsBelow", "GearExactAtCaps", "GearMinItemLevel", "GearAssumeHq", "GearAllJobs",
@@ -427,6 +427,8 @@ public sealed partial class Configuration
     public Dictionary<string,string> PagePlaces { get; set; } = [];
     // X-109 (0.981): the team panel beside the game's Beastmaster board.
     public bool ShowBeastBoardPanel { get; set; } = true;
+    // X-136 (0.1550, R03.2): in the labyrinth, the beastmaster's skills that make a combo with the beast called, highlighted on the hotbars; off by default.
+    public bool HighlightBeastCombos { get; set; }
     // X-188 (0.1178, user request of 12/11): the panel on the Occult Crescent (worn phantom job, knowledge, coins); on, shown only on the island.
     public bool OccultPanel { get; set; } = true;
     // X-189 (0.1179, user request of 12/11): on the island, a chat line (and the desktop application) when a critical engagement opens or a FATE starts.

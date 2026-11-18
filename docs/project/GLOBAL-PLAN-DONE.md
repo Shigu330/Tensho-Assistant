@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (566 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (582 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -610,6 +610,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
 | X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
 | X-519 | Review  (review 0.1497, 16/11), I1: finding in… | Done in 0.1498 |
+| X-520 | Review  (review 0.1497, 16/11), I2: finding in journal.jsonl (agent file)… | Done in 0.1536 |
 | X-521 | Review  (review 0.1497, 16/11), minor M1, M2, M3, M4, M5, M6, M7: M1 in… | Done in 0.1498.0 |
 | X-522 | Tool (defect seen by the master on 11/16 around 1:55 pm): plan.py… | Done in 0.1498.0 |
 | X-523 | Review of block 0.1498 to 0.1500 (review 0.1500, 16/11), I1: finding in… | Done in 0.1501 |
@@ -634,12 +635,27 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
 | X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
+| X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
+| X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
+| X-562 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), minor M1, M2, M3, M4… | Done in 0.1531 |
+| X-563 | Review of block 0.1527 to 0.1534 (review 0.1534, 17/11), minor M1, M2, M3: M1… | Done in 0.1535 |
+| X-566 | Audit of 17/11 (master's report, part A, items 1 to 3): three places of the… | Done in 0.1538.0 |
+| X-567 | Audit of 17/11 (master's report, part B): four errors players see: FAQ « the… | Done in 0.1538 |
+| X-570 | Audit of 17/11 (master's report, part A, items 4 to 10): cleanup and robustness… | Done in 0.1539 |
+| X-571 | Flaky test « Fair lock 1309 » (two bank stores on one file, 2 s lock wait)… | Done in 0.1541 |
+| X-572 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), I1: finding in… | Done in 0.1540 |
+| X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
+| X-575 | Bug seen by the user in the Beastmaster labyrinth on 17/11 around 23:00 (two… | Done in 0.1545 |
+| X-576 | User reading of 18/11 around 00:05 (capture of the window before entering the… | Done in 0.1546 |
+| X-578 | User's request of 18/11 around 00:15: « first find the rank of every beast… | Done in 0.1548 |
+| X-579 | User's request of 18/11 around 00:25 (capture of the call order of the board's… | Done in 0.1547 |
+| X-582 | Tool (defect seen on 18/11 around 00:30, relay 110): q.py plafond, hence… | Done in 0.1548 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (566 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (582 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1247,6 +1263,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
 | X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |
 | X-519 | Relecture  (relecture 0.1497, 16/11), I1 : Onze textes montrés aux joueurs… | Fait en 0.1498 |
+| X-520 | Relecture  (relecture 0.1497, 16/11), I2 : La définition de « fait » de X-449… | Fait en 0.1536 |
 | X-521 | Relecture  (relecture 0.1497, 16/11), mineurs M1, M2, M3, M4, M5, M6, M7 : M1… | Fait en 0.1498.0 |
 | X-522 | Outil (défaut vu par la maître le 16/11 vers 13 h 55) : plan.py… | Fait en 0.1498.0 |
 | X-523 | Relecture du bloc 0.1498 à 0.1500 (relecture 0.1500, 16/11), I1 : X-492 M4 : la… | Fait en 0.1501 |
@@ -1271,3 +1288,18 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
 | X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
+| X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
+| X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
+| X-562 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), mineurs M1, M2… | Fait en 0.1531 |
+| X-563 | Relecture du bloc 0.1527 à 0.1534 (relecture 0.1534, 17/11), mineurs M1, M2, M3… | Fait en 0.1535 |
+| X-566 | Audit du 17/11 (rapport de la maître, partie A, points 1 à 3) : trois endroits… | Fait en 0.1538.0 |
+| X-567 | Audit du 17/11 (rapport de la maître, partie B) : quatre erreurs que voient les… | Fait en 0.1538 |
+| X-570 | Audit du 17/11 (rapport de la maître, partie A, points 4 à 10) : nettoyage et… | Fait en 0.1539 |
+| X-571 | Test fragile « Fair lock 1309 » (deux magasins de banque sur un fichier… | Fait en 0.1541 |
+| X-572 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), I1 : Le rejeu peut… | Fait en 0.1540 |
+| X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
+| X-575 | Bug vu par l'utilisateur au Dédale bestial le 17/11 vers 23 h (deux captures du… | Fait en 0.1545 |
+| X-576 | Relevé de l'utilisateur du 18/11 vers 0 h 05 (capture de la fenêtre d'avant… | Fait en 0.1546 |
+| X-578 | Demande de l'utilisateur du 18/11 vers 0 h 15 : « avant il faut trouver le rang… | Fait en 0.1548 |
+| X-579 | Demande de l'utilisateur du 18/11 vers 0 h 25 (capture de l'ordre d'appel du… | Fait en 0.1547 |
+| X-582 | Outil (défaut constaté le 18/11 vers 0 h 30, relais 110) : q.py plafond, et… | Fait en 0.1548 |

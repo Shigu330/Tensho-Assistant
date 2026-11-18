@@ -512,13 +512,21 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerCompare?.Dispose());
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
-            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead),()=>boardReader?.Dispose());
+            registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead),()=>boardReader?.Dispose());
             registrations.Register(()=>{boardWindow=new BeastBoardWindow(mainWindow){Windows=()=>boardReader?.State ?? default};boardWindows.AddWindow(boardWindow);},()=>{if(boardWindow is not null)boardWindows.RemoveWindow(boardWindow);});
             showBoardPanel=()=>configuration.ShowBeastBoardPanel;
             // X-549 (0.1522): the board the game's board or team window is about, for the panel and the page.
             mainWindow.BeastBoardContent=()=>boardReader?.State.Content ?? 0;
             // X-550 (0.1526): the team the game's team window shows.
             mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
+            // X-486 (0.1529): the fights the game's board window shows.
+            mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
+            // X-136 (0.1550): the beast called and the hotbars for the combo highlight (off by default).
+            mainWindow.BeastActive=()=>boardReader?.ActiveBeast ?? 0;
+            Gathering.ActionBarLocator? beastBarLocator=null;
+            registrations.Register(()=>mainWindow.BeastBarLocator=beastBarLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BeastBarLocator=null;beastBarLocator?.Dispose();});
+            // X-136 (0.1530): the names of the beasts' Tricks and of the beastmaster's skills, from the game's Action sheet.
+            mainWindow.BeastActionName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Action>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
             mainWindow.BeastBoardOfTerritory=territory=>mainWindow.Beasts?.State.Catalog?.Boards.FirstOrDefault(board=>data.GetExcelSheet<Lumina.Excel.Sheets.ContentFinderCondition>().GetRowOrDefault(board.Content)?.TerritoryType.RowId==territory)?.Id ?? 0;
             Beastmaster.BeastWindowProbe? beastProbe=null;
             registrations.Register(()=>beastProbe=new Beastmaster.BeastWindowProbe(framework,gameGui,log,()=>configuration.DeveloperMode),()=>beastProbe?.Dispose());
@@ -1573,6 +1581,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("DutyFinder",mainWindow.DrawDutyFinderPanel),
             ("FashionCheck",mainWindow.DrawFashionCheckPanel),
             ("Gathering",mainWindow.DrawGatheringPanel),
+            ("BeastCombo",mainWindow.DrawBeastComboHighlight),
             ("Collectable",mainWindow.DrawCollectablePanel),
             ("RetainerSales",mainWindow.DrawRetainerSalesPanel),
             ("Spearfishing",mainWindow.DrawSpearfishingPanel),

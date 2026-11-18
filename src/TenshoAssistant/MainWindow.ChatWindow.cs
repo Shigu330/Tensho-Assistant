@@ -381,6 +381,8 @@ internal sealed partial class MainWindow
                     if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"))){ChatMessages.Restart(tab);tabs.RemoveAt(index);chatSettingsPending=true;return;}
                     Tip("ChatWindow.TabRemoveTip");
                 }
+                // X-520 (0.1537): the desktop application's picture of the chat's tabs shows the first tab's channels (X-560's grid).
+                if(index==0 && desktopChatChannelsOpen){ImGui.SetNextItemOpen(true);desktopChatChannelsOpen=false;}
                 if(TenshoAssistant.UI.UiComponents.TreeNode(localization.Format("ChatWindow.TabChannels",tab.Channels?.Count ?? 0)+"###ChatTabChannels"))
                 {
                     try{DrawChatTabFilters(tab);}
@@ -479,16 +481,11 @@ internal sealed partial class MainWindow
             ImGui.SameLine();
             if(ImGui.SmallButton(localization.Get("ChatWindow.GroupNone"))){filters.RemoveAll(chosen=>list.Any(row=>row.Id==chosen));ChatTabChanged(tab);}
             Tip("ChatWindow.GroupNoneTip");
-            foreach(var row in list)
+            DrawChatCheckGrid("###ChatFilterRows"+id,list,row=>row.Name,row=>"ChatFilterRow"+row.Id,row=>filters.Contains(row.Id),(row,shown)=>
             {
-                var shown=filters.Contains(row.Id);
-                if(ImGui.Checkbox(row.Name+"###ChatFilterRow"+row.Id,ref shown))
-                {
-                    if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
-                    ChatTabChanged(tab);
-                }
-                TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));
-            }
+                if(shown)filters.Add(row.Id);else filters.Remove(row.Id);
+                ChatTabChanged(tab);
+            },row=>{TipText(()=>ChatHelpText(Chat.ChatHelp.FilterTip(row,localization.Get)));});
         }
         finally{ImGui.TreePop();}
     }
@@ -497,20 +494,17 @@ internal sealed partial class MainWindow
     /// them are, its label counting them.</summary>
     private void DrawChatFilterGenres(ChatTabSettings tab,List<uint> filters,ChatFilterTable table)
     {
-        foreach(var (genre,rows) in table.Genres())
+        DrawChatCheckGrid("###ChatFilterGenres",table.Genres(),genre=>
         {
-            var key=ChatFilterTable.GenreKey(genre);
-            var name=localization.Has(key) ? localization.Get(key):rows[0].Name;
-            var on=rows.Count(row=>filters.Contains(row.Id));
-            var all=on==rows.Count;
-            if(ImGui.Checkbox(ChatFilterLabel(name,rows,filters)+"###ChatFilterGenre"+key,ref all))
-            {
-                filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
-                if(all)filters.AddRange(rows.Select(row=>row.Id));
-                ChatTabChanged(tab);
-            }
-            TipText(()=>ChatGenreTip(on,rows.Count));
-        }
+            var key=ChatFilterTable.GenreKey(genre.Genre);
+            return ChatFilterLabel(localization.Has(key) ? localization.Get(key):genre.Rows[0].Name,genre.Rows,filters);
+        },genre=>"ChatFilterGenre"+ChatFilterTable.GenreKey(genre.Genre),genre=>genre.Rows.All(row=>filters.Contains(row.Id)),(genre,all)=>
+        {
+            var rows=genre.Rows;
+            filters.RemoveAll(chosen=>rows.Any(row=>row.Id==chosen));
+            if(all)filters.AddRange(rows.Select(row=>row.Id));
+            ChatTabChanged(tab);
+        },genre=>{TipText(()=>ChatGenreTip(genre.Rows.Count(row=>filters.Contains(row.Id)),genre.Rows.Count));});
     }
 
     private string ChatGenreTip(int on,int count)=>localization.Format("ChatWindow.GenreTip",on,count);
@@ -544,19 +538,40 @@ internal sealed partial class MainWindow
     private void DrawChatTabChannels(ChatTabSettings tab)
     {
         tab.Channels??=[];
-        if(!TenshoAssistant.UI.UiComponents.BeginDataTable("###ChatTabChannelTable",3))return;
+        DrawChatCheckGrid("###ChatTabChannelTable",ChatChannels.All,ChatChannelName,channel=>"ChatChannel"+channel,tab.Shows,(channel,shown)=>
+        {
+            if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
+            ChatMessages.Restart(tab);chatSettingsPending=true;
+        },channel=>{TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));});
+    }
+
+    /// <summary>
+    /// X-560 (0.1528, the user's report of 17/11: « chat settings still not framed », the third column under the window's right edge and the
+    /// names cut): a grid of boxes with as many columns as the width left holds (the scroll bar outside it, ImGui's content region), each as
+    /// wide as the widest name, so no name is cut; a name wider than the window itself is written beside its box, wrapped.
+    /// </summary>
+    private void DrawChatCheckGrid<T>(string id,IReadOnlyList<T> items,Func<T,string> name,Func<T,string> key,Func<T,bool> get,Action<T,bool> set,Action<T> drawTip)
+    {
+        if(items.Count==0)return;
+        var style=ImGui.GetStyle();
+        var box=ImGui.GetFrameHeight()+style.ItemInnerSpacing.X;
+        var widest=0f;
+        foreach(var item in items)widest=Math.Max(widest,ImGui.CalcTextSize(name(item)).X);
+        var columns=ChatFormat.GridColumns(ImGui.GetContentRegionAvail().X,box+widest+style.CellPadding.X*2+style.ItemSpacing.X,items.Count);
+        if(!TenshoAssistant.UI.UiComponents.BeginDataTable(id,columns))return;
         try
         {
-            foreach(var channel in ChatChannels.All)
+            foreach(var item in items)
             {
                 ImGui.TableNextColumn();
-                var shown=tab.Shows(channel);
-                if(ImGui.Checkbox(ChatChannelName(channel)+"###ChatChannel"+channel,ref shown))
-                {
-                    if(shown)tab.Channels.Add(channel);else tab.Channels.Remove(channel);
-                    ChatMessages.Restart(tab);chatSettingsPending=true;
-                }
-                TipText(()=>ChatHelpText(Chat.ChatHelp.ChannelTip(channel)));
+                var label=name(item);
+                var fits=box+ImGui.CalcTextSize(label).X<=ImGui.GetContentRegionAvail().X;
+                var shown=get(item);
+                if(ImGui.Checkbox((fits ? label:"")+"###"+key(item),ref shown))set(item,shown);
+                drawTip(item);
+                if(fits)continue;
+                ImGui.SameLine();ImGui.TextWrapped(label);
+                drawTip(item);
             }
         }
         finally{ImGui.EndTable();}
@@ -611,10 +626,16 @@ internal sealed partial class MainWindow
     /// are drawn after the bar, or before it with the bar's height kept free at the bottom.</summary>
     private void DrawChatWindowBody()
     {
+        // X-558 (0.1533): after a load, the chat's code is compiled in the warm-up's early phase; the window waits for it (a second or two)
+        // instead of compiling it in one frame (« Chat 62 ms » on the reload of 17/11 13:05).
+        if(!WarmupEarlyDone){EmptyState("ChatWindow.Loading");return;}
         var options=ChatOptions;
         var tabs=ChatTabs(options);
         var table=ChatFilterTableNow();
+        // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
+        var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
         chatAlertWords=ChatTextFilter.Words(options.AlertWords);
         // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
@@ -774,27 +795,51 @@ internal sealed partial class MainWindow
             var key=ChatFormat.LayoutKey(options,ChatFormat.NamesKey(itemCatalog.State.Catalog is not null,quests.State.ById is not null,maps.State.Catalog is not null));
             var relaid=!view.LaidOutFor(width,key);
             if(relaid)view.Relayout(width,key);
-            for(var budget=ChatLayoutsPerFrame;budget>0;budget--)
-            {
-                var next=view.NextToLayOut();
-                if(next<0)break;
-                LayOutChatLine(view,next,options);
-            }
             var height=ImGui.GetTextLineHeightWithSpacing();
+            // X-558 (0.1532): laid out within a time budget, the newest first, only the newest ahead (ChatLoading); scrolled back, a packet of
+            // older lines above the view, the scroll moved by the rows they add so the view does not jump.
+            var layoutStarted=System.Diagnostics.Stopwatch.GetTimestamp();
+            var laid=0;
+            while(ChatLoading.More(laid,System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds))
+            {
+                var next=view.NextToLayOut(ChatLoading.Eager);
+                if(next<0)break;
+                LayOutChatLine(view,next,options);laid++;
+            }
+            // X-563 M1: how far the scroll moves at the next frame because of the rows added above (0 when none).
+            var shift=0f;
+            if(!relaid && !ChatScroll.AtBottom(ImGui.GetScrollY(),view.RowsShown,height,view.HeightShown))
+            {
+                var first=view.IndexAtRow((int)(ImGui.GetScrollY()/height));
+                var firstRow=view.RowOf(first);
+                while(ChatLoading.More(laid,System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds))
+                {
+                    var older=view.OlderToLayOut(first,ChatLoading.Packet);
+                    if(older<0)break;
+                    LayOutChatLine(view,older,options);laid++;
+                }
+                if(view.RowOf(first)-firstRow is var added and not 0){ImGui.SetScrollY(ChatLoading.Kept(ImGui.GetScrollY(),added,height));shift=ChatLoading.Shift(ImGui.GetScrollY(),added,height);}
+            }
+            if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat layout",System.Diagnostics.Stopwatch.GetElapsedTime(layoutStarted).TotalMilliseconds);
             chatLineHeight=height;
             // X-457 (0.1462): the top of the content, as SetCursorPosY counts it (GetCursorStartPos takes the scroll off, and SetCursorPosY
             // takes it off again: every line was drawn the scroll too high, the cause of the jumps and of the empty window).
             var top=ImGui.GetCursorPosY();
             var scroll=ImGui.GetScrollY();
             var shown=ImGui.GetWindowHeight();
+            // X-563 M1 (review of 0.1534): the scroll the lines are drawn at: ImGui's still has the frame before's (SetScrollY takes effect at
+            // the next frame), so in the frame a packet was laid out above, the lines are drawn as the next frame will draw them (no jump of a
+            // frame); the « back to the bottom » button, the mouse and « at the bottom » keep ImGui's scroll.
+            var drawn=scroll+shift;
+            top-=shift;
             // At the bottom on the frame before (its rows): follow the new lines, and nothing is unread in this tab any more.
             var atBottom=ChatScroll.AtBottom(scroll,view.RowsShown,height,view.HeightShown);
-            var end=scroll+shown;
+            var end=drawn+shown;
             // X-482 M2 (0.1472): the « back to the bottom » button is placed before the lines: the links and lines under it do not answer the mouse.
             var button=atBottom ? null:ChatBottomButton(view,scroll,shown);
             var mouse=ImGui.GetMousePos()-ImGui.GetWindowPos()+new Vector2(0,scroll);
             chatLinesBlocked=button is { } placed && ImGui.IsWindowHovered() && ChatScroll.OnButton(mouse.X,mouse.Y,placed.Corner,placed.Size.X,placed.Size.Y);
-            for(var index=view.IndexAtRow((int)(scroll/height));index<view.Count;index++)
+            for(var index=view.IndexAtRow((int)(drawn/height));index<view.Count;index++)
             {
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
                 var row=view.RowOf(index);
@@ -810,7 +855,7 @@ internal sealed partial class MainWindow
             // X-492 M1: the rest of a fine wheel belongs to one tab: another tab starts from nothing.
             if(!ReferenceEquals(view,chatWheelView)){chatWheelView=view;chatWheelRest=0;}
             if(ImGui.IsWindowHovered() && ImGui.GetIO().MouseWheel is var wheel and not 0)
-                ImGui.SetScrollY(ChatScroll.Wheel(scroll,wheel,height,ImGui.GetScrollMaxY(),ref chatWheelRest));
+                ImGui.SetScrollY(ChatScroll.Wheel(drawn,wheel,height,ImGui.GetScrollMaxY()+shift,ref chatWheelRest));
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);

@@ -186,7 +186,8 @@ internal sealed partial class MainWindow
     {
         LoadBeastPlans();
         var floors = LoadBeastPlans().Floors;
-        var key = BeastTeams.Key(state.Obtained, BeastRanks, floors);
+        // X-575 (0.1543): the key holds the mark of the rules and of the game's data: a plan kept from older rules is made again.
+        var key = BeastTeams.Key(state.Obtained, BeastRanks, floors, state.Catalog is { } marked ? BeastMarkOf(marked) : "");
         if (beastPlanTask is { IsCompleted: true } done && beastPlanFor is { } wanted)
         {
             beastPlanTask = null;
@@ -205,6 +206,13 @@ internal sealed partial class MainWindow
         }
         return beastPlans.Plans.GetValueOrDefault(board.Id);
     }
+    private (BeastCatalog Catalog, string Mark)? beastMark;
+    /// <summary>X-575 (0.1543): BeastTeams.Mark of the catalog, worked out once per catalog (R07).</summary>
+    private string BeastMarkOf(BeastCatalog catalog)
+    {
+        if (beastMark is not { } kept || !ReferenceEquals(kept.Catalog, catalog)) beastMark = kept = (catalog, BeastTeams.Mark(catalog));
+        return kept.Mark;
+    }
     /// <summary>X-109 (0.981): each beast's rank read in the game's team window, kept on disk with the plans; null: unknown, the board's limit is assumed.</summary>
     internal IReadOnlyDictionary<uint, int>? BeastRanks => LoadBeastPlans().Ranks;
     /// <summary>X-109 (0.981): ranks read in the game's team window: merged with those known, saved when they change. X-549 (0.1522): a rank
@@ -217,6 +225,13 @@ internal sealed partial class MainWindow
         if (plans.Ranks is { } known && known.Count == merged.Count && merged.All(pair => known.TryGetValue(pair.Key, out var rank) && rank == pair.Value)
             && (plans.Floors ?? []).SetEquals(floors)) return;
         beastPlans = plans with { Ranks = merged, Floors = floors };
+        SaveBeastPlans();
+    }
+    /// <summary>X-578 (0.1548): a page of the game's bestiary read: the beast's own rank, saved when something changes (BeastTeams.WithBook).</summary>
+    internal void BeastBookRead(BeastTeams.BookRead read)
+    {
+        if (BeastTeams.WithBook(LoadBeastPlans(), read) is not { } plans) return;
+        beastPlans = plans;
         SaveBeastPlans();
     }
     /// <summary>X-549 (0.1522): the board the game's board or team window is about (0: not read).</summary>
@@ -268,15 +283,17 @@ internal sealed partial class MainWindow
     {
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
-        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
-        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        var fights = BeastTeamFightsFor(board, plan, team, catalog);
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamRead", team.Count));
         foreach (var member in team)
         {
             if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
             else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
+            // X-575 part 5 (0.1545): the rank the team window shows, below the board's recommended range.
+            if (BeastTeams.RankLow(board, member.Rank))
+                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadRankLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Rank, board.RankRecommended, board.RankLimit));
         }
-        foreach (var fight in beastTeamFights.Value.Fights)
+        foreach (var fight in fights)
         {
             var battle = board.Battles[fight.Battle];
             ImGui.TextColored(Accent, battle.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", fight.Battle));
@@ -284,11 +301,20 @@ internal sealed partial class MainWindow
             ImGui.Indent();
             try
             {
-                ImGui.TextUnformatted("→ " + Names(fight.Trio));
+                DrawBeastCallOrder(battle, fight.Trio, catalog);
                 if (fight.Lost.Count > 0) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", Names(fight.Lost), fight.Instead.Count > 0 ? Names(fight.Instead) : "—"));
             }
             finally { ImGui.Unindent(); }
         }
+    }
+
+    /// <summary>X-550 (0.1526): each fight's three among the team taken, worked out again only when the board, the plan or the team (HP included)
+    /// changes (X-486: shared by the fight shown and the whole board).</summary>
+    private IReadOnlyList<BeastTeams.TeamFight> BeastTeamFightsFor(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember> team, BeastCatalog catalog)
+    {
+        var key = $"{board.Id}|{string.Join(",", plan.Battles.SelectMany(battle => battle.Team).Select(pick => pick.Beast))}|{string.Join(",", team.Select(member => $"{member.Beast}:{member.Rank}:{member.Hp}/{member.MaxHp}"))}";
+        if (beastTeamFights?.Key != key) beastTeamFights = (key, BeastTeams.FromTeam(board, plan, team, catalog.Beasts));
+        return beastTeamFights.Value.Fights;
     }
 
     /// <summary>X-481 (0.1525): the result's lines as the game's window shows them: the score's parts (a label, the value when it has one, the
@@ -348,9 +374,79 @@ internal sealed partial class MainWindow
         }
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
         // X-366 (0.1373): the panel sizes itself to its content, up to BeastBoardWindow.MaxWidth: every line wraps inside that width, never cut at the edge.
-        var wrapAt = ImGui.GetCursorPosX() + BeastBoardWindow.WrapWidth;
+        var wrapAt = ImGui.GetCursorPosX() + BeastPanelWrap;
+        var team = BeastTeamRead?.Invoke();
+        // X-486 (0.1529, the user's request of 16/11): the fights the game's board window shows come first, one block each; the whole board
+        // (the team taken, the advised plan) folded under « whole board ». The panel follows the window: it is read four times a second.
+        var now = BeastTeams.FightsShown(board, BeastFightsShown?.Invoke());
+        if (now.Count > 0)
+        {
+            var taken = team is { Count: > 0 } ? BeastTeamFightsFor(board, plan, team, catalog) : null;
+            ImGui.PushTextWrapPos(wrapAt);
+            try { foreach (var index in now) DrawBeastFightNow(board, index, plan, taken, catalog); }
+            finally { ImGui.PopTextWrapPos(); }
+            ImGui.Separator();
+            if (!TenshoAssistant.UI.UiComponents.TreeNode(localization.Get("BeastUi.WholeBoard") + "###BeastWholeBoard")) return;
+            try { DrawBeastBoardWhole(board, plan, team, catalog, state, wrapAt); }
+            finally { ImGui.TreePop(); }
+            return;
+        }
+        DrawBeastBoardWhole(board, plan, team, catalog, state, wrapAt);
+    }
+
+    /// <summary>X-136 (0.1530): an action's name in the game's language (empty: not known, the desktop application).</summary>
+    internal Func<uint, string>? BeastActionName { get; set; }
+
+    /// <summary>
+    /// X-136 (0.1530): a beast's Trick affinity and its two intentional combos (« combo instinctif II »): the beastmaster's skill before the
+    /// Trick, or after it, with the kind (BeastInstinct, from the game's help). Shown before the fight only; nothing is sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastCombo(uint beast)
+    {
+        var combos = BeastInstinct.Combos(beast);
+        if (combos.Count < 2) return;
+        string Skill(BeastInstinct.Combo combo) => BeastActionName?.Invoke(combo.Skill) is { Length: > 0 } name ? name : localization.Get("BeastUi.Affinity" + combo.SkillAffinity);
+        var trick = BeastActionName?.Invoke(BeastInstinct.Trick(beast)) ?? "";
+        ImGui.Indent();
+        try
+        {
+            ImGui.TextDisabled(localization.Format("BeastUi.ComboLine", localization.Get("BeastUi.Affinity" + BeastInstinct.Of(beast)), trick.Length > 0 ? trick : "—",
+                Skill(combos[0]), localization.Get("BeastUi.Combo" + combos[0].Kind), Skill(combos[1]), localization.Get("BeastUi.Combo" + combos[1].Kind)));
+        }
+        finally { ImGui.Unindent(); }
+    }
+
+    /// <summary>X-136 (0.1550): the hotbars read for the combo highlight (its own locator, apart from the gathering panel's).</summary>
+    internal Gathering.ActionBarLocator? BeastBarLocator { get; set; }
+    /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (0: none).</summary>
+    internal Func<uint>? BeastActive { get; set; }
+
+    /// <summary>
+    /// X-136 (0.1550, the user's request of 11/11; R03.2: the labyrinth is not cut, combat included): with the option on and in the labyrinth
+    /// only, the beastmaster's two skills that make an intentional combo with the beast called (BeastInstinct.Combos: the one before its
+    /// Trick and the one after) are highlighted on the hotbars, as the gathering panel's next action. Shows only: nothing is sent to the
+    /// game (R03.3).
+    /// </summary>
+    internal void DrawBeastComboHighlight()
+    {
+        if (!configuration.HighlightBeastCombos || BeastBarLocator is not { } located) return;
+        if ((BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0) == 0) return;
+        if (BeastActive?.Invoke() is not (> 0 and var beast) || BeastInstinct.Combos(beast) is not [var before, var after]) return;
+        located.Want(before.Skill, after.Skill);
+        if (located.ReadFor == before.Skill) DrawGatheringBarHighlight(located);
+    }
+
+    /// <summary>X-551 (0.1534): the width the panel's lines wrap at (BeastBoardWindow sets it from the game's window beside it).</summary>
+    internal float BeastPanelWrap { get; set; } = BeastBoardWindow.WrapWidth;
+
+    /// <summary>X-486 (0.1529): the fights the game's board window shows (null: not read).</summary>
+    internal Func<IReadOnlySet<uint>?>? BeastFightsShown { get; set; }
+
+    /// <summary>X-486 (0.1529): the whole board as the panel showed it before: the team taken first (X-550), then the advised plan.</summary>
+    private void DrawBeastBoardWhole(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember>? team, BeastCatalog catalog, BeastState state, float wrapAt)
+    {
         // X-550 (0.1526): the team the player took (the game's team window) comes first: its three per fight, then the advised plan.
-        if (BeastTeamRead?.Invoke() is { Count: > 0 } team)
+        if (team is { Count: > 0 })
         {
             ImGui.PushTextWrapPos(wrapAt);
             try { DrawBeastTeamRead(board, plan, team, catalog); }
@@ -363,12 +459,80 @@ internal sealed partial class MainWindow
         finally { ImGui.PopTextWrapPos(); }
     }
 
+    /// <summary>
+    /// X-486 (0.1529): one fight the game's board window shows: its enemies (icon, weakness, the game's stars) and their actions (damage, shape,
+    /// target, from the sheets), then the three beasts for it, from the team taken when it is read (X-550), else the advised plan, each with why
+    /// (the enemies whose weakness it hits). Nothing is chosen nor sent to the game (R03.3).
+    /// </summary>
+    private void DrawBeastFightNow(Board board, int index, BoardPlan plan, IReadOnlyList<BeastTeams.TeamFight>? taken, BeastCatalog catalog)
+    {
+        if (index >= board.Battles.Count) return;
+        var fight = board.Battles[index];
+        ImGui.TextColored(Accent, (fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", index)) + " · " + localization.Get("BeastUi.FightNow"));
+        foreach (var enemy in fight.Enemies)
+        {
+            DrawSmallGameIcon(enemy.Icon); ImGui.SameLine();
+            ImGui.TextUnformatted(enemy.Name);
+            if (enemy.Weakness.Length > 0) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.Weakness", enemy.Weakness)); }
+            ImGui.Indent();
+            try
+            {
+                if (enemy.Stars is { } stars) ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality));
+                foreach (var action in enemy.Actions)
+                    ImGui.TextDisabled(string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
+            }
+            finally { ImGui.Unindent(); }
+        }
+        var fromTeam = taken?.FirstOrDefault(row => row.Battle == index);
+        var trio = fromTeam?.Trio ?? plan.Battles.FirstOrDefault(battle => battle.Battle == index)?.Team.Select(pick => pick.Beast).ToArray() ?? [];
+        if (trio.Count == 0) return;
+        ImGui.TextColored(Accent, localization.Get(fromTeam is not null ? "BeastUi.FightBeastsTeam" : "BeastUi.FightBeasts"));
+        ImGui.Indent();
+        try
+        {
+            for (var place = 0; place < trio.Count; place++)
+            {
+                var id = trio[place];
+                var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
+                if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); }
+                ImGui.TextUnformatted(BeastCallText(fight, place, id, catalog));
+                DrawBeastCombo(id);
+            }
+            if (fromTeam is { Lost.Count: > 0 } lost)
+                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", string.Join(", ", lost.Lost.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")),
+                    lost.Instead.Count > 0 ? string.Join(", ", lost.Instead.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")) : "—"));
+        }
+        finally { ImGui.Unindent(); }
+    }
+
+    /// <summary>X-575 part 4 (0.1544): a beast called for a fight: its place in the calling order, its name and why (the enemies whose weakness it
+    /// hits, else its attack and defence). One text for the plan, the team taken and the fight shown. X-579 (0.1547): the strongest enemy
+    /// it aims at is named first and said the strongest.</summary>
+    private string BeastCallText(BoardBattle fight, int place, uint id, BeastCatalog catalog)
+    {
+        var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
+        var strongest = BeastTeams.Strongest(fight)?.Name;
+        var hits = BeastTeams.Hits(fight, beast).Select(name => name == strongest ? localization.Format("BeastUi.Strongest", name) : name).ToArray();
+        var name = beast?.Name ?? $"#{id}";
+        return hits.Length > 0 ? localization.Format("BeastUi.FightReasonHits", place + 1, name, beast!.AutoAttack, string.Join(", ", hits))
+            : localization.Format("BeastUi.FightReasonNone", place + 1, name);
+    }
+
+    /// <summary>X-575 part 4 (0.1544): the three of a fight in calling order, the best first (BeastTeams.Best orders them).</summary>
+    private void DrawBeastCallOrder(BoardBattle fight, IReadOnlyList<uint> trio, BeastCatalog catalog)
+    {
+        if (trio.Count == 0) return;
+        ImGui.TextDisabled(localization.Get("BeastUi.CallOrder"));
+        for (var place = 0; place < trio.Count; place++) ImGui.TextUnformatted(BeastCallText(fight, place, trio[place], catalog));
+    }
+
     private void DrawBeastTeam(BeastState state, BeastCatalog catalog)
     {
         if (catalog.Boards.Count == 0) { ImGui.TextDisabled(localization.Get("BeastUi.NoBoard")); return; }
         FollowBeastBoard(catalog);
         var board = DrawBeastBoardChoice(catalog);
         BoolSetting("BeastUi.BoardPanel", "BeastUi.BoardPanelTip", () => configuration.ShowBeastBoardPanel, value => configuration.ShowBeastBoardPanel = value, c => c.ShowBeastBoardPanel);
+        BoolSetting("BeastUi.ComboHighlight", "BeastUi.ComboHighlightTip", () => configuration.HighlightBeastCombos, value => configuration.HighlightBeastCombos = value, c => c.HighlightBeastCombos);
         ImGui.TextWrapped(localization.Get("BeastUi.TeamRules"));
         DrawBeastResult(catalog);
         if (BeastPlanFor(board, state) is not { } plan) { EmptyState("BeastUi.TeamComputing"); return; }
@@ -388,15 +552,32 @@ internal sealed partial class MainWindow
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
         if (heldUnknown) ImGui.TextColored(Warning, localization.Get("BeastUi.TeamHeldUnknown"));
         // X-549 (0.1522): said only for the team's beasts whose rank is not known (the others' do not change the plan).
-        if (plan.RanksUnknown > 0) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", plan.RanksUnknown, board.RankLimit));
+        // X-562 M2: a plan kept before 0.1522 counts its beasts whose rank is assumed.
+        if (BeastTeams.RanksUnknownOf(plan) is > 0 and var unknown) ImGui.TextDisabled(localization.Format("BeastUi.TeamRanksAssumed", unknown, board.RankLimit));
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamTen", plan.Team.Count));
-        foreach (var pick in plan.Team)
+        // X-551 (0.1534): one row per beast as the game's « Formation de l'équipe »: icon and name, rank, automatic attack.
+        // X-580 (0.1549): in the order of the game's bestiary, its number before the name, to find each beast in the game's window.
+        if (TenshoAssistant.UI.UiComponents.BeginDataTable("###BeastTeamRows", 3))
         {
-            if (Of(pick.Beast) is not { } beast) continue;
-            DrawSmallGameIcon(beast.Icon); ImGui.SameLine();
-            ImGui.TextUnformatted(localization.Format("BeastUi.TeamBeast", beast.Name, pick.Rank, beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical")));
+            try
+            {
+                foreach (var pick in BeastTeams.BookOrder(plan.Team))
+                {
+                    if (Of(pick.Beast) is not { } beast) continue;
+                    ImGui.TableNextRow(); ImGui.TableNextColumn();
+                    DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(localization.Format("BeastUi.BookNumber", beast.Id, beast.Name));
+                    ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
+                    // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
+                    if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format("BeastUi.RankLow", board.RankRecommended, board.RankLimit)); }
+                    ImGui.TableNextColumn(); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                }
+            }
+            finally { ImGui.EndTable(); }
         }
-        ImGui.Spacing();
+        // X-575 (0.1543): a weakness of the board no fight's three hits, and why: no beast held hits it, or the places went to weaknesses of more enemies.
+        foreach (var left in plan.Left ?? [])
+            ImGui.TextColored(Warning, localization.Format(left.Reason == LeftReason.NoneHeld ? "BeastUi.LeftNoneHeld" : "BeastUi.LeftNoRoom", left.Name, plan.Team.Count));
+        ImGui.Separator();
         foreach (var battle in plan.Battles)
         {
             if (battle.Battle >= board.Battles.Count) continue;
@@ -407,18 +588,33 @@ internal sealed partial class MainWindow
             try
             {
                 ImGui.TextDisabled(string.Join(", ", fight.Enemies.Select(enemy => enemy.Weakness.Length > 0 ? $"{enemy.Name} ({enemy.Weakness})" : enemy.Name)));
-                ImGui.TextUnformatted("→ " + string.Join(", ", battle.Team.Select(pick => Of(pick.Beast)?.Name ?? $"#{pick.Beast}")));
-                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it.
-                foreach (var miss in BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, Beasts?.State.Obtained))
+                DrawBeastCallOrder(fight, battle.Team.Select(pick => pick.Beast).ToArray(), catalog);
+                // X-553 (0.1523): a weakness none of the three hits is said, with the beasts that would hit it. X-562 M3: worked out once per
+                // plan and beasts held, not at each frame (R07).
+                foreach (var miss in BeastMissed(plan, battle, fight, catalog))
                 {
                     string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
-                    ImGui.TextColored(Warning, miss.InTeam.Count > 0 ? localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam))
-                        : miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
+                    // X-575 (0.1543): orange only when no beast brought hits the weakness; one of the team that could (its three places went
+                    // to weaknesses of more enemies) is said in grey.
+                    if (miss.InTeam.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam)));
+                    else ImGui.TextColored(Warning, miss.Held.Count > 0 ? localization.Format("BeastUi.MissNone", miss.Name, Names(miss.Held))
                         : localization.Format("BeastUi.MissNoneHeld", miss.Name));
                 }
             }
             finally { ImGui.Unindent(); }
         }
+    }
+
+    private (BoardPlan Plan, IReadOnlySet<uint>? Held, Dictionary<int, IReadOnlyList<BeastTeams.WeaknessMissed>> Fights)? beastMissed;
+    /// <summary>X-562 M3 (review of 0.1526): BeastTeams.Missed of a fight, kept until the plan or the beasts held change.</summary>
+    private IReadOnlyList<BeastTeams.WeaknessMissed> BeastMissed(BoardPlan plan, BattlePlan battle, BoardBattle fight, BeastCatalog catalog)
+    {
+        var held = Beasts?.State.Obtained;
+        if (beastMissed is not { } kept || !ReferenceEquals(kept.Plan, plan) || !ReferenceEquals(kept.Held, held)) beastMissed = kept = (plan, held, []);
+        if (kept.Fights.TryGetValue(battle.Battle, out var known)) return known;
+        var missed = BeastTeams.Missed(fight, battle.Team, plan.Team, catalog.Beasts, held);
+        kept.Fights[battle.Battle] = missed;
+        return missed;
     }
 
     /// <summary>
@@ -471,7 +667,7 @@ internal sealed partial class MainWindow
                     // X-109 (0.980): the game's stars of the enemy (same order as its board window).
                     if (enemy.Stars is { } stars) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality)); }
                     foreach (var action in enemy.Actions)
-                        ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Shape, action.Target }.Where(part => part.Length > 0)));
+                        ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
                 }
             }
         }

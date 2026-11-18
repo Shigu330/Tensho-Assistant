@@ -11,7 +11,8 @@ namespace TenshoAssistant.Beastmaster;
 /// </summary>
 internal sealed class BeastWindowProbe : IDisposable
 {
-    private static readonly string[] Windows = ["XBMMonsterBookDetail", "XBMPetParty", "XBMBattleMonsterDetail", "XBMBattleMonster", "XBMStageDetailList"];
+    // X-136 (0.1530): XBMActivePet, the beast called, to read in game (the highlight of its combos on the hotbar).
+    private static readonly string[] Windows = ["XBMMonsterBookDetail", "XBMPetParty", "XBMBattleMonsterDetail", "XBMBattleMonster", "XBMStageDetailList", "XBMActivePet"];
     private const int MaximumDepth = 4, MaximumNodes = 2000, MaximumTexts = 300, MaximumValues = 400, MaximumText = 60, MaximumLinesPerWindow = 60;
     private readonly IFramework framework;
     private readonly IGameGui gui;

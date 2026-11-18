@@ -14,6 +14,14 @@ public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=n
 /// <summary>X-403 phase 1 (D-166; back from 0.471): how one message reads, and its lines for a given width. Pure: the width of a text is given by the caller.</summary>
 public static class ChatFormat
 {
+    /// <summary>X-560 (0.1528, the user's report of 17/11: « chat settings still not framed »): how many columns of boxes the width holds, each
+    /// as wide as the widest box (its name never cut): at least one, at most one per box; a width not known (0, NaN) gives one.</summary>
+    public static int GridColumns(float available,float cell,int count)
+    {
+        if(count<=1 || !float.IsFinite(available) || !float.IsFinite(cell) || cell<=0)return 1;
+        return Math.Clamp((int)MathF.Floor(available/cell),1,count);
+    }
+
     /// <summary>The text without control characters; X-472 (0.1471): each glyph of the game's font (private use area U+E000 to U+F8FF) written
     /// with its readable equivalent (ChatGlyphs: boxed letters as letters, the world icon « @ »…), the link glyph alone left out.</summary>
     public static string Clean(string? text)

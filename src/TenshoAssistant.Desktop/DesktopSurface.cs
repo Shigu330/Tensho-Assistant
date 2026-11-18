@@ -44,6 +44,9 @@ internal sealed class DesktopSurface
     public required Action<double?[]?,int[]?,long> GameMeasures { get; init; }
     /// <summary>--zone (diagnostic): the weather page of a territory (territory, zone name).</summary>
     public required Action<uint,string> OpenWeather { get; init; }
+    /// <summary>X-520 (0.1536): the Settings page at a tab and a category (tab, category, « » keeps the chosen one; the window's developer
+    /// mode, in which alone the Debug tab is drawn), for the reference pictures of each tab.</summary>
+    public required Action<string,string,bool> OpenSettings { get; init; }
 
     /// <summary>The entries by name, as they cross to the application (a dictionary of CoreLib's types only).</summary>
     public IReadOnlyDictionary<string,Delegate> ToMap()=>new Dictionary<string,Delegate>(StringComparer.Ordinal)
@@ -52,6 +55,7 @@ internal sealed class DesktopSurface
         [nameof(DesktopMode)]=DesktopMode,[nameof(UseData)]=UseData,[nameof(CopyData)]=CopyData,[nameof(CopyDiscoveries)]=CopyDiscoveries,
         [nameof(DueAlarms)]=DueAlarms,[nameof(AlarmNotification)]=AlarmNotification,[nameof(LinkNotices)]=LinkNotices,
         [nameof(AlarmHeld)]=AlarmHeld,[nameof(GameState)]=GameState,[nameof(GameMeasures)]=GameMeasures,[nameof(OpenWeather)]=OpenWeather,
+        [nameof(OpenSettings)]=OpenSettings,
     };
 
     /// <summary>
@@ -84,6 +88,7 @@ internal sealed class DesktopSurface
             GameState=Take<Action<string?,double?,string[]>>(nameof(GameState),(_,_,_)=>{}),
             GameMeasures=Take<Action<double?[]?,int[]?,long>>(nameof(GameMeasures),(_,_,_)=>{}),
             OpenWeather=Take<Action<uint,string>>(nameof(OpenWeather),(_,_)=>{}),
+            OpenSettings=Take<Action<string,string,bool>>(nameof(OpenSettings),(_,_,_)=>{}),
         };
         missing=absent;
         return surface;
