@@ -1298,7 +1298,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1096) Retours d'aéronef et de sous-marin, tâches des servants, missions d'escouade (mode développeur, journal des découvertes) : dalamud.log écrit « Item gain attributed: … from AirshipReturn / SubmarineReturn / Venture / Squadron » au lieu de « Item gain not attributed » ; une nouvelle destination ou un rang donne « Discovery: airship new destination … » ou « submarine rank … ».
 
-- [ ] (0.1097) Paramètres › Artisanat, « Son de la ligne de fin de macro » : « Écouter » joue le même son qu'un <se.N> tapé dans le chat pour N = 1, 8 et 16 ; à 0 le bouton est grisé.
+- [x] (0.1097) Paramètres › Artisanat, « Son de la ligne de fin de macro » : « Écouter » joue le même son qu'un <se.N> tapé dans le chat pour N = 1, 8 et 16 ; à 0 le bouton est grisé.
 
 - [x] (0.1098) Carte : poser un drapeau dans une zone, se téléporter dans une autre zone, ouvrir la carte (M) : la carte de Tensho montre la zone du joueur, pas celle de l'ancien drapeau ; retirer le drapeau puis rouvrir : idem. Un lien de quête du journal ouvre toujours sur la quête. dalamud.log : « Game map request kept from before ».
 
@@ -1325,7 +1325,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 
 
-- [ ] (0.1115) Dédale bestial (dresseur) : à l'entrée, pas de ligne « Tensho en pause » dans le chat ; les pages et panneaux de Tensho restent ouverts pendant le plateau et les combats ; en JcJ, la coupure se fait toujours
+- [x] (0.1115) Dédale bestial (dresseur) : à l'entrée, pas de ligne « Tensho en pause » dans le chat ; les pages et panneaux de Tensho restent ouverts pendant le plateau et les combats ; en JcJ, la coupure se fait toujours
 
 - [x] (0.1116) Mode développeur activé, jouer un plateau du Dédale jusqu'au résultat : dalamud.log contient « Labyrinth reading: … windows: … » avec le nom de la fenêtre du résultat et des lignes « Labyrinth window XBM…: values=… » (nombres seulement) ; les donner à l'agent pour coder X-135
 
@@ -2023,13 +2023,13 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1490) Fenêtre de chat de Tensho : le décor du jeu se voit à travers le fond, sur toute la fenêtre (messages et onglets) ; Opacité à 0 % : fond invisible, texte lisible par son contour ; à 100 % : fond plein.
 
-- [ ] (0.1491) Alarme de Tensho sur un objet récoltable au lieu connu : quand elle sonne, le chat du jeu montre la flèche, le nom du lieu et ses coordonnées (« Zone ( x , y ) »), puis la flèche et le nom de l'objet ; un clic sur le lieu place le drapeau et ouvre la carte.
+- [x] (0.1491) Alarme de Tensho sur un objet récoltable au lieu connu : quand elle sonne, le chat du jeu montre la flèche, le nom du lieu et ses coordonnées (« Zone ( x , y ) »), puis la flèche et le nom de l'objet ; un clic sur le lieu place le drapeau et ouvre la carte.
 
 - [x] (0.1491) Fenêtre de chat de Tensho, même alarme : le lieu avec sa flèche orange et ses coordonnées, puis l'objet avec sa propre flèche orange ; une adresse web dite dans le chat est soulignée (couleur d'accent), comme un lien nommé par Tensho.
 
 - [x] (0.1492) Fenêtre de chat de Tensho › roue dentée : cocher « Garder l'historique du chat sur ce PC » ouvre une question (ce qui est gardé, le dossier, 2 000 messages et 7 jours, comment l'effacer) ; « Annuler » laisse la case décochée ; « Garder l'historique » la coche.
 
-- [ ] (0.1492) Historique activé : dire quelques messages, puis recharger Tensho ou relancer le jeu : les messages d'avant reviennent dans les onglets, avant ceux de la session, sans doublon (dalamud.log : « Chat history: N messages read back »).
+- [x] (0.1492) Historique activé : dire quelques messages, puis recharger Tensho ou relancer le jeu : les messages d'avant reviennent dans les onglets, avant ceux de la session, sans doublon (dalamud.log : « Chat history: N messages read back »).
 
 - [ ] (0.1492) Historique activé, deux personnages : se connecter sur un autre personnage : ses onglets ne montrent pas les messages du premier ; revenir au premier : les siens reviennent.
 
@@ -2079,7 +2079,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1504) Chat Tensho ouvert, cocher « Cacher les messages du chat du jeu » : les messages du chat du jeu disparaissent, sa zone de saisie, son menu des canaux et ses onglets restent ; la fenêtre Tensho est juste au-dessus de la saisie du jeu, sans la couvrir ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho
 
-- [ ] (0.1504) Option cochée : changer d'onglet du jeu, recevoir des messages, changer de zone, voir une scène cinématique : les messages du jeu restent cachés ; redimensionner ou déplacer le chat du jeu (son bouton de taille, le mode HUD) : la fenêtre Tensho suit
+- [x] (0.1504) Option cochée : changer d'onglet du jeu, recevoir des messages, changer de zone, voir une scène cinématique : les messages du jeu restent cachés ; redimensionner ou déplacer le chat du jeu (son bouton de taille, le mode HUD) : la fenêtre Tensho suit
 
 - [ ] (0.1504) Décocher l'option, puis la recocher et fermer la fenêtre Tensho, puis la recocher et décharger Tensho : à chaque fois les messages du jeu reviennent tout de suite, la fenêtre Tensho retourne à sa place d'avant
 
@@ -2093,19 +2093,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1507) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire, carte) : la fenêtre Tensho part et les messages du jeu reviennent sous la fenêtre du jeu ; la fermer : la fenêtre Tensho revient à leur place et ils se cachent.
 
-- [ ] (0.1507) Option cochée, un onglet du chat du jeu détaché ailleurs sur l'écran : cet onglet détaché reste affiché ; seuls les messages sous la fenêtre Tensho sont cachés.
+- [x] (0.1507) Option cochée, un onglet du chat du jeu détaché ailleurs sur l'écran : cet onglet détaché reste affiché ; seuls les messages sous la fenêtre Tensho sont cachés.
 
 - [ ] (0.1507) Option décochée, réduire la fenêtre Tensho à ses onglets, puis cocher l'option dans les Paramètres : la fenêtre prend la place des messages du jeu en entier ; entrer en combat avec « Masquer en combat » puis en sortir : elle revient entière, pas réduite.
 
-- [ ] (0.1508) Reprend T-0.1504-1. Chat Tensho ouvert, « Cacher les messages du chat du jeu » cochée : les messages et la barre d'onglets du chat du jeu sont cachés ; la fenêtre Tensho occupe leur place, juste au-dessus de la ligne de saisie du jeu, sans couvrir le nom du canal (« Dire ») ni la saisie ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho.
+- [x] (0.1508) Reprend T-0.1504-1. Chat Tensho ouvert, « Cacher les messages du chat du jeu » cochée : les messages et la barre d'onglets du chat du jeu sont cachés ; la fenêtre Tensho occupe leur place, juste au-dessus de la ligne de saisie du jeu, sans couvrir le nom du canal (« Dire ») ni la saisie ; taper un message dans la saisie du jeu (Dire, Équipe, /tell) : il part comme d'habitude et s'affiche dans la fenêtre Tensho.
 
-- [ ] (0.1508) Option cochée : cliquer sur le nom du canal (« Dire ») à gauche de la saisie du jeu : le menu des canaux s'ouvre, la fenêtre Tensho s'efface, le menu est entièrement lisible et cliquable ; choisir un canal : le menu se ferme, la fenêtre Tensho revient. Mode développeur : dalamud.log dit « Game chat: channel menu open (drop-down owner …, list …) » puis « closed ».
+- [x] (0.1508) Option cochée : cliquer sur le nom du canal (« Dire ») à gauche de la saisie du jeu : le menu des canaux s'ouvre, la fenêtre Tensho s'efface, le menu est entièrement lisible et cliquable ; choisir un canal : le menu se ferme, la fenêtre Tensho revient. Mode développeur : dalamud.log dit « Game chat: channel menu open (drop-down owner …, list …) » puis « closed ».
 
-- [ ] (0.1508) Option cochée puis décochée (ou fermer la fenêtre Tensho, ou « les deux chats ») : la barre d'onglets du chat du jeu revient telle qu'avant, onglets cliquables ; recharger Tensho option cochée : elle revient aussi.
+- [x] (0.1508) Option cochée puis décochée (ou fermer la fenêtre Tensho, ou « les deux chats ») : la barre d'onglets du chat du jeu revient telle qu'avant, onglets cliquables ; recharger Tensho option cochée : elle revient aussi.
 
-- [ ] (0.1508) Si vos onglets du chat du jeu sont en haut (réglage du jeu) : option cochée, la fenêtre Tensho couvre aussi la ligne des onglets du haut, jusqu'à la saisie.
+- [x] (0.1508) Si vos onglets du chat du jeu sont en haut (réglage du jeu) : option cochée, la fenêtre Tensho couvre aussi la ligne des onglets du haut, jusqu'à la saisie.
 
-- [ ] (0.1510) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir puis fermer une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire) : à la fermeture, la fenêtre Tensho revient directement à la place des messages du jeu, sans apparaître un instant ailleurs ; pareil à la fin d'un combat avec « Masquer en combat ».
+- [x] (0.1510) Option « Cacher les messages du chat du jeu » cochée, « Sous une fenêtre du jeu » sur « Se cacher » : ouvrir puis fermer une fenêtre du jeu par-dessus la fenêtre Tensho (inventaire) : à la fermeture, la fenêtre Tensho revient directement à la place des messages du jeu, sans apparaître un instant ailleurs ; pareil à la fin d'un combat avec « Masquer en combat ».
 
 - [ ] (0.1511) Écran titre puis sélection du personnage, avec Tensho chargé et des fenêtres de Tensho laissées ouvertes à la dernière session (par exemple la fenêtre de chat Tensho) : aucune fenêtre ni panneau de Tensho n'apparaît ; après la connexion du personnage, les mêmes fenêtres reviennent ; Échap › Retour à l'écran titre : elles disparaissent, puis reviennent à la connexion suivante.
 
@@ -2121,7 +2121,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1519) Réglages du chat, un onglet qui montre Hurler ou Crier : cochez « Replier les messages répétés » ; dans une cité où quelqu'un répète la même annonce, la fenêtre de chat Tensho ne la montre qu'une fois, avec « ×2 », « ×3 »… à sa fin ; survolez « ×3 » : l'infobulle dit combien de fois il est venu
 
-- [ ] (0.1519) Réglages du chat, Joueurs : écrivez le nom d'un joueur qui parle près de vous dans « Joueurs mis en avant » : chacun de ses messages est posé sur une bande colorée, son nom dans la couleur d'avertissement, et le texte reste lisible
+- [x] (0.1519) Réglages du chat, Joueurs : écrivez le nom d'un joueur qui parle près de vous dans « Joueurs mis en avant » : chacun de ses messages est posé sur une bande colorée, son nom dans la couleur d'avertissement, et le texte reste lisible
 
 - [ ] (0.1520) Réglages du chat, Joueurs : écrivez « raid, vente » dans « Mots d'alerte » ; quand un message de Hurler ou Crier contient l'un de ces mots, il est posé sur une bande colorée ; si son onglet n'est pas celui affiché, le nom de l'onglet porte « ! » devant, qui disparaît quand vous ouvrez l'onglet et descendez en bas
 
@@ -2137,7 +2137,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1523) Au Dédale bestial, 1er plateau, devant la disposition du plateau : le panneau Tensho appelle Piège-volant (Glace) au combat 4 (Sarcopte, Glace) ; sous le combat 2 (Archidémon, Foudre) une ligne dit qu'aucune bête de l'équipe ne touche Foudre et nomme celles qui la toucheraient
 
-- [ ] (0.1523) Page Dresseur, onglet Bêtes : la colonne de l'attaque automatique montre l'élément des bêtes magiques (Feu, Glace…) comme le bestiaire du jeu, « Magique » seulement pour une attaque neutre
+- [x] (0.1523) Page Dresseur, onglet Bêtes : la colonne de l'attaque automatique montre l'élément des bêtes magiques (Feu, Glace…) comme le bestiaire du jeu, « Magique » seulement pour une attaque neutre
 
 - [ ] (0.1525) Après un plateau du Dédale bestial, page Dresseur, onglet Équipe, « Dernier plateau » ouvert : les lignes (chemin parcouru, affrontements, cibles d'élite, gardien du plateau, PV restants, score, bonus, total) ont les mêmes nombres que la fenêtre de résultat du jeu
 
@@ -2149,7 +2149,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1527) Devant « Formation de l'équipe », hors du Dédale : le nom du plateau dans le panneau Tensho est suivi de « (lu dans la fenêtre du jeu ; son numéro reste à confirmer en jeu) » ; dans dalamud.log, la ligne « Beastmaster board read in the game's windows: content N » donne le numéro à relever
 
-- [ ] (0.1528) Fenêtre de chat Tensho : un onglet qui ne montre que le combat (par exemple « Combat ») ne porte jamais de nombre de non lus pendant un combat, et « nouveaux messages plus bas » ne compte pas les lignes de combat
+- [x] (0.1528) Fenêtre de chat Tensho : un onglet qui ne montre que le combat (par exemple « Combat ») ne porte jamais de nombre de non lus pendant un combat, et « nouveaux messages plus bas » ne compte pas les lignes de combat
 
 - [ ] (0.1528) Réglages du chat › Onglets › canaux : réduisez la fenêtre petit à petit ; les cases passent de trois colonnes à deux puis à une, aucun nom n'est coupé (« Linkshell inter-Monde [3] », « Messages d'erreur système », « Objets vendus aux marchés » en entier) et rien ne passe sous la barre de défilement ; même chose pour les filtres du jeu et les genres de lignes de combat
 
@@ -2157,7 +2157,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1529) Passez à l'étape suivante du plateau : le bloc du combat en tête change avec l'étape ; dans dalamud.log, la ligne « Beastmaster board window entries: … fights … » change aussi (à relever : une étape ou tout le plateau)
 
-- [ ] (0.1529) Si la disposition du plateau liste tous les combats à la fois, le panneau reste comme avant (tout le plateau), sans bloc de combat en tête
+- [x] (0.1529) Si la disposition du plateau liste tous les combats à la fois, le panneau reste comme avant (tout le plateau), sans bloc de combat en tête
 
 - [ ] (0.1530) Au Dédale bestial, devant « Formation de l'équipe » : sous chaque bête conseillée du combat en tête, une ligne « Technique de type féroce (Griffure) ; combo instinctif II : Hache rafale puis la technique (Assaut vital), ou la technique puis Hache mistral (Assaut létal) » pour le cu sith ; faites le combo en combat et vérifiez que le jeu l'annonce
 
@@ -2165,15 +2165,15 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1531) Au Dédale bestial, après un plateau : dans dalamud.log, la ligne « Beastmaster board result, numbers 47 to 62 » donne des nombres à comparer aux bonus que montre la fenêtre de résultat (lignes de XBMScoreBonus ?)
 
-- [ ] (0.1532) Rechargez Tensho avec un long historique de chat (fenêtre de chat ouverte) : pas d'à-coup ; dans dalamud.log (mode développeur), plus de « Slow frame » où « Chat » dépasse quelques ms, et « Chat layout » reste vers 3 ms
+- [x] (0.1532) Rechargez Tensho avec un long historique de chat (fenêtre de chat ouverte) : pas d'à-coup ; dans dalamud.log (mode développeur), plus de « Slow frame » où « Chat » dépasse quelques ms, et « Chat layout » reste vers 3 ms
 
-- [ ] (0.1532) Remontez loin dans l'historique avec la molette : les anciennes lignes apparaissent sans que la vue saute, dans l'ordre
+- [x] (0.1532) Remontez loin dans l'historique avec la molette : les anciennes lignes apparaissent sans que la vue saute, dans l'ordre
 
 - [ ] (0.1533) Rechargez Tensho avec la fenêtre de chat ouverte : « Chargement… » une ou deux secondes, puis les lignes ; dans dalamud.log (mode développeur), plus de « Slow frame » où « Chat » dépasse 16 ms juste après le rechargement
 
 - [ ] (0.1534) Au Dédale bestial, devant « Formation de l'équipe » : le panneau Tensho n'est pas plus large que la fenêtre du jeu à côté, l'équipe conseillée est un tableau (icône et nom, rang, attaque) comme dans le jeu, aucun texte coupé
 
-- [ ] (0.1535) Fenêtre de chat avec un long historique : remonter à la molette, puis en tirant la barre ; la vue ne saute pas quand des lignes plus anciennes arrivent au-dessus (elles arrivent par paquets)
+- [x] (0.1535) Fenêtre de chat avec un long historique : remonter à la molette, puis en tirant la barre ; la vue ne saute pas quand des lignes plus anciennes arrivent au-dessus (elles arrivent par paquets)
 
 - [ ] (0.1535) Après un rechargement en mode développeur : dalamud.log a la ligne « JIT warm-up: … Early phase (map, overlays, chat; …) ready N ms after the load » (logread.py)
 
@@ -2190,6 +2190,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1546) Dédale bestial, 2e plateau, une bête de rang 5 ou moins dans l'équipe : le panneau dit « rang bas pour ce plateau » (6 à 10) à côté d'elle ; une bête de rang 6 à 10 ne le dit plus
 
 - [ ] (0.1546) si vous atteignez le 3e plateau du Dédale bestial : la fenêtre d'avant l'entrée dit « Rang de bête recommandé : 11 à 15 », comme Tensho
+
+- [ ] (0.1547) Dédale bestial, 1er plateau, Gardien du plateau : l'ordre d'appel met d'abord une bête Perforant (Cu sith, Pampa ou Acarus) qui vise « Pas de Seul (le plus fort) », puis Écureuil pour les deux Succubes
+
+- [ ] (0.1547) Dédale bestial, un combat à plusieurs monstres : la première bête appelée vise le monstre marqué « (le plus fort) »
+
+- [ ] (0.1548) Dresseur : ouvrir le bestiaire de dresseur du jeu et cliquer sur quelques bêtes (les deux pages) : la page Dresseur de Tensho donne à chacune le rang entre parenthèses de sa fiche (« Rang 5 (8) » : 8)
+
+- [ ] (0.1548) Dédale bestial : après avoir ouvert les fiches des bêtes de l'équipe dans le bestiaire, le panneau ne dit plus « rang pas encore lu » pour elles
+
+- [ ] (0.1549) Dédale bestial, panneau du plateau (ou page Dresseur, Équipe) : « Les 10 à emmener » sont rangées par numéro du bestiaire, « N° 1 » devant Cu sith, et chaque numéro est celui de la bête dans le bestiaire du jeu ; les trois de chaque combat restent dans l'ordre d'appel
+
+- [ ] (0.1550) Page Dresseur, onglet Équipe : l'option « Surligner les combos de la bête » est là, coupée par défaut
+
+- [ ] (0.1550) Dédale bestial, option activée, en combat : quand une bête est appelée, les deux techniques du dresseur de son combo (celle d'avant sa technique et celle d'après) sont surlignées sur la barre d'actions ; elles changent quand une autre bête est appelée
 
 **0.535 : interfaces** — à voir en jouant
 
