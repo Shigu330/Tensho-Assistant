@@ -150,15 +150,30 @@ internal sealed partial class MainWindow
     internal Func<string>? BeastTeamsFile { get; set; }
     private BeastTeams.SavedPlans? beastPlans;
     private bool beastPlansLoaded;
+    // X-587 (external audit A03 of 18/11): the file read before any write; one that could not be read is never written over.
+    private readonly BeastPlansFile beastFile = new();
+    private bool beastBlockedSaid;
     private Task<BoardPlan>? beastPlanTask;
     private (uint Board, string Key)? beastPlanFor;
     /// <summary>X-135 (0.1163): read once, before the first draw or the first ranks read (before, ranks read before the page was opened were lost).</summary>
     private BeastTeams.SavedPlans LoadBeastPlans()
     {
-        if (!beastPlansLoaded)
+        // X-587 (external audit A03 of 18/11): held by another program, the file is read again (every 10 s) and nothing is saved over it
+        // meanwhile; damaged, it is set aside under a dated name first (BeastPlansFile).
+        if (!beastPlansLoaded || beastFile.Blocked)
         {
             beastPlansLoaded = true;
-            try { if (BeastTeamsFile?.Invoke() is { } file && File.Exists(file)) beastPlans = BeastTeams.Read(File.ReadAllText(file)); }
+            try
+            {
+                if (BeastTeamsFile?.Invoke() is { } file && beastFile.ReadIfDue(file, DateTimeOffset.UtcNow,
+                        (aside, error) => log.Warning(error, "Beast team plans unreadable; the file is set aside as {0}.", Path.GetFileName(aside))) is { } plans)
+                    beastPlans = plans;
+                if (beastFile.Blocked && !beastBlockedSaid)
+                {
+                    beastBlockedSaid = true;
+                    log.Warning("Beast team plans could not be read (held by another program?): nothing is saved over them; read again every 10 s.");
+                }
+            }
             catch (Exception error) { log.Warning(error, "Beast team plans unreadable."); }
             beastPlans ??= new([], []);
         }
@@ -170,6 +185,8 @@ internal sealed partial class MainWindow
     {
         // X-180 (0.1168): never in the desktop application (its copy is overwritten from the game; the plans stay in memory there).
         if (inDesktopApp) return;
+        // X-587 (A03): never before the file was read, nor over a file that could not be read (BeastPlansFile.MayWrite).
+        if (!beastFile.MayWrite) return;
         try
         {
             if (beastPlans is not null && BeastTeamsFile?.Invoke() is { } file)

@@ -270,6 +270,13 @@ public sealed class DiscoveryStore
         lock(gate)return Enum.GetValues<DiscoveryKind>().Where(kind=>!sharedWaiting.Contains(kind)).ToHashSet();
     }
     public int SharedKindsWaiting{get{lock(gate)return sharedWaiting.Count;}}
+    /// <summary>
+    /// X-587 (external audit A16 of 18/11): set at start when your own base was not read whole (a database that exists but cannot be opened,
+    /// a file set aside or that could not be read): the store then holds only this session's sightings, and an upload would replace what you
+    /// published before with them. GitHubExchange sends nothing while it is set; the common data are still received.
+    /// </summary>
+    public bool MineIncomplete{get=>Volatile.Read(ref mineIncomplete);set=>Volatile.Write(ref mineIncomplete,value);}
+    private bool mineIncomplete;
     /// <summary>X-93 (0.942): the Discoveries page shows every kind's totals: it asks for all the shared kinds still on disk.</summary>
     public void WantAll(){lock(gate)foreach(var kind in sharedWaiting.ToArray())Want(kind);}
     // Under the lock: asks for a kind in the background.

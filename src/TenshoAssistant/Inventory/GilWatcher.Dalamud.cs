@@ -25,7 +25,7 @@ public sealed unsafe class GilWatcher : IDisposable
     private ulong character;
     private List<GilEntry> entries=[];
     private long? gil,retainers,company;
-    private bool dirty,disposed,warned,loadFailed;
+    private bool disposed,warned,loadFailed;
     private DateTimeOffset nextRead,nextSave;
     private GilJournalState? state;
 
@@ -145,7 +145,7 @@ public sealed unsafe class GilWatcher : IDisposable
                     string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)),
                     string.Join(", ",heard.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).Select(pair=>pair.Key)));
             if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,at);
-            dirty=true;
+            Saves.Changed();
         }
         last=value;
         return true;
@@ -154,19 +154,25 @@ public sealed unsafe class GilWatcher : IDisposable
     private Task<List<GilEntry>>? loading;
     private void Switch(ulong id,DateTimeOffset now)
     {
-        character=id;gil=null;retainers=null;company=null;dirty=false;loadFailed=false;entries=[];
-        loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id,now),now));
+        character=id;gil=null;retainers=null;company=null;loadFailed=false;entries=[];
+        Saves.Switch();
+        // X-587 (external audit A14 of 18/11): a journal of this character whose write failed is newer than the data file's: the one used.
+        if(id!=0 && Saves.Failed(id) is { } kept)loading=Task.FromResult(GilJournal.Prune(kept,now));
+        else loading=id==0 ? null:Task.Run(()=>GilJournal.Prune(store.Load(id,now),now));
         Volatile.Write(ref state,null);
     }
 
     private void Save(DateTimeOffset now)
     {
         nextSave=now.AddMinutes(1);
+        var pending=Saves;var dirty=pending.Due;var queue=writer??=new((error,message)=>log.Warning(error,message));
+        // X-587 (external audit A14 of 18/11): a journal whose write failed is written again at each save, after the character changed too.
+        foreach(var (other,kept) in pending.Again(character,dirty && character!=0 && !loadFailed))
+            queue.Enqueue("Gil journal could not be saved again; tried at the next save.",pending.Done(other,kept,null,()=>store.Save(other,kept)));
         if(!dirty || character==0 || loadFailed)return;
-        // X-76 H10 (0.925): a copy is written off the framework thread.
+        // X-76 H10 (0.925): a copy is written off the framework thread. X-587 (A14): marked written only once the write is done.
         var id=character;var copy=GilJournal.Prune(entries,now).ToArray();
-        (writer??=new((error,message)=>log.Warning(error,message))).Enqueue("Gil journal could not be saved.",()=>store.Save(id,copy));
-        dirty=false;
+        queue.Enqueue("Gil journal could not be saved.",pending.Done(id,copy,pending.Stamp,()=>store.Save(id,copy)));
     }
 
     public void Dispose()
@@ -177,8 +183,12 @@ public sealed unsafe class GilWatcher : IDisposable
         TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnUpdate);
         Save(DateTimeOffset.UtcNow);
         if(writer?.Flush(TimeSpan.FromSeconds(3))==false)log.Warning("Gil journal: the last write did not finish before the plugin closed.");
+        // X-587 (A14): a journal that could not be written even at the close is said; the data file keeps its last whole save.
+        else if(saves is { FailedCount:>0 } left)log.Warning("Gil journal: {0} character journal(s) could not be written before the plugin closed; the data file keeps the last whole save.",left.FailedCount);
         // X-173 (0.1139): the data file's journal folded in, so the folder holds one file when the game is closed (SQLite does it at the next start otherwise).
         else try{store.Checkpoint();}catch(Exception error){log.Warning(error,"The Tensho data file's journal could not be folded in; SQLite does it at the next start.");}
     }
     private BackgroundWriter? writer;
+    private GilSaves? saves;
+    private GilSaves Saves=>saves??=new();
 }

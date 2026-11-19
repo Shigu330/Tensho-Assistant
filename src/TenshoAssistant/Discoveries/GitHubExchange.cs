@@ -341,7 +341,10 @@ public sealed class GitHubExchange : IDisposable
         catch(Exception error) when(CommonUnreadable(error)){taken=(CommonUnreachable(error) ? "CommonUnreachable":"CommonUnreadable",0,0);}
         var (common,added,joined)=taken;
         var sent="";
-        if(upload && Connected)
+        // X-587 (external audit A16 of 18/11): your own base not read whole at start (DiscoveryStore.MineIncomplete): the gist would be
+        // replaced by this session's facts only, and its kinds missing here removed; nothing is sent, the common data above are still taken.
+        if(upload && Connected && store.MineIncomplete)sent="ShareBlocked";
+        else if(upload && Connected)
         {
             var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
             // X-174 (0.1137, DEC-052): sent as a v3 set: index.json and one kind-NN.jsonl.gz.b64 per kind (base64: a gist holds text). The index holds each

@@ -789,6 +789,7 @@
     "ExchangeFailed": "The exchange failed ({0}); see the log.",
     "CommonSame": "Already up to date: the common file has not changed.",
     "ShareEmpty": "Nothing seen by you yet to share.",
+    "ShareBlocked": "Nothing sent: your discoveries file was not read whole this session, and sending would replace what you shared before with this session's finds only.",
     "SummaryBlueSpellCaster": "Monsters seen casting a blue spell: {0} ({1} seen by you, {2} imported only)",
     "SpellCaster": "{1} seen casting {0}",
     "SummaryFishTransition": "Fish and the weather before: {0} ({1} seen by you, {2} imported only)",

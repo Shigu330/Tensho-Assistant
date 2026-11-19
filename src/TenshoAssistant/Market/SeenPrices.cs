@@ -174,6 +174,11 @@ public static class SeenPrices
 public sealed class SeenPriceStore
 {
     public const int MaxEntries=50_000;
+    /// <summary>
+    /// X-587 (external audit A15 of 18/11): the one size bound of MarketSeen.json, in reading and in writing. The writer bounded only the
+    /// count of entries, offers and sales, so a file it wrote could be refused at the next start and then replaced by the entries in memory.
+    /// </summary>
+    public const long MaxFileBytes=64L*1024*1024;
     private readonly object gate=new();
     private readonly Dictionary<(uint World,uint Item),SeenMarketEntry> entries=[];
     // X-142 (0.1121, audit A04): changes counted, acknowledged only once written (MarkSaved): a failed write keeps them to save.
@@ -287,31 +292,59 @@ public sealed class SeenPriceStore
 
     public void Load(IEnumerable<SeenMarketEntry> saved)
     {
+        var now=DateTimeOffset.UtcNow;
         lock(gate)
         {
             revision++;
             foreach(var entry in saved)
+            {
                 // X-73.1 (0.857): nothing older than KeptFor is loaded.
-                if(entry.World!=0 && entry.Item!=0 && entries.Count<MaxEntries && DateTimeOffset.UtcNow-entry.Seen<=SeenPrices.KeptFor)
-                    entries[(entry.World,entry.Item)]=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,OwnKnown=entry.OwnKnown,
-                        Listings=entry.Listings.Where(listing=>listing.Price>0).Take(SeenPrices.MaxListings).ToList(),ListingsAt=entry.ListingsAt,
-                        Sales=entry.Sales.Where(sale=>sale.Price>0).Take(SeenPrices.MaxSales).ToList(),SalesAt=entry.SalesAt};
+                if(entry.World==0 || entry.Item==0 || now-entry.Seen>SeenPrices.KeptFor)continue;
+                var read=new SeenMarketEntry{World=entry.World,Item=entry.Item,ListingsRequest=entry.ListingsRequest,OwnKnown=entry.OwnKnown,
+                    Listings=entry.Listings.Where(listing=>listing.Price>0).Take(SeenPrices.MaxListings).ToList(),ListingsAt=entry.ListingsAt,
+                    Sales=entry.Sales.Where(sale=>sale.Price>0).Take(SeenPrices.MaxSales).ToList(),SalesAt=entry.SalesAt};
+                // X-587 (external audit A27 of 18/11): the board's reader is subscribed before this load (a slow start): an item and world seen
+                // meanwhile keeps the newer offers, and the sales of both, as two clients' files are joined (Join).
+                var key=(entry.World,entry.Item);
+                if(entries.TryGetValue(key,out var held)){entries[key]=Join(held,read,now);quotes.Remove(key);lowest.Remove(key);}
+                else if(entries.Count<MaxEntries)entries[key]=read;
+            }
         }
     }
 
-    public static List<SeenMarketEntry>? Read(string path)=>File.Exists(path) && new FileInfo(path).Length<=64L*1024*1024 ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
+    public static List<SeenMarketEntry>? Read(string path,long max=MaxFileBytes)=>File.Exists(path) && new FileInfo(path).Length<=max ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
     /// <summary>
     /// X-171 (0.1216, audit of 12/11, R02): two game clients on one profile each held the file's entries of the start and wrote back their whole
     /// copy: the second write erased what the first client had seen since. The write now holds the profile's lock file (« .lock » beside it) and
     /// joins what the file holds at that moment (Joined) before replacing it; a file that cannot be read is replaced by this client's entries, as before.
     /// </summary>
-    public static void Write(string path,List<SeenMarketEntry> entries)
+    public static void Write(string path,List<SeenMarketEntry> entries,long max=MaxFileBytes)
     {
         using var held=HoldLock(path+".lock");
         List<SeenMarketEntry>? onDisk;
-        try{onDisk=Read(path);}
-        catch(Exception error) when(error is IOException or JsonException or UnauthorizedAccessException){onDisk=null;}
-        AtomicFile.Write(path,JsonSerializer.Serialize(Joined(entries,onDisk,DateTimeOffset.UtcNow)));
+        try{onDisk=Read(path,max);}
+        catch(JsonException){onDisk=null;}
+        // X-587 (external audit A15 of 18/11): a file that is there but cannot be read (over the bound, damaged) is set aside under a dated
+        // name before this client's entries take its place, never written over; held by another program (IOException), the save fails and
+        // is kept to save again. What is written always fits the bound the reader applies (Bounded).
+        if(onDisk is null && File.Exists(path))File.Move(path,Discoveries.DiscoveryFiles.SetAsideName(path,DateTimeOffset.UtcNow),false);
+        AtomicFile.Write(path,Bounded(Joined(entries,onDisk,DateTimeOffset.UtcNow),max));
+    }
+
+    /// <summary>
+    /// X-587 (A15): the JSON of the most recently seen entries (Joined orders them newest first) whose UTF-8 size fits <paramref name="max"/>:
+    /// the oldest are left out until it fits, so the reader never refuses a file the plugin wrote.
+    /// </summary>
+    internal static string Bounded(List<SeenMarketEntry> joined,long max)
+    {
+        var count=joined.Count;
+        while(true)
+        {
+            var text=JsonSerializer.Serialize(count==joined.Count ? joined:joined.Take(count).ToList());
+            var bytes=System.Text.Encoding.UTF8.GetByteCount(text);
+            if(bytes<=max || count==0)return text;
+            count=(int)Math.Max(0,Math.Min(count-1L,(long)(count*(double)max/bytes*0.95)));
+        }
     }
 
     /// <summary>
@@ -327,12 +360,18 @@ public sealed class SeenPriceStore
         {
             if(other is null || other.World==0 || other.Item==0 || now-other.Seen>SeenPrices.KeptFor)continue;
             if(!all.TryGetValue((other.World,other.Item),out var kept)){all[(other.World,other.Item)]=other;continue;}
-            var newer=other.ListingsAt>kept.ListingsAt ? other:kept;
-            all[(other.World,other.Item)]=new SeenMarketEntry{World=kept.World,Item=kept.Item,Listings=[..newer.Listings],ListingsAt=newer.ListingsAt,
-                ListingsRequest=newer.ListingsRequest,OwnKnown=newer.OwnKnown,Sales=SeenPrices.MergeSales(kept.Sales,other.Sales,now),
-                SalesAt=kept.SalesAt>other.SalesAt ? kept.SalesAt:other.SalesAt};
+            all[(other.World,other.Item)]=Join(kept,other,now);
         }
         return all.Values.OrderByDescending(entry=>entry.Seen).ThenBy(entry=>entry.World).ThenBy(entry=>entry.Item).Take(MaxEntries).ToList();
+    }
+
+    /// <summary>X-171 (0.1216), X-587 (A27): one item and world seen twice: the offers of the newer reading, the sales of both without twins.</summary>
+    private static SeenMarketEntry Join(SeenMarketEntry kept,SeenMarketEntry other,DateTimeOffset now)
+    {
+        var newer=other.ListingsAt>kept.ListingsAt ? other:kept;
+        return new SeenMarketEntry{World=kept.World,Item=kept.Item,Listings=[..newer.Listings],ListingsAt=newer.ListingsAt,
+            ListingsRequest=newer.ListingsRequest,OwnKnown=newer.OwnKnown,Sales=SeenPrices.MergeSales(kept.Sales,other.Sales,now),
+            SalesAt=kept.SalesAt>other.SalesAt ? kept.SalesAt:other.SalesAt};
     }
 
     // The lock file held for the read and the write (FileShare.None): the other client waits for it, 10 s at most, then the save fails and is kept.

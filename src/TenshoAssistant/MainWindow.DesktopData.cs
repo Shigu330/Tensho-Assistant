@@ -88,7 +88,7 @@ internal sealed partial class MainWindow
             case "beast-teams":
                 var teams=Path.Combine(folder,"BeastTeams.json");
                 BeastTeamsFile=()=>teams;
-                beastPlans=null;beastPlansLoaded=false;
+                beastPlans=null;beastPlansLoaded=false;beastFile.Reset();
                 break;
             case "characters":
                 UseDesktopCharacters(folder,warn);

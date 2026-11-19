@@ -30,7 +30,13 @@ public sealed partial class Plugin
         _=Task.Run(()=>
         {
             try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
-            catch(Exception error){log.Warning(error,"The market prices seen could not be read; the file is kept as .broken.");try{File.Move(Path.Combine(discoveryFolder,"MarketSeen.json"),Path.Combine(discoveryFolder,"MarketSeen.json.broken"),true);}catch(Exception){}}
+            catch(Exception error)
+            {
+                // X-587 (external audit A15 of 18/11): set aside under a dated name, never over one set aside before.
+                var pricesPath=Path.Combine(discoveryFolder,"MarketSeen.json");var aside=Discoveries.DiscoveryFiles.SetAsideName(pricesPath,DateTimeOffset.UtcNow);
+                log.Warning(error,"The market prices seen could not be read; the file is set aside as {0}.",Path.GetFileName(aside));
+                try{File.Move(pricesPath,aside,false);}catch(Exception){}
+            }
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
             // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite), the files of before converted once
             // and kept aside. A database that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is
@@ -53,6 +59,8 @@ public sealed partial class Plugin
                 if(File.Exists(databasePath))
                 {
                     mainWindow.DiscoveriesWriteBlocked=true;
+                    // X-587 (external audit A16 of 18/11): your facts are not in memory: nothing is sent to your gist this session.
+                    discoveries.MineIncomplete=true;
                     log.Error(error,"The discoveries database could not be opened: nothing is saved this session.");
                     var said=localization.Format("DiscoveriesUi.BaseBlocked",Discoveries.DiscoveryDatabase.FileName);
                     _=framework.RunOnFrameworkThread(()=>chat.PrintError("[Tensho] "+said));
@@ -72,6 +80,8 @@ public sealed partial class Plugin
             // X-93 part 2 (0.1039): a base that cannot be read (over 64 MB, damaged) is set aside under a dated name and said in the chat and on the page,
             // never overwritten by an empty base; if it cannot even be moved, nothing is saved this session.
             var read=Discoveries.DiscoveryFiles.ReadBase(saved,DateTimeOffset.UtcNow,(aside,error)=>log.Warning(error,"The discoveries could not be read; the file is set aside as {0}.",Path.GetFileName(aside)));
+            // X-587 (external audit A16 of 18/11): a base set aside or that could not be read: only this session's facts are held, never sent.
+            if(read.Unsafe || read.SetAside is not null)discoveries.MineIncomplete=true;
             if(read.File is { } file)discoveries.Load(file);
             if(read.Unsafe){mainWindow.DiscoveriesWriteBlocked=true;log.Error("The discoveries file could not be read nor set aside: nothing is saved this session.");}
             if(read.SetAside is { } setAside)

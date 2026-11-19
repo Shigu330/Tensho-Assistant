@@ -203,11 +203,17 @@ public sealed class TenshoDataDatabase
             if(new FileInfo(from).Length>max)return (0,[$"{name}: larger than {max>>20} MB, not copied"]);
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(to)!);
             try{Backup(from,to);}
-            // The application's own copy damaged (not a database, corrupt): it is only a copy, made again from scratch once.
+            // The application's own copy damaged (not a database, corrupt): it is only a copy, made again from scratch once. X-587 (external
+            // audit A20 of 18/11): unless the plugin's own file is the damaged one: then the copy may be the last readable one and is kept as it
+            // is; the new copy is made beside it and takes its place only once whole.
             catch(SqliteException error) when(error.SqliteErrorCode is 11 or 26)
             {
-                foreach(var path in new[]{to,to+"-wal",to+"-shm"})if(File.Exists(path))File.Delete(path);
-                Backup(from,to);
+                if(!Sound(from))return (0,[$"{name}: the plugin's file is damaged (SQLite error {error.SqliteErrorCode}); the last copy is kept"]);
+                var fresh=to+".new";
+                foreach(var path in new[]{fresh,fresh+"-wal",fresh+"-shm"})if(File.Exists(path))File.Delete(path);
+                Backup(from,fresh);
+                foreach(var path in new[]{to+"-wal",to+"-shm"})if(File.Exists(path))File.Delete(path);
+                File.Move(fresh,to,true);
             }
             return (1,problems);
         }
@@ -219,6 +225,20 @@ public sealed class TenshoDataDatabase
     /// <summary>0.1202: how long a copy waits for the other side (a save of the plugin, a read of the application's copy) before it gives
     /// up and keeps the last whole copy: 5 s. DesktopData1147Tests shortens it to see the same refusal in a fraction of the time.</summary>
     internal static int CopyBusyWait=5000;
+
+    /// <summary>X-587 (A20): the plugin's file passes SQLite's quick check, read-only (false: damaged, « corrupt » or « not a database »).</summary>
+    private static bool Sound(string from)
+    {
+        try
+        {
+            using var reader=new SqliteConnection(new SqliteConnectionStringBuilder{DataSource=from,Mode=SqliteOpenMode.ReadOnly,Pooling=false}.ToString());
+            reader.Open();
+            Run(reader,$"PRAGMA busy_timeout={CopyBusyWait};");
+            using var command=reader.CreateCommand();command.CommandText="PRAGMA quick_check;";
+            return command.ExecuteScalar() as string=="ok";
+        }
+        catch(SqliteException error) when(error.SqliteErrorCode is 11 or 26){return false;}
+    }
 
     private static void Backup(string from,string to)
     {

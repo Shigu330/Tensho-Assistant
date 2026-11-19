@@ -789,6 +789,7 @@
     "ExchangeFailed": "L'échange a échoué ({0}) ; voir le journal.",
     "CommonSame": "Déjà à jour : le fichier commun n'a pas changé.",
     "ShareEmpty": "Rien de vu par vous à partager pour l'instant.",
+    "ShareBlocked": "Rien envoyé : votre fichier de découvertes n'a pas été lu en entier pendant cette session, et un envoi remplacerait ce que vous avez partagé avant par les seules découvertes de cette session.",
     "SummaryBlueSpellCaster": "Monstres vus lançant un sort de mage bleu : {0} ({1} vus par vous, {2} importés seulement)",
     "SpellCaster": "{1} vu lançant {0}",
     "SummaryFishTransition": "Poissons et météo précédente : {0} ({1} vus par vous, {2} importés seulement)",
