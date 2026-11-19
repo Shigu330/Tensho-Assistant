@@ -27,12 +27,12 @@ internal static class DiscoveriesFamily1250Tests
                 ("the database opened",@"new Discoveries\.DiscoveryDatabase\(databasePath\)"),
                 ("the files of before converted",@"Discoveries\.DiscoveryDatabase\.ConvertFiles\("),
                 ("the base read safely",@"Discoveries\.DiscoveryFiles\.ReadBase\(saved,"),
-                ("the prices seen read",@"Market\.SeenPriceStore\.Read\("),
+                ("the prices seen read",@"Market\.SeenPriceStore\.ReadAtStart\("),
             })
                 Check(files.Sum(file => Count(file.Text,pattern)) == 1 && Count(home,pattern) == 1,what + ": once, in its family's file");
             Check(Count(home,@"registrations\.Register\(") == 1,"the exchange through the plugin's registrations");
             Check(Count(home,@"Task\.Run\(") == 1,"one loading worker, as before");
-            Check(home.IndexOf("Market.SeenPriceStore.Read(",StringComparison.Ordinal) < home.IndexOf("Discoveries.DiscoveryDatabase.ConvertFiles(",StringComparison.Ordinal),"the prices seen first, then the discoveries, as before");
+            Check(home.IndexOf("Market.SeenPriceStore.ReadAtStart(",StringComparison.Ordinal) < home.IndexOf("Discoveries.DiscoveryDatabase.ConvertFiles(",StringComparison.Ordinal),"the prices seen first, then the discoveries, as before");
             Check(home.Contains("mainWindow.DiscoveriesWriteBlocked=true;") && home.Contains("_=framework.RunOnFrameworkThread(()=>chat.PrintError(\"[Tensho] \"+said));"),"blocked saves and the chat line kept");
         }),
         ("Discoveries family 1250: Plugin.cs calls it at the places of before: the store before its item watcher, the loading after the seen prices' reader",() =>

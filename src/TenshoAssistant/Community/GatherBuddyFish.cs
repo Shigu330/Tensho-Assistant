@@ -188,7 +188,10 @@ public sealed class GatherBuddyFishService : IDisposable
                 var cached = cache is null ? null : await cache.ReadAsync<GatherBuddyFishCache>(Family, "all", Version, token).ConfigureAwait(false);
                 string text;
                 GatherBuddyFishData? data = null;
-                if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) text = cached.Value.Text;
+                // X-618 (M4): a fresh copy is checked as a download is (X-589 A26): one without a fish (kept by a version before 0.1554)
+                // is downloaded again, never taken as fresh, empty and without an error for its whole lifetime.
+                if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime() && GatherBuddyFishData.Parse([cached.Value.Text]) is { Count: > 0 } fresh)
+                { text = cached.Value.Text; data = fresh; }
                 else try
                 {
                     if (Abandoned()) return;
@@ -209,7 +212,8 @@ public sealed class GatherBuddyFishService : IDisposable
                     if (cache is not null) await cache.WriteAsync(Family, "all", Version, new GatherBuddyFishCache(text), DateTimeOffset.UtcNow).ConfigureAwait(false);
                 }
                 // Network down or GitHub refusing: the expired copy is better than nothing (kept until a download succeeds).
-                catch (Exception) when (cached?.Value.Text is { Length: > 0 } && !token.IsCancellationRequested) { text = cached.Value.Text; data = null; }
+                // X-618 (M4): an expired copy without a fish is no copy: the error, tried again later.
+                catch (Exception) when (cached?.Value.Text is { Length: > 0 } old && !token.IsCancellationRequested && GatherBuddyFishData.Parse([old]) is { Count: > 0 } copy) { text = old; data = copy; }
                 Volatile.Write(ref state, new(data ?? GatherBuddyFishData.Parse([text]), false, null));
             }
             // 0.330: only the plugin's own cancellation is silent; an HttpClient timeout (also an OperationCanceledException) is a failure: it

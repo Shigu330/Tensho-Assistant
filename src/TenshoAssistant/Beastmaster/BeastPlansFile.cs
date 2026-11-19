@@ -39,11 +39,12 @@ public sealed class BeastPlansFile
         try
         {
             var aside=Discoveries.DiscoveryFiles.SetAsideName(file,now);
-            broken?.Invoke(aside,error);
             File.Move(file,aside,false);
             SetAside=aside;Blocked=false;
+            // X-618 (M1): said once moved (before, said before the move: a move that failed was said as done, again every 10 s).
+            broken?.Invoke(aside,error);
         }
-        catch(Exception){}   // not moved: nothing written over it, read again later
+        catch(Exception){}   // not moved: nothing written over it, read again later (the window says it once: « could not be read »)
         return null;
     }
 

@@ -312,6 +312,32 @@ public sealed class SeenPriceStore
         }
     }
 
+    /// <summary>
+    /// X-618 (review of block 0.1551 to 0.1554, M2): the start's read. Held by another program (DiscoveryFiles.Busy: a second client writing),
+    /// read again up to <paramref name="tries"/> times, then left where it is (<paramref name="left"/>): the next save joins it (Write),
+    /// nothing lost. Before, any failure set the file aside as damaged and left the prices seen out of use for the session. Damaged: set
+    /// aside under a dated name, said once moved (<paramref name="setAside"/>); not moved: left (the next save sets it aside).
+    /// </summary>
+    public static List<SeenMarketEntry>? ReadAtStart(string path,DateTimeOffset now,Action<string,Exception> setAside,Action<Exception> left,int tries=3,int waitMs=1000)
+    {
+        for(var attempt=1;;attempt++)
+        {
+            Exception error;
+            try{return Read(path);}
+            catch(Exception caught){error=caught;}
+            if(Discoveries.DiscoveryFiles.Away(error))return null;
+            if(Discoveries.DiscoveryFiles.Busy(error))
+            {
+                if(attempt<tries){Thread.Sleep(waitMs);continue;}
+                left(error);return null;
+            }
+            var aside=Discoveries.DiscoveryFiles.SetAsideName(path,now);
+            try{File.Move(path,aside,false);}
+            catch(Exception){left(error);return null;}
+            setAside(aside,error);return null;
+        }
+    }
+
     public static List<SeenMarketEntry>? Read(string path,long max=MaxFileBytes)=>File.Exists(path) && new FileInfo(path).Length<=max ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
     /// <summary>
     /// X-171 (0.1216, audit of 12/11, R02): two game clients on one profile each held the file's entries of the start and wrote back their whole

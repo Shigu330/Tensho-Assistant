@@ -76,10 +76,10 @@ public sealed class FishBiteTimeService : IDisposable
         {
             if (states.TryGetValue(spotId, out var known))
             {
-                if (known.Error is null || !failedAt.TryGetValue(spotId, out var at) || Environment.TickCount64 - at < RetryMs) return known;
-                states.Remove(spotId); failedAt.Remove(spotId);   // X-589 (A09): asked again
+                if (!failedAt.TryGetValue(spotId, out var at) || Environment.TickCount64 - at < RetryMs) return known;
+                failedAt.Remove(spotId);   // X-589 (A09): asked again; X-618 (M3): an expired copy too, still shown meanwhile
             }
-            var loading = new FishBiteSpotState(null, true, null); states[spotId] = loading;
+            var loading = new FishBiteSpotState(known?.Times, true, null); states[spotId] = loading;
             pending.Enqueue(spotId);
             if (!draining || worker is { IsFaulted: true }) { draining = true; worker = Task.Run(DrainAsync); }
             return loading;
@@ -117,10 +117,12 @@ public sealed class FishBiteTimeService : IDisposable
                 result = new(FishBiteTimeSummary.Summarize(rows.Where(row => row.Length == 3 && row[0] > 0).Select(row => ((uint)row[0], row[1], row[2]))), false, null);
             }
             catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { lock (gate) draining = false; return; }
-            // X-589 (A09): the expired copy is better than nothing (kept until a request succeeds); without one, an error tried again later.
+            // X-589 (A09): the expired copy is better than nothing; without one, an error tried again later. X-618 (M3): the copy is asked
+            // again after the same deadline (before, kept as a success: the spot was never asked again in the session).
             catch (Exception) when (cached?.Value.Rows is { Count: > 0 } old)
             {
                 result = new(FishBiteTimeSummary.Summarize(old.Where(row => row.Length == 3 && row[0] > 0).Select(row => ((uint)row[0], row[1], row[2]))), false, null);
+                lock (gate) failedAt[spot] = Environment.TickCount64;
             }
             catch (Exception error) { result = new(null, false, error.Message); lock (gate) failedAt[spot] = Environment.TickCount64; }
             lock (gate) states[spot] = result;

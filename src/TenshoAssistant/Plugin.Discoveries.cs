@@ -29,14 +29,16 @@ public sealed partial class Plugin
     {
         _=Task.Run(async()=>
         {
-            try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
-            catch(Exception error)
+            // X-587 (external audit A15 of 18/11): damaged, set aside under a dated name, never over one set aside before. X-618 (M2): held by
+            // another program, read again, then left where it is (the next save joins it), never set aside as damaged.
+            try
             {
-                // X-587 (external audit A15 of 18/11): set aside under a dated name, never over one set aside before.
-                var pricesPath=Path.Combine(discoveryFolder,"MarketSeen.json");var aside=Discoveries.DiscoveryFiles.SetAsideName(pricesPath,DateTimeOffset.UtcNow);
-                log.Warning(error,"The market prices seen could not be read; the file is set aside as {0}.",Path.GetFileName(aside));
-                try{File.Move(pricesPath,aside,false);}catch(Exception){}
+                if(Market.SeenPriceStore.ReadAtStart(Path.Combine(discoveryFolder,"MarketSeen.json"),DateTimeOffset.UtcNow,
+                    (aside,error)=>log.Warning(error,"The market prices seen could not be read; the file is set aside as {0}.",Path.GetFileName(aside)),
+                    error=>log.Warning(error,"The market prices seen could not be read for now (held by another program?); the file stays where it is and is joined at the next save.")) is { } prices)
+                    seenPrices.Load(prices);
             }
+            catch(Exception error){log.Warning(error,"The market prices seen could not be read.");}
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
             // X-172 (0.1136, trial docs/evidence/x172-sqlite-trial.md): the discoveries in Discoveries.db (SQLite), the files of before converted once
             // and kept aside. A database that exists but cannot be opened (SQLite not loaded, damaged, newer layout) is never replaced: nothing is
@@ -76,7 +78,8 @@ public sealed partial class Plugin
                 // left the page « loading » for the session); each failure said on the page; still failing after the last try, the page opens
                 // without your facts and nothing is sent to GitHub this session (MineIncomplete); new sightings are still saved, row by row,
                 // added to what the base holds (X-171).
-                var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine((key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),Kinds:opened.SharedKinds()),
+                // X-618 (M5): a row of yours that cannot be read leaves your facts incomplete: nothing sent to your gist (DiscoveryStart.Incomplete).
+                var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine(Discoveries.DiscoveryStart.Incomplete(discoveries,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key))),Kinds:opened.SharedKinds()),
                     Discoveries.DiscoveryStart.Tries,Discoveries.DiscoveryStart.Wait,
                     (error,attempt)=>{log.Warning(error,"Your discoveries could not be read (try {0} of {1}).",attempt,Discoveries.DiscoveryStart.Tries);mainWindow.DiscoveriesReadFailed=attempt;},
                     gameDataCancel.Token).ConfigureAwait(false);
