@@ -260,6 +260,17 @@ public sealed class DiscoveryStore
     /// </summary>
     private Func<DiscoveryKind,DiscoveryFile?>? sharedSource;
     private readonly HashSet<DiscoveryKind> sharedWaiting=[],sharedLoading=[];
+    /// <summary>
+    /// X-588 (external audit A17 of 18/11): the shared kinds whose read failed, with when (Environment.TickCount64). Before, a read that threw
+    /// took the kind out of those waiting: its facts were hidden for the session and its file could be written from memory alone. Now the
+    /// kind stays waiting (never written over), the page says it, and it is read again after <see cref="SharedRetryMs"/>.
+    /// </summary>
+    private readonly Dictionary<DiscoveryKind,long> sharedFailed=[];
+    internal long SharedRetryMs{get;set;}=30_000;
+    /// <summary>X-588 (A17): the shared kinds whose last read failed (read again every 30 s).</summary>
+    public int SharedKindsFailed{get{lock(gate)return sharedFailed.Count;}}
+    // Under the lock: a kind whose read failed less than SharedRetryMs ago.
+    private bool FailedLately(DiscoveryKind kind)=>sharedFailed.TryGetValue(kind,out var at) && Environment.TickCount64-at<SharedRetryMs;
     public void UseSharedSource(Func<DiscoveryKind,DiscoveryFile?> source,IEnumerable<DiscoveryKind> onDisk)
     {
         lock(gate){sharedSource=source;sharedWaiting.Clear();sharedWaiting.UnionWith(onDisk);}
@@ -282,29 +293,71 @@ public sealed class DiscoveryStore
     // Under the lock: asks for a kind in the background.
     private void Want(DiscoveryKind kind)
     {
-        if(sharedSource is not { } source || !sharedWaiting.Contains(kind) || !sharedLoading.Add(kind))return;
+        if(sharedSource is not { } source || !sharedWaiting.Contains(kind) || FailedLately(kind) || !sharedLoading.Add(kind))return;
         _=Task.Run(()=>
         {
-            DiscoveryFile? file=null;
-            try{file=source(kind);}catch(Exception){file=null;}
             // X-93 part 2 (0.1040): checked outside the lock; put in only if no import read the kind meanwhile (it was loaded twice before).
-            var prepared=file is null ? null:Prepare(file);
-            lock(gate){if(prepared is not null && sharedWaiting.Contains(kind))Apply(prepared,false);sharedWaiting.Remove(kind);sharedLoading.Remove(kind);revision++;}
+            var (prepared,failed)=ReadKind(source,kind);
+            lock(gate)
+            {
+                sharedLoading.Remove(kind);revision++;
+                if(failed){sharedFailed[kind]=Environment.TickCount64;return;}   // X-588 (A17): left waiting, read again later
+                sharedFailed.Remove(kind);
+                if(prepared is not null && sharedWaiting.Contains(kind))Apply(prepared,false);
+                sharedWaiting.Remove(kind);
+            }
         });
     }
-    /// <summary>Reads at once the shared kinds still on disk among <paramref name="kinds"/> (before an import joins facts to them); the file read outside the lock.</summary>
-    private void NeedNow(IEnumerable<DiscoveryKind> kinds)
+    /// <summary>X-588 (A17): one shared kind read and checked, outside the lock; failed when the read or the check threw (a null file: none).</summary>
+    private (Prepared? Prepared,bool Failed) ReadKind(Func<DiscoveryKind,DiscoveryFile?> source,DiscoveryKind kind)
+    {
+        try{return source(kind) is { } file ? (Prepare(file),false):(null,false);}
+        catch(Exception){return (null,true);}
+    }
+
+    /// <summary>
+    /// Reads at once the shared kinds still on disk among <paramref name="kinds"/>; the file read outside the lock. X-588 (A17): gives the kinds whose
+    /// read failed: they stay waiting (never written over), said on the page, read again later.
+    /// </summary>
+    private List<DiscoveryKind> ReadNow(IEnumerable<DiscoveryKind> kinds)
     {
         Func<DiscoveryKind,DiscoveryFile?>? source;DiscoveryKind[] wanted;
         lock(gate){source=sharedSource;wanted=kinds.Distinct().Where(kind=>sharedWaiting.Contains(kind)).ToArray();}
-        if(source is null)return;
+        var failedKinds=new List<DiscoveryKind>();
+        if(source is null)return failedKinds;
         foreach(var kind in wanted)
         {
-            DiscoveryFile? file=null;
-            try{file=source(kind);}catch(Exception){file=null;}
-            var prepared=file is null ? null:Prepare(file);
-            lock(gate){if(sharedWaiting.Contains(kind)){if(prepared is not null)Apply(prepared,false);sharedWaiting.Remove(kind);revision++;}}
+            var (prepared,failed)=ReadKind(source,kind);
+            lock(gate)
+            {
+                if(failed){sharedFailed[kind]=Environment.TickCount64;failedKinds.Add(kind);revision++;continue;}
+                sharedFailed.Remove(kind);
+                if(sharedWaiting.Contains(kind)){if(prepared is not null)Apply(prepared,false);sharedWaiting.Remove(kind);revision++;}
+            }
         }
+        return failedKinds;
+    }
+
+    /// <summary>
+    /// Before an import joins facts to them. X-588 (A17): a kind that cannot be read stops the import before anything is joined (IOException:
+    /// the exchange counts its file unreachable and takes it again later, the Import button says it failed), so no fact of that kind is joined
+    /// without the ones already on disk.
+    /// </summary>
+    private void NeedNow(IEnumerable<DiscoveryKind> kinds)
+    {
+        if(ReadNow(kinds) is { Count:>0 } failed)
+            throw new IOException($"The shared discoveries of {string.Join(", ",failed)} could not be read; nothing imported, tried again later.");
+    }
+
+    /// <summary>
+    /// X-588 (external audit A18 of 18/11): every shared kind still on disk read now, before an export copies the memory (an export made during
+    /// the reading left those kinds out and said it had written everything); gives the kinds that could not be read, for the export to say them.
+    /// </summary>
+    public IReadOnlyList<DiscoveryKind> ReadAllShared()
+    {
+        DiscoveryKind[] waiting;
+        lock(gate)waiting=[..sharedWaiting];
+        return ReadNow(waiting);
     }
     /// <summary>X-93 (0.939): shared facts left out since the start because the shared part was full.</summary>
     public int LeftOut { get; private set; }
@@ -770,12 +823,23 @@ public sealed class DiscoveryStore
         }
     }
 
-    /// <summary>Per kind: the facts, those seen by the player, those only imported.</summary>
+    /// <summary>
+    /// Per kind: the facts, those seen by the player, those only imported. X-588 (external audit A19 of 18/11): worked out again only when the
+    /// base changed (its revision or its count of changes); before, every fact was grouped under the lock at each frame of the page.
+    /// </summary>
     public IReadOnlyList<(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)> Summary()
     {
-        lock(gate)return facts.Values.GroupBy(fact=>fact.Kind).OrderBy(group=>group.Key)
-            .Select(group=>(group.Key,group.Count(),group.Count(fact=>fact.Seen>0),group.Count(fact=>fact.Seen==0))).ToArray();
+        lock(gate)
+        {
+            var at=(revision,Interlocked.Read(ref changes));
+            if(summary is { } kept && kept.At==at)return kept.Rows;
+            var rows=facts.Values.GroupBy(fact=>fact.Kind).OrderBy(group=>group.Key)
+                .Select(group=>(group.Key,group.Count(),group.Count(fact=>fact.Seen>0),group.Count(fact=>fact.Seen==0))).ToArray();
+            summary=(at,rows);
+            return rows;
+        }
     }
+    private ((int,long) At,(DiscoveryKind Kind,int Total,int Seen,int ImportedOnly)[] Rows)? summary;
 
     /// <summary>The facts of a kind whose subject passes the filter, most seen first.</summary>
     public IReadOnlyList<DiscoveryFact> Find(DiscoveryKind kind,Func<uint,bool> subject,int max)

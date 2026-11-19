@@ -27,7 +27,7 @@ public sealed partial class Plugin
     /// <summary>The prices seen, then the discoveries, read on a worker (as before the move); the chat lines go through the framework thread.</summary>
     private void LoadDiscoveries(string discoveryFolder,Discoveries.DiscoveryStore discoveries,Market.SeenPriceStore seenPrices,IFramework framework,IChatGui chat)
     {
-        _=Task.Run(()=>
+        _=Task.Run(async()=>
         {
             try{if(Market.SeenPriceStore.Read(Path.Combine(discoveryFolder,"MarketSeen.json")) is { } prices)seenPrices.Load(prices);}
             catch(Exception error)
@@ -72,8 +72,21 @@ public sealed partial class Plugin
             mainWindow.DiscoveryDatabase=database;
             if(database is { } opened)
             {
-                discoveries.Load(opened.ReadMine((key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)));
-                discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),opened.SharedKinds());
+                // X-588 (external audit A01 of 18/11): your facts and the shared kinds' list read inside a retry (outside any try before: an error
+                // left the page « loading » for the session); each failure said on the page; still failing after the last try, the page opens
+                // without your facts and nothing is sent to GitHub this session (MineIncomplete); new sightings are still saved, row by row,
+                // added to what the base holds (X-171).
+                var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine((key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),Kinds:opened.SharedKinds()),
+                    Discoveries.DiscoveryStart.Tries,Discoveries.DiscoveryStart.Wait,
+                    (error,attempt)=>{log.Warning(error,"Your discoveries could not be read (try {0} of {1}).",attempt,Discoveries.DiscoveryStart.Tries);mainWindow.DiscoveriesReadFailed=attempt;},
+                    gameDataCancel.Token).ConfigureAwait(false);
+                if(gotMine)
+                {
+                    discoveries.Load(mine.Facts);
+                    discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),mine.Kinds);
+                    mainWindow.DiscoveriesReadFailed=0;
+                }
+                else discoveries.MineIncomplete=true;
                 mainWindow.DiscoveriesLoaded=true;
                 return;
             }

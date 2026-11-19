@@ -38,6 +38,8 @@ internal sealed partial class MainWindow
     /// <summary>X-93 part 2 (0.1039): the unreadable base set aside at load (its new name), and whether it could not be moved (then nothing is saved).</summary>
     internal volatile string? DiscoveriesSetAside;
     internal volatile bool DiscoveriesWriteBlocked;
+    /// <summary>X-588 (A01): how many times the start's read of your discoveries failed (0: none, or read in the end).</summary>
+    internal volatile int DiscoveriesReadFailed;
     private long discoveriesAt=-100_000,discoveriesSavedAt;private int discoverySaving,discoveryBusy;
     private string discoverySearch="",discoverySearched="\u0001";private int discoveryShownRevision=-1;
     private IReadOnlyList<DiscoveryFact> discoveryRows=[];private string? discoveryMessage;private bool discoveryClearAsked;
@@ -369,6 +371,13 @@ internal sealed partial class MainWindow
             ImGui.TextWrapped(localization.Format(DiscoveriesWriteBlocked ? "DiscoveriesUi.BaseBlocked":"DiscoveriesUi.BaseSetAside",Path.GetFileName(setAside)));
             ImGui.PopStyleColor();
         }
+        // X-588 (external audit A01 of 18/11): a read of your discoveries that failed is said while it is tried again, and when it gave up.
+        if(DiscoveriesReadFailed is > 0 and var readFailed)
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text,Warning);
+            ImGui.TextWrapped(localization.Format(DiscoveriesLoaded ? "DiscoveriesUi.ReadGaveUp":"DiscoveriesUi.ReadRetrying",readFailed,Discoveries.DiscoveryStart.Tries));
+            ImGui.PopStyleColor();
+        }
         if(DiscoveryStore is not { } store || DiscoveryFolder is not { } folder || !DiscoveriesLoaded){ImGui.TextDisabled(LoadingText("DiscoveriesUi.Loading"));return;}
         BoolSetting("DiscoveriesUi.Enabled","DiscoveriesUi.EnabledTip",()=>configuration.Discovery.Enabled,value=>configuration.Discovery.Enabled=value,c=>c.Discovery.Enabled);
         if(configuration.Discovery.Enabled)
@@ -386,6 +395,8 @@ internal sealed partial class MainWindow
         // X-93 (0.942): the page reads every shared kind still on disk, and says so while it does.
         store.WantAll();
         if(store.SharedKindsWaiting is > 0 and var waiting)ImGui.TextDisabled(localization.Format("DiscoveriesUi.SharedReading",waiting));
+        // X-588 (external audit A17 of 18/11): a shared kind whose read failed is said, never hidden.
+        if(store.SharedKindsFailed is > 0 and var unread)ImGui.TextColored(Warning,localization.Format("DiscoveriesUi.SharedFailed",unread));
         var summary=store.Summary();
         // X-93 (0.939): never silent: shared discoveries left out because the shared part is full, or nearly full.
         var sharedHeld=summary.Count==0 ? 0:summary.Max(row=>row.ImportedOnly);
@@ -409,9 +420,12 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("DiscoveriesUi.Export")))
                 Run(()=>
                 {
+                    // X-588 (external audit A18 of 18/11): the shared kinds still being read are read first; one that cannot be is named.
+                    var missing=store.ReadAllShared();
                     var path=Path.Combine(folder,"Export",DiscoveryFiles.ExportName(DateTimeOffset.UtcNow));
                     DiscoveryFiles.Write(path,store.Snapshot(DateTimeOffset.UtcNow,false));
-                    return localization.Format("DiscoveriesUi.ExportDone",path);
+                    return missing.Count==0 ? localization.Format("DiscoveriesUi.ExportDone",path)
+                        :localization.Format("DiscoveriesUi.ExportPartial",path,missing.Count);
                 });
             Tip("DiscoveriesUi.ExportTip");
             ImGui.SameLine();
