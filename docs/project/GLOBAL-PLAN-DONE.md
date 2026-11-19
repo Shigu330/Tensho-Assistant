@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (582 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (593 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -647,15 +647,26 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-573 | Review of block 0.1535 to 0.1539 (review 0.1539, 17/11), minor M1, M2, M3, M4… | Done in 0.1542 |
 | X-575 | Bug seen by the user in the Beastmaster labyrinth on 17/11 around 23:00 (two… | Done in 0.1545 |
 | X-576 | User reading of 18/11 around 00:05 (capture of the window before entering the… | Done in 0.1546 |
+| X-577 | Tool: a decision added through the master's queue (decisions.py add, replayed… | Done in 0.1551 |
 | X-578 | User's request of 18/11 around 00:15: « first find the rank of every beast… | Done in 0.1548 |
 | X-579 | User's request of 18/11 around 00:25 (capture of the call order of the board's… | Done in 0.1547 |
 | X-582 | Tool (defect seen on 18/11 around 00:30, relay 110): q.py plafond, hence… | Done in 0.1548 |
+| X-583 | Tool: on 18/11 around 01:00, relay 110 asked the master a question then waited… | Done in 0.1551 |
+| X-586 | External audit of 18/11 (GPT-6.2 Astra, commit c6389abe, 27 new findings, 6… | Done in 0.1550 |
+| X-587 | External audit of 18/11, family « player data after an error »: A16 (critical… | Done in 0.1551 |
+| X-588 | External audit of 18/11, family « discoveries: loading and export »: A01 (base… | Done in 0.1552 |
+| X-593 | External audit of 18/11, A04 (user's choice of 18/11: fix the text, not the… | Done in 0.1553 |
+| X-594 | Method audit of 18/11, backup of the agent's files: M27, M14, M28, M29, M30… | Done in 0.1550 |
+| X-595 | Method audit of 18/11, tools that hide an error: M11, M12, M24, M26, M18, M22… | Done in 0.1550 |
+| X-596 | Method audit of 18/11, cycle and truth: M01, M17, M23 (with X-585 M7), M20… | Done in 0.1550 |
+| X-597 | Method audit of 18/11: six rule changes confirmed by the user on 18/11 (R28.6)… | Done in 0.1550 |
+| X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (582 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (593 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1300,6 +1311,17 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-573 | Relecture du bloc 0.1535 à 0.1539 (relecture 0.1539, 17/11), mineurs M1, M2… | Fait en 0.1542 |
 | X-575 | Bug vu par l'utilisateur au Dédale bestial le 17/11 vers 23 h (deux captures du… | Fait en 0.1545 |
 | X-576 | Relevé de l'utilisateur du 18/11 vers 0 h 05 (capture de la fenêtre d'avant… | Fait en 0.1546 |
+| X-577 | Outil : une décision ajoutée par la file de la maître (decisions.py add… | Fait en 0.1551 |
 | X-578 | Demande de l'utilisateur du 18/11 vers 0 h 15 : « avant il faut trouver le rang… | Fait en 0.1548 |
 | X-579 | Demande de l'utilisateur du 18/11 vers 0 h 25 (capture de l'ordre d'appel du… | Fait en 0.1547 |
 | X-582 | Outil (défaut constaté le 18/11 vers 0 h 30, relais 110) : q.py plafond, et… | Fait en 0.1548 |
+| X-583 | Outil : le 18/11 vers 1 h, le relais 110 a posé une question à la maître puis… | Fait en 0.1551 |
+| X-586 | Audit externe du 18/11 (GPT-6.2 Astra, commit c6389abe, 27 constats nouveaux… | Fait en 0.1550 |
+| X-587 | Audit externe du 18/11, famille « données du joueur après une erreur » : A16… | Fait en 0.1551 |
+| X-588 | Audit externe du 18/11, famille « découvertes : chargement et export » : A01… | Fait en 0.1552 |
+| X-593 | Audit externe du 18/11, A04 (choix de l'utilisateur le 18/11 : corriger le… | Fait en 0.1553 |
+| X-594 | Audit de méthode du 18/11, sauvegarde des fichiers de l'agent : M27 (une source… | Fait en 0.1550 |
+| X-595 | Audit de méthode du 18/11, outils qui mentent sur une erreur : M11 (state.py… | Fait en 0.1550 |
+| X-596 | Audit de méthode du 18/11, cycle et vérité : M01 (lance.py compte 8 versions… | Fait en 0.1550 |
+| X-597 | Audit de méthode du 18/11 : six changements de règles confirmés par… | Fait en 0.1550 |
+| X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
