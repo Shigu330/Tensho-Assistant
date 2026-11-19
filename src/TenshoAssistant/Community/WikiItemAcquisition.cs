@@ -82,8 +82,18 @@ public sealed class WikiItemAcquisitionService:IDisposable
     private readonly Dictionary<uint,WikiItemAcquisitionState> states=[];
     private readonly Queue<uint> pending=new();
     private readonly CancellationTokenSource disposal=new();
-    private Task? worker;private bool disposed;private DateTimeOffset lastRequest;
+    // X-589 (external audit A10 of 18/11): « draining » is changed under the same lock as the queue. Before, the drainer left the lock with
+    // the queue empty just before its task was completed; an item asked in between saw a task still running, woke nobody, and stayed
+    // « loading » (asked again, the state kept was returned).
+    private bool disposed,draining;private DateTimeOffset lastRequest;
     public WikiItemAcquisitionService(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk){this.englishName=englishName;this.lifetime=lifetime;this.disk=disk;}
+    /// <summary>X-589 (A10): a simulated network for the managed tests (the service's own client otherwise).</summary>
+    internal WikiItemAcquisitionService(Func<uint,string?> englishName,Func<TimeSpan> lifetime,DataCache? disk,HttpMessageHandler handler):this(englishName,lifetime,disk)
+    {http.Dispose();http=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(20)};}
+    /// <summary>X-589 (A10): the pause between two requests (3 s; shorter in the managed tests).</summary>
+    internal TimeSpan Gap { get; set; }=TimeSpan.FromSeconds(3);
+    /// <summary>X-589 (A10): called by the drainer once it found the queue empty, just before its task ends (the managed tests ask there).</summary>
+    internal Action? Idle { get; set; }
     // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
     public Func<bool>? Enabled { get; set; }
     /// <summary>What is already known for the item, without requesting anything (null = nothing yet).</summary>
@@ -100,7 +110,7 @@ public sealed class WikiItemAcquisitionService:IDisposable
             if(states.TryGetValue(itemId,out var known))return known;
             if(states.Count>=512)states.Remove(states.Keys.First());
             var loading=new WikiItemAcquisitionState(null,true,null);states[itemId]=loading;
-            if(!disposed){pending.Enqueue(itemId);if(worker is null || worker.IsCompleted)worker=Task.Run(DrainAsync);}
+            if(!disposed){pending.Enqueue(itemId);if(!draining){draining=true;_=Task.Run(DrainAsync);}}
             return loading;
         }
     }
@@ -108,8 +118,9 @@ public sealed class WikiItemAcquisitionService:IDisposable
     {
         while(true)
         {
-            uint id;
-            lock(gate){if(disposed || pending.Count==0)return;id=pending.Dequeue();}
+            uint id=0;var idle=false;
+            lock(gate){if(disposed || pending.Count==0){draining=false;idle=true;}else id=pending.Dequeue();}
+            if(idle){Idle?.Invoke();return;}
             WikiItemAcquisitionState result;
             try{result=new(await LoadAsync(id).ConfigureAwait(false),false,null);}
             catch(OperationCanceledException) when(disposal.IsCancellationRequested){return;}
@@ -126,7 +137,7 @@ public sealed class WikiItemAcquisitionService:IDisposable
            && CacheAge.Fresh(saved.RecordedAt,DateTimeOffset.UtcNow,lifetime()) && saved.Value.Lines is not null)return saved.Value;
         var title=englishName(id);
         if(string.IsNullOrWhiteSpace(title) || title.Length>256)throw new InvalidDataException("English item name unavailable.");
-        var wait=lastRequest+TimeSpan.FromSeconds(3)-DateTimeOffset.UtcNow;
+        var wait=lastRequest+Gap-DateTimeOffset.UtcNow;
         if(wait>TimeSpan.Zero)await Task.Delay(wait,token).ConfigureAwait(false);
         if(Enabled?.Invoke()==false)throw new SourceDisabledException("FFXIV Console Games Wiki");
         lastRequest=DateTimeOffset.UtcNow;

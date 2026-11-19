@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1556.0
+- Plan global, X-589 : Sources réseau, suite et fin de l'audit externe du 18/11 : la file des fiches d'objet du wiki change son état « en cours » sous le même verrou que la file (A10 : une fiche demandée juste quand la file se vide n'est plus laissée en chargement) ; PaissaDB ne montre plus les parcelles d'un monde sous un autre pendant le chargement ou après un échec (A11) ; l'alerte immobilière relit la coupure JcJ au moment d'écrire dans le chat (A02, PaissaDb.Alert) ; le lot de CSV de LuminaSupplemental et le second essai du guide du wiki relisent l'interrupteur avant chaque requête (A07) ; la confidentialité de PaissaDB est vérifiée sur un transport HTTP simulé (A24 : une seule requête GET par monde, l'identifiant du monde seul, sans corps).
+- Pour les joueurs : parcelles à vendre : celles d'un autre monde ne s'affichent plus pendant le chargement du monde actuel ; aucune alerte en contenu classé.
+- Tests : NetworkEnds1556Tests. Verify.ps1 (agent) : 3141/3141, 0 avertissement, 0 erreur ; DLL 0.1556.0.0. Rien à essayer en jeu.
+### English
+- Network sources, rest and end of the external audit of 18/11: the wiki's item queue changes its « running » state under the same lock as the queue (A10: an item asked just as the queue empties is no longer left loading); PaissaDB no longer shows a world's plots under another while loading or after a failure (A11); the housing alert reads the PvP cut again when it writes in the chat (A02, PaissaDb.Alert); LuminaSupplemental's batch of CSV files and the wiki guide's second try read the switch again before each request (A07); PaissaDB's privacy is checked on a simulated HTTP transport (A24: one GET per world, the world's id only, no body).
+- For players: Housing plots: another world's plots are no longer shown while the current world loads; no plot alert in ranked content.
+
 ## 0.1555.0
 - Plan global, X-617 : Dédale bestial : ce qui est lu pendant que BeastTeams.json est tenu par un autre programme (rangs, résultat d'un plateau, pages du bestiaire, plans calculés) n'est plus perdu à la relecture du fichier : BeastTeams.Join le joint au fichier (rang jamais revu à la baisse, rang exact avant un plancher, résultat le plus récent, page du bestiaire du rang le plus haut, plans calculés entre-temps), puis l'écrit (BeastPlansFile.Load). Avant, le fichier relu remplaçait la mémoire sans un mot. Relecture du bloc 0.1551 à 0.1554, constat I1.
 - Pour les joueurs : dédale bestial : les rangs et le résultat d'un plateau lus pendant que le fichier des plans était tenu par un autre programme ne sont plus perdus.

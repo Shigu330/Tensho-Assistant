@@ -1138,7 +1138,8 @@ public sealed partial class Plugin : IDalamudPlugin
             var paissa=new Community.PaissaDbService();
             registrations.Register(()=>{},paissa.Dispose);
             mainWindow.Paissa=paissa;
-            mainWindow.PlotAlert=text=>framework.RunOnFrameworkThread(()=>chat.Print("[Tensho] "+text));
+            // X-589 (external audit A02 of 18/11): the competitive cut read again when the line is printed (PaissaDb.Alert).
+            mainWindow.PlotAlert=Community.PaissaDb.Alert(()=>Competitive.CompetitiveGate.Cut,action=>framework.RunOnFrameworkThread(action),text=>chat.Print("[Tensho] "+text));
             mainWindow.ChatNotice=text=>chat.Print("[Tensho] "+text);
             // X-13 (0.447): the conductor's call, sent to the chosen channel on click only, on the framework thread.
             mainWindow.SendHuntCall=command=>framework.RunOnFrameworkThread(()=>Maps.HuntAnnouncer.Send(command,log));

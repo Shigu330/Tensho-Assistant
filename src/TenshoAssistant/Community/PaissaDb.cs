@@ -47,6 +47,13 @@ public static class PaissaDb
 
     public static string Key(OpenPlot plot)=>$"{plot.District}/{plot.Ward}/{plot.Plot}";
 
+    /// <summary>
+    /// X-589 (external audit A02 of 18/11): the watch's chat line, printed on the game's thread only if Tensho is not cut then (PvP, ranked
+    /// content: CompetitiveGate, DEC-038). Before, the cut was read when the read began; a plot found just before entering ranked content
+    /// was announced inside it.
+    /// </summary>
+    public static Action<string> Alert(Func<bool> cut,Action<Action> onGameThread,Action<string> print)=>text=>onGameThread(()=>{if(!cut())print(text);});
+
     /// <summary>The plots not in the previous read (none on the first read: nothing is « new » before a first list).</summary>
     public static IReadOnlyList<OpenPlot> New(IReadOnlyList<OpenPlot>? previous,IReadOnlyList<OpenPlot> current)
     {
@@ -72,7 +79,10 @@ public sealed class PaissaDbService(HttpClient? client=null) : IDisposable
     {
         if(worldId==0 || Interlocked.Exchange(ref busy,1)==1)return;
         var previous=State;
-        Volatile.Write(ref state,previous with {WorldId=worldId,Loading=true,Error=null});
+        // X-589 (external audit A11 of 18/11): another world's plots and their time are not carried under this world, loading or failed
+        // (before, world A's list showed under world B and passed the page's world check).
+        var kept=previous.WorldId==worldId ? previous:new PaissaState(worldId,null,null,false,null);
+        Volatile.Write(ref state,kept with {Loading=true,Error=null});
         var token=cancellation.Token;
         _=Task.Run(async()=>
         {
@@ -83,7 +93,7 @@ public sealed class PaissaDbService(HttpClient? client=null) : IDisposable
                 Volatile.Write(ref state,new(worldId,plots,DateTimeOffset.UtcNow,false,null));
                 read?.Invoke(previous.WorldId==worldId ? previous.Plots:null,plots);
             }
-            catch(Exception error) when(!token.IsCancellationRequested){Volatile.Write(ref state,previous with {WorldId=worldId,Loading=false,Error=error.Message});}
+            catch(Exception error) when(!token.IsCancellationRequested){Volatile.Write(ref state,kept with {Loading=false,Error=error.Message});}
             finally{Interlocked.Exchange(ref busy,0);}
         },token);
     }

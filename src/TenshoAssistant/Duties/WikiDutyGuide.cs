@@ -131,6 +131,8 @@ public sealed class WikiDutyGuides(Func<uint,string?> englishName,Func<TimeSpan>
             if(WikiDutyGuideParser.Missing(json) && WikiDutyGuideParser.WithoutArticle(title) is { } shorter)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1),linked.Token).ConfigureAwait(false);
+                // X-589 (external audit A07 of 18/11): the wiki's switch read again before the second request.
+                if(Enabled?.Invoke()==false)throw new SourceDisabledException("FFXIV Console Games Wiki");
                 title=shorter;
                 json=await BoundedHttp.ReadAsync(http,new Uri("https://ffxiv.consolegameswiki.com/mediawiki/api.php?action=parse&format=json&redirects=1&prop=text%7Crevid&page="+Uri.EscapeDataString(title.Replace(' ','_'))),GarlandClient.MaximumBytes,linked.Token).ConfigureAwait(false);
             }

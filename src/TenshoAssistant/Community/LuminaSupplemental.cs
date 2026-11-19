@@ -216,6 +216,8 @@ public sealed class LuminaSupplementalService : IDisposable
                 {
                     var cached = cache is null ? null : await cache.ReadAsync<LuminaCsvCache>(Family, file, Version, token).ConfigureAwait(false);
                     if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) { files[file] = cached.Value.Text; continue; }
+                    // X-589 (external audit A07 of 18/11): the switch read again before each file (before, only before the batch).
+                    if (Enabled?.Invoke() == false) throw new SourceDisabledException("LuminaSupplemental");
                     try
                     {
                         var text = await BoundedHttp.ReadAsync(client, new Uri(Base + file + ".csv"), 4 * 1024 * 1024, token).ConfigureAwait(false);
@@ -230,6 +232,8 @@ public sealed class LuminaSupplementalService : IDisposable
             // X-589 (external audit A08 of 18/11): only the plugin's own cancellation is silent (as GatherBuddy since 0.330); a request past its
             // 30 s without a copy (TaskCanceledException) was caught here too and left « loading » for the session, never tried again.
             catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+            // X-589 (A07): turned off during the batch: nothing more asked, and asked again once the source is back on (no pause).
+            catch (SourceDisabledException) { Volatile.Write(ref state, new(null, false, null)); Interlocked.Exchange(ref started, 0); }
             catch (Exception error)
             {
                 Volatile.Write(ref state, new(null, false, error.Message));
