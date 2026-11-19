@@ -165,9 +165,15 @@ internal sealed partial class MainWindow
             beastPlansLoaded = true;
             try
             {
-                if (BeastTeamsFile?.Invoke() is { } file && beastFile.ReadIfDue(file, DateTimeOffset.UtcNow,
-                        (aside, error) => log.Warning(error, "Beast team plans unreadable; the file is set aside as {0}.", Path.GetFileName(aside))) is { } plans)
+                // X-617 (review of block 0.1551 to 0.1554, I1): what was read while the file was held is joined to it once read, then written
+                // (before, the file replaced it: a board's result read meanwhile was lost without a word).
+                if (BeastTeamsFile?.Invoke() is { } file)
+                {
+                    var (plans, save) = beastFile.Load(file, beastPlans, DateTimeOffset.UtcNow,
+                        (aside, error) => log.Warning(error, "Beast team plans unreadable; the file is set aside as {0}.", Path.GetFileName(aside)));
                     beastPlans = plans;
+                    if (save) SaveBeastPlans();
+                }
                 if (beastFile.Blocked && !beastBlockedSaid)
                 {
                     beastBlockedSaid = true;

@@ -47,6 +47,21 @@ public sealed class BeastPlansFile
         return null;
     }
 
+    /// <summary>
+    /// X-617 (review of block 0.1551 to 0.1554, I1): the plans to keep, <paramref name="kept"/> being those in memory. Read while the file was
+    /// held, they are joined to the file once it is read (BeastTeams.Join), never replaced by it; Save: something read meanwhile is to be
+    /// written now that the file may be (joined, or the file gone or set aside meanwhile). Still held: the memory, nothing to write.
+    /// </summary>
+    public (BeastTeams.SavedPlans Plans, bool Save) Load(string file,BeastTeams.SavedPlans? kept,DateTimeOffset now,Action<string,Exception>? broken=null)
+    {
+        var held=Blocked && kept is not null;
+        var plans=ReadIfDue(file,now,broken);
+        if(plans is null)return (kept ?? new([],[]),held && MayWrite);
+        if(!held)return (plans,false);
+        var joined=BeastTeams.Join(plans,kept!);
+        return (joined,BeastTeams.Write(joined)!=BeastTeams.Write(plans));
+    }
+
     /// <summary>Another file to read (the desktop application's copy changed).</summary>
     public void Reset(){read=false;Blocked=false;SetAside=null;}
 }

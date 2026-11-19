@@ -445,6 +445,37 @@ public static class BeastTeams
             .Select(pair => $"{pair.Key}:{pair.Value}{(floors?.Contains(pair.Key) == true ? "+" : "")}"));
     public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
     /// <summary>
+    /// X-617 (review of block 0.1551 to 0.1554, I1): the plans read from the file joined with those kept in memory while the file could not be
+    /// read (held by another program, BeastPlansFile.Blocked). Before, the file replaced the memory and all read meanwhile was lost without a
+    /// word (a board's result is never read again). A rank never goes down (X-561): the higher one is kept, exact over a floor when they are
+    /// equal (X-549); the most recent result; a bestiary page of a higher rank (X-578); the plans made meanwhile over the file's (their key
+    /// says what they were made from: a plan made from other ranks is made again).
+    /// </summary>
+    public static SavedPlans Join(SavedPlans file, SavedPlans meanwhile)
+    {
+        var ranks = file.Ranks is null && meanwhile.Ranks is null ? null : new Dictionary<uint, int>(file.Ranks ?? []);
+        var floors = file.Floors is null && meanwhile.Floors is null ? null : new HashSet<uint>(file.Floors ?? []);
+        foreach (var (beast, rank) in meanwhile.Ranks ?? [])
+        {
+            var floor = meanwhile.Floors?.Contains(beast) == true;
+            if (!ranks!.TryGetValue(beast, out var before) || rank > before)
+            {
+                ranks[beast] = rank;
+                if (floor) floors!.Add(beast); else floors?.Remove(beast);
+            }
+            else if (rank == before && !floor) floors?.Remove(beast);
+        }
+        var result = meanwhile.Result is { } late && (file.Result is not { } early || late.At > early.At) ? late : file.Result;
+        var book = file.Book is null && meanwhile.Book is null ? null : new Dictionary<uint, BookRead>(file.Book ?? []);
+        foreach (var (beast, page) in meanwhile.Book ?? [])
+            if (!book!.TryGetValue(beast, out var before) || before.Rank <= page.Rank) book[beast] = page;
+        var plans = new Dictionary<uint, BoardPlan>(file.Plans);
+        var keys = new Dictionary<uint, string>(file.Keys);
+        foreach (var (board, plan) in meanwhile.Plans)
+            if (meanwhile.Keys.TryGetValue(board, out var key)) { plans[board] = plan; keys[board] = key; }
+        return file with { Plans = plans, Keys = keys, Ranks = ranks, Floors = floors, Result = result, Book = book };
+    }
+    /// <summary>
     /// X-284 M1 (review of block 0.1278, R07): the plans saved off the game's thread. The text is made here, from the plans as they are now
     /// (the caller's thread keeps changing them); the file is written by <paramref name="writer"/>, one write after the other, so a file held
     /// an instant by another program (AtomicFile tries again for up to about 750 ms) never makes the game wait while it draws.
