@@ -180,7 +180,7 @@ public sealed class LuminaSupplementalService : IDisposable
 {
     private const string Family = "lumina-supplemental", Version = "main-v1"; // one entry per file
     private const string Base = "https://raw.githubusercontent.com/Critical-Impact/LuminaSupplemental/main/src/LuminaSupplemental.Excel/Generated/";
-    private readonly HttpClient client = new() { Timeout = TimeSpan.FromSeconds(30) };
+    private readonly HttpClient client;
     private readonly CancellationTokenSource cancellation = new();
     private readonly Func<TimeSpan> lifetime;
     private readonly DataCache? cache;
@@ -192,7 +192,11 @@ public sealed class LuminaSupplementalService : IDisposable
     private readonly Func<uint, string?>? monsterName, fateName, npcName, questName;
     public LuminaSupplementalService(Func<TimeSpan> lifetime, DataCache? cache, Func<uint, string?>? monsterName = null, Func<uint, string?>? fateName = null,
         Func<uint, string?>? npcName = null, Func<uint, string?>? questName = null)
-    { this.lifetime = lifetime; this.cache = cache; this.monsterName = monsterName; this.fateName = fateName; this.npcName = npcName; this.questName = questName; }
+    { this.lifetime = lifetime; this.cache = cache; this.monsterName = monsterName; this.fateName = fateName; this.npcName = npcName; this.questName = questName; client = new() { Timeout = TimeSpan.FromSeconds(30) }; }
+
+    /// <summary>X-589 (external audit A08 of 18/11): a simulated network for the managed tests (the service's own client otherwise).</summary>
+    internal LuminaSupplementalService(Func<TimeSpan> lifetime, DataCache? cache, HttpMessageHandler handler) : this(lifetime, cache)
+    { client.Dispose(); client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) }; }
 
     // Settings › Advanced (0.206): when off, nothing is downloaded and the source is simply absent.
     public Func<bool>? Enabled { get; set; }
@@ -223,7 +227,9 @@ public sealed class LuminaSupplementalService : IDisposable
                 }
                 Volatile.Write(ref state, new(new LuminaSupplementalData(files, monsterName, fateName, npcName, questName), false, null));
             }
-            catch (OperationCanceledException) { }
+            // X-589 (external audit A08 of 18/11): only the plugin's own cancellation is silent (as GatherBuddy since 0.330); a request past its
+            // 30 s without a copy (TaskCanceledException) was caught here too and left « loading » for the session, never tried again.
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { }
             catch (Exception error)
             {
                 Volatile.Write(ref state, new(null, false, error.Message));

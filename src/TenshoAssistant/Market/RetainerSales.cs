@@ -61,6 +61,9 @@ public static class RetainerSales
             : new(RetainerVerdictKind.Lowest, lowest.UnitPrice, gap, lowest.Retainer, null);
     }
 
+    /// <summary>X-589 (A12): the last millisecond DateTimeOffset holds.</summary>
+    public static readonly long MaxUnixMilliseconds = DateTimeOffset.MaxValue.ToUnixTimeMilliseconds();
+
     /// <summary>Universalis' two answers: several items under « items », or one item at the root.</summary>
     public static IReadOnlyDictionary<uint, RetainerItemOffers> ParseMany(string json, string world, IReadOnlyList<uint> asked, DateTimeOffset now)
     {
@@ -69,7 +72,10 @@ public static class RetainerSales
         var root = document.RootElement;
         void Add(uint item, JsonElement view)
         {
-            var uploaded = view.TryGetProperty("lastUploadTime", out var time) && time.TryGetInt64(out var at) && at > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(at) : (DateTimeOffset?)null;
+            // X-589 (external audit A12 of 18/11): a time that is not a number (TryGetInt64 threw) or past the calendar (FromUnixTimeMilliseconds
+            // threw) is unknown, never an error that left the comparison « loading ».
+            var uploaded = view.TryGetProperty("lastUploadTime", out var time) && time.ValueKind == JsonValueKind.Number && time.TryGetInt64(out var at)
+                && at > 0 && at <= MaxUnixMilliseconds ? DateTimeOffset.FromUnixTimeMilliseconds(at) : (DateTimeOffset?)null;
             result[item] = new(MarketBoard.Parse(view.GetRawText(), world, item, now).Offers, uploaded);
         }
         if (root.TryGetProperty("items", out var items) && items.ValueKind == JsonValueKind.Object)
@@ -135,6 +141,8 @@ public sealed class RetainerCompareService : IDisposable
         catch (OperationCanceledException) { result = new(false, null, "Network", null, world); }
         catch (HttpRequestException) { result = new(false, null, "Network", null, world); }
         catch (Exception error) when (error is JsonException or InvalidDataException or KeyNotFoundException or FormatException or DecoderFallbackException) { result = new(false, null, "Data", null, world); }
+        // X-589 (external audit A12 of 18/11): any other error of the answer ends the request too (« loading » was kept for the session).
+        catch (Exception) { result = new(false, null, "Data", null, world); }
         lock (gate) if (!disposed) state = result;
     }
 

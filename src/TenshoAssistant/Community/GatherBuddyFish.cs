@@ -153,7 +153,7 @@ public sealed record GatherBuddyFishCache(string Text);
 /// </summary>
 public sealed class GatherBuddyFishService : IDisposable
 {
-    private const string Family = "gatherbuddy-fish", Version = "main-v2";
+    internal const string Family = "gatherbuddy-fish", Version = "main-v2";
     private const string Listing = "https://api.github.com/repos/Ottermandias/GatherBuddy/contents/GatherBuddy.GameData/Data/Fish";
     private const string Raw = "https://raw.githubusercontent.com/Ottermandias/GatherBuddy/main/GatherBuddy.GameData/Data/Fish/";
     private readonly HttpClient client;
@@ -187,6 +187,7 @@ public sealed class GatherBuddyFishService : IDisposable
             {
                 var cached = cache is null ? null : await cache.ReadAsync<GatherBuddyFishCache>(Family, "all", Version, token).ConfigureAwait(false);
                 string text;
+                GatherBuddyFishData? data = null;
                 if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) text = cached.Value.Text;
                 else try
                 {
@@ -201,11 +202,15 @@ public sealed class GatherBuddyFishService : IDisposable
                         parts.Add(await BoundedHttp.ReadAsync(client, new Uri(Raw + Uri.EscapeDataString(name)), 512 * 1024, token).ConfigureAwait(false));
                     }
                     text = string.Join("\n", parts);
+                    // X-589 (external audit A26 of 18/11): checked before it is kept: an index without data files, or files without a fish, is a
+                    // failure (the expired copy, else an error tried again), never an empty copy kept fresh for the whole lifetime.
+                    data = GatherBuddyFishData.Parse([text]);
+                    if (data.Count == 0) throw new InvalidDataException("GatherBuddy's files hold no fish.");
                     if (cache is not null) await cache.WriteAsync(Family, "all", Version, new GatherBuddyFishCache(text), DateTimeOffset.UtcNow).ConfigureAwait(false);
                 }
                 // Network down or GitHub refusing: the expired copy is better than nothing (kept until a download succeeds).
-                catch (Exception) when (cached?.Value.Text is { Length: > 0 } && !token.IsCancellationRequested) { text = cached.Value.Text; }
-                Volatile.Write(ref state, new(GatherBuddyFishData.Parse([text]), false, null));
+                catch (Exception) when (cached?.Value.Text is { Length: > 0 } && !token.IsCancellationRequested) { text = cached.Value.Text; data = null; }
+                Volatile.Write(ref state, new(data ?? GatherBuddyFishData.Parse([text]), false, null));
             }
             // 0.330: only the plugin's own cancellation is silent; an HttpClient timeout (also an OperationCanceledException) is a failure: it
             // ends the loading state and is retried after the pause, instead of leaving « downloading… » until the plugin reloads.

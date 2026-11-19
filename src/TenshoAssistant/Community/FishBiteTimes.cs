@@ -55,6 +55,12 @@ public sealed class FishBiteTimeService : IDisposable
     // was still « running » used to start no worker and stay loading).
     private bool draining;
     public Func<bool>? Enabled { get; set; }
+    /// <summary>
+    /// X-589 (external audit A09 of 18/11): when each spot's request failed (Environment.TickCount64). Before, an error stayed for the session
+    /// and the expired copy was not used: a spot asked again after <see cref="RetryMs"/> (5 minutes, as R-10), the expired copy first.
+    /// </summary>
+    private readonly Dictionary<uint, long> failedAt = [];
+    internal long RetryMs { get; set; } = 300_000;
 
     public FishBiteTimeService(Func<TimeSpan> lifetime, DataCache? cache, HttpClient? client = null)
     {
@@ -68,7 +74,11 @@ public sealed class FishBiteTimeService : IDisposable
         if (spotId == 0 || Enabled?.Invoke() == false) return new(null, false, null);
         lock (gate)
         {
-            if (states.TryGetValue(spotId, out var known)) return known;
+            if (states.TryGetValue(spotId, out var known))
+            {
+                if (known.Error is null || !failedAt.TryGetValue(spotId, out var at) || Environment.TickCount64 - at < RetryMs) return known;
+                states.Remove(spotId); failedAt.Remove(spotId);   // X-589 (A09): asked again
+            }
             var loading = new FishBiteSpotState(null, true, null); states[spotId] = loading;
             pending.Enqueue(spotId);
             if (!draining || worker is { IsFaulted: true }) { draining = true; worker = Task.Run(DrainAsync); }
@@ -83,10 +93,11 @@ public sealed class FishBiteTimeService : IDisposable
             uint spot;
             lock (gate) { if (pending.Count == 0 || cancellation.IsCancellationRequested) { draining = false; return; } spot = pending.Dequeue(); }
             FishBiteSpotState result;
+            CachedValue<FishBiteCache>? cached = null;
             try
             {
                 var token = cancellation.Token;
-                var cached = cache is null ? null : await cache.ReadAsync<FishBiteCache>(Family, spot.ToString(), Version, token).ConfigureAwait(false);
+                cached = cache is null ? null : await cache.ReadAsync<FishBiteCache>(Family, spot.ToString(), Version, token).ConfigureAwait(false);
                 List<int[]> rows;
                 if (cached is not null && DateTimeOffset.UtcNow - cached.RecordedAt <= lifetime()) rows = cached.Value.Rows;
                 // 0.326: Teamcraft turned off while this spot waited: forget it, so it is asked again once the switch is back on.
@@ -106,7 +117,12 @@ public sealed class FishBiteTimeService : IDisposable
                 result = new(FishBiteTimeSummary.Summarize(rows.Where(row => row.Length == 3 && row[0] > 0).Select(row => ((uint)row[0], row[1], row[2]))), false, null);
             }
             catch (OperationCanceledException) when (cancellation.IsCancellationRequested) { lock (gate) draining = false; return; }
-            catch (Exception error) { result = new(null, false, error.Message); }
+            // X-589 (A09): the expired copy is better than nothing (kept until a request succeeds); without one, an error tried again later.
+            catch (Exception) when (cached?.Value.Rows is { Count: > 0 } old)
+            {
+                result = new(FishBiteTimeSummary.Summarize(old.Where(row => row.Length == 3 && row[0] > 0).Select(row => ((uint)row[0], row[1], row[2]))), false, null);
+            }
+            catch (Exception error) { result = new(null, false, error.Message); lock (gate) failedAt[spot] = Environment.TickCount64; }
             lock (gate) states[spot] = result;
         }
     }
