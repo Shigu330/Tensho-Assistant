@@ -96,6 +96,16 @@ public sealed class ChatSettings
     /// <summary>X-447 B7 (0.1643, the user's choice of 15/11, after WIM): a tab not shown holding a message with an alert word not seen yet blinks
     /// (besides its « ! »). On by default: it only blinks once alert words are chosen.</summary>
     public bool BlinkAlerts{get;set;}=true;
+    /// <summary>X-447 B7 (0.1646, the user's choice of 15/11, after Prat): your character's first name said by a player (a spoken channel)
+    /// alerts as an alert word does. On by default.</summary>
+    public bool AlertOwnName{get;set;}=true;
+    /// <summary>X-447 B7 (0.1646, after Prat and WIM): the game's sound (the macros' &lt;se.1&gt; to &lt;se.16&gt;) a message with an alert plays;
+    /// 0: none (the default).</summary>
+    public int AlertSound{get;set;}
+    /// <summary>X-447 B7 (0.1646, after Prat): the sound each spoken channel's messages play (1 to 16); a channel not listed plays none.</summary>
+    public Dictionary<ChatChannel,int>? Sounds{get;set;}
+    /// <summary>X-447 B7 (0.1646): the sound of <paramref name="channel"/>'s messages, 0 for none (or a number out of 1 to 16).</summary>
+    public int SoundOf(ChatChannel channel)=>Sounds is { } sounds && sounds.TryGetValue(channel,out var sound) && Alarms.MacroSound.Valid(sound) ? sound:0;
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
     /// default, as the game's chat.</summary>
     public bool TabsAtBottom{get;set;}=true;

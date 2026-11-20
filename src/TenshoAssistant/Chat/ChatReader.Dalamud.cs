@@ -18,6 +18,13 @@ internal sealed class ChatReader : IDisposable
     private readonly Func<bool>? developer;
     // X-554 (review of 0.1520): your character's name, to mark what you say yourself (the game gives no subject for it).
     private readonly Func<string?>? ownName;
+    // X-447 B7 (0.1646): a sound only while logged in.
+    private readonly IClientState client;
+    /// <summary>X-447 B7 (0.1646): plays the game's sound N (the macros' &lt;se.N&gt;), set by the plugin; null: none (as outside the game).</summary>
+    internal Action<int>? PlaySound{get;set;}
+    private readonly ChatSoundGate soundGate=new();
+    private string? soundWordsKey,soundHiddenKey;
+    private IReadOnlyList<string> soundWords=[],soundHidden=[];
     // X-475: the chat history on disk (null: none, as outside the game).
     private readonly ChatHistoryKeeper? history;
     private bool disposed,warned;
@@ -36,7 +43,7 @@ internal sealed class ChatReader : IDisposable
 
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null,Func<string?>? ownName=null)
     {
-        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;this.ownName=ownName;
+        this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;this.ownName=ownName;this.client=client;
         // One owner for the subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
@@ -101,6 +108,17 @@ internal sealed class ChatReader : IDisposable
             var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,source,(byte)message.TargetKind);
             // X-475: kept on disk too when the player turned the history on.
             history?.Keep(record);
+            // X-447 B7 (0.1646): your name for the tabs' alerts.
+            var name=ownName?.Invoke();
+            if(!string.Equals(store.OwnName,name,StringComparison.Ordinal))store.OwnName=name;
+            // X-447 B7 (0.1646, after Prat and WIM): the alert's sound or the channel's, at most one every 2 s, only while logged in.
+            if(PlaySound is { } play && client.IsLoggedIn)
+            {
+                if(!string.Equals(current.AlertWords,soundWordsKey,StringComparison.Ordinal)){soundWordsKey=current.AlertWords;soundWords=ChatTextFilter.Words(current.AlertWords);}
+                if(!string.Equals(current.HiddenPlayers,soundHiddenKey,StringComparison.Ordinal)){soundHiddenKey=current.HiddenPlayers;soundHidden=ChatTextFilter.Words(current.HiddenPlayers);}
+                var alert=ChatAlert.Holds(record,soundWords,current.AlertOwnName ? name:null);
+                if(ChatSound.For(record,current,alert,soundHidden) is var sound and >0 && soundGate.Take(Environment.TickCount64))play(sound);
+            }
             // X-654 (0.1602): who sent it (name and world of the sender's player link), waiting for the game's identifiers.
             if(sources is not null && message.Sender.Payloads.OfType<PlayerPayload>().FirstOrDefault() is { } player)
                 sources.Expect(record.Id,player.PlayerName,(ushort)player.World.RowId,(ushort)message.LogKind);

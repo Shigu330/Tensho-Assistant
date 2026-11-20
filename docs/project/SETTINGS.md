@@ -46,8 +46,10 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `AutoBankCapture` | bool | true | Settings › Data › Storage · Settings › Data › Storage | **Save retainers, saddlebags and the company chest automatically when they are opened** — Off: an import button appears beside the game's storage windows. Default: on. |
 | `BagsServerBar` | bool | false | Settings › General › Header | **Bags in the server bar** — Shows the free slots of your four bags in the server bar; its tooltip gives the total, a click opens Storage. Refreshed every 2 seconds. Default: off. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Show as a list** — One item per line with NQ, HQ, total and its storages, instead of the bag grids. Click a column to sort. The tab and filters above still apply. Default: off. |
+| `Chat.AlertOwnName` | bool | true | Settings › Panels › ChatPlayers | **Your name as an alert** — A player's message holding your character's first name (a whole word, capitals ignored) stands out and marks its tab with « ! », as the alert words do; a loot or system line naming you does not, nor what you send. Default: on. |
+| `Chat.AlertSound` | int | 0 | Settings › Panels › ChatPlayers | **Alert sound** — The game's sound (the macros' <se.1> to <se.16>) played when a message with an alert word or your name arrives; 0: none. At most one sound every 2 seconds, never for what you send nor a combat line. Default: 0 (none). |
 | `Chat.AlertWords` | string? | null | Settings › Panels › ChatPlayers | **Alert words** — A message holding one of these words (one per line, capitals ignored) sits on a band in the accent colour, and its tab shows « ! » in front of its name until you see it. Your own messages and the combat lines never alert. Only in Tensho's window, no sound. Default: none. |
-| `Chat.BlinkAlerts` | bool | true | Settings › Panels › ChatPlayers | **Blinking tab on an alert** — A tab not shown that holds a message with one of the alert words, not seen yet, blinks until it is shown (besides its « ! »). Nothing blinks while no alert word is chosen. Default: on. |
+| `Chat.BlinkAlerts` | bool | true | Settings › Panels › ChatPlayers | **Blinking tab on an alert** — A tab not shown that holds a message with one of the alert words, not seen yet, blinks until it is shown (besides its « ! »). Nothing blinks while no alert word is chosen and your name is not an alert. Default: on. |
 | `Chat.Border` | int | 1 | Settings › Panels › ChatWindow | **Frame thickness** — Thickness of the window's frame when it has one, from 0 to 4 pixels. Default: 1 px. |
 | `Chat.Borderless` | bool | false | Settings › Panels › ChatWindow | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.BothChats` | bool | false | Settings › Panels › ChatWindow | **Show both chats** — Shows the game's messages again and puts this window back where it was, to compare both chats; the button with two windows at the end of the tabs switches too. Default: off. |
@@ -378,7 +380,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 322 controls (305 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 324 controls (307 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -430,8 +432,10 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `AutoBankCapture` | bool | true | Paramètres › Données et sources › Relevé du rangement · Paramètres › Données et sources › Relevé du rangement | **Enregistrer automatiquement les servants, sacoches et le coffre de compagnie à leur ouverture** — Désactivé : un bouton d'import apparaît à côté des fenêtres de rangement du jeu. Par défaut : activé. |
 | `BagsServerBar` | bool | false | Paramètres › Général › En-tête et accueil | **Sacs dans la barre du serveur** — Montre les cases libres de vos quatre sacs dans la barre du serveur ; son infobulle donne le total, un clic ouvre Rangements. Mis à jour toutes les 2 secondes. Par défaut : désactivé. |
 | `BankListView` | bool | false | `MainWindow.Bank.cs` | **Afficher en liste** — Un objet par ligne avec NQ, HQ, total et ses rangements, à la place des grilles de sacs. Cliquez sur une colonne pour trier. L'onglet et les filtres ci-dessus restent appliqués. Par défaut : désactivé. |
+| `Chat.AlertOwnName` | bool | true | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Votre prénom en alerte** — Le message d'un joueur qui contient le prénom de votre personnage (un mot entier, majuscules ignorées) ressort et ajoute « ! » à son onglet, comme les mots d'alerte ; une ligne de butin ou du système qui vous nomme ne compte pas, ni ce que vous envoyez. Par défaut : activé. |
+| `Chat.AlertSound` | int | 0 | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Son des alertes** — Le son du jeu (<se.1> à <se.16> des macros) joué quand arrive un message avec un mot d'alerte ou votre prénom ; 0 : aucun. Un son toutes les 2 secondes au plus, jamais pour ce que vous envoyez ni pour une ligne de combat. Par défaut : 0 (aucun). |
 | `Chat.AlertWords` | string? | null | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Mots d'alerte** — Un message qui contient l'un de ces mots (un par ligne, majuscules ignorées) est posé sur une bande dans la couleur d'accent, et son onglet porte « ! » devant son nom jusqu'à ce que vous le voyiez. Vos propres messages et les lignes de combat n'alertent jamais. Seulement dans la fenêtre Tensho, sans son. Par défaut : aucun. |
-| `Chat.BlinkAlerts` | bool | true | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Onglet qui clignote sur une alerte** — Un onglet non affiché qui contient un message avec l'un des mots d'alerte, pas encore vu, clignote jusqu'à ce qu'il soit affiché (en plus de son « ! »). Rien ne clignote tant qu'aucun mot d'alerte n'est choisi. Par défaut : activé. |
+| `Chat.BlinkAlerts` | bool | true | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Onglet qui clignote sur une alerte** — Un onglet non affiché qui contient un message avec l'un des mots d'alerte, pas encore vu, clignote jusqu'à ce qu'il soit affiché (en plus de son « ! »). Rien ne clignote tant qu'aucun mot d'alerte n'est choisi et que votre prénom n'est pas en alerte. Par défaut : activé. |
 | `Chat.Border` | int | 1 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Épaisseur du cadre** — Épaisseur du cadre de la fenêtre quand elle en a un, de 0 à 4 pixels. Par défaut : 1 px. |
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.BothChats` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les deux chats** — Affiche de nouveau les messages du jeu et remet cette fenêtre à sa place, pour comparer les deux chats ; le bouton aux deux fenêtres au bout des onglets bascule aussi. Par défaut : désactivé. |
@@ -762,5 +766,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 322 cases (305 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 324 cases (307 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

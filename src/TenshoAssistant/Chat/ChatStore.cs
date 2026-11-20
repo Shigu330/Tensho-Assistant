@@ -33,6 +33,10 @@ public sealed class ChatStore
     private long clears;
     private int combat;
     public long Clears{get{lock(gate)return clears;}}
+    private string? ownName;
+    /// <summary>X-447 B7 (0.1646): your character's name, as the reader last saw it (the tabs alert on your first name with the setting on); null
+    /// before any message. Your own name: not another player's data.</summary>
+    public string? OwnName{get{lock(gate)return ownName;}set{lock(gate)ownName=value;}}
     public long LastId{get{lock(gate)return nextId-1;}}
     public int Count{get{lock(gate)return records.Count;}}
 

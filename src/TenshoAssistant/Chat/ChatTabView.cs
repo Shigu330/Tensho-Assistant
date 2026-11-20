@@ -20,6 +20,8 @@ public sealed class ChatTabView
     // not looked yet), not at each frame by the drawing.
     private readonly List<bool?> alertMarks=[];
     private string? alertKey;
+    // X-447 B7 (0.1646): your name when the setting is on (read at each refresh from the store), and the one the marks were made with.
+    private string? alertName,alertKeyName;
     private IReadOnlyList<string> alertWords=[];
     private DateTimeOffset lastSeen;
     private int rows;
@@ -47,6 +49,7 @@ public sealed class ChatTabView
         var changed=false;
         ChatTabFilter? filter=null;
         IReadOnlyList<string>? alerts=null;
+        alertName=settings?.AlertOwnName==true ? store.OwnName:null;
         foreach(var record in store.After(lastId))
         {
             lastId=record.Id;
@@ -72,7 +75,7 @@ public sealed class ChatTabView
         void Count(ChatRecord record)
         {
             if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
-            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
+            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName))Alerts++;
         }
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
@@ -108,12 +111,12 @@ public sealed class ChatTabView
     /// one word per line): looked once per message, again for all only when the words change.</summary>
     public bool AlertAt(int index,string? words)
     {
-        if(!string.Equals(words,alertKey,StringComparison.Ordinal))
+        if(!string.Equals(words,alertKey,StringComparison.Ordinal) || !string.Equals(alertName,alertKeyName,StringComparison.Ordinal))
         {
-            alertKey=words;alertWords=ChatTextFilter.Words(words);
+            alertKey=words;alertWords=ChatTextFilter.Words(words);alertKeyName=alertName;
             for(var at=0;at<alertMarks.Count;at++)alertMarks[at]=null;
         }
-        return alertMarks[index]??=ChatAlert.Holds(records[index],alertWords);
+        return alertMarks[index]??=ChatAlert.Holds(records[index],alertWords,alertKeyName);
     }
     public IReadOnlyList<IReadOnlyList<ChatRun>>? LinesAt(int index)=>lines[index];
 

@@ -661,6 +661,15 @@ internal sealed partial class MainWindow
         ListSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600);
         // X-447 B7 (0.1643): the tab holding an alert not seen blinks.
         BoolSetting("ChatWindow.BlinkAlerts","ChatWindow.BlinkAlertsTip",()=>configuration.Chat.BlinkAlerts,value=>configuration.Chat.BlinkAlerts=value,c=>c.Chat.BlinkAlerts);
+        // X-447 B7 (0.1646, after Prat): your character's first name said by a player alerts as the words do.
+        BoolSetting("ChatWindow.AlertOwnName","ChatWindow.AlertOwnNameTip",()=>configuration.Chat.AlertOwnName,value=>configuration.Chat.AlertOwnName=value,c=>c.Chat.AlertOwnName);
+        // X-447 B7 (0.1646, after Prat and WIM): the game's sound a message with an alert plays (0: none), to listen to.
+        IntSetting("ChatWindow.AlertSound","ChatWindow.AlertSoundTip",()=>configuration.Chat.AlertSound,value=>configuration.Chat.AlertSound=value,0,Alarms.MacroSound.Last,0);
+        ImGui.SameLine();
+        ImGui.BeginDisabled(!Alarms.MacroSound.Valid(configuration.Chat.AlertSound));
+        try{if(ImGui.SmallButton(localization.Get("Alarms.Try")+"##ChatAlertSoundTry"))alarmService?.PreviewChatSound(configuration.Chat.AlertSound);}
+        finally{ImGui.EndDisabled();}
+        Tip("Advanced.TryTip");
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)
@@ -804,11 +813,40 @@ internal sealed partial class MainWindow
                         chatSettingsPending=true;
                     }
                     Tip("ChatWindow.ChannelNameTip");
+                    // X-447 B7 (0.1646, after Prat): the channel's sound (none by default); what you send plays none.
+                    if(channel!=ChatChannel.TellOut)DrawChatChannelSound(options,channel);
                 }
             }
             finally{ImGui.PopID();}
         }
     }
+
+    /// <summary>X-447 B7 (0.1646, after Prat): the sound a spoken channel's messages play: none, or one of the game's sixteen (the macros'
+    /// &lt;se.N&gt;); a sound picked is played once, to hear it.</summary>
+    private void DrawChatChannelSound(ChatSettings options,ChatChannel channel)
+    {
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(90*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+        var sound=options.SoundOf(channel);
+        if(ImGui.BeginCombo("###ChatChannelSound",ChatSoundName(sound)))
+        {
+            try
+            {
+                for(var choice=0;choice<=Alarms.MacroSound.Last;choice++)
+                {
+                    if(!ImGui.Selectable(ChatSoundName(choice),choice==sound))continue;
+                    options.Sounds??=[];
+                    if(choice==0)options.Sounds.Remove(channel);
+                    else{options.Sounds[channel]=choice;alarmService?.PreviewChatSound(choice);}
+                    chatSettingsPending=true;
+                }
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("ChatWindow.ChannelSoundTip");
+    }
+
+    private string ChatSoundName(int sound)=>sound==0 ? localization.Get("ChatWindow.NoSound"):localization.Format("ChatWindow.SoundNumber",sound);
 
     // Developer mode: the chat kinds seen (counts only, no text), to find the kinds still grouped under « Other ».
     private void DrawChatKinds()

@@ -143,6 +143,43 @@ public static class ChatAlert
         return words.Any(word=>SearchText.Contains(text,word,StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>X-447 B7 (0.1646, after Prat): <see cref="Holds(ChatRecord,IReadOnlyList{string})"/>, or your character's first name said by a
+    /// player (<see cref="NameIn"/>; <paramref name="ownName"/> null: not looked for).</summary>
+    public static bool Holds(ChatRecord record,IReadOnlyList<string> words,string? ownName)=>Holds(record,words) || NameIn(record,ownName);
+
+    /// <summary>X-447 B7 (0.1646): your first name (<see cref="FirstName"/>) as a whole word, capitals ignored, in a message of a spoken channel
+    /// (a player's words: never a loot or system line naming you), never one you sent.</summary>
+    public static bool NameIn(ChatRecord record,string? ownName)
+    {
+        if(FirstName(ownName) is not { } first || !ChatChannels.Spoken(record.Channel) || Sent(record))return false;
+        return WholeWord(string.Concat(record.Body.Select(segment=>segment.Text)),first);
+    }
+
+    /// <summary>X-447 B7 (0.1646): the first name of a character's name (« Ann » of « Ann Doe »); null for none or a single letter.</summary>
+    public static string? FirstName(string? name)
+    {
+        var trimmed=name?.Trim();
+        if(string.IsNullOrEmpty(trimmed))return null;
+        var space=trimmed.IndexOf(' ');
+        var first=space>0 ? trimmed[..space]:trimmed;
+        return first.Length>=2 ? first:null;
+    }
+
+    /// <summary>X-447 B7 (0.1646): <paramref name="word"/> in <paramref name="text"/>, capitals ignored, not inside a longer word (« Ann » in
+    /// « Ann? » and « hi ann », not in « Annie » nor « Joann »).</summary>
+    public static bool WholeWord(string text,string word)
+    {
+        // Apostrophes folded on both sides, as every search (SearchText): « Y’shtola » said finds « Y'shtola ».
+        var folded=SearchText.Fold(text);var wanted=SearchText.Fold(word);
+        if(wanted.Length==0)return false;
+        for(var at=folded.IndexOf(wanted,0,StringComparison.OrdinalIgnoreCase);at>=0;at=folded.IndexOf(wanted,at+1,StringComparison.OrdinalIgnoreCase))
+        {
+            var end=at+wanted.Length;
+            if((at==0 || !char.IsLetterOrDigit(folded[at-1])) && (end>=folded.Length || !char.IsLetterOrDigit(folded[end])))return true;
+        }
+        return false;
+    }
+
     /// <summary>Dalamud's XivChatRelationKind.LocalPlayer: the message's subject is you.</summary>
     public const byte You=1;
 
