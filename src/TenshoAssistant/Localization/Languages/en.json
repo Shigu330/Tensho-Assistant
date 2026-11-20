@@ -7243,7 +7243,8 @@
     "Level": "Level",
     "Thresholds": "Low / mid / high",
     "Reward": "Scrips",
-    "ItemReward": "items"
+    "ItemReward": "items",
+    "DeliveryReward": "custom delivery"
   },
   "Tracker": {
     "Title": "Tensho tracker",

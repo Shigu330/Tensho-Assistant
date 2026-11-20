@@ -65,9 +65,34 @@ internal sealed class CollectableReader : IDisposable
                         reward?.LowReward ?? 0,reward?.MidReward ?? 0,reward?.HighReward ?? 0,scripRows.Contains(row.RowId),
                         row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText() ?? "",reward?.Currency ?? -1));
                 }
+            rules.AddRange(DeliveryRules());
             Volatile.Write(ref catalog,new CollectableCatalog(rules));
         }
         catch(Exception error){CatalogFailed=true;log.Warning(error,"Collectable thresholds unavailable.");}
+    }
+
+    /// <summary>
+    /// X-657 (0.1601, the user's report of 20/11: « Charbon » collectable, no threshold known). The custom deliveries' collectables (Coal
+    /// 38821, the Voeburt dish ingredient 38822, the writing and school supply components 36669, 36670…) are in SatisfactionSupply only, never
+    /// in CollectablesShopItem (probe of every sheet, game 2026.11.03: docs/evidence/0.1601-delivery-collectables.md): their thresholds were
+    /// never read. Their rows now join the catalogue, named by their client (SatisfactionNpc's ranks give the SatisfactionSupply rows).
+    /// </summary>
+    private IEnumerable<CollectableRule> DeliveryRules()
+    {
+        var clients=new Dictionary<uint,string>();
+        foreach(var npc in data.GetExcelSheet<SatisfactionNpc>())
+        {
+            if(npc.RowId==0 || npc.Npc.RowId==0)continue;
+            var name=npc.Npc.ValueNullable?.Singular.ExtractText() ?? "";
+            foreach(var rank in npc.SatisfactionNpcParams)if(rank.SupplyIndex>0)clients.TryAdd((uint)rank.SupplyIndex,name);
+        }
+        foreach(var lines in data.GetSubrowExcelSheet<SatisfactionSupply>())
+            foreach(var line in lines)
+            {
+                if(line.Item.RowId==0 || line.CollectabilityLow==0)continue;
+                yield return new(line.Item.RowId,line.Item.ValueNullable?.Name.ExtractText() ?? "",0,0,line.CollectabilityLow,line.CollectabilityMid,line.CollectabilityHigh,0,0,0,false,
+                    clients.GetValueOrDefault(line.RowId,""),-1,Delivery:true);
+            }
     }
 
     private unsafe void Update(IFramework unused)

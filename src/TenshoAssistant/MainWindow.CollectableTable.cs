@@ -67,11 +67,12 @@ internal sealed partial class MainWindow
                     ImGui.TableNextRow();ImGui.TableNextColumn();
                     if(ImGui.Selectable($"{rule.Name}##Collectable{index}")){SelectItem(rule.ItemId);OpenItemSheet();}
                     ImGui.TableNextColumn();ImGui.TextUnformatted(rule.Group);
-                    ImGui.TableNextColumn();ImGui.TextUnformatted(rule.LevelMin==rule.LevelMax ? $"{rule.LevelMin}":$"{rule.LevelMin}–{rule.LevelMax}");
+                    ImGui.TableNextColumn();ImGui.TextUnformatted(rule.LevelMin==0 && rule.LevelMax==0 ? "—":rule.LevelMin==rule.LevelMax ? $"{rule.LevelMin}":$"{rule.LevelMin}–{rule.LevelMax}");
                     ImGui.TableNextColumn();ImGui.TextUnformatted($"{rule.Low} / {rule.Mid} / {rule.High}");
                     ImGui.TableNextColumn();
                     if(rule.Scrips && rule.RewardHigh>0)ImGui.TextUnformatted($"{rule.RewardLow} / {rule.RewardMid} / {rule.RewardHigh}");
-                    else ImGui.TextDisabled(localization.Get("CollectableTable.ItemReward"));
+                    // X-657 (0.1601): a custom delivery's collectable: its rewards are on the client's page, not scrips here.
+                    else ImGui.TextDisabled(localization.Get(rule.Delivery ? "CollectableTable.DeliveryReward":"CollectableTable.ItemReward"));
                 }
             }
             finally{clipper.End();clipper.Destroy();}

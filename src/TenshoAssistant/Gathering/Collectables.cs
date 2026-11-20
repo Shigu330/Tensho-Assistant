@@ -7,9 +7,10 @@ namespace TenshoAssistant.Gathering;
 /// R-06 (0.409): collectable thresholds and rewards of an item, from the game's CollectablesShopItem rows (CollectablesShopRefine:
 /// low / mid / high collectability; CollectablesShopRewardScrip: reward of each tier). Scrips: the row belongs to a shop whose
 /// RewardType is 1 (scrip exchanges; RewardType 2 shops give items). The scrip's kind (Currency column) is not mapped: unknown, not shown.
-/// Evidence: docs/evidence/0.409-collectables.md.
+/// Evidence: docs/evidence/0.409-collectables.md. X-657 (0.1601): Delivery = a custom delivery's collectable (SatisfactionSupply: its
+/// thresholds, Group the client's name, no scrips here, level 0: not given by that sheet), docs/evidence/0.1601-delivery-collectables.md.
 /// </summary>
-public sealed record CollectableRule(uint ItemId,string Name,int LevelMin,int LevelMax,int Low,int Mid,int High,int RewardLow,int RewardMid,int RewardHigh,bool Scrips,string Group="",int ScripKind=-1);
+public sealed record CollectableRule(uint ItemId,string Name,int LevelMin,int LevelMax,int Low,int Mid,int High,int RewardLow,int RewardMid,int RewardHigh,bool Scrips,string Group="",int ScripKind=-1,bool Delivery=false);
 
 public enum CollectableTier { Below, Low, Mid, High }
 
