@@ -2205,11 +2205,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1550) Dédale bestial, option activée, en combat : quand une bête est appelée, les deux techniques du dresseur de son combo (celle d'avant sa technique et celle d'après) sont surlignées sur la barre d'actions ; elles changent quand une autre bête est appelée
 
-- [ ] (0.1558) Dédale bestial, page Dresseur › Équipe, sur un plateau où l'équipe a moins de places que de faiblesses : la faiblesse de l'ennemi le plus fort de chaque combat (le gardien d'abord) est dans les 10 ; si une faiblesse est laissée, c'est celle de monstres plus faibles.
+- [x] (0.1558) Dédale bestial, page Dresseur › Équipe, sur un plateau où l'équipe a moins de places que de faiblesses : la faiblesse de l'ennemi le plus fort de chaque combat (le gardien d'abord) est dans les 10 ; si une faiblesse est laissée, c'est celle de monstres plus faibles.
 
 - [ ] (0.1558) Dédale bestial, option « surligner les combos » cochée, une bête appelée : sur vos barres d'actions, la technique à faire avant la technique de la bête porte « 1 », celle d'après porte « 2 ».
 
-- [ ] (0.1558) Page Dresseur, plateau 3 ou plus, une bête de rang bas : le texte dit « recommandé : … à …, à confirmer en jeu » ; aux plateaux 1 et 2, sans « à confirmer ».
+- [x] (0.1558) Page Dresseur, plateau 3 ou plus, une bête de rang bas : le texte dit « recommandé : … à …, à confirmer en jeu » ; aux plateaux 1 et 2, sans « à confirmer ».
 
 - [x] (0.1559) Dédale bestial, page Dresseur › Plateaux, 1er plateau : sous un ennemi, une action dit « inflige : … » (par exemple Poison ou Brûlure du vent) quand elle pose un effet ; une action sans effet n'a rien de plus.
 
@@ -2266,6 +2266,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1590) Île › Atelier, première ouverture après le chargement du plugin : aucun à-coup du jeu ; « Lecture des données des fabriques… » peut s'afficher un instant, puis la page de l'atelier.
 
 - [ ] (0.1598) Rechargez Tensho en cours de jeu (mode développeur, ou une version publiée) avec un panneau libre ouvert : le panneau revient en 6 s au plus, sans à-coup visible ; dans dalamud.log, la ligne « Panels opened … ms after the load » dit « their code compiled » (mesuré au rechargement automatique de 0.1598 : ouvert à 5,5 s, première image 103 ms, contre 248 à 1244 ms à l'ancienne borne de 3 s)
+
+- [ ] (0.1599) Dresseur, option « Surligner les combos de la bête » cochée (page Dresseur) : au Dédale bestial, appelez une bête et entrez en combat : « 1 » et « 2 » apparaissent sur les deux techniques du dresseur (ex. Opo-opo ou cu sith : 1 sur Hache rafale, 2 sur Hache mistral) ; dans dalamud.log, les lignes « Beastmaster beast called: beast n (Familiar) … » et « Beast combo highlight: … 1 on _ActionBar… slot …, 2 on … » ; si rien n'apparaît, la ligne « Beast combo highlight: nothing drawn: … » dit pourquoi
+
+- [ ] (0.1599) Hors du Dédale (zone ouverte, en JcE), bête appelée, même option : « 1 » et « 2 » sur les mêmes techniques ; en changeant de bête par une autre Corne d'appel, les chiffres suivent la nouvelle bête
+
+- [ ] (0.1601) Mineur ou botaniste, un objet de collection de livraison spéciale (ex. Charbon, Carrière de pierre niv. 85) : le panneau Collectionnable de Tensho montre les seuils 240 / 450 / 600 et un plan, au lieu de « Aucun seuil de remise connu » ; le tableau des objets de collection (page Récolte) liste Charbon avec « livraison spéciale »
+
+- [ ] (0.1602) Fenêtre de chat de Tensho, clic droit sur le message d'un joueur (dire, équipe ou murmure) : après Cacher et Mettre en avant viennent Murmurer, Répondre avec le même mode de discussion, Inviter dans l'équipe, Voir la carte de personnage, Ajouter à la liste muette, Cibler ; Murmurer met la saisie du jeu en murmure à ce joueur sans rien envoyer ; Voir la carte de personnage ouvre sa carte
+
+- [ ] (0.1602) Même menu sur un joueur à portée : « Menu du jeu… » ouvre le menu du jeu de ce personnage (requête d'ami, liste noire…) ; Cibler le cible ; sur un joueur loin, ces deux entrées sont absentes ou grisées
+
+- [ ] (0.1602) Sur un message repris de l'historique (après un redémarrage, historique activé) : les entrées qui demandent l'identifiant du joueur (Murmurer, carte, liste muette) sont grisées, sans erreur
 
 **0.535 : interfaces** — à voir en jouant
 

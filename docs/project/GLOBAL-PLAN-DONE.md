@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (656 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (660 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -724,12 +724,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-651 | Review of block 0.1594 to 0.1594 (review 0.1594, 20/11), minor M1: M1 in… | Done in 0.1595.0 |
 | X-652 | User decision D-188 b (20/11 about 10 am): an unreadable row of the discoveries… | Done in 0.1596.0 |
 | X-653 | User decision D-194 b (20/11 about 10 am, follow-up of X-352): after Tensho is… | Done in 0.1598.0 |
+| X-654 | User request of 20/11 about 10:20 am (test T-0.1566-2, capture of the game's… | Done in 0.1602.0 |
+| X-655 | Bug seen by the user on 20/11 about 10:45 am (test T-0.1558-2, capture of the… | Done in 0.1599.0 |
+| X-656 | Review of block 0.1596 to 0.1598 (review 0.1598, 20/11), minor M1, M2: M1 in… | Done in 0.1600.0 |
+| X-657 | Bug seen by the user on 20/11 about 11:20 am (captures kept out of the repo)… | Done in 0.1601.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (656 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (660 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1451,3 +1455,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-651 | Relecture du bloc 0.1594 à 0.1594 (relecture 0.1594, 20/11), mineurs M1 : M1… | Fait en 0.1595.0 |
 | X-652 | Décision D-188 b de l'utilisateur (20/11 vers 10 h) : une ligne illisible de la… | Fait en 0.1596.0 |
 | X-653 | Décision D-194 b de l'utilisateur (20/11 vers 10 h, suite de X-352) : après un… | Fait en 0.1598.0 |
+| X-654 | Demande de l'utilisateur du 20/11 vers 10 h 20 (essai T-0.1566-2, capture du… | Fait en 0.1602.0 |
+| X-655 | Bug vu par l'utilisateur le 20/11 vers 10 h 45 (essai T-0.1558-2, capture de la… | Fait en 0.1599.0 |
+| X-656 | Relecture du bloc 0.1596 à 0.1598 (relecture 0.1598, 20/11), mineurs M1, M2… | Fait en 0.1600.0 |
+| X-657 | Bug vu par l'utilisateur le 20/11 vers 11 h 20 (captures gardées hors du dépôt)… | Fait en 0.1601.0 |
