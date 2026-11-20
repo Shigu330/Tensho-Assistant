@@ -2289,6 +2289,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1605) Récolte › tableau des objets de collection, recherche « Charbon » : une seule ligne (livraison spéciale, Anden, 240/450/600)
 
+- [ ] (0.1606) Stockage › Gils : vendre un objet par un servant, recharger le plugin (ou relancer le jeu) sans toucher aux gils du personnage, ouvrir le servant puis retirer : la vente sous « Marché », le retrait en transfert des deux côtés
+
+- [ ] (0.1606) Fenêtre de chat de Tensho : clic droit sur le nom d'un joueur qui vient de parler : les entrées du jeu (murmurer, inviter, carte de personnage) sont actives ; au journal, « Chat window, a sender's identifiers: Given » une fois
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

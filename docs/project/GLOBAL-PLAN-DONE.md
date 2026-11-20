@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (664 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (666 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -631,6 +631,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-536 | Tool (R13.3), test page of 17/11 around midnight: 29 tests commented « I don't… | Done in 0.1511 |
 | X-537 | Tool (R13.3), idea box defect (idees.py, called by page_essais.py import on… | Done in 0.1511 |
 | X-538 | Tool (R13.3), relay statistics skewed, seen on 17/11 around 0:40 comparing… | Done in 0.1511 |
+| X-539 | Bug seen by the user (17/11 around 0:55, screenshot of the title screen): «… | Done in 0.1511.0 |
 | X-540 | Review of block 0.1508 to 0.1510 (review 0.1510, 17/11), minor M1, M2, M3: M1… | Done in 0.1512 |
 | X-541 | Bug (seen while rereading test T-0.437-1, relay 101, 17/11): Map › Markers ›… | Done in 0.1583 |
 | X-542 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), I1: finding in agent… | Done in 0.1514 |
@@ -732,12 +733,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-659 | User request of 20/11 about noon (« why no report? »): X-654 (0.1602) made the… | Done in 0.1602.0 |
 | X-660 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), I1: finding in… | Done in 0.1603.0 |
 | X-661 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), minor M1, M2: M1 in… | Done in 0.1605.0 |
+| X-662 | Review of block 0.1603 to 0.1605 (review 0.1605, 20/11), minor M1, M2, M3: M1… | Done in 0.1606.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (664 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (666 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1366,6 +1368,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-536 | Outil (R13.3), page des essais du 17/11 vers 0 h : 29 essais commentés « je… | Fait en 0.1511 |
 | X-537 | Outil (R13.3), défaut de la boîte à idées (idees.py, appelé par page_essais.py… | Fait en 0.1511 |
 | X-538 | Outil (R13.3), statistiques des relais faussées, vu le 17/11 vers 0 h 40 en… | Fait en 0.1511 |
+| X-539 | Bug vu par l'utilisateur (17/11 vers 0 h 55, capture de l'écran titre) : « il… | Fait en 0.1511.0 |
 | X-540 | Relecture du bloc 0.1508 à 0.1510 (relecture 0.1510, 17/11), mineurs M1, M2, M3… | Fait en 0.1512 |
 | X-541 | Bug (vu en relisant l'essai T-0.437-1, relais 101, 17/11) : Carte › Repères ›… | Fait en 0.1583 |
 | X-542 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), I1 : X-536… | Fait en 0.1514 |
@@ -1467,3 +1470,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-659 | Demande de l'utilisateur du 20/11 vers 12 h (« pourquoi pas de signaler ? »)… | Fait en 0.1602.0 |
 | X-660 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), I1 : Les… | Fait en 0.1603.0 |
 | X-661 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), mineurs M1, M2… | Fait en 0.1605.0 |
+| X-662 | Relecture du bloc 0.1603 à 0.1605 (relecture 0.1605, 20/11), mineurs M1, M2, M3… | Fait en 0.1606.0 |
