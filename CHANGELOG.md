@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1652.0
+- Plan global, X-676 : Fenêtre de chat (X-676, relecture de 0.1644 à 0.1650, M1) : avec « Masquer les onglets » actif, un clic sur l'entrée « ! Chat N » de la barre du serveur ne montrait rien : le clic était consommé, mais aucun onglet n'était dessiné pour prendre la sélection. L'onglet qui contient la première alerte pas vue est maintenant montré tout de suite quand les onglets sont masqués (ChatAlert.ShownAfterClick) ; onglets dessinés, il est toujours choisi par son onglet, comme avant. La recherche du premier onglet passe par ChatAlert.FirstWithAlert.
+- Pour les joueurs : fenêtre de chat : onglets masqués, un clic sur « ! Chat » dans la barre du serveur montre l'onglet qui contient l'alerte.
+- Tests : ChatAlertClick1652Tests. Verify.ps1 (agent) : 3448/3448, 0 avertissement, 0 erreur ; DLL 0.1652.0.0. Non validé en jeu.
+### English
+- Chat window (X-676, review of 0.1644 to 0.1650, M1): with « Hide tabs » on, a click on the server bar's « ! Chat N » entry showed nothing: the click was used up, but no tab was drawn to take the selection. The tab holding the first alert not seen is now shown at once when the tabs are hidden (ChatAlert.ShownAfterClick); with the tabs drawn, its tab still takes it, as before. The first tab is found by ChatAlert.FirstWithAlert.
+- For players: Chat window: with the tabs hidden, a click on « ! Chat » in the server bar shows the tab holding the alert.
+
 ## 0.1651.0
 - Plan global, X-675 : Fenêtre de chat (X-675, signalé par l'utilisateur le 20/11 avec deux captures) : la fenêtre « Choisir du texte » du clic droit rapetissait à chaque image jusqu'à ce que sa zone de texte disparaisse. Cause : une fenêtre surgissante d'ImGui prend toujours la taille de son contenu, et la zone de texte prenait la place restante (-1,-1) : chacune réduisait l'autre. La zone a maintenant une taille fixe tirée de la fenêtre du chat (ChatCopy.SelectBox : aussi large que la fenêtre, 320 au moins ; aussi haute, de 200 à 600, moins la ligne d'aide, le bouton et les marges ; jamais sous 240 × 120) ; la fenêtre surgissante se règle autour d'elle.
 - Pour les joueurs : fenêtre de chat : la fenêtre « Choisir du texte » garde sa taille au lieu de rapetisser jusqu'à disparaître.

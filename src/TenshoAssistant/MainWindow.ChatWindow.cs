@@ -1024,7 +1024,13 @@ internal sealed partial class MainWindow
         {
             // X-447 B7 (0.1647): the server bar's entry clicked: the first tab holding an alert not seen is selected.
             var alertTab=-1;
-            if(Volatile.Read(ref chatShowAlert)){Volatile.Write(ref chatShowAlert,false);alertTab=tabs.FindIndex(tab=>ChatMessages.ViewOf(tab).Alerts>0);}
+            // X-676 (0.1652): with the tabs' names hidden no tab item takes SetSelected: the tab holding the alert is shown directly.
+            if(Volatile.Read(ref chatShowAlert))
+            {
+                Volatile.Write(ref chatShowAlert,false);
+                alertTab=ChatAlert.FirstWithAlert(tabs.Select(ChatMessages.ViewOf));
+                chatTabShown=ChatAlert.ShownAfterClick(chatTabShown,alertTab,options.HideTabs);
+            }
             // X-447 D4 (0.1618): the tabs' names hidden, the tab shown kept; the buttons at the end stay (one shows the tabs again).
             for(var index=0;index<tabs.Count && !options.HideTabs;index++)
             {

@@ -210,6 +210,24 @@ public static class ChatAlert
         return scratch.Count;
     }
 
+    /// <summary>X-676 (0.1652): the first tab whose view holds an alert not seen, the one the server bar's entry shows when clicked; -1: none.</summary>
+    public static int FirstWithAlert(IEnumerable<ChatTabView> views)
+    {
+        var index=0;
+        foreach(var view in views)
+        {
+            if(view.Alerts>0)return index;
+            index++;
+        }
+        return -1;
+    }
+
+    /// <summary>X-676 (0.1652, review of 0.1650 M1): the tab shown after the server bar's entry was clicked. With the tabs drawn, the tab holding
+    /// the alert is selected by its tab item (SetSelected) and becomes the tab shown when drawn: <paramref name="shown"/> stays. With the tabs'
+    /// names hidden (HideTabs) no tab item is drawn to take it: the tab is shown here (before 0.1652 the click was used up and nothing moved,
+    /// while the setting's tooltip promised the first tab holding one). <paramref name="alertTab"/> -1 (none): <paramref name="shown"/> stays.</summary>
+    public static int ShownAfterClick(int shown,int alertTab,bool tabsHidden)=>alertTab>=0 && tabsHidden ? alertTab:shown;
+
     /// <summary>The tab's label with « ! » in front while an alert in it is not seen.</summary>
     public static string Mark(string label,int alerts)=>alerts>0 ? "! "+label:label;
 }
