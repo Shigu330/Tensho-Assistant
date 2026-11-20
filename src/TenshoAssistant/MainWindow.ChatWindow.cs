@@ -662,22 +662,28 @@ internal sealed partial class MainWindow
     {
         var player=ChatTextFilter.PlayerName(said.Sender);
         if(player.Length==0)return;
+        // X-669 M2 (review of 0.1627, R25): in capture mode the entries name the player by their stand-in, as the line does (a menu open in a
+        // picture showed the real name); what they do is unchanged (the real name copied, hidden or put forward).
+        var shown=ChatMenuName(player,options);
         ImGui.Separator();
         // X-455 E3 (0.1617): the player's name with their world, copied (nothing kept, R04).
-        if(ImGui.Selectable(localization.Format("ChatWindow.MenuCopyPlayer",player)))
+        if(ImGui.Selectable(localization.Format("ChatWindow.MenuCopyPlayer",shown)))
             ImGui.SetClipboardText(ChatCopy.Player(player,ChatSenders?.For(said.Id) is { World:>0 } source && ChatPlayers is { } players ? players.World(source.World):ChatCopy.WorldOf(said.Sender)));
-        if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",player)) && ChatTextFilter.Add(options.HiddenPlayers,player,600) is { } hidden)
+        if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",shown)) && ChatTextFilter.Add(options.HiddenPlayers,player,600) is { } hidden)
             SetHiddenPlayers(options,hidden);
         if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
         {
-            if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",player))){options.HighlightedPlayers=ChatTextFilter.RemovePlayer(options.HighlightedPlayers,said.Sender);chatSettingsPending=true;}
+            if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",shown))){options.HighlightedPlayers=ChatTextFilter.RemovePlayer(options.HighlightedPlayers,said.Sender);chatSettingsPending=true;}
         }
-        else if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",player)) && ChatTextFilter.Add(options.HighlightedPlayers,player,600) is { } shown)
+        else if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",shown)) && ChatTextFilter.Add(options.HighlightedPlayers,player,600) is { } forward)
         {
-            options.HighlightedPlayers=shown;chatSettingsPending=true;
+            options.HighlightedPlayers=forward;chatSettingsPending=true;
         }
         DrawChatPlayerGameEntries(said);
     }
+
+    /// <summary>X-669 M2 (review of 0.1627): the player's name as a message's menu writes it: their stand-in in capture mode.</summary>
+    private static string ChatMenuName(string player,ChatSettings options)=>ChatCopy.MenuName(player,options.CaptureNames);
 
     /// <summary>X-654 (0.1602): the senders of the messages and the game's entries of a player's menu (null: none, as in the desktop application).</summary>
     internal Chat.ChatSources? ChatSenders{get;set;}
@@ -1358,7 +1364,7 @@ internal sealed partial class MainWindow
         if(run.Role==ChatRole.Timestamp)return Muted;
         if(run.Role!=ChatRole.Sender)return color;
         if(!options.NameColors || !ChatChannels.Spoken(record.Channel))return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:color;
-        var (r,g,b)=ChatLook.NameColour(record.Sender);
+        var (r,g,b)=ChatLook.SenderColour(record.Sender,options.CaptureNames);
         return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:new Vector4(r,g,b,color.W);
     }
 

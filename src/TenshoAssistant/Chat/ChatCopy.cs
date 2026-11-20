@@ -14,7 +14,6 @@ public static class ChatCopy
     public static string Player(string name,string? world)
         =>string.IsNullOrWhiteSpace(world) ? name.Trim():name.Trim()+"@"+world.Trim();
 
-    /// <summary>E3: the world written after « @ » in a sender's name, or nothing.</summary>
     /// <summary>X-473 (0.1627): a sender's name without its world (« Name@World » as the game writes it elsewhere).</summary>
     public static string NameOf(string? sender)
     {
@@ -31,6 +30,11 @@ public static class ChatCopy
         return job is { Length:>0 } && level>0 ? first+"\n"+withJob(job,level):first;
     }
 
+    /// <summary>X-669 M2 (review of 0.1627, R25): a player's name as the menus of the chat window write it: their stand-in in capture mode
+    /// (<see cref="ChatFormat.StandIn(string?)"/>, as the line), else the name.</summary>
+    public static string MenuName(string player,bool capture)=>capture ? ChatFormat.StandIn(player):player;
+
+    /// <summary>E3: the world written after « @ » in a sender's name, or nothing.</summary>
     public static string WorldOf(string? sender)
     {
         if(string.IsNullOrWhiteSpace(sender))return "";

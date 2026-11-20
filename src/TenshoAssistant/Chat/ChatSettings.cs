@@ -156,7 +156,9 @@ public sealed class ChatSettings
     /// The class colour of WoW is not taken: the game shows a player's class only in the party or nearby (R04).</summary>
     public bool NameColors{get;set;}
     /// <summary>X-447 B15 (0.1623, R25): capture mode: the players' names before their messages replaced by a stand-in taken from the name
-    /// (ChatFormat.StandIn: the same player, the same stand-in), for screenshots. The messages' own text is not changed.</summary>
+    /// (ChatFormat.StandIn: the same player, the same stand-in), for screenshots. The messages' own text is not changed. X-669 (review of
+    /// 0.1627): the stand-in is made with a secret drawn at each start (a guessed name cannot be checked against it); the names' colours and
+    /// the message menu follow it.</summary>
     public bool CaptureNames{get;set;}
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);

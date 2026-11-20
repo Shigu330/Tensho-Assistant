@@ -45,7 +45,7 @@ internal static class ChatCopy1617Tests
             var chat=Read("MainWindow.ChatWindow.cs");
             Check(chat.Contains("if(ImGui.IsKeyPressed(ImGuiKey.A,false))chatWholeTab=view.Serial;") && chat.Contains("ImGui.IsKeyPressed(ImGuiKey.C,false) && ChatCopy.Chosen(") && chat.Contains("ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows)"),"E2 keys, window in front only");
             Check(chat.Contains("if(!chatLinesBlocked && ImGui.IsItemHovered())chatHoveredRecord=record;"),"E2 the hovered message");
-            Check(chat.Contains("localization.Format(\"ChatWindow.MenuCopyPlayer\",player)") && chat.Contains("players.World(source.World)"),"E3");
+            Check(chat.Contains("localization.Format(\"ChatWindow.MenuCopyPlayer\",shown)") && chat.Contains("players.World(source.World)"),"E3");
             Check(chat.Contains("localization.Get(\"ChatWindow.CopyPlace\")") && chat.Contains("ItemLinksMenu(\"##ChatItem\"+id,item,copyName:true);") && chat.Contains("localization.Get(\"ChatWindow.CopyQuest\")"),"E4");
             Check(chat.Contains("ImGui.BeginPopupContextItem(\"###ChatTabMenu\"+index)") && chat.Contains("tab.ClearedAt=clear ? DateTimeOffset.Now:null;ChatTabChanged(tab);"),"E7 saved with the settings");
             foreach(var language in new[]{"en","fr"})

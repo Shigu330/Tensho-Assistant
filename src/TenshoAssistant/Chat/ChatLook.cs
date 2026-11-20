@@ -78,6 +78,10 @@ public static class ChatLook
 
     /// <summary>X-447 B5 (0.1621): a player's name's own colour, taken from the name alone (case and spaces aside): a hue from a stable hash
     /// (FNV-1a, the same on every PC and at every start), light enough to read on the window's dark background. Nothing is kept.</summary>
+    /// <summary>X-669 M1 (review of 0.1627, R25): the colour of a sender's name; in capture mode, taken from its stand-in (made with the secret of
+    /// this start), not from the name: a colour from the name alone let a guessed name be checked against a picture, one hue in 360.</summary>
+    public static (float R,float G,float B) SenderColour(string? sender,bool capture)=>NameColour(capture ? ChatFormat.StandIn(sender):sender);
+
     public static (float R,float G,float B) NameColour(string? name)
     {
         var key=(name ?? "").Trim().ToLowerInvariant();

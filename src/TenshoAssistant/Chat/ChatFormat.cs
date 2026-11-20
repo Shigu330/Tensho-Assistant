@@ -64,16 +64,34 @@ public static class ChatFormat
     /// <summary>X-447 B5 (0.1621): a sender as written before the text: in brackets when chosen.</summary>
     public static string Sender(string sender,ChatSettings settings)=>settings.SenderBrackets ? $"[{sender}]":sender;
 
-    /// <summary>X-447 B15 (0.1623): a player's stand-in in capture mode: « # » and five letters or digits taken from the name (FNV-1a, its world,
-    /// case and spaces aside), the same on every PC and at every start; nothing of the name can be read in it.</summary>
+    /// <summary>X-669 M1 (review of 0.1627, R25): the secret the stand-ins are made with: 32 random bytes drawn once per load of the plugin, kept in
+    /// memory only (never saved, logged nor shown).</summary>
+    private static readonly byte[] CaptureKey=System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+    // X-669 M1: the stand-ins made so far (the names' colours ask for them each frame); emptied past 2000 names.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string,string> standIns=new(StringComparer.Ordinal);
+
+    /// <summary>X-447 B15 (0.1623): a player's stand-in in capture mode: « # » and five letters or digits taken from the name (its world, case and
+    /// spaces aside), the same for the same player; nothing of the name can be read in it. X-669 M1 (review of 0.1627, R25): made with
+    /// <see cref="CaptureKey"/>. It was a hash without a key, the same on every PC: whoever saw a picture could check a guessed name by working
+    /// out its code, and match a player from one picture to the next, even between two players' pictures. Without the key neither can be done;
+    /// the codes change at each start of the plugin.</summary>
     public static string StandIn(string? name)
     {
-        var key=(name ?? "").Trim().ToLowerInvariant();
-        var at=key.IndexOf('@');
-        if(at>0)key=key[..at];
-        var hash=2166136261u;
-        foreach(var letter in key){hash^=letter;hash*=16777619u;}
-        return "#"+(hash&0xFFFFF).ToString("X5",System.Globalization.CultureInfo.InvariantCulture);
+        var text=name ?? "";
+        if(standIns.TryGetValue(text,out var known))return known;
+        if(standIns.Count>=2000)standIns.Clear();
+        return standIns[text]=StandIn(text,CaptureKey);
+    }
+
+    /// <summary>X-669 M1: the stand-in made with a given key: HMAC-SHA256 of the name (world, case and spaces aside), its first 20 bits as five
+    /// letters or digits. The tests give their own keys.</summary>
+    public static string StandIn(string? name,byte[] key)
+    {
+        var text=(name ?? "").Trim().ToLowerInvariant();
+        var at=text.IndexOf('@');
+        if(at>0)text=text[..at].Trim();
+        var hash=System.Security.Cryptography.HMACSHA256.HashData(key,Encoding.UTF8.GetBytes(text));
+        return "#"+((hash[0]<<12)|(hash[1]<<4)|(hash[2]>>4)).ToString("X5",System.Globalization.CultureInfo.InvariantCulture);
     }
 
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>

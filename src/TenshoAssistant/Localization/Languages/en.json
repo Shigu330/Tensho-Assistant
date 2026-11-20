@@ -6536,7 +6536,7 @@
     "SenderBrackets": "Players' names in brackets",
     "SenderBracketsTip": "Writes [Name]: before a player's message, as WoW's chat addons do.\nDefault: off.",
     "CaptureNames": "Capture mode: hide the players' names",
-    "CaptureNamesTip": "For screenshots: each player's name before their messages is replaced by a stand-in such as #A3F27, the same for the same player, from which the name cannot be read. The messages' own text is not changed: look at it before sharing a picture.\nDefault: off.",
+    "CaptureNamesTip": "For screenshots: each player's name before their messages, and in the menu of a message, is replaced by a stand-in such as #A3F27, the same for the same player until the game or Tensho starts again. It is made with a secret drawn at each start and never saved: the name cannot be read from it nor a guessed name checked against it, and pictures from two starts cannot be matched. The names' own colours follow it. The messages' own text is not changed: look at it before sharing a picture.\nDefault: off.",
     "NameColors": "A colour for each player's name",
     "NameColorsTip": "Each player's name in a colour of its own, taken from the name itself: the same name always has the same colour. Nothing is kept about the player. A player put forward keeps the warning colour.\nDefault: off.",
     "Empty": "No message in this tab yet.",

@@ -44,7 +44,7 @@ internal static class ChatNames1621Tests
         ("Chat names 1621: wiring: the run's colour, the short name's box, the settings",()=>
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(chat.Contains("ImGui.TextColored(ChatRunColour(run,record,color,options),run.Text);") && chat.Contains("var (r,g,b)=ChatLook.NameColour(record.Sender);"),"the colour");
+            Check(chat.Contains("ImGui.TextColored(ChatRunColour(run,record,color,options),run.Text);") && chat.Contains("var (r,g,b)=ChatLook.SenderColour(record.Sender,options.CaptureNames);"),"the colour");
             Check(chat.Contains("ImGui.InputTextWithHint(\"###ChatChannelName\",ChatChannelShort(channel),ref shortName,ChatSettings.MaximumChannelName)"),"the short name's box");
             Check(chat.Contains("BoolSetting(\"ChatWindow.SenderBrackets\",") && chat.Contains("BoolSetting(\"ChatWindow.NameColors\","),"settings");
         }),
