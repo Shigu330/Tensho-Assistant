@@ -286,6 +286,9 @@ public sealed class JitWarmup : IDisposable
         var order=new List<MethodBase>();
         var seen=new HashSet<MethodBase>();
         var queue=new Queue<MethodBase>();
+        // X-564 (0.1634): a chat method holding a « later » word is still called at each frame (DrawChatSettingsPopup opens nothing until
+        // asked): itself taken, what it calls not followed.
+        var later=new List<MethodBase>();
         foreach(var root in roots)
             if(seen.Add(root))queue.Enqueue(root);
         while(queue.Count>0 && order.Count<ChatFrameCap)
@@ -294,15 +297,34 @@ public sealed class JitWarmup : IDisposable
             var method=queue.Dequeue();
             order.Add(method);
             foreach(var callee in CallGraph.Callees(method))
-                if(chatPart(callee) && !ChatLater(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))queue.Enqueue(callee);
+                if(chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))
+                {
+                    if(ChatLater(callee))later.Add(callee);
+                    else queue.Enqueue(callee);
+                }
         }
         var inside=order.Count;
-        for(var index=0;index<inside && order.Count<ChatFrameCap;index++)
+        var outside=new List<MethodBase>();
+        for(var index=0;index<inside && order.Count+outside.Count<ChatFrameCap;index++)
         {
             if(stop?.Invoke()==true)break;
             foreach(var callee in CallGraph.Callees(order[index]))
-                if(order.Count<ChatFrameCap && !chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))order.Add(callee);
+                if(order.Count+outside.Count<ChatFrameCap && !chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))outside.Add(callee);
         }
+        // X-564 (0.1634): a second level outside the chat part (DrawGlyphAt, called by the tab bar's GlyphTabButton), from the first level's
+        // methods whose name holds no « later » word (a menu's callees wait for the menu).
+        var second=new List<MethodBase>();
+        foreach(var method in outside)
+        {
+            if(stop?.Invoke()==true)break;
+            if(ChatLater(method))continue;
+            foreach(var callee in CallGraph.Callees(method))
+                if(order.Count+outside.Count+second.Count<ChatFrameCap && !chatPart(callee) && !ChatLater(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))second.Add(callee);
+        }
+        order.AddRange(outside);
+        order.AddRange(second);
+        foreach(var method in later)
+            if(order.Count<ChatFrameCap)order.Add(method);
         // X-564 (0.1633): the equality members of the plugin's types met (records: the runtime calls them through object's virtual methods,
         // from a dictionary or a set: not named in the IL, so not followed).
         var types=new HashSet<Type>();
@@ -311,7 +333,16 @@ public sealed class JitWarmup : IDisposable
         foreach(var type in types)
             foreach(var method in EqualityMembers(type))
                 if(order.Count<ChatFrameCap && seen.Add(method))order.Add(method);
+        // X-564 (0.1634): the type initializers of the types met (ChatFilterTable's lambdas' cache: run at the first use, not named in the IL).
+        foreach(var type in types)
+            if(Initializer(type) is { } initializer && order.Count<ChatFrameCap && seen.Add(initializer))order.Add(initializer);
         return order;
+    }
+
+    private static ConstructorInfo? Initializer(Type type)
+    {
+        try{return type.TypeInitializer is { } initializer && Compilable(initializer) ? initializer:null;}
+        catch(Exception){return null;}
     }
 
     /// <summary>X-564 (0.1633): a type's own equality members (Equals, GetHashCode, the equality contract and operators of a record), with a body.</summary>

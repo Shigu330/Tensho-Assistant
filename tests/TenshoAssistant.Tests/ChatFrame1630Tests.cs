@@ -32,7 +32,9 @@ internal static class ChatFrame1630Tests
         {
             var frame=JitWarmup.ChatFirstFrame([Of("DrawBody")],InFrame,typeof(Frame1630).Assembly);
             var names=frame.Select(method=>method.DeclaringType!.Name+"."+method.Name).ToArray();
-            Check(names.SequenceEqual(["Frame1630.DrawBody","Frame1630.Line","Frame1630.Tab","Frame1630.Format","Helper1630.Help"]),string.Join(", ",names));
+            // 0.1634 (X-564): then the chat methods holding a « later » word themselves (called at each frame), not what they call; and a second
+            // level outside the chat part (Helper1630.Far, called by Help).
+            Check(names.SequenceEqual(["Frame1630.DrawBody","Frame1630.Line","Frame1630.Tab","Frame1630.Format","Helper1630.Help","Helper1630.Far","Frame1630.DrawSettings","Frame1630.OpenMenu"]),string.Join(", ",names));
             Check(JitWarmup.ChatFirstFrame([Of("DrawBody")],InFrame,typeof(Frame1630).Assembly,()=>true).Count==0,"stopped: nothing");
         }),
         ("Chat frame 1630: behaviour: the window is told ready once its first frame is compiled; the rest of the chat part then, each method once",()=>
@@ -40,7 +42,7 @@ internal static class ChatFrame1630Tests
             using var warmup=JitWarmup.Start(()=>[typeof(Frame1630),typeof(Helper1630)],TimeSpan.Zero,null,early:_=>true,
                 chatPart:InFrame,chatFrame:method=>method.Name=="DrawBody" && InFrame(method));
             Check(SpinWait.SpinUntil(()=>warmup.ChatDone,Long),"told ready");
-            Check(warmup.ChatPrepared==5 && warmup.ChatReadyAfter>=0,"the first frame only: "+warmup.ChatPrepared);
+            Check(warmup.ChatPrepared==8 && warmup.ChatReadyAfter>=0,"the first frame only: "+warmup.ChatPrepared);
             Check(warmup.Wait(Long) && warmup.Completed,"then the rest");
             var all=JitWarmup.Methods([typeof(Frame1630),typeof(Helper1630)]).Count;
             Check(warmup.Prepared==all && all==10,$"each method once: {warmup.Prepared} of {all}");

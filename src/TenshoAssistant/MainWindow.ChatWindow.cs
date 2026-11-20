@@ -21,16 +21,29 @@ internal sealed partial class MainWindow
     private bool chatHistoryAsk;
     private volatile int chatHistoryErased;
     /// <summary>X-484 (0.1482): the game's log filters (LogFilter sheet, client language), set by the plugin; read once, on first use.</summary>
-    internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource{get;set;}
+    internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource
+    {
+        get=>chatFilterSource;
+        // X-564 (0.1634): with the chat window open at the load, the game's log filters are read at once off the game's thread (the chat's
+        // first frame with lines read them there: a sheet and the code to read it, 20/11 18:00).
+        set{chatFilterSource=value;if(value is not null && ChatOptions.WindowOpen && !inDesktopApp)_=Task.Run(()=>ChatFilterTableNow());}
+    }
+    private Func<IReadOnlyList<ChatFilterRow>>? chatFilterSource;
     private ChatFilterTable? chatFilterTable;
     private bool chatFilterTried;
+    private readonly object chatFilterGate=new();
+    // X-564 (0.1634): read once, by the first of the game's thread and the background reading (the other waits for it or finds it made).
     private ChatFilterTable? ChatFilterTableNow()
     {
-        if(chatFilterTried || ChatFilterSource is not { } source)return chatFilterTable;
-        chatFilterTried=true;
-        try{chatFilterTable=new(source());}
-        catch(Exception error){log.Warning(error,"The game's log filters could not be read: the chat tabs use their channels.");}
-        return chatFilterTable;
+        if(Volatile.Read(ref chatFilterTried))return chatFilterTable;
+        lock(chatFilterGate)
+        {
+            if(chatFilterTried || chatFilterSource is not { } source)return chatFilterTable;
+            try{chatFilterTable=new(source());}
+            catch(Exception error){log.Warning(error,"The game's log filters could not be read: the chat tabs use their channels.");}
+            Volatile.Write(ref chatFilterTried,true);
+            return chatFilterTable;
+        }
     }
     // X-484 (0.1482): the players whose name stands out, read once per frame.
     private IReadOnlyList<string> chatHighlighted=[];
