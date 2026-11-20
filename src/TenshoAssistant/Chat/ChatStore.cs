@@ -187,12 +187,21 @@ public sealed class ChatStore
             var all=new List<ChatRecord>(back.Count+records.Count);
             all.AddRange(back);all.AddRange(records);
             records.Clear();combat=0;
-            foreach(var record in all)
+            // X-673 M1 (review of 0.1643): this session's lines by their number before, for the pins to follow them.
+            var moved=new Dictionary<long,ChatRecord>();
+            for(var at=0;at<all.Count;at++)
             {
+                var record=all[at];
                 var numbered=record with{Id=nextId++,Channel=ChatChannels.From(record.Kind)};
                 records.Add(numbered);
+                if(at>=back.Count)moved[record.Id]=numbered;
                 if(numbered.Channel==ChatChannel.Combat)combat++;
             }
+            // X-673 M1: a pinned message takes its new number (a click goes to it, its menu knows it pinned and unpins it, never pins it twice);
+            // a pin whose line had already left the store keeps its own.
+            foreach(var list in pins.Values)
+                for(var at=0;at<list.Count;at++)
+                    if(moved.TryGetValue(list[at].Id,out var numbered))list[at]=numbered;
             var limit=Bounded(cap);
             while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
             while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
