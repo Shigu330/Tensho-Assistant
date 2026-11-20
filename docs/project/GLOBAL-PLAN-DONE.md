@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (622 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (624 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -690,12 +690,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-625 | Tool: tools/discoveries-merge.py sync --dry-run crashes on Windows without -X… | Done in 0.1569 |
 | X-626 | Review of block 0.1565 to 0.1568 (review 0.1568, 20/11), minor M1, M2, M3: M1… | Done in 0.1571 |
 | X-627 | Review  (review 0.1569, 20/11), I1: finding in… | Done in 0.1570 |
+| X-629 | Cleanup after X-600 (passage 129): unused language keys CraftPresets.Back… | Done in 0.1578 |
+| X-630 | Review of block 0.1573 to 0.1575 (review 0.1575, 20/11), minor M1: M1 in… | Done in 0.1577 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (622 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (624 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1383,3 +1385,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-625 | Outil : tools/discoveries-merge.py sync --dry-run plante sous Windows sans -X… | Fait en 0.1569 |
 | X-626 | Relecture du bloc 0.1565 à 0.1568 (relecture 0.1568, 20/11), mineurs M1, M2, M3… | Fait en 0.1571 |
 | X-627 | Relecture  (relecture 0.1569, 20/11), I1 : Le second cas, censé être le test de… | Fait en 0.1570 |
+| X-629 | Ménage après X-600 (passage 129) : clés de langue sans usage CraftPresets.Back… | Fait en 0.1578 |
+| X-630 | Relecture du bloc 0.1573 à 0.1575 (relecture 0.1575, 20/11), mineurs M1 : M1… | Fait en 0.1577 |

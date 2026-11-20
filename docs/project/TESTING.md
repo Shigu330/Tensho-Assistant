@@ -2241,6 +2241,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1574) Dédale bestial, fenêtre « Formation de l'équipe » : dans le panneau, sous « Tout le plateau », chaque bête à emmener est sur une ligne (icône, numéro et nom, rang, type de dégâts précédé de l'icône du jeu) ; une bête à l'attaque magique neutre montre « Magique » sans icône.
 
+- [ ] (0.1576) Jardin : ouvrez un emplacement dont la récolte prévue est passée et que le jeu dit encore en pousse ; sur la page Jardin, au survol de « Inconnu », la phrase même du jeu entre guillemets avec son heure.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
