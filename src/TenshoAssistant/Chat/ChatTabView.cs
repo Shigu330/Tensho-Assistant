@@ -41,7 +41,8 @@ public sealed class ChatTabView
     /// <summary>Takes the store's new lines this tab shows, oldest dropped past the cap; true when the tab changed.</summary>
     /// <param name="table">X-484 (0.1482): the game's log filters (null: not read; the tab's channels decide), with <paramref name="settings"/>
     /// for the players hidden.</param>
-    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap,ChatFilterTable? table=null,ChatSettings? settings=null)
+    /// <param name="also">X-447 B8 (0.1638): a further test each message must pass (the search's text); null: none.</param>
+    public bool Refresh(ChatStore store,ChatTabSettings tab,int cap,ChatFilterTable? table=null,ChatSettings? settings=null,Func<ChatRecord,bool>? also=null)
     {
         var changed=false;
         ChatTabFilter? filter=null;
@@ -50,7 +51,7 @@ public sealed class ChatTabView
         {
             lastId=record.Id;
             filter??=new(tab,table,settings);
-            if(!filter.Shows(record))continue;
+            if(!filter.Shows(record) || also?.Invoke(record)==false)continue;
             if(tab.FoldRepeats && records.Count>0 && ChatRepeat.Repeats(records[^1],lastSeen,record))
             {
                 repeats[^1]++;lastSeen=record.Time;changed=true;

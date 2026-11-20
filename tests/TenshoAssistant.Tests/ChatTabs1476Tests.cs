@@ -50,7 +50,7 @@ internal static class ChatTabs1476Tests
         ("Chat tabs 1476: the frame and lock buttons go through the common icon component, no icon font label (X-477)", () =>
         {
             var window = Window();
-            Check(window.Split("GlyphTabButton(").Length == 8, "seven icon tab buttons (X-476: « + » and the gear; X-467: both chats and reduce; X-447 D4: the tabs' names)");
+            Check(window.Split("GlyphTabButton(").Length == 9, "eight icon tab buttons (X-476: « + » and the gear; X-467: both chats and reduce; X-447 D4: the tabs' names; X-447 B8: the search)");
             Check(!window.Contains("ImGui.PushFont(Dalamud.Interface.UiBuilder.IconFont);", StringComparison.Ordinal), "no icon font pushed by hand in the chat window");
             var component = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/UI/Components/ToolButton.cs")).Replace("\r\n", "\n");
             Check(component.Contains("var clicked=ImGui.TabItemButton(new string(' ',", StringComparison.Ordinal)

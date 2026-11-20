@@ -960,7 +960,30 @@ internal sealed partial class MainWindow
         var view=ChatMessages.ViewOf(tabs[shown]);
         // X-447 B1 (0.1622): the tab shown's newest message (another tab chosen counts as new).
         chatShownNewest=view.Count>0 ? view.RecordAt(view.Count-1).Id:-1;
+        // X-447 B8 (0.1638): the search line, then only the tab's messages holding the text typed (a view of their own).
+        if(chatSearchOpen)view=DrawChatSearchLine(tabs[shown],view,options);
         DrawChatLines(view,options,height,view.Serial);
+    }
+
+    // X-447 B8 (0.1638): the search line open, its text (in memory only), and the box to focus once opened.
+    private bool chatSearchOpen,chatSearchFocus;
+    private string chatSearchText="";
+
+    /// <summary>X-447 B8 (0.1638): the search box over the lines; with text typed, the view of the tab's messages holding it (kept by the
+    /// store, refreshed each frame as a tab's) and how many they are; without, the tab's own view.</summary>
+    private ChatTabView DrawChatSearchLine(ChatTabSettings tab,ChatTabView view,ChatSettings options)
+    {
+        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X*0.6f,260*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale));
+        if(chatSearchFocus){ImGui.SetKeyboardFocusHere();chatSearchFocus=false;}
+        ImGui.InputTextWithHint("###ChatSearchText",localization.Get("ChatWindow.SearchHint"),ref chatSearchText,ChatSearch.MaximumText);
+        Tip("ChatWindow.SearchBoxTip");
+        var query=ChatSearch.Query(chatSearchText);
+        if(query.Length==0)return view;
+        var found=ChatMessages.SearchView(tab,query);
+        found.Refresh(ChatMessages,tab,options.BoundedMaxLines,ChatFilterTableNow(),options,record=>ChatSearch.Matches(record,query));
+        ImGui.SameLine();
+        ImGui.TextDisabled(localization.Format("ChatWindow.SearchFound",found.Count));
+        return found;
     }
 
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
@@ -974,6 +997,13 @@ internal sealed partial class MainWindow
             if(GlyphTabButton("###ChatAddTab",Dalamud.Interface.FontAwesomeIcon.Plus,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip)){AddChatTab(tabs);TrySave("Chat window tabs");}
             Tip("ChatWindow.AddTabTip");
         }
+        // X-447 B8 (0.1638): the search in the tab shown, opened or closed (closed, its text is forgotten).
+        if(GlyphTabButton("###ChatSearch",Dalamud.Interface.FontAwesomeIcon.Search,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip))
+        {
+            chatSearchOpen=!chatSearchOpen;chatSearchFocus=chatSearchOpen;
+            if(!chatSearchOpen)chatSearchText="";
+        }
+        Tip(chatSearchOpen ? "ChatWindow.SearchCloseTip":"ChatWindow.SearchTip");
         var settingsButton=GlyphTabButton("###ChatSettingsButton",Dalamud.Interface.FontAwesomeIcon.Cog,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip("ChatWindow.SettingsTip");
         if(settingsButton)ImGui.OpenPopup("###TenshoChatSettings");

@@ -85,7 +85,24 @@ public sealed class ChatStore
     }
 
     /// <summary>A tab whose channels changed, or that was removed: its view is built again from the lines kept, as read.</summary>
-    public void Restart(ChatTabSettings tab){lock(gate)views.Remove(tab);}
+    public void Restart(ChatTabSettings tab){lock(gate){views.Remove(tab);searchView=null;}}
+
+    // X-447 B8 (0.1638): the search's view of the tab shown (one at a time), kept here so a clear drops it with the other copies.
+    private ChatTabView? searchView;
+    private ChatTabSettings? searchTab;
+    private string searchText="";
+
+    /// <summary>X-447 B8: the view of <paramref name="tab"/>'s messages holding <paramref name="query"/> (ChatSearch.Matches; filled by its
+    /// Refresh): the same view while the tab and the text stay, a new one otherwise; dropped by a clear or a tab restarted.</summary>
+    public ChatTabView SearchView(ChatTabSettings tab,string query)
+    {
+        lock(gate)
+        {
+            if(searchView is null || !ReferenceEquals(searchTab,tab) || !string.Equals(searchText,query,StringComparison.Ordinal))
+                (searchView,searchTab,searchText)=(new ChatTabView(),tab,query);
+            return searchView;
+        }
+    }
 
     /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
     /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
@@ -117,7 +134,7 @@ public sealed class ChatStore
             var limit=Bounded(cap);
             while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
             while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
-            views.Clear();
+            views.Clear();searchView=null;
             return back.Count;
         }
     }
@@ -137,7 +154,7 @@ public sealed class ChatStore
 
     public void Clear()
     {
-        lock(gate){records.Clear();views.Clear();clears++;combat=0;}
+        lock(gate){records.Clear();views.Clear();searchView=null;clears++;combat=0;}
     }
 
     public IReadOnlyList<KeyValuePair<int,int>> KindCounts(){lock(gate)return kinds.OrderBy(row=>row.Key).ToArray();}

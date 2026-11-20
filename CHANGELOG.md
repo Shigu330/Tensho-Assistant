@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1638.0
+- Plan global, X-447 : Fenêtre de chat, option B8 de X-447 (choix de l'utilisateur du 15/11) : recherche dans l'onglet affiché. Une loupe au bout de la barre des onglets ouvre une ligne de recherche au-dessus des lignes ; avec du texte tapé, l'onglet ne montre que ses messages dont l'auteur ou le texte le contient, majuscules et accents à part (« fete » trouve « Fête »), avec leur nombre ; les nouveaux messages qui le contiennent s'ajoutent. Refermée, la recherche oublie son texte ; rien n'est enregistré. Les messages trouvés sont une vue à part gardée par le magasin du chat, effacée avec ses autres copies (déconnexion, fenêtre coupée, onglet changé). X-447 reste ouvert (B7, B9 à B11, B13, B14, B16).
+- Pour les joueurs : fenêtre de chat : une loupe dans la barre des onglets cherche dans l'onglet affiché (majuscules et accents à part).
+- Tests : ChatSearch1638Tests. Verify.ps1 (agent) : 3404/3404, 0 avertissement, 0 erreur ; DLL 0.1638.0.0. Non validé en jeu.
+### English
+- Chat window, option B8 of X-447 (the user's choice of 15/11): search in the tab shown. A magnifier at the end of the tab bar opens a search line over the lines; with text typed, the tab shows only its messages whose sender or text holds it, capitals and accents aside (« fete » finds « Fête »), with their number; new messages that hold it come in. Closed, the search forgets its text; nothing is saved. The messages found are a view of their own kept by the chat store, dropped with its other copies (logout, window turned off, tab changed). X-447 stays open (B7, B9 to B11, B13, B14, B16).
+- For players: Chat window: a magnifier in the tab bar searches the tab shown (capitals and accents aside).
+
 ## 0.1637.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1636. Mesures à vide du 20/11 de 18 h 05 à 18 h 16 : la partie chat prête 3,7 à 4,2 s après le chargement et les lignes dessinées dans la même image, contre 2,0 à 2,9 s de 0.1631 à 0.1633 avec autant de méthodes (587 à 735) : depuis 0.1634, les filtres du journal du jeu sont lus sur un fil à eux pendant le chargement, à côté du préchauffage. Ils sont maintenant lus sur le fil du préchauffage lui-même, juste après le code du chat et avant que la fenêtre de chat soit dite prête : sa première image les trouve lus, et rien ne tourne à côté du préchauffage. Une erreur de lecture n'arrête pas le préchauffage (la fenêtre les relit elle-même).
 - Tests : ChatThen1637Tests. Verify.ps1 (agent) : 3400/3400, 0 avertissement, 0 erreur ; DLL 0.1637.0.0. Rien à essayer en jeu.
