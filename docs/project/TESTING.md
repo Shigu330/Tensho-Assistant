@@ -2261,6 +2261,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1588) Carte › Favoris : collez une liste de lieux avec coordonnées (« Lieu ( x , y ) ») et cliquez aussitôt « Importer » : aucun à-coup du jeu ; « Lecture des noms de zones… » peut s'afficher un instant, puis les favoris sont ajoutés.
 
+- [ ] (0.1589) Carte › Favoris : collez une liste « Lieu ( x , y ) », cliquez « Importer » puis changez aussitôt le texte ou passez à un autre onglet : rien n'est importé, « Lecture des noms de zones… » disparaît ; sans rien toucher, les favoris sont ajoutés.
+
+- [ ] (0.1590) Île › Atelier, première ouverture après le chargement du plugin : aucun à-coup du jeu ; « Lecture des données des fabriques… » peut s'afficher un instant, puis la page de l'atelier.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

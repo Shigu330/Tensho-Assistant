@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (643 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (646 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -505,6 +505,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-391 | Tool (user's finding, 15/11: « the reviewer is late too, isn't it? »): lance.py… | Done in 0.1364.0 |
 | X-392 | Tool (user's finding, 15/11: « you didn't remind me to do some »): after relays… | Done in 0.1364.0 |
 | X-393 | Tool (15/11): plan.py import-relecture read « 0 findings » from review 0.1361… | Done in 0.1364.0 |
+| X-394 | Review 0.1350 to 0.1361, important finding 1: X-384 and X-385 done without the… | Done in 0.1591 |
 | X-395 | Review 0.1350 to 0.1361, minors 3 and 4: (3) garden: a bed menu opened then… | Done in 0.1366.0 |
 | X-396 | Tool (R37 changed on 15/11, J139): while the desktop app is frozen (D-149)… | Done in 0.1364.0 |
 | X-397 | Review of block 0.1362 to 0.1364 (review 0.1364, 15/11), I1: finding in… | Done in 0.1368 |
@@ -711,12 +712,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-642 | Review of block 0.1579 to 0.1581 (review 0.1581, 20/11), minor M1, M2: M1 in… | Done in 0.1582 |
 | X-643 | Review of block 0.1582 to 0.1586 (review 0.1586, 20/11), I1: finding in… | Done in 0.1587 |
 | X-644 | Review of block 0.1582 to 0.1586 (review 0.1586, 20/11), minor M1, M2: M1 in… | Done in 0.1588 |
+| X-645 | Review of block 0.1587 to 0.1588 (review 0.1588, 20/11), minor M1: M1 in… | Done in 0.1589 |
+| X-646 | Review of block 0.1587 to 0.1588 (review 0.1588, 20/11), pre-existing before… | Done in 0.1590 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (643 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (646 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1219,6 +1222,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-391 | Outil (constat de l'utilisateur du 15/11 : « relecteur est en retard aussi non… | Fait en 0.1364.0 |
 | X-392 | Outil (constat de l'utilisateur du 15/11 : « tu ne m'as pas rappelé d'en faire… | Fait en 0.1364.0 |
 | X-393 | Outil (15/11) : plan.py import-relecture a lu « 0 constat » dans le rapport… | Fait en 0.1364.0 |
+| X-394 | Relecture 0.1350 à 0.1361 (relecture 0.1361, 15/11), constat important 1… | Fait en 0.1591 |
 | X-395 | Relecture 0.1350 à 0.1361, mineurs 3 et 4 : (3) jardin… | Fait en 0.1366.0 |
 | X-396 | Outil (R37 changée le 15/11, J139) : tant que l'application est gelée (D-149)… | Fait en 0.1364.0 |
 | X-397 | Relecture du bloc 0.1362 à 0.1364 (relecture 0.1364, 15/11), I1 : X-378 n'a pas… | Fait en 0.1368 |
@@ -1425,3 +1429,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-642 | Relecture du bloc 0.1579 à 0.1581 (relecture 0.1581, 20/11), mineurs M1, M2… | Fait en 0.1582 |
 | X-643 | Relecture du bloc 0.1582 à 0.1586 (relecture 0.1586, 20/11), I1 : X-518 M2… | Fait en 0.1587 |
 | X-644 | Relecture du bloc 0.1582 à 0.1586 (relecture 0.1586, 20/11), mineurs M1, M2… | Fait en 0.1588 |
+| X-645 | Relecture du bloc 0.1587 à 0.1588 (relecture 0.1588, 20/11), mineurs M1 : M1… | Fait en 0.1589 |
+| X-646 | Relecture du bloc 0.1587 à 0.1588 (relecture 0.1588, 20/11), déjà là avant le… | Fait en 0.1590 |
