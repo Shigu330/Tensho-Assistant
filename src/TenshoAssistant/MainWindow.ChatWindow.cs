@@ -327,6 +327,26 @@ internal sealed partial class MainWindow
         SliderSetting("ChatWindow.LineSpacing","ChatWindow.LineSpacingTip",()=>configuration.Chat.BoundedLineSpacing,value=>configuration.Chat.LineSpacing=value,0,12,defaults.LineSpacing,"%d px");
         SliderSetting("ChatWindow.FadeAfter","ChatWindow.FadeAfterTip",()=>configuration.Chat.BoundedFadeAfter,value=>configuration.Chat.FadeAfter=value,0,600,defaults.FadeAfter,"%d s");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
+        DrawChatLookCode();
+    }
+
+    // X-447 B16 (0.1648): what the last copy or paste of the look did.
+    private string? chatLookMessage;
+
+    /// <summary>X-447 B16 (0.1648, the user's choice of 15/11, after Chattynator and ElvUI): the window's look copied as a code, or a code pasted
+    /// (ChatTheme: never the tabs, the players, the words nor the sounds).</summary>
+    private void DrawChatLookCode()
+    {
+        if(ImGui.Button(localization.Get("ChatWindow.CopyLook"))){ImGui.SetClipboardText(ChatTheme.Share(configuration.Chat));chatLookMessage=localization.Get("ChatWindow.LookCopied");}
+        Tip("ChatWindow.CopyLookTip");
+        ImGui.SameLine();
+        if(ImGui.Button(localization.Get("ChatWindow.PasteLook")))
+        {
+            if(ChatTheme.Apply(ImGui.GetClipboardText(),configuration.Chat)){chatLookMessage=localization.Get("ChatWindow.LookPasted");TrySave("Chat window look");}
+            else chatLookMessage=localization.Get("ChatWindow.LookNotACode");
+        }
+        Tip("ChatWindow.PasteLookTip");
+        if(chatLookMessage is { } said)ImGui.TextDisabled(said);
     }
 
     /// <summary>X-475 (the user's remark of 15/11, asked again on 16/11; X-447 B10): « Keep the chat history on this PC », off by default. Ticking it
