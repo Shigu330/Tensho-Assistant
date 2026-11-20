@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (604 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (607 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -667,17 +667,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
 | X-611 | Tool (defect seen by the user on 19/11 around 23:30): the per-model statistics… | Done in 0.1554 |
 | X-612 | Tool, user request of 19/11 around 23:40 (« take as many stats as possible for… | Done in 0.1557 |
+| X-613 | Tool, user request of 19/11 around 23:45 (« for GPT find a way for you to see… | Done in 0.1562 |
 | X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
 | X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 | X-619 | Review  (review 0.1557, 20/11), minor M1, M2, M3: M1 in… | Done in 0.1560 |
 | X-621 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), I1: finding in… | Done in 0.1561 |
 | X-622 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), minor M1, M2: M1 in… | Done in 0.1562 |
+| X-623 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), I1: finding in… | Done in 0.1563 |
+| X-624 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), minor M1, M2, M3, M4… | Done in 0.1564 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (604 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (607 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1342,8 +1345,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
 | X-611 | Outil (défaut vu par l'utilisateur le 19/11 vers 23 h 30) : les statistiques… | Fait en 0.1554 |
 | X-612 | Outil, demande de l'utilisateur du 19/11 vers 23 h 40 (« prendre un max de… | Fait en 0.1557 |
+| X-613 | Outil, demande de l'utilisateur du 19/11 vers 23 h 45 (« pour gpt il faudrait… | Fait en 0.1562 |
 | X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
 | X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
 | X-619 | Relecture  (relecture 0.1557, 20/11), mineurs M1, M2, M3 : M1 : X-618 M5 : une… | Fait en 0.1560 |
 | X-621 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), I1 : X-619 M1 lève… | Fait en 0.1561 |
 | X-622 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), mineurs M1, M2… | Fait en 0.1562 |
+| X-623 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), I1 : KeepAside lit… | Fait en 0.1563 |
+| X-624 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), mineurs M1, M2… | Fait en 0.1564 |
