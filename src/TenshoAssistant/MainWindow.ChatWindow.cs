@@ -1172,12 +1172,16 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
                             ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName));
                         if(chatShownTab is { } shownTab && ImGui.Selectable(localization.Get("ChatWindow.ClearTab")))ClearChatTab(shownTab,true);
+                        // X-455 E1 (0.1624): the tab as text to select with the mouse (ImGui draws no selectable text: a read-only box).
+                        if(ImGui.Selectable(localization.Get("ChatWindow.SelectText")))
+                            chatSelectText=ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName);
                         DrawChatSenderMenu(options,said);
                     }
                     finally{ImGui.EndPopup();}
                 }
                 else chatWindowLine=null;
             }
+            DrawChatSelectText();
             // X-455 E4 (0.1617): the menu of a quest link, opened by a right click on it: its name copied.
             if(chatWindowQuest is { } questName)
             {
@@ -1306,6 +1310,32 @@ internal sealed partial class MainWindow
     }
 
     private string ChatRepeatsTip(int times)=>localization.Format("ChatWindow.RepeatsTip",times);
+
+    // X-455 E1 (0.1624): the tab's text made when « Select text » was chosen (null: closed); its box opened at the next frame.
+    private string? chatSelectText;
+    private bool chatSelectOpen;
+
+    /// <summary>X-455 E1 (0.1624): the tab's messages in a read-only text box, the size of the window: a piece of one or several messages selected
+    /// with the mouse (or Ctrl+A) and copied with Ctrl+C or the button. Made once when opened (never each frame); Échap or a click outside closes it.</summary>
+    private void DrawChatSelectText()
+    {
+        if(chatSelectText is null)return;
+        if(!chatSelectOpen){ImGui.OpenPopup("###TenshoChatSelect");chatSelectOpen=true;}
+        var width=Math.Max(chatSize.X,320);
+        ImGui.SetNextWindowSize(new Vector2(width,Math.Clamp(chatSize.Y,200,600)),ImGuiCond.Appearing);
+        if(!ImGui.BeginPopup("###TenshoChatSelect")){chatSelectText=null;chatSelectOpen=false;return;}
+        try
+        {
+            ImGui.TextColored(Muted,localization.Get("ChatWindow.SelectTextHelp"));
+            var all=chatSelectText;
+            CopyButton(localization.Get("ChatWindow.SelectTextCopyAll"),()=>all);
+            Tip("ChatWindow.SelectTextCopyAllTip");
+            var text=chatSelectText;
+            ImGui.InputTextMultiline("###ChatSelectText",ref text,System.Text.Encoding.UTF8.GetByteCount(text)+1,new Vector2(-1,-1),ImGuiInputTextFlags.ReadOnly);
+            Tip("ChatWindow.SelectTextTip");
+        }
+        finally{ImGui.EndPopup();}
+    }
 
     /// <summary>A run's colour: the time muted, a player put forward in the warning colour, X-447 B5 (0.1621) a player's name in its own colour
     /// when chosen (spoken channels), else the channel's colour.</summary>

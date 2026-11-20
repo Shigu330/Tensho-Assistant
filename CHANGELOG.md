@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1624.0
+- Plan global, X-455 : Fenêtre de chat, option choisie par l'utilisateur le 15/11 (X-455 E1). « Choisir du texte… » dans le menu d'un message (clic droit) : les messages de l'onglet s'ouvrent en texte dans une boîte en lecture seule de la taille de la fenêtre ; un morceau d'un ou de plusieurs messages se choisit à la souris (ou Ctrl+A) et se copie par Ctrl+C, ou tout par « Tout copier » ; Échap ou un clic à côté ferme. ImGui ne sait pas choisir du texte dessiné : d'où ce mode à part. E5 (menu du jeu sur un nom) était déjà fait en 0.1602 (X-654) ; E6 (coller dans la saisie) attend que la saisie soit décidée. X-455 reste ouvert pour l'essai en jeu et E6.
+- Pour les joueurs : fenêtre de chat : « Choisir du texte… » dans le menu d'un message permet de choisir à la souris n'importe quel morceau des messages et de le copier.
+- Tests : ChatSelect1624Tests. Verify.ps1 (agent) : 3371/3371, 0 avertissement, 0 erreur ; DLL 0.1624.0.0. Non validé en jeu.
+### English
+- Chat window, option chosen by the user on 15/11 (X-455 E1). « Select text… » in a message's menu (right click): the tab's messages open as text in a read-only box the size of the window; a piece of one or several messages is selected with the mouse (or Ctrl+A) and copied with Ctrl+C, or all with « Copy all »; Escape or a click beside closes it. ImGui cannot select drawn text: hence this separate mode. E5 (the game's menu on a name) was already done in 0.1602 (X-654); E6 (paste into the typing box) waits for the typing box to be decided. X-455 stays open for the game test and E6.
+- For players: Chat window: « Select text… » in a message's menu lets you select any piece of the messages with the mouse and copy it.
+
 ## 0.1623.0
 - Plan global, X-447 : Fenêtre de chat, option choisie par l'utilisateur le 15/11 (X-447 B15, R25). « Mode capture : masquer les noms des joueurs » : pour les captures d'écran, le nom de chaque joueur avant ses messages (canaux parlés, murmures compris, et la copie d'un message) est remplacé par un code comme #A3F27, tiré du nom (le même pour le même joueur, d'une session à l'autre), d'où le nom ne peut pas se lire ; un personnage de l'histoire garde son nom. Le texte des messages lui-même n'est pas changé (l'info-bulle le dit). Coupé par défaut. X-447 reste ouvert pour les autres options cochées.
 - Pour les joueurs : fenêtre de chat : un mode capture remplace les noms des joueurs par des codes, pour les captures d'écran.
