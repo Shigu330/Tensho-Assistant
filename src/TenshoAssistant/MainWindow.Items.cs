@@ -679,8 +679,12 @@ internal sealed partial class MainWindow
     {
         ImGui.TextDisabled(ToolText("Related"));
         var tools = PlannedTools.Where(tool => tool.Reference is "Craftimizer" or "Item Use" or "GatherBuddy" or "Price Insight" or "Monster Loot Hunter").ToArray();
+        // X-599 (0.1567, the user's report of 18/11: a dead button): this line is drawn in the item's recipes tab, where « Craftimizer » led
+        // back (OpenContextTool: focusCraftTab). Here it opens the craft simulation on the item's recipe, and is not shown without one.
+        var simulated = recipeCatalog.State.Catalog?.ForResult((uint)itemId).FirstOrDefault();
         foreach (var tool in tools)
         {
+            if (tool.Reference == "Craftimizer" && simulated is null) continue;
             if (ImGui.GetContentRegionAvail().X < ImGui.CalcTextSize(ToolText(tool.Name)).X + 56) ImGui.NewLine();
             ImGui.PushID($"RecipeTool{tool.Reference}");
             try
@@ -689,7 +693,11 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(Accent, tool.Icon.ToIconString());
                 ImGui.PopFont();
                 ImGui.SameLine();
-                if (ImGui.SmallButton(ToolText(tool.Name))) OpenContextTool(tool.Reference);
+                if (ImGui.SmallButton(ToolText(tool.Name)))
+                {
+                    if (tool.Reference == "Craftimizer" && simulated is not null) OpenCraftSimulation(simulated);
+                    else OpenContextTool(tool.Reference);
+                }
                 if (ImGui.IsItemHovered()) WrappedTooltip(localization.Format("ToolDirectory.OpenContext",ToolText(tool.Name)));
                 ImGui.SameLine();
             }

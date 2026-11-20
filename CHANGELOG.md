@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1567.0
+- Plan global, X-599 : Fiche d'objet, onglet des recettes, ligne « Outils liés » : le bouton « Recettes, simulation et macros d'artisanat » ouvre la simulation d'artisanat sur la recette de l'objet choisi ; avant, il rouvrait l'onglet des recettes où l'on était déjà, sans effet visible. Pour un objet sans recette, il n'est pas montré. Les autres boutons de la ligne ne changent pas.
+- Pour les joueurs : fiche d'objet : le bouton de simulation d'artisanat de l'onglet des recettes ouvre maintenant la simulation sur la recette de l'objet.
+- Tests : RecipeTools1567Tests. Verify.ps1 (agent) : 3188/3188, 0 avertissement, 0 erreur ; DLL 0.1567.0.0. Non validé en jeu.
+### English
+- Item sheet, recipes tab, « Related tools » line: the « Recipes, simulation and craft macros » button opens the craft simulation on the chosen item's recipe; before, it opened again the recipes tab already shown, with no visible effect. For an item without a recipe it is not shown. The other buttons of the line are unchanged.
+- For players: Item sheet: the craft simulation button of the recipes tab now opens the simulation on the item's recipe.
+
 ## 0.1566.0
 - Plan global, X-508 : Réglages du chat : « Seulement avec » et « Cacher avec » (de chaque onglet), « Joueurs cachés », « Joueurs mis en avant » et « Mots d'alerte » s'affichent en lignes, une par joueur ou par mot, chacune avec un bouton pour la retirer, et une case « Ajouter… » (Entrée ou bouton ; plusieurs d'un coup avec des virgules ; un doublon n'est pas ajouté). Toujours enregistrées avec des virgules : les valeurs déjà enregistrées sont reprises ligne par ligne. Fenêtre de chat : le clic droit sur un message propose « Cacher <joueur> » et « Mettre <joueur> en avant » (ou « Ne plus mettre … en avant »). Les noms des filtres ne sont plus coupés depuis 0.1528 (X-560).
 - Pour les joueurs : réglages du chat : joueurs cachés, mis en avant et mots sont maintenant des listes, une ligne chacun, et un clic droit sur un message cache ou met en avant son auteur.
