@@ -2295,6 +2295,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1606) Fenêtre de chat de Tensho : clic droit sur le nom d'un joueur qui vient de parler : les entrées du jeu (murmurer, inviter, carte de personnage) sont actives ; au journal, « Chat window, a sender's identifiers: Given » une fois
 
+- [ ] (0.1608) Alarmes : six onglets (Horloges, Alarmes par job, Autres alarmes, Alarme personnelle, Alarmes du jeu, Réglages) ; le nombre d'alarmes dans les deux onglets d'alarmes égale celui du titre de la page ; activer une alarme, changer son avance, la supprimer : gardé après un rechargement
+
+- [ ] (0.1609) Jardin : trois onglets (Jardin, Croisements, Alarmes) ; Croisements : choisir une graine, « donne » puis « utilise », une paire et son plan de plantation ; Jardin : les prévisions sur les carrés toujours là
+
+- [ ] (0.1610) Dédale bestial : finir un plateau, la fenêtre de résultat ouverte jusqu'au bout : la page montre le bonus et le total de la fenêtre ; au journal, « Beastmaster board result read » (une ou deux lignes) sans avertissement
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

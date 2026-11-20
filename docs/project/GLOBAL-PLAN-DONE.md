@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (666 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (673 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -578,6 +578,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-471 | Tool, idea I-014 put on the plan by the user on 11/15 around 10:35 pm: the same… | Done in 0.1467.0 |
 | X-472 | Bug seen by the user on 11/15 around 10:40 pm (screenshot, game chat and Tensho… | Done in 0.1471.0 |
 | X-474 | Bug seen by the user on 11/15 around 10:50 pm: in the Tensho chat window, the «… | Done in 0.1477 |
+| X-476 | User request of 11/15 around 10:50 pm (two screenshots side by side, Tensho… | Done in 0.1481.0 |
 | X-477 | Display bug seen by the user on 11/15 around 10:55 pm (screenshot): Tensho chat… | Done in 0.1476.0 |
 | X-478 | User request of 11/15 around 11 pm (Tensho chat window): a chosen colour for… | Done in 0.1476.0 |
 | X-479 | Review of block 0.1462 to 0.1467 (review 0.1467, 15/11), I1: finding in… | Done in 0.1487.0 |
@@ -605,6 +606,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-503 | Review  (review 0.1482, 16/11), minor M1, M2, M3: M1 in… | Done in 0.1486.0 |
 | X-504 | Review  (review 0.1486, 16/11), minor M1, M2: M1 in… | Done in 0.1489 |
 | X-506 | Bug seen on 11/16 around 9:30 am (user screenshot next to the game chat, and… | Done in 0.1487 |
+| X-507 | Bug seen by the user on 11/16 around 10:05 am: in Settings, picking a result of… | Done in 0.1497.0 |
 | X-508 | User remark of 11/16 around 10:15 am (screenshot of the chat settings panel… | Done in 0.1566 |
 | X-509 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I1: finding in… | Done in 0.1491 |
 | X-510 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I2: finding in… | Done in 0.1491.0 |
@@ -671,6 +673,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-587 | External audit of 18/11, family « player data after an error »: A16 (critical… | Done in 0.1551 |
 | X-588 | External audit of 18/11, family « discoveries: loading and export »: A01 (base… | Done in 0.1552 |
 | X-589 | External audit of 18/11, family « network sources »: A08, A09, A10, A26, A11… | Done in 0.1556 |
+| X-590 | External audit of 18/11, family « native reads » (R08): A05 (map marker count… | Done in 0.1610.0 |
+| X-591 | External audit of 18/11, texts and tests: A13 (SECURITY says once a day at… | Done in 0.1611.0 |
 | X-593 | External audit of 18/11, A04 (user's choice of 18/11: fix the text, not the… | Done in 0.1553 |
 | X-594 | Method audit of 18/11, backup of the agent's files: M27, M14, M28, M29, M30… | Done in 0.1550 |
 | X-595 | Method audit of 18/11, tools that hide an error: M11, M12, M24, M26, M18, M22… | Done in 0.1550 |
@@ -679,6 +683,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
 | X-599 | Dead button (reported by the user on 18/11, screenshot): in the item sheet's… | Done in 0.1567 |
 | X-600 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1573 |
+| X-602 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1608.0 |
+| X-603 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1609.0 |
 | X-608 | Rule R03.1 changed on 18/11 (user's choice, rules journal): in PvE combat… | Done in 0.1575 |
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
 | X-610 | Bug seen by the user on 19/11 around 23:15 (item card capture, kept off the… | Done in 0.1568 |
@@ -734,12 +740,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-660 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), I1: finding in… | Done in 0.1603.0 |
 | X-661 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), minor M1, M2: M1 in… | Done in 0.1605.0 |
 | X-662 | Review of block 0.1603 to 0.1605 (review 0.1605, 20/11), minor M1, M2, M3: M1… | Done in 0.1606.0 |
+| X-663 | Review  (review 0.1606, 20/11), pre-existing before the block M1: M1 in… | Done in 0.1607.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (666 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (673 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1315,6 +1322,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-471 | Outil, idée I-014 mise au plan par l'utilisateur le 15/11 vers 22 h 35 : la… | Fait en 0.1467.0 |
 | X-472 | Bug vu par l'utilisateur le 15/11 vers 22 h 40 (capture, chat du jeu et fenêtre… | Fait en 0.1471.0 |
 | X-474 | Bug vu par l'utilisateur le 15/11 vers 22 h 50 : dans la fenêtre de chat… | Fait en 0.1477 |
+| X-476 | Demande de l'utilisateur du 15/11 vers 22 h 50 (deux captures côte à côte… | Fait en 0.1481.0 |
 | X-477 | Bug d'affichage vu par l'utilisateur le 15/11 vers 22 h 55 (capture) : fenêtre… | Fait en 0.1476.0 |
 | X-478 | Demande de l'utilisateur du 15/11 vers 23 h (fenêtre de chat Tensho) : une… | Fait en 0.1476.0 |
 | X-479 | Relecture du bloc 0.1462 à 0.1467 (relecture 0.1467, 15/11), I1 : X-461 : la… | Fait en 0.1487.0 |
@@ -1342,6 +1350,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-503 | Relecture  (relecture 0.1482, 16/11), mineurs M1, M2, M3 : M1 : Les marges… | Fait en 0.1486.0 |
 | X-504 | Relecture  (relecture 0.1486, 16/11), mineurs M1, M2 : M1 : X-502 : le contour… | Fait en 0.1489 |
 | X-506 | Bug vu le 16/11 vers 9 h 30 (capture de l'utilisateur côte à côte avec le chat… | Fait en 0.1487 |
+| X-507 | Bug vu par l'utilisateur le 16/11 vers 10 h 05 : dans Paramètres, choisir un… | Fait en 0.1497.0 |
 | X-508 | Remarque de l'utilisateur du 16/11 vers 10 h 15 (capture du panneau des… | Fait en 0.1566 |
 | X-509 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I1 : X-506 : la… | Fait en 0.1491 |
 | X-510 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I2 : X-505… | Fait en 0.1491.0 |
@@ -1408,6 +1417,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-587 | Audit externe du 18/11, famille « données du joueur après une erreur » : A16… | Fait en 0.1551 |
 | X-588 | Audit externe du 18/11, famille « découvertes : chargement et export » : A01… | Fait en 0.1552 |
 | X-589 | Audit externe du 18/11, famille « sources réseau » : A08 (délai dépassé de… | Fait en 0.1556 |
+| X-590 | Audit externe du 18/11, famille « lectures natives » (R08) : A05 (nombre de… | Fait en 0.1610.0 |
+| X-591 | Audit externe du 18/11, textes et tests : A13 (SECURITY dit « une fois par jour… | Fait en 0.1611.0 |
 | X-593 | Audit externe du 18/11, A04 (choix de l'utilisateur le 18/11 : corriger le… | Fait en 0.1553 |
 | X-594 | Audit de méthode du 18/11, sauvegarde des fichiers de l'agent : M27 (une source… | Fait en 0.1550 |
 | X-595 | Audit de méthode du 18/11, outils qui mentent sur une erreur : M11 (state.py… | Fait en 0.1550 |
@@ -1416,6 +1427,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
 | X-599 | Bouton mort (signalé par l'utilisateur le 18/11, capture) : dans la fiche… | Fait en 0.1567 |
 | X-600 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1573 |
+| X-602 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1608.0 |
+| X-603 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1609.0 |
 | X-608 | Règle R03.1 changée le 18/11 (choix de l'utilisateur, journal des règles) : en… | Fait en 0.1575 |
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
 | X-610 | Bug vu par l'utilisateur le 19/11 vers 23 h 15 (capture de la fiche d'objet… | Fait en 0.1568 |
@@ -1471,3 +1484,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-660 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), I1 : Les… | Fait en 0.1603.0 |
 | X-661 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), mineurs M1, M2… | Fait en 0.1605.0 |
 | X-662 | Relecture du bloc 0.1603 à 0.1605 (relecture 0.1605, 20/11), mineurs M1, M2, M3… | Fait en 0.1606.0 |
+| X-663 | Relecture  (relecture 0.1606, 20/11), déjà là avant le bloc M1 : M1 : X-662 M3… | Fait en 0.1607.0 |
