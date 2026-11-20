@@ -2363,6 +2363,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1643) Fenêtre de chat : dans ses réglages, mots d'alerte, ajouter un mot ; afficher un autre onglet ; quand un message avec ce mot arrive dans l'onglet non affiché, cet onglet clignote (et porte « ! ») ; l'afficher : il cesse ; éteindre « Onglet qui clignote sur une alerte » : plus de clignotement, le « ! » reste.
 
+- [ ] (0.1644) Fenêtre de chat, avec un historique déjà gardé d'une séance d'avant : désactiver « Garder l'historique du chat sur ce PC », épingler un message, puis réactiver le réglage (les anciens messages reviennent avant ceux de la séance) : un clic sur l'épingle va toujours au message ; son menu propose « Désépingler », pas « Épingler » une deuxième fois.
+
+- [ ] (0.1646) Fenêtre de chat : dans ses réglages, « Votre prénom en alerte » activé ; demander à quelqu'un (ou un second compte) de dire votre prénom en /dire : la ligne ressort et l'onglet non affiché porte « ! » ; une ligne de butin qui vous nomme ne le fait pas.
+
+- [ ] (0.1646) Fenêtre de chat : « Son des alertes » réglé sur un son (bouton « Écouter » pour l'entendre) : un message avec un mot d'alerte ou votre prénom joue ce son ; dans les couleurs des canaux, choisir un son pour Groupe : un message de groupe d'un autre joueur le joue, le vôtre non ; deux messages rapprochés ne jouent qu'un son.
+
+- [ ] (0.1647) Fenêtre de chat : activer « Alertes dans la barre du serveur » ; quand un message avec un mot d'alerte ou votre prénom arrive dans un onglet non affiché, la barre du serveur montre « ! Chat 1 » ; un clic dessus affiche cet onglet et le compte revient à rien quand il est vu.
+
+- [ ] (0.1648) Fenêtre de chat, réglages d'apparence : changer l'opacité et une couleur de canal, « Copier l'apparence », remettre d'autres valeurs, puis « Coller une apparence » : la fenêtre reprend l'opacité et la couleur copiées, ses onglets et mots d'alerte restent ; avec un autre texte dans le presse-papiers, « Coller une apparence » dit qu'il n'y a pas de code et rien ne change.
+
+- [ ] (0.1649) Fenêtre de chat, réglages d'apparence : « Apparences toutes faites », choisir « Transparente » : plus de fond ni de cadre, lettres avec contour ; puis « Compacte » : texte plus petit et serré ; puis « Par défaut » : l'apparence d'origine ; les onglets et mots d'alerte restent à chaque fois.
+
+- [ ] (0.1650) Fenêtre de chat ouverte : recharger le plugin (ou relancer le jeu) ; « Chargement… » dure moins longtemps qu'avant, et le jeu ne saccade pas plus pendant ces secondes.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

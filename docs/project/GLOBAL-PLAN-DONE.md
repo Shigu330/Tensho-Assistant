@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (681 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (683 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -749,12 +749,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-669 | Review of block 0.1619 to 0.1627 (review 0.1627, 20/11), minor M1, M2, M3: M1… | Done in 0.1629.0 |
 | X-670 | Review of block 0.1628 to 0.1638 (review 0.1638, 20/11), minor M1, M2, M3: M1… | Done in 0.1640.0 |
 | X-671 | A managed test fails now and then under the load of Verify.ps1 -Release (0.1638… | Done in 0.1639.0 |
+| X-672 | Flaky CI test: « After error 1551: A14, gil journal … written after a character… | Done in 0.1645.0 |
+| X-673 | Review of block 0.1639 to 0.1643 (review 0.1643, 20/11), minor M1, M2, M3: M1… | Done in 0.1644.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (681 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (683 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1501,3 +1503,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-669 | Relecture du bloc 0.1619 à 0.1627 (relecture 0.1627, 20/11), mineurs M1, M2, M3… | Fait en 0.1629.0 |
 | X-670 | Relecture du bloc 0.1628 à 0.1638 (relecture 0.1638, 20/11), mineurs M1, M2, M3… | Fait en 0.1640.0 |
 | X-671 | Un test géré échoue de temps en temps sous la charge de Verify.ps1 -Release… | Fait en 0.1639.0 |
+| X-672 | Test fragile en CI : « After error 1551: A14, a gil journal whose write failed…… | Fait en 0.1645.0 |
+| X-673 | Relecture du bloc 0.1639 à 0.1643 (relecture 0.1643, 20/11), mineurs M1, M2, M3… | Fait en 0.1644.0 |
