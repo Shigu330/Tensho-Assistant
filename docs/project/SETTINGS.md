@@ -51,6 +51,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.Borderless` | bool | false | Settings › Panels › ChatWindow | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.BothChats` | bool | false | Settings › Panels › ChatWindow | **Show both chats** — Shows the game's messages again and puts this window back where it was, to compare both chats; the button with two windows at the end of the tabs switches too. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels › ChatWindow | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
+| `Chat.FadeAfter` | int | 0 | Settings › Panels › ChatWindow | **Fade out after (seconds without message)** — The whole window fades out when no new message came in the tab shown for that long, and the clicks then go through to the game; the mouse on it, an open menu of the chat or a new message brings it back. 0: never. Default: 0 s. |
 | `Chat.FontScale` | int | 100 | Settings › Panels › ChatWindow | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
 | `Chat.GameLinks` | bool | true | Settings › Panels › ChatWindow | **Links as in the game** — Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour. Default: on. |
 | `Chat.GameTabs` | bool | true | Settings › Panels › ChatWindow | **Tabs as in the game** — Rounded grey tabs, the one shown marked by a dot, as the game's chat. Default: on. |
@@ -64,6 +65,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Settings › Panels › ChatHistory | **Days kept** — Messages older than this are removed, from 1 to 90 days. Default: 30. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Settings › Panels › ChatHistory | **Messages kept** — The last messages kept per character, from 100 to 10,000 (the combat lines and the others each); the oldest go first. Default: 2,000. |
 | `Chat.HourLeadingZero` | bool | false | Settings › Panels › ChatWindow | **Hour with a leading zero** — Writes the hour with two digits ([09:21]); otherwise as the game's chat writes it ([9:21]). Default: off. |
+| `Chat.LineSpacing` | int | 0 | Settings › Panels › ChatWindow | **Space between the lines** — Pixels added between the lines of the messages, to read them more easily. Default: 0 px. |
 | `Chat.Locked` | bool | false | Settings › Panels › ChatWindow | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MarginX` | int | 6 | Settings › Panels › ChatWindow | **Margins across** — Space between the window's sides and its text, from 0 to 24 pixels. Default: 6 px. |
 | `Chat.MarginY` | int | 4 | Settings › Panels › ChatWindow | **Margins down** — Space between the window's top and bottom and its text, from 0 to 24 pixels. Default: 4 px. |
@@ -373,7 +375,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 317 controls (300 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 319 controls (302 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -430,6 +432,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.BothChats` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les deux chats** — Affiche de nouveau les messages du jeu et remet cette fenêtre à sa place, pour comparer les deux chats ; le bouton aux deux fenêtres au bout des onglets bascule aussi. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
+| `Chat.FadeAfter` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **S'effacer après (secondes sans message)** — Toute la fenêtre s'efface quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, et les clics passent alors au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir. 0 : jamais. Par défaut : 0 s. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
 | `Chat.GameLinks` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Liens comme dans le jeu** — Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent. Par défaut : activé. |
 | `Chat.GameTabs` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Onglets comme dans le jeu** — Des onglets gris arrondis, celui qui est affiché marqué d'un point, comme dans le chat du jeu. Par défaut : activé. |
@@ -443,6 +446,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Paramètres › Panneaux à côté du jeu › Historique du chat | **Jours gardés** — Les messages plus anciens sont retirés, de 1 à 90 jours. Par défaut : 30. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Paramètres › Panneaux à côté du jeu › Historique du chat | **Messages gardés** — Les derniers messages gardés par personnage, de 100 à 10 000 (les lignes de combat et les autres, chacune) ; les plus anciens partent d'abord. Par défaut : 2 000. |
 | `Chat.HourLeadingZero` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Heure avec un zéro devant** — Écrit l'heure sur deux chiffres ([09:21]) ; sinon comme le chat du jeu l'écrit ([9:21]). Par défaut : désactivé. |
+| `Chat.LineSpacing` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Espace entre les lignes** — Pixels ajoutés entre les lignes des messages, pour les lire plus facilement. Par défaut : 0 px. |
 | `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MarginX` | int | 6 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Marges en largeur** — Espace entre les côtés de la fenêtre et son texte, de 0 à 24 pixels. Par défaut : 6 px. |
 | `Chat.MarginY` | int | 4 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Marges en hauteur** — Espace entre le haut et le bas de la fenêtre et son texte, de 0 à 24 pixels. Par défaut : 4 px. |
@@ -752,5 +756,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 317 cases (300 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 319 cases (302 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

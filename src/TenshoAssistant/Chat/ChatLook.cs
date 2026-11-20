@@ -53,6 +53,19 @@ public static class ChatLook
     public static float? Alpha(float? covered,int opacity,bool hovered)
         =>covered ?? (hovered || opacity>=100 ? null:Math.Clamp(opacity,20,100)/100f);
 
+    /// <summary>X-447 B1 (0.1622): how long the window takes to fade out once the delay is over (seconds).</summary>
+    public const double IdleFadeSeconds=1.5;
+
+    /// <summary>X-447 B1 (0.1622): the window's alpha after <paramref name="idle"/> seconds without a new message: as it is until the delay
+    /// (<paramref name="after"/> seconds; 0: never), then down to 0 in <see cref="IdleFadeSeconds"/>; as it is while <paramref name="kept"/>
+    /// (the mouse on it, a menu open).</summary>
+    public static float? Idle(float? alpha,int after,double idle,bool kept)
+    {
+        if(after<=0 || kept || double.IsNaN(idle) || idle<=after)return alpha;
+        var left=(float)Math.Clamp(1-(idle-after)/IdleFadeSeconds,0,1);
+        return (alpha ?? 1f)*left;
+    }
+
     /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;

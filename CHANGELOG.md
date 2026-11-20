@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1622.0
+- Plan global, X-447 : Fenêtre de chat, options choisies par l'utilisateur le 15/11 (X-447 B1 et B2). B1 : « S'effacer après (secondes sans message) » : quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, toute la fenêtre s'efface en 1,5 s et les clics passent au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir (0 : jamais, par défaut). B2 : « Espace entre les lignes » (0 à 12 pixels) et une taille du texte propre à un onglet (case « Taille à part » dans les réglages des onglets ; sinon celle de la fenêtre). X-447 reste ouvert pour les autres options cochées.
+- Pour les joueurs : fenêtre de chat : la fenêtre peut s'effacer après un moment sans message, les lignes peuvent s'espacer, et un onglet peut avoir sa propre taille de texte.
+- Tests : ChatIdle1622Tests. Verify.ps1 (agent) : 3367/3367, 0 avertissement, 0 erreur ; DLL 0.1622.0.0. Non validé en jeu.
+### English
+- Chat window, options chosen by the user on 15/11 (X-447 B1 and B2). B1: « Fade out after (seconds without message) »: when no new message came in the tab shown for that long, the whole window fades out in 1.5 s and the clicks go through to the game; the mouse on it, an open menu of the chat or a new message brings it back (0: never, the default). B2: « Space between the lines » (0 to 12 pixels) and a text size of a tab's own (box « Own size » in the tabs' settings; else the window's). X-447 stays open for the other options chosen.
+- For players: Chat window: the window can fade out after a while without message, the lines can be spaced, and a tab can have its own text size.
+
 ## 0.1621.0
 - Plan global, X-447 : Fenêtre de chat, options choisies par l'utilisateur le 15/11 (X-447 B4 et B5). B4 : un nom court choisi par canal (8 lettres au plus), écrit entre crochets avant ses messages au lieu de celui du jeu ; la case vide garde celui du jeu (réglages du chat, à côté de la couleur du canal). B5 : « Noms des joueurs entre crochets » ([Nom] : texte, murmures compris ; un personnage de l'histoire garde son nom tel quel) et « Une couleur pour le nom de chaque joueur », tirée du nom lui-même (le même nom a toujours la même couleur, claire sur le fond sombre ; rien n'est gardé sur le joueur ; la couleur de classe de WoW n'est pas reprise, le jeu ne montre la classe que dans le groupe ou à portée, R04). Un joueur mis en avant garde la couleur d'avertissement. Coupés par défaut. X-447 reste ouvert pour les autres options cochées.
 - Pour les joueurs : fenêtre de chat : choisir un nom court pour chaque canal, écrire les noms des joueurs entre crochets et donner à chaque nom sa couleur.

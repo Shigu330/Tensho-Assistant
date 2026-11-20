@@ -53,10 +53,21 @@ internal sealed partial class MainWindow
         MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:ChatFade,
         Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce);
 
-    /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).</summary>
+    /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).
+    /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.</summary>
     private float? ChatFade()
-        =>ChatLook.Alpha(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,ChatOptions.BoundedTextOpacity,
-            chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y)));
+    {
+        var hovered=chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y));
+        if(chatShownNewest!=chatSeenNewest){chatSeenNewest=chatShownNewest;chatLastMessageAt=Environment.TickCount64;}
+        var alpha=ChatLook.Idle(ChatBaseFade(hovered),ChatOptions.BoundedFadeAfter,(Environment.TickCount64-chatLastMessageAt)/1000d,hovered || chatMenuOpen);
+        chatIdleOut=alpha is <= 0f;
+        return alpha;
+    }
+    private float? ChatBaseFade(bool hovered)
+        =>ChatLook.Alpha(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,ChatOptions.BoundedTextOpacity,hovered);
+    // X-447 B1 (0.1622): the newest message of the tab shown (its id; -1: none), the one seen last, when it came, and the window faded out.
+    private long chatShownNewest=-1,chatSeenNewest=-1,chatLastMessageAt=Environment.TickCount64;
+    private bool chatIdleOut;
 
     /// <summary>X-447 D5 (0.1618): the window's margins, corners and frame thickness from its settings.</summary>
     private PanelFrame ChatFrame()=>new(new Vector2(ChatOptions.BoundedMarginX,ChatOptions.BoundedMarginY),ChatOptions.BoundedRounding,ChatOptions.BoundedBorder);
@@ -113,6 +124,8 @@ internal sealed partial class MainWindow
         // X-467 (0.1504): over the game's messages, the game's chat decides its place and size (its own resize button, the HUD layout).
         |(chatFollowing ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
         |(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None)
+        // X-447 B1 (0.1622): faded out after the delay without message, the clicks go through to the game.
+        |(chatIdleOut ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None)
         // X-447 D1 (0.1620): locked, the clicks go through to the game except on the zones drawn the frame before.
         |(ChatLook.Through(ChatOptions.MouseThrough,ChatOptions.Locked,chatMenuOpen,(ImGui.GetMousePos().X,ImGui.GetMousePos().Y),chatZones) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);
 
@@ -284,6 +297,9 @@ internal sealed partial class MainWindow
             [(ChatCovered.Hide,localization.Get("ChatWindow.CoveredHide")),(ChatCovered.Fade,localization.Get("ChatWindow.CoveredFade")),(ChatCovered.Stay,localization.Get("ChatWindow.CoveredStay"))],
             ChatCovered.Hide,220);
         SliderSetting("ChatWindow.FontScale","ChatWindow.FontScaleTip",()=>configuration.Chat.BoundedFontScale,value=>configuration.Chat.FontScale=value,60,200,defaults.FontScale,"%d %%");
+        // X-447 B2 (0.1622): spacing between the lines; B1: the window fades out after a delay without message.
+        SliderSetting("ChatWindow.LineSpacing","ChatWindow.LineSpacingTip",()=>configuration.Chat.BoundedLineSpacing,value=>configuration.Chat.LineSpacing=value,0,12,defaults.LineSpacing,"%d px");
+        SliderSetting("ChatWindow.FadeAfter","ChatWindow.FadeAfterTip",()=>configuration.Chat.BoundedFadeAfter,value=>configuration.Chat.FadeAfter=value,0,600,defaults.FadeAfter,"%d s");
         IntSetting("ChatWindow.MaxLines","ChatWindow.MaxLinesTip",()=>configuration.Chat.BoundedMaxLines,value=>configuration.Chat.MaxLines=value,ChatStore.MinimumLines,ChatStore.MaximumLines,defaults.MaxLines);
     }
 
@@ -456,6 +472,19 @@ internal sealed partial class MainWindow
                 }
                 Tip("ChatWindow.TabColorTip");
                 if(DefaultButton("ChatTabColor",tab.NameColor is not null)){tab.NameColor=null;chatSettingsPending=true;}
+                // X-447 B2 (0.1622): the tab's own text size.
+                SameLineIfFits(boxed+ImGui.CalcTextSize(localization.Get("ChatWindow.TabFontOwn")).X);
+                var own=tab.FontScale is not null;
+                if(ImGui.Checkbox(localization.Get("ChatWindow.TabFontOwn")+"###ChatTabFontOwn",ref own)){tab.FontScale=own ? options.BoundedFontScale:null;chatSettingsPending=true;}
+                Tip("ChatWindow.TabFontOwnTip");
+                if(tab.FontScale is not null)
+                {
+                    SameLineIfFits(120*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+                    ImGui.SetNextItemWidth(120*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+                    var size=tab.ScaleIn(options);
+                    if(ImGui.SliderInt("###ChatTabFont",ref size,60,200,"%d %%")){tab.FontScale=size;chatSettingsPending=true;}
+                    Tip("ChatWindow.TabFontTip");
+                }
                 if(tabs.Count>1)
                 {
                     SameLineIfFits(ImGui.CalcTextSize(localization.Get("ChatWindow.TabRemove")).X+style.FramePadding.X*2);
@@ -868,6 +897,8 @@ internal sealed partial class MainWindow
         chatShownTab=tabs[shown];
         // X-504 M2 (review of 0.1486): the area named after the tab's view (its own number), not the tab's place.
         var view=ChatMessages.ViewOf(tabs[shown]);
+        // X-447 B1 (0.1622): the tab shown's newest message (another tab chosen counts as new).
+        chatShownNewest=view.Count>0 ? view.RecordAt(view.Count-1).Id:-1;
         DrawChatLines(view,options,height,view.Serial);
     }
 
@@ -990,7 +1021,9 @@ internal sealed partial class MainWindow
     {
         // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the
         // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
-        var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
+        // X-447 B2 (0.1622): the tab's own text size, else the window's; the spacing added between the lines.
+        var scale=chatShownTab?.ScaleIn(options) ?? options.BoundedFontScale;
+        var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*scale/100f+options.BoundedLineSpacing;
         chatHoveredRecord=null;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
         // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
@@ -1015,13 +1048,13 @@ internal sealed partial class MainWindow
         {
             if(!visible)return;
             if(view.Count==0){EmptyState("ChatWindow.Empty");view.MarkSeen();return;}
-            ImGui.SetWindowFontScale(options.BoundedFontScale/100f);
+            ImGui.SetWindowFontScale(scale/100f);
             var width=ImGui.GetContentRegionAvail().X;
-            // X-482 M1 (0.1472): laid out again once the lists naming the links are loaded.
-            var key=ChatFormat.LayoutKey(options,ChatFormat.NamesKey(itemCatalog.State.Catalog is not null,quests.State.ById is not null,maps.State.Catalog is not null));
+            // X-482 M1 (0.1472): laid out again once the lists naming the links are loaded. X-447 B2 (0.1622): and with the tab's own size.
+            var key=ChatFormat.LayoutKey(options,ChatFormat.NamesKey(itemCatalog.State.Catalog is not null,quests.State.ById is not null,maps.State.Catalog is not null))+"|"+scale;
             var relaid=!view.LaidOutFor(width,key);
             if(relaid)view.Relayout(width,key);
-            var height=ImGui.GetTextLineHeightWithSpacing();
+            var height=ImGui.GetTextLineHeightWithSpacing()+options.BoundedLineSpacing;
             // X-558 (0.1532): laid out within a time budget, the newest first, only the newest ahead (ChatLoading); scrolled back, a packet of
             // older lines above the view, the scroll moved by the rows they add so the view does not jump.
             var layoutStarted=System.Diagnostics.Stopwatch.GetTimestamp();

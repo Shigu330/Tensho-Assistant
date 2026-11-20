@@ -23,6 +23,9 @@ public sealed class ChatTabSettings
     /// <summary>X-455 E7 (0.1617): when the player cleared this tab: the messages before are no longer shown in it (the other tabs keep them);
     /// null: never cleared, or shown again.</summary>
     public DateTimeOffset? ClearedAt{get;set;}
+    /// <summary>X-447 B2 (0.1622): this tab's own text size (60 to 200 %); null: the window's.</summary>
+    public int? FontScale{get;set;}
+    public int ScaleIn(ChatSettings window)=>FontScale is { } own ? Math.Clamp(own,60,200):window.BoundedFontScale;
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
 }
 
@@ -74,6 +77,13 @@ public sealed class ChatSettings
     public int Border{get;set;}=1;
     /// <summary>X-447 D6 (0.1618): the window's opacity, text included, while the mouse is not on it (percent); full under the mouse.</summary>
     public int TextOpacity{get;set;}=100;
+    /// <summary>X-447 B1 (0.1622, Glass and Prat): seconds without a new message in the tab shown before the whole window fades out (0: never);
+    /// the mouse on it, a menu of the chat or a new message brings it back.</summary>
+    public int FadeAfter{get;set;}
+    public int BoundedFadeAfter=>Math.Clamp(FadeAfter,0,600);
+    /// <summary>X-447 B2 (0.1622, Prat, Chattynator): pixels added between the lines.</summary>
+    public int LineSpacing{get;set;}
+    public int BoundedLineSpacing=>Math.Clamp(LineSpacing,0,12);
     /// <summary>X-485 (0.1479): what the window does while a window of the game covers it: it hides (the default, as the panels), it fades
     /// (no background, text faint, clicks go through), or it stays.</summary>
     public ChatCovered WhenCovered{get;set;}=ChatCovered.Hide;
