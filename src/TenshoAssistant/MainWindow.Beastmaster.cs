@@ -275,7 +275,9 @@ internal sealed partial class MainWindow
     internal void BeastResultRead(BoardResult result)
     {
         var plans = LoadBeastPlans();
-        if (BeastResults.Same(plans.Result, result)) return;
+        // X-590 A06 (0.1610): the same board read again with fuller numbers (bonus, total) replaces the first reading; the same numbers, or fewer, change nothing.
+        if (BeastResults.Keep(plans.Result, result) is not { } kept) return;
+        result = kept;
         // X-549 (0.1522): the result's ranks are the beasts' own (not brought down to the board's limit): no longer floors.
         var floors = plans.Floors is { } before ? before.Where(beast => result.Beasts.All(gain => gain.Beast != beast)).ToHashSet() : null;
         beastPlans = plans with { Result = result, Ranks = BeastResults.Merge(plans.Ranks, result), Floors = floors };

@@ -259,7 +259,11 @@ internal sealed class MapLiveReader : IDisposable
     private readonly HashSet<string> failedReads=[];
     private void Failed(string part,Exception error)
     {
-        if(failedReads.Add(part)){log.Warning(error,"Map {0} unavailable; the last copy is kept, position and flag still update.",part);Volatile.Write(ref failedParts,failedReads.ToArray());}
+        if(!failedReads.Add(part))return;
+        // X-590 A05 (0.1610): a structure changed by a game update said so, in one line (no stack: nothing failed in Tensho's code).
+        if(error is TenshoAssistant.Diagnostics.UnexpectedGameStructureException)log.Warning("Map {0} unavailable after a game update ({1}); the last copy is kept, position and flag still update.",part,error.Message);
+        else log.Warning(error,"Map {0} unavailable; the last copy is kept, position and flag still update.",part);
+        Volatile.Write(ref failedParts,failedReads.ToArray());
     }
     // 0.569 (P15): a part that reads again is no longer said to be down.
     private void Read(string part)
@@ -531,8 +535,10 @@ internal sealed class MapLiveReader : IDisposable
         if(agent==null)return [];
         // 0.328 (R-14): after a game update First/Last can be garbage and an access violation is not catchable: the vector
         // length is checked first, and every visited entry counts (skipped ones too), not only the kept ones.
+        // X-590 A05 (0.1610): a length out of bounds is a changed structure, not an empty zone: the caller keeps the last copy and says
+        // « events » unavailable after a game update (Failed, logged once).
         var count=agent->EventMarkers.LongCount;
-        if(count is <0 or >1024)return [];
+        TenshoAssistant.Diagnostics.NativeShape.Count(count,1024,"the map window's event markers");
         var result=new List<MapEventMarker>();var visited=0;
         foreach(var marker in agent->EventMarkers)
         {
@@ -591,8 +597,9 @@ internal sealed class MapLiveReader : IDisposable
     {
         var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
         if(map==null)return [];
+        // X-590 A05 (0.1610): an empty list is a count of 0; a count out of bounds a changed structure (thrown, see ReadEvents).
         var count=map->UnacceptedQuestMarkers.LongCount;
-        if(count is <=0 or >1024)return [];
+        if(TenshoAssistant.Diagnostics.NativeShape.Count(count,1024,"the game's markers of quests not accepted")==0)return [];
         var result=new List<MapEventMarker>();var visited=0;
         foreach(var entry in map->UnacceptedQuestMarkers)
         {

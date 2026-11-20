@@ -96,6 +96,29 @@ public static class BeastResults
     public static bool Same(BoardResult? left, BoardResult? right)
         => left is not null && right is not null && left.Score == right.Score && left.Beasts.SequenceEqual(right.Beasts);
 
+    /// <summary>
+    /// X-590 A06 (0.1610, external audit of 18/11): the result to keep when the window is read: a new board's result; the same board read again
+    /// with numbers the page shows that differ (bonus, total, the score's lines, the bonuses' points), when it knows at least as many of them
+    /// (the window filled after a first reading), at the first reading's time; null when nothing changes (the same numbers, or a reading that
+    /// knows fewer of them: the fuller one stays).
+    /// </summary>
+    public static BoardResult? Keep(BoardResult? kept, BoardResult read)
+    {
+        if (kept is null || !Same(kept, read)) return read;
+        if (Shown(kept, read) || Known(read) < Known(kept)) return null;
+        return read with { At = kept.At };
+    }
+
+    /// <summary>X-590 A06: the numbers the page shows beside the score and the beasts are the same.</summary>
+    private static bool Shown(BoardResult left, BoardResult right)
+        => left.Bonus == right.Bonus && left.Bonuses == right.Bonuses && left.Total == right.Total && left.Parts == right.Parts
+           && (left.BonusPoints ?? []).SequenceEqual(right.BonusPoints ?? []) && left.BonusPoints is null == right.BonusPoints is null;
+
+    /// <summary>X-590 A06: how many of those numbers are known (read), an unknown one being null.</summary>
+    private static int Known(BoardResult result)
+        => (result.Bonus is null ? 0 : 1) + (result.Bonuses is null ? 0 : 1) + (result.Total is null ? 0 : 1) + (result.Parts is null ? 0 : 1)
+           + (result.Parts?.HpLeft is null ? 0 : 1) + (result.BonusPoints is null ? 0 : 1);
+
     /// <summary>The known ranks with the result's « after » ranks over them.</summary>
     public static Dictionary<uint, int> Merge(IReadOnlyDictionary<uint, int>? known, BoardResult result)
     {

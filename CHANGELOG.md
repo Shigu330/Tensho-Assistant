@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1610.0
+- Plan global, X-590 : Audit externe du 18/11, lectures natives (R08). A05 : un nombre de marqueurs de la carte hors borne (après une mise à jour du jeu) n'est plus lu comme une zone vide : NativeShape.Count lève UnexpectedGameStructureException, la carte garde sa dernière copie des événements et dit « événements » indisponible, peut-être après une mise à jour du jeu, journalisé une fois ; de même pour les quêtes non acceptées du jeu (0 reste une liste vide). A06 : le résultat du Dédale bestial relu avec des chiffres plus complets (bonus, total, lignes du score, points des bonus) remplace la première lecture, à son heure (BeastResults.Keep) ; une lecture plus pauvre ne remplace jamais une plus complète. X-590.
+- Pour les joueurs : carte : après une mise à jour du jeu, des marqueurs illisibles sont signalés au lieu d'une zone vide. Dédale bestial : le bonus et le total du résultat sont gardés quand la fenêtre se remplit après coup.
+- Tests : NativeReads1610Tests. Verify.ps1 (agent) : 3318/3318, 0 avertissement, 0 erreur ; DLL 0.1610.0.0. Non validé en jeu.
+### English
+- External audit of 18/11, native reads (R08). A05: a map marker count out of bounds (after a game update) is no longer read as an empty zone: NativeShape.Count throws UnexpectedGameStructureException, the map keeps its last copy of the events and says « events » unavailable, maybe after a game update, logged once; the same for the game's quests not accepted (0 stays an empty list). A06: the Beastmaster board result read again with fuller numbers (bonus, total, the score's lines, the bonuses' points) replaces the first reading, at its time (BeastResults.Keep); a poorer reading never replaces a fuller one. X-590.
+- For players: Map: after a game update, unreadable markers are reported instead of showing an empty zone. Beastmaster: the result's bonus and total are kept when the window fills in afterwards.
+
 ## 0.1609.0
 - Plan global, X-603 : Demande de l'utilisateur du 18/11 (D-186) : la page Jardin donne aux croisements leur propre onglet (Jardin, Croisements, Alarmes, gabarit commun DetailTabs) au lieu d'un bloc repliable sous le journal. L'onglet reprend tout le planificateur (graine, « donne » ou « utilise », paires et plan de plantation, source, paires non reconnues) ; les prévisions de croisement sur les carrés restent dans l'onglet Jardin. X-603.
 - Pour les joueurs : jardin : les croisements ont leur propre onglet.
