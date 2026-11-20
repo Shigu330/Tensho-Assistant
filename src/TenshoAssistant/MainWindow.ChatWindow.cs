@@ -360,12 +360,15 @@ internal sealed partial class MainWindow
                 ImGui.SetNextItemWidth(180);
                 if(ImGui.InputText(localization.Get("ChatWindow.TabName")+"###ChatTabName",ref name,ChatSettings.MaximumTabName)){tab.Name=name;chatSettingsPending=true;}
                 Tip("ChatWindow.TabNameTip");
-                ImGui.SameLine();
+                // X-565 (0.1565): each control of the tab's line goes to the next line when the width left does not hold it (narrow window).
+                var style=ImGui.GetStyle();
+                var boxed=ImGui.GetFrameHeight()+style.ItemInnerSpacing.X;
+                SameLineIfFits(boxed+ImGui.CalcTextSize(localization.Get("ChatWindow.TabUnread")).X);
                 var unread=tab.ShowUnread;
                 if(ImGui.Checkbox(localization.Get("ChatWindow.TabUnread")+"###ChatTabUnread",ref unread)){tab.ShowUnread=unread;chatSettingsPending=true;}
                 Tip("ChatWindow.TabUnreadTip");
                 // X-478 (the user's request of 15/11): the colour of the tab's name; « ↺ » brings back the theme's text colour.
-                ImGui.SameLine();
+                SameLineIfFits(boxed+ImGui.CalcTextSize(localization.Get("ChatWindow.TabColor")).X+(tab.NameColor is null ? 0:ImGui.GetFrameHeight()+style.ItemSpacing.X));
                 var named=tab.NameColor is { } chosen ? ChatColor(chosen):ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
                 var nameRgb=new Vector3(named.X,named.Y,named.Z);
                 if(ImGui.ColorEdit3(localization.Get("ChatWindow.TabColor")+"###ChatTabColor",ref nameRgb,ImGuiColorEditFlags.NoInputs))
@@ -377,7 +380,7 @@ internal sealed partial class MainWindow
                 if(DefaultButton("ChatTabColor",tab.NameColor is not null)){tab.NameColor=null;chatSettingsPending=true;}
                 if(tabs.Count>1)
                 {
-                    ImGui.SameLine();
+                    SameLineIfFits(ImGui.CalcTextSize(localization.Get("ChatWindow.TabRemove")).X+style.FramePadding.X*2);
                     if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"))){ChatMessages.Restart(tab);tabs.RemoveAt(index);chatSettingsPending=true;return;}
                     Tip("ChatWindow.TabRemoveTip");
                 }
@@ -397,6 +400,13 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("ChatWindow.TabAdd"))){AddChatTab(tabs);chatSettingsPending=true;}
             Tip("ChatWindow.TabAddTip");
         }
+    }
+
+    /// <summary>X-565 (0.1565): the next control on the same line when the width left holds it, else on the next line.</summary>
+    private static void SameLineIfFits(float width)
+    {
+        ImGui.SameLine();
+        if(!Chat.ChatFormat.FitsOnLine(ImGui.GetContentRegionAvail().X,width))ImGui.NewLine();
     }
 
     private void ChatTabChanged(ChatTabSettings tab){ChatMessages.Restart(tab);chatSettingsPending=true;}

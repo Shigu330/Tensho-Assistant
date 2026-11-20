@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1565.0
+- Plan global, X-560, X-565 : Réglages du chat, onglets : en fenêtre étroite, chaque contrôle de la ligne d'un onglet (messages non lus, couleur du nom, retirer) passe à la ligne quand la largeur restante ne le tient pas, au lieu de sortir de la colonne et d'être coupé. Les grilles de cases du panneau (X-560, faites en 0.1528) ont maintenant leur test : colonnes selon la largeur, numéro de chaque linkshell gardé dans son nom.
+- Pour les joueurs : réglages du chat : la ligne de chaque onglet ne sort plus d'une fenêtre étroite.
+- Tests : ChatSettingsFit1565Tests. Verify.ps1 (agent) : 3181/3181, 0 avertissement, 0 erreur ; DLL 0.1565.0.0. Non validé en jeu.
+### English
+- Chat settings, tabs: in a narrow window, each control of a tab's line (unread messages, name colour, remove) goes to the next line when the width left does not hold it, instead of going out of the column and being cut. The panel's grids of boxes (X-560, done in 0.1528) now have their test: columns from the width, each linkshell's number kept in its name.
+- For players: Chat settings: the line of each tab no longer goes out of a narrow window.
+
 ## 0.1564.0
 - Plan global, X-624 : Relecture de 0.1562, constats mineurs : M2, deux clients du jeu sur un même profil : le second, qui trouve les lignes mises de côté déjà réglées par le premier, reçoit quand même dans sa mémoire la copie relue sur le gist (sans réécrire la base) quand le premier l'a gardée ; avant, son envoi suivant remplaçait le gist sans ce fait ; M3, une copie relue pendant l'écriture d'une sauvegarde qui échoue ensuite n'est plus ajoutée une deuxième fois par la sauvegarde suivante (la base d'avant reprend la copie que le fichier a reçue) ; M1 fait en 0.1563 ; M4 (lecture de gist.githubusercontent.com sous le consentement « Connecter GitHub ») laissé à la décision D-190.
 - Pour les joueurs : découvertes : avec deux clients du jeu sur un même PC, vos découvertes mises de côté ne disparaissent plus de votre copie GitHub, ni ne sont comptées deux fois après une sauvegarde échouée.

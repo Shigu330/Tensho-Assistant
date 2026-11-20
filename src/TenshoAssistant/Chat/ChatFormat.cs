@@ -14,6 +14,10 @@ public readonly record struct ChatRun(string Text,ChatRole Role,ChatLink? Link=n
 /// <summary>X-403 phase 1 (D-166; back from 0.471): how one message reads, and its lines for a given width. Pure: the width of a text is given by the caller.</summary>
 public static class ChatFormat
 {
+    /// <summary>X-565 (0.1565): whether the next control, this wide, still fits on the current line (the width left on it); a width left not
+    /// known (NaN, infinite) counts as not fitting, so the control goes to the next line rather than past the edge.</summary>
+    public static bool FitsOnLine(float left,float needed)=>float.IsFinite(left) && float.IsFinite(needed) && needed<=left;
+
     /// <summary>X-560 (0.1528, the user's report of 17/11: « chat settings still not framed »): how many columns of boxes the width holds, each
     /// as wide as the widest box (its name never cut): at least one, at most one per box; a width not known (0, NaN) gives one.</summary>
     public static int GridColumns(float available,float cell,int count)
