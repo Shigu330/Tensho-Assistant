@@ -190,6 +190,7 @@
     "TeamRank": "rang {0}",
     "BookNumber": "N° {0} {1}",
     "RankLow": "rang bas pour ce plateau (recommandé : {0} à {1})",
+    "ActionEffect": "inflige : {0}",
     "RankLowUnsure": "rang bas pour ce plateau (recommandé : {0} à {1}, à confirmer en jeu)",
     "TeamFight": "Combat {0}",
     "TeamHit": "faiblesse touchée : {0} sur {1} ennemis",

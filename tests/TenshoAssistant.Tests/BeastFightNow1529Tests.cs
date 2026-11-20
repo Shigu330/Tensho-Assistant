@@ -55,7 +55,7 @@ internal static class BeastFightNow1529Tests
         {
             var catalog = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastCatalog.cs"));
             Check(catalog.Contains("Array.AsReadOnly(enemies.GetValueOrDefault(battle.UInt(0)) ?? []), battle.UInt(0))"), "a fight keeps its XBMBattleDetail row");
-            Check(catalog.Contains("targets.GetValueOrDefault(row.UInt(1), \"\"), Auto(row.UInt(0))))"), "an action's damage from its Action row");
+            Check(catalog.Contains("targets.GetValueOrDefault(row.UInt(1), \"\"), Auto(row.UInt(0)), Effect(row.UInt(3))))") /* 0.1559: the effect after the damage */, "an action's damage from its Action row");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("var entries = stage->Entries;") && reader.Contains("entries[index].BattleDetailId") && reader.Contains("Beastmaster board window entries:"), "the reader reads the window's fights, said in the log");
             Check(!reader.Contains("GetSelectedEntryIndex"), "no function of the game called");

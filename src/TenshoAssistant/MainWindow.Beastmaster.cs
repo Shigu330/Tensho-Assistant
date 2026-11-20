@@ -515,7 +515,7 @@ internal sealed partial class MainWindow
             {
                 if (enemy.Stars is { } stars) ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality));
                 foreach (var action in enemy.Actions)
-                    ImGui.TextDisabled(string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
+                    ImGui.TextDisabled(BeastActionText(action));
             }
             finally { ImGui.Unindent(); }
         }
@@ -553,6 +553,10 @@ internal sealed partial class MainWindow
         return hits.Length > 0 ? localization.Format("BeastUi.FightReasonHits", place + 1, name, beast!.AutoAttack, string.Join(", ", hits))
             : localization.Format("BeastUi.FightReasonNone", place + 1, name);
     }
+
+    /// <summary>X-486 (0.1559): an enemy's action as one line: name, type of damage, shape, target, then the effect it inflicts.</summary>
+    private string BeastActionText(BoardAction action)
+        => string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target, action.Effect.Length > 0 ? localization.Format("BeastUi.ActionEffect", action.Effect) : "" }.Where(part => part.Length > 0));
 
     /// <summary>X-575 part 4 (0.1544): the three of a fight in calling order, the best first (BeastTeams.Best orders them).</summary>
     private void DrawBeastCallOrder(BoardBattle fight, IReadOnlyList<uint> trio, BeastCatalog catalog)
@@ -703,7 +707,7 @@ internal sealed partial class MainWindow
                     // X-109 (0.980): the game's stars of the enemy (same order as its board window).
                     if (enemy.Stars is { } stars) { ImGui.SameLine(); ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality)); }
                     foreach (var action in enemy.Actions)
-                        ImGui.TextDisabled("    " + string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target }.Where(part => part.Length > 0)));
+                        ImGui.TextDisabled("    " + BeastActionText(action));
                 }
             }
         }

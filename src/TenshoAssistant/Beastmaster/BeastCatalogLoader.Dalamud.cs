@@ -80,7 +80,9 @@ internal sealed class BeastCatalogLoader : IDisposable
                 _ => "",
             },
             // X-553 (0.1523): a magical automatic attack's element.
-            aspect: id => actions.TryGetRow(id, out var action) ? action.Aspect : 0);
+            aspect: id => actions.TryGetRow(id, out var action) ? action.Aspect : 0,
+            // X-486 (0.1559): the status an enemy's action inflicts, in the client's language.
+            statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "");
     }
 
     private unsafe void OnUpdate(IFramework _)
