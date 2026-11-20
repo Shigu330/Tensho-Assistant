@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1592.0
+- Plan global, X-394 : Suite de 0.1591 (X-394) : l'image « SortPreview-trial » était demandée à 1400 px de haut ; la fenêtre, ramenée à la taille de l'écran (1061 px), décalait le découpage des cadres des sacs (en-têtes « Sac » et premières lignes coupés). L'image est prise à 860 px comme les autres ; SortTrial1591Tests vérifie qu'aucune image ne dépasse 860 px.
+- Tests : SortTrial1591Tests. Verify.ps1 (agent) : 3260/3260, 0 avertissement, 0 erreur ; DLL 0.1592.0.0. Rien à essayer en jeu.
+### English
+- Follow-up of 0.1591 (X-394): the « SortPreview-trial » picture was asked 1400 px tall; the window, cut to the screen's size (1061 px), shifted the clipping of the bags' frames (the « Bag » headers and first rows cut). The picture is taken at 860 px like the others; SortTrial1591Tests checks that no picture is taller than 860 px.
+
 ## 0.1591.0
 - Plan global, X-394 : Relecture 0.1350 à 0.1361, constat important 1 (R37) : l'image de référence de l'aperçu du rangement ne montrait que « Connectez un personnage… ». Nouvelle image « SortPreview-trial » de l'application de bureau : un inventaire d'exemple (un personnage, quatre sacs lus en entier, 30 piles de fragments, cristaux et agrégats) donné à la page par le contrat typé du bureau (DesktopSurface.SortTrial, jamais en jeu), en mode développeur : les cadres dans l'ordre du remplissage (Sac 1, 3, 2, 4) et la ligne « Tri visuel appliqué aux quatre sacs… » une seule fois ; l'exemple et le mode développeur sont repris après l'image. Nouveau test SortTrial1591Tests ; DesktopSurface1238Tests compte la nouvelle entrée du contrat.
 - Tests : SortTrial1591Tests. Verify.ps1 (agent) : 3260/3260, 0 avertissement, 0 erreur ; DLL 0.1591.0.0. Rien à essayer en jeu.

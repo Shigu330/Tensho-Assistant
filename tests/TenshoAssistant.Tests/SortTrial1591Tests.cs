@@ -27,6 +27,8 @@ internal static class SortTrial1591Tests
         {
             var plan=ReferencePlan.Plan(DesktopPages.AsIs.Concat(DesktopPages.NeedsLink));
             Check(plan.Count(shot=>shot.Id=="SortPreview-trial" && shot.Page=="SortPreview" && shot.Setup=="sort-trial")==1,"planned once");
+            // 0.1592: never taller than the other pictures (a window cut to the screen shifts the frames' clipping).
+            Check(plan.All(shot=>shot.Height<=860),"no picture taller than 860 px");
             var settings=plan.ToList().FindIndex(shot=>ReferencePlan.SettingsSetup(shot.Setup) is not null);
             Check(settings<0 || plan.ToList().FindIndex(shot=>shot.Id=="SortPreview-trial")<settings,"before the Settings tabs (they come last)");
             var references=Read("src/TenshoAssistant.Desktop/References.cs");
