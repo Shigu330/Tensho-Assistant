@@ -35,8 +35,9 @@ internal static class ChatHistoryReview1586Tests
         ("Chat history review 1586: M2, unticking « No limit » while the history is kept asks first",() =>
         {
             var ui=Text("src/TenshoAssistant/MainWindow.ChatWindow.cs");
-            Check(ui.Contains("if(!value && configuration.Chat.KeepHistory)chatHistoryLimitAsk=1;else configuration.Chat.HistoryMessagesUnlimited=value;"),"messages");
-            Check(ui.Contains("if(!value && configuration.Chat.KeepHistory)chatHistoryLimitAsk=2;else configuration.Chat.HistoryDaysUnlimited=value;"),"days");
+            // X-643 (0.1587): the decision moved to ChatHistoryLimitGuard, tested as behaviour in ChatHistoryLimitGuard1587Tests.
+            Check(ui.Contains("ChatHistoryLimitGuard.Change(configuration.Chat,ChatHistoryBound.Messages,value) is var ask and not ChatHistoryBound.None)chatHistoryLimitAsk=ask;"),"messages");
+            Check(ui.Contains("ChatHistoryLimitGuard.Change(configuration.Chat,ChatHistoryBound.Days,value) is var ask and not ChatHistoryBound.None)chatHistoryLimitAsk=ask;"),"days");
             Check(ui.Contains("DrawChatHistoryLimitAsk();") && ui.Contains("###ChatHistoryLimitYes"),"the question is drawn, with its answer");
         }),
         ("Chat history review 1586: M3, the log line carries the call stack, the character's number scrubbed",() =>
