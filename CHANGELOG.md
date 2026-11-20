@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1570.0
+- Plan global, X-627 : Test de la sortie UTF-8 de l'outil des découvertes partagées (MergeUtf81569Tests) : le second cas lançait l'aide de l'outil, sans « → », avec PYTHONIOENCODING ignoré sous `python -I` ; il ne pouvait pas échouer sur le code d'avant la correction. Il lance maintenant l'outil derrière une sortie cp1252 sur un rapport hors ligne qui contient « → », et vérifie que la même exécution sur une copie de l'outil sans la correction s'arrête sur une UnicodeEncodeError.
+- Tests : MergeUtf81569Tests. Verify.ps1 (agent) : 3194/3194, 0 avertissement, 0 erreur ; DLL 0.1570.0.0. Rien à essayer en jeu.
+### English
+- Test of the shared discoveries tool's UTF-8 output (MergeUtf81569Tests): the second case ran the tool's help, which holds no « → », with PYTHONIOENCODING ignored under `python -I`; it could not fail on the code from before the fix. It now runs the tool behind a cp1252 output on an offline report that holds « → », and checks that the same run on a copy of the tool without the fix stops on a UnicodeEncodeError.
+
 ## 0.1569.0
 - Plan global, X-625 : Outil des découvertes partagées (tools/discoveries-merge.py) : sa sortie passe en UTF-8 avant tout affichage ; lancé avec `python -I` seul sous Windows (console cp1252), `sync --dry-run` s'arrêtait sur la flèche « → » du rapport des faits à revérifier.
 - Tests : MergeUtf81569Tests. Verify.ps1 (agent) : 3194/3194, 0 avertissement, 0 erreur ; DLL 0.1569.0.0. Rien à essayer en jeu.
