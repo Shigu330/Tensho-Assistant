@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1595.0
+- Plan global, X-651 : Test du tri de l'inventaire d'exemple : le cas de l'ordre de remplissage vérifie de nouveau l'ordre entre les sacs (première pile triée en case 1 du sac 1, 36e en case 1 du sac 3, 71e en case 1 du sac 2, comparées à l'ordre trié de l'aperçu ; les piles du résultat suivent les cases, pas l'ordre de tri), pas seulement le compte des piles par sac (X-651, relecture 0.1594 M1).
+- Tests : SortTrial1593Tests. Verify.ps1 (agent) : 3265/3265, 0 avertissement, 0 erreur ; DLL 0.1595.0.0. Rien à essayer en jeu.
+### English
+- Test of the sample inventory sort: the fill-order case checks the order between the bags again (first sorted stack in bag 1's first slot, 36th in bag 3's first slot, 71st in bag 2's first slot), not only the stack count per bag (X-651, review 0.1594 M1).
+
 ## 0.1594.0
 - Plan global, X-649 : Inventaire d'exemple du tri (application de bureau) : la recherche de case libre est bornée aux 35 cases d'un sac et échoue avec un message clair au-delà, au lieu de tourner sans fin (X-649, R07). Le test de l'ordre de remplissage trie vraiment l'exemple par InventorySortRules.Build et compte les piles placées dans chaque sac (X-648).
 - Tests : SortTrial1594Tests. Verify.ps1 (agent) : 3265/3265, 0 avertissement, 0 erreur ; DLL 0.1594.0.0. Rien à essayer en jeu.

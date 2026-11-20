@@ -25,6 +25,14 @@ internal static class SortTrial1593Tests
             Check(per[1]==count-2*scope.SlotsPerContainer && per[3]==0,"bag 2 holds the rest, bag 4 empty: "+string.Join(",",per));
             Check(Enumerable.Range(scope.SlotsPerContainer,per[1]).All(slot=>sorted.Slots![slot] is not null),"bag 2 filled from its first slot");
             Check(sorted.Stacks.Count==count,"every stack placed once");
+            // X-651 (review of 0.1594, M1): the order between the bags, not only their counts. sorted.Stacks follows the slots (bag after
+            // bag); the sorted order itself is the preview's, so its 1st stack is in bag 1's first slot, its 36th in bag 3's (bag 3 before
+            // bag 2), its 71st in bag 2's.
+            var order=InventorySortPreview.Build(containers,scope.Capacity,InventorySortRules.Default(scope).Criteria,id=>("Item "+id.ToString("D4"),1u)).Stacks;
+            Check(order.Count==count,"the sorted order holds every stack");
+            Check(Equals(sorted.Slots![0],order[0]),"1st sorted stack in bag 1, slot 1");
+            Check(Equals(sorted.Slots![2*scope.SlotsPerContainer],order[scope.SlotsPerContainer]),"36th sorted stack in bag 3, slot 1");
+            Check(Equals(sorted.Slots![scope.SlotsPerContainer],order[2*scope.SlotsPerContainer]),"71st sorted stack in bag 2, slot 1");
         }),
         ("Sort trial 1593: wiring: the trial picture scrolled to the frames' foot, after the frames",() =>
         {
