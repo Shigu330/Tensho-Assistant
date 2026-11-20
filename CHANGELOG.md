@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1584.0
+- Plan global, X-552 : Dédale bestial, journal : depuis 0.1524, la ligne « Labyrinth reading » n'est écrite que quand son contenu change, mais le journal des 17 et 18/11 en compte encore 321 en deux soirées, dont un tiers dues au survol : les infobulles de détail du Dédale (XBMItemDetail, XBMPetActionDetail, XBMBattleMonsterDetail, XBMBattleDetailAction) qui s'ouvrent sous la souris. Elles ne font plus changer la ligne ; la liste du plateau (XBMStageDetailList), les écrans de chargement, le combat et la coupure la font toujours changer. Relu sur le journal du 18/11 : 321 lignes en auraient fait 192. Nouveau test LabyrinthHover1584Tests.
+- Tests : LabyrinthHover1584Tests. Verify.ps1 (agent) : 3237/3237, 0 avertissement, 0 erreur ; DLL 0.1584.0.0. Non validé en jeu.
+### English
+- Beastmaster labyrinth, log: since 0.1524 the « Labyrinth reading » line is written only when its content changes, but the log of 11/17 and 11/18 still counts 321 of them in two evenings, a third from hovering: the labyrinth's detail tips (XBMItemDetail, XBMPetActionDetail, XBMBattleMonsterDetail, XBMBattleDetailAction) that open under the mouse. They no longer change the line; the board's list (XBMStageDetailList), the loading screens, combat and the cut still do. Replayed on the log of 11/18: 321 lines would have been 192. New test LabyrinthHover1584Tests.
+
 ## 0.1583.0
 - Plan global, X-541 : Carte › Repères › Repères favoris, import de coordonnées collées (« Lieu ( x , y ) », listes de chasse) : le champ d'import est maintenant sur plusieurs lignes, si bien qu'un collage de plusieurs lignes garde ses retours à la ligne et donne un favori par ligne ; et le lieu est cherché sous le nom de zone du client puis sous ses noms dans les autres langues du jeu (feuille PlaceName en anglais, français, allemand et japonais, lue au premier import), si bien qu'une liste en anglais est reconnue sur un client français. L'info-bulle du champ le dit. Nouveau test PastedZones1583Tests (comportement : trois lignes dont une en anglais et une inconnue donnent deux favoris et un inconnu).
 - Pour les joueurs : repères de la carte : une liste de coordonnées collée donne un favori par ligne, et les noms de zone d'une autre langue du jeu sont reconnus.
