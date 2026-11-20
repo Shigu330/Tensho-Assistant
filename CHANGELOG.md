@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1578.0
+- Plan global, X-629 : Ménage après l'en-tête unique des pages à onglets (X-600, 0.1573) : quatre clés de langue sans usage retirées (CraftPresets.Back, CraftPresets.Title, CraftLiveUi.Title, GpUi.Title), en anglais et en français ; l'allemand et le japonais ne les avaient pas. Aucune source ni aucun test ne les demandait (recherche dans src, tests et tools). Nouveau test UnusedKeys1578Tests.
+- Tests : UnusedKeys1578Tests. Verify.ps1 (agent) : 3221/3221, 0 avertissement, 0 erreur ; DLL 0.1578.0.0. Rien à essayer en jeu.
+### English
+- Clean-up after the single header of the tabbed pages (X-600, 0.1573): four language keys without use removed (CraftPresets.Back, CraftPresets.Title, CraftLiveUi.Title, GpUi.Title), in English and in French; German and Japanese did not have them. No source nor test asked for them (search in src, tests and tools). New test UnusedKeys1578Tests.
+
 ## 0.1577.0
 - Plan global, X-630 : Test de refus d'un parser ou d'un minuteur de boss (DEC-055) élargi, constat M1 de la relecture de 0.1573 à 0.1575. Nouveau test DalamudRulesCombat1577Tests : le texte flottant des dégâts (IFlyTextGui, FlyText, AddonFlyText, FlyTextKind) est refusé partout ; la lecture de l'incantation d'un ennemi (IsCasting, CastActionId, CastActionType, CastTargetObjectId, IsCastInterruptible, CurrentCastTime, TotalCastTime, BaseCastTime, GetCastInfo) n'est permise qu'à son seul usage d'aujourd'hui, la découverte des monstres qui lancent un sort de mage bleu (fait pour les découvertes partagées, ni alerte ni minuteur), avec un cliquet sur son compte ; les sources de l'application de bureau sont fouillées aussi ; preuve que le refus trouve une alerte d'incantation, un minuteur d'incantation et un compteur tiré du texte flottant. Le code ne change pas.
 - Tests : DalamudRulesCombat1577Tests. Verify.ps1 (agent) : 3220/3220, 0 avertissement, 0 erreur ; DLL 0.1577.0.0. Rien à essayer en jeu.
