@@ -181,6 +181,8 @@ public static class ChatHistory
     /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
     /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
     /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.</summary>
+    /// <summary>X-518 M4: this many messages older than the days in a row end the reading from the end (the rest is older still).</summary>
+    public const int OldRunEnd=256;
     public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)=>Read(path,character,now,messages,days,MaximumReadBytes);
 
     /// <summary><see cref="Read(string,ulong,DateTimeOffset,int,int)"/> with the most of the end read (a test makes it small).</summary>
@@ -195,7 +197,7 @@ public static class ChatHistory
         var shown=Math.Min(limit,MaximumMessages);
         var oldest=Oldest(now,days);
         var newest=new List<ChatRecord>();
-        int lines=0,bad=0,combat=0,others=0;
+        int lines=0,bad=0,combat=0,others=0,oldRun=0;
         bool over=false,old=false,full=false;
         var walk=new BackwardLines(stream,body,budget);
         while(walk.Next() is { } line)
@@ -203,7 +205,10 @@ public static class ChatHistory
             if(line.Length==0)continue;
             lines++;
             if(Decode(line,0) is not { } record){bad++;continue;}
-            if(record.Time<oldest){old=true;continue;}
+            // X-518 M4 (review of 0.1494): the file is in time order, read from its end: the lines before a run of old ones are older too.
+            // A run, not the first one: a single line out of order (a clock set back) never hides the rest.
+            if(record.Time<oldest){old=true;if(++oldRun>=OldRunEnd)break;continue;}
+            oldRun=0;
             ref var count=ref record.Channel==ChatChannel.Combat ? ref combat:ref others;
             if(count>=shown){over=true;continue;}
             count++;
@@ -420,7 +425,13 @@ public static class ChatHistory
 
     /// <summary>X-515 M5: the line written to the log for a failure of the history: the message, the error's kind and its scrubbed message
     /// (never the error itself, whose message and stack name the file).</summary>
-    public static string Report(Exception error,string message)=>$"{message} ({error.GetType().Name}: {Scrub(error.Message)})";
+    /// X-518 M3 (review of 0.1494): the scrubbed call stack follows (a real bug, a NullReferenceException, says where it is); the stack holds
+    /// method and source names, never the character's number, scrubbed all the same.
+    public static string Report(Exception error,string message)
+        =>$"{message} ({error.GetType().Name}: {Scrub(error.Message)})"+(string.IsNullOrEmpty(error.StackTrace) ? "":"\n"+Scrub(error.StackTrace));
+
+    /// <summary>X-518 M1 (review of 0.1494): the history removes its older messages only while one bound (messages or days) is set.</summary>
+    public static bool RemovesOlder(bool messagesUnlimited,bool daysUnlimited)=>!(messagesUnlimited && daysUnlimited);
 
     /// <summary>Deletes every history file of the folder (every character), and the folder when it is left empty. False when a file is still
     /// there (held by another program).</summary>

@@ -43,6 +43,8 @@ public static class ReferencePlan
     [
         ("Panels","Panels","GamePanels",1280),("Map","Map","MapGame",1280),("Tracking","Tracking","Alarms",1280),("Data","Data","Storage",1280),
         ("Advanced","Advanced","Restore",1280),("Debug","Debug","DebugTools",1280),("ChatTabs","Panels","ChatTabs",1280),("ChatTabs-narrow","Panels","ChatTabs",760),
+        // X-518 M5 (review of 0.1494): the chat history's settings (« No limit » boxes, greyed with their reason outside the game).
+        ("ChatHistory","Panels","ChatHistory",1280),
     ];
     public const string SettingsPrefix="settings:";
     /// <summary>The tab of the Settings page drawn only in developer mode.</summary>

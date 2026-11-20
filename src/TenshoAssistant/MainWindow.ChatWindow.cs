@@ -272,12 +272,15 @@ internal sealed partial class MainWindow
             try{IntSetting("ChatWindow.HistoryMessages","ChatWindow.HistoryMessagesTip",()=>ChatHistory.BoundedMessages(configuration.Chat.HistoryMessages),value=>configuration.Chat.HistoryMessages=value,ChatHistory.MinimumMessages,ChatHistory.MaximumMessages,defaults.HistoryMessages);}
             finally{ImGui.EndDisabled();}
             ImGui.SameLine();
-            BoolSetting("ChatWindow.HistoryMessagesUnlimited","ChatWindow.HistoryMessagesUnlimitedTip",()=>configuration.Chat.HistoryMessagesUnlimited,value=>configuration.Chat.HistoryMessagesUnlimited=value,c=>c.Chat.HistoryMessagesUnlimited);
+            // X-518 M2 (review of 0.1494): unticking « No limit » while the history is kept asks first: what is past the bound is deleted.
+            BoolSetting("ChatWindow.HistoryMessagesUnlimited","ChatWindow.HistoryMessagesUnlimitedTip",()=>configuration.Chat.HistoryMessagesUnlimited,
+                value=>{if(!value && configuration.Chat.KeepHistory)chatHistoryLimitAsk=1;else configuration.Chat.HistoryMessagesUnlimited=value;},c=>c.Chat.HistoryMessagesUnlimited);
             ImGui.BeginDisabled(configuration.Chat.HistoryDaysUnlimited);
             try{IntSetting("ChatWindow.HistoryDays","ChatWindow.HistoryDaysTip",()=>ChatHistory.BoundedDays(configuration.Chat.HistoryDays),value=>configuration.Chat.HistoryDays=value,ChatHistory.MinimumDays,ChatHistory.MaximumDays,defaults.HistoryDays);}
             finally{ImGui.EndDisabled();}
             ImGui.SameLine();
-            BoolSetting("ChatWindow.HistoryDaysUnlimited","ChatWindow.HistoryDaysUnlimitedTip",()=>configuration.Chat.HistoryDaysUnlimited,value=>configuration.Chat.HistoryDaysUnlimited=value,c=>c.Chat.HistoryDaysUnlimited);
+            BoolSetting("ChatWindow.HistoryDaysUnlimited","ChatWindow.HistoryDaysUnlimitedTip",()=>configuration.Chat.HistoryDaysUnlimited,
+                value=>{if(!value && configuration.Chat.KeepHistory)chatHistoryLimitAsk=2;else configuration.Chat.HistoryDaysUnlimited=value;},c=>c.Chat.HistoryDaysUnlimited);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
         // X-513: the place the character's history takes on disk, measured off the game's thread (none while no history is open).
@@ -299,8 +302,38 @@ internal sealed partial class MainWindow
             ImGui.TextColored(chatHistoryErased==1 ? Success:Warning,localization.Get(chatHistoryErased==1 ? "ChatWindow.HistoryErased":"ChatWindow.HistoryEraseLeft"));
         }
         if(chatHistoryAsk){chatHistoryAsk=false;ImGui.OpenPopup("###ChatHistoryConsent");}
+        if(chatHistoryLimitAsk>0 && !ImGui.IsPopupOpen("###ChatHistoryLimitAsk")){chatHistoryLimitAsking=chatHistoryLimitAsk;chatHistoryLimitAsk=0;ImGui.OpenPopup("###ChatHistoryLimitAsk");}
         DrawChatHistoryConsent();
         DrawChatHistoryEraseAsk();
+        DrawChatHistoryLimitAsk();
+    }
+
+    // X-518 M2 (review of 0.1494): « No limit » unticked: 1 for the messages, 2 for the days; asked before it applies.
+    private int chatHistoryLimitAsk,chatHistoryLimitAsking;
+
+    /// <summary>X-518 M2: the question before « No limit » is unticked: the messages past the number, or older than the days, are deleted from
+    /// the history at its next trim (opening, or soon after), possibly months of them; « Cancel » leaves « No limit » ticked.</summary>
+    private void DrawChatHistoryLimitAsk()
+    {
+        var open=true;
+        if(!ImGui.BeginPopupModal(localization.Get("ChatWindow.HistoryLimitTitle")+"###ChatHistoryLimitAsk",ref open,ImGuiWindowFlags.AlwaysAutoResize))return;
+        try
+        {
+            var days=chatHistoryLimitAsking==2;
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*30);
+            ImGui.TextUnformatted(days ? localization.Format("ChatWindow.HistoryLimitDaysText",ChatHistory.BoundedDays(configuration.Chat.HistoryDays))
+                :localization.Format("ChatWindow.HistoryLimitMessagesText",ChatHistory.BoundedMessages(configuration.Chat.HistoryMessages)));
+            ImGui.PopTextWrapPos();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryLimitYes")+"###ChatHistoryLimitYes"))
+            {
+                if(days)configuration.Chat.HistoryDaysUnlimited=false;else configuration.Chat.HistoryMessagesUnlimited=false;
+                TrySave("Chat history limit");
+                ImGui.CloseCurrentPopup();
+            }
+            ImGui.SameLine();
+            if(ImGui.Button(localization.Get("ChatWindow.HistoryCancel")+"###ChatHistoryLimitNo"))ImGui.CloseCurrentPopup();
+        }
+        finally{ImGui.EndPopup();}
     }
 
     /// <summary>X-475: the question before the history is turned on; « Keep the history » turns it on, anything else leaves it off.</summary>
@@ -314,7 +347,9 @@ internal sealed partial class MainWindow
             // X-513: « No limit » said in words, a number as the language writes it.
             ImGui.TextUnformatted(localization.Format("ChatWindow.HistoryConsentText",ChatHistoryFolder ?? "-",
                 ChatOptions.HistoryMessagesUnlimited ? localization.Get("ChatWindow.HistoryNoLimit"):localization.Format("ChatWindow.HistoryNumber",ChatOptions.BoundedHistoryMessages),
-                ChatOptions.HistoryDaysUnlimited ? localization.Get("ChatWindow.HistoryNoLimit"):localization.Format("ChatWindow.HistoryNumber",ChatOptions.BoundedHistoryDays)));
+                ChatOptions.HistoryDaysUnlimited ? localization.Get("ChatWindow.HistoryNoLimit"):localization.Format("ChatWindow.HistoryNumber",ChatOptions.BoundedHistoryDays),
+                // X-518 M1 (review of 0.1494): « older ones are removed » only when a bound is set; with both « No limit », nothing is removed.
+                localization.Get(ChatHistory.RemovesOlder(ChatOptions.HistoryMessagesUnlimited,ChatOptions.HistoryDaysUnlimited) ? "ChatWindow.HistoryOlderRemoved":"ChatWindow.HistoryNothingRemoved")));
             ImGui.PopTextWrapPos();
             if(ImGui.Button(localization.Get("ChatWindow.HistoryConsentYes")+"###ChatHistoryYes")){configuration.Chat.KeepHistory=true;TrySave("Chat history");ImGui.CloseCurrentPopup();}
             ImGui.SameLine();
