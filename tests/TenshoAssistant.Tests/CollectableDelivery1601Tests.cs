@@ -30,7 +30,7 @@ internal static class CollectableDelivery1601Tests
         ("Collectable delivery 1601: the reader adds SatisfactionSupply's rows; the table says « custom delivery » and « — » for no level",()=>
         {
             var reader=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/CollectableReader.Dalamud.cs"));
-            Check(reader.Contains("rules.AddRange(DeliveryRules());") && reader.Contains("data.GetSubrowExcelSheet<SatisfactionSupply>()")
+            Check(reader.Contains("rules.AddRange(CollectableDeliveries.Distinct(DeliveryRules()));") && reader.Contains("data.GetSubrowExcelSheet<SatisfactionSupply>()")
                 && reader.Contains("line.CollectabilityLow,line.CollectabilityMid,line.CollectabilityHigh"),"the delivery rows read");
             var table=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.CollectableTable.cs"));
             Check(table.Contains("rule.Delivery ? \"CollectableTable.DeliveryReward\"") && table.Contains("rule.LevelMin==0 && rule.LevelMax==0 ? \"—\""),"the table");

@@ -14,6 +14,16 @@ public sealed record CollectableRule(uint ItemId,string Name,int LevelMin,int Le
 
 public enum CollectableTier { Below, Low, Mid, High }
 
+/// <summary>
+/// X-661 M1 (0.1605, review of 0.1602): a custom delivery's collectable can be in several SatisfactionSupply rows (Coal 38821 in 42.1 and 45.6,
+/// 38822 in 43.1 and 45.7, same client, same thresholds: docs/evidence/0.1601-delivery-collectables.md): one rule per row showed it twice in
+/// the collectables table. Kept once when the rules are the same; rows that differ (thresholds, client) stay apart, as the game has them.
+/// </summary>
+public static class CollectableDeliveries
+{
+    public static IReadOnlyList<CollectableRule> Distinct(IEnumerable<CollectableRule> rows)=>rows.Distinct().ToArray();
+}
+
 /// <summary>0.523 (user report): which of a node's collectables pays the most, at the high tier. Only between items of the same kind of scrip (the sheet's Currency column): the kinds are not worth the same, and their names are not known here.</summary>
 public static class CollectableChoice
 {

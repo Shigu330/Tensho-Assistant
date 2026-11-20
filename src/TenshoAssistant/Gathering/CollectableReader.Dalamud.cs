@@ -65,7 +65,8 @@ internal sealed class CollectableReader : IDisposable
                         reward?.LowReward ?? 0,reward?.MidReward ?? 0,reward?.HighReward ?? 0,scripRows.Contains(row.RowId),
                         row.CollectablesShopItemGroup.ValueNullable?.Name.ExtractText() ?? "",reward?.Currency ?? -1));
                 }
-            rules.AddRange(DeliveryRules());
+            // X-661 M1 (0.1605): a delivery's collectable in several rows of the sheet, kept once.
+            rules.AddRange(CollectableDeliveries.Distinct(DeliveryRules()));
             Volatile.Write(ref catalog,new CollectableCatalog(rules));
         }
         catch(Exception error){CatalogFailed=true;log.Warning(error,"Collectable thresholds unavailable.");}
