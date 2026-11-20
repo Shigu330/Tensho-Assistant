@@ -148,19 +148,36 @@ public static class BeastTeams
         double Attack(int member) => fights.Sum(fight => fight.Enemies.Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
         // X-575 (0.1543): the weaknesses first, over the whole board: each pick is the beast that adds the most enemies hit (a fight's three at
         // most), then the one strongest against the enemies it hits, then the best total attack.
-        var weak = fights.Select(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0).GroupBy(enemy => enemy.WeaknessRow).ToDictionary(group => group.Key, group => group.Count())).ToArray();
+        // X-585 M1 (review of 0.1550): as the three of a fight (X-579), the 10 weigh each fight's strongest enemy first: a fight's three
+        // weaknesses counted are those of the most weight (Weights), and a pick first adds the strength (Power) of the fights' strongest enemies
+        // it hits (a stronger guardian over a fight of weak enemies), then enemies.
+        // Before, the count of enemies alone could leave the guardian's weakness (one enemy) for that of two weaker ones when places lacked.
+        var weak = fights.Select(fight => Ranked(fight.Enemies)).ToArray();
         var team = new List<int>();
         var rows = new HashSet<uint>();
-        int Covered(HashSet<uint> present) => weak.Sum(fight => fight.Where(pair => present.Contains(pair.Key)).Select(pair => pair.Value).OrderDescending().Take(PerBattle).Sum());
+        (int Strongest, int Enemies) Covered(HashSet<uint> present)
+        {
+            var (strongest, enemies) = (0, 0);
+            foreach (var fight in weak)
+            {
+                var counted = fight.Rows.Where(row => present.Contains(row.Row)).Take(PerBattle).ToArray();
+                enemies += counted.Sum(row => row.Count);
+                if (counted.Any(row => fight.Top.Contains(row.Row))) strongest += Math.Max(1, fight.Power);
+            }
+            return (strongest, enemies);
+        }
+        static bool Adds((int Strongest, int Enemies) gain) => gain.Strongest > 0 || gain.Strongest == 0 && gain.Enemies > 0;
         double Strength(int member) => fights.Sum(fight => fight.Enemies.Where(enemy => enemy.WeaknessRow != 0 && enemy.WeaknessRow == pool[member].Beast.AutoRow)
             .Sum(enemy => Against(pool[member].Stats, pool[member].Beast.AutoRow, enemy).Attack));
         while (team.Count < size)
         {
             var now = Covered(rows);
             var next = Enumerable.Range(0, pool.Length).Where(member => !team.Contains(member) && pool[member].Beast.AutoRow != 0 && !rows.Contains(pool[member].Beast.AutoRow))
-                .Select(member => (Member: member, Gain: Covered([.. rows, pool[member].Beast.AutoRow]) - now)).Where(pick => pick.Gain > 0)
-                .OrderByDescending(pick => pick.Gain).ThenByDescending(pick => Strength(pick.Member)).ThenByDescending(pick => Attack(pick.Member)).ThenBy(pick => pool[pick.Member].Beast.Id).FirstOrDefault();
-            if (next.Gain <= 0) break;
+                .Select(member => (Member: member, Gain: Covered([.. rows, pool[member].Beast.AutoRow]) is var after ? (after.Strongest - now.Strongest, after.Enemies - now.Enemies) : default))
+                .Where(pick => Adds(pick.Gain))
+                .OrderByDescending(pick => pick.Gain.Item1).ThenByDescending(pick => pick.Gain.Item2).ThenByDescending(pick => Strength(pick.Member)).ThenByDescending(pick => Attack(pick.Member))
+                .ThenBy(pick => pool[pick.Member].Beast.Id).Select(pick => (pick.Member, Found: true)).FirstOrDefault();
+            if (!next.Found) break;
             team.Add(next.Member); rows.Add(pool[next.Member].Beast.AutoRow);
         }
         // The places left: the beasts each fight would call from everything held, most fights first, then the best total attack.
@@ -190,9 +207,34 @@ public static class BeastTeams
     /// </summary>
     public static bool RankLow(Board board, int rank, bool known = true) => known && board.RankRecommended > 0 && rank > 0 && rank < board.RankRecommended;
 
+    /// <summary>
+    /// X-585 M2 (review of 0.1550, R06): the recommended ranges seen in the game's board window (« 1 à 5 » on the 1st board, « 6 à 10 » on the
+    /// 2nd: docs/evidence/0.1546-beast-rank-range.md). The other boards' range follows the rule drawn from these two, the expert boards
+    /// (team of 12 and 15) perhaps not: their range is said « to be confirmed in game ».
+    /// </summary>
+    public static bool RankRangeSeen(Board board) => (board.RankRecommended, board.RankLimit) is (1, 5) or (6, 10);
+
+    /// <summary>X-585 M2: the text key of a low rank, with « to be confirmed » when the board's range was not seen in game.</summary>
+    public static string RankLowKey(Board board, bool team) => (team ? "BeastUi.TeamReadRankLow" : "BeastUi.RankLow") + (RankRangeSeen(board) ? "" : "Unsure");
+
+    /// <summary>
+    /// X-585 M1 (review of 0.1550): a fight's weaknesses for the 10: each row with how many enemies it hits, the rows of most weight first
+    /// (<see cref="Weights"/>: the strongest enemy first, then the count), and the rows of its strongest enemies (a lone enemy, or enemies all
+    /// as strong, are its strongest), and that strongest enemy's strength.
+    /// </summary>
+    public static (IReadOnlyList<(uint Row, int Count)> Rows, IReadOnlySet<uint> Top, int Power) Ranked(IReadOnlyList<BoardEnemy> enemies)
+    {
+        var weights = Weights(enemies);
+        var top = enemies.Count == 0 ? 0 : enemies.Max(Power);
+        var rows = enemies.Select((enemy, index) => (enemy.WeaknessRow, Weight: weights[index])).Where(pair => pair.WeaknessRow != 0).GroupBy(pair => pair.WeaknessRow)
+            .OrderByDescending(group => group.Sum(pair => pair.Weight)).ThenBy(group => group.Key).Select(group => (group.Key, group.Count())).ToArray();
+        return (rows, enemies.Where(enemy => enemy.WeaknessRow != 0 && Power(enemy) == top).Select(enemy => enemy.WeaknessRow).ToHashSet(), top);
+    }
+
     /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
-    /// 3 (0.1544): each fight's three in calling order. 4 (0.1547, X-579): the strongest enemy's weakness first.</summary>
-    public const int PlanVersion = 4;
+    /// 3 (0.1544): each fight's three in calling order. 4 (0.1547, X-579): the strongest enemy's weakness first.
+    /// 5 (0.1558, X-585 M1): the 10 too weigh each fight's strongest enemy first.</summary>
+    public const int PlanVersion = 5;
 
     /// <summary>
     /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made
@@ -350,6 +392,9 @@ public static class BeastTeams
     /// docs/evidence/0.1548-beast-book.md). Each fight's three keep their calling order.
     /// </summary>
     public static IReadOnlyList<BeastPick> BookOrder(IEnumerable<BeastPick> team) => team.OrderBy(pick => pick.Beast).ToArray();
+    /// <summary>X-585 M7 (review of 0.1550): the team read and the beasts named in a line (missed weaknesses, lost beasts) in the bestiary's order too.</summary>
+    public static IReadOnlyList<uint> BookOrder(IEnumerable<uint> beasts) => beasts.Order().ToArray();
+    public static IReadOnlyList<TeamMember> BookOrder(IEnumerable<TeamMember> team) => team.OrderBy(member => member.Beast).ToArray();
 
     /// <summary>X-578 (0.1548): the limit to give <see cref="MergeRanks"/> for a rank read in the bestiary: the beast's own, never a floor.</summary>
     public const int Exact = int.MaxValue;

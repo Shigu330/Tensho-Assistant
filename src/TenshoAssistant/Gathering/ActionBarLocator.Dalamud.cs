@@ -69,19 +69,21 @@ internal sealed class ActionBarLocator : IDisposable
                 {
                     if(slots[index].Icon==null)continue;
                     // 0.734 (user report): the game turns some actions into their next rank on the bar (Bountiful Harvest shows as II): the slot keeps the first one, so what it shows counts.
-                    var matched=slots[index].ActionId==(int)wanted || other!=0 && slots[index].ActionId==(int)other;
+                    // X-585 M6: the first and the second action apart, so the beast combo's two skills can be numbered.
+                    var first=slots[index].ActionId==(int)wanted;
+                    var second=other!=0 && slots[index].ActionId==(int)other;
                     if(module!=null && addon->RaptureHotbarId<module->Hotbars.Length)
                     {
                         ref var saved=ref module->Hotbars[addon->RaptureHotbarId].Slots[index];
                         // An item or a macro can carry the same number: only an action counts.
                         if(saved.ApparentSlotType!=RaptureHotbarModule.HotbarSlotType.Action)continue;
-                        matched|=saved.ApparentActionId==wanted || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==wanted;
-                        if(other!=0)matched|=saved.ApparentActionId==other || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==other;
+                        first|=saved.ApparentActionId==wanted || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==wanted;
+                        if(other!=0)second|=saved.ApparentActionId==other || actions!=null && saved.CommandId!=0 && actions->GetAdjustedActionId(saved.CommandId)==other;
                     }
-                    if(!matched)continue;
+                    if(!first && !second)continue;
                     var node=&slots[index].Icon->AtkResNode;
                     if(!Visible(node))continue;
-                    var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale);
+                    var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale,!first && second);
                     if(rect.Valid)found.Add(rect);
                 }
             }

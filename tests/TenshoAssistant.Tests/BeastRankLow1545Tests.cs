@@ -38,8 +38,8 @@ internal static class BeastRankLow1545Tests
             var catalog = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastCatalog.cs"));
             Check(catalog.Contains("board with { RankRecommended = RankFloor(limits, board.RankLimit) }") && !catalog.Contains("row.UInt(0), row.Int(2));"), "the range's first number from the previous board's rank, column 2 no longer read");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
-            Check(page.Contains("if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown))") && page.Contains("\"BeastUi.RankLow\", board.RankRecommended, board.RankLimit"), "beside the ten's rank");
-            Check(page.Contains("if (BeastTeams.RankLow(board, member.Rank))") && page.Contains("\"BeastUi.TeamReadRankLow\""), "for the team taken");
+            Check(page.Contains("if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown))") && page.Contains("BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit") /* X-585 M2 (0.1558): the key says « to be confirmed » when the range was not seen */, "beside the ten's rank");
+            Check(page.Contains("if (BeastTeams.RankLow(board, member.Rank))") && page.Contains("BeastTeams.RankLowKey(board, true)"), "for the team taken");
             foreach (var language in new[] { "en", "fr" })
             {
                 var text = File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json"));

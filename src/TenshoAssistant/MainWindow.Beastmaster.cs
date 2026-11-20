@@ -305,16 +305,17 @@ internal sealed partial class MainWindow
     private void DrawBeastTeamRead(Board board, BoardPlan plan, IReadOnlyList<BeastTeams.TeamMember> team, BeastCatalog catalog)
     {
         Beast? Of(uint id) => catalog.Beasts.FirstOrDefault(beast => beast.Id == id);
-        string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Select(id => Of(id)?.Name ?? $"#{id}"));
+        string Names(IEnumerable<uint> ids) => string.Join(", ", BeastTeams.BookOrder(ids).Select(id => Of(id)?.Name ?? $"#{id}"));
         var fights = BeastTeamFightsFor(board, plan, team, catalog);
         ImGui.TextColored(Accent, localization.Format("BeastUi.TeamRead", team.Count));
-        foreach (var member in team)
+        // X-585 M7: in the bestiary's order, as the 10 of the plan (X-580).
+        foreach (var member in BeastTeams.BookOrder(team))
         {
             if (member.Down) ImGui.TextColored(Error, localization.Format("BeastUi.TeamReadDown", Of(member.Beast)?.Name ?? $"#{member.Beast}"));
             else if (member.Low) ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Hp, member.MaxHp));
             // X-575 part 5 (0.1545): the rank the team window shows, below the board's recommended range.
             if (BeastTeams.RankLow(board, member.Rank))
-                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadRankLow", Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Rank, board.RankRecommended, board.RankLimit));
+                ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, true), Of(member.Beast)?.Name ?? $"#{member.Beast}", member.Rank, board.RankRecommended, board.RankLimit));
         }
         foreach (var fight in fights)
         {
@@ -456,8 +457,20 @@ internal sealed partial class MainWindow
         if ((BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0) == 0) return;
         if (BeastActive?.Invoke() is not (> 0 and var beast) || BeastInstinct.Combos(beast) is not [var before, var after]) return;
         located.Want(before.Skill, after.Skill);
-        if (located.ReadFor == before.Skill) DrawGatheringBarHighlight(located);
+        if (located.ReadFor != before.Skill) return;
+        DrawGatheringBarHighlight(located);
+        // X-585 M6 (review of 0.1550): the order the combo needs (BeastInstinct.Combos: AfterTrick false, then true): « 1 » on the skill used
+        // before the beast's Trick, « 2 » on the one after, in the slot's top-left corner (before, both were highlighted alike).
+        var draw = ImGui.GetBackgroundDrawList();
+        foreach (var rect in located.Rects)
+        {
+            var at = new Vector2(rect.X + 3, rect.Y + 1);
+            var mark = BeastInstinct.Mark(rect.Second);
+            draw.AddText(at + Vector2.One, ImGui.GetColorU32(new Vector4(0, 0, 0, 1)), mark);
+            draw.AddText(at, ImGui.GetColorU32(UI.FfxivTheme.Gold), mark);
+        }
     }
+
 
     /// <summary>X-551 (0.1534): the width the panel's lines wrap at (BeastBoardWindow sets it from the game's window beside it).</summary>
     internal float BeastPanelWrap { get; set; } = BeastBoardWindow.WrapWidth;
@@ -522,8 +535,8 @@ internal sealed partial class MainWindow
                 DrawBeastCombo(id);
             }
             if (fromTeam is { Lost.Count: > 0 } lost)
-                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", string.Join(", ", lost.Lost.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")),
-                    lost.Instead.Count > 0 ? string.Join(", ", lost.Instead.Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")) : "—"));
+                ImGui.TextColored(Warning, localization.Format("BeastUi.TeamReadLost", string.Join(", ", BeastTeams.BookOrder(lost.Lost).Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")),
+                    lost.Instead.Count > 0 ? string.Join(", ", BeastTeams.BookOrder(lost.Instead).Select(id => catalog.Beasts.FirstOrDefault(row => row.Id == id)?.Name ?? $"#{id}")) : "—"));
         }
         finally { ImGui.Unindent(); }
     }
@@ -591,7 +604,7 @@ internal sealed partial class MainWindow
                     DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); ImGui.TextUnformatted(localization.Format("BeastUi.BookNumber", beast.Id, beast.Name));
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
                     // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
-                    if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format("BeastUi.RankLow", board.RankRecommended, board.RankLimit)); }
+                    if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit)); }
                     ImGui.TableNextColumn(); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                 }
             }
@@ -616,7 +629,7 @@ internal sealed partial class MainWindow
                 // plan and beasts held, not at each frame (R07).
                 foreach (var miss in BeastMissed(plan, battle, fight, catalog))
                 {
-                    string Names(IEnumerable<uint> ids) => string.Join(", ", ids.Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
+                    string Names(IEnumerable<uint> ids) => string.Join(", ", BeastTeams.BookOrder(ids).Take(5).Select(id => Of(id)?.Name ?? $"#{id}"));
                     // X-575 (0.1543): orange only when no beast brought hits the weakness; one of the team that could (its three places went
                     // to weaknesses of more enemies) is said in grey.
                     if (miss.InTeam.Count > 0) ImGui.TextDisabled(localization.Format("BeastUi.MissInTeam", miss.Name, Names(miss.InTeam)));

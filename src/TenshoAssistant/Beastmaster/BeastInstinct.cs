@@ -73,4 +73,6 @@ public static class BeastInstinct
         var after = Next(trick);
         return [new(TrainerSkill[before], before, false, Kind(before, trick)), new(TrainerSkill[after], after, true, Kind(trick, after))];
     }
+    /// <summary>X-585 M6 (review of 0.1550): the mark of a combo skill on the hotbars: « 1 » before the beast's Trick, « 2 » after.</summary>
+    public static string Mark(bool after) => after ? "2" : "1";
 }

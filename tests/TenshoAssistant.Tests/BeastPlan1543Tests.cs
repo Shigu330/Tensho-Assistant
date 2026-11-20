@@ -68,9 +68,10 @@ internal static class BeastPlan1543Tests
                 "every other weakness still hit");
             // Eight weaknesses on the board, seven places: one weakness of a single enemy is left out, said as « no room ».
             var seven = BeastTeams.Plan(FirstBoard(7), Beasts(), HeldIds(), null);
-            Check(seven.Team.Count == 7 && seven.Left is [{ Reason: LeftReason.NoRoom }] && seven.Left[0].Weakness is Lightning or Slashing or Wind or Piercing,
+            Check(seven.Team.Count == 7 && seven.Left is [{ Reason: LeftReason.NoRoom }] && seven.Left[0].Weakness is Fire or Water,
                 "seven places: one weakness of one enemy left out for want of room: " + string.Join(", ", (seven.Left ?? []).Select(left => left.Name)));
-            Check(seven.Battles.Sum(battle => battle.WeaknessesHit) == 11 && seven.Battles.Sum(battle => battle.Enemies) == 12, "eleven enemies of twelve hit");
+            // X-585 M1 (0.1558): each fight's strongest enemy first, so the weakness left is one of two weak enemies (Feu or Eau): ten of twelve hit.
+            Check(seven.Battles.Sum(battle => battle.WeaknessesHit) == 10 && seven.Battles.Sum(battle => battle.Enemies) == 12, "ten enemies of twelve hit");
         }),
         ("Beast plan 1543: chosen team, the user's ten of the capture: the guardian 3 of 3 with Écureuil, fight 4 counted, fight 5 with Salamandre", () =>
         {
