@@ -2319,6 +2319,34 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1618) Place et taille : taper X, Y, largeur, hauteur puis « Appliquer » ; sortir la fenêtre de l'écran : l'avertissement s'affiche, « Ramener au centre » la remet au milieu
 
+- [ ] (0.1619) Fenêtre de chat sur la boîte des messages du jeu (ou réduite) : roue, taper une place puis « Appliquer » : l'avertissement « La fenêtre suit les messages du jeu… » s'affiche et la fenêtre ne saute pas plus tard quand elle redevient libre
+
+- [ ] (0.1620) Roue de la fenêtre de chat : « Verrouiller la fenêtre » et « Clics à travers la fenêtre verrouillée » : un clic sur les lignes du chat agit dans le jeu derrière (choisir une cible, tourner la caméra, molette pour le zoom) ; les onglets, leurs boutons, un lien et « En bas » répondent toujours ; le cadenas déverrouille
+
+- [ ] (0.1620) « Masquer pendant les cinématiques » : la fenêtre disparaît pendant une cinématique (aussi une scène qui garde l'interface) et revient seule après
+
+- [ ] (0.1620) « Masquer en mission » : la fenêtre disparaît en entrant dans un donjon et revient en sortant ; avec « Messages du jeu masqués », les messages du jeu reviennent pendant la mission
+
+- [ ] (0.1621) Réglages du chat, couleurs : taper « Dire » dans la case du nom court de /dire : les messages de /dire montrent [Dire] ; vider la case : le nom court du jeu revient
+
+- [ ] (0.1621) « Noms des joueurs entre crochets » : les messages montrent [Nom] : texte, murmures compris ; un PNJ garde son nom sans crochets
+
+- [ ] (0.1621) « Une couleur pour le nom de chaque joueur » : chaque nom a sa couleur, la même à chaque message et après un rechargement ; un joueur mis en avant reste en couleur d'avertissement
+
+- [ ] (0.1622) Réglages du chat : « S'effacer après » à 10 s : sans nouveau message, la fenêtre s'efface en douceur et un clic à sa place agit dans le jeu ; la souris dessus ou un nouveau message la ramène
+
+- [ ] (0.1622) « Espace entre les lignes » à 6 px : les lignes s'écartent, le défilement et « En bas » restent justes
+
+- [ ] (0.1622) Réglages des onglets : « Taille à part » sur un onglet, 150 % : seul cet onglet grossit ; décocher : il reprend la taille de la fenêtre
+
+- [ ] (0.1623) Réglages du chat : « Mode capture » : les noms des joueurs avant leurs messages deviennent des codes #XXXXX, le même pour le même joueur ; les PNJ gardent leur nom ; décocher : les noms reviennent
+
+- [ ] (0.1624) Clic droit sur un message de la fenêtre de chat, « Choisir du texte… » : la boîte s'ouvre avec les messages de l'onglet ; choisir à la souris un morceau sur deux messages, Ctrl+C, coller ailleurs : le morceau exact ; « Tout copier » ; Échap ferme
+
+- [ ] (0.1627) Survoler le nom d'un joueur dans la fenêtre de chat : son nom et son monde ; un membre du groupe ou un joueur proche : sa classe et son niveau aussi ; en mode capture : pas d'info-bulle
+
+- [ ] (0.1627) Survoler un lien d'objet : l'icône, le nom et la description de l'objet comme dans le jeu, puis l'aide du clic
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
