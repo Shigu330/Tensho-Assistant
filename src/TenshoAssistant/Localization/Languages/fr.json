@@ -6439,6 +6439,8 @@
     "HighlightedPlayersTip": "Ce qu'écrivent ces joueurs ressort dans la fenêtre : leur nom dans la couleur d'avertissement et tout leur message sur une bande colorée (un joueur par ligne, le monde n'est pas nécessaire ; un clic droit sur un message propose aussi « Mettre en avant »).\nPar défaut : aucun.",
     "AlertWords": "Mots d'alerte",
     "AlertWordsTip": "Un message qui contient l'un de ces mots (un par ligne, majuscules ignorées) est posé sur une bande dans la couleur d'accent, et son onglet porte « ! » devant son nom jusqu'à ce que vous le voyiez. Vos propres messages et les lignes de combat n'alertent jamais. Seulement dans la fenêtre Tensho, sans son.\nPar défaut : aucun.",
+    "BlinkAlerts": "Onglet qui clignote sur une alerte",
+    "BlinkAlertsTip": "Un onglet non affiché qui contient un message avec l'un des mots d'alerte, pas encore vu, clignote jusqu'à ce qu'il soit affiché (en plus de son « ! »). Rien ne clignote tant qu'aucun mot d'alerte n'est choisi.\nPar défaut : activé.",
     "WhenCovered": "Sous une fenêtre du jeu",
     "WhenCoveredTip": "Ce que fait la fenêtre de chat quand une fenêtre du jeu la recouvre (les fenêtres de Tensho restent toujours devant elle). Se cacher : elle revient seule quand la fenêtre du jeu se ferme. S'effacer : sans fond et le texte pâle, les clics vont au jeu. Rester : telle quelle.\nPar défaut : se cacher.",
     "CoveredHide": "Se cacher",

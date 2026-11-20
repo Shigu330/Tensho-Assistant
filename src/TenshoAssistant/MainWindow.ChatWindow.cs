@@ -659,6 +659,8 @@ internal sealed partial class MainWindow
         ListSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>{options.HiddenPlayers=value;RestartChatTabs(options);},600);
         ListSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600);
         ListSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600);
+        // X-447 B7 (0.1643): the tab holding an alert not seen blinks.
+        BoolSetting("ChatWindow.BlinkAlerts","ChatWindow.BlinkAlertsTip",()=>configuration.Chat.BlinkAlerts,value=>configuration.Chat.BlinkAlerts=value,c=>c.Chat.BlinkAlerts);
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)
@@ -932,8 +934,11 @@ internal sealed partial class MainWindow
                 var view=ChatMessages.ViewOf(tab);
                 bool open;
                 var coloured=PushChatTabColor(tab);
+                // X-447 B7 (0.1643): a tab not shown holding an alert not seen blinks: lit in the accent colour every other half second.
+                var blink=options.BlinkAlerts && view.Alerts>0 && index!=chatTabShown && ChatLook.Blink(ImGui.GetTime());
+                if(blink)ImGui.PushStyleColor(ImGuiCol.Tab,Accent with{W=0.75f});
                 try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
-                finally{if(coloured)ImGui.PopStyleColor();}
+                finally{if(coloured)ImGui.PopStyleColor();if(blink)ImGui.PopStyleColor();}
                 // X-455 E7 (0.1617): a right click on a tab: clear its messages (the other tabs keep theirs), or show them again.
                 if(ImGui.BeginPopupContextItem("###ChatTabMenu"+index))
                 {

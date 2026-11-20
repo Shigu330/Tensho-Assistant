@@ -21,7 +21,7 @@
 English is the reference language. Missing keys fall back to English, then to `[Key.Name]`.
 
 <!-- docgen:languages-en -->
-Current state (counted in the language files, version <!-- docgen:version -->0.1638<!-- /docgen:version -->): English and French are complete (8080 keys; French must stay complete); German (`de.json`) translates 28 keys and Japanese (`ja.json`) translates 28 keys, not reviewed by native speakers.
+Current state (counted in the language files, version <!-- docgen:version -->0.1638<!-- /docgen:version -->): English and French are complete (8082 keys; French must stay complete); German (`de.json`) translates 28 keys and Japanese (`ja.json`) translates 28 keys, not reviewed by native speakers.
 <!-- /docgen:languages-en -->
 
 The completion of each language is shown in
@@ -65,7 +65,7 @@ official game catalogue: these files translate the plugin interface, and game da
 L'anglais est la langue de référence. Les clés manquantes se replient sur l'anglais, puis sur `[Key.Name]`.
 
 <!-- docgen:languages-fr -->
-État actuel (compté dans les fichiers de langue, version <!-- docgen:version -->0.1638<!-- /docgen:version -->) : l'anglais et le français sont complets (8080 clés ; le français doit le rester) ; l'allemand (`de.json`) traduit 28 clés et le japonais (`ja.json`) traduit 28 clés, sans relecture par des locuteurs natifs.
+État actuel (compté dans les fichiers de langue, version <!-- docgen:version -->0.1638<!-- /docgen:version -->) : l'anglais et le français sont complets (8082 clés ; le français doit le rester) ; l'allemand (`de.json`) traduit 28 clés et le japonais (`ja.json`) traduit 28 clés, sans relecture par des locuteurs natifs.
 <!-- /docgen:languages-fr -->
 
 L'avancement de chaque langue est

@@ -84,6 +84,9 @@ public static class ChatLook
         return text[..low].TrimEnd()+"…";
     }
 
+    /// <summary>X-447 B7 (0.1643): a blinking tab is lit for half a second, then not for the next half (<paramref name="seconds"/>: ImGui's time).</summary>
+    public static bool Blink(double seconds)=>!double.IsNaN(seconds) && (long)Math.Floor(seconds*2)%2==0;
+
     /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1643.0
+- Plan global, X-447 : Fenêtre de chat (X-447 B7, choix de l'utilisateur du 15/11, d'après WIM), une partie : un onglet non affiché qui contient un message avec un mot d'alerte pas encore vu clignote (couleur d'accent une demi-seconde sur deux) jusqu'à ce qu'il soit affiché, en plus de son « ! ». Nouveau réglage « Onglet qui clignote sur une alerte », activé par défaut : rien ne clignote tant qu'aucun mot d'alerte n'est choisi. Reste de B7 : son par canal, son propre nom en alerte, compteur dans la barre du serveur.
+- Pour les joueurs : fenêtre de chat : un onglet non affiché clignote quand un message avec l'un de vos mots d'alerte y arrive (réglage « Onglet qui clignote sur une alerte »).
+- Tests : ChatBlink1643Tests. Verify.ps1 (agent) : 3425/3425, 0 avertissement, 0 erreur ; DLL 0.1643.0.0. Non validé en jeu.
+### English
+- Chat window (X-447 B7, the user's choice of 15/11, after WIM), a part: a tab not shown holding a message with an alert word not seen yet blinks (the accent colour every other half second) until it is shown, besides its « ! ». New setting « Blinking tab on an alert », on by default: nothing blinks while no alert word is chosen. Left of B7: a sound per channel, the player's own name as an alert, a counter in the server bar.
+- For players: Chat window: a tab not shown blinks when a message with one of your alert words arrives in it (setting « Blinking tab on an alert »).
+
 ## 0.1642.0
 - Plan global, X-447 : Fenêtre de chat (X-447 B9, choix de l'utilisateur du 15/11) : épingles. Clic droit sur un message, « Épingler en haut de cet onglet » : le message reste en haut de l'onglet, sur une ligne coupée par « … », dans la couleur de son canal, le message entier au survol ; un clic dessus ramène l'onglet à ce message (signet ; en haut de l'onglet s'il en est sorti) ; la croix le retire, comme « Retirer l'épingle » du menu. Au plus 5 par onglet. En mémoire seulement (R04) : rien n'est écrit, une déconnexion, un déchargement ou l'onglet vidé les oublie ; une épingle reste tant que dure la session, même quand ses lignes ont quitté l'onglet. ChatStore.Pins, ChatTabView.IndexOfId, ChatLook.Shorten.
 - Pour les joueurs : fenêtre de chat : un message peut être épinglé en haut de son onglet (clic droit) ; un clic sur l'épingle y ramène l'onglet. Les épingles restent en mémoire seulement.
