@@ -43,7 +43,7 @@ internal sealed class PanelWindow : Window
 
     public override bool DrawConditions()
     {
-        // X-01 (0.1279): not before the panels' code is compiled, 3 s at most after the load (Diagnostics/PanelGate.cs).
+        // X-01 (0.1279): not before the panels' code is compiled, 6 s at most after the load since X-653 (Diagnostics/PanelGate.cs).
         if (!owner.PanelsOpen) return false;
         try { return !broken && panel.Visible() && !(panel.StepsAside?.Invoke() != false && lastPosition is { } at && owner.BarBehindGame(at, lastSize, panel.Name)); }
         catch (Exception error) { TurnOff(error); return false; }

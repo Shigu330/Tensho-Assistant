@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1598.0
+- Plan global, X-653 : Panneaux : après un rechargement de Tensho, les panneaux libres, les barres et la passe d'affichage attendent que leur code soit prêt 6 s au plus au lieu de 3 s (PanelGate.Bound) : mesuré le 20/11, ce code est prêt 3,8 à 4,9 s après un rechargement en cours de jeu, et l'ouverture à 3 s donnait une première image de 130 à 190 ms ; au démarrage du jeu, rien ne change (code prêt à 1,8 s). X-653, décision D-194 b de l'utilisateur, suite de X-352.
+- Tests : PanelGate1279Tests. Verify.ps1 (agent) : 3274/3274, 0 avertissement, 0 erreur ; DLL 0.1598.0.0. Non validé en jeu.
+### English
+- Panels: after Tensho is reloaded, the free panels, the bars and the overlay pass wait for their code to be ready 6 s at most instead of 3 s (PanelGate.Bound): measured on 20/11, that code is ready 3.8 to 4.9 s after a reload during play, and opening at 3 s gave a first frame of 130 to 190 ms; at game start nothing changes (code ready at 1.8 s). X-653, user decision D-194 b, follow-up of X-352.
+
 ## 0.1597.0
 - Plan global, X-640 : Découvertes : quand des découvertes à vous mises de côté (abîmées) attendent leur copie sur votre gist et que GitHub refuse durablement l'adresse brute de cette copie (gist.githubusercontent.com : 404, 401, 403…), l'échange le dit (« GitHub a refusé… ») au lieu de « GitHub injoignable », compte les refus d'un échange à l'autre (github.json, gardé au redémarrage) et, au 3e échange de suite, envoie sans cette copie et le dit ; le texte abîmé reste gardé dans la base. « Injoignable » (5xx, 408, 429, réseau) attend toujours sans limite. Avant, tout refus bloquait l'envoi sans fin ni cause dite (X-640, banc X-631, relecture 0.1564 M1 ; décision D-190 a de l'utilisateur).
 - Pour les joueurs : échange des découvertes : quand GitHub refuse sans cesse la copie de découvertes abîmées sur votre gist, Tensho le dit et, après 3 échanges, envoie le reste sans elles au lieu d'attendre sans fin.

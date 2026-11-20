@@ -196,8 +196,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
-    /// <summary>X-01 (0.1279): the free panels, the bars and the overlay pass are drawn only once their code is compiled (3 s at most after
-    /// the load; Diagnostics/PanelGate.cs).</summary>
+    /// <summary>X-01 (0.1279): the free panels, the bars and the overlay pass are drawn only once their code is compiled (6 s at most after
+    /// the load since X-653; Diagnostics/PanelGate.cs).</summary>
     internal bool PanelsOpen => panelGate.Open;
     private readonly Diagnostics.PanelGate panelGate;
     /// <summary>X-01 (0.1279): the line of the frame where the panels came back, written once by the plugin.</summary>

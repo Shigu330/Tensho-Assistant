@@ -5,12 +5,16 @@ namespace TenshoAssistant.Diagnostics;
 /// all run on the plugin's first frame, before any of their code was compiled: 152 to 338 ms in one frame at each load (dalamud.log of
 /// 13/11, 38 loads), each panel 2 to 66 ms of first-run compiling. They now wait until the warm-up has compiled their code and what it calls
 /// (<see cref="JitWarmup.FirstPartDone"/>), <see cref="Bound"/> at most after the load, and are drawn from then on: the panels come back 1 to
-/// 3 s after a load instead of freezing the game. Asked from the draw only; once open it stays open, whatever the warm-up does next.
+/// 6 s after a load instead of freezing the game. Asked from the draw only; once open it stays open, whatever the warm-up does next.
 /// </summary>
 public sealed class PanelGate
 {
-    /// <summary>How long the panels wait at most after the load.</summary>
-    public static readonly TimeSpan Bound=TimeSpan.FromSeconds(3);
+    /// <summary>
+    /// How long the panels wait at most after the load. X-653 (user decision D-194 b of 20/11, follow-up of X-352): 6 s, was 3 s (decision of
+    /// 13/11). Measured on 20/11: after a reload during play their code is ready 3.8 to 4.9 s after the load, so at 3 s they opened before it
+    /// and their first frame took 130 to 190 ms; at game start it is ready at 1.8 s, unchanged.
+    /// </summary>
+    public static readonly TimeSpan Bound=TimeSpan.FromSeconds(6);
     private readonly Func<bool> compiled;
     private readonly Func<long> now;
     private readonly long started;

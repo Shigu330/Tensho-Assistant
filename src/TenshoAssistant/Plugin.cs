@@ -1597,7 +1597,7 @@ public sealed partial class Plugin : IDalamudPlugin
             ("PlotWatch",mainWindow.WatchPlots),
             ("Fishing",mainWindow.DrawFishingPanel),
         ];
-        // X-01 (0.1279): the overlay pass and the free panels wait until their code is compiled, 3 s at most after the load: they were
+        // X-01 (0.1279): the overlay pass and the free panels wait until their code is compiled, 6 s at most after the load (X-653): they were
         // 152 to 338 ms of first-run compiling in one frame at each load. The frame where they come back is timed once, in every mode.
         var panelsOpen=mainWindow.PanelsOpen;
         var panelsFirst=panelsOpen && !panelsOpenedLogged ? System.Diagnostics.Stopwatch.GetTimestamp():0;

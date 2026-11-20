@@ -101,7 +101,7 @@ internal static class PanelGate1279Tests
             Check(gate.Open && gate.ByBound && gate.OpenedAfter == 3_000, "open at the bound, said so");
             var broken = new PanelGate(() => throw new InvalidOperationException("warm-up gone"), () => 0, TimeSpan.FromSeconds(3));
             Check(broken.Open && !broken.ByBound, "an error never keeps the panels away");
-            Check(PanelGate.Bound == TimeSpan.FromSeconds(3), "3 s at most, as the user decided");
+            Check(PanelGate.Bound == TimeSpan.FromSeconds(6), "6 s at most, as the user decided (D-194 b of 20/11, was 3 s)");
         }),
         ("Call graph 1279: the callees read from the IL: another class, a lambda, generic code closed over the plugin's type; not itself", () =>
         {
