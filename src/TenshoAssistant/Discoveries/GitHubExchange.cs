@@ -36,6 +36,10 @@ public sealed class GitHubExchangeMeta
     /// gist, start again from 0. Empty: none.
     /// </summary>
     public string AsideRefusedFor { get; set; }="";
+    /// <summary>X-666 M4 (0.1614, review of 0.1612): when the last exchange was started, and how many exchanges in a row failed since the last
+    /// one that ended (GitHubExchange.Wait): kept here so a restart of the game does not try again at once.</summary>
+    public DateTimeOffset? Tried { get; set; }
+    public int Failures { get; set; }
     /// <summary>
     /// X-656 M1 (review of 0.1598): copies refused GistAside.RefusalLimit times were given up and their rows settled, but no send has replaced
     /// the gist since: « ShareAsideGivenUp » is said at the first send that does (« Sent »), even sessions later, then this goes back to false.
@@ -55,7 +59,8 @@ internal sealed class ExchangeRefused(string key,bool forget):Exception(key)
 /// client id below, not a secret; no client secret in the plugin): Tensho shows a code, the player approves it on github.com; the token is kept on this PC only,
 /// protected by Windows for this user (DPAPI), and can be revoked on GitHub at any time. An exchange: the common file of the repository joined as imported
 /// (once per version of the file), then, when connected, the player's own sightings (never imported ones) written to one secret gist of theirs, updated each
-/// time, and one issue per player in the repository pointing to it. Started by a click, or at most once every 20 hours (<see cref="Every"/>) by the opt-in setting « automatic exchange ».
+/// time, and one issue per player in the repository pointing to it. Started by a click, or at most once every 20 hours (<see cref="Every"/>) by the opt-in setting « automatic exchange »;
+/// after a failure, tried again 15 minutes later, then twice as long after each new failure, 20 hours at most (<see cref="Wait"/>, X-666).
 /// A discovery never holds a player's name, position or id; the issue's title holds the GitHub login of the account the player connected.
 /// X-175 (1138): the sign-in (OAuth app today, GitHub App once its client id is given) comes from GitHubSignIn, the one switch; an expiring token
 /// is renewed before an upload with its refresh token, kept protected the same way (github.refresh).
@@ -66,6 +71,12 @@ public sealed class GitHubExchange : IDisposable
     /// <summary>X-175: the files that hold a secret, never put in a backup copy.</summary>
     public static readonly IReadOnlySet<string> SecretFiles=new HashSet<string>(StringComparer.OrdinalIgnoreCase){"github.token","github.refresh"};
     public static readonly TimeSpan Every=TimeSpan.FromHours(20),Retry=TimeSpan.FromMinutes(15);
+    /// <summary>
+    /// X-666 M4 (0.1614, review of 0.1612, R04: fewer automatic requests): the wait before the automatic exchange tries again after
+    /// <paramref name="failures"/> exchanges in a row that failed (expired token, refusal, network): 15 minutes, then twice as long after each
+    /// new failure, 20 hours at most (<see cref="Every"/>). It was 15 minutes whatever the number of failures.
+    /// </summary>
+    public static TimeSpan Wait(int failures)=>failures<=1 ? Retry:TimeSpan.FromTicks(Math.Min(Every.Ticks,Retry.Ticks<<Math.Min(failures-1,20)));
     private readonly string folder;
     private readonly HttpClient client;
     private readonly GitHubSignIn signIn;
@@ -121,18 +132,27 @@ public sealed class GitHubExchange : IDisposable
         try{if(token is not null && File.Exists(RefreshPath))refresh=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(RefreshPath)));}catch(Exception){refresh=null;}
         // X-175: a token of the other sign-in (the OAuth app's, once the GitHub App is in place) is forgotten: the player connects again, to the App.
         if(token is not null && !this.signIn.Owns(meta.ClientId)){Disconnect();message=new("ExchangeSignInChanged");}
+        tried=meta.Tried ?? default;
     }
 
-    /// <summary>The automatic exchange is due: none for <see cref="Every"/>, and no attempt for <see cref="Retry"/> (a failure is not retried every second).</summary>
-    public bool Due(DateTimeOffset now){lock(gate)return !busy && now-tried>=Retry && (meta.Exchanged is not { } last || now-last>=Every);}
+    /// <summary>The automatic exchange is due: none for <see cref="Every"/>, and no attempt for <see cref="Wait"/> (X-666 M4: a failure is
+    /// tried again later and later, never every 15 minutes); a last attempt dated after now (the clock set back) does not hold it.</summary>
+    public bool Due(DateTimeOffset now)
+    {
+        lock(gate)
+        {
+            var since=now-tried;
+            return !busy && (since<TimeSpan.Zero || since>=Wait(meta.Failures)) && (meta.Exchanged is not { } last || now-last>=Every);
+        }
+    }
 
-    private bool Start(Func<Task<ExchangeMessage>> work,bool report=false)
+    private bool Start(Func<Task<ExchangeMessage>> work,bool report=false,bool exchange=false)
     {
         lock(gate)
         {
             if(busy)return false;
             busy=true;workGeneration=generation;
-            if(report)reportMessage=null;else{message=null;tried=DateTimeOffset.UtcNow;}
+            if(report)reportMessage=null;else{message=null;tried=clock();if(exchange)meta.Tried=tried;}
         }
         _=Task.Run(async()=>
         {
@@ -142,13 +162,19 @@ public sealed class GitHubExchange : IDisposable
             catch(ExchangeRefused refused){if(refused.Forget)Disconnect();result=new(refused.Key);}
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){ForgetIfStill(null);result=new("ExchangeUnauthorized");}
             catch(Exception error){result=new("ExchangeFailed",error.GetType().Name);}
+            // X-666 M4: an exchange that ended clears the count of failures; one that failed adds one (a stop of the plugin is not one).
+            if(exchange && result.Key!="ExchangeStopped")
+            {
+                lock(gate)meta.Failures=result.Key=="ExchangeDone" ? 0:Math.Min(meta.Failures+1,30);
+                SaveMeta();
+            }
             lock(gate){if(report)reportMessage=result;else message=result;busy=false;userCode=null;}
         });
         return true;
     }
 
     public bool Connect()=>Start(ConnectAsync);
-    public bool Exchange(DiscoveryStore store,bool upload)=>Start(()=>ExchangeAsync(store,upload));
+    public bool Exchange(DiscoveryStore store,bool upload)=>Start(()=>ExchangeAsync(store,upload),exchange:true);
     /// <summary>
     /// X-340 (0.1324, user's decision of 2026-11-14, R04): the player's problem report opened as an issue of the repository, through this connection,
     /// on the player's click only (the Help page calls it from its « Send » button, under the preview of these very strings). False when not

@@ -782,7 +782,7 @@
     "Disconnect": "Déconnecter",
     "DisconnectTip": "Oublie l'autorisation sur ce PC. Votre gist et votre ticket restent sur GitHub : supprimez le gist sur github.com et fermez le ticket. Pour retirer l'autorisation tout à fait : github.com › Settings › Applications › Tensho Assistant.",
     "AutoExchange": "Échange automatique",
-    "AutoExchangeTip": "Au plus une fois toutes les 20 heures : récupère les découvertes communes et, si GitHub est connecté, envoie vos nouvelles. Rien n'est envoyé automatiquement tant que c'est coupé (« Échanger maintenant » envoie quand même si GitHub est connecté). Ne fonctionne que si « Noter les découvertes » est activé (grisé sinon).\nPar défaut : désactivé.",
+    "AutoExchangeTip": "Au plus une fois toutes les 20 heures : récupère les découvertes communes et, si GitHub est connecté, envoie vos nouvelles. Rien n'est envoyé automatiquement tant que c'est coupé (« Échanger maintenant » envoie quand même si GitHub est connecté). Ne fonctionne que si « Noter les découvertes » est activé (grisé sinon). Après un échange qui a échoué, il réessaie 15 minutes plus tard, puis attend deux fois plus longtemps après chaque nouvel échec (20 heures au plus).\nPar défaut : désactivé.",
     "ExchangedAt": "Dernier échange : {0}",
     "ExchangeDone": "Échange fait : {0} nouvelles, {1} jointes. {2} {3}",
     "CommonTaken": "Fichier commun récupéré.",

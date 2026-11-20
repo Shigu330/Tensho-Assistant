@@ -60,7 +60,8 @@ What the plugin does that matters for security (read against the code of the `De
   monsters and the sightseeing log, and a recent Fashion Report copy; Garland item sources, wiki item acquisition, Teamcraft,
   LuminaSupplemental and GatherBuddy data are hidden while their switch is off.
 - **Shared discoveries exchange (GitHub)**: World › Discoveries, on « Exchange now » or with the « Automatic exchange » setting (off by
-  default, at most once every 20 hours). It downloads the common files of this repository (`raw.githubusercontent.com`): since 0.1137 the index of
+  default, at most once every 20 hours; after a failed exchange, tried again 15 minutes later, then twice as long after each new failure, 20 hours
+  at most). It downloads the common files of this repository (`raw.githubusercontent.com`): since 0.1137 the index of
   `community-discoveries/v3/` and only the compressed file of each kind that changed, each checked against the hash and size the index gives
   and read within bounds (DEC-052); nothing else since 0.1349 (the older single `discoveries.json` is gone). Only after the player
   presses « Connect GitHub » and approves the code shown on github.com (GitHub's device sign-in, no password in the game), it also sends
@@ -239,7 +240,8 @@ Ce que fait le plugin et qui compte pour la sécurité (relu contre le code de l
   d'exploration, et une copie récente de la Revue de mode ; les sources d'objets de Garland, l'acquisition du wiki, Teamcraft,
   LuminaSupplemental et GatherBuddy sont masqués tant que leur interrupteur est coupé.
 - **Échange des découvertes partagées (GitHub)** : Monde › Découvertes, sur « Échanger maintenant » ou avec le réglage « Échange
-  automatique » (désactivé par défaut, au plus une fois toutes les 20 heures). Il télécharge les fichiers communs de ce dépôt
+  automatique » (désactivé par défaut, au plus une fois toutes les 20 heures ; après un échange qui a échoué, réessayé 15 minutes plus tard, puis
+  deux fois plus tard après chaque nouvel échec, 20 heures au plus). Il télécharge les fichiers communs de ce dépôt
   (`raw.githubusercontent.com`) : depuis 0.1137 l'index de `community-discoveries/v3/` et seulement le fichier compressé de chaque genre qui a
   changé, chacun vérifié contre l'empreinte et la taille que donne l'index et lu dans des bornes (DEC-052) ;
   rien d'autre depuis 0.1349 (l'ancien fichier unique `discoveries.json` est retiré). Seulement après que le joueur a appuyé sur « Connecter GitHub » et approuvé sur github.com le code

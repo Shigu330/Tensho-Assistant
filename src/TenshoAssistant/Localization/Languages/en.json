@@ -782,7 +782,7 @@
     "Disconnect": "Disconnect",
     "DisconnectTip": "Forgets the authorisation on this PC. Your gist and your issue stay on GitHub: delete the gist on github.com and close the issue. To revoke the authorisation completely: github.com › Settings › Applications › Tensho Assistant.",
     "AutoExchange": "Automatic exchange",
-    "AutoExchangeTip": "At most once every 20 hours: takes the common discoveries and, if GitHub is connected, sends your new ones. Nothing is sent automatically while this is off (« Exchange now » still sends when GitHub is connected). Runs only while « Note discoveries » is on (greyed while it is off).\nDefault: off.",
+    "AutoExchangeTip": "At most once every 20 hours: takes the common discoveries and, if GitHub is connected, sends your new ones. Nothing is sent automatically while this is off (« Exchange now » still sends when GitHub is connected). Runs only while « Note discoveries » is on (greyed while it is off). After a failed exchange, it tries again 15 minutes later, then waits twice as long after each new failure (20 hours at most).\nDefault: off.",
     "ExchangedAt": "Last exchange: {0}",
     "ExchangeDone": "Exchange done: {0} new, {1} joined. {2} {3}",
     "CommonTaken": "Common file taken.",
