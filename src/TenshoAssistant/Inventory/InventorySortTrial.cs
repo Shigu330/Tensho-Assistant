@@ -2,11 +2,12 @@ namespace TenshoAssistant.Inventory;
 
 /// <summary>X-394 (review of 0.1361, R37): the sample inventory of the desktop application's « SortPreview-trial » picture (never in the
 /// game): one character's four bags, read complete, with shards, crystals and clusters scattered over them, each in a slot of its own and
-/// its displayed place given, so the preview shows its frames in fill order (bags 1, 3, 2, 4) and the stacks the sort would move.</summary>
+/// its displayed place given, so the preview shows its frames in fill order (bags 1, 3, 2, 4) and the stacks the sort would move.
+/// X-647 (review of 0.1592): 75 stacks, more than two bags hold, so the sorted stacks fill bag 1, then bag 3, then five in bag 2.</summary>
 public static class InventorySortTrial
 {
     public const ulong Character=1001;
-    public const int Stacks=30;
+    public const int Stacks=75;
     /// <summary>The sort's line after « Apply » on the bags (InventoryVisualSortBridge), pictured once even in developer mode (X-385).</summary>
     public const string Message="Visual sort applied to the four bags; refreshed within a second.";
 

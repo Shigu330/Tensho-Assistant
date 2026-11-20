@@ -213,6 +213,8 @@ internal sealed partial class MainWindow
             }
             finally { ImGui.EndChild(); }
         }
+        // X-647 (review of 0.1592): the desktop application's sample picture scrolled to the frames' foot, the four frames whole in 860 px.
+        if(sortTrial is not null)ImGui.SetScrollHereY(1f);
         if(openSlotMenu)ImGui.OpenPopup("SortSlotMenu");
         DrawSortSlotMenu(scope,catalog);
     }
