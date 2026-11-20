@@ -514,8 +514,11 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>X-445 (0.1458): the tabs, the game's three default ones (names of the game's Addon sheet) and Social, made or completed once.</summary>
-    private List<ChatTabSettings> ChatTabs(ChatSettings options)=>options.EnsureTabs(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabBattle"),
-        localization.Get("ChatWindow.TabEvent"),localization.Get("ChatWindow.TabSocial"));
+    private List<ChatTabSettings> ChatTabs(ChatSettings options)
+    {
+        var names=ChatTabNames();
+        return options.EnsureTabs(names.General,names.Battle,names.Event,names.Social);
+    }
 
     // X-447 B10 (0.1654): the conversations' tabs (memory only, never in the settings' tabs: R04), and the window's tabs: the settings' ones,
     // then the conversations' (one list kept, filled again at each frame). A conversation opened from a player's menu, shown at the next frame.
@@ -597,6 +600,7 @@ internal sealed partial class MainWindow
     private void DrawChatTabSettings(ChatSettings options)
     {
         var tabs=ChatTabs(options);
+        DrawChatTabUndo(tabs);
         for(var index=0;index<tabs.Count;index++)
         {
             var tab=tabs[index];
@@ -641,7 +645,13 @@ internal sealed partial class MainWindow
                 if(tabs.Count>1)
                 {
                     SameLineIfFits(ImGui.CalcTextSize(localization.Get("ChatWindow.TabRemove")).X+style.FramePadding.X*2);
-                    if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove"))){ChatMessages.Restart(tab);tabs.RemoveAt(index);chatSettingsPending=true;return;}
+                    // X-686: the tab is kept a few seconds, the time to undo it (the line above the tabs)
+                    if(ImGui.SmallButton(localization.Get("ChatWindow.TabRemove")) && chatTabUndo.Remove(tabs,index,Environment.TickCount64))
+                    {
+                        ChatMessages.Restart(tab);
+                        chatSettingsPending=true;
+                        return;
+                    }
                     Tip("ChatWindow.TabRemoveTip");
                 }
                 // X-520 (0.1537): the desktop application's picture of the chat's tabs shows the first tab's channels (X-560's grid).
@@ -660,6 +670,66 @@ internal sealed partial class MainWindow
             if(ImGui.SmallButton(localization.Get("ChatWindow.TabAdd"))){AddChatTab(tabs);chatSettingsPending=true;}
             Tip("ChatWindow.TabAddTip");
         }
+        DrawChatTabDefaults(options,tabs);
+    }
+
+    // X-686 (the user's report of 20/11: a tab removed by mistake at the first click, and no way to get the default tabs back): « Remove »
+    // keeps the tab a few seconds to undo it; a default tab removed comes back alone; all of them come back after a question.
+    private readonly ChatTabUndo chatTabUndo=new();
+
+    private (string General,string Battle,string Event,string Social) ChatTabNames()
+        =>(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabBattle"),localization.Get("ChatWindow.TabEvent"),
+           localization.Get("ChatWindow.TabSocial"));
+
+    private void DrawChatTabUndo(List<ChatTabSettings> tabs)
+    {
+        var now=Environment.TickCount64;
+        if(chatTabUndo.Waiting(now) is not { } removed)return;
+        ImGui.TextColored(Warning,localization.Format("ChatWindow.TabRemoved",removed.Name,chatTabUndo.SecondsLeft(now)));
+        var undo=localization.Get("ChatWindow.TabUndo");
+        SameLineIfFits(ImGui.CalcTextSize(undo).X+ImGui.GetStyle().FramePadding.X*2);
+        if(ImGui.SmallButton(undo+"###ChatTabUndo") && chatTabUndo.Undo(tabs,now))
+        {
+            ChatMessages.Restart(removed);
+            chatSettingsPending=true;
+        }
+        Tip("ChatWindow.TabUndoTip");
+    }
+
+    private void DrawChatTabDefaults(ChatSettings options,List<ChatTabSettings> tabs)
+    {
+        var names=ChatTabNames();
+        foreach(var (place,missing) in ChatSettings.MissingDefaults(tabs,names.General,names.Battle,names.Event,names.Social))
+        {
+            if(tabs.Count>=ChatSettings.MaximumTabs)break;
+            var label=localization.Format("ChatWindow.TabAddDefault",missing.Name);
+            SameLineIfFits(ImGui.CalcTextSize(label).X+ImGui.GetStyle().FramePadding.X*2);
+            if(ImGui.SmallButton(label+"###ChatTabAddDefault"+place)
+               && ChatSettings.AddDefault(tabs,place,missing))chatSettingsPending=true;
+            Tip("ChatWindow.TabAddDefaultTip");
+        }
+        if(ImGui.SmallButton(localization.Get("ChatWindow.TabsReset")+"###ChatTabsReset"))ImGui.OpenPopup("###ChatTabsResetAsk");
+        Tip("ChatWindow.TabsResetTip");
+        var open=true;
+        if(!ImGui.BeginPopupModal(localization.Get("ChatWindow.TabsResetTitle")+"###ChatTabsResetAsk",ref open,ImGuiWindowFlags.AlwaysAutoResize))return;
+        try
+        {
+            ImGui.PushTextWrapPos(ImGui.GetFontSize()*30);
+            ImGui.TextUnformatted(localization.Get("ChatWindow.TabsResetText"));
+            ImGui.PopTextWrapPos();
+            if(ImGui.Button(localization.Get("ChatWindow.TabsResetYes")+"###ChatTabsResetYes"))
+            {
+                foreach(var tab in tabs)ChatMessages.Restart(tab);
+                options.ResetTabs(names.General,names.Battle,names.Event,names.Social);
+                chatTabUndo.Forget();
+                chatSettingsPending=true;
+                ImGui.CloseCurrentPopup();
+            }
+            var cancel=localization.Get("ChatWindow.HistoryCancel");
+            SameLineIfFits(ImGui.CalcTextSize(cancel).X+ImGui.GetStyle().FramePadding.X*2);
+            if(ImGui.Button(cancel+"###ChatTabsResetNo"))ImGui.CloseCurrentPopup();
+        }
+        finally{ImGui.EndPopup();}
     }
 
     /// <summary>X-565 (0.1565): the next control on the same line when the width left holds it, else on the next line.</summary>

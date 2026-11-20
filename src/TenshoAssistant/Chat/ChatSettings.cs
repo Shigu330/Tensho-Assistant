@@ -237,14 +237,81 @@ public sealed class ChatSettings
             TabsVersion=CurrentTabs;
             return Tabs;
         }
-        Tabs=
-        [
-            new(){Name=generalName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.General).ToList()},
-            new(){Name=battleName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Battle).ToList(),ShowUnread=false},
-            new(){Name=eventName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Event).ToList(),ShowUnread=false},
-            new(){Name=socialName,Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()},
-        ];
+        Tabs=DefaultTabs(generalName,battleName,eventName,socialName);
         TabsVersion=CurrentTabs;
         return Tabs;
     }
+
+    /// <summary>X-445 (0.1458): the tabs a new player starts with: the game's three default log tabs, then Social.</summary>
+    public static List<ChatTabSettings> DefaultTabs(string generalName,string battleName,string eventName,string socialName)=>
+    [
+        new(){Name=generalName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.General).ToList()},
+        new(){Name=battleName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Battle).ToList(),ShowUnread=false},
+        new(){Name=eventName,Channels=ChatChannels.All.Where(channel=>ChatChannels.DefaultTab(channel)==ChatGameTab.Event).ToList(),ShowUnread=false},
+        new(){Name=socialName,Channels=ChatChannels.All.Where(ChatChannels.Spoken).ToList()},
+    ];
+
+    /// <summary>X-686 (the user's report of 20/11): the tabs back to the ones a new player starts with. Only the tabs change: the history, the
+    /// look, the colours, the players and the contexts' profiles stay as they are (a profile naming a tab gone shows every tab).</summary>
+    public List<ChatTabSettings> ResetTabs(string generalName,string battleName,string eventName,string socialName)
+    {
+        Tabs=DefaultTabs(generalName,battleName,eventName,socialName);
+        TabsVersion=CurrentTabs;
+        return Tabs;
+    }
+
+    /// <summary>X-686: the default tabs no tab stands for any more (none with the same name, none with the same channels by channel), with the place
+    /// each has among the default ones, so that one can come back alone.</summary>
+    public static List<(int Place,ChatTabSettings Tab)> MissingDefaults(IReadOnlyList<ChatTabSettings> tabs,string generalName,string battleName,
+        string eventName,string socialName)
+        =>DefaultTabs(generalName,battleName,eventName,socialName).Select((tab,place)=>(place,tab))
+            .Where(missing=>!tabs.Any(tab=>StandsFor(tab,missing.tab))).ToList();
+
+    private static bool StandsFor(ChatTabSettings tab,ChatTabSettings standard)
+        =>string.Equals((tab.Name ?? "").Trim(),standard.Name,StringComparison.OrdinalIgnoreCase)
+          || (tab.Filters is null && tab.Channels is { Count:>0 } channels && channels.ToHashSet().SetEquals(standard.Channels));
+
+    /// <summary>X-686: one default tab back at its own place (or the end), when there is room for it.</summary>
+    public static bool AddDefault(List<ChatTabSettings> tabs,int place,ChatTabSettings tab)
+    {
+        if(tabs.Count>=MaximumTabs)return false;
+        tabs.Insert(Math.Clamp(place,0,tabs.Count),tab);
+        return true;
+    }
+}
+
+/// <summary>X-686 (the user's report of 20/11: a tab removed by mistake, at the first click): « Remove » takes the tab away at once and keeps
+/// it a few seconds, the time to undo it; it comes back at its place, with its own settings. Only the last tab removed can come back.</summary>
+public sealed class ChatTabUndo
+{
+    public const long UndoMilliseconds=10_000;
+    private ChatTabSettings? removed;
+    private int place;
+    private long until;
+
+    /// <summary>The tab removed that can still come back, else null.</summary>
+    public ChatTabSettings? Waiting(long now)=>removed is not null && now<until ? removed:null;
+    public int SecondsLeft(long now)=>Waiting(now) is null ? 0:(int)Math.Ceiling((until-now)/1000.0);
+
+    /// <summary>Removes the tab at this place (never the last tab); false when nothing was removed.</summary>
+    public bool Remove(List<ChatTabSettings> tabs,int index,long now)
+    {
+        if(index<0 || index>=tabs.Count || tabs.Count<=1)return false;
+        removed=tabs[index];
+        place=index;
+        until=now+UndoMilliseconds;
+        tabs.RemoveAt(index);
+        return true;
+    }
+
+    /// <summary>The tab back at its place (or the end); false when the time is over, nothing waits, or there is no room.</summary>
+    public bool Undo(List<ChatTabSettings> tabs,long now)
+    {
+        if(Waiting(now) is not { } tab || tabs.Count>=ChatSettings.MaximumTabs || tabs.Contains(tab))return false;
+        tabs.Insert(Math.Min(place,tabs.Count),tab);
+        removed=null;
+        return true;
+    }
+
+    public void Forget()=>removed=null;
 }
