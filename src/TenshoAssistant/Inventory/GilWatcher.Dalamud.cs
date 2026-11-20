@@ -24,7 +24,8 @@ public sealed unsafe class GilWatcher : IDisposable
     private readonly Dictionary<string,DateTimeOffset> seen=[];
     private ulong character;
     private List<GilEntry> entries=[];
-    private long? gil,retainers,company;
+    // X-658 (0.1604): the balances compared and how a change becomes entries (pure, tested: GilRecorder).
+    private readonly GilRecorder recorder=new();
     private bool disposed,warned,loadFailed;
     private DateTimeOffset nextRead,nextSave;
     private GilJournalState? state;
@@ -40,7 +41,6 @@ public sealed unsafe class GilWatcher : IDisposable
     private readonly Dictionary<uint,DateTimeOffset> messages=[];
     private readonly object messagesGate=new();
     private readonly IChatGui? chat;
-    private long retainerDeposits;
     public GilWatcher(IFramework framework,IPlayerState player,IGameGui gui,GilJournalStore store,IPluginLog log,Func<IReadOnlyList<string>>? windowsOpen=null,Func<bool>? developerMode=null,IChatGui? chat=null)
     {
         this.framework=framework;this.player=player;this.gui=gui;this.store=store;this.log=log;this.windowsOpen=windowsOpen;this.developerMode=developerMode ?? (()=>false);this.chat=chat;
@@ -81,7 +81,8 @@ public sealed unsafe class GilWatcher : IDisposable
             {
                 if(!read.IsCompleted)return;
                 loading=null;
-                if(read.IsCompletedSuccessfully)entries=read.Result;
+                // X-658 (0.1604): the retainers' total starts from the journal's last balance (sales made meanwhile are counted).
+                if(read.IsCompletedSuccessfully){entries=read.Result;recorder.Seed(entries);}
                 else{loadFailed=true;log.Warning(read.Exception?.GetBaseException(),"Gil journal could not be read; it is not written over.");}
                 Volatile.Write(ref state,new GilJournalState(character,entries.ToArray(),null,null,null,loadFailed));
             }
@@ -107,10 +108,17 @@ public sealed unsafe class GilWatcher : IDisposable
                     if(retainer.RetainerId!=0)sum+=RetainerPurse.Gil(retainer.RetainerId,retainer.Gil,livePurse);
                 newRetainers=sum;
             }
-            var changed=Record(ref gil,newGil,GilSource.Character,now) | Record(ref retainers,newRetainers,GilSource.Retainers,now)
-                | Record(ref company,newCompany,GilSource.Company,now);
+            // The messages heard lately, copied once per reading and only when a change of the character's gil needs them.
+            Dictionary<uint,DateTimeOffset>? heard=null;
+            GilCategory Category(long delta)
+            {
+                if(heard is null)lock(messagesGate)heard=new(messages);
+                return GilJournal.ForDelta(GilJournal.Classify(seen,now,heard),delta);
+            }
+            var changed=recorder.Read(newGil,newRetainers,newCompany,now,entries,Category,(category,change)=>Changed(category,change,now,heard));
+            if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,now);
             // Published only when something changed (the journal may hold 20 000 entries: not copied every second).
-            if(changed)Volatile.Write(ref state,new GilJournalState(character,entries.ToArray(),gil,retainers,company,loadFailed));
+            if(changed)Volatile.Write(ref state,new GilJournalState(character,entries.ToArray(),recorder.Gil,recorder.Retainers,recorder.Company,loadFailed));
             if(now>=nextSave)Save(now);
             warned=false;
         }
@@ -120,41 +128,20 @@ public sealed unsafe class GilWatcher : IDisposable
         }
     }
 
-    // A known balance that changed becomes an entry; the first known value is only a starting point. An unknown value changes nothing.
-    private bool Record(ref long? last,long? now,GilSource source,DateTimeOffset at)
+    // A change recorded (GilRecorder): saved at the next minute; in developer mode, what an « Other » change was.
+    private void Changed(GilCategory category,long change,DateTimeOffset at,Dictionary<uint,DateTimeOffset>? heard)
     {
-        if(now is not { } value || last==value)return false;
-        if(last is { } before && before!=value)
-        {
-            var delta=value-before;
-            Dictionary<uint,DateTimeOffset> heard;
-            lock(messagesGate)heard=new(messages);
-            var category=source switch{GilSource.Retainers=>GilCategory.Retainer,GilSource.Company=>GilCategory.Company,_=>GilJournal.ForDelta(GilJournal.Classify(seen,at,heard),delta)};
-            // 0.769 (X-19): a deposit to the retainers waits for their rise; a rise beyond the deposits is their market sales.
-            if(source==GilSource.Character && category==GilCategory.Retainer && delta<0)retainerDeposits+=-delta;
-            if(source==GilSource.Retainers && delta>0)
-            {
-                var (transfer,sales,left)=GilJournal.SplitRetainerRise(delta,retainerDeposits);
-                retainerDeposits=left;
-                if(sales>0)entries.Add(new GilEntry(at,sales,value-transfer,source,GilCategory.Market));
-                delta=transfer;
-            }
-            if(delta!=0)entries.Add(new GilEntry(at,delta,value,source,category));
-            if(category==GilCategory.Other && developerMode())
-                log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}; log messages: {2}",value-before,
-                    string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)),
-                    string.Join(", ",heard.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).Select(pair=>pair.Key)));
-            if(entries.Count>GilJournal.MaximumEntries+500)entries=GilJournal.Prune(entries,at);
-            Saves.Changed();
-        }
-        last=value;
-        return true;
+        if(category==GilCategory.Other && developerMode())
+            log.Information("Gil other: {0:+#,0;-#,0}, windows seen in the last 15 s: {1}; log messages: {2}",change,
+                string.Join(", ",seenAny.Where(pair=>at-pair.Value<=GilJournal.ContextWindow).OrderByDescending(pair=>pair.Value).Select(pair=>pair.Key)),
+                string.Join(", ",(heard ?? []).Where(pair=>at-pair.Value<=GilJournal.ContextWindow).Select(pair=>pair.Key)));
+        Saves.Changed();
     }
 
     private Task<List<GilEntry>>? loading;
     private void Switch(ulong id,DateTimeOffset now)
     {
-        character=id;gil=null;retainers=null;company=null;loadFailed=false;entries=[];
+        character=id;recorder.Reset();loadFailed=false;entries=[];
         Saves.Switch();
         // X-587 (external audit A14 of 18/11): a journal of this character whose write failed is newer than the data file's: the one used.
         if(id!=0 && Saves.Failed(id) is { } kept)loading=Task.FromResult(GilJournal.Prune(kept,now));

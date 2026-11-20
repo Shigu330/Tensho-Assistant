@@ -51,7 +51,7 @@ internal static class GilOther1319Tests
             foreach(var category in new[]{"Fate","Defeat","ChallengeLog"})Check(page.Contains($"GilCategory.{category}=>Dalamud.Interface.FontAwesomeIcon."),"icon: "+category);
             var watcher=Read("src/TenshoAssistant/Inventory/GilWatcher.Dalamud.cs");
             Check(watcher.Contains("if(chat is not null)chat.LogMessage+=OnLogMessage;") && watcher.Contains("if(chat is not null)chat.LogMessage-=OnLogMessage;\n        TenshoAssistant.Competitive.CompetitiveGate.Remove"),"subscribed, and removed on dispose");
-            Check(watcher.Contains("GilJournal.ForDelta(GilJournal.Classify(seen,at,heard),delta)"),"the messages heard classify");
+            Check(watcher.Contains("GilJournal.ForDelta(GilJournal.Classify(seen,now,heard),delta)"),"the messages heard classify (X-658, 0.1604: once per reading)");
             Check(Read("src/TenshoAssistant/Plugin.cs").Contains("()=>mainWindow.DeveloperMode,chatGui),()=>gilWatcher?.Dispose());"),"the plugin gives the chat");
             Check(Read("docs/evidence/0.1319-gil-other.md").Contains("| 3780 | 57 |"),"evidence");
         }),

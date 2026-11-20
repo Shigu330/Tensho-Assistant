@@ -89,6 +89,25 @@ internal static class UiComponents
         else ImGui.TextUnformatted(text);
     }
 
+    /// <summary>
+    /// X-658 (0.1604): a table's header row whose number columns have their title on the right, above their amounts (NumberCell), instead
+    /// of on the left with the amounts on the right. In place of ImGui.TableHeadersRow() after the columns are set up.
+    /// </summary>
+    public static void HeadersRow(IReadOnlyList<string> labels,Func<int,bool> number)
+    {
+        ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
+        for(var column=0;column<labels.Count;column++)
+        {
+            if(!ImGui.TableSetColumnIndex(column))continue;
+            if(number(column))
+            {
+                var room=ImGui.GetContentRegionAvail().X-ImGui.CalcTextSize(labels[column]).X;
+                if(room>0)ImGui.SetCursorPosX(ImGui.GetCursorPosX()+room);
+            }
+            ImGui.TableHeader(labels[column]);
+        }
+    }
+
     /// <summary>X-154 (0.1252): a title inside a page (a block of the page, the page named beside the folded navigation): the section font, accent colour.</summary>
     public static void SubTitle(string text)
     {

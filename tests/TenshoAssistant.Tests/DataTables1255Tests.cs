@@ -34,7 +34,8 @@ internal static class DataTables1255Tests
             Check(wishlist.Contains("UiComponents.BeginDataTable(\"Wishlist\",4)") && !wishlist.Contains("ImGui.BeginTable("),"wishlist");
             var gil=Read("src/TenshoAssistant/MainWindow.GilJournal.cs");
             Check(gil.Contains("UiComponents.BeginDataTable(\"GilTotals\"+source,4)") && gil.Contains("UiComponents.BeginDataTable(\"GilLatest\",5)") && !gil.Contains("ImGui.BeginTable("),"gil journal: both tables");
-            Check(gil.Split("UiComponents.NumberCell(").Length-1==7,"gil journal: gained, spent, net (and the transfers' two), change and balance aligned on the right");
+            // X-658 (0.1604): the transfers' « transfer » mark in the net column too, on the right as the amounts.
+            Check(gil.Split("UiComponents.NumberCell(").Length-1==8,"gil journal: gained, spent, net (and the transfers' three), change and balance aligned on the right");
         }),
     ];
 }

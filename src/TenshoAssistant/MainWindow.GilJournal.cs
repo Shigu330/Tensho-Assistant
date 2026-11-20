@@ -68,12 +68,15 @@ internal sealed partial class MainWindow
             var totals=gilTotals[(int)source];
             if(totals.Count==0)continue;
             // 0.769 (X-19): transfers with the retainers or the company chest stay out of the net.
-            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent).ToString("+#,0;-#,0;0")));
+            // X-658 (0.1604): one way of writing the amounts (TenshoCulture): « -62.360 » here beside « 327 297 » below, before.
+            ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,TenshoAssistant.Localization.TenshoCulture.Signed(totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent))));
             if(!UI.UiComponents.BeginDataTable("GilTotals"+source,4))continue;
             try
             {
-                foreach(var column in new[]{"ColumnCategory","ColumnGained","ColumnSpent","ColumnNet"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
-                ImGui.TableHeadersRow();
+                var titles=new[]{"ColumnCategory","ColumnGained","ColumnSpent","ColumnNet"}.Select(column=>localization.Get("GilJournal."+column)).ToArray();
+                foreach(var title in titles)ImGui.TableSetupColumn(title);
+                // X-658 (0.1604): the amounts' titles on the right, above them.
+                UI.UiComponents.HeadersRow(titles,column=>column>0);
                 foreach(var (category,gained,spent) in totals)
                 {
                     ImGui.TableNextRow();
@@ -87,14 +90,14 @@ internal sealed partial class MainWindow
                     {
                         ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(gained),Muted);
                         ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(spent),Muted);
-                        ImGui.TableNextColumn();ImGui.TextDisabled(localization.Get("GilJournal.Transfer"));
+                        ImGui.TableNextColumn();UI.UiComponents.NumberCell(localization.Get("GilJournal.Transfer"),Muted);
                         Tip("GilJournal.TransferTip");
                         continue;
                     }
                     // X-154 (0.1255): amounts aligned on the right of their column (NumberCell), same colours as before.
                     ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(gained),gained>0 ? Success:Muted);
                     ImGui.TableNextColumn();UI.UiComponents.NumberCell(Part(spent),spent>0 ? UI.FfxivTheme.Warning:Muted);
-                    ImGui.TableNextColumn();UI.UiComponents.NumberCell((gained-spent).ToString("+#,0;-#,0;0"),gained>=spent ? Success:UI.FfxivTheme.Warning);
+                    ImGui.TableNextColumn();UI.UiComponents.NumberCell(TenshoAssistant.Localization.TenshoCulture.Signed(gained-spent),gained>=spent ? Success:UI.FfxivTheme.Warning);
                 }
             }
             finally{ImGui.EndTable();}
@@ -104,13 +107,14 @@ internal sealed partial class MainWindow
         if(!UI.UiComponents.BeginDataTable("GilLatest",5))return;
         try
         {
-            foreach(var column in new[]{"ColumnDate","ColumnChange","ColumnBalance","ColumnCategory","ColumnSource"})ImGui.TableSetupColumn(localization.Get("GilJournal."+column));
-            ImGui.TableHeadersRow();
+            var titles=new[]{"ColumnDate","ColumnChange","ColumnBalance","ColumnCategory","ColumnSource"}.Select(column=>localization.Get("GilJournal."+column)).ToArray();
+            foreach(var title in titles)ImGui.TableSetupColumn(title);
+            UI.UiComponents.HeadersRow(titles,column=>column is 1 or 2);
             foreach(var entry in state.Entries.TakeLast(50).Reverse())
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();ImGui.TextUnformatted(entry.At.ToLocalTime().ToString("g"));
-                ImGui.TableNextColumn();UI.UiComponents.NumberCell(entry.Delta.ToString("+#,0;-#,0"));
+                ImGui.TableNextColumn();UI.UiComponents.NumberCell(TenshoAssistant.Localization.TenshoCulture.Signed(entry.Delta));
                 ImGui.TableNextColumn();UI.UiComponents.NumberCell(entry.Balance.ToString("N0",Numbers));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Category"+entry.Category));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(localization.Get("GilJournal.Short"+entry.Source));

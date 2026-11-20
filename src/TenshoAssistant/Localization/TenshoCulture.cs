@@ -28,6 +28,9 @@ internal static class TenshoCulture
     public static string Percent(double value, string format = "0")
         => value.ToString(format, current) + (IsFrench ? " %" : "%");
 
+    /// <summary>X-658 (0.1604): a gain or a loss with its sign, grouped as the language writes numbers: « +1,234 » / « +1 234 », « 0 » for none.</summary>
+    public static string Signed(long value) => value.ToString("+#,0;-#,0;0", current);
+
     /// <summary>The colon after a label: « : » in English, « : » after a no-break space in French.</summary>
     public static string Colon => IsFrench ? " :" : ":";
 
