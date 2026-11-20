@@ -472,6 +472,39 @@ internal sealed partial class MainWindow
     }
 
 
+    private readonly Dictionary<uint, byte[]> beastFontIcons = [];
+    private bool beastFontIconFailed;
+    /// <summary>
+    /// X-551 (0.1574): the game's own icon of a damage type or weakness (an icon of the game's font, named by the XBMElement sheet's text:
+    /// BeastCatalog.ElementIcons), drawn by Dalamud's text renderer at the height of a line, the word following on the same line. Nothing is
+    /// drawn when the element has no icon, in the desktop application (no game font) or once the renderer failed (said once in the log):
+    /// the word alone stays.
+    /// </summary>
+    private void DrawBeastElementIcon(BeastCatalog catalog, string element)
+    {
+        if (inDesktopApp || beastFontIconFailed || element.Length == 0 || !catalog.ElementIcons.TryGetValue(element, out var icon)) return;
+        var side = ImGui.GetTextLineHeight();
+        var width = side;
+        try
+        {
+            if (!beastFontIcons.TryGetValue(icon, out var text))
+                beastFontIcons[icon] = text = new Dalamud.Game.Text.SeStringHandling.SeStringBuilder().AddIcon((Dalamud.Game.Text.SeStringHandling.BitmapFontIcon)icon).Build().Encode();
+            // Drawn on the window's list at the cursor, without an item of its own (Dalamud's rule for a given draw list: the list, the place,
+            // the font and its size are all given): the place is kept by the Dummy below.
+            var how = new Dalamud.Interface.ImGuiSeStringRenderer.SeStringDrawParams { TargetDrawList = ImGui.GetWindowDrawList(), ScreenOffset = ImGui.GetCursorScreenPos(), Font = ImGui.GetFont(), FontSize = ImGui.GetFontSize(), WrapWidth = float.MaxValue };
+            var drawn = Dalamud.Interface.Utility.ImGuiHelpers.SeStringWrapped(text, how);
+            if (float.IsFinite(drawn.Size.X) && drawn.Size.X > 0) width = Math.Min(drawn.Size.X, side * 2);
+        }
+        catch (Exception error)
+        {
+            beastFontIconFailed = true;
+            log.Warning(error, "Beast element icons unavailable; the words alone are shown.");
+            return;
+        }
+        ImGui.Dummy(new Vector2(width, side));
+        ImGui.SameLine(0, ImGui.GetStyle().ItemInnerSpacing.X);
+    }
+
     /// <summary>X-551 (0.1534): the width the panel's lines wrap at (BeastBoardWindow sets it from the game's window beside it).</summary>
     internal float BeastPanelWrap { get; set; } = BeastBoardWindow.WrapWidth;
 
@@ -505,20 +538,39 @@ internal sealed partial class MainWindow
         if (index >= board.Battles.Count) return;
         var fight = board.Battles[index];
         ImGui.TextColored(Accent, (fight.Guardian ? localization.Get("BeastUi.Guardian") : localization.Format("BeastUi.TeamFight", index)) + " · " + localization.Get("BeastUi.FightNow"));
-        foreach (var enemy in fight.Enemies)
+        ImGui.Separator();
+        // X-551 (0.1574): one block per enemy as the game's board window: its icon and name, then « Faiblesse » with the game's own icon of
+        // the element before the word; its stars and actions under it, each action after the icon of its type of damage; a line between enemies.
+        for (var number = 0; number < fight.Enemies.Count; number++)
         {
+            var enemy = fight.Enemies[number];
+            if (number > 0) ImGui.Separator();
             DrawSmallGameIcon(enemy.Icon); ImGui.SameLine();
             ImGui.TextUnformatted(enemy.Name);
-            if (enemy.Weakness.Length > 0) { ImGui.SameLine(); ImGui.TextColored(Success, localization.Format("BeastUi.Weakness", enemy.Weakness)); }
+            if (enemy.Weakness.Length > 0)
+            {
+                ImGui.Indent();
+                try
+                {
+                    ImGui.TextDisabled(localization.Get("BeastUi.WeaknessLabel")); ImGui.SameLine();
+                    DrawBeastElementIcon(catalog, enemy.Weakness);
+                    ImGui.TextColored(Success, enemy.Weakness);
+                }
+                finally { ImGui.Unindent(); }
+            }
             ImGui.Indent();
             try
             {
                 if (enemy.Stars is { } stars) ImGui.TextDisabled(localization.Format("BeastUi.Stars", stars.Strength, stars.Intelligence, stars.PhysicalResistance, stars.MagicalResistance, stars.Vitality));
                 foreach (var action in enemy.Actions)
+                {
+                    DrawBeastElementIcon(catalog, action.Damage);
                     ImGui.TextDisabled(BeastActionText(action));
+                }
             }
             finally { ImGui.Unindent(); }
         }
+        ImGui.Separator();
         var fromTeam = taken?.FirstOrDefault(row => row.Battle == index);
         var trio = fromTeam?.Trio ?? plan.Battles.FirstOrDefault(battle => battle.Battle == index)?.Team.Select(pick => pick.Beast).ToArray() ?? [];
         if (trio.Count == 0) return;
@@ -530,7 +582,7 @@ internal sealed partial class MainWindow
             {
                 var id = trio[place];
                 var beast = catalog.Beasts.FirstOrDefault(row => row.Id == id);
-                if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); }
+                if (beast is not null) { DrawSmallGameIcon(beast.Icon); ImGui.SameLine(); DrawBeastElementIcon(catalog, beast.AutoAttack); }
                 ImGui.TextUnformatted(BeastCallText(fight, place, id, catalog));
                 DrawBeastCombo(id);
             }
@@ -612,7 +664,8 @@ internal sealed partial class MainWindow
                     ImGui.TableNextColumn(); ImGui.TextUnformatted(localization.Format("BeastUi.TeamRank", pick.Rank));
                     // X-575 part 5 (0.1545): a rank read below the board's recommended range is said; it never changes the choice.
                     if (BeastTeams.RankLow(board, pick.Rank, pick.RankKnown)) { ImGui.SameLine(); ImGui.TextColored(Warning, localization.Format(BeastTeams.RankLowKey(board, false), board.RankRecommended, board.RankLimit)); }
-                    ImGui.TableNextColumn(); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
+                    // X-551 (0.1574): the type of damage after the game's own icon of it (none for an unaspected magical attack).
+                    ImGui.TableNextColumn(); DrawBeastElementIcon(catalog, beast.AutoAttack); ImGui.TextDisabled(beast.AutoAttack.Length > 0 ? beast.AutoAttack : localization.Get("BeastUi.Magical"));
                 }
             }
             finally { ImGui.EndTable(); }

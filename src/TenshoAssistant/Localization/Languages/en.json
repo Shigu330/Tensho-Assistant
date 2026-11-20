@@ -279,6 +279,7 @@
     "Enemies": "Enemies",
     "Guardian": "Boss of the Board",
     "Weakness": "Weakness: {0}",
+    "WeaknessLabel": "Weakness",
     "Bonuses": "Score bonuses"
   },
   "PageHelp": {

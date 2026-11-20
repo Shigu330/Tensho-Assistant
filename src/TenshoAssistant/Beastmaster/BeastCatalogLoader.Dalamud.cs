@@ -65,6 +65,10 @@ internal sealed class BeastCatalogLoader : IDisposable
         var actions = data.GetExcelSheet<Lumina.Excel.Sheets.Action>();
         var enemies = data.GetExcelSheet<BNpcName>();
         var contents = data.GetExcelSheet<ContentFinderCondition>();
+        // X-551 (0.1574): XBMElement's name with its macro codes (« <icon(56)>Feu »): the icon the game draws before the word.
+        var elementMacros = new Dictionary<uint, string>();
+        foreach (var row in data.Excel.GetSheet<RawRow>(null, "XBMElement"))
+            if (row.ReadColumn(0) is ReadOnlySeString name) elementMacros[row.RowId] = name.ToMacroString();
         return BeastCatalog.Build(sheets,
             id => pets.TryGetRow(id, out var pet) ? pet.Name.ExtractText() : "",
             family => addon.TryGetRow(FamilyAddonBase + (uint)Math.Max(family, 0), out var text) ? text.Text.ExtractText() : "",
@@ -84,7 +88,8 @@ internal sealed class BeastCatalogLoader : IDisposable
             // X-486 (0.1559): the status an enemy's action inflicts, in the client's language.
             statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
             // X-622 M1 (review of 0.1560): 1 helpful, 2 harmful (docs/evidence/0.1562-beast-effect-category.md).
-            statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0);
+            statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0,
+            elementMacro: row => elementMacros.GetValueOrDefault(row, ""));
     }
 
     private unsafe void OnUpdate(IFramework _)

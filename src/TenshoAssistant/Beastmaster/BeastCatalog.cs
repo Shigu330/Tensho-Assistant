@@ -59,6 +59,23 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
     private const int FirstBonusColumn = 4;
 
     /// <summary>
+    /// X-551 (0.1574, the user's request of 17/11: « look more like the game's »): the icon the game itself puts before each damage type and
+    /// weakness, by the element's name as the other records keep it (Feu, Contondant…). It is in the sheet's own text: XBMElement's name is
+    /// « &lt;icon(56)&gt;Feu » (an icon of the game's font: 56 to 61 the six elements, 185 to 187 blunt, piercing, slashing;
+    /// docs/evidence/0.1574-beast-element-icons.md). Empty when the sheet's raw text is not given (tests, the desktop application).
+    /// </summary>
+    public IReadOnlyDictionary<string, uint> ElementIcons { get; init; } = new Dictionary<string, uint>();
+
+    /// <summary>X-551 (0.1574): the number of the font icon a sheet's text starts with (« &lt;icon(56)&gt;Feu » → 56); 0 when it starts with none.</summary>
+    public static uint IconOfMacro(string? macro)
+    {
+        const string open = "<icon(";
+        if (macro is null || !macro.StartsWith(open, StringComparison.Ordinal)) return 0;
+        var end = macro.IndexOf(")>", open.Length, StringComparison.Ordinal);
+        return end > open.Length && uint.TryParse(macro.AsSpan(open.Length, end - open.Length), System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var icon) ? icon : 0;
+    }
+
+    /// <summary>
     /// X-576 (0.1546, the user's capture of 18/11 around 00:05: « Rang de bête recommandé : 6 à 10 » before the 2nd board; « 1 à 5 » on the
     /// 1st): the range's first number is the highest synchronisation rank (XBMContent column 3) below this board's, plus one; 1 for the
     /// lowest board; 0 when the board's own rank is not known. No column of XBMContent holds it (docs/evidence/0.1546-beast-rank-range.md).
@@ -67,7 +84,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
-        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null)
+        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null, Func<uint, string>? elementMacro = null)
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -115,7 +132,12 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         // X-576 (0.1546): each board's recommended range starts after the previous board's synchronisation rank (not column 2).
         var limits = boards.Select(board => board.RankLimit).ToArray();
         boards = boards.Select(board => board with { RankRecommended = RankFloor(limits, board.RankLimit) }).ToArray();
-        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards));
+        // X-551 (0.1574): each element's own icon, from the sheet's raw text (its macro form); a name without one is left out.
+        var icons = new Dictionary<string, uint>();
+        if (elementMacro is not null)
+            foreach (var (row, name) in elements)
+                if (name.Length > 0 && IconOfMacro(elementMacro(row)) is var icon and not 0) icons[name] = icon;
+        return new(Array.AsReadOnly(beasts), Array.AsReadOnly(boards)) { ElementIcons = icons };
     }
 
     /// <summary>

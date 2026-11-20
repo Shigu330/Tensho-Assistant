@@ -279,6 +279,7 @@
     "Enemies": "Ennemis",
     "Guardian": "Gardien du plateau",
     "Weakness": "Faiblesse : {0}",
+    "WeaknessLabel": "Faiblesse",
     "Bonuses": "Bonus de score"
   },
   "PageHelp": {
