@@ -6261,6 +6261,7 @@
     "ListRemoveTip": "Remove this line from the list.",
     "MenuHidePlayer": "Hide {0}",
     "MenuHighlightPlayer": "Put {0} forward",
+    "MenuGameMenu": "Game menu…",
     "MenuUnhighlightPlayer": "No longer put {0} forward",
     "WebLinkTip": "{0}\nSite: {1}\nClick: a menu to open this web address in your browser or to copy it.",
     "WebWarning": "A web address written in the chat: check where it leads before you open it.",

@@ -29,6 +29,10 @@ internal sealed class ChatReader : IDisposable
     // X-525 M3 (0.1503): developer mode: the icon codes met in senders' names, once per code, at most twenty per session (codes only).
     private readonly ChatPieceLog senderIconsSaid=new(1,20);
     private const int BareSaidMax=10;
+    // X-654 (0.1602): the sender of each message, for a player's menu (in memory only; null: none, as outside the game). Cleared with the
+    // messages: window off, logout (ChatPlayerActions), unload.
+    internal ChatSources? Sources{get;set;}
+    private ChatSources? sources=>Sources;
 
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null,Func<string?>? ownName=null)
     {
@@ -44,12 +48,15 @@ internal sealed class ChatReader : IDisposable
 
     private void OnMessage(IChatMessage message)
     {
+        // X-654: the identifiers that follow a message not copied are not given to anyone.
+        sources?.Skip();
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         if(disposed)return;
         try
         {
             var current=settings();
             // Turned off (also by « restore every setting »): what was kept goes at the next message.
+            if(!current.WindowOpen)sources?.Clear();
             if(!current.WindowOpen){if(store.Count>0)store.Clear();return;}
             // X-403 phase 2 (0.1441): the links too (a place or an item), with the text that shows them; a link whose target cannot be
             // read stays plain text. X-479 (0.1468): each payload told apart here (ChatPayload, pure), the rest in ChatPayloads.
@@ -86,6 +93,9 @@ internal sealed class ChatReader : IDisposable
             var record=store.Add(ChatFormat.When(message.Timestamp,DateTimeOffset.UtcNow),(int)message.LogKind,sender,body,current.BoundedMaxLines,source,(byte)message.TargetKind);
             // X-475: kept on disk too when the player turned the history on.
             history?.Keep(record);
+            // X-654 (0.1602): who sent it (name and world of the sender's player link), waiting for the game's identifiers.
+            if(sources is not null && message.Sender.Payloads.OfType<PlayerPayload>().FirstOrDefault() is { } player)
+                sources.Expect(record.Id,player.PlayerName,(ushort)player.World.RowId);
             warned=false;
         }
         catch(Exception error)

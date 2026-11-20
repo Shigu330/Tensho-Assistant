@@ -6261,6 +6261,7 @@
     "ListRemoveTip": "Retirer cette ligne de la liste.",
     "MenuHidePlayer": "Cacher {0}",
     "MenuHighlightPlayer": "Mettre {0} en avant",
+    "MenuGameMenu": "Menu du jeu…",
     "MenuUnhighlightPlayer": "Ne plus mettre {0} en avant",
     "WebLinkTip": "{0}\nSite : {1}\nClic : un menu pour ouvrir cette adresse web dans votre navigateur ou la copier.",
     "WebWarning": "Une adresse web écrite dans le chat : vérifiez où elle mène avant de l'ouvrir.",

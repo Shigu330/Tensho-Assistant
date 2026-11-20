@@ -602,6 +602,32 @@ internal sealed partial class MainWindow
         {
             options.HighlightedPlayers=shown;chatSettingsPending=true;
         }
+        DrawChatPlayerGameEntries(said);
+    }
+
+    /// <summary>X-654 (0.1602): the senders of the messages and the game's entries of a player's menu (null: none, as in the desktop application).</summary>
+    internal Chat.ChatSources? ChatSenders{get;set;}
+    internal Chat.ChatPlayerActions? ChatPlayers{get;set;}
+
+    /// <summary>
+    /// X-654 (0.1602, the user's request of 20/11, choice « by the game's menu »): after Tensho's entries, the game's own for this player, in the
+    /// client's words (ChatPlayerMenu); an entry that needs the game's identifiers of the message is greyed without them (a message from the
+    /// history on disk, or not given by the game). Each one only on the player's click (R03.3).
+    /// </summary>
+    private void DrawChatPlayerGameEntries(ChatRecord said)
+    {
+        if(ChatPlayers is not { Available:true } actions || ChatSenders?.For(said.Id) is not { } source)return;
+        var inRange=actions.InRange(source) is not null;
+        var entries=Chat.ChatPlayerMenu.Entries(source,said.Channel,inRange,actions.CanInvite(source));
+        if(entries.Count==0)return;
+        ImGui.Separator();
+        foreach(var entry in entries)
+        {
+            var text=entry.AddonRow!=0 ? actions.Text(entry.AddonRow):localization.Get("ChatWindow.MenuGameMenu");
+            if(text.Length==0)continue;
+            if(ImGui.Selectable(text+"###ChatPlayer"+entry.Action,false,entry.Enabled ? ImGuiSelectableFlags.None:ImGuiSelectableFlags.Disabled))
+                actions.Run(entry.Action,source,said.Channel);
+        }
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>

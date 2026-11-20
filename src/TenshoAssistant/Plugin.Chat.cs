@@ -11,7 +11,7 @@ namespace TenshoAssistant;
 public sealed partial class Plugin
 {
     /// <summary>The chat family: what Tensho reads of the game's chat, and what the main window reads from it.</summary>
-    private void RegisterChat(Configuration configuration,IClientState client,IAddonLifecycle addonLifecycle,IFramework framework,IPlayerState player,string pluginFolder)
+    private void RegisterChat(Configuration configuration,IClientState client,IAddonLifecycle addonLifecycle,IFramework framework,IPlayerState player,string pluginFolder,Chat.ChatSources? senders=null)
     {
         // X-403 (0.1434, D-166): the Tensho chat window's copy of the messages, in memory, only while the window is on. X-475: with the chat
         // history the player turned on (off by default), kept on this PC too, per character; the reader owns it and releases it.
@@ -21,6 +21,7 @@ public sealed partial class Plugin
             var history=new Chat.ChatHistoryKeeper(framework,client,player,log,()=>configuration.Chat,mainWindow.ChatMessages,pluginFolder);
             try{chatReader=new Chat.ChatReader(chatGui,client,log,()=>configuration.Chat,mainWindow.ChatMessages,()=>mainWindow.DeveloperMode,history,()=>player.CharacterName);}
             catch{history.Dispose();throw;}
+            chatReader.Sources=senders;
             mainWindow.ChatHistoryFolder=history.Folder;
             mainWindow.EraseChatHistory=history.Erase;
             mainWindow.ChatHistoryBytes=()=>history.Bytes;
