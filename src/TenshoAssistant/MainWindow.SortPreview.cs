@@ -42,7 +42,8 @@ internal sealed partial class MainWindow
             IntSetting("SortButton.OffsetY","SortButton.OffsetYTip",()=>configuration.InventorySortButtonY,value=>configuration.InventorySortButtonY=value,0,400,DefaultConfiguration.InventorySortButtonY);
             ImGui.Unindent();
         }
-        var character = bankBridge.State.CharacterId;
+        // X-394: the desktop application's sample inventory (DesktopSortTrial), for its picture only.
+        var character = sortTrial?.Character ?? bankBridge.State.CharacterId;
         if (character == 0) { ImGui.TextDisabled(localization.Get("SortUi.Login")); return; }
         var entries = bank.State.Entries.Where(entry => entry.Key.CharacterId == character).ToArray();
         var open=new[]{bankBridge.State.Retainer,bankBridge.State.Saddlebag,bankBridge.State.Premium}
@@ -79,9 +80,9 @@ internal sealed partial class MainWindow
             finally{ImGui.EndDisabled();}
             ImGui.TextWrapped(localization.Get("SortUi.ReadHelp"));
         }
-        if(visualSort.State.Message is { } status)DrawServiceMessage(status,"ServiceErrors.Sort");
+        if((sortTrial?.Message ?? visualSort.State.Message) is { } status)DrawServiceMessage(status,"ServiceErrors.Sort");
         var imported=entries.FirstOrDefault(entry=>entry.Key==sortPreviewOrigin);
-        var snapshot=scope.Storage is null ? inventory.Current:live?.Snapshot ?? imported?.Snapshot;
+        var snapshot=scope.Storage is null ? sortTrial?.Snapshot ?? inventory.Current:live?.Snapshot ?? imported?.Snapshot;
         var containers=snapshot?.Containers.Values.Where(container=>container.Location.Owner.Value==scope.InventoryOwner
             && container.Location.Container.Value>=scope.FirstContainer && container.Location.Container.Value<scope.FirstContainer+scope.ContainerCount).ToArray() ?? [];
         if (containers.Length != scope.ContainerCount || containers.Any(container => container.Coverage != InventoryCoverage.Complete))

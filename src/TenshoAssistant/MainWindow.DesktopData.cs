@@ -35,6 +35,7 @@ internal sealed partial class MainWindow
         GameMeasures=DesktopGameMeasures,
         OpenWeather=OpenWeather,
         OpenSettings=DesktopOpenSettings,
+        SortTrial=DesktopSortTrial,
     }.ToMap();
 
     // X-520 (0.1536): the desktop application's pictures of each Settings tab: the page at that tab and category (« » keeps the one chosen),
@@ -46,6 +47,17 @@ internal sealed partial class MainWindow
         if(category.Length>0)OpenSettingsCategory(tab,category);else requestedSettingsTab=tab;
         // X-520 (0.1537): the chat's tabs pictured with the first tab's channels unfolded (X-560's grid).
         desktopChatChannelsOpen=category=="ChatTabs";
+    }
+    // X-394 (review of 0.1361, R37): the sort preview pictured with a sample inventory (Inventory/InventorySortTrial), in developer mode
+    // (the sort's line drawn once, X-385); taken back after the picture, the developer mode as before. Never in the game.
+    private (ulong Character,InventorySnapshot Snapshot,string Message)? sortTrial;
+    private bool sortTrialDeveloper;
+    private void DesktopSortTrial(bool on)
+    {
+        if(!inDesktopApp)return;
+        if(on && sortTrial is null){sortTrialDeveloper=developerMode;developerMode=true;sortTrial=(InventorySortTrial.Character,InventorySortTrial.Snapshot(DateTimeOffset.UtcNow),InventorySortTrial.Message);}
+        else if(!on && sortTrial is not null){developerMode=sortTrialDeveloper;sortTrial=null;}
+        sortingViewResult=null;sortingViewError=null;sortingViewSnapshot=null;
     }
     /// <summary>X-520 (0.1537): the first chat tab's channels are unfolded at the next draw (the desktop application's pictures only).</summary>
     private bool desktopChatChannelsOpen;

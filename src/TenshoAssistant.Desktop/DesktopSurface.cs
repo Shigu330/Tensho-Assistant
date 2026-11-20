@@ -47,6 +47,8 @@ internal sealed class DesktopSurface
     /// <summary>X-520 (0.1536): the Settings page at a tab and a category (tab, category, « » keeps the chosen one; the window's developer
     /// mode, in which alone the Debug tab is drawn), for the reference pictures of each tab.</summary>
     public required Action<string,string,bool> OpenSettings { get; init; }
+    /// <summary>X-394: the sort preview's sample inventory on (true) or taken back (false), for the « SortPreview-trial » picture.</summary>
+    public required Action<bool> SortTrial { get; init; }
 
     /// <summary>The entries by name, as they cross to the application (a dictionary of CoreLib's types only).</summary>
     public IReadOnlyDictionary<string,Delegate> ToMap()=>new Dictionary<string,Delegate>(StringComparer.Ordinal)
@@ -55,7 +57,7 @@ internal sealed class DesktopSurface
         [nameof(DesktopMode)]=DesktopMode,[nameof(UseData)]=UseData,[nameof(CopyData)]=CopyData,[nameof(CopyDiscoveries)]=CopyDiscoveries,
         [nameof(DueAlarms)]=DueAlarms,[nameof(AlarmNotification)]=AlarmNotification,[nameof(LinkNotices)]=LinkNotices,
         [nameof(AlarmHeld)]=AlarmHeld,[nameof(GameState)]=GameState,[nameof(GameMeasures)]=GameMeasures,[nameof(OpenWeather)]=OpenWeather,
-        [nameof(OpenSettings)]=OpenSettings,
+        [nameof(OpenSettings)]=OpenSettings,[nameof(SortTrial)]=SortTrial,
     };
 
     /// <summary>
@@ -89,6 +91,7 @@ internal sealed class DesktopSurface
             GameMeasures=Take<Action<double?[]?,int[]?,long>>(nameof(GameMeasures),(_,_,_)=>{}),
             OpenWeather=Take<Action<uint,string>>(nameof(OpenWeather),(_,_)=>{}),
             OpenSettings=Take<Action<string,string,bool>>(nameof(OpenSettings),(_,_,_)=>{}),
+            SortTrial=Take<Action<bool>>(nameof(SortTrial),_=>{}),
         };
         missing=absent;
         return surface;

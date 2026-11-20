@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1591.0
+- Plan global, X-394 : Relecture 0.1350 à 0.1361, constat important 1 (R37) : l'image de référence de l'aperçu du rangement ne montrait que « Connectez un personnage… ». Nouvelle image « SortPreview-trial » de l'application de bureau : un inventaire d'exemple (un personnage, quatre sacs lus en entier, 30 piles de fragments, cristaux et agrégats) donné à la page par le contrat typé du bureau (DesktopSurface.SortTrial, jamais en jeu), en mode développeur : les cadres dans l'ordre du remplissage (Sac 1, 3, 2, 4) et la ligne « Tri visuel appliqué aux quatre sacs… » une seule fois ; l'exemple et le mode développeur sont repris après l'image. Nouveau test SortTrial1591Tests ; DesktopSurface1238Tests compte la nouvelle entrée du contrat.
+- Tests : SortTrial1591Tests. Verify.ps1 (agent) : 3260/3260, 0 avertissement, 0 erreur ; DLL 0.1591.0.0. Rien à essayer en jeu.
+### English
+- Review 0.1350 to 0.1361, important finding 1 (R37): the sort preview's reference picture only showed « Connect a character… ». New « SortPreview-trial » picture of the desktop application: a sample inventory (one character, four bags read whole, 30 stacks of shards, crystals and clusters) given to the page through the desktop's typed contract (DesktopSurface.SortTrial, never in the game), in developer mode: the frames in fill order (Bag 1, 3, 2, 4) and the line « Visual sort applied to the four bags… » once; the sample and the developer mode are taken back after the picture. New test SortTrial1591Tests; DesktopSurface1238Tests counts the contract's new entry.
+
 ## 0.1590.0
 - Plan global, X-646 : Relecture du bloc 0.1587 à 0.1588, constat antérieur M2 (R07, rien de lourd dans le dessin) : les feuilles de l'île (IslandCatalogLoad) étaient lues dans le dessin, au premier affichage de l'atelier. Corrigé : elles sont lues par une tâche, comme les autres chargeurs de feuilles (FATE, donjons profonds, peuples alliés, noms de zones) ; « Lecture des données des fabriques… » s'affiche pendant la lecture ; une lecture ratée n'est pas relancée à chaque image. Nouveau test IslandSheets1590Tests.
 - Tests : IslandSheets1590Tests. Verify.ps1 (agent) : 3258/3258, 0 avertissement, 0 erreur ; DLL 0.1590.0.0. Non validé en jeu.
