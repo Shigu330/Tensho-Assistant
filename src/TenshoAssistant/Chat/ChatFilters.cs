@@ -93,14 +93,16 @@ public static class ChatTextFilter
 
     /// <summary>X-508 (0.1566): the list with one more line, still saved with commas (the values saved before are read line by line). The
     /// entry may hold commas: each piece is a line. Null when nothing is added: empty, already there (capitals ignored), or the list would
-    /// go past its maximum length.</summary>
-    public static string? Add(string? list,string? entry,int maximum)
+    /// go past its maximum length. X-626 M3 (review of 0.1568): with <paramref name="matchCase"/> (a tab's « Match case »), « Foo » is not
+    /// the double of « foo ».</summary>
+    public static string? Add(string? list,string? entry,int maximum,bool matchCase=false)
     {
         var lines=Words(list).ToList();
         var added=false;
+        var comparison=matchCase ? StringComparison.Ordinal:StringComparison.OrdinalIgnoreCase;
         foreach(var word in Words(entry))
         {
-            if(lines.Any(line=>string.Equals(line,word,StringComparison.OrdinalIgnoreCase)))continue;
+            if(lines.Any(line=>string.Equals(line,word,comparison)))continue;
             lines.Add(word);added=true;
         }
         if(!added)return null;
@@ -119,6 +121,11 @@ public static class ChatTextFilter
     /// <summary>X-508 (0.1566): the list without this line (capitals ignored).</summary>
     public static string Remove(string? list,string word)
         =>string.Join(", ",Words(list).Where(line=>!string.Equals(line,word.Trim(),StringComparison.OrdinalIgnoreCase)));
+
+    /// <summary>X-626 M3 (review of 0.1568): the list without every line that names this sender, the way <see cref="IsPlayer"/> finds them
+    /// (« Ann Doe » and « Ann Doe@World », capitals ignored): what the menu offers to take away is really taken away.</summary>
+    public static string RemovePlayer(string? list,string sender)
+        =>string.Join(", ",Words(list).Where(line=>!IsPlayer(sender,[line])));
 }
 
 /// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>

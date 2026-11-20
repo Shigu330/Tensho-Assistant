@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1571.0
+- Plan global, X-626 : Listes du chat (relecture de 0.1568, M1 à M3) : le texte en cours dans la case « Ajouter… » est gardé par liste et par onglet (il passait d'un onglet à l'autre) ; après Entrée, le curseur reste dans la case pour la ligne suivante ; « Ne plus mettre X en avant » retire aussi une ligne enregistrée avec le monde (« Nom@Monde ») ; avec « Respecter la casse », les mots d'un onglet s'ajoutent avec leurs majuscules (« Foo » à côté de « foo »).
+- Pour les joueurs : listes du chat : ce qu'on tape dans une case « Ajouter… » reste dans son onglet, Entrée garde le curseur dans la case, « Ne plus mettre en avant » marche pour un nom écrit avec son monde, et les mots gardent leurs majuscules avec « Respecter la casse ».
+- Tests : ChatLists1571Tests. Verify.ps1 (agent) : 3197/3197, 0 avertissement, 0 erreur ; DLL 0.1571.0.0. Non validé en jeu.
+### English
+- Chat lists (review of 0.1568, M1 to M3): the text being typed in the « Add » box is kept by list and by tab (it moved from one tab to another); after Enter, the cursor stays in the box for the next line; « No longer put X forward » also removes a line saved with the world (« Name@World »); with « Match case », a tab's words are added with their capitals (« Foo » beside « foo »).
+- For players: Chat lists: what you type in an « Add » box stays in that tab, Enter keeps the cursor in the box, « No longer put forward » works for names saved with their world, and words keep their capitals when « Match case » is on.
+
 ## 0.1570.0
 - Plan global, X-627 : Test de la sortie UTF-8 de l'outil des découvertes partagées (MergeUtf81569Tests) : le second cas lançait l'aide de l'outil, sans « → », avec PYTHONIOENCODING ignoré sous `python -I` ; il ne pouvait pas échouer sur le code d'avant la correction. Il lance maintenant l'outil derrière une sortie cp1252 sur un rapport hors ligne qui contient « → », et vérifie que la même exécution sur une copie de l'outil sans la correction s'arrête sur une UnicodeEncodeError.
 - Tests : MergeUtf81569Tests. Verify.ps1 (agent) : 3194/3194, 0 avertissement, 0 erreur ; DLL 0.1570.0.0. Rien à essayer en jeu.

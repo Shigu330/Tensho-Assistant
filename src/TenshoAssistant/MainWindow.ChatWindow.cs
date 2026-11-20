@@ -522,8 +522,8 @@ internal sealed partial class MainWindow
     /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
     private void DrawChatTabWords(ChatTabSettings tab)
     {
-        ListSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300);
-        ListSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300);
+        ListSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300,()=>tab.WordsMatchCase);
+        ListSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,()=>tab.WordsMatchCase);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
         CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
     }
@@ -558,7 +558,7 @@ internal sealed partial class MainWindow
             SetHiddenPlayers(options,hidden);
         if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
         {
-            if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",player))){options.HighlightedPlayers=ChatTextFilter.Remove(options.HighlightedPlayers,player);chatSettingsPending=true;}
+            if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",player))){options.HighlightedPlayers=ChatTextFilter.RemovePlayer(options.HighlightedPlayers,said.Sender);chatSettingsPending=true;}
         }
         else if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",player)) && ChatTextFilter.Add(options.HighlightedPlayers,player,600) is { } shown)
         {

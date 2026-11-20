@@ -43,7 +43,7 @@ internal sealed partial class MainWindow
     /// its « remove » button, and an « Add » box (Enter or the button). Still saved with commas (ChatTextFilter.Add, Remove), so the values
     /// saved before are read line by line.
     /// </summary>
-    private bool ListSetting(string labelKey,string tipKey,Func<string?> read,Action<string> write,int maximum)
+    private bool ListSetting(string labelKey,string tipKey,Func<string?> read,Action<string> write,int maximum,Func<bool>? matchCase=null)
     {
         var changed=false;
         ImGui.TextUnformatted(localization.Get(labelKey));
@@ -71,20 +71,24 @@ internal sealed partial class MainWindow
                 }
                 finally{ImGui.PopID();}
             }
-            listSettingDrafts.TryGetValue(labelKey,out var draft);
+            // X-626 M1 (review of 0.1568): the draft is kept by the box's ImGui id, so « Only with » of tab 1 and tab 2 each have their own.
+            var draftId=ImGui.GetID("###ListDraft");
+            listSettingDrafts.TryGetValue(draftId,out var draft);
             draft??="";
             ImGui.SetNextItemWidth(Math.Min(260,Math.Max(120,ImGui.GetContentRegionAvail().X-120)));
+            // X-626 M2: after Enter, the cursor goes back into the box on the next frame (the former call aimed at the last item, the button).
+            if(listSettingFocus.Remove(draftId))ImGui.SetKeyboardFocusHere();
             var enter=ImGui.InputTextWithHint("###ListDraft",localization.Get("ChatWindow.ListAddHint"),ref draft,120,ImGuiInputTextFlags.EnterReturnsTrue);
             Tip("ChatWindow.ListAddTip");
-            listSettingDrafts[labelKey]=draft;
+            listSettingDrafts[draftId]=draft;
             ImGui.SameLine();
             var clicked=ImGui.SmallButton(localization.Get("ChatWindow.ListAdd"));
             Tip("ChatWindow.ListAddTip");
             if((enter || clicked) && draft.Trim().Length>0)
             {
-                if(Chat.ChatTextFilter.Add(read(),draft,maximum) is { } added){write(added);changed=true;listSettingDrafts[labelKey]="";}
-                else listSettingDrafts[labelKey]=draft;
-                if(enter)ImGui.SetKeyboardFocusHere(-1);
+                if(Chat.ChatTextFilter.Add(read(),draft,maximum,matchCase?.Invoke()??false) is { } added){write(added);changed=true;listSettingDrafts[draftId]="";}
+                else listSettingDrafts[draftId]=draft;
+                if(enter)listSettingFocus.Add(draftId);
             }
             ImGui.Unindent();
         }
@@ -92,8 +96,10 @@ internal sealed partial class MainWindow
         return changed;
     }
 
-    /// <summary>X-508 (0.1566): the text being typed in each list's « Add » box, by the list's label key.</summary>
-    private readonly Dictionary<string,string> listSettingDrafts=[];
+    /// <summary>X-508 (0.1566): the text being typed in each list's « Add » box; X-626 M1: by the box's ImGui id (one per list and per tab).</summary>
+    private readonly Dictionary<uint,string> listSettingDrafts=[];
+    /// <summary>X-626 M2: the « Add » boxes where Enter was pressed: the cursor goes back into them on the next frame.</summary>
+    private readonly HashSet<uint> listSettingFocus=[];
 
     /// <summary>X-503 M2: an on/off setting of something that is not a field of Configuration (a chat tab): no « ↺ », its default is the
     /// tab's own; the tooltip still names it.</summary>
