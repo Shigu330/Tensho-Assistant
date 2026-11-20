@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1596.0
+- Plan global, X-652 : Découvertes : une ligne illisible (JSON abîmé) de votre base est mise de côté au démarrage (gardée à part, jamais effacée) et l'envoi à votre gist reprend dans la même session, la copie de ce fait sur votre gist relue d'abord ; avant, l'envoi restait bloqué jusqu'au démarrage suivant. Une mise de côté qui échoue garde le blocage. Le journal dit la reprise (X-652, décision D-188 b de l'utilisateur, avec D-190 a).
+- Tests : DamagedRow1596Tests. Verify.ps1 (agent) : 3269/3269, 0 avertissement, 0 erreur ; DLL 0.1596.0.0. Rien à essayer en jeu.
+### English
+- Discoveries: an unreadable row (damaged JSON) of your base is set aside at start (kept apart, never erased) and the upload to your gist resumes in the same session, the gist's copy of that fact read back first; before, the upload stayed blocked until the next start. A set-aside that fails keeps the block. The log says the resumption (X-652, user decision D-188 b, with D-190 a).
+
 ## 0.1595.0
 - Plan global, X-651 : Test du tri de l'inventaire d'exemple : le cas de l'ordre de remplissage vérifie de nouveau l'ordre entre les sacs (première pile triée en case 1 du sac 1, 36e en case 1 du sac 3, 71e en case 1 du sac 2, comparées à l'ordre trié de l'aperçu ; les piles du résultat suivent les cases, pas l'ordre de tri), pas seulement le compte des piles par sac (X-651, relecture 0.1594 M1).
 - Tests : SortTrial1593Tests. Verify.ps1 (agent) : 3265/3265, 0 avertissement, 0 erreur ; DLL 0.1595.0.0. Rien à essayer en jeu.

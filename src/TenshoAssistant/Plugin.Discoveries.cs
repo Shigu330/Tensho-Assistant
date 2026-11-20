@@ -100,8 +100,10 @@ public sealed partial class Plugin
                 // without your facts and nothing is sent to GitHub this session (MineIncomplete); new sightings are still saved, row by row,
                 // added to what the base holds (X-171).
                 // X-618 (M5): a row of yours that cannot be read leaves your facts incomplete: nothing sent to your gist (DiscoveryStart.Incomplete).
-                // X-619 M1 (review of 0.1557): such a row is then set aside (DiscoveryDatabase.SetAside): this session stays incomplete, the next
-                // start reads your facts whole again (before, the row stayed and blocked the sharing for good).
+                // X-619 M1 (review of 0.1557): such a row is then set aside (DiscoveryDatabase.SetAside): the next start reads your facts whole
+                // again (before, the row stayed and blocked the sharing for good).
+                // X-652 (user decision D-188 b of 20/11): and this session's sending resumes once the rows are set aside and listed for the read-back
+                // of their copy on your gist (DiscoveryStart.Resume); before, it stayed blocked until the next start.
                 var unreadable=new HashSet<string>();
                 var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine(Discoveries.DiscoveryStart.Incomplete(discoveries,(key,error)=>{lock(unreadable)unreadable.Add(key);log.Warning(error,"A discovery row could not be read ({0}); it is set aside after the read.",key);})),Kinds:opened.SharedKinds()),
                     Discoveries.DiscoveryStart.Tries,Discoveries.DiscoveryStart.Wait,
@@ -111,9 +113,10 @@ public sealed partial class Plugin
                 {
                     discoveries.Load(mine.Facts);
                     string[] aside;lock(unreadable)aside=[..unreadable];
+                    var moved=0;
                     if(aside.Length>0)
                     {
-                        try{log.Warning("Discoveries: {0} row(s) that could not be read set aside in the table facts_aside of {1} (kept, not sent); the next start reads your facts whole.",opened.SetAside(aside,DateTimeOffset.UtcNow),Discoveries.DiscoveryDatabase.FileName);}
+                        try{moved=opened.SetAside(aside,DateTimeOffset.UtcNow);log.Warning("Discoveries: {0} row(s) that could not be read set aside in the table facts_aside of {1} (kept, never erased); the next start reads your facts whole.",moved,Discoveries.DiscoveryDatabase.FileName);}
                         catch(Exception error){log.Warning(error,"Discoveries: the rows that could not be read could not be set aside; they stay and are tried again at the next start.");}
                     }
                     // X-621 (review of 0.1560, I1): your rows set aside (now or at an earlier start) and not settled: the next send reads their copy
@@ -127,6 +130,10 @@ public sealed partial class Plugin
                         }
                     }
                     catch(Exception error){discoveries.MineIncomplete=true;log.Warning(error,"Discoveries: the rows set aside could not be listed; nothing is sent to your gist this session.");}
+                    if(Discoveries.DiscoveryStart.Resume(discoveries,aside,moved))
+                        log.Information("Discoveries: the sending to your gist resumes this session; the copy of the {0} row(s) set aside is read back from your gist before any send (X-652).",aside.Length);
+                    else if(aside.Length>0)
+                        log.Warning("Discoveries: {0} row(s) could not be read and {1} set aside; nothing is sent to your gist this session.",aside.Length,moved);
                     discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),mine.Kinds);
                     mainWindow.DiscoveriesReadFailed=0;
                 }

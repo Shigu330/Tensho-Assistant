@@ -13,10 +13,27 @@ public static class DiscoveryStart
 
     /// <summary>
     /// X-618 (review of block 0.1551 to 0.1554, M5): what a row of your facts that cannot be read (damaged JSON) does: said (<paramref name="broken"/>)
-    /// and your facts marked incomplete, so the next exchange does not replace your gist without that fact (GitHubExchange: « ShareBlocked »).
-    /// Before, the row was skipped and the gist replaced by the facts read. The row stays in the database.
+    /// and your facts marked incomplete, so no exchange replaces your gist without that fact (GitHubExchange: « ShareBlocked ») until the row is
+    /// set aside and its copy on your gist can be read back first (<see cref="Resume"/>, X-652). The row stays in the database.
     /// </summary>
     public static Action<string,Exception> Incomplete(DiscoveryStore store,Action<string,Exception> broken)=>(key,error)=>{store.MineIncomplete=true;broken(key,error);};
+
+    /// <summary>
+    /// X-652 (user decision D-188 b of 20/11, with D-190 a): after the start's read, your rows that could not be read (<paramref name="unreadable"/>)
+    /// were set aside (<paramref name="moved"/> of them moved into facts_aside, DiscoveryDatabase.SetAside, their text kept, never erased). When every
+    /// one of them was moved and is listed among the rows whose copy the next send reads back from your gist first (<c>store.Aside</c>,
+    /// GitHubExchange.KeepAside), your facts are whole again for the send: the sending resumes this session (true). Before (0.1557 to 0.1595) the
+    /// sending stayed blocked for the session. A row not moved (the set-aside failed, or the row changed meanwhile) or not listed keeps the block.
+    /// Only for the start's read, where <see cref="Incomplete"/> alone marks your facts incomplete.
+    /// </summary>
+    public static bool Resume(DiscoveryStore store,IReadOnlyCollection<string> unreadable,int moved)
+    {
+        if(unreadable.Count==0 || moved!=unreadable.Count || store.Aside is not { } rows)return false;
+        var listed=new HashSet<string>(rows.Keys,StringComparer.Ordinal);
+        if(!unreadable.All(listed.Contains))return false;
+        store.MineIncomplete=false;
+        return true;
+    }
 
     /// <summary>(true, the value) once <paramref name="read"/> returns; (false, default) after <paramref name="tries"/> failures or when stopped.</summary>
     public static async Task<(bool Read,T? Value)> ReadWithRetries<T>(Func<T> read,int tries,TimeSpan wait,Action<Exception,int> failed,CancellationToken token)
