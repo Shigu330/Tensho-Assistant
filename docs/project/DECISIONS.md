@@ -61,6 +61,7 @@ Index produced by `tools/docgen.py` (one row per DEC, its problem):
 | DEC-052 | 2026-11-12 | The shared discoveries are exchanged as one JSON file (DEC-042, version 2): the common file of the repository (`community-discoveries/discoveries.json`) and the single gist file of each player (`tensho-discoveries.b64`, base64 of gzip of JSON) are read whole, and a change to one kind makes every player download everything again; changing the format after the public announcement would force migrating every player's files. |
 | DEC-053 | 2026-11-15 | DEC-030 removed the customisable chat (« I will take Chat 2 if I need it »); the chat study of 2026-11-15 (X-388: an audit of Chat 2 and of what Tensho could add to it) asked how far a Tensho chat should go, and when. |
 | DEC-054 | 2026-11-16 | DEC-048 grouped the settings in seven tabs with a search; the tabs had grown long (General held the window, the header, the fonts, the language, the theme, the item tooltips and the market in one scroll; Panels held every tool's aids and the chat), so a setting was hard to find. |
+| DEC-055 | 2026-11-18 | DEC-009 removed the Combat domain and DEC-041 said « nothing during a fight »; since then the user asked for help that stays visible in PvE fights (the Crucible of the Unbroken, deep dungeons), and Dalamud's own rule only asks that combat elements stay informative, what the player would already know. |
 <!-- /docgen:decisions-en -->
 
 ID: DEC-001
@@ -151,7 +152,7 @@ Options: Keep ACT as an optional study; remove it from the scope. Keep the zips 
 Decision: ACT/IINACT and Combat removed from the project (docs updated, no code concerned). Archives checkpoints/*.zip ignored by git (kept on disk); logs and verification notes stay tracked.
 Reason: Scope decision by the user; git history already keeps every version of the code.
 Consequences: The zips are still created at each version but outside the repository. Commits are made automatically by the desktop application, not by the agent. Zips already in the local history are not rewritten.
-References: .gitignore, the maintainer's notes (not in the repository); modified by DEC-050 (commits and releases by the agent)
+References: .gitignore, the maintainer's notes (not in the repository); modified by DEC-050 (commits and releases by the agent); replaced in part by DEC-055 (2026-11-18: information from the game allowed in PvE fights; ACT and IINACT stay out)
 
 ID: DEC-010
 Timestamp: 2026-10-31 Europe/Brussels
@@ -605,6 +606,16 @@ Reason: User's request and choices.
 Consequences: Coded in 0.1496 (X-449). The search index lists the category of every setting (a test makes the same scan and fails when a setting is in no category); SETTINGS.md says « Settings › tab › category ». Since 0.1497 (X-507), choosing a search result opens the category, scrolls to the setting and highlights it; since 0.1498 (X-521 M1), only the sections around that setting are unfolded, the others folded before are folded back. Since 0.1498 (X-519), a test checks that every « Settings › tab › category » quoted in the texts names an existing tab and category.
 References: DEC-048, GLOBAL-PLAN X-449 and X-507, src/TenshoAssistant/MainWindow.SettingsCategories.cs
 
+ID: DEC-055
+Timestamp: 2026-11-18 Europe/Brussels (written in 0.1575)
+Problem: DEC-009 removed the Combat domain and DEC-041 said « nothing during a fight »; since then the user asked for help that stays visible in PvE fights (the Crucible of the Unbroken, deep dungeons), and Dalamud's own rule only asks that combat elements stay informative, what the player would already know.
+Evidence: User, 2026-11-18: « et pas oublie que aide au combat tant que ca fais pas a notre place c'est bon » ("and do not forget that combat help is fine as long as it does not do it in our place"); then, after the pros and cons were given with Dalamud's rule, his choice: « Infos du jeu, aussi en combat » ("Information from the game, in combat too").
+Options: (a) Keep « nothing during a fight ». (b) In a PvE fight, show what the player would already know, taken from the game; never predict, time, measure or act. (c) A full combat domain (timers, parsing).
+Decision: Option (b). In a PvE fight Tensho may show what the player would already know, taken from the game itself (the client's texts and sheets: weaknesses, actions and their effects, preparation reminders). Never a mechanic prediction nor a boss timer, never a measure of the damage (no parser; ACT and IINACT stay out of scope), never an action sent in the player's place. Play advice in PvE only (DEC-033). PvP, ranked content, Triple Triad and Mahjong stay cut (DEC-038 and its exceptions).
+Reason: User's choice; it is what Dalamud's rule « combat elements informative only » allows.
+Consequences: Replaces DEC-009 in part (the Combat domain is no longer « removed »: information from the game is allowed in PvE fights; ACT and IINACT stay out) and the « nothing during a fight » of DEC-041 and DEC-046 as a general rule. A feature that hides itself in a fight today (duty notes, alerts held until the end of a fight, the team panel that stands beside the board window) keeps doing so until its own point changes it. PUBLISHING.md says the rule in its Dalamud table; a test refuses the functions a parser or a boss timer would need (combat log, action effects, enemy cast times).
+References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-041, DEC-046, DEC-047, docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/DalamudRulesCombat1575Tests.cs, GLOBAL-PLAN X-608
+
 ---
 
 # Décisions durables
@@ -668,6 +679,7 @@ Index produit par `tools/docgen.py` (une ligne par DEC, son problème) :
 | DEC-052 | 2026-11-12 | Les découvertes partagées s'échangent en un seul fichier JSON (DEC-042, version 2) : le fichier commun du dépôt (`community-discoveries/discoveries.json`) et le fichier unique du gist de chaque joueur (`tensho-discoveries.b64`, base64 d'un gzip de JSON) se lisent en entier, et un changement d'un seul genre fait tout retélécharger à chaque joueur ; changer le format après l'annonce publique obligerait à migrer les fichiers de tous les joueurs. |
 | DEC-053 | 2026-11-15 | DEC-030 a retiré le chat personnalisable (« je prendrai Chat 2 si j'en ai besoin ») ; l'étude du chat du 2026-11-15 (X-388 : audit de Chat 2 et de ce que Tensho pourrait y ajouter) demandait jusqu'où irait un chat de Tensho, et quand. |
 | DEC-054 | 2026-11-16 | DEC-048 a regroupé les réglages en sept onglets avec une recherche ; les onglets étaient devenus longs (Général tenait la fenêtre, l'en-tête, les polices, la langue, le thème, les infobulles des objets et le marché dans un seul défilement ; Panneaux tenait les aides de chaque outil et le chat), donc un réglage était difficile à trouver. |
+| DEC-055 | 2026-11-18 | DEC-009 a retiré le domaine Combat et DEC-041 disait « rien pendant un combat » ; depuis, l'utilisateur a demandé des aides qui restent visibles en combat JcE (Dédale bestial, donjons profonds), et la règle de Dalamud demande seulement que les éléments de combat restent informatifs, ce que le joueur saurait déjà. |
 <!-- /docgen:decisions -->
 
 DEC-ID: DEC-001
@@ -758,7 +770,7 @@ Options: Garder ACT en étude facultative ; le retirer du périmètre. Garder le
 Decision: ACT/IINACT et Combat retirés du projet (docs mises à jour, aucun code concerné). Archives checkpoints/*.zip ignorées par git (gardées sur disque) ; logs et notes de vérification restent suivis.
 Reason: Décision de périmètre de l'utilisateur ; l'historique git conserve déjà chaque version du code.
 Consequences: Les zips restent créés à chaque version mais hors dépôt. Les commits sont faits automatiquement par l'application de bureau, pas par l'agent. Les zips déjà présents dans l'historique local ne sont pas réécrits.
-References: .gitignore, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (commits et releases par l'agent)
+References: .gitignore, notes du mainteneur (hors du dépôt) ; modifiée par DEC-050 (commits et releases par l'agent) ; remplacée en partie par DEC-055 (2026-11-18 : informations du jeu permises en combat JcE ; ACT et IINACT restent dehors)
 
 DEC-ID: DEC-010
 Timestamp: 2026-10-31 Europe/Brussels
@@ -1211,3 +1223,13 @@ Decision: Option (a). Les sept onglets de DEC-048 restent ; chacun liste ses cat
 Reason: Demande et choix de l'utilisateur.
 Consequences: Codé en 0.1496 (X-449). L'index de la recherche donne la catégorie de chaque réglage (un test fait le même relevé et échoue si un réglage est dans aucune catégorie) ; SETTINGS.md dit « Paramètres › onglet › catégorie ». Depuis 0.1497 (X-507), choisir un résultat de la recherche ouvre la catégorie, fait défiler jusqu'au réglage et le met en évidence ; depuis 0.1498 (X-521 M1), seules les sections autour de ce réglage sont dépliées, les autres repliées avant sont repliées de nouveau. Depuis 0.1498 (X-519), un test vérifie que chaque « Paramètres › onglet › catégorie » cité dans les textes nomme un onglet et une catégorie qui existent.
 References: DEC-048, GLOBAL-PLAN X-449 et X-507, src/TenshoAssistant/MainWindow.SettingsCategories.cs
+
+DEC-ID: DEC-055
+Timestamp: 2026-11-18 Europe/Brussels (écrite en 0.1575)
+Problem: DEC-009 a retiré le domaine Combat et DEC-041 disait « rien pendant un combat » ; depuis, l'utilisateur a demandé des aides qui restent visibles en combat JcE (Dédale bestial, donjons profonds), et la règle de Dalamud demande seulement que les éléments de combat restent informatifs, ce que le joueur saurait déjà.
+Evidence: Utilisateur, 2026-11-18 : « et pas oublie que aide au combat tant que ca fais pas a notre place c'est bon » ; puis, après le pour et le contre donnés avec la règle de Dalamud, son choix : « Infos du jeu, aussi en combat ».
+Options: (a) Garder « rien pendant un combat ». (b) En combat JcE, montrer ce que le joueur saurait déjà, tiré du jeu ; ne jamais prédire, minuter, mesurer ni agir. (c) Un domaine combat complet (minuteurs, analyse).
+Decision: Option (b). En combat JcE, Tensho peut montrer ce que le joueur saurait déjà, tiré du jeu lui-même (textes du client et feuilles : faiblesses, actions et leurs effets, rappels de préparation). Jamais de prédiction de mécanique ni de minuteur de boss, jamais de mesure des dégâts (aucun parser ; ACT et IINACT restent hors périmètre), jamais d'action envoyée à la place du joueur. Conseils de jeu en JcE seulement (DEC-033). JcJ, contenus classés, Triple Triade et Mahjong restent coupés (DEC-038 et ses exceptions).
+Reason: Choix de l'utilisateur ; c'est ce que permet la règle de Dalamud « éléments de combat seulement informatifs ».
+Consequences: Remplace en partie DEC-009 (le domaine Combat n'est plus « retiré » : les informations du jeu sont permises en combat JcE ; ACT et IINACT restent dehors) et le « rien pendant un combat » de DEC-041 et DEC-046 comme règle générale. Une fonction qui se masque en combat aujourd'hui (notes de mission, alertes retenues jusqu'à la fin d'un combat, panneau d'équipe posé à côté de la fenêtre du plateau) continue de le faire tant que son propre point ne la change pas. PUBLISHING.md dit la règle dans son tableau Dalamud ; un test refuse les fonctions dont un parser ou un minuteur de boss aurait besoin (journal de combat, effets d'action, temps d'incantation des ennemis).
+References: DEC-009, DEC-032, DEC-033, DEC-038, DEC-041, DEC-046, DEC-047, docs/project/PUBLISHING.md, tests/TenshoAssistant.Tests/DalamudRulesCombat1575Tests.cs, GLOBAL-PLAN X-608
