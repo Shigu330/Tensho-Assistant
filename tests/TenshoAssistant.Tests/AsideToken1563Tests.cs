@@ -8,6 +8,8 @@ using TenshoAssistant.Discoveries;
 // past its 8 h: the gist is read with the token renewed first (before, a 401 taken for « GitHub not reached » blocked the send at every
 // exchange); a 401 with a refresh token in hand renews once; without one, or a renewal refused: the sign-in ends, nothing sent, nothing lost.
 // A cut file's raw address refused while the listing answered: « not reached », the rows kept pending, never settled with nothing kept.
+// 0.1564 (X-624 M2, M3): two clients of one profile (the second gets the copy too, sends it, saves it once); a copy read back while a save
+// is being written, that write failing for real (the file read-only): the next save adds the copy once.
 internal static class AsideToken1563Tests
 {
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
@@ -86,6 +88,14 @@ internal static class AsideToken1563Tests
         return facts;
     }
 
+    /// <summary>The copies of <paramref name="keys"/> your gist holds, read as the exchange does (its files given whole).</summary>
+    private static List<DiscoveryFact> Kept(IReadOnlyDictionary<string,string> gist,IReadOnlyCollection<string> keys)
+    {
+        var files=new JsonObject();
+        foreach(var (name,content) in gist)files[name]=new JsonObject{["content"]=content};
+        return GistAside.Read(()=>Task.FromResult<JsonNode?>(new JsonObject{["files"]=files}),_=>throw new Exception("no raw read"),keys).GetAwaiter().GetResult();
+    }
+
     private static string Said(ExchangeMessage message)=>message.Key+" "+string.Join(", ",message.Args);
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
@@ -151,6 +161,54 @@ internal static class AsideToken1563Tests
             github.Raw=HttpStatusCode.OK;
             said=Run(exchange,store);
             Check(said.Args[3]=="Sent" && Sent(github)[b].Seen==bSeen && database.AsidePending().Count==0,"the raw file read: B sent and settled");
+        })),
+        ("Aside token 1563: M2, two clients of one profile: the second finds B settled, still gets its copy, sends it and saves it once",() => AsideGist1561Tests.InTemp(root =>
+        {
+            var (database,gist,a,b,bSeen)=AsideGist1561Tests.Damaged(root);
+            var github=new GitHub{Files=gist,Valid="ghu_old"};
+            using var first=Connected(root,github,null,null);
+            using var second=new GitHubExchange(root,github,GitHubSignIn.For(TestAppId),()=>At);
+            var one=AsideGist1561Tests.Start(database);var two=AsideGist1561Tests.Start(database);
+            two.SeeSource(DiscoveryKind.Venture,6,7,2,DateTimeOffset.UtcNow);
+            Check(Run(first,one).Args[3]=="Sent" && Sent(github)[b].Seen==bSeen,"the first client sends B");
+            var said=Run(second,two);
+            Check(said.Args[3]=="Sent" && Sent(github).TryGetValue(b,out var kept) && kept.Seen==bSeen+1 && Sent(github).ContainsKey(a),"the second client's send keeps B, with its own new sighting: "+Said(said));
+            Check(two.Find(DiscoveryKind.Venture,6,10).Single().Seen==bSeen+1 && two.Aside is null,"B in the second client's memory");
+            var changes=two.ChangesToSave(out var stamp);database.Write(changes.Write,changes.Remove,changes.All,changes.Bases);two.MarkSaved(stamp);
+            Check(AsideGist1561Tests.Row(database,b)?.Seen==bSeen+1,"saved: the copy once, the new sighting once ("+AsideGist1561Tests.Row(database,b)?.Seen+")");
+        })),
+        ("Aside token 1563: M3, B read back while a save is being written, then that write fails: the next save never adds the copy twice",() => AsideGist1561Tests.InTemp(root =>
+        {
+            var (database,gist,_,b,bSeen)=AsideGist1561Tests.Damaged(root);
+            var store=AsideGist1561Tests.Start(database);
+            store.SeeSource(DiscoveryKind.Venture,6,7,2,DateTimeOffset.UtcNow);
+            var changes=store.ChangesToSave(out _);
+            Check(changes.Bases is { } before && before.ContainsKey(b),"the save holds B's base");
+            Check(store.RestoreAside(Kept(gist,database.AsidePending()))==1 && AsideGist1561Tests.Row(database,b)?.Seen==bSeen,"B read back meanwhile: settled in the file");
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            File.SetAttributes(database.Path,FileAttributes.ReadOnly);
+            var failed=false;
+            try{database.Write(changes.Write,changes.Remove,changes.All,changes.Bases);}
+            catch(Exception){failed=true;store.SaveFailed(changes);}
+            finally{Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();File.SetAttributes(database.Path,FileAttributes.Normal);}
+            Check(failed && AsideGist1561Tests.Row(database,b)?.Seen==bSeen,"the write failed, nothing of it in the file");
+            changes=store.ChangesToSave(out var stamp);database.Write(changes.Write,changes.Remove,changes.All,changes.Bases);store.MarkSaved(stamp);
+            Check(AsideGist1561Tests.Row(database,b)?.Seen==bSeen+1 && store.Find(DiscoveryKind.Venture,6,10).Single().Seen==bSeen+1,
+                "the copy once and the new sighting once ("+AsideGist1561Tests.Row(database,b)?.Seen+")");
+        })),
+        ("Aside token 1563: M3, B read back while a save is being written and that write succeeds: counted once, nothing kept for a later failure",() => AsideGist1561Tests.InTemp(root =>
+        {
+            var (database,gist,_,b,bSeen)=AsideGist1561Tests.Damaged(root);
+            var store=AsideGist1561Tests.Start(database);
+            store.SeeSource(DiscoveryKind.Venture,6,7,2,DateTimeOffset.UtcNow);
+            var changes=store.ChangesToSave(out var stamp);
+            Check(store.RestoreAside(Kept(gist,database.AsidePending()))==1,"read back meanwhile");
+            database.Write(changes.Write,changes.Remove,changes.All,changes.Bases);store.MarkSaved(stamp);
+            Check(AsideGist1561Tests.Row(database,b)?.Seen==bSeen+1,"counted once");
+            store.SeeSource(DiscoveryKind.Venture,6,7,2,DateTimeOffset.UtcNow);
+            changes=store.ChangesToSave(out _);store.SaveFailed(changes);
+            changes=store.ChangesToSave(out stamp);database.Write(changes.Write,changes.Remove,changes.All,changes.Bases);store.MarkSaved(stamp);
+            Check(AsideGist1561Tests.Row(database,b)?.Seen==bSeen+2 && store.Find(DiscoveryKind.Venture,6,10).Single().Seen==bSeen+2,"a later failed save adds nothing twice ("+AsideGist1561Tests.Row(database,b)?.Seen+")");
         })),
         ("Aside token 1563: I1 wiring: the token renewed before the gist is read; the listing's 401 renewed once; the raw read never sends the token",() =>
         {

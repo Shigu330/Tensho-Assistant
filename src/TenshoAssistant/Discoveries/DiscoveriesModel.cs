@@ -315,6 +315,9 @@ public sealed class DiscoveryStore
                 var fact=copy.Copy();
                 if(facts.TryGetValue(fact.Key,out var known))
                 {
+                    // X-624 M3: a save being written holds this key's base: the copy noted, for its base if that write fails (SaveFailed).
+                    if(saving is { } inFlight && inFlight.ContainsKey(fact.Key))
+                    {if(joinedWhileSaving.TryGetValue(fact.Key,out var more))Join(more,fact);else joinedWhileSaving[fact.Key]=fact.Copy();}
                     if(bases.TryGetValue(fact.Key,out var was)){if(was is null)bases[fact.Key]=fact.Copy();else Join(was,fact);}
                     Join(known,fact);
                 }
@@ -437,6 +440,7 @@ public sealed class DiscoveryStore
         lock(gate)
         {
             if(stamp>Interlocked.Read(ref saved))Interlocked.Exchange(ref saved,stamp);
+            saving=null;joinedWhileSaving.Clear();
             var now=Interlocked.Read(ref saved);
             for(var at=importsWaiting.Count-1;at>=0;at--)
                 if(importsWaiting[at].Stamp<=now){done.Add(importsWaiting[at].Done);importsWaiting.RemoveAt(at);}
@@ -844,6 +848,7 @@ public sealed class DiscoveryStore
             }
             changedKeys.Clear();changedKeys.UnionWith(waiting);
             if(waiting.Count>0)Dirty=true;
+            saving=before;joinedWhileSaving.Clear();
             return new(write,remove,all,before);
         }
     }
@@ -856,9 +861,21 @@ public sealed class DiscoveryStore
             foreach(var fact in failed.Write)changedKeys.Add(fact.Key);
             changedKeys.UnionWith(failed.Remove);
             // X-171 (0.1313): nothing of that save is in the file: the fact as it was before it is the one to add from (older than any noted since).
-            if(failed.Bases is { } before)foreach(var (key,was) in before)bases[key]=was;
+            // X-624 M3 (review of 0.1562): with the copy read back from your gist and settled in the file meanwhile (RestoreAside), which the row
+            // on disk now holds: the next save adds only your own sightings, never that copy a second time.
+            if(failed.Bases is { } before)
+                foreach(var (key,was) in before)
+                    bases[key]=ReferenceEquals(before,saving) && joinedWhileSaving.TryGetValue(key,out var copy) ? WithCopy(was,copy):was;
+            saving=null;joinedWhileSaving.Clear();
         }
     }
+    private static DiscoveryFact WithCopy(DiscoveryFact? was,DiscoveryFact copy){if(was is null)return copy.Copy();var joined=was.Copy();Join(joined,copy);return joined;}
+    /// <summary>
+    /// X-624 M3 (review of 0.1562): the bases of the save being written (from ChangesToSave to MarkSaved or SaveFailed; one save at a time,
+    /// MainWindow.SaveDiscoveries) and the copies RestoreAside joined to their facts meanwhile, under the lock.
+    /// </summary>
+    private Dictionary<string,DiscoveryFact?>? saving;
+    private readonly Dictionary<string,DiscoveryFact> joinedWhileSaving=new(StringComparer.Ordinal);
 
     /// <summary>
     /// Per kind: the facts, those seen by the player, those only imported. X-588 (external audit A19 of 18/11): worked out again only when the

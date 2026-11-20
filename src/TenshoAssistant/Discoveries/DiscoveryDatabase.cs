@@ -137,6 +137,9 @@ public sealed class DiscoveryDatabase
     /// it is now (the sightings made since the set-aside added to those of before, DiscoveryStore.Join), or put in when there is none (or it cannot
     /// be read). Returns the copies joined, for the memory to join them the same way (DiscoveryStore.JoinSaved); a key already settled is left out.
     /// </summary>
+    /// <remarks>X-624 M2 (review of 0.1562): a key another client of this profile settled with its copy (restored=1) is not written again, but
+    /// its copy read here is returned too: this client's memory lacked it (its row was set aside at its start) and its next send replaced the gist
+    /// without it. A key settled with nothing kept (restored=0) is still left out: the row on disk has no copy either.</remarks>
     public IReadOnlyList<DiscoveryFact> RestoreAside(IReadOnlyCollection<string> keys,IReadOnlyCollection<DiscoveryFact> kept,DateTimeOffset now)
     {
         var joined=new List<DiscoveryFact>();
@@ -147,7 +150,7 @@ public sealed class DiscoveryDatabase
         using var transaction=open.BeginTransaction(deferred:false);
         Run(open,AsideDoneTable,transaction);
         using var settled=open.CreateCommand();settled.Transaction=transaction;
-        settled.CommandText="SELECT COUNT(*) FROM facts_aside_done WHERE key=$key;";
+        settled.CommandText="SELECT MAX(restored) FROM facts_aside_done WHERE key=$key;";
         var settledKey=settled.Parameters.Add("$key",SqliteType.Text);
         using var select=open.CreateCommand();select.Transaction=transaction;
         select.CommandText="SELECT fact FROM facts WHERE key=$key;";
@@ -160,8 +163,8 @@ public sealed class DiscoveryDatabase
         foreach(var key in keys.Distinct(StringComparer.Ordinal))
         {
             settledKey.Value=key;
-            if(settled.ExecuteScalar() is long and > 0)continue;
             var copy=byKey.GetValueOrDefault(key);
+            if(settled.ExecuteScalar() is long elsewhere){if(elsewhere>0 && copy is not null)joined.Add(copy.Copy());continue;}
             if(copy is not null)
             {
                 selectKey.Value=key;

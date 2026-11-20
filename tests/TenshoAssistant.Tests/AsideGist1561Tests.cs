@@ -172,7 +172,7 @@ internal static class AsideGist1561Tests
                 ["kind-"+((int)DiscoveryKind.Venture).ToString("00")+".jsonl.gz.b64"]=new JsonObject{["content"]=gist["kind-"+((int)DiscoveryKind.Venture).ToString("00")+".jsonl.gz.b64"]}}}.ToJsonString())),
                 _=>throw new Exception("no raw read"),pending).GetAwaiter().GetResult();
             Check(kept.Count==1 && kept[0].Key==b,"only B kept from the gist");
-            Check(database.RestoreAside(pending,kept,DateTimeOffset.UtcNow).Count==1 && database.RestoreAside(pending,kept,DateTimeOffset.UtcNow).Count==0,"the second client finds B settled");
+            Check(database.RestoreAside(pending,kept,DateTimeOffset.UtcNow).Count==1 && database.RestoreAside(pending,kept,DateTimeOffset.UtcNow).Count==1,"the second client finds B settled: not written again, its copy given to its memory (X-624 M2)");
             Check(Row(database,b)?.Seen==bSeen,"B counted once");
             var (other,otherGist,_,ob,_)=Damaged(Directory.CreateDirectory(Path.Combine(root,"two")).FullName);
             var gone=new Server{Files=otherGist,Gist=HttpStatusCode.NotFound};
