@@ -421,6 +421,10 @@ public sealed class GitHubExchange : IDisposable
     /// sent again. The gist not reached: false, nothing is sent this time, tried again at the next exchange. No gist yet, a gist gone (404), or a
     /// gist this version cannot read: nothing on it to keep; the rows are settled (their text stays in facts_aside).
     /// </summary>
+    /// <remarks>X-623 (review of 0.1562, I1): the gist is read with the token renewed first, as the send does (Fresh): a GitHub App token past
+    /// its 8 h answered 401, taken for « GitHub not reached », and the send stayed blocked at every exchange. A 401 with a refresh token in hand
+    /// renews once and reads again; a 401 without one ends as the send does (ExchangeUnauthorized), never « not reached ». X-624 M1: only the
+    /// listing's 404 means « gist gone »; a cut file not read from its raw address (any status) is « not reached », tried again later.</remarks>
     private async Task<bool> KeepAside(DiscoveryStore store)
     {
         if(store.Aside is not { } aside)return true;
@@ -428,14 +432,36 @@ public sealed class GitHubExchange : IDisposable
         IReadOnlyCollection<DiscoveryFact> kept;
         try
         {
-            kept=gist.Length==0 ? []:await GistAside.Read(()=>Api(HttpMethod.Get,$"https://api.github.com/gists/{gist}",null,maximumBytes:GistAside.MaxListingBytes),
-                address=>Community.BoundedHttp.ReadAsync(client,address,GistAside.MaxRawBytes,stop.Token),aside.Keys).ConfigureAwait(false);
+            if(gist.Length==0)kept=[];
+            else
+            {
+                WriteSecrets();
+                await Fresh().ConfigureAwait(false);
+                kept=await GistAside.Read(()=>AsideListing(gist),AsideRaw,aside.Keys).ConfigureAwait(false);
+            }
         }
         catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){kept=[];}
-        catch(Exception error) when(CommonUnreachable(error)){return false;}
+        catch(Exception error) when(CommonUnreachable(error) && error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return false;}
         catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or DecoderFallbackException){kept=[];}
         store.RestoreAside(kept);
         return true;
+    }
+    /// <summary>X-623: your gist's listing; a 401 with a refresh token in hand (a PC clock late, a token ended early) renews once and asks again.</summary>
+    private async Task<JsonNode?> AsideListing(string gist)
+    {
+        var address=$"https://api.github.com/gists/{gist}";
+        try{return await Api(HttpMethod.Get,address,null,maximumBytes:GistAside.MaxListingBytes).ConfigureAwait(false);}
+        catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized && HasRefresh)
+        {await Fresh(force:true).ConfigureAwait(false);return await Api(HttpMethod.Get,address,null,maximumBytes:GistAside.MaxListingBytes).ConfigureAwait(false);}
+    }
+    /// <summary>
+    /// X-624 M1 (review of 0.1562): a cut file read from its raw address (no token sent). A refusal there (404, 401, 5xx), while the listing
+    /// answered, says nothing of the gist: « not reached » (IOException), never « gist gone » nor a refused sign-in.
+    /// </summary>
+    private async Task<string> AsideRaw(Uri address)
+    {
+        try{return await Community.BoundedHttp.ReadAsync(client,address,GistAside.MaxRawBytes,stop.Token).ConfigureAwait(false);}
+        catch(HttpRequestException error) when(error.StatusCode is { } status){throw new IOException($"A cut gist file not read ({(int)status}).",error);}
     }
 
     private async Task Upload(IReadOnlyDictionary<string,string> contents)

@@ -14,7 +14,7 @@ internal static class AsideGist1561Tests
     private static void Check(bool value,string message) { if (!value) throw new Exception(message); }
     private static readonly DateTimeOffset At=DateTimeOffset.UtcNow.AddDays(-2);
 
-    private static void InTemp(Action<string> run)
+    internal static void InTemp(Action<string> run)
     {
         var root=Path.Combine(Path.GetTempPath(),"tensho-1561-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
@@ -72,7 +72,7 @@ internal static class AsideGist1561Tests
     /// Your base with two facts (A, B), both sent to your gist before; B's row then damaged and set aside at a start (the start of
     /// Plugin.Discoveries.cs). Gives the database, the gist's files and B's key and sightings on the gist.
     /// </summary>
-    private static (DiscoveryDatabase Database,IReadOnlyDictionary<string,string> Gist,string A,string B,int BSeen) Damaged(string root)
+    internal static (DiscoveryDatabase Database,IReadOnlyDictionary<string,string> Gist,string A,string B,int BSeen) Damaged(string root)
     {
         var seen=new DiscoveryStore();
         seen.SeeSource(DiscoveryKind.Venture,5,7,2,At);
@@ -96,7 +96,7 @@ internal static class AsideGist1561Tests
     }
 
     /// <summary>The next start, read whole: your facts loaded, the rows set aside and not settled given to the store (Plugin.Discoveries.cs).</summary>
-    private static DiscoveryStore Start(DiscoveryDatabase database)
+    internal static DiscoveryStore Start(DiscoveryDatabase database)
     {
         var store=new DiscoveryStore();
         store.Load(database.ReadMine((key,error)=>throw new Exception("unreadable "+key,error)));
@@ -116,7 +116,7 @@ internal static class AsideGist1561Tests
         return facts;
     }
 
-    private static DiscoveryFact? Row(DiscoveryDatabase database,string key)=>database.ReadMine().Facts.SingleOrDefault(fact=>fact.Key==key);
+    internal static DiscoveryFact? Row(DiscoveryDatabase database,string key)=>database.ReadMine().Facts.SingleOrDefault(fact=>fact.Key==key);
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
