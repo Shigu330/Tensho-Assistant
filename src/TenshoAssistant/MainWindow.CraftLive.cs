@@ -37,7 +37,6 @@ internal sealed partial class MainWindow
 
     private void DrawCraftLive()
     {
-        Heading(localization.Get("CraftLiveUi.Title"),localization.Get("CraftLiveUi.Description"));
         var state=craftLive.State;
         DrawToolSettingsLink("CraftLive","Crafting");
         DrawCraftLiveSettings();

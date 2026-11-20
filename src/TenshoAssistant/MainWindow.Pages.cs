@@ -10,7 +10,12 @@ internal sealed partial class MainWindow
     /// <param name="Source">Where its code starts, shown to contributors.</param>
     /// <param name="Parent">The navigation entry that stays selected on this page.</param>
     /// <param name="Visible">Null: always shown in the navigation.</param>
-    private sealed record PageEntry(Page Page,string? Category,Func<string>? Label,Action Draw,string Source,Page? Parent=null,Func<bool>? Visible=null);
+    /// <param name="Tab">X-600 (0.1573): its name in the tab bar of its family (a navigation entry and the pages that name it as their parent);
+    /// the one header (DrawPageHeader) draws the family's title, this page's description and the bar. Null: a page alone, which draws its own heading.</param>
+    /// <param name="About">The description under the title while this page of a family is shown.</param>
+    /// <param name="TabAction">On a family's navigation entry: a button at the end of the family's tab bar.</param>
+    private sealed record PageEntry(Page Page,string? Category,Func<string>? Label,Action Draw,string Source,Page? Parent=null,Func<bool>? Visible=null,
+        Func<string>? Tab=null,Func<string>? About=null,(Func<string> Label,Action Run)? TabAction=null);
     private sealed record PageGroup(string? Category,Page[] Pages,PageEntry[] Entries);
 
     private Func<string> PageLabel(string key)=>()=>localization.Get(key);
@@ -25,12 +30,13 @@ internal sealed partial class MainWindow
         new(Page.Market,"Objects",PageLabel("Navigation.Market"),DrawMarket,"MainWindow.Market*.cs, Market/"),
         // X-127 (0.1106): the wishlist, a tool of its own (it was a tab of Collections).
         new(Page.Wishlist,"Objects",PageLabel("Navigation.Wishlist"),DrawWishlistPage,"MainWindow.Wishlist.cs, Items/Wishlist*.cs"),
-        new(Page.CraftSimulation,"Production",PageLabel("Navigation.Crafting"),DrawCraftSimulation,"MainWindow.Craft*.cs, Craft/"),
-        new(Page.CraftLive,"Production",null,DrawCraftLive,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation),
-        new(Page.CraftPresets,"Production",null,DrawCraftPresets,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation),
-        new(Page.Gathering,"Production",PageLabel("Navigation.Gathering"),DrawGatheringBrowser,"MainWindow.Gathering*.cs"),
-        new(Page.GatheringGp,"Production",null,DrawGatheringGp,"MainWindow.Gathering*.cs",Page.Gathering),
-        new(Page.GatheringCollectables,"Production",null,DrawCollectablesPage,"MainWindow.CollectableTable.cs, Gathering/Collectables.cs",Page.Gathering),
+        // X-600 (0.1573): the tabs of a family are drawn in the order of this list.
+        new(Page.CraftSimulation,"Production",PageLabel("Navigation.Crafting"),DrawCraftSimulation,"MainWindow.Craft*.cs, Craft/",Tab:PageLabel("CraftSimulation.Title"),About:PageLabel("CraftSimulation.Description"),TabAction:(PageLabel("CraftSimulation.Notebook"),BackToCraftItem)),
+        new(Page.CraftPresets,"Production",null,DrawCraftPresets,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation,Tab:PageLabel("CraftPresets.Browse"),About:PageLabel("CraftPresets.Description")),
+        new(Page.CraftLive,"Production",null,DrawCraftLive,"MainWindow.Craft*.cs, Craft/",Page.CraftSimulation,Tab:PageLabel("CraftSimulation.Live"),About:PageLabel("CraftLiveUi.Description")),
+        new(Page.Gathering,"Production",PageLabel("Navigation.Gathering"),DrawGatheringBrowser,"MainWindow.Gathering*.cs",Tab:PageLabel("GatheringBrowser.Title"),About:PageLabel("GatheringBrowser.Description")),
+        new(Page.GatheringGp,"Production",null,DrawGatheringGp,"MainWindow.Gathering*.cs",Page.Gathering,Tab:PageLabel("Category.GatheringGp"),About:PageLabel("GpUi.Subtitle")),
+        new(Page.GatheringCollectables,"Production",null,DrawCollectablesPage,"MainWindow.CollectableTable.cs, Gathering/Collectables.cs",Page.Gathering,Tab:()=>localization.Format("CollectableTable.Title",Collectables?.Catalog?.Count ?? 0),About:PageLabel("CollectableTable.Help")),
         new(Page.OceanFishing,"Production",PageLabel("Navigation.OceanFishing"),DrawOceanFishing,"MainWindow.OceanFishing.cs"),
         new(Page.IslandSanctuary,"Production",PageLabel("Navigation.IslandSanctuary"),DrawIslandSanctuary,"MainWindow.IslandSanctuary.cs, Island/"),
         new(Page.MacroChain,"Production",PageLabel("Category.MacroChain"),DrawMacroChain,"MainWindow.MacroChain*.cs, Macros/"),
@@ -48,8 +54,8 @@ internal sealed partial class MainWindow
         // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
         new(Page.Quests,"Progression",PageLabel("Navigation.Quests"),DrawQuests,"MainWindow.Quests.cs, Quests/"),
         new(Page.Events,"Progression",PageLabel("Navigation.Events"),DrawEventsPage,"MainWindow.Events.cs, Events/"),
-        new(Page.Collections,"Progression",PageLabel("Navigation.Collection"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/"),
-        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections),
+        new(Page.Collections,"Progression",PageLabel("Navigation.Collection"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("CollectionsBrowser.Title"),About:PageLabel("CollectionsBrowser.Description")),
+        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections,Tab:PageLabel("Category.BlueMagic"),About:PageLabel("CollectionsBrowser.BlueDescription")),
         new(Page.AlliedSocieties,"Progression",PageLabel("Navigation.AlliedSocieties"),DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/"),
         new(Page.GrandCompanies,"Progression",PageLabel("Navigation.GrandCompanies"),DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/"),
         new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.SpecialDeliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs"),

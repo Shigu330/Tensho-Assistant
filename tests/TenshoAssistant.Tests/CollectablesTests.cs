@@ -151,7 +151,7 @@ internal static class CollectablesTests
             Check(Ids(4,true).SequenceEqual([2u,1u,3u]),"high reward");
             var table=Read("MainWindow.CollectableTable.cs");
             Check(table.Contains("ImGuiTableFlags.Sortable") && table.Contains("TableGetSortSpecs"),"table");
-            Check(Read("MainWindow.Pages.cs").Contains("new(Page.GatheringCollectables,\"Production\",null,DrawCollectablesPage,") && Read("UI/Navigation/MainWindow.CategoryNavigation.cs").Contains("Page.GatheringCollectables") && !Read("MainWindow.GatheringBrowser.cs").Contains("DrawCollectableTable();"),"its own tab");
+            Check(Read("MainWindow.Pages.cs").Contains("new(Page.GatheringCollectables,\"Production\",null,DrawCollectablesPage,") && Read("MainWindow.Pages.cs").Contains("Page.Gathering,Tab:()=>localization.Format(\"CollectableTable.Title\"") && !Read("MainWindow.GatheringBrowser.cs").Contains("DrawCollectableTable();"),"its own tab");
         }),
         ("Collectable window values: read from the in-game capture; anything missing or of another type gives no turn",() =>
         {

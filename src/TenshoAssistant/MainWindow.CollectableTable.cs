@@ -20,7 +20,6 @@ internal sealed partial class MainWindow
     // 0.478 (user request, in-game campaign): its own tab of the Gathering page.
     private void DrawCollectablesPage()
     {
-        Heading(localization.Format("CollectableTable.Title",Collectables?.Catalog?.Count ?? 0),localization.Get("CollectableTable.Help"));
         DrawCollectableTable();
     }
 

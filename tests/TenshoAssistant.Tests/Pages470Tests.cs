@@ -22,7 +22,7 @@ internal static class Pages470Tests
         }),
         ("Pages: a page without a name in the navigation says which entry stays selected",() =>
         {
-            foreach(Match row in Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"),@"new\(Page\.(\w+),[^,]+,null,.*"))Check(Regex.IsMatch(row.Value,@",Page\.\w+\),$"),"parent: "+row.Groups[1].Value);
+            foreach(Match row in Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"),@"new\(Page\.(\w+),[^,]+,null,.*"))Check(Regex.IsMatch(row.Value,@""",Page\.\w+(\),$|,Tab:)"),"parent: "+row.Groups[1].Value);
         }),
         ("New tool: the generator covers each step, refuses a bad name, and writes nothing on a dry run",() =>
         {

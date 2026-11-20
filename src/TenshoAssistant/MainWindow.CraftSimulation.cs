@@ -150,12 +150,13 @@ internal sealed partial class MainWindow
     }
     private enum CraftPageTab { None, Simulation, Preparation }
     private CraftPageTab focusCraftPage;
+    /// <summary>0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab. X-600: the button at the end of the family's tab bar.</summary>
+    private void BackToCraftItem(){if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId);page=Page.Items;focusCraftTab=true;}
+
     private void DrawCraftSimulation()
     {
-        Heading(localization.Get("CraftSimulation.Title"),localization.Get("CraftSimulation.Description"));
-        if(ImGui.SmallButton(localization.Get("CraftSimulation.Live"))) page=Page.CraftLive;
-        // 0.424 (user report): « Back to the item » — the recipe's item sheet, Craft tab.
-        if(ImGui.SmallButton(localization.Get("CraftSimulation.Notebook"))) { if(simulationRecipe is { } shown)SelectItem(shown.ResultItemId); page=Page.Items; focusCraftTab=true; }
+        // X-600 (0.1573): the title, the description, the tabs of the family (simulation, saved sequences, current synthesis) and
+        // « Back to the item » are drawn by the one page header (DrawPageHeader, from the page list).
         // 0.423 (user report): with no recipe chosen, the item in context's own recipe (its first one) is taken, on Preparation.
         if(simulationRecipe is null && itemId>0 && recipeCatalog.State.Catalog?.ForResult((uint)itemId) is { Count:>0 } own)OpenCraftPreparation(PreferredRecipe(own));
         // 0.408 (user request): the full preparation (quantities, cost, sub-recipe chain) is a tab of this page; the item sheet keeps

@@ -79,7 +79,7 @@ public sealed class JitWarmup : IDisposable
     /// added by the window itself (its page table's draw method), whatever it is (Settings at the load of 0.1282, not Home).
     /// A test checks that each name is still declared in the sources.</summary>
     public static readonly IReadOnlyList<string> WindowMethods=["PreDraw","PostDraw","Draw","DrawMain","DrawNavigation","DrawNavigationPopup","DrawPageHelpButton",
-        "DrawCategoryNavigation","DrawHelpBanner"];
+        "DrawPageHeader","DrawHelpBanner"];
     // X-433 (0.1449): « <Name> » made once (a lambda or a local function carries its outer method's name in angle brackets); the filters
     // built it for every method and name (82 MB of strings on the warm-up's thread in the two minutes after a load, 0.1448).
     private static readonly string[] WindowBracketed=Bracketed(WindowMethods);

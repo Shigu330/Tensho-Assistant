@@ -49,8 +49,6 @@ internal sealed partial class MainWindow
     }
     private void DrawCraftPresets()
     {
-        Heading(localization.Get("CraftPresets.Title"),localization.Get("CraftPresets.Description"));
-        if(ImGui.SmallButton(localization.Get("CraftPresets.Back")))page=Page.CraftSimulation;
         var rows=configuration.CraftPresets ?? [];var catalog=recipeCatalog.State.Catalog;
         ImGui.TextDisabled(localization.Format("CraftPresetMessages.Count", rows.Count, CraftPresets.Capacity));
         if(craftPresetError is { } error)ImGui.TextWrapped(localization.Get(error));

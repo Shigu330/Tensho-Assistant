@@ -28,7 +28,6 @@ internal sealed partial class MainWindow
     }
     private void DrawGatheringGp()
     {
-        Heading(localization.Get("GpUi.Title"),localization.Get("GpUi.Subtitle"));
         // 0.391 (g, X-06): the on-screen GP tick bar.
         BoolSetting("GpTick.Setting","GpTick.SettingTip",()=>configuration.GpTickBar,value=>configuration.GpTickBar=value,c=>c.GpTickBar);
         // 0.403 (g, R-08): GP alert at a threshold (0 = full).

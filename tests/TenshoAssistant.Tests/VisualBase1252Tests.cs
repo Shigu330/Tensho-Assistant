@@ -75,7 +75,7 @@ internal static class VisualBase1252Tests
             var row=components[components.IndexOf("public static bool SelectableRow(",StringComparison.Ordinal)..components.IndexOf("public static bool NavigationItem(",StringComparison.Ordinal)];
             Check(row.Contains("SelectionMark.SideMark(") && !row.Contains("ImGuiCol.Text"),"a selected row: the mark, and the text colour untouched");
             Check(components.Contains("=> SelectableRow(label, selected, 26*Scale);"),"the navigation item is a selectable row, at the scale");
-            Check(components.Contains("SelectionMark.UnderMark("),"a selected category button carries the mark too");
+            Check(!components.Contains("CategoryItem("),"X-600 (0.1573): the row of category buttons is gone (sub-pages are tabs, drawn by the page header)");
             Check(components.Contains("public static void SubTitle(string text)"),"sub-title component");
             var theme=Read("src/TenshoAssistant/UI/FfxivTheme.cs");
             Check(theme.Contains("ImGui.PushStyleColor(ImGuiCol.NavHighlight, c.Accent);"),"the focus frame takes the accent");

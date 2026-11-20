@@ -65,21 +65,6 @@ internal static class UiComponents
     public static bool NavigationItem(string label, bool selected)
         => SelectableRow(label, selected, 26*Scale);
 
-    public static bool CategoryItem(string label,bool selected)
-    {
-        if(selected)ImGui.PushStyleColor(ImGuiCol.Button,FfxivTheme.Selected);
-        bool clicked;
-        try{clicked=ImGui.SmallButton(label);}
-        finally{if(selected)ImGui.PopStyleColor();}
-        if(selected)
-        {
-            // X-154: the same mark as a selected row, under the button (the buttons sit side by side).
-            var (min,max)=SelectionMark.UnderMark(ImGui.GetItemRectMin(),ImGui.GetItemRectMax(),Scale);
-            ImGui.GetWindowDrawList().AddRectFilled(min,max,ImGui.GetColorU32(FfxivTheme.Gold));
-        }
-        return clicked;
-    }
-
     /// <summary>
     /// X-154 (0.1255): the one way to open a data table: striped rows, a thin line between rows, columns sharing the width; sortable and
     /// a scrolling body of a given height on demand. Closed by ImGui.EndTable() as any table (the pages keep their try/finally).

@@ -50,7 +50,6 @@ internal sealed partial class MainWindow
     }
     private void DrawCollections(bool blueMagic = false)
     {
-        Heading(localization.Get(blueMagic ? "Category.BlueMagic":"CollectionsBrowser.Title"),localization.Get(blueMagic ? "CollectionsBrowser.BlueDescription":"CollectionsBrowser.Description"));
         var state = collections.State;
         if (ImGui.Button(localization.Get("CollectionsBrowser.Refresh"))) collections.RequestRefresh();
         ImGui.SameLine();
