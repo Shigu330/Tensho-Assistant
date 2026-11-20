@@ -57,6 +57,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/MapFloors.cs" Link="Maps/MapFloors.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/BuiltOnce.cs" Link="Maps/BuiltOnce.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapBookmarks.cs" Link="Maps/MapBookmarks.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/PendingPasteImport.cs" Link="Maps/PendingPasteImport.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapProjection.cs" Link="Maps/MapProjection.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/VistaLogNumbers.cs" Link="Maps/VistaLogNumbers.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MapPartySmoother.cs" Link="Maps/MapPartySmoother.cs" />

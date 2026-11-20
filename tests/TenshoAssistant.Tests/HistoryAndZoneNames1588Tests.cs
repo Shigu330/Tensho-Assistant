@@ -84,7 +84,7 @@ internal static class HistoryAndZoneNames1588Tests
             var ui=File.ReadAllText(Path.Combine(Root(),"src","TenshoAssistant","MainWindow.MapBookmarks.cs")).Replace("\r\n","\n");
             Check(!ui.Contains("ZoneNamesLoad?.Invoke()") && !ui.Contains("ZoneNamesLoad()"),"never read in the drawing");
             Check(ui.Contains("zoneNamesTask = Task.Run(loadNames);"),"read by a task");
-            Check(ui.Contains("bookmarkPastePending = true;") && ui.Contains("ImportPastedCoordinates();"),"a click before they are read waits");
+            Check(ui.Contains("bookmarkPaste.Start(bookmarkImport, ImGui.GetFrameCount());") && ui.Contains("ImportPastedCoordinates(pastedText);"),"a click before they are read waits (X-645: with the clicked text)");
             foreach(var language in new[]{"en","fr"})
                 Check(File.ReadAllText(Path.Combine(Root(),"src","TenshoAssistant","Localization","Languages",language+".json")).Contains("\"PastedReading\""),language+": the waiting line");
         }),
