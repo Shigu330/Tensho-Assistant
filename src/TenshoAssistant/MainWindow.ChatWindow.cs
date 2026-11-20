@@ -346,8 +346,33 @@ internal sealed partial class MainWindow
             else chatLookMessage=localization.Get("ChatWindow.LookNotACode");
         }
         Tip("ChatWindow.PasteLookTip");
+        // X-447 B16 (0.1649): a ready-made look, applied at once (a complete look, the tabs, players, words and sounds kept).
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(200*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+        if(ImGui.BeginCombo("###ChatReadyLooks",localization.Get("ChatWindow.Looks")))
+        {
+            try
+            {
+                foreach(var (key,_) in ChatTheme.Ready)
+                {
+                    if(!ImGui.Selectable(ChatLookName(key)) || ChatTheme.ReadyCode(key) is not { } code || !ChatTheme.Apply(code,configuration.Chat))continue;
+                    chatLookMessage=localization.Format("ChatWindow.LookChosen",ChatLookName(key));
+                    TrySave("Chat window look");
+                }
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip("ChatWindow.LooksTip");
         if(chatLookMessage is { } said)ImGui.TextDisabled(said);
     }
+
+    private string ChatLookName(string key)=>key switch
+    {
+        "Clear"=>localization.Get("ChatWindow.LookClear"),
+        "Dark"=>localization.Get("ChatWindow.LookDark"),
+        "Compact"=>localization.Get("ChatWindow.LookCompact"),
+        _=>localization.Get("ChatWindow.LookGame"),
+    };
 
     /// <summary>X-475 (the user's remark of 15/11, asked again on 16/11; X-447 B10): « Keep the chat history on this PC », off by default. Ticking it
     /// asks first, in plain words: what is kept (the tabs' messages, other players' names and words included), where (the folder, one file per

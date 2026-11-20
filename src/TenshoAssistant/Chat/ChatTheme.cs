@@ -114,6 +114,29 @@ public static class ChatTheme
         return true;
     }
 
+    /// <summary>X-447 B16 (0.1649): the ready-made looks, each a complete look (the channels' colours and names the default ones): the window's
+    /// default (close to the game's chat), clear (no background, no frame, letters outlined), dark, compact.</summary>
+    public static readonly (string Key,Action<ChatSettings> Set)[] Ready=
+    [
+        ("Game",_=>{}),
+        ("Clear",look=>{look.Opacity=0;look.Borderless=true;look.TextOutline=true;}),
+        ("Dark",look=>{look.Opacity=85;look.Rounding=4;look.TextOutline=false;}),
+        ("Compact",look=>{look.FontScale=85;look.LineSpacing=0;look.MarginX=2;look.MarginY=1;}),
+    ];
+
+    /// <summary>X-447 B16 (0.1649): the code of the ready-made look <paramref name="key"/>; null for none of that name.</summary>
+    public static string? ReadyCode(string key)
+    {
+        foreach(var (name,set) in Ready)
+        {
+            if(name!=key)continue;
+            var look=new ChatSettings();
+            set(look);
+            return Share(look);
+        }
+        return null;
+    }
+
     private static Look? Read(string? code)
     {
         var text=(code ?? "").Trim();

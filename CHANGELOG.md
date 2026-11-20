@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1649.0
+- Plan global, X-447 : Fenêtre de chat (X-447 B16, choix de l'utilisateur du 15/11, d'après Chattynator et ElvUI), fin : une liste « Apparences toutes faites » à côté de « Coller une apparence » applique tout de suite une apparence complète : par défaut (proche du chat du jeu), transparente (sans fond ni cadre, lettres avec contour), sombre ou compacte ; les couleurs et noms courts des canaux reviennent à leurs valeurs par défaut, les onglets, joueurs, mots et sons sont gardés. Elles passent par le même code que la copie (mêmes bornes). B16 est fini (apparence copiée, collée, apparences toutes faites).
+- Pour les joueurs : fenêtre de chat : des apparences toutes faites (par défaut, transparente, sombre, compacte) s'appliquent en un clic.
+- Tests : ChatLooks1649Tests. Verify.ps1 (agent) : 3441/3441, 0 avertissement, 0 erreur ; DLL 0.1649.0.0. Non validé en jeu.
+### English
+- Chat window (X-447 B16, the user's choice of 15/11, after Chattynator and ElvUI), the end: a « Ready-made looks » list beside « Paste a look » applies a complete look at once: the default one (close to the game's chat), clear (no background nor frame, letters outlined), dark or compact; the channels' colours and short names go back to their defaults, the tabs, players, words and sounds are kept. They go through the same code as the copy (same bounds). B16 is done (look copied, pasted, ready-made looks).
+- For players: Chat window: ready-made looks (default, clear, dark, compact) apply in one click.
+
 ## 0.1648.0
 - Plan global, X-447 : Fenêtre de chat (X-447 B16, choix de l'utilisateur du 15/11, d'après Chattynator et ElvUI), une première partie : « Copier l'apparence » met l'apparence de la fenêtre dans le presse-papiers sous forme d'un code (opacité, texte, marges, coins, cadre, espacement, fondu, onglets et barre de défilement, heure et canal affichés, couleurs et noms courts des canaux, crochets et couleurs des noms, icônes des objets, contour) ; « Coller une apparence » la reprend d'un tel code. Jamais les onglets, les joueurs masqués ou mis en avant, les mots d'alerte ni les sons : un code partagé ne nomme aucun joueur. À l'import, chaque valeur est bornée comme dans les réglages, un canal inconnu est laissé de côté, une valeur absente prend sa valeur par défaut, et un texte qui n'est pas un code ne change rien.
 - Pour les joueurs : fenêtre de chat : son apparence se copie en un code et se colle, sans onglet, joueur ni mot.
