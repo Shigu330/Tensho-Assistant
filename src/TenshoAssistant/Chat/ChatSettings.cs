@@ -280,6 +280,36 @@ public sealed class ChatSettings
     }
 }
 
+/// <summary>
+/// X-687 (0.1663, the user's request of 20/11 around 22:05: « no way to sort the tabs »): the settings' tabs in a new order, kept in
+/// ChatSettings.Tabs (saved, so kept at reload). One order for the window and its contexts' profiles (a profile names the tabs it shows; they
+/// come in this order). The conversations' tabs (memory only) are not in the list and stay after. Pure (tests).
+/// </summary>
+public static class ChatTabOrder
+{
+    /// <summary>The tab one place to the left (<paramref name="step"/> -1) or right (+1); false at an end or out of the list.</summary>
+    public static bool Move(List<ChatTabSettings> tabs,int index,int step)
+    {
+        var to=index+step;
+        if(step==0 || index<0 || index>=tabs.Count || to<0 || to>=tabs.Count)return false;
+        (tabs[index],tabs[to])=(tabs[to],tabs[index]);
+        return true;
+    }
+
+    /// <summary>After a drag in the window: the settings' tabs <paramref name="shown"/> in the order the window now shows them, each in one of the
+    /// places these tabs had (a profile may show some only: the others keep their places); tabs not in the list (conversations) left out. False
+    /// when nothing changes.</summary>
+    public static bool Apply(List<ChatTabSettings> tabs,IReadOnlyList<ChatTabSettings> shown)
+    {
+        var moved=shown.Where(tabs.Contains).Distinct().ToList();
+        var places=moved.Select(tab=>tabs.IndexOf(tab)).Order().ToList();
+        var changed=false;
+        for(var at=0;at<places.Count;at++)
+            if(!ReferenceEquals(tabs[places[at]],moved[at])){tabs[places[at]]=moved[at];changed=true;}
+        return changed;
+    }
+}
+
 /// <summary>X-686 (the user's report of 20/11: a tab removed by mistake, at the first click): « Remove » takes the tab away at once and keeps
 /// it a few seconds, the time to undo it; it comes back at its place, with its own settings. Only the last tab removed can come back.</summary>
 public sealed class ChatTabUndo

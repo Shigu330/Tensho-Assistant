@@ -648,6 +648,21 @@ internal sealed partial class MainWindow
                     if(ImGui.SliderInt("###ChatTabFont",ref size,60,200,"%d %%")){tab.FontScale=size;chatSettingsPending=true;}
                     Tip("ChatWindow.TabFontTip");
                 }
+                // X-687 (0.1663): the tab one place to the left or right, also without the mouse's drag and with the tabs' names hidden.
+                if(index>0)
+                {
+                    var left=localization.Get("ChatWindow.TabMoveLeft");
+                    SameLineIfFits(ImGui.CalcTextSize(left).X+style.FramePadding.X*2);
+                    if(ImGui.SmallButton(left+"###ChatTabLeft") && ChatTabOrder.Move(tabs,index,-1)){chatSettingsPending=true;return;}
+                    Tip("ChatWindow.TabMoveTip");
+                }
+                if(index<tabs.Count-1)
+                {
+                    var right=localization.Get("ChatWindow.TabMoveRight");
+                    SameLineIfFits(ImGui.CalcTextSize(right).X+style.FramePadding.X*2);
+                    if(ImGui.SmallButton(right+"###ChatTabRight") && ChatTabOrder.Move(tabs,index,1)){chatSettingsPending=true;return;}
+                    Tip("ChatWindow.TabMoveTip");
+                }
                 if(tabs.Count>1)
                 {
                     SameLineIfFits(ImGui.CalcTextSize(localization.Get("ChatWindow.TabRemove")).X+style.FramePadding.X*2);
@@ -1223,7 +1238,13 @@ internal sealed partial class MainWindow
 
     private void DrawChatTabItems(List<ChatTabSettings> tabs,ChatSettings options)
     {
-        if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
+        // X-687 (0.1663): the tabs dragged with the mouse (Reorderable); each tab's id is its own (not its place), so ImGui keeps it while the
+        // order changes. The order the bar shows is read after it (ChatTabsAfterDrag).
+        if(!ImGui.BeginTabBar("###TenshoChatTabs"+chatTabBarGeneration,ImGuiTabBarFlags.FittingPolicyScroll | ImGuiTabBarFlags.Reorderable))return;
+        chatTabPlaces.Clear();
+        var dragged=false;
+        var fresh=chatTabBarFresh;
+        chatTabBarFresh=false;
         try
         {
             // X-447 B7 (0.1647): the server bar's entry clicked: the first tab holding an alert not seen is selected.
@@ -1252,8 +1273,13 @@ internal sealed partial class MainWindow
                 // X-447 B7 (0.1643): a tab not shown holding an alert not seen blinks: lit in the accent colour every other half second.
                 var blink=options.BlinkAlerts && view.Alerts>0 && index!=chatTabShown && ChatLook.Blink(ImGui.GetTime());
                 if(blink)ImGui.PushStyleColor(ImGuiCol.Tab,Accent with{W=0.75f});
-                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(ChatConversations.Label(tab,options.CaptureNames),tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index,index==alertTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);}
+                var select=index==alertTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
+                // X-687 (0.1663): a bar made again in the list's order selects the tab shown.
+                if(fresh && index==chatTabShown)select=ImGuiTabItemFlags.SetSelected;
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(ChatConversations.Label(tab,options.CaptureNames),tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+ChatTabKey(tab),select);}
                 finally{if(coloured)ImGui.PopStyleColor();if(blink)ImGui.PopStyleColor();}
+                chatTabPlaces.Add((tab,ImGui.GetItemRectMin().X));
+                if(ImGui.IsItemActive() && ImGui.IsMouseDragging(ImGuiMouseButton.Left))dragged=true;
                 // X-455 E7 (0.1617): a right click on a tab: clear its messages (the other tabs keep theirs), or show them again.
                 if(ImGui.BeginPopupContextItem("###ChatTabMenu"+index))
                 {
@@ -1264,6 +1290,11 @@ internal sealed partial class MainWindow
                         // X-447 B10 (0.1654): a conversation's tab closed (its messages stay in the other tabs).
                         if(tab.Conversation is not null && ImGui.Selectable(localization.Get("ChatWindow.CloseConversation")) && chatConversations.Close(tab))
                             ChatConversationClosed(tab);
+                        // X-687 (0.1663): the tab one place to the left or right (a settings' tab; a conversation's stays after them).
+                        var all=ChatTabs(options);
+                        var at=all.IndexOf(tab);
+                        if(at>0 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveLeft")) && ChatTabOrder.Move(all,at,-1))ChatTabsMoved(tabs);
+                        if(at>=0 && at<all.Count-1 && ImGui.Selectable(localization.Get("ChatWindow.TabMoveRight")) && ChatTabOrder.Move(all,at,1))ChatTabsMoved(tabs);
                     }
                     finally{ImGui.EndPopup();}
                 }
@@ -1274,6 +1305,41 @@ internal sealed partial class MainWindow
             DrawChatFrameButtons(options);
         }
         finally{ImGui.EndTabBar();}
+        ChatTabsAfterDrag(tabs,options,dragged);
+    }
+
+    // X-687 (0.1663): the tabs as the bar placed them in this frame, the bar's number (a new one shows the list's order), each tab's own id.
+    private readonly List<(ChatTabSettings Tab,float X)> chatTabPlaces=[];
+    private int chatTabBarGeneration;
+    private bool chatTabBarFresh,chatTabDragging;
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<ChatTabSettings,object> chatTabKeys=new();
+    private int chatTabKeyNext;
+    private int ChatTabKey(ChatTabSettings tab)=>(int)chatTabKeys.GetValue(tab,_=>++chatTabKeyNext);
+
+    /// <summary>
+    /// X-687 (0.1663): when a drag ends, the order the bar shows becomes the settings' order (ChatTabOrder.Apply), saved, the tab shown kept;
+    /// otherwise the list's order is the truth: a bar showing another order (a tab put back, moved by its menu, a context's tabs) is made
+    /// again in the list's order, the tab shown selected.
+    /// </summary>
+    private void ChatTabsAfterDrag(List<ChatTabSettings> tabs,ChatSettings options,bool dragged)
+    {
+        if(dragged){chatTabDragging=true;return;}
+        var shown=chatTabPlaces.OrderBy(place=>place.X).Select(place=>place.Tab).ToList();
+        var same=shown.SequenceEqual(chatTabPlaces.Select(place=>place.Tab));
+        if(chatTabDragging)
+        {
+            chatTabDragging=false;
+            if(!same && ChatTabOrder.Apply(ChatTabs(options),shown))ChatTabsMoved(tabs);
+            return;
+        }
+        if(!same){chatTabBarGeneration++;chatTabBarFresh=true;}
+    }
+
+    /// <summary>X-687 (0.1663): the order changed: saved, the tab shown kept (selected again at the next frame).</summary>
+    private void ChatTabsMoved(List<ChatTabSettings> tabs)
+    {
+        if(chatTabShown>=0 && chatTabShown<tabs.Count)chatSelectTab=tabs[chatTabShown];
+        chatSettingsPending=true;
     }
 
     private void DrawChatShownTab(List<ChatTabSettings> tabs,ChatSettings options,float height)
