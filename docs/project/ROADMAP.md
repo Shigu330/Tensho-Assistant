@@ -80,7 +80,9 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Nothing open.
+| No. | Point | Choice applied, or record awaited | Where |
+|---|---|---|---|
+| D-188 | An unreadable row of your discoveries (damaged JSON) blocks the upload to your gist each session while it stays in the base | Keep the block: nothing is replaced on the gist (applied in 0.1557, recommended) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -177,7 +179,9 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-Aucune en attente.
+| N° | Point | Choix appliqué, ou relevé attendu | Où |
+|---|---|---|---|
+| D-188 | Une ligne illisible de vos découvertes (JSON abîmé) bloque l'envoi à votre gist à chaque session tant qu'elle reste dans la base | Garder ce blocage : rien n'est remplacé sur le gist (appliqué en 0.1557, recommandé) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

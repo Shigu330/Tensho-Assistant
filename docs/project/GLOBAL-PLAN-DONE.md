@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (593 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (597 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -655,18 +655,22 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-586 | External audit of 18/11 (GPT-6.2 Astra, commit c6389abe, 27 new findings, 6… | Done in 0.1550 |
 | X-587 | External audit of 18/11, family « player data after an error »: A16 (critical… | Done in 0.1551 |
 | X-588 | External audit of 18/11, family « discoveries: loading and export »: A01 (base… | Done in 0.1552 |
+| X-589 | External audit of 18/11, family « network sources »: A08, A09, A10, A26, A11… | Done in 0.1556 |
 | X-593 | External audit of 18/11, A04 (user's choice of 18/11: fix the text, not the… | Done in 0.1553 |
 | X-594 | Method audit of 18/11, backup of the agent's files: M27, M14, M28, M29, M30… | Done in 0.1550 |
 | X-595 | Method audit of 18/11, tools that hide an error: M11, M12, M24, M26, M18, M22… | Done in 0.1550 |
 | X-596 | Method audit of 18/11, cycle and truth: M01, M17, M23 (with X-585 M7), M20… | Done in 0.1550 |
 | X-597 | Method audit of 18/11: six rule changes confirmed by the user on 18/11 (R28.6)… | Done in 0.1550 |
 | X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
+| X-611 | Tool (defect seen by the user on 19/11 around 23:30): the per-model statistics… | Done in 0.1554 |
+| X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
+| X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (593 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (597 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1319,9 +1323,13 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-586 | Audit externe du 18/11 (GPT-6.2 Astra, commit c6389abe, 27 constats nouveaux… | Fait en 0.1550 |
 | X-587 | Audit externe du 18/11, famille « données du joueur après une erreur » : A16… | Fait en 0.1551 |
 | X-588 | Audit externe du 18/11, famille « découvertes : chargement et export » : A01… | Fait en 0.1552 |
+| X-589 | Audit externe du 18/11, famille « sources réseau » : A08 (délai dépassé de… | Fait en 0.1556 |
 | X-593 | Audit externe du 18/11, A04 (choix de l'utilisateur le 18/11 : corriger le… | Fait en 0.1553 |
 | X-594 | Audit de méthode du 18/11, sauvegarde des fichiers de l'agent : M27 (une source… | Fait en 0.1550 |
 | X-595 | Audit de méthode du 18/11, outils qui mentent sur une erreur : M11 (state.py… | Fait en 0.1550 |
 | X-596 | Audit de méthode du 18/11, cycle et vérité : M01 (lance.py compte 8 versions… | Fait en 0.1550 |
 | X-597 | Audit de méthode du 18/11 : six changements de règles confirmés par… | Fait en 0.1550 |
 | X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
+| X-611 | Outil (défaut vu par l'utilisateur le 19/11 vers 23 h 30) : les statistiques… | Fait en 0.1554 |
+| X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
+| X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
