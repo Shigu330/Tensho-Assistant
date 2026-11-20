@@ -10,7 +10,9 @@ internal sealed partial class MainWindow
     internal Func<IslandCatalog?>? IslandCatalogLoad { get; set; }
     internal Func<IslandCatalog,Task<IslandSnapshot>>? ReadIsland { get; set; }
     private IslandCatalog? islandCatalog;
-    private bool islandCatalogTried,islandReadFailed;
+    // X-646 (review of 0.1588, M2, R07): the island's sheets are read by a task, like the other sheet loaders, never in the drawing.
+    private Task<IslandCatalog?>? islandCatalogTask;
+    private bool islandCatalogFailed,islandReadFailed;
     private Task<IslandSnapshot>? islandRead;
     private IslandSnapshot? island;
     private IslandRow[] islandRows=[];
@@ -33,7 +35,14 @@ internal sealed partial class MainWindow
 
     private void DrawIslandWorkshop()
     {
-        if(!islandCatalogTried){islandCatalogTried=true;islandCatalog=IslandCatalogLoad?.Invoke();}
+        if(islandCatalog is null && !islandCatalogFailed && islandCatalogTask is null && IslandCatalogLoad is { } load)islandCatalogTask=Task.Run(load);
+        if(islandCatalogTask is { IsCompleted:true } loaded)
+        {
+            islandCatalogTask=null;
+            islandCatalog=loaded.IsCompletedSuccessfully ? loaded.Result:null;
+            islandCatalogFailed=islandCatalog is not { Valid:true };
+        }
+        if(islandCatalogTask is not null){StateLine(UI.UiState.Waiting,localization.Get("Island.Loading"));return;}
         if(islandCatalog is not { Valid:true } catalog){ImGui.TextColored(UI.FfxivTheme.Error,localization.Get("Island.SheetsUnavailable"));return;}
         ImGui.TextWrapped(localization.Get("Island.Help"));
         if(islandRead is { IsCompleted:true } read)

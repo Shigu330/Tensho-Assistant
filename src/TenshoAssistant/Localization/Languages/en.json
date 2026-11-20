@@ -7935,6 +7935,7 @@
     "Read": "Read the island",
     "ReadTip": "Copies what the game has loaded, once. No request and no action in the game.",
     "SheetsUnavailable": "The workshops' data could not be read, perhaps after a game update.",
+    "Loading": "Reading the workshops' data…",
     "Unavailable": "The island could not be read, perhaps after a game update.",
     "NotOnIsland": "You are not on your island.",
     "NotLoaded": "The game has not loaded supply and demand yet: open the Isleworks Agenda in the game, then read again.",

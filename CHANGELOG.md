@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1590.0
+- Plan global, X-646 : Relecture du bloc 0.1587 à 0.1588, constat antérieur M2 (R07, rien de lourd dans le dessin) : les feuilles de l'île (IslandCatalogLoad) étaient lues dans le dessin, au premier affichage de l'atelier. Corrigé : elles sont lues par une tâche, comme les autres chargeurs de feuilles (FATE, donjons profonds, peuples alliés, noms de zones) ; « Lecture des données des fabriques… » s'affiche pendant la lecture ; une lecture ratée n'est pas relancée à chaque image. Nouveau test IslandSheets1590Tests.
+- Tests : IslandSheets1590Tests. Verify.ps1 (agent) : 3258/3258, 0 avertissement, 0 erreur ; DLL 0.1590.0.0. Non validé en jeu.
+### English
+- Review of the 0.1587 to 0.1588 block, earlier finding M2 (R07, nothing heavy in the drawing): the island's sheets (IslandCatalogLoad) were read in the drawing, at the workshop's first showing. Fixed: they are read by a task, like the other sheet loaders (FATEs, deep dungeons, allied societies, zone names); « Reading the workshops' data… » is shown meanwhile; a failed reading is not tried again at each frame. New test IslandSheets1590Tests.
+
 ## 0.1589.0
 - Plan global, X-645 : Relecture du bloc 0.1587 à 0.1588, mineur M1 : l'import de favoris collés (« Lieu ( x , y ) ») qui attend la lecture des noms de zones partait au premier dessin suivant avec le texte du champ à ce moment, même changé ou vidé, et « Lecture des noms de zones… » restait affiché après avoir quitté l'onglet. Corrigé : l'attente garde le texte du clic (PendingPasteImport) ; elle s'annule si le texte change ou se vide, ou si la zone de partage n'est pas dessinée une image (autre onglet, fenêtre fermée) ; le message d'attente s'efface alors et rien n'est importé. Nouveau test de comportement PendingPasteImport1589Tests ; le contrôle de câblage de HistoryAndZoneNames1588Tests suit le nouveau nom.
 - Tests : PendingPasteImport1589Tests. Verify.ps1 (agent) : 3257/3257, 0 avertissement, 0 erreur ; DLL 0.1589.0.0. Non validé en jeu.

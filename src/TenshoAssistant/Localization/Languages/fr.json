@@ -7935,6 +7935,7 @@
     "Read": "Lire l'île",
     "ReadTip": "Copie une fois ce que le jeu a chargé. Aucune requête et aucune action dans le jeu.",
     "SheetsUnavailable": "Les données des fabriques n'ont pas pu être lues, peut-être après une mise à jour du jeu.",
+    "Loading": "Lecture des données des fabriques…",
     "Unavailable": "L'île n'a pas pu être lue, peut-être après une mise à jour du jeu.",
     "NotOnIsland": "Vous n'êtes pas sur votre île.",
     "NotLoaded": "Le jeu n'a pas encore chargé la disponibilité et la demande : ouvrez le carnet de fabrication dans le jeu, puis relisez.",
