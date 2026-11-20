@@ -2233,6 +2233,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1572) Jardin : ouvrir un emplacement mûr (le jeu écrit « … est arrivé(e) à maturité ! ») : la page montre « Mûr » pour cet emplacement, même avant l'heure prévue ; récolter : il est retiré du journal.
 
+- [ ] (0.1573) Artisanat, Récolte et Collections : chaque page montre son titre, une description et une barre d'onglets comme Rangements (plus de rangée de petits boutons) ; cliquer chaque onglet ouvre la sous-page ; ouvrir une sous-page par un autre chemin (barre de côté, bouton « Séquences sauvegardées » du simulateur, liste des outils) sélectionne le bon onglet sans revenir en arrière.
+
+- [ ] (0.1573) Artisanat : « Retour à l'objet », au bout de la barre d'onglets, ouvre la fiche de l'objet de la recette simulée, onglet Artisanat, depuis les trois sous-pages.
+
+- [ ] (0.1574) Dédale bestial, fenêtre « Disposition du plateau » ouverte, panneau Tensho à côté : chaque ennemi du combat montré a son icône et son nom, puis « Faiblesse » suivie de la même icône d'élément que dans la fenêtre du jeu et du mot (Feu, Perforant…) ; ses actions commencent par l'icône de leur type de dégâts ; un trait sépare les ennemis ; le panneau n'est ni plus large ni plus haut que la fenêtre du jeu et aucun texte n'est coupé.
+
+- [ ] (0.1574) Dédale bestial, fenêtre « Formation de l'équipe » : dans le panneau, sous « Tout le plateau », chaque bête à emmener est sur une ligne (icône, numéro et nom, rang, type de dégâts précédé de l'icône du jeu) ; une bête à l'attaque magique neutre montre « Magique » sans icône.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

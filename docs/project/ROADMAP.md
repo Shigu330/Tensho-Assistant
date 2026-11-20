@@ -83,6 +83,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
 | D-188 | An unreadable row of your discoveries (damaged JSON) blocks the upload to your gist each session while it stays in the base | Keep the block: nothing is replaced on the gist (applied in 0.1557, recommended) |  |
+| D-193 | Garden (X-581, review 0.1572 M4): until you open the bed after the expected time, Tensho says « Ripe » and alerts (chat, desktop) from the seed durations alone (Lotlab); this is what rang wrongly on 17/11. Recommended: b | Keep « Ripe » and the alert from the durations, corrected at the first opening of the bed in game (applied in 0.1572) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -182,6 +183,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
 | D-188 | Une ligne illisible de vos découvertes (JSON abîmé) bloque l'envoi à votre gist à chaque session tant qu'elle reste dans la base | Garder ce blocage : rien n'est remplacé sur le gist (appliqué en 0.1557, recommandé) |  |
+| D-193 | Jardin (X-581, relecture 0.1572 M4) : tant que vous n'avez pas ouvert l'emplacement après l'heure prévue, Tensho dit « Mûr » et prévient (chat, bureau) d'après les seules durées des graines (Lotlab) ; c'est ce qui a sonné à tort le 17/11. Recommandé : b | Garder « Mûr » et l'avis d'après les durées, corrigé à la première ouverture de l'emplacement dans le jeu (appliqué en 0.1572) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

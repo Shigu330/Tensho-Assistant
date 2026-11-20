@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (620 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (622 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -670,6 +670,8 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-597 | Method audit of 18/11: six rule changes confirmed by the user on 18/11 (R28.6)… | Done in 0.1550 |
 | X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
 | X-599 | Dead button (reported by the user on 18/11, screenshot): in the item sheet's… | Done in 0.1567 |
+| X-600 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1573 |
+| X-608 | Rule R03.1 changed on 18/11 (user's choice, rules journal): in PvE combat… | Done in 0.1575 |
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
 | X-610 | Bug seen by the user on 19/11 around 23:15 (item card capture, kept off the… | Done in 0.1568 |
 | X-611 | Tool (defect seen by the user on 19/11 around 23:30): the per-model statistics… | Done in 0.1554 |
@@ -693,7 +695,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (620 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (622 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1361,6 +1363,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-597 | Audit de méthode du 18/11 : six changements de règles confirmés par… | Fait en 0.1550 |
 | X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
 | X-599 | Bouton mort (signalé par l'utilisateur le 18/11, capture) : dans la fiche… | Fait en 0.1567 |
+| X-600 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1573 |
+| X-608 | Règle R03.1 changée le 18/11 (choix de l'utilisateur, journal des règles) : en… | Fait en 0.1575 |
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
 | X-610 | Bug vu par l'utilisateur le 19/11 vers 23 h 15 (capture de la fiche d'objet… | Fait en 0.1568 |
 | X-611 | Outil (défaut vu par l'utilisateur le 19/11 vers 23 h 30) : les statistiques… | Fait en 0.1554 |
