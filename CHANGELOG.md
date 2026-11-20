@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1633.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1632. Mesure à vide du 20/11 à 17 h 55 : les lignes sont dessinées 2474 ms après le chargement ; leur première image prend 45 ms, dont 43 ms à compiler 7 méthodes sur le fil du jeu. En mode développeur, le journal les nomme maintenant (les événements de compilation du runtime, écoutés dans le processus pendant cette seule image, gardés pour le fil du jeu entre deux marques compilées sur lui, lus 2 s plus tard). Et la première image du chat prend aussi les membres d'égalité des types qu'elle touche (Equals, GetHashCode, opérateurs des records), que le runtime appelle par les méthodes virtuelles d'object, absentes du code lu.
+- Tests : ChatFrameJit1633Tests. Verify.ps1 (agent) : 3393/3393, 0 avertissement, 0 erreur ; DLL 0.1633.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564), following 0.1632. Idle measure of 20/11 17:55: the lines are drawn 2474 ms after the load; their first frame takes 45 ms, 43 ms of it compiling 7 methods on the game's thread. In developer mode the log now names them (the runtime's compilation events, listened to in the process during that frame only, kept for the game's thread between two marks compiled on it, read 2 s later). And the chat's first frame also takes the equality members of the types it touches (Equals, GetHashCode, records' operators), which the runtime calls through object's virtual methods, absent from the code read.
+
 ## 0.1632.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1631. Mesure à vide du 20/11 à 17 h 50 : les lignes sont dessinées 2641 ms après le chargement (moins de 3 s), avant les autres panneaux ; mais le chat prenait 34 ms de cette image. Le journal dit maintenant combien de temps prend la première image du chat avec ses lignes et quelle part le fil du jeu y passe à compiler, pour distinguer une compilation restante du travail de mise en page.
 - Tests : ChatFirstFrame1632Tests. Verify.ps1 (agent) : 3390/3390, 0 avertissement, 0 erreur ; DLL 0.1632.0.0. Rien à essayer en jeu.

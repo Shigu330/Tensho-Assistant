@@ -840,17 +840,34 @@ internal sealed partial class MainWindow
             chatFirstLinesLogged=true;
             log.Information(FormattableString.Invariant($"Chat window: lines first drawn {WarmupSinceMade:F0} ms after the load (X-564), the panels' gate {(PanelsOpen ? "open":"still closed")}."));
             // X-564 (0.1632): that frame's time, and how much of it the game's thread spent compiling (34 ms of chat on 20/11 17:50).
+            // X-564 (0.1633): in developer mode, the names of the methods compiled meanwhile on this thread (the runtime's JIT events).
+            var names=developerMode ? new Diagnostics.JitNames():null;
+            names?.Start();
             var jitBefore=System.Runtime.JitInfo.GetCompilationTime(true);
             var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
             try{DrawChatWindowLines();}
             finally
             {
+                names?.Stop();
                 log.Information(FormattableString.Invariant($"Chat window: its first frame with lines {System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds:F0} ms{Diagnostics.JitWarmup.CompiledText((System.Runtime.JitInfo.GetCompilationTime(true)-jitBefore).TotalMilliseconds,System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore)} (X-564)."));
+                if(names is not null)LogChatFrameJit(names,Diagnostics.ThreadClock.SystemId());
             }
             return;
         }
         DrawChatWindowLines();
+    }
+
+    /// <summary>X-564 (0.1633): the methods the chat's first frame compiled, named in the log 2 s later (the runtime's events come late), then
+    /// the listener let go; off the game's thread.</summary>
+    private void LogChatFrameJit(Diagnostics.JitNames names,long thread)
+    {
+        _=Task.Delay(2000).ContinueWith(_=>
+        {
+            try{log.Information("Chat window: methods compiled on the game's thread in its first frame with lines (X-564){0}: {1}.",names.Heard(thread) ? "":" (window not heard whole)",string.Join(", ",names.Names(thread)) is { Length:>0 } list ? list:"none");}
+            catch(Exception error){log.Warning("Chat window: the first frame's compilations could not be named: {0}",error.Message);}
+            finally{names.Dispose();}
+        },TaskScheduler.Default);
     }
 
     /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log).</summary>

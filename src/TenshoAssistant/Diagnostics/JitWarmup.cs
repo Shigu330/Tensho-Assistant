@@ -303,7 +303,26 @@ public sealed class JitWarmup : IDisposable
             foreach(var callee in CallGraph.Callees(order[index]))
                 if(order.Count<ChatFrameCap && !chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))order.Add(callee);
         }
+        // X-564 (0.1633): the equality members of the plugin's types met (records: the runtime calls them through object's virtual methods,
+        // from a dictionary or a set: not named in the IL, so not followed).
+        var types=new HashSet<Type>();
+        for(var index=0;index<order.Count;index++)
+            if(order[index].DeclaringType is { } type && type.Assembly==home && !type.ContainsGenericParameters)types.Add(type);
+        foreach(var type in types)
+            foreach(var method in EqualityMembers(type))
+                if(order.Count<ChatFrameCap && seen.Add(method))order.Add(method);
         return order;
+    }
+
+    /// <summary>X-564 (0.1633): a type's own equality members (Equals, GetHashCode, the equality contract and operators of a record), with a body.</summary>
+    public static IEnumerable<MethodBase> EqualityMembers(Type type)
+    {
+        const BindingFlags own=BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly;
+        MethodInfo[] methods;
+        try{methods=type.GetMethods(own);}
+        catch(Exception){yield break;}
+        foreach(var method in methods)
+            if(method.Name is "Equals" or "GetHashCode" or "get_EqualityContract" or "op_Equality" or "op_Inequality" && Compilable(method))yield return method;
     }
 
     private static bool ChatLater(MethodBase method)
