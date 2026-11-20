@@ -1,6 +1,7 @@
 using TenshoAssistant.Diagnostics;
 
 // 0.1626 (X-564): the chat part of the warm-up compiled on a few threads of low priority: each method once, all of them, the count right.
+// 0.1630 (X-564, D-196 a): no gain measured from the threads (3155 ms on one, 3560 ms on three, idle): back to one thread; the count stays right.
 internal static class ChatThreads1626Tests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
@@ -14,10 +15,11 @@ internal static class ChatThreads1626Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Chat threads 1626: a quarter of the processors, one to three",()=>
+        ("Chat threads 1630: one thread again (D-196 a): no helper thread, no thread count left",()=>
         {
-            Check(JitWarmup.Threads(1)==1 && JitWarmup.Threads(4)==1 && JitWarmup.Threads(7)==1 && JitWarmup.Threads(8)==2 && JitWarmup.Threads(12)==3 && JitWarmup.Threads(32)==3,"bounds");
-            Check(JitWarmup.ChatThreads is >= 1 and <= 3,"here");
+            var source=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Diagnostics/JitWarmup.cs"));
+            Check(!source.Contains("Tensho JIT warm-up (chat",StringComparison.Ordinal) && !source.Contains("ChatThreads",StringComparison.Ordinal),"no helper threads");
+            Check(typeof(JitWarmup).GetProperty("ChatThreads") is null && typeof(JitWarmup).GetMethod("Threads") is null,"no thread count");
         }),
         ("Chat threads 1626: behaviour: every method of the chat part compiled once, counted once, then the rest",()=>
         {

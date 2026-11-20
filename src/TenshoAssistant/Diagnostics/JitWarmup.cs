@@ -40,30 +40,17 @@ public sealed class JitWarmup : IDisposable
         slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now,processor);
         return compiled;
     }
-    /// <summary>X-564 (0.1626): how many threads compile the chat part: a quarter of the processors, 1 to 3 (one on a machine of up to 7, so the
-    /// game keeps its processors; three from 12).</summary>
-    public static int ChatThreads=>Threads(Environment.ProcessorCount);
-    public static int Threads(int processors)=>Math.Clamp(processors/4,1,3);
-
-    /// <summary>X-564 (0.1626): <paramref name="methods"/> compiled on <paramref name="threads"/> threads (this one and helpers of low priority),
-    /// each taking the next one; stops when <paramref name="token"/> is cancelled; how many were compiled and skipped.</summary>
-    private (int Prepared,int Skipped) Compile(IReadOnlyList<MethodBase> methods,int threads,CancellationToken token)
+    /// <summary>X-564: <paramref name="methods"/> compiled on this thread, in order, until <paramref name="token"/> is cancelled; how many were
+    /// compiled and skipped. 0.1626 spread the chat part over up to three threads of low priority: no gain measured (3155 ms on one thread,
+    /// 3560 ms on three, idle, 20/11), the compilations waiting on the load's locks rather than on the processor; back to one (D-196 a).</summary>
+    private (int Prepared,int Skipped) Compile(IReadOnlyList<MethodBase> methods,CancellationToken token)
     {
-        var next=-1;var prepared=0;var skipped=0;
-        void Work()
+        var prepared=0;var skipped=0;
+        foreach(var method in methods)
         {
-            for(var index=Interlocked.Increment(ref next);index<methods.Count && !token.IsCancellationRequested;index=Interlocked.Increment(ref next))
-                if(Timed(methods[index],()=>CallGraph.Prepare(methods[index])))Interlocked.Increment(ref prepared);else Interlocked.Increment(ref skipped);
+            if(token.IsCancellationRequested)break;
+            if(Timed(method,()=>CallGraph.Prepare(method)))prepared++;else skipped++;
         }
-        var helpers=new List<Thread>();
-        for(var count=1;count<Math.Max(1,threads) && methods.Count>1;count++)
-        {
-            var helper=new Thread(Work){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up (chat "+count+")"};
-            helper.Start();
-            helpers.Add(helper);
-        }
-        Work();
-        foreach(var helper in helpers)helper.Join();
         return (prepared,skipped);
     }
 
@@ -86,7 +73,8 @@ public sealed class JitWarmup : IDisposable
     /// </summary>
     public bool ChatDone=>chatDone || earlyDone;
     private volatile bool chatDone;
-    /// <summary>X-564: methods of the chat part compiled, and when they all were (ms after the warm-up was made; -1 before, or without one).</summary>
+    /// <summary>X-564: methods of the chat part compiled before the window was told ready (since 0.1630, with a first frame given: those of the
+    /// window's first frame, <see cref="ChatFirstFrame"/>), and when (ms after the warm-up was made; -1 before, or without one).</summary>
     public int ChatPrepared{get;private set;}
     public double ChatReadyAfter{get;private set;}=-1;
     /// <summary>X-564 (0.1625): when the methods were listed, the chat part's among them (ms after the warm-up was made; -1 without a chat part).</summary>
@@ -143,7 +131,7 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
     private readonly Func<bool>? measure;
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure,Func<MethodBase,bool>? chatPart)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame)
     {
         var token=cancellation.Token;
         this.measure=measure;
@@ -151,7 +139,7 @@ public sealed class JitWarmup : IDisposable
         // hypothesis (docs/evidence/0.1427-warmup-priority.md: the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and disproved
         // in 0.1432 (docs/evidence/0.1432-background-collection-stall.md): its long compilations without processor time were stops of every
         // managed thread during a background collection, the game's included; undone.
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,chatPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,chatPart,chatFrame,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -167,8 +155,11 @@ public sealed class JitWarmup : IDisposable
     /// gives the developer mode. None: never timed.</param>
     /// <param name="chatPart">X-564 (0.1616): the methods compiled before anything else (the chat window's, when it is open at the load);
     /// <see cref="ChatDone"/> tells when. None: <see cref="ChatDone"/> follows the early phase.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null,Func<MethodBase,bool>? chatPart=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure,chatPart);
+    /// <param name="chatFrame">X-564 (D-196 a): with <paramref name="chatPart"/>, the roots of the chat window's first frame: only that frame's
+    /// code (<see cref="ChatFirstFrame"/>) is compiled before <see cref="ChatDone"/>, the rest of the chat part right after. None: the whole
+    /// chat part first, as before.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null,Func<MethodBase,bool>? chatPart=null,Func<MethodBase,bool>? chatFrame=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure,chatPart,chatFrame);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -248,6 +239,65 @@ public sealed class JitWarmup : IDisposable
         if(declaring.Namespace==ChatNamespace)return true;
         for(var type=declaring;type is not null;type=type.DeclaringType)
             if(type.Name=="MainWindow")return method.Name.Contains("Chat",StringComparison.Ordinal);
+        return false;
+    }
+
+    /// <summary>X-564 (D-196 a, 20/11): the chat window's methods its first frame starts from (the body drawn once the code is ready, lambdas
+    /// included). A test checks that each name is still declared in the sources.</summary>
+    public static readonly IReadOnlyList<string> ChatFrameRoots=["DrawChatWindowBody"];
+    private static readonly string[] ChatFrameBracketed=Bracketed(ChatFrameRoots);
+    /// <summary>X-564 (D-196 a): words of the chat's methods drawn only after a click or in its settings (settings, menus, the text to
+    /// select, the game's entries of a player, the kinds seen): not followed from the first frame. A test checks that each word still names
+    /// a method of the chat window.</summary>
+    public static readonly IReadOnlyList<string> ChatLaterWords=["Settings","Menu","SelectText","GameEntries","Kinds"];
+    /// <summary>X-564: at most this many methods in the chat window's first frame (about 450 measured on 20/11: 314 in the chat part, 137
+    /// called elsewhere).</summary>
+    public const int ChatFrameCap=2000;
+
+    /// <summary>X-564 (D-196 a): a root of the chat window's first frame: a method of the main window named in <see cref="ChatFrameRoots"/>.</summary>
+    public static bool ChatFrameRoot(MethodBase method)
+    {
+        for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
+            if(type.Name=="MainWindow")return Named(method.Name,ChatFrameRoots,ChatFrameBracketed);
+        return false;
+    }
+
+    /// <summary>
+    /// X-564 (D-196 a, measured outside the game on 20/11: the chat part is 1355 methods, the window's first frame reaches 314 of them, plus 137
+    /// it calls elsewhere): the code of the chat window's first frame, compiled before the window is told ready. From <paramref name="roots"/>,
+    /// breadth first, the callees in <paramref name="chatPart"/> whose name holds none of <see cref="ChatLaterWords"/> (drawn after a click),
+    /// followed in turn; then what those call elsewhere in the plugin (its own methods, generic code over its types: <see cref="CallGraph.Wanted"/>),
+    /// one level, not followed. At most <see cref="ChatFrameCap"/>; <paramref name="stop"/> asked before each method.
+    /// </summary>
+    public static IReadOnlyList<MethodBase> ChatFirstFrame(IEnumerable<MethodBase> roots,Func<MethodBase,bool> chatPart,Assembly home,Func<bool>? stop=null)
+    {
+        var order=new List<MethodBase>();
+        var seen=new HashSet<MethodBase>();
+        var queue=new Queue<MethodBase>();
+        foreach(var root in roots)
+            if(seen.Add(root))queue.Enqueue(root);
+        while(queue.Count>0 && order.Count<ChatFrameCap)
+        {
+            if(stop?.Invoke()==true)return order;
+            var method=queue.Dequeue();
+            order.Add(method);
+            foreach(var callee in CallGraph.Callees(method))
+                if(chatPart(callee) && !ChatLater(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))queue.Enqueue(callee);
+        }
+        var inside=order.Count;
+        for(var index=0;index<inside && order.Count<ChatFrameCap;index++)
+        {
+            if(stop?.Invoke()==true)break;
+            foreach(var callee in CallGraph.Callees(order[index]))
+                if(order.Count<ChatFrameCap && !chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))order.Add(callee);
+        }
+        return order;
+    }
+
+    private static bool ChatLater(MethodBase method)
+    {
+        for(var index=0;index<ChatLaterWords.Count;index++)
+            if(method.Name.Contains(ChatLaterWords[index],StringComparison.Ordinal))return true;
         return false;
     }
 
@@ -391,7 +441,7 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<MethodBase,bool>? chatPart,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame,CancellationToken token)
     {
         try
         {
@@ -412,14 +462,20 @@ public sealed class JitWarmup : IDisposable
             // shows its lines then, no longer after the map's and the overlays' code too.
             if(chatPart is not null)
             {
-                // X-564 (0.1626, measured on 20/11: the list ready 160 ms after the load, the compiling 3 to 7 s): on a few threads of low
-                // priority (ChatThreads), each taking the next method; the warm-up's own thread is one of them.
-                var part=methods.Where(chatPart).Where(compiled.Add).ToArray();
-                var (prepared,skipped)=Compile(part,ChatThreads,token);
+                // X-564 (D-196 a, 20/11: the whole chat part, 1343 methods, took about 3 s idle, on one thread as on three): with a first
+                // frame given, only its code first (ChatFirstFrame, about 450 methods), on this thread; the window shows its lines then.
+                var frame=chatFrame is not null && types.Count>0
+                    ? ChatFirstFrame(methods.Where(chatFrame),chatPart,types[0].Assembly,()=>token.IsCancellationRequested):methods.Where(chatPart).ToArray();
+                var part=frame.Where(compiled.Add).ToArray();
+                var (prepared,skipped)=Compile(part,token);
                 if(token.IsCancellationRequested)return;
                 Prepared+=prepared;ChatPrepared+=prepared;Skipped+=skipped;
                 ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                 chatDone=true;
+                // Then the rest of the chat part (its settings, menus: drawn after a click), before the map's and the overlays' code.
+                var (more,moreSkipped)=Compile(methods.Where(chatPart).Where(compiled.Add).ToArray(),token);
+                if(token.IsCancellationRequested)return;
+                Prepared+=more;Skipped+=moreSkipped;
                 var left=wait-System.Diagnostics.Stopwatch.GetElapsedTime(created);
                 if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
             }

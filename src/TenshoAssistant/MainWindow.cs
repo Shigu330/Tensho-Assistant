@@ -184,7 +184,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         // X-01 (0.1283): the page the window opens on, compiled with the window's frame (only its method's handle is kept, not the window).
         var firstPage = PageEntryFor(page)?.Draw.Method.MethodHandle;
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
-            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms. Early phase (map, overlays, chat; the readers' compilation waits for it, X-563) ready {done.EarlyReadyAfter:F0} ms after the load. Chat part (X-564, the chat window waits for it; -1: window closed at the load, it waits for the early phase): {done.ChatPrepared} methods ready {done.ChatReadyAfter:F0} ms after the load. Methods listed {done.ChatListedAfter:F0} ms after the load (X-564, 0.1625).")),
+            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms. Early phase (map, overlays, chat; the readers' compilation waits for it, X-563) ready {done.EarlyReadyAfter:F0} ms after the load. Chat part (X-564, since 0.1630 the chat window's first frame, the rest of the chat after it; the window waits for it; -1: window closed at the load, it waits for the early phase): {done.ChatPrepared} methods ready {done.ChatReadyAfter:F0} ms after the load. Methods listed {done.ChatListedAfter:F0} ms after the load (X-564, 0.1625).")),
             // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
             holdRest: static ()=>TenshoAssistant.Competitive.CompetitiveGate.CompilerBusy,
             // X-01 (0.1279): the free panels' and the bars' code first, with what it calls: they wait for it (PanelGate).
@@ -195,6 +195,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             measure: static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true,
             // X-564 (0.1616): the chat window open at the load: its code first, so its lines show a second or two after the load.
             chatPart: configuration.Chat.WindowOpen ? Diagnostics.JitWarmup.ChatFirst : null,
+            // X-564 (D-196 a, 20/11): of it, the window's first frame first (its settings and menus after); the window shows its lines then.
+            chatFrame: Diagnostics.JitWarmup.ChatFrameRoot,
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
