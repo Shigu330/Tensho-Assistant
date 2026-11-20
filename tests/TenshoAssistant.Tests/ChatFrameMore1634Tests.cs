@@ -32,7 +32,8 @@ internal static class ChatFrameMore1634Tests
             string Name(MethodBase method)=>method.DeclaringType!.Name+"."+method.Name;
             var names=frame.Select(Name).ToArray();
             Check(names.Contains("Chat1634.DrawPopupSettings") && !names.Contains("Glyph1634.Deep"),"the popup itself, not its callees: "+string.Join(", ",names));
-            Check(names.Contains("Glyph1634.Button") && names.Contains("Glyph1634.At"),"two levels out: "+string.Join(", ",names));
+            // 0.1635 (X-564): one level out only (the second took the chat's first part to 1060 methods); a helper further out is a root.
+            Check(names.Contains("Glyph1634.Button") && !names.Contains("Glyph1634.At"),"one level out: "+string.Join(", ",names));
             Check(frame.Any(method=>method is ConstructorInfo { IsStatic:true } && method.DeclaringType!.DeclaringType==typeof(Chat1634)),"the lambdas' cache's static constructor: "+string.Join(", ",names));
             Check(!names.Contains("Glyph1634.Never") && !names.Contains("Glyph1634.OpenMenu"),"not what nothing calls");
         }),

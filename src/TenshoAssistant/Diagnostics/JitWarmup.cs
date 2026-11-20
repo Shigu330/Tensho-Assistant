@@ -254,6 +254,10 @@ public sealed class JitWarmup : IDisposable
     public static readonly IReadOnlyList<string> ChatPanelRoots=["DrawChatWindowContents","ChatWindowVisible","ChatFade","ChatFrameFlags","ChatPlace","ChatPlaceOnce",
         "ChatFrame","get_ChatPanelDefinition"];
     private static readonly string[] ChatPanelBracketed=Bracketed(ChatPanelRoots);
+    /// <summary>X-564 (0.1635): the main window's helpers the chat's first frame calls two levels outside the chat part, named by the log of
+    /// 0.1633 (20/11 18:00): roots of the first frame. A test checks that each name is still declared in the sources.</summary>
+    public static readonly IReadOnlyList<string> ChatHelperRoots=["DrawGlyphAt"];
+    private static readonly string[] ChatHelperBracketed=Bracketed(ChatHelperRoots);
     /// <summary>X-564 (D-196 a): words of the chat's methods drawn only after a click or in its settings (settings, menus, the text to
     /// select, the game's entries of a player, the kinds seen): not followed from the first frame. A test checks that each word still names
     /// a method of the chat window.</summary>
@@ -269,7 +273,8 @@ public sealed class JitWarmup : IDisposable
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
         {
             if(type.Name=="PanelWindow")return true;
-            if(type.Name=="MainWindow")return Named(method.Name,ChatFrameRoots,ChatFrameBracketed) || Named(method.Name,ChatPanelRoots,ChatPanelBracketed);
+            if(type.Name=="MainWindow")return Named(method.Name,ChatFrameRoots,ChatFrameBracketed) || Named(method.Name,ChatPanelRoots,ChatPanelBracketed)
+                || Named(method.Name,ChatHelperRoots,ChatHelperBracketed);
         }
         return false;
     }
@@ -303,26 +308,18 @@ public sealed class JitWarmup : IDisposable
                     else queue.Enqueue(callee);
                 }
         }
+        // One level outside the chat part, a « later » word left out there too (a link's menu). X-564 (0.1635): no second level (0.1634's
+        // took the chat's first part from 587 to 1060 methods: generic code, a link's click actions); the one helper found two levels out
+        // (DrawGlyphAt) is a root (ChatHelperRoots).
         var inside=order.Count;
         var outside=new List<MethodBase>();
         for(var index=0;index<inside && order.Count+outside.Count<ChatFrameCap;index++)
         {
             if(stop?.Invoke()==true)break;
             foreach(var callee in CallGraph.Callees(order[index]))
-                if(order.Count+outside.Count<ChatFrameCap && !chatPart(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))outside.Add(callee);
-        }
-        // X-564 (0.1634): a second level outside the chat part (DrawGlyphAt, called by the tab bar's GlyphTabButton), from the first level's
-        // methods whose name holds no « later » word (a menu's callees wait for the menu).
-        var second=new List<MethodBase>();
-        foreach(var method in outside)
-        {
-            if(stop?.Invoke()==true)break;
-            if(ChatLater(method))continue;
-            foreach(var callee in CallGraph.Callees(method))
-                if(order.Count+outside.Count+second.Count<ChatFrameCap && !chatPart(callee) && !ChatLater(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))second.Add(callee);
+                if(order.Count+outside.Count<ChatFrameCap && !chatPart(callee) && !ChatLater(callee) && CallGraph.Wanted(callee,home) && seen.Add(callee))outside.Add(callee);
         }
         order.AddRange(outside);
-        order.AddRange(second);
         foreach(var method in later)
             if(order.Count<ChatFrameCap)order.Add(method);
         // X-564 (0.1633): the equality members of the plugin's types met (records: the runtime calls them through object's virtual methods,
