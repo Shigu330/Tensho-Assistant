@@ -38,9 +38,9 @@ public sealed class ItemHoverCoordinator : IDisposable
             if(force)_=request.ContinueWith(done=>
             {
                 var status=done.Status==TaskStatus.RanToCompletion ? done.Result.Status:MarketFetchStatus.Failed;
+                // X-671 (0.1639): the press kept before it is said done (what listens to RefreshDone finds it kept).
+                if(status is MarketFetchStatus.Cooldown or MarketFetchStatus.Busy)lock(gate)if(!disposed && tracker.Current?.ItemId==item.ItemId)refreshWanted=true;
                 try{RefreshDone?.Invoke(item.ItemId,status);}catch(Exception){}
-                if(status is not (MarketFetchStatus.Cooldown or MarketFetchStatus.Busy))return;
-                lock(gate)if(!disposed && tracker.Current?.ItemId==item.ItemId)refreshWanted=true;
             },TaskScheduler.Default);
             return request;
         }

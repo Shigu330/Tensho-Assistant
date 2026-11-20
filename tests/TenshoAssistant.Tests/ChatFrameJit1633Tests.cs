@@ -4,6 +4,9 @@ using TenshoAssistant.Diagnostics;
 
 // 0.1633 (X-564): the chat window's first frame still compiled 7 methods on the game's thread (43 ms): in developer mode the log names them
 // (the runtime's JIT events); the first frame takes the equality members of the types it touches.
+// 0.1639 (X-671): alone, after the parallel tests, and 30 s to hear both marks: beside the other test threads compiling, under the load of
+// Verify -Release, the marks were not heard within 10 s (1 run in 4 with 40 busy processes).
+[SerialTests("listens to the runtime's JIT events of the whole process: beside the parallel tests' compilations they came too late or were lost")]
 internal static class ChatFrameJit1633Tests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
@@ -30,7 +33,7 @@ internal static class ChatFrameJit1633Tests
             RuntimeHelpers.PrepareMethod(typeof(Fresh1633).GetMethod("Never")!.MethodHandle);
             names.Stop();
             var thread=ThreadClock.SystemId();
-            Check(SpinWait.SpinUntil(()=>names.Heard(thread),TimeSpan.FromSeconds(10)),"both marks heard");
+            Check(SpinWait.SpinUntil(()=>names.Heard(thread),TimeSpan.FromSeconds(30)),"both marks heard");
             var heard=names.Names(thread);
             Check(heard.Any(name=>name.EndsWith("::Never",StringComparison.Ordinal)) && !heard.Any(name=>name.Contains("TenshoJit",StringComparison.Ordinal)),"named, marks aside: "+string.Join(", ",heard));
             Check(names.Names(thread+1).Count==0,"another thread's are not its own");
