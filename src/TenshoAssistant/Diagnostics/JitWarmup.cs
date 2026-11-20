@@ -323,11 +323,17 @@ public sealed class JitWarmup : IDisposable
         foreach(var method in later)
             if(order.Count<ChatFrameCap)order.Add(method);
         // X-564 (0.1633): the equality members of the plugin's types met (records: the runtime calls them through object's virtual methods,
-        // from a dictionary or a set: not named in the IL, so not followed).
+        // from a dictionary or a set: not named in the IL, so not followed). 0.1636: of the chat part's own types only (its records used as
+        // keys); those of every type met were about 135 methods, none named by the log.
         var types=new HashSet<Type>();
+        var chatTypes=new HashSet<Type>();
         for(var index=0;index<order.Count;index++)
-            if(order[index].DeclaringType is { } type && type.Assembly==home && !type.ContainsGenericParameters)types.Add(type);
-        foreach(var type in types)
+            if(order[index].DeclaringType is { } type && type.Assembly==home && !type.ContainsGenericParameters)
+            {
+                types.Add(type);
+                if(index<inside)chatTypes.Add(type);
+            }
+        foreach(var type in chatTypes)
             foreach(var method in EqualityMembers(type))
                 if(order.Count<ChatFrameCap && seen.Add(method))order.Add(method);
         // X-564 (0.1634): the type initializers of the types met (ChatFilterTable's lambdas' cache: run at the first use, not named in the IL).

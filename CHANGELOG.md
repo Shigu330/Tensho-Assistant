@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1636.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1635. Mesures à vide du 20/11 à 18 h 11 : la première image avec les lignes prend 0 et 2 ms et ne compile plus rien, mais les lignes viennent 3980 et 3687 ms après le chargement (le bruit d'un chargement à l'autre est d'environ une seconde) ; la première partie du chat compte 735 méthodes, dont environ 135 membres d'égalité de tous les types rencontrés, ajoutés en 0.1633 par précaution (le journal n'en a nommé aucun). Elle ne prend plus que ceux des types de la partie chat (ses records servant de clés : liens, onglets, sources).
+- Tests : ChatFrameEquality1636Tests. Verify.ps1 (agent) : 3398/3398, 0 avertissement, 0 erreur ; DLL 0.1636.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564), following 0.1635. Idle measures of 20/11 18:11: the first frame with the lines takes 0 and 2 ms and compiles nothing any more, but the lines come 3980 and 3687 ms after the load (the noise from one load to the next is about a second); the chat's first part counts 735 methods, about 135 of them the equality members of every type met, added in 0.1633 as a precaution (the log named none of them). It now takes only those of the chat part's own types (its records used as keys: links, tabs, sources).
+
 ## 0.1635.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1634. Mesure à vide du 20/11 à 18 h 05 : la première image du chat avec ses lignes prenait 1 ms et ne compilait plus rien, mais le deuxième niveau hors de la partie chat avait porté la première partie du chat de 587 à 1060 méthodes (code générique sur les types du plugin, actions d'un clic sur un lien) et les lignes venaient 3417 ms après le chargement. Mesuré hors du jeu : sans le deuxième niveau, avec les mots « plus tard » écartés aussi au premier niveau et DrawGlyphAt nommée comme racine (la seule aide trouvée deux niveaux plus loin par 0.1633), 600 méthodes, et tout ce que 0.1633 avait nommé y reste.
 - Tests : ChatFrameTrim1635Tests. Verify.ps1 (agent) : 3397/3397, 0 avertissement, 0 erreur ; DLL 0.1635.0.0. Rien à essayer en jeu.

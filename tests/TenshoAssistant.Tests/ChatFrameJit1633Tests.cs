@@ -17,7 +17,8 @@ internal static class ChatFrameJit1633Tests
         {
             var names=JitWarmup.EqualityMembers(typeof(Point1633)).Select(method=>method.Name).ToHashSet();
             Check(names.SetEquals(["Equals","GetHashCode","get_EqualityContract","op_Equality","op_Inequality"]),string.Join(", ",names));
-            var frame=JitWarmup.ChatFirstFrame([typeof(Frame1633).GetMethod("Draw")!],method=>method.DeclaringType==typeof(Frame1633),typeof(Frame1633).Assembly);
+            // 0.1636 (X-564): the equality members of the chat part's own types only: Point1633 is part of it here.
+            var frame=JitWarmup.ChatFirstFrame([typeof(Frame1633).GetMethod("Draw")!],method=>method.DeclaringType==typeof(Frame1633) || method.DeclaringType==typeof(Point1633),typeof(Frame1633).Assembly);
             Check(frame.Any(method=>method.DeclaringType==typeof(Point1633) && method.Name=="GetHashCode") && frame.Any(method=>method.DeclaringType==typeof(Point1633) && method.Name==".ctor"),
                 string.Join(", ",frame.Select(method=>method.DeclaringType!.Name+"."+method.Name)));
         }),
