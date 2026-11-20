@@ -82,7 +82,9 @@ internal sealed class BeastCatalogLoader : IDisposable
             // X-553 (0.1523): a magical automatic attack's element.
             aspect: id => actions.TryGetRow(id, out var action) ? action.Aspect : 0,
             // X-486 (0.1559): the status an enemy's action inflicts, in the client's language.
-            statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "");
+            statusName: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.Name.ExtractText() ?? "",
+            // X-622 M1 (review of 0.1560): 1 helpful, 2 harmful (docs/evidence/0.1562-beast-effect-category.md).
+            statusCategory: id => data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(id)?.StatusCategory ?? 0);
     }
 
     private unsafe void OnUpdate(IFramework _)

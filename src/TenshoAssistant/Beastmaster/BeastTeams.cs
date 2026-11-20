@@ -221,20 +221,24 @@ public static class BeastTeams
     /// X-585 M1 (review of 0.1550): a fight's weaknesses for the 10: each row with how many enemies it hits, the rows of most weight first
     /// (<see cref="Weights"/>: the strongest enemy first, then the count), and the rows of its strongest enemies (a lone enemy, or enemies all
     /// as strong, are its strongest), and that strongest enemy's strength.
+    /// X-622 M2 (review of 0.1560): the strongest enemies counted are those that have a weakness. Before, a fight whose strongest enemy has none
+    /// (WeaknessRow 0) had no strongest row and counted only by its number of enemies: its second strongest's weakness could be left for that of
+    /// two weak enemies of the same fight, while its three (Best, Weights) call that second strongest's first.
     /// </summary>
     public static (IReadOnlyList<(uint Row, int Count)> Rows, IReadOnlySet<uint> Top, int Power) Ranked(IReadOnlyList<BoardEnemy> enemies)
     {
         var weights = Weights(enemies);
-        var top = enemies.Count == 0 ? 0 : enemies.Max(Power);
+        var weak = enemies.Where(enemy => enemy.WeaknessRow != 0).ToArray();
+        var top = weak.Length == 0 ? 0 : weak.Max(Power);
         var rows = enemies.Select((enemy, index) => (enemy.WeaknessRow, Weight: weights[index])).Where(pair => pair.WeaknessRow != 0).GroupBy(pair => pair.WeaknessRow)
             .OrderByDescending(group => group.Sum(pair => pair.Weight)).ThenBy(group => group.Key).Select(group => (group.Key, group.Count())).ToArray();
-        return (rows, enemies.Where(enemy => enemy.WeaknessRow != 0 && Power(enemy) == top).Select(enemy => enemy.WeaknessRow).ToHashSet(), top);
+        return (rows, weak.Where(enemy => Power(enemy) == top).Select(enemy => enemy.WeaknessRow).ToHashSet(), top);
     }
 
     /// <summary>X-575 (0.1543): the version of the rules that make a plan. A plan kept on disk is made again when it changes.
     /// 3 (0.1544): each fight's three in calling order. 4 (0.1547, X-579): the strongest enemy's weakness first.
-    /// 5 (0.1558, X-585 M1): the 10 too weigh each fight's strongest enemy first.</summary>
-    public const int PlanVersion = 5;
+    /// 5 (0.1558, X-585 M1): the 10 too weigh each fight's strongest enemy first. 6 (0.1562, X-622 M2): the strongest enemy that has a weakness.</summary>
+    public const int PlanVersion = 6;
 
     /// <summary>
     /// X-575 (0.1543, the user's report of 17/11: trios that hit no fire nor water although the team had both): a plan kept on disk was made

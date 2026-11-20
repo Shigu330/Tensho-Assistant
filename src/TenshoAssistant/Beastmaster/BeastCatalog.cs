@@ -23,8 +23,14 @@ public sealed record Beast(uint Id, string Name, uint Icon, string Family, strin
 }
 /// <summary>X-486 (0.1529): Damage = the action's type of damage (Action.AttackType, its element when magical: the XBMElement rows of
 /// <see cref="Beast.AutoRow"/>), empty for an unaspected one or none. X-486 (0.1559): Effect = the status the action inflicts
-/// (XBMBattleDetailAction column 3, a Status row: docs/evidence/0.1559-beast-action-effect.md), empty for none.</summary>
-public sealed record BoardAction(string Name, string Shape, string Target, string Damage = "", string Effect = "");
+/// (XBMBattleDetailAction column 3, a Status row: docs/evidence/0.1559-beast-action-effect.md), empty for none. X-622 M1 (review of 0.1560):
+/// EffectCategory = that status's Status.StatusCategory (column 6): 2 harmful (Poison, Glas: inflicted), 1 helpful (a bonus, a barrier,
+/// Couvert: granted, not inflicted), 0 not known.</summary>
+public sealed record BoardAction(string Name, string Shape, string Target, string Damage = "", string Effect = "")
+{
+    public int EffectCategory { get; init; }
+    public const int Helpful = 1, Harmful = 2;
+}
 /// <summary>
 /// X-109 (0.980, docs/evidence/0.980-beast-teams.md): Stars = XBMBattleDetail columns 1 to 5, the stars of the game's board window, in the order
 /// Strength, Intelligence, Physical resistance, Magical resistance, Vitality (the user's capture: Chevalier du plateau 2, 1, 2, 2, 3); WeaknessRow = its XBMElement row.
@@ -61,7 +67,7 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
 
     public static BeastCatalog Build(IReadOnlyDictionary<string, IReadOnlyList<XbmRow>> sheets, Func<uint, string> petName, Func<int, string> familyName,
         Func<uint, int> attackType, Func<uint, string> enemyName, Func<uint, string> actionName, Func<uint, (string Name, int Level, int ItemLevel)> content, Func<int, uint, string>? catchPlace = null,
-        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null)
+        Func<uint, int>? aspect = null, Func<uint, string>? statusName = null, Func<uint, int>? statusCategory = null)
     {
         foreach (var (sheet, columns) in Columns)
         {
@@ -87,6 +93,10 @@ public sealed record BeastCatalog(IReadOnlyList<Beast> Beasts, IReadOnlyList<Boa
         // X-486 (0.1559): column 3 is the status the action inflicts (Poison, Paralysie, Glas…), 0 for none.
         string Effect(uint status) => status == 0 || statusName is null ? "" : statusName(status);
         var actions = sheets["XBMBattleDetailAction"].ToDictionary(row => row.Row, row => new BoardAction(actionName(row.UInt(0)), shapes.GetValueOrDefault(row.UInt(2), ""), targets.GetValueOrDefault(row.UInt(1), ""), Auto(row.UInt(0)), Effect(row.UInt(3))));
+        // X-622 M1 (review of 0.1560): whether that status harms or helps (Status column 6), so a bonus the enemy gives is not said « inflicted ».
+        if (statusCategory is not null)
+            foreach (var row in sheets["XBMBattleDetailAction"].Where(row => row.UInt(3) != 0))
+                actions[row.Row] = actions[row.Row] with { EffectCategory = statusCategory(row.UInt(3)) };
         var enemies = sheets["XBMBattleDetail"].Where(row => row.UInt(0) != 0).GroupBy(row => row.Row).ToDictionary(group => group.Key, group => group.OrderBy(row => row.Sub).Select(row =>
             new BoardEnemy(Capitalize(enemyName(row.UInt(0))), row.UInt(10), Element(row.UInt(8)),
                 Array.AsReadOnly(new[] { row.UInt(6), row.UInt(7) }.Where(id => id != 0 && actions.ContainsKey(id)).Select(id => actions[id]).ToArray()),

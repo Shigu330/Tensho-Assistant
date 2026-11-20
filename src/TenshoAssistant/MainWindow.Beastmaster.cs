@@ -554,9 +554,12 @@ internal sealed partial class MainWindow
             : localization.Format("BeastUi.FightReasonNone", place + 1, name);
     }
 
-    /// <summary>X-486 (0.1559): an enemy's action as one line: name, type of damage, shape, target, then the effect it inflicts.</summary>
+    /// <summary>X-486 (0.1559): an enemy's action as one line: name, type of damage, shape, target, then the effect it inflicts. X-622 M1 (review
+    /// of 0.1560): « inflicts » only for a harmful status; a helpful one (a bonus, a barrier, Couvert) is « grants », one not known « effect ».</summary>
     private string BeastActionText(BoardAction action)
-        => string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target, action.Effect.Length > 0 ? localization.Format("BeastUi.ActionEffect", action.Effect) : "" }.Where(part => part.Length > 0));
+        => string.Join(" · ", new[] { action.Name, action.Damage, action.Shape, action.Target, action.Effect.Length == 0 ? ""
+            : action.EffectCategory == BoardAction.Harmful ? localization.Format("BeastUi.ActionEffect", action.Effect)
+            : localization.Format(action.EffectCategory == BoardAction.Helpful ? "BeastUi.ActionEffectGrants" : "BeastUi.ActionEffectOther", action.Effect) }.Where(part => part.Length > 0));
 
     /// <summary>X-575 part 4 (0.1544): the three of a fight in calling order, the best first (BeastTeams.Best orders them).</summary>
     private void DrawBeastCallOrder(BoardBattle fight, IReadOnlyList<uint> trio, BeastCatalog catalog)

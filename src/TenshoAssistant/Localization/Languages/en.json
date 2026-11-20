@@ -191,6 +191,8 @@
     "BookNumber": "No. {0} {1}",
     "RankLow": "low for this board (recommended {0} to {1})",
     "ActionEffect": "inflicts: {0}",
+    "ActionEffectGrants": "grants: {0}",
+    "ActionEffectOther": "effect: {0}",
     "RankLowUnsure": "low for this board (recommended {0} to {1}, to be confirmed in game)",
     "TeamFight": "Fight {0}",
     "TeamHit": "weakness hit: {0} of {1} enemies",
