@@ -7,6 +7,10 @@ public sealed record ChatSource(string Name,ushort World,ulong ContentId=0,ulong
 /// and home world of its sender's player link (empty name: none).</summary>
 public readonly record struct ChatLogLine(ushort Kind,string Name,ushort World);
 
+/// <summary>X-679 (0.1660): where a message's menu found its sender (said once each in the log, never with a name): its own source with the
+/// identifiers, the identifiers of the same player's other message, its own source without them, only the name its text gives, nothing.</summary>
+public enum ChatSourceFound : byte { Message, Player, MessageOnly, Named, None }
+
 /// <summary>X-660 (0.1603): what became of the identifiers the game gave (said in the log, never with a name).</summary>
 public enum ChatSourceMatch : byte { Given, NotWaiting, NoIdentifiers, Own, Kind, LineUnread, Line, World }
 
@@ -29,6 +33,10 @@ public sealed class ChatSources
     private readonly object gate=new();
     private readonly Dictionary<long,ChatSource> sources=[];
     private readonly Queue<long> order=new();
+    // X-679 (0.1660): the identifiers are the character's, not the message's: the last ones given to a player (name and home world) serve
+    // their other messages too (one from the history on disk, a repeat folded into its first copy, a message whose number changed).
+    private readonly Dictionary<(string Name,ushort World),ChatSource> players=[];
+    private readonly Queue<(string Name,ushort World)> playerOrder=new();
     private long expected=-1;
     private ushort expectedKind;
 
@@ -68,7 +76,11 @@ public sealed class ChatSources
             if(line() is not { } read)return ChatSourceMatch.LineUnread;
             if((read.Kind&KindMask)!=expectedKind || !string.Equals(read.Name,source.Name,StringComparison.Ordinal) || read.World!=source.World)return ChatSourceMatch.Line;
             if(source.World!=world)return ChatSourceMatch.World;
-            sources[id]=source with{ContentId=contentId,AccountId=accountId};
+            var given=source with{ContentId=contentId,AccountId=accountId};
+            sources[id]=given;
+            var key=(given.Name,given.World);
+            if(!players.ContainsKey(key)){playerOrder.Enqueue(key);while(playerOrder.Count>MaximumKept)players.Remove(playerOrder.Dequeue());}
+            players[key]=given;
             return ChatSourceMatch.Given;
         }
     }
@@ -99,15 +111,39 @@ public sealed class ChatSources
     public void Skip(){lock(gate)expected=-1;}
 
     public ChatSource? For(long id){lock(gate)return sources.GetValueOrDefault(id);}
+
+    /// <summary>
+    /// X-679 (0.1660, the user's report of 20/11: a player's menu with none of the game's entries): the sender of a message for its menu,
+    /// never nothing when the message names a player. Its own source with the game's identifiers; else the identifiers last given to the same
+    /// player (same name and home world: the character's, never another player's); else its own source without them; else the player the
+    /// message names (<paramref name="name"/> and <paramref name="world"/>, read from its sender's text), without identifiers; null only when
+    /// neither is known.
+    /// </summary>
+    public (ChatSource? Source,ChatSourceFound How) Find(long id,string name,ushort world)
+    {
+        lock(gate)
+        {
+            var own=sources.GetValueOrDefault(id);
+            if(own is { ContentId:not 0 })return (own,ChatSourceFound.Message);
+            var key=own is not null ? (own.Name,own.World):(name,world);
+            if(key.Item1.Length>0 && key.Item2!=0 && players.TryGetValue(key,out var known))return (known,ChatSourceFound.Player);
+            if(own is not null)return (own,ChatSourceFound.MessageOnly);
+            return name.Length>0 && world!=0 ? (new ChatSource(name,world),ChatSourceFound.Named):(null,ChatSourceFound.None);
+        }
+    }
+
     public int Count{get{lock(gate)return sources.Count;}}
-    public void Clear(){lock(gate){sources.Clear();order.Clear();expected=-1;}}
+    public void Clear(){lock(gate){sources.Clear();order.Clear();players.Clear();playerOrder.Clear();expected=-1;}}
 }
 
 /// <summary>X-654 (0.1602): the entries of a player's menu in the chat window, after Tensho's own; their texts are the client's (Addon rows).</summary>
 public enum ChatPlayerAction : byte { Tell, Reply, Invite, Plate, Mute, Target, GameMenu }
 
-/// <summary>X-654 (0.1602): one entry, its text's Addon row (0: Tensho's own text), and whether it can be used now.</summary>
-public readonly record struct ChatPlayerEntry(ChatPlayerAction Action,uint AddonRow,bool Enabled);
+/// <summary>X-679 (0.1660): why an entry is greyed, said in its tooltip (None: it can be used).</summary>
+public enum ChatPlayerWhy : byte { None, NoSender, NoIdentifiers, NoAccount, NotInRange }
+
+/// <summary>X-654 (0.1602): one entry, its text's Addon row (0: Tensho's own text), and whether it can be used now. X-679 (0.1660): why not.</summary>
+public readonly record struct ChatPlayerEntry(ChatPlayerAction Action,uint AddonRow,bool Enabled,ChatPlayerWhy Why=ChatPlayerWhy.None);
 
 /// <summary>
 /// X-654 (0.1602): which entries a player's menu offers, from what is known of the sender. The client's texts (Addon, game 2026.11.03): 50
@@ -122,18 +158,41 @@ public static class ChatPlayerMenu
     /// <summary>The channels whose mode « Reply in selected mode » sets (the game's ChatChannel values of ClientStructs: Say 1, Party 2, Alliance 3), tells apart.</summary>
     public static int? ReplyChannel(ChatChannel channel)=>channel switch{ChatChannel.Say=>1,ChatChannel.Party=>2,ChatChannel.Alliance=>3,_=>null};
 
+    /// <summary>
+    /// X-679 (0.1660): a sender not known (null) shows the entries greyed with the reason, never an empty menu. X-681 (0.1660, the user's
+    /// request of 20/11: « Tell, can't it be done with the name? »): a tell, and the reply to a tell, need only the player's name and home world,
+    /// which every source has (the typing box set to a tell to that player, as « /tell Name@World » does; nothing sent).
+    /// </summary>
     public static IReadOnlyList<ChatPlayerEntry> Entries(ChatSource? source,ChatChannel channel,bool inRange,bool canInvite)
     {
-        if(source is null)return [];
-        var known=source.ContentId!=0;
         var tell=channel is ChatChannel.TellIn or ChatChannel.TellOut;
-        var list=new List<ChatPlayerEntry>{new(ChatPlayerAction.Tell,TellRow,known)};
-        if(tell || ReplyChannel(channel) is not null)list.Add(new(ChatPlayerAction.Reply,ReplyRow,!tell || known));
+        var reply=tell || ReplyChannel(channel) is not null;
+        if(source is null)
+        {
+            var greyed=new List<ChatPlayerEntry>{new(ChatPlayerAction.Tell,TellRow,false,ChatPlayerWhy.NoSender)};
+            if(reply)greyed.Add(new(ChatPlayerAction.Reply,ReplyRow,false,ChatPlayerWhy.NoSender));
+            greyed.Add(new(ChatPlayerAction.Plate,PlateRow,false,ChatPlayerWhy.NoSender));
+            greyed.Add(new(ChatPlayerAction.Mute,MuteRow,false,ChatPlayerWhy.NoSender));
+            greyed.Add(new(ChatPlayerAction.Target,TargetRow,false,ChatPlayerWhy.NoSender));
+            return greyed;
+        }
+        var known=source.ContentId!=0;
+        var list=new List<ChatPlayerEntry>{new(ChatPlayerAction.Tell,TellRow,true)};
+        if(reply)list.Add(new(ChatPlayerAction.Reply,ReplyRow,true));
         if(canInvite)list.Add(new(ChatPlayerAction.Invite,InviteRow,true));
-        list.Add(new(ChatPlayerAction.Plate,PlateRow,known));
-        list.Add(new(ChatPlayerAction.Mute,MuteRow,known && source.AccountId!=0));
-        list.Add(new(ChatPlayerAction.Target,TargetRow,inRange));
+        list.Add(new(ChatPlayerAction.Plate,PlateRow,known,known ? ChatPlayerWhy.None:ChatPlayerWhy.NoIdentifiers));
+        list.Add(new(ChatPlayerAction.Mute,MuteRow,known && source.AccountId!=0,
+            !known ? ChatPlayerWhy.NoIdentifiers:source.AccountId==0 ? ChatPlayerWhy.NoAccount:ChatPlayerWhy.None));
+        list.Add(new(ChatPlayerAction.Target,TargetRow,inRange,inRange ? ChatPlayerWhy.None:ChatPlayerWhy.NotInRange));
         if(inRange)list.Add(new(ChatPlayerAction.GameMenu,0,true));
         return list;
+    }
+
+    /// <summary>X-679 (0.1660): the player a message names, from its sender's text (glyphs taken off, « Name@World »): the name, and the world's
+    /// name (empty: none written, the game writes none for a player of the world you are on).</summary>
+    public static (string Name,string World) Named(string? sender)
+    {
+        var clean=ChatConversations.Key(sender);
+        return (ChatTextFilter.PlayerName(clean),ChatCopy.WorldOf(clean));
     }
 }

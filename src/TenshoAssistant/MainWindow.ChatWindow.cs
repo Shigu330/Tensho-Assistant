@@ -948,21 +948,42 @@ internal sealed partial class MainWindow
     /// client's words (ChatPlayerMenu); an entry that needs the game's identifiers of the message is greyed without them (a message from the
     /// history on disk, or not given by the game). Each one only on the player's click (R03.3).
     /// </summary>
+    /// <remarks>X-679 (0.1660, the user's report of 20/11: none of the game's entries, even for a new message): the sender is found by the
+    /// message, else by the player (the identifiers are the character's), else by the name its text gives (ChatSources.Find); without one the
+    /// entries are greyed with the reason in their tooltip, never left out. Your own lines and what no player says have none.</remarks>
     private void DrawChatPlayerGameEntries(ChatRecord said)
     {
-        if(ChatPlayers is not { Available:true } actions || ChatSenders?.For(said.Id) is not { } source)return;
-        var inRange=actions.InRange(source) is not null;
-        var entries=Chat.ChatPlayerMenu.Entries(source,said.Channel,inRange,actions.CanInvite(source));
+        if(ChatPlayers is not { Available:true } actions || ChatSenders is not { } senders)return;
+        if(said.Channel!=ChatChannel.TellOut && Chat.ChatAlert.Sent(said))return;
+        var (name,worldName)=Chat.ChatPlayerMenu.Named(said.Sender);
+        var spoken=ChatChannels.Spoken(said.Channel);
+        var (source,how)=senders.Find(said.Id,spoken ? name:"",worldName.Length>0 ? actions.WorldId(worldName):actions.CurrentWorldId());
+        if(source is null && !spoken)return;
+        actions.SaidFound(how,said.Kind);
+        var inRange=source is not null && actions.InRange(source) is not null;
+        var entries=Chat.ChatPlayerMenu.Entries(source,said.Channel,inRange,source is not null && actions.CanInvite(source));
         if(entries.Count==0)return;
         ImGui.Separator();
         foreach(var entry in entries)
         {
             var text=entry.AddonRow!=0 ? actions.Text(entry.AddonRow):localization.Get("ChatWindow.MenuGameMenu");
             if(text.Length==0)continue;
-            if(ImGui.Selectable(text+"###ChatPlayer"+entry.Action,false,entry.Enabled ? ImGuiSelectableFlags.None:ImGuiSelectableFlags.Disabled))
+            if(ImGui.Selectable(text+"###ChatPlayer"+entry.Action,false,entry.Enabled ? ImGuiSelectableFlags.None:ImGuiSelectableFlags.Disabled)
+               && entry.Enabled && source is not null)
                 actions.Run(entry.Action,source,said.Channel);
+            if(ChatPlayerWhyKey(entry.Why) is { Length:>0 } why)Tip(why);
         }
     }
+
+    /// <summary>X-679 (0.1660): the tooltip of a greyed entry, saying why.</summary>
+    private static string ChatPlayerWhyKey(Chat.ChatPlayerWhy why)=>why switch
+    {
+        Chat.ChatPlayerWhy.NoSender=>"ChatWindow.PlayerWhyNoSender",
+        Chat.ChatPlayerWhy.NoIdentifiers=>"ChatWindow.PlayerWhyNoIdentifiers",
+        Chat.ChatPlayerWhy.NoAccount=>"ChatWindow.PlayerWhyNoAccount",
+        Chat.ChatPlayerWhy.NotInRange=>"ChatWindow.PlayerWhyNotInRange",
+        _=>"",
+    };
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
     private void AddChatTab(List<ChatTabSettings> tabs)

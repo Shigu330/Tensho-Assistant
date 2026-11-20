@@ -82,6 +82,28 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         log.Information("Chat window, a sender's identifiers: {0} (kind {1}).",match,chatType&ChatSources.KindMask);
     }
 
+    // X-679 (0.1660): where a menu found its sender, said once each per session (how and kind only, never a name): « Named » for a new
+    // message means the chat event gave no player link to note (the message was never waiting for its identifiers).
+    private readonly bool[] foundSaid=new bool[Enum.GetValues<ChatSourceFound>().Length];
+    public void SaidFound(ChatSourceFound how,int kind)
+    {
+        if(foundSaid[(int)how])return;
+        foundSaid[(int)how]=true;
+        log.Information("Chat window, a player's menu found its sender: {0} (kind {1}).",how,kind);
+    }
+
+    // X-679 (0.1660): a world's number from its name (the World sheet, read once); 0 when unknown.
+    private Dictionary<string,ushort>? worldIds;
+    public ushort WorldId(string name)
+    {
+        if(name.Length==0)return 0;
+        worldIds??=data.GetExcelSheet<Lumina.Excel.Sheets.World>().Where(row=>!row.Name.IsEmpty)
+            .GroupBy(row=>row.Name.ExtractText(),StringComparer.OrdinalIgnoreCase).ToDictionary(group=>group.Key,group=>(ushort)group.First().RowId,StringComparer.OrdinalIgnoreCase);
+        return worldIds.GetValueOrDefault(name.Trim());
+    }
+    /// <summary>X-679 (0.1660): the world you are on (the game writes no world for a player of this world).</summary>
+    public ushort CurrentWorldId()=>CurrentWorld();
+
     /// <summary>The client's text of an Addon row (empty: not found).</summary>
     public string Text(uint row)=>data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRowOrDefault(row)?.Text.ExtractText() ?? "";
     /// <summary>X-455 E3 (0.1617): a world's name from the client's World sheet; empty for none or an unknown one.</summary>
@@ -127,10 +149,11 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     /// <summary>The entry the player clicked, done at the next framework tick with the character loaded; nothing otherwise.</summary>
     public void Run(ChatPlayerAction action,ChatSource source,ChatChannel channel)
     {
-        if(failed)return;
+        // X-681 (0.1660): never during a cut (PvP, ranked contents: R03.2), checked at the click and at the tick.
+        if(failed || TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
         framework.RunOnTick(()=>
         {
-            if(!client.IsLoggedIn || objects.LocalPlayer is null)return;
+            if(!client.IsLoggedIn || objects.LocalPlayer is null || TenshoAssistant.Competitive.CompetitiveGate.Cut)return;
             try{Do(action,source,channel);}
             catch(Exception error){failed=true;log.Warning(error,"A game entry of a player's menu (chat window) failed (maybe after a game update): those entries are off until the plugin reloads.");}
         });
@@ -140,9 +163,11 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     {
         switch(action)
         {
+            // X-681 (0.1660, the user's request of 20/11): by name and home world too, without the game's identifiers (0, as for a tell
+            // typed « /tell Name@World »: docs/evidence/0.1660-tell-by-name.md); only the typing box is set, nothing is sent (R03.3).
             case ChatPlayerAction.Tell:
             case ChatPlayerAction.Reply when channel is ChatChannel.TellIn or ChatChannel.TellOut:
-                if(source.ContentId==0)return;
+                if(source.Name.Length==0 || source.World==0)return;
                 var world=data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(source.World)?.Name.ExtractText() ?? "";
                 var name=Utf8String.FromString(source.Name);var worldName=Utf8String.FromString(world);
                 try{RaptureShellModule.Instance()->SetContextTellTarget(name,worldName,source.World,source.AccountId,source.ContentId,0,true);}
