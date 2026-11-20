@@ -183,6 +183,25 @@ public static class ChatHistory
     /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.</summary>
     /// <summary>X-518 M4: this many messages older than the days in a row end the reading from the end (the rest is older still).</summary>
     public const int OldRunEnd=256;
+    /// <summary>X-644 M1 (review of 0.1586): the time and the kind of a line as <see cref="Encode"/> writes it (« {"time":…,"kind":…, »),
+    /// read without decoding the rest; null when the line does not start so (it is then decoded whole). Once one kind is full, its next
+    /// lines are only peeked: with « No limit » on the messages and the days, a kind that rarely comes (few combat lines) no longer makes
+    /// every opening decode the whole file back to <see cref="MaximumReadBytes"/>; what the window gets is the same.</summary>
+    public static (DateTimeOffset Time,int Kind)? Peek(string line)
+    {
+        const string timeKey="{\"time\":",kindKey=",\"kind\":";
+        if(!line.StartsWith(timeKey,StringComparison.Ordinal))return null;
+        var timeEnd=line.IndexOf(',',timeKey.Length);
+        if(timeEnd<0 || !long.TryParse(line.AsSpan(timeKey.Length,timeEnd-timeKey.Length),NumberStyles.None,CultureInfo.InvariantCulture,out var milliseconds)
+           || milliseconds<=0 || string.CompareOrdinal(line,timeEnd,kindKey,0,kindKey.Length)!=0)return null;
+        var kindAt=timeEnd+kindKey.Length;
+        var kindEnd=kindAt;
+        while(kindEnd<line.Length && char.IsAsciiDigit(line[kindEnd]))kindEnd++;
+        if(kindEnd==kindAt || kindEnd>=line.Length || line[kindEnd] is not (',' or '}')
+           || !int.TryParse(line.AsSpan(kindAt,kindEnd-kindAt),NumberStyles.None,CultureInfo.InvariantCulture,out var kind))return null;
+        try{return (DateTimeOffset.FromUnixTimeMilliseconds(milliseconds),kind);}
+        catch(ArgumentOutOfRangeException){return null;}
+    }
     public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)=>Read(path,character,now,messages,days,MaximumReadBytes);
 
     /// <summary><see cref="Read(string,ulong,DateTimeOffset,int,int)"/> with the most of the end read (a test makes it small).</summary>
@@ -204,6 +223,12 @@ public static class ChatHistory
         {
             if(line.Length==0)continue;
             lines++;
+            // X-644 M1: a line of a kind already full is only peeked (the same steps as below, without decoding its text).
+            if((combat>=shown || others>=shown) && Peek(line) is { } peek && (ChatChannels.From(peek.Kind)==ChatChannel.Combat ? combat:others)>=shown)
+            {
+                if(peek.Time<oldest){old=true;if(++oldRun>=OldRunEnd)break;continue;}
+                oldRun=0;over=true;continue;
+            }
             if(Decode(line,0) is not { } record){bad++;continue;}
             // X-518 M4 (review of 0.1494): the file is in time order, read from its end: the lines before a run of old ones are older too.
             // A run, not the first one: a single line out of order (a clock set back) never hides the rest.

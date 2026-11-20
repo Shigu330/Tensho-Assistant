@@ -2468,6 +2468,7 @@
     "FindResource": "Resource",
     "PastedGroup": "Pasted coordinates",
     "PastedImported": "{0} bookmark(s) added from coordinates, {1} already there, {2} line(s) with an unknown place.",
+    "PastedReading": "Reading the zone names in every language…",
     "Group": "Group (optional)",
     "GroupTip": "Bookmark group (40 characters at most), shown in brackets in the list and on the map.",
     "NoteTip": "Bookmark note (300 characters at most), shown on hover in the list and on the Tensho map.",

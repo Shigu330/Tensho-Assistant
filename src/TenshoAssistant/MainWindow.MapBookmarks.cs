@@ -110,9 +110,11 @@ internal sealed partial class MainWindow
         if (bookmarkSaved) ImGui.TextColored(Success, localization.Get("MapsUi.Saved"));
         DrawBookmarkShare();
     }
-    // X-541: the zone names in every language of the game (PlaceName row → names), read on the first import of pasted coordinates.
+    // X-541: the zone names in every language of the game (PlaceName row → names). X-644 M2 (review of 0.1586, R07): read off the frame,
+    // started as soon as text is in the import field; a click before they are read waits for them (pending), the next frames finish it.
     internal Func<IReadOnlyDictionary<uint, IReadOnlyList<string>>?>? ZoneNamesLoad;
-    private IReadOnlyDictionary<uint, IReadOnlyList<string>>? zoneNamesRead;
+    private Task<IReadOnlyDictionary<uint, IReadOnlyList<string>>?>? zoneNamesTask;
+    private bool bookmarkPastePending;
     // 0.378 (g, M-08): share the bookmarks as a TENSHO-MAP1 text code (clipboard), or add those of a code typed or pasted here.
     private void DrawBookmarkShare()
     {
@@ -132,6 +134,8 @@ internal sealed partial class MainWindow
         Tip("MapsUi.ShareHintTip");
         if (bookmarkImport.Length == 0 && !ImGui.IsItemActive())
             ImGui.GetWindowDrawList().AddText(importAt + ImGui.GetStyle().FramePadding, ImGui.GetColorU32(ImGuiCol.TextDisabled), localization.Get("MapsUi.ShareHint"));
+        if (bookmarkImport.Length > 0 && zoneNamesTask is null && ZoneNamesLoad is { } loadNames) zoneNamesTask = Task.Run(loadNames);
+        if (bookmarkPastePending && zoneNamesTask is not { IsCompleted: false }) { bookmarkPastePending = false; ImportPastedCoordinates(); }
         ImGui.SameLine();
         ImGui.BeginDisabled(bookmarkImport.Trim().Length == 0);
         try
@@ -148,24 +152,32 @@ internal sealed partial class MainWindow
                 catch (FormatException)
                 {
                     // N-11 (0.437): not a share code: « Place ( x , y ) » lines (hunt sites, chat), matched to the zones by name.
-                    // X-541: the zone under its name in the client's language, else in the game's other languages.
-                    zoneNamesRead ??= ZoneNamesLoad?.Invoke();
-                    var list = maps.State.Catalog is { } catalog
-                        ? MapBookmarks.ParseCoordinateList(bookmarkImport, MapBookmarks.ZoneByName(catalog.Entries, zoneNamesRead), localization.Get("MapsUi.PastedGroup"))
-                        : (Bookmarks: (IReadOnlyList<MapBookmark>)[], Unknown: 0);
-                    if (list.Bookmarks.Count == 0) bookmarkShareMessage = localization.Get("MapsUi.ShareInvalid");
-                    else
-                    {
-                        var added = 0; var skipped = 0;
-                        if (SaveBookmarks(items => { var merged = MapBookmarks.Merge(items, list.Bookmarks); added = merged.Added; skipped = merged.Skipped; return merged.Bookmarks; }))
-                        { bookmarkImport = ""; bookmarkShareMessage = localization.Format("MapsUi.PastedImported", added, skipped, list.Unknown); }
-                    }
+                    // X-644 M2: the zone names are read off the frame; still reading: the import waits for them.
+                    if (zoneNamesTask is null && ZoneNamesLoad is { } loadAtClick) zoneNamesTask = Task.Run(loadAtClick);
+                    if (zoneNamesTask is { IsCompleted: false }) { bookmarkPastePending = true; bookmarkShareMessage = localization.Get("MapsUi.PastedReading"); }
+                    else ImportPastedCoordinates();
                 }
             }
         }
         finally { ImGui.EndDisabled(); }
         Tip("MapsUi.ShareImportTip");
         if (bookmarkShareMessage is { } message) ImGui.TextDisabled(message);
+    }
+    /// <summary>N-11 (0.437), X-541: the pasted « Place ( x , y ) » lines added as bookmarks, the zone under its name in the client's
+    /// language, else in the game's other languages (read off the frame, X-644 M2; none when they could not be read).</summary>
+    private void ImportPastedCoordinates()
+    {
+        var zoneNamesRead = zoneNamesTask is { IsCompletedSuccessfully: true } done ? done.Result : null;
+        var list = maps.State.Catalog is { } catalog
+            ? MapBookmarks.ParseCoordinateList(bookmarkImport, MapBookmarks.ZoneByName(catalog.Entries, zoneNamesRead), localization.Get("MapsUi.PastedGroup"))
+            : (Bookmarks: (IReadOnlyList<MapBookmark>)[], Unknown: 0);
+        if (list.Bookmarks.Count == 0) bookmarkShareMessage = localization.Get("MapsUi.ShareInvalid");
+        else
+        {
+            var added = 0; var skipped = 0;
+            if (SaveBookmarks(items => { var merged = MapBookmarks.Merge(items, list.Bookmarks); added = merged.Added; skipped = merged.Skipped; return merged.Bookmarks; }))
+            { bookmarkImport = ""; bookmarkShareMessage = localization.Format("MapsUi.PastedImported", added, skipped, list.Unknown); }
+        }
     }
     private void SelectBookmark(MapBookmark point)
     {

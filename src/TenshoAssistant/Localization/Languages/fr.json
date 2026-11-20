@@ -2468,6 +2468,7 @@
     "FindResource": "Ressource",
     "PastedGroup": "Coordonnées collées",
     "PastedImported": "{0} favori(s) ajouté(s) depuis des coordonnées, {1} déjà présent(s), {2} ligne(s) au lieu inconnu.",
+    "PastedReading": "Lecture des noms de zones dans toutes les langues…",
     "Group": "Groupe (facultatif)",
     "GroupTip": "Groupe du favori (40 caractères au plus), montré entre crochets dans la liste et sur la carte.",
     "NoteTip": "Note du favori (300 caractères au plus), montrée au survol dans la liste et sur la carte Tensho.",
