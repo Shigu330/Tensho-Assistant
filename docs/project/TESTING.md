@@ -24,10 +24,12 @@ livré à côté de la DLL depuis 0.248 ; aucune assembly de l'hôte redistribu�
   `src/TenshoAssistant/FreeCompany/Data/`.
 - Dernier passage : ligne « Tests » de la dernière entrée du [CHANGELOG](../../CHANGELOG.md). En CI, à chaque push : `Build and test` (dont une compilation à la manière du dépôt Dalamud, [relevé](../evidence/0.512-d17-build.md)) et CodeQL.
 
-Les tests couvrent la logique pure : 87 fichiers `*Tests.cs` (un par domaine : inventaire, banque et tri, artisanat et macros, récolte et
-pêche, météo et alarmes, carte et projection, marchands PNJ, collections, quêtes, sources Garland / wiki / LuminaSupplemental, cache
-disque, langues, Mini Cactpot, Triple Triade…) et des groupes écrits directement dans `Program.cs` (marché, rappels, compagnie libre,
-équipement, quêtes, infobulles des réglages, score des cartes). Tous sont enregistrés dans `Program.cs` (contrôlé le 2026-11-02).
+Les tests couvrent la logique pure : des fichiers `*Tests.cs`, un par sujet ou par version (inventaire, banque et tri, artisanat et
+macros, récolte et pêche, météo et alarmes, carte et projection, marchands PNJ, collections, quêtes, sources Garland / wiki /
+LuminaSupplemental, cache disque, langues, Mini Cactpot, Triple Triade…), plus un groupe écrit directement dans `Program.cs`. Rien ne
+s'inscrit à la main : chaque classe statique qui a des `Cases` est trouvée seule par réflexion (`TestRegistry`, `TestRunner.cs`, depuis
+0.1275) ; leur nombre et celui des tests : ligne « Tests » de la dernière entrée du CHANGELOG. Un test qui ne peut pas tourner sur le
+système (lien local de l'application, Windows seulement) est compté à part, « sauté », jamais comme réussi (depuis 0.1611).
 Ils ne couvrent pas : lecture de la mémoire du jeu (sacs, atelier de la compagnie, barre du serveur, cabine d'essayage…), feuilles Excel
 réelles (vérifiées par les sondes de `tools/`, sorties dans [docs/evidence/](../evidence/)), rendu ImGui et clics, requêtes HTTP réelles
 (Universalis, Garland, wiki, GitHub, Teamcraft : transport simulé ou extraits enregistrés).

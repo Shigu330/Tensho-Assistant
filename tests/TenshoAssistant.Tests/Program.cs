@@ -938,7 +938,8 @@ var run = ParallelTests.Run(groups, Environment.ProcessorCount, Quarantine.Entri
 foreach (var result in run.Results)
 {
     if (result.Passed) Console.WriteLine($"PASS {result.Name}");
-    else Console.Error.WriteLine($"FAIL {result.Name}: {result.Error}");
+    // X-591 A25 (0.1611): a skipped test is said by its note (SKIP and its reason), neither PASS nor FAIL.
+    else if (!result.Skipped) Console.Error.WriteLine($"FAIL {result.Name}: {result.Error}");
 }
 foreach (var note in run.Results.Select(result => result.Note).OfType<string>().Concat(run.Notes)) Console.WriteLine(note);
 Console.WriteLine(ParallelTests.Line(run, groups));

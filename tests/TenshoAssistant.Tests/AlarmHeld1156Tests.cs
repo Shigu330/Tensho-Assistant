@@ -42,7 +42,7 @@ internal static class AlarmHeld1156Tests
             Check(LocalLinkProtocol.TryParse(line,out _,out var why),"the worst line is read: "+why);
             foreach(var bad in new IReadOnlyList<LinkHeld>[]{[.. Enumerable.Range(1,LocalLinkProtocol.MaxHeld+1).Select(n=>new LinkHeld((uint)n,1))],[new LinkHeld(0,1)],[new LinkHeld(1,-1)],[new LinkHeld(1,LocalLinkProtocol.MaxHeldCount+1)],[null!]})
                 Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample(bad)),out _,out var refused) && refused=="held list refused","refused: "+refused);
-            if(!OperatingSystem.IsWindows())return;
+            if(!OperatingSystem.IsWindows())throw Skip.Because("Windows only (the desktop link's named pipes)");
             var name="TenshoAssistant.Link.Test."+Guid.NewGuid().ToString("N")[..12];
             var server=new LocalLinkServer(name);
             try

@@ -55,7 +55,7 @@ internal sealed class ExchangeRefused(string key,bool forget):Exception(key)
 /// client id below, not a secret; no client secret in the plugin): Tensho shows a code, the player approves it on github.com; the token is kept on this PC only,
 /// protected by Windows for this user (DPAPI), and can be revoked on GitHub at any time. An exchange: the common file of the repository joined as imported
 /// (once per version of the file), then, when connected, the player's own sightings (never imported ones) written to one secret gist of theirs, updated each
-/// time, and one issue per player in the repository pointing to it. Started by a click, or once a day by the opt-in setting « automatic exchange ».
+/// time, and one issue per player in the repository pointing to it. Started by a click, or at most once every 20 hours (<see cref="Every"/>) by the opt-in setting « automatic exchange ».
 /// A discovery never holds a player's name, position or id; the issue's title holds the GitHub login of the account the player connected.
 /// X-175 (1138): the sign-in (OAuth app today, GitHub App once its client id is given) comes from GitHubSignIn, the one switch; an expiring token
 /// is renewed before an upload with its refresh token, kept protected the same way (github.refresh).

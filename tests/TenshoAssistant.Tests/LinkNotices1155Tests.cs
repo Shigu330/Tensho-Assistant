@@ -65,7 +65,7 @@ internal static class LinkNotices1155Tests
             foreach(var bad in new IReadOnlyList<LinkNotice>[]{[.. Enumerable.Range(1,5).Select(n=>new LinkNotice(n,T0,"x"))],[new LinkNotice(0,T0,"x")],[new LinkNotice(1,T0,new string('x',LocalLinkProtocol.MaxNoticeText+1))],[new LinkNotice(1,T0,null!)]})
                 Check(!LocalLinkProtocol.TryParse(LocalLinkProtocol.Serialize(Sample(1,bad)),out _,out var refused) && refused=="notice list refused","refused: "+refused);
             Check(LocalLinkProtocol.TryParse("{\"Protocol\":3,\"Plugin\":\"0.1154.0\",\"LoggedIn\":true,\"Paused\":false,\"Territory\":1,\"Zone\":\"\",\"Sequence\":1}",out var older,out _) && older!.Notices is null,"a plugin of before sends none");
-            if(!OperatingSystem.IsWindows())return;
+            if(!OperatingSystem.IsWindows())throw Skip.Because("Windows only (the desktop link's named pipes)");
             var log=new LinkNoticeLog();
             var now=DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             log.Add("Duty ready: Sastasha",now);log.Add("Allagan tomestones: 1,900 of 2,000",now);

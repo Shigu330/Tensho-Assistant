@@ -75,7 +75,7 @@ internal sealed partial class MainWindow
                         log.Information("Discovery: FATE {0} ({1}) on map {2} at {3:F1}, {4:F1}.",fate.Name,fate.Id,here.MapId,fate.Position.X,fate.Position.Z);
         }
         if((store.Dirty || SeenPrices?.Dirty==true) && now-discoveriesSavedAt>60_000)SaveDiscoveries(false);
-        // X-77.1 (0.883): the automatic exchange, only when the player turned it on, once a day at most.
+        // X-77.1 (0.883): the automatic exchange, only when the player turned it on, at most once every 20 hours (GitHubExchange.Every).
         if(settings.Enabled && settings.AutoExchange && DiscoveryExchange is { } exchange && exchange.Due(DateTimeOffset.UtcNow))exchange.Exchange(store,exchange.Connected);
     }
 

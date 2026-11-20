@@ -43,7 +43,7 @@ internal static class LocalLink1081Tests
         }),
         ("Local link 1081: a real pipe carries the plugin's snapshots to the application; a second server waits; closing the server ends the link",() =>
         {
-            if(!OperatingSystem.IsWindows())return;// the link is Windows only (named pipes with an access list)
+            if(!OperatingSystem.IsWindows())throw Skip.Because("the link is Windows only (named pipes with an access list)");
             var name="TenshoAssistant.Link.Test."+Guid.NewGuid().ToString("N")[..12];
             var log=new List<string>();
             using(var client=new LocalLinkClient(name))

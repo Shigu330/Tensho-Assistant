@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1611.0
+- Plan global, X-591 : Audit externe du 18/11, textes et tests. A13 : SECURITY (en et fr) et l'info-bulle de « Échange automatique » disent le vrai rythme, au plus une fois toutes les 20 heures (GitHubExchange.Every), au lieu de « une fois par jour au plus ». A23 : TESTING ne dit plus « 87 fichiers » ni « tous enregistrés dans Program.cs » : les classes de tests sont trouvées seules par réflexion, leur nombre est dans le CHANGELOG. A25 : un test qui ne peut pas tourner sur le système (lien local, Windows seulement) lève Skip.Because : le lanceur le compte à part (SKIP et sa raison, « N/M passed, K skipped »), jamais comme réussi ; les quatre tests qui rendaient la main hors Windows passent par là. X-591.
+- Pour les joueurs : découvertes : l'info-bulle de l'échange automatique dit maintenant qu'il a lieu au plus une fois toutes les 20 heures.
+- Tests : AuditTexts1611Tests. Verify.ps1 (agent) : 3322/3322, 0 avertissement, 0 erreur ; DLL 0.1611.0.0. Rien à essayer en jeu.
+### English
+- External audit of 18/11, texts and tests. A13: SECURITY (en and fr) and the « Automatic exchange » tip say the real pace, at most once every 20 hours (GitHubExchange.Every), instead of « once a day at most ». A23: TESTING no longer says « 87 files » nor « all registered in Program.cs »: the test classes are found by reflection, their number is in the CHANGELOG. A25: a test that cannot run on the system (local link, Windows only) throws Skip.Because: the runner counts it apart (SKIP and its reason, « N/M passed, K skipped »), never as passed; the four tests that returned early off Windows use it. X-591.
+- For players: Discoveries: the automatic exchange's tip now says it runs at most once every 20 hours.
+
 ## 0.1610.0
 - Plan global, X-590 : Audit externe du 18/11, lectures natives (R08). A05 : un nombre de marqueurs de la carte hors borne (après une mise à jour du jeu) n'est plus lu comme une zone vide : NativeShape.Count lève UnexpectedGameStructureException, la carte garde sa dernière copie des événements et dit « événements » indisponible, peut-être après une mise à jour du jeu, journalisé une fois ; de même pour les quêtes non acceptées du jeu (0 reste une liste vide). A06 : le résultat du Dédale bestial relu avec des chiffres plus complets (bonus, total, lignes du score, points des bonus) remplace la première lecture, à son heure (BeastResults.Keep) ; une lecture plus pauvre ne remplace jamais une plus complète. X-590.
 - Pour les joueurs : carte : après une mise à jour du jeu, des marqueurs illisibles sont signalés au lieu d'une zone vide. Dédale bestial : le bonus et le total du résultat sont gardés quand la fenêtre se remplit après coup.

@@ -23,7 +23,7 @@ internal static class LinkCategories1119Tests
     [
         ("Link 1119: real saved files changed, their notices through a real pipe: the bytes received hold categories only, no file name, no character id",() =>
         {
-            if(!OperatingSystem.IsWindows())return;
+            if(!OperatingSystem.IsWindows())throw Skip.Because("Windows only (the desktop link's named pipes)");
             var root=Path.Combine(Path.GetTempPath(),"tensho-link-1119-"+Guid.NewGuid().ToString("N"));
             var folder=Path.Combine(root,"TenshoAssistant");var settings=Path.Combine(root,"TenshoAssistant.json");
             const string id="18014398509481984";

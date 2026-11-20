@@ -17,6 +17,17 @@ internal sealed class SerialTestsAttribute(string reason) : Attribute
     public string Reason { get; } = reason;
 }
 
+/// <summary>
+/// X-591 A25 (0.1611, external audit of 18/11): a test that cannot run on this system (a Windows-only channel) throws this from its first
+/// line, « if(!OperatingSystem.IsWindows())throw Skip.Because(…); »: the run counts it apart (SKIP and its reason), never as passed.
+/// </summary>
+internal sealed class SkipTestException(string reason) : Exception(reason);
+
+internal static class Skip
+{
+    public static SkipTestException Because(string reason) => new(reason);
+}
+
 /// <summary>A class of tests: its name, its tests in order, and whether it must run alone.</summary>
 internal sealed record TestGroup(string Name, (string Name, Action Run)[] Tests, bool Serial);
 
@@ -59,13 +70,15 @@ internal static class GroupFilter
     public static bool Full(string[] args) => !(args.Length == 2 && args[0] == "--only" && args[1].Length > 0);
 }
 
-internal sealed record TestResult(string Group, string Name, bool Passed, string? Error, double Seconds, string? Note);
+internal sealed record TestResult(string Group, string Name, bool Passed, string? Error, double Seconds, string? Note, bool Skipped = false);
 
 internal sealed record TestRun(TestResult[] Results, string[] Notes, double Whole, int Threads)
 {
-    public int Total => Results.Length;
-    public int Failed => Results.Count(result => !result.Passed) + Notes.Count(note => note.StartsWith("FAIL ", StringComparison.Ordinal));
+    /// <summary>The tests that ran (X-591 A25: the skipped ones apart).</summary>
+    public int Total => Results.Count(result => !result.Skipped);
+    public int Failed => Results.Count(result => !result.Passed && !result.Skipped) + Notes.Count(note => note.StartsWith("FAIL ", StringComparison.Ordinal));
     public int Passed => Results.Count(result => result.Passed);
+    public int Skipped => Results.Count(result => result.Skipped);
     public IReadOnlyList<(double Seconds, string Name)> Times => Results.Select(result => (result.Seconds, result.Name)).ToList();
 }
 
@@ -114,9 +127,12 @@ internal static class ParallelTests
             var (name, run) = group.Tests[index];
             var started = Stopwatch.GetTimestamp();
             string? error = null;
+            string? skipped = null;
             try { run(); }
+            catch (SkipTestException skip) { skipped = skip.Message; }
             catch (Exception failure) { error = failure.ToString(); }
             var seconds = Stopwatch.GetElapsedTime(started).TotalSeconds;
+            if (skipped is not null) { results[index] = new(group.Name, name, false, null, seconds, $"SKIP {name}: {skipped}", true); continue; }
             if (error is not null && held.TryGetValue(name, out var quarantine))
                 results[index] = new(group.Name, name, true, error, seconds,
                     $"QUARANTINE {name} (until {quarantine.Until:yyyy-MM-dd}: {quarantine.Reason}) failed this run, not counted as a failure: {FirstLine(error)}");
@@ -134,8 +150,10 @@ internal static class ParallelTests
     public static string CountLine(TestRun run)
     {
         var faults = run.Notes.Count(note => note.StartsWith("FAIL ", StringComparison.Ordinal));
-        return faults == 0 ? $"{run.Passed}/{run.Total} passed"
-            : $"{run.Passed}/{run.Total} tests passed, but the run FAILED: {faults} quarantine entr{(faults == 1 ? "y" : "ies")} wrong (FAIL lines above)";
+        // X-591 A25 (0.1611): the skipped tests after the count, never in it.
+        var skipped = run.Skipped == 0 ? "" : $", {run.Skipped} skipped (not run on this system, SKIP lines above)";
+        return faults == 0 ? $"{run.Passed}/{run.Total} passed{skipped}"
+            : $"{run.Passed}/{run.Total} tests passed{skipped}, but the run FAILED: {faults} quarantine entr{(faults == 1 ? "y" : "ies")} wrong (FAIL lines above)";
     }
 
     /// <summary>One line on the run itself: threads, groups, the serial ones, and the longest group (the floor of a parallel run).</summary>
