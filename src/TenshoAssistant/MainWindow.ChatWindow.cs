@@ -1290,6 +1290,8 @@ internal sealed partial class MainWindow
                 {
                     if(options.TextOutline)ChatOutline(run.Text);
                     ImGui.TextColored(ChatRunColour(run,record,color,options),run.Text);
+                    // X-473 (0.1627): a player's name: their world, and their job and level when the game shows them (never in capture mode).
+                    if(!chatLinesBlocked && run.Role==ChatRole.Sender && !options.CaptureNames && ChatChannels.Spoken(record.Channel))TipText(()=>ChatSenderTip(record));
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
@@ -1310,6 +1312,18 @@ internal sealed partial class MainWindow
     }
 
     private string ChatRepeatsTip(int times)=>localization.Format("ChatWindow.RepeatsTip",times);
+
+    /// <summary>X-473 (0.1627): a player's tooltip: name and world (the message's identifiers, else the name as written), job and level when the
+    /// game shows them (ChatPlayerActions.Seen: the party or nearby).</summary>
+    private string ChatSenderTip(ChatRecord record)
+    {
+        var source=ChatSenders?.For(record.Id);
+        var name=source?.Name is { Length:>0 } known ? known:ChatCopy.NameOf(ChatFormat.Clean(record.Sender));
+        var world=source is { World:>0 } withWorld && ChatPlayers is { } players ? players.World(withWorld.World):ChatCopy.WorldOf(ChatFormat.Clean(record.Sender));
+        var seen=source is not null ? ChatPlayers?.Seen(source):null;
+        return ChatCopy.SenderTip(name,world,seen?.Job,seen?.Level ?? 0,(who,where)=>localization.Format("ChatWindow.SenderTipWorld",who,where),
+            (job,level)=>localization.Format("ChatWindow.SenderTipJob",job,level));
+    }
 
     // X-455 E1 (0.1624): the tab's text made when « Select text » was chosen (null: closed); its box opened at the next frame.
     private string? chatSelectText;
@@ -1473,7 +1487,21 @@ internal sealed partial class MainWindow
         if(itemCatalog.State.Catalog?.Find(link.ItemId) is not { } item){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
         if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
         // X-638 (bench X-631, review of 0.1441, M5): a high-quality item link says so, as the game's link does.
-        TipText(()=>localization.Format(link.Hq ? "ChatWindow.ItemLinkTipHq":"ChatWindow.ItemLinkTip",item.Name));
+        // X-473 (0.1627): as the game's tooltip: the item's icon, its name, its description (Item sheet), then what a click does.
+        if(ImGui.IsItemHovered())
+            using(TooltipScope.Begin())
+            {
+                DrawGameIcon(item.IconId,new Vector2(32,32)*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+                ImGui.SameLine();
+                ImGui.TextUnformatted(localization.Format(link.Hq ? "ChatWindow.ItemLinkTipHq":"ChatWindow.ItemLinkTip",item.Name));
+                if(ChatPlayers?.Description(item.Id) is { Length:>0 } description)
+                {
+                    ImGui.Separator();
+                    ImGui.PushTextWrapPos(ImGui.GetFontSize()*28);
+                    try{ImGui.TextColored(Muted,description);}
+                    finally{ImGui.PopTextWrapPos();}
+                }
+            }
         if(ChatLinkClicked(id))
         {
             SelectItem(item.Id);

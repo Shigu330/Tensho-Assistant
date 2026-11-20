@@ -6270,6 +6270,8 @@
     "CopyItem": "Copier le nom de l'objet",
     "CopyQuest": "Copier le nom de la quête",
     "MenuCopyPlayer": "Copier le nom {0}",
+    "SenderTipWorld": "{0} ({1})",
+    "SenderTipJob": "{0}, niveau {1}",
     "WholeTabChosen": "Tout l'onglet est choisi : Ctrl+C le copie, Échap le relâche",
     "ListEmpty": "Aucun pour l'instant.",
     "ListAdd": "Ajouter",

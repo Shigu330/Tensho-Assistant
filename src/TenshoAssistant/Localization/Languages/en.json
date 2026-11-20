@@ -6270,6 +6270,8 @@
     "CopyItem": "Copy the item's name",
     "CopyQuest": "Copy the quest's name",
     "MenuCopyPlayer": "Copy the name {0}",
+    "SenderTipWorld": "{0} ({1})",
+    "SenderTipJob": "{0}, level {1}",
     "WholeTabChosen": "Whole tab chosen: Ctrl+C copies it, Esc lets it go",
     "ListEmpty": "None yet.",
     "ListAdd": "Add",

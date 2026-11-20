@@ -78,6 +78,27 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     /// <summary>X-455 E3 (0.1617): a world's name from the client's World sheet; empty for none or an unknown one.</summary>
     public string World(ushort id)=>id==0 ? "":data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
 
+    /// <summary>X-473 (0.1627, R04): the job and level the game shows of that player: a member of your party (its list), else the character
+    /// nearby; null otherwise. Read when the mouse is on the name (the game's thread draws the window), never kept.</summary>
+    public (string Job,int Level)? Seen(ChatSource source)
+    {
+        foreach(var member in party)
+            if(member.Name.TextValue==source.Name && member.World.RowId==source.World && member.Level>0)
+                return (member.ClassJob.ValueNullable?.Name.ExtractText() ?? "",member.Level);
+        return InRange(source) is { } character && character.Level>0 ? (character.ClassJob.ValueNullable?.Name.ExtractText() ?? "",character.Level):null;
+    }
+
+    // X-473 (0.1627): the items' descriptions read once each, on hover (the Item sheet, the client's language).
+    private readonly Dictionary<uint,string> descriptions=[];
+    /// <summary>X-473 (0.1627): an item's description as the game's tooltip gives it (its text, without the game's formatting); empty when none.</summary>
+    public string Description(uint item)
+    {
+        if(descriptions.TryGetValue(item,out var known))return known;
+        var text=data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(item)?.Description.ExtractText().Trim() ?? "";
+        if(descriptions.Count<2000)descriptions[item]=text;
+        return text;
+    }
+
     /// <summary>The character of that player in range (name and home world), or null.</summary>
     public IPlayerCharacter? InRange(ChatSource source)
         =>objects.OfType<IPlayerCharacter>().FirstOrDefault(character=>character.Name.TextValue==source.Name && character.HomeWorld.RowId==source.World);

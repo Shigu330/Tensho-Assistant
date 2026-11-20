@@ -15,6 +15,22 @@ public static class ChatCopy
         =>string.IsNullOrWhiteSpace(world) ? name.Trim():name.Trim()+"@"+world.Trim();
 
     /// <summary>E3: the world written after « @ » in a sender's name, or nothing.</summary>
+    /// <summary>X-473 (0.1627): a sender's name without its world (« Name@World » as the game writes it elsewhere).</summary>
+    public static string NameOf(string? sender)
+    {
+        var name=(sender ?? "").Trim();
+        var at=name.IndexOf('@');
+        return at>0 ? name[..at].Trim():name;
+    }
+
+    /// <summary>X-473 (0.1627): the lines of a player's tooltip: the name and its world (when known), then the job and level when the game shows
+    /// them (in the party or nearby; null otherwise: nothing guessed).</summary>
+    public static string SenderTip(string name,string world,string? job,int level,Func<string,string,string> withWorld,Func<string,int,string> withJob)
+    {
+        var first=world.Length>0 ? withWorld(name,world):name;
+        return job is { Length:>0 } && level>0 ? first+"\n"+withJob(job,level):first;
+    }
+
     public static string WorldOf(string? sender)
     {
         if(string.IsNullOrWhiteSpace(sender))return "";

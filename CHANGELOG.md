@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1627.0
+- Plan global, X-473 : Fenêtre de chat, info-bulles (X-473, 1re partie). Au survol du nom d'un joueur (canaux parlés) : son nom et son monde, puis sa classe et son niveau seulement s'il est dans votre groupe ou à portée, comme le jeu les montre (lus au survol, rien n'est gardé, R04 ; jamais en mode capture). Au survol d'un lien d'objet : son icône, son nom et sa description tirée de la feuille Item du jeu, comme l'info-bulle du jeu, puis ce que fait un clic. Reste : les noms d'actions et de statuts dans le texte des messages (lignes de combat comprises). X-473 reste ouvert.
+- Pour les joueurs : fenêtre de chat : survoler le nom d'un joueur montre son monde (et sa classe et son niveau dans votre groupe ou à portée) ; survoler un lien d'objet montre son icône et sa description.
+- Tests : ChatTips1627Tests. Verify.ps1 (agent) : 3377/3377, 0 avertissement, 0 erreur ; DLL 0.1627.0.0. Non validé en jeu.
+### English
+- Chat window, tooltips (X-473, part 1). On a player's name (spoken channels): their name and world, then their job and level only when they are in your party or nearby, as the game shows them (read on hover, nothing kept, R04; never in capture mode). On an item link: its icon, its name and its description from the game's Item sheet, as the game's tooltip, then what a click does. Left: the names of actions and statuses in the messages' text (combat lines included). X-473 stays open.
+- For players: Chat window: hovering a player's name shows their world (and job and level in your party or nearby); hovering an item link shows its icon and description.
+
 ## 0.1626.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564). La partie chat du préchauffage (environ 1340 méthodes ; leur liste est prête 160 ms après le chargement, leur compilation prenait 3 à 7 s) se compile maintenant sur plusieurs fils de priorité basse : un quart des processeurs, de 1 à 3 (un seul jusqu'à 7 processeurs, pour laisser les siens au jeu). Chaque méthode une fois, le compte juste. X-564 reste ouvert pour la mesure à vide.
 - Tests : ChatThreads1626Tests. Verify.ps1 (agent) : 3375/3375, 0 avertissement, 0 erreur ; DLL 0.1626.0.0. Rien à essayer en jeu.
