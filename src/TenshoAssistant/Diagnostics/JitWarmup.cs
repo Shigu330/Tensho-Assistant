@@ -40,6 +40,33 @@ public sealed class JitWarmup : IDisposable
         slowest.Note(SlowCompilations.Name(method),System.Diagnostics.Stopwatch.GetElapsedTime(at).TotalMilliseconds,DateTimeOffset.Now,processor);
         return compiled;
     }
+    /// <summary>X-564 (0.1626): how many threads compile the chat part: a quarter of the processors, 1 to 3 (one on a machine of up to 7, so the
+    /// game keeps its processors; three from 12).</summary>
+    public static int ChatThreads=>Threads(Environment.ProcessorCount);
+    public static int Threads(int processors)=>Math.Clamp(processors/4,1,3);
+
+    /// <summary>X-564 (0.1626): <paramref name="methods"/> compiled on <paramref name="threads"/> threads (this one and helpers of low priority),
+    /// each taking the next one; stops when <paramref name="token"/> is cancelled; how many were compiled and skipped.</summary>
+    private (int Prepared,int Skipped) Compile(IReadOnlyList<MethodBase> methods,int threads,CancellationToken token)
+    {
+        var next=-1;var prepared=0;var skipped=0;
+        void Work()
+        {
+            for(var index=Interlocked.Increment(ref next);index<methods.Count && !token.IsCancellationRequested;index=Interlocked.Increment(ref next))
+                if(Timed(methods[index],()=>CallGraph.Prepare(methods[index])))Interlocked.Increment(ref prepared);else Interlocked.Increment(ref skipped);
+        }
+        var helpers=new List<Thread>();
+        for(var count=1;count<Math.Max(1,threads) && methods.Count>1;count++)
+        {
+            var helper=new Thread(Work){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up (chat "+count+")"};
+            helper.Start();
+            helpers.Add(helper);
+        }
+        Work();
+        foreach(var helper in helpers)helper.Join();
+        return (prepared,skipped);
+    }
+
     /// <summary>X-01 (0.1104): how many of <see cref="Prepared"/> were compiled first.</summary>
     public int EarlyPrepared { get; private set; }
     public int Skipped { get; private set; }
@@ -385,12 +412,12 @@ public sealed class JitWarmup : IDisposable
             // shows its lines then, no longer after the map's and the overlays' code too.
             if(chatPart is not null)
             {
-                foreach(var method in methods.Where(chatPart))
-                {
-                    if(token.IsCancellationRequested)return;
-                    if(!compiled.Add(method))continue;
-                    if(Timed(method,()=>CallGraph.Prepare(method))){Prepared++;ChatPrepared++;}else Skipped++;
-                }
+                // X-564 (0.1626, measured on 20/11: the list ready 160 ms after the load, the compiling 3 to 7 s): on a few threads of low
+                // priority (ChatThreads), each taking the next method; the warm-up's own thread is one of them.
+                var part=methods.Where(chatPart).Where(compiled.Add).ToArray();
+                var (prepared,skipped)=Compile(part,ChatThreads,token);
+                if(token.IsCancellationRequested)return;
+                Prepared+=prepared;ChatPrepared+=prepared;Skipped+=skipped;
                 ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                 chatDone=true;
                 var left=wait-System.Diagnostics.Stopwatch.GetElapsedTime(created);

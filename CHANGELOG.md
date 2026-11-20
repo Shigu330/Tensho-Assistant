@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1626.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564). La partie chat du préchauffage (environ 1340 méthodes ; leur liste est prête 160 ms après le chargement, leur compilation prenait 3 à 7 s) se compile maintenant sur plusieurs fils de priorité basse : un quart des processeurs, de 1 à 3 (un seul jusqu'à 7 processeurs, pour laisser les siens au jeu). Chaque méthode une fois, le compte juste. X-564 reste ouvert pour la mesure à vide.
+- Tests : ChatThreads1626Tests. Verify.ps1 (agent) : 3375/3375, 0 avertissement, 0 erreur ; DLL 0.1626.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564). The warm-up's chat part (about 1340 methods; their list is ready 160 ms after the load, compiling them took 3 to 7 s) is now compiled on a few threads of low priority: a quarter of the processors, 1 to 3 (one up to 7 processors, so the game keeps its own). Each method once, the count right. X-564 stays open for the idle measure.
+
 ## 0.1625.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564). Mesure à vide du 20/11 à 16 h 49 (même DLL rechargée, sans compilation ni tests à côté) : la partie chat du préchauffage était prête 3567 ms après le chargement, au-dessus des 3 s visées. Elle part maintenant tout de suite, sans l'attente de 500 ms du début du préchauffage ; le reste garde cette attente, après elle. Le journal dit aussi quand la liste des méthodes était prête (le parcours de tout l'assemblage passe avant la partie chat), pour la mesure suivante. X-564 reste ouvert pour la mesure à vide.
 - Tests : ChatFirst1625Tests. Verify.ps1 (agent) : 3373/3373, 0 avertissement, 0 erreur ; DLL 0.1625.0.0. Rien à essayer en jeu.
