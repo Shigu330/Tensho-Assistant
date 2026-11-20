@@ -201,6 +201,15 @@ public static class ChatAlert
         return string.Equals(name,ownName.Trim(),StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>X-447 B7 (0.1647): the messages with an alert not seen in any of <paramref name="views"/>, a message shown by two tabs counted
+    /// once (<paramref name="scratch"/> reused from frame to frame).</summary>
+    public static int Unseen(IEnumerable<ChatTabView> views,HashSet<long> scratch)
+    {
+        scratch.Clear();
+        foreach(var view in views)scratch.UnionWith(view.AlertIds);
+        return scratch.Count;
+    }
+
     /// <summary>The tab's label with « ! » in front while an alert in it is not seen.</summary>
     public static string Mark(string label,int alerts)=>alerts>0 ? "! "+label:label;
 }

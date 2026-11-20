@@ -104,6 +104,9 @@ public sealed class ChatSettings
     public int AlertSound{get;set;}
     /// <summary>X-447 B7 (0.1646, after Prat): the sound each spoken channel's messages play (1 to 16); a channel not listed plays none.</summary>
     public Dictionary<ChatChannel,int>? Sounds{get;set;}
+    /// <summary>X-447 B7 (0.1647, after WIM): the messages with an alert not seen yet counted in the game's server bar while the window is on; a
+    /// click shows the first tab holding one. Off by default.</summary>
+    public bool ServerBarAlerts{get;set;}
     /// <summary>X-447 B7 (0.1646): the sound of <paramref name="channel"/>'s messages, 0 for none (or a number out of 1 to 16).</summary>
     public int SoundOf(ChatChannel channel)=>Sounds is { } sounds && sounds.TryGetValue(channel,out var sound) && Alarms.MacroSound.Valid(sound) ? sound:0;
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by

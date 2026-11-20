@@ -1079,7 +1079,9 @@
     "Wear": "Gear {0}",
     "WearTip": "Lowest condition of your worn gear: {0}. To repair: {1} piece(s); materia to extract: {2} piece(s). Click: Gear.",
     "PlaceTip": "{0}. Click: Map.",
-    "PlaceInstanceTip": "{0}, instance {1}. Click: Map."
+    "PlaceInstanceTip": "{0}, instance {1}. Click: Map.",
+    "Chat": "! Chat {0}",
+    "ChatTip": "{0} message(s) with an alert word or your name not seen yet in the Tensho chat window. Click: show the first tab holding one."
   },
   "Localization": {
     "LoadedLanguages": "{0} languages loaded",
@@ -6448,6 +6450,8 @@
     "NoSound": "No sound",
     "SoundNumber": "Sound {0}",
     "ChannelSoundTip": "The game's sound this channel's messages play (none by default); a sound picked is played once, to hear it. The alert sound comes first; at most one sound every 2 seconds, never for what you send nor a player you hid.",
+    "ServerBarAlerts": "Alerts in the server bar",
+    "ServerBarAlertsTip": "The messages with an alert word or your name not seen yet in this window are counted in the game's server bar (« ! Chat 3 »), a message shown by two tabs once; nothing while there is none. A click shows the first tab holding one.\nDefault: off.",
     "WhenCovered": "Under a game window",
     "WhenCoveredTip": "What the chat window does while a window of the game covers it (Tensho's windows always stay in front of it). Hide: it comes back by itself once the game window closes. Fade: no background and faint text, the clicks go to the game. Stay: as it is.\nDefault: hide.",
     "CoveredHide": "Hide",

@@ -11,6 +11,14 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     internal ChatStore ChatMessages{get;}=new();
+    // X-447 B7 (0.1647): the alerts not seen in any tab (for the server bar, read on the game's thread), and a click on it waiting.
+    private readonly HashSet<long> chatUnseen=[];
+    private int chatAlertsUnseen;
+    private bool chatShowAlert;
+    /// <summary>X-447 B7 (0.1647): the messages with an alert not seen yet in the Tensho chat window, a message in two tabs counted once.</summary>
+    internal int ChatAlertsUnseen=>Volatile.Read(ref chatAlertsUnseen);
+    /// <summary>X-447 B7 (0.1647): the server bar's entry clicked: the first tab holding an alert not seen is shown at the next frame.</summary>
+    internal void ShowChatAlert()=>Volatile.Write(ref chatShowAlert,true);
     /// <summary>X-475: the folder of the chat history files (said when the player is asked to turn it on); null outside the game.</summary>
     internal string? ChatHistoryFolder{get;set;}
     /// <summary>X-475: « Erase the history » (every character's file, and what is queued); its answer says whether every file went.</summary>
@@ -670,6 +678,8 @@ internal sealed partial class MainWindow
         try{if(ImGui.SmallButton(localization.Get("Alarms.Try")+"##ChatAlertSoundTry"))alarmService?.PreviewChatSound(configuration.Chat.AlertSound);}
         finally{ImGui.EndDisabled();}
         Tip("Advanced.TryTip");
+        // X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar.
+        BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)
@@ -931,6 +941,8 @@ internal sealed partial class MainWindow
         // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
         var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
+        // X-447 B7 (0.1647): the alerts not seen, for the server bar.
+        Volatile.Write(ref chatAlertsUnseen,ChatAlert.Unseen(tabs.Select(ChatMessages.ViewOf),chatUnseen));
         if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
         chatAlertWords=options.AlertWords;
@@ -965,6 +977,9 @@ internal sealed partial class MainWindow
         if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
         try
         {
+            // X-447 B7 (0.1647): the server bar's entry clicked: the first tab holding an alert not seen is selected.
+            var alertTab=-1;
+            if(Volatile.Read(ref chatShowAlert)){Volatile.Write(ref chatShowAlert,false);alertTab=tabs.FindIndex(tab=>ChatMessages.ViewOf(tab).Alerts>0);}
             // X-447 D4 (0.1618): the tabs' names hidden, the tab shown kept; the buttons at the end stay (one shows the tabs again).
             for(var index=0;index<tabs.Count && !options.HideTabs;index++)
             {
@@ -975,7 +990,7 @@ internal sealed partial class MainWindow
                 // X-447 B7 (0.1643): a tab not shown holding an alert not seen blinks: lit in the accent colour every other half second.
                 var blink=options.BlinkAlerts && view.Alerts>0 && index!=chatTabShown && ChatLook.Blink(ImGui.GetTime());
                 if(blink)ImGui.PushStyleColor(ImGuiCol.Tab,Accent with{W=0.75f});
-                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index,index==alertTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);}
                 finally{if(coloured)ImGui.PopStyleColor();if(blink)ImGui.PopStyleColor();}
                 // X-455 E7 (0.1617): a right click on a tab: clear its messages (the other tabs keep theirs), or show them again.
                 if(ImGui.BeginPopupContextItem("###ChatTabMenu"+index))

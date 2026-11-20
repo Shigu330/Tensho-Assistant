@@ -22,6 +22,10 @@ public sealed class ChatTabView
     private string? alertKey;
     // X-447 B7 (0.1646): your name when the setting is on (read at each refresh from the store), and the one the marks were made with.
     private string? alertName,alertKeyName;
+    // X-447 B7 (0.1647): the messages counted in Alerts, by number (the server bar counts a message shown by two tabs once).
+    private readonly HashSet<long> alertIds=[];
+    /// <summary>X-447 B7 (0.1647): the numbers of the messages with an alert not seen in this tab.</summary>
+    public IReadOnlyCollection<long> AlertIds=>alertIds;
     private IReadOnlyList<string> alertWords=[];
     private DateTimeOffset lastSeen;
     private int rows;
@@ -75,7 +79,7 @@ public sealed class ChatTabView
         void Count(ChatRecord record)
         {
             if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
-            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName))Alerts++;
+            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName)){Alerts++;alertIds.Add(record.Id);}
         }
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
@@ -87,7 +91,7 @@ public sealed class ChatTabView
     }
 
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
-    public void MarkSeen(){Unread=0;Alerts=0;}
+    public void MarkSeen(){Unread=0;Alerts=0;alertIds.Clear();}
 
     public ChatRecord RecordAt(int index)=>records[index];
 

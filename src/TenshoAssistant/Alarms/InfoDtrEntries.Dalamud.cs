@@ -32,30 +32,35 @@ public sealed class InfoDtrEntries : IDisposable
     private readonly Func<uint,string?> territoryName;
     private readonly Func<string,string> text;
     private readonly Func<string,object[],string> format;
-    private readonly IDtrBarEntry bags,wear,place;
+    private readonly IDtrBarEntry bags,wear,place,chat;
+    // X-447 B7 (0.1647): the chat window's alerts not seen (0: the entry hidden).
+    private readonly Func<int> chatAlerts;
     private readonly IDtrBarEntry[] entries;
-    private readonly string?[] shown=new string?[3];
+    private readonly string?[] shown=new string?[4];
     /// <summary>X-276: what each entry shows and where it is on screen (null when hidden or not found), for the draw thread.</summary>
     private sealed record Shown(string Label,string Tip,(Vector2 Min,Vector2 Max)? Bounds);
-    private readonly Shown?[] lines=new Shown?[3];
+    private readonly Shown?[] lines=new Shown?[4];
     private DateTimeOffset nextRefresh;
     private bool instanceFailed,disposed;
 
     public InfoDtrEntries(IDtrBar bar,IFramework framework,IGameGui gui,IClientState client,IGameInventory inventory,Configuration configuration,
         Func<IReadOnlyList<EquippedPiece>> equipped,Func<uint,string?> territoryName,Func<string,string> text,Func<string,object[],string> format,
-        Action openStorage,Action openGear,Action openMap)
+        Action openStorage,Action openGear,Action openMap,Func<int> chatAlerts,Action openChat)
     {
         this.framework=framework;this.gui=gui;this.client=client;this.inventory=inventory;this.configuration=configuration;this.equipped=equipped;
-        this.territoryName=territoryName;this.text=text;this.format=format;
+        this.territoryName=territoryName;this.text=text;this.format=format;this.chatAlerts=chatAlerts;
         bags=bar.Get("Tensho Assistant (Bags)");wear=bar.Get("Tensho Assistant (Gear condition)");place=bar.Get("Tensho Assistant (Place)");
-        entries=[bags,wear,place];
+        // X-447 B7 (0.1647): the Tensho chat window's alerts not seen; a click shows the first tab holding one.
+        chat=bar.Get("Tensho Assistant (Chat alerts)");
+        entries=[bags,wear,place,chat];
         foreach(var entry in entries)entry.Shown=false;
-        bags.OnClick=_=>openStorage();wear.OnClick=_=>openGear();place.OnClick=_=>openMap();
+        bags.OnClick=_=>openStorage();wear.OnClick=_=>openGear();place.OnClick=_=>openMap();chat.OnClick=_=>openChat();
         CompetitiveGate.AddAlways(framework,OnUpdate);
     }
 
     private void OnUpdate(IFramework _)
     {
+        if(CompetitiveGate.Cut)chat.Shown=false;
         if(CompetitiveGate.Cut){bags.Shown=wear.Shown=place.Shown=false;return;}
         var now=DateTimeOffset.UtcNow;
         if(disposed || now<nextRefresh)return;
@@ -64,6 +69,7 @@ public sealed class InfoDtrEntries : IDisposable
         Show(bags,0,loggedIn && configuration.BagsServerBar ? BagsLine():null);
         Show(wear,1,loggedIn && configuration.WearServerBar ? WearLine():null);
         Show(place,2,loggedIn && configuration.PlaceServerBar ? PlaceLine():null);
+        Show(chat,3,loggedIn && configuration.Chat.WindowOpen && configuration.Chat.ServerBarAlerts ? ChatLine():null);
     }
 
     private void Show(IDtrBarEntry entry,int index,(string Label,string Tip)? line)
@@ -121,6 +127,13 @@ public sealed class InfoDtrEntries : IDisposable
         return (format("ServerBarInfo.Wear",[percent]),format("ServerBarInfo.WearTip",[percent,state.ToRepair,state.ToExtract]));
     }
 
+    // X-447 B7 (0.1647): « ! Chat 3 » while messages with an alert are not seen; nothing at 0.
+    private (string,string)? ChatLine()
+    {
+        var count=chatAlerts();
+        return count<=0 ? null:(format("ServerBarInfo.Chat",[count]),format("ServerBarInfo.ChatTip",[count]));
+    }
+
     private (string,string)? PlaceLine()
     {
         var territory=(uint)client.TerritoryType;
@@ -147,6 +160,6 @@ public sealed class InfoDtrEntries : IDisposable
         if(disposed)return;
         disposed=true;
         CompetitiveGate.RemoveAlways(framework,OnUpdate);
-        bags.Remove();wear.Remove();place.Remove();
+        bags.Remove();wear.Remove();place.Remove();chat.Remove();
     }
 }
