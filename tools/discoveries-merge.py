@@ -795,7 +795,13 @@ def notice(argv):
     out=subprocess.run(["gh","issue","comment",issue,"-R","Shigu330/Tensho-Assistant","--body",body],capture_output=True,text=True,timeout=REMOTE_TIMEOUT)
     print(f"#{issue}: {'commented' if out.returncode==0 else 'comment failed'}");return out.returncode
 
+def utf8_output(stream):
+    """X-625 (0.1569): the reports hold « → » and accented names; a Windows console (cp1252) could not write them and `sync --dry-run`
+    stopped on a UnicodeEncodeError when run with plain `python -I`. The tool's own output is UTF-8 whatever the console."""
+    if hasattr(stream,"reconfigure") and (stream.encoding or "").lower().replace("-","")!="utf8":stream.reconfigure(encoding="utf-8",errors="replace")
+
 if __name__=="__main__":
+    utf8_output(sys.stdout);utf8_output(sys.stderr)
     if len(sys.argv)<2:print(__doc__);sys.exit(2)
     command=sys.argv[1]
     if command=="sync":sync("--dry-run" in sys.argv)
