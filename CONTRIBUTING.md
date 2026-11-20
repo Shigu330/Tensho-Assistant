@@ -138,18 +138,36 @@ Discuss the idea first with the « Tool proposal » issue form. Then, from the r
 - `tests/TenshoAssistant.Tests/<Name>Tests.cs`: replace its example;
 - the texts in `en.json` and `fr.json`, and one line in the list of pages, `MainWindow.Pages.cs`.
 
-It builds and passes the tests as it is. It changes no version and commits nothing. What is left to you:
+It changes no version and commits nothing. Then follow the list below: the tests refuse a page that misses one of its places.
 
-1. Write the tool. Prove any game data with a read-only probe (`tools/`), with its output in `docs/evidence/`. Read native memory on the
-   framework thread and copy it; nothing heavy in the draw.
-2. Give each subscription an owner and a cleanup, registered in `Plugin.cs` with `registrations.Register`.
-3. Give each setting a tooltip and a « ↺ » button. Replace the texts of `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`: the « ? »
-   of your page shows them, and a test refuses a page without them. If the page depends on what the game gives, add it to `HelpIndex` so
-   that its help says what is missing.
-4. Run `.\scripts\Verify.ps1`, add the `CHANGELOG.md` entry (third version number, x.y.Z) and open the pull request.
+### Adding a page: where everything is declared
 
-A page reached only from another page's tabs has no name in the navigation: give its line `null` as label and its parent as last value,
-as `Page.CraftLive` does.
+1. **The page.** One name in `enum Page` (`MainWindow.cs`) and one line in the list of pages, `MainWindow.Pages.cs`: its navigation group,
+   its name (`Navigation.<Name>`), its `Draw<Name>` method and where its code is. A page of a family (one title and a tab bar in the page
+   header, as Crafting or Gathering) names its family as `Parent` and gives its tab name in `Tab` and its description in `About`; a page
+   alone draws its own title with `Heading(title, description)`.
+2. **Its template.** Blocks of a page go in tabs with `DetailTabs(id, [(key, label, draw), …], ref focus)` (as Storage, Alarms and
+   Garden), not in a tab bar written by hand. Tables open with `UiComponents.BeginDataTable` and title their columns with
+   `UiComponents.HeadersRow`; numbers right-aligned with `NumberCell`. Empty, waiting and failed states: `EmptyState`, `StateLine`,
+   `DrawDataError`. After each control, its tooltip: `Tip("Section.KeyTip")`. Settings: `BoolSetting`, `IntSetting`, `SliderSetting`,
+   `ComboSetting` (a default, a « Default: » line and a « ↺ » button). Icon buttons `ToolButton`, game icons `DrawGameIcon`, colours from
+   the theme (`Accent`, `Muted`, `Success`, `Warning`, `Error`). Tests refuse the forms these replace, and the number of tab bars and
+   tables still written by hand can only go down.
+3. **Its texts.** English and French in `Localization/Languages/en.json` and `fr.json` (English is the original; French says « vous »;
+   a word of the game is taken from the French client). The help of its « ? »: `PageHelp.<Name>Title`, `Purpose`, `Start` and `Empty`.
+   A question players will ask goes in `Help/Faq.cs`. If the page depends on what the game gives, add it to `HelpIndex` so that its help
+   says what is missing.
+4. **The guide and the Home page.** A stop of the guide's visit (`Guide/GuideFlow.cs`) or a line in its `LeftOut` with the reason; the
+   Home page's list of tools, or a line in `DirectoryLeftOut` (`MainWindow.Tools.cs`) with the reason (`PageCoverageTests`).
+5. **The desktop application.** Its kind in `src/TenshoAssistant.Desktop/DesktopPages.cs` (`InGame`, `NeedsLink` or `AsIs`, and
+   `Editing` when it changes saved data, greyed there between `DesktopEditBegin` and `DesktopEditEnd`). `Verify.ps1` draws every page
+   without the game; a page not classified stops it.
+6. **Its tests.** The logic in a pure class outside `MainWindow` (the tests do not compile `MainWindow`), tested in
+   `tests/TenshoAssistant.Tests/<Name>Tests.cs`: a static class with a static `Cases`, found by itself. Code that reads the game goes in a
+   `*.Dalamud.cs` file: read native memory on the framework thread and copy it, nothing heavy in the draw, and prove any game data with a
+   read-only probe (`tools/`) whose output goes in `docs/evidence/`. Give each subscription an owner and a cleanup, registered in
+   `Plugin.cs` with `registrations.Register`. A page coded without the game adds its reading to `MainWindow.SelfCheckPages.cs`.
+7. **Finish.** Run `.\scripts\Verify.ps1`, add the `CHANGELOG.md` entry (third version number, x.y.Z) and open the pull request.
 
 ## Help, videos and guides
 
@@ -377,18 +395,40 @@ Discutez d'abord de l'idée avec le formulaire de ticket « Tool proposal ». Pu
 - `tests/TenshoAssistant.Tests/<Name>Tests.cs` : remplacez son exemple ;
 - les textes dans `en.json` et `fr.json`, et une ligne dans la liste des pages, `MainWindow.Pages.cs`.
 
-Il compile et passe les tests tel quel. Il ne change aucune version et ne commite rien. Ce qui vous reste :
+Il ne change aucune version et ne commite rien. Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l'une de
+ses places.
 
-1. Écrire l'outil. Prouver toute donnée du jeu par une sonde en lecture seule (`tools/`), avec sa sortie dans `docs/evidence/`. Lire la
-   mémoire native sur le thread framework et la copier ; rien de lourd dans le dessin.
-2. Donner à chaque abonnement un propriétaire et un nettoyage, enregistrés dans `Plugin.cs` avec `registrations.Register`.
-3. Donner à chaque réglage une infobulle et un bouton « ↺ ». Remplacer les textes de `PageHelp.<Name>Title`, `Purpose`, `Start` et
-   `Empty` : le « ? » de votre page les montre, et un test refuse une page qui ne les a pas. Si la page dépend de ce que donne le jeu,
-   l'ajouter à `HelpIndex` pour que son aide dise ce qui manque.
-4. Lancer `.\scripts\Verify.ps1`, ajouter l'entrée de `CHANGELOG.md` (troisième numéro de version, x.y.Z) et ouvrir la pull request.
+### Ajouter une page : où tout se déclare
 
-Une page atteinte seulement par les onglets d'une autre page n'a pas de nom dans la navigation : donnez à sa ligne `null` comme libellé
-et sa page parente comme dernière valeur, comme le fait `Page.CraftLive`.
+1. **La page.** Un nom dans `enum Page` (`MainWindow.cs`) et une ligne dans la liste des pages, `MainWindow.Pages.cs` : son groupe de
+   navigation, son nom (`Navigation.<Name>`), sa méthode `Draw<Name>` et l'endroit de son code. Une page d'une famille (un titre et une
+   barre d'onglets dans l'en-tête de page, comme Artisanat ou Récolte) nomme sa famille en `Parent` et donne son nom d'onglet en `Tab` et
+   sa description en `About` ; une page seule dessine son titre avec `Heading(titre, description)`.
+2. **Son gabarit.** Les blocs d'une page vont dans des onglets avec `DetailTabs(id, [(clé, libellé, dessin), …], ref focus)` (comme
+   Rangements, Alarmes et Jardin), pas dans une barre d'onglets écrite à la main. Les tableaux s'ouvrent avec
+   `UiComponents.BeginDataTable` et titrent leurs colonnes avec `UiComponents.HeadersRow` ; les nombres à droite avec `NumberCell`. États
+   vide, en attente et en échec : `EmptyState`, `StateLine`, `DrawDataError`. Après chaque contrôle, son infobulle :
+   `Tip("Section.CléTip")`. Réglages : `BoolSetting`, `IntSetting`, `SliderSetting`, `ComboSetting` (un défaut, une ligne « Par
+   défaut : » et un bouton « ↺ »). Boutons à icône `ToolButton`, icônes du jeu `DrawGameIcon`, couleurs du thème (`Accent`, `Muted`,
+   `Success`, `Warning`, `Error`). Des tests refusent les formes qu'ils remplacent, et le nombre de barres d'onglets et de tableaux encore
+   écrits à la main ne peut que baisser.
+3. **Ses textes.** Anglais et français dans `Localization/Languages/en.json` et `fr.json` (l'anglais est l'original ; le français dit
+   « vous » ; un mot du jeu se prend dans le client français). L'aide de son « ? » : `PageHelp.<Name>Title`, `Purpose`, `Start` et
+   `Empty`. Une question que les joueurs poseront va dans `Help/Faq.cs`. Si la page dépend de ce que donne le jeu, l'ajouter à
+   `HelpIndex` pour que son aide dise ce qui manque.
+4. **Le guide et l'accueil.** Un arrêt de la visite du guide (`Guide/GuideFlow.cs`) ou une ligne dans son `LeftOut` avec la raison ; la
+   liste des outils de l'accueil, ou une ligne dans `DirectoryLeftOut` (`MainWindow.Tools.cs`) avec la raison (`PageCoverageTests`).
+5. **L'application de bureau.** Son genre dans `src/TenshoAssistant.Desktop/DesktopPages.cs` (`InGame`, `NeedsLink` ou `AsIs`, et
+   `Editing` quand elle change des données enregistrées, grisées là entre `DesktopEditBegin` et `DesktopEditEnd`). `Verify.ps1` dessine
+   chaque page sans le jeu ; une page non classée l'arrête.
+6. **Ses tests.** La logique dans une classe pure hors de `MainWindow` (les tests ne compilent pas `MainWindow`), testée dans
+   `tests/TenshoAssistant.Tests/<Name>Tests.cs` : une classe statique avec un `Cases` statique, trouvée seule. Le code qui lit le jeu va
+   dans un fichier `*.Dalamud.cs` : lire la mémoire native sur le thread framework et la copier, rien de lourd dans le dessin, et prouver
+   toute donnée du jeu par une sonde en lecture seule (`tools/`) dont la sortie va dans `docs/evidence/`. Donner à chaque abonnement un
+   propriétaire et un nettoyage, enregistrés dans `Plugin.cs` avec `registrations.Register`. Une page codée sans le jeu ajoute sa
+   lecture à `MainWindow.SelfCheckPages.cs`.
+7. **Finir.** Lancer `.\scripts\Verify.ps1`, ajouter l'entrée de `CHANGELOG.md` (troisième numéro de version, x.y.Z) et ouvrir la pull
+   request.
 
 ## Aide, vidéos et guides
 
