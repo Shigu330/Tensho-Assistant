@@ -48,6 +48,38 @@ public static class ChatLook
     /// <summary>A tab's label: with the game's look, the tab shown is marked by a dot before its name (« · »: the game font has no bullet).</summary>
     public static string TabLabel(string label,bool shown,bool game)=>game && shown ? "· "+label:label;
 
+    /// <summary>X-447 D6 (0.1618): the window's alpha: faded under a game window (that wins), else the opacity chosen while the mouse is
+    /// elsewhere (20 % at least); null: full (under the mouse, or 100 %).</summary>
+    public static float? Alpha(float? covered,int opacity,bool hovered)
+        =>covered ?? (hovered || opacity>=100 ? null:Math.Clamp(opacity,20,100)/100f);
+
+    /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
+    public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
+        =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;
+
+    /// <summary>X-447 D7 (0.1618): the smallest size a typed size is given.</summary>
+    public const float MinWidth=200,MinHeight=80;
+
+    /// <summary>X-447 D7: a typed place kept inside the screen: its size between the smallest and the screen's, its corner moved in so the
+    /// whole window shows.</summary>
+    public static (float X,float Y,float Width,float Height) Inside(float x,float y,float width,float height,float screenWidth,float screenHeight)
+    {
+        var w=Math.Clamp(float.IsFinite(width) ? width:MinWidth,Math.Min(MinWidth,screenWidth),Math.Max(Math.Min(MinWidth,screenWidth),screenWidth));
+        var h=Math.Clamp(float.IsFinite(height) ? height:MinHeight,Math.Min(MinHeight,screenHeight),Math.Max(Math.Min(MinHeight,screenHeight),screenHeight));
+        return (Math.Clamp(float.IsFinite(x) ? x:0,0,Math.Max(0,screenWidth-w)),Math.Clamp(float.IsFinite(y) ? y:0,0,Math.Max(0,screenHeight-h)),w,h);
+    }
+
+    /// <summary>X-447 D7: the window brought back to the screen's centre, its size kept inside the screen.</summary>
+    public static (float X,float Y,float Width,float Height) Centered(float width,float height,float screenWidth,float screenHeight)
+    {
+        var inside=Inside(0,0,width,height,screenWidth,screenHeight);
+        return ((screenWidth-inside.Width)/2,(screenHeight-inside.Height)/2,inside.Width,inside.Height);
+    }
+
+    /// <summary>X-447 D7: whether a part of the window is out of the screen.</summary>
+    public static bool Outside(float x,float y,float width,float height,float screenWidth,float screenHeight)
+        =>x<0 || y<0 || x+width>screenWidth || y+height>screenHeight;
+
     /// <summary>How far the lines a message wraps onto are indented: about one letter's height, or nothing.</summary>
     public static float Indent(float fontSize,bool on)=>on && fontSize>0 ? MathF.Round(fontSize):0f;
     /// <summary>X-556 M3 (review of 0.1520): the width left to a message's text when <paramref name="beside"/> pixels follow it on its line

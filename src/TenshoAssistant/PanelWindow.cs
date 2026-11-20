@@ -19,6 +19,8 @@ internal sealed class PanelWindow : Window
     private bool borderPushed;
     private bool fadePushed;
     private bool paddingPushed;
+    // X-447 D5 (0.1618): style values pushed for the panel's own corners and frame.
+    private int framePushed;
     // X-503 M1 (review of 0.1482): the margins before this panel's own, given back to what it opens (popups, menus, tooltips).
     private Vector2 outerPadding;
     // X-467 (0.1504): placed from outside (the chat window over the game's messages, or reduced to its tabs): where it was before, given back once.
@@ -53,6 +55,7 @@ internal sealed class PanelWindow : Window
     {
         if (panel.Title is { } title) WindowName = title() + panel.Id;
         Place();
+        PlaceOnce();
         UI.FfxivTheme.Push();
         // X-403 (0.1434): an opacity chosen in the settings is read at each draw.
         if ((panel.Opacity?.Invoke() ?? panel.Alpha) is { } alpha) ImGui.SetNextWindowBgAlpha(alpha);
@@ -60,16 +63,25 @@ internal sealed class PanelWindow : Window
         if (panel.MoreFlags is { } more) Flags = panel.Flags | more();
         borderPushed = panel.NoBorder?.Invoke() == true;
         if (borderPushed) ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
+        // X-447 D5 (0.1618): corners and frame thickness of its own, read at each draw (no frame line when borderless).
+        var frame = panel.Frame?.Invoke();
+        if (frame is { } own)
+        {
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, own.Rounding); framePushed++;
+            if (!borderPushed) { ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, own.Border); framePushed++; }
+        }
         // X-498 M1 (0.1480): a faded panel (the chat window under a game window) is faded whole: pushed before Begin, its title bar, frame
         // and resize grip are drawn faded too, not only its content.
         var fade = panel.Fade?.Invoke();
         fadePushed = fade is not null;
         if (fade is { } alphaFaded) ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alphaFaded);
         // X-476 (0.1481): margins of its own (the chat window: narrow, as the game's chat).
-        paddingPushed = panel.Padding is not null;
-        if (panel.Padding is { } padding)
+        // X-447 D5 (0.1618): the margins of its own frame first (read at each draw), else its fixed ones.
+        paddingPushed = frame is not null || panel.Padding is not null;
+        if (paddingPushed) outerPadding = ImGui.GetStyle().WindowPadding;
+        if (frame is { } framed) ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, framed.Padding);
+        else if (panel.Padding is { } padding)
         {
-            outerPadding = ImGui.GetStyle().WindowPadding;
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, padding);
         }
     }
@@ -99,9 +111,24 @@ internal sealed class PanelWindow : Window
         if (beforeSize.X > 0 && beforeSize.Y > 0) ImGui.SetNextWindowSize(beforeSize, ImGuiCond.Always);
     }
 
+    /// <summary>X-447 D7 (0.1618): a place and size asked once (typed in the settings, or the window brought back to the screen's centre);
+    /// not while the window is placed from outside.</summary>
+    private void PlaceOnce()
+    {
+        if (placed || panel.Once is null) return;
+        PanelPlace? once;
+        try { once = panel.Once(); }
+        catch (Exception error) { TurnOff(error); return; }
+        if (once is not { } asked) return;
+        Position = null; Size = null;
+        if (asked.At is { } at) ImGui.SetNextWindowPos(ImGui.GetMainViewport().Pos + at, ImGuiCond.Always);
+        ImGui.SetNextWindowSize(asked.Size, ImGuiCond.Always);
+    }
+
     public override void PostDraw()
     {
         if (paddingPushed) { ImGui.PopStyleVar(); paddingPushed = false; }
+        if (framePushed > 0) { ImGui.PopStyleVar(framePushed); framePushed = 0; }
         if (fadePushed) { ImGui.PopStyleVar(); fadePushed = false; }
         if (borderPushed) { ImGui.PopStyleVar(); borderPushed = false; }
         UI.FfxivTheme.Pop();
@@ -132,7 +159,12 @@ internal sealed class PanelWindow : Window
 
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
 internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null,
-    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null, Vector2? Padding = null, Func<PanelPlace?>? Place = null);
+    Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null, Vector2? Padding = null, Func<PanelPlace?>? Place = null,
+    Func<PanelFrame>? Frame = null, Func<PanelPlace?>? Once = null);
+
+/// <summary>X-447 D5 (0.1618): a panel's margins, corners and frame thickness read at each draw (the chat window's settings); they replace
+/// <see cref="PanelDefinition.Padding"/>.</summary>
+internal readonly record struct PanelFrame(Vector2 Padding, float Rounding, float Border);
 
 /// <summary>X-467 (0.1504): a place given to a panel from outside, in screen pixels from the main viewport's origin: <c>At</c> null keeps
 /// where the window is (only its size is set).</summary>

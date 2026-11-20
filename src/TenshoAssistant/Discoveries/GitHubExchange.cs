@@ -163,7 +163,9 @@ public sealed class GitHubExchange : IDisposable
             catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.Unauthorized){ForgetIfStill(null);result=new("ExchangeUnauthorized");}
             catch(Exception error){result=new("ExchangeFailed",error.GetType().Name);}
             // X-666 M4: an exchange that ended clears the count of failures; one that failed adds one (a stop of the plugin is not one).
-            if(exchange && result.Key!="ExchangeStopped")
+            // 0.1618: nothing written once the plugin unloads (stop asked): the file was written while its folder went away (a test's
+            // cleanup met the temporary file moved under it, GitHubToken1171 N8 under load).
+            if(exchange && result.Key!="ExchangeStopped" && !stop.IsCancellationRequested)
             {
                 lock(gate)meta.Failures=result.Key=="ExchangeDone" ? 0:Math.Min(meta.Failures+1,30);
                 SaveMeta();

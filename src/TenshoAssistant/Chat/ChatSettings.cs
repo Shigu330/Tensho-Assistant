@@ -56,6 +56,17 @@ public sealed class ChatSettings
     public bool Borderless{get;set;}
     /// <summary>X-448 (0.1454): the window is neither moved nor resized.</summary>
     public bool Locked{get;set;}
+    /// <summary>X-447 D4 (0.1618): the tabs' names hidden: the tab shown stays, the buttons at the end of the bar stay, with the one that shows
+    /// the tabs again.</summary>
+    public bool HideTabs{get;set;}
+    /// <summary>X-447 D5 (0.1618): the window's margins (pixels, across and down), its corners' rounding and its frame's thickness when it has
+    /// one; the defaults are the window as before (ChatLook.Padding, the theme's corners, a one-pixel frame).</summary>
+    public int MarginX{get;set;}=6;
+    public int MarginY{get;set;}=4;
+    public int Rounding{get;set;}=2;
+    public int Border{get;set;}=1;
+    /// <summary>X-447 D6 (0.1618): the window's opacity, text included, while the mouse is not on it (percent); full under the mouse.</summary>
+    public int TextOpacity{get;set;}=100;
     /// <summary>X-485 (0.1479): what the window does while a window of the game covers it: it hides (the default, as the panels), it fades
     /// (no background, text faint, clicks go through), or it stays.</summary>
     public ChatCovered WhenCovered{get;set;}=ChatCovered.Hide;
@@ -117,6 +128,11 @@ public sealed class ChatSettings
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);
+    public int BoundedMarginX=>Math.Clamp(MarginX,0,24);
+    public int BoundedMarginY=>Math.Clamp(MarginY,0,24);
+    public int BoundedRounding=>Math.Clamp(Rounding,0,16);
+    public int BoundedBorder=>Math.Clamp(Border,0,4);
+    public int BoundedTextOpacity=>Math.Clamp(TextOpacity,20,100);
     public int BoundedMaxLines=>ChatStore.Bounded(MaxLines);
     public uint ColorOf(ChatChannel channel)=>Colors?.TryGetValue(channel,out var color)==true ? color&0xFFFFFF:ChatChannels.DefaultColor(channel);
     /// <summary>The tabs, made at first use. X-445 (0.1458): the game's three default log tabs (General: everything but the combat lines and the

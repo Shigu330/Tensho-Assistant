@@ -50,8 +50,20 @@ internal sealed partial class MainWindow
         ImGuiWindowFlags.NoFocusOnAppearing|ImGuiWindowFlags.NoNav|ImGuiWindowFlags.NoScrollbar|ImGuiWindowFlags.NoBringToFrontOnFocus,
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
         StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
-        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:()=>ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,
-        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace);
+        MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:ChatFade,
+        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce);
+
+    /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).</summary>
+    private float? ChatFade()
+        =>ChatLook.Alpha(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ChatCover.FadedAlpha:null,ChatOptions.BoundedTextOpacity,
+            chatAt is { } at && ChatLook.Under((ImGui.GetMousePos().X,ImGui.GetMousePos().Y),(at.X,at.Y),(chatSize.X,chatSize.Y)));
+
+    /// <summary>X-447 D5 (0.1618): the window's margins, corners and frame thickness from its settings.</summary>
+    private PanelFrame ChatFrame()=>new(new Vector2(ChatOptions.BoundedMarginX,ChatOptions.BoundedMarginY),ChatOptions.BoundedRounding,ChatOptions.BoundedBorder);
+
+    /// <summary>X-447 D7 (0.1618): a place asked in the settings, given once to the window.</summary>
+    private PanelPlace? chatPlaceAsked;
+    private PanelPlace? ChatPlaceOnce(){var once=chatPlaceAsked;chatPlaceAsked=null;return once;}
 
     /// <summary>X-467 (0.1504): the box the game's messages leave free while they are hidden (GameChatHider.Place, set by the plugin).</summary>
     internal Func<ChatFollowPlace?>? ChatGamePlace{get;set;}
@@ -91,7 +103,7 @@ internal sealed partial class MainWindow
         if(follow is { Box:var box })return new PanelPlace(new Vector2(box.X,box.Y),new Vector2(box.Width,box.Height));
         if(!chatReduced)return null;
         var width=chatSize.X>0 ? chatSize.X:560;
-        return new PanelPlace(null,new Vector2(width,ImGui.GetFrameHeightWithSpacing()+ChatLook.Padding.Y*2+(ChatOptions.Borderless ? 0:ImGui.GetFrameHeight())));
+        return new PanelPlace(null,new Vector2(width,ImGui.GetFrameHeightWithSpacing()+ChatOptions.BoundedMarginY*2+(ChatOptions.Borderless ? 0:ImGui.GetFrameHeight())));
     }
 
     /// <summary>X-448 (0.1454): what the two settings add to the window's flags: borderless, no title bar; locked, neither moved nor resized.
@@ -239,6 +251,14 @@ internal sealed partial class MainWindow
         BoolSetting("ChatWindow.GameLinks","ChatWindow.GameLinksTip",()=>configuration.Chat.GameLinks,value=>configuration.Chat.GameLinks=value,c=>c.Chat.GameLinks);
         BoolSetting("ChatWindow.GameTabs","ChatWindow.GameTabsTip",()=>configuration.Chat.GameTabs,value=>configuration.Chat.GameTabs=value,c=>c.Chat.GameTabs);
         BoolSetting("ChatWindow.WrapIndent","ChatWindow.WrapIndentTip",()=>configuration.Chat.WrapIndent,value=>configuration.Chat.WrapIndent=value,c=>c.Chat.WrapIndent);
+        // X-447 D4 to D7 (0.1618, the user's choices of 15/11): the window's own settings.
+        BoolSetting("ChatWindow.HideTabs","ChatWindow.HideTabsSettingTip",()=>configuration.Chat.HideTabs,value=>configuration.Chat.HideTabs=value,c=>c.Chat.HideTabs);
+        SliderSetting("ChatWindow.MarginX","ChatWindow.MarginXTip",()=>configuration.Chat.BoundedMarginX,value=>configuration.Chat.MarginX=value,0,24,defaults.MarginX,"%d px");
+        SliderSetting("ChatWindow.MarginY","ChatWindow.MarginYTip",()=>configuration.Chat.BoundedMarginY,value=>configuration.Chat.MarginY=value,0,24,defaults.MarginY,"%d px");
+        SliderSetting("ChatWindow.Rounding","ChatWindow.RoundingTip",()=>configuration.Chat.BoundedRounding,value=>configuration.Chat.Rounding=value,0,16,defaults.Rounding,"%d px");
+        SliderSetting("ChatWindow.Border","ChatWindow.BorderTip",()=>configuration.Chat.BoundedBorder,value=>configuration.Chat.Border=value,0,4,defaults.Border,"%d px");
+        SliderSetting("ChatWindow.TextOpacity","ChatWindow.TextOpacityTip",()=>configuration.Chat.BoundedTextOpacity,value=>configuration.Chat.TextOpacity=value,20,100,defaults.TextOpacity,"%d %%");
+        DrawChatPlaceSettings();
         // X-485 (0.1479): what the window does under a window of the game.
         ComboSetting("ChatWindow.WhenCovered","ChatWindow.WhenCoveredTip",()=>ChatCover.Bounded(configuration.Chat.WhenCovered),value=>configuration.Chat.WhenCovered=value,
             [(ChatCovered.Hide,localization.Get("ChatWindow.CoveredHide")),(ChatCovered.Fade,localization.Get("ChatWindow.CoveredFade")),(ChatCovered.Stay,localization.Get("ChatWindow.CoveredStay"))],
@@ -769,7 +789,8 @@ internal sealed partial class MainWindow
         if(!ImGui.BeginTabBar("###TenshoChatTabs",ImGuiTabBarFlags.FittingPolicyScroll))return;
         try
         {
-            for(var index=0;index<tabs.Count;index++)
+            // X-447 D4 (0.1618): the tabs' names hidden, the tab shown kept; the buttons at the end stay (one shows the tabs again).
+            for(var index=0;index<tabs.Count && !options.HideTabs;index++)
             {
                 var tab=tabs[index];
                 var view=ChatMessages.ViewOf(tab);
@@ -826,6 +847,10 @@ internal sealed partial class MainWindow
         Tip(options.Borderless ? "ChatWindow.FrameOnTip":"ChatWindow.FrameOffTip");
         var lockButton=GlyphTabButton("###ChatLock",options.Locked ? Dalamud.Interface.FontAwesomeIcon.Lock:Dalamud.Interface.FontAwesomeIcon.LockOpen,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
         Tip(options.Locked ? "ChatWindow.UnlockTip":"ChatWindow.LockTip");
+        // X-447 D4 (0.1618): the tabs' names hidden or shown again.
+        var tabsButton=GlyphTabButton("###ChatTabsShown",options.HideTabs ? Dalamud.Interface.FontAwesomeIcon.Eye:Dalamud.Interface.FontAwesomeIcon.EyeSlash,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
+        Tip(options.HideTabs ? "ChatWindow.ShowTabsTip":"ChatWindow.HideTabsTip");
+        if(tabsButton){options.HideTabs=!options.HideTabs;TrySave("Chat window");}
         // X-467 (0.1504, D-181): with the game's messages hidden by the option, both chats on or off; out of it, this window reduced or not.
         var both=false;
         if(options.HideGameMessages)
@@ -843,6 +868,46 @@ internal sealed partial class MainWindow
         if(reduce)chatReduced=!chatReduced;
         if(frame){options.Borderless=!options.Borderless;TrySave("Chat window");}
         if(lockButton){options.Locked=!options.Locked;TrySave("Chat window");}
+    }
+
+    // X-447 D7 (0.1618): the place and size typed (X, Y, width, height, from the screen's corner), read from the window when null.
+    private int[]? chatPlaceTyped;
+
+    /// <summary>X-447 D7 (0.1618): the window's place and size typed to the pixel, or brought back to the screen's centre; kept inside the
+    /// screen (ChatLook.Inside); a window partly out of the screen is said.</summary>
+    private void DrawChatPlaceSettings()
+    {
+        var viewport=ImGui.GetMainViewport();
+        var at=(chatAt ?? viewport.Pos)-viewport.Pos;
+        var size=chatSize.X>0 ? chatSize:new Vector2(560,320);
+        chatPlaceTyped??=[(int)at.X,(int)at.Y,(int)size.X,(int)size.Y];
+        ImGui.TextUnformatted(localization.Get("ChatWindow.Place"));
+        string[] keys=["ChatWindow.PlaceX","ChatWindow.PlaceY","ChatWindow.PlaceWidth","ChatWindow.PlaceHeight"];
+        for(var index=0;index<keys.Length;index++)
+        {
+            if(index>0)ImGui.SameLine();
+            ImGui.SetNextItemWidth(90*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+            var value=chatPlaceTyped[index];
+            if(ImGui.InputInt(localization.Get(keys[index])+"###ChatPlace"+index,ref value,0))chatPlaceTyped[index]=value;
+            Tip(keys[index]+"Tip");
+        }
+        if(ImGui.Button(localization.Get("ChatWindow.PlaceApply")))
+        {
+            var place=ChatLook.Inside(chatPlaceTyped[0],chatPlaceTyped[1],chatPlaceTyped[2],chatPlaceTyped[3],viewport.Size.X,viewport.Size.Y);
+            chatPlaceAsked=new PanelPlace(new Vector2(place.X,place.Y),new Vector2(place.Width,place.Height));chatPlaceTyped=null;
+        }
+        Tip("ChatWindow.PlaceApplyTip");
+        ImGui.SameLine();
+        if(ImGui.Button(localization.Get("ChatWindow.PlaceCenter")))
+        {
+            var place=ChatLook.Centered(size.X,size.Y,viewport.Size.X,viewport.Size.Y);
+            chatPlaceAsked=new PanelPlace(new Vector2(place.X,place.Y),new Vector2(place.Width,place.Height));chatPlaceTyped=null;
+        }
+        Tip("ChatWindow.PlaceCenterTip");
+        ImGui.SameLine();
+        if(ImGui.Button(localization.Get("ChatWindow.PlaceRead")))chatPlaceTyped=null;
+        Tip("ChatWindow.PlaceReadTip");
+        if(chatAt is not null && ChatLook.Outside(at.X,at.Y,size.X,size.Y,viewport.Size.X,viewport.Size.Y))ImGui.TextColored(Warning,localization.Get("ChatWindow.PlaceOutside"));
     }
 
     /// <summary>X-476 (0.1481): the chat's own settings, in a panel opened by the gear at the end of the tabs.</summary>
