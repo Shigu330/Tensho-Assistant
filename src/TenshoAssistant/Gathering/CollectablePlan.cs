@@ -150,10 +150,17 @@ public static class CollectableAdvisor
         return new(turn.Scour-extra,turn.BrazenMin-extra,turn.BrazenMax-extra,turn.Meticulous-extra,turn.Scour-extra);
     }
 
-    public static CollectableAdvice? Advise(CollectableTurn turn,int attempts,CollectableRule? rule,CollectableBonuses? given=null)
+    public static CollectableAdvice? Advise(CollectableTurn turn,int attempts,CollectableRule? rule,CollectableBonuses? given=null)=>Advise(turn,attempts,rule,given,out _);
+
+    /// <summary>X-674 (0.1653): the same advice, with the search's work: the states it evaluated (each call of its search, memo hits included).
+    /// It depends on the turn only, never on the machine's load: the tests bound it instead of a time (a hard case took 6046 ms against a
+    /// bound of 5000 under 32 busy processes, relay 147). MaxStates keeps each search finite; the work says how much it really did.</summary>
+    public static CollectableAdvice? Advise(CollectableTurn turn,int attempts,CollectableRule? rule,CollectableBonuses? given,out long work)
     {
         ArgumentNullException.ThrowIfNull(turn);
+        work=0;
         if(attempts<=0 || rule is null)return null;
+        long calls=0;
         var bonuses=given ?? CollectableBonuses.None;
         // 0.520: a free attempt is there for sure; the very last gather closes the node, so it goes first.
         var lastBeforeEureka=bonuses.EurekaReady && attempts==1 && bonuses.MaxAttempts>1;
@@ -206,6 +213,7 @@ public static class CollectableAdvisor
 
         Outcome Best(int value,int left,int gp,bool active,bool focus,bool first,bool priming)
         {
+            calls++;
             value=Math.Min(value,turn.Maximum);
             // Nothing more to gain past the high threshold or the maximum. This also ends the search: a free Meticulous at the maximum would otherwise come back to the same state for ever, and a stack
             // overflow closes the game without a message (in-game report, 0.480). The memo and the bound on states keep it finite in every case.
@@ -257,7 +265,7 @@ public static class CollectableAdvisor
             var kept=caution;caution=0;memo.Clear();
             var bold=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
             caution=kept;memo.Clear();
-            if(bold.Mean<=0)return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);
+            if(bold.Mean<=0){work=calls;return new(CollectableMove.Collect,CollectableTier.Below,0,attempts,0,true);}
             result=Best(turn.Current,attempts,gpNow,bonuses.ScrutinyActive,false,true,primingOn);
         }
         // 0.534 (user captures): the plans this node really offers, from several searches: the highest floor first, each lower floor only for a better average. Safe takes the first. Balanced goes further down
@@ -380,6 +388,7 @@ public static class CollectableAdvisor
             CollectableMove.Meticulous=>(gains.Meticulous+onNow,gains.Meticulous+onNow),
             _=>(0,0),
         };
+        work=calls;
         return new(result.Move,reached,sure,sureCollects,scrips,false,sureScrutinies,result.Mean,sureRestores,
             highCollects is { } most && rule.Scrips ? rule.RewardHigh*most:null,Math.Max(0,rule.High-furthest),gainLow,gainHigh,result.Worst,path);
     }

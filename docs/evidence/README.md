@@ -191,7 +191,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.459-garden-detection.md](0.459-garden-detection.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.874-probe-coverage.md` |
 | [0.463-squadron-probe.log](0.463-squadron-probe.log) | — | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.478-collectable-truncated-name.md](0.478-collectable-truncated-name.md) | `src/TenshoAssistant/Gathering/Collectables.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
-| [0.479-collectable-window-values.md](0.479-collectable-window-values.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/CollectablesTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
+| [0.479-collectable-window-values.md](0.479-collectable-window-values.md) | `src/TenshoAssistant/Gathering/CollectablePlan.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/CollectableWork1653Tests.cs`, `tests/TenshoAssistant.Tests/CollectablesTests.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md` |
 | [0.488-gp-regen-traits.md](0.488-gp-regen-traits.md) | `src/TenshoAssistant/Gathering/RegenTick.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/evidence/0.650-gp-while-gathering.md` |
 | [0.493-triad-npc-requirements.md](0.493-triad-npc-requirements.md) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs`, `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.400-0.499.md`, `docs/project/TESTING.md` |
 | [0.494-selfcheck-first-pass.log](0.494-selfcheck-first-pass.log) | — | `docs/changelog/CHANGELOG-0.400-0.499.md` |

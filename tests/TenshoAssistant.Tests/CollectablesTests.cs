@@ -245,9 +245,10 @@ internal static class CollectablesTests
             foreach(var (scour,low,high,meticulous) in new[]{(177,88,265,132),(1,1,2,1),(2000,1000,3000,1500)})
             foreach(var attempts in new[]{1,2,4,12})
                 Check(CollectableAdvisor.Advise(Turn(current,scour,low,high,meticulous,chance),attempts,ore,new(150,175,5000,200,100)) is not null,$"{chance} {current} {scour} {attempts}");
-            var clock=System.Diagnostics.Stopwatch.StartNew();
-            var heavy=CollectableAdvisor.Advise(Turn(0,177,88,265,132,8) with {IntuitionChance=13},6,ore,new(175,88,2000,200,100,false,true,300,6))!;
-            Check(heavy.Expected>0 && clock.ElapsedMilliseconds<5000 && Read("MainWindow.CollectablePanel.cs").Contains("collectableAdviceRun=Task.Run("),"a hard case ends in reasonable time, off the draw: "+clock.ElapsedMilliseconds+" ms");
+            // X-674 (0.1653): the search's work, not the clock (6046 ms against 5000 under 32 busy processes, relay 147): 1 412 726 calls of
+            // the search on 20/11 whatever the load; the bound leaves room for small changes, a search gone wild is far above it.
+            var heavy=CollectableAdvisor.Advise(Turn(0,177,88,265,132,8) with {IntuitionChance=13},6,ore,new(175,88,2000,200,100,false,true,300,6),out var work)!;
+            Check(heavy.Expected>0 && work>0 && work<=CollectableWork1653Tests.Budget && Read("MainWindow.CollectablePanel.cs").Contains("collectableAdviceRun=Task.Run("),"a hard case ends within a bounded work, off the draw: "+work+" calls of the search");
             var capped=Rule(1,"Capped",80,5000,20) with {Low=400,Mid=700,High=5000};
             Check(CollectableAdvisor.Advise(Turn(1000,177,88,265,132,100),4,capped)?.Move==CollectableMove.Collect,"at the window's maximum, even under the high threshold: collect");
         }),

@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1653.0
+- Plan global, X-674 : Tests (X-674) : le test « Collectable plan always ends » bornait le cas difficile par l'horloge (moins de 5000 ms) et en a pris 6046 sous charge (relais 147, 1 passage sur 10 avec 32 processus occupés). Le conseiller des collectables dit maintenant le travail de sa recherche (CollectableAdvisor.Advise(…, out long work) : chaque appel de la recherche, mémo compris ; 1 412 726 pour ce cas, le même à chaque fois quelle que soit la charge) ; le test borne ce travail (2 000 000 au plus) au lieu d'une durée. Le conseil donné ne change pas.
+- Tests : CollectableWork1653Tests. Verify.ps1 (agent) : 3450/3450, 0 avertissement, 0 erreur ; DLL 0.1653.0.0. Rien à essayer en jeu.
+### English
+- Tests (X-674): the test « Collectable plan always ends » bounded the hard case by the clock (under 5000 ms) and took 6046 under load (relay 147, 1 run in 10 with 32 busy processes). The collectable advisor now says its search's work (CollectableAdvisor.Advise(…, out long work): each call of the search, memo included; 1,412,726 for this case, the same every time whatever the load); the test bounds that work (2,000,000 at most) instead of a time. The advice given does not change.
+
 ## 0.1652.0
 - Plan global, X-676 : Fenêtre de chat (X-676, relecture de 0.1644 à 0.1650, M1) : avec « Masquer les onglets » actif, un clic sur l'entrée « ! Chat N » de la barre du serveur ne montrait rien : le clic était consommé, mais aucun onglet n'était dessiné pour prendre la sélection. L'onglet qui contient la première alerte pas vue est maintenant montré tout de suite quand les onglets sont masqués (ChatAlert.ShownAfterClick) ; onglets dessinés, il est toujours choisi par son onglet, comme avant. La recherche du premier onglet passe par ChatAlert.FirstWithAlert.
 - Pour les joueurs : fenêtre de chat : onglets masqués, un clic sur « ! Chat » dans la barre du serveur montre l'onglet qui contient l'alerte.
