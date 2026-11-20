@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (677 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (679 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -745,12 +745,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-665 | Review of block 0.1607 to 0.1612 (review 0.1612, 20/11), minor M1, M2, M3: M1… | Done in 0.1613.0 |
 | X-666 | Review of block 0.1607 to 0.1612 (review 0.1612, 20/11), pre-existing before… | Done in 0.1614.0 |
 | X-667 | Review of block 0.1613 to 0.1618 (review 0.1618, 20/11), minor M1, M2, M3, M4… | Done in 0.1619.0 |
+| X-668 | Review of block 0.1619 to 0.1627 (review 0.1627, 20/11), I1: finding in… | Done in 0.1628.0 |
+| X-669 | Review of block 0.1619 to 0.1627 (review 0.1627, 20/11), minor M1, M2, M3: M1… | Done in 0.1629.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (677 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (679 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1493,3 +1495,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-665 | Relecture du bloc 0.1607 à 0.1612 (relecture 0.1612, 20/11), mineurs M1, M2, M3… | Fait en 0.1613.0 |
 | X-666 | Relecture du bloc 0.1607 à 0.1612 (relecture 0.1612, 20/11), déjà là avant le… | Fait en 0.1614.0 |
 | X-667 | Relecture du bloc 0.1613 à 0.1618 (relecture 0.1618, 20/11), mineurs M1, M2… | Fait en 0.1619.0 |
+| X-668 | Relecture du bloc 0.1619 à 0.1627 (relecture 0.1627, 20/11), I1 : En 0.1625… | Fait en 0.1628.0 |
+| X-669 | Relecture du bloc 0.1619 à 0.1627 (relecture 0.1627, 20/11), mineurs M1, M2, M3… | Fait en 0.1629.0 |

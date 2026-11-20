@@ -366,7 +366,7 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-606 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage, Alarms, Collections): Quests page: it gives little information and cannot show quests on the map; do more with game data or discoveries. Done when: a probe of the game sheets (Quest, Level, ENpc…) says what can be shown (giver and place, level, rewards, previous and next quest, type) with its sources (R06); the page shows it; a button puts the chosen quest on Tensho's map (linked to X-57); image declared; Verify green | To sort (request of 18/11) |
 | X-607 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage, Alarms, Collections): code as easy as possible to maintain, above all for a human: generalise as much as possible (one template for all pages, one for tooltips, etc.). Done when: a survey of the gestures still written by hand page by page (headers, tooltips, status lines, tables, tool buttons) against the shared components; each repeated gesture goes through its component, with a ratchet test (R10); a short doc page « add a page to Tensho » for a human (where to declare the page, its template, texts, tests); Verify green | To sort (request of 18/11) |
 
-567 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
+569 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -806,7 +806,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-606 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte, Rangements, Alarmes, Collections) : page Quêtes : elle donne peu d'informations et ne montre pas les quêtes sur la carte ; faire plus avec les données du jeu ou les découvertes. Fait quand : une sonde des feuilles du jeu (Quest, Level, ENpc…) dit ce qu'on peut montrer (donneur et lieu, niveau, récompenses, quête d'avant et d'après, type) avec ses sources (R06) ; la page le montre ; un bouton place la quête choisie sur la carte de Tensho (lien avec X-57) ; image déclarée ; Verify vert | À classer (demande du 18/11) |
 | X-607 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte, Rangements, Alarmes, Collections) : code le plus facile possible à maintenir, surtout pour un humain : généraliser au maximum (un gabarit pour toutes les pages, un pour les info-bulles, etc.). Fait quand : un relevé des gestes encore écrits à la main page par page (en-têtes, info-bulles, lignes d'état, tableaux, boutons d'outil) contre les composants communs ; chaque geste répété passe par son composant, avec un test à cliquet (R10) ; une page de doc courte « ajouter une page à Tensho » pour un humain (où déclarer la page, son gabarit, ses textes, ses tests) ; Verify vert | À classer (demande du 18/11) |
 
-567 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
+569 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment

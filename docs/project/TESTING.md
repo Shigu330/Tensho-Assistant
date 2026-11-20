@@ -2209,7 +2209,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1558) Dédale bestial, page Dresseur › Équipe, sur un plateau où l'équipe a moins de places que de faiblesses : la faiblesse de l'ennemi le plus fort de chaque combat (le gardien d'abord) est dans les 10 ; si une faiblesse est laissée, c'est celle de monstres plus faibles.
 
-- [ ] (0.1558) Dédale bestial, option « surligner les combos » cochée, une bête appelée : sur vos barres d'actions, la technique à faire avant la technique de la bête porte « 1 », celle d'après porte « 2 ».
+- [x] (0.1558) Dédale bestial, option « surligner les combos » cochée, une bête appelée : sur vos barres d'actions, la technique à faire avant la technique de la bête porte « 1 », celle d'après porte « 2 ».
 
 - [x] (0.1558) Page Dresseur, plateau 3 ou plus, une bête de rang bas : le texte dit « recommandé : … à …, à confirmer en jeu » ; aux plateaux 1 et 2, sans « à confirmer ».
 
@@ -2346,6 +2346,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1627) Survoler le nom d'un joueur dans la fenêtre de chat : son nom et son monde ; un membre du groupe ou un joueur proche : sa classe et son niveau aussi ; en mode capture : pas d'info-bulle
 
 - [ ] (0.1627) Survoler un lien d'objet : l'icône, le nom et la description de l'objet comme dans le jeu, puis l'aide du clic
+
+- [ ] (0.1629) Fenêtre de chat Tensho, Paramètres › Chat, mode capture coché : chaque nom devant un message est un code #XXXXX ; un clic droit sur un message écrit « Copier le nom #XXXXX », « Cacher #XXXXX », « Mettre #XXXXX en avant » (aucun vrai nom) ; « Copier le nom » copie bien le vrai nom ; avec « couleur propre des noms », les couleurs changent entre deux rechargements de Tensho, comme les codes
+
+- [ ] (0.1630) Recharger Tensho (ou relancer le jeu) avec la fenêtre de chat ouverte : « Chargement… » disparaît en moins de 3 s et les lignes apparaissent sans à-coup
+
+- [ ] (0.1638) Fenêtre de chat Tensho : clic sur la loupe au bout de la barre des onglets : une case « Chercher dans l'onglet… » s'ouvre ; taper un mot (essayer sans accent pour un mot qui en a) : seuls les messages qui le contiennent restent, avec leur nombre ; un nouveau message qui le contient s'ajoute ; re-clic sur la loupe : tous les messages reviennent
 
 **0.535 : interfaces** — à voir en jouant
 
