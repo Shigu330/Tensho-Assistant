@@ -522,8 +522,8 @@ internal sealed partial class MainWindow
     /// <summary>X-484 (0.1482, beyond the game): words kept or hidden in this tab.</summary>
     private void DrawChatTabWords(ChatTabSettings tab)
     {
-        TextSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300,260);
-        TextSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300,260);
+        ListSetting("ChatWindow.KeepWords","ChatWindow.KeepWordsTip",()=>tab.KeepWords,value=>{tab.KeepWords=value;ChatTabChanged(tab);},300);
+        ListSetting("ChatWindow.HideWords","ChatWindow.HideWordsTip",()=>tab.HideWords,value=>{tab.HideWords=value;ChatTabChanged(tab);},300);
         CheckSetting("ChatWindow.WordsMatchCase","ChatWindow.WordsMatchCaseTip",()=>tab.WordsMatchCase,value=>{tab.WordsMatchCase=value;ChatTabChanged(tab);});
         CheckSetting("ChatWindow.FoldRepeats","ChatWindow.FoldRepeatsTip",()=>tab.FoldRepeats,value=>{tab.FoldRepeats=value;ChatTabChanged(tab);});
     }
@@ -531,14 +531,39 @@ internal sealed partial class MainWindow
     /// <summary>X-484 (0.1482, beyond the game): players hidden from every tab, players whose name stands out.</summary>
     private void DrawChatPlayers(ChatSettings options)
     {
-        TextSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>
+        ListSetting("ChatWindow.HiddenPlayers","ChatWindow.HiddenPlayersTip",()=>options.HiddenPlayers,value=>{options.HiddenPlayers=value;RestartChatTabs(options);},600);
+        ListSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600);
+        ListSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600);
+    }
+
+    private void SetHiddenPlayers(ChatSettings options,string value)
+    {
+        options.HiddenPlayers=value;
+        RestartChatTabs(options);
+    }
+
+    private void RestartChatTabs(ChatSettings options)
+    {
+        foreach(var tab in ChatTabs(options))ChatMessages.Restart(tab);
+        chatSettingsPending=true;
+    }
+
+    /// <summary>X-508 (0.1566): the menu of a message, for its sender: hide this player, put them forward (or no longer).</summary>
+    private void DrawChatSenderMenu(ChatSettings options,ChatRecord said)
+    {
+        var player=ChatTextFilter.PlayerName(said.Sender);
+        if(player.Length==0)return;
+        ImGui.Separator();
+        if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",player)) && ChatTextFilter.Add(options.HiddenPlayers,player,600) is { } hidden)
+            SetHiddenPlayers(options,hidden);
+        if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
         {
-            options.HiddenPlayers=value;
-            foreach(var tab in ChatTabs(options))ChatMessages.Restart(tab);
-            chatSettingsPending=true;
-        },600,300);
-        TextSetting("ChatWindow.HighlightedPlayers","ChatWindow.HighlightedPlayersTip",()=>options.HighlightedPlayers,value=>{options.HighlightedPlayers=value;chatSettingsPending=true;},600,300);
-        TextSetting("ChatWindow.AlertWords","ChatWindow.AlertWordsTip",()=>options.AlertWords,value=>{options.AlertWords=value;chatSettingsPending=true;},600,300);
+            if(ImGui.Selectable(localization.Format("ChatWindow.MenuUnhighlightPlayer",player))){options.HighlightedPlayers=ChatTextFilter.Remove(options.HighlightedPlayers,player);chatSettingsPending=true;}
+        }
+        else if(ImGui.Selectable(localization.Format("ChatWindow.MenuHighlightPlayer",player)) && ChatTextFilter.Add(options.HighlightedPlayers,player,600) is { } shown)
+        {
+            options.HighlightedPlayers=shown;chatSettingsPending=true;
+        }
     }
 
     /// <summary>X-476 (0.1481): a new tab with what people say, from the settings or from the « + » at the end of the window's tabs.</summary>
@@ -913,6 +938,7 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyLine")))ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort,ChatLinkName));
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
                             ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName));
+                        DrawChatSenderMenu(options,said);
                     }
                     finally{ImGui.EndPopup();}
                 }

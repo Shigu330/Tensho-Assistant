@@ -70,7 +70,7 @@ internal static class SettingsReview1498Tests
         }),
         ("Settings review 1498 M6: no setting is drawn by two categories; every map category ends with FinishMapSettings, every chat one saves",() =>
         {
-            var places=SettingsTabs999Tests.Walk().SelectMany(step=>Regex.Matches(step.Body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*""([\w.]+)""")
+            var places=SettingsTabs999Tests.Walk().SelectMany(step=>Regex.Matches(step.Body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|ListSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*""([\w.]+)""")
                 .Select(match=>(Key:match.Groups[1].Value,Place:step.Tab+"/"+step.Category))).GroupBy(row=>row.Key)
                 .Where(group=>group.Select(row=>row.Place).Distinct().Count()>1).Select(group=>group.Key+": "+string.Join(", ",group.Select(row=>row.Place).Distinct())).ToArray();
             Check(places.Length==0,"a setting in two categories: "+string.Join(" ; ",places));

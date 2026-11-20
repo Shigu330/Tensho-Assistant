@@ -38,7 +38,7 @@ internal static class ChatAlerts1520Tests
         ("Chat alerts 1520: the settings and the window use the alert words", () =>
         {
             var code = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(code.Contains("TextSetting(\"ChatWindow.AlertWords\"") && code.Contains("chatAlertWords=ChatTextFilter.Words(options.AlertWords);")
+            Check(code.Contains("ListSetting(\"ChatWindow.AlertWords\"") && code.Contains("chatAlertWords=ChatTextFilter.Words(options.AlertWords);")
                   && code.Contains("ChatAlert.Holds(record,chatAlertWords)") && code.Contains("ChatAlert.Mark(ChatFormat.TabLabel("), "setting, band and tab mark");
         }),
     ];

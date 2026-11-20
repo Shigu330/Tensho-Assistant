@@ -310,7 +310,7 @@ def version_problems(release):
 SOURCE = ROOT / "src/TenshoAssistant"
 CONFIGURATION = SOURCE / "Configuration.cs"
 SETTINGS_INDEX = SOURCE / "SettingsIndex.cs"
-CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
+CONTROL = re.compile(r'\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|TextSetting|ListSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*"([\w.]+)"\s*,\s*"([\w.]+)"')
 SETTING_BOX = re.compile(r'\bSettingBox\(\s*"([\w.]+)"\s*,\s*([\w.]+)\s*,')
 PROPERTY = re.compile(r"public\s+(?:required\s+)?([\w.<>?,\[\] ]+?)\s+(\w+)\s*\{\s*get\s*(;\s*(?:set|init);\s*\}(?:\s*=\s*([^;\n]+);)?|=>[^{}]*\})")
 # A property with get=>/set=> accessors reads a backing field (« ref field » or « =>field »), whose initializer is the default.

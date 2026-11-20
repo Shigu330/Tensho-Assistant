@@ -57,9 +57,9 @@ internal static class SettingFocus1497Tests
         ("Setting focus 1497: every row the search can find reports itself, every fold on the way opens, the page asks and gives up",() =>
         {
             var row=Read("src/TenshoAssistant/UI/Components/SettingRow.cs");
-            foreach(var component in new[]{"BoolSetting","TextSetting","CheckSetting","SettingButton","ComboSetting<T>","IntSetting","SliderSetting"})
+            foreach(var component in new[]{"BoolSetting","TextSetting","ListSetting","CheckSetting","SettingButton","ComboSetting<T>","IntSetting","SliderSetting"})
             {
-                var start=row.IndexOf("private "+(component is "TextSetting" or "CheckSetting" or "SettingButton" ? "bool ":"void ")+component+"(",StringComparison.Ordinal);
+                var start=row.IndexOf("private "+(component is "TextSetting" or "ListSetting" or "CheckSetting" or "SettingButton" ? "bool ":"void ")+component+"(",StringComparison.Ordinal);
                 Check(start>=0,"component "+component);
                 var end=row.IndexOf("\n    }\n",start,StringComparison.Ordinal);
                 Check(row[start..end].Contains("ReachSetting(labelKey);",StringComparison.Ordinal),component+" reports its row (a second slider is checked below)");
@@ -80,10 +80,10 @@ internal static class SettingFocus1497Tests
         {
             var index=TenshoAssistant.SettingsIndex.Entries;
             Check(index.Length>=224 && index.All(entry=>TenshoAssistant.SettingsIndex.Categories.ContainsKey(entry.Key)),"every entry has its tab and its category");
-            var calls=SettingsTabs999Tests.Walk().SelectMany(step=>Regex.Matches(step.Body,@"\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*""([\w.]+)""")
+            var calls=SettingsTabs999Tests.Walk().SelectMany(step=>Regex.Matches(step.Body,@"\b(BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|ListSetting|CheckSetting|SettingButton)(?:<[^>()]*>)?\(\s*""([\w.]+)""")
                 .Select(match=>(Component:match.Groups[1].Value,Key:match.Groups[2].Value))).ToArray();
             foreach(var entry in index)Check(calls.Any(call=>call.Key==entry.Key),$"{entry.Key}: no row component draws it");
-            Check(calls.Select(call=>call.Component).Distinct().All(component=>new[]{"BoolSetting","IntSetting","SliderSetting","ComboSetting","SettingBox","TextSetting","CheckSetting","SettingButton"}.Contains(component)),"only components that report");
+            Check(calls.Select(call=>call.Component).Distinct().All(component=>new[]{"BoolSetting","IntSetting","SliderSetting","ComboSetting","SettingBox","TextSetting","ListSetting","CheckSetting","SettingButton"}.Contains(component)),"only components that report");
         }),
     ];
 }

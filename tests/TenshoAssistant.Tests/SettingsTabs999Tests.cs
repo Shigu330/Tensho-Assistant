@@ -41,7 +41,7 @@ internal static class SettingsTabs999Tests
     {
         var seen=new Dictionary<string,(string Tab,string Category)>();
         foreach(var (tab,category,_,body) in Walk())
-            foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,(tab,category));
+            foreach(Match key in Regex.Matches(body,@"\b(?:BoolSetting|IntSetting|SliderSetting|ComboSetting|SettingBox|TextSetting|ListSetting|CheckSetting|SettingButton)\(\s*""([\w.]+)"""))seen.TryAdd(key.Groups[1].Value,(tab,category));
         return seen;
     }
 

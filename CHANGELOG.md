@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1566.0
+- Plan global, X-508 : Réglages du chat : « Seulement avec » et « Cacher avec » (de chaque onglet), « Joueurs cachés », « Joueurs mis en avant » et « Mots d'alerte » s'affichent en lignes, une par joueur ou par mot, chacune avec un bouton pour la retirer, et une case « Ajouter… » (Entrée ou bouton ; plusieurs d'un coup avec des virgules ; un doublon n'est pas ajouté). Toujours enregistrées avec des virgules : les valeurs déjà enregistrées sont reprises ligne par ligne. Fenêtre de chat : le clic droit sur un message propose « Cacher <joueur> » et « Mettre <joueur> en avant » (ou « Ne plus mettre … en avant »). Les noms des filtres ne sont plus coupés depuis 0.1528 (X-560).
+- Pour les joueurs : réglages du chat : joueurs cachés, mis en avant et mots sont maintenant des listes, une ligne chacun, et un clic droit sur un message cache ou met en avant son auteur.
+- Tests : ChatLists1566Tests. Verify.ps1 (agent) : 3186/3186, 0 avertissement, 0 erreur ; DLL 0.1566.0.0. Non validé en jeu.
+### English
+- Chat settings: « Only with » and « Hide with » (of each tab), « Hidden players », « Highlighted players » and « Alert words » are shown as lines, one per player or word, each with a button to remove it, and an « Add… » box (Enter or the button; several at once with commas; a double is not added). Still saved with commas: the values saved before come back line by line. Chat window: a right click on a message offers « Hide <player> » and « Put <player> forward » (or « No longer put … forward »). Filter names are no longer cut since 0.1528 (X-560).
+- For players: Chat settings: hidden players, highlighted players and words are now lists, one line each, and a right click on a message hides or highlights its sender.
+
 ## 0.1565.0
 - Plan global, X-560, X-565 : Réglages du chat, onglets : en fenêtre étroite, chaque contrôle de la ligne d'un onglet (messages non lus, couleur du nom, retirer) passe à la ligne quand la largeur restante ne le tient pas, au lieu de sortir de la colonne et d'être coupé. Les grilles de cases du panneau (X-560, faites en 0.1528) ont maintenant leur test : colonnes selon la largeur, numéro de chaque linkshell gardé dans son nom.
 - Pour les joueurs : réglages du chat : la ligne de chaque onglet ne sort plus d'une fenêtre étroite.

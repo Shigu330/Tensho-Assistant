@@ -82,6 +82,43 @@ public static class ChatTextFilter
     }
 
     public static string Text(ChatRecord record)=>record.Sender+" "+string.Concat(record.Body.Select(segment=>segment.Text));
+
+    /// <summary>X-508 (0.1566): the player's name of a sender, without its world (« Ann Doe@World » gives « Ann Doe »); empty for none.</summary>
+    public static string PlayerName(string? sender)
+    {
+        if(string.IsNullOrWhiteSpace(sender))return "";
+        var at=sender.IndexOf('@');
+        return (at>0 ? sender[..at]:sender).Trim();
+    }
+
+    /// <summary>X-508 (0.1566): the list with one more line, still saved with commas (the values saved before are read line by line). The
+    /// entry may hold commas: each piece is a line. Null when nothing is added: empty, already there (capitals ignored), or the list would
+    /// go past its maximum length.</summary>
+    public static string? Add(string? list,string? entry,int maximum)
+    {
+        var lines=Words(list).ToList();
+        var added=false;
+        foreach(var word in Words(entry))
+        {
+            if(lines.Any(line=>string.Equals(line,word,StringComparison.OrdinalIgnoreCase)))continue;
+            lines.Add(word);added=true;
+        }
+        if(!added)return null;
+        var joined=string.Join(", ",lines);
+        return joined.Length<=maximum ? joined:null;
+    }
+
+    /// <summary>X-508 (0.1566): the list without its line at this index (an index out of the list leaves it as it is, written again).</summary>
+    public static string Remove(string? list,int index)
+    {
+        var lines=Words(list).ToList();
+        if(index>=0 && index<lines.Count)lines.RemoveAt(index);
+        return string.Join(", ",lines);
+    }
+
+    /// <summary>X-508 (0.1566): the list without this line (capitals ignored).</summary>
+    public static string Remove(string? list,string word)
+        =>string.Join(", ",Words(list).Where(line=>!string.Equals(line,word.Trim(),StringComparison.OrdinalIgnoreCase)));
 }
 
 /// <summary>X-484 (0.1520, beyond the game): the alert words: a message holding one stands out and marks its tab until seen. Pure (tests).</summary>

@@ -38,6 +38,63 @@ internal sealed partial class MainWindow
         return changed;
     }
 
+    /// <summary>
+    /// X-508 (0.1566, the user's remark of 16/11: one box of text made a list look like one name): a list of players or words, one line each with
+    /// its « remove » button, and an « Add » box (Enter or the button). Still saved with commas (ChatTextFilter.Add, Remove), so the values
+    /// saved before are read line by line.
+    /// </summary>
+    private bool ListSetting(string labelKey,string tipKey,Func<string?> read,Action<string> write,int maximum)
+    {
+        var changed=false;
+        ImGui.TextUnformatted(localization.Get(labelKey));
+        ReachSetting(labelKey);
+        Tip(tipKey);
+        ImGui.PushID(labelKey);
+        try
+        {
+            ImGui.Indent();
+            var lines=Chat.ChatTextFilter.Words(read());
+            if(lines.Count==0)ImGui.TextDisabled(localization.Get("ChatWindow.ListEmpty"));
+            for(var index=0;index<lines.Count;index++)
+            {
+                ImGui.PushID(index);
+                try
+                {
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    bool removed;
+                    try{removed=ImGui.SmallButton(FontAwesomeIcon.Times.ToIconString()+"###ListRemove");}
+                    finally{ImGui.PopFont();}
+                    Tip("ChatWindow.ListRemoveTip");
+                    ImGui.SameLine();
+                    ImGui.TextWrapped(lines[index]);
+                    if(removed){write(Chat.ChatTextFilter.Remove(read(),index));changed=true;break;}
+                }
+                finally{ImGui.PopID();}
+            }
+            listSettingDrafts.TryGetValue(labelKey,out var draft);
+            draft??="";
+            ImGui.SetNextItemWidth(Math.Min(260,Math.Max(120,ImGui.GetContentRegionAvail().X-120)));
+            var enter=ImGui.InputTextWithHint("###ListDraft",localization.Get("ChatWindow.ListAddHint"),ref draft,120,ImGuiInputTextFlags.EnterReturnsTrue);
+            Tip("ChatWindow.ListAddTip");
+            listSettingDrafts[labelKey]=draft;
+            ImGui.SameLine();
+            var clicked=ImGui.SmallButton(localization.Get("ChatWindow.ListAdd"));
+            Tip("ChatWindow.ListAddTip");
+            if((enter || clicked) && draft.Trim().Length>0)
+            {
+                if(Chat.ChatTextFilter.Add(read(),draft,maximum) is { } added){write(added);changed=true;listSettingDrafts[labelKey]="";}
+                else listSettingDrafts[labelKey]=draft;
+                if(enter)ImGui.SetKeyboardFocusHere(-1);
+            }
+            ImGui.Unindent();
+        }
+        finally{ImGui.PopID();}
+        return changed;
+    }
+
+    /// <summary>X-508 (0.1566): the text being typed in each list's « Add » box, by the list's label key.</summary>
+    private readonly Dictionary<string,string> listSettingDrafts=[];
+
     /// <summary>X-503 M2: an on/off setting of something that is not a field of Configuration (a chat tab): no « ↺ », its default is the
     /// tab's own; the tooltip still names it.</summary>
     private bool CheckSetting(string labelKey,string tipKey,Func<bool> read,Action<bool> write)
