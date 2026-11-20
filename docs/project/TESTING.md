@@ -2215,6 +2215,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1562) Dédale bestial, onglet des plateaux ou panneau du combat : une action ennemie qui donne un bonus ou une barrière (Bonus de dégâts, Couvert, Pointes de glace) dit « confère : … », une qui donne Poison ou Glas dit « inflige : … ».
 
+- [ ] (0.1565) Réglages › Panneaux à côté › Onglets du chat, fenêtre réduite vers 760 pixels de large : la ligne de chaque onglet (nom, messages non lus, couleur, retirer) va à la ligne, rien n'est coupé ; les cases des canaux tiennent dans la fenêtre, une ou plusieurs colonnes selon la largeur, chaque linkshell avec son numéro
+
+- [ ] (0.1566) Réglages › Panneaux à côté › Joueurs du chat : « Joueurs cachés » montre une ligne par joueur ; taper deux noms séparés par une virgule puis Entrée ajoute deux lignes ; le bouton × d'une ligne la retire ; un nom déjà là n'est pas ajouté deux fois ; les noms enregistrés avant (avec des virgules) apparaissent chacun sur sa ligne
+
+- [ ] (0.1566) Fenêtre de chat Tensho : clic droit sur le message d'un joueur : « Cacher <nom> » fait disparaître ses messages de tous les onglets et l'ajoute aux joueurs cachés ; « Mettre <nom> en avant » colore son nom, puis le même menu propose « Ne plus mettre <nom> en avant »
+
+- [ ] (0.1567) Objets › un objet fabriqué (par exemple un lingot) › onglet des recettes › ligne « Outils liés » : « Recettes, simulation et macros d'artisanat » ouvre la page de simulation d'artisanat sur la recette de cet objet ; pour un objet sans recette (un minerai brut), le bouton n'est pas dans la ligne
+
+- [ ] (0.1568) Objets › Fibre alchimique › « Comment l'obtenir » : une ligne « Explorations en aéronef » (deux secteurs) et une ligne « Explorations en sous-marin » (secteurs avec leur mer), la source en gris dessous, et plus « Aucune source connue » ; un objet sans aucune source garde « Aucune source connue »
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

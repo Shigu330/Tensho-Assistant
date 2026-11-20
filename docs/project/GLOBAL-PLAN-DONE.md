@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (607 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (615 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -602,6 +602,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-503 | Review  (review 0.1482, 16/11), minor M1, M2, M3: M1 in… | Done in 0.1486.0 |
 | X-504 | Review  (review 0.1486, 16/11), minor M1, M2: M1 in… | Done in 0.1489 |
 | X-506 | Bug seen on 11/16 around 9:30 am (user screenshot next to the game chat, and… | Done in 0.1487 |
+| X-508 | User remark of 11/16 around 10:15 am (screenshot of the chat settings panel… | Done in 0.1566 |
 | X-509 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I1: finding in… | Done in 0.1491 |
 | X-510 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), I2: finding in… | Done in 0.1491.0 |
 | X-511 | Review of block 0.1487 to 0.1490 (review 0.1490, 16/11), minor M1, M2, M3: M1… | Done in 0.1491.0 |
@@ -630,15 +631,18 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-542 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), I1: finding in agent… | Done in 0.1514 |
 | X-543 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), minor M1, M2, M3, M4… | Done in 0.1514 |
 | X-544 | Tool: the state.py quota verdict (and the start hook) says « BELOW: one relay a… | Done in 0.1514 |
+| X-545 | User request of 17/11 around 10:00 (chat settings capture, channel boxes): «… | Done in 0.1517 |
 | X-546 | Review  (review 0.1515, 17/11), I1: finding in q.py (agent file) :299 (French… | Done in 0.1516.0 |
 | X-547 | Review  (review 0.1515, 17/11), minor M1, M2, M3, M4: M1 in q.py (agent file)… | Done in 0.1516.0 |
 | X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
 | X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
 | X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
+| X-560 | Bug seen by the user on 17/11 around 12:20 (capture of the chat settings… | Done in 0.1565 |
 | X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
 | X-562 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), minor M1, M2, M3, M4… | Done in 0.1531 |
 | X-563 | Review of block 0.1527 to 0.1534 (review 0.1534, 17/11), minor M1, M2, M3: M1… | Done in 0.1535 |
+| X-565 | Chat tab settings in a narrow window: each tab's line (name, unread messages… | Done in 0.1565 |
 | X-566 | Audit of 17/11 (master's report, part A, items 1 to 3): three places of the… | Done in 0.1538.0 |
 | X-567 | Audit of 17/11 (master's report, part B): four errors players see: FAQ « the… | Done in 0.1538 |
 | X-570 | Audit of 17/11 (master's report, part A, items 4 to 10): cleanup and robustness… | Done in 0.1539 |
@@ -664,10 +668,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-596 | Method audit of 18/11, cycle and truth: M01, M17, M23 (with X-585 M7), M20… | Done in 0.1550 |
 | X-597 | Method audit of 18/11: six rule changes confirmed by the user on 18/11 (R28.6)… | Done in 0.1550 |
 | X-598 | Quota verdict: the Fable line says « Fable relays allowed » from Fable's own… | Done in 0.1550 |
+| X-599 | Dead button (reported by the user on 18/11, screenshot): in the item sheet's… | Done in 0.1567 |
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
+| X-610 | Bug seen by the user on 19/11 around 23:15 (item card capture, kept off the… | Done in 0.1568 |
 | X-611 | Tool (defect seen by the user on 19/11 around 23:30): the per-model statistics… | Done in 0.1554 |
 | X-612 | Tool, user request of 19/11 around 23:40 (« take as many stats as possible for… | Done in 0.1557 |
 | X-613 | Tool, user request of 19/11 around 23:45 (« for GPT find a way for you to see… | Done in 0.1562 |
+| X-614 | Tool, idea I-045 (Anthropic post « Solving code review at Anthropic », read… | Done in 0.1564 |
+| X-615 | Tool, idea I-046 (Anthropic post « Solving code review at Anthropic », read… | Done in 0.1564 |
 | X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
 | X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 | X-619 | Review  (review 0.1557, 20/11), minor M1, M2, M3: M1 in… | Done in 0.1560 |
@@ -680,7 +688,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (607 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (615 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1280,6 +1288,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-503 | Relecture  (relecture 0.1482, 16/11), mineurs M1, M2, M3 : M1 : Les marges… | Fait en 0.1486.0 |
 | X-504 | Relecture  (relecture 0.1486, 16/11), mineurs M1, M2 : M1 : X-502 : le contour… | Fait en 0.1489 |
 | X-506 | Bug vu le 16/11 vers 9 h 30 (capture de l'utilisateur côte à côte avec le chat… | Fait en 0.1487 |
+| X-508 | Remarque de l'utilisateur du 16/11 vers 10 h 15 (capture du panneau des… | Fait en 0.1566 |
 | X-509 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I1 : X-506 : la… | Fait en 0.1491 |
 | X-510 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), I2 : X-505… | Fait en 0.1491.0 |
 | X-511 | Relecture du bloc 0.1487 à 0.1490 (relecture 0.1490, 16/11), mineurs M1, M2, M3… | Fait en 0.1491.0 |
@@ -1308,15 +1317,18 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-542 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), I1 : X-536… | Fait en 0.1514 |
 | X-543 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), mineurs M1, M2… | Fait en 0.1514 |
 | X-544 | Outil : le verdict de state.py quota (et le relevé du hook de démarrage) dit «… | Fait en 0.1514 |
+| X-545 | Demande de l'utilisateur du 17/11 vers 10 h (capture des réglages du chat… | Fait en 0.1517 |
 | X-546 | Relecture  (relecture 0.1515, 17/11), I1 : X-542 : NOT_UNDERSTOOD laisse passer… | Fait en 0.1516.0 |
 | X-547 | Relecture  (relecture 0.1515, 17/11), mineurs M1, M2, M3, M4 : M1 : X-542 : des… | Fait en 0.1516.0 |
 | X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
 | X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
 | X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
+| X-560 | Bug vu par l'utilisateur le 17/11 vers 12 h 20 (capture des « Réglages du chat… | Fait en 0.1565 |
 | X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
 | X-562 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), mineurs M1, M2… | Fait en 0.1531 |
 | X-563 | Relecture du bloc 0.1527 à 0.1534 (relecture 0.1534, 17/11), mineurs M1, M2, M3… | Fait en 0.1535 |
+| X-565 | Réglages des onglets du chat en fenêtre étroite : la ligne de chaque onglet… | Fait en 0.1565 |
 | X-566 | Audit du 17/11 (rapport de la maître, partie A, points 1 à 3) : trois endroits… | Fait en 0.1538.0 |
 | X-567 | Audit du 17/11 (rapport de la maître, partie B) : quatre erreurs que voient les… | Fait en 0.1538 |
 | X-570 | Audit du 17/11 (rapport de la maître, partie A, points 4 à 10) : nettoyage et… | Fait en 0.1539 |
@@ -1342,10 +1354,14 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-596 | Audit de méthode du 18/11, cycle et vérité : M01 (lance.py compte 8 versions… | Fait en 0.1550 |
 | X-597 | Audit de méthode du 18/11 : six changements de règles confirmés par… | Fait en 0.1550 |
 | X-598 | Verdict de quota : la ligne Fable dit « Fable relays allowed » en ne regardant… | Fait en 0.1550 |
+| X-599 | Bouton mort (signalé par l'utilisateur le 18/11, capture) : dans la fiche… | Fait en 0.1567 |
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
+| X-610 | Bug vu par l'utilisateur le 19/11 vers 23 h 15 (capture de la fiche d'objet… | Fait en 0.1568 |
 | X-611 | Outil (défaut vu par l'utilisateur le 19/11 vers 23 h 30) : les statistiques… | Fait en 0.1554 |
 | X-612 | Outil, demande de l'utilisateur du 19/11 vers 23 h 40 (« prendre un max de… | Fait en 0.1557 |
 | X-613 | Outil, demande de l'utilisateur du 19/11 vers 23 h 45 (« pour gpt il faudrait… | Fait en 0.1562 |
+| X-614 | Outil, idée I-045 (billet d'Anthropic « Solving code review at Anthropic », lu… | Fait en 0.1564 |
+| X-615 | Outil, idée I-046 (billet d'Anthropic « Solving code review at Anthropic », lu… | Fait en 0.1564 |
 | X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
 | X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
 | X-619 | Relecture  (relecture 0.1557, 20/11), mineurs M1, M2, M3 : M1 : X-618 M5 : une… | Fait en 0.1560 |
