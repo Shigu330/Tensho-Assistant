@@ -69,8 +69,10 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.MarginY` | int | 4 | Settings › Panels › ChatWindow | **Margins down** — Space between the window's top and bottom and its text, from 0 to 24 pixels. Default: 4 px. |
 | `Chat.MaxLines` | int | 2000 | Settings › Panels › ChatWindow | **Lines kept** — From 100 to 10,000, in memory only; the oldest go first. More lines use more memory. Default: 2,000. |
 | `Chat.MouseThrough` | bool | false | Settings › Panels › ChatWindow | **Clicks through the locked window** — While the window is locked, clicks and the mouse wheel go through it to the game behind, except on the tabs and their buttons, the links and « Bottom ». An open menu of the chat takes the clicks again; the lock button unlocks it. Default: off. |
+| `Chat.NameColors` | bool | false | Settings › Panels › ChatWindow | **A colour for each player's name** — Each player's name in a colour of its own, taken from the name itself: the same name always has the same colour. Nothing is kept about the player. A player put forward keeps the warning colour. Default: off. |
 | `Chat.Opacity` | int | DefaultOpacity | Settings › Panels › ChatWindow | **Background opacity** — Opacity of the window's background, from 0% (transparent) to 100%. Default: 15%. |
 | `Chat.Rounding` | int | 2 | Settings › Panels › ChatWindow | **Rounded corners** — How round the window's corners are, from 0 (square) to 16 pixels. Default: 2 px. |
+| `Chat.SenderBrackets` | bool | false | Settings › Panels › ChatWindow | **Players' names in brackets** — Writes [Name]: before a player's message, as WoW's chat addons do. Default: off. |
 | `Chat.ShowChannel` | bool | true | Settings › Panels › ChatWindow | **Show the channel** — Writes the channel's short name in front of what people say, such as [1] for linkshell 1. Default: on. |
 | `Chat.ShowSeconds` | bool | false | Settings › Panels › ChatWindow | **Show the seconds** — Adds the seconds to the time. Greyed while the time is not shown. Default: off. |
 | `Chat.ShowTimestamps` | bool | true | Settings › Panels › ChatWindow | **Show the time** — Writes the time of each message in front of it. Default: on. |
@@ -371,7 +373,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 315 controls (298 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 317 controls (300 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -446,8 +448,10 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.MarginY` | int | 4 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Marges en hauteur** — Espace entre le haut et le bas de la fenêtre et son texte, de 0 à 24 pixels. Par défaut : 4 px. |
 | `Chat.MaxLines` | int | 2000 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Lignes gardées** — De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire. Par défaut : 2 000. |
 | `Chat.MouseThrough` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Clics à travers la fenêtre verrouillée** — Quand la fenêtre est verrouillée, les clics et la molette passent au jeu derrière elle, sauf sur les onglets et leurs boutons, les liens et « En bas ». Un menu du chat ouvert reprend les clics ; le cadenas la déverrouille. Par défaut : désactivé. |
+| `Chat.NameColors` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Une couleur pour le nom de chaque joueur** — Le nom de chaque joueur dans une couleur à lui, tirée du nom lui-même : le même nom a toujours la même couleur. Rien n'est gardé sur le joueur. Un joueur mis en avant garde la couleur d'avertissement. Par défaut : désactivé. |
 | `Chat.Opacity` | int | DefaultOpacity | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Opacité du fond** — Opacité du fond de la fenêtre, de 0 % (transparent) à 100 %. Par défaut : 15 %. |
 | `Chat.Rounding` | int | 2 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Coins arrondis** — Arrondi des coins de la fenêtre, de 0 (carrés) à 16 pixels. Par défaut : 2 px. |
+| `Chat.SenderBrackets` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Noms des joueurs entre crochets** — Écrit [Nom] : avant le message d'un joueur, comme les addons de chat de WoW. Par défaut : désactivé. |
 | `Chat.ShowChannel` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher le canal** — Écrit le nom court du canal devant ce que disent les gens, comme [1] pour la linkshell 1. Par défaut : activé. |
 | `Chat.ShowSeconds` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les secondes** — Ajoute les secondes à l'heure. Grisé tant que l'heure n'est pas affichée. Par défaut : désactivé. |
 | `Chat.ShowTimestamps` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher l'heure** — Écrit l'heure de chaque message devant lui. Par défaut : activé. |
@@ -748,5 +752,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 315 cases (298 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 317 cases (300 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

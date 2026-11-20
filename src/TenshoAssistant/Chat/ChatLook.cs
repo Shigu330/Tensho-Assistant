@@ -63,6 +63,24 @@ public static class ChatLook
     public static bool Through(bool setting,bool locked,bool menuOpen,(float X,float Y) mouse,IReadOnlyList<(float X,float Y,float Width,float Height)> zones)
         =>setting && locked && !menuOpen && !zones.Any(zone=>Under(mouse,(zone.X,zone.Y),(zone.Width,zone.Height)));
 
+    /// <summary>X-447 B5 (0.1621): a player's name's own colour, taken from the name alone (case and spaces aside): a hue from a stable hash
+    /// (FNV-1a, the same on every PC and at every start), light enough to read on the window's dark background. Nothing is kept.</summary>
+    public static (float R,float G,float B) NameColour(string? name)
+    {
+        var key=(name ?? "").Trim().ToLowerInvariant();
+        var at=key.IndexOf('@');
+        if(at>0)key=key[..at];
+        var hash=2166136261u;
+        foreach(var letter in key){hash^=letter;hash*=16777619u;}
+        var hue=hash%360/60f;
+        const float value=0.95f,saturation=0.45f;
+        var chroma=value*saturation;
+        var x=chroma*(1-Math.Abs(hue%2-1));
+        var (r,g,b)=(int)hue switch{0=>(chroma,x,0f),1=>(x,chroma,0f),2=>(0f,chroma,x),3=>(0f,x,chroma),4=>(x,0f,chroma),_=>(chroma,0f,x)};
+        var m=value-chroma;
+        return (r+m,g+m,b+m);
+    }
+
     /// <summary>X-447 D8 (0.1620): whether the window is hidden now by the moments chosen (combat, cutscene, duty); it comes back by itself.</summary>
     public static bool HiddenNow(ChatSettings options,bool inCombat,bool inCutscene,bool inDuty)
         =>options.HideInCombat && inCombat || options.HideInCutscene && inCutscene || options.HideInDuty && inDuty;

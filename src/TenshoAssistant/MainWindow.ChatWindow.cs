@@ -254,6 +254,9 @@ internal sealed partial class MainWindow
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
         BoolSetting("ChatWindow.Channel","ChatWindow.ChannelTip",()=>configuration.Chat.ShowChannel,value=>configuration.Chat.ShowChannel=value,c=>c.Chat.ShowChannel);
+        // X-447 B5 (0.1621): the players' names in brackets, in a colour of their own.
+        BoolSetting("ChatWindow.SenderBrackets","ChatWindow.SenderBracketsTip",()=>configuration.Chat.SenderBrackets,value=>configuration.Chat.SenderBrackets=value,c=>c.Chat.SenderBrackets);
+        BoolSetting("ChatWindow.NameColors","ChatWindow.NameColorsTip",()=>configuration.Chat.NameColors,value=>configuration.Chat.NameColors=value,c=>c.Chat.NameColors);
         SliderSetting("ChatWindow.Opacity","ChatWindow.OpacityTip",()=>configuration.Chat.BoundedOpacity,value=>configuration.Chat.Opacity=value,0,100,defaults.Opacity,"%d %%");
         // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
         BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);
@@ -733,6 +736,20 @@ internal sealed partial class MainWindow
                 }
                 Tip("ChatWindow.ColorTip");
                 if(DefaultButton("ChatColor",options.Colors?.ContainsKey(channel)==true)){options.Colors?.Remove(channel);chatSettingsPending=true;}
+                // X-447 B4 (0.1621): the channel's short name, for the channels whose messages show it.
+                if(ChatChannels.Spoken(channel))
+                {
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(70*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale);
+                    var shortName=options.ChannelNames?.GetValueOrDefault(channel) ?? "";
+                    if(ImGui.InputTextWithHint("###ChatChannelName",ChatChannelShort(channel),ref shortName,ChatSettings.MaximumChannelName))
+                    {
+                        options.ChannelNames??=[];
+                        if(shortName.Trim().Length==0)options.ChannelNames.Remove(channel);else options.ChannelNames[channel]=shortName;
+                        chatSettingsPending=true;
+                    }
+                    Tip("ChatWindow.ChannelNameTip");
+                }
             }
             finally{ImGui.PopID();}
         }
@@ -1233,7 +1250,7 @@ internal sealed partial class MainWindow
                 else
                 {
                     if(options.TextOutline)ChatOutline(run.Text);
-                    ImGui.TextColored(run.Role==ChatRole.Timestamp ? Muted:run.Role==ChatRole.Sender && ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:color,run.Text);
+                    ImGui.TextColored(ChatRunColour(run,record,color,options),run.Text);
                     if(!chatLinesBlocked && run.Link is { Kind:ChatSegmentKind.DalamudLink })TipText(localization.Get("ChatWindow.DalamudLinkGameTip"));
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
@@ -1254,6 +1271,17 @@ internal sealed partial class MainWindow
     }
 
     private string ChatRepeatsTip(int times)=>localization.Format("ChatWindow.RepeatsTip",times);
+
+    /// <summary>A run's colour: the time muted, a player put forward in the warning colour, X-447 B5 (0.1621) a player's name in its own colour
+    /// when chosen (spoken channels), else the channel's colour.</summary>
+    private Vector4 ChatRunColour(ChatRun run,ChatRecord record,Vector4 color,ChatSettings options)
+    {
+        if(run.Role==ChatRole.Timestamp)return Muted;
+        if(run.Role!=ChatRole.Sender)return color;
+        if(!options.NameColors || !ChatChannels.Spoken(record.Channel))return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:color;
+        var (r,g,b)=ChatLook.NameColour(record.Sender);
+        return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:new Vector4(r,g,b,color.W);
+    }
 
     /// <summary>X-476 (0.1481, X-447 A3): the dark outline of the text about to be drawn at the cursor, as the game's chat.</summary>
     private static void ChatOutline(string text)

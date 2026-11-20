@@ -55,7 +55,14 @@ public static class ChatFormat
     /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
     /// for good; it is laid out again once they are.</summary>
     public static string LayoutKey(ChatSettings settings,string names="")
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}|{names}";
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}|{ChannelNamesKey(settings)}|{names}";
+
+    /// <summary>X-447 B4 (0.1621): the channels' short names chosen, in the layout's key (a name changed lays the lines out again).</summary>
+    public static string ChannelNamesKey(ChatSettings settings)
+        =>settings.ChannelNames is { Count:>0 } names ? string.Join(",",names.OrderBy(pair=>pair.Key).Select(pair=>$"{(int)pair.Key}={pair.Value}")):"";
+
+    /// <summary>X-447 B5 (0.1621): a sender as written before the text: in brackets when chosen.</summary>
+    public static string Sender(string sender,ChatSettings settings)=>settings.SenderBrackets ? $"[{sender}]":sender;
 
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
@@ -84,7 +91,8 @@ public static class ChatFormat
         // X-476 (0.1481): in brackets, as the game's chat ([22:47]).
         if(settings.ShowTimestamps)runs.Add(new($"[{Time(record.Time,settings)}] ",ChatRole.Timestamp));
         var spoken=ChatChannels.Spoken(record.Channel);
-        if(settings.ShowChannel && spoken && shortName(record.Channel) is { Length:>0 } channel)runs.Add(new($"[{channel}] ",ChatRole.Channel));
+        // X-447 B4 (0.1621): the short name chosen for the channel, else the game's.
+        if(settings.ShowChannel && spoken && (settings.ShortNameOf(record.Channel) ?? shortName(record.Channel)) is { Length:>0 } channel)runs.Add(new($"[{channel}] ",ChatRole.Channel));
         // X-510 (review of 0.1490): with the game's look, the links that have the game's arrow (its glyph, or the arrow written for it); the
         // others get the underline (ChatRun.Underlined). Made once per layout, not per frame.
         HashSet<ChatLink>? arrowed=null;
@@ -96,7 +104,11 @@ public static class ChatFormat
         // A custom emote (kind 28) has its author apart from its text; a standard emote (29) already names them.
         if(record.Kind==28 && sender.Length>0)runs.Add(new($"{sender} ",ChatRole.Sender));
         else if(sender.Length>0 && (spoken || record.Channel is ChatChannel.Npc))
-            runs.Add(new(record.Channel switch{ChatChannel.TellOut=>$">> {sender}: ",ChatChannel.TellIn=>$"{sender} >> ",_=>$"{sender}: "},ChatRole.Sender));
+        {
+            // X-447 B5 (0.1621): a player's name in brackets when chosen (a character of the game's story keeps its name as it is).
+            var named=spoken ? Sender(sender,settings):sender;
+            runs.Add(new(record.Channel switch{ChatChannel.TellOut=>$">> {named}: ",ChatChannel.TellIn=>$"{named} >> ",_=>$"{named}: "},ChatRole.Sender));
+        }
         foreach(var segment in record.Body)
         {
             // X-461 (0.1463): a link with no text of its own (ChatPieces keeps its place empty): the name of what it points to.

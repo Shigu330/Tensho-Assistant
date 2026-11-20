@@ -132,6 +132,19 @@ public sealed class ChatSettings
     /// <summary>X-464 (0.1466): 2, the Battle and Event tabs count no unread line; the General tab saved before 0.1458 leaves the NPC dialogue to Event.</summary>
     public const int CurrentTabs=2;
     public Dictionary<ChatChannel,uint>? Colors{get;set;}
+    /// <summary>X-447 B4 (0.1621): a short name chosen per channel, shown in brackets before its messages instead of the game's own short name;
+    /// empty or absent: the game's.</summary>
+    public Dictionary<ChatChannel,string>? ChannelNames{get;set;}
+    public const int MaximumChannelName=8;
+    /// <summary>X-447 B4: the short name chosen for a channel, cleaned and bounded; null when none is chosen.</summary>
+    public string? ShortNameOf(ChatChannel channel)
+        =>ChannelNames?.GetValueOrDefault(channel) is { } chosen && ChatFormat.Clean(chosen).Trim() is { Length:>0 } name
+            ? name.Length>MaximumChannelName ? name[..MaximumChannelName]:name:null;
+    /// <summary>X-447 B5 (0.1621): the players' names in brackets ([Name]: text), as WoW's chat addons write them.</summary>
+    public bool SenderBrackets{get;set;}
+    /// <summary>X-447 B5: each player's name in a colour of its own, taken from the name itself (the same name, the same colour; nothing is kept).
+    /// The class colour of WoW is not taken: the game shows a player's class only in the party or nearby (R04).</summary>
+    public bool NameColors{get;set;}
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);
