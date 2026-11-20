@@ -29,13 +29,14 @@ internal static class ReviewFindings1613Tests
         ("Review findings 1613: M3, a reading that knows other numbers adds them and keeps the bonus and total",()=>
         {
             // The review's case: the kept result knows the bonus, their number and the total (3); the new one the lines, the HP left and the points (3).
-            var kept=Result(First,bonus:120,bonuses:2,total:1020);
-            var merged=BeastResults.Keep(kept,Result(First.AddSeconds(2),parts:new(300,400,100,100,0,77),points:[60,60]));
+            // X-667 M1 (0.1619): the bonus group comes whole from one reading (the points with their bonus), as the window's reading gives it.
+            var kept=Result(First,bonus:120,bonuses:2,total:1020,points:[60,60]);
+            var merged=BeastResults.Keep(kept,Result(First.AddSeconds(2),parts:new(300,400,100,100,0,77)));
             Check(merged is { Bonus:120, Bonuses:2, Total:1020, Parts.HpLeft:77 } && merged.BonusPoints!.SequenceEqual([60,60]) && merged.At==First,"every number known kept: "+merged);
             Check(BeastResults.Keep(merged,Result(First.AddSeconds(4),parts:new(300,400,100,100,0,null))) is null,"the HP left unknown again: nothing changes");
             Check(BeastResults.Keep(merged,Result(First.AddSeconds(4))) is null,"nothing known: nothing changes");
-            var changed=BeastResults.Keep(merged,Result(First.AddSeconds(5),bonus:180,bonuses:3,total:1080));
-            Check(changed is { Bonus:180, Total:1080, Parts.HpLeft:77 } && changed.BonusPoints!.SequenceEqual([60,60]),"changed numbers taken, the others kept");
+            var changed=BeastResults.Keep(merged,Result(First.AddSeconds(5),bonus:180,bonuses:3,total:1080,points:[60,60,60]));
+            Check(changed is { Bonus:180, Total:1080, Parts.HpLeft:77 } && changed.BonusPoints!.SequenceEqual([60,60,60]),"changed numbers taken, the others kept");
         }),
     ];
 }

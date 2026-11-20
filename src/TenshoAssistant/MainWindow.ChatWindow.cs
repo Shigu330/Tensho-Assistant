@@ -908,6 +908,8 @@ internal sealed partial class MainWindow
         if(ImGui.Button(localization.Get("ChatWindow.PlaceRead")))chatPlaceTyped=null;
         Tip("ChatWindow.PlaceReadTip");
         if(chatAt is not null && ChatLook.Outside(at.X,at.Y,size.X,size.Y,viewport.Size.X,viewport.Size.Y))ImGui.TextColored(Warning,localization.Get("ChatWindow.PlaceOutside"));
+        // X-667 M3 (0.1619): placed from outside (over the game's messages, or reduced), a place asked now is not kept.
+        if(chatFollowing||chatReduced)ImGui.TextColored(Warning,localization.Get("ChatWindow.PlaceFollowing"));
     }
 
     /// <summary>X-476 (0.1481): the chat's own settings, in a panel opened by the gear at the end of the tabs.</summary>

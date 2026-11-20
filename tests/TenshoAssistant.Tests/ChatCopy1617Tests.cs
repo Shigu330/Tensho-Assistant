@@ -6,7 +6,7 @@ internal static class ChatCopy1617Tests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}
     private static readonly DateTimeOffset At=new(2026,11,20,15,0,0,TimeSpan.Zero);
-    private static ChatRecord Say(long id,int seconds,string sender="Aya Rin@Moogle",string text="hello")=>new(id,At.AddSeconds(seconds),10,ChatChannel.Say,sender,[new ChatSegment(text)]);
+    private static ChatRecord Say(long id,int seconds,string sender="Ann Doe@Moogle",string text="hello")=>new(id,At.AddSeconds(seconds),10,ChatChannel.Say,sender,[new ChatSegment(text)]);
     private static string Read(string name)=>File.ReadAllText(Path.GetFullPath(Path.Combine("src","TenshoAssistant",name))).Replace("\r\n","\n");
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
@@ -20,20 +20,20 @@ internal static class ChatCopy1617Tests
         }),
         ("Chat copy 1617: E3, a player's name with their world, as the game writes it elsewhere",()=>
         {
-            Check(ChatCopy.Player("Aya Rin","Moogle")=="Aya Rin@Moogle" && ChatCopy.Player(" Aya Rin ","")=="Aya Rin" && ChatCopy.Player("Aya Rin",null)=="Aya Rin","name and world");
-            Check(ChatCopy.WorldOf("Aya Rin@Moogle")=="Moogle" && ChatCopy.WorldOf("Aya Rin")=="" && ChatCopy.WorldOf(null)=="" && ChatCopy.WorldOf("@x")=="","world after « @ »");
+            Check(ChatCopy.Player("Ann Doe","Moogle")=="Ann Doe@Moogle" && ChatCopy.Player(" Ann Doe ","")=="Ann Doe" && ChatCopy.Player("Ann Doe",null)=="Ann Doe","name and world");
+            Check(ChatCopy.WorldOf("Ann Doe@Moogle")=="Moogle" && ChatCopy.WorldOf("Ann Doe")=="" && ChatCopy.WorldOf(null)=="" && ChatCopy.WorldOf("@x")=="","world after « @ »");
         }),
         ("Chat copy 1617: E7, behaviour: a cleared tab drops its messages until then, keeps the later ones, and shows them again; another tab keeps them",()=>
         {
             var store=new ChatStore();
-            store.Add(At,10,"Aya Rin",[new ChatSegment("one")],1000);store.Add(At.AddSeconds(10),10,"Aya Rin",[new ChatSegment("two")],1000);
+            store.Add(At,10,"Ann Doe",[new ChatSegment("one")],1000);store.Add(At.AddSeconds(10),10,"Ann Doe",[new ChatSegment("two")],1000);
             var cleared=new ChatTabSettings{Name="A",Channels=[ChatChannel.Say],ClearedAt=At.AddSeconds(5)};
             var other=new ChatTabSettings{Name="B",Channels=[ChatChannel.Say]};
             var a=new ChatTabView();a.Refresh(store,cleared,1000);
             var b=new ChatTabView();b.Refresh(store,other,1000);
             Check(a.Count==1 && a.RecordAt(0).Time==At.AddSeconds(10),"the cleared tab: only the later message, "+a.Count);
             Check(b.Count==2,"the other tab keeps both");
-            store.Add(At.AddSeconds(20),10,"Aya Rin",[new ChatSegment("three")],1000);a.Refresh(store,cleared,1000);
+            store.Add(At.AddSeconds(20),10,"Ann Doe",[new ChatSegment("three")],1000);a.Refresh(store,cleared,1000);
             Check(a.Count==2,"a new message shows in the cleared tab");
             cleared.ClearedAt=null;
             var again=new ChatTabView();again.Refresh(store,cleared,1000);

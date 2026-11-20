@@ -12,6 +12,9 @@ using System.Text.RegularExpressions;
 //    frozen. A new such line fails until its amount is checked to be invented (docs/evidence/0.1604-gil-retainer-sales.md) and the count
 //    raised here.
 // Every file git tracks or would add is read (README, CONTRIBUTING, SECURITY, repo.json and the .json files included), binaries aside.
+// Narrower than the hashes of 0.1607 for short numbers, on purpose (X-667 M2, 0.1619): a value of fewer than five digits counts only with
+// « gil » less than 40 characters away. Alone, such a number is as often the game's own data (an item and its quantity in the tracked
+// game tables, written on one line) and says nothing of the user; beside gil it is an amount. Words and longer numbers are found anywhere.
 internal static class PrivateValues1607Tests
 {
     private static void Check(bool value,string message){if(!value)throw new Exception(message);}

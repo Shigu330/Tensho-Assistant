@@ -40,7 +40,7 @@ internal static class ChatWindowFrame1618Tests
             Check(chat.Contains("SliderSetting(\"ChatWindow.TextOpacity\",") && chat.Contains("DrawChatPlaceSettings();"),"settings");
             var panel=Read("PanelWindow.cs");
             Check(panel.Contains("ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, own.Rounding); framePushed++;") && panel.Contains("if (framePushed > 0) { ImGui.PopStyleVar(framePushed); framePushed = 0; }"),"pushed and popped");
-            Check(panel.Contains("if (placed || panel.Once is null) return;"),"a place asked once, not while placed from outside");
+            Check(panel.Contains("if (placed || once is not { } asked) return;"),"a place asked once, not while placed from outside (X-667 M3: dropped)");
         }),
     ];
 }

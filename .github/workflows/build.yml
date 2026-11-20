@@ -82,3 +82,36 @@ jobs:
           if ($manifest.InternalName -ne 'TenshoAssistant') { throw "internal name: $($manifest.InternalName)" }
           if (-not $manifest.IconUrl) { throw 'no IconUrl in the packaged manifest: the installed plugin would show no icon' }
           "Built $($manifest.AssemblyVersion), API level $($manifest.DalamudApiLevel)"
+
+  new-tool:
+    # X-667 M5 (0.1619): the skeleton of scripts/New-Tool.ps1 passes Verify as it is: two pages (one alone, one tab of a family) added to
+    # this checkout, then the whole Verify (build, every test, languages, package). Names other than NewTool1615Tests' own, which it adds
+    # again on a copy of the files (a page already there is refused).
+    name: New tool skeleton passes Verify
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          $hooks = Join-Path $env:APPDATA 'XIVLauncher\addon\Hooks\dev'
+          ./scripts/Get-Dalamud.ps1 -Destination $hooks
+          "DALAMUD_HOME=$hooks" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Add two skeleton pages
+        shell: pwsh
+        run: |
+          ./scripts/New-Tool.ps1 -Name CiNotes -Category Objects -LabelEn "CI notes" -LabelFr "Notes de la CI"
+          ./scripts/New-Tool.ps1 -Name CiGatherTab -Category Production -Parent Gathering -LabelEn "CI tab" -LabelFr "Onglet de la CI"
+
+      - name: Verify with the skeletons
+        shell: pwsh
+        run: ./scripts/Verify.ps1 -Force -DotNet dotnet

@@ -102,18 +102,25 @@ public static class BeastResults
     /// bonuses' points) taken from the new reading when it knows it, else kept from the first; null when nothing changes.
     /// X-665 M3 (0.1613, review of 0.1612): numbers compared one by one, no longer their count: a reading that knows as many numbers but
     /// other ones (the lines, not the bonus and total) no longer loses those the first reading had.
+    /// X-667 M1 (0.1619, review of 0.1618): the bonus, the number of bonuses, the total and each bonus's points are one group, kept only when
+    /// they add up (<see cref="Parse(IReadOnlyDictionary{int, long}, IReadOnlyList{Beast}, DateTimeOffset)"/>): taken whole from the new
+    /// reading when it knows them, else whole from the first, never mixed (a mix no longer adds up: never a wrong total, R08).
     /// </summary>
     public static BoardResult? Keep(BoardResult? kept, BoardResult read)
     {
         if (kept is null || !Same(kept, read)) return read;
         var parts = read.Parts is null ? kept.Parts : read.Parts with { HpLeft = read.Parts.HpLeft ?? kept.Parts?.HpLeft };
+        var bonus = KnowsBonus(read) ? read : kept;
         var merged = kept with
         {
-            Bonus = read.Bonus ?? kept.Bonus, Bonuses = read.Bonuses ?? kept.Bonuses, Total = read.Total ?? kept.Total,
-            Parts = parts, BonusPoints = read.BonusPoints ?? kept.BonusPoints,
+            Bonus = bonus.Bonus, Bonuses = bonus.Bonuses, Total = bonus.Total, BonusPoints = bonus.BonusPoints, Parts = parts,
         };
         return Shown(kept, merged) ? null : merged;
     }
+
+    /// <summary>X-667 M1 (0.1619): a reading knows the bonus group when any of its numbers is known.</summary>
+    private static bool KnowsBonus(BoardResult result)
+        => result.Bonus is not null || result.Bonuses is not null || result.Total is not null || result.BonusPoints is not null;
 
     /// <summary>X-590 A06: the numbers the page shows beside the score and the beasts are the same.</summary>
     private static bool Shown(BoardResult left, BoardResult right)

@@ -6454,6 +6454,7 @@
     "PlaceRead": "Lire la place de la fenêtre",
     "PlaceReadTip": "Remplit les nombres avec la place et la taille actuelles de la fenêtre.",
     "PlaceOutside": "Une partie de la fenêtre sort de l'écran : « Ramener au centre » la remet.",
+    "PlaceFollowing": "La fenêtre suit les messages du jeu en ce moment : une place demandée ici n'est pas gardée.",
     "MaxLines": "Lignes gardées",
     "MaxLinesTip": "De 100 à 10 000, en mémoire seulement ; les plus anciennes partent d'abord. Plus de lignes prennent plus de mémoire.\nPar défaut : 2 000.",
     "KeepHistory": "Garder l'historique du chat sur ce PC",

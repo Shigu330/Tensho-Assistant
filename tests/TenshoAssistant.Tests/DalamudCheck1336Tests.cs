@@ -58,7 +58,7 @@ internal static class DalamudCheck1336Tests
         ("Dalamud check 1336: every workflow download goes through the check",() =>
         {
             var build=Read(".github/workflows/build.yml");var codeql=Read(".github/workflows/CodeQL.yml");
-            Check(build.Split("./scripts/Get-Dalamud.ps1 -Destination").Length==3,"the two build jobs");
+            Check(build.Split("./scripts/Get-Dalamud.ps1 -Destination").Length==4,"the three build jobs (X-667 M5, 0.1619: the job new-tool)");
             Check(codeql.Contains("./scripts/Get-Dalamud.ps1 -Destination \"$HOME/.xlcore/dalamud/Hooks/dev\""),"CodeQL");
             foreach(var (name,text) in new[]{("build.yml",build),("CodeQL.yml",codeql)})
                 Check(!text.Contains("dalamud-distrib/latest.zip",StringComparison.Ordinal),"no download left unchecked in "+name);

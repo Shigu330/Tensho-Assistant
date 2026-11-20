@@ -111,15 +111,16 @@ internal sealed class PanelWindow : Window
         if (beforeSize.X > 0 && beforeSize.Y > 0) ImGui.SetNextWindowSize(beforeSize, ImGuiCond.Always);
     }
 
-    /// <summary>X-447 D7 (0.1618): a place and size asked once (typed in the settings, or the window brought back to the screen's centre);
-    /// not while the window is placed from outside.</summary>
+    /// <summary>X-447 D7 (0.1618): a place and size asked once (typed in the settings, or the window brought back to the screen's centre).
+    /// X-667 M3 (0.1619, review of 0.1618): asked while the window is placed from outside, it is taken and dropped, never kept for later (a
+    /// jump hours after); the chat's settings say so.</summary>
     private void PlaceOnce()
     {
-        if (placed || panel.Once is null) return;
+        if (panel.Once is null) return;
         PanelPlace? once;
         try { once = panel.Once(); }
         catch (Exception error) { TurnOff(error); return; }
-        if (once is not { } asked) return;
+        if (placed || once is not { } asked) return;
         Position = null; Size = null;
         if (asked.At is { } at) ImGui.SetNextWindowPos(ImGui.GetMainViewport().Pos + at, ImGuiCond.Always);
         ImGui.SetNextWindowSize(asked.Size, ImGuiCond.Always);

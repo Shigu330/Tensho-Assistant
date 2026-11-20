@@ -6454,6 +6454,7 @@
     "PlaceRead": "Read the window's place",
     "PlaceReadTip": "Fills the numbers with the window's place and size now.",
     "PlaceOutside": "A part of the window is out of the screen: « Bring back to the centre » puts it back.",
+    "PlaceFollowing": "The window follows the game's messages now: a place asked here is not kept.",
     "MaxLines": "Lines kept",
     "MaxLinesTip": "From 100 to 10,000, in memory only; the oldest go first. More lines use more memory.\nDefault: 2,000.",
     "KeepHistory": "Keep the chat history on this PC",
