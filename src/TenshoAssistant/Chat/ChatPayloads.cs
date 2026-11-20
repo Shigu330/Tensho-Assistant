@@ -24,6 +24,9 @@ public static class ChatPayloads
             switch(payload.Kind)
             {
                 case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud when payload.Link is { } link:yield return new(null,link);break;
+                // X-635 (bench X-631, review of 0.1441, M1): a link whose target could not be read (MapLink null) ends a link still open: its
+                // text stays plain, never joined to the link before.
+                case ChatPayloadKind.Item or ChatPayloadKind.Quest or ChatPayloadKind.Map or ChatPayloadKind.Dalamud:yield return new(null,End:true);break;
                 case ChatPayloadKind.LinkEnd:yield return new(null,End:true);break;
                 case ChatPayloadKind.Text:yield return new(payload.Text);break;
                 // X-472 (0.1471): an icon of the game's font keeps its place, written readably (the world icon « @ »).

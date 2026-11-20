@@ -16,6 +16,7 @@ public sealed class ChatFilterTable
     public const byte Discussion=1,Announcements=2,FirstCombat=4,LastCombat=14;
     public const byte GeneralTab=1,BattleTab=2,EventTab=4;
     public IReadOnlyList<ChatFilterRow> Rows{get;}
+    private IReadOnlyList<((int Kind,bool ToSubject) Genre,IReadOnlyList<ChatFilterRow> Rows)>? genres;
 
     public ChatFilterTable(IEnumerable<ChatFilterRow> rows)
         =>Rows=rows.Where(row=>row.Kind>0 && row.Category>0 && row.Name.Length>0).OrderBy(row=>row.Category).ThenBy(row=>row.Order).ThenBy(row=>row.Id).ToList();
@@ -40,8 +41,9 @@ public sealed class ChatFilterTable
 
     /// <summary>X-484 (0.1518): the combat filters grouped by kind of line across every subject (« damage dealt »: by you, by your party
     /// members… by others' pets), in the game's order (the side done by the subject first, then the side done to it, each by kind).</summary>
+    /// <remarks>X-634 (bench X-631, review of 0.1520, M2): made once per table (the table does not change), not at each frame the tree is open.</remarks>
     public IReadOnlyList<((int Kind,bool ToSubject) Genre,IReadOnlyList<ChatFilterRow> Rows)> Genres()
-        =>Rows.Where(row=>IsCombat(row.Category)).GroupBy(row=>Genre(row)!.Value).OrderBy(group=>group.Key.ToSubject).ThenBy(group=>group.Min(row=>row.Order))
+        =>genres??=Rows.Where(row=>IsCombat(row.Category)).GroupBy(row=>Genre(row)!.Value).OrderBy(group=>group.Key.ToSubject).ThenBy(group=>group.Min(row=>row.Order))
             .ThenBy(group=>group.Key.Kind).Select(group=>(group.Key,(IReadOnlyList<ChatFilterRow>)group.ToList())).ToList();
 
     /// <summary>X-484 (0.1518): the localisation key of a kind of line (« ChatWindow.Genre41By », « ChatWindow.Genre41On »).</summary>

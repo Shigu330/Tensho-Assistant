@@ -32,7 +32,7 @@ internal static class ChatLinks1442Tests
             // 0.1468 (X-479): told apart by the reader (ChatPayload), made into a piece by ChatPayloads.
             Check(Read("Chat/ChatReader.Dalamud.cs").Contains("QuestPayload quest=>new(ChatPayloadKind.Quest,\"Quest\",Link:new ChatLink(ChatSegmentKind.QuestLink,QuestId:quest.Quest.RowId)),"),"quest read");
             var window = Read("MainWindow.ChatWindow.cs");
-            Check(window.Contains("if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}"),"quest: the Quests page");
+            Check(window.Contains("if(ChatLinkClicked(id)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}"),"quest: the Quests page");
             Check(window.Contains("ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup(\"###TenshoChatLine\");}")   /* 0.1472 (X-482 M2): not under the button */
                 && window.Contains("ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort,ChatLinkName));"),"a message's menu: copy");   // 0.1463 (X-461): with the links' names
             foreach(var lang in new[]{"en","fr"})

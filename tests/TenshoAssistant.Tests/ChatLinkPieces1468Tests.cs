@@ -146,8 +146,9 @@ internal static class ChatLinkPieces1468Tests
         }),
         ("Chat link pieces 1468: a raw payload or another payload is never a piece (0.1471, X-472: an icon is, written readably); the reader tells each payload apart (wiring)", () =>
         {
-            Check(!ChatPayloads.Pieces([new(ChatPayloadKind.Raw, "Raw", Size: 4), new(ChatPayloadKind.Other, "PlayerPayload"),
-                new(ChatPayloadKind.Map, "MapLink")]).Any(), "no piece (a map link that could not be read has no start)");
+            Check(!ChatPayloads.Pieces([new(ChatPayloadKind.Raw, "Raw", Size: 4), new(ChatPayloadKind.Other, "PlayerPayload")]).Any(), "no piece");
+            // X-635 (0.1580): a map link that could not be read has no start, and ends a link still open (ChatBench1580Tests).
+            Check(ChatPayloads.Pieces([new(ChatPayloadKind.Map, "MapLink")]).Single() is { Start: null, End: true }, "an unreadable map link: an end, no start");
             Check(ChatPayloads.Pieces([new(ChatPayloadKind.Icon, "IconPayload", Icon: 88)]).Single() == new ChatPiece("@"), "the world icon: « @ »");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatReader.Dalamud.cs"));
             Check(reader.Contains("ChatPayloads.Segments(payloads)", StringComparison.Ordinal) && reader.Contains("ChatPayloads.Describe(payloads)", StringComparison.Ordinal)

@@ -34,8 +34,11 @@ internal sealed partial class MainWindow
     }
     // X-484 (0.1482): the players whose name stands out, read once per frame.
     private IReadOnlyList<string> chatHighlighted=[];
-    // X-484 (0.1520): the alert words, read once per frame.
-    private IReadOnlyList<string> chatAlertWords=[];
+    // X-484 (0.1520): the alert words. X-634 (review of 0.1520, M2): looked once per message by the tab's view (ChatTabView.AlertAt).
+    private string? chatAlertWords;
+    // X-636 (bench X-631, review of 0.1441, M3): the link the left button was pressed on (it acts on the release over it, without a drag).
+    private string? chatLinkPressed;
+    private Vector2 chatLinkPressedAt;
     private ChatSettings ChatOptions=>configuration.Chat;
     // Saved once no control is active any more (tab names, channels, colours: several edits per frame while typing or picking).
     private bool chatSettingsPending;
@@ -672,7 +675,7 @@ internal sealed partial class MainWindow
         foreach(var tab in tabs)ChatMessages.ViewOf(tab).Refresh(ChatMessages,tab,options.BoundedMaxLines,table,options);
         if(developerMode)SlowFrames.Add(ImGui.GetFrameCount(),"Chat refresh",System.Diagnostics.Stopwatch.GetElapsedTime(refreshStarted).TotalMilliseconds);
         chatHighlighted=ChatTextFilter.Words(options.HighlightedPlayers);
-        chatAlertWords=ChatTextFilter.Words(options.AlertWords);
+        chatAlertWords=options.AlertWords;
         // X-467 (0.1504): reduced to its tabs, the lines are not drawn (never while it stands over the game's hidden messages).
         var reduced=chatReduced && !chatFollowing;
         if(options.TabsAtBottom && !reduced)DrawChatShownTab(tabs,options,-ImGui.GetFrameHeightWithSpacing());
@@ -879,7 +882,7 @@ internal sealed partial class MainWindow
                 if(view.LinesAt(index) is null)LayOutChatLine(view,index,options);
                 var row=view.RowOf(index);
                 if(row*height>end)break;
-                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options,view.RepeatsAt(index));
+                DrawChatRecord(view.RecordAt(index),view.LinesAt(index)!,top+row*height,height,options,view.RepeatsAt(index),view.AlertAt(index,chatAlertWords));
             }
             // X-457 (0.1462): the last line at the bottom of the window, from the rows laid out in this frame (the next frame declares them).
             view.RowsShown=view.RowCount;view.HeightShown=shown;
@@ -984,7 +987,7 @@ internal sealed partial class MainWindow
         _=>null,
     } is { Length:>0 } name ? name:localization.Get("ChatWindow.LinkNoName");
 
-    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options,int repeats=0)
+    private void DrawChatRecord(ChatRecord record,IReadOnlyList<IReadOnlyList<ChatRun>> lines,float y,float height,ChatSettings options,int repeats=0,bool alert=false)
     {
         var color=ChatColor(options.ColorOf(record.Channel));
         // X-505 (0.1488): the lines after the first indented, as laid out (LayOutChatLine).
@@ -992,7 +995,7 @@ internal sealed partial class MainWindow
         // X-484 (0.1519, the user's request of 17/11: the player put forward more visible): a band in the warning colour behind the whole message.
         // X-484 (0.1520): a message holding an alert word on a band in the accent colour (a player put forward keeps the warning colour).
         var put=ChatTextFilter.IsPlayer(record.Sender,chatHighlighted);
-        if(put || ChatAlert.Holds(record,chatAlertWords))
+        if(put || alert)
         {
             ImGui.SetCursorPosY(y);
             var top=ImGui.GetCursorScreenPos();
@@ -1076,6 +1079,18 @@ internal sealed partial class MainWindow
     /// the browser, copy), never the browser at once. 0.1456 (X-451): the tooltip and the menu say the site it leads to (its host as the browser
     /// reaches it) and warn when that name holds letters of other alphabets; the tooltip is made only under the mouse (X-453 M3).
     /// </summary>
+    /// <summary>X-636 (bench X-631, review of 0.1441, M3): a link acts on the left button's release over it, pressed on it, without a drag
+    /// (the chat window moves by its whole background: pressing a link to move it placed the flag or opened the item). Pure rule:
+    /// <see cref="TenshoAssistant.Chat.ChatLinkPress.Acts"/>.</summary>
+    private bool ChatLinkClicked(string id)
+    {
+        if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){chatLinkPressed=id;chatLinkPressedAt=ImGui.GetMousePos();}
+        if(!ImGui.IsMouseReleased(ImGuiMouseButton.Left))return false;
+        var acts=TenshoAssistant.Chat.ChatLinkPress.Acts(chatLinkPressed,id,ImGui.IsItemHovered(),TenshoAssistant.Chat.ChatLinkPress.Dragged(chatLinkPressedAt,ImGui.GetMousePos()));
+        if(chatLinkPressed==id)chatLinkPressed=null;
+        return acts;
+    }
+
     private void DrawChatLink(ChatRun run,ChatLink link,string id,ChatRecord record)
     {
         if(ChatOptions.TextOutline)ChatOutline(run.Text);
@@ -1098,8 +1113,8 @@ internal sealed partial class MainWindow
         if(link.Kind==ChatSegmentKind.DalamudLink)
         {
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(DalamudLinkFailed==link.Plugin ? localization.Format("ChatWindow.DalamudLinkFailedTip",link.Plugin):localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+            TipText(()=>DalamudLinkFailed==link.Plugin ? localization.Format("ChatWindow.DalamudLinkFailedTip",link.Plugin):localization.Format("ChatWindow.DalamudLinkTip",link.Plugin));
+            if(ChatLinkClicked(id))
             {
                 DalamudLinkFailed=null;
                 if(OpenDalamudLink?.Invoke(link.Plugin,link.CommandId,link.Data,run.Text)!=true)
@@ -1112,18 +1127,19 @@ internal sealed partial class MainWindow
         if(link.Kind==ChatSegmentKind.WebLink)
         {
             if(ImGui.IsItemHovered()){ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);TipText(WebLinkTip(link.Url));}
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Left) || ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowWeb=link.Url;ImGui.OpenPopup("###TenshoChatWeb");}
+            if(ChatLinkClicked(id) || ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowWeb=link.Url;ImGui.OpenPopup("###TenshoChatWeb");}
             return;
         }
         if(link.Kind==ChatSegmentKind.MapLink)
         {
             if(maps.State.Catalog?.Find(link.MapId) is not { } map || !Maps.MapCatalog.CoordinatesValid(link.X,link.Y)){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
             var coordinate=new Vector2(link.X,link.Y);
-            var place=$"{(link.Place.Length>0 ? link.Place:map.Zone)}  ({Maps.MapProjection.CoordinateText(coordinate)})";
+            // X-637 (bench X-631, review of 0.1441, M4): the place and its tooltip written only under the mouse or on a click, not at each frame.
+            string Place()=>$"{(link.Place.Length>0 ? link.Place:map.Zone)}  ({Maps.MapProjection.CoordinateText(coordinate)})";
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(localization.Format("ChatWindow.MapLinkTip",place));
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Left))OpenMapPointFromPage(map,link.X,link.Y);
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,place);ImGui.OpenPopup("###TenshoChatWindowPlace");}
+            TipText(()=>localization.Format("ChatWindow.MapLinkTip",Place()));
+            if(ChatLinkClicked(id))OpenMapPointFromPage(map,link.X,link.Y);
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,Place());ImGui.OpenPopup("###TenshoChatWindowPlace");}
             return;
         }
         if(link.Kind==ChatSegmentKind.QuestLink)
@@ -1131,14 +1147,15 @@ internal sealed partial class MainWindow
             // 0.1442: a quest link: left click opens it on Tensho's Quests page.
             if(quests.State.ById?.GetValueOrDefault(link.QuestId) is not { } quest){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(localization.Format("ChatWindow.QuestLinkTip",quest.Name));
-            if(ImGui.IsItemClicked(ImGuiMouseButton.Left)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
+            TipText(()=>localization.Format("ChatWindow.QuestLinkTip",quest.Name));
+            if(ChatLinkClicked(id)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
             return;
         }
         if(itemCatalog.State.Catalog?.Find(link.ItemId) is not { } item){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
         if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-        TipText(localization.Format("ChatWindow.ItemLinkTip",item.Name));
-        if(ImGui.IsItemClicked(ImGuiMouseButton.Left))
+        // X-638 (bench X-631, review of 0.1441, M5): a high-quality item link says so, as the game's link does.
+        TipText(()=>localization.Format(link.Hq ? "ChatWindow.ItemLinkTipHq":"ChatWindow.ItemLinkTip",item.Name));
+        if(ChatLinkClicked(id))
         {
             SelectItem(item.Id);
             if(RelevantRoutes(item.Id) is { Count:>0 } routes)OpenRoute(routes[0],item.Id);

@@ -6267,6 +6267,7 @@
     "CopyWeb": "Copy the address",
     "MapLinkTip": "{0}\nLeft click: place the flag there and open the map. Right click: Tensho's place menu (nearest aetheryte with its cost, Tensho map, weather).",
     "ItemLinkTip": "{0}\nLeft click: open it in Tensho. Right click: Tensho's item menu.",
+    "ItemLinkTipHq": "{0} (HQ)\nLeft click: open it in Tensho. Right click: Tensho's item menu.",
     "DalamudLinkTip": "This link of {0} does what it does in the game's chat.\nLeft click: open it. Right click: the message's menu (copy).",
     "DalamudLinkFailedTip": "{0} could not open this link (its error is in Dalamud's log). Left click: try again; or open it from the game's chat.",
     "DalamudLinkGameTip": "This link only works from the game's chat (the plugin that made it no longer answers): open it there.",

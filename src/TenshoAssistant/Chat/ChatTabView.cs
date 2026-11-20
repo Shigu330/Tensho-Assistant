@@ -16,6 +16,11 @@ public sealed class ChatTabView
     private readonly List<int> rowStarts=[];
     // X-484 (0.1519): how many times each message came again right after itself (tabs folding repeats), and when the last one came.
     private readonly List<int> repeats=[];
+    // X-634 (bench X-631, review of 0.1520, M2): whether each message holds an alert word, found once per message and list of words (null:
+    // not looked yet), not at each frame by the drawing.
+    private readonly List<bool?> alertMarks=[];
+    private string? alertKey;
+    private IReadOnlyList<string> alertWords=[];
     private DateTimeOffset lastSeen;
     private int rows;
     private bool rowsDirty;
@@ -49,20 +54,27 @@ public sealed class ChatTabView
             if(tab.FoldRepeats && records.Count>0 && ChatRepeat.Repeats(records[^1],lastSeen,record))
             {
                 repeats[^1]++;lastSeen=record.Time;changed=true;
+                // X-633 (bench X-631, review of 0.1520, M1): a repeat folded counts as the new message it is: unread, and an alert when it
+                // holds a word (before, a word said again within the minute left a tab already seen without « ! »).
+                Count(record);
                 continue;
             }
-            records.Add(record);lines.Add(null);repeats.Add(0);lastSeen=record.Time;
+            records.Add(record);lines.Add(null);repeats.Add(0);alertMarks.Add(null);lastSeen=record.Time;
             if(rowsDirty)rowStarts.Add(0);else{rowStarts.Add(rows);rows++;}
             layoutCursor=records.Count-1;
-            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
-            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
+            Count(record);
             changed=true;
         }
         started=true;
+        void Count(ChatRecord record)
+        {
+            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
+            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords)))Alerts++;
+        }
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
         {
-            records.RemoveRange(0,excess);lines.RemoveRange(0,excess);rowStarts.RemoveRange(0,excess);repeats.RemoveRange(0,excess);
+            records.RemoveRange(0,excess);lines.RemoveRange(0,excess);rowStarts.RemoveRange(0,excess);repeats.RemoveRange(0,excess);alertMarks.RemoveRange(0,excess);
             rowsDirty=true;layoutCursor=Math.Max(-1,layoutCursor-excess);
         }
         return changed;
@@ -74,6 +86,18 @@ public sealed class ChatTabView
     public ChatRecord RecordAt(int index)=>records[index];
     /// <summary>X-484 (0.1519): how many times the message at this place came again right after itself (0: never, or the tab does not fold).</summary>
     public int RepeatsAt(int index)=>repeats[index];
+
+    /// <summary>X-634 (bench X-631, review of 0.1520, M2): the message at this place holds one of <paramref name="words"/> (the setting's text,
+    /// one word per line): looked once per message, again for all only when the words change.</summary>
+    public bool AlertAt(int index,string? words)
+    {
+        if(!string.Equals(words,alertKey,StringComparison.Ordinal))
+        {
+            alertKey=words;alertWords=ChatTextFilter.Words(words);
+            for(var at=0;at<alertMarks.Count;at++)alertMarks[at]=null;
+        }
+        return alertMarks[index]??=ChatAlert.Holds(records[index],alertWords);
+    }
     public IReadOnlyList<IReadOnlyList<ChatRun>>? LinesAt(int index)=>lines[index];
 
     public bool LaidOutFor(float width,string key)=>Math.Abs(width-Width)<=0.5f && key==LayoutKey;
