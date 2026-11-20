@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (660 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (664 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -728,12 +728,16 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-655 | Bug seen by the user on 20/11 about 10:45 am (test T-0.1558-2, capture of the… | Done in 0.1599.0 |
 | X-656 | Review of block 0.1596 to 0.1598 (review 0.1598, 20/11), minor M1, M2: M1 in… | Done in 0.1600.0 |
 | X-657 | Bug seen by the user on 20/11 about 11:20 am (captures kept out of the repo)… | Done in 0.1601.0 |
+| X-658 | Bug reported by the user on 20/11 about 11:20 am (capture of the gil journal… | Done in 0.1604.0 |
+| X-659 | User request of 20/11 about noon (« why no report? »): X-654 (0.1602) made the… | Done in 0.1602.0 |
+| X-660 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), I1: finding in… | Done in 0.1603.0 |
+| X-661 | Review of block 0.1599 to 0.1602 (review 0.1602, 20/11), minor M1, M2: M1 in… | Done in 0.1605.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (660 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (664 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1459,3 +1463,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-655 | Bug vu par l'utilisateur le 20/11 vers 10 h 45 (essai T-0.1558-2, capture de la… | Fait en 0.1599.0 |
 | X-656 | Relecture du bloc 0.1596 à 0.1598 (relecture 0.1598, 20/11), mineurs M1, M2… | Fait en 0.1600.0 |
 | X-657 | Bug vu par l'utilisateur le 20/11 vers 11 h 20 (captures gardées hors du dépôt)… | Fait en 0.1601.0 |
+| X-658 | Bug signalé par l'utilisateur le 20/11 vers 11 h 20 (capture du journal des… | Fait en 0.1604.0 |
+| X-659 | Demande de l'utilisateur du 20/11 vers 12 h (« pourquoi pas de signaler ? »)… | Fait en 0.1602.0 |
+| X-660 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), I1 : Les… | Fait en 0.1603.0 |
+| X-661 | Relecture du bloc 0.1599 à 0.1602 (relecture 0.1602, 20/11), mineurs M1, M2… | Fait en 0.1605.0 |

@@ -2279,6 +2279,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1602) Sur un message repris de l'historique (après un redémarrage, historique activé) : les entrées qui demandent l'identifiant du joueur (Murmurer, carte, liste muette) sont grisées, sans erreur
 
+- [ ] (0.1603) Mode développeur, fenêtre de chat de Tensho ouverte : un joueur vous dit quelque chose (dire ou équipe), puis clic droit sur son message : Murmurer et Voir la carte de personnage ne sont pas grisés et agissent sur ce joueur ; dalamud.log porte « Chat window, a sender's identifiers: Given (kind …) » (si c'est « LineUnread » ou « Kind » à la place, les entrées restent grisées : le dire)
+
+- [ ] (0.1603) Envoyez un murmure à un joueur, puis clic droit sur votre ligne « >> » : Murmurer vise ce joueur (jamais vous-même) ou reste grisé ; journal : « Given » ou « Own », jamais d'erreur
+
+- [ ] (0.1604) Après une vente au marché d'un servant : sonnette, ouvrir ce servant puis retirer ses gils : Rangement › Gils, période 1 jour : Servants, Marché compte la vente une fois ; Échanges avec les servants égaux des deux côtés (Servants : dépenses = Personnage : gains)
+
+- [ ] (0.1604) Même page : tous les montants s'écrivent de la même façon (espaces entre les milliers en français, aussi au net en tête et dans « Derniers changements ») ; les titres Gains, Dépenses, Net, Variation et Solde sont à droite, au-dessus de leurs montants
+
+- [ ] (0.1605) Récolte › tableau des objets de collection, recherche « Charbon » : une seule ligne (livraison spéciale, Anden, 240/450/600)
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
