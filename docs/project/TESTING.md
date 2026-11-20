@@ -2353,6 +2353,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1638) Fenêtre de chat Tensho : clic sur la loupe au bout de la barre des onglets : une case « Chercher dans l'onglet… » s'ouvre ; taper un mot (essayer sans accent pour un mot qui en a) : seuls les messages qui le contiennent restent, avec leur nombre ; un nouveau message qui le contient s'ajoute ; re-clic sur la loupe : tous les messages reviennent
 
+- [ ] (0.1640) Fenêtre de chat, recherche (loupe) : taper un mot lettre par lettre dans un onglet chargé (réglage de lignes au plus haut si possible) : aucune saccade du jeu ; « Recherche… » peut paraître un instant, puis le nombre de messages ; un nouveau message qui contient le mot s'ajoute ; fermer la loupe puis la rouvrir : la boîte est vide.
+
+- [ ] (0.1640) Fenêtre de chat, mode capture allumé : dans la recherche, taper le code d'un joueur vu à l'écran (« #… ») trouve ses messages ; taper son vrai nom ne les trouve plus.
+
+- [ ] (0.1641) Fenêtre de chat, réglages (roue) : allumer « Icônes des objets dans le texte », puis lier un objet en /dire (ou attendre un lien d'objet) : l'icône de l'objet paraît devant son nom, de la hauteur de la ligne ; un message long se coupe proprement autour ; clic droit, copier : le texte sans icône ; éteindre le réglage : plus d'icône.
+
+- [ ] (0.1642) Fenêtre de chat : clic droit sur un message, « Épingler en haut de cet onglet » : il paraît en haut de l'onglet, sur une ligne, dans la couleur de son canal ; au survol le message entier ; remonter ou descendre dans l'onglet puis cliquer l'épingle : l'onglet revient au message ; la croix le retire ; à 5 épingles, l'entrée du menu est grisée ; se déconnecter puis revenir : plus d'épingle.
+
+- [ ] (0.1643) Fenêtre de chat : dans ses réglages, mots d'alerte, ajouter un mot ; afficher un autre onglet ; quand un message avec ce mot arrive dans l'onglet non affiché, cet onglet clignote (et porte « ! ») ; l'afficher : il cesse ; éteindre « Onglet qui clignote sur une alerte » : plus de clignotement, le « ! » reste.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
