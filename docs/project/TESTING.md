@@ -2301,6 +2301,24 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1610) Dédale bestial : finir un plateau, la fenêtre de résultat ouverte jusqu'au bout : la page montre le bonus et le total de la fenêtre ; au journal, « Beastmaster board result read » (une ou deux lignes) sans avertissement
 
+- [ ] (0.1616) Fenêtre de chat ouverte, recharger le plugin (ou relancer le jeu) : les lignes du chat s'affichent en une à deux secondes, sans « Chargement… » qui dure ; au journal, « Chat part (X-564): … ms after the load » sous 3000 et pas de « Slow frame » du chat juste après
+
+- [ ] (0.1617) Fenêtre de chat au premier plan : survoler un message puis Ctrl+C, coller ailleurs : le message ; Ctrl+A montre une bande « Tout l'onglet est choisi », Ctrl+C copie tout l'onglet, Échap la retire
+
+- [ ] (0.1617) Clic droit sur le message d'un joueur d'un autre monde : « Copier le nom … » colle « Nom@Monde » ; d'un joueur de votre monde : « Nom@Monde » aussi
+
+- [ ] (0.1617) Clic droit sur un lien de lieu : « Copier le lieu et ses coordonnées » ; sur un lien d'objet : « Copier le nom de l'objet » ; sur un lien de quête : un menu « Copier le nom de la quête »
+
+- [ ] (0.1617) Clic droit sur un onglet, « Vider cet onglet » : il se vide, un autre onglet garde les mêmes messages, un nouveau message s'y montre ; après un rechargement il reste vidé ; « Remontrer les messages vidés » les rend
+
+- [ ] (0.1618) Roue de la fenêtre de chat, « Masquer les noms des onglets » ou l'œil au bout de la barre : les noms disparaissent, l'onglet affiché reste, l'œil les remontre
+
+- [ ] (0.1618) Marges, coins arrondis et épaisseur du cadre : la fenêtre change aussitôt ; les valeurs par défaut la laissent comme avant
+
+- [ ] (0.1618) Opacité loin de la souris à 40 % : la fenêtre (texte compris) pâlit quand la souris s'en va, redevient pleine dessous
+
+- [ ] (0.1618) Place et taille : taper X, Y, largeur, hauteur puis « Appliquer » ; sortir la fenêtre de l'écran : l'avertissement s'affiche, « Ramener au centre » la remet au milieu
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
