@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1582.0
+- Plan global, X-642 : Relecture de 0.1579 à 0.1581, constats mineurs. M1 : le fichier de langue français avait un retour chariot seul après une clé ajoutée en 0.1580 ; Git le voyait comme un fichier binaire et l'enregistrait entier en CRLF, si bien qu'une seule clé ajoutée réécrivait ses 8 536 lignes dans le diff. Les fichiers de langue anglais et français sont repassés en fins de ligne LF, et un nouveau test refuse tout retour chariot seul dans les fichiers de langue (LanguageLineEnds1582Tests). M2 : les raisons des constats non retenus du banc du relecteur sont écrites dans le point X-631 (déjà corrigés, déjà au plan, faux ou écartés).
+- Tests : LanguageLineEnds1582Tests. Verify.ps1 (agent) : 3232/3232, 0 avertissement, 0 erreur ; DLL 0.1582.0.0. Rien à essayer en jeu.
+### English
+- Review of 0.1579 to 0.1581, minor findings. M1: the French language file had a lone carriage return after a key added in 0.1580; Git saw it as a binary file and stored it whole in CRLF, so one added key rewrote its 8,536 lines in the diff. The English and French language files are back to LF line ends, and a new test refuses any lone carriage return in the language files (LanguageLineEnds1582Tests). M2: the reasons of the reviewer bench findings not kept are written in point X-631 (already fixed, already planned, wrong or set aside).
+
 ## 0.1581.0
 - Plan global, X-639 : Constat du banc du relecteur (X-631, relecture de 0.1560, M3) : au démarrage, un fichier des prix vus abîmé qui n'a pas pu être mis de côté n'est plus pris pour un fichier tenu par un autre programme : il n'est plus relu toutes les 30 s pour rien, et le journal dit qu'il est abîmé (la sauvegarde suivante le met de côté). Nouveau test SeenStuck1581Tests (comportement : fichier abîmé ouvert par un autre lecteur).
 - Tests : SeenStuck1581Tests. Verify.ps1 (agent) : 3230/3230, 0 avertissement, 0 erreur ; DLL 0.1581.0.0. Rien à essayer en jeu.
