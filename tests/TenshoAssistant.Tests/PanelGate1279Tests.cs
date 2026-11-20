@@ -156,7 +156,8 @@ internal static class PanelGate1279Tests
             var window = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.cs"));
             Check(window.Contains("firstPart: Diagnostics.JitWarmup.OverlayFirst,", StringComparison.Ordinal), "first part: the overlays");
             Check(window.Contains("new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone)", StringComparison.Ordinal), "the gate waits for it");
-            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/PanelWindow.cs")).Contains("if (!owner.PanelsOpen) return false;", StringComparison.Ordinal), "a free panel waits");
+            // X-564 (0.1631): through PanelGate.Lets, so a panel that opens early (the chat window) does not wait (ChatEarly1631Tests).
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/PanelWindow.cs")).Contains("if (!Diagnostics.PanelGate.Lets(owner.PanelsOpen, panel.Early)) return false;", StringComparison.Ordinal), "a free panel waits");
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
             Check(plugin.Contains("if(!panelsOpen)break;", StringComparison.Ordinal), "the overlay pass waits");
             Check(plugin.Contains("log.Information(mainWindow.PanelsOpenedText(", StringComparison.Ordinal), "the line of the frame where they come back");

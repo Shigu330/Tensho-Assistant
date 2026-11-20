@@ -128,6 +128,8 @@ public sealed class JitWarmup : IDisposable
         return Named(method.Name,WindowMethods,WindowBracketed);
     }
     private readonly long created=System.Diagnostics.Stopwatch.GetTimestamp();
+    /// <summary>X-564 (0.1631): ms since the warm-up was made (the same clock as <see cref="ChatReadyAfter"/>).</summary>
+    public double SinceMade=>System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
     /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
     private readonly Func<bool>? measure;
 
@@ -246,6 +248,12 @@ public sealed class JitWarmup : IDisposable
     /// included). A test checks that each name is still declared in the sources.</summary>
     public static readonly IReadOnlyList<string> ChatFrameRoots=["DrawChatWindowBody"];
     private static readonly string[] ChatFrameBracketed=Bracketed(ChatFrameRoots);
+    /// <summary>X-564 (0.1631): the chat window opens before the other panels once its code is compiled (PanelDefinition.Early): its panel's
+    /// code is part of its first frame: the panel's own methods (PanelWindow) and the chat panel's callbacks in the main window (lambdas
+    /// included). A test checks that each name is still declared in the sources.</summary>
+    public static readonly IReadOnlyList<string> ChatPanelRoots=["DrawChatWindowContents","ChatWindowVisible","ChatFade","ChatFrameFlags","ChatPlace","ChatPlaceOnce",
+        "ChatFrame","get_ChatPanelDefinition"];
+    private static readonly string[] ChatPanelBracketed=Bracketed(ChatPanelRoots);
     /// <summary>X-564 (D-196 a): words of the chat's methods drawn only after a click or in its settings (settings, menus, the text to
     /// select, the game's entries of a player, the kinds seen): not followed from the first frame. A test checks that each word still names
     /// a method of the chat window.</summary>
@@ -254,11 +262,15 @@ public sealed class JitWarmup : IDisposable
     /// called elsewhere).</summary>
     public const int ChatFrameCap=2000;
 
-    /// <summary>X-564 (D-196 a): a root of the chat window's first frame: a method of the main window named in <see cref="ChatFrameRoots"/>.</summary>
+    /// <summary>X-564 (D-196 a): a root of the chat window's first frame: a method of the main window named in <see cref="ChatFrameRoots"/>;
+    /// 0.1631: or in <see cref="ChatPanelRoots"/>, or a method of the panel it is drawn in (PanelWindow, nested types included).</summary>
     public static bool ChatFrameRoot(MethodBase method)
     {
         for(var type=method.DeclaringType;type is not null;type=type.DeclaringType)
-            if(type.Name=="MainWindow")return Named(method.Name,ChatFrameRoots,ChatFrameBracketed);
+        {
+            if(type.Name=="PanelWindow")return true;
+            if(type.Name=="MainWindow")return Named(method.Name,ChatFrameRoots,ChatFrameBracketed) || Named(method.Name,ChatPanelRoots,ChatPanelBracketed);
+        }
         return false;
     }
 

@@ -35,7 +35,7 @@ internal static class ChatWindowFrame1618Tests
         ("Chat window frame 1618: wiring: the panel takes its frame, fade and place from the settings; tabs hidden with their button",()=>
         {
             var chat=Read("MainWindow.ChatWindow.cs");
-            Check(chat.Contains("Fade:ChatFade,") && chat.Contains("Frame:ChatFrame,Once:ChatPlaceOnce);"),"the panel's functions");
+            Check(chat.Contains("Fade:ChatFade,") && chat.Contains("Frame:ChatFrame,Once:ChatPlaceOnce,Early:()=>WarmupChatDone);"),"the panel's functions");
             Check(chat.Contains("for(var index=0;index<tabs.Count && !options.HideTabs;index++)") && chat.Contains("if(tabsButton){options.HideTabs=!options.HideTabs;TrySave(\"Chat window\");}"),"D4");
             Check(chat.Contains("SliderSetting(\"ChatWindow.TextOpacity\",") && chat.Contains("DrawChatPlaceSettings();"),"settings");
             var panel=Read("PanelWindow.cs");

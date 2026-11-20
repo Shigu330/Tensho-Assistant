@@ -24,6 +24,10 @@ public sealed class PanelGate
     /// <param name="compiled">Whether the panels' code is compiled; an error counts as yes (the panels are never kept away by it).</param>
     /// <param name="now">The clock in milliseconds (the tests' own; the machine's by default).</param>
     /// <param name="bound"><see cref="Bound"/> by default.</param>
+    /// <summary>X-564 (0.1631): a panel is drawn once the gate is open, or earlier when its own <paramref name="early"/> says so (the chat
+    /// window, once its first frame's code is compiled: it waited for the gate, 6 s after the load, with its code ready at 2.2 s).</summary>
+    public static bool Lets(bool open,Func<bool>? early)=>open || early?.Invoke()==true;
+
     public PanelGate(Func<bool> compiled,Func<long>? now=null,TimeSpan? bound=null)
     {
         this.compiled=compiled;

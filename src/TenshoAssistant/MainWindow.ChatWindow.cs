@@ -51,7 +51,7 @@ internal sealed partial class MainWindow
         ()=>ChatOptions.WindowOpen && !inDesktopApp,ChatWindowVisible,DrawChatWindowContents,CloseChatWindow,()=>localization.Get("ChatWindow.Title"),
         StepsAside:()=>false,Opacity:()=>ChatCover.Background(ChatOptions.WhenCovered,chatCovered,ChatOptions.BoundedOpacity),Size:new Vector2(560,320),
         MoreFlags:ChatFrameFlags,NoBorder:()=>ChatOptions.Borderless,Fade:ChatFade,
-        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce);
+        Padding:new Vector2(ChatLook.Padding.X,ChatLook.Padding.Y),Place:ChatPlace,Frame:ChatFrame,Once:ChatPlaceOnce,Early:()=>WarmupChatDone);
 
     /// <summary>X-447 D6 (0.1618): faded under a game window, else the opacity chosen while the mouse is not on the window (ChatLook.Alpha).
     /// X-447 B1 (0.1622): then faded out after the delay without a new message in the tab shown (ChatLook.Idle); faded out, the clicks go through.</summary>
@@ -97,7 +97,11 @@ internal sealed partial class MainWindow
     /// <summary>X-540 M1: the option wanted: on, « both chats » off, Tensho's chat window open, shown and working (the first state of
     /// ChatGameMessagesWant; the hider reads the game chat's place only then).</summary>
     internal bool ChatGameMessagesOption()
-        =>!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;
+        =>!inDesktopApp && !windowDisposed && ChatPanelOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;
+
+    /// <summary>X-564 (0.1631): the chat window may be drawn: the panels' gate is open, or its own code is compiled (it opens before the
+    /// other panels; the game's messages are hidden from the same moment).</summary>
+    internal bool ChatPanelOpen=>Diagnostics.PanelGate.Lets(PanelsOpen,()=>WarmupChatDone);
 
     /// <summary>X-467 (0.1504): the game's messages hidden now, Tensho's window in their place.</summary>
     internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;
@@ -830,6 +834,12 @@ internal sealed partial class MainWindow
         // (« Chat 62 ms » on the reload of 17/11 13:05). X-564 (0.1616): its own part, first, when the window is open at the load (it waited
         // for the whole early phase, 8 to 25 s).
         if(!WarmupChatDone){EmptyState("ChatWindow.Loading");return;}
+        // X-564 (0.1631): when the lines are first drawn after the load, said once (the measure of X-564).
+        if(!chatFirstLinesLogged)
+        {
+            chatFirstLinesLogged=true;
+            log.Information(FormattableString.Invariant($"Chat window: lines first drawn {WarmupSinceMade:F0} ms after the load (X-564), the panels' gate {(PanelsOpen ? "open":"still closed")}."));
+        }
         var options=ChatOptions;
         var tabs=ChatTabs(options);
         var table=ChatFilterTableNow();
@@ -1400,6 +1410,7 @@ internal sealed partial class MainWindow
     private ChatRecord? chatHoveredRecord;
     private int chatWholeTab=-1;
     private ChatTabSettings? chatShownTab;
+    private bool chatFirstLinesLogged;
     private string? chatWindowQuest;
     // 0.1460 (X-457): the scrolling of the tab shown, frame by frame, in developer mode.
     private readonly ChatScrollWatch chatScrollWatch=new();

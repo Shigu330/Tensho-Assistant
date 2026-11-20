@@ -63,7 +63,7 @@ internal static class ChatGameHide1504Tests
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
             // X-540 M1 (0.1512): the same states, named ChatGameMessagesOption (the hider reads the place only while it is true).
             Check(window.Contains("ChatHideWants.Of(ChatGameMessagesOption(),",StringComparison.Ordinal)
-                && window.Contains("=>!inDesktopApp && !windowDisposed && PanelsOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;",StringComparison.Ordinal),"wanted only with the window open and working (X-527: shown or not is ChatHideWants' choice)");
+                && window.Contains("=>!inDesktopApp && !windowDisposed && ChatPanelOpen && !chatWindowFailed && ChatOptions.WindowOpen && ChatOptions.HideGameMessages && !ChatOptions.BothChats;",StringComparison.Ordinal),"wanted only with the window open and working (X-527: shown or not is ChatHideWants' choice)");
             var tracker=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Dashboard.cs"));
             Check(tracker.Contains("if(name==\"Chat\")chatWindowFailed=true;",StringComparison.Ordinal),"a failed chat window gives the messages back");
             var plugin=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));

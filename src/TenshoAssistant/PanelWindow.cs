@@ -46,7 +46,8 @@ internal sealed class PanelWindow : Window
     public override bool DrawConditions()
     {
         // X-01 (0.1279): not before the panels' code is compiled, 6 s at most after the load since X-653 (Diagnostics/PanelGate.cs).
-        if (!owner.PanelsOpen) return false;
+        // X-564 (0.1631): a panel that opens early (the chat window, once its own code and the panel's are compiled) does not wait for it.
+        if (!Diagnostics.PanelGate.Lets(owner.PanelsOpen, panel.Early)) return false;
         try { return !broken && panel.Visible() && !(panel.StepsAside?.Invoke() != false && lastPosition is { } at && owner.BarBehindGame(at, lastSize, panel.Name)); }
         catch (Exception error) { TurnOff(error); return false; }
     }
@@ -161,7 +162,7 @@ internal sealed class PanelWindow : Window
 /// <summary>What a panel window shows: <c>Wanted</c> is its setting, <c>Visible</c> the state of the moment; no <c>Close</c>, no close button.</summary>
 internal sealed record PanelDefinition(string Name, string Id, Vector2 At, ImGuiWindowFlags Flags, Func<bool> Wanted, Func<bool> Visible, Action Contents, Action? Close = null, Func<string>? Title = null, float? Alpha = null, Func<bool>? StepsAside = null, Func<float>? Opacity = null, Vector2? Size = null,
     Func<ImGuiWindowFlags>? MoreFlags = null, Func<bool>? NoBorder = null, Func<float?>? Fade = null, Vector2? Padding = null, Func<PanelPlace?>? Place = null,
-    Func<PanelFrame>? Frame = null, Func<PanelPlace?>? Once = null);
+    Func<PanelFrame>? Frame = null, Func<PanelPlace?>? Once = null, Func<bool>? Early = null);
 
 /// <summary>X-447 D5 (0.1618): a panel's margins, corners and frame thickness read at each draw (the chat window's settings); they replace
 /// <see cref="PanelDefinition.Padding"/>.</summary>

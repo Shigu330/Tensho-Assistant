@@ -211,6 +211,8 @@ internal sealed partial class MainWindow : Window, IDisposable
     internal bool WarmupEarlyDone=>jitWarmup.EarlyDone;
     /// <summary>X-564 (0.1616): the chat window's code is compiled (its own part, or the early phase): the window may draw its lines.</summary>
     internal bool WarmupChatDone=>jitWarmup.ChatDone;
+    /// <summary>X-564 (0.1631): ms since the warm-up was made (at the window's making, during the load), for the log.</summary>
+    internal double WarmupSinceMade=>jitWarmup.SinceMade;
     /// <summary>X-433 (0.1425): the warm-up's longest compilations so far, for the readers' compiler's lines of the log.</summary>
     internal string WarmupSlowest=>jitWarmup.Slowest;
 
