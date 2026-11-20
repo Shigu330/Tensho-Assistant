@@ -2249,6 +2249,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1580) Fenêtre de chat Tensho : survoler un lien d'objet de haute qualité : la bulle dit « (HQ) » après le nom.
 
+- [ ] (0.1583) Carte › Repères › Repères favoris : collez trois lignes dans le champ d'import, « Western Thanalan ( 12.3 , 7.4 ) », « Thanalan central ( 20.5 , 25.3 ) » et « Nulle part ( 10.0 , 10.0 ) », puis « Importer » : deux favoris ajoutés (le premier nommé « Thanalan occidental »), une ligne au lieu inconnu.
+
+- [ ] (0.1584) Dédale bestial, un plateau entier en survolant objets, actions et monstres : dalamud.log n'a que quelques lignes « Labyrinth reading » (chargement, arène, plateau, combat), aucune à chaque infobulle (lecture par l'agent avec logread.py).
+
+- [ ] (0.1585) Fenêtre de chat de Tensho, onglet qui replie les répétitions : un message long qui remplit la largeur, répété trois fois en moins d'une minute : « ×3 » reste entier dans la fenêtre (le message passe à la ligne plus tôt), et le message se remet en page quand le compte passe de ×2 à ×3.
+
+- [ ] (0.1586) Paramètres › Panneaux › Historique du chat, historique gardé, « Sans limite » coché sur les messages : décochez-le : une question dit que les messages au-delà seront supprimés ; « Annuler » laisse la case cochée, « Limiter » la décoche. Même chose pour les jours.
+
+- [ ] (0.1586) Avec « Sans limite » coché sur les messages et sur les jours, décochez puis recochez « Garder l'historique » : la question d'accord dit « rien n'est retiré » ; avec une limite, elle dit « les plus anciens sont retirés ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

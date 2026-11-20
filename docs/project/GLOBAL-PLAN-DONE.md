@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (634 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (641 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -565,6 +565,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-456 | Tool: STATUS's « 0) Reprise » line piles up leftovers at each version… | Done in 0.1461.0 |
 | X-457 | Bug seen by the user on 11/15 around 8:50 pm (0.1454, two screenshots): the… | Done in 0.1462.0 |
 | X-458 | User request of 11/15 around 9 pm: on the private test page (X-450), a full… | Done in 0.1461.0 |
+| X-460 | Bug seen by the user on 11/15 around 9 pm (test T-0.1130-1, test page… | Done in 0.1500.0 |
 | X-461 | Bug seen by the user on 11/15 around 9:20 pm (test T-0.1441-3, test page)… | Done in 0.1463 |
 | X-462 | Bug seen by the user on 11/15 around 9:30 pm (three screenshots, game map left… | Done in 0.1464 |
 | X-463 | Tool: retour.py refuses the release while a relay commit has red CI, even when… | Done in 0.1461.0 |
@@ -610,6 +611,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-514 | Review  (review 0.1492, 16/11), I1: finding in… | Done in 0.1493 |
 | X-515 | Review  (review 0.1492, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1493.0 |
 | X-517 | Review  (review 0.1494, 16/11), I1: finding in… | Done in 0.1495 |
+| X-518 | Review  (review 0.1494, 16/11), minor M1, M2, M3, M4, M5: M1 in… | Done in 0.1586 |
 | X-519 | Review  (review 0.1497, 16/11), I1: finding in… | Done in 0.1498 |
 | X-520 | Review  (review 0.1497, 16/11), I2: finding in journal.jsonl (agent file)… | Done in 0.1536 |
 | X-521 | Review  (review 0.1497, 16/11), minor M1, M2, M3, M4, M5, M6, M7: M1 in… | Done in 0.1498.0 |
@@ -628,6 +630,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-537 | Tool (R13.3), idea box defect (idees.py, called by page_essais.py import on… | Done in 0.1511 |
 | X-538 | Tool (R13.3), relay statistics skewed, seen on 17/11 around 0:40 comparing… | Done in 0.1511 |
 | X-540 | Review of block 0.1508 to 0.1510 (review 0.1510, 17/11), minor M1, M2, M3: M1… | Done in 0.1512 |
+| X-541 | Bug (seen while rereading test T-0.437-1, relay 101, 17/11): Map › Markers ›… | Done in 0.1583 |
 | X-542 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), I1: finding in agent… | Done in 0.1514 |
 | X-543 | Review of block 0.1511 to 0.1514 (review 0.1514, 17/11), minor M1, M2, M3, M4… | Done in 0.1514 |
 | X-544 | Tool: the state.py quota verdict (and the start hook) says « BELOW: one relay a… | Done in 0.1514 |
@@ -635,8 +638,10 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-546 | Review  (review 0.1515, 17/11), I1: finding in q.py (agent file) :299 (French… | Done in 0.1516.0 |
 | X-547 | Review  (review 0.1515, 17/11), minor M1, M2, M3, M4: M1 in q.py (agent file)… | Done in 0.1516.0 |
 | X-548 | Tool: on 17/11, two master writes queued during the review were not replayed… | Done in 0.1515.0 |
+| X-552 | Bug seen by the master in dalamud.log (17/11 around 10:22, Beastmaster… | Done in 0.1584 |
 | X-554 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I1: finding in… | Done in 0.1521 |
 | X-555 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), I2: finding in… | Done in 0.1521 |
+| X-556 | Review of block 0.1516 to 0.1520 (review 0.1520, 17/11), minor M1, M2, M3, M4… | Done in 0.1585 |
 | X-559 | Gap to DEC-053 found by relay 104 (17/11 around 12:10): combat lines still… | Done in 0.1528 |
 | X-560 | Bug seen by the user on 17/11 around 12:20 (capture of the chat settings… | Done in 0.1565 |
 | X-561 | Review of block 0.1521 to 0.1526 (review 0.1526, 17/11), I1: finding in… | Done in 0.1527 |
@@ -702,12 +707,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-637 | Bench X-631 (review 0.1441, M4): each visible chat link formats its tooltip… | Done in 0.1580.0 |
 | X-638 | Bench X-631 (review 0.1441, M5): the high quality of a chat item link is kept… | Done in 0.1580.0 |
 | X-639 | Bench X-631 (review 0.1560, M3): at start, a damaged seen-prices file that… | Done in 0.1581 |
+| X-641 | Tool: plan.py done accepts a done-in without a version number, which breaks… | Done in 0.1586.0 |
+| X-642 | Review of block 0.1579 to 0.1581 (review 0.1581, 20/11), minor M1, M2: M1 in… | Done in 0.1582 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (634 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (641 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1270,6 +1277,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-456 | Outil : la ligne « 0) Reprise » de STATUS accumule des restes à chaque version… | Fait en 0.1461.0 |
 | X-457 | Bug vu par l'utilisateur le 15/11 vers 20 h 50 (0.1454, deux captures) : la… | Fait en 0.1462.0 |
 | X-458 | Demande de l'utilisateur du 15/11 vers 21 h : sur la page privée des essais… | Fait en 0.1461.0 |
+| X-460 | Bug vu par l'utilisateur le 15/11 vers 21 h (essai T-0.1130-1, page des essais… | Fait en 0.1500.0 |
 | X-461 | Bug vu par l'utilisateur le 15/11 vers 21 h 20 (essai T-0.1441-3, page des… | Fait en 0.1463 |
 | X-462 | Bug vu par l'utilisateur le 15/11 vers 21 h 30 (trois captures, carte du jeu à… | Fait en 0.1464 |
 | X-463 | Outil : retour.py refuse la release tant qu'un commit du relais a sa CI rouge… | Fait en 0.1461.0 |
@@ -1315,6 +1323,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-514 | Relecture  (relecture 0.1492, 16/11), I1 : X-475 garde sur disque les liens de… | Fait en 0.1493 |
 | X-515 | Relecture  (relecture 0.1492, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : «… | Fait en 0.1493.0 |
 | X-517 | Relecture  (relecture 0.1494, 16/11), I1 : La réponse publique de la FAQ sur… | Fait en 0.1495 |
+| X-518 | Relecture  (relecture 0.1494, 16/11), mineurs M1, M2, M3, M4, M5 : M1 : Avec «… | Fait en 0.1586 |
 | X-519 | Relecture  (relecture 0.1497, 16/11), I1 : Onze textes montrés aux joueurs… | Fait en 0.1498 |
 | X-520 | Relecture  (relecture 0.1497, 16/11), I2 : La définition de « fait » de X-449… | Fait en 0.1536 |
 | X-521 | Relecture  (relecture 0.1497, 16/11), mineurs M1, M2, M3, M4, M5, M6, M7 : M1… | Fait en 0.1498.0 |
@@ -1333,6 +1342,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-537 | Outil (R13.3), défaut de la boîte à idées (idees.py, appelé par page_essais.py… | Fait en 0.1511 |
 | X-538 | Outil (R13.3), statistiques des relais faussées, vu le 17/11 vers 0 h 40 en… | Fait en 0.1511 |
 | X-540 | Relecture du bloc 0.1508 à 0.1510 (relecture 0.1510, 17/11), mineurs M1, M2, M3… | Fait en 0.1512 |
+| X-541 | Bug (vu en relisant l'essai T-0.437-1, relais 101, 17/11) : Carte › Repères ›… | Fait en 0.1583 |
 | X-542 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), I1 : X-536… | Fait en 0.1514 |
 | X-543 | Relecture du bloc 0.1511 à 0.1514 (relecture 0.1514, 17/11), mineurs M1, M2… | Fait en 0.1514 |
 | X-544 | Outil : le verdict de state.py quota (et le relevé du hook de démarrage) dit «… | Fait en 0.1514 |
@@ -1340,8 +1350,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-546 | Relecture  (relecture 0.1515, 17/11), I1 : X-542 : NOT_UNDERSTOOD laisse passer… | Fait en 0.1516.0 |
 | X-547 | Relecture  (relecture 0.1515, 17/11), mineurs M1, M2, M3, M4 : M1 : X-542 : des… | Fait en 0.1516.0 |
 | X-548 | Outil : le 17/11, deux écritures de la maître mises en file pendant la… | Fait en 0.1515.0 |
+| X-552 | Bug vu par la maître dans dalamud.log (17/11 vers 10 h 22, Dédale bestial, 1er… | Fait en 0.1584 |
 | X-554 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I1 : X-484… | Fait en 0.1521 |
 | X-555 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), I2 : X-484… | Fait en 0.1521 |
+| X-556 | Relecture du bloc 0.1516 à 0.1520 (relecture 0.1520, 17/11), mineurs M1, M2… | Fait en 0.1585 |
 | X-559 | Écart à DEC-053 relevé par le relais 104 (passage-104, 17/11 vers 12 h 10)… | Fait en 0.1528 |
 | X-560 | Bug vu par l'utilisateur le 17/11 vers 12 h 20 (capture des « Réglages du chat… | Fait en 0.1565 |
 | X-561 | Relecture du bloc 0.1521 à 0.1526 (relecture 0.1526, 17/11), I1 : X-549… | Fait en 0.1527 |
@@ -1407,3 +1419,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-637 | Banc X-631 (relecture 0.1441, M4) : chaque lien visible du chat formate sa… | Fait en 0.1580.0 |
 | X-638 | Banc X-631 (relecture 0.1441, M5) : la haute qualité d'un lien d'objet du chat… | Fait en 0.1580.0 |
 | X-639 | Banc X-631 (relecture 0.1560, M3) : au démarrage, un fichier des prix vus abîmé… | Fait en 0.1581 |
+| X-641 | Outil : plan.py done accepte un « fait en » sans numéro de version (« hors… | Fait en 0.1586.0 |
+| X-642 | Relecture du bloc 0.1579 à 0.1581 (relecture 0.1581, 20/11), mineurs M1, M2… | Fait en 0.1582 |
