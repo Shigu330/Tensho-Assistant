@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (615 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (616 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -683,12 +683,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-622 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), minor M1, M2: M1 in… | Done in 0.1562 |
 | X-623 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), I1: finding in… | Done in 0.1563 |
 | X-624 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), minor M1, M2, M3, M4… | Done in 0.1564 |
+| X-625 | Tool: tools/discoveries-merge.py sync --dry-run crashes on Windows without -X… | Done in 0.1569 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (615 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (616 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1369,3 +1370,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-622 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), mineurs M1, M2… | Fait en 0.1562 |
 | X-623 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), I1 : KeepAside lit… | Fait en 0.1563 |
 | X-624 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), mineurs M1, M2… | Fait en 0.1564 |
+| X-625 | Outil : tools/discoveries-merge.py sync --dry-run plante sous Windows sans -X… | Fait en 0.1569 |
