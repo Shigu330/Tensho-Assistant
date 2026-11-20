@@ -11,7 +11,9 @@ internal static class ChatPlaceOption1512Tests
     // What the hider does in a frame: (state applied, place read).
     private static (ChatHideWant Now,bool Reads) Frame(bool option,bool cut,bool chatShown,bool covered,bool combat)
     {
-        var now=ChatHideWants.InFrame(ChatHideWants.Of(option,cut,false,combat,covered),cut,chatShown);
+        // X-689 (0.1657): Tensho's window hiding itself (covered, combat) no longer changes the choice: still passed, to show it.
+        _=(covered,combat);
+        var now=ChatHideWants.InFrame(ChatHideWants.Of(option,cut,false),cut,chatShown);
         return (now,ChatHideWants.OptionReadsPlace(option,cut) && ChatHideWants.ReadsPlace(now));
     }
 
@@ -22,8 +24,8 @@ internal static class ChatPlaceOption1512Tests
             Check(Frame(false,false,true,false,false)==(ChatHideWant.Release,false),"option off (the default): given back, nothing read");
             Check(Frame(true,true,true,false,false)==(ChatHideWant.Release,false),"competitive cut: given back, nothing read (DEC-038)");
             Check(Frame(true,false,true,false,false)==(ChatHideWant.Hide,true),"option on: hidden, place read");
-            Check(Frame(true,false,true,true,false)==(ChatHideWant.Release,true),"option on, a game window over Tensho's: given back, place still read (X-534 M1)");
-            Check(Frame(true,false,true,false,true)==(ChatHideWant.Release,true),"option on, in combat with « Hide in combat »: place still read");
+            Check(Frame(true,false,true,true,false)==(ChatHideWant.Hide,true),"option on, a game window over Tensho's: still hidden (X-689), place read");
+            Check(Frame(true,false,true,false,true)==(ChatHideWant.Hide,true),"option on, in combat with « Hide in combat »: still hidden (X-689), place read");
             Check(Frame(true,false,false,false,false)==(ChatHideWant.Hold,false),"game chat not shown: held, nothing read");
         }),
         ("Chat place option 1512: wiring: the hider reads the place only through OptionReadsPlace, the plugin gives it the option",() =>

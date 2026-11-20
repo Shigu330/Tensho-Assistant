@@ -33,7 +33,7 @@ internal static class ChatWindowMoments1620Tests
             Check(chat.Contains("|(ChatLook.Through(ChatOptions.MouseThrough,ChatOptions.Locked,chatMenuOpen,(ImGui.GetMousePos().X,ImGui.GetMousePos().Y),chatZones) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);"),"the flag");
             Check(chat.Contains("(chatZones,chatZonesNext)=(chatZonesNext,chatZones);") && chat.Contains("chatZonesNext.Add((barAt.X,barAt.Y,ImGui.GetContentRegionAvail().X,ImGui.GetFrameHeightWithSpacing()));"),"the zones swapped each frame, the bar");
             Check(chat.Split("ChatZone();").Length==3,"a link and « back to the bottom »");
-            Check(chat.Contains("!gameGui.GameUiHidden && !ChatHiddenNow();") && chat.Contains("gameGui.GameUiHidden,ChatHiddenNow(),"),"shown, and the game's messages given back, by the same moments");
+            Check(chat.Contains("!gameGui.GameUiHidden && !ChatHiddenNow();") && chat.Contains("CompetitiveGate.Cut,gameGui.GameUiHidden);"),"shown by the same moments; the game's messages no longer given back by them (X-689, 0.1657)");
             Check(chat.Contains("BoolSetting(\"ChatWindow.MouseThrough\",") && chat.Contains("BoolSetting(\"ChatWindow.HideInCutscene\",") && chat.Contains("BoolSetting(\"ChatWindow.HideInDuty\","),"settings");
             var plugin=Read("Plugin.cs");
             Check(plugin.Contains("mainWindow.InCutsceneNow=") && plugin.Contains("ConditionFlag.OccupiedInCutSceneEvent]") && plugin.Contains("mainWindow.InDutyNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];"),"conditions");
