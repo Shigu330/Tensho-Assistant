@@ -28,6 +28,12 @@ public static class ChatHideWants
             : gameUiHidden ? ChatHideWant.Hold
             : ChatHideWant.Hide;
 
+    /// <summary>X-696 M2 (review of 0.1658): since X-689 the game's messages stay hidden while Tensho's window hides, so « Hide in combat » or
+    /// « Hide in duties » with « Hide the game chat's messages » (not both chats) leaves no chat shown there: said under those settings, the
+    /// user's choice kept.</summary>
+    public static bool LeavesNoChat(bool hideGameMessages,bool bothChats,bool hideInCombat,bool hideInDuty)
+        =>hideGameMessages && !bothChats && (hideInCombat || hideInDuty);
+
     /// <summary>X-534 M2 (0.1509, review of 0.1507): the choice the hider applies in a frame, the one place where it is written. A competitive
     /// cut gives back (DEC-038), whatever Tensho wished; but while the game's chat window itself is not shown (cutscene, opening scene of a
     /// PvP match, interface hidden), nothing is touched (Hold, X-527): the panels Tensho hid come back as soon as ChatLog shows again.</summary>

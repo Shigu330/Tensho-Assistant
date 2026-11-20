@@ -281,6 +281,13 @@ internal sealed partial class MainWindow
         ImGui.BeginDisabled(!configuration.Chat.HideGameMessages);
         try{BoolSetting("ChatWindow.BothChats","ChatWindow.BothChatsTip",()=>configuration.Chat.BothChats,value=>configuration.Chat.BothChats=value,c=>c.Chat.BothChats);}
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // X-696 M2: no chat at all in combat or in a duty with these settings together (the game's messages stay hidden since X-689).
+        if(ChatHideWants.LeavesNoChat(configuration.Chat.HideGameMessages,configuration.Chat.BothChats,configuration.Chat.HideInCombat,configuration.Chat.HideInDuty))
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text,Warning);
+            ImGui.TextWrapped(localization.Get("ChatWindow.NoChatWarning"));
+            ImGui.PopStyleColor();
+        }
         BoolSetting("ChatWindow.Timestamps","ChatWindow.TimestampsTip",()=>configuration.Chat.ShowTimestamps,value=>configuration.Chat.ShowTimestamps=value,c=>c.Chat.ShowTimestamps);
         ImGui.Indent();
         ImGui.BeginDisabled(!configuration.Chat.ShowTimestamps);
@@ -703,8 +710,11 @@ internal sealed partial class MainWindow
             if(tabs.Count>=ChatSettings.MaximumTabs)break;
             var label=localization.Format("ChatWindow.TabAddDefault",missing.Name);
             SameLineIfFits(ImGui.CalcTextSize(label).X+ImGui.GetStyle().FramePadding.X*2);
-            if(ImGui.SmallButton(label+"###ChatTabAddDefault"+place)
-               && ChatSettings.AddDefault(tabs,place,missing))chatSettingsPending=true;
+            if(ImGui.SmallButton(label+"###ChatTabAddDefault"+place) && ChatSettings.AddDefault(tabs,place,missing))
+            {
+                chatTabUndo.Replaced(missing);   // X-696 M1: the removed tab it stands for no longer comes back as a second one
+                chatSettingsPending=true;
+            }
             Tip("ChatWindow.TabAddDefaultTip");
         }
         if(ImGui.SmallButton(localization.Get("ChatWindow.TabsReset")+"###ChatTabsReset"))ImGui.OpenPopup("###ChatTabsResetAsk");

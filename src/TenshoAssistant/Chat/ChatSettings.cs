@@ -267,7 +267,7 @@ public sealed class ChatSettings
         =>DefaultTabs(generalName,battleName,eventName,socialName).Select((tab,place)=>(place,tab))
             .Where(missing=>!tabs.Any(tab=>StandsFor(tab,missing.tab))).ToList();
 
-    private static bool StandsFor(ChatTabSettings tab,ChatTabSettings standard)
+    internal static bool StandsFor(ChatTabSettings tab,ChatTabSettings standard)
         =>string.Equals((tab.Name ?? "").Trim(),standard.Name,StringComparison.OrdinalIgnoreCase)
           || (tab.Filters is null && tab.Channels is { Count:>0 } channels && channels.ToHashSet().SetEquals(standard.Channels));
 
@@ -314,4 +314,11 @@ public sealed class ChatTabUndo
     }
 
     public void Forget()=>removed=null;
+
+    /// <summary>X-696 M1 (review of 0.1658): a default tab put back by « Restore « … » » while the tab it stands for waits to be undone; that
+    /// tab no longer comes back, or there would be two of it (two « Battle »).</summary>
+    public void Replaced(ChatTabSettings added)
+    {
+        if(removed is not null && ChatSettings.StandsFor(removed,added))removed=null;
+    }
 }
