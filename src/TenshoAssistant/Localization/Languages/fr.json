@@ -2475,7 +2475,7 @@
     "ShareCopyTip": "Copie vos favoris (200 au plus) dans le presse-papiers, en un code TENSHO-MAP1 à envoyer à un autre joueur. Aucun site tiers.",
     "ShareCopied": "{0} favori(s) copié(s) dans le presse-papiers.",
     "ShareHint": "Code TENSHO-MAP1…",
-    "ShareHintTip": "Collez ici un code de partage de favoris.",
+    "ShareHintTip": "Collez ici un code de partage de favoris, ou des lignes « Lieu ( x , y ) » (un favori par ligne ; le lieu peut être nommé dans n'importe quelle langue du jeu).",
     "ShareImport": "Importer",
     "ShareImportTip": "Ajoute les favoris du code qui ne sont pas déjà là, dans la limite de 200.",
     "ShareImported": "{0} favori(s) ajouté(s), {1} laissé(s) de côté (déjà là ou liste pleine).",

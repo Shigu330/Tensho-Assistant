@@ -110,6 +110,9 @@ internal sealed partial class MainWindow
         if (bookmarkSaved) ImGui.TextColored(Success, localization.Get("MapsUi.Saved"));
         DrawBookmarkShare();
     }
+    // X-541: the zone names in every language of the game (PlaceName row → names), read on the first import of pasted coordinates.
+    internal Func<IReadOnlyDictionary<uint, IReadOnlyList<string>>?>? ZoneNamesLoad;
+    private IReadOnlyDictionary<uint, IReadOnlyList<string>>? zoneNamesRead;
     // 0.378 (g, M-08): share the bookmarks as a TENSHO-MAP1 text code (clipboard), or add those of a code typed or pasted here.
     private void DrawBookmarkShare()
     {
@@ -122,9 +125,13 @@ internal sealed partial class MainWindow
         }
         finally { ImGui.EndDisabled(); }
         Tip("MapsUi.ShareCopyTip");
-        ImGui.SameLine(); ImGui.SetNextItemWidth(220);
-        ImGui.InputTextWithHint("##BookmarkImport", localization.Get("MapsUi.ShareHint"), ref bookmarkImport, 200_000);
+        // X-541: several lines (a pasted hunt list keeps its line breaks); the hint is drawn over the empty field.
+        ImGui.SameLine();
+        var importAt = ImGui.GetCursorScreenPos();
+        ImGui.InputTextMultiline("##BookmarkImport", ref bookmarkImport, 200_000, new System.Numerics.Vector2(220, ImGui.GetTextLineHeight() * 3 + ImGui.GetStyle().FramePadding.Y * 2));
         Tip("MapsUi.ShareHintTip");
+        if (bookmarkImport.Length == 0 && !ImGui.IsItemActive())
+            ImGui.GetWindowDrawList().AddText(importAt + ImGui.GetStyle().FramePadding, ImGui.GetColorU32(ImGuiCol.TextDisabled), localization.Get("MapsUi.ShareHint"));
         ImGui.SameLine();
         ImGui.BeginDisabled(bookmarkImport.Trim().Length == 0);
         try
@@ -141,9 +148,10 @@ internal sealed partial class MainWindow
                 catch (FormatException)
                 {
                     // N-11 (0.437): not a share code: « Place ( x , y ) » lines (hunt sites, chat), matched to the zones by name.
+                    // X-541: the zone under its name in the client's language, else in the game's other languages.
+                    zoneNamesRead ??= ZoneNamesLoad?.Invoke();
                     var list = maps.State.Catalog is { } catalog
-                        ? MapBookmarks.ParseCoordinateList(bookmarkImport, name => catalog.Entries.FirstOrDefault(map => map.Zone.Equals(name, StringComparison.CurrentCultureIgnoreCase)),
-                            localization.Get("MapsUi.PastedGroup"))
+                        ? MapBookmarks.ParseCoordinateList(bookmarkImport, MapBookmarks.ZoneByName(catalog.Entries, zoneNamesRead), localization.Get("MapsUi.PastedGroup"))
                         : (Bookmarks: (IReadOnlyList<MapBookmark>)[], Unknown: 0);
                     if (list.Bookmarks.Count == 0) bookmarkShareMessage = localization.Get("MapsUi.ShareInvalid");
                     else

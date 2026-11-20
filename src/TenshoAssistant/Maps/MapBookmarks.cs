@@ -109,6 +109,26 @@ public static class MapBookmarks
         return (Array.AsReadOnly(found.ToArray()), unknown);
     }
 
+    /// <summary>
+    /// X-541 (17/11): the zone a pasted place names. The client's own zone name first, then the same zone in the game's other languages
+    /// (<paramref name="otherNames"/>: PlaceName row → its names in English, French, German, Japanese), so an English hunt list pasted on
+    /// a French client is found. Case is ignored; the first map of a zone wins, as before.
+    /// </summary>
+    public static Func<string, MapDefinition?> ZoneByName(IEnumerable<MapDefinition> entries, IReadOnlyDictionary<uint, IReadOnlyList<string>>? otherNames)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+        var own = new Dictionary<string, MapDefinition>(StringComparer.OrdinalIgnoreCase);
+        var other = new Dictionary<string, MapDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var map in entries)
+        {
+            if (!string.IsNullOrWhiteSpace(map.Zone)) own.TryAdd(map.Zone.Trim(), map);
+            if (otherNames is not null && map.PlaceNameId != 0 && otherNames.TryGetValue(map.PlaceNameId, out var names))
+                foreach (var name in names)
+                    if (!string.IsNullOrWhiteSpace(name)) other.TryAdd(name.Trim(), map);
+        }
+        return name => own.GetValueOrDefault(name.Trim()) ?? other.GetValueOrDefault(name.Trim());
+    }
+
     /// <summary>Name given to a bookmark saved without one: « Zone · 12.3, 4.5 » (coordinates always with a dot, as the game writes them).</summary>
     public static string DefaultName(string zone, float x, float y) => $"{zone} · {MapProjection.CoordinateNumber(x)}, {MapProjection.CoordinateNumber(y)}";
 

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1583.0
+- Plan global, X-541 : Carte › Repères › Repères favoris, import de coordonnées collées (« Lieu ( x , y ) », listes de chasse) : le champ d'import est maintenant sur plusieurs lignes, si bien qu'un collage de plusieurs lignes garde ses retours à la ligne et donne un favori par ligne ; et le lieu est cherché sous le nom de zone du client puis sous ses noms dans les autres langues du jeu (feuille PlaceName en anglais, français, allemand et japonais, lue au premier import), si bien qu'une liste en anglais est reconnue sur un client français. L'info-bulle du champ le dit. Nouveau test PastedZones1583Tests (comportement : trois lignes dont une en anglais et une inconnue donnent deux favoris et un inconnu).
+- Pour les joueurs : repères de la carte : une liste de coordonnées collée donne un favori par ligne, et les noms de zone d'une autre langue du jeu sont reconnus.
+- Tests : PastedZones1583Tests. Verify.ps1 (agent) : 3235/3235, 0 avertissement, 0 erreur ; DLL 0.1583.0.0. Non validé en jeu.
+### English
+- Map › Bookmarks › Favourite bookmarks, import of pasted coordinates (« Place ( x , y ) », hunt lists): the import field is now multi-line, so a paste of several lines keeps its line breaks and gives one bookmark per line; and the place is looked up under the client's zone name, then under its names in the game's other languages (PlaceName sheet in English, French, German and Japanese, read on the first import), so an English list is recognised on a French client. The field's tooltip says so. New test PastedZones1583Tests (behaviour: three lines, one in English and one unknown, give two bookmarks and one unknown).
+- For players: Map bookmarks: pasted coordinate lists keep one bookmark per line, and zone names in another game language are recognised.
+
 ## 0.1582.0
 - Plan global, X-642 : Relecture de 0.1579 à 0.1581, constats mineurs. M1 : le fichier de langue français avait un retour chariot seul après une clé ajoutée en 0.1580 ; Git le voyait comme un fichier binaire et l'enregistrait entier en CRLF, si bien qu'une seule clé ajoutée réécrivait ses 8 536 lignes dans le diff. Les fichiers de langue anglais et français sont repassés en fins de ligne LF, et un nouveau test refuse tout retour chariot seul dans les fichiers de langue (LanguageLineEnds1582Tests). M2 : les raisons des constats non retenus du banc du relecteur sont écrites dans le point X-631 (déjà corrigés, déjà au plan, faux ou écartés).
 - Tests : LanguageLineEnds1582Tests. Verify.ps1 (agent) : 3232/3232, 0 avertissement, 0 erreur ; DLL 0.1582.0.0. Rien à essayer en jeu.

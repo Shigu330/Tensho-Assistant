@@ -34,6 +34,8 @@ internal sealed partial class MainWindow
         // g, R-01 (0.392): ocean fishing timetable from the game's loop and voyages, built on first use.
         var ocean=new Lazy<Gathering.OceanSchedule?>(()=>Read("Ocean fishing timetable",()=>Gathering.OceanScheduleLoader.Read(data)));
         OceanTimetable=()=>ocean.Value;
+        // X-541: the zone names in the four languages of the game, for coordinates pasted from a list in another language.
+        ZoneNamesLoad=()=>Read("Zone names",()=>Maps.ZoneNamesLoader.Read(data));
         // N-10 (0.671): the island's workshops, read on the player's click.
         IslandCatalogLoad=()=>Read("Island sheets",()=>Island.IslandCatalogLoader.Read(data));
         // W-01 (0.675): the custom delivery clients, read when the page opens and on the player's click.

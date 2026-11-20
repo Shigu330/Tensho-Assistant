@@ -2475,7 +2475,7 @@
     "ShareCopyTip": "Copies your bookmarks (200 at most) to the clipboard as a TENSHO-MAP1 code to send to another player. No third-party site.",
     "ShareCopied": "{0} bookmark(s) copied to the clipboard.",
     "ShareHint": "TENSHO-MAP1 code…",
-    "ShareHintTip": "Paste a bookmark share code here.",
+    "ShareHintTip": "Paste a bookmark share code here, or « Place ( x , y ) » lines (one bookmark per line; the place can be named in any language of the game).",
     "ShareImport": "Import",
     "ShareImportTip": "Adds the code's bookmarks that are not already there, up to 200.",
     "ShareImported": "{0} bookmark(s) added, {1} left out (already there or list full).",
