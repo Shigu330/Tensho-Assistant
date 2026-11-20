@@ -2135,9 +2135,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1522) Avant d'entrer, sur un autre plateau (2e ou plus), ouvrez sa disposition : le panneau Tensho prend ce plateau seul (nom et « (lu dans le jeu) ») ; s'il garde la liste, notez-le (le journal dit « Beastmaster board read in the game's windows: content … »)
 
-- [ ] (0.1522) Page Dresseur, onglet Équipe, après un plateau : sous « Dernier plateau », plus de « Rangs pas encore lus » contradictoire avec les rangs montrés
+- [x] (0.1522) Page Dresseur, onglet Équipe, après un plateau : sous « Dernier plateau », plus de « Rangs pas encore lus » contradictoire avec les rangs montrés
 
-- [ ] (0.1523) Au Dédale bestial, 1er plateau, devant la disposition du plateau : le panneau Tensho appelle Piège-volant (Glace) au combat 4 (Sarcopte, Glace) ; sous le combat 2 (Archidémon, Foudre) une ligne dit qu'aucune bête de l'équipe ne touche Foudre et nomme celles qui la toucheraient
+- [x] (0.1523) Au Dédale bestial, 1er plateau, devant la disposition du plateau : le panneau Tensho appelle Piège-volant (Glace) au combat 4 (Sarcopte, Glace) ; sous le combat 2 (Archidémon, Foudre) une ligne dit qu'aucune bête de l'équipe ne touche Foudre et nomme celles qui la toucheraient
 
 - [x] (0.1523) Page Dresseur, onglet Bêtes : la colonne de l'attaque automatique montre l'élément des bêtes magiques (Feu, Glace…) comme le bestiaire du jeu, « Magique » seulement pour une attaque neutre
 
@@ -2155,7 +2155,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1528) Réglages du chat › Onglets › canaux : réduisez la fenêtre petit à petit ; les cases passent de trois colonnes à deux puis à une, aucun nom n'est coupé (« Linkshell inter-Monde [3] », « Messages d'erreur système », « Objets vendus aux marchés » en entier) et rien ne passe sous la barre de défilement ; même chose pour les filtres du jeu et les genres de lignes de combat
 
-- [ ] (0.1529) Au Dédale bestial, devant « Formation de l'équipe » d'une étape : le panneau Tensho montre d'abord le ou les combats de l'étape (« Combat N · montré dans la disposition du plateau du jeu ») avec leurs ennemis, leurs actions et les trois bêtes avec la raison ; « Tout le plateau » est replié en dessous
+- [x] (0.1529) Au Dédale bestial, devant « Formation de l'équipe » d'une étape : le panneau Tensho montre d'abord le ou les combats de l'étape (« Combat N · montré dans la disposition du plateau du jeu ») avec leurs ennemis, leurs actions et les trois bêtes avec la raison ; « Tout le plateau » est replié en dessous
 
 - [ ] (0.1529) Passez à l'étape suivante du plateau : le bloc du combat en tête change avec l'étape ; dans dalamud.log, la ligne « Beastmaster board window entries: … fights … » change aussi (à relever : une étape ou tout le plateau)
 
@@ -2269,17 +2269,17 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1598) Rechargez Tensho en cours de jeu (mode développeur, ou une version publiée) avec un panneau libre ouvert : le panneau revient en 6 s au plus, sans à-coup visible ; dans dalamud.log, la ligne « Panels opened … ms after the load » dit « their code compiled » (mesuré au rechargement automatique de 0.1598 : ouvert à 5,5 s, première image 103 ms, contre 248 à 1244 ms à l'ancienne borne de 3 s)
 
-- [ ] (0.1599) Dresseur, option « Surligner les combos de la bête » cochée (page Dresseur) : au Dédale bestial, appelez une bête et entrez en combat : « 1 » et « 2 » apparaissent sur les deux techniques du dresseur (ex. Opo-opo ou cu sith : 1 sur Hache rafale, 2 sur Hache mistral) ; dans dalamud.log, les lignes « Beastmaster beast called: beast n (Familiar) … » et « Beast combo highlight: … 1 on _ActionBar… slot …, 2 on … » ; si rien n'apparaît, la ligne « Beast combo highlight: nothing drawn: … » dit pourquoi
+- [x] (0.1599) Dresseur, option « Surligner les combos de la bête » cochée (page Dresseur) : au Dédale bestial, appelez une bête et entrez en combat : « 1 » et « 2 » apparaissent sur les deux techniques du dresseur (ex. Opo-opo ou cu sith : 1 sur Hache rafale, 2 sur Hache mistral) ; dans dalamud.log, les lignes « Beastmaster beast called: beast n (Familiar) … » et « Beast combo highlight: … 1 on _ActionBar… slot …, 2 on … » ; si rien n'apparaît, la ligne « Beast combo highlight: nothing drawn: … » dit pourquoi
 
-- [ ] (0.1599) Hors du Dédale (zone ouverte, en JcE), bête appelée, même option : « 1 » et « 2 » sur les mêmes techniques ; en changeant de bête par une autre Corne d'appel, les chiffres suivent la nouvelle bête
+- [x] (0.1599) Hors du Dédale (zone ouverte, en JcE), bête appelée, même option : « 1 » et « 2 » sur les mêmes techniques ; en changeant de bête par une autre Corne d'appel, les chiffres suivent la nouvelle bête
 
-- [ ] (0.1601) Mineur ou botaniste, un objet de collection de livraison spéciale (ex. Charbon, Carrière de pierre niv. 85) : le panneau Collectionnable de Tensho montre les seuils 240 / 450 / 600 et un plan, au lieu de « Aucun seuil de remise connu » ; le tableau des objets de collection (page Récolte) liste Charbon avec « livraison spéciale »
+- [x] (0.1601) Mineur ou botaniste, un objet de collection de livraison spéciale (ex. Charbon, Carrière de pierre niv. 85) : le panneau Collectionnable de Tensho montre les seuils 240 / 450 / 600 et un plan, au lieu de « Aucun seuil de remise connu » ; le tableau des objets de collection (page Récolte) liste Charbon avec « livraison spéciale »
 
 - [ ] (0.1602) Fenêtre de chat de Tensho, clic droit sur le message d'un joueur (dire, équipe ou murmure) : après Cacher et Mettre en avant viennent Murmurer, Répondre avec le même mode de discussion, Inviter dans l'équipe, Voir la carte de personnage, Ajouter à la liste muette, Cibler ; Murmurer met la saisie du jeu en murmure à ce joueur sans rien envoyer ; Voir la carte de personnage ouvre sa carte
 
 - [ ] (0.1602) Même menu sur un joueur à portée : « Menu du jeu… » ouvre le menu du jeu de ce personnage (requête d'ami, liste noire…) ; Cibler le cible ; sur un joueur loin, ces deux entrées sont absentes ou grisées
 
-- [ ] (0.1602) Sur un message repris de l'historique (après un redémarrage, historique activé) : les entrées qui demandent l'identifiant du joueur (Murmurer, carte, liste muette) sont grisées, sans erreur
+- [x] (0.1602) Sur un message repris de l'historique (après un redémarrage, historique activé) : les entrées qui demandent l'identifiant du joueur (Murmurer, carte, liste muette) sont grisées, sans erreur
 
 - [ ] (0.1603) Mode développeur, fenêtre de chat de Tensho ouverte : un joueur vous dit quelque chose (dire ou équipe), puis clic droit sur son message : Murmurer et Voir la carte de personnage ne sont pas grisés et agissent sur ce joueur ; dalamud.log porte « Chat window, a sender's identifiers: Given (kind …) » (si c'est « LineUnread » ou « Kind » à la place, les entrées restent grisées : le dire)
 
@@ -2287,41 +2287,41 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1604) Après une vente au marché d'un servant : sonnette, ouvrir ce servant puis retirer ses gils : Rangement › Gils, période 1 jour : Servants, Marché compte la vente une fois ; Échanges avec les servants égaux des deux côtés (Servants : dépenses = Personnage : gains)
 
-- [ ] (0.1604) Même page : tous les montants s'écrivent de la même façon (espaces entre les milliers en français, aussi au net en tête et dans « Derniers changements ») ; les titres Gains, Dépenses, Net, Variation et Solde sont à droite, au-dessus de leurs montants
+- [x] (0.1604) Même page : tous les montants s'écrivent de la même façon (espaces entre les milliers en français, aussi au net en tête et dans « Derniers changements ») ; les titres Gains, Dépenses, Net, Variation et Solde sont à droite, au-dessus de leurs montants
 
 - [ ] (0.1605) Récolte › tableau des objets de collection, recherche « Charbon » : une seule ligne (livraison spéciale, Anden, 240/450/600)
 
 - [ ] (0.1606) Stockage › Gils : vendre un objet par un servant, recharger le plugin (ou relancer le jeu) sans toucher aux gils du personnage, ouvrir le servant puis retirer : la vente sous « Marché », le retrait en transfert des deux côtés
 
-- [ ] (0.1606) Fenêtre de chat de Tensho : clic droit sur le nom d'un joueur qui vient de parler : les entrées du jeu (murmurer, inviter, carte de personnage) sont actives ; au journal, « Chat window, a sender's identifiers: Given » une fois
+- [x] (0.1606) Fenêtre de chat de Tensho : clic droit sur le nom d'un joueur qui vient de parler : les entrées du jeu (murmurer, inviter, carte de personnage) sont actives ; au journal, « Chat window, a sender's identifiers: Given » une fois
 
-- [ ] (0.1608) Alarmes : six onglets (Horloges, Alarmes par job, Autres alarmes, Alarme personnelle, Alarmes du jeu, Réglages) ; le nombre d'alarmes dans les deux onglets d'alarmes égale celui du titre de la page ; activer une alarme, changer son avance, la supprimer : gardé après un rechargement
+- [x] (0.1608) Alarmes : six onglets (Horloges, Alarmes par job, Autres alarmes, Alarme personnelle, Alarmes du jeu, Réglages) ; le nombre d'alarmes dans les deux onglets d'alarmes égale celui du titre de la page ; activer une alarme, changer son avance, la supprimer : gardé après un rechargement
 
-- [ ] (0.1609) Jardin : trois onglets (Jardin, Croisements, Alarmes) ; Croisements : choisir une graine, « donne » puis « utilise », une paire et son plan de plantation ; Jardin : les prévisions sur les carrés toujours là
+- [x] (0.1609) Jardin : trois onglets (Jardin, Croisements, Alarmes) ; Croisements : choisir une graine, « donne » puis « utilise », une paire et son plan de plantation ; Jardin : les prévisions sur les carrés toujours là
 
 - [ ] (0.1610) Dédale bestial : finir un plateau, la fenêtre de résultat ouverte jusqu'au bout : la page montre le bonus et le total de la fenêtre ; au journal, « Beastmaster board result read » (une ou deux lignes) sans avertissement
 
-- [ ] (0.1616) Fenêtre de chat ouverte, recharger le plugin (ou relancer le jeu) : les lignes du chat s'affichent en une à deux secondes, sans « Chargement… » qui dure ; au journal, « Chat part (X-564): … ms after the load » sous 3000 et pas de « Slow frame » du chat juste après
+- [x] (0.1616) Fenêtre de chat ouverte, recharger le plugin (ou relancer le jeu) : les lignes du chat s'affichent en une à deux secondes, sans « Chargement… » qui dure ; au journal, « Chat part (X-564): … ms after the load » sous 3000 et pas de « Slow frame » du chat juste après
 
-- [ ] (0.1617) Fenêtre de chat au premier plan : survoler un message puis Ctrl+C, coller ailleurs : le message ; Ctrl+A montre une bande « Tout l'onglet est choisi », Ctrl+C copie tout l'onglet, Échap la retire
+- [x] (0.1617) Fenêtre de chat au premier plan : survoler un message puis Ctrl+C, coller ailleurs : le message ; Ctrl+A montre une bande « Tout l'onglet est choisi », Ctrl+C copie tout l'onglet, Échap la retire
 
-- [ ] (0.1617) Clic droit sur le message d'un joueur d'un autre monde : « Copier le nom … » colle « Nom@Monde » ; d'un joueur de votre monde : « Nom@Monde » aussi
+- [x] (0.1617) Clic droit sur le message d'un joueur d'un autre monde : « Copier le nom … » colle « Nom@Monde » ; d'un joueur de votre monde : « Nom@Monde » aussi
 
 - [ ] (0.1617) Clic droit sur un lien de lieu : « Copier le lieu et ses coordonnées » ; sur un lien d'objet : « Copier le nom de l'objet » ; sur un lien de quête : un menu « Copier le nom de la quête »
 
-- [ ] (0.1617) Clic droit sur un onglet, « Vider cet onglet » : il se vide, un autre onglet garde les mêmes messages, un nouveau message s'y montre ; après un rechargement il reste vidé ; « Remontrer les messages vidés » les rend
+- [x] (0.1617) Clic droit sur un onglet, « Vider cet onglet » : il se vide, un autre onglet garde les mêmes messages, un nouveau message s'y montre ; après un rechargement il reste vidé ; « Remontrer les messages vidés » les rend
 
-- [ ] (0.1618) Roue de la fenêtre de chat, « Masquer les noms des onglets » ou l'œil au bout de la barre : les noms disparaissent, l'onglet affiché reste, l'œil les remontre
+- [x] (0.1618) Roue de la fenêtre de chat, « Masquer les noms des onglets » ou l'œil au bout de la barre : les noms disparaissent, l'onglet affiché reste, l'œil les remontre
 
 - [ ] (0.1618) Marges, coins arrondis et épaisseur du cadre : la fenêtre change aussitôt ; les valeurs par défaut la laissent comme avant
 
-- [ ] (0.1618) Opacité loin de la souris à 40 % : la fenêtre (texte compris) pâlit quand la souris s'en va, redevient pleine dessous
+- [x] (0.1618) Opacité loin de la souris à 40 % : la fenêtre (texte compris) pâlit quand la souris s'en va, redevient pleine dessous
 
 - [ ] (0.1618) Place et taille : taper X, Y, largeur, hauteur puis « Appliquer » ; sortir la fenêtre de l'écran : l'avertissement s'affiche, « Ramener au centre » la remet au milieu
 
-- [ ] (0.1619) Fenêtre de chat sur la boîte des messages du jeu (ou réduite) : roue, taper une place puis « Appliquer » : l'avertissement « La fenêtre suit les messages du jeu… » s'affiche et la fenêtre ne saute pas plus tard quand elle redevient libre
+- [x] (0.1619) Fenêtre de chat sur la boîte des messages du jeu (ou réduite) : roue, taper une place puis « Appliquer » : l'avertissement « La fenêtre suit les messages du jeu… » s'affiche et la fenêtre ne saute pas plus tard quand elle redevient libre
 
-- [ ] (0.1620) Roue de la fenêtre de chat : « Verrouiller la fenêtre » et « Clics à travers la fenêtre verrouillée » : un clic sur les lignes du chat agit dans le jeu derrière (choisir une cible, tourner la caméra, molette pour le zoom) ; les onglets, leurs boutons, un lien et « En bas » répondent toujours ; le cadenas déverrouille
+- [x] (0.1620) Roue de la fenêtre de chat : « Verrouiller la fenêtre » et « Clics à travers la fenêtre verrouillée » : un clic sur les lignes du chat agit dans le jeu derrière (choisir une cible, tourner la caméra, molette pour le zoom) ; les onglets, leurs boutons, un lien et « En bas » répondent toujours ; le cadenas déverrouille
 
 - [ ] (0.1620) « Masquer pendant les cinématiques » : la fenêtre disparaît pendant une cinématique (aussi une scène qui garde l'interface) et revient seule après
 
@@ -2329,37 +2329,37 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1621) Réglages du chat, couleurs : taper « Dire » dans la case du nom court de /dire : les messages de /dire montrent [Dire] ; vider la case : le nom court du jeu revient
 
-- [ ] (0.1621) « Noms des joueurs entre crochets » : les messages montrent [Nom] : texte, murmures compris ; un PNJ garde son nom sans crochets
+- [x] (0.1621) « Noms des joueurs entre crochets » : les messages montrent [Nom] : texte, murmures compris ; un PNJ garde son nom sans crochets
 
-- [ ] (0.1621) « Une couleur pour le nom de chaque joueur » : chaque nom a sa couleur, la même à chaque message et après un rechargement ; un joueur mis en avant reste en couleur d'avertissement
+- [x] (0.1621) « Une couleur pour le nom de chaque joueur » : chaque nom a sa couleur, la même à chaque message et après un rechargement ; un joueur mis en avant reste en couleur d'avertissement
 
-- [ ] (0.1622) Réglages du chat : « S'effacer après » à 10 s : sans nouveau message, la fenêtre s'efface en douceur et un clic à sa place agit dans le jeu ; la souris dessus ou un nouveau message la ramène
+- [x] (0.1622) Réglages du chat : « S'effacer après » à 10 s : sans nouveau message, la fenêtre s'efface en douceur et un clic à sa place agit dans le jeu ; la souris dessus ou un nouveau message la ramène
 
 - [ ] (0.1622) « Espace entre les lignes » à 6 px : les lignes s'écartent, le défilement et « En bas » restent justes
 
 - [ ] (0.1622) Réglages des onglets : « Taille à part » sur un onglet, 150 % : seul cet onglet grossit ; décocher : il reprend la taille de la fenêtre
 
-- [ ] (0.1623) Réglages du chat : « Mode capture » : les noms des joueurs avant leurs messages deviennent des codes #XXXXX, le même pour le même joueur ; les PNJ gardent leur nom ; décocher : les noms reviennent
+- [x] (0.1623) Réglages du chat : « Mode capture » : les noms des joueurs avant leurs messages deviennent des codes #XXXXX, le même pour le même joueur ; les PNJ gardent leur nom ; décocher : les noms reviennent
 
-- [ ] (0.1624) Clic droit sur un message de la fenêtre de chat, « Choisir du texte… » : la boîte s'ouvre avec les messages de l'onglet ; choisir à la souris un morceau sur deux messages, Ctrl+C, coller ailleurs : le morceau exact ; « Tout copier » ; Échap ferme
+- [x] (0.1624) Clic droit sur un message de la fenêtre de chat, « Choisir du texte… » : la boîte s'ouvre avec les messages de l'onglet ; choisir à la souris un morceau sur deux messages, Ctrl+C, coller ailleurs : le morceau exact ; « Tout copier » ; Échap ferme
 
 - [ ] (0.1627) Survoler le nom d'un joueur dans la fenêtre de chat : son nom et son monde ; un membre du groupe ou un joueur proche : sa classe et son niveau aussi ; en mode capture : pas d'info-bulle
 
 - [ ] (0.1627) Survoler un lien d'objet : l'icône, le nom et la description de l'objet comme dans le jeu, puis l'aide du clic
 
-- [ ] (0.1629) Fenêtre de chat Tensho, Paramètres › Chat, mode capture coché : chaque nom devant un message est un code #XXXXX ; un clic droit sur un message écrit « Copier le nom #XXXXX », « Cacher #XXXXX », « Mettre #XXXXX en avant » (aucun vrai nom) ; « Copier le nom » copie bien le vrai nom ; avec « couleur propre des noms », les couleurs changent entre deux rechargements de Tensho, comme les codes
+- [x] (0.1629) Fenêtre de chat Tensho, Paramètres › Chat, mode capture coché : chaque nom devant un message est un code #XXXXX ; un clic droit sur un message écrit « Copier le nom #XXXXX », « Cacher #XXXXX », « Mettre #XXXXX en avant » (aucun vrai nom) ; « Copier le nom » copie bien le vrai nom ; avec « couleur propre des noms », les couleurs changent entre deux rechargements de Tensho, comme les codes
 
-- [ ] (0.1630) Recharger Tensho (ou relancer le jeu) avec la fenêtre de chat ouverte : « Chargement… » disparaît en moins de 3 s et les lignes apparaissent sans à-coup
+- [x] (0.1630) Recharger Tensho (ou relancer le jeu) avec la fenêtre de chat ouverte : « Chargement… » disparaît en moins de 3 s et les lignes apparaissent sans à-coup
 
-- [ ] (0.1638) Fenêtre de chat Tensho : clic sur la loupe au bout de la barre des onglets : une case « Chercher dans l'onglet… » s'ouvre ; taper un mot (essayer sans accent pour un mot qui en a) : seuls les messages qui le contiennent restent, avec leur nombre ; un nouveau message qui le contient s'ajoute ; re-clic sur la loupe : tous les messages reviennent
+- [x] (0.1638) Fenêtre de chat Tensho : clic sur la loupe au bout de la barre des onglets : une case « Chercher dans l'onglet… » s'ouvre ; taper un mot (essayer sans accent pour un mot qui en a) : seuls les messages qui le contiennent restent, avec leur nombre ; un nouveau message qui le contient s'ajoute ; re-clic sur la loupe : tous les messages reviennent
 
-- [ ] (0.1640) Fenêtre de chat, recherche (loupe) : taper un mot lettre par lettre dans un onglet chargé (réglage de lignes au plus haut si possible) : aucune saccade du jeu ; « Recherche… » peut paraître un instant, puis le nombre de messages ; un nouveau message qui contient le mot s'ajoute ; fermer la loupe puis la rouvrir : la boîte est vide.
+- [x] (0.1640) Fenêtre de chat, recherche (loupe) : taper un mot lettre par lettre dans un onglet chargé (réglage de lignes au plus haut si possible) : aucune saccade du jeu ; « Recherche… » peut paraître un instant, puis le nombre de messages ; un nouveau message qui contient le mot s'ajoute ; fermer la loupe puis la rouvrir : la boîte est vide.
 
 - [ ] (0.1640) Fenêtre de chat, mode capture allumé : dans la recherche, taper le code d'un joueur vu à l'écran (« #… ») trouve ses messages ; taper son vrai nom ne les trouve plus.
 
 - [ ] (0.1641) Fenêtre de chat, réglages (roue) : allumer « Icônes des objets dans le texte », puis lier un objet en /dire (ou attendre un lien d'objet) : l'icône de l'objet paraît devant son nom, de la hauteur de la ligne ; un message long se coupe proprement autour ; clic droit, copier : le texte sans icône ; éteindre le réglage : plus d'icône.
 
-- [ ] (0.1642) Fenêtre de chat : clic droit sur un message, « Épingler en haut de cet onglet » : il paraît en haut de l'onglet, sur une ligne, dans la couleur de son canal ; au survol le message entier ; remonter ou descendre dans l'onglet puis cliquer l'épingle : l'onglet revient au message ; la croix le retire ; à 5 épingles, l'entrée du menu est grisée ; se déconnecter puis revenir : plus d'épingle.
+- [x] (0.1642) Fenêtre de chat : clic droit sur un message, « Épingler en haut de cet onglet » : il paraît en haut de l'onglet, sur une ligne, dans la couleur de son canal ; au survol le message entier ; remonter ou descendre dans l'onglet puis cliquer l'épingle : l'onglet revient au message ; la croix le retire ; à 5 épingles, l'entrée du menu est grisée ; se déconnecter puis revenir : plus d'épingle.
 
 - [ ] (0.1643) Fenêtre de chat : dans ses réglages, mots d'alerte, ajouter un mot ; afficher un autre onglet ; quand un message avec ce mot arrive dans l'onglet non affiché, cet onglet clignote (et porte « ! ») ; l'afficher : il cesse ; éteindre « Onglet qui clignote sur une alerte » : plus de clignotement, le « ! » reste.
 
@@ -2371,11 +2371,11 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1647) Fenêtre de chat : activer « Alertes dans la barre du serveur » ; quand un message avec un mot d'alerte ou votre prénom arrive dans un onglet non affiché, la barre du serveur montre « ! Chat 1 » ; un clic dessus affiche cet onglet et le compte revient à rien quand il est vu.
 
-- [ ] (0.1648) Fenêtre de chat, réglages d'apparence : changer l'opacité et une couleur de canal, « Copier l'apparence », remettre d'autres valeurs, puis « Coller une apparence » : la fenêtre reprend l'opacité et la couleur copiées, ses onglets et mots d'alerte restent ; avec un autre texte dans le presse-papiers, « Coller une apparence » dit qu'il n'y a pas de code et rien ne change.
+- [x] (0.1648) Fenêtre de chat, réglages d'apparence : changer l'opacité et une couleur de canal, « Copier l'apparence », remettre d'autres valeurs, puis « Coller une apparence » : la fenêtre reprend l'opacité et la couleur copiées, ses onglets et mots d'alerte restent ; avec un autre texte dans le presse-papiers, « Coller une apparence » dit qu'il n'y a pas de code et rien ne change.
 
-- [ ] (0.1649) Fenêtre de chat, réglages d'apparence : « Apparences toutes faites », choisir « Transparente » : plus de fond ni de cadre, lettres avec contour ; puis « Compacte » : texte plus petit et serré ; puis « Par défaut » : l'apparence d'origine ; les onglets et mots d'alerte restent à chaque fois.
+- [x] (0.1649) Fenêtre de chat, réglages d'apparence : « Apparences toutes faites », choisir « Transparente » : plus de fond ni de cadre, lettres avec contour ; puis « Compacte » : texte plus petit et serré ; puis « Par défaut » : l'apparence d'origine ; les onglets et mots d'alerte restent à chaque fois.
 
-- [ ] (0.1650) Fenêtre de chat ouverte : recharger le plugin (ou relancer le jeu) ; « Chargement… » dure moins longtemps qu'avant, et le jeu ne saccade pas plus pendant ces secondes.
+- [x] (0.1650) Fenêtre de chat ouverte : recharger le plugin (ou relancer le jeu) ; « Chargement… » dure moins longtemps qu'avant, et le jeu ne saccade pas plus pendant ces secondes.
 
 - [ ] (0.1651) Fenêtre de chat : clic droit sur un message, « Choisir du texte… » ; attendre 10 secondes : la fenêtre garde sa taille et la zone de texte reste visible ; on peut y choisir un morceau de texte et le copier par Ctrl+C.
 
@@ -2392,6 +2392,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1655) Profil « En mission » avec un aspect à lui : entrer en mission, changer un peu l'aspect sur place, sortir puis revenir : le changement est gardé pour la mission, l'aspect habituel revient dehors.
 
 - [ ] (0.1655) Profil « En artisanat » : ouvrir le carnet d'artisanat et fabriquer : la fenêtre prend l'aspect et les onglets de l'artisanat, puis les rend en fermant le carnet.
+
+- [ ] (0.1656) Réglages du chat, section Onglets : cliquer « Retirer » sur l'onglet « Combat » : il disparaît et la ligne « Onglet « Combat » retiré (encore N s pour l'annuler) » apparaît au-dessus des onglets ; cliquer « Annuler » avant 10 secondes : « Combat » revient à sa place avec ses réglages.
+
+- [ ] (0.1656) Retirer « Combat » et laisser passer 10 secondes : sous la liste, le bouton « Remettre « Combat » » le remet seul à sa place ; puis « Remettre les onglets par défaut » : une question s'ouvre ; « Remettre » rend Général, Combat, Événement et Social, et l'historique du chat reste affiché.
+
+- [ ] (0.1657) Avec « Cacher les messages du chat du jeu » et « Sous une fenêtre du jeu : se cacher » : ouvrir l'inventaire par-dessus la fenêtre de chat de Tensho : la fenêtre de Tensho se cache, mais le chat du jeu ne revient pas ; fermer l'inventaire : la fenêtre de Tensho revient à sa place.
+
+- [ ] (0.1657) Survoler un lien d'objet dans le chat de Tensho (qui remplace celui du jeu) : seule l'info-bulle de Tensho s'affiche, aucune info-bulle d'objet du jeu ; la fenêtre ne disparaît pas et les réglages du chat de Tensho restent accessibles.
+
+- [ ] (0.1657) Avec « Masquer en combat » : engager un combat : la fenêtre de Tensho se cache et le chat du jeu reste caché ; décocher « Cacher les messages du chat du jeu » : le chat du jeu revient aussitôt.
+
+- [ ] (0.1658) Recharger Tensho (ou relancer le jeu), puis, dans les 30 secondes, recevoir un message d'un joueur (Dire ou Hurler) ; une minute plus tard, clic droit sur son nom dans le chat de Tensho : les entrées du jeu sont là (Murmurer actif, Carte de personnage…), comme pour un message reçu plus tard.
 
 **0.535 : interfaces** — à voir en jouant
 
