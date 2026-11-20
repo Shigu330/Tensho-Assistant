@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (641 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (643 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -709,12 +709,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-639 | Bench X-631 (review 0.1560, M3): at start, a damaged seen-prices file that… | Done in 0.1581 |
 | X-641 | Tool: plan.py done accepts a done-in without a version number, which breaks… | Done in 0.1586.0 |
 | X-642 | Review of block 0.1579 to 0.1581 (review 0.1581, 20/11), minor M1, M2: M1 in… | Done in 0.1582 |
+| X-643 | Review of block 0.1582 to 0.1586 (review 0.1586, 20/11), I1: finding in… | Done in 0.1587 |
+| X-644 | Review of block 0.1582 to 0.1586 (review 0.1586, 20/11), minor M1, M2: M1 in… | Done in 0.1588 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (641 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (643 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1421,3 +1423,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-639 | Banc X-631 (relecture 0.1560, M3) : au démarrage, un fichier des prix vus abîmé… | Fait en 0.1581 |
 | X-641 | Outil : plan.py done accepte un « fait en » sans numéro de version (« hors… | Fait en 0.1586.0 |
 | X-642 | Relecture du bloc 0.1579 à 0.1581 (relecture 0.1581, 20/11), mineurs M1, M2… | Fait en 0.1582 |
+| X-643 | Relecture du bloc 0.1582 à 0.1586 (relecture 0.1586, 20/11), I1 : X-518 M2… | Fait en 0.1587 |
+| X-644 | Relecture du bloc 0.1582 à 0.1586 (relecture 0.1586, 20/11), mineurs M1, M2… | Fait en 0.1588 |

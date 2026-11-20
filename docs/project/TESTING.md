@@ -2259,6 +2259,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1586) Avec « Sans limite » coché sur les messages et sur les jours, décochez puis recochez « Garder l'historique » : la question d'accord dit « rien n'est retiré » ; avec une limite, elle dit « les plus anciens sont retirés ».
 
+- [ ] (0.1588) Carte › Favoris : collez une liste de lieux avec coordonnées (« Lieu ( x , y ) ») et cliquez aussitôt « Importer » : aucun à-coup du jeu ; « Lecture des noms de zones… » peut s'afficher un instant, puis les favoris sont ajoutés.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
