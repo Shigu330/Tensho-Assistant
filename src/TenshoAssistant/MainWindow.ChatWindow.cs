@@ -159,6 +159,9 @@ internal sealed partial class MainWindow
     /// <summary>X-447 D8 (0.1620): the moments the window is hidden in (set by the plugin: the game's conditions).</summary>
     internal Func<bool>? InCutsceneNow{get;set;}
     internal Func<bool>? InDutyNow{get;set;}
+    /// <summary>X-447 B13 (0.1655): crafting (the game's crafting state), in a city (the zone's use, read once per zone): the chat's contexts.</summary>
+    internal Func<bool>? InCraftingNow{get;set;}
+    internal Func<bool>? InTownNow{get;set;}
     private bool ChatHiddenNow()=>ChatLook.HiddenNow(ChatOptions,InCombatNow?.Invoke()==true,InCutsceneNow?.Invoke()==true,InDutyNow?.Invoke()==true);
 
     // X-485 (0.1479): where the window was last drawn, whether a game window covers it there, and the frame it was last drawn in.
@@ -217,6 +220,7 @@ internal sealed partial class MainWindow
         DrawChatLookSettings();
         DrawChatHistorySettings(DefaultConfiguration.Chat);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionTabs")+"###ChatTabsSection"))DrawChatTabSettings(options);
+        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionContexts")+"###ChatContextsSection"))DrawChatContextProfiles(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionColors")+"###ChatColorsSection"))DrawChatColorSettings(options);
         if(TenshoAssistant.UI.UiComponents.Header(localization.Get("ChatWindow.SectionPlayers")+"###ChatPlayersSection"))DrawChatPlayers(options);
         if(developerMode)DrawChatKinds();
@@ -240,6 +244,7 @@ internal sealed partial class MainWindow
     {
         var options=ChatOptions;
         DrawChatTabSettings(options);
+        DrawChatContextProfiles(options);
         if(developerMode)DrawChatKinds();
         SaveChatSettingsWhenReleased();
     }
@@ -521,9 +526,54 @@ internal sealed partial class MainWindow
     private List<ChatTabSettings> ChatWindowTabs(ChatSettings options)
     {
         chatWindowTabs.Clear();
-        chatWindowTabs.AddRange(ChatTabs(options));
+        // X-447 B13 (0.1655): the tabs the context's profile shows (every tab without one).
+        ChatContexts.Shown(ChatTabs(options),ChatContexts.ProfileOf(options,chatContextNow),chatWindowTabs);
         if(options.Conversations)chatWindowTabs.AddRange(chatConversations.Tabs);
         return chatWindowTabs;
+    }
+
+    // X-447 B13 (0.1655): the context the window follows (a duty, crafting, a city).
+    private ChatContext chatContextNow;
+
+    /// <summary>X-447 B13 (0.1655, D-198 a): the window's look and tabs follow the context; the tab shown stays the same when the new context
+    /// shows it too. Only the display changes (R03.1).</summary>
+    private void FollowChatContext(ChatSettings options)
+    {
+        var now=ChatContexts.Now(InDutyNow?.Invoke()==true,InCraftingNow?.Invoke()==true,InTownNow?.Invoke()==true);
+        if(now!=chatContextNow)
+        {
+            chatContextNow=now;
+            if(options.ContextProfiles)chatSelectTab=chatShownTab;
+        }
+        if(ChatContexts.Follow(options,now))TrySave("Chat window context");
+    }
+
+    /// <summary>X-447 B13 (0.1655, D-198 a): each context's look and tabs, under the tabs' settings.</summary>
+    private void DrawChatContextProfiles(ChatSettings options)
+    {
+        BoolSetting("ChatWindow.ContextProfiles","ChatWindow.ContextProfilesTip",()=>configuration.Chat.ContextProfiles,value=>configuration.Chat.ContextProfiles=value,c=>c.Chat.ContextProfiles);
+        if(!options.ContextProfiles)return;
+        var tabs=ChatTabs(options);
+        foreach(var context in ChatContexts.Chosen)
+        {
+            ImGui.PushID("ChatContext"+context);
+            try
+            {
+                ImGui.TextColored(Accent,localization.Get("ChatWindow.Context"+context)+(context==chatContextNow ? " "+localization.Get("ChatWindow.ContextNow"):""));
+                var profile=options.Profiles?.GetValueOrDefault(context);
+                var ownLook=profile?.Look is { Length:>0 };
+                ImGui.TextColored(Muted,localization.Get(ownLook ? "ChatWindow.ContextLookOwn":"ChatWindow.ContextLookWindow"));
+                if(SettingButton("ChatWindow.ContextUseLook","ChatWindow.ContextUseLookTip")){ChatContexts.Edit(options,context).Look=ChatTheme.Share(options);chatSettingsPending=true;}
+                if(ownLook && profile is not null)
+                {
+                    ImGui.SameLine();
+                    if(SettingButton("ChatWindow.ContextNoLook","ChatWindow.ContextNoLookTip")){profile.Look=null;chatSettingsPending=true;}
+                }
+                DrawChatCheckGrid("###ChatContextTabs"+context,tabs,tab=>tab.Name,tab=>"ChatContextTab"+context+tab.Name,tab=>ChatContexts.ShowsTab(profile,tab),
+                    (tab,shown)=>{ChatContexts.SetTab(ChatContexts.Edit(options,context),tabs,tab,shown);chatSettingsPending=true;},_=>Tip("ChatWindow.ContextTabTip"));
+            }
+            finally{ImGui.PopID();}
+        }
     }
 
     /// <summary>X-447 B10 (0.1654): a conversation's tab never replaced while shown or holding something not seen.</summary>
@@ -1024,6 +1074,7 @@ internal sealed partial class MainWindow
     private void DrawChatWindowLines()
     {
         var options=ChatOptions;
+        FollowChatContext(options);
         UpdateChatConversations(options);
         var tabs=ChatWindowTabs(options);
         var table=ChatFilterTableNow();

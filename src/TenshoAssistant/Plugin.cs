@@ -255,6 +255,19 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.InCutsceneNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene]
                 || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene78] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent];
             mainWindow.InDutyNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
+            // X-447 B13 (0.1655): the chat window's contexts: crafting (the game's crafting states), a city (the zone's TerritoryIntendedUse 0,
+            // the game's 19 cities: docs/evidence/0.1655-chat-context-cities.md), read once per zone; a row not read is no city (R08).
+            mainWindow.InCraftingNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.Crafting] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.PreparingToCraft];
+            uint townTerritory=uint.MaxValue;var inTown=false;
+            mainWindow.InTownNow=()=>
+            {
+                uint territory=client.TerritoryType;
+                if(territory==townTerritory)return inTown;
+                townTerritory=territory;
+                try{inTown=territory!=0 && data.GetExcelSheet<Lumina.Excel.Sheets.TerritoryType>().GetRowOrDefault(territory) is { } row && row.TerritoryIntendedUse.RowId==Chat.ChatContexts.TownUse;}
+                catch(Exception){inTown=false;}
+                return inTown;
+            };
             // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
             // the same one a click in the game's chat calls), run on the game's thread on the player's click. X-496 M1 (0.1478): its message
             // is the link's own string (from the link to its end), as Dalamud passes it (docs/evidence/0.1478-dalamud-link-handler.md); a

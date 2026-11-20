@@ -99,7 +99,7 @@ internal static class ChatConversations1654Tests
             Check(!new ChatSettings().Conversations,"off by default");
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs")).Replace("\r\n","\n");
             Check(!window.Contains("ChatTabs(options).Add",StringComparison.Ordinal) && !window.Contains("options.Tabs.Add",StringComparison.Ordinal)
-                && window.Contains("chatWindowTabs.AddRange(ChatTabs(options));",StringComparison.Ordinal)
+                && window.Contains("ChatContexts.Shown(ChatTabs(options),ChatContexts.ProfileOf(options,chatContextNow),chatWindowTabs);",StringComparison.Ordinal)
                 && window.Contains("if(options.Conversations)chatWindowTabs.AddRange(chatConversations.Tabs);",StringComparison.Ordinal),"the window shows them beside the settings' tabs, never among them");
         }),
         ("Chat conversations 1654: wiring: updated before the tabs are drawn, the tell counted as new, a menu entry and a tab entry, closed tabs forgotten, the setting and its texts",()=>

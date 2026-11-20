@@ -111,6 +111,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1604-gil-retainer-sales.md](0.1604-gil-retainer-sales.md) | `src/TenshoAssistant/Inventory/GilRecorder.cs`, `tests/TenshoAssistant.Tests/GilRetainerSales1604Tests.cs`, `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.163.0-triad-editdeck-capture.log](0.163.0-triad-editdeck-capture.log) | `src/TenshoAssistant/MiniGames/TriadObservation.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1650-chat-part-priority.md](0.1650-chat-part-priority.md) | `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/ChatPriority1650Tests.cs` | `CHANGELOG.md` |
+| [0.1655-chat-context-cities.md](0.1655-chat-context-cities.md) | `src/TenshoAssistant/Chat/ChatContexts.cs`, `src/TenshoAssistant/Plugin.cs`, `tests/TenshoAssistant.Tests/ChatContexts1655Tests.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -311,7 +312,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.96.0-wolf-probe.log](0.96.0-wolf-probe.log) | — | `docs/changelog/CHANGELOG-0.0-0.99.md` |
 | [0.961-ocean-missions.md](0.961-ocean-missions.md) | `src/TenshoAssistant/Gathering/OceanMissions.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
 | [0.97.0-wolf-npc-probe.log](0.97.0-wolf-npc-probe.log) | `src/TenshoAssistant/Npcs/NpcVendorCatalog.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md` |
-| [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md` |
+| [0.975-field-zones.md](0.975-field-zones.md) | `src/TenshoAssistant/Fields/FieldBoard.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/evidence/0.1655-chat-context-cities.md` |
 | [0.978-garden-harvest.md](0.978-garden-harvest.md) | `src/TenshoAssistant/Reminders/GardenChat.cs`, `tests/TenshoAssistant.Tests/GardenJournalTests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/evidence/0.1360-garden-harvest-menu.md` |
 | [0.979-labyrinth-reading.md](0.979-labyrinth-reading.md) | `src/TenshoAssistant/Competitive/CompetitiveGate.Dalamud.cs`, `src/TenshoAssistant/Competitive/CompetitiveZones.cs` | `docs/evidence/0.980-beast-teams.md` |
 | [0.98.0-lgb-probe.log](0.98.0-lgb-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcLoader.Dalamud.cs`, `src/TenshoAssistant/Npcs/NpcVendorLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.0-0.99.md`, `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -337,5 +338,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 325 files · fichiers ; 280 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 326 files · fichiers ; 281 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

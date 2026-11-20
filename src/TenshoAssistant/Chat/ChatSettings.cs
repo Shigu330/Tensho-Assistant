@@ -113,6 +113,14 @@ public sealed class ChatSettings
     /// <summary>X-447 B10 (0.1654, the user's choice of 15/11, after WIM): each player's tells in a tab of their own, opened by the first tell and
     /// closed by the player; in memory only (ChatConversations). Off by default.</summary>
     public bool Conversations{get;set;}
+    /// <summary>X-447 B13 (0.1655, D-198 a): the window's look and the tabs shown change by themselves by context (ChatContexts). Off by default.</summary>
+    public bool ContextProfiles{get;set;}
+    /// <summary>X-447 B13: each context's profile (its look, its tabs).</summary>
+    public Dictionary<ChatContext,ChatContextProfile>? Profiles{get;set;}
+    /// <summary>X-447 B13: the context whose look the window wears now (None: its own), and its own look kept meanwhile (a B16 code), so that
+    /// it comes back even after a restart in the middle of a duty.</summary>
+    public ChatContext ProfileApplied{get;set;}
+    public string? OwnLook{get;set;}
     /// <summary>X-447 B7 (0.1646): the sound of <paramref name="channel"/>'s messages, 0 for none (or a number out of 1 to 16).</summary>
     public int SoundOf(ChatChannel channel)=>Sounds is { } sounds && sounds.TryGetValue(channel,out var sound) && Alarms.MacroSound.Valid(sound) ? sound:0;
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
