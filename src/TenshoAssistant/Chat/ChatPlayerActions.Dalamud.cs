@@ -193,6 +193,11 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
             case ChatPlayerAction.GameMenu:
                 if(InRange(source) is { } shown)AgentHUD.Instance()->OpenContextMenuFromTarget((FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)shown.Address);
                 break;
+            // X-680 (0.1662): the player's party finder listing, as the game's menu opens it (AgentLookingForGroup.OpenListingByContentId of
+            // FFXIVClientStructs); a player recruiting nothing: the game says so.
+            case ChatPlayerAction.PartyFinder:
+                if(source.ContentId!=0)AgentLookingForGroup.Instance()->OpenListingByContentId(source.ContentId);
+                break;
         }
     }
 

@@ -137,13 +137,17 @@ public sealed class ChatSources
 }
 
 /// <summary>X-654 (0.1602): the entries of a player's menu in the chat window, after Tensho's own; their texts are the client's (Addon rows).</summary>
-public enum ChatPlayerAction : byte { Tell, Reply, Invite, Plate, Mute, Target, GameMenu }
+/// X-680 (0.1662, the user's request of 20/11: « we still miss things », the game's menu beside Tensho's): the game's other entries.
+public enum ChatPlayerAction : byte { Tell, Reply, Invite, Plate, Mute, Target, GameMenu, Friend, Blacklist, Report, PartyFinder }
 
 /// <summary>X-679 (0.1660): why an entry is greyed, said in its tooltip (None: it can be used).</summary>
-public enum ChatPlayerWhy : byte { None, NoSender, NoIdentifiers, NoAccount, NotInRange }
+/// X-680 (0.1662): GameOnly, the game does it only from its own menu (no function of the game's library for it); NoReplyMode, the channel's
+/// mode is not known to the game's library (only say, party and alliance are).
+public enum ChatPlayerWhy : byte { None, NoSender, NoIdentifiers, NoAccount, NotInRange, GameOnly, NoReplyMode }
 
 /// <summary>X-654 (0.1602): one entry, its text's Addon row (0: Tensho's own text), and whether it can be used now. X-679 (0.1660): why not.</summary>
-public readonly record struct ChatPlayerEntry(ChatPlayerAction Action,uint AddonRow,bool Enabled,ChatPlayerWhy Why=ChatPlayerWhy.None);
+/// X-680 (0.1662): Block, an entry of the game's « Blocking functions » submenu (Addon 16061), drawn inside it.
+public readonly record struct ChatPlayerEntry(ChatPlayerAction Action,uint AddonRow,bool Enabled,ChatPlayerWhy Why=ChatPlayerWhy.None,bool Block=false);
 
 /// <summary>
 /// X-654 (0.1602): which entries a player's menu offers, from what is known of the sender. The client's texts (Addon, game 2026.11.03): 50
@@ -154,6 +158,10 @@ public readonly record struct ChatPlayerEntry(ChatPlayerAction Action,uint Addon
 public static class ChatPlayerMenu
 {
     public const uint TellRow=50,ReplyRow=368,InviteRow=54,PlateRow=15083,MuteRow=14833,TargetRow=8320;
+    /// <summary>X-680 (0.1662): the client's texts of the game's other entries (Addon, French client 2026.11.03, XbmProbe of 21/11): 61 « Envoyer
+    /// une requête d'ami », 16061 « Fonctions de blocage », 59 « Ajouter à la liste noire », 10870 « Signaler ce joueur », 2200 « Recherche
+    /// d'équipe ».</summary>
+    public const uint FriendRow=61,BlockRow=16061,BlacklistRow=59,ReportRow=10870,PartyFinderRow=2200;
 
     /// <summary>The channels whose mode « Reply in selected mode » sets (the game's ChatChannel values of ClientStructs: Say 1, Party 2, Alliance 3), tells apart.</summary>
     public static int? ReplyChannel(ChatChannel channel)=>channel switch{ChatChannel.Say=>1,ChatChannel.Party=>2,ChatChannel.Alliance=>3,_=>null};
@@ -163,28 +171,34 @@ public static class ChatPlayerMenu
     /// request of 20/11: « Tell, can't it be done with the name? »): a tell, and the reply to a tell, need only the player's name and home world,
     /// which every source has (the typing box set to a tell to that player, as « /tell Name@World » does; nothing sent).
     /// </summary>
+    /// <remarks>X-680 (0.1662, the user's request of 20/11, two pictures of the same « Yell »): the game's entries in the game's order:
+    /// tell, reply in the same mode (every spoken channel, as the game offers it), invite, friend request, blocking functions (mute list,
+    /// blacklist), report, party finder, target, adventurer plate, then Tensho's « Game menu… » for a character in range. What the game's
+    /// library cannot do (friend request, blacklist, report: no function, docs/evidence/0.1662-chat-player-menu-game-entries.md) is greyed
+    /// with why; « Game menu… » or the game's chat do it.</remarks>
     public static IReadOnlyList<ChatPlayerEntry> Entries(ChatSource? source,ChatChannel channel,bool inRange,bool canInvite)
     {
         var tell=channel is ChatChannel.TellIn or ChatChannel.TellOut;
-        var reply=tell || ReplyChannel(channel) is not null;
-        if(source is null)
+        var known=source is { ContentId:not 0 };
+        var account=known && source!.AccountId!=0;
+        ChatPlayerWhy Need(bool can,ChatPlayerWhy why)=>source is null ? ChatPlayerWhy.NoSender:can ? ChatPlayerWhy.None:why;
+        ChatPlayerEntry Entry(ChatPlayerAction action,uint row,bool can,ChatPlayerWhy why,bool block=false)
+            =>new(action,row,source is not null && can,Need(can,why),block);
+        var list=new List<ChatPlayerEntry>{Entry(ChatPlayerAction.Tell,TellRow,true,ChatPlayerWhy.None)};
+        if(ChatChannels.Spoken(channel))
         {
-            var greyed=new List<ChatPlayerEntry>{new(ChatPlayerAction.Tell,TellRow,false,ChatPlayerWhy.NoSender)};
-            if(reply)greyed.Add(new(ChatPlayerAction.Reply,ReplyRow,false,ChatPlayerWhy.NoSender));
-            greyed.Add(new(ChatPlayerAction.Plate,PlateRow,false,ChatPlayerWhy.NoSender));
-            greyed.Add(new(ChatPlayerAction.Mute,MuteRow,false,ChatPlayerWhy.NoSender));
-            greyed.Add(new(ChatPlayerAction.Target,TargetRow,false,ChatPlayerWhy.NoSender));
-            return greyed;
+            var mode=tell || ReplyChannel(channel) is not null;
+            list.Add(Entry(ChatPlayerAction.Reply,ReplyRow,mode,ChatPlayerWhy.NoReplyMode));
         }
-        var known=source.ContentId!=0;
-        var list=new List<ChatPlayerEntry>{new(ChatPlayerAction.Tell,TellRow,true)};
-        if(reply)list.Add(new(ChatPlayerAction.Reply,ReplyRow,true));
-        if(canInvite)list.Add(new(ChatPlayerAction.Invite,InviteRow,true));
-        list.Add(new(ChatPlayerAction.Plate,PlateRow,known,known ? ChatPlayerWhy.None:ChatPlayerWhy.NoIdentifiers));
-        list.Add(new(ChatPlayerAction.Mute,MuteRow,known && source.AccountId!=0,
-            !known ? ChatPlayerWhy.NoIdentifiers:source.AccountId==0 ? ChatPlayerWhy.NoAccount:ChatPlayerWhy.None));
-        list.Add(new(ChatPlayerAction.Target,TargetRow,inRange,inRange ? ChatPlayerWhy.None:ChatPlayerWhy.NotInRange));
-        if(inRange)list.Add(new(ChatPlayerAction.GameMenu,0,true));
+        if(source is not null && canInvite)list.Add(Entry(ChatPlayerAction.Invite,InviteRow,true,ChatPlayerWhy.None));
+        list.Add(Entry(ChatPlayerAction.Friend,FriendRow,false,ChatPlayerWhy.GameOnly));
+        list.Add(Entry(ChatPlayerAction.Mute,MuteRow,account,known ? ChatPlayerWhy.NoAccount:ChatPlayerWhy.NoIdentifiers,true));
+        list.Add(Entry(ChatPlayerAction.Blacklist,BlacklistRow,false,ChatPlayerWhy.GameOnly,true));
+        list.Add(Entry(ChatPlayerAction.Report,ReportRow,false,ChatPlayerWhy.GameOnly));
+        list.Add(Entry(ChatPlayerAction.PartyFinder,PartyFinderRow,known,ChatPlayerWhy.NoIdentifiers));
+        list.Add(Entry(ChatPlayerAction.Target,TargetRow,inRange,ChatPlayerWhy.NotInRange));
+        list.Add(Entry(ChatPlayerAction.Plate,PlateRow,known,ChatPlayerWhy.NoIdentifiers));
+        if(source is not null && inRange)list.Add(new(ChatPlayerAction.GameMenu,0,true));
         return list;
     }
 

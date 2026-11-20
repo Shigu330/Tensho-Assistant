@@ -964,8 +964,14 @@ internal sealed partial class MainWindow
         var entries=Chat.ChatPlayerMenu.Entries(source,said.Channel,inRange,source is not null && actions.CanInvite(source));
         if(entries.Count==0)return;
         ImGui.Separator();
+        // X-680 (0.1662): the game's « Blocking functions » submenu holds its entries (consecutive in the list); its text missing: drawn flat.
+        var blockLabel=actions.Text(Chat.ChatPlayerMenu.BlockRow);
+        bool blockStarted=false,blockOpen=false;
         foreach(var entry in entries)
         {
+            if(entry.Block && !blockStarted && blockLabel.Length>0){blockStarted=true;blockOpen=ImGui.BeginMenu(blockLabel+"###ChatPlayerBlock");}
+            else if(!entry.Block && blockOpen){ImGui.EndMenu();blockOpen=false;}
+            if(entry.Block && blockStarted && !blockOpen)continue;
             var text=entry.AddonRow!=0 ? actions.Text(entry.AddonRow):localization.Get("ChatWindow.MenuGameMenu");
             if(text.Length==0)continue;
             if(ImGui.Selectable(text+"###ChatPlayer"+entry.Action,false,entry.Enabled ? ImGuiSelectableFlags.None:ImGuiSelectableFlags.Disabled)
@@ -973,6 +979,7 @@ internal sealed partial class MainWindow
                 actions.Run(entry.Action,source,said.Channel);
             if(ChatPlayerWhyKey(entry.Why) is { Length:>0 } why)Tip(why);
         }
+        if(blockOpen)ImGui.EndMenu();
     }
 
     /// <summary>X-679 (0.1660): the tooltip of a greyed entry, saying why.</summary>
@@ -982,6 +989,8 @@ internal sealed partial class MainWindow
         Chat.ChatPlayerWhy.NoIdentifiers=>"ChatWindow.PlayerWhyNoIdentifiers",
         Chat.ChatPlayerWhy.NoAccount=>"ChatWindow.PlayerWhyNoAccount",
         Chat.ChatPlayerWhy.NotInRange=>"ChatWindow.PlayerWhyNotInRange",
+        Chat.ChatPlayerWhy.GameOnly=>"ChatWindow.PlayerWhyGameOnly",
+        Chat.ChatPlayerWhy.NoReplyMode=>"ChatWindow.PlayerWhyNoReplyMode",
         _=>"",
     };
 

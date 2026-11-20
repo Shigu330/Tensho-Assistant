@@ -78,7 +78,7 @@ internal static class ChatSenders1660Tests
                   && named.Single(e=>e.Action==ChatPlayerAction.Mute) is { Enabled:false,Why:ChatPlayerWhy.NoIdentifiers }
                   && named.Single(e=>e.Action==ChatPlayerAction.Target) is { Enabled:false,Why:ChatPlayerWhy.NotInRange },"plate, mute and target say why");
             var noAccount=ChatPlayerMenu.Entries(new ChatSource("Aya Lune",73,1001,0),ChatChannel.Say,true,true);
-            Check(noAccount.Single(e=>e.Action==ChatPlayerAction.Mute) is { Enabled:false,Why:ChatPlayerWhy.NoAccount } && noAccount.Where(e=>e.Action!=ChatPlayerAction.Mute).All(e=>e.Enabled && e.Why==ChatPlayerWhy.None),"no account: the mute list says so");
+            Check(noAccount.Single(e=>e.Action==ChatPlayerAction.Mute) is { Enabled:false,Why:ChatPlayerWhy.NoAccount } && noAccount.Where(e=>e.Action!=ChatPlayerAction.Mute && e.Why!=ChatPlayerWhy.GameOnly).All(e=>e.Enabled && e.Why==ChatPlayerWhy.None),"no account: the mute list says so");
             Check(ChatPlayerMenu.Entries(new ChatSource("Aya Lune",73),ChatChannel.TellIn,false,false).Single(e=>e.Action==ChatPlayerAction.Reply).Enabled,"reply to a tell by name");
         }),
         ("Chat senders 1660: the player a message names, from its sender's text (glyphs off, « Name@World »)",()=>

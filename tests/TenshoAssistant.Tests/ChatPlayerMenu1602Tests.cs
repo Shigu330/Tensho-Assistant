@@ -49,7 +49,10 @@ internal static class ChatPlayerMenu1602Tests
             Check(entries.Single(e=>e.Action==ChatPlayerAction.Target) is {Enabled:false,AddonRow:8320} && entries.All(e=>e.Action!=ChatPlayerAction.GameMenu),"not in range: no target, no game menu");
             var known=bare with{ContentId=1001,AccountId=2001};
             var near=ChatPlayerMenu.Entries(known,ChatChannel.Ls1,true,false);
-            Check(near.All(e=>e.Enabled) && near.Any(e=>e.Action==ChatPlayerAction.GameMenu) && near.All(e=>e.Action is not (ChatPlayerAction.Reply or ChatPlayerAction.Invite)),"in range, known: all on; linkshell: no reply; cannot invite: none");
+            // X-680 (0.1662): the game's own entries are all listed, those its library cannot do greyed (GameOnly); a linkshell's reply is
+            // listed as the game offers it, greyed without a known mode (before: no friend request, blacklist, report, nor linkshell reply).
+            Check(near.Where(e=>e.Why is not (ChatPlayerWhy.GameOnly or ChatPlayerWhy.NoReplyMode)).All(e=>e.Enabled) && near.Any(e=>e.Action==ChatPlayerAction.GameMenu)
+                  && near.Single(e=>e.Action==ChatPlayerAction.Reply) is {Enabled:false,Why:ChatPlayerWhy.NoReplyMode} && near.All(e=>e.Action!=ChatPlayerAction.Invite),"in range, known: all on but what the game alone does; linkshell: reply greyed; cannot invite: none");
             // X-681 (0.1660): the reply to a tell by name too (before: it needed the identifiers).
             Check(ChatPlayerMenu.Entries(bare,ChatChannel.TellIn,false,false).Single(e=>e.Action==ChatPlayerAction.Reply).Enabled,"reply to a tell by name");
             Check(ChatPlayerMenu.ReplyChannel(ChatChannel.Say)==1 && ChatPlayerMenu.ReplyChannel(ChatChannel.Party)==2 && ChatPlayerMenu.ReplyChannel(ChatChannel.Alliance)==3 && ChatPlayerMenu.ReplyChannel(ChatChannel.FreeCompany) is null,"modes of FFXIVClientStructs' ChatChannel");

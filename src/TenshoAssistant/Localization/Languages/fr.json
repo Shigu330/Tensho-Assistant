@@ -6322,6 +6322,8 @@
     "PlayerWhyNoIdentifiers": "Le jeu n'a pas donné les identifiants de ce joueur avec ce message (un message de l'historique gardé sur ce PC, ou reçu avant que Tensho soit prêt), et cette entrée en a besoin. Un nouveau message de ce joueur les donne.",
     "PlayerWhyNoAccount": "Le jeu n'a pas donné l'identifiant de compte de ce joueur : la liste muette en a besoin.",
     "PlayerWhyNotInRange": "Ce joueur n'est pas près de vous.",
+    "PlayerWhyGameOnly": "Le jeu ne le fait que depuis ses propres menus (sa bibliothèque n'offre à Tensho aucune fonction pour cela) : pour un joueur près de vous, « Menu du jeu… » ; sinon, le chat du jeu.",
+    "PlayerWhyNoReplyMode": "Tensho ne peut régler le mode de réponse que pour Dire, Équipe et Alliance (les seuls modes que nomme la bibliothèque du jeu) : pour ce canal, passez par le chat du jeu.",
     "ReduceTip": "Réduire cette fenêtre à ses onglets.",
     "ExpandTip": "Afficher de nouveau les messages de cette fenêtre.",
     "Timestamps": "Afficher l'heure",
