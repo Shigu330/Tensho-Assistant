@@ -318,7 +318,9 @@ public sealed class SeenPriceStore
     /// nothing lost. Before, any failure set the file aside as damaged and left the prices seen out of use for the session. Damaged: set
     /// aside under a dated name, said once moved (<paramref name="setAside"/>); not moved: left (the next save sets it aside).
     /// </summary>
-    public static List<SeenMarketEntry>? ReadAtStart(string path,DateTimeOffset now,Action<string,Exception> setAside,Action<Exception> left,int tries=3,int waitMs=1000)
+    /// <param name="stuck">X-639 (bench X-631, review of 0.1560, M3): damaged but not moved (the file name and the error): told apart from a
+    /// file held (<paramref name="left"/>), which alone is read again later. Null: <paramref name="left"/>, as before.</param>
+    public static List<SeenMarketEntry>? ReadAtStart(string path,DateTimeOffset now,Action<string,Exception> setAside,Action<Exception> left,int tries=3,int waitMs=1000,Action<Exception>? stuck=null)
     {
         for(var attempt=1;;attempt++)
         {
@@ -333,7 +335,7 @@ public sealed class SeenPriceStore
             }
             var aside=Discoveries.DiscoveryFiles.SetAsideName(path,now);
             try{File.Move(path,aside,false);}
-            catch(Exception){left(error);return null;}
+            catch(Exception){(stuck ?? left)(error);return null;}
             setAside(aside,error);return null;
         }
     }

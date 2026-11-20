@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1581.0
+- Plan global, X-639 : Constat du banc du relecteur (X-631, relecture de 0.1560, M3) : au démarrage, un fichier des prix vus abîmé qui n'a pas pu être mis de côté n'est plus pris pour un fichier tenu par un autre programme : il n'est plus relu toutes les 30 s pour rien, et le journal dit qu'il est abîmé (la sauvegarde suivante le met de côté). Nouveau test SeenStuck1581Tests (comportement : fichier abîmé ouvert par un autre lecteur).
+- Tests : SeenStuck1581Tests. Verify.ps1 (agent) : 3230/3230, 0 avertissement, 0 erreur ; DLL 0.1581.0.0. Rien à essayer en jeu.
+### English
+- Finding of the reviewer bench (X-631, review of 0.1560, M3): at start, a damaged prices-seen file that could not be set aside is no longer taken for a file held by another program: it is no longer read again every 30 s for nothing, and the log says it is damaged (the next save sets it aside). New test SeenStuck1581Tests (behaviour: a damaged file opened by another reader).
+
 ## 0.1580.0
 - Plan global, X-633 : Constats du banc du relecteur (X-631) sur la fenêtre de chat, corrigés. X-633 : une répétition repliée (« ×N ») compte comme non lue et comme alerte, comme un message neuf : un mot d'alerte redit dans la minute remet « ! » sur un onglet déjà vu. X-634 : l'alerte d'un message est trouvée une fois par message (et de nouveau seulement quand les mots changent) au lieu de chaque image, et le regroupement des lignes de combat par genre est fait une fois. X-635 : un lien de carte illisible ferme le lien encore ouvert : son texte reste simple. X-636 : un lien du chat agit au relâché du clic gauche, sans glissement : appuyer sur un lien pour déplacer la fenêtre ne pose plus le drapeau ni n'ouvre l'objet. X-637 : la bulle d'un lien n'est formée qu'au survol. X-638 : la bulle d'un lien d'objet de haute qualité le dit (HQ). Tests existants adaptés au nouvel appel (raison écrite). Nouveau test ChatBench1580Tests.
 - Pour les joueurs : fenêtre de chat : un message répété replié avec un mot d'alerte marque de nouveau son onglet, un lien n'agit plus quand on déplace la fenêtre depuis lui, et un lien d'objet de haute qualité dit HQ.

@@ -51,7 +51,9 @@ public sealed partial class Plugin
                 var held=false;
                 if(Market.SeenPriceStore.ReadAtStart(seenPath,DateTimeOffset.UtcNow,
                     (aside,error)=>log.Warning(error,"The market prices seen could not be read; the file is set aside as {0}.",Path.GetFileName(aside)),
-                    error=>{held=true;log.Warning(error,"The market prices seen could not be read for now (held by another program?); the file stays where it is, read again every 30 s and joined at the next save.");}) is { } prices)
+                    error=>{held=true;log.Warning(error,"The market prices seen could not be read for now (held by another program?); the file stays where it is, read again every 30 s and joined at the next save.");},
+                    // X-639 (bench X-631, review of 0.1560, M3): damaged and not moved: not read again every 30 s for nothing; the next save sets it aside.
+                    stuck:error=>log.Warning(error,"The market prices seen are damaged and could not be set aside for now; the file stays where it is and the next save sets it aside.")) is { } prices)
                     seenPrices.Load(prices);
                 // X-619 M2 (review of 0.1557): held at the start, the file is read again later and joined to the prices seen meanwhile (before,
                 // its prices stayed out of memory for the whole session).
