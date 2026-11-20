@@ -65,7 +65,8 @@ internal static class BeastMinor1558Tests
             Check(!new ActionBarRect(0, 0, 1, 1).Second && new ActionBarRect(0, 0, 1, 1, true).Second, "Second defaults to false");
             Check(BeastInstinct.Mark(false) == "1" && BeastInstinct.Mark(true) == "2", "1 then 2");
             var locator = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/ActionBarLocator.Dalamud.cs"));
-            Check(locator.Contains("node->Height*node->ScaleY*scale,!first && second)"), "the locator marks the second action");
+            // X-655 (0.1599): the rectangle also names its bar and slot, for the log.
+            Check(locator.Contains("node->Height*node->ScaleY*scale,!first && second,name,index+1)"), "the locator marks the second action");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
             Check(page.Contains("var mark = BeastInstinct.Mark(rect.Second);"), "the highlight numbers each slot");
         }),

@@ -521,8 +521,11 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.BeastTeamRead=()=>boardReader?.State.Team;
             // X-486 (0.1529): the fights the game's board window shows.
             mainWindow.BeastFightsShown=()=>boardReader?.State.Shown;
-            // X-136 (0.1550): the beast called and the hotbars for the combo highlight (off by default).
-            mainWindow.BeastActive=()=>boardReader?.ActiveBeast ?? 0;
+            // X-136 (0.1550): the beast called and the hotbars for the combo highlight (off by default). X-655 (0.1599): the beast read on the
+            // field first (the player's familiar), the battlehorns window only when none is found (the window is closed during the fights).
+            Beastmaster.BeastFamiliarReader? familiarReader=null;
+            registrations.Register(()=>familiarReader=new Beastmaster.BeastFamiliarReader(framework,objects,log,()=>configuration.HighlightBeastCombos,()=>mainWindow.Beasts?.State.Catalog?.Beasts,()=>boardReader?.ActiveBeast ?? 0),()=>familiarReader?.Dispose());
+            mainWindow.BeastCalledNow=()=>familiarReader?.Called ?? Beastmaster.BeastCalledRead.None;
             Gathering.ActionBarLocator? beastBarLocator=null;
             registrations.Register(()=>mainWindow.BeastBarLocator=beastBarLocator=new Gathering.ActionBarLocator(framework,gameGui,log),()=>{mainWindow.BeastBarLocator=null;beastBarLocator?.Dispose();});
             // X-136 (0.1530): the names of the beasts' Tricks and of the beastmaster's skills, from the game's Action sheet.

@@ -25,19 +25,20 @@ internal static class BeastComboHighlight1550Tests
             var combos = BeastInstinct.Combos(1);
             Check(combos is [{ Skill: 44889, AfterTrick: false }, { Skill: 44887, AfterTrick: true }], $"Cu sith: {string.Join(", ", combos)}");
         }),
-        ("Beast combo highlight 1550: an option off by default, in the labyrinth only, read and drawn without sending anything", () =>
+        // X-655 (0.1599, R03.1 changed on 20/11, journal J174): everywhere in PvE, no longer in the labyrinth only; the beast called comes from
+        // BeastFamiliarReader (BeastCalled1599Tests).
+        ("Beast combo highlight 1550: an option off by default, read and drawn without sending anything", () =>
         {
             Check(!new TenshoAssistant.Configuration().HighlightBeastCombos, "off by default");
             var page = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Beastmaster.cs"));
-            Check(page.Contains("if (!configuration.HighlightBeastCombos || BeastBarLocator is not { } located) return;")
-                  && page.Contains("if ((BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0) == 0) return;")
-                  && page.Contains("located.Want(before.Skill, after.Skill);"), "option, labyrinth, both skills asked");
+            Check(page.Contains("var option = configuration.HighlightBeastCombos;")
+                  && page.Contains("located.Want(wantBefore.Skill, wantAfter.Skill);"), "option, both skills asked");
             var reader = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Beastmaster/BeastBoardReader.Dalamud.cs"));
             Check(reader.Contains("gui.GetAddonByName(\"XBMActivePet\")") && reader.Contains("BeastInstinct.FromWindow(trick, name, known)"), "the window read");
             var locator = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Gathering/ActionBarLocator.Dalamud.cs"));
             Check(!locator.Contains("UseAction") && !locator.Contains("Hook") && !reader.Contains("UseAction"), "nothing sent to the game (R03.3)");
             var plugin = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Plugin.cs"));
-            Check(plugin.Contains("(\"BeastCombo\",mainWindow.DrawBeastComboHighlight)") && plugin.Contains("mainWindow.BeastActive=()=>boardReader?.ActiveBeast ?? 0;"), "drawn each frame, wired");
+            Check(plugin.Contains("(\"BeastCombo\",mainWindow.DrawBeastComboHighlight)") && plugin.Contains("()=>boardReader?.ActiveBeast ?? 0),()=>familiarReader?.Dispose());"), "drawn each frame, wired");
             foreach (var language in new[] { "en", "fr" })
             {
                 var text = File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json"));

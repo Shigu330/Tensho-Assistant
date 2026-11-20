@@ -6,8 +6,11 @@ public enum GpNextKind { Action,Gather,OffPlan,Done }
 /// at the end, not from the plan.
 /// </summary>
 public sealed record GpNextStep(GpNextKind Kind,GpAction? Action,IReadOnlyDictionary<uint,int> Used,bool Finished=false,bool Leftover=false);
-/// <summary>A hotbar slot on the screen, copied on the framework thread. X-585 M6: Second = the slot holds the second action wanted (not the first).</summary>
-public readonly record struct ActionBarRect(float X,float Y,float Width,float Height,bool Second=false)
+/// <summary>
+/// A hotbar slot on the screen, copied on the framework thread. X-585 M6: Second = the slot holds the second action wanted (not the first).
+/// X-655 (0.1599): Bar and Slot (from 1) name the game's bar window and the slot, for the log; empty and 0 when not given.
+/// </summary>
+public readonly record struct ActionBarRect(float X,float Y,float Width,float Height,bool Second=false,string Bar="",int Slot=0)
 {
     public bool Valid=>Width>0 && Height>0 && float.IsFinite(X) && float.IsFinite(Y);
 }

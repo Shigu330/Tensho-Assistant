@@ -23,6 +23,11 @@ internal sealed class ActionBarLocator : IDisposable
     private volatile IReadOnlyList<ActionBarRect> rects=[];
     private uint wanted,readFor,other;
     private long wantedAt;
+    // X-655 (0.1599): the slots of the visible hotbars, said in the log when the beast combo's skills are looked for and they change
+    // (at most SlotLinesMax lines a load), so an in-game test tells which action each slot gives (the beast's « Assaut » among them).
+    private const int SlotLinesMax=30;
+    private string slotsSaid="";
+    private int slotLines;
 
     /// <summary>Asked at each frame by the drawing while an action is to be found; a request older than half a second is dropped.</summary>
     /// <remarks>X-136 (0.1550): a second action found with the first (the beastmaster's two skills of a combo); 0: none.</remarks>
@@ -55,6 +60,7 @@ internal sealed class ActionBarLocator : IDisposable
         try
         {
             var found=new List<ActionBarRect>();
+            var seen=other!=0 && slotLines<SlotLinesMax ? new System.Text.StringBuilder():null;
             var module=RaptureHotbarModule.Instance();
             var actions=ActionManager.Instance();
             foreach(var name in Bars)
@@ -68,6 +74,14 @@ internal sealed class ActionBarLocator : IDisposable
                 for(var index=0;index<slots.Length && index<MaximumSlots;index++)
                 {
                     if(slots[index].Icon==null)continue;
+                    if(seen!=null && module!=null && addon->RaptureHotbarId<module->Hotbars.Length)
+                    {
+                        ref var shown=ref module->Hotbars[addon->RaptureHotbarId].Slots[index];
+                        if(shown.CommandId!=0 || shown.ApparentActionId!=0)
+                            seen.Append(name).Append('#').Append(index+1).Append('=').Append(slots[index].ActionId).Append('/').Append(shown.CommandType).Append(':').Append(shown.CommandId)
+                                .Append('/').Append(shown.ApparentSlotType).Append(':').Append(shown.ApparentActionId).Append("/icon ").Append(shown.IconId)
+                                .Append(actions!=null && shown.CommandType==RaptureHotbarModule.HotbarSlotType.Action && shown.CommandId!=0 ? $">{actions->GetAdjustedActionId(shown.CommandId)}":"").Append("; ");
+                    }
                     // 0.734 (user report): the game turns some actions into their next rank on the bar (Bountiful Harvest shows as II): the slot keeps the first one, so what it shows counts.
                     // X-585 M6: the first and the second action apart, so the beast combo's two skills can be numbered.
                     var first=slots[index].ActionId==(int)wanted;
@@ -83,9 +97,14 @@ internal sealed class ActionBarLocator : IDisposable
                     if(!first && !second)continue;
                     var node=&slots[index].Icon->AtkResNode;
                     if(!Visible(node))continue;
-                    var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale,!first && second);
+                    var rect=new ActionBarRect(node->ScreenX,node->ScreenY,node->Width*node->ScaleX*scale,node->Height*node->ScaleY*scale,!first && second,name,index+1);
                     if(rect.Valid)found.Add(rect);
                 }
+            }
+            if(seen!=null && seen.ToString() is var line && line!=slotsSaid)
+            {
+                slotsSaid=line;slotLines++;
+                log.Information("Hotbar slots read for the beast combo (bar#slot=slot action/command type:id/shown type:id/icon>adjusted): {0}",line.Length==0 ? "none":line);
             }
             rects=found;
             Volatile.Write(ref readFor,wanted);

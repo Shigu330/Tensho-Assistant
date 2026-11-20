@@ -442,22 +442,39 @@ internal sealed partial class MainWindow
 
     /// <summary>X-136 (0.1550): the hotbars read for the combo highlight (its own locator, apart from the gathering panel's).</summary>
     internal Gathering.ActionBarLocator? BeastBarLocator { get; set; }
-    /// <summary>X-136 (0.1550): the beast the game's « Cornes d'appel » window details (0: none).</summary>
-    internal Func<uint>? BeastActive { get; set; }
+    /// <summary>
+    /// X-136 (0.1550): the beast called. X-655 (0.1599): read on the field first (the player's familiar), then in the game's « Cornes d'appel »
+    /// window, which is closed during the fights (BeastCalled, BeastFamiliarReader).
+    /// </summary>
+    internal Func<Beastmaster.BeastCalledRead>? BeastCalledNow { get; set; }
+    private string beastComboSaid = "";
+    private (bool, bool, Beastmaster.BeastCalledRead, bool, object?) beastComboKey;
 
     /// <summary>
-    /// X-136 (0.1550, the user's request of 11/11; R03.2: the labyrinth is not cut, combat included): with the option on and in the labyrinth
-    /// only, the beastmaster's two skills that make an intentional combo with the beast called (BeastInstinct.Combos: the one before its
-    /// Trick and the one after) are highlighted on the hotbars, as the gathering panel's next action. Shows only: nothing is sent to the
-    /// game (R03.3).
+    /// X-136 (0.1550, the user's request of 11/11): with the option on, the beastmaster's two skills that make an intentional combo with the
+    /// beast called (BeastInstinct.Combos: the one before its Trick and the one after) are highlighted on the hotbars, as the gathering panel's
+    /// next action. X-655 (0.1599, R03.1 changed on 20/11, journal J174): everywhere in PvE, no longer in the labyrinth only (the trainer's
+    /// skills work everywhere; PvP and ranked contents stay cut by CompetitiveGate); where it stops, or which bar and slot carry « 1 » and
+    /// « 2 », is said in the log at each change (BeastComboTrace). Shows only: nothing is sent to the game (R03.3).
     /// </summary>
     internal void DrawBeastComboHighlight()
     {
-        if (!configuration.HighlightBeastCombos || BeastBarLocator is not { } located) return;
-        if ((BeastBoardOfTerritory?.Invoke(CurrentTerritory?.Invoke() ?? 0) ?? 0) == 0) return;
-        if (BeastActive?.Invoke() is not (> 0 and var beast) || BeastInstinct.Combos(beast) is not [var before, var after]) return;
-        located.Want(before.Skill, after.Skill);
-        if (located.ReadFor != before.Skill) return;
+        var option = configuration.HighlightBeastCombos;
+        var located = BeastBarLocator;
+        var called = option && located is not null ? BeastCalledNow?.Invoke() ?? Beastmaster.BeastCalledRead.None : Beastmaster.BeastCalledRead.None;
+        var combos = called.Beast > 0 ? BeastInstinct.Combos(called.Beast) : [];
+        if (combos is [var wantBefore, var wantAfter] && located is not null) located.Want(wantBefore.Skill, wantAfter.Skill);
+        var read = combos.Count == 2 && located is not null && located.ReadFor == combos[0].Skill;
+        // The line is made again only when what it says may have changed (the rectangles are a new list at each reading of the bars).
+        var key = (option, located is not null, called, read, read ? (object?)located!.Rects : null);
+        if (!key.Equals(beastComboKey))
+        {
+            beastComboKey = key;
+            var trace = Beastmaster.BeastComboTrace.Line(option, located is not null, called, combos.Count == 2 ? combos[0].Skill : 0, combos.Count == 2 ? combos[1].Skill : 0, read,
+                read ? located!.Rects.Select(rect => new Beastmaster.BeastComboSlot(rect.Bar, rect.Slot, rect.Second)).ToList() : []);
+            if (trace != beastComboSaid) { beastComboSaid = trace; log.Information(trace); }
+        }
+        if (!read || located is null) return;
         DrawGatheringBarHighlight(located);
         // X-585 M6 (review of 0.1550): the order the combo needs (BeastInstinct.Combos: AfterTrick false, then true): « 1 » on the skill used
         // before the beast's Trick, « 2 » on the one after, in the slot's top-left corner (before, both were highlighted alike).
