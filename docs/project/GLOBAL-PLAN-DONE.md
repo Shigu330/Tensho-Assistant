@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (624 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (634 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -679,6 +679,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-613 | Tool, user request of 19/11 around 23:45 (« for GPT find a way for you to see… | Done in 0.1562 |
 | X-614 | Tool, idea I-045 (Anthropic post « Solving code review at Anthropic », read… | Done in 0.1564 |
 | X-615 | Tool, idea I-046 (Anthropic post « Solving code review at Anthropic », read… | Done in 0.1564 |
+| X-616 | Tool, idea I-047 (Anthropic post « Solving code review at Anthropic », read… | Done in 0.1578.0 |
 | X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
 | X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 | X-619 | Review  (review 0.1557, 20/11), minor M1, M2, M3: M1 in… | Done in 0.1560 |
@@ -692,12 +693,21 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-627 | Review  (review 0.1569, 20/11), I1: finding in… | Done in 0.1570 |
 | X-629 | Cleanup after X-600 (passage 129): unused language keys CraftPresets.Back… | Done in 0.1578 |
 | X-630 | Review of block 0.1573 to 0.1575 (review 0.1575, 20/11), minor M1: M1 in… | Done in 0.1577 |
+| X-631 | Possibly new findings of the reviewer bench pilot (X-616, run… | Done in 0.1581.0 |
+| X-632 | Review of block 0.1576 to 0.1578 (review 0.1578, 20/11), pre-existing before… | Done in 0.1579 |
+| X-633 | Bench X-631 (review 0.1520, M1): a folded repeat counts neither as unread nor… | Done in 0.1580 |
+| X-634 | Bench X-631 (review 0.1520, M2): work redone each frame in the chat window… | Done in 0.1580.0 |
+| X-635 | Bench X-631 (review 0.1441, M1): an unreadable map link does not close an open… | Done in 0.1580.0 |
+| X-636 | Bench X-631 (review 0.1441, M3): a left click on a chat link acts on press, a… | Done in 0.1580.0 |
+| X-637 | Bench X-631 (review 0.1441, M4): each visible chat link formats its tooltip… | Done in 0.1580.0 |
+| X-638 | Bench X-631 (review 0.1441, M5): the high quality of a chat item link is kept… | Done in 0.1580.0 |
+| X-639 | Bench X-631 (review 0.1560, M3): at start, a damaged seen-prices file that… | Done in 0.1581 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (624 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (634 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1374,6 +1384,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-613 | Outil, demande de l'utilisateur du 19/11 vers 23 h 45 (« pour gpt il faudrait… | Fait en 0.1562 |
 | X-614 | Outil, idée I-045 (billet d'Anthropic « Solving code review at Anthropic », lu… | Fait en 0.1564 |
 | X-615 | Outil, idée I-046 (billet d'Anthropic « Solving code review at Anthropic », lu… | Fait en 0.1564 |
+| X-616 | Outil, idée I-047 (billet d'Anthropic « Solving code review at Anthropic », lu… | Fait en 0.1578.0 |
 | X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
 | X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
 | X-619 | Relecture  (relecture 0.1557, 20/11), mineurs M1, M2, M3 : M1 : X-618 M5 : une… | Fait en 0.1560 |
@@ -1387,3 +1398,12 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-627 | Relecture  (relecture 0.1569, 20/11), I1 : Le second cas, censé être le test de… | Fait en 0.1570 |
 | X-629 | Ménage après X-600 (passage 129) : clés de langue sans usage CraftPresets.Back… | Fait en 0.1578 |
 | X-630 | Relecture du bloc 0.1573 à 0.1575 (relecture 0.1575, 20/11), mineurs M1 : M1… | Fait en 0.1577 |
+| X-631 | Constats peut-être neufs du pilote du banc du relecteur (X-616, run… | Fait en 0.1581.0 |
+| X-632 | Relecture du bloc 0.1576 à 0.1578 (relecture 0.1578, 20/11), déjà là avant le… | Fait en 0.1579 |
+| X-633 | Banc X-631 (relecture 0.1520, M1, retrouvé par le pilote) : un message replié… | Fait en 0.1580 |
+| X-634 | Banc X-631 (relecture 0.1520, M2) : travail refait à chaque image dans la… | Fait en 0.1580.0 |
+| X-635 | Banc X-631 (relecture 0.1441, M1) : un lien de carte illisible (MapLink rend… | Fait en 0.1580.0 |
+| X-636 | Banc X-631 (relecture 0.1441, M3) : le clic gauche sur un lien du chat agit à… | Fait en 0.1580.0 |
+| X-637 | Banc X-631 (relecture 0.1441, M4) : chaque lien visible du chat formate sa… | Fait en 0.1580.0 |
+| X-638 | Banc X-631 (relecture 0.1441, M5) : la haute qualité d'un lien d'objet du chat… | Fait en 0.1580.0 |
+| X-639 | Banc X-631 (relecture 0.1560, M3) : au démarrage, un fichier des prix vus abîmé… | Fait en 0.1581 |

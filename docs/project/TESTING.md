@@ -2243,6 +2243,12 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1576) Jardin : ouvrez un emplacement dont la récolte prévue est passée et que le jeu dit encore en pousse ; sur la page Jardin, au survol de « Inconnu », la phrase même du jeu entre guillemets avec son heure.
 
+- [ ] (0.1580) Fenêtre de chat Tensho, onglet qui replie les répétitions avec un mot d'alerte : regarder l'onglet, passer à un autre, puis faire redire le même message contenant le mot dans la minute : l'onglet reprend « ! » et son compte de non-lus.
+
+- [ ] (0.1580) Fenêtre de chat Tensho : appuyer sur un lien de carte ou d'objet et faire glisser pour déplacer la fenêtre : la fenêtre bouge, aucun drapeau posé ni objet ouvert ; un simple clic sur le lien agit toujours.
+
+- [ ] (0.1580) Fenêtre de chat Tensho : survoler un lien d'objet de haute qualité : la bulle dit « (HQ) » après le nom.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
