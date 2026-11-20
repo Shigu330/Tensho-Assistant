@@ -80,11 +80,7 @@ in-game readings through GitHub, on the player's click or the opt-in daily excha
 <!-- gen:decisions:en -->
 Open points, produced by script from the agent's source of decisions. Choices already taken: [DECISIONS](DECISIONS.md); the former tables: [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| No. | Point | Choice applied, or record awaited | Where |
-|---|---|---|---|
-| D-188 | An unreadable row of your discoveries (damaged JSON) blocks the upload to your gist each session while it stays in the base | Keep the block: nothing is replaced on the gist (applied in 0.1557, recommended) |  |
-| D-193 | Garden (X-581, review 0.1572 M4): until you open the bed after the expected time, Tensho says « Ripe » and alerts (chat, desktop) from the seed durations alone (Lotlab); this is what rang wrongly on 17/11. Recommended: b | Keep « Ripe » and the alert from the durations, corrected at the first opening of the bed in game (applied in 0.1572) |  |
-| D-194 | X-352: after Tensho is reloaded during play, the panels wait for their code to be ready, 3 s at most (decision of 13/11). Measured on 20/11: that code is ready 3.8 to 4.9 s after the reload, so the panels open before and their first frame takes 130 to 190 ms (a small hitch). At game start nothing changes: code ready at 1.8 s, first frame 28 to 31 ms. Recommended: b. | Keep 3 s at most (a 130 to 190 ms hitch at each reload) |  |
+Nothing open.
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -181,11 +177,7 @@ donnée prise sur des sites web).
 <!-- gen:decisions:fr -->
 Points ouverts, produits par script depuis la source des décisions de l'agent. Choix déjà faits : [DECISIONS](DECISIONS.md) ; anciens tableaux : [archive](https://github.com/Shigu330/Tensho-Assistant/blob/024c426c1186a2e8f51e09087996a9c55208c28a/docs/project/archive/DECISIONS-EN-ATTENTE-2026-11-09.md).
 
-| N° | Point | Choix appliqué, ou relevé attendu | Où |
-|---|---|---|---|
-| D-188 | Une ligne illisible de vos découvertes (JSON abîmé) bloque l'envoi à votre gist à chaque session tant qu'elle reste dans la base | Garder ce blocage : rien n'est remplacé sur le gist (appliqué en 0.1557, recommandé) |  |
-| D-193 | Jardin (X-581, relecture 0.1572 M4) : tant que vous n'avez pas ouvert l'emplacement après l'heure prévue, Tensho dit « Mûr » et prévient (chat, bureau) d'après les seules durées des graines (Lotlab) ; c'est ce qui a sonné à tort le 17/11. Recommandé : b | Garder « Mûr » et l'avis d'après les durées, corrigé à la première ouverture de l'emplacement dans le jeu (appliqué en 0.1572) |  |
-| D-194 | X-352 : après un rechargement de Tensho en cours de jeu, les panneaux attendent que leur code soit prêt, 3 s au plus (décision du 13/11). Mesuré le 20/11 : ce code est prêt 3,8 à 4,9 s après le rechargement, donc les panneaux s'ouvrent avant et leur première image prend 130 à 190 ms (petit à-coup). Au démarrage du jeu, rien ne change : code prêt à 1,8 s, première image 28 à 31 ms. Recommandé : b. | Garder 3 s au plus (à-coup de 130 à 190 ms à chaque rechargement) |  |
+Aucune en attente.
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu

@@ -2211,19 +2211,19 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1558) Page Dresseur, plateau 3 ou plus, une bête de rang bas : le texte dit « recommandé : … à …, à confirmer en jeu » ; aux plateaux 1 et 2, sans « à confirmer ».
 
-- [ ] (0.1559) Dédale bestial, page Dresseur › Plateaux, 1er plateau : sous un ennemi, une action dit « inflige : … » (par exemple Poison ou Brûlure du vent) quand elle pose un effet ; une action sans effet n'a rien de plus.
+- [x] (0.1559) Dédale bestial, page Dresseur › Plateaux, 1er plateau : sous un ennemi, une action dit « inflige : … » (par exemple Poison ou Brûlure du vent) quand elle pose un effet ; une action sans effet n'a rien de plus.
 
-- [ ] (0.1562) Dédale bestial, onglet des plateaux ou panneau du combat : une action ennemie qui donne un bonus ou une barrière (Bonus de dégâts, Couvert, Pointes de glace) dit « confère : … », une qui donne Poison ou Glas dit « inflige : … ».
+- [x] (0.1562) Dédale bestial, onglet des plateaux ou panneau du combat : une action ennemie qui donne un bonus ou une barrière (Bonus de dégâts, Couvert, Pointes de glace) dit « confère : … », une qui donne Poison ou Glas dit « inflige : … ».
 
-- [ ] (0.1565) Réglages › Panneaux à côté › Onglets du chat, fenêtre réduite vers 760 pixels de large : la ligne de chaque onglet (nom, messages non lus, couleur, retirer) va à la ligne, rien n'est coupé ; les cases des canaux tiennent dans la fenêtre, une ou plusieurs colonnes selon la largeur, chaque linkshell avec son numéro
+- [x] (0.1565) Réglages › Panneaux à côté › Onglets du chat, fenêtre réduite vers 760 pixels de large : la ligne de chaque onglet (nom, messages non lus, couleur, retirer) va à la ligne, rien n'est coupé ; les cases des canaux tiennent dans la fenêtre, une ou plusieurs colonnes selon la largeur, chaque linkshell avec son numéro
 
-- [ ] (0.1566) Réglages › Panneaux à côté › Joueurs du chat : « Joueurs cachés » montre une ligne par joueur ; taper deux noms séparés par une virgule puis Entrée ajoute deux lignes ; le bouton × d'une ligne la retire ; un nom déjà là n'est pas ajouté deux fois ; les noms enregistrés avant (avec des virgules) apparaissent chacun sur sa ligne
+- [x] (0.1566) Réglages › Panneaux à côté › Joueurs du chat : « Joueurs cachés » montre une ligne par joueur ; taper deux noms séparés par une virgule puis Entrée ajoute deux lignes ; le bouton × d'une ligne la retire ; un nom déjà là n'est pas ajouté deux fois ; les noms enregistrés avant (avec des virgules) apparaissent chacun sur sa ligne
 
-- [ ] (0.1566) Fenêtre de chat Tensho : clic droit sur le message d'un joueur : « Cacher <nom> » fait disparaître ses messages de tous les onglets et l'ajoute aux joueurs cachés ; « Mettre <nom> en avant » colore son nom, puis le même menu propose « Ne plus mettre <nom> en avant »
+- [x] (0.1566) Fenêtre de chat Tensho : clic droit sur le message d'un joueur : « Cacher <nom> » fait disparaître ses messages de tous les onglets et l'ajoute aux joueurs cachés ; « Mettre <nom> en avant » colore son nom, puis le même menu propose « Ne plus mettre <nom> en avant »
 
-- [ ] (0.1567) Objets › un objet fabriqué (par exemple un lingot) › onglet des recettes › ligne « Outils liés » : « Recettes, simulation et macros d'artisanat » ouvre la page de simulation d'artisanat sur la recette de cet objet ; pour un objet sans recette (un minerai brut), le bouton n'est pas dans la ligne
+- [x] (0.1567) Objets › un objet fabriqué (par exemple un lingot) › onglet des recettes › ligne « Outils liés » : « Recettes, simulation et macros d'artisanat » ouvre la page de simulation d'artisanat sur la recette de cet objet ; pour un objet sans recette (un minerai brut), le bouton n'est pas dans la ligne
 
-- [ ] (0.1568) Objets › Fibre alchimique › « Comment l'obtenir » : une ligne « Explorations en aéronef » (deux secteurs) et une ligne « Explorations en sous-marin » (secteurs avec leur mer), la source en gris dessous, et plus « Aucune source connue » ; un objet sans aucune source garde « Aucune source connue »
+- [x] (0.1568) Objets › Fibre alchimique › « Comment l'obtenir » : une ligne « Explorations en aéronef » (deux secteurs) et une ligne « Explorations en sous-marin » (secteurs avec leur mer), la source en gris dessous, et plus « Aucune source connue » ; un objet sans aucune source garde « Aucune source connue »
 
 - [ ] (0.1571) Chat, Paramètres › Onglets du chat : ouvrir deux onglets, taper un mot dans « Seulement avec » du premier sans l'ajouter : la case du second reste vide ; taper un mot puis Entrée : il s'ajoute et le curseur reste dans la case pour en taper un autre.
 
@@ -2264,6 +2264,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 - [ ] (0.1589) Carte › Favoris : collez une liste « Lieu ( x , y ) », cliquez « Importer » puis changez aussitôt le texte ou passez à un autre onglet : rien n'est importé, « Lecture des noms de zones… » disparaît ; sans rien toucher, les favoris sont ajoutés.
 
 - [ ] (0.1590) Île › Atelier, première ouverture après le chargement du plugin : aucun à-coup du jeu ; « Lecture des données des fabriques… » peut s'afficher un instant, puis la page de l'atelier.
+
+- [ ] (0.1598) Rechargez Tensho en cours de jeu (mode développeur, ou une version publiée) avec un panneau libre ouvert : le panneau revient en 6 s au plus, sans à-coup visible ; dans dalamud.log, la ligne « Panels opened … ms after the load » dit « their code compiled » (mesuré au rechargement automatique de 0.1598 : ouvert à 5,5 s, première image 103 ms, contre 248 à 1244 ms à l'ancienne borne de 3 s)
 
 **0.535 : interfaces** — à voir en jouant
 

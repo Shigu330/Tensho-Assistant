@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (651 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (656 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -465,6 +465,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-344 | Bug seen by the user on 14/11 about 3:10 pm (screenshot, Dalamud plugin list… | Done in 0.1330 |
 | X-350 | Review of block 0.1318 to 0.1329 (14/11), I1: R03.2 and DEC-038: X-320's new… | Done in 0.1334 |
 | X-351 | Review of block 0.1318 to 0.1329 (14/11), I3: X-322: on a map the game did not… | Done in 0.1342.0 |
+| X-352 | Review of block 0.1318 to 0.1329 (14/11), I2: Rest of X-01 (closed on the… | Done in 0.1598.0 |
 | X-353 | Review of block 0.1318 to 0.1329 (14/11), M1 à M5: Minor: M1 X-340 has no… | Done in 0.1381 |
 | X-354 | Tooling (relay 59, 14/11): a publish.sh --last stopped by a failing test puts… | Done in 0.1349.0 |
 | X-355 | User request of 11/14 about 4:20 pm (game map and Tensho map captures at the… | Done in 0.1343 |
@@ -697,6 +698,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-625 | Tool: tools/discoveries-merge.py sync --dry-run crashes on Windows without -X… | Done in 0.1569 |
 | X-626 | Review of block 0.1565 to 0.1568 (review 0.1568, 20/11), minor M1, M2, M3: M1… | Done in 0.1571 |
 | X-627 | Review  (review 0.1569, 20/11), I1: finding in… | Done in 0.1570 |
+| X-628 | Review of block 0.1570 to 0.1572 (review 0.1572, 20/11), minor M1, M2, M3, M4… | Done in 0.1598.0 |
 | X-629 | Cleanup after X-600 (passage 129): unused language keys CraftPresets.Back… | Done in 0.1578 |
 | X-630 | Review of block 0.1573 to 0.1575 (review 0.1575, 20/11), minor M1: M1 in… | Done in 0.1577 |
 | X-631 | Possibly new findings of the reviewer bench pilot (X-616, run… | Done in 0.1581.0 |
@@ -708,6 +710,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-637 | Bench X-631 (review 0.1441, M4): each visible chat link formats its tooltip… | Done in 0.1580.0 |
 | X-638 | Bench X-631 (review 0.1441, M5): the high quality of a chat item link is kept… | Done in 0.1580.0 |
 | X-639 | Bench X-631 (review 0.1560, M3): at start, a damaged seen-prices file that… | Done in 0.1581 |
+| X-640 | Bench X-631 (review 0.1564, M1): any refusal of the raw gist address is seen as… | Done in 0.1597.0 |
 | X-641 | Tool: plan.py done accepts a done-in without a version number, which breaks… | Done in 0.1586.0 |
 | X-642 | Review of block 0.1579 to 0.1581 (review 0.1581, 20/11), minor M1, M2: M1 in… | Done in 0.1582 |
 | X-643 | Review of block 0.1582 to 0.1586 (review 0.1586, 20/11), I1: finding in… | Done in 0.1587 |
@@ -719,12 +722,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-649 | Review of block 0.1593 to 0.1593 (review 0.1593, 20/11), pre-existing before… | Done in 0.1594.0 |
 | X-650 | Tool: plan.py import-relecture refuses a finding row whose cell holds an… | Done in 0.1595.0 |
 | X-651 | Review of block 0.1594 to 0.1594 (review 0.1594, 20/11), minor M1: M1 in… | Done in 0.1595.0 |
+| X-652 | User decision D-188 b (20/11 about 10 am): an unreadable row of the discoveries… | Done in 0.1596.0 |
+| X-653 | User decision D-194 b (20/11 about 10 am, follow-up of X-352): after Tensho is… | Done in 0.1598.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (651 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (656 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1187,6 +1192,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-344 | Bug vu par l'utilisateur le 14/11 vers 15 h 10 (capture, liste des plugins de… | Fait en 0.1330 |
 | X-350 | Relecture du bloc 0.1318 à 0.1329 (14/11), I1 : R03.2 et DEC-038 : le nouvel… | Fait en 0.1334 |
 | X-351 | Relecture du bloc 0.1318 à 0.1329 (14/11), I3 : X-322 : sur une carte que le… | Fait en 0.1342.0 |
+| X-352 | Relecture du bloc 0.1318 à 0.1329 (14/11), I2 : Reste de X-01 (fermé sur… | Fait en 0.1598.0 |
 | X-353 | Relecture du bloc 0.1318 à 0.1329 (14/11), M1 à M5 : Mineurs : M1 X-340 sans… | Fait en 0.1381 |
 | X-354 | Outillage (relais 59, 14/11) : un publish.sh --last arrêté par un test échoué… | Fait en 0.1349.0 |
 | X-355 | Demande de l'utilisateur du 14/11 vers 16 h 20 (captures carte du jeu et carte… | Fait en 0.1343 |
@@ -1419,6 +1425,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-625 | Outil : tools/discoveries-merge.py sync --dry-run plante sous Windows sans -X… | Fait en 0.1569 |
 | X-626 | Relecture du bloc 0.1565 à 0.1568 (relecture 0.1568, 20/11), mineurs M1, M2, M3… | Fait en 0.1571 |
 | X-627 | Relecture  (relecture 0.1569, 20/11), I1 : Le second cas, censé être le test de… | Fait en 0.1570 |
+| X-628 | Relecture du bloc 0.1570 à 0.1572 (relecture 0.1572, 20/11), mineurs M1, M2… | Fait en 0.1598.0 |
 | X-629 | Ménage après X-600 (passage 129) : clés de langue sans usage CraftPresets.Back… | Fait en 0.1578 |
 | X-630 | Relecture du bloc 0.1573 à 0.1575 (relecture 0.1575, 20/11), mineurs M1 : M1… | Fait en 0.1577 |
 | X-631 | Constats peut-être neufs du pilote du banc du relecteur (X-616, run… | Fait en 0.1581.0 |
@@ -1430,6 +1437,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-637 | Banc X-631 (relecture 0.1441, M4) : chaque lien visible du chat formate sa… | Fait en 0.1580.0 |
 | X-638 | Banc X-631 (relecture 0.1441, M5) : la haute qualité d'un lien d'objet du chat… | Fait en 0.1580.0 |
 | X-639 | Banc X-631 (relecture 0.1560, M3) : au démarrage, un fichier des prix vus abîmé… | Fait en 0.1581 |
+| X-640 | Banc X-631 (relecture 0.1564, M1) : tout refus de l'adresse brute d'un gist… | Fait en 0.1597.0 |
 | X-641 | Outil : plan.py done accepte un « fait en » sans numéro de version (« hors… | Fait en 0.1586.0 |
 | X-642 | Relecture du bloc 0.1579 à 0.1581 (relecture 0.1581, 20/11), mineurs M1, M2… | Fait en 0.1582 |
 | X-643 | Relecture du bloc 0.1582 à 0.1586 (relecture 0.1586, 20/11), I1 : X-518 M2… | Fait en 0.1587 |
@@ -1441,3 +1449,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-649 | Relecture du bloc 0.1593 à 0.1593 (relecture 0.1593, 20/11), déjà là avant le… | Fait en 0.1594.0 |
 | X-650 | Outil : plan.py import-relecture refuse une ligne de constat dont une cellule… | Fait en 0.1595.0 |
 | X-651 | Relecture du bloc 0.1594 à 0.1594 (relecture 0.1594, 20/11), mineurs M1 : M1… | Fait en 0.1595.0 |
+| X-652 | Décision D-188 b de l'utilisateur (20/11 vers 10 h) : une ligne illisible de la… | Fait en 0.1596.0 |
+| X-653 | Décision D-194 b de l'utilisateur (20/11 vers 10 h, suite de X-352) : après un… | Fait en 0.1598.0 |
