@@ -422,9 +422,25 @@ internal sealed partial class MainWindow
         }
         if(recipeCatalog.State.Catalog?.ForResult(id) is { Count:>0 } recipes){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionCraft",recipes.Count));}
         if(gatheringCatalog.State.Catalog?.ForItem(id) is { Count:>0 } gathered){known++;ImGui.TextUnformatted(localization.Format("HoverUi.CollectionGathering",gathered[0].TypeName,gathered[0].Zone));}
+        known+=DrawVoyageSources(id);
         if(item is { IsMarketable:true })ImGui.TextDisabled(localization.Get("HoverUi.CollectionMarket"));
         if(known==0)DrawFallbackSources(id);
     }
+
+    /// <summary>X-610 (0.1568): the airship and submarine sectors where the item may be found (the embedded loot, sectors named by the game's
+    /// sheets), with the sources' credit; how many lines were drawn.</summary>
+    private int DrawVoyageSources(uint id)
+    {
+        var airships=FreeCompany.VoyageItemSources.Airships(AirshipCatalog?.Invoke(),id);
+        var submarines=FreeCompany.VoyageItemSources.Submarines(SubmarineCatalog?.Invoke(),id);
+        if(airships.Count>0)ImGui.TextWrapped(localization.Format("HoverUi.VoyageAirships",VoyageList(airships)));
+        if(submarines.Count>0)ImGui.TextWrapped(localization.Format("HoverUi.VoyageSubmarines",VoyageList(submarines)));
+        if(airships.Count+submarines.Count>0)ImGui.TextDisabled(localization.Get("HoverUi.VoyageCredit"));
+        return (airships.Count>0 ? 1:0)+(submarines.Count>0 ? 1:0);
+    }
+
+    private string VoyageList(IReadOnlyList<string> sectors)
+        =>string.Join(", ",sectors.Take(6))+(sectors.Count>6 ? localization.Format("HoverUi.More",sectors.Count-6):"");
 
     // e): true when a part turned on has something to draw for this item; Stock and « How to get it » always draw their heading.
     // Cheap lookups, cut short with the default settings (stock on).

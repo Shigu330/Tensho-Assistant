@@ -110,6 +110,7 @@
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyageHistory.cs" Link="FreeCompany/VoyageHistory.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyagePlanner.cs" Link="FreeCompany/VoyagePlanner.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/AirshipSectors.cs" Link="FreeCompany/AirshipSectors.cs" />
+    <Compile Include="../../src/TenshoAssistant/FreeCompany/VoyageItemSources.cs" Link="FreeCompany/VoyageItemSources.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/AirshipPlanner.cs" Link="FreeCompany/AirshipPlanner.cs" />
     <Compile Include="../../src/TenshoAssistant/FreeCompany/VesselBuilds.cs" Link="FreeCompany/VesselBuilds.cs" />
     <Compile Include="../../src/TenshoAssistant/Gear/GearCatalog.cs" Link="Gear/GearCatalog.cs" />

@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1568.0
+- Plan global, X-610 : Fiche d'objet, partie « Comment l'obtenir » : les secteurs d'exploration en aéronef et en sous-marin où l'objet peut être trouvé sont listés (noms des secteurs et des mers tirés des feuilles du jeu ; butin : LuminaSupplemental pour les aéronefs, relevés de FFXIVGachaSpreadsheet pour les sous-marins, déjà embarqués, source citée sous les lignes). Ces explorations comptent comme une source connue : « Aucune source connue » ne s'affiche plus pour ces objets (Fibre alchimique, 12926 : points 10 et 11 en aéronef et des secteurs de sous-marins).
+- Pour les joueurs : fiche d'objet : « Comment l'obtenir » liste maintenant les secteurs d'aéronefs et de sous-marins où trouver l'objet.
+- Tests : VoyageItemSources1568Tests. Verify.ps1 (agent) : 3192/3192, 0 avertissement, 0 erreur ; DLL 0.1568.0.0. Non validé en jeu.
+### English
+- Item sheet, « How to get it » part: the airship and submarine exploration sectors where the item may be found are listed (sector and sea names from the game's sheets; loot: LuminaSupplemental for airships, FFXIVGachaSpreadsheet records for submarines, already embedded, source cited under the lines). These voyages count as a known source: « No known source » no longer shows for such items (Alchemic Fibre, 12926: airship points 10 and 11 and submarine sectors).
+- For players: Item sheet: « How to get it » now lists the airship and submarine sectors where an item can be found.
+
 ## 0.1567.0
 - Plan global, X-599 : Fiche d'objet, onglet des recettes, ligne « Outils liés » : le bouton « Recettes, simulation et macros d'artisanat » ouvre la simulation d'artisanat sur la recette de l'objet choisi ; avant, il rouvrait l'onglet des recettes où l'on était déjà, sans effet visible. Pour un objet sans recette, il n'est pas montré. Les autres boutons de la ligne ne changent pas.
 - Pour les joueurs : fiche d'objet : le bouton de simulation d'artisanat de l'onglet des recettes ouvre maintenant la simulation sur la recette de l'objet.
