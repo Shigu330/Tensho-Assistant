@@ -222,21 +222,28 @@ public sealed class GardenTalkMemory
 {
     public static readonly TimeSpan Window=TimeSpan.FromSeconds(1);
     private readonly object gate=new();
-    private (GardenGameState State,string Place,DateTimeOffset At)? said;
+    private (GardenGameState State,string Place,DateTimeOffset At,string? Text)? said;
 
-    public void Said(GardenGameState state,string? place,DateTimeOffset at)
+    /// <param name="text">X-628 M2 (0.1576): the game's line itself, kept with its state.</param>
+    public void Said(GardenGameState state,string? place,DateTimeOffset at,string? text=null)
     {
-        lock(gate)said=state==GardenGameState.None || string.IsNullOrEmpty(place) ? null:(state,place,at);
+        lock(gate)said=state==GardenGameState.None || string.IsNullOrEmpty(place) ? null:(state,place,at,text);
     }
 
     /// <summary>A bed's menu opened at this place: the state said just before, or None.</summary>
-    public GardenGameState Opened(string? place,DateTimeOffset at)
+    public GardenGameState Opened(string? place,DateTimeOffset at)=>Opened(place,at,out _);
+
+    /// <summary>The same, with the game's line (null with None).</summary>
+    public GardenGameState Opened(string? place,DateTimeOffset at,out string? text)
     {
         lock(gate)
         {
+            text=null;
             if(said is not { } line)return GardenGameState.None;
             said=null;
-            return place==line.Place && at>=line.At && at-line.At<=Window ? line.State:GardenGameState.None;
+            if(place!=line.Place || at<line.At || at-line.At>Window)return GardenGameState.None;
+            text=line.Text;
+            return line.State;
         }
     }
 }

@@ -53,9 +53,9 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>X-581 (0.1572): the game's state line of a bed (read when its menu opened): kept on that bed; « Ripe » then follows the game.</summary>
-    internal void GardenExamined(string? zone,int patch,int bed,GardenGameState state)
+    internal void GardenExamined(string? zone,int patch,int bed,GardenGameState state,string? line)
     {
-        if(GardenJournal.Examined(configuration.GardenBeds,zone,patch,bed,state,DateTimeOffset.UtcNow) is null)return;
+        if(GardenJournal.Examined(configuration.GardenBeds,zone,patch,bed,state,DateTimeOffset.UtcNow,line) is null)return;
         SaveReminders();
     }
 
@@ -72,8 +72,8 @@ internal sealed partial class MainWindow
         // #36 (0.978): a harvest is of a ripe bed: the only one ripe here is that one; none ripe (0.997, review): nothing is removed, the player is told.
         if(kind==GardenChatKind.Harvested)
         {
-            // X-581 (0.1572): a bed whose ripeness is unknown may be the one harvested (the harvest says it was ripe).
-            var ripe=here.Where(row=>GardenJournal.State(row,DateTimeOffset.UtcNow) is GardenState.Ripe or GardenState.Unknown).ToArray();
+            // X-581 (0.1572): a bed whose ripeness is unknown may be the one harvested (the harvest says it was ripe); X-628 M1 (0.1576): never a withered one.
+            var ripe=GardenJournal.HarvestCandidates(here,DateTimeOffset.UtcNow);
             if(ripe.Length==0){ChatNotice?.Invoke(localization.Get("Garden.HarvestNoneRipe"));return;}
             here=ripe;
         }
@@ -243,8 +243,10 @@ internal sealed partial class MainWindow
     private string GardenUnknownText(GardenBed bed)
     {
         var said=(bed.GameStateAt ?? bed.PlantedAt).ToLocalTime().ToString("g");
-        return bed.GameState==GardenGameState.Withered ? localization.Format("Garden.UnknownWithered",said)
-            :localization.Format("Garden.UnknownGrowing",said,GardenJournal.RipeAt(bed).ToLocalTime().ToString("g"));
+        // X-628 M2 (0.1576): the game's own words when they were kept; else what its state means (Wilting: in need of care, not « still growing »).
+        var words=bed.GameStateText is { Length:>0 } line ? localization.Format("Garden.UnknownSaid",said,line)
+            :localization.Format(bed.GameState switch{GardenGameState.Withered=>"Garden.UnknownWithered",GardenGameState.Wilting=>"Garden.UnknownWilting",_=>"Garden.UnknownGrowing"},said);
+        return bed.GameState==GardenGameState.Withered ? words:words+" "+localization.Format("Garden.UnknownAfter",GardenJournal.RipeAt(bed).ToLocalTime().ToString("g"));
     }
 
     private string GardenTimes(GardenBed bed,DateTimeOffset now)

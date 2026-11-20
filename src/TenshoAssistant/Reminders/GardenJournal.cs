@@ -26,6 +26,9 @@ public sealed class GardenBed
     /// read. A new planting starts with None.</summary>
     public GardenGameState GameState { get; set; }
     public DateTimeOffset? GameStateAt { get; set; }
+    /// <summary>X-628 M2 (0.1576): the game's own words of that line (one line, at most 200 characters), shown under « Unknown »; null: not kept
+    /// (read before 0.1576).</summary>
+    public string? GameStateText { get; set; }
 }
 
 /// <summary>X-383 (0.1360): a neighbour kept at a bed's planting: its bed number, its seed's item (0 = unknown, found by the name) and the name noted.</summary>
@@ -111,12 +114,25 @@ public static class GardenJournal
 
     /// <summary>X-581 (0.1572): the game's state line read when the bed's menu opened (place, patch, bed): kept on that bed alone (the latest
     /// planted at that slot), or null when it is not noted (never another bed).</summary>
-    public static GardenBed? Examined(IEnumerable<GardenBed>? beds,string? place,int patch,int number,GardenGameState state,DateTimeOffset now)
+    public static GardenBed? Examined(IEnumerable<GardenBed>? beds,string? place,int patch,int number,GardenGameState state,DateTimeOffset now,string? line=null)
     {
         if(state==GardenGameState.None || CareTargets(beds,place,(patch,number)) is not [var bed])return null;
-        bed.GameState=state;bed.GameStateAt=now;
+        bed.GameState=state;bed.GameStateAt=now;bed.GameStateText=GameLine(line);
         return bed;
     }
+
+    /// <summary>X-628 M2 (0.1576): a game line kept as one line (line breaks and control characters made spaces, spaces folded), at most
+    /// 200 characters, or null when empty.</summary>
+    public static string? GameLine(string? text)
+    {
+        var clean=string.Join(' ',new string((text ?? "").Select(letter=>char.IsControl(letter) ? ' ':letter).ToArray()).Split(' ',StringSplitOptions.RemoveEmptyEntries));
+        return clean.Length==0 ? null:clean.Length>200 ? clean[..200]:clean;
+    }
+
+    /// <summary>X-628 M1 (0.1576): the beds a harvest may be of: ripe, or of unknown ripeness but not withered (a withered crop is not
+    /// harvested, docs/evidence/0.1572-garden-ripe.md).</summary>
+    public static GardenBed[] HarvestCandidates(IEnumerable<GardenBed> beds,DateTimeOffset now)
+        =>beds.Where(bed=>State(bed,now) is GardenState.Ripe || State(bed,now) is GardenState.Unknown && bed.GameState!=GardenGameState.Withered).ToArray();
 
     /// <param name="among">X-383 (0.1360): the journal at that moment: the neighbours planted then are kept in the new bed (null: none kept).</param>
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0,IEnumerable<GardenBed>? among=null)

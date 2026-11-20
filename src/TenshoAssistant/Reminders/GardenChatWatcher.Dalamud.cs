@@ -49,8 +49,8 @@ internal sealed class GardenChatWatcher : IDisposable
     private string? menuSeen;
     // X-581 (0.1572): the game's state line of a bed, kept for the menu that opens just after it, and who is told (place, patch, bed, state).
     private readonly GardenTalkMemory talkMemory=new();
-    private readonly Action<string?,int,int,GardenGameState>? examined;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null,Action<string?,int,int,GardenGameState>? examined=null)
+    private readonly Action<string?,int,int,GardenGameState,string?>? examined;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null,Action<string?,int,int,GardenGameState,string?>? examined=null)
     {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;this.examined=examined;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         rulesBuild=new(BuildRules,error=>log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update)."));
@@ -160,10 +160,10 @@ internal sealed class GardenChatWatcher : IDisposable
                         menuSeen=seen;
                         if(developer?.Invoke()==true)log.Information("Garden menu read: window {0}, patch {1}, bed {2}.",name,slot.Patch,slot.Bed);
                         // X-581 (0.1572): the game's state line written just before this menu opened is this bed's.
-                        if(talkMemory.Opened(place,now) is var said && said!=GardenGameState.None)
+                        if(talkMemory.Opened(place,now,out var line) is var said && said!=GardenGameState.None)
                         {
                             if(developer?.Invoke()==true)log.Information("Garden bed state read: patch {0}, bed {1}, {2}.",slot.Patch,slot.Bed,said);
-                            examined?.Invoke(place,slot.Patch,slot.Bed,said);
+                            examined?.Invoke(place,slot.Patch,slot.Bed,said,line);
                         }
                     }
                     return;
@@ -225,7 +225,7 @@ internal sealed class GardenChatWatcher : IDisposable
             // X-581 (0.1572): the state line the game writes when a bed is opened: kept for the bed's menu that opens just after it.
             if(sender.Length==0 && InHousing() && Rules()?.Talk?.Read(sender,text) is { } said && said!=GardenGameState.None)
             {
-                talkMemory.Said(said,Place(),DateTimeOffset.UtcNow);
+                talkMemory.Said(said,Place(),DateTimeOffset.UtcNow,text);
                 return;
             }
             if(Rules()?.Read(sender,text) is not { } found)return;

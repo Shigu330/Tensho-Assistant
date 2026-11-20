@@ -74,7 +74,7 @@ internal static class GardenMenu1165Tests
             Check(watcher.Contains("if(menuMemory.Take(place,DateTimeOffset.UtcNow) is { } slot)found=found with{Patch=slot.Patch,Bed=slot.Bed};") && watcher.Contains("var slot=menuMemory.Take(place,at);"), "tending, uprooting and harvest take it");
             var page = Read("src/TenshoAssistant/MainWindow.Garden.cs");
             Check(page.Contains("GardenJournal.CareTargets(configuration.GardenBeds,zone,menu)") && page.Contains("Tip(\"Garden.TendPatchTip\");"), "the page uses it; the patch button");
-            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("gui:gameGui,developer:()=>configuration.DeveloperMode,"), "the watcher gets the game's windows");
+            Check(Read("src/TenshoAssistant/Plugin.cs").Contains("gui:gameGui,developer:()=>configuration.DeveloperMode,") && Read("src/TenshoAssistant/Plugin.cs").Contains("=>mainWindow.GardenExamined(place,patch,bed,said,line)),()=>gardenWatcher?.Dispose());"), "the watcher gets the game's windows and is released at unload");
         }),
     ];
 }
