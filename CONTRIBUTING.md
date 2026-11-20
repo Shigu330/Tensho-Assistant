@@ -136,9 +136,14 @@ Discuss the idea first with the « Tool proposal » issue form. Then, from the r
 - `MainWindow.<Name>.cs`: the page, its method `Draw<Name>`;
 - `<Name>/<Name>Model.cs`: the pure logic, compiled by the tests. Code that reads the game goes beside it, in a file named `*.Dalamud.cs`;
 - `tests/TenshoAssistant.Tests/<Name>Tests.cs`: replace its example;
-- the texts in `en.json` and `fr.json`, and one line in the list of pages, `MainWindow.Pages.cs`.
+- the texts in `en.json` and `fr.json` (its name, its title and the help of its « ? »), and one line in the list of pages,
+  `MainWindow.Pages.cs`; with `-Parent <Page>`, the page is a tab of that family (its `Tab` and `About`, no title of its own);
+- a stop of the guide's visit for every player (`Guide/GuideFlow.cs`) and the kind `AsIs` in the desktop application
+  (`DesktopPages.cs`): review both. The Home page's list of tools takes the page from the list of pages and its help; README's table
+  of pages is produced by `tools/docgen.py write --blocks`, which the script runs when Python is there.
 
-It changes no version and commits nothing. Then follow the list below: the tests refuse a page that misses one of its places.
+It changes no version and commits nothing. The skeleton passes the tests as it is (`NewTool1615Tests` runs the script on a copy). Then
+follow the list below: the tests refuse a page that misses one of its places.
 
 ### Adding a page: where everything is declared
 
@@ -393,10 +398,14 @@ Discutez d'abord de l'idée avec le formulaire de ticket « Tool proposal ». Pu
 - `<Name>/<Name>Model.cs` : la logique pure, compilée par les tests. Le code qui lit le jeu va à côté, dans un fichier nommé
   `*.Dalamud.cs` ;
 - `tests/TenshoAssistant.Tests/<Name>Tests.cs` : remplacez son exemple ;
-- les textes dans `en.json` et `fr.json`, et une ligne dans la liste des pages, `MainWindow.Pages.cs`.
+- les textes dans `en.json` et `fr.json` (son nom, son titre et l'aide de son « ? »), et une ligne dans la liste des pages,
+  `MainWindow.Pages.cs` ; avec `-Parent <Page>`, la page est un onglet de cette famille (son `Tab` et son `About`, sans titre à elle) ;
+- un arrêt de la visite du guide pour tous les joueurs (`Guide/GuideFlow.cs`) et le genre `AsIs` dans l'application de bureau
+  (`DesktopPages.cs`) : à revoir tous les deux. La liste des outils de l'accueil prend la page dans la liste des pages et son aide ; le
+  tableau des pages du README est produit par `tools/docgen.py write --blocks`, que le script lance quand Python est là.
 
-Il ne change aucune version et ne commite rien. Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l'une de
-ses places.
+Il ne change aucune version et ne commite rien. Le squelette passe les tests tel quel (`NewTool1615Tests` lance le script sur une copie).
+Suivez ensuite la liste ci-dessous : les tests refusent une page à qui manque l'une de ses places.
 
 ### Ajouter une page : où tout se déclare
 

@@ -2,20 +2,29 @@
 .SYNOPSIS
     Adds the skeleton of a new tool page to Tensho Assistant (TEMPLATES-001).
 .DESCRIPTION
-    Creates the page, a pure model, a test and the English and French texts, and registers them: the Page enum, the list of pages (MainWindow.Pages.cs), the tests.
-    It changes no version and commits nothing. Review the result, then follow "Adding a tool" in CONTRIBUTING.md.
+    Creates the page, a pure model, a test and the English and French texts, and registers them everywhere the tests ask (X-664, 0.1615):
+    the Page enum, the list of pages (MainWindow.Pages.cs; with -Parent, a tab of that family with its Tab and About), a stop of the guide's
+    visit (Guide/GuideFlow.cs), the desktop application's kind « AsIs » (DesktopPages.cs), the help of its « ? » and the tests. The Home
+    page's list of tools is produced from the list of pages and its help. The skeleton passes the tests as it is (NewTool1615Tests runs it
+    on a copy). It changes no version and commits nothing. Review the result, then follow "Adding a page" in CONTRIBUTING.md.
 .EXAMPLE
     .\scripts\New-Tool.ps1 -Name RetainerNotes -Category Objects -LabelEn "Retainer notes" -LabelFr "Notes de servants" -DryRun
+.EXAMPLE
+    .\scripts\New-Tool.ps1 -Name GatheringNotes -Category Production -Parent Gathering -LabelEn "Notes" -LabelFr "Notes"
 #>
 param(
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][ValidateSet('Objects','Production','World','Tracking','Progression','Content','GoldSaucer','References','Preferences')][string]$Category,
     [Parameter(Mandatory)][string]$LabelEn,
     [Parameter(Mandatory)][string]$LabelFr,
+    # A page of a family (a tab of its page header, as CraftPresets of CraftSimulation): the family's first page.
+    [string]$Parent='',
+    # The repository to change (default: the one holding this script; the tests give a copy).
+    [string]$Root='',
     [switch]$DryRun
 )
 $ErrorActionPreference='Stop'
-$root=Split-Path $PSScriptRoot -Parent
+$root=if($Root){(Resolve-Path $Root).Path}else{Split-Path $PSScriptRoot -Parent}
 $src=Join-Path $root 'src/TenshoAssistant'
 $tests=Join-Path $root 'tests/TenshoAssistant.Tests'
 if($Name -cnotmatch '^[A-Z][A-Za-z0-9]{2,39}$'){throw "The name must be in PascalCase, 3 to 40 letters or digits: '$Name'."}
@@ -44,20 +53,41 @@ $window=Read-Text (Join-Path $src 'MainWindow.cs')
 if($window.Text -notmatch 'enum Page \{([^}]*)\}'){throw 'enum Page not found in MainWindow.cs.'}
 $pageNames=$Matches[1] -split ',' | ForEach-Object {$_.Trim()}
 if($pageNames -contains $Name){throw "The page '$Name' already exists."}
+$list=Read-Text (Join-Path $src 'MainWindow.Pages.cs')
+if($Parent){
+    if($pageNames -notcontains $Parent){throw "No page '$Parent' to be the family of '$Name'."}
+    # PageHeader1573Tests: every page of a family names its tab and its description; the family's first page has no parent of its own.
+    $parentLine=($list.Text -split "`n") | Where-Object {$_ -match "^\s*new\(Page\.$Parent,"} | Select-Object -First 1
+    if(-not $parentLine){throw "The page '$Parent' has no line in MainWindow.Pages.cs."}
+    if($parentLine -match ',Page\.\w+,Tab:'){throw "'$Parent' is itself a tab of a family: give the family's first page."}
+    if($parentLine -notmatch ',Tab:' -or $parentLine -notmatch ',About:'){throw "'$Parent' is not a family yet: give its line a Tab: and an About: first (as Gathering)."}
+}
+$guidePath=Join-Path $src 'Guide/GuideFlow.cs'
+$guide=Read-Text $guidePath
+$guideAnchor='new("Lexicon"), new("Settings"), new("Help"), new("Credits"),'
+if(-not $guide.Text.Contains($guideAnchor)){throw "Anchor not found in GuideFlow.cs: $guideAnchor"}
+$desktopPath=Join-Path $root 'src/TenshoAssistant.Desktop/DesktopPages.cs'
+$desktop=Read-Text $desktopPath
+$desktopAnchor="`n    ];`n`n    /// <summary>The page's kind, or null for a page that is not classified yet.</summary>"
+if(-not $desktop.Text.Contains($desktopAnchor)){throw 'Anchor not found in DesktopPages.cs (the end of the AsIs list).'}
 
 $changes=@(
     "create  src/TenshoAssistant/MainWindow.$Name.cs",
     "create  src/TenshoAssistant/$Name/${Name}Model.cs",
     "create  tests/TenshoAssistant.Tests/${Name}Tests.cs",
     "change  src/TenshoAssistant/MainWindow.cs (enum Page)",
-    "change  src/TenshoAssistant/MainWindow.Pages.cs (category $Category)",
+    "change  src/TenshoAssistant/MainWindow.Pages.cs (category $Category$(if($Parent){", a tab of $Parent"}))",
+    "change  src/TenshoAssistant/Guide/GuideFlow.cs (a stop of the guide's visit, for every player)",
+    "change  src/TenshoAssistant.Desktop/DesktopPages.cs (kind AsIs: drawn from the plugin's services alone)",
     "change  src/TenshoAssistant/Localization/Languages/en.json and fr.json (Navigation.$Name, ${Name}Ui, PageHelp)",
     "change  tests/TenshoAssistant.Tests/TenshoAssistant.Tests.csproj (the test class is found by itself: Program.cs unchanged)"
 )
 $changes | ForEach-Object {Write-Host $_}
 if($DryRun){Write-Host 'DRY RUN: nothing was written.';return}
 
-# Page
+# Page: a page alone draws its title; a tab of a family leaves it to the page header (PageHeader1573Tests).
+$heading=if($Parent){"        // A tab of the $Parent family: its title, description and tabs are drawn by the page header (Tab and About in MainWindow.Pages.cs)."}
+    else{"        Heading(localization.Get(`"${Name}Ui.Title`"),localization.Get(`"${Name}Ui.Help`"));"}
 Write-Text $pageFile @"
 using Dalamud.Bindings.ImGui;
 
@@ -68,7 +98,7 @@ internal sealed partial class MainWindow
 {
     private void Draw$Name()
     {
-        TenshoAssistant.UI.UiComponents.SectionHeader(localization.Get("${Name}Ui.Title"),localization.Get("${Name}Ui.Help"));
+$heading
         ImGui.TextDisabled(localization.Format("${Name}Ui.Count",${Name}.${Name}Model.Count([])));
     }
 }
@@ -107,9 +137,15 @@ internal static class ${Name}Tests
 # Registration
 $newWindow=$window.Text -replace '(enum Page \{[^}]*?)\s*\}',('$1, '+$Name+' }')
 Write-Text (Join-Path $src 'MainWindow.cs') $newWindow $window.Crlf
-$list=Read-Text (Join-Path $src 'MainWindow.Pages.cs')
 $anchor='        // New tools: scripts/New-Tool.ps1 adds their line above this one.'
-Write-Text (Join-Path $src 'MainWindow.Pages.cs') (Replace-Once $list.Text $anchor "        new(Page.$Name,`"$Category`",PageLabel(`"Navigation.$Name`"),Draw$Name,`"MainWindow.$Name.cs, $Name/`"),`n$anchor" 'MainWindow.Pages.cs') $list.Crlf
+$line=if($Parent){"        new(Page.$Name,`"$Category`",null,Draw$Name,`"MainWindow.$Name.cs, $Name/`",Page.$Parent,Tab:PageLabel(`"${Name}Ui.Title`"),About:PageLabel(`"${Name}Ui.Help`")),"}
+    else{"        new(Page.$Name,`"$Category`",PageLabel(`"Navigation.$Name`"),Draw$Name,`"MainWindow.$Name.cs, $Name/`"),"}
+Write-Text (Join-Path $src 'MainWindow.Pages.cs') (Replace-Once $list.Text $anchor "$line`n$anchor" 'MainWindow.Pages.cs') $list.Crlf
+# Guide: a stop of the visit for every player, before the common pages of the end (PageCoverageTests, GuideVisit1045Tests); give it an
+# interest (GuideInterest) when it is for some players only.
+Write-Text $guidePath (Replace-Once $guide.Text $guideAnchor "new(`"$Name`"), $guideAnchor" 'GuideFlow.cs') $guide.Crlf
+# Desktop application: AsIs (the skeleton reads nothing from the game); NeedsLink when the page calls a game-link class, InGame when it stays in the game.
+Write-Text $desktopPath (Replace-Once $desktop.Text $desktopAnchor "`n        `"$Name`",$desktopAnchor" 'DesktopPages.cs') $desktop.Crlf
 # Texts
 $texts=@{
     en=@{Label=$LabelEn;Title=$LabelEn;Help='Describe this tool in one sentence.';Count='{0} rows';Start='Say how to start.';Empty='Say what to do if it stays empty.'}
@@ -131,5 +167,17 @@ $include="    <Compile Include=`"../../src/TenshoAssistant/$Name/*.cs`" Exclude=
 $anchorProject='    <Compile Include="../../src/TenshoAssistant/Localization/*.cs"'
 Write-Text (Join-Path $tests 'TenshoAssistant.Tests.csproj') (Replace-Once $project.Text $anchorProject ($include+$anchorProject) 'TenshoAssistant.Tests.csproj') $project.Crlf
 
+# Produced documents: README's table of pages lists every page with its help (tools/docgen.py, PublicDocs tests).
+$docgen=Join-Path $root 'tools/docgen.py'
+if(Test-Path $docgen){
+    $python=Get-Command python -ErrorAction SilentlyContinue
+    if($python){
+        & $python.Source -I -X utf8 $docgen write --blocks | Out-Null
+        if($LASTEXITCODE -ne 0){throw 'tools/docgen.py write --blocks failed: run it again and read its message.'}
+        Write-Host 'change  README.md and the other produced blocks (tools/docgen.py write --blocks)'
+    }
+    else{Write-Host 'Then run: python -I -X utf8 tools/docgen.py write --blocks (README''s table of pages).'}
+}
+
 Write-Host ''
-Write-Host "Done. Next: write the tool and its tests, run .\scripts\Verify.ps1, then follow 'Adding a tool' in CONTRIBUTING.md."
+Write-Host "Done. Next: write the tool and its tests, run .\scripts\Verify.ps1, then follow 'Adding a page' in CONTRIBUTING.md (review the guide's stop and the desktop kind)."
