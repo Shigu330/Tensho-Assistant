@@ -2213,6 +2213,8 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1559) Dédale bestial, page Dresseur › Plateaux, 1er plateau : sous un ennemi, une action dit « inflige : … » (par exemple Poison ou Brûlure du vent) quand elle pose un effet ; une action sans effet n'a rien de plus.
 
+- [ ] (0.1562) Dédale bestial, onglet des plateaux ou panneau du combat : une action ennemie qui donne un bonus ou une barrière (Bonus de dégâts, Couvert, Pointes de glace) dit « confère : … », une qui donne Poison ou Glas dit « inflige : … ».
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

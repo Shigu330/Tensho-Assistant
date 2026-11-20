@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (602 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (604 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -670,12 +670,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
 | X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 | X-619 | Review  (review 0.1557, 20/11), minor M1, M2, M3: M1 in… | Done in 0.1560 |
+| X-621 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), I1: finding in… | Done in 0.1561 |
+| X-622 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), minor M1, M2: M1 in… | Done in 0.1562 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (602 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (604 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1343,3 +1345,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
 | X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
 | X-619 | Relecture  (relecture 0.1557, 20/11), mineurs M1, M2, M3 : M1 : X-618 M5 : une… | Fait en 0.1560 |
+| X-621 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), I1 : X-619 M1 lève… | Fait en 0.1561 |
+| X-622 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), mineurs M1, M2… | Fait en 0.1562 |

@@ -394,7 +394,7 @@ Noted in the order the user made them; to be done after the current task, one ve
 | X-616 | Tool, idea I-047 (Anthropic post « Solving code review at Anthropic », read 19/11; user's agreement on 19/11 around midnight: reviewer and verifiers on Opus 5.5 medium): a test bench for the reviewer: in-game ko tests and bugs found after a release become a set of examples (block diff + expected bug) replayed at every change of the reviewer's brief, model or effort, the change kept only if the score does not drop; plus a review of a known-clean block to count false alarms. Done when: an agent script holds the example set (at least 10 cases from the plan and the tests) and gives a score; the score is noted in the per-model statistics; selftest | Wished, rank 1 (tool) |
 | X-620 | Tool (X-612 review, 20/11): stats.py counts version 0.1514 in no relay: committed 01:33:51 on 17/11, six minutes after relay 101's end, and named under the heading « ### Après la fin : 0.1514.0 » that VERSION_LINE does not match (the heading must start with the number). Done when: a version committed after a relay's end and before the next relay's start goes to the relay whose passage names it (heading or line, number anywhere); selftest on that case | Wished (tool) |
 
-492 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
+494 done points of this table: [the done points](GLOBAL-PLAN-DONE.md#requests-of-2026-11-07-while-playing).
 <!-- /gen:plan:x-en -->
 
 ## In-game survey reminders, by moment
@@ -862,7 +862,7 @@ Notées dans l'ordre où l'utilisateur les a faites ; à faire après la tâche 
 | X-616 | Outil, idée I-047 (billet d'Anthropic « Solving code review at Anthropic », lu le 19/11 ; accord de l'utilisateur le 19/11 vers minuit : relecteur et vérificateurs en Opus 5.5 moyen) : banc d'essai du relecteur : les essais ko en jeu et les bugs trouvés après une release deviennent un jeu d'exemples (diff du bloc + bug attendu) rejoué à chaque changement de consigne, de modèle ou d'effort du relecteur, le changement gardé seulement si le score ne baisse pas ; plus la relecture d'un bloc connu propre pour compter les fausses alertes. Fait quand : un script de l'agent tient le jeu d'exemples (au moins 10 cas tirés du plan et des essais) et donne un score ; le score est noté dans les statistiques par modèle ; selftest | Souhaitable, rang 1 (outil) |
 | X-620 | Outil (relecture de X-612 le 20/11) : stats.py ne compte la version 0.1514 dans aucun relais : commit à 01:33:51 le 17/11, six minutes après la fin du relais 101, et nommée sous le titre « ### Après la fin : 0.1514.0 » que VERSION_LINE ne reconnaît pas (le titre doit commencer par le numéro). Fait quand : une version committée après la fin d'un relais et avant le début du suivant va au relais qui la nomme dans son passage (titre ou ligne, numéro n'importe où) ; selftest sur ce cas | Souhaitable (outil) |
 
-492 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
+494 points faits de ce tableau : [les points faits](GLOBAL-PLAN-DONE.md#demandes-du-2026-11-07-en-jouant).
 <!-- /gen:plan:x -->
 
 ## Rappels de relevés en jeu, par moment

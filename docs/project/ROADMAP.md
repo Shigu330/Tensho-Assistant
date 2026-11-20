@@ -83,6 +83,7 @@ Open points, produced by script from the agent's source of decisions. Choices al
 | No. | Point | Choice applied, or record awaited | Where |
 |---|---|---|---|
 | D-188 | An unreadable row of your discoveries (damaged JSON) blocks the upload to your gist each session while it stays in the base | Keep the block: nothing is replaced on the gist (applied in 0.1557, recommended) |  |
+| D-190 | Discoveries exchange: when discoveries of yours were set aside (damaged rows), Tensho first reads their copy back from your own gist (api.github.com, and gist.githubusercontent.com for a file over 1 MB) before sending, instead of removing them from the gist | Read the gist back before sending (applied: nothing lost; new GitHub host declared in SECURITY) |  |
 <!-- /gen:decisions:en -->
 
 ## In-game tests
@@ -182,6 +183,7 @@ Points ouverts, produits par script depuis la source des décisions de l'agent. 
 | N° | Point | Choix appliqué, ou relevé attendu | Où |
 |---|---|---|---|
 | D-188 | Une ligne illisible de vos découvertes (JSON abîmé) bloque l'envoi à votre gist à chaque session tant qu'elle reste dans la base | Garder ce blocage : rien n'est remplacé sur le gist (appliqué en 0.1557, recommandé) |  |
+| D-190 | Échange des découvertes : quand des découvertes à vous ont été mises de côté (lignes abîmées), Tensho relit d'abord leur copie sur votre propre gist (api.github.com, et gist.githubusercontent.com pour un fichier de plus de 1 Mo) avant d'envoyer, au lieu de les retirer du gist | Relire le gist avant l'envoi (appliqué : rien de perdu ; nouvel hôte de GitHub déclaré dans SECURITY) |  |
 <!-- /gen:decisions:fr -->
 
 ## Tests en jeu
