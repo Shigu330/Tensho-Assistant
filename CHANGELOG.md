@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1609.0
+- Plan global, X-603 : Demande de l'utilisateur du 18/11 (D-186) : la page Jardin donne aux croisements leur propre onglet (Jardin, Croisements, Alarmes, gabarit commun DetailTabs) au lieu d'un bloc repliable sous le journal. L'onglet reprend tout le planificateur (graine, « donne » ou « utilise », paires et plan de plantation, source, paires non reconnues) ; les prévisions de croisement sur les carrés restent dans l'onglet Jardin. X-603.
+- Pour les joueurs : jardin : les croisements ont leur propre onglet.
+- Tests : GardenCrossesTab1609Tests. Verify.ps1 (agent) : 3311/3311, 0 avertissement, 0 erreur ; DLL 0.1609.0.0. Non validé en jeu.
+### English
+- User request of 18/11 (D-186): the Garden page gives crossbreeding its own tab (Garden, Crossbreeding, Alarms, the common DetailTabs template) instead of a folding block under the journal. The tab holds the whole planner (seed, « gives » or « uses », pairs and planting plan, source, unmatched pairs); the crossbreed forecasts on the beds stay in the Garden tab. X-603.
+- For players: Garden: crossbreeding has its own tab.
+
 ## 0.1608.0
 - Plan global, X-602 : Demande de l'utilisateur du 18/11 (D-186) : la page Alarmes passe en onglets, au style de Rangements (gabarit commun DetailTabs), au lieu de blocs repliables à la suite : Horloges, Alarmes par job (avec leur nombre), Autres alarmes (avec leur nombre), Alarme personnelle, Alarmes du jeu (avec leur nombre une fois lues), Réglages. Chaque alarme listée tombe dans l'un des deux onglets d'alarmes ; suppressions, ajouts et sauvegarde inchangés ; l'onglet Alarmes de Rappels garde le même dessin. X-602.
 - Pour les joueurs : alarmes : la page passe en onglets (horloges, alarmes par job, autres alarmes, alarme personnelle, alarmes du jeu, réglages), chaque onglet d'alarmes avec son nombre.

@@ -41,7 +41,8 @@ internal static class Todo458Tests
             var main=Read("MainWindow.cs");
             Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Pages.cs")).Contains("new(Page.Garden,\"Tracking\",()=>GardenAlarmCount is var gardenAlarms and >0 ? localization.Format(\"Navigation.GardenCount\",gardenAlarms):localization.Get(\"Navigation.Garden\"),DrawGardenPage,"),"page and navigation (0.1160: with its alarms' count)");
             var garden=Read("MainWindow.Garden.cs");
-            Check(garden.Contains("()=>{DrawGardenJournal();DrawGardenCrosses();}") && Read("MainWindow.GardenCrosses.cs").Contains("UiComponents.Header(localization.Get(\"Garden.Crosses\")"),"two sections");
+            // X-603 (0.1609): the journal and the crossbreeding planner in two tabs of the page.
+            Check(garden.Contains("(\"Garden\",localization.Get(\"Garden.TabGarden\"),DrawGardenJournal)") && garden.Contains("(\"Crosses\",localization.Get(\"Garden.Crosses\"),DrawGardenCrosses)"),"two sections");
         }),
     ];
 }

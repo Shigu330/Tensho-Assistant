@@ -100,7 +100,9 @@ internal sealed partial class MainWindow
         // X-132 (0.1160, user request of 11/11): the garden's alarms in their own tab, their number beside « Garden » in the tools' menu.
         DetailTabs("GardenTabs",
         [
-            ("Garden",localization.Get("Garden.TabGarden"),()=>{DrawGardenJournal();DrawGardenCrosses();}),
+            ("Garden",localization.Get("Garden.TabGarden"),DrawGardenJournal),
+            // X-603 (0.1609, user request of 18/11, D-186): the crossbreeding planner in its own tab (was a folding block under the journal).
+            ("Crosses",localization.Get("Garden.Crosses"),DrawGardenCrosses),
             ("Alarms",localization.Format("Garden.TabAlarms",GardenAlarmCount),()=>DrawGardenAlarms()),
         ],ref gardenTabFocus);
     }

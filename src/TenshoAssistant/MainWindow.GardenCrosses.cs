@@ -4,7 +4,7 @@ using TenshoAssistant.Reminders;
 
 namespace TenshoAssistant;
 
-// N-14 (0.450, DEC-027): the crossbreeding planner under the garden journal. For a seed: the pairs that give it, or what it can give
+// N-14 (0.450, DEC-027): the crossbreeding planner, in the Garden page's « Crossbreeding » tab (X-603, 0.1609). For a seed: the pairs that give it, or what it can give
 // and with which seed. Pairs from nick75g/FFXIV-Crossbreed-Helper (MIT, English names linked to the game's items), shown in the game's
 // language; read once in the background the first time the section is opened.
 internal sealed partial class MainWindow
@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
 
     private void DrawGardenCrosses()
     {
-        if(!TenshoAssistant.UI.UiComponents.Header(localization.Get("Garden.Crosses")+"###GardenCrosses"))return;
+        // X-603 (0.1609): its own tab, open as soon as the tab is (the tab is its title); the pairs are read the first time it is shown.
         ImGui.TextDisabled(localization.Get("Garden.CrossesHelp"));
         // X-154 (0.1253): the shared states: failed (not offered here, or its read failed), or still being read.
         if(GardenCrossCatalog?.Invoke() is not { } task){StateLine(UI.UiState.Failed,localization.Get("Garden.CrossesUnavailable"));return;}
