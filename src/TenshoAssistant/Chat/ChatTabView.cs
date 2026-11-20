@@ -87,6 +87,20 @@ public sealed class ChatTabView
     public void MarkSeen(){Unread=0;Alerts=0;}
 
     public ChatRecord RecordAt(int index)=>records[index];
+
+    /// <summary>X-447 B9 (0.1642): the place of the message numbered <paramref name="id"/>, or of the one it was folded into (the last one not
+    /// after it); -1 when every message of the tab is newer (it has left the tab).</summary>
+    public int IndexOfId(long id)
+    {
+        int low=0,high=records.Count-1,found=-1;
+        while(low<=high)
+        {
+            var middle=(low+high)/2;
+            if(records[middle].Id<=id){found=middle;low=middle+1;}
+            else high=middle-1;
+        }
+        return found;
+    }
     /// <summary>X-484 (0.1519): how many times the message at this place came again right after itself (0: never, or the tab does not fold).</summary>
     public int RepeatsAt(int index)=>repeats[index];
 

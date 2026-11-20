@@ -124,6 +124,43 @@ public sealed class ChatStore
         }
     }
 
+    /// <summary>X-447 B9 (0.1642): the most messages pinned in one tab.</summary>
+    public const int MaximumPins=5;
+    // X-447 B9: the messages pinned per tab, oldest pinned first.
+    private readonly Dictionary<ChatTabSettings,List<ChatRecord>> pins=[];
+
+    /// <summary>X-447 B9 (0.1642, the user's choice of 15/11): the messages pinned at the top of <paramref name="tab"/>, oldest pinned first:
+    /// copies in memory only (other players' words, never written: R04), kept while the session lasts even once the tab's lines have moved past
+    /// them, dropped by a clear (logout, unload, window turned off) or the tab cleared.</summary>
+    public IReadOnlyList<ChatRecord> Pins(ChatTabSettings tab){lock(gate)return pins.TryGetValue(tab,out var list) ? list.ToArray():[];}
+
+    /// <summary>X-447 B9: <paramref name="record"/> is pinned in <paramref name="tab"/>.</summary>
+    public bool Pinned(ChatTabSettings tab,ChatRecord record){lock(gate)return pins.TryGetValue(tab,out var list) && list.Contains(record);}
+
+    /// <summary>X-447 B9: pins <paramref name="record"/> at the top of <paramref name="tab"/>, after the others; false when it already is, or when
+    /// the tab holds <see cref="MaximumPins"/>.</summary>
+    public bool Pin(ChatTabSettings tab,ChatRecord record)
+    {
+        lock(gate)
+        {
+            if(!pins.TryGetValue(tab,out var list))pins[tab]=list=[];
+            if(list.Count>=MaximumPins || list.Contains(record))return false;
+            list.Add(record);
+            return true;
+        }
+    }
+
+    /// <summary>X-447 B9: <paramref name="record"/> unpinned from <paramref name="tab"/>; null: every message of the tab.</summary>
+    public void Unpin(ChatTabSettings tab,ChatRecord? record=null)
+    {
+        lock(gate)
+        {
+            if(!pins.TryGetValue(tab,out var list))return;
+            if(record is null)list.Clear();else list.Remove(record);
+            if(list.Count==0)pins.Remove(tab);
+        }
+    }
+
     /// <summary>X-670 M1: the search closed: its view dropped (no copy of the messages left), a view being filled told to stop.</summary>
     public void EndSearch(){lock(gate)DropSearch();}
 
@@ -179,7 +216,7 @@ public sealed class ChatStore
 
     public void Clear()
     {
-        lock(gate){records.Clear();views.Clear();DropSearch();clears++;combat=0;}
+        lock(gate){records.Clear();views.Clear();DropSearch();pins.Clear();clears++;combat=0;}
     }
 
     public IReadOnlyList<KeyValuePair<int,int>> KindCounts(){lock(gate)return kinds.OrderBy(row=>row.Key).ToArray();}

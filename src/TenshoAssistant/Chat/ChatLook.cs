@@ -69,6 +69,21 @@ public static class ChatLook
     /// <summary>X-447 B14 (0.1641): the room an item's icon takes before its link: a square as high as the line, and a gap of a sixth of it.</summary>
     public static float IconWidth(float lineHeight)=>lineHeight+MathF.Round(lineHeight/6f);
 
+    /// <summary>X-447 B9 (0.1642): <paramref name="text"/> on one line within <paramref name="width"/>: as it is when it fits, else its start and
+    /// « … » (just « … » when nothing more fits). The line breaks become spaces.</summary>
+    public static string Shorten(string text,float width,Func<string,float> measure)
+    {
+        text=text.ReplaceLineEndings(" ");
+        if(measure(text)<=width)return text;
+        int low=0,high=text.Length;
+        while(low<high)
+        {
+            var middle=(low+high+1)/2;
+            if(measure(text[..middle].TrimEnd()+"…")<=width)low=middle;else high=middle-1;
+        }
+        return text[..low].TrimEnd()+"…";
+    }
+
     /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;

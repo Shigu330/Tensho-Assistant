@@ -963,8 +963,37 @@ internal sealed partial class MainWindow
         // X-447 B1 (0.1622): the tab shown's newest message (another tab chosen counts as new).
         chatShownNewest=view.Count>0 ? view.RecordAt(view.Count-1).Id:-1;
         // X-447 B8 (0.1638): the search line, then only the tab's messages holding the text typed (a view of their own).
+        // X-447 B9 (0.1642): the messages pinned at the top of the tab, then the search line.
+        DrawChatPins(tabs[shown],options);
         if(chatSearchOpen)view=DrawChatSearchLine(tabs[shown],view,options);
         DrawChatLines(view,options,height,view.Serial);
+    }
+
+    // X-447 B9 (0.1642): the message a pin clicked asks the lines to scroll to (-1: none).
+    private long chatScrollTo=-1;
+
+    /// <summary>X-447 B9 (0.1642, the user's choice of 15/11): the messages pinned at the top of the tab shown, one line each (cut with « … »), in
+    /// their channel's colour; a click scrolls the tab to the message (a bookmark), the cross unpins it; the whole message on hover. In memory
+    /// only (ChatStore.Pins).</summary>
+    private void DrawChatPins(ChatTabSettings tab,ChatSettings options)
+    {
+        var pinned=ChatMessages.Pins(tab);
+        for(var at=0;at<pinned.Count;at++)
+        {
+            var record=pinned[at];
+            ImGui.PushID(at);
+            try
+            {
+                if(ToolButton(Dalamud.Interface.FontAwesomeIcon.Times,"ChatWindow.UnpinTip",true))ChatMessages.Unpin(tab,record);
+                ImGui.SameLine();
+                var text=ChatFormat.Plain(record,options,ChatChannelShort,ChatLinkName).ReplaceLineEndings(" ");
+                ImGui.TextColored(ChatColor(options.ColorOf(record.Channel)),ChatLook.Shorten(text,ImGui.GetContentRegionAvail().X,line=>ImGui.CalcTextSize(line).X));
+                if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                TipText(()=>localization.Format("ChatWindow.PinnedTip",text));
+                if(ImGui.IsItemClicked(ImGuiMouseButton.Left))chatScrollTo=record.Id;
+            }
+            finally{ImGui.PopID();}
+        }
     }
 
     // X-447 B8 (0.1638): the search line open, its text (in memory only), and the box to focus once opened.
@@ -1210,6 +1239,8 @@ internal sealed partial class MainWindow
             view.RowsShown=view.RowCount;view.HeightShown=shown;
             if(atBottom){ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));view.MarkSeen();}
             else if(button is { } bottom)DrawChatBottomButton(view,bottom,shown,height);
+            // X-447 B9 (0.1642): a pinned message clicked: the tab scrolled to it (to its top when it has left the tab), after the bottom's.
+            if(chatScrollTo>=0){var pinned=view.IndexOfId(chatScrollTo);chatScrollTo=-1;ImGui.SetScrollY(pinned<0 ? 0:view.RowOf(pinned)*height);}
             chatLinesBlocked=false;
             // X-447 A4 (0.1467): the mouse wheel moves whole lines, as the game's chat. X-482 M3 (0.1472): a fine wheel adds up to whole notches.
             // X-492 M1: the rest of a fine wheel belongs to one tab: another tab starts from nothing.
@@ -1271,6 +1302,18 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
                             ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName));
                         if(chatShownTab is { } shownTab && ImGui.Selectable(localization.Get("ChatWindow.ClearTab")))ClearChatTab(shownTab,true);
+                        // X-447 B9 (0.1642): pinned at the top of this tab (in memory only), or unpinned.
+                        if(chatShownTab is { } pinTab)
+                        {
+                            if(ChatMessages.Pinned(pinTab,said)){if(ImGui.Selectable(localization.Get("ChatWindow.Unpin")))ChatMessages.Unpin(pinTab,said);}
+                            else
+                            {
+                                ImGui.BeginDisabled(ChatMessages.Pins(pinTab).Count>=ChatStore.MaximumPins);
+                                try{if(ImGui.Selectable(localization.Get("ChatWindow.Pin")))ChatMessages.Pin(pinTab,said);}
+                                finally{ImGui.EndDisabled();}
+                                Tip("ChatWindow.PinTip");
+                            }
+                        }
                         // X-455 E1 (0.1624): the tab as text to select with the mouse (ImGui draws no selectable text: a read-only box).
                         if(ImGui.Selectable(localization.Get("ChatWindow.SelectText")))
                             chatSelectText=ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName);
@@ -1316,7 +1359,8 @@ internal sealed partial class MainWindow
     }
 
     /// <summary>X-455 E7 (0.1617): a tab cleared (its messages until now hidden in it) or shown again; saved with the chat's settings.</summary>
-    private void ClearChatTab(ChatTabSettings tab,bool clear){tab.ClearedAt=clear ? DateTimeOffset.Now:null;ChatTabChanged(tab);}
+    // X-447 B9 (0.1642): a tab cleared lets go of its pins too.
+    private void ClearChatTab(ChatTabSettings tab,bool clear){tab.ClearedAt=clear ? DateTimeOffset.Now:null;if(clear)ChatMessages.Unpin(tab);ChatTabChanged(tab);}
 
     /// <summary>X-447 A4 (0.1467): while reading higher up, a button at the bottom right of the lines brings the window back down; it says how
     /// many messages arrived meanwhile. X-482 (0.1472): placed before the lines are drawn (M2); « 1 new » in the singular (M4).</summary>
