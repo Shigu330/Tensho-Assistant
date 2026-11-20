@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1579.0
+- Plan global, X-632 : Relecture de 0.1576 à 0.1578, M1 : le refus d'une alerte d'incantation de boss ou d'un minuteur d'incantation (DEC-055) s'étend aux fenêtres de barre d'incantation du jeu (_TargetInfoCastBar, _CastBar, FocusTargetInfo, CastBarEnemy et leurs types AddonCastBar, AddonTargetInfo…). Leur nom n'apparaît qu'à un seul endroit permis, la liste de ce qui n'est pas une fenêtre devant les panneaux (GameWindow), qui les ignore ; cliquet sur ce compte, application de bureau fouillée aussi. Nouveau test DalamudRulesCastBar1579Tests, avec la preuve que le refus trouve une lecture de ces fenêtres.
+- Tests : DalamudRulesCastBar1579Tests. Verify.ps1 (agent) : 3223/3223, 0 avertissement, 0 erreur ; DLL 0.1579.0.0. Rien à essayer en jeu.
+### English
+- Review of 0.1576 to 0.1578, M1: the refusal of a boss cast alert or a cast timer (DEC-055) is widened to the game's cast bar windows (_TargetInfoCastBar, _CastBar, FocusTargetInfo, CastBarEnemy and their types AddonCastBar, AddonTargetInfo…). Their name appears in a single allowed place, the list of what is not a window in front of the panels (GameWindow), which skips them; ratchet on this count, desktop application searched too. New test DalamudRulesCastBar1579Tests, with the proof that the refusal finds a read of these windows.
+
 ## 0.1578.0
 - Plan global, X-629 : Ménage après l'en-tête unique des pages à onglets (X-600, 0.1573) : quatre clés de langue sans usage retirées (CraftPresets.Back, CraftPresets.Title, CraftLiveUi.Title, GpUi.Title), en anglais et en français ; l'allemand et le japonais ne les avaient pas. Aucune source ni aucun test ne les demandait (recherche dans src, tests et tools). Nouveau test UnusedKeys1578Tests.
 - Tests : UnusedKeys1578Tests. Verify.ps1 (agent) : 3221/3221, 0 avertissement, 0 erreur ; DLL 0.1578.0.0. Rien à essayer en jeu.
