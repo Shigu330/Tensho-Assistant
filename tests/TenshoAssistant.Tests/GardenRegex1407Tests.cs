@@ -18,14 +18,14 @@ internal static class GardenRegex1407Tests
                 var text = Read(file);
                 Check(!text.Contains("TimeSpan.FromMilliseconds(50)", StringComparison.Ordinal), "no 50 ms timeout in " + file);
             }
-            Check(System.Text.RegularExpressions.Regex.Matches(Read("Reminders/GardenChat.cs"), "GardenJournal\\.MatchTimeout").Count == 4, "the four expressions of the chat and the menu use it");
+            Check(System.Text.RegularExpressions.Regex.Matches(Read("Reminders/GardenChat.cs"), "GardenJournal\\.MatchTimeout").Count == 5, "the five expressions of the chat, the menu and (X-581, 0.1572) the bed's state lines use it");
         }),
         ("Garden regex 1407: no timeout can happen in the journal, the chat line and the menu title (X-428, 0.1414: linear engine, no catch left)", () =>
         {
             var journal = Read("Reminders/GardenJournal.cs");
             Check(journal.Contains("new(@\"^(.+) · \\D*(\\d+)\\D+(\\d+)$\",Linear,MatchTimeout)", StringComparison.Ordinal), "the bed's slot");
             var chat = Read("Reminders/GardenChat.cs");
-            Check(System.Text.RegularExpressions.Regex.Matches(chat, "GardenJournal\\.Linear,GardenJournal\\.MatchTimeout").Count == 4, "the chat line and the menu title");
+            Check(System.Text.RegularExpressions.Regex.Matches(chat, "GardenJournal\\.Linear,GardenJournal\\.MatchTimeout").Count == 5, "the chat line, the menu title and (X-581, 0.1572) the bed's state lines");
             foreach (var text in new[] { journal, chat })
                 Check(!text.Contains("RegexMatchTimeoutException", StringComparison.Ordinal), "no timeout to catch");
         }),

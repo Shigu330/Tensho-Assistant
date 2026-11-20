@@ -47,8 +47,11 @@ internal sealed class GardenChatWatcher : IDisposable
     private GardenMenuTitle? menuTitle;
     private bool menuTitleFailed;
     private string? menuSeen;
-    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null)
-    {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;
+    // X-581 (0.1572): the game's state line of a bed, kept for the menu that opens just after it, and who is told (place, patch, bed, state).
+    private readonly GardenTalkMemory talkMemory=new();
+    private readonly Action<string?,int,int,GardenGameState>? examined;
+    public GardenChatWatcher(IChatGui chat,IFramework framework,IDataManager data,IClientState client,IPluginLog log,Func<bool> enabled,Func<uint,bool> isSeed,Action<GardenChatEvent,uint?,string?> planted,Func<uint>? target=null,IGameGui? gui=null,Func<bool>? developer=null,Func<uint,bool>? isGardenItem=null,Action<string?,int,int,GardenGameState>? examined=null)
+    {this.target=target;this.gui=gui;this.developer=developer;this.isGardenItem=isGardenItem;this.examined=examined;
         this.chat=chat;this.framework=framework;this.data=data;this.client=client;this.log=log;this.enabled=enabled;this.isSeed=isSeed;this.planted=planted;
         rulesBuild=new(BuildRules,error=>log.Warning(error,"Garden detection unavailable: its game messages could not be read (perhaps after a game update)."));
         chat.ChatMessageUnhandled+=OnMessage;
@@ -61,7 +64,28 @@ internal sealed class GardenChatWatcher : IDisposable
     private GardenChat BuildRules()
     {
         var sheet=data.GetExcelSheet<Lumina.Excel.Sheets.LogMessage>();
-        return new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows));
+        return new(Parts(sheet.GetRowOrDefault(PlantedBedRow)?.Text),Parts(sheet.GetRowOrDefault(PlantedPotRow)?.Text),GardenChat.BedComesFirst(client.ClientLanguage.ToString()),Texts(sheet,TendedRows),Texts(sheet,UprootedRows))
+            {Talk=TalkRules()};
+    }
+
+    /// <summary>X-581 (0.1572): the bed's state lines from the game's event sheet (GardenTalk.Sheet); null when they cannot be read (said once):
+    /// « Ripe » then stays the planting time plus the growing time.</summary>
+    private GardenTalk? TalkRules()
+    {
+        try
+        {
+            var rows=new List<(string,IReadOnlyList<string?>?)>();
+            foreach(var row in data.Excel.GetSheet<Lumina.Excel.RawRow>(null,GardenTalk.Sheet))
+                if(row.ReadColumn(0) is ReadOnlySeString key && row.ReadColumn(1) is ReadOnlySeString text)rows.Add((key.ExtractText(),Parts(text)));
+            var talk=GardenTalk.From(rows);
+            if(talk is null)log.Warning("Garden: the bed state lines of {0} could not be understood (perhaps after a game update): « Ripe » stays the expected time.",GardenTalk.Sheet);
+            return talk;
+        }
+        catch(Exception error)
+        {
+            log.Warning(error,"Garden: the bed state lines of {0} could not be read (perhaps after a game update): « Ripe » stays the expected time.",GardenTalk.Sheet);
+            return null;
+        }
     }
 
     // X-433 (0.1452): the rules built in the background, waited for only if a line comes before they are done (no line is lost).
@@ -131,7 +155,17 @@ internal sealed class GardenChatWatcher : IDisposable
                     var place=Place();
                     menuMemory.Seen(slot.Patch,slot.Bed,place,now);
                     var seen=$"{name}:{place}:{slot.Patch}:{slot.Bed}";
-                    if(seen!=menuSeen){menuSeen=seen;if(developer?.Invoke()==true)log.Information("Garden menu read: window {0}, patch {1}, bed {2}.",name,slot.Patch,slot.Bed);}
+                    if(seen!=menuSeen)
+                    {
+                        menuSeen=seen;
+                        if(developer?.Invoke()==true)log.Information("Garden menu read: window {0}, patch {1}, bed {2}.",name,slot.Patch,slot.Bed);
+                        // X-581 (0.1572): the game's state line written just before this menu opened is this bed's.
+                        if(talkMemory.Opened(place,now) is var said && said!=GardenGameState.None)
+                        {
+                            if(developer?.Invoke()==true)log.Information("Garden bed state read: patch {0}, bed {1}, {2}.",slot.Patch,slot.Bed,said);
+                            examined?.Invoke(place,slot.Patch,slot.Bed,said);
+                        }
+                    }
                     return;
                 }
             }
@@ -187,6 +221,12 @@ internal sealed class GardenChatWatcher : IDisposable
                     }
                     return;
                 }
+            }
+            // X-581 (0.1572): the state line the game writes when a bed is opened: kept for the bed's menu that opens just after it.
+            if(sender.Length==0 && InHousing() && Rules()?.Talk?.Read(sender,text) is { } said && said!=GardenGameState.None)
+            {
+                talkMemory.Said(said,Place(),DateTimeOffset.UtcNow);
+                return;
             }
             if(Rules()?.Read(sender,text) is not { } found)return;
             if(found.Kind is GardenChatKind.Tended or GardenChatKind.Uprooted)

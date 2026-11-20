@@ -29,9 +29,12 @@ public sealed class GardenChat
         this.tended=Lines(tended);this.uprooted=Lines(uprooted);
     }
     private static HashSet<string> Lines(IEnumerable<string?>? lines)=>(lines ?? []).Select(Bare).Where(line=>line.Length>0).ToHashSet();
-    private static string Bare(string? text)=>string.Concat((text ?? "").Where(character=>!char.IsWhiteSpace(character) && character!='\u00AD'));
+    internal static string Bare(string? text)=>string.Concat((text ?? "").Where(character=>!char.IsWhiteSpace(character) && character!='\u00AD'));
 
     public static bool BedComesFirst(string language)=>language is "English" or "French";
+
+    /// <summary>X-581 (0.1572): the bed's state lines (null: not read; the journal's times alone).</summary>
+    public GardenTalk? Talk { get; init; }
 
     /// <summary>#36 (0.978, docs/evidence/0.978-garden-harvest.md): EObjName 2003757, « emplacement », a garden bed: the target while harvesting.</summary>
     public const uint BedObject=2003757;
@@ -156,6 +159,84 @@ public sealed class GardenMenuMemory
             last=null;
             if(now<seen.At || now-seen.At>Window || string.IsNullOrEmpty(place) || seen.Place!=place)return null;
             return (seen.Patch,seen.Bed);
+        }
+    }
+}
+
+/// <summary>X-581 (0.1572): what the game says of a bed when it is opened (docs/evidence/0.1572-garden-ripe.md): None (not said), growing well,
+/// growing but in need of care, ripe, or withered.</summary>
+public enum GardenGameState { None, Growing, Wilting, Ripe, Withered }
+
+/// <summary>
+/// X-581 (0.1572, user report of 18/11: four beds said « Ripe » that were not): the line the game writes in the chat when a bed is opened, from
+/// its own event sheet <see cref="Sheet"/> (rows TALK_VIGOROUS, TALK_DEPRESSED, TALK_RIPE, TALK_DEAD, in the client's language): « Le semis de
+/// carotte de Krakka se porte bien. », « … est arrivée à maturité ! ». Each row in parts (text, or null for a macro: the crop's name, a
+/// non-breaking space), compared without spaces like the other garden lines. The only sure word on a bed's ripeness. Pure (tests).
+/// </summary>
+public sealed class GardenTalk
+{
+    public const string Sheet="custom/001/CmnDefHousingGardeningPlant_00151";
+    private readonly (Regex Pattern,GardenGameState State)[] lines;
+    private GardenTalk((Regex Pattern,GardenGameState State)[] lines){this.lines=lines;}
+
+    /// <summary>The state a row of the sheet tells, by its key (column 0), or None for the other rows (menu choices, questions).</summary>
+    public static GardenGameState StateOf(string? key)=>(key ?? "") switch
+    {
+        var text when text.EndsWith("_TALK_VIGOROUS",StringComparison.Ordinal)=>GardenGameState.Growing,
+        var text when text.EndsWith("_TALK_DEPRESSED",StringComparison.Ordinal)=>GardenGameState.Wilting,
+        var text when text.EndsWith("_TALK_RIPE",StringComparison.Ordinal)=>GardenGameState.Ripe,
+        var text when text.EndsWith("_TALK_DEAD",StringComparison.Ordinal)=>GardenGameState.Withered,
+        _=>GardenGameState.None,
+    };
+
+    /// <summary>The rules from the sheet's rows (key, text in parts); null unless the four states are all there (perhaps after a game update).</summary>
+    public static GardenTalk? From(IEnumerable<(string Key,IReadOnlyList<string?>? Parts)> rows)
+    {
+        var lines=new List<(Regex,GardenGameState)>();
+        foreach(var (key,parts) in rows)
+        {
+            var state=StateOf(key);
+            if(state==GardenGameState.None || parts is null || !parts.Any(part=>!string.IsNullOrEmpty(GardenChat.Bare(part))))continue;
+            Regex pattern=new("^"+string.Concat(parts.Select(part=>part is null ? ".*?":Regex.Escape(GardenChat.Bare(part))))+"$",GardenJournal.Linear,GardenJournal.MatchTimeout);
+            lines.Add((pattern,state));
+        }
+        return lines.Select(line=>line.Item2).Distinct().Count()==4 ? new(lines.ToArray()):null;
+    }
+
+    /// <summary>The state a chat line tells, or None. A line with a sender (a player) never counts.</summary>
+    public GardenGameState Read(string sender,string text)
+    {
+        if(sender.Length>0 || text.Length is 0 or >200)return GardenGameState.None;
+        var bare=GardenChat.Bare(text);
+        foreach(var (pattern,state) in lines)if(pattern.IsMatch(bare))return state;
+        return GardenGameState.None;
+    }
+}
+
+/// <summary>
+/// X-581 (0.1572): which bed a state line is about. The game writes it just before the bed's menu opens (dalamud.log and chat history of
+/// 19/11 23:08 to 23:09: eight beds, the line 65 to 85 ms before « Garden menu read »): the menu that opens at the same place within
+/// <see cref="Window"/> after the line is that bed's. A line is used once; a menu opening without a line just before tells nothing.
+/// </summary>
+public sealed class GardenTalkMemory
+{
+    public static readonly TimeSpan Window=TimeSpan.FromSeconds(1);
+    private readonly object gate=new();
+    private (GardenGameState State,string Place,DateTimeOffset At)? said;
+
+    public void Said(GardenGameState state,string? place,DateTimeOffset at)
+    {
+        lock(gate)said=state==GardenGameState.None || string.IsNullOrEmpty(place) ? null:(state,place,at);
+    }
+
+    /// <summary>A bed's menu opened at this place: the state said just before, or None.</summary>
+    public GardenGameState Opened(string? place,DateTimeOffset at)
+    {
+        lock(gate)
+        {
+            if(said is not { } line)return GardenGameState.None;
+            said=null;
+            return place==line.Place && at>=line.At && at-line.At<=Window ? line.State:GardenGameState.None;
         }
     }
 }

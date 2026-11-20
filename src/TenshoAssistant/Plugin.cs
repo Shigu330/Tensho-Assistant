@@ -1013,7 +1013,9 @@ public sealed partial class Plugin : IDalamudPlugin
                 target:()=>targets.Target is { ObjectKind:Dalamud.Game.ClientState.Objects.Enums.ObjectKind.EventObj } bedObject ? bedObject.BaseId:0u,
                 // X-410 M1 (0.1378): a harvest seen through the bed's menu names a seed or a crop.
                 isGardenItem:id=>mainWindow.GardenSeedCatalog?.Invoke().Any(row=>row.Item1.SeedId==id || row.Item1.HarvestId==id)==true,
-                gui:gameGui,developer:()=>configuration.DeveloperMode),()=>gardenWatcher?.Dispose());
+                gui:gameGui,developer:()=>configuration.DeveloperMode,
+                // X-581 (0.1572): the game's state line of a bed, read when its menu opens.
+                examined:(place,patch,bed,said)=>mainWindow.GardenExamined(place,patch,bed,said)),()=>gardenWatcher?.Dispose());
             mainWindow.SquadronTrainingName=id=>data.GetExcelSheet<Lumina.Excel.Sheets.GcArmyTraining>().GetRowOrDefault(id)?.Name.ExtractText();
             // 0.321: a failing Try On (game function moved) is logged once and its buttons turn off for the session.
             mainWindow.TryOnItem=item=>

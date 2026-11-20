@@ -52,6 +52,13 @@ internal sealed partial class MainWindow
         SaveReminders();
     }
 
+    /// <summary>X-581 (0.1572): the game's state line of a bed (read when its menu opened): kept on that bed; « Ripe » then follows the game.</summary>
+    internal void GardenExamined(string? zone,int patch,int bed,GardenGameState state)
+    {
+        if(GardenJournal.Examined(configuration.GardenBeds,zone,patch,bed,state,DateTimeOffset.UtcNow) is null)return;
+        SaveReminders();
+    }
+
     /// <summary>
     /// 0.616: tending or uprooting read from the chat. The line does not say which bed: with one bed noted here it is that one, with several nothing is guessed.
     /// X-179 (0.1165): the bed named by the game's menu just before (found.Patch, found.Bed) is that bed alone; not noted: nothing changes.
@@ -65,7 +72,8 @@ internal sealed partial class MainWindow
         // #36 (0.978): a harvest is of a ripe bed: the only one ripe here is that one; none ripe (0.997, review): nothing is removed, the player is told.
         if(kind==GardenChatKind.Harvested)
         {
-            var ripe=here.Where(row=>GardenJournal.RipeAt(row)<=DateTimeOffset.UtcNow).ToArray();
+            // X-581 (0.1572): a bed whose ripeness is unknown may be the one harvested (the harvest says it was ripe).
+            var ripe=here.Where(row=>GardenJournal.State(row,DateTimeOffset.UtcNow) is GardenState.Ripe or GardenState.Unknown).ToArray();
             if(ripe.Length==0){ChatNotice?.Invoke(localization.Get("Garden.HarvestNoneRipe"));return;}
             here=ripe;
         }
@@ -229,14 +237,22 @@ internal sealed partial class MainWindow
         finally{ImGui.PopID();}
     }
 
-    private static System.Numerics.Vector4 GardenColor(GardenState state)=>state switch{GardenState.Ripe=>Success,GardenState.ToTend=>UI.FfxivTheme.Warning,_=>Accent};
+    private static System.Numerics.Vector4 GardenColor(GardenState state)=>state switch{GardenState.Ripe=>Success,GardenState.ToTend=>UI.FfxivTheme.Warning,GardenState.Unknown=>Muted,_=>Accent};
+
+    /// <summary>X-581 (0.1572): why a bed's ripeness is unknown, from what the game said and when.</summary>
+    private string GardenUnknownText(GardenBed bed)
+    {
+        var said=(bed.GameStateAt ?? bed.PlantedAt).ToLocalTime().ToString("g");
+        return bed.GameState==GardenGameState.Withered ? localization.Format("Garden.UnknownWithered",said)
+            :localization.Format("Garden.UnknownGrowing",said,GardenJournal.RipeAt(bed).ToLocalTime().ToString("g"));
+    }
 
     private string GardenTimes(GardenBed bed,DateTimeOffset now)
     {
         var state=GardenJournal.State(bed,now);
         var ripe=GardenJournal.RipeAt(bed).ToLocalTime().ToString("g");
         var tend=GardenJournal.TendAt(bed) is { } due ? " · "+localization.Format(state==GardenState.ToTend ? "Garden.TendNow":"Garden.TendAt",due.ToLocalTime().ToString("g")):"";
-        return (state==GardenState.Ripe ? localization.Get("Garden.Ripe"):localization.Format("Garden.RipeAt",ripe))+tend;
+        return (state switch{GardenState.Ripe=>localization.Get("Garden.Ripe"),GardenState.Unknown=>localization.Get("Garden.StateUnknown"),_=>localization.Format("Garden.RipeAt",ripe)})+tend;
     }
 
     private void DrawBedButtons(GardenBed bed,DateTimeOffset now,ref bool changed,ref GardenBed? removed)

@@ -1,7 +1,7 @@
 namespace TenshoAssistant.Reminders;
 
 /// <summary>X-178: the small round mark on a seed's icon: nothing (no tending interval), tending later, tending due, or ripe.</summary>
-public enum GardenBadge { None, Later, Due, Ripe }
+public enum GardenBadge { None, Later, Due, Ripe, Unknown }
 
 /// <summary>X-178: the mark on a possible crossbreed's icon. Unknown = the inventories were not read: never « not owned » without a reading (R06).</summary>
 public enum GardenCrossMark { None, Wished, NotOwned, WishedNotOwned, Unknown }
@@ -16,14 +16,16 @@ public static class GardenView
     /// <summary>How far the bed has grown, 0 to 1; 0 when planted in the future (clock change).</summary>
     public static float Growth(GardenBed bed,DateTimeOffset now)
     {
+        if(bed.GameState==GardenGameState.Ripe)return 1;
         var total=(GardenJournal.RipeAt(bed)-bed.PlantedAt).TotalSeconds;
         var done=(now-bed.PlantedAt).TotalSeconds;
         return total<=0 ? 1:(float)Math.Clamp(done/total,0,1);
     }
 
-    /// <summary>The time left before the harvest, rounded down (never ripe too early); null once ripe.</summary>
+    /// <summary>The time left before the harvest, rounded down (never ripe too early); null once ripe, or (X-581) when ripeness is unknown.</summary>
     public static (int Days,int Hours,int Minutes)? Left(GardenBed bed,DateTimeOffset now)
     {
+        if(GardenJournal.State(bed,now) is GardenState.Ripe or GardenState.Unknown)return null;
         var left=GardenJournal.RipeAt(bed)-now;
         if(left<=TimeSpan.Zero)return null;
         return TenshoAssistant.UI.TimeLeft.Split(left);
@@ -34,7 +36,9 @@ public static class GardenView
 
     public static GardenBadge Badge(GardenBed bed,DateTimeOffset now)
     {
-        if(now>=GardenJournal.RipeAt(bed))return GardenBadge.Ripe;
+        var state=GardenJournal.State(bed,now);
+        if(state==GardenState.Ripe)return GardenBadge.Ripe;
+        if(state==GardenState.Unknown)return GardenBadge.Unknown;
         if(GardenJournal.TendAt(bed) is not { } due)return GardenBadge.None;
         return now>=due ? GardenBadge.Due:GardenBadge.Later;
     }

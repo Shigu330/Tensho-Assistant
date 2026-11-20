@@ -22,6 +22,10 @@ public sealed class GardenBed
     /// <summary>X-383 (0.1360): the beds next to this one that were planted when it was (the crossbreed is decided then): their number and seed.
     /// Null: not kept (noted before 0.1360, or a place that is no patch's bed).</summary>
     public List<GardenNeighbour>? NeighboursAtPlanting { get; set; }
+    /// <summary>X-581 (0.1572): what the game said of this bed the last time it was opened (its state line, GardenTalk), and when; None: never
+    /// read. A new planting starts with None.</summary>
+    public GardenGameState GameState { get; set; }
+    public DateTimeOffset? GameStateAt { get; set; }
 }
 
 /// <summary>X-383 (0.1360): a neighbour kept at a bed's planting: its bed number, its seed's item (0 = unknown, found by the name) and the name noted.</summary>
@@ -32,7 +36,9 @@ public sealed class GardenNeighbour
     public string Seed { get; set; } = "";
 }
 
-public enum GardenState { Growing, ToTend, Ripe }
+/// <summary>X-581 (0.1572): Unknown = whether the bed is ripe is not known: the game said it was still growing after the time expected for its
+/// harvest, or that it withered. Never « Ripe » then.</summary>
+public enum GardenState { Growing, ToTend, Ripe, Unknown }
 
 /// <summary>0.461: where a bed sits: its place (« zone ward-plot »), its patch and its bed number, read from the journal's place text.</summary>
 public sealed record GardenSlot(string Zone,int Patch,int Bed);
@@ -86,8 +92,31 @@ public static class GardenJournal
         return due<RipeAt(bed) ? due:null;
     }
 
+    /// <summary>
+    /// X-581 (0.1572, user report of 18/11): « Ripe » only when the game said so, or when the planting time plus the seed's growing time has
+    /// passed and the game has not said since that the crop was still growing. The growing times come from outside the game (Lotlab); on 17/11
+    /// four carrots were said ripe at 23:55 by them, the game still said « se porte bien » at 00:13, and they were harvested the next day.
+    /// </summary>
     public static GardenState State(GardenBed bed,DateTimeOffset now)
-        =>now>=RipeAt(bed) ? GardenState.Ripe:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
+    {
+        if(bed.GameState==GardenGameState.Ripe)return GardenState.Ripe;
+        if(Unknown(bed,now))return GardenState.Unknown;
+        return now>=RipeAt(bed) ? GardenState.Ripe:TendAt(bed) is { } due && now>=due ? GardenState.ToTend:GardenState.Growing;
+    }
+
+    /// <summary>X-581 (0.1572): the bed's ripeness is unknown: withered, or said growing by the game at or after the expected harvest, now past.</summary>
+    public static bool Unknown(GardenBed bed,DateTimeOffset now)
+        =>bed.GameState==GardenGameState.Withered
+          || bed.GameState is GardenGameState.Growing or GardenGameState.Wilting && now>=RipeAt(bed) && bed.GameStateAt is { } said && said>=RipeAt(bed);
+
+    /// <summary>X-581 (0.1572): the game's state line read when the bed's menu opened (place, patch, bed): kept on that bed alone (the latest
+    /// planted at that slot), or null when it is not noted (never another bed).</summary>
+    public static GardenBed? Examined(IEnumerable<GardenBed>? beds,string? place,int patch,int number,GardenGameState state,DateTimeOffset now)
+    {
+        if(state==GardenGameState.None || CareTargets(beds,place,(patch,number)) is not [var bed])return null;
+        bed.GameState=state;bed.GameStateAt=now;
+        return bed;
+    }
 
     /// <param name="among">X-383 (0.1360): the journal at that moment: the neighbours planted then are kept in the new bed (null: none kept).</param>
     public static GardenBed Plant(string place,string seed,int growHours,int tendHours,DateTimeOffset now,uint seedId=0,IEnumerable<GardenBed>? among=null)
@@ -170,7 +199,7 @@ public static class GardenJournal
         {
             if(bed.PlantedAt>now)continue;
             if(TendAt(bed) is { } tend && tend>now)alarms.Add((bed,GardenState.ToTend,tend));
-            if(RipeAt(bed) is var ripe && ripe>now)alarms.Add((bed,GardenState.Ripe,ripe));
+            if(RipeAt(bed) is var ripe && ripe>now && bed.GameState!=GardenGameState.Ripe)alarms.Add((bed,GardenState.Ripe,ripe));
         }
         return [.. alarms.OrderBy(alarm=>alarm.At).ThenBy(alarm=>alarm.Bed.Place,StringComparer.Ordinal)];
     }
