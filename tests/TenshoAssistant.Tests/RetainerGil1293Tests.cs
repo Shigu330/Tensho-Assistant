@@ -1,7 +1,7 @@
 using TenshoAssistant.Inventory;
 
-// X-291 (0.1293): user request of 13/11 about 23:45 (Storage › Bank, retainers Shirune and Zet-suna): the retainer's gil showed as an
-// item cell (gil icon, « 999 », « 528 ») in a « Bag 6 ». The gil purses (12000 retainer, 22000 company chest) are an amount, never a page.
+// X-291 (0.1293): user request of 13/11 about 23:45 (Storage › Bank, two retainers): the retainer's gil showed as an
+// item cell (gil icon, « 1 122 », « 612 »; X-663: invented amounts) in a « Bag 6 ». The gil purses (12000 retainer, 22000 company chest) are an amount, never a page.
 internal static class RetainerGil1293Tests
 {
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

@@ -6,12 +6,13 @@ namespace TenshoAssistant.Inventory;
 /// (docs/evidence/0.1604-gil-retainer-sales.md):
 /// <list type="bullet">
 /// <item>The first reading after a load was a starting point, never a change: the plugin reloaded (a new version) while a retainer was open
-/// with 215 005 gil of sales in its purse, the new instance took them as its starting point, and the withdrawal that followed was counted as a
+/// with 198 760 gil of sales in its purse, the new instance took them as its starting point, and the withdrawal that followed was counted as a
 /// transfer only. Now the retainers' total starts from the last balance the journal recorded (<see cref="Seed"/>), when the character's gil
 /// did not change meanwhile (X-662 M1, 0.1606): what rose meanwhile is their market sales. The character's and the company chest's first
 /// readings stay starting points (no category can be told for them).</item>
 /// <item>For one reading, when another retainer is opened, its purse may be read before the game filled it: the total fell then rose back
-/// (« withdrawal » −999 then « market » +999 a second later, 3 411 gil in seven days, the transfer's gap). A new retainers' total now counts
+/// (« withdrawal » −1 122 then « market » +1 122 a second later, 3 555 gil in seven days, the transfer's gap; X-663: amounts invented, of the shape of
+/// the user's journal, docs/evidence/0.1604-gil-retainer-sales.md). A new retainers' total now counts
 /// only once read the same twice in a row (<see cref="Settle"/>).</item>
 /// </list>
 /// 0.769 (X-19): a rise of the retainers' total is a deposit as far as the character's deposits since then cover it, the rest their market

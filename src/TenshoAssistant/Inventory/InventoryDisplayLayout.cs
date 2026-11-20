@@ -11,7 +11,7 @@ public static class InventoryDisplayLayout
     public static bool HasBagLayout(int container)=>container is >= 0 and <= 3 or 4000 or 4001 or 4100 or 4101 or >= 10000 and <= 10006;
 
     /// <summary>
-    /// X-291 (0.1293, user request of 13/11 about 23:45, Storage › Bank, retainers Shirune and Zet-suna: the gil shown as an item cell, « 999 »,
+    /// X-291 (0.1293, user request of 13/11 about 23:45, Storage › Bank, two retainers: the gil shown as an item cell, « 1 122 »,
     /// in a « Bag 6 »): a storage's gil purse, a retainer's (12000) or the company chest's (22000), is an amount, never an item page.
     /// </summary>
     public static bool IsGil(int container)=>container is 12000 or 22000;

@@ -1707,7 +1707,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1279) Au lancement du jeu (ou après une mise à jour de Tensho), les panneaux et barres libres de Tensho apparaissent 1 à 3 s après, sans petit gel de l'image au moment où ils arrivent.
 
-- [x] (0.1285) Stockage › Banque, onglet d'un servant relu à la cloche (Shirune, Zet-suna) : ses sacs s'affichent dans l'ordre du jeu, ses gils et cristaux sur une page après les sacs, plus de « réimportez ».
+- [x] (0.1285) Stockage › Banque, onglet d'un servant relu à la cloche (deux servants) : ses sacs s'affichent dans l'ordre du jeu, ses gils et cristaux sur une page après les sacs, plus de « réimportez ».
 
 - [x] (0.1286) Atelier de compagnie : ouvrir le panneau des sous-marins puis celui des dirigeables (puis l'inverse) : Atelier › Vaisseaux liste les deux vaisseaux partis, la barre serveur et Alarmes donnent les deux retours ; dalamud.log dit « Workshop read without … » une fois par visite.
 
@@ -1723,7 +1723,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1292) Page Alarmes › Alarmes à date, une alarme du 01/12 : la ligne dit « prochaine 01/12/2026 00:00 (dans 17 j … h) » ; une alarme d'aujourd'hui : l'heure seule et « dans 3 h 05 » ou « dans 45 min ».
 
-- [x] (0.1293) Stockage › Banque, onglet d'un servant (Shirune, Zet-suna) puis vue Globale : une ligne « <servant> · gils : 999 » avec l'icône de gil, plus de case gil dans un « Sac 6 » ; vue en liste : pas de ligne Gil.
+- [x] (0.1293) Stockage › Banque, onglet d'un servant (deux servants) puis vue Globale : une ligne « <servant> · gils : <montant> » avec l'icône de gil, plus de case gil dans un « Sac 6 » ; vue en liste : pas de ligne Gil.
 
 - [x] (0.1294) Page Équipement, clic sur un emplacement (Main secondaire, niveaux 40 à 45), fenêtre étroite puis large : aucun texte coupé au bout des lignes ; survol d'une pièce : « Statistiques de base », puis « Comparé à l'équipement porté » avec les écarts verts et rouges deux par deux et « Valeurs de base, sans matérias », puis niveau, stock et obtention.
 

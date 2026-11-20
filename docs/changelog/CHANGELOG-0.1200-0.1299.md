@@ -45,11 +45,11 @@ Archive de [CHANGELOG.md](../../CHANGELOG.md) : versions plus anciennes que la d
 - For players: Gear: the piece list no longer cuts stat differences at the end of the lines; hover a piece to see its stats and how it compares with what you wear.
 
 ## 0.1293.0
-- Plan global, X-291 : Stockage › Banque : les gils d'un servant (et ceux du coffre de compagnie) s'affichent en montant exact, sur une ligne à eux (« Shirune · gils : 1 234 567 », séparateurs de milliers de la langue, icône de gil), dans l'onglet du servant et dans la vue Globale, quels que soient les filtres ; ils ne sont plus une case d'objet dans un « Sac 6 » ni une ligne de la vue en liste, de la recherche ou des catégories. Un porte-monnaie non lu reste inconnu (pas de ligne), jamais zéro. Les cristaux restent des objets (cases, comme dans le jeu).
+- Plan global, X-291 : Stockage › Banque : les gils d'un servant (et ceux du coffre de compagnie) s'affichent en montant exact, sur une ligne à eux (« <servant> · gils : 1 234 567 », séparateurs de milliers de la langue, icône de gil), dans l'onglet du servant et dans la vue Globale, quels que soient les filtres ; ils ne sont plus une case d'objet dans un « Sac 6 » ni une ligne de la vue en liste, de la recherche ou des catégories. Un porte-monnaie non lu reste inconnu (pas de ligne), jamais zéro. Les cristaux restent des objets (cases, comme dans le jeu).
 - Pour les joueurs : Banque : les gils de vos servants s'affichent en montant sur une ligne à eux, plus comme un objet dans un sac.
 - Tests : RetainerGil1293Tests. Verify.ps1 (agent) : 2386/2386, 0 avertissement, 0 erreur ; DLL 0.1293.0.0. Non validé en jeu.
 ### English
-- Storage › Bank: a retainer's gil (and the company chest's) is shown as an exact amount, on a line of its own (« Shirune · gil: 1,234,567 », the language's thousands separators, gil icon), in the retainer's tab and in the Global view, whatever the filters; it is no longer an item cell in a « Bag 6 » nor a row of the list view, the search or the categories. A purse not read stays unknown (no line), never zero. Crystals stay items (cells, as in the game).
+- Storage › Bank: a retainer's gil (and the company chest's) is shown as an exact amount, on a line of its own (« <retainer> · gil: 1,234,567 », the language's thousands separators, gil icon), in the retainer's tab and in the Global view, whatever the filters; it is no longer an item cell in a « Bag 6 » nor a row of the list view, the search or the categories. A purse not read stays unknown (no line), never zero. Crystals stay items (cells, as in the game).
 - For players: Bank: your retainers' gil is now shown as an amount on its own line, no longer as an item in a bag.
 
 ## 0.1292.0

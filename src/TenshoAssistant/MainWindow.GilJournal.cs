@@ -68,7 +68,7 @@ internal sealed partial class MainWindow
             var totals=gilTotals[(int)source];
             if(totals.Count==0)continue;
             // 0.769 (X-19): transfers with the retainers or the company chest stay out of the net.
-            // X-658 (0.1604): one way of writing the amounts (TenshoCulture): « -62.360 » here beside « 327 297 » below, before.
+            // X-658 (0.1604): one way of writing the amounts (TenshoCulture): « -58.240 » here beside « 320 834 » below, before (invented amounts, X-663).
             ImGui.TextColored(Accent,localization.Format("GilJournal.Source"+source,TenshoAssistant.Localization.TenshoCulture.Signed(totals.Where(total=>!GilJournal.IsTransfer(total.Category)).Sum(total=>total.Gained-total.Spent))));
             if(!UI.UiComponents.BeginDataTable("GilTotals"+source,4))continue;
             try
