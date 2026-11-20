@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (616 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (620 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -655,6 +655,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-578 | User's request of 18/11 around 00:15: « first find the rank of every beast… | Done in 0.1548 |
 | X-579 | User's request of 18/11 around 00:25 (capture of the call order of the board's… | Done in 0.1547 |
 | X-580 | User's request of 18/11 around 00:20 (capture of the « The 10 to take » panel… | Done in 0.1558.0 |
+| X-581 | Bug seen by the user on 18/11 around 00:35 (capture of the Garden page, house… | Done in 0.1572 |
 | X-582 | Tool (defect seen on 18/11 around 00:30, relay 110): q.py plafond, hence… | Done in 0.1548 |
 | X-583 | Tool: on 18/11 around 01:00, relay 110 asked the master a question then waited… | Done in 0.1551 |
 | X-585 | Review of block 0.1540 to 0.1550 (review 0.1550, 18/11), minor M1, M2, M3, M4… | Done in 0.1558 |
@@ -679,17 +680,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-617 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), I1: finding in… | Done in 0.1555 |
 | X-618 | Review of block 0.1551 to 0.1554 (review 0.1554, 20/11), minor M1, M2, M3, M4… | Done in 0.1557 |
 | X-619 | Review  (review 0.1557, 20/11), minor M1, M2, M3: M1 in… | Done in 0.1560 |
+| X-620 | Tool (X-612 review, 20/11): stats.py counts version 0.1514 in no relay… | Done in 0.1570 |
 | X-621 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), I1: finding in… | Done in 0.1561 |
 | X-622 | Review of block 0.1558 to 0.1560 (review 0.1560, 20/11), minor M1, M2: M1 in… | Done in 0.1562 |
 | X-623 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), I1: finding in… | Done in 0.1563 |
 | X-624 | Review of block 0.1561 to 0.1562 (review 0.1562, 20/11), minor M1, M2, M3, M4… | Done in 0.1564 |
 | X-625 | Tool: tools/discoveries-merge.py sync --dry-run crashes on Windows without -X… | Done in 0.1569 |
+| X-626 | Review of block 0.1565 to 0.1568 (review 0.1568, 20/11), minor M1, M2, M3: M1… | Done in 0.1571 |
+| X-627 | Review  (review 0.1569, 20/11), I1: finding in… | Done in 0.1570 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (616 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (620 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1342,6 +1346,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-578 | Demande de l'utilisateur du 18/11 vers 0 h 15 : « avant il faut trouver le rang… | Fait en 0.1548 |
 | X-579 | Demande de l'utilisateur du 18/11 vers 0 h 25 (capture de l'ordre d'appel du… | Fait en 0.1547 |
 | X-580 | Demande de l'utilisateur du 18/11 vers 0 h 20 (capture du panneau « Les 10 à… | Fait en 0.1558.0 |
+| X-581 | Bug vu par l'utilisateur le 18/11 vers 0 h 35 (capture de la page Jardin… | Fait en 0.1572 |
 | X-582 | Outil (défaut constaté le 18/11 vers 0 h 30, relais 110) : q.py plafond, et… | Fait en 0.1548 |
 | X-583 | Outil : le 18/11 vers 1 h, le relais 110 a posé une question à la maître puis… | Fait en 0.1551 |
 | X-585 | Relecture du bloc 0.1540 à 0.1550 (relecture 0.1550, 18/11), mineurs M1, M2… | Fait en 0.1558 |
@@ -1366,8 +1371,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-617 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), I1 : X-587 A03… | Fait en 0.1555 |
 | X-618 | Relecture du bloc 0.1551 à 0.1554 (relecture 0.1554, 20/11), mineurs M1, M2… | Fait en 0.1557 |
 | X-619 | Relecture  (relecture 0.1557, 20/11), mineurs M1, M2, M3 : M1 : X-618 M5 : une… | Fait en 0.1560 |
+| X-620 | Outil (relecture de X-612 le 20/11) : stats.py ne compte la version 0.1514 dans… | Fait en 0.1570 |
 | X-621 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), I1 : X-619 M1 lève… | Fait en 0.1561 |
 | X-622 | Relecture du bloc 0.1558 à 0.1560 (relecture 0.1560, 20/11), mineurs M1, M2… | Fait en 0.1562 |
 | X-623 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), I1 : KeepAside lit… | Fait en 0.1563 |
 | X-624 | Relecture du bloc 0.1561 à 0.1562 (relecture 0.1562, 20/11), mineurs M1, M2… | Fait en 0.1564 |
 | X-625 | Outil : tools/discoveries-merge.py sync --dry-run plante sous Windows sans -X… | Fait en 0.1569 |
+| X-626 | Relecture du bloc 0.1565 à 0.1568 (relecture 0.1568, 20/11), mineurs M1, M2, M3… | Fait en 0.1571 |
+| X-627 | Relecture  (relecture 0.1569, 20/11), I1 : Le second cas, censé être le test de… | Fait en 0.1570 |

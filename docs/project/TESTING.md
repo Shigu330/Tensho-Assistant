@@ -2225,6 +2225,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1568) Objets › Fibre alchimique › « Comment l'obtenir » : une ligne « Explorations en aéronef » (deux secteurs) et une ligne « Explorations en sous-marin » (secteurs avec leur mer), la source en gris dessous, et plus « Aucune source connue » ; un objet sans aucune source garde « Aucune source connue »
 
+- [ ] (0.1571) Chat, Paramètres › Onglets du chat : ouvrir deux onglets, taper un mot dans « Seulement avec » du premier sans l'ajouter : la case du second reste vide ; taper un mot puis Entrée : il s'ajoute et le curseur reste dans la case pour en taper un autre.
+
+- [ ] (0.1571) Chat : clic droit sur un message d'un joueur mis en avant, « Ne plus mettre … en avant » : il n'est plus mis en avant, même si son nom avait été écrit avec le monde (« Nom@Monde ») ; dans un onglet avec « Respecter la casse », ajouter « Foo » à côté de « foo » : les deux lignes restent.
+
+- [ ] (0.1572) Jardin, au potager de la maison : ouvrir un emplacement dont le semis n'est pas encore mûr après l'heure prévue par Tensho (ou attendre ce cas) : le jeu écrit « Le semis de … se porte bien. » ; la page Jardin montre « Inconnu » pour cet emplacement (pas « Mûr »), avec au survol l'heure où le jeu l'a dit ; les autres emplacements gardent leur temps restant.
+
+- [ ] (0.1572) Jardin : ouvrir un emplacement mûr (le jeu écrit « … est arrivé(e) à maturité ! ») : la page montre « Mûr » pour cet emplacement, même avant l'heure prévue ; récolter : il est retiré du journal.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
