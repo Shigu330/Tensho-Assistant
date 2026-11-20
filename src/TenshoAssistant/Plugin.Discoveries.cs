@@ -24,6 +24,20 @@ public sealed partial class Plugin
         return (discoveries,discoveryFolder);
     }
 
+    /// <summary>X-619 M2 (review of 0.1557): MarketSeen.json held at the start, read again every 30 s (10 min at most) and joined to the prices
+    /// seen meanwhile; still held, the next save joins it.</summary>
+    private async Task ReadSeenPricesLater(string seenPath,Market.SeenPriceStore seenPrices)
+    {
+        try
+        {
+            if(await Market.SeenPriceStore.ReadWhenFree(seenPath,TimeSpan.FromSeconds(30),20,gameDataCancel.Token).ConfigureAwait(false) is { } later)
+            {seenPrices.Load(later);log.Information("The market prices seen were read once the file was free: {0} entries joined.",later.Count);}
+            else log.Warning("The market prices seen could still not be read; the next save joins the file.");
+        }
+        catch(OperationCanceledException){}
+        catch(Exception error){log.Warning(error,"The market prices seen could not be read again.");}
+    }
+
     /// <summary>The prices seen, then the discoveries, read on a worker (as before the move); the chat lines go through the framework thread.</summary>
     private void LoadDiscoveries(string discoveryFolder,Discoveries.DiscoveryStore discoveries,Market.SeenPriceStore seenPrices,IFramework framework,IChatGui chat)
     {
@@ -33,10 +47,15 @@ public sealed partial class Plugin
             // another program, read again, then left where it is (the next save joins it), never set aside as damaged.
             try
             {
-                if(Market.SeenPriceStore.ReadAtStart(Path.Combine(discoveryFolder,"MarketSeen.json"),DateTimeOffset.UtcNow,
+                var seenPath=Path.Combine(discoveryFolder,"MarketSeen.json");
+                var held=false;
+                if(Market.SeenPriceStore.ReadAtStart(seenPath,DateTimeOffset.UtcNow,
                     (aside,error)=>log.Warning(error,"The market prices seen could not be read; the file is set aside as {0}.",Path.GetFileName(aside)),
-                    error=>log.Warning(error,"The market prices seen could not be read for now (held by another program?); the file stays where it is and is joined at the next save.")) is { } prices)
+                    error=>{held=true;log.Warning(error,"The market prices seen could not be read for now (held by another program?); the file stays where it is, read again every 30 s and joined at the next save.");}) is { } prices)
                     seenPrices.Load(prices);
+                // X-619 M2 (review of 0.1557): held at the start, the file is read again later and joined to the prices seen meanwhile (before,
+                // its prices stayed out of memory for the whole session).
+                if(held)_=ReadSeenPricesLater(seenPath,seenPrices);
             }
             catch(Exception error){log.Warning(error,"The market prices seen could not be read.");}
             var saved=Path.Combine(discoveryFolder,"Discoveries.json");
@@ -79,13 +98,22 @@ public sealed partial class Plugin
                 // without your facts and nothing is sent to GitHub this session (MineIncomplete); new sightings are still saved, row by row,
                 // added to what the base holds (X-171).
                 // X-618 (M5): a row of yours that cannot be read leaves your facts incomplete: nothing sent to your gist (DiscoveryStart.Incomplete).
-                var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine(Discoveries.DiscoveryStart.Incomplete(discoveries,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key))),Kinds:opened.SharedKinds()),
+                // X-619 M1 (review of 0.1557): such a row is then set aside (DiscoveryDatabase.SetAside): this session stays incomplete, the next
+                // start reads your facts whole again (before, the row stayed and blocked the sharing for good).
+                var unreadable=new HashSet<string>();
+                var (gotMine,mine)=await Discoveries.DiscoveryStart.ReadWithRetries(()=>(Facts:opened.ReadMine(Discoveries.DiscoveryStart.Incomplete(discoveries,(key,error)=>{lock(unreadable)unreadable.Add(key);log.Warning(error,"A discovery row could not be read ({0}); it is set aside after the read.",key);})),Kinds:opened.SharedKinds()),
                     Discoveries.DiscoveryStart.Tries,Discoveries.DiscoveryStart.Wait,
                     (error,attempt)=>{log.Warning(error,"Your discoveries could not be read (try {0} of {1}).",attempt,Discoveries.DiscoveryStart.Tries);mainWindow.DiscoveriesReadFailed=attempt;},
                     gameDataCancel.Token).ConfigureAwait(false);
                 if(gotMine)
                 {
                     discoveries.Load(mine.Facts);
+                    string[] aside;lock(unreadable)aside=[..unreadable];
+                    if(aside.Length>0)
+                    {
+                        try{log.Warning("Discoveries: {0} row(s) that could not be read set aside in the table facts_aside of {1} (kept, not sent); the next start reads your facts whole.",opened.SetAside(aside,DateTimeOffset.UtcNow),Discoveries.DiscoveryDatabase.FileName);}
+                        catch(Exception error){log.Warning(error,"Discoveries: the rows that could not be read could not be set aside; they stay and are tried again at the next start.");}
+                    }
                     discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),mine.Kinds);
                     mainWindow.DiscoveriesReadFailed=0;
                 }

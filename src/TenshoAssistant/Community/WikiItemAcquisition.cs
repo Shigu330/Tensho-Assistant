@@ -70,7 +70,8 @@ public static class WikiItemAcquisitionParser
     }
 }
 
-public sealed record WikiItemAcquisitionState(WikiItemAcquisition? Page,bool Loading,string? Error);
+/// <summary>X-619 M3 (review of 0.1557): FailedAt = when the read failed (null: not failed); the item is asked again <see cref="WikiItemAcquisitionService.RetryAfter"/> later.</summary>
+public sealed record WikiItemAcquisitionState(WikiItemAcquisition? Page,bool Loading,string? Error,DateTimeOffset? FailedAt=null);
 
 /// <summary>Reads item pages on demand, one at a time (3 s apart), kept in DataCache « wiki-items » for the sources lifetime.</summary>
 public sealed class WikiItemAcquisitionService:IDisposable
@@ -94,6 +95,11 @@ public sealed class WikiItemAcquisitionService:IDisposable
     internal TimeSpan Gap { get; set; }=TimeSpan.FromSeconds(3);
     /// <summary>X-589 (A10): called by the drainer once it found the queue empty, just before its task ends (the managed tests ask there).</summary>
     internal Action? Idle { get; set; }
+    /// <summary>X-619 M3 (review of 0.1557): how long a failed item waits before it is asked again (network cut, the 20 s delay): as
+    /// Teamcraft's failedAt and GatherBuddy's retryAfter. Before, the error was kept for the whole session.</summary>
+    internal TimeSpan RetryAfter { get; set; }=TimeSpan.FromMinutes(5);
+    /// <summary>X-619 M3: the clock (moved forward in the managed tests).</summary>
+    internal Func<DateTimeOffset> Clock { get; set; }=()=>DateTimeOffset.UtcNow;
     // Settings › Advanced (0.206): when off, nothing is requested and the source is simply absent.
     public Func<bool>? Enabled { get; set; }
     /// <summary>What is already known for the item, without requesting anything (null = nothing yet).</summary>
@@ -107,7 +113,11 @@ public sealed class WikiItemAcquisitionService:IDisposable
         if(itemId==0 || Enabled?.Invoke()==false)return new(null,false,null);
         lock(gate)
         {
-            if(states.TryGetValue(itemId,out var known))return known;
+            if(states.TryGetValue(itemId,out var known))
+            {
+                if(known.FailedAt is not { } failed || Clock()-failed<RetryAfter)return known;
+                states.Remove(itemId);
+            }
             if(states.Count>=512)states.Remove(states.Keys.First());
             var loading=new WikiItemAcquisitionState(null,true,null);states[itemId]=loading;
             if(!disposed){pending.Enqueue(itemId);if(!draining){draining=true;_=Task.Run(DrainAsync);}}
@@ -126,7 +136,7 @@ public sealed class WikiItemAcquisitionService:IDisposable
             catch(OperationCanceledException) when(disposal.IsCancellationRequested){return;}
             // 0.326: the wiki was turned off while this item waited: forget it, so it is asked again once the switch is back on.
             catch(SourceDisabledException){lock(gate){if(!disposed)states.Remove(id);}continue;}
-            catch(Exception error){result=new(null,false,error.Message);}
+            catch(Exception error){result=new(null,false,error.Message,Clock());}
             lock(gate){if(!disposed)states[id]=result;}
         }
     }

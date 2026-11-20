@@ -59,6 +59,51 @@ public sealed class DiscoveryDatabase
     public DiscoveryFile ReadMine(Action<string,Exception>? broken=null)=>Read("SELECT key,fact FROM facts WHERE shared=0;",null,broken);
     /// <summary>The shared facts of one kind (read when a page asks for that kind, X-93).</summary>
     public DiscoveryFile ReadShared(DiscoveryKind kind,Action<string,Exception>? broken=null)=>Read("SELECT key,fact FROM facts WHERE kind=$kind AND shared=1;",(int)kind,broken);
+    /// <summary>
+    /// X-619 M1 (review of 0.1557): rows that could not be read, moved into the table <c>facts_aside</c> (key, kind, shared, the text as it
+    /// was, the time), in one transaction. A row read again meanwhile and readable now (another client wrote it) stays. Before, a damaged row
+    /// stayed in <c>facts</c> and marked your facts incomplete at every start: nothing was ever sent to your gist again. The text is kept,
+    /// never deleted. Returns how many rows were moved.
+    /// </summary>
+    public int SetAside(IReadOnlyCollection<string> keys,DateTimeOffset now)
+    {
+        if(keys.Count==0)return 0;
+        using var open=Open();
+        using var transaction=open.BeginTransaction(deferred:false);
+        Run(open,"CREATE TABLE IF NOT EXISTS facts_aside(key TEXT NOT NULL,kind INTEGER NOT NULL,shared INTEGER NOT NULL,fact TEXT NOT NULL,at TEXT NOT NULL);",transaction);
+        using var read=open.CreateCommand();read.Transaction=transaction;
+        read.CommandText="SELECT fact FROM facts WHERE key=$key;";
+        var readKey=read.Parameters.Add("$key",SqliteType.Text);
+        using var copy=open.CreateCommand();copy.Transaction=transaction;
+        copy.CommandText="INSERT INTO facts_aside(key,kind,shared,fact,at) SELECT key,kind,shared,fact,$at FROM facts WHERE key=$key;";
+        var copyKey=copy.Parameters.Add("$key",SqliteType.Text);copy.Parameters.AddWithValue("$at",now.ToString("O"));
+        using var delete=open.CreateCommand();delete.Transaction=transaction;
+        delete.CommandText="DELETE FROM facts WHERE key=$key;";
+        var deleteKey=delete.Parameters.Add("$key",SqliteType.Text);
+        var moved=0;
+        foreach(var key in keys)
+        {
+            readKey.Value=key;
+            if(read.ExecuteScalar() is not string text || Readable(text))continue;
+            copyKey.Value=key;copy.ExecuteNonQuery();
+            deleteKey.Value=key;delete.ExecuteNonQuery();
+            moved++;
+        }
+        transaction.Commit();
+        return moved;
+    }
+    private static bool Readable(string text)
+    {
+        try{JsonSerializer.Deserialize<DiscoveryFact>(text,Options);return true;}
+        catch(JsonException){return false;}
+    }
+    /// <summary>X-619 M1: how many rows were set aside (0 when the table does not exist).</summary>
+    public long CountAside()
+    {
+        using var open=Open();
+        return Scalar(open,"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='facts_aside';") is long and > 0 ? Convert.ToInt64(Scalar(open,"SELECT COUNT(*) FROM facts_aside;")):0;
+    }
+
     /// <summary>The kinds that have shared facts in the file.</summary>
     public IReadOnlyList<DiscoveryKind> SharedKinds()
     {

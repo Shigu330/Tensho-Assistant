@@ -338,6 +338,22 @@ public sealed class SeenPriceStore
         }
     }
 
+    /// <summary>
+    /// X-619 M2 (review of 0.1557): the file left at the start because another program held it (ReadAtStart), read again every
+    /// <paramref name="wait"/>, <paramref name="tries"/> times at most; null when still held, gone or damaged (the next save deals with it).
+    /// </summary>
+    public static async Task<List<SeenMarketEntry>?> ReadWhenFree(string path,TimeSpan wait,int tries,CancellationToken token)
+    {
+        for(var attempt=0;attempt<tries;attempt++)
+        {
+            await Task.Delay(wait,token).ConfigureAwait(false);
+            try{return Read(path);}
+            catch(Exception error) when(Discoveries.DiscoveryFiles.Busy(error)){}
+            catch(Exception){return null;}
+        }
+        return null;
+    }
+
     public static List<SeenMarketEntry>? Read(string path,long max=MaxFileBytes)=>File.Exists(path) && new FileInfo(path).Length<=max ? JsonSerializer.Deserialize<List<SeenMarketEntry>>(File.ReadAllText(path)):null;
     /// <summary>
     /// X-171 (0.1216, audit of 12/11, R02): two game clients on one profile each held the file's entries of the start and wrote back their whole
