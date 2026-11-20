@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1650.0
+- Plan global, X-564 : Fenêtre de chat (X-564), essai mesuré : la partie chat de l'échauffement JIT (la première image de la fenêtre, environ 730 méthodes) est compilée en priorité normale ; le reste de l'échauffement revient en priorité basse, comme avant (X-433). Mesures d'avant (journal du 20/11, chargements faits pendant une compilation à côté du jeu) : partie chat prête 4,7 à 7,9 s après le chargement, lignes dessinées 3,5 à 9,7 s après lui, et une compilation de 704 ms dont 109 ms de processeur : le fil attendait le processeur. Preuve dans docs/evidence/0.1650-chat-part-priority.md. Le point reste ouvert tant que les lignes ne sont pas dessinées en moins de 3 s.
+- Pour les joueurs : fenêtre de chat : ses lignes arrivent plus tôt après le chargement du plugin.
+- Tests : ChatPriority1650Tests. Verify.ps1 (agent) : 3443/3443, 0 avertissement, 0 erreur ; DLL 0.1650.0.0. Non validé en jeu.
+### English
+- Chat window (X-564), a measured attempt: the chat part of the JIT warm-up (the window's first frame, about 730 methods) is compiled at normal priority; the rest of the warm-up goes back below normal, as before (X-433). Measures before (log of 20/11, loads made while a build ran beside the game): chat part ready 4.7 to 7.9 s after the load, lines drawn 3.5 to 9.7 s after it, and a compilation of 704 ms with 109 ms of processor: the thread waited for the processor. Evidence in docs/evidence/0.1650-chat-part-priority.md. The point stays open until the lines are drawn within 3 s.
+- For players: Chat window: its lines come sooner after the plugin loads.
+
 ## 0.1649.0
 - Plan global, X-447 : Fenêtre de chat (X-447 B16, choix de l'utilisateur du 15/11, d'après Chattynator et ElvUI), fin : une liste « Apparences toutes faites » à côté de « Coller une apparence » applique tout de suite une apparence complète : par défaut (proche du chat du jeu), transparente (sans fond ni cadre, lettres avec contour), sombre ou compacte ; les couleurs et noms courts des canaux reviennent à leurs valeurs par défaut, les onglets, joueurs, mots et sons sont gardés. Elles passent par le même code que la copie (mêmes bornes). B16 est fini (apparence copiée, collée, apparences toutes faites).
 - Pour les joueurs : fenêtre de chat : des apparences toutes faites (par défaut, transparente, sombre, compacte) s'appliquent en un clic.
