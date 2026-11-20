@@ -2205,6 +2205,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1550) Dédale bestial, option activée, en combat : quand une bête est appelée, les deux techniques du dresseur de son combo (celle d'avant sa technique et celle d'après) sont surlignées sur la barre d'actions ; elles changent quand une autre bête est appelée
 
+- [ ] (0.1558) Dédale bestial, page Dresseur › Équipe, sur un plateau où l'équipe a moins de places que de faiblesses : la faiblesse de l'ennemi le plus fort de chaque combat (le gardien d'abord) est dans les 10 ; si une faiblesse est laissée, c'est celle de monstres plus faibles.
+
+- [ ] (0.1558) Dédale bestial, option « surligner les combos » cochée, une bête appelée : sur vos barres d'actions, la technique à faire avant la technique de la bête porte « 1 », celle d'après porte « 2 ».
+
+- [ ] (0.1558) Page Dresseur, plateau 3 ou plus, une bête de rang bas : le texte dit « recommandé : … à …, à confirmer en jeu » ; aux plateaux 1 et 2, sans « à confirmer ».
+
+- [ ] (0.1559) Dédale bestial, page Dresseur › Plateaux, 1er plateau : sous un ennemi, une action dit « inflige : … » (par exemple Poison ou Brûlure du vent) quand elle pose un effet ; une action sans effet n'a rien de plus.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
