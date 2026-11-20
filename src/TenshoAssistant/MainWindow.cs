@@ -184,7 +184,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         // X-01 (0.1283): the page the window opens on, compiled with the window's frame (only its method's handle is kept, not the window).
         var firstPage = PageEntryFor(page)?.Draw.Method.MethodHandle;
         jitWarmup = Diagnostics.JitWarmup.Start(() => Diagnostics.JitWarmup.FirstThenAssembly(typeof(MainWindow)), Diagnostics.JitWarmup.Delay, done => log.Information(FormattableString.Invariant(
-            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms. Early phase (map, overlays, chat; the readers' compilation and the chat window wait for it, X-563) ready {done.EarlyReadyAfter:F0} ms after the load.")),
+            $"JIT warm-up: {done.Prepared} methods of the window and the plugin compiled ahead in {done.Elapsed.TotalMilliseconds:F0} ms, {done.Skipped} skipped, {done.EarlyPrepared} of the map and the overlays first. Window part (X-01, 0.1282): {done.WindowPartMethods} methods ready {done.WindowReadyAfter:F0} ms after the load; panels' part ready {done.FirstReadyAfter:F0} ms. Early phase (map, overlays, chat; the readers' compilation waits for it, X-563) ready {done.EarlyReadyAfter:F0} ms after the load. Chat part (X-564, the chat window waits for it; -1: window closed at the load, it waits for the early phase): {done.ChatPrepared} methods ready {done.ChatReadyAfter:F0} ms after the load.")),
             // X-177 C4.2 (0.1200): the rest waits for the readers' classes (one thread compiles at a time: interface, readers, rest).
             holdRest: static ()=>TenshoAssistant.Competitive.CompetitiveGate.CompilerBusy,
             // X-01 (0.1279): the free panels' and the bars' code first, with what it calls: they wait for it (PanelGate).
@@ -193,6 +193,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             windowPart: method => Diagnostics.JitWarmup.WindowFirst(method) || firstPage is { } shown && method.MethodHandle == shown,
             // X-437 M2 (0.1428): its compilations timed for the log in developer mode only.
             measure: static ()=>TenshoAssistant.Competitive.CompetitiveGate.Developer?.Invoke()==true,
+            // X-564 (0.1616): the chat window open at the load: its code first, so its lines show a second or two after the load.
+            chatPart: configuration.Chat.WindowOpen ? Diagnostics.JitWarmup.ChatFirst : null,
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
@@ -205,6 +207,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         $"Panels opened {panelGate.OpenedAfter} ms after the load ({(panelGate.ByBound ? "at the bound" : "their code compiled")}: {jitWarmup.Prepared} of {jitWarmup.FirstPartMethods} methods with what they call compiled by then, all ready {jitWarmup.FirstReadyAfter:F0} ms after the load, -1 = not yet); their first frame {frameMs:F0} ms.");
     /// <summary>X-177 C4.2 (0.1200): the interface's code (map, overlays) is compiled: the readers' classes may be compiled next.</summary>
     internal bool WarmupEarlyDone=>jitWarmup.EarlyDone;
+    /// <summary>X-564 (0.1616): the chat window's code is compiled (its own part, or the early phase): the window may draw its lines.</summary>
+    internal bool WarmupChatDone=>jitWarmup.ChatDone;
     /// <summary>X-433 (0.1425): the warm-up's longest compilations so far, for the readers' compiler's lines of the log.</summary>
     internal string WarmupSlowest=>jitWarmup.Slowest;
 

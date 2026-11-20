@@ -29,7 +29,7 @@ internal static class ChatWarmup1533Tests
         ("Chat warm-up 1533: the chat window waits for the early phase", () =>
         {
             var code = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(code.Contains("if(!WarmupEarlyDone){EmptyState(\"ChatWindow.Loading\");return;}"), "waits");
+            Check(code.Contains("if(!WarmupChatDone){EmptyState(\"ChatWindow.Loading\");return;}"), "waits (its own part since 0.1616, X-564)");
         }),
     ];
 }

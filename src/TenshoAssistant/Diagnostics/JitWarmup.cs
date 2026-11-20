@@ -52,6 +52,16 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-563 M2 (review of 0.1534): when the early phase was compiled (ms after the warm-up was made; -1 before, or without an
     /// early phase): the readers' classes and the chat window wait for it (MainWindow.WarmupEarlyDone).</summary>
     public double EarlyReadyAfter{get;private set;}=-1;
+    /// <summary>
+    /// X-564 (0.1616): the chat part (the chat window's code, compiled before anything else when the window is open at the load) is compiled,
+    /// or there is none and the early phase is done, or the warm-up ended or was stopped: the chat window may draw its lines. It waited for the
+    /// whole early phase (map, overlays, chat): « Loading… » 8 to 25 s after a load (dalamud.log of 19/11 and 20/11).
+    /// </summary>
+    public bool ChatDone=>chatDone || earlyDone;
+    private volatile bool chatDone;
+    /// <summary>X-564: methods of the chat part compiled, and when they all were (ms after the warm-up was made; -1 before, or without one).</summary>
+    public int ChatPrepared{get;private set;}
+    public double ChatReadyAfter{get;private set;}=-1;
     /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
     public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
@@ -104,7 +114,7 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
     private readonly Func<bool>? measure;
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure,Func<MethodBase,bool>? chatPart)
     {
         var token=cancellation.Token;
         this.measure=measure;
@@ -112,7 +122,7 @@ public sealed class JitWarmup : IDisposable
         // hypothesis (docs/evidence/0.1427-warmup-priority.md: the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and disproved
         // in 0.1432 (docs/evidence/0.1432-background-collection-stall.md): its long compilations without processor time were stops of every
         // managed thread during a background collection, the game's included; undone.
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,chatPart,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -126,8 +136,10 @@ public sealed class JitWarmup : IDisposable
     /// with what they call in the plugin (<see cref="CallGraph.Closure"/>); <see cref="FirstPartDone"/> tells when.</param>
     /// <param name="measure">X-437 M2 (0.1428): while it says true, each compilation is timed for the log (<see cref="Slowest"/>); the plugin
     /// gives the developer mode. None: never timed.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure);
+    /// <param name="chatPart">X-564 (0.1616): the methods compiled before anything else (the chat window's, when it is open at the load);
+    /// <see cref="ChatDone"/> tells when. None: <see cref="ChatDone"/> follows the early phase.</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null,Func<MethodBase,bool>? chatPart=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure,chatPart);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -350,7 +362,7 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<MethodBase,bool>? chatPart,CancellationToken token)
     {
         try
         {
@@ -363,6 +375,19 @@ public sealed class JitWarmup : IDisposable
             var methods=Methods(types);
             // X-01 (0.1279): the panels' code first, with what it calls in the plugin and the generic code made for its types.
             var compiled=new HashSet<MethodBase>();
+            // X-564 (0.1616): the chat window's code before anything else when asked (about a thousand methods, a second or so): the window
+            // shows its lines then, no longer after the map's and the overlays' code too.
+            if(chatPart is not null)
+            {
+                foreach(var method in methods.Where(chatPart))
+                {
+                    if(token.IsCancellationRequested)return;
+                    if(!compiled.Add(method))continue;
+                    if(Timed(method,()=>CallGraph.Prepare(method))){Prepared++;ChatPrepared++;}else Skipped++;
+                }
+                ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
+                chatDone=true;
+            }
             if(early is not null && firstPart is not null && types.Count>0)
             {
                 var part=CallGraph.Closure(methods.Where(firstPart),types[0].Assembly,FirstCap,()=>token.IsCancellationRequested);
@@ -425,7 +450,7 @@ public sealed class JitWarmup : IDisposable
             if(!token.IsCancellationRequested)finished?.Invoke(this);
         }
         catch(Exception){Skipped++;}
-        finally{firstPartDone=true;earlyDone=true;done.Set();}
+        finally{firstPartDone=true;earlyDone=true;chatDone=true;done.Set();}
     }
     private static bool Held(Func<bool> ask)
     {
