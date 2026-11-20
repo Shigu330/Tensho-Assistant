@@ -232,6 +232,8 @@ internal sealed class MapLiveReader : IDisposable
             if(now>=eventsAt)
             {
                 try{events=ReadEvents();Read("events");}catch(Exception error){Failed("events",error);}
+                // X-665 M2 (0.1613): the game's quests not accepted, read apart inside the events: empty and said unavailable on their own.
+                if(unacceptedDone){if(unacceptedFailure is { } missed)Failed("quests not accepted",missed);else Read("quests not accepted");}
                 // Objects, FATEs and party carry no map id: on a failure they are emptied, never kept from another zone.
                 try{nearby=ReadObjects();Read("objects");}catch(Exception error){nearby=[];Failed("objects",error);}
                 try{questPoints=ReadQuestPoints();Read("quest points");}catch(Exception error){questPoints=null;Failed("quest points",error);}
@@ -528,9 +530,12 @@ internal sealed class MapLiveReader : IDisposable
         return leve;
     }
     private static IPluginLog? Log;
+    // X-665 M2 (0.1613): the last read of the quests not accepted (framework thread only): whether it ran, and its failure.
+    private static bool unacceptedDone;private static Exception? unacceptedFailure;
     // Quest and event markers of the game map, copied (strings included); at most 256 to bound the work per refresh.
     private static unsafe IReadOnlyList<MapEventMarker> ReadEvents()
     {
+        unacceptedDone=false;
         var agent=AgentMap.Instance();
         if(agent==null)return [];
         // 0.328 (R-14): after a game update First/Last can be garbage and an access violation is not catchable: the vector
@@ -561,7 +566,9 @@ internal sealed class MapLiveReader : IDisposable
         var current=MapQuestEvents.Merge(lastEvents,accepted,marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF));
         // X-99 (0.977, user report with captures: after a teleport, the quests not accepted yet were missing from the Tensho map): the map window's
         // list holds only the map last shown in the game's own window (here the world map, 919), so the game's own list of those quests is added.
-        var unaccepted=ReadGameUnaccepted();
+        // X-665 M2 (0.1613): read apart: a bad count of these leaves them out (as before 0.1610) and no longer freezes the whole events part.
+        var unaccepted=TenshoAssistant.Diagnostics.NativeShape.Apart(ReadGameUnaccepted,out unacceptedFailure);
+        unacceptedDone=true;
         current=MapGameLeves.Merge(current,unaccepted,marker=>(marker.MapId,marker.Icon,marker.Position.X,marker.Position.Z));
         // X-358 (0.1346, review of 0.1345): the accepted quests' markers are type 3 too; only the quests of the game's list of quests not accepted are offers.
         current=MapOfferedQuests.Tag(current,unaccepted,accepted,marker=>(marker.MarkerType==3,marker.ObjectiveId & 0xFFFF),marker=>marker with { Offered=true });
@@ -597,7 +604,7 @@ internal sealed class MapLiveReader : IDisposable
     {
         var map=FFXIVClientStructs.FFXIV.Client.Game.UI.Map.Instance();
         if(map==null)return [];
-        // X-590 A05 (0.1610): an empty list is a count of 0; a count out of bounds a changed structure (thrown, see ReadEvents).
+        // X-590 A05 (0.1610): an empty list is a count of 0; a count out of bounds a changed structure (thrown; read apart since X-665 M2).
         var count=map->UnacceptedQuestMarkers.LongCount;
         if(TenshoAssistant.Diagnostics.NativeShape.Count(count,1024,"the game's markers of quests not accepted")==0)return [];
         var result=new List<MapEventMarker>();var visited=0;

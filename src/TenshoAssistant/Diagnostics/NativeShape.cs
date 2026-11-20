@@ -13,4 +13,12 @@ public static class NativeShape
     /// <summary>The count when it is between 0 and max; else <see cref="UnexpectedGameStructureException"/> (never 0 in its place).</summary>
     public static int Count(long count,int max,string what)
         =>count<0 || count>max ? throw new UnexpectedGameStructureException(what,count,max):(int)count;
+
+    /// <summary>X-665 M2 (0.1613, review of 0.1612): a list read on its own inside a larger part: its failure leaves it empty and is
+    /// reported apart (<paramref name="failure"/>), never by the whole part (the map's events stayed frozen on another zone's copy).</summary>
+    public static IReadOnlyList<T> Apart<T>(Func<IReadOnlyList<T>> read,out Exception? failure)
+    {
+        try{var result=read();failure=null;return result;}
+        catch(Exception error){failure=error;return [];}
+    }
 }

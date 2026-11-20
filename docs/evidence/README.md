@@ -43,7 +43,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.129.0-sightseeing-probe.log](0.129.0-sightseeing-probe.log) | `tests/TenshoAssistant.Tests/WikiVistaTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1306-allied-kinds.md](0.1306-allied-kinds.md) | `tools/README.md` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
 | [0.1308-own-map-instances.md](0.1308-own-map-instances.md) | `src/TenshoAssistant/Competitive/CompetitiveZones.cs`, `tests/TenshoAssistant.Tests/DeepDungeonOpen1308Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/project/ARCHITECTURE.md` |
-| [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilCategories1418Tests.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1418-gil-windows.md` |
+| [0.1319-gil-other.md](0.1319-gil-other.md) | `src/TenshoAssistant/Inventory/GilJournal.cs`, `tests/TenshoAssistant.Tests/GilCategories1418Tests.cs`, `tests/TenshoAssistant.Tests/GilOther1319Tests.cs`, `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1418-gil-windows.md` |
 | [0.1320-map-marker-unlock.md](0.1320-map-marker-unlock.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerGameList1321Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerRemember1335Tests.cs`, `tests/TenshoAssistant.Tests/MapMarkerUnlock1320Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/0.1342-map-marker-bits.md` |
 | [0.133.0-crash-excerpt.log](0.133.0-crash-excerpt.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md`, `docs/project/ARCHITECTURE.md` |
 | [0.1342-map-marker-bits.md](0.1342-map-marker-bits.md) | `src/TenshoAssistant/Maps/MapMarkerUnlock.cs`, `tests/TenshoAssistant.Tests/MapMarkerBits1342Tests.cs` | `docs/changelog/CHANGELOG-0.1300-0.1399.md` |
@@ -64,7 +64,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1420-retainer-sales-end-probe.log](0.1420-retainer-sales-end-probe.log) | `tests/TenshoAssistant.Tests/Review1428Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1420-retainer-sales-end-code.md` |
 | [0.1427-warmup-priority.md](0.1427-warmup-priority.md) | `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/Review1428Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md` |
 | [0.1432-background-collection-stall.md](0.1432-background-collection-stall.md) | `src/TenshoAssistant/Caching/DataCache.cs`, `src/TenshoAssistant/Diagnostics/JitWarmup.cs`, `tests/TenshoAssistant.Tests/CacheStream1432Tests.cs`, `tests/TenshoAssistant.Tests/WarmupPriority1427Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1427-warmup-priority.md` |
-| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1517-chat-channel-help.md` |
+| [0.1434-chat-logfilter.md](0.1434-chat-logfilter.md) | `src/TenshoAssistant/Chat/ChatChannels.cs`, `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs`, `tests/TenshoAssistant.Tests/Review1437Tests.cs` | `docs/changelog/CHANGELOG-0.1400-0.1499.md`, `docs/evidence/0.1517-chat-channel-help.md` |
 | [0.1438-reader-guard.md](0.1438-reader-guard.md) | `src/TenshoAssistant/Diagnostics/ReaderCompiler.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1445-link-json-getters.md](0.1445-link-json-getters.md) | `src/TenshoAssistant/Link/LocalLink.cs`, `src/TenshoAssistant/Link/LocalLinkFeed.Dalamud.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | — |
 | [0.1446-low-memory-collections.md](0.1446-low-memory-collections.md) | `src/TenshoAssistant/Diagnostics/MachineMemory.cs`, `tests/TenshoAssistant.Tests/Review1446Tests.cs` | `docs/evidence/0.1438-reader-guard.md` |
@@ -138,7 +138,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.310-gear-sheets.md](0.310-gear-sheets.md) | `src/TenshoAssistant/Gear/GearCatalog.cs`, `src/TenshoAssistant/Gear/GearLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/project/REFERENCES.md` |
 | [0.312-materia.md](0.312-materia.md) | `src/TenshoAssistant/Gear/GearCatalog.cs`, `src/TenshoAssistant/Gear/GearLoader.Dalamud.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/evidence/0.338-overmeld-rates.md`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md` |
 | [0.315-vessel-builds.md](0.315-vessel-builds.md) | `src/TenshoAssistant/FreeCompany/VesselBuilds.cs`, `src/TenshoAssistant/FreeCompany/VoyageWatcher.Dalamud.cs`, `tests/TenshoAssistant.Tests/Program.cs`, `tests/TenshoAssistant.Tests/Sectors334Tests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/REFERENCES.md` |
-| [0.318-plugin-gaps.json](0.318-plugin-gaps.json) | — | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/GAPS.md` |
+| [0.318-plugin-gaps.json](0.318-plugin-gaps.json) | `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/evidence/0.320-credits.json`, `docs/project/DECISIONS.md`, `docs/project/GAPS.md` |
 | [0.320-credits.json](0.320-credits.json) | `src/TenshoAssistant/Credits/CreditCatalog.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md` |
 | [0.332-squadron-probe.md](0.332-squadron-probe.md) | `src/TenshoAssistant/Reminders/GameTimers.Dalamud.cs`, `tests/TenshoAssistant.Tests/SquadronTests.cs` | `docs/changelog/CHANGELOG-0.300-0.399.md`, `docs/evidence/0.340-chocobo-barding.md` |
 | [0.332-uld-window-frame.md](0.332-uld-window-frame.md) | `tools/README.md` | `docs/changelog/CHANGELOG-0.300-0.399.md` |
@@ -202,7 +202,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.515-node-effects.md](0.515-node-effects.md) | `src/TenshoAssistant/Gathering/GatherNodeEffects.cs`, `src/TenshoAssistant/Gathering/GatheringObservationReader.Dalamud.cs`, `src/TenshoAssistant/Plugin.Gathering.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md`, `docs/project/DECISIONS.md` |
 | [0.517-gp-action-unlocks.md](0.517-gp-action-unlocks.md) | `src/TenshoAssistant/Plugin.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.518-gather-tomes.md](0.518-gather-tomes.md) | `src/TenshoAssistant/Gathering/GatherKnowledgeReader.Dalamud.cs`, `src/TenshoAssistant/Gathering/GatherPointAccess.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
-| [0.519-crystal-actions.md](0.519-crystal-actions.md) | `src/TenshoAssistant/Gathering/GpCrystals.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
+| [0.519-crystal-actions.md](0.519-crystal-actions.md) | `src/TenshoAssistant/Gathering/GpCrystals.cs`, `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.526-folklore-tomes.md](0.526-folklore-tomes.md) | `src/TenshoAssistant/Collections/ExtraCollectionReader.Dalamud.cs`, `src/TenshoAssistant/Gathering/GatherPointAccess.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.527-priming-touch.md](0.527-priming-touch.md) | — | `docs/changelog/CHANGELOG-0.500-0.599.md` |
 | [0.537-game-windows.md](0.537-game-windows.md) | `src/TenshoAssistant/UI/GameWindow.cs` | `docs/changelog/CHANGELOG-0.500-0.599.md` |
@@ -270,7 +270,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.740-list-blink.md](0.740-list-blink.md) | `src/TenshoAssistant/Inventory/InventoryService.cs`, `src/TenshoAssistant/MainWindow.ListPanels.cs` | — |
 | [0.75.0-config-json-probe.log](0.75.0-config-json-probe.log) | — | `docs/changelog/CHANGELOG-0.0-0.99.md` |
 | [0.766-map-discovery.md](0.766-map-discovery.md) | `tools/README.md` | `docs/evidence/0.803-map-discovery-layout.md` |
-| [0.767-retainer-gil-crystals.md](0.767-retainer-gil-crystals.md) | `src/TenshoAssistant/Inventory/BankModels.cs` | `docs/evidence/0.874-probe-coverage.md` |
+| [0.767-retainer-gil-crystals.md](0.767-retainer-gil-crystals.md) | `src/TenshoAssistant/Inventory/BankModels.cs`, `tests/TenshoAssistant.Tests/PrivateValues1607Tests.cs` | `docs/evidence/0.874-probe-coverage.md` |
 | [0.782-raphael-freeze.md](0.782-raphael-freeze.md) | `src/TenshoAssistant/Craft/RaphaelActions.cs` | — |
 | [0.787-workshop-delivered.md](0.787-workshop-delivered.md) | `src/TenshoAssistant/FreeCompany/WorkshopDeliveryReader.Dalamud.cs`, `src/TenshoAssistant/FreeCompany/WorkshopProjects.cs`, `tests/TenshoAssistant.Tests/WorkshopDelivered787Tests.cs` | — |
 | [0.793-game-leve-markers.md](0.793-game-leve-markers.md) | `src/TenshoAssistant/Maps/MapLabels.cs`, `src/TenshoAssistant/Maps/MapLiveReader.Dalamud.cs` | — |
@@ -336,5 +336,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 324 files · fichiers ; 278 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 324 files · fichiers ; 279 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->
