@@ -42,6 +42,12 @@ internal static class FairLock1309Tests
         while (Volatile.Read(ref held.Value) == 0 && Environment.TickCount64 < until) Thread.Sleep(5);
         Check(Volatile.Read(ref held.Value) > 0,"the greedy client started");
     }
+    private static bool Until(Func<bool> done,int ms)
+    {
+        var until = Environment.TickCount64 + ms;
+        while (!done()) { if (Environment.TickCount64 >= until) return false; Thread.Sleep(1); }
+        return true;
+    }
 
     private static BankEntry Entry(ulong character,BankStorageKind kind,ulong storage = 0)
     {
@@ -53,30 +59,43 @@ internal static class FairLock1309Tests
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
-        ("Fair lock 1309: behaviour: a client taking the lock again in a tight loop lets a waiting client in, well before its limit (it was starved)",() => InTemp(root =>
+        // X-668 (relay 145): fair, not a hand-over, checked at each turn. In 0.1625 a wait of 2 s after the five turns let the greedy client take
+        // the lock once the waiting client had stopped asking: a lock that starved the greedy client during every turn passed. Now each turn
+        // of the waiting client lasts until the greedy client is queued (its waiting mark: load cannot hide it any more), and the next turn
+        // must find that the greedy client went first, unless that turn waited past half its wait (1 s), when the lock lets it try anyway.
+        ("Fair lock 1309: behaviour: a client taking the lock again in a tight loop lets a waiting client in, well before its limit (it was starved); queued at each release, the greedy client goes first in turn (fair, not a hand-over)",() => InTemp(root =>
         {
             var path = Path.Combine(root,"Profile.lock");
             using var stop = new CancellationTokenSource();
             var held = new StrongBox<int>();
-            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,6,stop.Token,held);
+            var greedy = Greedy(() => FairFileLock.Hold(path,10_000,error => error),20,30,stop.Token,held);
             Started(held);
-            var first = Volatile.Read(ref held.Value);
             var rounds = new List<string>();
+            var released = -1;
+            var wentFirst = 0;
             for (var round = 0; round < 5; round++)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
-                var before = Volatile.Read(ref held.Value);
-                using (FairFileLock.Hold(path,2_000,error => new TimeoutException("starved: " + error.Message))) Thread.Sleep(5);
-                rounds.Add(watch.ElapsedMilliseconds + " ms, greedy +" + (Volatile.Read(ref held.Value) - before));
-                Check(watch.ElapsedMilliseconds < 1_500,"the waiting client got the lock in " + watch.ElapsedMilliseconds + " ms (round " + round + ")");
+                using (FairFileLock.Hold(path,2_000,error => new TimeoutException("starved: " + error.Message)))
+                {
+                    var took = watch.ElapsedMilliseconds;
+                    var atHold = Volatile.Read(ref held.Value);
+                    rounds.Add(took + " ms, greedy " + (released < 0 ? "-" : "+" + (atHold - released)));
+                    Check(took < 1_500,"the waiting client got the lock in " + took + " ms (round " + round + ")");
+                    if (released >= 0)
+                    {
+                        if (atHold > released) wentFirst++;
+                        else Check(took >= 1_000,"fair, not a hand-over: the greedy client, queued at the release of round " + (round - 1)
+                            + ", went first (" + string.Join("; ",rounds) + ")");
+                    }
+                    // This client's own mark is gone once it holds the lock: a mark now is the greedy client's, waiting behind this turn.
+                    Check(Until(() => Marks(root).Length > 0,5_000),"the greedy client queued during round " + round + " (" + string.Join("; ",rounds) + ")");
+                    released = Volatile.Read(ref held.Value);
+                }
             }
-            // X-564 relay 144 (0.1625): under a loaded machine (Verify's 32 test threads) the greedy thread may not be scheduled during the
-            // five short turns (70 ms in all on 20/11 16:55): it is given up to 2 s to take the lock again before it is stopped.
-            SpinWait.SpinUntil(() => Volatile.Read(ref held.Value) > first,TimeSpan.FromSeconds(2));
             stop.Cancel();
-            // Fair, not a hand-over: the greedy client got the lock again meanwhile or right after (it is not starved in turn).
-            var during = Volatile.Read(ref held.Value) - first;
-            Check(greedy.Join(TimeSpan.FromSeconds(30)) && during >= 1,"the greedy client kept saving too: " + during + " times during the waiting client's turns (" + string.Join("; ",rounds) + ")");
+            Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy client stopped");
+            Check(wentFirst >= 1,"the greedy client kept saving between the waiting client's turns: " + wentFirst + " of 4 (" + string.Join("; ",rounds) + ")");
             Check(Marks(root).Length == 0,"no waiting mark left: " + string.Join(", ",Marks(root)));
         })),
         // X-571 (0.1541): the waiting store waits 10 s, the store's default (it was 2 s: one save of the busy store, slowed by the disk inside SQLite,
