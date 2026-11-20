@@ -6354,6 +6354,7 @@
     "SearchHint": "Chercher dans l'onglet…",
     "SearchBoxTip": "Seulement les messages de cet onglet dont l'auteur ou le texte contient ceci, majuscules et accents à part. Les nouveaux messages qui le contiennent s'ajoutent aussi. Rien n'est enregistré.",
     "SearchFound": "{0} messages",
+    "Searching": "Recherche…",
     "SettingsTitle": "Réglages du chat",
     "SectionPlayers": "Joueurs",
     "FiltersUse": "Utiliser les filtres du jeu",

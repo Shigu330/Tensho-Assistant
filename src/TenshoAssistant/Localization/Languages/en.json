@@ -6354,6 +6354,7 @@
     "SearchHint": "Search this tab…",
     "SearchBoxTip": "Only the messages of this tab whose sender or text holds this, capitals and accents aside. New messages that hold it come in too. Nothing is saved.",
     "SearchFound": "{0} messages",
+    "Searching": "Searching…",
     "SettingsTitle": "Chat settings",
     "SectionPlayers": "Players",
     "FiltersUse": "Use the game's filters",

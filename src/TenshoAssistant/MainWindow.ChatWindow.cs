@@ -970,7 +970,9 @@ internal sealed partial class MainWindow
     private string chatSearchText="";
 
     /// <summary>X-447 B8 (0.1638): the search box over the lines; with text typed, the view of the tab's messages holding it (kept by the
-    /// store, refreshed each frame as a tab's) and how many they are; without, the tab's own view.</summary>
+    /// store) and how many they are; without, the tab's own view. X-670 M1 (review of 0.1638, R07): the lines kept are gone through off the
+    /// game's thread (ChatStore.Searched); here, each frame, only the new ones. While a text is being searched, the last text's results as
+    /// they were (or the tab itself) and « Searching… ». X-670 M3: in capture mode, the senders by their stand-ins, as shown.</summary>
     private ChatTabView DrawChatSearchLine(ChatTabSettings tab,ChatTabView view,ChatSettings options)
     {
         ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X*0.6f,260*Dalamud.Interface.Utility.ImGuiHelpers.GlobalScale));
@@ -979,11 +981,16 @@ internal sealed partial class MainWindow
         Tip("ChatWindow.SearchBoxTip");
         var query=ChatSearch.Query(chatSearchText);
         if(query.Length==0)return view;
-        var found=ChatMessages.SearchView(tab,query);
-        found.Refresh(ChatMessages,tab,options.BoundedMaxLines,ChatFilterTableNow(),options,record=>ChatSearch.Matches(record,query));
+        var capture=options.CaptureNames;
+        var cap=options.BoundedMaxLines;
+        var table=ChatFilterTableNow();
+        bool Holds(ChatRecord record)=>ChatSearch.Matches(record,query,capture);
+        var (found,ready)=ChatMessages.Searched(tab,(capture ? "capture\u001f":"\u001f")+query,
+            (fresh,stale)=>fresh.Refresh(ChatMessages,tab,cap,table,options,record=>stale() ? throw new OperationCanceledException():Holds(record)));
+        if(ready && found is not null)found.Refresh(ChatMessages,tab,cap,table,options,Holds);
         ImGui.SameLine();
-        ImGui.TextDisabled(localization.Format("ChatWindow.SearchFound",found.Count));
-        return found;
+        ImGui.TextDisabled(ready && found is not null ? localization.Format("ChatWindow.SearchFound",found.Count):localization.Get("ChatWindow.Searching"));
+        return found ?? view;
     }
 
     /// <summary>X-448 (0.1454): at the end of the tab bar, always visible (also without the frame): the frame on or off, the lock on or off.</summary>
@@ -1001,7 +1008,8 @@ internal sealed partial class MainWindow
         if(GlyphTabButton("###ChatSearch",Dalamud.Interface.FontAwesomeIcon.Search,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip))
         {
             chatSearchOpen=!chatSearchOpen;chatSearchFocus=chatSearchOpen;
-            if(!chatSearchOpen)chatSearchText="";
+            // X-670 M1: closed, its text forgotten and its view dropped (no copy of the messages left).
+            if(!chatSearchOpen){chatSearchText="";ChatMessages.EndSearch();}
         }
         Tip(chatSearchOpen ? "ChatWindow.SearchCloseTip":"ChatWindow.SearchTip");
         var settingsButton=GlyphTabButton("###ChatSettingsButton",Dalamud.Interface.FontAwesomeIcon.Cog,ImGuiTabItemFlags.Trailing|ImGuiTabItemFlags.NoTooltip);
@@ -1492,14 +1500,6 @@ internal sealed partial class MainWindow
     // 0.1456 (X-451): its site, read when the menu shows a new address.
     private WebSite? chatWindowWebSite;
 
-    /// <summary>
-    /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
-    /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
-    /// opens Tensho's item menu. 0.1442: quest link: left click opens the quest on the Quests page. A target Tensho does not know (data not
-    /// loaded, an item it does not list) is only said on hover. 0.1453: web address: the whole address on hover; a click opens its menu (open in
-    /// the browser, copy), never the browser at once. 0.1456 (X-451): the tooltip and the menu say the site it leads to (its host as the browser
-    /// reaches it) and warn when that name holds letters of other alphabets; the tooltip is made only under the mouse (X-453 M3).
-    /// </summary>
     /// <summary>X-636 (bench X-631, review of 0.1441, M3): a link acts on the left button's release over it, pressed on it, without a drag
     /// (the chat window moves by its whole background: pressing a link to move it placed the flag or opened the item). Pure rule:
     /// <see cref="TenshoAssistant.Chat.ChatLinkPress.Acts"/>.</summary>
@@ -1512,6 +1512,15 @@ internal sealed partial class MainWindow
         return acts;
     }
 
+    /// <summary>
+    /// X-403 phase 2 (0.1441): a link of a message, underlined in the accent colour. Map link: left click places the flag and opens the map (as the
+    /// Maps page's « open »), right click opens Tensho's place menu. Item link: left click opens the item in Tensho (its first page), right click
+    /// opens Tensho's item menu. 0.1442: quest link: left click opens the quest on the Quests page. A target Tensho does not know (data not
+    /// loaded, an item it does not list) is only said on hover. 0.1453: web address: the whole address on hover; a click opens its menu (open in
+    /// the browser, copy), never the browser at once. 0.1456 (X-451): the tooltip and the menu say the site it leads to (its host as the browser
+    /// reaches it) and warn when that name holds letters of other alphabets; the tooltip is made only under the mouse (X-453 M3).
+    /// X-670 M2 (review of 0.1638): this summary stood above ChatLinkClicked, which has its own.
+    /// </summary>
     private void DrawChatLink(ChatRun run,ChatLink link,string id,ChatRecord record)
     {
         if(ChatOptions.TextOutline)ChatOutline(run.Text);

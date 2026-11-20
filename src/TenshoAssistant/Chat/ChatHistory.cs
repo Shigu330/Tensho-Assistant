@@ -175,12 +175,6 @@ public static class ChatHistory
         catch(JsonException){return null;}
     }
 
-    /// <summary>Reads a character's file back for the window: the messages within the bounds, numbered from 1, in their order: none older
-    /// than <paramref name="days"/> days, and the last <paramref name="messages"/> of the combat lines and the last of the others (as the
-    /// window keeps them: a raid's lines never push a conversation out). X-513: read from the file's end only (at most
-    /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
-    /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
-    /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.</summary>
     /// <summary>X-518 M4: this many messages older than the days in a row end the reading from the end (the rest is older still).</summary>
     public const int OldRunEnd=256;
     /// <summary>X-644 M1 (review of 0.1586): the time and the kind of a line as <see cref="Encode"/> writes it (« {"time":…,"kind":…, »),
@@ -202,6 +196,14 @@ public static class ChatHistory
         try{return (DateTimeOffset.FromUnixTimeMilliseconds(milliseconds),kind);}
         catch(ArgumentOutOfRangeException){return null;}
     }
+
+    /// <summary>Reads a character's file back for the window: the messages within the bounds, numbered from 1, in their order: none older
+    /// than <paramref name="days"/> days, and the last <paramref name="messages"/> of the combat lines and the last of the others (as the
+    /// window keeps them: a raid's lines never push a conversation out). X-513: read from the file's end only (at most
+    /// <see cref="MaximumReadBytes"/>, and no further back than both kinds need), so a big history is read back at once; with
+    /// <see cref="NoLimit"/>, the last <see cref="MaximumMessages"/> of each kind. <c>Trim</c> says the file holds more than its bounds (or
+    /// lines that cannot be read, or a damaged first line): <see cref="Trim"/> then goes through it whole. No file: nothing, ours.
+    /// X-670 M2 (review of 0.1638): this summary stood above OldRunEnd, which has its own.</summary>
     public static Loaded Read(string path,ulong character,DateTimeOffset now,int messages,int days)=>Read(path,character,now,messages,days,MaximumReadBytes);
 
     /// <summary><see cref="Read(string,ulong,DateTimeOffset,int,int)"/> with the most of the end read (a test makes it small).</summary>

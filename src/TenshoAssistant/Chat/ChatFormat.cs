@@ -94,6 +94,14 @@ public static class ChatFormat
         return "#"+((hash[0]<<12)|(hash[1]<<4)|(hash[2]>>4)).ToString("X5",System.Globalization.CultureInfo.InvariantCulture);
     }
 
+    /// <summary>X-670 M3 (review of 0.1638): a message's sender as the window writes it: cleaned, and in capture mode a player's stand-in (a
+    /// character of the story keeps its name). The lines and the search both take it, so the search finds what is shown.</summary>
+    public static string ShownSender(ChatRecord record,bool capture)
+    {
+        var sender=Clean(record.Sender).Trim();
+        return capture && sender.Length>0 && record.Channel is not ChatChannel.Npc ? StandIn(sender):sender;
+    }
+
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
 
@@ -130,9 +138,8 @@ public static class ChatFormat
             foreach(var segment in record.Body)
                 if(segment.Link is { } link && ChatLook.Marked(segment.Text))(arrowed??=[]).Add(link);
         bool Underlined(ChatLink target)=>settings.GameLinks && arrowed?.Contains(target)!=true;
-        var sender=Clean(record.Sender).Trim();
-        // X-447 B15 (0.1623): capture mode, a player's stand-in (a character of the story keeps its name).
-        if(settings.CaptureNames && sender.Length>0 && record.Channel is not ChatChannel.Npc)sender=StandIn(sender);
+        // X-447 B15 (0.1623): capture mode, a player's stand-in (a character of the story keeps its name). X-670 M3: ShownSender, the search's too.
+        var sender=ShownSender(record,settings.CaptureNames);
         // A custom emote (kind 28) has its author apart from its text; a standard emote (29) already names them.
         if(record.Kind==28 && sender.Length>0)runs.Add(new($"{sender} ",ChatRole.Sender));
         else if(sender.Length>0 && (spoken || record.Channel is ChatChannel.Npc))

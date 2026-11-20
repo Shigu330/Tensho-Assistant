@@ -9,6 +9,14 @@ internal static class ChatSearch1638Tests
     private static ChatRecord Said(long id,string sender,params string[] pieces)=>new(id,At,10,ChatChannel.Say,sender,[..pieces.Select(piece=>new ChatSegment(piece))]);
     private static ChatTabSettings Say()=>new(){Name="Say",Channels=[ChatChannel.Say]};
     private static void Put(ChatStore store,string sender,string text)=>store.Add(At,10,sender,[new ChatSegment(text)],100);
+    // 0.1640 (X-670 M1): the search's view is filled on a task (ChatStore.Searched): asked until it is ready.
+    private static ChatTabView Ready(ChatStore store,ChatTabSettings tab,string query)
+    {
+        ChatTabView? view=null;
+        Check(SpinWait.SpinUntil(()=>{var (found,ready)=store.Searched(tab,query,(fresh,stale)=>fresh.Refresh(store,tab,100,null,null,record=>ChatSearch.Matches(record,query)));view=found;return ready;},
+            TimeSpan.FromSeconds(30)),"filled: "+query);
+        return view!;
+    }
 
     public static IEnumerable<(string Name,Action Run)> Cases =>
     [
@@ -26,14 +34,13 @@ internal static class ChatSearch1638Tests
             Put(store,"Ann Doe","hello there");
             Put(store,"Bob Roe","good night");
             Put(store,"Cid Moe","Hello again");
-            var view=store.SearchView(tab,"hello");
-            view.Refresh(store,tab,100,null,null,record=>ChatSearch.Matches(record,"hello"));
+            var view=Ready(store,tab,"hello");
             Check(view.Count==2 && view.RecordAt(0).Sender=="Ann Doe" && view.RecordAt(1).Sender=="Cid Moe","two of three");
             Put(store,"Dee Lin","hello!");
-            var same=store.SearchView(tab,"hello");
+            var same=Ready(store,tab,"hello");
             same.Refresh(store,tab,100,null,null,record=>ChatSearch.Matches(record,"hello"));
             Check(ReferenceEquals(same,view) && same.Count==3,"the same view, the new message in");
-            Check(!ReferenceEquals(store.SearchView(tab,"night"),view),"another text: another view");
+            Check(!ReferenceEquals(Ready(store,tab,"night"),view),"another text: another view");
             var all=store.ViewOf(tab);
             all.Refresh(store,tab,100);
             Check(all.Count==4,"the tab itself keeps all its messages: "+all.Count);
@@ -43,20 +50,19 @@ internal static class ChatSearch1638Tests
             var store=new ChatStore();
             var tab=Say();
             Put(store,"Ann Doe","hello");
-            var view=store.SearchView(tab,"hello");
-            view.Refresh(store,tab,100,null,null,record=>ChatSearch.Matches(record,"hello"));
+            var view=Ready(store,tab,"hello");
             store.Clear();
-            var after=store.SearchView(tab,"hello");
+            var after=Ready(store,tab,"hello");
             Check(!ReferenceEquals(after,view) && after.Count==0,"cleared: a new, empty view");
             store.Restart(tab);
-            Check(!ReferenceEquals(store.SearchView(tab,"hello"),after),"restarted: a new view");
+            Check(!ReferenceEquals(Ready(store,tab,"hello"),after),"restarted: a new view");
         }),
         ("Chat search 1638: wiring: the magnifier at the end of the tab bar, the search line over the lines, the texts in both languages",()=>
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
             Check(chat.Contains("GlyphTabButton(\"###ChatSearch\",Dalamud.Interface.FontAwesomeIcon.Search,",StringComparison.Ordinal),"the button");
             Check(chat.Contains("if(chatSearchOpen)view=DrawChatSearchLine(tabs[shown],view,options);",StringComparison.Ordinal),"the line before the lines");
-            Check(chat.Contains("var found=ChatMessages.SearchView(tab,query);",StringComparison.Ordinal),"the store's view");
+            Check(chat.Contains("var (found,ready)=ChatMessages.Searched(tab,",StringComparison.Ordinal),"the store's view (0.1640: filled off the game's thread)");
             foreach(var language in new[]{"en","fr"})
             {
                 var text=File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{language}.json"));

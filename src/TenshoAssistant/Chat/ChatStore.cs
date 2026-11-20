@@ -85,24 +85,49 @@ public sealed class ChatStore
     }
 
     /// <summary>A tab whose channels changed, or that was removed: its view is built again from the lines kept, as read.</summary>
-    public void Restart(ChatTabSettings tab){lock(gate){views.Remove(tab);searchView=null;}}
+    public void Restart(ChatTabSettings tab){lock(gate){views.Remove(tab);DropSearch();}}
 
     // X-447 B8 (0.1638): the search's view of the tab shown (one at a time), kept here so a clear drops it with the other copies.
+    // X-670 M1 (review of 0.1638, R07): filled off the game's thread. Each letter typed made a new view and went through every line kept on the
+    // game's thread, with a comparison by culture: 11 to 17 ms a letter at 10 000 lines, 42 to 62 ms the first time.
     private ChatTabView? searchView;
+    private bool searchReady,searchStarted;
     private ChatTabSettings? searchTab;
-    private string searchText="";
+    private string searchKey="";
+    private long searchGeneration;
 
-    /// <summary>X-447 B8: the view of <paramref name="tab"/>'s messages holding <paramref name="query"/> (ChatSearch.Matches; filled by its
-    /// Refresh): the same view while the tab and the text stay, a new one otherwise; dropped by a clear or a tab restarted.</summary>
-    public ChatTabView SearchView(ChatTabSettings tab,string query)
+    /// <summary>X-447 B8, X-670 M1: the view of <paramref name="tab"/>'s messages a search keeps (<paramref name="key"/>: what the view depends
+    /// on, the text typed and how the sender is shown). At a new key or tab, a new view is filled by <paramref name="fill"/> on a task, off the
+    /// game's thread; its second argument tells it a newer key, a clear or the search closed made it useless (it then stops, and that view is
+    /// never shown). Returns the view to show and whether it is this key's (Ready): while the new one is filled, the last key's view of the same
+    /// tab as it was (not to be refreshed), or null (another tab, or none yet); once filled, that view, which the caller refreshes with the new
+    /// lines only. A clear, the tab restarted, the history read back or <see cref="EndSearch"/> drops it.</summary>
+    public (ChatTabView? View,bool Ready) Searched(ChatTabSettings tab,string key,Action<ChatTabView,Func<bool>> fill)
     {
         lock(gate)
         {
-            if(searchView is null || !ReferenceEquals(searchTab,tab) || !string.Equals(searchText,query,StringComparison.Ordinal))
-                (searchView,searchTab,searchText)=(new ChatTabView(),tab,query);
-            return searchView;
+            if(!searchStarted || !ReferenceEquals(searchTab,tab) || !string.Equals(searchKey,key,StringComparison.Ordinal))
+            {
+                if(!ReferenceEquals(searchTab,tab))searchView=null;
+                var generation=Interlocked.Increment(ref searchGeneration);
+                (searchTab,searchKey,searchReady,searchStarted)=(tab,key,false,true);
+                var view=new ChatTabView();
+                bool Stale()=>Interlocked.Read(ref searchGeneration)!=generation;
+                _=Task.Run(()=>
+                {
+                    try{fill(view,Stale);}
+                    catch(OperationCanceledException){return;}
+                    lock(gate)if(!Stale())(searchView,searchReady)=(view,true);
+                });
+            }
+            return (searchView,searchReady);
         }
     }
+
+    /// <summary>X-670 M1: the search closed: its view dropped (no copy of the messages left), a view being filled told to stop.</summary>
+    public void EndSearch(){lock(gate)DropSearch();}
+
+    private void DropSearch(){Interlocked.Increment(ref searchGeneration);searchStarted=false;searchReady=false;searchView=null;searchTab=null;searchKey="";}
 
     /// <summary>X-475: messages kept on disk from before (oldest first), put before this session's lines: only those older than the oldest
     /// line kept (a line of this session is never twice), the bounds kept as for new lines. Every line is numbered again after the last
@@ -134,7 +159,7 @@ public sealed class ChatStore
             var limit=Bounded(cap);
             while(combat>limit)RemoveOldest(ChatChannel.Combat,true);
             while(records.Count-combat>limit)RemoveOldest(ChatChannel.Combat,false);
-            views.Clear();searchView=null;
+            views.Clear();DropSearch();
             return back.Count;
         }
     }
@@ -154,7 +179,7 @@ public sealed class ChatStore
 
     public void Clear()
     {
-        lock(gate){records.Clear();views.Clear();searchView=null;clears++;combat=0;}
+        lock(gate){records.Clear();views.Clear();DropSearch();clears++;combat=0;}
     }
 
     public IReadOnlyList<KeyValuePair<int,int>> KindCounts(){lock(gate)return kinds.OrderBy(row=>row.Key).ToArray();}
