@@ -841,6 +841,8 @@ public sealed partial class Plugin : IDalamudPlugin
             // X-654 (0.1602): the senders of the chat window's messages (in memory) and the game's entries of a player's menu.
             var chatSenders=new Chat.ChatSources();
             mainWindow.ChatSenders=chatSenders;
+            // X-679 (0.1658): the senders follow their lines when the chat history put back numbers them again.
+            registrations.Register(()=>mainWindow.ChatMessages.Renumbered+=chatSenders.Renumber,()=>mainWindow.ChatMessages.Renumbered-=chatSenders.Renumber);
             RegisterChat(configuration,client,addonLifecycle,framework,player,pluginInterface.GetPluginConfigDirectory(),chatSenders);
             Chat.ChatPlayerActions? chatPlayers=null;
             registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders),

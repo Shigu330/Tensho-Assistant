@@ -73,6 +73,28 @@ public sealed class ChatSources
         }
     }
 
+    /// <summary>
+    /// X-679 (0.1658, the user's report of 20/11 around 21:50: no game entry at all in a player's menu): the chat history put back after a
+    /// reload numbers every line again, this session's too (ChatStore.Restore, 10 to 30 s after the load: dalamud.log of 20/11, 21:32:03 then
+    /// 21:32:31, 23:24:20 then 23:24:31); the senders kept by the old numbers were lost, and the menu of every message received in between
+    /// showed none of the game's entries. They follow their lines now, the message waiting for its identifiers too.
+    /// </summary>
+    public void Renumber(IReadOnlyDictionary<long,long> ids)
+    {
+        lock(gate)
+        {
+            if(ids.Count==0)return;
+            var moved=new Dictionary<long,ChatSource>();
+            foreach(var (before,after) in ids)
+                if(sources.Remove(before,out var source))moved[after]=source;
+            foreach(var (id,source) in moved)sources[id]=source;
+            var kept=order.Select(id=>ids.GetValueOrDefault(id,id)).Where(sources.ContainsKey).Distinct().ToList();
+            order.Clear();
+            foreach(var id in kept)order.Enqueue(id);
+            if(expected>=0)expected=ids.GetValueOrDefault(expected,expected);
+        }
+    }
+
     /// <summary>A message that is not followed by its identifiers (a system line, a message hidden by another plugin) ends the wait: the next identifiers are not its.</summary>
     public void Skip(){lock(gate)expected=-1;}
 

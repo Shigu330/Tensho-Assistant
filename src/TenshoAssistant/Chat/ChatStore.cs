@@ -36,6 +36,9 @@ public sealed class ChatStore
     /// <summary>X-447 B10 (0.1654): how many times messages were put back from the history (<see cref="Restore"/>: every line numbered again).</summary>
     public long Restores{get{lock(gate)return restores;}}
     private long restores;
+    /// <summary>X-679 (0.1658): after <see cref="Restore"/>, this session's lines by their number before and after (called outside the store's lock):
+    /// what keeps a line's number elsewhere follows it (ChatSources: the senders for a player's menu).</summary>
+    public event Action<IReadOnlyDictionary<long,long>>? Renumbered;
     private string? ownName;
     /// <summary>X-447 B7 (0.1646): your character's name, as the reader last saw it (the tabs alert on your first name with the setting on); null
     /// before any message. Your own name: not another player's data.</summary>
@@ -180,6 +183,14 @@ public sealed class ChatStore
     /// back too, except the ones this session holds already (same time, kind, sender and text, counted: two equal lines stay two).</summary>
     public int Restore(IReadOnlyList<ChatRecord> older,int cap)
     {
+        var put=Put(older,cap,out var ids);
+        if(ids.Count>0)Renumbered?.Invoke(ids);
+        return put;
+    }
+
+    private int Put(IReadOnlyList<ChatRecord> older,int cap,out Dictionary<long,long> ids)
+    {
+        ids=[];
         lock(gate)
         {
             var first=records.Count>0 ? records[0].Time:DateTimeOffset.MaxValue;
@@ -202,7 +213,7 @@ public sealed class ChatStore
                 var record=all[at];
                 var numbered=record with{Id=nextId++,Channel=ChatChannels.From(record.Kind)};
                 records.Add(numbered);
-                if(at>=back.Count)moved[record.Id]=numbered;
+                if(at>=back.Count){moved[record.Id]=numbered;ids[record.Id]=numbered.Id;}
                 if(numbered.Channel==ChatChannel.Combat)combat++;
             }
             // X-673 M1: a pinned message takes its new number (a click goes to it, its menu knows it pinned and unpins it, never pins it twice);

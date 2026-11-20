@@ -48,9 +48,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
         // X-662 M2 (0.1606, review of 0.1605): while Tensho is cut (PvP, ranked contents, R03.2) nothing is read; else the game's log line
         // only for the message that waits for its identifiers (ResolveRead calls Line at most once, after the cheap checks).
         if(TenshoAssistant.Competitive.CompetitiveGate.Cut){sources.Skip();return;}
+        // X-679 (0.1658): the first call after the load is said once, with its delay (a measure in the log); a failure is said once, no longer
+        // swallowed without a word.
+        if(!firstSaid){firstSaid=true;log.Information("Chat window, the game's sender identifiers: first call {0:0.0} s after the load.",loaded.Elapsed.TotalSeconds);}
         try{Said(sources.ResolveRead(contentId,accountId,worldId,chatType,()=>Line(module,messageIndex),module->LocalPlayerContentId),chatType);}
-        catch(Exception){}
+        catch(Exception error)
+        {
+            if(!errorSaid){errorSaid=true;log.Warning(error,"Chat window, a sender's identifiers could not be read (said once).");}
+        }
     }
+
+    private readonly System.Diagnostics.Stopwatch loaded=System.Diagnostics.Stopwatch.StartNew();
+    private bool firstSaid,errorSaid;
 
     /// <summary>
     /// X-660 (0.1603): the game's own log line at the index the game gives with the identifiers (RaptureLogModule.GetLogMessageDetail of
@@ -64,11 +73,11 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     }
 
     // X-660 (0.1603): each outcome said once per session (outcome and kind only, never a name nor an identifier), so a game test shows
-    // whether the identifiers reach the messages or why not.
+    // whether the identifiers reach the messages or why not. X-679 (0.1658): « NotWaiting » too (no message waited for them).
     private readonly bool[] matchSaid=new bool[Enum.GetValues<ChatSourceMatch>().Length];
     private void Said(ChatSourceMatch match,ushort chatType)
     {
-        if(match==ChatSourceMatch.NotWaiting || matchSaid[(int)match])return;
+        if(matchSaid[(int)match])return;
         matchSaid[(int)match]=true;
         log.Information("Chat window, a sender's identifiers: {0} (kind {1}).",match,chatType&ChatSources.KindMask);
     }
