@@ -26,6 +26,11 @@ public sealed class GitHubExchangeMeta
     public DateTimeOffset? RefreshExpires { get; set; }
     /// <summary>X-181 (0.1171, night review N30): the login that owns the gist and the issue (empty: not known, before 0.1171).</summary>
     public string GistLogin { get; set; }="";
+    /// <summary>
+    /// X-640 (D-190 a confirmed on 20/11): the exchanges in a row where GitHub refused durably the raw address of a cut file of your gist while
+    /// rows of yours set aside wait for their copy (GistAside.RefusalLimit); back to 0 once they are settled.
+    /// </summary>
+    public int AsideRefused { get; set; }
 }
 
 /// <summary>X-175 (1138): an exchange stopped with a message of its own (App not installed, sign-in expired), the token forgotten when <paramref name="Forget"/>.</summary>
@@ -340,12 +345,14 @@ public sealed class GitHubExchange : IDisposable
         try{taken=await TakeCommonV3(store).ConfigureAwait(false) ?? ("CommonUnreadable",0,0);}
         catch(Exception error) when(CommonUnreadable(error)){taken=(CommonUnreachable(error) ? "CommonUnreachable":"CommonUnreadable",0,0);}
         var (common,added,joined)=taken;
-        var sent="";
+        var sent="";(bool Go,string Said) aside=(true,"");
         // X-587 (external audit A16 of 18/11): your own base not read whole at start (DiscoveryStore.MineIncomplete): the gist would be
         // replaced by this session's facts only, and its kinds missing here removed; nothing is sent, the common data above are still taken.
         if(upload && Connected && store.MineIncomplete)sent="ShareBlocked";
         // X-621 (review of 0.1560, I1): rows of yours set aside as damaged: their copy on your gist read back first, else nothing sent this time.
-        else if(upload && Connected && store.Aside is not null && !await KeepAside(store).ConfigureAwait(false))sent="ShareAsideWaiting";
+        // X-640 (D-190 a confirmed on 20/11): « not reached » (ShareAsideWaiting) or refused durably (ShareAsideRefused), said with its cause; refused
+        // GistAside.RefusalLimit exchanges in a row, the send goes on without that copy (ShareAsideGivenUp, said once it is sent).
+        else if(upload && Connected && store.Aside is not null && !(aside=await KeepAside(store).ConfigureAwait(false)).Go)sent=aside.Said;
         else if(upload && Connected)
         {
             var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
@@ -367,6 +374,7 @@ public sealed class GitHubExchange : IDisposable
                 lock(gate)meta.UploadHash=hash;sent="Sent";
             }
         }
+        if(aside.Go && aside.Said.Length>0 && sent=="Sent")sent=aside.Said;
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
         return new("ExchangeDone",added.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),joined.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),common,sent);
@@ -424,11 +432,16 @@ public sealed class GitHubExchange : IDisposable
     /// <remarks>X-623 (review of 0.1562, I1): the gist is read with the token renewed first, as the send does (Fresh): a GitHub App token past
     /// its 8 h answered 401, taken for « GitHub not reached », and the send stayed blocked at every exchange. A 401 with a refresh token in hand
     /// renews once and reads again; a 401 without one ends as the send does (ExchangeUnauthorized), never « not reached ». X-624 M1: only the
-    /// listing's 404 means « gist gone »; a cut file not read from its raw address (any status) is « not reached », tried again later.</remarks>
-    private async Task<bool> KeepAside(DiscoveryStore store)
+    /// listing's 404 means « gist gone »; a cut file not read from its raw address (5xx, 408, 429, network) is « not reached », tried again later.
+    /// X-640 (D-190 a confirmed on 20/11): a cut file refused durably there (GistAside.Durable) is counted (meta.AsideRefused) and said
+    /// (« ShareAsideRefused »); at the GistAside.RefusalLimit-th exchange in a row, a file refused again is skipped (its facts not kept, their
+    /// damaged text still in facts_aside), the rows settled, the send goes on and says it (« ShareAsideGivenUp »). Go is false when nothing may
+    /// be sent this time, Said the message's key.</remarks>
+    private async Task<(bool Go,string Said)> KeepAside(DiscoveryStore store)
     {
-        if(store.Aside is not { } aside)return true;
-        string gist;lock(gate)gist=meta.GistId;
+        if(store.Aside is not { } aside)return (true,"");
+        string gist;int refused;lock(gate){gist=meta.GistId;refused=meta.AsideRefused;}
+        var last=refused+1>=GistAside.RefusalLimit;var skipped=false;
         IReadOnlyCollection<DiscoveryFact> kept;
         try
         {
@@ -437,14 +450,16 @@ public sealed class GitHubExchange : IDisposable
             {
                 WriteSecrets();
                 await Fresh().ConfigureAwait(false);
-                kept=await GistAside.Read(()=>AsideListing(gist),AsideRaw,aside.Keys).ConfigureAwait(false);
+                kept=await GistAside.Read(()=>AsideListing(gist),last ? GistAside.SkipRefused(AsideRaw,()=>skipped=true):AsideRaw,aside.Keys).ConfigureAwait(false);
             }
         }
         catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){kept=[];}
-        catch(Exception error) when(CommonUnreachable(error) && error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return false;}
+        catch(GistAside.RawRefusedException){lock(gate)meta.AsideRefused=refused+1;return (false,"ShareAsideRefused");}
+        catch(Exception error) when(CommonUnreachable(error) && error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return (false,"ShareAsideWaiting");}
         catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or DecoderFallbackException){kept=[];}
         store.RestoreAside(kept);
-        return true;
+        lock(gate)meta.AsideRefused=0;
+        return (true,skipped ? "ShareAsideGivenUp":"");
     }
     /// <summary>X-623: your gist's listing; a 401 with a refresh token in hand (a PC clock late, a token ended early) renews once and asks again.</summary>
     private async Task<JsonNode?> AsideListing(string gist)
@@ -456,12 +471,17 @@ public sealed class GitHubExchange : IDisposable
     }
     /// <summary>
     /// X-624 M1 (review of 0.1562): a cut file read from its raw address (no token sent). A refusal there (404, 401, 5xx), while the listing
-    /// answered, says nothing of the gist: « not reached » (IOException), never « gist gone » nor a refused sign-in.
+    /// answered, says nothing of the gist: never « gist gone » nor a refused sign-in. X-640 (D-190 a confirmed on 20/11): a durable one (4xx but
+    /// 408 and 429) is GistAside.RawRefusedException, counted by KeepAside; the others stay « not reached » (IOException).
     /// </summary>
     private async Task<string> AsideRaw(Uri address)
     {
         try{return await Community.BoundedHttp.ReadAsync(client,address,GistAside.MaxRawBytes,stop.Token).ConfigureAwait(false);}
-        catch(HttpRequestException error) when(error.StatusCode is { } status){throw new IOException($"A cut gist file not read ({(int)status}).",error);}
+        catch(HttpRequestException error) when(error.StatusCode is { } status)
+        {
+            if(GistAside.Durable(status))throw new GistAside.RawRefusedException(status,error);
+            throw new IOException($"A cut gist file not read ({(int)status}).",error);
+        }
     }
 
     private async Task Upload(IReadOnlyDictionary<string,string> contents)

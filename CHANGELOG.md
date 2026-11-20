@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1597.0
+- Plan global, X-640 : Découvertes : quand des découvertes à vous mises de côté (abîmées) attendent leur copie sur votre gist et que GitHub refuse durablement l'adresse brute de cette copie (gist.githubusercontent.com : 404, 401, 403…), l'échange le dit (« GitHub a refusé… ») au lieu de « GitHub injoignable », compte les refus d'un échange à l'autre (github.json, gardé au redémarrage) et, au 3e échange de suite, envoie sans cette copie et le dit ; le texte abîmé reste gardé dans la base. « Injoignable » (5xx, 408, 429, réseau) attend toujours sans limite. Avant, tout refus bloquait l'envoi sans fin ni cause dite (X-640, banc X-631, relecture 0.1564 M1 ; décision D-190 a de l'utilisateur).
+- Pour les joueurs : échange des découvertes : quand GitHub refuse sans cesse la copie de découvertes abîmées sur votre gist, Tensho le dit et, après 3 échanges, envoie le reste sans elles au lieu d'attendre sans fin.
+- Tests : GistRefused1597Tests. Verify.ps1 (agent) : 3274/3274, 0 avertissement, 0 erreur ; DLL 0.1597.0.0. Rien à essayer en jeu.
+### English
+- Discoveries: when discoveries of yours set aside (damaged) wait for their copy on your gist and GitHub durably refuses that copy's raw address (gist.githubusercontent.com: 404, 401, 403…), the exchange says so (« GitHub refused… ») instead of « GitHub not reached », counts the refusals from one exchange to the next (github.json, kept across restarts) and, at the 3rd exchange in a row, sends without that copy and says it; the damaged text stays kept in the base. « Not reached » (5xx, 408, 429, network) still waits without limit. Before, any refusal blocked the upload with no end and no cause given (X-640, bench X-631, review 0.1564 M1; user decision D-190 a).
+- For players: Discoveries exchange: when GitHub keeps refusing the saved copy of damaged discoveries on your gist, Tensho now tells you why and, after 3 exchanges, sends the rest without them instead of waiting forever.
+
 ## 0.1596.0
 - Plan global, X-652 : Découvertes : une ligne illisible (JSON abîmé) de votre base est mise de côté au démarrage (gardée à part, jamais effacée) et l'envoi à votre gist reprend dans la même session, la copie de ce fait sur votre gist relue d'abord ; avant, l'envoi restait bloqué jusqu'au démarrage suivant. Une mise de côté qui échoue garde le blocage. Le journal dit la reprise (X-652, décision D-188 b de l'utilisateur, avec D-190 a).
 - Tests : DamagedRow1596Tests. Verify.ps1 (agent) : 3269/3269, 0 avertissement, 0 erreur ; DLL 0.1596.0.0. Rien à essayer en jeu.

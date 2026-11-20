@@ -153,11 +153,11 @@ internal static class AsideToken1563Tests
             using var exchange=Connected(root,github,null,null);
             var store=AsideGist1561Tests.Start(database);
             var said=Run(exchange,store);
-            Check(said is { Key:"ExchangeDone" } && said.Args[3]=="ShareAsideWaiting" && github.Patches.Count==0,"a raw 404: nothing sent: "+Said(said));
+            Check(said is { Key:"ExchangeDone" } && said.Args[3]=="ShareAsideRefused" && github.Patches.Count==0,"a raw 404: nothing sent, the refusal said (X-640): "+Said(said));
             Check(database.AsidePending().SequenceEqual([b]) && store.Aside is not null,"B still pending, never settled with nothing kept");
             github.Raw=HttpStatusCode.Unauthorized;
             said=Run(exchange,store);
-            Check(said.Args.Length>3 && said.Args[3]=="ShareAsideWaiting" && exchange.Connected && github.Patches.Count==0,"a raw 401: not a refused sign-in: "+Said(said));
+            Check(said.Args.Length>3 && said.Args[3]=="ShareAsideRefused" && exchange.Connected && github.Patches.Count==0,"a raw 401: not a refused sign-in, the refusal said (X-640): "+Said(said));
             github.Raw=HttpStatusCode.OK;
             said=Run(exchange,store);
             Check(said.Args[3]=="Sent" && Sent(github)[b].Seen==bSeen && database.AsidePending().Count==0,"the raw file read: B sent and settled");
@@ -213,10 +213,10 @@ internal static class AsideToken1563Tests
         ("Aside token 1563: I1 wiring: the token renewed before the gist is read; the listing's 401 renewed once; the raw read never sends the token",() =>
         {
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs")).Replace("\r\n","\n");
-            var keep=exchange.IndexOf("private async Task<bool> KeepAside(",StringComparison.Ordinal);
+            var keep=exchange.IndexOf("private async Task<(bool Go,string Said)> KeepAside(",StringComparison.Ordinal);
             var fresh=exchange.IndexOf("await Fresh().ConfigureAwait(false);",keep,StringComparison.Ordinal);
             Check(keep>0 && fresh>keep && fresh<exchange.IndexOf("GistAside.Read(",keep,StringComparison.Ordinal),"Fresh before the read");
-            Check(exchange.Contains("error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return false;}",StringComparison.Ordinal),"a 401 is never « not reached »");
+            Check(exchange.Contains("error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return (false,\"ShareAsideWaiting\");}",StringComparison.Ordinal),"a 401 is never « not reached »");
             var raw=exchange[exchange.IndexOf("private async Task<string> AsideRaw(",StringComparison.Ordinal)..];
             raw=raw[..raw.IndexOf("\n    }\n",StringComparison.Ordinal)];
             Check(raw.Contains("BoundedHttp.ReadAsync(client,",StringComparison.Ordinal) && !raw.Contains("Api(",StringComparison.Ordinal),"the raw read goes without the token");

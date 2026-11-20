@@ -800,6 +800,8 @@
     "ShareEmpty": "Rien de vu par vous à partager pour l'instant.",
     "ShareBlocked": "Rien envoyé : votre fichier de découvertes n'a pas été lu en entier pendant cette session, et un envoi remplacerait ce que vous avez partagé avant par les seules découvertes de cette session.",
     "ShareAsideWaiting": "Rien envoyé cette fois : des découvertes à vous ont été mises de côté, abîmées, et leur copie sur votre gist n'a pas pu être relue (GitHub injoignable). Un envoi maintenant les retirerait de votre gist ; nouvel essai au prochain échange.",
+    "ShareAsideRefused": "Rien envoyé cette fois : des découvertes à vous ont été mises de côté, abîmées, et GitHub a refusé de rendre leur copie sur votre gist (gist.githubusercontent.com). Nouvel essai aux prochains échanges ; après 3 refus de suite, l'envoi se fait sans cette copie.",
+    "ShareAsideGivenUp": "Envoyé sans la copie, sur votre gist, de découvertes à vous mises de côté, abîmées : GitHub l'a refusée à 3 échanges de suite. Ces découvertes quittent votre gist ; leur texte abîmé reste gardé dans votre base.",
     "SummaryBlueSpellCaster": "Monstres vus lançant un sort de mage bleu : {0} ({1} vus par vous, {2} importés seulement)",
     "SpellCaster": "{1} vu lançant {0}",
     "SummaryFishTransition": "Poissons et météo précédente : {0} ({1} vus par vous, {2} importés seulement)",

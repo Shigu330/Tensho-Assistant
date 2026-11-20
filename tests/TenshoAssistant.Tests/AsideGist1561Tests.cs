@@ -188,7 +188,7 @@ internal static class AsideGist1561Tests
             Check(setAside>0 && listed>setAside && listed<plugin.IndexOf("mainWindow.DiscoveriesLoaded=true;",listed,StringComparison.Ordinal),"listed after the set-aside, before the page is said loaded");
             Check(plugin.Contains("catch(Exception error){discoveries.MineIncomplete=true;log.Warning(error,\"Discoveries: the rows set aside could not be listed",StringComparison.Ordinal),"not listed: nothing sent");
             var exchange=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Discoveries/GitHubExchange.cs"));
-            Check(exchange.IndexOf("!await KeepAside(store).ConfigureAwait(false))sent=\"ShareAsideWaiting\"",StringComparison.Ordinal) is var at && at>0
+            Check(exchange.IndexOf("!(aside=await KeepAside(store).ConfigureAwait(false)).Go)sent=aside.Said;",StringComparison.Ordinal) is var at && at>0
                 && at<exchange.IndexOf("CommunityDiscoveries.Mine(store.Snapshot(",StringComparison.Ordinal),"read back before the snapshot is sent");
         }),
     ];

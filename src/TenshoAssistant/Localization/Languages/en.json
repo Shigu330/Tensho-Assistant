@@ -800,6 +800,8 @@
     "ShareEmpty": "Nothing seen by you yet to share.",
     "ShareBlocked": "Nothing sent: your discoveries file was not read whole this session, and sending would replace what you shared before with this session's finds only.",
     "ShareAsideWaiting": "Nothing sent this time: discoveries of yours were set aside as damaged, and their copy on your gist could not be read back (GitHub not reached). Sending now would remove them from your gist; tried again at the next exchange.",
+    "ShareAsideRefused": "Nothing sent this time: discoveries of yours were set aside as damaged, and GitHub refused to give back their copy on your gist (gist.githubusercontent.com). Tried again at the next exchanges; after 3 refusals in a row, the send goes on without that copy.",
+    "ShareAsideGivenUp": "Sent without the copy on your gist of discoveries of yours set aside as damaged: GitHub refused it at 3 exchanges in a row. Those discoveries leave your gist; their damaged text stays kept in your base.",
     "SummaryBlueSpellCaster": "Monsters seen casting a blue spell: {0} ({1} seen by you, {2} imported only)",
     "SpellCaster": "{1} seen casting {0}",
     "SummaryFishTransition": "Fish and the weather before: {0} ({1} seen by you, {2} imported only)",
