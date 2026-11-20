@@ -31,6 +31,16 @@ public sealed class GitHubExchangeMeta
     /// rows of yours set aside wait for their copy (GistAside.RefusalLimit); back to 0 once they are settled.
     /// </summary>
     public int AsideRefused { get; set; }
+    /// <summary>
+    /// X-656 M2 (review of 0.1598): the gist and the rows set aside the count above is about (GitHubExchange.AsideRows); other rows, or another
+    /// gist, start again from 0. Empty: none.
+    /// </summary>
+    public string AsideRefusedFor { get; set; }="";
+    /// <summary>
+    /// X-656 M1 (review of 0.1598): copies refused GistAside.RefusalLimit times were given up and their rows settled, but no send has replaced
+    /// the gist since: « ShareAsideGivenUp » is said at the first send that does (« Sent »), even sessions later, then this goes back to false.
+    /// </summary>
+    public bool AsideGivenUp { get; set; }
 }
 
 /// <summary>X-175 (1138): an exchange stopped with a message of its own (App not installed, sign-in expired), the token forgotten when <paramref name="Forget"/>.</summary>
@@ -374,7 +384,11 @@ public sealed class GitHubExchange : IDisposable
                 lock(gate)meta.UploadHash=hash;sent="Sent";
             }
         }
-        if(aside.Go && aside.Said.Length>0 && sent=="Sent")sent=aside.Said;
+        // X-656 M2 (review of 0.1598): an exchange « blocked » or « not reached » breaks the row of refusals (« 3 exchanges in a row »).
+        if(sent is "ShareBlocked" or "ShareAsideWaiting")ClearRefused();
+        // X-656 M1 (review of 0.1598): the give-up is said by the send that replaces the gist without those copies, whenever it comes (an
+        // upload that failed, « SentSame » or « ShareEmpty » leave them on the gist: still to say).
+        if(sent=="Sent")lock(gate)if(meta.AsideGivenUp){meta.AsideGivenUp=false;sent="ShareAsideGivenUp";}
         lock(gate)meta.Exchanged=DateTimeOffset.UtcNow;
         SaveMeta();
         return new("ExchangeDone",added.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),joined.ToString("N0",TenshoAssistant.Localization.TenshoCulture.Current),common,sent);
@@ -440,7 +454,9 @@ public sealed class GitHubExchange : IDisposable
     private async Task<(bool Go,string Said)> KeepAside(DiscoveryStore store)
     {
         if(store.Aside is not { } aside)return (true,"");
-        string gist;int refused;lock(gate){gist=meta.GistId;refused=meta.AsideRefused;}
+        string gist,about;int refused;
+        // X-656 M2: the count is about this gist and these rows only (rows set aside at a later start begin at 0).
+        lock(gate){gist=meta.GistId;about=AsideRows(gist,aside.Keys);refused=meta.AsideRefusedFor==about ? meta.AsideRefused:0;}
         var last=refused+1>=GistAside.RefusalLimit;var skipped=false;
         IReadOnlyCollection<DiscoveryFact> kept;
         try
@@ -454,13 +470,19 @@ public sealed class GitHubExchange : IDisposable
             }
         }
         catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){kept=[];}
-        catch(GistAside.RawRefusedException){lock(gate)meta.AsideRefused=refused+1;return (false,"ShareAsideRefused");}
+        catch(GistAside.RawRefusedException){lock(gate){meta.AsideRefused=refused+1;meta.AsideRefusedFor=about;}return (false,"ShareAsideRefused");}
         catch(Exception error) when(CommonUnreachable(error) && error is not HttpRequestException{StatusCode:HttpStatusCode.Unauthorized}){return (false,"ShareAsideWaiting");}
         catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or DecoderFallbackException){kept=[];}
         store.RestoreAside(kept);
-        lock(gate)meta.AsideRefused=0;
-        return (true,skipped ? "ShareAsideGivenUp":"");
+        lock(gate){meta.AsideRefused=0;meta.AsideRefusedFor="";if(skipped)meta.AsideGivenUp=true;}
+        // X-656 M1: kept at once, the rows being settled: an upload that fails next must not lose what is still to say.
+        if(skipped)SaveMeta();
+        return (true,"");
     }
+    private void ClearRefused(){lock(gate){meta.AsideRefused=0;meta.AsideRefusedFor="";}}
+    /// <summary>X-656 M2: the gist and the rows set aside, as one short text (the keys' hash), for <see cref="GitHubExchangeMeta.AsideRefusedFor"/>.</summary>
+    internal static string AsideRows(string gist,IReadOnlyCollection<string> keys)
+        =>gist+"|"+Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('|',keys.Order(StringComparer.Ordinal)))))[..16];
     /// <summary>X-623: your gist's listing; a 401 with a refresh token in hand (a PC clock late, a token ended early) renews once and asks again.</summary>
     private async Task<JsonNode?> AsideListing(string gist)
     {
