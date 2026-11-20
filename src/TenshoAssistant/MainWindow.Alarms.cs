@@ -35,6 +35,8 @@ internal sealed partial class MainWindow
     private string alarmStatus="";private string alarmManualLabel="";private int alarmManualHour=8,alarmManualMinute;
     // 0.325: the group whose « Delete all » waits for its second click (null: none).
     private string? alarmGroupDeleteArmed;private int alarmGroupDeleteSeenFrame;
+    // X-602 (0.1608): a tab of the Alarms page asked by a link (DetailTabs selects it once).
+    private string? alarmTabFocus;
 
     private int DefaultAlarmLead=>configuration.AlarmOptions?.LeadMinutes ?? 5;
 
@@ -255,23 +257,44 @@ internal sealed partial class MainWindow
         // X-133 (0.1159, user request of 11/11): the reminders' alarms are in the Reminders tool (its « Alarms » tab), not here nor in this count.
         var shown=alarms.Where(alarm=>!IsReminderAlarm(alarm)).ToList();
         Heading(localization.Get("Alarms.PageTitle"),localization.Format("Alarms.Title",shown.Count));
-        DrawGatheringClock();
-        DrawWorldClocks();
         ImGui.TextWrapped(localization.Get("Alarms.Help"));
         if(alarmStatus.Length>0)ImGui.TextColored(Accent,alarmStatus);
-        if(TenshoAssistant.UI.UiComponents.Header(localization.Get("Alarms.SettingsTitle")+"###AlarmSettingsPage"))DrawAlarmSettings();
+        if(alarmService?.GameStatus is { } gameState)
+            ImGui.TextColored(gameState is "Done" or "Sending" ? Success:Accent,localization.Format("Alarms.GameState"+gameState,alarmService.Pending,GameAlarmCommand.GameMaximum));
         var now=DateTimeOffset.UtcNow;var changed=false;var remove=new List<TenshoAlarm>();var added=new List<TenshoAlarm>();
         // 0.326: an armed « Delete all » not drawn on the previous frame (page left, header folded, group gone) is dropped.
         if(alarmGroupDeleteArmed is not null && ImGui.GetFrameCount()>alarmGroupDeleteSeenFrame+1)alarmGroupDeleteArmed=null;
-        if(shown.Count==0)ImGui.TextDisabled(localization.Get("Alarms.Empty"));
-        changed|=DrawAlarmGroups(shown,now,remove,added);
+        // X-602 (0.1608, user request of 18/11, D-186): one tab per block, in the Storage style, instead of folding blocks one after another;
+        // the alarms' tabs carry their count. Every alarm is in one of the two lists (by job, or the others): none is left out.
+        var byJob=new List<TenshoAlarm>();var other=new List<TenshoAlarm>();
+        foreach(var alarm in shown)(AlarmJob(alarm)!=0 ? byJob:other).Add(alarm);
+        var gameCount=alarmService?.GameAlarms?.Count;
+        DetailTabs("AlarmsTabs",
+        [
+            ("Clocks",localization.Get("Alarms.TabClocks"),()=>{DrawGatheringClock();DrawWorldClocks();}),
+            ("Jobs",$"{localization.Get("Alarms.TabJobs")} ({byJob.Count})",()=>changed|=DrawAlarmList(byJob,now,remove,added,true)),
+            ("Other",$"{localization.Get("Alarms.TabOther")} ({other.Count})",()=>changed|=DrawAlarmList(other,now,remove,added,false)),
+            ("Personal",localization.Get("Alarms.ManualTitle"),DrawManualAlarm),
+            ("Game",localization.Get("Alarms.TabGame")+(gameCount is { } count ? $" ({count})":""),DrawGameAlarms),
+            ("Settings",localization.Get("Alarms.TabSettings"),DrawAlarmSettings),
+        ],ref alarmTabFocus);
         if(remove.Any(alarm=>alarm.GameName.Length>0))alarmStatus=localization.Get("Alarms.DeleteInGame");
         foreach(var alarm in remove){alarms.Remove(alarm);changed=true;}
-        if(alarmService?.GameStatus is { } gameState)
-            ImGui.TextColored(gameState is "Done" or "Sending" ? Success:Accent,localization.Format("Alarms.GameState"+gameState,alarmService.Pending,GameAlarmCommand.GameMaximum));
-        // Manual daily alarm at an ET time.
-        ImGui.Separator();
-        ImGui.TextColored(Accent,localization.Get("Alarms.ManualTitle"));
+        if(added.Count>0)AddAlarms(added);
+        if(changed)
+            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=SaveFailedText(error,"Alarms.SaveFailed");}
+    }
+
+    /// <summary>X-602 (0.1608): a tab's list of alarms, or the empty line; the « Other alarms » tab draws no second header of its own name.</summary>
+    private bool DrawAlarmList(List<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added,bool otherHeader)
+    {
+        if(alarms.Count==0){ImGui.TextDisabled(localization.Get("Alarms.Empty"));return false;}
+        return DrawAlarmGroups(alarms,now,remove,added,otherHeader);
+    }
+
+    /// <summary>The « Personal alarm » tab: a daily alarm at an ET time, or once at a local date.</summary>
+    private void DrawManualAlarm()
+    {
         // X-180 (0.1168): greyed in the desktop application (nothing is saved there).
         DesktopEditBegin();
         try
@@ -291,10 +314,6 @@ internal sealed partial class MainWindow
             DrawManualDateAlarm();
         }
         finally{DesktopEditEnd();}
-        if(added.Count>0)AddAlarms(added);
-        if(changed)
-            try{save();}catch(Exception error){log.Warning(error,"Alarms could not be saved.");alarmStatus=SaveFailedText(error,"Alarms.SaveFailed");}
-        DrawGameAlarms();
     }
 
     /// <summary>X-133 (0.1159): an alarm of the Reminders tool (a reminder's bell, or an automatic alarm of ventures, voyages or the squadron).</summary>
@@ -316,7 +335,7 @@ internal sealed partial class MainWindow
     private string AlarmNextText(DateTimeOffset at,DateTimeOffset now)
         =>localization.Format("Alarms.Next",at.ToLocalTime().ToString(TenshoAssistant.UI.TimeLeft.SameDay(at,now,TimeZoneInfo.Local) ? "t":"g"),TimeLeftText(at-now));
 
-    private bool DrawAlarmGroups(IEnumerable<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added)
+    private bool DrawAlarmGroups(IEnumerable<TenshoAlarm> alarms,DateTimeOffset now,List<TenshoAlarm> remove,List<TenshoAlarm> added,bool otherHeader=true)
     {
         var changed=false;
         // Sections by gathering job (0.203: miner, botanist, fisher, then the other alarms), groups ordered by their next ringing time.
@@ -324,9 +343,13 @@ internal sealed partial class MainWindow
         {
             var sectionTitle=section.Key==0 ? localization.Get("Alarms.OtherSection"):JobName(section.Key);
             ImGui.Spacing();
-            // ClassJob icon 62100 + job (62116 miner, 62117 botanist, 62118 fisher), as the gathering catalogue uses for fishing.
-            if(section.Key!=0){DrawGameIcon(62100+section.Key,new Vector2(ImGui.GetFrameHeight()));ImGui.SameLine();}
-            if(!TenshoAssistant.UI.UiComponents.Header($"{sectionTitle} ({section.Count()})###JobSection{section.Key}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+            // X-602 (0.1608): in the Alarms tool's « Other alarms » tab, the tab is the section's title.
+            if(section.Key!=0 || otherHeader)
+            {
+                // ClassJob icon 62100 + job (62116 miner, 62117 botanist, 62118 fisher), as the gathering catalogue uses for fishing.
+                if(section.Key!=0){DrawGameIcon(62100+section.Key,new Vector2(ImGui.GetFrameHeight()));ImGui.SameLine();}
+                if(!TenshoAssistant.UI.UiComponents.Header($"{sectionTitle} ({section.Count()})###JobSection{section.Key}",ImGuiTreeNodeFlags.DefaultOpen))continue;
+            }
             foreach(var group in section.GroupBy(AlarmGroupKey).OrderBy(group=>group.Min(alarm=>alarm.Enabled ? NextAlarm(alarm,now) ?? DateTimeOffset.MaxValue:DateTimeOffset.MaxValue)))
             {
                 var members=group.ToArray();var first=members[0];
@@ -501,11 +524,11 @@ internal sealed partial class MainWindow
         if(alarmStatus.Length>0){ImGui.SameLine();ImGui.TextColored(Accent,alarmStatus);}
     }
 
+    // X-602 (0.1608): its own tab of the Alarms page (was a folding block at the page's end).
     private void DrawGameAlarms()
     {
-        if(!ImGui.TreeNode(localization.Get("Alarms.GameTitle")+"###GameAlarms"))return;
-        try
         {
+            ImGui.TextColored(Accent,localization.Get("Alarms.GameTitle"));
             ImGui.TextWrapped(localization.Get("Alarms.GameHelp"));
             if(ImGui.SmallButton(localization.Get("Alarms.OpenGame")))alarmService?.OpenGameWindow();
             if(alarmService?.GameAlarms is not { } game){ImGui.TextDisabled(localization.Get("Alarms.GameUnavailable"));return;}
@@ -517,7 +540,6 @@ internal sealed partial class MainWindow
             if(game.Count>0 && ImGui.SmallButton(localization.Get("Alarms.CopyRaw")))
                 ImGui.SetClipboardText(string.Join(Environment.NewLine,game.Select(alarm=>$"name={alarm.Name} index={alarm.Index} clock={alarm.ClockTime} {alarm.Hour:00}:{alarm.Minute:00} reminder={alarm.Reminder} sound={alarm.Sound} timestamp={alarm.Timestamp} flags={alarm.Flags} captured={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}")));
         }
-        finally{ImGui.TreePop();}
     }
 
     // Settings › Modules › Alarms.

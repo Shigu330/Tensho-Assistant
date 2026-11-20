@@ -25,7 +25,9 @@ internal static class ReminderAlarms1159Tests
             Check(alarms.Contains("internal static bool IsReminderAlarm(TenshoAlarm alarm)=>DiscordWebhook.ReminderRowOf(alarm).Length>0;"),"one rule, the Discord box's");
             Check(alarms.Contains("var shown=alarms.Where(alarm=>!IsReminderAlarm(alarm)).ToList();") && alarms.Contains("localization.Format(\"Alarms.Title\",shown.Count)"),"the Alarms tool without them, its count too");
             Check(alarms.Contains("var shown=alarms.Where(IsReminderAlarm).ToList();"),"the tab lists them");
-            Check(alarms.Split("DrawAlarmGroups(shown,now,remove,added)").Length==3 && alarms.Split("foreach(var section in alarms.GroupBy(AlarmJob)").Length==2,"one drawing, used twice");
+            // X-602 (0.1608): the Alarms tool draws its two tabs' lists through DrawAlarmList, the same drawing.
+            Check(alarms.Split("DrawAlarmGroups(shown,now,remove,added)").Length==2 && alarms.Contains("return DrawAlarmGroups(alarms,now,remove,added,otherHeader);")
+                && alarms.Split("foreach(var section in alarms.GroupBy(AlarmJob)").Length==2,"one drawing, used by both tools");
             var pages=Read("src/TenshoAssistant/MainWindow.Pages.cs");
             Check(pages.Contains("localization.Format(\"Navigation.Alarms\",AlarmsToolCount)"),"the Alarms count without them");
             Check(pages.Contains("ReminderAlarmCount is var reminderAlarms and >0 ? localization.Format(\"Navigation.RemindersCount\",reminderAlarms):localization.Get(\"Navigation.Reminders\")"),"their number beside Reminders");

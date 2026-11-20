@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1608.0
+- Plan global, X-602 : Demande de l'utilisateur du 18/11 (D-186) : la page Alarmes passe en onglets, au style de Rangements (gabarit commun DetailTabs), au lieu de blocs repliables à la suite : Horloges, Alarmes par job (avec leur nombre), Autres alarmes (avec leur nombre), Alarme personnelle, Alarmes du jeu (avec leur nombre une fois lues), Réglages. Chaque alarme listée tombe dans l'un des deux onglets d'alarmes ; suppressions, ajouts et sauvegarde inchangés ; l'onglet Alarmes de Rappels garde le même dessin. X-602.
+- Pour les joueurs : alarmes : la page passe en onglets (horloges, alarmes par job, autres alarmes, alarme personnelle, alarmes du jeu, réglages), chaque onglet d'alarmes avec son nombre.
+- Tests : AlarmTabs1608Tests. Verify.ps1 (agent) : 3309/3309, 0 avertissement, 0 erreur ; DLL 0.1608.0.0. Non validé en jeu.
+### English
+- User request of 18/11 (D-186): the Alarms page is in tabs, in the Storage style (the common DetailTabs template), instead of folding blocks one after another: Clocks, Alarms by job (with their count), Other alarms (with their count), Personal alarm, Game alarms (with their count once read), Settings. Every listed alarm falls in one of the two alarms' tabs; removals, additions and the save unchanged; the Reminders tool's Alarms tab keeps the same drawing. X-602.
+- For players: Alarms: the page is in tabs (clocks, alarms by job, other alarms, personal alarm, game alarms, settings), each alarms' tab with its count.
+
 ## 0.1607.0
 - Plan global, X-663 : Relecture 0.1606, constat antérieur M1 : les commentaires du code gardaient des montants réels du journal des gils de l'utilisateur (la vente gardée par le servant au rechargement, la paire d'une seconde, l'écart sur sept jours, le montant signé et le total de sa capture) : remplacés par les montants inventés de la preuve 0.1604 (mêmes relations). Recherche dans src, tests et docs : les commentaires de 0.1293 et une entrée du CHANGELOG 0.1293 gardaient aussi deux montants de gils et les noms des servants de l'utilisateur, remplacés de même. Nouveau test à cliquet : aucune de ces valeurs (comparées par empreinte, jamais écrites) dans le code, les tests et les documents. Les valeurs restent dans l'historique git (réécriture interdite). X-663.
 - Tests : PrivateValues1607Tests. Verify.ps1 (agent) : 3306/3306, 0 avertissement, 0 erreur ; DLL 0.1607.0.0. Rien à essayer en jeu.
