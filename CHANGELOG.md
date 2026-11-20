@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1651.0
+- Plan global, X-675 : Fenêtre de chat (X-675, signalé par l'utilisateur le 20/11 avec deux captures) : la fenêtre « Choisir du texte » du clic droit rapetissait à chaque image jusqu'à ce que sa zone de texte disparaisse. Cause : une fenêtre surgissante d'ImGui prend toujours la taille de son contenu, et la zone de texte prenait la place restante (-1,-1) : chacune réduisait l'autre. La zone a maintenant une taille fixe tirée de la fenêtre du chat (ChatCopy.SelectBox : aussi large que la fenêtre, 320 au moins ; aussi haute, de 200 à 600, moins la ligne d'aide, le bouton et les marges ; jamais sous 240 × 120) ; la fenêtre surgissante se règle autour d'elle.
+- Pour les joueurs : fenêtre de chat : la fenêtre « Choisir du texte » garde sa taille au lieu de rapetisser jusqu'à disparaître.
+- Tests : ChatSelectBox1651Tests. Verify.ps1 (agent) : 3446/3446, 0 avertissement, 0 erreur ; DLL 0.1651.0.0. Non validé en jeu.
+### English
+- Chat window (X-675, reported by the user on 20/11 with two screenshots): the right-click « Select text » popup shrank each frame until its text box was gone. Cause: an ImGui popup always takes its content's size, and the text box took the space left (-1,-1): each shrank the other. The box now has a fixed size taken from the chat window (ChatCopy.SelectBox: as wide as the window, 320 at least; as high, 200 to 600, less the help line, the button and the margins; never under 240 × 120); the popup fits around it.
+- For players: Chat window: the « Select text » box keeps its size instead of shrinking until it disappears.
+
 ## 0.1650.0
 - Plan global, X-564 : Fenêtre de chat (X-564), essai mesuré : la partie chat de l'échauffement JIT (la première image de la fenêtre, environ 730 méthodes) est compilée en priorité normale ; le reste de l'échauffement revient en priorité basse, comme avant (X-433). Mesures d'avant (journal du 20/11, chargements faits pendant une compilation à côté du jeu) : partie chat prête 4,7 à 7,9 s après le chargement, lignes dessinées 3,5 à 9,7 s après lui, et une compilation de 704 ms dont 109 ms de processeur : le fil attendait le processeur. Preuve dans docs/evidence/0.1650-chat-part-priority.md. Le point reste ouvert tant que les lignes ne sont pas dessinées en moins de 3 s.
 - Pour les joueurs : fenêtre de chat : ses lignes arrivent plus tôt après le chargement du plugin.

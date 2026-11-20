@@ -10,6 +10,23 @@ public static class ChatCopy
     public static IReadOnlyList<ChatRecord>? Chosen(bool wholeTab,ChatRecord? hovered,Func<IEnumerable<ChatRecord>> tab)
         =>wholeTab ? tab().ToArray():hovered is { } one ? [one]:null;
 
+    /// <summary>X-675 (0.1651): the smallest « Select text » box: it never disappears, whatever the chat window's size.</summary>
+    public const float MinimumSelectWidth=240f,MinimumSelectHeight=120f;
+
+    /// <summary>X-675 (0.1651, the user's report of 20/11): the size of the « Select text » box, fixed from the chat window's size, never from
+    /// the space left in its popup (an ImGui popup always resizes to its content: a box of the space left, (-1,-1), and the popup shrank each
+    /// other frame after frame until the box was gone). As wide as the chat window (320 at least) and as high (200 to 600), less the help
+    /// line, the button and the popup's padding; never under <see cref="MinimumSelectWidth"/> × <see cref="MinimumSelectHeight"/>. A size not
+    /// known yet (0, not a number) takes the window's first size, 560 × 320.</summary>
+    public static (float Width,float Height) SelectBox((float X,float Y) chat,float header,float paddingX,float paddingY)
+    {
+        static float Known(float value,float fallback)=>float.IsFinite(value) && value>0 ? value:fallback;
+        static float Margin(float value)=>float.IsFinite(value) && value>0 ? value:0;
+        var width=Math.Max(Known(chat.X,560f),320f)-2*Margin(paddingX);
+        var height=Math.Clamp(Known(chat.Y,320f),200f,600f)-Margin(header)-2*Margin(paddingY);
+        return (Math.Max(width,MinimumSelectWidth),Math.Max(height,MinimumSelectHeight));
+    }
+
     /// <summary>E3: a player's name with their world as the game writes it outside the chat (« Name@World »); the name alone without one.</summary>
     public static string Player(string name,string? world)
         =>string.IsNullOrWhiteSpace(world) ? name.Trim():name.Trim()+"@"+world.Trim();

@@ -21,7 +21,8 @@ internal static class ChatSelect1624Tests
         {
             var chat=Window();
             Check(chat.Contains("if(ImGui.Selectable(localization.Get(\"ChatWindow.SelectText\")))\n                            chatSelectText=ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName);"),"made once from the menu");
-            Check(chat.Contains("ImGui.InputTextMultiline(\"###ChatSelectText\",ref text,System.Text.Encoding.UTF8.GetByteCount(text)+1,new Vector2(-1,-1),ImGuiInputTextFlags.ReadOnly);"),"read-only box");
+            // X-675 (0.1651): the box's size is fixed from the chat window (ChatSelectBox1651Tests), no longer the space left (-1,-1).
+            Check(chat.Contains("ImGui.InputTextMultiline(\"###ChatSelectText\",ref text,System.Text.Encoding.UTF8.GetByteCount(text)+1,new Vector2(boxWidth,boxHeight),ImGuiInputTextFlags.ReadOnly);"),"read-only box");
             Check(chat.Contains("if(!ImGui.BeginPopup(\"###TenshoChatSelect\")){chatSelectText=null;chatSelectOpen=false;return;}") && chat.Contains("DrawChatSelectText();"),"closed: forgotten");
         }),
     ];

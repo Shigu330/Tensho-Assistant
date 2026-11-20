@@ -1587,13 +1587,15 @@ internal sealed partial class MainWindow
     private bool chatSelectOpen;
 
     /// <summary>X-455 E1 (0.1624): the tab's messages in a read-only text box, the size of the window: a piece of one or several messages selected
-    /// with the mouse (or Ctrl+A) and copied with Ctrl+C or the button. Made once when opened (never each frame); Échap or a click outside closes it.</summary>
+    /// with the mouse (or Ctrl+A) and copied with Ctrl+C or the button. Made once when opened (never each frame); Échap or a click outside closes it.
+    /// X-675 (0.1651): the box has a fixed size taken from the chat window (ChatCopy.SelectBox); the popup, which always fits its content, fits
+    /// around it. A box of the space left (-1,-1) shrank with the popup frame after frame until it was gone (the user's report of 20/11).</summary>
     private void DrawChatSelectText()
     {
         if(chatSelectText is null)return;
         if(!chatSelectOpen){ImGui.OpenPopup("###TenshoChatSelect");chatSelectOpen=true;}
-        var width=Math.Max(chatSize.X,320);
-        ImGui.SetNextWindowSize(new Vector2(width,Math.Clamp(chatSize.Y,200,600)),ImGuiCond.Appearing);
+        var padding=ImGui.GetStyle().WindowPadding;
+        var (boxWidth,boxHeight)=ChatCopy.SelectBox((chatSize.X,chatSize.Y),ImGui.GetTextLineHeightWithSpacing()+ImGui.GetFrameHeightWithSpacing(),padding.X,padding.Y);
         if(!ImGui.BeginPopup("###TenshoChatSelect")){chatSelectText=null;chatSelectOpen=false;return;}
         try
         {
@@ -1602,7 +1604,7 @@ internal sealed partial class MainWindow
             CopyButton(localization.Get("ChatWindow.SelectTextCopyAll"),()=>all);
             Tip("ChatWindow.SelectTextCopyAllTip");
             var text=chatSelectText;
-            ImGui.InputTextMultiline("###ChatSelectText",ref text,System.Text.Encoding.UTF8.GetByteCount(text)+1,new Vector2(-1,-1),ImGuiInputTextFlags.ReadOnly);
+            ImGui.InputTextMultiline("###ChatSelectText",ref text,System.Text.Encoding.UTF8.GetByteCount(text)+1,new Vector2(boxWidth,boxHeight),ImGuiInputTextFlags.ReadOnly);
             Tip("ChatWindow.SelectTextTip");
         }
         finally{ImGui.EndPopup();}
