@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1625.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564). Mesure à vide du 20/11 à 16 h 49 (même DLL rechargée, sans compilation ni tests à côté) : la partie chat du préchauffage était prête 3567 ms après le chargement, au-dessus des 3 s visées. Elle part maintenant tout de suite, sans l'attente de 500 ms du début du préchauffage ; le reste garde cette attente, après elle. Le journal dit aussi quand la liste des méthodes était prête (le parcours de tout l'assemblage passe avant la partie chat), pour la mesure suivante. X-564 reste ouvert pour la mesure à vide.
+- Tests : ChatFirst1625Tests. Verify.ps1 (agent) : 3373/3373, 0 avertissement, 0 erreur ; DLL 0.1625.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564). Idle measure of 20/11 16:49 (the same DLL reloaded, no build nor tests beside): the warm-up's chat part was ready 3567 ms after the load, above the 3 s aimed at. It now starts at once, without the 500 ms wait at the warm-up's start; the rest keeps that wait, after it. The log also says when the list of methods was ready (the walk over the whole assembly comes before the chat part), for the next measure. X-564 stays open for the idle measure.
+
 ## 0.1624.0
 - Plan global, X-455 : Fenêtre de chat, option choisie par l'utilisateur le 15/11 (X-455 E1). « Choisir du texte… » dans le menu d'un message (clic droit) : les messages de l'onglet s'ouvrent en texte dans une boîte en lecture seule de la taille de la fenêtre ; un morceau d'un ou de plusieurs messages se choisit à la souris (ou Ctrl+A) et se copie par Ctrl+C, ou tout par « Tout copier » ; Échap ou un clic à côté ferme. ImGui ne sait pas choisir du texte dessiné : d'où ce mode à part. E5 (menu du jeu sur un nom) était déjà fait en 0.1602 (X-654) ; E6 (coller dans la saisie) attend que la saisie soit décidée. X-455 reste ouvert pour l'essai en jeu et E6.
 - Pour les joueurs : fenêtre de chat : « Choisir du texte… » dans le menu d'un message permet de choisir à la souris n'importe quel morceau des messages et de le copier.

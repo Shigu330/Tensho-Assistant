@@ -62,6 +62,8 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-564: methods of the chat part compiled, and when they all were (ms after the warm-up was made; -1 before, or without one).</summary>
     public int ChatPrepared{get;private set;}
     public double ChatReadyAfter{get;private set;}=-1;
+    /// <summary>X-564 (0.1625): when the methods were listed, the chat part's among them (ms after the warm-up was made; -1 without a chat part).</summary>
+    public double ChatListedAfter{get;private set;}=-1;
     /// <summary>X-177 C4.2 (0.1200): how long the rest waits at most for what is compiled before it (the readers' classes).</summary>
     public static readonly TimeSpan RestHold=TimeSpan.FromSeconds(30);
 
@@ -369,10 +371,14 @@ public sealed class JitWarmup : IDisposable
             Interlocked.Exchange(ref ThreadClock.WarmupThread,ThreadClock.SystemId());
             if(early is null){earlyDone=true;firstPartDone=true;}
             var first=early is null ? TimeSpan.Zero:EarlyDelay<delay ? EarlyDelay:delay;
-            if(token.WaitHandle.WaitOne(early is null ? delay:first))return;
+            var wait=early is null ? delay:first;
+            // X-564 (0.1625, measured idle on 20/11 16:49: chat part ready 3567 ms after the load): with a chat part, it starts at once; the
+            // wait is kept for the rest, after it (what is left of it).
+            if(chatPart is null && token.WaitHandle.WaitOne(wait))return;
             var started=System.Diagnostics.Stopwatch.GetTimestamp();
             var types=roots();
             var methods=Methods(types);
+            if(chatPart is not null)ChatListedAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
             // X-01 (0.1279): the panels' code first, with what it calls in the plugin and the generic code made for its types.
             var compiled=new HashSet<MethodBase>();
             // X-564 (0.1616): the chat window's code before anything else when asked (about a thousand methods, a second or so): the window
@@ -387,6 +393,8 @@ public sealed class JitWarmup : IDisposable
                 }
                 ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                 chatDone=true;
+                var left=wait-System.Diagnostics.Stopwatch.GetElapsedTime(created);
+                if(left>TimeSpan.Zero && token.WaitHandle.WaitOne(left))return;
             }
             if(early is not null && firstPart is not null && types.Count>0)
             {

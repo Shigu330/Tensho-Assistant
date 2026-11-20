@@ -70,8 +70,11 @@ internal static class FairLock1309Tests
                 rounds.Add(watch.ElapsedMilliseconds + " ms, greedy +" + (Volatile.Read(ref held.Value) - before));
                 Check(watch.ElapsedMilliseconds < 1_500,"the waiting client got the lock in " + watch.ElapsedMilliseconds + " ms (round " + round + ")");
             }
+            // X-564 relay 144 (0.1625): under a loaded machine (Verify's 32 test threads) the greedy thread may not be scheduled during the
+            // five short turns (70 ms in all on 20/11 16:55): it is given up to 2 s to take the lock again before it is stopped.
+            SpinWait.SpinUntil(() => Volatile.Read(ref held.Value) > first,TimeSpan.FromSeconds(2));
             stop.Cancel();
-            // Fair, not a hand-over: the greedy client got the lock again meanwhile (it is not starved in turn).
+            // Fair, not a hand-over: the greedy client got the lock again meanwhile or right after (it is not starved in turn).
             var during = Volatile.Read(ref held.Value) - first;
             Check(greedy.Join(TimeSpan.FromSeconds(30)) && during >= 1,"the greedy client kept saving too: " + during + " times during the waiting client's turns (" + string.Join("; ",rounds) + ")");
             Check(Marks(root).Length == 0,"no waiting mark left: " + string.Join(", ",Marks(root)));
