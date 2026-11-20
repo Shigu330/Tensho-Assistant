@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1632.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1631. Mesure à vide du 20/11 à 17 h 50 : les lignes sont dessinées 2641 ms après le chargement (moins de 3 s), avant les autres panneaux ; mais le chat prenait 34 ms de cette image. Le journal dit maintenant combien de temps prend la première image du chat avec ses lignes et quelle part le fil du jeu y passe à compiler, pour distinguer une compilation restante du travail de mise en page.
+- Tests : ChatFirstFrame1632Tests. Verify.ps1 (agent) : 3390/3390, 0 avertissement, 0 erreur ; DLL 0.1632.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564), following 0.1631. Idle measure of 20/11 17:50: the lines are drawn 2641 ms after the load (under 3 s), before the other panels; but the chat took 34 ms of that frame. The log now says how long the chat's first frame with its lines takes and how much of it the game's thread spends compiling, to tell a compilation left over from layout work.
+
 ## 0.1631.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1630. Mesure à vide du 20/11 à 17 h 42 : le code de la première image du chat était prêt 2247 ms après le chargement (moins de 3 s), mais la fenêtre de chat est un panneau, et les panneaux attendent leur porte (ouverte 6046 ms après le chargement, à sa borne) : les lignes n'apparaissaient qu'au bout de 6 s. La fenêtre de chat s'ouvre maintenant dès que son propre code est prêt, sans attendre les autres panneaux ; le code de son panneau (PanelWindow et les fonctions du panneau du chat) fait partie de sa première image. Les messages du jeu sont cachés à partir du même moment. Le journal dit quand les lignes sont dessinées pour la première fois, pour la mesure à vide.
 - Tests : ChatEarly1631Tests. Verify.ps1 (agent) : 3389/3389, 0 avertissement, 0 erreur ; DLL 0.1631.0.0. Rien à essayer en jeu.

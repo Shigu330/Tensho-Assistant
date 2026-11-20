@@ -839,7 +839,23 @@ internal sealed partial class MainWindow
         {
             chatFirstLinesLogged=true;
             log.Information(FormattableString.Invariant($"Chat window: lines first drawn {WarmupSinceMade:F0} ms after the load (X-564), the panels' gate {(PanelsOpen ? "open":"still closed")}."));
+            // X-564 (0.1632): that frame's time, and how much of it the game's thread spent compiling (34 ms of chat on 20/11 17:50).
+            var jitBefore=System.Runtime.JitInfo.GetCompilationTime(true);
+            var methodsBefore=System.Runtime.JitInfo.GetCompiledMethodCount(true);
+            var started=System.Diagnostics.Stopwatch.GetTimestamp();
+            try{DrawChatWindowLines();}
+            finally
+            {
+                log.Information(FormattableString.Invariant($"Chat window: its first frame with lines {System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds:F0} ms{Diagnostics.JitWarmup.CompiledText((System.Runtime.JitInfo.GetCompilationTime(true)-jitBefore).TotalMilliseconds,System.Runtime.JitInfo.GetCompiledMethodCount(true)-methodsBefore)} (X-564)."));
+            }
+            return;
         }
+        DrawChatWindowLines();
+    }
+
+    /// <summary>X-564 (0.1632): the chat window's tabs and lines, once its code is compiled (the first time timed for the log).</summary>
+    private void DrawChatWindowLines()
+    {
         var options=ChatOptions;
         var tabs=ChatTabs(options);
         var table=ChatFilterTableNow();
