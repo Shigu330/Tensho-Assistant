@@ -6516,7 +6516,7 @@
     "Linkshell": "Messages tapés avec /linkshell{0} (/l{0}) : tous les membres de la linkshell {0} les voient, où qu'ils se trouvent ; les lignes commencent par [{0}].",
     "CrossWorldLinkshell": "Messages tapés avec /linkshellim{0} (/lsim{0}) : tous les membres de la linkshell inter-Monde numéro {0} les voient, où qu'ils se trouvent, ses membres venant de plusieurs Mondes ; les lignes commencent par [LSIM {0}].",
     "Novice": "Messages tapés avec /novice (/n) : le réseau des novices, le mode de discussion consacré à l'entraide entre débutants et mentors ; seuls ses membres le lisent. Les lignes commencent par [RdN].",
-    "Emote": "Emotes : les emotes standard (« … montre du doigt … ») et les emotes personnalisées tapées avec /cmdémotion (/em), vues dans le même périmètre qu'un /dire.",
+    "Emote": "Emotes : les emotes standard (« … montre du doigt … ») et les emotes personnalisées tapées avec /cmdémotion (/em) ; le jeu dit qu'une /cmdémotion est vue dans le périmètre d'un /dire.",
     "Echo": "Messages tapés avec /écho (/e) : vous seul pouvez les voir.",
     "System": "Messages système du jeu : invitations (« Vous invitez … dans l'équipe. »), détails des signes placés, résultats des lancers de dés (/random), annonces du réseau des novices, lecture en cours de l'orchestrion, livre de correspondance, etc.",
     "Error": "Messages d'erreur système du jeu (« Votre murmure à … n'a pas pu être envoyé. »).",

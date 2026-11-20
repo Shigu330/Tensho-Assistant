@@ -973,9 +973,12 @@ internal sealed partial class MainWindow
     private float chatWheelRest;
     private object? chatWheelView;
 
+    // X-556 M3 (review of 0.1520): a folded message is laid out narrower by its « ×n », so the count never runs past the window's edge
+    // (ChatTabView lays it out again when the count grows).
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
-        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),view.Width,text=>ImGui.CalcTextSize(text).X,
-            ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));
+        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),
+            ChatLook.WidthBeside(view.Width,view.RepeatsAt(index)>0 ? ImGui.CalcTextSize(localization.Format("ChatWindow.Repeats",view.RepeatsAt(index)+1)).X:0),
+            text=>ImGui.CalcTextSize(text).X,ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));
 
     /// <summary>X-461 (0.1463): the name of what a link without text of its own points to: an item (Tensho's item list), a quest, a place; else
     /// a word for a link (never empty: the link keeps its place in the message).</summary>

@@ -50,6 +50,9 @@ public static class ChatLook
 
     /// <summary>How far the lines a message wraps onto are indented: about one letter's height, or nothing.</summary>
     public static float Indent(float fontSize,bool on)=>on && fontSize>0 ? MathF.Round(fontSize):0f;
+    /// <summary>X-556 M3 (review of 0.1520): the width left to a message's text when <paramref name="beside"/> pixels follow it on its line
+    /// (the « ×n » of a folded message); never below half the width, and the width as it is when nothing follows.</summary>
+    public static float WidthBeside(float width,float beside)=>beside>0 ? Math.Max(width/2,width-beside):width;
 
     /// <summary>Whether a link's text holds the game's link glyph (or the arrow written for it, X-506): the place of the game's arrow.</summary>
     public static bool Marked(string? text)=>text is { Length:>0 } && (text.Contains(ChatGlyphs.LinkMarker,StringComparison.Ordinal) || text.Contains(ChatGlyphs.LinkArrow,StringComparison.Ordinal));

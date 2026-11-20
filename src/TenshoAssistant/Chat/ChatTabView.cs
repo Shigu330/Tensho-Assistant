@@ -54,6 +54,8 @@ public sealed class ChatTabView
             if(tab.FoldRepeats && records.Count>0 && ChatRepeat.Repeats(records[^1],lastSeen,record))
             {
                 repeats[^1]++;lastSeen=record.Time;changed=true;
+                // X-556 M3 (review of 0.1520): the « ×n » after the message takes room on its last line: laid out again with the count.
+                lines[^1]=null;layoutCursor=records.Count-1;
                 // X-633 (bench X-631, review of 0.1520, M1): a repeat folded counts as the new message it is: unread, and an alert when it
                 // holds a word (before, a word said again within the minute left a tab already seen without « ! »).
                 Count(record);

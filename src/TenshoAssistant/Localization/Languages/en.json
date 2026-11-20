@@ -6516,7 +6516,7 @@
     "Linkshell": "Messages typed with /linkshell{0} (/l{0}): every member of the linkshell you registered in linkshell slot {0} sees them, wherever they are; the lines start with [{0}].",
     "CrossWorldLinkshell": "Messages typed with /cwlinkshell{0} (/cwl{0}): every member of the cross-world linkshell you registered in slot {0} sees them, wherever they are, its members coming from several Worlds; the lines start with [CWLS{0}].",
     "Novice": "Messages typed with /novice (/n): the Novice Network, the chat where new players ask the mentors for advice; only its members read it. The lines start with [NOVICE].",
-    "Emote": "Emotes: the standard ones (« … points at … ») and the custom ones written with /emote (/em), seen within the same radius as /say.",
+    "Emote": "Emotes: the standard ones (« … points at … ») and the custom ones written with /emote (/em); the game says a /emote is seen within a /say radius.",
     "Echo": "Messages typed with /echo (/e): only you can see them.",
     "System": "The game's system messages: invitations (« You invite … to a party. »), signs placed on targets, /random rolls, Novice Network notices, the orchestrion's track, the message book, and the like.",
     "Error": "The game's error messages (« Message to … could not be sent. »).",
