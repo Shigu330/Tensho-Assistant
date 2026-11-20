@@ -57,7 +57,7 @@ internal static class ChatSourceMatch1603Tests
         {
             string Read(string path)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+path)).Replace("\r\n","\n");
             var actions=Read("Chat/ChatPlayerActions.Dalamud.cs");
-            Check(actions.Contains("sources.Resolve(contentId,accountId,worldId,chatType,Line(module,messageIndex),module->LocalPlayerContentId)")
+            Check(actions.Contains("sources.ResolveRead(contentId,accountId,worldId,chatType,()=>Line(module,messageIndex),module->LocalPlayerContentId)")
                 && actions.Contains("module->GetLogMessageDetail(index,out var sender,out _,out var kind,out _,out _,out _)"),"kind, line at the game's index, own id");
             Check(actions.Contains("log.Information(\"Chat window, a sender's identifiers: {0} (kind {1}).\",match,chatType&ChatSources.KindMask);"),"each outcome said once, without name nor id");
             var reader=Read("Chat/ChatReader.Dalamud.cs");

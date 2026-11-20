@@ -56,7 +56,7 @@ internal static class ChatPlayerMenu1602Tests
             string Read(string path)=>File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/"+path));
             Check(!Read("Chat/ChatHistory.cs").Contains("ContentId") && !Read("Chat/ChatHistory.Dalamud.cs").Contains("ChatSources") && !Read("Chat/ChatStore.cs").Contains("ContentId"),"never on disk, not in the records");
             var actions=Read("Chat/ChatPlayerActions.Dalamud.cs");
-            Check(actions.Replace("\r\n","\n").Contains("hook!.Original(module,contentId,accountId,messageIndex,worldId,chatType);\n        try{Said(sources.Resolve("),"the game first, then the copy");
+            Check(actions.Replace("\r\n","\n").Contains("hook!.Original(module,contentId,accountId,messageIndex,worldId,chatType);\n        // X-662 M2") && actions.Contains("try{Said(sources.ResolveRead("),"the game first, then the copy");
             Check(actions.Contains("MemberFunctionPointers.AddMsgSourceEntry==0") && actions.Contains("framework.RunOnTick(") && actions.Contains("client.Logout+=OnLogout") && !actions.Contains("ProcessChatBoxEntry"),"pointer checked, next tick, cleared at logout, no command sent");
             var window=Read("MainWindow.ChatWindow.cs");
             Check(window.Contains("DrawChatPlayerGameEntries(said);") && window.Contains("actions.Run(entry.Action,source,said.Channel);"),"only from the click in the menu");

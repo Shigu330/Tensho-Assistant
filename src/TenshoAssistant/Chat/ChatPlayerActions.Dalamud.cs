@@ -45,7 +45,10 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     private void OnSource(RaptureLogModule* module,ulong contentId,ulong accountId,int messageIndex,ushort worldId,ushort chatType)
     {
         hook!.Original(module,contentId,accountId,messageIndex,worldId,chatType);
-        try{Said(sources.Resolve(contentId,accountId,worldId,chatType,Line(module,messageIndex),module->LocalPlayerContentId),chatType);}
+        // X-662 M2 (0.1606, review of 0.1605): while Tensho is cut (PvP, ranked contents, R03.2) nothing is read; else the game's log line
+        // only for the message that waits for its identifiers (ResolveRead calls Line at most once, after the cheap checks).
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut){sources.Skip();return;}
+        try{Said(sources.ResolveRead(contentId,accountId,worldId,chatType,()=>Line(module,messageIndex),module->LocalPlayerContentId),chatType);}
         catch(Exception){}
     }
 

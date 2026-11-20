@@ -50,6 +50,13 @@ public sealed class ChatSources
     /// own character's id; given once to the message just copied, only when they all agree (X-660).
     /// </summary>
     public ChatSourceMatch Resolve(ulong contentId,ulong accountId,ushort world,ushort chatType,ChatLogLine? line,ulong own)
+        =>ResolveRead(contentId,accountId,world,chatType,()=>line,own);
+
+    /// <summary>
+    /// X-662 M2 (0.1606, review of 0.1605): the same, the game's log line read only when a message waits for its identifiers and the
+    /// identifiers, owner and kind already agree (<paramref name="line"/> called at most once, never for the other messages of the game).
+    /// </summary>
+    public ChatSourceMatch ResolveRead(ulong contentId,ulong accountId,ushort world,ushort chatType,Func<ChatLogLine?> line,ulong own)
     {
         lock(gate)
         {
@@ -58,7 +65,7 @@ public sealed class ChatSources
             if(contentId==0)return ChatSourceMatch.NoIdentifiers;
             if(contentId==own)return ChatSourceMatch.Own;
             if((chatType&KindMask)!=expectedKind)return ChatSourceMatch.Kind;
-            if(line is not { } read)return ChatSourceMatch.LineUnread;
+            if(line() is not { } read)return ChatSourceMatch.LineUnread;
             if((read.Kind&KindMask)!=expectedKind || !string.Equals(read.Name,source.Name,StringComparison.Ordinal) || read.World!=source.World)return ChatSourceMatch.Line;
             if(source.World!=world)return ChatSourceMatch.World;
             sources[id]=source with{ContentId=contentId,AccountId=accountId};
