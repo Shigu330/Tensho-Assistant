@@ -57,6 +57,16 @@ public static class ChatLook
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;
 
+    /// <summary>X-447 D1 (0.1620, « Limited »: an ImGui window takes the mouse whole or not at all): whether the clicks and the wheel go through the
+    /// chat window to the game this frame: the setting on, the window locked, no menu of the chat open, and the mouse on none of the zones that
+    /// answer it (the tab bar with its buttons, each link, « back to the bottom »), as drawn the frame before.</summary>
+    public static bool Through(bool setting,bool locked,bool menuOpen,(float X,float Y) mouse,IReadOnlyList<(float X,float Y,float Width,float Height)> zones)
+        =>setting && locked && !menuOpen && !zones.Any(zone=>Under(mouse,(zone.X,zone.Y),(zone.Width,zone.Height)));
+
+    /// <summary>X-447 D8 (0.1620): whether the window is hidden now by the moments chosen (combat, cutscene, duty); it comes back by itself.</summary>
+    public static bool HiddenNow(ChatSettings options,bool inCombat,bool inCutscene,bool inDuty)
+        =>options.HideInCombat && inCombat || options.HideInCutscene && inCutscene || options.HideInDuty && inDuty;
+
     /// <summary>X-447 D7 (0.1618): the smallest size a typed size is given.</summary>
     public const float MinWidth=200,MinHeight=80;
 

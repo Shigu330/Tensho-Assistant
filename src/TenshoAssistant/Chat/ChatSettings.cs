@@ -36,6 +36,10 @@ public sealed class ChatSettings
     public const int MaximumTabs=12,MaximumTabName=24;
     public bool WindowOpen{get;set;}
     public bool HideInCombat{get;set;}
+    /// <summary>X-447 D8 (0.1620): the window hidden during a cutscene (also those that keep the game's interface) and in a duty; it comes back by
+    /// itself. The messages are still copied.</summary>
+    public bool HideInCutscene{get;set;}
+    public bool HideInDuty{get;set;}
     /// <summary>X-467 (0.1504, D-181 of 16/11, DEC-053 completed): the game chat's messages (its four panels) hidden and this window in their
     /// place, above the game's own typing box (never hidden). Off by default; given back as soon as it is no longer wanted (GameChatHider).</summary>
     public bool HideGameMessages{get;set;}
@@ -56,6 +60,9 @@ public sealed class ChatSettings
     public bool Borderless{get;set;}
     /// <summary>X-448 (0.1454): the window is neither moved nor resized.</summary>
     public bool Locked{get;set;}
+    /// <summary>X-447 D1 (0.1620): while locked, the clicks and the wheel go through the window to the game, except on what answers them (the
+    /// tabs and their buttons, the links, « back to the bottom »; a menu of the chat open takes them again).</summary>
+    public bool MouseThrough{get;set;}
     /// <summary>X-447 D4 (0.1618): the tabs' names hidden: the tab shown stays, the buttons at the end of the bar stay, with the one that shows
     /// the tabs again.</summary>
     public bool HideTabs{get;set;}

@@ -251,6 +251,10 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>{},dutyGuides.Dispose);
             mainWindow.DutyGuides=dutyGuides;
             mainWindow.InCombatNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.InCombat];
+            // X-447 D8 (0.1620): the chat window hidden in a cutscene (those that keep the interface too) or in a duty, when chosen.
+            mainWindow.InCutsceneNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene]
+                || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.WatchingCutscene78] || condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.OccupiedInCutSceneEvent];
+            mainWindow.InDutyNow=()=>condition[Dalamud.Game.ClientState.Conditions.ConditionFlag.BoundByDuty];
             // X-474 (0.1477): a link of Dalamud or of a plugin in Tensho's chat window: the handler Dalamud keeps for it (RegisteredLinkHandlers,
             // the same one a click in the game's chat calls), run on the game's thread on the player's click. X-496 M1 (0.1478): its message
             // is the link's own string (from the link to its end), as Dalamud passes it (docs/evidence/0.1478-dalamud-link-handler.md); a

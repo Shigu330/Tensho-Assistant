@@ -79,7 +79,7 @@ internal sealed partial class MainWindow
     /// while the game hides its interface (cutscene, GPose, interface hidden: Hold); given back only when really no longer wanted.</summary>
     internal ChatHideWant ChatGameMessagesWant()
         =>ChatHideWants.Of(ChatGameMessagesOption(),
-            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true,
+            TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatHiddenNow(),
             // X-528 M1 (0.1507): Tensho's window hidden under a game window: the game's messages come back, drawn under that window.
             ChatCover.Hidden(ChatOptions.WhenCovered,chatCovered));
 
@@ -112,7 +112,19 @@ internal sealed partial class MainWindow
         |(ChatOptions.Locked ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
         // X-467 (0.1504): over the game's messages, the game's chat decides its place and size (its own resize button, the HUD layout).
         |(chatFollowing ? ImGuiWindowFlags.NoMove|ImGuiWindowFlags.NoResize:ImGuiWindowFlags.None)
-        |(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);
+        |(ChatCover.Faded(ChatOptions.WhenCovered,chatCovered) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None)
+        // X-447 D1 (0.1620): locked, the clicks go through to the game except on the zones drawn the frame before.
+        |(ChatLook.Through(ChatOptions.MouseThrough,ChatOptions.Locked,chatMenuOpen,(ImGui.GetMousePos().X,ImGui.GetMousePos().Y),chatZones) ? ImGuiWindowFlags.NoInputs:ImGuiWindowFlags.None);
+
+    // X-447 D1 (0.1620): the zones of the window that answer the mouse (screen space), drawn last frame and being drawn now; a chat menu open.
+    private List<(float X,float Y,float Width,float Height)> chatZones=[],chatZonesNext=[];
+    private bool chatMenuOpen;
+    private void ChatZone(){var min=ImGui.GetItemRectMin();var max=ImGui.GetItemRectMax();chatZonesNext.Add((min.X,min.Y,max.X-min.X,max.Y-min.Y));}
+
+    /// <summary>X-447 D8 (0.1620): the moments the window is hidden in (set by the plugin: the game's conditions).</summary>
+    internal Func<bool>? InCutsceneNow{get;set;}
+    internal Func<bool>? InDutyNow{get;set;}
+    private bool ChatHiddenNow()=>ChatLook.HiddenNow(ChatOptions,InCombatNow?.Invoke()==true,InCutsceneNow?.Invoke()==true,InDutyNow?.Invoke()==true);
 
     // X-485 (0.1479): where the window was last drawn, whether a game window covers it there, and the frame it was last drawn in.
     private Vector2? chatAt;
@@ -121,7 +133,7 @@ internal sealed partial class MainWindow
     private int chatLastFrame=-10;
 
     private bool ChatWindowShown()
-        =>!windowDisposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && !gameGui.GameUiHidden && !(ChatOptions.HideInCombat && InCombatNow?.Invoke()==true);
+        =>!windowDisposed && !TenshoAssistant.Competitive.CompetitiveGate.Cut && !gameGui.GameUiHidden && !ChatHiddenNow();
 
     private bool ChatWindowVisible()
     {
@@ -221,6 +233,9 @@ internal sealed partial class MainWindow
         var defaults=DefaultConfiguration.Chat;
         BoolSetting("ChatWindow.Show","ChatWindow.ShowTip",()=>configuration.Chat.WindowOpen,value=>{configuration.Chat.WindowOpen=value;if(!value)ChatMessages.Clear();},c=>c.Chat.WindowOpen);
         BoolSetting("ChatWindow.HideInCombat","ChatWindow.HideInCombatTip",()=>configuration.Chat.HideInCombat,value=>configuration.Chat.HideInCombat=value,c=>c.Chat.HideInCombat);
+        // X-447 D8 (0.1620): hidden in a cutscene, in a duty.
+        BoolSetting("ChatWindow.HideInCutscene","ChatWindow.HideInCutsceneTip",()=>configuration.Chat.HideInCutscene,value=>configuration.Chat.HideInCutscene=value,c=>c.Chat.HideInCutscene);
+        BoolSetting("ChatWindow.HideInDuty","ChatWindow.HideInDutyTip",()=>configuration.Chat.HideInDuty,value=>configuration.Chat.HideInDuty=value,c=>c.Chat.HideInDuty);
         // X-467 (0.1504, D-181): the game chat's messages hidden, this window in their place above the game's typing box; both chats to compare.
         BoolSetting("ChatWindow.HideGameMessages","ChatWindow.HideGameMessagesTip",()=>configuration.Chat.HideGameMessages,value=>configuration.Chat.HideGameMessages=value,c=>c.Chat.HideGameMessages);
         ImGui.Indent();
@@ -243,6 +258,8 @@ internal sealed partial class MainWindow
         // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
         BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);
         BoolSetting("ChatWindow.Locked","ChatWindow.LockedTip",()=>configuration.Chat.Locked,value=>configuration.Chat.Locked=value,c=>c.Chat.Locked);
+        // X-447 D1 (0.1620): while locked, the clicks go through to the game.
+        BoolSetting("ChatWindow.MouseThrough","ChatWindow.MouseThroughTip",()=>configuration.Chat.MouseThrough,value=>configuration.Chat.MouseThrough=value,c=>c.Chat.MouseThrough);
         // X-476 (0.1481): the tabs under the lines, and the letters' outline.
         BoolSetting("ChatWindow.TabsAtBottom","ChatWindow.TabsAtBottomTip",()=>configuration.Chat.TabsAtBottom,value=>configuration.Chat.TabsAtBottom=value,c=>c.Chat.TabsAtBottom);
         BoolSetting("ChatWindow.TextOutline","ChatWindow.TextOutlineTip",()=>configuration.Chat.TextOutline,value=>configuration.Chat.TextOutline=value,c=>c.Chat.TextOutline);
@@ -738,7 +755,14 @@ internal sealed partial class MainWindow
         chatLastFrame=frameNow;
         chatAt=ImGui.GetWindowPos();chatSize=ImGui.GetWindowSize();
         // X-498 M1 (0.1480): faded, the whole window is (the alpha pushed before Begin by PanelWindow, Fade), its frame and title bar too.
-        DrawChatWindowBody();
+        chatZonesNext.Clear();
+        try{DrawChatWindowBody();}
+        finally
+        {
+            // X-447 D1 (0.1620): the zones drawn now decide the next frame's flags; a menu open (the chat's, or another) takes the clicks.
+            (chatZones,chatZonesNext)=(chatZonesNext,chatZones);
+            chatMenuOpen=ImGui.IsPopupOpen("",ImGuiPopupFlags.AnyPopupId|ImGuiPopupFlags.AnyPopupLevel);
+        }
     }
 
     // X-476 (0.1481): the tab chosen in the tab bar (its lines are drawn outside the bar, over or under it).
@@ -770,6 +794,9 @@ internal sealed partial class MainWindow
 
     private void DrawChatTabBar(List<ChatTabSettings> tabs,ChatSettings options)
     {
+        // X-447 D1 (0.1620): the whole bar answers the mouse (its tabs and the buttons at its end).
+        var barAt=ImGui.GetCursorScreenPos();
+        chatZonesNext.Add((barAt.X,barAt.Y,ImGui.GetContentRegionAvail().X,ImGui.GetFrameHeightWithSpacing()));
         // X-505 (0.1488): the game's tabs: rounded, grey, the one shown marked by a dot.
         var game=options.GameTabs;
         if(game)
@@ -1150,6 +1177,7 @@ internal sealed partial class MainWindow
     {
         ImGui.SetCursorPos(new Vector2(button.Corner.X,button.Corner.Y));
         if(ImGui.Button(button.Label+"###ChatToBottom"))ImGui.SetScrollY(ChatScroll.Bottom(view.RowCount,height,shown));
+        ChatZone();
         Tip("ChatWindow.ToBottomTip");
     }
 
@@ -1297,6 +1325,7 @@ internal sealed partial class MainWindow
         var colour=underline ? Accent:run.Role==ChatRole.LinkMark ? new Vector4(ChatLook.LinkMark.R,ChatLook.LinkMark.G,ChatLook.LinkMark.B,ChatLook.LinkMark.A)
             :ChatColor(ChatOptions.ColorOf(record.Channel));
         ImGui.TextColored(colour,run.Text);
+        ChatZone();
         if(underline)
         {
             var min=ImGui.GetItemRectMin();

@@ -42,7 +42,7 @@ internal static class ChatGameHold1506Tests
         ("Chat game hold 1506: wiring: the window passes the game's interface state, the hider holds while ChatLog is not shown",() =>
         {
             var window=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(window.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatOptions.HideInCombat && InCombatNow?.Invoke()==true",StringComparison.Ordinal),"the four states passed");
+            Check(window.Contains("TenshoAssistant.Competitive.CompetitiveGate.Cut,gameGui.GameUiHidden,ChatHiddenNow(),",StringComparison.Ordinal),"the four states passed");
             Check(window.Contains("internal bool ChatHidesGameMessages()=>ChatGameMessagesWant()==ChatHideWant.Hide;",StringComparison.Ordinal),"followed only while hidden");
             var hider=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/GameChatHider.Dalamud.cs"));
             Check(hider.Contains("ChatHideWants.InFrame(wanted(),chatLogShown:ChatLogShown(),competitiveCut:TenshoAssistant.Competitive.CompetitiveGate.Cut)",StringComparison.Ordinal)
