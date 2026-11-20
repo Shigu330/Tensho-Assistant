@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (649 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (651 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -716,13 +716,15 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-646 | Review of block 0.1587 to 0.1588 (review 0.1588, 20/11), pre-existing before… | Done in 0.1590 |
 | X-647 | Review of block 0.1589 to 0.1592 (review 0.1592, 20/11), minor M1: M1 in… | Done in 0.1593 |
 | X-648 | Review of block 0.1593 to 0.1593 (review 0.1593, 20/11), minor M1: M1 in… | Done in 0.1594.0 |
-| X-649 | Review of block 0.1593 to 0.1593 (review 0.1593, 20/11), pre-existing before… | Done in 0.1594 |
+| X-649 | Review of block 0.1593 to 0.1593 (review 0.1593, 20/11), pre-existing before… | Done in 0.1594.0 |
+| X-650 | Tool: plan.py import-relecture refuses a finding row whose cell holds an… | Done in 0.1595.0 |
+| X-651 | Review of block 0.1594 to 0.1594 (review 0.1594, 20/11), minor M1: M1 in… | Done in 0.1595.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (649 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (651 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1436,4 +1438,6 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-646 | Relecture du bloc 0.1587 à 0.1588 (relecture 0.1588, 20/11), déjà là avant le… | Fait en 0.1590 |
 | X-647 | Relecture du bloc 0.1589 à 0.1592 (relecture 0.1592, 20/11), mineurs M1 : M1… | Fait en 0.1593 |
 | X-648 | Relecture du bloc 0.1593 à 0.1593 (relecture 0.1593, 20/11), mineurs M1 : M1… | Fait en 0.1594.0 |
-| X-649 | Relecture du bloc 0.1593 à 0.1593 (relecture 0.1593, 20/11), déjà là avant le… | Fait en 0.1594 |
+| X-649 | Relecture du bloc 0.1593 à 0.1593 (relecture 0.1593, 20/11), déjà là avant le… | Fait en 0.1594.0 |
+| X-650 | Outil : plan.py import-relecture refuse une ligne de constat dont une cellule… | Fait en 0.1595.0 |
+| X-651 | Relecture du bloc 0.1594 à 0.1594 (relecture 0.1594, 20/11), mineurs M1 : M1… | Fait en 0.1595.0 |
