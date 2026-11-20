@@ -282,7 +282,7 @@ public static class BeastTeams
         for (var index = 0; index + 1 < texts.Count; index++)
         {
             var beast = beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, texts[index], StringComparison.CurrentCultureIgnoreCase));
-            if (beast is null || team.Any(member => member.Beast == beast.Id) || !int.TryParse(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
+            if (beast is null || team.Any(member => member.Beast == beast.Id) || !TryRank(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
             var (hp, max) = (-1, 0);
             if (index >= 2 && texts[index - 2].Split('/') is [var left, var right] && int.TryParse(left, out var now) && int.TryParse(right, out var top) && top > 0 && now >= 0 && now <= top)
                 (hp, max) = (now, top);
@@ -290,6 +290,22 @@ public static class BeastTeams
         }
         return team;
     }
+
+    /// <summary>
+    /// X-692 (0.1661, the user's tests T-0.1526-1 and -2 of 20/11: the team never read in front of « Team formation »): the team window writes
+    /// each beast's rank after a glyph of the game's font (U+E036, a private-use character: dalamud.log of 20/11 22:04:23 read byte by byte,
+    /// « Chimère » then EE 80 B6 and « 3 »; docs/evidence/0.1661-beast-team-rank-glyph.md); a bare number was expected, so no beast was read and
+    /// the panel showed the advised beasts. The number is read after the game's glyphs (private-use characters) and spaces, digits only.
+    /// </summary>
+    public static bool TryRank(string text, out int rank)
+    {
+        var digits = new string(text.Where(letter => letter is < '\uE000' or > '\uF8FF' && !char.IsWhiteSpace(letter)).ToArray());
+        return int.TryParse(digits, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out rank);
+    }
+
+    /// <summary>X-692 (0.1661): the team window shows beasts by name but none could be read with its rank (said once in the log, R08).</summary>
+    public static bool NamesWithoutTeam(IReadOnlyList<string> texts, IReadOnlyList<Beast> beasts, IReadOnlyList<TeamMember> team)
+        => team.Count == 0 && texts.Any(text => beasts.Any(row => row.Name.Length > 0 && string.Equals(row.Name, text, StringComparison.CurrentCultureIgnoreCase)));
 
     /// <summary>X-550 (0.1526): one fight's three beasts taken among the team read (beasts down left out), with the weaknesses they hit, and
     /// against the advised plan: the advised beasts missing (not taken, or down) and those that take their place.</summary>
@@ -483,7 +499,7 @@ public static class BeastTeams
         for (var index = 0; index + 1 < texts.Count; index++)
         {
             var beast = beasts.FirstOrDefault(row => row.Name.Length > 0 && string.Equals(row.Name, texts[index], StringComparison.CurrentCultureIgnoreCase));
-            if (beast is null || !int.TryParse(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
+            if (beast is null || !TryRank(texts[index + 1], out var rank) || rank < 1 || rank > Math.Max(1, beast.Ranks.Count)) continue;
             found[beast.Id] = rank;
         }
         return found;
