@@ -56,7 +56,7 @@ internal static class ChatLinks1441Tests
             Check(window.Contains("if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$\"{record.Id}_{line}_{index}\",record);"),"links drawn as links (X-474: a link of a plugin without a handler stays plain text)");
             Check(window.Contains("if(ChatLinkClicked(id))OpenMapPointFromPage(map,link.X,link.Y);"),"map: left click (X-636: on release, without a drag), flag and map");
             Check(window.Contains("PlaceEntries(place.Map,place.Coordinate,null,place.Place);") && window.Contains("ImGui.OpenPopup(\"###TenshoChatWindowPlace\");"),"map: right click, Tensho's place menu");
-            Check(window.Contains("ItemLinksMenu(\"##ChatItem\"+id,item);"),"item: Tensho's item menu");
+            Check(window.Contains("ItemLinksMenu(\"##ChatItem\"+id,item"),"item: Tensho's item menu (with « copy the name » since 0.1617, X-455 E4)");
             Check(!window.Contains("SendMessage") && !window.Contains("ProcessChatBox"),"nothing sent");
             foreach(var lang in new[]{"en","fr"})
             {

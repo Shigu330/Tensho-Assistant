@@ -171,12 +171,14 @@ internal sealed partial class MainWindow
     }
 
     private readonly HashSet<uint> goThereLogged=[];
-    private void ItemLinksMenu(string id,ItemDefinition? item)
+    private void ItemLinksMenu(string id,ItemDefinition? item,bool copyName=false)
     {
         if(item is null || !ImGui.BeginPopupContextItem(id))return;
         try
         {
             ImGui.TextColored(Accent,item.Name);
+            // X-455 E4 (0.1617): from an item link of the chat window, its name copied.
+            if(copyName && ImGui.Selectable(localization.Get("ChatWindow.CopyItem")+$"##CopyItem{item.Id}"))ImGui.SetClipboardText(item.Name);
             foreach(var route in RelevantRoutes(item.Id))
                 if(ImGui.Selectable(RouteTitle(route,item.Id)+$"##Route{route}")){SelectItem(item.Id);OpenRoute(route,item.Id);IsOpen=true;}
             // 0.310 (user request): the game's Try On window, for every piece of equipment shown by Tensho.

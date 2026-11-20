@@ -592,6 +592,9 @@ internal sealed partial class MainWindow
         var player=ChatTextFilter.PlayerName(said.Sender);
         if(player.Length==0)return;
         ImGui.Separator();
+        // X-455 E3 (0.1617): the player's name with their world, copied (nothing kept, R04).
+        if(ImGui.Selectable(localization.Format("ChatWindow.MenuCopyPlayer",player)))
+            ImGui.SetClipboardText(ChatCopy.Player(player,ChatSenders?.For(said.Id) is { World:>0 } source && ChatPlayers is { } players ? players.World(source.World):ChatCopy.WorldOf(said.Sender)));
         if(ImGui.Selectable(localization.Format("ChatWindow.MenuHidePlayer",player)) && ChatTextFilter.Add(options.HiddenPlayers,player,600) is { } hidden)
             SetHiddenPlayers(options,hidden);
         if(ChatTextFilter.IsPlayer(said.Sender,ChatTextFilter.Words(options.HighlightedPlayers)))
@@ -774,6 +777,16 @@ internal sealed partial class MainWindow
                 var coloured=PushChatTabColor(tab);
                 try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index);}
                 finally{if(coloured)ImGui.PopStyleColor();}
+                // X-455 E7 (0.1617): a right click on a tab: clear its messages (the other tabs keep theirs), or show them again.
+                if(ImGui.BeginPopupContextItem("###ChatTabMenu"+index))
+                {
+                    try
+                    {
+                        if(ImGui.Selectable(localization.Get("ChatWindow.ClearTab")))ClearChatTab(tab,true);
+                        if(tab.ClearedAt is not null && ImGui.Selectable(localization.Get("ChatWindow.UnclearTab")))ClearChatTab(tab,false);
+                    }
+                    finally{ImGui.EndPopup();}
+                }
                 if(!open)continue;
                 chatTabShown=index;
                 ImGui.EndTabItem();
@@ -787,6 +800,7 @@ internal sealed partial class MainWindow
     {
         if(tabs.Count==0)return;
         var shown=Math.Clamp(chatTabShown,0,tabs.Count-1);
+        chatShownTab=tabs[shown];
         // X-504 M2 (review of 0.1486): the area named after the tab's view (its own number), not the tab's place.
         var view=ChatMessages.ViewOf(tabs[shown]);
         DrawChatLines(view,options,height,view.Serial);
@@ -866,6 +880,7 @@ internal sealed partial class MainWindow
         // X-457 (0.1462): the scroll bar always kept (one width for the layout, whatever the height), and the lines' height declared from the
         // tab's rows, not measured from what the frame before drew (Chat/ChatScroll.cs).
         var rowHeight=chatLineHeight>0 ? chatLineHeight:ImGui.GetTextLineHeightWithSpacing()*options.BoundedFontScale/100f;
+        chatHoveredRecord=null;
         ImGui.SetNextWindowContentSize(new Vector2(0,ChatScroll.Content(view.RowCount,rowHeight)));
         // X-447 A4 (0.1467): the mouse wheel is read here (whole lines), not by ImGui.
         // X-505 (0.1488): a thin, discreet scroll bar, as the game's (its size and colours are taken when the area begins).
@@ -959,12 +974,19 @@ internal sealed partial class MainWindow
             // X-457 (0.1460): developer mode: a window that jumps says how in the log (layouts, rows, scroll limit, « at the bottom »).
             if(developerMode && chatScrollWatch.Frame(new(ImGui.GetTime(),width,view.RowCount,scroll,ImGui.GetScrollMaxY(),atBottom,relaid)) is { } jumps)
                 log.Information(jumps);
+            DrawChatCopyKeys(view,options);
             // X-403 phase 2 (0.1441): the place menu of a map link, opened by a right click on it (the same entries as Tensho's other place menus).
             if(chatWindowPlace is { } place)
             {
                 if(ImGui.BeginPopup("###TenshoChatWindowPlace"))
                 {
-                    try{MenuHeader(localization.Get("ChatLinks.MenuTitle"));PlaceEntries(place.Map,place.Coordinate,null,place.Place);}
+                    try
+                    {
+                        MenuHeader(localization.Get("ChatLinks.MenuTitle"));
+                        // X-455 E4 (0.1617): the place with its coordinates, copied.
+                        if(ImGui.Selectable(localization.Get("ChatWindow.CopyPlace")))ImGui.SetClipboardText(place.Place);
+                        PlaceEntries(place.Map,place.Coordinate,null,place.Place);
+                    }
                     finally{ImGui.EndPopup();}
                 }
                 else chatWindowPlace=null;
@@ -1003,15 +1025,49 @@ internal sealed partial class MainWindow
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyLine")))ImGui.SetClipboardText(ChatFormat.Plain(said,options,ChatChannelShort,ChatLinkName));
                         if(ImGui.Selectable(localization.Get("ChatWindow.CopyTab")))
                             ImGui.SetClipboardText(ChatFormat.Plain(Enumerable.Range(0,view.Count).Select(view.RecordAt),options,ChatChannelShort,ChatLinkName));
+                        if(chatShownTab is { } shownTab && ImGui.Selectable(localization.Get("ChatWindow.ClearTab")))ClearChatTab(shownTab,true);
                         DrawChatSenderMenu(options,said);
                     }
                     finally{ImGui.EndPopup();}
                 }
                 else chatWindowLine=null;
             }
+            // X-455 E4 (0.1617): the menu of a quest link, opened by a right click on it: its name copied.
+            if(chatWindowQuest is { } questName)
+            {
+                if(ImGui.BeginPopup("###TenshoChatQuest"))
+                {
+                    try{MenuHeader(questName);if(ImGui.Selectable(localization.Get("ChatWindow.CopyQuest")))ImGui.SetClipboardText(questName);}
+                    finally{ImGui.EndPopup();}
+                }
+                else chatWindowQuest=null;
+            }
         }
         finally{ImGui.EndChild();}
     }
+
+    /// <summary>
+    /// X-455 E2 (0.1617): with the chat window in front, Ctrl+A chooses the whole tab (a band over it says so; Esc or a click lets it go) and
+    /// Ctrl+C copies it, or else the message under the mouse (ChatCopy.Chosen).
+    /// </summary>
+    private void DrawChatCopyKeys(ChatTabView view,ChatSettings options)
+    {
+        if(chatWholeTab==view.Serial && (ImGui.IsKeyPressed(ImGuiKey.Escape,false) || ImGui.IsWindowHovered() && ImGui.IsMouseClicked(ImGuiMouseButton.Left)))chatWholeTab=-1;
+        if(ImGui.GetIO().KeyCtrl && ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows))
+        {
+            if(ImGui.IsKeyPressed(ImGuiKey.A,false))chatWholeTab=view.Serial;
+            if(ImGui.IsKeyPressed(ImGuiKey.C,false) && ChatCopy.Chosen(chatWholeTab==view.Serial,chatHoveredRecord,()=>Enumerable.Range(0,view.Count).Select(view.RecordAt)) is { Count:>0 } chosen)
+                ImGui.SetClipboardText(ChatFormat.Plain(chosen,options,ChatChannelShort,ChatLinkName));
+        }
+        if(chatWholeTab!=view.Serial)return;
+        var at=ImGui.GetWindowPos()+new Vector2(0,ImGui.GetScrollY());
+        var draw=ImGui.GetWindowDrawList();
+        draw.AddRectFilled(at,at+ImGui.GetWindowSize(),ImGui.GetColorU32(Selected with{W=0.18f}));
+        draw.AddText(at+new Vector2(6,4),ImGui.GetColorU32(Accent),localization.Get("ChatWindow.WholeTabChosen"));
+    }
+
+    /// <summary>X-455 E7 (0.1617): a tab cleared (its messages until now hidden in it) or shown again; saved with the chat's settings.</summary>
+    private void ClearChatTab(ChatTabSettings tab,bool clear){tab.ClearedAt=clear ? DateTimeOffset.Now:null;ChatTabChanged(tab);}
 
     /// <summary>X-447 A4 (0.1467): while reading higher up, a button at the bottom right of the lines brings the window back down; it says how
     /// many messages arrived meanwhile. X-482 (0.1472): placed before the lines are drawn (M2); « 1 new » in the singular (M4).</summary>
@@ -1087,6 +1143,8 @@ internal sealed partial class MainWindow
                     // 0.1442: a right click on a message's text: its menu (copy). X-482 M2: not under the « back to the bottom » button.
                     if(!chatLinesBlocked && ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowLine=record;ImGui.OpenPopup("###TenshoChatLine");}
                 }
+                // X-455 E2 (0.1617): the message under the mouse, for Ctrl+C.
+                if(!chatLinesBlocked && ImGui.IsItemHovered())chatHoveredRecord=record;
                 index++;
             }
             if(first)ImGui.TextUnformatted(" ");
@@ -1129,6 +1187,12 @@ internal sealed partial class MainWindow
     private (Maps.MapDefinition Map,Vector2 Coordinate,string Place)? chatWindowPlace;
     // 0.1442: the message whose menu a right click opened.
     private ChatRecord? chatWindowLine;
+    // X-455 (0.1617): the message under the mouse this frame (E2), the tab chosen whole by Ctrl+A (its view's number; -1: none), the tab shown
+    // (E7, its messages' menu) and the quest of a quest link's menu (E4).
+    private ChatRecord? chatHoveredRecord;
+    private int chatWholeTab=-1;
+    private ChatTabSettings? chatShownTab;
+    private string? chatWindowQuest;
     // 0.1460 (X-457): the scrolling of the tab shown, frame by frame, in developer mode.
     private readonly ChatScrollWatch chatScrollWatch=new();
     // 0.1453: the web address whose menu a click opened.
@@ -1214,6 +1278,7 @@ internal sealed partial class MainWindow
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             TipText(()=>localization.Format("ChatWindow.QuestLinkTip",quest.Name));
             if(ChatLinkClicked(id)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowQuest=quest.Name;ImGui.OpenPopup("###TenshoChatQuest");}
             return;
         }
         if(itemCatalog.State.Catalog?.Find(link.ItemId) is not { } item){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
@@ -1226,7 +1291,7 @@ internal sealed partial class MainWindow
             if(RelevantRoutes(item.Id) is { Count:>0 } routes)OpenRoute(routes[0],item.Id);
             IsOpen=true;
         }
-        ItemLinksMenu("##ChatItem"+id,item);
+        ItemLinksMenu("##ChatItem"+id,item,copyName:true);
     }
 
     /// <summary>X-451 (0.1456): the tooltip of a web address: the address, the site it leads to, a warning when the site's name holds letters

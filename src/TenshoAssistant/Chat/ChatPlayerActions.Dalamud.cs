@@ -75,6 +75,8 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
 
     /// <summary>The client's text of an Addon row (empty: not found).</summary>
     public string Text(uint row)=>data.GetExcelSheet<Lumina.Excel.Sheets.Addon>().GetRowOrDefault(row)?.Text.ExtractText() ?? "";
+    /// <summary>X-455 E3 (0.1617): a world's name from the client's World sheet; empty for none or an unknown one.</summary>
+    public string World(ushort id)=>id==0 ? "":data.GetExcelSheet<Lumina.Excel.Sheets.World>().GetRowOrDefault(id)?.Name.ExtractText() ?? "";
 
     /// <summary>The character of that player in range (name and home world), or null.</summary>
     public IPlayerCharacter? InRange(ChatSource source)

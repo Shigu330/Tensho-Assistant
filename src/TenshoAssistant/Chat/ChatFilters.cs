@@ -198,6 +198,7 @@ public sealed class ChatTabFilter
 
     public bool Shows(ChatRecord record)
     {
+        if(!ChatCopy.AfterClear(record,tab.ClearedAt))return false;
         if(!ByKind(record))return false;
         if(ChatTextFilter.IsPlayer(record.Sender,hidden))return false;
         return keep.Count==0 && hide.Count==0 || ChatTextFilter.Passes(ChatTextFilter.Text(record),keep,hide,tab.WordsMatchCase);
