@@ -21,13 +21,10 @@ internal sealed partial class MainWindow
     private bool chatHistoryAsk;
     private volatile int chatHistoryErased;
     /// <summary>X-484 (0.1482): the game's log filters (LogFilter sheet, client language), set by the plugin; read once, on first use.</summary>
-    internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource
-    {
-        get=>chatFilterSource;
-        // X-564 (0.1634): with the chat window open at the load, the game's log filters are read at once off the game's thread (the chat's
-        // first frame with lines read them there: a sheet and the code to read it, 20/11 18:00).
-        set{chatFilterSource=value;if(value is not null && ChatOptions.WindowOpen && !inDesktopApp)_=Task.Run(()=>ChatFilterTableNow());}
-    }
+    // X-564 (0.1634): the game's log filters read off the game's thread (its first frame with lines read them there: a sheet and the code to
+    // read it, 20/11 18:00); 0.1637: by the warm-up's thread, after the chat's code (MainWindow, chatThen), no longer on a thread of their
+    // own during the load (the chat part took 3.7 to 4.2 s with it, 2.0 to 2.9 s before).
+    internal Func<IReadOnlyList<ChatFilterRow>>? ChatFilterSource{get=>chatFilterSource;set=>chatFilterSource=value;}
     private Func<IReadOnlyList<ChatFilterRow>>? chatFilterSource;
     private ChatFilterTable? chatFilterTable;
     private bool chatFilterTried;

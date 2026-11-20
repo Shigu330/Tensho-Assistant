@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1637.0
+- Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1636. Mesures à vide du 20/11 de 18 h 05 à 18 h 16 : la partie chat prête 3,7 à 4,2 s après le chargement et les lignes dessinées dans la même image, contre 2,0 à 2,9 s de 0.1631 à 0.1633 avec autant de méthodes (587 à 735) : depuis 0.1634, les filtres du journal du jeu sont lus sur un fil à eux pendant le chargement, à côté du préchauffage. Ils sont maintenant lus sur le fil du préchauffage lui-même, juste après le code du chat et avant que la fenêtre de chat soit dite prête : sa première image les trouve lus, et rien ne tourne à côté du préchauffage. Une erreur de lecture n'arrête pas le préchauffage (la fenêtre les relit elle-même).
+- Tests : ChatThen1637Tests. Verify.ps1 (agent) : 3400/3400, 0 avertissement, 0 erreur ; DLL 0.1637.0.0. Rien à essayer en jeu.
+### English
+- Chat window after a reload (X-564), following 0.1636. Idle measures of 20/11 from 18:05 to 18:16: the chat part ready 3.7 to 4.2 s after the load and the lines drawn in the same frame, against 2.0 to 2.9 s from 0.1631 to 0.1633 with as many methods (587 to 735): since 0.1634 the game's log filters are read on a thread of their own during the load, beside the warm-up. They are now read on the warm-up's own thread, right after the chat's code and before the chat window is told ready: its first frame finds them read, and nothing runs beside the warm-up. A reading error does not stop the warm-up (the window reads them itself).
+
 ## 0.1636.0
 - Plan global, X-564 : Fenêtre de chat après un rechargement (X-564), suite de 0.1635. Mesures à vide du 20/11 à 18 h 11 : la première image avec les lignes prend 0 et 2 ms et ne compile plus rien, mais les lignes viennent 3980 et 3687 ms après le chargement (le bruit d'un chargement à l'autre est d'environ une seconde) ; la première partie du chat compte 735 méthodes, dont environ 135 membres d'égalité de tous les types rencontrés, ajoutés en 0.1633 par précaution (le journal n'en a nommé aucun). Elle ne prend plus que ceux des types de la partie chat (ses records servant de clés : liens, onglets, sources).
 - Tests : ChatFrameEquality1636Tests. Verify.ps1 (agent) : 3398/3398, 0 avertissement, 0 erreur ; DLL 0.1636.0.0. Rien à essayer en jeu.

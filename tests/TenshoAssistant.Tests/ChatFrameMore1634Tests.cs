@@ -40,7 +40,9 @@ internal static class ChatFrameMore1634Tests
         ("Chat frame more 1634: wiring: the log filters read off the game's thread when the window is open at the load, once, under a lock",()=>
         {
             var chat=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.ChatWindow.cs"));
-            Check(chat.Contains("set{chatFilterSource=value;if(value is not null && ChatOptions.WindowOpen && !inDesktopApp)_=Task.Run(()=>ChatFilterTableNow());}",StringComparison.Ordinal),"read at once, off the game's thread");
+            // 0.1637 (X-564): by the warm-up's thread before the window is told ready, no longer on a thread of its own (ChatThen1637Tests).
+            Check(File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.cs")).Contains("chatThen: () => ChatFilterTableNow(),",StringComparison.Ordinal)
+                && !chat.Contains("Task.Run(()=>ChatFilterTableNow())",StringComparison.Ordinal),"read off the game's thread, by the warm-up's");
             Check(chat.Contains("if(Volatile.Read(ref chatFilterTried))return chatFilterTable;",StringComparison.Ordinal) && chat.Contains("lock(chatFilterGate)",StringComparison.Ordinal)
                 && chat.Contains("Volatile.Write(ref chatFilterTried,true);",StringComparison.Ordinal),"once, under a lock");
         }),

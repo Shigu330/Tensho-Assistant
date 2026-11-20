@@ -133,7 +133,7 @@ public sealed class JitWarmup : IDisposable
     /// <summary>X-437 M2 (0.1428): whether the compilations are timed for the log (<see cref="Slowest"/>); none given: never.</summary>
     private readonly Func<bool>? measure;
 
-    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame)
+    private JitWarmup(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<bool>? measure,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame,Action? chatThen)
     {
         var token=cancellation.Token;
         this.measure=measure;
@@ -141,7 +141,7 @@ public sealed class JitWarmup : IDisposable
         // hypothesis (docs/evidence/0.1427-warmup-priority.md: the thread preempted in the middle of a compilation the game's thread waits on). Not proven to be the cause, and disproved
         // in 0.1432 (docs/evidence/0.1432-background-collection-stall.md): its long compilations without processor time were stops of every
         // managed thread during a background collection, the game's included; undone.
-        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,chatPart,chatFrame,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
+        thread=new Thread(()=>Run(roots,delay,finished,early,holdRest,firstPart,windowPart,chatPart,chatFrame,chatThen,token)){IsBackground=true,Priority=ThreadPriority.BelowNormal,Name="Tensho JIT warm-up"};
         thread.Start();
     }
 
@@ -160,8 +160,11 @@ public sealed class JitWarmup : IDisposable
     /// <param name="chatFrame">X-564 (D-196 a): with <paramref name="chatPart"/>, the roots of the chat window's first frame: only that frame's
     /// code (<see cref="ChatFirstFrame"/>) is compiled before <see cref="ChatDone"/>, the rest of the chat part right after. None: the whole
     /// chat part first, as before.</param>
-    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null,Func<MethodBase,bool>? chatPart=null,Func<MethodBase,bool>? chatFrame=null)
-        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure,chatPart,chatFrame);
+    /// <param name="chatThen">X-564 (0.1637): with <paramref name="chatPart"/>, what the chat window needs before its first frame, done on this
+    /// thread after its code and before <see cref="ChatDone"/> (the game's log filters read); an exception there is swallowed (the window
+    /// reads them itself).</param>
+    public static JitWarmup Start(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished=null,Func<MethodBase,bool>? early=null,Func<bool>? holdRest=null,Func<MethodBase,bool>? firstPart=null,Func<MethodBase,bool>? windowPart=null,Func<bool>? measure=null,Func<MethodBase,bool>? chatPart=null,Func<MethodBase,bool>? chatFrame=null,Action? chatThen=null)
+        =>new(roots,delay,finished,early,holdRest,firstPart,windowPart,measure,chatPart,chatFrame,chatThen);
 
     /// <summary>X-01 (0.1104): a method of the main window (or of a type nested in it: lambdas, local functions) whose name says Map.
     /// X-01 (0.1111): and every method of the map's own types (namespace <see cref="MapNamespace"/>, nested types included).
@@ -506,7 +509,7 @@ public sealed class JitWarmup : IDisposable
         return (method.Attributes&MethodAttributes.PinvokeImpl)==0;
     }
 
-    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame,CancellationToken token)
+    private void Run(Func<IReadOnlyList<Type>> roots,TimeSpan delay,Action<JitWarmup>? finished,Func<MethodBase,bool>? early,Func<bool>? holdRest,Func<MethodBase,bool>? firstPart,Func<MethodBase,bool>? windowPart,Func<MethodBase,bool>? chatPart,Func<MethodBase,bool>? chatFrame,Action? chatThen,CancellationToken token)
     {
         try
         {
@@ -535,6 +538,9 @@ public sealed class JitWarmup : IDisposable
                 var (prepared,skipped)=Compile(part,token);
                 if(token.IsCancellationRequested)return;
                 Prepared+=prepared;ChatPrepared+=prepared;Skipped+=skipped;
+                // X-564 (0.1637): then what the window reads before its first frame, on this thread (nothing beside the warm-up).
+                try{chatThen?.Invoke();}
+                catch(Exception){}
                 ChatReadyAfter=System.Diagnostics.Stopwatch.GetElapsedTime(created).TotalMilliseconds;
                 chatDone=true;
                 // Then the rest of the chat part (its settings, menus: drawn after a click), before the map's and the overlays' code.

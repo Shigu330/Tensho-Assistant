@@ -197,6 +197,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             chatPart: configuration.Chat.WindowOpen ? Diagnostics.JitWarmup.ChatFirst : null,
             // X-564 (D-196 a, 20/11): of it, the window's first frame first (its settings and menus after); the window shows its lines then.
             chatFrame: Diagnostics.JitWarmup.ChatFrameRoot,
+            // X-564 (0.1637): the game's log filters read by the warm-up's thread before the chat window is told ready.
+            chatThen: () => ChatFilterTableNow(),
             early: Diagnostics.JitWarmup.EarlyMethod);
         panelGate = new Diagnostics.PanelGate(() => jitWarmup.FirstPartDone);
     }
