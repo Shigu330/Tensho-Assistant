@@ -66,6 +66,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Settings › Panels › ChatHistory | **Days kept** — Messages older than this are removed, from 1 to 90 days. Default: 30. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Settings › Panels › ChatHistory | **Messages kept** — The last messages kept per character, from 100 to 10,000 (the combat lines and the others each); the oldest go first. Default: 2,000. |
 | `Chat.HourLeadingZero` | bool | false | Settings › Panels › ChatWindow | **Hour with a leading zero** — Writes the hour with two digits ([09:21]); otherwise as the game's chat writes it ([9:21]). Default: off. |
+| `Chat.ItemIcons` | bool | false | Settings › Panels › ChatWindow | **Item icons in the text** — Draws the item's icon before each item link, as WoW's chat addons do. The icon comes from the game's item list; nothing is kept. Default: off. |
 | `Chat.LineSpacing` | int | 0 | Settings › Panels › ChatWindow | **Space between the lines** — Pixels added between the lines of the messages, to read them more easily. Default: 0 px. |
 | `Chat.Locked` | bool | false | Settings › Panels › ChatWindow | **Lock the window** — The window can be neither moved nor resized (it keeps its place). The lock button at the end of the tabs unlocks it. Default: off. |
 | `Chat.MarginX` | int | 6 | Settings › Panels › ChatWindow | **Margins across** — Space between the window's sides and its text, from 0 to 24 pixels. Default: 6 px. |
@@ -376,7 +377,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 320 controls (303 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 321 controls (304 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -448,6 +449,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.HistoryDays` | int | ChatHistory.DefaultDays | Paramètres › Panneaux à côté du jeu › Historique du chat | **Jours gardés** — Les messages plus anciens sont retirés, de 1 à 90 jours. Par défaut : 30. |
 | `Chat.HistoryMessages` | int | ChatHistory.DefaultMessages | Paramètres › Panneaux à côté du jeu › Historique du chat | **Messages gardés** — Les derniers messages gardés par personnage, de 100 à 10 000 (les lignes de combat et les autres, chacune) ; les plus anciens partent d'abord. Par défaut : 2 000. |
 | `Chat.HourLeadingZero` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Heure avec un zéro devant** — Écrit l'heure sur deux chiffres ([09:21]) ; sinon comme le chat du jeu l'écrit ([9:21]). Par défaut : désactivé. |
+| `Chat.ItemIcons` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Icônes des objets dans le texte** — Dessine l'icône de l'objet devant chaque lien d'objet, comme les addons de chat de WoW. L'icône vient de la liste des objets du jeu ; rien n'est gardé. Par défaut : désactivé. |
 | `Chat.LineSpacing` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Espace entre les lignes** — Pixels ajoutés entre les lignes des messages, pour les lire plus facilement. Par défaut : 0 px. |
 | `Chat.Locked` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Verrouiller la fenêtre** — La fenêtre ne peut plus être déplacée ni redimensionnée (elle garde sa place). Le bouton du cadenas au bout des onglets la déverrouille. Par défaut : désactivé. |
 | `Chat.MarginX` | int | 6 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Marges en largeur** — Espace entre les côtés de la fenêtre et son texte, de 0 à 24 pixels. Par défaut : 6 px. |
@@ -758,5 +760,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 320 cases (303 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 321 cases (304 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

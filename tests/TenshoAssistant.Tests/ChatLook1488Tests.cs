@@ -97,7 +97,7 @@ internal static class ChatLook1488Tests
                   && window.Contains("ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)", StringComparison.Ordinal), "the game's tabs");
             // 0.1491 (X-510, review of 0.1490): with the game's look, a link without the game's arrow is underlined too (ChatReview1491Tests).
             Check(window.Contains("if(underline)\n        {\n            var min=ImGui.GetItemRectMin();", StringComparison.Ordinal), "underlined without the game's look, or a link without the game's arrow");
-            Check(window.Contains("ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));", StringComparison.Ordinal)
+            Check(window.Contains("ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent),ChatLook.IconWidth(ImGui.GetTextLineHeight())));", StringComparison.Ordinal)
                   && window.Contains("if(line>0 && indent>0)ImGui.SetCursorPosX(left+indent);", StringComparison.Ordinal), "laid out and drawn with the same indent");
             foreach (var key in new[] { "HourLeadingZero", "ThinScrollbar", "GameLinks", "GameTabs", "WrapIndent" })
                 Check(window.Contains($"BoolSetting(\"ChatWindow.{key}\",\"ChatWindow.{key}Tip\"", StringComparison.Ordinal), key + ": a setting");

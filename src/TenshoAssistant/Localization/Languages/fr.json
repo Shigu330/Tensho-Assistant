@@ -6343,6 +6343,8 @@
     "ThinScrollbarTip": "Une barre de défilement fine et discrète, comme dans le chat du jeu, au lieu de la barre large du thème.\nPar défaut : activé.",
     "GameLinks": "Liens comme dans le jeu",
     "GameLinksTip": "Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent.\nPar défaut : activé.",
+    "ItemIcons": "Icônes des objets dans le texte",
+    "ItemIconsTip": "Dessine l'icône de l'objet devant chaque lien d'objet, comme les addons de chat de WoW. L'icône vient de la liste des objets du jeu ; rien n'est gardé.\nPar défaut : désactivé.",
     "GameTabs": "Onglets comme dans le jeu",
     "GameTabsTip": "Des onglets gris arrondis, celui qui est affiché marqué d'un point, comme dans le chat du jeu.\nPar défaut : activé.",
     "WrapIndent": "Retrait des lignes repliées",

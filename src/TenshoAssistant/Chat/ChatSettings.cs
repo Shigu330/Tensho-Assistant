@@ -160,6 +160,9 @@ public sealed class ChatSettings
     /// 0.1627): the stand-in is made with a secret drawn at each start (a guessed name cannot be checked against it); the names' colours and
     /// the message menu follow it.</summary>
     public bool CaptureNames{get;set;}
+    /// <summary>X-447 B14 (0.1641, the user's choice of 15/11, after Prat): an item link's icon before its name, the icon of Tensho's item list
+    /// (the game's Item sheet); drawn only, nothing is kept. Off by default: the game's own chat draws none.</summary>
+    public bool ItemIcons{get;set;}
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);

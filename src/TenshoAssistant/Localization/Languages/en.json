@@ -6343,6 +6343,8 @@
     "ThinScrollbarTip": "A thin, discreet scroll bar, as the game's chat, instead of the theme's wide one.\nDefault: on.",
     "GameLinks": "Links as in the game",
     "GameLinksTip": "Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour.\nDefault: on.",
+    "ItemIcons": "Item icons in the text",
+    "ItemIconsTip": "Draws the item's icon before each item link, as WoW's chat addons do. The icon comes from the game's item list; nothing is kept.\nDefault: off.",
     "GameTabs": "Tabs as in the game",
     "GameTabsTip": "Rounded grey tabs, the one shown marked by a dot, as the game's chat.\nDefault: on.",
     "WrapIndent": "Indent wrapped lines",

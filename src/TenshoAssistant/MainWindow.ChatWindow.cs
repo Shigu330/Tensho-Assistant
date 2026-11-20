@@ -298,6 +298,8 @@ internal sealed partial class MainWindow
         // X-505 (0.1488): the rest of the game's look, each its own setting.
         BoolSetting("ChatWindow.ThinScrollbar","ChatWindow.ThinScrollbarTip",()=>configuration.Chat.ThinScrollbar,value=>configuration.Chat.ThinScrollbar=value,c=>c.Chat.ThinScrollbar);
         BoolSetting("ChatWindow.GameLinks","ChatWindow.GameLinksTip",()=>configuration.Chat.GameLinks,value=>configuration.Chat.GameLinks=value,c=>c.Chat.GameLinks);
+        // X-447 B14 (0.1641): an item's icon before its link.
+        BoolSetting("ChatWindow.ItemIcons","ChatWindow.ItemIconsTip",()=>configuration.Chat.ItemIcons,value=>configuration.Chat.ItemIcons=value,c=>c.Chat.ItemIcons);
         BoolSetting("ChatWindow.GameTabs","ChatWindow.GameTabsTip",()=>configuration.Chat.GameTabs,value=>configuration.Chat.GameTabs=value,c=>c.Chat.GameTabs);
         BoolSetting("ChatWindow.WrapIndent","ChatWindow.WrapIndentTip",()=>configuration.Chat.WrapIndent,value=>configuration.Chat.WrapIndent=value,c=>c.Chat.WrapIndent);
         // X-447 D4 to D7 (0.1618, the user's choices of 15/11): the window's own settings.
@@ -1342,9 +1344,12 @@ internal sealed partial class MainWindow
     // X-556 M3 (review of 0.1520): a folded message is laid out narrower by its « ×n », so the count never runs past the window's edge
     // (ChatTabView lays it out again when the count grows).
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
-        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName),
+        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName,ChatLinkIcon),
             ChatLook.WidthBeside(view.Width,view.RepeatsAt(index)>0 ? ImGui.CalcTextSize(localization.Format("ChatWindow.Repeats",view.RepeatsAt(index)+1)).X:0),
-            text=>ImGui.CalcTextSize(text).X,ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent)));
+            text=>ImGui.CalcTextSize(text).X,ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent),ChatLook.IconWidth(ImGui.GetTextLineHeight())));
+
+    /// <summary>X-447 B14 (0.1641): the icon of an item link's item, from Tensho's item list (0: not loaded, or not an item).</summary>
+    private uint ChatLinkIcon(ChatLink link)=>link.Kind==ChatSegmentKind.ItemLink ? itemCatalog.State.Catalog?.Find(link.ItemId)?.IconId ?? 0:0;
 
     /// <summary>X-461 (0.1463): the name of what a link without text of its own points to: an item (Tensho's item list), a quest, a place; else
     /// a word for a link (never empty: the link keeps its place in the message).</summary>
@@ -1382,7 +1387,15 @@ internal sealed partial class MainWindow
             {
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
-                if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}",record);
+                // X-447 B14 (0.1641): an item's icon, a square as high as the line, then its gap.
+                if(run.Role==ChatRole.ItemIcon && run.Link is { } item)
+                {
+                    var side=ImGui.GetTextLineHeight();
+                    DrawGameIcon(ChatLinkIcon(item),new Vector2(side,side));
+                    ImGui.SameLine(0,0);
+                    ImGui.Dummy(new Vector2(ChatLook.IconWidth(side)-side,side));
+                }
+                else if(run.Link is { } link && ChatLinkActive(link))DrawChatLink(run,link,$"{record.Id}_{line}_{index}",record);
                 else
                 {
                     if(options.TextOutline)ChatOutline(run.Text);

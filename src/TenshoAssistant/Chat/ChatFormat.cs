@@ -4,7 +4,8 @@ using System.Text;
 namespace TenshoAssistant.Chat;
 
 /// <remarks>X-505 (0.1488): LinkMark, the game's arrow before a link (part of the link: a click on it opens it).</remarks>
-public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark }
+/// <remarks>X-447 B14 (0.1641): ItemIcon, an item link's icon before it (no text: a block as wide as the line is high, ChatFormat.Wrap).</remarks>
+public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark,ItemIcon }
 /// <param name="Link">X-403 phase 2 (0.1441): what the run's text links to (role Link); null otherwise.</param>
 /// <param name="Underlined">X-510 (review of 0.1490): with the game's look, a link that has no arrow of the game (a web address found by Tensho,
 /// a link named by Tensho, a link of Dalamud without arrow): drawn underlined in the accent colour, as every link before 0.1488, so that it is
@@ -55,7 +56,7 @@ public static class ChatFormat
     /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
     /// for good; it is laid out again once they are.</summary>
     public static string LayoutKey(ChatSettings settings,string names="")
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}{settings.CaptureNames}|{ChannelNamesKey(settings)}|{names}";
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}{settings.CaptureNames}{settings.ItemIcons}|{ChannelNamesKey(settings)}|{names}";
 
     /// <summary>X-447 B4 (0.1621): the channels' short names chosen, in the layout's key (a name changed lays the lines out again).</summary>
     public static string ChannelNamesKey(ChatSettings settings)
@@ -123,7 +124,9 @@ public static class ChatFormat
 
     /// <param name="shortName">The channel's short name; empty for none.</param>
     /// <param name="linkName">X-461 (0.1463): the name of what a link without visible text points to (an item, a quest, a place); null or empty: « … ».</param>
-    public static IReadOnlyList<ChatRun> Runs(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
+    /// <param name="linkIcon">X-447 B14 (0.1641): the icon of an item link's item (0: none known); with <see cref="ChatSettings.ItemIcons"/>, an
+    /// <see cref="ChatRole.ItemIcon"/> run before the link's first piece. Null (the copy): no icon.</param>
+    public static IReadOnlyList<ChatRun> Runs(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null,Func<ChatLink,uint>? linkIcon=null)
     {
         var runs=new List<ChatRun>(5);
         // X-476 (0.1481): in brackets, as the game's chat ([22:47]).
@@ -148,8 +151,13 @@ public static class ChatFormat
             var named=spoken ? Sender(sender,settings):sender;
             runs.Add(new(record.Channel switch{ChatChannel.TellOut=>$">> {named}: ",ChatChannel.TellIn=>$"{named} >> ",_=>$"{named}: "},ChatRole.Sender));
         }
+        ChatLink? iconed=null;
         foreach(var segment in record.Body)
         {
+            // X-447 B14 (0.1641): an item link's icon, once before its first piece (a link in several pieces gets one).
+            if(segment.Link is not { } current || !Equals(current,iconed))iconed=null;
+            if(settings.ItemIcons && iconed is null && segment.Link is { Kind:ChatSegmentKind.ItemLink } item && (linkIcon?.Invoke(item) ?? 0)>0)
+            {runs.Add(new("",ChatRole.ItemIcon,item));iconed=item;}
             // X-461 (0.1463): a link with no text of its own (ChatPieces keeps its place empty): the name of what it points to.
             if(segment.Text.Length==0 && segment.Link is { } named)
             {
@@ -178,7 +186,8 @@ public static class ChatFormat
 
     /// <summary>The lines of a message for a width. Breaks between words; a word wider than the line is cut. Runs of one role (and one link) are joined on a line, to draw as little as possible.</summary>
     /// <param name="indent">X-505 (0.1488): how far the lines after the first are indented (they are that much narrower), as the game's chat.</param>
-    public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure,float indent=0)
+    /// <param name="icon">X-447 B14 (0.1641): the width of an item's icon (<see cref="ChatRole.ItemIcon"/>): one block, never cut.</param>
+    public static IReadOnlyList<IReadOnlyList<ChatRun>> Wrap(IEnumerable<ChatRun> runs,float width,Func<string,float> measure,float indent=0,float icon=0)
     {
         var lines=new List<IReadOnlyList<ChatRun>>();
         var line=new List<ChatRun>();
@@ -193,6 +202,13 @@ public static class ChatFormat
             used+=size;
         }
         foreach(var run in runs)
+        {
+            if(run.Role==ChatRole.ItemIcon)
+            {
+                if(used>0 && used+icon>width)Flush();
+                line.Add(run);used+=icon;
+                continue;
+            }
             foreach(var (token,newLine) in Tokens(run.Text))
             {
                 if(newLine){Flush();continue;}
@@ -208,6 +224,7 @@ public static class ChatFormat
                 }
                 if(part.Length>0)Add(part.ToString(),run,measure(part.ToString()));
             }
+        }
         if(line.Count>0 || lines.Count==0)lines.Add(line);
         return lines;
     }

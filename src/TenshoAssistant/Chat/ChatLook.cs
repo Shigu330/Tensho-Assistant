@@ -66,6 +66,9 @@ public static class ChatLook
         return (alpha ?? 1f)*left;
     }
 
+    /// <summary>X-447 B14 (0.1641): the room an item's icon takes before its link: a square as high as the line, and a gap of a sixth of it.</summary>
+    public static float IconWidth(float lineHeight)=>lineHeight+MathF.Round(lineHeight/6f);
+
     /// <summary>X-447 D6 (0.1618): whether the mouse is on the window drawn last at <paramref name="at"/> with <paramref name="size"/>.</summary>
     public static bool Under((float X,float Y) mouse,(float X,float Y) at,(float X,float Y) size)
         =>mouse.X>=at.X && mouse.Y>=at.Y && mouse.X<at.X+size.X && mouse.Y<at.Y+size.Y;
