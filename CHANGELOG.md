@@ -12,6 +12,12 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1594.0
+- Plan global, X-649 : Inventaire d'exemple du tri (application de bureau) : la recherche de case libre est bornée aux 35 cases d'un sac et échoue avec un message clair au-delà, au lieu de tourner sans fin (X-649, R07). Le test de l'ordre de remplissage trie vraiment l'exemple par InventorySortRules.Build et compte les piles placées dans chaque sac (X-648).
+- Tests : SortTrial1594Tests. Verify.ps1 (agent) : 3265/3265, 0 avertissement, 0 erreur ; DLL 0.1594.0.0. Rien à essayer en jeu.
+### English
+- Sample inventory of the sort (desktop application): the free-slot search is bounded to a bag's 35 slots and fails with a clear message beyond them, instead of looping (X-649, R07). The fill-order test really sorts the sample with InventorySortRules.Build and counts the stacks placed in each bag (X-648).
+
 ## 0.1593.0
 - Plan global, X-647 : Relecture de 0.1592 (X-647, constat mineur M1 sur X-394) : l'inventaire d'exemple de l'image « SortPreview-trial » passe de 30 à 75 piles, plus que deux sacs ; après le tri, Sac 1 et Sac 3 sont pleins et Sac 2 reçoit le reste : l'ordre de remplissage (1, 3, 2, 4) se voit aux piles, plus seulement aux titres. Dans l'application de bureau, l'aperçu d'exemple défile jusqu'au pied des cadres : les quatre sacs sont entiers en 1280x860. SortTrial1593Tests vérifie le débordement, l'ordre et le défilement.
 - Tests : SortTrial1593Tests. Verify.ps1 (agent) : 3262/3262, 0 avertissement, 0 erreur ; DLL 0.1593.0.0. Rien à essayer en jeu.

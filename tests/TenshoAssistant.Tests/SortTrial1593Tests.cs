@@ -17,10 +17,14 @@ internal static class SortTrial1593Tests
             Check(containers.All(container=>container.Stacks.Count()<=scope.SlotsPerContainer),"each bag holds what it can");
             var count=containers.Sum(container=>container.Stacks.Count());
             Check(count==InventorySortTrial.Stacks && count>2*scope.SlotsPerContainer && count<3*scope.SlotsPerContainer,"more than two bags, less than three");
-            var fill=InventorySortRules.FillOrder(scope);
-            var used=fill.Take(count).Select(slot=>slot/scope.SlotsPerContainer).Distinct().ToArray();
-            Check(used.SequenceEqual([0,2,1]),"filled 1, 3, then 2");
-            Check(fill.Take(count).Count(slot=>slot/scope.SlotsPerContainer==1)==count-2*scope.SlotsPerContainer,"bag 2 holds the rest");
+            // X-648 (review of 0.1593): the sample really sorted by the rules the preview uses, then the placed stacks counted per bag.
+            var sorted=InventorySortRules.Build(containers,scope,InventorySortRules.Default(scope),id=>("Item "+id.ToString("D4"),1u));
+            Check(sorted.Slots is { } slots && slots.Count==4*scope.SlotsPerContainer,"one entry per position");
+            var per=Enumerable.Range(0,4).Select(bag=>Enumerable.Range(bag*scope.SlotsPerContainer,scope.SlotsPerContainer).Count(slot=>sorted.Slots![slot] is not null)).ToArray();
+            Check(per[0]==scope.SlotsPerContainer && per[2]==scope.SlotsPerContainer,"bags 1 and 3 full: "+string.Join(",",per));
+            Check(per[1]==count-2*scope.SlotsPerContainer && per[3]==0,"bag 2 holds the rest, bag 4 empty: "+string.Join(",",per));
+            Check(Enumerable.Range(scope.SlotsPerContainer,per[1]).All(slot=>sorted.Slots![slot] is not null),"bag 2 filled from its first slot");
+            Check(sorted.Stacks.Count==count,"every stack placed once");
         }),
         ("Sort trial 1593: wiring: the trial picture scrolled to the frames' foot, after the frames",() =>
         {
