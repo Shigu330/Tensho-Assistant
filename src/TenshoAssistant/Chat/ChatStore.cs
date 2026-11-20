@@ -33,6 +33,9 @@ public sealed class ChatStore
     private long clears;
     private int combat;
     public long Clears{get{lock(gate)return clears;}}
+    /// <summary>X-447 B10 (0.1654): how many times messages were put back from the history (<see cref="Restore"/>: every line numbered again).</summary>
+    public long Restores{get{lock(gate)return restores;}}
+    private long restores;
     private string? ownName;
     /// <summary>X-447 B7 (0.1646): your character's name, as the reader last saw it (the tabs alert on your first name with the setting on); null
     /// before any message. Your own name: not another player's data.</summary>
@@ -188,6 +191,7 @@ public sealed class ChatStore
             }
             var back=older.Where(record=>record.Time<first || record.Time==first && !Held(held,record)).ToList();
             if(back.Count==0)return 0;
+            restores++;
             var all=new List<ChatRecord>(back.Count+records.Count);
             all.AddRange(back);all.AddRange(records);
             records.Clear();combat=0;

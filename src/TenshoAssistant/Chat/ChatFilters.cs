@@ -263,6 +263,8 @@ public sealed class ChatTabFilter
     public bool Shows(ChatRecord record)
     {
         if(!ChatCopy.AfterClear(record,tab.ClearedAt))return false;
+        // X-447 B10 (0.1654): a conversation's tab shows only the tells with its player, both ways.
+        if(tab.Conversation is { } partner && !ChatConversations.With(record,partner))return false;
         if(!ByKind(record))return false;
         if(ChatTextFilter.IsPlayer(record.Sender,hidden))return false;
         return keep.Count==0 && hide.Count==0 || ChatTextFilter.Passes(ChatTextFilter.Text(record),keep,hide,tab.WordsMatchCase);

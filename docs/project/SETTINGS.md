@@ -55,6 +55,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.BothChats` | bool | false | Settings › Panels › ChatWindow | **Show both chats** — Shows the game's messages again and puts this window back where it was, to compare both chats; the button with two windows at the end of the tabs switches too. Default: off. |
 | `Chat.CaptureNames` | bool | false | Settings › Panels › ChatWindow | **Capture mode: hide the players' names** — For screenshots: each player's name before their messages, and in the menu of a message, is replaced by a stand-in such as #A3F27, the same for the same player until the game or Tensho starts again. It is made with a secret drawn at each start and never saved: the name cannot be read from it nor a guessed name checked against it, and pictures from two starts cannot be matched. The names' own colours follow it. The messages' own text is not changed: look at it before sharing a picture. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels › ChatWindow | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
+| `Chat.Conversations` | bool | false | Settings › Panels › ChatPlayers | **Private conversations** — Each player you exchange tells with gets a tab of their own, opened by the first tell (received or sent) or from a player's menu (right click on their message); right click on the tab to close it. At most 6: the least recent one with nothing not seen leaves its place. In memory only: nothing is saved, the tabs leave at a logout; the tells stay in the other tabs. Default: off. |
 | `Chat.FadeAfter` | int | 0 | Settings › Panels › ChatWindow | **Fade out after (seconds without message)** — The whole window fades out when no new message came in the tab shown for that long, and the clicks then go through to the game; the mouse on it, an open menu of the chat or a new message brings it back. 0: never. Default: 0 s. |
 | `Chat.FontScale` | int | 100 | Settings › Panels › ChatWindow | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
 | `Chat.GameLinks` | bool | true | Settings › Panels › ChatWindow | **Links as in the game** — Draws the links as the game's chat: its orange arrow before them, their text in the message's colour, not underlined. Otherwise they are underlined in the accent colour. Default: on. |
@@ -381,7 +382,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 325 controls (308 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 326 controls (309 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -442,6 +443,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.BothChats` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les deux chats** — Affiche de nouveau les messages du jeu et remet cette fenêtre à sa place, pour comparer les deux chats ; le bouton aux deux fenêtres au bout des onglets bascule aussi. Par défaut : désactivé. |
 | `Chat.CaptureNames` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Mode capture : masquer les noms des joueurs** — Pour les captures d'écran : le nom de chaque joueur avant ses messages, et dans le menu d'un message, est remplacé par un code comme #A3F27, le même pour le même joueur jusqu'au prochain démarrage du jeu ou de Tensho. Il est fait avec un secret tiré à chaque démarrage et jamais enregistré : le nom ne peut ni s'y lire ni s'y vérifier, et deux images de deux démarrages ne se relient pas. La couleur propre des noms le suit. Le texte des messages lui-même n'est pas changé : relisez-le avant de partager une image. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
+| `Chat.Conversations` | bool | false | Paramètres › Panneaux à côté du jeu › Joueurs du chat | **Conversations privées** — Chaque joueur avec qui vous échangez des murmures a son propre onglet, ouvert au premier murmure (reçu ou envoyé) ou depuis le menu d'un joueur (clic droit sur son message) ; clic droit sur l'onglet pour le fermer. Au plus 6 : le moins récent sans rien de pas vu laisse sa place. En mémoire seulement : rien n'est enregistré, les onglets partent à la déconnexion ; les murmures restent dans les autres onglets. Par défaut : désactivé. |
 | `Chat.FadeAfter` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **S'effacer après (secondes sans message)** — Toute la fenêtre s'efface quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, et les clics passent alors au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir. 0 : jamais. Par défaut : 0 s. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
 | `Chat.GameLinks` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Liens comme dans le jeu** — Dessine les liens comme le chat du jeu : sa flèche orange devant, le texte dans la couleur du message, sans soulignement. Sinon, ils sont soulignés dans la couleur d'accent. Par défaut : activé. |
@@ -768,5 +770,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 325 cases (308 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 326 cases (309 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->

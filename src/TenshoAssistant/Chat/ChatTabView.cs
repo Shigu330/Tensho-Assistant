@@ -32,6 +32,8 @@ public sealed class ChatTabView
     private bool rowsDirty;
     private long lastId;
     private bool started;
+    // X-447 B10 (0.1654): from this number on, the messages count even at the view's first refresh (0: none).
+    private long countFrom;
     private int layoutCursor=-1;
     public int Unread{get;private set;}
     /// <summary>X-484 (0.1520): the messages holding an alert word not seen yet (cleared with <see cref="Unread"/>).</summary>
@@ -78,8 +80,9 @@ public sealed class ChatTabView
         started=true;
         void Count(ChatRecord record)
         {
-            if(started && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
-            if(started && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName)){Alerts++;alertIds.Add(record.Id);}
+            var counted=started || countFrom>0 && record.Id>=countFrom;
+            if(counted && ChatChannels.CountsAsUnread(record.Channel) && !ChatAlert.Sent(record))Unread++;
+            if(counted && ChatAlert.Holds(record,alerts??=ChatTextFilter.Words(settings?.AlertWords),alertName)){Alerts++;alertIds.Add(record.Id);}
         }
         var excess=records.Count-ChatStore.Bounded(cap);
         if(excess>0)
@@ -89,6 +92,10 @@ public sealed class ChatTabView
         }
         return changed;
     }
+
+    /// <summary>X-447 B10 (0.1654): before the view's first refresh, the messages numbered <paramref name="id"/> and after count as new (the tell
+    /// that opened a conversation's tab is not seen yet); the older ones are taken as read, as in any new view. After it: nothing changes.</summary>
+    public void CountFrom(long id){if(!started)countFrom=id;}
 
     /// <summary>The tab is shown at its bottom: nothing unread any more.</summary>
     public void MarkSeen(){Unread=0;Alerts=0;alertIds.Clear();}

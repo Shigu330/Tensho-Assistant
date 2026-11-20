@@ -512,6 +512,38 @@ internal sealed partial class MainWindow
     private List<ChatTabSettings> ChatTabs(ChatSettings options)=>options.EnsureTabs(localization.Get("ChatWindow.TabAll"),localization.Get("ChatWindow.TabBattle"),
         localization.Get("ChatWindow.TabEvent"),localization.Get("ChatWindow.TabSocial"));
 
+    // X-447 B10 (0.1654): the conversations' tabs (memory only, never in the settings' tabs: R04), and the window's tabs: the settings' ones,
+    // then the conversations' (one list kept, filled again at each frame). A conversation opened from a player's menu, shown at the next frame.
+    private readonly ChatConversations chatConversations=new();
+    private readonly List<ChatTabSettings> chatWindowTabs=[];
+    private ChatTabSettings? chatSelectTab;
+
+    private List<ChatTabSettings> ChatWindowTabs(ChatSettings options)
+    {
+        chatWindowTabs.Clear();
+        chatWindowTabs.AddRange(ChatTabs(options));
+        if(options.Conversations)chatWindowTabs.AddRange(chatConversations.Tabs);
+        return chatWindowTabs;
+    }
+
+    /// <summary>X-447 B10 (0.1654): a conversation's tab never replaced while shown or holding something not seen.</summary>
+    private bool ChatConversationBusy(ChatTabSettings tab)=>ReferenceEquals(tab,chatShownTab) || ChatMessages.ViewOf(tab) is { Unread:>0 } or { Alerts:>0 };
+
+    /// <summary>X-447 B10 (0.1654): a conversation closed: its view and its pins dropped (nothing of it left).</summary>
+    private void ChatConversationClosed(ChatTabSettings tab){ChatMessages.Restart(tab);ChatMessages.Unpin(tab);}
+
+    /// <summary>X-447 B10 (0.1654): the conversations follow the tells kept (a tab for each new player); turned off, they all close.</summary>
+    private void UpdateChatConversations(ChatSettings options)
+    {
+        if(!options.Conversations)
+        {
+            if(chatConversations.Tabs.Count>0)chatConversations.Clear(ChatConversationClosed);
+            return;
+        }
+        foreach(var (opened,from) in chatConversations.Update(ChatMessages,ChatConversationBusy,options.HiddenPlayers,options.ColorOf(ChatChannel.TellIn),ChatConversationClosed))
+            ChatMessages.ViewOf(opened).CountFrom(from);
+    }
+
     private void DrawChatTabSettings(ChatSettings options)
     {
         var tabs=ChatTabs(options);
@@ -725,6 +757,8 @@ internal sealed partial class MainWindow
         Tip("Advanced.TryTip");
         // X-447 B7 (0.1647, after WIM): the alerts not seen counted in the game's server bar.
         BoolSetting("ChatWindow.ServerBarAlerts","ChatWindow.ServerBarAlertsTip",()=>configuration.Chat.ServerBarAlerts,value=>configuration.Chat.ServerBarAlerts=value,c=>c.Chat.ServerBarAlerts);
+        // X-447 B10 (0.1654, after WIM): each player's tells in a tab of their own (memory only).
+        BoolSetting("ChatWindow.Conversations","ChatWindow.ConversationsTip",()=>configuration.Chat.Conversations,value=>configuration.Chat.Conversations=value,c=>c.Chat.Conversations);
     }
 
     private void SetHiddenPlayers(ChatSettings options,string value)
@@ -736,6 +770,7 @@ internal sealed partial class MainWindow
     private void RestartChatTabs(ChatSettings options)
     {
         foreach(var tab in ChatTabs(options))ChatMessages.Restart(tab);
+        foreach(var tab in chatConversations.Tabs)ChatMessages.Restart(tab);
         chatSettingsPending=true;
     }
 
@@ -761,8 +796,16 @@ internal sealed partial class MainWindow
         {
             options.HighlightedPlayers=forward;chatSettingsPending=true;
         }
+        // X-447 B10 (0.1654): the conversation with this player, opened (or the one open) and shown; a player's own lines open none.
+        if(options.Conversations && ChatSpoken(said) && ImGui.Selectable(localization.Format("ChatWindow.MenuConversation",shown))
+            && chatConversations.Open(said.Sender,DateTimeOffset.Now,ChatConversationBusy,options.ColorOf(ChatChannel.TellIn),ChatConversationClosed) is { } conversation)
+            chatSelectTab=conversation;
         DrawChatPlayerGameEntries(said);
     }
+
+    /// <summary>X-447 B10 (0.1654): a message a player said (a spoken channel), not one of yours (no conversation with yourself).</summary>
+    private static bool ChatSpoken(ChatRecord said)=>ChatChannels.Spoken(said.Channel) && said.Channel!=ChatChannel.TellOut && !ChatAlert.Sent(said)
+        || said.Channel==ChatChannel.TellOut;
 
     /// <summary>X-669 M2 (review of 0.1627): the player's name as a message's menu writes it: their stand-in in capture mode.</summary>
     private static string ChatMenuName(string player,ChatSettings options)=>ChatCopy.MenuName(player,options.CaptureNames);
@@ -981,7 +1024,8 @@ internal sealed partial class MainWindow
     private void DrawChatWindowLines()
     {
         var options=ChatOptions;
-        var tabs=ChatTabs(options);
+        UpdateChatConversations(options);
+        var tabs=ChatWindowTabs(options);
         var table=ChatFilterTableNow();
         // X-558 (0.1532): the tabs' new lines, measured apart in developer mode (the « Slow frame » line).
         var refreshStarted=System.Diagnostics.Stopwatch.GetTimestamp();
@@ -1031,6 +1075,13 @@ internal sealed partial class MainWindow
                 alertTab=ChatAlert.FirstWithAlert(tabs.Select(ChatMessages.ViewOf));
                 chatTabShown=ChatAlert.ShownAfterClick(chatTabShown,alertTab,options.HideTabs);
             }
+            // X-447 B10 (0.1654): a conversation opened from a player's menu is shown, as the tab of a clicked alert.
+            if(chatSelectTab is { } wanted)
+            {
+                chatSelectTab=null;
+                alertTab=tabs.IndexOf(wanted);
+                chatTabShown=ChatAlert.ShownAfterClick(chatTabShown,alertTab,options.HideTabs);
+            }
             // X-447 D4 (0.1618): the tabs' names hidden, the tab shown kept; the buttons at the end stay (one shows the tabs again).
             for(var index=0;index<tabs.Count && !options.HideTabs;index++)
             {
@@ -1041,7 +1092,7 @@ internal sealed partial class MainWindow
                 // X-447 B7 (0.1643): a tab not shown holding an alert not seen blinks: lit in the accent colour every other half second.
                 var blink=options.BlinkAlerts && view.Alerts>0 && index!=chatTabShown && ChatLook.Blink(ImGui.GetTime());
                 if(blink)ImGui.PushStyleColor(ImGuiCol.Tab,Accent with{W=0.75f});
-                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(tab.Name,tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index,index==alertTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);}
+                try{open=ImGui.BeginTabItem(ChatLook.TabLabel(ChatAlert.Mark(ChatFormat.TabLabel(ChatConversations.Label(tab,options.CaptureNames),tab.ShowUnread,view.Unread),view.Alerts),index==chatTabShown,options.GameTabs)+"###ChatTab"+index,index==alertTab ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None);}
                 finally{if(coloured)ImGui.PopStyleColor();if(blink)ImGui.PopStyleColor();}
                 // X-455 E7 (0.1617): a right click on a tab: clear its messages (the other tabs keep theirs), or show them again.
                 if(ImGui.BeginPopupContextItem("###ChatTabMenu"+index))
@@ -1050,6 +1101,9 @@ internal sealed partial class MainWindow
                     {
                         if(ImGui.Selectable(localization.Get("ChatWindow.ClearTab")))ClearChatTab(tab,true);
                         if(tab.ClearedAt is not null && ImGui.Selectable(localization.Get("ChatWindow.UnclearTab")))ClearChatTab(tab,false);
+                        // X-447 B10 (0.1654): a conversation's tab closed (its messages stay in the other tabs).
+                        if(tab.Conversation is not null && ImGui.Selectable(localization.Get("ChatWindow.CloseConversation")) && chatConversations.Close(tab))
+                            ChatConversationClosed(tab);
                     }
                     finally{ImGui.EndPopup();}
                 }

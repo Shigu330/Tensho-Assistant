@@ -27,6 +27,9 @@ public sealed class ChatTabSettings
     public int? FontScale{get;set;}
     public int ScaleIn(ChatSettings window)=>FontScale is { } own ? Math.Clamp(own,60,200):window.BoundedFontScale;
     public bool Shows(ChatChannel channel)=>Channels?.Contains(channel)==true;
+    /// <summary>X-447 B10 (0.1654): a conversation's tab: the player whose tells it shows (ChatConversations); null for the tabs of the settings.
+    /// Such a tab lives in memory only: it is never in <see cref="ChatSettings.Tabs"/>, never saved (R04).</summary>
+    public string? Conversation{get;set;}
 }
 
 /// <summary>
@@ -107,6 +110,9 @@ public sealed class ChatSettings
     /// <summary>X-447 B7 (0.1647, after WIM): the messages with an alert not seen yet counted in the game's server bar while the window is on; a
     /// click shows the first tab holding one. Off by default.</summary>
     public bool ServerBarAlerts{get;set;}
+    /// <summary>X-447 B10 (0.1654, the user's choice of 15/11, after WIM): each player's tells in a tab of their own, opened by the first tell and
+    /// closed by the player; in memory only (ChatConversations). Off by default.</summary>
+    public bool Conversations{get;set;}
     /// <summary>X-447 B7 (0.1646): the sound of <paramref name="channel"/>'s messages, 0 for none (or a number out of 1 to 16).</summary>
     public int SoundOf(ChatChannel channel)=>Sounds is { } sounds && sounds.TryGetValue(channel,out var sound) && Alarms.MacroSound.Valid(sound) ? sound:0;
     /// <summary>X-476 (0.1481): the tabs under the messages instead of over them. X-505 (0.1488, the user's answer to X-476): under them by
