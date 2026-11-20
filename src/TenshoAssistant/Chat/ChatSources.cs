@@ -3,24 +3,37 @@ namespace TenshoAssistant.Chat;
 /// <summary>X-654 (0.1602): who sent a message of the Tensho chat window: name and world from the message, the game's identifiers from its log (0: not known).</summary>
 public sealed record ChatSource(string Name,ushort World,ulong ContentId=0,ulong AccountId=0);
 
+/// <summary>X-660 (0.1603): a line of the game's own log, read at the index the game gives with a message's identifiers: its kind and the name
+/// and home world of its sender's player link (empty name: none).</summary>
+public readonly record struct ChatLogLine(ushort Kind,string Name,ushort World);
+
+/// <summary>X-660 (0.1603): what became of the identifiers the game gave (said in the log, never with a name).</summary>
+public enum ChatSourceMatch : byte { Given, NotWaiting, NoIdentifiers, Own, Kind, LineUnread, Line, World }
+
 /// <summary>
 /// X-654 (0.1602, the user's request of 20/11, choice « by the game's menu » of 20/11): the sender of each message, in memory only (never in the
 /// chat history on disk: a player's game identifiers are not kept), for the menu of a player in the chat window. The game gives a message's
 /// identifiers right after the message itself (RaptureLogModule.AddMsgSourceEntry, called for each message just after the chat event, as the
 /// Chat 2 plugin reads it, docs/evidence/0.1602-chat-player-menu.md): <see cref="Expect"/> notes the message just copied, <see cref="Resolve"/>
-/// gives it its identifiers once, only when the world the game gives is the sender's (else nothing: an identifier is never given to another
-/// player). Bounded; cleared with the messages.
+/// gives it its identifiers once. X-660 (0.1603, review of 0.1602, I1): order and world were not enough (a message hidden by another plugin, a
+/// tell you send whose link is the recipient's): the identifiers are given only when everything agrees: the kind the game gives (chatType) is
+/// the expected line's, the game's own log line at the index it gives has that kind and that sender (name and home world), the world is the
+/// sender's, and they are not your own character's; else nothing (the entries stay greyed): an identifier is never given to another player.
+/// Bounded; cleared with the messages.
 /// </summary>
 public sealed class ChatSources
 {
     public const int MaximumKept=2000;
+    /// <summary>The kind of a message is the low seven bits of the game's value (the rest: who does it and to whom).</summary>
+    public const ushort KindMask=0x7F;
     private readonly object gate=new();
     private readonly Dictionary<long,ChatSource> sources=[];
     private readonly Queue<long> order=new();
     private long expected=-1;
+    private ushort expectedKind;
 
-    /// <summary>The message just copied, sent by a player (name and world from its sender); a message without one: <paramref name="name"/> empty.</summary>
-    public void Expect(long id,string name,ushort world)
+    /// <summary>The message just copied, of that kind, sent by a player (name and world from its sender); a message without one: <paramref name="name"/> empty.</summary>
+    public void Expect(long id,string name,ushort world,ushort kind)
     {
         lock(gate)
         {
@@ -28,23 +41,32 @@ public sealed class ChatSources
             if(name.Length==0 || world==0)return;
             if(!sources.ContainsKey(id)){order.Enqueue(id);while(order.Count>MaximumKept)sources.Remove(order.Dequeue());}
             sources[id]=new(name,world);
-            expected=id;
+            expected=id;expectedKind=(ushort)(kind&KindMask);
         }
     }
 
-    /// <summary>The game's identifiers of the message just copied; given once, only when the game's world is the sender's. True when given.</summary>
-    public bool Resolve(ulong contentId,ulong accountId,ushort world)
+    /// <summary>
+    /// The game's identifiers of a message, with the kind and world it gives, the game's log line at its index (null: not readable) and your
+    /// own character's id; given once to the message just copied, only when they all agree (X-660).
+    /// </summary>
+    public ChatSourceMatch Resolve(ulong contentId,ulong accountId,ushort world,ushort chatType,ChatLogLine? line,ulong own)
     {
         lock(gate)
         {
             var id=expected;expected=-1;
-            if(id<0 || contentId==0 || !sources.TryGetValue(id,out var source) || source.World!=world)return false;
+            if(id<0 || !sources.TryGetValue(id,out var source))return ChatSourceMatch.NotWaiting;
+            if(contentId==0)return ChatSourceMatch.NoIdentifiers;
+            if(contentId==own)return ChatSourceMatch.Own;
+            if((chatType&KindMask)!=expectedKind)return ChatSourceMatch.Kind;
+            if(line is not { } read)return ChatSourceMatch.LineUnread;
+            if((read.Kind&KindMask)!=expectedKind || !string.Equals(read.Name,source.Name,StringComparison.Ordinal) || read.World!=source.World)return ChatSourceMatch.Line;
+            if(source.World!=world)return ChatSourceMatch.World;
             sources[id]=source with{ContentId=contentId,AccountId=accountId};
-            return true;
+            return ChatSourceMatch.Given;
         }
     }
 
-    /// <summary>A message that is not followed by its identifiers (a system line) ends the wait: the next identifiers are not its.</summary>
+    /// <summary>A message that is not followed by its identifiers (a system line, a message hidden by another plugin) ends the wait: the next identifiers are not its.</summary>
     public void Skip(){lock(gate)expected=-1;}
 
     public ChatSource? For(long id){lock(gate)return sources.GetValueOrDefault(id);}

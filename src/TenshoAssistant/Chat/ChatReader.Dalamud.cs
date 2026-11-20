@@ -37,13 +37,21 @@ internal sealed class ChatReader : IDisposable
     public ChatReader(IChatGui chat,IClientState client,IPluginLog log,Func<ChatSettings> settings,ChatStore store,Func<bool>? developer=null,ChatHistoryKeeper? history=null,Func<string?>? ownName=null)
     {
         this.log=log;this.settings=settings;this.store=store;this.developer=developer;this.history=history;this.ownName=ownName;
-        // One owner for both subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
+        // One owner for the subscriptions: a failure part-way undoes the ones made; Dispose releases them in reverse order.
         try
         {
             registrations.Register(()=>chat.ChatMessageUnhandled+=OnMessage,()=>chat.ChatMessageUnhandled-=OnMessage);
+            // X-660 (0.1603): a message another plugin hides is not copied; the identifiers that follow it are not given to anyone.
+            registrations.Register(()=>chat.ChatMessageHandled+=OnHidden,()=>chat.ChatMessageHandled-=OnHidden);
             registrations.Register(()=>client.Logout+=OnLogout,()=>client.Logout-=OnLogout);
         }
         catch{registrations.Dispose();throw;}
+    }
+
+    private void OnHidden(IChatMessage message)
+    {
+        // Also during a competitive cut (CompetitiveGate.Cut), when nothing is copied: then nothing waits anyway.
+        sources?.Skip();
     }
 
     private void OnMessage(IChatMessage message)
@@ -95,7 +103,7 @@ internal sealed class ChatReader : IDisposable
             history?.Keep(record);
             // X-654 (0.1602): who sent it (name and world of the sender's player link), waiting for the game's identifiers.
             if(sources is not null && message.Sender.Payloads.OfType<PlayerPayload>().FirstOrDefault() is { } player)
-                sources.Expect(record.Id,player.PlayerName,(ushort)player.World.RowId);
+                sources.Expect(record.Id,player.PlayerName,(ushort)player.World.RowId,(ushort)message.LogKind);
             warned=false;
         }
         catch(Exception error)

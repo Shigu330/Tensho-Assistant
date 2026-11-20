@@ -45,8 +45,29 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     private void OnSource(RaptureLogModule* module,ulong contentId,ulong accountId,int messageIndex,ushort worldId,ushort chatType)
     {
         hook!.Original(module,contentId,accountId,messageIndex,worldId,chatType);
-        try{sources.Resolve(contentId,accountId,worldId);}
+        try{Said(sources.Resolve(contentId,accountId,worldId,chatType,Line(module,messageIndex),module->LocalPlayerContentId),chatType);}
         catch(Exception){}
+    }
+
+    /// <summary>
+    /// X-660 (0.1603): the game's own log line at the index the game gives with the identifiers (RaptureLogModule.GetLogMessageDetail of
+    /// FFXIVClientStructs): its kind and its sender's player link; null when the game has no line there.
+    /// </summary>
+    private static ChatLogLine? Line(RaptureLogModule* module,int index)
+    {
+        if(index<0 || !module->GetLogMessageDetail(index,out var sender,out _,out var kind,out _,out _,out _))return null;
+        var player=Dalamud.Game.Text.SeStringHandling.SeString.Parse(sender).Payloads.OfType<Dalamud.Game.Text.SeStringHandling.Payloads.PlayerPayload>().FirstOrDefault();
+        return new ChatLogLine(kind,player?.PlayerName ?? "",(ushort)(player?.World.RowId ?? 0));
+    }
+
+    // X-660 (0.1603): each outcome said once per session (outcome and kind only, never a name nor an identifier), so a game test shows
+    // whether the identifiers reach the messages or why not.
+    private readonly bool[] matchSaid=new bool[Enum.GetValues<ChatSourceMatch>().Length];
+    private void Said(ChatSourceMatch match,ushort chatType)
+    {
+        if(match==ChatSourceMatch.NotWaiting || matchSaid[(int)match])return;
+        matchSaid[(int)match]=true;
+        log.Information("Chat window, a sender's identifiers: {0} (kind {1}).",match,chatType&ChatSources.KindMask);
     }
 
     /// <summary>The client's text of an Addon row (empty: not found).</summary>
