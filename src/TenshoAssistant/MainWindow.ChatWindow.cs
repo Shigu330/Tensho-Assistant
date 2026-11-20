@@ -270,6 +270,8 @@ internal sealed partial class MainWindow
         // X-447 B5 (0.1621): the players' names in brackets, in a colour of their own.
         BoolSetting("ChatWindow.SenderBrackets","ChatWindow.SenderBracketsTip",()=>configuration.Chat.SenderBrackets,value=>configuration.Chat.SenderBrackets=value,c=>c.Chat.SenderBrackets);
         BoolSetting("ChatWindow.NameColors","ChatWindow.NameColorsTip",()=>configuration.Chat.NameColors,value=>configuration.Chat.NameColors=value,c=>c.Chat.NameColors);
+        // X-447 B15 (0.1623, R25): capture mode.
+        BoolSetting("ChatWindow.CaptureNames","ChatWindow.CaptureNamesTip",()=>configuration.Chat.CaptureNames,value=>configuration.Chat.CaptureNames=value,c=>c.Chat.CaptureNames);
         SliderSetting("ChatWindow.Opacity","ChatWindow.OpacityTip",()=>configuration.Chat.BoundedOpacity,value=>configuration.Chat.Opacity=value,0,100,defaults.Opacity,"%d %%");
         // X-448 (0.1454): the frame and the lock, also on the buttons at the end of the window's tab bar.
         BoolSetting("ChatWindow.Borderless","ChatWindow.BorderlessTip",()=>configuration.Chat.Borderless,value=>configuration.Chat.Borderless=value,c=>c.Chat.Borderless);

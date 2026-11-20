@@ -6528,6 +6528,8 @@
     "ChannelNameTip": "The short name shown in brackets before this channel's messages (8 letters at most). Empty: the game's.",
     "SenderBrackets": "Players' names in brackets",
     "SenderBracketsTip": "Writes [Name]: before a player's message, as WoW's chat addons do.\nDefault: off.",
+    "CaptureNames": "Capture mode: hide the players' names",
+    "CaptureNamesTip": "For screenshots: each player's name before their messages is replaced by a stand-in such as #A3F27, the same for the same player, from which the name cannot be read. The messages' own text is not changed: look at it before sharing a picture.\nDefault: off.",
     "NameColors": "A colour for each player's name",
     "NameColorsTip": "Each player's name in a colour of its own, taken from the name itself: the same name always has the same colour. Nothing is kept about the player. A player put forward keeps the warning colour.\nDefault: off.",
     "Empty": "No message in this tab yet.",

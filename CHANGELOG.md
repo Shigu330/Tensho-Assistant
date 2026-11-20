@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1623.0
+- Plan global, X-447 : Fenêtre de chat, option choisie par l'utilisateur le 15/11 (X-447 B15, R25). « Mode capture : masquer les noms des joueurs » : pour les captures d'écran, le nom de chaque joueur avant ses messages (canaux parlés, murmures compris, et la copie d'un message) est remplacé par un code comme #A3F27, tiré du nom (le même pour le même joueur, d'une session à l'autre), d'où le nom ne peut pas se lire ; un personnage de l'histoire garde son nom. Le texte des messages lui-même n'est pas changé (l'info-bulle le dit). Coupé par défaut. X-447 reste ouvert pour les autres options cochées.
+- Pour les joueurs : fenêtre de chat : un mode capture remplace les noms des joueurs par des codes, pour les captures d'écran.
+- Tests : ChatCapture1623Tests. Verify.ps1 (agent) : 3369/3369, 0 avertissement, 0 erreur ; DLL 0.1623.0.0. Non validé en jeu.
+### English
+- Chat window, option chosen by the user on 15/11 (X-447 B15, R25). « Capture mode: hide the players' names »: for screenshots, each player's name before their messages (spoken channels, tells included, and a message's copy) is replaced by a stand-in such as #A3F27, taken from the name (the same for the same player, from one session to the next), from which the name cannot be read; a character of the story keeps its name. The messages' own text is not changed (the tooltip says so). Off by default. X-447 stays open for the other options chosen.
+- For players: Chat window: a capture mode replaces the players' names with codes, for screenshots.
+
 ## 0.1622.0
 - Plan global, X-447 : Fenêtre de chat, options choisies par l'utilisateur le 15/11 (X-447 B1 et B2). B1 : « S'effacer après (secondes sans message) » : quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, toute la fenêtre s'efface en 1,5 s et les clics passent au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir (0 : jamais, par défaut). B2 : « Espace entre les lignes » (0 à 12 pixels) et une taille du texte propre à un onglet (case « Taille à part » dans les réglages des onglets ; sinon celle de la fenêtre). X-447 reste ouvert pour les autres options cochées.
 - Pour les joueurs : fenêtre de chat : la fenêtre peut s'effacer après un moment sans message, les lignes peuvent s'espacer, et un onglet peut avoir sa propre taille de texte.

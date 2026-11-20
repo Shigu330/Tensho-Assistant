@@ -55,7 +55,7 @@ public static class ChatFormat
     /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
     /// for good; it is laid out again once they are.</summary>
     public static string LayoutKey(ChatSettings settings,string names="")
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}|{ChannelNamesKey(settings)}|{names}";
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}{settings.CaptureNames}|{ChannelNamesKey(settings)}|{names}";
 
     /// <summary>X-447 B4 (0.1621): the channels' short names chosen, in the layout's key (a name changed lays the lines out again).</summary>
     public static string ChannelNamesKey(ChatSettings settings)
@@ -63,6 +63,18 @@ public static class ChatFormat
 
     /// <summary>X-447 B5 (0.1621): a sender as written before the text: in brackets when chosen.</summary>
     public static string Sender(string sender,ChatSettings settings)=>settings.SenderBrackets ? $"[{sender}]":sender;
+
+    /// <summary>X-447 B15 (0.1623): a player's stand-in in capture mode: « # » and five letters or digits taken from the name (FNV-1a, its world,
+    /// case and spaces aside), the same on every PC and at every start; nothing of the name can be read in it.</summary>
+    public static string StandIn(string? name)
+    {
+        var key=(name ?? "").Trim().ToLowerInvariant();
+        var at=key.IndexOf('@');
+        if(at>0)key=key[..at];
+        var hash=2166136261u;
+        foreach(var letter in key){hash^=letter;hash*=16777619u;}
+        return "#"+(hash&0xFFFFF).ToString("X5",System.Globalization.CultureInfo.InvariantCulture);
+    }
 
     /// <summary>X-482 M1 (0.1472): the part of the layout key that says which lists of names are loaded.</summary>
     public static string NamesKey(bool items,bool quests,bool maps)=>$"{(items ? 'i':'-')}{(quests ? 'q':'-')}{(maps ? 'm':'-')}";
@@ -101,6 +113,8 @@ public static class ChatFormat
                 if(segment.Link is { } link && ChatLook.Marked(segment.Text))(arrowed??=[]).Add(link);
         bool Underlined(ChatLink target)=>settings.GameLinks && arrowed?.Contains(target)!=true;
         var sender=Clean(record.Sender).Trim();
+        // X-447 B15 (0.1623): capture mode, a player's stand-in (a character of the story keeps its name).
+        if(settings.CaptureNames && sender.Length>0 && record.Channel is not ChatChannel.Npc)sender=StandIn(sender);
         // A custom emote (kind 28) has its author apart from its text; a standard emote (29) already names them.
         if(record.Kind==28 && sender.Length>0)runs.Add(new($"{sender} ",ChatRole.Sender));
         else if(sender.Length>0 && (spoken || record.Channel is ChatChannel.Npc))

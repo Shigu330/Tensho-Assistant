@@ -6528,6 +6528,8 @@
     "ChannelNameTip": "Le nom court écrit entre crochets avant les messages de ce canal (8 lettres au plus). Vide : celui du jeu.",
     "SenderBrackets": "Noms des joueurs entre crochets",
     "SenderBracketsTip": "Écrit [Nom] : avant le message d'un joueur, comme les addons de chat de WoW.\nPar défaut : désactivé.",
+    "CaptureNames": "Mode capture : masquer les noms des joueurs",
+    "CaptureNamesTip": "Pour les captures d'écran : le nom de chaque joueur avant ses messages est remplacé par un code comme #A3F27, le même pour le même joueur, d'où le nom ne peut pas se lire. Le texte des messages lui-même n'est pas changé : relisez-le avant de partager une image.\nPar défaut : désactivé.",
     "NameColors": "Une couleur pour le nom de chaque joueur",
     "NameColorsTip": "Le nom de chaque joueur dans une couleur à lui, tirée du nom lui-même : le même nom a toujours la même couleur. Rien n'est gardé sur le joueur. Un joueur mis en avant garde la couleur d'avertissement.\nPar défaut : désactivé.",
     "Empty": "Aucun message dans cet onglet pour l'instant.",

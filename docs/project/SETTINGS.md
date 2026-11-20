@@ -50,6 +50,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `Chat.Border` | int | 1 | Settings › Panels › ChatWindow | **Frame thickness** — Thickness of the window's frame when it has one, from 0 to 4 pixels. Default: 1 px. |
 | `Chat.Borderless` | bool | false | Settings › Panels › ChatWindow | **Without a frame** — No title bar and no frame: only the tabs and the messages. The button at the end of the tabs brings the frame back; « /tensho chat » still shows or hides the window. Default: off. |
 | `Chat.BothChats` | bool | false | Settings › Panels › ChatWindow | **Show both chats** — Shows the game's messages again and puts this window back where it was, to compare both chats; the button with two windows at the end of the tabs switches too. Default: off. |
+| `Chat.CaptureNames` | bool | false | Settings › Panels › ChatWindow | **Capture mode: hide the players' names** — For screenshots: each player's name before their messages is replaced by a stand-in such as #A3F27, the same for the same player, from which the name cannot be read. The messages' own text is not changed: look at it before sharing a picture. Default: off. |
 | `Chat.Clock24` | bool | true | Settings › Panels › ChatWindow | **24-hour clock** — Otherwise a 12-hour clock with AM or PM. Greyed while the time is not shown. Default: on. |
 | `Chat.FadeAfter` | int | 0 | Settings › Panels › ChatWindow | **Fade out after (seconds without message)** — The whole window fades out when no new message came in the tab shown for that long, and the clicks then go through to the game; the mouse on it, an open menu of the chat or a new message brings it back. 0: never. Default: 0 s. |
 | `Chat.FontScale` | int | 100 | Settings › Panels › ChatWindow | **Text size** — Size of the messages, from 60% to 200% of Tensho's text. Default: 100%. |
@@ -375,7 +376,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 319 controls (302 linked to `Configuration`, 17 to another file), 34 settings without a control.
+Counted: 320 controls (303 linked to `Configuration`, 17 to another file), 34 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -431,6 +432,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `Chat.Border` | int | 1 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Épaisseur du cadre** — Épaisseur du cadre de la fenêtre quand elle en a un, de 0 à 4 pixels. Par défaut : 1 px. |
 | `Chat.Borderless` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Sans bordure** — Ni barre de titre ni cadre : seulement les onglets et les messages. Le bouton au bout des onglets remet le cadre ; « /tensho chat » affiche ou masque toujours la fenêtre. Par défaut : désactivé. |
 | `Chat.BothChats` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Afficher les deux chats** — Affiche de nouveau les messages du jeu et remet cette fenêtre à sa place, pour comparer les deux chats ; le bouton aux deux fenêtres au bout des onglets bascule aussi. Par défaut : désactivé. |
+| `Chat.CaptureNames` | bool | false | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Mode capture : masquer les noms des joueurs** — Pour les captures d'écran : le nom de chaque joueur avant ses messages est remplacé par un code comme #A3F27, le même pour le même joueur, d'où le nom ne peut pas se lire. Le texte des messages lui-même n'est pas changé : relisez-le avant de partager une image. Par défaut : désactivé. |
 | `Chat.Clock24` | bool | true | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Horloge sur 24 heures** — Sinon, une horloge sur 12 heures avec AM ou PM. Grisé tant que l'heure n'est pas affichée. Par défaut : activé. |
 | `Chat.FadeAfter` | int | 0 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **S'effacer après (secondes sans message)** — Toute la fenêtre s'efface quand aucun nouveau message n'est arrivé dans l'onglet affiché depuis ce temps, et les clics passent alors au jeu ; la souris dessus, un menu du chat ouvert ou un nouveau message la font revenir. 0 : jamais. Par défaut : 0 s. |
 | `Chat.FontScale` | int | 100 | Paramètres › Panneaux à côté du jeu › Fenêtre de chat | **Taille du texte** — Taille des messages, de 60 % à 200 % du texte de Tensho. Par défaut : 100 %. |
@@ -756,5 +758,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 319 cases (302 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
+Compté : 320 cases (303 reliées à `Configuration`, 17 à un autre fichier), 34 réglages sans case.
 <!-- /docgen:settings-fr -->
