@@ -97,7 +97,7 @@ public static class CreditCatalog
             ["Community/PaissaDb.cs", "MainWindow.Plots.cs", "Plugin.cs"], ["paissadb.zhu.codes"], "CommunityPaissa", false),
         // X-76 step 5 (0.949): the discoveries exchange through GitHub (sign-in, the common base, your gist and its issue), only after you connect.
         new("DiscoveriesExchange", CreditKind.Online, "Tensho Assistant shared discoveries (GitHub)", "Tensho Assistant players", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-discoveries", "https://creativecommons.org/publicdomain/zero/1.0/",
-            ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "MainWindow.Discoveries.cs"], ["github.com", "api.github.com", "raw.githubusercontent.com"], "", false),
+            ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "Discoveries/GistAside.cs", "MainWindow.Discoveries.cs"], ["github.com", "api.github.com", "raw.githubusercontent.com", "gist.githubusercontent.com"], "", false),
         // 0.447 (X-04, decided 2026-11-03): player events, opened in the player's browser on a click; nothing is fetched by Tensho.
         new("ToolGallery", CreditKind.Online, "Tensho Assistant community tools", "Tensho Assistant contributors", "CC0-1.0", "https://github.com/Shigu330/Tensho-Assistant/tree/main/community-templates", "https://creativecommons.org/publicdomain/zero/1.0/",
             ["MyTools/ToolGallery.cs", "MainWindow.MyTools.cs"], ["raw.githubusercontent.com"], "", false),

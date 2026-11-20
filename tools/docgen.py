@@ -564,8 +564,8 @@ NETWORK = [
     ("This repository", ["raw.githubusercontent.com"], None, ["MyTools/ToolGallery.cs", "Help/CommunityHelp.cs"],
      "community tool gallery and help videos, on a click, data only, never code",
      "galerie d'outils de la communauté et vidéos d'aide, sur un clic, des données seulement, jamais de code"),
-    ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com"], "Discovery.AutoExchange",
-     ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs"],
+    ("Shared discoveries exchange", ["raw.githubusercontent.com", "api.github.com", "github.com", "gist.github.com", "gist.githubusercontent.com"], "Discovery.AutoExchange",
+     ["Discoveries/GitHubExchange.cs", "Discoveries/CommunityDiscoveries.cs", "Discoveries/GistAside.cs"],
      "the common files of this repository; after « Connect GitHub » only, the player's own sightings to an unlisted gist and one issue that links it "
      "(described below); on « Exchange now » or with « Automatic exchange »; and, on « Send now » of Help › « Report a problem or help » only, the "
      "player's ticket, whose exact text is shown first",

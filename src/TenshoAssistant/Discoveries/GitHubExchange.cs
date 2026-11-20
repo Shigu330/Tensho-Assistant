@@ -344,6 +344,8 @@ public sealed class GitHubExchange : IDisposable
         // X-587 (external audit A16 of 18/11): your own base not read whole at start (DiscoveryStore.MineIncomplete): the gist would be
         // replaced by this session's facts only, and its kinds missing here removed; nothing is sent, the common data above are still taken.
         if(upload && Connected && store.MineIncomplete)sent="ShareBlocked";
+        // X-621 (review of 0.1560, I1): rows of yours set aside as damaged: their copy on your gist read back first, else nothing sent this time.
+        else if(upload && Connected && store.Aside is not null && !await KeepAside(store).ConfigureAwait(false))sent="ShareAsideWaiting";
         else if(upload && Connected)
         {
             var mine=CommunityDiscoveries.Mine(store.Snapshot(DateTimeOffset.UtcNow,false));
@@ -410,6 +412,30 @@ public sealed class GitHubExchange : IDisposable
             var noted=CommonV3Marks();noted[kind]=hash;
             Directory.CreateDirectory(folder);AtomicFile.Write(CommonV3Marker,JsonSerializer.Serialize(noted));
         }
+    }
+
+    /// <summary>
+    /// X-621 (review of 0.1560, I1): rows of yours set aside at a start (damaged, DiscoveryDatabase.SetAside) are missing from your facts, and the
+    /// send replaces the whole gist: before, a fact whose row was damaged vanished from your gist at the next send even when the gist held a valid
+    /// copy. That copy is now read back first (GistAside) and joined to your base, database and memory (DiscoveryStore.RestoreAside), so it is
+    /// sent again. The gist not reached: false, nothing is sent this time, tried again at the next exchange. No gist yet, a gist gone (404), or a
+    /// gist this version cannot read: nothing on it to keep; the rows are settled (their text stays in facts_aside).
+    /// </summary>
+    private async Task<bool> KeepAside(DiscoveryStore store)
+    {
+        if(store.Aside is not { } aside)return true;
+        string gist;lock(gate)gist=meta.GistId;
+        IReadOnlyCollection<DiscoveryFact> kept;
+        try
+        {
+            kept=gist.Length==0 ? []:await GistAside.Read(()=>Api(HttpMethod.Get,$"https://api.github.com/gists/{gist}",null,maximumBytes:GistAside.MaxListingBytes),
+                address=>Community.BoundedHttp.ReadAsync(client,address,GistAside.MaxRawBytes,stop.Token),aside.Keys).ConfigureAwait(false);
+        }
+        catch(HttpRequestException error) when(error.StatusCode==HttpStatusCode.NotFound){kept=[];}
+        catch(Exception error) when(CommonUnreachable(error)){return false;}
+        catch(Exception error) when(error is InvalidDataException or System.Text.Json.JsonException or DecoderFallbackException){kept=[];}
+        store.RestoreAside(kept);
+        return true;
     }
 
     private async Task Upload(IReadOnlyDictionary<string,string> contents)
@@ -495,7 +521,7 @@ public sealed class GitHubExchange : IDisposable
         return JsonNode.Parse(text)?.AsObject() ?? throw new InvalidDataException("Empty answer.");
     }
 
-    private async Task<JsonNode?> Api(HttpMethod method,string address,JsonNode? body,string? with=null)
+    private async Task<JsonNode?> Api(HttpMethod method,string address,JsonNode? body,string? with=null,int maximumBytes=4*1024*1024)
     {
         var request=new HttpRequestMessage(method,address);
         request.Headers.Accept.ParseAdd("application/vnd.github+json");
@@ -509,7 +535,7 @@ public sealed class GitHubExchange : IDisposable
         }
         if(bearer is not null)request.Headers.Authorization=new AuthenticationHeaderValue("Bearer",bearer);
         if(body is not null)request.Content=new StringContent(body.ToJsonString(),Encoding.UTF8,"application/json");
-        var text=await Community.BoundedHttp.SendAsync(client,request,4*1024*1024,stop.Token).ConfigureAwait(false);
+        var text=await Community.BoundedHttp.SendAsync(client,request,maximumBytes,stop.Token).ConfigureAwait(false);
         return text.Length==0 ? null:JsonNode.Parse(text);
     }
 

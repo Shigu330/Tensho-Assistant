@@ -104,6 +104,80 @@ public sealed class DiscoveryDatabase
         return Scalar(open,"SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='facts_aside';") is long and > 0 ? Convert.ToInt64(Scalar(open,"SELECT COUNT(*) FROM facts_aside;")):0;
     }
 
+    // X-621 (review of 0.1560, I1): a row set aside is settled once its copy on your gist, if any, is back in facts (restored=1) or there is
+    // none to keep (restored=0); the text set aside stays in facts_aside either way.
+    private const string AsideDoneTable="CREATE TABLE IF NOT EXISTS facts_aside_done(key TEXT PRIMARY KEY NOT NULL,at TEXT NOT NULL,restored INTEGER NOT NULL) WITHOUT ROWID;";
+    private static bool HasTable(SqliteConnection open,string name,SqliteTransaction? transaction=null)
+    {
+        using var command=open.CreateCommand();command.Transaction=transaction;
+        command.CommandText="SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$name;";command.Parameters.AddWithValue("$name",name);
+        return command.ExecuteScalar() is long and > 0;
+    }
+    /// <summary>
+    /// X-621 (review of 0.1560, I1): the keys of your rows set aside (facts_aside, not shared) and not settled yet: your gist may still hold a
+    /// valid copy of them, which a send would otherwise drop (the gist is replaced by your facts in memory). Read at start; the next send reads
+    /// those copies back first (GitHubExchange, DiscoveryStore.Aside).
+    /// </summary>
+    public IReadOnlyList<string> AsidePending()
+    {
+        using var open=Open();
+        if(!HasTable(open,"facts_aside"))return [];
+        using var select=open.CreateCommand();
+        select.CommandText=HasTable(open,"facts_aside_done")
+            ? "SELECT DISTINCT key FROM facts_aside WHERE shared=0 AND key NOT IN (SELECT key FROM facts_aside_done) ORDER BY key;"
+            : "SELECT DISTINCT key FROM facts_aside WHERE shared=0 ORDER BY key;";
+        var keys=new List<string>();
+        using var reader=select.ExecuteReader();
+        while(reader.Read())keys.Add(reader.GetString(0));
+        return keys;
+    }
+    /// <summary>
+    /// X-621 (review of 0.1560, I1): the rows of <paramref name="keys"/> settled, in one transaction that takes the write lock at once (a second
+    /// client finds them settled and joins nothing twice). A key's copy read back from your gist (<paramref name="kept"/>) is joined to its row as
+    /// it is now (the sightings made since the set-aside added to those of before, DiscoveryStore.Join), or put in when there is none (or it cannot
+    /// be read). Returns the copies joined, for the memory to join them the same way (DiscoveryStore.JoinSaved); a key already settled is left out.
+    /// </summary>
+    public IReadOnlyList<DiscoveryFact> RestoreAside(IReadOnlyCollection<string> keys,IReadOnlyCollection<DiscoveryFact> kept,DateTimeOffset now)
+    {
+        var joined=new List<DiscoveryFact>();
+        if(keys.Count==0)return joined;
+        var byKey=new Dictionary<string,DiscoveryFact>(StringComparer.Ordinal);
+        foreach(var fact in kept)if(DiscoveryStore.Valid(fact) && fact.Seen>0)byKey.TryAdd(fact.Key,fact);
+        using var open=Open();
+        using var transaction=open.BeginTransaction(deferred:false);
+        Run(open,AsideDoneTable,transaction);
+        using var settled=open.CreateCommand();settled.Transaction=transaction;
+        settled.CommandText="SELECT COUNT(*) FROM facts_aside_done WHERE key=$key;";
+        var settledKey=settled.Parameters.Add("$key",SqliteType.Text);
+        using var select=open.CreateCommand();select.Transaction=transaction;
+        select.CommandText="SELECT fact FROM facts WHERE key=$key;";
+        var selectKey=select.Parameters.Add("$key",SqliteType.Text);
+        using var done=open.CreateCommand();done.Transaction=transaction;
+        done.CommandText="INSERT INTO facts_aside_done(key,at,restored) VALUES($key,$at,$restored);";
+        var doneKey=done.Parameters.Add("$key",SqliteType.Text);var restored=done.Parameters.Add("$restored",SqliteType.Integer);
+        done.Parameters.AddWithValue("$at",now.ToString("O"));
+        var write=new List<DiscoveryFact>();
+        foreach(var key in keys.Distinct(StringComparer.Ordinal))
+        {
+            settledKey.Value=key;
+            if(settled.ExecuteScalar() is long and > 0)continue;
+            var copy=byKey.GetValueOrDefault(key);
+            if(copy is not null)
+            {
+                selectKey.Value=key;
+                DiscoveryFact? row=null;
+                if(select.ExecuteScalar() is string text)try{row=JsonSerializer.Deserialize<DiscoveryFact>(text,Options);}catch(JsonException){}
+                if(row is null)write.Add(copy.Copy());
+                else{DiscoveryStore.Join(row,copy);write.Add(row);}
+                joined.Add(copy.Copy());
+            }
+            doneKey.Value=key;restored.Value=copy is null ? 0:1;done.ExecuteNonQuery();
+        }
+        if(write.Count>0)Upsert(open,transaction,write);
+        transaction.Commit();
+        return joined;
+    }
+
     /// <summary>The kinds that have shared facts in the file.</summary>
     public IReadOnlyList<DiscoveryKind> SharedKinds()
     {

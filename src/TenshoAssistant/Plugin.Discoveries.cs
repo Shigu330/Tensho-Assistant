@@ -114,6 +114,17 @@ public sealed partial class Plugin
                         try{log.Warning("Discoveries: {0} row(s) that could not be read set aside in the table facts_aside of {1} (kept, not sent); the next start reads your facts whole.",opened.SetAside(aside,DateTimeOffset.UtcNow),Discoveries.DiscoveryDatabase.FileName);}
                         catch(Exception error){log.Warning(error,"Discoveries: the rows that could not be read could not be set aside; they stay and are tried again at the next start.");}
                     }
+                    // X-621 (review of 0.1560, I1): your rows set aside (now or at an earlier start) and not settled: the next send reads their copy
+                    // back from your gist first (GitHubExchange.KeepAside), never replaces the gist without them. Not listed: nothing sent this session.
+                    try
+                    {
+                        if(opened.AsidePending() is { Count:>0 } pending)
+                        {
+                            discoveries.Aside=new(pending,kept=>opened.RestoreAside(pending,kept,DateTimeOffset.UtcNow));
+                            log.Information("Discoveries: {0} row(s) of yours set aside and not settled; the next send reads their copy back from your gist first.",pending.Count);
+                        }
+                    }
+                    catch(Exception error){discoveries.MineIncomplete=true;log.Warning(error,"Discoveries: the rows set aside could not be listed; nothing is sent to your gist this session.");}
                     discoveries.UseSharedSource(kind=>opened.ReadShared(kind,(key,error)=>log.Warning(error,"A discovery row could not be read ({0}); left in the database.",key)),mine.Kinds);
                     mainWindow.DiscoveriesReadFailed=0;
                 }

@@ -288,6 +288,43 @@ public sealed class DiscoveryStore
     /// </summary>
     public bool MineIncomplete{get=>Volatile.Read(ref mineIncomplete);set=>Volatile.Write(ref mineIncomplete,value);}
     private bool mineIncomplete;
+
+    /// <summary>X-621 (review of 0.1560, I1): your rows set aside and not settled (their keys), and how to settle them in the database (DiscoveryDatabase.RestoreAside).</summary>
+    public sealed record AsideRows(IReadOnlyCollection<string> Keys,Func<IReadOnlyCollection<DiscoveryFact>,IReadOnlyList<DiscoveryFact>> Restore);
+    /// <summary>
+    /// X-621 (review of 0.1560, I1): set at start when rows of yours were set aside as damaged (now or at an earlier start) and not settled: they
+    /// are missing from your facts, and a send replaces the whole gist. GitHubExchange reads their copy back from your gist first
+    /// (<see cref="RestoreAside"/>), or sends nothing while the gist cannot be reached.
+    /// </summary>
+    public AsideRows? Aside{get=>Volatile.Read(ref aside);set=>Volatile.Write(ref aside,value);}
+    private AsideRows? aside;
+    /// <summary>
+    /// X-621: the copies read back from your gist (<paramref name="kept"/>; empty when it holds none) settled in the database, then joined here the
+    /// same way, never written again: the fact as it was at the last save (the base the next save adds from, AddMine) gets them too, so the save
+    /// adds only this client's own sightings. Their shared kinds are read first (they may throw: nothing is settled then). Returns how many were joined.
+    /// </summary>
+    public int RestoreAside(IReadOnlyCollection<DiscoveryFact> kept)
+    {
+        if(Aside is not { } rows)return 0;
+        NeedNow(kept.Select(fact=>fact.Kind).Distinct());
+        var joined=rows.Restore(kept);
+        lock(gate)
+        {
+            foreach(var copy in joined)
+            {
+                var fact=copy.Copy();
+                if(facts.TryGetValue(fact.Key,out var known))
+                {
+                    if(bases.TryGetValue(fact.Key,out var was)){if(was is null)bases[fact.Key]=fact.Copy();else Join(was,fact);}
+                    Join(known,fact);
+                }
+                else Put(fact);
+            }
+            if(joined.Count>0)revision++;
+        }
+        Aside=null;
+        return joined.Count;
+    }
     /// <summary>X-93 (0.942): the Discoveries page shows every kind's totals: it asks for all the shared kinds still on disk.</summary>
     public void WantAll(){lock(gate)foreach(var kind in sharedWaiting.ToArray())Want(kind);}
     // Under the lock: asks for a kind in the background.
