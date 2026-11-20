@@ -2377,6 +2377,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1650) Fenêtre de chat ouverte : recharger le plugin (ou relancer le jeu) ; « Chargement… » dure moins longtemps qu'avant, et le jeu ne saccade pas plus pendant ces secondes.
 
+- [ ] (0.1651) Fenêtre de chat : clic droit sur un message, « Choisir du texte… » ; attendre 10 secondes : la fenêtre garde sa taille et la zone de texte reste visible ; on peut y choisir un morceau de texte et le copier par Ctrl+C.
+
+- [ ] (0.1652) Fenêtre de chat, alertes dans la barre du serveur activées, onglets masqués (bouton en forme d'œil) : un message avec un mot d'alerte arrive dans un onglet qui n'est pas montré ; un clic sur « ! Chat 1 » dans la barre du serveur montre cet onglet.
+
+- [ ] (0.1654) Fenêtre de chat, réglage « Conversations privées » activé : recevoir un murmure (ou en envoyer un) ; un onglet au nom du joueur s'ouvre au bout des onglets, marqué comme nouveau, avec les murmures échangés avec lui seulement.
+
+- [ ] (0.1654) Clic droit sur le message d'un joueur, « Conversation avec … » : son onglet s'ouvre et se montre ; clic droit sur l'onglet, « Fermer cette conversation » : il part, ses murmures restent dans les autres onglets.
+
+- [ ] (0.1654) Mode capture activé avec un onglet de conversation ouvert : l'onglet porte le nom de remplacement, pas le vrai nom.
+
+- [ ] (0.1655) Réglages du chat, « Profils par contexte » : activer « Changer selon le contexte » ; pour « En ville », choisir un aspect sombre puis « Prendre l'aspect actuel ici », remettre l'aspect habituel, et décocher un onglet ; entrer dans une ville : l'aspect sombre et les onglets choisis viennent seuls ; en sortir : l'aspect habituel et tous les onglets reviennent.
+
+- [ ] (0.1655) Profil « En mission » avec un aspect à lui : entrer en mission, changer un peu l'aspect sur place, sortir puis revenir : le changement est gardé pour la mission, l'aspect habituel revient dehors.
+
+- [ ] (0.1655) Profil « En artisanat » : ouvrir le carnet d'artisanat et fabriquer : la fenêtre prend l'aspect et les onglets de l'artisanat, puis les rend en fermant le carnet.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

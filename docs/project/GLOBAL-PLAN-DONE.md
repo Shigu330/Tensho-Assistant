@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (686 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (688 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -751,7 +751,9 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-671 | A managed test fails now and then under the load of Verify.ps1 -Release (0.1638… | Done in 0.1639.0 |
 | X-672 | Flaky CI test: « After error 1551: A14, gil journal … written after a character… | Done in 0.1645.0 |
 | X-673 | Review of block 0.1639 to 0.1643 (review 0.1643, 20/11), minor M1, M2, M3: M1… | Done in 0.1644.0 |
+| X-674 | Flaky test under load (relay 147, the load tool, 1 run in 10 with 32 burners)… | Done in 0.1653.0 |
 | X-675 | User-reported bug (chat, 20/11 about 21:20, two screenshots): the right-click «… | Done in 0.1651.0 |
+| X-676 | Review of block 0.1644 to 0.1650 (review 0.1650, 20/11), minor M1: M1 in… | Done in 0.1652.0 |
 | X-677 | Review of block 0.1644 to 0.1650 (review 0.1650, 20/11), pre-existing before… | Done in 0.1651.0 |
 | X-678 | Tool: the decisions tool has no option to set a dated exception (field «… | Done in 0.1650.0 |
 
@@ -759,7 +761,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (686 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (688 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1508,6 +1510,8 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-671 | Un test géré échoue de temps en temps sous la charge de Verify.ps1 -Release… | Fait en 0.1639.0 |
 | X-672 | Test fragile en CI : « After error 1551: A14, a gil journal whose write failed…… | Fait en 0.1645.0 |
 | X-673 | Relecture du bloc 0.1639 à 0.1643 (relecture 0.1643, 20/11), mineurs M1, M2, M3… | Fait en 0.1644.0 |
+| X-674 | Test fragile sous charge (relais 147, l'outil de charge, 1 passage sur 10 avec… | Fait en 0.1653.0 |
 | X-675 | Bug signalé par l'utilisateur (chat, 20/11 vers 21 h 20, deux captures) : la… | Fait en 0.1651.0 |
+| X-676 | Relecture du bloc 0.1644 à 0.1650 (relecture 0.1650, 20/11), mineurs M1 : M1… | Fait en 0.1652.0 |
 | X-677 | Relecture du bloc 0.1644 à 0.1650 (relecture 0.1650, 20/11), déjà là avant le… | Fait en 0.1651.0 |
 | X-678 | Outil : l'outil des décisions n'a pas d'option pour poser une dérogation datée… | Fait en 0.1650.0 |
