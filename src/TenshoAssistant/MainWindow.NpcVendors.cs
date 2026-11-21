@@ -55,6 +55,8 @@ internal sealed partial class MainWindow
                     ImGui.Selectable(NpcName(offer.Vendor)+"##Offer",false,ImGuiSelectableFlags.SpanAllColumns);
                     var places=VendorLocations(offer.Vendor);
                     NpcMenu("NpcFlag",NpcName(offer.Vendor),offer.Vendor.NpcId,places);
+                    // X-684 (0.1689): the NPC's tooltip (its places, every shop), as on the map.
+                    if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(offer.Vendor));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(places.Count==0 ? localization.Get("NpcUi.NoLocation")
                         :string.Join(" · ",places.Take(2).Select(NpcPlace))+(places.Count>2 ? localization.Format("HoverUi.More",places.Count-2):""));
                     ImGui.TableNextColumn();DrawNpcCosts(offer.Sale,18,true);

@@ -2007,9 +2007,10 @@ internal sealed partial class MainWindow
         return shown;
     }
     // Gil shop = the shop icon; only special exchanges = the exchange icon.
-    private uint VendorIconOf(Npcs.NpcVendor vendor)
+    // X-684 (0.1689): the shops given by the NPC tooltip outside the map (the catalogue's); the map's own otherwise.
+    private uint VendorIconOf(Npcs.NpcVendor vendor,IReadOnlyDictionary<uint,(string Name,Npcs.NpcShopKind Kind,int Items)>? shops=null)
     {
-        var kinds=vendor.ShopIds.Select(id=>mapVendorCache.Shops.TryGetValue(id,out var shop) ? shop.Kind:(Npcs.NpcShopKind?)null).OfType<Npcs.NpcShopKind>().ToArray();
+        var kinds=vendor.ShopIds.Select(id=>(shops ?? mapVendorCache.Shops).TryGetValue(id,out var shop) ? shop.Kind:(Npcs.NpcShopKind?)null).OfType<Npcs.NpcShopKind>().ToArray();
         return kinds.Length>0 && kinds.All(kind=>kind==Npcs.NpcShopKind.Special) ? ExchangeIcon:VendorIcon;
     }
     // One tooltip for every icon under the cursor: game icon, first line as title, the rest muted; gathering points list their
@@ -2382,26 +2383,9 @@ internal sealed partial class MainWindow
         return mapVendorLayout=new(map.MapId,rows,shown,showFixed,localization.Revision,merged,lonely);
     }
     // Each shop: its name (or its kind when the game gives none, or only an untranslated Japanese placeholder such as
-    // « アイテムの購入 », seen 0.137) and how many items it sells; shops without sales in the catalogue are counted apart.
-    private string VendorLabel(Npcs.NpcVendor vendor)
-    {
-        var name=vendor.Name.Length>0 ? vendor.Name:localization.Get("MapLocal.UnnamedVendor");
-        // 0.679: an NPC of a service whose shop no sheet gives: its name and title say what it does.
-        if(vendor.ShopIds.Count==0)return name;
-        var lines=new List<string>();var unknown=0;
-        foreach(var id in vendor.ShopIds.Distinct())
-        {
-            if(!mapVendorCache.Shops.TryGetValue(id,out var shop)){unknown++;continue;}
-            var shopName=string.IsNullOrWhiteSpace(shop.Name) || localization.CurrentCode!="ja" && shop.Name.Any(c=>c is >= '\u3040' and <= '\u30FF' or >= '\u4E00' and <= '\u9FFF')
-                ? localization.Get("MapLocal.ShopKind"+shop.Kind):shop.Name;
-            lines.Add(localization.Format("MapLocal.ShopLine",shopName,shop.Items));
-        }
-        var shown=lines.Distinct().Take(6).ToList();
-        if(lines.Distinct().Count()>6)shown.Add(localization.Format("MapView.HoverMore",lines.Distinct().Count()-6));
-        if(unknown>0)shown.Add(localization.Format("MapLocal.ShopsUnknown",unknown));
-        if(shown.Count==0)shown.Add(localization.Get("MapLocal.ShopsNone"));
-        return name+"\n"+string.Join("\n",shown);
-    }
+    // « アイテムの購入 », seen 0.137) and how many items it sells; shops without sales in the catalogue are counted apart. X-684 (0.1689): the
+    // NPC tooltip's facts as text (one body for the label and the tooltip; an NPC of a service with no shop: its name only, as since 0.679).
+    private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(BuildVendorTip(vendor));
     private string GatheringPointLabel(MapLocalGatheringPoint point)
     {
         var items=itemCatalog.State.Catalog;

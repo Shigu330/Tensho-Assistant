@@ -94,7 +94,9 @@ internal static class Island679Tests
         {
             Check(TenshoAssistant.Npcs.NpcShopLinks.ServiceNpcs.Contains(1043463u) && TenshoAssistant.Npcs.NpcShopLinks.ServiceNpcs.Contains(1043464u),"both");
             Check(Read("Npcs/NpcVendorLoader.Dalamud.cs").Contains("foreach(var id in NpcShopLinks.ServiceNpcs)vendorShops.TryAdd(id,[]);"),"no shop added");
-            Check(Read("MainWindow.MapView.cs").Contains("if(vendor.ShopIds.Count==0)return name;"),"the label says no shop line");
+            // X-684 (0.1689): the label is the NPC tooltip's facts as text; a vendor with no shop id gets no shop line there (NpcTips.Shops).
+            Check(Read("MainWindow.MapView.cs").Contains("private string VendorLabel(Npcs.NpcVendor vendor)=>Npcs.NpcTips.Text(BuildVendorTip(vendor));")
+                && File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Npcs/NpcTips.cs")).Contains("if(shopIds==0)return [];"),"the label says no shop line");
         }),
     ];
 }

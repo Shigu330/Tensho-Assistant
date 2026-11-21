@@ -65,6 +65,8 @@ internal sealed partial class MainWindow
     {
         if(ImGui.Selectable(label+$"##SrcNpc{itemId}/{vendor.NpcId}")){npcVendorFocus=vendor.NpcId;page=Page.NpcVendors;IsOpen=true;}
         NpcMenu($"SrcNpcMenu{itemId}/{vendor.NpcId}",NpcName(vendor),vendor.NpcId,VendorLocations(vendor));
+        // X-684 (0.1689): the NPC's tooltip, then what the click does.
+        if(ImGui.IsItemHovered())DrawNpcTooltip(VendorTipFacts(vendor),localization.Get("NpcUi.ClickVendor"));
         if(VendorLocations(vendor).FirstOrDefault() is { } place && maps.State.Catalog?.Find(place.MapId) is { } map
            && ImGui.Selectable("    "+localization.Get("SourceLinks.Flag")+$"##SrcFlag{itemId}/{vendor.NpcId}"))PlaceFlagFromMapView(map,place.X,place.Y);
     }
