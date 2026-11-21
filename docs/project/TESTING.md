@@ -2566,6 +2566,22 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : utiliser une compétence (et laisser un allié en utiliser une) : son nom dans la ligne « … utilise … » montre au survol l'info-bulle du jeu (icône, nom, description) ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
 
+- [ ] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
+
+- [ ] (0.1722) Compagnie libre › Trajets › Aéronefs : choisir l'aéronef : si ses valeurs n'ont pas été lues, une ligne dit « Vitesse et distance de ce vaisseau non lues… » et aucun trajet n'est cherché ; sinon vitesse et distance sont celles du jeu (ou « d'après ses pièces lues à l'atelier ») et des trajets sont proposés ; saisir une vitesse et une distance retire la ligne
+
+- [ ] (0.1723) Jardin, un emplacement dont l'heure calculée est passée sans avoir ouvert son menu en jeu : la grille dit « Mûr ? » (marque en sablier), l'info-bulle « Mûr selon le calcul, à confirmer en jeu » avec l'explication ; le message du chat dit « devrait être mûr selon le calcul » ; ouvrir le menu de l'emplacement en jeu quand il est mûr : « Mûr » (marque verte)
+
+- [ ] (0.1723) Mode développeur : planter une graine puis ouvrir le menu d'un emplacement : le journal a « Garden planting noted: patch …, bed …, seed item …, planted …, growing … h (…) » et « Garden bed state kept: … (… min now) … »
+
+- [ ] (0.1724) En équipe, quelques messages dans le chat d'équipe : la fenêtre de chat de Tensho écrit « [1] [icône SAG] [Nom] » (chiffre, puis icône et abréviation du job, puis le nom) dans la couleur du rôle ; quitter l'équipe : ces lignes gardent couleur et icône ; un message du même joueur après (s'il n'est plus proche) n'a pas de couleur
+
+- [ ] (0.1724) Mode développeur, en équipe : le journal a « Chat window, pieces of a sender's name (kind 14): … » ; dire d'où viennent le chiffre et l'abréviation (glyphe U+…, mot en capitales, icône)
+
+- [ ] (0.1725) Barre du serveur, entrée « Reste à faire » activée : tout cocher dans Rappels (ou rien à faire) : l'entrée disparaît de la barre du serveur ; un rappel qui revient (remise à zéro) ou une tâche affichée : elle revient seule en quelques secondes
+
+- [ ] (0.1726) Vos ventes, liste à vendre d'un servant avec des prix vus : le bouton « Copier » montre et copie le prix le plus bas vu moins 1 (coller dans le jeu) ; la colonne « Prix vu » dit « tableau, 13:45 » (l'heure entière au survol) ; à la largeur par défaut de la fenêtre, les colonnes « Prix vu » et « Copier » se voient en entier
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

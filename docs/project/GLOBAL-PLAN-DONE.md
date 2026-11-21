@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (735 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (742 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -803,12 +803,19 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-715 | User's choice of 21/11 around 11:30 (D-202 b): the game's menu of a player far… | Done in 0.1718.0 |
 | X-716 | User request of 21/11 around 11:35 (screenshot of the chat settings, kept out… | Done in 0.1716.0 |
 | X-717 | Review of block 0.1713 to 0.1716 (review 0.1716, 21/11), minor M1, M2, M3: M1… | Done in 0.1717.0 |
+| X-718 | Bug reported by the user on 21/11 around 12:55 (two screenshots of the planner… | Done in 0.1722.0 |
+| X-719 | User request of 21/11 around 13:00 (screenshot of « Your sales », the… | Done in 0.1726.0 |
+| X-720 | Bug reported by the user on 21/11 around 13:05 (screenshot of the garden… | Done in 0.1723.0 |
+| X-721 | User request of 21/11 around 13:15 (screenshot of the server bar, kept out of… | Done in 0.1725.0 |
+| X-722 | User request of 21/11 around 13:35 (screenshot of Tensho's chat, start of the… | Done in 0.1724.0 |
+| X-723 | Bug reported by the user on 21/11 around 13:40: in Tensho's chat, the players'… | Done in 0.1724.0 |
+| X-726 | Review of block 0.1717 to 0.1720 (review 0.1720, 21/11), minor M1: M1 in… | Done in 0.1721.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (735 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (742 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1609,3 +1616,10 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-715 | Choix de l'utilisateur du 21/11 vers 11 h 30 (D-202 b) : menu du jeu d'un… | Fait en 0.1718.0 |
 | X-716 | Demande de l'utilisateur du 21/11 vers 11 h 35 (capture des réglages du chat… | Fait en 0.1716.0 |
 | X-717 | Relecture du bloc 0.1713 à 0.1716 (relecture 0.1716, 21/11), mineurs M1, M2, M3… | Fait en 0.1717.0 |
+| X-718 | Bug signalé par l'utilisateur le 21/11 vers 12 h 55 (deux captures du… | Fait en 0.1722.0 |
+| X-719 | Demande de l'utilisateur du 21/11 vers 13 h (capture de « Vos ventes », liste à… | Fait en 0.1726.0 |
+| X-720 | Bug signalé par l'utilisateur le 21/11 vers 13 h 05 (capture du jardin… | Fait en 0.1723.0 |
+| X-721 | Demande de l'utilisateur du 21/11 vers 13 h 15 (capture de la barre du serveur… | Fait en 0.1725.0 |
+| X-722 | Demande de l'utilisateur du 21/11 vers 13 h 35 (capture du chat de Tensho… | Fait en 0.1724.0 |
+| X-723 | Bug signalé par l'utilisateur le 21/11 vers 13 h 40 : dans le chat de Tensho… | Fait en 0.1724.0 |
+| X-726 | Relecture du bloc 0.1717 à 0.1720 (relecture 0.1720, 21/11), mineurs M1 : M1… | Fait en 0.1721.0 |
