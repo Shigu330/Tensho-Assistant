@@ -43,9 +43,11 @@ internal static class PublicDocsTests
         ("Public documents: the page table of README.md is every page of the navigation, in its order, with its help title and purpose",() =>
         {
             // The navigation's groups keep the order of their first page (PageGroups), so the table does too.
-            var pages=Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"),@"^\s*new\(Page\.(\w+),(null|""\w+""),(?!null,)",RegexOptions.Multiline)
-                .GroupBy(match=>match.Groups[2].Value).SelectMany(group=>group.Select(match=>match.Groups[1].Value)).ToArray();
-            Check(pages.Length>=40 && pages.Contains("Home") && pages.Contains("Diagnostics") && !pages.Contains("CraftLive"),"the navigation pages are read (a tab page is not one)");
+            // X-601 (0.1677): every page is in the table, a tab of a family too, in the group of its family's navigation entry.
+            var lines=Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"),@"^\s*new\(Page\.(\w+),(null|""\w+""),.*$",RegexOptions.Multiline)
+                .Select(match=>(Page:match.Groups[1].Value,Group:match.Groups[2].Value,Parent:Regex.Match(match.Value,@""",Page\.(\w+)[,)]").Groups[1].Value)).ToArray();
+            var pages=lines.GroupBy(line=>line.Parent.Length>0 ? lines.First(root=>root.Page==line.Parent).Group:line.Group).SelectMany(group=>group.Select(line=>line.Page)).ToArray();
+            Check(pages.Length>=52 && pages.Contains("Home") && pages.Contains("Diagnostics") && pages.Contains("CraftLive") && pages.Contains("Gear"),"every page is read, the tabs of a family too");
             var readme=Read("README.md");
             foreach(var language in new[]{"en","fr"})
             {

@@ -1,0 +1,151 @@
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using TenshoAssistant.UI;
+
+// X-601 (0.1677 and after, user request of 18/11, D-199): the side bar shrinks to pages that group (one tab template, DrawPageHeader of
+// X-600). No page is lost: every page is a side bar entry or a tab of one; a click on an entry, the quick search, a link and the last
+// page kept open the right tab; the names are the game's own (docs/evidence/0.1677-game-names.md).
+internal static class PageFamilies1677Tests
+{
+    private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    private static string Read(string path) => File.ReadAllText(Path.GetFullPath(path)).Replace("\r\n", "\n");
+
+    private enum P { Home, Character, Blue, Gear, Settings, Debug }
+
+    private static readonly PageFamilies.Member<P>[] Made =
+    [
+        new(P.Home, null, true, false),
+        new(P.Character, null, true, true), new(P.Blue, P.Character, false, true), new(P.Gear, P.Character, false, true),
+        new(P.Settings, null, true, true), new(P.Debug, P.Settings, false, true),
+    ];
+
+    /// <summary>The real page list, as the window builds it: page, parent, side bar entry, tab.</summary>
+    internal static List<PageFamilies.Member<int>> Real(out List<string> names)
+    {
+        names = [];
+        var rows = new List<(string Page, string? Parent, bool Label, bool Tab)>();
+        foreach (Match row in Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"), @"^\s*new\(Page\.(\w+),(?:""\w+""|null),(null|PageLabel\(|\(\)=>).*$", RegexOptions.Multiline))
+        {
+            var parent = Regex.Match(row.Value, @""",Page\.(\w+)[,)]");
+            rows.Add((row.Groups[1].Value, parent.Success ? parent.Groups[1].Value : null, row.Groups[2].Value != "null", row.Value.Contains(",Tab:")));
+        }
+        foreach (var row in rows) names.Add(row.Page);
+        var index = names.Select((name, at) => (name, at)).ToDictionary(pair => pair.name, pair => pair.at);
+        return rows.Select(row => new PageFamilies.Member<int>(index[row.Page], row.Parent is null ? null : index[row.Parent], row.Label, row.Tab)).ToList();
+    }
+
+    private static Dictionary<string, string> Texts(string code)
+    {
+        var values = new Dictionary<string, string>();
+        using var document = JsonDocument.Parse(File.ReadAllText(Path.GetFullPath($"src/TenshoAssistant/Localization/Languages/{code}.json")));
+        foreach (var section in document.RootElement.EnumerateObject())
+            if (section.Value.ValueKind == JsonValueKind.Object)
+                foreach (var key in section.Value.EnumerateObject())
+                    if (key.Value.ValueKind == JsonValueKind.String) values[section.Name + "." + key.Name] = key.Value.GetString()!;
+        return values;
+    }
+
+    /// <summary>The names taken from the game: language key, French, English, and the sheet row the evidence cites.</summary>
+    internal static readonly (string Key, string French, string English, string Source)[] GameNames =
+    [
+        ("Navigation.Character", "Personnage", "Character", "MainCommand 2"),
+        ("Navigation.BlueMagic", "Grimoire de magie bleue", "Blue Magic Spellbook", "MainCommand 81"),
+        ("Navigation.MaskedCarnivale", "La Grande Mascarade", "The Masked Carnivale", "ContentType 27"),
+        ("Navigation.Beastmaster", "Dresseur", "Beastmaster", "CharaCardPlayStyle 35"),
+        ("Navigation.Chocobo", "Chocobo", "Chocobo", "Addon 9081"),
+        ("Navigation.HuntingLog", "Bestiaire", "Hunting Log", "MainCommand 8"),
+        ("Navigation.Gear", "Équipement", "Gear", "HowToCategory 7"),
+        ("Navigation.RelicWeapons", "Armes antiques", "Relic Weapons", "AchievementCategory 62"),
+    ];
+
+    public static IEnumerable<(string Name, Action Run)> Cases =>
+    [
+        ("Page families 1677: a side bar entry opens the tab last shown, else its first page that can be reached; none: no entry", () =>
+        {
+            Check(PageFamilies.Root(Made, P.Gear) == P.Character && PageFamilies.Root(Made, P.Home) == P.Home, "the entry that stays selected");
+            Check(PageFamilies.Of(Made, P.Character).SequenceEqual([P.Character, P.Blue, P.Gear]), "the tabs, in the order of the list");
+            Check(PageFamilies.Target(Made, P.Character, null, _ => true) == P.Character, "first visit: the first page");
+            Check(PageFamilies.Target(Made, P.Character, P.Gear, _ => true) == P.Gear, "back on the family: the tab last shown");
+            Check(PageFamilies.Target(Made, P.Character, P.Gear, page => page != P.Gear) == P.Character, "the tab last shown is gone: the first page");
+            Check(PageFamilies.Target(Made, P.Character, null, page => page != P.Character) == P.Blue, "the first page stays in the game (desktop app): the next one");
+            Check(PageFamilies.Target(Made, P.Character, P.Blue, _ => false) is null, "nothing can be reached: the entry is not drawn");
+            Check(PageFamilies.Target(Made, P.Settings, P.Debug, page => page != P.Debug) == P.Settings, "developer mode off: the debug tab is not opened");
+            Check(PageFamilies.Target(Made, P.Home, null, _ => true) == P.Home, "a page alone is a family of one");
+            Check(PageFamilies.Target(Made, P.Character, P.Settings, _ => true) == P.Character, "a page of another family is never opened");
+        }),
+        ("Page families 1677: an orphan page, a parent out of the side bar and a family page without a tab are faults", () =>
+        {
+            Check(PageFamilies.Faults(Made).Count == 0, "the made list is sound: " + string.Join("; ", PageFamilies.Faults(Made)));
+            PageFamilies.Member<P>[] orphan = [.. Made, new(P.Debug + 1, null, false, false)];
+            Check(PageFamilies.Faults(orphan).Count == 1 && PageFamilies.Faults(orphan)[0].Contains("orphan"), "a page nothing opens");
+            PageFamilies.Member<P>[] nested = [new(P.Home, null, true, true), new(P.Blue, P.Home, false, true), new(P.Gear, P.Blue, false, true)];
+            Check(PageFamilies.Faults(nested).Any(fault => fault.Contains("is not a side bar entry")), "a tab of a tab");
+            PageFamilies.Member<P>[] mute = [new(P.Home, null, true, false), new(P.Blue, P.Home, false, false)];
+            Check(PageFamilies.Faults(mute).Count == 2, "a family without tabs: " + string.Join("; ", PageFamilies.Faults(mute)));
+            PageFamilies.Member<P>[] lost = [new(P.Home, null, true, true), new(P.Blue, P.Gear, false, true)];
+            Check(PageFamilies.Faults(lost).Count == 1, "a parent that is not in the list");
+        }),
+        ("Page families 1677: in the real list every page is a side bar entry or a tab of one, and the last page kept still opens its tab", () =>
+        {
+            var real = Real(out var names);
+            var enumBody = Regex.Match(Read("src/TenshoAssistant/MainWindow.cs"), @"enum Page \{([^}]*)\}").Groups[1].Value;
+            var pages = enumBody.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            Check(pages.Length >= 52 && pages.Order().SequenceEqual(names.Order()), "every page of the enum is read from the list: " + string.Join(",", pages.Except(names)));
+            var faults = PageFamilies.Faults(real);
+            Check(faults.Count == 0, string.Join("; ", faults.Select(fault => Regex.Replace(fault, @"\d+", match => names[int.Parse(match.Value)]))));
+            // Configuration.LastPage keeps a page's name: every name saved by an older version is still a page, and its family is in the side bar.
+            foreach (var page in pages)
+            {
+                var root = PageFamilies.Root(real, names.IndexOf(page));
+                Check(real[root].InSideBar && PageFamilies.Of(real, root).Contains(names.IndexOf(page)), "last page kept: " + page);
+            }
+            foreach (var kept in new[] { "Home", "Items", "Gathering", "Maps", "Collections", "BlueMagic", "Settings", "Gear", "HuntingLog", "Beastmaster", "Chocobo", "MaskedCarnivale", "RelicWeapons", "Discoveries", "Wishlist" })
+                Check(pages.Contains(kept), "a page name saved by an older version is gone: " + kept);
+            var window = Read("src/TenshoAssistant/MainWindow.cs");
+            Check(window.Contains("Enum.TryParse<Page>(configuration.LastPage,out var saved)") && window.Contains("configuration.LastPage=page.ToString();"), "the last page is kept by its name");
+        }),
+        ("Page families 1677: « Character » groups the pages of D-199, in its order", () =>
+        {
+            var real = Real(out var names);
+            string[] Family(string root) => PageFamilies.Of(real, names.IndexOf(root)).Select(at => names[at]).ToArray();
+            Check(Family("Collections").SequenceEqual(["Collections", "BlueMagic", "MaskedCarnivale", "Beastmaster", "Chocobo", "HuntingLog", "Gear", "RelicWeapons"]), "Character: " + string.Join(",", Family("Collections")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Collections,\"Progression\",PageLabel(\"Navigation.Character\"),"), "named « Character » in the side bar");
+        }),
+        ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>
+        {
+            var window = Read("src/TenshoAssistant/MainWindow.cs");
+            Check(window.Contains("if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);"), "an entry is drawn while one of its pages can be reached");
+            Check(window.Contains("PageFamilies.Target(FamilyMembers,root,familyLastTab.TryGetValue(root,out var last) ? last:null,Reachable)"), "its target");
+            Check(window.Contains("entry.Visible?.Invoke()!=false && ListedHere(shown)"), "reachable: shown and listed on this side");
+            var header = Read("src/TenshoAssistant/UI/Navigation/MainWindow.PageHeader.cs");
+            Check(header.Contains("if(entry.Page!=current && !Reachable(entry.Page))continue;") && header.Contains("familyLastTab[root]=page;"), "the header hides a tab out of reach and remembers the tab shown");
+            var search = Read("src/TenshoAssistant/MainWindow.QuickSearch.cs");
+            Check(search.Contains("entry.Label is not null || entry.Tab is not null") && search.Contains("QuickPageLabel(entry)") && search.Contains("Where(entry=>Reachable(entry.Page))"), "the quick search finds a tab by its name");
+            Check(search.Contains("case QuickSearchKind.Page when Enum.TryParse<Page>(hit.Key,out var target):page=target;break;"), "and opens that page, so its tab");
+            Check(Read("src/TenshoAssistant/MainWindow.Advanced.cs").Contains("(entry.Label is not null || entry.Tab is not null) && entry.Visible?.Invoke()!=false"), "a tab can be listed on one side only, as a page could");
+        }),
+        ("Page families 1677: folded categories kept when the categories change", () =>
+        {
+            Check(PageFamilies.KeepFolded(null, ["Tracking"]) is null, "never chosen: the defaults still apply");
+            var same = new HashSet<string> { "Tracking" };
+            Check(ReferenceEquals(PageFamilies.KeepFolded(same, ["Tracking", "World"]), same), "nothing to drop: the same set");
+            var kept = PageFamilies.KeepFolded(new HashSet<string> { "Tracking", "Content", "GoldSaucer" }, ["Tracking"]);
+            Check(kept is not null && kept.SetEquals(["Tracking"]), "the category that stays keeps its fold");
+            Check(PageFamilies.KeepFolded(new HashSet<string> { "Content" }, ["Tracking"]) is { Count: 0 }, "a choice was made: empty, not the defaults");
+        }),
+        ("Page families 1677: the names are the game's own, in both languages, each cited in the evidence", () =>
+        {
+            var french = Texts("fr");
+            var english = Texts("en");
+            var evidence = Read("docs/evidence/0.1677-game-names.md");
+            foreach (var (key, fr, en, source) in GameNames)
+            {
+                Check(french.TryGetValue(key, out var shownFr) && shownFr == fr, $"fr {key}: « {(french.TryGetValue(key, out var a) ? a : "")} », the game says « {fr} » ({source})");
+                Check(english.TryGetValue(key, out var shownEn) && shownEn == en, $"en {key}: « {(english.TryGetValue(key, out var b) ? b : "")} », the game says « {en} » ({source})");
+                Check(evidence.Contains($"| {source} | {fr} | {en} |"), "evidence row: " + source + " " + fr);
+            }
+            var probe = Read("tools/HelpTextProbe/Program.cs");
+            Check(probe.Contains("if(args[0]==\"names\")") && Read("tools/README.md").Contains("`names"), "the probe that read them");
+        }),
+    ];
+}

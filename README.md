@@ -41,7 +41,11 @@ and the help text of each page (the « ? » beside its title):
 |  | **Market** | Prices of the selected item from Universalis: summary, listings for your world, Data Center or region, and sale history. |
 |  | **Wishlist** | The items you want to get, in one list: their state (obtained, or the copies you hold), your price for a sale alert and, for the items that are gathered, where to gather them (job, zone, node, hours or weather). |
 | Production | **Crafting** | Simulate a recipe step by step, search a sequence, prepare the materials, and make a macro to copy or write into the game. Other tabs: crafting lists (with an on-screen panel of what they still need) and « What can I craft? » from your stocks. |
+|  | **Crafting presets** | Keep recipes and manual sequences to find them again. Nothing is run by itself. |
+|  | **Live synthesis** | During a synthesis: what the game shows, read by Tensho, and the comparison of your next moves under the current state. The page only reads and shows. |
 |  | **Gathering** | Find where and when a resource can be gathered or fished, with your gathering and fishing logs, an Eorzean clock and the fishing help. |
+|  | **GP plan** | Work out which gathering actions are worth their GP on an ordinary node, as a miner or botanist. |
+|  | **Collectables** | The table of gathered collectables: thresholds and scrip rewards. |
 |  | **Ocean Fishing** | The next departures from Limsa Lominsa and Kugane, with their stops and the time of day. |
 |  | **Island Sanctuary** | Your workshops' crafts with their estimated value, and the animals of your pasture, from what the game has loaded on your island. |
 |  | **Macro chain** | Chain several game macros, one after the other. The sequence only starts when you click. |
@@ -59,19 +63,20 @@ and the help text of each page (the « ? » beside its title):
 | Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
 |  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
 |  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wishlist. |
+|  | **Blue magic** | The blue mage's spells, known or not, with the monsters that teach them. |
+|  | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
+|  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
+|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that unlock the others. |
+|  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
+|  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
+|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
 |  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
 |  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
 |  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
 |  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
-|  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
-|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that unlock the others. |
 |  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
-|  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
-| Content | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
-|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
-|  | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
+| Content | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
 |  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
-|  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
 |  | **Triple Triad** | Your cards, decks, a simulator, NPCs with their availability and the cards you lack. With the observation on, advice during a match. |
 |  | **Mini Cactpot** | The best cell to reveal and the best line of a ticket. You always choose yourself. |
@@ -236,7 +241,11 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Marché** | Les prix de l'objet choisi, depuis Universalis : résumé, offres de votre monde, centre de traitement de données ou région, historique des ventes. |
 |  | **Souhaits** | Les objets que vous voulez obtenir, en une liste : leur état (obtenu, ou les exemplaires que vous avez), votre prix pour l'alerte de vente et, pour les objets qui se récoltent, où les récolter (job, zone, point, heures ou météo). |
 | Production | **Artisanat** | Simulez une recette étape par étape, cherchez une séquence, préparez les matières, et faites une macro à copier ou à écrire dans le jeu. Autres onglets : les listes d'artisanat (avec un panneau à l'écran de ce qu'il leur manque) et « Que puis-je fabriquer ? » d'après vos stocks. |
+|  | **Préréglages d'artisanat** | Gardez des recettes et des séquences manuelles pour les retrouver. Rien ne s'exécute seul. |
+|  | **Synthèse en direct** | Pendant une synthèse : ce que le jeu affiche, lu par Tensho, et la comparaison de vos prochains coups selon l'état en cours. La page ne fait que lire et afficher. |
 |  | **Récolte** | Trouvez où et quand récolter ou pêcher une ressource, avec vos carnets, l'horloge d'Éorzéa et l'aide à la pêche. |
+|  | **Plan de PR** | Calculez quelles actions de récolte valent leurs PR sur un point ordinaire, en mineur ou en botaniste. |
+|  | **Collectionnables** | Le tableau des collectionnables de récolte : seuils et assignats. |
 |  | **Pêche en mer** | Les prochains départs de Limsa Lominsa et de Kugane, avec leurs escales et le moment de la journée. |
 |  | **Félicité insulaire** | Les créations de vos fabriques avec leur valeur estimée, et les animaux de votre pâturage, à partir de ce que le jeu a chargé sur votre île. |
 |  | **Enchaînement de macros** | Enchaînez plusieurs macros du jeu, l'une après l'autre. La suite ne démarre que sur votre clic. |
@@ -254,19 +263,20 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 | Progression | **Quêtes** | Les quêtes du jeu avec votre progression, leurs récompenses et leurs enchaînements. |
 |  | **Événements** | Les événements saisonniers en cours, avec leurs quêtes, ce que vous avez fait et leurs boutiques. |
 |  | **Collections** | Montures, mascottes, emotes, cartes, rouleaux d'orchestrion, titres, hauts faits, coiffures et plus, avec ce que vous avez et comment obtenir le reste ; aussi votre liste de souhaits. |
+|  | **Magie bleue** | Les sorts du mage bleu, connus ou non, avec les monstres qui les enseignent. |
+|  | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
+|  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
+|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
+|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
+|  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
+|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
 |  | **Peuples alliés** | Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie. |
 |  | **Grandes compagnies** | Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent. |
 |  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
 |  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
-|  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
-|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
 |  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
-|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
-| Contenus | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
-|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
-|  | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
+| Contenus | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
 |  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
-|  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
 | Gold Saucer | **Revue de mode** | Le thème et les catégories de la semaine, ce que vous possédez pour chacune, et l'équipement signalé par la communauté. |
 |  | **Triple Triade** | Vos cartes, vos decks, un simulateur, les PNJ avec leur disponibilité et les cartes qui vous manquent. Avec l'observation activée, des conseils pendant un match. |
 |  | **Mini Cactpot** | La meilleure case à révéler et la meilleure ligne d'un ticket. Vous choisissez toujours vous-même. |

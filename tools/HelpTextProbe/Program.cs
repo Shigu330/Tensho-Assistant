@@ -15,10 +15,13 @@ using Lumina.Text.ReadOnly;
 //   find <sqpack> <language> <text>     every sheet, row and column whose text holds <text> (any case, accents ignored)
 //   index <sqpack> <folder> [sheets…]   writes <folder>/help-fr.jsonl, help-en.jsonl and meta.json (game version, sheets and rows);
 //                                       default sheets: Sheets below (chosen from « sheets » and « find », docs/evidence/0.1474-help-texts.md)
+//   names <sqpack> <language> <all|A,B> <name…>  every text that IS one of the names, in French, English, German and Japanese (X-601)
 //   search <folder> <words…>            the texts holding every word (any case, accents ignored), French and English side by side
 Console.OutputEncoding=new UTF8Encoding(false);
-if(args.Length<2)throw new ArgumentException("Usage: sheets <sqpack> | find <sqpack> <French|English> <text> | index <sqpack> <folder> [sheets…] | search <folder> <words…>");
+if(args.Length<2)throw new ArgumentException("Usage: sheets <sqpack> | find <sqpack> <French|English> <text> | names <sqpack> <language> <all|A,B> <name…> | index <sqpack> <folder> [sheets…] | search <folder> <words…>");
 
+// A name as the player reads it: the game's texts hold no-break spaces and soft hyphens.
+static string Plain(string text)=>Fold(text.Replace(' ',' ').Replace("­","")).Trim();
 static string Fold(string text)=>new string(text.Normalize(NormalizationForm.FormD).Where(c=>CharUnicodeInfo.GetUnicodeCategory(c)!=UnicodeCategory.NonSpacingMark).ToArray()).ToLowerInvariant();
 
 if(args[0]=="search")
@@ -148,6 +151,40 @@ if(args[0]=="index")
         new JsonSerializerOptions{WriteIndented=true}));
     Console.WriteLine($"INDEX game {version}: {counts.Values.Sum()} French texts in {counts.Count(c=>c.Value>0)} sheets → {folder}");
     foreach(var (name,n) in counts)Console.WriteLine($"  {name} {n}");
+    return;
+}
+if(args[0]=="names")
+{
+    // X-601 (0.1677): the game's own name of a thing, to name a page or a tab after it. Every text of every sheet (or of the sheets given
+    // as « A,B » in place of « all ») that IS one of the names (any case, accents ignored; not a text that merely holds it; three rows per sheet and name at most), in the given
+    // language, with the same cell in French, English, German and Japanese. Evidence: docs/evidence/0.1677-game-names.md.
+    var language=Enum.Parse<Language>(args[2]);
+    var sheets=args[3]=="all" ? data.Excel.SheetNames.OrderBy(n=>n,StringComparer.Ordinal).ToArray():args[3].Split(',');
+    var wanted=args[4..].Select(Plain).ToHashSet();
+    // « * » in place of the names: every text of the sheets given (never with « all »).
+    var every=args[4]=="*" && args[3]!="all";
+    Console.WriteLine($"GAME {version} NAMES ({language}): {string.Join(" | ",args[4..])}");
+    var unread=new List<string>();
+    var seen=new HashSet<string>();
+    foreach(var name in sheets)
+    {
+        try
+        {
+            var hits=(every ? Texts(name,language):Texts(name,language).Where(text=>wanted.Contains(Plain(text.Text))).GroupBy(text=>Plain(text.Text)).SelectMany(same=>same.Take(3))).ToArray();
+            if(hits.Length==0)continue;
+            var others=new[]{Language.French,Language.English,Language.German,Language.Japanese}
+                .ToDictionary(other=>other,other=>Texts(name,other).ToDictionary(text=>(text.Row,text.Column),text=>text.Text));
+            foreach(var (row,column,text) in hits)
+            {
+                seen.Add(Plain(text));
+                string In(Language other)=>others[other].TryGetValue((row,column),out var twin) ? twin:"";
+                Console.WriteLine($"{name} row {row} column {column}: fr « {In(Language.French)} » en « {In(Language.English)} » de « {In(Language.German)} » ja « {In(Language.Japanese)} »");
+            }
+        }
+        catch(Exception error){unread.Add($"{name} ({error.GetType().Name})");}
+    }
+    if(!every)foreach(var missing in args[4..].Where(asked=>!seen.Contains(Plain(asked))))Console.WriteLine($"NO TEXT IS « {missing} »");
+    if(unread.Count>0)Console.WriteLine($"NOT SEARCHED {unread.Count} sheet(s) unreadable in {language}: {string.Join(", ",unread)}");
     return;
 }
 throw new ArgumentException("Unknown mode: "+args[0]);

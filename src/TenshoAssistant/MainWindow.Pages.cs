@@ -4,7 +4,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     /// <param name="Page">The page; each one appears once, and a test checks it.</param>
-    /// <param name="Category">Its group in the navigation (null: above the groups).</param>
+    /// <param name="Category">Its group in the navigation (null: above the groups); for a tab of a family, only its group in the tool directory.</param>
     /// <param name="Label">Its name in the navigation; null for a page reached from the tabs of its parent.</param>
     /// <param name="Draw">Draws the page.</param>
     /// <param name="Source">Where its code starts, shown to contributors.</param>
@@ -54,22 +54,24 @@ internal sealed partial class MainWindow
         // 0.341 (user request): the Character page is gone (the Gear page shows the same real values); the chocobo has its own page.
         new(Page.Quests,"Progression",PageLabel("Navigation.Quests"),DrawQuests,"MainWindow.Quests.cs, Quests/"),
         new(Page.Events,"Progression",PageLabel("Navigation.Events"),DrawEventsPage,"MainWindow.Events.cs, Events/"),
-        new(Page.Collections,"Progression",PageLabel("Navigation.Collection"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("CollectionsBrowser.Title"),About:PageLabel("CollectionsBrowser.Description")),
-        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections,Tab:PageLabel("Category.BlueMagic"),About:PageLabel("CollectionsBrowser.BlueDescription")),
+        // X-601 (0.1677, D-199): « Character », the first page that groups: the collections, blue magic and its carnivale, the beastmaster,
+        // the chocobo, the hunting log, the gear and the relic weapons, each a tab of the one page header.
+        new(Page.Collections,"Progression",PageLabel("Navigation.Character"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("Navigation.Collection"),About:PageLabel("CollectionsBrowser.Description")),
+        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections,Tab:PageLabel("Navigation.BlueMagic"),About:PageLabel("CollectionsBrowser.BlueDescription")),
+        new(Page.MaskedCarnivale,"Content",null,DrawMaskedCarnivale,"MainWindow.MaskedCarnivale.cs, Carnivale/",Page.Collections,Tab:PageLabel("Navigation.MaskedCarnivale"),About:PageLabel("MaskedCarnivale.Subtitle")),
+        new(Page.Beastmaster,"Content",null,DrawBeastmaster,"MainWindow.Beastmaster.cs, Beastmaster/",Page.Collections,Tab:PageLabel("Navigation.Beastmaster"),About:PageLabel("BeastUi.Help")),
+        new(Page.Chocobo,"Progression",null,DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs",Page.Collections,Tab:PageLabel("Navigation.Chocobo"),About:PageLabel("ChocoboBarding.Help")),
+        new(Page.HuntingLog,"Progression",null,DrawHuntingLog,"MainWindow.HuntingLog.cs",Page.Collections,Tab:PageLabel("Navigation.HuntingLog"),About:PageLabel("HuntingLog.Description")),
+        new(Page.Gear,"Progression",null,DrawGearPlanner,"MainWindow.Gear.cs, Gear/",Page.Collections,Tab:PageLabel("Navigation.Gear"),About:PageLabel("Gear.Description")),
+        new(Page.RelicWeapons,"Content",null,DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/",Page.Collections,Tab:PageLabel("Navigation.RelicWeapons"),About:PageLabel("Relics.Subtitle")),
         new(Page.AlliedSocieties,"Progression",PageLabel("Navigation.AlliedSocieties"),DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/"),
         new(Page.GrandCompanies,"Progression",PageLabel("Navigation.GrandCompanies"),DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/"),
         new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.SpecialDeliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs"),
         new(Page.CustomDeliveries,"Progression",PageLabel("Navigation.CustomDeliveries"),DrawCustomDeliveries,"MainWindow.CustomDeliveries.cs, Deliveries/"),
-        new(Page.Gear,"Progression",PageLabel("Navigation.Gear"),DrawGearPlanner,"MainWindow.Gear.cs, Gear/"),
-        new(Page.Chocobo,"Progression",PageLabel("Navigation.Chocobo"),DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs"),
         new(Page.Leves,"Progression",PageLabel("Navigation.Leves"),DrawLeves,"MainWindow.Leves.cs"),
-        new(Page.HuntingLog,"Progression",PageLabel("Navigation.HuntingLog"),DrawHuntingLog,"MainWindow.HuntingLog.cs"),
         // X-100 (0.998, DEC-048): « Content », one family of content per page (X-90, X-92).
-        new(Page.MaskedCarnivale,"Content",PageLabel("Navigation.MaskedCarnivale"),DrawMaskedCarnivale,"MainWindow.MaskedCarnivale.cs, Carnivale/"),
-        new(Page.RelicWeapons,"Content",PageLabel("Navigation.RelicWeapons"),DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/"),
         new(Page.FieldContent,"Content",PageLabel("Navigation.FieldContent"),DrawFieldContent,"MainWindow.FieldContent.cs, Fields/"),
         new(Page.DeepDungeons,"Content",PageLabel("Navigation.DeepDungeons"),DrawDeepDungeons,"MainWindow.DeepDungeons.cs, DeepDungeons/"),
-        new(Page.Beastmaster,"Content",PageLabel("Navigation.Beastmaster"),DrawBeastmaster,"MainWindow.Beastmaster.cs, Beastmaster/"),
         new(Page.Fashion,"GoldSaucer",PageLabel("Category.Fashion"),DrawFashion,"MainWindow.Fashion*.cs, Fashion/"),
         new(Page.TripleTriad,"GoldSaucer",PageLabel("Category.Triad"),DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/"),
         new(Page.MiniCactpot,"GoldSaucer",PageLabel("Category.Cactpot"),DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/"),

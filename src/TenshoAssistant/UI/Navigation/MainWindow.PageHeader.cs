@@ -27,6 +27,9 @@ internal sealed partial class MainWindow
             foreach(var entry in PageEntries)
             {
                 if(entry.Tab is not { } tab || (entry.Page!=root && entry.Parent!=root))continue;
+                // X-601 (0.1677): a tab that cannot be reached here (developer mode, or listed on the other side only) is not drawn,
+                // unless a link opened it.
+                if(entry.Page!=current && !Reachable(entry.Page))continue;
                 var flags=pageTabs.Force(current,entry.Page) ? ImGuiTabItemFlags.SetSelected:ImGuiTabItemFlags.None;
                 if(!ImGui.BeginTabItem(tab()+"###PageTab"+entry.Page,flags))continue;
                 ImGui.EndTabItem();
@@ -40,6 +43,7 @@ internal sealed partial class MainWindow
             }
             if(chosen is { } next)page=next;
             pageTabs.Shown(page);
+            familyLastTab[root]=page;
         }
         finally{ImGui.EndTabBar();}
     }

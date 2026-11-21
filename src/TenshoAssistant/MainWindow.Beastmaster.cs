@@ -22,7 +22,6 @@ internal sealed partial class MainWindow
 
     private void DrawBeastmaster()
     {
-        Heading(localization.Get("BeastUi.Title"), localization.Get("BeastUi.Help"));
         var state = Beasts?.State;
         if (state?.Error is not null) { ImGui.TextWrapped(localization.Get("BeastUi.Error")); return; }
         if (state?.Catalog is not { } catalog) { ImGui.TextDisabled(LoadingText("BeastUi.Loading")); return; }

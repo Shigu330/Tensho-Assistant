@@ -58,7 +58,6 @@ internal sealed partial class MainWindow
     }
     private void DrawGearPlanner()
     {
-        Heading(localization.Get("Gear.Title"),localization.Get("Gear.Description"));
         var catalog=GearCatalog?.Invoke();
         var state=characterStats.State;
         if(state.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}

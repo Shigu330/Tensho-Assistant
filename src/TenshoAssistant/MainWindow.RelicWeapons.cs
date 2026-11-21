@@ -28,7 +28,6 @@ internal sealed partial class MainWindow
     }
     private void DrawRelicWeapons()
     {
-        Heading(localization.Get("Relics.Title"),localization.Get("Relics.Subtitle"));
         // W-13 (0.716): every weapon of the sheet is looked at: off the frame.
         if(!relicCatalogTried && RelicCatalogLoad is { } load)
         {

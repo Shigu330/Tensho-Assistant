@@ -178,6 +178,7 @@
     <Compile Include="../../src/TenshoAssistant/UI/NavigationLayout.cs" Link="UI/NavigationLayout.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/SelectionMark.cs" Link="UI/SelectionMark.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/PageTabSync.cs" Link="UI/PageTabSync.cs" />
+    <Compile Include="../../src/TenshoAssistant/UI/PageFamilies.cs" Link="UI/PageFamilies.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/UiStates.cs" Link="UI/UiStates.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/TextFit.cs" Link="UI/TextFit.cs" />
     <Compile Include="../../src/TenshoAssistant/UI/GaugeMath.cs" Link="UI/GaugeMath.cs" />

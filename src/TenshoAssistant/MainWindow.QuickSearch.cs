@@ -19,9 +19,18 @@ internal sealed partial class MainWindow
     private (Page Page,string Label,string Purpose)[] QuickPageIndex()
     {
         if(quickPageIndex is { } index && index.Language==localization.CurrentCode)return index.Pages;
-        var pages=PageEntries.Where(entry=>entry.Label is not null).Select(entry=>(entry.Page,entry.Label!(),TopicOf(entry.Page).Purpose)).ToArray();
+        // X-601 (0.1677): a page that is a tab of a family is found by its tab's name (« Hunting Log · Character ») and opens on that tab.
+        var pages=PageEntries.Where(entry=>entry.Label is not null || entry.Tab is not null).Select(entry=>(entry.Page,QuickPageLabel(entry),TopicOf(entry.Page).Purpose)).ToArray();
         quickPageIndex=(localization.CurrentCode,pages);
         return pages;
+    }
+
+    private string QuickPageLabel(PageEntry entry)
+    {
+        if(entry.Tab is not { } tab)return entry.Label!();
+        var family=PageEntryFor(entry.Parent ?? entry.Page)?.Label?.Invoke() ?? "";
+        var name=tab();
+        return family.Length==0 || string.Equals(family,name,StringComparison.CurrentCultureIgnoreCase) ? name:$"{name} · {family}";
     }
 
     private void DrawQuickSearch()
@@ -56,7 +65,7 @@ internal sealed partial class MainWindow
     private void StartQuickSearch(string query,string[] tokens)
     {
         // Pages on the frame: their labels follow the language and the places chosen for each side.
-        var pages=QuickPageIndex().Where(entry=>ListedHere(entry.Page)).ToArray();
+        var pages=QuickPageIndex().Where(entry=>Reachable(entry.Page)).ToArray();
         var byTitle=QuickSearch.Top(pages,entry=>entry.Label,tokens);
         var byHelp=byTitle.Count<QuickSearch.PerKind ? QuickSearch.Top(pages.Except(byTitle),entry=>entry.Purpose,tokens,QuickSearch.PerKind-byTitle.Count):[];
         quickPages=byTitle.Concat(byHelp).Select(entry=>new QuickSearchHit(QuickSearchKind.Page,0,entry.Page.ToString(),entry.Label,entry.Purpose)).ToArray();

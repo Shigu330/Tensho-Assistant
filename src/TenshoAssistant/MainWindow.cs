@@ -411,7 +411,7 @@ internal sealed partial class MainWindow : Window, IDisposable
         foreach(var group in PageGroups)
             if(group.Category is null || NavigationCategory(group.Category,group.Pages))
                 foreach(var entry in group.Entries)
-                    if(entry.Visible?.Invoke()!=false && ListedHere(entry.Page))Navigation(entry.Label!(),entry.Page);
+                    if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);
         ImGui.Spacing();
         ImGui.Separator();
         // 0.1038 (T-0.912-1): the theme's text colour, readable in the light theme too.
@@ -434,10 +434,20 @@ internal sealed partial class MainWindow : Window, IDisposable
 
     private Page NavigationPage(Page current)=>PageEntryFor(current)?.Parent ?? current;
 
-    private void Navigation(string label, Page destination)
+    // X-601 (0.1677): a side bar entry stands for its family (UI/PageFamilies.cs): it is drawn while one of its pages can be reached here,
+    // and a click opens the tab last shown in it during this session, else its first page that can be reached.
+    private readonly Dictionary<Page,Page> familyLastTab=[];
+    private TenshoAssistant.UI.PageFamilies.Member<Page>[]? familyMembers;
+    private TenshoAssistant.UI.PageFamilies.Member<Page>[] FamilyMembers=>familyMembers??=
+        [.. PageEntries.Select(entry=>new TenshoAssistant.UI.PageFamilies.Member<Page>(entry.Page,entry.Parent,entry.Label is not null,entry.Tab is not null))];
+    private bool Reachable(Page shown)=>PageEntryFor(shown) is { } entry && entry.Visible?.Invoke()!=false && ListedHere(shown);
+    private Page? FamilyTarget(Page root)
+        =>TenshoAssistant.UI.PageFamilies.Target(FamilyMembers,root,familyLastTab.TryGetValue(root,out var last) ? last:null,Reachable);
+
+    private void Navigation(string label, Page root, Page target)
     {
-        if (UiComponents.NavigationItem(label, NavigationPage(page) == destination))
-            page = destination;
+        if (UiComponents.NavigationItem(label, NavigationPage(page) == root) && NavigationPage(page) != root)
+            page = target;
     }
 
     private ItemDefinition? SelectedItem => itemId > 0 ? itemCatalog.State.Catalog?.Find((uint)itemId) : null;

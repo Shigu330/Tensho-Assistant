@@ -35,7 +35,7 @@ internal static class PagePlaces1158Tests
         {
             var configuration=Read("src/TenshoAssistant/Configuration.cs");
             Check(configuration.Contains("public Dictionary<string,string> PagePlaces { get; set; } = [];") && configuration.Contains("\"DesktopInstallFolder\", \"PagePlaces\", "),"a setting, reset with the others");
-            Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("if(entry.Visible?.Invoke()!=false && ListedHere(entry.Page))Navigation(entry.Label!(),entry.Page);"),"the navigation follows it");
+            Check(Read("src/TenshoAssistant/MainWindow.cs").Contains("if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);") && Read("src/TenshoAssistant/MainWindow.cs").Contains("entry.Visible?.Invoke()!=false && ListedHere(shown)"),"the navigation follows it");
             var advanced=Read("src/TenshoAssistant/MainWindow.Advanced.cs");
             Check(advanced.Contains("if(!Desktop.DesktopPages.Choosable(name))continue;") && advanced.Contains("ComboSetting(\"Advanced.PagePlace\",\"Advanced.PagePlaceTip\""),"one choice per page, by the shared component");
             Check(advanced.Contains("if(value==Desktop.PagePlace.Both)configuration.PagePlaces.Remove(name);"),"« both » removes the entry (no entry: both)");

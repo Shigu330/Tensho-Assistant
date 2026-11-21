@@ -16,7 +16,6 @@ internal sealed partial class MainWindow
 
     private void DrawMaskedCarnivale()
     {
-        Heading(localization.Get("MaskedCarnivale.Title"),localization.Get("MaskedCarnivale.Subtitle"));
         if(!carnivaleStagesTried)
         {
             carnivaleStagesTried=true;

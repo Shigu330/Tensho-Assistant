@@ -934,6 +934,7 @@
     "ClearNo": "No"
   },
   "Navigation": {
+    "BlueMagic": "Blue Magic Spellbook",
     "GardenCount": "Garden ({0})",
     "RemindersCount": "Reminders ({0})",
     "Wishlist": "Wishlist",
@@ -945,8 +946,8 @@
     "SpecialDeliveries": "Special deliveries",
     "GrandCompanies": "Grand Companies",
     "AlliedSocieties": "Allied Societies",
-    "RelicWeapons": "Relics",
-    "MaskedCarnivale": "Masked Carnivale",
+    "RelicWeapons": "Relic Weapons",
+    "MaskedCarnivale": "The Masked Carnivale",
     "CustomDeliveries": "Custom Deliveries",
     "IslandSanctuary": "Island Sanctuary",
     "Help": "Help",

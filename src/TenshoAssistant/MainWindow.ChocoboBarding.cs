@@ -60,7 +60,6 @@ internal sealed partial class MainWindow
 
     private void DrawChocoboPage()
     {
-        Heading(localization.Get("ChocoboBarding.Title"),localization.Get("ChocoboBarding.Help"));
         if(characterStats.State.CharacterId==0){ImGui.TextWrapped(localization.Get("CharacterUi.Offline"));return;}
         DrawRaceChocobo();
         if(GearCatalog?.Invoke() is not { } catalog){ImGui.TextDisabled(GearNotReady);return;}
