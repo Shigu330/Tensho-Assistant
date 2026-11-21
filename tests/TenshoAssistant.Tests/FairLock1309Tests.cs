@@ -135,12 +135,20 @@ internal static class FairLock1309Tests
             }) { IsBackground = true };
             greedy.Start();
             Started(held);
+            // X-751 (0.1742, idea I-049): fair at the stores' level too. The waiting store's change got through even with a lock made unfair on
+            // purpose (the busy store leaves gaps between its saves, and the waiting store waits 10 s): the busy store's saves while the
+            // waiting store waits are now counted: the lock lets the one in progress end and, queued behind the waiting store, the busy store
+            // goes after it (two at most, a third finishing as the count is read); an unfair lock lets it save again and again.
+            var during = new List<int>();
             for (var i = 0UL; i < 5; i++)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
+                var before = Volatile.Read(ref held.Value);
                 var saved = waiting.Apply(new BankChange(Put: Entry(8,BankStorageKind.Retainer,2000 + i)),[]);
+                during.Add(Volatile.Read(ref held.Value) - before);
                 Check(saved.Count(entry => entry.Key.CharacterId == 8) == (int)i + 1,"the waiting store's change " + i + " saved (" + watch.ElapsedMilliseconds + " ms)");
             }
+            Check(during.Max() <= 3,"fair: the busy store's saves while the waiting store waited: " + string.Join(", ",during));
             Check(greedy.IsAlive,"the busy store was still saving after the waiting store's changes");
             stop.Cancel();
             Check(greedy.Join(TimeSpan.FromSeconds(30)),"the greedy store stopped");
