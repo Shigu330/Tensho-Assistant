@@ -752,7 +752,7 @@
     "SaleListBoard": "tableau, {0}",
     "SaleListUniversalis": "Universalis, {0}",
     "SaleListNpcBetter": "Un PNJ paie au moins autant que le marché, taxe déduite.",
-    "SaleListCopyTip": "Copie ce prix unitaire, l'offre la plus basse vue. Tensho ne met rien en vente : vous fixez le prix vous-même dans le jeu.",
+    "SaleListCopyTip": "Copie l'offre la plus basse vue moins 1 gil (jamais sous 1), pour vendre juste en dessous. Tensho ne met rien en vente : vous fixez le prix vous-même dans le jeu.",
     "SaleListUnknown": "{0} objet(s) que le marché prend n'ont pas de prix connu : regardez-les au tableau des ventes, ou demandez à Universalis.",
     "SaleListFooter": "Total = offre la plus basse × quantité, moins la taxe de {0} % sur les ventes d'un servant ({1}). Les objets que le marché ne prend pas sont écartés.",
     "SaleListTaxCity": "le taux de sa ville, tel que le jeu l'a envoyé",

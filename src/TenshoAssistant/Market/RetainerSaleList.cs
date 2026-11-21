@@ -37,6 +37,13 @@ public static class RetainerSaleList
     /// sent it (MarketTax.RateFor), the help's 5 % otherwise.</summary>
     public static long Net(long unit,long quantity,int taxPercent=TaxPercent)=>unit*quantity*(100-Math.Clamp(taxPercent,0,100))/100;
 
+    /// <summary>X-719 (0.1726, the user's request of 21/11): the price the « Copy » button copies: the lowest seen minus 1 gil, never under 1
+    /// (as the undercut's price to paste, Undercut.Price).</summary>
+    public static long Paste(long lowest)=>Math.Max(1,lowest-1);
+
+    /// <summary>X-719 (0.1726): when a price was seen, short for the table (the time today, the date another day; the whole time on hover).</summary>
+    public static string Short(DateTimeOffset seen,DateTimeOffset now)=>seen.Date==now.Date ? seen.ToString("t",System.Globalization.CultureInfo.CurrentCulture):seen.ToString("d",System.Globalization.CultureInfo.CurrentCulture);
+
     /// <summary>The newer of two prices (either may be missing; the same age: the board, seen by the player).</summary>
     public static SalePrice? Newest(SalePrice? board,SalePrice? universalis)
         =>board is null ? universalis:universalis is null ? board:(universalis.At ?? DateTimeOffset.MinValue)>(board.At ?? DateTimeOffset.MinValue) ? universalis:board;

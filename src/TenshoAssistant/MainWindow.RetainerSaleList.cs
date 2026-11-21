@@ -66,7 +66,8 @@ internal sealed partial class MainWindow
             {
                 var titles = new[] { "RetainerSales.Item", "RetainerSales.Quantity", "RetainerSales.SaleListUnit", "RetainerSales.SaleListTotal", "RetainerSales.SaleListNpc", "RetainerSales.SaleListSource", "RetainerSales.Copy" }
                     .Select(title => localization.Get(title)).ToArray();
-                foreach (var title in titles) ImGui.TableSetupColumn(title);
+                // X-719 (0.1726): the « Copy » column keeps its button's width (never squeezed out of the window).
+                for (var column = 0; column < titles.Length; column++) ImGui.TableSetupColumn(titles[column], column == titles.Length - 1 ? ImGuiTableColumnFlags.WidthFixed : ImGuiTableColumnFlags.None);
                 // The amounts' titles on the right, above them.
                 UI.UiComponents.HeadersRow(titles, column => column is 1 or 2 or 3 or 4);
                 var catalog = itemCatalog.State.Catalog;
@@ -83,11 +84,21 @@ internal sealed partial class MainWindow
                     if (row.Npc is { } npc) ImGui.TextColored(row.NpcBetter ? UI.FfxivTheme.Warning : Muted, npc.ToString("N0", Numbers)); else ImGui.TextDisabled("—");
                     if (row.NpcBetter) TipText(localization.Get("RetainerSales.SaleListNpcBetter"));
                     ImGui.TableNextColumn();
-                    ImGui.TextDisabled(row.Price is { } price ? localization.Format(price.Source == SaleSource.Board ? "RetainerSales.SaleListBoard" : "RetainerSales.SaleListUniversalis", price.At?.ToLocalTime().ToString("g") ?? "?") : "—");
+                    // X-719 (0.1726): short (the time today, else the date), the whole time on hover.
+                    if (row.Price is { } price)
+                    {
+                        var key = price.Source == SaleSource.Board ? "RetainerSales.SaleListBoard" : "RetainerSales.SaleListUniversalis";
+                        var seen = price.At?.ToLocalTime();
+                        ImGui.TextDisabled(localization.Format(key, seen is { } local ? RetainerSaleList.Short(local, DateTimeOffset.Now) : "?"));
+                        if (seen is { } whole) TipText(localization.Format(key, whole.ToString("g")));
+                    }
+                    else ImGui.TextDisabled("—");
                     ImGui.TableNextColumn();
                     if (row.Price is { } unit)
                     {
-                        CopyButton($"{unit.Unit:N0}##RetainerSaleListCopy{row.Item}{(row.Hq ? "h" : "n")}", () => unit.Unit.ToString());
+                        // X-719 (0.1726): the lowest price seen minus 1 gil, never under 1.
+                        var paste = RetainerSaleList.Paste(unit.Unit);
+                        CopyButton($"{paste:N0}##RetainerSaleListCopy{row.Item}{(row.Hq ? "h" : "n")}", () => paste.ToString());
                         Tip("RetainerSales.SaleListCopyTip");
                     }
                 }

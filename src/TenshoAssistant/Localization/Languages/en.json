@@ -752,7 +752,7 @@
     "SaleListBoard": "board, {0}",
     "SaleListUniversalis": "Universalis, {0}",
     "SaleListNpcBetter": "An NPC pays at least as much as the market would, after tax.",
-    "SaleListCopyTip": "Copies this unit price, the lowest offer seen. Tensho puts nothing up for sale: you set the price yourself in the game.",
+    "SaleListCopyTip": "Copies the lowest offer seen minus 1 gil (never under 1), to sell just under it. Tensho puts nothing up for sale: you set the price yourself in the game.",
     "SaleListUnknown": "{0} item(s) the market takes have no known price: look them up at the market board, or ask Universalis.",
     "SaleListFooter": "Total = lowest offer × quantity, minus the {0}% tax of a retainer's sales ({1}). Items the market does not take are left out.",
     "SaleListTaxCity": "the rate of its city, as the game sent it",

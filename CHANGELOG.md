@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1726.0
+- Plan global, X-719 : Vos ventes › liste à vendre du servant (X-719, demande de l'utilisateur du 21/11 vers 13 h, capture gardée hors du dépôt) : le bouton de la colonne « Copier » copie maintenant le prix le plus bas vu moins 1 gil (jamais sous 1 gil, comme le prix à coller de la revue des ventes et du sous-cotage) ; il montre ce prix, son info-bulle le dit ; prix inconnu : pas de bouton ; le total et la liste restent calculés comme avant. Le tableau tient dans la fenêtre : la cellule « Prix vu » est courte (l'heure si c'est aujourd'hui, sinon la date ; l'heure entière au survol) et la colonne « Copier » garde la largeur de son bouton. Textes en et fr.
+- Pour les joueurs : vos ventes : le bouton « Copier » de la liste à vendre copie le prix le plus bas vu moins 1 gil, et le tableau tient dans la fenêtre.
+- Tests : SaleListCopy1726Tests. Verify.ps1 (agent) : 3677/3677, 0 avertissement, 0 erreur ; DLL 0.1726.0.0. Non validé en jeu.
+### English
+- Your sales › the retainer's sale list (X-719, the user's request of 21/11 around 13:00, screenshot kept out of the repository): the « Copy » column's button now copies the lowest price seen minus 1 gil (never under 1 gil, as the price to paste of the sales review and of the undercut); it shows that price, its tooltip says so; unknown price: no button; the total and the list are computed as before. The table fits the window: the « Price from » cell is short (the time if today, else the date; the whole time on hover) and the « Copy » column keeps its button's width. Texts in en and fr.
+- For players: Your sales: the sale list's « Copy » button copies the lowest price seen minus 1 gil, and the table fits the window.
+
 ## 0.1725.0
 - Plan global, X-721 : Barre du serveur (X-721, demande de l'utilisateur du 21/11 vers 13 h 15, capture gardée hors du dépôt) : l'entrée « Reste à faire » (icône et compteur) restait affichée à 0 avec « Rien à faire pour l'instant ». Elle n'apparaît plus que s'il reste au moins une chose à faire, et revient seule à la lecture suivante (toutes les 5 s) dès qu'il y en a une, comme l'entrée des travaux finis ; le réglage garde son sens (coupé : jamais). L'info-bulle du réglage le dit (en et fr).
 - Pour les joueurs : barre du serveur : l'entrée « Reste à faire » est cachée quand il n'y a rien à faire, et revient seule.
