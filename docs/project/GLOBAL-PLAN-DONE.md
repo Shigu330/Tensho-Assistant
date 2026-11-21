@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (721 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (723 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -789,12 +789,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-707 | Review of block 0.1687 to 0.1692 (review 0.1692, 21/11), minor M1: M1 in… | Done in 0.1693.0 |
 | X-708 | Flaky test seen in relay 156 (21/11 7:40, publishing 0.1696): « Fair lock 1309… | Done in 0.1699.0 |
 | X-709 | Review of block 0.1693 to 0.1698 (review 0.1698, 21/11), minor M1: M1 in… | Done in 0.1700.0 |
+| X-710 | Review of block 0.1699 to 0.1703 (review 0.1703, 21/11), I1: finding in… | Done in 0.1704.0 |
+| X-711 | Review of block 0.1699 to 0.1703 (review 0.1703, 21/11), minor M1, M2, M3: M1… | Done in 0.1705.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (721 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (723 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1581,3 +1583,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-707 | Relecture du bloc 0.1687 à 0.1692 (relecture 0.1692, 21/11), mineurs M1 : M1… | Fait en 0.1693.0 |
 | X-708 | Test instable constaté au relais 156 (21/11 07 h 40, publication de 0.1696) : «… | Fait en 0.1699.0 |
 | X-709 | Relecture du bloc 0.1693 à 0.1698 (relecture 0.1698, 21/11), mineurs M1 : M1… | Fait en 0.1700.0 |
+| X-710 | Relecture du bloc 0.1699 à 0.1703 (relecture 0.1703, 21/11), I1 : La… | Fait en 0.1704.0 |
+| X-711 | Relecture du bloc 0.1699 à 0.1703 (relecture 0.1703, 21/11), mineurs M1, M2, M3… | Fait en 0.1705.0 |

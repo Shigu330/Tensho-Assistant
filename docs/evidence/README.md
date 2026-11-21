@@ -125,7 +125,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1685-fishing-bite-stopwatch.md](0.1685-fishing-bite-stopwatch.md) | `src/TenshoAssistant/Gathering/FishingStopwatch.cs`, `tests/TenshoAssistant.Tests/FishingBite1685Tests.cs`, `tests/TenshoAssistant.Tests/Review1686Fixes1687Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1688-chat-player-menu-far.md](0.1688-chat-player-menu-far.md) | `src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs`, `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatPlayerMenu1688Tests.cs` | — |
 | [0.1697-reorderable-tabs.md](0.1697-reorderable-tabs.md) | `src/TenshoAssistant/UI/TabBarDrag.cs`, `src/TenshoAssistant/UI/TabOrder.cs` | — |
-| [0.1700-tab-bar-settle.md](0.1700-tab-bar-settle.md) | `src/TenshoAssistant/UI/TabBarDrag.cs`, `tests/TenshoAssistant.Tests/TabBarSettle1700Tests.cs` | `CHANGELOG.md` |
+| [0.1700-tab-bar-settle.md](0.1700-tab-bar-settle.md) | `src/TenshoAssistant/UI/TabBarDrag.cs`, `tests/TenshoAssistant.Tests/TabBarSettle1700Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1703-submarine-unlocks.md](0.1703-submarine-unlocks.md) | `src/TenshoAssistant/FreeCompany/SubmarineUnlocks.cs`, `tests/TenshoAssistant.Tests/SubmarineUnlock1703Tests.cs` | `CHANGELOG.md` |
 | [0.1706-route-planners.md](0.1706-route-planners.md) | `src/TenshoAssistant/MainWindow.Planner.cs`, `tests/TenshoAssistant.Tests/RoutePlanner1706Tests.cs` | `CHANGELOG.md` |
 | [0.1708-quest-info.md](0.1708-quest-info.md) | `tests/TenshoAssistant.Tests/QuestInfo1708Tests.cs` | `CHANGELOG.md` |

@@ -2531,6 +2531,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1703) Compagnie libre › Routes : choisir un sous-marin puis un « Secteur à débloquer » encore fermé : la suite des secteurs à explorer s'affiche avec leurs rangs, à partir du dernier déjà débloqué ; un secteur déjà débloqué ou le premier de la carte est dit tel quel
 
+- [ ] (0.1705) Barre de côté : cliquer une entrée en bougeant un peu la souris pendant le clic : la page s'ouvre ; commencer à glisser une entrée, fermer la fenêtre par son raccourci en tenant le bouton, relâcher, rouvrir : l'entrée n'a pas bougé
+
+- [ ] (0.1706) Compagnie libre › Meilleurs trajets : choisir Sous-marins puis Aéronefs en tête : chaque genre garde son vaisseau, son rang, sa vitesse et son autonomie ; un aéronef lu à l'atelier avec un montage prévu montre le bouton « Montage prévu » ; les meilleurs trajets et « Vos aéronefs » s'affichent comme avant
+
+- [ ] (0.1706) Compagnie libre › Secteurs d'aéronef : cocher deux secteurs puis « Planifier les trajets d'aéronef » : l'onglet Meilleurs trajets s'ouvre sur les aéronefs et mesure le trajet coché
+
+- [ ] (0.1707) Compagnie libre › Meilleurs trajets › Sous-marins : but « Butin : un objet », choisir un objet : seuls les trajets par un secteur où il peut tomber, les plus courts d'abord ; but « Débloquer un secteur », choisir un secteur fermé : les trajets passent par le prochain secteur à explorer
+
+- [ ] (0.1707) Meilleurs trajets › Sous-marins : ouvrir « Secteurs de cette carte », cocher deux secteurs : la ligne du trajet mesuré s'affiche (distance, durée, expérience, valeur) ; « Choisir » sur un meilleur trajet le coche ; « Vider » décoche
+
+- [ ] (0.1707) Meilleurs trajets › Sous-marins : ouvrir « Vos sous-marins » : un meilleur trajet par sous-marin lu à l'atelier ; « Choisir » reprend ce sous-marin et coche son trajet
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
