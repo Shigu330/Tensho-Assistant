@@ -22,7 +22,7 @@ public static class CommunityDiscoveries
     public static DiscoveryFile? Parse(string json)
     {
         // X-76 E1 (0.916): versions 1 and 2 (DiscoveryFile.Readable).
-        var file=JsonSerializer.Deserialize<DiscoveryFile>(json);
+        var file=JsonSerializer.Deserialize<DiscoveryFile>(json,TenshoJson.Plain);
         return DiscoveryFile.Readable(file) ? file:null;
     }
 
@@ -52,7 +52,7 @@ public static class CommunityDiscoveries
     public static string Encode(DiscoveryFile file)
     {
         using var memory=new MemoryStream();
-        using(var gzip=new GZipStream(memory,CompressionLevel.Optimal,true))JsonSerializer.Serialize(gzip,file);
+        using(var gzip=new GZipStream(memory,CompressionLevel.Optimal,true))JsonSerializer.Serialize(gzip,file,TenshoJson.Plain);
         return Convert.ToBase64String(memory.ToArray());
     }
     public static DiscoveryFile? Decode(string text)

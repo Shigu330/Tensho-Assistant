@@ -75,11 +75,11 @@ public static class GameDataChanges
         :(report.NeedsLook.Count>0,$"{report.VersionBefore} -> {report.VersionNow}: {report.Changes.Count} sheets changed, {report.NewSheets.Count} new"
             +(report.NeedsLook.Count>0 ? ", needs a look: "+string.Join(", ",report.NeedsLook.Select(look=>look.Split(':')[0])):""));
 
-    public static string Write(GameDataSnapshot snapshot)=>JsonSerializer.Serialize(snapshot);
+    public static string Write(GameDataSnapshot snapshot)=>JsonSerializer.Serialize(snapshot,TenshoJson.Plain);
     /// <summary>Null when the file cannot be read (then the next snapshot is taken as the first).</summary>
     public static GameDataSnapshot? Read(string text)
     {
-        try{return JsonSerializer.Deserialize<GameDataSnapshot>(text) is { Version:not null, Sheets:not null, SheetNames:not null } snapshot ? snapshot:null;}
+        try{return JsonSerializer.Deserialize<GameDataSnapshot>(text,TenshoJson.Plain) is { Version:not null, Sheets:not null, SheetNames:not null } snapshot ? snapshot:null;}
         catch(JsonException){return null;}
     }
 }

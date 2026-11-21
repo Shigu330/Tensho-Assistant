@@ -106,12 +106,12 @@ public sealed class SelfCheckMemory
         try
         {
             if (string.IsNullOrWhiteSpace(json)) return Empty(gameVersion);
-            var document = JsonSerializer.Deserialize<Document>(json);
+            var document = JsonSerializer.Deserialize<Document>(json,TenshoJson.Plain);
             return document is { Seen: not null } && document.GameVersion == gameVersion ? new(gameVersion, new(document.Seen)) : Empty(gameVersion);
         }
         catch (JsonException) { return Empty(gameVersion); }
     }
-    public string Save() => JsonSerializer.Serialize(new Document(gameVersion, seen));
+    public string Save() => JsonSerializer.Serialize(new Document(gameVersion, seen),TenshoJson.Plain);
     public int Count => seen.Count;
 
     /// <summary>Keeps an OK line. True when this should reach the disk: a new domain or detail, or the time of a known one, at most every five minutes.</summary>

@@ -186,6 +186,6 @@ public static class DiscordWebhook
         {
             ["content"] = content, ["username"] = Username(settings.Username),
             ["allowed_mentions"] = new Dictionary<string, object> { ["parse"] = Array.Empty<string>(), ["roles"] = roles },
-        });
+        },TenshoJson.Plain);
     }
 }

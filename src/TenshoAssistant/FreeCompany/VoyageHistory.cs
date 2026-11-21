@@ -74,7 +74,7 @@ public static class VoyageHistory
         return "\""+safe.Replace("\"","\"\"")+"\"";
     }
 
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,VoyageRecord[] Records);
 
     /// <summary>Reads the history file (missing = empty; a bad one throws, so it is never overwritten by mistake).</summary>
@@ -106,7 +106,7 @@ public sealed class VoyageHistoryData(string file,TenshoDataFile? data)
 {
     public const string Family="voyages";
     private readonly object gate=new();
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
 
     /// <summary>Test hook: run inside a save's transaction, after its rows and before the commit (a stop or an error there).</summary>
     internal Action? DuringSave { get; set; }

@@ -118,7 +118,7 @@ public static class LocalLinkProtocol
     public const string DiscoveriesCategory="discoveries";
     public const int MaxPlugin=32;
     public const int MaxZone=128;
-    private static readonly JsonSerializerOptions Options=new(){MaxDepth=4};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){MaxDepth=4});
 
     /// <summary>The pipe's name for a Windows user: the same in the game and in the application, apart between users of one PC.</summary>
     public static string PipeName(string user)

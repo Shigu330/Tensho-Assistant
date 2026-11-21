@@ -34,7 +34,7 @@ public static class DutyArena
         var tokens=note.Tokens.Take(MaxTokens).ToArray();
         var dto=new SharedDto(duty,note.Text.Length<=MaxText ? note.Text:note.Text[..MaxText],(int)note.Shape,tokens.Select(token=>CleanLabel(token.Label)).ToArray(),
             tokens.Select(token=>Clamp(token.X)).ToArray(),tokens.Select(token=>Clamp(token.Y)).ToArray());
-        return Prefix+Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto)));
+        return Prefix+Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto,TenshoJson.Plain)));
     }
     /// <summary>The duty and the note of a share code, or null when it is not one (wrong prefix, too long, broken, out of bounds).</summary>
     public static (uint Duty,DutyNote Note)? Parse(string? code)
@@ -43,7 +43,7 @@ public static class DutyArena
         if(!text.StartsWith(Prefix,StringComparison.Ordinal) || text.Length>20_000)return null;
         try
         {
-            var dto=JsonSerializer.Deserialize<SharedDto>(Encoding.UTF8.GetString(Convert.FromBase64String(text[Prefix.Length..])));
+            var dto=JsonSerializer.Deserialize<SharedDto>(Encoding.UTF8.GetString(Convert.FromBase64String(text[Prefix.Length..])),TenshoJson.Plain);
             if(dto is null || dto.Duty==0 || dto.Labels is null || dto.X is null || dto.Y is null || dto.Labels.Length>MaxTokens
                || dto.X.Length!=dto.Labels.Length || dto.Y.Length!=dto.Labels.Length || (dto.Text ?? "").Length>MaxText || dto.Shape is <0 or >1)return null;
             var note=new DutyNote{Text=dto.Text ?? "",Shape=(ArenaShape)dto.Shape,

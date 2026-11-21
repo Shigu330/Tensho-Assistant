@@ -15,7 +15,7 @@ public sealed class DiscoveryDatabase
     public const string FileName="Discoveries.db";
     /// <summary>The layout this version writes (PRAGMA user_version); a newer one is refused, never written over.</summary>
     public const int Schema=1;
-    private static readonly JsonSerializerOptions Options=new(){WriteIndented=false};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=false});
     private readonly string connection;
     public string Path { get; }
 

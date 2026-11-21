@@ -99,12 +99,12 @@ public static class ChatHistory
         [JsonPropertyName("data")] public byte[]? Data{get;set;}
     }
 
-    private static readonly JsonSerializerOptions Json=new()
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new()
     {
         DefaultIgnoreCondition=JsonIgnoreCondition.WhenWritingDefault,MaxDepth=8,
         // Letters of every language written as they are (the file stays readable); the JSON escapes stay (quotes, line breaks).
         Encoder=System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-    };
+    });
     private static readonly UTF8Encoding Utf8=new(false);
 
     /// <summary>The file's first line.</summary>

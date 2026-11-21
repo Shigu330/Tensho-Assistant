@@ -51,7 +51,7 @@ public sealed record OceanVoyageRecord(uint RouteId,int Zone,DateTimeOffset Upda
     public IReadOnlyList<OceanZoneCatch> At(int zone)=>Catches.Where(fish=>fish.Zone==zone).ToArray();
 
     public string ToJson()=>JsonSerializer.Serialize(new Saved(Format,RouteId,Zone,Updated,
-        Catches.Select(fish=>new[]{fish.Zone,(long)fish.Item,fish.Count,fish.Points}).ToArray(),Missions.ToArray(),ScheduleChecked,ResultLogged));
+        Catches.Select(fish=>new[]{fish.Zone,(long)fish.Item,fish.Count,fish.Points}).ToArray(),Missions.ToArray(),ScheduleChecked,ResultLogged),TenshoJson.Plain);
 
     /// <summary>Null for anything unreadable or of another format: the voyage is then read from the game alone.</summary>
     public static OceanVoyageRecord? FromJson(string? text)
@@ -59,7 +59,7 @@ public sealed record OceanVoyageRecord(uint RouteId,int Zone,DateTimeOffset Upda
         if(string.IsNullOrWhiteSpace(text))return null;
         try
         {
-            var saved=JsonSerializer.Deserialize<Saved>(text);
+            var saved=JsonSerializer.Deserialize<Saved>(text,TenshoJson.Plain);
             if(saved is null || saved.Format!=Format || saved.Catches is null || saved.Missions is null)return null;
             var catches=new List<OceanZoneCatch>();
             foreach(var row in saved.Catches)

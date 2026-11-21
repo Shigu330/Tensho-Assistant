@@ -8,6 +8,7 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.14" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/TenshoJson.cs" Link="Linked/TenshoJson.cs" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/DiscoveriesModel.cs" Link="Linked/DiscoveriesModel.cs" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/ItemGains.cs" Link="Linked/ItemGains.cs" />
     <Compile Include="../../src/TenshoAssistant/AtomicFile.cs" Link="Linked/AtomicFile.cs" />

@@ -10,10 +10,10 @@ public static class AchievementProgressStore
 {
     /// <summary>A progress seen below its maximum before, and at it now. Never on the first sight (nothing to compare with).</summary>
     public static bool JustCompleted(AchievementProgress? before,AchievementProgress now)=>before is { } known && known.Current<known.Max && now.Max>0 && now.Current>=now.Max;
-    public static string Write(Dictionary<ulong,Dictionary<uint,AchievementProgress>> all)=>JsonSerializer.Serialize(all);
+    public static string Write(Dictionary<ulong,Dictionary<uint,AchievementProgress>> all)=>JsonSerializer.Serialize(all,TenshoJson.Plain);
     public static Dictionary<ulong,Dictionary<uint,AchievementProgress>>? Read(string text)
     {
-        try{return JsonSerializer.Deserialize<Dictionary<ulong,Dictionary<uint,AchievementProgress>>>(text);}
+        try{return JsonSerializer.Deserialize<Dictionary<ulong,Dictionary<uint,AchievementProgress>>>(text,TenshoJson.Plain);}
         catch(JsonException){return null;}
     }
 }

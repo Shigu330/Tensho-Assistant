@@ -7,6 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/TenshoJson.cs" Link="TenshoJson.cs" />
     <Compile Include="../../src/TenshoAssistant/MyTools/*.cs" Exclude="../../src/TenshoAssistant/MyTools/*.Dalamud.cs" Link="MyTools/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Discoveries/*.cs" Exclude="../../src/TenshoAssistant/Discoveries/*.Dalamud.cs" Link="Discoveries/%(Filename)%(Extension)" />
     <!-- X-403 (0.1434): the Tensho chat window's pure parts (channels, store, tab views, format, settings). -->

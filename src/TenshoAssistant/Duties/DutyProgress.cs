@@ -21,10 +21,10 @@ public static class DutyProgress
 {
     /// <summary>X-106 (0.990, user choice DEC-045, from C-01): the states saved per character (content id), with when they were read.</summary>
     public sealed record Saved(Dictionary<uint,DutyStatus> ByInstance,DateTimeOffset ReadAt);
-    public static string Write(Dictionary<ulong,Saved> all,ulong last)=>System.Text.Json.JsonSerializer.Serialize(new SavedFile(all,last));
+    public static string Write(Dictionary<ulong,Saved> all,ulong last)=>System.Text.Json.JsonSerializer.Serialize(new SavedFile(all,last),TenshoJson.Plain);
     public static (Dictionary<ulong,Saved> All,ulong Last)? Read(string text)
     {
-        try{return System.Text.Json.JsonSerializer.Deserialize<SavedFile>(text) is { All:not null } file ? (file.All,file.Last):null;}
+        try{return System.Text.Json.JsonSerializer.Deserialize<SavedFile>(text,TenshoJson.Plain) is { All:not null } file ? (file.All,file.Last):null;}
         catch(System.Text.Json.JsonException){return null;}
     }
     public sealed record SavedFile(Dictionary<ulong,Saved> All,ulong Last);

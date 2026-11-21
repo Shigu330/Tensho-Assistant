@@ -953,7 +953,7 @@ public static class SeenPlaces
 /// <summary>X-43 (0.807): the files: the base, the exports (a dated copy) and the imports (every .json of the import folder, read once, then renamed).</summary>
 public static class DiscoveryFiles
 {
-    private static readonly JsonSerializerOptions Options=new(){WriteIndented=false};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=false});
     public const long MaxBytes=64L*1024*1024;
 
     public static DiscoveryFile? Read(string path)

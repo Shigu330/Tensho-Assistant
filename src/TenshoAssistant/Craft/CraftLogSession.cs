@@ -80,7 +80,7 @@ public sealed class CraftLogSession : IDisposable
         input.Owner,input.Recipe,input.Stats,input.StartingQuality,input.Options,input.ExtraWait,input.Echo,input.EchoSound,input.EchoLastOnly,
         input.Presets,Version=input.Catalog.DataVersion,ModelVersion=typeof(CraftSimulation).Assembly.GetName().Version?.ToString(),
         Actions=CraftActionCatalog.Specs.Select(spec=>input.Catalog.Find(input.Recipe.CraftTypeId+8,spec.Kind)).ToArray()
-    })));
+    },TenshoJson.Plain)));
     private static bool ValidCached(CraftLogInput input,CraftLogResult result)
     {
         try

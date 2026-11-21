@@ -508,7 +508,7 @@ public static class BeastTeams
     public static string Key(IReadOnlySet<uint>? held, IReadOnlyDictionary<uint, int>? ranks, IReadOnlySet<uint>? floors = null, string mark = "")
         => (mark.Length > 0 ? mark + "|" : "") + (held is null ? "?" : string.Join(",", held.Order())) + "|" + string.Join(",", (ranks ?? new Dictionary<uint, int>()).OrderBy(pair => pair.Key)
             .Select(pair => $"{pair.Key}:{pair.Value}{(floors?.Contains(pair.Key) == true ? "+" : "")}"));
-    public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans);
+    public static string Write(SavedPlans plans) => JsonSerializer.Serialize(plans,TenshoJson.Plain);
     /// <summary>
     /// X-617 (review of block 0.1551 to 0.1554, I1): the plans read from the file joined with those kept in memory while the file could not be
     /// read (held by another program, BeastPlansFile.Blocked). Before, the file replaced the memory and all read meanwhile was lost without a
@@ -552,7 +552,7 @@ public static class BeastTeams
     }
     public static SavedPlans? Read(string text)
     {
-        try { return JsonSerializer.Deserialize<SavedPlans>(text) is { Plans: not null, Keys: not null } plans ? plans : null; }
+        try { return JsonSerializer.Deserialize<SavedPlans>(text,TenshoJson.Plain) is { Plans: not null, Keys: not null } plans ? plans : null; }
         catch (JsonException) { return null; }
     }
 }

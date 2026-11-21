@@ -193,7 +193,7 @@ public static class CharacterStatuses
 
     public static string FileName(ulong contentId)=>contentId.ToString(CultureInfo.InvariantCulture)+".json";
 
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,CharacterStatus Status);
 
     /// <summary>Reads one character's file; a file too large, of another schema, or holding another character throws.</summary>

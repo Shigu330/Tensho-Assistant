@@ -11,7 +11,7 @@ public static class InventorySortTemplates
     public static string Encode(InventorySortTemplate template)
     {
         Validate(template);
-        return TextPrefix+Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(template)));
+        return TextPrefix+Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(template,TenshoJson.Plain)));
     }
     public static InventorySortTemplate? Decode(string? text)
     {
@@ -19,7 +19,7 @@ public static class InventorySortTemplates
         if(clean.Length>TextMaximum || !clean.StartsWith(TextPrefix,StringComparison.Ordinal))return null;
         try
         {
-            var read=System.Text.Json.JsonSerializer.Deserialize<InventorySortTemplate>(Convert.FromBase64String(clean[TextPrefix.Length..]));
+            var read=System.Text.Json.JsonSerializer.Deserialize<InventorySortTemplate>(Convert.FromBase64String(clean[TextPrefix.Length..]),TenshoJson.Plain);
             if(read is null)return null;
             var fresh=read with {Id=Guid.NewGuid()};
             Validate(fresh);

@@ -105,7 +105,7 @@ public sealed class FishBiteTimeService : IDisposable
                 else
                 {
                     var query = "query($spot:Int){biteTimes:bite_time_per_fish_per_spot(where:{spot:{_eq:$spot},flooredBiteTime:{_gt:1,_lt:600},occurences:{_gte:3}}){itemId flooredBiteTime occurences}}";
-                    var body = JsonSerializer.Serialize(new { query, variables = new { spot = (int)spot } });
+                    var body = JsonSerializer.Serialize(new { query, variables = new { spot = (int)spot } },TenshoJson.Plain);
                     var request = new HttpRequestMessage(HttpMethod.Post, Endpoint) { Content = new StringContent(body, Encoding.UTF8, "application/json") };
                     var text = await BoundedHttp.SendAsync(client, request, MaximumBytes, token).ConfigureAwait(false);
                     using var document = JsonDocument.Parse(text);

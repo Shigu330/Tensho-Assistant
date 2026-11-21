@@ -35,7 +35,7 @@ public sealed class ToolTemplateStore:IDisposable
     public const int MaxTools=50;
     private sealed record SavedTool(string Json,Dictionary<string,DateTimeOffset>? Done,Dictionary<string,int>? Counts);
     private sealed record FileDto(int Schema,SavedTool[] Tools);
-    private static readonly JsonSerializerOptions Options=new(){WriteIndented=true};
+    private static readonly JsonSerializerOptions Options=TenshoJson.Own(new(){WriteIndented=true});
     private readonly object gate=new();
     private readonly string path;
     private readonly Action<Exception,string> warn;

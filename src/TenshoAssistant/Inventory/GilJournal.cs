@@ -152,7 +152,7 @@ public static class GilJournal
             .Select(group=>(group.Key,group.Where(entry=>entry.Delta>0).Sum(entry=>entry.Delta),group.Where(entry=>entry.Delta<0).Sum(entry=>-entry.Delta)))
             .OrderByDescending(total=>total.Item2+total.Item3).ToArray();
 
-    private static readonly JsonSerializerOptions Json=new(){MaxDepth=8};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){MaxDepth=8});
     private sealed record FileDto(int Schema,GilEntry[] Entries);
 
     /// <summary>Reads a journal file (a missing file is an empty journal; a bad one throws, so it is never overwritten by mistake).</summary>

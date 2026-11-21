@@ -126,7 +126,7 @@ public sealed class GitHubExchange : IDisposable
         this.clock=clock ?? (()=>DateTimeOffset.UtcNow);
         client=handler is null ? new(){Timeout=TimeSpan.FromSeconds(30)}:new(handler){Timeout=TimeSpan.FromSeconds(30)};
         // X-76 H10 (0.923): an unreadable file is kept aside as « .broken » before a new one is started (it was written over later).
-        try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)) ?? new();}
+        try{if(File.Exists(MetaPath))meta=JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath),TenshoJson.Plain) ?? new();}
         catch(Exception){meta=new();try{File.Move(MetaPath,MetaPath+".broken",true);}catch(Exception){}}
         try{if(File.Exists(TokenPath))token=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(TokenPath)));}catch(Exception){token=null;}
         try{if(token is not null && File.Exists(RefreshPath))refresh=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(RefreshPath)));}catch(Exception){refresh=null;}
@@ -217,7 +217,7 @@ public sealed class GitHubExchange : IDisposable
             if(!File.Exists(TokenPath))return null;
             var access=Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(TokenPath)));
             var renewal=File.Exists(RefreshPath) ? Encoding.UTF8.GetString(UserSecret.Unprotect(File.ReadAllBytes(RefreshPath))):null;
-            var saved=File.Exists(MetaPath) ? JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath)):null;
+            var saved=File.Exists(MetaPath) ? JsonSerializer.Deserialize<GitHubExchangeMeta>(File.ReadAllText(MetaPath),TenshoJson.Plain):null;
             return new(access,renewal,saved?.TokenExpires,saved?.RefreshExpires,saved?.ClientId ?? "");
         }
         catch(Exception error) when(error is IOException or UnauthorizedAccessException or JsonException or System.ComponentModel.Win32Exception or System.Security.Cryptography.CryptographicException){return null;}
@@ -452,7 +452,7 @@ public sealed class GitHubExchange : IDisposable
     private Dictionary<int,string> CommonV3Marks()
     {
         lock(marks)
-            try{return File.Exists(CommonV3Marker) ? JsonSerializer.Deserialize<Dictionary<int,string>>(File.ReadAllText(CommonV3Marker)) ?? []:[];}
+            try{return File.Exists(CommonV3Marker) ? JsonSerializer.Deserialize<Dictionary<int,string>>(File.ReadAllText(CommonV3Marker),TenshoJson.Plain) ?? []:[];}
             catch(Exception){return [];}
     }
     private void NoteCommonV3(int kind,string hash)
@@ -460,7 +460,7 @@ public sealed class GitHubExchange : IDisposable
         lock(marks)
         {
             var noted=CommonV3Marks();noted[kind]=hash;
-            Directory.CreateDirectory(folder);AtomicFile.Write(CommonV3Marker,JsonSerializer.Serialize(noted));
+            Directory.CreateDirectory(folder);AtomicFile.Write(CommonV3Marker,JsonSerializer.Serialize(noted,TenshoJson.Plain));
         }
     }
 
@@ -639,7 +639,7 @@ public sealed class GitHubExchange : IDisposable
     {
         try
         {
-            string json;lock(gate)json=JsonSerializer.Serialize(meta);
+            string json;lock(gate)json=JsonSerializer.Serialize(meta,TenshoJson.Plain);
             AtomicFile.Write(MetaPath,json);
         }
         catch(Exception){}

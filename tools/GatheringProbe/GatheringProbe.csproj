@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../src/TenshoAssistant/TenshoJson.cs" Link="Linked/TenshoJson.cs" />
     <Compile Include="../../src/TenshoAssistant/Community/*.cs" Link="Community/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Monsters/*.cs" Link="Monsters/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Duties/*.cs" Exclude="../../src/TenshoAssistant/Duties/*.Dalamud.cs" Link="Duties/%(Filename)%(Extension)" />

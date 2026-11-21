@@ -15,7 +15,7 @@ public static class CraftLists
 {
     public const int MaxLists=32,MaxEntries=64,MaxName=40;
     public const long MaxQuantity=999999;
-    private static readonly JsonSerializerOptions Json=new(){WriteIndented=true};
+    private static readonly JsonSerializerOptions Json=TenshoJson.Own(new(){WriteIndented=true});
     private sealed record FileDto(int Schema,CraftList[] Lists);
 
     public static string? CleanName(string? name)

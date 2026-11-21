@@ -34,7 +34,7 @@ public sealed class DataCache : IDisposable
     public const int MaximumEntryBytes=32*1024*1024;
     private const int MaximumFiles=2048;
     private const long MaximumDiskBytes=256L*1024*1024;
-    private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=64,Converters={new RewardConverter()}};
+    private static readonly JsonSerializerOptions JsonOptions=TenshoJson.Own(new(){MaxDepth=64,Converters={new RewardConverter()}});
     private readonly string root;
     private readonly SemaphoreSlim io=new(1);
     private readonly CancellationTokenSource lifetime=new();
@@ -78,7 +78,7 @@ public sealed class DataCache : IDisposable
     private string FileName(string family,string scope,string version)
     {
         if(string.IsNullOrWhiteSpace(family) || family.Length>40 || scope.Length>2048 || version.Length>4096)throw new ArgumentException("Invalid cache identity.");
-        var hash=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"1",family,scope,version})));
+        var hash=Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"1",family,scope,version},TenshoJson.Plain)));
         return Path.Combine(root,hash+".json");
     }
     public Task<CachedValue<T>?> ReadAsync<T>(string family,string scope,string version,CancellationToken token=default)
@@ -215,7 +215,7 @@ public sealed class DataCache : IDisposable
         return moved;
     }
     private string PreviousPath(string family,string scope)=>
-        Path.Combine(PreviousFolder,Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"previous",family,scope})))+".json");
+        Path.Combine(PreviousFolder,Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new[]{"previous",family,scope},TenshoJson.Plain)))+".json");
     private long PreviousBytes()
     {
         try{return Directory.Exists(PreviousFolder) ? new DirectoryInfo(PreviousFolder).EnumerateFiles("*.json").Sum(file=>file.Length):0;}
