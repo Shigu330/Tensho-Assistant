@@ -77,6 +77,17 @@ internal sealed partial class MainWindow
                 +(row.Weather ? " · "+localization.Get("Alarms.WeatherCondition"):""));
             DrawItemInfoTooltip(row.ItemId,lines:lines);
         }
+        // X-735 M1 (review of 0.1733): an item the item list does not know (or not loaded yet) keeps the alarm's gestures, which do not depend
+        // on the item: a menu of its own, under the alarm's name.
+        if(item is null)
+        {
+            if(alarm is not null && ImGui.BeginPopupContextItem(UniqueMenuId($"{id}{row.Id}")))
+            {
+                try{ImGui.TextColored(Accent,row.Label);ImGui.Separator();TrackerAlarmMenu(alarm,map,place);}
+                finally{ImGui.EndPopup();}
+            }
+            return;
+        }
         ItemLinksMenu(UniqueMenuId($"{id}{row.Id}"),item,first:alarm is null ? null:()=>TrackerAlarmMenu(alarm,map,place));
     }
 
