@@ -1,11 +1,41 @@
 namespace TenshoAssistant.Chat;
 
 /// <summary>X-733 (0.1734): the Param of a meal's or a medicine's status on the one who gained it (the ItemFood row, plus 10000 for HQ), read
-/// when its line arrives or in the frames after (the line is kept before the game puts the status on); 0 while not read. Set and read on the
-/// game's thread.</summary>
+/// from its line on (ChatStatusWatch, X-756); 0 while not read. Set and read on the game's thread.</summary>
 public sealed class ChatStatusParam
 {
     public ushort Value{get;set;}
+}
+
+/// <summary>
+/// X-756 (0.1739, review of 0.1738, I1): which Param a meal's or a medicine's line names, read on the one who gained it from its line on. The
+/// game may print the line before it puts the new status on (X-733): someone already Well Fed from a meal A who eats a meal B still holds A
+/// when the line arrives, so the first Param seen is not the line's. The Param held at the line is kept and the next frames are watched: a
+/// Param that differs from it is the line's (put on after the line); one that stays the same for the whole watch is the line's too (put on
+/// before the line, or the same meal eaten again); none: not found. Only the lines of a buff gained (LogFilter: « Effets bénéfiques reçus »,
+/// kind 46; 48 is « Fin des effets bénéfiques », a status lost: its Param is no longer there to read). Pure (tests).
+/// </summary>
+public static class ChatStatusWatch
+{
+    /// <summary>The frames watched after the line (about half a second at 60 frames a second).</summary>
+    public const int Frames=30;
+
+    /// <summary>The log kind of the lines « … gains the effect of … » for a buff (LogFilter rows 56, 63, 76, 83, 96, 103…: kind 46).</summary>
+    public const int GainedKind=46;
+
+    /// <summary>A line of this kind names a status just gained, whose Param can be read.</summary>
+    public static bool Reads(int kind)=>kind==GainedKind;
+
+    /// <param name="atLine">The status's Param when its line arrived (0: not held then).</param>
+    /// <param name="seen">Its Param now (0: not held).</param>
+    /// <param name="frame">0 at the line, then 1, 2… for the next frames.</param>
+    /// <returns>Over: the watch ends, with the line's Param (0: not found) and what happened, for the log.</returns>
+    public static (bool Over,ushort Value,string How) Next(ushort atLine,ushort seen,int frame)
+    {
+        if(seen!=0 && seen!=atLine)return (true,seen,atLine==0 ? "put on after its line":"changed after its line (an older one held at the line)");
+        if(frame<Frames)return (false,0,"");
+        return seen!=0 ? (true,seen,"held from its line on, unchanged"):(true,(ushort)0,"not found");
+    }
 }
 
 /// <summary>X-733 (0.1734): one bonus of an ItemFood row: the attribute's name (BaseParam, the client's language), relative (a percent, capped)

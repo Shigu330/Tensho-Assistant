@@ -154,9 +154,11 @@ internal sealed class ChatReader : IDisposable
 
     /// <summary>X-733 (0.1734): a meal's or a medicine's status link (ChatFoodTip.Holds) gets a box for its Param, read on the one who gained it:
     /// the player the line links, else you when the line is yours (Dalamud's XivChatRelationKind 1, as source or target); any other line, or
-    /// any other status: the body as it is. The pieces of one link keep one link.</summary>
+    /// any other status: the body as it is. The pieces of one link keep one link. X-756 (0.1739): only a line of a buff gained (kind 46): a
+    /// status lost (kind 48) has no Param left to read.</summary>
     private static IReadOnlyList<ChatSegment> WithStatusParams(IReadOnlyList<ChatSegment> body,IChatMessage message,IChatLineData data)
     {
+        if(!ChatStatusWatch.Reads((int)message.LogKind))return body;
         if(!body.Any(segment=>segment.Link is { Kind:ChatSegmentKind.StatusLink } link && ChatFoodTip.Holds(link.StatusId)))return body;
         var player=message.Message.Payloads.OfType<PlayerPayload>().FirstOrDefault();
         if(player is null && (byte)message.SourceKind!=1 && (byte)message.TargetKind!=1)return body;

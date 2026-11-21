@@ -218,27 +218,28 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
     }
 
     // X-733 (0.1734): a meal's or a medicine's status looked for on the one who gained it, at its line and in the frames after (the game may
-    // print the line first); each outcome said once in the log. A failure turns it off until the plugin reloads.
-    private const int StatusFrames=10;
+    // print the line first); each outcome said once in the log. A failure turns it off until the plugin reloads. X-756 (0.1739): compared
+    // with the Param held at the line (ChatStatusWatch): a meal eaten over another one still held is never taken for the older one.
     private readonly HashSet<string> statusSaid=[];
     private bool statusFailed;
     /// <summary>X-733 (0.1734): reads into <paramref name="param"/> the Param of <paramref name="status"/> on the player named (name and home
     /// world), or on you (<paramref name="name"/> null): now, or in the next frames (on the game's thread).</summary>
-    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0);
+    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0);
 
-    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame)
+    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine)
     {
         if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;
         try
         {
             var character=name is null ? objects.LocalPlayer:objects.OfType<IPlayerCharacter>().FirstOrDefault(found=>found.Name.TextValue==name && found.HomeWorld.RowId==world);
-            ushort value=0;
-            if(character is not null)
-                foreach(var held in character.StatusList)
-                    if(held.StatusId==status && held.Param!=0){value=held.Param;break;}
-            if(value!=0){param.Value=value;StatusSaid(frame==0 ? "at once":"after some frames");return;}
-            if(character is null || frame>=StatusFrames){StatusSaid(character is null ? "the one who gained it is not in range":"not found");return;}
-            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1),delayTicks:1);
+            if(character is null){StatusSaid("the one who gained it is not in range");return;}
+            ushort seen=0;
+            foreach(var held in character.StatusList)
+                if(held.StatusId==status && held.Param!=0){seen=held.Param;break;}
+            if(frame==0)atLine=seen;
+            var read=ChatStatusWatch.Next(atLine,seen,frame);
+            if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);return;}
+            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine),delayTicks:1);
         }
         catch(Exception error)
         {
