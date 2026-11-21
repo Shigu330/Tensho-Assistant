@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (766 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (769 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -385,6 +385,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-201 | User request of 2026-11-12 (« add an automatic route calculator for airships… | Done in 0.1248 |
 | X-204 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1235 |
 | X-205 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1241 |
+| X-212 | User request of 2026-11-12 (plugin comparison, K-21, accepted on 11/12): CSV… | Done in 0.1756.0 |
 | X-217 | User request of 2026-11-12 (plugin comparison, K-30, accepted on 11/12)… | Done in 0.1226 |
 | X-218 | User request of 2026-11-12 (plugin comparison, K-32, accepted on 11/12): job… | Done in 0.1228 |
 | X-219 | User request of 2026-11-12 (plugin comparison, K-34, accepted on 11/12): richer… | Done in 0.1229 |
@@ -834,12 +835,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-761 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I1: finding in… | Done in 0.1747.0 |
 | X-762 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), I2: finding in… | Done in 0.1748.0 |
 | X-763 | Review of block 0.1743 to 0.1746 (review 0.1746, 21/11), minor M1, M2, M3: M1… | Done in 0.1749.0 |
+| X-764 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), minor M1, M2, M3: M1… | Done in 0.1753.0 |
+| X-765 | Review of block 0.1747 to 0.1751 (review 0.1751, 21/11), pre-existing before… | Done in 0.1754.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (766 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (769 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1222,6 +1225,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un calculateur de trajet auto… | Fait en 0.1248 |
 | X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1235 |
 | X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1241 |
+| X-212 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-21, accepté… | Fait en 0.1756.0 |
 | X-217 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-30, accepté… | Fait en 0.1226 |
 | X-218 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-32, accepté… | Fait en 0.1228 |
 | X-219 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-34, accepté… | Fait en 0.1229 |
@@ -1671,3 +1675,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-761 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I1 : Settings.json… | Fait en 0.1747.0 |
 | X-762 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), I2 : R04, données… | Fait en 0.1748.0 |
 | X-763 | Relecture du bloc 0.1743 à 0.1746 (relecture 0.1746, 21/11), mineurs M1, M2, M3… | Fait en 0.1749.0 |
+| X-764 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), mineurs M1, M2, M3… | Fait en 0.1753.0 |
+| X-765 | Relecture du bloc 0.1747 à 0.1751 (relecture 0.1751, 21/11), déjà là avant le… | Fait en 0.1754.0 |

@@ -2634,6 +2634,10 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1751) Tensho, page Banque, un onglet avec des objets (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par rangement, objet et qualité, avec la quantité ; le message dit le nombre de lignes copiées.
 
+- [ ] (0.1752) Barre du serveur, entrée « Tensho » : après une séance avec plusieurs mises à jour de Tensho, la mémoire affichée ne grimpe plus d'environ 100 Mo à chaque mise à jour ; dites le nombre affiché après le démarrage du jeu et après cinq mises à jour.
+
+- [ ] (0.1756) Tensho, page Marché, un objet, onglet Historique (filtres au choix) : « Copier en CSV », puis collez dans un tableur : une ligne par vente affichée, dans l'ordre du tableau, avec la date, le monde, le prix unitaire, la quantité et la qualité ; le message dit le nombre de ventes copiées.
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

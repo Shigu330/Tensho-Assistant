@@ -70,15 +70,15 @@ N'importe où, sans activité de jeu : réglages, langues, caches, crédits, aid
 - [x] **0.921** Pages avec icônes : présentes et même taille (TESTING l. 1092)
 - [x] **0.944** Paramètres : info-bulles, case zones de quête, bonus craft (TESTING l. 1119)
 - [x] **0.999** Paramètres : sept onglets, recherche d'un réglage (TESTING l. 1186)
-- [x] **0.514** Guide et carte : croix ferme du premier coup (TESTING l. 2712)
-- [x] **0.505** Accueil : proposition du guide, Non merci (TESTING l. 2732)
-- [ ] **0.502** Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les p… (TESTING l. 2739)
-- [x] **0.502** Page Aide : recherche, ouvrir la page, FAQ (TESTING l. 2740)
-- [ ] **0.503** Bandeau première ouverture, Compris (TESTING l. 2741)
-- [x] **0.498** Tensho replié se déplie quand demandé (TESTING l. 2756)
-- [x] **0.494** /tensho selftest et Diagnostics (TESTING l. 2763)
-- [x] **0.496** Fenêtre vue : OK_SEEN après rechargement (TESTING l. 2764)
-- [x] **0.394** Polices : famille et taille (TESTING l. 3219)
+- [x] **0.514** Guide et carte : croix ferme du premier coup (TESTING l. 2716)
+- [x] **0.505** Accueil : proposition du guide, Non merci (TESTING l. 2736)
+- [ ] **0.502** Le « ? » à côté du titre de la fenêtre Tensho explique la page ouverte, sur toutes les p… (TESTING l. 2743)
+- [x] **0.502** Page Aide : recherche, ouvrir la page, FAQ (TESTING l. 2744)
+- [ ] **0.503** Bandeau première ouverture, Compris (TESTING l. 2745)
+- [x] **0.498** Tensho replié se déplie quand demandé (TESTING l. 2760)
+- [x] **0.494** /tensho selftest et Diagnostics (TESTING l. 2767)
+- [x] **0.496** Fenêtre vue : OK_SEEN après rechargement (TESTING l. 2768)
+- [x] **0.394** Polices : famille et taille (TESTING l. 3223)
 
 *Il faut : compte GitHub*
 
@@ -92,15 +92,15 @@ N'importe où, sans activité de jeu : réglages, langues, caches, crédits, aid
 
 *Il faut : mode développeur*
 
-- [ ] **0.406** Messages développeur dans la langue du plugin (TESTING l. 3166)
+- [ ] **0.406** Messages développeur dans la langue du plugin (TESTING l. 3170)
 
 *Il faut : prochaine release*
 
 
 *Il faut : release*
 
-- [ ] **0.506** Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni… (TESTING l. 2728)
-- [ ] **0.475** Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil… (TESTING l. 2853)
+- [ ] **0.506** Aide (ou le « ? » d'une page) : cliquer « Vidéos et guides » : « Pas encore de vidéo ni… (TESTING l. 2732)
+- [ ] **0.475** Tensho › Mes outils › Galerie : cliquez « Charger la liste », puis « Voir » sur un outil… (TESTING l. 2857)
 
 ## Étape 2 : Objets, inventaire, servants, marché (125)
 
@@ -152,10 +152,10 @@ En ville, près d'une sonnette de servant et d'un tableau des ventes.
 - [ ] **0.889** À la prochaine quête qui demande un objet : remettre l'objet, puis Objets › fiche de cet… (TESTING l. 1049)
 - [ ] **0.927** Survoler un objet qui apprend une emote ou une coiffure : ligne « Enseigne : déjà appris… (TESTING l. 1099)
 - [x] **0.970** Survol quête et objet récolté : ligne « Extension » (TESTING l. 1148)
-- [ ] **0.516** Ouvrir l'inventaire du jeu : le bouton « Trier » de Tensho, sur la fenêtre, n'a ni fond… (TESTING l. 2702)
-- [x] **0.469** Ravitaillement GC : objet demandé aujourd'hui (TESTING l. 2876)
-- [x] **0.462** Menu objet Tensho sans Tous les outils (TESTING l. 2900)
-- [ ] **0.452** Try On depuis menu d'objet (TESTING l. 2951)
+- [ ] **0.516** Ouvrir l'inventaire du jeu : le bouton « Trier » de Tensho, sur la fenêtre, n'a ni fond… (TESTING l. 2706)
+- [x] **0.469** Ravitaillement GC : objet demandé aujourd'hui (TESTING l. 2880)
+- [x] **0.462** Menu objet Tensho sans Tous les outils (TESTING l. 2904)
+- [ ] **0.452** Try On depuis menu d'objet (TESTING l. 2955)
 
 *Il faut : autre personnage*
 
@@ -181,7 +181,7 @@ En ville, près d'une sonnette de servant et d'un tableau des ventes.
 - [ ] **0.576** Rangements › Banque, onglet d'un servant : « Effacer ce relevé » (deux clics) : ses obje… (TESTING l. 594)
 - [ ] **0.820** Inventaire du servant : case de l'objet de liste encadrée (TESTING l. 958)
 - [ ] **0.870** Ouvrir au tableau des ventes un objet que vous vendez, puis la liste de ventes du servan… (TESTING l. 1021)
-- [x] **0.508** Liste de ventes du servant : panneau Vos ventes (TESTING l. 2724)
+- [x] **0.508** Liste de ventes du servant : panneau Vos ventes (TESTING l. 2728)
 
 *Il faut : événement saisonnier*
 
@@ -209,10 +209,10 @@ En ville : montures, mascottes, cartes, orchestrion, succès, titres, carnets, R
 - [ ] **0.861** Fashion Report ouvert : catégories, thème, compté aux Découvertes (TESTING l. 1011)
 - [ ] **0.878** Combattez un monstre qui lance un sort de mage bleu (sa barre d'incantation s'affiche).… (TESTING l. 1035)
 - [ ] **0.989** Tenues : pièces manquantes vers souhaits (TESTING l. 1172)
-- [ ] **0.526** Collections › onglet « Légendes locales » (tomes de mineur, botaniste, pêcheur) : survol… (TESTING l. 2665)
-- [x] **0.491** Coffre à apparence : pièces de tenue possédées (TESTING l. 2773)
-- [ ] **0.407** Noms du wiki en français (TESTING l. 3160)
-- [ ] **0.395** Personnage › Grimoire de magie bleue : en quelques secondes « Livre des sorts du wiki :… (TESTING l. 3213)
+- [ ] **0.526** Collections › onglet « Légendes locales » (tomes de mineur, botaniste, pêcheur) : survol… (TESTING l. 2669)
+- [x] **0.491** Coffre à apparence : pièces de tenue possédées (TESTING l. 2777)
+- [ ] **0.407** Noms du wiki en français (TESTING l. 3164)
+- [ ] **0.395** Personnage › Grimoire de magie bleue : en quelques secondes « Livre des sorts du wiki :… (TESTING l. 3217)
 
 *Il faut : auberge*
 
@@ -257,29 +257,29 @@ Avec un métier d'artisan, à l'établi.
 - [x] **0.788** Carnet en Menuisier sur Lingot de mithril : « Mauvais métier » (TESTING l. 916)
 - [x] **0.808** Carnet d'artisanat : clic droit recette et matériau, entrée Tensho (TESTING l. 939)
 - [x] **0.826** Clic droit objet fabricable : « Ajouter à Liste 1 » (TESTING l. 965)
-- [ ] **0.516** Panneaux accrochés au jeu : même place et contenu (TESTING l. 2701)
-- [x] **0.509** Synthèse : Conseillé change à chaque coup (TESTING l. 2720)
-- [x] **0.469** Carnet : panneau en sections, barre de qualité (TESTING l. 2877)
-- [x] **0.468** Raphael : cache disque d'une recette (TESTING l. 2881)
-- [ ] **0.465** Séquence Raphael jouée donne le résultat (TESTING l. 2889)
-- [x] **0.465** Rechargement sans erreur après calcul (TESTING l. 2890)
-- [ ] **0.464** Simulateur : attributs copiés, ligne Détecté (TESTING l. 2894)
-- [x] **0.464** Liste de fabrication : icônes, manquants en rouge (TESTING l. 2895)
-- [x] **0.464** Projection pendant la synthèse (TESTING l. 2896)
-- [x] **0.438** Actions interdites non proposées (TESTING l. 3023)
-- [x] **0.436** Enregistreur de rotation : fabriquer à la main (TESTING l. 3033)
-- [ ] **0.435** Recette experte dans le simulateur : elle est acceptée et la ligne dit « Recette avancée… (TESTING l. 3039)
-- [ ] **0.434** Actions du simulateur comparées au jeu (TESTING l. 3044)
-- [x] **0.433** Liste de fabrication : créer, ajouter, retirer (TESTING l. 3049)
-- [ ] **0.432** Collectionnables des sacs : collectionnabilité (TESTING l. 3054)
-- [ ] **0.431** Artisanat › onglet Préparation, cliquez « Consulter les prix de la liste » : sous « Béné… (TESTING l. 3059)
-- [ ] **0.427** Prérequis de recette en vert ou rouge (TESTING l. 3068)
-- [x] **0.426** Ouvrir dans le carnet ferme Tensho (TESTING l. 3073)
-- [ ] **0.425** Importer une macro dans le simulateur (TESTING l. 3079)
-- [ ] **0.423** Menu objet Artisanat : onglet Préparation (TESTING l. 3087)
-- [x] **0.421** Craft lié : déjà fabriquée ou jamais (TESTING l. 3097)
-- [ ] **0.420** Simulateur : repas HQ et remède (TESTING l. 3102)
-- [ ] **0.419** Collectionnable : boutons Bas Moyen Haut (TESTING l. 3107)
+- [ ] **0.516** Panneaux accrochés au jeu : même place et contenu (TESTING l. 2705)
+- [x] **0.509** Synthèse : Conseillé change à chaque coup (TESTING l. 2724)
+- [x] **0.469** Carnet : panneau en sections, barre de qualité (TESTING l. 2881)
+- [x] **0.468** Raphael : cache disque d'une recette (TESTING l. 2885)
+- [ ] **0.465** Séquence Raphael jouée donne le résultat (TESTING l. 2893)
+- [x] **0.465** Rechargement sans erreur après calcul (TESTING l. 2894)
+- [ ] **0.464** Simulateur : attributs copiés, ligne Détecté (TESTING l. 2898)
+- [x] **0.464** Liste de fabrication : icônes, manquants en rouge (TESTING l. 2899)
+- [x] **0.464** Projection pendant la synthèse (TESTING l. 2900)
+- [x] **0.438** Actions interdites non proposées (TESTING l. 3027)
+- [x] **0.436** Enregistreur de rotation : fabriquer à la main (TESTING l. 3037)
+- [ ] **0.435** Recette experte dans le simulateur : elle est acceptée et la ligne dit « Recette avancée… (TESTING l. 3043)
+- [ ] **0.434** Actions du simulateur comparées au jeu (TESTING l. 3048)
+- [x] **0.433** Liste de fabrication : créer, ajouter, retirer (TESTING l. 3053)
+- [ ] **0.432** Collectionnables des sacs : collectionnabilité (TESTING l. 3058)
+- [ ] **0.431** Artisanat › onglet Préparation, cliquez « Consulter les prix de la liste » : sous « Béné… (TESTING l. 3063)
+- [ ] **0.427** Prérequis de recette en vert ou rouge (TESTING l. 3072)
+- [x] **0.426** Ouvrir dans le carnet ferme Tensho (TESTING l. 3077)
+- [ ] **0.425** Importer une macro dans le simulateur (TESTING l. 3083)
+- [ ] **0.423** Menu objet Artisanat : onglet Préparation (TESTING l. 3091)
+- [x] **0.421** Craft lié : déjà fabriquée ou jamais (TESTING l. 3101)
+- [ ] **0.420** Simulateur : repas HQ et remède (TESTING l. 3106)
+- [ ] **0.419** Collectionnable : boutons Bas Moyen Haut (TESTING l. 3111)
 
 *Il faut : exploration cosmique*
 
@@ -287,7 +287,7 @@ Avec un métier d'artisan, à l'établi.
 
 *Il faut : Macro Chain*
 
-- [ ] **0.422** Macro Chain : /nextmacro enchaîne (TESTING l. 3092)
+- [ ] **0.422** Macro Chain : /nextmacro enchaîne (TESTING l. 3096)
 
 *Il faut : mise à jour du jeu*
 
@@ -336,14 +336,14 @@ Mineur, botaniste, pêcheur ; pêche en mer à son créneau.
 - [ ] **0.918** Pêche en mer : panneau, appât encadré, chronomètre, spectral (TESTING l. 1086)
 - [ ] **0.959** Détroit ouest de Zorgor : météo et météo d'avant (TESTING l. 1135)
 - [ ] **0.982** Poisson collectionnable : ligne « Collectionnable », assignats au survol (TESTING l. 1164)
-- [x] **0.529** Trois icônes de risque, cran coloré, description (TESTING l. 2655)
-- [ ] **0.523** Deux types d'assignats : phrase types différents (TESTING l. 2678)
-- [x] **0.519** Cristaux : Bénédictions proposées sans nombre d'objets (TESTING l. 2689)
-- [ ] **0.518** Point d'Ostrakon : ouvert pas pour vous, tome (TESTING l. 2693)
-- [ ] **0.517** Mineur ou botaniste, devant un point de récolte, PR au maximum : le panneau de récolte d… (TESTING l. 2697)
-- [ ] **0.515** Point de récolte avec l'effet « PR ≧ 770 → tentatives +1 » (comme sur la capture du 04/1… (TESTING l. 2706)
-- [x] **0.514** Barre de PR en mineur : remplissage, tic (TESTING l. 2711)
-- [ ] **0.483** Raison solide refusée non conseillée (TESTING l. 2808)
+- [x] **0.529** Trois icônes de risque, cran coloré, description (TESTING l. 2659)
+- [ ] **0.523** Deux types d'assignats : phrase types différents (TESTING l. 2682)
+- [x] **0.519** Cristaux : Bénédictions proposées sans nombre d'objets (TESTING l. 2693)
+- [ ] **0.518** Point d'Ostrakon : ouvert pas pour vous, tome (TESTING l. 2697)
+- [ ] **0.517** Mineur ou botaniste, devant un point de récolte, PR au maximum : le panneau de récolte d… (TESTING l. 2701)
+- [ ] **0.515** Point de récolte avec l'effet « PR ≧ 770 → tentatives +1 » (comme sur la capture du 04/1… (TESTING l. 2710)
+- [x] **0.514** Barre de PR en mineur : remplissage, tic (TESTING l. 2715)
+- [ ] **0.483** Raison solide refusée non conseillée (TESTING l. 2812)
 
 *Il faut : mode développeur*
 
@@ -351,11 +351,11 @@ Mineur, botaniste, pêcheur ; pêche en mer à son créneau.
 
 *Il faut : niveau 90*
 
-- [x] **0.520** Niveau 90 : ligne tentative gratuite 50 % (TESTING l. 2685)
+- [x] **0.520** Niveau 90 : ligne tentative gratuite 50 % (TESTING l. 2689)
 
 *Il faut : niveau 95*
 
-- [x] **0.527** Niveau 95 : Toucher d'amorçage proposé après Inspection (TESTING l. 2659)
+- [x] **0.527** Niveau 95 : Toucher d'amorçage proposé après Inspection (TESTING l. 2663)
 
 *Ajouté en 0.1011*
 
@@ -410,12 +410,12 @@ En zone ouverte : carte Tensho, téléportation, ALEA, chasse, cartes au trésor
 - [x] **0.929** Vue panoramique Stormblood+ : « Carnet n° », numéros en liste (TESTING l. 1102)
 - [ ] **0.960** Carte Zorgor : trou de pêche sans « point légendaire » (TESTING l. 1137)
 - [x] **0.977** Téléportation, carte Tensho : quêtes non acceptées en rouge (TESTING l. 1157)
-- [x] **0.535** Carte sans barre de titre : déplacer et fermer (TESTING l. 2639)
-- [x] **0.499** Lien vers carte : carte devant Tensho (TESTING l. 2752)
-- [x] **0.453** Téléportation : coûts, mandats, chocobo lus (TESTING l. 2946)
-- [ ] **0.442** Train de chasse : enregistrer les marques (TESTING l. 3007)
-- [ ] **0.437** Coller liste Siren ou Faloop en favoris (TESTING l. 3028)
-- [x] **0.401** Survol d'un panorama : météo, pas d'erreur (TESTING l. 3183)
+- [x] **0.535** Carte sans barre de titre : déplacer et fermer (TESTING l. 2643)
+- [x] **0.499** Lien vers carte : carte devant Tensho (TESTING l. 2756)
+- [x] **0.453** Téléportation : coûts, mandats, chocobo lus (TESTING l. 2950)
+- [ ] **0.442** Train de chasse : enregistrer les marques (TESTING l. 3011)
+- [ ] **0.437** Coller liste Siren ou Faloop en favoris (TESTING l. 3032)
+- [x] **0.401** Survol d'un panorama : météo, pas d'erreur (TESTING l. 3187)
 
 *Il faut : carte au trésor*
 
@@ -423,7 +423,7 @@ En zone ouverte : carte Tensho, téléportation, ALEA, chasse, cartes au trésor
 
 *Il faut : contrat de chasse*
 
-- [ ] **0.440** Contrat de chasse : cibles et victimes (TESTING l. 3015)
+- [ ] **0.440** Contrat de chasse : cibles et victimes (TESTING l. 3019)
 
 *Il faut : fête saisonnière*
 
@@ -440,7 +440,7 @@ En zone ouverte : carte Tensho, téléportation, ALEA, chasse, cartes au trésor
 Atelier de compagnie, sous-marins, aéronefs, coffre, jardin, île sanctuaire.
 
 - [ ] **0.693** (0.693) Ouvrez à côté du jeu un panneau de liste (préparation, liste de fabrication ou p… (TESTING l. 784)
-- [ ] **0.444** Page Carte › onglet Repères › « Annuaire des lieux » : ajoutez une maison (monde, quarti… (TESTING l. 2997)
+- [ ] **0.444** Page Carte › onglet Repères › « Annuaire des lieux » : ajoutez une maison (monde, quarti… (TESTING l. 3001)
 
 *Il faut : aéronef*
 
@@ -487,10 +487,10 @@ Atelier de compagnie, sous-marins, aéronefs, coffre, jardin, île sanctuaire.
 Gold Saucer, Triple Triad, Mini Cactpot, escouade, chocobo, Dédale bestial hors combat.
 
 - [ ] **0.571** Mini Cactpot : comparer la table au ticket (TESTING l. 586)
-- [ ] **0.510** Triple Triade : conseils PNJ seulement, pas contre joueur (TESTING l. 2716)
-- [ ] **0.500** Personnage › Dresseur › Bêtes : 50 bêtes avec nom, classe et attaque auto., comme le bes… (TESTING l. 2748)
-- [x] **0.493** Triple Triade : colonne Disponible des PNJ (TESTING l. 2768)
-- [x] **0.491** Défi Triple Triade : règles lues (TESTING l. 2772)
+- [ ] **0.510** Triple Triade : conseils PNJ seulement, pas contre joueur (TESTING l. 2720)
+- [ ] **0.500** Personnage › Dresseur › Bêtes : 50 bêtes avec nom, classe et attaque auto., comme le bes… (TESTING l. 2752)
+- [x] **0.493** Triple Triade : colonne Disponible des PNJ (TESTING l. 2772)
+- [x] **0.491** Défi Triple Triade : règles lues (TESTING l. 2776)
 
 *Il faut : dresseur*
 
@@ -527,10 +527,10 @@ Liés aux horaires du jeu : à faire quand le moment arrive (réinitialisations,
 - [x] **0.812** Alarme : clic droit sur l'objet, menu avec « Tensho » (TESTING l. 945)
 - [ ] **0.837** (0.837) Dans le chat du jeu, faites un clic droit sur un objet en lien (par exemple la m… (TESTING l. 980)
 - [ ] **0.936** Rappels, « Vos personnages » : colonne « Autres », escouade (TESTING l. 1110)
-- [x] **0.514** Fenêtre de suivi : alarmes, objet, carte, croix (TESTING l. 2710)
-- [ ] **0.453** Rappels à l'écran titre sans zéros (TESTING l. 2943)
-- [ ] **0.448** Jardinage, « Me le rappeler dans le chat » coché : attendre un rappel du jardin dans le… (TESTING l. 2978)
-- [x] **0.443** Livre d'or : tâches à faire et à réclamer (TESTING l. 3002)
+- [x] **0.514** Fenêtre de suivi : alarmes, objet, carte, croix (TESTING l. 2714)
+- [ ] **0.453** Rappels à l'écran titre sans zéros (TESTING l. 2947)
+- [ ] **0.448** Jardinage, « Me le rappeler dans le chat » coché : attendre un rappel du jardin dans le… (TESTING l. 2982)
+- [x] **0.443** Livre d'or : tâches à faire et à réclamer (TESTING l. 3006)
 
 *Il faut : deux personnages*
 
