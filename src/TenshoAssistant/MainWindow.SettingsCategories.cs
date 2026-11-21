@@ -17,6 +17,7 @@ internal sealed partial class MainWindow
         new("General","Appearance",DrawAppearanceSettings),
         new("General","Fonts",DrawFontSettings),
         new("General","ItemTooltips",DrawItemTooltipSettings),
+        new("General","OtherTooltips",DrawTooltipPartSettings),
         new("General","ItemsMarket",DrawItemMarketSettings),
         new("Panels","GamePanels",DrawGamePanelSettings),
         new("Panels","Crafting",DrawCraftHelperSettings),

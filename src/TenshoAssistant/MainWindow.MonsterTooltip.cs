@@ -15,9 +15,9 @@ internal sealed partial class MainWindow
         using(TooltipScope.Begin())
         {
             TooltipTitle(facts.Name);
-            if(facts.Level is { } level)ImGui.TextDisabled(level);
-            if(facts.Zone is { } zone)ImGui.TextUnformatted(zone);
-            foreach(var note in facts.Notes)ImGui.TextUnformatted(note);
+            if(TipPart("Monster.Level") && facts.Level is { } level)ImGui.TextDisabled(level);
+            if(TipPart("Monster.Zone") && facts.Zone is { } zone)ImGui.TextUnformatted(zone);
+            if(TipPart("Monster.Notes"))foreach(var note in facts.Notes)ImGui.TextUnformatted(note);
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
     }

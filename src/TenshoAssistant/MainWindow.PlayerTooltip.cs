@@ -9,16 +9,20 @@ internal sealed partial class MainWindow
     /// tooltips as text.
     /// </summary>
     private string PlayerTip(string name,string world,string? job,int level)
-        =>Chat.ChatCopy.SenderTip(name,world,job,level,(who,where)=>localization.Format("ChatWindow.SenderTipWorld",who,where),
+    {
+        // X-684 (0.1696): the job and the level only while that part is shown (Settings › Other tooltips).
+        if(!TipPart("Player.Job")){job=null;level=0;}
+        return Chat.ChatCopy.SenderTip(name,world,job,level,(who,where)=>localization.Format("ChatWindow.SenderTipWorld",who,where),
             (shown,at)=>localization.Format("ChatWindow.SenderTipJob",shown,at));
+    }
 
     // X-684 (0.1690): a party member's tooltip, built once per member state (name, world, job, level) and language, not every frame (the map
     // draws its party and its edge markers each frame).
     private readonly Dictionary<(string Name,ushort World,uint Job,int Level),string> partyTips=[];
-    private int partyTipsRevision=-1;
+    private int partyTipsRevision=-1;private object? partyTipsParts;
     private string PartyMemberTip(Maps.MapPartyMarker member)
     {
-        if(partyTipsRevision!=localization.Revision){partyTips.Clear();partyTipsRevision=localization.Revision;}
+        if(partyTipsRevision!=localization.Revision || !ReferenceEquals(partyTipsParts,configuration.TooltipPartsHidden)){partyTips.Clear();partyTipsRevision=localization.Revision;partyTipsParts=configuration.TooltipPartsHidden;}
         var key=(member.Name,member.World,member.Job,member.Level);
         if(partyTips.TryGetValue(key,out var tip))return tip;
         if(partyTips.Count>=64)partyTips.Clear();

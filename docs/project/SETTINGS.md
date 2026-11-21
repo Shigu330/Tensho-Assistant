@@ -35,6 +35,42 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `(ModuleSettings.MacroBook)` | — | — | Settings › Panels › CraftMacros | **Game macros used** — Where macros are copied in the game: individual (this character) or shared (all characters). Default: individual macros. |
 | `(ModuleSettings.MacroChain)` | — | — | Settings › Panels › CraftMacros | **Chain the pages (Tensho Macro Chain: /tenshonext as the last line)** — Ends each page with /tenshonext so Tensho's Macro chain starts the next page (long rotations). Default: on. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Settings › Panels › CraftMacros | **Allow overwriting existing macros in the range** — On: the copy may replace any macro in the chosen slots. Off: only empty slots or slots Tensho copied before. Default: off. |
+| `(Settings.TipActionDescription)` | — | — | Settings › General › OtherTooltips | **The game's description** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipActionDetail)` | — | — | Settings › General › OtherTooltips | **Level, cost and other details** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipDutyKind)` | — | — | Settings › General › OtherTooltips | **Kind and level** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipDutyStatus)` | — | — | Settings › General › OtherTooltips | **Progress** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipDutyUnlock)` | — | — | Settings › General › OtherTooltips | **Unlocking quest** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipDutyZone)` | — | — | Settings › General › OtherTooltips | **Zone** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipFateDescription)` | — | — | Settings › General › OtherTooltips | **The game's description** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipFateKind)` | — | — | Settings › General › OtherTooltips | **Kind and level** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipFateNow)` | — | — | Settings › General › OtherTooltips | **State now** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipFateParticipants)` | — | — | Settings › General › OtherTooltips | **Players taken** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipFatePlace)` | — | — | Settings › General › OtherTooltips | **Place** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipGatheringDetail)` | — | — | Settings › General › OtherTooltips | **Job and kind of point** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipGatheringItems)` | — | — | Settings › General › OtherTooltips | **Items** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipGatheringOpening)` | — | — | Settings › General › OtherTooltips | **Opening and requirements** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipGatheringPlace)` | — | — | Settings › General › OtherTooltips | **Place** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipMonsterLevel)` | — | — | Settings › General › OtherTooltips | **Level or rank** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipMonsterNotes)` | — | — | Settings › General › OtherTooltips | **Why Tensho points at it** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipMonsterZone)` | — | — | Settings › General › OtherTooltips | **Zone** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipNpcNotes)` | — | — | Settings › General › OtherTooltips | **Triple Triad** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipNpcPlaces)` | — | — | Settings › General › OtherTooltips | **Places** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipNpcShops)` | — | — | Settings › General › OtherTooltips | **Shops** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipPlaceAetheryte)` | — | — | Settings › General › OtherTooltips | **Nearest aetheryte and its cost** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipPlaceCoordinates)` | — | — | Settings › General › OtherTooltips | **Coordinates** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipPlaceRegion)` | — | — | Settings › General › OtherTooltips | **Region** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipPlaceWeather)` | — | — | Settings › General › OtherTooltips | **Weather now** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipPlayerJob)` | — | — | Settings › General › OtherTooltips | **Job and level** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipQuestCategory)` | — | — | Settings › General › OtherTooltips | **Section and kind** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipQuestExpansion)` | — | — | Settings › General › OtherTooltips | **Expansion** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipQuestLevel)` | — | — | Settings › General › OtherTooltips | **Levels** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipQuestProgress)` | — | — | Settings › General › OtherTooltips | **Progress and repeatable** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipQuestZone)` | — | — | Settings › General › OtherTooltips | **Zone** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipRecipeCrafted)` | — | — | Settings › General › OtherTooltips | **Crafted before** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipRecipeFacts)` | — | — | Settings › General › OtherTooltips | **HQ, quick synthesis, books and other facts** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipRecipeIngredients)` | — | — | Settings › General › OtherTooltips | **Ingredients** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipRecipeMinimum)` | — | — | Settings › General › OtherTooltips | **Minimum attributes** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
+| `(Settings.TipRecipeStats)` | — | — | Settings › General › OtherTooltips | **Durability, progress, quality** — Shown in Tensho's tooltips of this kind. Off: this part is left out. Default: on. |
 | `AlarmBarTooltip` | bool | true | Settings › General › Header | **Tensho tooltip on its server bar entries** — Hovering one of Tensho's server bar entries (alarms, reminders, currencies, gil) shows Tensho's own tooltip next to it, above every window (the game's goes under plugin windows such as the Tensho map, and it may open on either side). Off: the game's tooltip. Default: on. |
 | `AlarmBarTooltipCount` | int | 5 | Settings › General › Header | **Alarms listed** — Number of upcoming alarms shown in the tooltip (1 to 10). Default: 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Settings › Tracking › Alarms | **Automatic alarms (retainer ventures and sales, vessels, squadron)** — Creates a Tensho alarm at the end of each retainer venture and of each retainer's sales (known once the retainer list was opened) and at each vessel's return (known after the workshop) and at the end of each squadron mission or training. The time follows the readings; the alarm goes an hour after it rang. No game alarm is ever made automatically. Default: on. |
@@ -348,7 +384,7 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `WishlistSaleAlert` | bool | false | page Wishlist | **Alert when a wish is on sale under my price** — When on: at most once every 30 minutes, Tensho asks Universalis for the wishes that have a price (20 a check) and writes a chat line when one is listed under your price, once each time it goes under. Needs Universalis on (Settings › Data and sources). Default: off. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Show this project on screen** — A small panel with the materials of your followed projects together, in stock over needed; when no project is followed, those of the project chosen here. Default: off. |
 
-Settings reset by « Restore every setting » without a control in the interface (34): state of the interface, choices written by a page or migration marks.
+Settings reset by « Restore every setting » without a control in the interface (35): state of the interface, choices written by a page or migration marks.
 
 | Setting | Type | Default |
 |---|---|---|
@@ -382,12 +418,13 @@ Settings reset by « Restore every setting » without a control in the interface
 | `SortPreviewField` | int | 0 |
 | `ThemeMode` | int | 0 |
 | `ThemeModeBeforeTool` | int? | null |
+| `TooltipPartsHidden` | List<string> | (empty) |
 | `WorkshopDelivered` | Dictionary<uint,FreeCompany.WorkshopDelivery>? | null |
 | `WorkshopFollowed` | List<uint>? | null |
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 331 controls (312 linked to `Configuration`, 19 to another file), 34 settings without a control.
+Counted: 367 controls (312 linked to `Configuration`, 55 to another file), 35 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -428,6 +465,42 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `(ModuleSettings.MacroBook)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Macros du jeu utilisées** — Où copier les macros dans le jeu : macros individuelles (ce personnage) ou partagées (tous les personnages). Par défaut : macros individuelles. |
 | `(ModuleSettings.MacroChain)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Chaîner les pages (Macro Chain de Tensho : /tenshonext en dernière ligne)** — Termine chaque page par /tenshonext, pour que l'Enchaînement de macros de Tensho lance la page suivante (rotations longues). Par défaut : activé. |
 | `(ModuleSettings.MacroOverwrite)` | — | — | Paramètres › Panneaux à côté du jeu › Macros d'artisanat | **Autoriser l'écrasement de macros existantes dans la plage** — Coché : la copie peut remplacer n'importe quelle macro dans les emplacements choisis. Décoché : seulement les emplacements vides ou déjà copiés par Tensho. Par défaut : désactivé. |
+| `(Settings.TipActionDescription)` | — | — | Paramètres › Général › Autres infobulles | **Description du jeu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipActionDetail)` | — | — | Paramètres › Général › Autres infobulles | **Niveau, coût et autres détails** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipDutyKind)` | — | — | Paramètres › Général › Autres infobulles | **Genre et niveau** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipDutyStatus)` | — | — | Paramètres › Général › Autres infobulles | **Avancement** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipDutyUnlock)` | — | — | Paramètres › Général › Autres infobulles | **Quête de déblocage** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipDutyZone)` | — | — | Paramètres › Général › Autres infobulles | **Zone** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipFateDescription)` | — | — | Paramètres › Général › Autres infobulles | **Description du jeu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipFateKind)` | — | — | Paramètres › Général › Autres infobulles | **Genre et niveau** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipFateNow)` | — | — | Paramètres › Général › Autres infobulles | **État actuel** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipFateParticipants)` | — | — | Paramètres › Général › Autres infobulles | **Joueurs admis** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipFatePlace)` | — | — | Paramètres › Général › Autres infobulles | **Lieu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipGatheringDetail)` | — | — | Paramètres › Général › Autres infobulles | **Job et sorte de point** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipGatheringItems)` | — | — | Paramètres › Général › Autres infobulles | **Objets** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipGatheringOpening)` | — | — | Paramètres › Général › Autres infobulles | **Ouverture et conditions** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipGatheringPlace)` | — | — | Paramètres › Général › Autres infobulles | **Lieu** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipMonsterLevel)` | — | — | Paramètres › Général › Autres infobulles | **Niveau ou rang** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipMonsterNotes)` | — | — | Paramètres › Général › Autres infobulles | **Pourquoi Tensho le signale** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipMonsterZone)` | — | — | Paramètres › Général › Autres infobulles | **Zone** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipNpcNotes)` | — | — | Paramètres › Général › Autres infobulles | **Triple Triade** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipNpcPlaces)` | — | — | Paramètres › Général › Autres infobulles | **Lieux** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipNpcShops)` | — | — | Paramètres › Général › Autres infobulles | **Boutiques** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipPlaceAetheryte)` | — | — | Paramètres › Général › Autres infobulles | **Éthérite le plus proche et son coût** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipPlaceCoordinates)` | — | — | Paramètres › Général › Autres infobulles | **Coordonnées** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipPlaceRegion)` | — | — | Paramètres › Général › Autres infobulles | **Région** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipPlaceWeather)` | — | — | Paramètres › Général › Autres infobulles | **Météo actuelle** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipPlayerJob)` | — | — | Paramètres › Général › Autres infobulles | **Classe et niveau** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipQuestCategory)` | — | — | Paramètres › Général › Autres infobulles | **Section et genre** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipQuestExpansion)` | — | — | Paramètres › Général › Autres infobulles | **Extension** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipQuestLevel)` | — | — | Paramètres › Général › Autres infobulles | **Niveaux** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipQuestProgress)` | — | — | Paramètres › Général › Autres infobulles | **Avancement et répétable** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipQuestZone)` | — | — | Paramètres › Général › Autres infobulles | **Zone** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipRecipeCrafted)` | — | — | Paramètres › Général › Autres infobulles | **Déjà fabriquée** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipRecipeFacts)` | — | — | Paramètres › Général › Autres infobulles | **HQ, synthèse rapide, livres et autres faits** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipRecipeIngredients)` | — | — | Paramètres › Général › Autres infobulles | **Ingrédients** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipRecipeMinimum)` | — | — | Paramètres › Général › Autres infobulles | **Attributs minimum** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
+| `(Settings.TipRecipeStats)` | — | — | Paramètres › Général › Autres infobulles | **Durabilité, progression, qualité** — Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté. Par défaut : activé. |
 | `AlarmBarTooltip` | bool | true | Paramètres › Général › En-tête et accueil | **Infobulle Tensho sur ses entrées de la barre du serveur** — Au survol d'une entrée de Tensho dans la barre du serveur (alarmes, rappels, devises, gils), Tensho affiche sa propre infobulle contre elle, par-dessus toutes les fenêtres (celle du jeu passe sous les fenêtres des plugins, dont la carte Tensho, et peut s'ouvrir d'un côté ou de l'autre). Décoché : l'infobulle du jeu. Par défaut : activé. |
 | `AlarmBarTooltipCount` | int | 5 | Paramètres › Général › En-tête et accueil | **Alarmes listées** — Nombre de prochaines alarmes affichées dans l'infobulle (1 à 10). Par défaut : 5. |
 | `AlarmOptions.AutoAlarms` | bool | true | Paramètres › Suivi et notifications › Alerte | **Alarmes automatiques (tâches et ventes des servants, vaisseaux, escouade)** — Crée d'office une alarme Tensho à la fin de chaque tâche de servant et des ventes de chaque servant (connues après avoir ouvert la liste des servants) et au retour de chaque vaisseau (connu après l'atelier) ainsi qu'à la fin de chaque mission ou entraînement d'escouade. L'heure suit les relevés ; l'alarme disparaît une heure après avoir sonné. Aucune alarme du jeu n'est créée d'office. Par défaut : activé. |
@@ -741,7 +814,7 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `WishlistSaleAlert` | bool | false | page Souhaits | **Alerte quand un souhait est en vente sous mon prix** — Activée : au plus une fois toutes les 30 minutes, Tensho demande à Universalis les souhaits qui ont un prix (20 par vérification) et écrit une ligne dans le chat quand l'un est en vente sous votre prix, une fois à chaque passage sous ce prix. Il faut qu'Universalis soit activé (Paramètres › Données et sources). Par défaut : désactivé. |
 | `WorkshopPanel` | bool | false | `MainWindow.WorkshopProjects.cs` | **Afficher ce projet à l'écran** — Un petit panneau avec les matériaux de vos projets suivis, ensemble, en stock sur requis ; quand aucun projet n'est suivi, ceux du projet choisi ici. Par défaut : désactivé. |
 
-Réglages remis par « Tout remettre par défaut » sans case dans l'interface (34) : état de l'interface, choix écrits par une page ou marques de migration.
+Réglages remis par « Tout remettre par défaut » sans case dans l'interface (35) : état de l'interface, choix écrits par une page ou marques de migration.
 
 | Réglage | Type | Défaut |
 |---|---|---|
@@ -775,10 +848,11 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `SortPreviewField` | int | 0 |
 | `ThemeMode` | int | 0 |
 | `ThemeModeBeforeTool` | int? | null |
+| `TooltipPartsHidden` | List<string> | (empty) |
 | `WorkshopDelivered` | Dictionary<uint,FreeCompany.WorkshopDelivery>? | null |
 | `WorkshopFollowed` | List<uint>? | null |
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 331 cases (312 reliées à `Configuration`, 19 à un autre fichier), 34 réglages sans case.
+Compté : 367 cases (312 reliées à `Configuration`, 55 à un autre fichier), 35 réglages sans case.
 <!-- /docgen:settings-fr -->

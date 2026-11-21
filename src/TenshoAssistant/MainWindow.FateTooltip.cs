@@ -19,12 +19,12 @@ internal sealed partial class MainWindow
             ImGui.BeginGroup();
             TooltipTitle(facts.Name);
             var level=facts.Level is { } value ? localization.Format("MapView.MonsterTipLevel",value):null;
-            if(level is not null || facts.Kind is not null)ImGui.TextDisabled(string.Join(" · ",new[]{facts.Kind,level}.Where(part=>part is not null)));
+            if(TipPart("Fate.Kind") && (level is not null || facts.Kind is not null))ImGui.TextDisabled(string.Join(" · ",new[]{facts.Kind,level}.Where(part=>part is not null)));
             ImGui.EndGroup();
-            if(facts.Place is { } place)ImGui.TextUnformatted(place);
-            if(facts.Now is { } now)ImGui.TextColored(Success,now);
-            if(facts.Description is { } description)ImGui.TextUnformatted(description);
-            if(facts.Participants>0)ImGui.TextDisabled(localization.Format("FieldContent.Participants",facts.Participants));
+            if(TipPart("Fate.Place") && facts.Place is { } place)ImGui.TextUnformatted(place);
+            if(TipPart("Fate.Now") && facts.Now is { } now)ImGui.TextColored(Success,now);
+            if(TipPart("Fate.Description") && facts.Description is { } description)ImGui.TextUnformatted(description);
+            if(TipPart("Fate.Participants") && facts.Participants>0)ImGui.TextDisabled(localization.Format("FieldContent.Participants",facts.Participants));
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
     }

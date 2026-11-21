@@ -34,12 +34,12 @@ internal sealed partial class MainWindow
         {
             if(name is { Length:>0 })TooltipTitle(name);
             ImGui.TextUnformatted(facts.Area);
-            if(facts.Region.Length>0 && facts.Region!=map.Zone)ImGui.TextDisabled(facts.Region);
-            if(facts.Coordinates is { } text)ImGui.TextUnformatted(text);
-            if(facts.Aetheryte is { } aetheryte)
+            if(TipPart("Place.Region") && facts.Region.Length>0 && facts.Region!=map.Zone)ImGui.TextDisabled(facts.Region);
+            if(TipPart("Place.Coordinates") && facts.Coordinates is { } text)ImGui.TextUnformatted(text);
+            if(TipPart("Place.Aetheryte") && facts.Aetheryte is { } aetheryte)
                 ImGui.TextDisabled(facts.AetheryteCost is { } cost ? localization.Format("MapView.PlaceTipAetheryteCost",aetheryte,cost.ToString("N0",Numbers))
                     :facts.Attuned==false ? localization.Format("MapView.PlaceTipAetheryteNotAttuned",aetheryte):localization.Format("MapView.PlaceTipAetheryte",aetheryte));
-            if(facts.Weather is { } weatherName)
+            if(TipPart("Place.Weather") && facts.Weather is { } weatherName)
             {
                 if(facts.WeatherIcon!=0){DrawGameIcon(facts.WeatherIcon,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();}
                 ImGui.TextUnformatted(localization.Format("MapView.VistaWeatherNow",weatherName));

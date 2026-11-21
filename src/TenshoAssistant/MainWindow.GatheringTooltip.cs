@@ -34,10 +34,11 @@ internal sealed partial class MainWindow
         var (facts,defs)=GatheringTipOf(point);
         ImGui.BeginGroup();
         TooltipTitle(facts.Title);
-        if(facts.Detail is { } detail)ImGui.TextDisabled(detail);
-        if(facts.Place is { } place)ImGui.TextDisabled(place);
+        if(TipPart("Gathering.Detail") && facts.Detail is { } detail)ImGui.TextDisabled(detail);
+        if(TipPart("Gathering.Place") && facts.Place is { } place)ImGui.TextDisabled(place);
         ImGui.EndGroup();
-        DrawPointAvailability(point);
+        if(TipPart("Gathering.Opening"))DrawPointAvailability(point);
+        if(!TipPart("Gathering.Items"))return;
         var side=new Vector2(ImGui.GetTextLineHeight());
         for(var index=0;index<facts.Items.Count && index<max;index++)
         {

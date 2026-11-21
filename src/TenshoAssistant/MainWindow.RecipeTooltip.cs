@@ -32,30 +32,31 @@ internal sealed partial class MainWindow
 
     // X-684 (0.1692): the facts of the recipe under the cursor, built once while it stays hovered (the recipe, the language, the item
     // catalogue, the crafting log's state), not every frame.
-    private (uint Recipe,int Revision,object? Items,bool? Crafted,RecipeTipFacts Facts)? recipeTip;
+    // X-684 (0.1696): and the parts turned off (the list, replaced whole at each change).
+    private (uint Recipe,int Revision,object? Items,bool? Crafted,object? Parts,RecipeTipFacts Facts)? recipeTip;
     private RecipeTipFacts RecipeTipOf(RecipeDefinition recipe)
     {
         var items=itemCatalog.State.Catalog;
         RecipeLog?.Want();
         var crafted=RecipeLog?.State?.WasCrafted(recipe.RecipeId);
-        if(recipeTip is { } cached && cached.Recipe==recipe.RecipeId && cached.Revision==localization.Revision && ReferenceEquals(cached.Items,items) && cached.Crafted==crafted)
+        if(recipeTip is { } cached && cached.Recipe==recipe.RecipeId && cached.Revision==localization.Revision && ReferenceEquals(cached.Items,items) && cached.Crafted==crafted && ReferenceEquals(cached.Parts,configuration.TooltipPartsHidden))
             return cached.Facts;
         string Name(uint id)=>items?.Find(id)?.Name ?? $"#{id}";
         var name=Name(recipe.ResultItemId)+(recipe.ResultAmount>1 ? " × "+recipe.ResultAmount.ToString("N0",Numbers):"");
         var lines=new List<string?>();
         if(recipe.Simulation is { } p)
         {
-            lines.Add(string.Join(" · ",RecipeTips.Stats(p).Select(stat=>localization.Get("CraftSequence."+stat.Key)+" "+stat.Value.ToString("N0",Numbers))));
+            if(TipPart("Recipe.Stats"))lines.Add(string.Join(" · ",RecipeTips.Stats(p).Select(stat=>localization.Get("CraftSequence."+stat.Key)+" "+stat.Value.ToString("N0",Numbers))));
             var minimums=RecipeTips.Minimums(p).Select(stat=>localization.Get("CraftSimulation."+stat.Key)+" "+stat.Value.ToString("N0",Numbers)).ToList();
-            if(minimums.Count>0)lines.Add(localization.Format("RecipeTip.Minimum",string.Join(" · ",minimums)));
-            lines.Add(RecipeFactsText(p));
+            if(TipPart("Recipe.Minimum") && minimums.Count>0)lines.Add(localization.Format("RecipeTip.Minimum",string.Join(" · ",minimums)));
+            if(TipPart("Recipe.Facts"))lines.Add(RecipeFactsText(p));
         }
-        if(crafted is { } done)lines.Add(localization.Get(done ? "RecipeUi.Crafted":"RecipeUi.NeverCrafted"));
+        if(TipPart("Recipe.Crafted") && crafted is { } done)lines.Add(localization.Get(done ? "RecipeUi.Crafted":"RecipeUi.NeverCrafted"));
         var ingredients=Npcs.NpcTips.Lines(recipe.Ingredients.Select(ingredient=>Name(ingredient.ItemId)+" × "+ingredient.Amount.ToString("N0",Numbers)),
             RecipeTips.MaxIngredients,more=>localization.Format("MapView.HoverMore",more));
-        if(ingredients.Count>0)lines.Add(localization.Format("RecipeTip.Ingredients",string.Join(", ",ingredients)));
+        if(TipPart("Recipe.Ingredients") && ingredients.Count>0)lines.Add(localization.Format("RecipeTip.Ingredients",string.Join(", ",ingredients)));
         var facts=RecipeTips.Build(name,recipe.CraftTypeId<8 ? 62108+recipe.CraftTypeId:0,localization.Format("RecipeUi.JobLevel",recipe.CraftType,recipe.Level),lines);
-        recipeTip=(recipe.RecipeId,localization.Revision,items,crafted,facts);
+        recipeTip=(recipe.RecipeId,localization.Revision,items,crafted,configuration.TooltipPartsHidden,facts);
         return facts;
     }
 }

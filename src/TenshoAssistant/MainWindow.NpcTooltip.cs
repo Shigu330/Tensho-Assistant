@@ -18,9 +18,9 @@ internal sealed partial class MainWindow
         {
             if(facts.Icon!=0){DrawGameIcon(facts.Icon,new Vector2(32));ImGui.SameLine();}
             TooltipTitle(facts.Name);
-            foreach(var place in facts.Places)ImGui.TextDisabled(place);
-            foreach(var shop in facts.Shops)ImGui.TextUnformatted(shop);
-            foreach(var note in facts.Notes)ImGui.TextUnformatted(note);
+            if(TipPart("Npc.Places"))foreach(var place in facts.Places)ImGui.TextDisabled(place);
+            if(TipPart("Npc.Shops"))foreach(var shop in facts.Shops)ImGui.TextUnformatted(shop);
+            if(TipPart("Npc.Notes"))foreach(var note in facts.Notes)ImGui.TextUnformatted(note);
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
     }

@@ -53,6 +53,8 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
+        // X-684 (0.1696): the parts of Tensho's own tooltips turned off.
+        "TooltipPartsHidden",
         "Cache", "OpenOnLoad", "AutoBankCapture", "ShowCharacterPanel", "RemindersFromGame", "ShowEnglishItemName", "CostDataCenter", "CostUseVendors", "HidePanelsBehindGame", "DesktopLink", "DesktopInstallFolder", "PagePlaces", "ShowBeastBoardPanel", "HighlightBeastCombos", "OccultPanel", "OccultAlerts", "MapReplaceNoticeSaid", "HideBarsBehindGame", "ShowDutyFinderLoot", "MacroCopy", "AlarmServerBar", "ReminderServerBar", "ReminderFinishedServerBar", "ReminderBarHidden", "AlarmBarTooltip", "ServerBarTooltipAbove",
         // 0.344 (g, I-02): currency alerts, their server bar entry and the thresholds.
         "CurrencyAlerts", "CurrencyServerBar", "GilServerBar", "BagsServerBar", "WearServerBar", "PlaceServerBar", "StateServerBar", "StateServerBarOnlyProblems", "StatePanel", "WishlistSaleAlert", "CurrencyThresholds", "CurrencyWeeklyCapAlert",
@@ -780,6 +782,9 @@ public sealed partial class Configuration
     public List<string>? WorldClocks { get; set; }
     // 0.377 (g, M-07): under the game's item tooltip, the hovered gear against the worn piece of its slot (on by default).
     public bool HoverShowCompare { get; set; } = true;
+    // X-684 (0.1696, M3 of X-700): the parts of Tensho's own tooltips turned off (« Kind.Part », UI/TooltipParts.All); none by default.
+    // Replaced whole at each change (MainWindow.SetTipPart).
+    public List<string> TooltipPartsHidden { get; set; } = [];
     // 0.376 (g, M-06): wear and spiritbond alert (on), on-screen bar (off) and thresholds; null = defaults.
     public Gear.GearWearSettings? GearWear { get; set; }
     // 0.370 (g, X-02): favourite orchestrion rolls (Orchestrion rows), 300 at most.

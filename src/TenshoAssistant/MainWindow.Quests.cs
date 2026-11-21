@@ -427,14 +427,14 @@ internal sealed partial class MainWindow
             if(entry.Icon>0){DrawGameIcon(entry.Icon,new Vector2(32));ImGui.SameLine();}
             ImGui.BeginGroup();
             ImGui.TextColored(Accent,entry.Name);
-            ImGui.TextDisabled(entry.Section.Length>0 ? $"{entry.Section} › {entry.Category}":entry.Category);
+            if(TipPart("Quest.Category"))ImGui.TextDisabled(entry.Section.Length>0 ? $"{entry.Section} › {entry.Category}":entry.Category);
             ImGui.EndGroup();
-            if(entry.Level>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
-            if(entry.AdditionalLevel>0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
-            if(entry.Zone.Length>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
-            if(entry.Expansion.Length>0)ImGui.TextDisabled(localization.Format("QuestDetails.Expansion",entry.Expansion));
-            ImGui.TextColored(entry.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(entry));
-            if(entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
+            if(TipPart("Quest.Level") && entry.Level>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Level",entry.Level));
+            if(TipPart("Quest.Level") && entry.AdditionalLevel>0)ImGui.TextUnformatted(localization.Format("QuestDetails.OtherLevel",entry.AdditionalLevel));
+            if(TipPart("Quest.Zone") && entry.Zone.Length>0)ImGui.TextUnformatted(localization.Format("QuestDetails.Zone",entry.Zone));
+            if(TipPart("Quest.Expansion") && entry.Expansion.Length>0)ImGui.TextDisabled(localization.Format("QuestDetails.Expansion",entry.Expansion));
+            if(TipPart("Quest.Progress"))ImGui.TextColored(entry.Progress==QuestProgress.Complete ? Success:Muted,QuestProgressLabel(entry));
+            if(TipPart("Quest.Progress") && entry.IsRepeatable)ImGui.TextDisabled(localization.Get("QuestDetails.Repeatable"));
             if(developerMode)ImGui.TextDisabled($"ID: {entry.Id}");
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }

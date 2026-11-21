@@ -19,9 +19,9 @@ internal sealed partial class MainWindow
             if(icon!=0){DrawGameIcon(icon,new Vector2(32));ImGui.SameLine();}
             ImGui.BeginGroup();
             TooltipTitle(name);
-            if(detail is { Length:>0 })ImGui.TextDisabled(detail);
+            if(TipPart("Action.Detail") && detail is { Length:>0 })ImGui.TextDisabled(detail);
             ImGui.EndGroup();
-            if(description is { Length:>0 })ImGui.TextUnformatted(description);
+            if(TipPart("Action.Description") && description is { Length:>0 })ImGui.TextUnformatted(description);
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
     }

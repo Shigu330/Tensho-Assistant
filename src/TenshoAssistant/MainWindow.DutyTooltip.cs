@@ -17,10 +17,10 @@ internal sealed partial class MainWindow
         {
             if(facts.Icon!=0){DrawGameIcon(facts.Icon,new Vector2(32));ImGui.SameLine();}
             TooltipTitle(facts.Name);
-            if(facts.Kind is { } kind)ImGui.TextDisabled(kind);
-            if(facts.Zone is { } zone)ImGui.TextUnformatted(zone);
-            if(facts.Status is { } status)ImGui.TextUnformatted(status);
-            if(facts.Unlock is { } unlock)ImGui.TextUnformatted(unlock);
+            if(TipPart("Duty.Kind") && facts.Kind is { } kind)ImGui.TextDisabled(kind);
+            if(TipPart("Duty.Zone") && facts.Zone is { } zone)ImGui.TextUnformatted(zone);
+            if(TipPart("Duty.Status") && facts.Status is { } status)ImGui.TextUnformatted(status);
+            if(TipPart("Duty.Unlock") && facts.Unlock is { } unlock)ImGui.TextUnformatted(unlock);
             if(facts.Developer is { } ids)ImGui.TextDisabled(ids);
             if(after is { Length:>0 }){ImGui.Separator();ImGui.TextDisabled(after);}
         }
