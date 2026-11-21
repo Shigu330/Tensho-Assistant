@@ -67,6 +67,18 @@ are embedded in 0.315, see above), AutoRetainer (0.307, not copied, licence not 
 0.310), Glamourer (Apache-2.0, 0.310), xivgear.app (no published licence: read only, 0.310). Allagan Tools is not used
 (DEC-013). The evidence of reading the game sheets is in [docs/evidence/](../evidence/).
 
+### Sources proposed by the user (X-752, read on 22/11/2026)
+
+Proposed by the user on 18/11/2026 and read by the agent only (pages, repository and licence files): nothing here is used by Tensho and
+no network request is added; any use would first need the R04 summary and the user's agreement.
+
+| Source | Licence and terms (read on 22/11/2026) | What it would add | Network |
+|---|---|---|---|
+| FFXIV Fish Tracker (ff14fish.carbuncleplushy.com; code github.com/icykoneko/ff14-fish-tracker-app) | Code under MIT (« Copyright (c) 2019 icykoneko »); its fish data (`private/fishData.yaml`: hours, weathers, predators, intuition, bait chain, tug, hookset, folklore, patch) states no licence of its own, the repository's MIT is the only one; no terms on the site, no API, no data download | The big fish's windows and bait chains, which Tensho already shows from its own sources: a cross-check, or a fish missing there | None; embedding its data (with the MIT notice) or reading the repository would be a new source: R04 first |
+| xivapi/ffxiv-datamining (GitHub) | No licence (no LICENSE file, none in the README); its CSVs are the game's sheets (Square Enix's data) extracted with XIV Data Oxidizer | Nothing for the plugin, which reads the installed client's sheets through Lumina; for the probes of `tools/`, a copy of sheets the client already holds | None |
+| ff14angler (fr.ff14angler.com) | No licence or terms of use for its statistics (only Square Enix's copyright line); its data comes from players' logs sent by its own Windows client FF14AnglerRep, whose terms forbid copying that client; no API, no download | Bite times, baits and hooksets measured by players, which Tensho does not have | Reading its pages would be scraping a site without terms: not proposed (R04, R05) |
+| Console Games Wiki, « Community Resources » page | The wiki's text is under the GNU FDL, version not given (page FFXIV_Wiki:About); the page says nothing of the licences of the tools it lists | A list of tools by subject, each to be read on its own (X-753) | None |
+
 ## Records 0.184 → 0.315 (checked against the code on 2026-11-02)
 
 > Records 0.213 (REF-FASHION-AVANTGARDE) and 0.227 (REF-FISH-GATHERBUDDY) are at the end of the archive below.
@@ -1040,6 +1052,18 @@ sont embarqués en 0.315, voir ci-dessus), AutoRetainer (0.307, non copié, lice
 « coût ≤ capacité » ; ses seuils de dirigeables viennent de sources sans licence et ne sont pas repris), HimbeertoniRaidTool (MIT,
 0.310), Glamourer (Apache-2.0, 0.310), xivgear.app (aucune licence publiée : lu seulement, 0.310). Allagan Tools n'est pas utilisé
 (DEC-013). Les preuves de lecture des feuilles du jeu sont dans [docs/evidence/](../evidence/).
+
+### Sources proposées par l'utilisateur (X-752, lues le 22/11/2026)
+
+Proposées par l'utilisateur le 18/11/2026 et lues par l'agent seulement (pages, dépôt et fichiers de licence) : rien ici n'est utilisé
+par Tensho et aucune requête réseau n'est ajoutée ; tout usage demanderait d'abord le résumé R04 et l'accord de l'utilisateur.
+
+| Source | Licence et conditions (lues le 22/11/2026) | Ce qu'elle apporterait | Réseau |
+|---|---|---|---|
+| FFXIV Fish Tracker (ff14fish.carbuncleplushy.com ; code github.com/icykoneko/ff14-fish-tracker-app) | Code sous MIT (« Copyright (c) 2019 icykoneko ») ; ses données de poissons (`private/fishData.yaml` : heures, météos, prédateurs, intuition, chaîne d'appâts, touche, ferrage, folklore, patch) n'annoncent aucune licence propre, la MIT du dépôt est la seule ; aucune condition sur le site, ni API ni téléchargement de données | Les fenêtres et chaînes d'appâts des gros poissons, que Tensho montre déjà depuis ses propres sources : une vérification croisée, ou un poisson qui y manque | Aucune ; embarquer ses données (avec l'avis MIT) ou lire le dépôt serait une nouvelle source : R04 d'abord |
+| xivapi/ffxiv-datamining (GitHub) | Aucune licence (pas de fichier LICENSE, rien dans le README) ; ses CSV sont les feuilles du jeu (données de Square Enix) extraites avec XIV Data Oxidizer | Rien pour le plugin, qui lit les feuilles du client installé par Lumina ; pour les sondes de `tools/`, une copie de feuilles que le client a déjà | Aucune |
+| ff14angler (fr.ff14angler.com) | Aucune licence ni condition d'utilisation pour ses statistiques (seule la ligne de copyright de Square Enix) ; ses données viennent des journaux des joueurs envoyés par son propre client Windows FF14AnglerRep, dont les conditions interdisent de copier ce client ; ni API ni téléchargement | Temps de touche, appâts et ferrages mesurés par les joueurs, que Tensho n'a pas | Lire ses pages serait aspirer un site sans conditions : non proposé (R04, R05) |
+| Console Games Wiki, page « Community Resources » | Le texte du wiki est sous GNU FDL, version non donnée (page FFXIV_Wiki:About) ; la page ne dit rien des licences des outils qu'elle liste | Une liste d'outils par sujet, chacun à lire à part (X-753) | Aucune |
 
 ## Fiches 0.184 → 0.315 (relues contre le code le 2026-11-02)
 
