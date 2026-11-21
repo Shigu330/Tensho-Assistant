@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (715 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (717 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -762,6 +762,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-681 | User request (chat, 20/11 about 9:45 pm): « Tell: can't we do it directly with… | Done in 0.1660.0 |
 | X-682 | Tool: the plan tool (public cells, the agent's paths list) does not refuse an… | Done in 0.1656.0 |
 | X-683 | User request (chat, 20/11 about 9:50 pm, screenshot « Water Cluster »): the… | Done in 0.1664.0 |
+| X-684 | User request (chat, 20/11 about 9:52 pm), after the chat item tooltip point: «… | Done in 0.1696.0 |
 | X-686 | User-reported bug (chat, 20/11 about 10 pm): a chat tab removed by mistake («… | Done in 0.1656.0 |
 | X-687 | User request (chat, 20/11 about 10:05 pm): « no way to arrange the tabs » of… | Done in 0.1663.0 |
 | X-688 | In-game test T-0.1526-2 (test page, 20/11 around 22:08): problem reported by… | Done in 0.1661.0 |
@@ -783,12 +784,13 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-704 | CI red on 0.1679, 0.1680 and 0.1681 (job « New tool skeleton passes Verify »)… | Done in 0.1682.0 |
 | X-705 | User's choice (21/11 about 4:35 am, D-201 b): in the grouped side bar (X-601)… | Done in 0.1683.0 |
 | X-706 | Review of block 0.1682 to 0.1686 (review 0.1686, 21/11), minor M1, M2, M3: M1… | Done in 0.1687.0 |
+| X-707 | Review of block 0.1687 to 0.1692 (review 0.1692, 21/11), minor M1: M1 in… | Done in 0.1693.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (715 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (717 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1548,6 +1550,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-681 | Demande de l'utilisateur (chat, 20/11 vers 21 h 45) : « Murmurer, on ne peut… | Fait en 0.1660.0 |
 | X-682 | Outil : l'outil du plan (cellules publiques, liste des chemins de l'agent) ne… | Fait en 0.1656.0 |
 | X-683 | Demande de l'utilisateur (chat, 20/11 vers 21 h 50, capture « Agrégat d'eau »)… | Fait en 0.1664.0 |
+| X-684 | Demande de l'utilisateur (chat, 20/11 vers 21 h 52), suite du point sur… | Fait en 0.1696.0 |
 | X-686 | Bug signalé par l'utilisateur (chat, 20/11 vers 22 h) : un onglet du chat… | Fait en 0.1656.0 |
 | X-687 | Demande de l'utilisateur (chat, 20/11 vers 22 h 05) : « aucun moyen de ranger… | Fait en 0.1663.0 |
 | X-688 | Essai T-0.1526-2 en jeu (page des essais, 20/11 vers 22 h 08) : problème… | Fait en 0.1661.0 |
@@ -1569,3 +1572,4 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-704 | CI rouge sur 0.1679, 0.1680 et 0.1681 (runs 44858515933, 44859015883… | Fait en 0.1682.0 |
 | X-705 | Choix de l'utilisateur (21/11 vers 4 h 35, D-201 b) : dans la barre de côté… | Fait en 0.1683.0 |
 | X-706 | Relecture du bloc 0.1682 à 0.1686 (relecture 0.1686, 21/11), mineurs M1, M2, M3… | Fait en 0.1687.0 |
+| X-707 | Relecture du bloc 0.1687 à 0.1692 (relecture 0.1692, 21/11), mineurs M1 : M1… | Fait en 0.1693.0 |

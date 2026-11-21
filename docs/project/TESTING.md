@@ -2507,6 +2507,20 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1692) Page Artisanat, livre de recettes : survoler une recette de la liste : icône de la classe, objet et quantité, classe et niveau, durabilité, progression et qualité, minimum, faits (HQ, travail rapide…), déjà fabriquée, ingrédients ; même info-bulle sur l'icône de classe d'une fabrication dans un panneau de liste et dans « Fabriquer depuis le stock »
 
+- [ ] (0.1694) Carte Tensho : survoler un point de récolte (à horaire si possible) sur la carte, puis dans la liste « Récolte » (clic droit sur la carte) : même contenu (genre et niveau, métier et sorte, lieu, ouvert ou fermé et pour combien de temps, objets avec icône), puis l'effet du clic
+
+- [ ] (0.1694) Aide à la pêche au harpon : survoler le nom d'un poisson : info-bulle complète de l'objet, puis l'ombre et « vu » s'il l'a été
+
+- [ ] (0.1695) Jardin : survoler une plantation puis une graine des croisements : lignes du jardin, puis collection, stock, usages et comment obtenir la graine
+
+- [ ] (0.1695) Eurêka et Bozja, onglet des actions : survoler une action : icône, nom, catégorie et maximum, description du jeu
+
+- [ ] (0.1696) Paramètres › Général › Autres infobulles : couper « Météo actuelle » (Lieux) puis survoler un lien de carte du chat ou un favori de la carte : la météo n'y est plus ; la remettre : elle revient. Même chose avec « Boutiques » (PNJ) sur la page Marchands
+
+- [ ] (0.1697) Artisanat (ou Récolte) : tirer un onglet du haut à une autre place, changer de page puis revenir : l'ordre reste ; recharger le plugin : l'ordre reste ; Paramètres › Général › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient, la page affichée reste
+
+- [ ] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
