@@ -106,6 +106,23 @@ internal static class NewTool1615Tests
             }
             finally{try{Directory.Delete(root,true);}catch(IOException){}}
         }),
+        ("New tool 1682: a page alone of « Tracking » goes after the last page of the category, so it stays one group of the side bar",()=>
+        {
+            // X-704 (0.1682): the side bar has one category left (D-199); at the end of the list such a page would draw « Tracking » twice.
+            var root=Copy();
+            try
+            {
+                var (code,output)=Run(root,"-Name","SampleTimers","-Category","Tracking","-LabelEn","Timers","-LabelFr","Minuteurs");
+                Check(code==0,"New-Tool.ps1 failed: "+output);
+                Registered(root,"SampleTimers");
+                var entries=Text(root,"src/TenshoAssistant/MainWindow.Pages.cs").Split('\n').Select(line=>Regex.Match(line,@"^\s*new\(Page\.(\w+),""(\w+)"",(?!null,)"))
+                    .Where(match=>match.Success).Select(match=>(Page:match.Groups[1].Value,Category:match.Groups[2].Value)).ToArray();
+                var groups=TenshoAssistant.UI.PageFamilies.Runs(entries,entry=>TenshoAssistant.UI.PageFamilies.SideBarCategory(entry.Category));
+                var tracking=groups.Where(group=>group.Key=="Tracking").ToArray();
+                Check(tracking.Length==1 && tracking[0].Items[^1].Page=="SampleTimers","one « Tracking » group, the new page last: "+string.Join(" | ",tracking.Select(group=>string.Join(",",group.Items.Select(entry=>entry.Page)))));
+            }
+            finally{try{Directory.Delete(root,true);}catch(IOException){}}
+        }),
         ("New tool 1615: a dry run writes nothing",()=>
         {
             var root=Copy();

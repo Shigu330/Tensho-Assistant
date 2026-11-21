@@ -140,7 +140,14 @@ Write-Text (Join-Path $src 'MainWindow.cs') $newWindow $window.Crlf
 $anchor='        // New tools: scripts/New-Tool.ps1 adds their line above this one.'
 $line=if($Parent){"        new(Page.$Name,`"$Category`",null,Draw$Name,`"MainWindow.$Name.cs, $Name/`",Page.$Parent,Tab:PageLabel(`"${Name}Ui.Title`"),About:PageLabel(`"${Name}Ui.Help`")),"}
     else{"        new(Page.$Name,`"$Category`",PageLabel(`"Navigation.$Name`"),Draw$Name,`"MainWindow.$Name.cs, $Name/`"),"}
-Write-Text (Join-Path $src 'MainWindow.Pages.cs') (Replace-Once $list.Text $anchor "$line`n$anchor" 'MainWindow.Pages.cs') $list.Crlf
+# X-704 (0.1682): « Tracking » is the side bar's one category left (D-199); a page alone of it goes after the last page of the category, so
+# the category stays one group (PageFamilies1677Tests). Any other page goes at the end of the list.
+$pagesText=if(-not $Parent -and $Category -eq 'Tracking'){
+    $lastTracking=($list.Text -split "`n") | Where-Object {$_ -match '^\s*new\(Page\.\w+,"Tracking",(?!null,)'} | Select-Object -Last 1
+    if(-not $lastTracking){throw 'No page of the « Tracking » category in MainWindow.Pages.cs.'}
+    Replace-Once $list.Text "$lastTracking`n" "$lastTracking`n$line`n" 'MainWindow.Pages.cs'
+}else{Replace-Once $list.Text $anchor "$line`n$anchor" 'MainWindow.Pages.cs'}
+Write-Text (Join-Path $src 'MainWindow.Pages.cs') $pagesText $list.Crlf
 # Guide: a stop of the visit for every player, before the common pages of the end (PageCoverageTests, GuideVisit1045Tests); give it an
 # interest (GuideInterest) when it is for some players only.
 Write-Text $guidePath (Replace-Once $guide.Text $guideAnchor "new(`"$Name`"), $guideAnchor" 'GuideFlow.cs') $guide.Crlf

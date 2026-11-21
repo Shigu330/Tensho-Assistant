@@ -20,11 +20,13 @@ internal static class PageFamilies1677Tests
     ];
 
     /// <summary>The real page list, as the window builds it: page, parent, side bar entry, tab.</summary>
-    internal static List<PageFamilies.Member<int>> Real(out List<string> names)
+    internal static List<PageFamilies.Member<int>> Real(out List<string> names) => Parse(Read("src/TenshoAssistant/MainWindow.Pages.cs"), out names);
+
+    private static List<PageFamilies.Member<int>> Parse(string list, out List<string> names)
     {
         names = [];
         var rows = new List<(string Page, string? Parent, bool Label, bool Tab)>();
-        foreach (Match row in Regex.Matches(Read("src/TenshoAssistant/MainWindow.Pages.cs"), @"^\s*new\(Page\.(\w+),(?:""\w+""|null),(null|PageLabel\(|\(\)=>).*$", RegexOptions.Multiline))
+        foreach (Match row in Regex.Matches(list, @"^\s*new\(Page\.(\w+),(?:""\w+""|null),(null|PageLabel\(|\(\)=>).*$", RegexOptions.Multiline))
         {
             var parent = Regex.Match(row.Value, @""",Page\.(\w+)[,)]");
             rows.Add((row.Groups[1].Value, parent.Success ? parent.Groups[1].Value : null, row.Groups[2].Value != "null", row.Value.Contains(",Tab:")));
@@ -33,6 +35,60 @@ internal static class PageFamilies1677Tests
         var index = names.Select((name, at) => (name, at)).ToDictionary(pair => pair.name, pair => pair.at);
         return rows.Select(row => new PageFamilies.Member<int>(index[row.Page], row.Parent is null ? null : index[row.Parent], row.Label, row.Tab)).ToList();
     }
+
+    /// <summary>D-199's pages that group: the first page, its name in the side bar, its category and its pages in order.</summary>
+    private static readonly (string Root, string Key, string Category, string[] Pages)[] Families =
+    [
+        ("Collections", "Navigation.Character", "Progression", ["Collections", "BlueMagic", "MaskedCarnivale", "Beastmaster", "Chocobo", "HuntingLog", "Gear", "RelicWeapons"]),
+        ("Items", "Navigation.Items", "Objects", ["Items", "Storage", "SortPreview", "Market"]),
+        ("CraftSimulation", "Navigation.Crafting", "Production", ["CraftSimulation", "CraftPresets", "CraftLive", "MacroChain"]),
+        ("Gathering", "Navigation.Gathering", "Production", ["Gathering", "GatheringGp", "GatheringCollectables", "OceanFishing"]),
+        ("Maps", "Navigation.World", "World", ["Maps", "Weather", "Fates", "NpcVendors", "DutyLoot", "MonsterLoot", "Discoveries"]),
+        ("Quests", "Navigation.Quests", "Progression", ["Quests", "Leves", "Events", "AlliedSocieties", "GrandCompanies"]),
+        ("SpecialDeliveries", "Navigation.Deliveries", "Progression", ["SpecialDeliveries", "CustomDeliveries"]),
+        ("FieldContent", "Navigation.Duty", "Content", ["FieldContent", "DeepDungeons"]),
+        ("Fashion", "Category.GoldSaucer", "GoldSaucer", ["Fashion", "TripleTriad", "MiniCactpot"]),
+        ("Help", "Navigation.Help", "References", ["Help", "Lexicon", "Credits"]),
+        ("Settings", "Navigation.Settings", "Preferences", ["Settings", "Diagnostics"]),
+    ];
+
+    /// <summary>D-199's side bar, in its order.</summary>
+    private static readonly string[] SideBar = ["Home", "MyTools", "Collections", "Items", "Wishlist", "CraftSimulation", "Gathering", "IslandSanctuary", "Maps", "Alarms", "Reminders", "Garden", "FreeCompany",
+        "Quests", "SpecialDeliveries", "FieldContent", "Fashion", "Help", "Settings"];
+
+    private static readonly string[] Tracking = ["Alarms", "Reminders", "Garden", "FreeCompany"];
+
+    /// <summary>
+    /// X-704 (0.1682): D-199's pages come in its order; a page D-199 does not name, one a new tool adds (scripts/New-Tool.ps1, the « New tool
+    /// skeleton » job of the CI), may sit anywhere. A page D-199 names that leaves its place or its family is still refused.
+    /// </summary>
+    private static bool InOrder(IEnumerable<string> shown, string[] expected)
+    {
+        var known = Families.SelectMany(family => family.Pages).Concat(SideBar).ToHashSet();
+        return shown.Where(known.Contains).SequenceEqual(expected);
+    }
+
+    /// <summary>What the list breaks of D-199: each family's pages in order, the side bar in order, « Tracking » one group of four.</summary>
+    private static List<string> D199Faults(string list)
+    {
+        var faults = new List<string>();
+        var real = Parse(list, out var names);
+        foreach (var (root, key, category, pages) in Families)
+        {
+            var family = names.Contains(root) ? PageFamilies.Of(real, names.IndexOf(root)).Select(at => names[at]).ToArray() : [];
+            if (!InOrder(family, pages)) faults.Add(root + ": " + string.Join(",", family));
+            if (!list.Contains($"new(Page.{root},\"{category}\",PageLabel(\"{key}\"),")) faults.Add(root + " not named « " + key + " » in the side bar");
+        }
+        var entries = Regex.Matches(list, @"^\s*new\(Page\.(\w+),(?:""(\w+)""|null),(?!null,)", RegexOptions.Multiline).Select(match => (Page: match.Groups[1].Value, Category: match.Groups[2].Value)).ToArray();
+        if (!InOrder(entries.Select(entry => entry.Page), SideBar)) faults.Add("the side bar: " + string.Join(",", entries.Select(entry => entry.Page)));
+        var groups = PageFamilies.Runs(entries, entry => PageFamilies.SideBarCategory(entry.Category.Length == 0 ? null : entry.Category));
+        var tracking = groups.Where(group => group.Key == "Tracking").ToArray();
+        if (tracking.Length != 1 || !InOrder(tracking[0].Items.Select(entry => entry.Page), Tracking))
+            faults.Add("« Tracking » is not one group of its four pages: " + string.Join(" | ", tracking.Select(group => string.Join(",", group.Items.Select(entry => entry.Page)))));
+        return faults;
+    }
+
+    private const string NewToolAnchor = "        // New tools: scripts/New-Tool.ps1 adds their line above this one.";
 
     private static Dictionary<string, string> Texts(string code)
     {
@@ -137,31 +193,32 @@ internal static class PageFamilies1677Tests
         }),
         ("Page families 1677: each page that groups holds the pages of D-199, in its order", () =>
         {
-            var real = Real(out var names);
-            string[] Family(string root) => PageFamilies.Of(real, names.IndexOf(root)).Select(at => names[at]).ToArray();
-            Check(Family("Collections").SequenceEqual(["Collections", "BlueMagic", "MaskedCarnivale", "Beastmaster", "Chocobo", "HuntingLog", "Gear", "RelicWeapons"]), "Character: " + string.Join(",", Family("Collections")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Collections,\"Progression\",PageLabel(\"Navigation.Character\"),"), "named « Character » in the side bar");
-            Check(Family("Items").SequenceEqual(["Items", "Storage", "SortPreview", "Market"]), "Items: " + string.Join(",", Family("Items")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Items,\"Objects\",PageLabel(\"Navigation.Items\"),"), "named « Items » in the side bar");
-            Check(Family("CraftSimulation").SequenceEqual(["CraftSimulation", "CraftPresets", "CraftLive", "MacroChain"]), "Crafting: " + string.Join(",", Family("CraftSimulation")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.CraftSimulation,\"Production\",PageLabel(\"Navigation.Crafting\"),"), "named « Crafting » in the side bar");
-            Check(Family("Gathering").SequenceEqual(["Gathering", "GatheringGp", "GatheringCollectables", "OceanFishing"]), "Gathering: " + string.Join(",", Family("Gathering")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Gathering,\"Production\",PageLabel(\"Navigation.Gathering\"),"), "named « Gathering » in the side bar");
-            Check(Family("Maps").SequenceEqual(["Maps", "Weather", "Fates", "NpcVendors", "DutyLoot", "MonsterLoot", "Discoveries"]), "World: " + string.Join(",", Family("Maps")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Maps,\"World\",PageLabel(\"Navigation.World\"),"), "named « World » in the side bar");
-            Check(Family("Quests").SequenceEqual(["Quests", "Leves", "Events", "AlliedSocieties", "GrandCompanies"]), "Quests: " + string.Join(",", Family("Quests")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Quests,\"Progression\",PageLabel(\"Navigation.Quests\"),"), "named « Quests » in the side bar");
-            Check(Family("SpecialDeliveries").SequenceEqual(["SpecialDeliveries", "CustomDeliveries"]), "Deliveries: " + string.Join(",", Family("SpecialDeliveries")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.SpecialDeliveries,\"Progression\",PageLabel(\"Navigation.Deliveries\"),"), "named « Deliveries » in the side bar");
-            Check(Family("FieldContent").SequenceEqual(["FieldContent", "DeepDungeons"]), "Duty: " + string.Join(",", Family("FieldContent")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.FieldContent,\"Content\",PageLabel(\"Navigation.Duty\"),"), "named « Duty » in the side bar");
-            Check(Family("Fashion").SequenceEqual(["Fashion", "TripleTriad", "MiniCactpot"]), "Gold Saucer: " + string.Join(",", Family("Fashion")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Fashion,\"GoldSaucer\",PageLabel(\"Category.GoldSaucer\"),"), "named « Gold Saucer » in the side bar");
-            Check(Family("Help").SequenceEqual(["Help", "Lexicon", "Credits"]), "Help: " + string.Join(",", Family("Help")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Help,\"References\",PageLabel(\"Navigation.Help\"),"), "named « Help » in the side bar");
-            Check(Family("Settings").SequenceEqual(["Settings", "Diagnostics"]), "Settings: " + string.Join(",", Family("Settings")));
-            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Settings,\"Preferences\",PageLabel(\"Navigation.Settings\"),"), "named « Settings » in the side bar");
-            // More families: added by each version of X-601, above this line.
+            // X-704 (0.1682): D199Faults reads every family of D-199 (Families); a page a new tool adds is not refused (next case).
+            var faults = D199Faults(Read("src/TenshoAssistant/MainWindow.Pages.cs"));
+            Check(faults.Count == 0, string.Join("; ", faults));
+        }),
+        ("Page families 1682: the pages a new tool adds are not refused, a page of D-199 that leaves its place still is", () =>
+        {
+            // X-704: the CI job « New tool skeleton passes Verify » adds a page alone and a tab of Gathering with scripts/New-Tool.ps1, which
+            // writes lines of this form (NewTool1615Tests; other names here, the job's own pages may already be in the list); 0.1679 to 0.1681 refused them, the CI stayed red. A page of « Tracking » goes after
+            // the last page of the category (New-Tool.ps1 since 0.1682), so the category stays one group.
+            var list = Read("src/TenshoAssistant/MainWindow.Pages.cs");
+            Check(list.Contains(NewToolAnchor + "\n"), "the anchor of scripts/New-Tool.ps1");
+            var added = list.Replace(NewToolAnchor,
+                "        new(Page.Added1682Alone,\"Objects\",PageLabel(\"Navigation.Added1682Alone\"),DrawAdded1682Alone,\"MainWindow.Added1682Alone.cs, Added1682Alone/\"),\n" +
+                "        new(Page.Added1682Tab,\"Production\",null,DrawAdded1682Tab,\"MainWindow.Added1682Tab.cs, Added1682Tab/\",Page.Gathering,Tab:PageLabel(\"Added1682TabUi.Title\"),About:PageLabel(\"Added1682TabUi.Help\")),\n" +
+                NewToolAnchor);
+            var lastTracking = list.Split('\n').Last(line => Regex.IsMatch(line, @"^\s*new\(Page\.\w+,""Tracking"",(?!null,)"));
+            added = added.Replace(lastTracking, lastTracking + "\n        new(Page.Added1682Tracking,\"Tracking\",PageLabel(\"Navigation.Added1682Tracking\"),DrawAdded1682Tracking,\"MainWindow.Added1682Tracking.cs, Added1682Tracking/\"),");
+            Check(D199Faults(added).Count == 0, "a new tool's pages refused: " + string.Join("; ", D199Faults(added)));
+            Check(PageFamilies.Faults(Parse(added, out _)).Count == 0, "no orphan page with the new tool's pages");
+            // The check still bites: a page of D-199 out of order, in another family, or « Tracking » split in two.
+            var swapped = list.Replace("new(Page.Storage,", "new(Page.Swap,").Replace("new(Page.SortPreview,", "new(Page.Storage,").Replace("new(Page.Swap,", "new(Page.SortPreview,");
+            Check(D199Faults(swapped).Any(fault => fault.StartsWith("Items:")), "two tabs of Items swapped");
+            var moved = Regex.Replace(list, @"(new\(Page\.Lexicon,""\w+"",null,[^\n]*?),Page\.Help,", "$1,Page.Settings,");
+            Check(moved != list && D199Faults(moved).Any(fault => fault.StartsWith("Help:")) && D199Faults(moved).Any(fault => fault.StartsWith("Settings:")), "a tab moved to another family");
+            var split = list.Replace(NewToolAnchor, "        new(Page.Added1682Tracking,\"Tracking\",PageLabel(\"Navigation.Added1682Tracking\"),DrawAdded1682Tracking,\"MainWindow.Added1682Tracking.cs, Added1682Tracking/\"),\n" + NewToolAnchor);
+            Check(D199Faults(split).Any(fault => fault.Contains("Tracking")), "a page of « Tracking » after the last entry splits the category");
         }),
         ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>
         {
@@ -193,11 +250,9 @@ internal static class PageFamilies1677Tests
                   && runs[2].Key is null && runs[2].Items.SequenceEqual(["c"]) && runs[3].Key == "Tracking", "entries that follow each other make a group; a key can come back");
             Check(PageFamilies.Runs<string>([], _ => null).Count == 0, "an empty list");
             var list = Read("src/TenshoAssistant/MainWindow.Pages.cs");
-            var entries = Regex.Matches(list, @"^\s*new\(Page\.(\w+),(?:""(\w+)""|null),(?!null,)", RegexOptions.Multiline).Select(match => (Page: match.Groups[1].Value, Category: match.Groups[2].Value)).ToArray();
-            Check(entries.Select(entry => entry.Page).SequenceEqual(["Home", "MyTools", "Collections", "Items", "Wishlist", "CraftSimulation", "Gathering", "IslandSanctuary", "Maps", "Alarms", "Reminders", "Garden", "FreeCompany",
-                "Quests", "SpecialDeliveries", "FieldContent", "Fashion", "Help", "Settings"]), "the side bar: " + string.Join(",", entries.Select(entry => entry.Page)));
-            var groups = PageFamilies.Runs(entries, entry => PageFamilies.SideBarCategory(entry.Category.Length == 0 ? null : entry.Category));
-            Check(groups.Count == 3 && groups[1].Key == "Tracking" && groups[1].Items.Select(entry => entry.Page).SequenceEqual(["Alarms", "Reminders", "Garden", "FreeCompany"]), "« Tracking » keeps its four pages, unchanged");
+            // X-704 (0.1682): the order of D-199 and « Tracking » as one group of its four pages are read by D199Faults, which lets a new tool's page in.
+            var faults = D199Faults(list);
+            Check(faults.Count == 0, string.Join("; ", faults));
             Check(list.Contains("PageFamilies.Runs(PageEntries.Where(entry=>entry.Label is not null).ToArray(),") && list.Contains("PageFamilies.SideBarCategory(entry.Category)"), "the groups of the side bar are read from the list");
             var window = Read("src/TenshoAssistant/MainWindow.cs");
             Check(window.Contains("configuration.NavigationCollapsed = TenshoAssistant.UI.PageFamilies.KeepFolded(configuration.NavigationCollapsed, TenshoAssistant.UI.PageFamilies.SideBarCategories);"), "the saved folds are migrated when the window is built");
