@@ -168,7 +168,8 @@ internal sealed partial class MainWindow
                 if(state==GardenState.ToTend)ImGui.TextColored(Warning,localization.Format("Garden.TipTendNow",when));
                 else ImGui.TextUnformatted(localization.Format("Garden.TipTendAt",when));
             }
-            if(item is not null)ImGui.TextDisabled(localization.Get("Garden.TipClick"));
+            // X-684 (0.1695): the seed's common item body under the garden's lines (collection, stock, uses, how to get it), the click last.
+            if(item is not null){ImGui.Separator();DrawItemInfoBody(item,item.Id);ImGui.TextDisabled(localization.Get("Garden.TipClick"));}
         }
     }
 
@@ -270,6 +271,8 @@ internal sealed partial class MainWindow
             else if(total>0)ImGui.TextUnformatted(localization.Format("Garden.CrossOwned",total.ToString("N0",Numbers)));
             else ImGui.TextColored(Warning,localization.Get("Garden.CrossNotOwned"));
             ImGui.TextDisabled(localization.Get("Garden.CrossForecast"));
+            // X-684 (0.1695): the seed's common item body under the crossbreed's lines.
+            if(item is not null){ImGui.Separator();DrawItemInfoBody(item,item.Id);}
         }
     }
 }

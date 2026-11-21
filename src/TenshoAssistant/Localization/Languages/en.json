@@ -3006,6 +3006,7 @@
     "Choice": "{0}: {1:N2} MGP"
   },
   "FashionUi": {
+    "ItemSlots": "Local equipment slot: {0}",
     "Title": "Fashion Report",
     "Description": "This week (theme from game data, categories read in its window) then every hint category · equipment reported by the community",
     "Help": "Choose a hint and its equipment slot. The current week is in the « This week » frame; no score or dye is calculated (the week's dyes are player reports).",
@@ -7959,6 +7960,7 @@
     "DesktopAllFine": "Nothing to look at."
   },
   "FieldContent": {
+    "ActionTipDetail": "{0} · most held: {1}",
     "Title": "Eureka and Bozja",
     "Subtitle": "From the game's files. What your character holds there is not read here.",
     "Loading": "Reading the game files…",

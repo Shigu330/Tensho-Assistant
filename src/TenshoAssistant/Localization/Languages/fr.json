@@ -3006,6 +3006,7 @@
     "Choice": "{0} : {1:N2} PGS"
   },
   "FashionUi": {
+    "ItemSlots": "Emplacement d'équipement local : {0}",
     "Title": "Revue de mode",
     "Description": "Cette semaine (thème des données du jeu, catégories lues dans sa fenêtre) puis toutes les catégories d'indices · équipements signalés par la communauté",
     "Help": "Choisissez un indice et son emplacement. La semaine en cours est dans le cadre « Cette semaine » ; aucun score ni teinture n'est calculé (les teintures de la semaine sont des signalements de joueurs).",
@@ -7959,6 +7960,7 @@
     "DesktopAllFine": "Rien à signaler."
   },
   "FieldContent": {
+    "ActionTipDetail": "{0} · maximum : {1}",
     "Title": "Eurêka et Bozja",
     "Subtitle": "D'après les fichiers du jeu. Ce que votre personnage possède là-bas n'est pas lu ici.",
     "Loading": "Lecture des fichiers du jeu…",

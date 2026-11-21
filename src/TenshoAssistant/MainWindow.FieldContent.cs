@@ -294,7 +294,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();DrawSmallGameIcon(row.Icon);ImGui.TextUnformatted(row.Name);
-                if(ImGui.IsItemHovered() && row.Description.Length>0)WrappedTooltip(row.Description);
+                // X-684 (0.1695): the one action tooltip (icon, name, category and most held, the game's description); before, the description alone.
+                if(ImGui.IsItemHovered())DrawActionTooltip(row.Icon,row.Name,row.Description,localization.Format("FieldContent.ActionTipDetail",row.Category,row.Most));
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Category);
                 ImGui.TableNextColumn();ImGui.TextUnformatted(row.Most.ToString());
             }
