@@ -229,16 +229,17 @@ internal sealed class GatheringCatalogLoader : IDisposable
     private GatheringSchedule ReadSchedule(GatheringPoint point)
     {
         // Transient keys refer to physical points, never GatheringPointBase.
-        if (point.Type == 8 || transient is null || !transient.TryGetRow(point.RowId, out var timing))
+        if (transient is null || !transient.TryGetRow(point.RowId, out var timing))
             return GatheringSchedule.Unknown;
-        if (timing.GatheringRarePopTimeTable.RowId == 0)
-            return GatheringSchedule.FromEphemeral(timing.EphemeralStartTime, timing.EphemeralEndTime);
-        if (rareTimes is null || !rareTimes.TryGetRow(timing.GatheringRarePopTimeTable.RowId, out var rare))
-            return GatheringSchedule.Unknown;
-        var slots = new List<(ushort, ushort)>();
-        for (var index = 0; index < rare.StartTime.Count; index++)
-            slots.Add((rare.StartTime[index], rare.Duration[index]));
-        return GatheringSchedule.FromRare(slots);
+        // X-714 (0.1713): the rule lives in GatheringSchedule.FromTransient, shared with the map's present points.
+        List<(ushort, ushort)>? slots = null;
+        if (timing.GatheringRarePopTimeTable.RowId != 0 && rareTimes is not null && rareTimes.TryGetRow(timing.GatheringRarePopTimeTable.RowId, out var rare))
+        {
+            slots = [];
+            for (var index = 0; index < rare.StartTime.Count; index++)
+                slots.Add((rare.StartTime[index], rare.Duration[index]));
+        }
+        return GatheringSchedule.FromTransient(point.Type, timing.GatheringRarePopTimeTable.RowId, timing.EphemeralStartTime, timing.EphemeralEndTime, slots);
     }
 
     private void Stop()

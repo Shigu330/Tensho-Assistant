@@ -545,6 +545,13 @@ if(Environment.GetEnvironmentVariable("PROBE_GATHERTYPE") is { Length:>0 })
             +$" points {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId)} timed {points.Count(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId && TimedPoint(point))}"
             +$" pointTypes {string.Join(",",points.Where(point=>point.GatheringPointBase.Value.GatheringType.RowId==type.RowId).GroupBy(point=>point.Type).OrderBy(group=>group.Key).Select(group=>$"{group.Key}:{group.Count()}/{group.Count(TimedPoint)}"))}");
     foreach(var job in data.Excel.GetSheet<ClassJob>(Language.English).Where(row=>row.RowId is 16 or 17 or 18))Console.WriteLine($"JOB {job.RowId} '{job.Name.ExtractText()}'");
+    // X-714 (0.1713): the edge cases of the review: an ephemeral window whose start equals its end (no restriction for the catalogue) and a
+    // single bound at 65535 (an invalid schedule for the catalogue), on points without a rare pop table.
+    var plain=points.Select(point=>(point,timing:transient.GetRowOrDefault(point.RowId))).Where(pair=>pair.timing is { } row && row.GatheringRarePopTimeTable.RowId==0).ToArray();
+    Console.WriteLine($"EDGE startEqualsEnd {plain.Count(pair=>pair.timing!.Value.EphemeralStartTime!=65535 && pair.timing.Value.EphemeralStartTime==pair.timing.Value.EphemeralEndTime)}"
+        +$" oneBound65535 {plain.Count(pair=>pair.timing!.Value.EphemeralStartTime==65535 ^ pair.timing.Value.EphemeralEndTime==65535)}"
+        +$" rareTableMissing {points.Count(point=>transient.GetRowOrDefault(point.RowId) is { } row && row.GatheringRarePopTimeTable.RowId!=0 && !row.GatheringRarePopTimeTable.IsValid)}"
+        +$" type8 {points.Count(point=>point.Type==8)} type8Timed {points.Count(point=>point.Type==8 && TimedPoint(point))}");
     return;
 }
 // PROBE_GPACTIONS (0.410, R-09): every miner and botanist action (ClassJob 16/17): level, GP cost, English and French names, description.

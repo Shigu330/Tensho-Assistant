@@ -22,11 +22,15 @@ public static class GatheringNodeIcons
 
     public static bool Timed(uint icon)=>icon is TimedMiner or TimedBotanist;
 
+    // X-714 (0.1713): whether a physical point is timed is its schedule's (GatheringSchedule.FromTransient(...).Timed), the gathering
+    // catalogue's own rule: a window 0-0 is no restriction, a single bound at 65535 an invalid schedule (neither happens in the client's
+    // sheets: probe of 21/11, docs/evidence/0.1711-gathering-node-icons.md); the timed points are those of types 2, 4 and 5 (285 of 5601).
+
     /// <summary>
-    /// A physical point is timed when its GatheringPointTransient row has a rare pop table or an ephemeral window (65535: none), as the
-    /// gathering catalogue reads its schedule; the probe counts these exactly on the points of types 2, 4 and 5 (285 of 5601).
+    /// X-714 (0.1713): a gathering point's area is drawn while « Gathering areas » is on; a timed point's also needs its own switch, which sits
+    /// under it (a player who turned the gathering areas off sees no timed ones either).
     /// </summary>
-    public static bool TimedPoint(uint rarePopTable,ushort ephemeralStart,ushort ephemeralEnd)=>rarePopTable!=0 || ephemeralStart!=65535 && ephemeralEnd!=65535;
+    public static bool AreaShown(bool timed,bool gatheringAreas,bool timedAreas)=>gatheringAreas && (!timed || timedAreas);
 
     /// <summary>The colour of a gathering point's area: its own for a timed point.</summary>
     public static Vector4 AreaColour(bool timed,Vector4 normal,Vector4 timedColour)=>timed ? timedColour:normal;

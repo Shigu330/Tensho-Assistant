@@ -184,12 +184,15 @@ internal sealed class MapLiveReader : IDisposable
                 if(point.GatheringPointBase.RowId!=0 && point.GatheringPointBase.IsValid)
                 {
                     gatheringLevels[point.RowId]=point.GatheringPointBase.Value.GatheringLevel;
+                    // X-714 (0.1713): timed by the gathering catalogue's own rule (GatheringSchedule.FromTransient).
                     var timed=transient.GetRowOrDefault(point.RowId) is { } timing
-                        && GatheringNodeIcons.TimedPoint(timing.GatheringRarePopTimeTable.RowId,timing.EphemeralStartTime,timing.EphemeralEndTime);
+                        && TenshoAssistant.Gathering.GatheringSchedule.FromTransient(point.Type,timing.GatheringRarePopTimeTable.RowId,timing.EphemeralStartTime,timing.EphemeralEndTime,
+                            timing.GatheringRarePopTimeTable.ValueNullable is { } rare ? RareSlots(rare):null).Timed;
                     if(GatheringNodeIcons.For(point.GatheringPointBase.Value.GatheringType.RowId,timed) is var icon and not 0)gatheringIcons[point.RowId]=icon;
                 }
         }
         catch(Exception error){log.Warning(error,"Gathering point levels unavailable.");}
+        static (ushort,ushort)[] RareSlots(GatheringRarePopTimeTable rare)=>[.. Enumerable.Range(0,rare.StartTime.Count).Select(index=>(rare.StartTime[index],rare.Duration[index]))];
         try
         {
             foreach(var mark in data.GetExcelSheet<NotoriousMonster>())

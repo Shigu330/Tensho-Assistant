@@ -1,4 +1,5 @@
 using System.Numerics;
+using TenshoAssistant.Gathering;
 using TenshoAssistant.Maps;
 
 // X-516 (0.1711, the user's request of 16/11): on Tensho's map, a present gathering point has one of four icons (botanist, miner, timed
@@ -22,9 +23,10 @@ internal static class GatheringNodes1711Tests
         }),
         ("Gathering nodes 1711: a point is timed by its transient row; a timed area has its own colour", () =>
         {
-            Check(GatheringNodeIcons.TimedPoint(12, 65535, 65535), "a rare pop table");
-            Check(GatheringNodeIcons.TimedPoint(0, 400, 800) && GatheringNodeIcons.TimedPoint(0, 0, 0), "an ephemeral window");
-            Check(!GatheringNodeIcons.TimedPoint(0, 65535, 65535) && !GatheringNodeIcons.TimedPoint(0, 65535, 400), "none: not timed");
+            // X-714 (0.1713): read by the catalogue's own rule (GatheringSchedule.FromTransient); a window 0-0 is no restriction.
+            Check(GatheringSchedule.FromTransient(2, 12, 65535, 65535, [(400, 200)]).Timed, "a rare pop table");
+            Check(GatheringSchedule.FromTransient(4, 0, 400, 800, null).Timed && !GatheringSchedule.FromTransient(4, 0, 0, 0, null).Timed, "an ephemeral window; 0-0: none");
+            Check(!GatheringSchedule.FromTransient(1, 0, 65535, 65535, null).Timed && !GatheringSchedule.FromTransient(1, 0, 65535, 400, null).Timed, "none: not timed");
             var normal = new Vector4(0.55f, 0.90f, 0.55f, 0.20f); var timed = new Vector4(0.95f, 0.40f, 0.75f, 0.28f);
             Check(GatheringNodeIcons.AreaColour(true, normal, timed) == timed && GatheringNodeIcons.AreaColour(false, normal, timed) == normal, "the colour by timing");
             var settings = Read("Configuration.cs");

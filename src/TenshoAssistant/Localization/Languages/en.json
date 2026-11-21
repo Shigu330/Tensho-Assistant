@@ -3966,7 +3966,7 @@
     "AreaLevesHelp": "Areas of a leve you have started: shown or not, and their colour. The game only gives them once the leve is started.\nDefault: shown.",
     "AreaFatesHelp": "FATE areas: shown or not, and their colour.\nDefault: shown.",
     "AreaGatheringHelp": "Gathering point areas: shown or not, and their colour.\nDefault: shown.",
-    "AreaGatheringTimedHelp": "Areas of the timed gathering points: shown or not, and their colour, apart from the normal points'.\nDefault: shown, pink.",
+    "AreaGatheringTimedHelp": "Areas of the timed gathering points: shown or not (only while the gathering areas are), and their colour, apart from the normal points'.\nDefault: shown, pink.",
     "IconTeleport": "Teleport here",
     "IconOpenMap": "Open this map",
     "IconGeneralMenu": "General map menu…",

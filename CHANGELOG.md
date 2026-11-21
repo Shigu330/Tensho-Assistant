@@ -12,6 +12,14 @@ Each version was built and tested by `scripts/Verify.ps1`; in-game validation is
 This file keeps the last release and the versions after it; older ones are in [docs/changelog/](docs/changelog/)
 (moved by `tools/changelog.py archive`, one file per hundred versions).
 
+## 0.1713.0
+- Plan global, X-714 : Carte de Tensho, récolte : constats mineurs de la relecture du bloc 0.1709 à 0.1712 (X-714). M1 : un point de récolte présent est « à horaire » (icône à étincelles et horloge) selon la règle même du catalogue de récolte, une seule fonction pour les deux (GatheringSchedule.FromTransient) : une fenêtre éphémère de début égal à la fin n'est plus lue « à horaire », une seule borne à 65535 non plus ; la sonde PROBE_GATHERTYPE, relancée, ne trouve aucun de ces cas dans les feuilles du client (les deux règles donnaient les mêmes points ; preuve 0.1711 complétée). M2 : la case « Zones de récolte à horaire » est rangée sous « Zones de récolte » et grisée quand celle-ci est décochée ; un joueur qui avait coupé les zones de récolte ne voit plus apparaître les zones roses après la mise à jour.
+- Pour les joueurs : carte : les zones de récolte à horaire suivent la case « Zones de récolte » (décochée, plus de zone rose non plus).
+- Tests : ReviewMinors1713Tests. Verify.ps1 (agent) : 3633/3633, 0 avertissement, 0 erreur ; DLL 0.1713.0.0. Non validé en jeu.
+### English
+- Tensho's map, gathering: minor findings of the review of block 0.1709 to 0.1712 (X-714). M1: a present gathering point is « timed » (sparkles icon and clock) by the gathering catalogue's own rule, one function for both (GatheringSchedule.FromTransient): an ephemeral window whose start equals its end is no longer read as timed, nor a single bound at 65535; the PROBE_GATHERTYPE probe, run again, finds none of these cases in the client's sheets (both rules gave the same points; evidence 0.1711 completed). M2: the « Timed gathering areas » box sits under « Gathering areas » and is greyed while it is off; a player who had turned the gathering areas off no longer sees the pink areas appear after the update.
+- For players: Map: the timed gathering areas now follow the « Gathering areas » box (turned off, no pink area either).
+
 ## 0.1712.0
 - Plan global, X-713 : Compagnie libre › aéronefs : une chaîne de déblocage coupée par un maillon inconnu (secteur absent de la table) ou une boucle est dite inconnue au lieu d'être montrée entière, dans l'info-bulle du tableau des secteurs d'aéronef et dans le but « Débloquer un secteur » des aéronefs (X-713, constat du relais 158, même forme que X-711 M3 pour les sous-marins). AirshipSectors.Whole (pur) : la chaîne remonte au secteur de départ (celui qui se débloque lui-même dans la table) ; toutes les chaînes de la table embarquée le font.
 - Tests : AirshipChain1712Tests. Verify.ps1 (agent) : 3630/3630, 0 avertissement, 0 erreur ; DLL 0.1712.0.0. Rien à essayer en jeu.

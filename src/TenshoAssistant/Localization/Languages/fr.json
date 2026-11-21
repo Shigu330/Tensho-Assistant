@@ -3966,7 +3966,7 @@
     "AreaLevesHelp": "Zones d'un mandat lancé : affichées ou non, et leur couleur. Le jeu ne les donne qu'une fois le mandat lancé.\nPar défaut : affichées.",
     "AreaFatesHelp": "Zones des ALÉA : affichées ou non, et leur couleur.\nPar défaut : affichées.",
     "AreaGatheringHelp": "Zones des points de récolte : affichées ou non, et leur couleur.\nPar défaut : affichées.",
-    "AreaGatheringTimedHelp": "Zones des points de récolte à horaire : affichées ou non, et leur couleur, à part de celle des points normaux.\nPar défaut : affichées, en rose.",
+    "AreaGatheringTimedHelp": "Zones des points de récolte à horaire : affichées ou non (seulement quand les zones de récolte le sont), et leur couleur, à part de celle des points normaux.\nPar défaut : affichées, en rose.",
     "IconTeleport": "Se téléporter ici",
     "IconOpenMap": "Ouvrir cette carte",
     "IconGeneralMenu": "Menu général de la carte…",

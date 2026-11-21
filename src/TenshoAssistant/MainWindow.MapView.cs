@@ -933,8 +933,12 @@ internal sealed partial class MainWindow
         changed|=AreaSetting("MapView.AreaEvents",settings.ShowEventAreas,value=>settings.ShowEventAreas=value,settings.EventAreaColor,value=>settings.EventAreaColor=value,MapDefaults.ShowEventAreas,MapDefaults.EventAreaColor);
         changed|=AreaSetting("MapView.AreaFates",settings.ShowFateAreas,value=>settings.ShowFateAreas=value,settings.FateAreaColor,value=>settings.FateAreaColor=value,MapDefaults.ShowFateAreas,MapDefaults.FateAreaColor);
         changed|=AreaSetting("MapView.AreaGathering",settings.ShowGatheringAreas,value=>settings.ShowGatheringAreas=value,settings.GatheringAreaColor,value=>settings.GatheringAreaColor=value,MapDefaults.ShowGatheringAreas,MapDefaults.GatheringAreaColor);
-        // X-516 (0.1711): the timed gathering points' areas, their own switch and colour.
-        changed|=AreaSetting("MapView.AreaGatheringTimed",settings.ShowTimedGatheringAreas,value=>settings.ShowTimedGatheringAreas=value,settings.TimedGatheringAreaColor,value=>settings.TimedGatheringAreaColor=value,MapDefaults.ShowTimedGatheringAreas,MapDefaults.TimedGatheringAreaColor);
+        // X-516 (0.1711): the timed gathering points' areas, their own switch and colour; X-714 (0.1713): under « Gathering areas », greyed
+        // while it is off (as the gatherers under « Gathering points », X-80).
+        ImGui.Indent();
+        using(ImRaii.Disabled(!settings.ShowGatheringAreas))
+            changed|=AreaSetting("MapView.AreaGatheringTimed",settings.ShowTimedGatheringAreas,value=>settings.ShowTimedGatheringAreas=value,settings.TimedGatheringAreaColor,value=>settings.TimedGatheringAreaColor=value,MapDefaults.ShowTimedGatheringAreas,MapDefaults.TimedGatheringAreaColor);
+        ImGui.Unindent();
         FinishMapSettings(changed);
     }
 
@@ -1424,10 +1428,10 @@ internal sealed partial class MainWindow
                 }
                 DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(marker.Position,map)*mapZoom,marker.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,quest ? settings.QuestAreaColor:marker.IsLeve ? settings.LeveAreaColor:settings.EventAreaColor);
             }
-            // X-516 (0.1711): a timed point's area has its own switch and colour.
-            if(settings.ShowGatheringAreas || settings.ShowTimedGatheringAreas)
+            // X-516 (0.1711): a timed point's area has its own colour; X-714 (0.1713): its switch sits under « Gathering areas ».
+            if(settings.ShowGatheringAreas)
                 foreach(var point in gathering)
-                    if(point.Position is { Radius:>0 } area && (point.Timed ? settings.ShowTimedGatheringAreas:settings.ShowGatheringAreas))
+                    if(point.Position is { Radius:>0 } area && GatheringNodeIcons.AreaShown(point.Timed,settings.ShowGatheringAreas,settings.ShowTimedGatheringAreas))
                         DrawArea(draw,origin+mapPan+MapProjection.PixelFromWorld(new Vector3(area.X,0,area.Z),map)*mapZoom,area.Radius*Math.Max(1,map.SizeFactor)/100f*mapZoom,
                             GatheringNodeIcons.AreaColour(point.Timed,settings.GatheringAreaColor,settings.TimedGatheringAreaColor));
             // N-07 (0.667): the Island Sanctuary's resources; world coordinates, to compare with the game's map.
@@ -1480,7 +1484,7 @@ internal sealed partial class MainWindow
             // 0.328 (map audit #7): hovering inside an area lists its icon only while that kind of area is drawn.
             foreach(var point in gathering)
                 if(point.Position is { } spot && point.Icon!=0)Add(point.Icon,1,MapProjection.PixelFromWorld(new Vector3(spot.X,0,spot.Z),map),GatheringLabelOf(point),point:point,
-                    worldRadius:(point.Timed ? settings.ShowTimedGatheringAreas:settings.ShowGatheringAreas) ? spot.Radius:0);
+                    worldRadius:GatheringNodeIcons.AreaShown(point.Timed,settings.ShowGatheringAreas,settings.ShowTimedGatheringAreas) ? spot.Radius:0);
             // NPC vendors (0.139): the game's shop map icon (MapSymbol 60412, docs/evidence/0.139.0-symbols-probe.log), in the
             // same list, sizes and priorities as the game icons; click = flag.
             foreach(var vendor in vendorLayout.Lonely)Add(vendor.Icon,1,vendor.Pixel,vendor.Label,flag:vendor.Flag);
