@@ -67,6 +67,7 @@ internal sealed partial class MainWindow
         BoolSetting("Settings.HelpBanners","SettingTips.HelpBanners",()=>configuration.HelpBanners,value=>configuration.HelpBanners=value,c=>c.HelpBanners);
         // 0.327 (queue step e): opening page, shared row (tooltip and « ↺ »); turning it on remembers the current page at once.
         BoolSetting("Settings.OpenOnLastPage","SettingTips.OpenOnLastPage",()=>configuration.OpenOnLastPage,value=>{configuration.OpenOnLastPage=value;rememberedPage=null;RememberPage();},c=>c.OpenOnLastPage);
+        DrawCloseOnGameWindowSetting();
     }
     private void DrawLanguageSetting()
     {
@@ -130,6 +131,8 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);
         }
         finally{ImGui.EndDisabled();ImGui.Unindent();}
+        // X-725 (0.1731): the market prices on hover (Universalis), beside the item uses on hover.
+        DrawMarketHoverSettings();
         // 0.705 (user request): NPC vendors in item tooltips, set as the list panels are. X-76 step 3 (0.952): out of the « item uses » block,
         // Tensho's own item tooltips (How to get, collection) use it whether that panel is on or not.
         BoolSetting("Settings.HoverVendors","Settings.HoverVendorsTip",()=>configuration.HoverVendors,value=>configuration.HoverVendors=value,c=>c.HoverVendors);
@@ -158,6 +161,7 @@ internal sealed partial class MainWindow
         // X-76 H5 (0.915): shared combo row; an unknown saved value is shown as the data centre (MarketScopeShown).
         ComboSetting("Settings.MarketScope","Settings.MarketScopeTip",()=>MarketScopeShown,value=>configuration.MarketBoardScope=value,
             Enum.GetValues<TenshoAssistant.Market.MarketScope>().Select(scope=>(scope,localization.Get("Settings.MarketScope"+scope))).ToArray(),DefaultConfiguration.MarketBoardScope,200);
+        DrawUndercutSetting();
     }
 
     // X-100 (0.999, DEC-048): the panels beside the game's windows (X-449: then each tool's aids, in their own categories).
@@ -165,6 +169,7 @@ internal sealed partial class MainWindow
     {
         BoolSetting("DutyFinder.Setting","Advanced.DutyFinderTip",()=>configuration.ShowDutyFinderLoot,value=>configuration.ShowDutyFinderLoot=value,c=>c.ShowDutyFinderLoot);
         BoolSetting("CharacterStats.Setting","Advanced.CharacterPanelTip",()=>configuration.ShowCharacterPanel,value=>configuration.ShowCharacterPanel=value,c=>c.ShowCharacterPanel);
+        DrawRetainerSalesSetting();
         BoolSetting("Advanced.HidePanelsBehindGame","Advanced.HidePanelsBehindGameTip",()=>configuration.HidePanelsBehindGame,value=>configuration.HidePanelsBehindGame=value,c=>c.HidePanelsBehindGame);
         BoolSetting("Advanced.HideBarsBehindGame","Advanced.HideBarsBehindGameTip",()=>configuration.HideBarsBehindGame,value=>configuration.HideBarsBehindGame=value,c=>c.HideBarsBehindGame);
     }

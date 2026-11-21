@@ -51,6 +51,9 @@ public static class ReferencePlan
         ("Advanced","Advanced","Restore",1280),("Debug","Debug","DebugTools",1280),("ChatTabs","Panels","ChatTabs",1280),("ChatTabs-narrow","Panels","ChatTabs",760),
         // X-518 M5 (review of 0.1494): the chat history's settings (« No limit » boxes, greyed with their reason outside the game).
         ("ChatHistory","Panels","ChatHistory",1280),
+        // X-724 and X-725 (0.1731): the categories whose settings moved, each pictured for the user.
+        ("Header","General","Header",1280),("ItemTooltips","General","ItemTooltips",1280),("ItemsMarket","General","ItemsMarket",1280),
+        ("ServerBar","Tracking","ServerBar",1280),("Sources","Data","Sources",1280),
     ];
     public const string SettingsPrefix="settings:";
     /// <summary>The tab of the Settings page drawn only in developer mode.</summary>

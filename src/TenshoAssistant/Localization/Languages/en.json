@@ -1377,7 +1377,7 @@
     "TeamcraftTip": "Time between the cast and the bite, per fish and spot, from Teamcraft's public reports (gubal API, MIT licence). One request per fishing spot, cached.\nDefault: on.",
     "GatherBuddy": "GatherBuddy (fishing)",
     "GatherBuddyTip": "GatherBuddy fishing data files (Ottermandias, Apache-2.0 licence): baits, mooches, bite and hookset, windows, weather, lures and predators. Downloaded once, cached.\nDefault: on.",
-    "MarketMoved": "Market prices on hover: Settings › Data and sources › Community sources.",
+    "MarketMoved": "Market prices on hover: Settings › General › Item hover and right-click.",
     "Help": "Settings to go further: restore all defaults, developer mode, desktop application and reporting help. Hover each setting for its explanation.",
     "HeaderClock": "PC time in the header",
     "HeaderClockTip": "Shows the computer time next to the version, at the top of the window. It is the only place it appears.\nDefault: on.",
@@ -1505,7 +1505,7 @@
     "SourceOffTip": "Source turned off (Settings › Data and sources › Community sources): no request is sent; a copy already kept is still shown where this page has one.",
     "HoverRefresh": "Ctrl+Alt refreshes the hovered price",
     "HoverRefreshTip": "While hovering an item, Ctrl+Alt asks Universalis for its price again, even if recent (one request per press, at least 5 seconds apart).\nDefault: on.",
-    "Undercut": "Copy the lowest offer minus 1",
+    "Undercut": "Market board: copy the lowest offer minus 1",
     "UndercutTip": "When you open an item's offers on the market board, Tensho copies the lowest offer minus 1 gil (your retainers left out) to the clipboard and says so in the chat. You paste and confirm in the game yourself: nothing is listed for you. Replaces the clipboard content.\nDefault: off."
   },
   "Contributor": {
@@ -2717,11 +2717,11 @@
   },
   "SettingsCategories": {
     "OtherTooltips": "Other tooltips",
-    "WindowOpening": "Window opening",
+    "WindowOpening": "Window opening and closing",
     "Header": "Header and home",
     "Appearance": "Language and theme",
     "Fonts": "Fonts",
-    "ItemTooltips": "Item tooltips",
+    "ItemTooltips": "Item hover and right-click",
     "ItemsMarket": "Items and market",
     "GamePanels": "Beside the game's windows",
     "Crafting": "Crafting helper",

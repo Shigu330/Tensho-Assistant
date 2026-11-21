@@ -77,10 +77,48 @@ internal sealed partial class MainWindow
         BoolSetting("Advanced.HeaderClock","Advanced.HeaderClockTip",()=>configuration.ShowHeaderClock,value=>configuration.ShowHeaderClock=value,c=>c.ShowHeaderClock);
         BoolSetting("Advanced.HeaderEt","Advanced.HeaderEtTip",()=>configuration.ShowHeaderEorzeaTime,value=>configuration.ShowHeaderEorzeaTime=value,c=>c.ShowHeaderEorzeaTime);
         BoolSetting("Advanced.HomeTools","Advanced.HomeToolsTip",()=>configuration.HomeShowTools,value=>configuration.HomeShowTools=value,c=>c.HomeShowTools);
-        // 0.426 (user request): close Tensho when it opens a game window.
+    }
+
+    // X-725 (0.1731): rows that moved to the category of their subject (each called by it; kept here, where their wiring is read).
+    // 0.426 (user request): close Tensho when it opens a game window; X-725: General › Window opening and closing.
+    private void DrawCloseOnGameWindowSetting()
+    {
         BoolSetting("Advanced.CloseOnGameWindow","Advanced.CloseOnGameWindowTip",()=>configuration.CloseOnGameWindow,value=>configuration.CloseOnGameWindow=value,c=>c.CloseOnGameWindow);
-        // 0.415 (g, R-13): pinned tracking window.
+    }
+
+    // 0.415 (g, R-13): pinned tracking window (the items of the active alarms); X-725: Tracking › Alarms and alerts.
+    private void DrawTrackerWindowSetting()
+    {
         BoolSetting("Tracker.Setting","Tracker.SettingTip",()=>configuration.TrackerWindow,value=>configuration.TrackerWindow=value,c=>c.TrackerWindow);
+    }
+
+    // 0.324: prices on hover, greyed while Universalis is off; X-725: General › Item hover and right-click, beside the item uses on hover.
+    private void DrawMarketHoverSettings()
+    {
+        if(!configuration.CommunityUniversalis)ImGui.BeginDisabled();
+        try
+        {
+            BoolSetting("Settings.MarketHover","Advanced.MarketTip",()=>configuration.MarketPricesOnHover,value=>{configuration.MarketPricesOnHover=value;if(!value)market.CancelBackground();},c=>c.MarketPricesOnHover);
+            // 0.343 (I-01): refresh key for the hovered price. X-76 step 3 (0.952): under « prices on hover », greyed while it is off (the
+            // hover reader drops the refresh with the prices, ItemHoverCoordinator).
+            ImGui.Indent();
+            ImGui.BeginDisabled(!configuration.MarketPricesOnHover);
+            try{BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);}
+            finally{ImGui.EndDisabled();ImGui.Unindent();}
+        }
+        finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();}
+    }
+
+    // 0.346 (g, I-07): the market board's lowest offer minus 1 (not tied to Universalis: the offers the game shows); X-725: General › Items and market.
+    private void DrawUndercutSetting()
+    {
+        BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
+    }
+
+    // X-725: the panel beside the game's retainer sale list, with the other panels beside the game's windows.
+    private void DrawRetainerSalesSetting()
+    {
+        BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
     }
 
     /// <summary>X-119 step 2 (0.1081): the local link's state and why it failed, set by Plugin.cs (null in the desktop application).</summary>
@@ -228,22 +266,13 @@ internal sealed partial class MainWindow
         if(!configuration.CommunityUniversalis)ImGui.BeginDisabled();
         try
         {
-            BoolSetting("Settings.MarketHover","Advanced.MarketTip",()=>configuration.MarketPricesOnHover,value=>{configuration.MarketPricesOnHover=value;if(!value)market.CancelBackground();},c=>c.MarketPricesOnHover);
-            // 0.343 (I-01): refresh key for the hovered price. X-76 step 3 (0.952): under « prices on hover », greyed while it is off (the
-            // hover reader drops the refresh with the prices, ItemHoverCoordinator).
-            ImGui.Indent();
-            ImGui.BeginDisabled(!configuration.MarketPricesOnHover);
-            try{BoolSetting("Advanced.HoverRefresh","Advanced.HoverRefreshTip",()=>configuration.HoverPriceRefresh,value=>configuration.HoverPriceRefresh=value,c=>c.HoverPriceRefresh);}
-            finally{ImGui.EndDisabled();ImGui.Unindent();}
+            // X-725 (0.1731): prices on hover live with the item hover settings now; said here, where they were.
+            ImGui.TextDisabled(localization.Get("Advanced.MarketMoved"));
             // X-122, D-101: the other uses of Universalis, each with its switch.
             BoolSetting("Advanced.UseUniversalisRetainerCompare","Advanced.UseUniversalisRetainerCompareTip",()=>configuration.SourceUses.UniversalisRetainerCompare,value=>configuration.SourceUses.UniversalisRetainerCompare=value,c=>c.SourceUses.UniversalisRetainerCompare);
             BoolSetting("Advanced.UseUniversalisToolPrices","Advanced.UseUniversalisToolPricesTip",()=>configuration.SourceUses.UniversalisToolPrices,value=>configuration.SourceUses.UniversalisToolPrices=value,c=>c.SourceUses.UniversalisToolPrices);
         }
         finally{if(!configuration.CommunityUniversalis)ImGui.EndDisabled();ImGui.Unindent();}
-        // 0.346 (g, I-07): not tied to Universalis: it uses the offers the game shows when you open them.
-        BoolSetting("Advanced.Undercut","Advanced.UndercutTip",()=>configuration.UndercutClipboard,value=>configuration.UndercutClipboard=value,c=>c.UndercutClipboard);
-        BoolSetting("Advanced.RetainerSales","Advanced.RetainerSalesTip",()=>configuration.RetainerSalesPanel,value=>configuration.RetainerSalesPanel=value,c=>c.RetainerSalesPanel);
-
     }
 
     // X-100 (0.999, DEC-048): the game command delay and « remove all alarms », now in « Tracking and notifications ».

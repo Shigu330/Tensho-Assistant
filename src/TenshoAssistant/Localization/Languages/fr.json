@@ -1377,7 +1377,7 @@
     "TeamcraftTip": "Temps entre le lancer et la touche, par poisson et lieu, d'après les relevés publics de Teamcraft (API gubal, licence MIT). Une requête par lieu de pêche, gardée en cache.\nPar défaut : activé.",
     "GatherBuddy": "GatherBuddy (pêche)",
     "GatherBuddyTip": "Fichiers de données de pêche de GatherBuddy (Ottermandias, licence Apache-2.0) : appâts, pêche au vif, touche et ferrage, créneaux, météo, leurres et prédateurs. Téléchargés une fois, gardés en cache.\nPar défaut : activé.",
-    "MarketMoved": "Prix du marché au survol : Paramètres › Données et sources › Sources communautaires.",
+    "MarketMoved": "Prix du marché au survol : Paramètres › Général › Survol et clic droit des objets.",
     "Help": "Réglages pour aller plus loin : tout remettre par défaut, mode développeur, application de bureau et aide au signalement. Survolez chaque réglage pour son explication.",
     "HeaderClock": "Heure du PC dans l'en-tête",
     "HeaderClockTip": "Affiche l'heure de l'ordinateur à côté de la version, en haut de la fenêtre. C'est le seul endroit où elle apparaît.\nPar défaut : activé.",
@@ -1505,7 +1505,7 @@
     "SourceOffTip": "Source désactivée (Paramètres › Données et sources › Sources communautaires) : aucune requête n'est envoyée ; une copie déjà gardée reste affichée quand la page en a une.",
     "HoverRefresh": "Ctrl+Alt actualise le prix survolé",
     "HoverRefreshTip": "Pendant le survol d'un objet, Ctrl+Alt redemande son prix à Universalis, même s'il est récent (une demande par appui, 5 secondes au moins entre deux).\nPar défaut : activé.",
-    "Undercut": "Copier l'offre la plus basse moins 1",
+    "Undercut": "Tableau des ventes : copier l'offre la plus basse moins 1",
     "UndercutTip": "Quand vous ouvrez les offres d'un objet au tableau des ventes, Tensho copie dans le presse-papiers l'offre la plus basse moins 1 gil (vos servants exclus) et le dit dans le chat. Vous collez et confirmez vous-même dans le jeu : rien n'est mis en vente pour vous. Remplace le contenu du presse-papiers.\nPar défaut : désactivé."
   },
   "Contributor": {
@@ -2717,11 +2717,11 @@
   },
   "SettingsCategories": {
     "OtherTooltips": "Autres infobulles",
-    "WindowOpening": "Ouverture de la fenêtre",
+    "WindowOpening": "Ouverture et fermeture de la fenêtre",
     "Header": "En-tête et accueil",
     "Appearance": "Langue et thème",
     "Fonts": "Polices",
-    "ItemTooltips": "Infobulles des objets",
+    "ItemTooltips": "Survol et clic droit des objets",
     "ItemsMarket": "Objets et marché",
     "GamePanels": "À côté des fenêtres du jeu",
     "Crafting": "Aide à l'artisanat",
