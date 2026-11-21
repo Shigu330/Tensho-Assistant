@@ -82,6 +82,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/ChatLinkHover.cs" Link="Maps/ChatLinkHover.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/HuntTrain.cs" Link="Maps/HuntTrain.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/PlaceDirectory.cs" Link="Maps/PlaceDirectory.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/PlaceTips.cs" Link="Maps/PlaceTips.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
     <Compile Include="../../src/TenshoAssistant/Character/StatFormulas.cs" Link="Character/StatFormulas.cs" />

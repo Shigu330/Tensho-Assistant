@@ -2066,7 +2066,8 @@ internal sealed partial class MainWindow
             // X-637 (bench X-631, review of 0.1441, M4): the place and its tooltip written only under the mouse or on a click, not at each frame.
             string Place()=>$"{(link.Place.Length>0 ? link.Place:map.Zone)}  ({Maps.MapProjection.CoordinateText(coordinate)})";
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-            TipText(()=>localization.Format("ChatWindow.MapLinkTip",Place()));
+            // X-684 (0.1672): the one place tooltip, the click's effect under it.
+            if(ImGui.IsItemHovered())DrawPlaceTooltip(map,coordinate,link.Place.Length>0 ? link.Place:null,localization.Format("ChatWindow.MapLinkTip","").Trim());
             if(ChatLinkClicked(id))OpenMapPointFromPage(map,link.X,link.Y);
             if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,Place());ImGui.OpenPopup("###TenshoChatWindowPlace");}
             return;

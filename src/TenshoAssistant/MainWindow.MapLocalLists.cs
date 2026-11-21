@@ -327,7 +327,8 @@ internal sealed partial class MainWindow
                         ImGui.CloseCurrentPopup();
                     }
                     if(known)PlaceMenu("FavoritePlace",here ? map:target!,new(point.X,point.Y),name);
-                    if(point.Note is { } note && ImGui.IsItemHovered())WrappedTooltip(note);
+                    // X-684 (0.1672): the one place tooltip, the note under it.
+                    if(ImGui.IsItemHovered()){if(known)DrawPlaceTooltip(here ? map:target!,new Vector2(point.X,point.Y),name,point.Note);else if(point.Note is { } note)WrappedTooltip(note);}
                 }
                 finally{ImGui.PopID();}
             }
