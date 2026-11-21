@@ -2479,6 +2479,18 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1681) Prise en main : relancer le guide (Aide, « Relancer le guide ») et vérifier : aucun : aucune page ni réglage nouveau ; le guide et l'aide gardent leurs pages, seule leur place dans la barre change
 
+- [ ] (0.1683) Barre de côté : l'entrée « Alerte (n) » et la catégorie « CALENDRIER » remplacent « Alarmes » et « SUIVI » ; si la catégorie était repliée avant la mise à jour, elle l'est encore ; la page s'ouvre sur le titre « Alerte »
+
+- [ ] (0.1683) Recherche rapide : taper « alerte » propose la page Alerte et l'ouvre ; en anglais, « alarm » fait de même
+
+- [ ] (0.1685) Pêche normale : lancer, attendre la touche : le chrono s'arrête à la touche (« Touche à N s » avec « ! », « !! » ou « !!! ») et reste figé pendant le ferrage, que le poisson soit pris ou non ; au lancer suivant il repart de zéro ; le poisson pris a sa case « Temps de touche » marquée « » »
+
+- [ ] (0.1685) Pêche en mer : même essai ; le bouton « Remettre à zéro » après la touche relance le chrono
+
+- [ ] (0.1685) Sous Amorçage : utiliser Amorçage puis lancer : « Amorçage » s'affiche à côté du chrono, les temps de touche sont divisés par deux (par exemple 2–4,5 s au lieu de 4–8 s), l'info-bulle d'une case le dit, et le temps figé tombe dans la fenêtre du poisson pris
+
+- [ ] (0.1686) Liste de vente d'un servant (bouton de la fenêtre de vente) : après avoir ouvert le tableau du marché une fois cette semaine, choisir dans la liste un autre servant que celui ouvert : le pied de liste dit « le taux de sa ville » avec le taux de cette ville, plus 5 % d'office
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
