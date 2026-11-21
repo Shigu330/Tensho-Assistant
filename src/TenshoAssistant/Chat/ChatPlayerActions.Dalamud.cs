@@ -224,9 +224,9 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
     private bool statusFailed;
     /// <summary>X-733 (0.1734): reads into <paramref name="param"/> the Param of <paramref name="status"/> on the player named (name and home
     /// world), or on you (<paramref name="name"/> null): now, or in the next frames (on the game's thread).</summary>
-    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0);
+    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64);
 
-    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine)
+    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine,long lineAt)
     {
         if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;
         try
@@ -237,9 +237,10 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
             foreach(var held in character.StatusList)
                 if(held.StatusId==status && held.Param!=0){seen=held.Param;break;}
             if(frame==0)atLine=seen;
-            var read=ChatStatusWatch.Next(atLine,seen,frame);
-            if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);return;}
-            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine),delayTicks:1);
+            var elapsed=Environment.TickCount64-lineAt;
+            var read=ChatStatusWatch.Next(atLine,seen,frame,elapsed);
+            if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);if(read.Value!=0 && read.Value!=atLine)StatusLate(frame,elapsed);return;}
+            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt),delayTicks:1);
         }
         catch(Exception error)
         {
@@ -251,6 +252,16 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
     private void StatusSaid(string how)
     {
         if(statusSaid.Add(how))log.Information("Chat window, a meal's or a medicine's status read for its line's tooltip: {0}.",how);
+    }
+
+    // X-760 (0.1744, review of 0.1742, M2): the longest delay seen between a line and its status put on, said in the log each time it grows:
+    // what the watch must cover (ChatStatusWatch.WatchMs), measured in game.
+    private long statusLateMs=-1;
+    private void StatusLate(int frame,long elapsed)
+    {
+        if(elapsed<=statusLateMs)return;
+        statusLateMs=elapsed;
+        log.Information("Chat window, a meal's or a medicine's status put on {0} frame(s) ({1} ms) after its line: the longest seen since the plugin loaded (the watch lasts {2} ms at least).",frame,elapsed,ChatStatusWatch.WatchMs);
     }
 
     // X-733 (0.1734): the lines of a meal's or a medicine's tooltip, made once per status and Param (ItemFood and BaseParam sheets, Addon 1016

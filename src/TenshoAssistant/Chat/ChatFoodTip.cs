@@ -14,11 +14,17 @@ public sealed class ChatStatusParam
 /// Param that differs from it is the line's (put on after the line); one that stays the same for the whole watch is the line's too (put on
 /// before the line, or the same meal eaten again); none: not found. Only the lines of a buff gained (LogFilter: « Effets bénéfiques reçus »,
 /// kind 46; 48 is « Fin des effets bénéfiques », a status lost: its Param is no longer there to read). Pure (tests).
+/// X-760 (0.1744, review of 0.1742, M2): the watch lasts <see cref="Frames"/> frames and <see cref="WatchMs"/> at least: 30 frames alone
+/// were half a second at 60 frames a second, a fifth at 144, and a meal put on later over an older one was taken for the older one. The
+/// delay the game takes is not measured yet: the reader writes the longest one seen in the log.
 /// </summary>
 public static class ChatStatusWatch
 {
-    /// <summary>The frames watched after the line (about half a second at 60 frames a second).</summary>
+    /// <summary>The frames watched after the line, at least (half a second at 60 frames a second).</summary>
     public const int Frames=30;
+
+    /// <summary>X-760 (0.1744): how long the watch lasts at least, whatever the frame rate.</summary>
+    public const int WatchMs=2000;
 
     /// <summary>The log kind of the lines « … gains the effect of … » for a buff (LogFilter rows 56, 63, 76, 83, 96, 103…: kind 46).</summary>
     public const int GainedKind=46;
@@ -29,11 +35,12 @@ public static class ChatStatusWatch
     /// <param name="atLine">The status's Param when its line arrived (0: not held then).</param>
     /// <param name="seen">Its Param now (0: not held).</param>
     /// <param name="frame">0 at the line, then 1, 2… for the next frames.</param>
+    /// <param name="elapsedMs">The milliseconds since the line (X-760).</param>
     /// <returns>Over: the watch ends, with the line's Param (0: not found) and what happened, for the log.</returns>
-    public static (bool Over,ushort Value,string How) Next(ushort atLine,ushort seen,int frame)
+    public static (bool Over,ushort Value,string How) Next(ushort atLine,ushort seen,int frame,long elapsedMs)
     {
         if(seen!=0 && seen!=atLine)return (true,seen,atLine==0 ? "put on after its line":"changed after its line (an older one held at the line)");
-        if(frame<Frames)return (false,0,"");
+        if(frame<Frames || elapsedMs<WatchMs)return (false,0,"");
         return seen!=0 ? (true,seen,"held from its line on, unchanged"):(true,(ushort)0,"not found");
     }
 }
