@@ -42,10 +42,12 @@ public static class AetherialWheels
     public const string KeyPrefix="wheel:";
 
     /// <summary>The slots read from the window's numbers (null for a number that is not one); null when anything is not as read on 21/11
-    /// (more slots than a stand has, an item that is no wheel of the sheet, a charge out of 0 to 100): nothing is read then (R08).</summary>
+    /// (no slot or more slots than a stand has, an item that is no wheel of the sheet, a charge out of 0 to 100): nothing is read then (R08).
+    /// X-726 (0.1721): a stand holds 1 to 6 slots (the game's own words, Item 8838 and 9462 to 9466): a window showing 0 is no reading, never
+    /// a stand with no wheel (that would drop the house's wheels, their alarms and their exact times).</summary>
     public static IReadOnlyList<AetherialWheelRead>? Parse(IReadOnlyList<int?> values,Func<uint,AetherialWheelRow?> wheel)
     {
-        if(values.Count==0 || values[0] is not { } count || count is <0 or >MaximumSlots)return null;
+        if(values.Count==0 || values[0] is not { } count || count is <1 or >MaximumSlots)return null;
         var slots=new List<AetherialWheelRead>(count);
         for(var slot=0;slot<count;slot++)
         {
@@ -56,6 +58,10 @@ public static class AetherialWheels
         }
         return slots;
     }
+
+    /// <summary>X-726 (0.1721): the window shows no slot yet (its number 0 at 0: most likely not set yet): nothing is read, and it is not
+    /// said as a game update.</summary>
+    public static bool NoSlotYet(IReadOnlyList<int?> values)=>values.Count>0 && values[0]==0;
 
     /// <summary>When a wheel of <paramref name="total"/> hours read at <paramref name="percent"/> is primed, at the earliest and the latest. The
     /// game shows 1 % just after a wheel is set (21/11): the percent shown is taken within one percent of the time gone by, either way.</summary>

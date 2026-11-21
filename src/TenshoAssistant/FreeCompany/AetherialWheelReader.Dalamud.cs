@@ -18,7 +18,7 @@ internal sealed unsafe class AetherialWheelReader : IDisposable
     private readonly Dictionary<uint,string> names=[];
     private (IReadOnlyList<AetherialWheelRead> Slots,DateTimeOffset At)? before;
     private long readAt=-100_000;
-    private bool failed,layoutSaid,houseSaid,disposed;
+    private bool failed,layoutSaid,houseSaid,noSlotSaid,disposed;
     private string lastSaid="";
 
     public AetherialWheelReader(IFramework framework,IGameGui gui,IDataManager data,IPluginLog log,Configuration configuration,Action save,Func<bool> developer)
@@ -46,6 +46,12 @@ internal sealed unsafe class AetherialWheelReader : IDisposable
                 values[index]=value.Type==AtkValueType.Int ? (int?)value.Int:value.Type==AtkValueType.UInt && value.UInt<=int.MaxValue ? (int?)(int)value.UInt:null;
             }
             rows??=Rows();
+            // X-726 (0.1721): no slot shown yet: nothing read, the saved wheels and their alarms stay (developer's log only).
+            if(AetherialWheels.NoSlotYet(values))
+            {
+                if(developer() && !noSlotSaid){noSlotSaid=true;log.Information("Aetherial wheels: the stand's window shows no slot yet: not read.");}
+                return;
+            }
             if(AetherialWheels.Parse(values,Row) is not { } read)
             {
                 if(!layoutSaid){layoutSaid=true;log.Warning("Aetherial wheels: the stand's window is not as read on 21/11 (maybe after a game update): the wheels are not read.");}
