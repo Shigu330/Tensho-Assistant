@@ -58,7 +58,13 @@ internal static class ChatPlayerMenu1688Tests
                 .Where(path => !path.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar, StringComparison.Ordinal) && !path.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar, StringComparison.Ordinal))
                 .Where(path => { var text = File.ReadAllText(path); return text.Contains("HandleLinkClick", StringComparison.Ordinal) || text.Contains("AtkExternalInterface", StringComparison.Ordinal); })
                 .Select(path => Path.GetRelativePath(root, path)).ToList();
-            Check(forged.Count == 0, "the game's chat event is the game's: " + string.Join(", ", forged));
+            // X-715 (0.1718, D-202 b: measure first): one file may name the chat panel's link handler, the developer-mode probe that hooks it
+            // and calls the game's own function with what it was given; it never calls the handler itself nor names the external handler.
+            var probe = Path.Combine("TenshoAssistant", "Chat", "ChatLinkWatch.Dalamud.cs");
+            Check(forged.All(path => path == probe), "the game's chat event is the game's: " + string.Join(", ", forged));
+            var watch = File.ReadAllText(Path.Combine(root, probe));
+            Check(!watch.Contains("AtkExternalInterface", StringComparison.Ordinal) && !watch.Contains("HandleLinkClick(", StringComparison.Ordinal)
+                && watch.Split(".Original(").Length == 2 && watch.Contains("hook!.Original(viewer,link);", StringComparison.Ordinal), "the probe only watches: the game's own call, with what it was given");
         }),
         ("Chat player menu 1688: the evidence says what was searched and why it cannot be done far away, in both halves", () =>
         {

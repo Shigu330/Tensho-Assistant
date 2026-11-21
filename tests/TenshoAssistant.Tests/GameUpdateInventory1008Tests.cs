@@ -21,8 +21,9 @@ internal static class GameUpdateInventory1008Tests
             Check(names.Count>80,"names found: "+names.Count);
             var missing=names.Where(name=>!doc.Contains("`"+name+"`")).ToArray();
             Check(missing.Length==0,"not in the inventory: "+string.Join(", ",missing));
-            // X-654 (0.1602): a third hook, RaptureLogModule.AddMsgSourceEntry (the chat's sender identifiers, copied only).
-            Check(Regex.Matches(code,@"HookFromAddress<").Count==3 && doc.Contains("Three hooks only"),"hooks");
+            // X-654 (0.1602): a third hook, RaptureLogModule.AddMsgSourceEntry (the chat's sender identifiers, copied only). X-715 (0.1718): a
+            // fourth, LogViewer.HandleLinkClick (developer mode only, a chat link's values copied).
+            Check(Regex.Matches(code,@"HookFromAddress<").Count==4 && doc.Contains("Four hooks only"),"hooks");
         }),
     ];
 }

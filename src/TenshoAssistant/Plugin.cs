@@ -853,6 +853,9 @@ public sealed partial class Plugin : IDalamudPlugin
             Chat.ChatPlayerActions? chatPlayers=null;
             registrations.Register(()=>mainWindow.ChatPlayers=chatPlayers=new Chat.ChatPlayerActions(interop,framework,client,objects,targets,partyList,data,log,chatSenders,gameConfig),
                 ()=>{mainWindow.ChatPlayers=null;chatPlayers?.Dispose();chatSenders.Clear();});
+            // X-715 (0.1718, D-202 b): developer mode, what the game's chat sends on a click on a player's name, read only.
+            Chat.ChatLinkWatch? chatLinkWatch=null;
+            registrations.Register(()=>chatLinkWatch=new Chat.ChatLinkWatch(interop,framework,contextMenus,log,()=>configuration.DeveloperMode),()=>chatLinkWatch?.Dispose());
             Alarms.AutoAlarmWatcher? autoAlarms=null;
             registrations.Register(()=>autoAlarms=new Alarms.AutoAlarmWatcher(framework,client,log,configuration,()=>SaveTimed("automatic alarms"),localization.Get),
                 ()=>autoAlarms?.Dispose());
