@@ -117,6 +117,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1661-beast-team-rank-glyph.md](0.1661-beast-team-rank-glyph.md) | `src/TenshoAssistant/Beastmaster/BeastTeams.cs`, `tests/TenshoAssistant.Tests/BeastTeamGlyph1661Tests.cs` | `CHANGELOG.md` |
 | [0.1662-chat-player-menu-game-entries.md](0.1662-chat-player-menu-game-entries.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatPlayerMenu1662Tests.cs` | `CHANGELOG.md` |
 | [0.1665-chat-reply-modes.md](0.1665-chat-reply-modes.md) | `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatReplyModes1665Tests.cs` | `CHANGELOG.md` |
+| [0.1666-chat-job-roles.md](0.1666-chat-job-roles.md) | `src/TenshoAssistant/Chat/ChatJobs.cs`, `tests/TenshoAssistant.Tests/ChatJobs1666Tests.cs` | `CHANGELOG.md` |
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
@@ -343,5 +344,5 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [x91-parsers-check.md](x91-parsers-check.md) | `src/TenshoAssistant/MainWindow.SRankConditions.cs`, `tests/TenshoAssistant.Tests/ParsersCheck971Tests.cs` | `docs/changelog/CHANGELOG-0.900-0.999.md`, `docs/project/GLOBAL-PLAN-DONE.md` |
 | [x93-load-test.md](x93-load-test.md) | `src/TenshoAssistant/Discoveries/DiscoveriesModel.cs`, `tests/TenshoAssistant.Tests/Evidence1069Tests.cs`, `tests/TenshoAssistant.Tests/LoadTest1036Tests.cs`, `tools/DiscoveryLoadProbe/Program.cs`, `tools/README.md`, `tools/discoveries-load.py` | `docs/changelog/CHANGELOG-0.1300-0.1399.md`, `docs/evidence/x172-sqlite-trial.md` |
 
-Counted · compté : 331 files · fichiers ; 286 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
+Counted · compté : 332 files · fichiers ; 287 cited by the code or the tests · citées par le code ou les tests ; 0 cited nowhere · citées nulle part.
 <!-- /docgen:evidence -->

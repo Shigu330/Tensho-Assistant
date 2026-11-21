@@ -5,7 +5,7 @@ namespace TenshoAssistant.Chat;
 
 /// <remarks>X-505 (0.1488): LinkMark, the game's arrow before a link (part of the link: a click on it opens it).</remarks>
 /// <remarks>X-447 B14 (0.1641): ItemIcon, an item link's icon before it (no text: a block as wide as the line is high, ChatFormat.Wrap).</remarks>
-public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark,ItemIcon }
+public enum ChatRole { Timestamp,Channel,Sender,Body,Link,LinkMark,ItemIcon,JobIcon }
 /// <param name="Link">X-403 phase 2 (0.1441): what the run's text links to (role Link); null otherwise.</param>
 /// <param name="Underlined">X-510 (review of 0.1490): with the game's look, a link that has no arrow of the game (a web address found by Tensho,
 /// a link named by Tensho, a link of Dalamud without arrow): drawn underlined in the accent colour, as every link before 0.1488, so that it is
@@ -63,7 +63,7 @@ public static class ChatFormat
     /// lists that name a link without text of its own (items, quests, maps) are loaded: a message received before them (at login) kept « [link] »
     /// for good; it is laid out again once they are.</summary>
     public static string LayoutKey(ChatSettings settings,string names="")
-        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}{settings.CaptureNames}{settings.ItemIcons}|{ChannelNamesKey(settings)}|{names}";
+        =>$"{settings.ShowTimestamps}{settings.Clock24}{settings.ShowSeconds}{settings.ShowChannel}{settings.BoundedFontScale}{settings.HourLeadingZero}{settings.GameLinks}{settings.WrapIndent}{settings.SenderBrackets}{settings.CaptureNames}{settings.ItemIcons}{settings.JobIcons}|{ChannelNamesKey(settings)}|{names}";
 
     /// <summary>X-447 B4 (0.1621): the channels' short names chosen, in the layout's key (a name changed lays the lines out again).</summary>
     public static string ChannelNamesKey(ChatSettings settings)
@@ -183,6 +183,20 @@ public static class ChatFormat
         return runs;
     }
 
+    /// <summary>X-690 (0.1666): the sender's job icon (<paramref name="icon"/>, 0: none) as a <see cref="ChatRole.JobIcon"/> run just before the
+    /// sender's name (capture mode too: the name is replaced, the icon stays, R25); the runs unchanged without a name or an icon. The copy
+    /// (Plain) never calls it.</summary>
+    public static IReadOnlyList<ChatRun> WithJobIcon(IReadOnlyList<ChatRun> runs,uint icon)
+    {
+        if(icon==0)return runs;
+        var at=-1;
+        for(var index=0;index<runs.Count;index++)if(runs[index].Role==ChatRole.Sender){at=index;break;}
+        if(at<0)return runs;
+        var with=runs.ToList();
+        with.Insert(at,new ChatRun("",ChatRole.JobIcon));
+        return with;
+    }
+
     /// <summary>X-403 phase 2 (0.1442): a message as one line of text, as the window writes it (time, channel, sender, text), for the clipboard.</summary>
     public static string Plain(ChatRecord record,ChatSettings settings,Func<ChatChannel,string> shortName,Func<ChatLink,string?>? linkName=null)
         =>string.Concat(Runs(record,settings,shortName,linkName).Select(run=>run.Text)).TrimEnd();
@@ -210,7 +224,7 @@ public static class ChatFormat
         }
         foreach(var run in runs)
         {
-            if(run.Role==ChatRole.ItemIcon)
+            if(run.Role is ChatRole.ItemIcon or ChatRole.JobIcon)
             {
                 if(used>0 && used+icon>width)Flush();
                 line.Add(run);used+=icon;

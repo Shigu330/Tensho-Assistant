@@ -193,6 +193,11 @@ public sealed class ChatSettings
     /// <summary>X-447 B14 (0.1641, the user's choice of 15/11, after Prat): an item link's icon before its name, the icon of Tensho's item list
     /// (the game's Item sheet); drawn only, nothing is kept. Off by default: the game's own chat draws none.</summary>
     public bool ItemIcons{get;set;}
+    /// <summary>X-690 (0.1666, the user's request of 20/11): a player's name in the colour of their role (tank, healer, DPS), the game's own role
+    /// colours, when the game shows their job (party, alliance, nearby); in capture mode too (the name is replaced, the colour stays).</summary>
+    public bool RoleColors{get;set;}=true;
+    /// <summary>X-690 (0.1666): the player's job icon before their name, when the game shows their job (party, alliance, nearby).</summary>
+    public bool JobIcons{get;set;}=true;
     /// <summary>X-448 (0.1454): down to 0 (transparent; was 10).</summary>
     public int BoundedOpacity=>Math.Clamp(Opacity,0,100);
     public int BoundedFontScale=>Math.Clamp(FontScale,60,200);

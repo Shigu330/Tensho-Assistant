@@ -303,6 +303,9 @@ internal sealed partial class MainWindow
         // X-447 B5 (0.1621): the players' names in brackets, in a colour of their own.
         BoolSetting("ChatWindow.SenderBrackets","ChatWindow.SenderBracketsTip",()=>configuration.Chat.SenderBrackets,value=>configuration.Chat.SenderBrackets=value,c=>c.Chat.SenderBrackets);
         BoolSetting("ChatWindow.NameColors","ChatWindow.NameColorsTip",()=>configuration.Chat.NameColors,value=>configuration.Chat.NameColors=value,c=>c.Chat.NameColors);
+        // X-690 (0.1666): the role's colour and the job's icon, when the game shows the player's job.
+        BoolSetting("ChatWindow.RoleColors","ChatWindow.RoleColorsTip",()=>configuration.Chat.RoleColors,value=>configuration.Chat.RoleColors=value,c=>c.Chat.RoleColors);
+        BoolSetting("ChatWindow.JobIcons","ChatWindow.JobIconsTip",()=>configuration.Chat.JobIcons,value=>configuration.Chat.JobIcons=value,c=>c.Chat.JobIcons);
         // X-447 B15 (0.1623, R25): capture mode.
         BoolSetting("ChatWindow.CaptureNames","ChatWindow.CaptureNamesTip",()=>configuration.Chat.CaptureNames,value=>configuration.Chat.CaptureNames=value,c=>c.Chat.CaptureNames);
         SliderSetting("ChatWindow.Opacity","ChatWindow.OpacityTip",()=>configuration.Chat.BoundedOpacity,value=>configuration.Chat.Opacity=value,0,100,defaults.Opacity,"%d %%");
@@ -1790,9 +1793,16 @@ internal sealed partial class MainWindow
     // X-556 M3 (review of 0.1520): a folded message is laid out narrower by its « ×n », so the count never runs past the window's edge
     // (ChatTabView lays it out again when the count grows).
     private void LayOutChatLine(ChatTabView view,int index,ChatSettings options)
-        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName,ChatLinkIcon),
+        =>view.SetLines(index,ChatFormat.Wrap(ChatFormat.WithJobIcon(ChatFormat.Runs(view.RecordAt(index),options,ChatChannelShort,ChatLinkName,ChatLinkIcon),ChatJobIcon(view.RecordAt(index),options)),
             ChatLook.WidthBeside(view.Width,view.RepeatsAt(index)>0 ? ImGui.CalcTextSize(localization.Format("ChatWindow.Repeats",view.RepeatsAt(index)+1)).X:0),
             text=>ImGui.CalcTextSize(text).X,ChatLook.Indent(ImGui.GetFontSize(),options.WrapIndent),ChatLook.IconWidth(ImGui.GetTextLineHeight())));
+
+    /// <summary>X-690 (0.1666): the job icon of a message's sender, the job the game showed when it arrived (0: not known, or the setting off).</summary>
+    private uint ChatJobIcon(ChatRecord record,ChatSettings options)=>ChatSenders is { } senders ? Chat.ChatJobs.IconFor(options,record.Channel,senders.For(record.Id)?.Job ?? 0):0;
+
+    /// <summary>X-690 (0.1666): the colour of a message's sender by role (red, green and blue), null when not known or the setting off.</summary>
+    private (float R,float G,float B)? ChatRoleColour(ChatRecord record,ChatSettings options)
+        =>ChatSenders is { } senders && senders.Jobs.ColourFor(options,record.Channel,senders.For(record.Id)?.Job ?? 0) is { } argb ? Chat.ChatJobs.Rgb(argb):null;
 
     /// <summary>X-447 B14 (0.1641): the icon of an item link's item, from Tensho's item list (0: not loaded, or not an item).</summary>
     private uint ChatLinkIcon(ChatLink link)=>link.Kind==ChatSegmentKind.ItemLink ? itemCatalog.State.Catalog?.Find(link.ItemId)?.IconId ?? 0:0;
@@ -1833,8 +1843,16 @@ internal sealed partial class MainWindow
             {
                 if(!first)ImGui.SameLine(0,0);
                 first=false;
+                // X-690 (0.1666): the sender's job icon, drawn as an item's icon.
+                if(run.Role==ChatRole.JobIcon)
+                {
+                    var side=ImGui.GetTextLineHeight();
+                    DrawGameIcon(ChatJobIcon(record,options),new Vector2(side,side));
+                    ImGui.SameLine(0,0);
+                    ImGui.Dummy(new Vector2(ChatLook.IconWidth(side)-side,side));
+                }
                 // X-447 B14 (0.1641): an item's icon, a square as high as the line, then its gap.
-                if(run.Role==ChatRole.ItemIcon && run.Link is { } item)
+                else if(run.Role==ChatRole.ItemIcon && run.Link is { } item)
                 {
                     var side=ImGui.GetTextLineHeight();
                     DrawGameIcon(ChatLinkIcon(item),new Vector2(side,side));
@@ -1915,6 +1933,8 @@ internal sealed partial class MainWindow
     {
         if(run.Role==ChatRole.Timestamp)return Muted;
         if(run.Role!=ChatRole.Sender)return color;
+        // X-690 (0.1666): the role's colour first (a player put forward keeps the warning colour).
+        if(ChatRoleColour(record,options) is var (red,green,blue))return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:new Vector4(red,green,blue,color.W);
         if(!options.NameColors || !ChatChannels.Spoken(record.Channel))return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:color;
         var (r,g,b)=ChatLook.SenderColour(record.Sender,options.CaptureNames);
         return ChatTextFilter.IsPlayer(record.Sender,chatHighlighted) ? Warning:new Vector4(r,g,b,color.W);

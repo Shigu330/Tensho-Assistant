@@ -1,6 +1,8 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
+using Dalamud.Game.Config;
+using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
@@ -24,13 +26,18 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
 {
     private readonly IFramework framework;private readonly IClientState client;private readonly IObjectTable objects;private readonly ITargetManager targets;
     private readonly IPartyList party;private readonly IDataManager data;private readonly IPluginLog log;private readonly ChatSources sources;
+    private readonly IGameConfig? config;
     private Hook<RaptureLogModule.Delegates.AddMsgSourceEntry>? hook;
     private bool failed;
 
-    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources)
+    public ChatPlayerActions(IGameInteropProvider interop,IFramework framework,IClientState client,IObjectTable objects,ITargetManager targets,IPartyList party,IDataManager data,IPluginLog log,ChatSources sources,IGameConfig? config=null)
     {
-        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;
+        this.framework=framework;this.client=client;this.objects=objects;this.targets=targets;this.party=party;this.data=data;this.log=log;this.sources=sources;this.config=config;
         client.Logout+=OnLogout;
+        // X-690 (0.1666): each job's role, read once from the ClassJob sheet; the jobs the game shows, once a second.
+        try{sources.Jobs.SetRoles(data.GetExcelSheet<Lumina.Excel.Sheets.ClassJob>().Select(row=>(row.RowId,row.Role)));}
+        catch(Exception error){log.Warning(error,"Chat window: the jobs' roles could not be read (maybe after a game update): no role colour.");}
+        TenshoAssistant.Competitive.CompetitiveGate.Add(framework,OnJobsTick);
         try
         {
             if((nint)RaptureLogModule.MemberFunctionPointers.AddMsgSourceEntry==0)throw new InvalidOperationException("RaptureLogModule.AddMsgSourceEntry not resolved");
@@ -204,5 +211,55 @@ internal sealed unsafe class ChatPlayerActions : IDisposable
     /// <summary>The senders are another character's business at logout: dropped, as the messages are.</summary>
     private void OnLogout(int type,int code)=>sources.Clear();
 
-    public void Dispose(){client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
+    // X-690 (0.1666): the jobs the game shows now (party, alliance, nearby), once a second, memory only; nothing during a cut (R03.2).
+    private long jobsAt=-100_000;
+    private bool jobsSaid,allianceSaid;
+    private void OnJobsTick(IFramework _)
+    {
+        var now=Environment.TickCount64;
+        if(now-jobsAt<1000)return;
+        jobsAt=now;
+        if(TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn || objects.LocalPlayer is null){sources.Jobs.Clear();return;}
+        try
+        {
+            var players=new List<(string,ushort,uint)>();
+            foreach(var member in party)players.Add((member.Name.TextValue,(ushort)member.World.RowId,member.ClassJob.RowId));
+            players.AddRange(AllianceJobs());
+            foreach(var character in objects.OfType<IPlayerCharacter>())players.Add((character.Name.TextValue,(ushort)character.HomeWorld.RowId,character.ClassJob.RowId));
+            sources.Jobs.Replace(players);
+            sources.Jobs.SetColours(Colour(UiConfigOption.LogColorRoleTank),Colour(UiConfigOption.LogColorRoleHealer),Colour(UiConfigOption.LogColorRoleDPS));
+            if(!jobsSaid){jobsSaid=true;log.Information("Chat window, the jobs the game shows: {0} players, first read (memory only).",sources.Jobs.Count);}
+        }
+        catch(Exception error)
+        {
+            sources.Jobs.Clear();
+            if(!jobsSaid){jobsSaid=true;log.Warning(error,"Chat window, the players' jobs could not be read (said once): no job icon nor role colour.");}
+        }
+    }
+
+    private uint? Colour(UiConfigOption option)
+    {
+        try{return config is not null && config.TryGet(option,out uint value) ? value:null;}
+        catch(InvalidOperationException){return null;}
+    }
+
+    /// <summary>X-690 (0.1666): the alliance's other members (GroupManager, the game's own list: name, home world, job); none outside an alliance.</summary>
+    private List<(string,ushort,uint)> AllianceJobs()
+    {
+        var found=new List<(string,ushort,uint)>();
+        try
+        {
+            var manager=GroupManager.Instance();
+            if(manager==null || !manager->MainGroup.IsAlliance)return found;
+            foreach(ref readonly var member in manager->MainGroup.AllianceMembers)
+                if(member.ClassJob!=0 && member.HomeWorld!=0 && member.NameString is { Length:>0 } name)found.Add((name,member.HomeWorld,member.ClassJob));
+        }
+        catch(Exception error)
+        {
+            if(!allianceSaid){allianceSaid=true;log.Warning(error,"Chat window, the alliance's jobs could not be read (maybe after a game update; said once).");}
+        }
+        return found;
+    }
+
+    public void Dispose(){TenshoAssistant.Competitive.CompetitiveGate.Remove(framework,OnJobsTick);client.Logout-=OnLogout;hook?.Dispose();hook=null;sources.Clear();}
 }

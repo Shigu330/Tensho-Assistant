@@ -1,7 +1,8 @@
 namespace TenshoAssistant.Chat;
 
 /// <summary>X-654 (0.1602): who sent a message of the Tensho chat window: name and world from the message, the game's identifiers from its log (0: not known).</summary>
-public sealed record ChatSource(string Name,ushort World,ulong ContentId=0,ulong AccountId=0);
+/// X-690 (0.1666): <paramref name="Job"/>, the sender's job the game showed when the message arrived (ChatJobs; 0: not known), memory only.
+public sealed record ChatSource(string Name,ushort World,ulong ContentId=0,ulong AccountId=0,uint Job=0);
 
 /// <summary>X-660 (0.1603): a line of the game's own log, read at the index the game gives with a message's identifiers: its kind and the name
 /// and home world of its sender's player link (empty name: none).</summary>
@@ -39,6 +40,8 @@ public sealed class ChatSources
     private readonly Queue<(string Name,ushort World)> playerOrder=new();
     private long expected=-1;
     private ushort expectedKind;
+    /// <summary>X-690 (0.1666): the jobs the game shows now, for the senders' jobs (memory only).</summary>
+    public ChatJobs Jobs{get;}=new();
 
     /// <summary>The message just copied, of that kind, sent by a player (name and world from its sender); a message without one: <paramref name="name"/> empty.</summary>
     public void Expect(long id,string name,ushort world,ushort kind)
@@ -48,7 +51,7 @@ public sealed class ChatSources
             expected=-1;
             if(name.Length==0 || world==0)return;
             if(!sources.ContainsKey(id)){order.Enqueue(id);while(order.Count>MaximumKept)sources.Remove(order.Dequeue());}
-            sources[id]=new(name,world);
+            sources[id]=new(name,world,Job:Jobs.Find(name,world));
             expected=id;expectedKind=(ushort)(kind&KindMask);
         }
     }
@@ -133,7 +136,7 @@ public sealed class ChatSources
     }
 
     public int Count{get{lock(gate)return sources.Count;}}
-    public void Clear(){lock(gate){sources.Clear();order.Clear();players.Clear();playerOrder.Clear();expected=-1;}}
+    public void Clear(){lock(gate){sources.Clear();order.Clear();players.Clear();playerOrder.Clear();expected=-1;}Jobs.Clear();}
 }
 
 /// <summary>X-654 (0.1602): the entries of a player's menu in the chat window, after Tensho's own; their texts are the client's (Addon rows).</summary>

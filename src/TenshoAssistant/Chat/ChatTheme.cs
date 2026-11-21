@@ -46,6 +46,8 @@ public static class ChatTheme
         public bool? SenderBrackets{get;set;}
         public bool? NameColors{get;set;}
         public bool? ItemIcons{get;set;}
+        public bool? RoleColors{get;set;}
+        public bool? JobIcons{get;set;}
         public Dictionary<string,uint>? Colors{get;set;}
         public Dictionary<string,string>? Names{get;set;}
     }
@@ -61,7 +63,7 @@ public static class ChatTheme
             ThinScrollbar=settings.ThinScrollbar,GameLinks=settings.GameLinks,GameTabs=settings.GameTabs,WrapIndent=settings.WrapIndent,
             TextOutline=settings.TextOutline,ShowTimestamps=settings.ShowTimestamps,Clock24=settings.Clock24,ShowSeconds=settings.ShowSeconds,
             HourLeadingZero=settings.HourLeadingZero,ShowChannel=settings.ShowChannel,SenderBrackets=settings.SenderBrackets,NameColors=settings.NameColors,
-            ItemIcons=settings.ItemIcons,
+            ItemIcons=settings.ItemIcons,RoleColors=settings.RoleColors,JobIcons=settings.JobIcons,
             Colors=settings.Colors is { Count:>0 } colors ? colors.ToDictionary(pair=>pair.Key.ToString(),pair=>pair.Value&0xFFFFFF):null,
             Names=ChatChannels.All.Where(ChatChannels.Spoken).Select(channel=>(channel,name:settings.ShortNameOf(channel))).Where(pair=>pair.name is not null)
                 .ToDictionary(pair=>pair.channel.ToString(),pair=>pair.name!) is { Count:>0 } names ? names:null,
@@ -100,6 +102,8 @@ public static class ChatTheme
         settings.SenderBrackets=look.SenderBrackets ?? fresh.SenderBrackets;
         settings.NameColors=look.NameColors ?? fresh.NameColors;
         settings.ItemIcons=look.ItemIcons ?? fresh.ItemIcons;
+        settings.RoleColors=look.RoleColors ?? fresh.RoleColors;
+        settings.JobIcons=look.JobIcons ?? fresh.JobIcons;
         var colors=new Dictionary<ChatChannel,uint>();
         foreach(var (key,color) in look.Colors ?? [])if(Channel(key) is { } channel)colors[channel]=color&0xFFFFFF;
         settings.Colors=colors.Count>0 ? colors:null;
