@@ -17,6 +17,8 @@ public sealed class ChatStatusParam
 /// X-760 (0.1744, review of 0.1742, M2): the watch lasts <see cref="Frames"/> frames and <see cref="WatchMs"/> at least: 30 frames alone
 /// were half a second at 60 frames a second, a fifth at 144, and a meal put on later over an older one was taken for the older one. The
 /// delay the game takes is not measured yet: the reader writes the longest one seen in the log.
+/// X-762 (0.1748, review of 0.1746, I2; D-208, the owner's choice of 21/11/2026 at about 8:15 pm): another player's status has a watch of its
+/// own, half a second at most after its line whatever the frame rate (<see cref="Other"/>): what D-207 was asked on (R04).
 /// </summary>
 public static class ChatStatusWatch
 {
@@ -43,6 +45,27 @@ public static class ChatStatusWatch
         if(frame<Frames || elapsedMs<WatchMs)return (false,0,"");
         return seen!=0 ? (true,seen,"held from its line on, unchanged"):(true,(ushort)0,"not found");
     }
+
+    /// <summary>X-762 (D-208): another player's status is never read later than this many milliseconds after its line.</summary>
+    public const int OtherMs=500;
+
+    /// <summary>X-762: whether another player's status may still be read this many milliseconds after its line.</summary>
+    public static bool OtherMayRead(long elapsedMs)=>elapsedMs<=OtherMs;
+
+    /// <summary>
+    /// X-762 (D-208): the watch of another player's status. A Param that differs from the one held at the line is the line's; at half a
+    /// second the watch ends: a Param unchanged since the line may be an older meal still held, the line's put on later, so no bonus rather
+    /// than an older meal (the same meal eaten again shows none either); none: not found.
+    /// </summary>
+    public static (bool Over,ushort Value,string How) Other(ushort atLine,ushort seen,long elapsedMs)
+    {
+        if(seen!=0 && seen!=atLine)return (true,seen,atLine==0 ? "another player's, put on after its line":"another player's, changed after its line (an older one held at the line)");
+        return elapsedMs<OtherMs ? (false,(ushort)0,""):OtherEnd(atLine);
+    }
+
+    /// <summary>X-762: the end of another player's watch, at half a second or at the first frame past it (then nothing is read).</summary>
+    public static (bool Over,ushort Value,string How) OtherEnd(ushort atLine)=>
+        (true,(ushort)0,atLine!=0 ? "another player's, unchanged for half a second: no bonus (maybe an older meal)":"another player's, not found within half a second");
 }
 
 /// <summary>X-733 (0.1734): one bonus of an ItemFood row: the attribute's name (BaseParam, the client's language), relative (a percent, capped)

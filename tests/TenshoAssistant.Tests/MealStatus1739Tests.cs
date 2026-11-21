@@ -50,7 +50,7 @@ internal static class MealStatus1739Tests
         ("Meal status 1739: wiring: the reader keeps the Param held at the line and asks the watch; only kind 46; PUBLISHING rule 5 says it, both halves", () =>
         {
             var players = Read("Chat/ChatPlayerActions.Dalamud.cs");
-            Check(players.Contains("if(frame==0)atLine=seen;", StringComparison.Ordinal) && players.Contains("var read=ChatStatusWatch.Next(atLine,seen,frame,elapsed);", StringComparison.Ordinal)
+            Check(players.Contains("if(frame==0)atLine=seen;", StringComparison.Ordinal) && players.Contains("var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed);", StringComparison.Ordinal)
                 && players.Contains("if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);", StringComparison.Ordinal), "the watch decides");
             Check(!players.Contains("\"at once\"", StringComparison.Ordinal), "no Param taken at once");
             var reader = Read("Chat/ChatReader.Dalamud.cs");

@@ -134,7 +134,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.1718-chat-link-click-probe.md](0.1718-chat-link-click-probe.md) | `src/TenshoAssistant/Chat/ChatLinkProbe.cs`, `src/TenshoAssistant/Chat/ChatLinkWatch.Dalamud.cs`, `tests/TenshoAssistant.Tests/ChatLinkProbe1718Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md`, `docs/evidence/0.1746-chat-player-menu-measure.md` |
 | [0.1720-chat-action-names.md](0.1720-chat-action-names.md) | `tests/TenshoAssistant.Tests/ChatActions1720Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.1734-chat-action-lines.md](0.1734-chat-action-lines.md) | `src/TenshoAssistant/Chat/ChatActionLines.cs`, `src/TenshoAssistant/Chat/ChatActionTips.cs`, `src/TenshoAssistant/Chat/ChatPayloads.cs`, `tests/TenshoAssistant.Tests/ChatLines1734Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
-| [0.1739-meal-status-gained.md](0.1739-meal-status-gained.md) | `tests/TenshoAssistant.Tests/MealConsent1743Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
+| [0.1739-meal-status-gained.md](0.1739-meal-status-gained.md) | `tests/TenshoAssistant.Tests/MealConsent1743Tests.cs`, `tests/TenshoAssistant.Tests/MealOther1748Tests.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1741-unload-json.md](0.1741-unload-json.md) | `src/TenshoAssistant/SettingsFile.cs`, `src/TenshoAssistant/TenshoJson.cs` | `docs/changelog/CHANGELOG-0.1700-0.1799.md`, `docs/evidence/0.1745-settings-file.md` |
 | [0.1745-settings-file.md](0.1745-settings-file.md) | — | `CHANGELOG.md` |
