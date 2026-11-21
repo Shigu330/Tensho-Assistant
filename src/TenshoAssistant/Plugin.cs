@@ -679,6 +679,12 @@ public sealed partial class Plugin : IDalamudPlugin
             registrations.Register(()=>graceWatcher=new Gear.GraceWatcher(framework,client,player,objects,chat,log,expIndex,()=>configuration.GraceCounts??=[],()=>SaveTimed("grace"),
                 status=>data.GetExcelSheet<Lumina.Excel.Sheets.Status>().GetRowOrDefault(status)?.Name.ExtractText() ?? status.ToString(System.Globalization.CultureInfo.InvariantCulture)),()=>graceWatcher?.Dispose());
             mainWindow.GraceSource=()=>graceWatcher?.Shown;
+            // X-197 (0.1761): an item's desynthesis (Item sheet) and your desynthesis levels (PlayerState, read on the framework thread).
+            mainWindow.ItemDesynthOf=id=>data.GetExcelSheet<Lumina.Excel.Sheets.Item>().GetRowOrDefault(id) is { } desynthItem
+                ? Items.ItemDesynth.Of(desynthItem.Desynth,desynthItem.ClassJobRepair.RowId,desynthItem.LevelItem.RowId):null;
+            Items.DesynthesisLevels? desynthLevels=null;
+            registrations.Register(()=>desynthLevels=new Items.DesynthesisLevels(framework,client,log),()=>desynthLevels?.Dispose());
+            mainWindow.DesynthLevelOf=job=>desynthLevels?.Of(job);
             // X-223 (0.1233): the region of the home world's data centre (WorldRegionGroup row), for the Jumbo Cactpot's draw time.
             mainWindow.HomeRegion=()=>player.HomeWorld.ValueNullable?.DataCenter.ValueNullable?.Region.RowId ?? 0;
             // X-222 (0.1232): the player's own kills for the S ranks counted by kills, from the game's « You defeat » message.

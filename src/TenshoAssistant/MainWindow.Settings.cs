@@ -126,6 +126,9 @@ internal sealed partial class MainWindow
             BoolSetting("Settings.HoverCollection","Settings.HoverCollectionTip",()=>configuration.HoverShowCollection,value=>configuration.HoverShowCollection=value,c=>c.HoverShowCollection);
             BoolSetting("Settings.HoverStock","Settings.HoverStockTip",()=>configuration.HoverShowStock,value=>configuration.HoverShowStock=value,c=>c.HoverShowStock);
             BoolSetting("Settings.HoverUsages","Settings.HoverUsagesTip",()=>configuration.HoverShowUsages,value=>configuration.HoverShowUsages=value,c=>c.HoverShowUsages);
+            // X-197 (0.1761): the item's desynthesis against your level; what a coffer holds that a collection tracks.
+            BoolSetting("Settings.HoverDesynth","Settings.HoverDesynthTip",()=>configuration.HoverShowDesynth,value=>configuration.HoverShowDesynth=value,c=>c.HoverShowDesynth);
+            BoolSetting("Settings.HoverCoffer","Settings.HoverCofferTip",()=>configuration.HoverShowCoffer,value=>configuration.HoverShowCoffer=value,c=>c.HoverShowCoffer);
             BoolSetting("Settings.HoverSources","Settings.HoverSourcesTip",()=>configuration.HoverShowSources,value=>configuration.HoverShowSources=value,c=>c.HoverShowSources);
             // 0.377 (g, M-07): comparison with the worn piece.
             BoolSetting("Settings.HoverCompare","Settings.HoverCompareTip",()=>configuration.HoverShowCompare,value=>configuration.HoverShowCompare=value,c=>c.HoverShowCompare);

@@ -57,6 +57,8 @@ public static class ConfigurationReset
         "HoverShowCollection", "HoverShowStock", "HoverShowUsages", "HoverShowSources",
         // 0.377 (g, M-07): comparison with the worn piece under the item tooltip.
         "HoverShowCompare",
+        // X-197 (0.1761): the desynthesis and coffer lines under the item tooltip.
+        "HoverShowDesynth", "HoverShowCoffer",
         // X-684 (0.1696): the parts of Tensho's own tooltips turned off.
         "TooltipPartsHidden",
         // X-605 (0.1697): the order of the families' tabs, dragged with the mouse.
@@ -795,6 +797,9 @@ public sealed partial class Configuration
     public List<string>? WorldClocks { get; set; }
     // 0.377 (g, M-07): under the game's item tooltip, the hovered gear against the worn piece of its slot (on by default).
     public bool HoverShowCompare { get; set; } = true;
+    // X-197 (0.1761): under the game's item tooltip, the item's desynthesis against your level, and what a coffer holds that a collection tracks (on by default).
+    public bool HoverShowDesynth { get; set; } = true;
+    public bool HoverShowCoffer { get; set; } = true;
     // X-684 (0.1696, M3 of X-700): the parts of Tensho's own tooltips turned off (« Kind.Part », UI/TooltipParts.All); none by default.
     // Replaced whole at each change (MainWindow.SetTipPart).
     public List<string> TooltipPartsHidden { get; set; } = [];

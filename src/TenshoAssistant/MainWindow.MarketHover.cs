@@ -398,6 +398,9 @@ internal sealed partial class MainWindow
                 :localization.Format("HoverUi.NpcSale",sold.SellPrice.ToString("N0",Numbers)));
         }
         if(!hoverPanel || configuration.HoverShowUsages)MeasureMap("hover usages",()=>DrawHoveredUsages(id));
+        // X-197 (0.1761): the item's desynthesis against your level; what a coffer holds that a collection tracks.
+        if(!hoverPanel || configuration.HoverShowDesynth)DrawItemDesynth(id);
+        if(!hoverPanel || configuration.HoverShowCoffer)MeasureMap("hover coffer",()=>DrawItemCoffer(id));
         // « How to get it » is the last part: hidden, its Garland / wiki fallback is not asked from the hover either.
         if(hoverPanel && !configuration.HoverShowSources)return;
         // How to obtain the item itself (0.144: the sources follow the unlocking item, not only the collection page).
@@ -453,7 +456,8 @@ internal sealed partial class MainWindow
     // Cheap lookups, cut short with the default settings (stock on).
     private bool HoverInfoShown(Items.ItemDefinition? item,uint id)=>configuration.HoverShowStock || configuration.HoverShowSources
         || configuration.HoverShowCollection && (item is { MountId:not 0 } or { CompanionId:not 0 } or { TripleTriadCardId:not 0 } or { OrchestrionId:not 0 } || item is not null && GameItemUnlocked(item.Id) is not null)
-        || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0;
+        || configuration.HoverShowUsages && HoveredUsageLines(id).Count>0
+        || configuration.HoverShowDesynth && DesynthOf(id) is not null || configuration.HoverShowCoffer && CofferOf(id) is not null;
 
     private void DrawHoveredUsages(uint id)
     {

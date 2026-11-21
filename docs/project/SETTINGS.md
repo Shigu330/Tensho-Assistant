@@ -227,8 +227,10 @@ effect, what changes when it is turned off, where the code reads it, the nine de
 | `HomeShowTools` | bool | true | Settings › General › Header | **Tool directory on the home page** — Shows, at the bottom of the home page, the collapsible list of every tool with a short description, an Open button and its details. Default: on. |
 | `HoverHideInDuty` | bool | false | Settings › General › ItemTooltips | **Hide the hover panel in duties** — No Tensho panel under the game's item tooltip while you are in a duty (dungeon, trial, raid…), prices included; nothing is read or asked for it. Same detection as the map's « Hide in duties ». Default: off. |
 | `HoverPriceRefresh` | bool | true | Settings › General › ItemTooltips | **Ctrl+Alt refreshes the hovered price** — While hovering an item, Ctrl+Alt asks Universalis for its price again, even if recent (one request per press, at least 5 seconds apart). Default: on. |
+| `HoverShowCoffer` | bool | true | Settings › General › ItemTooltips | **What a coffer holds** — Under the game's item tooltip, for a coffer, a card pack or a container: whether you already obtained everything in it that a collection tracks (mounts, minions, cards, orchestrion rolls…), or how many are missing (community list). Default: on. |
 | `HoverShowCollection` | bool | true | Settings › General › ItemTooltips | **Collection state** — Under the game's item tooltip: whether you own what the item unlocks (mount, minion, Triple Triad card, orchestrion roll). Tensho's own item tooltips always show it. Default: on. |
 | `HoverShowCompare` | bool | true | Settings › General › ItemTooltips | **Comparison with the worn piece** — Under a gear piece's tooltip: item level and stat difference with the piece worn in the same slot (both rings for a ring). Base values, no materia. Default: on. |
+| `HoverShowDesynth` | bool | true | Settings › General › ItemTooltips | **Desynthesis** — Under the game's item tooltip, for an item that can be desynthesized: its crafter, its item level and your desynthesis level of that crafter, the item above or below it. Default: on. |
 | `HoverShowSources` | bool | true | Settings › General › ItemTooltips | **How to get it** — Under the game's item tooltip: « How to get it » (NPC vendors, quests, achievements, duties, monsters, crafting, gathering…). Off: Garland Tools and the wiki are no longer asked from this panel. Default: on. |
 | `HoverShowStock` | bool | true | Settings › General › ItemTooltips | **Stock** — Under the game's item tooltip: how many you own and in which storages (bags, retainers, saddlebags…). Default: on. |
 | `HoverShowUsages` | bool | true | Settings › General › ItemTooltips | **Uses** — Under the game's item tooltip: recipes using the item, crafting leves, possible Grand Company delivery, aquarium. Default: on. |
@@ -427,7 +429,7 @@ Settings reset by « Restore every setting » without a control in the interface
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Counted: 369 controls (313 linked to `Configuration`, 56 to another file), 36 settings without a control.
+Counted: 371 controls (315 linked to `Configuration`, 56 to another file), 36 settings without a control.
 <!-- /docgen:settings -->
 
 ---
@@ -660,8 +662,10 @@ réel, ce qui change quand on coupe, où le code le lit, les neuf anomalies corr
 | `HomeShowTools` | bool | true | Paramètres › Général › En-tête et accueil | **Annuaire des outils sur l'accueil** — Montre, en bas de l'accueil, la liste repliable de tous les outils avec une courte description, un bouton Ouvrir et leurs détails. Par défaut : activé. |
 | `HoverHideInDuty` | bool | false | Paramètres › Général › Survol et clic droit des objets | **Masquer le panneau de survol en mission** — Aucun panneau Tensho sous l'infobulle d'objet du jeu quand vous êtes en mission (donjon, défi, raid…), prix compris ; rien n'est lu ni demandé pour lui. Même détection que « Masquer en mission » de la carte. Par défaut : désactivé. |
 | `HoverPriceRefresh` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Ctrl+Alt actualise le prix survolé** — Pendant le survol d'un objet, Ctrl+Alt redemande son prix à Universalis, même s'il est récent (une demande par appui, 5 secondes au moins entre deux). Par défaut : activé. |
+| `HoverShowCoffer` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Ce que contient un coffret** — Sous l'infobulle d'objet du jeu, pour un coffret, un paquet de cartes ou un contenant : si vous avez déjà obtenu tout ce qu'il contient qu'une collection suit (montures, mascottes, cartes, rouleaux d'orchestrion…), ou combien il en manque (liste de la communauté). Par défaut : activé. |
 | `HoverShowCollection` | bool | true | Paramètres › Général › Survol et clic droit des objets | **État de collection** — Sous l'infobulle d'objet du jeu : si vous possédez ce que l'objet débloque (monture, mascotte, carte de Triple Triade, rouleau d'orchestrion). Les infobulles d'objet de Tensho l'affichent toujours. Par défaut : activé. |
 | `HoverShowCompare` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Comparaison avec la pièce portée** — Sous l'infobulle d'une pièce d'équipement : différence de niveau d'objet et de statistiques avec la pièce portée au même emplacement (les deux bagues pour une bague). Valeurs de base, sans matérias. Par défaut : activé. |
+| `HoverShowDesynth` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Recyclage** — Sous l'infobulle d'objet du jeu, pour un objet qui peut être recyclé : son artisan, son niveau d'objet et votre niveau de recyclage de cet artisan, l'objet au-dessus ou en dessous. Par défaut : activé. |
 | `HoverShowSources` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Comment l'obtenir** — Sous l'infobulle d'objet du jeu : « Comment l'obtenir » (PNJ marchands, quêtes, hauts faits, missions, monstres, fabrication, récolte…). Désactivé : Garland Tools et le wiki ne sont plus interrogés depuis ce panneau. Par défaut : activé. |
 | `HoverShowStock` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Stock** — Sous l'infobulle d'objet du jeu : combien vous en possédez et dans quels rangements (sacs, servants, sacoches…). Par défaut : activé. |
 | `HoverShowUsages` | bool | true | Paramètres › Général › Survol et clic droit des objets | **Usages** — Sous l'infobulle d'objet du jeu : recettes qui utilisent l'objet, mandats d'artisanat, livraison possible à la Grande compagnie, aquarium. Par défaut : activé. |
@@ -860,5 +864,5 @@ Réglages remis par « Tout remettre par défaut » sans case dans l'interface (
 | `WorkshopPanelProject` | uint | 0 |
 | `WorldClocks` | List<string>? | null |
 
-Compté : 369 cases (313 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
+Compté : 371 cases (315 reliées à `Configuration`, 56 à un autre fichier), 36 réglages sans case.
 <!-- /docgen:settings-fr -->
