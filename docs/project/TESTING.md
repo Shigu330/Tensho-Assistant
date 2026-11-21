@@ -2521,6 +2521,16 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
 
+- [ ] (0.1700) Objets : ouvrir plusieurs objets de suite dans la fiche (un avec recette, un récoltable, un sans marché) : les onglets suivent sans clignoter ni montrer un corps vide, dans l'ordre rangé ; faire défiler l'aperçu d'un objet puis changer d'onglet et revenir : le défilement reste
+
+- [ ] (0.1701) Rangements, Marché, Compagnie libre, Cartes, Paramètres, Collections, Triple Triade, artisanat : tirer un onglet à une autre place, changer de page puis revenir, recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (« Construire » d'une route, une collection depuis la recherche, l'engrenage de la carte vers Paramètres › Carte) ouvre toujours le bon ; « Remettre les onglets des pages dans l'ordre » remet tout
+
+- [ ] (0.1701) Banque : les onglets des servants se rangent à la souris et l'onglet ouvert reste le même servant quand la liste change
+
+- [ ] (0.1702) Barre de côté : tirer une entrée (par exemple Carte) au-dessus d'une autre du même groupe : un trait doré montre la place, au relâchement l'entrée y reste et la page ne change pas ; un simple clic ouvre toujours la page ; recharger le plugin : l'ordre reste ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » remet aussi la barre de côté
+
+- [ ] (0.1703) Compagnie libre › Routes : choisir un sous-marin puis un « Secteur à débloquer » encore fermé : la suite des secteurs à explorer s'affiche avec leurs rangs, à partir du dernier déjà débloqué ; un secteur déjà débloqué ou le premier de la carte est dit tel quel
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.

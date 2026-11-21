@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (717 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (721 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -381,6 +381,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-189 | User request of 2026-11-12 (on the Crescent Isle, « all of them »: the four… | Done in 0.1179 |
 | X-191 | User's finding of 2026-11-12 (« Condition 81 % Spiritbond 0 % », on the… | Done in 0.1177 |
 | X-196 | User request of 2026-11-12 (plugin comparison, K-05, accepted on 11/12): table… | Done in 0.1411 |
+| X-200 | User request of 2026-11-12 (plugin comparison, K-09, accepted on 11/12)… | Done in 0.1703.0 |
 | X-201 | User request of 2026-11-12 (« add an automatic route calculator for airships… | Done in 0.1248 |
 | X-204 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1235 |
 | X-205 | User request of 2026-11-12 (plugin comparison, the agent's notes; content… | Done in 0.1241 |
@@ -686,6 +687,7 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-601 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1681.0 |
 | X-602 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1608.0 |
 | X-603 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1609.0 |
+| X-605 | User request of 18/11 around 2 pm (screenshots: Crafting, Gathering, Storage… | Done in 0.1702.0 |
 | X-608 | Rule R03.1 changed on 18/11 (user's choice, rules journal): in PvE combat… | Done in 0.1575 |
 | X-609 | Tool (seen by relay 116 on 19/11 around 23:35): plan.py add takes --tri and… | Done in 0.1557 |
 | X-610 | Bug seen by the user on 19/11 around 23:15 (item card capture, kept off the… | Done in 0.1568 |
@@ -785,12 +787,14 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-705 | User's choice (21/11 about 4:35 am, D-201 b): in the grouped side bar (X-601)… | Done in 0.1683.0 |
 | X-706 | Review of block 0.1682 to 0.1686 (review 0.1686, 21/11), minor M1, M2, M3: M1… | Done in 0.1687.0 |
 | X-707 | Review of block 0.1687 to 0.1692 (review 0.1692, 21/11), minor M1: M1 in… | Done in 0.1693.0 |
+| X-708 | Flaky test seen in relay 156 (21/11 7:40, publishing 0.1696): « Fair lock 1309… | Done in 0.1699.0 |
+| X-709 | Review of block 0.1693 to 0.1698 (review 0.1698, 21/11), minor M1: M1 in… | Done in 0.1700.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (717 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (721 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1169,6 +1173,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-189 | Demande de l'utilisateur du 2026-11-12 (sur l'île de Lunule, « le tous » : les… | Fait en 0.1179 |
 | X-191 | Constat de l'utilisateur du 2026-11-12 (« État 81 % Symbiose 0 % », sur l'île… | Fait en 0.1177 |
 | X-196 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-05, accepté… | Fait en 0.1411 |
+| X-200 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, K-09, accepté… | Fait en 0.1703.0 |
 | X-201 | Demande de l'utilisateur du 2026-11-12 (« ajoute un calculateur de trajet auto… | Fait en 0.1248 |
 | X-204 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1235 |
 | X-205 | Demande de l'utilisateur du 2026-11-12 (comparaison aux plugins, notes de… | Fait en 0.1241 |
@@ -1474,6 +1479,7 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-601 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1681.0 |
 | X-602 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1608.0 |
 | X-603 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1609.0 |
+| X-605 | Demande de l'utilisateur du 18/11 vers 14 h (captures : Artisanat, Récolte… | Fait en 0.1702.0 |
 | X-608 | Règle R03.1 changée le 18/11 (choix de l'utilisateur, journal des règles) : en… | Fait en 0.1575 |
 | X-609 | Outil (vu par le relais 116 le 19/11 vers 23 h 35) : plan.py add n'accepte… | Fait en 0.1557 |
 | X-610 | Bug vu par l'utilisateur le 19/11 vers 23 h 15 (capture de la fiche d'objet… | Fait en 0.1568 |
@@ -1573,3 +1579,5 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-705 | Choix de l'utilisateur (21/11 vers 4 h 35, D-201 b) : dans la barre de côté… | Fait en 0.1683.0 |
 | X-706 | Relecture du bloc 0.1682 à 0.1686 (relecture 0.1686, 21/11), mineurs M1, M2, M3… | Fait en 0.1687.0 |
 | X-707 | Relecture du bloc 0.1687 à 0.1692 (relecture 0.1692, 21/11), mineurs M1 : M1… | Fait en 0.1693.0 |
+| X-708 | Test instable constaté au relais 156 (21/11 07 h 40, publication de 0.1696) : «… | Fait en 0.1699.0 |
+| X-709 | Relecture du bloc 0.1693 à 0.1698 (relecture 0.1698, 21/11), mineurs M1 : M1… | Fait en 0.1700.0 |
