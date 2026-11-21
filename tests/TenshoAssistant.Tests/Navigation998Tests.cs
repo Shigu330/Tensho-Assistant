@@ -9,7 +9,8 @@ internal static class Navigation998Tests
         {
             var pages=File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/MainWindow.Pages.cs"));
             var groups=System.Text.RegularExpressions.Regex.Matches(pages,@"new\(Page\.\w+,""(\w+)""").Select(match=>match.Groups[1].Value).Distinct().ToArray();
-            Check(groups.SequenceEqual(["Objects","Production","World","Tracking","Progression","Content","GoldSaucer","References","Preferences"]),"order: "+string.Join(",",groups));
+            // X-601 (0.1681): the list follows the side bar of D-199, « Character » first; the groups are those of the tool directory and of the README.
+            Check(groups.SequenceEqual(["Progression","Content","Objects","Production","World","Tracking","GoldSaucer","References","Preferences"]),"order: "+string.Join(",",groups));
             foreach(var (page,group) in new[]{("Alarms","Tracking"),("Garden","Tracking"),("FreeCompany","Tracking"),("Beastmaster","Content"),("DeepDungeons","Content"),("RelicWeapons","Content"),
                 ("CustomDeliveries","Progression"),("Lexicon","References"),("Credits","References"),("Settings","Preferences"),("Discoveries","World")})
                 Check(pages.Contains($"new(Page.{page},\"{group}\""),page);

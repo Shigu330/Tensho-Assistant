@@ -4,7 +4,7 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     /// <param name="Page">The page; each one appears once, and a test checks it.</param>
-    /// <param name="Category">Its group in the navigation (null: above the groups); for a tab of a family, only its group in the tool directory.</param>
+    /// <param name="Category">Its group in the tool directory and in the README; in the side bar only « Tracking » is still a category (X-601, PageFamilies.SideBarCategories).</param>
     /// <param name="Label">Its name in the navigation; null for a page reached from the tabs of its parent.</param>
     /// <param name="Draw">Draws the page.</param>
     /// <param name="Source">Where its code starts, shown to contributors.</param>
@@ -23,7 +23,21 @@ internal sealed partial class MainWindow
     private PageGroup[]? pageGroups;
     private PageEntry[] PageEntries=>pageEntries??=
     [
+        // X-601 (0.1681, D-199): the list is in the order of the side bar: the two pages above everything, the pages that group, « Tracking »
+        // (the one category left, with its four pages), then the rest; the tabs of a family follow its entry.
         new(Page.Home,null,PageLabel("Navigation.Home"),DrawHome,"MainWindow.Home.cs"),
+        // R-13 (0.320): everything Tensho uses, shown to every player.
+        new(Page.MyTools,null,PageLabel("Navigation.MyTools"),DrawMyTools,"MainWindow.MyTools.cs, MyTools/"),
+        // X-601 (0.1677, D-199): « Character », the first page that groups: the collections, blue magic and its carnivale, the beastmaster,
+        // the chocobo, the hunting log, the gear and the relic weapons, each a tab of the one page header.
+        new(Page.Collections,"Progression",PageLabel("Navigation.Character"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("Navigation.Collection"),About:PageLabel("CollectionsBrowser.Description")),
+        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections,Tab:PageLabel("Navigation.BlueMagic"),About:PageLabel("CollectionsBrowser.BlueDescription")),
+        new(Page.MaskedCarnivale,"Content",null,DrawMaskedCarnivale,"MainWindow.MaskedCarnivale.cs, Carnivale/",Page.Collections,Tab:PageLabel("Navigation.MaskedCarnivale"),About:PageLabel("MaskedCarnivale.Subtitle")),
+        new(Page.Beastmaster,"Content",null,DrawBeastmaster,"MainWindow.Beastmaster.cs, Beastmaster/",Page.Collections,Tab:PageLabel("Navigation.Beastmaster"),About:PageLabel("BeastUi.Help")),
+        new(Page.Chocobo,"Progression",null,DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs",Page.Collections,Tab:PageLabel("Navigation.Chocobo"),About:PageLabel("ChocoboBarding.Help")),
+        new(Page.HuntingLog,"Progression",null,DrawHuntingLog,"MainWindow.HuntingLog.cs",Page.Collections,Tab:PageLabel("Navigation.HuntingLog"),About:PageLabel("HuntingLog.Description")),
+        new(Page.Gear,"Progression",null,DrawGearPlanner,"MainWindow.Gear.cs, Gear/",Page.Collections,Tab:PageLabel("Navigation.Gear"),About:PageLabel("Gear.Description")),
+        new(Page.RelicWeapons,"Content",null,DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/",Page.Collections,Tab:PageLabel("Navigation.RelicWeapons"),About:PageLabel("Relics.Subtitle")),
         // X-601 (0.1678, D-199): « Items », the item search, the storage, the sort and the markets, each a tab of the one page header (the wishlist stays apart).
         new(Page.Items,"Objects",PageLabel("Navigation.Items"),DrawItems,"MainWindow.Items*.cs, MainWindow.ItemSheet.cs",Tab:PageLabel("Navigation.ItemSearch"),About:PageLabel("ItemsUi.Description")),
         new(Page.Storage,"Objects",null,DrawStorage,"MainWindow.Storage.cs, MainWindow.Bank.cs",Page.Items,Tab:PageLabel("Navigation.Storage"),About:PageLabel("StorageUi.Description")),
@@ -63,16 +77,6 @@ internal sealed partial class MainWindow
         new(Page.Events,"Progression",null,DrawEventsPage,"MainWindow.Events.cs, Events/",Page.Quests,Tab:PageLabel("Navigation.Events"),About:PageLabel("Events.Description")),
         new(Page.AlliedSocieties,"Progression",null,DrawAlliedSocieties,"MainWindow.AlliedSocieties.cs, Societies/",Page.Quests,Tab:PageLabel("Navigation.AlliedSocieties"),About:PageLabel("Allied.Subtitle")),
         new(Page.GrandCompanies,"Progression",null,DrawGrandCompanies,"MainWindow.GrandCompanies.cs, GrandCompanies/",Page.Quests,Tab:PageLabel("Navigation.GrandCompanies"),About:PageLabel("GrandCompany.Subtitle")),
-        // X-601 (0.1677, D-199): « Character », the first page that groups: the collections, blue magic and its carnivale, the beastmaster,
-        // the chocobo, the hunting log, the gear and the relic weapons, each a tab of the one page header.
-        new(Page.Collections,"Progression",PageLabel("Navigation.Character"),()=>DrawCollections(),"MainWindow.Collections.cs, Collections/",Tab:PageLabel("Navigation.Collection"),About:PageLabel("CollectionsBrowser.Description")),
-        new(Page.BlueMagic,"Progression",null,()=>DrawCollections(true),"MainWindow.Collections.cs, Collections/",Page.Collections,Tab:PageLabel("Navigation.BlueMagic"),About:PageLabel("CollectionsBrowser.BlueDescription")),
-        new(Page.MaskedCarnivale,"Content",null,DrawMaskedCarnivale,"MainWindow.MaskedCarnivale.cs, Carnivale/",Page.Collections,Tab:PageLabel("Navigation.MaskedCarnivale"),About:PageLabel("MaskedCarnivale.Subtitle")),
-        new(Page.Beastmaster,"Content",null,DrawBeastmaster,"MainWindow.Beastmaster.cs, Beastmaster/",Page.Collections,Tab:PageLabel("Navigation.Beastmaster"),About:PageLabel("BeastUi.Help")),
-        new(Page.Chocobo,"Progression",null,DrawChocoboPage,"MainWindow.ChocoboBarding.cs, Gear/ChocoboBarding.cs, Gear/ChocoboReader.Dalamud.cs",Page.Collections,Tab:PageLabel("Navigation.Chocobo"),About:PageLabel("ChocoboBarding.Help")),
-        new(Page.HuntingLog,"Progression",null,DrawHuntingLog,"MainWindow.HuntingLog.cs",Page.Collections,Tab:PageLabel("Navigation.HuntingLog"),About:PageLabel("HuntingLog.Description")),
-        new(Page.Gear,"Progression",null,DrawGearPlanner,"MainWindow.Gear.cs, Gear/",Page.Collections,Tab:PageLabel("Navigation.Gear"),About:PageLabel("Gear.Description")),
-        new(Page.RelicWeapons,"Content",null,DrawRelicWeapons,"MainWindow.RelicWeapons.cs, Relics/",Page.Collections,Tab:PageLabel("Navigation.RelicWeapons"),About:PageLabel("Relics.Subtitle")),
         // X-601 (0.1680, D-199): « Deliveries », the special and the custom deliveries.
         new(Page.SpecialDeliveries,"Progression",PageLabel("Navigation.Deliveries"),DrawSpecialDeliveries,"MainWindow.SpecialDeliveries.cs, Deliveries/SpecialDeliveries.cs",Tab:PageLabel("Navigation.SpecialDeliveries"),About:PageLabel("SpecialDeliveries.Subtitle")),
         new(Page.CustomDeliveries,"Progression",null,DrawCustomDeliveries,"MainWindow.CustomDeliveries.cs, Deliveries/",Page.SpecialDeliveries,Tab:PageLabel("Navigation.CustomDeliveries"),About:PageLabel("CustomDeliveries.Subtitle")),
@@ -85,17 +89,19 @@ internal sealed partial class MainWindow
         new(Page.TripleTriad,"GoldSaucer",null,DrawTripleTriad,"MainWindow.TripleTriad.cs, MainWindow.Triad*.cs, MiniGames/",Page.Fashion,Tab:PageLabel("Category.Triad"),About:PageLabel("TriadUi.Description")),
         new(Page.MiniCactpot,"GoldSaucer",null,DrawMiniCactpot,"MainWindow.MiniCactpot.cs, MiniGames/",Page.Fashion,Tab:PageLabel("Category.Cactpot"),About:PageLabel("CactpotUi.Description")),
         // X-100 (0.998, DEC-048): « References », what is looked up.
-        new(Page.Lexicon,"References",PageLabel("Navigation.Lexicon"),DrawLexicon,"MainWindow.Lexicon.cs, Lexicon/"),
-        new(Page.Help,"References",PageLabel("Navigation.Help"),DrawHelpPage,"MainWindow.Help.cs, Help/"),
-        new(Page.Settings,"Preferences",PageLabel("Navigation.Settings"),DrawSettings,"MainWindow.Settings.cs, MainWindow.Advanced.cs"),
-        // R-13 (0.320): everything Tensho uses, shown to every player.
-        new(Page.Credits,"References",PageLabel("Navigation.Credits"),DrawCredits,"MainWindow.Credits.cs, Credits/"),
-        new(Page.Diagnostics,"Preferences",PageLabel("Navigation.Diagnostics"),DrawDiagnostics,"MainWindow.Diagnostics.cs, MainWindow.Advanced.cs",Visible:()=>developerMode),
-        new(Page.MyTools,null,PageLabel("Navigation.MyTools"),DrawMyTools,"MainWindow.MyTools.cs, MyTools/"),
+        // X-601 (0.1681, D-199): « Help », the help, the lexicon and the credits.
+        new(Page.Help,"References",PageLabel("Navigation.Help"),DrawHelpPage,"MainWindow.Help.cs, Help/",Tab:PageLabel("Navigation.Help"),About:PageLabel("PageHelp.HelpPurpose")),
+        new(Page.Lexicon,"References",null,DrawLexicon,"MainWindow.Lexicon.cs, Lexicon/",Page.Help,Tab:PageLabel("Navigation.Lexicon"),About:PageLabel("Lexicon.Subtitle")),
+        new(Page.Credits,"References",null,DrawCredits,"MainWindow.Credits.cs, Credits/",Page.Help,Tab:PageLabel("Navigation.Credits"),About:()=>localization.Format("Credits.Count",TenshoAssistant.Credits.CreditCatalog.All.Count)),
+        // X-601 (0.1681, D-199): « Settings », the settings and, in developer mode, the diagnostics.
+        new(Page.Settings,"Preferences",PageLabel("Navigation.Settings"),DrawSettings,"MainWindow.Settings.cs, MainWindow.Advanced.cs",Tab:PageLabel("Navigation.Settings"),About:PageLabel("Settings.Description")),
+        new(Page.Diagnostics,"Preferences",null,DrawDiagnostics,"MainWindow.Diagnostics.cs, MainWindow.Advanced.cs",Page.Settings,Tab:PageLabel("Navigation.Diagnostics"),About:PageLabel("DiagnosticsUi.Help"),Visible:()=>developerMode),
         // New tools: scripts/New-Tool.ps1 adds their line above this one.
     ];
     /// <summary>The navigation's groups, in the order of the list; a page without a label is not an entry.</summary>
-    private PageGroup[] PageGroups=>pageGroups??=PageEntries.Where(entry=>entry.Label is not null).GroupBy(entry=>entry.Category)
-        .Select(group=>new PageGroup(group.Key,group.Select(entry=>entry.Page).ToArray(),group.ToArray())).ToArray();
+    // X-601 (0.1681): the side bar is flat but for the categories of PageFamilies.SideBarCategories (« Tracking »): entries that follow each other
+    // in the same category make one group; the entries around it are drawn without a header.
+    private PageGroup[] PageGroups=>pageGroups??=[.. TenshoAssistant.UI.PageFamilies.Runs(PageEntries.Where(entry=>entry.Label is not null).ToArray(),
+        entry=>TenshoAssistant.UI.PageFamilies.SideBarCategory(entry.Category)).Select(run=>new PageGroup(run.Key,run.Items.Select(entry=>entry.Page).ToArray(),run.Items))];
     private PageEntry? PageEntryFor(Page shown)=>Array.Find(PageEntries,entry=>entry.Page==shown);
 }

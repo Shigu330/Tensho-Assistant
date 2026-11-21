@@ -94,7 +94,7 @@ In « Report a problem or help » on the Help page, choose « A translation »: 
 
 ## Where is my wishlist?
 
-In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
+In the side bar, « Wishlist » (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list.
 
 ## Hover prices still say « old » after Ctrl+Alt: why?
 
@@ -102,7 +102,7 @@ Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. U
 
 ## The garden is shown as icons: how do I get the text back?
 
-Tracking › Garden › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
+Tracking › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
 
 ## How do I install Tensho?
 
@@ -220,7 +220,7 @@ Dans « Signaler un problème ou aider » de la page Aide, choisissez « Une tra
 
 ## Où est ma liste de souhaits ?
 
-Dans la barre latérale, OBJETS › Souhaits (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
+Dans la barre latérale, « Souhaits » (c'était un onglet de Collections). Ajoutez un objet par un clic droit dessus n'importe où dans Tensho › « Ajouter à mes souhaits » ; la ligne « ajouté à vos souhaits » en bas de la fenêtre ouvre la liste.
 
 ## Les prix au survol disent encore « ancien » après Ctrl+Alt : pourquoi ?
 

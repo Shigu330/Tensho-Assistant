@@ -597,7 +597,7 @@
     "QuestionActions": "Does Tensho play for me?",
     "AnswerActions": "No. It reads and shows. What acts on the game, such as teleporting, sorting or writing a macro, only happens when you click. Two settings act without a click: the M key opens Tensho's map instead of the game's (on by default), and the title you chose for a job is worn when you change job (off by default).",
     "QuestionGardenText": "The garden is shown as icons: how do I get the text back?",
-    "AnswerGardenText": "Tracking › Garden › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).",
+    "AnswerGardenText": "Tracking › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).",
     "QuestionOldPrice": "Hover prices still say « old » after Ctrl+Alt: why?",
     "AnswerOldPrice": "Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. Universalis only knows what players have uploaded, so the world's date is its last upload, by anyone; when nobody has opened that item at the board since, it stays old. For each line Tensho shows the newest reading it knows, Universalis' upload or what you saw yourself at the game's market board (« Seen at the market board »). Open the item at the market board for today's prices.",
     "QuestionMap": "M opens another map: how do I get the game's back?",
@@ -633,7 +633,7 @@
     "QuestionChatHistory": "Does Tensho keep my chat messages?",
     "AnswerChatHistory": "Not by default. Only if you tick « Keep the chat history on this PC » in the Tensho chat window's settings, and say yes to the question that follows, is every message the chat window reads kept on this PC (also those of channels no tab shows and those of the hidden players: the tabs and the hidden players only choose what is shown): one file per character in Tensho's folder (ChatHistory), the last messages and days you set (2,000 messages and 30 days by default; each can also be set to « No limit » to keep everything, and the place it takes on this PC is shown in the same settings), other players' names and words included, so that they show again after Tensho reloads or the game restarts. Tensho never sends them anywhere and does not read the chat in PvP or ranked play. « Erase the history », in the same settings, deletes every file; unticking the setting keeps nothing more.",
     "QuestionWishlist": "Where is my wishlist?",
-    "AnswerWishlist": "In the side bar, ITEMS › Wishlist (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list."
+    "AnswerWishlist": "In the side bar, « Wishlist » (it used to be a tab of Collections). Add an item by right-clicking it anywhere in Tensho › « Add to my wishlist »; the line « added to your wishlist » at the bottom of the window opens the list."
   },
   "Guide": {
     "Title": "Tensho: first steps",
@@ -943,7 +943,7 @@
     "Sort": "Sort",
     "ItemSearch": "Item Search",
     "BlueMagic": "Blue Magic Spellbook",
-    "GardenCount": "Garden ({0})",
+    "GardenCount": "Gardening ({0})",
     "RemindersCount": "Reminders ({0})",
     "Wishlist": "Wishlist",
     "Discoveries": "Discoveries",
@@ -966,7 +966,7 @@
     "Gear": "Gear",
     "FreeCompany": "Free Company",
     "Reminders": "Reminders",
-    "Garden": "Garden",
+    "Garden": "Gardening",
     "Storage": "Storage",
     "CategoryObjects": "ITEMS",
     "CategoryProduction": "PRODUCTION",
@@ -6081,7 +6081,7 @@
     "Added": "« {0} » added to your wishlist.",
     "AddedMany": "{0} items added to your wishlist.",
     "Open": "Open the wishlist",
-    "OpenTip": "Opens the Wishlist page (ITEMS › Wishlist).",
+    "OpenTip": "Opens the Wishlist page (« Wishlist » in the side bar).",
     "GatherAt": "Gathered: {0}",
     "MorePlaces": "… and {0} more places (Gathering page)"
   },
@@ -6118,7 +6118,7 @@
     "StateInDresser": "ready to store",
     "StateStored": "stored",
     "ToWishlist": "Missing pieces ({0}) → wishlist",
-    "ToWishlistTip": "Adds the pieces you do not own (bags, saved storages, dresser) to your wishlist (ITEMS › Wishlist).",
+    "ToWishlistTip": "Adds the pieces you do not own (bags, saved storages, dresser) to your wishlist (« Wishlist » in the side bar).",
     "ToCraftList": "Craftable ({0}) → « {1} »",
     "ToCraftListTip": "Adds the missing pieces that have a recipe to the chosen crafting list (Preparation page), one of each.",
     "InDresser": "in the dresser",

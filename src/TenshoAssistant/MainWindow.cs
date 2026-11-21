@@ -172,6 +172,8 @@ internal sealed partial class MainWindow : Window, IDisposable
         this.textures = textures;
         this.gameGui = gameGui;
         // 0.327 (queue step e): Home as before, or the last page used when that setting is on (developerMode is known here).
+        // X-601 (0.1681, R02.3): the folded categories saved by an older version: those that are still categories keep their fold.
+        configuration.NavigationCollapsed = TenshoAssistant.UI.PageFamilies.KeepFolded(configuration.NavigationCollapsed, TenshoAssistant.UI.PageFamilies.SideBarCategories);
         page = InitialPage();
         Size = new Vector2(1040, 700);
         SizeCondition = ImGuiCond.FirstUseEver;
@@ -407,11 +409,17 @@ internal sealed partial class MainWindow : Window, IDisposable
         // and the Gold Saucer are now direct entries, the sub-pages of crafting, gathering and collections stay in their own tab bar.
         // 0.470 (TEMPLATES-001): the pages and their order come from one list, MainWindow.Pages.cs.
         // X-220 (0.1230): one search over pages, items, quests and maps, above the list.
+        var afterCategory=false;
         DrawQuickSearch();
         foreach(var group in PageGroups)
+        {
+            // X-601 (0.1681): the flat entries that follow a category are set apart from its pages.
+            if(group.Category is null && afterCategory){ImGui.Spacing();ImGui.Separator();}
+            afterCategory=group.Category is not null;
             if(group.Category is null || NavigationCategory(group.Category,group.Pages))
                 foreach(var entry in group.Entries)
                     if(FamilyTarget(entry.Page) is { } target)Navigation(entry.Label!(),entry.Page,target);
+        }
         ImGui.Spacing();
         ImGui.Separator();
         // 0.1038 (T-0.912-1): the theme's text colour, readable in the light theme too.

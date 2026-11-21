@@ -72,5 +72,28 @@ public static class PageFamilies
         return saved.Count(known.Contains)==saved.Count ? saved:new HashSet<string>(saved.Where(known.Contains),StringComparer.Ordinal);
     }
 
+    /// <summary>X-601 (0.1681, D-199): the categories the side bar still draws as a folding header; every other entry is listed flat.</summary>
+    public static readonly IReadOnlySet<string> SideBarCategories=new HashSet<string>(StringComparer.Ordinal){"Tracking"};
+
+    /// <summary>The side bar category of a page's group: itself when the side bar still has it, else null (listed flat).</summary>
+    public static string? SideBarCategory(string? category)=>category is not null && SideBarCategories.Contains(category) ? category:null;
+
+    /// <summary>The entries that follow each other under the same key, as groups in the order of the list (a key can come back later).</summary>
+    public static IReadOnlyList<(string? Key,T[] Items)> Runs<T>(IReadOnlyList<T> entries,Func<T,string?> key)
+    {
+        var runs=new List<(string? Key,T[] Items)>();
+        var current=new List<T>();
+        string? currentKey=null;
+        foreach(var entry in entries)
+        {
+            var entryKey=key(entry);
+            if(current.Count>0 && !string.Equals(entryKey,currentKey,StringComparison.Ordinal)){runs.Add((currentKey,current.ToArray()));current.Clear();}
+            currentKey=entryKey;
+            current.Add(entry);
+        }
+        if(current.Count>0)runs.Add((currentKey,current.ToArray()));
+        return runs;
+    }
+
     private static bool Same<T>(T left,T right) where T:struct=>EqualityComparer<T>.Default.Equals(left,right);
 }

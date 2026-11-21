@@ -17,7 +17,6 @@ internal sealed partial class MainWindow
 
     private void DrawCredits()
     {
-        Heading(localization.Get("Credits.Title"),localization.Format("Credits.Count",CreditCatalog.All.Count));
         ImGui.TextWrapped(localization.Get("Credits.Intro"));
         ImGui.SetNextItemWidth(Math.Min(320,ImGui.GetContentRegionAvail().X));
         ImGui.InputTextWithHint("###CreditsFilter",localization.Get("Credits.Filter"),ref creditsFilter,60);

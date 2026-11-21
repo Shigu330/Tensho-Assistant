@@ -12,7 +12,6 @@ internal sealed partial class MainWindow
     private string? requestedSettingsTab;
     private void DrawSettings()
     {
-        Heading(localization.Get("Settings.Title"),localization.Get("Settings.Description"));
         DrawSettingsSearch();
         settingFocus.Tick();
         // X-507: while the setting a search chose is looked for, the headers and tree nodes around it are not folded; X-521 M1: given back

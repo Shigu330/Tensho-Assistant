@@ -35,6 +35,21 @@ and the help text of each page (the « ? » beside its title):
 |---|---|---|
 | — | **Home** | An overview: one tile per main tool with its live state, the next alarm, running calculations and errors. |
 |  | **My tools** | Build your own small pages from Tensho's blocks, without code, or install those shared by the community. |
+| Progression | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wishlist. |
+|  | **Blue magic** | The blue mage's spells, known or not, with the monsters that teach them. |
+|  | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
+|  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
+|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that unlock the others. |
+|  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
+|  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
+|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
+|  | **Quests** | The quests of the game with your progress, their rewards and their chains. |
+|  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
+|  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
+|  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
+|  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
+|  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
+|  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
 | Items | **Items** | Find an item and see its item page: how to get it, your stocks, crafting, uses, gathering, market, your note. |
 |  | **Storage** | Where your items are: character, retainers, saddlebags, armoury, glamour dresser, armoire, company chest; also crystals, currencies with what they buy, a gil journal, a report of what could free space, and your other characters. |
 |  | **Inventory sorting** | Preview a sorting rule, then apply it to your storage. Nothing moves until you click. |
@@ -60,28 +75,13 @@ and the help text of each page (the « ? » beside its title):
 |  | **Reminders** | The game's timers and counters, with « done » boxes: daily and weekly tasks, retainers, voyages, roulettes, squadron, character status, your own tasks. |
 |  | **Garden** | Your beds and pots with their reminders, and seed crossbreeds with a planting plan. |
 |  | **Free Company** | Submersibles and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
-| Progression | **Quests** | The quests of the game with your progress, their rewards and their chains. |
-|  | **Guildleves** | Guildleves and tradecraft leves, with your allowances, what is done and what is accepted. |
-|  | **Events** | The seasonal events running now, with their quests, what you have done and their shops. |
-|  | **Allied Societies** | Each allied society: your rank and reputation, its place and its currency. |
-|  | **Grand Companies** | Your rank and seals in each Grand Company, the next promotion, and what seals buy. |
-|  | **Collections** | Mounts, minions, emotes, cards, orchestrion rolls, titles, achievements, hairstyles and more, with what you own and how to get the rest; also your wishlist. |
-|  | **Blue magic** | The blue mage's spells, known or not, with the monsters that teach them. |
-|  | **Masked Carnivale** | The stages of the Masked Carnivale, done or left, with their enemies and times. |
-|  | **Beastmaster** | The beastmaster's beasts, with their attributes at a chosen rank, and the boards of the Crucible of the Unbroken with their enemies and bonuses. |
-|  | **Chocobo** | Your companion chocobo: what it wears, the bardings unlocked and the items that unlock the others. |
-|  | **Hunting Log** | Your hunting logs: rank, monsters and kills, for your class and grand company. |
-|  | **Gear** | Plan your gear in the style of the Character window: worn pieces, materia, real and planned stats, upgrades, your game gear sets, wear and spiritbond. |
-|  | **Relics** | Relic weapons and armour, the stages you hold and the Trials of the Braves book in progress. |
-|  | **Special deliveries** | The delivery quest lines of crafters and gatherers: Crystarium, Studium and Wachumeqimeqi, done or left. |
-|  | **Custom Deliveries** | Your custom delivery clients: rank, points and what each one still takes this week; and each client's rewards, from the game's sheets. |
 | Content | **Eureka and Bozja** | Where FATEs, skirmishes and critical engagements take place in these zones, the field records and the lost actions. |
 |  | **Deep Dungeons** | Prepare before going in: the floors, their state, the items of each dungeon and what its coffers give. |
 | Gold Saucer | **Fashion Report** | This week's theme and categories, what you own for each, and the equipment reported by the community. |
 |  | **Triple Triad** | Your cards, decks, a simulator, NPCs with their availability and the cards you lack. With the observation on, advice during a match. |
 |  | **Mini Cactpot** | The best cell to reveal and the best line of a ticket. You always choose yourself. |
-| References | **Lexicon** | Look up in-game terms in French and in English: items, actions, places, monsters, quests and the interface's own words. |
-|  | **Help** | All of Tensho's help: search it, read the frequent questions, or open a page. The « ? » beside the title explains the page you are on. |
+| References | **Help** | All of Tensho's help: search it, read the frequent questions, or open a page. The « ? » beside the title explains the page you are on. |
+|  | **Lexicon** | Look up in-game terms in French and in English: items, actions, places, monsters, quests and the interface's own words. |
 |  | **Credits** | Who Tensho owes its data and libraries to, with their licences. |
 | Preferences | **Settings** | All of Tensho's options, grouped by domain. Each has a tooltip, and the reset button (curved arrow) next to a changed option puts it back to its default. |
 |  | **Diagnostics** *(developer mode only)* | For checks and bug reports, in developer mode: what is loaded, what Tensho read, draw times, and the self-check. |
@@ -235,6 +235,21 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |---|---|---|
 | — | **Accueil** | Une vue d'ensemble : une tuile par outil principal avec son état, la prochaine alarme, les calculs en cours et les erreurs. |
 |  | **Mes outils** | Construisez vos petites pages avec les blocs de Tensho, sans code, ou installez celles de la communauté. |
+| Progression | **Collections** | Montures, mascottes, emotes, cartes, rouleaux d'orchestrion, titres, hauts faits, coiffures et plus, avec ce que vous avez et comment obtenir le reste ; aussi votre liste de souhaits. |
+|  | **Magie bleue** | Les sorts du mage bleu, connus ou non, avec les monstres qui les enseignent. |
+|  | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
+|  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
+|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
+|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
+|  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
+|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
+|  | **Quêtes** | Les quêtes du jeu avec votre progression, leurs récompenses et leurs enchaînements. |
+|  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
+|  | **Événements** | Les événements saisonniers en cours, avec leurs quêtes, ce que vous avez fait et leurs boutiques. |
+|  | **Peuples alliés** | Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie. |
+|  | **Grandes compagnies** | Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent. |
+|  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
+|  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
 | Objets | **Objets** | Trouvez un objet et voyez sa fiche : comment l'obtenir, vos stocks, l'artisanat, les usages, la récolte, le marché, votre note. |
 |  | **Rangements** | Où sont vos objets : personnage, servants, sacoches, arsenal, coiffeuse mirage, bahut personnel, coffre de compagnie ; aussi les cristaux, les devises avec ce qu'elles achètent, un journal des gils, un rapport de ce qui pourrait libérer de la place, et vos autres personnages. |
 |  | **Tri de l'inventaire** | Prévisualisez une règle de tri, puis appliquez-la à vos rangements. Rien ne bouge sans votre clic. |
@@ -260,28 +275,13 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Rappels** | Les minuteurs et compteurs du jeu, avec des cases « fait » : tâches du jour et de la semaine, servants, expéditions, missions aléatoires, escouade, état du personnage, vos propres tâches. |
 |  | **Jardinage** | Vos emplacements de potager et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
 |  | **Compagnie libre** | Sous-marins et aéronefs : rang, trajet, retour, trouvailles, meilleurs trajets, montages et l'historique de vos expéditions ; aussi les matériaux des projets de l'atelier, avec un panneau à l'écran. |
-| Progression | **Quêtes** | Les quêtes du jeu avec votre progression, leurs récompenses et leurs enchaînements. |
-|  | **Mandats** | Les mandats et les mandats d'artisanat, avec vos autorisations, ce qui est fait et ce qui est accepté. |
-|  | **Événements** | Les événements saisonniers en cours, avec leurs quêtes, ce que vous avez fait et leurs boutiques. |
-|  | **Peuples alliés** | Chaque peuple allié : votre rang et votre réputation, son lieu et sa monnaie. |
-|  | **Grandes compagnies** | Votre grade et vos sceaux dans chaque grande compagnie, la prochaine promotion et ce que les sceaux achètent. |
-|  | **Collections** | Montures, mascottes, emotes, cartes, rouleaux d'orchestrion, titres, hauts faits, coiffures et plus, avec ce que vous avez et comment obtenir le reste ; aussi votre liste de souhaits. |
-|  | **Magie bleue** | Les sorts du mage bleu, connus ou non, avec les monstres qui les enseignent. |
-|  | **La Grande Mascarade** | Les niveaux de la Grande Mascarade, réussis ou non, avec leurs ennemis et leurs temps. |
-|  | **Dresseur** | Les bêtes du dresseur, avec leurs attributs au rang choisi, et les plateaux du Dédale avec leurs ennemis et leurs bonus. |
-|  | **Chocobo** | Votre compagnon chocobo : ce qu'il porte, les bardes débloquées et les objets qui débloquent les autres. |
-|  | **Bestiaire** | Vos carnets du bestiaire : rang, monstres à vaincre et nombre vaincu, pour votre classe et votre grande compagnie. |
-|  | **Équipement** | Préparez votre équipement dans le style de la fenêtre Personnage : pièces portées, matérias, statistiques réelles et prévues, améliorations, tenues du jeu, usure et symbiose. |
-|  | **Armes antiques** | Les armes antiques et leurs armures, les étapes que vous détenez et le livre des Chroniques du zodiaque en cours. |
-|  | **Livraisons spéciales** | Les quêtes de livraison des artisans et récolteurs : Cristarium, Académie de magie et Bazar aux Mille Perles, faites ou à faire. |
-|  | **Commandes spéciales** | Vos clients des commandes spéciales : rang, points et ce que chacun prend encore cette semaine ; et les récompenses de chaque client, d'après les feuilles du jeu. |
 | Contenus | **Eurêka et Bozja** | Où se tiennent les ALÉA, escarmouches et affrontements cruciaux de ces zones, les rapports du front bozjien et les actions oubliées. |
 |  | **Donjons sans fond** | Pour se préparer avant d'entrer : les étages, leur état, les objets de chaque donjon et ce que donnent ses coffres. |
 | Gold Saucer | **Revue de mode** | Le thème et les catégories de la semaine, ce que vous possédez pour chacune, et l'équipement signalé par la communauté. |
 |  | **Triple Triade** | Vos cartes, vos decks, un simulateur, les PNJ avec leur disponibilité et les cartes qui vous manquent. Avec l'observation activée, des conseils pendant un match. |
 |  | **Mini Cactpot** | La meilleure case à révéler et la meilleure ligne d'un ticket. Vous choisissez toujours vous-même. |
-| Références | **Lexique** | Trouvez un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface. |
-|  | **Aide** | Toute l'aide de Tensho : cherchez-y, lisez les questions fréquentes ou ouvrez une page. Le « ? » à côté du titre explique la page où vous êtes. |
+| Références | **Aide** | Toute l'aide de Tensho : cherchez-y, lisez les questions fréquentes ou ouvrez une page. Le « ? » à côté du titre explique la page où vous êtes. |
+|  | **Lexique** | Trouvez un mot du jeu en français et en anglais : objets, actions, lieux, monstres, quêtes et les mots de l'interface. |
 |  | **Crédits** | À qui Tensho doit ses données et ses bibliothèques, avec leurs licences. |
 | Préférences | **Paramètres** | Toutes les options de Tensho, groupées par domaine. Chacune a son infobulle, et le bouton de retour au défaut (flèche courbe), à côté d'une option changée, la remet par défaut. |
 |  | **Diagnostics** *(mode développeur seulement)* | Pour les vérifications et les rapports de bug, en mode développeur : ce qui est chargé, ce que Tensho a lu, les temps d'affichage et l'auto-contrôle. |

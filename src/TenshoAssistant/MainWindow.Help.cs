@@ -165,7 +165,6 @@ internal sealed partial class MainWindow
 
     private void DrawHelpPage()
     {
-        Heading(localization.Get("PageHelp.HelpTitle"), localization.Get("PageHelp.HelpPurpose"));
         if (ImGui.SmallButton(localization.Get("Guide.Start"))) StartGuide();
         Tip("Guide.StartTip");
         ImGui.SetNextItemWidth(320); ImGui.InputTextWithHint("##HelpQuery", localization.Get("Help.Search"), ref helpQuery, 64); Tip("Help.SearchTip");

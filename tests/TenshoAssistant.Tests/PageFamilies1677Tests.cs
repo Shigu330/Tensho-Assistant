@@ -81,6 +81,11 @@ internal static class PageFamilies1677Tests
         ("Category.Fashion", "Revue de mode", "Fashion Report", "Addon 8819"),
         ("Category.Triad", "Triple Triade", "Triple Triad", "ContentType 32"),
         ("Category.Cactpot", "Mini Cactpot", "Mini Cactpot", "Addon 9358"),
+        ("Navigation.Help", "Aide", "Help", "Addon 7662"),
+        ("Navigation.Settings", "Paramètres", "Settings", "MainCommand 49"),
+        ("Navigation.Garden", "Jardinage", "Gardening", "ItemUICategory 82"),
+        ("Navigation.FreeCompany", "Compagnie libre", "Free Company", "MainCommand 27"),
+        ("Navigation.IslandSanctuary", "Félicité insulaire", "Island Sanctuary", "ContentType 36"),
         // More names: added by each version of X-601, above this line.
     ];
 
@@ -152,6 +157,10 @@ internal static class PageFamilies1677Tests
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.FieldContent,\"Content\",PageLabel(\"Navigation.Duty\"),"), "named « Duty » in the side bar");
             Check(Family("Fashion").SequenceEqual(["Fashion", "TripleTriad", "MiniCactpot"]), "Gold Saucer: " + string.Join(",", Family("Fashion")));
             Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Fashion,\"GoldSaucer\",PageLabel(\"Category.GoldSaucer\"),"), "named « Gold Saucer » in the side bar");
+            Check(Family("Help").SequenceEqual(["Help", "Lexicon", "Credits"]), "Help: " + string.Join(",", Family("Help")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Help,\"References\",PageLabel(\"Navigation.Help\"),"), "named « Help » in the side bar");
+            Check(Family("Settings").SequenceEqual(["Settings", "Diagnostics"]), "Settings: " + string.Join(",", Family("Settings")));
+            Check(Read("src/TenshoAssistant/MainWindow.Pages.cs").Contains("new(Page.Settings,\"Preferences\",PageLabel(\"Navigation.Settings\"),"), "named « Settings » in the side bar");
             // More families: added by each version of X-601, above this line.
         }),
         ("Page families 1677: the side bar, the page header, the quick search and the page places read the families", () =>
@@ -175,6 +184,38 @@ internal static class PageFamilies1677Tests
             var kept = PageFamilies.KeepFolded(new HashSet<string> { "Tracking", "Content", "GoldSaucer" }, ["Tracking"]);
             Check(kept is not null && kept.SetEquals(["Tracking"]), "the category that stays keeps its fold");
             Check(PageFamilies.KeepFolded(new HashSet<string> { "Content" }, ["Tracking"]) is { Count: 0 }, "a choice was made: empty, not the defaults");
+        }),
+        ("Page families 1677: the side bar is flat but for « Tracking », in the order of D-199", () =>
+        {
+            Check(PageFamilies.SideBarCategory("Tracking") == "Tracking" && PageFamilies.SideBarCategory("World") is null && PageFamilies.SideBarCategory(null) is null, "one category left");
+            var runs = PageFamilies.Runs<string>(["a", "b", "T1", "T2", "c", "T3"], name => name.StartsWith('T') ? "Tracking" : null);
+            Check(runs.Count == 4 && runs[0].Key is null && runs[0].Items.SequenceEqual(["a", "b"]) && runs[1].Key == "Tracking" && runs[1].Items.SequenceEqual(["T1", "T2"])
+                  && runs[2].Key is null && runs[2].Items.SequenceEqual(["c"]) && runs[3].Key == "Tracking", "entries that follow each other make a group; a key can come back");
+            Check(PageFamilies.Runs<string>([], _ => null).Count == 0, "an empty list");
+            var list = Read("src/TenshoAssistant/MainWindow.Pages.cs");
+            var entries = Regex.Matches(list, @"^\s*new\(Page\.(\w+),(?:""(\w+)""|null),(?!null,)", RegexOptions.Multiline).Select(match => (Page: match.Groups[1].Value, Category: match.Groups[2].Value)).ToArray();
+            Check(entries.Select(entry => entry.Page).SequenceEqual(["Home", "MyTools", "Collections", "Items", "Wishlist", "CraftSimulation", "Gathering", "IslandSanctuary", "Maps", "Alarms", "Reminders", "Garden", "FreeCompany",
+                "Quests", "SpecialDeliveries", "FieldContent", "Fashion", "Help", "Settings"]), "the side bar: " + string.Join(",", entries.Select(entry => entry.Page)));
+            var groups = PageFamilies.Runs(entries, entry => PageFamilies.SideBarCategory(entry.Category.Length == 0 ? null : entry.Category));
+            Check(groups.Count == 3 && groups[1].Key == "Tracking" && groups[1].Items.Select(entry => entry.Page).SequenceEqual(["Alarms", "Reminders", "Garden", "FreeCompany"]), "« Tracking » keeps its four pages, unchanged");
+            Check(list.Contains("PageFamilies.Runs(PageEntries.Where(entry=>entry.Label is not null).ToArray(),") && list.Contains("PageFamilies.SideBarCategory(entry.Category)"), "the groups of the side bar are read from the list");
+            var window = Read("src/TenshoAssistant/MainWindow.cs");
+            Check(window.Contains("configuration.NavigationCollapsed = TenshoAssistant.UI.PageFamilies.KeepFolded(configuration.NavigationCollapsed, TenshoAssistant.UI.PageFamilies.SideBarCategories);"), "the saved folds are migrated when the window is built");
+            Check(window.Contains("if(group.Category is null && afterCategory){ImGui.Spacing();ImGui.Separator();}"), "the entries after a category are set apart");
+        }),
+        ("Page families 1677: the folds saved by an older version: « Tracking » keeps its state, the categories that are gone leave the set", () =>
+        {
+            // What 0.1676 could have saved: the defaults of then with « Tracking » folded by the player.
+            var saved = new HashSet<string> { "Progression", "Content", "GoldSaucer", "References", "Tracking" };
+            var kept = PageFamilies.KeepFolded(saved, PageFamilies.SideBarCategories);
+            Check(kept is not null && kept.SetEquals(["Tracking"]), "« Tracking » stays folded");
+            var open = PageFamilies.KeepFolded(new HashSet<string> { "Progression", "Content" }, PageFamilies.SideBarCategories);
+            Check(open is { Count: 0 } && !TenshoAssistant.Guide.FirstScreen.Folded(open).Contains("Tracking"), "« Tracking » left open stays open");
+            Check(TenshoAssistant.Guide.FirstScreen.Folded(PageFamilies.KeepFolded(null, PageFamilies.SideBarCategories)).Count == 0, "never chosen: nothing folded");
+            // The saved set goes through the configuration file as Dalamud writes it and comes back the same.
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new TenshoAssistant.Configuration { NavigationCollapsed = kept, LastPage = "HuntingLog", OpenOnLastPage = true });
+            var back = Newtonsoft.Json.JsonConvert.DeserializeObject<TenshoAssistant.Configuration>(json)!;
+            Check(back.NavigationCollapsed is not null && back.NavigationCollapsed.SetEquals(["Tracking"]) && back.LastPage == "HuntingLog", "saved and read back");
         }),
         ("Page families 1677: the names are the game's own, in both languages, each cited in the evidence", () =>
         {
