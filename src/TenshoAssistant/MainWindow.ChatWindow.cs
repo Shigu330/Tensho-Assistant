@@ -270,6 +270,8 @@ internal sealed partial class MainWindow
     private void DrawChatLookSettings()
     {
         var defaults=DefaultConfiguration.Chat;
+        // X-691 M1 and M2 (0.1668, review of 0.1655): the context followed here too, the window closed or hidden, and the profile worn said.
+        DrawChatProfileWorn(ChatOptions);
         BoolSetting("ChatWindow.Show","ChatWindow.ShowTip",()=>configuration.Chat.WindowOpen,value=>{configuration.Chat.WindowOpen=value;if(!value)ChatMessages.Clear();},c=>c.Chat.WindowOpen);
         BoolSetting("ChatWindow.HideInCombat","ChatWindow.HideInCombatTip",()=>configuration.Chat.HideInCombat,value=>configuration.Chat.HideInCombat=value,c=>c.Chat.HideInCombat);
         // X-447 D8 (0.1620): hidden in a cutscene, in a duty.
@@ -558,6 +560,20 @@ internal sealed partial class MainWindow
             if(options.ContextProfiles)chatSelectTab=chatShownTab;
         }
         if(ChatContexts.Follow(options,now))TrySave("Chat window context");
+    }
+
+    /// <summary>
+    /// X-691 M1 (0.1668, review of 0.1655): the context was followed only while the chat window drew its lines: the window closed or hidden in a
+    /// duty, then out of it, a change of the look went into the duty's profile and the look of before came back with the window. The settings
+    /// that change the look follow the context first. M2: while a profile is worn, the sections of the look and the colours say which one,
+    /// and that a change there goes to it.
+    /// </summary>
+    private void DrawChatProfileWorn(ChatSettings options)
+    {
+        FollowChatContext(options);
+        if(ChatContexts.Worn(options) is not { } context)return;
+        ImGui.TextColored(UI.FfxivTheme.Warning,localization.Format("ChatWindow.ProfileWorn",localization.Get("ChatWindow.Context"+context)));
+        TipText(localization.Get("ChatWindow.ProfileWornTip"));
     }
 
     /// <summary>X-447 B13 (0.1655, D-198 a): each context's look and tabs, under the tabs' settings.</summary>
@@ -1060,6 +1076,7 @@ internal sealed partial class MainWindow
 
     private void DrawChatColorSettings(ChatSettings options)
     {
+        DrawChatProfileWorn(options);
         EmptyState("ChatWindow.ColorsHelp");
         foreach(var channel in ChatChannels.All)
         {

@@ -63,6 +63,9 @@ public static class ChatContexts
         return true;
     }
 
+    /// <summary>X-691 M2 (0.1668): the context whose look the window wears now (its changes of the look go to that profile), else null.</summary>
+    public static ChatContext? Worn(ChatSettings settings)=>settings.ContextProfiles && settings.ProfileApplied!=ChatContext.None ? settings.ProfileApplied:null;
+
     /// <summary>The tab is shown in that profile's context (no profile, or no list: every tab).</summary>
     public static bool ShowsTab(ChatContextProfile? profile,ChatTabSettings tab)
         =>profile?.Tabs is not { } names || names.Contains(tab.Name,StringComparer.OrdinalIgnoreCase);

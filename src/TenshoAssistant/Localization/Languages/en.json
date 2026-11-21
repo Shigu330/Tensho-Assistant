@@ -6504,6 +6504,8 @@
     "ContextCrafting": "Crafting",
     "ContextTown": "In a city",
     "ContextNow": "(now)",
+    "ProfileWorn": "Look of the profile « {0} » worn now: the changes here go to it.",
+    "ProfileWornTip": "While you are in this context, the window wears its profile's look. A change of the look or the colours made now is kept for this context only; the window's own look comes back when you leave it. To change the window's own look, leave the context first, or turn off « Profiles by context ».",
     "ContextLookOwn": "Look: its own",
     "ContextLookWindow": "Look: the window's",
     "ContextUseLook": "Use the current look here",

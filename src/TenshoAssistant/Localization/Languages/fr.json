@@ -6504,6 +6504,8 @@
     "ContextCrafting": "En artisanat",
     "ContextTown": "En ville",
     "ContextNow": "(maintenant)",
+    "ProfileWorn": "Aspect du profil « {0} » porté maintenant : les changements faits ici vont à lui.",
+    "ProfileWornTip": "Tant que vous êtes dans ce contexte, la fenêtre porte l'aspect de son profil. Un changement de l'aspect ou des couleurs fait maintenant est gardé pour ce contexte seulement ; l'aspect propre de la fenêtre revient quand vous en sortez. Pour changer l'aspect propre de la fenêtre, sortez d'abord du contexte, ou coupez « Profils par contexte ».",
     "ContextLookOwn": "Aspect : le sien",
     "ContextLookWindow": "Aspect : celui de la fenêtre",
     "ContextUseLook": "Prendre l'aspect actuel ici",
