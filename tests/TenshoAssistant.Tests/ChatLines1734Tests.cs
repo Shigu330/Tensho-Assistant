@@ -121,7 +121,7 @@ internal static class ChatLines1734Tests
             Check(players.Contains("public void Prepare()=>actionTips??=Task.Run(ActionTips);", StringComparison.Ordinal)
                 && players.Contains("ChatChannels.From((int)row.LogKind.RowId)==ChatChannel.Combat", StringComparison.Ordinal)
                 && players.Contains("data.Language!=Dalamud.Game.ClientLanguage.Japanese", StringComparison.Ordinal), "the templates of the combat kinds, the client's language");
-            Check(players.Contains("framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt),delayTicks:1);", StringComparison.Ordinal)
+            Check(players.Contains("framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt,fresh),delayTicks:1);", StringComparison.Ordinal)
                 && players.Contains("if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;", StringComparison.Ordinal), "read again in the next frames; never after unload, during a cut or logged out");
             Check(players.Contains("strings.EvaluateFromAddon(1017,", StringComparison.Ordinal) && players.Contains("strings.EvaluateFromAddon(1016,", StringComparison.Ordinal), "the game's words, evaluated by Dalamud");
             var window = Read("MainWindow.ChatWindow.cs");

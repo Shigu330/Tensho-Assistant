@@ -225,9 +225,9 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
     /// <summary>X-733 (0.1734): reads into <paramref name="param"/> the Param of <paramref name="status"/> on the player named (name and home
     /// world), or on you (<paramref name="name"/> null): now, or in the next frames (on the game's thread); another player's half a second at
     /// most after the line (X-762, D-208).</summary>
-    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64);
+    public void StatusParam(ChatStatusParam param,uint status,string? name,ushort world)=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64,false);
 
-    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine,long lineAt)
+    private void ReadStatus(ChatStatusParam param,uint status,string? name,ushort world,int frame,ushort atLine,long lineAt,bool fresh)
     {
         if(disposed || statusFailed || TenshoAssistant.Competitive.CompetitiveGate.Cut || !client.IsLoggedIn)return;
         try
@@ -235,22 +235,57 @@ internal sealed unsafe class ChatPlayerActions : IDisposable,IChatLineData
             var elapsed=Environment.TickCount64-lineAt;
             // X-762 (review of 0.1746, I2; D-208, the owner's choice of 21/11 at about 8:15 pm): another player's status is read half a second
             // at most after its line (what D-207 was asked on); past it, never read again: no bonus rather than an older meal.
-            if(name is not null && !ChatStatusWatch.OtherMayRead(elapsed)){StatusSaid(ChatStatusWatch.OtherEnd(atLine).How);return;}
+            if(name is not null && !ChatStatusWatch.OtherMayRead(elapsed)){var end=ChatStatusWatch.OtherEnd(atLine,fresh);if(end.Value!=0)param.Value=end.Value;StatusSaid(end.How);return;}
             var character=name is null ? objects.LocalPlayer:objects.OfType<IPlayerCharacter>().FirstOrDefault(found=>found.Name.TextValue==name && found.HomeWorld.RowId==world);
             if(character is null){StatusSaid("the one who gained it is not in range");return;}
-            ushort seen=0;
+            ushort seen=0;float remaining=0;var extended=false;
             foreach(var held in character.StatusList)
-                if(held.StatusId==status && held.Param!=0){seen=held.Param;break;}
+            {
+                if(seen==0 && held.StatusId==status && held.Param!=0){seen=held.Param;remaining=held.RemainingTime;}
+                if(ChatStatusWatch.ExtendsMeals(held.StatusId))extended=true;
+            }
             if(frame==0)atLine=seen;
-            var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed);
+            // X-766 (review of 0.1751, X-764 M2; D-211, the owner's choice of 21/11 at about 10:30 pm, R04): another player's Well Fed status
+            // held at its line is the line's when its remaining time is the meal's full duration (put on just before the line).
+            if(frame==0 && name is not null && status==Craft.CraftConsumables.WellFed && seen!=0)fresh=MealPutOnAtLine(seen,remaining,extended);
+            var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed,fresh);
             if(read.Over){if(read.Value!=0)param.Value=read.Value;StatusSaid(read.How);if(read.Value!=0 && read.Value!=atLine)StatusLate(frame,elapsed);return;}
-            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt),delayTicks:1);
+            framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt,fresh),delayTicks:1);
         }
         catch(Exception error)
         {
             statusFailed=true;
             log.Warning(error,"Chat window, a meal's status could not be read (maybe after a game update): its tooltip shows the status's description only, until the plugin reloads.");
         }
+    }
+
+    // X-766 (D-211): each meal's full duration by its Param (ItemAction, read once); null when unreadable (then no meal is taken as put on
+    // at its line: as before). The gap between the full duration and the remaining time at the line, the closest seen, is said in the log:
+    // what ChatStatusWatch.FreshSeconds must cover, measured in game.
+    private IReadOnlyDictionary<ushort,int>? mealDurations;
+    private bool mealDurationsRead;
+    private float mealGapSaid=float.MaxValue;
+    private bool MealPutOnAtLine(ushort param,float remaining,bool extended)
+    {
+        if(!mealDurationsRead)
+        {
+            mealDurationsRead=true;
+            try
+            {
+                mealDurations=ChatStatusWatch.MealDurations(data.GetExcelSheet<Lumina.Excel.Sheets.ItemAction>().Where(row=>row.Data.Count>=3 && row.DataHQ.Count>=3)
+                    .SelectMany(row=>new[]{((uint)row.Data[0],(uint)row.Data[1],(uint)row.Data[2],false),((uint)row.DataHQ[0],(uint)row.DataHQ[1],(uint)row.DataHQ[2],true)}));
+                log.Information("Chat window, the meals' full durations read for another player's meal: {0} Params, {1}.",mealDurations.Count,
+                    string.Join(", ",mealDurations.Values.GroupBy(seconds=>seconds).OrderBy(group=>group.Key).Select(group=>$"{group.Count()} of {group.Key} s")));
+            }
+            catch(Exception error){log.Warning(error,"Chat window, the meals' durations could not be read (maybe after a game update): another player's meal put on before its line shows no bonus.");}
+        }
+        var full=mealDurations?.GetValueOrDefault(param) ?? 0;
+        if(full>0 && !extended && Math.Abs(full-remaining)<mealGapSaid)
+        {
+            mealGapSaid=Math.Abs(full-remaining);
+            log.Information("Chat window, another player's meal held at its line {0:F1} s from its full duration ({1} s): the closest seen since the plugin loaded (taken as put on just before its line within {2} s).",full-remaining,full,ChatStatusWatch.FreshSeconds);
+        }
+        return ChatStatusWatch.PutOnAtLine(remaining,full,extended);
     }
 
     private void StatusSaid(string how)

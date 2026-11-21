@@ -40,9 +40,9 @@ internal static class MealWatch1744Tests
         ("Meal watch 1744: wiring: the reader gives the time since the line and logs the longest delay seen, each time it grows", () =>
         {
             var players = File.ReadAllText(Path.GetFullPath("src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs")).ReplaceLineEndings("\n");
-            Check(players.Contains("=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64);", StringComparison.Ordinal)
+            Check(players.Contains("=>ReadStatus(param,status,name,world,0,0,Environment.TickCount64,false);", StringComparison.Ordinal)
                 && players.Contains("var elapsed=Environment.TickCount64-lineAt;", StringComparison.Ordinal)
-                && players.Contains("framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt),delayTicks:1);", StringComparison.Ordinal), "the time since the line");
+                && players.Contains("framework.RunOnTick(()=>ReadStatus(param,status,name,world,frame+1,atLine,lineAt,fresh),delayTicks:1);", StringComparison.Ordinal), "the time since the line");
             Check(players.Contains("if(read.Value!=0 && read.Value!=atLine)StatusLate(frame,elapsed);return;}", StringComparison.Ordinal)
                 && players.Contains("if(elapsed<=statusLateMs)return;", StringComparison.Ordinal) && players.Contains("the longest seen since the plugin loaded", StringComparison.Ordinal), "the longest delay, once per new longest");
         }),

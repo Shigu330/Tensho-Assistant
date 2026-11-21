@@ -55,17 +55,61 @@ public static class ChatStatusWatch
     /// <summary>
     /// X-762 (D-208): the watch of another player's status. A Param that differs from the one held at the line is the line's; at half a
     /// second the watch ends: a Param unchanged since the line may be an older meal still held, the line's put on later, so no bonus rather
-    /// than an older meal (the same meal eaten again shows none either); none: not found.
+    /// than an older meal, unless it was put on just before the line (<paramref name="fresh"/>, X-766, D-211); none: not found.
     /// </summary>
-    public static (bool Over,ushort Value,string How) Other(ushort atLine,ushort seen,long elapsedMs)
+    /// <param name="fresh">X-766 (D-211): the Well Fed status held at the line was at its full duration (<see cref="PutOnAtLine"/>).</param>
+    public static (bool Over,ushort Value,string How) Other(ushort atLine,ushort seen,long elapsedMs,bool fresh=false)
     {
         if(seen!=0 && seen!=atLine)return (true,seen,atLine==0 ? "another player's, put on after its line":"another player's, changed after its line (an older one held at the line)");
-        return elapsedMs<OtherMs ? (false,(ushort)0,""):OtherEnd(atLine);
+        return elapsedMs<OtherMs ? (false,(ushort)0,""):OtherEnd(atLine,fresh);
     }
 
-    /// <summary>X-762: the end of another player's watch, at half a second or at the first frame past it (then nothing is read).</summary>
-    public static (bool Over,ushort Value,string How) OtherEnd(ushort atLine)=>
-        (true,(ushort)0,atLine!=0 ? "another player's, unchanged for half a second: no bonus (maybe an older meal)":"another player's, not found within half a second");
+    /// <summary>X-762: the end of another player's watch, at half a second or at the first frame past it (then nothing is read). X-766
+    /// (D-211): a meal held at its line at its full duration is the line's (<paramref name="fresh"/>).</summary>
+    public static (bool Over,ushort Value,string How) OtherEnd(ushort atLine,bool fresh=false)=>
+        atLine!=0 && fresh ? (true,atLine,"another player's, held at its line at its full duration: put on just before it")
+        :(true,(ushort)0,atLine!=0 ? "another player's, unchanged for half a second: no bonus (maybe an older meal)":"another player's, not found within half a second");
+
+    /// <summary>X-766 (D-211): how many seconds below its full duration another player's Well Fed status may be at its line and still be
+    /// the line's (put on just before it). Kept short: an older meal is that close to its full duration only if eaten that many seconds
+    /// before the line; the gap seen in game is written in the log.</summary>
+    public const float FreshSeconds=3;
+
+    /// <summary>
+    /// X-766 (D-211, the owner's choice of 21/11/2026 at about 10:30 pm, R04): whether another player's Well Fed status held when its line
+    /// arrives was put on just before it: its remaining time is the meal's full duration (<paramref name="fullSeconds"/>, its ItemAction:
+    /// 1800 s for every meal, docs/evidence/0.1739-meal-status-gained.md) down to <see cref="FreshSeconds"/> below it. Not when a
+    /// meal-duration extension is held (<see cref="ExtendsMeals"/>: its length is not read; an older meal could then sit at 1800 s), nor
+    /// past the full duration (the same meal eaten again adds its time, up to 60 minutes by the item's help: an older meal may be held).
+    /// Unknown duration (0): never.
+    /// </summary>
+    public static bool PutOnAtLine(float remaining,int fullSeconds,bool extended)=>
+        fullSeconds>0 && !extended && remaining<=fullSeconds+0.5f && remaining>=fullSeconds-FreshSeconds;
+
+    /// <summary>X-766: the statuses that lengthen a meal's effect (Status 360 « Meat and Mead », the company action, by 5, 10 or 15 minutes
+    /// by its items' help; 1084 « Rationing », the Grand Company manuals, by 15 minutes; both « Food effect duration is increased. », the
+    /// only two, read on 21/11/2026).</summary>
+    public static bool ExtendsMeals(uint status)=>status is 360 or 1084;
+
+    /// <summary>
+    /// X-766: the full duration of a meal's Well Fed status by its Param (the ItemFood row, plus 10000 for HQ), from the ItemAction rows:
+    /// status (Data[0], 48 for a meal), ItemFood row (Data[1]) and seconds (Data[2]), the same three in DataHQ for the HQ item. A Param given
+    /// two different durations has none (unknown); a duration of 0 is not one.
+    /// </summary>
+    public static IReadOnlyDictionary<ushort,int> MealDurations(IEnumerable<(uint Status,uint Row,uint Seconds,bool Hq)> actions)
+    {
+        var durations=new Dictionary<ushort,int>();
+        var unclear=new HashSet<ushort>();
+        foreach(var (status,row,seconds,hq) in actions)
+        {
+            if(status!=Craft.CraftConsumables.WellFed || seconds==0 || row==0 || row>=10000)continue;
+            var param=(ushort)(hq ? row+10000:row);
+            if(durations.TryGetValue(param,out var known) && known!=(int)seconds)unclear.Add(param);
+            durations[param]=(int)seconds;
+        }
+        foreach(var param in unclear)durations.Remove(param);
+        return durations;
+    }
 }
 
 /// <summary>X-733 (0.1734): one bonus of an ItemFood row: the attribute's name (BaseParam, the client's language), relative (a percent, capped)

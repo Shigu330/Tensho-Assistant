@@ -67,10 +67,10 @@ internal static class MealOther1748Tests
         ("Meal other 1748: wiring: the reader stops another player's watch before reading anything past half a second; rule 5 and the evidence say how long, both halves", () =>
         {
             var players = Read("src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs");
-            var stop = players.IndexOf("if(name is not null && !ChatStatusWatch.OtherMayRead(elapsed)){StatusSaid(ChatStatusWatch.OtherEnd(atLine).How);return;}", StringComparison.Ordinal);
+            var stop = players.IndexOf("if(name is not null && !ChatStatusWatch.OtherMayRead(elapsed)){var end=ChatStatusWatch.OtherEnd(atLine,fresh);if(end.Value!=0)param.Value=end.Value;StatusSaid(end.How);return;}", StringComparison.Ordinal);
             var look = players.IndexOf("var character=name is null ? objects.LocalPlayer", StringComparison.Ordinal);
             Check(stop > 0 && look > stop, "the limit checked before the player is looked for");
-            Check(players.Contains("var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed);", StringComparison.Ordinal), "another player's own watch");
+            Check(players.Contains("var read=name is null ? ChatStatusWatch.Next(atLine,seen,frame,elapsed):ChatStatusWatch.Other(atLine,seen,elapsed,fresh);", StringComparison.Ordinal), "another player's own watch");
             var publishing = Read("docs/project/PUBLISHING.md");
             Check(publishing.Contains("reads that player's status when the line arrives and for half a second at most after it (D-208,", StringComparison.Ordinal)
                 && publishing.Contains("lit le statut de ce joueur à l'arrivée de la ligne et une demi-seconde au plus après elle (D-208,", StringComparison.Ordinal), "rule 5, en and fr");
