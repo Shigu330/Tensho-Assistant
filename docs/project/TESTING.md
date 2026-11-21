@@ -2427,6 +2427,24 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1664) Fenêtre de chat : survoler un objet lié (par exemple un cristal ou un agrégat) : nom en haut, description du jeu, puis collection, stock, prix de vente aux PNJ, usages et « Comment l'obtenir » comme dans l'info-bulle d'objet de Tensho, la ligne des clics en bas ; comparer avec le survol du même objet dans l'inventaire.
 
+- [ ] (0.1665) Chat de Tensho, profils par contexte : dans un contexte qui a un profil (en ville par exemple), glisser un onglet : hors du contexte, l'ordre de la fenêtre n'a pas changé ; revenir dans le contexte : l'ordre du profil est gardé, aussi après un rechargement
+
+- [ ] (0.1665) Chat de Tensho : clic droit sur un joueur dans un message Hurler, puis de compagnie libre, puis de linkshell : « Répondre avec le même mode » est actif, et la zone de saisie du jeu passe sur ce canal (la bonne linkshell)
+
+- [ ] (0.1666) Chat de Tensho en équipe (et si possible en alliance) : les noms des membres sont à la couleur de leur rôle (tank bleu, soigneur vert, DPS rouge) et ont l'icône de leur classe devant, comme dans le chat du jeu ; un joueur proche qui parle en Dire aussi ; un joueur loin et hors équipe : ni icône ni couleur de rôle
+
+- [ ] (0.1666) Chat de Tensho, réglages : couper « Nom à la couleur du rôle du joueur » puis « Icône de la classe devant le nom » : la couleur puis l'icône disparaissent ; en mode capture, l'icône et la couleur restent mais le nom est remplacé
+
+- [ ] (0.1667) Ouvrir un servant, puis sa liste de vente : dans le panneau de Tensho à côté, cliquer « 20 meilleurs à vendre » : la liste de l'inventaire du servant, triée par total après taxe, avec prix unitaire, source et date ; cliquer « Demander à Universalis » : les prix inconnus se remplissent ; comparer deux ou trois prix avec le tableau des ventes du jeu
+
+- [ ] (0.1667) Même liste : un objet que le marché ne prend pas (objet de quête, intransférable) n'y est pas ; un objet sans prix connu est compté en bas comme « inconnu », jamais à 0 ; changer de servant dans la liste déroulante
+
+- [ ] (0.1668) Chat de Tensho, profils par contexte avec un aspect pour « En ville » : en ville, ouvrir les réglages Apparence : la ligne « Aspect du profil « En ville » porté maintenant » s'affiche ; fermer la fenêtre de chat, sortir de la ville, changer l'opacité dans les réglages, rouvrir la fenêtre : le changement est gardé
+
+- [ ] (0.1669) Survoler un objet dans l'aperçu du rangement (tri), une récompense d'événement et un appât de la pêche : l'info-bulle commune de l'objet (catégorie, niveau, usages, comment l'obtenir), avec l'emplacement et la quantité en bas pour le rangement, la remontée et le clic droit pour l'appât, sans le nom écrit deux fois
+
+- [ ] (0.1670) Survoler une quête dans la page Quêtes, dans les sources d'un objet (onglet des quêtes qui le donnent) et un lien de quête dans le chat de Tensho : la même info-bulle (icône, section et genre, niveau, zone, extension, avancement), avec « Clic gauche… » en bas pour le chat
+
 **0.535 : interfaces** — à voir en jouant
 
 - [x] Carte › Paramètres : « Sans barre de titre » : plus de barre ; elle se déplace par sa colonne d'outils et se ferme avec la touche de la carte. Le déplacement par la colonne reste à confirmer.
