@@ -86,11 +86,12 @@ internal sealed partial class MainWindow
         if(!same){pageTabGeneration++;pageTabs.Reset();}
     }
 
-    /// <summary>X-605 (0.1697): every family's tabs back in the list's order (a new bar, the page shown kept).</summary>
+    /// <summary>X-605 (0.1697): every family's tabs back in the list's order (a new bar, the page shown kept). 0.1698: and every detail bar's.</summary>
     private void ResetTabOrders()
     {
         configuration.TabOrders=new Dictionary<string,List<string>>();
         pageTabGeneration++;pageTabs.Reset();
+        foreach(var drag in tabBarDrags.Values)drag.Renew();
         TrySave("TabOrders");
     }
 }

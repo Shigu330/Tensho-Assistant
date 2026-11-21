@@ -124,7 +124,7 @@ Français : nommage : `<version>-<sujet>.<ext>` avec la version à deux nombres 
 | [0.168.0-triad-sources-probe.log](0.168.0-triad-sources-probe.log) | `src/TenshoAssistant/MiniGames/TriadNpcCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.1685-fishing-bite-stopwatch.md](0.1685-fishing-bite-stopwatch.md) | `src/TenshoAssistant/Gathering/FishingStopwatch.cs`, `tests/TenshoAssistant.Tests/FishingBite1685Tests.cs`, `tests/TenshoAssistant.Tests/Review1686Fixes1687Tests.cs` | `docs/changelog/CHANGELOG-0.1600-0.1699.md` |
 | [0.1688-chat-player-menu-far.md](0.1688-chat-player-menu-far.md) | `src/TenshoAssistant/Chat/ChatPlayerActions.Dalamud.cs`, `src/TenshoAssistant/Chat/ChatSources.cs`, `tests/TenshoAssistant.Tests/ChatPlayerMenu1688Tests.cs` | — |
-| [0.1697-reorderable-tabs.md](0.1697-reorderable-tabs.md) | `src/TenshoAssistant/UI/TabOrder.cs` | — |
+| [0.1697-reorderable-tabs.md](0.1697-reorderable-tabs.md) | `src/TenshoAssistant/UI/TabBarDrag.cs`, `src/TenshoAssistant/UI/TabOrder.cs` | — |
 | [0.171.0-cosmic-vendors-probe.log](0.171.0-cosmic-vendors-probe.log) | `tests/TenshoAssistant.Tests/MapProjectionTests.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.174.0-triad-seldeck-capture.log](0.174.0-triad-seldeck-capture.log) | — | `docs/changelog/CHANGELOG-0.100-0.199.md` |
 | [0.175.0-auxesia-maps-probe.log](0.175.0-auxesia-maps-probe.log) | `src/TenshoAssistant/Maps/MapCatalog.cs` | `docs/changelog/CHANGELOG-0.100-0.199.md` |

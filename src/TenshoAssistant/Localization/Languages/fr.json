@@ -1048,7 +1048,7 @@
   },
   "Settings": {
     "TabOrderReset": "Remettre les onglets des pages dans l'ordre",
-    "TabOrderResetTip": "Les onglets en haut d'une famille de pages (artisanat, récolte, collections, le monde…) se déplacent à la souris ; leur ordre est gardé. Ceci remet chaque famille dans l'ordre de la liste.\nPar défaut : l'ordre de la liste.",
+    "TabOrderResetTip": "Les onglets des pages (en haut d'une famille de pages : artisanat, récolte, collections, le monde… ; dans une page : alarmes, rappels, le jardin, Grandes Compagnies…) se déplacent à la souris ; leur ordre est gardé. Ceci remet chaque barre dans l'ordre de la liste.\nPar défaut : l'ordre de la liste.",
     "TipPartsHelp": "Chaque partie des infobulles de Tensho, par genre, dans les pages et le chat (l'infobulle des objets a sa propre catégorie).",
     "TipPartTip": "Montrée dans les infobulles de Tensho de ce genre. Désactivée : cette partie est laissée de côté.\nPar défaut : activé.",
     "TipKindPlace": "Lieux",

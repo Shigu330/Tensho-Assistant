@@ -1048,7 +1048,7 @@
   },
   "Settings": {
     "TabOrderReset": "Put the pages' tabs back in order",
-    "TabOrderResetTip": "The tabs at the top of a family of pages (crafting, gathering, collections, the world…) can be dragged with the mouse; their order is kept. This puts every family back in the list's order.\nDefault: the list's order.",
+    "TabOrderResetTip": "The tabs of the pages (at the top of a family of pages: crafting, gathering, collections, the world…; inside a page: alarms, reminders, the garden, Grand Companies…) can be dragged with the mouse; their order is kept. This puts every bar back in the list's order.\nDefault: the list's order.",
     "TipPartsHelp": "Each part of Tensho's own tooltips, by kind, in the pages and the chat (the item tooltip has its own category).",
     "TipPartTip": "Shown in Tensho's tooltips of this kind. Off: this part is left out.\nDefault: on.",
     "TipKindPlace": "Places",
