@@ -755,6 +755,7 @@
     "SaleListFooter": "Total = offre la plus basse × quantité, moins la taxe de {0} % sur les ventes d'un servant ({1}). Les objets que le marché ne prend pas sont écartés.",
     "SaleListTaxCity": "le taux de sa ville, tel que le jeu l'a envoyé",
     "SaleListTaxHelp": "le taux de l'aide du jeu : le taux de sa ville cette semaine n'a pas été reçu du jeu",
+    "SaleListTaxTown": "le taux de l'aide du jeu : la ville du marché de ce servant n'a pas été lue",
     "Footer": "Vos prix viennent du jeu. Tensho ne change rien."
   },
   "DiscoveriesUi": {
@@ -5204,7 +5205,7 @@
     "NoProcs": "aucune indication",
     "VisibleCounter": "{0} · compteur affiché : {1}",
     "Extra": "Indication supplémentaire : {0}",
-    "Alternatives": "{0}\n{1} état(s) de combo/historique compatible(s) dans le modèle."
+    "Alternatives": "{0} état(s) de combo/historique compatible(s) dans le modèle."
   },
   "UiFragments": {
     "Footer": "Sacs en direct · Servants et chocobo : enregistrés à l'ouverture (datés)",
@@ -6308,7 +6309,7 @@
   },
   "ChatWindow": {
     "Loading": "Chargement…",
-    "QuestLinkTip": "{0}\nClic gauche : l'ouvre dans la page Quêtes de Tensho.",
+    "QuestLinkTip": "Clic gauche : l'ouvre dans la page Quêtes de Tensho.",
     "CopyLine": "Copier ce message",
     "CopyTab": "Copier tous les messages de cet onglet",
     "SelectText": "Choisir du texte…",
@@ -6340,7 +6341,7 @@
     "WebForeign": "Le nom de ce site contient des lettres d'autres alphabets : il se lit « {0} » et peut imiter un site que vous connaissez.",
     "OpenWeb": "Ouvrir dans le navigateur",
     "CopyWeb": "Copier l'adresse",
-    "MapLinkTip": "{0}\nClic gauche : pose le drapeau à cet endroit et ouvre la carte. Clic droit : menu de lieu de Tensho (éthérite la plus proche avec son coût, carte Tensho, météo).",
+    "MapLinkTip": "Clic gauche : pose le drapeau à cet endroit et ouvre la carte. Clic droit : menu de lieu de Tensho (éthérite la plus proche avec son coût, carte Tensho, météo).",
     "ItemLinkTip": "{0}\nClic gauche : l'ouvre dans Tensho. Clic droit : menu d'objet de Tensho.",
     "ItemLinkTipHq": "{0} (HQ)\nClic gauche : l'ouvre dans Tensho. Clic droit : menu d'objet de Tensho.",
     "DalamudLinkTip": "Ce lien de {0} fait ce qu'il fait dans le chat du jeu.\nClic gauche : l'ouvrir. Clic droit : le menu du message (copier).",

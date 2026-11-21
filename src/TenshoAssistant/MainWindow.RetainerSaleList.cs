@@ -41,9 +41,8 @@ internal sealed partial class MainWindow
         Tip("RetainerSales.SaleListRetainerTip");
         var compare = RetainerSaleListCompare?.State;
         var universalis = compare is { Items: not null } && compare.World == state.HomeWorld ? compare.Items : null;
-        // X-698 M4 (0.1671): the tax of the open retainer's city when the game sent it; another retainer's city is not known here: the help's rate.
-        var cityTax = shown.Key.StorageId == state.RetainerId ? MarketTax.RateFor(MarketTaxRatesSource?.Invoke(), state.Town, DateTimeOffset.UtcNow) : null;
-        var tax = cityTax ?? MarketTax.HelpPercent;
+        // X-698 M4 (0.1671), X-700 M1 (0.1686): the tax of the retainer's city when the game sent the rates, for any retainer whose town was read.
+        var (tax, taxFrom) = MarketTax.ForRetainer(MarketTaxRatesSource?.Invoke(), state.Towns, shown.Key.StorageId, DateTimeOffset.UtcNow);
         var list = RetainerSaleListOf(shown, state, universalis, tax);
         ImGui.SameLine();
         ImGui.BeginDisabled(RetainerSaleListCompare is null || compare is { Loading: true } || !state.AtHome || !SourceOn(SourceUse.UniversalisRetainerCompare) || list.ToAsk.Count == 0);
@@ -96,7 +95,7 @@ internal sealed partial class MainWindow
             finally { ImGui.EndTable(); }
         }
         if (list.Unknown > 0) ImGui.TextDisabled(localization.Format("RetainerSales.SaleListUnknown", list.Unknown));
-        ImGui.TextDisabled(localization.Format("RetainerSales.SaleListFooter", tax, localization.Get(cityTax is null ? "RetainerSales.SaleListTaxHelp" : "RetainerSales.SaleListTaxCity")));
+        ImGui.TextDisabled(localization.Format("RetainerSales.SaleListFooter", tax, localization.Get(taxFrom switch { MarketTax.Source.City => "RetainerSales.SaleListTaxCity", MarketTax.Source.NotReceived => "RetainerSales.SaleListTaxHelp", _ => "RetainerSales.SaleListTaxTown" })));
         ImGui.Separator();
     }
 

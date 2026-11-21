@@ -32,7 +32,7 @@ internal static class PlaceTips1672Tests
             Check(body.Contains("seen.Map==map.MapId && seen.Coordinate==coordinate && seen.Minute==minute && ReferenceEquals(seen.Costs,costs))return seen.Facts;")
                   && body.Split("PlaceTips.Build(").Length==2,"worked out once, then kept");
             Check(Read("src/TenshoAssistant/MainWindow.MapBookmarks.cs").Contains("DrawPlaceTooltip(map!, new Vector2(point.X, point.Y),")
-                  && Read("src/TenshoAssistant/MainWindow.ChatWindow.cs").Contains("DrawPlaceTooltip(map,coordinate,link.Place.Length>0 ? link.Place:null,localization.Format(\"ChatWindow.MapLinkTip\",\"\").Trim());")
+                  && Read("src/TenshoAssistant/MainWindow.ChatWindow.cs").Contains("DrawPlaceTooltip(map,coordinate,link.Place.Length>0 ? link.Place:null,localization.Get(\"ChatWindow.MapLinkTip\"));")
                   && Read("src/TenshoAssistant/MainWindow.ChatMapLinks.cs").Contains("DrawPlaceTooltip(map,new Vector2(link.X,link.Y),")
                   && Read("src/TenshoAssistant/MainWindow.MapLocalLists.cs").Contains("DrawPlaceTooltip(here ? map:target!,new Vector2(point.X,point.Y),name,point.Note);")
                   && Read("src/TenshoAssistant/MainWindow.PlaceDirectory.cs").Contains("DrawPlaceTooltip(districtMap,null,"),"the five places use it");

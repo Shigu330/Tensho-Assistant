@@ -26,4 +26,14 @@ public static class MarketTax
     /// <summary>The city's rate when the game sent it and it still holds; null otherwise (the caller says so and uses the help's rate).</summary>
     public static int? RateFor(MarketTaxRates? rates,byte town,DateTimeOffset now)
         =>rates is not null && town!=0 && now<rates.ValidUntil && rates.ByTown.TryGetValue(town,out var percent) ? percent:null;
+
+    /// <summary>X-700 M1 (0.1686): where a retainer's rate comes from: its city's rate sent by the game, the help's rate because the rates were not received (or no longer hold), or because its city was not read.</summary>
+    public enum Source { City, NotReceived, TownUnknown }
+
+    /// <summary>X-700 M1: the rate of <paramref name="retainer"/>'s city (any retainer whose town was read, not only the open one) and where it comes from; the help's rate otherwise.</summary>
+    public static (int Percent,Source From) ForRetainer(MarketTaxRates? rates,IReadOnlyDictionary<ulong,byte>? towns,ulong retainer,DateTimeOffset now)
+    {
+        if(towns is null || !towns.TryGetValue(retainer,out var town) || town==0)return (HelpPercent,Source.TownUnknown);
+        return RateFor(rates,town,now) is { } percent ? (percent,Source.City):(HelpPercent,Source.NotReceived);
+    }
 }

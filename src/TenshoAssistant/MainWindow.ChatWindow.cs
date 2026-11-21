@@ -2067,7 +2067,7 @@ internal sealed partial class MainWindow
             string Place()=>$"{(link.Place.Length>0 ? link.Place:map.Zone)}  ({Maps.MapProjection.CoordinateText(coordinate)})";
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             // X-684 (0.1672): the one place tooltip, the click's effect under it.
-            if(ImGui.IsItemHovered())DrawPlaceTooltip(map,coordinate,link.Place.Length>0 ? link.Place:null,localization.Format("ChatWindow.MapLinkTip","").Trim());
+            if(ImGui.IsItemHovered())DrawPlaceTooltip(map,coordinate,link.Place.Length>0 ? link.Place:null,localization.Get("ChatWindow.MapLinkTip"));
             if(ChatLinkClicked(id))OpenMapPointFromPage(map,link.X,link.Y);
             if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowPlace=(map,coordinate,Place());ImGui.OpenPopup("###TenshoChatWindowPlace");}
             return;
@@ -2078,7 +2078,7 @@ internal sealed partial class MainWindow
             if(quests.State.ById?.GetValueOrDefault(link.QuestId) is not { } quest){TipText(localization.Get("ChatWindow.LinkUnknownTip"));return;}
             if(ImGui.IsItemHovered())ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
             // X-684 (0.1670): the one quest tooltip, the click's effect under it.
-            if(ImGui.IsItemHovered())DrawQuestTooltip(quest,localization.Format("ChatWindow.QuestLinkTip","").Trim());
+            if(ImGui.IsItemHovered())DrawQuestTooltip(quest,localization.Get("ChatWindow.QuestLinkTip"));
             if(ChatLinkClicked(id)){SelectQuest(quest.Id);page=Page.Quests;IsOpen=true;}
             if(ImGui.IsItemClicked(ImGuiMouseButton.Right)){chatWindowQuest=quest.Name;ImGui.OpenPopup("###TenshoChatQuest");}
             return;

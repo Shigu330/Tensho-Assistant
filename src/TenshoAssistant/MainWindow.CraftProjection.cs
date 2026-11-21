@@ -156,7 +156,7 @@ internal sealed partial class MainWindow
                 {
                     ImGui.TableNextRow();ImGui.TableNextColumn();DrawGameIcon(row.Metadata.Icon,new Vector2(24));ImGui.SameLine();ImGui.TextWrapped(row.Metadata.Name);
                     // X-684 (0.1674): the one action tooltip, the model's alternatives under it.
-                    if(ImGui.IsItemHovered())DrawCraftActionTooltip(row.Metadata,after:localization.Format("LiveDetails.Alternatives","",row.Alternatives).Trim());
+                    if(ImGui.IsItemHovered())DrawCraftActionTooltip(row.Metadata,after:localization.Format("LiveDetails.Alternatives",row.Alternatives));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Progress.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.Quality?.ToString() ?? localization.Get("CraftProjectionUi.Unknown"));
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.Durability.ToString());ImGui.TableNextColumn();ImGui.TextUnformatted(row.CpCost.ToString());
                     ImGui.TableNextColumn();ImGui.TextUnformatted(row.InnerQuiet.ToString());ImGui.TableNextColumn();

@@ -8,8 +8,9 @@ namespace TenshoAssistant.Market;
 /// <summary>A retainer's listing as the game's sale list shows it. UnitPrice is null when its text could not be read.</summary>
 public sealed record RetainerListing(int Row, uint ItemId, bool Hq, int Quantity, long? UnitPrice);
 public enum RetainerSalesStatus { Closed, Ready, Unavailable }
-/// <summary>X-698 M4 (0.1671): RetainerId and Town: the open retainer (RetainerManager.LastSelectedRetainerId) and its market's Town row; 0: unknown.</summary>
-public sealed record RetainerSalesState(RetainerSalesStatus Status, IReadOnlyList<RetainerListing> Listings, IReadOnlySet<string> OwnNames, string HomeWorld, bool AtHome, ulong RetainerId = 0, byte Town = 0);
+/// <summary>X-698 M4 (0.1671): RetainerId and Town: the open retainer (RetainerManager.LastSelectedRetainerId) and its market's Town row; 0: unknown.
+/// X-700 M1 (0.1686): Towns: every retainer's market Town row read with them (RetainerManager.Retainers), for the tax of a retainer that is not open.</summary>
+public sealed record RetainerSalesState(RetainerSalesStatus Status, IReadOnlyList<RetainerListing> Listings, IReadOnlySet<string> OwnNames, string HomeWorld, bool AtHome, ulong RetainerId = 0, byte Town = 0, IReadOnlyDictionary<ulong, byte>? Towns = null);
 public enum RetainerVerdictKind { Unknown, PriceUnknown, Alone, Lowest, Tied, Undercut }
 /// <summary>Paste: the price to copy, only when another seller is at or under yours. Null otherwise.</summary>
 public sealed record RetainerVerdict(RetainerVerdictKind Kind, long? Lowest, long? Gap, string? Competitor, long? Paste);

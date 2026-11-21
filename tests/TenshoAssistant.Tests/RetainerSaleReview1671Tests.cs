@@ -58,7 +58,8 @@ internal static class RetainerSaleReview1671Tests
             var list=RetainerSaleList.Build([(1,false,10)],item=>new ItemDefinition(item,"x",false,IsMarketable:true,SellPrice:95),(item,hq)=>new SalePrice(10,SaleSource.Board,At),taxPercent:0);
             Check(list.Rows[0] is { Total:100,Npc:950 } && list.Rows[0].NpcBetter,"the rate given is the one used (the NPC's 950 against the market's 100)");
             var window=Read("src/TenshoAssistant/MainWindow.RetainerSaleList.cs");
-            Check(window.Contains("shown.Key.StorageId == state.RetainerId ? MarketTax.RateFor(") && window.Contains("var tax = cityTax ?? MarketTax.HelpPercent;"),"the open retainer's city; another retainer: the help's rate");
+            // X-700 M1 (0.1686): any retainer whose town was read takes its city's rate (Review1676Fixes1686Tests), no longer the open one alone.
+            Check(window.Contains("MarketTax.ForRetainer(MarketTaxRatesSource?.Invoke(), state.Towns, shown.Key.StorageId, DateTimeOffset.UtcNow)"),"the retainer's city; the help's rate otherwise, with the reason");
         }),
     ];
 }

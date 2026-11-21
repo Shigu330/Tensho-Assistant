@@ -755,6 +755,7 @@
     "SaleListFooter": "Total = lowest offer × quantity, minus the {0}% tax of a retainer's sales ({1}). Items the market does not take are left out.",
     "SaleListTaxCity": "the rate of its city, as the game sent it",
     "SaleListTaxHelp": "the rate of the game's help: its city's rate this week has not been received from the game",
+    "SaleListTaxTown": "the game help's rate: this retainer's market city was not read",
     "Footer": "Your prices come from the game. Tensho changes nothing."
   },
   "DiscoveriesUi": {
@@ -5204,7 +5205,7 @@
     "NoProcs": "no indication",
     "VisibleCounter": "{0} · displayed counter: {1}",
     "Extra": "Additional indication: {0}",
-    "Alternatives": "{0}\n{1} compatible combo/history state(s) in the model."
+    "Alternatives": "{0} compatible combo/history state(s) in the model."
   },
   "UiFragments": {
     "Footer": "Live bags · Retainers and chocobo: saved when you open them (dated)",
@@ -6308,7 +6309,7 @@
   },
   "ChatWindow": {
     "Loading": "Loading…",
-    "QuestLinkTip": "{0}\nLeft click: open it on Tensho's Quests page.",
+    "QuestLinkTip": "Left click: open it on Tensho's Quests page.",
     "CopyLine": "Copy this message",
     "CopyTab": "Copy every message of this tab",
     "SelectText": "Select text…",
@@ -6340,7 +6341,7 @@
     "WebForeign": "This site's name holds letters of other alphabets: it reads « {0} » and may imitate a site you know.",
     "OpenWeb": "Open in the browser",
     "CopyWeb": "Copy the address",
-    "MapLinkTip": "{0}\nLeft click: place the flag there and open the map. Right click: Tensho's place menu (nearest aetheryte with its cost, Tensho map, weather).",
+    "MapLinkTip": "Left click: place the flag there and open the map. Right click: Tensho's place menu (nearest aetheryte with its cost, Tensho map, weather).",
     "ItemLinkTip": "{0}\nLeft click: open it in Tensho. Right click: Tensho's item menu.",
     "ItemLinkTipHq": "{0} (HQ)\nLeft click: open it in Tensho. Right click: Tensho's item menu.",
     "DalamudLinkTip": "This link of {0} does what it does in the game's chat.\nLeft click: open it. Right click: the message's menu (copy).",

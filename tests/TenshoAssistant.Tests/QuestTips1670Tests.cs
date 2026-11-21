@@ -19,7 +19,7 @@ internal static class QuestTips1670Tests
         {
             Check(Read("MainWindow.Quests.cs").Contains("if (ImGui.IsItemHovered()) DrawQuestTooltip(entry);"),"Quests page");
             Check(Read("MainWindow.QuestItemSources.cs").Contains("DrawQuestTooltip(questEntry);"),"quest sources");
-            Check(Read("MainWindow.ChatWindow.cs").Contains("DrawQuestTooltip(quest,localization.Format(\"ChatWindow.QuestLinkTip\",\"\").Trim());"),"chat link");
+            Check(Read("MainWindow.ChatWindow.cs").Contains("DrawQuestTooltip(quest,localization.Get(\"ChatWindow.QuestLinkTip\"));"),"chat link");
         }),
     ];
 }
