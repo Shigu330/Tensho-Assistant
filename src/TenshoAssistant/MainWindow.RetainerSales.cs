@@ -46,6 +46,8 @@ internal sealed partial class MainWindow
     private void DrawRetainerSalesContent(RetainerSalesState state)
     {
         if (state.Status == RetainerSalesStatus.Unavailable) { ImGui.TextWrapped(localization.Get("RetainerSales.Unavailable")); return; }
+        // X-695 (0.1667): the retainer's 20 most profitable items to sell, on a click.
+        DrawRetainerSaleListButton(state);
         if (state.Listings.Count == 0) { ImGui.TextDisabled(localization.Get("RetainerSales.Empty")); return; }
         var compare = RetainerCompare?.State;
         var fresh = compare is { Items: not null } && compare.World == state.HomeWorld ? compare.Items : null;

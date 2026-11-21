@@ -112,10 +112,11 @@ public sealed class RetainerCompareService : IDisposable
     public static string Address(string world, IEnumerable<uint> items)
         => $"https://universalis.app/api/v2/{Uri.EscapeDataString(world)}/{string.Join(',', items)}?listings={MarketBoard.MaximumOffers}&entries=0";
 
-    /// <summary>False when it was not sent: already running, too soon, source off, or nothing to ask.</summary>
-    public bool Request(string world, IEnumerable<uint> items, DateTimeOffset now)
+    /// <summary>False when it was not sent: already running, too soon, source off, or nothing to ask. X-695 (0.1667): <paramref name="maximum"/>
+    /// items at most (the sale list asks up to 100, Universalis' limit; the sale panel its 20 listings).</summary>
+    public bool Request(string world, IEnumerable<uint> items, DateTimeOffset now, int maximum = RetainerSales.MaximumListings)
     {
-        var asked = items.Distinct().Take(RetainerSales.MaximumListings).ToArray();
+        var asked = items.Distinct().Take(Math.Clamp(maximum, 1, RetainerSaleList.Asked)).ToArray();
         lock (gate)
         {
             if (disposed || state.Loading || now < nextAllowed || asked.Length == 0 || world.Length == 0 || Enabled?.Invoke() == false) return false;
