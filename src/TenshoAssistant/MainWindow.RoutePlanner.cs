@@ -9,7 +9,8 @@ namespace TenshoAssistant;
 // Computed on a worker when an input changes; the previous search is cancelled; the 25 best are listed. Loot averages:
 // FFXIVGachaSpreadsheet (MIT, embedded); formulas understood from SubmarineTracker (MIT), original code (FreeCompany/VoyagePlanner.cs).
 // 0.315: « unlocked sectors only » filter (read in the chosen submarine's company workshop), « planned build » button, and a
-// « Build » button per route that opens it in the Builds tab. No airship planner: no public loot records for airships.
+// « Build » button per route that opens it in the Builds tab.
+// X-604 (0.1706): the submarine part of the one route planner of both kinds (MainWindow.Planner.cs: the kind, the vessel, rank, speed, range).
 // 0.335 (DEC-023, point 2): value from the NPC price or the best of NPC and market (Universalis lowest NQ of the current world, fetched
 // on a click, 32 items at most), and from all records or those of one surveillance band (the source splits its records by band).
 internal sealed partial class MainWindow
@@ -17,14 +18,10 @@ internal sealed partial class MainWindow
     internal Func<SubmarineCatalog?>? SubmarineCatalog { get; set; }
     // 0.331 (audit): the route catalog could not be built (VoyageWatcher.CatalogFailed): « unavailable » instead of « loading ».
     internal Func<bool>? SubmarineCatalogFailed { get; set; }
-    // 0.331 (audit): the chosen submarine by its key (VesselKey, as the Builds tab), not by its index in a list re-sorted at each workshop read.
-    private string? plannerVesselKey;
     private uint plannerMap;
-    private int plannerRank=1,plannerSpeed=1,plannerRange=1;
     private RouteGoal plannerGoal=RouteGoal.ValuePerVoyage;
-    private string? plannerKey;
-    private Task<IReadOnlyList<PlannedRoute>>? plannerTask;
-    private CancellationTokenSource? plannerCancel;
+    // X-604 (0.1706): the search on a worker, one per set of inputs (FreeCompany/PlannerSearch.cs, as the airships').
+    private readonly PlannerSearch<IReadOnlyList<PlannedRoute>> submarineSearch=new();
     private IReadOnlyList<PlannedRoute> plannerRoutes=[];
     private bool plannerMarket;
     private SurveillanceBand plannerBand=SurveillanceBand.All;
@@ -45,45 +42,16 @@ internal sealed partial class MainWindow
     // X-200 (0.1703): the sector aimed at (0: none), for the way to unlock it.
     private uint plannerUnlockTarget;
 
-    private void DrawRoutePlanner()
+    private void DrawSubmarineRoutes()
     {
         var catalog=SubmarineCatalog?.Invoke();
-        if(catalog is null){ImGui.TextDisabled(localization.Get(SubmarineCatalogFailed?.Invoke()==true ? "RoutePlanner.Unavailable":"RoutePlanner.Loading"));return;}
+        // X-604 (0.1706): the catalogue is read in the game only (the desktop application says so, LoadingText).
+        if(catalog is null){ImGui.TextDisabled(SubmarineCatalogFailed?.Invoke()==true ? localization.Get("RoutePlanner.Unavailable"):LoadingText("RoutePlanner.Loading"));return;}
         ImGui.TextWrapped(localization.Get("RoutePlanner.Help"));
-        // Vessel: fills rank, speed and range (still editable, e.g. to try a new build). A key no longer read = manual input.
-        var subs=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==VesselKind.Submarine).ToArray();
-        var chosen=plannerVesselKey is null ? null:subs.FirstOrDefault(vessel=>VesselKey(vessel)==plannerVesselKey);
-        if(chosen is null)plannerVesselKey=null;
-        ImGui.SetNextItemWidth(220);
-        var vesselLabel=chosen?.Name ?? localization.Get("RoutePlanner.Manual");
-        if(ImGui.BeginCombo(localization.Get("RoutePlanner.Vessel")+"##PlannerVessel",vesselLabel))
-        {
-            try
-            {
-                if(ImGui.Selectable(localization.Get("RoutePlanner.Manual"),chosen is null)){plannerVesselKey=null;chosen=null;}
-                for(var index=0;index<subs.Length;index++)
-                    if(ImGui.Selectable($"{subs[index].Name} · {localization.Format("FreeCompany.Rank",subs[index].Rank)}##PlannerVessel{index}",VesselKey(subs[index])==plannerVesselKey))
-                    {
-                        var vessel=subs[index];plannerVesselKey=VesselKey(vessel);chosen=vessel;
-                        plannerRank=vessel.Rank;plannerSpeed=Math.Max(1,vessel.Speed);plannerRange=Math.Max(1,vessel.Range);
-                        if(vessel.Points.Count>0 && catalog.Sectors.TryGetValue(vessel.Points[0],out var first))plannerMap=first.Map;
-                    }
-            }
-            finally{ImGui.EndCombo();}
-        }
-        Tip("RoutePlanner.VesselTip");
-        // 0.315 (R-11): the vessel's planned build (Free company › Builds) gives its rank, speed and range.
-        if(chosen is not null && VesselParts?.Invoke() is { } parts
-            && VesselBuilds.EffectivePlan(VesselBuild.FromList(VesselKind.Submarine,configuration.VesselPlans?.GetValueOrDefault(VesselKey(chosen))),chosen.Rank) is { } plannedBuild)
-        {
-            ImGui.SameLine();
-            if(ImGui.SmallButton(localization.Get("RoutePlanner.UsePlan")))
-            {
-                var summary=VesselBuilds.Summarize(parts,plannedBuild);
-                plannerRank=plannedBuild.Rank;plannerSpeed=Math.Max(1,summary.Stats.Speed);plannerRange=Math.Max(1,summary.Stats.Range);
-            }
-            Tip("RoutePlanner.UsePlanTip");
-        }
+        // X-604 (0.1706): the vessel, its planned build, rank, speed and range: the planner's common part (MainWindow.Planner.cs); a submarine
+        // chosen also shows the map of its current route.
+        var chosen=DrawPlannerVessel(VesselKind.Submarine,vessel=>{if(vessel.Points.Count>0 && catalog.Sectors.TryGetValue(vessel.Points[0],out var first))plannerMap=first.Map;});
+        var inputs=submarineInputs;
         if(plannerMap==0 && catalog.Maps.Count>0)plannerMap=catalog.Maps[0].Id;
         ImGui.SameLine();ImGui.SetNextItemWidth(200);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Map")+"##PlannerMap",catalog.Maps.FirstOrDefault(map=>map.Id==plannerMap).Name ?? ""))
@@ -92,10 +60,7 @@ internal sealed partial class MainWindow
             finally{ImGui.EndCombo();}
         }
         Tip("RoutePlanner.MapTip");
-        ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Rank")+"##PlannerRank",ref plannerRank);Tip("RoutePlanner.RankTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref plannerSpeed);Tip("RoutePlanner.SpeedTip");
-        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref plannerRange);Tip("RoutePlanner.RangeTip");
-        plannerRank=Math.Clamp(plannerRank,1,200);plannerSpeed=Math.Clamp(plannerSpeed,1,1000);plannerRange=Math.Clamp(plannerRange,1,1000);
+        DrawPlannerStats(VesselKind.Submarine);
         ImGui.SetNextItemWidth(220);
         if(ImGui.BeginCombo(localization.Get("RoutePlanner.Goal")+"##PlannerGoal",localization.Get("RoutePlanner.Goal"+plannerGoal)))
         {
@@ -142,37 +107,32 @@ internal sealed partial class MainWindow
             foreach(var id in prices.Items.Take(prices.Completed))
                 if(market.GetCached(fetching.WorldId,id) is { } quote)routeQuotes[(fetching.WorldId,id)]=quote;
             routeQuotesList=prices.Items;routeQuotesCaptured=prices.Completed;routeQuotesLoading=prices.Loading;
-            if(!prices.Loading)plannerKey=null;
+            if(!prices.Loading)submarineSearch.Again();
         }
         if(plannerMarket)DrawRoutePriceFetch(world,character,prices);
 
-        // New search when an input changed or a price list ended (plannerKey cleared above); the running one is cancelled.
-        var key=$"{plannerMap}|{plannerRank}|{plannerSpeed}|{plannerRange}|{plannerGoal}|{useUnlocked}|{house}|{unlockedList?.Count}|{plannerMarket}|{plannerBand}|{world.WorldId}";
-        if(key!=plannerKey)
+        // New search when an input changed or a price list ended (submarineSearch.Again above); the running one is cancelled.
+        var key=$"{plannerMap}|{inputs.Rank}|{inputs.Speed}|{inputs.Range}|{plannerGoal}|{useUnlocked}|{house}|{unlockedList?.Count}|{plannerMarket}|{plannerBand}|{world.WorldId}";
+        if(submarineSearch.Needs(key))
         {
-            plannerKey=key;plannerCancel?.Cancel();plannerCancel?.Dispose();plannerCancel=new CancellationTokenSource();
-            var token=plannerCancel.Token;var (map,rank,speed,range,goal,band)=(plannerMap,plannerRank,plannerSpeed,plannerRange,plannerGoal,plannerBand);
+            var (map,rank,speed,range,goal,band)=(plannerMap,inputs.Rank,inputs.Speed,inputs.Range,plannerGoal,plannerBand);
             var unlocked=unlockedList?.ToHashSet() ?? [];
             ISet<uint>? excluded=useUnlocked ? catalog.SectorsOf(map).Where(sector=>!sector.Start && !unlocked.Contains(sector.Id)).Select(sector=>sector.Id).ToHashSet():null;
             var values=BuildRouteValues(catalog,map,world.WorldId);plannerValues=values;
-            plannerTask=Task.Run(()=>VoyagePlanner.Plan(catalog.SectorsOf(map),rank,speed,range,goal,id=>SectorValue(catalog,values,band,id),25,token,excluded),token);
+            submarineSearch.Start(key,token=>VoyagePlanner.Plan(catalog.SectorsOf(map),rank,speed,range,goal,id=>SectorValue(catalog,values,band,id),25,token,excluded));
         }
-        if(plannerTask is { IsCompleted:true } done)
+        if(submarineSearch.Take(out var found,out var failure))
         {
-            if(done.IsCompletedSuccessfully)
-            {
-                plannerRoutes=done.Result;
-                // Missing market prices of the listed routes' loot, the most expected per voyage first (computed once per search, not per frame).
-                plannerWanted=plannerValues is { } found ? plannerRoutes.SelectMany(route=>route.Sectors).Distinct()
-                    .SelectMany(id=>VoyagePlanner.PerVisit(catalog.Loot.GetValueOrDefault(id),plannerBand) ?? VoyagePlanner.PerVisit(catalog.Loot.GetValueOrDefault(id)).ToArray())
-                    .Where(entry=>found.Missing.Contains(entry.ItemId)).GroupBy(entry=>entry.ItemId)
-                    .OrderByDescending(group=>group.Sum(entry=>entry.PerVisit)).Select(group=>group.Key).ToArray():[];
-                plannerMissingCounts=plannerValues is { } counted ? plannerRoutes.Select(route=>RouteMissing(catalog,counted,route,plannerBand)).ToArray():[];
-            }
-            else if(done.Exception is { } error)log.Warning(error,"Submarine routes could not be planned.");
-            plannerTask=null;
+            plannerRoutes=found;
+            // Missing market prices of the listed routes' loot, the most expected per voyage first (computed once per search, not per frame).
+            plannerWanted=plannerValues is { } valued ? plannerRoutes.SelectMany(route=>route.Sectors).Distinct()
+                .SelectMany(id=>VoyagePlanner.PerVisit(catalog.Loot.GetValueOrDefault(id),plannerBand) ?? VoyagePlanner.PerVisit(catalog.Loot.GetValueOrDefault(id)).ToArray())
+                .Where(entry=>valued.Missing.Contains(entry.ItemId)).GroupBy(entry=>entry.ItemId)
+                .OrderByDescending(group=>group.Sum(entry=>entry.PerVisit)).Select(group=>group.Key).ToArray():[];
+            plannerMissingCounts=plannerValues is { } counted ? plannerRoutes.Select(route=>RouteMissing(catalog,counted,route,plannerBand)).ToArray():[];
         }
-        if(plannerTask is not null){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
+        else if(failure is not null)log.Warning(failure,"Submarine routes could not be planned.");
+        if(submarineSearch.Searching){ImGui.TextDisabled(localization.Get("RoutePlanner.Searching"));return;}
         if(plannerRoutes.Count==0){ImGui.TextDisabled(localization.Get("RoutePlanner.None"));return;}
         if(!ImGui.BeginTable("PlannerRoutes",7,ImGuiTableFlags.RowBg|ImGuiTableFlags.SizingStretchProp|ImGuiTableFlags.BordersInnerH|ImGuiTableFlags.ScrollY,new Vector2(0,ImGui.GetContentRegionAvail().Y-ImGui.GetTextLineHeightWithSpacing()*2)))return;
         try
@@ -190,7 +150,7 @@ internal sealed partial class MainWindow
                 ImGui.Selectable($"{index}. {string.Join(" › ",names)}##PlannerRoute{index}",false,ImGuiSelectableFlags.SpanAllColumns|ImGuiSelectableFlags.AllowItemOverlap);
                 // This ImGui ignores later overlapping items in IsItemHovered: one tooltip per row, chosen after the button (0.315 review).
                 var rowHovered=ImGui.IsItemHovered();
-                ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {plannerRange}");
+                ImGui.TableNextColumn();ImGui.TextUnformatted($"{route.Distance} / {inputs.Range}");
                 ImGui.TableNextColumn();ImGui.TextUnformatted(HoursMinutes(TimeSpan.FromSeconds(route.Seconds)));
                 // 0.335: a market price is missing on this route: its items count at the NPC price, the value is a lower bound (≥).
                 var missingPrices=index-1<plannerMissingCounts.Length ? plannerMissingCounts[index-1]:0;
@@ -211,7 +171,7 @@ internal sealed partial class MainWindow
                         if(VesselParts?.Invoke() is { } vesselParts)
                         {
                             var plan=PlannedBuild(vesselParts,manual,null);
-                            var wanted=Math.Clamp(plannerRank,1,VesselBuilds.MaxRank(vesselParts.SubmarineRanks));
+                            var wanted=Math.Clamp(inputs.Rank,1,VesselBuilds.MaxRank(vesselParts.SubmarineRanks));
                             if(plan.Rank!=wanted)StoreVesselPlan(manual,plan with{Rank=wanted});
                         }
                     }

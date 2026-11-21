@@ -74,6 +74,7 @@ internal static class DesktopContract
         new("TenshoAssistant.Reminders.GardenBed",Kind.Property,"TendHours",false,null,"the trial patch of the garden views (X-178)"),
         new(Main,Kind.Field,"desktopCharacters",false,null,"the trial retainers of the « Reminders-retainers » picture (X-430)"),
         new(Main,Kind.Field,"reminderTabFocus",false,null,"the « Reminders-retainers » picture opens the Status tab (X-430)"),
+        new(Main,Kind.Field,"freeCompanyTabRequest",false,null,"the « FreeCompany-routes » picture opens the Best routes tab (X-604)"),
         new("TenshoAssistant.Character.CharacterStatus",Kind.Property,"Retainers",false,null,"the trial retainers' character file (X-430)"),
         new("TenshoAssistant.Character.RetainerState",Kind.Property,"MarketEnds",false,null,"the trial retainers' character file (X-430)"),
         new("TenshoAssistant.Character.RetainerState",Kind.Property,"VentureDone",false,null,"the trial retainers' character file (X-430)"),

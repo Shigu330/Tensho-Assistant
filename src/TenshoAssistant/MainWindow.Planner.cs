@@ -1,0 +1,99 @@
+using Dalamud.Bindings.ImGui;
+using TenshoAssistant.FreeCompany;
+
+namespace TenshoAssistant;
+
+// X-604 (0.1706, the user's request of 18/11: « airships and submarines each have their own route planner; keep the best of both in one »):
+// one route planner for both kinds of vessels, in the Routes tab: the kind at its top, then the common part (the vessel read in the
+// workshop or manual input, its planned build, rank, speed and range), then the kind's own part: MainWindow.RoutePlanner.cs (submarines:
+// community loot values, maps, unlocked sectors, the way to unlock a sector) and MainWindow.AirshipPlanner.cs (airships: the game's leg
+// times, targets, sectors chosen by hand, the fleet). Comparison of the two planners: docs/evidence/0.1706-route-planners.md.
+internal sealed partial class MainWindow
+{
+    /// <summary>X-604: what the planner is set to for one kind of vessel (kept while the window lives, one set per kind).</summary>
+    private sealed class PlannerInputs
+    {
+        // 0.331 (audit): the chosen vessel by its key (VesselKey, as the Builds tab), not by its index in a list re-sorted at each workshop read.
+        public string? VesselKey;
+        public int Rank,Speed=1,Range=1;
+    }
+
+    private VesselKind plannerKind=VesselKind.Submarine;
+    private readonly PlannerInputs submarineInputs=new(){Rank=1};
+    private readonly PlannerInputs airshipInputs=new();
+    private PlannerInputs Inputs(VesselKind kind)=>kind==VesselKind.Airship ? airshipInputs:submarineInputs;
+
+    private void DrawRoutePlanner()
+    {
+        foreach(var kind in new[]{VesselKind.Submarine,VesselKind.Airship})
+        {
+            if(kind!=VesselKind.Submarine)ImGui.SameLine();
+            if(ImGui.RadioButton(localization.Get("FreeCompany."+kind)+"##PlannerKind"+kind,plannerKind==kind))plannerKind=kind;
+            Tip("RoutePlanner.KindTip");
+        }
+        if(plannerKind==VesselKind.Airship)DrawAirshipRoutes();
+        else DrawSubmarineRoutes();
+    }
+
+    private void DrawAirshipRoutes()
+    {
+        var catalog=AirshipCatalog?.Invoke();
+        if(catalog is null){ImGui.TextDisabled(AirshipCatalogFailed?.Invoke()==true ? localization.Get("AirshipSectors.Unavailable"):LoadingText("AirshipSectors.Loading"));return;}
+        ImGui.TextWrapped(localization.Get("AirshipPlanner.Help"));
+        DrawAirshipPlanner(catalog);
+    }
+
+    /// <summary>
+    /// X-604: the vessel of this kind (read in the workshop, else manual input; a key no longer read is manual input): choosing one fills rank,
+    /// speed and range (still editable, to try another build); its planned build (Builds tab) can give them too, for both kinds.
+    /// </summary>
+    private VoyageVessel? DrawPlannerVessel(VesselKind kind,Action<VoyageVessel>? chosenNow=null)
+    {
+        var inputs=Inputs(kind);
+        var vessels=(configuration.Voyages ?? []).Where(vessel=>vessel.Kind==kind).ToArray();
+        var chosen=inputs.VesselKey is null ? null:vessels.FirstOrDefault(vessel=>VesselKey(vessel)==inputs.VesselKey);
+        if(chosen is null)inputs.VesselKey=null;
+        var airship=kind==VesselKind.Airship;
+        ImGui.SetNextItemWidth(220);
+        if(ImGui.BeginCombo(localization.Get(airship ? "AirshipPlanner.Vessel":"RoutePlanner.Vessel")+"##PlannerVessel",chosen?.Name ?? localization.Get("RoutePlanner.Manual")))
+        {
+            try
+            {
+                if(ImGui.Selectable(localization.Get("RoutePlanner.Manual"),chosen is null)){inputs.VesselKey=null;chosen=null;}
+                for(var index=0;index<vessels.Length;index++)
+                    if(ImGui.Selectable($"{vessels[index].Name} · {localization.Format("FreeCompany.Rank",vessels[index].Rank)}##PlannerVessel{index}",VesselKey(vessels[index])==inputs.VesselKey))
+                    {
+                        var vessel=vessels[index];inputs.VesselKey=VesselKey(vessel);chosen=vessel;
+                        inputs.Rank=vessel.Rank;inputs.Speed=Math.Max(1,vessel.Speed);inputs.Range=Math.Max(1,vessel.Range);
+                        chosenNow?.Invoke(vessel);
+                    }
+            }
+            finally{ImGui.EndCombo();}
+        }
+        Tip(airship ? "AirshipPlanner.VesselTip":"RoutePlanner.VesselTip");
+        // 0.315 (R-11): the vessel's planned build (Free company › Builds) gives its rank, speed and range; X-604: airships too.
+        if(chosen is not null && VesselParts?.Invoke() is { } parts
+            && VesselBuilds.EffectivePlan(VesselBuild.FromList(kind,configuration.VesselPlans?.GetValueOrDefault(VesselKey(chosen))),chosen.Rank) is { } plannedBuild)
+        {
+            ImGui.SameLine();
+            if(ImGui.SmallButton(localization.Get("RoutePlanner.UsePlan")))
+            {
+                var summary=VesselBuilds.Summarize(parts,plannedBuild);
+                inputs.Rank=plannedBuild.Rank;inputs.Speed=Math.Max(1,summary.Stats.Speed);inputs.Range=Math.Max(1,summary.Stats.Range);
+            }
+            Tip("RoutePlanner.UsePlanTip");
+        }
+        return chosen;
+    }
+
+    /// <summary>X-604: rank, speed and range of this kind's search (an airship's rank 0: every sector, as before).</summary>
+    private void DrawPlannerStats(VesselKind kind)
+    {
+        var inputs=Inputs(kind);
+        var airship=kind==VesselKind.Airship;
+        ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Rank")+"##PlannerRank",ref inputs.Rank);Tip(airship ? "AirshipPlanner.RankTip":"RoutePlanner.RankTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Speed")+"##PlannerSpeed",ref inputs.Speed);Tip(airship ? "AirshipPlanner.SpeedTip":"RoutePlanner.SpeedTip");
+        ImGui.SameLine();ImGui.SetNextItemWidth(90);ImGui.InputInt(localization.Get("RoutePlanner.Range")+"##PlannerRange",ref inputs.Range);Tip(airship ? "AirshipPlanner.RangeTip":"RoutePlanner.RangeTip");
+        inputs.Rank=Math.Clamp(inputs.Rank,airship ? 0:1,200);inputs.Speed=Math.Clamp(inputs.Speed,1,1000);inputs.Range=Math.Clamp(inputs.Range,1,1000);
+    }
+}

@@ -33,9 +33,10 @@ internal sealed partial class MainWindow
         fromStockPrices.Dispose();
         cactpotSolve.Dispose();
         // 0.315: the route and build searches stop with the window.
-        plannerCancel?.Cancel();plannerCancel?.Dispose();plannerCancel=null;
+        // X-604 (0.1706): the planner's three searches (the fleet's was left running before).
+        submarineSearch.Cancel();
         buildSearchCancel?.Cancel();buildSearchCancel?.Dispose();buildSearchCancel=null;
-        airshipPlanCancel?.Cancel();airshipPlanCancel?.Dispose();airshipPlanCancel=null;
+        airshipSearch.Cancel();airshipFleetSearch.Cancel();
         bankFrameRows.Clear();
         bankFrameGroups=[];bankFrameErrors=[];bankFrameGil=[];
         bankSourceRows.Clear();bankSourcePersonal=[];bankSourceCategories=[];

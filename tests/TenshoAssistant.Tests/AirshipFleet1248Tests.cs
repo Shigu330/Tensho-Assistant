@@ -46,7 +46,7 @@ internal static class AirshipFleet1248Tests
             var page=Read("src/TenshoAssistant/MainWindow.AirshipPlanner.cs");
             Check(page.Contains("if(!open){RequestAirshipSpeeds?.Invoke([]);return;}"),"closed: no other speed asked");
             Check(page.Contains("AirshipPlanner.Plan(sectors,table,ship.Rank==0 ? int.MaxValue:ship.Rank,ship.Range,goal,1,token,targets).FirstOrDefault()"),"each airship: its rank, range, goal and target");
-            Check(page.Contains("airshipFleetTask=Task.Run(") && page.Contains("airshipFleetCancel?.Cancel();"),"searched on a worker, the previous search cancelled");
+            Check(page.Contains("airshipFleetSearch.Start(key,token=>") && page.Contains("if(airshipFleetSearch.Needs(key))"),"searched on a worker, the previous search cancelled (PlannerSearch, X-604)");
             var plugin=Read("src/TenshoAssistant/Plugin.Voyages.cs");
             Check(plugin.Contains("mainWindow.RequestAirshipSpeeds=speeds=>airshipTable?.RequestAlso(speeds);") && plugin.Contains("mainWindow.AirshipTableFor=speed=>airshipTable?.TableFor(speed);"),"wired");
             var en=Read("src/TenshoAssistant/Localization/Languages/en.json");var fr=Read("src/TenshoAssistant/Localization/Languages/fr.json");

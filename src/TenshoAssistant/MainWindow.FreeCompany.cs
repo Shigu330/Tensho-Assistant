@@ -126,7 +126,7 @@ internal sealed partial class MainWindow
         {
             // The Builds tab and the planner leave a forgotten vessel (Builds: first submarine read, else manual; planner: manual input).
             if(buildVesselKey is not null && Voyages.IsPlanOf(buildVesselKey,house)){buildVesselKey=null;buildCandidates=[];buildSearchKey=null;}
-            if(plannerVesselKey is not null && Voyages.IsPlanOf(plannerVesselKey,house))plannerVesselKey=null;
+            foreach(var inputs in new[]{submarineInputs,airshipInputs})if(inputs.VesselKey is not null && Voyages.IsPlanOf(inputs.VesselKey,house))inputs.VesselKey=null;
         }
     }
 

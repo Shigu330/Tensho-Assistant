@@ -30,6 +30,8 @@ public static class ReferencePlan
         foreach(var page in ErrorPages.Where(shown.Contains))plan.Add(new($"{page}-error",page,0,1280,860,"error"));
         // X-394 (review of 0.1361): the sort preview with a sample inventory: bags 1, 3, 2, 4 and the sort's line once (developer mode).
         if(shown.Contains("SortPreview"))plan.Add(new("SortPreview-trial","SortPreview",0,1280,860,"sort-trial"));
+        // X-604 (0.1706): Free Company › Best routes, the one route planner of both kinds (its kind chosen at its top).
+        if(shown.Contains("FreeCompany"))plan.Add(new("FreeCompany-routes","FreeCompany",0,1280,860,"fc-routes"));
         // X-520 (0.1536): every other tab of the Settings page (« Settings » shows General), last: the tab and category they open stay chosen.
         if(shown.Contains("Settings"))
             foreach(var (id,tab,category,width) in SettingsShots)plan.Add(new($"Settings-{id}","Settings",0,width,860,$"{SettingsPrefix}{tab}:{category}"));
