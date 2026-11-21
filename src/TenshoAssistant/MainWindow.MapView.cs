@@ -2029,25 +2029,19 @@ internal sealed partial class MainWindow
                 ImGui.BeginGroup();
                 try
                 {
-                    var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
-                    ImGui.TextColored(Accent,lines[0]);
-                    foreach(var line in lines.Skip(hit.Point is null ? 1:2))ImGui.TextDisabled(line);
+                    // X-684 (0.1694): a gathering point through the one gathering body (title, job and kind, place, opening, items), no longer a copy by hand.
+                    if(hit.Point is { } point)DrawGatheringBody(point,GatheringTips.MaxListItems);
+                    else
+                    {
+                        var lines=(hit.Label ?? (mapMarkers?.SymbolName(hit.Icon) is { Length:>0 } symbol ? symbol:localization.Format("MapView.IconUnnamed",hit.Icon))).Split('\n');
+                        ImGui.TextColored(Accent,lines[0]);
+                        foreach(var line in lines.Skip(1))ImGui.TextDisabled(line);
+                    }
                     // 0.645 (P7): the cost on hover, or that it is not attuned.
                     if(hit.Fixed is { AetheryteId:not 0 } crystal && mapLive?.TeleportCostsFailed!=true && mapLive?.TeleportCosts is { Count:>0 } teleportCosts)
                     {
                         if(teleportCosts.TryGetValue(crystal.AetheryteId,out var gilCost))ImGui.TextDisabled(localization.Format("MapView.TeleportCost",gilCost.ToString("N0",Numbers)));
                         else ImGui.TextColored(UI.FfxivTheme.Warning,localization.Get("MapView.AetheryteNotAttuned"));
-                    }
-                    if(hit.Point is { } point)
-                    {
-                        DrawPointAvailability(point);
-                        var items=itemCatalog.State.Catalog;
-                        foreach(var id in point.Items.Take(8))
-                        {
-                            var item=items?.Find(id);
-                            DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                            ImGui.TextUnformatted(item?.Name ?? $"#{id}");
-                        }
                     }
                     if(top is { } clicked && clicked.Order==hit.Order && clicked.Layer==hit.Layer)
                     {
@@ -2102,11 +2096,16 @@ internal sealed partial class MainWindow
     private static bool IsGatheringPointBase(MapLocalGatheringPoint point)=>point.TypeId!=100;
     private TenshoAssistant.Gathering.GatherPointAccess? PointAccess(MapLocalGatheringPoint point)=>IsGatheringPointBase(point) ? GatherAccess?.Invoke(point.BaseId):null;
     private Vector4 TimedPointColor(MapLocalGatheringPoint point)=>PointAccess(point)?.TomeMissing is not null ? Muted:point.ActiveAt(EorzeaMinutes()) ? UI.FfxivTheme.Success:UI.FfxivTheme.Warning;
+    // 0.647 (C27): the kind of the point. X-684 (0.1694): a part of the gathering body's detail line (built once per point, MainWindow.GatheringTooltip.cs).
+    private string? PointKindText(MapLocalGatheringPoint point)
+    {
+        if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)return localization.Get("MapView.PointKind"+kind);
+        return null;
+    }
+    // Whether a point is open now and for how long, and what it asks of the player (read live in the gathering body).
     private void DrawPointAvailability(MapLocalGatheringPoint point)
     {
         var access=PointAccess(point);
-        // 0.647 (C27): the kind of the point.
-        if(IsGatheringPointBase(point) && GatherKind?.Invoke(point.BaseId) is { } kind and not TenshoAssistant.Gathering.GatherPointKind.Normal)ImGui.TextDisabled(localization.Get("MapView.PointKind"+kind));
         if(point.Timed)
         {
             var open=point.ActiveAt(EorzeaMinutes());
@@ -2266,24 +2265,6 @@ internal sealed partial class MainWindow
                 });
             }
             if(done==true && vista.Data!=0)DrawGameIcon(vista.Data,new Vector2(160,90),false);
-        }
-    }
-    private void DrawGatheringTooltip(MapLocalGatheringPoint point)
-    {
-        using(TooltipScope.Begin())
-        {
-            if(point.Icon!=0){DrawSmallGameIcon(point.Icon);}
-            ImGui.TextColored(Accent,$"{point.Type} · {localization.Format("MapLocal.Level",point.Level)}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}");
-            if(point.Place.Length>0)ImGui.TextDisabled(point.Place);
-            DrawPointAvailability(point);
-            var items=itemCatalog.State.Catalog;
-            foreach(var id in point.Items.Take(16))
-            {
-                var item=items?.Find(id);
-                DrawItemIcon(item,new Vector2(ImGui.GetTextLineHeight()));ImGui.SameLine();
-                ImGui.TextUnformatted(item?.Name ?? $"#{id}");
-            }
-            ImGui.TextDisabled(localization.Get("MapLocal.ClickFlag"));
         }
     }
     // Vendors standing on a map, with the shop names of each, rebuilt only when the map or the catalogue changes.

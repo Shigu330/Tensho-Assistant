@@ -110,8 +110,12 @@ internal sealed partial class MainWindow
                 ImGui.TextColored(colour,row.Size is { } size && row.Speed is { } speed ? Gathering.Spearfishing.ShortShadow(size,speed):"?");
                 ImGui.SameLine(column+shadowWidth+ImGui.GetStyle().ItemSpacing.X);
                 ImGui.TextColored(colour,name);
-                if(ImGui.IsItemHovered())WrappedTooltip(name+" — "+(row.Size is { } wordsSize && row.Speed is { } wordsSpeed ? SpearShadowText(wordsSize,wordsSpeed):"?")
-                    +(row.Seen ? " · "+localization.Get("Spearfishing.Seen"):""));
+                // X-684 (0.1694): the fish's name carries the common item tooltip, then its shadow and whether it was seen (added under it, the same tooltip).
+                if(ImGui.IsItemHovered())
+                {
+                    DrawItemInfoTooltip(row.Fish);
+                    WrappedTooltip((row.Size is { } wordsSize && row.Speed is { } wordsSpeed ? SpearShadowText(wordsSize,wordsSpeed):"?")+(row.Seen ? " · "+localization.Get("Spearfishing.Seen"):""));
+                }
                 if(row.Seen)
                 {
                     ImGui.SameLine();

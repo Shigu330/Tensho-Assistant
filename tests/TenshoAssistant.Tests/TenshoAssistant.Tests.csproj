@@ -84,6 +84,7 @@
     <Compile Include="../../src/TenshoAssistant/Maps/PlaceDirectory.cs" Link="Maps/PlaceDirectory.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/PlaceTips.cs" Link="Maps/PlaceTips.cs" />
     <Compile Include="../../src/TenshoAssistant/Maps/MonsterTips.cs" Link="Maps/MonsterTips.cs" />
+    <Compile Include="../../src/TenshoAssistant/Maps/GatheringTips.cs" Link="Maps/GatheringTips.cs" />
     <Compile Include="../../src/TenshoAssistant/MiniGames/*.cs" Exclude="../../src/TenshoAssistant/MiniGames/*.Dalamud.cs" Link="MiniGames/%(Filename)%(Extension)" />
     <Compile Include="../../src/TenshoAssistant/Character/CharacterStatsService.cs" Link="Character/CharacterStatsService.cs" />
     <Compile Include="../../src/TenshoAssistant/Character/StatFormulas.cs" Link="Character/StatFormulas.cs" />

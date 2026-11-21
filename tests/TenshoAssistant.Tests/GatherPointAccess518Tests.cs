@@ -30,7 +30,9 @@ internal static class GatherPointAccess518Tests
         ("Point access: both map tooltips and the edge markers use it; read on the framework thread and guarded",() =>
         {
             var map=Read("MainWindow.MapView.cs");
-            Check(map.Split("DrawPointAvailability(point);").Length==3,"both tooltips");
+            var body=Read("MainWindow.GatheringTooltip.cs");
+            Check(body.Split("DrawPointAvailability(point);").Length==2 && map.Contains("if(hit.Point is { } point)DrawGatheringBody(point,GatheringTips.MaxListItems);")
+                && Read("MainWindow.MapLocalLists.cs").Split("DrawGatheringTooltip(point);").Length==3,"both tooltips, through the one body (X-684, 0.1694)");
             Check(map.Contains("\"MapView.TimedOpenNoTome\"") && map.Contains("\"MapView.TomeMissing\"") && map.Contains("\"MapView.PointLevelLow\""),"said");
             Check(map.Contains("point.ActiveAt(minutes) && PointAccess(point)?.TomeMissing is null"),"no edge marker for a point closed to the player (X-112: through PointAccess)");
             Check(map.Contains("ImGui.GetColorU32(TimedPointColor(timedPoint))"),"nor a green clock");

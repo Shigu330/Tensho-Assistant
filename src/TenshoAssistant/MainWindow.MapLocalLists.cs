@@ -147,7 +147,6 @@ internal sealed partial class MainWindow
             mapLocalGatheringCache=(map.MapId,catalog,index,MapLocalLists.Gathering(catalog.Sources,index,map.MapId));
         var groups=mapLocalGatheringCache.Groups;
         if(groups.Count==0){ImGui.TextDisabled(localization.Get("MapLocal.Empty"));return;}
-        var items=itemCatalog.State.Catalog;
         DrawSplitView("Gathering",groups,ref mapLocalGatheringType,point=>
         {
             var label=$"{localization.Format("MapLocal.Level",point.Level)}  {point.Place}{(point.Hidden ? " "+localization.Get("MapLocal.Hidden"):"")}";
@@ -163,7 +162,8 @@ internal sealed partial class MainWindow
             {
                 ImGui.TextDisabled(label);
                 GatheringToolMenu($"GatheringTool{point.BaseId}",point.Items);
-                if(ImGui.IsItemHovered())WrappedTooltip(string.Join(", ",point.Items.Select(id=>items?.Find(id)?.Name ?? $"#{id}"))+"\n"+localization.Get("MapLocal.NoPosition"));
+                // X-684 (0.1694): the one gathering tooltip (before: the item names alone), saying that the game gives no position.
+                if(ImGui.IsItemHovered())DrawGatheringTooltip(point);
             }
         });
     }
