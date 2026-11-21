@@ -71,7 +71,7 @@ and the help text of each page (the « ? » beside its title):
 |  | **Duty loot** | What each duty can drop, and how far you have got in it. |
 |  | **Monster loot** | Which monsters drop the selected item, and where to find them. |
 |  | **Discoveries** | What you discover while playing, kept on your disk only: where monsters, hunt marks and FATEs were seen; where the items you get come from (desynthesis, ventures, duty chests, FATE rewards, monster drops, opened items, voyages); fish caught; Fashion Report judgements; blue magic spells learned, beasts captured, festivals and vistas seen; market board prices. The hunting log, monster loot and the item hover show what you saw. |
-| Tracking | **Alarms** | Alarms on items, gathering points, dates, voyages and duties, with sound, chat line and Discord if you wish. The clocks are here too. |
+| Timers | **Alarm** | Alarms on items, gathering points, dates, voyages and duties, with sound, chat line and Discord if you wish. The clocks are here too. |
 |  | **Reminders** | The game's timers and counters, with « done » boxes: daily and weekly tasks, retainers, voyages, roulettes, squadron, character status, your own tasks. |
 |  | **Garden** | Your beds and pots with their reminders, and seed crossbreeds with a planting plan. |
 |  | **Free Company** | Submersibles and airships: rank, route, return, finds, best routes, builds and the history of your voyages; also the materials of the workshop's projects, with an on-screen panel. |
@@ -271,7 +271,7 @@ La barre latérale range les pages en groupes repliables. Le tableau est écrit 
 |  | **Butin des missions** | Ce que chaque mission peut donner, et où vous en êtes. |
 |  | **Butin des monstres** | Quels monstres donnent l'objet choisi, et où les trouver. |
 |  | **Découvertes** | Ce que vous découvrez en jouant, gardé sur votre disque seulement : où ont été vus les monstres, les cibles d'élite et les ALÉA ; d'où viennent les objets obtenus (recyclage, tâches de servants, coffres de mission, récompenses d'ALÉA, butin de monstres, objets ouverts, expéditions) ; les poissons pris ; les jugements de la Revue de mode ; les sorts de mage bleu appris, les bêtes capturées, les fêtes et les lieux notoires vus ; les prix du tableau des ventes. Le bestiaire, le butin des monstres et l'infobulle des objets montrent ce que vous avez vu. |
-| Suivi | **Alarmes** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
+| Calendrier | **Alerte** | Des alarmes sur les objets, points de récolte, dates, expéditions et missions, avec son, ligne de chat et Discord si vous le souhaitez. Les horloges sont ici aussi. |
 |  | **Rappels** | Les minuteurs et compteurs du jeu, avec des cases « fait » : tâches du jour et de la semaine, servants, expéditions, missions aléatoires, escouade, état du personnage, vos propres tâches. |
 |  | **Jardinage** | Vos emplacements de potager et vos pots avec leurs rappels, et les croisements de graines avec un plan de plantation. |
 |  | **Compagnie libre** | Sous-marins et aéronefs : rang, trajet, retour, trouvailles, meilleurs trajets, montages et l'historique de vos expéditions ; aussi les matériaux des projets de l'atelier, avec un panneau à l'écran. |

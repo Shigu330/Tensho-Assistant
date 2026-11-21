@@ -102,7 +102,7 @@ Ctrl+Alt asks Universalis again: « Fetched » shows the time of that request. U
 
 ## The garden is shown as icons: how do I get the text back?
 
-Tracking › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
+Timers › Gardening › Garden tab › « Detailed view » shows each bed as text again (seed, dates, crossbreeds). The icons say the same: hover a seed for its dates; the round mark shows the tending state (drop: later, « ! »: due, check: ripe).
 
 ## How do I install Tensho?
 
@@ -228,7 +228,7 @@ Ctrl+Alt redemande les prix à Universalis : « Consulté » donne l'heure de ce
 
 ## Le jardin est en icônes : comment retrouver le texte ?
 
-Suivi › Jardinage › onglet Jardin › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
+Calendrier › Jardinage › onglet Jardin › « Vue détaillée » remet chaque emplacement en texte (graine, dates, croisements). En icônes, tout y est aussi : survolez une graine pour ses dates ; la pastille dit l'entretien (goutte : à venir, « ! » : à faire, coche : mûr).
 
 ## Comment installer Tensho ?
 
