@@ -2,7 +2,7 @@
 
 > *Traduction française plus bas.*
 
-Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (742 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
+Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title and the version that did it (749 points); the detail of each version is in the [CHANGELOG](../../CHANGELOG.md). Produced by a script from the plan's source, with the global plan; never written by hand.
 
 ## Phase 1: fixes without the game
 
@@ -809,13 +809,20 @@ Each done point of the [global plan](GLOBAL-PLAN.md): its number, a short title 
 | X-721 | User request of 21/11 around 13:15 (screenshot of the server bar, kept out of… | Done in 0.1725.0 |
 | X-722 | User request of 21/11 around 13:35 (screenshot of Tensho's chat, start of the… | Done in 0.1724.0 |
 | X-723 | Bug reported by the user on 21/11 around 13:40: in Tensho's chat, the players'… | Done in 0.1724.0 |
+| X-724 | User request of 21/11 around 13:50 (two screenshots of the Settings, kept out… | Done in 0.1730.0 |
+| X-725 | User request of 21/11 around 13:55 (« check the rest too », after the server… | Done in 0.1731.0 |
 | X-726 | Review of block 0.1717 to 0.1720 (review 0.1720, 21/11), minor M1: M1 in… | Done in 0.1721.0 |
+| X-727 | User request of 21/11 around 14:00 (screenshot of the « Tensho tracker »… | Done in 0.1733.0 |
+| X-728 | Bug reported by the user on 21/11 around 14:42: no Tensho menu on a right click… | Done in 0.1732.0 |
+| X-729 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), I1: finding in… | Done in 0.1727.0 |
+| X-730 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), minor M1, M2: M1 in… | Done in 0.1729.0 |
+| X-731 | Review of block 0.1721 to 0.1726 (review 0.1726, 21/11), pre-existing before… | Done in 0.1727.0 |
 
 ---
 
 # Plan global : points faits
 
-Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (742 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
+Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court et la version qui l'a fait (749 points) ; le détail de chaque version est dans le [CHANGELOG](../../CHANGELOG.md). Produit par script depuis la source du plan, avec le plan global ; jamais écrit à la main.
 
 ## Phase 1 : corrections sans le jeu
 
@@ -1622,4 +1629,11 @@ Chaque point fait du [plan global](GLOBAL-PLAN.md) : son numéro, un titre court
 | X-721 | Demande de l'utilisateur du 21/11 vers 13 h 15 (capture de la barre du serveur… | Fait en 0.1725.0 |
 | X-722 | Demande de l'utilisateur du 21/11 vers 13 h 35 (capture du chat de Tensho… | Fait en 0.1724.0 |
 | X-723 | Bug signalé par l'utilisateur le 21/11 vers 13 h 40 : dans le chat de Tensho… | Fait en 0.1724.0 |
+| X-724 | Demande de l'utilisateur du 21/11 vers 13 h 50 (deux captures des Paramètres… | Fait en 0.1730.0 |
+| X-725 | Demande de l'utilisateur du 21/11 vers 13 h 55 (« vérifier aussi le reste »… | Fait en 0.1731.0 |
 | X-726 | Relecture du bloc 0.1717 à 0.1720 (relecture 0.1720, 21/11), mineurs M1 : M1… | Fait en 0.1721.0 |
+| X-727 | Demande de l'utilisateur du 21/11 vers 14 h (capture de la fenêtre « Suivi… | Fait en 0.1733.0 |
+| X-728 | Bug signalé par l'utilisateur le 21/11 vers 14 h 42 : pas de menu Tensho au… | Fait en 0.1732.0 |
+| X-729 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), I1 : X-720 : un… | Fait en 0.1727.0 |
+| X-730 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), mineurs M1, M2… | Fait en 0.1729.0 |
+| X-731 | Relecture du bloc 0.1721 à 0.1726 (relecture 0.1726, 21/11), déjà là avant le… | Fait en 0.1727.0 |

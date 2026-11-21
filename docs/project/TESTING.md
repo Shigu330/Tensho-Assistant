@@ -537,7 +537,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.545) Carte : la molette zoome aussi sur la colonne d'outils et le curseur ; le pas et l'inversion fonctionnent.
 
-- [ ] (0.546) Carte, réglage activé : un clic gauche sur un endroit vide pose le drapeau ; un glisser ne le pose pas ; un clic sur une icône garde son effet.
+- [x] (0.546) Carte, réglage activé : un clic gauche sur un endroit vide pose le drapeau ; un glisser ne le pose pas ; un clic sur une icône garde son effet.
 
 - [x] (0.547) Carte, bouton « Couches » : chaque case change la carte, comme dans les réglages ; « Tout masquer » puis « Tout afficher » ; la colonne tient dans une petite fenêtre.
 
@@ -2447,9 +2447,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1677) Barre de côté : « Personnage » remplace Collections, Équipement, Chocobo, Bestiaire, La Grande Mascarade, Armes antiques et Dresseur ; ses huit onglets s'ouvrent ; quitter la page puis recliquer « Personnage » : l'onglet quitté revient
 
-- [ ] (0.1677) Recherche rapide : taper « bestiaire » puis « équipement » : le résultat « … · Personnage » ouvre le bon onglet ; depuis l'accueil, la tuile Équipement ouvre l'onglet Équipement
+- [x] (0.1677) Recherche rapide : taper « bestiaire » puis « équipement » : le résultat « … · Personnage » ouvre le bon onglet ; depuis l'accueil, la tuile Équipement ouvre l'onglet Équipement
 
-- [ ] (0.1678) Barre de côté : « Objets » ouvre quatre onglets (Recherche d'objets, Rangements, Trier, Marchés) ; « Souhaits » reste une entrée à part ; clic droit sur un objet du jeu › prix : l'onglet Marchés s'ouvre ; « Voir les quantités » de l'objet en contexte ouvre l'onglet Recherche d'objets
+- [x] (0.1678) Barre de côté : « Objets » ouvre quatre onglets (Recherche d'objets, Rangements, Trier, Marchés) ; « Souhaits » reste une entrée à part ; clic droit sur un objet du jeu › prix : l'onglet Marchés s'ouvre ; « Voir les quantités » de l'objet en contexte ouvre l'onglet Recherche d'objets
 
 - [ ] (0.1679) Barre de côté : « Monde » ouvre sept onglets (Carte, Météo, ALÉA, Échoppes, Butin des missions, Butin des monstres, Découvertes) ; « Artisanat » a l'onglet Macros et « Récolte » l'onglet Pêche en mer ; un lien de carte du chat ou « Voir sur la carte » ouvre l'onglet Carte ; la météo ouverte depuis une zone montre le nom de la zone sous le titre
 
@@ -2463,9 +2463,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1681) Aide › « Lancer le guide » : le guide montre les mêmes étapes qu'avant, sans page ni réglage nouveau ; seule la place des pages dans la barre de côté a changé.
 
-- [ ] (0.1683) Barre de côté : l'entrée « Alerte (n) » et la catégorie « CALENDRIER » remplacent « Alarmes » et « SUIVI » ; si la catégorie était repliée avant la mise à jour, elle l'est encore ; la page s'ouvre sur le titre « Alerte »
+- [x] (0.1683) Barre de côté : l'entrée « Alerte (n) » et la catégorie « CALENDRIER » remplacent « Alarmes » et « SUIVI » ; si la catégorie était repliée avant la mise à jour, elle l'est encore ; la page s'ouvre sur le titre « Alerte »
 
-- [ ] (0.1683) Recherche rapide : taper « alerte » propose la page Alerte et l'ouvre ; en anglais, « alarm » fait de même
+- [x] (0.1683) Recherche rapide : taper « alerte » propose la page Alerte et l'ouvre ; en anglais, « alarm » fait de même
 
 - [ ] (0.1685) Pêche normale : lancer, attendre la touche : le chrono s'arrête à la touche (« Touche à N s » avec « ! », « !! » ou « !!! ») et reste figé pendant le ferrage, que le poisson soit pris ou non ; au lancer suivant il repart de zéro ; le poisson pris a sa case « Temps de touche » marquée « » »
 
@@ -2495,14 +2495,14 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1694) Aide à la pêche au harpon : survoler le nom d'un poisson : info-bulle complète de l'objet, puis l'ombre et « vu » s'il l'a été
 
-- [ ] (0.1695) Jardin : survoler une plantation puis une graine des croisements : lignes du jardin, puis collection, stock, usages et comment obtenir la graine
+- [x] (0.1695) Jardin : survoler une plantation puis une graine des croisements : lignes du jardin, puis collection, stock, usages et comment obtenir la graine
 
 - [ ] (0.1695) Eurêka et Bozja, onglet des actions : survoler une action : icône, nom, catégorie et maximum, description du jeu
 
 - [ ] (0.1696) Paramètres › Général › Autres infobulles : couper « Météo actuelle » (Lieux) puis survoler un lien de carte du chat ou un favori de la carte : la météo n'y est plus ; la remettre : elle revient. Même chose avec « Boutiques » (PNJ) sur la page Marchands
 
 
-- [ ] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
+- [x] (0.1698) Alarmes (ou Rappels, Jardin) : tirer un onglet à une autre place, quitter la page puis revenir, puis recharger le plugin : l'ordre reste ; un lien qui ouvre un onglet précis (par exemple une alarme depuis la barre du serveur) ouvre toujours le bon ; Paramètres › Apparence › « Remettre les onglets des pages dans l'ordre » : l'ordre d'origine revient
 
 - [ ] (0.1700) Objets : ouvrir plusieurs objets de suite dans la fiche (un avec recette, un récoltable, un sans marché) : les onglets suivent sans clignoter ni montrer un corps vide, dans l'ordre rangé ; faire défiler l'aperçu d'un objet puis changer d'onglet et revenir : le défilement reste
 
@@ -2538,9 +2538,9 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1713) Carte de Tensho › réglages des zones colorées : décocher « Zones de récolte » : la case « Zones de récolte à horaire » se grise et aucune zone de récolte n'est dessinée, ni verte ni rose ; recocher : les deux reviennent
 
-- [ ] (0.1714) Fenêtre de chat Tensho : clic droit sur un onglet › « Détacher dans sa propre fenêtre » : l'onglet quitte la barre et s'ouvre dans sa propre fenêtre, avec son nom et ses messages ; les messages nouveaux y arrivent, les liens, le clic droit sur un message (copier, épingler, choisir du texte) et la molette y marchent ; la déplacer et la redimensionner, puis /xlplugins › recharger Tensho : elle revient à la même place
+- [x] (0.1714) Fenêtre de chat Tensho : clic droit sur un onglet › « Détacher dans sa propre fenêtre » : l'onglet quitte la barre et s'ouvre dans sa propre fenêtre, avec son nom et ses messages ; les messages nouveaux y arrivent, les liens, le clic droit sur un message (copier, épingler, choisir du texte) et la molette y marchent ; la déplacer et la redimensionner, puis /xlplugins › recharger Tensho : elle revient à la même place
 
-- [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, le bouton en haut de sa fenêtre (flèche vers une boîte), puis sa croix une autre fois : l'onglet revient dans la barre de la fenêtre de chat, affiché ; avec un seul onglet restant dans la fenêtre de chat, « Détacher » est grisé et son info-bulle dit pourquoi
+- [x] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, le bouton en haut de sa fenêtre (flèche vers une boîte), puis sa croix une autre fois : l'onglet revient dans la barre de la fenêtre de chat, affiché ; avec un seul onglet restant dans la fenêtre de chat, « Détacher » est grisé et son info-bulle dit pourquoi
 
 - [ ] (0.1714) Fenêtre de chat Tensho : avec un onglet détaché, taper « /tensho chat hide » : toutes les fenêtres de chat Tensho disparaissent ; recevoir un message, puis taper « /tensho chat » : elles reviennent, le message est là ; clic droit sur un onglet › « Masquer toutes les fenêtres de chat un moment » fait de même
 
@@ -2548,7 +2548,7 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [x] (0.1715) Mode développeur, après quelques lignes de combat (actions, dégâts, effets) dans le chat du jeu : dalamud.log a des lignes « Chat window, pieces of a combat line (kind …) » et « pieces of a message with a link » avec « Status … » (rien d'autre à faire : l'agent les lit)
 
-- [ ] (0.1716) Fenêtre de chat Tensho › roue dentée › Joueurs : ajouter plus de 8 noms à « Joueurs cachés » : la liste reste haute de 8 lignes avec sa barre de défilement, et la croix d'une ligne la retire toujours
+- [x] (0.1716) Fenêtre de chat Tensho › roue dentée › Joueurs : ajouter plus de 8 noms à « Joueurs cachés » : la liste reste haute de 8 lignes avec sa barre de défilement, et la croix d'une ligne la retire toujours
 
 - [ ] (0.1717) Fenêtre de chat Tensho, profils de contexte : dans un contexte dont le profil ne montre que des onglets détachés, la fenêtre de chat garde le premier de ces onglets (sa fenêtre détachée se cache) ; hors de ce contexte, il retourne dans sa fenêtre
 
@@ -2566,21 +2566,47 @@ hors plage : 0.303–0.306, 0.310–0.314. Une étape impossible (pas de compagn
 
 - [ ] (0.1720) Fenêtre de chat Tensho, onglet de combat : utiliser une compétence (et laisser un allié en utiliser une) : son nom dans la ligne « … utilise … » montre au survol l'info-bulle du jeu (icône, nom, description) ; le nom d'une action d'ennemi qui porte le nom d'une action de joueur n'a pas d'info-bulle
 
-- [ ] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
+- [x] (0.1722) Mode développeur, atelier de la compagnie, panneau de contrôle aérien : liste des aéronefs, puis le détail de l'aéronef (ses pièces) : le journal a des lignes « Workshop vessel read: Airship 1: rank …, speed …, range … » ; dire si vitesse, distance et pièces sont à 0 avant le détail et lues après
 
-- [ ] (0.1722) Compagnie libre › Trajets › Aéronefs : choisir l'aéronef : si ses valeurs n'ont pas été lues, une ligne dit « Vitesse et distance de ce vaisseau non lues… » et aucun trajet n'est cherché ; sinon vitesse et distance sont celles du jeu (ou « d'après ses pièces lues à l'atelier ») et des trajets sont proposés ; saisir une vitesse et une distance retire la ligne
+- [x] (0.1722) Compagnie libre › Trajets › Aéronefs : choisir l'aéronef : si ses valeurs n'ont pas été lues, une ligne dit « Vitesse et distance de ce vaisseau non lues… » et aucun trajet n'est cherché ; sinon vitesse et distance sont celles du jeu (ou « d'après ses pièces lues à l'atelier ») et des trajets sont proposés ; saisir une vitesse et une distance retire la ligne
 
-- [ ] (0.1723) Jardin, un emplacement dont l'heure calculée est passée sans avoir ouvert son menu en jeu : la grille dit « Mûr ? » (marque en sablier), l'info-bulle « Mûr selon le calcul, à confirmer en jeu » avec l'explication ; le message du chat dit « devrait être mûr selon le calcul » ; ouvrir le menu de l'emplacement en jeu quand il est mûr : « Mûr » (marque verte)
+- [x] (0.1723) Jardin, un emplacement dont l'heure calculée est passée sans avoir ouvert son menu en jeu : la grille dit « Mûr ? » (marque en sablier), l'info-bulle « Mûr selon le calcul, à confirmer en jeu » avec l'explication ; le message du chat dit « devrait être mûr selon le calcul » ; ouvrir le menu de l'emplacement en jeu quand il est mûr : « Mûr » (marque verte)
 
 - [ ] (0.1723) Mode développeur : planter une graine puis ouvrir le menu d'un emplacement : le journal a « Garden planting noted: patch …, bed …, seed item …, planted …, growing … h (…) » et « Garden bed state kept: … (… min now) … »
 
-- [ ] (0.1724) En équipe, quelques messages dans le chat d'équipe : la fenêtre de chat de Tensho écrit « [1] [icône SAG] [Nom] » (chiffre, puis icône et abréviation du job, puis le nom) dans la couleur du rôle ; quitter l'équipe : ces lignes gardent couleur et icône ; un message du même joueur après (s'il n'est plus proche) n'a pas de couleur
+- [x] (0.1724) En équipe, quelques messages dans le chat d'équipe : la fenêtre de chat de Tensho écrit « [1] [icône SAG] [Nom] » (chiffre, puis icône et abréviation du job, puis le nom) dans la couleur du rôle ; quitter l'équipe : ces lignes gardent couleur et icône ; un message du même joueur après (s'il n'est plus proche) n'a pas de couleur
 
 - [ ] (0.1724) Mode développeur, en équipe : le journal a « Chat window, pieces of a sender's name (kind 14): … » ; dire d'où viennent le chiffre et l'abréviation (glyphe U+…, mot en capitales, icône)
 
-- [ ] (0.1725) Barre du serveur, entrée « Reste à faire » activée : tout cocher dans Rappels (ou rien à faire) : l'entrée disparaît de la barre du serveur ; un rappel qui revient (remise à zéro) ou une tâche affichée : elle revient seule en quelques secondes
+- [x] (0.1725) Barre du serveur, entrée « Reste à faire » activée : tout cocher dans Rappels (ou rien à faire) : l'entrée disparaît de la barre du serveur ; un rappel qui revient (remise à zéro) ou une tâche affichée : elle revient seule en quelques secondes
 
 - [ ] (0.1726) Vos ventes, liste à vendre d'un servant avec des prix vus : le bouton « Copier » montre et copie le prix le plus bas vu moins 1 (coller dans le jeu) ; la colonne « Prix vu » dit « tableau, 13:45 » (l'heure entière au survol) ; à la largeur par défaut de la fenêtre, les colonnes « Prix vu » et « Copier » se voient en entier
+
+- [ ] (0.1727) Jardin, un emplacement dont l'heure calculée est passée sans que le jeu l'ait dit mûr : survoler l'icône des rappels terminés de la barre du serveur : la ligne dit « Emplacements mûrs selon le calcul, à confirmer en jeu : 1 », pas « Emplacements mûrs » ; ouvrir le menu de l'emplacement en jeu (mûr) : la ligne devient « Emplacements mûrs : 1 » ; l'accueil, ligne « Terminé », dit la même chose
+
+- [ ] (0.1727) si une récolte est à venir et les rappels du jardin activés : l'accueil, « Prochaine échéance », dit « <graine> : mûr (calcul) », comme l'onglet Alarmes du jardin
+
+- [ ] (0.1728) Planificateur de trajets, aéronef dont vitesse et distance sont inconnues (ligne « non lues ») : saisir la vitesse seule : la ligne reste et rien n'est cherché ; saisir aussi la distance : la ligne disparaît et la recherche donne des trajets
+
+- [ ] (0.1729) Fenêtre de discussion Tensho, en équipe, une ligne d'un membre (« [1] [SAG] Nom ») : chercher « [1] », puis « 1 SAG » : la ligne est trouvée les deux fois
+
+- [ ] (0.1730) Paramètres › Suivi et notifications › Barre du serveur : on y trouve toutes les cases de la barre du serveur (alarme, rappels, rappels terminés, devises, gils du jour, sacs, équipement, zone, alertes du chat, état de Tensho et son panneau), puis l'infobulle ; Général › En-tête et accueil n'en a plus ; Panneaux › Joueurs du chat n'a plus les alertes dans la barre
+
+- [ ] (0.1730) N'afficher que les sacs dans la barre du serveur : la case « Infobulle Tensho sur ses entrées » n'est pas grisée ; tout couper : elle l'est
+
+- [ ] (0.1730) Tableau de bord (état de Tensho), bouton « Détails », et clic sur l'entrée de l'état dans la barre du serveur : la page s'ouvre sur Suivi et notifications › Barre du serveur
+
+- [ ] (0.1731) Paramètres, Général : « Ouverture et fermeture de la fenêtre » a « Fermer Tensho quand il ouvre une fenêtre du jeu » ; « En-tête et accueil » n'a plus que les deux heures et l'annuaire ; « Survol et clic droit des objets » a « Afficher les prix au survol des objets en jeu » (grisé si Universalis est coupé) ; « Objets et marché » a « Tableau des ventes : copier l'offre la plus basse moins 1 »
+
+- [ ] (0.1731) Paramètres, Suivi et notifications › Alerte : « Fenêtre de suivi épinglée » y est ; Panneaux › À côté des fenêtres du jeu : « Panneau à côté de la liste de ventes des servants » ; Données › Sources communautaires : sous Universalis, la ligne dit où sont les prix au survol ; chercher « prix au survol » dans la recherche des réglages mène au bon endroit
+
+- [ ] (0.1732) Carnet de récolte du jeu, clic droit sur un objet (un objet de collection aussi) : le menu du jeu a l'entrée « Tensho » et ses outils portent sur cet objet
+
+- [ ] (0.1732) Carnet de pêche du jeu, clic droit sur un poisson : l'entrée « Tensho » apparaît ; sinon, en mode développeur, lire la ligne « Context menu opened » du journal (nom de la fenêtre, objet survolé)
+
+- [ ] (0.1733) Fenêtre « Suivi Tensho » avec une alarme d'objet créée sans icône (terreau, minerai) : la ligne montre l'icône de l'objet ; survoler l'icône ou le nom : l'info-bulle de l'objet, avec sous son nom le lieu et la prochaine alarme
+
+- [ ] (0.1733) Clic droit sur une ligne du suivi : « Ouvrir le module Alerte », « Couper cette alarme » (la ligne disparaît, l'alarme est coupée dans Alerte), « Carte », puis le menu habituel de l'objet
 
 **0.535 : interfaces** — à voir en jouant
 
