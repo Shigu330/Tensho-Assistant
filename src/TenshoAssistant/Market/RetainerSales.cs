@@ -8,7 +8,8 @@ namespace TenshoAssistant.Market;
 /// <summary>A retainer's listing as the game's sale list shows it. UnitPrice is null when its text could not be read.</summary>
 public sealed record RetainerListing(int Row, uint ItemId, bool Hq, int Quantity, long? UnitPrice);
 public enum RetainerSalesStatus { Closed, Ready, Unavailable }
-public sealed record RetainerSalesState(RetainerSalesStatus Status, IReadOnlyList<RetainerListing> Listings, IReadOnlySet<string> OwnNames, string HomeWorld, bool AtHome);
+/// <summary>X-698 M4 (0.1671): RetainerId and Town: the open retainer (RetainerManager.LastSelectedRetainerId) and its market's Town row; 0: unknown.</summary>
+public sealed record RetainerSalesState(RetainerSalesStatus Status, IReadOnlyList<RetainerListing> Listings, IReadOnlySet<string> OwnNames, string HomeWorld, bool AtHome, ulong RetainerId = 0, byte Town = 0);
 public enum RetainerVerdictKind { Unknown, PriceUnknown, Alone, Lowest, Tied, Undercut }
 /// <summary>Paste: the price to copy, only when another seller is at or under yours. Null otherwise.</summary>
 public sealed record RetainerVerdict(RetainerVerdictKind Kind, long? Lowest, long? Gap, string? Competitor, long? Paste);
@@ -88,10 +89,15 @@ public static class RetainerSales
     }
 }
 
-/// <summary>One request for a retainer's items, on the player's click, at least 3 s apart, bounded in size. Its own short path: it shares no state with the market page.</summary>
+/// <summary>One request for a retainer's items, on the player's click, at least 3 s apart, bounded in size. Its own short path: it shares no state with the market page.
+/// X-698 M1 (0.1671): the sale panel and the sale list each have their own (Plugin.cs): one's answer no longer wipes the other's.</summary>
 public sealed class RetainerCompareService : IDisposable
 {
-    private const int MaximumBytes = 4 * 1024 * 1024;
+    /// <summary>X-698 M3 (0.1671): the answer's limit grows with the items asked: 64 KB an item, 4 MB at least. Measured on 21/11
+    /// (docs/evidence/0.1671-retainer-sale-list-review.md): 355 bytes a listing, the largest item 30 100 bytes for 76 listings, so about
+    /// 40 KB for an item's 100 listings; 100 items fit in 6.4 MB where 4 MB could be passed.</summary>
+    public const int MinimumBytes = 4 * 1024 * 1024, BytesPerItem = 64 * 1024;
+    public static int MaximumBytes(int items) => Math.Max(MinimumBytes, items * BytesPerItem);
     private static readonly TimeSpan Pause = TimeSpan.FromSeconds(3);
     private readonly HttpClient client;
     private readonly bool ownsClient;
@@ -101,6 +107,9 @@ public sealed class RetainerCompareService : IDisposable
     private DateTimeOffset nextAllowed;
     private bool disposed;
     public Func<bool>? Enabled { get; set; }
+    /// <summary>X-698 M2 (0.1671): the sale list's service keeps what Universalis answered on the same world and adds each new answer to it,
+    /// so that clicks one after the other cover more than 100 items; an item asked and not answered is kept as « no data » (never asked first again).</summary>
+    public bool Accumulate { get; init; }
     public RetainerCompareState State { get { lock (gate) return state; } }
 
     public RetainerCompareService(HttpClient? client = null)
@@ -121,7 +130,7 @@ public sealed class RetainerCompareService : IDisposable
         {
             if (disposed || state.Loading || now < nextAllowed || asked.Length == 0 || world.Length == 0 || Enabled?.Invoke() == false) return false;
             nextAllowed = now + Pause;
-            state = state with { Loading = true, Error = null, World = world };
+            state = state with { Loading = true, Error = null, World = world, Items = Accumulate && state.World != world ? null : state.Items };
         }
         _ = Task.Run(() => Fetch(world, asked));
         return true;
@@ -129,22 +138,41 @@ public sealed class RetainerCompareService : IDisposable
 
     private async Task Fetch(string world, IReadOnlyList<uint> asked)
     {
-        RetainerCompareState result;
+        IReadOnlyDictionary<uint, RetainerItemOffers>? items = null;
+        string? error = null;
+        DateTimeOffset? at = null;
         // X-170 (0.1144, GPT audit): the setting read again at departure: turned off since the click, nothing leaves and what was known stays.
         if (Enabled?.Invoke() == false) { lock (gate) if (!disposed) state = state with { Loading = false }; return; }
         try
         {
-            // X-76 (step 2): the shared bounded reader (size limit, Tensho's User-Agent, strict UTF-8).
-            var json = await BoundedHttp.ReadAsync(client, new Uri(Address(world, asked)), MaximumBytes, cancellation.Token).ConfigureAwait(false);
-            var now = DateTimeOffset.UtcNow;
-            result = new(false, RetainerSales.ParseMany(json, world, asked, now), null, now, world);
+            // X-76 (step 2): the shared bounded reader (size limit, Tensho's User-Agent, strict UTF-8). X-698 M3: the limit follows the items asked.
+            var json = await BoundedHttp.ReadAsync(client, new Uri(Address(world, asked)), MaximumBytes(asked.Count), cancellation.Token).ConfigureAwait(false);
+            at = DateTimeOffset.UtcNow;
+            items = RetainerSales.ParseMany(json, world, asked, at.Value);
         }
-        catch (OperationCanceledException) { result = new(false, null, "Network", null, world); }
-        catch (HttpRequestException) { result = new(false, null, "Network", null, world); }
-        catch (Exception error) when (error is JsonException or InvalidDataException or KeyNotFoundException or FormatException or DecoderFallbackException) { result = new(false, null, "Data", null, world); }
+        catch (OperationCanceledException) { error = "Network"; }
+        catch (HttpRequestException) { error = "Network"; }
+        catch (Exception failure) when (failure is JsonException or InvalidDataException or KeyNotFoundException or FormatException or DecoderFallbackException) { error = "Data"; }
         // X-589 (external audit A12 of 18/11): any other error of the answer ends the request too (« loading » was kept for the session).
-        catch (Exception) { result = new(false, null, "Data", null, world); }
-        lock (gate) if (!disposed) state = result;
+        catch (Exception) { error = "Data"; }
+        lock (gate)
+        {
+            if (disposed) return;
+            state = Merged(state, world, asked, items, error, at, Accumulate);
+        }
+    }
+
+    /// <summary>X-698 M1 and M2 (0.1671): the state after an answer. Without <paramref name="accumulate"/>: the answer alone, as before. With it:
+    /// the answer added to what the same world already answered (an item asked and missing is « no data »), and an error keeps what was known.</summary>
+    public static RetainerCompareState Merged(RetainerCompareState before, string world, IReadOnlyList<uint> asked, IReadOnlyDictionary<uint, RetainerItemOffers>? items,
+        string? error, DateTimeOffset? at, bool accumulate)
+    {
+        var kept = accumulate && before.World == world ? before.Items : null;
+        if (items is null) return new(false, kept, error ?? "Data", before.FetchedAt is { } previous && kept is not null ? previous : null, world);
+        if (!accumulate) return new(false, items, null, at, world);
+        var merged = kept is null ? new Dictionary<uint, RetainerItemOffers>() : new Dictionary<uint, RetainerItemOffers>(kept);
+        foreach (var item in asked) merged[item] = items.GetValueOrDefault(item) ?? new RetainerItemOffers([], null);
+        return new(false, merged, null, at, world);
     }
 
     public void Dispose()

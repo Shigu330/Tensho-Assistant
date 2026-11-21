@@ -68,13 +68,22 @@ internal sealed class RetainerSalesReader : IDisposable
             }
             var own = new HashSet<string>();
             var manager = RetainerManager.Instance();
+            // X-698 M4 (0.1671): the open retainer and its market's Town row, read here (no game function called), for the city's tax rate.
+            ulong openRetainer = 0;
+            byte town = 0;
             if (manager != null && manager->IsReady)
+            {
+                var selected = manager->LastSelectedRetainerId;
                 foreach (ref var retainer in manager->Retainers)
+                {
                     if (retainer.RetainerId != 0 && retainer.NameString is { Length: > 0 } name) own.Add(name);
+                    if (selected != 0 && retainer.RetainerId == selected) { openRetainer = selected; town = (byte)retainer.Town; }
+                }
+            }
             var home = player.HomeWorld.IsValid ? player.HomeWorld.Value.Name.ExtractText() : "";
             var atHome = player.HomeWorld.RowId != 0 && player.HomeWorld.RowId == player.CurrentWorld.RowId;
             failure = null;
-            Publish(new(RetainerSalesStatus.Ready, listings.AsReadOnly(), own, home, atHome));
+            Publish(new(RetainerSalesStatus.Ready, listings.AsReadOnly(), own, home, atHome, openRetainer, town));
             var capture = string.Join(";", raw);
             if (developer?.Invoke() == true && capture != lastRaw && rawLines < 40) { lastRaw = capture; rawLines++; log.Information("Retainer sale list: {0} rows: {1}", count, capture); }
         }

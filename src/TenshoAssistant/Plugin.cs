@@ -527,6 +527,12 @@ public sealed partial class Plugin : IDalamudPlugin
             mainWindow.RetainerSalesSource=()=>retainerSales?.State ?? new(Market.RetainerSalesStatus.Closed,[],new HashSet<string>(),"",false);
             Market.RetainerCompareService? retainerCompare=null;
             registrations.Register(()=>mainWindow.RetainerCompare=retainerCompare=new Market.RetainerCompareService{Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerCompare?.Dispose());
+            // X-698 M1 (0.1671): the sale list's own requests (its answers added up), apart from the panel's; M4: the market tax rates the game sends.
+            Market.RetainerCompareService? retainerSaleListCompare=null;
+            registrations.Register(()=>mainWindow.RetainerSaleListCompare=retainerSaleListCompare=new Market.RetainerCompareService{Accumulate=true,Enabled=()=>CommunitySources.Allowed(configuration,SourceUse.UniversalisRetainerCompare)},()=>retainerSaleListCompare?.Dispose());
+            Market.MarketTaxReader? marketTaxes=null;
+            registrations.Register(()=>marketTaxes=new Market.MarketTaxReader(marketBoardEvents,log),()=>marketTaxes?.Dispose());
+            mainWindow.MarketTaxRatesSource=()=>marketTaxes?.Rates;
             Help.CommunityHelpIndex? communityHelp=null;
             registrations.Register(()=>mainWindow.CommunityHelp=communityHelp=new Help.CommunityHelpIndex(),()=>communityHelp?.Dispose());
             registrations.Register(()=>boardReader=new Beastmaster.BeastBoardReader(framework,gameGui,log,()=>mainWindow.Beasts?.State.Catalog?.Beasts,mainWindow.BeastRanksRead,mainWindow.BeastResultRead,mainWindow.BeastBookRead),()=>boardReader?.Dispose());

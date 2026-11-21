@@ -9,10 +9,14 @@ namespace TenshoAssistant;
 internal sealed partial class MainWindow
 {
     // X-695 (0.1667): the sale list shown or not, the retainer chosen (null: the one recorded last, the one open), the list worked out again
-    // only when the inventory, the prices seen, Universalis' answer or the minute change, never each frame.
+    // only when the inventory, the prices seen, Universalis' answer, the tax rate or the minute change, never each frame.
     private bool retainerSaleListOpen;
     private BankKey? retainerSaleListChosen;
-    private (InventorySnapshot? Snapshot, long Revision, object? Universalis, long Minute, SaleList List) retainerSaleListSeen = (null, -1, null, 0, new([], 0, []));
+    private (InventorySnapshot? Snapshot, long Revision, object? Universalis, long Minute, int Tax, SaleList List) retainerSaleListSeen = (null, -1, null, 0, -1, new([], 0, []));
+    /// <summary>X-698 M1 (0.1671): the sale list's own Universalis requests (it accumulates its answers), apart from the sale panel's.</summary>
+    internal RetainerCompareService? RetainerSaleListCompare { get; set; }
+    /// <summary>X-698 M4 (0.1671): the market tax rates the game sent (MarketTaxReader), null before.</summary>
+    internal Func<MarketTaxRates?>? MarketTaxRatesSource { get; set; }
 
     private void DrawRetainerSaleListButton(RetainerSalesState state)
     {
@@ -35,18 +39,26 @@ internal sealed partial class MainWindow
             finally { ImGui.EndCombo(); }
         }
         Tip("RetainerSales.SaleListRetainerTip");
-        var compare = RetainerCompare?.State;
+        var compare = RetainerSaleListCompare?.State;
         var universalis = compare is { Items: not null } && compare.World == state.HomeWorld ? compare.Items : null;
-        var list = RetainerSaleListOf(shown, state, universalis);
+        // X-698 M4 (0.1671): the tax of the open retainer's city when the game sent it; another retainer's city is not known here: the help's rate.
+        var cityTax = shown.Key.StorageId == state.RetainerId ? MarketTax.RateFor(MarketTaxRatesSource?.Invoke(), state.Town, DateTimeOffset.UtcNow) : null;
+        var tax = cityTax ?? MarketTax.HelpPercent;
+        var list = RetainerSaleListOf(shown, state, universalis, tax);
         ImGui.SameLine();
-        ImGui.BeginDisabled(RetainerCompare is null || compare is { Loading: true } || !state.AtHome || !SourceOn(SourceUse.UniversalisRetainerCompare) || list.ToAsk.Count == 0);
+        ImGui.BeginDisabled(RetainerSaleListCompare is null || compare is { Loading: true } || !state.AtHome || !SourceOn(SourceUse.UniversalisRetainerCompare) || list.ToAsk.Count == 0);
         try
         {
             if (ImGui.SmallButton(localization.Get("RetainerSales.SaleListPrices")))
-                RetainerCompare?.Request(state.HomeWorld, list.ToAsk, DateTimeOffset.UtcNow, RetainerSaleList.Asked);
+                RetainerSaleListCompare?.Request(state.HomeWorld, list.ToAsk, DateTimeOffset.UtcNow, RetainerSaleList.Asked);
         }
         finally { ImGui.EndDisabled(); }
         Tip(SourceOn(SourceUse.UniversalisRetainerCompare) ? "RetainerSales.SaleListPricesTip" : "RetainerSales.SourceOffTip");
+        ImGui.SameLine();
+        ImGui.TextDisabled(compare is { Loading: true } ? localization.Get("RetainerSales.Loading")
+            : compare?.Error is { } error ? localization.Get("RetainerSales.Error" + error)
+            : compare?.FetchedAt is { } at ? localization.Format("RetainerSales.FetchedAt", at.ToLocalTime().ToString("HH:mm"))
+            : localization.Get("RetainerSales.NotAsked"));
         ImGui.TextDisabled(localization.Format("RetainerSales.SaleListRecorded", shown.Snapshot.ObservedAt.ToLocalTime().ToString("g")));
         if (list.Rows.Count == 0) EmptyState("RetainerSales.SaleListEmpty");
         else if (UI.UiComponents.BeginDataTable("RetainerSaleListTable", 7))
@@ -84,15 +96,16 @@ internal sealed partial class MainWindow
             finally { ImGui.EndTable(); }
         }
         if (list.Unknown > 0) ImGui.TextDisabled(localization.Format("RetainerSales.SaleListUnknown", list.Unknown));
-        ImGui.TextDisabled(localization.Get("RetainerSales.SaleListFooter"));
+        ImGui.TextDisabled(localization.Format("RetainerSales.SaleListFooter", tax, localization.Get(cityTax is null ? "RetainerSales.SaleListTaxHelp" : "RetainerSales.SaleListTaxCity")));
         ImGui.Separator();
     }
 
-    private SaleList RetainerSaleListOf(BankEntry entry, RetainerSalesState state, IReadOnlyDictionary<uint, RetainerItemOffers>? universalis)
+    private SaleList RetainerSaleListOf(BankEntry entry, RetainerSalesState state, IReadOnlyDictionary<uint, RetainerItemOffers>? universalis, int tax)
     {
         var store = SeenPrices is { } seen && configuration.Discovery.Enabled && configuration.Discovery.MarketPrices ? seen : null;
         var now = DateTimeOffset.UtcNow; var minute = now.ToUnixTimeSeconds() / 60; var revision = store?.Revision ?? -1;
-        if (ReferenceEquals(retainerSaleListSeen.Snapshot, entry.Snapshot) && retainerSaleListSeen.Revision == revision && ReferenceEquals(retainerSaleListSeen.Universalis, universalis) && retainerSaleListSeen.Minute == minute)
+        if (ReferenceEquals(retainerSaleListSeen.Snapshot, entry.Snapshot) && retainerSaleListSeen.Revision == revision && ReferenceEquals(retainerSaleListSeen.Universalis, universalis)
+            && retainerSaleListSeen.Minute == minute && retainerSaleListSeen.Tax == tax)
             return retainerSaleListSeen.List;
         var prices = market.State;
         var world = prices.WorldName == state.HomeWorld ? prices.WorldId : prices.WorldNames?.FirstOrDefault(pair => pair.Value == state.HomeWorld).Key ?? 0;
@@ -108,8 +121,8 @@ internal sealed partial class MainWindow
                 fetched = new SalePrice(cheapest, SaleSource.Universalis, offers.DataAt);
             return RetainerSaleList.Newest(board, fetched);
         }
-        var list = RetainerSaleList.Build(stacks, item => catalog?.Find(item), Price);
-        retainerSaleListSeen = (entry.Snapshot, revision, universalis, minute, list);
+        var list = RetainerSaleList.Build(stacks, item => catalog?.Find(item), Price, tax, item => universalis?.ContainsKey(item) == true);
+        retainerSaleListSeen = (entry.Snapshot, revision, universalis, minute, tax, list);
         return list;
     }
 }

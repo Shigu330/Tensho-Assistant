@@ -27,7 +27,8 @@ internal static class RetainerSaleList1667Tests
             Check(list.Rows[1] is { Item:1,Hq:true,Total:1425,Npc:null } && list.Rows[2] is { Item:2,Total:494,Npc:500 },"HQ ore: no NPC price; potion: 494 after tax");
             Check(list.Rows[2].NpcBetter && !list.Rows[0].NpcBetter,"the NPC pays more for the potion");
             Check(list.Rows.All(row=>row.Item!=3),"an item the market does not take: left out, whatever its price");
-            Check(list.Unknown==1 && list.ToAsk.SequenceEqual(new uint[]{1,2,4}),"one marketable item without a price (unknown, never 0); the items to ask Universalis");
+            // X-698 M2 (0.1671): the item without a price is asked first, then the most valuable.
+            Check(list.Unknown==1 && list.ToAsk.SequenceEqual(new uint[]{4,1,2}),"one marketable item without a price (unknown, never 0); the items to ask Universalis");
         }),
         ("Retainer sale list 1667: 20 at most, the most profitable; the newer price; the retainer's pages only",()=>
         {
@@ -43,8 +44,9 @@ internal static class RetainerSaleList1667Tests
         {
             var panel=Read("src/TenshoAssistant/MainWindow.RetainerSales.cs");
             var window=Read("src/TenshoAssistant/MainWindow.RetainerSaleList.cs");
-            Check(panel.Contains("DrawRetainerSaleListButton(state);") && window.Split("RetainerCompare?.Request(").Length==2
-                  && window.Contains("if (ImGui.SmallButton(localization.Get(\"RetainerSales.SaleListPrices\")))\n                RetainerCompare?.Request(state.HomeWorld, list.ToAsk, DateTimeOffset.UtcNow, RetainerSaleList.Asked);"),"button; Universalis asked on its click only");
+            // X-698 M1 (0.1671): the list's own service (RetainerSaleListCompare), apart from the panel's.
+            Check(panel.Contains("DrawRetainerSaleListButton(state);") && window.Split("RetainerSaleListCompare?.Request(").Length==2
+                  && window.Contains("if (ImGui.SmallButton(localization.Get(\"RetainerSales.SaleListPrices\")))\n                RetainerSaleListCompare?.Request(state.HomeWorld, list.ToAsk, DateTimeOffset.UtcNow, RetainerSaleList.Asked);"),"button; Universalis asked on its click only");
             Check(window.Contains("SourceOn(SourceUse.UniversalisRetainerCompare)") && !window.Contains("SetRetainerMarketPrice"),"source setting; no game call");
             Check(Read("src/TenshoAssistant/Market/RetainerSales.cs").Contains("Math.Clamp(maximum, 1, RetainerSaleList.Asked)"),"100 at most");
         }),
