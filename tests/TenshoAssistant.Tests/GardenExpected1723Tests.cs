@@ -56,7 +56,7 @@ internal static class GardenExpected1723Tests
             var view = Read("MainWindow.GardenView.cs");
             Check(view.Contains("else if(state==GardenState.Expected){ImGui.TextColored(Accent,localization.Get(\"Garden.StateExpectedShort\"));TipText(localization.Get(\"Garden.ExpectedWhy\"));}", StringComparison.Ordinal)
                 && view.Contains("GardenBadge.Expected=>(Accent,background,FontAwesomeIcon.HourglassEnd),", StringComparison.Ordinal), "the grid: « Ripe? » and its mark");
-            Check(Read("Reminders/ReminderCounts.cs").Contains("GardenJournal.State(bed,now) is GardenState.Ripe or GardenState.Expected", StringComparison.Ordinal), "counted among the beds to look at");
+            Check(Read("Reminders/ReminderCounts.cs").Contains("Add(FinishedKind.GardenExpected,beds?.Count(bed=>GardenJournal.State(bed,now)==GardenState.Expected) ?? 0);", StringComparison.Ordinal), "counted among the beds to look at, apart (X-729)");
             var fr = Read("Localization/Languages/fr.json");
             Check(fr.Contains("\"StateExpected\": \"Mûr selon le calcul, à confirmer en jeu\"", StringComparison.Ordinal) && fr.Contains("\"AlarmRipe\": \"Mûr (calcul)\"", StringComparison.Ordinal), "fr");
             Check(Read("Localization/Languages/en.json").Contains("\"ExpectedNotice\": \"Garden: {0} should be ripe by the calculation, to confirm in game — {1}.\"", StringComparison.Ordinal), "en");
