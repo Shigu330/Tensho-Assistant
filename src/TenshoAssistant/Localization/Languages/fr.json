@@ -2689,6 +2689,9 @@
     "ScopeTip": "Portée lue sur Universalis pour les annonces et les ventes : votre monde, votre centre de traitement de données ou votre région. Grisée tant que son nom n'est pas connu. Le choix est gardé : la page s'ouvre dessus la fois suivante.",
     "QualityTip": "Annonces et ventes prises en compte : NQ et HQ, NQ seulement ou HQ seulement ; les statistiques de ventes suivent ce choix.",
     "WorldTip": "Ne garde que les annonces et ventes de ce monde ; « Tous les mondes » les montre toutes.",
+    "CopyCsv": "Copier en CSV",
+    "CopyCsvTip": "Copie les ventes affichées (les filtres au-dessus et l'ordre du tableau) en texte CSV, une ligne par vente : objet, date, monde, prix unitaire, quantité, qualité, à coller dans un tableur. Aucun nom de joueur n'est gardé.",
+    "CsvCopied": "{0} vente(s) copiée(s).",
     "SortHelp": "Cliquez sur un en-tête pour trier ; cliquez à nouveau pour inverser l'ordre."
   },
   "MarketUi": {

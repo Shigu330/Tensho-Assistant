@@ -2689,6 +2689,9 @@
     "ScopeTip": "Range read from Universalis for listings and sales: your world, Data Center or region. Greyed out until its name is known. The choice is saved: the page opens on it next time.",
     "QualityTip": "Listings and sales counted: NQ and HQ, NQ only or HQ only; sale statistics follow this choice.",
     "WorldTip": "Keeps only the listings and sales of this world; « All worlds » shows them all.",
+    "CopyCsv": "Copy as CSV",
+    "CopyCsvTip": "Copies the sales shown (the filters above and the table's order) as CSV text, one line per sale: item, date, world, unit price, quantity, quality, to paste into a spreadsheet. No player's name is kept.",
+    "CsvCopied": "{0} sale(s) copied.",
     "SortHelp": "Click a header to sort; click again to reverse the order."
   },
   "MarketUi": {

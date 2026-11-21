@@ -66,6 +66,28 @@ public sealed record MarketSaleStats(int Sales,int Units,long Minimum,double Ave
 
 public static class MarketBoardMath
 {
+    /// <summary>
+    /// X-212 part 2 (0.1756, the user's request of 12/11): the sales shown, as CSV for a spreadsheet (as BankList.Csv): one line per sale in the
+    /// order given (the table's, with its filters and sort): the item, the date (ISO 8601 with its offset), the world, the unit price, the
+    /// quantity, NQ or HQ. A sale holds no buyer or seller (MarketSale): nothing of another player is copied (R04).
+    /// </summary>
+    public static string SalesCsv(uint item,string name,IEnumerable<MarketSale> sales)
+    {
+        var invariant=System.Globalization.CultureInfo.InvariantCulture;
+        var text=new System.Text.StringBuilder("ItemId,Item,Date,World,UnitPrice,Quantity,Quality\n");
+        foreach(var sale in sales)
+            text.Append(string.Join(",",item.ToString(invariant),CsvQuote(name),sale.At.ToString("yyyy-MM-ddTHH:mm:sszzz",invariant),CsvQuote(sale.World),
+                sale.UnitPrice.ToString(invariant),sale.Quantity.ToString(invariant),sale.Hq ? "HQ":"NQ")).Append('\n');
+        return text.ToString();
+    }
+
+    // Quoted, inner quotes doubled; a leading = + - @ is prefixed so a spreadsheet never reads a field as a formula (as BankList, VoyageHistory).
+    private static string CsvQuote(string value)
+    {
+        var safe=value.Length>0 && "=+-@".Contains(value[0]) ? "'"+value:value;
+        return "\""+safe.Replace("\"","\"\"")+"\"";
+    }
+
     public const int MaximumWanted=9999;
 
     /// <summary>Cheapest set of whole listings (a market listing cannot be split) giving at least <paramref name="wanted"/> units, tax
